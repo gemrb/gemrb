@@ -203,7 +203,7 @@ String TLKImporter::BuiltinToken(const ieVariable& Token)
 
 	//these are hardcoded, all engines are the same or don't use them
 	if (Token == "DAYANDMONTH") {
-		ieDword dayandmonth = core->GetVariable("DAYANDMONTH", 0);
+		ieDword dayandmonth = core->GetDictionary().Get("DAYANDMONTH", 0);
 		//preparing sub-tokens
 		core->GetCalendar()->GetMonthName((int) dayandmonth);
 		return GetString(ieStrRef::DAYANDMONTH, STRING_FLAGS::RESOLVE_TAGS);
@@ -244,7 +244,7 @@ String TLKImporter::BuiltinToken(const ieVariable& Token)
 	}
 	if (Token == "MAGESCHOOL") {
 		//this is subject to change, the row number in magesch.2da, default value is 0 (generalist)
-		ieDword row = core->GetVariable("MAGESCHOOL", 0);
+		ieDword row = core->GetDictionary().Get("MAGESCHOOL", 0);
 		AutoTable tm = gamedata->LoadTable("magesch");
 		if (tm) {
 			ieStrRef value = tm->QueryFieldAsStrRef(row, 2);

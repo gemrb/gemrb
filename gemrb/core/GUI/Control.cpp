@@ -172,14 +172,14 @@ void Control::UpdateDictValue() noexcept
 	value_t curVal = op == BitOp::SET ? INVALID_VALUE : 0;
 	std::string key{VarName.c_str()};
 
-	auto lookup = vars.find(key);
-	if (lookup != vars.cend()) {
-		curVal = lookup->second;
+	auto lookup = vars.Get(key);
+	if (lookup != nullptr) {
+		curVal = *lookup;
 	}
 
 	value_t newVal = curVal;
 	SetBits(newVal, Value, op);
-	vars[key] = newVal;
+	vars.Set(key, newVal);
 
 	const Window* win = GetWindow();
 	if (win) {
@@ -205,9 +205,9 @@ void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange val
 		UpdateDictValue();
 	} else {
 		auto& vars = core->GetDictionary();
-		auto lookup = vars.find(VarName.c_str());
-		if (lookup != vars.cend()) {
-			UpdateState(VarName, lookup->second);
+		auto lookup = vars.Get(VarName);
+		if (lookup != nullptr) {
+			UpdateState(VarName, *lookup);
 		}
 	}
 }

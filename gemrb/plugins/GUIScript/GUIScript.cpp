@@ -1901,10 +1901,10 @@ control. See more about this in 'data_exchange'.\n\
 static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 {
 	PyObject* Value;
-	char* VarName;
+	PyObject* pyVar = nullptr;
 	unsigned int min = Control::INVALID_VALUE;
 	unsigned int max = Control::INVALID_VALUE;
-	PARSE_ARGS(args, "OsO|II", &self, &VarName, &Value, &min, &max);
+	PARSE_ARGS(args, "OOO|II", &self, &pyVar, &Value, &min, &max);
 
 	Control* ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
@@ -1915,14 +1915,16 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 		val = static_cast<Control::value_t>(PyLong_AsUnsignedLongMask(Value));
 	}
 
-	Control::value_t realVal = core->GetVariable(VarName, 0);
+	StringView VarName = PyString_AsStringView(pyVar);
+
+	Control::value_t realVal = core->GetDictionary().Get(VarName, 0);
 	Control::varname_t varname = Control::varname_t(VarName);
 
 	ctrl->BindDictVariable(varname, val, Control::ValueRange(min, max));
 	// restore variable for sliders, since it's only a multiplier for them
 	if (ctrl->ControlType == IE_GUI_SLIDER) {
 		ctrl->UpdateState(realVal);
-		core->GetDictionary()[VarName] = val * static_cast<Slider*>(ctrl)->GetPosition();
+		core->GetDictionary().Set(VarName, val * static_cast<Slider*>(ctrl)->GetPosition());
 	}
 
 	// refresh python copies
@@ -4022,7 +4024,7 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 	unsigned long value;
 	PARSE_ARGS(args, "Ok", &Variable, &value);
 
-	core->GetDictionary()[PyString_AsStringView(Variable).CString()] = (ieDword) value;
+	core->GetDictionary().Set(PyString_AsStringView(Variable), value);
 
 	//this is a hack to update the settings deeper in the core
 	UpdateActorConfig();
@@ -4111,7 +4113,7 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 	PyObject* Variable;
 	PARSE_ARGS( args, "O", &Variable );
 
-	ieDword value = core->GetVariable(PyString_AsStringView(Variable).CString(), 0);
+	ieDword value = core->GetDictionary().Get(PyString_AsStringView(Variable), 0);
 	if (!value) {
 		return PyLong_FromLong(0);
 	}
@@ -4276,7 +4278,7 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 
 	ResRef resref = ResRefFromPy(string);
 	//Lookup will leave the flag untouched if it doesn't exist yet
-	ieDword ind = core->GetVariable(resref.c_str(), 0);
+	ieDword ind = core->GetDictionary().Get(resref, 0);
 	if (flag)
 		ind = 0;
 	if (!ind) {
@@ -11416,7 +11418,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		}
 		actor->spellbook.FindSpellInfo(&spelldata, actor->PCStats->QuickSpells[spell], actor->PCStats->QuickSpellBookType[spell]);
 	} else {
-		ieDword ActionLevel = core->GetVariable("ActionLevel", 0);
+		ieDword ActionLevel = core->GetDictionary().Get("ActionLevel", 0);
 		if (ActionLevel == 5) {
 			// get the right spell, since the lookup below only checks the memorized list
 			actor->spellbook.SetCustomSpellInfo(data, ResRef(), type);

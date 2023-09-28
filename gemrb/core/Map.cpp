@@ -1616,7 +1616,7 @@ BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, cons
 		return BlitFlags::NONE; // not behind a wall, no stencil required
 	}
 
-	ieDword always_dither = core->GetVariable("Always Dither", 0);
+	ieDword always_dither = core->GetDictionary().Get("Always Dither", 0);
 
 	BlitFlags flags = BlitFlags::STENCIL_DITHER; // TODO: make dithering configurable
 	if (always_dither) {
@@ -3529,8 +3529,7 @@ bool Map::HasWeather() const
 	if ((AreaType & (AT_WEATHER|AT_OUTDOOR) ) != (AT_WEATHER|AT_OUTDOOR) ) {
 		return false;
 	}
-	ieDword tmp = core->GetVariable("Weather", 1);
-	return !!tmp;
+	return core->GetDictionary().Get("Weather", true);
 }
 
 int Map::GetWeather() const

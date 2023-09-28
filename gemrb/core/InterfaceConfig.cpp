@@ -318,7 +318,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	
 	// everything else still remaining in cfg is populated into the variables
 	for (const auto& pair : cfg) {
-		config.vars[pair.first] = atoi(pair.second.c_str());
+		config.vars.Set(pair.first, atoi(pair.second.c_str()));
 	}
 	
 	return config;

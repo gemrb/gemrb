@@ -408,7 +408,7 @@ void Game::InitActorPos(Actor *actor) const
 		error("Game", "Game is missing character start data.");
 	}
 	// 0 - single player, 1 - tutorial, 2 - expansion
-	ieDword playmode = core->GetVariable("PlayMode", 0);
+	ieDword playmode = core->GetDictionary().Get("PlayMode", 0);
 
 	//Sometimes playmode is set to -1 (in pregenerate)
 	//normally execution shouldn't ever come here, but it actually does
@@ -1888,7 +1888,7 @@ void Game::CastOnRest() const
 	using RestSpells = std::vector<HealingResource>;
 	using RestTargets = std::vector<Injured>;
 
-	ieDword tmp = core->GetVariable("Heal Party on Rest", 0);
+	ieDword tmp = core->GetDictionary().Get("Heal Party on Rest", 0);
 
 	const auto& special_spells = gamedata->GetSpecialSpells();
 	size_t specialCount = special_spells.size();
@@ -2015,7 +2015,7 @@ void Game::Infravision()
 	const Map *map = GetCurrentArea();
 	if (!map) return;
 
-	ieDword tmp = core->GetVariable("infravision", 0);
+	ieDword tmp = core->GetDictionary().Get("infravision", 0);
 
 	bool someoneWithInfravision = false;
 	bool allSelectedWithInfravision = true;
@@ -2220,7 +2220,7 @@ void Game::SetExpansion(ieDword value)
 		break;
 	//TODO: move this hardcoded hack to the scripts
 	case 0:
-		core->GetDictionary()["PlayMode"] = 2;
+		core->GetDictionary().Set("PlayMode", 2);
 
 		int i = GetPartySize(false);
 		while(i--) {
@@ -2312,7 +2312,7 @@ void Game::ResetPartyCommentTimes() const
 // this function is deliberatly called only for normal passage of time
 void Game::CheckBored()
 {
-	static int boredTimeout = core->GetVariable("Bored Timeout", 3000);
+	static int boredTimeout = core->GetDictionary().Get("Bored Timeout", 3000);
 	if (!boredTimeout) return;
 	if (core->InCutSceneMode()) return;
 

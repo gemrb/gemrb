@@ -490,7 +490,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 	if (Strref == ieStrRef::INVALID && soundpath == nullptr) return;
 
 	// Check if subtitles are not enabled
-	ieDword charactersubtitles = core->GetVariable("Subtitles", 0);
+	ieDword charactersubtitles = core->GetDictionary().Get("Subtitles", 0);
 
 	// display the verbal constants in the console; some callers force this themselves
 	if (charactersubtitles) {
@@ -1330,7 +1330,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		gc->SetDialogueFlags(DF_INTERACT, BitOp::OR);
 	}
 
-	core->GetDictionary()["DialogChoose"] = (ieDword) -1;
+	core->GetDictionary().Set("DialogChoose", -1);
 	if (!gc->dialoghandler->InitDialog(scr, tar, Dialog)) {
 		if (!(Flags & BD_NOEMPTY)) {
 			displaymsg->DisplayConstantStringName(HCStrings::NothingToSay, GUIColors::RED, tar);

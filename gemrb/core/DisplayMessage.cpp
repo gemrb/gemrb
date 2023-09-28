@@ -43,9 +43,7 @@ DisplayMessage::StrRefs DisplayMessage::SRefs;
 
 bool DisplayMessage::EnableRollFeedback()
 {
-	ieDword feedback = core->GetVariable("EnableRollFeedback", 0);
-
-	return bool(feedback);
+	return core->GetDictionary().Get("EnableRollFeedback", 0);
 }
 
 String DisplayMessage::ResolveStringRef(ieStrRef stridx)

@@ -212,8 +212,8 @@ void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 void MapControl::ClickHandle(const MouseEvent&) const
 {
 	auto& vars = core->GetDictionary();
-	vars["MapControlX"] = notePos.x;
-	vars["MapControlY"] = notePos.y;
+	vars.Set("MapControlX", notePos.x);
+	vars.Set("MapControlY", notePos.y);
 }
 
 void MapControl::UpdateViewport(Point vp)

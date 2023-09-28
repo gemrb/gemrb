@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "exports.h"
+#include "Strings/StringMap.h"
 #include "System/VFS.h"
 
 // This is changed by both cmake and AppVeyor (CmakeLists.txt and .appveyor.yml)
@@ -48,7 +49,7 @@ public:
 
 #define CIE CoreInitializationException
 
-using variables_t = std::unordered_map<std::string, int32_t>;
+using variables_t = StringMap<int32_t>;
 
 struct CoreSettings {
 	path_t GamePath = ".";

@@ -3445,7 +3445,7 @@ int GameScript::NightmareModeOn(Scriptable */*Sender*/, const Trigger */*paramet
 	const Game *game = core->GetGame();
 
 	if (game->version == 11) { // GAM_VER_IWD
-		core->GetVariable("Nightmare Mode", 0);
+		diff = core->GetDictionary().Get("Nightmare Mode", 0);
 	} else if (game->version == 22) { // GAM_VER_IWD2
 		diff = game->HOFMode;
 	}
@@ -3458,7 +3458,7 @@ int GameScript::NightmareModeOn(Scriptable */*Sender*/, const Trigger */*paramet
 
 int GameScript::StoryModeOn(Scriptable */*Sender*/, const Trigger */*parameters*/)
 {
-	ieDword mode = core->GetVariable("Story Mode", 0);
+	ieDword mode = core->GetDictionary().Get("Story Mode", 0);
 	if (mode) {
 		return 1;
 	}
@@ -3475,7 +3475,7 @@ int GameScript::CheckAreaDiffLevel(Scriptable */*Sender*/, const Trigger *parame
 
 int GameScript::Difficulty(Scriptable */*Sender*/, const Trigger *parameters)
 {
-	ieDword diff = core->GetVariable("Difficulty Level", 0);
+	ieDword diff = core->GetDictionary().Get("Difficulty Level", 0);
 	int mode = parameters->int1Parameter;
 	//hack for compatibility
 	if (!mode) {
@@ -3486,14 +3486,14 @@ int GameScript::Difficulty(Scriptable */*Sender*/, const Trigger *parameters)
 
 int GameScript::DifficultyGT(Scriptable */*Sender*/, const Trigger *parameters)
 {
-	ieDword diff = core->GetVariable("Difficulty Level", 0);
+	ieDword diff = core->GetDictionary().Get("Difficulty Level", 0);
 
 	return diff+1>(ieDword) parameters->int0Parameter;
 }
 
 int GameScript::DifficultyLT(Scriptable */*Sender*/, const Trigger *parameters)
 {
-	ieDword diff = core->GetVariable("Difficulty Level", 0);
+	ieDword diff = core->GetDictionary().Get("Difficulty Level", 0);
 
 	return diff+1<(ieDword) parameters->int0Parameter;
 }

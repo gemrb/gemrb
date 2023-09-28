@@ -247,7 +247,7 @@ strret_t BIKPlayer::fileRead(strpos_t pos, void* buf, strpos_t count)
 
 int BIKPlayer::setAudioStream() const
 {
-	ieDword volume = core->GetVariable("Volume Movie", 0);
+	ieDword volume = core->GetDictionary().Get("Volume Movie", 0);
 
 	int source = core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume, false, false);
 	return source;

@@ -400,7 +400,7 @@ String Button::TooltipText() const
 		return u"";
 	}
 
-	ieDword showHotkeys = core->GetVariable("Hotkeys On Tooltips", 0);
+	ieDword showHotkeys = core->GetDictionary().Get("Hotkeys On Tooltips", 0);
 	if (showHotkeys && hotKey) {
 		String s;
 		switch (hotKey.key) {
