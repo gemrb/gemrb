@@ -183,19 +183,17 @@ void LoadPlugins(const path_t& pluginpath, const plugin_flags_t& pluginFlags)
 	do {
 		const path_t& name = dirIt.GetName();
 
-		auto lookup = pluginFlags.find(name);
-		if (lookup != pluginFlags.cend()) {
-			PluginFlagsType flags = lookup->second;
-
+		auto flags = pluginFlags.Get(name);
+		if (flags != nullptr) {
 			// module is sent to the back
-			if (flags == PluginFlagsType::DELAY) {
+			if (*flags == PluginFlagsType::DELAY) {
 				Log(MESSAGE, "PluginLoader", "Loading \"{}\" delayed.", name);
 				delayedPlugins.emplace(name);
 				continue;
 			}
 
 			// module is skipped
-			if (flags == PluginFlagsType::SKIP) {
+			if (*flags == PluginFlagsType::SKIP) {
 				Log(MESSAGE, "PluginLoader", "Loading \"{}\" skipped.", name);
 				continue;
 			}
