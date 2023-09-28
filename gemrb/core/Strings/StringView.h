@@ -19,6 +19,8 @@
 #ifndef STRINGVIEW_H
 #define STRINGVIEW_H
 
+#include <fmt/format.h>
+
 #include <cstring>
 #include <iterator>
 #include <type_traits>
@@ -138,6 +140,11 @@ private:
 
 using StringView = StringViewImp<const char>;
 using MutableStringView = StringViewImp<char>;
+
+template <typename CHAR>
+auto format_as(const StringViewImp<CHAR>& str) {
+	return fmt::string_view(str.c_str(), str.length());
+}
 
 }
 
