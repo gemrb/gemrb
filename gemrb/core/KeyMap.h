@@ -25,30 +25,30 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "Strings/StringMap.h"
 #include "System/VFS.h"
 
 namespace GemRB {
 
-class Function {
-public:
-	ieVariable moduleName;
-	ieVariable function;
-	int group;
-	int key;
-
-	Function(const ieVariable& m, const ieVariable& f, int g, int key);
-};
-
 class GEM_EXPORT KeyMap {
-private:
-	std::unordered_map<std::string, Function> keymap;
 public:
+	struct Function {
+		ieVariable moduleName;
+		ieVariable function;
+		int group;
+		int key;
+	};
+
 	bool InitializeKeyMap(const path_t& inifile, const ResRef& keyfile);
 	bool ResolveKey(unsigned short key, int group) const;
-	bool ResolveName(const char* name, int group) const;
+	bool ResolveName(const StringView& name, int group) const;
 
-	Function* LookupFunction(std::string name);
+	const Function* LookupFunction(const StringView& name);
+
+private:
+	StringMap<Function> keymap;
 };
+
 }
 
 #endif
