@@ -471,7 +471,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, unsigned int chan
 			}
 		}
 
-		volume = core->GetVariable("Volume Voices", 100);
+		volume = core->GetDictionary().Get("Volume Voices", 100);
 
 		loop = 0; // Speech ignores GEM_SND_LOOPING
 	} else {
@@ -484,7 +484,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, unsigned int chan
 			}
 		}
 
-		volume = core->GetVariable("Volume SFX", 100);
+		volume = core->GetDictionary().Get("Volume SFX", 100);
 
 		if (stream == NULL) {
 			// Failed to assign new sound.
@@ -513,7 +513,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, unsigned int chan
 	checkALError("Unable to set audio parameters", WARNING);
 
 #ifdef HAVE_OPENAL_EFX_H
-	ieDword efxSetting = core->GetVariable("Environmental Audio", 0);
+	ieDword efxSetting = core->GetDictionary().Get("Environmental Audio", 0);
 
 	if (efxSetting && hasReverbProperties && (!p.IsZero() || (flags & GEM_SND_RELATIVE))) {
 		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, efxEffectSlot, 0, 0);
@@ -541,14 +541,14 @@ void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 
 	if (flags & GEM_SND_VOL_MUSIC) {
 		musicMutex.lock();
-		volume = core->GetVariable("Volume Music", 0);
+		volume = core->GetDictionary().Get("Volume Music", 0);
 		if (MusicSource && alIsSource(MusicSource))
 			alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
 		musicMutex.unlock();
 	}
 
 	if (flags & GEM_SND_VOL_AMBIENTS) {
-		volume = core->GetVariable("Volume Ambients", volume);
+		volume = core->GetDictionary().Get("Volume Ambients", volume);
 		ambim->UpdateVolume(volume);
 	}
 }
@@ -663,7 +663,7 @@ int OpenALAudioDriver::CreateStream(ResourceHolder<SoundMgr> newMusic)
 			0.0f, 0.0f, 0.0f
 		};
 
-		ieDword volume = core->GetVariable("Volume Music", 0);
+		ieDword volume = core->GetDictionary().Get("Volume Music", 0);
 		alSourcef( MusicSource, AL_PITCH, 1.0f );
 		alSourcef( MusicSource, AL_GAIN, 0.01f * volume );
 		alSourcei( MusicSource, AL_SOURCE_RELATIVE, 1 );

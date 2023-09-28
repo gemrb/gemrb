@@ -2225,7 +2225,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	if (direction == WMPDirection::NONE && keyAreaVisited) {
 		direction = WMPDirection::WEST;
 	}
-	core->GetDictionary()["Travel"] = (ieDword) direction;
+	core->GetDictionary().SetAs("Travel", direction);
 	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenTravelWindow" );
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
@@ -4818,9 +4818,9 @@ void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 {
 	auto& vars = core->GetDictionary();
 	ClearAllActions(Sender, parameters);
-	vars["QuitGame1"] = (ieDword) parameters->int0Parameter;
-	vars["QuitGame2"] = (ieDword) parameters->int1Parameter;
-	vars["QuitGame3"] = (ieDword) parameters->int2Parameter;
+	vars.Set("QuitGame1", parameters->int0Parameter);
+	vars.Set("QuitGame2", parameters->int1Parameter);
+	vars.Set("QuitGame3", parameters->int2Parameter);
 	core->SetNextScript("QuitGame");
 }
 
@@ -4829,9 +4829,9 @@ void GameScript::DemoEnd(Scriptable* Sender, Action* parameters)
 {
 	auto& vars = core->GetDictionary();
 	ClearAllActions(Sender, parameters);
-	vars["QuitGame1"] = (ieDword)0;
-	vars["QuitGame2"] = (ieDword)0;
-	vars["QuitGame3"] = (ieDword)-1;
+	vars.Set("QuitGame1", 0);
+	vars.Set("QuitGame2", 0);
+	vars.Set("QuitGame3", -1);
 	core->SetNextScript("QuitGame");
 }
 

@@ -49,6 +49,7 @@
 
 #include <array>
 #include <cmath>
+#include <fmt/ranges.h>
 
 namespace GemRB {
 
@@ -111,12 +112,12 @@ void GameControl::SetTracker(const Actor *actor, ieDword dist)
 GameControl::GameControl(const Region& frame)
 : View(frame)
 {
-	this->AlwaysRun = core->GetVariable("Always Run", 0);
+	this->AlwaysRun = core->GetDictionary().Get("Always Run", 0);
 
 	ResetTargetMode();
 	SetCursor(nullptr);
 
-	int lookup = core->GetVariable("Center", 0);
+	int lookup = core->GetDictionary().Get("Center", 0);
 	if (lookup) {
 		ScreenFlags |= SF_ALWAYSCENTER;
 	}
@@ -677,7 +678,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 		case GEM_LEFT:
 		case GEM_RIGHT:
 			{
-				ieDword keyScrollSpd = core->GetVariable("Keyboard Scroll Speed", 64);
+				ieDword keyScrollSpd = core->GetDictionary().Get("Keyboard Scroll Speed", 64);
 
 				if (keycode >= GEM_UP) {
 					int v = (keycode == GEM_UP) ? -1 : 1;
@@ -947,7 +948,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				core->GetGame()->DumpKaputz();
 				break;
 			case 'V': // dump GemRB vars like the game ini settings
-				core->DumpVariables();
+				fmt::print("{}", fmt::join(core->GetDictionary(), "\n"));
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
 				area->ExploreMapChunk( gameMousePos, RAND(0,29), 1 );
@@ -2096,14 +2097,14 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 
 	// right click
 	if (me.button == GEM_MB_MENU) {
-		ieDword actionLevel = core->GetVariable("ActionLevel", 0);
+		ieDword actionLevel = core->GetDictionary().Get("ActionLevel", 0);
 
 		if (target_mode != TARGET_MODE_NONE || actionLevel) {
 			if (!core->HasFeature(GFFlags::HAS_FLOAT_MENU)) {
 				SetTargetMode(TARGET_MODE_NONE);
 			}
 			// update the action bar
-			core->GetDictionary()["ActionLevel"] = 0;
+			core->GetDictionary().Set("ActionLevel", 0);
 			core->SetEventFlag(EF_ACTION);
 			ClearMouseState();
 			return true;
@@ -2477,7 +2478,7 @@ void GameControl::DisplayString(Scriptable* target) const
 	}
 
 	// add as a "subtitle" to the main message window
-	auto lookup = core->GetVariable("Duplicate Floating Text", 0);
+	auto lookup = core->GetDictionary().Get("Duplicate Floating Text", 0);
 	if (lookup) {
 		displaymsg->DisplayString(target->overHead.GetText());
 	}
@@ -2635,7 +2636,7 @@ void GameControl::SetDisplayText(HCStrings text, unsigned int time)
 void GameControl::ToggleAlwaysRun()
 {
 	AlwaysRun = !AlwaysRun;
-	core->GetDictionary()["Always Run"] = AlwaysRun;
+	core->GetDictionary().Set("Always Run", AlwaysRun);
 }
 
 int GameControl::GetOverheadOffset() const

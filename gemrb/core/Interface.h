@@ -39,6 +39,7 @@
 #include "InterfaceConfig.h"
 #include "Orientation.h"
 #include "SaveGameAREExtractor.h"
+#include "Strings/StringMap.h"
 #include "StringMgr.h"
 #include "TableMgr.h"
 
@@ -422,8 +423,6 @@ public:
 	SaveGameIterator * GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */
 	variables_t& GetDictionary();
-	void DumpVariables() const;
-	variables_t::mapped_type GetVariable(const variables_t::key_type& key, int fallback) const;
 	/** Get the Token Dictionary */
 	tokens_t& GetTokenDictionary();
 	const String& GetToken(const ieVariable& key, const String& fallback) const;
@@ -716,7 +715,7 @@ public:
 	}
 	inline void ResetActionBar()
 	{
-		vars["ActionLevel"] = 0;
+		vars.Set("ActionLevel", 0);
 		SetEventFlag(EF_ACTION);
 	}
 

@@ -67,7 +67,7 @@ static PluginHolder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 IniSpawn::IniSpawn(Map* owner, const ResRef& defaultArea)
 : map(owner)
 {
-	this->detail_level = core->GetVariable("Detail Level", 0);
+	this->detail_level = core->GetDictionary().Get("Detail Level", 0);
 
 	const auto inifile = GetIniFile(defaultArea);
 	if (!inifile) {
@@ -648,7 +648,7 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 	if (critter.Flags & CF_NO_DIFF_MASK) {
 		ieDword diff_bit;
 
-		ieDword difficulty = core->GetVariable("Difficulty Level", 0);
+		ieDword difficulty = core->GetDictionary().Get("Difficulty Level", 0);
 		switch (difficulty) {
 		case 0:
 			diff_bit = CF_NO_DIFF_1;

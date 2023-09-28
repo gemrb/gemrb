@@ -247,7 +247,7 @@ Interface::Interface(CoreSettings&& cfg)
 	if (!config.KeepCache) DelTree(config.CachePath, false);
 	
 	vars = std::move(config.vars);
-	vars["MaxPartySize"] = config.MaxPartySize; // for simple GUIScript access
+	vars.Set("MaxPartySize", config.MaxPartySize); // for simple GUIScript access
 
 	LoadPlugins();
 	InitVideo();
@@ -258,8 +258,8 @@ Interface::Interface(CoreSettings&& cfg)
 	Control::ActionRepeatDelay = config.ActionRepeatDelay;
 	GameControl::DebugFlags = config.DebugFlags;
 
-	ieDword brightness = GetVariable("Brightness Correction", 10);
-	ieDword contrast = GetVariable("Gamma Correction", 5);
+	ieDword brightness = vars.Get("Brightness Correction", 10);
+	ieDword contrast = vars.Get("Gamma Correction", 5);
 
 	Log(MESSAGE, "Core", "Initializing search path...");
 	if (!IsAvailable(PLUGIN_RESOURCE_DIRECTORY)) {
@@ -366,7 +366,7 @@ Interface::Interface(CoreSettings&& cfg)
 
 	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
 	// we also need the display to exist to create sprites using the display format
-	ieDword fullscreen = GetVariable("Full Screen", 0);
+	ieDword fullscreen = vars.Get("Full Screen", 0);
 
 	int createDisplayResult =
 	VideoDriver->CreateDisplay(
@@ -402,12 +402,12 @@ Interface::Interface(CoreSettings&& cfg)
 	}
 
 	// We use this for the game's state exclusively
-	ieDword maxRefreshRate = GetVariable("Maximum Frame Rate", 30);
+	ieDword maxRefreshRate = vars.Get("Maximum Frame Rate", 30);
 	// the originals used double ticks for haste handling
 	Time.ticksPerSec = maxRefreshRate / 2;
 
 	// set up the tooltip delay which we store in milliseconds
-	ieDword tooltipDelay = GetVariable("Tooltips", 0);
+	ieDword tooltipDelay = vars.Get("Tooltips", 0);
 	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
 
 	// restore the game config name if we read it from our version
@@ -919,7 +919,7 @@ void Interface::DisableMusicPlaylist(size_t SongType)
 /** this is the main loop */
 void Interface::Main()
 {
-	int speed = GetVariable("Mouse Scroll Speed", 10);
+	int speed = vars.Get("Mouse Scroll Speed", 10);
 	SetMouseScrollSpeed(speed);
 
 	// We had 36 at 30fps originally, so more fps
@@ -1246,7 +1246,7 @@ String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 	if (!(options & STRING_FLAGS::STRREFOFF)) {
 		flags =
 			static_cast<STRING_FLAGS>(
-				GetVariable("Strref On", static_cast<std::underlying_type_t<STRING_FLAGS>>(STRING_FLAGS::NONE))
+				vars.Get("Strref On", UnderType(STRING_FLAGS::NONE))
 			);
 	}
 	
@@ -1792,7 +1792,7 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 		// -2 close
 		// -1 open
 		// choose option
-		ieDword var = GetVariable("DialogChoose", -3);
+		ieDword var = vars.Get("DialogChoose", -3);
 
 		if ((int) var == -2) {
 			// TODO: this seems to never be called? (EndDialog is called from elsewhere instead)
@@ -1806,10 +1806,10 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 				guiscript->RunFunction( "GUIWORLD", "NextDialogState" );
 
 			// the last node of a dialog can have a new-dialog action! don't interfere in that case
-			ieDword newvar = GetVariable("DialogChoose", 0);
+			ieDword newvar = vars.Get("DialogChoose", 0);
 
 			if (var == (ieDword) -1 || newvar != (ieDword) -1) {
-				vars["DialogChoose"] = -3;
+				vars.Set("DialogChoose", -3);
 			}
 		}
 		if (flg & DF_OPENCONTINUEWINDOW) {
@@ -1858,11 +1858,11 @@ SaveGameIterator* Interface::GetSaveGameIterator() const
 void Interface::AskAndExit()
 {
 	// if askExit is 1 then we are trying to quit a second time and should instantly do so
-	ieDword askExit = GetVariable("AskAndExit", 0);
+	ieDword askExit = vars.Get("AskAndExit", 0);
 
 	if (game && !askExit) {
 		SetPause(PauseState::On);
-		vars["AskAndExit"] = 1;
+		vars.Set("AskAndExit", 1);
 
 		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
 		Log(MESSAGE, "Info", "Press ctrl-c (or close the window) again to quit GemRB.\n");
@@ -1874,22 +1874,6 @@ void Interface::AskAndExit()
 /** Returns the variables dictionary */
 variables_t& Interface::GetDictionary() {
 	return vars;
-}
-
-void Interface::DumpVariables() const {
-	Log(DEBUG, "Variables", "Item count: {}", vars.size());
-	for (const auto& entry : vars) {
-		Log(DEBUG, "Variables", "{} = {}", entry.first, entry.second);
-	}
-}
-
-variables_t::mapped_type Interface::GetVariable(const variables_t::key_type& key, int fallback) const {
-	auto lookup = vars.find(key);
-	if (lookup != vars.cend()) {
-		return lookup->second;
-	}
-
-	return fallback;
 }
 
 /** Returns the token dictionary */
@@ -2014,9 +1998,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	}
 
 	//one of these two should exist (they both mean the same thing)
-	ieDword subtitles = GetVariable("Dialog Movie Subtitles", 1);
+	ieDword subtitles = vars.Get("Dialog Movie Subtitles", 1);
 	if (!subtitles) {
-		subtitles = GetVariable("Dialog Subtitles", 0);
+		subtitles = vars.Get("Dialog Subtitles", 0);
 	}
 
 	mp->EnableSubtitles(subtitles);
@@ -2105,7 +2089,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	if (ambim) ambim->Activate();
 
 	//Setting the movie name to 1
-	vars[movieRef.c_str()] = 1;
+	vars.Set(movieRef, 1);
 	return 0;
 }
 
@@ -2201,10 +2185,10 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 		for (int j = 0; j < defaults->GetKeysCount(tag); j++) {
 			auto key = std::string{defaults->GetKeyNameByIndex(tag, j).c_str()};
 			//skip any existing entries. GemRB.cfg has priority
-			auto lookup = vars.find(key);
-			if (lookup == vars.cend()) {
+			auto lookup = vars.Get(key);
+			if (lookup == nullptr) {
 				ieDword defaultVal = defaults->GetKeyAsInt(tag, key, 0);
-				vars.emplace(key, overrides->GetKeyAsInt(tag, key, defaultVal));
+				vars.Set(key, overrides->GetKeyAsInt(tag, key, defaultVal));
 			}
 		}
 	}
@@ -2219,7 +2203,7 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 
 	// copies
 	if (!overrides->GetKeyAsInt("Game Options", "Darkvision", 1)) {
-		vars["Infravision"] = 0;
+		vars.Set("Infravision", 0);
 	}
 
 	if (!config.Width || !config.Height) {
@@ -2265,9 +2249,9 @@ bool Interface::SaveConfig()
 			AppendFormat(contents, "[{}]\n", tag);
 			for (int j = 0; j < defaultsINI->GetKeysCount(tag); j++) {
 				auto key = std::string{defaultsINI->GetKeyNameByIndex(tag, j).c_str()};
-				auto lookup = vars.find(key);
-				assert(lookup != vars.cend());
-				AppendFormat(contents, "{} = {}\n", key, lookup->second);
+				auto lookup = vars.Get(key);
+				assert(lookup != nullptr);
+				AppendFormat(contents, "{} = {}\n", key, *lookup);
 			}
 		}
 
@@ -3063,7 +3047,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const path_t& Prefix)
 bool Interface::ReadRandomItems()
 {
 	//rt norm or rt fury
-	ieDword difflev = GetVariable("Nightmare Mode", 0);
+	ieDword difflev = vars.Get("Nightmare Mode", 0);
 	RtRows.clear();
 
 	AutoTable tab = gamedata->LoadTable("randitem");
@@ -3891,10 +3875,7 @@ bool Interface::SetPause(PauseState pause, int flags) const
 
 bool Interface::Autopause(AUTOPAUSE flag, Scriptable* target) const
 {
-	AUTOPAUSE autopause_flags =
-		static_cast<AUTOPAUSE>(
-			GetVariable("Auto Pause State", static_cast<std::underlying_type_t<AUTOPAUSE>>(AUTOPAUSE::UNUSABLE))
-		);
+	AUTOPAUSE autopause_flags = vars.GetAs<AUTOPAUSE>("Auto Pause State", AUTOPAUSE::UNUSABLE);
 
 	if (!(autopause_flags & AUTOPAUSE(1 << ieDword(flag)))) {
 		return false;
@@ -3906,7 +3887,7 @@ bool Interface::Autopause(AUTOPAUSE flag, Scriptable* target) const
 
 	displaymsg->DisplayConstantStringName(HCStrings(ieDword(HCStrings::ApUnusable) + ieDword(flag)), GUIColors::RED, target);
 
-	ieDword centerOnAutoPause = GetVariable("Auto Pause Center", 0);
+	ieDword centerOnAutoPause = vars.Get("Auto Pause Center", 0);
 
 	if (centerOnAutoPause && target) {
 		GameControl* gc = GetGameControl();
@@ -4040,7 +4021,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 // see 8cff52b3c8 if this needs to be resurrected at some point
 void Interface::WaitForDisc(int disc_number, const path_t& path)
 {
-	GetDictionary()["WaitForDisc"] = (ieDword) disc_number;
+	vars.Set("WaitForDisc", disc_number);
 
 	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {

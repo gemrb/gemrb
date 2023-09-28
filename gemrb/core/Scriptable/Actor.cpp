@@ -343,7 +343,7 @@ Actor::Actor()
 		//This block is executed only once, when the first actor is loaded
 		InitActorTables();
 
-		TranslucentShadows = core->GetVariable("Translucent Shadows", 0);
+		TranslucentShadows = core->GetDictionary().Get("Translucent Shadows", 0);
 	}
 	static size_t maxProjectileCount = core->GetProjectileServer()->GetHighestProjectileNumber();
 	projectileImmunity.resize(maxProjectileCount);
@@ -1224,7 +1224,7 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		ScriptEngine::FunctionParameters params;
 		params.push_back(ScriptEngine::Parameter(pc));
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", params, true);
-		ieDword NeedsLevelUp = core->GetVariable(varName, 0);
+		ieDword NeedsLevelUp = core->GetDictionary().Get(varName, 0);
 		if (NeedsLevelUp == 1) {
 			displaymsg->DisplayConstantStringName(HCStrings::LevelUp, GUIColors::WHITE, actor);
 			actor->GotLUFeedback = true;
@@ -1497,25 +1497,25 @@ static int IsClassFromName (const std::string& name)
 
 GEM_EXPORT void UpdateActorConfig()
 {
-	crit_hit_scr_shake = core->GetVariable("Critical Hit Screen Shake", 1);
+	crit_hit_scr_shake = core->GetDictionary().Get("Critical Hit Screen Shake", 1);
 
-	unsigned int effectTextLevel = core->GetVariable("Effect Text Level", 0);
+	unsigned int effectTextLevel = core->GetDictionary().Get("Effect Text Level", 0);
 	core->SetFeedbackLevel(effectTextLevel);
 
-	sel_snd_freq = core->GetVariable("Selection Sounds Frequency", 0);
-	cmd_snd_freq = core->GetVariable("Command Sounds Frequency", 0);
+	sel_snd_freq = core->GetDictionary().Get("Selection Sounds Frequency", 0);
+	cmd_snd_freq = core->GetDictionary().Get("Command Sounds Frequency", 0);
 	// only pst has the whole gamut for these two options
 	if (!(effectTextLevel & FT_SELECTION)) sel_snd_freq = 0;
 	if (!(effectTextLevel & FT_ACTIONS)) cmd_snd_freq = 0;
 
-	bored_time = core->GetVariable("Bored Timeout", 3000);
-	footsteps = core->GetVariable("Footsteps", 1);
-	war_cries = core->GetVariable("Attack Sounds", 1);
-	PreferSneakAttack = core->GetVariable("3E Thief Sneak Attack", 0);
+	bored_time = core->GetDictionary().Get("Bored Timeout", 3000);
+	footsteps = core->GetDictionary().Get("Footsteps", 1);
+	war_cries = core->GetDictionary().Get("Attack Sounds", 1);
+	PreferSneakAttack = core->GetDictionary().Get("3E Thief Sneak Attack", 0);
 
 	//Handle Game Difficulty and Nightmare Mode
 	// iwd2 had it saved in the GAM, iwd1 only relied on the ini value
-	GameDifficulty = core->GetVariable("Nightmare Mode", 0);
+	GameDifficulty = core->GetDictionary().Get("Nightmare Mode", 0);
 
 	auto& vars = core->GetDictionary();
 	Game *game = core->GetGame();
@@ -1523,16 +1523,16 @@ GEM_EXPORT void UpdateActorConfig()
 		GameDifficulty = DIFF_INSANE;
 		if (game) game->HOFMode = true;
 		// also set it for GUIOPT
-		vars["Difficulty Level"] = DIFF_INSANE - 1;
+		vars.Set("Difficulty Level", DIFF_INSANE - 1);
 	} else {
-		GameDifficulty = core->GetVariable("Difficulty Level", 0);
+		GameDifficulty = core->GetDictionary().Get("Difficulty Level", 0);
 		GameDifficulty++; // slider starts at 0, real levels at 1
 	}
-	ieDword newMode = core->GetVariable("Story Mode", 0);
+	ieDword newMode = core->GetDictionary().Get("Story Mode", 0);
 	if (newMode != StoryMode) {
 		if (newMode) {
 			GameDifficulty = DIFF_EASY;
-			vars["Difficulty Level"] = DIFF_EASY - 1U;
+			vars.Set("Difficulty Level", DIFF_EASY - 1U);
 
 			// add all the immunities and bonuses to party
 			for (int i = 0; game && i < game->GetPartySize(false); i++) {
@@ -1555,7 +1555,7 @@ GEM_EXPORT void UpdateActorConfig()
 	DifficultySaveMod = gamedata->GetDifficultyMod(3, GameDifficulty);
 
 	// iwd has a config option for leniency
-	NoExtraDifficultyDmg = core->GetVariable("Suppress Extra Difficulty Damage", 0);
+	NoExtraDifficultyDmg = core->GetDictionary().Get("Suppress Extra Difficulty Damage", 0);
 }
 
 static void ReadModalStates()
@@ -3766,7 +3766,7 @@ void Actor::PlayExistenceSounds()
 			return;
 		}
 
-		ieDword vol = core->GetVariable("Volume Ambients", 100);
+		ieDword vol = core->GetDictionary().Get("Volume Ambients", 100);
 		int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, ieWord(vol), true, 50); // REFERENCE_DISTANCE
 		if (stream != -1) {
 			tick_t audioLength = audio->QueueAmbient(stream, sb.Sound);
@@ -4060,7 +4060,7 @@ void Actor::CheckCleave()
 // NOTE: only does the visual part of chunking
 static void ChunkActor(Actor* actor)
 {
-	ieDword gore = core->GetVariable("Gore", 0);
+	ieDword gore = core->GetDictionary().Get("Gore", 0);
 	if (!gore) return;
 
 	// TODO: play chunky animation / particles #128
@@ -7334,7 +7334,7 @@ void Actor::UpdateActorState()
 
 	// display pc hitpoints if requested
 	// limit the invocation count to save resources (the text is drawn repeatedly anyway)
-	ieDword overheadHP = core->GetVariable("HP Over Head", 0);
+	ieDword overheadHP = core->GetDictionary().Get("HP Over Head", 0);
 	assert(game->GameTime);
 	assert(core->Time.round_size);
 	if (overheadHP && Persistent() && (game->GameTime % (core->Time.round_size / 2) == 0)) { // smaller delta to skip fading
@@ -7930,7 +7930,7 @@ bool Actor::ShouldDrawCircle() const
 	bool drawcircle = true; // we always show circle/target on pause
 	if (!(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		// check marker feedback level
-		ieDword markerfeedback = core->GetVariable("GUI Feedback Level", 4);
+		ieDword markerfeedback = core->GetDictionary().Get("GUI Feedback Level", 4);
 		if (Selected) {
 			// selected creature
 			drawcircle = markerfeedback >= 2;

@@ -176,7 +176,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		ieDword playmode = 0;
 		//only bg2 has 9 rows (iwd's have 6 rows - normal+extension)
 		if (tm->GetRowCount() == 9) {
-			playmode = core->GetVariable("PlayMode", 0);
+			playmode = core->GetDictionary().Get("PlayMode", 0);
 			playmode *= 3;
 		}
 

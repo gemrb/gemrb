@@ -5970,7 +5970,7 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(fx->Parameter2) {
 		//all known spells, no need to memorize
 		// the details are all handled by the Spellbook guiscript
-		vars["ActionLevel"] = 5;
+		vars.Set("ActionLevel", 5);
 	} else {
 		//all spells listed in 2da
 		// (ees) differentiate between 1 and 2 with some minor extra filtering, but we do that elsewhere
@@ -5978,11 +5978,11 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		gamedata->ReadResRefTable(fx->Resource, data);
 		sb->SetCustomSpellInfo(data, fx->SourceRef, 0);
 
-		vars["ActionLevel"] = 11;
+		vars.Set("ActionLevel", 11);
 	}
 	// force a redraw of the action bar
 	//this is required, because not all of these opcodes are firing right at casting
-	vars["Type"] = -1;
+	vars.Set("Type", -1);
 	core->SetEventFlag(EF_ACTION);
 	return FX_NOT_APPLIED;
 }
@@ -6605,9 +6605,9 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->InParty) {
 		auto& dict = core->GetDictionary();
 
-		dict["P0"] = target->InParty;
-		dict["P1"] = fx->Parameter1;
-		dict["P2"] = fx->Parameter2;
+		dict.Set("P0", target->InParty);
+		dict.Set("P1", fx->Parameter1);
+		dict.Set("P2", fx->Parameter2);
 		core->SetEventFlag(EF_SEQUENCER);
 		// set also this for GUIMG, since the spell won't be normally cast, but applied
 		target->objects.LastSpellOnMe = ResolveSpellNumber(fx->SourceRef);
@@ -7037,9 +7037,9 @@ int fx_create_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->InParty) {
 		auto& vars = core->GetDictionary();
 
-		vars["P0"] = target->InParty;
-		vars["P1"] = fx->Parameter1;
-		vars["P2"] = fx->Parameter2 | (2 << 16);
+		vars.Set("P0", target->InParty);
+		vars.Set("P1", fx->Parameter1);
+		vars.Set("P2", fx->Parameter2 | (2 << 16));
 		core->SetEventFlag(EF_SEQUENCER);
 	}
 	return FX_NOT_APPLIED;

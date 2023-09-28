@@ -300,7 +300,7 @@ bool WorldMapControl::OnMouseWheelScroll(const Point& delta)
 
 bool WorldMapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 {
-	ieDword keyScrollSpd = core->GetVariable("Keyboard Scroll Speed", 64);
+	ieDword keyScrollSpd = core->GetDictionary().Get("Keyboard Scroll Speed", 64);
 
 	switch (Key.keycode) {
 		case GEM_LEFT:
