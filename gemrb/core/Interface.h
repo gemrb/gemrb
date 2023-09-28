@@ -296,7 +296,7 @@ private:
 	GameControl* gamectrl = nullptr;
 	SaveGameIterator *sgiterator = nullptr;
 	tokens_t tokens;
-	std::unordered_map<std::string, std::vector<ieDword>> lists;
+	StringMap<std::vector<ieDword>> lists;
 	variables_t vars;
 	PluginHolder<MusicMgr> music;
 	std::vector<Symbol> symbols;
@@ -609,7 +609,7 @@ public:
 	unwanted return variables could be omitted */
 	void GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef& resource2, ResRef& resource3) const;
 	/** returns a numeric list read from a 2da. The 0th element is the number of elements in the list */
-	std::vector<ieDword>* GetListFrom2DA(const ResRef& resref);
+	const std::vector<ieDword>* GetListFrom2DA(const ResRef& resref);
 	/** translates a stat symbol to numeric value */
 	ieDword TranslateStat(const std::string& statName);
 	/** resolves a stat bonus based on multiple stats */
