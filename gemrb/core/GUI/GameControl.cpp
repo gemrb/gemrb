@@ -768,6 +768,12 @@ void GameControl::SelectActor(int whom, int type)
 	}
 }
 
+template <typename CONTAIN>
+static void PrintCollection(const char* name, const CONTAIN& container)
+{
+	fmt::println("{} ({}):\n{}", name, container.size(), fmt::join(container, "\n"));
+}
+
 //Effect for the ctrl-r cheatkey (resurrect)
 static EffectRef heal_ref = { "CurrentHPModifier", -1 };
 static EffectRef damage_ref = { "Damage", -1 };
@@ -825,7 +831,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			// f
 			case 'g'://shows loaded areas and other game information
-				Log(DEBUG, "Game", "{}", game->dump());
+				fmt::println("{}", game->dump());
 				break;
 			// h
 			case 'i'://interact trigger (from the original game)
@@ -942,13 +948,13 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				//refresh gui here once we got it
 				break;
 			case 'u': // dump GameScript GLOBAL vars
-				core->GetGame()->DumpLocals();
+				PrintCollection("locals", core->GetGame()->locals);
 				break;
 			case 'U': // dump death vars
-				core->GetGame()->DumpKaputz();
+				PrintCollection("kaputz", core->GetGame()->kaputz);
 				break;
 			case 'V': // dump GemRB vars like the game ini settings
-				fmt::print("{}", fmt::join(core->GetDictionary(), "\n"));
+				PrintCollection("variables", core->GetDictionary());
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
 				area->ExploreMapChunk( gameMousePos, RAND(0,29), 1 );
@@ -957,7 +963,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				area->MoveVisibleGroundPiles(gameMousePos);
 				break;
 			case 'x': // shows coordinates on the map
-				Log(MESSAGE, "GameControl", "Position: {} [{}.{}]", area->GetScriptName(), gameMousePos.x, gameMousePos.y);
+				fmt::println("{}: {}", area->GetScriptName(), gameMousePos);
 				break;
 			case 'Y': // damages all enemies by 300 (resistances apply)
 				// mwahaha!

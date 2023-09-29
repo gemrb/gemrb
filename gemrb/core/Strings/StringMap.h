@@ -109,6 +109,10 @@ public:
 		return static_cast<T>(Get(key, static_cast<V>(fallback)));
 	}
 
+	auto size() const {
+		return map.size();
+	}
+
 	auto begin() const {
 		return map.begin();
 	}

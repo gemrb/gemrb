@@ -2449,11 +2449,4 @@ void Game::MoveFamiliars(const ResRef& targetArea, const Point& targetPoint, int
 	}
 }
 
-void Game::DumpKaputz() const {
-	Log(DEBUG, "Game", "Kaputz item count: {}", kaputz.size());
-	for (const auto& entry : kaputz) {
-		Log(DEBUG, "Game", "{} = {}", entry.first, entry.second);
-	}
-}
-
 }

@@ -99,13 +99,6 @@ ieDword Scriptable::GetLocal(const ieVariable& key, ieDword fallback) const {
 	return fallback;
 }
 
-void Scriptable::DumpLocals() const {
-	Log(DEBUG, "Scriptable", "Locals item count: {}", locals.size());
-	for (const auto& entry : locals) {
-		Log(DEBUG, "Scriptable", "{} = {}", entry.first, entry.second);
-	}
-}
-
 void Scriptable::SetScriptName(const ieVariable& text)
 {
 	// recreate to remove internal spaces
