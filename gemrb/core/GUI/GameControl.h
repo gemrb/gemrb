@@ -163,6 +163,9 @@ private:
 	
 	void DebugPaint(const Point& p, bool sample) const noexcept;
 
+	enum class ActorDump {Anims, Stats};
+	void DumpActorInfo(ActorDump, const Map*) const noexcept;
+
 public:
 	explicit GameControl(const Region& frame);
 	~GameControl(void) override;

@@ -768,6 +768,39 @@ void GameControl::SelectActor(int whom, int type)
 	}
 }
 
+void GameControl::DumpActorInfo(ActorDump dump, const Map* area) const noexcept
+{
+	const Point gameMousePos = GameMousePos();
+	const Actor* act = area->GetActorByGlobalID(lastActorID);
+	if (!act) {
+		act = area->GetActor(gameMousePos, GA_DEFAULT);
+	}
+	if (!act) {
+		// ValidTarget never returns immobile targets, making debugging a nightmare
+		// so if we don't have an actor, we make really really sure by checking manually
+		unsigned int count = area->GetActorCount(true);
+		while (count--) {
+			const Actor *actor = area->GetActor(count, true);
+			if (actor->IsOver(gameMousePos)) {
+				act = actor;
+				break;
+			}
+		}
+	}
+
+	if (act) {
+		if (dump == ActorDump::Stats) {
+			fmt::println("{}", act->dump());
+		} else if (dump == ActorDump::Anims) {
+			constexpr int width = 10;
+			const CharAnimations* anims = act->GetAnims();
+			fmt::println("{1:<{0}}: {2:#x}", width, "Anim ID", anims->GetAnimationID());
+			fmt::println("{1:<{0}}: {2}", width, "BloodColor", anims->GetBloodColor());
+			fmt::println("{1:<{0}}: {2:#x}", width, "Flags", anims->GetFlags());
+		}
+	}
+}
+
 template <typename CONTAIN>
 static void PrintCollection(const char* name, const CONTAIN& container)
 {
@@ -869,47 +902,13 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				}
 				break;
 			case 'M':
-				if (!lastActor) {
-					lastActor = area->GetActor( gameMousePos, GA_DEFAULT);
-				}
-				if (!lastActor) {
-					// ValidTarget never returns immobile targets, making debugging a nightmare
-					// so if we don't have an actor, we make really really sure by checking manually
-					unsigned int count = area->GetActorCount(true);
-					while (count--) {
-						const Actor *actor = area->GetActor(count, true);
-						if (actor->IsOver(gameMousePos)) {
-							actor->GetAnims()->DebugDump();
-						}
-					}
-				}
-				if (lastActor) {
-					lastActor->GetAnims()->DebugDump();
-					break;
-				}
+				DumpActorInfo(ActorDump::Anims, area);
 				break;
 			case 'm': //prints a debug dump (ctrl-m in the original game too)
-				if (!lastActor) {
-					lastActor = area->GetActor( gameMousePos, GA_DEFAULT);
-				}
-				if (!lastActor) {
-					// ValidTarget never returns immobile targets, making debugging a nightmare
-					// so if we don't have an actor, we make really really sure by checking manually
-					unsigned int count = area->GetActorCount(true);
-					while (count--) {
-						const Actor *actor = area->GetActor(count, true);
-						if (actor->IsOver(gameMousePos)) {
-							actor->dump();
-						}
-					}
-				}
-				if (lastActor) {
-					lastActor->dump();
-					break;
-				}
 				if (overMe && overMe->Type != ST_ACTOR) {
-					overMe->dump();
-					break;
+					fmt::println("{}", overMe->dump());
+				} else {
+					DumpActorInfo(ActorDump::Stats, area);
 				}
 				core->GetGame()->GetCurrentArea()->dump(false);
 				break;

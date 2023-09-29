@@ -229,7 +229,6 @@ public:
 	int GetWalkSoundCount() const;
 	const ResRef &GetArmourLevel(int ArmourLevel) const;
 	void PulseRGBModifiers();
-	void DebugDump() const;
 
 private:
 	void DropAnims();

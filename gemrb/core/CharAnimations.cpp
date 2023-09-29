@@ -2791,13 +2791,6 @@ void CharAnimations::PulseRGBModifiers()
 	lastModUpdate += inc*40;
 }
 
-void CharAnimations::DebugDump() const
-{
-	Log (DEBUG, "CharAnimations", "Anim ID   : {:#x}", GetAnimationID());
-	Log (DEBUG, "CharAnimations", "BloodColor: {}", GetBloodColor());
-	Log (DEBUG, "CharAnimations", "Flags     : {:#x}", GetFlags());
-}
-
 static inline void applyMod(const Color& src, Color& dest, const RGBModifier& mod) noexcept
 {
 	if (mod.speed == -1) {
