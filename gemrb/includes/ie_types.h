@@ -125,7 +125,7 @@ inline ieVariable MakeVariable(const StringView& sv) {
 		// TODO: we shouldnt call towlower here. ieVariable is case insensitive
 		// we probably should be calling WriteVariableLC in the writers instead
 		char c = std::towlower(*source++);
-		if (c!=' ') {
+		if (!std::isspace(c)) { // FIXME: should whitespace get converted?
 			*dest++ = c;
 		}
 	}
