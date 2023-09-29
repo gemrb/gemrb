@@ -3960,7 +3960,7 @@ be avoided. The hardcoded token list:\n\
 \n\
 **Parameters:**\n\
   *  VariableName - the name of the variable (shorter than 32!)\n\
-  *  Value        - string, the value of the token\n\
+  *  Value        - string or None, the value of the token\n\
 \n\
 **Examples:**\n\
 \n\
@@ -3981,10 +3981,10 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	PyObject* value;
 	PARSE_ARGS(args, "OO", &Variable, &value);
 
-	if (PyUnicode_Check(value)) {
-		core->GetTokenDictionary()[ieVariableFromPy(Variable)] = PyString_AsStringObj(value);
+	if (value == Py_None) {
+		core->GetTokenDictionary().erase(ieVariableFromPy(Variable));
 	} else {
-		core->GetTokenDictionary()[ieVariableFromPy(Variable)] = StringFromCString(PyBytes_AsString(value));
+		core->GetTokenDictionary()[ieVariableFromPy(Variable)] = PyString_AsStringObj(value);
 	}
 
 	Py_RETURN_NONE;
