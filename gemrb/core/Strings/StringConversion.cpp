@@ -46,13 +46,12 @@ static String StringFromEncodedData(const void* inptr, size_t length, const std:
 		return u"";
 	}
 
-	size_t outLen = length * 4;
-	size_t outLenLeft = outLen;
-	std::u16string buffer(length * 2, u'\0');
+	std::u16string buffer(length, u'\0');
 	auto outBuf = reinterpret_cast<char*>(const_cast<char16_t*>(buffer.data()));
 	const char* in = static_cast<const char*>(inptr);
 
-	size_t ret = portableIconv(cd, &in, &length, &outBuf, &outLenLeft);
+	size_t outLen = length * sizeof(char16_t);
+	size_t ret = portableIconv(cd, &in, &length, &outBuf, &outLen);
 	iconv_close(cd);
 
 	if (ret == static_cast<size_t>(-1)) {
@@ -60,9 +59,8 @@ static String StringFromEncodedData(const void* inptr, size_t length, const std:
 		return u"";
 	}
 
-	auto zero = buffer.find(u'\0');
-	if (zero != decltype(buffer)::npos) {
-		buffer.resize(zero);
+	if (outLen) {
+		buffer.resize(buffer.size() - (outLen / sizeof(char16_t)));
 	}
 
 	return buffer;
