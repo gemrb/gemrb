@@ -457,7 +457,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 
 		//torment has them as 0 or -1
 		if (pcInfo.Name[0] != 0) {
-			actor->SetName(StringFromCString(pcInfo.Name.c_str()), 0);
+			actor->SetName(StringFromTLK(pcInfo.Name), 0);
 		}
 		actor->TalkCount = pcInfo.TalkCount;
 	} else {
@@ -520,7 +520,7 @@ void GAMImporter::GetPCStats(PCStatsStruct& ps, bool extended)
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS) ) {
 		ieVariable soundFolder;
 		str->ReadVariable(soundFolder);
-		ps.SoundFolder = StringFromCString(soundFolder.c_str());
+		ps.SoundFolder = StringFromTLK(soundFolder);
 	}
 	
 	//iwd2 has some PC only stats that the player can set (this can be done via a guiscript interface)

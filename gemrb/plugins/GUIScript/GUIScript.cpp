@@ -1375,8 +1375,9 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 		// clear the text
 		ctrl->SetText(u"");
 	} else if (PyObject_TypeCheck(str, &PyByteArray_Type)) { // state font
+		static const EncodingStruct enc {"ISO-8859-1", false, false, false}; // ISO-8859-1 is extended ASCII, which we need for state fonts
 		const char *tmp = PyByteArray_AS_STRING(str);
-		ctrl->SetText(StringFromCString(tmp));
+		ctrl->SetText(StringFromEncodedView(StringView(tmp), enc));
 	} else { // string value of the object
 		ctrl->SetText(PyString_AsStringObj(str));
 	}

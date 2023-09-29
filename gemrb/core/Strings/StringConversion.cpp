@@ -27,9 +27,9 @@
 
 namespace GemRB {
 
-static String StringFromEncodedData(const char* in, size_t length, const std::string& encoding)
+static String StringFromEncodedData(const void* inptr, size_t length, const std::string& encoding)
 {
-	if (!in || length == 0) {
+	if (!inptr || length == 0) {
 		return u"";
 	}
 
@@ -50,6 +50,7 @@ static String StringFromEncodedData(const char* in, size_t length, const std::st
 	size_t outLenLeft = outLen;
 	std::u16string buffer(length * 2, u'\0');
 	auto outBuf = reinterpret_cast<char*>(const_cast<char16_t*>(buffer.data()));
+	const char* in = static_cast<const char*>(inptr);
 
 	size_t ret = portableIconv(cd, &in, &length, &outBuf, &outLenLeft);
 	iconv_close(cd);
@@ -67,35 +68,45 @@ static String StringFromEncodedData(const char* in, size_t length, const std::st
 	return buffer;
 }
 
-static String StringFromEncodedData(const char* string, const EncodingStruct& encoding) {
-	size_t inLen = 0;
+template <typename VIEW>
+String StringFromEncodedView(const VIEW& view, const EncodingStruct& encoding)
+{
+	return StringFromEncodedData(view.c_str(), view.length() * sizeof(typename VIEW::value_type), encoding.encoding);
+}
 
-	assert(string);
+String StringFromEncodedView(const StringView& view, const EncodingStruct& encoding)
+{
+	return StringFromEncodedData(view.c_str(), view.length(), encoding.encoding);
+}
+
+String StringFromASCII(const StringView& asciiview)
+{
+	static const EncodingStruct enc {"ASCII", false, false, false};
+	return StringFromEncodedView(asciiview, enc);
+}
+
+String StringFromTLK(const StringView& tlkview)
+{
+	const EncodingStruct& encoding = core->TLKEncoding;
 	if (encoding.widechar) {
-		inLen = wcslen(reinterpret_cast<const wchar_t*>(string));
+		const wchar_t* str = reinterpret_cast<const wchar_t*>(tlkview.c_str());
+		size_t len = tlkview.length() / sizeof(wchar_t);
+		StringViewImp<const wchar_t> wideView(str, len);
+		return StringFromEncodedView(wideView, core->TLKEncoding);
 	} else {
-		inLen = strlen(string);
+		return StringFromEncodedView(tlkview, core->TLKEncoding);
 	}
-
-	return StringFromEncodedData(string, inLen, encoding.encoding);
 }
 
-String StringFromCString(const char* string)
+String StringFromUtf8(const StringView& utf8view)
 {
-	return StringFromEncodedData(string, core->TLKEncoding);
+	static const EncodingStruct enc {"UTF-8", false, true, false};
+	return StringFromEncodedView(utf8view, enc);
 }
 
-String StringFromResRef(const ResRef& string)
+String StringFromUtf8(const char* data)
 {
-	return StringFromEncodedData(string.c_str(), ResRef::Size, core->TLKEncoding.encoding);
-}
-
-String StringFromUtf8(const char* string)
-{
-	EncodingStruct enc;
-	enc.encoding = "UTF-8";
-	enc.multibyte = true;
-	return StringFromEncodedData(string, enc);
+	return StringFromUtf8(StringView(data));
 }
 
 std::string RecodedStringFromWideStringBytes(const char16_t* bytes, size_t bytesLength, const std::string& encoding)

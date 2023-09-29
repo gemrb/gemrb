@@ -291,7 +291,7 @@ void View::Draw()
 				id &= 0x00000000ffffffff; // control id is lower 32bits
 
 				std::string formatted = fmt::format("id: {}  grp: {}  \nflgs: {}\ntype:{}", id, ref->ScriptingGroup(), flags, typeid(*this).name());
-				const String& string = StringFromCString(formatted.c_str());
+				const String& string = StringFromASCII(formatted);
 				
 				Region r = drawFrame;
 				r.w = win ? win->Frame().w - r.x : Frame().w - r.x;

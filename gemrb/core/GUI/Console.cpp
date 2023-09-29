@@ -171,7 +171,7 @@ void Console::LoadHistory()
 	if (histFile) {
 		std::string line;
 		while (histFile->ReadLine(line) != DataStream::Error) {
-			History.Append(std::make_pair(-1, StringFromCString(line.c_str())));
+			History.Append(std::make_pair(-1, StringFromUtf8(line)));
 		}
 	}
 	delete histFile;

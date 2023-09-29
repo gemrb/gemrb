@@ -648,8 +648,8 @@ void CREImporter::ReadChrHeader(Actor *act)
 	str->Rewind();
 	str->Read (Signature, 8);
 	str->ReadVariable(name);
-	if (name[0]) {
-		act->SetName(StringFromCString(name.c_str()), 0); //setting longname
+	if (name) {
+		act->SetName(StringFromTLK(name), 0); //setting longname
 	}
 	str->ReadDword(offset);
 	str->ReadDword(size);
@@ -706,7 +706,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 		{
 			ieVariable soundFolder;
 			str->ReadVariable(soundFolder);
-			act->PCStats->SoundFolder = StringFromCString(soundFolder.c_str());
+			act->PCStats->SoundFolder = StringFromTLK(soundFolder);
 		}
 		str->ReadResRef(act->PCStats->SoundSet);
 		for (auto& setting : act->PCStats->ExtraSettings) {

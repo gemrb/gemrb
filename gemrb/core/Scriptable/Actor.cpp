@@ -8632,7 +8632,7 @@ String Actor::GetSoundFolder(int full, const ResRef& overrideSet) const
 		set = overrideSet;
 	}
 
-	String wSet = StringFromResRef(set);
+	String wSet = StringFromTLK(set);
 	String soundset;
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS)) {
 		if (full) {

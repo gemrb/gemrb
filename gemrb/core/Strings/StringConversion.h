@@ -21,6 +21,7 @@
 
 #include "CString.h"
 #include "String.h"
+#include "StringView.h"
 #include "ie_types.h"
 
 namespace GemRB {
@@ -35,9 +36,11 @@ struct EncodingStruct
 
 // String creators
 GEM_EXPORT char* ConvertCharEncoding(const char * string, const char * from, const char* to);
-GEM_EXPORT String StringFromCString(const char* string);
-GEM_EXPORT String StringFromResRef(const ResRef& string);
-GEM_EXPORT String StringFromUtf8(const char* string);
+GEM_EXPORT String StringFromEncodedView(const StringView& view, const EncodingStruct& encoding);
+GEM_EXPORT String StringFromASCII(const StringView& asciiview);
+GEM_EXPORT String StringFromTLK(const StringView& tlkview);
+GEM_EXPORT String StringFromUtf8(const char* data);
+GEM_EXPORT String StringFromUtf8(const StringView& tlkview);
 GEM_EXPORT std::string RecodedStringFromWideStringBytes(const char16_t* bytes, size_t bytesLength, const std::string& encoding);
 GEM_EXPORT std::string MBStringFromString(const String& string);
 GEM_EXPORT std::string TLKStringFromString(const String& string);

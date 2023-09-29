@@ -3142,7 +3142,7 @@ int GameScript::CharName(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	return actor->GetShortName() == StringFromCString(parameters->string0Parameter.c_str());
+	return actor->GetShortName() == StringFromTLK(parameters->string0Parameter);
 }
 
 int GameScript::AnimationID(Scriptable *Sender, const Trigger *parameters)

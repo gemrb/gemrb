@@ -1306,7 +1306,7 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 			bytes[500] = '\0';
 			ieDword readonly;
 			str->ReadDword(readonly); // readonly == 1
-			map->AddMapNote(point, 0, StringFromCString(bytes), readonly);
+			map->AddMapNote(point, 0, StringFromTLK(StringView(bytes)), readonly);
 			str->Seek(20, GEM_CURRENT_POS);
 		}
 	} else {

@@ -6098,7 +6098,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		String basename = u"Auto-Save";
 		AutoTable tab = gamedata->LoadTable("savegame");
 		if (tab) {
-			basename = StringFromCString(tab->QueryDefault().c_str());
+			basename = StringFromTLK(tab->QueryDefault());
 		}
 		String str = core->GetString(ieStrRef(parameters->int0Parameter), STRING_FLAGS::STRREFOFF);
 		String FolderName = fmt::format(u"{} - {}", basename, str);
@@ -7489,7 +7489,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 		TableMgr::index_t j = RAND<TableMgr::index_t>(0, tm->GetColumnCount(i) - 1);
 		ieVariable tokenname = tm->GetRowName(i);
 
-		core->GetTokenDictionary()[tokenname] = StringFromCString(tm->QueryField(i, j).c_str());
+		core->GetTokenDictionary()[tokenname] = StringFromTLK(tm->QueryField(i, j));
 	}
 }
 
@@ -7593,7 +7593,7 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 		auto fav = std::max_element(favs.begin(), favs.end(), [] (const auto& lhs, const auto& rhs) {
 			return lhs.second < rhs.second;
 		});
-		if (fav->second != 0) token = StringFromCString(fav->first.c_str());
+		if (fav->second != 0) token = StringFromTLK(fav->first);
 		core->GetTokenDictionary()[favtok] = token;
 		SetTokenAsString(cnttok, fav->second);
 	};

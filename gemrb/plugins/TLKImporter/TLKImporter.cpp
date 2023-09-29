@@ -335,7 +335,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		if (OverrideTLK) {
 			size_t Length;
 			char* cstr = OverrideTLK->ResolveAuxString(strref, Length);
-			string = StringFromCString(cstr);
+			string = StringFromTLK(StringView(cstr, Length));
 			free(cstr);
 		}
 		type = 0;
@@ -358,7 +358,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 			str->Seek( StrOffset + Offset, GEM_STREAM_START );
 			std::string mbstr(l, '\0');
 			str->Read(&mbstr[0], l);
-			string = StringFromCString(mbstr.c_str());
+			string = StringFromTLK(mbstr);
 		}
 	}
 
