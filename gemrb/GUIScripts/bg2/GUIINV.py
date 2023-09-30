@@ -22,6 +22,7 @@
 ###################################################
 
 import GemRB
+import GameCheck
 import GUICommon
 import GUICommonWindows
 import CommonTables
@@ -35,7 +36,13 @@ def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
 
 	Window.AddAlias("WIN_INV")
-	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
+	# info label, game paused, etc
+	if GameCheck.IsBG2EE ():
+		Feedback = Window.GetControl (64)
+	else:
+		Feedback = Window.GetControl (0x1000003f)
+	Feedback.AddAlias ("MsgSys", 1)
+	Feedback.SetText ("")
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
@@ -82,9 +89,10 @@ def InitInventoryWindow (Window):
 	Label = Window.GetControl (0x1000003a)
 	Label.SetTooltip (17378)
 
-	# info label, game paused, etc
-	Label = Window.GetControl (0x1000003f)
-	Label.SetText ("")
+	# TODO: ee, by default ees load the dragging window, where stats are
+	# displayed before and after equipping an item
+	# loading the normal INVSTATS bam as an overlay is done by ui.menu,
+	# which also takes care of the missing bg of the AC/HP/THAC0/damage buttons
 
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
 	for slot in range (SlotCount):
