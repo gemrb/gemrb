@@ -39,6 +39,8 @@ class INITag {
 private:
 	std::vector< INIPair> pairs;
 	std::string TagName;
+
+	static const std::string emptyValue;
 public:
 	explicit INITag(std::string Name) : TagName(std::move(Name)) {};
 
@@ -52,10 +54,7 @@ public:
 		return (int) pairs.size();
 	}
 
-	const std::string& GetKeyNameByIndex(int index) const
-	{
-		return pairs[index].Name;
-	}
+	const std::string& GetKeyNameByIndex(int index) const;
 
 	bool AddLine(std::string iniLine);
 	StringView GetKeyAsString(StringView Key, StringView Default) const;
@@ -76,10 +75,7 @@ public:
 	{
 		return static_cast<int>(tags.size());
 	}
-	StringView GetTagNameByIndex(int index) const override
-	{
-		return tags[index].GetTagName();
-	}
+	StringView GetTagNameByIndex(int index) const override;
 
 	int GetKeysCount(StringView Tag) const override;
 	StringView GetKeyNameByIndex(StringView Tag, int index) const override;

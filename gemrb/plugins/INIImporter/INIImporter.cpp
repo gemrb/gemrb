@@ -108,6 +108,16 @@ bool INITag::GetKeyAsBool(StringView Key, const bool Default) const
 	return atoi(ret) != 0;
 }
 
+const std::string INITag::emptyValue;
+
+const std::string& INITag::GetKeyNameByIndex(int index) const {
+	if (index < GetKeyCount()) {
+		return pairs[index].Name;
+	}
+
+	return emptyValue;
+}
+
 // standard INI file importer
 bool INIImporter::Open(DataStream* str)
 {
@@ -161,6 +171,14 @@ bool INIImporter::Open(DataStream* str)
 	}
 	delete str;
 	return true;
+}
+
+StringView INIImporter::GetTagNameByIndex(int index) const {
+	if (index < GetTagsCount()) {
+		return tags[index].GetTagName();
+	}
+
+	return {};
 }
 
 int INIImporter::GetKeysCount(StringView Tag) const
