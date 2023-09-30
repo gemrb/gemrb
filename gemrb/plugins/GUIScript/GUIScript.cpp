@@ -3071,6 +3071,7 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 
 		auto func = core->GetKeyMap()->LookupFunction(keymap);
 		if (!func) {
+			Log(DEBUG, "GUIScript", "Couldn't find keymap entry for {}", keymap);
 			Py_RETURN_NONE;
 		}
 
