@@ -30,6 +30,8 @@ static bool StringCompKey(const std::string& str, TableMgr::key_t key)
 	return stricmp(str.c_str(), key.c_str()) == 0;
 }
 
+TableMgr::index_t p2DAImporter::npos = TableMgr::npos;
+
 bool p2DAImporter::Open(DataStream* str)
 {
 	if (str == NULL) {
