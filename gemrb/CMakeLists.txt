@@ -185,6 +185,19 @@ IF (BUILD_TESTING)
     TARGET_LINK_LIBRARIES(Test_gemrb_core shlwapi)
   ENDIF()
 
-  ADD_TEST(NAME Test_gemrb_core COMMAND Test_gemrb_core)
-  FILE(COPY tests/resources DESTINATION ${CMAKE_BINARY_DIR}/gemrb/tests)
+  IF (MSVC)
+    ADD_TEST(NAME Test_gemrb_core
+      COMMAND ${CMAKE_COMMAND} -E env "PATH=${CMAKE_BINARY_DIR}/gemrb;$ENV{PATH}" Test_gemrb_core
+      WORKING_DIRECTORY $<TARGET_FILE_DIR:gemrb_core>
+    )
+  ELSE()
+    ADD_TEST(NAME Test_gemrb_core COMMAND Test_gemrb_core
+      WORKING_DIRECTORY $<TARGET_FILE_DIR:gemrb_core>
+    )
+  ENDIF()
+
+  ADD_CUSTOM_COMMAND(TARGET Test_gemrb_core POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:gemrb_core>/tests/resources
+      && ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/gemrb/tests/resources $<TARGET_FILE_DIR:gemrb_core>/tests/resources
+  )
 ENDIF()

@@ -509,7 +509,7 @@ ADD_DEFINITIONS("-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0")
 # On Release builds cmake automatically defines NDEBUG, so we
 # explicitly undefine it:
 # This matches stripped (Release) and nonstripped (RelWithDebInfo) builds
-if(CMAKE_BUILD_TYPE MATCHES "Rel.*" AND NOT MSVC)
+if(CMAKE_BUILD_TYPE MATCHES "Rel.*")
 	ADD_DEFINITIONS("-UNDEBUG")
 endif()
 
@@ -601,6 +601,43 @@ MACRO(ADD_GEMRB_PLUGIN plugin_name)
 			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/gemrb/plugins)
 	ENDIF (APPLE)
 ENDMACRO(ADD_GEMRB_PLUGIN)
+
+# TODO: think of a way to add additional libs for linking
+MACRO(ADD_GEMRB_PLUGIN_TEST plugin_name)
+	IF (BUILD_TESTING)
+		ADD_EXECUTABLE(Test_${plugin_name} ${ARGN})
+
+		TARGET_LINK_LIBRARIES(Test_${plugin_name} GTest::gtest GTest::gtest_main gemrb_core)
+
+		# copy test executables to where the core lib is
+		IF (WIN32)
+			ADD_CUSTOM_COMMAND(TARGET Test_${plugin_name} POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Test_${plugin_name}> $<TARGET_FILE_DIR:gemrb_core>
+			)
+
+			# 3rd party DLLs are somewhere in the build directory
+			IF (MSVC)
+				ADD_TEST(NAME Test_${plugin_name}
+					COMMAND ${CMAKE_COMMAND} -E env "PATH=${CMAKE_BINARY_DIR}/gemrb;$ENV{PATH}" $<TARGET_FILE_DIR:gemrb_core>/$<TARGET_FILE_NAME:Test_${plugin_name}>
+					WORKING_DIRECTORY $<TARGET_FILE_DIR:gemrb_core>
+				)
+			ELSE ()
+				ADD_TEST(NAME Test_${plugin_name}
+					COMMAND $<TARGET_FILE_DIR:gemrb_core>/$<TARGET_FILE_NAME:Test_${plugin_name}>
+					WORKING_DIRECTORY $<TARGET_FILE_DIR:gemrb_core>
+				)
+			ENDIF()
+		# set env to where the core lib is
+		ELSE()
+			ADD_TEST(NAME Test_${plugin_name}
+				COMMAND $<TARGET_FILE:Test_${plugin_name}>
+				WORKING_DIRECTORY $<TARGET_FILE_DIR:gemrb_core>
+			)
+			SET_PROPERTY(TEST Test_${plugin_name} PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=$<TARGET_FILE_DIR:gemrb_core>")
+			SET_PROPERTY(TEST Test_${plugin_name} PROPERTY ENVIRONMENT "DYLD_LIBRARY_PATH=$<TARGET_FILE_DIR:gemrb_core>")
+		ENDIF()
+	ENDIF()
+ENDMACRO()
 
 # also put the chosen paths in the man page (Ubuntu)
 CONFIGURE_FILE(
