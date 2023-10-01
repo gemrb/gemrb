@@ -24,20 +24,14 @@
 #include "SymbolMgr.h"
 #include "Strings/StringView.h"
 
+#include <utility>
 #include <vector>
 
 namespace GemRB {
 
 class IDSImporter : public SymbolMgr {
 private:
-	struct Pair {
-		int val;
-		std::string str;
-		
-		Pair(int val, std::string str)
-		: val(val), str(std::move(str))
-		{}
-	};
+	using Pair = std::pair<int, std::string>;
 
 	std::vector<Pair> pairs;
 

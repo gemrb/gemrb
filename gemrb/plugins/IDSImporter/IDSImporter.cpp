@@ -64,8 +64,8 @@ bool IDSImporter::Open(DataStream* str)
 int IDSImporter::GetValue(StringView txt) const
 {
 	for (const auto& pair : pairs) {
-		if (stricmp(pair.str.c_str(), txt.c_str()) == 0) {
-			return pair.val;
+		if (stricmp(pair.second.c_str(), txt.c_str()) == 0) {
+			return pair.first;
 		}
 	}
 	return -1;
@@ -74,8 +74,8 @@ int IDSImporter::GetValue(StringView txt) const
 const std::string& IDSImporter::GetValue(int val) const
 {
 	for (const auto& pair : pairs) {
-		if (pair.val == val) {
-			return pair.str;
+		if (pair.first == val) {
+			return pair.second;
 		}
 	}
 	return blank;
@@ -86,7 +86,7 @@ const std::string& IDSImporter::GetStringIndex(size_t Index) const
 	if (Index >= pairs.size()) {
 		return blank;
 	}
-	return pairs[Index].str;
+	return pairs[Index].second;
 }
 
 int IDSImporter::GetValueIndex(size_t Index) const
@@ -94,14 +94,14 @@ int IDSImporter::GetValueIndex(size_t Index) const
 	if (Index >= pairs.size()) {
 		return 0;
 	}
-	return pairs[Index].val;
+	return pairs[Index].first;
 }
 
 int IDSImporter::FindString(StringView str) const
 {
 	int i = static_cast<int>(pairs.size());
 	while(i--) {
-		if (strnicmp(pairs[i].str.c_str(), str.c_str(), str.length()) == 0) {
+		if (strnicmp(pairs[i].second.c_str(), str.c_str(), str.length()) == 0) {
 			return i;
 		}
 	}
@@ -112,7 +112,7 @@ int IDSImporter::FindValue(int val) const
 {
 	int i = static_cast<int>(pairs.size());
 	while(i--) {
-		if(pairs[i].val==val) {
+		if(pairs[i].first == val) {
 			return i;
 		}
 	}
@@ -127,10 +127,10 @@ int IDSImporter::GetHighestValue() const
 	}
 	//the highest value is likely at the last line
 	i--;
-	int max = pairs[i].val;
+	int max = pairs[i].first;
 	while (i--) {
-		if (pairs[i].val > max) {
-			max = pairs[i].val;
+		if (pairs[i].first > max) {
+			max = pairs[i].first;
 		}
 	}
 	return max;
