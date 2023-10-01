@@ -33,7 +33,7 @@ class ActionResponder {
 public:
 	using Action = uint32_t;
 	
-	const class Responder {
+	class Responder {
 		using ResponderCallback = Callback<void, T>;
 		ResponderCallback callback = nullptr;
 
@@ -69,14 +69,16 @@ public:
 		}
 
 		void operator()(T responder) const {
-			assert(responder->executingResponseHandler == nullptr);
-			responder->executingResponseHandler = this;
+			assert(responder->responderStack.empty() || responder->responderStack.back() != this);
+			responder->responderStack.push_back(this);
 			callback(responder);
-			responder->executingResponseHandler = nullptr;
+			responder->responderStack.pop_back();
 		}
-		
+
 		operator bool() const { return bool(callback); }
-	}* executingResponseHandler = nullptr;
+	};
+
+	std::vector<const Responder*> responderStack;
 
 	class ActionKey {
 		uint32_t key;
@@ -94,14 +96,14 @@ public:
 	};
 	
 public:
-	bool IsExecutingResponseHandler() const { return executingResponseHandler; }
+	bool IsExecutingResponseHandler() const { return !responderStack.empty(); }
 
 	virtual void SetAction(Responder handler, const ActionKey& key) = 0;
 	virtual bool PerformAction(const ActionKey& action) = 0;
 	virtual bool SupportsAction(const ActionKey& action) = 0;
 	
 	virtual ~ActionResponder() {
-		assert(executingResponseHandler == nullptr);
+		assert(responderStack.empty());
 	}
 };
 
