@@ -587,7 +587,7 @@ bool Window::InActionHandler() const
 		}
 	}
 	
-	return executingResponseHandler;
+	return !responderStack.empty();
 }
 
 bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
