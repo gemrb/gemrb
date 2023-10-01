@@ -270,6 +270,7 @@ struct ItemDragOp : public Control::ControlDragOp {
 	CREItem* item;
 
 	explicit ItemDragOp(CREItem* item);
+	~ItemDragOp();
 	
 private:
 	static Control dragDummy;

@@ -213,6 +213,13 @@ ItemDragOp::ItemDragOp(CREItem* item)
 	dragDummy.BindDictVariable("itembutton", Control::INVALID_VALUE);
 }
 
+ItemDragOp::~ItemDragOp() {
+	Window* win = GetWindow(0, "WIN_INV");
+	if (win) {
+		win->Focus();
+	}
+}
+
 Interface::Interface(CoreSettings&& cfg)
 : config(std::move(cfg))
 {
