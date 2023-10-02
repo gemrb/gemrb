@@ -153,6 +153,7 @@ def OpenPriestSpellInfoWindow (spell):
 
 	Label = Window.GetControl (0x0fffffff)
 	Label.SetText (spell['SpellName'])
+	Label.SetFlags(IE_GUI_LABEL_USE_COLOR, OP_OR)
 
 	Icon = Window.GetControl (1)
 	Icon.SetSpellIcon (spell['SpellResRef'])
