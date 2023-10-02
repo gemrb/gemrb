@@ -1615,13 +1615,17 @@ def RedrawStoreStealWindow (Window):
 
 def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
 	if Slot == None:
-		Button.SetVisible(False)
+		# BG1 doesnt have empty slots on the window bg
+		# instead of GameChecking, just clear data for all instead of setting visibility
+		Button.SetPicture(None)
+		Button.SetState(IE_GUI_BUTTON_DISABLED)
+		Button.SetText("")
+		Button.EnableBorder (1, False)
 		Label.SetVisible(False)
 		return
 
 	Item = GemRB.GetItem (Slot['ItemResRef'])
 	Button.SetItemIcon (Slot['ItemResRef'], 0)
-	Button.SetVisible(True)
 	Label.SetVisible(True)
 	if Item['MaxStackAmount'] > 1:
 		Button.SetText ( str(Slot['Usages0']) )
