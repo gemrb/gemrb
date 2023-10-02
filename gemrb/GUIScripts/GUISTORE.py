@@ -316,26 +316,20 @@ def InitStoreShoppingWindow (Window):
 			Label.SetText (51881)
 		else:
 			Label.SetText ("")
-		# buy price ...
-		Label = Window.GetControlAlias ('PRICEB')
-		Label.SetText ("")
-		# sell price ...
-		Label = Window.GetControlAlias ('PRICES')
-		Label.SetText ("")
+
 		# buy price ...
 		Label = Window.GetControl (0x1000002f)
 		Label.SetText ("")
 		# sell price ...
 		Label = Window.GetControl (0x10000030)
 		Label.SetText ("")
-	else:
-		# buy price ...
-		Label = Window.GetControlAlias ('PRICEB')
-		Label.SetText ("0")
 
-		# sell price ...
-		Label = Window.GetControlAlias ('PRICES')
-		Label.SetText ("0")
+	# buy price ...
+	Label = Window.GetControlAlias ('PRICEB')
+	Label.SetText ("")
+	# sell price ...
+	Label = Window.GetControlAlias ('PRICES')
+	Label.SetText ("")
 
 	for i in range (ItemButtonCount):
 		Button = Window.GetControlAlias ('LBTN' + str(i))
@@ -1622,11 +1616,13 @@ def RedrawStoreStealWindow (Window):
 def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
 	if Slot == None:
 		Button.SetVisible(False)
+		Label.SetVisible(False)
 		return
 
 	Item = GemRB.GetItem (Slot['ItemResRef'])
 	Button.SetItemIcon (Slot['ItemResRef'], 0)
 	Button.SetVisible(True)
+	Label.SetVisible(True)
 	if Item['MaxStackAmount'] > 1:
 		Button.SetText ( str(Slot['Usages0']) )
 	else:
