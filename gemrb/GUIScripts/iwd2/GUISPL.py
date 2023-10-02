@@ -293,9 +293,16 @@ def OnSpellBookMemorizeSpell (btn):
 	BookType = GetBookType(pc)
 	Window = GemRB.GetView("WIN_SPL")
 
+	spell = GemRB.GetKnownSpell(pc, BookType, level, btn.Value)
+	memorized = MemorizedSpellList(pc, BookType, level)
+	for idx in range(len(memorized)):
+		if memorized[idx]["SpellResRef"] == spell["SpellResRef"]:
+			break
+	else: # not found, use next slot
+		idx = len(memorized)
+
 	def Complete():
-		mem_cnt = GemRB.GetMemorizedSpellsCount(pc, BookType, level, False)
-		AnimBtn = Window.GetControl(mem_cnt + 5)
+		AnimBtn = Window.GetControl(idx + 6)
 		AnimBtn.SetAnimation("FLASH", 0, A_ANI_PLAYONCE | A_ANI_BLEND)
 		AnimBtn.OnAnimEnd(lambda: UpdateSpellBookWindow (Window))
 
