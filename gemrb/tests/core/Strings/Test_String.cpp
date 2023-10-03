@@ -148,6 +148,19 @@ TEST(String_Test, RTrim) {
 	EXPECT_EQ(testString, u"space lt");
 }
 
+TEST(String_Test, RTrimCopy) {
+	String testString{u"space  "};
+	EXPECT_EQ(RTrimCopy(testString), u"space");
+
+	testString = u"\n\n\n";
+	EXPECT_EQ(RTrimCopy(testString), u"");
+
+	testString = u"space ltd";
+	EXPECT_EQ(RTrimCopy(testString), u"space ltd");
+
+	EXPECT_EQ((RTrimCopy(testString, u"xd")), u"space lt");
+}
+
 TEST(String_Test, LTrim) {
 	String testString{u"  space"};
 	LTrim(testString);

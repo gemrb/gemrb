@@ -31,4 +31,20 @@ TEST(StringView_Test, Equality) {
 	EXPECT_NE(StringView{"123"}, StringView{"abc"});
 }
 
+TEST(StringView_Test, clear) {
+	StringView unit{"abc"};
+	unit.clear();
+
+	EXPECT_EQ(unit.length(), 0);
+	EXPECT_TRUE(unit.empty());
+}
+
+TEST(StringView_Test, erase) {
+	StringView unit{"abcd"};
+	unit.erase(3);
+
+	EXPECT_EQ(unit.length(), 3);
+	EXPECT_EQ(unit, StringView{"abc"});
+}
+
 }
