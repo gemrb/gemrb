@@ -210,7 +210,7 @@ using namespace GemRB;
 		gemrb.Main();
 		VideoDriver.reset();
 	} catch (std::exception& e) {
-		Log(FATAL, "Cocoa Wrapper", "Unable to initialize core: {}. Terminating.", e.what());
+		Log(FATAL, "Cocoa Wrapper", "Unable to initialize core: {}. Terminating.", e);
 	}
 
 	if ([defaults boolForKey:@"TerminateOnClose"]) {

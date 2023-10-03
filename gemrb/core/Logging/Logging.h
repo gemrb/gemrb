@@ -32,6 +32,7 @@
 #include "Strings/String.h"
 
 #include <cstdarg>
+#include <fmt/std.h>
 
 namespace GemRB {
 

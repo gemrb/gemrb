@@ -112,7 +112,7 @@ using namespace GemRB;
 			free(argv);
 			gemrb.Main(); // pass control to GemRB
 		} catch (CoreInitializationException& cie) {
-			Log(FATAL, "Main", "Aborting due to fatal error... {}", cie.what());
+			Log(FATAL, "Main", "Aborting due to fatal error... {}", cie);
 			// reload the wrapper interface so we can try again instead of dying
 			[self setupWrapper];
 		}

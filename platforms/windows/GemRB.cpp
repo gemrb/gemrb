@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 		Interface gemrb(std::move(cfg));
 		gemrb.Main();
 	} catch (CoreInitializationException& cie) {
-		Log(FATAL, "Main", "Aborting due to fatal error... {}", cie.what());
+		Log(FATAL, "Main", "Aborting due to fatal error... {}", cie);
 		ret = GEM_ERROR;
 	}
 

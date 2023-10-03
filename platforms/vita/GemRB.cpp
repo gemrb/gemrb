@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 		Interface gemrb(LoadFromArgs(argc, argv));
 		gemrb.Main();
 	} catch (CoreInitializationException& cie) {
-		Log(FATAL, "Main", "Aborting due to fatal error... {}", cie.what());
+		Log(FATAL, "Main", "Aborting due to fatal error... {}", cie);
 		ToggleLogging(false);
 		return sceKernelExitProcess(GEM_ERROR);
 	}

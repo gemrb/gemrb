@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 #endif
 		gemrb.Main();
 	} catch (CoreInitializationException& cie) {
-		Log(FATAL, "Main", "Aborting due to fatal error... {}", cie.what());
+		Log(FATAL, "Main", "Aborting due to fatal error... {}", cie);
 		return GEM_ERROR;
 	}
 
