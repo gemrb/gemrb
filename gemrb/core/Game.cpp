@@ -2412,7 +2412,7 @@ void Game::CheckAreaComment()
 		int areaType = tm->QueryFieldSigned<int>(rows, 0);
 		if (!(pc->GetCurrentArea()->AreaType & areaType)) continue;
 
-		int vc = tm->QueryFieldSigned<int>(rows, 1);
+		unsigned int vc = tm->QueryFieldUnsigned<unsigned int>(rows, 1);
 		if (tm->QueryFieldSigned<int>(rows, 2) && !core->GetGame()->IsDay()) {
 			vc++;
 		}
