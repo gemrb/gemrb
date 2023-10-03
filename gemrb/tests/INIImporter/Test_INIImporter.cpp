@@ -45,40 +45,38 @@ TEST_F(INIImporter_Test, GetTagsCount) {
 	EXPECT_EQ(unit.GetTagsCount(), 4);
 }
 
-TEST_F(INIImporter_Test, GetTagNameByIndex) {
-	EXPECT_EQ(StringView{"sectionA"}, unit.GetTagNameByIndex(0));
-	EXPECT_EQ(StringView{"sectionB"}, unit.GetTagNameByIndex(1));
-	EXPECT_EQ(StringView{"sectionC"}, unit.GetTagNameByIndex(2));
-	EXPECT_EQ(StringView{"sectionC"}, unit.GetTagNameByIndex(3));
+TEST_F(INIImporter_Test, GroupIteration) {
+	auto it = unit.begin();
 
-	EXPECT_EQ(StringView{}, unit.GetTagNameByIndex(200));
+	EXPECT_EQ("sectionA", (*it++).GetName());
+	EXPECT_EQ("sectionB", (*it++).GetName());
+	EXPECT_EQ("sectionC", (*it++).GetName());
+	EXPECT_EQ("sectionC", (*it++).GetName());
+	EXPECT_EQ(unit.end(), it);
 }
 
-TEST_F(INIImporter_Test, GetKeysCount) {
-	EXPECT_EQ(unit.GetKeysCount(StringView{"SectionA"}), 6);
-	EXPECT_EQ(unit.GetKeysCount(StringView{"sectiona"}), 6);
-	EXPECT_EQ(unit.GetKeysCount(StringView{"SectionB"}), 1);
-	// first tag match
-	EXPECT_EQ(unit.GetKeysCount(StringView{"SectionC"}), 1);
+TEST_F(INIImporter_Test, Find) {
+	auto it = unit.find("sectionC");
+	auto it2 = unit.find("Sectionc");
+	EXPECT_EQ(it, it2);
 
-	EXPECT_EQ(unit.GetKeysCount(StringView{"nope"}), 0);
+	EXPECT_EQ("sectionC", it->GetName());
 }
 
-TEST_F(INIImporter_Test, GetKeyNameByIndex) {
-	auto sectionA = StringView{"SectionA"};
-	auto sectionB = StringView{"SectionB"};
-	auto sectionC = StringView{"SectionC"};
+TEST_F(INIImporter_Test, KeyValueIteration) {
+	auto it = unit.begin();
+	std::unordered_map<std::string, std::string> values;
 
-	EXPECT_EQ(StringView{"stringValue"}, (unit.GetKeyNameByIndex(sectionA, 0)));
-	EXPECT_EQ(StringView{"intValue"}, (unit.GetKeyNameByIndex(sectionA, 1)));
-	EXPECT_EQ(StringView{"intValue"}, (unit.GetKeyNameByIndex(sectionA, 2)));
-	EXPECT_EQ(StringView{"floatValue"}, (unit.GetKeyNameByIndex(sectionA, 3)));
-	EXPECT_EQ(StringView{"trueValue"}, (unit.GetKeyNameByIndex(sectionA, 4)));
-	EXPECT_EQ(StringView{"anotherStringValue"}, (unit.GetKeyNameByIndex(sectionB, 0)));
-	EXPECT_EQ(StringView{"iAm"}, (unit.GetKeyNameByIndex(sectionC, 0)));
+	for (const auto& p : *it) {
+		values[static_cast<StringView>(p.first).MakeString()] = p.second;
+	};
 
-	EXPECT_EQ(StringView{}, (unit.GetKeyNameByIndex(sectionA, 100)));
-	EXPECT_EQ(StringView{}, (unit.GetKeyNameByIndex(StringView{"section404"}, 0)));
+	EXPECT_EQ(5, values.size());
+	EXPECT_EQ("abc", values.find("stringValue")->second);
+	EXPECT_EQ("1", values.find("intValue")->second);
+	EXPECT_EQ("2.5", values.find("floatValue")->second);
+	EXPECT_EQ("true", values.find("trueValue")->second);
+	EXPECT_EQ("FALSE", values.find("falseValue")->second);
 }
 
 TEST_F(INIImporter_Test, GetKeyAsString) {
@@ -87,19 +85,22 @@ TEST_F(INIImporter_Test, GetKeyAsString) {
 	EXPECT_EQ(StringView{"abc"}, (unit.GetKeyAsString(sectionA, StringView{"stringValue"})));
 	EXPECT_EQ(StringView{"abc"}, (unit.GetKeyAsString(sectionA, StringView{"Stringvalue"})));
 	EXPECT_EQ(StringView{"n/a"}, (unit.GetKeyAsString(sectionA, StringView{"strongValue"}, StringView{"n/a"})));
-	// first match
-	EXPECT_EQ(StringView{"123"}, (unit.GetKeyAsString(sectionA, StringView{"intValue"})));
+	// last match
+	EXPECT_EQ(StringView{"1"}, (unit.GetKeyAsString(sectionA, StringView{"intValue"})));
 	EXPECT_EQ(StringView{"2.5"}, (unit.GetKeyAsString(sectionA, StringView{"floatValue"})));
 	EXPECT_EQ(StringView{"true"}, (unit.GetKeyAsString(sectionA, StringView{"trueValue"})));
 
 	EXPECT_EQ(StringView{"xyz"}, (unit.GetKeyAsString(StringView{"sectionB"}, StringView{"anotherStringValue"})));
+	// match of first sec C
+	EXPECT_EQ(StringView{"Here"}, (unit.GetKeyAsString(StringView{"sectionC"}, StringView{"iAm"})));
+	EXPECT_EQ(StringView{}, (unit.GetKeyAsString(StringView{"sectionC"}, StringView{"2ndKey"})));
 }
 
 TEST_F(INIImporter_Test, GetKeyAsInt) {
 	auto sectionA = StringView{"SectionA"};
 
-	EXPECT_EQ(123, (unit.GetKeyAsInt(sectionA, StringView{"intValue"}, 0)));
-	EXPECT_EQ(123, (unit.GetKeyAsInt(sectionA, StringView{"Intvalue"}, 0)));
+	EXPECT_EQ(1, (unit.GetKeyAsInt(sectionA, StringView{"intValue"}, 0)));
+	EXPECT_EQ(1, (unit.GetKeyAsInt(sectionA, StringView{"Intvalue"}, 0)));
 	EXPECT_EQ(456, (unit.GetKeyAsInt(sectionA, StringView{"intValueX"}, 456)));
 	EXPECT_EQ(0, (unit.GetKeyAsInt(sectionA, StringView{"stringValue"}, 2)));
 	EXPECT_EQ(2, (unit.GetKeyAsInt(sectionA, StringView{"floatValue"}, 0)));
@@ -113,7 +114,7 @@ TEST_F(INIImporter_Test, GetKeyAsFloat) {
 	EXPECT_EQ(1.5, (unit.GetKeyAsFloat(sectionA, StringView{"floatValueX"}, 1.5)));
 
 	EXPECT_EQ(0.0, (unit.GetKeyAsFloat(sectionA, StringView{"stringValue"}, 2.0)));
-	EXPECT_EQ(123.0, (unit.GetKeyAsFloat(sectionA, StringView{"intValue"}, 0.0)));
+	EXPECT_EQ(1.0, (unit.GetKeyAsFloat(sectionA, StringView{"intValue"}, 0.0)));
 }
 
 TEST_F(INIImporter_Test, GetKeyAsBool) {
@@ -127,6 +128,16 @@ TEST_F(INIImporter_Test, GetKeyAsBool) {
 	EXPECT_TRUE(unit.GetKeyAsBool(sectionA, StringView{"intValue"}, false));
 	EXPECT_TRUE(unit.GetKeyAsBool(sectionA, StringView{"floatValue"}, false));
 	EXPECT_FALSE(unit.GetKeyAsBool(sectionA, StringView{"stringValue"}, true));
+}
+
+TEST_F(INIImporter_Test, GetAsAndGetAsXEquality) {
+	auto sectionA = StringView{"SectionA"};
+	auto section = *unit.find(sectionA);
+
+	EXPECT_EQ((section.GetAs<StringView>("stringValue", StringView{"no"})), (unit.GetKeyAsString(sectionA, StringView{"stringValue"})));
+	EXPECT_EQ((section.GetAs<int>("intValue", 0)), (unit.GetKeyAsInt(sectionA, StringView{"intValue"}, 4)));
+	EXPECT_EQ((section.GetAs<float>("floatValue", 0.0)), (unit.GetKeyAsFloat(sectionA, StringView{"floatValue"}, 17.0)));
+	EXPECT_EQ((section.GetAs<bool>("trueValue", false)), (unit.GetKeyAsBool(sectionA, StringView{"trueValue"}, false)));
 }
 
 }

@@ -26,63 +26,40 @@
 #include "globals.h"
 
 #include <cstring>
+#include <unordered_map>
 #include <vector>
 
 namespace GemRB {
 
-struct INIPair {
-	std::string Name;
-	std::string Value;
-};
-
-class INITag {
-private:
-	std::vector< INIPair> pairs;
-	std::string TagName;
-
-	static const std::string emptyValue;
-public:
-	explicit INITag(std::string Name) : TagName(std::move(Name)) {};
-
-	const std::string& GetTagName() const
-	{
-		return TagName;
-	}
-
-	int GetKeyCount() const
-	{
-		return (int) pairs.size();
-	}
-
-	const std::string& GetKeyNameByIndex(int index) const;
-
-	bool AddLine(std::string iniLine);
-	StringView GetKeyAsString(StringView Key, StringView Default) const;
-	int GetKeyAsInt(StringView Key, const int Default) const;
-	float GetKeyAsFloat(StringView Key, const float Default) const;
-	bool GetKeyAsBool(StringView Key, const bool Default) const;
-};
-
 class INIImporter : public DataFileMgr {
 private:
-	std::vector<INITag> tags;
+	std::vector<KeyValueGroup> tags;
 
 public:
 	INIImporter() noexcept = default;
 	~INIImporter(void) override = default;
 	bool Open(DataStream* stream) override;
-	int GetTagsCount() const override
-	{
-		return static_cast<int>(tags.size());
-	}
-	StringView GetTagNameByIndex(int index) const override;
 
-	int GetKeysCount(StringView Tag) const override;
-	StringView GetKeyNameByIndex(StringView Tag, int index) const override;
+	KeyValueGroupIterator begin() const override;
+	KeyValueGroupIterator end() const override;
+	KeyValueGroupIterator find(StringView Tag) const override;
+
+	size_t GetTagsCount() const override;
 	StringView GetKeyAsString(StringView Tag, StringView Key, StringView Default = StringView()) const override;
 	int GetKeyAsInt(StringView Tag, StringView Key, int Default) const override;
 	float GetKeyAsFloat(StringView Tag, StringView Key, float Default) const override;
 	bool GetKeyAsBool(StringView Tag, StringView Key, bool Default) const override;
+
+private:
+	template<typename T>
+	T GetAs(StringView Tag, StringView Key, const T Default) const {
+		auto result = find(Tag);
+		if (result != end()) {
+			return result->GetAs<T>(Key, Default);
+		}
+
+		return Default;
+	}
 };
 
 }

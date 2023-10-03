@@ -2180,15 +2180,14 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 		overrides = defaults;
 	}
 
-	for (int i = 0; i < defaults->GetTagsCount(); i++) {
-		const StringView tag = defaults->GetTagNameByIndex(i);
-		for (int j = 0; j < defaults->GetKeysCount(tag); j++) {
-			auto key = std::string{defaults->GetKeyNameByIndex(tag, j).c_str()};
-			//skip any existing entries. GemRB.cfg has priority
+	for (auto& group : *defaults) {
+		for (auto& pair : group) {
+			// skip any existing entries. GemRB.cfg has priority
+			const auto& key = pair.first;
 			auto lookup = vars.Get(key);
 			if (lookup == nullptr) {
-				ieDword defaultVal = defaults->GetKeyAsInt(tag, key, 0);
-				vars.Set(key, overrides->GetKeyAsInt(tag, key, defaultVal));
+				auto value = group.GetAs<int>(pair.first, 0);
+				vars.Set(key, overrides->GetKeyAsInt(group.GetName(), key, value));
 			}
 		}
 	}
@@ -2243,12 +2242,12 @@ bool Interface::SaveConfig()
 	if (INIStream && defaultsINI->Open(INIStream)) {
 		// dump the formatted default config options to the file
 		std::string contents;
-		for (int i = 0; i < defaultsINI->GetTagsCount(); i++) {
-			const StringView tag = defaultsINI->GetTagNameByIndex(i);
-			// write section header
-			AppendFormat(contents, "[{}]\n", tag);
-			for (int j = 0; j < defaultsINI->GetKeysCount(tag); j++) {
-				auto key = std::string{defaultsINI->GetKeyNameByIndex(tag, j).c_str()};
+
+		for (auto& group : *defaultsINI) {
+			AppendFormat(contents, "[{}]\n", group.GetName());
+
+			for (auto& pair : group) {
+				const auto& key = pair.first;
 				auto lookup = vars.Get(key);
 				assert(lookup != nullptr);
 				AppendFormat(contents, "{} = {}\n", key, *lookup);

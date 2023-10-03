@@ -5220,7 +5220,7 @@ static PyObject* GemRB_GetINIPartyCount(PyObject * /*self*/,
 	if (!core->GetPartyINI()) {
 		return RuntimeError( "INI resource not found!\n" );
 	}
-	return PyLong_FromLong(core->GetPartyINI()->GetTagsCount());
+	return PyLong_FromSize_t(core->GetPartyINI()->GetTagsCount());
 }
 
 PyDoc_STRVAR( GemRB_GetINIQuestsKey__doc,

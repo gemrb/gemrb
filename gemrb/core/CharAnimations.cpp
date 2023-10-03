@@ -107,7 +107,8 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 
 		if (resdata) {
 			std::string section = fmt::to_string(i);
-			if (!resdata->GetKeysCount(section)) continue;
+			auto lookup = resdata->find(section);
+			if (lookup == resdata->end() || lookup->size() == 0) continue;
 
 			float walkscale = resdata->GetKeyAsFloat(section, "walkscale", 0.0f);
 			if (walkscale != 0.0f) table[i].WalkScale = (int)(1000.0f / walkscale);
