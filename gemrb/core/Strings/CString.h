@@ -47,8 +47,6 @@ struct CstrHash
 	size_t operator() (const StringView& str) const {
 		size_t nHash = 0;
 		for (const auto& c : str) {
-			if (c == '\0')
-				break;
 			nHash = (nHash << 5) ^ TRANS(c);
 		}
 		return nHash;
