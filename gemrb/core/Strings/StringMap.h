@@ -69,6 +69,7 @@ public:
 
 	template <typename T>
 	auto SetAs(const StringView& key, T value) {
+		static_assert(sizeof(T) <= sizeof(V), "Cannot truncate value. Use Set() and static_cast if it must be done.");
 		return Set(key, static_cast<V>(value));
 	}
 
