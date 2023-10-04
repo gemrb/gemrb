@@ -61,25 +61,33 @@ inline int tolower(int ch)
 
 using CstrHashCI = CstrHash<tolower>;
 
-template <int(*CMP)(const char*, const char*) = strcmp>
+template <int(*CMP)(const char*, const char*, size_t) = strncmp>
 struct CstrLess
 {
-	int operator() (const StringView& lhs, const StringView& rhs) const {
-		return CMP(lhs.c_str(), rhs.c_str()) < 0;
+	bool operator() (const StringView& lhs, const StringView& rhs) const {
+		// FIXME: this is broken when a StringView containes '\0'
+		size_t len = std::min(lhs.length(), rhs.length());
+		int ret = CMP(lhs.c_str(), rhs.c_str(), len);
+		if (ret == 0 && lhs.length() < rhs.length()) {
+			return true;
+		}
+		return ret < 0;
 	}
 };
 
-using CstrLessCI = CstrLess<stricmp>;
+using CstrLessCI = CstrLess<strnicmp>;
 
-template <int(*CMP)(const char*, const char*) = strcmp>
+template <int(*CMP)(const char*, const char*, size_t) = strncmp>
 struct CstrEq
 {
-	int operator() (const StringView& lhs, const StringView& rhs) const {
-		return CMP(lhs.c_str(), rhs.c_str()) == 0;
+	bool operator() (const StringView& lhs, const StringView& rhs) const {
+		// FIXME: this is broken when a StringView containes '\0'
+		if (lhs.length() != rhs.length()) return false;
+		return CMP(lhs.c_str(), rhs.c_str(), lhs.length()) == 0;
 	}
 };
 
-using CstrEqCI = CstrEq<stricmp>;
+using CstrEqCI = CstrEq<strnicmp>;
 
 template<size_t LEN, int(*CMP)(const char*, const char*, size_t) = strncmp>
 class FixedSizeString {
