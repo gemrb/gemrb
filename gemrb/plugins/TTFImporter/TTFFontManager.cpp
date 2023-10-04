@@ -167,7 +167,7 @@ Holder<Font> TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/,
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x3AD6427C, "TTF Font Importer")
-PLUGIN_RESOURCE(TTFFontManager, "ttf")
+PLUGIN_IE_RESOURCE(TTFFontManager, "ttf", (ieWord) IE_TTF_CLASS_ID)
 PLUGIN_INITIALIZER(loadFT)
 PLUGIN_CLEANUP(destroyFT)
 END_PLUGIN()

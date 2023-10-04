@@ -64,6 +64,7 @@ path_t TypeExt(SClass_ID type)
 		{ IE_TLK_CLASS_ID, "tlk" },
 		{ IE_TOH_CLASS_ID, "toh" },
 		{ IE_TOT_CLASS_ID, "tot" },
+		{ IE_TTF_CLASS_ID, "ttf" },
 		{ IE_VAR_CLASS_ID, "var" },
 		{ IE_VEF_CLASS_ID, "vef" },
 		{ IE_VVC_CLASS_ID, "vvc" },

@@ -75,6 +75,8 @@
  *
  * @def PLUGIN_IE_RESOURCE
  * Registers a resource through ResourceManager.
+ * @param[in] cls Class to register.
+ * @param[in] ext Extension of resource files.
  * @param[in] ie_id Type id that appears in BIF files.
  *
  * See \ref{PLUGIN_RESOURCE} for details. The ie_id will be used when
