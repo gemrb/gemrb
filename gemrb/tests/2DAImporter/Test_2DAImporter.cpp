@@ -29,15 +29,13 @@ static const path_t ENC_SAMPLE_FILE = PathJoin("tests", "resources", "2DAImporte
 
 class p2DAImporter_Test : public testing::TestWithParam<path_t> {
 protected:
-	FileStream* stream;
 	p2DAImporter unit;
 public:
 	void SetUp() override {
-		this->stream = new FileStream{};
+		auto stream = new FileStream{};
+
 		assert(stream->Open(GetParam()));
-		assert(unit.Open(stream));
-		// p2DAImporter deletes stream internally after use
-		this->stream = nullptr;
+		assert(unit.Open(std::unique_ptr<DataStream>{stream}));
 	}
 };
 

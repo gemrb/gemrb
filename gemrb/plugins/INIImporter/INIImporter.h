@@ -38,7 +38,7 @@ private:
 public:
 	INIImporter() noexcept = default;
 	~INIImporter(void) override = default;
-	bool Open(DataStream* stream) override;
+	bool Open(std::unique_ptr<DataStream> stream) override;
 
 	KeyValueGroupIterator begin() const override;
 	KeyValueGroupIterator end() const override;

@@ -29,18 +29,15 @@ static const path_t ENC_SAMPLE_FILE = PathJoin("tests", "resources", "IDSImporte
 
 class IDSImporter_Test : public testing::TestWithParam<path_t> {
 protected:
-	FileStream* stream;
 	IDSImporter unit;
 	const path_t path;
 
 public:
 	void SetUp() override {
-		this->stream = new FileStream{};
+		auto stream = new FileStream{};
 
 		assert(stream->Open(GetParam()));
-		assert(unit.Open(stream));
-		// IDSImporter deletes stream internally after use
-		this->stream = nullptr;
+		assert(unit.Open(std::unique_ptr<DataStream>{stream}));
 	}
 };
 

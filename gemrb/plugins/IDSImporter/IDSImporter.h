@@ -38,7 +38,7 @@ private:
 public:
 	IDSImporter() noexcept = default;
 
-	bool Open(DataStream* stream) override;
+	bool Open(std::unique_ptr<DataStream> stream) override;
 	int GetValue(StringView txt) const override;
 	const std::string& GetValue(int val) const override;
 	const std::string& GetStringIndex(size_t Index) const override;

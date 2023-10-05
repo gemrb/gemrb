@@ -25,12 +25,8 @@
 using namespace GemRB;
 
 // standard INI file importer
-bool INIImporter::Open(DataStream* str)
+bool INIImporter::Open(std::unique_ptr<DataStream> str)
 {
-	if (str == NULL) {
-		return false;
-	}
-
 	std::string strbuf;
 	KeyValueGroup* lastTag = NULL;
 	bool startedSection = false;
@@ -75,7 +71,7 @@ bool INIImporter::Open(DataStream* str)
 				str->filename, lastTag->GetName(), strbuf);
 		}
 	}
-	delete str;
+
 	return true;
 }
 

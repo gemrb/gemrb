@@ -32,11 +32,8 @@ static bool StringCompKey(const std::string& str, TableMgr::key_t key)
 
 TableMgr::index_t p2DAImporter::npos = TableMgr::npos;
 
-bool p2DAImporter::Open(DataStream* str)
+bool p2DAImporter::Open(std::unique_ptr<DataStream> str)
 {
-	if (str == NULL) {
-		return false;
-	}
 	str->CheckEncrypted();
 
 	std::string line;
@@ -88,7 +85,6 @@ bool p2DAImporter::Open(DataStream* str)
 		rows.emplace_back(Explode<StringView, cell_t>(sv, ' ', colNames.size() - 1));
 	}
 
-	delete str;
 	assert(rows.size() < std::numeric_limits<index_t>::max());
 	return true;
 }

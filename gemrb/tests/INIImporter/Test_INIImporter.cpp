@@ -28,16 +28,13 @@ static const path_t SAMPLE_FILE = PathJoin("tests", "resources", "INIImporter", 
 
 class INIImporter_Test : public testing::Test {
 protected:
-	FileStream* stream;
 	INIImporter unit;
 public:
 	void SetUp() override {
-		this->stream = new FileStream{};
+		auto stream = new FileStream{};
 
 		assert(stream->Open(SAMPLE_FILE));
-		assert(unit.Open(stream));
-		// INIImporter deletes stream internally after use
-		this->stream = nullptr;
+		assert(unit.Open(std::unique_ptr<DataStream>{stream}));
 	}
 };
 

@@ -29,6 +29,7 @@
 #define DATAFILEMGR_H
 
 #include <algorithm>
+#include <memory>
 #include <vector>
 
 #include "Plugin.h"
@@ -156,7 +157,7 @@ class GEM_EXPORT DataFileMgr : public Plugin {
 public:
 	using KeyValueGroupIterator = std::vector<KeyValueGroup>::const_iterator;
 
-	virtual bool Open(DataStream* stream) = 0;
+	virtual bool Open(std::unique_ptr<DataStream> stream) = 0;
 
 	virtual KeyValueGroupIterator begin() const = 0;
 	virtual KeyValueGroupIterator end() const = 0;

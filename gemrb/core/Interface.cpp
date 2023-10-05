@@ -502,7 +502,8 @@ Interface::Interface(CoreSettings&& cfg)
 		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		path_t tINIparty = PathJoin(config.GamePath, "Party.ini");
 		fs = FileStream::OpenFile(tINIparty);
-		if (!INIparty->Open(fs)) {
+
+		if (!INIparty->Open(std::unique_ptr<DataStream>{fs})) {
 			Log(WARNING, "Core", "Failed to load precreated teams.");
 		}
 	}
@@ -516,7 +517,8 @@ Interface::Interface(CoreSettings&& cfg)
 		INIbeasts = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		path_t tINIbeasts = PathJoin(config.GamePath, "beast.ini");
 		fs = FileStream::OpenFile(tINIbeasts);
-		if (!INIbeasts->Open(fs)) {
+
+		if (!INIbeasts->Open(std::unique_ptr<DataStream>{fs})) {
 			Log(WARNING, "Core", "Failed to load beast definitions.");
 		}
 
@@ -524,7 +526,8 @@ Interface::Interface(CoreSettings&& cfg)
 		INIquests = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		path_t tINIquests = PathJoin(config.GamePath, "quests.ini");
 		FileStream* fs2 = FileStream::OpenFile(tINIquests);
-		if (!INIquests->Open(fs2)) {
+
+		if (!INIquests->Open(std::unique_ptr<DataStream>{fs2})) {
 			Log(WARNING, "Core", "Failed to load quest definitions.");
 		}
 	}
@@ -1053,7 +1056,8 @@ void Interface::InitAudio()
 		INIresdata = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		StringView sv(resdata ? "resdata" : "sounds");
 		DataStream* ds = gamedata->GetResourceStream(sv, IE_INI_CLASS_ID);
-		if (!INIresdata->Open(ds)) {
+
+		if (!INIresdata->Open(std::unique_ptr<DataStream>{ds})) {
 			Log(WARNING, "Core", "Failed to load resource data.");
 		}
 	}
@@ -1382,7 +1386,7 @@ void Interface::LoadGemRBINI()
 		inifile->originalfile);
 
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-	ini->Open(inifile);
+	ini->Open(std::unique_ptr<DataStream>{inifile});
 
 	ResRef tooltipBG;
 	// Resrefs are already initialized in Interface::Interface()
@@ -1484,7 +1488,7 @@ bool Interface::LoadEncoding()
 		inifile->originalfile);
 
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-	ini->Open(inifile);
+	ini->Open(std::unique_ptr<DataStream>{inifile});
 
 	TLKEncoding.encoding = StringFromView<std::string>(ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding));
 	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", false);
@@ -1911,9 +1915,11 @@ int Interface::LoadSymbol(const ResRef& ref)
 		delete str;
 		return -1;
 	}
-	if (!sm->Open(str)) {
+
+	if (!sm->Open(std::unique_ptr<DataStream>{str})) {
 		return -1;
 	}
+
 	Symbol s = { sm, ref };
 	ind = -1;
 	for (size_t i = 0; i < symbols.size(); i++) {
@@ -2157,20 +2163,17 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	FileStream* iniStream = FileStream::OpenFile(iniFileName);
 	// if filename is not set we assume we are creating defaults without an INI
-	bool opened = ini->Open(iniStream);
+	bool opened = iniStream != nullptr && ini->Open(std::unique_ptr<DataStream>{iniStream});
 	if (iniFileName[0] && !opened) {
 		Log(WARNING, "Core", "Unable to read defaults from '{}'. Using GemRB default values.", iniFileName);
 	} else {
 		overrides = ini;
 	}
-	if (!opened || iniFileName[0] == 0) {
-		delete iniStream; // Open deletes it itself on success
-	}
 
 	PluginHolder<DataFileMgr> gemINI = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	DataStream* gemINIStream = gamedata->GetResourceStream("defaults", IE_INI_CLASS_ID);
 
-	if (!gemINIStream || !gemINI->Open(gemINIStream)) {
+	if (!gemINIStream || !gemINI->Open(std::unique_ptr<DataStream>{gemINIStream})) {
 		Log(WARNING, "Core", "Unable to load GemRB default values.");
 		defaults = ini;
 	} else {
@@ -2239,7 +2242,7 @@ bool Interface::SaveConfig()
 	PluginHolder<DataFileMgr> defaultsINI = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	DataStream* INIStream = gamedata->GetResourceStream("defaults", IE_INI_CLASS_ID);
 
-	if (INIStream && defaultsINI->Open(INIStream)) {
+	if (INIStream && defaultsINI->Open(std::unique_ptr<DataStream>{INIStream})) {
 		// dump the formatted default config options to the file
 		std::string contents;
 

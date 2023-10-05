@@ -25,6 +25,8 @@
 #ifndef SYMBOLMGR_H
 #define SYMBOLMGR_H
 
+#include <memory>
+
 #include "Plugin.h"
 #include "Streams/DataStream.h"
 
@@ -37,7 +39,7 @@ namespace GemRB {
 
 class GEM_EXPORT SymbolMgr : public Plugin {
 public:
-	virtual bool Open(DataStream* stream) = 0;
+	virtual bool Open(std::unique_ptr<DataStream> stream) = 0;
 	/// Returns -1 if string isn't found.
 	virtual int GetValue(StringView text) const = 0;
 	virtual const std::string& GetValue(int val) const = 0;

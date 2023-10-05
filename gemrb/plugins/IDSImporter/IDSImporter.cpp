@@ -30,12 +30,8 @@ using namespace GemRB;
 
 const std::string blank;
 
-bool IDSImporter::Open(DataStream* str)
+bool IDSImporter::Open(std::unique_ptr<DataStream> str)
 {
-	if (str == NULL) {
-		return false;
-	}
-
 	str->CheckEncrypted();
 	std::string line;
 	str->ReadLine(line, 10);
@@ -57,7 +53,6 @@ bool IDSImporter::Open(DataStream* str)
 		pairs.emplace_back(val, std::move(parts[1]));
 	}
 
-	delete str;
 	return true;
 }
 

@@ -60,7 +60,7 @@ static PluginHolder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 	}
 
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
-	ini->Open(inifile);
+	ini->Open(std::unique_ptr<DataStream>{inifile});
 	return ini;
 }
 
