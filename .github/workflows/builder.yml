@@ -126,8 +126,9 @@ jobs:
         if grep -q '^v[01]\.[0-9].[0-9]' <<< "${GITHUB_REF}"; then make fetch-demo-data; fi
         # create a debugging runner, since xvfb runs one command per process only
         echo "ulimit -Sc unlimited; sudo sysctl -w kernel.core_pattern=$PWD/core-%e" >> run-or-dump.sh
-        echo 'gemrb/gemrb -q --color 2 -c ../gemrb/GemRB.cfg.noinstall.sample ||' >> run-or-dump.sh
+        echo 'if ! gemrb/gemrb -q --color 2 -c ../gemrb/GemRB.cfg.noinstall.sample; then' >> run-or-dump.sh
         echo 'gdb -q -c core-* -ex bt -ex q -batch --args gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample' >> run-or-dump.sh
+        echo "exit 1; fi" >> run-or-dump.sh
         chmod +x run-or-dump.sh
 
     - name: Test Suite
