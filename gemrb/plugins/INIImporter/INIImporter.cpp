@@ -24,99 +24,11 @@
 
 using namespace GemRB;
 
-bool INITag::AddLine(std::string iniLine)
-{
-	auto equalsPos = iniLine.find_first_of('=');
-	if (equalsPos == std::string::npos) {
-		return false;
-	}
-
-	auto keyStart = iniLine.find_first_not_of(' ');
-	if (keyStart == std::string::npos) return true;
-	std::string key = iniLine.substr(keyStart, equalsPos - keyStart);
-	key = key.substr(0, key.find_last_not_of(' ') + 1); // right trimming
-
-	auto valueStart = iniLine.find_first_not_of(' ', equalsPos + 1);
-	auto valueEnd = iniLine.find_last_not_of(' ');
-	if (valueStart == std::string::npos) return true;
-	if (valueEnd == std::string::npos) return true;
-	std::string value = iniLine.substr(valueStart, valueEnd - valueStart + 1);
-
-	INIPair p = { key, std::move(value) };
-	pairs.push_back(std::move(p));
-	return true;
-}
-
-StringView INITag::GetKeyAsString(StringView Key, StringView Default) const
-{
-	for (const auto& pair : pairs) {
-		if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
-			return pair.Value;
-		}
-	}
-	return Default;
-}
-
-int INITag::GetKeyAsInt(StringView Key, const int Default) const
-{
-	const char* ret = nullptr;
-	for (const auto& pair : pairs) {
-		if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
-			ret = pair.Value.c_str();
-			break;
-		}
-	}
-	if (!ret) {
-		return Default;
-	}
-	return atoi(ret);
-}
-
-float INITag::GetKeyAsFloat(StringView Key, const float Default) const
-{
-	const char* ret = nullptr;
-	for (const auto& pair : pairs) {
-		if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
-			ret = pair.Value.c_str();
-			break;
-		}
-	}
-	if (!ret) {
-		return Default;
-	}
-	return static_cast<float>(atof(ret));
-}
-
-bool INITag::GetKeyAsBool(StringView Key, const bool Default) const
-{
-	const char* ret = nullptr;
-	for (const auto& pair : pairs) {
-		if (stricmp(Key.c_str(), pair.Name.c_str()) == 0) {
-			ret = pair.Value.c_str();
-			break;
-		}
-	}
-	if (!ret) {
-		return Default;
-	}
-	if (!stricmp(ret, "true")) {
-		return true;
-	}
-	if (!stricmp(ret, "false")) {
-		return false;
-	}
-	return atoi(ret) != 0;
-}
-
 // standard INI file importer
-bool INIImporter::Open(DataStream* str)
+bool INIImporter::Open(std::unique_ptr<DataStream> str)
 {
-	if (str == NULL) {
-		return false;
-	}
-
 	std::string strbuf;
-	INITag* lastTag = NULL;
+	KeyValueGroup* lastTag = NULL;
 	bool startedSection = false;
 	while (str->ReadLine(strbuf) != DataStream::Error) {
 		if (strbuf.length() == 0)
@@ -141,7 +53,7 @@ bool INIImporter::Open(DataStream* str)
 			// [guard6]
 			// /.../
 			if (startedSection) {
-				Log(WARNING, "INIImporter", "Skipping empty section in '{}', entry: '{}'", str->filename, lastTag->GetTagName());
+				Log(WARNING, "INIImporter", "Skipping empty section in '{}', entry: '{}'", str->filename, lastTag->GetName());
 				tags.pop_back();
 			}
 
@@ -156,77 +68,49 @@ bool INIImporter::Open(DataStream* str)
 			startedSection = false;
 		} else {
 			Log(ERROR, "INIImporter", "Bad Line in file: {}, Section: [{}], Entry: '{}'",
-				str->filename, lastTag->GetTagName(), strbuf);
+				str->filename, lastTag->GetName(), strbuf);
 		}
 	}
-	delete str;
+
 	return true;
 }
 
-int INIImporter::GetKeysCount(StringView Tag) const
-{
-	for (const auto& tag : tags) {
-		const std::string& TagName = tag.GetTagName();
-		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
-			return tag.GetKeyCount();
-		}
-	}
-	return 0;
+INIImporter::KeyValueGroupIterator INIImporter::begin() const {
+	return tags.begin();
 }
 
-StringView INIImporter::GetKeyNameByIndex(StringView Tag, int index) const
-{
-	for (const auto& tag : tags) {
-		const std::string& TagName = tag.GetTagName();
-		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
-			return tag.GetKeyNameByIndex(index);
-		}
-	}
-	return StringView();
+INIImporter::KeyValueGroupIterator INIImporter::end() const {
+	return tags.end();
+}
+
+INIImporter::KeyValueGroupIterator INIImporter::find(StringView tag) const {
+	return std::find_if(tags.begin(), tags.end(), [tag](const auto& t) {
+		return stricmp(t.GetName().c_str(), tag.c_str()) == 0;
+	});
+}
+
+size_t INIImporter::GetTagsCount() const {
+	return tags.size();
 }
 
 StringView INIImporter::GetKeyAsString(StringView Tag, StringView Key, StringView Default) const
 {
-	for (const auto& tag : tags) {
-		const std::string& TagName = tag.GetTagName();
-		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
-			return tag.GetKeyAsString(Key, Default);
-		}
-	}
-	return Default;
+	return GetAs<StringView>(Tag, Key, Default);
 }
 
 int INIImporter::GetKeyAsInt(StringView Tag, StringView Key, const int Default) const
 {
-	for (const auto& tag : tags) {
-		const std::string& TagName = tag.GetTagName();
-		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
-			return tag.GetKeyAsInt(Key, Default);
-		}
-	}
-	return Default;
+	return GetAs<int>(Tag, Key, Default);
 }
 
 float INIImporter::GetKeyAsFloat(StringView Tag, StringView Key, const float Default) const
 {
-	for (const auto& tag : tags) {
-		const std::string& TagName = tag.GetTagName();
-		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
-			return tag.GetKeyAsFloat(Key, Default);
-		}
-	}
-	return Default;
+	return GetAs<float>(Tag, Key, Default);
 }
 
 bool INIImporter::GetKeyAsBool(StringView Tag, StringView Key, const bool Default) const
 {
-	for (const auto& tag : tags) {
-		const std::string& TagName = tag.GetTagName();
-		if (stricmp(TagName.c_str(), Tag.c_str()) == 0) {
-			return tag.GetKeyAsBool(Key, Default);
-		}
-	}
-	return Default;
+	return GetAs<bool>(Tag, Key, Default);
 }
 
 #include "plugindef.h"

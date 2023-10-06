@@ -28,6 +28,8 @@
 #ifndef TABLEMGR_H
 #define TABLEMGR_H
 
+#include <memory>
+
 #include "globals.h"
 
 #include "Strings/StringView.h"
@@ -95,7 +97,7 @@ public:
 	virtual index_t FindTableValue(const key_t& column, const key_t& value, index_t start = 0) const = 0;
 
 	/** Opens a Table File */
-	virtual bool Open(DataStream* stream) = 0;
+	virtual bool Open(std::unique_ptr<DataStream> stream) = 0;
 };
 
 using AutoTable = PluginHolder<TableMgr>;

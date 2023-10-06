@@ -24,27 +24,21 @@
 #include "SymbolMgr.h"
 #include "Strings/StringView.h"
 
+#include <utility>
 #include <vector>
 
 namespace GemRB {
 
 class IDSImporter : public SymbolMgr {
 private:
-	struct Pair {
-		int val;
-		std::string str;
-		
-		Pair(int val, std::string str)
-		: val(val), str(std::move(str))
-		{}
-	};
+	using Pair = std::pair<int, std::string>;
 
 	std::vector<Pair> pairs;
 
 public:
 	IDSImporter() noexcept = default;
 
-	bool Open(DataStream* stream) override;
+	bool Open(std::unique_ptr<DataStream> stream) override;
 	int GetValue(StringView txt) const override;
 	const std::string& GetValue(int val) const override;
 	const std::string& GetStringIndex(size_t Index) const override;

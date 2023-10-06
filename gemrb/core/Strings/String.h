@@ -110,6 +110,13 @@ void RTrim(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
 }
 
 template <typename STR>
+STR RTrimCopy(STR string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
+{
+	RTrim(string, chars);
+	return string;
+}
+
+template <typename STR>
 void LTrim(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
 {
 	string.erase(0, FindFirstNotOf(string, chars));

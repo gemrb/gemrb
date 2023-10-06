@@ -101,6 +101,14 @@ public:
 		return data + len;
 	}
 
+	void clear() {
+		erase(0);
+	}
+	
+	void erase(size_type index) {
+		this->len = index;
+	}
+
 	std::reverse_iterator<iterator> rbegin() const noexcept {
 		return std::reverse_iterator<iterator>(end());
 	}
