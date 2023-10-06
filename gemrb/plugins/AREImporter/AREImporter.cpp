@@ -1771,9 +1771,8 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += TrapCount * 0x1c;
 	NoteOffset = headersize;
 
-	int pst = core->HasFeature( GFFlags::AUTOMAP_INI );
 	NoteCount = map->GetMapNoteCount();
-	headersize += NoteCount * (pst?0x214: 0x34);
+	headersize += NoteCount * (core->HasFeature(GFFlags::AUTOMAP_INI) ? 0x214 : 0x34);
 	SongHeader = headersize;
 
 	headersize += 0x90;
