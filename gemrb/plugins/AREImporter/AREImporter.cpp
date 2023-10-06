@@ -1034,6 +1034,10 @@ void AREImporter::GetSpawnPoint(DataStream* str, int idx, Map* map) const
 	}
 	sp->Frequency = spawningFrequency;
 	str->ReadWord(sp->Method);
+	if (sp->Method & SPF_BGT) {
+		sp->Difficulty /= 100;
+	}
+
 	str->ReadDword(sp->sduration); // time to live for spawns
 	str->ReadWord(sp->rwdist); // random walk distance (0 is unlimited), hunting range
 	str->ReadWord(sp->owdist); // other walk distance (inactive in all engines?), follow range

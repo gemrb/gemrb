@@ -64,6 +64,7 @@ class Wall_Polygon;
 #define SPF_NOSPAWN		0x0001	//if set don't span if WAIT is set
 #define SPF_ONCE		0x0002	//only spawn a single time
 #define SPF_WAIT		0x0004	//spawn temporarily disabled
+#define SPF_BGT                 0x0008 // bgt v1.21 adjusted bg1 spawns to bg2 mode
 
 //area flags (pst uses them only for resting purposes!)
 #define AF_NOSAVE         1
