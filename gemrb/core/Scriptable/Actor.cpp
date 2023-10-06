@@ -4775,7 +4775,6 @@ ieDword Actor::GetXPLevel(int modified) const
 {
 	const stats_t& stats = modified ? Modified : BaseStats;
 
-	size_t clscount = 0;
 	stat_t average = 0;
 	if (iwd2class) {
 		// iwd2
@@ -4783,7 +4782,7 @@ ieDword Actor::GetXPLevel(int modified) const
 	} else {
 		stat_t levels[3]={stats[IE_LEVEL], stats[IE_LEVEL2], stats[IE_LEVEL3]};
 		average = levels[0];
-		clscount = 1;
+		size_t clscount = 1;
 		if (IsDualClassed()) {
 			// dualclassed
 			if (levels[1] > 0) {
