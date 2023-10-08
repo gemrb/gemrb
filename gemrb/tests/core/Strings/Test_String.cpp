@@ -201,6 +201,7 @@ TEST(String_Test, Explode) {
 	String c{u"c"};
 	String bc{u"b,c"};
 	std::vector<StringViewT<String>> expectedList{a, b, c};
+	std::vector<StringViewT<String>> emptyList;
 
 	auto input = String{u"a,b,c"};
 	auto result = Explode(input, u',');
@@ -217,6 +218,36 @@ TEST(String_Test, Explode) {
 	input = String{u"   a, b, c  "};
 	result = Explode(input, u',');
 	EXPECT_EQ(result, expectedList);
+
+	input = String {};
+	result = Explode(input);
+	EXPECT_EQ(result, emptyList);
+
+	input = String {u"a/b/c"};
+	emptyList.emplace_back(input);
+	result = Explode(input);
+	EXPECT_EQ(result, emptyList);
+
+	input = String {u","};
+	emptyList.clear();
+	emptyList.emplace_back();
+	emptyList.emplace_back();
+	result = Explode(input);
+	EXPECT_EQ(result, emptyList);
+
+	input = String {u",,"};
+	emptyList.emplace_back();
+	result = Explode(input);
+	EXPECT_EQ(result, emptyList);
+
+	input = String {u",,,"};
+	emptyList.emplace_back();
+	result = Explode(input);
+	EXPECT_EQ(result, emptyList);
+
+	input = String {u" ,, , "};
+	result = Explode(input);
+	EXPECT_EQ(result, emptyList);
 }
 
 TEST(String_Test, SubStr) {
