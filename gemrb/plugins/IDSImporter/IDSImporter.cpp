@@ -20,8 +20,6 @@
 
 #include "IDSImporter.h"
 
-#include "IDSImporterDefs.h"
-
 #include "globals.h"
 
 #include <cstring>
