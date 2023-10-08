@@ -70,7 +70,11 @@ TEST_P(IDSImporter_Test, GetValueIndex) {
 	EXPECT_EQ(unit.GetValueIndex(0), 8);
 	EXPECT_EQ(unit.GetValueIndex(10), 45);
 
-	EXPECT_EQ(unit.GetValueIndex(100), 0);
+#ifdef _MSC_VER
+	GTEST_SKIP() << "Not working on native Windows.";
+#else
+	ASSERT_DEATH_IF_SUPPORTED({ unit.GetValueIndex(100); }, "");
+#endif
 }
 
 TEST_P(IDSImporter_Test, FindString) {

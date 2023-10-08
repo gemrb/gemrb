@@ -214,8 +214,7 @@ size_t ProjectileServer::PrepareSymbols(const PluginHolder<SymbolMgr>& projlist)
 	size_t rows = projlist->GetSize();
 	while(rows--) {
 		unsigned int value = projlist->GetValueIndex(rows);
-		if (value>MAX_PROJ_IDX) {
-			//value = MAX_PROJ_IDX;
+		if (value > MAX_PROJ_IDX) {
 			Log(WARNING, "ProjectileServer", "Too high projectilenumber");
 			continue; // ignore
 		}

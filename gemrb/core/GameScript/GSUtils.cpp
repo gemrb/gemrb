@@ -2045,7 +2045,7 @@ Action *ParamCopyNoOverride(const Action *parameters)
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate)
 {
 	Trigger *newTrigger = new Trigger();
-	newTrigger->triggerID = (unsigned short) triggersTable->GetValueIndex( trIndex )&0x3fff;
+	newTrigger->triggerID = (unsigned short) triggersTable->GetValueIndex(trIndex) & 0x3fff;
 	newTrigger->flags = (unsigned short) negate;
 	int mergestrings = triggerflags[newTrigger->triggerID]&TF_MERGESTRINGS;
 	int stringsCount = 0;

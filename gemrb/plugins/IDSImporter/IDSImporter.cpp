@@ -86,9 +86,7 @@ const std::string& IDSImporter::GetStringIndex(size_t Index) const
 
 int IDSImporter::GetValueIndex(size_t Index) const
 {
-	if (Index >= pairs.size()) {
-		return 0;
-	}
+	assert(Index < pairs.size());
 	return pairs[Index].first;
 }
 
