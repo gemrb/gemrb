@@ -281,7 +281,8 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 def OnLockViewPress ():
 	OptionsWindow = GemRB.GetView("OPTWIN")
 	Button = OptionsWindow.GetControl (0)
-	GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR | SF_ALWAYSCENTER, OP_XOR)
+	GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_XOR)
+	GemRB.GameControlSetScreenFlags (SF_ALWAYSCENTER, OP_XOR)
 
 	# no way to get the screen flags
 	if OnLockViewPress.counter % 2:

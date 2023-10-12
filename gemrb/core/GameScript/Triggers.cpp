@@ -4089,7 +4089,7 @@ int GameScript::SystemVariable_Trigger(Scriptable *Sender, const Trigger *parame
 
 	switch (parameters->int0Parameter) {
 	case SYSV_SCREENFLAGS:
-		value = core->GetGameControl()->GetScreenFlags();
+		value = core->GetGameControl()->GetScreenFlags().to_ulong();
 		break;
 	case SYSV_CONTROLSTATUS:
 		value = core->GetGame()->ControlStatus;

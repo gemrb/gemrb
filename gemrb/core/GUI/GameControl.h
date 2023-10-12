@@ -76,7 +76,7 @@ private:
 	Point vpVector;
 	int numScrollCursor = 0;
 	PathListNode* drawPath = nullptr;
-	unsigned int ScreenFlags = SF_CENTERONACTOR;
+	EnumBitset<ScreenFlags> screenFlags;
 	unsigned int DialogueFlags = DF_FREEZE_SCRIPTS;
 	String DisplayText;
 	unsigned int DisplayTextTime = 0;
@@ -159,9 +159,9 @@ public:
 
 	void SetTargetMode(TargetMode mode);
 	TargetMode GetTargetMode() const { return targetMode; }
-	bool SetScreenFlags(unsigned int value, BitOp mode);
+	bool SetScreenFlags(ScreenFlags value, BitOp mode);
 	void SetDialogueFlags(unsigned int value, BitOp mode);
-	int GetScreenFlags() const { return ScreenFlags; }
+	EnumBitset<ScreenFlags> GetScreenFlags() const { return screenFlags; }
 	int GetDialogueFlags() const { return DialogueFlags; }
 	bool InDialog() const { return DialogueFlags & DF_IN_DIALOG; }
 	void SetDisplayText(const String& text, unsigned int time);

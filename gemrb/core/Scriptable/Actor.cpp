@@ -7913,7 +7913,7 @@ bool Actor::ShouldDrawCircle() const
 	}
 	
 	const GameControl* gc = core->GetGameControl();
-	if (gc->GetScreenFlags()&SF_CUTSCENE) {
+	if (gc->GetScreenFlags().Test(ScreenFlags::Cutscene)) {
 		// ground circles are not drawn in cutscenes
 		// except for the speaker
 		if (gc->dialoghandler->IsTarget(this) == false) {

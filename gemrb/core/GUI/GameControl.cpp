@@ -119,7 +119,7 @@ GameControl::GameControl(const Region& frame)
 
 	int lookup = core->GetDictionary().Get("Center", 0);
 	if (lookup) {
-		ScreenFlags |= SF_ALWAYSCENTER;
+		screenFlags.Set(ScreenFlags::AlwaysCenter);
 	}
 	// the game always starts paused so nothing happens till we are ready
 	dialoghandler = new DialogHandler();
@@ -420,7 +420,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 	
 	// handle keeping the actor in the spotlight, but only when unpaused
-	if ((ScreenFlags & SF_ALWAYSCENTER) && update_scripts) {
+	if (screenFlags.Test(ScreenFlags::AlwaysCenter) && update_scripts) {
 		const Actor *star = core->GetFirstSelectedActor();
 		if (star) {
 			vpVector = star->Pos - vpOrigin - Point(frame.w / 2, frame.h / 2);
@@ -428,7 +428,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	}
 
 	if (!vpVector.IsZero() && MoveViewportTo(vpOrigin + vpVector, false)) {
-		if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed() && (ScreenFlags & SF_ALWAYSCENTER) == 0) {
+		if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed() && !screenFlags.Test(ScreenFlags::AlwaysCenter)) {
 			orient_t orient = GetOrient(vpVector, Point());
 			// set these cursors on game window so they are universal
 			window->SetCursor(core->GetScrollCursorSprite(orient, numScrollCursor));
@@ -762,8 +762,8 @@ void GameControl::SelectActor(int whom, int type)
 
 	bool was_selected = actor->IsSelected();
 	if (game->SelectActor( actor, true, SELECT_REPLACE )) {
-		if (was_selected || (ScreenFlags & SF_ALWAYSCENTER)) {
-			ScreenFlags |= SF_CENTERONACTOR;
+		if (was_selected || screenFlags.Test(ScreenFlags::AlwaysCenter)) {
+			screenFlags.Set(ScreenFlags::CenterOnActor);
 		}
 	}
 }
@@ -917,8 +917,8 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			// o
 			case 'p': //center on actor
-				ScreenFlags|=SF_CENTERONACTOR;
-				ScreenFlags^=SF_ALWAYSCENTER;
+				screenFlags.Flip(ScreenFlags::CenterOnActor);
+				screenFlags.Flip(ScreenFlags::AlwaysCenter);
 				break;
 			case 'q': //joins actor to the party
 				if (lastActor && !lastActor->InParty) {
@@ -2465,11 +2465,11 @@ void GameControl::SetCutSceneMode(bool active)
 {
 	WindowManager* wm = core->GetWindowManager();
 	if (active) {
-		ScreenFlags |= SF_CUTSCENE;
+		screenFlags.Set(ScreenFlags::Cutscene);
 		vpVector.reset();
 		wm->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
-		ScreenFlags &= ~SF_CUTSCENE;
+		screenFlags.Clear(ScreenFlags::Cutscene);
 		wm->SetCursorFeedback(WindowManager::CursorFeedback(core->config.MouseFeedback));
 	}
 	SetFlags(IgnoreEvents, (active || InDialog()) ? BitOp::OR : BitOp::NAND);
@@ -2516,7 +2516,7 @@ void GameControl::ChangeMap(const Actor *pc, bool forced)
 		if (!core->InCutSceneMode()) {
 			// don't interfere with any scripted moves of the viewport
 			// checking core->timer->ViewportIsMoving() is not enough
-			ScreenFlags |= SF_CENTERONACTOR;
+			screenFlags.Set(ScreenFlags::CenterOnActor);
 		}
 		
 		SetDisabled(false);
@@ -2526,9 +2526,9 @@ void GameControl::ChangeMap(const Actor *pc, bool forced)
 		}
 	}
 	//center on first selected actor
-	if (pc && (ScreenFlags&SF_CENTERONACTOR)) {
+	if (pc && screenFlags.Test(ScreenFlags::CenterOnActor)) {
 		MoveViewportTo( pc->Pos, true );
-		ScreenFlags&=~SF_CENTERONACTOR;
+		screenFlags.Clear(ScreenFlags::CenterOnActor);
 	}
 }
 
@@ -2540,15 +2540,18 @@ void GameControl::FlagsChanged(unsigned int /*oldflags*/)
 	}
 }
 
-bool GameControl::SetScreenFlags(unsigned int value, BitOp mode)
+bool GameControl::SetScreenFlags(ScreenFlags value, BitOp mode)
 {
-	return SetBits(ScreenFlags, value, mode);
+	auto bits = screenFlags.to_ulong();
+	bool toggled = SetBits(bits, (unsigned long) value, mode);
+	screenFlags = EnumBitset<ScreenFlags>(bits);
+	return toggled;
 }
 
 void GameControl::SetDialogueFlags(unsigned int value, BitOp mode)
 {
 	SetBits(DialogueFlags, value, mode);
-	SetFlags(IgnoreEvents, (DialogueFlags&DF_IN_DIALOG || ScreenFlags&SF_CUTSCENE) ? BitOp::OR : BitOp::NAND);
+	SetFlags(IgnoreEvents, (DialogueFlags & DF_IN_DIALOG || screenFlags.Test(ScreenFlags::Cutscene)) ? BitOp::OR : BitOp::NAND);
 }
 
 Map* GameControl::CurrentArea() const

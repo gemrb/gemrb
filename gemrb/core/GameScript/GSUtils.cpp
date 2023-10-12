@@ -1390,7 +1390,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 	// should this perhaps be a 'selected' check or similar instead?
 	if (actor->InParty) {
 		GameControl *gc=core->GetGameControl();
-		gc->SetScreenFlags(SF_CENTERONACTOR, BitOp::OR);
+		gc->SetScreenFlags(ScreenFlags::CenterOnActor, BitOp::OR);
 		if (newSong) {
 			game->ChangeSong(false, true);
 		}

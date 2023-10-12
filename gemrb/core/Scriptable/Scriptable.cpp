@@ -263,7 +263,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	// area scripts still run for at least the current area, in bg1 (see ar2631, confirmed by testing)
 	// but not in bg2 (kill Abazigal in ar6005)
-	if (gc->GetScreenFlags() & SF_CUTSCENE) {
+	if (gc->GetScreenFlags().Test(ScreenFlags::Cutscene)) {
 		if (! (core->HasFeature(GFFlags::CUTSCENE_AREASCRIPTS) && Type == ST_AREA)) {
 			return;
 		}

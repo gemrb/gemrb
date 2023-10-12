@@ -2293,7 +2293,7 @@ void Interface::SetCutSceneMode(bool active)
 bool Interface::InCutSceneMode() const
 {
 	const GameControl *gc = GetGameControl();
-	if (!gc || gc->InDialog() || (gc->GetScreenFlags() & SF_CUTSCENE)) {
+	if (!gc || gc->InDialog() || gc->GetScreenFlags().Test(ScreenFlags::Cutscene)) {
 		return true;
 	}
 	return false;

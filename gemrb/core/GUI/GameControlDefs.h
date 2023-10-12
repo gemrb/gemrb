@@ -33,9 +33,13 @@
 
 // screen flags
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define SF_CENTERONACTOR 1  //
-#define SF_ALWAYSCENTER  2
-#define SF_CUTSCENE      4 //don't push new actions onto the action queue
+enum class ScreenFlags : unsigned int {
+	CenterOnActor = 0,
+	AlwaysCenter = 1,
+	Cutscene = 2, // don't push new actions onto the action queue
+
+	count = 3
+};
 
 // target modes and types
 // !!! Keep these synchronized with GUIDefines.py !!!

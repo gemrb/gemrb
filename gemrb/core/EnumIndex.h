@@ -174,6 +174,11 @@ public:
 		bits.set();
 	}
 
+	void Flip(ENUM key)
+	{
+		bits.flip(UnderType(key));
+	}
+
 	void Clear(ENUM key)
 	{
 		bits.reset(UnderType(key));

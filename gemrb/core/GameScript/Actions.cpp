@@ -1114,7 +1114,7 @@ void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 {
 	// disable centering if anything enabled it before us (eg. LeaveAreaLUA as in movie02a.bcs)
 	GameControl *gc = core->GetGameControl();
-	gc->SetScreenFlags(SF_CENTERONACTOR, BitOp::NAND);
+	gc->SetScreenFlags(ScreenFlags::CenterOnActor, BitOp::NAND);
 	core->timer.SetMoveViewPort( parameters->pointParameter, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?
@@ -1953,7 +1953,8 @@ void GameScript::LockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_CENTERONACTOR|SF_ALWAYSCENTER, BitOp::OR);
+		gc->SetScreenFlags(ScreenFlags::CenterOnActor, BitOp::OR);
+		gc->SetScreenFlags(ScreenFlags::AlwaysCenter, BitOp::OR);
 	}
 }
 
@@ -1961,7 +1962,8 @@ void GameScript::UnlockScroll(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		gc->SetScreenFlags(SF_CENTERONACTOR|SF_ALWAYSCENTER, BitOp::NAND);
+		gc->SetScreenFlags(ScreenFlags::CenterOnActor, BitOp::NAND);
+		gc->SetScreenFlags(ScreenFlags::AlwaysCenter, BitOp::NAND);
 	}
 }
 

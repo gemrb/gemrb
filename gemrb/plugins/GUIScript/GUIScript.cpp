@@ -3264,11 +3264,11 @@ Don't confuse it with the saved screen flags set by GameSetScreenFlags.\n\
 
 static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* args)
 {
-	int Flags;
+	ScreenFlags flag;
 	BitOp Operation;
-	PARSE_ARGS( args,  "ii", &Flags, &Operation );
+	PARSE_ARGS(args, "Ii", &flag, &Operation);
 	GET_GAMECONTROL();
-	RETURN_BOOL(gc->SetScreenFlags( Flags, Operation ));
+	RETURN_BOOL(gc->SetScreenFlags(flag, Operation));
 }
 
 
