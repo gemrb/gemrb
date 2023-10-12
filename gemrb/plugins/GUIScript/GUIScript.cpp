@@ -6344,6 +6344,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	case -1: return RuntimeError("avprefix table contains no entries." );
 	case -2: return RuntimeError("Couldn't load avprefix table.");
 	case -3: return RuntimeError("Couldn't load an avprefix subtable.");
+	default: break;
 	}
 
 	// clear several fields (only useful for cg; currently needed only in iwd2, but that will change if its system is ported to the rest)
@@ -7558,6 +7559,8 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		}
 		break;
 	}
+	default:
+		break;
 	}
 	return PyLong_FromLong(res);
 }
@@ -9131,10 +9134,11 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 		//the named actor cannot remove it except when initiating a swap (used for plain inventory slots)
 		// and make sure not to treat earrings improperly
 		case CRI_REMOVEFORSWAP:
-			int flags = usedItem.flags;
-			if (!(flags&1) || flags&4) {
+			if (!(usedItem.flags & 1) || usedItem.flags & 4) {
 				continue;
 			}
+			break;
+		default:
 			break;
 		}
 

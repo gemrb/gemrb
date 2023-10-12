@@ -2737,6 +2737,8 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 		case -1: // weak
 			if (apr % 2) apr++; // round up
 			break;
+		default:
+			break;
 		}
 		Modified[IE_NUMBEROFATTACKS] = apr;
 	}
@@ -3592,6 +3594,8 @@ bool Actor::GetPartyComment(const Actor* target)
 			break;
 		case I_INSULT:
 			target->Interact(I_INSULT_RESP);
+			break;
+		default:
 			break;
 	}
 	return true;
