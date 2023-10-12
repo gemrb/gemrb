@@ -273,9 +273,9 @@ void GameControl::ClearMouseState()
 // only PST supports RunToPoint
 void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool tryToRun) const
 {
-	Action *action = NULL;
+	Action* action = nullptr;
 	tryToRun |= AlwaysRun;
-	
+
 	if (append) {
 		action = GenerateAction(fmt::format("AddWayPoint([{}.{}])", p.x, p.y));
 		assert(action);
@@ -299,10 +299,9 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool
 bool GameControl::CanRun(const Actor *actor) const
 {
 	if (!actor) return false;
-	if (actor->GetEncumbranceFactor(true) != 1) {
-		return false;
-	}
-	return true;
+	static bool hasRun = GenerateActionDirect("RunToPoint([0.0])", actor) != nullptr;
+	if (!hasRun) return false;
+	return actor->GetEncumbranceFactor(true) == 1;
 }
 
 bool GameControl::ShouldRun(const Actor *actor) const
