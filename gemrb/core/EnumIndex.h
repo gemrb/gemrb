@@ -159,13 +159,33 @@ public:
 	operator[](ENUM key) {
 		return bits[UnderType(key)];
 	}
-	
+
+	bool Test(ENUM key) const
+	{
+		return bits.test(UnderType(key));
+	}
+
+	void Set(ENUM key)
+	{
+		bits.set(UnderType(key));
+	}
+
 	void SetAll() {
 		bits.set();
 	}
-	
+
+	void Clear(ENUM key)
+	{
+		bits.reset(UnderType(key));
+	}
+
 	void ClearAll() {
 		bits.reset();
+	}
+
+	unsigned long to_ulong() const
+	{
+		return bits.to_ulong();
 	}
 };
 
