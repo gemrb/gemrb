@@ -274,7 +274,7 @@ void GameControl::ClearMouseState()
 void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool tryToRun) const
 {
 	Action* action = nullptr;
-	tryToRun |= AlwaysRun;
+	tryToRun = tryToRun || AlwaysRun;
 
 	if (append) {
 		action = GenerateAction(fmt::format("AddWayPoint([{}.{}])", p.x, p.y));
@@ -656,7 +656,8 @@ bool GameControl::DispatchEvent(const Event& event) const
 /** Key Press Event */
 bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 {
-	unsigned int i, pc;
+	int i;
+	int pc;
 	Game* game = core->GetGame();
 
 	KeyboardKey keycode = Key.keycode;
@@ -1223,10 +1224,8 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 		}
 	}
 
-	if ((target_types & GA_NO_SELF) && lastActor ) {
-		if (lastActor == core->GetFirstSelectedActor()) {
-			lastActor=NULL;
-		}
+	if ((target_types & GA_NO_SELF) && lastActor == core->GetFirstSelectedActor()) {
+		lastActor = nullptr;
 	}
 
 	if (lastActor && lastActor->GetStat(IE_NOCIRCLE)) {
@@ -2096,7 +2095,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	bool isDoubleClick = me.repeats == 2;
 	bool tryToRun = isDoubleClick;
 	if (core->HasFeature(GFFlags::HAS_FLOAT_MENU)) {
-		tryToRun |= Mod & GEM_MOD_SHIFT;
+		tryToRun = tryToRun || (Mod & GEM_MOD_SHIFT);
 	}
 
 	// right click
