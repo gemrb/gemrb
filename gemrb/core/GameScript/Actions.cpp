@@ -6513,7 +6513,7 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 
 	//bashing makes the actor visible
 	actor->CureInvisibility();
-	gc->SetTargetMode(TARGET_MODE_ATTACK); //for bashing doors too
+	gc->SetTargetMode(TargetMode::Attack); // for bashing doors too
 
 	// try to bash it
 	if (door) {

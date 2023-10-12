@@ -74,13 +74,13 @@ void Container::Draw(bool highlight, const Region& vp, Color tint, BlitFlags fla
 }
 
 // returns the appropriate cursor over a container (or pile)
-int Container::GetCursor(int targetMode, int lastCursor) const
+int Container::GetCursor(TargetMode targetMode, int lastCursor) const
 {
 	if (Flags & CONT_DISABLED) {
 		return lastCursor;
 	}
 
-	if (targetMode == TARGET_MODE_PICK) {
+	if (targetMode == TargetMode::Pick) {
 		if (VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
 		}

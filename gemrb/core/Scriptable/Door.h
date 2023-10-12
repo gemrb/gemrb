@@ -23,8 +23,10 @@
 
 #include "PathFinder.h"
 #include "Polygon.h"
-#include "Scriptable/Scriptable.h"
 #include "TileOverlay.h"
+
+#include "GUI/GameControlDefs.h"
+#include "Scriptable/Scriptable.h"
 
 namespace GemRB {
 
@@ -114,7 +116,7 @@ public:
 	bool TryUnlock(Actor *actor) const;
 	void TryDetectSecret(int skill, ieDword actorID);
 	bool Visible() const;
-	int GetCursor(int targetMode, int lastCursor) const;
+	int GetCursor(TargetMode targetMode, int lastCursor) const;
 	std::string dump() const override;
 	int TrapResets() const override { return Flags & DOOR_RESET; }
 	bool CantAutoClose() const { return Flags & (DOOR_CANTCLOSE | DOOR_LOCKED); }

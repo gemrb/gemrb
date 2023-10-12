@@ -472,7 +472,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 	for (size_t idx = 0; (i = area->TMap->GetInfoPoint(idx)); idx++) {
 		i->Highlight = false;
 		if (i->VisibleTrap(0)) {
-			if (overMe == i && target_mode) {
+			if (overMe == i && targetMode != TargetMode::None) {
 				i->outlineColor = ColorGreen;
 			} else {
 				i->outlineColor = ColorRed;
@@ -501,7 +501,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 
 		if (overMe == d) {
 			d->Highlight = true;
-			if (target_mode) {
+			if (targetMode != TargetMode::None) {
 				if (d->Visible() && (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED))) {
 					// only highlight targettable doors
 					d->outlineColor = ColorGreen;
@@ -529,7 +529,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 
 		if (overMe == c) {
 			c->Highlight = true;
-			if (target_mode) {
+			if (targetMode != TargetMode::None) {
 				if (c->Flags & CONT_LOCKED) {
 					c->outlineColor = ColorGreen;
 				}
@@ -1166,21 +1166,23 @@ String GameControl::TooltipText() const {
 Holder<Sprite2D> GameControl::GetTargetActionCursor() const
 {
 	int curIdx = -1;
-	switch(target_mode) {
-		case TARGET_MODE_TALK:
+	switch (targetMode) {
+		case TargetMode::Talk:
 			curIdx = IE_CURSOR_TALK;
 			break;
-		case TARGET_MODE_ATTACK:
+		case TargetMode::Attack:
 			curIdx = IE_CURSOR_ATTACK;
 			break;
-		case TARGET_MODE_CAST:
+		case TargetMode::Cast:
 			curIdx = IE_CURSOR_CAST;
 			break;
-		case TARGET_MODE_DEFEND:
+		case TargetMode::Defend:
 			curIdx = IE_CURSOR_DEFEND;
 			break;
-		case TARGET_MODE_PICK:
+		case TargetMode::Pick:
 			curIdx = IE_CURSOR_PICK;
+			break;
+		default:
 			break;
 	}
 	if (curIdx != -1) {
@@ -1266,7 +1268,7 @@ void GameControl::UpdateCursor()
 	// ignore infopoints and containers beneath doors
 	if (overDoor) {
 		if (overDoor->Visible()) {
-			nextCursor = overDoor->GetCursor(target_mode, lastCursor);
+			nextCursor = overDoor->GetCursor(targetMode, lastCursor);
 		} else {
 			overMe = nullptr;
 		}
@@ -1274,7 +1276,7 @@ void GameControl::UpdateCursor()
 		InfoPoint* overInfoPoint = area->TMap->GetInfoPoint(gameMousePos, false);
 		overMe = overInfoPoint;
 		if (overInfoPoint) {
-			nextCursor = overInfoPoint->GetCursor(target_mode);
+			nextCursor = overInfoPoint->GetCursor(targetMode);
 		}
 		// recheck in case the position was different, resulting in a new isVisible check
 		if (nextCursor == IE_CURSOR_INVALID) {
@@ -1294,7 +1296,7 @@ void GameControl::UpdateCursor()
 	}
 
 	if (overContainer) {
-		nextCursor = overContainer->GetCursor(target_mode, lastCursor);
+		nextCursor = overContainer->GetCursor(targetMode, lastCursor);
 	}
 	// recheck in case the position was different, resulting in a new isVisible check
 	// fixes bg2 long block door in ar0801 above vamp beds, crashing on mouseover (too big)
@@ -1324,7 +1326,7 @@ void GameControl::UpdateCursor()
 		}
 	}
 
-	if (target_mode == TARGET_MODE_TALK) {
+	if (targetMode == TargetMode::Talk) {
 		nextCursor = IE_CURSOR_TALK;
 		if (!lastActor) {
 			nextCursor |= IE_CURSOR_GRAY;
@@ -1335,24 +1337,24 @@ void GameControl::UpdateCursor()
 				nextCursor |= IE_CURSOR_GRAY;
 			}
 		}
-	} else if (target_mode == TARGET_MODE_ATTACK) {
+	} else if (targetMode == TargetMode::Attack) {
 		nextCursor = IE_CURSOR_ATTACK;
 		if (!lastActor && (!overMe || overMe->Type <= ST_TRIGGER)) {
 			nextCursor |= IE_CURSOR_GRAY;
 		}
-	} else if (target_mode == TARGET_MODE_CAST) {
+	} else if (targetMode == TargetMode::Cast) {
 		nextCursor = IE_CURSOR_CAST;
 		// point is always valid if accessible
 		if (!(area->GetBlocked(gameMousePos) & (PathMapFlags::PASSABLE | PathMapFlags::TRAVEL | PathMapFlags::ACTOR)) ||
 		    (!(target_types & GA_POINT) && !lastActor)) {
 			nextCursor |= IE_CURSOR_GRAY;
 		}
-	} else if (target_mode == TARGET_MODE_DEFEND) {
+	} else if (targetMode == TargetMode::Defend) {
 		nextCursor = IE_CURSOR_DEFEND;
 		if(!lastActor) {
 			nextCursor |= IE_CURSOR_GRAY;
 		}
-	} else if (target_mode == TARGET_MODE_PICK) {
+	} else if (targetMode == TargetMode::Pick) {
 		if (lastActor) {
 			nextCursor = IE_CURSOR_PICK;
 		} else if (!overMe) {
@@ -1414,7 +1416,7 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 		return true;
 	}
 
-	if (target_mode != TARGET_MODE_NONE) {
+	if (targetMode != TargetMode::None) {
 		// we are in a target mode; nothing here applies
 		return true;
 	}
@@ -1466,7 +1468,7 @@ bool GameControl::OnTouchUp(const TouchEvent& te, unsigned short mod)
 bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 {
 	if (gesture.numFingers == 1) {
-		if (target_mode != TARGET_MODE_NONE) {
+		if (targetMode != TargetMode::None) {
 			// we are in a target mode; nothing here applies
 			return true;
 		}
@@ -1854,7 +1856,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 		return;
 	}
 
-	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
+	if ((targetMode == TargetMode::Cast) && spellCount) {
 		//we'll get the container back from the coordinates
 		TryToCast(actor, container->Pos);
 		//Do not reset target_mode, TryToCast does it for us!!
@@ -1863,13 +1865,13 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 
 	core->SetEventFlag(EF_RESETTARGET);
 
-	if (target_mode == TARGET_MODE_ATTACK) {
+	if (targetMode == TargetMode::Attack) {
 		std::string Tmp = fmt::format("BashDoor(\"{}\")", container->GetScriptName());
 		actor->CommandActor(GenerateAction(std::move(Tmp)));
 		return;
 	}
 
-	if (target_mode == TARGET_MODE_PICK) {
+	if (targetMode == TargetMode::Pick) {
 		TryToPick(actor, container);
 		return;
 	}
@@ -1883,7 +1885,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 void GameControl::HandleDoor(Door *door, Actor *actor)
 {
 	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
-	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
+	if ((targetMode == TargetMode::Cast) && spellCount) {
 		//we'll get the door back from the coordinates
 		const Point *p = door->toOpen;
 		const Point *otherp = door->toOpen+1;
@@ -1896,13 +1898,13 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 
 	core->SetEventFlag(EF_RESETTARGET);
 
-	if (target_mode == TARGET_MODE_ATTACK) {
+	if (targetMode == TargetMode::Attack) {
 		std::string Tmp = fmt::format("BashDoor(\"{}\")", door->GetScriptName());
 		actor->CommandActor(GenerateAction(std::move(Tmp)));
 		return;
 	}
 
-	if (target_mode == TARGET_MODE_PICK) {
+	if (targetMode == TargetMode::Pick) {
 		TryToPick(actor, door);
 		return;
 	}
@@ -1917,13 +1919,13 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point& p)
 {
 	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return false;
-	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
+	if ((targetMode == TargetMode::Cast) && spellCount) {
 		//we'll get the active region from the coordinates (if needed)
 		TryToCast(actor, p);
 		//don't bother with this region further
 		return true;
 	}
-	if (target_mode == TARGET_MODE_PICK) {
+	if (targetMode == TargetMode::Pick) {
 		TryToDisarm(actor, trap);
 		return true;
 	}
@@ -2102,9 +2104,9 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	if (me.button == GEM_MB_MENU) {
 		ieDword actionLevel = core->GetDictionary().Get("ActionLevel", 0);
 
-		if (target_mode != TARGET_MODE_NONE || actionLevel) {
+		if (targetMode != TargetMode::None || actionLevel) {
 			if (!core->HasFeature(GFFlags::HAS_FLOAT_MENU)) {
-				SetTargetMode(TARGET_MODE_NONE);
+				SetTargetMode(TargetMode::None);
 			}
 			// update the action bar
 			core->GetDictionary().Set("ActionLevel", 0);
@@ -2123,28 +2125,28 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			MoveViewportTo(p, true);
 
 		// handle actions
-		if (target_mode == TARGET_MODE_NONE && lastActorID) {
+		if (targetMode == TargetMode::None && lastActorID) {
 			switch (lastCursor & ~IE_CURSOR_GRAY) {
 				case IE_CURSOR_TALK:
-					SetTargetMode(TARGET_MODE_TALK);
+					SetTargetMode(TargetMode::Talk);
 					break;
 				case IE_CURSOR_ATTACK:
-					SetTargetMode(TARGET_MODE_ATTACK);
+					SetTargetMode(TargetMode::Attack);
 					break;
 				case IE_CURSOR_CAST:
-					SetTargetMode(TARGET_MODE_CAST);
+					SetTargetMode(TargetMode::Cast);
 					break;
 				case IE_CURSOR_DEFEND:
-					SetTargetMode(TARGET_MODE_DEFEND);
+					SetTargetMode(TargetMode::Defend);
 					break;
 				case IE_CURSOR_PICK:
-					SetTargetMode(TARGET_MODE_PICK);
+					SetTargetMode(TargetMode::Pick);
 					break;
 				default: break;
 			}
 		}
 
-		if (target_mode == TARGET_MODE_NONE && (isSelectionRect || lastActorID)) {
+		if (targetMode == TargetMode::None && (isSelectionRect || lastActorID)) {
 			MakeSelection(Mod & GEM_MOD_SHIFT);
 			ClearMouseState();
 			return true;
@@ -2154,8 +2156,8 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			// don't allow travel if the destination is actually blocked
 			return false;
 		}
-		
-		if (overMe && (overMe->Type == ST_DOOR || overMe->Type == ST_CONTAINER || (overMe->Type == ST_TRAVEL && target_mode == TARGET_MODE_NONE))) {
+
+		if (overMe && (overMe->Type == ST_DOOR || overMe->Type == ST_CONTAINER || (overMe->Type == ST_TRAVEL && targetMode == TargetMode::None))) {
 			// move to the object before trying to interact with it
 			Actor* mainActor = GetMainSelectedActor();
 			if (mainActor && overMe->Type == ST_CONTAINER) {
@@ -2164,8 +2166,8 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 				CommandSelectedMovement(p, true, false, tryToRun);
 			}
 		}
-		
-		if (target_mode != TARGET_MODE_NONE || (overMe && overMe->Type != ST_ACTOR)) {
+
+		if (targetMode != TargetMode::None || (overMe && overMe->Type != ST_ACTOR)) {
 			PerformSelectedAction(p);
 			ClearMouseState();
 			return true;
@@ -2203,7 +2205,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	}
 
 	//add a check if you don't want some random monster handle doors and such
-	if (target_mode == TARGET_MODE_CAST) {
+	if (targetMode == TargetMode::Cast) {
 		//the player is using an item or spell on the ground
 		TryToCast(selectedActor, p);
 	} else if (!overMe) {
@@ -2212,7 +2214,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 		HandleDoor(Scriptable::As<Door>(overMe), selectedActor);
 	} else if (overMe->Type == ST_CONTAINER) {
 		HandleContainer(Scriptable::As<Container>(overMe), selectedActor);
-	} else if (overMe->Type == ST_TRAVEL && target_mode == TARGET_MODE_NONE) {
+	} else if (overMe->Type == ST_TRAVEL && targetMode == TargetMode::None) {
 		ieDword exitID = overMe->GetGlobalID();
 		if (core->HasFeature(GFFlags::TEAM_MOVEMENT)) {
 			// pst forces everyone to travel (eg. ar0201 outside_portal)
@@ -2332,15 +2334,15 @@ void GameControl::PerformActionOn(Actor *actor)
 		type = ACT_NONE; //party
 	}
 
-	if (target_mode == TARGET_MODE_ATTACK) {
+	if (targetMode == TargetMode::Attack) {
 		type = ACT_ATTACK;
-	} else if (target_mode == TARGET_MODE_TALK) {
+	} else if (targetMode == TargetMode::Talk) {
 		type = ACT_TALK;
-	} else if (target_mode == TARGET_MODE_CAST) {
+	} else if (targetMode == TargetMode::Cast) {
 		type = ACT_CAST;
-	} else if (target_mode == TARGET_MODE_DEFEND) {
+	} else if (targetMode == TargetMode::Defend) {
 		type = ACT_DEFEND;
-	} else if (target_mode == TARGET_MODE_PICK) {
+	} else if (targetMode == TargetMode::Pick) {
 		type = ACT_THIEVING;
 	}
 
@@ -2351,7 +2353,7 @@ void GameControl::PerformActionOn(Actor *actor)
 	//we shouldn't zero this for two reasons in case of spell or item
 	//1. there could be multiple targets
 	//2. the target mode is important
-	if (!(target_mode == TARGET_MODE_CAST) || !spellCount) {
+	if (targetMode != TargetMode::Cast || !spellCount) {
 		ResetTargetMode();
 	}
 
@@ -2420,17 +2422,18 @@ void GameControl::PerformActionOn(Actor *actor)
 }
 
 //sets target mode, and resets the cursor
-void GameControl::SetTargetMode(int mode) {
-	target_mode = mode;
+void GameControl::SetTargetMode(TargetMode mode)
+{
+	targetMode = mode;
 }
 
 void GameControl::ResetTargetMode() {
 	target_types = GA_NO_DEAD|GA_NO_HIDDEN|GA_NO_UNSCHEDULED;
-	SetTargetMode(TARGET_MODE_NONE);
+	SetTargetMode(TargetMode::None);
 }
 
 void GameControl::UpdateTargetMode() {
-	SetTargetMode(target_mode);
+	SetTargetMode(targetMode);
 }
 
 Region GameControl::SelectionRect() const
@@ -2601,7 +2604,7 @@ void GameControl::SetupItemUse(int slot, size_t header, Actor *u, int targettype
 	spellSlot = slot;
 	spellIndex = static_cast<int>(header);
 	//item use also uses the casting icon, this might be changed in some custom game?
-	SetTargetMode(TARGET_MODE_CAST);
+	SetTargetMode(TargetMode::Cast);
 	target_types = targettype;
 	spellCount = cnt;
 }
@@ -2620,7 +2623,7 @@ void GameControl::SetupCasting(const ResRef& spellname, int type, int level, int
 	spellUser = u;
 	spellSlot = level;
 	spellIndex = idx;
-	SetTargetMode(TARGET_MODE_CAST);
+	SetTargetMode(TargetMode::Cast);
 	target_types = targettype;
 	spellCount = cnt;
 }

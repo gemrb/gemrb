@@ -3313,7 +3313,7 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 	GET_GAMECONTROL();
 
 	//target mode is only the low bits (which is a number)
-	gc->SetTargetMode(Mode&GA_ACTION);
+	gc->SetTargetMode(TargetMode(Mode & GA_ACTION));
 	//target type is all the bits
 	gc->target_types = (Mode&GA_ACTION)|Types;
 	Py_RETURN_NONE;
@@ -3335,7 +3335,7 @@ static PyObject* GemRB_GameControlGetTargetMode(PyObject * /*self*/, PyObject* /
 {
 	GET_GAMECONTROL();
 
-	return PyLong_FromLong(gc->GetTargetMode());
+	return PyLong_FromLong(int(gc->GetTargetMode()));
 }
 
 PyDoc_STRVAR( GemRB_GameControlLocateActor__doc,
@@ -10883,7 +10883,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 					SetItemText(btn, item->Usages[actor->PCStats->QuickWeaponHeaders[action-ACT_WEAPON1]], true);
 					if (usedslot == slot) {
 						btn->EnableBorder(0, true);
-						if (gc->GetTargetMode() == TARGET_MODE_ATTACK) {
+						if (gc->GetTargetMode() == TargetMode::Attack) {
 							state = Button::SELECTED;
 						} else {
 							state = Button::FAKEDISABLED;

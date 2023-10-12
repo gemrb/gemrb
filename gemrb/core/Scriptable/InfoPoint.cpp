@@ -117,9 +117,9 @@ bool InfoPoint::IsPortal() const
 }
 
 // returns the appropriate cursor over an active region (trap, infopoint, travel region)
-int InfoPoint::GetCursor(int targetMode) const
+int InfoPoint::GetCursor(TargetMode targetMode) const
 {
-	if (targetMode == TARGET_MODE_PICK) {
+	if (targetMode == TargetMode::Pick) {
 		if (VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
 		}

@@ -445,10 +445,10 @@ void Door::TryBashLock(Actor *actor)
 }
 
 // returns the appropriate cursor over a door
-int Door::GetCursor(int targetMode, int lastCursor) const
+int Door::GetCursor(TargetMode targetMode, int lastCursor) const
 {
 	if (!Visible()) {
-		if (targetMode == TARGET_MODE_NONE) {
+		if (targetMode == TargetMode::None) {
 			// most secret doors are in walls, so default to the blocked cursor to not give them away
 			// iwd ar6010 table/door/puzzle is walkable, secret and undetectable
 			return area->GetCursor(Pos);
@@ -457,7 +457,7 @@ int Door::GetCursor(int targetMode, int lastCursor) const
 		}
 	}
 
-	if (targetMode == TARGET_MODE_PICK) {
+	if (targetMode == TargetMode::Pick) {
 		if (VisibleTrap(0)) {
 			return IE_CURSOR_TRAP;
 		}

@@ -27,13 +27,14 @@
 #ifndef GAMECONTROL_H
 #define GAMECONTROL_H
 
-#include "GUI/Control.h"
-
 #include "exports.h"
+#include "strrefs.h"
 
 #include "Dialog.h"
 #include "Map.h"
-#include "strrefs.h"
+
+#include "GUI/Control.h"
+#include "GUI/GameControlDefs.h"
 
 #include <vector>
 
@@ -42,32 +43,6 @@ namespace GemRB {
 class GameControl;
 class Window;
 class DialogHandler;
-
-//dialog flags
-#define DF_IN_DIALOG      1
-#define DF_TALKCOUNT      2
-#define DF_UNBREAKABLE    4
-#define DF_FREEZE_SCRIPTS 8
-#define DF_INTERACT       16
-#define DF_IN_CONTAINER   32
-#define DF_OPENCONTINUEWINDOW 64
-#define DF_OPENENDWINDOW 128
-#define DF_POSTPONE_SCRIPTS 256
-
-//screen flags
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define SF_CENTERONACTOR 1  //
-#define SF_ALWAYSCENTER  2
-#define SF_CUTSCENE      4 //don't push new actions onto the action queue
-
-// target modes and types
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define TARGET_MODE_NONE    0
-#define TARGET_MODE_TALK    1
-#define TARGET_MODE_ATTACK  2
-#define TARGET_MODE_CAST    3
-#define TARGET_MODE_DEFEND  4
-#define TARGET_MODE_PICK    5
 
 /**
  * @class GameControl
@@ -96,7 +71,7 @@ private:
 
 	// currently selected targeting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
-	int target_mode = TARGET_MODE_NONE;
+	TargetMode targetMode = TargetMode::None;
 	int lastCursor = 0;
 	Point vpVector;
 	int numScrollCursor = 0;
@@ -182,8 +157,8 @@ public:
 	void DrawTooltip(const Point& p) const;
 	String TooltipText() const override;
 
-	void SetTargetMode(int mode);
-	int GetTargetMode() const { return target_mode; }
+	void SetTargetMode(TargetMode mode);
+	TargetMode GetTargetMode() const { return targetMode; }
 	bool SetScreenFlags(unsigned int value, BitOp mode);
 	void SetDialogueFlags(unsigned int value, BitOp mode);
 	int GetScreenFlags() const { return ScreenFlags; }

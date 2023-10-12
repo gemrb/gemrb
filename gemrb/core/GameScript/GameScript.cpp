@@ -41,16 +41,16 @@
 
 #include "GameScript/GameScript.h"
 
-#include "GameScript/GSUtils.h"
-#include "GameScript/Matching.h"
-
 #include "Game.h"
-#include "GUI/GameControl.h" // just for DF_POSTPONE_SCRIPTS
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
-#include "TableMgr.h"
 #include "RNG.h"
+#include "TableMgr.h"
+
+#include "GUI/GameControl.h"
+#include "GameScript/GSUtils.h"
+#include "GameScript/Matching.h"
 
 #include <cstdarg>
 

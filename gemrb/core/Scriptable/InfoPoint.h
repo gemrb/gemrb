@@ -21,6 +21,7 @@
 #ifndef INFOPOINT_H
 #define INFOPOINT_H
 
+#include "GUI/GameControlDefs.h"
 #include "Scriptable/Scriptable.h"
 
 namespace GemRB {
@@ -41,7 +42,7 @@ public:
 	bool CanDetectTrap() const override;
 	bool PossibleToSeeTrap() const override;
 	bool IsPortal() const;
-	int GetCursor(int targetMode) const;
+	int GetCursor(TargetMode targetMode) const;
 
 public:
 	ResRef Destination;
