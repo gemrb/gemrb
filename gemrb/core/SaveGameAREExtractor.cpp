@@ -47,14 +47,16 @@ int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trac
 
 	size_t relativeLocation = 0;
 	for (auto it = areLocations.cbegin(); it != areLocations.cend(); ++it, ++i) {
-		relativeLocation += 4 + it->first.length() + 1;
+		size_t nameLength = it->first.length() + 4 + 1; // +4 for the extension, +1 for ending null as per SAV spec
+		relativeLocation += 4 + nameLength; // set initial offset past the stored length and string
 
-		ieDword complen, declen;
+		ieDword declen;
+		ieDword complen;
 		saveGameStream->Seek(it->second, GEM_STREAM_START);
 		saveGameStream->ReadDword(declen);
 		saveGameStream->ReadDword(complen);
 
-		destStream->WriteDword(it->first.length() + 1 + 4);
+		destStream->WriteDword(ieDword(nameLength));
 		destStream->WriteString(it->first);
 		destStream->WriteString(".are");
 		destStream->WriteDword(declen);
@@ -62,7 +64,7 @@ int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trac
 
 		if (trackLocations) {
 			newAreLocations.emplace(it->first, relativeLocation);
-			relativeLocation += 8 + complen;
+			relativeLocation += 8 + complen; // skip past the two length dwords and compressed data
 		}
 
 		BufferT::size_type remaining = complen;
