@@ -519,8 +519,6 @@ public:
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
 	int CanUseItemType(int slottype, const Item *item, const Actor *actor = nullptr, bool feedback = false, bool equipped = false) const;
 	int CheckItemType(const Item* item, int slotType) const;
-	/*removes single file from cache*/
-	void RemoveFromCache(const ResRef& resref, SClass_ID SClassID) const;
 	/*removes all files from directory*/
 	void DelTree(const path_t& path, bool onlysaved) const;
 	/*returns 0,1,2 based on how the file should be saved */
