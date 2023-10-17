@@ -166,7 +166,7 @@ Logger::WriterPtr createStdioLogWriter()
 			color = ANSIColor::True;
 		}
 
-		Log(DEBUG, "Logging", "Using colorized terminal output: {}\nDetermined from COLORTERM={}", color, colorterm);
+		Log(DEBUG, "Logging", "Using colorized terminal output: {} (determined from COLORTERM={})", color, colorterm ? colorterm : "");
 	}
 #endif
 
