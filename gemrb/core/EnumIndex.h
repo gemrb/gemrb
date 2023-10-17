@@ -148,6 +148,7 @@ public:
 	static constexpr auto size = UnderType(ENUM::count);
 		
 	explicit constexpr EnumBitset(under_t<ENUM> value) : bits(value) {}
+	explicit constexpr EnumBitset(ENUM value) : bits(1 << UnderType(value)) {}
 	constexpr EnumBitset() = default;
 	
 	constexpr

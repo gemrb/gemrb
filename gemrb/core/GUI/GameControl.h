@@ -76,7 +76,7 @@ private:
 	Point vpVector;
 	int numScrollCursor = 0;
 	PathListNode* drawPath = nullptr;
-	EnumBitset<ScreenFlags> screenFlags;
+	EnumBitset<ScreenFlags> screenFlags { ScreenFlags::CenterOnActor };
 	unsigned int DialogueFlags = DF_FREEZE_SCRIPTS;
 	String DisplayText;
 	unsigned int DisplayTextTime = 0;
