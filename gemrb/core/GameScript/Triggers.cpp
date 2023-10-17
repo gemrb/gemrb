@@ -1150,19 +1150,22 @@ int GameScript::HasItemEquipped(Scriptable * Sender, const Trigger *parameters)
 	if (!actor) {
 		return 0;
 	}
+
 	int slot = actor->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE);
+	int skip = 0;
+	while (slot != -1) {
+		// instead of looking for IE_INV_ITEM_EQUIPPED, which we set only on weapons,
+		// just inspect in which part of the inventory the slot is
+		// bg2/ddguard7.baf needs it (strohm mask) and the bg1re (Branwen) girdle of gender banter
+		// confirmed by RE: only checked the item is not in the magic slot or general inventory
+		if (!actor->inventory.InBackpack(slot) && slot != Inventory::GetMagicSlot()) {
+			return 1;
+		}
+		slot = actor->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE, ++skip);
+	}
 	if (slot == -1) {
 		return 0;
 	}
-
-	// instead of looking for IE_INV_ITEM_EQUIPPED, which we set only on weapons,
-	// just inspect in which part of the inventory the slot is
-	// bg2/ddguard7.baf needs it (strohm mask) and the bg1re (Branwen) girdle of gender banter
-	// confirmed by RE: only checked the item is not in the magic slot or general inventory
-	if (actor->inventory.InBackpack(slot) || slot == Inventory::GetMagicSlot()) {
-		return 0;
-	}
-
 	return 1;
 }
 
