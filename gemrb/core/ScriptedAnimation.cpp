@@ -610,6 +610,9 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 	if (Transparency & IE_VVC_SEPIA) {
 		flags |= BlitFlags::SEPIA;
 	}
+	if (Transparency & IE_VVC_NO_SEPIA) {
+		flags &= ~BlitFlags::SEPIA;
+	}
 	if (Transparency & IE_VVC_TINT) {
 		flags |= BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD;
 	}
