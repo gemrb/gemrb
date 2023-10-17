@@ -636,8 +636,7 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 
 	Point p(Pos.x - vp.x + XOffset, Pos.y - vp.y - ZOffset + YOffset);
 	if (SequenceFlags & IE_VVC_HEIGHT) p.y -= height;
-
-	if (SequenceFlags & IE_VVC_NOCOVER) {
+	if (SequenceFlags & IE_VVC_NOCOVER || Transparency & IE_VVC_NOCOVER_2) {
 		flags &= ~BlitFlags::STENCIL_MASK;
 	}
 
