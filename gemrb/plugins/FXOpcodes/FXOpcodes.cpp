@@ -1871,9 +1871,9 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x18 State:Panic
+// 0x18 State:Panic / State: Horror
 // TODO: Non-zero param2 -> Bypass opcode #101 (Immunity to effect); iwd thing, but no users
-int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_set_panic_state(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_set_panic_state(%2d)", fx->Opcode);
 
@@ -1892,6 +1892,26 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		BASE_STATE_SET( STATE_PANIC );
 	} else {
 		STATE_SET( STATE_PANIC );
+	}
+
+	// run away and reevaluate every round, so expiry can take effect
+	// a simplified Actor::Panic that does too much and too little for reuse here
+	if (fx->FirstApply || target->Ticks % core->Time.round_size == 0) {
+		if (target->InParty) core->GetGame()->SelectActor(target, false, SELECT_NORMAL);
+		target->VerbalConstant(Verbal::Panic, gamedata->GetVBData("SPECIAL_COUNT"));
+
+		Action* action;
+		if (Owner->Type == ST_ACTOR) {
+			action = GenerateActionDirect("RunAwayFromNoInterruptNoLeaveArea([-1])", Owner);
+		} else {
+			action = GenerateAction("RandomWalk()");
+		}
+		assert(action);
+		action->int0Parameter = core->Time.round_size;
+		action->int2Parameter = 1; // mark as our own
+		const Action* current = target->GetCurrentAction();
+		if (current && current->int2Parameter == 1) target->ReleaseCurrentAction();
+		target->AddActionInFront(action);
 	}
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_PANIC);

@@ -13,3 +13,4 @@ IDS
 148 BashDoor(O:Object)
 112 UseContainer()
 93 LeaveAreaName(O:Target*)
+354 RunAwayFromNoInterruptNoLeaveArea(O:Creature,I:Time)
