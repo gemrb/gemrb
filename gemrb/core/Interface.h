@@ -523,10 +523,6 @@ public:
 	void DelTree(const path_t& path, bool onlysaved) const;
 	/*returns 0,1,2 based on how the file should be saved */
 	int SavedExtension(const path_t& filename) const;
-	/*returns true if the file should never be deleted accidentally */
-	bool ProtectedExtension(const path_t& filename) const;
-	/*returns true if the directory path isn't good as a Cache */
-	bool StupidityDetector(const path_t& Pt) const;
 
 	/*handles the load screen*/
 	void LoadProgress(int percent);
@@ -662,6 +658,11 @@ private:
 	bool ReadDamageTypeTable();
 	bool ReadGameTimeTable();
 	bool ReadSoundChannelsTable() const;
+
+	/*returns true if the file should never be deleted accidentally */
+	bool ProtectedExtension(const path_t& filename) const;
+	/*returns true if the directory path isn't good as a Cache */
+	bool StupidityDetector(const path_t& Pt) const;
 
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags() noexcept;
