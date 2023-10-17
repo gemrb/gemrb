@@ -1170,6 +1170,7 @@ int GameScript::HasItemEquipped(Scriptable * Sender, const Trigger *parameters)
 }
 
 // this is only used for Lilarcor in the originals, where it matter that the weapon is actually being used
+// same as HasItemEquiped, but only the currently equipped weapon slot is checked alongside the rest
 int GameScript::HasItemEquippedReal(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
@@ -1180,9 +1181,14 @@ int GameScript::HasItemEquippedReal(Scriptable* Sender, const Trigger* parameter
 
 	int slot = actor->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE);
 	int skip = 0;
+	int firstWeaponSlot = actor->inventory.GetWeaponSlot();
 	while (slot != -1) {
-		const CREItem* item = actor->inventory.GetSlotItem(slot);
-		if (item->Flags & IE_INV_ITEM_EQUIPPED) {
+		if (slot >= firstWeaponSlot && slot <= actor->inventory.GetWeaponSlot() + 3) {
+			const CREItem* item = actor->inventory.GetSlotItem(slot);
+			if (item->Flags & IE_INV_ITEM_EQUIPPED) {
+				return 1;
+			}
+		} else if (!actor->inventory.InBackpack(slot) && slot != Inventory::GetMagicSlot()) {
 			return 1;
 		}
 		slot = actor->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE, ++skip);
