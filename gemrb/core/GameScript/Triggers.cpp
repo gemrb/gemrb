@@ -1158,7 +1158,8 @@ int GameScript::HasItemEquipped(Scriptable * Sender, const Trigger *parameters)
 	// instead of looking for IE_INV_ITEM_EQUIPPED, which we set only on weapons,
 	// just inspect in which part of the inventory the slot is
 	// bg2/ddguard7.baf needs it (strohm mask) and the bg1re (Branwen) girdle of gender banter
-	if (actor->inventory.InBackpack(slot)) {
+	// confirmed by RE: only checked the item is not in the magic slot or general inventory
+	if (actor->inventory.InBackpack(slot) || slot == Inventory::GetMagicSlot()) {
 		return 0;
 	}
 
