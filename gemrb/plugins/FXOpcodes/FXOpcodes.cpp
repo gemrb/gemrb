@@ -1873,7 +1873,7 @@ int fx_morale_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x18 State:Panic / State: Horror
 // TODO: Non-zero param2 -> Bypass opcode #101 (Immunity to effect); iwd thing, but no users
-int fx_set_panic_state(Scriptable* Owner, Actor* target, Effect* fx)
+int fx_set_panic_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_set_panic_state(%2d)", fx->Opcode);
 
@@ -1901,8 +1901,9 @@ int fx_set_panic_state(Scriptable* Owner, Actor* target, Effect* fx)
 		target->VerbalConstant(Verbal::Panic, gamedata->GetVBData("SPECIAL_COUNT"));
 
 		Action* action;
-		if (Owner->Type == ST_ACTOR) {
-			action = GenerateActionDirect("RunAwayFromNoInterruptNoLeaveArea([-1])", Owner);
+		const Actor* caster = GetCasterObject();
+		if (caster) {
+			action = GenerateActionDirect("RunAwayFromNoInterruptNoLeaveArea([-1])", caster);
 		} else {
 			action = GenerateAction("RandomWalk()");
 		}
