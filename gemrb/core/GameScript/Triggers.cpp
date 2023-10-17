@@ -1169,6 +1169,30 @@ int GameScript::HasItemEquipped(Scriptable * Sender, const Trigger *parameters)
 	return 1;
 }
 
+// this is only used for Lilarcor in the originals, where it matter that the weapon is actually being used
+int GameScript::HasItemEquippedReal(Scriptable* Sender, const Trigger* parameters)
+{
+	const Scriptable* scr = GetScriptableFromObject(Sender, parameters->objectParameter);
+	const Actor* actor = Scriptable::As<Actor>(scr);
+	if (!actor) {
+		return 0;
+	}
+
+	int slot = actor->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE);
+	int skip = 0;
+	while (slot != -1) {
+		const CREItem* item = actor->inventory.GetSlotItem(slot);
+		if (item->Flags & IE_INV_ITEM_EQUIPPED) {
+			return 1;
+		}
+		slot = actor->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE, ++skip);
+	}
+	if (slot == -1) {
+		return 0;
+	}
+	return 1;
+}
+
 int GameScript::Acquired(Scriptable * Sender, const Trigger *parameters)
 {
 	const Actor* actor = Scriptable::As<Actor>(Sender);
