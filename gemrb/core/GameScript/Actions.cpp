@@ -6719,8 +6719,20 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	ieDword flags = 0; // aura pollution is on for everyone
 	ResRef itemres;
 
+	// cater to all 4 signatures:
+	//   UseItem(S:Object*,O:Target*)
+	//   UseItemAbility(S:Object*,O:Target*,I:Slot*,I:Ability*)
+	//   UseItemSlot(O:Target*,I:Slot*Slots)
+	//   UseItemSlotAbility(O:Target*,I:Slot*Slots,I:Ability*)
 	if (!parameters->resref0Parameter.IsEmpty()) {
 		Slot = act->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE);
+		// UseItemAbility passes both the resref and slot, so we need to be stricter to deplete the right item
+		if (parameters->int0Parameter) {
+			int skip = 0;
+			while (Slot != -1 && Slot != parameters->int0Parameter) {
+				Slot = act->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE, ++skip);
+			}
+		}
 		//this IS in the original game code (ability)
 		header = parameters->int0Parameter;
 		flags |= parameters->int1Parameter;
