@@ -1340,8 +1340,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 				Color tint = GetLighting(sca->Pos);
 				tint.a = 255;
 
-				// FIXME: these should actually make use of SetDrawingStencilForObject too
-				BlitFlags flags = core->DitherSprites ? BlitFlags::STENCIL_BLUE : BlitFlags::STENCIL_RED;
+				BlitFlags flags = SetDrawingStencilForScriptedAnimation(sca->GetSingleObject(), viewport, 0);
 				if (timestop) {
 					flags |= BlitFlags::GREY;
 				}
@@ -1374,6 +1373,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 				drawn = 1;
 			}
 			if (drawn) {
+				// no wallgroup stenciling needed, in the original these were always drawn
 				spark->Draw(viewport.origin);
 				spaidx++;
 			} else {
@@ -1664,6 +1664,30 @@ BlitFlags Map::SetDrawingStencilForAreaAnimation(const AreaAnimation* anim, cons
 	}
 
 	return (anim->Flags & A_ANI_NO_WALL) ? BlitFlags::NONE : BlitFlags::STENCIL_GREEN;
+}
+
+// test case: vvc played when summoning a creature (it's not attached to the actor as most spell vfx)
+BlitFlags Map::SetDrawingStencilForScriptedAnimation(const ScriptedAnimation* anim, const Region& viewPort, int height)
+{
+	const Region& bbox = anim->DrawingRegion();
+	if (bbox.IntersectsRegion(viewPort) == false) {
+		return BlitFlags::NONE;
+	}
+
+	Point p(anim->Pos.x + anim->XOffset, anim->Pos.y - anim->ZOffset + anim->YOffset);
+	if (anim->SequenceFlags & IE_VVC_HEIGHT) p.y -= height;
+
+	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &p);
+
+	SetDrawingStencilForObject(anim, bbox, walls, viewPort.origin);
+
+	// check this after SetDrawingStencilForObject for debug drawing purposes
+	if (walls.first.empty()) {
+		return BlitFlags::NONE; // not behind a wall, no stencil required
+	}
+
+	BlitFlags flags = core->DitherSprites ? BlitFlags::STENCIL_BLUE : BlitFlags::STENCIL_RED;
+	return flags;
 }
 
 void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
