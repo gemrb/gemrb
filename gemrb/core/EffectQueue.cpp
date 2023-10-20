@@ -1019,10 +1019,10 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 	return -1;
 }
 
-//check resistances, saving throws
+// check resistances
 static int check_resistance(Actor* actor, Effect* fx)
 {
-	if (!actor) return -1;
+	if (!actor) return -2;
 
 	const Scriptable *cob = GetCasterObject();
 	const Actor* caster = Scriptable::As<const Actor>(cob);
@@ -1042,7 +1042,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 	}
 
 	if (globals.pstflags && (actor->GetSafeStat(IE_STATE_ID) & STATE_ANTIMAGIC)) {
-		return -1;
+		return -2;
 	}
 
 	// check magic resistance if applicable
@@ -1054,22 +1054,33 @@ static int check_resistance(Actor* actor, Effect* fx)
 		}
 	}
 
+	return -1;
+}
 
-	//saving throws, bonus can be improved by school specific bonus
+// check saving throws
+static int checkSaves(Actor* actor, Effect* fx)
+{
+	if (!actor) return -1;
+
+	const Actor* caster = Scriptable::As<const Actor>(GetCasterObject());
+	const auto& globals = Globals::Get();
+
+	// bonus can be improved by school specific bonus
 	int bonus = fx->SavingThrowBonus + actor->fxqueue.BonusForParam2(fx_spell_resistance_ref, fx->PrimaryType);
 	if (caster) {
-		bonus += actor->fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,caster);
-		//saving throw could be made difficult by caster's school specific bonus
+		// bonus from generic ac&saves bonus opcode
+		bonus += actor->fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref, caster);
+		// saving throw could be made difficult by caster's school specific bonus
 		bonus -= caster->fxqueue.BonusForParam2(fx_spell_focus_ref, fx->PrimaryType);
 	}
 
 	// handle modifiers of specialist mages
-	if (!core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+	if (!globals.pstflags) {
 		int specialist = KIT_BASECLASS;
 		if (caster) specialist = caster->GetStat(IE_KIT);
 		if (caster && caster->GetMageLevel() && specialist != KIT_BASECLASS) {
 			// specialist mage's enemies get a -2 penalty to saves vs the specialist's school
-			if (specialist & (1 << (fx->PrimaryType+5))) {
+			if (specialist & (1 << (fx->PrimaryType + 5))) {
 				bonus -= 2;
 			}
 		}
@@ -1077,27 +1088,27 @@ static int check_resistance(Actor* actor, Effect* fx)
 		// specialist mages get a +2 bonus to saves to spells of the same school used against them
 		specialist = actor->GetStat(IE_KIT);
 		if (actor->GetMageLevel() && specialist != KIT_BASECLASS) {
-			if (specialist & (1 << (fx->PrimaryType+5))) {
+			if (specialist & (1 << (fx->PrimaryType + 5))) {
 				bonus += 2;
 			}
 		}
 	}
 
 	bool saved = false;
-	for (int i=0;i<5;i++) {
-		if( fx->SavingThrowType&(1<<i)) {
+	for (int i = 0; i < 5; i++) {
+		if (fx->SavingThrowType & (1 << i)) {
 			// FIXME: first bonus handling for iwd2 is just a guess
 			if (globals.iwd2fx) {
 				saved = actor->GetSavingThrow(i, bonus - fx->SavingThrowBonus, fx);
 			} else {
 				saved = actor->GetSavingThrow(i, bonus, fx);
 			}
-			if( saved) {
+			if (saved) {
 				break;
 			}
 		}
 	}
-	if( saved) {
+	if (saved) {
 		if (fx->IsSaveForHalfDamage || (fx->Opcode == 12 && fx->IsVariable & DamageFlags::SaveForHalf)) {
 			// if we have evasion, we take no damage
 			// sadly there's no feat or stat for it
@@ -1173,11 +1184,20 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 				return FX_NOT_APPLIED;
 			}
 
-			//the effect didn't pass the resistance check
+			// the effect didn't pass the resistance check
 			int resisted = check_resistance(target, fx);
-			if (resisted != -1) {
-				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-				return resisted;
+			if (resisted != -2) {
+				if (resisted != -1) {
+					fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+					return resisted;
+				}
+
+				// the effect didn't pass saving throws
+				int saved = checkSaves(target, fx);
+				if (saved != -1) {
+					fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+					return saved;
+				}
 			}
 		}
 
