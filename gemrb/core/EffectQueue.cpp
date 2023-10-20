@@ -1041,6 +1041,10 @@ static int check_resistance(Actor* actor, Effect* fx)
 		return FX_ABORT;
 	}
 
+	if (globals.pstflags && (actor->GetSafeStat(IE_STATE_ID) & STATE_ANTIMAGIC)) {
+		return -1;
+	}
+
 	// check magic resistance if applicable
 	// (note that no MR roll does not preclude saving throws -- see e.g. chromatic orb instakill)
 	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL && check_magic_res(actor, fx, caster) == FX_NOT_APPLIED) {
@@ -1050,9 +1054,6 @@ static int check_resistance(Actor* actor, Effect* fx)
 		}
 	}
 
-	if (globals.pstflags && (actor->GetSafeStat(IE_STATE_ID) & STATE_ANTIMAGIC)) {
-		return -1;
-	}
 
 	//saving throws, bonus can be improved by school specific bonus
 	int bonus = fx->SavingThrowBonus + actor->fxqueue.BonusForParam2(fx_spell_resistance_ref, fx->PrimaryType);
