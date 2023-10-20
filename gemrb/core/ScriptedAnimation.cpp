@@ -36,19 +36,34 @@
 
 namespace GemRB {
 
-#define ILLEGAL 0         //
-#define ONE 1             //hold
-#define TWO 2             //onset + hold
-#define THREE 3           //onset + hold + release
-#define DOUBLE 4          //has twin (pst)
-#define FIVE 8            //five faces (orientation)
-#define NINE 16           //nine faces (orientation)
-#define SEVENEYES 32      //special hack for seven eyes
+enum CycleType {
+	Illegal = 0,
+	One = 1, // hold
+	Two = 2, // onset + hold
+	Three = 3, // onset + hold + release
+	Double = 4, // has twin (pst)
+	Five = 8, // five faces (orientation)
+	Nine = 16, // nine faces (orientation)
+	SevenEyes2 = 32, // special hack for seven eyes
+};
 
-#define MAX_CYCLE_TYPE 16
-static const ieByte ctypes[MAX_CYCLE_TYPE]={
-	ILLEGAL, ONE, TWO, THREE, TWO|DOUBLE, ONE|FIVE, THREE|DOUBLE, ILLEGAL,
-	SEVENEYES, ONE|NINE, TWO|FIVE, ILLEGAL, ILLEGAL, ILLEGAL, ILLEGAL,THREE|FIVE,
+static const std::array<CycleType, 16> cTypes = {
+	CycleType::Illegal,
+	CycleType::One,
+	CycleType::Two,
+	CycleType::Three,
+	CycleType::Two | CycleType::Double,
+	CycleType::One | CycleType::Five,
+	CycleType::Three | CycleType::Double,
+	CycleType::Illegal,
+	CycleType::SevenEyes2,
+	CycleType::One | CycleType::Nine,
+	CycleType::Two | CycleType::Five,
+	CycleType::Illegal,
+	CycleType::Illegal,
+	CycleType::Illegal,
+	CycleType::Illegal,
+	CycleType::Three | CycleType::Five,
 };
 
 static const ieByte SixteenToNine[3*MAX_ORIENT]={
@@ -102,35 +117,35 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 		++cCount;
 	}
 
-	if (cCount >= MAX_CYCLE_TYPE) {
+	if (cCount >= cTypes.size()) {
 		cCount = 1;
 	}
 
-	int type = ctypes[cCount];
+	CycleType type = cTypes[cCount];
 	switch(gettwin) {
 	case 2:
-		if (type == TWO) {
-			type = ONE|DOUBLE;
+		if (type == CycleType::Two) {
+			type = CycleType::One | CycleType::Double;
 		}
 		gettwin = 0;
 		break;
 	case 1:
-		type = ONE|DOUBLE;
+		type = CycleType::One | CycleType::Double;
 		break;
 	}
 
-	if (type == ILLEGAL) {
+	if (type == CycleType::Illegal) {
 		cCount = 1;
-		type = ONE;
-	} else if (type & DOUBLE) {
+		type = CycleType::One;
+	} else if (type & CycleType::Double) {
 		cCount /= 2;
 	}
 
 	//these fields mark that the anim cycles should 'follow' the target's orientation
-	if (type & FIVE) {
+	if (type & CycleType::Five) {
 		NumOrientations = 5;
 		cCount = MAX_ORIENT * (type & 3);
-	} else if (type & NINE) {
+	} else if (type & CycleType::Nine) {
 		NumOrientations = 9;
 		cCount = MAX_ORIENT * (type & 3);
 	} else {
@@ -141,19 +156,19 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 		BlitFlags mirrorFlags = BlitFlags::NONE;
 		Animation::index_t c = i;
 		int p = i;
-		if (type & DOUBLE) {
+		if (type & CycleType::Double) {
 			c <<= 1;
 			if (gettwin) c++;
 			//this is needed for PST twin animations that contain 2 or 3 phases
 			assert(p < 3);
 			p *= MAX_ORIENT;
-		} else if (type & FIVE) {
+		} else if (type & CycleType::Five) {
 			c = SixteenToFive[c];
 			if ((i & 15) >= 5) mirrorFlags = BlitFlags::MIRRORX;
-		} else if (type & NINE) {
+		} else if (type & CycleType::Nine) {
 			c = SixteenToNine[c];
 			if ((i & 15) >= 9) mirrorFlags = BlitFlags::MIRRORX;
-		} else if (!(type & SEVENEYES)) {
+		} else if (!(type & CycleType::SevenEyes2)) {
 			assert(p < 3);
 			p *= MAX_ORIENT;
 		}
@@ -189,7 +204,7 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 	if (gettwin) {
 		return;
 	}
-	if (type & DOUBLE) {
+	if (type & CycleType::Double) {
 		twin = new ScriptedAnimation();
 		twin->LoadAnimationFactory(af, 1);
 	}
