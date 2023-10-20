@@ -214,7 +214,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->Parameter2&2) {
 		sca->Pos = fx->Pos;
-		area->AddVVCell( new VEFObject(sca));
+		area->AddVVCell(sca);
 	} else {
 		assert(target);
 		ScriptedAnimation *twin = sca->DetachTwin();
@@ -329,9 +329,9 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 			twin->Pos = fx->Pos;
 			twin->XOffset -= x;
 			twin->YOffset -= y;
-			area->AddVVCell( new VEFObject(twin) );
+			area->AddVVCell(twin);
 		}
-		area->AddVVCell( new VEFObject(sca) );
+		area->AddVVCell(sca);
 	}
 	return FX_NOT_APPLIED;
 }

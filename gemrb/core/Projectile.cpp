@@ -1496,8 +1496,7 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 				vvc->Pos = Pos;
 				vvc->PlayOnce();
 				vvc->SetBlend();
-				//quick hack to use the single object envelope
-				area->AddVVCell(new VEFObject(vvc));
+				area->AddVVCell(vvc);
 			}
 			// bg2 comet has the explosion split into two vvcs, with just a starting cycle difference
 			// until we actually need two vvc fields in the extension, let's just hack around it
@@ -1507,7 +1506,7 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 					secondVVC->Pos = Pos;
 					secondVVC->PlayOnce();
 					secondVVC->SetBlend();
-					area->AddVVCell(new VEFObject(secondVVC));
+					area->AddVVCell(secondVVC);
 				}
 			}
 		}

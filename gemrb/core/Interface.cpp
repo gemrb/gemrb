@@ -1666,7 +1666,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 				vvc->Pos = ab->Pos;
 				//force vvc to play only once
 				vvc->PlayOnce();
-				map->AddVVCell( new VEFObject(vvc) );
+				map->AddVVCell(vvc);
 
 				//set up the summon disable effect
 				Effect *newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);

@@ -2893,7 +2893,7 @@ int fx_unsummon_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, false);
 		if (sca) {
 			sca->Pos = target->Pos;
-			area->AddVVCell(new VEFObject(sca));
+			area->AddVVCell(sca);
 		}
 		//remove the creature
 		target->DestroySelf();
@@ -4627,7 +4627,7 @@ int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		sca->SetBlend();
 		sca->PlayOnce();
-		map->AddVVCell( new VEFObject(sca));
+		map->AddVVCell(sca);
 	} else {
 		Log(ERROR, "FXOpcodes", "fx_visual_spell_hit: Unhandled Type: {}", fx->Parameter2);
 	}
@@ -5565,7 +5565,7 @@ static Actor *GetFamiliar(Scriptable *Owner, const Actor *target, const Effect *
 			vvc->Pos = fam->Pos;
 			//force vvc to play only once
 			vvc->PlayOnce();
-			map->AddVVCell( new VEFObject(vvc) );
+			map->AddVVCell(vvc);
 		}
 	}
 
@@ -6084,7 +6084,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		sca->Pos = target->Pos;
 	}
 	sca->PlayOnce();
-	map->AddVVCell( new VEFObject(sca) );
+	map->AddVVCell(sca);
 	return FX_NOT_APPLIED;
 }
 

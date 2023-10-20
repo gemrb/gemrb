@@ -683,7 +683,7 @@ void Map::DrawPortal(const InfoPoint *ip, int enable)
 			sca->Pos = ip->Pos;
 			//this is actually ordered by time, not by height
 			sca->ZOffset = gotPortal;
-			AddVVCell( new VEFObject(sca));
+			AddVVCell(sca);
 		}
 		return;
 	}
@@ -2767,6 +2767,11 @@ ieDword Map::HasVVCCell(const ResRef &resource, const Point &p) const
 }
 
 //adding videocell in order, based on its height parameter
+void Map::AddVVCell(ScriptedAnimation* vvc)
+{
+	AddVVCell(new VEFObject(vvc));
+}
+
 void Map::AddVVCell(VEFObject* vvc)
 {
 	scaIterator iter;
