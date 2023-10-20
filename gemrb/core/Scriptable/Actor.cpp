@@ -8112,13 +8112,25 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	tint.a = 255 - trans;
 
 	//draw videocells under the actor
+	// but don't try to dither them; test cases for occlusion:
+	// - fireshield: not drawn
+	// - casting glow: not drawn
+	// - fireshield: not drawn
+	// - spell turning: not drawn
+	// - globe: drawn (we don't, which looks fine)
+	// - mirror images: drawn
+	BlitFlags vvcFlags = flags & (BlitFlags::STENCIL_MASK | BlitFlags::ALPHA_MOD);
+	if (vvcFlags & BlitFlags::STENCIL_DITHER) {
+		vvcFlags &= ~(BlitFlags::STENCIL_ALPHA | BlitFlags::STENCIL_DITHER);
+		vvcFlags |= BlitFlags::STENCIL_BLUE;
+	}
 	auto it = vfxQueue.cbegin();
 	for (; it != vfxQueue.cend(); ++it) {
 		const ScriptedAnimation* vvc = *it;
 		if (vvc->YOffset >= 0) {
 			break;
 		}
-		vvc->Draw(vp, baseTint, BBox.h, flags & (BlitFlags::STENCIL_MASK | BlitFlags::ALPHA_MOD));
+		vvc->Draw(vp, baseTint, BBox.h, vvcFlags);
 	}
 
 	if (ShouldDrawCircle()) {
@@ -8237,7 +8249,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	//draw videocells over the actor
 	for (; it != vfxQueue.cend(); ++it) {
 		const ScriptedAnimation* vvc = *it;
-		vvc->Draw(vp, baseTint, BBox.h, flags & (BlitFlags::STENCIL_MASK | BlitFlags::ALPHA_MOD));
+		vvc->Draw(vp, baseTint, BBox.h, vvcFlags);
 	}
 }
 
