@@ -64,7 +64,7 @@ bool INIImporter::Open(std::unique_ptr<DataStream> str)
 		}
 		if (lastTag == NULL)
 			continue;
-		if (lastTag->AddLine(std::move(strbuf))) {
+		if (lastTag->AddLine(strbuf)) {
 			startedSection = false;
 		} else {
 			Log(ERROR, "INIImporter", "Bad Line in file: {}, Section: [{}], Entry: '{}'",
