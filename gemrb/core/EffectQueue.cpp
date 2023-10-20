@@ -21,6 +21,7 @@
 #include "EffectQueue.h"
 
 #include "ie_feats.h"
+#include "opcode_params.h"
 #include "overlays.h"
 #include "strrefs.h"
 
@@ -1137,6 +1138,8 @@ static int CheckResistances(Effect* fx, Actor* target)
 	if (globals.pstflags && (target->GetSafeStat(IE_STATE_ID) & STATE_ANTIMAGIC)) {
 		return -1;
 	}
+	// also check for SS_ANTIMAGIC for completeness (spell adds level immunities)
+	if (target->HasSpellState(SS_ANTIMAGIC)) return -1;
 
 	int immune = CheckOpcodeImmunity(fx, target);
 	if (immune != -1) return immune;
