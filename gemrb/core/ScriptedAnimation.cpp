@@ -663,8 +663,8 @@ Region ScriptedAnimation::DrawingRegion() const
 	
 	if (light) {
 		Region lightArea = light->Frame;
-		lightArea.x = XOffset - light->Frame.x;
-		lightArea.y = YOffset - ZOffset - light->Frame.y;
+		lightArea.x = XOffset - light->Frame.x + Pos.x;
+		lightArea.y = YOffset - ZOffset - light->Frame.y + Pos.y;
 		r.ExpandToRegion(lightArea);
 	}
 
