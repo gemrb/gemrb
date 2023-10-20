@@ -1475,9 +1475,16 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 	if (phase==P_EXPLODING1) {
 		core->GetAudioDrv()->Play(Extension->SoundRes, SFX_CHAN_MISSILE, Pos);
 		//play VVC in center
-		//FIXME: make it possible to play VEF too?
 		if (aoeflags&PAF_VVC) {
-			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
+			ScriptedAnimation* vvc;
+			VEFObject* vef = gamedata->GetVEFObject(Extension->VVCRes, false);
+			if (vef) {
+				vvc = vef->GetSingleObject();
+				if (!vvc) delete vef;
+			} else {
+				vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
+			}
+
 			if (vvc) {
 				if (apflags & APF_VVCPAL) {
 					//if the palette is used as tint (as opposed to clown colorset) tint the vvc
@@ -1496,7 +1503,11 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 				vvc->Pos = Pos;
 				vvc->PlayOnce();
 				vvc->SetBlend();
-				area->AddVVCell(vvc);
+				if (vef) {
+					area->AddVVCell(vef);
+				} else {
+					area->AddVVCell(vvc);
+				}
 			}
 			// bg2 comet has the explosion split into two vvcs, with just a starting cycle difference
 			// until we actually need two vvc fields in the extension, let's just hack around it
