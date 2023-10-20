@@ -1358,7 +1358,8 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 				drawn = 1;
 			}
 			if (drawn) {
-				pro->Draw(viewport);
+				BlitFlags flags = SetDrawingStencilForProjectile(pro, viewport);
+				pro->Draw(viewport, flags);
 				proidx++;
 			} else {
 				delete pro;
@@ -1680,6 +1681,30 @@ BlitFlags Map::SetDrawingStencilForScriptedAnimation(const ScriptedAnimation* an
 	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &p);
 
 	SetDrawingStencilForObject(anim, bbox, walls, viewPort.origin);
+
+	// check this after SetDrawingStencilForObject for debug drawing purposes
+	if (walls.first.empty()) {
+		return BlitFlags::NONE; // not behind a wall, no stencil required
+	}
+
+	BlitFlags flags = core->DitherSprites ? BlitFlags::STENCIL_BLUE : BlitFlags::STENCIL_RED;
+	return flags;
+}
+
+// test case: fireball ball and spread animation
+// almost all parts should be occluded, but many are drawn by adding vvcs to the map
+BlitFlags Map::SetDrawingStencilForProjectile(const Projectile* pro, const Region& viewPort)
+{
+	const Region& bbox = pro->DrawingRegion();
+	if (bbox.IntersectsRegion(viewPort) == false) {
+		return BlitFlags::NONE;
+	}
+
+	Point p = pro->GetPos();
+	p.y -= pro->GetZPos();
+	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &p);
+
+	SetDrawingStencilForObject(pro, bbox, walls, viewPort.origin);
 
 	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {

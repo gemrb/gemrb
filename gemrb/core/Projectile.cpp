@@ -1270,7 +1270,47 @@ int Projectile::Update()
 	return 1;
 }
 
-void Projectile::Draw(const Region& viewport)
+Region Projectile::DrawingRegion() const
+{
+	Region r(Pos, Size());
+	r.y -= ZPos;
+
+	for (const auto& child : children) {
+		r.ExpandToRegion(child.DrawingRegion());
+	}
+
+	orient_t face = GetOrientation();
+	const Animation& travelAnim = travel[face];
+	if (travelAnim) {
+		Region r2 = travelAnim.animArea;
+		r2.origin += Pos;
+		r.ExpandToRegion(r2);
+		// NOTE: fireball: small part of the ball and spread can still be out of the final region
+		// perhaps we need to account for the BAM center coordinates again?
+		// we reuse `travel` for both animations and assuming they're at the same height
+	}
+	const Animation& shadowAnim = shadow[face];
+	if (shadowAnim) {
+		Region r2 = shadowAnim.animArea;
+		r2.origin += Pos;
+		r2.y += ZPos; // always on the ground
+		r.ExpandToRegion(r2);
+	}
+	// we can ignore BAMRes1, BAMRes2, Extension->Spread: used only to create the above two
+	// same for TrailBAMs, smokebam, Extension->VVCRes: used to create standalone VVCs
+
+	// FIXME: position is different for curved paths (magic missile), see below
+	if (light) {
+		Region lightArea = light->Frame;
+		lightArea.origin += Pos;
+		lightArea.y += ZPos; // always on the ground
+		r.ExpandToRegion(lightArea);
+	}
+
+	return r;
+}
+
+void Projectile::Draw(const Region& viewport, BlitFlags flags)
 {
 	switch (phase) {
 		case P_UNINITED:
@@ -1279,30 +1319,30 @@ void Projectile::Draw(const Region& viewport)
 			//This extension flag is to enable the travel projectile at
 			//trigger/explosion time
 			if (Extension->AFlags&PAF_VISIBLE) {
-				DrawTravel(viewport);
+				DrawTravel(viewport, flags);
 			}
 
 			CheckTrigger(Extension->TriggerRadius);
 			if (phase == P_EXPLODING1 || phase == P_EXPLODING2) {
-				DrawExplosion(viewport);
+				DrawExplosion(viewport, flags);
 			}
 			break;
 		case P_TRAVEL: case P_TRAVEL2:
 			//There is no Extension for simple traveling projectiles!
-			DrawTravel(viewport);
+			DrawTravel(viewport, flags);
 			return;
 		default:
-			DrawExploded(viewport);
+			DrawExploded(viewport, flags);
 			return;
 	}
 }
 
-bool Projectile::DrawChildren(const Region& vp)
+bool Projectile::DrawChildren(const Region& vp, BlitFlags flags)
 {
 	bool drawn = false;
 	for (auto it = children.begin(); it != children.end();){
 		if (it->Update()) {
-			it->DrawTravel(vp);
+			it->DrawTravel(vp, flags);
 			drawn = true;
 			++it;
 		} else {
@@ -1314,9 +1354,9 @@ bool Projectile::DrawChildren(const Region& vp)
 }
 
 //draw until all children expire
-void Projectile::DrawExploded(const Region& viewport)
+void Projectile::DrawExploded(const Region& viewport, BlitFlags flags)
 {
-	if (DrawChildren(viewport)) {
+	if (DrawChildren(viewport, flags)) {
 		return;
 	}
 	phase = P_EXPIRED;
@@ -1352,7 +1392,7 @@ void Projectile::SpawnFragments(const Holder<ProjectileExtension>& extension) co
 	}
 }
 
-void Projectile::DrawExplosion(const Region& vp)
+void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 {
 	//This seems to be a needless safeguard
 	if (!Extension) {
@@ -1361,7 +1401,7 @@ void Projectile::DrawExplosion(const Region& vp)
 	}
 
 	StopSound();
-	DrawChildren(vp);
+	DrawChildren(vp, flags);
 
 	int pause = core->IsFreezed();
 	if (pause) {
@@ -1683,15 +1723,12 @@ void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 	}
 }
 
-void Projectile::DrawTravel(const Region& viewport)
+void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 {
 	const Game *game = core->GetGame();
-	BlitFlags flags;
 
 	if(ExtFlags&PEF_HALFTRANS) {
-		flags = BlitFlags::HALFTRANS;
-	} else {
-		flags = BlitFlags::NONE;
+		flags |= BlitFlags::HALFTRANS;
 	}
 
 	//static tint (use the tint field)

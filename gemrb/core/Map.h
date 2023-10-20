@@ -665,6 +665,7 @@ private:
 	BlitFlags SetDrawingStencilForScriptable(const Scriptable*, const Region& viewPort);
 	BlitFlags SetDrawingStencilForAreaAnimation(const AreaAnimation*, const Region& viewPort);
 	BlitFlags SetDrawingStencilForScriptedAnimation(const ScriptedAnimation* anim, const Region& viewPort, int height);
+	BlitFlags SetDrawingStencilForProjectile(const Projectile* pro, const Region& viewPort);
 
 	void DrawDebugOverlay(const Region &vp, uint32_t dFlags) const;
 	void DrawPortal(const InfoPoint *ip, int enable);
