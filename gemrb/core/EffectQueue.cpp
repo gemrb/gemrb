@@ -1094,6 +1094,11 @@ static int checkSaves(Actor* actor, Effect* fx)
 		}
 	}
 
+	static EffectRef fx_damage_ref = { "Damage", -1 };
+	if (fx_damage_ref.opcode < 0) {
+		Globals::ResolveEffectRef(fx_damage_ref);
+	}
+
 	bool saved = false;
 	for (int i = 0; i < 5; i++) {
 		if (fx->SavingThrowType & (1 << i)) {
@@ -1109,7 +1114,7 @@ static int checkSaves(Actor* actor, Effect* fx)
 		}
 	}
 	if (saved) {
-		if (fx->IsSaveForHalfDamage || (fx->Opcode == 12 && fx->IsVariable & DamageFlags::SaveForHalf)) {
+		if (fx->IsSaveForHalfDamage || ((int) fx->Opcode == fx_damage_ref.opcode && fx->IsVariable & DamageFlags::SaveForHalf)) {
 			// if we have evasion, we take no damage
 			// sadly there's no feat or stat for it
 			if (globals.iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
@@ -1123,7 +1128,7 @@ static int checkSaves(Actor* actor, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 	} else {
-		if (fx->Opcode == 12 && fx->IsVariable & DamageFlags::FailForHalf) {
+		if ((int) fx->Opcode == fx_damage_ref.opcode && fx->IsVariable & DamageFlags::FailForHalf) {
 			fx->Parameter1 /= 2;
 		}
 		// improved evasion: take only half damage even though we failed the save
