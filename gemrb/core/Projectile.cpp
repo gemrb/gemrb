@@ -1447,7 +1447,7 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 		//Extension->FragAnimID the animation id for the character animation
 		//This color is not used in the original game
 		Point pos = Pos - vp.origin;
-		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, pos, Extension->FragAnimID, GetZPos());
+		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, pos, Extension->FragAnimID, ZPos);
 	}
 
 	if(Shake) {
@@ -1825,7 +1825,7 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 		Draw(frame, pos, flags, tint2);
 	}
 
-	pos.y-=GetZPos();
+	pos.y -= ZPos;
 	
 	if (TFlags & PTF_TRANS) {
 		flags |= BlitFlags::ONE_MINUS_DST;
@@ -1860,7 +1860,7 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 	}
 
 	if (drawSpark) {
-		area->Sparkle(0,SparkColor, SPARKLE_EXPLOSION, pos, 0, GetZPos() );
+		area->Sparkle(0, SparkColor, SPARKLE_EXPLOSION, pos, 0, ZPos);
 		drawSpark = 0;
 	}
 
