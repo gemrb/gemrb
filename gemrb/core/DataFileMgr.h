@@ -52,7 +52,8 @@ private:
 	const std::string name;
 
 public:
-	KeyValueGroup (std::string name) : name(std::move(name)) {}
+	explicit KeyValueGroup(std::string name)
+		: name(std::move(name)) {}
 
 	const std::string& GetName() const {
 		return name;

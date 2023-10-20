@@ -104,8 +104,9 @@ public:
 		}
 	}
 
-	template <typename T>
-	WARN_UNUSED const T GetAs(const StringView& key, T fallback = V()) const {
+	template<typename T>
+	WARN_UNUSED T GetAs(const StringView& key, T fallback = V()) const
+	{
 		static_assert(sizeof(T) >= sizeof(V), "Cannot truncate value. Use Get() and static_cast if it must be done.");
 		return static_cast<T>(Get(key, static_cast<V>(fallback)));
 	}

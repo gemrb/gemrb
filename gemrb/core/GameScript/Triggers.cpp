@@ -1181,9 +1181,9 @@ int GameScript::HasItemEquippedReal(Scriptable* Sender, const Trigger* parameter
 
 	int slot = actor->inventory.FindItem(parameters->resref0Parameter, IE_INV_ITEM_UNDROPPABLE);
 	int skip = 0;
-	int firstWeaponSlot = actor->inventory.GetWeaponSlot();
+	int firstWeaponSlot = Inventory::GetWeaponSlot();
 	while (slot != -1) {
-		if (slot >= firstWeaponSlot && slot <= actor->inventory.GetWeaponSlot() + 3) {
+		if (slot >= firstWeaponSlot && slot <= firstWeaponSlot + 3) {
 			const CREItem* item = actor->inventory.GetSlotItem(slot);
 			if (item->Flags & IE_INV_ITEM_EQUIPPED) {
 				return 1;

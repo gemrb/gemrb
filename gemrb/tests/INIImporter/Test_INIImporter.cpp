@@ -66,7 +66,7 @@ TEST_F(INIImporter_Test, KeyValueIteration) {
 
 	for (const auto& p : *it) {
 		values[static_cast<StringView>(p.first).MakeString()] = p.second;
-	};
+	}
 
 	EXPECT_EQ(5, values.size());
 	EXPECT_EQ("abc", values.find("stringValue")->second);
