@@ -8944,7 +8944,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	}
 	ResetCommentTime();
 	if (pro) {
-		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
+		pro->SetCaster(GetGlobalID(), gamedata->GetMiscRule("ITEM_CASTERLEVEL"));
 		GetCurrentArea()->AddProjectile(pro, Pos, target);
 		SetOrientation(target, Pos, false);
 		return true;
@@ -9300,7 +9300,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 		return false;
 	}
 
-	pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
+	pro->SetCaster(GetGlobalID(), gamedata->GetMiscRule("ITEM_CASTERLEVEL"));
 	if (flags & UI_FAKE) {
 		delete pro;
 	} else if (((int) header < 0) && !(flags & UI_MISS)) { // using a weapon

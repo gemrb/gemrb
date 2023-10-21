@@ -92,11 +92,12 @@ EffectQueue Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, 
 	EffectQueue fxqueue;
 	EffectQueue selfqueue;
 	Actor* target = Scriptable::As<Actor>(self);
+	static int casterLevel = gamedata->GetMiscRule("ITEM_CASTERLEVEL");
 
 	for (size_t i = 0; i < count; ++i) {
 		Effect *fx = features[i];
 		fx->InventorySlot = invslot;
-		fx->CasterLevel = ITEM_CASTERLEVEL; //items all have casterlevel 10
+		fx->CasterLevel = casterLevel;
 		fx->CasterID = self->GetGlobalID();
 		if (usage >= 0) {
 			//this is not coming from the item header, but from the recharge flags
