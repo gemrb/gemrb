@@ -415,12 +415,10 @@ bool Projectile::FailedIDS(const Actor *target) const
 				fail = !fail;
 			}
 		}
-	} else {
-		if (fail && IDSType2) {
-			fail = !EffectQueue::match_ids( target, IDSType2, IDSValue2);
-			if (ExtFlags&PEF_NOTIDS2) {
-				fail = !fail;
-			}
+	} else if (fail && IDSType2) {
+		fail = !EffectQueue::match_ids(target, IDSType2, IDSValue2);
+		if (ExtFlags & PEF_NOTIDS2) {
+			fail = !fail;
 		}
 	}
 
