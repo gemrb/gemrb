@@ -398,12 +398,6 @@ void Projectile::SetDelay(int delay)
 	ExtFlags|=PEF_FREEZE;
 }
 
-//copied from Actor.cpp
-#define WEAPON_FIST        0
-#define WEAPON_MELEE       1
-#define WEAPON_RANGED      2
-#define WEAPON_BYPASS      0x10000
-
 bool Projectile::FailedIDS(const Actor *target) const
 {
 	bool fail = !EffectQueue::match_ids( target, IDSType, IDSValue);
@@ -425,53 +419,6 @@ bool Projectile::FailedIDS(const Actor *target) const
 	}
 
 	return fail;
-}
-
-// TODO move this to Actor
-bool Projectile::TouchAttack(const Actor* target) const
-{
-	if (!(ExtFlags & PEF_TOUCH)) {
-		return false;
-	}
-
-	Actor* caster = core->GetGame()->GetActorByGlobalID(Caster);
-	if (!caster) {
-		return false;
-	}
-
-	static int attackRollDiceSides = gamedata->GetMiscRule("ATTACK_ROLL_DICE_SIDES");
-	int roll = caster->LuckyRoll(1, attackRollDiceSides, 0);
-	if (roll == 1) {
-		return false; // critical failure
-	}
-
-	if (!(target->GetStat(IE_STATE_ID) & STATE_CRIT_PROT))  {
-		if (roll >= attackRollDiceSides - (int) caster->GetStat(IE_CRITICALHITBONUS)) {
-			return true; // critical success
-		}
-	}
-
-	// handle attack type here, weapon depends on it too
-	int attackType = WEAPON_FIST;
-	if (form == ITEM_AT_MELEE) {
-		// unsure if present in the originals
-		// this way spells could simulate proficient melee attacks
-		attackType = WEAPON_MELEE;
-	} else if (form % 2 == 0) {
-		attackType = WEAPON_RANGED;
-	}
-	int toHit = caster->GetToHit(attackType, target);
-	// damage type, should be generic?
-	// ignore the armor bonus
-	int defense = target->GetDefense(0, WEAPON_BYPASS, caster);
-	bool fail;
-	if (Actor::IsReverseToHit()) {
-		fail = roll + defense < toHit;
-	} else {
-		fail = toHit + roll < defense;
-	}
-
-	return !fail;
 }
 
 void Projectile::Payload()
@@ -525,7 +472,7 @@ void Projectile::Payload()
 		Owner = target;
 	}
 	// apply this spell on target when the projectile fails
-	if (FailedIDS(target) && !TouchAttack(target)) {
+	if (FailedIDS(target) && !target->TouchAttack(this)) {
 		if (!failureSpell.IsEmpty()) {
 			if (Target) {
 				core->ApplySpell(failureSpell, target, Owner, Level);

@@ -1094,6 +1094,7 @@ public:
 	bool ShouldModifyMorale() const;
 	bool HibernateIfAble();
 	bool ForceScriptCheck();
+	bool TouchAttack(const Projectile* pro) const;
 };
 }
 
