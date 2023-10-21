@@ -465,6 +465,7 @@ private:
 	int CalculateTargetFlag() const;
 	//logic to resolve the explosion count (may be based on caster level)
 	int CalculateExplosionCount() const;
+	bool TouchAttack(const Actor* target) const;
 
 	Actor *GetTarget();
 	void NextTarget(const Point &p);

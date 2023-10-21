@@ -404,8 +404,6 @@ void Projectile::SetDelay(int delay)
 
 bool Projectile::FailedIDS(const Actor *target) const
 {
-	static int attackRollDiceSides = gamedata->GetMiscRule("ATTACK_ROLL_DICE_SIDES");
-
 	bool fail = !EffectQueue::match_ids( target, IDSType, IDSValue);
 	if (ExtFlags&PEF_NOTIDS) {
 		fail = !fail;
@@ -426,30 +424,32 @@ bool Projectile::FailedIDS(const Actor *target) const
 		}
 	}
 
-	if (fail) {
-		return fail;
-	}
+	return fail;
+}
 
+// TODO move this to Actor
+bool Projectile::TouchAttack(const Actor* target) const
+{
 	if (!(ExtFlags & PEF_TOUCH)) {
-		return fail;
+		return false;
 	}
 
-	Actor *caster = core->GetGame()->GetActorByGlobalID(Caster);
+	Actor* caster = core->GetGame()->GetActorByGlobalID(Caster);
 	if (!caster) {
-		return fail;
+		return false;
 	}
 
-	// TODO move this to Actor
 	// TODO some projectiles use melee attack (fist), others use projectile attack
-	//this apparently depends on the spell's SpellForm (normal vs. projectile)
+	// this apparently depends on the spell's SpellForm (normal vs. projectile)
+	static int attackRollDiceSides = gamedata->GetMiscRule("ATTACK_ROLL_DICE_SIDES");
 	int roll = caster->LuckyRoll(1, attackRollDiceSides, 0);
 	if (roll == 1) {
-		return true; //critical failure
+		return false; // critical failure
 	}
-	
+
 	if (!(target->GetStat(IE_STATE_ID) & STATE_CRIT_PROT))  {
 		if (roll >= attackRollDiceSides - (int) caster->GetStat(IE_CRITICALHITBONUS)) {
-			return false; // critical success
+			return true; // critical success
 		}
 	}
 
@@ -458,13 +458,14 @@ bool Projectile::FailedIDS(const Actor *target) const
 	// damage type, should be generic?
 	// ignore the armor bonus
 	int defense = target->GetDefense(0, WEAPON_BYPASS, caster);
+	bool fail;
 	if (Actor::IsReverseToHit()) {
 		fail = roll + defense < toHit;
 	} else {
 		fail = toHit + roll < defense;
 	}
 
-	return fail;
+	return !fail;
 }
 
 void Projectile::Payload()
@@ -518,7 +519,7 @@ void Projectile::Payload()
 		Owner = target;
 	}
 	// apply this spell on target when the projectile fails
-	if (FailedIDS(target)) {
+	if (FailedIDS(target) && !TouchAttack(target)) {
 		if (!failureSpell.IsEmpty()) {
 			if (Target) {
 				core->ApplySpell(failureSpell, target, Owner, Level);
