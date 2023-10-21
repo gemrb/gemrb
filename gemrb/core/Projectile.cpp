@@ -400,6 +400,8 @@ void Projectile::SetDelay(int delay)
 
 //copied from Actor.cpp
 #define WEAPON_FIST        0
+#define WEAPON_MELEE       1
+#define WEAPON_RANGED      2
 #define WEAPON_BYPASS      0x10000
 
 bool Projectile::FailedIDS(const Actor *target) const
@@ -437,8 +439,6 @@ bool Projectile::TouchAttack(const Actor* target) const
 		return false;
 	}
 
-	// TODO some projectiles use melee attack (fist), others use projectile attack
-	// this apparently depends on the spell's SpellForm (normal vs. projectile)
 	static int attackRollDiceSides = gamedata->GetMiscRule("ATTACK_ROLL_DICE_SIDES");
 	int roll = caster->LuckyRoll(1, attackRollDiceSides, 0);
 	if (roll == 1) {
@@ -451,8 +451,16 @@ bool Projectile::TouchAttack(const Actor* target) const
 		}
 	}
 
-	// handle attack type here, weapon depends on it too?
-	int toHit = caster->GetToHit(WEAPON_FIST, target);
+	// handle attack type here, weapon depends on it too
+	int attackType = WEAPON_FIST;
+	if (form == ITEM_AT_MELEE) {
+		// unsure if present in the originals
+		// this way spells could simulate proficient melee attacks
+		attackType = WEAPON_MELEE;
+	} else if (form % 2 == 0) {
+		attackType = WEAPON_RANGED;
+	}
+	int toHit = caster->GetToHit(attackType, target);
 	// damage type, should be generic?
 	// ignore the armor bonus
 	int defense = target->GetDefense(0, WEAPON_BYPASS, caster);

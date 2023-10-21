@@ -288,6 +288,7 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 		pro->SetEffects(GetEffectBlock(self, target, header, level, seh->ProjectileAnimation));
 	}
 	pro->Range = GetCastingDistance(self);
+	pro->form = seh->SpellForm;
 	return pro;
 }
 

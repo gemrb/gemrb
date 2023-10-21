@@ -252,7 +252,8 @@ public:
 	//these are public but not in the .pro file
 	Holder<ProjectileExtension> Extension;
 	Holder<Palette> palette = nullptr;
-	//internals
+	int form = 0; // gemrb extension
+
 private:
 	ResRef smokebam;
 	tick_t timeStartStep = 0;

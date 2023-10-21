@@ -256,6 +256,7 @@ Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &targe
 		pro->SetEffects(GetEffectBlock(self, target, usage, invslot, idx));
 	}
 	pro->Range = eh->Range;
+	pro->form = eh->AttackType;
 	return pro;
 }
 
