@@ -6433,13 +6433,6 @@ int Actor::GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, i
 	if (third) {
 		if (!dualWielding) return prof;
 
-		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
-		// it is limited to shortswords and daggers, which also have this flag set
-		// the bonus is applied to both hands
-		if (weaponInfo[1].wflags & WEAPON_FINESSE) {
-			prof += 2;
-		}
-
 		// rangers wearing light or no armor gain ambidexterity and
 		// two-weapon-fighting feats for free
 		bool ambidextrous = HasFeat(FEAT_AMBIDEXTERITY);
@@ -6452,23 +6445,26 @@ int Actor::GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, i
 			}
 		}
 
-		// FIXME: externalise
 		// penalites and boni for both hands:
 		// -6 main, -10 off with no adjustments
 		//  0 main, +4 off with ambidexterity
 		// +2 main, +2 off with two weapon fighting
-		// +2 main, +2 off with a simple weapons in the off hand
+		// +2 main, +2 off with a simple weapon in the off hand
 		// so a minimum penalty of -2, -2
-		if (twoWeaponFighting) {
-			prof += 2;
+		static AutoTable modifierTable = gamedata->LoadTable("dwmods");
+		std::string hand = "RIGHT";
+		if (wi.wflags & WEAPON_LEFTHAND) hand = "LEFT";
+
+		prof += modifierTable->QueryFieldSigned<int>("BASE", hand);
+		if (ambidextrous) {
+			prof += modifierTable->QueryFieldSigned<int>("AMBIDEXTERITY", hand);
 		}
-		if (wi.wflags & WEAPON_LEFTHAND) {
-			prof -= 6;
-		} else {
-			prof -= 10;
-			if (ambidextrous) {
-				prof += 4;
-			}
+		if (twoWeaponFighting) {
+			prof += modifierTable->QueryFieldSigned<int>("2WFIGHTING", hand);
+		}
+		// this bonus is limited to shortswords and daggers, which also have this flag set
+		if (weaponInfo[1].wflags & WEAPON_FINESSE) {
+			prof += modifierTable->QueryFieldSigned<int>("SIMPLEWEAPONS", hand);
 		}
 
 		return prof;

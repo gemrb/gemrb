@@ -1,0 +1,10 @@
+2DA V1.0
+0
+             LEFT   RIGHT
+BASE          -10      -6
+AMBIDEXTERITY   4       0
+2WFIGHTING      2       2
+SIMPLEWEAPONS   2       2
+
+# this table externalises the various bonuses and
+# maluses related to dualwielding in iwd2
