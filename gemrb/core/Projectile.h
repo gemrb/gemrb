@@ -451,6 +451,7 @@ private:
 	void CheckTrigger(unsigned int radius);
 	//calculate target and destination points for a firewall
 	void SetupWall();
+	void BendPosition(Point& pos) const;
 	void DrawLine(const Region &screen, int face, BlitFlags flag);
 	void DrawTravel(const Region& screen, BlitFlags flags);
 	bool DrawChildren(const Region& screen, BlitFlags flags);

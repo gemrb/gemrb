@@ -1687,6 +1687,36 @@ void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 	}
 }
 
+// adjust position for arcing paths
+void Projectile::BendPosition(Point& pos) const
+{
+	double total_distance = Distance(Origin, Destination);
+	double travelled_distance = Distance(Origin, Pos);
+
+	// distance travelled along the line, from 0.0 to 1.0
+	double travelled = travelled_distance / total_distance;
+	if (travelled > 1.0) {
+		Log(WARNING, "Projectile", "Travelled over full distance ({} = {} / {})! Origin: {}, Destination: {}, Pos: {}", travelled, travelled_distance, total_distance, Origin, Destination, Pos);
+		travelled = 1.0;
+	}
+
+	// input to sin(): 0 to pi gives us an arc
+	double arc_angle = travelled * M_PI;
+
+	// calculate the distance between the arc and the current pos
+	// (this could use travelled and a larger constant multiplier,
+	// to make the arc size fixed rather than relative to the total
+	// distance to travel)
+	double length_of_normal = travelled_distance * std::sin(arc_angle) * 0.3 * ((bend / 2) + 1);
+	if (bend % 2) length_of_normal = -length_of_normal;
+
+	// adjust the to-be-rendered point by that distance
+	double x_vector = (Destination.x - Origin.x) / total_distance;
+	double y_vector = (Destination.y - Origin.y) / total_distance;
+	pos.x += y_vector * length_of_normal;
+	pos.y -= x_vector * length_of_normal;
+}
+
 void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 {
 	const Game *game = core->GetGame();
@@ -1713,34 +1743,8 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 	}
 
 	Point pos = Pos - viewport.origin;
-	if(bend && phase == P_TRAVEL && Origin != Destination) {
-		double total_distance = Distance(Origin, Destination);
-		double travelled_distance = Distance(Origin, Pos);
-
-		// distance travelled along the line, from 0.0 to 1.0
-		double travelled = travelled_distance / total_distance;
-		if (travelled > 1.0) {
-			Log(WARNING, "Projectile", "Travelled over full distance ({} = {} / {})! Origin: {}, Destination: {}, Pos: {}", travelled, travelled_distance, total_distance, Origin, Destination, Pos);
-			travelled = 1.0;
-		}
-
-		// input to sin(): 0 to pi gives us an arc
-		double arc_angle = travelled * M_PI;
-
-		// calculate the distance between the arc and the current pos
-		// (this could use travelled and a larger constant multiplier,
-		// to make the arc size fixed rather than relative to the total
-		// distance to travel)
-		double length_of_normal = travelled_distance * std::sin(arc_angle) * 0.3 * ((bend / 2) + 1);
-		if (bend % 2) length_of_normal = -length_of_normal;
-
-		// adjust the to-be-rendered point by that distance
-		double x_vector = (Destination.x - Origin.x) / total_distance;
-		double y_vector = (Destination.y - Origin.y) / total_distance;
-		Point newpos = pos;
-		newpos.x += y_vector * length_of_normal;
-		newpos.y -= x_vector * length_of_normal;
-		pos = newpos;
+	if (bend && phase == P_TRAVEL && Origin != Destination) {
+		BendPosition(pos);
 	}
 
 	// set up the tint for the rest of the blits, but don't overwrite the saved one
