@@ -1717,6 +1717,35 @@ void Projectile::BendPosition(Point& pos) const
 	pos.y -= x_vector * length_of_normal;
 }
 
+// draw pop in/hold/pop out animation sequences
+void Projectile::DrawPopping(unsigned int face, const Point& pos, BlitFlags flags, const Color& tint)
+{
+	const Game* game = core->GetGame();
+	Holder<Sprite2D> frame;
+	if (game && game->IsTimestopActive() && !(TFlags & PTF_TIMELESS)) {
+		frame = travel[face].LastFrame();
+		flags |= BlitFlags::GREY;
+		Draw(frame, pos, flags, tint);
+		return;
+	}
+
+	if (ExtFlags & PEF_UNPOP) {
+		frame = shadow[0].NextFrame();
+		if (shadow[0].endReached) {
+			ExtFlags &= ~PEF_UNPOP;
+		}
+	} else {
+		frame = travel[0].NextFrame();
+		if (travel[0].endReached) {
+			travel[0].playReversed = true;
+			travel[0].SetFrame(0);
+			ExtFlags |= PEF_UNPOP;
+			frame = shadow[0].NextFrame();
+		}
+	}
+	Draw(frame, pos, flags, tint);
+}
+
 void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 {
 	const Game *game = core->GetGame();
@@ -1759,29 +1788,8 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 	}
 
 	if (ExtFlags&PEF_POP) {
-			//draw pop in/hold/pop out animation sequences
-			Holder<Sprite2D> frame;
-			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
-				frame = travel[face].LastFrame();
-				flags |= BlitFlags::GREY;
-			} else {
-				if (ExtFlags&PEF_UNPOP) {
-					frame = shadow[0].NextFrame();
-					if (shadow[0].endReached) {
-						ExtFlags &= ~PEF_UNPOP;
-					}
-				} else {
-					frame = travel[0].NextFrame();
-					if (travel[0].endReached) {
-						travel[0].playReversed = true;
-						travel[0].SetFrame(0);
-						ExtFlags |= PEF_UNPOP;
-						frame = shadow[0].NextFrame();
-					}
-				}
-			}
-			Draw(frame, pos, flags, tint2);
-			return;
+		DrawPopping(face, pos, flags, tint2);
+		return;
 	}
 	
 	if (ExtFlags&PEF_LINE) {
