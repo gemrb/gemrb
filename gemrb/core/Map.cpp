@@ -3927,14 +3927,6 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell) const
 		triggerType = trigger_spellcastpriest;
 
 	caster->AddTrigger(TriggerEntry(triggerType, caster->GetGlobalID(), spell));
-
-	size_t i = actors.size();
-	while (i--) {
-		const Actor *witness = actors[i];
-		if (CanSee(witness, caster, true, 0)) {
-			caster->AddTrigger(TriggerEntry(triggerType, caster->GetGlobalID(), spell));
-		}
-	}
 }
 
 void Map::SetBackground(const ResRef &bgResRef, ieDword duration)
