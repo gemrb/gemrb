@@ -5317,9 +5317,6 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "INI resource not found!\n" );
 	}
 	const StringView desc = core->GetPartyINI()->GetKeyAsString(PyString_AsStringView(Tag), PyString_AsStringView(Key), PyString_AsStringView(Default));
-	// ensure it can be converted to unicode
-	// FIXME: English party.ini is encoded in cp-1252, not iso-8859-1, the tlk encoding
-	// but we don't display its 0x92 single quote / apostrophe correctly either way (see The Winter Rose description: father Di'Arnos)
 	return PyString_FromStringView(desc);
 }
 
