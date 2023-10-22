@@ -1352,6 +1352,65 @@ void Projectile::SpawnFragments(const Holder<ProjectileExtension>& extension) co
 	}
 }
 
+void Projectile::DrawExplodingPhase1() const
+{
+	core->GetAudioDrv()->Play(Extension->SoundRes, SFX_CHAN_MISSILE, Pos);
+
+	// play VVC in center
+	if (!(Extension->AFlags & PAF_VVC)) {
+		return;
+	}
+
+	ScriptedAnimation* vvc;
+	VEFObject* vef = gamedata->GetVEFObject(Extension->VVCRes, false);
+	if (vef) {
+		vvc = vef->GetSingleObject();
+		if (!vvc) delete vef;
+	} else {
+		vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
+	}
+	if (!vvc) {
+		return;
+	}
+
+	if (Extension->APFlags & APF_VVCPAL) {
+		// if the palette is used as tint (as opposed to clown colorset) tint the vvc
+		if (Extension->APFlags & APF_TINT) {
+			const auto& pal32 = core->GetPalette32(Extension->ExplColor);
+			vvc->Tint = pal32[PALSIZE / 2];
+			vvc->Transparency |= BlitFlags::COLOR_MOD;
+		} else {
+			vvc->SetPalette(Extension->ExplColor);
+		}
+	}
+
+	// if the trail oriented, then the center is oriented too
+	if (ExtFlags & PEF_TRAIL) {
+		vvc->SetOrientation(Orientation);
+	}
+
+	vvc->Pos = Pos;
+	vvc->PlayOnce();
+	vvc->SetBlend();
+	if (vef) {
+		area->AddVVCell(vef);
+	} else {
+		area->AddVVCell(vvc);
+	}
+
+	// bg2 comet has the explosion split into two vvcs, with just a starting cycle difference
+	// until we actually need two vvc fields in the extension, let's just hack around it
+	if (Extension->VVCRes == "SPCOMEX1") {
+		ScriptedAnimation* secondVVC = gamedata->GetScriptedAnimation("SPCOMEX2", false);
+		if (secondVVC) {
+			secondVVC->Pos = Pos;
+			secondVVC->PlayOnce();
+			secondVVC->SetBlend();
+			area->AddVVCell(secondVVC);
+		}
+	}
+}
+
 void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 {
 	//This seems to be a needless safeguard
@@ -1433,55 +1492,7 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 	
 	//draw it only once, at the time of explosion
 	if (phase==P_EXPLODING1) {
-		core->GetAudioDrv()->Play(Extension->SoundRes, SFX_CHAN_MISSILE, Pos);
-		//play VVC in center
-		if (aoeflags&PAF_VVC) {
-			ScriptedAnimation* vvc;
-			VEFObject* vef = gamedata->GetVEFObject(Extension->VVCRes, false);
-			if (vef) {
-				vvc = vef->GetSingleObject();
-				if (!vvc) delete vef;
-			} else {
-				vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
-			}
-
-			if (vvc) {
-				if (apflags & APF_VVCPAL) {
-					//if the palette is used as tint (as opposed to clown colorset) tint the vvc
-					if (apflags & APF_TINT) {
-						const auto& pal32 = core->GetPalette32(Extension->ExplColor);
-						vvc->Tint = pal32[PALSIZE/2];
-						vvc->Transparency |= BlitFlags::COLOR_MOD;
-					} else {
-						vvc->SetPalette(Extension->ExplColor);
-					}
-				}
-				//if the trail oriented, then the center is oriented too
-				if (ExtFlags&PEF_TRAIL) {
-					vvc->SetOrientation(Orientation);
-				}
-				vvc->Pos = Pos;
-				vvc->PlayOnce();
-				vvc->SetBlend();
-				if (vef) {
-					area->AddVVCell(vef);
-				} else {
-					area->AddVVCell(vvc);
-				}
-			}
-			// bg2 comet has the explosion split into two vvcs, with just a starting cycle difference
-			// until we actually need two vvc fields in the extension, let's just hack around it
-			if (Extension->VVCRes == "SPCOMEX1") {
-				ScriptedAnimation* secondVVC = gamedata->GetScriptedAnimation("SPCOMEX2", false);
-				if (secondVVC) {
-					secondVVC->Pos = Pos;
-					secondVVC->PlayOnce();
-					secondVVC->SetBlend();
-					area->AddVVCell(secondVVC);
-				}
-			}
-		}
-		
+		DrawExplodingPhase1();
 		phase=P_EXPLODING2;
 	} else {
 		core->GetAudioDrv()->Play(Extension->AreaSound, SFX_CHAN_MISSILE, Pos);

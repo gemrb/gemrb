@@ -456,6 +456,7 @@ private:
 	void DrawLine(const Region &screen, int face, BlitFlags flag);
 	void DrawTravel(const Region& screen, BlitFlags flags);
 	bool DrawChildren(const Region& screen, BlitFlags flags);
+	void DrawExplodingPhase1() const;
 	void DrawExplosion(const Region& screen, BlitFlags flags);
 	void SpawnFragment(Point& pos) const;
 	void SpawnFragments(const Holder<ProjectileExtension>& extension) const;
