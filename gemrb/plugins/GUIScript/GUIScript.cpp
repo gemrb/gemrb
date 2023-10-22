@@ -5369,12 +5369,15 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	Slot = ( PlayerSlot & 0x7fff );
 	GET_GAME();
 
-	//FIXME:overwriting original slot
-	//is dangerous if the game is already loaded
-	//maybe the actor should be removed from the area first
+	// overwriting original slot?
 	if (PlayerSlot & 0x8000) {
 		PlayerSlot = game->FindPlayer( Slot );
 		if (PlayerSlot >= 0) {
+			Map* map = game->GetCurrentArea();
+			if (map) {
+				Actor* actor = game->GetPC(PlayerSlot, false);
+				map->RemoveActor(actor);
+			}
 			game->DelPC(PlayerSlot, true);
 		}
 	} else {
