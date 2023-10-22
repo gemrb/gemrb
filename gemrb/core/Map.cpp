@@ -3458,12 +3458,7 @@ static void MergePiles(Container *donorPile, Container *pile)
 		int skipped = count;
 		while (count) {
 			int slot = pile->inventory.FindItem(item->ItemResRef, 0, --count);
-			if (slot == -1) {
-				// probably an inventory bug, shouldn't happen
-				Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: {}", item->ItemResRef);
-				skipped--;
-				continue;
-			}
+			assert(slot != -1);
 			const CREItem *otheritem = pile->inventory.GetSlotItem(slot);
 			if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
 				// already full (or nonstackable), nothing to do here
