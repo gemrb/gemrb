@@ -1411,6 +1411,151 @@ void Projectile::DrawExplodingPhase1() const
 	}
 }
 
+void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion)
+{
+	int apFlags = Extension->APFlags;
+	ResRef tmp = Extension->Spread;
+	if (apFlags & APF_BOTH) {
+		if (RandomFlip()) {
+			tmp = Extension->Secondary;
+		} else {
+			tmp = Extension->Spread;
+		}
+	}
+
+	// create a custom projectile with single traveling effect
+	Projectile* pro = server->CreateDefaultProjectile((unsigned int) ~0);
+	// not setting Caster, so we target the ground (ZPos 0)
+	pro->BAMRes1 = tmp;
+	if (ExtFlags & PEF_TRAIL) {
+		pro->Aim = Aim;
+	}
+	pro->SetEffects(EffectQueue());
+
+	// calculate the child projectile's target point, it is either
+	// a perimeter or an inside point of the explosion radius
+	int rad = Extension->ExplosionRadius;
+	Point newdest;
+	if (apFlags & APF_FILL) {
+		rad = RAND(1, rad);
+	}
+	int max = 360;
+	int add = 0;
+	if (Extension->AFlags & PAF_CONE) {
+		max = Extension->ConeWidth;
+		add = (Orientation * 45 - max) / 2;
+	}
+	max = RAND(1, max) + add;
+	double degree = max * M_PI / 180;
+	newdest.x = (int) -(rad * std::sin(degree));
+	newdest.y = (int) (rad * std::cos(degree));
+	newdest += Destination;
+
+	// these fields and flags are always inherited by all children
+	pro->Speed = Speed;
+	pro->ExtFlags = ExtFlags & (PEF_HALFTRANS | PEF_CYCLE | PEF_RGB);
+	pro->RGB = RGB;
+	pro->ColorSpeed = ColorSpeed;
+
+	if (apFlags & APF_FILL) {
+		// a bit of difference in case crowding is needed
+		// make this a separate flag if speed difference
+		// is not always wanted
+		pro->Speed -= RAND(0, 7);
+
+		int delay = Extension->Delay * extensionExplosionCount;
+		if (apFlags & APF_BOTH && delay) {
+			delay = RAND(0, delay - 1);
+		}
+		// this needs to be commented out for ToB horrid wilting
+		//if(ExtFlags&PEF_FREEZE) {
+		delay += Extension->Delay;
+		//}
+		pro->SetDelay(delay);
+	}
+
+	if (apFlags & APF_FILL) { // add another bit if it turns out we need more control
+		if (firstExplosion) {
+			childLocations.push_back(newdest);
+		} else {
+			newdest = childLocations[idx];
+		}
+	}
+
+	if (apFlags & APF_SCATTER) {
+		pro->MoveTo(area, newdest);
+	} else {
+		pro->MoveTo(area, Pos);
+	}
+	pro->SetTarget(newdest);
+
+	// sets up the gradient color for the explosion animation
+	if (apFlags & (APF_PALETTE | APF_TINT)) {
+		pro->SetGradient(Extension->ExplColor, !(apFlags & APF_PALETTE));
+	}
+	// i'm unsure if we need blending for all anims or just the tinted ones
+	// FIXME: this seems suspect
+	pro->TFlags |= PTF_TRANS;
+	if (!(ExtFlags & PEF_CYCLE) || (ExtFlags & PEF_RANDOM)) {
+		pro->ExtFlags |= PEF_RANDOM;
+	}
+
+	pro->Setup();
+
+	// currently needed by bg2/how Web (less obvious in bg1)
+	// the original hardcoded a cycle switch to 1 or 2 at random when reaching the end, which results in the same frame
+	// TODO: original behaviour was to repeat individually (per-child) not as a whole
+	if (pro->travel[0] && Extension->APFlags & APF_PLAYONCE) {
+		// set on all orients while we don't force one for single-orientation animations (see CreateOrientedAnimations)
+		for (auto& anim : pro->travel) {
+			anim.Flags |= A_ANI_PLAYONCE;
+		}
+	}
+
+	children.push_back(std::move(*pro));
+	delete pro;
+}
+
+void Projectile::DrawSpread()
+{
+	// returns if the explosion animation is fake coloured
+
+	int apFlags = Extension->APFlags;
+	bool isCone = (Extension->AFlags & PAF_CONE) != 0;
+	// zero cone width means single line area of effect
+	size_t childCount = 1;
+	if (!isCone || Extension->ConeWidth) {
+		childCount = (Extension->ExplosionRadius + 15) / 16;
+		// more sprites if the whole area needs to be filled
+		if (apFlags & APF_FILL) childCount *= 2;
+		if (apFlags & APF_SPREAD) childCount *= 2;
+		if (apFlags & APF_BOTH) childCount /= 2; //intentionally decreases
+		if (apFlags & APF_MORE) childCount *= 2;
+	}
+
+	// expire children, so they don't accumulate
+	// good for web, holy blight, horrid wilting and more
+	bool firstExplosion = true;
+	if (apFlags & APF_FILL) {
+		children.clear();
+		if (childLocations.size() == childCount) {
+			firstExplosion = false;
+		} else {
+			childLocations.clear();
+		}
+	}
+
+	for (size_t i = 0; i < childCount; ++i) {
+		DrawSpreadChild(i, firstExplosion);
+	}
+
+	// switch fill to scatter after the first time
+	// eg. web and storm of vengeance shouldn't explode outward in subsequent applications
+	if (Extension && apFlags & APF_FILL) {
+		Extension->APFlags |= APF_SCATTER;
+	}
+}
+
 void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 {
 	//This seems to be a needless safeguard
@@ -1446,9 +1591,6 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 		LineTarget();
 	}
 
-	int apflags = Extension->APFlags;
-	int aoeflags = Extension->AFlags;
-
 	//no idea what is PAF_SECONDARY
 	//probably it is to alter some behaviour in the secondary
 	//projectile generation
@@ -1459,7 +1601,7 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 	SecondaryTarget();
 
 	//draw fragment graphics animation at the explosion center
-	if (aoeflags&PAF_FRAGMENT) {
+	if (Extension->AFlags & PAF_FRAGMENT) {
 		//there is a character animation in the center of the explosion
 		//which will go towards the edges (flames, etc)
 		//Extension->ExplColor fake color for single shades (blue,green,red flames)
@@ -1480,7 +1622,7 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 
   //remove PAF_SECONDARY if it is buggy, but that will break the 'HOLD' projectile
 	if ((Extension->AFlags&PAF_SECONDARY) && Extension->FragProjIdx) {
-		if (apflags&APF_TILED) {
+		if (Extension->APFlags & APF_TILED) {
 			SpawnFragments(Extension);
 		} else {
 			SpawnFragment(Pos);
@@ -1499,141 +1641,7 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 	}
 	
 	if (Extension->Spread) {
-		//i'm unsure about the need of this
-		//returns if the explosion animation is fake coloured
-
-		//zero cone width means single line area of effect
-		size_t child_size = 1;
-		if((aoeflags&PAF_CONE) == 0 || Extension->ConeWidth) {
-			child_size = (Extension->ExplosionRadius + 15) / 16;
-			//more sprites if the whole area needs to be filled
-			if (apflags&APF_FILL) child_size*=2;
-			if (apflags&APF_SPREAD) child_size*=2;
-			if (apflags&APF_BOTH) child_size/=2; //intentionally decreases
-			if (apflags&APF_MORE) child_size*=2;
-		}
-
-		// expire children, so they don't accumulate
-		// good for web, holy blight, horrid wilting and more
-		bool firstExplosion = true;
-		if (apflags & APF_FILL) {
-			children.clear();
-			if (childLocations.size() == child_size) {
-				firstExplosion = false;
-			} else {
-				childLocations.clear();
-			}
-		}
-
-		//the spreading animation is in the first column
-		ResRef tmp = Extension->Spread;
-		for (size_t i = 0; i < child_size; ++i) {
-			if(apflags&APF_BOTH) {
-				if (RandomFlip()) {
-					tmp = Extension->Secondary;
-				} else {
-					tmp = Extension->Spread;
-				}
-			}
-			//create a custom projectile with single traveling effect
-			Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
-			// not setting Caster, so we target the ground (ZPos 0)
-			pro->BAMRes1 = tmp;
-			if (ExtFlags&PEF_TRAIL) {
-				pro->Aim = Aim;
-			}
-			pro->SetEffects(EffectQueue());
-			//calculate the child projectile's target point, it is either
-			//a perimeter or an inside point of the explosion radius
-			int rad = Extension->ExplosionRadius;
-			Point newdest;
-			
-			if (apflags&APF_FILL) {
-				rad=core->Roll(1,rad,0);
-			}
-			int max = 360;
-			int add = 0;
-			if (aoeflags&PAF_CONE) {
-				max=Extension->ConeWidth;
-				add=(Orientation*45-max)/2;
-			}
-			max=core->Roll(1,max,add);
-			double degree=max*M_PI/180;
-			newdest.x = (int) -(rad * std::sin(degree) );
-			newdest.y = (int) (rad * std::cos(degree) );
-			
-			//these fields and flags are always inherited by all children
-			pro->Speed = Speed;
-			pro->ExtFlags = ExtFlags&(PEF_HALFTRANS|PEF_CYCLE|PEF_RGB);
-			pro->RGB = RGB;
-			pro->ColorSpeed = ColorSpeed;
-
-			if (apflags&APF_FILL) {
-				//a bit of difference in case crowding is needed
-				//make this a separate flag if speed difference
-				//is not always wanted
-				pro->Speed-=RAND(0,7);
-
-				int delay = Extension->Delay * extensionExplosionCount;
-				if (apflags & APF_BOTH && delay) {
-					delay = RAND(0, delay - 1);
-				}
-				//this needs to be commented out for ToB horrid wilting
-				//if(ExtFlags&PEF_FREEZE) {
-					delay += Extension->Delay;
-				//}
-				pro->SetDelay(delay);
-			}
-
-			newdest += Destination;
-			if (apflags & APF_FILL) { // add another bit if it turns out we need more control
-				if (firstExplosion) {
-					childLocations.push_back(newdest);
-				} else {
-					newdest = childLocations[i];
-				}
-			}
-
-			if (apflags&APF_SCATTER) {
-				pro->MoveTo(area, newdest);
-			} else {
-				pro->MoveTo(area, Pos);
-			}
-			pro->SetTarget(newdest);
-			
-			//sets up the gradient color for the explosion animation
-			if (apflags&(APF_PALETTE|APF_TINT) ) {
-				pro->SetGradient(Extension->ExplColor, !(apflags&APF_PALETTE));
-			}
-			//i'm unsure if we need blending for all anims or just the tinted ones
-			// FIXME: this seems suspect
-			pro->TFlags|=PTF_TRANS;
-			//random frame is needed only for some of these, make it an areapro flag?
-			if( !(ExtFlags&PEF_CYCLE) || (ExtFlags&PEF_RANDOM) ) {
-				pro->ExtFlags|=PEF_RANDOM;
-			}
-
-			pro->Setup();
-
-			// currently needed by bg2/how Web (less obvious in bg1)
-			// the original hardcoded a cycle switch to 1 or 2 at random when reaching the end, which results in the same frame
-			// TODO: original behaviour was to repeat individually (per-child) not as a whole
-			if (pro->travel[0] && Extension->APFlags & APF_PLAYONCE) {
-				// set on all orients while we don't force one for single-orientation animations (see CreateOrientedAnimations)
-				for (auto& anim : pro->travel) {
-					anim.Flags |= A_ANI_PLAYONCE;
-				}
-			}
-			
-			children.push_back(std::move(*pro));
-			delete pro;
-		}
-
-		// switch fill to scatter after the first time
-		// eg. web and storm of vengeance shouldn't explode outward in subsequent applications
-		if (Extension && apflags & APF_FILL) {
-			Extension->APFlags |= APF_SCATTER;
-		}
+		DrawSpread();
 	}
 
 	if (extensionExplosionCount) {
