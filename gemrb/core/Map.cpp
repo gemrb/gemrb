@@ -1695,7 +1695,7 @@ BlitFlags Map::SetDrawingStencilForScriptedAnimation(const ScriptedAnimation* an
 // almost all parts should be occluded, but many are drawn by adding vvcs to the map
 BlitFlags Map::SetDrawingStencilForProjectile(const Projectile* pro, const Region& viewPort)
 {
-	const Region& bbox = pro->DrawingRegion();
+	const Region& bbox = pro->DrawingRegion(viewPort);
 	if (bbox.IntersectsRegion(viewPort) == false) {
 		return BlitFlags::NONE;
 	}

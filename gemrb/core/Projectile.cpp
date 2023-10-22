@@ -1224,13 +1224,20 @@ int Projectile::Update()
 	return 1;
 }
 
-Region Projectile::DrawingRegion() const
+Region Projectile::DrawingRegion(const Region& viewPort) const
 {
-	Region r(Pos, Size());
+	// adjust position for magic missile and the like
+	Point pos = Pos;
+	if (bend && phase == P_TRAVEL && Origin != Destination) {
+		pos -= viewPort.origin;
+		BendPosition(pos);
+		pos += viewPort.origin;
+	}
+	Region r(pos, Size());
 	r.y -= ZPos;
 
 	for (const auto& child : children) {
-		r.ExpandToRegion(child.DrawingRegion());
+		r.ExpandToRegion(child.DrawingRegion(viewPort));
 	}
 
 	orient_t face = GetOrientation();
@@ -1253,7 +1260,6 @@ Region Projectile::DrawingRegion() const
 	// we can ignore BAMRes1, BAMRes2, Extension->Spread: used only to create the above two
 	// same for TrailBAMs, smokebam, Extension->VVCRes: used to create standalone VVCs
 
-	// FIXME: position is different for curved paths (magic missile), see below
 	if (light) {
 		Region lightArea = light->Frame;
 		lightArea.origin += Pos;

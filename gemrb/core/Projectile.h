@@ -412,7 +412,7 @@ public:
 	void ClearPath();
 	//handle phases, return 0 when expired
 	int Update();
-	Region DrawingRegion() const;
+	Region DrawingRegion(const Region& viewPort) const;
 	//draw object
 	void Draw(const Region& screen, BlitFlags flags);
 	void SetGradient(int gradient, bool tinted);
