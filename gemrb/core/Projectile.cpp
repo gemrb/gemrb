@@ -1326,9 +1326,6 @@ void Projectile::SpawnFragment(Point& dest) const
 {
 	Projectile *pro = server->GetProjectileByIndex(Extension->FragProjIdx);
 	if (pro) {
-//		if (Extension->AFlags&PAF_SECONDARY) {
-//				pro->SetEffectsCopy(effects);
-//		}
 		pro->SetCaster(Caster, Level);
 		if (pro->ExtFlags&PEF_RANDOM) {
 			dest.x += core->Roll(1,Extension->tileCoord.x, -Extension->tileCoord.x / 2);
