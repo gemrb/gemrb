@@ -126,7 +126,7 @@ enum ProHeights {
 #define PAF_VISIBLE    1      //the travel projectile is visible until explosion; CPROJECTILEAREAFILEFORMAT_FLAGS_CENTERBAM
 #define PAF_INANIMATE  2      //target inanimates
 #define PAF_TRIGGER    4      //explosion needs to be triggered
-#define PAF_SYNC       8      //one explosion at a time
+#define PAF_DELAYED    8 // one explosion at a time, a delayed trigger
 #define PAF_SECONDARY  16     //secondary projectiles at explosion
 #define PAF_FRAGMENT   32     //fragments (charanimation) at explosion
 #define PAF_ENEMY      64     //target party or not party

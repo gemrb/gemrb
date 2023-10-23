@@ -992,7 +992,7 @@ void Projectile::CheckTrigger(unsigned int radius)
 			phase = P_EXPLODING1;
 			extensionDelay = Extension->Delay;
 		}
-	} else if (phase == P_EXPLODING1 && Extension->AFlags & PAF_SYNC) {
+	} else if (phase == P_EXPLODING1 && Extension->AFlags & PAF_DELAYED) {
 		//the explosion is revoked
 		phase = P_TRIGGER;
 	}
