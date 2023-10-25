@@ -1424,10 +1424,14 @@ void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion)
 	Projectile* pro = server->CreateDefaultProjectile((unsigned int) ~0);
 	// not setting Caster, so we target the ground (ZPos 0)
 	pro->BAMRes1 = tmp;
+	pro->SetEffects(EffectQueue());
+
 	if (ExtFlags & PEF_TRAIL) {
 		pro->Aim = Aim;
 	}
-	pro->SetEffects(EffectQueue());
+	// bg2 cone of cold of course has Aim set to "don't orient" ...
+	// perhaps all PAF_CONE should take Aim into account?
+	if (tmp == "SPCCOLDL") pro->Aim = 5;
 
 	// calculate the child projectile's target point, it is either
 	// a perimeter or an inside point of the explosion radius
