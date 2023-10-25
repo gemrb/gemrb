@@ -3891,7 +3891,6 @@ void AreaAnimation::Update()
 bool Map::ChangeMap(bool day_or_night)
 {
 	//no need of change if the area is not extended night
-	//if (((AreaType&(AT_DAYNIGHT|AT_EXTENDED_NIGHT))!=(AT_DAYNIGHT|AT_EXTENDED_NIGHT))) return false;
 	if (!(AreaType&AT_EXTENDED_NIGHT)) return false;
 	//no need of change if the area already has the right tilemap
 	if ((DayNight == day_or_night) && GetTileMap()) return false;
