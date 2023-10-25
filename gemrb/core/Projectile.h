@@ -458,7 +458,7 @@ private:
 	bool DrawChildren(const Region& screen, BlitFlags flags);
 	void DrawExplodingPhase1() const;
 	void DrawSpread();
-	void DrawSpreadChild(size_t idx, bool firstExplosion);
+	void DrawSpreadChild(size_t idx, bool firstExplosion, const Point& offset);
 	void DrawExplosion(const Region& screen, BlitFlags flags);
 	void SpawnFragment(Point& pos) const;
 	void SpawnFragments(const Holder<ProjectileExtension>& extension) const;

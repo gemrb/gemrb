@@ -1408,7 +1408,8 @@ void Projectile::DrawExplodingPhase1() const
 	}
 }
 
-void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion)
+constexpr Point ZeroPoint;
+void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion, const Point& offset)
 {
 	int apFlags = Extension->APFlags;
 	ResRef tmp = Extension->Spread;
@@ -1432,6 +1433,17 @@ void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion)
 	// bg2 cone of cold of course has Aim set to "don't orient" ...
 	// perhaps all PAF_CONE should take Aim into account?
 	if (tmp == "SPCCOLDL") pro->Aim = 5;
+	// it also spawned several children for the same direction slightly shifted
+	// some of them appeared later, some not
+	// we just emulate some of this mess
+	if (firstExplosion && tmp == "SPCCOLDL") {
+		orient_t face = GetOrient(Pos, Destination);
+		Point offset;
+		for (int i = 1; i <= 4; ++i) {
+			offset = OrientedOffset(face, 9 * i);
+			DrawSpreadChild(idx, false, offset);
+		}
+	}
 
 	// calculate the child projectile's target point, it is either
 	// a perimeter or an inside point of the explosion radius
@@ -1486,7 +1498,7 @@ void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion)
 	if (apFlags & APF_SCATTER) {
 		pro->MoveTo(area, newdest);
 	} else {
-		pro->MoveTo(area, Pos);
+		pro->MoveTo(area, Pos + offset);
 	}
 	pro->SetTarget(newdest);
 
@@ -1547,7 +1559,7 @@ void Projectile::DrawSpread()
 	}
 
 	for (size_t i = 0; i < childCount; ++i) {
-		DrawSpreadChild(i, firstExplosion);
+		DrawSpreadChild(i, firstExplosion, ZeroPoint);
 	}
 
 	// switch fill to scatter after the first time

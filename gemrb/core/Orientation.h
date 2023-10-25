@@ -128,6 +128,29 @@ inline orient_t GetOrient(const Point &s, const Point &d)
 	return orientations[(aY+2)*5+aX+2];
 }
 
+// OffsetOrient(GetOrient(A, B), offsetScalar)
+inline Point OrientedOffset(orient_t face, int offset)
+{
+	int x;
+	int y;
+	if (face >= WNW && face <= ENE) {
+		y = -1;
+	} else if (face == W || face == E) {
+		y = 0;
+	} else {
+		y = 1;
+	}
+	if (face >= SSW && face <= NNW) {
+		x = -1;
+	} else if (face == S || face == N) {
+		x = 0;
+	} else {
+		x = 1;
+	}
+
+	return Point(x * offset, y * offset);
+}
+
 inline orient_t GetNextFace(orient_t old, orient_t next) {
 	if (old != next) {
 		if (ClampToOrientation(next - old) <= MAX_ORIENT / 2) {
