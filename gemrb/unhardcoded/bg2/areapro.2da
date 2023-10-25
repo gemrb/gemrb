@@ -23,3 +23,10 @@ VENGEANCE  SPSTRMVA   SPSTRMVB   *          *       	*	2
 FIREBALL2  SPFLAMES   SPFIREPI   *          EFF_M21	*	0
 # CGAMEFIREBALL_TYPE_FIRE_DRAGON_GREEN
 FIREBALL3  SPFLAMES   SPFIREPI   *          EFF_M21	*	0
+
+# RESOURCE1: center animation
+# RESOURCE2: spread animation
+# RESOURCE3: secondary animation
+# SOUND1: explosion sound
+# SOUND2: area/secondary sound
+# FLAGS: area projectile flags (APFlags, see Projectile.h)

@@ -7,3 +7,10 @@ CLOUDKILL  STNKCLDD   *          *          EFF_M18A	EFF_M18C	34
 ICESTORM   STNKCLDD   SPBOOM     *          EFF_M34	*	42
 GREASE     GREASEH    SPBOOM     GREASED    EFF_M31B	*	42
 WEB        WEBENTH    SPBOOM     WEBENTD    EFF_M19	*	8234
+
+# RESOURCE1: center animation
+# RESOURCE2: spread animation
+# RESOURCE3: secondary animation
+# SOUND1: explosion sound
+# SOUND2: area/secondary sound
+# FLAGS: area projectile flags (APFlags, see Projectile.h)

@@ -20,3 +20,10 @@ DRAGON     DBREATHA   DBREATHX   *          ARE_M21	*	16
 VENGEANCE  SPSTRMVA   SPSTRMVB   *          *		*	2
 FIREBALL2  SPRING   SPFIREPI   *          EFF_M21	* 32
 FIREBALL3  SPRING   SPFIREPI   *          EFF_M21	* 32
+
+# RESOURCE1: center animation
+# RESOURCE2: spread animation
+# RESOURCE3: secondary animation
+# SOUND1: explosion sound
+# SOUND2: area/secondary sound
+# FLAGS: area projectile flags (APFlags, see Projectile.h)
