@@ -1,0 +1,29 @@
+2DA V1.0
+*
+           RESOURCE1  RESOURCE2  RESOURCE3  SOUND1	SOUND2	FLAGS
+FIREBALL   SPRING     SPBOOM     *          EFF_M21	*	32
+STINKCLOUD SCLOUDA    SCLOUDX    SCLOUDR    RNG_M01 	ARE_M02	2
+CLOUDKILL  CLOUDKA    CLOUDKX    CLOUDKR    RNG_M01 	ARE_M02	2
+ICESTORM   ISTORMA    ISTORMX    *          *		ARE_M04	14
+GREASE     GREASEA    GREASEX    GREASEH    EFF_M31B	ARE_M01	2
+WEB        WEBENTD    *          WEBENTH    EFF_M19	ARE_M03	8226
+METEOR     SPMETSWM   *          *          EFF_M34	ARE_P14	2
+WILTING    SPHORPUF   SPHORWIL   *          EFF_M34	*	1
+WEIRD      SPWRDFLD   *          *          EFF_M34	ARE_M11	2
+ENTANGLE   ENTANGA    ENTANGX    *          *		ARE_P01	2
+COLORSPRAY SPCSPRA3   *          SPCSPRA2   EFF_M19	*	2
+CONECOLD   SPCCOLDE   SPCCOLDL   *          EFF_M19	*	0
+HOLYSMITE  SPHLYSM2   SPHLYSM3   *          EFF_M34	*	6
+UNHOLY     SPUNHBL2   SPUNHBL3   *          EFF_M34	*	0
+PRISMATIC  SPPRISM2   SPPRISM3   *          EFF_M34	*	0
+DRAGON     DBREATHA   DBREATHX   *          ARE_M21	*	16
+VENGEANCE  SPSTRMVA   SPSTRMVB   *          *		*	2
+FIREBALL2  SPRING   SPFIREPI   *          EFF_M21	* 32
+FIREBALL3  SPRING   SPFIREPI   *          EFF_M21	* 32
+
+# RESOURCE1: center animation
+# RESOURCE2: spread animation
+# RESOURCE3: secondary animation
+# SOUND1: explosion sound
+# SOUND2: area/secondary sound
+# FLAGS: area projectile flags (APFlags, see Projectile.h)
