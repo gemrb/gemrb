@@ -8941,8 +8941,8 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	ResetCommentTime();
 	if (pro) {
 		pro->SetCaster(GetGlobalID(), gamedata->GetMiscRule("ITEM_CASTERLEVEL"));
-		GetCurrentArea()->AddProjectile(pro, Pos, target);
 		SetOrientation(target, Pos, false);
+		GetCurrentArea()->AddProjectile(pro, Pos, target);
 		return true;
 	}
 	return false;
@@ -9325,8 +9325,8 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 		}
 		attackProjectile = pro;
 	} else { // launch it now as we are not attacking
-		GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
 		SetOrientation(target->Pos, Pos, false);
+		GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
 	}
 	return true;
 }
