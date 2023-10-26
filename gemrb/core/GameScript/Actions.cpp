@@ -6131,9 +6131,9 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 
 	if (!parameters->resref0Parameter.IsEmpty()) {
 		Point q(parameters->int0Parameter, parameters->int1Parameter);
-		EscapeAreaCore(Sender, p, parameters->resref0Parameter, q, 0, parameters->int2Parameter);
+		EscapeAreaCore(Sender, p, parameters->resref0Parameter, q, EscapeArea::None, parameters->int2Parameter);
 	} else {
-		EscapeAreaCore(Sender, p, parameters->resref0Parameter, p, EA_DESTROY, parameters->int0Parameter);
+		EscapeAreaCore(Sender, p, parameters->resref0Parameter, p, EscapeArea::Destroy, parameters->int0Parameter);
 	}
 	//EscapeAreaCore will do its ReleaseCurrentAction
 	//Sender->ReleaseCurrentAction();
@@ -6158,9 +6158,9 @@ void GameScript::EscapeAreaNoSee(Scriptable* Sender, Action* parameters)
 
 	if (!parameters->resref0Parameter.IsEmpty()) {
 		Point q(parameters->int0Parameter, parameters->int1Parameter);
-		EscapeAreaCore(Sender, p, parameters->resref0Parameter, q, 0, parameters->int2Parameter);
+		EscapeAreaCore(Sender, p, parameters->resref0Parameter, q, EscapeArea::None, parameters->int2Parameter);
 	} else {
-		EscapeAreaCore(Sender, p, parameters->resref0Parameter, p, EA_DESTROY|EA_NOSEE, parameters->int0Parameter);
+		EscapeAreaCore(Sender, p, parameters->resref0Parameter, p, EscapeArea::DestroyNoSee, parameters->int0Parameter);
 	}
 	//EscapeAreaCore will do its ReleaseCurrentAction
 	//Sender->ReleaseCurrentAction();
@@ -6182,7 +6182,7 @@ void GameScript::EscapeAreaDestroy(Scriptable* Sender, Action* parameters)
 	Point p = Sender->Pos;
 	map->TMap->AdjustNearestTravel(p);
 	//EscapeAreaCore will do its ReleaseCurrentAction
-	EscapeAreaCore(Sender, p, parameters->resref0Parameter, p, EA_DESTROY, parameters->int0Parameter);
+	EscapeAreaCore(Sender, p, parameters->resref0Parameter, p, EscapeArea::Destroy, parameters->int0Parameter);
 }
 
 /*EscapeAreaObjectMove(S:Area*,I:X*,I:Y*,I:Face*)*/
@@ -6206,9 +6206,9 @@ void GameScript::EscapeAreaObject(Scriptable* Sender, Action* parameters)
 	Point p = tar->Pos;
 	if (!parameters->resref0Parameter.IsEmpty()) {
 		Point q(parameters->int0Parameter, parameters->int1Parameter);
-		EscapeAreaCore(Sender, p, parameters->resref0Parameter, q, 0, parameters->int2Parameter);
+		EscapeAreaCore(Sender, p, parameters->resref0Parameter, q, EscapeArea::None, parameters->int2Parameter);
 	} else {
-		EscapeAreaCore(Sender, p, {}, p, EA_DESTROY, parameters->int0Parameter);
+		EscapeAreaCore(Sender, p, {}, p, EscapeArea::Destroy, parameters->int0Parameter);
 	}
 	//EscapeAreaCore will do its ReleaseCurrentAction
 }
@@ -6236,9 +6236,9 @@ void GameScript::EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters)
 	Sender->SetWait(parameters->int0Parameter);
 	if (!parameters->resref0Parameter.IsEmpty()) {
 		Point q(parameters->int0Parameter, parameters->int1Parameter);
-		EscapeAreaCore(Sender, p, parameters->resref0Parameter, q, 0, parameters->int2Parameter);
+		EscapeAreaCore(Sender, p, parameters->resref0Parameter, q, EscapeArea::None, parameters->int2Parameter);
 	} else {
-		EscapeAreaCore(Sender, p, {}, p, EA_DESTROY|EA_NOSEE, parameters->int0Parameter);
+		EscapeAreaCore(Sender, p, {}, p, EscapeArea::DestroyNoSee, parameters->int0Parameter);
 	}
 	//EscapeAreaCore will do its ReleaseCurrentAction
 }

@@ -37,8 +37,11 @@ class Action;
 class GameScript;
 
 //escapearea flags
-#define EA_DESTROY 1        //destroy actor at the exit (otherwise move to new place)
-#define EA_NOSEE   2        //no need to see the exit
+enum class EscapeArea {
+	None,
+	Destroy, // destroy actor at the exit (otherwise move to new place)
+	DestroyNoSee // no need to see the exit either
+};
 
 //displaystring flags
 #define DS_WAIT    1

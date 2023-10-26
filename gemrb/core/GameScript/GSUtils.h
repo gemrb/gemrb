@@ -93,7 +93,7 @@ bool ResolveSpellName(ResRef& spellRes, const Action *parameter);
 GEM_EXPORT void ResolveSpellName(ResRef& spellRes, ieDword number);
 GEM_EXPORT ieDword ResolveSpellNumber(const ResRef& spellRef);
 bool ResolveItemName(ResRef& itemres, const Actor *act, ieDword Slot);
-void EscapeAreaCore(Scriptable *Sender, const Point &p, const ResRef& area, const Point &enter, int flags, int wait);
+void EscapeAreaCore(Scriptable* Sender, const Point& p, const ResRef& area, const Point& enter, EscapeArea flags, int wait);
 void GoNear(Scriptable *Sender, const Point &p);
 void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, int dont_release = 0);
 int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int no_release);
