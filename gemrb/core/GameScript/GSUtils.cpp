@@ -2726,24 +2726,37 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	dist = GetSpellDistance(spellResRef, Sender, tar->Pos);
 
 	if (act) {
+		// make sure we can still see the target
+		const Actor* target = Scriptable::As<const Actor>(tar);
+		const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
+		if (Sender != tar && !(flags & SC_NOINTERRUPT) && !(spl->Flags & SF_TARGETS_INVISIBLE) && target->IsInvisibleTo(Sender)) {
+			Sender->ReleaseCurrentAction();
+			Sender->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
+			core->Autopause(AUTOPAUSE::NOTARGET, Sender);
+			gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+			return;
+		}
+
 		//move near to target
 		if ((flags&SC_RANGE_CHECK) && dist != 0xffffffff) {
 			if (PersonalDistance(tar, Sender) > dist) {
 				MoveNearerTo(Sender, tar, dist);
+				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 				return;
 			}
 			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, tar->Pos)) {
-				const Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
 				if (!(spl->Flags&SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					MoveNearerTo(Sender, tar, dist);
 					return;
 				}
-				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 			}
 
 			// finish approach before continuing with casting
-			if (act->InMove()) return;
+			if (act->InMove()) {
+				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+				return;
+			}
 		}
 
 		//face target
@@ -2753,6 +2766,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 		//stop doing anything else
 		act->SetModal(Modal::None);
+		gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 	}
 
 	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {

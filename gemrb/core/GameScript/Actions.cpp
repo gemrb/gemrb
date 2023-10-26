@@ -6753,6 +6753,18 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	// make sure we can still see the target
+	const Actor* target = Scriptable::As<const Actor>(tar);
+	const Item* itm = gamedata->GetItem(itemres, true);
+	if (Sender != tar && !(itm->Flags & IE_ITEM_NO_INVIS) && target->IsInvisibleTo(Sender)) {
+		Sender->ReleaseCurrentAction();
+		Sender->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
+		core->Autopause(AUTOPAUSE::NOTARGET, Sender);
+		gamedata->FreeItem(itm, itemres, false);
+		return;
+	}
+	gamedata->FreeItem(itm, itemres, false);
+
 	double angle = AngleFromPoints(Sender->Pos, tar->Pos);
 	unsigned int dist = GetItemDistance(itemres, header, angle);
 	if (PersonalDistance(Sender, tar) > dist) {

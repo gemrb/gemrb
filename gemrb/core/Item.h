@@ -65,7 +65,7 @@ class Projectile;
 //tobex modder extensions, please note, these are not copied into the local slot bits
 #define IE_ITEM_NO_DISPEL    0x01000000 // disables destruction by dispelling; named BODYPART in ee - different?
 #define IE_ITEM_TOGGLE_CRITS 0x02000000 //toggles critical hit avertion
-#define IE_ITEM_NO_INVIS     0x04000000 // TODO: don't target invisible
+#define IE_ITEM_NO_INVIS     0x04000000
 
 
 //Extended header recharge flags
