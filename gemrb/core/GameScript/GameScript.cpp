@@ -41,6 +41,8 @@
 
 #include "GameScript/GameScript.h"
 
+#include "voodooconst.h"
+
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -1768,7 +1770,11 @@ void InitializeIEScript()
 	NoCreate = core->HasFeature(GFFlags::NO_NEW_VARIABLES);
 	HasKaputz = core->HasFeature(GFFlags::HAS_KAPUTZ);
 
-	InitScriptTables();
+	// see note in voodooconst.h
+	if (core->HasFeature(GFFlags::AREA_OVERRIDE)) {
+		MAX_OPERATING_DISTANCE = 40 * 3;
+	}
+
 	int tT = core->LoadSymbol("trigger");
 	int aT = core->LoadSymbol("action");
 	int oT = core->LoadSymbol("object");

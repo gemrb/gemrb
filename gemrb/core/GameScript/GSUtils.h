@@ -87,7 +87,6 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee);
 GEM_EXPORT bool CreateItemCore(CREItem *item, const ResRef &resref, int a, int b, int c);
 void AttackCore(Scriptable *Sender, Scriptable *target, int flags);
-void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, BitOp opcode);
 bool ResolveSpellName(ResRef& spellRes, const Action *parameter);
 GEM_EXPORT void ResolveSpellName(ResRef& spellRes, ieDword number);

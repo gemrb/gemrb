@@ -81,14 +81,6 @@ int ExtraParametersCount = 0;
 int RandomNumValue;
 Gem_Polygon **polygons;
 
-void InitScriptTables()
-{
-	// see note in voodooconst.h
-	if (core->HasFeature(GFFlags::AREA_OVERRIDE)) {
-		MAX_OPERATING_DISTANCE = 40*3;
-	}
-}
-
 int GetReaction(const Actor *target, const Scriptable *Sender)
 {
 	int reaction = 10;
