@@ -198,6 +198,33 @@ void GameScript::RealSetGlobalTimer(Scriptable* Sender, Action* parameters)
 		parameters->int0Parameter * core->Time.defaultTicksPerSec + mytime);
 }
 
+// buggy in all engines, even ees, temporarily wiping other IDS
+// fields and permanently reseting IE_GENERAL to 0
+// Bubb's description:
+// These actions add/remove the creature to/from an internal list that keeps track of
+// all familiars. Being in this list enables a majority of the engine's special casing
+// regarding familiars. The actions exist because changing EA directly doesn't update
+// the "familiar" list. The engine adds a creature with EA=3 to the familiar list on
+// unmarshal, but not automatically during gameplay.
+// We don't need such a list, since we can just check EA.
+void GameScript::AddFamiliar(Scriptable* Sender, Action* /*parameters*/)
+{
+	Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!actor || !actor->Persistent()) {
+		return;
+	}
+	actor->SetBase(IE_EA, EA_FAMILIAR);
+}
+
+void GameScript::RemoveFamiliar(Scriptable* Sender, Action* /*parameters*/)
+{
+	Actor* actor = Scriptable::As<Actor>(Sender);
+	if (!actor) {
+		return;
+	}
+	actor->SetBase(IE_EA, EA_NEUTRAL);
+}
+
 void GameScript::ChangeAllegiance(Scriptable* Sender, Action* parameters)
 {
 	Scriptable *scr = Sender;

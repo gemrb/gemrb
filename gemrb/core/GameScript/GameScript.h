@@ -927,6 +927,7 @@ public: //Script Functions
 	static void AddExperienceParty(Scriptable *Sender, Action* parameters);
 	static void AddExperiencePartyCR(Scriptable *Sender, Action* parameters);
 	static void AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters);
+	static void AddFamiliar(Scriptable* Sender, Action* parameters);
 	static void AddFeat(Scriptable *Sender, Action* parameters);
 	static void AddGlobals(Scriptable* Sender, Action* parameters);
 	static void AddHP(Scriptable* Sender, Action* parameters);
@@ -1242,6 +1243,7 @@ public: //Script Functions
 	static void RegainRangerHood(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaFlag(Scriptable* Sender, Action* parameters);
 	static void RemoveAreaType(Scriptable* Sender, Action* parameters);
+	static void RemoveFamiliar(Scriptable* Sender, Action* parameters);
 	static void RemoveJournalEntry(Scriptable* Sender, Action* parameters);
 	static void RemoveMapnote(Scriptable* Sender, Action* parameters);
 	static void RemovePaladinHood(Scriptable* Sender, Action* parameters);
