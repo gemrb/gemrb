@@ -79,11 +79,7 @@ std::vector<ResRef> ObjectIDSTableNames;
 int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
 int RandomNumValue;
-// reaction modifiers (by reputation and charisma)
 #define MAX_REP_COLUMN 20
-#define MAX_CHR_COLUMN 25
-int rmodrep[MAX_REP_COLUMN];
-int rmodchr[MAX_CHR_COLUMN];
 ieWordSigned happiness[3][MAX_REP_COLUMN];
 Gem_Polygon **polygons;
 
@@ -99,22 +95,6 @@ void InitScriptTables()
 		}
 	}
 
-	//initializing the reaction mod. reputation table
-	AutoTable rmr = gamedata->LoadTable("rmodrep");
-	if (rmr) {
-		for (int reputation=0; reputation<MAX_REP_COLUMN; reputation++) {
-			rmodrep[reputation] = rmr->QueryFieldSigned<int>(0, reputation);
-		}
-	}
-
-	//initializing the reaction mod. charisma table
-	AutoTable rmc = gamedata->LoadTable("rmodchr");
-	if (rmc) {
-		for (int charisma=0; charisma<MAX_CHR_COLUMN; charisma++) {
-			rmodchr[charisma] = rmc->QueryFieldSigned<int>(0, charisma);
-		}
-	}
-
 	// see note in voodooconst.h
 	if (core->HasFeature(GFFlags::AREA_OVERRIDE)) {
 		MAX_OPERATING_DISTANCE = 40*3;
@@ -123,18 +103,25 @@ void InitScriptTables()
 
 int GetReaction(const Actor *target, const Scriptable *Sender)
 {
-	int rep;
-	if (target->GetStat(IE_EA) == EA_PC) {
-		rep = core->GetGame()->Reputation/10-1;
-	} else {
-		rep = target->GetStat(IE_REPUTATION)/10-1;
+	int reaction = 10;
+
+	static AutoTable repModTable = gamedata->LoadTable("rmodrep", true);
+	if (repModTable) {
+		int rep;
+		if (target->GetStat(IE_EA) == EA_PC) {
+			rep = core->GetGame()->Reputation / 10 - 1;
+		} else {
+			rep = target->GetStat(IE_REPUTATION) / 10 - 1;
+		}
+		rep = Clamp<int>(rep, 0, repModTable->GetColumnCount() - 1);
+		reaction += repModTable->QueryFieldSigned<int>(0, rep);
 	}
-	rep = Clamp(rep, 0, MAX_REP_COLUMN - 1);
 
-	int chr = target->GetStat(IE_CHR) - 1;
-	chr = Clamp(chr, 0, MAX_CHR_COLUMN - 1);
-
-	int reaction = 10 + rmodrep[rep] + rmodchr[chr];
+	static AutoTable chrModTable = gamedata->LoadTable("rmodchr", true);
+	if (chrModTable) {
+		int chr = Clamp<int>(target->GetStat(IE_CHR) - 1, 0, 24);
+		reaction += repModTable->QueryFieldSigned<int>(0, chr);
+	}
 
 	// add -4 penalty when dealing with racial enemies
 	const Actor* scr = Scriptable::As<Actor>(Sender);
