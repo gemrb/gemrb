@@ -1371,7 +1371,8 @@ static const EnumArray<GFFlags, StringView> game_flags {
 		"LayeredWaterTiles",  //82GF_LAYERED_WATER_TILES
 		"ClearingActionOverride", //83GF_CLEARING_ACTIONOVERRIDE
 		"DamageInnocentRep",  //84GF_DAMAGE_INNOCENT_REP
-		"HasWeaponSets" // GF_HAS_WEAPON_SETS
+		"HasWeaponSets", // GF_HAS_WEAPON_SETS
+		"SellableCritsNoConv"	//SELLABLE_CRITS_NO_CONV
 };
 
 /** Loads gemrb.ini */
@@ -3157,10 +3158,15 @@ void Interface::SanitizeItem(CREItem *item) const
 	// some slot flags might be affected by the item flags
 	if (!(item->Flags & IE_INV_ITEM_CRITICAL)) {
 		item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
-	}
-
+	} else if (core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
+		item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
+		}
+	if  ((item->Flags & IE_INV_ITEM_CONVERSABLE) && core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
+		item->Flags &= ~IE_INV_ITEM_DESTRUCTIBLE;
+		}
+		
 	// pst has no stolen flag, but "steel" in its place
-	if ((item->Flags & IE_INV_ITEM_STOLEN2) && !HasFeature(GFFlags::PST_STATE_FLAGS)) {
+	if (item->Flags & IE_INV_ITEM_STOLEN2 && !HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		item->Flags |= IE_INV_ITEM_STOLEN;
 	}
 
