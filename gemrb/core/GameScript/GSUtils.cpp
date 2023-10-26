@@ -79,22 +79,10 @@ std::vector<ResRef> ObjectIDSTableNames;
 int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
 int RandomNumValue;
-#define MAX_REP_COLUMN 20
-ieWordSigned happiness[3][MAX_REP_COLUMN];
 Gem_Polygon **polygons;
 
 void InitScriptTables()
 {
-	//initializing the happiness table
-	AutoTable tab = gamedata->LoadTable("happy");
-	if (tab) {
-		for (int alignment=0;alignment<3;alignment++) {
-			for (int reputation=0;reputation<MAX_REP_COLUMN;reputation++) {
-				happiness[alignment][reputation] = tab->QueryFieldSigned<ieWordSigned>(reputation, alignment);
-			}
-		}
-	}
-
 	// see note in voodooconst.h
 	if (core->HasFeature(GFFlags::AREA_OVERRIDE)) {
 		MAX_OPERATING_DISTANCE = 40*3;
@@ -145,7 +133,12 @@ ieWordSigned GetHappiness(const Scriptable* Sender, int reputation)
 		alignment = AL_GE_NEUTRAL;
 	}
 	reputation = Clamp(reputation, 10, 200);
-	return happiness[alignment-1][reputation/10-1];
+
+	static AutoTable happyTable = gamedata->LoadTable("happy", true);
+	if (happyTable) {
+		return happyTable->QueryFieldSigned<ieWordSigned>(alignment - 1, reputation / 10 - 1);
+	}
+	return 0;
 }
 
 int GetHPPercent(const Scriptable *Sender)
