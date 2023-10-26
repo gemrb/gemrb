@@ -491,7 +491,7 @@ static const TriggerLink triggernames[] = {
 
 //Make this an ordered list, so we could use bsearch!
 static const ActionLink actionnames[] = {
-	{"actionoverride",NULL, AF_INVALID}, //will this function ever be reached
+	{"actionoverride", GameScript::NoAction, AF_INVALID}, // will never be reached, but this sooths other references
 	{"activate", GameScript::Activate, 0},
 	{"activateportalcursor", GameScript::ActivatePortalCursor, 0},
 	{"addareaflag", GameScript::AddAreaFlag, 0},
@@ -605,6 +605,9 @@ static const ActionLink actionnames[] = {
 	{"damage", GameScript::Damage, 0},
 	{"daynight", GameScript::DayNight, 0},
 	{"deactivate", GameScript::Deactivate, 0},
+	{"deathmatchpositionarea", nullptr, 0},
+	{"deathmatchpositionglobal", nullptr, 0},
+	{"deathmatchpositionlocal", nullptr, 0},
 	{"debug", GameScript::Debug, 0},
 	{"debugoutput", GameScript::Debug, 0},
 	{"deletejournalentry", GameScript::RemoveJournalEntry, 0},
@@ -888,6 +891,7 @@ static const ActionLink actionnames[] = {
 	{"reputationset", GameScript::ReputationSet, 0},
 	{"reserved", nullptr, 0},
 	{"resetfogofwar", GameScript::UndoExplore, 0}, //pst
+	{"resetjoinrequests", nullptr, 0},
 	{"resetmorale", GameScript::ResetMorale, 0},
 	{"resetplayerai", GameScript::ResetPlayerAI, 0},
 	{"rest", GameScript::Rest, AF_ALIVE},
@@ -1046,6 +1050,7 @@ static const ActionLink actionnames[] = {
 	{"staticsequence", GameScript::PlaySequence, 0},//bg2 animation sequence
 	{"staticstart", GameScript::StaticStart, 0},
 	{"staticstop", GameScript::StaticStop, 0},
+	{"stopjoinrequests", GameScript::NoAction, 0},
 	{"stickysinisterpoof", GameScript::CreateVisualEffectObjectSticky, 0},
 	{"stopmoving", GameScript::StopMoving, 0},
 	{"storepartylocations", GameScript::StorePartyLocation, 0},
