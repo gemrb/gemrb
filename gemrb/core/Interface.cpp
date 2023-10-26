@@ -421,8 +421,8 @@ Interface::Interface(CoreSettings&& cfg)
 	GameNameResRef = tmp;
 
 	Log(MESSAGE, "Core", "Reading Encoding Table...");
-	if (!LoadEncoding()) {
-		Log(ERROR, "Core", "Cannot Load Encoding.");
+	if (!LoadEncoding() && config.Encoding != "default") {
+		Log(ERROR, "Core", "Cannot load encoding from {}.", config.Encoding);
 	}
 
 	Log(MESSAGE, "Core", "Creating Projectile Server...");
@@ -1479,7 +1479,7 @@ void Interface::LoadGemRBINI()
 /** Load the encoding table selected in gemrb.cfg */
 bool Interface::LoadEncoding()
 {
-	DataStream* inifile = gamedata->GetResourceStream(config.Encoding, IE_INI_CLASS_ID);
+	DataStream* inifile = gamedata->GetResourceStream(config.Encoding, IE_INI_CLASS_ID, true);
 	if (! inifile) {
 		return false;
 	}
