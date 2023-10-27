@@ -1401,6 +1401,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)
 	// and delay most idle actions
 	// but only if we skip for at least an hour
+	Map* map = GetCurrentArea();
 	if (add >= core->Time.hour_size) {
 		for (const auto& pc : PCs) {
 			pc->ResetCommentTime();
@@ -1419,7 +1420,13 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		}
 
 		// bg1 also closed doors
-		GetCurrentArea()->AutoLockDoors();
+		map->AutoLockDoors();
+		// teleport the familar to the protagonist, sometimes
+		// resting already ensures all pcs are in the same area
+		// the original also checked if the familiar was controllable, but then we'd have to look it up
+		if (map->AreaType & AT_DAYNIGHT) {
+			MoveFamiliars(map->GetScriptRef(), PCs[0]->Pos, -1);
+		}
 	}
 
 	if (!fatigue) {
@@ -1431,7 +1438,6 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 	}
 
 	//change the tileset if needed
-	Map *map = GetCurrentArea();
 	if (map && map->ChangeMap(IsDay())) {
 		//play the daylight transition movie appropriate for the area
 		//it is needed to play only when the area truly changed its tileset
@@ -1740,6 +1746,16 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 				if (area->AreaType & AT_OUTDOOR && !core->HasFeature(GFFlags::AREA_VISITED_VAR)) {
 					return true;
 				}
+				*err = DisplayMessage::GetStringReference(HCStrings::MayNotRest);
+				return false;
+			}
+		}
+
+		// disallowed if a familiar is in an incompatible area
+		for (const auto& npc : NPCs) {
+			if (npc->GetBase(IE_EA) != EA_FAMILIAR) continue;
+			const Map* map = npc->GetCurrentArea();
+			if (map && !(map->AreaType & (AT_OUTDOOR | AT_DUNGEON | AT_CAN_REST_INDOORS))) {
 				*err = DisplayMessage::GetStringReference(HCStrings::MayNotRest);
 				return false;
 			}
