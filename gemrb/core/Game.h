@@ -273,13 +273,21 @@ public:
 	ieDword Reputation = 0;
 	ieDword ControlStatus = 0; // used in bg2, iwd (where you can switch panes off)
 	ieDword Expansion = 0; // mostly used by BG2. IWD games set it to 3 on newgame
-	ieDword zoomLevel = 0; // ee-style zoom
+	ieDword zoomLevel = 0; // ee-style zoom, 0 or 100: default zoom level, >100: zoomed out, <100: zoomed in
 	ResRef AnotherArea;
 	ResRef CurrentArea;
 	ResRef PreviousArea; //move here if the worldmap exit is illegal?
 	ResRef LastMasterArea; // last party-visited master area
 	ResRef LoadMos;
 	ResRef TextScreen;
+
+	// EE-only stuff that we don't really need yet
+	ResRef RandomEncounterArea;
+	ResRef CurrentWorldMap;
+	ResRef CurrentCampaign; // eg. "SOD"
+	ieDword FamiliarOwner; // IWDEE: which player has the familiar? InParty - 1
+	FixedSizeString<20> RandomEncounterEntry;
+
 	Particles *weather = nullptr;
 	int event_timer = 0;
 	EventHandler event_handler = nullptr;

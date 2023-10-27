@@ -148,9 +148,15 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			str->ReadDword(newGame->RealTime);
 			str->ReadDword(PPLocOffset);
 			str->ReadDword(PPLocCount);
-			str->ReadDword(newGame->zoomLevel);
-			str->Seek(48, GEM_CURRENT_POS);
-			// TODO: EEs used up these bits, see https://gibberlings3.github.io/iesdp/file_formats/ie_formats/gam_v2.0.htm#GAMEV2_0_Header
+			// EE-only from here on
+			if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+				str->ReadDword(newGame->zoomLevel);
+				str->ReadResRef(newGame->RandomEncounterArea);
+				str->ReadResRef(newGame->CurrentWorldMap);
+				str->ReadResRef(newGame->CurrentCampaign);
+				str->ReadDword(newGame->FamiliarOwner);
+				str->ReadRTrimString(newGame->RandomEncounterEntry, 20); // ran out of space for a proper ieVariable
+			}
 			break;
 
 		case GAM_VER_PST:

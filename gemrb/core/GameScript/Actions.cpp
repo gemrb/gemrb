@@ -7668,8 +7668,12 @@ void GameScript::ForceRandomEncounter(Scriptable* Sender, Action* parameters)
 	if (!link) {
 		return;
 	}
-	if (!parameters->variable1Parameter.IsEmpty()) link->DestEntryPoint = parameters->variable1Parameter;
+	if (!parameters->variable1Parameter.IsEmpty()) {
+		link->DestEntryPoint = parameters->variable1Parameter;
+		core->GetGame()->RandomEncounterEntry = parameters->variable1Parameter;
+	}
 	worldMap->SetEncounterArea(parameters->resref0Parameter, link);
+	core->GetGame()->RandomEncounterArea = parameters->resref0Parameter;
 }
 
 void GameScript::RemoveStoreItem(Scriptable* /*Sender*/, Action* parameters)
