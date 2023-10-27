@@ -1093,6 +1093,7 @@ Targets* GameScript::Familiar(const Scriptable* Sender, Targets* parameters, int
 }
 
 // the original assumed there can only be one here as well
+// in EEs returns the pc matching game->FamiliarOwner (set in fx_familiar_marker) if the familiar list is non-empty
 Targets* GameScript::FamiliarSummoner(const Scriptable* Sender, Targets* parameters, int ga_flags)
 {
 	static EffectRef fx_familiar_marker_ref = { "FamiliarMarker", -1 };

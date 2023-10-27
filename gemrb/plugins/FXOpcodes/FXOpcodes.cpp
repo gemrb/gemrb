@@ -5673,9 +5673,8 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 }
 
 //0xc4 FamiliarMarker
-int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_familiar_marker(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_familiar_marker(%2d)", fx->Opcode);
 	if (!target) {
 		return FX_NOT_APPLIED;
 	}
@@ -5702,6 +5701,10 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (!STATE_GET(STATE_NOSAVE)) {
 		game->familiarBlock=true;
+		if (fx->FirstApply) {
+			const Actor* master = Scriptable::As<Actor>(GetCasterObject());
+			if (master && master->InParty) game->FamiliarOwner = master->InParty - 1;
+		}
 		return FX_APPLIED;
 	}
 	game->familiarBlock=false;
