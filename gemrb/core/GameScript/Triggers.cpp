@@ -4802,4 +4802,14 @@ int GameScript::Switch(Scriptable* Sender, const Trigger* parameters)
 	return 0;
 }
 
+
+int GameScript::Reset(Scriptable* Sender, const Trigger* parameters)
+{
+	const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
+	const Highlightable* trap = Scriptable::As<Highlightable>(target);
+	if (!trap) return 0;
+
+	return Sender->MatchTrigger(trigger_reset, trap->GetGlobalID());
+}
+
 }

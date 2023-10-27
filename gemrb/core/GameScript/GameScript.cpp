@@ -423,6 +423,7 @@ static const TriggerLink triggernames[] = {
 	{"reserved1", nullptr, 0},
 	{"reserved2", nullptr, 0},
 	{"reserved3", nullptr, 0},
+	{"reset", GameScript::Reset, 0},
 	{"school", GameScript::School, 0}, //similar to kit
 	{"secretdoordetected", GameScript::SecretDoorDetected, 0},
 	{"see", GameScript::See, 0},
