@@ -5929,9 +5929,28 @@ int fx_power_word_stun (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0xd3 State:Imprisonment (avatar removal plus portrait icon)
-int fx_imprisonment (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
+int fx_imprisonment(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_imprisonment(%2d)", fx->Opcode);
+	// a bunch of odd special-casing for (fake) familiars
+	if (target->GetBase(IE_EA) == EA_FAMILIAR) {
+		if (fx->IsVariable == 1) {
+			target->GetCurrentArea()->RemoveActor(target);
+			return FX_NOT_APPLIED;
+		} else if (fx->IsVariable == 2) {
+			BASE_STATE_SET(STATE_DEAD);
+			target->SetBase(IE_EA, EA_NEUTRAL);
+			target->SetPersistent(-1);
+			return FX_NOT_APPLIED;
+		} else if (fx->IsVariable == 3) {
+			target->SetBase(IE_EA, EA_NEUTRAL);
+			target->SetPersistent(-1);
+		} else {
+			core->GetGame()->familiarBlock = false;
+			core->GetGame()->FamiliarOwner = 0;
+			target->GetCurrentArea()->RemoveActor(target);
+			return FX_NOT_APPLIED;
+		}
+	}
 	STAT_SET(IE_AVATARREMOVAL, 1);
 	target->AddPortraitIcon(PI_PRISON);
 	target->SendDiedTrigger();
