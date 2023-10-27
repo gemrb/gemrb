@@ -900,7 +900,7 @@ void GameScript::Enemy(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::Ally(Scriptable* Sender, Action* /*parameters*/)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
-	if (!actor) {
+	if (!actor || actor->GetBase(IE_EA) == EA_FAMILIAR) {
 		return;
 	}
 
