@@ -831,8 +831,11 @@ static const ActionLink actionnames[] = {
 	{"nidspecial5", GameScript::UseItem, AF_BLOCKING|AF_DIRECT|AF_ALIVE},
 	{"nidspecial6", GameScript::Spell, AF_BLOCKING|AF_DIRECT|AF_ALIVE},
 	{"nidspecial7", GameScript::SpellNoDec, AF_BLOCKING|AF_DIRECT|AF_ALIVE},
-	//{"nidspecial8", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE}, //not needed
+	{"nidspecial8", GameScript::SpellPoint, AF_BLOCKING | AF_ALIVE}, // not needed, but avoids warning
 	{"nidspecial9", GameScript::ToggleDoor, AF_BLOCKING},//another internal hack, maybe we should use UseDoor instead
+	{"nidspecial10", GameScript::NoAction, 0},
+	{"nidspecial11", GameScript::NoAction, 0},
+	{"nidspecial12", GameScript::NoAction, 0},
 	{"noaction", GameScript::NoAction, 0},
 	{"opendoor", GameScript::OpenDoor,0},
 	{"panic", GameScript::Panic, AF_ALIVE},
