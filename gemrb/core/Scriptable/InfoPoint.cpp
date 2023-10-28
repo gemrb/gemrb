@@ -218,7 +218,7 @@ check:
 	}
 
 	// recheck ar1404 mirror trap Shadow1 still works if you modify TRAP_NPC logic
-	if ((Flags&TRAP_NPC) ^ (!!actor->InParty)) {
+	if ((Flags & TRAP_NPC) ^ actor->IsPartyMember()) {
 		//no need to avoid a travel trigger
 
 		//skill?
