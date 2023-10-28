@@ -3090,6 +3090,10 @@ void MoveGlobalObjectCore(Scriptable* Sender, const Action* parameters, int flag
 
 	if (actor->Persistent() || !CreateMovementEffect(actor, map->GetScriptRef(), dest, 0)) {
 		MoveBetweenAreasCore(actor, map->GetScriptRef(), dest, -1, true);
+		const Actor* protagonist = core->GetGame()->GetPC(0, false);
+		if (actor == protagonist) {
+			core->GetGame()->MoveFamiliars(map->GetScriptRef(), dest, -1);
+		}
 	}
 }
 

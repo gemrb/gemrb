@@ -600,6 +600,14 @@ void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	actor->SetPosition(parameters->pointParameter, true);
+
+	const Actor* protagonist = core->GetGame()->GetPC(0, false);
+	// original: all familiars have JumpToPoint() (to protagonist) inserted at the front of their action queue
+	// it didn't check they were in the same area
+	// we just do it instantly for simplicity
+	if (actor == protagonist) {
+		core->GetGame()->MoveFamiliars(actor->Area, actor->Pos, -1);
+	}
 }
 
 void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
@@ -3149,6 +3157,11 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	}
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+
+		const Actor* protagonist = core->GetGame()->GetPC(0, false);
+		if (actor == protagonist) {
+			core->GetGame()->MoveFamiliars(parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter);
+		}
 	}
 }
 
@@ -3164,6 +3177,11 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	}
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore(actor, parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
+
+		const Actor* protagonist = core->GetGame()->GetPC(0, false);
+		if (actor == protagonist) {
+			core->GetGame()->MoveFamiliars(parameters->resref0Parameter, parameters->pointParameter, parameters->int0Parameter);
+		}
 	}
 }
 
@@ -7737,7 +7755,7 @@ void GameScript::SetWorldmap(Scriptable* /*Sender*/, Action* parameters)
 // save folder name or starting area. Campaign refers to the name defined in
 // the first column of that table. Used eg. to switch from BGEE to SOD.
 // this approach complements our start.2da and should be unified
-// also check MoveToExpansion
+// also check MoveToExpansion, Game::CurrentCampaign
 void GameScript::MoveToCampaign(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(ERROR, "GameScript", "MoveToCampaign is not implemented yet!");
