@@ -7457,12 +7457,12 @@ void Actor::UpdateModalState(ieDword gameTime)
 				// some modals notify each round, some only initially
 				bool feedback = ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
 				Modal.FirstApply = false;
-				if (InParty && feedback && core->HasFeedback(FT_MISC)) {
+				if (IsPartyMember() && feedback && core->HasFeedback(FT_MISC)) {
 					ieStrRef entering = PersonalizePSTString(ModalStates[Modal.State].entering_str, this);
 					displaymsg->DisplayStringName(entering, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
 			} else {
-				if (InParty && core->HasFeedback(FT_MISC)) {
+				if (IsPartyMember() && core->HasFeedback(FT_MISC)) {
 					ieStrRef failed = PersonalizePSTString(ModalStates[Modal.State].failed_str, this);
 					displaymsg->DisplayStringName(failed, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
