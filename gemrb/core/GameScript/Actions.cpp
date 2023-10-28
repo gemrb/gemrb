@@ -6296,8 +6296,8 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 	if (!item) {
 		return;
 	}
-	if (res!=-1 && scr->InParty) { //it is gold and we got the party pool!
-		if (scr->InParty) {
+	if (res != -1) { // it is gold and we got the party pool!
+		if (scr->IsPartyMember()) {
 			core->GetGame()->PartyGold += res;
 			// if you want message here then use core->GetGame()->AddGold(res);
 		} else {
@@ -6306,7 +6306,12 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 		delete item;
 		return;
 	}
-	res = scr->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
+
+	Actor* receiver = scr;
+	if (scr->GetBase(IE_EA) == EA_FAMILIAR) {
+		receiver = core->GetGame()->FindPC(1);
+	}
+	res = receiver->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
 	if (res !=ASI_SUCCESS) { //putting it back
 		c->AddItem(item);
 	}

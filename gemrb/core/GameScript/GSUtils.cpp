@@ -671,12 +671,14 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 	}
 
 	item->Flags|=setflag;
-
+	Actor* targetActor = Scriptable::As<Actor>(target);
 	switch(target->Type) {
 		case ST_ACTOR:
-			tmp = Scriptable::As<Actor>(target);
-			myinv = &tmp->inventory;
-			if (tmp->InParty) gotitem = true;
+			if (targetActor->GetBase(IE_EA) == EA_FAMILIAR) {
+				targetActor = core->GetGame()->FindPC(1);
+			}
+			myinv = &targetActor->inventory;
+			if (targetActor->InParty) gotitem = true;
 			break;
 		case ST_CONTAINER:
 			myinv=&((Container *) target)->inventory;
@@ -697,9 +699,8 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
 		if (gotitem) {
-			tmp = Scriptable::As<Actor>(target);
-			if (tmp && tmp->InParty) {
-				tmp->VerbalConstant(Verbal::InventoryFull);
+			if (targetActor && targetActor->InParty) {
+				targetActor->VerbalConstant(Verbal::InventoryFull);
 			}
 			displaymsg->DisplayMsgCentered(HCStrings::InventoryFullItemDrop, FT_ANY, GUIColors::XPCHANGE);
 		}

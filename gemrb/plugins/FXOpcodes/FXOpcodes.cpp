@@ -4008,7 +4008,11 @@ int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Resource3.IsEmpty()) count++;
 	int choice = RAND(0, count - 1);
 
-	target->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
+	Actor* receiver = target;
+	if (target->GetBase(IE_EA) == EA_FAMILIAR) {
+		receiver = core->GetGame()->FindPC(1);
+	}
+	receiver->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
 
 	int ret = MaybeTransformTo(fx_remove_inventory_item_ref, fx);
 	if (ret == FX_APPLIED) fx->Resource = *refs[choice];
@@ -7035,8 +7039,11 @@ int fx_remove_map_note (Scriptable* Owner, Actor* target, Effect* fx)
 // 0xff Item:CreateDays
 int fx_create_item_days (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_create_item_days(%2d)", fx->Opcode);
-	target->inventory.AddSlotItemRes( fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
+	Actor* receiver = target;
+	if (target->GetBase(IE_EA) == EA_FAMILIAR) {
+		receiver = core->GetGame()->FindPC(1);
+	}
+	receiver->inventory.AddSlotItemRes(fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
 
 	int ret = MaybeTransformTo(fx_remove_inventory_item_ref, fx);
 	// duration needs recalculating for days
