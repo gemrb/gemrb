@@ -2390,6 +2390,15 @@ void GameControl::PerformActionOn(Actor *actor)
 					source = game->GetPC(0, false); //protagonist
 				} else {
 					source = core->GetFirstSelectedPC(false);
+					if (!source) {
+						// check also for familiars
+						for (auto& npc : game->selected) {
+							if (npc->GetBase(IE_EA) == EA_FAMILIAR) {
+								source = npc;
+								break;
+							}
+						}
+					}
 				}
 				// only party members can start conversations
 				if (source) {
