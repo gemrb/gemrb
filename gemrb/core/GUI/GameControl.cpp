@@ -1876,6 +1876,12 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 		return;
 	}
 
+	// familiars can not pick up items
+	if (actor->GetBase(IE_EA) == EA_FAMILIAR) {
+		displaymsg->DisplayConstantString(HCStrings::FamiliarNoHands, GUIColors::WHITE, actor);
+		return;
+	}
+
 	container->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
 	core->SetCurrentContainer( actor, container);
 	actor->CommandActor(GenerateAction("UseContainer()"));

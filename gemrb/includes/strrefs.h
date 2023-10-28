@@ -185,6 +185,7 @@ enum class HCStrings : TableMgr::index_t {
 	WildSurge,
 	FamiliarBlock,
 	FamiliarProtagonistOnly,
+	FamiliarNoHands,
 	MagicResisted,
 	CantSaveStore,
 	NoSeeNoCast,

@@ -151,6 +151,7 @@ MISCASTMAGIC            36633               2
 WILDSURGE               36633               2
 FAMBLOCK                   -1               0
 FAMPROTAGONIST             -1               0
+FAMNOHANDS                 -1               0
 MAGIC_RESISTED             -1               0
 CANTSAVESTORE              -1               0
 NOSEE_NOCAST               -1               0
