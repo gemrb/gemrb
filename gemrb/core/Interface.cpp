@@ -923,7 +923,7 @@ void Interface::DisableMusicPlaylist(size_t SongType)
 void Interface::Main()
 {
 	int speed = vars.Get("Mouse Scroll Speed", 10);
-	SetMouseScrollSpeed(speed);
+	SetMouseScrollSpeed(speed + 1);
 
 	// We had 36 at 30fps originally, so more fps
 	// should not speed this up unless adjusted
@@ -3353,7 +3353,7 @@ Store *Interface::SetCurrentStore(const ResRef &resName, ieDword owner)
 }
 
 void Interface::SetMouseScrollSpeed(int speed) {
-	mousescrollspd = (speed+1)*2;
+	mousescrollspd = speed * 2;
 }
 
 int Interface::GetMouseScrollSpeed() const {
