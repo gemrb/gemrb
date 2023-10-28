@@ -770,6 +770,13 @@ int Game::DelMap(unsigned int index, int forced)
 		if (!map->CanFree()) {
 			return 1;
 		}
+		// if a familiar isn't executing EscapeArea, it warps to the protagonist
+		for (auto& npc : NPCs) {
+			if (npc->GetBase(IE_EA) == EA_FAMILIAR && (!npc->GetCurrentAction() || npc->GetCurrentAction()->actionID != 108)) {
+				npc->SetPosition(PCs[0]->Pos, true);
+			}
+		}
+
 		//if there are still selected actors on the map (e.g. summons)
 		//unselect them now before they get axed
 		for (auto m = selected.begin(); m != selected.end();) {
