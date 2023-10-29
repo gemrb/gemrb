@@ -67,7 +67,13 @@ bool KeyMap::InitializeKeyMap(const path_t& inifile, const ResRef& tablefile)
 		if (parts.size() < 2) {
 			parts.emplace_back();
 		}
-		
+
+		auto& key = parts[0];
+		RTrim(key);
+		if (key.substr(0, 10) == "unmappable") {
+			continue;
+		}
+
 		auto& val = parts[1];
 		if (val.length() == 0) continue;
 		LTrim(val);
@@ -76,9 +82,7 @@ bool KeyMap::InitializeKeyMap(const path_t& inifile, const ResRef& tablefile)
 			Log(WARNING, "KeyMap", "Ignoring key {}", val);
 			continue;
 		}
-		
-		auto& key = parts[0];
-		RTrim(key);
+
 		//change internal spaces to underscore
 		std::replace(key.begin(), key.end(), ' ', '_');
 
