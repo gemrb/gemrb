@@ -4641,8 +4641,10 @@ int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0x8e Icon:Display
 int fx_display_portrait_icon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_display_string(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-	target->AddPortraitIcon(fx->Parameter2);
+	static EffectRef fx_disable_portrait_icon_ref = { "Icon:Disable", -1 };
+	if (!target->fxqueue.HasEffectWithParam(fx_disable_portrait_icon_ref, fx->Parameter2)) {
+		target->AddPortraitIcon(fx->Parameter2);
+	}
 	return FX_APPLIED;
 }
 
