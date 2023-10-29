@@ -2570,7 +2570,7 @@ void Interface::InitItemTypes()
 			itemtypedata[i][IDT_SKILLPENALTY] = 0; // skill check malus
 		}
 	}
-	AutoTable af = gamedata->LoadTable("itemdata");
+	AutoTable af = gamedata->LoadTable("itemdata", true);
 	if (af) {
 		TableMgr::index_t armcount = af->GetRowCount();
 		TableMgr::index_t colcount = af->GetColumnCount();
