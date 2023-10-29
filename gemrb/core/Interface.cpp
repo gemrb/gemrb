@@ -307,14 +307,18 @@ Interface::Interface(CoreSettings&& cfg)
 
 	// accomodating silly installers that create a data/Data/.* structure
 	path = PathJoin(config.GamePath, config.GameDataPath, "Data");
-	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	if (DirExists(path)) {
+		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	}
 
 	// IWD2 movies are on the CD but not in the BIF
 	for (size_t i = 0; i < MAX_CD; i++) {
 		const std::string description = fmt::format("CD{}/data", i);
 		for (size_t j = 0; j < config.CD[i].size(); j++) {
 			path = PathJoin(config.CD[i][j], config.GameDataPath);
-			gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
+			if (DirExists(path)) {
+				gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
+			}
 		}
 	}
 
