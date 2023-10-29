@@ -875,6 +875,7 @@ public: //Script Functions
 	static int StoryModeOn(Scriptable *Sender, const Trigger */*parameters*/);
 	static int StuffGlobalRandom(Scriptable *Sender, const Trigger *parameters);
 	static int SubRace(Scriptable *Sender, const Trigger *parameters);
+	static int Summoned(Scriptable* Sender, const Trigger* parameters);
 	static int SummoningLimit(Scriptable *Sender, const Trigger *parameters);
 	static int SummoningLimitGT(Scriptable *Sender, const Trigger *parameters);
 	static int SummoningLimitLT(Scriptable *Sender, const Trigger *parameters);
@@ -1207,6 +1208,7 @@ public: //Script Functions
 	static void NIDSpecial2(Scriptable* Sender, Action* parameters);
 	static void NoAction(Scriptable* Sender, Action* parameters);
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
+	static void OverrideAreaDifficulty(Scriptable* Sender, Action* parameters);
 	static void Panic(Scriptable* Sender, Action* parameters);
 	static void PauseGame(Scriptable *Sender, Action* parameters);
 	static void PermanentStatChange(Scriptable* Sender, Action* parameters);
@@ -1325,6 +1327,7 @@ public: //Script Functions
 	static void SetMyTarget(Scriptable* Sender, Action* parameters);
 	static void SetNamelessClass(Scriptable* Sender, Action* parameters);
 	static void SetNamelessDeath(Scriptable* Sender, Action* parameters);
+	static void SetNamelessDeathParty(Scriptable* Sender, Action* parameters);
 	static void SetNamelessDisguise(Scriptable* Sender, Action* parameters);
 	static void SetNoOneOnTrigger(Scriptable* Sender, Action* parameters);
 	static void SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters);

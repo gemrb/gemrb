@@ -569,6 +569,12 @@ void IniSpawn::SetNamelessDeath(const ResRef& area, const Point& pos, ieDword st
 	NamelessState = state;
 }
 
+// complete guesswork
+void IniSpawn::SetNamelessDeathParty(const Point& pos, int /*reserved*/)
+{
+	PartySpawnPoint = pos;
+}
+
 /*** events ***/
 
 //respawn nameless after he bit the dust

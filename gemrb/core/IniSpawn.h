@@ -166,6 +166,7 @@ private:
 public:
 	/* called by action of the same name */
 	void SetNamelessDeath(const ResRef& area, const Point& pos, ieDword state);
+	void SetNamelessDeathParty(const Point& pos, int reserved);
 	void RespawnNameless();
 	void InitialSpawn();
 	void ExitSpawn();

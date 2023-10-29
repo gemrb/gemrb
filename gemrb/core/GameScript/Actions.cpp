@@ -7608,6 +7608,15 @@ void GameScript::SetNamelessDeath(Scriptable* Sender, Action* parameters)
 	sp->SetNamelessDeath(area, parameters->pointParameter, parameters->int1Parameter);
 }
 
+void GameScript::SetNamelessDeathParty(Scriptable* Sender, Action* parameters)
+{
+	IniSpawn* sp = Sender->GetCurrentArea()->INISpawn;
+	if (!sp) {
+		return;
+	}
+	sp->SetNamelessDeathParty(parameters->pointParameter, parameters->int0Parameter);
+}
+
 // like GameScript::Kill, but forces chunking damage (disabling resurrection)
 void GameScript::ChunkCreature(Scriptable *Sender, Action* parameters)
 {
@@ -7748,6 +7757,15 @@ void GameScript::DestroyGroundPiles(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::SetWorldmap(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->UpdateWorldMap(parameters->resref0Parameter);
+}
+
+// pretty ineffectual action, due to this being important in the importer
+// only the CheckAreaDiffLevel trigger would pick this change up
+void GameScript::OverrideAreaDifficulty(Scriptable* /*Sender*/, Action* parameters)
+{
+	Map* map = core->GetGame()->GetMap(parameters->resref0Parameter, false);
+	if (!map) return;
+	map->AreaDifficulty = parameters->int0Parameter;
 }
 
 // TODO: ee, this action reinitializes important default values and resource

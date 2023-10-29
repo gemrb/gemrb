@@ -424,6 +424,7 @@ static const TriggerLink triggernames[] = {
 	{"reserved2", nullptr, 0},
 	{"reserved3", nullptr, 0},
 	{"reset", GameScript::Reset, 0},
+	{"said", GameScript::False, 0},
 	{"school", GameScript::School, 0}, //similar to kit
 	{"secretdoordetected", GameScript::SecretDoorDetected, 0},
 	{"see", GameScript::See, 0},
@@ -442,6 +443,7 @@ static const TriggerLink triggernames[] = {
 	{"storymodeon", GameScript::StoryModeOn, 0},
 	{"stuffglobalrandom", GameScript::StuffGlobalRandom, 0},//hm, this is a trigger
 	{"subrace", GameScript::SubRace, 0},
+	{"summoned", GameScript::Summoned, 0},
 	{"summoninglimit", GameScript::SummoningLimit, 0},
 	{"summoninglimitgt", GameScript::SummoningLimitGT, 0},
 	{"summoninglimitlt", GameScript::SummoningLimitLT, 0},
@@ -544,6 +546,7 @@ static const ActionLink actionnames[] = {
 	{"bitglobal", GameScript::BitGlobal,AF_MERGESTRINGS},
 	{"bitset", GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
 	{"breakinstants", GameScript::BreakInstants, AF_BLOCKING},//delay execution of instants to the next AI cycle???
+	{"buystuff", GameScript::NoAction, 0},
 	{"calllightning", GameScript::Kill, 0}, // just an instant death with Param2 = 0x100
 	{"calm", GameScript::Calm, 0},
 	{"changeaiscript", GameScript::ChangeAIScript, 0},
@@ -776,6 +779,7 @@ static const ActionLink actionnames[] = {
 	{"jumptosavedlocation", GameScript::JumpToSavedLocation, 0},
 	{"kill", GameScript::Kill, 0},
 	{"killfloatmessage", GameScript::KillFloatMessage, 0},
+	{"layhands", GameScript::NoAction, 0}, // broken in released engines; likely on purpose, since a spell is cleaner
 	{"leader", GameScript::Leader, AF_ALIVE},
 	{"leavearea", GameScript::LeaveAreaLUA, 0}, //so far the same
 	{"leavearealua", GameScript::LeaveAreaLUA, 0},
@@ -838,6 +842,7 @@ static const ActionLink actionnames[] = {
 	{"nidspecial12", GameScript::NoAction, 0},
 	{"noaction", GameScript::NoAction, 0},
 	{"opendoor", GameScript::OpenDoor,0},
+	{"overrideareadifficulty", GameScript::OverrideAreaDifficulty, 0},
 	{"panic", GameScript::Panic, AF_ALIVE},
 	{"permanentstatchange", GameScript::PermanentStatChange, 0}, //pst
 	{"pausegame", GameScript::PauseGame, AF_BLOCKING}, //this is almost surely blocking
@@ -980,6 +985,7 @@ static const ActionLink actionnames[] = {
 	{"setname", GameScript::SetApparentName, 0},
 	{"setnamelessclass", GameScript::SetNamelessClass, 0},
 	{"setnamelessdeath", GameScript::SetNamelessDeath, 0},
+	{"setnamelessdeathparty", GameScript::SetNamelessDeathParty, 0},
 	{"setnamelessdisguise", GameScript::SetNamelessDisguise, 0},
 	{"setnooneontrigger", GameScript::SetNoOneOnTrigger, 0},
 	{"setnumtimestalkedto", GameScript::SetNumTimesTalkedTo, 0},

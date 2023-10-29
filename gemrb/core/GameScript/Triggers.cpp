@@ -4802,6 +4802,13 @@ int GameScript::Switch(Scriptable* Sender, const Trigger* parameters)
 	return 0;
 }
 
+int GameScript::Summoned(Scriptable* Sender, const Trigger* parameters)
+{
+	const Scriptable* summon = GetScriptableFromObject(Sender, parameters->objectParameter);
+	if (!summon) return 0;
+
+	return Sender->MatchTrigger(trigger_summoned, summon->GetGlobalID());
+}
 
 int GameScript::Reset(Scriptable* Sender, const Trigger* parameters)
 {
