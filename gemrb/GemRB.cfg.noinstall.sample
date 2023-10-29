@@ -3,19 +3,17 @@
 ###############################################################################
 
 ###############################################################################
-#  Game Paths [String]                                                        #
+#  Game Path [String]                                                         #
 #                                                                             #
-#  These are the paths where the Game you want to play is installed.          #
-#  Enter the full path to the directory.                                      #
+#  Full path to the directory where the game you want to play is installed.   #
 #                                                                             #
-#  Remember, EE versions are not supported!                                   #
 ###############################################################################
 
 GamePath=../gemrb/tests/minimal
 
 ###############################################################################
 #                                                                             #
-#  Game Type [String] Use one of the following:                               #
+#  Game Type [String]. Use one of the following:                              #
 #                                                                             #
 #  auto      Attempt to autodetect game type                                  #
 #                                                                             #
@@ -29,7 +27,6 @@ GamePath=../gemrb/tests/minimal
 #                                                                             #
 #  demo      GemRB demo                                                       #
 #  test      Minimal test mode                                                #
-#  (More will come)                                                           #
 #                                                                             #
 ###############################################################################
 
@@ -41,23 +38,23 @@ GameType=test
 ###############################################################################
 #  Video Parameters                                                           #
 ###############################################################################
-#Resolutions supported by the original games are:
-# * 640x480 (except in iwd2)
-# * 800x600 (bg2, iwd:how, iwd2)
-# * 1024x768 (bg2, iwd:how, iwd2)
-# * 1280x960 (bg2, iwd:how, iwd2)
+# Resolutions supported by the original games are:
+#   * 640x480 (except in iwd2)
+#   * 800x600 (bg2, iwd:how, iwd2)
+#   * 1024x768 (bg2, iwd:how, iwd2)
+#   * 1280x960 (bg2, iwd:how, iwd2)
 # You can use others as well!
 
-#Screen width
+# Screen width
 Width=640
 
-#Screen height
+# Screen height
 Height=480
 
-#Bits per pixel [Integer:16,32]
+# Bits per pixel [Integer:16,32]
 Bpp=32
 
-#Fullscreen [Boolean]
+# Fullscreen [Boolean]
 Fullscreen=0
 
 # Cap FPS, 0 = request VSync (SDL2 only, default), -1 = no limit, 30+ = cap value
@@ -97,7 +94,7 @@ GUIEnhancements = 15
 # Enable or disable (0) logging
 #Logging = 1
 
-# color setting for the console log. -1 = auto, 0 = none, 1 = Basic, 2 = truecolor
+# Color setting for the console log. -1 = auto, 0 = none, 1 = basic, 2 = truecolor
 #LogColor = -1
 
 # Title for GemRB window, use anything you wish, e.g. Baldur's Gate 3: RotFL
@@ -143,9 +140,7 @@ GUIEnhancements = 15
 #  Hide mouse+tooltips = 3                                                    #
 ###############################################################################
 
-# For a strictly touchscreen device we recommend
-# Changing this to 3.
-# Default is 0
+# For a strictly touchscreen device we recommend changing this to 3
 #MouseFeedback=0
 
 # Force enable touch input (in case autodetection fails or for hybrids)
@@ -173,8 +168,8 @@ VitaKeepAspectRatio=1
 #  Paths                                                                      #
 ###############################################################################
 
-# only set these if the folders are not in your GamePath
-# really, you can ignore the warnings; never needed on full and GOG installs
+# Only set these if the folders are not in your GamePath
+# Really, never needed on full and GOG installs
 #CD1=/mnt/windows/Programmi/Black Isle/BGII - SoA/
 #CD2=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD2/
 #CD3=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD3/
