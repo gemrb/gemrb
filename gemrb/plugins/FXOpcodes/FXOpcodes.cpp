@@ -704,7 +704,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Protection:SpellDec",fx_resist_spell_dec, 0, -1 ),//overlay?
 	EffectDesc("Protection:SpellLevel",fx_protection_spelllevel, 0, -1 ),//overlay?
 	EffectDesc("Protection:SpellLevelDec",fx_protection_spelllevel_dec, 0, -1 ),//overlay?
-	EffectDesc("Protection:String", fx_generic_effect, 0, -1 ),
+	EffectDesc("Protection:String", fx_protection_from_string, 0, -1),
 	EffectDesc("Protection:Tracking", fx_protection_from_tracking, 0, -1 ),
 	EffectDesc("Protection:Turn", fx_protection_from_turn, 0, -1 ),
 	EffectDesc("Protection:Weapons", fx_immune_to_weapon, EFFECT_NO_ACTOR|EFFECT_REINIT_ON_LOAD, -1 ),
@@ -7236,7 +7236,14 @@ int fx_remove_immunity(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0x10b protection from display string is a generic effect
+// 0x10b protection from display string
+// we can't use a generic effect, because the unused Parameter2 differs with uses in fx_display_string
+int fx_protection_from_string(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	fx->Parameter2 = 0;
+	return FX_APPLIED;
+}
+
 // 0x10c ExploreModifier
 int fx_explore_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
