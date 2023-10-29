@@ -196,8 +196,8 @@ GS_MAPNOTE           = 128
 
 # GameControl screen flags
 # !!! Keep these synchronized with GameControl.h !!!
-SF_CENTERONACTOR     = 1
-SF_ALWAYSCENTER      = 2
+SF_CENTERONACTOR     = 0
+SF_ALWAYSCENTER      = 1
 
 # GameControltarget modes
 # !!! Keep these synchronized with GameControl.h !!!
