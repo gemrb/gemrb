@@ -910,10 +910,10 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				} else {
 					DumpActorInfo(ActorDump::Stats, area);
 				}
-				core->GetGame()->GetCurrentArea()->dump(false);
+				game->GetCurrentArea()->dump(false);
 				break;
 			case 'n': //prints a list of all the live actors in the area
-				core->GetGame()->GetCurrentArea()->dump(true);
+				game->GetCurrentArea()->dump(true);
 				break;
 			// o
 			case 'p': //center on actor
