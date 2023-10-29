@@ -285,7 +285,7 @@ public:
 	ResRef RandomEncounterArea;
 	ResRef CurrentWorldMap;
 	ResRef CurrentCampaign; // eg. "SOD"
-	ieDword FamiliarOwner; // IWDEE: which player has the familiar? InParty - 1
+	ieDword FamiliarOwner = 0; // IWDEE: which player has the familiar? InParty - 1
 	FixedSizeString<20> RandomEncounterEntry;
 
 	Particles *weather = nullptr;

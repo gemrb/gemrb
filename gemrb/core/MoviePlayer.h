@@ -58,10 +58,11 @@ public:
 	
 	public:
 		explicit SubtitleSet(Holder<Font> fnt, Color col = ColorWhite)
-		: col(col), font(fnt) {
+			: col(col), font(std::move(fnt))
+		{
 			assert(font);
 		}
-		
+
 		virtual ~SubtitleSet() noexcept = default;
 
 		virtual size_t NextSubtitleFrame() const = 0;

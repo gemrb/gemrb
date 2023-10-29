@@ -6057,7 +6057,7 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	if (actor) {
 		Holder<Sprite2D> portrait = actor->CopyPortrait(which);
 		PyObject* dict = PyDict_New();
-		PyDict_SetItemString(dict, "Sprite", PyObject_FromHolder(portrait));
+		PyDict_SetItemString(dict, "Sprite", PyObject_FromHolder(std::move(portrait)));
 		PyObject* pystr = PyString_FromResRef(which ? actor->SmallPortrait : actor->LargePortrait);
 		PyDict_SetItemString(dict, "ResRef", pystr);
 		Py_DecRef(pystr);

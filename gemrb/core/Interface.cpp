@@ -2024,7 +2024,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	public:
 		// default color taken from BGEE.lua
 		IESubtitles(Holder<Font> fnt, const AutoTable& sttable, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
-		: MoviePlayer::SubtitleSet(fnt, col)
+			: MoviePlayer::SubtitleSet(std::move(fnt), col)
 		{
 			for (TableMgr::index_t i = 0; i < sttable->GetRowCount(); ++i) {
 				const auto& rowName = sttable->GetRowName(i);

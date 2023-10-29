@@ -1560,7 +1560,7 @@ void Projectile::DrawSpread()
 
 	// switch fill to scatter after the first time
 	// eg. web and storm of vengeance shouldn't explode outward in subsequent applications
-	if (Extension && apFlags & APF_FILL) {
+	if (apFlags & APF_FILL) {
 		Extension->APFlags |= APF_SCATTER;
 	}
 }

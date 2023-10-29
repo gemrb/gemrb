@@ -640,7 +640,7 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 
 int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const String& slotname, bool force) const {
 	auto mbSlotName = MBStringFromString(slotname);
-	return CreateSaveGame(save, StringView{mbSlotName}, force);
+	return CreateSaveGame(std::move(save), StringView { mbSlotName }, force);
 }
 
 int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, StringView slotname, bool force) const

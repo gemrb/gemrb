@@ -624,7 +624,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 		stream->WriteFilling(26);
 		{
 			auto soundFolder = TLKStringFromString(act->PCStats->SoundFolder);
-			stream->WriteStringLC(soundFolder, ieVariable::Size);
+			stream->WriteStringLC(std::move(soundFolder), ieVariable::Size);
 		}
 		stream->WriteResRef(act->PCStats->SoundSet);
 		for (const auto& setting : act->PCStats->ExtraSettings) {
