@@ -1121,13 +1121,11 @@ static int CheckSaves(Actor* actor, Effect* fx)
 static int CheckResistances(Effect* fx, Actor* target)
 {
 	if (!CheckProbability(fx)) {
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 		return FX_NOT_APPLIED;
 	}
 
 	// the effect didn't pass the target level check
 	if (CheckLevel(target, fx)) {
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 		return FX_NOT_APPLIED;
 	}
 
@@ -1150,19 +1148,13 @@ static int CheckResistances(Effect* fx, Actor* target)
 	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL && CheckMagicResistance(target, fx, caster) == FX_NOT_APPLIED) {
 		// bg2 sequencer trigger spells have bad resistance set, so ignore them
 		if (signed(fx->Opcode) != EffectQueue::ResolveEffect(fx_activate_spell_sequencer_ref)) {
-			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 			return FX_NOT_APPLIED;
 		}
 	}
 
 	// the effect didn't pass saving throws
 	int saved = CheckSaves(target, fx);
-	if (saved != -1) {
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-		return saved;
-	}
-
-	return -1;
+	return saved;
 }
 
 // this function is called two different ways
