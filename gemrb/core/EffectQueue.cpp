@@ -671,6 +671,7 @@ all_party:
 		i = map->GetActorCount(false);
 		while(i--) {
 			Actor* actor = map->GetActor( i, false );
+			if (actor->GetBase(IE_EA) == EA_FAMILIAR) continue;
 			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
