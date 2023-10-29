@@ -41,7 +41,7 @@ TLKImporter::TLKImporter(void)
 		charname=-1;
 	}
 
-	AutoTable tm = gamedata->LoadTable("gender");
+	AutoTable tm = gamedata->LoadTable("gender", true);
 	TableMgr::index_t gtcount = 0;
 	if (tm) {
 		gtcount = tm->GetRowCount();
