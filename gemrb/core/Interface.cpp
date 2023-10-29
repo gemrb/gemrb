@@ -1910,7 +1910,7 @@ int Interface::LoadSymbol(const ResRef& ref)
 	if (ind != -1) {
 		return ind;
 	}
-	DataStream* str = gamedata->GetResourceStream(ref, IE_IDS_CLASS_ID);
+	DataStream* str = gamedata->GetResourceStream(ref, IE_IDS_CLASS_ID, true);
 	if (!str) {
 		return -1;
 	}
