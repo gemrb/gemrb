@@ -29,6 +29,8 @@ from ie_feats import *
 def GetNextLevelExp (Level, Class):
 	"""Returns the amount of XP required to gain the next level."""
 	Row = CommonTables.NextLevel.GetRowIndex (Class)
+	if not Row:
+		return 0
 	if Level < CommonTables.NextLevel.GetColumnCount (Row):
 		return CommonTables.NextLevel.GetValue (Row, Level, GTV_INT)
 
