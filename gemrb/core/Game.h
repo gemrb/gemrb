@@ -74,8 +74,10 @@ class TableMgr;
 #define SELECT_QUIET    0x02 // do not run handler when changing selection
 
 // Flags bits for EveryoneNearPoint()
-#define ENP_CANMOVE     1    // also check if the PC can move
-#define ENP_ONLYSELECT  2    // check only selected PC
+enum ENP {
+	CanMove = 1, // also check if the PC can move
+	OnlySelect = 2 // check only selected PC
+};
 
 // GUI Control Status flags (saved in game)
 #define CS_PARTY_AI  1   //enable party AI

@@ -1264,13 +1264,13 @@ bool Game::EveryoneStopped() const
 bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 {
 	for (const auto& pc : PCs) {
-		if (flags & ENP_ONLYSELECT && !pc->Selected) {
+		if (flags & ENP::OnlySelect && !pc->Selected) {
 			continue;
 		}
 		if (pc->GetStat(IE_STATE_ID) & STATE_DEAD) {
 			continue;
 		}
-		if (flags&ENP_CANMOVE) {
+		if (flags & ENP::CanMove) {
 			//someone is uncontrollable, can't move
 			if (pc->GetStat(IE_EA) > EA_GOODCUTOFF) {
 				return false;
