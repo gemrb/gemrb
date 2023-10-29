@@ -889,12 +889,9 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				case SDL_WINDOWEVENT_RESTORED: //SDL 1.3
 					core->GetAudioDrv()->Resume();//this is for ANDROID mostly
 					break;
-					/*
-				case SDL_WINDOWEVENT_RESIZED: //SDL 1.2
-					// this event exists in SDL 1.2, but this handler is only getting compiled under 1.3+
-					Log(WARNING, "SDL 2 Driver",  "Window resized so your window surface is now invalid.");
+				// SDL_WINDOWEVENT_RESIZED and SDL_WINDOWEVENT_SIZE_CHANGED are handled automatically
+				default:
 					break;
-					 */
 			}
 			break;
 
