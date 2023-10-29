@@ -397,7 +397,7 @@ int fx_no_backstab_modifier (Scriptable* Owner, Actor* target, Effect* fx);//124
 int fx_offscreenai_modifier (Scriptable* Owner, Actor* target, Effect* fx);//125
 int fx_existance_delay_modifier (Scriptable* Owner, Actor* target, Effect* fx);//126
 int fx_disable_chunk_modifier (Scriptable* Owner, Actor* target, Effect* fx);//127
-int fx_protection_from_animation (Scriptable* Owner, Actor* target, Effect* fx);//128
+// fx_protection_from_animation implements as generic effect, 128
 int fx_protection_from_turn (Scriptable* Owner, Actor* target, Effect* fx);//129
 int fx_cutscene2 (Scriptable* Owner, Actor* target, Effect* fx);//12a
 int fx_chaos_shield_modifier (Scriptable* Owner, Actor* target, Effect* fx);//12b
@@ -6052,6 +6052,11 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Map *map = target->GetCurrentArea();
 	if (!map) return FX_APPLIED;
 
+	if (target->fxqueue.HasEffectWithResource(fx_protection_from_animation_ref, fx->Resource)) {
+		// effect supressed by opcode 0x128
+		return FX_APPLIED;
+	}
+
 	//if it is sticky, don't add it if it is already played
 	if (fx->Parameter2) {
 		auto range = target->GetVVCCells(fx->Resource);
@@ -6063,12 +6068,6 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		if (! fx->FirstApply) return FX_NOT_APPLIED;
 	}
-
-	if (target->fxqueue.HasEffectWithResource(fx_protection_from_animation_ref, fx->Resource)) {
-		// effect supressed by opcode 0x128
-		return FX_APPLIED;
-	}
-
 
 	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, false);
 
