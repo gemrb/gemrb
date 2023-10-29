@@ -128,7 +128,6 @@ inline orient_t GetOrient(const Point &s, const Point &d)
 	return orientations[(aY+2)*5+aX+2];
 }
 
-// OffsetOrient(GetOrient(A, B), offsetScalar)
 inline Point OrientedOffset(orient_t face, int offset)
 {
 	int x;

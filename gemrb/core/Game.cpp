@@ -754,51 +754,53 @@ int Game::DelMap(unsigned int index, int forced)
 	// (definitely if MAX_MAPS_LOADED gets bumped)
 	if (map->INISpawn) map->INISpawn->ExitSpawn();
 
-	if (forced || Maps.size() > MAX_MAPS_LOADED) {
-		//keep at least one master
-		const ResRef name = map->GetScriptRef();
-		if (MasterArea(name) && AnotherArea.IsEmpty()) {
-			AnotherArea = name;
-			if (!forced) {
-				return -1;
-			}
-		}
-		//this check must be the last, because
-		//after PurgeActors you cannot keep the
-		//area in memory
-		//Or the queues should be regenerated!
-		if (!map->CanFree()) {
-			return 1;
-		}
-		// if a familiar isn't executing EscapeArea, it warps to the protagonist
-		for (auto& npc : NPCs) {
-			if (npc->GetBase(IE_EA) == EA_FAMILIAR && (!npc->GetCurrentAction() || npc->GetCurrentAction()->actionID != 108)) {
-				npc->SetPosition(PCs[0]->Pos, true);
-			}
-		}
+	if (!forced && Maps.size() <= MAX_MAPS_LOADED) {
+		// not removing the map
+		return 0;
+	}
 
-		//if there are still selected actors on the map (e.g. summons)
-		//unselect them now before they get axed
-		for (auto m = selected.begin(); m != selected.end();) {
-			if (!(*m)->InParty && (*m)->Area == Maps[index]->GetScriptRef()) {
-				m = selected.erase(m);
-			} else {
-				++m;
-			}
+	// keep at least one master
+	const ResRef name = map->GetScriptRef();
+	if (MasterArea(name) && AnotherArea.IsEmpty()) {
+		AnotherArea = name;
+		if (!forced) {
+			return -1;
 		}
+	}
 
-		//remove map from memory
-		core->SwapoutArea(Maps[index]);
-		delete(Maps[index]);
-		Maps.erase(Maps.begin() + index);
-		//current map will be decreased
-		if (MapIndex > (int) index) {
-			MapIndex--;
-		}
+	// this check must be the last, because
+	// after PurgeActors you cannot keep the area in memory
+	// Or the queues should be regenerated!
+	if (!map->CanFree()) {
 		return 1;
 	}
-	//didn't remove the map
-	return 0;
+
+	// if a familiar isn't executing EscapeArea, it warps to the protagonist
+	for (auto& npc : NPCs) {
+		if (npc->GetBase(IE_EA) == EA_FAMILIAR && (!npc->GetCurrentAction() || npc->GetCurrentAction()->actionID != 108)) {
+			npc->SetPosition(PCs[0]->Pos, true);
+		}
+	}
+
+	// if there are still selected actors on the map (e.g. summons)
+	// unselect them now before they get axed
+	for (auto m = selected.begin(); m != selected.end();) {
+		if (!(*m)->InParty && (*m)->Area == Maps[index]->GetScriptRef()) {
+			m = selected.erase(m);
+		} else {
+			++m;
+		}
+	}
+
+	// remove map from memory
+	core->SwapoutArea(Maps[index]);
+	delete Maps[index];
+	Maps.erase(Maps.begin() + index);
+	// current map will be decreased
+	if (MapIndex > (int) index) {
+		MapIndex--;
+	}
+	return 1;
 }
 
 void Game::PlacePersistents(Map *newMap, const ResRef &resRef)

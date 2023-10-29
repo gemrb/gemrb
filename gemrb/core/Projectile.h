@@ -452,7 +452,7 @@ private:
 	//calculate target and destination points for a firewall
 	void SetupWall();
 	void BendPosition(Point& pos) const;
-	void DrawPopping(unsigned int face, const Point& pos, BlitFlags flags, const Color& tint);
+	void DrawPopping(unsigned int face, const Point& pos, BlitFlags flags, const Color& popTint);
 	void DrawLine(const Region &screen, int face, BlitFlags flag);
 	void DrawTravel(const Region& screen, BlitFlags flags);
 	bool DrawChildren(const Region& screen, BlitFlags flags);

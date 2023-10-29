@@ -1413,12 +1413,8 @@ void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion, const Point& o
 {
 	int apFlags = Extension->APFlags;
 	ResRef tmp = Extension->Spread;
-	if (apFlags & APF_BOTH) {
-		if (RandomFlip()) {
-			tmp = Extension->Secondary;
-		} else {
-			tmp = Extension->Spread;
-		}
+	if (apFlags & APF_BOTH && RandomFlip()) {
+		tmp = Extension->Secondary;
 	}
 
 	// create a custom projectile with single traveling effect
@@ -1438,10 +1434,10 @@ void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion, const Point& o
 	// we just emulate some of this mess
 	if (firstExplosion && tmp == "SPCCOLDL") {
 		orient_t face = GetOrient(Pos, Destination);
-		Point offset;
+		Point followerOffset;
 		for (int i = 1; i <= 4; ++i) {
-			offset = OrientedOffset(face, 9 * i);
-			DrawSpreadChild(idx, false, offset);
+			followerOffset = OrientedOffset(face, 9 * i);
+			DrawSpreadChild(idx, false, followerOffset);
 		}
 	}
 
@@ -1756,14 +1752,14 @@ void Projectile::BendPosition(Point& pos) const
 }
 
 // draw pop in/hold/pop out animation sequences
-void Projectile::DrawPopping(unsigned int face, const Point& pos, BlitFlags flags, const Color& tint)
+void Projectile::DrawPopping(unsigned int face, const Point& pos, BlitFlags flags, const Color& popTint)
 {
 	const Game* game = core->GetGame();
 	Holder<Sprite2D> frame;
 	if (game && game->IsTimestopActive() && !(TFlags & PTF_TIMELESS)) {
 		frame = travel[face].LastFrame();
 		flags |= BlitFlags::GREY;
-		Draw(frame, pos, flags, tint);
+		Draw(frame, pos, flags, popTint);
 		return;
 	}
 
@@ -1781,7 +1777,7 @@ void Projectile::DrawPopping(unsigned int face, const Point& pos, BlitFlags flag
 			frame = shadow[0].NextFrame();
 		}
 	}
-	Draw(frame, pos, flags, tint);
+	Draw(frame, pos, flags, popTint);
 }
 
 void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)

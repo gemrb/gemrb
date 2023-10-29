@@ -2326,6 +2326,28 @@ void GameControl::Scroll(const Point& amt)
 	MoveViewportTo(vpOrigin + amt, false);
 }
 
+// only party members and familiars can start conversations from the GUI
+static Actor* GetTalkInitiator()
+{
+	const Game* game = core->GetGame();
+	Actor* source;
+	if (core->HasFeature(GFFlags::PROTAGONIST_TALKS)) {
+		source = game->GetPC(0, false); // protagonist
+	} else {
+		source = core->GetFirstSelectedPC(false);
+		if (!source) {
+			// check also for familiars
+			for (auto& npc : game->selected) {
+				if (npc->GetBase(IE_EA) == EA_FAMILIAR) {
+					source = npc;
+					break;
+				}
+			}
+		}
+	}
+	return source;
+}
+
 void GameControl::PerformActionOn(Actor *actor)
 {
 	const Game* game = core->GetGame();
@@ -2382,25 +2404,9 @@ void GameControl::PerformActionOn(Actor *actor)
 				return;
 			}
 
-			//talk (first selected talks)
+			// talk (first selected talks)
 			if (!game->selected.empty()) {
-				//if we are in PST modify this to NO!
-				Actor *source;
-				if (core->HasFeature(GFFlags::PROTAGONIST_TALKS) ) {
-					source = game->GetPC(0, false); //protagonist
-				} else {
-					source = core->GetFirstSelectedPC(false);
-					if (!source) {
-						// check also for familiars
-						for (auto& npc : game->selected) {
-							if (npc->GetBase(IE_EA) == EA_FAMILIAR) {
-								source = npc;
-								break;
-							}
-						}
-					}
-				}
-				// only party members can start conversations
+				Actor* source = GetTalkInitiator();
 				if (source) {
 					TryToTalk(source, actor);
 				}
