@@ -1263,15 +1263,16 @@ bool Game::EveryoneStopped() const
 //canmove=true: if some PC can't move (or hostile), then this returns false
 bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 {
-	for (const auto& pc : PCs) {
+	auto NearPoint = [area, &p, flags](const Actor* pc) {
 		if (flags & ENP::OnlySelect && !pc->Selected) {
-			continue;
+			return true;
 		}
 		if (pc->GetStat(IE_STATE_ID) & STATE_DEAD) {
-			continue;
+			return true;
 		}
+
 		if (flags & ENP::CanMove) {
-			//someone is uncontrollable, can't move
+			// someone is uncontrollable, can't move
 			if (pc->GetStat(IE_EA) > EA_GOODCUTOFF) {
 				return false;
 			}
@@ -1280,6 +1281,7 @@ bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 				return false;
 			}
 		}
+
 		if (pc->GetCurrentArea() != area) {
 			return false;
 		}
@@ -1287,7 +1289,21 @@ bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 			Log(MESSAGE, "Game", "Actor {} is not near!", fmt::WideToChar{pc->GetName()});
 			return false;
 		}
+		return true;
+	};
+
+	for (const auto& pc : PCs) {
+		if (!NearPoint(pc)) return false;
 	}
+
+	if (flags & ENP::Familars) {
+		for (const auto& npc : NPCs) {
+			if (npc->GetBase(IE_EA) == EA_FAMILIAR && !NearPoint(npc)) {
+				return false;
+			}
+		}
+	}
+
 	return true;
 }
 

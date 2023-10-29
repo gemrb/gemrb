@@ -2213,7 +2213,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	}
 
 	Map* map = actor->GetCurrentArea();
-	if (!game->EveryoneNearPoint(map, actor->Pos, ENP::CanMove)) {
+	if (!game->EveryoneNearPoint(map, actor->Pos, ENP::CanMove | ENP::Familars)) {
 		//we abort the command, everyone should be here
 		if (map->LastGoCloser < game->Ticks) {
 			displaymsg->DisplayMsgCentered(HCStrings::WholeParty, FT_ANY, GUIColors::WHITE);

@@ -79,7 +79,7 @@ int InfoPoint::CheckTravel(const Actor *actor) const
 	// pst doesn't care about distance, selection or the party bit at all
 	static const bool teamMove = core->HasFeature(GFFlags::TEAM_MOVEMENT);
 	if (pm && ((Flags&TRAVEL_PARTY) || teamMove)) {
-		if (teamMove || core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP::CanMove)) {
+		if (teamMove || core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP::CanMove | ENP::Familars)) {
 			return CT_WHOLE;
 		}
 		return CT_GO_CLOSER;

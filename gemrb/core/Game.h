@@ -76,7 +76,8 @@ class TableMgr;
 // Flags bits for EveryoneNearPoint()
 enum ENP {
 	CanMove = 1, // also check if the PC can move
-	OnlySelect = 2 // check only selected PC
+	OnlySelect = 2, // check only selected PC
+	Familars = 4, // also check familiars
 };
 
 // GUI Control Status flags (saved in game)
