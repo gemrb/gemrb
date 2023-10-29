@@ -169,6 +169,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	CONFIG_INT("CapFPS", config.CapFPS);
 	CONFIG_INT("EnableCheatKeys", config.CheatFlag);
 	CONFIG_INT("GCDebug", config.DebugFlags);
+	CONFIG_INT("GUIEnhancements", config.GUIEnhancements);
 	CONFIG_INT("Height", config.Height);
 	CONFIG_INT("KeepCache", config.KeepCache);
 	CONFIG_INT("MaxPartySize", config.MaxPartySize);

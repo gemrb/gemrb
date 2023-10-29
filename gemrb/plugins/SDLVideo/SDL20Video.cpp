@@ -741,7 +741,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
 	int modstate = GetModState(SDL_GetModState());
 	Event e;
-	static int mouseScrollSpeed = core->GetMouseScrollSpeed();
 
 	switch (event.type) {
 #ifdef USE_SDL_CONTROLLER_API
@@ -872,10 +871,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_WINDOWEVENT://SDL 1.2
 			switch (event.window.event) {
 				case SDL_WINDOWEVENT_LEAVE:
-					core->SetMouseScrollSpeed(0);
+					if (core->config.GUIEnhancements & 8) core->DisableGameControl(true);
 					break;
 				case SDL_WINDOWEVENT_ENTER:
-					core->SetMouseScrollSpeed(mouseScrollSpeed);
+					if (core->config.GUIEnhancements & 8) core->DisableGameControl(false);
 					break;
 				case SDL_WINDOWEVENT_MINIMIZED://SDL 1.3
 					// We pause the game and audio when the window is minimized.

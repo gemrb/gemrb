@@ -337,6 +337,7 @@ SV_SAVEPATH = 5
 GE_SCROLLBARS = 1
 GE_TRY_IDENTIFY_ON_TRANSFER = 2
 GE_ALWAYS_OPEN_CONTAINER_ITEMS = 4
+GE_UNFOCUS_STOPS_SCROLLING = 8
 
 # Log Levels
 # !!! Keep this synchronized with Logging/Logging.h !!!

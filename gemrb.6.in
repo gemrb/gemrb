@@ -107,7 +107,8 @@ Specify language used in the game data.
 The value is a bitfield. Set it to 1 to enable a few GUI enhancements, mostly in BG2.
 Add or set to 2 to try to autoidentify items on transfer (if the character has enough lore).
 Add or set 4 if you want to skip the item description window when opening bags.
-Enabled by default.
+Enabled by default. Add or set 8 if you want the game to stop mouse scrolling the area at
+its edges when the window loses focus.
 
 .TP
 .BR MultipleQuickSaves =(0|1)

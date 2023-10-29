@@ -3453,6 +3453,12 @@ Holder<Sprite2D> Interface::GetScrollCursorSprite(orient_t orient, int spriteNum
 	return gamedata->GetBAMSprite(ScrollCursorBam, frame, spriteNum, true);
 }
 
+void Interface::DisableGameControl(bool disable) const
+{
+	if (!gamectrl) return;
+	gamectrl->SetFlags(View::IgnoreEvents, disable ? BitOp::OR : BitOp::NAND);
+}
+
 /* we should return -1 if it isn't gold, otherwise return the gold value */
 int Interface::CanMoveItem(const CREItem *item) const
 {

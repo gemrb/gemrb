@@ -82,7 +82,7 @@ Fullscreen=0
 ###############################################################################
 
 # Enable all gui enhancements ? [Integer]
-GUIEnhancements = 15
+GUIEnhancements = 7
 
 # Enable bigger parties (up to 10) or force smaller ones [Integer]
 # NOTE: You need to choose a big enough resolution, so
