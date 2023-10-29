@@ -1204,7 +1204,10 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 
 		if (resistance) {
 			int resisted = CheckResistances(fx, target);
-			if (resisted != -1) return resisted;
+			if (resisted != -1) {
+				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+				return resisted;
+			}
 		}
 
 		//Same as in items and spells
