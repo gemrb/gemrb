@@ -95,7 +95,7 @@ public:
 	const std::vector<ResourceDesc>& GetResourceDesc(const TypeID*);
 
 	/**
-	 * Registers a static intializer.
+	 * Registers a static initializer.
 	 *
 	 * @param[in] init Function to call on startup.
 	 */
@@ -107,7 +107,7 @@ public:
 	 */
 	void RegisterCleanup(void (*cleanup)(void));
 
-	/** Run intializer functions. */
+	/** Run initializer functions. */
 	void RunInitializers(const CoreSettings&) const;
 	/** Run cleanup functions */
 	void RunCleanup() const;

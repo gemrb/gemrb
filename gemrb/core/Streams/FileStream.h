@@ -71,7 +71,7 @@ public:
 
 	void Close();
 public:
-	/** Opens the specifed file.
+	/** Opens the specified file.
 	 *
 	 *  Returns NULL, if the file can't be opened.
 	 */

@@ -56,7 +56,7 @@ public:
 		Invalidate();
 	}
 
-	void SetInverval(TimeInterval i) {
+	void SetInterval(TimeInterval i) {
 		fireDate += (i - interval);
 		interval = i;
 	}

@@ -194,7 +194,7 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	    p_table[i][0] = -1; //codes
 	}
 
-	/* first pass: map codes and compute auxillary table sizes */
+	/* first pass: map codes and compute auxiliary table sizes */
 	for (int i = 0; i < nb_codes; i++) {
 	    GET_DATA(n, bits, i, bits_wrap, bits_size);
 	    GET_DATA(code, codes, i, codes_wrap, codes_size);
@@ -236,7 +236,7 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	    }
 	}
 
-	/* second pass : fill auxillary tables recursively */
+	/* second pass : fill auxiliary tables recursively */
 	for (int i = 0; i < table_size; i++) {
 	    n = p_table[i][1]; //bits
 	    if (n < 0) {
@@ -303,7 +303,7 @@ int VLC::init_vlc(int nb_bits, int nb_codes,
 	
 	if (build_table(nb_bits, nb_codes, p_bits, bits_wrap, bits_size,
 		codes, codes_wrap, codes_size, 0, 0, flags) < 0) {
-		//no need of freeing this, it was allocated staticly
+		//no need of freeing this, it was allocated statically
 		//av_freep((void **) &table);
 		return -1;
 	}

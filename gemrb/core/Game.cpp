@@ -1446,7 +1446,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 
 		// bg1 also closed doors
 		map->AutoLockDoors();
-		// teleport the familar to the protagonist, sometimes
+		// teleport the familiar to the protagonist, sometimes
 		// resting already ensures all pcs are in the same area
 		// the original also checked if the familiar was controllable, but then we'd have to look it up
 		if (map->AreaType & AT_DAYNIGHT) {
@@ -1822,7 +1822,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 				hp = std::max(1, hp * (hours - hoursLeft) / hours);
 			}
 			hours -= hoursLeft;
-			// the interruption occured before any resting could be done, so just bail out
+			// the interruption occurred before any resting could be done, so just bail out
 			if (!hours) {
 				return false;
 			}
@@ -2350,7 +2350,7 @@ void Game::ResetPartyCommentTimes() const
 }
 
 // drop the bored one liner if there was no action for some time
-// this function is deliberatly called only for normal passage of time
+// this function is deliberately called only for normal passage of time
 void Game::CheckBored()
 {
 	static int boredTimeout = core->GetDictionary().Get("Bored Timeout", 3000);

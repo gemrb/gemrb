@@ -220,14 +220,14 @@ void View::DrawBackground(const Region* rgn) const
 			Region r = superView->ConvertRegionToWindow(frame);
 			VideoDriver->DrawRect(r, backgroundColor, true);
 		} else {
-			// FIXME: this is a Window and we need this hack becasue Window::WillDraw() changed the coordinate system
+			// FIXME: this is a Window and we need this hack because Window::WillDraw() changed the coordinate system
 			VideoDriver->DrawRect(Region(Point(), Dimensions()), backgroundColor, true);
 		}
 	}
 
 	// NOTE: technically it's possible for the BG to be smaller than the view
 	// if this were to happen then the areas outside the BG wouldnt get redrawn
-	// you should make sure the backgound color is set to something suitable in those cases
+	// you should make sure the background color is set to something suitable in those cases
 
 	if (background) {
 		if (rgn) {

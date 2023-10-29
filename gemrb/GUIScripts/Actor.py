@@ -201,7 +201,7 @@ class Actor:
 	def Reset (self, pc):
 		"""Resets all internal variables.
 
-		This should be called after any fundemental changes to the pc.
+		This should be called after any fundamental changes to the pc.
 		This includes: dualclassing, leveling."""
 
 		#accessible variables
@@ -210,7 +210,7 @@ class Actor:
 		self.isdual = GemRB.GetPlayerStat (self.pc, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 		self.multiclass = CommonTables.Classes.GetValue (GUICommon.GetClassRowName (pc), "MULTI")
 
-		#internal variables - these are only intialized on the first
+		# internal variables - these are only initialized on the first
 		#call to their respective function, and stored thereafter
 		self.__classes = None
 		self.__classnames = None

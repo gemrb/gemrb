@@ -124,9 +124,9 @@ public:
 	Holder<Palette> GetPalette() const noexcept { return format.palette; }
 	void SetPalette(const Holder<Palette>& pal);
 	
-	/* GetColorKey: either a px value or a palete index if sprite has a palette. */
+	/* GetColorKey: either a px value or a palette index if sprite has a palette. */
 	colorkey_t GetColorKey() const noexcept { return format.ColorKey; }
-	/* SetColorKey: either a px value or a palete index if sprite has a palette. */
+	/* SetColorKey: either a px value or a palette index if sprite has a palette. */
 	void SetColorKey(colorkey_t);
 
 	virtual bool ConvertFormatTo(const PixelFormat&) noexcept;

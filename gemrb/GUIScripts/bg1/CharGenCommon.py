@@ -33,14 +33,14 @@ class CharGen:
 		
 		where each stage is defined by either an intermediate screen: 
 			name: 		name
-			control: 		id of the controle
+			control: 		id of the control
 			text: 		id of button text or string to use
 		or a request stage
 			name:			name
 			script | setFn:		script name to proceed or function to request and set data for this stage
 			commentFn(area):	function to append information to the text area
 			unsetFn:			function to remove data for this stage
-			guard			return wether or not to activate this stage 
+			guard			return whether or not to activate this stage
 		"""
 		self.stages = stages
 		self.imp = importFn

@@ -77,13 +77,13 @@ class Map;
 
 struct CritterEntry {
 	std::vector<ResRef> CreFile;        //spawn one of these creatures
-	ieByte Spec[9]{};	  // existance check IDS qualifier
+	ieByte Spec[9] {}; // existence check IDS qualifier
 	ieByte SetSpec[9]{};  // set IDS qualifier
-	ieVariable ScriptName;    //existance check scripting name
+	ieVariable ScriptName; // existence check scripting name
 	ieVariable SpecVar;       //condition variable
 	ResRef SpecContext;     //condition variable context
 	ResRef OverrideScript;  //override override script
-	ResRef ClassScript;     //overrride class script
+	ResRef ClassScript; // override class script
 	ResRef RaceScript;      //override race script
 	ResRef GeneralScript;   //override general script
 	ResRef DefaultScript;   //override default script

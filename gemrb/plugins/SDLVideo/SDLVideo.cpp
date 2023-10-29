@@ -297,7 +297,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 	// instead of doing this and then reversing it in that case only for SDL to reverse it yet again
 	// lets just not worry about clipping on SDL2. the backends handle all of that for us unlike with SDL 1 where we
 	// might walk off a memory buffer; we have no danger of that in SDL 2.
-	// This fixes bizzare clipping issues when a "flipped" sprite is partially offscreen
+	// This fixes bizarre clipping issues when a "flipped" sprite is partially offscreen
 	// we still will clip with screenClip later so no worries there
 	// we still want to do the clipping for the purposes of avoiding calls to BlitSpriteNativeClipped where
 	// expensive calls to SDLSurfaceSprite2D::RenderWithFlags may take place

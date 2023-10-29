@@ -385,7 +385,7 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 	}
 	
 	// the current points are the ends of the top/bottom segments
-	VideoDriver->DrawLine(points[i++] + offsetV, p + offsetV, color); // begin top segement
+	VideoDriver->DrawLine(points[i++] + offsetV, p + offsetV, color); // begin top segment
 	VideoDriver->DrawLine(points[i++] + offsetV, p + offsetV, color); // end top segment
 	VideoDriver->DrawLine(points[i++] - offsetV, p - offsetV, color); // begin bottom segment
 	VideoDriver->DrawLine(points[i++] - offsetV, p - offsetV, color); // end bottom segment
@@ -1841,7 +1841,7 @@ void GameControl::TryToTalk(Actor *source, const Actor *tgt) const
 	//Nidspecial1 is just an unused action existing in all games
 	//(non interactive demo)
 	//i found no fitting action which would emulate this kind of
-	//dialog initation
+	// dialog initiation
 	source->SetModal(Modal::None);
 	dialoghandler->SetTarget(tgt); //this is a hack, but not so deadly
 	source->CommandActor(GenerateActionDirect( "NIDSpecial1()", tgt));

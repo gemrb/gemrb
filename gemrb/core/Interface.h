@@ -284,7 +284,7 @@ public:
 	using tokens_t = std::unordered_map<ieVariable, String, CstrHashCI>;
 
 private:
-	// dirvers must be deallocated last (keep them at the top)
+	// drivers must be deallocated last (keep them at the top)
 	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
 	PluginHolder<Audio> AudioDriver;
 

@@ -926,7 +926,7 @@ int fx_remove_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->fxqueue.RemoveAllEffects(fx->Resource, FX_DURATION_INSTANT_LIMITED);
 			break;
 		default:
-			// NOTE: if this turns out to be too agressive and the original ignored permanent effects,
+			// NOTE: if this turns out to be too aggressive and the original ignored permanent effects,
 			// use a similar RemoveAllEffects call as above, only looking at live effects
 			target->fxqueue.RemoveAllEffects(fx->Resource);
 	}

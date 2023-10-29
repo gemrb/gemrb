@@ -101,7 +101,7 @@ private:
 
 	// attempt to set focus to view. return the focused view which is view if success or the currently focused view (if any) on failure
 	View* TrySetFocus(View* view);
-	bool IsDragable() const;
+	bool IsDraggable() const;
 
 	inline void DispatchMouseMotion(View*, const MouseEvent&);
 	inline void DispatchMouseDown(View*, const MouseEvent& me, unsigned short /*Mod*/);

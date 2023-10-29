@@ -91,11 +91,11 @@ public:
 	}
 };
 
-// this is used to syncronize the various "selected" Actor color animations
+// this is used to synchronize the various "selected" Actor color animations
 extern ColorCycle GlobalColorCycle;
 
 // This is supposed to be a fast optionally infinitely repeating transition
-// between 2 colors. We will create a global instance to syncronize many elements with the same animation.
+// between 2 colors. We will create a global instance to synchronize many elements with the same animation.
 class ColorAnimation : public GUIAnimation<Color> {
 public:
 	Color begin;

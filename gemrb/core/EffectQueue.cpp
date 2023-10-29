@@ -781,7 +781,7 @@ static inline bool CheckLevel(const Actor* target, Effect* fx)
 	return false;
 }
 
-//roll for the effect probability, there is a high and a low treshold, the d100
+// roll for the effect probability, there is a high and a low threshold, the d100
 //roll should hit in the middle
 static inline bool CheckProbability(const Effect* fx)
 {
@@ -2311,7 +2311,7 @@ int EffectQueue::CheckImmunity(Actor *target) const
 		return 0;
 	}
 
-	// Allegedly, the book of infinite spells needed this, but irresistable by level
+	// Allegedly, the book of infinite spells needed this, but irresistible by level
 	// spells got fx->Power = 0, so i added those exceptions and removed returning here for fx->InventorySlot
 
 	// check level resistances

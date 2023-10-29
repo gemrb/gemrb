@@ -1149,7 +1149,7 @@ void Projectile::SecondaryTarget()
 		}
 
 		Projectile *pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
-		// run special targetting modes on one child only, so target-all and similar don't run payload too often
+		// run special targeting modes on one child only, so target-all and similar don't run payload too often
 		EffectQueue projQueue;
 		ProcessEffects(projQueue, owner, nullptr, first);
 		pro->SetEffectsCopy(projQueue, Pos);

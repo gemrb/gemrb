@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# a library of any functions for spell(book) managment
+# a library of any functions for spell(book) management
 
 import GemRB
 import CommonTables

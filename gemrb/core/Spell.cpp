@@ -206,7 +206,7 @@ EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_
 		if ((Flags & SF_SIMPLIFIED_DURATION) && block_index >= 0 && fx.HasDuration()) {
 			fx.Duration = (TimePerLevel * block_index + TimeConstant) * core->Time.round_sec;
 		} else if (tables.pstflags) {
-			// many pst spells require unhacking and we can't use the simplified duration bit and custome projectiles for all
+			// many pst spells require unhacking and we can't use the simplified duration bit and custom projectiles for all
 			// luckily this was redone in pstee simply with extra extended headers
 			// NOTE: some of these have several headers for increased range per level, but
 			//       simplified duration always operates only on the first, so we can use it even less

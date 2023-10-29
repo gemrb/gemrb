@@ -422,7 +422,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 
 		if (sm) {
 			// night small map is *optional*!
-			// keep the exising map if this one is null
+			// keep the existing map if this one is null
 			map->SmallMap = sm->GetSprite2D();
 		}
 		

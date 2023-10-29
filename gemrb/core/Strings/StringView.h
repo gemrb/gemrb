@@ -25,7 +25,7 @@
 #include <iterator>
 #include <type_traits>
 
-// SFINAE garbage to only enable funtions for strings of known size
+// SFINAE garbage to only enable functions for strings of known size
 // i'm sure its not perfect, but it meets our needs
 #define ENABLE_CHAR_RANGE(PARAM) std::enable_if_t< \
 (!std::is_enum<PARAM>::value && !std::is_fundamental<PARAM>::value && !std::is_pointer<PARAM>::value) \

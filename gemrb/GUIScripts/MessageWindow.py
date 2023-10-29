@@ -29,7 +29,7 @@ from GUIDefines import *
 
 def OnLoad():
 	# just load the medium window always. we can shrink/expand it, but it is the one with both controls
-	# this saves us from haveing to bend over backwards to load the new window and move the text to it (its also shorter code)
+	# this saves us from having to bend over backwards to load the new window and move the text to it (its also shorter code)
 	# for reference: medium = 12 = guiwdmb8, large = 7 = guwbtp38, small = 4 = guwbtp28
 	MessageWindow = GemRB.LoadWindow(12, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	MessageWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)

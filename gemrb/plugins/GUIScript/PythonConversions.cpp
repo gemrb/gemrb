@@ -198,7 +198,7 @@ String PyString_AsStringObj(PyObject* obj)
 	iconv_close(cd);
 
 	if (ret == static_cast<size_t>(-1)) {
-		Log(ERROR, "PythonConversions", "iconv failed to convert a Pythong string from {} to UTF-16 with error: {}", encoding, strerror(errno));
+		Log(ERROR, "PythonConversions", "iconv failed to convert a Python string from {} to UTF-16 with error: {}", encoding, strerror(errno));
 		return u"";
 	}
 
@@ -213,7 +213,7 @@ String PyString_AsStringObj(PyObject* obj)
 PyStringWrapper PyString_AsStringView(PyObject* obj)
 {
 	// TODO: this is the same as PyString_AsString
-	// it exists to diferentiate uses so that we can weed out PyString_AsString
+	// it exists to differentiate uses so that we can weed out PyString_AsString
 	// and replace them with PyUnicode_Decode or other alternatives
 	return PyStringWrapper(obj, core->config.SystemEncoding.c_str());
 }

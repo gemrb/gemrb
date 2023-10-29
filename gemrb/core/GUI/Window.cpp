@@ -291,7 +291,7 @@ View* Window::TrySetFocus(View* target)
 	return newFocus;
 }
 
-bool Window::IsDragable() const
+bool Window::IsDraggable() const
 {
 	if (trackingView != this)
 	{
@@ -490,7 +490,7 @@ bool Window::DispatchEvent(const Event& event)
 
 	Point screenPos = event.mouse.Pos();
 	if (!frame.PointInside(screenPos) && trackingView == nullptr) {
-		// this can hapen if the window is modal since it will absorb all events
+		// this can happen if the window is modal since it will absorb all events
 		// the window manager maybe shouldnt dispatch the events in this case
 		// but this is a public function and its possible to post a phoney event from anywhere anyway
 		return true;
@@ -499,7 +499,7 @@ bool Window::DispatchEvent(const Event& event)
 	target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
 	assert(target == nullptr || target->IsVisible());
 
-	if (IsDragable() && target == nullptr) {
+	if (IsDraggable() && target == nullptr) {
 		target = this;
 	}
 
@@ -609,7 +609,7 @@ bool Window::OnMouseDrag(const MouseEvent& me)
 {
 	assert(me.buttonStates);
 	// dragging the window to a new position. only happens with left mouse.
-	if (IsDragable()) {
+	if (IsDraggable()) {
 		Point newOrigin = frame.origin - me.Delta();
 		SetFrameOrigin(newOrigin);
 	} else {

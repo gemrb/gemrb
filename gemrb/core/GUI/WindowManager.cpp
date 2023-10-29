@@ -351,7 +351,7 @@ Window* WindowManager::GetFocusWindow() const
 	}
 
 	// for all intents and purposes there must always be a window considered to be the focus
-	// gameWin is the "root" window so it will be considered the focus if no eligable windows are
+	// gameWin is the "root" window so it will be considered the focus if no eligible windows are
 	return gameWin;
 }
 

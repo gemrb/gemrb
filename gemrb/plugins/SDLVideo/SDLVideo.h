@@ -101,7 +101,7 @@ protected:
 	void BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = nullptr);
 
 	int PollEvents() override;
-	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
+	/* used to process the SDL events dequeued by PollEvents or an arbitrary event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
 	void Wait(uint32_t w) override { SDL_Delay(w); }
 

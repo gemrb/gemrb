@@ -234,7 +234,7 @@ void Font::CreateAliasForChar(ieWord chr, ieWord alias)
 	assert(AtlasIndex.size() > chr && AtlasIndex[chr].pageIdx != static_cast<ieWord>(-1));
 
 	// we need to now find the page for the existing character and add this new one to that page
-	const GlyphIndexEntry& idx = AtlasIndex[chr]; // this referenece may become invalid after call to CreateGlyphIndex!
+	const GlyphIndexEntry& idx = AtlasIndex[chr]; // this reference may become invalid after call to CreateGlyphIndex!
 	ieWord pageIdx = idx.pageIdx;
 	CreateGlyphIndex(alias, pageIdx, idx.glyph);
 	Atlas[pageIdx]->MapSheetSegment(alias, (*Atlas[pageIdx])[chr]);

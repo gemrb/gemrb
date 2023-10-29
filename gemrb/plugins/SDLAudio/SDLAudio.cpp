@@ -59,7 +59,7 @@ bool SDLAudioSoundHandle::Playing()
 
 void SDLAudioSoundHandle::Stop()
 {
-	// Mix_FadeOutChannel is not as agressive sounding (especially when stopping spellcasting) as Mix_HaltChannel
+	// Mix_FadeOutChannel is not as aggressive sounding (especially when stopping spellcasting) as Mix_HaltChannel
 	Mix_FadeOutChannel(chunkChannel, 500);
 }
 

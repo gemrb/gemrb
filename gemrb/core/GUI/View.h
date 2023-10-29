@@ -58,7 +58,7 @@ public:
 		ResizeVertical = ResizeTop|ResizeBottom, // top+bottom effectively resizes me vertically
 		ResizeLeft = 1 << 3, // keep my left relative to my super
 		ResizeRight = 1 << 4, // keep my right relative to my super
-		ResizeHorizontal = ResizeLeft|ResizeRight, // top+bottom effectively resizes me horizontaly
+		ResizeHorizontal = ResizeLeft | ResizeRight, // left + right effectively resizes me horizontally
 		ResizeAll = ResizeVertical|ResizeHorizontal, // resize me relative to my super
 		
 		// TODO: move these to TextContainer

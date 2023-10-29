@@ -72,7 +72,7 @@ void Control::SetActionInterval(unsigned int interval)
 {
 	repeatDelay = interval;
 	if (actionTimer) {
-		actionTimer->SetInverval(repeatDelay);
+		actionTimer->SetInterval(repeatDelay);
 	}
 }
 

@@ -105,7 +105,7 @@ ieStrRef DisplayMessage::StrRefs::Get(HCStrings idx, const Scriptable* speaker) 
 
 		// handle flags mode 1 and 2
 		// figure out PC index (TNO, Morte, Annah, Dakkon, FFG, Nordom, Ignus, Vhailor), anyone else
-		// then use it to calculate presonalized feedback strings
+		// then use it to calculate personalized feedback strings
 		int pcOffset;
 		int specific = gabber->GetStat(IE_SPECIFIC);
 		const std::array<int, 8> spec2offset = { 0, 7, 5, 6, 4, 3, 2, 1 };
@@ -124,7 +124,7 @@ ieStrRef DisplayMessage::StrRefs::Get(HCStrings idx, const Scriptable* speaker) 
 
 void DisplayMessage::LoadStringRefs()
 {
-	// "strings" is the dafault table. we could, in theory, load other tables
+	// "strings" is the default table. we could, in theory, load other tables
 	static const std::string stringTableName = "strings";
 	if (SRefs.loadedTable != stringTableName) {
 		SRefs.LoadTable(stringTableName);

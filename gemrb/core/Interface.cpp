@@ -209,7 +209,7 @@ ItemDragOp::ItemDragOp(CREItem* item)
 
 	cursor = pic;
 
-	// FIXME: this VarName is not consistant
+	// FIXME: this VarName is not consistent
 	dragDummy.BindDictVariable("itembutton", Control::INVALID_VALUE);
 }
 
@@ -305,7 +305,7 @@ Interface::Interface(CoreSettings&& cfg)
 	path = PathJoin(config.GamePath, config.GameDataPath);
 	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	// accomodating silly installers that create a data/Data/.* structure
+	// accommodating silly installers that create a data/Data/.* structure
 	path = PathJoin(config.GamePath, config.GameDataPath, "Data");
 	if (DirExists(path)) {
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);

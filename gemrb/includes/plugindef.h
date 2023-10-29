@@ -67,7 +67,7 @@
  *
  * The class given must derive from a subclass of Resource that
  * contains a static member ID of type TypeID. Any number of class
- * extension pairs can be registerd. They will be tried in turn when a
+ * extension pairs can be registered. They will be tried in turn when a
  * resource of the given subclass is requested.
  *
  * If the resource exists in bif files, then \ref{PLUGIN_IE_RESOURCE}
@@ -83,7 +83,7 @@
  * searching chitin.key.
  *
  * @def PLUGIN_INITIALIZER
- * Registers a function to do global intialization.
+ * Registers a function to do global initialization.
  * @param[in] func Function to call at startup.
  *
  * This function is called during Interface initialization.

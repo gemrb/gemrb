@@ -83,7 +83,7 @@ private:
 	std::vector< BIFEntry> biffiles;
 	std::unordered_map<MapKey, ieDword, MapKeyHash> resources;
 
-	/** Gets the stream assoicated to a RESKey */
+	/** Gets the stream associated to a RESKey */
 	DataStream *GetStream(const ResRef&, ieWord type);
 public:
 	bool Open(const path_t& file, std::string desc) override;

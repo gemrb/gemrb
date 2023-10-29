@@ -898,7 +898,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			}
 
 			// don't stack strength spells
-			// potentially too agressive, since the durations vary a lot — did old ones just get suppressed?
+			// potentially too aggressive, since the durations vary a lot — did old ones just get suppressed?
 			int duration = core->Time.hour_sec * fx->CasterLevel;
 			if (fx->SavingThrowBonus == 1) { // power of one - 286
 				duration /= 2;

@@ -378,7 +378,7 @@ static void GetScrollbar(DataStream* str, Control*& ctrl, const Region& ctrlFram
 			ta->SetScrollbar(sb);
 		} else {
 			ctrl = sb;
-			// NOTE: we dont delete this, becuase there are at least a few instances
+			// NOTE: we dont delete this, because there are at least a few instances
 			// where the CHU has this assigned to a text area even tho there isnt one! (BG1 GUISTORE:RUMORS, PST ContainerWindow)
 			// set them invisible instead, we will unhide them in the scripts that need them
 			sb->SetVisible(false);

@@ -94,7 +94,7 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 
 	ResRef res = newOverlays->TilesetResRef;
 	uint8_t len = res.length();
-	// in BG1 extended night WEDs alway reference the day TIS instead of the matching night TIS
+	// in BG1 extended night WEDs always reference the day TIS instead of the matching night TIS
 	if (ExtendedNight && len == 6) {
 		res[len] = 'N';
 		if (!gamedata->Exists(res, IE_TIS_CLASS_ID)) {

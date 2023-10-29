@@ -28,7 +28,7 @@
 namespace GemRB {
 
 /**CHU File Importer Class
-  *@author GemRB Developement Team
+  *@author GemRB Development Team
   */
 
 class CHUImporter : public GUIFactory {

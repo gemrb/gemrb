@@ -57,8 +57,8 @@ GEM_EXPORT bool intersectSegmentScanline(const Point& a, const Point& b, int y, 
  return vector of Points composing a circle of specified radius at origin
  since the points are ordered by octant, they are suitable for connecting as lines to create a filled circle
 
- PlotCircle uses the laws of symetry to draw up to 8 octants (using all 8 yields a complete circle) of a circle at once
- The octants parameter is a bitfield where each bit coresponds to an octant. See the diagram to understand how they are ordered.
+ PlotCircle uses the laws of symmetry to draw up to 8 octants (using all 8 yields a complete circle) of a circle at once
+ The octants parameter is a bitfield where each bit corresponds to an octant. See the diagram to understand how they are ordered.
 	  1   0
    3 ⋱  ⋮  ⋰2
   3____⋱⋮⋰___2

@@ -286,7 +286,7 @@ public:
 	// State relating to the currently-running action.
 	int CurrentActionState = 0;
 	ieDword CurrentActionTarget = 0;
-	bool CurrentActionInterruptable = true;
+	bool CurrentActionInterruptible = true;
 	ieDword CurrentActionTicks = 0;
 
 	std::array<GameScript*, MAX_SCRIPTS> Scripts {};

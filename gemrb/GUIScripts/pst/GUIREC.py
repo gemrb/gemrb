@@ -1012,7 +1012,7 @@ def OpenLevelUpWindow ():
 			SavThrTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "SAVE"))
 			# Updating the current saving throws. They are changed only if the
 			# new ones are better than current. The smaller the number, the better.
-			# We need to substract one from the NextLevel, so that we get right values.
+			# We need to subtract one from the NextLevel, so that we get right values.
 			# We also need to check if NextLevel is larger than 21, since after that point
 			# the table runs out, and the throws remain the same
 			if NextLevel < 22:

@@ -199,7 +199,7 @@ void GameScript::RealSetGlobalTimer(Scriptable* Sender, Action* parameters)
 }
 
 // buggy in all engines, even ees, temporarily wiping other IDS
-// fields and permanently reseting IE_GENERAL to 0
+// fields and permanently resetting IE_GENERAL to 0
 // Bubb's description:
 // These actions add/remove the creature to/from an internal list that keeps track of
 // all familiars. Being in this list enables a majority of the engine's special casing
@@ -311,7 +311,7 @@ void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
 inline void PermanentStatChangeFeedback(int stat, const Actor* actor)
 {
 	// figure out PC index (TNO, Morte, Annah, Dakkon, FFG, Nordom, Ignus, Vhailor)
-	// then use it to calculate presonalized feedback strings
+	// then use it to calculate personalized feedback strings
 	int spec2offset[] = { 0, 7, 5, 6, 4, 3, 2, 1 };
 	int pcOffset = spec2offset[actor->GetStat(IE_SPECIFIC) - 2];
 
@@ -1954,7 +1954,7 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	actor->DestroySelf();
-	// needeed in pst #532, but softly breaks bg2 #1179
+	// needed in pst #532, but softly breaks bg2 #1179
 	if (actor == core->GetCutSceneRunner() && core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 		core->SetCutSceneMode(false);
 	}
@@ -2698,7 +2698,7 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
-//casting time is calculated, not interruptable
+// casting time is calculated, not interruptible
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
@@ -2716,7 +2716,7 @@ void GameScript::ForceSpellRange(Scriptable* Sender, Action* parameters)
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
-//casting time is calculated, not interruptable
+// casting time is calculated, not interruptible
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
@@ -2734,7 +2734,7 @@ void GameScript::ForceSpellPointRange(Scriptable* Sender, Action* parameters)
 }
 
 //ForceSpell with zero casting time
-//zero casting time, no depletion, not interruptable
+// zero casting time, no depletion, not interruptible
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 {
@@ -2742,7 +2742,7 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 }
 
 //ForceSpellPoint with zero casting time
-//zero casting time, no depletion (finish casting at point), not interruptable
+// zero casting time, no depletion (finish casting at point), not interruptible
 //no CFB
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
@@ -3261,7 +3261,7 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	actor->CurrentActionInterruptable = false;
+	actor->CurrentActionInterruptible = false;
 	if (!Sender->CurrentActionTicks && parameters->int0Parameter) {
 		// set countdown on first run
 		Sender->CurrentActionState = parameters->int0Parameter;
@@ -3275,7 +3275,7 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 	actor->CurrentActionState--;
 }
 
-void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
+void GameScript::PlayDeadInterruptible(Scriptable* Sender, Action* parameters)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
 	if (!actor) {
@@ -4101,7 +4101,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	act->ApplyKit(false, Actor::GetClassID(ISRANGER));
 }
 
-//transfering item from Sender to target, target must be an actor
+// transferring item from Sender to target, target must be an actor
 //if target can't get it, it will be dropped at its feet
 //a container or an actor can take an item from someone
 void GameScript::GetItem(Scriptable* Sender, Action* parameters)
@@ -6301,7 +6301,7 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//the following part is coming from GUISCript.cpp with trivial changes
+	// the following part is coming from GUIScript.cpp with trivial changes
 	int Slot = c->inventory.FindItem(parameters->resref0Parameter, 0);
 	if (Slot<0) {
 		return;

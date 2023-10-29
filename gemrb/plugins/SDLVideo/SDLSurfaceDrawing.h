@@ -293,7 +293,7 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 	// we will just overestimate by reserving shortLen + longLen Points
 	// we continually recycle this vector
 	// this prevents constant allocation/deallocation
-	// while drawing. Yes, its permanantly used memory, but we do
+	// while drawing. Yes, its permanently used memory, but we do
 	// enough drawing that this is not a problem (its a tiny amount anyway)
 	// Point is trivial and clear() should be constant
 	static std::vector<Point> s_points;
@@ -369,7 +369,7 @@ void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Poi
 	} else {
 		// we continually recycle this vector
 		// this prevents constant allocation/deallocation
-		// while drawing. Yes, its permanantly used memory, but we do
+		// while drawing. Yes, its permanently used memory, but we do
 		// enough drawing that this is not a problem (its a tiny amount anyway)
 		// Point is trivial and clear() should be constant
 		static std::vector<Point> s_points;

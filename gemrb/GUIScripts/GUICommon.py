@@ -446,7 +446,7 @@ def IsDualClassed(actor, verbose):
 		return (2, FirstClassIndex, SecondClassIndex)
 
 def IsDualSwap (actor, override=None):
-	"""Returns true if the dualed classes are reverse of expection.
+	"""Returns true if the dualed classes are reverse of expectation.
 
 	This can happen, because the engine gives dualclass characters the same ID as
 	their multiclass counterpart (eg. FIGHTER_MAGE = 3). Logic would dictate that

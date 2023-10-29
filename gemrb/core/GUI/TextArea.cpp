@@ -352,7 +352,7 @@ void TextArea::UpdateScrollview()
 			y = nodeBounds.y - LineHeight();
 		}
 
-		// FIXME: must update before the scroll, but this should be automaticly done as a reaction to changing sizes/origins of subviews
+		// FIXME: must update before the scroll, but this should be automatically done as a reaction to changing sizes/origins of subviews
 		scrollview.Update();
 		scrollview.ScrollTo(Point(0, -y), anim);
 	} else if (!core->HasFeature(GFFlags::DIALOGUE_SCROLLS)) {

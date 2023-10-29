@@ -30,7 +30,7 @@ using Callback = std::function<R(ARGS...)>;
 
 using EventHandler = std::function<void()>;
 
-// std::function has an explicitly deleted operator== so we need to write our own comparitor
+// std::function has an explicitly deleted operator== so we need to write our own comparator
 // that makes sense for our purposes
 template <typename R, typename... ARGS>
 bool FunctionTargetsEqual(const std::function<R(ARGS...)>& lhs, const std::function<R(ARGS...)>& rhs)

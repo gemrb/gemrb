@@ -145,7 +145,7 @@ def OpenSkillsWindow(chargen, level=0):
 
 	PointsLeft *= LevelDiff
 
-	# Humans recieve +2 skill points at level 1 and +1 skill points each level thereafter
+	# Humans receive +2 skill points at level 1 and +1 skill points each level thereafter
 	RaceBonusTable = GemRB.LoadTable ("racskill")
 	RaceName = CommonTables.Races.GetRowName (IDLUCommon.GetRace (pc))
 	PointsLeft += RaceBonusTable.GetValue (RaceName, "BONUS") * LevelDiff

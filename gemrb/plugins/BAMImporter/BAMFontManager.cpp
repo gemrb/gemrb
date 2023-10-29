@@ -75,7 +75,7 @@ Holder<Font> BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*styl
 	// I think cycle 1 is for determining line height (it appears to be a cursor)
 	// this is important because iterating the initials font would give an incorrect LineHeight
 	// initials should still have 13 for the line height because they have a descent that covers
-	// multiple lines (2 in BG2). numeric and state fonts don't posess these magic glyphs,
+	// multiple lines (2 in BG2). Numeric and state fonts don't possess these magic glyphs,
 	// but it is harmless to use them the same way
 	ieWord baseLine = 0;
 	ieWord lineHeight = 0;

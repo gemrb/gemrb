@@ -91,7 +91,7 @@ GEM_EXPORT void PathAppend(path_t& target, const path_t& name);
  * @param[in] ... list of path components to join
  * @return the joined path
  *
- * properly handles the case when paramater contain slashes.
+ * properly handles the case when parameters contain slashes.
  *
  * Example:
  * path_t path = PathJoin(core->GUIScriptsPath, core->GameType, 'GUIDefines.py');

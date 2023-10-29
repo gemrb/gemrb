@@ -72,7 +72,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const path_t& pa
 			laststep++;
 		}
 	}
-	out.Close(); // This is necesary, since windows won't open the file otherwise.
+	out.Close(); // This is necessary, since windows won't open the file otherwise.
 #if defined(SUPPORTS_MEMSTREAM)
 	return new MappedFileMemoryStream{path};
 #else

@@ -527,7 +527,7 @@ void Map::MoveToNewArea(const ResRef &area, const ieVariable& entrance, unsigned
 	//make a random pick
 
 	Game* game = core->GetGame();
-	const Map* map = game->GetMap(area, false); // add a GUIEnhacement bit for this if anyone ever complains we only show the first loadscreen
+	const Map* map = game->GetMap(area, false); // add a GUIEnhancement bit for this if anyone ever complains we only show the first loadscreen
 	if (EveryOne & CT_GO_CLOSER) {
 		//copy the area name if it exists on the worldmap
 		const WMPAreaEntry* entry = core->GetWorldMap()->FindNearestEntry(area);
@@ -2861,7 +2861,7 @@ bool Map::CanFree()
 		}
 
 		const Action *current = actor->GetCurrentAction();
-		// maybe we should also catch non-interruptible actions (!actor->CurrentActionInterruptable)
+		// maybe we should also catch non-interruptible actions (!actor->CurrentActionInterruptible)
 		// but it has not been needed yet
 		if (current && actionflags[current->actionID] & AF_CHASE) {
 			// limit to situations where pcs are targets, so to not delay area unloading too much

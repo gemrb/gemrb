@@ -238,7 +238,7 @@ public:
 
 	explicit RGBBlendingPipeline(const Color& tint, void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
 	: tint(tint), blender(blender) {
-		shift = 8; // we shift by 8 as a fast aproximation of dividing by 255
+		shift = 8; // we shift by 8 as a fast approximation of dividing by 255
 		if (SHADE == SHADER::GREYSCALE || SHADE == SHADER::SEPIA) {
 			shift += 2;
 		}
@@ -281,7 +281,7 @@ public:
 				}
 				break;
 			case SHADER::NONE:
-				// fallthough
+				// fallthrough
 			default:
 				break;
 		}

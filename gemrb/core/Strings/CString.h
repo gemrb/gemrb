@@ -65,7 +65,7 @@ template <int(*CMP)(const char*, const char*, size_t) = strncmp>
 struct CstrLess
 {
 	bool operator() (const StringView& lhs, const StringView& rhs) const {
-		// FIXME: this is broken when a StringView containes '\0'
+		// FIXME: this is broken when a StringView contains '\0'
 		size_t len = std::min(lhs.length(), rhs.length());
 		int ret = CMP(lhs.c_str(), rhs.c_str(), len);
 		if (ret == 0 && lhs.length() < rhs.length()) {
@@ -81,7 +81,7 @@ template <int(*CMP)(const char*, const char*, size_t) = strncmp>
 struct CstrEq
 {
 	bool operator() (const StringView& lhs, const StringView& rhs) const {
-		// FIXME: this is broken when a StringView containes '\0'
+		// FIXME: this is broken when a StringView contains '\0'
 		if (lhs.length() != rhs.length()) return false;
 		return CMP(lhs.c_str(), rhs.c_str(), lhs.length()) == 0;
 	}

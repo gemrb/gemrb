@@ -52,7 +52,7 @@ enum class ieStrRef : ieDword {
 	BIO_START = 62016,            //first BIO string
 	BIO_END   = (BIO_START + 5),  //last BIO string
 	OVERRIDE_START = 450000,
-	// not actually an ieStrRef, but can be &'ded with an ieStrRef to detrmine which TLK (eg dialogf.tlk) to use
+	// not actually an ieStrRef, but can be &'ded with an ieStrRef to determine which TLK (eg dialogf.tlk) to use
 	ALTREF = 0x0100000,
 	
 	// NOTE: all strrefs below this point are contextual
@@ -134,7 +134,7 @@ inline ieVariable MakeVariable(const StringView& sv) {
 
 }
 
-// FIXME: these specializations are only required due to something in fmt/ranges.h being prefered
+// FIXME: these specializations are only required due to something in fmt/ranges.h being preferred
 // over our own format_as (I've also tried formatter and operator<<)
 namespace fmt {
 

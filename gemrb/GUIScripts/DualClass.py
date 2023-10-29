@@ -575,7 +575,7 @@ def OpenSkillsWindow ():
 	"""Opens the skills selection window.
 
 	This will allow the selection of thief skills for appropriate classes, or
-	auto-assign them for classes that recieve skills based on level."""
+	auto-assign them for classes that receive skills based on level."""
 
 	global DCSkillsWindow, DCSkillsDoneButton
 

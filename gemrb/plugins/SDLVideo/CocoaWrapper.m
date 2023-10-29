@@ -20,7 +20,7 @@
 #import <SDL.h>
 #import "CocoaWrapper.h"
 
-// SDL 1.3 has its own App Delegate, but curently all it does is what this delegate category is doing
+// SDL 1.3 has its own App Delegate, but currently all it does is what this delegate category is doing
 // SDL is nice enough to check if a delegate exists prior to assigning its own.
 
 /*

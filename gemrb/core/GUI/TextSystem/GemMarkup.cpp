@@ -174,7 +174,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 							state = OPEN_TAG;
 							saved = token;
 							token.clear();
-							continue; // + means concatonate with the existing text
+							continue; // + means concatenate with the existing text
 						} else {
 							--it;
 							state = OPEN_TAG;

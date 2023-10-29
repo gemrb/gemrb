@@ -81,7 +81,7 @@ private:
 	WindowList windows;
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened
 
-	Region screen; // only a Region for convinience. we dont use x,y
+	Region screen; // only a Region for convenience - we dont use x,y
 	Window* gameWin;
 	Window* hoverWin = nullptr;
 	Window* trackingWin = nullptr;
@@ -138,7 +138,7 @@ public:
 
 	CursorFeedback SetCursorFeedback(CursorFeedback feedback);
 
-	// all drawing will be done directly on the screen until DrawingLock is destoryed
+	// all drawing will be done directly on the screen until DrawingLock is destroyed
 	HUDLock DrawHUD() const;
 
 	/*

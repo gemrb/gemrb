@@ -692,7 +692,7 @@ def UpdateSlot (pc, slot):
 	Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
-	# characters should auto-identify any item they recieve
+	# characters should auto-identify any item they receive
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		TryAutoIdentification(pc, item, slot+1, slot_item, GemRB.GetVar("GUIEnhancements")&GE_TRY_IDENTIFY_ON_TRANSFER)
@@ -1171,7 +1171,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	if item["MaxStackAmount"] > 1:
 		Button.SetText (str (Slot["Usages0"]))
 
-	# auto-identify mundane items; the actual indentification will happen on transfer
+	# auto-identify mundane items; the actual identification will happen on transfer
 	if not identified and item["LoreToID"] == 0:
 		identified = True
 

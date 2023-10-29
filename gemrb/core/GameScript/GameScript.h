@@ -265,13 +265,13 @@ public:
 	int int2Parameter = 0;
 	
 	union {
-		StringParam string0Parameter; // keep largest type first to 0 fill everythings
+		StringParam string0Parameter; // keep largest type first to 0 fill everything
 		ieVariable variable0Parameter;
 		ResRef resref0Parameter;
 	};
 	
 	union {
-		StringParam string1Parameter; // keep largest type first to 0 fill everythings
+		StringParam string1Parameter; // keep largest type first to 0 fill everything
 		ieVariable variable1Parameter;
 		ResRef resref1Parameter;
 	};
@@ -1217,7 +1217,7 @@ public: //Script Functions
 	static void PickUpItem(Scriptable* Sender, Action* parameters);
 	static void PlayBardSong(Scriptable* Sender, Action* parameters);
 	static void PlayDead(Scriptable* Sender, Action* parameters);
-	static void PlayDeadInterruptable(Scriptable* Sender, Action* parameters);
+	static void PlayDeadInterruptible(Scriptable* Sender, Action* parameters);
 	static void PlayerDialogue(Scriptable* Sender, Action* parameters);
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
 	static void PlaySequenceGlobal(Scriptable* Sender, Action* parameters);

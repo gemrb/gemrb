@@ -42,7 +42,7 @@ namespace GemRB {
 
 // !!! Keep this synchronized with GUIDefines !!!
 enum LogLevel : uint8_t {
-	INTERNAL = uint8_t(-1), // special value that can only be used by the logger itself. these messages cannot be supressed
+	INTERNAL = uint8_t(-1), // special value that can only be used by the logger itself. These messages cannot be suppressed
 	FATAL = 0,
 	ERROR = 1,
 	WARNING = 2,

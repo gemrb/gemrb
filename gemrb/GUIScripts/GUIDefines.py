@@ -26,7 +26,7 @@ IE_GUI_VIEW_RESIZE_BOTTOM		= 1 << 1 # keep my bottom relative to my super
 IE_GUI_VIEW_RESIZE_VERTICAL		= IE_GUI_VIEW_RESIZE_TOP|IE_GUI_VIEW_RESIZE_BOTTOM # top+bottom effectively resizes me vertically
 IE_GUI_VIEW_RESIZE_LEFT			= 1 << 3 # keep my left relative to my super
 IE_GUI_VIEW_RESIZE_RIGHT		= 1 << 4 # keep my right relative to my super
-IE_GUI_VIEW_RESIZE_HORIZONTAL	= IE_GUI_VIEW_RESIZE_LEFT|IE_GUI_VIEW_RESIZE_RIGHT # top+bottom effectively resizes me horizontaly
+IE_GUI_VIEW_RESIZE_HORIZONTAL	= IE_GUI_VIEW_RESIZE_LEFT | IE_GUI_VIEW_RESIZE_RIGHT # left + right effectively resizes me horizontally
 IE_GUI_VIEW_RESIZE_ALL			= IE_GUI_VIEW_RESIZE_VERTICAL|IE_GUI_VIEW_RESIZE_HORIZONTAL # resize me relative to my super
 
 # TODO: move these to TextContainer

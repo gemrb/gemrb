@@ -851,7 +851,7 @@ static const ActionLink actionnames[] = {
 	{"pickupitem", GameScript::PickUpItem, 0},
 	{"playbardsong", GameScript::PlayBardSong, AF_ALIVE},
 	{"playdead", GameScript::PlayDead,AF_BLOCKING|AF_ALIVE},
-	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,AF_BLOCKING|AF_ALIVE},
+	{"playdeadinterruptable", GameScript::PlayDeadInterruptible, AF_BLOCKING | AF_ALIVE},
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playsequence", GameScript::PlaySequence, 0},
@@ -2493,7 +2493,7 @@ static void HandleActionOverride(Scriptable* target, const Action* aC)
 		target->ClearActions(1);
 	} else if (core->HasFeature(GFFlags::RULES_3ED)) { // iwd2
 		// it was more complicated, always releasing if the game was paused — not something to replicate
-		if (target->CurrentActionInterruptable) {
+		if (target->CurrentActionInterruptible) {
 			target->ReleaseCurrentAction();
 		}
 	} else { // for all the games we don't understand fully yet
@@ -2505,7 +2505,7 @@ static void HandleActionOverride(Scriptable* target, const Action* aC)
 		assert(target->GetNextAction());
 		// there are plenty of places where it's vital that ActionOverride is not interrupted,
 		// so make double sure it doesn't happen
-		target->CurrentActionInterruptable = false;
+		target->CurrentActionInterruptible = false;
 	}
 }
 
@@ -2544,7 +2544,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	}
 
 	// check for ActionOverride
-	// actions use the second and third object, so this is only set when overriden (see GenerateActionCore)
+	// actions use the second and third object, so this is only set when overridden (see GenerateActionCore)
 	if (aC->objects[0]) {
 		Scriptable* scr = GetScriptableFromObject(Sender, aC->objects[0]);
 		if (CheckDeadException(scr, actionID)) {
@@ -2581,8 +2581,8 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	}
 	ActionFunction func = actions[actionID];
 	if (func) {
-		//turning off interruptable flag
-		//uninterruptable actions will set it back
+		// turning off interruptible flag
+		// uninterruptible actions will set it back
 		if (Sender->Type==ST_ACTOR) {
 			Sender->Activate();
 			if (actionflags[actionID] & AF_ALIVE && Sender->GetInternalFlag() & IF_STOPATTACK) {

@@ -298,7 +298,7 @@ bool FogRenderer::DrawFogCellByDirection(Point p, Direction direction, BlitFlags
 }
 
 bool FogRenderer::DrawFogCellByDirectionBAMs(Point p, Direction direction, BlitFlags flags) {
-	// supress compiler warnings about case not in enum by using UnderType
+	// suppress compiler warnings about case not in enum by using UnderType
 	switch (UnderType(direction) & 0xF) {
 		case UnderType(Direction::N):
 		case UnderType(Direction::W):

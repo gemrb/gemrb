@@ -166,7 +166,7 @@ def OpenLevelUpWindow():
 	print("NumClasses: " + str(NumClasses) + "\tActor NumClasses: " + str(actor.NumClasses()))
 
 	if IsDual:
-		# convert the classes from indicies to class id's
+		# convert the classes from indices to class id's
 		DualSwap = GUICommon.IsDualSwap (pc)
 		ClassName = GUICommon.GetClassRowName (Classes[0], "index")
 		KitName = ClassName # for simplicity throughout the code
@@ -542,7 +542,7 @@ def ReactivateBaseClass ():
 	"""Regains all abilities of the base dual-class.
 
 	Proficiencies, THACO, saves, spells, and innate abilites,
-	most noteably."""
+	most notably."""
 
 	# we construct the Classes array, so that the active class is always first and the base is second
 	ClassName = GUICommon.GetClassRowName (Classes[1], "class")

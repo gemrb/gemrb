@@ -190,7 +190,7 @@ public:
 
 	// draw a circle at origin with radius r
 	void DrawCircle(const Point& origin, uint16_t r, const Color& color, BlitFlags flags = BlitFlags::NONE);
-	// Draw an elipse bounded by rect
+	// Draw an ellipse bounded by rect
 	void DrawEllipse(const Region& rect, const Color& color, BlitFlags flags = BlitFlags::NONE);
 	/** Draws a polygon on the screen */
 	void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, BlitFlags flags = BlitFlags::NONE);

@@ -138,7 +138,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 			size_t begin = 0;
 			size_t end = 0;
 			do {
-				// process all overlaping exclusion zones until we trim down to the leftmost non conflicting region.
+				// process all overlapping exclusion zones until we trim down to the leftmost non conflicting region.
 				// check for intersections with other content
 				excluded = parent->ContentRegionForRect(lineSegment);
 				if (!excluded) {
@@ -333,7 +333,7 @@ void ContentContainer::WillDraw(const Region& drawFrame, const Region& clip)
 		sc.w += margin.right - diff;
 	}
 	
-	// TODO: if we ever support horzontal scrollbars these will need to be fixed
+	// TODO: if we ever support horizontal scrollbars these will need to be fixed
 	sc.y += margin.top;
 	sc.h -= margin.top + margin.bottom;
 
@@ -413,7 +413,7 @@ void ContentContainer::SizeChanged(const Size& /*oldSize*/)
 void ContentContainer::SubviewAdded(View* view, View* parent)
 {
 	if (parent == this) {
-		// ContentContainer should grow to the size of its (immidiate) subviews automatically
+		// ContentContainer should grow to the size of its (immediate) subviews automatically
 		const Region& subViewFrame = view->Frame();
 		Size s;
 		s.h = std::max(subViewFrame.y + subViewFrame.h, frame.h);
@@ -577,7 +577,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		ContentLayout::iterator i = std::find(layout.begin(), layout.end(), *clearit);
 		if (i != layout.end()) {
 			layoutPoint.reset(); // reset cached layoutPoint
-			// since 'layout' is sorted alongsize 'contents' we should be able clear everyting following 'i' and bail
+			// since 'layout' is sorted alongsize 'contents' we should be able clear everything following 'i' and bail
 			layout.erase(i, layout.end());
 			break;
 		}
@@ -736,7 +736,7 @@ String TextContainer::TextFrom(ContentList::const_iterator it) const
 		return u""; // must bail or things will get screwed up!
 	}
 
-	// iterate all the content and pick out the TextSpans and concatonate them into a single string
+	// iterate all the content and pick out the TextSpans and concatenate them into a single string
 	String text;
 	for (; it != contents.end(); ++it) {
 		if (const TextSpan* textSpan = static_cast<TextSpan*>(*it)) {

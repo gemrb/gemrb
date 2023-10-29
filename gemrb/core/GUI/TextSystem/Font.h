@@ -86,7 +86,7 @@ class GEM_EXPORT Font {
 	 Furthermore, a single page may grow too large to be used as a texture in OpenGL (esp for mobile devices).
 	 Therefore we generate pages of glyphs (1024 x LineHeight + descent) as sprites suitable for segmented blitting to the screen.
 	 The pixel data will be safely shared between the Sprite2D objects and the Glyph objects when the video driver is using software rendering
-	 so this isn't horribly wasteful useage of memory. Hardware acceleration will force the font to keep its own copy of pixel data.
+	 so this isn't horribly wasteful usage of memory. Hardware acceleration will force the font to keep its own copy of pixel data.
 	 
 	 One odd quirk in this implementation is that, since TTF fonts cannot be pregenerated (efficiently), we must defer creation of a page sprite 
 	 until either the page is full, or until a call to a print method is made.
@@ -99,12 +99,12 @@ public:
 	};
 	
 	struct StringSizeMetrics {
-		// specifiy behavior of StringSize based on values of struct
+		// specify behavior of StringSize based on values of struct
 		// StringSize will modify the struct with the results
 		Size size;		// maximum size allowed; updated with actual size <= initial value
 		size_t numChars; // maximum characters to size (0 implies no limit); updated with the count of characters that fit within size <= initial value
 		uint32_t numLines; // maximum number of lines to allow (use 0 for unlimited); updated with the actual number of lines that were used
-		bool forceBreak;// whether or not a break can occur without whitespace; updated to false if initially true and no force break occured
+		bool forceBreak;// whether or not a break can occur without whitespace; updated to false if initially true and no force break occurred
 	};
 
 private:
@@ -200,7 +200,7 @@ public:
 	/** Returns size of the string rendered in this font in pixels */
 	Size StringSize(const String&, StringSizeMetrics* metrics = NULL) const;
 
-	// like StringSize, but single line and doens't take whitespace into consideration
+	// like StringSize, but single line and doesn't take whitespace into consideration
 	size_t StringSizeWidth(const String&, size_t width, size_t* numChars = NULL) const;
 };
 

@@ -203,7 +203,7 @@ void SDL12VideoDriver::BlitSpriteRLEClipped(const Holder<Sprite2D>& spr, const R
 	unsigned int remflags = flags & ~(BlitFlags::BLENDED | BlitFlags::MIRRORX | BlitFlags::MIRRORY | BlitFlags::STENCIL_MASK);
 	if (remflags & BlitFlags::GREY) remflags &= ~BlitFlags::SEPIA;
 
-	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
+	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticeably to account for that.
 
 	if (remflags == BlitFlags::COLOR_MOD && tint.a == 255) {
 		SRTinter_Tint<true, true> tinter(tint);
@@ -322,7 +322,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const Region
 
 void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, SDL_Rect* src, SDL_Rect* dst, BlitFlags flags, Color tint)
 {
-	// must be checked afer palette versioning is done
+	// must be checked after palette versioning is done
 	
 	// the gamewin is an RGB surface (no alpha)
 	// RGBA->RGB with SDL_SRCALPHA

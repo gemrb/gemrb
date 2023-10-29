@@ -109,7 +109,7 @@ public:
 	Point origin;
 	Size size;
 	
-	// unfortunatly anonymous structs are an extension in C++...
+	// unfortunately anonymous structs are an extension in C++...
 	int& x = origin.x;
 	int& y = origin.y;
 	int& w = size.w;

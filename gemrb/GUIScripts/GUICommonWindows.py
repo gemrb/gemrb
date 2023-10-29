@@ -178,7 +178,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			# disabled/selected frame isn't present in .chu, defining it here
 			Button.SetSprites ("GUILSOP", 0,16,17,16,16)
 
-	# Party managment / character arbitration. Distinct form reform party window.
+	# Party management / character arbitration. Distinct form reform party window.
 	if not pst:
 		Button = Window.GetControl (OptionControl['Party'])
 		Button.OnPress (None) #TODO: OpenPartyWindow
@@ -1483,7 +1483,7 @@ def ToggleWindow(id, pack, pos=WINDOW_CENTER):
 # returns buttons and a numerical index
 # does nothing new in pst, iwd2 due to layout
 # in the rest, it will enable extra button generation for higher resolutions
-# Mode determines arrangment direction, horizontal being for party reform and potentially save/load
+# Mode determines arrangement direction, horizontal being for party reform and potentially save/load
 def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	pairs = {}
 
@@ -1931,7 +1931,7 @@ def PortraitButtonOnPress (btn):
 	return
 
 def PortraitButtonOnShiftPress (btn):
-	"""Handles selecting multiple portaits with shift."""
+	"""Handles selecting multiple portraits with shift."""
 	
 	pcID = btn.Value
 	if (not SelectionChangeHandler):

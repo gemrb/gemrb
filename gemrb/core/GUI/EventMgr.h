@@ -115,7 +115,7 @@ struct GEM_EXPORT EventBase {
 };
 
 struct GEM_EXPORT ScreenEvent : public EventBase {
-	// cant use Point due to non trival constructor
+	// can't use Point due to non-trivial constructor
 	int x,y; // mouse position at time of event
 	int deltaX, deltaY; // the vector of motion/scroll
 
@@ -265,7 +265,7 @@ public:
 	using EventCallback = Callback<bool, const Event&>;
 	using TapMonitorId = size_t;
 	
-	static constexpr int mouseClickRadius = 5; // radius for reapeat click events
+	static constexpr int mouseClickRadius = 5; // radius for repeat click events
 	static constexpr int mouseDragRadius = 10; // radius for drag events
 
 	static tick_t DCDelay;

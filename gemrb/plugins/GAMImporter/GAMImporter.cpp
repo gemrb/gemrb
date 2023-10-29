@@ -817,7 +817,7 @@ int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 	case GAM_VER_TOB:
 	case GAM_VER_IWD2:
 		stream->WriteDword(game->Reputation);
-		stream->WriteResRefUC(masterArea); // current area, but usually overriden via NPCAreaViewed
+		stream->WriteResRefUC(masterArea); // current area, but usually overridden via NPCAreaViewed
 		stream->WriteDword(game->ControlStatus);
 		stream->WriteDword(game->Expansion);
 		stream->WriteDword(FamiliarsOffset);

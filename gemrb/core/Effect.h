@@ -70,7 +70,7 @@ namespace GemRB {
 #define FX_NO_RESIST_NO_DISPEL      0
 #define FX_CAN_DISPEL               1
 #define FX_CAN_RESIST_CAN_DISPEL     1
-//#define FX_CAN_RESIST_NO_DISPEL     2   //same as 0 (not resistable, not dispellable)
+//#define FX_CAN_RESIST_NO_DISPEL     2   // same as 0 (not resistible, not dispellable)
 #define FX_NO_RESIST_CAN_DISPEL    3
 #define FX_NO_RESIST_BYPASS_BOUNCE 4 // EE bit to bypass deflection/reflection/trap opcodes
 #define FX_NO_RESIST_SELF_TARGETED 8 // TODO: EE bit to fix an exploit, see IESDP
@@ -116,7 +116,7 @@ struct GEM_EXPORT Effect {
 	ieWord ProbabilityRangeMin = 0;
 	
 	union {
-		ResourceGroup resources; // keep largest type first to 0 fill everythings
+		ResourceGroup resources; // keep largest type first to 0 fill everything
 		ieVariable VariableName;
 	};
 

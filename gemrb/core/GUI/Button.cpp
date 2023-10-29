@@ -85,7 +85,7 @@ void Button::SetImage(ButtonImage type, Holder<Sprite2D> img)
 	} else {
 		buttonImages[type] = std::move(img);
 		/*
-		 currently IE_GUI_BUTTON_NO_IMAGE cannot be infered from the presence or lack of images
+		 currently IE_GUI_BUTTON_NO_IMAGE cannot be inferred from the presence or lack of images
 		 leaving this here commented out in case it may be useful in the future.
 
 		if (img) {

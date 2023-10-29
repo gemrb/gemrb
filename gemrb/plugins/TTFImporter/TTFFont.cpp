@@ -120,7 +120,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	// TODO: handle styles for fonts that dont do it themselves
 
 	 FIXME: maxx is currently unused.
-	 glyph spacing is non existant right now
+	 glyph spacing is non-existent right now
 	 font styles are non functional too
 	 */
 

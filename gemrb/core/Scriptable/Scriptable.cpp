@@ -146,7 +146,7 @@ void Scriptable::SetScript(const ResRef &aScript, int idx, bool ai)
 		delete Scripts[idx];
 	}
 	Scripts[idx] = NULL;
-	// NONE is an 'invalid' script name, seldomly used to reset the slot, which we do above
+	// NONE is an 'invalid' script name, seldom used to reset the slot, which we do above
 	// This check is to prevent flooding of the console
 	if (!aScript.IsEmpty() && aScript != "NONE") {
 		if (idx!=AI_SCRIPT_LEVEL) ai = false;
@@ -269,12 +269,12 @@ void Scriptable::ExecuteScript(int scriptCount)
 		}
 	}
 
-	// Don't abort if there is a running non-interruptable action.
+	// Don't abort if there is a running non-interruptible action.
 	// NOTE: the original didn't check for the next action, causing odd timing bugs
 	if ((InternalFlags & IF_NOINT) && (CurrentAction || GetNextAction())) {
 		return;
 	}
-	if (!CurrentActionInterruptable) {
+	if (!CurrentActionInterruptible) {
 		// sanity check
 		if (!CurrentAction && !GetNextAction()) {
 			error("Scriptable", "No current action and no next action.");
@@ -432,7 +432,7 @@ void Scriptable::ClearActions(int skipFlags)
 			savedCurrentAction = true;
 		} else if (skipFlags == 2 && CurrentAction && actionflags[CurrentAction->actionID] & AF_IWD2_OVERRIDE) {
 			savedCurrentAction = true;
-		} else if (skipFlags == 3 && (CurrentActionInterruptable == false || InternalFlags & IF_NOINT)) {
+		} else if (skipFlags == 3 && (CurrentActionInterruptible == false || InternalFlags & IF_NOINT)) {
 			savedCurrentAction = true;
 		} else {
 			ReleaseCurrentAction();
@@ -477,7 +477,7 @@ void Scriptable::ReleaseCurrentAction()
 
 	CurrentActionState = 0;
 	CurrentActionTarget = 0;
-	CurrentActionInterruptable = true;
+	CurrentActionInterruptible = true;
 	CurrentActionTicks = 0;
 }
 
@@ -490,7 +490,7 @@ void Scriptable::ProcessActions()
 
 	int lastAction = -1;
 	while (true) {
-		CurrentActionInterruptable = true;
+		CurrentActionInterruptible = true;
 		if (!CurrentAction) {
 			if (! (CurrentActionTicks == 0 && CurrentActionState == 0)) {
 				Log(ERROR, "Scriptable", "Last action: {}", lastAction);
@@ -577,9 +577,6 @@ void Scriptable::Deactivate()
 	InternalFlags &=~(IF_ACTIVE|IF_IDLE);
 }
 
-//turning off the not interruptable flag, actions should reenable it themselves
-//also turning off the idle flag
-//heh, no, i wonder why did i touch the interruptable flag here
 void Scriptable::Activate()
 {
 	InternalFlags |= IF_ACTIVE;
@@ -1287,7 +1284,7 @@ int Scriptable::CastSpell(Scriptable* target, bool deplete, bool instant, bool n
 
 	if (!instant) {
 		SpellcraftCheck(actor, SpellResRef);
-		// self-targetted spells that are not hostile maintain invisibility
+		// self-targeted spells that are not hostile maintain invisibility
 		if (actor && target != this) actor->CureInvisibility();
 	}
 	return SpellCast(instant, target, level);
@@ -2248,7 +2245,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	if (path) {
 		return;
 	}
-	//if not continous random walk, then stops for a while
+	// if not continuous random walk, then stops for a while
 	if (can_stop) {
 		Region vp = core->GetGameControl()->Viewport();
 		if (!vp.PointInside(Pos)) {

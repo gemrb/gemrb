@@ -140,7 +140,7 @@ T* GetControl(ScriptingId id, const Window* win) {
 
 template <class T>
 T* GetControl(ScriptingGroup_t group, ScriptingId id) {
-	auto ref = static_cast<const ControlScriptingRef*>(ScriptEngine::GetScripingRef(group, id));
+	auto ref = static_cast<const ControlScriptingRef*>(ScriptEngine::GetScriptingRef(group, id));
 	return GetView<T>(ref);
 }
 

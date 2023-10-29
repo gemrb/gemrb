@@ -126,7 +126,7 @@ static bool LoadPlugin(const char* pluginpath)
 		return false;
 	}
 	if (strcmp(LibVersion(), VERSION_GEMRB) ) {
-		Log(ERROR, "PluginLoader", "Skipping plugin \"{}\" with version mistmatch.", pluginpath);
+		Log(ERROR, "PluginLoader", "Skipping plugin \"{}\" with version mismatch.", pluginpath);
 		FREE_PLUGIN( hMod );
 		return false;
 	}

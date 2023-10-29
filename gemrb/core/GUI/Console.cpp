@@ -70,7 +70,7 @@ void Console::UpdateTextArea()
 		textArea->SetValue(INVALID_VALUE);
 		textArea->SetSelectOptions(options, false);
 		// TODO: if we add a method to TextArea to return the TextContainer for a given select option
-		// then we can change the color to red for failed commands and green for successfull ones
+		// then we can change the color to red for failed commands and green for successful ones
 		// and the highlight can be just a darker shade of those
 	}
 }

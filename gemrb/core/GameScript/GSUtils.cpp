@@ -623,7 +623,7 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 	return 0;
 }
 
-//transfering item from Sender to target
+// transferring item from Sender to target
 //if target has no inventory, the item will be destructed
 //if target can't get it, it will be dropped at its feet
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, int flags, int setflag, int count)
@@ -988,7 +988,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point& p, const ResRef& area, cons
 				if (!Sender->InMove()) Log(WARNING, "GSUtils", "At least it said so...");
 				// ensure the action doesn't get interrupted
 				// fixes Nalia starting a second dialog in the Coronet, if she gets a chance #253
-				Sender->CurrentActionInterruptable = false;
+				Sender->CurrentActionInterruptible = false;
 				return;
 			}
 		}
@@ -1802,7 +1802,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					mergestrings = 0;
 				}
 				//skipping the context part, which
-				//is to be readed later
+				// is to be readded later
 				if (mergestrings) {
 					for (i=0;i<6;i++) {
 						*dst++='*';
@@ -1929,7 +1929,7 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 
 	// chasing is not unbreakable
 	// would prevent smart ai from dropping a target that's running away
-	//Sender->CurrentActionInterruptable = false;
+	//Sender->CurrentActionInterruptible = false;
 
 	if (!actor->InMove() || actor->Destination != p) {
 		ieDword flags = core->GetGameControl()->ShouldRun(actor) ? IF_RUNNING : 0;
@@ -2075,7 +2075,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					dst = newTrigger->string1Parameter.begin();
 				}
 				//skipping the context part, which
-				//is to be readed later
+				// is to be readded later
 				if (mergestrings) {
 					for (i=0;i<6;i++) {
 						*dst++='*';
@@ -2447,7 +2447,7 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const 
 }
 
 /* returns an item's casting distance, it depends on the used header, and targeting mode too
- the used header is explictly given */
+ the used header is explicitly given */
 unsigned int GetItemDistance(const ResRef& itemres, int header, double angle)
 {
 	const Item* itm = gamedata->GetItem(itemres);
@@ -2753,7 +2753,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	// the originals or at least iwd2 even marked it as IF_NOINT,
 	// so it also guarded against the ClearActions action
 	// ... but just for the actual spellcasting part
-	Sender->CurrentActionInterruptable = false;
+	Sender->CurrentActionInterruptible = false;
 
 	int duration;
 	if (!parameters->int2Parameter) {
@@ -2872,7 +2872,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	// the originals or at least iwd2 even marked it as IF_NOINT,
 	// so it also guarded against the ClearActions action
 	// ... but just for the actual spellcasting part
-	Sender->CurrentActionInterruptable = false;
+	Sender->CurrentActionInterruptible = false;
 
 	int duration;
 	if (!parameters->int2Parameter) {
@@ -3057,7 +3057,7 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 		maxDistance = static_cast<int>(maxDistance * gamedata->GetStepTime() / speed);
 	}
 
-	if (flags & RunAwayFlags::NoInterrupt) { // should we just mark the action as CurrentActionInterruptable = false instead?
+	if (flags & RunAwayFlags::NoInterrupt) { // should we just mark the action as CurrentActionInterruptible = false instead?
 		actor->NoInterrupt();
 	}
 

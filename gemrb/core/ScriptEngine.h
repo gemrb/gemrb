@@ -94,7 +94,7 @@ public:
 		return GUIDict[groupId];
 	}
 
-	static const ScriptingRefBase* GetScripingRef(ScriptingGroup_t group, ScriptingId id)
+	static const ScriptingRefBase* GetScriptingRef(ScriptingGroup_t group, ScriptingId id)
 	{
 		const ScriptingRefBase* ref = NULL;
 		ScriptingDefinitions::iterator it = GUIDict[group].find(id);

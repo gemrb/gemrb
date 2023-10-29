@@ -341,7 +341,7 @@ def GetHLAs ():
 				HLAClassTable.GetValue (j, 6, GTV_STR),\
 				HLAClassTable.GetValue (j, 7, GTV_STR)]
 
-			# make sure we fall within the min and max paramaters
+			# make sure we fall within the min and max parameters
 			if HLAClassTable.GetValue (j, 3) > CurrentLevel or HLAClassTable.GetValue (j, 4) < CurrentLevel:
 				print("\t\tNot within parameters")
 				HLAAbilities.append(SaveArray)
@@ -399,9 +399,9 @@ def GetHLAs ():
 	return
 
 def HLARecheckPrereqs (index):
-	"""Rechecks the HLA prequisites on the index on the fly."""
+	"""Rechecks the HLA prerequisites on the index on the fly."""
 
-	# the numer of times memorized
+	# the number of times memorized
 	Ref = HLAAbilities[index][0]
 	Memorized = HLAAbilities[index][2]
 
@@ -432,7 +432,7 @@ def HLARecheckPrereqs (index):
 						if (HLAAbilities[j][0] == HLAAbilities[i][4]) and (HLAAbilities[j][2] <= 0): # can learn
 							HLAAbilities[i][1] = 1
 							break
-				else: # no exlusions
+				else: # no exclusions
 					HLAAbilities[i][1] = 1
 			else: # prereqs not met
 				HLAAbilities[i][1] = 0

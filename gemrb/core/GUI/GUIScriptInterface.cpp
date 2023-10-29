@@ -42,7 +42,7 @@ const ControlScriptingRef* GetControlRef(ScriptingId id, const Window* win)
 			id = ModifiedCtrlIdForWin(id, winref);
 		}
 	}
-	const ScriptingRefBase* base = ScriptEngine::GetScripingRef(group, id);
+	const ScriptingRefBase* base = ScriptEngine::GetScriptingRef(group, id);
 	return static_cast<const ControlScriptingRef*>(base);
 }
 
@@ -54,7 +54,7 @@ Control* GetControl(ScriptingId id, const Window* win)
 
 Window* GetWindow(ScriptingId id, const ScriptingGroup_t& pack)
 {
-	const WindowScriptingRef* ref = dynamic_cast<const WindowScriptingRef*>(ScriptEngine::GetScripingRef(pack, id));
+	const WindowScriptingRef* ref = dynamic_cast<const WindowScriptingRef*>(ScriptEngine::GetScriptingRef(pack, id));
 	return ScriptingRefCast<Window>(ref);
 }
 

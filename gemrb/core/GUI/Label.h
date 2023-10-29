@@ -21,7 +21,7 @@
 /**
  * @file Label.h
  * Declares Label widget for displaying static texts
- * @author GemRB Developement Team
+ * @author GemRB Development Team
  */
 
 #ifndef LABEL_H

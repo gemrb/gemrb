@@ -97,7 +97,7 @@ def getAlignment(area):
 	area.Append(AlignCap)
 	area.Append("\n")
 
-#Abilties
+# Abilities
 def unsetAbilities():
 	MyChar = GemRB.GetVar ("Slot")
 	AbilityTable = GemRB.LoadTable ("ability")

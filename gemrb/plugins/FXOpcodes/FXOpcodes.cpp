@@ -395,7 +395,7 @@ int fx_title_modifier (Scriptable* Owner, Actor* target, Effect* fx);//122
 int fx_disable_overlay_modifier (Scriptable* Owner, Actor* target, Effect* fx);//123
 int fx_no_backstab_modifier (Scriptable* Owner, Actor* target, Effect* fx);//124
 int fx_offscreenai_modifier (Scriptable* Owner, Actor* target, Effect* fx);//125
-int fx_existance_delay_modifier (Scriptable* Owner, Actor* target, Effect* fx);//126
+int fx_existence_delay_modifier (Scriptable* Owner, Actor* target, Effect* fx);//126
 int fx_disable_chunk_modifier (Scriptable* Owner, Actor* target, Effect* fx);//127
 // fx_protection_from_animation implements as generic effect, 128
 int fx_protection_from_turn (Scriptable* Owner, Actor* target, Effect* fx);//129
@@ -588,7 +588,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("ElectricityResistanceModifier", fx_electricity_resistance_modifier, EFFECT_SPECIAL_UNDO, -1 ),
 	EffectDesc("EnchantmentBonus", fx_generic_effect, 0, -1),
 	EffectDesc("EnchantmentVsCreatureType", fx_generic_effect, 0, -1),
-	EffectDesc("ExistanceDelayModifier", fx_existance_delay_modifier , 0, -1 ), //unknown
+	EffectDesc("ExistanceDelayModifier", fx_existence_delay_modifier , 0, -1 ),
 	EffectDesc("ExperienceModifier", fx_experience_modifier, 0, -1 ),
 	EffectDesc("ExploreModifier", fx_explore_modifier, 0, -1 ),
 	EffectDesc("FamiliarBond", fx_familiar_constitution_loss, 0, -1 ),
@@ -953,7 +953,7 @@ static inline void HandleMainStatBonus(const Actor *target, int stat, Effect *fx
 		return;
 	}
 
-	// restore initial value in case we anulled it the previous tick
+	// restore initial value in case we annulled it the previous tick
 	if (!bonus && fx->Parameter3 != 0) {
 		bonus = fx->Parameter3;
 		fx->Parameter3 = 0;
@@ -1782,7 +1782,7 @@ int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->ToHit.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 		}
 		break;
-	case 2:// EE: weak invisibility, like improved after being revelead (no backstabbing)
+	case 2:// EE: weak invisibility, like improved after being revealed (no backstabbing)
 		STATE_SET(STATE_INVIS2);
 	default:
 		break;
@@ -2235,7 +2235,7 @@ int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 			target->SetSpellState(SS_PRONE);
 		}
 		// else make the creature untargettable (backlisted); an original hack to avoid stunning damage
-		// knockout then death by some other (eg. script targetting or call lightning)
+		// knockout then death by some other (eg. script targeting or call lightning)
 
 		target->AddPortraitIcon(PI_SLEEP);
 	}
@@ -2636,7 +2636,7 @@ int fx_alignment_change (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x3a DispelEffects
 int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// ees added an upper word to tweak targetting of weapons in SLOT_MAGIC
+	// ees added an upper word to tweak targeting of weapons in SLOT_MAGIC
 	int slot = Inventory::GetMagicSlot();
 	ieDword itemLevel;
 	if (fx->Parameter2 > 2 && !target->inventory.IsSlotEmpty(slot)) {
@@ -3896,7 +3896,7 @@ int fx_mirror_image (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter2) {
 		images = 1; //reflection
 	} else {
-		// the original uses only IE_LEVEL, but that can be awefully bad in
+		// the original uses only IE_LEVEL, but that can be awfully bad in
 		// the case of dual- and multiclasses
 		unsigned int level = target->GetCasterLevel(IE_SPL_WIZARD);
 		if (!level) level = target->GetAnyActiveCasterLevel();
@@ -4427,7 +4427,7 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!cached || fx->Resource != target->polymorphCache->Resource) {
 		Actor *newCreature = gamedata->GetCreature(fx->Resource,0);
 
-		//I don't know how could this happen, existance of the resource was already checked
+		// I don't know how could this happen, existence of the resource was already checked
 		if (!newCreature) {
 			return FX_NOT_APPLIED;
 		}
@@ -6055,7 +6055,7 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!map) return FX_APPLIED;
 
 	if (target->fxqueue.HasEffectWithResource(fx_protection_from_animation_ref, fx->Resource)) {
-		// effect supressed by opcode 0x128
+		// effect suppressed by opcode 0x128
 		return FX_APPLIED;
 	}
 
@@ -6927,7 +6927,7 @@ int fx_berserkstage2_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xf8 set melee effect
-// adds effect to melee attacks (for monks, asssasins, fighter hlas, ...)
+// adds effect to melee attacks (for monks, assassins, fighter hlas, ...)
 // it is cumulative
 
 // 0xf9 set missile effect
@@ -7652,7 +7652,7 @@ int fx_offscreenai_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x126 ExistanceDelayModifier
-int fx_existance_delay_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_existence_delay_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	STAT_SET(IE_EXISTANCEDELAY, fx->Parameter2);
 	return FX_APPLIED;
