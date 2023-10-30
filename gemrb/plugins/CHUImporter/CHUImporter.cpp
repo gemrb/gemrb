@@ -220,6 +220,8 @@ static void GetSlider(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 static void GetTextEdit(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 {
 	ResRef bgMos;
+	ResRef editingMos;
+	ResRef overMos;
 	ResRef fontResRef;
 	ResRef cursorResRef;
 	Point pos;
@@ -230,8 +232,8 @@ static void GetTextEdit(DataStream* str, Control*& ctrl, const Region& ctrlFrame
 	ieVariable initial;
 
 	str->ReadResRef(bgMos);
-	// Two more MOS resrefs, probably unused, labeled EditClientFocus & EditClientNoFocus
-	str->Seek(16, GEM_CURRENT_POS);
+	str->ReadResRef(editingMos); // EditClientFocus
+	str->ReadResRef(overMos); // EditClientNoFocus
 	str->ReadResRef(cursorResRef);
 	str->ReadWord(curCycle);
 	str->ReadWord(curFrame);
@@ -257,17 +259,14 @@ static void GetTextEdit(DataStream* str, Control*& ctrl, const Region& ctrlFrame
 		cursor = bam->GetFrame(curCycle, curFrame);
 	}
 
-	ResourceHolder<ImageMgr> mos = gamedata->GetResourceHolder<ImageMgr>(bgMos);
-	Holder<Sprite2D> img;
-	if (mos) {
-		img = mos->GetSprite2D();
-	}
-
 	TextEdit* te = new TextEdit(ctrlFrame, maxInput, pos);
 	ctrl = te;
 	te->SetFont(std::move(fnt));
 	te->SetCursor(cursor);
-	te->SetBackground(img);
+	te->SetBackground(bgMos, TextEditBG::Normal);
+	te->SetBackground(editingMos, TextEditBG::Editing);
+	te->SetBackground(overMos, TextEditBG::Over);
+	te->SetBackground(TextEditBG::Normal);
 }
 
 static void GetTextArea(DataStream* str, Control*& ctrl, const Region& ctrlFrame, Window*& win)

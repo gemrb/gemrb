@@ -27,8 +27,18 @@
 #ifndef TEXTEDIT_H
 #define TEXTEDIT_H
 
+#include "EnumIndex.h"
+
 #include "GUI/Control.h"
 #include "GUI/TextSystem/TextContainer.h"
+
+enum class TextEditBG : uint8_t {
+	Normal,
+	Editing,
+	Over,
+
+	count
+};
 
 namespace GemRB {
 
@@ -43,6 +53,7 @@ private:
 
 	/** Max Edit Text Length */
 	size_t max;
+	EnumArray<TextEditBG, ResRef> bgMos; // the second two are rarely used alternative backgrounds
 
 private:
 	void TextChanged(const TextContainer& tc);
@@ -86,6 +97,9 @@ public:
 	void SetBufferLength(size_t buflen);
 	/** Sets the alignment */
 	void SetAlignment(unsigned char Alignment);
+	/** Sets one of the background images */
+	void SetBackground(const ResRef& bg, TextEditBG type);
+	void SetBackground(TextEditBG type);
 
 	void DidFocus() override { textContainer.DidFocus(); }
 	void DidUnFocus() override { textContainer.DidUnFocus(); }
