@@ -243,7 +243,7 @@ def OpenSaveDetailWindow ():
 	for j in range (MAX_PARTY_SIZE):
 		Button = Window.GetControl (6 + j)
 		if Button:
-			Button.SetPicture (GemRB.GetPlayerPortrait (j)["Sprite"])
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 
 	CheckSaveName ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
