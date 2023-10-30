@@ -110,6 +110,7 @@ def NoteChanged (Edit):
 	Edit.SetFlags(IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	Text = Edit.QueryText ()
 	Edit.SetText ("")
+	Edit.SetBackground ("MAMOSED1")
 	PosX = GemRB.GetVar("MapControlX")
 	PosY = GemRB.GetVar("MapControlY")
 	GemRB.SetMapnote (PosX, PosY, 1, Text)

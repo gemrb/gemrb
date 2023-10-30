@@ -26,7 +26,9 @@
 #include "Interface.h"
 #include "Map.h"
 #include "Sprite2D.h"
+
 #include "GUI/GameControl.h"
+#include "GUI/TextEdit.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
@@ -215,6 +217,10 @@ void MapControl::ClickHandle(const MouseEvent&) const
 	auto& vars = core->GetDictionary();
 	vars.Set("MapControlX", notePos.x);
 	vars.Set("MapControlY", notePos.y);
+
+	if (LinkedLabel && LinkedLabel->ControlType == IE_GUI_EDIT && GetValue() == EDIT_NOTE) {
+		static_cast<TextEdit*>(LinkedLabel)->SetBackground(TextEditBG::Editing);
+	}
 }
 
 void MapControl::UpdateViewport(Point vp)
@@ -286,6 +292,11 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 	if (MyMap == NULL)
 		return false;
 
+	TextEdit* edit = nullptr;
+	if (LinkedLabel && LinkedLabel->ControlType == IE_GUI_EDIT) {
+		edit = static_cast<TextEdit*>(LinkedLabel);
+	}
+
 	value_t val = GetValue();
 	if (val == VIEW_NOTES) {
 		Point p = ConvertPointFromScreen(me.Pos());
@@ -297,8 +308,14 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 			if (LinkedLabel) {
 				LinkedLabel->SetText(mn->text);
 			}
+			if (edit) {
+				edit->SetBackground(TextEditBG::Over);
+			}
 		} else if (LinkedLabel) {
 			LinkedLabel->SetText(u"");
+			if (edit) {
+				edit->SetBackground(TextEditBG::Normal);
+			}
 		}
 	}
 
