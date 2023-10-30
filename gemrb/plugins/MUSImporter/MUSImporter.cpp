@@ -57,19 +57,25 @@ bool MUSImporter::Init()
 	}\
 }
 
-#define FILL_VAR(VAR) while (i < len) {\
-	if (!isblank(line[i])) {\
-		pls.VAR[p++] = line[i++];\
-	} else {\
-		break;\
-	}\
-}\
-pls.VAR[9] = 0;\
-p = 0;
-
 /** Loads a PlayList for playing */
 bool MUSImporter::OpenPlaylist(const ieVariable& name)
 {
+	size_t i = 0;
+	size_t len = 0;
+	std::string line;
+
+	auto fillVar = [&i, len, &line](MUSString& var) {
+		int p = 0;
+		while (i < len) {
+			if (!isblank(line[i])) {
+				var[p++] = line[i++];
+			} else {
+				break;
+			}
+		}
+		var[var.Size - 1] = 0;
+	};
+
 	if (Playing || IsCurrentPlayList(name)) {
 		return true;
 	}
@@ -86,7 +92,7 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 		Log(ERROR, "MUSImporter", "Didn't find playlist '{}'.", path);
 		return false;
 	}
-	std::string line;
+
 	str->ReadLine(line);
 	PLName = line;
 	size_t c = line.length();
@@ -102,8 +108,8 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	int count = atoi(line.c_str());
 	while (count != 0) {
 		str->ReadLine(line);
-		size_t len = line.length();
-		size_t i = 0;
+		len = line.length();
+		i = 0;
 		int p = 0;
 		PLString pls;
 		while (i < len) {
@@ -115,14 +121,13 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 			}
 		}
 
-		p = 0;
 		if (i < len && line[i] != '@') {
-			FILL_VAR(PLTag)
+			fillVar(pls.PLTag);
 			SKIP_BLANKS
 			if (line[i] == '@') {
 				pls.PLLoop = pls.PLTag;
 			} else {
-				FILL_VAR(PLLoop)
+				fillVar(pls.PLLoop);
 			}
 			SKIP_BLANKS
 		} else {
@@ -137,7 +142,7 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 				break;
 			}
 		}
-		FILL_VAR(PLEnd)
+		fillVar(pls.PLEnd);
 		playlist.push_back( pls );
 		count--;
 	}
