@@ -187,12 +187,13 @@ void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		i = MyMap -> GetMapNoteCount();
 		while (i--) {
 			const MapNote& mn = MyMap -> GetMapNote(i);
-			
+
 			// Skip unexplored map notes unless they are player added
-			// FIXME: PST should include user notes regardless (!mn.readonly)
+			// PST draws user notes regardless of visibility
 			bool visible = MyMap->IsExplored(mn.Pos);
-			if (!visible)
+			if (!visible && (!core->HasFeature(GFFlags::PST_STATE_FLAGS) || mn.readonly)) {
 				continue;
+			}
 
 			Point pos = ConvertPointFromGame(mn.Pos);
 
