@@ -34,11 +34,12 @@ namespace GemRB {
   *@author GemRB Development Team
   */
 
+using MUSString = FixedSizeString<10>;
 struct PLString {
-	char PLFile[10]{};
-	char PLLoop[10]{};
-	char PLTag[10]{};
-	char PLEnd[10]{};
+	MUSString PLFile;
+	MUSString PLLoop;
+	MUSString PLTag;
+	MUSString PLEnd;
 	unsigned int soundID = 0;
 };
 

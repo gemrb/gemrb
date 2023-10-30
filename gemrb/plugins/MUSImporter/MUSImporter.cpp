@@ -63,7 +63,9 @@ bool MUSImporter::Init()
 	} else {\
 		break;\
 	}\
-}
+}\
+pls.VAR[9] = 0;\
+p = 0;
 
 /** Loads a PlayList for playing */
 bool MUSImporter::OpenPlaylist(const ieVariable& name)
@@ -112,24 +114,20 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 				break;
 			}
 		}
-		pls.PLFile[p] = 0;
+
 		p = 0;
 		if (i < len && line[i] != '@') {
 			FILL_VAR(PLTag)
-			pls.PLTag[std::min(p, 9)] = 0;
-			p = 0;
 			SKIP_BLANKS
-			if (line[i] == '@')
-				strcpy( pls.PLLoop, pls.PLTag );
-			else {
+			if (line[i] == '@') {
+				pls.PLLoop = pls.PLTag;
+			} else {
 				FILL_VAR(PLLoop)
-				pls.PLLoop[p] = 0;
 			}
 			SKIP_BLANKS
-			p = 0;
 		} else {
-			pls.PLTag[0] = 0;
-			pls.PLLoop[0] = 0;
+			pls.PLTag.clear();
+			pls.PLLoop.clear();
 		}
 		while (i < len) {
 			if (!isblank(line[i]))
@@ -140,7 +138,6 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 			}
 		}
 		FILL_VAR(PLEnd)
-		pls.PLEnd[p] = 0;
 		playlist.push_back( pls );
 		count--;
 	}
@@ -153,9 +150,9 @@ void MUSImporter::Start()
 	if (playlist.empty()) return;
 
 	PLpos = 0;
-	if (playlist[PLpos].PLLoop[0] != 0) {
+	if (playlist[PLpos].PLLoop) {
 		for (unsigned int i = 0; i < playlist.size(); i++) {
-			if (stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
+			if (playlist[i].PLFile == playlist[PLpos].PLLoop) {
 				PLnext = i;
 				break;
 			}
@@ -178,10 +175,8 @@ void MUSImporter::End()
 	if (!Playing) return;
 	if (playlist.empty()) return;
 
-	if (playlist[PLpos].PLEnd[0] != 0) {
-		if (stricmp(playlist[PLpos].PLEnd, "end") != 0) {
-			PlayMusic(playlist[PLpos].PLEnd);
-		}
+	if (playlist[PLpos].PLEnd && playlist[PLpos].PLEnd != "end") {
+		PlayMusic(playlist[PLpos].PLEnd);
 	}
 	PLnext = -1;
 }
@@ -230,15 +225,15 @@ void MUSImporter::PlayNext()
 	if (PLnext != -1) {
 		PlayMusic( PLnext );
 		PLpos = PLnext;
-		if (playlist[PLpos].PLLoop[0] != 0) {
+		if (playlist[PLpos].PLLoop) {
 			for (unsigned int i = 0; i < playlist.size(); i++) {
-				if (stricmp( playlist[i].PLFile, playlist[PLpos].PLLoop ) == 0) {
+				if (playlist[i].PLFile == playlist[PLpos].PLLoop) {
 					PLnext = i;
 					break;
 				}
 			}
 		} else {
-			if (stricmp( playlist[PLnext].PLEnd, "end" ) == 0)
+			if (playlist[PLnext].PLEnd == "end")
 				PLnext = -1;
 			else
 				PLnext = PLpos + 1;
