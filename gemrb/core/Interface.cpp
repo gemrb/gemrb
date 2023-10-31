@@ -1292,90 +1292,90 @@ bool Interface::HasFeature(GFFlags flag) const
 }
 
 static const EnumArray<GFFlags, StringView> game_flags {
-		"HasKaputz",          //0 GF_HAS_KAPUTZ
-		"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
-		"HasSongList",        //2 GF_HAS_SONGLIST
-		"TeamMovement",       //3 GF_TEAM_MOVEMENT
-		"UpperButtonText",    //4 GF_UPPER_BUTTON_TEXT
-		"LowerLabelText",     //5 GF_LOWER_LABEL_TEXT
-		"HasPartyIni",        //6 GF_HAS_PARTY_INI
-		"SoundFolders",       //7 GF_SOUNDFOLDERS
-		"IgnoreButtonFrames", //8 GF_IGNORE_BUTTON_FRAMES
-		"OneByteAnimationID", //9 GF_ONE_BYTE_ANIMID
-		"HasDPLAYER",         //10GF_HAS_DPLAYER
-		"HasEXPTABLE",        //11GF_HAS_EXPTABLE
-		"HasBeastsIni",       //12GF_HAS_BEASTS_INI
-		"HasEEEffects",       //13GF_HAS_EE_EFFECTS
-		"HasPickSound",       //14GF_HAS_PICK_SOUND
-		"IWDMapDimensions",   //15GF_IWD_MAP_DIMENSIONS
-		"AutomapINI",         //16GF_AUTOMAP_INI
-		"SmallFog",           //17GF_SMALL_FOG
-		"ReverseDoor",        //18GF_REVERSE_DOOR
-		"ProtagonistTalks",   //19GF_PROTAGONIST_TALKS
-		"HasSpellList",       //20GF_HAS_SPELLLIST
-		"IWD2ScriptName",     //21GF_IWD2_SCRIPTNAME
-		"DialogueScrolls",    //22GF_DIALOGUE_SCROLLS
-		"KnowWorld",          //23GF_KNOW_WORLD
-		"ReverseToHit",       //24GF_REVERSE_TOHIT
-		"SaveForHalfDamage",  //25GF_SAVE_FOR_HALF
-		"CharNameIsGabber",   //26GF_CHARNAMEISGABBER
-		"MagicBit",           //27GF_MAGICBIT
-		"CheckAbilities",     //28GF_CHECK_ABILITIES
-		"ChallengeRating",    //29GF_CHALLENGERATING
-		"SpellBookIconHack",  //30GF_SPELLBOOKICONHACK
-		"EnhancedEffects",    //31GF_ENHANCED_EFFECTS
-		"DeathOnZeroStat",    //32GF_DEATH_ON_ZERO_STAT
-		"SpawnIni",           //33GF_SPAWN_INI
-		"IWD2DeathVarFormat", //34GF_IWD2_DEATHVARFORMAT
-		"HasResDataIni",      //35GF_RESDATA_INI
-		"OverrideCursorPos",  //36GF_OVERRIDE_CURSORPOS
-		"BreakableWeapons",   //37GF_BREAKABLE_WEAPONS
-		"3EdRules",           //38GF_3ED_RULES
-		"LevelslotPerClass",  //39GF_LEVELSLOT_PER_CLASS
-		"SelectiveMagicRes",  //40GF_SELECTIVE_MAGIC_RES
-		"HasHideInShadows",   //41GF_HAS_HIDE_IN_SHADOWS
-		"AreaVisitedVar",     //42GF_AREA_VISITED_VAR
-		"ProperBackstab",     //43GF_PROPER_BACKSTAB
-		"OnScreenText",       //44GF_ONSCREEN_TEXT
-		"HasSpecificDamageBonus", //45GF_SPECIFIC_DMG_BONUS
-		"StrrefSaveGame",     //46GF_STRREF_SAVEGAME
-		"SimplifiedDisruption",//47GF_SIMPLE_DISRUPTION
-		"BiographyIsRes",     //48GF_BIOGRAPHY_RES
-		"NoBiography",        //49GF_NO_BIOGRAPHY
-		"StealIsAttack",      //50GF_STEAL_IS_ATTACK
-		"CutsceneAreascripts",//51GF_CUTSCENE_AREASCRIPTS
-		"FlexibleWorldmap",   //52GF_FLEXIBLE_WMAP
-		"AutoSearchHidden",   //53GF_AUTOSEARCH_HIDDEN
-		"PSTStateFlags",      //54GF_PST_STATE_FLAGS
-		"NoDropCanMove",      //55GF_NO_DROP_CAN_MOVE
-		"JournalHasSections", //56GF_JOURNAL_HAS_SECTIONS
-		"CastingSounds",      //57GF_CASTING_SOUNDS
-		"EnhancedCastingSounds", //58GF_CASTING_SOUNDS2
-		"ForceAreaScript",    //59GF_FORCE_AREA_SCRIPT
-		"AreaOverride",       //60GF_AREA_OVERRIDE
-		"NoNewVariables",     //61GF_NO_NEW_VARIABLES
-		"HasSoundsIni",       //62GF_SOUNDS_INI
-		"HasNoNPCFlag",       //63GF_USEPOINT_400
-		"HasUsePointFlag",    //64GF_USEPOINT_200
-		"HasFloatMenu",       //65GF_HAS_FLOAT_MENU
-		"NoUndroppable",      //67GF_NO_UNDROPPABLE
-		"StartActive",        //68GF_START_ACTIVE
-		"HasInfopointDialogs", //69GF_INFOPOINT_DIALOGS
-		"ImplicitAreaAnimBackground", //70GF_IMPLICIT_AREAANIM_BACKGROUND
-		"HealOn100Plus",      //71GF_HEAL_ON_100PLUS
-		"InPartyAllowsDead",  //72GF_IN_PARTY_ALLOWS_DEAD
-		"ZeroTimerIsValid",   //73GF_ZERO_TIMER_IS_VALID
-		"ShopsRechargeItems", //74GF_SHOP_RECHARGE
-		"MeleeHeaderUsesProjectile", //75GF_MELEEHEADER_USESPROJECTILE
-		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
-		"RandomBanterDialogs",//77GF_RANDOM_BANTER_DIALOGS
-		"FixedMoraleOpcode",  //79GF_FIXED_MORALE_OPCODE
-		"Happiness",          //80GF_HAPPINESS
-		"EfficientORTrigger", //81GF_EFFICIENT_OR
-		"LayeredWaterTiles",  //82GF_LAYERED_WATER_TILES
-		"ClearingActionOverride", //83GF_CLEARING_ACTIONOVERRIDE
-		"DamageInnocentRep",  //84GF_DAMAGE_INNOCENT_REP
-		"HasWeaponSets" // GF_HAS_WEAPON_SETS
+	"HasKaputz", // GFFlags::HAS_KAPUTZ
+	"AllStringsTagged", // GFFlags::ALL_STRINGS_TAGGED
+	"HasSongList", // GFFlags::HAS_SONGLIST
+	"TeamMovement", // GFFlags::TEAM_MOVEMENT
+	"UpperButtonText", // GFFlags::UPPER_BUTTON_TEXT
+	"LowerLabelText", // GFFlags::LOWER_LABEL_TEXT
+	"HasPartyIni", // GFFlags::HAS_PARTY_INI
+	"SoundFolders", // GFFlags::SOUNDFOLDERS
+	"IgnoreButtonFrames", // GFFlags::IGNORE_BUTTON_FRAMES
+	"OneByteAnimationID", // GFFlags::ONE_BYTE_ANIMID
+	"HasDPLAYER", // GFFlags::HAS_DPLAYER
+	"HasEXPTABLE", // GFFlags::HAS_EXPTABLE
+	"HasBeastsIni", // GFFlags::HAS_BEASTS_INI
+	"HasEEEffects", // GFFlags::HAS_EE_EFFECTS
+	"HasPickSound", // GFFlags::HAS_PICK_SOUND
+	"IWDMapDimensions", // GFFlags::IWD_MAP_DIMENSIONS
+	"AutomapINI", // GFFlags::AUTOMAP_INI
+	"SmallFog", // GFFlags::SMALL_FOG
+	"ReverseDoor", // GFFlags::REVERSE_DOOR
+	"ProtagonistTalks", // GFFlags::PROTAGONIST_TALKS
+	"HasSpellList", // GFFlags::HAS_SPELLLIST
+	"IWD2ScriptName", // GFFlags::IWD2_SCRIPTNAME
+	"DialogueScrolls", // GFFlags::DIALOGUE_SCROLLS
+	"KnowWorld", // GFFlags::KNOW_WORLD
+	"ReverseToHit", // GFFlags::REVERSE_TOHIT
+	"SaveForHalfDamage", // GFFlags::SAVE_FOR_HALF
+	"CharNameIsGabber", // GFFlags::CHARNAMEISGABBER
+	"MagicBit", // GFFlags::MAGICBIT
+	"CheckAbilities", // GFFlags::CHECK_ABILITIES
+	"ChallengeRating", // GFFlags::CHALLENGERATING
+	"SpellBookIconHack", // GFFlags::SPELLBOOKICONHACK
+	"EnhancedEffects", // GFFlags::ENHANCED_EFFECTS
+	"DeathOnZeroStat", // GFFlags::DEATH_ON_ZERO_STAT
+	"SpawnIni", // GFFlags::SPAWN_INI
+	"IWD2DeathVarFormat", // GFFlags::IWD2_DEATHVARFORMAT
+	"HasResDataIni", // GFFlags::RESDATA_INI
+	"OverrideCursorPos", // GFFlags::OVERRIDE_CURSORPOS
+	"BreakableWeapons", // GFFlags::BREAKABLE_WEAPONS
+	"3EdRules", // GFFlags::3ED_RULES
+	"LevelslotPerClass", // GFFlags::LEVELSLOT_PER_CLASS
+	"SelectiveMagicRes", // GFFlags::SELECTIVE_MAGIC_RES
+	"HasHideInShadows", // GFFlags::HAS_HIDE_IN_SHADOWS
+	"AreaVisitedVar", // GFFlags::AREA_VISITED_VAR
+	"ProperBackstab", // GFFlags::PROPER_BACKSTAB
+	"OnScreenText", // GFFlags::ONSCREEN_TEXT
+	"HasSpecificDamageBonus", // GFFlags::SPECIFIC_DMG_BONUS
+	"StrrefSaveGame", // GFFlags::STRREF_SAVEGAME
+	"SimplifiedDisruption", // GFFlags::SIMPLE_DISRUPTION
+	"BiographyIsRes", // GFFlags::BIOGRAPHY_RES
+	"NoBiography", // GFFlags::NO_BIOGRAPHY
+	"StealIsAttack", // GFFlags::STEAL_IS_ATTACK
+	"CutsceneAreascripts", // GFFlags::CUTSCENE_AREASCRIPTS
+	"FlexibleWorldmap", // GFFlags::FLEXIBLE_WMAP
+	"AutoSearchHidden", // GFFlags::AUTOSEARCH_HIDDEN
+	"PSTStateFlags", // GFFlags::PST_STATE_FLAGS
+	"NoDropCanMove", // GFFlags::NO_DROP_CAN_MOVE
+	"JournalHasSections", // GFFlags::JOURNAL_HAS_SECTIONS
+	"CastingSounds", // GFFlags::CASTING_SOUNDS
+	"EnhancedCastingSounds", // GFFlags::CASTING_SOUNDS2
+	"ForceAreaScript", // GFFlags::FORCE_AREA_SCRIPT
+	"AreaOverride", // GFFlags::AREA_OVERRIDE
+	"NoNewVariables", // GFFlags::NO_NEW_VARIABLES
+	"HasSoundsIni", // GFFlags::SOUNDS_INI
+	"HasNoNPCFlag", // GFFlags::USEPOINT_400
+	"HasUsePointFlag", // GFFlags::USEPOINT_200
+	"HasFloatMenu", // GFFlags::HAS_FLOAT_MENU
+	"NoUndroppable", // GFFlags::NO_UNDROPPABLE
+	"StartActive", // GFFlags::START_ACTIVE
+	"HasInfopointDialogs", // GFFlags::INFOPOINT_DIALOGS
+	"ImplicitAreaAnimBackground", // GFFlags::IMPLICIT_AREAANIM_BACKGROUND
+	"HealOn100Plus", // GFFlags::HEAL_ON_100PLUS
+	"InPartyAllowsDead", // GFFlags::IN_PARTY_ALLOWS_DEAD
+	"ZeroTimerIsValid", // GFFlags::ZERO_TIMER_IS_VALID
+	"ShopsRechargeItems", // GFFlags::SHOP_RECHARGE
+	"MeleeHeaderUsesProjectile", // GFFlags::MELEEHEADER_USESPROJECTILE
+	"ForceDialogPause", // GFFlags::FORCE_DIALOGPAUSE
+	"RandomBanterDialogs", // GFFlags::RANDOM_BANTER_DIALOGS
+	"FixedMoraleOpcode", // GFFlags::FIXED_MORALE_OPCODE
+	"Happiness", // GFFlags::HAPPINESS
+	"EfficientORTrigger", // GFFlags::EFFICIENT_OR
+	"LayeredWaterTiles", // GFFlags::LAYERED_WATER_TILES
+	"ClearingActionOverride", // GFFlags::CLEARING_ACTIONOVERRIDE
+	"DamageInnocentRep", // GFFlags::DAMAGE_INNOCENT_REP
+	"HasWeaponSets" // GFFlags::GF_HAS_WEAPON_SETS
 };
 
 /** Loads gemrb.ini */
