@@ -6059,8 +6059,8 @@ std::list<int> Actor::ListLevels() const
 	}
 
 	std::list<int> levels;
-	for (ieDword isclass = 0; isclass < ISCLASSES; ++isclass) {
-		auto level = GetClassLevel(isclass);
+	for (ieDword i = 0; i < ISCLASSES; ++i) {
+		auto level = GetClassLevel(i);
 		if (level) {
 			levels.push_back(level);
 		}

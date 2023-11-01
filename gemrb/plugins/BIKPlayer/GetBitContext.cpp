@@ -174,7 +174,7 @@ int VLC::alloc_table(int size)
 }
 
 int VLC::build_table(int table_nb_bits, int nb_codes,
-	             const void *bits, int bits_wrap, int bits_size,
+	             const void* bitsTable, int bits_wrap, int bits_size,
 	             const void *codes, int codes_wrap, int codes_size,
 	             uint32_t code_prefix, int n_prefix, int flags)
 {
@@ -183,20 +183,20 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	uint32_t code;
 	int16_t (*p_table)[2];
 
-	int table_size = 1 << table_nb_bits;
-	int table_index = alloc_table(table_size);
+	int tableSize = 1 << table_nb_bits;
+	int table_index = alloc_table(tableSize);
 	if (table_index < 0 || table_nb_bits > 30 || n_prefix > 31)
 	    return -1;
 	p_table = &table[table_index];
 
-	for (int i = 0; i < table_size; i++) {
+	for (int i = 0; i < tableSize; i++) {
 	    p_table[i][1] = 0; //bits
 	    p_table[i][0] = -1; //codes
 	}
 
 	/* first pass: map codes and compute auxiliary table sizes */
 	for (int i = 0; i < nb_codes; i++) {
-	    GET_DATA(n, bits, i, bits_wrap, bits_size);
+	    GET_DATA(n, bitsTable, i, bits_wrap, bits_size);
 	    GET_DATA(code, codes, i, codes_wrap, codes_size);
 	    /* we accept tables with holes */
 	    if (n <= 0)
@@ -211,7 +211,7 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	    if (n > 0 && code_prefix2 == code_prefix) {
 	        if (n <= table_nb_bits) {
 	            /* no need to add another table */
-	            int j = (code << (table_nb_bits - n)) & (table_size - 1);
+	            int j = (code << (table_nb_bits - n)) & (tableSize - 1);
 	            int nb = 1 << (table_nb_bits - n);
 	            for (int k = 0; k < nb; k++) {
 	                if(flags & INIT_VLC_LE)
@@ -237,7 +237,7 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	}
 
 	/* second pass : fill auxiliary tables recursively */
-	for (int i = 0; i < table_size; i++) {
+	for (int i = 0; i < tableSize; i++) {
 	    n = p_table[i][1]; //bits
 	    if (n < 0) {
 	        n = -n;
@@ -246,7 +246,7 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	            p_table[i][1] = -n; //bits
 	        }
 	        int index = build_table(n, nb_codes,
-	                            bits, bits_wrap, bits_size,
+	                                bitsTable, bits_wrap, bits_size,
 	                            codes, codes_wrap, codes_size,
 	                            (flags & INIT_VLC_LE) ? (code_prefix | (i << n_prefix)) : ((code_prefix << table_nb_bits) | i),
 	                            n_prefix + table_nb_bits, flags);

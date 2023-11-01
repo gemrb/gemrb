@@ -404,7 +404,7 @@ private:
 
 	private:
 		using profile_t = uint8_t;
-		profile_t loadProperties(const AutoTable &reverbs, id_t reverbID);
+		profile_t loadProperties(const AutoTable& reverbs, id_t reverbIdx);
 		static id_t obtainProfile(const ResRef& mapref);
 	};
 	

@@ -36,12 +36,13 @@ Map::MapReverb::MapReverb(MapEnv env, const ResRef& mapref)
 : MapReverb(env, obtainProfile(mapref))
 {}
 
-Map::MapReverb::profile_t Map::MapReverb::loadProperties (const AutoTable &reverbs, id_t reverbID) {
-	if (reverbID > reverbs->GetRowCount()) {
+Map::MapReverb::profile_t Map::MapReverb::loadProperties(const AutoTable& reverbs, id_t reverbIdx)
+{
+	if (reverbIdx > reverbs->GetRowCount()) {
 		return EFX_PROFILE_REVERB_INVALID;
 	}
 
-	const ieVariable efxProfileName = reverbs->QueryField(reverbID, 0);
+	const ieVariable efxProfileName = reverbs->QueryField(reverbIdx, 0);
 
 	/* Limited to values seemingly used. */
 	if (efxProfileName == "ARENA") {
@@ -61,14 +62,14 @@ Map::MapReverb::profile_t Map::MapReverb::loadProperties (const AutoTable &rever
 		properties = _properties;
 	}
 
-	float decay = strtof(reverbs->QueryField(reverbID, 2).c_str(), nullptr);
+	float decay = strtof(reverbs->QueryField(reverbIdx, 2).c_str(), nullptr);
 	if (decay >= 0.0f && decay <= 20.0f) {
 		properties.reverbData.flDecayTime = decay;
 	}
 
 	/* TODO: deal with DAMPING, REVERB_LEVEL, VOLUME */
 
-	return reverbID;
+	return reverbIdx;
 }
 
 Map::MapReverb::id_t Map::MapReverb::obtainProfile(const ResRef& mapref) {

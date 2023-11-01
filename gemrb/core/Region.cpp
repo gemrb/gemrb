@@ -200,23 +200,23 @@ Point Region::Intercept(const Point& p) const noexcept
 	float m = float(mid.y - p.y) / float(mid.x - p.x);
 
 	if (p.x <= mid.x) { // check "left" side
-		int y = m * (min.x - p.x) + p.y;
-		if (min.y <= y && y <= max.y) return Point(min.x, y);
+		int newY = m * (min.x - p.x) + p.y;
+		if (min.y <= newY && newY <= max.y) return Point(min.x, newY);
 	}
 
 	if (p.x >= mid.x) { // check "right" side
-		int y = m * (max.x - p.x) + p.y;
-		if (min.y <= y && y <= max.y) return Point(max.x, y);
+		int newY = m * (max.x - p.x) + p.y;
+		if (min.y <= newY && newY <= max.y) return Point(max.x, newY);
 	}
 	
 	if (p.y <= mid.y) { // check "top" side
-		int x = (min.y - p.y) / m + p.x;
-		if (min.x <= x && x <= max.x) return Point(x, min.y);
+		int newX = (min.y - p.y) / m + p.x;
+		if (min.x <= newX && newX <= max.x) return Point(newX, min.y);
 	}
 
 	if (p.y >= mid.y) { // check "bottom" side
-		int x = (max.y - p.y) / m + p.x;
-		if (min.x <= x && x <= max.x) return Point(x, max.y);
+		int newX = (max.y - p.y) / m + p.x;
+		if (min.x <= newX && newX <= max.x) return Point(newX, max.y);
 	}
 	
 	assert(p == mid || PointInside(p));

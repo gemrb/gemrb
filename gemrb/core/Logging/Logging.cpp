@@ -106,7 +106,7 @@ static void addGemRBLog(const CoreSettings& config)
 		AddLogWriter(createStreamLogWriter(file));
 	} else {
 		path = PathJoin(config.CachePath, "GemRB.log");
-		FILE* file = fopen(path.c_str(), "wb");
+		file = fopen(path.c_str(), "wb");
 		if (file) {
 			AddLogWriter(createStreamLogWriter(file));
 		} else {

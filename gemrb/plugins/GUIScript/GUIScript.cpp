@@ -657,10 +657,10 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 		return AttributeError("RowIndex/RowString and ColIndex/ColString must be the same type.");
 	}
 	
-	auto GetIndex = [&tm](PyObject* obj, bool row) -> TableMgr::index_t {
+	auto GetIndex = [&tm](PyObject* obj, bool isRow) -> TableMgr::index_t {
 		if (PyUnicode_Check(obj)) {
 			auto str = PyString_AsStringView(obj);
-			return row ? tm->GetRowIndex(str) : tm->GetColumnIndex(str);
+			return isRow ? tm->GetRowIndex(str) : tm->GetColumnIndex(str);
 		} else if (PyLong_Check(obj)) {
 			return static_cast<TableMgr::index_t>(PyLong_AsLong(obj));
 		}
