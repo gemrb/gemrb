@@ -72,7 +72,6 @@ public:
 		// !!! Keep these synchronized with GUIDefines.py !!!
 		static const Control::Action Change = Control::ValueChange; // text change event (keyboard, etc)
 		static const Control::Action Done = ACTION_CUSTOM(0);
-		static const Control::Action Cancel = ACTION_CUSTOM(1); // FIXME: unused, how do we cancel?
 	};
 
 	enum TextEditFlags {
