@@ -56,7 +56,7 @@ def OptSlider (winhelp, ctlhelp, help_ta, window, slider_id, label_id, label_str
 
 	return slider
 
-def OptRadio (action, window, button_id, label_id, variable, value):
+def OptRadio (action, window, button_id, label_id, variable, value, label_strref = None, help_ta = None, focusedText = None, defaultText = None):
 	"""Standard radio button for option windows"""
 
 	button = window.GetControl (button_id)
@@ -68,7 +68,7 @@ def OptRadio (action, window, button_id, label_id, variable, value):
 	elif GameCheck.IsIWD1() or GameCheck.IsBG1():
 		button.SetSprites ("TOGGLE", 0, 0, 1, 3, 2)
 
-	OptBuddyLabel (window, label_id)
+	OptBuddyLabel (window, label_id, label_strref, help_ta, focusedText, defaultText)
 
 	return button
 
@@ -133,15 +133,15 @@ def OptHelpText (name, window, text_id, text_strref):
 	text.SetText (text_strref)
 	return text
 
-def OptBuddyLabel (window, label_id, label_strref = None, help_ta = None, ctlname = None, winname = None):
+def OptBuddyLabel (window, label_id, label_strref = None, help_ta = None, focusedText = None, defaultText = None):
 	label = window.GetControl (label_id)
 	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	label.SetState (IE_GUI_BUTTON_LOCKED)
 	if label_strref and GameCheck.IsPST():
 		label.SetText (label_strref)
 	if help_ta:
-		label.OnMouseEnter (lambda: help_ta.SetText (ctlname))
-		label.OnMouseLeave (lambda: help_ta.SetText (winname))
+		label.OnMouseEnter (lambda: help_ta.SetText (focusedText))
+		label.OnMouseLeave (lambda: help_ta.SetText (defaultText))
 
 ###################################################
 # End of file GUIOPTControls.py
