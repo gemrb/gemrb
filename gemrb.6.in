@@ -99,7 +99,7 @@ type, use the default "auto".
 Arbitrary name of the game. It will be displayed in the window's title bar.
 
 .TP
-.BR Encoding =(default|czech|german)
+.BR Encoding =(default|japanese|korean|chinese)
 Specify language used in the game data.
 
 .TP

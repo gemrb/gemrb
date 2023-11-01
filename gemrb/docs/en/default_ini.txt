@@ -1,4 +1,4 @@
-ENCODING SPECIFICATION - DEFAULT.INI, CZECH.INI, ...
+ENCODING SPECIFICATION - DEFAULT.INI, KOREAN.INI, ...
 ****************************************************************
 
 GemRB needs information about encoding used in game data (specifically, in
@@ -8,9 +8,9 @@ Naming
 ------
 
 default.ini is standard encoding for all western language-games.
-czech.ini is encoding used for all Czech versions of games.
+korean.ini is encoding used for all Korean versions of games.
 
-To use e.g. czech.ini encoding, specify "Encoding=czech" in GemRB.cfg.
+To use e.g. korean.ini for encoding, specify "Encoding=korean" in GemRB.cfg.
 Default is default.ini.
 
 Format
