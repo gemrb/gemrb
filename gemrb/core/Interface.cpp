@@ -1328,7 +1328,6 @@ static const EnumArray<GFFlags, StringView> game_flags {
 	"SpawnIni", // GFFlags::SPAWN_INI
 	"IWD2DeathVarFormat", // GFFlags::IWD2_DEATHVARFORMAT
 	"HasResDataIni", // GFFlags::RESDATA_INI
-	"OverrideCursorPos", // GFFlags::OVERRIDE_CURSORPOS
 	"BreakableWeapons", // GFFlags::BREAKABLE_WEAPONS
 	"3EdRules", // GFFlags::3ED_RULES
 	"LevelslotPerClass", // GFFlags::LEVELSLOT_PER_CLASS
@@ -3433,15 +3432,10 @@ bool Interface::HasCurrentArea() const
 	return game->GetCurrentArea() != nullptr;
 }
 
-//this is used only for the console
+// this is used by our console and editable textareas (textedits provide their own cursor)
 Holder<Sprite2D> Interface::GetCursorSprite() const
 {
-	Holder<Sprite2D> spr = gamedata->GetBAMSprite(TextCursorBam, 0, 0);
-	if (spr && HasFeature(GFFlags::OVERRIDE_CURSORPOS)) {
-		spr->Frame.x = 1;
-		spr->Frame.y = spr->Frame.h - 1;
-	}
-	return spr;
+	return gamedata->GetBAMSprite(TextCursorBam, 0, 0);
 }
 
 Holder<Sprite2D> Interface::GetScrollCursorSprite(orient_t orient, int spriteNum) const
