@@ -369,7 +369,7 @@ key_list = [
 
 
 KEYS_PAGE_SIZE = 60
-KEYS_PAGE_COUNT = ((len (key_list) - 1) / KEYS_PAGE_SIZE)+ 1
+KEYS_PAGE_COUNT = ((len (key_list) - 1) // KEYS_PAGE_SIZE) + 1
 
 def OpenKeyboardMappingsWindow ():
 	global last_key_action
