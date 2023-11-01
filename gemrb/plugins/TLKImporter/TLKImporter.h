@@ -45,6 +45,7 @@ private:
 	CTlkOverride *OverrideTLK = nullptr;
 	ResRefMap<gt_type> gtmap;
 	int charname = 0;
+	bool hasEndingNewline = false;
 
 public:
 	TLKImporter(void);

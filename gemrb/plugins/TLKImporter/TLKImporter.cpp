@@ -106,6 +106,11 @@ bool TLKImporter::Open(DataStream* stream)
 		Log(ERROR, "TLKImporter", "Too many strings ({}), increase OVERRIDE_START.", StrRefCount);
 		return false;
 	}
+
+	if (GetString(ieStrRef(1)).back() == u'\n') {
+		hasEndingNewline = true;
+	}
+
 	return true;
 }
 
@@ -372,6 +377,9 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 	}
 	if (bool(flags & STRING_FLAGS::STRREFON)) {
 		string = fmt::format(u"{}: {}", ieDword(strref), string);
+	}
+	if (hasEndingNewline) {
+		RTrim(string, u"\n");
 	}
 	return string;
 }
