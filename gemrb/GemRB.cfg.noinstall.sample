@@ -32,7 +32,7 @@ GamePath=../gemrb/tests/minimal
 
 GameType=test
 
-# Encoding [default|polish|czech|german] Language used by game data.
+# Encoding [default|czech|german] Language used by game data.
 # Encoding=default
 
 ###############################################################################
