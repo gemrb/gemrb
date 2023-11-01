@@ -43,12 +43,6 @@ HelpTextArea = None
 LoadMsgWindow = None
 QuitMsgWindow = None
 
-if GameCheck.IsBG1():
-	HelpTextArea2 = None
-else:
-	# just an alias to keep our logic from being plagued by too many GameCheck.IsBG1() checks
-	HelpTextArea2 = HelpTextArea
-
 ###################################################
 def InitOptionsWindow (Window):
 	"""Open main options window"""
@@ -225,12 +219,12 @@ def DisplayHelpMusicVolume ():
 def OpenCharacterSoundsWindow ():
 	"""Open character sounds window"""
 
-	global HelpTextArea2
+	global HelpTextArea
 
 	Window = GemRB.LoadWindow (12, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
-	HelpTextArea2 = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
+	HelpTextArea = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
 
 	GUIOPTControls.OptDone (Window.Close, Window, 24)
 	GUIOPTControls.OptCancel (Window.Close, Window, 25)
@@ -259,11 +253,11 @@ def OpenCharacterSoundsWindow ():
 
 def DisplayHelpCommandSounds ():
 	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18016)
+	HelpTextArea.SetText (18016)
 
 def DisplayHelpSelectionSounds ():
 	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (11352)
+	HelpTextArea.SetText (11352)
 
 ###################################################
 
@@ -331,14 +325,14 @@ def DisplayHelpMouseScrollingSpeed ():
 def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
 
-	global HelpTextArea2
+	global HelpTextArea
 
 	Window = GemRB.LoadWindow (9, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	# same as HelpTextArea if not BG1
-	HelpTextArea2 = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 28, 18043)
+	HelpTextArea = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 28, 18043)
 
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
@@ -364,7 +358,7 @@ def OpenFeedbackOptionsWindow ():
 
 def DisplayHelpMarkerFeedback ():
 	# same as HelpTextArea if not BG1
-	HelpTextArea2.SetText (18024)
+	HelpTextArea.SetText (18024)
 	GemRB.SetVar ("GUI Feedback Level", GemRB.GetVar ("Circle Feedback") + 1)
 
 ###################################################
@@ -372,13 +366,13 @@ def DisplayHelpMarkerFeedback ():
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
 
-	global HelpTextArea2
+	global HelpTextArea
 
 	Window = GemRB.LoadWindow (10, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
-	HelpTextArea2 = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
+	HelpTextArea = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
 
 	GUIOPTControls.OptDone (Window.Close, Window, 11)
 	GUIOPTControls.OptCancel (Window.Close, Window, 14)
