@@ -57,7 +57,7 @@ public:
 template<typename PT>
 struct AndPredicate : CompoundPredicate<PT> {
 	AndPredicate(SharedPredicate<PT> p1, SharedPredicate<PT> p2)
-	: CompoundPredicate<PT>(p1, p2) {}
+		: CompoundPredicate<PT>(std::move(p1), std::move(p2)) {}
 
 	bool operator()(const PT& param) const override {
 		return (*this->pred1)(param) && (*this->pred2)(param);
@@ -67,7 +67,7 @@ struct AndPredicate : CompoundPredicate<PT> {
 template<typename PT>
 struct OrPredicate : CompoundPredicate<PT> {
 	OrPredicate(SharedPredicate<PT> p1, SharedPredicate<PT> p2)
-	: CompoundPredicate<PT>(p1, p2) {}
+		: CompoundPredicate<PT>(std::move(p1), std::move(p2)) {}
 
 	bool operator()(const PT& param) const override {
 		return (*this->pred1)(param) || (*this->pred2)(param);

@@ -45,7 +45,7 @@ void WindowManager::SetTooltipDelay(int delay)
 }
 
 WindowManager::WindowManager(PluginHolder<Video> vid, std::shared_ptr<GUIFactory> fact)
-: guifact(fact), video(vid), tooltip(core->CreateTooltip())
+	: guifact(std::move(fact)), video(std::move(vid)), tooltip(core->CreateTooltip())
 {
 	assert(video);
 	assert(guifact);

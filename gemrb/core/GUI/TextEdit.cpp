@@ -61,7 +61,7 @@ void TextEdit::SetAlignment(unsigned char align)
 /** Set Font */
 void TextEdit::SetFont(Holder<Font> f)
 {
-	textContainer.SetFont(f);
+	textContainer.SetFont(std::move(f));
 }
 
 /** Key Press Event */
@@ -149,7 +149,7 @@ void TextEdit::SetBackground(TextEditBG type)
 	auto mos = gamedata->GetResourceHolder<ImageMgr>(bgMos[type]);
 	if (mos) {
 		Holder<Sprite2D> img = mos->GetSprite2D();
-		View::SetBackground(img);
+		View::SetBackground(std::move(img));
 	}
 }
 

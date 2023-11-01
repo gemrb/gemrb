@@ -73,7 +73,7 @@ private:
 	class SpanSelector : public ContentContainer {
 		struct OptSpan : public TextContainer {
 			OptSpan(const Region& frame, Holder<Font> font, const Color& fg, const Color& bg)
-			: TextContainer(frame, font)
+				: TextContainer(frame, std::move(font))
 			{
 				SetColors(fg, bg);
 			}

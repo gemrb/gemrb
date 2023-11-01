@@ -24,7 +24,7 @@
 namespace GemRB {
 
 SaveGameAREExtractor::SaveGameAREExtractor(Holder<SaveGame> saveGame)
-: saveGame(saveGame)
+	: saveGame(std::move(saveGame))
 {}
 
 int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trackLocations) {

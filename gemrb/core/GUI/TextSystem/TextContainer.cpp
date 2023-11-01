@@ -672,7 +672,7 @@ void ContentContainer::DeleteContentsInRect(const Region& exclusion)
 
 
 TextContainer::TextContainer(const Region& frame, Holder<Font> fnt)
-	: ContentContainer(frame), font(fnt)
+	: ContentContainer(frame), font(std::move(fnt))
 {
 }
 
