@@ -114,12 +114,12 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptDone (Window.Close, Window, 7)
 	GUIOPTControls.OptCancel (Window.Close, Window, 8)
 
-	GUIOPTControls.OptSlider (31052, 31431, VideoHelpText, Window, 1, 10, 31234, "Brightness Correction", lambda: GammaFeedback(31431))
-	GUIOPTControls.OptSlider (31052, 31459, VideoHelpText, Window, 2, 11, 31429, "Gamma Correction", lambda: GammaFeedback(31459))
+	GUIOPTControls.OptSlider (31052, 31431, Window, 1, 10, 31234, "Brightness Correction", lambda: GammaFeedback(31431))
+	GUIOPTControls.OptSlider (31052, 31459, Window, 2, 11, 31429, "Gamma Correction", lambda: GammaFeedback(31459))
 
-	GUIOPTControls.OptCheckbox (31052, 31221, VideoHelpText, Window, 6, 15, 30898, "SoftBlt")
-	GUIOPTControls.OptCheckbox (31052, 31216, VideoHelpText, Window, 4, 13, 30896, "SoftMirrorBlt")
-	GUIOPTControls.OptCheckbox (31052, 31220, VideoHelpText, Window, 5, 14, 30897, "SoftSrcKeyBlt")
+	GUIOPTControls.OptCheckbox (31052, 31221, Window, 6, 15, 30898, "SoftBlt")
+	GUIOPTControls.OptCheckbox (31052, 31216, Window, 4, 13, 30896, "SoftMirrorBlt")
+	GUIOPTControls.OptCheckbox (31052, 31220, Window, 5, 14, 30897, "SoftSrcKeyBlt")
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -162,15 +162,15 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptDone (Window.Close, Window, 7)
 	GUIOPTControls.OptCancel (Window.Close, Window, 8)
 
-	GUIOPTControls.OptSlider (31210, 31227, AudioHelpText, Window, 1, 10, 31460, "Volume Ambients", lambda: UpdateVolume(31227))
-	GUIOPTControls.OptSlider (31210, 31228, AudioHelpText, Window, 2, 11, 31466, "Volume SFX", lambda: UpdateVolume(31228))
-	GUIOPTControls.OptSlider (31210, 31226, AudioHelpText, Window, 3, 12, 31467, "Volume Voices", lambda: UpdateVolume(31226))
-	GUIOPTControls.OptSlider (31210, 31225, AudioHelpText, Window, 4, 13, 31468, "Volume Music", lambda: UpdateVolume(31225))
-	GUIOPTControls.OptSlider (31210, 31229, AudioHelpText, Window, 5, 14, 31469, "Volume Movie", lambda: UpdateVolume(31229))
+	GUIOPTControls.OptSlider (31210, 31227, Window, 1, 10, 31460, "Volume Ambients", lambda: UpdateVolume(31227))
+	GUIOPTControls.OptSlider (31210, 31228, Window, 2, 11, 31466, "Volume SFX", lambda: UpdateVolume(31228))
+	GUIOPTControls.OptSlider (31210, 31226, Window, 3, 12, 31467, "Volume Voices", lambda: UpdateVolume(31226))
+	GUIOPTControls.OptSlider (31210, 31225, Window, 4, 13, 31468, "Volume Music", lambda: UpdateVolume(31225))
+	GUIOPTControls.OptSlider (31210, 31229, Window, 5, 14, 31469, "Volume Movie", lambda: UpdateVolume(31229))
 	
-	GUIOPTControls.OptCheckbox (31210, 31224, AudioHelpText, Window, 6, 15, 30900, "Environmental Audio")
-	GUIOPTControls.OptCheckbox (31210, 63244, AudioHelpText, Window, 16, 17, 63242, "Sound Processing")
-	GUIOPTControls.OptCheckbox (31210, 63247, AudioHelpText, Window, 18, 19, 63243, "Music Processing")
+	GUIOPTControls.OptCheckbox (31210, 31224, Window, 6, 15, 30900, "Environmental Audio")
+	GUIOPTControls.OptCheckbox (31210, 63244, Window, 16, 17, 63242, "Sound Processing")
+	GUIOPTControls.OptCheckbox (31210, 63247, Window, 18, 19, 63243, "Music Processing")
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
@@ -198,17 +198,17 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptDone (Window.Close, Window, 10)
 	GUIOPTControls.OptCancel (Window.Close, Window, 11)
 
-	GUIOPTControls.OptSlider (31212, 31232, GameplayHelpText, Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
-	GUIOPTControls.OptSlider (31212, 31230, GameplayHelpText, Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
-	GUIOPTControls.OptSlider (31212, 31231, GameplayHelpText, Window, 3, 15, 31480, "Keyboard Scroll Speed")
-	GUIOPTControls.OptSlider (31212, 31233, GameplayHelpText, Window, 4, 16, 31479, "Difficulty Level")
+	GUIOPTControls.OptSlider (31212, 31232, Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
+	GUIOPTControls.OptSlider (31212, 31230, Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
+	GUIOPTControls.OptSlider (31212, 31231, Window, 3, 15, 31480, "Keyboard Scroll Speed")
+	GUIOPTControls.OptSlider (31212, 31233, Window, 4, 16, 31479, "Difficulty Level")
 
-	GUIOPTControls.OptCheckbox (31212, 31222, GameplayHelpText, Window, 5, 17, 31217, "Always Dither")
-	GUIOPTControls.OptCheckbox (31212, 31223, GameplayHelpText, Window, 6, 18, 31218, "Gore")
-	GUIOPTControls.OptCheckbox (31212, 62419, GameplayHelpText, Window, 22, 23, 62418, "Always Run", GUICommonWindows.ToggleAlwaysRun)
+	GUIOPTControls.OptCheckbox (31212, 31222, Window, 5, 17, 31217, "Always Dither")
+	GUIOPTControls.OptCheckbox (31212, 31223, Window, 6, 18, 31218, "Gore")
+	GUIOPTControls.OptCheckbox (31212, 62419, Window, 22, 23, 62418, "Always Run", GUICommonWindows.ToggleAlwaysRun)
 
-	PSTOptButton (31212, 31213, GameplayHelpText, Window, 8, 20, 31478, OpenFeedbackOptionsWindow)
-	PSTOptButton (31212, 31214, GameplayHelpText, Window, 9, 21, 31470, OpenAutopauseOptionsWindow)
+	PSTOptButton (31212, 31213, Window, 8, 20, 31478, OpenFeedbackOptionsWindow)
+	PSTOptButton (31212, 31214, Window, 9, 21, 31470, OpenAutopauseOptionsWindow)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -236,20 +236,20 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptDone (Window.Close, Window, 7)
 	GUIOPTControls.OptCancel (Window.Close, Window, 8)
 
-	GUIOPTControls.OptSlider (31213, 37411, FeedbackHelpText, Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
-	GUIOPTControls.OptSlider (31213, 37447, FeedbackHelpText, Window, 2, 11, 37586, "Locator Feedback Level")
-	GUIOPTControls.OptSlider (31213, 54878, FeedbackHelpText, Window, 20, 21, 54879, "Selection Sounds Frequency")
-	GUIOPTControls.OptSlider (31213, 54880, FeedbackHelpText, Window, 22, 23, 55012, "Command Sounds Frequency")
+	GUIOPTControls.OptSlider (31213, 37411, Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
+	GUIOPTControls.OptSlider (31213, 37447, Window, 2, 11, 37586, "Locator Feedback Level")
+	GUIOPTControls.OptSlider (31213, 54878, Window, 20, 21, 54879, "Selection Sounds Frequency")
+	GUIOPTControls.OptSlider (31213, 54880, Window, 22, 23, 55012, "Command Sounds Frequency")
 
 	# others have: to hit rolls, combat info, [actions], state changes, [selection text], misc
 	# pst: states, misc, to hit rolls, combat info, [spell casting]; and separate sliders for selection and command
 	# we harmonize it across games by likely breaking compatibility with the original
 	# there's no need to disable values 4 and 16 (set by our defaults.ini), since their use takes the separate sliders into account
-	GUIOPTControls.OptCheckbox (31213, 37460, FeedbackHelpText, Window, 6, 15, 37594, 'Effect Text Level', None, 8)
-	GUIOPTControls.OptCheckbox (31213, 37462, FeedbackHelpText, Window, 17, 19, 37596, 'Effect Text Level', None, 32)
-	GUIOPTControls.OptCheckbox (31213, 37453, FeedbackHelpText, Window, 3, 12, 37588, 'Effect Text Level', None, 1)
-	GUIOPTControls.OptCheckbox (31213, 37457, FeedbackHelpText, Window, 4, 13, 37590, 'Effect Text Level', None, 2)
-	GUIOPTControls.OptCheckbox (31213, 37458, FeedbackHelpText, Window, 5, 14, 37592, 'Effect Text Level', None, 64)
+	GUIOPTControls.OptCheckbox (31213, 37460, Window, 6, 15, 37594, 'Effect Text Level', None, 8)
+	GUIOPTControls.OptCheckbox (31213, 37462, Window, 17, 19, 37596, 'Effect Text Level', None, 32)
+	GUIOPTControls.OptCheckbox (31213, 37453, Window, 3, 12, 37588, 'Effect Text Level', None, 1)
+	GUIOPTControls.OptCheckbox (31213, 37457, Window, 4, 13, 37590, 'Effect Text Level', None, 2)
+	GUIOPTControls.OptCheckbox (31213, 37458, Window, 5, 14, 37592, 'Effect Text Level', None, 64)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
@@ -270,13 +270,13 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCancel (Window.Close, Window, 17)
 
 	# checkboxes OR the values if they associate to the same variable
-	GUIOPTControls.OptCheckbox (31214, 37688, AutopauseHelpText, Window, 2, 9, 37598, "Auto Pause State", None, 4)
-	GUIOPTControls.OptCheckbox (31214, 37689, AutopauseHelpText, Window, 3, 10, 37681, "Auto Pause State", None, 8)
-	GUIOPTControls.OptCheckbox (31214, 37690, AutopauseHelpText, Window, 4, 11, 37682, "Auto Pause State", None, 16)
-	GUIOPTControls.OptCheckbox (31214, 37691, AutopauseHelpText, Window, 5, 12, 37683, "Auto Pause State", None, 2)
-	GUIOPTControls.OptCheckbox (31214, 37692, AutopauseHelpText, Window, 6, 13, 37684, "Auto Pause State", None, 1)
-	GUIOPTControls.OptCheckbox (31214, 37693, AutopauseHelpText, Window, 7, 14, 37685, "Auto Pause State", None, 32)
-	GUIOPTControls.OptCheckbox (31214, 37694, AutopauseHelpText, Window, 8, 15, 37686, "Auto Pause State", None, 64)
+	GUIOPTControls.OptCheckbox (31214, 37688, Window, 2, 9, 37598, "Auto Pause State", None, 4)
+	GUIOPTControls.OptCheckbox (31214, 37689, Window, 3, 10, 37681, "Auto Pause State", None, 8)
+	GUIOPTControls.OptCheckbox (31214, 37690, Window, 4, 11, 37682, "Auto Pause State", None, 16)
+	GUIOPTControls.OptCheckbox (31214, 37691, Window, 5, 12, 37683, "Auto Pause State", None, 2)
+	GUIOPTControls.OptCheckbox (31214, 37692, Window, 6, 13, 37684, "Auto Pause State", None, 1)
+	GUIOPTControls.OptCheckbox (31214, 37693, Window, 7, 14, 37685, "Auto Pause State", None, 32)
+	GUIOPTControls.OptCheckbox (31214, 37694, Window, 8, 15, 37686, "Auto Pause State", None, 64)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
@@ -495,14 +495,15 @@ def OnCreditsPress ():
 
 ###################################################
 
-def PSTOptButton (winname, ctlname, help_ta, window, button_id, label_id, label_strref, action):
+def PSTOptButton (winname, ctlname, window, button_id, label_id, label_strref, action):
 	"""Standard subwindow button for option windows"""
 	button = window.GetControl (button_id)
 	button.OnPress (action)
+	help_ta = GemRB.GetView ("OPTHELP")
 	button.OnMouseEnter (lambda: help_ta.SetText (ctlname))
 	button.OnMouseLeave (lambda: help_ta.SetText (winname))
 
-	GUIOPTControls.OptBuddyLabel (window, label_id, label_strref, help_ta, ctlname, winname)
+	GUIOPTControls.OptBuddyLabel (window, label_id, label_strref, ctlname, winname)
 
 ###################################################
 # End of file GUIOPT.py

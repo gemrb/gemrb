@@ -19,6 +19,8 @@
 # GUIOPTControls.py - control functions for the GUIOPT winpack:
 
 ###################################################
+
+import GemRB
 import GameCheck
 from GUIDefines import *
 
@@ -40,23 +42,24 @@ else:
 # control (button, slider ...) and a label
 
 # NOTE: make sure handler users also set the strref in them!
-def OptSlider (winhelp, ctlhelp, help_ta, window, slider_id, label_id, label_strref, variable, action = None, value = 1):
+def OptSlider (winhelp, ctlhelp, window, slider_id, label_id, label_strref, variable, action = None, value = 1):
 	"""Standard slider for option windows"""
 	slider = window.GetControl (slider_id)
+	helpTA = GemRB.GetView ("OPTHELP")
 	slider.SetVarAssoc (variable, value)
 	if action:
 		slider.OnChange (action)
 	else:
 		# create an anonymous callback, so we don't need to create a separate function for each string
-		slider.OnChange (lambda: help_ta.SetText (ctlhelp))
+		slider.OnChange (lambda: helpTA.SetText (ctlhelp))
 
-	OptBuddyLabel (window, label_id, label_strref, help_ta, ctlhelp, winhelp)
-	slider.OnMouseEnter (lambda: help_ta.SetText (ctlhelp))
-	slider.OnMouseLeave (lambda: help_ta.SetText (winhelp))
+	OptBuddyLabel (window, label_id, label_strref, ctlhelp, winhelp)
+	slider.OnMouseEnter (lambda: helpTA.SetText (ctlhelp))
+	slider.OnMouseLeave (lambda: helpTA.SetText (winhelp))
 
 	return slider
 
-def OptRadio (action, window, button_id, label_id, variable, value, label_strref = None, help_ta = None, focusedText = None, defaultText = None):
+def OptRadio (action, window, button_id, label_id, variable, value, label_strref = None, focusedText = None, defaultText = None):
 	"""Standard radio button for option windows"""
 
 	button = window.GetControl (button_id)
@@ -68,12 +71,12 @@ def OptRadio (action, window, button_id, label_id, variable, value, label_strref
 	elif GameCheck.IsIWD1() or GameCheck.IsBG1():
 		button.SetSprites ("TOGGLE", 0, 0, 1, 3, 2)
 
-	OptBuddyLabel (window, label_id, label_strref, help_ta, focusedText, defaultText)
+	OptBuddyLabel (window, label_id, label_strref, focusedText, defaultText)
 
 	return button
 
 # NOTE: make sure handler users also set the strref in them!
-def OptCheckbox (winhelp, ctlhelp, help_ta, window, button_id, label_id, label_strref, variable, handler=None, value=1):
+def OptCheckbox (winhelp, ctlhelp, window, button_id, label_id, label_strref, variable, handler=None, value=1):
 	"""Standard checkbox for option windows"""
 
 	button = window.GetControl (button_id)
@@ -90,11 +93,11 @@ def OptCheckbox (winhelp, ctlhelp, help_ta, window, button_id, label_id, label_s
 		button.OnPress (handler)
 	else:
 		def callback():
-			help_ta.SetText(ctlhelp)
+			GemRB.GetView ("OPTHELP").SetText (ctlhelp)
 
 		button.OnMouseEnter (callback)
 
-	OptBuddyLabel (window, label_id, label_strref, help_ta, ctlhelp, winhelp)
+	OptBuddyLabel (window, label_id, label_strref, ctlhelp, winhelp)
 
 	return button
 
@@ -131,14 +134,16 @@ def OptHelpText (name, window, text_id, text_strref):
 	"""Standard textarea with context help for option windows"""
 	text = window.GetControl (text_id)
 	text.SetText (text_strref)
+	text.AddAlias ("OPTHELP", 0, 1)
 	return text
 
-def OptBuddyLabel (window, label_id, label_strref = None, help_ta = None, focusedText = None, defaultText = None):
+def OptBuddyLabel (window, label_id, label_strref = None, focusedText = None, defaultText = None):
 	label = window.GetControl (label_id)
 	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	label.SetState (IE_GUI_BUTTON_LOCKED)
 	if label_strref and GameCheck.IsPST():
 		label.SetText (label_strref)
+	help_ta = GemRB.GetView ("OPTHELP")
 	if help_ta:
 		label.OnMouseEnter (lambda: help_ta.SetText (focusedText))
 		label.OnMouseLeave (lambda: help_ta.SetText (defaultText))
