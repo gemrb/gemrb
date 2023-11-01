@@ -238,9 +238,10 @@ static void GetTextEdit(DataStream* str, Control*& ctrl, const Region& ctrlFrame
 	str->ReadWord(curCycle);
 	str->ReadWord(curFrame);
 	str->ReadPoint(pos); // "XEditClientOffset" and "YEditClientOffset" in the original
-	//FIXME: I still don't know what to do with this point
+	// NOTE: I still don't know what to do with this point
 	// Contrary to forum posts, it is definitely not a scrollbar ID
 	// ee docs call them XEditCaretOffset and YEditCaretOffset
+	// "pos" does affect the caret position in the originals, so we don't need an extra point
 	str->ReadPoint(pos2);
 	str->ReadResRef(fontResRef);
 	//this field is still unknown or unused, labeled SequenceText
@@ -249,7 +250,7 @@ static void GetTextEdit(DataStream* str, Control*& ctrl, const Region& ctrlFrame
 	// always writes it over, and never uses it (labeled DefaultString)
 	str->ReadVariable(initial);
 	str->ReadWord(maxInput);
-	// word: caseformat: 0 normal, 1 upper, 2 lower TODO (Allowed case in NI)
+	// word: caseformat: 0 normal, 1 upper, 2 lower (Allowed case in NI) - not working in the original
 	// word: typeformat, unknown
 	auto fnt = core->GetFont(fontResRef);
 
