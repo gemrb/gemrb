@@ -2033,39 +2033,35 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // gemrb extension: if the resource field is filled, it will remove curse only from the specified item
 int fx_remove_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_remove_curse(%2d): Resource: %s Type: %d", fx->Opcode, fx->Resource, fx->Parameter2);
-
-	switch(fx->Parameter2)
-	{
-	case 1:
-		//this is pst specific
+	if (fx->Parameter2 == 1) {
+		// this is pst specific, other games don't use parameters
 		target->fxqueue.RemoveAllEffects(fx_pst_jumble_curse_ref);
-		break;
-	default:
-		Inventory *inv = &target->inventory;
-		int i = target->inventory.GetSlotCount();
-		while(i--) {
-			//does this slot need unequipping
-			if (core->QuerySlotEffects(i) ) {
-				if (!fx->Resource.IsEmpty() && inv->GetSlotItem(i)->ItemResRef != fx->Resource) {
-					continue;
-				}
-				if (!(inv->GetItemFlag(i)&IE_INV_ITEM_CURSED)) {
-					continue;
-				}
-				if (inv->UnEquipItem(i,true)) {
-					CREItem *tmp = inv->RemoveItem(i);
-					if(inv->AddSlotItem(tmp,-3)!=ASI_SUCCESS) {
-						//if the item couldn't be placed in the inventory, then put it back to the original slot
-						inv->SetSlotItem(tmp,i);
-						//and drop it in the area. (If there is no area, then the item will stay in the inventory)
-						target->DropItem(i,0);
-					}
-				}
+		return FX_NOT_APPLIED;
+	}
+
+	Inventory* inv = &target->inventory;
+	int i = target->inventory.GetSlotCount();
+	while (i--) {
+		// does this slot need unequipping
+		if (!core->QuerySlotEffects(i)) continue;
+		if (!fx->Resource.IsEmpty() && inv->GetSlotItem(i)->ItemResRef != fx->Resource) {
+			continue;
+		}
+		if (!(inv->GetItemFlag(i) & IE_INV_ITEM_CURSED)) {
+			continue;
+		}
+
+		if (inv->UnEquipItem(i, true)) {
+			CREItem* tmp = inv->RemoveItem(i);
+			if (inv->AddSlotItem(tmp, -3) != ASI_SUCCESS) {
+				// if the item couldn't be placed in the inventory, then put it back to the original slot
+				inv->SetSlotItem(tmp, i);
+				// and drop it in the area. (If there is no area, then the item will stay in the inventory)
+				target->DropItem(i, 0);
 			}
 		}
-		target->fxqueue.RemoveAllEffects(fx_apply_effect_curse_ref);
 	}
+	target->fxqueue.RemoveAllEffects(fx_apply_effect_curse_ref);
 
 	//this is an instant effect
 	return FX_NOT_APPLIED;
