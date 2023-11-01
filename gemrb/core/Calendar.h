@@ -24,21 +24,21 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include <vector>
+
 namespace GemRB {
 
 class GEM_EXPORT Calendar {
 private:
-	int daysinyear = 0;
-	size_t monthnamecount = 0;
-	int *days = nullptr;
-	ieStrRef *monthnames = nullptr;
+	int daysInYear = 0;
+	std::vector<int> days;
+	std::vector<ieStrRef> monthNames;
 
 public:
 	Calendar(void);
 	Calendar(const Calendar&) = delete;
-	~Calendar(void);
 	Calendar& operator=(const Calendar&) = delete;
-	void GetMonthName(int dayandmonth) const;
+	void GetMonthName(int dayAndMonth) const;
 	int GetCalendarDay(int date) const;
 };
 

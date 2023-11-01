@@ -31,35 +31,29 @@ Calendar::Calendar(void)
 	if (!tab) {
 		return;
 	}
-	monthnamecount = tab->GetRowCount();
-	monthnames = new ieStrRef[monthnamecount];
-	days = new int[monthnamecount];
+	size_t monthNameCount = tab->GetRowCount();
+	monthNames.resize(monthNameCount);
+	days.resize(monthNameCount);
 
-	for (size_t i = 0; i < monthnamecount; i++) {
+	for (size_t i = 0; i < monthNameCount; i++) {
 		days[i] = tab->QueryFieldSigned<int>(i,0);
-		daysinyear+=days[i];
-		monthnames[i] = tab->QueryFieldAsStrRef(i,1);
+		daysInYear += days[i];
+		monthNames[i] = tab->QueryFieldAsStrRef(i, 1);
 	}
 }
 
-Calendar::~Calendar(void)
-{
-	delete[] monthnames;
-	delete[] days;
-}
-
-void Calendar::GetMonthName(int dayandmonth) const
+void Calendar::GetMonthName(int dayAndMonth) const
 {
 	int month=1;
 
-	for (size_t i = 0; i < monthnamecount; ++i) {
-		if (dayandmonth<days[i]) {
-			SetTokenAsString("DAY", dayandmonth + 1);
-			core->GetTokenDictionary()["MONTHNAME"] = core->GetString(monthnames[i]);
+	for (size_t i = 0; i < monthNames.size(); ++i) {
+		if (dayAndMonth < days[i]) {
+			SetTokenAsString("DAY", dayAndMonth + 1);
+			core->GetTokenDictionary()["MONTHNAME"] = core->GetString(monthNames[i]);
 			SetTokenAsString("MONTH", month);
 			return;
 		}
-		dayandmonth-=days[i];
+		dayAndMonth -= days[i];
 		//ignoring single days (they are not months)
 		if (days[i]!=1) month++;
 	}
@@ -67,17 +61,15 @@ void Calendar::GetMonthName(int dayandmonth) const
 
 int Calendar::GetCalendarDay(int date) const
 {
-	int dayandmonth;
-
-	if (!daysinyear) return 0;
-	dayandmonth = date%daysinyear;
-	for (size_t i=0; i < monthnamecount; ++i) {
-		if (dayandmonth<days[i]) {
+	if (!daysInYear) return 0;
+	int dayAndMonth = date % daysInYear;
+	for (const auto& day : days) {
+		if (dayAndMonth < day) {
 			break;
 		}
-		dayandmonth-=days[i];
+		dayAndMonth -= day;
 	}
-	return dayandmonth+1;
+	return dayAndMonth + 1;
 }
 
 }
