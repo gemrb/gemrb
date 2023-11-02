@@ -42,8 +42,10 @@ else:
 # control (button, slider ...) and a label
 
 # NOTE: make sure handler users also set the strref in them!
-def OptSlider (winhelp, ctlhelp, window, slider_id, label_id, label_strref, variable, action = None, value = 1):
+def OptSlider (winhelp, ctlhelp, slider_id, label_id, label_strref, variable, action = None, value = 1):
 	"""Standard slider for option windows"""
+
+	window = GetWindow ()
 	slider = window.GetControl (slider_id)
 	helpTA = GemRB.GetView ("OPTHELP")
 	slider.SetVarAssoc (variable, value)
@@ -53,15 +55,16 @@ def OptSlider (winhelp, ctlhelp, window, slider_id, label_id, label_strref, vari
 		# create an anonymous callback, so we don't need to create a separate function for each string
 		slider.OnChange (lambda: helpTA.SetText (ctlhelp))
 
-	OptBuddyLabel (window, label_id, label_strref, ctlhelp, winhelp)
+	OptBuddyLabel (label_id, label_strref, ctlhelp, winhelp)
 	slider.OnMouseEnter (lambda: helpTA.SetText (ctlhelp))
 	slider.OnMouseLeave (lambda: helpTA.SetText (winhelp))
 
 	return slider
 
-def OptRadio (action, window, button_id, label_id, variable, value, label_strref = None, focusedText = None, defaultText = None):
+def OptRadio (action, button_id, label_id, variable, value, label_strref = None, focusedText = None, defaultText = None):
 	"""Standard radio button for option windows"""
 
+	window = GetWindow ()
 	button = window.GetControl (button_id)
 	button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	button.OnPress (action)
@@ -71,14 +74,15 @@ def OptRadio (action, window, button_id, label_id, variable, value, label_strref
 	elif GameCheck.IsIWD1() or GameCheck.IsBG1():
 		button.SetSprites ("TOGGLE", 0, 0, 1, 3, 2)
 
-	OptBuddyLabel (window, label_id, label_strref, focusedText, defaultText)
+	OptBuddyLabel (label_id, label_strref, focusedText, defaultText)
 
 	return button
 
 # NOTE: make sure handler users also set the strref in them!
-def OptCheckbox (winhelp, ctlhelp, window, button_id, label_id, label_strref, variable, handler=None, value=1):
+def OptCheckbox (winhelp, ctlhelp, button_id, label_id, label_strref, variable, handler = None, value = 1):
 	"""Standard checkbox for option windows"""
 
+	window = GetWindow ()
 	button = window.GetControl (button_id)
 	button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	if variable:
@@ -97,20 +101,22 @@ def OptCheckbox (winhelp, ctlhelp, window, button_id, label_id, label_strref, va
 
 		button.OnMouseEnter (callback)
 
-	OptBuddyLabel (window, label_id, label_strref, ctlhelp, winhelp)
+	OptBuddyLabel (label_id, label_strref, ctlhelp, winhelp)
 
 	return button
 
-def OptButton (action, window, button_id, button_strref):
+def OptButton (action, button_id, button_strref):
 	"""Standard subwindow button for option windows"""
 
+	window = GetWindow ()
 	button = window.GetControl (button_id)
 	button.OnPress (action)
 	button.SetText (button_strref)
 
-def OptDone (action, window, button_id):
+def OptDone (action, button_id):
 	"""Standard `Done' button for option windows"""
 
+	window = GetWindow ()
 	button = window.GetControl (button_id)
 	button.SetText (STR_OPT_DONE) # Done
 	button.OnPress (action)
@@ -119,9 +125,10 @@ def OptDone (action, window, button_id):
 	if GameCheck.IsPST():
 		button.SetVarAssoc ("Cancel", 0)
 
-def OptCancel (action, window, button_id):
+def OptCancel (action, button_id):
 	"""Standard `Cancel' button for option windows"""
 
+	window = GetWindow ()
 	button = window.GetControl (button_id)
 	button.SetText (STR_OPT_CANCEL) # Cancel
 	button.OnPress (action)
@@ -130,14 +137,17 @@ def OptCancel (action, window, button_id):
 	if GameCheck.IsPST():
 		button.SetVarAssoc ("Cancel", 1)
 
-def OptHelpText (name, window, text_id, text_strref):
+def OptHelpText (name, text_id, text_strref):
 	"""Standard textarea with context help for option windows"""
+
+	window = GetWindow ()
 	text = window.GetControl (text_id)
 	text.SetText (text_strref)
 	text.AddAlias ("OPTHELP", 0, 1)
 	return text
 
-def OptBuddyLabel (window, label_id, label_strref = None, focusedText = None, defaultText = None):
+def OptBuddyLabel (label_id, label_strref = None, focusedText = None, defaultText = None):
+	window = GetWindow ()
 	label = window.GetControl (label_id)
 	label.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	label.SetState (IE_GUI_BUTTON_LOCKED)
@@ -147,6 +157,10 @@ def OptBuddyLabel (window, label_id, label_strref = None, focusedText = None, de
 	if help_ta:
 		label.OnMouseEnter (lambda: help_ta.SetText (focusedText))
 		label.OnMouseLeave (lambda: help_ta.SetText (defaultText))
+
+def GetWindow ():
+	win = GemRB.GetView ("SUB_WIN", 1)
+	return win if win else GemRB.GetView ("SUB_WIN", 0)
 
 ###################################################
 # End of file GUIOPTControls.py
