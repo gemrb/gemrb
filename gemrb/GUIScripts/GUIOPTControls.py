@@ -56,8 +56,9 @@ def OptSlider (winhelp, ctlhelp, slider_id, label_id, label_strref, variable, ac
 		slider.OnChange (lambda: helpTA.SetText (ctlhelp))
 
 	OptBuddyLabel (label_id, label_strref, ctlhelp, winhelp)
-	slider.OnMouseEnter (lambda: helpTA.SetText (ctlhelp))
-	slider.OnMouseLeave (lambda: helpTA.SetText (winhelp))
+	if HasMouseOver ():
+		slider.OnMouseEnter (lambda: helpTA.SetText (ctlhelp))
+		slider.OnMouseLeave (lambda: helpTA.SetText (winhelp))
 
 	return slider
 
@@ -93,13 +94,15 @@ def OptCheckbox (winhelp, ctlhelp, button_id, label_id, label_strref, variable, 
 	elif GameCheck.IsIWD1() or GameCheck.IsBG1():
 		button.SetSprites ("GMPPARBC", 3, 1, 2, 3, 5)
 
+	def callback():
+		GemRB.GetView ("OPTHELP").SetText (ctlhelp)
+
 	if handler:
 		button.OnPress (handler)
-	else:
-		def callback():
-			GemRB.GetView ("OPTHELP").SetText (ctlhelp)
-
+	elif HasMouseOver ():
 		button.OnMouseEnter (callback)
+	else:
+		button.OnPress (callback)
 
 	OptBuddyLabel (label_id, label_strref, ctlhelp, winhelp)
 
@@ -154,13 +157,18 @@ def OptBuddyLabel (label_id, label_strref = None, focusedText = None, defaultTex
 	if label_strref and GameCheck.IsPST():
 		label.SetText (label_strref)
 	help_ta = GemRB.GetView ("OPTHELP")
-	if help_ta:
+	if help_ta and HasMouseOver ():
 		label.OnMouseEnter (lambda: help_ta.SetText (focusedText))
 		label.OnMouseLeave (lambda: help_ta.SetText (defaultText))
+	else:
+		label.OnPress (lambda: help_ta.SetText (focusedText))
 
 def GetWindow ():
 	win = GemRB.GetView ("SUB_WIN", 1)
 	return win if win else GemRB.GetView ("SUB_WIN", 0)
+
+def HasMouseOver ():
+	return GameCheck.IsPST () or GameCheck.IsIWD2 ()
 
 ###################################################
 # End of file GUIOPTControls.py
