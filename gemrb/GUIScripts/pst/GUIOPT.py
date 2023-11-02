@@ -101,7 +101,6 @@ def TrySavingConfiguration():
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
-	global VideoHelpText
 
 	def OnClose(Window):
 		TrySavingConfiguration()
@@ -110,8 +109,7 @@ def OpenVideoOptionsWindow ():
 	Window.AddAlias ("SUB_WIN", 0)
 	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
 
-	VideoHelpText = GUIOPTControls.OptHelpText ('VideoOptions', 9, 31052)
-
+	GUIOPTControls.OptHelpText ('VideoOptions', 9, 31052)
 	GUIOPTControls.OptDone (Window.Close, 7)
 	GUIOPTControls.OptCancel (Window.Close, 8)
 
@@ -126,7 +124,7 @@ def OpenVideoOptionsWindow ():
 	return
 	
 def GammaFeedback (feedback_ref):
-	VideoHelpText.SetText (feedback_ref)
+	GemRB.GetView ("OPTHELP").SetText (feedback_ref)
 	GemRB.SetGamma (GemRB.GetVar("Brightness Correction")/5,GemRB.GetVar("Gamma Correction")/20)
 	return
 
@@ -136,18 +134,15 @@ saved_audio_options = {}
 
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
-	global AudioHelpText
 
 	Window = GemRB.LoadWindow (5, "GUIOPT")
 	Window.AddAlias ("SUB_WIN", 0)
 
 	def OnClose(Window):
-		global AudioHelpText
 		# Restore values in case of cancel
 		if GemRB.GetVar ("Cancel") == 1:
 			for k, v in list(saved_audio_options.items ()):
 				GemRB.SetVar (k, v)
-			AudioHelpText = None
 			UpdateVolume (31210)
 
 		TrySavingConfiguration()
@@ -158,9 +153,7 @@ def OpenAudioOptionsWindow ():
 	for v in "Volume Ambients", "Volume SFX", "Volume Voices", "Volume Music", "Volume Movie", "Sound Processing", "Music Processing":
 		saved_audio_options[v] = GemRB.GetVar (v)
 
-
-	AudioHelpText = GUIOPTControls.OptHelpText ('AudioOptions', 9, 31210)
-
+	GUIOPTControls.OptHelpText ('AudioOptions', 9, 31210)
 	GUIOPTControls.OptDone (Window.Close, 7)
 	GUIOPTControls.OptCancel (Window.Close, 8)
 
@@ -177,8 +170,9 @@ def OpenAudioOptionsWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	
 def UpdateVolume (volume_ref):
-	if AudioHelpText:
-		AudioHelpText.SetText (volume_ref)
+	helpTA = GemRB.GetView ("OPTHELP")
+	if helpTA:
+		helpTA.SetText (volume_ref)
 	GemRB.UpdateAmbientsVolume ()
 	GemRB.UpdateMusicVolume ()
 
@@ -186,7 +180,6 @@ def UpdateVolume (volume_ref):
 
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
-	global GameplayHelpText
 
 	Window = GemRB.LoadWindow (6, "GUIOPT")
 	Window.AddAlias ("SUB_WIN", 0)
@@ -196,7 +189,7 @@ def OpenGameplayOptionsWindow ():
 
 	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
 
-	GameplayHelpText = GUIOPTControls.OptHelpText ('GameplayOptions', 12, 31212)
+	GUIOPTControls.OptHelpText ('GameplayOptions', 12, 31212)
 
 	GUIOPTControls.OptDone (Window.Close, 10)
 	GUIOPTControls.OptCancel (Window.Close, 11)
@@ -217,26 +210,23 @@ def OpenGameplayOptionsWindow ():
 	return
 
 def UpdateTooltips ():
-	GameplayHelpText.SetText (31232)
+	GemRB.GetView ("OPTHELP").SetText (31232)
 	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") )
 
 def UpdateMouseSpeed ():
-	GameplayHelpText.SetText (31230)
+	GemRB.GetView ("OPTHELP").SetText (31230)
 	GemRB.SetMouseScrollSpeed (GemRB.GetVar ("Mouse Scroll Speed") )
 
 ###################################################
 	
 def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
-	global FeedbackHelpText
 
 	Window = GemRB.LoadWindow (8, "GUIOPT")
 	Window.AddAlias ("SUB_WIN", 1)
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
-
-	FeedbackHelpText = GUIOPTControls.OptHelpText ('FeedbackOptions', 9, 37410)
-
+	GUIOPTControls.OptHelpText ('FeedbackOptions', 9, 37410)
 	GUIOPTControls.OptDone (Window.Close, 7)
 	GUIOPTControls.OptCancel (Window.Close, 8)
 
@@ -264,13 +254,11 @@ def UpdateMarkerFeedback ():
 
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
-	global AutopauseHelpText
 	
 	Window = GemRB.LoadWindow (9, "GUIOPT")
 	Window.AddAlias ("SUB_WIN", 1)
 
-	AutopauseHelpText = GUIOPTControls.OptHelpText ('AutopauseOptions', 1, 31214)
-
+	GUIOPTControls.OptHelpText ('AutopauseOptions', 1, 31214)
 	GUIOPTControls.OptDone (Window.Close, 16)
 	GUIOPTControls.OptCancel (Window.Close, 17)
 

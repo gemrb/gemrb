@@ -37,10 +37,7 @@ import GUIOPTControls
 from GUIDefines import *
 
 ###################################################
-GameOptionsWindow = None # not in PST
-HelpTextArea = None
 
-LoadMsgWindow = None
 QuitMsgWindow = None
 
 ###################################################
@@ -117,13 +114,12 @@ def CloseVideoOptionsWindow ():
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
-	global HelpTextArea
 
 	Window = GemRB.LoadWindow (6, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
-	HelpTextArea = GUIOPTControls.OptHelpText ('VideoOptions', 33, 18038)
+	GUIOPTControls.OptHelpText ('VideoOptions', 33, 18038)
 
 	GUIOPTControls.OptDone (CloseVideoOptionsWindow, 21)
 	GUIOPTControls.OptCancel (CloseVideoOptionsWindow, 32)
@@ -151,18 +147,18 @@ def OpenVideoOptionsWindow ():
 	return
 
 def DisplayHelpFullScreen ():
-	HelpTextArea.SetText (18000)
+	GemRB.GetView ("OPTHELP").SetText (18000)
 	GemRB.SetFullScreen (GemRB.GetVar("Full Screen"))
 
 def DisplayHelpBPP ():
-	HelpTextArea.SetText (17205)
+	GemRB.GetView ("OPTHELP").SetText (17205)
 
 def DisplayHelpBrightness ():
-	HelpTextArea.SetText (17203)
+	GemRB.GetView ("OPTHELP").SetText (17203)
 	SetGfxCorrection ()
 
 def DisplayHelpContrast ():
-	HelpTextArea.SetText (17204)
+	GemRB.GetView ("OPTHELP").SetText (17204)
 	SetGfxCorrection ()
 
 # different games have different slider ranges, but the engine wants:
@@ -184,12 +180,11 @@ def CloseAudioOptionsWindow ():
 
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
-	global HelpTextArea
 
 	Window = GemRB.LoadWindow (7, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
-	HelpTextArea = GUIOPTControls.OptHelpText ('AudioOptions', 14, 18040)
+	GUIOPTControls.OptHelpText ('AudioOptions', 14, 18040)
 
 	GUIOPTControls.OptDone (CloseAudioOptionsWindow, 24)
 	GUIOPTControls.OptCancel (CloseAudioOptionsWindow, 25)
@@ -207,11 +202,11 @@ def OpenAudioOptionsWindow ():
 	return
 
 def DisplayHelpAmbientVolume ():
-	HelpTextArea.SetText (18008)
+	GemRB.GetView ("OPTHELP").SetText (18008)
 	GemRB.UpdateAmbientsVolume ()
 
 def DisplayHelpMusicVolume ():
-	HelpTextArea.SetText (18011)
+	GemRB.GetView ("OPTHELP").SetText (18011)
 	GemRB.UpdateMusicVolume ()
 
 ###################################################
@@ -219,12 +214,10 @@ def DisplayHelpMusicVolume ():
 def OpenCharacterSoundsWindow ():
 	"""Open character sounds window"""
 
-	global HelpTextArea
-
 	Window = GemRB.LoadWindow (12, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
-	HelpTextArea = GUIOPTControls.OptHelpText ('CharacterSounds', 16, 18041)
+	GUIOPTControls.OptHelpText ('CharacterSounds', 16, 18041)
 
 	GUIOPTControls.OptDone (Window.Close, 24)
 	GUIOPTControls.OptCancel (Window.Close, 25)
@@ -252,12 +245,10 @@ def OpenCharacterSoundsWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def DisplayHelpCommandSounds ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea.SetText (18016)
+	GemRB.GetView ("OPTHELP").SetText (18016)
 
 def DisplayHelpSelectionSounds ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea.SetText (11352)
+	GemRB.GetView ("OPTHELP").SetText (11352)
 
 ###################################################
 
@@ -269,14 +260,13 @@ def CloseGameplayOptionsWindow ():
 
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
-	global HelpTextArea
 
 	#gameplayoptions
 	Window = GemRB.LoadWindow (8, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
-	HelpTextArea = GUIOPTControls.OptHelpText ('GameplayOptions', 40, 18042)
+	GUIOPTControls.OptHelpText ('GameplayOptions', 40, 18042)
 
 	GUIOPTControls.OptDone (CloseGameplayOptionsWindow, 7)
 	GUIOPTControls.OptCancel (CloseGameplayOptionsWindow, 20)
@@ -309,7 +299,7 @@ def OpenGameplayOptionsWindow ():
 	return
 
 def DisplayHelpTooltipDelay ():
-	HelpTextArea.SetText (18017)
+	GemRB.GetView ("OPTHELP").SetText (18017)
 	delay_var = GemRB.GetVar ("Tooltips")
 	# BG2 disables tooltips on max setting, we just set it to an extremely high value for simplicity
 	if delay_var == 100:
@@ -317,7 +307,7 @@ def DisplayHelpTooltipDelay ():
 	GemRB.SetTooltipDelay (delay_var * TOOLTIP_DELAY_FACTOR//10)
 
 def DisplayHelpMouseScrollingSpeed ():
-	HelpTextArea.SetText (18018)
+	GemRB.GetView ("OPTHELP").SetText (18018)
 	GemRB.SetMouseScrollSpeed (GemRB.GetVar ("Mouse Scroll Speed") )
 
 ###################################################
@@ -325,14 +315,11 @@ def DisplayHelpMouseScrollingSpeed ():
 def OpenFeedbackOptionsWindow ():
 	"""Open feedback options window"""
 
-	global HelpTextArea
-
 	Window = GemRB.LoadWindow (9, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
-	# same as HelpTextArea if not BG1
-	HelpTextArea = GUIOPTControls.OptHelpText ('FeedbackOptions', 28, 18043)
+	GUIOPTControls.OptHelpText ('FeedbackOptions', 28, 18043)
 
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
@@ -357,8 +344,7 @@ def OpenFeedbackOptionsWindow ():
 	return
 
 def DisplayHelpMarkerFeedback ():
-	# same as HelpTextArea if not BG1
-	HelpTextArea.SetText (18024)
+	GemRB.GetView ("OPTHELP").SetText (18024)
 	GemRB.SetVar ("GUI Feedback Level", GemRB.GetVar ("Circle Feedback") + 1)
 
 ###################################################
@@ -366,13 +352,11 @@ def DisplayHelpMarkerFeedback ():
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
 
-	global HelpTextArea
-
 	Window = GemRB.LoadWindow (10, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
-	HelpTextArea = GUIOPTControls.OptHelpText ('AutopauseOptions', 15, 18044)
+	GUIOPTControls.OptHelpText ('AutopauseOptions', 15, 18044)
 
 	GUIOPTControls.OptDone (Window.Close, 11)
 	GUIOPTControls.OptCancel (Window.Close, 14)
