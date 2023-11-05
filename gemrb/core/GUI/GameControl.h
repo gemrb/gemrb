@@ -132,7 +132,11 @@ private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
-	
+	void OutlineInfoPoints() const;
+	void OutlineDoors() const;
+	void OutlineContainers() const;
+	void DrawTrackingArrows();
+
 	bool CanLockFocus() const override { return true; };
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 	

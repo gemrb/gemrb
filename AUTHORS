@@ -1,3 +1,10 @@
+bonnawehessei-4312@yopmail.com
+POST MERGE:
+- resolve TODO: in the original: does it matter which pc opens the store wrt prices and charisma? no, the leader of the party is used regardless of who initiates
+- iwd2 hp "progress" bar shouldn't be clickable
+- Interface::DelTree - move to VFS?
+- Interface::SavedExtension make private? Ne če je prejšnja res
+
 Check README.md on how to contact us.
 
 A list of GemRB authors is available through:

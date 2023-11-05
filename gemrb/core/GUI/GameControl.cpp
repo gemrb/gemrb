@@ -459,91 +459,131 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	}
 }
 
-/** Draws the Control on the Output Display */
-void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
+// FIXME: some of this should happen during mouse events
+void GameControl::OutlineInfoPoints() const
 {
 	const Game* game = core->GetGame();
-	Map *area = game->GetCurrentArea();
-	if (!area) return;
+	const Map* area = game->GetCurrentArea();
 
-	// FIXME: some of this should happen during mouse events
-	// setup outlines
-	InfoPoint *i;
-	for (size_t idx = 0; (i = area->TMap->GetInfoPoint(idx)); idx++) {
-		i->Highlight = false;
-		if (i->VisibleTrap(0)) {
-			if (overMe == i && targetMode != TargetMode::None) {
-				i->outlineColor = ColorGreen;
+	InfoPoint* infoPoint;
+	for (size_t idx = 0; (infoPoint = area->TMap->GetInfoPoint(idx)); idx++) {
+		infoPoint->Highlight = false;
+
+		if (infoPoint->VisibleTrap(0)) {
+			if (overMe == infoPoint && targetMode != TargetMode::None) {
+				infoPoint->outlineColor = ColorGreen;
 			} else {
-				i->outlineColor = ColorRed;
+				infoPoint->outlineColor = ColorRed;
 			}
-			i->Highlight = true;
+			infoPoint->Highlight = true;
 			continue;
 		}
 	}
+}
 
-	// FIXME: some of this should happen during mouse events
-	Door *d;
-	for (size_t idx = 0; (d = area->TMap->GetDoor(idx)); idx++) {
-		d->Highlight = false;
-		if (d->Flags & DOOR_HIDDEN) {
+// FIXME: some of this should happen during mouse events
+void GameControl::OutlineDoors() const
+{
+	const Game* game = core->GetGame();
+	const Map* area = game->GetCurrentArea();
+
+	Door* door;
+	for (size_t idx = 0; (door = area->TMap->GetDoor(idx)); idx++) {
+		door->Highlight = false;
+		if (door->Flags & DOOR_HIDDEN) {
 			continue;
 		}
 
-		if (d->Flags & DOOR_SECRET) {
-			if (d->Flags & DOOR_FOUND) {
-				d->Highlight = true;
-				d->outlineColor = displaymsg->GetColor(GUIColors::HIDDENDOOR);
+		if (door->Flags & DOOR_SECRET) {
+			if (door->Flags & DOOR_FOUND) {
+				door->Highlight = true;
+				door->outlineColor = displaymsg->GetColor(GUIColors::HIDDENDOOR);
 			} else {
 				continue;
 			}
 		}
 
-		if (overMe == d) {
-			d->Highlight = true;
-			if (targetMode != TargetMode::None) {
-				if (d->Visible() && (d->VisibleTrap(0) || (d->Flags & DOOR_LOCKED))) {
-					// only highlight targettable doors
-					d->outlineColor = ColorGreen;
-				}
-			} else if (!(d->Flags & DOOR_SECRET)) {
-				// mouse over, not in target mode, no secret door
-				d->outlineColor = ColorCyan;
-			}
-		}
-
 		// traps always take precedence
-		if (d->VisibleTrap(0)) {
-			d->Highlight = true;
-			d->outlineColor = ColorRed;
-		}
-	}
-
-	// FIXME: some of this should happen during mouse events
-	Container *c;
-	for (size_t idx = 0; (c = area->TMap->GetContainer(idx)); ++idx) {
-		c->Highlight = false;
-		if (c->Flags & CONT_DISABLED) {
+		if (door->VisibleTrap(0)) {
+			door->Highlight = true;
+			door->outlineColor = ColorRed;
 			continue;
 		}
 
-		if (overMe == c) {
-			c->Highlight = true;
-			if (targetMode != TargetMode::None) {
-				if (c->Flags & CONT_LOCKED) {
-					c->outlineColor = ColorGreen;
-				}
-			} else {
-				c->outlineColor = displaymsg->GetColor(GUIColors::HOVERCONTAINER);
+		if (overMe != door) continue;
+
+		door->Highlight = true;
+		if (targetMode != TargetMode::None) {
+			if (door->Visible() && (door->Flags & DOOR_LOCKED)) {
+				// only highlight targetable doors
+				door->outlineColor = ColorGreen;
+			}
+		} else if (!(door->Flags & DOOR_SECRET)) {
+			// mouse over, not in target mode, no secret door
+			door->outlineColor = ColorCyan;
+		}
+	}
+}
+
+// FIXME: some of this should happen during mouse events
+void GameControl::OutlineContainers() const
+{
+	const Game* game = core->GetGame();
+	const Map* area = game->GetCurrentArea();
+
+	Container* container;
+	for (size_t idx = 0; (container = area->TMap->GetContainer(idx)); ++idx) {
+		container->Highlight = false;
+		if (container->Flags & CONT_DISABLED) {
+			continue;
+		}
+
+		if (overMe == container) {
+			container->Highlight = true;
+			if (targetMode == TargetMode::None) {
+				container->outlineColor = displaymsg->GetColor(GUIColors::HOVERCONTAINER);
+			} else if (container->Flags & CONT_LOCKED) {
+				container->outlineColor = ColorGreen;
 			}
 		}
 
 		// traps always take precedence
-		if (c->VisibleTrap(0)) {
-			c->Highlight = true;
-			c->outlineColor = ColorRed; // traps
+		if (container->VisibleTrap(0)) {
+			container->Highlight = true;
+			container->outlineColor = ColorRed;
 		}
 	}
+}
+
+void GameControl::DrawTrackingArrows()
+{
+	if (!trackerID) return;
+
+	const Game* game = core->GetGame();
+	Map* area = game->GetCurrentArea();
+	const Actor* actor = area->GetActorByGlobalID(trackerID);
+	if (actor) {
+		std::vector<Actor*> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED, distance);
+		for (const auto& monster : monsters) {
+			if (monster->IsPartyMember()) continue;
+			if (monster->GetStat(IE_NOTRACKING)) continue;
+			DrawArrowMarker(monster->Pos, ColorBlack);
+		}
+	} else {
+		trackerID = 0;
+	}
+}
+
+/** Draws the Control on the Output Display */
+void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
+{
+	const Game* game = core->GetGame();
+	Map* area = game->GetCurrentArea();
+	if (!area) return;
+
+	OutlineInfoPoints();
+	OutlineDoors();
+	OutlineContainers();
 
 	uint32_t tmpflags = DebugFlags;
 	if (EventMgr::ModState(GEM_MOD_ALT)) {
@@ -552,20 +592,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 	//drawmap should be here so it updates fog of war
 	area->DrawMap(Viewport(), core->GetFogRenderer(), tmpflags);
 
-	if (trackerID) {
-		const Actor *actor = area->GetActorByGlobalID(trackerID);
-
-		if (actor) {
-			std::vector<Actor*> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
-			for (const auto& monster : monsters) {
-				if (monster->IsPartyMember()) continue;
-				if (monster->GetStat(IE_NOTRACKING)) continue;
-				DrawArrowMarker(monster->Pos, ColorBlack);
-			}
-		} else {
-			trackerID = 0;
-		}
-	}
+	DrawTrackingArrows();
 
 	if (lastActorID) {
 		const Actor* actor = GetLastActor();
