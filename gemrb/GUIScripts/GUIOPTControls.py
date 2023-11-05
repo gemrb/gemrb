@@ -42,7 +42,7 @@ else:
 # control (button, slider ...) and a label
 
 # NOTE: make sure handler users also set the strref in them!
-def OptSlider (winhelp, ctlhelp, slider_id, nameID, nameStrRef, variable, action = None, value = 1):
+def OptSlider (ctlhelp, slider_id, nameID, nameStrRef, variable, action = None, value = 1):
 	"""Standard slider for option windows"""
 
 	window = GetWindow ()
@@ -55,10 +55,10 @@ def OptSlider (winhelp, ctlhelp, slider_id, nameID, nameStrRef, variable, action
 		# create an anonymous callback, so we don't need to create a separate function for each string
 		slider.OnChange (lambda: helpTA.SetText (ctlhelp))
 
-	OptBuddyLabel (nameID, nameStrRef, ctlhelp, winhelp)
+	OptBuddyLabel (nameID, nameStrRef, ctlhelp, helpTA.Value)
 	if HasMouseOver ():
 		slider.OnMouseEnter (lambda: helpTA.SetText (ctlhelp))
-		slider.OnMouseLeave (lambda: helpTA.SetText (winhelp))
+		slider.OnMouseLeave (lambda: helpTA.SetText (helpTA.Value))
 
 	return slider
 
@@ -80,7 +80,7 @@ def OptRadio (action, button_id, nameID, variable, value, nameStrRef = None, foc
 	return button
 
 # NOTE: make sure handler users also set the strref in them!
-def OptCheckbox (winhelp, ctlhelp, button_id, nameID, nameStrRef, variable, handler = None, value = 1):
+def OptCheckbox (ctlhelp, button_id, nameID, nameStrRef, variable, handler = None, value = 1):
 	"""Standard checkbox for option windows"""
 
 	window = GetWindow ()
@@ -104,7 +104,7 @@ def OptCheckbox (winhelp, ctlhelp, button_id, nameID, nameStrRef, variable, hand
 	else:
 		button.OnPress (callback)
 
-	OptBuddyLabel (nameID, nameStrRef, ctlhelp, winhelp)
+	OptBuddyLabel (nameID, nameStrRef, ctlhelp, GemRB.GetView ("OPTHELP").Value)
 
 	return button
 
@@ -147,6 +147,7 @@ def OptHelpText (text_id, text_strref):
 	text = window.GetControl (text_id)
 	text.SetText (text_strref)
 	text.AddAlias ("OPTHELP", 0, 1)
+	text.SetValue (text_strref)
 	return text
 
 def OptBuddyLabel (nameID, strRef = None, focusedText = None, defaultText = None):

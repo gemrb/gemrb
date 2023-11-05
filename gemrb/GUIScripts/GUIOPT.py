@@ -124,24 +124,24 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptDone (CloseVideoOptionsWindow, 21)
 	GUIOPTControls.OptCancel (CloseVideoOptionsWindow, 32)
 
-	GUIOPTControls.OptSlider (18038, 17203, 3, 35, 17129, 'Brightness Correction', DisplayHelpBrightness, 4)
-	GUIOPTControls.OptSlider (18038, 17204, 22, 36, 17128, 'Gamma Correction', DisplayHelpContrast)
+	GUIOPTControls.OptSlider (17203, 3, 35, 17129, 'Brightness Correction', DisplayHelpBrightness, 4)
+	GUIOPTControls.OptSlider (17204, 22, 36, 17128, 'Gamma Correction', DisplayHelpContrast)
 
 	GUIOPTControls.OptRadio (DisplayHelpBPP, 5, 37, 'BitsPerPixel', 16, None, 17205, 18038)
 	GUIOPTControls.OptRadio (DisplayHelpBPP, 6, 37, 'BitsPerPixel', 24, None, 17205, 18038)
 	GUIOPTControls.OptRadio (DisplayHelpBPP, 7, 37, 'BitsPerPixel', 32, None, 17205, 18038)
 
-	GUIOPTControls.OptCheckbox (18038, 18000, 9, 38, 17131, 'Full Screen', DisplayHelpFullScreen)
+	GUIOPTControls.OptCheckbox (18000, 9, 38, 17131, 'Full Screen', DisplayHelpFullScreen)
 
-	GUIOPTControls.OptCheckbox (18038, 20620, 51, 50, 20617, 'Translucent Shadows')
-	GUIOPTControls.OptCheckbox (18038, 15135, 40, 44, 17134, 'SoftMirrorBlt')
-	GUIOPTControls.OptCheckbox (18038, 18006, 41, 46, 17136, 'SoftSrcKeyBlt') # software standard blit
-	GUIOPTControls.OptCheckbox (18038, 18007, 42, 48, 17135, 'SoftBltFast') # software transparent blit
+	GUIOPTControls.OptCheckbox (20620, 51, 50, 20617, 'Translucent Shadows')
+	GUIOPTControls.OptCheckbox (15135, 40, 44, 17134, 'SoftMirrorBlt')
+	GUIOPTControls.OptCheckbox (18006, 41, 46, 17136, 'SoftSrcKeyBlt') # software standard blit
+	GUIOPTControls.OptCheckbox (18007, 42, 48, 17135, 'SoftBltFast') # software transparent blit
 
 	# maybe not present in original iwd, but definitely in how
 	if GameCheck.IsIWD1 () or GameCheck.IsIWD2 ():
-		GUIOPTControls.OptCheckbox (18038, 15141, 56, 52, 14447, 'TranslucentBlt')
-		GUIOPTControls.OptCheckbox (18038, 18004, 57, 54, 14578, 'StaticAnims')
+		GUIOPTControls.OptCheckbox (15141, 56, 52, 14447, 'TranslucentBlt')
+		GUIOPTControls.OptCheckbox (18004, 57, 54, 14578, 'StaticAnims')
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -190,13 +190,13 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptCancel (CloseAudioOptionsWindow, 25)
 	GUIOPTControls.OptButton (OpenCharacterSoundsWindow, 13, 17778)
 
-	GUIOPTControls.OptSlider (18040, 18008, 1, 16, 16514, 'Volume Ambients', DisplayHelpAmbientVolume, 10)
-	GUIOPTControls.OptSlider (18040, 18009, 2, 17, 16515, 'Volume SFX', None, 10)
-	GUIOPTControls.OptSlider (18040, 18010, 3, 18, 16512, 'Volume Voices', None, 10)
-	GUIOPTControls.OptSlider (18040, 18011, 4, 19, 16511, 'Volume Music', DisplayHelpMusicVolume, 10)
-	GUIOPTControls.OptSlider (18040, 18012, 22, 20, 16546, 'Volume Movie', None, 10)
+	GUIOPTControls.OptSlider (18008, 1, 16, 16514, 'Volume Ambients', DisplayHelpAmbientVolume, 10)
+	GUIOPTControls.OptSlider (18009, 2, 17, 16515, 'Volume SFX', None, 10)
+	GUIOPTControls.OptSlider (18010, 3, 18, 16512, 'Volume Voices', None, 10)
+	GUIOPTControls.OptSlider (18011, 4, 19, 16511, 'Volume Music', DisplayHelpMusicVolume, 10)
+	GUIOPTControls.OptSlider (18012, 22, 20, 16546, 'Volume Movie', None, 10)
 
-	GUIOPTControls.OptCheckbox (18040, 18022, 26, 28, 20689, 'Environmental Audio')
+	GUIOPTControls.OptCheckbox (18022, 26, 28, 20689, 'Environmental Audio')
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -222,9 +222,9 @@ def OpenCharacterSoundsWindow ():
 	GUIOPTControls.OptDone (Window.Close, 24)
 	GUIOPTControls.OptCancel (Window.Close, 25)
 
-	GUIOPTControls.OptCheckbox (18041, 18015, 5, 20, 17138, 'Subtitles')
-	GUIOPTControls.OptCheckbox (18041, 18013, 6, 18, 17139, 'Attack Sounds')
-	GUIOPTControls.OptCheckbox (18041, 18014, 7, 19, 17140, 'Footsteps')
+	GUIOPTControls.OptCheckbox (18015, 5, 20, 17138, 'Subtitles')
+	GUIOPTControls.OptCheckbox (18013, 6, 18, 17139, 'Attack Sounds')
+	GUIOPTControls.OptCheckbox (18014, 7, 19, 17140, 'Footsteps')
 
 	frequency = GemRB.GetVar ('Command Sounds Frequency')
 	frequency2 = GemRB.GetVar ('Selection Sounds Frequency')
@@ -271,24 +271,24 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptDone (CloseGameplayOptionsWindow, 7)
 	GUIOPTControls.OptCancel (CloseGameplayOptionsWindow, 20)
 
-	GUIOPTControls.OptSlider (18042, 18017, 1, 21, 17143, 'Tooltips', DisplayHelpTooltipDelay, 10)
-	GUIOPTControls.OptSlider (18042, 18018, 2, 22, 17144, 'Mouse Scroll Speed', DisplayHelpMouseScrollingSpeed, 5)
-	GUIOPTControls.OptSlider (18042, 18019, 3, 23, 17145, 'Keyboard Scroll Speed', None, 5)
+	GUIOPTControls.OptSlider (18017, 1, 21, 17143, 'Tooltips', DisplayHelpTooltipDelay, 10)
+	GUIOPTControls.OptSlider (18018, 2, 22, 17144, 'Mouse Scroll Speed', DisplayHelpMouseScrollingSpeed, 5)
+	GUIOPTControls.OptSlider (18019, 3, 23, 17145, 'Keyboard Scroll Speed', None, 5)
 
-	GUIOPTControls.OptSlider (18042, 18020, 12, 24, 13911, 'Difficulty Level', None)
+	GUIOPTControls.OptSlider (18020, 12, 24, 13911, 'Difficulty Level', None)
 	if GemRB.GetVar ("Nightmare Mode") == 1:
 		# lock the slider
 		Slider = Window.GetControl (12)
 		Slider.SetDisabled (True)
 
-	GUIOPTControls.OptCheckbox (18042, 18021, 14, 25, 13697, 'Always Dither')
-	GUIOPTControls.OptCheckbox (18042, 18023, 19, 27, 17182, 'Gore')
-	GUIOPTControls.OptCheckbox (18042, 11797, 42, 44, 11795, 'Infravision')
-	GUIOPTControls.OptCheckbox (18042, 20619, 47, 46, 20618, 'Weather')
+	GUIOPTControls.OptCheckbox (18021, 14, 25, 13697, 'Always Dither')
+	GUIOPTControls.OptCheckbox (18023, 19, 27, 17182, 'Gore')
+	GUIOPTControls.OptCheckbox (11797, 42, 44, 11795, 'Infravision')
+	GUIOPTControls.OptCheckbox (20619, 47, 46, 20618, 'Weather')
 	if GameCheck.IsBG2():
-		GUIOPTControls.OptCheckbox (18042, 2242, 50, 48, 2241, 'Heal Party on Rest')
+		GUIOPTControls.OptCheckbox (2242, 50, 48, 2241, 'Heal Party on Rest')
 	elif GameCheck.IsIWD2() or GameCheck.IsIWD1():
-		GUIOPTControls.OptCheckbox (18042, 15136, 50, 49, 17378, 'Maximum HP')
+		GUIOPTControls.OptCheckbox (15136, 50, 49, 17378, 'Maximum HP')
 
 	GUIOPTControls.OptButton (OpenFeedbackOptionsWindow, 5, 17163)
 	GUIOPTControls.OptButton (OpenAutopauseOptionsWindow, 6, 17166)
@@ -326,16 +326,16 @@ def OpenFeedbackOptionsWindow ():
 	GUIOPTControls.OptDone (Window.Close, 26)
 	GUIOPTControls.OptCancel (Window.Close, 27)
 
-	GUIOPTControls.OptSlider (18043, 18024, 8, 30, 13688, 'Circle Feedback', DisplayHelpMarkerFeedback)
-	GUIOPTControls.OptSlider (18043, 18025, 9, 31, 17769, 'Locator Feedback Level')
+	GUIOPTControls.OptSlider (18024, 8, 30, 13688, 'Circle Feedback', DisplayHelpMarkerFeedback)
+	GUIOPTControls.OptSlider (18025, 9, 31, 17769, 'Locator Feedback Level')
 
 	# to hit rolls (extra feedback), combat info, actions, state changes, selection text, miscellaneus
-	GUIOPTControls.OptCheckbox (18043, 18026, 10, 32, 17149, 'Effect Text Level', None, 1)
-	GUIOPTControls.OptCheckbox (18043, 18027, 11, 33, 17150, 'Effect Text Level', None, 2)
-	GUIOPTControls.OptCheckbox (18043, 18028, 12, 34, 17151, 'Effect Text Level', None, 4)
-	GUIOPTControls.OptCheckbox (18043, 18029, 13, 35, 17152, 'Effect Text Level', None, 8)
-	GUIOPTControls.OptCheckbox (18043, 18030, 14, 36, 17181, 'Effect Text Level', None, 16)
-	GUIOPTControls.OptCheckbox (18043, 18031, 15, 37, 17153, 'Effect Text Level', None, 32)
+	GUIOPTControls.OptCheckbox (18026, 10, 32, 17149, 'Effect Text Level', None, 1)
+	GUIOPTControls.OptCheckbox (18027, 11, 33, 17150, 'Effect Text Level', None, 2)
+	GUIOPTControls.OptCheckbox (18028, 12, 34, 17151, 'Effect Text Level', None, 4)
+	GUIOPTControls.OptCheckbox (18029, 13, 35, 17152, 'Effect Text Level', None, 8)
+	GUIOPTControls.OptCheckbox (18030, 14, 36, 17181, 'Effect Text Level', None, 16)
+	GUIOPTControls.OptCheckbox (18031, 15, 37, 17153, 'Effect Text Level', None, 32)
 	# pst adds bit 64, but it still has its own GUIOPT; let's just ensure it is set
 	GemRB.SetVar ('Effect Text Level', GemRB.GetVar ('Effect Text Level') | 64)
 
@@ -362,24 +362,24 @@ def OpenAutopauseOptionsWindow ():
 	GUIOPTControls.OptCancel (Window.Close, 14)
 
 	# checkboxes OR the values if they associate to the same variable
-	GUIOPTControls.OptCheckbox (18044, 18032, 1, 17, 17155, 'Auto Pause State', None, 4) # hit
-	GUIOPTControls.OptCheckbox (18044, 18033, 2, 18, 17156, 'Auto Pause State', None, 8) # wounded
-	GUIOPTControls.OptCheckbox (18044, 18034, 3, 19, 17157, 'Auto Pause State', None, 16) # dead
-	GUIOPTControls.OptCheckbox (18044, 18035, 4, 20, 17158, 'Auto Pause State', None, 2) # attacked
-	GUIOPTControls.OptCheckbox (18044, 18036, 5, 21, 17159, 'Auto Pause State', None, 1) # weapon unusable
-	GUIOPTControls.OptCheckbox (18044, 18037, 13, 22, 17160, 'Auto Pause State', None, 32) # target gone
-	GUIOPTControls.OptCheckbox (18044, 10640, 25, 24, 10639, 'Auto Pause State', None, 64) # end of round
+	GUIOPTControls.OptCheckbox (18032, 1, 17, 17155, 'Auto Pause State', None, 4) # hit
+	GUIOPTControls.OptCheckbox (18033, 2, 18, 17156, 'Auto Pause State', None, 8) # wounded
+	GUIOPTControls.OptCheckbox (18034, 3, 19, 17157, 'Auto Pause State', None, 16) # dead
+	GUIOPTControls.OptCheckbox (18035, 4, 20, 17158, 'Auto Pause State', None, 2) # attacked
+	GUIOPTControls.OptCheckbox (18036, 5, 21, 17159, 'Auto Pause State', None, 1) # weapon unusable
+	GUIOPTControls.OptCheckbox (18037, 13, 22, 17160, 'Auto Pause State', None, 32) # target gone
+	GUIOPTControls.OptCheckbox (10640, 25, 24, 10639, 'Auto Pause State', None, 64) # end of round
 	if GameCheck.IsIWD2() or GameCheck.IsIWD1():
-		GUIOPTControls.OptCheckbox (18044, 23514, 30, 31, 23516, 'Auto Pause State', None, 128) # enemy sighted
-		GUIOPTControls.OptCheckbox (18044, 18560, 26, 28, 16519, 'Auto Pause State', None, 256) # trap found
-		GUIOPTControls.OptCheckbox (18044, 26311, 36, 37, 26310, 'Auto Pause State', None, 512) # spell cast
-		GUIOPTControls.OptCheckbox (18044, 24888, 33, 34, 10574, 'Auto Pause Center', None, 1)
+		GUIOPTControls.OptCheckbox (23514, 30, 31, 23516, 'Auto Pause State', None, 128) # enemy sighted
+		GUIOPTControls.OptCheckbox (18560, 26, 28, 16519, 'Auto Pause State', None, 256) # trap found
+		GUIOPTControls.OptCheckbox (26311, 36, 37, 26310, 'Auto Pause State', None, 512) # spell cast
+		GUIOPTControls.OptCheckbox (24888, 33, 34, 10574, 'Auto Pause Center', None, 1)
 	elif Window.GetControl (26):
-		GUIOPTControls.OptCheckbox (18044, 23514, 26, 27, 23516, 'Auto Pause State', None, 128) # enemy sighted
+		GUIOPTControls.OptCheckbox (23514, 26, 27, 23516, 'Auto Pause State', None, 128) # enemy sighted
 	if GameCheck.IsBG2():
-		GUIOPTControls.OptCheckbox (18044, 31872, 31, 33, 31875, 'Auto Pause State', None, 512) # spell cast
-		GUIOPTControls.OptCheckbox (18044, 58171, 34, 30, 57354, 'Auto Pause State', None, 256) # trap found
-		GUIOPTControls.OptCheckbox (18044, 10571, 37, 36, 10574, 'Auto Pause Center', None, 1)
+		GUIOPTControls.OptCheckbox (31872, 31, 33, 31875, 'Auto Pause State', None, 512) # spell cast
+		GUIOPTControls.OptCheckbox (58171, 34, 30, 57354, 'Auto Pause State', None, 256) # trap found
+		GUIOPTControls.OptCheckbox (10571, 37, 36, 10574, 'Auto Pause Center', None, 1)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
