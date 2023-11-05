@@ -119,7 +119,7 @@ def OpenVideoOptionsWindow ():
 	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
-	GUIOPTControls.OptHelpText ('VideoOptions', 33, 18038)
+	GUIOPTControls.OptHelpText (33, 18038)
 
 	GUIOPTControls.OptDone (CloseVideoOptionsWindow, 21)
 	GUIOPTControls.OptCancel (CloseVideoOptionsWindow, 32)
@@ -184,7 +184,7 @@ def OpenAudioOptionsWindow ():
 	Window = GemRB.LoadWindow (7, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
-	GUIOPTControls.OptHelpText ('AudioOptions', 14, 18040)
+	GUIOPTControls.OptHelpText (14, 18040)
 
 	GUIOPTControls.OptDone (CloseAudioOptionsWindow, 24)
 	GUIOPTControls.OptCancel (CloseAudioOptionsWindow, 25)
@@ -217,7 +217,7 @@ def OpenCharacterSoundsWindow ():
 	Window = GemRB.LoadWindow (12, "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
-	GUIOPTControls.OptHelpText ('CharacterSounds', 16, 18041)
+	GUIOPTControls.OptHelpText (16, 18041)
 
 	GUIOPTControls.OptDone (Window.Close, 24)
 	GUIOPTControls.OptCancel (Window.Close, 25)
@@ -266,7 +266,7 @@ def OpenGameplayOptionsWindow ():
 	Window.AddAlias("SUB_WIN", 0)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
-	GUIOPTControls.OptHelpText ('GameplayOptions', 40, 18042)
+	GUIOPTControls.OptHelpText (40, 18042)
 
 	GUIOPTControls.OptDone (CloseGameplayOptionsWindow, 7)
 	GUIOPTControls.OptCancel (CloseGameplayOptionsWindow, 20)
@@ -319,7 +319,7 @@ def OpenFeedbackOptionsWindow ():
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
-	GUIOPTControls.OptHelpText ('FeedbackOptions', 28, 18043)
+	GUIOPTControls.OptHelpText (28, 18043)
 
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
@@ -356,7 +356,7 @@ def OpenAutopauseOptionsWindow ():
 	Window.AddAlias("SUB_WIN", 1)
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
-	GUIOPTControls.OptHelpText ('AutopauseOptions', 15, 18044)
+	GUIOPTControls.OptHelpText (15, 18044)
 
 	GUIOPTControls.OptDone (Window.Close, 11)
 	GUIOPTControls.OptCancel (Window.Close, 14)

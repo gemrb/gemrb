@@ -109,7 +109,7 @@ def OpenVideoOptionsWindow ():
 	Window.AddAlias ("SUB_WIN", 0)
 	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
 
-	GUIOPTControls.OptHelpText ('VideoOptions', 9, 31052)
+	GUIOPTControls.OptHelpText (9, 31052)
 	GUIOPTControls.OptDone (Window.Close, 7)
 	GUIOPTControls.OptCancel (Window.Close, 8)
 
@@ -153,7 +153,7 @@ def OpenAudioOptionsWindow ():
 	for v in "Volume Ambients", "Volume SFX", "Volume Voices", "Volume Music", "Volume Movie", "Sound Processing", "Music Processing":
 		saved_audio_options[v] = GemRB.GetVar (v)
 
-	GUIOPTControls.OptHelpText ('AudioOptions', 9, 31210)
+	GUIOPTControls.OptHelpText (9, 31210)
 	GUIOPTControls.OptDone (Window.Close, 7)
 	GUIOPTControls.OptCancel (Window.Close, 8)
 
@@ -189,7 +189,7 @@ def OpenGameplayOptionsWindow ():
 
 	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
 
-	GUIOPTControls.OptHelpText ('GameplayOptions', 12, 31212)
+	GUIOPTControls.OptHelpText (12, 31212)
 
 	GUIOPTControls.OptDone (Window.Close, 10)
 	GUIOPTControls.OptCancel (Window.Close, 11)
@@ -226,7 +226,7 @@ def OpenFeedbackOptionsWindow ():
 	Window.AddAlias ("SUB_WIN", 1)
 	GemRB.SetVar ("Circle Feedback", GemRB.GetVar ("GUI Feedback Level") - 1)
 
-	GUIOPTControls.OptHelpText ('FeedbackOptions', 9, 37410)
+	GUIOPTControls.OptHelpText (9, 37410)
 	GUIOPTControls.OptDone (Window.Close, 7)
 	GUIOPTControls.OptCancel (Window.Close, 8)
 
@@ -258,7 +258,7 @@ def OpenAutopauseOptionsWindow ():
 	Window = GemRB.LoadWindow (9, "GUIOPT")
 	Window.AddAlias ("SUB_WIN", 1)
 
-	GUIOPTControls.OptHelpText ('AutopauseOptions', 1, 31214)
+	GUIOPTControls.OptHelpText (1, 31214)
 	GUIOPTControls.OptDone (Window.Close, 16)
 	GUIOPTControls.OptCancel (Window.Close, 17)
 

@@ -140,7 +140,7 @@ def OptCancel (action, button_id):
 	if GameCheck.IsPST():
 		button.SetVarAssoc ("Cancel", 1)
 
-def OptHelpText (name, text_id, text_strref):
+def OptHelpText (text_id, text_strref):
 	"""Standard textarea with context help for option windows"""
 
 	window = GetWindow ()
