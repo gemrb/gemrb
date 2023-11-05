@@ -7936,6 +7936,10 @@ bool Actor::ShouldDrawCircle() const
 	}
 
 	bool drawcircle = true; // we always show circle/target on pause
+	if (gc->InDialog() && gc->dialoghandler->IsTarget(this)) {
+		return true;
+	}
+
 	if (!(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		// check marker feedback level
 		ieDword markerfeedback = core->GetDictionary().Get("GUI Feedback Level", 4);
