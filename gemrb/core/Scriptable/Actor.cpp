@@ -3961,7 +3961,7 @@ void Actor::DialogInterrupt() const
 	/* this part is unsure */
 	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
 		VerbalConstant(Verbal::Hostile);
-	} else if (TalkCount) {
+	} else if (TalkCount && GetVerbalConstant(Verbal::Dialog) != ieStrRef::INVALID) {
 		VerbalConstant(Verbal::Dialog);
 	} else {
 		VerbalConstant(Verbal::InitialMeet);
