@@ -520,7 +520,7 @@ void GameControl::OutlineDoors() const
 			}
 		} else if (!(door->Flags & DOOR_SECRET)) {
 			// mouse over, not in target mode, no secret door
-			door->outlineColor = ColorCyan;
+			door->outlineColor = displaymsg->GetColor(GUIColors::HOVERDOOR);
 		}
 	}
 }

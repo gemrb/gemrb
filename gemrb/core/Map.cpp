@@ -1013,7 +1013,6 @@ void Map::DrawHighlightables(const Region& viewport) const
 		if (!d) continue;
 
 		if (d->Highlight) {
-			d->outlineColor = displaymsg->GetColor(GUIColors::HOVERDOOR);
 			d->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_DOORS && !(d->Flags & DOOR_SECRET)) {
 			d->outlineColor = displaymsg->GetColor(GUIColors::ALTDOOR);
