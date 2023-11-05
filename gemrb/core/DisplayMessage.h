@@ -61,6 +61,8 @@ enum class GUIColors : uint8_t {
 	FLOAT_TXT_ACTOR,
 	FLOAT_TXT_INFO,
 	FLOAT_TXT_OTHER,
+	TRAPCOLOR,
+	HOVERTARGETABLE,
 
 	count
 };

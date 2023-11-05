@@ -471,9 +471,9 @@ void GameControl::OutlineInfoPoints() const
 
 		if (infoPoint->VisibleTrap(0)) {
 			if (overMe == infoPoint && targetMode != TargetMode::None) {
-				infoPoint->outlineColor = ColorGreen;
+				infoPoint->outlineColor = displaymsg->GetColor(GUIColors::HOVERTARGETABLE);
 			} else {
-				infoPoint->outlineColor = ColorRed;
+				infoPoint->outlineColor = displaymsg->GetColor(GUIColors::TRAPCOLOR);
 			}
 			infoPoint->Highlight = true;
 			continue;
@@ -506,7 +506,7 @@ void GameControl::OutlineDoors() const
 		// traps always take precedence
 		if (door->VisibleTrap(0)) {
 			door->Highlight = true;
-			door->outlineColor = ColorRed;
+			door->outlineColor = displaymsg->GetColor(GUIColors::TRAPCOLOR);
 			continue;
 		}
 
@@ -516,7 +516,7 @@ void GameControl::OutlineDoors() const
 		if (targetMode != TargetMode::None) {
 			if (door->Visible() && (door->Flags & DOOR_LOCKED)) {
 				// only highlight targetable doors
-				door->outlineColor = ColorGreen;
+				door->outlineColor = displaymsg->GetColor(GUIColors::HOVERTARGETABLE);
 			}
 		} else if (!(door->Flags & DOOR_SECRET)) {
 			// mouse over, not in target mode, no secret door
@@ -543,14 +543,14 @@ void GameControl::OutlineContainers() const
 			if (targetMode == TargetMode::None) {
 				container->outlineColor = displaymsg->GetColor(GUIColors::HOVERCONTAINER);
 			} else if (container->Flags & CONT_LOCKED) {
-				container->outlineColor = ColorGreen;
+				container->outlineColor = displaymsg->GetColor(GUIColors::HOVERTARGETABLE);
 			}
 		}
 
 		// traps always take precedence
 		if (container->VisibleTrap(0)) {
 			container->Highlight = true;
-			container->outlineColor = ColorRed;
+			container->outlineColor = displaymsg->GetColor(GUIColors::TRAPCOLOR);
 		}
 	}
 }

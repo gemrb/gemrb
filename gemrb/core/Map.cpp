@@ -1033,7 +1033,7 @@ void Map::DrawHighlightables(const Region& viewport) const
 			p->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_INFOPOINTS) {
 			if (p->VisibleTrap(true)) {
-				p->outlineColor = ColorRed;
+				p->outlineColor = displaymsg->GetColor(GUIColors::TRAPCOLOR);
 			} else {
 				p->outlineColor = ColorBlue;
 			}
