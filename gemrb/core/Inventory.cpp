@@ -953,7 +953,7 @@ bool Inventory::EquipItem(ieDword slot)
 		}
 		header = itm->GetExtHeader(EquippedHeader);
 		if (!header) return false; // in case of broken saves
-		if (header->AttackType == ITEM_AT_BOW || header->AttackType == ITEM_AT_PROJECTILE) {
+		if (header->AttackType == ITEM_AT_BOW || (header->AttackType == ITEM_AT_PROJECTILE && !header->Charges)) {
 			// find the ranged projectile associated with it, this returns equipped code
 			equip = FindRangedProjectile(header->ProjectileQualifier);
 			// this is the real item slot of the quarrel
@@ -1090,7 +1090,7 @@ int Inventory::FindTypedRangedWeapon(unsigned int type) const
 		//always look for a ranged header when looking for a projectile/projector
 		const ITMExtHeader *ext_header = itm->GetWeaponHeader(true);
 		int weapontype = 0;
-		if (ext_header && (ext_header->AttackType == ITEM_AT_BOW || ext_header->AttackType == ITEM_AT_PROJECTILE)) {
+		if (ext_header && (ext_header->AttackType == ITEM_AT_BOW || (ext_header->AttackType == ITEM_AT_PROJECTILE && !ext_header->Charges))) {
 			weapontype = ext_header->ProjectileQualifier;
 		}
 		gamedata->FreeItem(itm, Slot->ItemResRef, false);
