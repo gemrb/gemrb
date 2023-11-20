@@ -4690,16 +4690,7 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter2 == 0 || target->Type == ST_CONTAINER) {
-		// no deplete, no interrupt, caster or provided level
-		// ForceSpell doesn't have a RES variant, so there's more work
-		std::string tmp = fmt::format("ForceSpell([-1],{})", ResolveSpellNumber(fx->Resource));
-		Action *forceSpellAction = GenerateActionDirect(std::move(tmp), target);
-		if (fx->Parameter1 != 0) {
-			// override casting level
-			forceSpellAction->int1Parameter = fx->Parameter1;
-		}
-		Owner->AddActionInFront(forceSpellAction);
-		Owner->ImmediateEvent();
+		core->ApplySpell(fx->Resource, target, Owner, fx->Parameter1);
 	} else if (fx->Parameter2 == 1) {
 		// no deplete, instant, no interrupt, caster level
 		ResRef OldSpellResRef(Owner->SpellResRef);
