@@ -7876,7 +7876,10 @@ bool Actor::AdvanceAnimations()
 
 bool Actor::IsDead() const
 {
-	return InternalFlags & IF_STOPATTACK;
+	if (InternalFlags & IF_REALLYDIED) return true;
+	if (Modified[IE_STATE_ID] & STATE_DEAD) return true;
+
+	return false;
 }
 
 bool Actor::ShouldDrawCircle() const
