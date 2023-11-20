@@ -4915,9 +4915,9 @@ int Actor::CalculateSpeedFromINI(bool feedback) const
 }
 
 //receive turning
-void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
+void Actor::Turn(Scriptable *sender, ieDword turnlevel)
 {
-	assert(cleric);
+	assert(sender);
 	bool evilcleric = false;
 	static ieDword turnPanicLevelMod = gamedata->GetMiscRule("TURN_PANIC_LVL_MOD");
 	static ieDword turnDeathLevelMod = gamedata->GetMiscRule("TURN_DEATH_LVL_MOD");
@@ -4927,59 +4927,46 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 	}
 
 	//determine if we see the cleric (distance)
-	if (!CanSee(cleric, this, true, GA_NO_DEAD)) {
+	if (!CanSee(sender, this, true, GA_NO_DEAD)) {
 		return;
 	}
 
-	const Actor* cleric2 = Scriptable::As<Actor>(cleric);
-	if (cleric2 && GameScript::ID_Alignment(cleric2, AL_EVIL)) {
+	const Actor* caster = Scriptable::As<Actor>(sender);
+	if (caster && GameScript::ID_Alignment(caster, AL_EVIL)) {
 		evilcleric = true;
 	}
 
-	//a little adjustment of the level to get a slight randomness on who is turned
-	unsigned int level = GetXPLevel(true)-(GetGlobalID()&3);
+	int casterTurnLevel = turnlevel - 1 + core->Roll(1, 4, 0);
+	int targetTurnLevel = GetStat(IE_GENERAL) == GEN_UNDEAD ? GetXPLevel(true) : evilcleric ? GetPaladinLevel() : 0;
 
-	//this is safely hardcoded i guess
-	if (Modified[IE_GENERAL]!=GEN_UNDEAD) {
-		level = GetPaladinLevel();
-		if (evilcleric && level) {
-			AddTrigger(TriggerEntry(trigger_turnedby, cleric->GetGlobalID()));
-			if (turnlevel >= level + turnDeathLevelMod) {
-				if (gamedata->Exists("panic", IE_SPL_CLASS_ID)) {
-					core->ApplySpell(ResRef("panic"), this, cleric, level);
-				} else {
-					Log(DEBUG, "Actor", "Panic from turning!");
-					Panic(cleric, PANIC_RUNAWAY);
-				}
-			}
-		}
+	if (!targetTurnLevel) {
 		return;
 	}
 
 	//determine alignment (if equals, then no turning)
 
-	AddTrigger(TriggerEntry(trigger_turnedby, cleric->GetGlobalID()));
+	AddTrigger(TriggerEntry(trigger_turnedby, sender->GetGlobalID()));
 
 	//determine panic or destruction/control
 	//we get the modified level
-	if (turnlevel >= level + turnDeathLevelMod) {
+	if (casterTurnLevel >= targetTurnLevel + turnDeathLevelMod) {
 		if (evilcleric) {
 			Effect* fx = EffectQueue::CreateEffect(control_creature_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
 			if (!fx) {
 				fx = EffectQueue::CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
 			}
 			if (fx) {
-				fx->Duration = core->Time.round_sec;
+				fx->Duration = core->Time.round_sec * caster->GetXPLevel(true);
 				fx->Target = FX_TARGET_PRESET;
-				core->ApplyEffect(fx, this, cleric);
+				core->ApplyEffect(fx, this, sender);
 				return;
 			}
 			//fallthrough for bg1
 		}
-		Die(cleric);
-	} else if (turnlevel >= level + turnPanicLevelMod) {
+		Die(sender);
+	} else if (casterTurnLevel >= targetTurnLevel + turnPanicLevelMod) {
 		Log(DEBUG, "Actor", "Panic from turning!");
-		Panic(cleric, PANIC_RUNAWAY);
+		Panic(sender, PANIC_RUNAWAY);
 	}
 }
 
@@ -7457,7 +7444,17 @@ void Actor::ApplyModal(const ResRef& modalSpell)
 {
 	unsigned int aoe = ModalStates[Modal.State].aoe_spell;
 	if (aoe == 1) {
-		core->ApplySpellPoint(modalSpell, GetCurrentArea(), Pos, this, 0);
+		if (Modal.State == MS_TURNUNDEAD) {
+			if (!area) return;
+			std::vector<Actor*> targets = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_NEUTRAL|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
+			for (const auto& target : targets) {
+				if (GameScript::ID_Alignment(this, AL_EVIL) || target->GetStat(IE_GENERAL) == GEN_UNDEAD) {
+					core->ApplySpell(modalSpell, target, this, 0);
+				}
+			}
+		} else {
+			core->ApplySpellPoint(modalSpell, GetCurrentArea(), Pos, this, 0);
+		}
 	} else if (aoe == 2) {
 		// target actors around us manually
 		// used for iwd2 songs, as the spells don't use an aoe projectile
