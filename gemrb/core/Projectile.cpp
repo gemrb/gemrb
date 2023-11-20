@@ -119,14 +119,14 @@ Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactor
 		case 5:
 			c = SixteenToFive[cycle];
 			// orientations go counter-clockwise, starting south
-			if (cycle <= 8) {
-				// top-right quadrant
-				mirrorFlags = BlitFlags::MIRRORY;
-			} else if (cycle < 12) {
+			if (cycle > 4 && cycle <= 8) {
 				// top-left quadrant
+				mirrorFlags = BlitFlags::MIRRORY;
+			} else if (cycle > 8 && cycle < 12) {
+				// top-right quadrant
 				mirrorFlags = BlitFlags::MIRRORX | BlitFlags::MIRRORY;
-			} else if (cycle > 4) {
-				// bottom-left quadrant
+			} else if (cycle >= 12 && cycle <= 15) {
+				// bottom-right quadrant
 				mirrorFlags = BlitFlags::MIRRORX;
 			}
 			break;
