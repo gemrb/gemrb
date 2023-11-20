@@ -7331,7 +7331,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	//actually, iwd2 has autosearch, also, this is useful for dayblindness
 	//apply the modal effect about every second (pst and iwds have round sizes that are not multiples of 15)
 	// FIXME: split dayblindness out of detect.spl and only run that each tick + simplify this check
-	if (InParty && core->HasFeature(GFFlags::AUTOSEARCH_HIDDEN) && (third || (roundFraction % core->Time.defaultTicksPerSec == 0))) {
+	if (InParty && core->HasFeature(GFFlags::AUTOSEARCH_HIDDEN) && third && (roundFraction % core->Time.defaultTicksPerSec == 0)) {
 		core->ApplySpell(ResRef("detect"), this, this, 0);
 	}
 
