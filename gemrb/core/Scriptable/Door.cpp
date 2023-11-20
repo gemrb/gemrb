@@ -324,13 +324,13 @@ void Highlightable::TryDisarm(Actor* actor)
 {
 	if (!Trapped || !TrapDetected) return;
 
-	int skill = actor->GetStat(IE_TRAPS);
+	int skill = actor->GetStat(IE_LOCKPICKING);
 	int roll = 0;
 	int bonus = 0;
 	int trapDC = TrapRemovalDiff;
 
 	if (core->HasFeature(GFFlags::RULES_3ED)) {
-		skill = actor->GetSkill(IE_TRAPS);
+		skill = actor->GetSkill(IE_LOCKPICKING);
 		roll = core->Roll(1, 20, 0);
 		bonus = actor->GetAbilityBonus(IE_INT);
 		trapDC = TrapRemovalDiff/7 + 10; // oddity from the original
