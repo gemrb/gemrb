@@ -2079,13 +2079,13 @@ void CharAnimations::AddMHRSuffix(ResRef& dest, unsigned char StanceID,
 		case IE_ANI_CAST://looping
 			dest.Append("ca");
 			EquipData.Suffix = "ca";
-			Cycle = 8 + Orient;
+			Cycle = Orient;
 			break;
 
 		case IE_ANI_CONJURE://ending
 			dest.Append("ca");
 			EquipData.Suffix = "ca";
-			Cycle = Orient;
+			Cycle = 8 + Orient;
 			break;
 
 		case IE_ANI_DAMAGE:
