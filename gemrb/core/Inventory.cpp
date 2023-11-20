@@ -1929,35 +1929,33 @@ HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 		return HCStrings::MagicWeapon;
 	}
 
-	//can't equip in shield slot if a weapon slot is twohanded or ranged
-	for (int i=SLOT_MELEE; i<=LAST_MELEE;i++) {
-		//see GetShieldSlot
-		int otherslot;
-		if (IWD2) {
-			otherslot = i+1;
-		} else {
-			otherslot = SLOT_LEFT;
+	if (core->QuerySlotType(slot) & SLOT_SHIELD) {
+		//can't equip in shield slot if a weapon is twohanded or ranged
+		if (twohanded || ranged) {
+			return HCStrings::WrongItemType;
 		}
-		if (slot != otherslot) continue;
 
-		if (TwoHandedInSlot(i)) {
-			return HCStrings::TwohandedUsed;
-		}
-		if (ranged) {
-			return HCStrings::NoRangedOffhand;
+		//can't equip shield/offhand if twohand equipped
+		if (IWD2) {
+			if (TwoHandedInSlot(slot - 1)) {
+				return HCStrings::TwohandedUsed;
+			}
+		} else {
+			for (int i = SLOT_MELEE; i <= LAST_MELEE; i++) {
+				if (TwoHandedInSlot(i)) {
+					return HCStrings::TwohandedUsed;
+				}
+			}
 		}
 	}
 
+	//can't equip twohand if offhand equipped
 	if (twohanded) {
 		if (IWD2) {
-			if (slot>=SLOT_MELEE&&slot<=LAST_MELEE && (slot-SLOT_MELEE)&1) {
-				return HCStrings::NotInOffhand;
+			if (slot + 1 <= LAST_MELEE && !IsSlotEmpty(slot + 1)) {
+				return HCStrings::OffhandUsed;
 			}
-		} else if (slot == SLOT_LEFT) {
-			return HCStrings::NotInOffhand;
-		}
-		if (IsSlotBlocked(slot)) {
-		//cannot equip two handed while shield slot is in use?
+		} else if (!IsSlotEmpty(SLOT_LEFT)) {
 			return HCStrings::OffhandUsed;
 		}
 	}
