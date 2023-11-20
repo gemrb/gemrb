@@ -864,9 +864,11 @@ static void UpdateHappiness(Actor *actor) {
 	if (!core->HasFeature(GFFlags::HAPPINESS)) return;
 
 	ieWordSigned newHappiness = GetHappiness(actor, core->GetGame()->Reputation);
-	if (newHappiness == actor->PCStats->Happiness) return;
+	if (actor->PCStats) {
+		if (newHappiness == actor->PCStats->Happiness) return;
+		actor->PCStats->Happiness = newHappiness;
+	}
 
-	actor->PCStats->Happiness = newHappiness;
 	if (!actor->Ticks) return; // skip feedback on startup
 
 	const Effect* fx;
