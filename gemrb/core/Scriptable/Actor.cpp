@@ -2922,7 +2922,7 @@ void Actor::RefreshPCStats() {
 			if (morale < 10) {
 				NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 			} else if (morale > 10) {
-				NewBase(IE_MORALE, (stat_t) -1, MOD_ADDITIVE);
+				SetBase(IE_MORALE, GetBase(IE_MORALE) - 1);
 			}
 		}
 	}
@@ -4255,11 +4255,11 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		int newRatio = 100 * (chp + damage) / (signed) BaseStats[IE_MAXHITPOINTS];
 		if (ShouldModifyMorale()) {
 			if (currentRatio > 50 && newRatio < 25) {
-				NewBase(IE_MORALE, (stat_t) -4, MOD_ADDITIVE);
+				SetBase(IE_MORALE, GetBase(IE_MORALE) - 4);
 			} else if (currentRatio > 50 && newRatio < 50) {
-				NewBase(IE_MORALE, (stat_t) -2, MOD_ADDITIVE);
+				SetBase(IE_MORALE, GetBase(IE_MORALE) - 2);
 			} else if (currentRatio > 25 && newRatio < 25) {
-				NewBase(IE_MORALE, (stat_t) -2, MOD_ADDITIVE);
+				SetBase(IE_MORALE, GetBase(IE_MORALE) - 2);
 			}
 		}
 
@@ -4275,7 +4275,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 	// can be negative if we're healing on 100%+ resistance
 	// do this after GetHit, so VB_HURT isn't overridden by VB_DAMAGE, just (dis)played later
 	if (damage != 0) {
-		NewBase(IE_HITPOINTS, (stat_t) -damage, MOD_ADDITIVE);
+		SetBase(IE_HITPOINTS, GetBase(IE_HITPOINTS) - damage);
 		// unstun for that one special stun type
 		// run fx_cure_stun_state instead if it turns out not to be enough
 		if (HasSpellState(SS_AWAKE)) fxqueue.RemoveAllEffectsWithParam(fx_set_stun_state_ref, 1);
@@ -5148,9 +5148,9 @@ void Actor::SendDiedTrigger() const
 		if (!neighbour->ShouldModifyMorale()) continue;
 		int pea = neighbour->GetStat(IE_EA);
 		if (ea == EA_PC && pea == EA_PC) {
-			neighbour->NewBase(IE_MORALE, (stat_t) -1, MOD_ADDITIVE);
+			neighbour->SetBase(IE_MORALE, neighbour->GetBase(IE_MORALE) - 1);
 		} else if (OfType(this, neighbour)) {
-			neighbour->NewBase(IE_MORALE, (stat_t) -1, MOD_ADDITIVE);
+			neighbour->SetBase(IE_MORALE, neighbour->GetBase(IE_MORALE) - 1);
 		// are we an enemy of neighbour, regardless if we're good or evil?
 		} else if (abs(ea - pea) > 30) {
 			neighbour->NewBase(IE_MORALE, 2, MOD_ADDITIVE);
