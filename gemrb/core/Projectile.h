@@ -414,6 +414,9 @@ public:
 	void SetGradient(int gradient, bool tinted);
 	void StaticTint(const Color &newtint);
 	static Point GetStartOffset(const Actor* actor);
+	inline int GetZPos() const;
+	void SetZPos(int value);
+
 private:
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
@@ -456,7 +459,6 @@ private:
 	int GetTravelPos(int face) const;
 	int GetShadowPos(int face) const;
 	void SetFrames(int face, int frame1, int frame2);
-	inline int GetZPos() const;
 
 	//logic to resolve target when single projectile hit destination
 	int CalculateTargetFlag() const;

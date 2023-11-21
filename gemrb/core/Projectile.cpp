@@ -250,8 +250,6 @@ void Projectile::Setup()
 		ZPos = ProHeights::Flying;
 	}
 
-	ZPos /= 2;
-
 	//falling = vertical
 	//incoming = right side
 	//both = left side
@@ -1830,6 +1828,10 @@ void Projectile::DrawTravel(const Region& viewport)
 int Projectile::GetZPos() const
 {
 	return ZPos;
+}
+
+void Projectile::SetZPos(int value) {
+	ZPos = value;
 }
 
 void Projectile::SetIdentifiers(const ResRef &resref, size_t idx)

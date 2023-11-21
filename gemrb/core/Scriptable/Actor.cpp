@@ -9280,6 +9280,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 		attackProjectile = pro;
 		attackProjectile->MoveTo(tar->GetCurrentArea(), ranged ? Pos : tar->Pos);
 		attackProjectile->SetTarget(tar->GetGlobalID(), false);
+		attackProjectile->SetZPos(attackProjectile->GetZPos() / 2);
 	}
 
 	return true;
