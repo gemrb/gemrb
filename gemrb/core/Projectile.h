@@ -52,8 +52,6 @@ enum ProHeights {
 	Background = 50 // this is supposed to move the projectile to the background
 };
 
-#define BACK_DEPTH 50
-
 //projectile phases
 #define P_UNINITED  -1
 #define P_TRAVEL     0   //projectile moves to target
