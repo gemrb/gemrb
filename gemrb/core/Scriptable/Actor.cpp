@@ -4956,7 +4956,7 @@ void Actor::Turn(Scriptable *sender, ieDword turnlevel)
 				fx = EffectQueue::CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
 			}
 			if (fx) {
-				fx->Duration = core->Time.round_sec * caster->GetXPLevel(true);
+				fx->Duration = core->Time.round_sec;
 				fx->Target = FX_TARGET_PRESET;
 				core->ApplyEffect(fx, this, sender);
 				return;
