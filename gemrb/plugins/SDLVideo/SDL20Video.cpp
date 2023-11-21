@@ -594,7 +594,11 @@ void SDL20VideoDriver::DrawRawGeometry(
 		nullptr,
 		vertices.data(),
 		2 * sizeof(float),
+		#if SDL_VERSION_ATLEAST(2, 0, 22)
 		reinterpret_cast<const SDL_Color*>(colors.data()),
+		#else
+		reinterpret_cast<const int*>(colors.data()),
+		#endif
 		sizeof(Color),
 		nullptr,
 		0,
