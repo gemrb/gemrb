@@ -574,6 +574,7 @@ public:
 	//add a projectile to the area
 	void AddProjectile(Projectile *pro, const Point &source, ieDword actorID, bool fake);
 	void AddProjectile(Projectile* pro, const Point &source, const Point &dest);
+	void AddProjectile(Projectile* pro);
 
 	//returns the duration of a VVC cell set in the area (point may be set to empty)
 	ieDword HasVVCCell(const ResRef &resource, const Point &p) const;
@@ -721,7 +722,6 @@ private:
 	
 	void UpdateSpawns() const;
 	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
-	void AddProjectile(Projectile* pro);
 	
 	// same as GetBlocked, but in TileCoords
 	PathMapFlags GetBlockedTile(const SearchmapPoint&) const;
