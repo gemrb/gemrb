@@ -7446,7 +7446,7 @@ void Actor::ApplyModal(const ResRef& modalSpell)
 	if (aoe == 1) {
 		if (Modal.State == MS_TURNUNDEAD) {
 			if (!area) return;
-			std::vector<Actor*> targets = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_NEUTRAL|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
+			std::vector<Actor*> targets = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_SELF|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
 			for (const auto& target : targets) {
 				if (GameScript::ID_Alignment(this, AL_EVIL) || target->GetStat(IE_GENERAL) == GEN_UNDEAD) {
 					core->ApplySpell(modalSpell, target, this, 0);
