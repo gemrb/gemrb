@@ -529,7 +529,7 @@ Actor::stat_t Actor::GetSafeStat(unsigned int StatIndex) const
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
 	}
-	if (PrevStats) return PrevStats[StatIndex];
+	//if (PrevStats) return PrevStats[StatIndex];
 	return Modified[StatIndex];
 }
 
@@ -3338,7 +3338,7 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	return Modified[StatIndex] - oldmod;
 }
 
-int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType)
+int Actor::NewBase(unsigned int StatIndex, ieDwordSigned ModifierValue, ieDword ModifierType)
 {
 	int oldmod = BaseStats[StatIndex];
 
@@ -4246,11 +4246,11 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		int newRatio = 100 * (chp + damage) / (signed) BaseStats[IE_MAXHITPOINTS];
 		if (ShouldModifyMorale()) {
 			if (currentRatio > 50 && newRatio < 25) {
-				NewBase(IE_MORALE, (ieDword) -4, MOD_ADDITIVE);
+				NewBase(IE_MORALE, -4, MOD_ADDITIVE);
 			} else if (currentRatio > 50 && newRatio < 50) {
-				NewBase(IE_MORALE, (ieDword) -2, MOD_ADDITIVE);
+				NewBase(IE_MORALE, -2, MOD_ADDITIVE);
 			} else if (currentRatio > 25 && newRatio < 25) {
-				NewBase(IE_MORALE, (ieDword) -2, MOD_ADDITIVE);
+				NewBase(IE_MORALE, -2, MOD_ADDITIVE);
 			}
 		}
 
@@ -4266,7 +4266,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 	// can be negative if we're healing on 100%+ resistance
 	// do this after GetHit, so VB_HURT isn't overriden by VB_DAMAGE, just (dis)played later
 	if (damage != 0) {
-		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+		NewBase(IE_HITPOINTS, -damage, MOD_ADDITIVE);
 	}
 
 	InternalFlags |= IF_ACTIVE;
@@ -5066,9 +5066,9 @@ void Actor::SendDiedTrigger() const
 		if (!neighbour->ShouldModifyMorale()) continue;
 		int pea = neighbour->GetStat(IE_EA);
 		if (ea == EA_PC && pea == EA_PC) {
-			neighbour->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+			neighbour->NewBase(IE_MORALE, -1, MOD_ADDITIVE);
 		} else if (OfType(this, neighbour)) {
-			neighbour->NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+			neighbour->NewBase(IE_MORALE, -1, MOD_ADDITIVE);
 		// are we an enemy of neighbour, regardless if we're good or evil?
 		} else if (abs(ea - pea) > 30) {
 			neighbour->NewBase(IE_MORALE, 2, MOD_ADDITIVE);
