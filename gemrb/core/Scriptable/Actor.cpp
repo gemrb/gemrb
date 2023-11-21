@@ -7268,7 +7268,7 @@ void Actor::UpdateActorState()
 		//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
 		// however some critters don't have that long animations (eg. squirrel 0xC400)
 		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
-			GetCurrentArea()->AddProjectile(attackProjectile);
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTargetPersistent, false);
 			attackProjectile = NULL;
 		}
 	}
@@ -9274,15 +9274,10 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 			// ignore timestop
 			pro->TFlags |= PTF_TIMELESS;
 		}
-	}
-
-	if (pro) {
 		attackProjectile = pro;
-		attackProjectile->MoveTo(tar->GetCurrentArea(), ranged ? Pos : tar->Pos);
-		attackProjectile->SetTarget(tar->GetGlobalID(), false);
-		attackProjectile->SetZPos(attackProjectile->GetZPos() / 2);
+	} else { // launch it now as we are not attacking
+		GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
 	}
-
 	return true;
 }
 
