@@ -589,7 +589,7 @@ void SDL20VideoDriver::DrawRawGeometry(
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	}
 
-	static_assert(sizeof(int) == sizeof(SDL_Color));
+	static_assert(sizeof(int) == sizeof(SDL_Color), "Incompatible types to cast");
 
 	SDL_RenderGeometryRaw(
 		renderer,
