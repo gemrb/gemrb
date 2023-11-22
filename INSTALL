@@ -25,8 +25,7 @@ Optional dependencies:
 
 When choosing SDL 1.2 or SDL 2.0.x, pass -DSDL_BACKEND=SDL (for 1.2) or
 -DSDL_BACKEND=SDL2 (for 2.0) to cmake invocation. You can also invoke cmake
-with -DSDL_BACKEND=Auto (default) or even without defining specific backend
-for autodetection.
+with -DSDL_BACKEND=Auto (default).
 
 You can explicitly disable searching (and using) a particular optional
 dependency by specifying -DUSE_foo=OFF flags (cumulative), where "foo" can be
@@ -39,15 +38,15 @@ The following commands will try to configure, make and install GemRB.
   mkdir build
   cd build
   cmake .. [some options]
-  # Or, you can launch GUI:
-  cmake-gui ..
+  # Or, you can launch the interactive TUI and set options that way:
+  ccmake ..
   make
   make install
 
 By default, GemRB is installed into /usr/local ("fhs"). You can pass -DLAYOUT
-with "home" or "opt" to change the general layout and -DPREFIX to change the
-install path prefix. Check the toplevel CMakeLists.txt to get see all the
-individual path components you can additionally alter.
+with "home" or "opt" to change the general layout and -DCMAKE_INSTALL_PREFIX
+to change the install path prefix. Check the toplevel CMakeLists.txt to see
+all the individual path components you can additionally alter.
 
 Pass -DCMAKE_BUILD_TYPE=Debug to cmake if you want to create a debug build.
 
