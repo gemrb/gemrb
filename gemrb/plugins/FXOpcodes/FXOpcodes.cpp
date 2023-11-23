@@ -1936,8 +1936,9 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_ABORT;
 	}
 
-	int count = target->fxqueue.CountEffects(fx_poisoned_state_ref, fx->Parameter1, fx->Parameter2, fx->Resource);
-	if (count > 1) {
+	// don't stack, only run one of the same at a time
+	ieDword count = target->fxqueue.CountEffects(fx_poisoned_state_ref, fx->Parameter1, fx->Parameter2, fx->Resource);
+	if (count > 1 && target->fxqueue.GetEffectOrder(fx_poisoned_state_ref, fx) < count) {
 		return FX_APPLIED;
 	}
 
