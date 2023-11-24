@@ -9338,6 +9338,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 			pro->TFlags |= PTF_TIMELESS;
 		}
 		attackProjectile = pro;
+		attackProjectile->SFlags &= ~PSF_FLYING;
 	} else { // launch it now as we are not attacking
 		SetOrientation(target->Pos, Pos, false);
 		GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
