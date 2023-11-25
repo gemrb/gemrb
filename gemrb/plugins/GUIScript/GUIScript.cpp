@@ -5684,15 +5684,16 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Tip", DecRef(PyLong_FromLong, (int)core->QuerySlottip(tmp)));
 	PyDict_SetItemString(dict, "Flags", PyLong_FromLong((int)core->QuerySlotFlags(tmp)));
 	//see if the actor shouldn't have some slots displayed
+	int weaponSlot;
 	if (!actor || !actor->PCStats) {
 		goto has_slot;
 	}
-	//WARNING:idx isn't used any more, recycling it
-	idx = Inventory::GetWeaponSlot();
-	if (tmp<idx || tmp>idx+3) {
+
+	weaponSlot = Inventory::GetWeaponSlot();
+	if (tmp < weaponSlot || tmp > weaponSlot + 3) {
 		goto has_slot;
 	}
-	if (actor->GetQuickSlot(tmp-idx)==0xffff) {
+	if (actor->GetQuickSlot(tmp - weaponSlot) == 0xffff) {
 		PyDict_SetItemString(dict, "ResRef", DecRef(PyString_FromString, ""));
 		goto continue_quest;
 	}
