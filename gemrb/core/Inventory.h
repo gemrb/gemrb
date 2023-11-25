@@ -125,19 +125,12 @@ using ieCREItemFlagBits = enum ieCREItemFlagBits : uint32_t {
 #define EQUIP_RANGED 2
 #define EQUIP_FORCE 4
 
-//FIXME:
-//actually this header shouldn't be THIS large, i was just
-//lazy to pick the interesting elements
-//it could be possible that some elements need to be added from the
-//item header itself
+// a mash of useful data fields from Item, ITMExtHeader and potentially CREItem
 struct ItemExtHeader {
 	ieDword slot;
 	size_t headerindex;
 	//from itmextheader
 	ieByte AttackType;
-	ieByte IDReq;
-	ieByte Location;
-	ieByte unknown1;
 	ResRef UseIcon;
 	ieStrRef Tooltip;
 	ieByte Target;
@@ -145,19 +138,9 @@ struct ItemExtHeader {
 	ieWord Range;
 	//This was commented out in ITMExtHeader
 	//ieWord ProjectileType;
-	ieWord Speed;
-	ieWord THAC0Bonus;
-	ieWord DiceSides;
-	ieWord DiceThrown;
-	ieWordSigned DamageBonus; //this must be signed!!!
-	ieWord DamageType;
-	ieWord FeatureCount;
-	ieWord FeatureOffset;
 	ieWord Charges;
 	ieWord ChargeDepletion;
-	ieDword RechargeFlags; //this is a bitfield with many bits
 	ieWord ProjectileAnimation;
-	int ProjectileQualifier; //this is a derived value determined on load time
 	//other data
 	ResRef itemName;
 

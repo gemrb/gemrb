@@ -66,25 +66,14 @@ static void InvalidSlot(int slot)
 void ItemExtHeader::CopyITMExtHeader(const ITMExtHeader &src)
 {
 	AttackType = src.AttackType;
-	IDReq = src.IDReq;
-	Location = src.Location;
 	UseIcon = src.UseIcon;
 	Tooltip = src.Tooltip;
 	Target = src.Target;
 	TargetNumber = src.TargetNumber;
 	Range = src.Range;
-	Speed = src.Speed;
-	THAC0Bonus = src.THAC0Bonus;
-	DiceSides = src.DiceSides;
-	DiceThrown = src.DiceThrown;
-	DamageBonus = src.DamageBonus;
-	DamageType = src.DamageType;
-	FeatureOffset = src.FeatureOffset;
 	Charges = src.Charges;
 	ChargeDepletion = src.ChargeDepletion;
-	RechargeFlags = src.RechargeFlags;
 	ProjectileAnimation = src.ProjectileAnimation;
-	ProjectileQualifier = src.ProjectileQualifier;
 }
 
 //This inline function returns both an item pointer and the slot data.
