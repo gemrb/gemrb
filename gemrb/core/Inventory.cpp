@@ -479,6 +479,11 @@ void Inventory::KillSlot(unsigned int index)
 			}
 			recache = false;
 			break;
+		case SLOT_EFFECT_ALIAS:
+			break;
+		default:
+			Log(FATAL, "Inventory", "Unknown slot effect type set: {}", effect);
+			break;
 	}
 	if (recache) CacheAllWeaponInfo();
 	gamedata->FreeItem(itm, item->ItemResRef, false);
@@ -647,10 +652,8 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype, bool ranged)
 		if (!(core->QuerySlotType(i)&slottype))
 			continue;
 		//the slot has been disabled for this actor
-		if (i>=SLOT_MELEE && i<=LAST_MELEE) {
-			if (Owner->GetQuickSlot(i-SLOT_MELEE)==0xffff) {
-				continue;
-			}
+		if (i >= SLOT_MELEE && i <= LAST_MELEE && Owner->GetQuickSlot(i - SLOT_MELEE) == 0xffff) {
+			continue;
 		}
 		int part_res = AddSlotItem (item, i);
 		if (part_res == ASI_SUCCESS) return ASI_SUCCESS;
@@ -997,6 +1000,8 @@ bool Inventory::EquipItem(ieDword slot)
 		} else {
 			UpdateShieldAnimation(itm);
 		}
+		break;
+	default: // none, SLOT_EFFECT_MAGIC (handled indirectly elsewhere) or alias
 		break;
 	}
 	gamedata->FreeItem(itm, item->ItemResRef, false);
