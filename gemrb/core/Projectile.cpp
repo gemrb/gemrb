@@ -1112,7 +1112,8 @@ void Projectile::SecondaryTarget()
 		ieDword targetID = actor->GetGlobalID();
 
 		//this flag is actually about ignoring the caster (who is at the center)
-		if ((SFlags & PSF_IGNORE_CENTER) && Caster == targetID) {
+		// the bg2 divine "find traps" spell has both set and fx_find_traps is expected to run on the caster
+		if ((SFlags & PSF_IGNORE_CENTER) && Caster == targetID && !(Extension->AFlags & PAF_INANIMATE)) {
 			continue;
 		}
 
