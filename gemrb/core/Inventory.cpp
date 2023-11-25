@@ -1856,8 +1856,6 @@ void Inventory::UpdateWeaponAnimation()
 	ieWord MeleeAnimation[3]={100,0,0};
 	CREItem *Slot;
 
-	// TODO: fix bows?
-
 	const ITMExtHeader *header = nullptr;
 	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) {
@@ -1872,7 +1870,6 @@ void Inventory::UpdateWeaponAnimation()
 		WeaponType = IE_ANI_WEAPON_2H;
 	} else {
 		// Examine shield slot to check if we're using two weapons
-		// TODO: for consistency, use same Item* access method as above
 		int shieldSlot = GetShieldSlot();
 		const CREItem* si = nullptr;
 		if (shieldSlot > 0) {
