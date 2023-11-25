@@ -320,7 +320,7 @@ public:
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
 	int FindCandidateSlot(int slottype, size_t first_slot, const ResRef& resref = ResRef()) const;
 	/** Creates an item in the slot*/
-	void SetSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
+	void SetSlotItemRes(const ResRef& ItemResRef, size_t SlotID, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
 	/** Adds item to slot*/
 	void AddSlotItemRes(const ResRef& ItemResRef, int Slot, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
 	/** returns the itemtype held in the left hand */
@@ -380,8 +380,8 @@ private:
 	void CalculateWeight(void);
 	int FindRangedProjectile(unsigned int type) const;
 	// called by KillSlot
-	void RemoveSlotEffects(ieDword slot);
-	void KillSlot(unsigned int index);
+	void RemoveSlotEffects(size_t slot);
+	void KillSlot(size_t index);
 	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot) const;
 	void UpdateWeaponAnimation();
 	void UpdateShieldAnimation(const Item *it);

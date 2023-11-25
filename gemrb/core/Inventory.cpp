@@ -232,7 +232,7 @@ void Inventory::AddSlotEffects(ieDword index)
 
 //no need to know the item effects 'personally', the equipping slot
 //is stored in them
-void Inventory::RemoveSlotEffects(ieDword index)
+void Inventory::RemoveSlotEffects(size_t index)
 {
 	if (Owner->fxqueue.RemoveEquippingEffects(index)) {
 		Owner->RefreshEffects();
@@ -341,7 +341,7 @@ bool Inventory::HasItem(const ResRef &resref, ieDword flags) const
 	return false;
 }
 
-void Inventory::KillSlot(unsigned int index)
+void Inventory::KillSlot(size_t index)
 {
 	if (InventoryType == ieInventoryType::HEAP) {
 		Slots.erase(Slots.begin()+index);
@@ -360,11 +360,11 @@ void Inventory::KillSlot(unsigned int index)
 	Slots[index] = NULL;
 	CalculateWeight();
 
-	int effect = core->QuerySlotEffects( index );
+	int effect = core->QuerySlotEffects((unsigned int) index);
 	if (!effect) {
 		return;
 	}
-	RemoveSlotEffects( index );
+	RemoveSlotEffects(index);
 	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	//this cannot happen, but stuff happens!
 	if (!itm) {
@@ -526,11 +526,11 @@ unsigned int Inventory::DestroyItem(const ResRef& resref, ieDword flags, ieDword
 				item = RemoveItem( (unsigned int) slot, removed );
 			}
 			else {
-				KillSlot( (unsigned int) slot);
+				KillSlot(slot);
 			}
 		} else {
 			removed=1;
-			KillSlot( (unsigned int) slot);
+			KillSlot(slot);
 		}
 		delete item;
 		destructed+=removed;
@@ -859,7 +859,7 @@ bool Inventory::DropItemAtLocation(const ResRef& resRef, unsigned int flags, Map
 		item->Flags &= ~ IE_INV_ITEM_EQUIPPED;
 		map->AddItemToLocation(loc, item);
 		dropped = true;
-		KillSlot((unsigned int) i);
+		KillSlot(i);
 		//if it isn't all items then we stop here
 		if (!resRef.IsEmpty())
 			break;
@@ -1262,7 +1262,7 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 		EquippedHeader = 0;
 	}
 
-	int oldslot = GetEquippedSlot();
+	unsigned int oldslot = GetEquippedSlot();
 	int newslot = GetWeaponSlot(slotcode);
 
 	//remove previous slot effects
@@ -1271,8 +1271,8 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 		//for projectiles we may need to remove the launcher effects too
 		int oldeffects = core->QuerySlotEffects(oldslot);
 		if (oldeffects == SLOT_EFFECT_MISSILE) {
-			int launcher = FindSlotRangedWeapon(oldslot);
-			if (launcher != SLOT_FIST) {
+			size_t launcher = FindSlotRangedWeapon(oldslot);
+			if (launcher != (unsigned int) SLOT_FIST) {
 				RemoveSlotEffects(launcher);
 			}
 		}
@@ -1582,18 +1582,18 @@ void Inventory::AddSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0
 	}
 }
 
-void Inventory::SetSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
+void Inventory::SetSlotItemRes(const ResRef& ItemResRef, size_t SlotID, int Charge0, int Charge1, int Charge2)
 {
 	if (!ItemResRef.IsEmpty()) {
 		CREItem *TmpItem = new CREItem();
 		if (CreateItemCore(TmpItem, ItemResRef, Charge0, Charge1, Charge2)) {
-			SetSlotItem( TmpItem, SlotID );
+			SetSlotItem(TmpItem, (unsigned int) SlotID);
 		} else {
 			delete TmpItem;
 		}
 	} else {
 		//if the item isn't creatable, we still destroy the old item
-		KillSlot( SlotID );
+		KillSlot(SlotID);
 	}
 }
 

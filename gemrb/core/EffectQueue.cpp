@@ -1325,9 +1325,6 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 
 #define MATCH_OPCODE() if (fx.Opcode != opcode) { continue; }
 
-// useful for: remove equipped item
-#define MATCH_SLOTCODE() if (fx.InventorySlot != slotcode) { continue; }
-
 // useful for: remove projectile type
 #define MATCH_PROJECTILE() if (fx.Projectile != projectile) { continue; }
 
@@ -1421,12 +1418,12 @@ void EffectQueue::RemoveBonusMemorizations(const Effect& fx)
 }
 
 //removes all equipping effects that match slotcode
-bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode)
+bool EffectQueue::RemoveEquippingEffects(size_t slotCode)
 {
 	bool removed = false;
 	for (auto& fx : effects) {
 		if (!IsEquipped(fx.TimingMode)) continue;
-		MATCH_SLOTCODE()
+		if (fx.InventorySlot != (ieDwordSigned) slotCode) continue;
 
 		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 		RemoveBonusMemorizations(fx);

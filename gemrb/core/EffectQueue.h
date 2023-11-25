@@ -255,7 +255,7 @@ public:
 	void RemoveAllEffectsWithSource(ieDword opcode, const ResRef &source, int mode);
 
 	/* removes equipping effects with specified inventory slot code */
-	bool RemoveEquippingEffects(ieDwordSigned slotcode);
+	bool RemoveEquippingEffects(size_t slotCode);
 
 	/* removes all effects of a given spell */
 	void RemoveAllEffects(const ResRef &Removed);
