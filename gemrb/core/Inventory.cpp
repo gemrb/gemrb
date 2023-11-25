@@ -84,9 +84,6 @@ void ItemExtHeader::CopyITMExtHeader(const ITMExtHeader &src)
 	ChargeDepletion = src.ChargeDepletion;
 	RechargeFlags = src.RechargeFlags;
 	ProjectileAnimation = src.ProjectileAnimation;
-	MeleeAnimation[0] = src.MeleeAnimation[0];
-	MeleeAnimation[1] = src.MeleeAnimation[1];
-	MeleeAnimation[2] = src.MeleeAnimation[2];
 	ProjectileQualifier = src.ProjectileQualifier;
 }
 
@@ -1853,7 +1850,7 @@ void Inventory::UpdateWeaponAnimation()
 	}
 
 	AnimRef AnimationType;
-	ieWord MeleeAnimation[3]={100,0,0};
+	std::array<ieWord, 3> meleeAnimation = { 100, 0, 0 };
 	CREItem *Slot;
 
 	const ITMExtHeader *header = nullptr;
@@ -1889,11 +1886,10 @@ void Inventory::UpdateWeaponAnimation()
 		}
 	}
 
-	if (header)
-		memcpy(MeleeAnimation,header->MeleeAnimation, sizeof(MeleeAnimation) );
+	if (header) meleeAnimation = header->MeleeAnimation;
 	if (itm)
 		gamedata->FreeItem( itm, Slot->ItemResRef, false );
-	Owner->SetUsedWeapon(AnimationType, MeleeAnimation, WeaponType);
+	Owner->SetUsedWeapon(AnimationType, meleeAnimation, WeaponType);
 }
 
 //this function will also check disabled slots (if that feature will be imped)

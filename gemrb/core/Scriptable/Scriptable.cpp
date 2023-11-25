@@ -1965,11 +1965,9 @@ void Movable::SetOrientation(const Point& from, const Point& to, bool slow)
 	SetOrientation(GetOrient(from, to), slow);
 }
 
-void Movable::SetAttackMoveChances(const ieWord *amc)
+void Movable::SetAttackMoveChances(const std::array<ieWord, 3>& amc)
 {
-	AttackMovements[0]=amc[0];
-	AttackMovements[1]=amc[1];
-	AttackMovements[2]=amc[2];
+	AttackMovements = amc;
 }
 
 //this could be used for WingBuffet as well

@@ -9466,7 +9466,7 @@ void Actor::ClearCurrentStanceAnims()
 	currentStance.shadow.clear();
 }
 
-void Actor::SetUsedWeapon(AnimRef AnimationType, const ieWord* MeleeAnimation, unsigned char wt)
+void Actor::SetUsedWeapon(AnimRef AnimationType, const std::array<ieWord, 3>& meleeAnimation, unsigned char wt)
 {
 	WeaponRef = AnimationType;
 	if (wt != IE_ANI_WEAPON_INVALID) WeaponType = wt;
@@ -9476,7 +9476,7 @@ void Actor::SetUsedWeapon(AnimRef AnimationType, const ieWord* MeleeAnimation, u
 	anims->SetWeaponRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
 	ClearCurrentStanceAnims();
-	SetAttackMoveChances(MeleeAnimation);
+	SetAttackMoveChances(meleeAnimation);
 	if (InParty) {
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);

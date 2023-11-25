@@ -157,7 +157,6 @@ struct ItemExtHeader {
 	ieWord ChargeDepletion;
 	ieDword RechargeFlags; //this is a bitfield with many bits
 	ieWord ProjectileAnimation;
-	ieWord MeleeAnimation[3];
 	int ProjectileQualifier; //this is a derived value determined on load time
 	//other data
 	ResRef itemName;

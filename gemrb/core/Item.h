@@ -160,7 +160,7 @@ public:
 	ieWord ChargeDepletion = 0;
 	ieDword RechargeFlags = 0; // this is a bitfield with many bits
 	ieWord ProjectileAnimation = 0;
-	ieWord MeleeAnimation[3]{};
+	std::array<ieWord, 3> MeleeAnimation;
 	//this value is set in projectiles and launchers too
 	int ProjectileQualifier = 0; // this is a derived value determined on load time
 	std::vector<Effect*> features;

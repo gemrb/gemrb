@@ -489,7 +489,7 @@ private: //these seem to be sensitive, so get protection
 	unsigned char StanceID = 0;
 	orient_t Orientation = S;
 	orient_t NewOrientation = S;
-	ieWord AttackMovements[3] = { 100, 0 , 0 };
+	std::array<ieWord, 3> AttackMovements = { 100, 0, 0 };
 
 	PathListNode* path = nullptr; // whole path
 	PathListNode* step = nullptr; // actual step
@@ -561,7 +561,7 @@ public:
 	void SetStance(unsigned int arg);
 	void SetOrientation(orient_t value, bool slow);
 	void SetOrientation(const Point& from, const Point& to, bool slow);
-	void SetAttackMoveChances(const ieWord *amc);
+	void SetAttackMoveChances(const std::array<ieWord, 3>& amc);
 	virtual void DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);
 	void RunAwayFrom(const Point &Des, int PathLength, bool noBackAway);
