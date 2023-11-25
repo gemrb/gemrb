@@ -886,27 +886,26 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 		act->LargePortrait = "NONE";
 	}
 
-	unsigned int Inventory_Size;
-
+	size_t inventorySize;
 	switch(CREVersion) {
 		case CREVersion::GemRB:
-			Inventory_Size = GetActorGemRB(act);
+			inventorySize = GetActorGemRB(act);
 			break;
 		case CREVersion::V1_2:
-			Inventory_Size=46;
+			inventorySize = 46;
 			GetActorPST(act);
 			break;
 		case CREVersion::V1_1: // bg2 (fake version)
 		case CREVersion::V1_0: // bg1 too
-			Inventory_Size=38;
+			inventorySize = 38;
 			GetActorBG(act);
 			break;
 		case CREVersion::V2_2:
-			Inventory_Size=50;
+			inventorySize = 50;
 			GetActorIWD2(act);
 			break;
 		case CREVersion::V9_0:
-			Inventory_Size=38;
+			inventorySize = 38;
 			GetActorIWD1(act);
 			break;
 		default:
@@ -922,7 +921,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 		Log(ERROR, "CREImporter", "Effect importer is unavailable!");
 	}
 	// Reading inventory, spellbook, etc
-	ReadInventory( act, Inventory_Size );
+	ReadInventory(act, inventorySize);
 	ReadSpellbook(act);
 
 	if (IsCharacter) {
@@ -1082,13 +1081,13 @@ void CREImporter::GetActorPST(Actor *act)
 	ReadDialog(act);
 }
 
-void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
+void CREImporter::ReadInventory(Actor* act, size_t slotCount)
 {
-	act->inventory.SetSlotCount(Inventory_Size + 1);
+	act->inventory.SetSlotCount(slotCount + 1);
 	str->Seek(ItemSlotsOffset + CREOffset, GEM_STREAM_START);
 
 	//first read the indices
-	std::vector<ieWord> indices(Inventory_Size);
+	std::vector<ieWord> indices(slotCount);
 	for (auto& idx : indices) {
 		str->ReadWord(idx);
 	}
@@ -1108,7 +1107,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	//read the item entries based on the previously read indices
 	//an item entry may be read multiple times if the indices are repeating
-	for (unsigned int i = 0; i < Inventory_Size;) {
+	for (size_t i = 0; i < slotCount;) {
 		//the index was intentionally increased here, the fist slot isn't saved
 		ieWord index = indices[i++];
 		if (index != 0xffff) {
@@ -1120,7 +1119,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			str->Seek(ItemsOffset + index * 20 + CREOffset, GEM_STREAM_START);
 			//the core allocates this item data
 			CREItem *item = core->ReadItem(str);
-			int Slot = core->QuerySlot(i);
+			int Slot = core->QuerySlot((unsigned int) i);
 			if (item) {
 				act->inventory.SetSlotItem(item, Slot);
 			} else {
@@ -1225,7 +1224,7 @@ Effect *CREImporter::GetEffect()
 	}
 }
 
-ieDword CREImporter::GetActorGemRB(Actor *act)
+size_t CREImporter::GetActorGemRB(Actor* act)
 {
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_REPUTATION]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HIDEINSHADOWS]);

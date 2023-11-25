@@ -77,13 +77,13 @@ private:
 	/** skips the chr header */
 	bool SeekCreHeader(char *Signature);
 	void GetActorPST(Actor *actor);
-	ieDword GetActorGemRB(Actor *act);
+	size_t GetActorGemRB(Actor* act);
 	void GetActorBG(Actor *actor);
 	void GetActorIWD1(Actor *actor);
 	void GetActorIWD2(Actor *actor);
 	ieDword GetIWD2SpellpageSize(const Actor *actor, ieIWD2SpellType type, int level) const;
 	void GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int count);
-	void ReadInventory(Actor*, unsigned int);
+	void ReadInventory(Actor*, size_t);
 	void ReadSpellbook(Actor* act);
 	void ReadEffects(Actor* actor);
 	Effect* GetEffect();

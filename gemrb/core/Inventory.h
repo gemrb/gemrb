@@ -251,7 +251,7 @@ public:
 	int GetSlotCount() const { return (int)Slots.size(); }
 
 	/** sets inventory size, for the first time */
-	void SetSlotCount(unsigned int size);
+	void SetSlotCount(size_t size);
 
 
 	/** Returns CREItem in specified slot. 

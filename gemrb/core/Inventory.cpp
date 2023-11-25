@@ -248,14 +248,14 @@ void Inventory::SetInventoryType(ieInventoryType arg)
 	InventoryType = arg;
 }
 
-void Inventory::SetSlotCount(unsigned int size)
+void Inventory::SetSlotCount(size_t size)
 {
 	if (!Slots.empty()) {
 		error("Core", "Inventory size changed???");
 		//we don't allow reassignment,
 		//if you want this, delete the previous Slots here
 	}
-	Slots.assign((size_t) size, NULL);
+	Slots.assign(size, nullptr);
 }
 
 /** if you supply a "" string, then it checks if the slot is empty */
