@@ -1921,7 +1921,11 @@ inline bool Inventory::TwoHandedInSlot(int slot) const
 HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 {
 	// check only for hand slots
-	if ((slot<SLOT_MELEE || slot>LAST_MELEE) && (slot != SLOT_LEFT) ) {
+	if (IWD2) {
+		if (slot < SLOT_MELEE || slot > LAST_MELEE + 1) { // up to last adjacent shield slot
+			return HCStrings::count;
+		}
+	} else if ((slot < SLOT_MELEE || slot > LAST_MELEE) && slot != SLOT_LEFT) {
 		return HCStrings::count;
 	}
 
