@@ -5042,7 +5042,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 				fx = EffectQueue::CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
 			}
 			if (fx) {
-				fx->Duration = core->Time.round_sec;
+				fx->Duration = core->Time.round_sec * 10;
 				fx->Target = FX_TARGET_PRESET;
 				core->ApplyEffect(fx, this, cleric);
 				return;
