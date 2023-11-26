@@ -39,9 +39,7 @@ STOItem::STOItem(const CREItem *item) {
 void STOItem::CopyCREItem(const CREItem *item) {
 	ItemResRef = item->ItemResRef;
 	PurchasedAmount = 0; // Expired in STOItem
-	Usages[0] = item->Usages[0];
-	Usages[1] = item->Usages[1];
-	Usages[2] = item->Usages[2];
+	Usages = item->Usages;
 	Flags = item->Flags;
 	Weight = item->Weight;
 	MaxStackAmount = item->MaxStackAmount;
@@ -225,7 +223,7 @@ STOItem *Store::FindItem(const CREItem *item, bool exact) const
 				return temp;
 			}
 			// Check if we have a non-stackable item with a different number of charges.
-			if (!item->MaxStackAmount && memcmp(temp->Usages, item->Usages, sizeof(item->Usages)) != 0) {
+			if (!item->MaxStackAmount && temp->Usages != item->Usages) {
 				continue;
 			}
 		}
@@ -261,7 +259,7 @@ void Store::RechargeItem(CREItem *item) const
 	//recharge 1   0   0   1
 	if (IsBag() != !(Flags&IE_STORE_RECHARGE)) {
 		bool feature = core->HasFeature(GFFlags::SHOP_RECHARGE);
-		for (int i=0;i<CHARGE_COUNTERS;i++) {
+		for (size_t i = 0; i < item->Usages.size(); i++) {
 			const ITMExtHeader *h = itm->GetExtHeader(i);
 			if (!h) {
 				item->Usages[i] = 0;

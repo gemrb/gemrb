@@ -3136,7 +3136,7 @@ void Interface::SanitizeItem(CREItem *item) const
 	} else {
 		//set charge counters for non-rechargeable items if their charge is zero
 		//set charge counters for items not using charges to one
-		for (int i = 0; i < CHARGE_COUNTERS; i++) {
+		for (size_t i = 0; i < item->Usages.size(); i++) {
 			const ITMExtHeader *h = itm->GetExtHeader(i);
 			if (!h) {
 				item->Usages[i] = 0;
@@ -3288,7 +3288,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 			if (itm->ItemResRef == "no_drop") {
 				return false;
 			}
-			itm->Usages[0] = static_cast<ieWord>(Roll(1, diceSides, 0));
+			itm->Usages[0] = RAND<ieWord>(1, diceSides);
 		}
 	}
 	Log(ERROR, "Interface", "Loop detected while generating random item: {}", itm->ItemResRef);

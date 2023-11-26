@@ -210,31 +210,31 @@ const ITMExtHeader* Item::GetExtHeader(int which) const
 	return &ext_headers[which];
 }
 
-int Item::UseCharge(ieWord *Charges, int header, bool expend) const
+int Item::UseCharge(std::array<ieWord, CHARGE_COUNTERS>& charges, int header, bool expend) const
 {
 	const ITMExtHeader *ieh = GetExtHeader(header);
 	if (!ieh) return 0;
 	int type = ieh->ChargeDepletion;
 
 	int ccount = 0;
-	if ((header>=CHARGE_COUNTERS) || (header<0) || MaxStackAmount) {
+	if (header >= CHARGE_COUNTERS || header < 0 || MaxStackAmount) {
 		header = 0;
 	}
-	ccount=Charges[header];
+	ccount = charges[header];
 
 	//if the item started from 0 charges, then it isn't depleting
 	if (ieh->Charges==0) {
 		return CHG_NONE;
 	}
 	if (expend) {
-		Charges[header] = --ccount;
+		charges[header] = --ccount;
 	}
 
 	if (ccount>0) {
 		return CHG_NONE;
 	}
 	if (type == CHG_NONE) {
-		Charges[header]=0;
+		charges[header] = 0;
 	}
 	return type;
 }

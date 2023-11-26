@@ -29,14 +29,16 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
-#include "GameScript/GSUtils.h"
 #include "Interface.h"
 #include "Item.h"
 #include "Map.h"
 #include "ScriptEngine.h"
+
+#include "GameScript/GSUtils.h"
 #include "Scriptable/Actor.h"
 
 #include <cstdio>
+#include <fmt/ranges.h>
 
 namespace GemRB {
 
@@ -751,9 +753,7 @@ int Inventory::DepleteItem(ieDword flags) const
 				continue;
 		}
 		//deplete item
-		item->Usages[0]=0;
-		item->Usages[1]=0;
-		item->Usages[2]=0;
+		item->Usages.fill(0);
 	}
 	return -1;
 }
@@ -1651,7 +1651,7 @@ std::string Inventory::dump(bool print) const
 			continue;
 		}
 
-		AppendFormat(buffer, "{}: {} - ({} {} {}) Fl:{:#x}", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags);
+		AppendFormat(buffer, "{}: {} - {} Flags:{:#x}", i, itm->ItemResRef, itm->Usages, itm->Flags);
 		AppendFormat(buffer, "Wt: {} x {}Lb\n", (itm->Usages[0] && itm->MaxStackAmount) ? itm->Usages[0] : 1, itm->Weight);
 	}
 
@@ -1787,7 +1787,7 @@ bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int sta
 			}
 
 			// don't modify ehc, it is a counter
-			if (ehc >= CHARGE_COUNTERS) {
+			if (ehc >= slot->Usages.size()) {
 				headerList[pos].Charges = slot->Usages[0];
 			} else {
 				headerList[pos].Charges = slot->Usages[ehc];
@@ -1972,7 +1972,7 @@ void Inventory::ChargeAllItems(int hours) const
 
 		const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 		if (!itm) continue;
-		for(int h=0;h<CHARGE_COUNTERS;h++) {
+		for (size_t h = 0; h < item->Usages.size(); h++) {
 			const ITMExtHeader *header = itm->GetExtHeader(h);
 			if (!header || !(header->RechargeFlags & IE_ITEM_RECHARGE)) {
 				continue;
@@ -1981,7 +1981,6 @@ void Inventory::ChargeAllItems(int hours) const
 			unsigned short add = header->Charges;
 			if (hours && add > hours) add = hours;
 			item->Usages[h] = std::min<ieWord>(add + item->Usages[h], header->Charges);
-
 		}
 		gamedata->FreeItem( itm, item->ItemResRef, false );
 	}

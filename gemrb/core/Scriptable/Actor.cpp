@@ -5556,7 +5556,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 	item->itemName = slot->ItemResRef;
 	item->slot = idx;
 	item->headerindex = headerindex;
-	if (headerindex>=CHARGE_COUNTERS) {
+	if (headerindex >= slot->Usages.size()) {
 		item->Charges=0;
 	} else {
 		item->Charges=slot->Usages[headerindex];

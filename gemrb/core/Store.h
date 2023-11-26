@@ -71,7 +71,7 @@ STA_CURE = 3, STA_DONATE = 4, STA_DRINK = 5, STA_ROOMRENT = 6, STA_OPTIONAL = 0x
 struct GEM_EXPORT STOItem {
 	ResRef ItemResRef;
 	ieWord PurchasedAmount = 0;
-	ieWord Usages[CHARGE_COUNTERS] = {};
+	std::array<ieWord, CHARGE_COUNTERS> Usages;
 	ieDword Flags = 0;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
 	int Weight = 0;

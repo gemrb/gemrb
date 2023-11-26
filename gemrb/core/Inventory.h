@@ -161,7 +161,7 @@ public:
 	//recent research showed that this field is used by the create item
 	//for days effect. This field shows the expiration in gametime hours
 	ieWord Expired = 0;
-	ieWord Usages[CHARGE_COUNTERS]{};
+	std::array<ieWord, CHARGE_COUNTERS> Usages;
 	uint32_t Flags = 0;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
 	/** Weight of each item in the stack */
@@ -178,9 +178,7 @@ public:
 	{
 		ItemResRef = item->ItemResRef;
 		Expired = 0; // PurchasedAmount in STOItem
-		Usages[0] = item->Usages[0];
-		Usages[1] = item->Usages[1];
-		Usages[2] = item->Usages[2];
+		Usages = item->Usages;
 		Flags = item->Flags;
 		Weight = item->Weight;
 		MaxStackAmount = item->MaxStackAmount;

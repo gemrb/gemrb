@@ -237,7 +237,7 @@ public:
 	ieStrRef GetItemDesc(bool identified) const;
 
 	//returns if the item is usable, expend will also expend a charge
-	int UseCharge(ieWord *Charges, int header, bool expend) const;
+	int UseCharge(std::array<ieWord, CHARGE_COUNTERS>& charges, int header, bool expend) const;
 
 	ieDword GetWieldedGradient() const
 	{
