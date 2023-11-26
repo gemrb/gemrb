@@ -180,7 +180,7 @@ public:
 		return str;
 	}
 	
-	operator StringView() const noexcept {
+	StringView ToStringView() const noexcept {
 		return StringView(str, len);
 	}
 	
