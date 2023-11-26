@@ -1733,13 +1733,15 @@ void Inventory::EquipBestWeapon(int flags)
 	UpdateWeaponAnimation();
 }
 
-#define ID_NONEED  0   //id is not important
-#define ID_NEED    1   //id is important
-#define ID_NO      2   //shouldn't id
-
 // returns true if there are more item usages not fitting in given vector
 bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int startindex, int count) const
 {
+	enum class IDNeeded {
+		No, // id is not important
+		Yes, // id is important
+		Never // shouldn't id
+	};
+
 	int pos = 0;
 	int actual = 0;
 	for(unsigned int idx=0;idx<Slots.size();idx++) {
@@ -1759,9 +1761,9 @@ bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int sta
 			}
 			//skipping if we cannot use the item
 			int idreq1 = (slot->Flags&IE_INV_ITEM_IDENTIFIED);
-			int idreq2 = ext_header->IDReq;
-			if (idreq2 == ID_NO && idreq1) continue;
-			if (idreq2 == ID_NEED && !idreq1) continue;
+			IDNeeded idreq2 = static_cast<IDNeeded>(ext_header->IDReq);
+			if (idreq2 == IDNeeded::Never && idreq1) continue;
+			if (idreq2 == IDNeeded::Yes && !idreq1) continue;
 
 			actual++;
 			if (actual <= startindex) {
