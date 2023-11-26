@@ -1897,14 +1897,19 @@ bool Inventory::IsSlotBlocked(int slot) const
 	return !IsSlotEmpty(otherslot);
 }
 
-inline bool Inventory::TwoHandedInSlot(int slot) const
+inline HCStrings Inventory::CanUseShieldSlot(int slot, bool ranged) const
 {
-	const CREItem *item = GetSlotItem(slot);
-	if (!item) return false;
-	if (item->Flags&IE_INV_ITEM_TWOHANDED) {
-		return true;
+	const CREItem* item = GetSlotItem(slot);
+	if (!item) return HCStrings::count;
+
+	if (item->Flags & IE_INV_ITEM_TWOHANDED) {
+		return HCStrings::TwohandedUsed;
+	} else if (item->Flags & IE_INV_ITEM_NOT_OFFHAND) {
+		return HCStrings::TwohandedUsed;
+	} else if (ranged) {
+		return HCStrings::NoRangedOffhand;
 	}
-	return false;
+	return HCStrings::count;
 }
 
 HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
@@ -1935,11 +1940,9 @@ HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 		}
 		if (slot != otherslot) continue;
 
-		if (TwoHandedInSlot(i)) {
-			return HCStrings::TwohandedUsed;
-		}
-		if (ranged) {
-			return HCStrings::NoRangedOffhand;
+		HCStrings shieldSlotUsable = CanUseShieldSlot(i, ranged);
+		if (shieldSlotUsable != HCStrings::count) {
+			return shieldSlotUsable;
 		}
 	}
 

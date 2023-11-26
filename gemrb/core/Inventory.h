@@ -114,7 +114,8 @@ using ieCREItemFlagBits = enum ieCREItemFlagBits : uint32_t {
 	IE_INV_ITEM_CONVERSABLE = 0x80000,
 	IE_INV_ITEM_PULSATING = 0x100000,
 	// gap
-	IE_INV_ITEM_NO_DISPEL = 0x1000000 // matching IE_ITEM_NO_DISPEL for convenience
+	IE_INV_ITEM_NO_DISPEL = 0x1000000, // matching IE_ITEM_NO_DISPEL for convenience
+	IE_INV_ITEM_NOT_OFFHAND = 0x2000000,
 };
 
 #define IE_INV_DEPLETABLE (IE_INV_ITEM_MAGICAL|IE_INV_ITEM_DESTRUCTIBLE)
@@ -321,8 +322,8 @@ public:
 	ieDword GetEquipExclusion(int index) const;
 	/** returns if a slot is temporarily blocked */
 	bool IsSlotBlocked(int slot) const;
-	/** returns true if a two handed weapon is in slot */
-	bool TwoHandedInSlot(int slot) const;
+	/** returns any HCStrings objection to using the shield slot */
+	HCStrings CanUseShieldSlot(int slot, bool ranged) const;
 	/** returns the strref for the reason why the item cannot be equipped */
 	HCStrings WhyCantEquip(int slot, int twohanded, bool ranged = false) const;
 	/** returns a slot that has a stealable item */

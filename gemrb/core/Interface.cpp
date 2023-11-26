@@ -3125,6 +3125,7 @@ void Interface::SanitizeItem(CREItem *item) const
 	if (!itm) return;
 
 	if (itm->Flags & IE_ITEM_NO_DISPEL) item->Flags |= IE_INV_ITEM_NO_DISPEL;
+	if (itm->Flags & IE_ITEM_NOT_OFFHAND) item->Flags |= IE_INV_ITEM_NOT_OFFHAND;
 
 	item->MaxStackAmount = itm->MaxStackAmount;
 	//if item is stacked mark it as so
