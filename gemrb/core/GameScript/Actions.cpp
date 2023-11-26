@@ -7643,9 +7643,11 @@ void GameScript::DestroyAllFragileEquipment(Scriptable* Sender, Action* paramete
 		return;
 	}
 
-	// TODO: ensure it's using the inventory/CREItem flags, not Item — IE_ITEM_ADAMANTINE won't work as an input otherwise
-	// merge with DestroyAllDestructableEquipment
-	actor->inventory.DestroyItem("", parameters->int0Parameter, ~0);
+	// bits are from itemflag.ids and are identical to our Item flags, not CREItem
+	// handling the only known user for now
+	ieDword flags = parameters->int0Parameter;
+	if (flags & IE_ITEM_ADAMANTINE) flags = (flags | IE_INV_ITEM_ADAMANTINE) & ~IE_ITEM_ADAMANTINE;
+	actor->inventory.DestroyItem("", flags, ~0);
 }
 
 void GameScript::SetOriginalClass(Scriptable* Sender, Action* parameters)

@@ -60,10 +60,10 @@ class Projectile;
 // see IESDP for details
 #define IE_ITEM_FORCE_2H     0x00002000 // TODO: ee, Force two-handed animation DISABLE_OFFHAND
 #define IE_ITEM_NOT_OFFHAND  0x00004000 // ee, not usable in off-hand
-#define IE_ITEM_INV_USABLE   0x00008000 // TODO: ee ADAMANTINE (itemflag.ids); pstee, usable in inventory
-#define IE_ITEM_ADAMANTINE   0x00010000 // RECHECK vs IE_ITEM_INV_USABLE (missing from ids)
+#define IE_ITEM_INV_USABLE   0x00008000 // TODO: ee, only pstee: usable in inventory, shared with IE_ITEM_ADAMANTINE
+#define IE_ITEM_ADAMANTINE   0x00008000 // bgee: adamantine (itemflag.ids)
 //tobex modder extensions, please note, these are not copied into the local slot bits
-#define IE_ITEM_NO_DISPEL    0x01000000 // disables destruction by dispelling; named BODYPART in ee - different?
+#define IE_ITEM_NO_DISPEL    0x01000000 // disables destruction by dispelling; named BODYPART in ee
 #define IE_ITEM_TOGGLE_CRITS 0x02000000 //toggles critical hit avertion
 #define IE_ITEM_NO_INVIS     0x04000000
 
