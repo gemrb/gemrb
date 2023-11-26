@@ -3921,17 +3921,14 @@ int fx_mirror_image (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 // 0x78 Protection:Weapons
+// gemrb extension: modes 12 and 13 - arbitrary checks
 int fx_immune_to_weapon (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	// print("fx_immune_to_weapon(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	if (!fx->FirstApply) return FX_APPLIED;
 
-	int level;
-	ieDword mask, value;
-
-	level = -1;
-	mask = 0;
-	value = 0;
+	int level = -1;
+	ieDword mask = 0;
+	ieDword value = 0;
 	switch(fx->Parameter2) {
 	case 0: //enchantment level
 		level = fx->Parameter1;
