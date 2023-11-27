@@ -5009,9 +5009,6 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 
 	//a little adjustment of the level to get a slight randomness on who is turned
 	unsigned int level = GetXPLevel(true)-(GetGlobalID()&3);
-	if (cleric2 && cleric2->GetPaladinLevel()) {
-		level += 2; // hardcoded penalty from the originals
-	}
 
 	//this is safely hardcoded i guess
 	if (Modified[IE_GENERAL]!=GEN_UNDEAD) {
