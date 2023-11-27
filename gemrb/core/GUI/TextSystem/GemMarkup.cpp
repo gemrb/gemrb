@@ -25,11 +25,11 @@ namespace GemRB {
 static Color ParseColor(const String& colorString)
 {
 	Color color = ColorWhite;
-	uint8_t values[4] = {0, 0, 0, 0};
+	uint8_t values[4] = { 0, 0, 0, 0xff };
 
 	// That's a short way to interpret 4 groups of %02hhx,
 	// since `swscanf` does not work on our string type unless converting first
-	for (uint8_t i = 0; i < 4; ++i) {
+	for (uint8_t i = 0; i < colorString.size() / 2; ++i) {
 		uint8_t value = 0;
 
 		for (uint8_t j = 0; j < 2; ++j) {
