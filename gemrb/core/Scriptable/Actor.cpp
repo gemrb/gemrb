@@ -5007,8 +5007,8 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 		evilcleric = true;
 	}
 
-	//a little adjustment of the level to get a slight randomness on who is turned
-	unsigned int level = GetXPLevel(true)-(GetGlobalID()&3);
+	ieDword level = GetXPLevel(true);
+	turnlevel += RAND(0, 3);
 
 	//this is safely hardcoded i guess
 	if (Modified[IE_GENERAL]!=GEN_UNDEAD) {
