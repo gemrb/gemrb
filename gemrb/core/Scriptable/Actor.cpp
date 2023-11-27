@@ -3925,7 +3925,7 @@ void Actor::Panic(const Scriptable *attacker, int panicmode)
 
 	switch(panicmode) {
 	case PANIC_RUNAWAY:
-		action = GenerateActionDirect("RunAwayFromNoInterrupt([-1])", attacker);
+		action = GenerateActionDirect("RunAwayFromNoInterrupt([-1],300)", attacker);
 		SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 		break;
 	case PANIC_RANDOMWALK:
