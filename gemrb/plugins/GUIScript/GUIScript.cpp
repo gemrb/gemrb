@@ -660,7 +660,7 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 	auto GetIndex = [&tm](PyObject* obj, bool isRow) -> TableMgr::index_t {
 		if (PyUnicode_Check(obj)) {
 			auto str = PyString_AsStringView(obj);
-			return isRow ? tm->GetRowIndex(str.ToStringView()) : tm->GetColumnIndex(str.ToStringView());
+			return isRow ? tm->GetRowIndex(str) : tm->GetColumnIndex(str);
 		} else if (PyLong_Check(obj)) {
 			return static_cast<TableMgr::index_t>(PyLong_AsLong(obj));
 		}
@@ -736,11 +736,11 @@ static PyObject* GemRB_Table_FindValue(PyObject* self, PyObject* args)
 	TableMgr::index_t val = TableMgr::npos;
 	if (col == -1) {
 		auto colnameV = PyString_AsStringView(colname);
-		val = tm->FindTableValue(colnameV.ToStringView(), Value, start);
+		val = tm->FindTableValue(colnameV, Value, start);
 	} else if (col == -2) {
 		auto colnameV = PyString_AsStringView(colname);
 		auto strvalueV = PyString_AsStringView(strvalue);
-		val = tm->FindTableValue(colnameV.ToStringView(), strvalueV.ToStringView(), start);
+		val = tm->FindTableValue(colnameV, strvalueV, start);
 	} else {
 		val = tm->FindTableValue(col, Value, start);
 	}
@@ -778,7 +778,7 @@ static PyObject* GemRB_Table_GetRowIndex(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(tm);
 
 	auto str = PyString_AsStringView(rowname);
-	TableMgr::index_t row = tm->GetRowIndex(str.ToStringView());
+	TableMgr::index_t row = tm->GetRowIndex(str);
 	if (row == TableMgr::npos) {
 		Py_RETURN_NONE;
 	}
@@ -842,7 +842,7 @@ static PyObject* GemRB_Table_GetColumnIndex(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(tm);
 
 	auto str = PyString_AsStringView(colname);
-	TableMgr::index_t col = tm->GetColumnIndex(str.ToStringView());
+	TableMgr::index_t col = tm->GetColumnIndex(str);
 	if (col == TableMgr::npos) {
 		Py_RETURN_NONE;
 	}
@@ -1009,7 +1009,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject* self, PyObject* args)
 
 	if (PyObject_TypeCheck(sym, &PyUnicode_Type)) {
 		auto str = PyString_AsStringView(sym);
-		long val = sm->GetValue(str.ToStringView());
+		long val = sm->GetValue(str);
 		return PyLong_FromLong(val);
 	}
 	if (PyObject_TypeCheck(sym, &PyLong_Type)) {
@@ -1923,7 +1923,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	}
 
 	auto pyVarV = PyString_AsStringView(pyVar);
-	StringView VarName = pyVarV.ToStringView();
+	StringView VarName = pyVarV;
 
 	Control::value_t realVal = core->GetDictionary().Get(VarName, 0);
 	Control::varname_t varname = Control::varname_t(VarName);
@@ -2472,7 +2472,7 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 		ABORT_IF_NULL(btn);
 		
 		auto wrapper = PyString_AsStringView(pyref);
-		StringView ResRef = wrapper.ToStringView();
+		StringView ResRef = wrapper;
 
 		if (ResRef[0] == 0) {
 			btn->SetImage(ButtonImage::None, nullptr);
@@ -3075,7 +3075,7 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 		PARSE_ARGS(args, "OO|i", &self, &pyStr, &global);
 
 		auto pyStrV = PyString_AsStringView(pyStr);
-		StringView keymap = pyStrV.ToStringView();
+		StringView keymap = pyStrV;
 
 		auto func = core->GetKeyMap()->LookupFunction(keymap);
 		if (!func) {
@@ -3661,7 +3661,7 @@ static PyObject* GemRB_Button_SetBAM(PyObject* self, PyObject* args)
 
 	Button* btn = GetView<Button>(self);
 	auto ResRefV = PyString_AsStringView(ResRef);
-	PyObject* ret = SetButtonBAM(btn, ResRefV.ToStringView(), (AnimationFactory::index_t)CycleIndex, (AnimationFactory::index_t)FrameIndex, col1);
+	PyObject* ret = SetButtonBAM(btn, ResRefV, (AnimationFactory::index_t)CycleIndex, (AnimationFactory::index_t)FrameIndex, col1);
 	if (ret) {
 		Py_INCREF(ret);
 	}
@@ -3848,7 +3848,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 			core->GetAudioDrv()->PlayMB(PyString_AsStringObj(pyref), channel, pos, flags);
 		} else {
 			auto pyrefV = PyString_AsStringView(pyref);
-			core->GetAudioDrv()->Play(pyrefV.ToStringView(), channel, pos, flags);
+			core->GetAudioDrv()->Play(pyrefV, channel, pos, flags);
 		}
 	}
 
@@ -4039,7 +4039,7 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS(args, "Ok", &Variable, &value);
 
 	auto VariableV = PyString_AsStringView(Variable);
-	core->GetDictionary().Set(VariableV.ToStringView(), value);
+	core->GetDictionary().Set(VariableV, value);
 
 	//this is a hack to update the settings deeper in the core
 	UpdateActorConfig();
@@ -4129,7 +4129,7 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args, "O", &Variable );
 
 	auto VariableV = PyString_AsStringView(Variable);
-	ieDword value = core->GetDictionary().Get(VariableV.ToStringView(), 0);
+	ieDword value = core->GetDictionary().Get(VariableV, 0);
 	if (!value) {
 		return PyLong_FromLong(0);
 	}
@@ -4259,7 +4259,7 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	auto VariableV = PyString_AsStringView(Variable);
-	StringView lookupVariable = VariableV.ToStringView();
+	StringView lookupVariable = VariableV;
 	return PyLong_FromLong((unsigned long) game->GetGlobal(lookupVariable, 0));
 }
 
@@ -4363,7 +4363,7 @@ static PyObject* GemRB_SaveCharacter(PyObject * /*self*/, PyObject * args)
 	GET_ACTOR_GLOBAL();
 
 	auto nameV = PyString_AsStringView(name);
-	return PyLong_FromLong(core->WriteCharacter(nameV.ToStringView(), actor));
+	return PyLong_FromLong(core->WriteCharacter(nameV, actor));
 }
 
 
@@ -4433,7 +4433,7 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 		CObject<SaveGame> save(obj);
 
 		auto folderV = PyString_AsStringView(folder);
-		return PyLong_FromLong(sgip->CreateSaveGame(save, folderV.ToStringView()));
+		return PyLong_FromLong(sgip->CreateSaveGame(save, folderV));
 	} else {
 		return PyLong_FromLong(sgip->CreateSaveGame(slot, core->config.MultipleQuickSaves));
 	}
@@ -5269,9 +5269,9 @@ static PyObject* GemRB_GetINIQuestsKey(PyObject * /*self*/, PyObject* args)
 	auto TagV = PyString_AsStringView(Tag);
 	auto KeyV = PyString_AsStringView(Key);
 	auto DefaultV = PyString_AsStringView(Default);
-	return PyString_FromStringView(core->GetQuestsINI()->GetKeyAsString(TagV.ToStringView(),
-																		KeyV.ToStringView(),
-																		DefaultV.ToStringView()
+	return PyString_FromStringView(core->GetQuestsINI()->GetKeyAsString(TagV,
+																		KeyV,
+																		DefaultV
 																		));
 }
 
@@ -5304,9 +5304,9 @@ static PyObject* GemRB_GetINIBeastsKey(PyObject * /*self*/, PyObject* args)
 	auto TagV = PyString_AsStringView(Tag);
 	auto KeyV = PyString_AsStringView(Key);
 	auto DefaultV = PyString_AsStringView(Default);
-	return PyString_FromStringView(core->GetBeastsINI()->GetKeyAsString(TagV.ToStringView(),
-																		KeyV.ToStringView(),
-																		DefaultV.ToStringView()
+	return PyString_FromStringView(core->GetBeastsINI()->GetKeyAsString(TagV,
+																		KeyV,
+																		DefaultV
 																	));
 }
 
@@ -5340,7 +5340,7 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 	auto TagV = PyString_AsStringView(Tag);
 	auto KeyV = PyString_AsStringView(Key);
 	auto DefaultV = PyString_AsStringView(Default);
-	const StringView desc = core->GetPartyINI()->GetKeyAsString(TagV.ToStringView(), KeyV.ToStringView(), DefaultV.ToStringView());
+	const StringView desc = core->GetPartyINI()->GetKeyAsString(TagV, KeyV, DefaultV);
 	return PyString_FromStringView(desc);
 }
 
@@ -10504,7 +10504,7 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 		RETURN_BOOL(gamedata->Exists(PyString_AsStringObj(ResRef), ResType, silent));
 	} else {
 		auto ResRefV = PyString_AsStringView(ResRef);
-		RETURN_BOOL(gamedata->Exists(ResRefV.ToStringView(), ResType, silent));
+		RETURN_BOOL(gamedata->Exists(ResRefV, ResType, silent));
 	}
 }
 
