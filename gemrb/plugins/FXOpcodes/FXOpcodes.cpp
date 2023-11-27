@@ -3684,7 +3684,7 @@ int fx_turn_undead (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_turn_undead(%2d): Level %d", fx->Opcode, fx->Parameter1);
 
-	if (target->GetStat(IE_NOTURNABLE)) {
+	if (target->GetStat(IE_NOTURNABLE) || Owner == target) {
 		return FX_NOT_APPLIED;
 	}
 	if (fx->Parameter1) {
