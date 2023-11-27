@@ -3157,6 +3157,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 	// NOTE: assuming criticals apply to iwd2 too
 	if (ret == 1) return false;
 	if (ret == saveDiceSides) return true;
+	if (Modified[IE_STATE_ID] & STATE_DEAD) return false; // just to shut some errant feedback, should be fine
 	const Effect* sfx = fxqueue.HasEffect(fx_save_vs_school_bonus_ref);
 
 	if (!third) {
