@@ -3941,6 +3941,7 @@ void Actor::Panic(const Scriptable *attacker, int panicmode)
 		return;
 	}
 	if (action) {
+		ReleaseCurrentAction();
 		AddActionInFront(action);
 	} else {
 		Log(ERROR, "Actor", "Cannot generate panic action");
