@@ -3910,11 +3910,14 @@ bool Actor::OverrideActions()
 
 void Actor::Panic(const Scriptable *attacker, int panicmode)
 {
-	if (GetStat(IE_STATE_ID)&STATE_PANIC) {
+	auto PanicAction = [](unsigned short actionID) {
+		return actionID == 184 || actionID == 85 || actionID == 124;
+	};
+	if (GetStat(IE_STATE_ID) & STATE_PANIC && (!CurrentAction || PanicAction(CurrentAction->actionID))) {
 		Log(DEBUG, "Actor", "Already panicked!");
-		//already in panic
 		return;
 	}
+
 	if (InParty) core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 	VerbalConstant(Verbal::Panic, gamedata->GetVBData("SPECIAL_COUNT"));
 
