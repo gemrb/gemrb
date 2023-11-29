@@ -158,7 +158,8 @@ public:
 				PyErr_Clear();
 				Py_IncRef(obj);
 				object = obj;
-				PyBytes_AsStringAndSize(object, &str, &len);
+				len = PyUnicode_GET_LENGTH(object);
+				str = static_cast<char*>(PyUnicode_DATA(object));
 			}
 		} else if (PyObject_TypeCheck(obj, &PyBytes_Type)) {
 			Py_IncRef(obj);
