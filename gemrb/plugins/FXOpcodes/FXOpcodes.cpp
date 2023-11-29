@@ -4739,12 +4739,13 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter2 == 0 || target->Type == ST_CONTAINER) {
 		// no deplete, no interrupt, caster or provided level
 		// ForceSpell doesn't have a RES variant, so there's more work
-		std::string tmp = fmt::format("ForceSpell([-1],{})", ResolveSpellNumber(fx->Resource));
+		std::string tmp = fmt::format("ForceSpell([-1],0)");
 		Action *forceSpellAction = GenerateActionDirect(std::move(tmp), target);
 		if (fx->Parameter1 != 0) {
 			// override casting level
 			forceSpellAction->int1Parameter = fx->Parameter1;
 		}
+		forceSpellAction->resref1Parameter = fx->Resource;
 		Owner->AddActionInFront(forceSpellAction);
 		Owner->ImmediateEvent();
 	} else if (fx->Parameter2 == 1) {
@@ -4779,12 +4780,13 @@ int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	if (fx->Parameter2 == 0) {
 		// no deplete, no interrupt, caster or provided level
 		// ForceSpellPoint doesn't have a RES variant, so there's more work
-		std::string tmp = fmt::format("ForceSpellPoint([{}.{}],{})", fx->Pos.x, fx->Pos.y, ResolveSpellNumber(fx->Resource));
+		std::string tmp = fmt::format("ForceSpellPoint([{}.{}],{})", fx->Pos.x, fx->Pos.y, 0);
 		Action *forceSpellAction = GenerateAction(std::move(tmp));
 		if (fx->Parameter1 != 0) {
 			// override casting level
 			forceSpellAction->int1Parameter = fx->Parameter1;
 		}
+		forceSpellAction->resref1Parameter = fx->Resource;
 		Owner->AddActionInFront(forceSpellAction);
 		Owner->ImmediateEvent();
 	} else if (fx->Parameter2 == 1) {

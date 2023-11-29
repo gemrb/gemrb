@@ -2699,6 +2699,7 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 
 //spell is not depleted (doesn't need to be memorised or known)
 // casting time is calculated, not interruptible
+// has a hidden ForceSpellRES variant for internal purposes - just set string1Parameter
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
