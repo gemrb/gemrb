@@ -149,7 +149,7 @@ class PyStringWrapper {
 public:
 	PyStringWrapper(PyObject* obj, const char* encoding) noexcept {
 		if (PyUnicode_Check(obj)) {
-			PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, encoding, "strict"); // Owned reference
+			PyObject* temp_bytes = PyUnicode_AsEncodedString(obj, encoding, "backslashreplace"); // Owned reference
 			if (temp_bytes != NULL) {
 				PyBytes_AsStringAndSize(temp_bytes, &str, &len);
 				object = temp_bytes; // needs to outlive our use of wrap.str
