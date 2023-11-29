@@ -2075,6 +2075,14 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		double dx = nmptStep.x - Pos.x;
 		double dy = nmptStep.y - Pos.y;
 		Map::NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / double(walkScale));
+		if (dx == 0 && dy == 0) {
+			// probably shouldn't happen, but it does when running bg2's cut28a set of cutscenes
+			ClearPath(true);
+			Log(DEBUG, "PathFinderWIP", "Abandoning because I'm exactly at the goal");
+			pathAbandoned = true;
+			return;
+		}
+
 		Actor *actorInTheWay = nullptr;
 		// We can't use GetActorInRadius because we want to only check directly along the way
 		// and not be blocked by actors who are on the sides
