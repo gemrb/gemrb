@@ -161,6 +161,8 @@ public:
 				PyBytes_AsStringAndSize(object, &str, &len);
 			}
 		} else if (PyObject_TypeCheck(obj, &PyBytes_Type)) {
+			Py_IncRef(obj);
+			object = obj;
 			PyBytes_AsStringAndSize(obj, &str, &len);
 		}
 	}
@@ -178,7 +180,7 @@ public:
 	}
 	
 	~PyStringWrapper() noexcept {
-		Py_XDECREF(object);
+		Py_DECREF(object);
 	}
 };
 PyStringWrapper PyString_AsStringView(PyObject* obj);
