@@ -659,8 +659,10 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 	
 	auto GetIndex = [&tm](PyObject* obj, bool isRow) -> TableMgr::index_t {
 		if (PyUnicode_Check(obj)) {
-			auto str = PyString_AsStringView(obj);
-			return isRow ? tm->GetRowIndex(str) : tm->GetColumnIndex(str);
+			if (isRow) {
+				return tm->GetRowIndex(PyString_AsStringView(obj));
+			}
+			return tm->GetColumnIndex(PyString_AsStringView(obj));
 		} else if (PyLong_Check(obj)) {
 			return static_cast<TableMgr::index_t>(PyLong_AsLong(obj));
 		}
@@ -1916,10 +1918,10 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 		val = static_cast<Control::value_t>(PyLong_AsUnsignedLongMask(Value));
 	}
 
-	StringView VarName = PyString_AsStringView(pyVar);
+	auto VarName = PyString_AsStringView(pyVar);
 
 	Control::value_t realVal = core->GetDictionary().Get(VarName, 0);
-	Control::varname_t varname = Control::varname_t(VarName);
+	Control::varname_t varname = Control::varname_t(StringView(VarName));
 
 	ctrl->BindDictVariable(varname, val, Control::ValueRange(min, max));
 	// restore variable for sliders, since it's only a multiplier for them
@@ -2463,10 +2465,8 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 	) {
 		Button* btn = GetView<Button>(self);
 		ABORT_IF_NULL(btn);
-		
-		auto wrapper = PyString_AsStringView(pyref);
-		StringView ResRef = wrapper;
 
+		ResRef ResRef = ResRefFromPy(pyref);
 		if (ResRef[0] == 0) {
 			btn->SetImage(ButtonImage::None, nullptr);
 			Py_RETURN_NONE;
@@ -3067,11 +3067,10 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 		PyObject* pyStr = nullptr;
 		PARSE_ARGS(args, "OO|i", &self, &pyStr, &global);
 
-		StringView keymap = PyString_AsStringView(pyStr);
-
+		auto keymap = PyString_AsStringView(pyStr);
 		auto func = core->GetKeyMap()->LookupFunction(keymap);
 		if (!func) {
-			Log(DEBUG, "GUIScript", "Couldn't find keymap entry for {}", keymap);
+			Log(DEBUG, "GUIScript", "Couldn't find keymap entry for {}", StringView(keymap));
 			Py_RETURN_NONE;
 		}
 
