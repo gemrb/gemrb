@@ -1372,8 +1372,10 @@ void GameControl::UpdateCursor()
 	} else if (targetMode == TargetMode::Cast) {
 		nextCursor = IE_CURSOR_CAST;
 		// point is always valid if accessible
-		if (!(area->GetBlocked(gameMousePos) & (PathMapFlags::PASSABLE | PathMapFlags::TRAVEL | PathMapFlags::ACTOR)) ||
-		    (!(target_types & GA_POINT) && !lastActor)) {
+		// knock ignores that
+		bool blocked = bool(area->GetBlocked(gameMousePos) & (PathMapFlags::PASSABLE | PathMapFlags::TRAVEL | PathMapFlags::ACTOR));
+		bool ignoreSM = gamedata->GetSpecialSpell(spellName) & SPEC_AREA;
+		if (!ignoreSM && (!blocked || (!(target_types & GA_POINT) && !lastActor))) {
 			nextCursor |= IE_CURSOR_GRAY;
 		}
 	} else if (targetMode == TargetMode::Defend) {
