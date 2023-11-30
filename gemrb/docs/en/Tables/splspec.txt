@@ -7,6 +7,7 @@ Columns
   4 - spells that can't be used during a wild surge
   8 - spells that are autocast on rest (targeting only injured party members)
  16 - spells that are autocast on rest (whole party; special case for healing estimation)
+ 32 - spells that require their ability header targets changed to area (knock)
 
 - amount and bonus_limit are currently only used for healing on rest. The
   first holds the expected value of the healing die (eg. 2d8), the other

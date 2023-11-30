@@ -67,6 +67,7 @@ class Projectile;
 #define SPEC_IDENTIFY  1  //spells that don't appear in the casting bar
 #define SPEC_SILENCE   2  //spells that can be cast when silenced
 #define SPEC_DEAD      4  //spells that can target dead actors despite their target type is 1 (pst hack)
+#define SPEC_AREA      32 // spells that can target the area despite their target type being 1
 
 /**
  * @class SPLExtHeader

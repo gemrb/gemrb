@@ -2238,7 +2238,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	}
 
 	//add a check if you don't want some random monster handle doors and such
-	if (targetMode == TargetMode::Cast) {
+	if (targetMode == TargetMode::Cast && !(gamedata->GetSpecialSpell(spellName) & SPEC_AREA)) {
 		//the player is using an item or spell on the ground
 		TryToCast(selectedActor, p);
 	} else if (!overMe) {

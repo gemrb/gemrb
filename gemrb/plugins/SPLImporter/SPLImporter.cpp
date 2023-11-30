@@ -195,9 +195,13 @@ void SPLImporter::GetExtHeader(const Spell *s, SPLExtHeader* eh)
 	str->Read( &eh->Target, 1 );
 
 	//this hack is to let gemrb target dead actors by some spells
+	// and knock in non-pst, since it's also set to target actors
 	if (eh->Target == 1) {
-		if (gamedata->GetSpecialSpell(s->Name) & SPEC_DEAD) {
+		int flags = gamedata->GetSpecialSpell(s->Name);
+		if (flags & SPEC_DEAD) {
 			eh->Target = 3;
+		} else if (flags & SPEC_AREA) {
+			eh->Target = 4;
 		}
 	}
 	str->Read(&eh->TargetNumber, 1);
