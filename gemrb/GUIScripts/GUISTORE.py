@@ -1984,8 +1984,10 @@ def RentConfirm (Window0):
 	price = Store['StoreRoomPrices'][RentIndex]
 	Gold = GemRB.GameGetPartyGold ()
 	GemRB.GameSetPartyGold (Gold-price)
+	RestTable = GemRB.LoadTable ("restheal")
+	healFor = RestTable.GetValue (RentIndex, 0, GTV_INT)
 	# TODO: run GemRB.RunRestScripts ()
-	info = GemRB.RestParty (2, 1, RentIndex+1) # 2 = REST_SCATTER, check that everyone is close by
+	info = GemRB.RestParty (2, 1, healFor) # 2 = REST_SCATTER, check that everyone is close by
 	cutscene = info["Cutscene"]
 
 	if RentConfirmWindow:
@@ -1999,8 +2001,7 @@ def RentConfirm (Window0):
 		CloseStoreWindow ()
 	elif not info["Error"]:
 		TextArea = Window.GetControlAlias('RENTTA')
-		#is there any way to change this???
-		GemRB.SetToken ("HP", "%d"%(RentIndex+1))
+		GemRB.SetToken ("HP", str(healFor))
 		TextArea.SetText (strrefs["restedfor"])
 		GemRB.SetVar ("RentIndex", -1)
 		Button = Window.GetControl (RentIndex+4)

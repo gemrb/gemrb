@@ -1,0 +1,10 @@
+2DA V1.0
+0
+           HPGAIN
+PEASANT         1
+MERCHANT        2
+NOBLE           3
+ROYAL           4
+
+# a table with HP healed per rest in an inn room
+# 0 means a full heal
