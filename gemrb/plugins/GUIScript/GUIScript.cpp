@@ -4240,13 +4240,12 @@ is what gamescripts know as GLOBAL variables. \n\
 
 static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
-	PyObject* Variable;
-	PARSE_ARGS( args,  "O", &Variable );
+	PyObject* variable;
+	PARSE_ARGS(args,  "O", &variable);
 
 	GET_GAME();
 
-	StringView lookupVariable = static_cast<StringView>(PyString_AsStringView(Variable));
-	return PyLong_FromLong((unsigned long) game->GetGlobal(lookupVariable, 0));
+	return PyLong_FromLong((unsigned long) game->GetGlobal(ieVariableFromPy(variable), 0));
 }
 
 PyDoc_STRVAR( GemRB_PlayMovie__doc,
