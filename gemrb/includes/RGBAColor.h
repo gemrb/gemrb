@@ -25,6 +25,7 @@
 
 namespace GemRB {
 
+#pragma pack(push,1)
 struct Color {
 	unsigned char r = 0, g = 0, b = 0, a = 0;
 
@@ -88,6 +89,9 @@ struct Color {
 		return Color(px, px >> 8, px >> 16, px >> 24);
 	}
 }; // close of Color struct
+#pragma pack(pop)
+
+static_assert(sizeof(Color) == sizeof(uint32_t), "Incompatible Color struct layout. Please open an issue about this.");
 
 template<int SIZE>
 using ColorPal = std::array<Color, SIZE>;

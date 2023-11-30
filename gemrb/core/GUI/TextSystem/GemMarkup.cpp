@@ -24,47 +24,39 @@ namespace GemRB {
 
 static Color ParseColor(const String& colorString)
 {
-	Color color = ColorWhite;
-	uint8_t values[4] = {0, 0, 0, 0};
+	uint32_t color = 0;
 
 	// That's a short way to interpret 4 groups of %02hhx,
 	// since `swscanf` does not work on our string type unless converting first
-	for (uint8_t i = 0; i < 4; ++i) {
-		uint8_t value = 0;
-
-		for (uint8_t j = 0; j < 2; ++j) {
-			uint8_t nibble = 0;
-			switch (colorString[i * 2 + j]) {
-				case u'0': nibble = 0x0; break;
-				case u'1': nibble = 0x1; break;
-				case u'2': nibble = 0x2; break;
-				case u'3': nibble = 0x3; break;
-				case u'4': nibble = 0x4; break;
-				case u'5': nibble = 0x5; break;
-				case u'6': nibble = 0x6; break;
-				case u'7': nibble = 0x7; break;
-				case u'8': nibble = 0x8; break;
-				case u'9': nibble = 0x9; break;
-				case u'a': case u'A': nibble = 0xA; break;
-				case u'b': case u'B': nibble = 0xB; break;
-				case u'c': case u'C': nibble = 0xC; break;
-				case u'd': case u'D': nibble = 0xD; break;
-				case u'e': case u'E': nibble = 0xE; break;
-				case u'f': case u'F': nibble = 0xF; break;
-			}
-
-			value |= (nibble << (4 * (1 - j)));
+	size_t size = std::min<size_t>(8, colorString.size());
+	for (size_t i = 0; i < size; ++i) {
+		uint32_t nibble = 0;
+		switch (colorString[i]) {
+			case u'0': nibble = 0x0; break;
+			case u'1': nibble = 0x1; break;
+			case u'2': nibble = 0x2; break;
+			case u'3': nibble = 0x3; break;
+			case u'4': nibble = 0x4; break;
+			case u'5': nibble = 0x5; break;
+			case u'6': nibble = 0x6; break;
+			case u'7': nibble = 0x7; break;
+			case u'8': nibble = 0x8; break;
+			case u'9': nibble = 0x9; break;
+			case u'a': case u'A': nibble = 0xA; break;
+			case u'b': case u'B': nibble = 0xB; break;
+			case u'c': case u'C': nibble = 0xC; break;
+			case u'd': case u'D': nibble = 0xD; break;
+			case u'e': case u'E': nibble = 0xE; break;
+			case u'f': case u'F': nibble = 0xF; break;
 		}
-
-		values[i] = value;
+		color |= nibble << (28 - (i * 4));
 	}
 
-	color.r = values[0];
-	color.g = values[1];
-	color.b = values[2];
-	color.a = values[3];
+	if (size < 7) {
+		color |= 0xff;
+	}
 
-	return color;
+	return Color(color);
 }
 
 GemMarkupParser::GemMarkupParser()
