@@ -1061,7 +1061,7 @@ public:
 	int GetArmorWeightClass(ieWord armorType) const;
 	int GetTotalArmorFailure() const;
 	int GetArmorFailure(int &armor, int &shield) const;
-	bool IsDead() const;
+	bool ShouldStopAttack() const;
 	bool IsInvisibleTo(const Scriptable *checker) const;
 	int UpdateAnimationID(bool derived);
 	void MovementCommand(std::string command);

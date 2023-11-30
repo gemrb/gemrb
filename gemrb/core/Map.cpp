@@ -1884,7 +1884,7 @@ bool Map::AnyEnemyNearPoint(const Point &p) const
 		if (!actor->Schedule(gametime, true) ) {
 			continue;
 		}
-		if (actor->IsDead() ) {
+		if (actor->ShouldStopAttack()) {
 			continue;
 		}
 		if (actor->GetStat(IE_AVATARREMOVAL)) {

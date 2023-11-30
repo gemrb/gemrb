@@ -6881,7 +6881,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 
-	if (IsDead()) {
+	if (ShouldStopAttack()) {
 		// this should be avoided by the AF_ALIVE check by all the calling actions
 		Log(ERROR, "Actor", "Attack by dead actor!");
 		return;
@@ -7903,7 +7903,7 @@ bool Actor::AdvanceAnimations()
 	return true;
 }
 
-bool Actor::IsDead() const
+bool Actor::ShouldStopAttack() const
 {
 	return InternalFlags & IF_STOPATTACK;
 }
