@@ -2701,6 +2701,7 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 // ForceSpell(O:Target*,I:Spell*Spell)
 // ForceSpellRES(S:RES*,O:Target*)
 // ForceSpellRES(S:RES*,O:Target*,I:CastingLevel*)
+// ForceSpellRESNoFeedback(S:RES*,O:Target*) - no logging or overhead text; add another SC_ flag once understood
 //spell is not depleted (doesn't need to be memorised or known)
 // casting time is calculated, not interruptible
 //FIXME The caster must meet the level requirements as set in the spell file

@@ -708,6 +708,7 @@ static const ActionLink actionnames[] = {
 	{"forcerandomencounterentry", GameScript::ForceRandomEncounter, 0},
 	{"forcespell", GameScript::ForceSpell, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"forcespellres", GameScript::ForceSpell, AF_BLOCKING | AF_ALIVE | AF_IWD2_OVERRIDE},
+	{"forcespellresnofeedback", GameScript::ForceSpell, AF_BLOCKING | AF_ALIVE | AF_IWD2_OVERRIDE},
 	{"forcespellpoint", GameScript::ForceSpellPoint, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"forcespellpointres", GameScript::ForceSpellPoint, AF_BLOCKING | AF_ALIVE | AF_IWD2_OVERRIDE},
 	{"forcespellpointrange", GameScript::ForceSpellPointRange, AF_BLOCKING|AF_ALIVE},
