@@ -2668,14 +2668,12 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 }
 
 //spell is depleted, casting time is calculated, interruptible
-//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::Spell(Scriptable* Sender, Action* parameters)
 {
 	SpellCore(Sender, parameters, SC_NO_DEAD|SC_RANGE_CHECK|SC_DEPLETE|SC_AURA_CHECK);
 }
 
 //spell is depleted, casting time is calculated, interruptible
-//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 {
 	SpellPointCore(Sender, parameters, SC_RANGE_CHECK|SC_DEPLETE|SC_AURA_CHECK);
@@ -2683,7 +2681,6 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 
 //spell is not depleted (doesn't need to be memorised or known)
 //casting time is calculated, interruptible
-//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 {
 	SpellCore(Sender, parameters, SC_NO_DEAD|SC_RANGE_CHECK|SC_AURA_CHECK);
@@ -2691,7 +2688,6 @@ void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
 
 //spell is not depleted (doesn't need to be memorised or known)
 //casting time is calculated, interruptible
-//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 {
 	SpellPointCore(Sender, parameters, SC_RANGE_CHECK|SC_AURA_CHECK);
@@ -2704,7 +2700,6 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 // ForceSpellRESNoFeedback(S:RES*,O:Target*) - no logging or overhead text; add another SC_ flag once understood
 //spell is not depleted (doesn't need to be memorised or known)
 // casting time is calculated, not interruptible
-//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
 	SpellCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
@@ -2717,7 +2712,6 @@ void GameScript::ForceSpellRange(Scriptable* Sender, Action* parameters)
 
 //spell is not depleted (doesn't need to be memorised or known)
 // casting time is calculated, not interruptible
-//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
 	SpellPointCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
@@ -2730,7 +2724,6 @@ void GameScript::ForceSpellPointRange(Scriptable* Sender, Action* parameters)
 
 //ForceSpell with zero casting time
 // zero casting time, no depletion, not interruptible
-//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 {
 	SpellCore(Sender, parameters, SC_NOINTERRUPT|SC_SETLEVEL|SC_INSTANT);
@@ -2739,7 +2732,6 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 //ForceSpellPoint with zero casting time
 // zero casting time, no depletion (finish casting at point), not interruptible
 //no CFB
-//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
 	SpellPointCore(Sender, parameters, SC_NOINTERRUPT|SC_SETLEVEL|SC_INSTANT);
