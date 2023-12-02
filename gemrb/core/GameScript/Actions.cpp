@@ -2697,18 +2697,16 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 	SpellPointCore(Sender, parameters, SC_RANGE_CHECK|SC_AURA_CHECK);
 }
 
+// this one has many signatures:
+// ForceSpell(O:Target*,I:Spell*Spell)
+// ForceSpellRES(S:RES*,O:Target*)
+// ForceSpellRES(S:RES*,O:Target*,I:CastingLevel*)
 //spell is not depleted (doesn't need to be memorised or known)
 // casting time is calculated, not interruptible
-// has a hidden ForceSpellRES variant for internal purposes - just set string1Parameter
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
-	// gemrb extension for internal use
-	if (parameters->int1Parameter) {
-		SpellCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
-	} else {
-		SpellCore(Sender, parameters, SC_NOINTERRUPT);
-	}
+	SpellCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
 }
 
 void GameScript::ForceSpellRange(Scriptable* Sender, Action* parameters)
@@ -2721,12 +2719,7 @@ void GameScript::ForceSpellRange(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
-	// gemrb extension for internal use
-	if (parameters->int1Parameter) {
-		SpellPointCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
-	} else {
-		SpellPointCore(Sender, parameters, SC_NOINTERRUPT);
-	}
+	SpellPointCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
 }
 
 void GameScript::ForceSpellPointRange(Scriptable* Sender, Action* parameters)
