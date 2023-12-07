@@ -130,7 +130,7 @@ def MWinBG(size, width=None):
 MinimizedWindows = {}
 def ToggleWindowMinimize(win, GSFlag = 0):
 	key = win.ID
-	maximize = True if key in MinimizedWindows else False
+	minimize = True if key in MinimizedWindows else False
 	if maximize:
 		# restore to original size
 		win.SetSize(*MinimizedWindows[key])
