@@ -6814,8 +6814,8 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	act->UseItem(Slot, header, tar, flags);
 	Sender->ReleaseCurrentAction();
+	act->UseItem(Slot, header, tar, flags);
 }
 
 void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
