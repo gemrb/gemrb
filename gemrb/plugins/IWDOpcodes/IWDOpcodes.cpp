@@ -625,9 +625,14 @@ int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	core->GetResRefFrom2DA(iwd_monster_2da[fx->Parameter2], monster, hit, areahit);
 
-	//the monster should appear near the effect position
-	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
+	int amount = core->Roll(fx->DiceSides, fx->DiceThrown , 0);
+
+	while (amount) {
+		//the monster should appear near the effect position
+		Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
+		core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
+		amount--;
+	}
 	return FX_NOT_APPLIED;
 }
 
