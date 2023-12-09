@@ -729,7 +729,9 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 	cre->SetPosition(critter.SpawnPoint, true);
 	cre->SetOrientation(ClampToOrientation(critter.Orientation), false);
 
-	cre->SetScriptName(critter.ScriptName);
+	if (!critter.ScriptName.empty()) {
+		cre->SetScriptName(critter.ScriptName);
+	}
 
 	//increases death variable
 	if (critter.Flags & CF_DEATHVAR) {
