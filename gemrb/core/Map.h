@@ -515,6 +515,7 @@ public:
 	bool HasActor(const Actor *actor) const;
 	bool SpawnsAlive() const;
 	void RemoveActor(Actor* actor);
+	Actor* GetRandomEnemySeen(const Actor* origin) const;
 
 	int GetActorCount(bool any) const;
 	//fix actors position if required

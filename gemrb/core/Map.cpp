@@ -3930,4 +3930,47 @@ void Map::SetBackground(const ResRef &bgResRef, ieDword duration)
 	BgDuration = duration;
 }
 
+Actor* Map::GetRandomEnemySeen(const Actor* origin) const
+{
+	int type = GetGroup(origin);
+	if (type == 2) {
+		return nullptr; //no enemies
+	}
+	int i = GetActorCount(true);
+	// see a random enemy
+	int pos = RAND(1, i) - 1;
+	i -= pos;
+	while (i--) {
+		Actor* ac = GetActor(i, true);
+		if (!CanSee(origin, ac, true, GA_NO_DEAD | GA_NO_HIDDEN | GA_NO_UNSCHEDULED)) continue;
+		if (type) { // origin is PC
+			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				return ac;
+			}
+		} else {
+			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				return ac;
+			}
+		}
+	}
+
+	i = GetActorCount(true);
+	while (i-- != pos) {
+		Actor* ac = GetActor(i, true);
+		if (!CanSee(origin, ac, true, GA_NO_DEAD | GA_NO_HIDDEN | GA_NO_UNSCHEDULED)) continue;
+		if (type) { // origin is PC
+			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				return ac;
+			}
+		} else {
+			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				return ac;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+
 }

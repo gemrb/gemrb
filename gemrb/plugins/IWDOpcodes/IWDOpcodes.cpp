@@ -3021,51 +3021,6 @@ int fx_alicorn_lance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //449 CallLightning
-static Actor *GetRandomEnemySeen(const Map *map, const Actor *origin)
-{
-	int type = GetGroup(origin);
-
-	if (type==2) {
-		return NULL; //no enemies
-	}
-	int i = map->GetActorCount(true);
-	//see a random enemy
-	int pos = core->Roll(1,i,-1);
-	i -= pos;
-	while(i--) {
-		Actor *ac = map->GetActor(i,true);
-		if (!CanSee(origin, ac, true, GA_NO_DEAD|GA_NO_HIDDEN|GA_NO_UNSCHEDULED)) continue;
-		if (type) { //origin is PC
-			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				return ac;
-			}
-		}
-		else {
-			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				return ac;
-			}
-		}
-	}
-
-	i=map->GetActorCount(true);
-	while(i--!=pos) {
-		Actor *ac = map->GetActor(i,true);
-		if (!CanSee(origin, ac, true, GA_NO_DEAD|GA_NO_HIDDEN|GA_NO_UNSCHEDULED)) continue;
-		if (type) { //origin is PC
-			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				return ac;
-			}
-		}
-		else {
-			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				return ac;
-			}
-		}
-	}
-
-	return NULL;
-}
-
 int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_call_lightning(%2d)", fx->Opcode);
@@ -3089,7 +3044,7 @@ int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	fx->Parameter1--;
 
 	//calculate victim (an opponent of target)
-	Actor *victim = GetRandomEnemySeen(map, target);
+	Actor* victim = map->GetRandomEnemySeen(target);
 	if (!victim) {
 		displaymsg->DisplayConstantStringName(HCStrings::LightningDissipate, GUIColors::WHITE, target);
 		return ret;
