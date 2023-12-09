@@ -1903,7 +1903,11 @@ int fx_set_panic_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Action* action;
 		const Actor* caster = GetCasterObject();
 		if (caster) {
-			action = GenerateActionDirect("RunAwayFromNoInterruptNoLeaveArea([-1])", caster);
+			if (core->HasFeature(GFFlags::IWD_MAP_DIMENSIONS)) { // iwd troll scripts are incompatible with full panic
+				action = GenerateActionDirect("RunAwayFrom([-1],300)", caster);
+			} else {
+				action = GenerateActionDirect("RunAwayFromNoInterrupt([-1],300)", caster);
+			}
 		} else {
 			action = GenerateAction("RandomWalk()");
 		}

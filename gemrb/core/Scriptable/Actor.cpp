@@ -3928,7 +3928,11 @@ void Actor::Panic(const Scriptable *attacker, int panicmode)
 
 	switch(panicmode) {
 	case PANIC_RUNAWAY:
-		action = GenerateActionDirect("RunAwayFromNoInterrupt([-1],300)", attacker);
+		if (core->HasFeature(GFFlags::IWD_MAP_DIMENSIONS)) { // iwd troll scripts are incompatible with full panic
+			action = GenerateActionDirect("RunAwayFrom([-1],300)", attacker);
+		} else {
+			action = GenerateActionDirect("RunAwayFromNoInterrupt([-1],300)", attacker);
+		}
 		SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 		break;
 	case PANIC_RANDOMWALK:
