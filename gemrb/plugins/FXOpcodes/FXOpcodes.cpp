@@ -8373,13 +8373,13 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 
 	// ee level param and unhardcoded delay
 	ieDword level = std::max(1U, fx->Parameter2);
-	ieWord delay = fx->IsVariable;
-	if (!delay) delay = static_cast<ieWord>(core->Time.round_size);
+	ieWord delay = fx->IsVariable * 10;
+	if (!delay) delay = static_cast<ieWord>(core->Time.rounds_per_turn * core->Time.round_size);
 	ResRef spell = fx->Resource;
 
 	// timing
 	fx->TimingMode = FX_DURATION_DELAY_PERMANENT;
-	fx->Duration = core->GetGame()->GameTime + 10 * delay;
+	fx->Duration = core->GetGame()->GameTime + delay;
 	fx->Parameter1--;
 
 	// this effect is targeted on the caster, so we need to manually find a damage target
