@@ -3936,36 +3936,18 @@ Actor* Map::GetRandomEnemySeen(const Actor* origin) const
 	if (type == 2) {
 		return nullptr; //no enemies
 	}
-	int i = GetActorCount(true);
-	// see a random enemy
-	int pos = RAND(1, i) - 1;
-	i -= pos;
-	while (i--) {
-		Actor* ac = GetActor(i, true);
-		if (!CanSee(origin, ac, true, GA_NO_DEAD | GA_NO_HIDDEN | GA_NO_UNSCHEDULED)) continue;
-		if (type) { // origin is PC
-			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				return ac;
-			}
-		} else {
-			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				return ac;
-			}
-		}
-	}
 
-	i = GetActorCount(true);
-	while (i-- != pos) {
-		Actor* ac = GetActor(i, true);
-		if (!CanSee(origin, ac, true, GA_NO_DEAD | GA_NO_HIDDEN | GA_NO_UNSCHEDULED)) continue;
-		if (type) { // origin is PC
-			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				return ac;
-			}
-		} else {
-			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				return ac;
-			}
+	int flags = GA_NO_HIDDEN | GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF;
+	std::vector<Actor*> neighbours = GetAllActorsInRadius(origin->Pos, flags, origin->GetBase(IE_VISUALRANGE), origin);
+	Actor* victim = neighbours[RAND<size_t>(0, neighbours.size() - 1)];
+
+	if (type) { // origin is PC
+		if (victim->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+			return victim;
+		}
+	} else {
+		if (victim->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+			return victim;
 		}
 	}
 
