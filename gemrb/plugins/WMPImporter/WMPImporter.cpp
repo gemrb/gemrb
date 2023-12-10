@@ -123,11 +123,11 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 	// Load map bitmap
 	ResourceHolder<ImageMgr> mos = gamedata->GetResourceHolder<ImageMgr>(m->MapResRef);
 	if (!mos) {
-		Log(ERROR, "WMPImporter", "Worldmap image not found.");
+		error("WMPImporter", "Worldmap image not found.");
 	} else {
 		m->SetMapMOS(mos->GetSprite2D());
 		if (!m->GetMapMOS()) {
-			Log(ERROR, "WMPImporter", "Worldmap image malformed!");
+			error("WMPImporter", "Worldmap image malformed!");
 		}
 	}
 

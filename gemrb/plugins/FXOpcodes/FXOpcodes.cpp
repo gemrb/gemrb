@@ -1903,7 +1903,11 @@ int fx_set_panic_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Action* action;
 		const Actor* caster = GetCasterObject();
 		if (caster) {
-			action = GenerateActionDirect("RunAwayFromNoInterruptNoLeaveArea([-1])", caster);
+			if (core->HasFeature(GFFlags::IWD_MAP_DIMENSIONS)) { // iwd troll scripts are incompatible with full panic
+				action = GenerateActionDirect("RunAwayFrom([-1],300)", caster);
+			} else {
+				action = GenerateActionDirect("RunAwayFromNoInterrupt([-1],300)", caster);
+			}
 		} else {
 			action = GenerateAction("RandomWalk()");
 		}
@@ -8356,7 +8360,7 @@ int fx_iwdee_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx)
 // 0x14d (333) Spell Effect: Static Charge, ee
 int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// if the target is dead, this effect ceases to exist
+	// if the owner (target) is dead, this effect ceases to exist
 	if (STATE_GET(STATE_DEAD | STATE_PETRIFIED | STATE_FROZEN)) {
 		displaymsg->DisplayConstantStringName(HCStrings::StaticDissipate, GUIColors::WHITE, target);
 		return FX_NOT_APPLIED;
@@ -8373,32 +8377,41 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 
 	// ee level param and unhardcoded delay
 	ieDword level = std::max(1U, fx->Parameter2);
-	ieWord delay = fx->IsVariable;
-	if (!delay) delay = static_cast<ieWord>(core->Time.round_size);
+	ieWord delay = fx->IsVariable * 10;
+	if (!delay) delay = static_cast<ieWord>(core->Time.rounds_per_turn * core->Time.round_size);
 	ResRef spell = fx->Resource;
 
 	// timing
 	fx->TimingMode = FX_DURATION_DELAY_PERMANENT;
-	fx->Duration = core->GetGame()->GameTime + 10 * delay;
+	fx->Duration = core->GetGame()->GameTime + delay;
 	fx->Parameter1--;
+
+	// this effect is targeted on the caster, so we need to manually find a damage target
+	const Map* map = target->GetCurrentArea();
+	if (!map) return FX_APPLIED;
+	Actor* victim = map->GetRandomEnemySeen(target);
+	if (!victim) {
+		displaymsg->DisplayConstantStringName(HCStrings::StaticDissipate, GUIColors::WHITE, target);
+		return FX_APPLIED;
+	}
 
 	// ee style
 	if (fx->Opcode == 0x14d) {
 		if (spell.IsEmpty()) {
 			spell.Format("{:.7}B", fx->SourceRef);
 		}
-		core->ApplySpell(spell, target, Owner, level);
+		core->ApplySpell(spell, victim, Owner, level);
 		return ret;
 	}
 
 	// iwd2 style
 	if (!spell.IsEmpty()) {
-		core->ApplySpell(spell, target, Owner, fx->Power);
+		core->ApplySpell(spell, victim, Owner, fx->Power);
 		return ret;
 	}
 
 	// how style
-	target->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, Owner, MOD_ADDITIVE, fx->SavingThrowType);
+	victim->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, Owner, MOD_ADDITIVE, fx->SavingThrowType);
 	return ret;
 }
 
