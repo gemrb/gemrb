@@ -14,5 +14,3 @@ IDS
 112 UseContainer()
 93 LeaveAreaName(O:Target*)
 354 RunAwayFromNoInterruptNoLeaveArea(O:Creature,I:Time)
-113 ForceSpellRES(S:RES*,O:Target)
-114 ForceSpellPointRES(S:RES*,P:Target)
