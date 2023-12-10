@@ -99,7 +99,8 @@
 0x5F       DQUIB      DQUIB      DQUIB      DQUIB      58          2          
 0x60       CTRDB      CTRDB      CTRDB      CTRDB      58          2          
 0x61       DNOFB      DNOFB      DNOFB      DNOFB      56          2          
-0x62       DVHSTDB    *          *          *          57          2         
+0x62       DVHSTDB    *          *          *          57          2
+0x63       DCTMB      DCTMB      DCTMB      DCTMB      56          2      
 0x2000     GEARS1     GEARS2     *          *          57          3
 0x3000     IGHEAD     IGARM      *          *          57          3
 0xf000     POSMAIN    POSSHAD    *          *          57          3
