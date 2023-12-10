@@ -235,7 +235,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("ChillTouch", fx_chill_touch, 0, -1), //ec (how)
 	EffectDesc("ChillTouchPanic", fx_chill_touch_panic, 0, -1), //ec (iwd2)
 	EffectDesc("CrushingDamage", fx_crushing_damage, EFFECT_DICED, -1), //ed
-	EffectDesc("IWDMonsterSummoning", fx_iwd_monster_summoning, EFFECT_NO_ACTOR, -1), //f0
+	EffectDesc("IWDMonsterSummoning", fx_iwd_monster_summoning, EFFECT_DICED|EFFECT_NO_ACTOR, -1), //f0
 	EffectDesc("VampiricTouch", fx_vampiric_touch, EFFECT_DICED, -1), //f1
 	EffectDesc("Overlay2", fx_overlay_iwd, 0, -1), //f2
 	EffectDesc("AnimateDead", fx_animate_dead, 0, -1), //f3
