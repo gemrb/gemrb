@@ -161,6 +161,10 @@ IF(WIN32)
 	TARGET_LINK_LIBRARIES(gemrb_core shlwapi)
 ENDIF()
 
+IF(USE_TRACY)
+  TARGET_LINK_LIBRARIES(gemrb_core TracyClient)
+ENDIF()
+
 target_compile_definitions(gemrb_core PRIVATE _USE_MATH_DEFINES)
 
 # make lintian happy

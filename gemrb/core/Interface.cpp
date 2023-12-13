@@ -1007,6 +1007,8 @@ void Interface::Main()
 			VideoDriver->DrawRect( fpsRgn, ColorBlack );
 			fps->Print(fpsRgn, String(fpsstring), IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, {ColorWhite, ColorBlack});
 		}
+
+		TRACY(FrameMark);
 	} while (VideoDriver->SwapBuffers(config.CapFPS) == GEM_OK && !(QuitFlag&QF_KILL));
 	QuitGame(0);
 }
@@ -1765,6 +1767,7 @@ bool Interface::IsFreezed() const
 
 void Interface::GameLoop(void)
 {
+	TRACY(ZoneScoped);
 	update_scripts = false;
 	GameControl *gc = GetGameControl();
 	if (gc) {

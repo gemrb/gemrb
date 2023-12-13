@@ -23,6 +23,10 @@
 #include "Audio.h"
 #include "Interface.h"
 
+#ifdef USE_TRACY
+#include <tracy/TracyOpenGL.hpp>
+#endif
+
 using namespace GemRB;
 
 #ifdef BAKE_ICON
@@ -216,6 +220,8 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 	glewInit();
 #endif
 
+	TRACY(TracyGpuContext);
+
 	scratchBuffer = CreateBuffer(Region(Point(), screenSize), BufferFormat::DISPLAY_ALPHA);
 	scratchBuffer->Clear();
 
@@ -291,6 +297,9 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 		(*it)->RenderOnDisplay(renderer);
 	}
 
+#if USE_OPENGL_BACKEND
+	TRACY(TracyGpuCollect);
+#endif
 	SDL_RenderPresent( renderer );
 }
 
@@ -370,6 +379,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Region& srgn, const Region& drgn, BlitFlags flags, const SDL_Color* tint)
 {
+	TRACY(ZoneScoped);
 	SDL_Rect srect = RectFromRegion(srgn);
 	SDL_Rect drect = RectFromRegion(drgn);
 	
