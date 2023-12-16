@@ -729,6 +729,9 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 	cre->SetPosition(critter.SpawnPoint, true);
 	cre->SetOrientation(ClampToOrientation(critter.Orientation), false);
 
+	//Empty critter script name can remove worked cre script name.
+	//As a result, PST script 1500CS1.bsc step MoveToObject("Hargrim") 
+	//does not work because it doesn’t find a character with this script name.
 	if (!critter.ScriptName.empty()) {
 		cre->SetScriptName(critter.ScriptName);
 	}
