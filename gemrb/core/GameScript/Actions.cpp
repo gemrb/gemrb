@@ -6864,8 +6864,10 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	Point targetPos = parameters->pointParameter;
+
 	Sender->ReleaseCurrentAction();
-	act->UseItemPoint(Slot, header, parameters->pointParameter, flags);
+	act->UseItemPoint(Slot, header, targetPos, flags);
 }
 
 //addfeat will be able to remove feats too
