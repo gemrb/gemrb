@@ -34,3 +34,6 @@ xcuserdata
 **/gemrb_console.txt
 **/GemRB.log
 build_debug/
+
+#clangd cache dir
+.cache
