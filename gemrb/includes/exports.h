@@ -90,14 +90,14 @@
 #	define _CRT_NONSTDC_NO_DEPRECATE 1
 #endif
 
-/// Make sure we don't like to static libraries
+/// Make sure we don't link to static libraries
 /// This causes hard to debug errors due to multiple heaps.
 #if defined(_MSC_VER) && !defined(_DLL)
 #	error GemRB must be dynamically linked with runtime libraries on win32.
 #endif
 
 /// Silence some persistent unused warnings (supported since gcc 2.4)
-#ifdef __GNUC__
+#if defined __GNUC__ or defined __clang__
 #	define IGNORE_UNUSED __attribute__ ((unused))
 #else
 #	define IGNORE_UNUSED
