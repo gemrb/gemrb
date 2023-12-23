@@ -594,6 +594,7 @@ WindowManager::HUDLock WindowManager::DrawHUD() const
 
 void WindowManager::DrawWindows() const
 {
+	TRACY(ZoneScoped);
 	HUDBuf->Clear();
 
 	if (windows.empty()) {

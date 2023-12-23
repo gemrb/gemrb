@@ -38,7 +38,6 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 	size_t last_percent = 20;
 	if (!All) return GEM_ERROR;
 
-	tick_t startTime = GetMilliseconds();
 	do {
 		ieDword fnlen, complen, declen;
 		compressed->ReadDword(fnlen);
@@ -80,8 +79,6 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 	}
 	while(Current);
 
-	tick_t endTime = GetMilliseconds();
-	Log(MESSAGE, "Core", "{} ms (extracting the SAV)", endTime - startTime);
 	return GEM_OK;
 }
 

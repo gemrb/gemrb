@@ -33,6 +33,14 @@
 	#include <unistd.h>
 #endif
 
+#ifdef USE_TRACY
+#define TRACY_ENABLE 1
+#include <tracy/Tracy.hpp>
+#define TRACY(x) x
+#else
+#define TRACY(x)
+#endif
+
 #include <cstddef>
 
 #endif  //! PLATFORM_H

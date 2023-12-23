@@ -101,6 +101,7 @@ OPTION(USE_PNG "Enable LibPNG support" ON)
 OPTION(USE_TESTS "Enable building and running of tests" OFF)
 OPTION(USE_VORBIS "Enable Vorbis support" ON)
 OPTION(DISABLE_WERROR "Do not treat warnings as errors" OFF)
+OPTION(USE_TRACY "Build with Tracy support" OFF)
 
 OPTION(USE_SDL_CONTROLLER_API "Enable SDL controller APIs. (disable if you plan on handling controller input in an external program like gptokeyb)" ON)
 OPTION(SDL_RESOLUTION_INDEPENDANCE "Scale the window to the size of the screen with pixel scaling." OFF)
@@ -653,6 +654,26 @@ IF (USE_TESTS)
 	INCLUDE(CTest)
 	ENABLE_TESTING()
 	LIST(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+ENDIF()
+
+IF(USE_TRACY)
+	INCLUDE(FetchContent)
+
+	IF (NOT STATIC_LINK)
+		SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
+	ENDIF()
+
+	FETCHCONTENT_DECLARE(
+		tracy
+		GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+		GIT_TAG v0.10
+		GIT_SHALLOW TRUE
+		GIT_PROGRESS TRUE
+	)
+	FETCHCONTENT_MAKEAVAILABLE(tracy)
+
+	ADD_DEFINITIONS("-DUSE_TRACY")
+	INCLUDE_DIRECTORIES(${tracy_SOURCE_DIR}/public)
 ENDIF()
 
 ADD_SUBDIRECTORY( gemrb )
