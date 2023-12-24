@@ -68,6 +68,7 @@ def StartTextScreen ():
 	elif GameCheck.IsGemRBDemo ():
 		#TODO: set MusicName
 		TableName = "chapters"
+		Message = "*"
 
 	if TableName == "":
 		EndTextScreen ()
