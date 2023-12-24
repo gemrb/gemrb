@@ -28,7 +28,6 @@
 178 BreakInstants()
 186 EndCredits()
 200 RandomWalkContinuous()
-248 RunToPoint(P:Point*)
 254 ScreenShake(P:Point*,I:Duration*)
 272 CreateVisualEffect(S:Object*,P:Location*)
 301 AmbientActivate(O:Object*,I:State*Boolean)
