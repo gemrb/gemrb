@@ -1118,7 +1118,7 @@ void Interface::LoadPlugins() const
 void Interface::LoadSprites()
 {
 	Log(MESSAGE, "Core", "Loading Cursors...");
-	auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(MainCursorsImage, IE_BAM_CLASS_ID);
+	auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(MainCursorsImage, IE_BAM_CLASS_ID, true);
 	size_t CursorCount = 0;
 	if (anim) {
 		CursorCount = anim->GetCycleCount();
