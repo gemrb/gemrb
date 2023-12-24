@@ -3834,7 +3834,9 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 			channel = core->GetAudioDrv()->GetChannel(channel_name);
 		}
 
-		if (PyUnicode_Check(pyref)) {
+		if (pyref == Py_None) {
+			core->GetAudioDrv()->Play("", channel, pos, flags);
+		} else if (PyUnicode_Check(pyref)) {
 			core->GetAudioDrv()->PlayMB(PyString_AsStringObj(pyref), channel, pos, flags);
 		} else {
 			core->GetAudioDrv()->Play(PyString_AsStringView(pyref), channel, pos, flags);
