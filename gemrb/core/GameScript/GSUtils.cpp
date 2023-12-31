@@ -1740,7 +1740,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			// Action - only ActionOverride takes such a parameter
 			{
 				SKIP_ARGUMENT();
-				char action[257];
+				std::string action(257, '\0');
 				int i = 0;
 				int openParenthesisCount = 0;
 				while (true) {
@@ -1761,7 +1761,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					i++;
 					src++;
 				}
-				action[i] = 0;
 				Action* act = GenerateAction( action);
 				if (!act) {
 					delete newAction;
