@@ -1580,14 +1580,12 @@ static int GetIdsValue(const char *&symbol, const ResRef& idsname)
 		return -1;
 	}
 
-	char symbolname[64];
-	int x;
-	for (x=0;ismysymbol(*symbol) && x<(int) sizeof(symbolname)-1;x++) {
-		symbolname[x]=*symbol;
+	std::string symbolName(64, '\0');
+	for (int x = 0; ismysymbol(*symbol) && x < 63; x++) {
+		symbolName[x] = *symbol;
 		symbol++;
 	}
-	symbolname[x]=0;
-	return valHook->GetValue(symbolname);
+	return valHook->GetValue(symbolName);
 }
 
 static int ParseIntParam(const char *&src, const char *&str)
