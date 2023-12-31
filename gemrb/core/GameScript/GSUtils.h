@@ -43,12 +43,12 @@ extern PluginHolder<SymbolMgr> overrideTriggersTable;
 extern PluginHolder<SymbolMgr> overrideActionsTable;
 extern PluginHolder<SymbolMgr> objectsTable;
 
-extern TriggerFunction triggers[MAX_TRIGGERS];
-extern ActionFunction actions[MAX_ACTIONS];
-extern short actionflags[MAX_ACTIONS];
-extern short triggerflags[MAX_TRIGGERS];
-extern ObjectFunction objects[MAX_OBJECTS];
-extern IDSFunction idtargets[MAX_OBJECT_FIELDS];
+extern std::array<TriggerFunction, MAX_TRIGGERS> triggers;
+extern std::array<ActionFunction, MAX_ACTIONS> actions;
+extern std::array<ObjectFunction, MAX_OBJECTS> objects;
+extern std::array<IDSFunction, MAX_OBJECT_FIELDS> idtargets;
+extern std::array<short, MAX_ACTIONS> actionflags;
+extern std::array<short, MAX_TRIGGERS> triggerflags;
 extern ResRefRCCache<Script> BcsCache; //cache for scripts
 extern int ObjectIDSCount;
 extern int MaxObjectNesting;

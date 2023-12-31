@@ -61,12 +61,12 @@ PluginHolder<SymbolMgr> overrideTriggersTable;
 PluginHolder<SymbolMgr> overrideActionsTable;
 PluginHolder<SymbolMgr> objectsTable;
 
-TriggerFunction triggers[MAX_TRIGGERS];
-ActionFunction actions[MAX_ACTIONS];
-short actionflags[MAX_ACTIONS];
-short triggerflags[MAX_TRIGGERS];
-ObjectFunction objects[MAX_OBJECTS];
-IDSFunction idtargets[MAX_OBJECT_FIELDS];
+std::array<TriggerFunction, MAX_TRIGGERS> triggers;
+std::array<ActionFunction, MAX_ACTIONS> actions;
+std::array<ObjectFunction, MAX_OBJECTS> objects;
+std::array<IDSFunction, MAX_OBJECT_FIELDS> idtargets;
+std::array<short, MAX_ACTIONS> actionflags;
+std::array<short, MAX_TRIGGERS> triggerflags;
 ResRefRCCache<Script> BcsCache; //cache for scripts
 int ObjectIDSCount = 7;
 int MaxObjectNesting = 5;

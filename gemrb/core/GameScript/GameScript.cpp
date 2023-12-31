@@ -1841,13 +1841,6 @@ void InitializeIEScript()
 	ObjectFieldsCount = ObjectIDSCount - ExtraParametersCount;
 
 	/* Initializing the Script Engine */
-
-	memset(triggers, 0, sizeof(triggers));
-	memset(triggerflags, 0, sizeof(triggerflags));
-	memset(actions, 0, sizeof(actions));
-	memset(actionflags, 0, sizeof(actionflags));
-	memset(objects, 0, sizeof(objects));
-
 	SetupTriggers();
 	SetupActions();
 
