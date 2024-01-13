@@ -132,21 +132,21 @@ IF(APPLE)
 
   if (STATIC_LINK)
     TARGET_LINK_LIBRARIES(gemrb
-        ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT}
+        ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} Threads::Threads
        gemrb_core ${plugins}  -Wl,-all_load)
   else (STATIC_LINK)
     TARGET_LINK_LIBRARIES(gemrb gemrb_core
-        ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+        ${COCOA_LIBRARY_PATH} ${CMAKE_DL_LIBS} Threads::Threads)
   endif (STATIC_LINK)
 ELSE(APPLE)
   if (STATIC_LINK)
-    TARGET_LINK_LIBRARIES(gemrb ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT}
+    TARGET_LINK_LIBRARIES(gemrb ${CMAKE_DL_LIBS} Threads::Threads
       -Wl,--whole-archive gemrb_core ${plugins} -Wl,--no-whole-archive)
   else (STATIC_LINK)
     IF (MSVC)
       TARGET_LINK_LIBRARIES(gemrb gemrb_core)
     ELSE (MSVC)
-      TARGET_LINK_LIBRARIES(gemrb gemrb_core ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+      TARGET_LINK_LIBRARIES(gemrb gemrb_core ${CMAKE_DL_LIBS} Threads::Threads)
     ENDIF (MSVC)
   endif (STATIC_LINK)
 ENDIF(APPLE)

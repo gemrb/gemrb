@@ -100,6 +100,9 @@ CONFIGURE_FOR_SANITIZE(${SANITIZE})
 CONFIGURE_TARGET_PLATFORM_SPECIFICS()
 CONFIGURE_FMT_INCLUDES()
 
+# The engine does not work without threads, enable them globally.
+FIND_PACKAGE(Threads REQUIRED)
+
 # Tests (need init'd before subdirectories)
 IF (USE_TESTS)
 	FIND_PACKAGE(GTest REQUIRED)
