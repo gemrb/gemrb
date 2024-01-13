@@ -184,6 +184,11 @@ FUNCTION(CONFIGURE_SDL SDL_BACKEND)
             SET_INTERNAL(SDL_MIXER_FOUND ${SDL_MIXER_FOUND})
         ENDIF()
 
+        IF(SDL_FOUND)
+            MESSAGE(STATUS "Found SDL 1.2, switching to SDL backend.")
+            SET_INTERNAL(SDL_FOUND ${SDL_FOUND})
+        ENDIF()
+
         SET_INTERNAL(SDL_INCLUDE_DIR "${SDL_INCLUDE_DIRS}")
         SET_INTERNAL(SDL_LIBRARY "${SDL_LIBRARIES}")
     ENDIF()
@@ -198,6 +203,12 @@ FUNCTION(CONFIGURE_SDL SDL_BACKEND)
         ELSE()
             FIND_PACKAGE(SDL2 REQUIRED)
         ENDIF()
+
+        IF(SDL2_FOUND)
+            MESSAGE(STATUS "Found SDL 2.0, switching to SDL2 backend.")
+            SET_INTERNAL(SDL_FOUND ${SDL2_FOUND})
+        ENDIF()
+
         # unify SDL variables, so we don't have to differentiate later
         UNSET(SDL_INCLUDE_DIR CACHE)
         UNSET(SDL_LIBRARY CACHE)
