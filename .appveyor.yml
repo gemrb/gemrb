@@ -58,7 +58,7 @@ before_build:
     pushd c:\projects\gemrb
 
     $git_version = (git rev-parse --short HEAD) | Out-String
-    $env:archive_file = -join("gemrb-win32-", $git_version.Trim(), ".zip")
+    $env:archive_file = -join("gemrb-win32-", $(Get-Date -Format "yyyy-MM-dd-"), $git_version.Trim(), ".zip")
     $env:archive_path = -join("c:\projects\gemrb\", $env:archive_file)
     $env:archive_source = -join("c:\gemrb-win32-", $git_version.Trim())
     mkdir $env:archive_source

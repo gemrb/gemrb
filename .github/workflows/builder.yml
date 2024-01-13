@@ -185,7 +185,7 @@ jobs:
         # NOTE: only do it on gcc builds if we ever add more compilers
         filepath=Linux
         filei=build/GemRB-*.AppImage
-        fileo=GemRB-${GITHUB_REF##*/}-${GITHUB_SHA:0:10}-x86_64.AppImage
+        fileo=GemRB-$(date +%F)-${GITHUB_REF##*/}-${GITHUB_SHA:0:10}-x86_64.AppImage
 
         filepath="$filepath/$fileo"
         scp $filei \
