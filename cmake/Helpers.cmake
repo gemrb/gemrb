@@ -1,190 +1,190 @@
 FUNCTION(SET_INTERNAL VAR_NAME VALUE)
-    SET(${VAR_NAME} ${VALUE} CACHE INTERNAL "")
+	SET(${VAR_NAME} ${VALUE} CACHE INTERNAL "")
 ENDFUNCTION()
 
 FUNCTION(ADD_FLAG_IF_SUPPORTED)
-    SET(options "")
-    SET(oneValueArgs FLAG VALUE)
-    SET(multiValueArgs "")
-    CMAKE_PARSE_ARGUMENTS("" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+	SET(options "")
+	SET(oneValueArgs FLAG VALUE)
+	SET(multiValueArgs "")
+	CMAKE_PARSE_ARGUMENTS("" "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    IF(${_VALUE})
-        SET(TEST_FLAG "${_FLAG}=${_VALUE}")
-    ELSE ()
-        SET(TEST_FLAG "${_FLAG}")
-    ENDIF ()
+	IF(${_VALUE})
+		SET(TEST_FLAG "${_FLAG}=${_VALUE}")
+	ELSE ()
+		SET(TEST_FLAG "${_FLAG}")
+	ENDIF ()
 
-    STRING(REGEX REPLACE "[^a-zA-Z0-9]" "_" HAS_FLAG ${TEST_FLAG})
-    CHECK_CXX_COMPILER_FLAG(${TEST_FLAG} ${HAS_FLAG})
+	STRING(REGEX REPLACE "[^a-zA-Z0-9]" "_" HAS_FLAG ${TEST_FLAG})
+	CHECK_CXX_COMPILER_FLAG(${TEST_FLAG} ${HAS_FLAG})
 
-    IF(HAS_FLAG)
-        IF(${_VALUE})
-            SET(_FLAG "${_FLAG}=${_VALUE}")
-        ENDIF ()
-        STRING(APPEND CMAKE_CXX_FLAGS " ${_FLAG}")
-    ENDIF ()
+	IF(HAS_FLAG)
+		IF(${_VALUE})
+			SET(_FLAG "${_FLAG}=${_VALUE}")
+		ENDIF ()
+		STRING(APPEND CMAKE_CXX_FLAGS " ${_FLAG}")
+	ENDIF ()
 ENDFUNCTION()
 
 FUNCTION(USE_SCCACHE_IF_AVAILABLE)
-    FIND_PROGRAM(SCCACHE_PROGRAM "sccache")
-    IF(SCCACHE_PROGRAM)
-        MESSAGE(STATUS "Using sccache found at ${SCCACHE_PROGRAM} for caching build results")
-        SET(CMAKE_C_COMPILER_LAUNCHER "${SCCACHE_PROGRAM}" CACHE STRING "" FORCE)
-        SET(CMAKE_CXX_COMPILER_LAUNCHER "${SCCACHE_PROGRAM}" CACHE STRING "" FORCE)
-    ENDIF()
+	FIND_PROGRAM(SCCACHE_PROGRAM "sccache")
+	IF(SCCACHE_PROGRAM)
+		MESSAGE(STATUS "Using sccache found at ${SCCACHE_PROGRAM} for caching build results")
+		SET(CMAKE_C_COMPILER_LAUNCHER "${SCCACHE_PROGRAM}" CACHE STRING "" FORCE)
+		SET(CMAKE_CXX_COMPILER_LAUNCHER "${SCCACHE_PROGRAM}" CACHE STRING "" FORCE)
+	ENDIF()
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_COMPILER)
-    INCLUDE(CheckCXXCompilerFlag)
-    IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-        IF((NOT DISABLE_WERROR) AND (NOT IS_RELEASE_VERSION))
-            STRING(JOIN " "
-                CMAKE_CXX_FLAGS
-                ${CMAKE_CXX_FLAGS}
-                "-Werror"
-                "-Wno-inline"
-                "-Wno-error=cast-align"
-                "-Wmissing-declarations"
-            )
-        ELSEIF(IS_RELEASE_VERSION)
-            ADD_FLAG_IF_SUPPORTED(
-                FLAG "-ffile-prefix-map"
-                VALUE "${CMAKE_SOURCE_DIR}=."
-            )		
-        ENDIF ()
+	INCLUDE(CheckCXXCompilerFlag)
+	IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+		IF((NOT DISABLE_WERROR) AND (NOT IS_RELEASE_VERSION))
+			STRING(JOIN " "
+				CMAKE_CXX_FLAGS
+				${CMAKE_CXX_FLAGS}
+				"-Werror"
+				"-Wno-inline"
+				"-Wno-error=cast-align"
+				"-Wmissing-declarations"
+			)
+		ELSEIF(IS_RELEASE_VERSION)
+			ADD_FLAG_IF_SUPPORTED(
+				FLAG "-ffile-prefix-map"
+				VALUE "${CMAKE_SOURCE_DIR}=."
+			)		
+		ENDIF ()
 
-        STRING(JOIN " "
-            CMAKE_CXX_FLAGS
-            ${CMAKE_CXX_FLAGS}
-            "-Wall"
-            "-W"
-            "-Wpointer-arith"
-            "-Wno-format-y2k"
-            "-Wno-long-long"
-        )
+		STRING(JOIN " "
+			CMAKE_CXX_FLAGS
+			${CMAKE_CXX_FLAGS}
+			"-Wall"
+			"-W"
+			"-Wpointer-arith"
+			"-Wno-format-y2k"
+			"-Wno-long-long"
+		)
 
-        STRING(APPEND CMAKE_CXX_FLAGS " -pedantic")
-        # mark chars explicitly signed (ARM defaults to unsigned)
-        ADD_FLAG_IF_SUPPORTED(FLAG "-fsigned-char")
-        # only export symbols explicitly marked to be exported.
-        ADD_FLAG_IF_SUPPORTED(FLAG "-fvisibility=hidden")
-        # Fast math helps us covering some things that need a little more rework soon
-        ADD_FLAG_IF_SUPPORTED(FLAG "-ffast-math")
-        ADD_FLAG_IF_SUPPORTED(FLAG "-frounding-math")
+		STRING(APPEND CMAKE_CXX_FLAGS " -pedantic")
+		# mark chars explicitly signed (ARM defaults to unsigned)
+		ADD_FLAG_IF_SUPPORTED(FLAG "-fsigned-char")
+		# only export symbols explicitly marked to be exported.
+		ADD_FLAG_IF_SUPPORTED(FLAG "-fvisibility=hidden")
+		# Fast math helps us covering some things that need a little more rework soon
+		ADD_FLAG_IF_SUPPORTED(FLAG "-ffast-math")
+		ADD_FLAG_IF_SUPPORTED(FLAG "-frounding-math")
 
-        IF(WIN32)
-            # GCC 4.5.0+ has shared libstdc++ without dllimport
-            STRING(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--enable-auto-import")
-            STRING(APPEND CMAKE_MODULE_LINKER_FLAGS " -Wl,--enable-auto-import")
-        ENDIF (WIN32)
-        # Ensure all plugin symbols exist.
-        IF(NOT APPLE AND NOT UNSAFE_PLUGIN)
-            string(APPEND CMAKE_MODULE_LINKER_FLAGS " -Wl,--no-undefined")
-        ENDIF (NOT APPLE AND NOT UNSAFE_PLUGIN)
-    ENDIF ()
+		IF(WIN32)
+			# GCC 4.5.0+ has shared libstdc++ without dllimport
+			STRING(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--enable-auto-import")
+			STRING(APPEND CMAKE_MODULE_LINKER_FLAGS " -Wl,--enable-auto-import")
+		ENDIF (WIN32)
+		# Ensure all plugin symbols exist.
+		IF(NOT APPLE AND NOT UNSAFE_PLUGIN)
+			string(APPEND CMAKE_MODULE_LINKER_FLAGS " -Wl,--no-undefined")
+		ENDIF (NOT APPLE AND NOT UNSAFE_PLUGIN)
+	ENDIF ()
 
-    IF(CMAKE_COMPILER_ID MATCHES "GNU")
-        STRING(APPEND CMAKE_CXX_FLAGS " -Wcast-align")
-        ADD_FLAG_IF_SUPPORTED(
-            FLAG "-Wno-error"
-            VALUE "stringop-truncation"
-        )
-        ADD_FLAG_IF_SUPPORTED(
-            FLAG "-Wno-error"
-            VALUE "stringop-overflow"
-        )
-        ADD_FLAG_IF_SUPPORTED(
-            FLAG "-Wno-error"
-            VALUE "stringop-overread"
-        )
+	IF(CMAKE_COMPILER_ID MATCHES "GNU")
+		STRING(APPEND CMAKE_CXX_FLAGS " -Wcast-align")
+		ADD_FLAG_IF_SUPPORTED(
+			FLAG "-Wno-error"
+			VALUE "stringop-truncation"
+		)
+		ADD_FLAG_IF_SUPPORTED(
+			FLAG "-Wno-error"
+			VALUE "stringop-overflow"
+		)
+		ADD_FLAG_IF_SUPPORTED(
+			FLAG "-Wno-error"
+			VALUE "stringop-overread"
+		)
 
-        IF(CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 13)
-            # too much noise from false positives
-            STRING(APPEND CMAKE_CXX_FLAGS " -Wno-stringop-truncation -Wno-stringop-overflow -Wno-stringop-overread")
-        ENDIF ()
-        # only later c++ standards conditionally allow function/object pointer casts
-        # gcc pragmas for disabling are broken: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
-        IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7)
-            STRING(APPEND CMAKE_CXX_FLAGS " -Wno-error=pedantic")
-        ENDIF ()
+		IF(CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 13)
+			# too much noise from false positives
+			STRING(APPEND CMAKE_CXX_FLAGS " -Wno-stringop-truncation -Wno-stringop-overflow -Wno-stringop-overread")
+		ENDIF ()
+		# only later c++ standards conditionally allow function/object pointer casts
+		# gcc pragmas for disabling are broken: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
+		IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7)
+			STRING(APPEND CMAKE_CXX_FLAGS " -Wno-error=pedantic")
+		ENDIF ()
 
-        ADD_FLAG_IF_SUPPORTED(FLAG "-Wimplicit-fallthrough" VALUE "2")
-    ENDIF ()
+		ADD_FLAG_IF_SUPPORTED(FLAG "-Wimplicit-fallthrough" VALUE "2")
+	ENDIF ()
 
-    IF(CMAKE_COMPILER_ID MATCHES "Clang")
-        IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6 OR APPLE)
-            STRING(APPEND CMAKE_CXX_FLAGS " -Wno-error=pedantic")
-        ENDIF ()
-    ENDIF ()
+	IF(CMAKE_COMPILER_ID MATCHES "Clang")
+		IF(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6 OR APPLE)
+			STRING(APPEND CMAKE_CXX_FLAGS " -Wno-error=pedantic")
+		ENDIF ()
+	ENDIF ()
 
-    IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-        STRING(APPEND CMAKE_CXX_FLAGS " /fp:fast") 
-    ENDIF()
+	IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+		STRING(APPEND CMAKE_CXX_FLAGS " /fp:fast") 
+	ENDIF()
 
-    USE_SCCACHE_IF_AVAILABLE()
+	USE_SCCACHE_IF_AVAILABLE()
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_PYTHON)
-    IF(PYTHON_VERSION STREQUAL "Auto")
-        FIND_PACKAGE(PythonLibs 3)
-        # Record for reporting later
-        SET_INTERNAL(PYTHON_VERSION 3)
-    ELSEIF(PYTHON_VERSION STREQUAL "2")
-        MESSAGE(FATAL_ERROR "Python 2 support has been removed, rerun cmake in a clean build dir.")
-    ELSE()
-        FIND_PACKAGE(PythonLibs ${PYTHON_VERSION} REQUIRED)
-    ENDIF()
-    IF(PYTHONLIBS_FOUND)
-        MESSAGE(STATUS "Looking for Python libraries and headers: found")
-        INCLUDE_DIRECTORIES(SYSTEM ${PYTHON_INCLUDE_DIRS})
-        SET_INTERNAL(PYTHON_LIBRARIES "${PYTHON_LIBRARIES}")
-    ENDIF()
+	IF(PYTHON_VERSION STREQUAL "Auto")
+		FIND_PACKAGE(PythonLibs 3)
+		# Record for reporting later
+		SET_INTERNAL(PYTHON_VERSION 3)
+	ELSEIF(PYTHON_VERSION STREQUAL "2")
+		MESSAGE(FATAL_ERROR "Python 2 support has been removed, rerun cmake in a clean build dir.")
+	ELSE()
+		FIND_PACKAGE(PythonLibs ${PYTHON_VERSION} REQUIRED)
+	ENDIF()
+	IF(PYTHONLIBS_FOUND)
+		MESSAGE(STATUS "Looking for Python libraries and headers: found")
+		INCLUDE_DIRECTORIES(SYSTEM ${PYTHON_INCLUDE_DIRS})
+		SET_INTERNAL(PYTHON_LIBRARIES "${PYTHON_LIBRARIES}")
+	ENDIF()
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_SDL SDL_BACKEND)
-    # Autodetection mechanism
-    # Default priority to SDL
-    # If both backends are found, preferring SDL2
-    IF(SDL_BACKEND STREQUAL "Auto")
-        MESSAGE(STATUS "Autodetecting SDL backend...")
-        IF(WIN32 AND _VCPKG_INSTALLED_DIR)
-            FIND_PACKAGE(SDL2 CONFIG REQUIRED)
-            GET_TARGET_PROPERTY(SDL2_INCLUDE_DIRS SDL2::SDL2 INTERFACE_INCLUDE_DIRECTORIES)
-            GET_TARGET_PROPERTY(SDL2_LIBRARY_DEBUG SDL2::SDL2 IMPORTED_IMPLIB_DEBUG)
-            GET_TARGET_PROPERTY(SDL2_LIBRARY_RELEASE SDL2::SDL2 IMPORTED_IMPLIB_RELEASE)
-            SET(SDL2_LIBRARIES debug ${SDL2_LIBRARY_DEBUG} optimized ${SDL2_LIBRARY_RELEASE})
-        ELSE()
-            FIND_PACKAGE(SDL2)
-        ENDIF()
-        IF(SDL2_FOUND)
-            SET(SDL_BACKEND "SDL2" CACHE STRING ${SDL_BACKEND_DESCRIPTION} FORCE)
-        ELSE()
-            INCLUDE(FindSDL)
-            IF(SDL_FOUND)
-                SET(SDL_BACKEND "SDL" CACHE STRING ${SDL_BACKEND_DESCRIPTION} FORCE)
-            ENDIF()
-        ENDIF()
-    ELSEIF(SDL_BACKEND STREQUAL "SDL")
-        INCLUDE(FindSDL)
-        IF(SDL_FOUND)
-            SET_INTERNAL(SDL_FOUND ${SDL_FOUND})
-        ENDIF()
-    ELSEIF(SDL_BACKEND STREQUAL "SDL2")
-        IF(WIN32 AND _VCPKG_INSTALLED_DIR)
-            FIND_PACKAGE(SDL2 CONFIG REQUIRED)
-            GET_TARGET_PROPERTY(SDL2_INCLUDE_DIRS SDL2::SDL2 INTERFACE_INCLUDE_DIRECTORIES)
-            GET_TARGET_PROPERTY(SDL2_LIBRARY_DEBUG SDL2::SDL2 IMPORTED_IMPLIB_DEBUG)
-            GET_TARGET_PROPERTY(SDL2_LIBRARY_RELEASE SDL2::SDL2 IMPORTED_IMPLIB_RELEASE)
-            SET(SDL2_LIBRARIES debug ${SDL2_LIBRARY_DEBUG} optimized ${SDL2_LIBRARY_RELEASE})
-        ELSE()
-            FIND_PACKAGE(SDL2 REQUIRED)
-        ENDIF()
-    ENDIF()
+	# Autodetection mechanism
+	# Default priority to SDL
+	# If both backends are found, preferring SDL2
+	IF(SDL_BACKEND STREQUAL "Auto")
+		MESSAGE(STATUS "Autodetecting SDL backend...")
+		IF(WIN32 AND _VCPKG_INSTALLED_DIR)
+			FIND_PACKAGE(SDL2 CONFIG REQUIRED)
+			GET_TARGET_PROPERTY(SDL2_INCLUDE_DIRS SDL2::SDL2 INTERFACE_INCLUDE_DIRECTORIES)
+			GET_TARGET_PROPERTY(SDL2_LIBRARY_DEBUG SDL2::SDL2 IMPORTED_IMPLIB_DEBUG)
+			GET_TARGET_PROPERTY(SDL2_LIBRARY_RELEASE SDL2::SDL2 IMPORTED_IMPLIB_RELEASE)
+			SET(SDL2_LIBRARIES debug ${SDL2_LIBRARY_DEBUG} optimized ${SDL2_LIBRARY_RELEASE})
+		ELSE()
+			FIND_PACKAGE(SDL2)
+		ENDIF()
+		IF(SDL2_FOUND)
+			SET(SDL_BACKEND "SDL2" CACHE STRING ${SDL_BACKEND_DESCRIPTION} FORCE)
+		ELSE()
+			INCLUDE(FindSDL)
+			IF(SDL_FOUND)
+				SET(SDL_BACKEND "SDL" CACHE STRING ${SDL_BACKEND_DESCRIPTION} FORCE)
+			ENDIF()
+		ENDIF()
+	ELSEIF(SDL_BACKEND STREQUAL "SDL")
+		INCLUDE(FindSDL)
+		IF(SDL_FOUND)
+			SET_INTERNAL(SDL_FOUND ${SDL_FOUND})
+		ENDIF()
+	ELSEIF(SDL_BACKEND STREQUAL "SDL2")
+		IF(WIN32 AND _VCPKG_INSTALLED_DIR)
+			FIND_PACKAGE(SDL2 CONFIG REQUIRED)
+			GET_TARGET_PROPERTY(SDL2_INCLUDE_DIRS SDL2::SDL2 INTERFACE_INCLUDE_DIRECTORIES)
+			GET_TARGET_PROPERTY(SDL2_LIBRARY_DEBUG SDL2::SDL2 IMPORTED_IMPLIB_DEBUG)
+			GET_TARGET_PROPERTY(SDL2_LIBRARY_RELEASE SDL2::SDL2 IMPORTED_IMPLIB_RELEASE)
+			SET(SDL2_LIBRARIES debug ${SDL2_LIBRARY_DEBUG} optimized ${SDL2_LIBRARY_RELEASE})
+		ELSE()
+			FIND_PACKAGE(SDL2 REQUIRED)
+		ENDIF()
+	ENDIF()
 
-    IF(NOT (SDL_FOUND OR SDL2_FOUND))
-        MESSAGE(WARNING "Looking for SDL: not found!")
-        MESSAGE(FATAL_ERROR "Please get SDL from www.libsdl.org")
-    ENDIF()
+	IF(NOT (SDL_FOUND OR SDL2_FOUND))
+		MESSAGE(WARNING "Looking for SDL: not found!")
+		MESSAGE(FATAL_ERROR "Please get SDL from www.libsdl.org")
+	ENDIF()
 
 		# unify SDL variables, so we don't have to differentiate later
 		UNSET(SDL_INCLUDE_DIR CACHE)
@@ -219,33 +219,33 @@ FUNCTION(CONFIGURE_SDL SDL_BACKEND)
 			ENDIF()
 		ENDIF()
 
-    IF(SDL_MIXER_FOUND)
-        MESSAGE(STATUS "Looking for SDL_mixer: found")
-    ELSEIF(USE_SDLMIXER)
-        MESSAGE(WARNING "Looking for SDL_mixer: not found!")
-        MESSAGE(WARNING "If you want to build the SDL_mixer plugin, install SDL_mixer first.")
-        MESSAGE(WARNING "Make sure you use a version compatible with the chosen SDL version.")
-    ENDIF()
+	IF(SDL_MIXER_FOUND)
+		MESSAGE(STATUS "Looking for SDL_mixer: found")
+	ELSEIF(USE_SDLMIXER)
+		MESSAGE(WARNING "Looking for SDL_mixer: not found!")
+		MESSAGE(WARNING "If you want to build the SDL_mixer plugin, install SDL_mixer first.")
+		MESSAGE(WARNING "Make sure you use a version compatible with the chosen SDL version.")
+	ENDIF()
 
-    IF(APPLE AND SDL2_LIBDIR)
-        SET_INTERNAL(SDL2_LIBDIR ${SDL2_LIBDIR})
-    ENDIF()
+	IF(APPLE AND SDL2_LIBDIR)
+		SET_INTERNAL(SDL2_LIBDIR ${SDL2_LIBDIR})
+	ENDIF()
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_OPENGL OPENGL_BACKEND SDL_BACKEND)
-    IF(USE_OPENGL)
-        MESSAGE(WARNING "USE_OPENGL has been dropped, use OPENGL_BACKEND instead: None, OpenGL, GLES")
-        SET(OPENGL_BACKEND "OpenGL")
-    ENDIF()
+	IF(USE_OPENGL)
+		MESSAGE(WARNING "USE_OPENGL has been dropped, use OPENGL_BACKEND instead: None, OpenGL, GLES")
+		SET(OPENGL_BACKEND "OpenGL")
+	ENDIF()
 
 		IF(OPENGL_BACKEND STREQUAL "None")
 			RETURN()
 		ENDIF()
 
-    SET(VALID_GL_BACKENDS None OpenGL GLES)
-    IF(NOT (OPENGL_BACKEND IN_LIST VALID_GL_BACKENDS))
-        MESSAGE(FATAL_ERROR "Wrong value passed for OPENGL_BACKEND, use one of: None, OpenGL, GLES")
-    ENDIF()
+	SET(VALID_GL_BACKENDS None OpenGL GLES)
+	IF(NOT (OPENGL_BACKEND IN_LIST VALID_GL_BACKENDS))
+		MESSAGE(FATAL_ERROR "Wrong value passed for OPENGL_BACKEND, use one of: None, OpenGL, GLES")
+	ENDIF()
 
 		IF(SDL_BACKEND STREQUAL "SDL")
 			MESSAGE(FATAL_ERROR "SDL2 is required for OpenGL backend support!")
@@ -274,14 +274,14 @@ FUNCTION(CONFIGURE_OPENGL OPENGL_BACKEND SDL_BACKEND)
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_FOR_SANITIZE SANITIZE)
-    STRING(TOLOWER ${SANITIZE} SANITIZE_LOWERCASE)
-    IF(NOT SANITIZE_LOWERCASE STREQUAL "none")
-        STRING(APPEND CMAKE_C_FLAGS " -O0 -g -fsanitize=${SANITIZE} -fno-omit-frame-pointer")
-        STRING(APPEND CMAKE_CXX_FLAGS " -O0 -g -fsanitize=${SANITIZE} -fno-omit-frame-pointer")
-        STRING(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=${SANITIZE}")
-        STRING(APPEND CMAKE_SHARED_LINKER_FLAGS " -fsanitize=${SANITIZE}")
-        # also CMAKE_MODULE_LINKER_FLAGS for macs?
-    ENDIF()
+	STRING(TOLOWER ${SANITIZE} SANITIZE_LOWERCASE)
+	IF(NOT SANITIZE_LOWERCASE STREQUAL "none")
+		STRING(APPEND CMAKE_C_FLAGS " -O0 -g -fsanitize=${SANITIZE} -fno-omit-frame-pointer")
+		STRING(APPEND CMAKE_CXX_FLAGS " -O0 -g -fsanitize=${SANITIZE} -fno-omit-frame-pointer")
+		STRING(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=${SANITIZE}")
+		STRING(APPEND CMAKE_SHARED_LINKER_FLAGS " -fsanitize=${SANITIZE}")
+		# also CMAKE_MODULE_LINKER_FLAGS for macs?
+	ENDIF()
 ENDFUNCTION()
 
 FUNCTION(SET_PATH variable default)
@@ -291,120 +291,120 @@ FUNCTION(SET_PATH variable default)
 ENDFUNCTION(SET_PATH)
 
 FUNCTION(CONFIGURE_DIRECTORY_LAYOUT)
-    IF (NOT LAYOUT)
-        IF (WIN32)
-            set(LAYOUT "home")
-        ELSEIF (APPLE)
-            set(LAYOUT "bundle")
-        ELSE (APPLE)
-            set(LAYOUT "fhs")
-        ENDIF (WIN32)
-    ENDIF (NOT LAYOUT)
+	IF (NOT LAYOUT)
+		IF (WIN32)
+			set(LAYOUT "home")
+		ELSEIF (APPLE)
+			set(LAYOUT "bundle")
+		ELSE (APPLE)
+			set(LAYOUT "fhs")
+		ENDIF (WIN32)
+	ENDIF (NOT LAYOUT)
 
-    SET(LAYOUT "${LAYOUT}" CACHE STRING "Directory layout.")
+	SET(LAYOUT "${LAYOUT}" CACHE STRING "Directory layout.")
 
-    IF (${LAYOUT} MATCHES "home")
-        SET_PATH( PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/plugins/ )
-        SET_PATH( DATA_DIR ${CMAKE_INSTALL_PREFIX} )
-        SET_PATH( MAN_DIR ${CMAKE_INSTALL_PREFIX}/man/man6 )
-        SET_PATH( BIN_DIR ${CMAKE_INSTALL_PREFIX} )
-        SET_PATH( SYSCONF_DIR ${CMAKE_INSTALL_PREFIX} )
-        SET_PATH( LIB_DIR ${CMAKE_INSTALL_PREFIX} )
-        SET_PATH( DOC_DIR ${CMAKE_INSTALL_PREFIX}/doc )
-        SET_PATH( ICON_DIR ${CMAKE_INSTALL_PREFIX} )
-        SET_PATH( SVG_DIR ${CMAKE_INSTALL_PREFIX} )
-        SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX} )
-        SET_PATH( EXAMPLE_CONF_DIR ${CMAKE_INSTALL_PREFIX} )
-        SET_PATH( METAINFO_DIR ${CMAKE_INSTALL_PREFIX} )
-    ELSEIF (${LAYOUT} MATCHES "fhs")
-        SET_PATH( LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIBDIR_SUFFIX}/gemrb )
-        SET_PATH( PLUGIN_DIR ${LIB_DIR}/plugins )
-        SET_PATH( DATA_DIR ${CMAKE_INSTALL_PREFIX}/share/gemrb )
-        SET_PATH( MAN_DIR ${CMAKE_INSTALL_PREFIX}/share/man/man6 )
-        SET_PATH( BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin )
-        IF(NOT SYSCONF_DIR)
-            IF(${CMAKE_INSTALL_PREFIX} STREQUAL "/usr")
-                SET_PATH(SYSCONF_DIR /etc/gemrb)
-            ELSE()
-                SET_PATH(SYSCONF_DIR ${CMAKE_INSTALL_PREFIX}/etc/gemrb)
-            ENDIF()
-        ENDIF()
-        SET_PATH( DOC_DIR ${CMAKE_INSTALL_PREFIX}/share/doc/gemrb )
-        SET_PATH( ICON_DIR ${CMAKE_INSTALL_PREFIX}/share/pixmaps )
-        SET_PATH( SVG_DIR ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps )
-        SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX}/share/applications )
-        SET_PATH( EXAMPLE_CONF_DIR ${SYSCONF_DIR} )
-        SET_PATH( METAINFO_DIR ${CMAKE_INSTALL_PREFIX}/share/metainfo )
-    ELSEIF (${LAYOUT} MATCHES "opt")
-        SET_PATH( LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIBDIR_SUFFIX} )
-        SET_PATH( PLUGIN_DIR ${LIB_DIR}/plugins )
-        SET_PATH( DATA_DIR ${CMAKE_INSTALL_PREFIX}/share/ )
-        SET_PATH( MAN_DIR ${CMAKE_INSTALL_PREFIX}/man/man6 )
-        SET_PATH( BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin )
-        SET_PATH( SYSCONF_DIR ${CMAKE_INSTALL_PREFIX}/etc )
-        SET_PATH( DOC_DIR ${CMAKE_INSTALL_PREFIX}/share/doc/gemrb )
-        SET_PATH( ICON_DIR ${CMAKE_INSTALL_PREFIX}/share/pixmaps )
-        SET_PATH( SVG_DIR ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps )
-        SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX}/share/applications )
-        SET_PATH( EXAMPLE_CONF_DIR ${SYSCONF_DIR} )
-        SET_PATH( METAINFO_DIR ${CMAKE_INSTALL_PREFIX}/share/metainfo )
-    ELSE (${LAYOUT} MATCHES "bundle") # Mac or iOS
-        SET(CMAKE_INSTALL_RPATH @loader_path/../Frameworks)
-        SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
-        SET_PATH( BIN_DIR /Applications )
-        SET_PATH( LIB_DIR @loader_path/../Frameworks )
-        SET_PATH( METAINFO_DIR "" )
-    ENDIF (${LAYOUT} MATCHES "home")
+	IF (${LAYOUT} MATCHES "home")
+		SET_PATH(PLUGIN_DIR ${CMAKE_INSTALL_PREFIX}/plugins/)
+		SET_PATH(DATA_DIR ${CMAKE_INSTALL_PREFIX})
+		SET_PATH(MAN_DIR ${CMAKE_INSTALL_PREFIX}/man/man6)
+		SET_PATH(BIN_DIR ${CMAKE_INSTALL_PREFIX})
+		SET_PATH(SYSCONF_DIR ${CMAKE_INSTALL_PREFIX})
+		SET_PATH(LIB_DIR ${CMAKE_INSTALL_PREFIX})
+		SET_PATH(DOC_DIR ${CMAKE_INSTALL_PREFIX}/doc)
+		SET_PATH(ICON_DIR ${CMAKE_INSTALL_PREFIX})
+		SET_PATH(SVG_DIR ${CMAKE_INSTALL_PREFIX})
+		SET_PATH(MENU_DIR ${CMAKE_INSTALL_PREFIX})
+		SET_PATH(EXAMPLE_CONF_DIR ${CMAKE_INSTALL_PREFIX})
+		SET_PATH(METAINFO_DIR ${CMAKE_INSTALL_PREFIX})
+	ELSEIF (${LAYOUT} MATCHES "fhs")
+		SET_PATH(LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIBDIR_SUFFIX}/gemrb)
+		SET_PATH(PLUGIN_DIR ${LIB_DIR}/plugins)
+		SET_PATH(DATA_DIR ${CMAKE_INSTALL_PREFIX}/share/gemrb)
+		SET_PATH(MAN_DIR ${CMAKE_INSTALL_PREFIX}/share/man/man6)
+		SET_PATH(BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
+		IF(NOT SYSCONF_DIR)
+			IF(${CMAKE_INSTALL_PREFIX} STREQUAL "/usr")
+				SET_PATH(SYSCONF_DIR /etc/gemrb)
+			ELSE()
+				SET_PATH(SYSCONF_DIR ${CMAKE_INSTALL_PREFIX}/etc/gemrb)
+			ENDIF()
+		ENDIF()
+		SET_PATH(DOC_DIR ${CMAKE_INSTALL_PREFIX}/share/doc/gemrb)
+		SET_PATH(ICON_DIR ${CMAKE_INSTALL_PREFIX}/share/pixmaps)
+		SET_PATH(SVG_DIR ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps)
+		SET_PATH(MENU_DIR ${CMAKE_INSTALL_PREFIX}/share/applications)
+		SET_PATH(EXAMPLE_CONF_DIR ${SYSCONF_DIR})
+		SET_PATH(METAINFO_DIR ${CMAKE_INSTALL_PREFIX}/share/metainfo)
+	ELSEIF (${LAYOUT} MATCHES "opt")
+		SET_PATH(LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIBDIR_SUFFIX})
+		SET_PATH(PLUGIN_DIR ${LIB_DIR}/plugins)
+		SET_PATH(DATA_DIR ${CMAKE_INSTALL_PREFIX}/share/)
+		SET_PATH(MAN_DIR ${CMAKE_INSTALL_PREFIX}/man/man6)
+		SET_PATH(BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
+		SET_PATH(SYSCONF_DIR ${CMAKE_INSTALL_PREFIX}/etc)
+		SET_PATH(DOC_DIR ${CMAKE_INSTALL_PREFIX}/share/doc/gemrb)
+		SET_PATH(ICON_DIR ${CMAKE_INSTALL_PREFIX}/share/pixmaps)
+		SET_PATH(SVG_DIR ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps)
+		SET_PATH(MENU_DIR ${CMAKE_INSTALL_PREFIX}/share/applications)
+		SET_PATH(EXAMPLE_CONF_DIR ${SYSCONF_DIR})
+		SET_PATH(METAINFO_DIR ${CMAKE_INSTALL_PREFIX}/share/metainfo)
+	ELSE (${LAYOUT} MATCHES "bundle") # Mac or iOS
+		SET(CMAKE_INSTALL_RPATH @loader_path/../Frameworks)
+		SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+		SET_PATH(BIN_DIR /Applications)
+		SET_PATH(LIB_DIR @loader_path/../Frameworks)
+		SET_PATH(METAINFO_DIR "")
+	ENDIF (${LAYOUT} MATCHES "home")
 ENDFUNCTION()
 
 FUNCTION(READ_GEMRB_VERSION)
-    # try to extract the version from the source
-    FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/core/InterfaceConfig.h GLOBALS)
-    SET(GEMRB_VERSION "")
-    STRING(REGEX MATCH "define VERSION_GEMRB .([^\"]*)" GEMRB_VERSION "${GLOBALS}")
-    STRING(REGEX REPLACE "define VERSION_GEMRB .([^\"]*)$" "\\1" GEMRB_VERSION "${GEMRB_VERSION}")
-    IF(GEMRB_VERSION STREQUAL "") # lookup failed
-        set(GEMRB_VERSION "unknown")
-    ENDIF()
-    message(STATUS "Detected version: ${GEMRB_VERSION}")
-    SET_INTERNAL(GEMRB_VERSION ${GEMRB_VERSION})
-    unset(GLOBALS)
+	# try to extract the version from the source
+	FILE(READ ${CMAKE_CURRENT_SOURCE_DIR}/gemrb/core/InterfaceConfig.h GLOBALS)
+	SET(GEMRB_VERSION "")
+	STRING(REGEX MATCH "define VERSION_GEMRB .([^\"]*)" GEMRB_VERSION "${GLOBALS}")
+	STRING(REGEX REPLACE "define VERSION_GEMRB .([^\"]*)$" "\\1" GEMRB_VERSION "${GEMRB_VERSION}")
+	IF(GEMRB_VERSION STREQUAL "") # lookup failed
+		set(GEMRB_VERSION "unknown")
+	ENDIF()
+	message(STATUS "Detected version: ${GEMRB_VERSION}")
+	SET_INTERNAL(GEMRB_VERSION ${GEMRB_VERSION})
+	unset(GLOBALS)
 ENDFUNCTION()
 
 FUNCTION(CACHE_BUILD_TYPE)
-    # If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
-    # and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
-    # to Release prior to calling PROJECT()
-    SET(BUILD_TYPE RelWithDebInfo)
-    SET(BUILD_TYPE_DESCRIPTION
-        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-    )
-    IF(DEFINED CMAKE_BUILD_TYPE)
-        SET(BUILD_TYPE ${CMAKE_BUILD_TYPE})
-    ENDIF()
+	# If the user specifies -DCMAKE_BUILD_TYPE on the command line, take their definition
+	# and dump it in the cache along with proper documentation, otherwise set CMAKE_BUILD_TYPE
+	# to Release prior to calling PROJECT()
+	SET(BUILD_TYPE RelWithDebInfo)
+	SET(BUILD_TYPE_DESCRIPTION
+		"Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+	)
+	IF(DEFINED CMAKE_BUILD_TYPE)
+		SET(BUILD_TYPE ${CMAKE_BUILD_TYPE})
+	ENDIF()
 
-    SET(CMAKE_BUILD_TYPE ${BUILD_TYPE} CACHE STRING ${BUILD_TYPE_DESCRIPTION})
+	SET(CMAKE_BUILD_TYPE ${BUILD_TYPE} CACHE STRING ${BUILD_TYPE_DESCRIPTION})
 ENDFUNCTION()
 
 FUNCTION(ENABLE_LINK_TIME_OPTIMIZATIONS)
-    include(CheckIPOSupported)
-    check_ipo_supported(RESULT supported)
+	include(CheckIPOSupported)
+	check_ipo_supported(RESULT supported)
 
-    IF(supported)
-        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE CACHE BOOL)
-    ENDIF()
+	IF(supported)
+		set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE CACHE BOOL)
+	ENDIF()
 ENDFUNCTION()
 
 FUNCTION(CHECK_IS_RELEASE_VERSION)
-    SET(RC "")
-    STRING(REGEX MATCH "-git$" RC ${GEMRB_VERSION})
-    IF(RC STREQUAL "")
-        SET(IS_RELEASE_VERSION 1)
-    ELSE()
-        SET(IS_RELEASE_VERSION 0)
-    ENDIF()
-    MESSAGE(STATUS "IS_RELEASE_VERSION: ${IS_RELEASE_VERSION}")
-    SET_INTERNAL(IS_RELEASE_VERSION ${IS_RELEASE_VERSION})
+	SET(RC "")
+	STRING(REGEX MATCH "-git$" RC ${GEMRB_VERSION})
+	IF(RC STREQUAL "")
+		SET(IS_RELEASE_VERSION 1)
+	ELSE()
+		SET(IS_RELEASE_VERSION 0)
+	ENDIF()
+	MESSAGE(STATUS "IS_RELEASE_VERSION: ${IS_RELEASE_VERSION}")
+	SET_INTERNAL(IS_RELEASE_VERSION ${IS_RELEASE_VERSION})
 ENDFUNCTION()
 
 FUNCTION(ADD_GEMRB_PLUGIN plugin_name)
@@ -500,184 +500,184 @@ endif()
 ENDMACRO(PRINT_OPTION)
 
 FUNCTION(CONFIGURE_APPLE_SPECIFICS)
-    # favor mac frameworks over unix libraries
-    SET(CMAKE_FIND_FRAMEWORK FIRST)
-    SET_INTERNAL(BAKE_ICON 0)
-    SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
-    # Make sure we can find the 'ibtool' program. we need it to compile xibs
-    FIND_PROGRAM(IBTOOL ibtool HINTS "/usr/bin" "${OSX_DEVELOPER_ROOT}/usr/bin")
-    IF (${IBTOOL} STREQUAL "IBTOOL-NOTFOUND")
-        MESSAGE (FATAL_ERROR "ibtool can not be found and is needed to compile the .xib files. It should have been installed with 
-                    the Apple developer tools. The default system paths were searched in addition to ${OSX_DEVELOPER_ROOT}/usr/bin")
-    ENDIF ()
-    ADD_DEFINITIONS("-x objective-c++")
-    INCLUDE_DIRECTORIES(platforms/apple)
-    FIND_LIBRARY(COCOA_LIBRARY_PATH Cocoa)
-    FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation)
-    # for objective-c++
-    STRING(APPEND CMAKE_CXX_FLAGS " -DTARGET_OS_MAC")
-    # for pure objective-c
-    STRING(APPEND CMAKE_C_FLAGS " -x objective-c -DTARGET_OS_MAC")
+	# favor mac frameworks over unix libraries
+	SET(CMAKE_FIND_FRAMEWORK FIRST)
+	SET_INTERNAL(BAKE_ICON 0)
+	SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum OS X deployment version")
+	# Make sure we can find the 'ibtool' program. we need it to compile xibs
+	FIND_PROGRAM(IBTOOL ibtool HINTS "/usr/bin" "${OSX_DEVELOPER_ROOT}/usr/bin")
+	IF (${IBTOOL} STREQUAL "IBTOOL-NOTFOUND")
+		MESSAGE (FATAL_ERROR "ibtool can not be found and is needed to compile the .xib files. It should have been installed with 
+					the Apple developer tools. The default system paths were searched in addition to ${OSX_DEVELOPER_ROOT}/usr/bin")
+	ENDIF ()
+	ADD_DEFINITIONS("-x objective-c++")
+	INCLUDE_DIRECTORIES(platforms/apple)
+	FIND_LIBRARY(COCOA_LIBRARY_PATH Cocoa)
+	FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation)
+	# for objective-c++
+	STRING(APPEND CMAKE_CXX_FLAGS " -DTARGET_OS_MAC")
+	# for pure objective-c
+	STRING(APPEND CMAKE_C_FLAGS " -x objective-c -DTARGET_OS_MAC")
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_VITA_SPECIFICS)
-    INCLUDE(platforms/vita/vita.cmake)
+	INCLUDE(platforms/vita/vita.cmake)
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_UNIX_SPECIFICS)
-    SET_INTERNAL(CMAKE_THREAD_PREFER_PTHREAD true)
+	SET_INTERNAL(CMAKE_THREAD_PREFER_PTHREAD true)
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_RPI_SPECIFICS)
-    # check for RaspberryPi
-    FIND_FILE(RPI NAMES bcm_host.h PATHS "/opt/vc/include")
-    # By default, Pi0 to Pi3 models use the legacy (Broadcom) GLESv2 drivers, from /opt/vc.
-    # Newer models (Pi4) don't support it, using the open source MESA drivers.
-    # NOTE: the Pi3B(+) models can also run with open source MESA drivers, but support for it must be explicitely enabled
-    IF(RPI AND NOT DISABLE_VIDEOCORE)
-        SET_INTERNAL(HINT_GLES_LIBNAME brcmGLESv2)
-        SET_INTERNAL(HINT_GLES_INCDIR "/opt/vc/include")
-        SET_INTERNAL(HINT_GLES_LIBDIR "/opt/vc/lib")
-        SET_INTERNAL(OPENGL_BACKEND GLES)
-        SET(SDL_BACKEND "SDL2" CACHE STRING ${SDL_BACKEND_DESCRIPTION} FORCE)
-    ENDIF()
+	# check for RaspberryPi
+	FIND_FILE(RPI NAMES bcm_host.h PATHS "/opt/vc/include")
+	# By default, Pi0 to Pi3 models use the legacy (Broadcom) GLESv2 drivers, from /opt/vc.
+	# Newer models (Pi4) don't support it, using the open source MESA drivers.
+	# NOTE: the Pi3B(+) models can also run with open source MESA drivers, but support for it must be explicitely enabled
+	IF(RPI AND NOT DISABLE_VIDEOCORE)
+		SET_INTERNAL(HINT_GLES_LIBNAME brcmGLESv2)
+		SET_INTERNAL(HINT_GLES_INCDIR "/opt/vc/include")
+		SET_INTERNAL(HINT_GLES_LIBDIR "/opt/vc/lib")
+		SET_INTERNAL(OPENGL_BACKEND GLES)
+		SET(SDL_BACKEND "SDL2" CACHE STRING ${SDL_BACKEND_DESCRIPTION} FORCE)
+	ENDIF()
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_TARGET_PLATFORM_SPECIFICS)
-    SET_INTERNAL(BAKE_ICON 1)
-    IF(APPLE)
-        CONFIGURE_APPLE_SPECIFICS()
-    ENDIF()
+	SET_INTERNAL(BAKE_ICON 1)
+	IF(APPLE)
+		CONFIGURE_APPLE_SPECIFICS()
+	ENDIF()
 
-    IF(VITA)
-        CONFIGURE_VITA_SPECIFICS()
-    ENDIF()
+	IF(VITA)
+		CONFIGURE_VITA_SPECIFICS()
+	ENDIF()
 
-    IF(UNIX)
-        CONFIGURE_UNIX_SPECIFICS()
-        CONFIGURE_RPI_SPECIFICS()
-    ENDIF()
+	IF(UNIX)
+		CONFIGURE_UNIX_SPECIFICS()
+		CONFIGURE_RPI_SPECIFICS()
+	ENDIF()
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_LINKING)
-    IF(STATIC_LINK)
-        IF(MSVC)
-            UNSET(STATIC_LINK CACHE)
-            MESSAGE(STATUS "Static linking not (yet) supported on this platform.")
-        ELSE()
-            ADD_DEFINITIONS("-DSTATIC_LINK")
-        ENDIF()
-    ELSE()
-        IF(NOT HAVE_DLFCN_H AND NOT WIN32)
-            MESSAGE(WARNING "Dynamic linking not supported by platform, switching to static!")
-            SET(STATIC_LINK 1 CACHE FORCE "")
-            ADD_DEFINITIONS("-DSTATIC_LINK")
-            LIST(FIND CMAKE_FIND_LIBRARY_SUFFIXES ".a" FOUND)
-            IF(NOT (FOUND EQUAL "-1"))
-                LIST(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-            ENDIF()
-        ENDIF()
-    ENDIF()
+	IF(STATIC_LINK)
+		IF(MSVC)
+			UNSET(STATIC_LINK CACHE)
+			MESSAGE(STATUS "Static linking not (yet) supported on this platform.")
+		ELSE()
+			ADD_DEFINITIONS("-DSTATIC_LINK")
+		ENDIF()
+	ELSE()
+		IF(NOT HAVE_DLFCN_H AND NOT WIN32)
+			MESSAGE(WARNING "Dynamic linking not supported by platform, switching to static!")
+			SET(STATIC_LINK 1 CACHE FORCE "")
+			ADD_DEFINITIONS("-DSTATIC_LINK")
+			LIST(FIND CMAKE_FIND_LIBRARY_SUFFIXES ".a" FOUND)
+			IF(NOT (FOUND EQUAL "-1"))
+				LIST(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+			ENDIF()
+		ENDIF()
+	ENDIF()
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_FMT_INCLUDES)
-    # supress static analysis of fmt
-    INCLUDE_DIRECTORIES(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/includes/fmt)
-    # ensure fmt gets included properly
-    ADD_DEFINITIONS("-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0")
+	# supress static analysis of fmt
+	INCLUDE_DIRECTORIES(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/includes/fmt)
+	# ensure fmt gets included properly
+	ADD_DEFINITIONS("-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0")
 ENDFUNCTION()
 
 FUNCTION(MAKE_UNINSTALL_TARGET)
-    CONFIGURE_FILE(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-        IMMEDIATE @ONLY
-    )
-    ADD_CUSTOM_TARGET(
-        uninstall "${CMAKE_COMMAND}"
-            -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    )
+	CONFIGURE_FILE(
+		"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+		"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+		IMMEDIATE @ONLY
+	)
+	ADD_CUSTOM_TARGET(
+		uninstall "${CMAKE_COMMAND}"
+			-P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+	)
 ENDFUNCTION()
 
 FUNCTION(MAKE_DIST_TARGET)
-    # make dist for a gzipped tarball of current HEAD
-    set(PKG_NAME ${CMAKE_PROJECT_NAME}-${GEMRB_VERSION})
-    ADD_CUSTOM_TARGET(dist
-        COMMAND
-            git archive --worktree-attributes --prefix=${PKG_NAME}/ -o ${PKG_NAME}.tar HEAD
-        COMMAND
-            tar --append -f ${PKG_NAME}.tar --transform="s,^,${PKG_NAME}/," demo/music
-        COMMAND
-            gzip --best -c ${PKG_NAME}.tar > ${CMAKE_BINARY_DIR}/${PKG_NAME}.tar.gz
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    )
+	# make dist for a gzipped tarball of current HEAD
+	set(PKG_NAME ${CMAKE_PROJECT_NAME}-${GEMRB_VERSION})
+	ADD_CUSTOM_TARGET(dist
+		COMMAND
+			git archive --worktree-attributes --prefix=${PKG_NAME}/ -o ${PKG_NAME}.tar HEAD
+		COMMAND
+			tar --append -f ${PKG_NAME}.tar --transform="s,^,${PKG_NAME}/," demo/music
+		COMMAND
+			gzip --best -c ${PKG_NAME}.tar > ${CMAKE_BINARY_DIR}/${PKG_NAME}.tar.gz
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	)
 
-    # include fetch_demo_data files manually, since they're not part of the repo
-    ADD_CUSTOM_TARGET(fetch-demo-data
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake/fetch_demo_data.cmake
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/demo
-    )
-    ADD_DEPENDENCIES(dist fetch-demo-data)
+	# include fetch_demo_data files manually, since they're not part of the repo
+	ADD_CUSTOM_TARGET(fetch-demo-data
+		COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake/fetch_demo_data.cmake
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/demo
+	)
+	ADD_DEPENDENCIES(dist fetch-demo-data)
 ENDFUNCTION()
 
 FUNCTION(MAKE_APPIMAGE_TARGET)
-    SET(SHARE "AppDir/usr/share")
-    ADD_CUSTOM_TARGET(appimage
-        COMMAND
-            rm -rf ./AppDir GemRB-*-x86_64.AppImage
-        COMMAND
-            make install DESTDIR=./AppDir
-        COMMAND
-            mv AppDir/usr/usr/share/gemrb ${SHARE}/ || true # not always needed
-        COMMAND
-            sed -i 's,X-AppImage-Version.*,X-AppImage-Version='`date +%F`-$ENV{GITHUB_SHA}',' ${SHARE}/applications/gemrb.desktop
-        # bundle core python modules
-        # AppRun defaults PYTHONPATH to this destination
-        # source is probably available in Python3_STDLIB once we switch to newer cmake
-        COMMAND
-            mkdir -p ${SHARE}/pyshared
-        COMMAND
-            cp -r /usr/lib/python3.8/* ${SHARE}/pyshared
-        COMMAND
-            rm -rf ${SHARE}/pyshared/config-*x86_64-linux-gnu
-        COMMAND
-            rm -rf ${SHARE}/pyshared/dist-packages
-        COMMAND
-            rm -rf ${SHARE}/pyshared/test
-        COMMAND
-            rm -rf ${SHARE}/pyshared/pydoc_data
-        COMMAND
-            rm -rf ${SHARE}/pyshared/lib2to3
-        COMMAND
-            rm -rf ${SHARE}/pyshared/config-3*/libpython3*.a
-        COMMAND
-            LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage --custom-apprun="${CMAKE_CURRENT_SOURCE_DIR}/platforms/linux/AppRun.sh"
-        WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
-    )
+	SET(SHARE "AppDir/usr/share")
+	ADD_CUSTOM_TARGET(appimage
+		COMMAND
+			rm -rf ./AppDir GemRB-*-x86_64.AppImage
+		COMMAND
+			make install DESTDIR=./AppDir
+		COMMAND
+			mv AppDir/usr/usr/share/gemrb ${SHARE}/ || true # not always needed
+		COMMAND
+			sed -i 's,X-AppImage-Version.*,X-AppImage-Version='`date +%F`-$ENV{GITHUB_SHA}',' ${SHARE}/applications/gemrb.desktop
+		# bundle core python modules
+		# AppRun defaults PYTHONPATH to this destination
+		# source is probably available in Python3_STDLIB once we switch to newer cmake
+		COMMAND
+			mkdir -p ${SHARE}/pyshared
+		COMMAND
+			cp -r /usr/lib/python3.8/* ${SHARE}/pyshared
+		COMMAND
+			rm -rf ${SHARE}/pyshared/config-*x86_64-linux-gnu
+		COMMAND
+			rm -rf ${SHARE}/pyshared/dist-packages
+		COMMAND
+			rm -rf ${SHARE}/pyshared/test
+		COMMAND
+			rm -rf ${SHARE}/pyshared/pydoc_data
+		COMMAND
+			rm -rf ${SHARE}/pyshared/lib2to3
+		COMMAND
+			rm -rf ${SHARE}/pyshared/config-3*/libpython3*.a
+		COMMAND
+			LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage --custom-apprun="${CMAKE_CURRENT_SOURCE_DIR}/platforms/linux/AppRun.sh"
+		WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
+	)
 ENDFUNCTION()
 
 FUNCTION(INSTALL_APP_RESOURCES)
 
-    CONFIGURE_FILE(
-        "${CMAKE_CURRENT_SOURCE_DIR}/gemrb.6.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/gemrb.6"
-        IMMEDIATE @ONLY
-    )
+	CONFIGURE_FILE(
+		"${CMAKE_CURRENT_SOURCE_DIR}/gemrb.6.in"
+		"${CMAKE_CURRENT_BINARY_DIR}/gemrb.6"
+		IMMEDIATE @ONLY
+	)
 
-    IF (NOT APPLE)
-        INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/gemrb.6" DESTINATION ${MAN_DIR})
-        IF (NOT HAIKU)
-            SET(ARTWORK_PATH ${CMAKE_SOURCE_DIR}/artwork)
-            SET(LINUX_PATH ${CMAKE_SOURCE_DIR}/platforms/linux)
-            SET(ADMIN_PATH ${CMAKE_SOURCE_DIR}/admin)
+	IF (NOT APPLE)
+		INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/gemrb.6" DESTINATION ${MAN_DIR})
+		IF (NOT HAIKU)
+			SET(ARTWORK_PATH ${CMAKE_SOURCE_DIR}/artwork)
+			SET(LINUX_PATH ${CMAKE_SOURCE_DIR}/platforms/linux)
+			SET(ADMIN_PATH ${CMAKE_SOURCE_DIR}/admin)
 
-            INSTALL(FILES ${ARTWORK_PATH}/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME gemrb.png)
-            INSTALL(FILES ${ARTWORK_PATH}/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME gemrb.svg)
-            INSTALL(FILES ${LINUX_PATH}/gemrb.desktop DESTINATION ${MENU_DIR})
-            INSTALL(FILES ${LINUX_PATH}/org.gemrb.gemrb.metainfo.xml DESTINATION ${METAINFO_DIR})
-        ENDIF()
-        INSTALL(FILES ${CMAKE_SOURCE_DIR}/README.md INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR} )
-        INSTALL(FILES ${ADMIN_PATH}/extend2da.py DESTINATION ${BIN_DIR}
-            PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-    ENDIF()
+			INSTALL(FILES ${ARTWORK_PATH}/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME gemrb.png)
+			INSTALL(FILES ${ARTWORK_PATH}/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME gemrb.svg)
+			INSTALL(FILES ${LINUX_PATH}/gemrb.desktop DESTINATION ${MENU_DIR})
+			INSTALL(FILES ${LINUX_PATH}/org.gemrb.gemrb.metainfo.xml DESTINATION ${METAINFO_DIR})
+		ENDIF()
+		INSTALL(FILES ${CMAKE_SOURCE_DIR}/README.md INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR})
+		INSTALL(FILES ${ADMIN_PATH}/extend2da.py DESTINATION ${BIN_DIR}
+			PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+	ENDIF()
 ENDFUNCTION()
