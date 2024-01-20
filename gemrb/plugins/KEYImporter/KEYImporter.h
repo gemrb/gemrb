@@ -60,7 +60,7 @@ struct MapKey {
 
 struct MapKeyHash {
 	size_t operator()(const MapKey& key) const {
-		size_t h{key.type};
+		uint64_t h{key.type};
 		
 		for (const char c : key.ref)
 		{
