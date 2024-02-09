@@ -493,7 +493,13 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 				if(flags&DS_NONAME) {
 					displaymsg->DisplayString(sb.text);
 				} else {
-					displaymsg->DisplayStringName(Strref, GUIColors::WHITE, Sender, STRING_FLAGS::NONE);
+					// Default color is white, color for party is different.
+					Actor* actor = Scriptable::As<Actor>(Sender);
+					auto color = GUIColors::MSG;
+					if (actor && actor->InParty) {
+						color = GUIColors::MSGPARTY;
+					}
+					displaymsg->DisplayStringName(Strref, color, Sender, STRING_FLAGS::NONE);
 				}
 			}
 			if (flags & (DS_HEAD | DS_AREA)) {

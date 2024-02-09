@@ -63,6 +63,8 @@ enum class GUIColors : uint8_t {
 	FLOAT_TXT_OTHER,
 	TRAPCOLOR,
 	HOVERTARGETABLE,
+	MSG,       // non-dialog actor console messages: existence sounds, etc.
+	MSGPARTY,  // non-dialog party characters console messages: selection subtitles, etc.
 
 	count
 };

@@ -169,12 +169,15 @@ Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&speaker) 
 	Color speaker_color {0x80, 0, 0, 0xff};
 	// NOTE: name color was hardcoded to a limited list in the originals;
 	// the 1PP mod tackled this restriction by altering the exe to use a bigger list.
-	// We just generate a colour by looking at the existing palette instead.
+	// We used to generate a colour by looking at the existing palette instead.
+	// That proved to be inconvenient in-game when many characters are stoneskinned and all get the same color;
+	// also dynamic name colors do not have any real use, they just add confusion.
+	// Current implementation is the same as the original: use the character's major color.
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = Scriptable::As<Actor>(speaker)->GetDefaultName();
 			{
-				auto pal16 = core->GetPalette16(((const Actor *) speaker)->GetStat(IE_MAJOR_COLOR));
+				auto pal16 = core->GetPalette16(((const Actor *) speaker)->GetBase(IE_MAJOR_COLOR));
 				// cmleat4 from dark horizons sets all the colors to pitch black, so work around too dark results
 				if (pal16[4].r + pal16[4].g + pal16[4].b < 75) {
 					pal16[4].r = 75;
