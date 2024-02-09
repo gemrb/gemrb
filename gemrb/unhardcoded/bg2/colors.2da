@@ -22,8 +22,8 @@ FLOAT_TXT_INFO			0xf0f0f0ff
 FLOAT_TXT_OTHER			0xf0f0f0ff
 TRAPCOLOR			0xff0000ff
 HOVERTARGETABLE			0x00ff00ff
-CONSOLE			0xf0f0f0ff
-CONSOLE_PARTY		0x97bccbff
+MSG			0xf0f0f0ff
+MSG_PARTY		0x97bccbff
 
 # To add a new color apart of adding it here you must add also the following changes:
 # On the file DisplayMessage.h put the name of the color at the end of the enum.

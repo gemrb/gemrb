@@ -495,9 +495,9 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 				} else {
 					// Default color is white, color for party is different.
 					Actor* actor = Scriptable::As<Actor>(Sender);
-					auto color = GUIColors::CONSOLE;
+					auto color = GUIColors::MSG;
 					if (actor && actor->InParty) {
-						color = GUIColors::CONSOLEPARTY;
+						color = GUIColors::MSGPARTY;
 					}
 					displaymsg->DisplayStringName(Strref, color, Sender, STRING_FLAGS::NONE);
 				}
