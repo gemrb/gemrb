@@ -21,7 +21,7 @@ void main() {
 	color.rgb += (u_brightness-1.0);
 	// Originals call the second parameter "Contrast" in UI and "Gamma Correction" in inis.
 	// Looks like it's neither, just a multiplicator to brightness.
-	color.rgb = color.rgb *= u_contrast;
+	color.rgb *= u_contrast;
 
 	// Limit to 1.0
 	color.rgb = clamp(color.rgb, 0.0, 1.0);
