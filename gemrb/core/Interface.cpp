@@ -388,8 +388,8 @@ Interface::Interface(CoreSettings&& cfg)
 	// we also need the display to exist to create sprites using the display format
 	ieDword fullscreen = vars.Get("Full Screen", 0);
 	// Brightness and contrast are specified in gem-INICONFIG, so display must be initialized after reading it.
-	ieDword brightness = vars.Get("Brightness Correction", 10);
-	ieDword contrast = vars.Get("Gamma Correction", 5);
+	ieDword brightness = vars.Get("Brightness Correction", 0);
+	ieDword contrast = vars.Get("Gamma Correction", 0);
 
 	int createDisplayResult =
 	VideoDriver->CreateDisplay(
