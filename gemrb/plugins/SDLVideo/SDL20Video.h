@@ -222,6 +222,8 @@ private:
 	SDL_GameController* gameController = nullptr;
 
 	GLSLProgram* blitRGBAShader = nullptr;
+	float brightness = 1.0;
+	float contrast = 1.0;
 public:
 	SDL20VideoDriver() noexcept;
 	~SDL20VideoDriver() noexcept override;

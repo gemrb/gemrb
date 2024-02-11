@@ -11,9 +11,12 @@ uniform int u_channel;
 uniform int u_stencil;
 uniform int u_dither;
 uniform int u_rgba;
+uniform float u_brightness;
 
 void main() {
 	vec4 color = texture2D(s_sprite, v_texCoord) * v_color;
+	color.rgb *= u_brightness; // Apply brightness control
+
 	gl_FragColor = color;
 	if (u_rgba == 0) {
 		gl_FragColor.a = 1.0;
