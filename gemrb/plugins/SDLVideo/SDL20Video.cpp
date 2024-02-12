@@ -473,8 +473,8 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 
 	blitRGBAShader->SetUniformValue("u_greyMode", 1, greyMode);
 
-	blitRGBAShader->SetUniformValue("u_brightness", 1, this->brightness);
-	blitRGBAShader->SetUniformValue("u_contrast", 1, this->contrast);
+	blitRGBAShader->SetUniformValue("u_brightness", 1, brightness);
+	blitRGBAShader->SetUniformValue("u_contrast", 1, contrast);
 
 	GLint channel = 3;
 	if (flags & BlitFlags::STENCIL_RED) {
