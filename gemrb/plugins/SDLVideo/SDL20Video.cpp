@@ -1012,10 +1012,10 @@ bool SDL20VideoDriver::CanDrawRawGeometry() const {
 #endif
 }
 
-void SDL20VideoDriver::SetGamma(int new_brightness, int new_contrast)
+void SDL20VideoDriver::SetGamma(int newBrightness, int newContrast)
 {
-	this->brightness = 1.0 + (float)new_brightness*0.0015;
-	this->contrast = 1.0 + (float)new_contrast*0.05;
+	brightness = 1.0 + (float)newBrightness*0.0015;
+	contrast = 1.0 + (float)newContrast*0.05;
 }
 
 bool SDL20VideoDriver::SetFullscreenMode(bool set)
