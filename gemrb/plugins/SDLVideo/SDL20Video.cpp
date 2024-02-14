@@ -285,6 +285,8 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	blitRGBAShader->SetUniformValue("u_stencil", 1, 0);
 	blitRGBAShader->SetUniformValue("u_dither", 1, 0);
 	blitRGBAShader->SetUniformValue("u_rgba", 1, 1);
+	blitRGBAShader->SetUniformValue("u_brightness", 1, 1);
+	blitRGBAShader->SetUniformValue("u_contrast", 1, 1);
 #endif
 
 	SDL_SetRenderTarget(renderer, NULL);
@@ -470,6 +472,9 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	}
 
 	blitRGBAShader->SetUniformValue("u_greyMode", 1, greyMode);
+
+	blitRGBAShader->SetUniformValue("u_brightness", 1, brightness);
+	blitRGBAShader->SetUniformValue("u_contrast", 1, contrast);
 
 	GLint channel = 3;
 	if (flags & BlitFlags::STENCIL_RED) {
@@ -1007,11 +1012,11 @@ bool SDL20VideoDriver::CanDrawRawGeometry() const {
 #endif
 }
 
-void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)
+void SDL20VideoDriver::SetGamma(int newBrightness, int newContrast)
 {
-	// FIXME: hardcoded hack. in in Interface our default brigtness value is 10
-	// so we assume that to be "normal" (1.0) value.
-	SDL_SetWindowBrightness(window, (float)brightness/10.0);
+	// Steps chosen empirically to give ranges close to originals.
+	brightness = 1.0 + (float)newBrightness * 0.0015;
+	contrast = 1.0 + (float)newContrast * 0.05;
 }
 
 bool SDL20VideoDriver::SetFullscreenMode(bool set)

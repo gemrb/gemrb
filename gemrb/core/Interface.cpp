@@ -258,9 +258,6 @@ Interface::Interface(CoreSettings&& cfg)
 	Control::ActionRepeatDelay = config.ActionRepeatDelay;
 	GameControl::DebugFlags = config.DebugFlags;
 
-	ieDword brightness = vars.Get("Brightness Correction", 10);
-	ieDword contrast = vars.Get("Gamma Correction", 5);
-
 	Log(MESSAGE, "Core", "Initializing search path...");
 	if (!IsAvailable(PLUGIN_RESOURCE_DIRECTORY)) {
 		throw CIE("no DirectoryImporter!");
@@ -368,24 +365,6 @@ Interface::Interface(CoreSettings&& cfg)
 	Log(MESSAGE, "Core", "Reading Game Options...");
 	LoadGemRBINI();
 
-	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
-	// we also need the display to exist to create sprites using the display format
-	ieDword fullscreen = vars.Get("Full Screen", 0);
-
-	int createDisplayResult =
-	VideoDriver->CreateDisplay(
-				Size(config.Width, config.Height),
-				config.Bpp,
-				fullscreen,
-				config.GameName.c_str(),
-				config.CapFPS == 0
-		);
-
-	if (createDisplayResult == GEM_ERROR) {
-		throw CIE("Cannot initialize shaders.");
-	}
-	VideoDriver->SetGamma(brightness, contrast);
-
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
 	// read from our version of the config if it is present
 	path_t gemrbINI = "gem-" + INIConfig;
@@ -404,6 +383,27 @@ Interface::Interface(CoreSettings&& cfg)
 	if (!InitializeVarsWithINI(ini_path)) {
 		Log(WARNING, "Core", "Unable to set dictionary default values!");
 	}
+
+	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
+	// we also need the display to exist to create sprites using the display format
+	ieDword fullscreen = vars.Get("Full Screen", 0);
+	// Brightness and contrast are specified in gem-INICONFIG, so display must be initialized after reading it.
+	ieDword brightness = vars.Get("Brightness Correction", 0);
+	ieDword contrast = vars.Get("Gamma Correction", 0);
+
+	int createDisplayResult =
+	VideoDriver->CreateDisplay(
+				Size(config.Width, config.Height),
+				config.Bpp,
+				fullscreen,
+				config.GameName.c_str(),
+				config.CapFPS == 0
+		);
+
+	if (createDisplayResult == GEM_ERROR) {
+		throw CIE("Cannot initialize shaders.");
+	}
+	VideoDriver->SetGamma(brightness, contrast);
 
 	// We use this for the game's state exclusively
 	ieDword maxRefreshRate = vars.Get("Maximum Frame Rate", 30);

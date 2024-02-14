@@ -11,9 +11,26 @@ uniform int u_channel;
 uniform int u_stencil;
 uniform int u_dither;
 uniform int u_rgba;
+uniform float u_brightness;
+uniform float u_contrast;
 
 void main() {
 	vec4 color = texture2D(s_sprite, v_texCoord) * v_color;
+
+	// Additive Brightness
+	color.rgb += (u_brightness-1.0);
+	// Originals call the second parameter "Contrast" in UI and "Gamma Correction" in inis.
+	// Looks like it's neither, just a multiplicator to brightness.
+	color.rgb *= u_contrast;
+
+	// Limit to 1.0
+	color.rgb = clamp(color.rgb, 0.0, 1.0);
+
+	// Actual gamma correction example.
+//	color.rgb = pow(color.rgb, vec3(1.0 / u_contrast));
+	// Actual contrast correction example.
+//	color.rgb = ((color.rgb - 0.5) * max(u_contrast, 0.0)) + 0.5;
+
 	gl_FragColor = color;
 	if (u_rgba == 0) {
 		gl_FragColor.a = 1.0;
