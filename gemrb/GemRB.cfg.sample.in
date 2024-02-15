@@ -54,9 +54,6 @@ Height=480
 # Bits per pixel [Integer:16,32]
 Bpp=32
 
-# Fullscreen [Boolean]
-Fullscreen=0
-
 # Cap FPS, 0 = request VSync (SDL2 only, default), -1 = no limit, 30+ = cap value
 #CapFPS=0
 

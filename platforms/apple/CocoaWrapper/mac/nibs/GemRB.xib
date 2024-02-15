@@ -513,17 +513,6 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="990">
-                                    <rect key="frame" x="15" y="94" width="80" height="18"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="Full Screen" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="991">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <binding destination="882" name="value" keyPath="values.Fullscreen" id="993"/>
-                                    </connections>
-                                </button>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1140">
                                     <rect key="frame" x="15" y="22" width="92" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>

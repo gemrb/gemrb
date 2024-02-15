@@ -85,9 +85,6 @@ NumFingInfo=2
 #Bits per pixel [Integer:16,32]
 Bpp=32
 
-#Fullscreen [Boolean]
-Fullscreen=1
-
 #####################################################
 #  Paths                                            #
 #####################################################
