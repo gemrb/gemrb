@@ -19,6 +19,7 @@
 #this is essentially Start.py from the SoA game, except for a very small change
 import GemRB
 import GameCheck
+from StartFix import ShiftWindow
 
 def OnLoad():
 	StartWindow = GemRB.LoadWindow (0, "START")
@@ -33,6 +34,12 @@ def OnLoad():
 	MultiPlayerButton = StartWindow.GetControl (1)
 	MoviesButton = StartWindow.GetControl (2)
 	BackButton = StartWindow.GetControl (5)
+
+	# Fix misaligned buttons, see https://github.com/gemrb/gemrb/issues/1991.
+	ShiftWindow(MoviesButton, -1, 0)
+	ShiftWindow(OptionsButton, -1, 0)
+	ShiftWindow(MultiPlayerButton, -1, 0)
+
 	Label = StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label.SetText (GemRB.Version)
 	if GameCheck.HasTOB():
@@ -187,6 +194,10 @@ def ExitPress():
 	QuitTextArea = QuitWindow.GetControl (0)
 	CancelButton = QuitWindow.GetControl (2)
 	ConfirmButton = QuitWindow.GetControl (1)
+
+	# Fix misaligned buttons, see https://github.com/gemrb/gemrb/issues/1991.
+	ShiftWindow(CancelButton, -1, 0)
+
 	QuitTextArea.SetText (19532)
 	CancelButton.SetText (13727)
 	ConfirmButton.SetText (15417)

@@ -18,6 +18,7 @@
 #
 import GemRB
 import GUIOPT
+from StartFix import ShiftWindow
 
 OptionsWindow = 0
 
@@ -28,6 +29,12 @@ def OnLoad():
 	GameButton = OptionsWindow.GetControl(9)
 	GraphicButton = OptionsWindow.GetControl(7)
 	BackButton = OptionsWindow.GetControl(11)
+
+	# Fix misaligned buttons, see https://github.com/gemrb/gemrb/issues/1991.
+	ShiftWindow(GameButton, -1, 0)
+	ShiftWindow(GraphicButton, -1, 0)
+	ShiftWindow(BackButton, -1, 0)
+
 	SoundButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	GameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	GraphicButton.SetStatus(IE_GUI_BUTTON_ENABLED)
