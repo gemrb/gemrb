@@ -150,9 +150,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 				break;
 		}
 		if (Image) {
-			// FIXME: maybe it's useless...
-			Point offset((frame.w / 2) - (Image->Frame.w / 2), (frame.h / 2) - (Image->Frame.h / 2));
-			VideoDriver->BlitSprite(Image, rgn.origin + offset);
+			VideoDriver->BlitSprite(Image, rgn.origin);
 		}
 	}
 
@@ -673,11 +671,7 @@ bool Button::HitTest(const Point& p) const
 		// some buttons in BG2 are text only (if BAM == 'GUICTRL')
 		Holder<Sprite2D> Unpressed = buttonImages[ButtonImage::Unpressed];
 		if (Picture || !PictureList.empty() || !Unpressed) return true;
-
-		Point off;
-		off.x = (frame.w / 2) - (Unpressed->Frame.w / 2) + Unpressed->Frame.x;
-		off.y = (frame.h / 2) - (Unpressed->Frame.h / 2) + Unpressed->Frame.y;
-		hit = !Unpressed->IsPixelTransparent(p - off);
+		hit = !Unpressed->IsPixelTransparent(p);
 	}
 	return hit;
 }
