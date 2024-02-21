@@ -6096,7 +6096,8 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			sca->Pos = fx->Pos;
 		}
 	} else {
-		sca->Pos = target->Pos;
+		// add also its offset, so drawing order is ok (eg. with stoneskin)
+		sca->Pos = target->Pos + Point(sca->XOffset, sca->YOffset);
 	}
 	sca->PlayOnce();
 	map->AddVVCell(sca);
