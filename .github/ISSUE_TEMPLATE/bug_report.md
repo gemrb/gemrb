@@ -44,5 +44,5 @@ GemRB version (check as many as you know apply)
 
 Video Driver (check as many as you know apply)
 - [ ] SDL1.2
-- [ ] SDL2 built with `USE_OPENGL_BACKEND`
-- [ ] SDL2 without `USE_OPENGL_BACKEND`
+- [ ] SDL2 built with `OPENGL_BACKEND` enabled
+- [ ] SDL2 without `OPENGL_BACKEND` enabled
