@@ -18,12 +18,17 @@
 #
 import GemRB
 import GUIOPT
+import GameCheck
 
 OptionsWindow = 0
 
 def OnLoad():
 	global OptionsWindow
 	OptionsWindow = GemRB.LoadWindow(13, "GUIOPT")
+	if GameCheck.HasTOB() and GemRB.GetVar("oldgame") == 1:
+		OptionsWindow.SetBackground("STARTOLD")
+	Label = OptionsWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
+	Label.SetText (GemRB.Version)
 	SoundButton = OptionsWindow.GetControl(8)
 	GameButton = OptionsWindow.GetControl(9)
 	GraphicButton = OptionsWindow.GetControl(7)
