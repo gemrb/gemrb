@@ -300,11 +300,7 @@ def OpenGameplayOptionsWindow ():
 
 def DisplayHelpTooltipDelay ():
 	GemRB.GetView ("OPTHELP").SetText (18017)
-	delay_var = GemRB.GetVar ("Tooltips")
-	# BG2 disables tooltips on max setting, we just set it to an extremely high value for simplicity
-	if delay_var == 100:
-		delay_var = 10000000
-	GemRB.SetTooltipDelay (delay_var * TOOLTIP_DELAY_FACTOR//10)
+	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") * TOOLTIP_DELAY_FACTOR//10)
 
 def DisplayHelpMouseScrollingSpeed ():
 	GemRB.GetView ("OPTHELP").SetText (18018)
