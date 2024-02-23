@@ -5590,7 +5590,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//The protagonist is ALWAYS in the first slot
-	if (game->GetPC(0, false)!=target) {
+	if (game->protagonist != PM_TEAM && game->GetPC(0, false) != target) {
 		displaymsg->DisplayConstantStringName(HCStrings::FamiliarProtagonistOnly, GUIColors::RED, target);
 		return FX_NOT_APPLIED;
 	}
