@@ -2627,7 +2627,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 		}
 
 		//trap scripts are triggered by SetDoorOpen
-		door->SetDoorOpen(!door->IsOpen(), false, actor->GetGlobalID());
+		door->SetDoorOpen(!door->IsOpen(), true, actor->GetGlobalID());
 	} else {
 		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE,0);
 		return;
