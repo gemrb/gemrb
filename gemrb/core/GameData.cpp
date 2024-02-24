@@ -314,7 +314,7 @@ Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int fra
 
 Holder<Sprite2D> GameData::GetAnySprite(const ResRef& resRef, int cycle, int frame, bool silent)
 {
-	Holder<Sprite2D> img = GetBAMSprite(ResRef(resRef), cycle, frame, silent);
+	Holder<Sprite2D> img = GetBAMSprite(resRef, cycle, frame, silent);
 	if (img) return img;
 
 	// try static image formats to support PNG

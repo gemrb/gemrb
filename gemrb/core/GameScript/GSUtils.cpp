@@ -668,7 +668,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 		item = new CREItem();
 
 		if (count <= 0) count = 1;
-		if (!GetItemContainer(*item, myinv, ResRef(resref), count)) {
+		if (!GetItemContainer(*item, myinv, resref, count)) {
 			delete item;
 			item = NULL;
 		}
