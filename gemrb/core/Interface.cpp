@@ -1376,7 +1376,8 @@ static const EnumArray<GFFlags, StringView> game_flags {
 	"LayeredWaterTiles", // GFFlags::LAYERED_WATER_TILES
 	"ClearingActionOverride", // GFFlags::CLEARING_ACTIONOVERRIDE
 	"DamageInnocentRep", // GFFlags::DAMAGE_INNOCENT_REP
-	"HasWeaponSets" // GFFlags::GF_HAS_WEAPON_SETS
+	"HasWeaponSets", // GFFlags::GF_HAS_WEAPON_SETS
+	"HighlightOutlineOnly", // GFFlags::HIGHLIGHT_OUTLINE_ONLY
 };
 
 /** Loads gemrb.ini */
