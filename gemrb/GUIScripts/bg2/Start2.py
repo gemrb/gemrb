@@ -44,11 +44,11 @@ def OnLoad():
 	SinglePlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 	ExitButton.SetState (IE_GUI_BUTTON_ENABLED)
 	OptionsButton.SetState (IE_GUI_BUTTON_ENABLED)
+
+	MultiPlayerButton.SetState (IE_GUI_BUTTON_DISABLED)
 	if GameCheck.IsBG2Demo():
-		MultiPlayerButton.SetState (IE_GUI_BUTTON_DISABLED)
 		MoviesButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
-		MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 		MultiPlayerButton.SetText (15414)
 		MultiPlayerButton.OnPress (MultiPlayerPress)
 
@@ -103,31 +103,6 @@ def SinglePlayerPress():
 	return
 
 def MultiPlayerPress():
-
-	OptionsButton.SetText ("")
-	SinglePlayerButton.SetText (20642)
-	ExitButton.SetText (15416)
-	MultiPlayerButton.SetText ("")
-	MoviesButton.SetText (11825)
-	MultiPlayerButton.OnPress (None)
-	SinglePlayerButton.OnPress (ConnectPress)
-	MoviesButton.OnPress (PregenPress)
-	ExitButton.OnPress (Restart)
-	MultiPlayerButton.SetState (IE_GUI_BUTTON_DISABLED)
-	OptionsButton.SetState (IE_GUI_BUTTON_DISABLED)
-	return
-
-def ConnectPress():
-#well...
-	#GemRB.SetVar("PlayMode",2)
-	return
-
-def PregenPress():
-	#do not start game after chargen
-	GemRB.SetVar("PlayMode",-1) #will allow export
-	GemRB.SetVar("Slot",1)
-	GemRB.LoadGame(None)
-	GemRB.SetNextScript ("CharGen")
 	return
 
 def LoadSingle():
