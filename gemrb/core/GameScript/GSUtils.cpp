@@ -475,7 +475,9 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 	// PST does not echo verbal constants in the console, their strings
 	// actually contain development related identifying comments
 	// thus the console flag is unset.
-	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) || !charactersubtitles) {
+	// The console flag is also unset when we get a string from an ACTOR without
+	// subtitles enabled, but e.g. AREA strings should still be displayed.
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) || (Sender->Type == ST_ACTOR && !charactersubtitles)) {
 		flags &= ~DS_CONSOLE;
 	}
 

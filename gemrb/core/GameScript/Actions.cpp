@@ -1725,11 +1725,13 @@ void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 	if (!target) {
 		target=Sender;
 	}
-	if (Sender->Type==ST_ACTOR) {
-		DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_CONSOLE);
-	} else {
-		DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_AREA);
-	}
+
+	int flags = DS_CONSOLE;
+
+	if (Sender->Type != ST_ACTOR)
+		flags |= DS_AREA;
+
+	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), flags);
 }
 
 //DisplayStringHead, but wait until done
