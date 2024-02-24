@@ -1728,8 +1728,9 @@ void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 
 	int flags = DS_CONSOLE;
 
-	if (Sender->Type != ST_ACTOR)
+	if (Sender->Type != ST_ACTOR) {
 		flags |= DS_AREA;
+	}
 
 	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), flags);
 }
