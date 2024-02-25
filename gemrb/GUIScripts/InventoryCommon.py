@@ -708,6 +708,9 @@ def UpdateSlot (pc, slot):
 		if SlotType["ID"] == 10 and using_fists:
 			Button.OnPress (None)
 			#dropping is ok, because it will drop in the quick weapon slot and not the default weapon slot.
+		# pst shows the inventory-bag icon bg behind items
+		if GameCheck.IsPST ():
+			Button.SetSprites ("IVSLOT", 0, 0, 0, 0, 0)
 	else:
 		if SlotType["ResRef"]=="*":
 			Button.SetBAM ("",0,0)
