@@ -1727,11 +1727,17 @@ void Highlightable::DrawOutline(Point origin) const
 	}
 	origin = outline->BBox.origin - origin;
 
-	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
-		VideoDriver->DrawPolygon(outline.get(), origin, outlineColor, true, BlitFlags::MOD | BlitFlags::HALFTRANS);
-	} else {
-		VideoDriver->DrawPolygon( outline.get(), origin, outlineColor, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS );
-		VideoDriver->DrawPolygon( outline.get(), origin, outlineColor, false );
+	bool highlightOutlineOnly = core->HasFeature(GFFlags::HIGHLIGHT_OUTLINE_ONLY);
+	bool pstStateFlags = core->HasFeature(GFFlags::PST_STATE_FLAGS);
+
+	if (!highlightOutlineOnly) {
+		BlitFlags flag = BlitFlags::HALFTRANS | (pstStateFlags ? BlitFlags::MOD : BlitFlags::BLENDED);
+
+		VideoDriver->DrawPolygon(outline.get(), origin, outlineColor, true, flag);
+	}
+
+	if (highlightOutlineOnly || !pstStateFlags) {
+		VideoDriver->DrawPolygon(outline.get(), origin, outlineColor, false);
 	}
 }
 

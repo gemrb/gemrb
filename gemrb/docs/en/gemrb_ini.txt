@@ -373,6 +373,13 @@ HasWeaponSets = <bool>
 Does the game support several weapon sets, shield slots like iwd2?
 
 
+HighlightOutlineOnly = <bool>
+- - - - - - - - - - - - - - -
+Toggles whether the game highlights only the outline of doors and containers
+(HighlightOutlineOnly=1, in BG1), or highlights the complete surface of the
+object (HighlightOutlineOnly=0, all except BG1).
+
+
 IgnoreButtonFrames = <bool>
 - - - - - - - - - - - - - -
 If set to 1, buttons will ignore frame numbers as set in button CHU
