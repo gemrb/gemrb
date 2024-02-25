@@ -2214,7 +2214,9 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	}
 
 	// handle movement/travel, but not if we just opened the float window
-	if ((!core->HasFeature(GFFlags::HAS_FLOAT_MENU) || me.button != GEM_MB_MENU) && lastCursor != IE_CURSOR_BLOCKED && lastCursor != IE_CURSOR_NORMAL) {
+	// or if it doesn't make sense due to the location
+	bool saneCursor = lastCursor != IE_CURSOR_BLOCKED && lastCursor != IE_CURSOR_NORMAL && lastCursor != IE_CURSOR_TALK;
+	if ((!core->HasFeature(GFFlags::HAS_FLOAT_MENU) || me.button != GEM_MB_MENU) && saneCursor) {
 		// pst has different mod keys
 		int modKey = GEM_MOD_SHIFT;
 		if (core->HasFeature(GFFlags::HAS_FLOAT_MENU)) modKey = GEM_MOD_CTRL;
