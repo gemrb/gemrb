@@ -78,7 +78,7 @@ def PlayPress():
 	while (not GemRB.HasResource (CharSound + SoundSeq[SoundIndex], RES_WAV)):
 		NextSound()
 	# play the sound like it was a speech, so any previous yells are quieted
-	GemRB.PlaySound (CharSound + SoundSeq[SoundIndex], CHAN_CHAR1, 0, 0, 4)
+	GemRB.PlaySound (CharSound + SoundSeq[SoundIndex], CHAN_CHAR1, 0, 0, 5)
 	NextSound()
 	return
 
