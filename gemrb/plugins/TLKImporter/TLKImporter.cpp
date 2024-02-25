@@ -360,7 +360,9 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		str->ReadDword(l);
 				
 		if (type & 1) {
-			str->Seek( StrOffset + Offset, GEM_STREAM_START );
+			if (str->Seek(StrOffset + Offset, GEM_STREAM_START) == GEM_ERROR) {
+				return u"";
+			}
 			std::string mbstr(l, '\0');
 			str->Read(&mbstr[0], l);
 			string = StringFromTLK(mbstr);
@@ -397,7 +399,9 @@ StringBlock TLKImporter::GetStringBlock(ieStrRef strref, STRING_FLAGS flags)
 		return StringBlock();
 	}
 	ieWord type;
-	str->Seek( 18 + (ieDword(strref) * 0x1A), GEM_STREAM_START );
+	if (str->Seek(18 + (ieDword(strref) * 0x1A), GEM_STREAM_START) == GEM_ERROR) {
+		return StringBlock();
+	}
 	str->ReadWord(type);
 	ResRef soundRef;
 	str->ReadResRef( soundRef );
