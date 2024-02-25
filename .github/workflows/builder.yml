@@ -19,6 +19,7 @@ jobs:
     - name: Set up Homebrew
       run: |
         brew install sdl2 openal-soft sdl2_mixer libpng libvorbis sccache googletest
+        brew reinstall libpng
 
     - name: Set up build
       run: |
