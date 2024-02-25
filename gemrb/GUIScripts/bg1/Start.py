@@ -53,7 +53,6 @@ def SinglePlayerPress():
 	
 	SinglePlayerButton.SetText(13728)
 	MultiPlayerButton.SetText(13729)
-	MoviesButton.SetText(24110)
 	ExitButton.SetText(15416)
 	MultiPlayerButton.OnPress (LoadSingle)
 	SinglePlayerButton.OnPress (NewSingle)
@@ -61,6 +60,7 @@ def SinglePlayerPress():
 	ExitButton.MakeEscape()
 	if HasTOTSC():
 		MoviesButton.OnPress (MissionPack)
+		MoviesButton.SetText(24110)
 	else:
 		MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		MoviesButton.SetStatus(IE_GUI_BUTTON_DISABLED)
