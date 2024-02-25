@@ -63,7 +63,7 @@ struct EndsWithFilter : Predicate<path_t> {
 			return false;
 		}
 
-		return stricmp(endMatch.data(), &fname[fpos]) == 0;
+		return strnicmp(endMatch.data(), &fname[fpos], endMatch.length()) == 0;
 	}
 };
 
