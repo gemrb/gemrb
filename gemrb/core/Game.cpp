@@ -613,7 +613,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 		assert(actor->IsSelected());
 		selected.push_back( actor );
 
-		if (!(flags&SELECT_QUIET)) {
+		if (!(flags & SELECT_QUIET) && selected.size() == 1) {
 			actor->PlaySelectionSound();
 		}
 	} else {
