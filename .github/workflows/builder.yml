@@ -18,6 +18,8 @@ jobs:
 
     - name: Set up Homebrew
       run: |
+        brew untap homebrew/cask
+        brew untap homebrew/core
         brew install sdl2 openal-soft sdl2_mixer libpng libvorbis sccache googletest
         brew reinstall libpng
 
