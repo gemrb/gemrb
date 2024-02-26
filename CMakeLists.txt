@@ -1,11 +1,25 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.11)
 
+SET(CMAKE_PROJECT_INCLUDE_BEFORE
+	"${CMAKE_SOURCE_DIR}/cmake/IncludeBeforeProject.cmake"
+)
+
+PROJECT(gemrb)
+
 SET(CMAKE_CXX_STANDARD 14)
 
 LIST(APPEND CMAKE_MODULE_PATH
-	"${CMAKE_SOURCE_DIR}/cmake"
+	"${CMAKE_CURRENT_SOURCE_DIR}/cmake"
 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/"
 )
+
+IF(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+	LIST(APPEND CMAKE_MODULE_PATH
+		"${CMAKE_CURRENT_SOURCE_DIR}/platforms/apple/cmake")
+ENDIF()
+
+include(CMakePrintHelpers)
+cmake_print_variables(CMAKE_MODULE_PATH CMAKE_SYSTEM_NAME)
 
 INCLUDE(Validations)
 INCLUDE(Helpers)
@@ -22,13 +36,6 @@ if(CMAKE_BUILD_TYPE MATCHES "Rel.*")
 	# This matches stripped (Release) and nonstripped (RelWithDebInfo) builds
 	ADD_DEFINITIONS("-UNDEBUG")
 endif()
-
-SET(CMAKE_PROJECT_INCLUDE_BEFORE
-	"${CMAKE_SOURCE_DIR}/cmake/IncludeBeforeProject.cmake"
-)
-
-
-PROJECT(gemrb)
 
 # use relative rpaths for build relocation / reproducibility
 SET(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
