@@ -244,6 +244,10 @@ bool OpenALAudioDriver::Init(void)
 		Log(MESSAGE, "OpenAL", "EFX not available.");
 	}
 
+	// The higher the listener pos, the smoother the L/R transitions but the more gain required
+	// to compensate for lower volume
+	alListenerf(AL_GAIN, 1.25f);
+
 	ambim = new AmbientMgr;
 	return true;
 }
@@ -734,11 +738,15 @@ int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 	ALfloat position[] = { (float) x, (float) y, (float) z };
 	alSourcef( source, AL_PITCH, 1.0f );
 	alSourcefv( source, AL_POSITION, position );
-	alSourcef( source, AL_GAIN, 0.01f * gain );
-	// AL_REFERENCE_DISTANCE is the distance under which the volume would normally drop by half
-	alSourcei(source, AL_REFERENCE_DISTANCE, ambientRange > 0 ? ambientRange : REFERENCE_DISTANCE);
-	alSourcei( source, AL_ROLLOFF_FACTOR, point ? 1 : 0 );
 	alSourcei( source, AL_LOOPING, 0 );
+	alSourcef( source, AL_GAIN, 0.01f * gain );
+	// under default sound distance model (AL_INVERSE_DISTANCE_CLAMPED) the formula is:
+	//   dist = max(dist, AL_REFERENCE_DISTANCE);
+	//   dist = min(dist, AL_MAX_DISTANCE);
+	//   gain = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE + AL_ROLLOFF_FACTOR * (dist – AL_REFERENCE_DISTANCE) );
+	// ambientRange also works as cut-off distance, so reducing the volume earlier
+	alSourcei(source, AL_REFERENCE_DISTANCE, ambientRange > 0 ? (ambientRange / 2) : REFERENCE_DISTANCE);
+	alSourcei( source, AL_ROLLOFF_FACTOR, point ? 1 : 0 );
 	checkALError("Unable to set stream parameters", WARNING);
 
 	streams[stream].Buffer = 0;
