@@ -18,9 +18,6 @@ IF(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 		"${CMAKE_CURRENT_SOURCE_DIR}/platforms/apple/cmake")
 ENDIF()
 
-include(CMakePrintHelpers)
-cmake_print_variables(CMAKE_MODULE_PATH CMAKE_SYSTEM_NAME)
-
 INCLUDE(Validations)
 INCLUDE(Helpers)
 
