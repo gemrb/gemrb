@@ -111,8 +111,8 @@ def TrySavingConfiguration():
 # work around radiobutton preselection issues
 # after the generation of the controls we have to re-adjust the visible and
 # internal state, i.e. adjust button state and dictionary entry
-def PreselectRadioGroup (variable, value, button_ids, window):
-	for i in button_ids:
+def PreselectRadioGroup (variable, value, buttonIds, window):
+	for i in buttonIds:
 		Button = window.GetControl (i)
 		if (Button.Value == value):
 			Button.SetState (IE_GUI_BUTTON_SELECTED)
@@ -144,12 +144,12 @@ def OpenVideoOptionsWindow ():
 	# Radiobuttons need special care...
 	Variable = 'BitsPerPixel'
 	Value = GemRB.GetVar(Variable)
-	Button_Ids = [5, 6, 7]
+	ButtonIds = [5, 6, 7]
 
-	GUIOPTControls.OptRadio (DisplayHelpBPP, Button_Ids[0], 37, Variable, 16, None, 17205, 18038)
-	GUIOPTControls.OptRadio (DisplayHelpBPP, Button_Ids[1], 37, Variable, 24, None, 17205, 18038)
-	GUIOPTControls.OptRadio (DisplayHelpBPP, Button_Ids[2], 37, Variable, 32, None, 17205, 18038)
-	PreselectRadioGroup (Variable, Value, Button_Ids, Window)
+	GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[0], 37, Variable, 16, None, 17205, 18038)
+	GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[1], 37, Variable, 24, None, 17205, 18038)
+	GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[2], 37, Variable, 32, None, 17205, 18038)
+	PreselectRadioGroup (Variable, Value, ButtonIds, Window)
 
 	GUIOPTControls.OptCheckbox (18000, 9, 38, 17131, 'Full Screen', DisplayHelpFullScreen)
 
@@ -249,21 +249,21 @@ def OpenCharacterSoundsWindow ():
 	# Radiobuttons need special care...
 	Variable = 'Command Sounds Frequency'
 	Value = GemRB.GetVar(Variable)
-	Button_Ids = [8, 9, 10]
+	ButtonIds = [8, 9, 10]
 
-	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Button_Ids[0], 21, Variable, 3)
-	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Button_Ids[1], 21, Variable, 2)
-	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, Button_Ids[2], 21, Variable, 1)
-	PreselectRadioGroup (Variable, Value, Button_Ids, Window)
+	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, ButtonIds[0], 21, Variable, 3)
+	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, ButtonIds[1], 21, Variable, 2)
+	GUIOPTControls.OptRadio (DisplayHelpCommandSounds, ButtonIds[2], 21, Variable, 1)
+	PreselectRadioGroup (Variable, Value, ButtonIds, Window)
 
 	Variable = 'Selection Sounds Frequency'
 	Value = GemRB.GetVar(Variable)
-	Button_Ids = [58, 59, 60]
+	ButtonIds = [58, 59, 60]
 
-	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Button_Ids[0], 57, Variable, 3)
-	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Button_Ids[1], 57, Variable, 2)
-	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, Button_Ids[2], 57, Variable, 1)
-	PreselectRadioGroup (Variable, Value, Button_Ids, Window)
+	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, ButtonIds[0], 57, Variable, 3)
+	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, ButtonIds[1], 57, Variable, 2)
+	GUIOPTControls.OptRadio (DisplayHelpSelectionSounds, ButtonIds[2], 57, Variable, 1)
+	PreselectRadioGroup (Variable, Value, ButtonIds, Window)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
