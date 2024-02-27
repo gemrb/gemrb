@@ -269,12 +269,12 @@ Holder<SoundHandle> SDLAudio::Play(StringView ResRef, unsigned int channel,
 	}
 	Mix_Volume(chan, MIX_MAX_VOLUME * volume / 100);
 
-	if (!(flags & GEM_SND_RELATIVE)) {
+	if (flags & GEM_SND_SPATIAL) {
 		SetChannelPosition(listenerPos, p, chan, AUDIO_DISTANCE_ROLLOFF_MOD);
 	}
 
 	// TODO: we need something like static_ptr_cast
-	return Holder<SoundHandle>(new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE));
+	return Holder<SoundHandle>(new SDLAudioSoundHandle(chunk, chan, flags));
 }
 
 bool SDLAudio::Pause()

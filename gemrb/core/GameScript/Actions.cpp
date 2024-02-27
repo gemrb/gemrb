@@ -1907,13 +1907,13 @@ void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
 	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS,
-		parameters->pointParameter);
+		parameters->pointParameter, GEM_SND_SPATIAL);
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
-	core->GetAudioDrv()->PlayRelative(parameters->string0Parameter, SFX_CHAN_ACTIONS);
+	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS);
 }
 
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -2623,7 +2623,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* /*parameters*/)
 			door->AddTrigger(TriggerEntry(trigger_failedtoopen, actor->GetGlobalID()));
 
 			//playsound unsuccessful opening of door
-			core->PlaySound(door->IsOpen() ? DS_CLOSE_FAIL : DS_OPEN_FAIL, SFX_CHAN_ACTIONS);
+			core->PlaySound(door->IsOpen() ? DS_CLOSE_FAIL : DS_OPEN_FAIL, SFX_CHAN_ACTIONS, *otherp, GEM_SND_SPATIAL);
 			Sender->ReleaseCurrentAction();
 			actor->TargetDoor = 0;
 			return; //don't open door
@@ -7344,9 +7344,9 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	}
 
 	// voice
-	core->GetAudioDrv()->Play(parameters->string0Parameter, channel, Sender->Pos, GEM_SND_SPEECH | GEM_SND_QUEUE);
+	core->GetAudioDrv()->Play(parameters->string0Parameter, channel, Sender->Pos, GEM_SND_SPEECH | GEM_SND_QUEUE | GEM_SND_SPATIAL);
 	// starting sound, played at the same time, but on a different channel
-	core->GetAudioDrv()->Play(parameters->string1Parameter, SFX_CHAN_CASTING, Sender->Pos, GEM_SND_QUEUE);
+	core->GetAudioDrv()->Play(parameters->string1Parameter, SFX_CHAN_CASTING, Sender->Pos, GEM_SND_QUEUE | GEM_SND_SPATIAL);
 	// NOTE: only a few uses have also an ending sound that plays when the effect ends (also stopping Sound1)
 	// but we don't even read all three string parameters, as Action stores just two
 	// seems like a waste of memory to impose it on everyone, just for these few users
@@ -7798,6 +7798,6 @@ void GameScript::MoveToCampaign(Scriptable* /*Sender*/, Action* parameters)
 // 	Delays actions until the voice channel of the active creature is ready to play a new sound.
 //
 // 471 PlaySoundThroughVoice(S:Sound*)
-// 	Plays the specified sound through the actor's voice channel. Uses GEM_SND_RELATIVE.
+// 	Plays the specified sound through the actor's voice channel.
 
 }

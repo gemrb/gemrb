@@ -507,19 +507,20 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, unsigned int chan
 		}
 	}
 
-	alSourcef( Source, AL_PITCH, 1.0f );
-	alSourcefv( Source, AL_VELOCITY, SourceVel );
-	alSourcei( Source, AL_LOOPING, loop);
-	alSourcef( Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-	alSourcef( Source, AL_GAIN, 0.01f * (volume / 100.0f) * GetVolume(channel) );
-	alSourcei( Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
-	alSourcefv( Source, AL_POSITION, SourcePos );
+	alSourcef(Source, AL_PITCH, 1.0f);
+	alSourcefv(Source, AL_VELOCITY, SourceVel);
+	alSourcei(Source, AL_LOOPING, loop);
+	alSourcef(Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE);
+	alSourcef(Source, AL_GAIN, 0.01f * (volume / 100.0f) * GetVolume(channel));
+	// AL_SOURCE_RELATIVE = source pos & co to be interpreted as if listener was at (0, 0, 0)
+	alSourcei(Source, AL_SOURCE_RELATIVE, !(flags & GEM_SND_SPATIAL));
+	alSourcefv(Source, AL_POSITION, SourcePos);
 	checkALError("Unable to set audio parameters", WARNING);
 
 #ifdef HAVE_OPENAL_EFX_H
 	ieDword efxSetting = core->GetDictionary().Get("Environmental Audio", 0);
 
-	if (efxSetting && hasReverbProperties && (flags & GEM_SND_RELATIVE)) {
+	if (efxSetting && hasReverbProperties && (flags & (GEM_SND_SPATIAL | GEM_SND_EFX))) {
 		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, efxEffectSlot, 0, 0);
 	} else {
 		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, 0, 0, 0);

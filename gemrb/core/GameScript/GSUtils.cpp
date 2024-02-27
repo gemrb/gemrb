@@ -514,19 +514,20 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 	}
 
 	if (soundpath && soundpath[0] && !(flags & DS_SILENT)) {
-		ieDword speech = 0;
-		Point pos = Sender->Pos;
-		if (flags&DS_SPEECH) {
-			speech = GEM_SND_SPEECH;
+		ieDword soundFlags = GEM_SND_EFX;
+		Point pos;
+		if (flags & DS_SPEECH) {
+			soundFlags |= GEM_SND_SPEECH;
 		}
-		// disable position, but only for party
+
 		Actor* actor = Scriptable::As<Actor>(Sender);
-		if (!actor || actor->InParty ||
-			core->InCutSceneMode() || core->GetGameControl()->InDialog()) {
-			speech |= GEM_SND_RELATIVE;
-			pos.reset();
+		// Spatial unless PC, cutscene or dialog
+		if (actor && !actor->InParty && !core->InCutSceneMode() && !core->GetGameControl()->InDialog()) {
+			pos = Sender->Pos;
+			soundFlags |= GEM_SND_SPATIAL;
 		}
-		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
+
+		if (flags&DS_QUEUE) soundFlags |= GEM_SND_QUEUE;
 		
 		unsigned int channel = SFX_CHAN_DIALOG;
 		if (flags & DS_CONST && actor) {
@@ -538,7 +539,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 		}
 		
 		tick_t len = 0;
-		core->GetAudioDrv()->Play(StringView(soundpath), channel, pos, speech, &len);
+		core->GetAudioDrv()->Play(StringView(soundpath), channel, pos, soundFlags, &len);
 		tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
 
 		if (actor && len > 0 && flags & DS_CIRCLE) {

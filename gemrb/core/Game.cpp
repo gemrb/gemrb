@@ -1066,7 +1066,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group, ieStrR
 	// pst/bg2 also has a sound attached to the base string, so play it manually
 	StringBlock sb = core->strings->GetStringBlock(strJournalChange);
 	if (sb.Sound.IsEmpty()) return true;
-	core->GetAudioDrv()->PlayRelative(StringView(sb.Sound), SFX_CHAN_DIALOG);
+	core->GetAudioDrv()->Play(StringView(sb.Sound), SFX_CHAN_DIALOG);
 
 	return true;
 }

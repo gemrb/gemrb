@@ -1870,7 +1870,7 @@ int fx_harpy_wail (Scriptable* Owner, Actor* target, Effect* fx)
 	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
-	core->GetAudioDrv()->Play(fx->Resource2, SFX_CHAN_MONSTER, target->Pos);
+	core->GetAudioDrv()->Play(fx->Resource2, SFX_CHAN_MONSTER, target->Pos, GEM_SND_SPATIAL);
 
 	const Map *area = target->GetCurrentArea();
 	if (!area) return FX_NOT_APPLIED;

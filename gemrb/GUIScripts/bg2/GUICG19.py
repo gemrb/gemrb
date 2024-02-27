@@ -22,7 +22,7 @@ import GemRB
 import CharGenCommon
 import GUICommon
 from ie_restype import *
-from ie_sounds import CHAN_CHAR1
+from ie_sounds import CHAN_CHAR1, SND_SPEECH
 from ie_stats import IE_SEX
 
 VoiceList = 0
@@ -78,7 +78,7 @@ def PlayPress():
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
 		NextSound()
 	# play the sound like it was a speech, so any previous yells are quieted
-	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], CHAN_CHAR1, 0, 0, 5)
+	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], CHAN_CHAR1, 0, 0, SND_SPEECH)
 	NextSound()
 	return
 

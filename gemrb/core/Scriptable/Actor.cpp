@@ -3525,7 +3525,7 @@ tick_t Actor::ReactToDeath(const ieVariable& deadname) const
 
 	tick_t len = 0;
 	unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
-	core->GetAudioDrv()->PlayRelative(resRef, channel, &len);
+	core->GetAudioDrv()->Play(resRef, channel, &len);
 	return len;
 }
 
@@ -3657,7 +3657,7 @@ void Actor::PlaySelectionSound(bool force)
 	if (!found) {
 		ResRef sound;
 		GetSoundFromFile(sound, Verbal::Select);
-		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
+		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos, GEM_SND_EFX);
 	}
 }
 
@@ -3670,7 +3670,7 @@ void Actor::PlayWarCry(int range) const
 	if (!found && !InParty) {
 		ResRef sound;
 		GetSoundFromFile(sound, Verbal::BattleCry);
-		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
+		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos, GEM_SND_SPATIAL);
 	}
 }
 
@@ -3986,7 +3986,7 @@ void Actor::GetHit(int damage, bool killingBlow)
 		if (!VerbalConstant(Verbal::Damage, beingHitCount)) {
 			ResRef sound;
 			GetSoundFromFile(sound, Verbal::Damage);
-			core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
+			core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos, GEM_SND_SPATIAL);
 		}
 	}
 
@@ -4489,7 +4489,7 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 		case DAMAGE_STUNNING: type = -3; break;
 		case DAMAGE_FIRE: // the only odd one out
 		case DAMAGE_MAGICFIRE:
-			core->GetAudioDrv()->Play("FIRE", SFX_CHAN_HITS, Pos);
+			core->GetAudioDrv()->Play("FIRE", SFX_CHAN_HITS, Pos, GEM_SND_SPATIAL);
 			return;
 		default: return;                       //other
 	}
@@ -4540,7 +4540,7 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 			Sound.Format("HIT_0{}{:c}", type, suffix ? '1' : 0);
 		}
 	}
-	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos);
+	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos, GEM_SND_SPATIAL);
 }
 
 // Play swing sounds
@@ -4573,7 +4573,7 @@ void Actor::PlaySwingSound(const WeaponInfo &wi) const
 	// this extra ATTACK in 2das was always played, together with anything else
 	ResRef sound;
 	GetSoundFrom2DA(sound, Verbal::Attack0);
-	if (!IsStar(sound)) core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos);
+	if (!IsStar(sound)) core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos, GEM_SND_SPATIAL);
 
 	// the CRE attack was played only if the itemtype was 0/misc to avoid clashes with the hardcoded exceptions
 	// TobExAL and Infinity Sounds prefer both to be played, so we match that, giving more choice to modders
@@ -4603,7 +4603,7 @@ void Actor::PlaySwingSound(const WeaponInfo &wi) const
 		if (!found) {
 			ResRef sound2;
 			GetSoundFromFile(sound2, *vb);
-			if (sound != sound2) core->GetAudioDrv()->Play(sound2, SFX_CHAN_SWINGS, Pos);
+			if (sound != sound2) core->GetAudioDrv()->Play(sound2, SFX_CHAN_SWINGS, Pos, GEM_SND_SPATIAL);
 		}
 	}
 
@@ -4615,7 +4615,7 @@ void Actor::PlaySwingSound(const WeaponInfo &wi) const
 		int isChoice = core->Roll(1, isCount, -1) + 2;
 		if (!gamedata->GetItemSound(sound, itemType, AnimRef(), isChoice)) return;
 	}
-	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos);
+	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos, GEM_SND_SPATIAL);
 }
 
 //Just to quickly inspect debug maximum values
@@ -5201,7 +5201,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	if (found) {
 		ResRef sound;
 		GetSoundFromFile(sound, Verbal::Die);
-		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos);
+		core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, Pos, GEM_SND_SPATIAL);
 	}
 
 	// remove poison, hold, casterhold, stun and its icon
@@ -11178,7 +11178,7 @@ void Actor::PlayArmorSound() const
 
 	const ResRef armorSound = GetArmorSound();
 	if (!armorSound.IsEmpty()) {
-		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos);
+		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos, GEM_SND_SPATIAL);
 	}
 }
 
