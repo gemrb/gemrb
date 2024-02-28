@@ -372,9 +372,9 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 	if (bool(flags & STRING_FLAGS::RESOLVE_TAGS) || (type & 4)) {
 		string = ResolveTags(string);
 	}
-	if (type & 2 && bool(flags & STRING_FLAGS::SOUND) && !SoundResRef.IsEmpty()) {
+	if ((type & 2) && bool(flags & STRING_FLAGS::SOUND) && !SoundResRef.IsEmpty()) {
 		// GEM_SND_SPEECH will stop the previous sound source
-		unsigned int flag = GEM_SND_RELATIVE | (uint32_t(flags) & (GEM_SND_SPEECH | GEM_SND_QUEUE));
+		unsigned int flag = (uint32_t(flags) & (GEM_SND_SPEECH | GEM_SND_QUEUE));
 
 		// Narrator's error announcements (ambush, incomplete party)
 		unsigned int channel = SoundResRef.BeginsWith("ERROR") ? SFX_CHAN_NARRATOR : SFX_CHAN_DIALOG;

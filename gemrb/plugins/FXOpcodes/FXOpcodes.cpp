@@ -982,7 +982,7 @@ static inline void HandleMainStatBonus(const Actor *target, int stat, Effect *fx
 static inline void PlayRemoveEffect(const Actor *target, const Effect* fx, StringView defsound = StringView())
 {
 	core->GetAudioDrv()->Play(fx->Resource.IsEmpty() ? defsound : StringView(fx->Resource),
-			SFX_CHAN_ACTIONS, target->Pos);
+			SFX_CHAN_ACTIONS, target->Pos, GEM_SND_SPATIAL);
 }
 
 //resurrect code used in many places
@@ -1493,7 +1493,7 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		// Actor::CheckOnDeath handles the actual chunking
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
 		// bg1 & iwds have this file, bg2 & pst none
-		core->GetAudioDrv()->Play("GORE", SFX_CHAN_HITS, target->Pos);
+		core->GetAudioDrv()->Play("GORE", SFX_CHAN_HITS, target->Pos, GEM_SND_SPATIAL);
 		break;
 	case 16:
 		BASE_STATE_SET(STATE_PETRIFIED);
@@ -1507,12 +1507,12 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_PETRIFIED);
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
 		// file only in iwds
-		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos);
+		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos, GEM_SND_SPATIAL);
 		break;
 	case 128:
 		if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_FROZEN);
 		damagetype = DAMAGE_COLD|DAMAGE_CHUNKING;
-		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos);
+		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos, GEM_SND_SPATIAL);
 		break;
 	case 256:
 		damagetype = DAMAGE_ELECTRICITY;
@@ -3756,9 +3756,9 @@ int fx_remove_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (fx->Parameter1 == 0) {
 			core->PlaySound(DS_ITEM_GONE, SFX_CHAN_GUI);
 		} else if (fx->Parameter1 == 1) {
-			core->GetAudioDrv()->PlayRelative("AMB_D02B", SFX_CHAN_GUI);
+			core->GetAudioDrv()->Play("AMB_D02B", SFX_CHAN_GUI);
 		} else if (fx->Parameter1 == 2) {
-			core->GetAudioDrv()->PlayRelative(fx->Resource2, SFX_CHAN_GUI);
+			core->GetAudioDrv()->Play(fx->Resource2, SFX_CHAN_GUI);
 		}
 	}
 
@@ -4531,7 +4531,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			// mrttaunt.src has placeholder text, but valid audio, so enable just sound
 			if (fx->IsVariable) {
 				StringBlock sb = core->strings->GetStringBlock(str);
-				core->GetAudioDrv()->Play(StringView(sb.Sound), SFX_CHAN_ACTIONS, target->Pos);
+				core->GetAudioDrv()->Play(StringView(sb.Sound), SFX_CHAN_ACTIONS, target->Pos, GEM_SND_SPATIAL);
 			} else {
 				fx->Parameter1 = ieDword(str);
 				DisplayStringCore(target, str, DS_HEAD);
@@ -5259,9 +5259,9 @@ int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//this is probably inaccurate
 	if (target) {
-		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos);
+		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos, GEM_SND_SPATIAL);
 	} else {
-		core->GetAudioDrv()->PlayRelative(fx->Resource, SFX_CHAN_HITS);
+		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS);
 	}
 	//this is an instant, it shouldn't stick
 	return FX_NOT_APPLIED;

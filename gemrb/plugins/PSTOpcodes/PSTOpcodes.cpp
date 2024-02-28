@@ -506,7 +506,7 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		core->GetWindowManager()->FadeColor += step;
 		fx->Parameter3--;
 	}
-	if (fx->FirstApply) core->GetAudioDrv()->PlayRelative(fx->Resource, SFX_CHAN_HITS);
+	if (fx->FirstApply) core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS);
 
 	// only some types actually use duration, the rest are permanent
 	tick_t fromTime = core->Time.defaultTicksPerSec;
@@ -807,7 +807,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			// unhardcoded in our sshadow.spl with 10s as the flat bonus instead of rolling
 			break;
 		case 6: //duplication
-			core->GetAudioDrv()->Play("magic02", SFX_CHAN_HITS, target->Pos);
+			core->GetAudioDrv()->Play("magic02", SFX_CHAN_HITS, target->Pos, GEM_SND_SPATIAL);
 			break;
 		case 7: //armor
 			target->ApplyEffectCopy(fx, fx_colorchange_ref, Owner, 0x825A2800, -1);

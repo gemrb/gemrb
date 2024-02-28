@@ -24,6 +24,7 @@ import Portrait
 from GUIDefines import *
 from ie_stats import IE_SEX, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
 from ie_restype import RES_WAV
+from ie_sounds import SND_SPEECH
 
 CustomizeWindow = None
 ExportWindow = None
@@ -372,7 +373,7 @@ def PlaySoundPressed():
 			break
 	else:
 		NextSound()
-	GemRB.PlaySound (VoiceSet + SoundSeq[SoundIndex], "CHARACT" + str(pc - 1), 0, 0, 5)
+	GemRB.PlaySound (VoiceSet + SoundSeq[SoundIndex], "CHARACT" + str(pc - 1), 0, 0, SND_SPEECH)
 	return
 
 def NextSound():

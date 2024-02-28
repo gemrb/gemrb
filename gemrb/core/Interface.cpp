@@ -2075,7 +2075,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 
 	Holder<SoundHandle> sound_override;
 	if (!sound_resref.empty()) {
-		sound_override = AudioDriver->PlayRelative(sound_resref, SFX_CHAN_NARRATOR);
+		sound_override = AudioDriver->Play(sound_resref, SFX_CHAN_NARRATOR);
 	}
 
 	// clear whatever is currently on screen
@@ -3395,8 +3395,13 @@ ieStrRef Interface::GetRumour(const ResRef& dlgref)
 //plays stock sound listed in defsound.2da
 Holder<SoundHandle> Interface::PlaySound(size_t index, unsigned int channel) const
 {
+	return PlaySound(index, channel, Point(), 0);
+}
+
+Holder<SoundHandle> Interface::PlaySound(size_t index, unsigned int channel, const Point& p, unsigned int flags) const
+{
 	if (index <= gamedata->defaultSounds.size()) {
-		return AudioDriver->PlayRelative(gamedata->defaultSounds[index], channel);
+		return AudioDriver->Play(gamedata->defaultSounds[index], channel, p, flags);
 	}
 	return NULL;
 }
