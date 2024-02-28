@@ -42,8 +42,17 @@ ENDIF()
 
 IF(USE_PNG)
 	IF(APPLE AND DEFINED ENV{GITHUB_SHA})
-		SET(PNG_INCLUDE_DIRS "/usr/local/Cellar/libpng/1.6.40/include")
-		SET(PNG_LIBRARIES "/usr/local/Cellar/libpng/1.6.40/lib/libpng16.16.dylib")
+		execute_process(
+			COMMAND brew --prefix libpng
+			OUTPUT_VARIABLE LIBPNG_PATH
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+		if(NOT LIBPNG_PATH)
+			message(FATAL_ERROR "Cannot deduce LIBPNG_PATH!")
+		endif()
+
+		SET(PNG_INCLUDE_DIRS "${LIBPNG_PATH}/include")
+		SET(PNG_LIBRARIES "${LIBPNG_PATH}/lib/libpng16.16.dylib")
 		SET(PNG_FOUND TRUE)
 	ELSE()
 		INCLUDE(FindPNG)

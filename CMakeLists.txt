@@ -1,10 +1,10 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.11)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 
 SET(CMAKE_CXX_STANDARD 14)
 
 LIST(APPEND CMAKE_MODULE_PATH
 	"${CMAKE_SOURCE_DIR}/cmake"
-	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/"
+	"${CMAKE_SOURCE_DIR}/cmake/modules/"
 )
 
 INCLUDE(Validations)
@@ -29,6 +29,9 @@ SET(CMAKE_PROJECT_INCLUDE_BEFORE
 
 
 PROJECT(gemrb)
+IF(APPLE)
+	enable_language(OBJC OBJCXX)
+ENDIF()
 
 # use relative rpaths for build relocation / reproducibility
 SET(CMAKE_BUILD_RPATH_USE_ORIGIN ON)

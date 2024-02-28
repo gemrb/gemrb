@@ -391,7 +391,7 @@ FUNCTION(ENABLE_LINK_TIME_OPTIMIZATIONS)
 	check_ipo_supported(RESULT supported)
 
 	IF(supported)
-		set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE CACHE BOOL)
+		set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE CACHE BOOL "")
 	ENDIF()
 ENDFUNCTION()
 
@@ -510,14 +510,10 @@ FUNCTION(CONFIGURE_APPLE_SPECIFICS)
 		MESSAGE (FATAL_ERROR "ibtool can not be found and is needed to compile the .xib files. It should have been installed with 
 					the Apple developer tools. The default system paths were searched in addition to ${OSX_DEVELOPER_ROOT}/usr/bin")
 	ENDIF ()
-	ADD_DEFINITIONS("-x objective-c++")
 	INCLUDE_DIRECTORIES(platforms/apple)
 	FIND_LIBRARY(COCOA_LIBRARY_PATH Cocoa)
 	FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation)
-	# for objective-c++
-	STRING(APPEND CMAKE_CXX_FLAGS " -DTARGET_OS_MAC")
-	# for pure objective-c
-	STRING(APPEND CMAKE_C_FLAGS " -x objective-c -DTARGET_OS_MAC")
+	add_compile_definitions(TARGET_OS_MAC)
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_VITA_SPECIFICS)
