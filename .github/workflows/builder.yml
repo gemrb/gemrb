@@ -137,10 +137,9 @@ jobs:
         make test
 
     - name: Test Run
-      uses: coactions/setup-xvfb@v1
-      with:
-        run: ./run-or-dump.sh
-        working-directory: build
+      run: |
+        cd build
+        xvfb-run ./run-or-dump.sh
 
     - name: Prepare AppImage
       run: |
