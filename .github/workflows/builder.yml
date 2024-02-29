@@ -137,10 +137,9 @@ jobs:
         make test
 
     - name: Test Run
-      uses: coactions/setup-xvfb@v1
-      with:
-        run: ./run-or-dump.sh
-        working-directory: build
+      run: |
+        cd build
+        xvfb-run ./run-or-dump.sh
 
     - name: Prepare AppImage
       run: |
@@ -162,10 +161,9 @@ jobs:
         echo "::endgroup::"
 
     - name: Test AppImage
-      uses: coactions/setup-xvfb@v1
-      with:
-        run: ./grrr-gemrb.AppImage -q ../gemrb/tests/minimal/
-        working-directory: build
+      run: |
+        cd build
+        xvfb-run ./grrr-gemrb.AppImage -q ../gemrb/tests/minimal/
 
     - name: Show build cache stats
       run: |
