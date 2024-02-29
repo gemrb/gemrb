@@ -20,8 +20,6 @@
 
 #include "Video.h"
 
-#include "Interface.h"
-
 #include "Palette.h"
 #include "Sprite2D.h"
 
@@ -171,8 +169,6 @@ void Video::SetScreenClip(const Region* clip)
 
 bool Video::ToggleFullscreenMode()
 {
-	auto& vars = core->GetDictionary();
-	vars.Set("Full Screen", !fullscreen);
 	return SetFullscreenMode(!fullscreen);
 }
 

@@ -324,9 +324,13 @@ void WindowManager::CloseAllWindows() const
 bool WindowManager::HotKey(const Event& event) const
 {
 	if (event.type == Event::KeyDown && event.keyboard.repeats == 1) {
+		auto& vars = core->GetDictionary();
+		bool fullscreen;
 		switch (event.keyboard.keycode) {
 			case 'f':
 				video->ToggleFullscreenMode();
+				fullscreen = (bool) vars.Get("Full Screen", 0);
+				vars.Set("Full Screen", !fullscreen);
 				return true;
 			case GEM_GRAB:
 				video->ToggleGrabInput();
