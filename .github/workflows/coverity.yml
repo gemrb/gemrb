@@ -15,7 +15,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libsdl2-mixer-2.0-0 libvlc-dev libvorbis-dev python3-dev
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: master
 
