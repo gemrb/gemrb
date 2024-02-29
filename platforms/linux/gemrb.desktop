@@ -1,13 +1,13 @@
 [Desktop Entry]
 Version=1.0
 Name=GemRB
-GenericName=Game engine made with preRendered Background
+GenericName=Game engine
 Comment=a portable opensource implementation of Bioware's Infinity Engine
 Type=Application
 Icon=gemrb
 Terminal=true
 Exec=gemrb
-Categories=Game;RolePlaying;Emulator;
-Keywords=roleplay;rpg;adventure;game;2d;isometric;gemrb;infinity engine;black isle;
+Categories=Game;RolePlaying;
+Keywords=roleplay;rpg;game;2d;isometric;infinity engine;
 X-AppImage-Name=GemRB
 X-AppImage-Version=-
