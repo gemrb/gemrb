@@ -147,10 +147,6 @@ Game window height (in pixels).
 Color depth of the game window (in bits per pixel).
 
 .TP
-.BR Fullscreen =(0|1)
-Whether the game should run in fullscreen mode.
-
-.TP
 .BR CapFPS =(-1|0|n)
 Set FPS handling:
   -1: no limit

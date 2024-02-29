@@ -68,7 +68,7 @@ Keyboard input is done with D-Pad (on character creation and game saves. 'a-z', 
 
 Pointer movement speed can be changed with 'GamepadPointerSpeed' parameter in GemRB.cfg.
 
-Use "Fullscreen=1" to scale game area to native Vita resolution or "Fullscreen=0" to keep game area at the center of the screen.
+Use `Full Screen = 1` in game ini config (e.g. `baldur.ini`) to scale game area to native Vita resolution or `Full Screen = 0` to keep game area at the center of the screen.
 
 VitaKeepAspectRatio=1 keeps aspect ratio of original image when scaling. VitaKeepAspectRatio=0 just scales it to 960x544.
 
