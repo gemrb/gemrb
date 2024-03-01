@@ -99,10 +99,12 @@ def StartTextScreen ():
 		ID = GemRB.GetGameVar("CHAPTER") & 0x7fffffff
 		Chapter = ID + 1
 
+	# Textscreen should always stop currently playing music before starting
+	# to play any chapter music.
+	GemRB.HardEndPL ()
+
 	if MusicName != "*":
 		GemRB.LoadMusicPL (MusicName + ".mus")
-	else:
-		GemRB.HardEndPL ()
 
 	TextScreen = GemRB.LoadWindow (ID, "GUICHAP")
 	TextArea = TextScreen.GetControl (2)
