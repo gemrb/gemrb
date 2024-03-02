@@ -1,3 +1,4 @@
+import BGCommon
 import GemRB
 from GUIDefines import *
 from ie_stats import *
@@ -314,19 +315,7 @@ def setAccept():
 	MyChar = GemRB.GetVar ("Slot")
 
 	#reputation
-	# If Rep > 0 then MyChar is an imported character with a saved reputation,
-	# in which case the reputation shouldn't be overwritten.
-	Rep = GemRB.GetPlayerStat (MyChar, IE_REPUTATION)
-
-	if Rep <= 0:
-		RepTable = GemRB.LoadTable ("repstart")
-		Alignment = GemRB.GetVar ("Alignment")
-		AlignmentAbbrev = CommonTables.Aligns.FindValue (3, Alignment)
-		Rep = RepTable.GetValue (AlignmentAbbrev, 0) * 10
-		GemRB.SetPlayerStat (MyChar, IE_REPUTATION, Rep)
-
-	if MyChar == 1: # only do it once
-		GemRB.GameSetReputation (Rep)
+	BGCommon.SetReputation ()
 
 	# don't reset most stats of imported chars
 	if GemRB.GetVar ("ImportedChar"):
