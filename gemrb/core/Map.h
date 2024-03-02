@@ -444,6 +444,7 @@ public:
 	ResRef ResolveTerrainSound(const ResRef &sound, const Point &pos) const;
 	void DoStepForActor(Actor *actor, ieDword time) const;
 	void UpdateEffects();
+	void UpdateProjectiles();
 	/* removes empty heaps and returns total itemcount */
 	int ConsolidateContainers();
 	/* transfers all ever visible piles (loose items) to the specified position */

@@ -1121,9 +1121,9 @@ const Projectile* Map::GetNextTrap(proIterator& iter, int flags) const
 
 		iter++;
 		// find dormant traps (thieves', skull traps, glyphs of warding ...)
-		if (flags == 0 && pro->GetPhase() == P_TRIGGER) break;
+		if (flags == 0 && pro->IsWaitingForTrigger()) break;
 		// find AOE projectiles like stinking cloud
-		if (flags == 1 && pro->Extension  && pro->GetPhase() != P_TRIGGER) break;
+		if (flags == 1 && pro->Extension && !pro->IsWaitingForTrigger()) break;
 	} while (pro);
 	return pro;
 }
@@ -1350,23 +1350,14 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 			sca = GetNextScriptedAnimation(scaidx);
 			break;
 		case AOT_PROJECTILE:
-			int drawn;
-			if (gametime > oldGameTime) {
-				drawn = pro->Update();
-			} else {
-				drawn = 1;
-			}
-			if (drawn) {
+			{
 				BlitFlags flags = SetDrawingStencilForProjectile(pro, viewport);
 				pro->Draw(viewport, flags);
-				proidx++;
-			} else {
-				delete pro;
-				proidx = projectiles.erase(proidx);
+				pro = GetNextProjectile(++proidx);
 			}
-			pro = GetNextProjectile(proidx);
 			break;
 		case AOT_SPARK:
+			int drawn;
 			if (gametime > oldGameTime) {
 				drawn = spark->Update();
 			} else {
@@ -1836,6 +1827,18 @@ void Map::UpdateEffects()
 	size_t i = actors.size();
 	while (i--) {
 		actors[i]->RefreshEffects();
+	}
+}
+
+void Map::UpdateProjectiles()
+{
+	for (auto it = projectiles.begin(); it != projectiles.end(); ) {
+		(*it)->Update();
+		if ((*it)->IsStillIntact()) {
+			++it;
+		} else {
+			it = projectiles.erase(it);
+		}
 	}
 }
 

@@ -161,6 +161,8 @@ bool GlobalTimer::Update()
 	if (!gc->InDialog() || !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		map->UpdateFog();
 		map->UpdateEffects();
+		map->UpdateProjectiles();
+
 		if (thisTime) {
 			//this measures in-world time (affected by effects, actions, etc)
 			game->AdvanceTime(1);

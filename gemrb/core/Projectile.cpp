@@ -204,7 +204,7 @@ void Projectile::CreateIteration()
 	}
 
 	// added by fuzzie, to make magic missiles instant, maybe wrong place
-	pro->Setup();
+	pro->Update();
 }
 
 void Projectile::GetSmokeAnim()
@@ -340,7 +340,6 @@ void Projectile::Setup()
 		light = CreateLight(Size(LightX, LightY), LightZ);
 	}
 
-	phase = P_TRAVEL;
 	unsigned int flags = GEM_SND_SPATIAL;
 	if (SFlags & PSF_LOOPING) {
 		flags |= GEM_SND_LOOPING;
@@ -566,41 +565,40 @@ void Projectile::UpdateSound()
 	}
 }
 
-//control the phase change when the projectile reached its target
+//control the state change when the projectile reached its target
 //possible actions: vanish, hover over point, explode
 //depends on the area extension
 //play explosion sound
-void Projectile::ChangePhase()
+Projectile::ProjectileState Projectile::GetNextTravelState()
 {
 	if (Target) {
 		const Actor *target = area->GetActorByGlobalID(Target);
 		if (!target) {
-			phase = P_EXPIRED;
-			return;
+			return ProjectileState::EXPIRED;
 		}
 	}
 
-	if (phase == P_TRAVEL && (ExtFlags & PEF_DELAY) && extensionDelay) {
-		 extensionDelay--;
-		 UpdateSound();
-		 return;
+	if (state == ProjectileState::TRAVELLING && (ExtFlags & PEF_DELAY) && extensionDelay) {
+		extensionDelay--;
+		UpdateSound();
+		return state;
 	}
 
 	//reached target, and explodes now
 	if (Extension) {
-		EndTravel();
-		return;
+		return EndTravel();
 	}
 
 	// there are no-effect projectiles, like missed arrows
 	// Payload can redirect the projectile in case of projectile reflection
-	if (phase == P_TRAVEL) {
+	if (state == ProjectileState::TRAVELLING) {
 		if (ExtFlags & PEF_DEFSPELL) {
 			ApplyDefault();
 		}
 		if (!ArrivalSound.IsEmpty()) StopSound();
 		Payload();
-		phase = P_TRAVEL2;
+
+		return ProjectileState::HIT;
 	}
 
 	// freeze on target, this is recommended only for child projectiles
@@ -610,23 +608,24 @@ void Projectile::ChangePhase()
 			extensionDelay--;
 			UpdateSound();
 		}
-		return;
+
+		return state;
 	}
 
-	if (phase == P_TRAVEL2 && extensionDelay) {
-			extensionDelay--;
-			return;
+	if (state == ProjectileState::HIT && extensionDelay) {
+		extensionDelay--;
+		return state;
 	}
 
 	if (ExtFlags & PEF_FADE) {
 		TFlags &= ~PTF_TINT; // turn off area tint
 		tint.a--;
 		if (tint.a > 0) {
-			return;
+			return state;
 		}
 	}
 
-	EndTravel();
+	return EndTravel();
 }
 
 //Call this only if Extension exists!
@@ -648,21 +647,19 @@ int Projectile::CalculateExplosionCount() const
 	return count;
 }
 
-void Projectile::EndTravel()
+Projectile::ProjectileState Projectile::EndTravel()
 {
 	StopSound();
 	UpdateSound();
-	if(!Extension) {
-		phase = P_EXPIRED;
-		return;
+	if (!Extension) {
+		return ProjectileState::EXPIRED;
 	}
 
 	//this flag says that the explosion should occur only when triggered
-	if (Extension->AFlags&PAF_TRIGGER) {
-		phase = P_TRIGGER;
-		return;
+	if (Extension->AFlags & PAF_TRIGGER) {
+		return ProjectileState::AWAITING_TRIGGER;
 	} else {
-		phase = P_EXPLODING1;
+		return ProjectileState::EXPLODING;
 	}
 }
 
@@ -699,9 +696,14 @@ int Projectile::AddTrail(const ResRef& BAM, const ieByte *pal) const
 	return sca->GetSequenceDuration(core->Time.defaultTicksPerSec);
 }
 
-void Projectile::DoStep()
+Projectile::ProjectileState Projectile::DoStep()
 {
-	if(pathcounter) {
+	//recreate path if target has moved
+	if (Target) {
+		SetTarget(Target, false);
+	}
+
+	if (pathcounter) {
 		pathcounter--;
 	} else {
 		ClearPath();
@@ -717,14 +719,12 @@ void Projectile::DoStep()
 	}
 
 	if (path.empty()) {
-		ChangePhase();
-		return;
+		return GetNextTravelState();
 	}
 
-	if (Pos==Destination) {
+	if (Pos == Destination) {
 		ClearPath();
-		ChangePhase();
-		return;
+		return GetNextTravelState();
 	}
 
 	//don't bug out on 0 smoke frequency like the original IE
@@ -738,8 +738,10 @@ void Projectile::DoStep()
 		}
 	}
 
-	if (ExtFlags&PEF_LINE) {
-		if(Extension) {
+	if (ExtFlags & PEF_LINE) {
+		auto newState = state;
+
+		if (Extension) {
 			//transform into an explosive line
 			EndTravel();
 		} else {
@@ -747,10 +749,10 @@ void Projectile::DoStep()
 				//switch to 'fading' phase
 				SetDelay(100);
 			}
-			ChangePhase();
+			newState = GetNextTravelState();
 		}
 		//don't change position
-		return;
+		return newState;
 	}
 
 	// path shouldn't be calculated if Speed == 0, so this shouldn't be reached
@@ -794,11 +796,10 @@ void Projectile::DoStep()
 	if (step == last) {
 		ClearPath();
 		NewOrientation = Orientation;
-		ChangePhase();
-		return;
+		return GetNextTravelState();
 	}
 	if (!timePerStep) {
-		return;
+		return state;
 	}
 
 	if (SFlags&PSF_SPARKS) {
@@ -816,6 +817,7 @@ void Projectile::DoStep()
 	else
 		Pos.y -= (Pos.y - next->point.y) * delta / timePerStep;
 
+	return state;
 }
 
 void Projectile::SetCaster(ieDword caster, int level)
@@ -873,7 +875,7 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 	}
 	 
 	if (!target) {
-		phase = P_EXPIRED;
+		state = ProjectileState::EXPIRED;
 		return;
 	}
 
@@ -983,27 +985,29 @@ int Projectile::CalculateTargetFlag() const
 }
 
 //get actors covered in area of trigger radius
-void Projectile::CheckTrigger(unsigned int radius)
+Projectile::ProjectileState Projectile::CheckTrigger(unsigned int radius)
 {
-	if (phase == P_TRIGGER) {
+	if (state == ProjectileState::AWAITING_TRIGGER) {
 		//special trigger flag, explode only if the trigger animation has
 		//passed a hardcoded sequence number
 		if (Extension->AFlags & PAF_TRIGGER_D && travel[Orientation]) {
 			int anim = travel[Orientation].GetCurrentFrameIndex();
 			if (anim < 30) {
-				return;
+				return state;
 			}
 		}
 	}
 	if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
-		if (phase == P_TRIGGER) {
-			phase = P_EXPLODING1;
+		if (state == ProjectileState::AWAITING_TRIGGER) {
 			extensionDelay = Extension->Delay;
+			return ProjectileState::EXPLODING;
 		}
-	} else if (phase == P_EXPLODING1 && Extension->AFlags & PAF_DELAYED) {
+	} else if (state == ProjectileState::EXPLODING && Extension->AFlags & PAF_DELAYED) {
 		//the explosion is revoked
-		phase = P_TRIGGER;
+		return ProjectileState::AWAITING_TRIGGER;
 	}
+
+	return state;
 }
 
 void Projectile::SetEffectsCopy(const EffectQueue& eq, const Point &source)
@@ -1196,48 +1200,69 @@ void Projectile::SecondaryTarget()
 
 	//In case of utter failure, apply a spell of the same name on the caster
 	//this feature is used by SCHARGE, PRTL_OP and PRTL_CL in the HoW pack
-	if(fail) {
+	if (fail) {
 		ApplyDefault();
 	}
 }
 
-int Projectile::Update()
-{
-	//if reached target explode
-	//if target doesn't exist expire
-	if (phase == P_EXPIRED) {
-		return 0;
+void Projectile::Update() {
+	if (state == ProjectileState::EXPIRED) {
+		return;
 	}
-	if (phase == P_UNINITED) {
+
+	if (state == ProjectileState::NEW) {
 		Setup();
+		state = ProjectileState::TRAVELLING;
+		return;
 	}
 
 	int pause = core->IsFreezed();
 	if (pause) {
-		return 1;
+		return;
 	}
 
 	const Game *game = core->GetGame();
-	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
-		return 1;
+	if (game && game->IsTimestopActive() && !(TFlags & PTF_TIMELESS)) {
+		return;
 	}
 
-	//recreate path if target has moved
-	if(Target) {
-		SetTarget(Target, false);
-	}
+	switch (state) {
+		case ProjectileState::TRAVELLING:
+		case ProjectileState::HIT:
+			state = DoStep();
+			break;
+		case ProjectileState::AWAITING_TRIGGER:
+			state = CheckTrigger(Extension->TriggerRadius);
+			break;
+		case ProjectileState::EXPLODING:
+		case ProjectileState::EXPLODING_AGAIN:
+			state = CheckTrigger(Extension->TriggerRadius);
 
-	if (phase == P_TRAVEL || phase == P_TRAVEL2) {
-		DoStep();
+			// may have been revoked
+			if (state == ProjectileState::EXPLODING || state == ProjectileState::EXPLODING_AGAIN) {
+				state = GetNextExplosionState();
+			}
+			break;
+		case ProjectileState::BURNING_DOWN:
+			UpdateChildren();
+			if (children.empty()) {
+				state = ProjectileState::EXPIRED;
+			}
+			break;
+		default:
+			break;
 	}
-	return 1;
+}
+
+bool Projectile::IsStillIntact() const {
+	return state != ProjectileState::EXPIRED;
 }
 
 Region Projectile::DrawingRegion(const Region& viewPort) const
 {
 	// adjust position for magic missile and the like
 	Point pos = Pos;
-	if (bend && phase == P_TRAVEL && Origin != Destination) {
+	if (bend && state == ProjectileState::TRAVELLING && Origin != Destination) {
 		pos -= viewPort.origin;
 		BendPosition(pos);
 		pos += viewPort.origin;
@@ -1281,54 +1306,50 @@ Region Projectile::DrawingRegion(const Region& viewPort) const
 
 void Projectile::Draw(const Region& viewport, BlitFlags flags)
 {
-	switch (phase) {
-		case P_UNINITED:
-			return;
-		case P_TRIGGER: case P_EXPLODING1:case P_EXPLODING2:
+	switch (state) {
+		case ProjectileState::AWAITING_TRIGGER:
+		case ProjectileState::EXPLODING:
+		case ProjectileState::EXPLODING_AGAIN:
 			//This extension flag is to enable the travel projectile at
 			//trigger/explosion time
-			if (Extension->AFlags&PAF_VISIBLE) {
+			if (Extension->AFlags & PAF_VISIBLE) {
 				DrawTravel(viewport, flags);
 			}
 
-			CheckTrigger(Extension->TriggerRadius);
-			if (phase == P_EXPLODING1 || phase == P_EXPLODING2) {
+			if (state == ProjectileState::EXPLODING || state == ProjectileState::EXPLODING_AGAIN) {
 				DrawExplosion(viewport, flags);
 			}
-			break;
-		case P_TRAVEL: case P_TRAVEL2:
+			return;
+		case ProjectileState::TRAVELLING:
+		case ProjectileState::HIT:
 			//There is no Extension for simple traveling projectiles!
 			DrawTravel(viewport, flags);
 			return;
+		case ProjectileState::BURNING_DOWN:
+			DrawChildren(viewport, flags);
+			return;
 		default:
-			DrawExploded(viewport, flags);
 			return;
 	}
 }
 
-bool Projectile::DrawChildren(const Region& vp, BlitFlags flags)
-{
-	bool drawn = false;
-	for (auto it = children.begin(); it != children.end();){
-		if (it->Update()) {
-			it->DrawTravel(vp, flags);
-			drawn = true;
+void Projectile::UpdateChildren() {
+	for (auto it = children.begin(); it != children.end();) {
+		it->Update();
+		if (it->IsStillIntact()) {
 			++it;
 		} else {
 			it = children.erase(it);
 		}
 	}
-
-	return drawn;
 }
 
-//draw until all children expire
-void Projectile::DrawExploded(const Region& viewport, BlitFlags flags)
+void Projectile::DrawChildren(const Region& vp, BlitFlags flags)
 {
-	if (DrawChildren(viewport, flags)) {
-		return;
+	for (auto& child : children) {
+		// regardless of the state, always use this draw method
+		child.DrawTravel(vp, flags);
 	}
-	phase = P_EXPIRED;
 }
 
 void Projectile::SpawnFragment(Point& dest) const
@@ -1358,7 +1379,7 @@ void Projectile::SpawnFragments(const Holder<ProjectileExtension>& extension) co
 	}
 }
 
-void Projectile::DrawExplodingPhase1() const
+void Projectile::InitExplodingPhase1() const
 {
 	core->GetAudioDrv()->Play(Extension->SoundRes, SFX_CHAN_MISSILE, Pos, GEM_SND_SPATIAL);
 
@@ -1418,7 +1439,7 @@ void Projectile::DrawExplodingPhase1() const
 }
 
 constexpr Point ZeroPoint;
-void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion, const Point& offset)
+void Projectile::SpawnChild(size_t idx, bool firstExplosion, const Point& offset)
 {
 	int apFlags = Extension->APFlags;
 	ResRef tmp = Extension->Spread;
@@ -1446,7 +1467,7 @@ void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion, const Point& o
 		Point followerOffset;
 		for (int i = 1; i <= 4; ++i) {
 			followerOffset = OrientedOffset(face, 9 * i);
-			DrawSpreadChild(idx, false, followerOffset);
+			SpawnChild(idx, false, followerOffset);
 		}
 	}
 
@@ -1518,7 +1539,7 @@ void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion, const Point& o
 		pro->ExtFlags |= PEF_RANDOM;
 	}
 
-	pro->Setup();
+	pro->Update();
 
 	// currently needed by bg2/how Web (less obvious in bg1)
 	// the original hardcoded a cycle switch to 1 or 2 at random when reaching the end, which results in the same frame
@@ -1534,7 +1555,7 @@ void Projectile::DrawSpreadChild(size_t idx, bool firstExplosion, const Point& o
 	delete pro;
 }
 
-void Projectile::DrawSpread()
+void Projectile::SpawnChildren()
 {
 	// returns if the explosion animation is fake coloured
 
@@ -1564,7 +1585,7 @@ void Projectile::DrawSpread()
 	}
 
 	for (size_t i = 0; i < childCount; ++i) {
-		DrawSpreadChild(i, firstExplosion, ZeroPoint);
+		SpawnChild(i, firstExplosion, ZeroPoint);
 	}
 
 	// switch fill to scatter after the first time
@@ -1574,26 +1595,18 @@ void Projectile::DrawSpread()
 	}
 }
 
-void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
-{
-	//This seems to be a needless safeguard
+Projectile::ProjectileState Projectile::GetNextExplosionState() {
 	if (!Extension) {
-		phase = P_EXPIRED;
-		return;
+		return ProjectileState::EXPIRED;
 	}
 
 	StopSound();
-	DrawChildren(vp, flags);
-
-	int pause = core->IsFreezed();
-	if (pause) {
-		return;
-	}
+	UpdateChildren();
 
 	//Delay explosion, it could even be revoked with PAF_SYNC (see skull trap)
 	if (extensionDelay) {
 		extensionDelay--;
-		return;
+		return state;
 	}
 
 	//0 and 1 have the same effect (1 explosion)
@@ -1618,18 +1631,7 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 	//the secondary projectile will target everyone in the area of effect
 	SecondaryTarget();
 
-	//draw fragment graphics animation at the explosion center
-	if (Extension->AFlags & PAF_FRAGMENT) {
-		//there is a character animation in the center of the explosion
-		//which will go towards the edges (flames, etc)
-		//Extension->ExplColor fake color for single shades (blue,green,red flames)
-		//Extension->FragAnimID the animation id for the character animation
-		//This color is not used in the original game
-		Point pos = Pos - vp.origin;
-		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, pos, Extension->FragAnimID, ZPos);
-	}
-
-	if(Shake) {
+	if (Shake) {
 		core->timer.SetScreenShake(Point(Shake, Shake), Shake);
 		Shake = 0;
 	}
@@ -1651,21 +1653,41 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 	//these resources are listed in areapro.2da and served by ProjectileServer.cpp
 	
 	//draw it only once, at the time of explosion
-	if (phase==P_EXPLODING1) {
-		DrawExplodingPhase1();
-		phase=P_EXPLODING2;
+	auto nextState = state;
+
+	if (state == ProjectileState::EXPLODING) {
+		InitExplodingPhase1();
+		nextState = ProjectileState::EXPLODING_AGAIN;
 	} else {
 		core->GetAudioDrv()->Play(Extension->AreaSound, SFX_CHAN_MISSILE, Pos, GEM_SND_SPATIAL);
 	}
 	
 	if (Extension->Spread) {
-		DrawSpread();
+		SpawnChildren();
 	}
 
 	if (extensionExplosionCount) {
 		extensionDelay = Extension->Delay;
 	} else {
-		phase = P_EXPLODED;
+		nextState = ProjectileState::BURNING_DOWN;
+	}
+
+	return nextState;
+}
+
+void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
+{
+	DrawChildren(vp, flags);
+
+	//draw fragment graphics animation at the explosion center
+	if (Extension->AFlags & PAF_FRAGMENT) {
+		//there is a character animation in the center of the explosion
+		//which will go towards the edges (flames, etc)
+		//Extension->ExplColor fake color for single shades (blue,green,red flames)
+		//Extension->FragAnimID the animation id for the character animation
+		//This color is not used in the original game
+		Point pos = Pos - vp.origin;
+		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, pos, Extension->FragAnimID, ZPos);
 	}
 }
 
@@ -1815,7 +1837,7 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 	}
 
 	Point pos = Pos - viewport.origin;
-	if (bend && phase == P_TRAVEL && Origin != Destination) {
+	if (bend && state == ProjectileState::TRAVELLING && Origin != Destination) {
 		BendPosition(pos);
 	}
 
@@ -1899,11 +1921,12 @@ void Projectile::SetIdentifiers(const ResRef &resref, size_t idx)
 
 bool Projectile::PointInRadius(const Point &p) const
 {
-	switch(phase) {
+	switch (state) {
 		//better not trigger on projectiles unset/expired
-		case P_EXPIRED:
-		case P_UNINITED: return false;
-		case P_TRAVEL:
+		case ProjectileState::NEW:
+		case ProjectileState::EXPIRED:
+			return false;
+		case ProjectileState::TRAVELLING:
 			return p == Pos;
 		default:
 			if (p == Pos) return true;
@@ -1931,9 +1954,8 @@ void Projectile::StaticTint(const Color &newtint)
 	TFlags &= ~PTF_TINT; //turn off area tint
 }
 
-int Projectile::GetPhase() const
-{
-	return phase;
+bool Projectile::IsWaitingForTrigger() const {
+	return state == ProjectileState::AWAITING_TRIGGER;
 }
 
 void Projectile::Cleanup()
@@ -1941,7 +1963,7 @@ void Projectile::Cleanup()
 	//neutralise the payload
 	effects = EffectQueue();
 	//diffuse the projectile
-	phase=P_EXPIRED;
+	state = ProjectileState::EXPIRED;
 }
 
 void Projectile::Draw(const Holder<Sprite2D>& spr, const Point& p, BlitFlags flags, Color overrideTint) const
