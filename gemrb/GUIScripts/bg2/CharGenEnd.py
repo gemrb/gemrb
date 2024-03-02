@@ -40,6 +40,7 @@ def OnLoad():
 	if Rep <= 0:
 		# use the alignment to apply starting reputation
 		RepTable = GemRB.LoadTable ("repstart")
+		Alignment = GemRB.GetVar ("Alignment")
 		AlignmentAbbrev = CommonTables.Aligns.FindValue (3, Alignment)
 		Rep = RepTable.GetValue (AlignmentAbbrev, 0) * 10
 		GemRB.SetPlayerStat (MyChar, IE_REPUTATION, Rep)
