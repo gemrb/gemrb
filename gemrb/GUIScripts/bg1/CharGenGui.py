@@ -319,9 +319,10 @@ def setAccept():
 	Rep = GemRB.GetPlayerStat (MyChar, IE_REPUTATION)
 
 	if Rep <= 0:
-		AlignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-		TmpTable = GemRB.LoadTable ("repstart")
-		Rep = TmpTable.GetValue (AlignID, 0) * 10
+		RepTable = GemRB.LoadTable ("repstart")
+		Alignment = GemRB.GetVar ("Alignment")
+		AlignmentAbbrev = CommonTables.Aligns.FindValue (3, Alignment)
+		Rep = RepTable.GetValue (AlignmentAbbrev, 0) * 10
 		GemRB.SetPlayerStat (MyChar, IE_REPUTATION, Rep)
 
 	if MyChar == 1: # only do it once
