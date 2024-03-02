@@ -32,6 +32,22 @@ def OnLoad():
 	# set my character up
 	MyChar = GemRB.GetVar ("Slot")
 
+	#reputation
+	# If Rep > 0 then MyChar is an imported character with a saved reputation,
+	# in which case the reputation shouldn't be overwritten.
+	Rep = GemRB.GetPlayerStat (MyChar, IE_REPUTATION)
+
+	if Rep <= 0:
+		# use the alignment to apply starting reputation
+		RepTable = GemRB.LoadTable ("repstart")
+		AlignmentAbbrev = CommonTables.Aligns.FindValue (3, Alignment)
+		Rep = RepTable.GetValue (AlignmentAbbrev, 0) * 10
+		GemRB.SetPlayerStat (MyChar, IE_REPUTATION, Rep)
+
+	# set the party rep if this in the main char
+	if MyChar == 1:
+		GemRB.GameSetReputation (Rep)
+
 	# don't reset most stats of imported chars
 	if GemRB.GetVar ("ImportedChar"):
 		CustomizeChar (MyChar)
