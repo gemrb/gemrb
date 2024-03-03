@@ -132,7 +132,7 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType
 	tick_t delay = maxDelay;
 	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && !scrollOffset.IsInvalid()) {
 		// empirically determined estimate to get the right speed and distance and 2px/tick
-		delay = 1800;
+		delay = 1800 * core->Time.ticksPerSec / core->Time.defaultTicksPerSec;
 	}
 
 	tick_t time = core->Time.Ticks2Ms(core->GetGame()->GameTime);
