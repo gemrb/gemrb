@@ -93,20 +93,8 @@ def NextPress():
 		AlignmentWindow.Close ()
 	# save previous stats:
 	#       alignment
-	#       reputation
-	#       alignment abilities
 	Alignment = GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)
-
-	# use the alignment to apply starting reputation
-	RepTable = GemRB.LoadTable ("repstart")
-	AlignmentAbbrev = CommonTables.Aligns.FindValue (3, Alignment)
-	Rep = RepTable.GetValue (AlignmentAbbrev, 0) * 10
-	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, Rep)
-
-	# set the party rep if this in the main char
-	if MyChar == 1:
-		GemRB.GameSetReputation (Rep)
 
 	GemRB.SetNextScript("CharGen5") #appearance
 	return

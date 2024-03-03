@@ -20,7 +20,7 @@
 import GemRB
 import CommonTables
 import GUICommon
-from ie_stats import IE_RACE, IE_SEX
+from ie_stats import IE_ALIGNMENT, IE_RACE, IE_REPUTATION, IE_SEX
 
 def RefreshPDoll(button, MinorColor, MajorColor, SkinColor, HairColor):
 	MyChar = GemRB.GetVar ("Slot")
@@ -38,3 +38,22 @@ def RefreshPDoll(button, MinorColor, MajorColor, SkinColor, HairColor):
 
 	button.SetPLT (ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
 	return
+
+def SetReputation ():
+	MyChar = GemRB.GetVar ("Slot")
+
+	# If Rep > 0 then MyChar is an imported character with a saved reputation,
+	# in which case the reputation shouldn't be overwritten.
+	Rep = GemRB.GetPlayerStat (MyChar, IE_REPUTATION)
+
+	if Rep <= 0:
+		# use the alignment to apply starting reputation
+		Alignment = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
+		AlignmentAbbrev = CommonTables.Aligns.FindValue (3, Alignment)
+		RepTable = GemRB.LoadTable ("repstart")
+		Rep = RepTable.GetValue (AlignmentAbbrev, 0) * 10
+		GemRB.SetPlayerStat (MyChar, IE_REPUTATION, Rep)
+
+	# set the party rep if this is the main char
+	if MyChar == 1:
+		GemRB.GameSetReputation (Rep)

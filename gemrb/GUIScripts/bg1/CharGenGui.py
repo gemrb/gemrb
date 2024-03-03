@@ -1,3 +1,4 @@
+import BGCommon
 import GemRB
 from GUIDefines import *
 from ie_stats import *
@@ -313,6 +314,9 @@ def setAccept():
 	#set my character up
 	MyChar = GemRB.GetVar ("Slot")
 
+	#reputation
+	BGCommon.SetReputation ()
+
 	# don't reset most stats of imported chars
 	if GemRB.GetVar ("ImportedChar"):
 		CustomizeChar (MyChar)
@@ -320,14 +324,6 @@ def setAccept():
 		return
 
 	ClassName = GUICommon.GetClassRowName (MyChar)
-	
-	#reputation
-	AlignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
-	TmpTable=GemRB.LoadTable ("repstart")
-	t = TmpTable.GetValue (AlignID, 0) * 10
-	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
-	if MyChar == 1: # only do it once
-		GemRB.GameSetReputation( t )
 
 	#lore, thac0, hp, and saves
 	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
