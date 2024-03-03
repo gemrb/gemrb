@@ -4395,6 +4395,9 @@ static void CopyPolymorphStats(Actor *source, Actor *target)
 	for (size_t i = 0; i < polystats.size(); ++i) {
 		target->polymorphCache->stats[i] = source->Modified[polystats[i]];
 	}
+	// reset stance since some polymorph targets don't have conjuration animations
+	// eg. spin141 from iwd1
+	target->SetStance(IE_ANI_AWAKE);
 }
 
 int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
