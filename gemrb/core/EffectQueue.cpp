@@ -1055,7 +1055,7 @@ static int CheckSaves(Actor* actor, Effect* fx)
 	}
 
 	// handle modifiers of specialist mages
-	if (!globals.pstflags) {
+	if (!globals.pstflags && !globals.iwd2fx) {
 		int specialist = KIT_BASECLASS;
 		if (caster) specialist = caster->GetStat(IE_KIT);
 		if (caster && caster->GetMageLevel() && specialist != KIT_BASECLASS) {
