@@ -52,16 +52,6 @@ enum ProHeights {
 	Background = 50 // this is supposed to move the projectile to the background
 };
 
-//projectile phases
-#define P_UNINITED  -1
-#define P_TRAVEL     0   //projectile moves to target
-#define P_TRAVEL2    1   //projectile hit target
-#define P_TRIGGER    2   //projectile hovers over target, waits for trigger
-#define P_EXPLODING1 3   //projectile explosion spreads
-#define P_EXPLODING2 4   //projectile explosion repeats
-#define P_EXPLODED   5   //projectile spread over area
-#define P_EXPIRED   99   //projectile scheduled for removal (existing parts are still drawn)
-
 //projectile spark flags
 #define PSF_SPARKS  1
 #define PSF_FLYING  2
@@ -198,6 +188,18 @@ struct ProjectileExtension
 
 class GEM_EXPORT Projectile
 {
+private:
+	enum class ProjectileState {
+		NEW,
+		TRAVELLING,       // moving towards target
+		AWAITING_TRIGGER, // hovering over target, waiting to trigger
+		HIT,              // hit target
+		EXPLODING,        // first explosion
+		EXPLODING_AGAIN,  // any subsequent explosion
+		BURNING_DOWN,     // children still there
+		EXPIRED
+	};
+
 public:
 	Projectile() noexcept;
 #if _MSC_VER
@@ -270,7 +272,7 @@ private:
 	int Level = 0;         // the caster's level
 	ieDword Target = 0;    // the globalID of target actor
 	ieDword FakeTarget = 0; // a globalID for target that isn't followed
-	int phase = P_UNINITED;
+	ProjectileState state = ProjectileState::NEW;
 	//saved in area
 	ResRef projectileName; // used also for namesake externalized spells
 	ieWord type = 0;
@@ -341,10 +343,10 @@ public:
 	void SetCaster(ieDword t, int level);
 	ieDword GetCaster() const;
 	bool FailedIDS(const Actor *target) const;
+	bool IsWaitingForTrigger() const;
 	void SetTarget(ieDword t, bool fake);
 	void SetTarget(const Point &p);
 	bool PointInRadius(const Point &p) const;
-	int GetPhase() const;
 	void Cleanup();
 
 	Point GetPos() const { return Pos; }
@@ -407,16 +409,18 @@ public:
 	//before vanishing (without the need of area extension)
 	void SetDelay(int delay);
 	void MoveTo(Map *map, const Point &Des);
-	void ClearPath();
 	//handle phases, return 0 when expired
-	int Update();
+	void Update();
+	void UpdateChildren();
 	Region DrawingRegion(const Region& viewPort) const;
 	//draw object
 	void Draw(const Region& screen, BlitFlags flags);
 	void SetGradient(int gradient, bool tinted);
 	void StaticTint(const Color &newtint);
+	bool IsStillIntact() const;
 	static Point GetStartOffset(const Actor* actor);
 private:
+	void ClearPath();
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
 	AnimArray CreateAnimations(const ResRef& bam, ieByte seq);
@@ -430,7 +434,7 @@ private:
 	//area effect projectiles call a separate single travel projectile for each affected target
 	void Payload();
 	//if there is an extension, convert to exploding or wait for trigger
-	void EndTravel();
+	ProjectileState EndTravel();
 	void ProcessEffects(EffectQueue& projQueue, Scriptable* owner, Actor* target, bool apply) const;
 	//apply default spell
 	void ApplyDefault() const;
@@ -439,24 +443,25 @@ private:
 	//kickstarts the secondary sound
 	void UpdateSound();
 	//reached end of single travel missile, explode or expire now
-	void ChangePhase();
+	ProjectileState GetNextTravelState();
+	ProjectileState GetNextExplosionState();
 	//drop a BAM or VVC on the trail path, return the length of the animation
 	int AddTrail(const ResRef& BAM, const ieByte *pal) const;
-	void DoStep();
+	ProjectileState DoStep();
 	void LineTarget() const;      //line projectiles (walls, scorchers)
 	void LineTarget(Path::const_iterator beg, Path::const_iterator end) const;
 	void SecondaryTarget(); //area projectiles (circles, cones)
-	void CheckTrigger(unsigned int radius);
+	ProjectileState CheckTrigger(unsigned int radius);
 	//calculate target and destination points for a firewall
 	void SetupWall();
 	void BendPosition(Point& pos) const;
 	void DrawPopping(unsigned int face, const Point& pos, BlitFlags flags, const Color& popTint);
 	void DrawLine(const Region &screen, int face, BlitFlags flag);
 	void DrawTravel(const Region& screen, BlitFlags flags);
-	bool DrawChildren(const Region& screen, BlitFlags flags);
-	void DrawExplodingPhase1() const;
-	void DrawSpread();
-	void DrawSpreadChild(size_t idx, bool firstExplosion, const Point& offset);
+	void DrawChildren(const Region& screen, BlitFlags flags);
+	void InitExplodingPhase1() const;
+	void SpawnChildren();
+	void SpawnChild(size_t idx, bool firstExplosion, const Point& offset);
 	void DrawExplosion(const Region& screen, BlitFlags flags);
 	void SpawnFragment(Point& pos) const;
 	void SpawnFragments(const Holder<ProjectileExtension>& extension) const;
