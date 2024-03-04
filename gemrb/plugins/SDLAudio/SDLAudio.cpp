@@ -81,12 +81,14 @@ SDLAudio::~SDLAudio(void)
 	Mix_HookMusic(NULL, NULL);
 	FreeBuffers();
 	Mix_ChannelFinished(NULL);
+
+	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
 bool SDLAudio::Init(void)
 {
-	// TODO: we assume SDLVideo already got loaded
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
+		Log(ERROR, "SDLAudio", "InitSubSystem failed: {}", SDL_GetError());
 		return false;
 	}
 #ifdef RPI

@@ -70,6 +70,7 @@ int main(int argc, char* argv[])
 		return GEM_ERROR;
 	}
 
+	VideoDriver.reset();
 	PluginMgr::Get()->RunCleanup();
 
 	return GEM_OK;

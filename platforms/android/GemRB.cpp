@@ -81,5 +81,7 @@ int main(int argc, char* argv[])
 		return GEM_ERROR;
 	}
 
+	VideoDriver.reset();
+
 	return GEM_OK;
 }

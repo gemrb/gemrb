@@ -28,12 +28,12 @@ using namespace GemRB;
 
 SDLVideoDriver::~SDLVideoDriver(void)
 {
-	SDL_Quit();
+	SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_VIDEO);
 }
 
 int SDLVideoDriver::Init(void)
 {
-	if (SDL_InitSubSystem( SDL_INIT_VIDEO ) == -1) {
+	if (SDL_InitSubSystem(SDL_INIT_VIDEO) == -1) {
 		Log(ERROR, "SDLVideo", "InitSubSystem failed: {}", SDL_GetError());
 		return GEM_ERROR;
 	}

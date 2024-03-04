@@ -55,13 +55,6 @@ int SDL12VideoDriver::Init(void)
 		// this may limit people actually using very old single button mice, but who cares :)
 		setenv("SDL_HAS3BUTTONMOUSE", "SDL_HAS3BUTTONMOUSE", 1);
 #endif
-		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == -1) {
-			Log(ERROR, "SDLJoystick", "InitSubSystem failed: {}", SDL_GetError());
-		} else {
-			if (SDL_NumJoysticks() > 0) {
-				gameController = SDL_JoystickOpen(0);
-			}
-		}
 	}
 
 	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == -1) {
