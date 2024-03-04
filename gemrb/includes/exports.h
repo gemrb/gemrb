@@ -97,7 +97,7 @@
 #endif
 
 /// Silence some persistent unused warnings (supported since gcc 2.4)
-#if defined __GNUC__ or defined __clang__
+#if defined(__GNUC__) or defined(__clang__)
 #	define IGNORE_UNUSED __attribute__ ((unused))
 #else
 #	define IGNORE_UNUSED
