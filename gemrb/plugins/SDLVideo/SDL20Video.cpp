@@ -125,7 +125,7 @@ int SDL20VideoDriver::Init()
 int SDL20VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 {
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, core->config.ScaleQuality.c_str());
 
 #if USE_OPENGL_BACKEND
 #if USE_OPENGL_API

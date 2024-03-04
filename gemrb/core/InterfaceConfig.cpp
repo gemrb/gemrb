@@ -291,6 +291,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	CONFIG_STRING("AudioDriver", config.AudioDriverName);
 	CONFIG_STRING("VideoDriver", config.VideoDriverName);
 	CONFIG_STRING("Encoding", config.Encoding);
+	CONFIG_STRING("ScaleQuality", config.ScaleQuality);
 
 	auto value = cfg.Get("ModPath", "");
 	if (value.length()) {
