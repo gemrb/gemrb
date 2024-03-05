@@ -246,7 +246,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		if recommend:
 			SpellsWindow.Focus()
 		else:
-			SpellsWindow.ShowModal (MODAL_SHADOW_NONE)
+			SpellsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	else:
 		SpellsWindow.ShowModal (MODAL_SHADOW_GRAY)
 

@@ -60,7 +60,7 @@ def OnLoad():
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	RedrawSkills()
-	SkillWindow.ShowModal(MODAL_SHADOW_NONE)
+	SkillWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
 def NextPress():

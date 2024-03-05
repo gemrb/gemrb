@@ -48,7 +48,7 @@ def OnLoad():
 	DoneButton.OnPress (DonePress)
 	CancelButton.OnPress (CancelPress)
 	TextAreaControl.OnSelect (SelectPress)
-	ImportWindow.ShowModal(MODAL_SHADOW_NONE)
+	ImportWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
 def SelectPress():

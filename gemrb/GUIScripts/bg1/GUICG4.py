@@ -171,7 +171,7 @@ def OnLoad():
 	RerollButton.OnPress (RollPress)
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (lambda: CharGenCommon.back(AbilityWindow))
-	AbilityWindow.ShowModal(MODAL_SHADOW_NONE)
+	AbilityWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
 def RightPress():
