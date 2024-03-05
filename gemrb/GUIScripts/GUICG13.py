@@ -110,17 +110,17 @@ def DonePress():
 	ColorWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	PickedColor=ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))
-	if ColorIndex==0:
+	if ColorIndex == 0:
 		HairColor=PickedColor
 		HairButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, HairColor)
 		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
-	if ColorIndex==1:
+	if ColorIndex == 1:
 		SkinColor=PickedColor
 		SkinButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, SkinColor)
 		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
-	if ColorIndex==2:
+	if ColorIndex == 2:
 		MinorColor=PickedColor
 		MajorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MinorColor)
 		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
