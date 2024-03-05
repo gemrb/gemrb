@@ -30,12 +30,12 @@ CharGenWindow = 0
 TextAreaControl = 0
 PortraitName = ""
 
-def PositionCharGenWin(window, offset = 0):
+def PositionCharGenWin(window, yOffset = 0, xOffset = 0):
 	global CharGenWindow
 	
 	CGFrame = CharGenWindow.GetFrame()
 	WFrame = window.GetFrame()
-	window.SetPos(CGFrame['x'], offset + CGFrame['y'] + (CGFrame['h'] - WFrame['h']))
+	window.SetPos(CGFrame['x'] + xOffset, yOffset + CGFrame['y'] + (CGFrame['h'] - WFrame['h']))
 
 
 def DisplayOverview(step):
