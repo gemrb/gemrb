@@ -1486,7 +1486,7 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed)
 
 		// fx_pause_target is a one-tick shot pony, nothing to do
 
-		fx->Parameter1 = -fx->Parameter1;
+		fx->Parameter1 = 0xffffffff - fx->Parameter1; // over- or under-flow is intentional
 
 		Log(DEBUG, "EffectQueue", "Manually removing effect {} (from {})", fx->Opcode, removed);
 		ApplyEffect(OwnerActor, fx, 1, 0);

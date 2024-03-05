@@ -2724,8 +2724,6 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 
 	ResRef enc[5];
 	int k;
-	EnumArray<WMPDirection, ieDword> links;
-	EnumArray<WMPDirection, ieDword> indices;
 	TableMgr::index_t rows = newarea->GetRowCount();
 	for (TableMgr::index_t i = 0; i < rows; ++i) {
 		const ResRef area  = newarea->QueryField(i,0);
@@ -2737,6 +2735,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		int label          = newarea->QueryFieldSigned<int>(i,6);
 		int name           = newarea->QueryFieldSigned<int>(i,7);
 		ResRef ltab   = newarea->QueryField(i, 8);
+		EnumArray<WMPDirection, ieDword> links;
 		links[WMPDirection::NORTH] = newarea->QueryFieldUnsigned<ieDword>(i, 9);
 		links[WMPDirection::EAST] = newarea->QueryFieldUnsigned<ieDword>(i, 10);
 		links[WMPDirection::SOUTH] = newarea->QueryFieldUnsigned<ieDword>(i, 11);
@@ -2746,6 +2745,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 
 		unsigned int local = 0;
 		int linkcnt = wmap->GetLinkCount();
+		EnumArray<WMPDirection, ieDword> indices;
 		for (WMPDirection dir : EnumIterator<WMPDirection>()) {
 			indices[dir] = linkcnt;
 			linkcnt += links[dir];
@@ -5734,7 +5734,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "i", &PartyID );
 	GET_GAME();
 
-	Actor* MyActor = game->FindPC( PartyID );
+	const Actor* MyActor = game->FindPC(PartyID);
 	if (!MyActor || !MyActor->PCStats) {
 		Py_RETURN_NONE;
 	}
