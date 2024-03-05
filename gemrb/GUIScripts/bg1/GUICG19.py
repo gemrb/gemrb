@@ -61,7 +61,7 @@ def OnLoad():
 	VoiceList.OnSelect (ChangeVoice)
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (lambda: CharGenCommon.back(CharSoundWindow))
-	CharSoundWindow.ShowModal(MODAL_SHADOW_NONE)
+	CharSoundWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
 def PlayPress():

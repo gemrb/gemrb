@@ -87,7 +87,7 @@ def OnLoad():
 
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (lambda: CharGenCommon.back(RaceWindow))
-	RaceWindow.ShowModal(MODAL_SHADOW_NONE)
+	RaceWindow.ShowModal(MODAL_SHADOW_GRAY)
 	DisplayRaces()
 	return
 

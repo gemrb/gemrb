@@ -97,7 +97,7 @@ def OnLoad():
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (lambda: CharGenCommon.back(KitWindow))
 	#KitPress()
-	KitWindow.ShowModal(MODAL_SHADOW_NONE)
+	KitWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
 def KitPress():

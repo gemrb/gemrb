@@ -70,7 +70,7 @@ def OnLoad():
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (lambda: CharGenCommon.back(AlignmentWindow))
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	AlignmentWindow.ShowModal(MODAL_SHADOW_NONE)
+	AlignmentWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
 def AlignmentPress():

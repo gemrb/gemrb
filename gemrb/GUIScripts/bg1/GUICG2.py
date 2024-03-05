@@ -108,7 +108,7 @@ def OnLoad():
 	SpecialistButton.OnPress (SpecialistPress)
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (lambda: CharGenCommon.back(ClassWindow))
-	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
+	ClassWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
 def MultiClassPress():

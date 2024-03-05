@@ -98,7 +98,7 @@ def OnLoad():
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (BackPress)
 	BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
-	ColorWindow.ShowModal (MODAL_SHADOW_NONE)
+	ColorWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def DonePress():
@@ -107,7 +107,7 @@ def DonePress():
 	if ColorPicker:
 		ColorPicker.Close ()
 
-	ColorWindow.ShowModal (MODAL_SHADOW_NONE)
+	ColorWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	PickedColor=ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex==0:
@@ -159,13 +159,13 @@ def GetColor():
 		Button.OnPress (DonePress)
 
 	ColorPicker.GetControl(0).MakeEscape ()
-	ColorPicker.ShowModal (MODAL_SHADOW_NONE)
+	ColorPicker.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def HairPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(False)
+	ColorWindow.SetVisible(True)
 	ColorIndex = 0
 	PickedColor = HairColor
 	GetColor()
@@ -174,7 +174,7 @@ def HairPress():
 def SkinPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(False)
+	ColorWindow.SetVisible(True)
 	ColorIndex = 1
 	PickedColor = SkinColor
 	GetColor()
@@ -183,7 +183,7 @@ def SkinPress():
 def MajorPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(False)
+	ColorWindow.SetVisible(True)
 	ColorIndex = 2
 	PickedColor = MinorColor
 	GetColor()
@@ -192,7 +192,7 @@ def MajorPress():
 def MinorPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(False)
+	ColorWindow.SetVisible(True)
 	ColorIndex = 3
 	PickedColor = MajorColor
 	GetColor()

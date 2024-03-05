@@ -81,7 +81,7 @@ def OnLoad():
 	DoneButton.OnPress (lambda: NextPress(ClassWindow))
 	BackButton.OnPress (lambda: CharGenCommon.back(ClassWindow))
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
+	ClassWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
 def ClassPress():

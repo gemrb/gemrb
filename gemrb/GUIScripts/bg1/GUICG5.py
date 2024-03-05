@@ -48,7 +48,7 @@ def OnLoad():
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (lambda: CharGenCommon.back(NameWindow))
 	NameField.OnChange (EditChange)
-	NameWindow.ShowModal(MODAL_SHADOW_NONE)
+	NameWindow.ShowModal(MODAL_SHADOW_GRAY)
 	NameField.Focus()
 	return
 
