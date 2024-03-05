@@ -48,6 +48,7 @@ void Video::DestroyBuffers()
 	for (auto buffer : buffers) {
 		delete buffer;
 	}
+	buffers.clear();
 }
 
 int Video::CreateDisplay(const Size& s, int bits, bool fs, const char* title, bool vsync)
