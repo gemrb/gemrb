@@ -766,53 +766,49 @@ def ColorDonePress():
 		ColorPicker.Close ()
 
 	ColorTable = GemRB.LoadTable ("clowncol")
-	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
-	if ColorIndex==0:
-		GUICommon.SetColorStat (pc, IE_HAIR_COLOR, PickedColor)
-	elif ColorIndex==1:
-		GUICommon.SetColorStat (pc, IE_SKIN_COLOR, PickedColor)
-	elif ColorIndex==2:
-		GUICommon.SetColorStat (pc, IE_MAJOR_COLOR, PickedColor)
+	pickedColor = ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
+	if ColorIndex == 0:
+		GUICommon.SetColorStat (pc, IE_HAIR_COLOR, pickedColor)
+	elif ColorIndex == 1:
+		GUICommon.SetColorStat (pc, IE_SKIN_COLOR, pickedColor)
+	elif ColorIndex == 2:
+		GUICommon.SetColorStat (pc, IE_MAJOR_COLOR, pickedColor)
 	else:
-		GUICommon.SetColorStat (pc, IE_MINOR_COLOR, PickedColor)
+		GUICommon.SetColorStat (pc, IE_MINOR_COLOR, pickedColor)
 	UpdateInventoryWindow ()
 	return
 
 def HairPress():
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 0
-	PickedColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR, 1) & 0xFF
 	GetColor()
 	return
 
 def SkinPress():
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 1
-	PickedColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR, 1) & 0xFF
 	GetColor()
 	return
 
 def MajorPress():
 	"""Selects the major color."""
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 2
-	PickedColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1) & 0xFF
 	GetColor()
 	return
 
 def MinorPress():
 	"""Selects the minor color."""
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 3
-	PickedColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1) & 0xFF
 	GetColor()
 	return
 
@@ -829,9 +825,10 @@ def GetColor():
 	if GameCheck.IsIWD2 () or GameCheck.IsGemRBDemo ():
 		Button = ColorPicker.GetControl (35)
 		Button.OnPress (CancelColor)
-		Button.SetText (103)
 		if GameCheck.IsIWD2 ():
 			Button.SetText (13727)
+		else:
+			Button.SetText (103)
 
 	for i in range (34):
 		Button = ColorPicker.GetControl (i)
@@ -839,14 +836,9 @@ def GetColor():
 		if MyColor == "*":
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			continue
-		if PickedColor == MyColor:
-			GemRB.SetVar ("Selected",i)
-			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			Button.MakeEscape()
-		else:
-			Button.SetBAM ("COLGRAD", 2, 0, MyColor)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetBAM ("COLGRAD", 2, 0, MyColor)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("Selected",i)
 		Button.OnPress (ColorDonePress)
 	ColorPicker.Focus()
