@@ -195,8 +195,8 @@ static void InitActorTables();
 #define DAMAGE_LEVELS 19
 
 // ANIMATION1 in dmgtypes.2da, except it only has fire, electricity, cold AND no levels
-// we have both maps in damage.2da, plus the gradient info in d_gradient
-static ResRef d_main[DAMAGE_LEVELS] = {
+// we have both maps in damage.2da, plus the gradient info in damageGradients
+static ResRef damageMainResources[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
 	"BLOODCR","BLOODS","BLOODM","BLOODL", //blood
 	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //fire
@@ -206,7 +206,7 @@ static ResRef d_main[DAMAGE_LEVELS] = {
 	"SPDUSTY2","SPDUSTY2","SPDUSTY2"      //disintegrate
 };
 // ANIMATION2 in dmgtypes.2da with the same limitations
-static ResRef d_splash[DAMAGE_LEVELS] = {
+static ResRef damageSparks[DAMAGE_LEVELS] = {
 	"","","","",
 	"SPBURN","SPBURN","SPBURN", //flames
 	"SPSPARKS","SPSPARKS","SPSPARKS", //sparks
@@ -215,12 +215,14 @@ static ResRef d_splash[DAMAGE_LEVELS] = {
 	"","",""
 };
 
+static bool damageBlendFlags[DAMAGE_LEVELS] = {0};
+
 #define BLOOD_GRADIENT 19
 #define FIRE_GRADIENT 19
 #define ICE_GRADIENT 71
 #define STONE_GRADIENT 93
 
-static int d_gradient[DAMAGE_LEVELS] = {
+static int damageGradients[DAMAGE_LEVELS] = {
 	BLOOD_GRADIENT,BLOOD_GRADIENT,BLOOD_GRADIENT,BLOOD_GRADIENT,
 	FIRE_GRADIENT,FIRE_GRADIENT,FIRE_GRADIENT,
 	-1,-1,-1,
@@ -1494,6 +1496,7 @@ static const PostChangeFunctionType post_change_functions[MAX_STATS] = {
 #define COL_MAIN       0
 #define COL_SPARKS     1
 #define COL_GRADIENT   2
+#define COL_BLEND      3
 
 /* returns the ISCLASS for the class based on name */
 static int IsClassFromName (const std::string& name)
@@ -1724,16 +1727,19 @@ static void InitActorTables()
 	if (tm) {
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
 			ResRef tmp = tm->QueryField( i, COL_MAIN );
-			d_main[i] = tmp;
-			if (IsStar(d_main[i])) {
-				d_main[i].Reset();
+			damageMainResources[i] = tmp;
+			if (IsStar(damageMainResources[i])) {
+				damageMainResources[i].Reset();
 			}
 			tmp = tm->QueryField(i, COL_SPARKS);
-			d_splash[i] = tmp;
-			if (IsStar(d_splash[i])) {
-				d_splash[i].Reset();
+			damageSparks[i] = tmp;
+			if (IsStar(damageSparks[i])) {
+				damageSparks[i].Reset();
 			}
-			d_gradient[i] = tm->QueryFieldSigned<int>(i, COL_GRADIENT);
+			damageGradients[i] = tm->QueryFieldSigned<int>(i, COL_GRADIENT);
+
+			uint8_t value = tm->QueryFieldUnsigned<uint8_t>(i, COL_BLEND);
+			damageBlendFlags[i] = value > 0;
 		}
 	}
 
@@ -2355,8 +2361,11 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 	int flags = AA_PLAYONCE;
 	int height = 22;
 	if (pstflags) {
-		flags |= AA_BLEND;
 		height = 45; // empirical like in fx_visual_spell_hit
+	}
+
+	if (damageBlendFlags[type]) {
+		flags |= AA_BLEND;
 	}
 
 	Log(COMBAT, "Actor", "Damage animation type: {}", type);
@@ -2371,44 +2380,52 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 			//fall through
 		case 1: case 2: case 3: //blood
 			i = anims->GetBloodColor();
-			if (!i) i = d_gradient[type];
+			if (!i) i = damageGradients[type];
 			fx = fxqueue.HasEffectWithParam(fx_animation_override_data_ref, 2);
 			if (fx) {
 				i = fx->Parameter1;
 			}
 			if (hit) {
-				AddAnimation(d_main[type], i, height, flags);
+				AddAnimation(damageMainResources[type], i, height, flags);
 			}
 			break;
 		case 4: case 5: case 6: //fire
 			if(hit) {
-				AddAnimation(d_main[type], d_gradient[type], height, flags);
+				AddAnimation(damageMainResources[type], damageGradients[type], height, flags);
 			}
 			for(i=DL_FIRE;i<=type;i++) {
-				AddAnimation(d_splash[i], d_gradient[i], height, flags);
+				AddAnimation(damageSparks[i], damageGradients[i], height, flags);
 			}
 			break;
 		case 7: case 8: case 9: //electricity
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], height, flags);
+				AddAnimation(damageMainResources[type], damageGradients[type], height, flags);
 			}
 			for(i=DL_ELECTRICITY;i<=type;i++) {
-				AddAnimation(d_splash[i], d_gradient[i], height, flags);
+				AddAnimation(damageSparks[i], damageGradients[i], height, flags);
 			}
 			break;
 		case 10: case 11: case 12://cold
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], height, flags);
+				AddAnimation(damageMainResources[type], damageGradients[type], height, flags);
+			}
+
+			for (i = DL_COLD; i <= type; i++) {
+				AddAnimation(damageSparks[i], damageGradients[i], height, flags);
 			}
 			break;
 		case 13: case 14: case 15://acid
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], height, flags);
+				AddAnimation(damageMainResources[type], damageGradients[type], height, flags);
+			}
+
+			for (i = DL_ACID; i <= type; i++) {
+				AddAnimation(damageSparks[i], damageGradients[i], height, flags);
 			}
 			break;
 		case 16: case 17: case 18://disintegrate
 			if (hit) {
-				AddAnimation(d_main[type], d_gradient[type], height, flags);
+				AddAnimation(damageMainResources[type], damageGradients[type], height, flags);
 			}
 			break;
 	}

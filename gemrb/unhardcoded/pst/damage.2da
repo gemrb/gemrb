@@ -1,16 +1,16 @@
 2DA V1.0
 *
-	MAIN		SPARKS		GRADIENT
-CRIT	BLOODCR		*               47
-SMALL	BLOODS		*               47
-MEDIUM	BLOODM		*               47
-LARGE	BLOODL		*               47
-FIRES	T_FIRE1		*               19
-FIREM	T_FIRE1		*               19
-FIREL	T_FIRE1		*               19
-SPARKS	DMGSPARK	*        -1
-SPARKM	DMGSPARK	*        -1
-SPARKL	DMGSPARK	*        -1
-ICES	D005DICE		*               -1
-ICEM	D005DICE		*               -1
-ICEL	D005DICE		*               -1
+        MAIN      SPARKS  GRADIENT  BLEND
+CRIT    BLOODCR   *       47        1
+SMALL   BLOODS    *       47        1
+MEDIUM  BLOODM    *       47        1
+LARGE   BLOODL    *       47        1
+FIRES   T_FIRE1   *       19        1
+FIREM   T_FIRE1   *       19        1
+FIREL   T_FIRE1   *       19        1
+SPARKS  DMGSPARK  *       -1        1
+SPARKM  DMGSPARK  *       -1        1
+SPARKL  DMGSPARK  *       -1        1
+ICES    D005DICE  *       -1        1
+ICEM    D005DICE  *       -1        1
+ICEL    D005DICE  *       -1        1
