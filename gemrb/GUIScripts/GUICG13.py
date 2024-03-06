@@ -30,7 +30,6 @@ ColorWindow = 0
 ColorPicker = 0
 DoneButton = 0
 ColorIndex = 0
-PickedColor = 0
 HairButton = 0
 SkinButton = 0
 MajorButton = 0
@@ -45,8 +44,8 @@ ModalShadow = MODAL_SHADOW_NONE
 def OnLoad():
 	global ColorWindow, DoneButton, PDollButton, ColorTable, ModalShadow
 	global HairButton, SkinButton, MajorButton, MinorButton
-	global HairColor, SkinColor, MinorColor, MajorColor
-	
+	global HairColor, SkinColor, MajorColor, MinorColor
+
 	ColorWindow=GemRB.LoadWindow(13, "GUICG")
 	ColorWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 	if GameCheck.IsBG2 ():
@@ -62,8 +61,8 @@ def OnLoad():
 		PortraitIndex = 0
 	HairColor = PortraitTable.GetValue (PortraitIndex, 1)
 	SkinColor = PortraitTable.GetValue (PortraitIndex, 2)
-	MinorColor = PortraitTable.GetValue (PortraitIndex, 3)
-	MajorColor = PortraitTable.GetValue (PortraitIndex, 4)
+	MajorColor = PortraitTable.GetValue (PortraitIndex, 3)
+	MinorColor = PortraitTable.GetValue (PortraitIndex, 4)
 
 	PDollButton = ColorWindow.GetControl(1)
 	PDollButton.SetState (IE_GUI_BUTTON_LOCKED)
@@ -79,15 +78,15 @@ def OnLoad():
 	SkinButton.OnPress (SkinPress)
 	SkinButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, SkinColor)
 
-	MajorButton = ColorWindow.GetControl(5)
+	MajorButton = ColorWindow.GetControl(4)
 	MajorButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
 	MajorButton.OnPress (MajorPress)
-	MajorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MinorColor)
+	MajorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MajorColor)
 
-	MinorButton = ColorWindow.GetControl(4)
+	MinorButton = ColorWindow.GetControl(5)
 	MinorButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
 	MinorButton.OnPress (MinorPress)
-	MinorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MajorColor)
+	MinorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MinorColor)
 
 	BackButton = ColorWindow.GetControl(13)
 	BackButton.SetText(15416)
@@ -108,32 +107,32 @@ def OnLoad():
 	return
 
 def DonePress():
-	global HairColor, SkinColor, MinorColor, MajorColor
+	global HairColor, SkinColor, MajorColor, MinorColor
 
 	if ColorPicker:
 		ColorPicker.Close ()
 
 	ColorWindow.ShowModal (ModalShadow)
 
-	PickedColor = ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))
+	pickedColor = ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex == 0:
-		HairColor = PickedColor
+		HairColor = pickedColor
 		HairButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, HairColor)
 		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
 	if ColorIndex == 1:
-		SkinColor = PickedColor
+		SkinColor = pickedColor
 		SkinButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, SkinColor)
 		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
 	if ColorIndex == 2:
-		MinorColor = PickedColor
-		MajorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MinorColor)
+		MajorColor = pickedColor
+		MajorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MajorColor)
 		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
 
-	MajorColor = PickedColor
-	MinorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MajorColor)
+	MinorColor = pickedColor
+	MinorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MinorColor)
 	BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 	return
 
@@ -160,45 +159,38 @@ def GetColor():
 			break
 		Button = ColorPicker.GetControl(i)
 		Button.SetBAM("COLGRAD", 2, 0, MyColor)
-		if PickedColor == MyColor:
-			GemRB.SetVar("Selected",i)
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc("Selected",i)
 		Button.OnPress (DonePress)
 
-	ColorPicker.GetControl(0).MakeEscape ()
 	ColorPicker.ShowModal (ModalShadow)
 	return
 
 def HairPress():
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	ColorIndex = 0
-	PickedColor = HairColor
 	GetColor()
 	return
 
 def SkinPress():
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	ColorIndex = 1
-	PickedColor = SkinColor
 	GetColor()
 	return
 
 def MajorPress():
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	ColorIndex = 2
-	PickedColor = MinorColor
 	GetColor()
 	return
 
 def MinorPress():
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	ColorIndex = 3
-	PickedColor = MajorColor
 	GetColor()
 	return
 

@@ -1042,34 +1042,30 @@ def UpdatePaperDoll ():
 	return
 
 def SetHairColor ():
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	ColorIndex = 0
-	PickedColor = HairColor
 	OpenColorPicker ()
 	return
 
 def SetSkinColor ():
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	ColorIndex = 1
-	PickedColor = SkinColor
 	OpenColorPicker ()
 	return
 
 def SetMinorColor ():
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	ColorIndex = 2
-	PickedColor = MinorColor
 	OpenColorPicker ()
 	return
 
 def SetMajorColor ():
-	global ColorIndex, PickedColor
+	global ColorIndex
 
 	ColorIndex = 3
-	PickedColor = MajorColor
 	OpenColorPicker ()
 	return
 
@@ -1089,8 +1085,6 @@ def OpenColorPicker ():
 			break
 		Button = Window.GetControl (i+1)
 		Button.SetBAM("COLGRAD", 2, 0, MyColor)
-		if PickedColor == MyColor:
-			GemRB.SetVar ("Selected",i)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc("Selected",i)
 		Button.OnPress (DonePress)
@@ -1100,24 +1094,23 @@ def OpenColorPicker ():
 
 def DonePress():
 	global HairColor, SkinColor, MajorColor, MinorColor
-	global PickedColor
 
 	GemRB.GetView("SUB_WIN", 1).Close()
-	PickedColor=ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
-	if ColorIndex==0:
-		HairColor=PickedColor
+	pickedColor = ColorTable.GetValue (ColorIndex, GemRB.GetVar ("Selected"))
+	if ColorIndex == 0:
+		HairColor = pickedColor
 		UpdatePaperDoll ()
 		return
-	if ColorIndex==1:
-		SkinColor=PickedColor
+	if ColorIndex == 1:
+		SkinColor = pickedColor
 		UpdatePaperDoll ()
 		return
-	if ColorIndex==2:
-		MinorColor=PickedColor
+	if ColorIndex == 2:
+		MinorColor = pickedColor
 		UpdatePaperDoll ()
 		return
 
-	MajorColor=PickedColor
+	MajorColor = pickedColor
 	UpdatePaperDoll ()
 	return
 
