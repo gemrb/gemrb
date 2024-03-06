@@ -46,7 +46,7 @@ def OnLoad():
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global HairColor, SkinColor, MajorColor, MinorColor
 
-	ColorWindow=GemRB.LoadWindow(13, "GUICG")
+	ColorWindow = GemRB.LoadWindow(13, "GUICG")
 	ColorWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 	if GameCheck.IsBG2 ():
 		CharGenCommon.PositionCharGenWin (ColorWindow, -6)
