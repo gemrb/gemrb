@@ -116,6 +116,7 @@ struct CoreSettings {
 	uint32_t ActionRepeatDelay = 250;
 	int TouchInput = -1;
 	std::string SystemEncoding = "UTF-8";
+	std::string ScaleQuality = "best";
 
 	variables_t vars;
 };

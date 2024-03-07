@@ -54,6 +54,9 @@ Height=480
 # Bits per pixel [Integer:16,32]
 Bpp=32
 
+# Choices: best (default), linear, nearest
+#ScaleQuality = best
+
 # Cap FPS, 0 = request VSync (SDL2 only, default), -1 = no limit, 30+ = cap value
 #CapFPS=0
 
