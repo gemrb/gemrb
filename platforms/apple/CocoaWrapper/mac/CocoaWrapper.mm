@@ -23,6 +23,7 @@
 #import "AppleLogger.h"
 #import "Interface.h"
 #import "Logging/Logging.h"
+#import "PluginMgr.h"
 #import "Streams/FileStream.h"
 
 using namespace GemRB;
@@ -212,6 +213,8 @@ using namespace GemRB;
 	} catch (std::exception& e) {
 		Log(FATAL, "Cocoa Wrapper", "Unable to initialize core: {}. Terminating.", e);
 	}
+
+	PluginMgr::Get()->RunCleanup();
 
 	if ([defaults boolForKey:@"TerminateOnClose"]) {
 		[NSApp terminate:self];

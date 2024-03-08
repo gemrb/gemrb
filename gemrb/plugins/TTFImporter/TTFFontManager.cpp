@@ -66,10 +66,12 @@ bool TTFFontManager::Import(DataStream* stream)
 			delete static_cast<DataStream*>(TTFStream->descriptor.pointer);
 			delete TTFStream;
 		};
-		ftStream->descriptor.pointer = stream->Clone();
-		ftStream->pos = stream->GetPos();
-		ftStream->size = stream->Size();
-		
+
+		DataStream* clone = stream->Clone();
+		ftStream->descriptor.pointer = clone;
+		ftStream->pos = clone->GetPos();
+		ftStream->size = clone->Size();
+
 		FT_Open_Args args = FT_Open_Args();
 		args.flags = FT_OPEN_STREAM;
 		args.stream = ftStream;
@@ -93,6 +95,7 @@ void TTFFontManager::Close()
 {
 	if (face) {
 		FT_Done_Face(face);
+		face = nullptr;
 	}
 }
 

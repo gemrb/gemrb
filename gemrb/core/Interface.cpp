@@ -615,9 +615,6 @@ Interface::~Interface() noexcept
 	delete worldmap;
 	delete keymap;
 
-	// fonts need to be destroyed before TTF plugin
-	PluginMgr::Get()->RunCleanup();
-
 	slotTypes.clear();
 	itemtypedata.clear();
 

@@ -26,6 +26,7 @@
 #include "Interface.h"
 #include "Logging/Logging.h"
 #include "Logging/Loggers/Stdio.h"
+#include "PluginMgr.h"
 
 using namespace GemRB;
 
@@ -64,6 +65,8 @@ int main(int argc, char* argv[])
 		Log(FATAL, "Main", "Aborting due to fatal error... {}", cie);
 		ret = GEM_ERROR;
 	}
+
+	PluginMgr::Get()->RunCleanup();
 
 	ToggleLogging(false); // Windows build will hang if we leave the logging thread running
 	SetConsoleMode(hConsole, dwMode);

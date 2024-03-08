@@ -31,7 +31,7 @@ namespace GemRB {
 class TTFFont : public Font
 {
 private:
-	FT_Face face;
+	FT_Face face = nullptr;
 
 	const Glyph& AliasBlank(ieWord chr) const;
 
