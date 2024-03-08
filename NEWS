@@ -1,4 +1,4 @@
-GemRB git (7ce99f1):
+GemRB git (04fc79cb):
   New features:
     - 
     - full i18n (language) support, custom journal entries
@@ -8,7 +8,7 @@ GemRB git (7ce99f1):
   Improved features:
     - 
     - colored logging, pathfinding, drawing
-    - switched to c++14
+    - switched to c++14, build system
     - ee compat, iwd2&pst worldmap, creature sounds, effects, familiars, modals
     - bugfixes
 
