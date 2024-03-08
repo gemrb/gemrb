@@ -614,21 +614,14 @@ Interface::~Interface() noexcept
 	delete calendar;
 	delete worldmap;
 	delete keymap;
-
-	slotTypes.clear();
-	itemtypedata.clear();
-
 	delete sgiterator;
-
-	DamageInfoMap.clear();
-
 	delete projserv;
-
 	delete displaymsg;
 	delete TooltipBG;
 
+	// delete and nullify this global data as well
 	delete gamedata;
-	gamedata = NULL;
+	gamedata = nullptr;
 
 	// Removing all stuff from Cache, except bifs
 	if (!config.KeepCache) DelTree(config.CachePath, true);
