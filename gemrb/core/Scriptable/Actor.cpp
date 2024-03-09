@@ -663,7 +663,7 @@ static void ApplyClab_internal(Actor* actor, const ResRef& clab, int level, bool
 #define KIT_WILDMAGE KIT_BASECLASS+30
 #define KIT_BARBARIAN KIT_BASECLASS+31
 
-ieDword Actor::GetKitUsability(ieDword baseClass, ieDword kit) const
+static ieDword GetKitUsability(ieDword baseClass, ieDword kit)
 {
 	ieDword usability = 0;
 	int idx = 0;
@@ -673,6 +673,21 @@ ieDword Actor::GetKitUsability(ieDword baseClass, ieDword kit) const
 	}
 
 	return usability;
+}
+
+int Actor::GetSpecialistSaveBonus(ieDword school) const
+{
+	int bonus = 0;
+	ieDword specialist = Modified[IE_KIT];
+	if (GetMageLevel() && specialist != KIT_BASECLASS) {
+		if (specialist > KIT_BASECLASS) {
+			specialist = GetKitUsability(1, specialist - KIT_BASECLASS); // send the kit index for pcs
+		}
+		if (specialist & (1 << (school + 5))) {
+			bonus = 2;
+		}
+	}
+	return bonus;
 }
 
 // iwd2 supports multiple kits per actor, but sanely only one kit per class

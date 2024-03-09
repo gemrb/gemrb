@@ -40,8 +40,6 @@
 #include <cstdio>
 #include "GameData.h"
 
-#define KIT_BASECLASS 0x4000
-
 namespace GemRB {
 
 static std::vector<EffectDesc> effectnames;
@@ -1056,28 +1054,10 @@ static int CheckSaves(Actor* actor, Effect* fx)
 
 	// handle modifiers of specialist mages
 	if (!globals.pstflags && !globals.iwd2fx && fx->PrimaryType) {
-		ieDword specialist = KIT_BASECLASS;
-		if (caster) specialist = caster->GetStat(IE_KIT);
-		if (caster && caster->GetMageLevel() && specialist != KIT_BASECLASS) {
-			// specialist mage's enemies get a -2 penalty to saves vs the specialist's school
-			if (specialist > KIT_BASECLASS) {
-				specialist = caster->GetKitUsability(1, specialist - KIT_BASECLASS); // send the kit index
-			}
-			if (specialist & (1 << (fx->PrimaryType + 5))) {
-				bonus -= 2;
-			}
-		}
-
+		// specialist mage's enemies get a -2 penalty to saves vs the specialist's school
+		if (caster) bonus -= caster->GetSpecialistSaveBonus(fx->PrimaryType);
 		// specialist mages get a +2 bonus to saves to spells of the same school used against them
-		specialist = actor->GetStat(IE_KIT);
-		if (actor->GetMageLevel() && specialist != KIT_BASECLASS) {
-			if (specialist > KIT_BASECLASS) {
-				specialist = actor->GetKitUsability(1, specialist - KIT_BASECLASS);
-			}
-			if (specialist & (1 << (fx->PrimaryType + 5))) {
-				bonus += 2;
-			}
-		}
+		bonus += actor->GetSpecialistSaveBonus(fx->PrimaryType);
 	}
 
 	static EffectRef fx_damage_ref = { "Damage", -1 };
