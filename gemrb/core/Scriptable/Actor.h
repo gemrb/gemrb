@@ -991,6 +991,7 @@ public:
 	static ieDword GetClassID(ieDword isClass);
 	const std::string& GetClassName(ieDword classID) const;
 	const std::string& GetKitName(ieDword kitID) const;
+	ieDword GetKitUsability(ieDword baseClass, ieDword kit) const;
 	/* Returns the actor's level of the given class */
 	ieDword GetFighterLevel() const { return GetClassLevel(ISFIGHTER); }
 	ieDword GetMageLevel() const { return GetClassLevel(ISMAGE); }

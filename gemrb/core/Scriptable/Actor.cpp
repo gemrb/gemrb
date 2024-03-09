@@ -663,6 +663,18 @@ static void ApplyClab_internal(Actor* actor, const ResRef& clab, int level, bool
 #define KIT_WILDMAGE KIT_BASECLASS+30
 #define KIT_BARBARIAN KIT_BASECLASS+31
 
+ieDword Actor::GetKitUsability(ieDword baseClass, ieDword kit) const
+{
+	ieDword usability = 0;
+	int idx = 0;
+	for (const auto& aKit : class2kits[baseClass].indices) {
+		if (kit == aKit) return class2kits[baseClass].ids[idx];
+		idx++;
+	}
+
+	return usability;
+}
+
 // iwd2 supports multiple kits per actor, but sanely only one kit per class
 static TableMgr::index_t GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool strict=false)
 {
