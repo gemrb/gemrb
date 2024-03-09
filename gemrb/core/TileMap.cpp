@@ -362,14 +362,14 @@ InfoPoint* TileMap::GetTravelTo(const ResRef& Destination) const
 
 InfoPoint *TileMap::AdjustNearestTravel(Point &p)
 {
-	int min = -1;
-	InfoPoint *best = NULL;
+	unsigned int min = UINT_MAX;
+	InfoPoint* best = nullptr;
 
 	for (InfoPoint *infoPoint : infoPoints) {
 		if (infoPoint->Type != ST_TRAVEL) continue;
 
-		unsigned int dist = Distance(p, infoPoint);
-		if (dist<(unsigned int) min) {
+		unsigned int dist = SquaredDistance(p, infoPoint->Pos);
+		if (dist < min) {
 			min = dist;
 			best = infoPoint;
 		}
