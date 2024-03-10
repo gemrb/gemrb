@@ -6718,21 +6718,21 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 	if (!scr) {
 		return;
 	}
+
+	// weapon
 	int slot = parameters->int0Parameter;
-	int wslot = Inventory::GetWeaponSlot();
-	//weapon
 	if (core->QuerySlotType(slot)&SLOT_WEAPON) {
-		slot-=wslot;
+		slot = Inventory::GetWeaponQuickSlot(slot);
 		if (slot<0 || slot>=MAX_QUICKWEAPONSLOT) {
 			return;
 		}
 		scr->SetEquippedQuickSlot(slot, parameters->int1Parameter);
 		return;
 	}
+
 	//quick item
-	wslot = Inventory::GetQuickSlot();
 	if (core->QuerySlotType(slot)&SLOT_ITEM) {
-		slot-=wslot;
+		slot -= Inventory::GetQuickSlot();
 		if (slot<0 || slot>=MAX_QUICKITEMSLOT) {
 			return;
 		}
