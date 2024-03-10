@@ -74,7 +74,7 @@ public:
 	InfoPoint* GetInfoPoint(const ieVariable& Name) const;
 	InfoPoint* GetInfoPoint(size_t idx) const;
 	InfoPoint* GetTravelTo(const ResRef& Destination) const;
-	InfoPoint* AdjustNearestTravel(Point &p);
+	InfoPoint* AdjustNearestTravel(Point& p) const;
 	size_t GetInfoPointCount() const { return infoPoints.size(); }
 
 	TileObject* AddTile(const ResRef& ID, const ieVariable& Name, unsigned int Flags,

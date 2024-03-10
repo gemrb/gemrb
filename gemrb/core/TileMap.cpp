@@ -360,7 +360,7 @@ InfoPoint* TileMap::GetTravelTo(const ResRef& Destination) const
 	return NULL;
 }
 
-InfoPoint *TileMap::AdjustNearestTravel(Point &p)
+InfoPoint* TileMap::AdjustNearestTravel(Point& p) const
 {
 	unsigned int min = UINT_MAX;
 	InfoPoint* best = nullptr;
