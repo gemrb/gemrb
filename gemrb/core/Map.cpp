@@ -585,6 +585,12 @@ void Map::MoveToNewArea(const ResRef &area, const ieVariable& entrance, unsigned
 		X = ent->Pos.x;
 		Y = ent->Pos.y;
 		face = ent->Face;
+		// testing in candlekeep shows that actors are offset from the entrance position
+		if (face > W && face < E) {
+			X -= 2 * 16;
+		} else if (face < W || face > E) {
+			X += 2 * 16;
+		}
 	}
 	//LeaveArea is the same in ALL engine versions
 	std::string command = fmt::format("LeaveArea(\"{}\",[{}.{}],{})", area, X, Y, face);
