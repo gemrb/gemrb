@@ -595,39 +595,22 @@ void Map::MoveToNewArea(const ResRef &area, const ieVariable& entrance, unsigned
 	//LeaveArea is the same in ALL engine versions
 	std::string command = fmt::format("LeaveArea(\"{}\",[{}.{}],{})", area, X, Y, face);
 
-	if (EveryOne&CT_GO_CLOSER) {
-		int i=game->GetPartySize(false);
+	if (EveryOne & (CT_GO_CLOSER | CT_SELECTED)) {
+		int i = game->GetPartySize(false);
 		while (i--) {
-			Actor *pc = game->GetPC(i,false);
-			if (pc->GetCurrentArea()==this) {
-			  pc->MovementCommand(command);
-			}
+			Actor* pc = game->GetPC(i, false);
+			if (pc->GetCurrentArea() != this) continue;
+			if (EveryOne & CT_SELECTED && !pc->IsSelected()) continue;
+			pc->MovementCommand(command);
 		}
-		i = game->GetNPCCount();
-		while(i--) {
-			Actor *npc = game->GetNPC(i);
-			if ((npc->GetCurrentArea()==this) && (npc->GetStat(IE_EA)<EA_GOODCUTOFF) ) {
-				npc->MovementCommand(command);
-			}
-		}
-	} else if (EveryOne&CT_SELECTED) {
-		int i=game->GetPartySize(false);
-		while (i--) {
-			Actor *pc = game->GetPC(i,false);
 
-			if (!pc->IsSelected()) {
-				continue;
-			}
-			if (pc->GetCurrentArea()==this) {
-				pc->MovementCommand(command);
-			}
-		}
 		i = game->GetNPCCount();
-		while(i--) {
-			Actor *npc = game->GetNPC(i);
-			if (npc->IsSelected() && (npc->GetCurrentArea()==this)) {
-				npc->MovementCommand(command);
-			}
+		while (i--) {
+			Actor* npc = game->GetNPC(i);
+			if (npc->GetCurrentArea() != this) continue;
+			if (EveryOne & CT_SELECTED && !npc->IsSelected()) continue;
+			if (EveryOne & CT_GO_CLOSER && npc->GetStat(IE_EA) >= EA_GOODCUTOFF) continue;
+			npc->MovementCommand(command);
 		}
 	} else {
 		actor->MovementCommand(std::move(command));
