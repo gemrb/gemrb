@@ -987,13 +987,19 @@ void ChangeAnimationCore(Actor* src, const ResRef& replacement, bool effect)
 	}
 }
 
+// check for searchmap travel regions, which should be identical to accessible map borders in practice
+static bool NearEdge(const Scriptable* escapee)
+{
+	return bool(escapee->GetCurrentArea()->GetBlocked(escapee->Pos) & PathMapFlags::TRAVEL);
+}
+
 void EscapeAreaCore(Scriptable* Sender, const Point& p, const ResRef& area, const Point& enter, EscapeArea flags, int wait)
 {
 	if (Sender->CurrentActionTicks<100) {
 		if (!p.IsInvalid() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
 			//MoveNearerTo will return 0, if the actor is in move
 			//it will return 1 (the fourth parameter) if the target is unreachable
-			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
+			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE, 1) && !NearEdge(Sender)) {
 				if (!Sender->InMove()) Log(WARNING, "GSUtils", "At least it said so...");
 				// ensure the action doesn't get interrupted
 				// fixes Nalia starting a second dialog in the Coronet, if she gets a chance #253
