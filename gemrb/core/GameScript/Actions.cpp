@@ -6727,6 +6727,7 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 			return;
 		}
 		scr->SetEquippedQuickSlot(slot, parameters->int1Parameter);
+		core->SetEventFlag(EF_ACTION);
 		return;
 	}
 
