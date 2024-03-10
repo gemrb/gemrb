@@ -6726,6 +6726,9 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 		if (slot<0 || slot>=MAX_QUICKWEAPONSLOT) {
 			return;
 		}
+		// nothing to do? Then don't disrupt by reequipping
+		if (slot == scr->inventory.GetEquipped() && parameters->int1Parameter == scr->inventory.GetEquippedHeader()) return;
+
 		scr->SetEquippedQuickSlot(slot, parameters->int1Parameter);
 		core->SetEventFlag(EF_ACTION);
 		return;
