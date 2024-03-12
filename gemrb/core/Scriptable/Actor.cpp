@@ -9505,10 +9505,7 @@ void Actor::SetFeatValue(unsigned int feat, int value, bool init)
 		return;
 	}
 
-	//handle maximum and minimum values
-	if (value<0) value = 0;
-	else if (value>featmax[feat]) value = featmax[feat];
-
+	value = Clamp<int>(value, 0, featmax[feat]);
 	if (value) {
 		SetFeat(feat, BitOp::OR);
 		if (featstats[feat]) SetBase(featstats[feat], value);
