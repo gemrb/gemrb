@@ -1989,7 +1989,17 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_ACPIERCINGMOD]);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_ACSLASHINGMOD]);
 	stream->WriteScalar<int, ieByte>(actor->ToHit.GetBase());
+
 	ieByte tmpByte = static_cast<ieByte>(actor->BaseStats[IE_NUMBEROFATTACKS]);
+	if (actor->creVersion != CREVersion::V2_2 && actor->InParty && actor->HasPlayerClass()) {
+		// not setting to 2 just in case they got a permanent APR change applied
+		ieDword wl;
+		tmpByte -= 2 * actor->IsDualWielding() + actor->GetStyleExtraAPR(wl);
+		if (tmpByte != 2) {
+			Log(DEBUG, "CREImporter", "Detected creature '{}' with uncommon APR: {}", fmt::WideToChar { actor->GetName() }, tmpByte / 2);
+		}
+	}
+
 	if (actor->creVersion == CREVersion::V2_2) {
 		stream->Write( &tmpByte, 1);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SAVEFORTITUDE]);

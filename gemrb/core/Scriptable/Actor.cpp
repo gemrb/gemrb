@@ -2953,6 +2953,23 @@ void Actor::RefreshHP() {
 	lastConBonus = bonus;
 }
 
+int Actor::GetStyleExtraAPR(ieDword& warriorLevel) const
+{
+	if (third) return 0;
+
+	ieDword stars = GetProficiency(weaponInfo[0].prof) & PROFS_MASK;
+	// tenser's transformation ensures the actor is at least proficient with any weapon
+	if (!stars && HasSpellState(SS_TENSER)) stars = 1;
+	if (!stars) return 0;
+
+	warriorLevel = GetWarriorLevel();
+	if (warriorLevel) {
+		return gamedata->GetWeaponStyleAPRBonus(stars, warriorLevel - 1);
+	} else {
+		return gamedata->GetWeaponStyleAPRBonus(stars, 0);
+	}
+}
+
 // refresh stats on creatures (PC or NPC) with a valid class (not animals etc)
 // internal use only, and this is maybe a stupid name :)
 void Actor::RefreshPCStats() {
@@ -2983,17 +3000,13 @@ void Actor::RefreshPCStats() {
 
 	//get the wspattack bonuses for proficiencies
 	const ITMExtHeader* header = GetWeapon(false);
-	ieDword stars;
-	int dualwielding = IsDualWielding();
-	stars = GetProficiency(weaponInfo[0].prof) & PROFS_MASK;
-
-	// tenser's transformation ensures the actor is at least proficient with any weapon
-	if (!stars && HasSpellState(SS_TENSER)) stars = 1;
 
 	if (header) {
-		//wspattack appears to only effect warriors
-		int defaultattacks = 2 + 2*dualwielding;
-		if (stars) {
+		// haste and monk bonuses are added on top, later
+		int defaultattacks = 2 + 2 * IsDualWielding();
+		ieDword warriorLevel = 0;
+		int bonus = GetStyleExtraAPR(warriorLevel);
+		if (bonus) {
 			// In bg2 the proficiency and warrior level bonus is added after effects, so also ranged weapons are affected,
 			// since their rate of fire (apr) is set using an effect with a flat modifier.
 			// SetBase will compensate only for the difference between the current two stats, not considering the default
@@ -3001,18 +3014,17 @@ void Actor::RefreshPCStats() {
 			// the adjustment results in a base of 2-5 (2+[0-3]) and the modified stat degrades to 4+(4-[2-5]) = 8-[2-5] = 3-6
 			// instead of 4+[0-3] = 4-7
 			// For a master ranger at level 14, the difference ends up as 2 (1 apr).
-			ieDword warriorLevel = GetWarriorLevel();
+			defaultattacks += bonus;
 			if (warriorLevel) {
 				int mod = Modified[IE_NUMBEROFATTACKS] - BaseStats[IE_NUMBEROFATTACKS];
-				int bonus = gamedata->GetWeaponStyleAPRBonus(stars, warriorLevel - 1);
-				BaseStats[IE_NUMBEROFATTACKS] = defaultattacks + bonus;
+				BaseStats[IE_NUMBEROFATTACKS] = defaultattacks;
 				if (fxqueue.HasEffectWithParam(fx_attacks_per_round_modifier_ref, 1)) { // launcher sets base APR
 					Modified[IE_NUMBEROFATTACKS] += bonus; // no default
 				} else {
 					Modified[IE_NUMBEROFATTACKS] = BaseStats[IE_NUMBEROFATTACKS] + mod;
 				}
 			} else {
-				SetBase(IE_NUMBEROFATTACKS, defaultattacks + gamedata->GetWeaponStyleAPRBonus(stars, 0));
+				SetBase(IE_NUMBEROFATTACKS, defaultattacks);
 			}
 		} else {
 			// unproficient user - force defaultattacks
