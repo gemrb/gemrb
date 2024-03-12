@@ -10245,20 +10245,14 @@ bool Actor::IsDualSwap() const
 
 ieDword Actor::GetWarriorLevel() const
 {
-	ieDword warriorlevels[4] = {
+	std::array<ieDword, 4> warriorlevels = {
 		GetBarbarianLevel(),
 		GetFighterLevel(),
 		GetPaladinLevel(),
 		GetRangerLevel()
 	};
 
-	ieDword highest = 0;
-	for (unsigned int warriorLevel : warriorlevels) {
-		if (warriorLevel > highest) {
-			highest = warriorLevel;
-		}
-	}
-
+	ieDword highest = *std::max_element(warriorlevels.begin(), warriorlevels.end());
 	return highest;
 }
 
