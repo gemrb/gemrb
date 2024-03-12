@@ -35,40 +35,34 @@ def OnLoad():
 	ClassWindow = GemRB.LoadWindow(10, "GUICG")
 
 	ClassCount = CommonTables.Classes.GetRowCount()+1
-	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )
+	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1)
 
-	j=0
-	for i in range(1,ClassCount):
-		ClassName = CommonTables.Classes.GetRowName (i-1)
-		if CommonTables.Classes.GetValue (ClassName, "MULTI") == 0:
-			continue
-		if j>11:
-			Button = ClassWindow.GetControl(j+7)
-		else:
-			Button = ClassWindow.GetControl(j+2)
-		Button.SetState(IE_GUI_BUTTON_DISABLED)
-		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-		j = j + 1
+	GemRB.SetVar("Class", 0)
 
-	j=0
-	for i in range(1,ClassCount):
-		ClassName = CommonTables.Classes.GetRowName (i-1)
+	for i in range(1, ClassCount):
+		ClassName = CommonTables.Classes.GetRowName(i-1)
 		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
-		if CommonTables.Classes.GetValue (ClassName, "MULTI") == 0:
-			continue
-		if j>11:
-			Button = ClassWindow.GetControl(j+7)
-		else:
-			Button = ClassWindow.GetControl(j+2)
 
-		t = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
-		Button.SetText(t )
-		j=j+1
-		if Allowed ==0:
+		# Don't setup buttons for non-multiclasses.
+		if CommonTables.Classes.GetValue(ClassName, "MULTI") == 0:
 			continue
-		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.OnPress (ClassPress)
+
+		# Only enable the button if this class is allowed by this race.
+		# Test for != 0 because of possible value 2 for gnomes.
+		if Allowed != 0:
+			btnState = IE_GUI_BUTTON_ENABLED
+		else:
+			btnState = IE_GUI_BUTTON_DISABLED
+
+		Button = ClassWindow.GetControl(i-7)
 		Button.SetVarAssoc("Class", i) #multiclass, actually
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetState(btnState) # reset from SELECTED after SetVarAssoc
+		Button.SetText(CommonTables.Classes.GetValue(ClassName, "NAME_REF"))
+		Button.OnPress(ClassPress)
+
+	# restore after SetVarAssoc
+	GemRB.SetVar("Class", 0)
 
 	BackButton = ClassWindow.GetControl(14)
 	BackButton.SetText(15416)

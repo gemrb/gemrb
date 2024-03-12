@@ -33,8 +33,6 @@ def OnLoad():
 	global AlignmentWindow, TextAreaControl, DoneButton
 
 	MyChar = GemRB.GetVar ("Slot")
-
-	GemRB.SetVar("Alignment",-1)
 	
 	KitName = GUICommon.GetClassRowName (MyChar)
 
@@ -44,18 +42,25 @@ def OnLoad():
 
 	# This section enables or disables different alignment selections
 	# based on Class, and depends on the ALIGNMNT.2DA table
-	#
-	# For now, we just enable all buttons
+
+	GemRB.SetVar("Alignment", -1)
+
 	for i in range(9):
-		Button = AlignmentWindow.GetControl(i+2)
-		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetText (CommonTables.Aligns.GetValue (i,0))
-		if AlignmentOk.GetValue (KitName, CommonTables.Aligns.GetValue (i, 4)) != 0:
-			Button.SetState(IE_GUI_BUTTON_ENABLED)
+		# Only enable the button if this alignment is allowed by this class.
+		if AlignmentOk.GetValue(KitName, CommonTables.Aligns.GetValue(i, 4)):
+			btnState = IE_GUI_BUTTON_ENABLED
 		else:
-			Button.SetState(IE_GUI_BUTTON_DISABLED)
-		Button.OnPress (AlignmentPress)
+			btnState = IE_GUI_BUTTON_DISABLED
+
+		Button = AlignmentWindow.GetControl(i+2)
 		Button.SetVarAssoc("Alignment", i)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetState(btnState) # reset from SELECTED after SetVarAssoc
+		Button.SetText(CommonTables.Aligns.GetValue(i, 0))
+		Button.OnPress(AlignmentPress)
+
+	# restore after SetVarAssoc
+	GemRB.SetVar("Alignment", -1)
 
 	BackButton = AlignmentWindow.GetControl(13)
 	BackButton.SetText(15416)

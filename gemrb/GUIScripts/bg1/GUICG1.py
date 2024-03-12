@@ -42,17 +42,21 @@ def OnLoad():
 	TextAreaControl = GenderWindow.GetControl(5)
 	TextAreaControl.SetText(17236)
 
-	MaleButton = GenderWindow.GetControl(2)
-	MaleButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetVar("Gender", 0)
 
-	FemaleButton = GenderWindow.GetControl(3)
-	FemaleButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	
-	GemRB.SetVar("Gender",0)
-	MaleButton.SetVarAssoc("Gender",1)
-	FemaleButton.SetVarAssoc("Gender",2)
-	MaleButton.OnPress (ClickedMale)
-	FemaleButton.OnPress (ClickedFemale)
+	def SetGenderButton(controlID, var, onPress):
+		Button = GenderWindow.GetControl(controlID)
+		Button.SetVarAssoc("Gender", var)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetState(IE_GUI_BUTTON_ENABLED) # reset from SELECTED after SetVarAssoc
+		Button.OnPress(onPress)
+
+	SetGenderButton(2, 1, ClickedMale)
+	SetGenderButton(3, 2, ClickedFemale)
+
+	# restore after SetVarAssoc
+	GemRB.SetVar("Gender", 0)
+
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (lambda: CharGenCommon.back(GenderWindow))
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)

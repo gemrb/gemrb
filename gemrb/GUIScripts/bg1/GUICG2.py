@@ -34,48 +34,56 @@ def OnLoad():
 
 	MyChar = GemRB.GetVar ("Slot")
 	
-	GemRB.SetVar("Class",0)
-	GemRB.SetVar("Multi Class",0)
-	GemRB.SetVar("Specialist",0)
-	GemRB.SetVar("Class Kit",0)
-	
 	ClassCount = CommonTables.Classes.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindow(2, "GUICG")
 	RaceRow = CommonTables.Races.FindValue(3,GemRB.GetPlayerStat (MyChar, IE_RACE))
 	RaceName = CommonTables.Races.GetRowName(RaceRow)
 
-	#radiobutton groups must be set up before doing anything else to them
-	for i in range(1,ClassCount):
-		ClassName = CommonTables.Classes.GetRowName (i-1)
-		if CommonTables.Classes.GetValue(ClassName, "MULTI"):
-			continue
-			
-		Button = ClassWindow.GetControl(i+1)
-		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-		Button.SetState(IE_GUI_BUTTON_DISABLED)
+	GemRB.SetVar("Class", 0)
+	GemRB.SetVar("Multi Class", 0)
+	GemRB.SetVar("Specialist", 0)
+	GemRB.SetVar("Class Kit", 0)
+	GemRB.SetVar("MAGESCHOOL", 0)
 
-	GemRB.SetVar("MAGESCHOOL",0) 
+	HasIllusion = 0
 	HasMulti = 0
-	for i in range(1,ClassCount):
+
+	for i in range(1, ClassCount):
 		ClassName = CommonTables.Classes.GetRowName(i-1)
 		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
-		if CommonTables.Classes.GetValue (ClassName, "MULTI"):
-			if Allowed!=0:
+
+		# If we ever come across an Allowed-value of 2, then we know the
+		# character is limited to the illusionist mageschool.
+		if Allowed == 2:
+			HasIllusion = 1
+
+		# Multiclasses don't have their own buttons in this window, so
+		# don't setup buttons for them here. For later evaluation we have
+		# to remember if any multiclass is allowed for this race.
+		if CommonTables.Classes.GetValue(ClassName, "MULTI"):
+			if Allowed != 0:
 				HasMulti = 1
 			continue
-			
-		Button = ClassWindow.GetControl(i+1)
-		
-		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
-		Button.SetText(t )
 
-		if Allowed==2:
-			GemRB.SetVar("MAGESCHOOL",5) #illusionist
-		if Allowed!=1:
-			continue
-		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.OnPress (ClassPress)
+		# Only enable the button if this class is allowed by this race.
+		if Allowed == 1:
+			btnState = IE_GUI_BUTTON_ENABLED
+		else:
+			btnState = IE_GUI_BUTTON_DISABLED
+
+		Button = ClassWindow.GetControl(i+1)
 		Button.SetVarAssoc("Class", i)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetState(btnState) # reset from SELECTED after SetVarAssoc
+		Button.SetText(CommonTables.Classes.GetValue(ClassName, "NAME_REF"))
+		Button.OnPress(ClassPress)
+
+	# restore after SetVarAssoc
+	GemRB.SetVar("Class", 0)
+
+	# propagate limitation to illusionist mageschool
+	if HasIllusion == 1:
+		GemRB.SetVar("MAGESCHOOL", 5)
 
 	MultiClassButton = ClassWindow.GetControl(10)
 	MultiClassButton.SetText(11993)

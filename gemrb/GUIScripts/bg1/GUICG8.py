@@ -32,22 +32,23 @@ DoneButton = 0
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RaceTable
-	
-	GemRB.SetVar("Race",0) 
 
 	RaceWindow = GemRB.LoadWindow(8, "GUICG")
 
 	RaceCount = CommonTables.Races.GetRowCount()
 
-	for i in range(2,RaceCount+2):
-		Button = RaceWindow.GetControl(i)
-		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+	GemRB.SetVar("Race", 0)
+
 	for i in range(2, RaceCount+2):
 		Button = RaceWindow.GetControl(i)
-		Button.SetText(CommonTables.Races.GetValue(i-2,0) )
-		Button.SetState(IE_GUI_BUTTON_ENABLED)
-		Button.OnPress (RacePress)
-		Button.SetVarAssoc("Race",i-1)
+		Button.SetVarAssoc("Race", i-1)
+		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+		Button.SetState(IE_GUI_BUTTON_ENABLED) # reset from SELECTED after SetVarAssoc
+		Button.SetText(CommonTables.Races.GetValue(i-2, 0))
+		Button.OnPress(RacePress)
+
+	# restore after SetVarAssoc
+	GemRB.SetVar("Race", 0)
 
 	BackButton = RaceWindow.GetControl(10)
 	BackButton.SetText(15416)

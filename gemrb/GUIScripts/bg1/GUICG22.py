@@ -46,44 +46,59 @@ def OnLoad():
 	#there is only a specialist mage window for bg1
 	KitWindow = GemRB.LoadWindow(12, "GUICG")
 
-	for i in range(8):
-		Button = KitWindow.GetControl(i+2)
-		Button.SetState(IE_GUI_BUTTON_DISABLED)
-		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	GemRB.SetVar("Class Kit", -1)
+
+	def GetKit(rowIdx):
+		if not KitTable:
+			if ClassName == "MAGE":
+				return GemRB.GetVar("MAGESCHOOL")
+			return 0
+		else:
+			kit = KitTable.GetValue(rowIdx, 0)
+			if kit and ClassName == "MAGE":
+				kit -= 21
+			return kit
+
+	def GetKitName(rowIdx, kit):
+		if not KitTable:
+			if ClassName == "MAGE":
+				return SchoolList.GetValue(rowIdx, 0)
+			return CommonTables.Classes.GetValue(ClassName, "NAME_REF")
+		else:
+			if ClassName == "MAGE":
+				return SchoolList.GetValue(kit, 0)
+			elif kit:
+				return CommonTables.KitList.GetValue(kit, 1)
+			return CommonTables.Classes.GetValue(ClassName, "NAME_REF")
 
 	if not KitTable:
 		RowCount = 1
 	else:
 		RowCount = KitTable.GetRowCount()
 
-	for i in range(RowCount):
-		Button = KitWindow.GetControl(i+2)
-		if not KitTable:
-			if ClassName == "MAGE":
-				Kit=GemRB.GetVar("MAGESCHOOL")
-				KitName = SchoolList.GetValue(i, 0)
-			else:
-				Kit = 0
-				KitName = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
+	for i in range(8):
+		btnFlags = IE_GUI_BUTTON_RADIOBUTTON
 
+		# Only process the button if it holds a Kit.
+		if i < RowCount:
+			Kit = GetKit(i)
+			KitName = GetKitName(i, Kit)
+			btnState = IE_GUI_BUTTON_ENABLED
 		else:
-			Kit = KitTable.GetValue(i,0)
-			if ClassName == "MAGE":
-				if Kit:
-					Kit = Kit - 21
-				KitName = SchoolList.GetValue(Kit, 0)
-			else:
-				if Kit:
-					KitName = CommonTables.KitList.GetValue(Kit, 1)
-				else:
-					KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
+			Kit = -1
+			KitName = ""
+			btnFlags |= IE_GUI_BUTTON_NO_TEXT
+			btnState = IE_GUI_BUTTON_DISABLED
 
-		Button.SetState(IE_GUI_BUTTON_ENABLED)
+		Button = KitWindow.GetControl(i+2)
+		Button.SetVarAssoc("Class Kit", Kit)
+		Button.SetFlags(btnFlags, OP_OR)
+		Button.SetState(btnState) # reset from SELECTED after SetVarAssoc
 		Button.SetText(KitName)
-		Button.SetVarAssoc("Class Kit",Kit)
-		if i==0:
-			GemRB.SetVar("Class Kit",Kit)
-		Button.OnPress (KitPress)
+		Button.OnPress(KitPress)
+
+	# restore after SetVarAssoc
+	GemRB.SetVar("Class Kit", -1)
 
 	BackButton = KitWindow.GetControl(12)
 	BackButton.SetText(15416)

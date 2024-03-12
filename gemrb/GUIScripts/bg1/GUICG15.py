@@ -36,39 +36,46 @@ LISTSIZE = 6
 def DisplayRaces():
 	global TopIndex
 
-	TopIndex=GemRB.GetVar("TopIndex")
+	GemRB.SetVar("HatedRace", 0)
+
+	TopIndex = GemRB.GetVar("TopIndex")
+
 	for i in range(LISTSIZE):
-		Button = RaceWindow.GetControl(i+2)
-		Val = RacialEnemyTable.GetValue(i+TopIndex,0)
-		if Val==0:
-			Button.SetText("")
-			Button.SetState(IE_GUI_BUTTON_DISABLED)
+		Val = RacialEnemyTable.GetValue(i+TopIndex, 0)
+		btnFlags = IE_GUI_BUTTON_RADIOBUTTON
+
+		# Only enable the button if it is visible.
+		if Val > 0:
+			btnState = IE_GUI_BUTTON_ENABLED
 		else:
-			Button.SetText(Val)
-			Button.SetState(IE_GUI_BUTTON_ENABLED)
-			Button.OnPress (RacePress)
-			Button.SetVarAssoc("HatedRace",RacialEnemyTable.GetValue(i+TopIndex,1) )
+			btnFlags |= IE_GUI_BUTTON_NO_TEXT
+			btnState = IE_GUI_BUTTON_DISABLED
+
+		Button = RaceWindow.GetControl(i+2)
+		Button.SetVarAssoc("HatedRace", RacialEnemyTable.GetValue(i+TopIndex, 1))
+		Button.SetFlags(btnFlags, OP_OR)
+		Button.SetSprites("GUIHRC", i, 0, 1, 2, 3)
+		Button.SetState(btnState) # reset from SELECTED after SetVarAssoc
+		Button.SetText(Val)
+		Button.OnPress(RacePress)
+
+	# restore after SetVarAssoc
+	GemRB.SetVar("HatedRace", 0)
+
 	return
 
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RacialEnemyTable, RaceCount, TopIndex
-	
-	GemRB.SetVar ("HatedRace",0)
-	
+
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	TableName = CommonTables.ClassSkills.GetValue(ClassName, "HATERACE")
 	
 	RaceWindow = GemRB.LoadWindow(15, "GUICG")
 	RacialEnemyTable = GemRB.LoadTable(TableName)
 	RaceCount = RacialEnemyTable.GetRowCount()-LISTSIZE
-	if RaceCount<0:
-		RaceCount=0
-
-	for i in range(LISTSIZE):
-		Button = RaceWindow.GetControl(i+2)
-		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-		Button.SetSprites("GUIHRC",i,0,1,2,3)
+	if RaceCount < 0:
+		RaceCount = 0
 
 	BackButton = RaceWindow.GetControl(10)
 	BackButton.SetText(15416)
