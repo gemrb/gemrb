@@ -228,9 +228,9 @@ TextArea::TextArea(const Region& frame, Holder<Font> text)
 TextArea::TextArea(const Region& frame, Holder<Font> text, Holder<Font> caps)
 	: Control(frame), scrollview(Region(Point(), Dimensions())), ftext(std::move(text)), colors()
 {
-	colors[COLOR_OPTIONS] = ColorWhitish;
-	colors[COLOR_HOVER] = SelectOptionHover;
-	colors[COLOR_SELECTED] = SelectOptionSelected;
+	colors[COLOR_OPTIONS] = displaymsg->GetColor(GUIColors::TA_LB_OPTIONS);
+	colors[COLOR_HOVER] = displaymsg->GetColor(GUIColors::TA_LB_HOVER);
+	colors[COLOR_SELECTED] = displaymsg->GetColor(GUIColors::TA_LB_SELECTED);
 
 	// quick font optimization (prevents creating unnecessary cap spans)
 	finit = (caps && caps != ftext) ? caps : ftext;
