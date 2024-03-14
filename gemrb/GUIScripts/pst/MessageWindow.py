@@ -75,7 +75,7 @@ def OnLoad():
 	MessageTA.SetColor(ColorRed, TA_COLOR_OPTIONS)
 	MessageTA.SetColor(ColorWhite, TA_COLOR_HOVER)
 
-	CloseButton= MWindow.GetControl (0)
+	CloseButton = MWindow.GetControl (0)
 	CloseButton.SetText(28082)
 	CloseButton.OnPress (MWindow.Close)
 	CloseButton.MakeDefault()
