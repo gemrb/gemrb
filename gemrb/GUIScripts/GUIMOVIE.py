@@ -39,7 +39,6 @@ def OnLoad():
 	DoneButton = MovieWindow.GetControl (4)
 	MoviesTable = GemRB.LoadTable ("MOVIDESC")
 	opts = [MoviesTable.GetValue (i, 0) for i in range(MoviesTable.GetRowCount ()) if GemRB.GetVar(MoviesTable.GetRowName (i)) == 1]
-	TextAreaControl.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
 	TextAreaControl.SetOptions (opts, "MovieIndex", 0)
 	PlayButton.SetText (17318)
 	CreditsButton.SetText (15591)

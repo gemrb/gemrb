@@ -228,6 +228,7 @@ TextArea::TextArea(const Region& frame, Holder<Font> text)
 TextArea::TextArea(const Region& frame, Holder<Font> text, Holder<Font> caps)
 	: Control(frame), scrollview(Region(Point(), Dimensions())), ftext(std::move(text)), colors()
 {
+	colors[COLOR_OPTIONS] = ColorWhitish;
 	colors[COLOR_HOVER] = SelectOptionHover;
 	colors[COLOR_SELECTED] = SelectOptionSelected;
 

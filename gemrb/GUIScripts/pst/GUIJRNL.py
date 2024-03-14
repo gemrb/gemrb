@@ -157,7 +157,6 @@ def PopulateQuestsList ():
 	
 	lookup = lambda quest: int(GemRB.GetINIQuestsKey (str (quest[0]), 'title', '0'))
 	opts = ['- ' + GemRB.GetString(lookup(q)) for q in quests[selected_quest_class]]
-	QuestsList.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
 	QuestsList.SetOptions(opts)
 	
 def EvaluateCondition (var, value, condition):
@@ -304,7 +303,6 @@ def PopulateBeastsList ():
 
 	lookup = lambda beast: int(GemRB.GetINIBeastsKey (str (beast), 'name', '0'))
 	opts = [GemRB.GetString(lookup(b)) for b in beasts[selected_beast_class]]
-	BeastsList.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
 	BeastsList.SetOptions(opts)
 
 def EvaluateAllBeasts ():
