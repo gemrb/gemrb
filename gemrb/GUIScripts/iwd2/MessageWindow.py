@@ -43,8 +43,8 @@ def OnLoad():
 	smallMTA.AddAlias("MsgSys", 0)
 	smallMTA.AddAlias("MTA_SM", 0, True)
 	smallMTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
-	smallMTA.SetColor({'r' : 255, 'g' : 0, 'b' : 0}, TA_COLOR_OPTIONS)
-	smallMTA.SetColor({'r' : 255, 'g' : 255, 'b' : 255}, TA_COLOR_HOVER)
+	smallMTA.SetColor(ColorRed, TA_COLOR_OPTIONS)
+	smallMTA.SetColor(ColorWhite, TA_COLOR_HOVER)
 	smallID = smallMTA.ID
 	
 	sbar = OptionsWindow.GetControl(2)

@@ -159,7 +159,7 @@ def AddUserEntry ():
 	Text = Window.ReplaceSubview (0, IE_GUI_TEXTAREA, "NORMAL")
 	Text.SetFlags (IE_GUI_TEXTAREA_EDITABLE, OP_OR)
 	Text.SetColor (ColorBlackish, TA_COLOR_NORMAL)
-	Text.SetColor ({'r' : 126, 'g' : 126, 'b' : 126, 'a' : 255}, TA_COLOR_BACKGROUND)
+	Text.SetColor (ColorGray, TA_COLOR_BACKGROUND)
 	# disable the 1-6 hotkeys, so we can't lose focus
 	if GemRB.GetView ("PORTWIN"):
 		PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (GemRB.GetView ("PORTWIN"))

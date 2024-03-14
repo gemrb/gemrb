@@ -72,8 +72,8 @@ def OnLoad():
 	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	MessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
 	MessageTA.AddAlias("MsgSys", 0)
-	MessageTA.SetColor({'r' : 255, 'g' : 0, 'b' : 0}, TA_COLOR_OPTIONS)
-	MessageTA.SetColor({'r' : 255, 'g' : 255, 'b' : 255}, TA_COLOR_HOVER)
+	MessageTA.SetColor(ColorRed, TA_COLOR_OPTIONS)
+	MessageTA.SetColor(ColorWhite, TA_COLOR_HOVER)
 
 	CloseButton= MWindow.GetControl (0)
 	CloseButton.SetText(28082)
