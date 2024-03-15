@@ -138,6 +138,8 @@ int main(int argc, char* argv[])
 		SDL_SetVideoModeScaling(vitaDestRect.x, vitaDestRect.y, vitaDestRect.w, vitaDestRect.h);
 	}
 #endif
+	VideoDriver.reset();
+
 	ToggleLogging(false);
 
 	return sceKernelExitProcess(0);

@@ -66,6 +66,7 @@ int main(int argc, char* argv[])
 		ret = GEM_ERROR;
 	}
 
+	VideoDriver.reset();
 	PluginMgr::Get()->RunCleanup();
 
 	ToggleLogging(false); // Windows build will hang if we leave the logging thread running
