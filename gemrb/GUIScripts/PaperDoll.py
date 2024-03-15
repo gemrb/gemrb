@@ -36,13 +36,11 @@ def ColorStatsFromPortrait(PortraitName):
 	else:
 		PortraitTable = GemRB.LoadTable("pictures")
 
-	PortraitIndex = PortraitTable.GetRowIndex(PortraitName) or 0
-
 	return {
-		IE_MINOR_COLOR : PortraitTable.GetValue (PortraitIndex, 3),
-		IE_MAJOR_COLOR : PortraitTable.GetValue (PortraitIndex, 4),
-		IE_SKIN_COLOR : PortraitTable.GetValue (PortraitIndex, 2),
-		IE_HAIR_COLOR : PortraitTable.GetValue (PortraitIndex, 1),
+		IE_MINOR_COLOR : PortraitTable.GetValue (PortraitName, "MINOR", GTV_INT),
+		IE_MAJOR_COLOR : PortraitTable.GetValue (PortraitName, "MAJOR", GTV_INT),
+		IE_SKIN_COLOR : PortraitTable.GetValue (PortraitName, "SKIN", GTV_INT),
+		IE_HAIR_COLOR : PortraitTable.GetValue (PortraitName, "HAIR", GTV_INT),
 		# not editable in GUI, but part of the SetPLT payload
 		IE_LEATHER_COLOR : 0,
 		IE_ARMOR_COLOR : 0,
@@ -117,6 +115,9 @@ def OpenColorPicker(row, PickedColor, pack = "GUIREC"):
 		Button.SetBAM("COLGRAD", 2, 0, MyColor)
 		Button.SetVarAssoc("PickedColor", MyColor)
 		Button.OnPress(Window.Close)
+
+	# restore value after SetVarAssoc
+	Window.SetVar("PickedColor", PickedColor)
 		
 	if pack == "GUICG" and GameCheck.IsBG2 ():
 		import CharGenCommon
@@ -128,8 +129,9 @@ def SaveStats(stats, pc):
 	for stat, color in stats.items():
 		GemRB.SetPlayerStat(pc, stat, color)
 		
-def SelectColorForPC(stat, pc, pack = "GUIREC"):
-	stats = ColorStatsFromPC(pc)
+def SelectColorForPC(stat, pc, pack = "GUIREC", stats = None):
+	if stats is None:
+		stats = ColorStatsFromPC(pc)
 
 	row = 0 # hair
 	if stat == IE_SKIN_COLOR:
@@ -185,7 +187,7 @@ def OpenPaperDollWindow(pc, pack = "GUIREC", stats = None):
 		return
 		
 	def SelectColor(stat):
-		Picker = SelectColorForPC(stat, pc, pack)
+		Picker = SelectColorForPC(stat, pc, pack, stats)
 		
 		def SaveStat():
 			stats[stat] = Picker.GetVar("PickedColor")
