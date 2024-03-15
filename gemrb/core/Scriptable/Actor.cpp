@@ -4629,7 +4629,7 @@ void Actor::PlaySwingSound(const WeaponInfo &wi) const
 	// this extra ATTACK in 2das was always played, together with anything else
 	ResRef sound;
 	GetSoundFrom2DA(sound, Verbal::Attack0);
-	if (!IsStar(sound)) core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos, GEM_SND_SPATIAL);
+	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos, GEM_SND_SPATIAL);
 
 	// the CRE attack was played only if the itemtype was 0/misc to avoid clashes with the hardcoded exceptions
 	// TobExAL and Infinity Sounds prefer both to be played, so we match that, giving more choice to modders
@@ -8436,6 +8436,7 @@ bool Actor::GetSoundFrom2DA(ResRef& sound, Verbal index) const
 	Log(MESSAGE, "Actor", "Getting sound 2da {} entry: {}", prefix, tab->GetRowName(idx));
 	TableMgr::index_t col = RAND<TableMgr::index_t>(0, tab->GetColumnCount(idx) - 1);
 	sound = tab->QueryField(idx, col);
+	if (IsStar(sound) || sound == "nosound") sound.Reset();
 	return true;
 }
 
@@ -8506,6 +8507,8 @@ bool Actor::GetSoundFromINI(ResRef& sound, Verbal index) const
 
 	int choice = core->Roll(1, int(count), -1);
 	sound = elements[choice];
+	// highly unlikely, but this way we match the expectations from GetSoundFrom2DA
+	if (IsStar(sound) || sound == "nosound") sound.Reset();
 
 	return true;
 }
@@ -8551,11 +8554,6 @@ void Actor::GetVerbalConstantSound(ResRef& Sound, Verbal index, bool resolved) c
 		GetSoundFromINI(Sound, Verbal(idx));
 	} else {
 		GetSoundFrom2DA(Sound, Verbal(idx));
-	}
-
-	//Empty resrefs
-	if (IsStar(Sound) || Sound == "nosound") {
-		Sound.Reset();
 	}
 }
 
