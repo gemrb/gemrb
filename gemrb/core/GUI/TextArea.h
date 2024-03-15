@@ -38,9 +38,6 @@ using SelectOption = std::pair<int, String>;
 using OptionId_t = EventMgr::TapMonitorId;
 using Option_t = size_t;
 
-static const Color SelectOptionHover(255, 180, 0, 255);  // default hover color for SelectOption
-static const Color SelectOptionSelected(55, 100, 0, 255);// default selected color for SelectOption
-
 /**
  * @class TextArea
  * Widget capable of displaying long paragraphs of text.

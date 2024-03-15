@@ -40,8 +40,8 @@ def OnLoad():
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	TMessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
 	TMessageTA.AddAlias("MsgSys", 0)
-	TMessageTA.SetColor({'r' : 255, 'g' : 0, 'b' : 0}, TA_COLOR_OPTIONS)
-	TMessageTA.SetColor({'r' : 255, 'g' : 255, 'b' : 255}, TA_COLOR_HOVER)
+	TMessageTA.SetColor(ColorRed, TA_COLOR_OPTIONS)
+	TMessageTA.SetColor(ColorWhite, TA_COLOR_HOVER)
 	
 	sbar = MessageWindow.GetControl(2)
 	sbar.SetResizeFlags(IE_GUI_VIEW_RESIZE_VERTICAL)

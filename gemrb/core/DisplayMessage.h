@@ -65,6 +65,9 @@ enum class GUIColors : uint8_t {
 	HOVERTARGETABLE,
 	MSG,       // non-dialog actor console messages: existence sounds, etc.
 	MSGPARTY,  // non-dialog party characters console messages: selection subtitles, etc.
+	TA_LB_OPTIONS, // textarea listbox options
+	TA_LB_HOVER,
+	TA_LB_SELECTED,
 
 	count
 };

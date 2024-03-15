@@ -458,11 +458,9 @@ def OpenSequencerWindow ():
 		TargLabel.SetVisible (False)
 	else:
 		CondSelect.OnSelect (ContingencyHelpCondition)
-		CondSelect.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
 		CondSelect.SetOptions ([elem[0] for elem in ContCond], "ContCond", 0)
 
 		TargSelect.OnSelect (ContingencyHelpTarget)
-		TargSelect.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
 		if Target:
 			TargSelect.SetOptions ([ContTarg[0][0]], "ContTarg", 1)
 		else:

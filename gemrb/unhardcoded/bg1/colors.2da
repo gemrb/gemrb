@@ -24,6 +24,9 @@ TRAPCOLOR			0xff0000ff
 HOVERTARGETABLE			0x00ff00ff
 MSG			0xf0f0f0ff
 MSG_PARTY		0x8080ffff
+TA_LB_OPTIONS		0xd7d7d7ff
+TA_LB_HOVER		0xffb400ff
+TA_LB_SELECTED		0xff6000ff
 
 # To add a new color apart of adding it here you must add also the following changes:
 # On the file DisplayMessage.h put the name of the color at the end of the enum.
