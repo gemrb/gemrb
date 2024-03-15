@@ -236,14 +236,15 @@ Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, orient_t
 {
 	int Count = 0;
 	int Max = Distance(start, dest);
+	Point diff = dest - start;
 	Path path;
 	path.reserve(Max);
 	path.push_back(PathNode {start, Orientation});
 	auto StartNode = path.begin();
 	for (int Steps = 0; Steps < Max; Steps++) {
 		Point p;
-		p.x = start.x + ((dest.x - start.x) * Steps / Max);
-		p.y = start.y + ((dest.y - start.y) * Steps / Max);
+		p.x = start.x + (diff.x * Steps / Max);
+		p.y = start.y + (diff.y * Steps / Max);
 
 		//the path ends here as it would go off the screen, causing problems
 		//maybe there is a better way, but i needed a quick hack to fix
