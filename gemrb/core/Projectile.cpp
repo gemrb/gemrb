@@ -1738,8 +1738,8 @@ void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 		frame = travel[face].NextFrame();
 	}
 
-	Color tint2 = tint;
-	if (game) game->ApplyGlobalTint(tint2, flag);
+	// agannazar's scorcher and the bg1 wand of frost (only known line projectiles)
+	// should not have the global tint applied, which is easily tested at night
 	while(iter != path.end()) {
 		Point pos = iter->point - vp.origin;
 
@@ -1747,7 +1747,7 @@ void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 			pos.y -= ProHeights::Flying;
 		}
 
-		Draw(frame, pos, flag, tint2);
+		Draw(frame, pos, flag, tint);
 		++iter;
 	}
 }
