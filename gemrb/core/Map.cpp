@@ -2392,14 +2392,23 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 {
 	size_t pl = SongList[SongType];
 	const ieVariable* poi = &core->GetMusicPlaylist(pl);
-	// for subareas fall back to the main list
-	// needed eg. in bg1 ar2607 (intro candlekeep ambush south)
-	// it's not the correct music, perhaps it needs the one from the master area
-	// it would match for ar2607 and ar2600, but very annoying (see GetMasterArea)
-	// ... but this is also definitely wrong for iwd
+	Game* game = core->GetGame();
+
+	// Some subareas don't have their own songlist. It is currently unclear
+	// how the different games handle this situation and which music GemRB
+	// should play, if any. Further research is needed.
+	// At least for the battle music in BG1, e.g. AR2607 (intro candlekeep
+	// ambush south), there is a strong assumption to play the music from
+	// the masterarea's songlist.
+	// This assumption is definitely wrong for IWD, see #1476! Therefore we
+	// use a preliminary flag test to restrict it to BG1 for now.
 	if (IsStar(*poi) && !MasterArea && SongType == SONG_BATTLE && core->HasFeature(GFFlags::BREAKABLE_WEAPONS)) {
-		poi = &core->GetMusicPlaylist(SongType);
-		pl = SongType;
+		static constexpr int bc1Idx = 19; // fallback to first BG1 battle music
+
+		const Map* lastMasterArea = game->GetMap(game->LastMasterArea, false);
+
+		pl = lastMasterArea ? lastMasterArea->SongList[SongType] : bc1Idx;
+		poi = &core->GetMusicPlaylist(pl);
 	}
 
 	if (IsStar(*poi)) return;
@@ -2413,7 +2422,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 		return;
 	}
 	if (SongType == SONG_BATTLE) {
-		core->GetGame()->CombatCounter = 150;
+		game->CombatCounter = 150;
 	}
 }
 

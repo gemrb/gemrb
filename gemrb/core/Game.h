@@ -360,8 +360,6 @@ public:
 	bool MasterArea(const ResRef &area) const;
 	/** Dynamically adding an area to master areas*/
 	void SetMasterArea(const ResRef &area);
-	/** Guess the master area of the given area*/
-	//Map* GetMasterArea(const char *area);
 	/** place persistent actors in the fresly loaded area*/
 	void PlacePersistents(Map *map, const ResRef &resRef);
 	/** Returns slot of the map, if it was already loaded,
