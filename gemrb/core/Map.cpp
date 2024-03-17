@@ -3511,18 +3511,19 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 Container *Map::GetPile(Point position)
 {
 	//converting to search square
-	position = ConvertCoordToTile(position);
+	Point smPos = ConvertCoordToTile(position);
 	ieVariable pileName;
-	pileName.Format("heap_{}.{}", position.x, position.y);
+	pileName.Format("heap_{}.{}", smPos.x, smPos.y);
 	//pixel position is centered on search square
-	position.x=position.x*16+8;
-	position.y=position.y*12+6;
+	Point upperLeft = position;
+	position.x += 8;
+	position.y += 6;
 	Container *container = TMap->GetContainer(position,IE_CONTAINER_PILE);
 	if (!container) {
 		container = AddContainer(pileName, IE_CONTAINER_PILE, nullptr);
 		container->Pos=position;
 		//bounding box covers the search square
-		container->BBox = Region::RegionFromPoints(Point(position.x-8, position.y-6), Point(position.x+8,position.y+6));
+		container->BBox = Region::RegionFromPoints(upperLeft, Point(position.x + 8, position.y + 6));
 	}
 	return container;
 }
