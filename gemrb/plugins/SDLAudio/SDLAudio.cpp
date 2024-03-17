@@ -91,11 +91,7 @@ bool SDLAudio::Init(void)
 		Log(ERROR, "SDLAudio", "InitSubSystem failed: {}", SDL_GetError());
 		return false;
 	}
-#ifdef RPI
 	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 512) < 0) {
-#else
-	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 8192) < 0) {
-#endif
 		return false;
 	}
 
