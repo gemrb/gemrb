@@ -227,11 +227,7 @@ void Projectile::GetSmokeAnim()
 // load animations, start sound
 void Projectile::Setup()
 {
-	tint.r=128;
-	tint.g=128;
-	tint.b=128;
-	tint.a=255;
-
+	tint = ColorGray;
 	timeStartStep = core->Time.Ticks2Ms(core->GetGame()->Ticks);
 
 	const Actor* act = area->GetActorByGlobalID(Caster);
