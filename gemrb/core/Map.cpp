@@ -2739,10 +2739,8 @@ ieDword Map::HasVVCCell(const ResRef &resource, const Point &p) const
 	ieDword ret = 0;
 
 	for (const VEFObject *vvc: vvcCells) {
-		if (!p.IsInvalid()) {
-			if (vvc->Pos.x != p.x) continue;
-			if (vvc->Pos.y != p.y) continue;
-		}
+		if (!p.IsInvalid() && vvc->Pos != p) continue;
+
 		if (resource != vvc->ResName) continue;
 		const ScriptedAnimation *sca = vvc->GetSingleObject();
 		if (sca) {
