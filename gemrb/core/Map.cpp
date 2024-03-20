@@ -2392,7 +2392,10 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 {
 	size_t pl = SongList[SongType];
 	const ieVariable* poi = &core->GetMusicPlaylist(pl);
+
+	bool isBG1 = core->HasFeature(GFFlags::BREAKABLE_WEAPONS); // preliminary BG1 test
 	Game* game = core->GetGame();
+	const PluginHolder<MusicMgr>& musicMgr = core->GetMusicMgr();
 
 	// Some subareas don't have their own songlist. It is currently unclear
 	// how the different games handle this situation and which music GemRB
@@ -2404,7 +2407,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	// use a preliminary flag test to restrict it to BG1 for now.
 	// Test for non-zero pl in order to keep subareas quiet which disable
 	// music explicitely with pl=0.
-	if (IsStar(*poi) && pl && !MasterArea && core->HasFeature(GFFlags::BREAKABLE_WEAPONS)) {
+	if (IsStar(*poi) && pl && !MasterArea && isBG1) {
 		static constexpr int bc1Idx = 19; // fallback to first BG1 battle music
 
 		const Map* lastMasterArea = game->GetMap(game->LastMasterArea, false);
@@ -2413,11 +2416,24 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 		poi = &core->GetMusicPlaylist(pl);
 	}
 
-	if (IsStar(*poi)) return;
+	if (IsStar(*poi)) {
+		// It is currently unclear how the different games handle the change
+		// to "no music". Should GemRB stop the currently playing music?
+		// Further research is needed.
+		// At least for BG1 there is a strong assumption to just stop the
+		// music, e.g. transition from AR2616 to AR2617 (go to 2nd floor
+		// in Candlekeep Inn) or from AR2616 to AR2600 (leaving Candlekeep
+		// Inn).
+		if (isBG1) {
+			musicMgr->HardEnd();
+		}
+
+		return;
+	}
 
 	//check if restart needed (either forced or the current song is different)
-	if (!restart && core->GetMusicMgr()->IsCurrentPlayList(*poi)) return;
-	int ret = core->GetMusicMgr()->SwitchPlayList(*poi, hard);
+	if (!restart && musicMgr->IsCurrentPlayList(*poi)) return;
+	int ret = musicMgr->SwitchPlayList(*poi, hard);
 	if (ret) {
 		//Here we disable the faulty musiclist entry
 		core->DisableMusicPlaylist(pl);
