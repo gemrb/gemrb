@@ -1543,18 +1543,27 @@ void Game::UpdateScripts()
 		Maps[idx]->UpdateScripts();
 	}
 
+	// determine if we should start some music
+	bool doChangeSong;
+	bool doChangeSongHard;
+
 	if (PartyAttack) {
 		//ChangeSong will set the battlesong only if CombatCounter is nonzero
-		CombatCounter=150;
-		ChangeSong(false, true);
+		CombatCounter = 150;
+		doChangeSong = true;
+		doChangeSongHard = true;
+	} else if (CombatCounter) {
+		//Change song if combatcounter goes down to 0
+		CombatCounter--;
+		doChangeSong = !CombatCounter;
+		doChangeSongHard = false;
 	} else {
-		if (CombatCounter) {
-			CombatCounter--;
-			//Change song if combatcounter went down to 0
-			if (!CombatCounter) {
-				ChangeSong(false, false);
-			}
-		}
+		// nothing to change
+		doChangeSong = false;
+		doChangeSongHard = false;
+	}
+	if (doChangeSong) {
+		ChangeSong(false, doChangeSongHard);
 	}
 
 	if (StateOverrideTime)
