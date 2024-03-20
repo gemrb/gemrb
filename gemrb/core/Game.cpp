@@ -387,7 +387,7 @@ int Game::LeaveParty(Actor* actor, bool returnCriticalItems)
 	if (returnCriticalItems && core->HasFeature(GFFlags::HEAL_ON_100PLUS)) { // TODO: change to !SELLABLE_CRITS_NO_CONV once that is merged
 		slot = actor->inventory.FindItem("", IE_INV_ITEM_CRITICAL);
 		while (slot != -1) {
-			const CREItem* si = actor->inventory.RemoveItem(slot);
+			const CREItem* si = actor->inventory.GetSlotItem(slot);
 			MoveItemCore(actor, PCs[0], si->ItemResRef, 0, 0);
 			slot = actor->inventory.FindItem("", IE_INV_ITEM_CRITICAL);
 		}
