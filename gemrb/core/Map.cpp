@@ -2388,12 +2388,12 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	// Some subareas don't have their own songlist. It is currently unclear
 	// how the different games handle this situation and which music GemRB
 	// should play, if any. Further research is needed.
-	// At least for the battle music in BG1, e.g. AR2607 (intro candlekeep
-	// ambush south), there is a strong assumption to play the music from
-	// the masterarea's songlist.
+	// At least for BG1 there is a strong assumption to play the music from
+	// the masterarea's songlist, e.g. AR2607 (intro candlekeep ambush south),
+	// or AR2302 (friendly arm inn 2nd floor).
 	// This assumption is definitely wrong for IWD, see #1476! Therefore we
 	// use a preliminary flag test to restrict it to BG1 for now.
-	if (IsStar(*poi) && !MasterArea && SongType == SONG_BATTLE && core->HasFeature(GFFlags::BREAKABLE_WEAPONS)) {
+	if (IsStar(*poi) && !MasterArea && core->HasFeature(GFFlags::BREAKABLE_WEAPONS)) {
 		static constexpr int bc1Idx = 19; // fallback to first BG1 battle music
 
 		const Map* lastMasterArea = game->GetMap(game->LastMasterArea, false);
