@@ -1349,7 +1349,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 	Map* map1 = actor->GetCurrentArea();
 	Map* map2;
 	Game* game = core->GetGame();
-	bool newSong = false;
+
 	if (!area.IsEmpty() && (!map1 || area != map1->GetScriptRef())) { //do we need to switch area?
 		//we have to change the pathfinder
 		//to the target area if adjust==true
@@ -1358,7 +1358,6 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 			map1->RemoveActor( actor );
 		}
 		map2->AddActor( actor, true );
-		newSong = true;
 
 		// update the worldmap if needed
 		if (actor->InParty) {
@@ -1379,9 +1378,6 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 	if (actor->InParty) {
 		GameControl *gc=core->GetGameControl();
 		gc->SetScreenFlags(ScreenFlags::CenterOnActor, BitOp::OR);
-		if (newSong) {
-			game->ChangeSong(false, true);
-		}
 	}
 }
 
