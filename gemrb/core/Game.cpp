@@ -1566,6 +1566,12 @@ void Game::UpdateScripts()
 		CombatCounter--;
 		doChangeSong = !CombatCounter;
 		doChangeSongHard = false;
+	} else if (!core->GetMusicMgr()->IsPlaying()) {
+		// perhaps a StartMusic action stopped the area music?
+		// (we should probably find a less silly way to handle this,
+		// because nothing can ever stop area music now..)
+		doChangeSong = true;
+		doChangeSongHard = false;
 	} else {
 		// nothing to change
 		doChangeSong = false;
@@ -1587,13 +1593,6 @@ void Game::UpdateScripts()
 		for(unsigned int i=0;i<idx;i++) {
 			DelMap(i, false);
 		}
-	}
-
-	// perhaps a StartMusic action stopped the area music?
-	// (we should probably find a less silly way to handle this,
-	// because nothing can ever stop area music now..)
-	if (!core->GetMusicMgr()->IsPlaying()) {
-		ChangeSong(false,false);
 	}
 
 	//this is used only for the death delay so far
