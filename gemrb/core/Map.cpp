@@ -2383,7 +2383,10 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 {
 	size_t pl = SongList[SongType];
 	const ieVariable* poi = &core->GetMusicPlaylist(pl);
+
+	bool isBG1 = core->HasFeature(GFFlags::BREAKABLE_WEAPONS); // preliminary BG1 test
 	Game* game = core->GetGame();
+	const PluginHolder<MusicMgr>& musicMgr = core->GetMusicMgr();
 
 	// Some subareas don't have their own songlist. It is currently unclear
 	// how the different games handle this situation and which music GemRB
@@ -2395,7 +2398,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	// use a preliminary flag test to restrict it to BG1 for now.
 	// Test for non-zero pl in order to keep subareas quiet which disable
 	// music explicitely with pl=0.
-	if (IsStar(*poi) && pl && !MasterArea && core->HasFeature(GFFlags::BREAKABLE_WEAPONS)) {
+	if (IsStar(*poi) && pl && !MasterArea && isBG1) {
 		static constexpr int bc1Idx = 19; // fallback to first BG1 battle music
 
 		const Map* lastMasterArea = game->GetMap(game->LastMasterArea, false);
@@ -2404,11 +2407,16 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 		poi = &core->GetMusicPlaylist(pl);
 	}
 
-	if (IsStar(*poi)) return;
+	if (IsStar(*poi)) {
+		// ease off the music if possible
+		// playlists without the exit segment will be forcefully ended
+		musicMgr->End();
+		return;
+	}
 
 	//check if restart needed (either forced or the current song is different)
-	if (!restart && core->GetMusicMgr()->IsCurrentPlayList(*poi)) return;
-	int ret = core->GetMusicMgr()->SwitchPlayList(*poi, hard);
+	if (!restart && musicMgr->IsCurrentPlayList(*poi)) return;
+	int ret = musicMgr->SwitchPlayList(*poi, hard);
 	if (ret) {
 		//Here we disable the faulty musiclist entry
 		core->DisableMusicPlaylist(pl);
