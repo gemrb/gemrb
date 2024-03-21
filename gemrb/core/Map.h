@@ -147,9 +147,9 @@ struct RestHeaderType {
 	ResRef CreResRef[MAX_RESCOUNT];
 	ieWord CreatureNum;
 	ieWord Difficulty;
-	ieDword sduration;
-	ieWord rwdist;
-	ieWord owdist;
+	ieDword Duration; // spawn duration, lifespan — useless, since they spawn on top of you
+	ieWord RandomWalkDistance; // random walk distance, hunting range
+	ieWord FollowDistance; // other walk distance, follow range, (currently) unused
 	ieWord Maximum;
 	ieWord Enabled;
 	ieWord DayChance;

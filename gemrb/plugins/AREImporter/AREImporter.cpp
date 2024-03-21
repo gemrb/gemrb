@@ -550,9 +550,9 @@ void AREImporter::GetRestHeader(DataStream* str, Map* map) const
 		map->RestHeader.CreatureNum = MAX_RESCOUNT;
 	}
 	str->ReadWord(map->RestHeader.Difficulty); // difficulty?
-	str->ReadDword(map->RestHeader.sduration); // spawn duration, lifespan
-	str->ReadWord(map->RestHeader.rwdist); // random walk distance, hunting range
-	str->ReadWord(map->RestHeader.owdist); // other walk distance, follow range
+	str->ReadDword(map->RestHeader.Duration);
+	str->ReadWord(map->RestHeader.RandomWalkDistance);
+	str->ReadWord(map->RestHeader.FollowDistance);
 	str->ReadWord(map->RestHeader.Maximum); // maximum number of creatures
 	str->ReadWord(map->RestHeader.Enabled);
 	str->ReadWord(map->RestHeader.DayChance);
@@ -2490,9 +2490,9 @@ int AREImporter::PutRestHeader(DataStream *stream, const Map *map) const
 	}
 	stream->WriteWord(map->RestHeader.CreatureNum);
 	stream->WriteWord(map->RestHeader.Difficulty);
-	stream->WriteDword(map->RestHeader.sduration);
-	stream->WriteWord(map->RestHeader.rwdist);
-	stream->WriteWord(map->RestHeader.owdist);
+	stream->WriteDword(map->RestHeader.Duration);
+	stream->WriteWord(map->RestHeader.RandomWalkDistance);
+	stream->WriteWord(map->RestHeader.FollowDistance);
 	stream->WriteWord(map->RestHeader.Maximum);
 	stream->WriteWord(map->RestHeader.Enabled);
 	stream->WriteWord(map->RestHeader.DayChance);
