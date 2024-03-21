@@ -142,16 +142,19 @@ enum MapEnv : ieWord {
 #define MAX_RESCOUNT 10
 
 struct RestHeaderType {
+	// we ignore 32 bytes for the unused name
 	ieStrRef Strref[MAX_RESCOUNT];
 	ResRef CreResRef[MAX_RESCOUNT];
-	ieWord Difficulty;
 	ieWord CreatureNum;
+	ieWord Difficulty;
+	ieDword sduration;
+	ieWord rwdist;
+	ieWord owdist;
 	ieWord Maximum;
 	ieWord Enabled;
 	ieWord DayChance;
 	ieWord NightChance;
-	ieDword sduration;
-	ieWord rwdist, owdist;
+	// some more unused space
 };
 
 struct Entrance {
