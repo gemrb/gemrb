@@ -3267,8 +3267,9 @@ least one creature is summoned, regardless the difficulty cap.
 */
 int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 {
+	Game* game = core->GetGame();
 	if (!RestHeader.CreatureNum || !RestHeader.Enabled || !RestHeader.Maximum) {
-		core->GetGame()->AdvanceTime(hours * core->Time.hour_size);
+		game->AdvanceTime(hours * core->Time.hour_size);
 		return 0;
 	}
 
@@ -3282,12 +3283,12 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
 	bool interrupt = RAND(0, 99) < chance;
 	if (!interrupt) {
-		core->GetGame()->AdvanceTime(hours * core->Time.hour_size);
+		game->AdvanceTime(hours * core->Time.hour_size);
 		return 0;
 	}
 
 	unsigned int spawncount = 0;
-	int spawnamount = core->GetGame()->GetTotalPartyLevel(true) * RestHeader.Difficulty;
+	int spawnamount = game->GetTotalPartyLevel(true) * RestHeader.Difficulty;
 	if (spawnamount < 1) spawnamount = 1;
 	// this loop is a bit odd, since we only check the interrupt chance once
 	// the only way this not to return immediately at hour 0 is from a data error
@@ -3295,7 +3296,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 		int idx = RAND(0, RestHeader.CreatureNum - 1);
 		const Actor* creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
 		if (!creature) {
-			core->GetGame()->AdvanceTime(core->Time.hour_size);
+			game->AdvanceTime(core->Time.hour_size);
 			continue;
 		}
 
