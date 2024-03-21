@@ -1651,7 +1651,7 @@ std::string Inventory::dump(bool print) const
 			continue;
 		}
 
-		AppendFormat(buffer, "{}: {} - {} Flags:{:#x}", i, itm->ItemResRef, itm->Usages, itm->Flags);
+		AppendFormat(buffer, "{}: {} - {} Flags: {:#x} ", i, itm->ItemResRef, itm->Usages, itm->Flags);
 		AppendFormat(buffer, "Wt: {} x {}Lb\n", (itm->Usages[0] && itm->MaxStackAmount) ? itm->Usages[0] : 1, itm->Weight);
 	}
 
