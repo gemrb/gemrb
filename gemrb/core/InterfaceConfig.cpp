@@ -290,6 +290,8 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 
 	CONFIG_STRING("AudioDriver", config.AudioDriverName);
 	CONFIG_STRING("VideoDriver", config.VideoDriverName);
+	CONFIG_STRING("SkipPlugin", config.SkipPlugin);
+	CONFIG_STRING("DelayPlugin", config.DelayPlugin);
 	CONFIG_STRING("Encoding", config.Encoding);
 	CONFIG_STRING("ScaleQuality", config.ScaleQuality);
 
