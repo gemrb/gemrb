@@ -3885,14 +3885,15 @@ int GameScript::Delay( Scriptable *Sender, const Trigger *parameters)
 	return (Sender->ScriptTicks % delay) <= Sender->IdleTicks;
 }
 
-#define TIMEOFDAY_DAY		0	/* 7-21 */
-#define TIMEOFDAY_DUSK		1	/* 21-22 */
-#define TIMEOFDAY_NIGHT		2	/* 22-6 */
-#define TIMEOFDAY_MORNING	3	/* 6-7 */
-
 int GameScript::TimeOfDay(Scriptable */*Sender*/, const Trigger *parameters)
 {
 	int hour = core->Time.GetHour(core->GetGame()->GameTime);
+	enum {
+		TIMEOFDAY_DAY, /* 7-21 */
+		TIMEOFDAY_DUSK, /* 21-22 */
+		TIMEOFDAY_NIGHT, /* 22-6 */
+		TIMEOFDAY_MORNING, /* 6-7 */
+	};
 
 	if ((parameters->int0Parameter == TIMEOFDAY_DAY && hour >= 7 && hour < 21)
 		|| (parameters->int0Parameter == TIMEOFDAY_DUSK && hour == 21)
