@@ -1561,8 +1561,18 @@ void Game::UpdateScripts()
 		// perhaps a StartMusic action stopped the area music?
 		// (we should probably find a less silly way to handle this,
 		// because nothing can ever stop area music now..)
-		doChangeSong = true;
+
+		// Call ChangeSong only once per round in order to prevent spam
+		// calls every tick in areas without music.
+		static unsigned int ticks = 0;
+		ticks++;
+
+		doChangeSong = ticks >= core->Time.round_size;
 		doChangeSongHard = false;
+
+		if (doChangeSong) {
+			ticks = 0;
+		}
 	} else {
 		// nothing to change
 		doChangeSong = false;
