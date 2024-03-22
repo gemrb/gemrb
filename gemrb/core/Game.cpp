@@ -1409,11 +1409,11 @@ void Game::AddGold(int add)
 	}
 }
 
-EffectRef fx_set_regenerating_state_ref = { "State:Regenerating", -1 };
-
 //later this could be more complicated
 void Game::AdvanceTime(ieDword add, bool fatigue)
 {
+	static EffectRef fx_set_regenerating_state_ref = { "State:Regenerating", -1 };
+
 	ieDword h = GameTime/core->Time.hour_size;
 	GameTime+=add;
 	if (h!=GameTime/core->Time.hour_size) {
