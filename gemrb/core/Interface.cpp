@@ -1368,6 +1368,7 @@ static const EnumArray<GFFlags, StringView> game_flags {
 	"DamageInnocentRep", // GFFlags::DAMAGE_INNOCENT_REP
 	"HasWeaponSets", // GFFlags::GF_HAS_WEAPON_SETS
 	"HighlightOutlineOnly", // GFFlags::HIGHLIGHT_OUTLINE_ONLY
+	"IWDRestSpawns", // GFFlags::IWD_REST_SPAWNS
 };
 
 /** Loads gemrb.ini */

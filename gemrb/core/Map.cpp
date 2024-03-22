@@ -3273,18 +3273,36 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 		return 0;
 	}
 
-	// TODO: it appears there was a limit on how many rest encounters can
-	// be triggered in a row (or area?), since HOFMode should increase it
-	// by 1. It doesn't look like it was stored in the header, so perhaps
-	// it was just a hardcoded limit to make the game more forgiving
-	// OR did it increase the number of spawned creatures by 1, 2?
-
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
 	bool interrupt = RAND(0, 99) < chance;
 	if (!interrupt) {
 		game->AdvanceTime(hours * core->Time.hour_size);
 		return 0;
+	}
+
+	// slightly different behaviour in iwd1, with heart of fury increasing spawn rate,
+	// no level adjustments and less randomness
+	if (core->HasFeature(GFFlags::IWD_REST_SPAWNS)) {
+		// time was actually randomly advanced between 0 and 450 seconds, ie. 0-1.5h
+		// ... but that would require some refactoring, since we use hours everywhere else
+		int step = 1;
+		game->AdvanceTime(step * core->Time.hour_size);
+
+		int idx = RAND(0, RestHeader.CreatureNum - 1);
+		const Actor* creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
+		if (!creature) return 0;
+
+		displaymsg->DisplayString(RestHeader.Strref[idx], GUIColors::GOLD, STRING_FLAGS::SOUND);
+		// the HoF bonus is potentially interesting for externalization
+		int attempts = std::max(1, RestHeader.Maximum + RAND(-2, 2)) + (game->HOFMode ? 1 : 0);
+		for (int i = 0; i < attempts; i++) {
+			if (!SpawnCreature(pos, RestHeader.CreResRef[idx], Size(20, 20), RestHeader.RandomWalkDistance)) {
+				break;
+			}
+		}
+
+		return hours - step;
 	}
 
 	unsigned int spawncount = 0;

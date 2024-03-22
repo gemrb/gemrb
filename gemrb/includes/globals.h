@@ -136,6 +136,7 @@ enum class GFFlags : uint32_t {
 	DAMAGE_INNOCENT_REP,             // not bg1
 	HAS_WEAPON_SETS,             	// iwd2
 	HIGHLIGHT_OUTLINE_ONLY,         // all
+	IWD_REST_SPAWNS,                // iwd1, not bgs or iwdee
 
 	count // must be last
 };
