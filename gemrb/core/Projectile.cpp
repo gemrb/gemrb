@@ -1826,7 +1826,7 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 		flags |= BlitFlags::COLOR_MOD;
 	}
 
-	unsigned int face = GetNextFace();
+	unsigned int face = GetNextFace(Orientation, NewOrientation);
 	if (face!=Orientation) {
 		SetFrames(face, GetTravelPos(face), GetShadowPos(face));
 	}

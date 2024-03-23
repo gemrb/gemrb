@@ -393,10 +393,6 @@ public:
 		effects = std::move(fx);
 	}
 
-	inline unsigned char GetNextFace() const {
-		return GemRB::GetNextFace(Orientation, NewOrientation);
-	}
-
 	inline void SetOrientation(orient_t value, bool slow) {
 		//MAX_ORIENT == 16, so we can do this
 		NewOrientation = value;
