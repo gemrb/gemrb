@@ -825,15 +825,21 @@ void Projectile::NextTarget(const Point &p)
 	//this hack ensures that the projectile will go away after its time
 	//by the time it reaches this part, it was already expired, so Target
 	//needs to be cleared.
+	Point fakeDestination = Destination;
 	if(ExtFlags&PEF_NO_TRAVEL) {
 		Target = 0;
 		Destination = Pos;
 		return;
+	} else if (ExtFlags & PEF_LINE && !Extension) {
+		// reduce the distance by roughly a bam width to not overshoot as much
+		// but only for single target scorchers (bg1 vs bg2)
+		Point offset = OrientedOffset(Orientation, 48);
+		fakeDestination -= offset;
 	}
 
 	int flags = (ExtFlags&PEF_BOUNCE) ? GL_REBOUND : GL_PASS;
 	int stepping = (ExtFlags & PEF_LINE) ? Speed : 1;
-	path = area->GetLinePath(Pos, Destination, stepping, Orientation, flags);
+	path = area->GetLinePath(Pos, fakeDestination, stepping, Orientation, flags);
 }
 
 void Projectile::SetTarget(const Point &p)
