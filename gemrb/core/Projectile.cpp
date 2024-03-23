@@ -882,9 +882,11 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 		//replan the path in case the source moved (only for line projectiles)
 		if(ExtFlags&PEF_LINE) {
 			const Actor *c = area->GetActorByGlobalID(Caster);
-			if(c && c->Pos!=Pos) {
-				// readd the casting offsets
-				Pos = c->Pos - Point(0, ZPos) + GetStartOffset(c);
+			if (!c) return;
+
+			Point start = GetStartOffset(c);
+			if (c->Pos != Pos - start) {
+				Pos = c->Pos + start;
 				NextTarget(target->Pos);
 			}
 		}
