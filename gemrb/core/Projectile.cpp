@@ -882,8 +882,14 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 
 		//replan the path in case the source moved (only for line projectiles)
 		if(ExtFlags&PEF_LINE) {
-			const Actor *c = area->GetActorByGlobalID(Caster);
+			Actor* c = area->GetActorByGlobalID(Caster);
 			if (!c) return;
+			// the original forced the actor to always face the target even when moving
+			// this avoids the line going through the caster when facing the opposite way
+			// we're losing the race to the movement code, but at least this reorients at the end
+			if (GetOrient(target->Pos, c->Pos) != c->GetOrientation()) {
+				c->SetOrientation(target->Pos, c->Pos, false);
+			}
 
 			Point start = GetStartOffset(c);
 			if (c->Pos != Pos - start) {
