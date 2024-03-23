@@ -1691,7 +1691,7 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 	}
 }
 
-int Projectile::GetTravelPos(int face) const
+int Projectile::GetTravelPos(orient_t face) const
 {
 	if (travel[face]) {
 		return travel[face].GetCurrentFrameIndex();
@@ -1699,7 +1699,7 @@ int Projectile::GetTravelPos(int face) const
 	return 0;
 }
 
-int Projectile::GetShadowPos(int face) const
+int Projectile::GetShadowPos(orient_t face) const
 {
 	if (shadow[face]) {
 		return shadow[face].GetCurrentFrameIndex();
@@ -1707,7 +1707,7 @@ int Projectile::GetShadowPos(int face) const
 	return 0;
 }
 
-void Projectile::SetFrames(int face, int frame1, int frame2)
+void Projectile::SetFrames(orient_t face, int frame1, int frame2)
 {
 	if (travel[face]) {
 		travel[face].SetFrame(frame1);
@@ -1726,7 +1726,7 @@ void Projectile::SetupWall()
 	SetTarget(p2);
 }
 
-void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
+void Projectile::DrawLine(const Region& vp, orient_t face, BlitFlags flag)
 {
 	const Game *game = core->GetGame();
 	auto iter = path.begin();
@@ -1778,7 +1778,7 @@ void Projectile::BendPosition(Point& pos) const
 }
 
 // draw pop in/hold/pop out animation sequences
-void Projectile::DrawPopping(unsigned int face, const Point& pos, BlitFlags flags, const Color& popTint)
+void Projectile::DrawPopping(orient_t face, const Point& pos, BlitFlags flags, const Color& popTint)
 {
 	const Game* game = core->GetGame();
 	Holder<Sprite2D> frame;
@@ -1826,7 +1826,7 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 		flags |= BlitFlags::COLOR_MOD;
 	}
 
-	unsigned int face = GetNextFace(Orientation, NewOrientation);
+	orient_t face = GetNextFace(Orientation, NewOrientation);
 	if (face!=Orientation) {
 		SetFrames(face, GetTravelPos(face), GetShadowPos(face));
 	}

@@ -452,8 +452,8 @@ private:
 	//calculate target and destination points for a firewall
 	void SetupWall();
 	void BendPosition(Point& pos) const;
-	void DrawPopping(unsigned int face, const Point& pos, BlitFlags flags, const Color& popTint);
-	void DrawLine(const Region &screen, int face, BlitFlags flag);
+	void DrawPopping(orient_t face, const Point& pos, BlitFlags flags, const Color& popTint);
+	void DrawLine(const Region& screen, orient_t face, BlitFlags flag);
 	void DrawTravel(const Region& screen, BlitFlags flags);
 	void DrawChildren(const Region& screen, BlitFlags flags);
 	void InitExplodingPhase1() const;
@@ -463,9 +463,9 @@ private:
 	void SpawnFragment(Point& pos) const;
 	void SpawnFragments(const Holder<ProjectileExtension>& extension) const;
 	void DrawExploded(const Region& screen, BlitFlags flags);
-	int GetTravelPos(int face) const;
-	int GetShadowPos(int face) const;
-	void SetFrames(int face, int frame1, int frame2);
+	int GetTravelPos(orient_t face) const;
+	int GetShadowPos(orient_t face) const;
+	void SetFrames(orient_t face, int frame1, int frame2);
 
 	//logic to resolve target when single projectile hit destination
 	int CalculateTargetFlag() const;
