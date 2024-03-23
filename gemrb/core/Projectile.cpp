@@ -684,11 +684,6 @@ int Projectile::AddTrail(const ResRef& BAM, const ieByte *pal) const
 
 Projectile::ProjectileState Projectile::DoStep()
 {
-	//recreate path if target has moved
-	if (Target) {
-		SetTarget(Target, false);
-	}
-
 	if (pathcounter) {
 		pathcounter--;
 	} else {
@@ -729,7 +724,7 @@ Projectile::ProjectileState Projectile::DoStep()
 
 		if (Extension) {
 			//transform into an explosive line
-			EndTravel();
+			newState = EndTravel();
 		} else {
 			if(!(ExtFlags&PEF_FREEZE) && travel[0]) {
 				//switch to 'fading' phase
@@ -1212,6 +1207,11 @@ void Projectile::Update() {
 	const Game *game = core->GetGame();
 	if (game && game->IsTimestopActive() && !(TFlags & PTF_TIMELESS)) {
 		return;
+	}
+
+	// recreate path if target has moved
+	if (Target) {
+		SetTarget(Target, false);
 	}
 
 	switch (state) {
