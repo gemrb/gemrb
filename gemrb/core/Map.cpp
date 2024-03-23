@@ -2730,6 +2730,7 @@ void Map::AddProjectile(Projectile* pro)
 void Map::AddProjectile(Projectile *pro, const Point &source, ieDword actorID, bool fake)
 {
 	pro->MoveTo(this, source);
+	pro->SetupZPos();
 	pro->SetTarget(actorID, fake);
 	AddProjectile(pro);
 }
@@ -2737,6 +2738,7 @@ void Map::AddProjectile(Projectile *pro, const Point &source, ieDword actorID, b
 void Map::AddProjectile(Projectile* pro, const Point &source, const Point &dest)
 {
 	pro->MoveTo(this, source);
+	pro->SetupZPos();
 	pro->SetTarget(dest);
 	AddProjectile(pro);
 }

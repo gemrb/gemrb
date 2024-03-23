@@ -231,20 +231,10 @@ void Projectile::Setup()
 	timeStartStep = core->Time.Ticks2Ms(core->GetGame()->Ticks);
 
 	const Actor* act = area->GetActorByGlobalID(Caster);
-
-	if (act) {
-		ZPos = ProHeights::Normal;
-		if (act->ValidTarget(GA_BIGBAD)) {
-			ZPos = ProHeights::Dragon;
-		}
-
-		if (ExtFlags & PEF_TEXT) {
-			displaymsg->DisplayStringName(StrRef, GUIColors::LIGHTGREY, act, STRING_FLAGS::NONE);
-		}
+	if (act && ExtFlags & PEF_TEXT) {
+		displaymsg->DisplayStringName(StrRef, GUIColors::LIGHTGREY, act, STRING_FLAGS::NONE);
 	}
-	if (ZPos != ProHeights::Dragon && SFlags & PSF_FLYING) {
-		ZPos = ProHeights::Flying;
-	}
+	SetupZPos();
 
 	//falling = vertical
 	//incoming = right side
@@ -1907,6 +1897,21 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 int Projectile::GetZPos() const
 {
 	return ZPos;
+}
+
+void Projectile::SetupZPos()
+{
+	const Actor* act = area->GetActorByGlobalID(Caster);
+	if (act) {
+		ZPos = ProHeights::Normal;
+		if (act->ValidTarget(GA_BIGBAD)) {
+			ZPos = ProHeights::Dragon;
+		}
+	}
+
+	if (ZPos != ProHeights::Dragon && SFlags & PSF_FLYING) {
+		ZPos = ProHeights::Flying;
+	}
 }
 
 void Projectile::SetIdentifiers(const ResRef &resref, size_t idx)

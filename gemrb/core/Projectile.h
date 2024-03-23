@@ -351,6 +351,7 @@ public:
 
 	Point GetPos() const { return Pos; }
 	int GetZPos() const;
+	void SetupZPos();
 	inline Point GetDestination() const { return Destination; }
 	inline const ResRef& GetName() const { return projectileName; }
 	inline ieWord GetType() const { return type; }
