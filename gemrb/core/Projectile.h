@@ -286,8 +286,8 @@ private:
 	// using std::vector over std::array for better movability
 	// the array will always be MAX_ORIENT in size
 	using AnimArray = std::vector<Animation>;
-	AnimArray travel;
-	AnimArray shadow;
+	AnimArray travelAnim;
+	AnimArray shadowAnim;
 
 	Holder<Sprite2D> light = nullptr; // this is just a round/halftrans sprite, has no animation
 	EffectQueue effects;

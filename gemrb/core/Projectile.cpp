@@ -50,8 +50,8 @@ Projectile::Projectile() noexcept
 	if (!server) {
 		server = core->GetProjectileServer();
 	}
-	travel.resize(MAX_ORIENT);
-	shadow.resize(MAX_ORIENT);
+	travelAnim.resize(MAX_ORIENT);
+	shadowAnim.resize(MAX_ORIENT);
 }
 
 Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bam, ieByte seq)
@@ -288,10 +288,10 @@ void Projectile::Setup()
 		StaticTint(pal32[idx]);
 	}
 
-	travel = CreateAnimations(BAMRes1, Seq1);
+	travelAnim = CreateAnimations(BAMRes1, Seq1);
 
 	if (TFlags&PTF_SHADOW) {
-		shadow = CreateAnimations(BAMRes2, Seq2);
+		shadowAnim = CreateAnimations(BAMRes2, Seq2);
 	}
 
 	if (TFlags&PTF_SMOKE) {
@@ -305,19 +305,19 @@ void Projectile::Setup()
 		//the travel projectile should linger after explosion
 		if(ExtFlags&PEF_POP) {
 			//the explosion consists of a pop in/hold/pop out of the travel projectile (dimension door)
-			if (travel[0] && shadow[0]) {
-				extensionDelay = travel[0].GetFrameCount() * 2 + shadow[0].GetFrameCount();
-				travel[0].Flags |= A_ANI_PLAYONCE;
-				shadow[0].Flags |= A_ANI_PLAYONCE;
+			if (travelAnim[0] && shadowAnim[0]) {
+				extensionDelay = travelAnim[0].GetFrameCount() * 2 + shadowAnim[0].GetFrameCount();
+				travelAnim[0].Flags |= A_ANI_PLAYONCE;
+				shadowAnim[0].Flags |= A_ANI_PLAYONCE;
 			}
-		} else if (travel[0]) {
-			extensionDelay = travel[0].GetFrameCount();
-			travel[0].Flags |= A_ANI_PLAYONCE;
+		} else if (travelAnim[0]) {
+			extensionDelay = travelAnim[0].GetFrameCount();
+			travelAnim[0].Flags |= A_ANI_PLAYONCE;
 		}
 	}
 
 	if (TFlags&PTF_COLOUR) {
-		SetupPalette(travel, palette, Gradients);
+		SetupPalette(travelAnim, palette, Gradients);
 	} else {
 		palette = gamedata->GetPalette(PaletteRes);
 	}
@@ -726,7 +726,7 @@ Projectile::ProjectileState Projectile::DoStep()
 			//transform into an explosive line
 			newState = EndTravel();
 		} else {
-			if(!(ExtFlags&PEF_FREEZE) && travel[0]) {
+			if (!(ExtFlags & PEF_FREEZE) && travelAnim[0]) {
 				//switch to 'fading' phase
 				SetDelay(100);
 			}
@@ -985,8 +985,8 @@ Projectile::ProjectileState Projectile::CheckTrigger(unsigned int radius)
 	if (state == ProjectileState::AWAITING_TRIGGER) {
 		//special trigger flag, explode only if the trigger animation has
 		//passed a hardcoded sequence number
-		if (Extension->AFlags & PAF_TRIGGER_D && travel[Orientation]) {
-			int anim = travel[Orientation].GetCurrentFrameIndex();
+		if (Extension->AFlags & PAF_TRIGGER_D && travelAnim[Orientation]) {
+			int anim = travelAnim[Orientation].GetCurrentFrameIndex();
 			if (anim < 30) {
 				return state;
 			}
@@ -1275,18 +1275,18 @@ Region Projectile::DrawingRegion(const Region& viewPort) const
 	}
 
 	orient_t face = GetOrientation();
-	const Animation& travelAnim = travel[face];
-	if (travelAnim) {
-		Region r2 = travelAnim.animArea;
+	const Animation& travel = travelAnim[face];
+	if (travel) {
+		Region r2 = travel.animArea;
 		r2.origin += Pos;
 		r.ExpandToRegion(r2);
 		// NOTE: fireball: small part of the ball and spread can still be out of the final region
 		// perhaps we need to account for the BAM center coordinates again?
 		// we reuse `travel` for both animations and assuming they're at the same height
 	}
-	const Animation& shadowAnim = shadow[face];
-	if (shadowAnim) {
-		Region r2 = shadowAnim.animArea;
+	const Animation& shadow = shadowAnim[face];
+	if (shadow) {
+		Region r2 = shadow.animArea;
 		r2.origin += Pos;
 		r2.y += ZPos; // always on the ground
 		r.ExpandToRegion(r2);
@@ -1544,9 +1544,9 @@ void Projectile::SpawnChild(size_t idx, bool firstExplosion, const Point& offset
 	// currently needed by bg2/how Web (less obvious in bg1)
 	// the original hardcoded a cycle switch to 1 or 2 at random when reaching the end, which results in the same frame
 	// TODO: original behaviour was to repeat individually (per-child) not as a whole
-	if (pro->travel[0] && Extension->APFlags & APF_PLAYONCE) {
+	if (pro->travelAnim[0] && Extension->APFlags & APF_PLAYONCE) {
 		// set on all orients while we don't force one for single-orientation animations (see CreateOrientedAnimations)
-		for (auto& anim : pro->travel) {
+		for (auto& anim : pro->travelAnim) {
 			anim.Flags |= A_ANI_PLAYONCE;
 		}
 	}
@@ -1693,27 +1693,27 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 
 int Projectile::GetTravelPos(orient_t face) const
 {
-	if (travel[face]) {
-		return travel[face].GetCurrentFrameIndex();
+	if (travelAnim[face]) {
+		return travelAnim[face].GetCurrentFrameIndex();
 	}
 	return 0;
 }
 
 int Projectile::GetShadowPos(orient_t face) const
 {
-	if (shadow[face]) {
-		return shadow[face].GetCurrentFrameIndex();
+	if (shadowAnim[face]) {
+		return shadowAnim[face].GetCurrentFrameIndex();
 	}
 	return 0;
 }
 
 void Projectile::SetFrames(orient_t face, int frame1, int frame2)
 {
-	if (travel[face]) {
-		travel[face].SetFrame(frame1);
+	if (travelAnim[face]) {
+		travelAnim[face].SetFrame(frame1);
 	}
-	if (shadow[face]) {
-		shadow[face].SetFrame(frame2);
+	if (shadowAnim[face]) {
+		shadowAnim[face].SetFrame(frame2);
 	}
 }
 
@@ -1732,10 +1732,10 @@ void Projectile::DrawLine(const Region& vp, orient_t face, BlitFlags flag)
 	auto iter = path.begin();
 	Holder<Sprite2D> frame;
 	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
-		frame = travel[face].LastFrame();
+		frame = travelAnim[face].LastFrame();
 		flag |= BlitFlags::GREY;
 	} else {
-		frame = travel[face].NextFrame();
+		frame = travelAnim[face].NextFrame();
 	}
 
 	// agannazar's scorcher and the bg1 wand of frost (only known line projectiles)
@@ -1783,24 +1783,24 @@ void Projectile::DrawPopping(orient_t face, const Point& pos, BlitFlags flags, c
 	const Game* game = core->GetGame();
 	Holder<Sprite2D> frame;
 	if (game && game->IsTimestopActive() && !(TFlags & PTF_TIMELESS)) {
-		frame = travel[face].LastFrame();
+		frame = travelAnim[face].LastFrame();
 		flags |= BlitFlags::GREY;
 		Draw(frame, pos, flags, popTint);
 		return;
 	}
 
 	if (ExtFlags & PEF_UNPOP) {
-		frame = shadow[0].NextFrame();
-		if (shadow[0].endReached) {
+		frame = shadowAnim[0].NextFrame();
+		if (shadowAnim[0].endReached) {
 			ExtFlags &= ~PEF_UNPOP;
 		}
 	} else {
-		frame = travel[0].NextFrame();
-		if (travel[0].endReached) {
-			travel[0].playReversed = true;
-			travel[0].SetFrame(0);
+		frame = travelAnim[0].NextFrame();
+		if (travelAnim[0].endReached) {
+			travelAnim[0].playReversed = true;
+			travelAnim[0].SetFrame(0);
 			ExtFlags |= PEF_UNPOP;
-			frame = shadow[0].NextFrame();
+			frame = shadowAnim[0].NextFrame();
 		}
 	}
 	Draw(frame, pos, flags, popTint);
@@ -1856,9 +1856,9 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 		DrawLine(viewport, face, flags);
 		return;
 	}
-	
-	if (shadow[face]) {
-		Holder<Sprite2D> frame = shadow[face].NextFrame();
+
+	if (shadowAnim[face]) {
+		Holder<Sprite2D> frame = shadowAnim[face].NextFrame();
 		Draw(frame, pos, flags, tint2);
 	}
 
@@ -1877,20 +1877,20 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 	if (ExtFlags&PEF_PILLAR) {
 		//draw all frames simultaneously on top of each other
 		for(int i=0;i<Aim;i++) {
-			if (travel[i]) {
-				Holder<Sprite2D> frame = travel[i].NextFrame();
+			if (travelAnim[i]) {
+				Holder<Sprite2D> frame = travelAnim[i].NextFrame();
 				Draw(frame, pos, flags, tint2);
 				pos.y-=frame->Frame.y;
 			}
 		}
 	} else {
-		if (travel[face]) {
+		if (travelAnim[face]) {
 			Holder<Sprite2D> frame;
 			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
-				frame = travel[face].LastFrame();
+				frame = travelAnim[face].LastFrame();
 				flags |= BlitFlags::GREY; // move higher if it interferes with other tints badly
 			} else {
-				frame = travel[face].NextFrame();
+				frame = travelAnim[face].NextFrame();
 			}
 			Draw(frame, pos, flags, tint2);
 		}
