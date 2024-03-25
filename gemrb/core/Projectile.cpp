@@ -720,7 +720,7 @@ Projectile::ProjectileState Projectile::DoStep()
 	}
 
 	if (ExtFlags & PEF_LINE) {
-		auto newState = state;
+		ProjectileState newState;
 
 		if (Extension) {
 			//transform into an explosive line

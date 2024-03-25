@@ -215,7 +215,7 @@ static ResRef damageSparks[DAMAGE_LEVELS] = {
 	"","",""
 };
 
-static bool damageBlendFlags[DAMAGE_LEVELS] = {0};
+static bool damageBlendFlags[DAMAGE_LEVELS] = { false };
 
 #define BLOOD_GRADIENT 19
 #define FIRE_GRADIENT 19
@@ -2384,7 +2384,7 @@ void Actor::PlayCritDamageAnimation(int type)
 void Actor::PlayDamageAnimation(int type, bool hit)
 {
 	if (!anims) return;
-	int i;
+
 	int flags = AA_PLAYONCE;
 	int height = 22;
 	if (pstflags) {
@@ -2397,6 +2397,8 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 
 	Log(COMBAT, "Actor", "Damage animation type: {}", type);
 	const Effect* fx;
+	int sparkType = 0;
+	int gradientType = damageGradients[type];
 	switch(type&255) {
 		case 0:
 			//PST specific personal criticals
@@ -2406,55 +2408,36 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 			}
 			//fall through
 		case 1: case 2: case 3: //blood
-			i = anims->GetBloodColor();
-			if (!i) i = damageGradients[type];
+			gradientType = anims->GetBloodColor();
+			if (!gradientType) gradientType = damageGradients[type];
 			fx = fxqueue.HasEffectWithParam(fx_animation_override_data_ref, 2);
 			if (fx) {
-				i = fx->Parameter1;
-			}
-			if (hit) {
-				AddAnimation(damageMainResources[type], i, height, flags);
+				gradientType = fx->Parameter1;
 			}
 			break;
 		case 4: case 5: case 6: //fire
-			if(hit) {
-				AddAnimation(damageMainResources[type], damageGradients[type], height, flags);
-			}
-			for(i=DL_FIRE;i<=type;i++) {
-				AddAnimation(damageSparks[i], damageGradients[i], height, flags);
-			}
+			sparkType = DL_FIRE;
 			break;
 		case 7: case 8: case 9: //electricity
-			if (hit) {
-				AddAnimation(damageMainResources[type], damageGradients[type], height, flags);
-			}
-			for(i=DL_ELECTRICITY;i<=type;i++) {
-				AddAnimation(damageSparks[i], damageGradients[i], height, flags);
-			}
+			sparkType = DL_ELECTRICITY;
 			break;
 		case 10: case 11: case 12://cold
-			if (hit) {
-				AddAnimation(damageMainResources[type], damageGradients[type], height, flags);
-			}
-
-			for (i = DL_COLD; i <= type; i++) {
-				AddAnimation(damageSparks[i], damageGradients[i], height, flags);
-			}
+			sparkType = DL_COLD;
 			break;
 		case 13: case 14: case 15://acid
-			if (hit) {
-				AddAnimation(damageMainResources[type], damageGradients[type], height, flags);
-			}
+			sparkType = DL_ACID;
+			break;
+		case 16:
+		case 17:
+		case 18: //disintegrate
+			break;
+	}
 
-			for (i = DL_ACID; i <= type; i++) {
-				AddAnimation(damageSparks[i], damageGradients[i], height, flags);
-			}
-			break;
-		case 16: case 17: case 18://disintegrate
-			if (hit) {
-				AddAnimation(damageMainResources[type], damageGradients[type], height, flags);
-			}
-			break;
+	if (hit) {
+		AddAnimation(damageMainResources[type], gradientType, height, flags);
+	}
+	for (int i = sparkType; i && i <= type; i++) {
+		AddAnimation(damageSparks[i], gradientType, height, flags);
 	}
 }
 
