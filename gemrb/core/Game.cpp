@@ -1686,10 +1686,10 @@ void Game::TextDream()
 }
 
 static EffectRef fx_disable_rest_ref = { "DisableRest", -1 };
-bool Game::CanPartyRest(int checks, ieStrRef* err) const
+bool Game::CanPartyRest(RestChecks checks, ieStrRef* err) const
 {
-	if (checks == REST_NOCHECKS) return true;
-	
+	if (checks == RestChecks::NoCheck) return true;
+
 	if (!err) {
 		static ieStrRef noerr = ieStrRef::INVALID;
 		err = &noerr;
@@ -1705,7 +1705,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 		}
 	}
 
-	if (checks & REST_CONTROL) {
+	if (checks & RestChecks::InControl) {
 		for (const auto& pc : PCs) {
 			if (pc->GetStat(IE_STATE_ID) & STATE_MINDLESS) {
 				// You cannot rest at this time because you do not have control of all your party members
@@ -1719,7 +1719,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	assert(leader);
 	const Map *area = leader->GetCurrentArea();
 	//we let them rest if someone is paralyzed, but the others gather around
-	if (checks & REST_SCATTER) {
+	if (checks & RestChecks::Scattered) {
 		if (!EveryoneNearPoint(area, leader->Pos, 0)) {
 			//party too scattered
 			*err = DisplayMessage::GetStringReference(HCStrings::Scattered);
@@ -1727,7 +1727,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 		}
 	}
 
-	if (checks & REST_CRITTER) {
+	if (checks & RestChecks::Enemies) {
 		//don't allow resting while in combat
 		if (AnyPCInCombat()) {
 			*err = DisplayMessage::GetStringReference(HCStrings::CantRestMonsters);
@@ -1741,7 +1741,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 	}
 
 	//rest check, if PartyRested should be set, area should return true
-	if (checks & REST_AREA) {
+	if (checks & RestChecks::Area) {
 		//you cannot rest here
 		if (area->AreaFlags & AF_NOSAVE) {
 			*err = DisplayMessage::GetStringReference(HCStrings::MayNotRest);
@@ -1797,7 +1797,7 @@ bool Game::CanPartyRest(int checks, ieStrRef* err) const
 //    1-7: dream selected from a fixed list
 // hp: how much hp the rest will heal
 // returns true if a cutscene dream is about to be played
-bool Game::RestParty(int checks, int dream, int hp)
+bool Game::RestParty(RestChecks checks, int dream, int hp)
 {
 	if (!CanPartyRest(checks)) {
 		return false;
@@ -1808,7 +1808,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	// TODO: implement "rest until healed", it's an option in some games
 	int hours = 8;
 	int hoursLeft = 0;
-	if (checks & REST_AREA) {
+	if (checks & RestChecks::Area) {
 		//area encounters
 		// also advances gametime (so partial rest is possible)
 		Trigger parameters;

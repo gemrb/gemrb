@@ -113,14 +113,16 @@ enum ENP {
 #define WB_INCREASESTORM   0x100
 #define WB_HASWEATHER 0x200
 
-//Rest flags
-#define REST_NOCHECKS 0
-#define REST_AREA     1 // area checks
-#define REST_SCATTER  2 // scattered party check
-#define REST_CONTROL  4 // control check
-#define REST_CRITTER  8 // hostiles check
+// Rest flags
+enum RestChecks {
+	NoCheck = 0,
+	Area = 1, // is it allowed at all?
+	Scattered = 2, // is the party together?
+	InControl = 4, // are pcs controllable?
+	Enemies = 8
+};
 
-// Song types (hardcoded and in musics.ids for scripts (iwd))
+// Song types, index in ARE song section (hardcoded and in musics.ids for scripts (iwd))
 #define SONG_DAY        0
 #define SONG_NIGHT      1
 // SONG_BATTLE_WIN
@@ -458,9 +460,9 @@ public:
 	areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
 	/** checks if resting is possible */
-	bool CanPartyRest(int checks, ieStrRef* err = nullptr) const;
+	bool CanPartyRest(RestChecks checks, ieStrRef* err = nullptr) const;
 	/** runs area functionality, sets partyrested trigger */
-	bool RestParty(int checks, int dream, int hp);
+	bool RestParty(RestChecks checks, int dream, int hp);
 	/** timestop effect initiated by actor */
 	void TimeStop(Actor *actor, ieDword end);
 	/** check if the passed actor is a victim of timestop */

@@ -2902,7 +2902,7 @@ std::string Map::dump(bool show_actors) const
 	AppendFormat(buffer, "Extended night: {}\n", YesNo(AreaType & AT_EXTENDED_NIGHT));
 	AppendFormat(buffer, "Weather: {}\n", YesNo(AreaType & AT_WEATHER));
 	AppendFormat(buffer, "Area Type: {}\n", AreaType & (AT_CITY | AT_FOREST | AT_DUNGEON));
-	AppendFormat(buffer, "Can rest: {}\n", YesNo(core->GetGame()->CanPartyRest(REST_AREA)));
+	AppendFormat(buffer, "Can rest: {}\n", YesNo(core->GetGame()->CanPartyRest(RestChecks::Area)));
 
 	if (show_actors) {
 		buffer.append("\n");
