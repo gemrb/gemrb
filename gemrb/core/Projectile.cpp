@@ -1912,14 +1912,14 @@ void Projectile::SetupZPos()
 {
 	const Actor* act = area->GetActorByGlobalID(Caster);
 	if (act) {
-		ZPos = ProHeights::Normal;
+		ZPos = int(ProHeights::Normal);
 		if (act->ValidTarget(GA_BIGBAD)) {
-			ZPos = ProHeights::Dragon;
+			ZPos = int(ProHeights::Dragon);
 		}
 	}
 
-	if (ZPos != ProHeights::Dragon && SFlags & PSF_FLYING) {
-		ZPos = ProHeights::Flying;
+	if (ZPos != int(ProHeights::Dragon) && SFlags & PSF_FLYING) {
+		ZPos = int(ProHeights::Flying);
 	}
 }
 

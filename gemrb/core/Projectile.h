@@ -44,7 +44,7 @@
 namespace GemRB {
 
 // various special heights/Zs hardcoded in the originals
-enum ProHeights {
+enum class ProHeights {
 	None = 0, // pst casting glows
 	Flying = 50, // this is the height of the projectile when Spark Flag Fly = 1
 	Normal = 0x23,
@@ -376,7 +376,7 @@ public:
 		}
 		//if projectile is drawn behind target (not behind everyone)
 		if (ExtFlags&PEF_BACKGROUND) {
-			return Pos.y - ProHeights::Background;
+			return Pos.y - int(ProHeights::Background);
 		}
 
 		return Pos.y + ZPos;
