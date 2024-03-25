@@ -24,6 +24,7 @@
 #include "Geometry.h"
 #include "RNG.h"
 
+#include <cmath>
 #include <cstdint>
 
 namespace GemRB {
