@@ -545,7 +545,7 @@ void Actor::SetCircleSize()
 		return;
 
 	const GameControl *gc = core->GetGameControl();
-	float oscillationFactor = 1.0f;
+	float_t oscillationFactor = 1.0f;
 	Color color;
 	int normalIdx;
 	if (UnselectableTimer) {
@@ -563,7 +563,7 @@ void Actor::SetCircleSize()
 			 * Approximation: pulsating at about 2Hz over a notable radius growth.
 			 * Maybe check this relation for dragons and rats, too.
 			 */
-			oscillationFactor = 1.1F + float(std::sin(double(remainingTalkSoundTime) * (4 * M_PI) / 1000)) * 0.1F;
+			oscillationFactor = 1.1F + std::sin(double(remainingTalkSoundTime) * (4 * M_PI) / 1000) * 0.1F;
 		}
 	} else {
 		switch (Modified[IE_EA]) {

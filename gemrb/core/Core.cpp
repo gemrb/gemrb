@@ -145,8 +145,8 @@ unsigned int SquaredPersonalDistance(const Scriptable *a, const Scriptable *b)
 	return (unsigned int) ret;
 }
 
-unsigned int PersonalLineDistance(const Point &v, const Point &w, const Scriptable *s, double *proj) {
-	double t;
+unsigned int PersonalLineDistance(const Point& v, const Point& w, const Scriptable* s, float_t* proj) {
+	float_t t;
 	Point p;
 
 	int len = SquaredDistance(w, v);
@@ -156,7 +156,7 @@ unsigned int PersonalLineDistance(const Point &v, const Point &w, const Scriptab
 		p = v;
 	} else {
 		// find the projection of Pos onto the line
-		t = ((s->Pos.x - v.x) * (w.x - v.x) + (s->Pos.y - v.y) * (w.y - v.y)) / (double) len;
+		t = ((s->Pos.x - v.x) * (w.x - v.x) + (s->Pos.y - v.y) * (w.y - v.y)) / (float_t) len;
 		if (t < 0.0) {
 			// projection beyond the v end of the line
 			p = v;
@@ -205,11 +205,11 @@ unsigned int PersonalLineDistance(const Point &v, const Point &w, const Scriptab
 // Potential optimisation through precomputing:
 // rounding the angle into 5° intervals [0-90] gives these values per foot:
 // 16 16 16 16 15 15 15 14 14 14 13 13 13 12 12 12 12 12 12
-double Feet2Pixels(int feet, double angle)
+float_t Feet2Pixels(int feet, float_t angle)
 {
-	double sin2 = pow(sin(angle) / 12, 2);
-	double cos2 = pow(cos(angle) / 16, 2);
-	double r = sqrt(1 / (cos2 + sin2));
+	float_t sin2 = std::pow(std::sin(angle) / 12, 2);
+	float_t cos2 = std::pow(std::cos(angle) / 16, 2);
+	float_t r = std::sqrt(1 / (cos2 + sin2));
 	return r * feet;
 }
 
@@ -227,19 +227,19 @@ bool WithinAudibleRange(const Actor *actor, const Point &dest)
 
 bool WithinRange(const Scriptable *actor, const Point &dest, int distance)
 {
-	double angle = AngleFromPoints(actor->Pos, dest);
+	float_t angle = AngleFromPoints(actor->Pos, dest);
 	return Distance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 
 bool WithinPersonalRange(const Scriptable *actor, const Point &dest, int distance)
 {
-	double angle = AngleFromPoints(actor->Pos, dest);
+	float_t angle = AngleFromPoints(actor->Pos, dest);
 	return PersonalDistance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 
 bool WithinPersonalRange(const Scriptable* scr1, const Scriptable* scr2, int distance)
 {
-	double angle = AngleFromPoints(scr1->Pos, scr2->Pos);
+	float_t angle = AngleFromPoints(scr1->Pos, scr2->Pos);
 	return PersonalDistance(scr2, scr1) <= Feet2Pixels(distance, angle);
 }
 

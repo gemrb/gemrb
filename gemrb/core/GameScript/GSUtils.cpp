@@ -1534,7 +1534,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		}
 	}
 
-	double angle = AngleFromPoints(attacker->Pos, target->Pos);
+	float_t angle = AngleFromPoints(attacker->Pos, target->Pos);
 	if (attacker->GetCurrentArea() != target->GetCurrentArea() ||
 		!WithinPersonalRange(attacker, target, weaponRange) ||
 		!attacker->GetCurrentArea()->IsVisibleLOS(attacker->Pos, target->Pos) ||
@@ -2450,7 +2450,7 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const 
 	}
 
 	if (!target.IsZero()) {
-		double angle = AngleFromPoints(Sender->Pos, target);
+		float_t angle = AngleFromPoints(Sender->Pos, target);
 		return Feet2Pixels(dist, angle);
 	}
 
@@ -2460,7 +2460,7 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const 
 
 /* returns an item's casting distance, it depends on the used header, and targeting mode too
  the used header is explicitly given */
-unsigned int GetItemDistance(const ResRef& itemres, int header, double angle)
+unsigned int GetItemDistance(const ResRef& itemres, int header, float_t angle)
 {
 	const Item* itm = gamedata->GetItem(itemres);
 	if (!itm) {
@@ -3065,7 +3065,7 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 	}
 
 	// estimate max distance with time and actor speed
-	double speed = actor->GetSpeed();
+	float_t speed = actor->GetSpeed();
 	int maxDistance = parameters->int0Parameter;
 	if (speed) {
 		maxDistance = static_cast<int>(maxDistance * gamedata->GetStepTime() / speed);

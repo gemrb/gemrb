@@ -1650,7 +1650,7 @@ void Selectable::DrawCircle(const Point& p) const
 	if (sprite) {
 		VideoDriver->BlitSprite(sprite, Pos - p);
 	} else {
-		float baseSize = CircleSize2Radius() * sizeFactor;
+		auto baseSize = CircleSize2Radius() * sizeFactor;
 		const Size s(baseSize * 8, baseSize * 6);
 		const Region r(Pos - p - s.Center(), s);
 		VideoDriver->DrawEllipse(r, *col);
@@ -1695,7 +1695,7 @@ void Selectable::Select(int Value)
 	}
 }
 
-void Selectable::SetCircle(int circlesize, float factor, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle)
+void Selectable::SetCircle(int circlesize, float_t factor, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle)
 {
 	circleSize = circlesize;
 	sizeFactor = factor;
@@ -2078,9 +2078,9 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 
 	if (time > timeStartStep) {
 		Point nmptStep = step->point;
-		double dx = nmptStep.x - Pos.x;
-		double dy = nmptStep.y - Pos.y;
-		Map::NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / double(walkScale));
+		float_t dx = nmptStep.x - Pos.x;
+		float_t dy = nmptStep.y - Pos.y;
+		Map::NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / float_t(walkScale));
 		if (dx == 0 && dy == 0) {
 			// probably shouldn't happen, but it does when running bg2's cut28a set of cutscenes
 			ClearPath(true);
@@ -2094,8 +2094,8 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		// and not be blocked by actors who are on the sides
 		int collisionLookaheadRadius = ((circleSize < 3 ? 3 : circleSize) - 1) * 3;
 		for (int r = collisionLookaheadRadius; r > 0 && !actorInTheWay; r--) {
-			double xCollision = Pos.x + dx * r;
-			double yCollision = Pos.y + dy * r * 0.75;
+			auto xCollision = Pos.x + dx * r;
+			auto yCollision = Pos.y + dy * r * 0.75;
 			Point nmptCollision(xCollision, yCollision);
 			actorInTheWay = area->GetActor(nmptCollision, GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_SELF, this);
 		}

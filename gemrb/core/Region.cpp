@@ -197,7 +197,7 @@ Point Region::Intercept(const Point& p) const noexcept
 	if (p.x == mid.x) return Point(p.x, (p.y < min.y) ? min.y : max.y); // vert line
 	if (p.y == mid.y) return Point((p.x < min.x) ? min.x : max.x, p.y); // horiz line
 
-	float m = float(mid.y - p.y) / float(mid.x - p.x);
+	float_t m = float_t(mid.y - p.y) / float_t(mid.x - p.x);
 
 	if (p.x <= mid.x) { // check "left" side
 		int newY = m * (min.x - p.x) + p.y;

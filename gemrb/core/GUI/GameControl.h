@@ -67,7 +67,7 @@ private:
 	Point screenMousePos;
 	Point vpOrigin;
 	bool updateVPTimer = true;
-	double formationBaseAngle = 0.0;
+	float_t formationBaseAngle = 0.0;
 
 	// currently selected targeting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
@@ -111,10 +111,10 @@ private:
 	Region SelectionRect() const;
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(const Point& p, const Color& color) const;
-	void DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, double angle) const;
+	void DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, float_t angle) const;
 	
-	Point GetFormationPoint(const Point& origin, size_t pos, double angle, const FormationPoints& exclude = FormationPoints()) const;
-	FormationPoints GetFormationPoints(const Point& origin, const std::vector<Actor*>& actors, double angle) const;
+	Point GetFormationPoint(const Point& origin, size_t pos, float_t angle, const FormationPoints& exclude = FormationPoints()) const;
+	FormationPoints GetFormationPoints(const Point& origin, const std::vector<Actor*>& actors, float_t angle) const;
 	
 	void Scroll(const Point& amt);
 

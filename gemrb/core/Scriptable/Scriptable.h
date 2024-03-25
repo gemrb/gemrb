@@ -436,7 +436,7 @@ public:
 	Color overColor = ColorBlack;
 	Holder<Sprite2D> circleBitmap[2] = {};
 	int circleSize = 0;
-	float sizeFactor = 1.0f;
+	float_t sizeFactor = 1.0f;
 public:
 	void SetBBox(const Region &newBBox);
 	void DrawCircle(const Point& p) const;
@@ -444,7 +444,7 @@ public:
 	void SetOver(bool over);
 	bool IsSelected() const;
 	void Select(int Value);
-	void SetCircle(int size, float, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle);
+	void SetCircle(int size, float_t, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle);
 	int CircleSize2Radius() const;
 };
 
