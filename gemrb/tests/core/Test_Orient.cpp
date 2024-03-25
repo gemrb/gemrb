@@ -20,6 +20,7 @@
 #include "../../core/Orientation.h"
 #include "../../core/Region.h"
 
+#include <cmath>
 #include <gtest/gtest.h>
 
 namespace GemRB {

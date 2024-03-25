@@ -145,7 +145,7 @@ inline orient_t GetOrient(const Point& from, const Point& to)
 
 	// calculate which segment the angle falls into and which orientation that represents
 	constexpr float M_PI_8 = M_PI / 8;
-	float segment = std::fmod(angle + M_PI_8 / 2 + 2 * M_PI, 2 * M_PI);
+	float segment = std::fmod(angle + M_PI_8 / 2 + 2 * M_PI, 2.0F * M_PI);
 	return PrevOrientation(E, int(segment / M_PI_8));
 }
 
