@@ -1085,7 +1085,7 @@ void Projectile::SecondaryTarget()
 
 	//the AOE (area of effect) is cone shaped
 	if (Extension->AFlags&PAF_CONE) {
-		// see CharAnimations.cpp for a nice visualization of the orientation directions
+		// see Orientation.h for a nice visualization of the orientation directions
 		// they start at 270° and go anticlockwise, so we have to rotate (reflect over y=-x) to match what math functions expect
 		// TODO: check if we can ignore this and use the angle between caster pos and target pos (are they still available here?)
 		orient_t saneOrientation = PrevOrientation(E, Orientation);
@@ -1358,8 +1358,8 @@ void Projectile::SpawnFragment(Point& dest) const
 	if (pro) {
 		pro->SetCaster(Caster, Level);
 		if (pro->ExtFlags&PEF_RANDOM) {
-			dest.x += core->Roll(1,Extension->tileCoord.x, -Extension->tileCoord.x / 2);
-			dest.y += core->Roll(1,Extension->tileCoord.y, -Extension->tileCoord.y / 2);
+			dest.x += RAND(-Extension->tileCoord.x / 2, Extension->tileCoord.x / 2);
+			dest.y += RAND(-Extension->tileCoord.y / 2, Extension->tileCoord.y / 2);
 		}
 		area->AddProjectile(pro, dest, dest);
 	}
