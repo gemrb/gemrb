@@ -438,6 +438,7 @@ FUNCTION(ADD_GEMRB_PLUGIN plugin_name)
 			TARGET_LINK_LIBRARIES(${plugin_name} -lbsd)
 		ENDIF (CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
 	ENDIF (STATIC_LINK)
+	target_compile_definitions(${plugin_name} PRIVATE _USE_MATH_DEFINES)
 
 	IF(APPLE)
 		SET_TARGET_PROPERTIES(${plugin_name} PROPERTIES PREFIX ""
@@ -456,6 +457,7 @@ FUNCTION(ADD_GEMRB_PLUGIN_TEST plugin_name)
 	# TODO: think of a way to add additional libs for linking
 	IF (BUILD_TESTING)
 		ADD_EXECUTABLE(Test_${plugin_name} ${ARGN})
+		target_compile_definitions(Test_${plugin_name} PRIVATE _USE_MATH_DEFINES)
 
 		TARGET_LINK_LIBRARIES(Test_${plugin_name} GTest::gtest GTest::gtest_main gemrb_core)
 
