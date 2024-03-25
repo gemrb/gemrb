@@ -29,7 +29,7 @@
 
 namespace GemRB {
 
-GEM_EXPORT double AngleFromPoints(const Point& p1, const Point& p2, bool exact = true);
+GEM_EXPORT double AngleFromPoints(const Point& p1, const Point& p2, bool exact = false);
 GEM_EXPORT double AngleFromPoints(float y, float x);
 GEM_EXPORT Point RotatePoint(const Point& p, double angle);
 GEM_EXPORT unsigned int Distance(const Point &pos, const Point &pos2);
