@@ -110,22 +110,42 @@ inline orient_t PrevOrientation(orient_t orient, int step = 1)
 /** Calculates the orientation of a character (or projectile) facing a point */
 inline orient_t GetOrient(const Point &s, const Point &d)
 {
-	static const orient_t orientations[25]={
-		NW, NNW, N, NNE, NE,
-		WNW, NW, N, NE, ENE,
-		W, W, S, E, E,
-		WSW, SW, S, SE, ESE,
-		SW, SSW, S, SSE, SE
-	};
-
 	int deltaX = s.x - d.x;
 	int deltaY = s.y - d.y;
-	int div = Distance(s,d);
-	if(!div) return S;
-	if(div>3) div/=2;
-	int aX=deltaX/div;
-	int aY=deltaY/div;
-	return orientations[(aY+2)*5+aX+2];
+	if (!deltaX) return deltaY >= 0 ? S : N;
+
+	// Approximates atan2(y, x) normalized to the [0,4) range
+	// with a maximum error of 0.1620 degrees
+	// rcor's rational approximation that can be arbitrarily
+	// improved if we ever want greater precision
+	auto pseudoAtan2 = [](float y, float x) {
+		static const uint32_t signMask = 0x80000000;
+		static const float b = 0.596227F;
+
+		// Extract the sign bits
+		uint32_t xS = signMask & (uint32_t&) x;
+		uint32_t yS = signMask & (uint32_t&) y;
+
+		// Determine the quadrant offset
+		float q = (float) ((~xS & yS) >> 29 | xS >> 30);
+
+		// Calculate the arctangent in the first quadrant
+		float bxy = std::fabs(b * x * y);
+		float num = bxy + y * y;
+		float atan1q = num / (x * x + bxy + num);
+
+		// Translate it to the proper quadrant
+		uint32_t uatan2q = (xS ^ yS) | (uint32_t&) atan1q;
+		return q + (float&) uatan2q;
+	};
+
+	// reverse Y to match our game coordinate system
+	float angle = pseudoAtan2(-deltaY, deltaX) * M_PI_2;
+
+	// calculate which segment the angle falls into and which orientation that represents
+	constexpr float M_PI_8 = M_PI / 8;
+	float segment = std::fmod(angle + M_PI_8 / 2 + 2 * M_PI, 2 * M_PI);
+	return PrevOrientation(E, int(segment / M_PI_8));
 }
 
 inline Point OrientedOffset(orient_t face, int offset)
