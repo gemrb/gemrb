@@ -108,10 +108,10 @@ inline orient_t PrevOrientation(orient_t orient, int step = 1)
 }
 
 /** Calculates the orientation of a character (or projectile) facing a point */
-inline orient_t GetOrient(const Point &s, const Point &d)
+inline orient_t GetOrient(const Point& from, const Point& to)
 {
-	int deltaX = s.x - d.x;
-	int deltaY = s.y - d.y;
+	int deltaX = to.x - from.x;
+	int deltaY = to.y - from.y;
 	if (!deltaX) return deltaY >= 0 ? S : N;
 
 	// Approximates atan2(y, x) normalized to the [0,4) range

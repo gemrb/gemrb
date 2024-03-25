@@ -6254,7 +6254,7 @@ void Actor::AttackedBy(const Actor *attacker)
 void Actor::FaceTarget(const Scriptable *target)
 {
 	if (!target) return;
-	SetOrientation(target->Pos, Pos, false);
+	SetOrientation(Pos, target->Pos, false);
 }
 
 //in case of LastTarget = 0
@@ -9018,7 +9018,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	ResetCommentTime();
 	if (pro) {
 		pro->SetCaster(GetGlobalID(), gamedata->GetMiscRule("ITEM_CASTERLEVEL"));
-		SetOrientation(target, Pos, false);
+		SetOrientation(Pos, target, false);
 		GetCurrentArea()->AddProjectile(pro, Pos, target);
 		return true;
 	}
@@ -9403,7 +9403,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 		attackProjectile = pro;
 		attackProjectile->SFlags &= ~PSF_FLYING;
 	} else { // launch it now as we are not attacking
-		SetOrientation(target->Pos, Pos, false);
+		SetOrientation(Pos, target->Pos, false);
 		GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
 	}
 	return true;
@@ -10413,7 +10413,7 @@ bool Actor::IsBehind(const Actor* target) const
 {
 	orient_t tarOrient = target->GetOrientation();
 	// computed, since we don't care where we face
-	orient_t myOrient = GetOrient(target->Pos, Pos);
+	orient_t myOrient = GetOrient(Pos, target->Pos);
 
 	for (int i = -2; i <= 2; i++) {
 		orient_t side = NextOrientation(myOrient, i);

@@ -260,7 +260,7 @@ void Projectile::Setup()
 	//but also makes the caster immune to the effect
 	if (Extension) {
 		if (Extension->AFlags&PAF_CONE) {
-			NewOrientation = Orientation = GetOrient(Destination, Pos);
+			NewOrientation = Orientation = GetOrient(Pos, Destination);
 			Destination=Pos;
 			ExtFlags|=PEF_NO_TRAVEL;
 		}
@@ -820,7 +820,7 @@ void Projectile::NextTarget(const Point &p)
 		Pos = Destination;
 		return;
 	}
-	NewOrientation = Orientation = GetOrient(Destination, Pos);
+	NewOrientation = Orientation = GetOrient(Pos, Destination);
 
 	//this hack ensures that the projectile will go away after its time
 	//by the time it reaches this part, it was already expired, so Target
@@ -887,8 +887,8 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 			// the original forced the actor to always face the target even when moving
 			// this avoids the line going through the caster when facing the opposite way
 			// we're losing the race to the movement code, but at least this reorients at the end
-			if (GetOrient(target->Pos, c->Pos) != c->GetOrientation()) {
-				c->SetOrientation(target->Pos, c->Pos, false);
+			if (GetOrient(c->Pos, target->Pos) != c->GetOrientation()) {
+				c->SetOrientation(c->Pos, target->Pos, false);
 			}
 
 			Point start = GetStartOffset(c);

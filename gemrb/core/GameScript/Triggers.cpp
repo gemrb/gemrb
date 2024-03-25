@@ -3326,7 +3326,7 @@ int GameScript::IsFacingObject(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (actor->GetOrientation() == GetOrient(target->Pos, actor->Pos)) {
+	if (actor->GetOrientation() == GetOrient(actor->Pos, target->Pos)) {
 		return 1;
 	}
 	return 0;

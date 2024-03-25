@@ -39,7 +39,7 @@ TEST(Orientation_Test, GetOrient)
 		int dx = std::cos(angle) * distance;
 		int dy = std::sin(angle) * distance;
 		auto target = Point(start.x + dx, start.y - dy);
-		dir = GetOrient(target, start);
+		dir = GetOrient(start, target);
 		int expectedDir = PrevOrientation(E, i);
 		EXPECT_EQ(dir, expectedDir) << "i: " << i << " target: " << target.x << " " << target.y << std::endl;
 	}

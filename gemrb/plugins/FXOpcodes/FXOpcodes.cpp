@@ -6688,10 +6688,10 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 		case 2: // away
 		default:
-			dir = GetOrient(target->Pos, fx->Source);
+			dir = GetOrient(fx->Source, target->Pos);
 			break;
 		case 4: // towards
-			dir = GetOrient(fx->Source, target->Pos);
+			dir = GetOrient(target->Pos, fx->Source);
 			break;
 		case 5: // fixed direction
 			dir = ClampToOrientation(fx->Parameter3);

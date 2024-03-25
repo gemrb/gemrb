@@ -124,7 +124,7 @@ PathListNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor 
 	PathListNode *step = new PathListNode;
 	const Size& mapSize = PropsSize();
 	step->point = Clamp(p, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
-	step->orient = GetOrient(p, s);
+	step->orient = GetOrient(s, p);
 	return step;
 }
 
@@ -143,13 +143,6 @@ bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, b
 		}
 	}
 	return targetUnreachable;
-}
-
-// Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
-PathListNode *Map::GetLine(const Point &start, const Point &dest, int flags) const
-{
-	orient_t Orientation = GetOrient(start, dest);
-	return GetLine(start, dest, 1, Orientation, flags);
 }
 
 PathListNode *Map::GetLine(const Point &start, int Steps, orient_t Orientation, int flags) const
@@ -290,7 +283,7 @@ PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
 	step->point.y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
 	const Size& mapSize = PropsSize();
 	step->point = Clamp(step->point, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
-	step->orient = GetOrient(step->point, p);
+	step->orient = GetOrient(p, step->point);
 	return step;
 }
 
@@ -437,9 +430,9 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			// we approximate that with a relaxed collinearity check and intentionally
 			// skip the first step, otherwise it doesn't help with iwd beetles in ar1015
 			if (flags & PF_BACKAWAY && resultPath && std::abs(area2(nmptCurrent, resultPath->point, nmptParent)) < 300) {
-				newStep->orient = GetOrient(nmptParent, nmptCurrent);
-			} else {
 				newStep->orient = GetOrient(nmptCurrent, nmptParent);
+			} else {
+				newStep->orient = GetOrient(nmptParent, nmptCurrent);
 			}
 			if (resultPath) {
 				resultPath->Parent = newStep;

@@ -593,7 +593,6 @@ public:
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy() const;
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
-	PathListNode* GetLine(const Point &start, const Point &dest, int flags) const;
 	PathListNode* GetLine(const Point &start, int steps, orient_t orient) const;
 	PathListNode* GetLine(const Point &start, int Steps, orient_t Orientation, int flags) const;
 	PathListNode* GetLine(const Point &start, const Point &dest, int speed, orient_t Orientation, int flags) const;

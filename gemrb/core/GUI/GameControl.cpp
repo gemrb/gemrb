@@ -318,7 +318,7 @@ void GameControl::DrawArrowMarker(const Point& p, const Color& color) const
 	const Region& bounds = Viewport();
 	if (bounds.PointInside(p)) return;
 
-	orient_t dir = GetOrient(p, bounds.Center());
+	orient_t dir = GetOrient(bounds.Center(), p);
 	Holder<Sprite2D> arrow = core->GetScrollCursorSprite(dir, 0);
 	
 	const Point& dp = bounds.Intercept(p) - bounds.origin;
@@ -429,7 +429,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 
 	if (!vpVector.IsZero() && MoveViewportTo(vpOrigin + vpVector, false)) {
 		if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed() && !screenFlags.Test(ScreenFlags::AlwaysCenter)) {
-			orient_t orient = GetOrient(vpVector, Point());
+			orient_t orient = GetOrient(Point(), vpVector);
 			// set these cursors on game window so they are universal
 			window->SetCursor(core->GetScrollCursorSprite(orient, numScrollCursor));
 
