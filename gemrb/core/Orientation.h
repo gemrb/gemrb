@@ -115,33 +115,8 @@ inline orient_t GetOrient(const Point& from, const Point& to)
 	int deltaY = to.y - from.y;
 	if (!deltaX) return deltaY >= 0 ? S : N;
 
-	// Approximates atan2(y, x) normalized to the [0,4) range
-	// with a maximum error of 0.1620 degrees
-	// rcor's rational approximation that can be arbitrarily
-	// improved if we ever want greater precision
-	auto pseudoAtan2 = [](float y, float x) {
-		static const uint32_t signMask = 0x80000000;
-		static const float b = 0.596227F;
-
-		// Extract the sign bits
-		uint32_t xS = signMask & (uint32_t&) x;
-		uint32_t yS = signMask & (uint32_t&) y;
-
-		// Determine the quadrant offset
-		float q = (float) ((~xS & yS) >> 29 | xS >> 30);
-
-		// Calculate the arctangent in the first quadrant
-		float bxy = std::fabs(b * x * y);
-		float num = bxy + y * y;
-		float atan1q = num / (x * x + bxy + num);
-
-		// Translate it to the proper quadrant
-		uint32_t uatan2q = (xS ^ yS) | (uint32_t&) atan1q;
-		return q + (float&) uatan2q;
-	};
-
 	// reverse Y to match our game coordinate system
-	float angle = pseudoAtan2(-deltaY, deltaX) * M_PI_2;
+	float angle = AngleFromPoints(-deltaY, deltaX);
 
 	// calculate which segment the angle falls into and which orientation that represents
 	constexpr float M_PI_8 = M_PI / 8;

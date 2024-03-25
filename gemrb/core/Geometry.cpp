@@ -21,14 +21,52 @@
 
 #include "Geometry.h"
 
+#include <cmath>
+
 namespace GemRB {
 
-double AngleFromPoints(const Point& p1, const Point& p2)
+// Fast approximation of atan2(y, x)
+// with a maximum error of 0.1620 degrees
+// rcor's rational approximation that can be arbitrarily
+// improved if we ever want greater precision
+float pseudoAtan2(float y, float x)
+{
+	static const uint32_t signMask = 0x80000000;
+	static const float b = 0.596227F;
+
+	// Extract the sign bits
+	uint32_t xS = signMask & (uint32_t&) x;
+	uint32_t yS = signMask & (uint32_t&) y;
+
+	// Determine the quadrant offset
+	float q = (float) ((~xS & yS) >> 29 | xS >> 30);
+
+	// Calculate the arctangent in the first quadrant
+	float bxy = std::fabs(b * x * y);
+	float num = bxy + y * y;
+	float atan1q = num / (x * x + bxy + num);
+
+	// Translate it to the proper quadrant
+	uint32_t uatan2q = (xS ^ yS) | (uint32_t&) atan1q;
+	return (q + (float&) uatan2q) * M_PI_2;
+}
+
+double AngleFromPoints(float y, float x)
+{
+	return pseudoAtan2(y, x);
+}
+
+double AngleFromPoints(const Point& p1, const Point& p2, bool exact)
 {
 	double xdiff = p1.x - p2.x;
 	double ydiff = p1.y - p2.y;
-	
-	double angle = std::atan2(ydiff, xdiff);
+
+	double angle;
+	if (exact) {
+		angle = std::atan2(ydiff, xdiff);
+	} else {
+		angle = pseudoAtan2(ydiff, xdiff);
+	}
 	return angle;
 }
 
