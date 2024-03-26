@@ -164,7 +164,6 @@ struct Entrance {
 };
 
 class GEM_EXPORT MapNote {
-	void swap(MapNote& mn) noexcept;
 public:
 	// FIXME: things can get messed up by exposing these (specifically strref and text)
 	ieStrRef strref = ieStrRef::INVALID;

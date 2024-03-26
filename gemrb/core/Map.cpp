@@ -416,15 +416,6 @@ const Color& MapNote::GetColor() const
 	return colors[color];
 }
 
-void MapNote::swap(MapNote& mn) noexcept
-{
-	if (&mn == this) return;
-	std::swap(strref, mn.strref);
-	std::swap(color, mn.color);
-	std::swap(text, mn.text);
-	std::swap(Pos, mn.Pos);
-}
-
 //returns true if creature must be embedded in the area
 //npcs in saved game shouldn't be embedded either
 static inline bool MustSave(const Actor *actor)
