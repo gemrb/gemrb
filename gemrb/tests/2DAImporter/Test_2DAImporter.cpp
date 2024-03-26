@@ -26,6 +26,7 @@ namespace GemRB {
 
 static const path_t SAMPLE_FILE = PathJoin("tests", "resources", "2DAImporter", "sample.2da");
 static const path_t ENC_SAMPLE_FILE = PathJoin("tests", "resources", "2DAImporter", "sample_encrypted.2da");
+static const path_t SAMPLE_FILE2 = PathJoin("tests", "resources", "2DAImporter", "sample2.2da");
 
 class p2DAImporter_Test : public testing::TestWithParam<path_t> {
 protected:
@@ -112,5 +113,16 @@ INSTANTIATE_TEST_SUITE_P(
 	p2DAImporter_Test,
 	testing::Values(SAMPLE_FILE, ENC_SAMPLE_FILE)
 );
+
+// single column table
+TEST(p2DAImporter_Test, GetColumnCount2)
+{
+	p2DAImporter unit;
+	auto stream = new FileStream {};
+	stream->Open(SAMPLE_FILE2);
+	unit.Open(std::unique_ptr<DataStream> { stream });
+	EXPECT_EQ(unit.GetColumnCount(), 1);
+	EXPECT_EQ(unit.GetColumnCount(0), 1);
+}
 
 }
