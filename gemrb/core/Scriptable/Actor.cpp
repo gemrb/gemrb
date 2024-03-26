@@ -4125,6 +4125,7 @@ static void ChunkActor(Actor* actor)
 	ieDword gore = core->GetDictionary().Get("Gore", 0);
 	if (!gore) return;
 
+	actor->ClearCurrentStanceAnims(); // perhaps this should be done on all SetAnimationID calls instead
 	// TODO: play chunky animation / particles #128
 	actor->SetAnimationID(0x230); // EXPLODING_TORSO
 }
