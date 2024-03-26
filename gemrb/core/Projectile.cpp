@@ -1883,17 +1883,15 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 				pos.y-=frame->Frame.y;
 			}
 		}
-	} else {
-		if (travelAnim[face]) {
-			Holder<Sprite2D> frame;
-			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
-				frame = travelAnim[face].LastFrame();
-				flags |= BlitFlags::GREY; // move higher if it interferes with other tints badly
-			} else {
-				frame = travelAnim[face].NextFrame();
-			}
-			Draw(frame, pos, flags, tint2);
+	} else if (travelAnim[face]) {
+		Holder<Sprite2D> frame;
+		if (game && game->IsTimestopActive() && !(TFlags & PTF_TIMELESS)) {
+			frame = travelAnim[face].LastFrame();
+			flags |= BlitFlags::GREY; // move higher if it interferes with other tints badly
+		} else {
+			frame = travelAnim[face].NextFrame();
 		}
+		Draw(frame, pos, flags, tint2);
 	}
 
 	if (drawSpark) {
