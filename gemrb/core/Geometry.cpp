@@ -29,7 +29,7 @@ namespace GemRB {
 // with a maximum error of 0.1620 degrees
 // rcor's rational approximation that can be arbitrarily
 // improved if we ever want greater precision
-float pseudoAtan2(float y, float x)
+static float pseudoAtan2(float y, float x)
 {
 	static const uint32_t signMask = 0x80000000;
 	static const float b = 0.596227F;
