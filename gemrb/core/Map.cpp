@@ -3374,25 +3374,28 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 			Tile.x = Pos.x + explore.VisibilityMasks[i][p].x;
 			Tile.y = Pos.y + explore.VisibilityMasks[i][p].y;
 
-			if (los) {
-				if (!block) {
-					PathMapFlags type = GetBlocked(Tile);
-					if (bool(type & PathMapFlags::NO_SEE)) {
-						block=true;
-					} else if (bool(type & PathMapFlags::SIDEWALL)) {
-						sidewall = true;
-					} else if (sidewall) {
-						block = true;
-					// outdoor doors are automatically transparent (DOOR_TRANSPARENT)
-					// as a heuristic, exclude cities to avoid unnecessary shrouding
-					} else if (bool(type & PathMapFlags::DOOR_IMPASSABLE) && AreaType & AT_OUTDOOR && !(AreaType & AT_CITY)) {
-						fogOnly = true;
-					}
+			if (!los) {
+				ExploreTile(Tile, fogOnly);
+				continue;
+			}
+
+			if (!block) {
+				PathMapFlags type = GetBlocked(Tile);
+				if (bool(type & PathMapFlags::NO_SEE)) {
+					block=true;
+				} else if (bool(type & PathMapFlags::SIDEWALL)) {
+					sidewall = true;
+				} else if (sidewall) {
+					block = true;
+				// outdoor doors are automatically transparent (DOOR_TRANSPARENT)
+				// as a heuristic, exclude cities to avoid unnecessary shrouding
+				} else if (bool(type & PathMapFlags::DOOR_IMPASSABLE) && AreaType & AT_OUTDOOR && !(AreaType & AT_CITY)) {
+					fogOnly = true;
 				}
-				if (block) {
-					Pass--;
-					if (!Pass) break;
-				}
+			}
+			if (block) {
+				Pass--;
+				if (!Pass) break;
 			}
 			ExploreTile(Tile, fogOnly);
 		}
