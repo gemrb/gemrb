@@ -1573,7 +1573,7 @@ int GameScript::InLine(Scriptable *Sender, const Trigger *parameters)
 	if (fdm1>fdm2 || fd12>fdm2) {
 		return 0;
 	}
-	float_t angle = acos(( fdm2 + fdm1 - fd12 ) / (2*dm1*dm2));
+	float_t angle = std::acos((fdm2 + fdm1 - fd12) / (2 * dm1 * dm2));
 	if (angle*180.0*M_PI<30.0) return 1;
 	return 0;
 }

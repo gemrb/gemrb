@@ -275,7 +275,7 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 	bool yLonger = false;
 	int shortLen = p2.y - p1.y;
 	int longLen = p2.x - p1.x;
-	if (abs( shortLen ) > abs( longLen )) {
+	if (std::abs(shortLen) > std::abs(longLen)) {
 		std::swap(shortLen, longLen);
 		yLonger = true;
 	}

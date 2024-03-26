@@ -97,12 +97,12 @@ public:
 	}
 	
 	BitProxy operator[](int i) noexcept {
-		div_t res = div(i, 8);
+		div_t res = std::div(i, 8);
 		return BitProxy(data[res.quot], res.rem);
 	}
 	
 	bool operator[](int i) const noexcept {
-		div_t res = div(i, 8);
+		div_t res = std::div(i, 8);
 		return data[res.quot] & (1 << res.rem);
 	}
 	

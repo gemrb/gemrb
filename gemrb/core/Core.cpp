@@ -71,7 +71,7 @@ unsigned int PersonalDistance(const Point &p, const Scriptable *b)
 {
 	long x = p.x - b->Pos.x;
 	long y = p.y - b->Pos.y;
-	int ret = (int) std::hypot(x, y);
+	auto ret = std::hypot(x, y);
 	if (b->Type==ST_ACTOR) {
 		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * DistanceFactor;
 	}
@@ -119,7 +119,7 @@ unsigned int PersonalDistance(const Scriptable *a, const Scriptable *b)
 {
 	long x = a->Pos.x - b->Pos.x;
 	long y = a->Pos.y - b->Pos.y;
-	int ret = (int) std::hypot(x, y);
+	auto ret = std::hypot(x, y);
 	if (a->Type==ST_ACTOR) {
 		ret -= static_cast<const Actor*>(a)->CircleSize2Radius() * DistanceFactor;
 	}

@@ -183,7 +183,7 @@ void Particles::Draw(Point p)
 		int length; //used only for raindrops
 		if (state>=MAX_SPARK_PHASE) {
 			constexpr int maxDropLength = 6;
-			length = maxDropLength - abs(state - MAX_SPARK_PHASE - maxDropLength);
+			length = maxDropLength - std::abs(state - MAX_SPARK_PHASE - maxDropLength);
 			state = 0;
 		} else {
 			state=MAX_SPARK_PHASE-state-1;

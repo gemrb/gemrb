@@ -4405,11 +4405,11 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			HCStrings strref;
 			if (resisted < 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage bonus)
-				SetTokenAsString("RESISTED", abs(resisted));
+				SetTokenAsString("RESISTED", std::abs(resisted));
 				strref = HCStrings::DamageDetail3;
 			} else if (resisted > 0) {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER> (<RESISTED> damage resisted)
-				SetTokenAsString("RESISTED", abs(resisted));
+				SetTokenAsString("RESISTED", std::abs(resisted));
 				strref = HCStrings::DamageDetail2;
 			} else {
 				//Takes <AMOUNT> <TYPE> damage from <DAMAGER>
@@ -4917,7 +4917,7 @@ int Actor::GetWildMod(int level)
 	static int modRange = int(wmLevelMods.size());
 	WMLevelMod = wmLevelMods[core->Roll(1, modRange, -1)][level - 1];
 
-	SetTokenAsString("LEVELDIF", abs(WMLevelMod));
+	SetTokenAsString("LEVELDIF", std::abs(WMLevelMod));
 	if (core->HasFeedback(FT_STATES)) {
 		if (WMLevelMod > 0) {
 			displaymsg->DisplayConstantStringName(HCStrings::CasterLvlInc, GUIColors::WHITE, this);
@@ -5202,7 +5202,7 @@ void Actor::SendDiedTrigger() const
 		} else if (OfType(this, neighbour)) {
 			neighbour->SetBase(IE_MORALE, neighbour->GetBase(IE_MORALE) - 1);
 		// are we an enemy of neighbour, regardless if we're good or evil?
-		} else if (abs(ea - pea) > 30) {
+		} else if (std::abs(ea - pea) > 30) {
 			neighbour->NewBase(IE_MORALE, 2, MOD_ADDITIVE);
 		}
 	}
@@ -7134,7 +7134,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		} else {
 			hitMiss = core->GetString(DisplayMessage::GetStringReference(HCStrings::Miss));
 		}
-		String rollLog = fmt::format(u"{} {} {} {} = {} : {}", leftRight, roll, (rollMod >= 0) ? u"+" : u"-", abs(rollMod), roll + rollMod, hitMiss);
+		String rollLog = fmt::format(u"{} {} {} {} = {} : {}", leftRight, roll, (rollMod >= 0) ? u"+" : u"-", std::abs(rollMod), roll + rollMod, hitMiss);
 		displaymsg->DisplayStringName(std::move(rollLog), GUIColors::WHITE, this);
 	}
 
@@ -7333,7 +7333,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			} else {
 				int resistance = (signed)GetSafeStat(it->second.resist_stat);
 				// avoid buggy data
-				if ((unsigned)abs(resistance) > maximum_values[it->second.resist_stat]) {
+				if ((unsigned)std::abs(resistance) > maximum_values[it->second.resist_stat]) {
 					resistance = 0;
 					Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value ({}).", resistance);
 				}
@@ -10313,8 +10313,8 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, const Actor* op
 
 	if (dice > 100) {
 		int bonus;
-		if (abs(luck) > size) {
-			bonus = luck/abs(luck) * size;
+		if (std::abs(luck) > size) {
+			bonus = luck / std::abs(luck) * size;
 		} else {
 			bonus = luck;
 		}

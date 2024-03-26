@@ -871,7 +871,7 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 		const Point& B = target->Pos;
 		float_t angle = AngleFromPoints(B, A);
 		float_t adjustedRange = Feet2Pixels(Range, angle);
-		Point C(A.x + adjustedRange * cos(angle), A.y + adjustedRange * sin(angle));
+		Point C(A.x + adjustedRange * std::cos(angle), A.y + adjustedRange * std::sin(angle));
 		SetTarget(C);
 	} else {
 		//replan the path in case the target moved
