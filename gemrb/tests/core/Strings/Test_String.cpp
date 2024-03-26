@@ -219,6 +219,12 @@ TEST(String_Test, Explode) {
 	result = Explode(input, u',');
 	EXPECT_EQ(result, expectedList);
 
+	input = String { u"a b c " };
+	result = Explode(input, u' ');
+	expectedList.emplace_back();
+	EXPECT_EQ(result, expectedList);
+	expectedList.pop_back();
+
 	input = String {};
 	result = Explode(input);
 	EXPECT_EQ(result, emptyList);
