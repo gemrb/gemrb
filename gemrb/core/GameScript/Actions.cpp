@@ -3795,15 +3795,14 @@ void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameter
 //the third parameter is a GemRB extension
 void GameScript::AddJournalEntry(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->AddJournalEntry(ieStrRef(parameters->int0Parameter), (ieByte) parameters->int1Parameter, (ieByte) parameters->int2Parameter);
+	core->GetGame()->AddJournalEntry(ieStrRef(parameters->int0Parameter), (JournalSection) parameters->int1Parameter, (ieByte) parameters->int2Parameter);
 }
 
 void GameScript::SetQuestDone(Scriptable* /*Sender*/, Action* parameters)
 {
 	Game *game = core->GetGame();
 	game->DeleteJournalEntry(ieStrRef(parameters->int0Parameter));
-	game->AddJournalEntry(ieStrRef(parameters->int0Parameter), IE_GAM_QUEST_DONE, (ieByte) parameters->int2Parameter);
-
+	game->AddJournalEntry(ieStrRef(parameters->int0Parameter), JournalSection::Solved, (ieByte) parameters->int2Parameter);
 }
 
 void GameScript::RemoveJournalEntry(Scriptable* /*Sender*/, Action* parameters)

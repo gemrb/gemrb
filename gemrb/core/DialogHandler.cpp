@@ -39,20 +39,14 @@
 
 namespace GemRB {
 
-//translate section values (journal, quests, solved, user)
-static const ieByte* sectionMap;
-static const ieByte bg2Sections[4] = { 4, 1, 2, 0 };
-static const ieByte noSections[4] = { 0, 0, 0, 0 };
-
 // FIXME: arbitrary guess value
 #define DIALOG_MOVE_SPEED 75
 
 DialogHandler::DialogHandler(void)
 {
+	// translate section values (journal, quests, solved, user)
 	if (core->HasFeature(GFFlags::JOURNAL_HAS_SECTIONS)) {
-		sectionMap = bg2Sections;
-	} else {
-		sectionMap = noSections;
+		sectionMap = { JournalSection::UserBit, JournalSection::Unsolved, JournalSection::Solved, JournalSection::Main };
 	}
 }
 

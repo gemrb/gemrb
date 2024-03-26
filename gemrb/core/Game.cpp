@@ -1002,20 +1002,20 @@ void Game::DeleteJournalGroup(ieByte group)
 	}
 }
 /* returns true if it modified or added a journal entry */
-bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group, ieStrRef feedback)
+bool Game::AddJournalEntry(ieStrRef strRef, JournalSection section, ieByte group, ieStrRef feedback)
 {
 	GAMJournalEntry* je = FindJournalEntry(strRef);
 	if (je) {
 		//don't set this entry again in the same section
-		if (je->Section == section) {
+		if (je->Section == UnderType(section)) {
 			return false;
 		}
-		if ((section == IE_GAM_QUEST_DONE) && group) {
+		if ((section == JournalSection::Solved) && group) {
 			//removing all of this group and adding a new entry
 			DeleteJournalGroup(group);
 		} else {
 			//modifying existing entry
-			je->Section = section;
+			je->Section = UnderType(section);
 			je->Group = group;
 			ieDword chapter = 0;
 			if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
@@ -1034,7 +1034,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group, ieStrR
 	}
 	je->Chapter = (ieByte) chapter;
 	je->unknown09 = 0;
-	je->Section = section;
+	je->Section = UnderType(section);
 	je->Group = group;
 	je->Text = strRef;
 

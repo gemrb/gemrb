@@ -130,10 +130,13 @@ enum RestChecks {
 // SONG_BATTLE_LOSE
 // SONG_MISC0-4
 
-#define IE_GAM_JOURNAL 0
-#define IE_GAM_QUEST_UNSOLVED 1
-#define IE_GAM_QUEST_DONE  2
-#define IE_GAM_JOURNAL_USER 3
+enum class JournalSection : uint8_t {
+	Main,
+	Unsolved,
+	Solved,
+	User,
+	UserBit
+};
 
 /**
  * @struct GAMJournalEntry
@@ -384,7 +387,7 @@ public:
 	/** Adds a journal entry from dialog data.
 	 * Time and chapter are calculated on the fly
 	 * Returns false if the entry already exists */
-	bool AddJournalEntry(ieStrRef strRef, ieByte section, ieByte group, ieStrRef feedback = ieStrRef::INVALID);
+	bool AddJournalEntry(ieStrRef strRef, JournalSection section, ieByte group, ieStrRef feedback = ieStrRef::INVALID);
 	/** Adds a journal entry while loading the .gam structure */
 	void AddJournalEntry(GAMJournalEntry* entry);
 	unsigned int GetJournalCount() const;

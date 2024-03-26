@@ -24,6 +24,8 @@
 #include "exports.h"
 
 #include "Dialog.h"
+#include "Game.h"
+
 #include "Scriptable/Scriptable.h"
 
 namespace GemRB {
@@ -63,6 +65,8 @@ private:
 
 	int initialState = -1;
 	Point prevViewPortLoc;
+
+	std::array<JournalSection, 4> sectionMap {};
 };
 
 }
