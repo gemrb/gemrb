@@ -148,7 +148,7 @@ Point GameControl::GetFormationOffset(size_t formation, uint8_t pos) const
 	return Formations::GetFormation(formation)[pos];
 }
 
-Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double angle, const std::vector<Point>& exclude) const
+Point GameControl::GetFormationPoint(const Point& origin, size_t pos, float_t angle, const std::vector<Point>& exclude) const
 {
 	Point vec;
 	
@@ -184,7 +184,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 	Point dest = vec + origin;
 	int step = 0;
 	constexpr int maxStep = 4;
-	double stepAngle = 0.0;
+	float_t stepAngle = 0.0;
 	const Point& start = vec;
 	
 	auto NextDest = [&]() {
@@ -244,7 +244,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 }
 
 GameControl::FormationPoints GameControl::GetFormationPoints(const Point& origin, const std::vector<Actor*>& actors,
-															 double angle) const
+															 float_t angle) const
 {
 	FormationPoints formation;
 	for (size_t i = 0; i < actors.size(); ++i) {
@@ -253,7 +253,7 @@ GameControl::FormationPoints GameControl::GetFormationPoints(const Point& origin
 	return formation;
 }
 
-void GameControl::DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, double angle) const
+void GameControl::DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, float_t angle) const
 {
 	std::vector<Point> formationPoints = GetFormationPoints(formationPoint, actors, angle);
 	for (size_t i = 0; i < actors.size(); ++i) {
@@ -612,7 +612,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 	const Point& gameMousePos = GameMousePos();
 	// draw reticles
 	if (isFormationRotation) {
-		double angle = AngleFromPoints(gameMousePos, gameClickPoint);
+		float_t angle = AngleFromPoints(gameMousePos, gameClickPoint);
 		DrawFormation(game->selected, gameClickPoint, angle);
 	} else {
 		for (const auto& selectee : game->selected) {
@@ -2301,7 +2301,7 @@ void GameControl::CommandSelectedMovement(const Point& p, bool formation, bool a
 	if (party.empty())
 		return;
 
-	double angle = isFormationRotation ? AngleFromPoints(GameMousePos(), p) : formationBaseAngle;
+	float_t angle = isFormationRotation ? AngleFromPoints(GameMousePos(), p) : formationBaseAngle;
 	bool doWorldMap = ShouldTriggerWorldMap(party[0]);
 	
 	std::vector<Point> formationPoints = GetFormationPoints(p, party, angle);

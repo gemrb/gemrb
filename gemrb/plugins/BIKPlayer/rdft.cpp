@@ -66,7 +66,7 @@ av_cold int ff_rdft_init(RDFTContext *s, int nbits, enum RDFTransformType trans)
     s->tcos = ff_cos_tabs[nbits];
     s->tsin = ff_sin_tabs[nbits]+(trans == RDFT || trans == IRIDFT)*(n>>2);
     for (int i = 0; i < (n>>2); i++) {
-        s->tsin[i] = (float) sin(i*theta);
+        s->tsin[i] = (float)std::sin(i*theta);
     }
     return 0;
 }

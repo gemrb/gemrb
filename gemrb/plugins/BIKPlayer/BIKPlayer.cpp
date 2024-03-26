@@ -508,7 +508,7 @@ void BIKPlayer::DecodeBlock(short *out)
 
 		for (unsigned int i = 0; i < s_num_bands; i++) {
 			int value = s_gb.get_bits(8);
-			quant[i] = (float) pow(10.0, std::min(value, 95) * 0.066399999) * s_root;
+			quant[i] = (float)std::pow(10.0, std::min(value, 95) * 0.066399999) * s_root;
 		}
 
 		// find band (k)

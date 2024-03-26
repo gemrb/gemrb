@@ -412,10 +412,10 @@ Event EventMgr::CreateTouchEvent(const TouchEvent::Finger fingers[], int numFing
 		for (int i = 0; i < numFingers; ++i) {
 			e.touch.x += fingers[i].x;
 			e.touch.y += fingers[i].y;
-			if (abs(fingers[i].deltaX) > abs(e.touch.deltaX)) {
+			if (std::abs(fingers[i].deltaX) > std::abs(e.touch.deltaX)) {
 				e.touch.deltaX = fingers[i].deltaX;
 			}
-			if (abs(fingers[i].deltaY) > abs(e.touch.deltaY)) {
+			if (std::abs(fingers[i].deltaY) > std::abs(e.touch.deltaY)) {
 				e.touch.deltaY = fingers[i].deltaY;
 			}
 			e.touch.fingers[i] = fingers[i];

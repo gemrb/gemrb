@@ -430,7 +430,7 @@ private:
 public:
 	Map(TileMap *tm, TileProps tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
-	static void NormalizeDeltas(double &dx, double &dy, double factor = 1);
+	static void NormalizeDeltas(float_t &dx, float_t &dy, float_t factor = 1);
 	static Point ConvertCoordToTile(const Point&);
 	static Point ConvertCoordFromTile(const Point&);
 

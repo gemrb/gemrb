@@ -869,9 +869,9 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 	if (ExtFlags&PEF_CONTINUE) {
 		const Point& A = Origin;
 		const Point& B = target->Pos;
-		double angle = AngleFromPoints(B, A);
-		double adjustedRange = Feet2Pixels(Range, angle);
-		Point C(A.x + adjustedRange * cos(angle), A.y + adjustedRange * sin(angle));
+		float_t angle = AngleFromPoints(B, A);
+		float_t adjustedRange = Feet2Pixels(Range, angle);
+		Point C(A.x + adjustedRange * std::cos(angle), A.y + adjustedRange * std::sin(angle));
 		SetTarget(C);
 	} else {
 		//replan the path in case the target moved
@@ -1046,7 +1046,7 @@ void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end) 
 			if (!target->ValidTarget(targetFlags)) {
 				continue;
 			}
-			double t = 0.0;
+			float_t t = 0.0;
 			if (PersonalLineDistance(s, d, target, &t) > 1) {
 				continue;
 			}
@@ -1134,15 +1134,15 @@ void Projectile::SecondaryTarget()
 			if (Caster == targetID) {
 				continue;
 			}
-			double xdiff = actor->Pos.x - Pos.x;
-			double ydiff = Pos.y - actor->Pos.y;
+			float_t xdiff = actor->Pos.x - Pos.x;
+			float_t ydiff = Pos.y - actor->Pos.y;
 			int deg;
 
 			// a dragon will definitely be easier to hit than a mouse
 			// but nothing checks the personal space of possible targets in the original either #384
 			if (ydiff) {
 				// ensure [0,360] range: transform [-180,180] from atan2, but also take orientation correction factor into account
-				deg = (int) (std::atan2(ydiff, xdiff) * 180/M_PI);
+				deg = int(std::atan2(ydiff, xdiff) * 180 / M_PI);
 				deg = ((deg % 360) + 360 + degOffset) % 360;
 			} else if (xdiff < 0) {
 				deg = 180;
@@ -1485,7 +1485,7 @@ void Projectile::SpawnChild(size_t idx, bool firstExplosion, const Point& offset
 		add = (Orientation * 45 - max) / 2;
 	}
 	max = RAND(1, max) + add;
-	double degree = max * M_PI / 180;
+	float_t degree = max * M_PI / 180;
 	newdest.x = (int) -(rad * std::sin(degree));
 	newdest.y = (int) (rad * std::cos(degree));
 	newdest += Destination;
@@ -1750,29 +1750,29 @@ void Projectile::DrawLine(const Region& vp, orient_t face, BlitFlags flag)
 // adjust position for arcing paths
 void Projectile::BendPosition(Point& pos) const
 {
-	double total_distance = Distance(Origin, Destination);
-	double travelled_distance = Distance(Origin, Pos);
+	float_t total_distance = Distance(Origin, Destination);
+	float_t travelled_distance = Distance(Origin, Pos);
 
 	// distance travelled along the line, from 0.0 to 1.0
-	double travelled = travelled_distance / total_distance;
+	float_t travelled = travelled_distance / total_distance;
 	if (travelled > 1.0) {
 		Log(WARNING, "Projectile", "Travelled over full distance ({} = {} / {})! Origin: {}, Destination: {}, Pos: {}", travelled, travelled_distance, total_distance, Origin, Destination, Pos);
 		travelled = 1.0;
 	}
 
 	// input to sin(): 0 to pi gives us an arc
-	double arc_angle = travelled * M_PI;
+	float_t arc_angle = travelled * M_PI;
 
 	// calculate the distance between the arc and the current pos
 	// (this could use travelled and a larger constant multiplier,
 	// to make the arc size fixed rather than relative to the total
 	// distance to travel)
-	double length_of_normal = travelled_distance * std::sin(arc_angle) * 0.3 * ((bend / 2) + 1);
+	float_t length_of_normal = travelled_distance * std::sin(arc_angle) * 0.3 * ((bend / 2) + 1);
 	if (bend % 2) length_of_normal = -length_of_normal;
 
 	// adjust the to-be-rendered point by that distance
-	double x_vector = (Destination.x - Origin.x) / total_distance;
-	double y_vector = (Destination.y - Origin.y) / total_distance;
+	float_t x_vector = (Destination.x - Origin.x) / total_distance;
+	float_t y_vector = (Destination.y - Origin.y) / total_distance;
 	pos.x += y_vector * length_of_normal;
 	pos.y -= x_vector * length_of_normal;
 }
@@ -2062,7 +2062,7 @@ static Size GetEllipseSize(int circleSize)
 	ellipse.w = 2 * std::max(1, (circleSize - 1) * 8);
 	ellipse.h = static_cast<int>(ellipse.w * 0.6F); // NOTE: not quite 12/16!
 
-	float multiplier = EventMgr::TouchInputEnabled ? 1.4F : 1.1F;
+	float_t multiplier = EventMgr::TouchInputEnabled ? 1.4F : 1.1F;
 	ellipse.w *= multiplier;
 	ellipse.h *= multiplier;
 	return ellipse;

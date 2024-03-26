@@ -116,11 +116,11 @@ inline orient_t GetOrient(const Point& from, const Point& to)
 	if (!deltaX) return deltaY >= 0 ? S : N;
 
 	// reverse Y to match our game coordinate system
-	float angle = AngleFromPoints(-deltaY, deltaX);
+	float_t angle = AngleFromPoints(-deltaY, deltaX);
 
 	// calculate which segment the angle falls into and which orientation that represents
-	constexpr float M_PI_8 = M_PI / 8;
-	float segment = std::fmod(angle + M_PI_8 / 2 + 2 * M_PI, 2.0F * M_PI);
+	constexpr float_t M_PI_8 = M_PI / 8;
+	float_t segment = std::fmod(angle + M_PI_8 / 2 + 2 * M_PI, 2.0F * M_PI);
 	return PrevOrientation(E, int(segment / M_PI_8));
 }
 

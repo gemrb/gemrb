@@ -86,11 +86,11 @@ enum {
 // to sort nodes by their (heuristic) distance from the destination
 class PQNode {
 public:
-	PQNode(Point p, double l) : point(p), dist(l) {};
+	PQNode(Point p, float_t l) : point(p), dist(l) {};
 	PQNode() : point(Point(0, 0)), dist(0) {};
 
 	Point point;
-	double dist;
+	float_t dist;
 
 	friend bool operator < (const PQNode &lhs, const PQNode &rhs) { return lhs.dist < rhs.dist;}
 	friend bool operator > (const PQNode &lhs, const PQNode &rhs){ return rhs < lhs; }

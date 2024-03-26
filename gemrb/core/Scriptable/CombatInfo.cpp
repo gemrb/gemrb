@@ -54,7 +54,7 @@ static void SetBonusInternal(int& current, int bonus, int mod)
 					newBonus = tmp;
 				} // else leave it be at the current value
 			} else {
-				if (abs(tmp) > abs(current)) {
+				if (std::abs(tmp) > std::abs(current)) {
 					newBonus = tmp;
 				} // else leave it be at the current value
 			}

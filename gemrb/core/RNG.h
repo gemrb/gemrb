@@ -72,7 +72,7 @@ class GEM_EXPORT RNG {
 		return signum * randomNum;
 	}
 	
-	bool randPct(double pct) noexcept {
+	bool randPct(float_t pct) noexcept {
 		std::bernoulli_distribution distribution(pct);
 		return distribution(engine);
 	}

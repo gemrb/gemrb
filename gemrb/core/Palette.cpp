@@ -31,7 +31,7 @@ Palette::Palette(const Color &color, const Color &back) noexcept
 {
 	col[0] = Color(0, 0xff, 0, 0);
 	for (int i = 1; i < 256; i++) {
-		float p = i / 255.0f;
+		float_t p = i / 255.0f;
 		col[i].r = std::min<int>(back.r * (1 - p) + color.r * p, 255);
 		col[i].g = std::min<int>(back.g * (1 - p) + color.g * p, 255);
 		col[i].b = std::min<int>(back.b * (1 - p) + color.b * p, 255);

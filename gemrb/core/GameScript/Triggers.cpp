@@ -1564,17 +1564,17 @@ int GameScript::InLine(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	double fdm1 = SquaredDistance(Sender, scr1);
-	double fdm2 = SquaredDistance(Sender, scr2);
-	double fd12 = SquaredDistance(scr1, scr2);
-	double dm1 = sqrt(fdm1);
-	double dm2 = sqrt(fdm2);
+	float_t fdm1 = SquaredDistance(Sender, scr1);
+	float_t fdm2 = SquaredDistance(Sender, scr2);
+	float_t fd12 = SquaredDistance(scr1, scr2);
+	float_t dm1 = std::sqrt(fdm1);
+	float_t dm2 = std::sqrt(fdm2);
 
 	if (fdm1>fdm2 || fd12>fdm2) {
 		return 0;
 	}
-	double angle = acos(( fdm2 + fdm1 - fd12 ) / (2*dm1*dm2));
-	if (angle*180.0*M_PI<30.0) return 1;
+	float_t angle = std::acos((fdm2 + fdm1 - fd12) / (2 * dm1 * dm2));
+	if (angle * (180.0 / M_PI) < 30.0) return 1;
 	return 0;
 }
 

@@ -88,7 +88,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		return false;
 	}
 	
-	int glyphH = g.size.h + abs(g.pos.y);
+	int glyphH = g.size.h + std::abs(g.pos.y);
 	if (glyphH > SheetRegion.h) {
 		// must grow to accommodate this glyph
 		if (Sheet) {
