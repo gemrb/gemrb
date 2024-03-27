@@ -100,7 +100,7 @@ class GView:
 	'Focus': _GemRB.View_Focus
 	}
 
-	__slots__ = ['SCRIPT_GROUP', 'Flags']
+	__slots__ = ['SCRIPT_GROUP', 'Flags', 'Window']
 	
 	def __eq__(self, rhs):
 		if rhs == None:
@@ -212,8 +212,11 @@ class GWindow(GView, Scrollable):
 			view = self.GetControl (view)
 		RemoveView (view, True)
 
-	def GetControl(self, newID):
-		return GetView(self, newID)
+	def GetControl(self, cid):
+		if cid is not None and cid >= 0: # FIXME: some GUIScript functions are still returning values of -1 instead on None
+			return GetView(self, cid)
+		else:
+			return None
 
 	def AliasControls (self, map):
 		for alias, cid in map.items():
@@ -240,6 +243,15 @@ class GWindow(GView, Scrollable):
 
 	def Close(self, *args):
 		RemoveView(self, False)
+
+	def OnClose(self, handler):
+		self.SetAction(handler, ACTION_WINDOW_CLOSED)
+
+	def OnFocus(self, handler):
+		self.SetAction(handler, ACTION_WINDOW_FOCUS_GAINED)
+		
+	def OnUnFocus(self, handler):
+		self.SetAction(handler, ACTION_WINDOW_FOCUS_LOST)
 
 class GControl(GView):
 	methods = {
@@ -335,12 +347,14 @@ class GButton(GControl):
 		'SetPictureClipping': _GemRB.Button_SetPictureClipping,
 		'SetPicture': _GemRB.Button_SetPicture,
 		'SetPLT': _GemRB.Button_SetPLT,
-		'SetBAM': _GemRB.Button_SetBAM,
 		'SetSpellIcon': _GemRB.Button_SetSpellIcon,
 		'SetItemIcon': _GemRB.Button_SetItemIcon,
 		'SetActionIcon': _GemRB.Button_SetActionIcon,
 		'SetAnimation': _GemRB.Button_SetAnimation,
 	}
+	
+	def SetBAM(self, resref, cycle, frame, pal = -1):
+		return self.SetPicture(GemRB.GetSprite(resref, pal, cycle, frame))
 
 	def MakeDefault(self, glob=False):
 		# return key
@@ -359,6 +373,9 @@ class GButton(GControl):
 		frame = self.GetFrame()
 		frame["x"] = frame["y"] = 0
 		return self.CreateSubview(btnid, IE_GUI_BUTTON, frame)
+		
+	def OnAnimEnd(self, handler):
+		self.SetAction(handler, IE_ACT_CUSTOM)
 
 class GWorldMap(GControl, Scrollable):
 	methods = {

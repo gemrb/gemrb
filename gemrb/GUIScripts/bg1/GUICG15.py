@@ -92,7 +92,7 @@ def OnLoad():
 	return
 
 def RacePress():
-	Race = GemRB.GetVar("HatedRace")
+	Race = GemRB.GetVar("HatedRace") or 0
 	Row = RacialEnemyTable.FindValue(1, Race)
 	TextAreaControl.SetText(RacialEnemyTable.GetValue(Row, 2) )
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
@@ -101,5 +101,5 @@ def RacePress():
 def NextPress():
 	RaceWindow.Close ()
 	MyChar = GemRB.GetVar ("Slot")
-	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") )
+	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") or 0)
 	CharGenCommon.next()

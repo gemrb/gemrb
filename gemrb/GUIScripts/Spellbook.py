@@ -497,7 +497,7 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 		# specialist mages get an extra spell if they already know that level
 		# FIXME: get a general routine to find specialists
 		school = GemRB.GetVar("MAGESCHOOL")
-		if (Type == IE_SPELL_TYPE_WIZARD and school != 0) or \
+		if (Type == IE_SPELL_TYPE_WIZARD and school is not None) or \
 			(GameCheck.IsIWD2() and Type == IE_IWD2_SPELL_WIZARD and not (kit&0x4000)):
 			if value > 0:
 				value += 1
@@ -545,9 +545,7 @@ def HasSorcererBook (pc, cls=-1):
 		return False
 	return IsSorcererBook (SorcererBook)
 
-def CannotLearnSlotSpell ():
-	pc = GemRB.GameGetSelectedPCSingle ()
-
+def CannotLearnSlotSpell (slot_item, pc):
 	# disqualify sorcerers immediately
 	if HasSorcererBook (pc):
 		return LSR_STAT
@@ -556,7 +554,6 @@ def CannotLearnSlotSpell ():
 	if GameCheck.IsIWD2():
 		booktype = IE_IWD2_SPELL_WIZARD
 
-	slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
 	spell_ref = GemRB.GetItem (slot_item['ItemResRef'])['Spell']
 	spell = GemRB.GetSpell (spell_ref)
 	level = spell['SpellLevel']

@@ -33,7 +33,7 @@
 
 namespace GemRB {
 
-unsigned int Control::ActionRepeatDelay = 250;
+tick_t Control::ActionRepeatDelay = 250;
 
 const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeric_limits<value_t>::max());
 
@@ -68,7 +68,7 @@ void Control::SetAction(Responder handler, const ActionKey& key)
 	}
 }
 
-void Control::SetActionInterval(unsigned int interval)
+void Control::SetActionInterval(tick_t interval)
 {
 	repeatDelay = interval;
 	if (actionTimer) {
@@ -225,7 +225,7 @@ void Control::ClearActionTimer()
 	}
 }
 
-Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int delay)
+void Control::StartActionTimer(const ControlEventHandler& action, tick_t delay)
 {
 	EventHandler h = [this, action] () {
 		// update the timer to use the actual repeatDelay
@@ -239,7 +239,7 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 	};
 	// always start the timer with ActionRepeatDelay
 	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
-	return &core->SetTimer(h, delay ? delay : ActionRepeatDelay);
+	actionTimer = &core->SetTimer(h, delay ? delay : ActionRepeatDelay);
 }
 
 View::UniqueDragOp Control::DragOperation()
@@ -301,7 +301,7 @@ bool Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
 	ControlActionKey key(Click, mod, me.button, me.repeats);
 	if (repeatDelay && SupportsAction(key)) {
-		actionTimer = StartActionTimer(actions[key]);
+		StartActionTimer(actions[key]);
 	}
 	return true; // always handled
 }
@@ -319,7 +319,7 @@ void Control::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
 bool Control::OnTouchDown(const TouchEvent& /*te*/, unsigned short /*mod*/)
 {
 	ControlEventHandler cb = &Control::HandleTouchActionTimer;
-	actionTimer = StartActionTimer(cb, 500); // TODO: this time value should be configurable
+	StartActionTimer(cb, 500); // TODO: this time value should be configurable
 	return true; // always handled
 }
 

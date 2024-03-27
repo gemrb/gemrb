@@ -56,17 +56,10 @@ IE_GUI_BUTTON_LOWERCASE    = 0x00002000
 #IE_GUI_BUTTON_MULTILINE    = 0x00004000 # don't set the SINGLE_LINE font rendering flag
 #end of hardcoded section
 
-IE_GUI_BUTTON_NO_TEXT    = 0x00010000   # don't draw button label
-IE_GUI_BUTTON_PLAYRANDOM = 0x00020000   # the button animation is random
-IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart
-IE_GUI_BUTTON_PLAYALWAYS = 0x00080000   # animation will play when game is paused
-
 IE_GUI_BUTTON_CENTER_PICTURES = 0x00100000 # center the button's PictureList
 IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00200000 # BG1-style paperdoll
 IE_GUI_BUTTON_HORIZONTAL      = 0x00400000 # horizontal clipping of overlay
 IE_GUI_BUTTON_NO_TOOLTIP      = 0x00800000 # disable the tooltip
-
-IE_GUI_BUTTON_PORTRAIT    = IE_GUI_BUTTON_PLAYONCE|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_PICTURE
 
 #label flags
 IE_GUI_LABEL_USE_COLOR = 1
@@ -178,10 +171,12 @@ ACTION_WINDOW_FOCUS_GAINED	= 1
 ACTION_WINDOW_FOCUS_LOST	= 2
 
 # animation flags
-ANIM_PLAY_NORMAL		= 0,
-ANIM_PLAY_RANDOM		= 1, # the button animation is random
-ANIM_PLAY_ONCE			= 2, # the button animation won't restart
-ANIM_PLAY_ALWAYS		= 4  # animation will play when game is paused
+A_ANI_ACTIVE         = 1        # if not set, animation is invisible
+A_ANI_BLEND          = 2        # blend
+A_ANI_GAMEANIM       = 4        # stops when game is paused
+A_ANI_PLAYONCE       = 8        # stop after endframe
+A_ANI_SYNC           = 16       # synchronised draw (skip frames if needed)
+A_ANI_RANDOM_START   = 32       # starts with a random frame in the start range
 
 # GameScreen flags
 GS_PARTYAI           = 1
@@ -312,9 +307,9 @@ SHOP_BUY    = 1
 SHOP_SELL   = 2
 SHOP_ID     = 4
 SHOP_STEAL  = 8
-SHOP_SELECT = 0x40
-SHOP_NOREPADJ = 0x2000 # IE_STORE_NOREPADJ
-SHOP_FULL   = 0x10000 # IE_STORE_CAPACITY
+SHOP_NOREPADJ = 0x2000 # StoreActionFlags::NOREPADJ
+SHOP_FULL   = 0x10000 # StoreActionFlags::CAPACITY
+SHOP_SELECT = 0x20000
 
 #game constants
 

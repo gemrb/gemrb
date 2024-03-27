@@ -200,7 +200,11 @@ void Window::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 
 void Window::Focus()
 {
-	manager.FocusWindow(this);
+	if (!HasFocus()) {
+		manager.FocusWindow(this);
+	} else if (responderStack.empty()) {
+		FocusGained(); // fire the focus handler anyway
+	}
 }
 
 void Window::SetFocused(View* ctrl)
@@ -237,6 +241,11 @@ bool Window::IsDisabledCursor() const
 		isDisabled = isDisabled || hoverView->IsDisabledCursor();
 	}
 	return isDisabled;
+}
+
+bool Window::IsReceivingEvents() const
+{
+	return !IsDisabled();
 }
 
 void Window::SetPosition(WindowPosition pos)
@@ -575,7 +584,7 @@ bool Window::InActionHandler() const
 		}
 	}
 	
-	return executingResponseHandler;
+	return !responderStack.empty();
 }
 
 bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)

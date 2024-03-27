@@ -37,6 +37,7 @@ def InitInventoryWindow (Window):
 	global InventoryWindow
 
 	Window.AddAlias("WIN_INV")
+	Window.OnFocus(UpdateInventoryWindow)
 	InventoryWindow = Window
 
 	#ground items scrollbar
@@ -137,10 +138,8 @@ def ChangeWeaponPressed ():
 	return
 
 #complete update
-def UpdateInventoryWindow (Window = None):
-	if Window == None:
-		Window = GemRB.GetView("WIN_INV")
-
+def UpdateInventoryWindow (Window):
+	Window.OnClose(InventoryCommon.InventoryClosed)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
@@ -159,8 +158,6 @@ def UpdateInventoryWindow (Window = None):
 	for i in range (SlotCount):
 		InventoryCommon.UpdateSlot (pc, i)
 	return
-
-InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 
 ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
 OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
@@ -185,7 +182,7 @@ def RefreshInventoryWindow ():
 	# and then remove this block
 	if GemRB.HasResource (pdoll, RES_BAM):
 		pal = [GemRB.GetPlayerStat (pc, c) for c in range(IE_METAL_COLOR, IE_HAIR_COLOR + 1)]
-		Button.SetAnimation (pdoll, 0, 8, pal)
+		Button.SetAnimation (pdoll, 0, A_ANI_ACTIVE, pal)
 
 	# portrait
 	Button = Window.GetControl (84)

@@ -20,10 +20,10 @@
 
 #include "Animation.h"
 
+#include "EnumFlags.h"
 #include "Game.h"
 #include "Interface.h"
 #include "Logging/Logging.h"
-#include "Map.h"
 #include "Sprite2D.h"
 #include "RNG.h"
 
@@ -35,7 +35,7 @@ Animation::Animation(std::vector<frame_t> fr) noexcept
 	size_t count = frames.size();
 	assert(count > 0);
 	frameIdx = RAND<index_t>(0, count-1);
-	Flags = A_ANI_ACTIVE;
+	flags = Flags::Active;
 
 	for (const frame_t& frame : frames) {
 		if (!frame) continue;
@@ -69,7 +69,7 @@ Animation::frame_t Animation::CurrentFrame() const
 
 Animation::frame_t Animation::LastFrame(void)
 {
-	if (!(Flags&A_ANI_ACTIVE)) {
+	if (!(flags & Flags::Active)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive1!");
 		return NULL;
 	}
@@ -83,13 +83,14 @@ Animation::frame_t Animation::LastFrame(void)
 
 Animation::frame_t Animation::NextFrame(void)
 {
-	if (!(Flags&A_ANI_ACTIVE)) {
+	if (!(flags & Flags::Active)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive2!");
 		return NULL;
 	}
 
 	Holder<Sprite2D> ret = frames[GetCurrentFrameIndex()];
-	if (endReached && (Flags&A_ANI_PLAYONCE))
+
+	if (endReached && bool(flags & Flags::Once))
 		return ret;
 
 	tick_t time;
@@ -110,7 +111,7 @@ Animation::frame_t Animation::NextFrame(void)
 	}
 	if (frameIdx >= GetFrameCount()) {
 		if (!frames.empty()) {
-			if (Flags&A_ANI_PLAYONCE) {
+			if (bool(flags & Flags::Once)) {
 				frameIdx = GetFrameCount() - 1;
 				endReached = true;
 			} else {
@@ -127,7 +128,7 @@ Animation::frame_t Animation::NextFrame(void)
 
 Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 {
-	if (!(Flags&A_ANI_ACTIVE)) {
+	if (!(flags & Flags::Active)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive!");
 		return NULL;
 	}
@@ -150,9 +151,9 @@ Animation::frame_t Animation::GetFrame(index_t i) const
 	return frames[i];
 }
 
-void Animation::MirrorAnimation(BlitFlags flags)
+void Animation::MirrorAnimation(BlitFlags bf)
 {
-	if (flags == BlitFlags::NONE) {
+	if (bf == BlitFlags::NONE) {
 		return;
 	}
 
@@ -160,22 +161,22 @@ void Animation::MirrorAnimation(BlitFlags flags)
 		if (!sprite) continue;
 		sprite = sprite->copy();
 
-		if (flags & BlitFlags::MIRRORX) {
+		if (bf & BlitFlags::MIRRORX) {
 			sprite->renderFlags ^= BlitFlags::MIRRORX;
 			sprite->Frame.x = sprite->Frame.w - sprite->Frame.x;
 		}
-		if (flags & BlitFlags::MIRRORY) {
+		if (bf & BlitFlags::MIRRORY) {
 			sprite->renderFlags ^= BlitFlags::MIRRORY;
 			sprite->Frame.y = sprite->Frame.h - sprite->Frame.y;
 		}
 	}
 
-	if (flags & BlitFlags::MIRRORX) {
+	if (bf & BlitFlags::MIRRORX) {
 		// flip animArea horizontally as well
 		animArea.x = -animArea.w - animArea.x;
 	}
 
-	if (flags & BlitFlags::MIRRORY) {
+	if (bf & BlitFlags::MIRRORY) {
 		// flip animArea vertically as well
 		animArea.y = -animArea.h - animArea.y;
 	}

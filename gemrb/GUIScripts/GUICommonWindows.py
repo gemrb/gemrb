@@ -29,20 +29,15 @@ from ie_action import *
 from ie_slots import SLOT_QUIVER
 from ie_restype import RES_2DA
 from ie_sounds import CHAN_HITS
-from GameCheck import MAX_PARTY_SIZE
 from Clock import UpdateClock, CreateClockButton
 import GameCheck
 import GUICommon
 import CommonTables
 import CommonWindow
 import Container
-import LUCommon
 import InventoryCommon
 if not GameCheck.IsPST():
   import Spellbook  ##not used in pst - YET
-
-FRAME_PC_SELECTED = 0
-FRAME_PC_TARGET   = 1
 
 CurrentWindow = None
 ActionBarControlOffset = 0
@@ -57,10 +52,6 @@ elif GameCheck.IsPST():
 else:
 	MageSpellsKey = 'Wizard_Spells'
 	CharacterStatsKey = 'Character_Record'
-
-StatesFont = "STATES2"
-if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-	StatesFont = "STATES"
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
@@ -315,8 +306,8 @@ def AIPress (toggle=1):
 		OptionsWindow = GemRB.GetView("OPTWIN")
 		Button = OptionsWindow.GetControl (OptionControl['Toggle_AI'])
 	else:
-		PortraitWindow = GemRB.GetView("PORTWIN")
-		Button = PortraitWindow.GetControl (OptionControl['Toggle_AI'])
+		PortraitWin = GemRB.GetView("PORTWIN")
+		Button = PortraitWin.GetControl (OptionControl['Toggle_AI'])
 
 	if toggle:
 		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_XOR)
@@ -619,7 +610,7 @@ def UpdateActionsWindow ():
 	except RuntimeError:
 		return
 
-	PortraitWindow = GemRB.GetView("PORTWIN")
+	PortraitWin = GemRB.GetView("PORTWIN")
 	ActionsWindow = GemRB.GetView("ACTWIN")
 
 	if not GameCheck.IsIWD2():
@@ -627,7 +618,7 @@ def UpdateActionsWindow ():
 		ActionBarControlOffset = 0
 		UpdateClock ()
 	else:
-		CurrentWindow = PortraitWindow
+		CurrentWindow = PortraitWin
 		ActionBarControlOffset = 6 # set it here too, since we get called before menu setup
 
 	if GameCheck.IsPST():
@@ -1160,7 +1151,7 @@ def SpellPressed ():
 		Type = Spell // 1000
 	Spell = Spell % 1000
 	slot = GemRB.GetVar ("QSpell")
-	if slot>=0:
+	if slot is not None:
 		#setup quickspell slot
 		#if spell has no target, return
 		#otherwise continue with casting
@@ -1174,7 +1165,7 @@ def SpellPressed ():
 		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 		GemRB.SetVar("Type", 0)
 	GemRB.SpellCast (pc, Type, Spell)
-	if GemRB.GetVar ("Type")!=-1:
+	if GemRB.GetVar ("Type") is not None:
 		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 		#init spell list
 		GemRB.SpellCast (pc, -1, 0)
@@ -1297,7 +1288,6 @@ def GetActorPaperDoll (actor):
 
 
 SelectionChangeHandler = None
-SelectionChangeMultiHandler = None ##relates to floatmenu
 
 def SetSelectionChangeHandler (handler):
 	"""Updates the selection handler."""
@@ -1315,14 +1305,7 @@ def SetSelectionChangeHandler (handler):
 
 	SelectionChangeHandler = handler
 
-	# redraw selection on change main selection | single selection
-	# SelectionChanged ()
 	return
-
-def SetSelectionChangeMultiHandler (handler):
-	global SelectionChangeMultiHandler
-	SelectionChangeMultiHandler = handler
-	#SelectionChanged ()
 
 def CloseTopWindow ():
 	window = GemRB.GetView("WIN_TOP")
@@ -1352,25 +1335,7 @@ def TopWindowClosed(window):
 		GemRB.GetView ("ACTWIN").SetVisible (True)
 		GemRB.GetView ("MSGWIN").SetVisible(True)
 
-	# TODO: this should be moved to GUIINV and that window should have a custom close handler
-	# that does this stuff then calls this manually
-
-	GemRB.LeaveContainer()
-	if GemRB.IsDraggingItem () == 1:
-		pc = GemRB.GameGetSelectedPCSingle ()
-		#store the item in the inventory before window is closed
-		GemRB.DropDraggedItem (pc, -3)
-		#dropping on ground if cannot store in inventory
-		if GemRB.IsDraggingItem () == 1:
-			GemRB.DropDraggedItem (pc, -2)
-
-	# for worldmap purposes
-	GemRB.SetVar ("Travel", -1)
-
-	#don't go back to multi selection mode when going to the store screen
-	if not GemRB.GetVar ("Inventory"):
-		SetSelectionChangeHandler (None)
-
+	SetSelectionChangeHandler (None)
 	SelectionChanged()
 
 if GameCheck.IsIWD2():
@@ -1398,10 +1363,6 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 			
 			SetTopWindow (window, selectionHandler)
 			window.SetAction(lambda: TopWindowClosed(window), ACTION_WINDOW_CLOSED)
-			if GameCheck.IsPST ():
-				import FloatMenuWindow
-				if FloatMenuWindow.FloatMenuWindow:
-					FloatMenuWindow.FloatMenuWindow.Close ()
 
 			if pause:
 				CreateTopWinLoader.PauseState = GemRB.GamePause(3, 1)
@@ -1411,12 +1372,12 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 
 			optwin = GemRB.GetView("OPTWIN")
 			if optwin:
+				if btn:
+					btn.SetState(IE_GUI_BUTTON_SELECTED)
+					GemRB.SetVar ("OPTBTN", btn.ID)
 				rtgbtn = optwin.GetControl(0) # return to game button
-			if optwin and rtgbtn: # not in PST or IWD2
-				rtgbtn.SetState(IE_GUI_BUTTON_UNPRESSED)
-			if btn:
-				btn.SetState(IE_GUI_BUTTON_SELECTED)
-				GemRB.SetVar ("OPTBTN", btn.ID)
+				if rtgbtn: # not in PST or IWD2
+					rtgbtn.SetState(IE_GUI_BUTTON_UNPRESSED)
 			
 			GameWin = GemRB.GetView("GAMEWIN")
 			GameWin.SetDisabled(True)
@@ -1480,117 +1441,6 @@ def ToggleWindow(id, pack, pos=WINDOW_CENTER):
 	else:
 		return GemRB.LoadWindow(id, pack, pos)
 
-# returns buttons and a numerical index
-# does nothing new in pst, iwd2 due to layout
-# in the rest, it will enable extra button generation for higher resolutions
-# Mode determines arrangement direction, horizontal being for party reform and potentially save/load
-def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
-	pairs = {}
-
-	if not Window:
-		return pairs
-
-	oldSlotCount = 6 + ExtraSlots
-
-	for i in range(min(oldSlotCount, MAX_PARTY_SIZE + ExtraSlots)): # the default chu/game limit or less
-		pairs[i] = Window.GetControl (i)
-
-	# nothing left to do
-	PartySize = GemRB.GetPartySize ()
-	if PartySize <= oldSlotCount:
-		return pairs
-
-	if GameCheck.IsIWD2() or GameCheck.IsPST():
-		# set Mode = "horizontal" once we can create enough space
-		GemRB.Log(LOG_ERROR, "GetPortraitButtonPairs", "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ...")
-		return pairs
-
-	# GUIWORLD doesn't have a separate portraits window, so we need to skip
-	# all this magic when reforming an overflowing party
-	if PartySize > MAX_PARTY_SIZE:
-		return pairs
-
-	# generate new buttons by copying from existing ones
-	firstButton = pairs[0]
-	firstRect = firstButton.GetFrame ()
-	buttonHeight = firstRect["h"]
-	buttonWidth = firstRect["w"]
-	xOffset = firstRect["x"]
-	yOffset = firstRect["y"]
-	windowRect = Window.GetFrame()
-	windowHeight = windowRect["h"]
-	windowWidth = windowRect["w"]
-	limit = limitStep = 0
-	scale = 0
-	portraitGap = 0
-	if Mode ==  "horizontal":
-		xOffset += 3*buttonWidth  # width of other controls in party reform; we'll draw on the other side (atleast in guiw8, guiw10 has no need for this)
-		maxWidth = windowWidth - xOffset
-		limit = maxWidth
-		limitStep = buttonWidth
-	else:
-		# reduce it by existing slots + 0 slots in framed views (eg. inventory) and
-		# 1 in main game control (for spacing and any other controls below (ai/select all in bg2))
-		maxHeight = windowHeight - buttonHeight * PartySize - buttonHeight // 2
-		if windowHeight != ScreenHeight:
-			maxHeight += buttonHeight // 2
-		limit = maxHeight
-		# for framed views, limited to 6, we downscale the buttons to fit, clipping their portraits
-		if maxHeight < buttonHeight:
-			unused = -40 if GameCheck.IsBG1() else 20 # remaining unused space below the portraits
-			scale = 1
-			portraitGap = buttonHeight
-			buttonHeight = (windowHeight + unused) // PartySize
-			if portraitGap == buttonHeight:
-				scale = 0 # ensure idempotence, eg. when this gets called on click
-			portraitGap = portraitGap - buttonHeight - 2 # 2 for a quasi border
-			limit = windowHeight - buttonHeight * 6 + unused
-		limitStep = buttonHeight
-
-	for i in range(len(pairs), PartySize):
-		if limitStep > limit:
-			raise SystemExit("Not enough window space for so many party members (portraits), bailing out! %d vs width/height of %d/%d" %(limit, buttonWidth, buttonHeight))
-		nextID = 1000 + i
-		control = Window.GetControl (nextID)
-		if control:
-			pairs[i] = control
-			continue
-		if Mode ==  "horizontal":
-			Window.CreateButton (nextID, xOffset+i*buttonWidth, yOffset, buttonWidth, buttonHeight)
-		else:
-			# vertical
-			Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset+i*2*scale, buttonWidth, buttonHeight)
-
-		button = Window.GetControl (nextID)
-		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
-		button.SetVarAssoc ("portrait", i + 1)
-		SetupButtonBorders (Window, button, i)
-		button.SetFont (StatesFont)
-
-		button.OnRightPress (OpenInventoryWindowClick)
-		button.OnPress (PortraitButtonOnPress)
-		button.OnShiftPress (PortraitButtonOnShiftPress)
-		button.SetAction (PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
-		button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
-		button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
-
-		pairs[i] = button
-		limit -= limitStep
-
-	# move the buttons back up, to combine the freed space
-	if scale:
-		for i in range(PartySize - 1):
-			button = pairs[i]
-			button.SetSize (buttonWidth, buttonHeight)
-			if i == 0:
-				continue # don't move the first portrait
-			rect = button.GetFrame ()
-			x = rect["x"]
-			y = rect["y"]
-			button.SetPos (x, y-portraitGap*i)
-
-	return pairs
-
 def OpenInventoryWindowClick (btn):
 	import GUIINV
 	GemRB.GameSelectPC (btn.Value, True, SELECT_REPLACE)
@@ -1618,301 +1468,6 @@ def ButtonDragDestHandler (btn):
 		
 	DragButton = None
 
-def AddStatusFlagLabel (Window, Button, i):
-	label = Window.GetControl (200 + i)
-	if label:
-		return label
-
-	# label for status flags (dialog, store, level up)
-	align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT | IE_FONT_SINGLE_LINE
-	if GameCheck.IsBG2 ():
-		align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE
-	label = Button.CreateLabel (200 + i, StatesFont, "", align) #level up icon is on the right
-	label.SetFrame (Button.GetInsetFrame (4))
-	return label
-
-# overlay a label, so we can display the hp with the correct font. Regular button label
-#   is used by effect icons
-def AddHPLabel (Window, Button, i):
-	label = Window.GetControl (100 + i)
-	if label:
-		return label
-
-	label = Button.CreateLabel (100 + i, "NUMFONT", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_LEFT | IE_FONT_SINGLE_LINE)
-	return label
-
-def SetupButtonBorders (Window, Button, i):
-	# unlike other buttons, this one lacks extra frames for a selection effect
-	# so we create it and shift it to cover the grooves of the image
-	# except iwd2's second frame already has it incorporated (but we miscolor it)
-	yellow = {'r' : 255, 'g' : 255, 'b' : 0, 'a' : 255}
-	green = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
-	if GameCheck.IsIWD2 ():
-		Button.SetBorder (FRAME_PC_SELECTED, green)
-		Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame (2, 2, 3, 3))
-	elif GameCheck.IsPST ():
-		Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame (1, 1, 2, 2))
-		Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame (3, 3, 4, 4))
-		Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
-		ButtonHP = Window.GetControl (6 + i)
-		ButtonHP.OnPress (PortraitButtonHPOnPress)
-		ButtonHP.SetVarAssoc ("pid", i + 1) # storing so the callback knows which button it's operating on
-	else:
-		Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame (4, 3, 4, 3))
-		Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame (2, 2, 3, 3))
-
-def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
-	#take care, this window is different in how/iwd
-	if GameCheck.HasHOW() and needcontrols:
-		PortraitWindow = Window = GemRB.LoadWindow (26, GUICommon.GetWindowPack(), pos)
-	else:
-		PortraitWindow = Window = GemRB.LoadWindow (1, GUICommon.GetWindowPack(), pos)
-
-	PortraitWindow.AddAlias("PORTWIN")
-	PortraitWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
-
-	if needcontrols and not GameCheck.IsPST(): #not in pst
-		# 1280 and higher don't have this control
-		Button = Window.GetControl (8)
-		if Button:
-			if GameCheck.IsIWD():
-				# Rest (iwd)
-				Button.SetTooltip (11942)
-				Button.OnPress (RestPress)
-			else:
-				Button.OnPress (MinimizePortraits)
-		else:
-			if GameCheck.HasHOW():
-				# Rest (how)
-				pos = Window.GetFrame()["h"] - 37
-				Button = Window.CreateButton (8, 6, pos, 55, 37)
-				Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
-				Button.SetTooltip (11942)
-				Button.OnPress (RestPress)
-
-				pos = pos - 37
-				Window.CreateButton (6, 6, pos, 27, 36)
-
-		# AI
-		Button = Window.GetControl (6)
-		#fixing a gui bug, and while we are at it, hacking it to be easier
-		Button.SetSprites ("GUIBTACT", 0, 46, 47, 48, 49)
-		InitOptionButton(Window, 'Toggle_AI', AIPress)
-		AIPress(0) #this initialises the state and tooltip
-
-		#Select All
-		if GameCheck.HasHOW():
-			Button = Window.CreateButton (7, 33, pos, 27, 36)
-			Button.SetSprites ("GUIBTACT", 0, 50, 51, 50, 51)
-		else:
-			Button = Window.GetControl (7)
-		Button.SetTooltip (10485)
-		Button.OnPress (GUICommon.SelectAllOnPress)
-	else:
-		# Rest
-		if not GameCheck.IsIWD2():
-			Button = Window.GetControl (6)
-			if Button:
-				Button.SetTooltip (11942)
-				Button.OnPress (RestPress)
-
-	PortraitButtons = GetPortraitButtonPairs (Window)
-	for i, Button in PortraitButtons.items():
-		pcID = i + 1
-		
-		Button.SetVarAssoc("portrait", pcID)
-		
-		if not GameCheck.IsPST():
-			Button.SetFont (StatesFont)
-
-			AddStatusFlagLabel (Window, Button, i)
-
-		if needcontrols or GameCheck.IsIWD2():
-			Button.OnRightPress (OpenInventoryWindowClick)
-		else:
-			Button.OnRightPress (PortraitButtonOnPress)
-
-		Button.OnPress (PortraitButtonOnPress)
-		Button.OnShiftPress (PortraitButtonOnShiftPress)
-		Button.SetAction (PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
-		Button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
-		Button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
-
-		AddHPLabel (Window, Button, i)
-		SetupButtonBorders (Window, Button, i)
-
-	UpdatePortraitWindow ()
-	SelectionChanged ()
-	return Window
-
-def UpdatePortraitWindow ():
-	"""Updates all of the portraits."""
-
-	Window = GemRB.GetView("PORTWIN")
-	Window.Focus(None)
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	Inventory = GemRB.GetVar ("Inventory")
-	GSFlags = GemRB.GetGUIFlags()
-	indialog = GSFlags & GS_DIALOG
-
-	PortraitButtons = GetPortraitButtonPairs (Window)
-	for i, Button in PortraitButtons.items():
-		pcID = i + 1
-		if indialog:
-			Button.SetHotKey(None)
-		if (pcID <= GemRB.GetPartySize()):
-			Button.SetAction(lambda btn, pc=pcID: GemRB.GameControlLocateActor(pc), IE_ACT_MOUSE_ENTER);
-			Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE);
-			if (i < 6 and not indialog):
-				Button.SetHotKey(chr(ord('1') + i), 0, True)
-
-		if GameCheck.IsPST():
-			UpdateAnimatedPortrait(Window, i)
-			continue
-
-		Portrait = GemRB.GetPlayerPortrait (pcID, 1)
-		pic = Portrait["Sprite"]
-		Hide = False
-		if Inventory and pc != pcID:
-			Hide = True
-
-		if pic and GemRB.GetPlayerStat(pcID, IE_STATE_ID) & STATE_DEAD:
-			import GUISTORE
-			# dead pcs are hidden in all stores but temples
-			if GUISTORE.StoreWindow and not GUISTORE.StoreHealWindow:
-				Hide = True
-
-		if Hide or (not pic and not Portrait["ResRef"]):
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
-			Button.SetText ("")
-			Button.SetTooltip ("")
-			continue
-
-		portraitFlags = IE_GUI_BUTTON_PORTRAIT | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM
-		Button.SetFlags (portraitFlags, OP_SET)
-
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		if pic == None:
-			pic = ""
-		Button.SetPicture (pic, "NOPORTSM")
-		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
-
-		# character - 1 == bam cycle, sometimes
-		# only frames have all the glyphs
-		# only bg2 and iwds have a proper blank glyph
-		# so avoid using blanks except in bg2
-		flag = blank = bytearray([33])
-		if GameCheck.IsBG2():
-			# only BG2 has icons for talk or store
-			flag = blank = bytearray([238])
-			talk = bytearray([154]) # dialog icon
-			store = bytearray([155]) # shopping icon
-
-			if pc == pcID and GemRB.GetStore() != None:
-				flag = store
-			# talk icon
-			elif GemRB.GameGetSelectedPCSingle(1) == pcID:
-				flag = talk
-
-		if LUCommon.CanLevelUp (pcID):
-			if GameCheck.IsBG2():
-				flag = flag + blank + bytearray([255])
-			else:
-				flag = bytearray([255])
-		else:
-			if GameCheck.IsBG2():
-				flag = flag + blank + blank
-			else:
-				flag = ""
-			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-				HPLabel = AddHPLabel (Window, Button, i) # missing if new pc joined since the window was opened
-				HPLabel.SetText (ratio_str)
-				HPLabel.SetColor (color)
-			
-		FlagLabel = AddStatusFlagLabel (Window, Button, i) # missing if new pc joined since the window was opened
-		FlagLabel.SetText(flag)
-
-		#add effects on the portrait
-		effects = GemRB.GetPlayerStates (pcID)
-
-		numCols = 4 if GameCheck.IsIWD2() else 3
-		numEffects = len(effects)
-
-		# calculate the partial row
-		idx = numEffects % numCols
-		states = bytearray(effects[0:idx])
-		# now do any rows that are full
-		for x in range(idx, numEffects):
-			if (x - idx) % numCols == 0:
-				states.append(ord('\n'))
-			states.append(effects[x])
-
-		Button.SetText(states)
-	return
-
-def UpdateAnimatedPortrait (Window,i):
-	"""Selects the correct portrait cycle depending on character state"""
-	# note: there are actually two portraits per chr, eg PPPANN (static), WMPANN (animated)
-	Button = Window.GetControl (i)
-	ButtonHP = Window.GetControl (6 + i)
-	pic = GemRB.GetPlayerPortrait (i+1, 0)["ResRef"]
-	if not pic:
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetAnimation (None)
-		ButtonHP.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		ButtonHP.SetText ("")
-		ButtonHP.SetBAM ("", 0, 0)
-		return
-
-	state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
-	hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
-	hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
-	if state & STATE_DEAD:
-			cycle = 9
-	elif state & STATE_HELPLESS:
-			cycle = 8
-	elif state & STATE_PETRIFIED:
-			cycle = 7
-	elif state & STATE_PANIC:
-			cycle = 6
-	elif state & STATE_POISONED:
-			cycle = 2
-	elif hp<hp_max/2:
-		cycle = 4
-	else:
-		cycle = 0
-
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
-	if cycle<6:
-		Button.SetFlags (IE_GUI_BUTTON_PLAYRANDOM, OP_OR)
-
-	Button.SetAnimation (pic, cycle)
-	ButtonHP.SetFlags(IE_GUI_BUTTON_PICTURE, OP_SET)
-
-	if hp_max < 1 or hp == "?":
-		ratio = 0.0
-	else:
-		ratio = hp / float(hp_max)
-		if ratio > 1.0: ratio = 1.0
-
-	r = int (255 * (1.0 - ratio))
-	g = int (255 * ratio)
-
-	ButtonHP.SetText ("%s / %d" %(hp, hp_max))
-	ButtonHP.SetColor ({'r' : r, 'g' : g, 'b' : 0})
-	ButtonHP.SetBAM ('FILLBAR', 0, 0, -1)
-	ButtonHP.SetPictureClipping (ratio)
-
-	if GemRB.GetVar('Health Bar Settings') & (1 << i):
-		op = OP_OR
-	else:
-		op = OP_NAND
-	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
-
-	return
-
 def PortraitButtonOnPress (btn):
 	"""Selects the portrait individually."""
 	pcID = btn.Value
@@ -1927,7 +1482,6 @@ def PortraitButtonOnPress (btn):
 		GemRB.GameSelectPC (pcID, True, SELECT_REPLACE)
 	else:
 		GemRB.GameSelectPCSingle (pcID)
-		SelectionChanged ()
 	return
 
 def PortraitButtonOnShiftPress (btn):
@@ -1940,41 +1494,21 @@ def PortraitButtonOnShiftPress (btn):
 		GemRB.GameSelectPC (pcID, sel)
 	else:
 		GemRB.GameSelectPCSingle (pcID)
-		SelectionChanged ()
-	return
-
-def PortraitButtonHPOnPress (btn, pcID): ##pst hitpoint display
-	hbs = GemRB.GetVar('Health Bar Settings')
-	if hbs & (1 << (pcID - 1)):
-		op = OP_NAND
-	else:
-		op = OP_OR
-
-	btn.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
-	GemRB.SetVar('Health Bar Settings', hbs ^ (1 << (pcID - 1)))
 	return
 
 def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
+	from PortraitWindow import UpdatePortraitWindow
 
-	PortraitWindow = GemRB.GetView("PORTWIN")
 	# FIXME: hack. If defined, display single selection
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
-		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
-		for i, Button in PortraitButtons.items():
-			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
-		if SelectionChangeMultiHandler:
-			SelectionChangeMultiHandler ()
 	else:
-		sel = GemRB.GameGetSelectedPCSingle ()
-		GUICommon.UpdateMageSchool (sel)
+		pc = GemRB.GameGetSelectedPCSingle();
+		GUICommon.UpdateMageSchool (pc)
 
-		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
-		for i, Button in PortraitButtons.items():
-			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
-
+	UpdatePortraitWindow()
 	Container.CloseContainerWindow()
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
@@ -1996,9 +1530,6 @@ def ActionDefendPressed ():
 
 def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD|GA_NO_SELF|GA_NO_ENEMY|GA_NO_HIDDEN)
-
-def MinimizePortraits(): #bg2
-	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
 
 def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #relates to pst containers
 	if Slot != None:
@@ -2029,7 +1560,7 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 		Button.OnPress (None)
 		Button.OnRightPress (None)
 
-def OpenWaitForDiscWindow ():
+def OpenWaitForDiscWindow (disc_num):
 	global DiscWindow
 
 	if DiscWindow:
@@ -2040,7 +1571,6 @@ def OpenWaitForDiscWindow ():
 	DiscWindow = GemRB.LoadWindow (0, "GUIID")
 	label = DiscWindow.GetControl (0)
 
-	disc_num = GemRB.GetVar ("WaitForDisc")
 	disc_path = 'XX:'
 
 	text = GemRB.GetString (31483) + " " + str (disc_num) + " " + GemRB.GetString (31569) + " " + disc_path + "\n" + GemRB.GetString (49152)
@@ -2052,12 +1582,6 @@ def OpenWaitForDiscWindow ():
 	# 31571 - There is no disc in drive
 	# 31578 - No disc could be found in drive. Please place Disc 1 in drive.
 	# 49152 - To quit the game, press Alt-F4
-
-
-def CheckLevelUp(pc):
-	if GameCheck.IsGemRBDemo ():
-		return
-	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))
 
 def ToggleAlwaysRun():
 	GemRB.GameControlToggleAlwaysRun()
@@ -2100,8 +1624,7 @@ def OpenPSTDeathWindow ():
 		# will also exit to the main menu
 
 	# reuse the main error window
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	Window = GemRB.LoadWindow (25)
+	Window = GemRB.LoadWindow (25, GUICommon.GetWindowPack())
 	Label = Window.GetControl (0xfffffff) # -1 in the CHU
 	Label.SetText (48155)
 	Button = Window.GetControl (1)

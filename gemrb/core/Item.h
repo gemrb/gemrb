@@ -56,7 +56,7 @@ class Projectile;
 #define IE_ITEM_STOLEN       0x00000400 // TODO: ee offhanded
 #define IE_ITEM_CONVERSABLE  0x00000800
 #define IE_ITEM_PULSATING    0x00001000 // TODO: ee fake offhand
-#define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN ) // beware: IE_STORE_BUYCRITS may override the first half
+#define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN ) // beware: StoreActionFlags::BUYCRITS may override the first half
 // see IESDP for details
 #define IE_ITEM_FORCE_2H     0x00002000 // TODO: ee, Force two-handed animation DISABLE_OFFHAND
 #define IE_ITEM_NOT_OFFHAND  0x00004000 // ee, not usable in off-hand

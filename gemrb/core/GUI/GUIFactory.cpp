@@ -20,13 +20,18 @@
 
 #include "GUIFactory.h"
 
+#include "Logging/Logging.h"
+
 namespace GemRB {
 
 Window* GUIFactory::CreateWindow(ScriptingId winId, const Region& frame) const
 {
 	assert(winmgr);
 	Window* win = winmgr->MakeWindow(frame);
-	RegisterScriptableWindow(win, winPack, winId);
+	const WindowScriptingRef* ref = RegisterScriptableWindow(win, winPack, winId);
+	if (ref == nullptr) {
+		Log(DEBUG, "GUIFactory", "Unable to register window {} from CHU {}", winId, winPack);
+	}
 	return win;
 }
 

@@ -25,6 +25,7 @@ import GemRB
 import GUICommon
 import CommonTables
 import GUICommonWindows
+from GUICommon import BindControlCallbackParams
 from GUIDefines import *
 from ie_stats import *
 
@@ -46,21 +47,16 @@ def InitMageWindow (Window):
 		Icon = Window.GetControl (2 + i)
 		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
 		Icon.SetBorder (0, color,  0, 1)
-		Icon.SetVarAssoc ("SpellButton", i)
+		Icon.SetVarAssoc ("Memorized", i)
 
 	for i in range (20):
 		Icon = Window.GetControl (14 + i)
-		Icon.SetVarAssoc ("SpellButton", 100 + i)
+		Icon.SetValue (i)
 	return
 
 def UpdateMageWindow (Window=None):
-	global MageMemorizedSpellList, MageKnownSpellList
-
 	if Window == None:
 		Window = MageWindow
-
-	MageMemorizedSpellList = []
-	MageKnownSpellList = []
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	spelltype = IE_SPELL_TYPE_WIZARD
@@ -88,10 +84,9 @@ def UpdateMageWindow (Window=None):
 				Icon.OnPress (OpenMageSpellUnmemorizeWindow)
 			else:
 				Icon.OnPress (OnMageUnmemorizeSpell)
-			Icon.OnRightPress (OpenMageSpellInfoWindow)
 			spell = GemRB.GetSpell (ms['SpellResRef'])
+			Icon.OnRightPress (BindControlCallbackParams(OpenMageSpellInfoWindow, spell))
 			Icon.SetTooltip (spell['SpellName'])
-			MageMemorizedSpellList.append (ms['SpellResRef'])
 			Icon.EnableBorder (0, ms['Flags'] == 0)
 		else:
 			if i < max_mem_cnt:
@@ -116,10 +111,9 @@ def UpdateMageWindow (Window=None):
 		Icon.SetSpellIcon (ks['SpellResRef'])
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Icon.OnPress (OnMageMemorizeSpell)
-		Icon.OnRightPress (OpenMageSpellInfoWindow)
 		spell = GemRB.GetSpell (ks['SpellResRef'])
+		Icon.OnRightPress (BindControlCallbackParams(OpenMageSpellInfoWindow, spell))
 		Icon.SetTooltip (spell['SpellName'])
-		MageKnownSpellList.append (ks['SpellResRef'])
 
 	if known_cnt == 0: i = -1
 	for i in range (i + 1, btncount):
@@ -148,27 +142,19 @@ def MageNextLevelPress ():
 		MageSpellLevel = MageSpellLevel + 1
 		UpdateMageWindow ()
 
-def OpenMageSpellInfoWindow ():
-	Window = GemRB.LoadWindow (4)
+def OpenMageSpellInfoWindow (spell):
+	Window = GemRB.LoadWindow (4, "GUIMG")
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
 	Button.OnPress (Window.Close)
-
-	index = GemRB.GetVar ("SpellButton")
-	if index < 100:
-		ResRef = MageMemorizedSpellList[index]
-	else:
-		ResRef = MageKnownSpellList[index - 100]
-
-	spell = GemRB.GetSpell (ResRef)
 
 	Label = Window.GetControl (0x0fffffff)
 	Label.SetText (spell['SpellName'])
 	Label.SetFlags(IE_GUI_LABEL_USE_COLOR, OP_OR)
 
 	Icon = Window.GetControl (1)
-	Icon.SetSpellIcon (ResRef)
+	Icon.SetSpellIcon (spell['SpellResRef'])
 
 	Text = Window.GetControl (2)
 	Text.SetText (spell['SpellDesc'])
@@ -181,21 +167,19 @@ def OpenMageSpellInfoWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
-def OnMageMemorizeSpell ():
+def OnMageMemorizeSpell (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
-	index = GemRB.GetVar ("SpellButton") - 100
-
-	if GemRB.MemorizeSpell (pc, spelltype, level, index):
+	if GemRB.MemorizeSpell (pc, spelltype, level, btn.Value):
 		UpdateMageWindow ()
 
 	# FIXME: use FLASH.bam
 
 
 def OpenMageSpellUnmemorizeWindow (btn):
-	Window = GemRB.LoadWindow (6)
+	Window = GemRB.LoadWindow (6, "GUIMG")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (2)

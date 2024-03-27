@@ -1190,10 +1190,10 @@ String GameControl::TooltipText() const {
 	return tip;
 }
 
-Holder<Sprite2D> GameControl::GetTargetActionCursor() const
+Holder<Sprite2D> GameControl::GetTargetActionCursor(TargetMode mode)
 {
 	int curIdx = -1;
-	switch (targetMode) {
+	switch (mode) {
 		case TargetMode::Talk:
 			curIdx = IE_CURSOR_TALK;
 			break;
@@ -2058,9 +2058,7 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 	switch(me.button) {
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GFFlags::HAS_FLOAT_MENU) && !Mod) {
-			ScriptEngine::FunctionParameters params;
-			params.push_back(ScriptEngine::Parameter(p));
-			core->GetGUIScriptEngine()->RunFunction("GUICommon", "OpenFloatMenuWindow", params, false);
+			core->GetGUIScriptEngine()->RunFunction("GUICommon", "OpenFloatMenuWindow", p, false);
 		} else {
 			TryDefaultTalk();
 		}
@@ -2341,9 +2339,9 @@ bool GameControl::OnControllerButtonDown(const ControllerEvent& ce)
 {
 	switch (ce.button) {
 		case CONTROLLER_BUTTON_Y:
-			return core->GetGUIScriptEngine()->RunFunction("GUIINV", "ToggleInventoryWindow", false);
+			return !core->GetGUIScriptEngine()->RunFunction("GUIINV", "ToggleInventoryWindow", false).IsNull();
 		case CONTROLLER_BUTTON_X:
-			return core->GetGUIScriptEngine()->RunFunction("GUIMA", "ToggleMapWindow", false);
+			return !core->GetGUIScriptEngine()->RunFunction("GUIMA", "ToggleMapWindow", false).IsNull();
 		case CONTROLLER_BUTTON_BACK:
 			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
 			return true;
@@ -2474,9 +2472,12 @@ void GameControl::PerformActionOn(Actor *actor)
 }
 
 //sets target mode, and resets the cursor
-void GameControl::SetTargetMode(TargetMode mode)
-{
+void GameControl::SetTargetMode(TargetMode mode) {
 	targetMode = mode;
+	Window* win = GemRB::GetWindow(0, "PORTWIN");
+	if (win) {
+		win->SetCursor(GetTargetActionCursor(mode));
+	}
 }
 
 void GameControl::ResetTargetMode() {

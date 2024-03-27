@@ -86,7 +86,7 @@ def OnLoad ():
 
 def ScrollBarPress ():
 	#draw load game portraits
-	Pos = GemRB.GetVar ("TopIndex")
+	Pos = GemRB.GetVar ("TopIndex") or 0
 	for i in range (4):
 		ActPos = Pos + i
 
@@ -162,7 +162,7 @@ def DeleteGameCancel ():
 def DeleteGamePress ():
 	global ConfirmWindow
 
-	ConfirmWindow=GemRB.LoadWindow (1)
+	ConfirmWindow=GemRB.LoadWindow (1, "GUILOAD")
 	ConfirmWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 
 	Text=ConfirmWindow.GetControl (0)

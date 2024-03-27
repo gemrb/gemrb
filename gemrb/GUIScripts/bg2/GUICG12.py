@@ -197,7 +197,7 @@ def CustomPress():
 	global RowCount1, RowCount2
 	global CustomWindow
 
-	CustomWindow = Window = GemRB.LoadWindow (18)
+	CustomWindow = Window = GemRB.LoadWindow (18, "GUICG")
 	PortraitList1 = Window.GetControl (2)
 	RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 1))
 	PortraitList1.OnSelect (LargeCustomPortrait)

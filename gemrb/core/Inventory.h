@@ -250,9 +250,9 @@ public:
 	int AddSlotItem(CREItem* item, int slot, int slottype = -1, bool ranged = false);
 	/** tries to equip all inventory items in a given slot */
 	void TryEquipAll(int slot);
-	/** Adds STOItem to the inventory, it is never wielded, action might be STA_STEAL or STA_BUY */
+	/** Adds STOItem to the inventory, it is never wielded, action might be STEAL or BUY */
 	/** The amount of items is stored in PurchasedAmount */
-	int AddStoreItem(STOItem* item, int action);
+	int AddStoreItem(STOItem* item, StoreActionType action);
 
 	/** flags: see ieCREItemFlagBits */
 	/** count == ~0 means to destroy all */
