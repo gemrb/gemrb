@@ -40,7 +40,7 @@ class GEM_EXPORT Targets {
 public:
 	Targets() noexcept {};
 
-	int Count() const;
+	size_t Count() const;
 	targettype* RemoveTargetAt(targetlist::iterator& m);
 	const targettype* GetNextTarget(targetlist::iterator& m, ScriptableType type);
 	const targettype* GetLastTarget(ScriptableType type);

@@ -438,7 +438,7 @@ int GetObjectCount(Scriptable *Sender, const Object *oC)
 	Targets* tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0);
 	int count = 0; // silly fallback to avoid potential crashes
 	if (tgts) {
-		count = tgts->Count();
+		count = static_cast<int>(tgts->Count());
 		delete tgts;
 	}
 	return count;

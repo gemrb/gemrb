@@ -27,9 +27,9 @@
 
 namespace GemRB {
 
-int Targets::Count() const
+size_t Targets::Count() const
 {
-	return (int) objects.size();
+	return objects.size();
 }
 
 targettype* Targets::RemoveTargetAt(targetlist::iterator& m)

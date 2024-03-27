@@ -7437,7 +7437,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 			// no enemy to jump to
 			return FX_NOT_APPLIED;
 		}
-		int rnd = core->Roll(1,tgts->Count(),-1);
+		unsigned int rnd = RAND<unsigned int>(1, tgts->Count()) - 1;
 		const Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
 		delete tgts;
 		if (victim && PersonalDistance(victim, target)>20) {
