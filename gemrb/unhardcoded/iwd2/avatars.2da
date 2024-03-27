@@ -379,14 +379,14 @@
 0xEA00     MSHR       MSHR       MSHR       MSHR       9          2          1          *
 0xEBB1     MSHR       MSHR       MSHR       MSHR       9          2          1          *
 0xEBF1     MARU       MARU       MARU       MARU       9          2          1          *
-0xEA10     MSH1       MSH1       MSH1       MSH1       9          2          1          *
+0xEA10     MCRD       MCRD       MCRD       MCRD       9          2          1          *
 0xE908     MSH1       MSH1       MSH1       MSH1       9          2          1          *
 0xEA20     MCRD       MCRD       MCRD       MCRD       9          2          1          *
 0xEB00     MSKT       MSKT       MSKT       MSKT       9          2          1          *
 0xF019     MSKT       MSKT       MSKT       MSKT       9          2          1          *
 0xEB10     MSKA       MSKA       MSKA       MSKA       9          2          1          *
-0xEB18     MANI       MANI       MANI       MANI       9          2          1          *
-0xEB28     MAN2       MAN2       MAN2       MAN2       9          2          1          *
+0xEB18     MAN2       MAN2       MAN2       MAN2       9          2          1          *
+0xEB28     MAN3       MAN3       MAN3       MAN3       9          2          1          *
 0xEB39     MBE1       MBE1       MBE1       MBE1       9          2          1          *
 0xEB49     MBE2       MBE2       MBE2       MBE2       9          2          1          *
 0xEB79     MLER       MLER       MLER       MLER       9          2          1          *
