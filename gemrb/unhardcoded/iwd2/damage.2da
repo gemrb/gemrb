@@ -14,6 +14,9 @@ SPARKL     ElectrH    ElectrL    -1        1
 ICES       COLDH      COLDL      -1        1
 ICEM       COLDH      COLDL      -1        1
 ICEL       COLDH      COLDL      -1        1
-ACIDS      ACIDH      ACIDTH     -1        1
-ACIDM      ACIDH      ACIDTH     -1        1
-ACIDL      ACIDH      ACIDTH     -1        1
+ACIDS      ACIDH      ACIDDTH    -1        1
+ACIDM      ACIDH      ACIDDTH    -1        1
+ACIDL      ACIDH      ACIDDTH    -1        1
+# looks like disin, divin might also be present as types
+# add them here and in Actor::PlayDamageType if spells
+# don't do it themselves
