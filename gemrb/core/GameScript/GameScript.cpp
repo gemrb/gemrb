@@ -1330,22 +1330,22 @@ targettype *Targets::RemoveTargetAt(targetlist::iterator &m)
 	return NULL;
 }
 
-const targettype *Targets::GetLastTarget(int Type)
+const targettype* Targets::GetLastTarget(ScriptableType type)
 {
 	targetlist::const_iterator m = objects.end();
 	while (m--!=objects.begin() ) {
-		if (Type == -1 || (*m).actor->Type == Type) {
+		if (type == ST_ANY || (*m).actor->Type == type) {
 			return &(*m);
 		}
 	}
 	return nullptr;
 }
 
-const targettype *Targets::GetFirstTarget(targetlist::iterator &m, int Type)
+const targettype* Targets::GetFirstTarget(targetlist::iterator& m, ScriptableType type)
 {
 	m=objects.begin();
 	while (m!=objects.end() ) {
-		if (Type != -1 && (*m).actor->Type != Type) {
+		if (type != ST_ANY && (*m).actor->Type != type) {
 			m++;
 			continue;
 		}
@@ -1354,11 +1354,11 @@ const targettype *Targets::GetFirstTarget(targetlist::iterator &m, int Type)
 	return NULL;
 }
 
-const targettype *Targets::GetNextTarget(targetlist::iterator &m, int Type)
+const targettype* Targets::GetNextTarget(targetlist::iterator& m, ScriptableType type)
 {
 	m++;
 	while (m!=objects.end() ) {
-		if (Type != -1 && (*m).actor->Type != Type) {
+		if (type != ST_ANY && (*m).actor->Type != type) {
 			m++;
 			continue;
 		}
@@ -1367,11 +1367,11 @@ const targettype *Targets::GetNextTarget(targetlist::iterator &m, int Type)
 	return NULL;
 }
 
-Scriptable *Targets::GetTarget(unsigned int index, int Type)
+Scriptable* Targets::GetTarget(unsigned int index, ScriptableType type)
 {
 	targetlist::iterator m = objects.begin();
 	while(m!=objects.end() ) {
-		if (Type == -1 || (*m).actor->Type == Type) {
+		if (type == ST_ANY || (*m).actor->Type == type) {
 			if (!index) {
 				return (*m).actor;
 			}

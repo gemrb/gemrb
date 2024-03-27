@@ -116,10 +116,10 @@ public:
 	int Count() const;
 	void dump() const;
 	targettype *RemoveTargetAt(targetlist::iterator &m);
-	const targettype *GetNextTarget(targetlist::iterator &m, int Type);
-	const targettype *GetLastTarget(int Type);
-	const targettype *GetFirstTarget(targetlist::iterator &m, int Type);
-	Scriptable *GetTarget(unsigned int index, int Type);
+	const targettype* GetNextTarget(targetlist::iterator& m, ScriptableType type);
+	const targettype* GetLastTarget(ScriptableType type);
+	const targettype* GetFirstTarget(targetlist::iterator& m, ScriptableType type);
+	Scriptable* GetTarget(unsigned int index, ScriptableType type);
 	void AddTarget(Scriptable* target, unsigned int distance, int flags);
 	void Clear();
 	void FilterObjectRect(const Object *oC);

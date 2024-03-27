@@ -137,7 +137,7 @@ class Sprite2D;
 #define MAX_RAND_WALK 10
 
 using ScriptableType = enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
-	ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 };
+	ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7, ST_ANY = 8 };
 
 enum {
 	trigger_acquired = 0x1, // unused and broken in the original

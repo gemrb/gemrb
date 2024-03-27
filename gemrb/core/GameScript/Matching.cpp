@@ -319,7 +319,7 @@ Scriptable *GetScriptableFromObject(Scriptable *Sender, const Object *oC, int ga
 	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, ga_flags);
 	if (tgts) {
 		//now this could return other than actor objects
-		aC = tgts->GetTarget(0,-1);
+		aC = tgts->GetTarget(0, ST_ANY);
 		delete tgts;
 		if (aC || !oC || oC->objectFields[0]!=-1) {
 			return aC;
@@ -491,7 +491,7 @@ Targets *GetMyTarget(const Scriptable *Sender, const Actor *actor, Targets *para
 Targets *XthNearestDoor(Targets *parameters, unsigned int count)
 {
 	//get the origin
-	Scriptable *origin = parameters->GetTarget(0, -1);
+	Scriptable* origin = parameters->GetTarget(0, ST_ANY);
 	parameters->Clear();
 	if (!origin) {
 		return parameters;

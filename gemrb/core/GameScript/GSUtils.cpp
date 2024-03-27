@@ -1052,6 +1052,8 @@ static void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 		case ST_DOOR: case ST_CONTAINER:
 			position = static_cast<Highlightable*>(scr)->TrapLaunch;
 			break;
+		default: // ST_ANY
+			break;
 	}
 }
 
@@ -1080,6 +1082,8 @@ void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest
 		// intentional fallthrough
 		case ST_DOOR: case ST_CONTAINER:
 			position = static_cast<const Highlightable*>(scr)->TrapLaunch;
+		default: // ST_ANY
+			break;
 	}
 }
 

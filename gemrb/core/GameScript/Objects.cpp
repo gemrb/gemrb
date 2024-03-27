@@ -147,7 +147,7 @@ Targets *GameScript::Gabber(const Scriptable */*Sender*/, Targets *parameters, i
 
 Targets *GameScript::LastTrigger(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	Scriptable *target = parameters->GetTarget(0, -1);
+	Scriptable* target = parameters->GetTarget(0, ST_ANY);
 	parameters->Clear();
 	if (target) {
 		target = Sender->GetCurrentArea()->GetActorByGlobalID(target->objects.LastTrigger);
@@ -315,7 +315,7 @@ Targets *GameScript::LastCommandedBy(const Scriptable *Sender, Targets *paramete
 
 Targets* GameScript::LastKilled(const Scriptable* Sender, Targets* parameters, int gaFlags)
 {
-	const Scriptable* actor = parameters->GetTarget(0, -1);
+	const Scriptable* actor = parameters->GetTarget(0, ST_ANY);
 	if (!actor) {
 		actor = Sender;
 	}
@@ -333,7 +333,7 @@ Targets* GameScript::LastKilled(const Scriptable* Sender, Targets* parameters, i
 // but IWD2 defines it
 Targets *GameScript::MyTarget(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Scriptable *actor = parameters->GetTarget(0, -1);
+	const Scriptable* actor = parameters->GetTarget(0, ST_ANY);
 	if (!actor) {
 		actor = Sender;
 	}
