@@ -25,6 +25,8 @@
 
 #include "Debug.h"
 #include "SymbolMgr.h"
+
+#include "GameScript/Targets.h"
 #include "Scriptable/Actor.h"
 #include "Streams/DataStream.h"
 
@@ -100,30 +102,6 @@ enum class EscapeArea {
 
 using StringParam = FixedSizeString<64, strnicmp>;
 static_assert(std::is_standard_layout<StringParam>::value, "Fixed Size String must be standard layout for use in unions");
-
-struct targettype {
-	Scriptable *actor; //hmm, could be door
-	unsigned int distance;
-};
-
-using targetlist = std::list<targettype>;
-
-class GEM_EXPORT Targets {
-	targetlist objects;
-public:
-	Targets() noexcept {};
-	
-	int Count() const;
-	void dump() const;
-	targettype *RemoveTargetAt(targetlist::iterator &m);
-	const targettype* GetNextTarget(targetlist::iterator& m, ScriptableType type);
-	const targettype* GetLastTarget(ScriptableType type);
-	const targettype* GetFirstTarget(targetlist::iterator& m, ScriptableType type);
-	Scriptable* GetTarget(unsigned int index, ScriptableType type);
-	void AddTarget(Scriptable* target, unsigned int distance, int flags);
-	void Clear();
-	void FilterObjectRect(const Object *oC);
-};
 
 class Canary {
 private:
