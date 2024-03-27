@@ -71,6 +71,7 @@ FUNCTION(CONFIGURE_COMPILER)
 		# Fast math helps us covering some things that need a little more rework soon
 		ADD_FLAG_IF_SUPPORTED(FLAG "-ffast-math")
 		ADD_FLAG_IF_SUPPORTED(FLAG "-frounding-math")
+		ADD_FLAG_IF_SUPPORTED(FLAG "-fno-strict-aliasing")
 
 		IF(WIN32)
 			# GCC 4.5.0+ has shared libstdc++ without dllimport
