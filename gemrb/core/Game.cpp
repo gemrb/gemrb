@@ -1552,18 +1552,43 @@ void Game::UpdateScripts()
 		Maps[idx]->UpdateScripts();
 	}
 
+	// determine if we should start some music
+	bool doChangeSong;
+	bool doChangeSongHard;
+
 	if (PartyAttack) {
 		//ChangeSong will set the battlesong only if CombatCounter is nonzero
-		CombatCounter=150;
-		ChangeSong(false, true);
-	} else {
-		if (CombatCounter) {
-			CombatCounter--;
-			//Change song if combatcounter went down to 0
-			if (!CombatCounter) {
-				ChangeSong(false, false);
-			}
+		CombatCounter = 150;
+		doChangeSong = true;
+		doChangeSongHard = true;
+	} else if (CombatCounter) {
+		//Change song if combatcounter goes down to 0
+		CombatCounter--;
+		doChangeSong = !CombatCounter;
+		doChangeSongHard = false;
+	} else if (!core->GetMusicMgr()->IsPlaying()) {
+		// perhaps a StartMusic action stopped the area music?
+		// (we should probably find a less silly way to handle this,
+		// because nothing can ever stop area music now..)
+
+		// Call ChangeSong only once per round in order to prevent spam
+		// calls every tick in areas without music.
+		static int ticks = 0;
+		ticks++;
+
+		doChangeSong = ticks >= core->Time.round_size;
+		doChangeSongHard = false;
+
+		if (doChangeSong) {
+			ticks = 0;
 		}
+	} else {
+		// nothing to change
+		doChangeSong = false;
+		doChangeSongHard = false;
+	}
+	if (doChangeSong) {
+		ChangeSong(false, doChangeSongHard);
 	}
 
 	if (StateOverrideTime)
@@ -1578,13 +1603,6 @@ void Game::UpdateScripts()
 		for(unsigned int i=0;i<idx;i++) {
 			DelMap(i, false);
 		}
-	}
-
-	// perhaps a StartMusic action stopped the area music?
-	// (we should probably find a less silly way to handle this,
-	// because nothing can ever stop area music now..)
-	if (!core->GetMusicMgr()->IsPlaying()) {
-		ChangeSong(false,false);
 	}
 
 	//this is used only for the death delay so far
@@ -2158,10 +2176,9 @@ void Game::ChangeSong(bool always, bool force) const
 		BattleSong++;
 	} else {
 		//will select SONG_DAY or SONG_NIGHT
-		Trigger* parameters = new Trigger;
-		parameters->int0Parameter = 0; // TIMEOFDAY_DAY, while dusk, dawn and night we treat as night
-		Song = int(GameScript::TimeOfDay(nullptr, parameters) != 1);
-		delete parameters;
+		Trigger parameters;
+		parameters.int0Parameter = 0; // TIMEOFDAY_DAY, while dusk, dawn and night we treat as night
+		Song = int(GameScript::TimeOfDay(nullptr, &parameters) != 1);
 		BattleSong = 0;
 	}
 	//area may override the song played (stick in battlemusic)
