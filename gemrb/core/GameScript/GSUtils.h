@@ -22,6 +22,7 @@
 
 #include "Cache.h"
 #include "GameScript/GameScript.h"
+#include "GameScript/Targets.h"
 #include "GUI/EventMgr.h"
 #include "SrcMgr.h"
 

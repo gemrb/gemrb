@@ -21,6 +21,7 @@
 #define MATCHING_H
 
 #include "GameScript/GameScript.h"
+#include "GameScript/Targets.h"
 
 #include "exports.h"
 

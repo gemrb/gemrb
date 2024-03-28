@@ -22,6 +22,7 @@
 
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
+#include "GameScript/Targets.h"
 
 #include "voodooconst.h"
 

@@ -43,6 +43,7 @@
 #include "damages.h"
 #include "GameScript/GSUtils.h" //needs for MoveBetweenAreasCore
 #include "GameScript/Matching.h" //needs for GetAllObjects
+#include "GameScript/Targets.h" // fx_teleport_to_target
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 #include "Scriptable/Container.h"
