@@ -433,15 +433,26 @@ Targets *GameScript::LastSummonerOf(const Scriptable *Sender, Targets *parameter
 	return parameters;
 }
 
-inline Targets *PlayerX(Targets *parameters, int ga_flags, unsigned int slot, bool fill = false)
+// PlayerN is usually filled based on join-order
+//   if a pc left the party, PlayerN will be invalid for them
+//   actors joining the party fill the first available PlayerN, not necessarily max + 1
+// PlayerNFill (our InParty) is PlayerN, but just with valid entries
+//   On a game load PlayerNFill entries will replace PlayerN ones
+// The two are usually the same, so we don't bother with maintaining a sparse list
+// PartySlotN is the actual portrait order, which was also set/reset in JoinParty/LeaveParty
+inline Targets* PlayerX(Targets* parameters, int ga_flags, unsigned int slot, int mode = 0)
 {
 	parameters->Clear();
 	Actor *pc;
-	// some EE testing suggests the fill objects are identical to nonfill one, since it introduced partyslotN as well
-	// if that is true and becomes important, add another case here and break the aliasing of partyslot1 -> player1fill ...
-	if (fill) {
+	if (mode == 1) {
+		// PlayerNFill
 		pc = core->GetGame()->FindPC(slot + 1);
+	} else if (mode == 2) {
+		// PartySlotN
+		slot = core->GetDictionary().Get("portrait", slot + 1);
+		pc = core->GetGame()->GetPC(slot - 1, false);
 	} else {
+		// PlayerN
 		pc = core->GetGame()->GetPC(slot, false);
 	}
 	parameters->AddTarget(pc, 0, ga_flags);
@@ -455,7 +466,7 @@ Targets *GameScript::Player1(const Scriptable */*Sender*/, Targets *parameters, 
 
 Targets *GameScript::Player1Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	return PlayerX(parameters, ga_flags, 0, true);
+	return PlayerX(parameters, ga_flags, 0, 1);
 }
 
 Targets *GameScript::Player2(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
@@ -465,7 +476,7 @@ Targets *GameScript::Player2(const Scriptable */*Sender*/, Targets *parameters, 
 
 Targets *GameScript::Player2Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	return PlayerX(parameters, ga_flags, 1, true);
+	return PlayerX(parameters, ga_flags, 1, 1);
 }
 
 Targets *GameScript::Player3(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
@@ -475,7 +486,7 @@ Targets *GameScript::Player3(const Scriptable */*Sender*/, Targets *parameters, 
 
 Targets *GameScript::Player3Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	return PlayerX(parameters, ga_flags, 2, true);
+	return PlayerX(parameters, ga_flags, 2, 1);
 }
 
 Targets *GameScript::Player4(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
@@ -485,7 +496,7 @@ Targets *GameScript::Player4(const Scriptable */*Sender*/, Targets *parameters, 
 
 Targets *GameScript::Player4Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	return PlayerX(parameters, ga_flags, 3, true);
+	return PlayerX(parameters, ga_flags, 3, 1);
 }
 
 Targets *GameScript::Player5(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
@@ -495,7 +506,7 @@ Targets *GameScript::Player5(const Scriptable */*Sender*/, Targets *parameters, 
 
 Targets *GameScript::Player5Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	return PlayerX(parameters, ga_flags, 4, true);
+	return PlayerX(parameters, ga_flags, 4, 1);
 }
 
 Targets *GameScript::Player6(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
@@ -505,7 +516,7 @@ Targets *GameScript::Player6(const Scriptable */*Sender*/, Targets *parameters, 
 
 Targets *GameScript::Player6Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	return PlayerX(parameters, ga_flags, 5, true);
+	return PlayerX(parameters, ga_flags, 5, 1);
 }
 
 Targets *GameScript::Player7(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
@@ -515,7 +526,7 @@ Targets *GameScript::Player7(const Scriptable */*Sender*/, Targets *parameters, 
 
 Targets *GameScript::Player7Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	return PlayerX(parameters, ga_flags, 6, true);
+	return PlayerX(parameters, ga_flags, 6, 1);
 }
 
 Targets *GameScript::Player8(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
@@ -525,7 +536,7 @@ Targets *GameScript::Player8(const Scriptable */*Sender*/, Targets *parameters, 
 
 Targets *GameScript::Player8Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	return PlayerX(parameters, ga_flags, 7, true);
+	return PlayerX(parameters, ga_flags, 7, 1);
 }
 
 Targets *GameScript::Player9(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
@@ -535,7 +546,7 @@ Targets *GameScript::Player9(const Scriptable */*Sender*/, Targets *parameters, 
 
 Targets *GameScript::Player9Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	return PlayerX(parameters, ga_flags, 8, true);
+	return PlayerX(parameters, ga_flags, 8, 1);
 }
 
 Targets *GameScript::Player10(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
@@ -545,7 +556,57 @@ Targets *GameScript::Player10(const Scriptable */*Sender*/, Targets *parameters,
 
 Targets *GameScript::Player10Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	return PlayerX(parameters, ga_flags, 9, true);
+	return PlayerX(parameters, ga_flags, 9, 1);
+}
+
+Targets* GameScript::PartySlot1(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return PlayerX(parameters, gaFlags, 0, 2);
+}
+
+Targets* GameScript::PartySlot2(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return PlayerX(parameters, gaFlags, 1, 2);
+}
+
+Targets* GameScript::PartySlot3(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return PlayerX(parameters, gaFlags, 2, 2);
+}
+
+Targets* GameScript::PartySlot4(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return PlayerX(parameters, gaFlags, 3, 2);
+}
+
+Targets* GameScript::PartySlot5(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return PlayerX(parameters, gaFlags, 4, 2);
+}
+
+Targets* GameScript::PartySlot6(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return PlayerX(parameters, gaFlags, 5, 2);
+}
+
+Targets* GameScript::PartySlot7(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return PlayerX(parameters, gaFlags, 6, 2);
+}
+
+Targets* GameScript::PartySlot8(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return PlayerX(parameters, gaFlags, 7, 2);
+}
+
+Targets* GameScript::PartySlot9(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return PlayerX(parameters, gaFlags, 8, 2);
+}
+
+Targets* GameScript::PartySlot10(const Scriptable* /*Sender*/, Targets* parameters, int gaFlags)
+{
+	return PlayerX(parameters, gaFlags, 9, 2);
 }
 
 //This filter works only on the Party - silly restriction, but the dataset expects this
