@@ -4126,8 +4126,29 @@ static void ChunkActor(Actor* actor)
 	if (!gore) return;
 
 	actor->ClearCurrentStanceAnims(); // perhaps this should be done on all SetAnimationID calls instead
+	Map* map = actor->GetCurrentArea();
+	if (!map->IsVisible(actor->Pos)) return; // protect against ctrl-shift-y
+
 	// TODO: play chunky animation / particles #128
-	actor->SetAnimationID(0x230); // EXPLODING_TORSO
+	// for now fake a fountain by spawning more actors to explode
+	actor->SetAnimationID(0x220);
+	static EffectRef fx_remove_creature_ref = { "RemoveCreature", -1 };
+	constexpr std::array<int, 7> bodyParts = { 0x200, 0x200, 0x210, 0x220, 0x230, 0x240, 0x240 };
+	for (auto animID : bodyParts) {
+		Actor* copy = actor->CopySelf(true);
+		map->ClearSearchMapFor(copy);
+		copy->SetStance(IE_ANI_TWITCH); // force only one loop of the animation
+		copy->SetAnimationID(animID);
+		copy->SetBase(IE_DONOTJUMP, DNJ_UNHINDERED);
+		copy->MoveTo(actor->Pos + OrientedOffset(RandomOrientation(), RAND(5, 40)));
+		copy->SetBase(IE_DONOTJUMP, 0); // revert, so we get occlusion
+		// make it expire
+		copy->SetInternalFlag(IF_REALLYDIED, BitOp::OR);
+		Effect* fx = EffectQueue::CreateEffect(fx_remove_creature_ref, 0, 0, FX_DURATION_DELAY_PERMANENT);
+		fx->Target = FX_TARGET_SELF;
+		fx->Duration = core->GetGame()->GameTime + core->Time.round_size / 2 + RAND(-30, 30);
+		copy->fxqueue.AddEffect(fx, true);
+	}
 }
 
 //returns actual damage
