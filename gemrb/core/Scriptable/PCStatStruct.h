@@ -134,8 +134,6 @@ public:
 	std::array<ieByte, GUIBT_COUNT> QSlots {0xff, 0};          			//iwd2 specific
 	std::array<ieByte, MAX_QSLOTS> QuickSpellBookType {0xff};
 	StateArray States;
-	ieDword   LastLeft = 0;   //trigger
-	ieDword   LastJoined = 0; //trigger
 	std::array<ieDword, MAX_INTERACT> Interact {0};
 	ieWordSigned Happiness = 0;
 private:

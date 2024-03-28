@@ -6356,8 +6356,6 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		newstats.AwayTime = oldstats.AwayTime;
 		newstats.unknown10 = oldstats.unknown10;
 		newstats.Happiness = oldstats.Happiness;
-		newstats.LastLeft = oldstats.LastLeft;
-		newstats.LastJoined = oldstats.LastJoined;
 		newstats.SoundFolder = oldstats.SoundFolder;
 		newstats.States = oldstats.States;
 		

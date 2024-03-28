@@ -361,9 +361,7 @@ int Game::LeaveParty(Actor* actor, bool returnCriticalItems)
 		SelectActor(PCs[0], true, SELECT_NORMAL);
 	}
 
-	ieDword id = actor->GetGlobalID();
 	for (const auto& pc : PCs) {
-		pc->PCStats->LastLeft = id;
 		if (pc->InParty>actor->InParty) {
 			pc->InParty--;
 		}
@@ -474,14 +472,7 @@ int Game::JoinParty(Actor* actor, int join)
 			}
 		}
 
-		//set the lastjoined trigger
-		if (size) {
-			ieDword id = actor->GetGlobalID();
-			for (size_t i=0;i<size; i++) {
-				Actor *a = GetPC(i, false);
-				a->PCStats->LastJoined = id;
-			}
-		} else {
+		if (!size) {
 			Reputation = actor->GetStat(IE_REPUTATION);
 		}
 		AddTrigger(TriggerEntry(trigger_joins, actor->GetGlobalID()));
