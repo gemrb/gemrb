@@ -285,7 +285,26 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->features.size()) {
-		pro->SetEffects(GetEffectBlock(self, target, header, level, seh->ProjectileAnimation));
+		EffectQueue fxqueue = GetEffectBlock(self, target, header, level, seh->ProjectileAnimation);
+		pro->SetEffects(std::move(fxqueue));
+	}
+	if (seh->ProjectileAnimation == 108 && pro->Extension && pro->ExtFlags & PEF_LINE) {
+		// fix hardcoded iwd scorcher having no damage payload; supposedly caused
+		// 3-18 points of fire damage to the target, no save, while anyone in the flame's
+		// path took 2-16, but they are allowed a save for half
+		// we just do 3d6 with a save to everyone
+		EffectQueue& fxqueue = pro->GetEffects();
+		static EffectRef dmgRef = { "Damage", -1 };
+		EffectQueue::ResolveEffect(dmgRef);
+		if (!fxqueue.HasEffect(dmgRef)) {
+			Effect* fx = EffectQueue::CreateEffect(dmgRef, 0, 0x80000, FX_DURATION_INSTANT_PERMANENT);
+			fx->DiceThrown = 3;
+			fx->DiceSides = 6;
+			fx->SavingThrowType = core->HasFeature(GFFlags::RULES_3ED) ? 8 : 1;
+			fx->IsSaveForHalfDamage = 1;
+			fx->Target = FX_TARGET_PRESET;
+			fxqueue.AddEffect(fx);
+		}
 	}
 	pro->Range = GetCastingDistance(self);
 	pro->form = seh->SpellForm;
