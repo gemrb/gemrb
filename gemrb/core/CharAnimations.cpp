@@ -1306,7 +1306,11 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_FRAGMENT:
-			Cycle = SixteenToFive[Orient];
+			if ((GetAnimationID() & 0xf200) == 0x0200) {
+				Cycle = (GetAnimationID() - 0x200) / 0x10;
+			} else {
+				Cycle = SixteenToFive[Orient];
+			}
 			break;
 
 		case IE_ANI_ONE_FILE:
