@@ -272,6 +272,7 @@ private:
 	int Level = 0;         // the caster's level
 	ieDword Target = 0;    // the globalID of target actor
 	ieDword FakeTarget = 0; // a globalID for target that isn't followed
+	std::map<ieDword, uint32_t> lineTargets; // a list of PEF_LINE targets
 	ProjectileState state = ProjectileState::NEW;
 	//saved in area
 	ResRef projectileName; // used also for namesake externalized spells
@@ -445,8 +446,8 @@ private:
 	//drop a BAM or VVC on the trail path, return the length of the animation
 	int AddTrail(const ResRef& BAM, const ieByte *pal) const;
 	ProjectileState DoStep();
-	void LineTarget() const;      //line projectiles (walls, scorchers)
-	void LineTarget(Path::const_iterator beg, Path::const_iterator end) const;
+	void LineTarget(); // line projectiles (walls, scorchers)
+	void LineTarget(Path::const_iterator beg, Path::const_iterator end);
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	ProjectileState CheckTrigger(unsigned int radius);
 	//calculate target and destination points for a firewall
@@ -474,6 +475,7 @@ private:
 
 	Actor *GetTarget();
 	void NextTarget(const Point &p);
+	bool HasBeenHitRecently(ieDword targetID, uint32_t time) const;
 	void SetupPalette(const AnimArray&, Holder<Palette> &pal, const ieByte *gradients) const;
 
 	void Draw(const Holder<Sprite2D>& spr, const Point& p,

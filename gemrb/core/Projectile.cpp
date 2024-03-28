@@ -1011,12 +1011,27 @@ void Projectile::SetEffectsCopy(const EffectQueue& eq, const Point &source)
 	effects.ModifyAllEffectSources(source);
 }
 
-void Projectile::LineTarget() const
+// in-line hits are throttled
+bool Projectile::HasBeenHitRecently(ieDword targetID, uint32_t time) const
+{
+	// not relevant
+	if (!(ExtFlags & PEF_LINE)) return false;
+
+	auto targeted = lineTargets.find(targetID);
+	if (targeted == lineTargets.end()) {
+		// not hit
+		return false;
+	}
+	// hit recently?
+	return targeted->second + Extension->Delay / 2 > time;
+}
+
+void Projectile::LineTarget()
 {
 	LineTarget(path.begin(), path.end());
 }
 
-void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end) const
+void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end)
 {
 	if (!effects) {
 		return;
@@ -1024,6 +1039,7 @@ void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end) 
 
 	Actor *original = area->GetActorByGlobalID(Caster);
 	int targetFlags = CalculateTargetFlag();
+	uint32_t time = core->GetGame()->GameTime;
 	auto iter = beg;
 
 	do {
@@ -1040,12 +1056,15 @@ void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end) 
 		const std::vector<Actor *> &actors = area->GetAllActors();
 
 		for (Actor *target : actors) {
-			if (target->GetGlobalID() == Caster) {
+			ieDword targetID = target->GetGlobalID();
+			if (targetID == Caster) {
 				continue;
 			}
 			if (!target->ValidTarget(targetFlags)) {
 				continue;
 			}
+			if (HasBeenHitRecently(targetID, time)) continue;
+
 			float_t t = 0.0;
 			if (PersonalLineDistance(s, d, target, &t) > 1) {
 				continue;
@@ -1068,6 +1087,12 @@ void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end) 
 				}
 
 				eff.AddAllEffects(target, target->Pos);
+				auto targeted = lineTargets.find(targetID);
+				if (targeted != lineTargets.end()) {
+					targeted->second = time;
+				} else {
+					lineTargets.emplace(targetID, time);
+				}
 			}
 		}
 	} while (iter != end);
@@ -1606,6 +1631,13 @@ Projectile::ProjectileState Projectile::GetNextExplosionState() {
 	//Delay explosion, it could even be revoked with PAF_SYNC (see skull trap)
 	if (extensionDelay) {
 		extensionDelay--;
+		// proper scorchers hit at the start then have a delayed hit at the end
+		// but also anyone else that walks into them gets hit once or twice if unlucky
+		// this enables use in a fanning motion/AOE if the caster can move (bg2, not HoW)
+		// slightly throttle calls for efficiency
+		if (ExtFlags & PEF_LINE && core->GetGame()->GameTime % 5 == 0) {
+			LineTarget();
+		}
 		return state;
 	}
 
