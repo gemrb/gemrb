@@ -1051,7 +1051,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, JournalSection section, ieByte group
 		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 			core->GetGameControl()->SetDisplayText(HCStrings::JournalChange, 30);
 		} else {
-			displaymsg->DisplayMarkupString(msg);
+			displaymsg->DisplayMarkupString(std::move(msg));
 		}
 	}
 	// pst/bg2 also has a sound attached to the base string, so play it manually
