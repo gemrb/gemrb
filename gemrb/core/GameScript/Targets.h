@@ -27,6 +27,9 @@
 
 namespace GemRB {
 
+class Actor;
+class Object;
+
 struct targettype {
 	Scriptable* actor; // could be door
 	unsigned int distance;

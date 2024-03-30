@@ -22,8 +22,6 @@
 #include "Targets.h"
 
 #include "GameScript/GSUtils.h"
-#include "GameScript/GameScript.h"
-#include "Scriptable/Actor.h"
 
 namespace GemRB {
 
