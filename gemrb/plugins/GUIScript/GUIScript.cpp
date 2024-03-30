@@ -7877,40 +7877,26 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_UpdateMusicVolume__doc,
-"===== UpdateMusicVolume =====\n\
+PyDoc_STRVAR(GemRB_UpdateVolume__doc,
+"===== UpdateVolume =====\n\
 \n\
-**Prototype:** GemRB.UpdateMusicVolume ()\n\
+**Prototype:** GemRB.UpdateVolume ([type])\n\
 \n\
-**Description:** Updates music volume on-the-fly.\n\
+**Description:** Updates volume on-the-fly.\n\
 \n\
-**Return value:** N/A\n\
+**Parameters**:\n\
+  * type:\n\
+    * 1 - music\n\
+    * 2 - ambients\n\
+    * 3 - both, default\n\
 \n\
-**See also:** [UpdateAmbientsVolume](UpdateAmbientsVolume.md)"
-);
+**Return value:** N/A");
 
-static PyObject* GemRB_UpdateMusicVolume(PyObject * /*self*/, PyObject* /*args*/)
+static PyObject* GemRB_UpdateVolume(PyObject* /*self*/, PyObject* args)
 {
-	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_MUSIC );
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_UpdateAmbientsVolume__doc,
-"===== UpdateAmbientsVolume =====\n\
-\n\
-**Prototype:** GemRB.UpdateAmbientsVolume ()\n\
-\n\
-**Description:** Updates ambients volume on-the-fly.\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [UpdateMusicVolume](UpdateMusicVolume.md)"
-);
-
-static PyObject* GemRB_UpdateAmbientsVolume(PyObject * /*self*/, PyObject* /*args*/)
-{
-	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
+	int type = 3;
+	PARSE_ARGS(args, "i", &type);
+	core->GetAudioDrv()->UpdateVolume(type);
 
 	Py_RETURN_NONE;
 }
@@ -13157,8 +13143,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SpellCast, METH_VARARGS),
 	METHOD(StealFailed, METH_NOARGS),
 	METHOD(UnmemorizeSpell, METH_VARARGS),
-	METHOD(UpdateAmbientsVolume, METH_NOARGS),
-	METHOD(UpdateMusicVolume, METH_NOARGS),
+	METHOD(UpdateVolume, METH_VARARGS),
 	METHOD(UpdateWorldMap, METH_VARARGS),
 	METHOD(UseItem, METH_VARARGS),
 	METHOD(ValidTarget, METH_VARARGS),

@@ -173,8 +173,7 @@ def UpdateVolume (volume_ref):
 	helpTA = GemRB.GetView ("OPTHELP")
 	if helpTA:
 		helpTA.SetText (volume_ref)
-	GemRB.UpdateAmbientsVolume ()
-	GemRB.UpdateMusicVolume ()
+	GemRB.UpdateVolume ()
 
 ###################################################
 

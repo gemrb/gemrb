@@ -35,6 +35,7 @@ import GUICommonWindows
 import GUISAVE
 import GUIOPTControls
 from GUIDefines import *
+from ie_sounds import GEM_SND_VOL_MUSIC, GEM_SND_VOL_AMBIENTS
 
 ###################################################
 
@@ -223,11 +224,11 @@ def OpenAudioOptionsWindow ():
 
 def DisplayHelpAmbientVolume ():
 	GemRB.GetView ("OPTHELP").SetText (18008)
-	GemRB.UpdateAmbientsVolume ()
+	GemRB.UpdateVolume (GEM_SND_VOL_AMBIENTS)
 
 def DisplayHelpMusicVolume ():
 	GemRB.GetView ("OPTHELP").SetText (18011)
-	GemRB.UpdateMusicVolume ()
+	GemRB.UpdateVolume (GEM_SND_VOL_MUSIC)
 
 ###################################################
 
