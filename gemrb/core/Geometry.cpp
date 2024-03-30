@@ -29,26 +29,26 @@ namespace GemRB {
 // with a maximum error of 0.1620 degrees
 // rcor's rational approximation that can be arbitrarily
 // improved if we ever want greater precision
-static float_t pseudoAtan2(float_t y, float_t x)
+static float pseudoAtan2(float y, float x)
 {
 	static const uint32_t signMask = 0x80000000;
-	static const float_t b = 0.596227F;
+	static const float b = 0.596227F;
 
 	// Extract the sign bits
 	uint32_t xS = signMask & (uint32_t&) x;
 	uint32_t yS = signMask & (uint32_t&) y;
 
 	// Determine the quadrant offset
-	float_t q = float_t((~xS & yS) >> 29 | xS >> 30);
+	float q = float((~xS & yS) >> 29 | xS >> 30);
 
 	// Calculate the arctangent in the first quadrant
-	float_t bxy = std::fabs(b * x * y);
-	float_t num = bxy + y * y;
-	float_t atan1q = num / (x * x + bxy + num);
+	float bxy = std::fabs(b * x * y);
+	float num = bxy + y * y;
+	float atan1q = num / (x * x + bxy + num);
 
 	// Translate it to the proper quadrant
 	uint32_t uatan2q = (xS ^ yS) | (uint32_t&) atan1q;
-	return (q + (float_t&) uatan2q) * M_PI_2;
+	return (q + (float&) uatan2q) * M_PI_2;
 }
 
 float_t AngleFromPoints(float_t y, float_t x)
