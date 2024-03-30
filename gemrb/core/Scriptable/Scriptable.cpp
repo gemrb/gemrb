@@ -1242,11 +1242,13 @@ int Scriptable::CastSpellPoint(const Point& target, bool deplete, bool instant, 
 	if(!CheckWildSurge()) {
 		return -1;
 	}
-	if (!instant) {
+
+	int duration = SpellCast(instant, nullptr, level);
+	if (!instant && duration) {
 		SpellcraftCheck(actor, SpellResRef);
 		if (actor) actor->CureInvisibility();
 	}
-	return SpellCast(instant, nullptr, level);
+	return duration;
 }
 
 //set target as actor (if target isn't actor, use its position)
@@ -1284,12 +1286,13 @@ int Scriptable::CastSpell(Scriptable* target, bool deplete, bool instant, bool n
 		return -1;
 	}
 
-	if (!instant) {
+	int duration = SpellCast(instant, target, level);
+	if (!instant && duration) {
 		SpellcraftCheck(actor, SpellResRef);
 		// self-targeted spells that are not hostile maintain invisibility
 		if (actor && target != this) actor->CureInvisibility();
 	}
-	return SpellCast(instant, target, level);
+	return duration;
 }
 
 static EffectRef fx_force_surge_modifier_ref = { "ForceSurgeModifier", -1 };
