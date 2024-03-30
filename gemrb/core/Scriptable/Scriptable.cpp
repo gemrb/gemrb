@@ -333,7 +333,9 @@ void Scriptable::ExecuteScript(int scriptCount)
 		GameScript* script = Scripts[scriptLevel];
 		if (script) {
 			changed |= script->Update(&continuing, &done);
-			if (script->dead) delete script;
+			if (script->dead) {
+				delete script;
+			}
 		}
 
 		/* scripts are not concurrent, see WAITPC override script for example */
