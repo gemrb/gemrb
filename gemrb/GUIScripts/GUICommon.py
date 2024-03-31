@@ -34,7 +34,7 @@ CommonTables.Load ()
 def GetWindowPack():
 	height = GemRB.GetSystemVariable (SV_HEIGHT)
 
-	if GemRB.GameType == "pst":
+	if GameCheck.IsPST ():
 		default = "GUIWORLD"
 	else:
 		default = "GUIW"
@@ -48,7 +48,9 @@ def GetWindowPack():
 	# 3. not all games have all the window packs
 	# ... but the widescreen mod only modifies guiw08 or guiw10, not touching others
 	# luckily internally its guiw08 is in the end produced as a copy of guiw10
-	if default == "GUIW" and GameCheck.HasWideScreenMod ():
+	if GameCheck.HasWideScreenMod ():
+		if GameCheck.IsBG1 () or GameCheck.IsPST ():
+			return default
 		return "GUIW10"
 	else:
 		if height >= 960 and GemRB.HasResource ("GUIW12", RES_CHU, 1):
