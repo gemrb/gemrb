@@ -60,6 +60,7 @@ enum class STRING_FLAGS : uint32_t {
 	ALLOW_ZERO		= 8, // 0 strref is allowed
 	RESOLVE_TAGS	= 16,
 	STRREFOFF		= 256,
+	// iwd2 also used 0x8000 to mark removed ctlk entries for recycling
 };
 
 /**
