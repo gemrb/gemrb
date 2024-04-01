@@ -566,16 +566,16 @@ def CanDualClass(actor):
 	# race restriction (human)
 	RaceName = CommonTables.Races.FindValue ("ID", GemRB.GetPlayerStat (actor, IE_RACE, 1))
 	if not RaceName:
-		return 1
+		return 0
 	RaceName = CommonTables.Races.GetRowName (RaceName)
 	RaceDual = CommonTables.Races.GetValue (RaceName, "CANDUAL", GTV_STR)
 	if RaceDual != "1":
-		return 1
+		return 0
 
 	# already dualclassed
 	Dual = IsDualClassed (actor,0)
 	if Dual[0] > 0:
-		return 1
+		return 0
 
 	DualClassTable = GemRB.LoadTable ("dualclas")
 	ClassName = GetClassRowName(actor)
@@ -591,7 +591,7 @@ def CanDualClass(actor):
 
 	if Row == None:
 		print("CannotDualClass: inappropriate starting class")
-		return 1
+		return 0
 
 	# create a lookup table for the DualClassTable columns
 	classes = []
@@ -609,12 +609,12 @@ def CanDualClass(actor):
 	# cannot dc if all the columns of the DualClassTable are 0
 	if Sum == 0:
 		print("CannotDualClass: all the columns of the DualClassTable are 0")
-		return 1
+		return 0
 
 	# if the only choice for dc is already the same as the actors base class
 	if Sum == 1 and ClassName in matches and KitIndex == 0:
 		print("CannotDualClass: the only choice for dc is already the same as the actors base class")
-		return 1
+		return 0
 
 	AlignmentTable = GemRB.LoadTable ("alignmnt")
 	Alignment = GemRB.GetPlayerStat (actor, IE_ALIGNMENT)
@@ -622,7 +622,7 @@ def CanDualClass(actor):
 	AlignmentColName = CommonTables.Aligns.GetValue (AlignmentColName, 4)
 	if AlignmentColName == -1:
 		print("CannotDualClass: extraordinary character alignment")
-		return 1
+		return 0
 	Sum = 0
 	for classy in matches:
 		Sum += AlignmentTable.GetValue (classy, AlignmentColName, GTV_INT)
@@ -630,7 +630,7 @@ def CanDualClass(actor):
 	# cannot dc if all the available classes forbid the chars alignment
 	if Sum == 0:
 		print("CannotDualClass: all the available classes forbid the chars alignment")
-		return 1
+		return 0
 
 	# check current class' stat limitations
 	CurrentStatTable = GemRB.LoadTable ("abdcscrq")
@@ -643,7 +643,7 @@ def CanDualClass(actor):
 		name = CurrentStatTable.GetColumnName (stat)
 		if GemRB.GetPlayerStat (actor, SafeStatEval ("IE_" + name[4:]), 1) < minimum:
 			print("CannotDualClass: current class' stat limitations are too big")
-			return 1
+			return 0
 
 	# check new class' stat limitations - make sure there are any good class choices
 	TargetStatTable = GemRB.LoadTable ("abdcdsrq")
@@ -658,13 +658,13 @@ def CanDualClass(actor):
 				break
 	if len(matches) == bad:
 		print("CannotDualClass: no good new class choices")
-		return 1
+		return 0
 
 	# must be at least level 2
 	if GemRB.GetPlayerStat (actor, IE_LEVEL) == 1:
 		print("CannotDualClass: level 1")
-		return 1
-	return 0
+		return 0
+	return 1
 
 def IsWarrior (actor):
 	IsWarrior = CommonTables.ClassSkills.GetValue (GetClassRowName(actor), "NO_PROF", GTV_INT)

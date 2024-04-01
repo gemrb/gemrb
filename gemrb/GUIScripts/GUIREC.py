@@ -102,9 +102,9 @@ def UpdateRecordsWindow (Window):
 	# dual-classable
 	Button = Window.GetControl (0)
 	if GUICommon.CanDualClass (pc):
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	else:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	# levelup
 	Button = Window.GetControl (37)
