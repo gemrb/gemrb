@@ -41,11 +41,11 @@ bool CTlkOverride::Init()
 	CloseResources();
 	//Creation of the headers should be game specific, some games don't have these
 	toh_str = GetAuxHdr(true);
-	if (toh_str == NULL) {
+	if (!toh_str) {
 		return false;
 	}
 	tot_str = GetAuxTlk(true);
-	if (tot_str == NULL) {
+	if (!tot_str) {
 		return false;
 	}
 
@@ -71,11 +71,11 @@ void CTlkOverride::CloseResources()
 {
 	if (toh_str) {
 		delete toh_str;
-		toh_str=NULL;
+		toh_str = nullptr;
 	}
 	if (tot_str) {
 		delete tot_str;
-		tot_str=NULL;
+		tot_str = nullptr;
 	}
 }
 
@@ -111,12 +111,12 @@ strret_t CTlkOverride::GetLength(strpos_t offset)
 char* CTlkOverride::GetString(strpos_t offset)
 {
 	if (!tot_str) {
-		return NULL;
+		return nullptr;
 	}
 
 	strret_t length = GetLength(offset);
 	if (length == 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	//assuming char is one byte
@@ -202,13 +202,11 @@ strpos_t CTlkOverride::ClaimFreeSegment()
 		}
 	}
 	ieDword tmp = 0;
-	char buffer[SEGMENT_SIZE];
-	memset(buffer, 0, sizeof(buffer));
 	tot_str->Seek(offset, GEM_STREAM_START);
 	tot_str->WriteDword(tmp);
 	tmp = 0xffffffff;
 	tot_str->WriteDword(tmp);
-	tot_str->Write(buffer, SEGMENT_SIZE);
+	tot_str->WriteFilling(SEGMENT_SIZE);
 	tot_str->WriteDword(tmp);
 
 	//update free segment pointer
