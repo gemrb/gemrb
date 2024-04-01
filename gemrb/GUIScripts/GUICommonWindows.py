@@ -1239,7 +1239,7 @@ def UpdateAnimation ():
 	AnimTable = GemRB.LoadTable ("ANIMS")
 	if animid=="":
 		animid="*"
-	value = AnimTable.GetValue (animid, AvatarName)
+	value = AnimTable.GetValue (animid, AvatarName, GTV_INT)
 	if value<0:
 		return
 	GemRB.SetPlayerStat (pc, IE_ANIMATION_ID, value)
@@ -1265,7 +1265,7 @@ def GetKitIndex (actor, ClassIndex):
 	for ci in range (KitOffset, CommonTables.Classes.GetRowCount ()):
 		RowName = CommonTables.Classes.GetRowName (ci)
 		BaseClass = CommonTables.Classes.GetValue (RowName, "CLASS")
-		if BaseClass == ClassID and Kit & CommonTables.Classes.GetValue (RowName, "ID"):
+		if BaseClass == ClassID and Kit & CommonTables.Classes.GetValue (RowName, "ID", GTV_INT):
 			#FIXME: this will return the last kit only, check if proper multikit return values are needed
 			KitIndex = ci
 

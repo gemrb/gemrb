@@ -145,7 +145,7 @@ def CanLevelUp(actor):
 	elif Dual[0] > 0: # dual classed
 		# get the class we can level
 		if Dual[0] == 3:
-			ClassID = CommonTables.KitList.GetValue (Dual[2], 7)
+			ClassID = CommonTables.KitList.GetValue (Dual[2], 7, GTV_INT)
 			Class = GUICommon.GetClassRowName (ClassID, "class")
 		else:
 			Class = GUICommon.GetClassRowName(Dual[2], "index")
@@ -193,10 +193,10 @@ def _SetupLevels (pc, Level, offset=0, noclass=0):
 		Class = [Multi[1], Multi[2], Multi[3]]
 	elif Dual[0]: #only worry about the newer class
 		if Dual[0] == 3:
-			Class = [CommonTables.KitList.GetValue (Dual[2], 7)]
+			Class = [CommonTables.KitList.GetValue (Dual[2], 7, GTV_INT)]
 		else:
 			ClassRow = GUICommon.GetClassRowName(Dual[2], "index")
-			Class = [CommonTables.Classes.GetValue (ClassRow, "ID")]
+			Class = [CommonTables.Classes.GetValue (ClassRow, "ID", GTV_INT)]
 		#assume Level is correct if passed
 		if GUICommon.IsDualSwap(pc) and not Level:
 			Levels = [Levels[1], Levels[0], Levels[2]]
@@ -253,13 +253,13 @@ def SetupSavingThrows (pc, Level=None):
 		for i in range (NumClasses):
 			#loop through each class and update the save value if we have
 			#a better save
-			TmpSave = SaveTables[i].GetValue (row, Levels[i])
+			TmpSave = SaveTables[i].GetValue (row, Levels[i], GTV_INT)
 			if TmpSave and (TmpSave < CurrentSave or i == 0):
 				CurrentSave = TmpSave
 
 		#add racial bonuses if applicable (small pc's)
 		if RaceSaveTable:
-			CurrentSave -= RaceSaveTable.GetValue (row, Con)
+			CurrentSave -= RaceSaveTable.GetValue (row, Con, GTV_INT)
 
 		#add class bonuses if applicable (paladin)
 		CurrentSave -= ClassBonus
@@ -303,7 +303,7 @@ def SetupThaco (pc, Level=None):
 		#loop through each class and update the save value if we have
 		#a better thac0
 		ClassName = GUICommon.GetClassRowName (Class[i], "class")
-		TmpThaco = ThacoTable.GetValue (ClassName, str(Levels[i]+1))
+		TmpThaco = ThacoTable.GetValue (ClassName, str(Levels[i] + 1), GTV_INT)
 		if TmpThaco < CurrentThaco:
 			NewThaco = 1
 			CurrentThaco = TmpThaco
@@ -373,10 +373,10 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		if (Levels[0]<=Levels[1]):
 			return
 		if Dual[0] == 3:
-			Class = [CommonTables.KitList.GetValue (Dual[2], 7)]
+			Class = [CommonTables.KitList.GetValue (Dual[2], 7, GTV_INT)]
 		else:
 			ClassRow = GUICommon.GetClassRowName(Dual[2], "index")
-			Class = [CommonTables.Classes.GetValue (ClassRow, "ID")]
+			Class = [CommonTables.Classes.GetValue (ClassRow, "ID", GTV_INT)]
 		#if Level and LevelDiff are passed, we assume it is correct
 		if GUICommon.IsDualSwap(pc) and not Level and not LevelDiff:
 			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]

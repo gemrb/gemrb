@@ -389,13 +389,13 @@ def GetClassRowName(value, which=-1):
 
 # checks the classes.2da table if the class is multiclass/dualclass capable (bits define the class combination)
 def HasMultiClassBits(actor):
-	MultiBits = CommonTables.Classes.GetValue (GetClassRowName(actor), "MULTI")
+	MultiBits = CommonTables.Classes.GetValue (GetClassRowName(actor), "MULTI", GTV_STR)
 
 	# we have no entries for npc creature classes, so treat them as single-classed
 	if MultiBits == "*":
-		MultiBits = 0
+		return 0
 
-	return MultiBits
+	return int(MultiBits)
 
 def IsDualClassed(actor, verbose):
 	"""Returns an array containing the dual class information.
@@ -476,11 +476,11 @@ def IsDualSwap (actor, override=None):
 	if Dual[0] > 1:
 		BaseClass = GetClassRowName(Dual[1], "index")
 	else:
-		BaseClass = CommonTables.KitList.GetValue (Dual[1], 7)
+		BaseClass = CommonTables.KitList.GetValue (Dual[1], 7, GTV_STR)
 		if BaseClass == "*":
 			# mod boilerplate
 			return 0
-		BaseClass = GetClassRowName(BaseClass, "class")
+		BaseClass = GetClassRowName(int(BaseClass), "class")
 
 	# if our old class is the first class, we need to swap
 	if Class[0] == BaseClass:
@@ -568,8 +568,8 @@ def CanDualClass(actor):
 	if not RaceName:
 		return 1
 	RaceName = CommonTables.Races.GetRowName (RaceName)
-	RaceDual = CommonTables.Races.GetValue (RaceName, "CANDUAL")
-	if int(RaceDual) != 1:
+	RaceDual = CommonTables.Races.GetValue (RaceName, "CANDUAL", GTV_STR)
+	if RaceDual != "1":
 		return 1
 
 	# already dualclassed
@@ -583,7 +583,7 @@ def CanDualClass(actor):
 	if KitIndex == 0:
 		ClassTitle = ClassName
 	else:
-		ClassTitle = CommonTables.KitList.GetValue (KitIndex, 0)
+		ClassTitle = CommonTables.KitList.GetValue (KitIndex, 0, GTV_STR)
 	Row = DualClassTable.GetRowIndex (ClassTitle)
 	if Row == None and KitIndex > 0:
 		# retry with the baseclass in case the kit/school is missing (eg. wildmages)
@@ -625,7 +625,7 @@ def CanDualClass(actor):
 		return 1
 	Sum = 0
 	for classy in matches:
-		Sum += AlignmentTable.GetValue (classy, AlignmentColName)
+		Sum += AlignmentTable.GetValue (classy, AlignmentColName, GTV_INT)
 
 	# cannot dc if all the available classes forbid the chars alignment
 	if Sum == 0:
@@ -667,7 +667,7 @@ def CanDualClass(actor):
 	return 0
 
 def IsWarrior (actor):
-	IsWarrior = CommonTables.ClassSkills.GetValue (GetClassRowName(actor), "NO_PROF")
+	IsWarrior = CommonTables.ClassSkills.GetValue (GetClassRowName(actor), "NO_PROF", GTV_INT)
 
 	# warriors get only a -2 penalty for wielding weapons they are not proficient with
 	# FIXME: make the check more robust, someone may change the value!
@@ -678,7 +678,7 @@ def IsWarrior (actor):
 		DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 		FirstClassIndex = CommonTables.Classes.FindValue ("MC_WAS_ID", DualedFrom)
 		FirstClassName = CommonTables.Classes.GetRowName (FirstClassIndex)
-		OldIsWarrior = CommonTables.ClassSkills.GetValue (FirstClassName, "NO_PROF")
+		OldIsWarrior = CommonTables.ClassSkills.GetValue (FirstClassName, "NO_PROF", GTV_INT)
 		# there are no warrior to warrior dualclasses, so if the previous class was one, the current one certainly isn't
 		if OldIsWarrior == -2:
 			return 0
@@ -848,7 +848,7 @@ def GetACStyleBonus (pc):
 	cdet = GemRB.GetCombatDetails (pc, 0)
 	if cdet["Style"] % 1000 != IE_PROFICIENCYSINGLEWEAPON:
 		return 0
-	return WStyleTable.GetValue (str(stars), "AC")
+	return WStyleTable.GetValue (str(stars), "AC", GTV_INT)
 
 def AddDefaultVoiceSet (VoiceList, Voices):
 	if GameCheck.IsBG1 () or GameCheck.IsBG2 ():

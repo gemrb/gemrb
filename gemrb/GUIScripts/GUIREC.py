@@ -259,7 +259,7 @@ def GetValidSkill (pc, className, stat):
 		if stat != IE_STEALTH:
 			return 0
 	else:
-		if SkillsTable.GetValue (SkillStatNames[stat], className) == -1:
+		if SkillsTable.GetValue (SkillStatNames[stat], className, GTV_INT) == -1:
 			return 0
 
 	return val

@@ -190,20 +190,20 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 	if classid: #for dual classes when we can't get the class dualing to
 		Class = classid
 	elif IsDual[0] == 3:
-		Class = CommonTables.KitList.GetValue (IsDual[2], 7)
+		Class = CommonTables.KitList.GetValue (IsDual[2], 7, GTV_INT)
 	elif IsDual[0]:
 		Class = GUICommon.GetClassRowName(IsDual[2], "index")
-		Class = CommonTables.Classes.GetValue (Class, "ID")
+		Class = CommonTables.Classes.GetValue (Class, "ID", GTV_INT)
 	else:
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassName = GUICommon.GetClassRowName (Class, "class")
 
 	# profs.2da has entries for everyone, so no need to muck around
-	ProfsRate = ProfsTable.GetValue (ClassName, "RATE")
+	ProfsRate = ProfsTable.GetValue (ClassName, "RATE", GTV_INT)
 
 	#figure out how many prof points we have
 	if sum (level1) == 0: #character is being generated (either chargen or dual)
-		ProfsPointsLeft = ProfsTable.GetValue (ClassName, "FIRST_LEVEL")
+		ProfsPointsLeft = ProfsTable.GetValue (ClassName, "FIRST_LEVEL", GTV_INT)
 
 	ProfIndex = 0
 	IsMulti = GUICommon.IsMultiClassed (pc, 1)
@@ -219,7 +219,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 				if cls == 0:
 					break
 				ClsName = GUICommon.GetClassRowName (cls, "class")
-				Rate = ProfsTable.GetValue (ClsName, "RATE")
+				Rate = ProfsTable.GetValue (ClsName, "RATE", GTV_INT)
 				if Rate < BestRate:
 					BestRate = Rate
 					ProfIndex = IsMulti[1:].index(cls)
