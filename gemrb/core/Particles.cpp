@@ -189,7 +189,7 @@ void Particles::Draw(Point p)
 			state=MAX_SPARK_PHASE-state-1;
 			length=0;
 		}
-		Color clr = sparkcolors[color][state];
+		Color clr = sparkcolors[colorIdx][state];
 		switch (type) {
 		case SP_TYPE_BITMAP:
 			/*

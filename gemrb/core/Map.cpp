@@ -3678,7 +3678,7 @@ void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &po
 		style = SP_TYPE_POINT;
 	}
 	sparkles->SetType(style, path, grow);
-	sparkles->SetColor(color);
+	sparkles->SetColorIndex(color);
 	sparkles->SetPhase(P_GROW);
 
 	spaIterator iter;

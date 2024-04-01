@@ -2224,14 +2224,14 @@ void Game::StartRainOrSnow(bool conditional, ieWord w)
 		core->PlaySound(DS_SNOW, SFX_CHAN_AREA_AMB);
 		weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
-		weather->SetColor(SPARK_COLOR_WHITE);
+		weather->SetColorIndex(SPARK_COLOR_WHITE);
 		return;
 	}
 	if (w&WB_RAIN) {
 		core->PlaySound(DS_RAIN, SFX_CHAN_AREA_AMB);
 		weather->SetType(SP_TYPE_LINE, SP_PATH_RAIN, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
-		weather->SetColor(SPARK_COLOR_STONE);
+		weather->SetColorIndex(SPARK_COLOR_STONE);
 		return;
 	}
 	weather->SetPhase(P_FADE);

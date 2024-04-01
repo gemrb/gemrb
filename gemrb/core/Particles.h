@@ -111,7 +111,7 @@ public:
 		pos.h = h;
 	}
 	void SetTimeToLive(int ttl) { timetolive = ttl; }
-	void SetColor(ieByte c) { color=c; }
+	void SetColorIndex(ieByte c) { colorIdx = c; }
 	void SetOwner(Scriptable *o) { owner=o; }
 	/* returns true if it cannot add new elements */
 	bool AddNew(const Point &point);
@@ -131,7 +131,7 @@ private:
 	ieByte phase = P_FADE;      // global phase
 	ieByte type = SP_TYPE_POINT;       // draw type (snow, rain)
 	ieByte path = SP_PATH_FALL;       // path type
-	ieByte color = 0;      // general spark color (index, see SPARK_COLOR_*)
+	ieByte colorIdx = 0; // general spark color (index, see SPARK_COLOR_*)
 	ieByte spawn_type = SP_SPAWN_NONE;
 	//use char animations for the fragment animations
 	//1. the cycles are loaded only when needed
