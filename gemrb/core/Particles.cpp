@@ -188,7 +188,7 @@ void Particles::Draw(Point p)
 
 		int length; //used only for raindrops
 		if (state>=MAX_SPARK_PHASE) {
-			constexpr int maxDropLength = 6;
+			constexpr int maxDropLength = 10;
 			length = maxDropLength - std::abs(state - MAX_SPARK_PHASE - maxDropLength);
 			state = 0;
 		} else {
@@ -237,7 +237,8 @@ void Particles::Draw(Point p)
 		// this is more like a raindrop
 		case SP_TYPE_LINE:
 			if (length) {
-				VideoDriver->DrawLine (points[i].pos - p, points[i].pos - p + Point((i&1), length), clr);
+				int y = length > 3 ? i & 1 : 0;
+				VideoDriver->DrawLine(points[i].pos - p, points[i].pos - p + Point(y, length), clr);
 			}
 			break;
 		}
