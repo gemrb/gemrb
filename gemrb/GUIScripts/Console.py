@@ -62,7 +62,7 @@ def ci(item, c0=1, c1=0, c2=0, slot=-1):
 def cv(var, context="GLOBAL"):
 	GemRB.CheckVar(var, context)
 
-def ex(cmd, runner):
+def ex(cmd, runner = 0):
 	GemRB.ExecuteString(cmd, runner)
 
 def ev(trigger):
