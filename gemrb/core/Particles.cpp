@@ -89,6 +89,12 @@ Particles::Particles(int s)
 	size = last_insert = s;
 }
 
+void Particles::SetColorIndex(ieByte c)
+{
+	colorIdx = c;
+	color = Color();
+}
+
 void Particles::SetBitmap(unsigned int FragAnimID)
 {
 	//int i;
@@ -189,7 +195,10 @@ void Particles::Draw(Point p)
 			state=MAX_SPARK_PHASE-state-1;
 			length=0;
 		}
-		Color clr = sparkcolors[colorIdx][state];
+		Color clr = color;
+		if (!clr.Packed()) {
+			clr = sparkcolors[colorIdx][state];
+		}
 		switch (type) {
 		case SP_TYPE_BITMAP:
 			/*

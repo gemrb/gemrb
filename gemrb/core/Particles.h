@@ -27,6 +27,7 @@
 #ifndef PARTICLES_H
 #define PARTICLES_H
 
+#include "RGBAColor.h"
 #include "exports.h"
 #include "ie_types.h"
 
@@ -111,7 +112,8 @@ public:
 		pos.h = h;
 	}
 	void SetTimeToLive(int ttl) { timetolive = ttl; }
-	void SetColorIndex(ieByte c) { colorIdx = c; }
+	void SetColorIndex(ieByte c);
+	void SetColor(const Color& c) { color = c; }
 	void SetOwner(Scriptable *o) { owner=o; }
 	/* returns true if it cannot add new elements */
 	bool AddNew(const Point &point);
@@ -132,6 +134,7 @@ private:
 	ieByte type = SP_TYPE_POINT;       // draw type (snow, rain)
 	ieByte path = SP_PATH_FALL;       // path type
 	ieByte colorIdx = 0; // general spark color (index, see SPARK_COLOR_*)
+	Color color; // arbitrary color for when the spark ones are not appropriate
 	ieByte spawn_type = SP_SPAWN_NONE;
 	//use char animations for the fragment animations
 	//1. the cycles are loaded only when needed

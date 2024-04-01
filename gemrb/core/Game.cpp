@@ -2231,7 +2231,16 @@ void Game::StartRainOrSnow(bool conditional, ieWord w)
 		core->PlaySound(DS_RAIN, SFX_CHAN_AREA_AMB);
 		weather->SetType(SP_TYPE_LINE, SP_PATH_RAIN, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
-		weather->SetColorIndex(SPARK_COLOR_STONE);
+		// colors re-d from iwd2
+		// during lightning it's pure white
+		Color rainColor(110, 110, 110, 0xff); // default and day, 7-20
+		int hour = core->Time.GetHour(GameTime);
+		if (hour == 6 || hour == 21) { // same for dusk and dawn
+			rainColor = Color(90, 90, 100, 0xff);
+		} else if (hour < 6 || hour > 21) {
+			rainColor = Color(70, 70, 90, 0xff);
+		}
+		weather->SetColor(rainColor);
 		return;
 	}
 	weather->SetPhase(P_FADE);
