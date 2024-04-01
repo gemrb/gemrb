@@ -77,9 +77,6 @@ void CTlkOverride::CloseResources()
 		delete tot_str;
 		tot_str=NULL;
 	}
-#ifdef CACHE_TLK_OVERRIDE
-	stringmap.clear();
-#endif
 }
 
 //gets the length of a stored string which might span more than one segment
@@ -298,21 +295,9 @@ strpos_t CTlkOverride::LocateString(ieStrRef strref)
 	return DataStream::InvalidPos;
 }
 
-//this function handles all of the .tlk override mechanism with caching
-//strings it once found
-//it is possible to turn off caching
 char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t &Length)
 {
-	char *string;
-
-#ifdef CACHE_TLK_OVERRIDE
-	StringMapType::iterator tmp = stringmap.find(strref);
-	if (tmp!=stringmap.end()) {
-		return CS((*tmp).second);
-	}
-#endif
-
-	string = NULL;
+	char* string = nullptr;
 	strpos_t offset = LocateString(strref);
 	if (offset != DataStream::InvalidPos) {
 		string = GetString(offset);
@@ -324,9 +309,7 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t &Length)
 		string = ( char* ) malloc( 1 );
 		string[0] = 0;
 	}
-#ifdef CACHE_TLK_OVERRIDE
-	stringmap[strref]=CS(string);
-#endif
+
 	return string;
 }
 

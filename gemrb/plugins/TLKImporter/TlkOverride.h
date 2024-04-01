@@ -29,12 +29,6 @@
 #include "Streams/FileStream.h"
 #include "Strings/String.h"
 
-#ifdef CACHE_TLK_OVERRIDE
-#include <map>
-
-using StringMapType = std::map<ieStrRef, char *>;
-#endif
-
 namespace GemRB {
 
 constexpr strret_t SEGMENT_SIZE = 512;
@@ -52,9 +46,6 @@ struct EntryType
 class CTlkOverride  
 {
 private:
-#ifdef CACHE_TLK_OVERRIDE
-	StringMapType stringmap;
-#endif
 	DataStream* tot_str = nullptr;
 	DataStream* toh_str = nullptr;
 	ieDword AuxCount = 0;
