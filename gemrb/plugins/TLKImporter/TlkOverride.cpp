@@ -258,8 +258,6 @@ ieStrRef CTlkOverride::GetNewStrRef(ieStrRef strref)
 {
 	EntryType entry;
 
-	memset(&entry,0,sizeof(entry));
-
 	if (strref >= ieStrRef::BIO_START && strref <= ieStrRef::BIO_END) {
 		entry.strref = strref;
 	} else {
@@ -269,7 +267,10 @@ ieStrRef CTlkOverride::GetNewStrRef(ieStrRef strref)
 
 	toh_str->Seek(TOH_HEADER_SIZE + AuxCount * EntryType::FileSize, GEM_STREAM_START);
 	toh_str->WriteStrRef(entry.strref);
-	toh_str->Write(entry.dummy, 20);
+	toh_str->WriteDword(entry.flags);
+	toh_str->WriteResRef(entry.soundRef);
+	toh_str->WriteDword(entry.volumeVariance);
+	toh_str->WriteDword(entry.pitchVariance);
 	toh_str->WriteScalar<strpos_t, int32_t>(entry.offset);
 	AuxCount++;
 	toh_str->Seek(12,GEM_STREAM_START);
