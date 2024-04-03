@@ -77,7 +77,9 @@ namespace GemRB {
 // unused gap
 #define FX_SET_BY_ITEM 0x80000000 // TODO: EE bit for opcode 324, perhaps not needed (use SourceType?)
 
-// Effect save flags (ToBEx)
+// Effect save flags (ToBEx, EE)
+#define SF_LINE_PRO_NO_PRIMARY   0x400 // TODO:  ee, ignore primary target, line AoE projectile doesn’t affect end target
+#define SF_LINE_PRO_NO_SECONDARY 0x800 // TODO: ee, ignore secondary target, line AoE projectile doesn’t affect targets in the line
 #define SF_BYPASS_MIRROR_IMAGE 0x1000000
 #define SF_IGNORE_DIFFICULTY   0x2000000
 
