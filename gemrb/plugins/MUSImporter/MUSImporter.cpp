@@ -182,6 +182,8 @@ void MUSImporter::End()
 
 	if (playlist[PLpos].PLEnd && playlist[PLpos].PLEnd != "end") {
 		PlayMusic(playlist[PLpos].PLEnd);
+	} else {
+		HardEnd();
 	}
 	PLnext = -1;
 }
