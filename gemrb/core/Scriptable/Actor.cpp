@@ -3209,7 +3209,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 			ret -= CheckVariable(nullptr, "Morte_Taunt", "GLOBAL");
 		}
 
-		bool success = ret > (int) GetStat(savingThrows[type]);
+		bool success = ret >= (int) GetStat(savingThrows[type]);
 		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
 		if (core->HasFeedback(FT_COMBAT) && success && (lastSave.prevType != type || lastSave.prevRoll != ret)) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
@@ -3298,7 +3298,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 
 	ret = AdjustSaveVsSchool(ret, fx->PrimaryType, sfx);
 
-	if (ret > saveDC) {
+	if (ret >= saveDC) {
 		// ~Saving throw result: (d20 + save + bonuses) %d + %d  + %d vs. (10 + spellLevel + saveMod)  10 + %d + %d - Success!~
 		displaymsg->DisplayRollStringName(ieStrRef::ROLL22, GUIColors::LIGHTGREY, this, roll, save, modifier, spellLevel, saveBonus);
 		return true;
