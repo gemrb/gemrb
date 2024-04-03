@@ -3190,12 +3190,8 @@ static const std::array<int, 5> savingThrows = { IE_SAVEVSSPELL, IE_SAVEVSBREATH
 bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 {
 	assert(type < savingThrows.size());
-	static int saveDiceSides = gamedata->GetMiscRule("SAVING_THROW_DICE_SIDES");
 	InternalFlags|=IF_USEDSAVE;
 	int ret = lastSave.savingThrow[type];
-	// NOTE: assuming criticals apply to iwd2 too
-	if (ret == 1) return false;
-	if (ret == saveDiceSides) return true;
 	if (Modified[IE_STATE_ID] & STATE_DEAD) return false; // just to shut some errant feedback, should be fine
 	const Effect* sfx = fxqueue.HasEffect(fx_save_vs_school_bonus_ref);
 
