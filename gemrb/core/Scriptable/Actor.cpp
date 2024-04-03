@@ -3209,8 +3209,9 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 			ret -= CheckVariable(nullptr, "Morte_Taunt", "GLOBAL");
 		}
 
+		bool success = ret > (int) GetStat(savingThrows[type]);
 		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
-		if (core->HasFeedback(FT_COMBAT) && (lastSave.prevType != type || lastSave.prevRoll != ret)) {
+		if (core->HasFeedback(FT_COMBAT) && success && (lastSave.prevType != type || lastSave.prevRoll != ret)) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
 			String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings(ieDword(HCStrings::SaveSpell) + type)));
 			msg += fmt::format(u" {}", ret);
@@ -3218,7 +3219,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		}
 		lastSave.prevType = type;
 		lastSave.prevRoll = ret;
-		return ret > (int) GetStat(savingThrows[type]);
+		return success;
 	}
 
 	int roll = ret;
