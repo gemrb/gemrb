@@ -1309,7 +1309,10 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 					talkee->SetStance(IE_ANI_READY);
 				}
 				if (!core->InCutSceneMode()) {
+					// temporarily pretend the dialog already started, so the VB isn't spatial
+					gc->SetDialogueFlags(DF_IN_DIALOG, BitOp::OR);
 					talkee->DialogInterrupt();
+					gc->SetDialogueFlags(DF_IN_DIALOG, BitOp::NAND);
 				}
 			}
 		}
