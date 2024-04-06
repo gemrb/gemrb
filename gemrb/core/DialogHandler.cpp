@@ -252,6 +252,137 @@ static int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& op
 	return idx;
 }
 
+void DialogHandler::DialogChooseInitial(Scriptable* target, Actor* tgta) const
+{
+	// increasing talkcount after top level condition was determined
+	GameControl* gc = core->GetGameControl();
+	if (tgta) {
+		if (gc->GetDialogueFlags() & DF_TALKCOUNT) {
+			gc->SetDialogueFlags(DF_TALKCOUNT, BitOp::NAND);
+			tgta->TalkCount++;
+		} else if (gc->GetDialogueFlags() & DF_INTERACT) {
+			gc->SetDialogueFlags(DF_INTERACT, BitOp::NAND);
+			tgta->InteractCount++;
+		}
+	}
+
+	// does this belong here? we must clear actions somewhere before
+	// we start executing them (otherwise queued actions interfere)
+	// executing actions directly does not work, because dialog
+	// needs to end before final actions are executed due to
+	// actions making new dialogs!
+	if (!(target->GetInternalFlag() & IF_NOINT)) {
+		target->Stop();
+	}
+}
+
+int DialogHandler::DialogChooseTransition(unsigned int choose, Scriptable*& target, Actor*& tgta, Actor* speaker)
+{
+	DialogTransition* tr = ds->transitions[choose];
+	UpdateJournalForTransition(tr);
+
+	TextArea* ta = core->GetMessageTextArea();
+	if (tr->textStrRef != ieStrRef::INVALID) {
+		//allow_zero is for PST (deionarra's text)
+		ta->AppendText(u"\n");
+		displaymsg->DisplayStringName(tr->textStrRef, GUIColors::DIALOGPARTY, speaker, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::ALLOW_ZERO);
+	}
+	target->ImmediateEvent();
+	target->ProcessActions(); // run the action queue now
+
+	if (!tr->actions.empty()) {
+		if (!(target->GetInternalFlag() & IF_NOINT)) {
+			target->ReleaseCurrentAction();
+		}
+
+		// do not interrupt during dialog actions (needed for aerie.d polymorph block)
+		target->AddAction("SetInterrupt(FALSE)");
+		// delay all other actions until the next cycle (needed for the machine of Lum the Mad (gorlum2.dlg))
+		// FIXME: figure out if pst needs something similar (action missing)
+		//        (not conditional on GenerateAction to prevent console spam)
+		// iwd2 41nate.d breaks if this is included, since the original delayed execution in a different manner
+		if (!core->HasFeature(GFFlags::AREA_OVERRIDE) && !core->HasFeature(GFFlags::RULES_3ED) && !(tr->Flags & IE_DLG_IMMEDIATE)) {
+			target->AddAction("BreakInstants()");
+		}
+		for (unsigned int i = 0; i < tr->actions.size(); i++) {
+			if (i == tr->actions.size() - 1) tr->actions[i]->flags |= ACF_REALLOW_SCRIPTS;
+			target->AddAction(tr->actions[i]);
+		}
+		target->AddAction("SetInterrupt(TRUE)");
+	}
+
+	GameControl* gc = core->GetGameControl();
+	if (tr->Flags & IE_DLG_TR_FINAL) {
+		if (!tr->actions.empty()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, BitOp::OR);
+		EndDialog();
+		ta->AppendText(u"\n");
+		return -1;
+	}
+
+	// avoid problems when dhjollde.dlg tries starting a cutscene in the middle of a dialog
+	// (it seems harmless doing it in non-HoW too, since other versions would just break in such a situation)
+	core->SetCutSceneMode(false);
+
+	// displaying dialog for selected option
+	int si = tr->stateIndex;
+	// follow external linkage, if required
+	if (!tr->Dialog.IsEmpty() && tr->Dialog != dlg->resRef) {
+		// target should be recalculated!
+		target->LeftDialog();
+		Scriptable* tgt = nullptr;
+		tgta = nullptr;
+		if (originalTargetID) {
+			// always try original target first (sometimes there are multiple
+			// actors with the same dialog in an area, we want to pick the one
+			// we were talking to)
+			tgta = GetLocalActorByGlobalID(originalTargetID);
+			if (tgta && tgta->GetDialog(GD_NORMAL) != tr->Dialog) {
+				tgta = nullptr;
+			} else {
+				tgt = tgta;
+			}
+		}
+		if (!tgt) {
+			// then just search the current area for an actor with the dialog
+			tgt = target->GetCurrentArea()->GetScriptableByDialog(tr->Dialog);
+			if (tgt && tgt->Type == ST_ACTOR) {
+				tgta = (Actor*) tgt;
+			}
+		}
+		if (!tgt) {
+			// try searching for banter dialogue: the original engine seems to
+			// happily let you randomly switch between normal and banter dialogs
+			tgta = FindBanter(target, tr->Dialog);
+			tgt = tgta;
+		}
+		// pst: check if we're carrying any items with the needed dialog (eg. mertwyn's head)
+		if (!tgt && core->HasFeature(GFFlags::AREA_OVERRIDE)) {
+			tgta = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
+			tgt = tgta;
+		}
+
+		if (!tgt) {
+			Log(WARNING, "DialogHandler", "Can't redirect dialog");
+			EndDialog();
+			return -1;
+		}
+		Actor* oldTarget = GetLocalActorByGlobalID(targetID);
+		targetID = tgt->GetGlobalID();
+		if (tgta) tgta->SetCircleSize();
+		if (oldTarget) oldTarget->SetCircleSize();
+		target = tgt;
+
+		// we have to make a backup, tr->Dialog is freed
+		ResRef tmpresref = tr->Dialog;
+		if (!InitDialog(speaker, target, tmpresref, si)) {
+			// error was displayed by InitDialog
+			EndDialog();
+			return -1;
+		}
+	}
+	return si;
+}
+
 bool DialogHandler::DialogChoose(unsigned int choose)
 {
 	TextArea* ta = core->GetMessageTextArea();
@@ -261,21 +392,20 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		return false;
 	}
 
-	Actor *speaker = GetSpeaker();
+	Actor* speaker = GetSpeaker();
 	if (!speaker) {
 		Log(ERROR, "DialogHandler", "Speaker gone???");
 		EndDialog();
 		return false;
 	}
 
-	Scriptable *target = GetTarget();
+	Scriptable* target = GetTarget();
 	if (!target) {
 		Log(ERROR, "DialogHandler", "Target gone???");
 		EndDialog();
 		return false;
 	}
-	Scriptable *tgt = nullptr;
-	Actor *tgta = nullptr;
+	Actor* tgta = nullptr;
 	if (target->Type == ST_ACTOR) {
 		tgta = (Actor *)target;
 	}
@@ -283,135 +413,18 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	int si;
 	GameControl* gc = core->GetGameControl();
 	if (choose == (unsigned int) -1) {
-		//increasing talkcount after top level condition was determined
-
 		si = initialState;
-		if (si<0) {
+		if (si < 0) {
 			EndDialog();
 			return false;
 		}
-
-		if (tgta) {
-			if (gc->GetDialogueFlags()&DF_TALKCOUNT) {
-				gc->SetDialogueFlags(DF_TALKCOUNT, BitOp::NAND);
-				tgta->TalkCount++;
-			} else if (gc->GetDialogueFlags()&DF_INTERACT) {
-				gc->SetDialogueFlags(DF_INTERACT, BitOp::NAND);
-				tgta->InteractCount++;
-			}
-		}
-		// does this belong here? we must clear actions somewhere before
-		// we start executing them (otherwise queued actions interfere)
-		// executing actions directly does not work, because dialog
-		// needs to end before final actions are executed due to
-		// actions making new dialogs!
-		if (!(target->GetInternalFlag() & IF_NOINT)) {
-			target->Stop();
-		}
+		DialogChooseInitial(target, tgta);
 	} else {
 		if (!ds || ds->transitionsCount <= choose) {
 			return false;
 		}
-
-		DialogTransition* tr = ds->transitions[choose];
-		UpdateJournalForTransition(tr);
-		if (tr->textStrRef != ieStrRef::INVALID) {
-			//allow_zero is for PST (deionarra's text)
-			ta->AppendText(u"\n");
-			displaymsg->DisplayStringName( tr->textStrRef, GUIColors::DIALOGPARTY, speaker, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH | STRING_FLAGS::ALLOW_ZERO);
-		}
-		target->ImmediateEvent();
-		target->ProcessActions(); //run the action queue now
-
-		if (!tr->actions.empty()) {
-			if (!(target->GetInternalFlag() & IF_NOINT)) {
-				target->ReleaseCurrentAction();
-			}
-
-			// do not interrupt during dialog actions (needed for aerie.d polymorph block)
-			target->AddAction("SetInterrupt(FALSE)");
-			// delay all other actions until the next cycle (needed for the machine of Lum the Mad (gorlum2.dlg))
-			// FIXME: figure out if pst needs something similar (action missing)
-			//        (not conditional on GenerateAction to prevent console spam)
-			// iwd2 41nate.d breaks if this is included, since the original delayed execution in a different manner
-			if (!core->HasFeature(GFFlags::AREA_OVERRIDE) && !core->HasFeature(GFFlags::RULES_3ED) && !(tr->Flags & IE_DLG_IMMEDIATE)) {
-				target->AddAction("BreakInstants()");
-			}
-			for (unsigned int i = 0; i < tr->actions.size(); i++) {
-				if (i == tr->actions.size() - 1) tr->actions[i]->flags |= ACF_REALLOW_SCRIPTS;
-				target->AddAction(tr->actions[i]);
-			}
-			target->AddAction("SetInterrupt(TRUE)");
-		}
-
-		if (tr->Flags & IE_DLG_TR_FINAL) {
-			if (!tr->actions.empty()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, BitOp::OR);
-			EndDialog();
-			ta->AppendText(u"\n");
-			return false;
-		}
-
-		// avoid problems when dhjollde.dlg tries starting a cutscene in the middle of a dialog
-		// (it seems harmless doing it in non-HoW too, since other versions would just break in such a situation)
-		core->SetCutSceneMode( false );
-
-		//displaying dialog for selected option
-		si = tr->stateIndex;
-		//follow external linkage, if required
-		if (!tr->Dialog.IsEmpty() && tr->Dialog != dlg->resRef) {
-			//target should be recalculated!
-			target->LeftDialog();
-			tgt = nullptr;
-			tgta = nullptr;
-			if (originalTargetID) {
-				// always try original target first (sometimes there are multiple
-				// actors with the same dialog in an area, we want to pick the one
-				// we were talking to)
-				tgta = GetLocalActorByGlobalID(originalTargetID);
-				if (tgta && tgta->GetDialog(GD_NORMAL) != tr->Dialog) {
-					tgta = nullptr;
-				} else {
-					tgt = tgta;
-				}
-			}
-			if (!tgt) {
-				// then just search the current area for an actor with the dialog
-				tgt = target->GetCurrentArea()->GetScriptableByDialog(tr->Dialog);
-				if (tgt && tgt->Type == ST_ACTOR) {
-					tgta = (Actor *) tgt;
-				}
-			}
-			if (!tgt) {
-				// try searching for banter dialogue: the original engine seems to
-				// happily let you randomly switch between normal and banter dialogs
-				tgta = FindBanter(target, tr->Dialog);
-				tgt = tgta;
-			}
-			// pst: check if we're carrying any items with the needed dialog (eg. mertwyn's head)
-			if (!tgt && core->HasFeature(GFFlags::AREA_OVERRIDE)) {
-				tgta = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
-				tgt = tgta;
-			}
-
-			if (!tgt) {
-				Log(WARNING, "DialogHandler", "Can't redirect dialog");
-				EndDialog();
-				return false;
-			}
-			Actor *oldTarget = GetLocalActorByGlobalID(targetID);
-			targetID = tgt->GetGlobalID();
-			if (tgta) tgta->SetCircleSize();
-			if (oldTarget) oldTarget->SetCircleSize();
-			target = tgt;
-
-			// we have to make a backup, tr->Dialog is freed
-			ResRef tmpresref = tr->Dialog;
-			if (!InitDialog(speaker, target, tmpresref, si)) {
-				// error was displayed by InitDialog
-				EndDialog();
-				return false;
-			}
-		}
+		si = DialogChooseTransition(choose, target, tgta, speaker);
+		if (si < 0) return false;
 	}
 
 	ds = dlg->GetState( si );
