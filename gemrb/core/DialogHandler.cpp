@@ -326,59 +326,61 @@ int DialogHandler::DialogChooseTransition(unsigned int choose, Scriptable*& targ
 	// displaying dialog for selected option
 	int si = tr->stateIndex;
 	// follow external linkage, if required
-	if (!tr->Dialog.IsEmpty() && tr->Dialog != dlg->resRef) {
-		// target should be recalculated!
-		target->LeftDialog();
-		Scriptable* tgt = nullptr;
-		tgta = nullptr;
-		if (originalTargetID) {
-			// always try original target first (sometimes there are multiple
-			// actors with the same dialog in an area, we want to pick the one
-			// we were talking to)
-			tgta = GetLocalActorByGlobalID(originalTargetID);
-			if (tgta && tgta->GetDialog(GD_NORMAL) != tr->Dialog) {
-				tgta = nullptr;
-			} else {
-				tgt = tgta;
-			}
-		}
-		if (!tgt) {
-			// then just search the current area for an actor with the dialog
-			tgt = target->GetCurrentArea()->GetScriptableByDialog(tr->Dialog);
-			if (tgt && tgt->Type == ST_ACTOR) {
-				tgta = (Actor*) tgt;
-			}
-		}
-		if (!tgt) {
-			// try searching for banter dialogue: the original engine seems to
-			// happily let you randomly switch between normal and banter dialogs
-			tgta = FindBanter(target, tr->Dialog);
+	if (tr->Dialog.IsEmpty() || tr->Dialog == dlg->resRef) {
+		return si;
+	}
+
+	// target should be recalculated!
+	target->LeftDialog();
+	Scriptable* tgt = nullptr;
+	tgta = nullptr;
+	if (originalTargetID) {
+		// always try original target first (sometimes there are multiple
+		// actors with the same dialog in an area, we want to pick the one
+		// we were talking to)
+		tgta = GetLocalActorByGlobalID(originalTargetID);
+		if (tgta && tgta->GetDialog(GD_NORMAL) != tr->Dialog) {
+			tgta = nullptr;
+		} else {
 			tgt = tgta;
 		}
-		// pst: check if we're carrying any items with the needed dialog (eg. mertwyn's head)
-		if (!tgt && core->HasFeature(GFFlags::AREA_OVERRIDE)) {
-			tgta = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
-			tgt = tgta;
+	}
+	if (!tgt) {
+		// then just search the current area for an actor with the dialog
+		tgt = target->GetCurrentArea()->GetScriptableByDialog(tr->Dialog);
+		if (tgt && tgt->Type == ST_ACTOR) {
+			tgta = (Actor*) tgt;
 		}
+	}
+	if (!tgt) {
+		// try searching for banter dialogue: the original engine seems to
+		// happily let you randomly switch between normal and banter dialogs
+		tgta = FindBanter(target, tr->Dialog);
+		tgt = tgta;
+	}
+	// pst: check if we're carrying any items with the needed dialog (eg. mertwyn's head)
+	if (!tgt && core->HasFeature(GFFlags::AREA_OVERRIDE)) {
+		tgta = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
+		tgt = tgta;
+	}
 
-		if (!tgt) {
-			Log(WARNING, "DialogHandler", "Can't redirect dialog");
-			EndDialog();
-			return -1;
-		}
-		Actor* oldTarget = GetLocalActorByGlobalID(targetID);
-		targetID = tgt->GetGlobalID();
-		if (tgta) tgta->SetCircleSize();
-		if (oldTarget) oldTarget->SetCircleSize();
-		target = tgt;
+	if (!tgt) {
+		Log(WARNING, "DialogHandler", "Can't redirect dialog");
+		EndDialog();
+		return -1;
+	}
+	Actor* oldTarget = GetLocalActorByGlobalID(targetID);
+	targetID = tgt->GetGlobalID();
+	if (tgta) tgta->SetCircleSize();
+	if (oldTarget) oldTarget->SetCircleSize();
+	target = tgt;
 
-		// we have to make a backup, tr->Dialog is freed
-		ResRef tmpresref = tr->Dialog;
-		if (!InitDialog(speaker, target, tmpresref, si)) {
-			// error was displayed by InitDialog
-			EndDialog();
-			return -1;
-		}
+	// we have to make a backup, tr->Dialog is freed
+	ResRef tmpresref = tr->Dialog;
+	if (!InitDialog(speaker, target, tmpresref, si)) {
+		// error was displayed by InitDialog
+		EndDialog();
+		return -1;
 	}
 	return si;
 }
