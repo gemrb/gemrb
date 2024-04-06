@@ -85,7 +85,6 @@ void GlobalTimer::DoStep(int count)
 		if (d <= magnitude) {
 			p = goal;
 		} else {
-			magnitude = std::min(magnitude, d);
 			float r = magnitude / float(d);
 			p.x = (1 - r) * p.x + r * goal.x;
 			p.y = (1 - r) * p.y + r * goal.y;
