@@ -33,6 +33,13 @@ from ie_restype import RES_BAM
 
 InventoryWindow = None
 
+# ground slots are transposed with one outlier, so map them to something normal
+# 68 71 -> 68 69
+# 69 72 -> 70 71
+# 70 81 -> 72 81
+# the original seems to have stored the order in the Cycle field (0-5)
+HorizontalSlots = { 68: 68,  69: 70, 70: 72, 71: 69, 72: 71, 81: 81 }
+
 def InitInventoryWindow (Window):
 	global InventoryWindow
 
@@ -44,8 +51,8 @@ def InitInventoryWindow (Window):
 	ScrollBar.OnChange (RefreshInventoryWindow)
 
 	# Ground Items (6)
-	for i in range (5):
-		Button = Window.GetControl (i+68)
+	for cid in HorizontalSlots:
+		Button = Window.GetControl (cid)
 		Button.OnMouseEnter (InventoryCommon.MouseEnterGround)
 		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
 		Button.SetFont ("NUMBER")
@@ -145,9 +152,8 @@ def UpdateInventoryWindow (Window = None):
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
 	Count = Container['ItemCount']
-	if Count<1:
-		Count=1
-	ScrollBar.SetVarAssoc ("TopIndex", Count)
+	# account for two columns
+	ScrollBar.SetVarAssoc ("TopIndex", max(0, (Count - 6 + 1) // 2))
 	Equipped = GemRB.GetEquippedQuickSlot (pc, 1)
 	GemRB.SetVar ("Equipped", Equipped)
 	for i in range (0, 3, 2):
@@ -232,12 +238,12 @@ def RefreshInventoryWindow ():
 	Button.SetBAM ("COLGRAD", 0, 0, Color)
 
 	# update ground inventory slots
-	TopIndex = GemRB.GetVar ("TopIndex")
-	for i in range (6):
-		if i<5:
-			Button = Window.GetControl (i+68)
-		else:
-			Button = Window.GetControl (i+76)
+	TopIndex = GemRB.GetVar ("TopIndex") * 2
+	for (i, cid) in enumerate(HorizontalSlots):
+		Button = Window.GetControl (cid)
+		# use a different item, so the order is LTR
+		i = min(5, HorizontalSlots[cid] - 68)
+		slotID = i + TopIndex
 
 		if GemRB.IsDraggingItem ()==1:
 			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
@@ -245,14 +251,14 @@ def RefreshInventoryWindow ():
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
 
-		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
+		Slot = GemRB.GetContainerItem (pc, slotID)
 		if Slot == None:
 			Button.OnPress (None)
 			Button.OnRightPress (None)
 			Button.OnShiftPress (None)
 			Button.OnDoublePress (None)
 		else:
-			Button.SetValue (i + TopIndex)
+			Button.SetValue (slotID)
 			Button.OnPress (InventoryCommon.OnDragItemGround)
 			Button.OnRightPress (InventoryCommon.OpenGroundItemInfoWindow)
 			Button.OnShiftPress (InventoryCommon.OpenGroundItemAmountWindow)
