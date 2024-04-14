@@ -85,7 +85,7 @@ FUNCTION(CONFIGURE_COMPILER)
 	ENDIF ()
 
 	IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-		STRING(APPEND CMAKE_CXX_FLAGS " -Wcast-align -Woverloaded-virtual=0")
+		STRING(APPEND CMAKE_CXX_FLAGS " -Wcast-align")
 		ADD_FLAG_IF_SUPPORTED(
 			FLAG "-Wno-error"
 			VALUE "stringop-truncation"
@@ -110,6 +110,7 @@ FUNCTION(CONFIGURE_COMPILER)
 		ENDIF ()
 
 		ADD_FLAG_IF_SUPPORTED(FLAG "-Wimplicit-fallthrough" VALUE "2")
+		ADD_FLAG_IF_SUPPORTED(FLAG "-Woverloaded-virtual" VALUE "0")
 	ENDIF ()
 
 	IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
