@@ -130,8 +130,8 @@ def UpdateMageWindow (Window=None):
 		Icon.SetTooltip ('')
 		
 
-ToggleSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, UpdateMageWindow, WINDOW_TOP|WINDOW_HCENTER)
-OpenSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, UpdateMageWindow, WINDOW_TOP|WINDOW_HCENTER)
+ToggleSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, UpdateMageWindow)
+OpenSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, UpdateMageWindow)
 
 def MagePrevLevelPress ():
 	global MageSpellLevel

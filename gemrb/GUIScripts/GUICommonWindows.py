@@ -1375,6 +1375,8 @@ def TopWindowClosed(window):
 
 if GameCheck.IsIWD2():
 	DefaultWinPos = WINDOW_TOP|WINDOW_HCENTER
+elif GameCheck.IsPST () and GemRB.GetSystemVariable (SV_HEIGHT) < 480 + 73:
+	DefaultWinPos = WINDOW_TOP | WINDOW_HCENTER
 else:
 	DefaultWinPos = WINDOW_CENTER
 

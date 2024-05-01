@@ -251,8 +251,8 @@ def UpdateRecordsWindow (Window):
 	Text.SetText (stats_overview)
 	return
 
-ToggleRecordsWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIREC", GUICommonWindows.ToggleWindow, InitRecordsWindow, UpdateRecordsWindow, WINDOW_TOP|WINDOW_HCENTER, True)
-OpenRecordsWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIREC", GUICommonWindows.OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow, WINDOW_TOP|WINDOW_HCENTER, True)
+ToggleRecordsWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIREC", GUICommonWindows.ToggleWindow, InitRecordsWindow, UpdateRecordsWindow, GUICommonWindows.DefaultWinPos, True)
+OpenRecordsWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIREC", GUICommonWindows.OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow, GUICommonWindows.DefaultWinPos, True)
 
 # puts default info to textarea (overview of PC's bonuses, saves, etc.
 def OnRecordsButtonLeave ():

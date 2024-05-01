@@ -131,8 +131,8 @@ def UpdatePriestWindow (Window):
 
 	return
 
-TogglePriestWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIPR", GUICommonWindows.ToggleWindow, InitPriestWindow, UpdatePriestWindow, WINDOW_TOP|WINDOW_HCENTER)
-OpenPriestWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIPR", GUICommonWindows.OpenWindowOnce, InitPriestWindow, UpdatePriestWindow, WINDOW_TOP|WINDOW_HCENTER)
+TogglePriestWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIPR", GUICommonWindows.ToggleWindow, InitPriestWindow, UpdatePriestWindow)
+OpenPriestWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIPR", GUICommonWindows.OpenWindowOnce, InitPriestWindow, UpdatePriestWindow)
 
 def PriestPrevLevelPress ():
 	global PriestSpellLevel
