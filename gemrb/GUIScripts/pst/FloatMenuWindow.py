@@ -406,7 +406,10 @@ def SelectItem ():
 		float_menu_selected = None
 	else:
 		float_menu_selected = Button
-	UpdateFloatMenuWindow()
+	if GUICommon.UsingTouchInput ():
+		FloatMenuWindow.Close ()
+	else:
+		UpdateFloatMenuWindow()
 	return
 
 def UpdateFloatMenuSpell (pc, i):
@@ -420,6 +423,11 @@ def UpdateFloatMenuSpell (pc, i):
 		Button.SetPicture(None)
 		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 
+	def CloseOnPress (callback):
+		if GUICommon.UsingTouchInput ():
+			FloatMenuWindow.Close ()
+		callback ()
+
 	if i + float_menu_index < len (spell_list):
 		SpellResRef = spell_list[i + float_menu_index]["SpellResRef"]
 		Button.SetSpellIcon (SpellResRef)
@@ -427,7 +435,7 @@ def UpdateFloatMenuSpell (pc, i):
 
 		spell = GemRB.GetSpell (SpellResRef)
 		Button.SetTooltip (spell['SpellName'])
-		Button.OnPress (GUICommonWindows.SpellPressed)
+		Button.OnPress (lambda: CloseOnPress (GUICommonWindows.SpellPressed))
 		Button.SetVarAssoc ("Spell", spell_list[i + float_menu_index]['SpellIndex'])
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	elif i < 3 and GemRB.GetPlayerStat (pc, IE_CLASS) == 9:
@@ -435,7 +443,7 @@ def UpdateFloatMenuSpell (pc, i):
 		thieving = [ ACT_SEARCH, ACT_THIEVING, ACT_STEALTH ]
 		acts = [ GUICommonWindows.ActionSearchPressed, GUICommonWindows.ActionThievingPressed, GUICommonWindows.ActionStealthPressed ]
 		Button.SetActionIcon (globals(), thieving[i])
-		Button.OnPress (acts[i])
+		Button.OnPress (lambda: CloseOnPress (acts[i]))
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		ClearSlot (i)
@@ -488,7 +496,7 @@ def FloatMenuSelectDialog ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK)
 	# close it immediately for touch users, since it's hard for them rightclick to close
 	if GUICommon.UsingTouchInput ():
-		OpenFloatMenuWindow ()
+		FloatMenuWindow.Close ()
 	else:
 		UpdateFloatMenuWindow ()
 	return
@@ -499,10 +507,7 @@ def FloatMenuSelectWeapons ():
 	float_menu_index = 0
 	float_menu_selected = None
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
-	if GUICommon.UsingTouchInput ():
-		OpenFloatMenuWindow ()
-	else:
-		UpdateFloatMenuWindow ()
+	UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectItems ():
@@ -510,10 +515,7 @@ def FloatMenuSelectItems ():
 	float_menu_mode = MENU_MODE_ITEMS
 	float_menu_index = 0
 	float_menu_selected = None
-	if GUICommon.UsingTouchInput ():
-		OpenFloatMenuWindow ()
-	else:
-		UpdateFloatMenuWindow ()
+	UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectSpells ():
@@ -528,10 +530,7 @@ def FloatMenuSelectSpells ():
 	float_menu_mode = MENU_MODE_SPELLS
 	float_menu_index = 0
 	float_menu_selected = None
-	if GUICommon.UsingTouchInput ():
-		OpenFloatMenuWindow ()
-	else:
-		UpdateFloatMenuWindow ()
+	UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectAbilities ():
@@ -539,10 +538,7 @@ def FloatMenuSelectAbilities ():
 	float_menu_mode = MENU_MODE_ABILITIES
 	float_menu_index = 0
 	float_menu_selected = None
-	if GUICommon.UsingTouchInput ():
-		OpenFloatMenuWindow ()
-	else:
-		UpdateFloatMenuWindow ()
+	UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuPreviousItem ():
