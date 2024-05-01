@@ -30,7 +30,7 @@ import DualClass
 import GUIRECCommon
 import PartyReform
 from GUIDefines import *
-from GUICommonWindows import CreateTopWinLoader, ToggleWindow, OpenWindowOnce, DefaultWinPos
+from GUICommonWindows import CreateTopWinLoader, ToggleWindow, OpenWindowOnce
 from ie_stats import *
 from ie_restype import *
 ###################################################
@@ -218,8 +218,8 @@ def UpdateRecordsWindow (Window):
 
 	return
 
-ToggleRecordsWindow = CreateTopWinLoader(2, "GUIREC", ToggleWindow, InitRecordsWindow, UpdateRecordsWindow, DefaultWinPos, True)
-OpenRecordsWindow = CreateTopWinLoader(2, "GUIREC", OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow, DefaultWinPos, True)
+ToggleRecordsWindow = CreateTopWinLoader(2, "GUIREC", ToggleWindow, InitRecordsWindow, UpdateRecordsWindow, True)
+OpenRecordsWindow = CreateTopWinLoader(2, "GUIREC", OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow, True)
 
 #original returns to game before continuing...
 def OpenRecReformPartyWindow ():

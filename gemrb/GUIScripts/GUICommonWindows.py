@@ -1380,7 +1380,7 @@ elif GameCheck.IsPST () and GemRB.GetSystemVariable (SV_HEIGHT) < 480 + 73:
 else:
 	DefaultWinPos = WINDOW_CENTER
 
-def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None, pos = DefaultWinPos, pause = False):
+def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None, pause = False, pos = DefaultWinPos):
 	def ret (btn = None):
 		topwin = GemRB.GetView("WIN_TOP")
 		if topwin and topwin.HasFocus == False:
