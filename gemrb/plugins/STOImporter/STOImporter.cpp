@@ -85,7 +85,7 @@ Store* STOImporter::GetStore(Store *s)
 	str->ReadDword(s->PurchasedCategoriesOffset);
 	str->ReadDword(s->PurchasedCategoriesCount);
 	str->ReadDword(s->ItemsOffset);
-	str->ReadDword(s->ItemsCount);
+	str->ReadDword(shopType);
 	str->ReadDword(s->Lore);
 	str->ReadDword(s->IDPrice);
 	str->ReadResRef( s->RumoursTavern );
@@ -111,7 +111,7 @@ Store* STOImporter::GetStore(Store *s)
 	}
 
 	s->purchased_categories.resize(s->PurchasedCategoriesCount);
-	s->items.resize(s->ItemsCount);
+	s->items.resize(shopType);
 	s->drinks.resize(s->DrinksCount);
 	s->cures.resize(s->CuresCount);
 
@@ -303,7 +303,7 @@ void STOImporter::PutHeader(DataStream *stream, const Store *s)
 	stream->WriteDword(s->PurchasedCategoriesOffset);
 	stream->WriteDword(s->PurchasedCategoriesCount);
 	stream->WriteDword(s->ItemsOffset);
-	stream->WriteDword(s->ItemsCount);
+	stream->WriteDword(s->items.size());
 	stream->WriteDword(s->Lore);
 	stream->WriteDword(s->IDPrice);
 	stream->WriteResRef( s->RumoursTavern);

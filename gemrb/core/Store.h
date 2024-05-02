@@ -145,8 +145,7 @@ public:
 	ieDword PurchasedCategoriesOffset = 0;
 	ieDword PurchasedCategoriesCount = 0;
 	ieDword ItemsOffset = 0;
-	//don't use this value directly, use GetRealStockSize
-	ieDword ItemsCount = 0;
+	// use GetRealStockSize to get the item count
 	ieDword Lore = 0;
 	ieDword IDPrice = 0;
 	ResRef RumoursTavern;

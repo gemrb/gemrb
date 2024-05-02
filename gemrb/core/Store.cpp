@@ -82,7 +82,7 @@ bool Store::IsItemAvailable(const STOItem* item) const
 
 int Store::GetRealStockSize() const
 {
-	int count=ItemsCount;
+	int count = items.size();
 	if (!HasTriggers) {
 		return count;
 	}
@@ -199,7 +199,8 @@ STOItem *Store::GetItem(unsigned int idx, bool usetrigger) const
 
 unsigned int Store::FindItem(const ResRef &itemname, bool usetrigger) const
 {
-	for (unsigned int i=0;i<ItemsCount;i++) {
+	unsigned int count = items.size();
+	for (unsigned int i = 0; i < count; i++) {
 		const STOItem* temp = items[i];
 		if (usetrigger) {
 			if (!IsItemAvailable(temp)) {
@@ -339,7 +340,6 @@ void Store::AddItem(CREItem *item)
 		temp->Usages[0] = 1;
 	}
 	items.push_back (temp );
-	ItemsCount++;
 }
 
 void Store::RemoveItem(const STOItem *itm)
@@ -348,7 +348,6 @@ void Store::RemoveItem(const STOItem *itm)
 	while(i--) {
 		if (items[i]==itm) {
 			items.erase(items.begin()+i);
-			ItemsCount--;
 			break;
 		}
 	}
