@@ -415,6 +415,11 @@ IWDMapDimensions = <bool>
 If set to 1, then the minimap dimensions are using the IWD specific ratio.
 
 
+IWDRestSpawns = <bool>
+- - - - - - - - - - - -
+If set to 1, a simpler rest interruption spawning algorithm is used.
+
+
 IWD2ScriptName = <bool>
 - - - - - - - - - - - -
 If set to 1, then areas always override the scripting name of the creature.
