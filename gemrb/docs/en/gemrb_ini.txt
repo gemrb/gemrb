@@ -269,6 +269,12 @@ Whether original game data contains beasts.ini and quests.ini files
 with descriptions of monsters and quests (PST only).
 
 
+HasContinuation = <bool>
+- - - - - - - - - - - - -
+If set to 1, -1 as an area song entry has special meaning; the song is
+looked up in the previous master area's song header instead.
+
+
 HasDPLAYER = <bool>
 - - - - - - - - - - 
 If set to 1, then NPCs will get a default player script (DPLAYER2) set

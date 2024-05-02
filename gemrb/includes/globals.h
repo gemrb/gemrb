@@ -137,6 +137,7 @@ enum class GFFlags : uint32_t {
 	HAS_WEAPON_SETS,             	// iwd2
 	HIGHLIGHT_OUTLINE_ONLY,         // all
 	IWD_REST_SPAWNS,                // iwd1, not bgs or iwdee
+	HAS_CONTINUATION,               // all but iwds
 
 	count // must be last
 };

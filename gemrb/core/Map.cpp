@@ -2394,18 +2394,18 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	}
 	size_t pl = SongList[SongType];
 
-	bool isBG1 = core->HasFeature(GFFlags::BREAKABLE_WEAPONS); // preliminary BG1 test
+	bool hasContinuation = core->HasFeature(GFFlags::HAS_CONTINUATION);
 	Game* game = core->GetGame();
 	const PluginHolder<MusicMgr>& musicMgr = core->GetMusicMgr();
 
+	// handle -1
 	// Test for non-zero pl in order to keep subareas quiet which disable
 	// music explicitely with pl=0.
 	ieVariable poi = core->GetMusicPlaylist(pl);
-	if (IsStar(poi) && pl && !MasterArea && isBG1) {
-		static constexpr int bc1Idx = 19; // fallback to first BG1 battle music
+	if (IsStar(poi) && pl && !MasterArea && hasContinuation) {
+		static constexpr int bc1Idx = 19; // fallback to first BG1 battle music, should never be hit
 
 		const Map* lastMasterArea = game->GetMap(game->LastMasterArea, false);
-
 		pl = lastMasterArea ? lastMasterArea->SongList[SongType] : bc1Idx;
 		poi = core->GetMusicPlaylist(pl);
 	}
