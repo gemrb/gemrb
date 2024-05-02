@@ -2382,22 +2382,26 @@ bool Map::SpawnsAlive() const
 void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 {
 	size_t pl = SongList[SongType];
-	const ieVariable* poi = &core->GetMusicPlaylist(pl);
-
 	bool isBG1 = core->HasFeature(GFFlags::BREAKABLE_WEAPONS); // preliminary BG1 test
 	Game* game = core->GetGame();
 	const PluginHolder<MusicMgr>& musicMgr = core->GetMusicMgr();
 
-	// Some subareas don't have their own songlist. It is currently unclear
-	// how the different games handle this situation and which music GemRB
-	// should play, if any. Further research is needed.
-	// At least for BG1 there is a strong assumption to play the music from
-	// the masterarea's songlist, e.g. AR2607 (intro candlekeep ambush south),
-	// or AR2302 (friendly arm inn 2nd floor).
-	// This assumption is definitely wrong for IWD, see #1476! Therefore we
-	// use a preliminary flag test to restrict it to BG1 for now.
+	// Some subareas don't have their own songlist. IWDs do nothing about it,
+	// while other games support continuation values:
+	// * -1 for last master area's song of the same entry,
+	// * -2 for current area's day/night song
+	// Eg. bg1 AR2607 (intro candlekeep ambush south), AR2302 (friendly arm inn 2nd floor)
+	if (pl == size_t(-2)) {
+		// select SONG_DAY or SONG_NIGHT
+		Trigger parameters;
+		parameters.int0Parameter = 0; // TIMEOFDAY_DAY, while dusk, dawn and night we treat as night
+		SongType = int(GameScript::TimeOfDay(nullptr, &parameters) != 1);
+		pl = SongList[SongType];
+	}
+
 	// Test for non-zero pl in order to keep subareas quiet which disable
 	// music explicitely with pl=0.
+	const ieVariable* poi = &core->GetMusicPlaylist(pl);
 	if (IsStar(*poi) && pl && !MasterArea && isBG1) {
 		static constexpr int bc1Idx = 19; // fallback to first BG1 battle music
 
