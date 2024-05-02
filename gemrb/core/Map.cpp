@@ -2401,17 +2401,17 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 
 	// Test for non-zero pl in order to keep subareas quiet which disable
 	// music explicitely with pl=0.
-	const ieVariable* poi = &core->GetMusicPlaylist(pl);
-	if (IsStar(*poi) && pl && !MasterArea && isBG1) {
+	ieVariable poi = core->GetMusicPlaylist(pl);
+	if (IsStar(poi) && pl && !MasterArea && isBG1) {
 		static constexpr int bc1Idx = 19; // fallback to first BG1 battle music
 
 		const Map* lastMasterArea = game->GetMap(game->LastMasterArea, false);
 
 		pl = lastMasterArea ? lastMasterArea->SongList[SongType] : bc1Idx;
-		poi = &core->GetMusicPlaylist(pl);
+		poi = core->GetMusicPlaylist(pl);
 	}
 
-	if (IsStar(*poi)) {
+	if (IsStar(poi)) {
 		// ease off the music if possible
 		// playlists without the exit segment will be forcefully ended
 		musicMgr->End();
@@ -2419,8 +2419,8 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	}
 
 	//check if restart needed (either forced or the current song is different)
-	if (!restart && musicMgr->IsCurrentPlayList(*poi)) return;
-	int ret = musicMgr->SwitchPlayList(*poi, hard);
+	if (!restart && musicMgr->IsCurrentPlayList(poi)) return;
+	int ret = musicMgr->SwitchPlayList(poi, hard);
 	if (ret) {
 		//Here we disable the faulty musiclist entry
 		core->DisableMusicPlaylist(pl);
