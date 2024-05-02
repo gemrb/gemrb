@@ -1882,7 +1882,7 @@ void GameScript::StartCombatCounter(Scriptable* Sender, Action* /*parameters*/)
 {
 	const Map *map = Sender->GetCurrentArea();
 	if (!map) return;
-	map->PlayAreaSong(3, true, true);
+	map->PlayAreaSong(SONG_BATTLE, true, true);
 }
 
 /*iwd2 can set an areasong slot*/
