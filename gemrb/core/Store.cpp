@@ -124,13 +124,20 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 
 	if (pc && Type < StoreType::BG2CONT) {
 		//don't allow selling of non destructible items
-		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE )) {
+		if (!(invflags & IE_INV_ITEM_DESTRUCTIBLE)) {
 			ret &= ~IE_STORE_SELL;
 		}
 
 		//don't allow selling of critical items (they could still be put in bags) ... unless the shop is special
-		if ((invflags&IE_INV_ITEM_CRITICAL) && !(Flags&IE_STORE_BUYCRITS)) {
+		bool critical = invflags & IE_INV_ITEM_CRITICAL;
+		if (critical && !(Flags & IE_STORE_BUYCRITS)) {
 			ret &= ~IE_STORE_SELL;
+		}
+
+		// ... however some games determine sellability differently
+		bool sellable = critical && !(invflags & IE_INV_ITEM_CONVERSABLE);
+		if (sellable && core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
+			ret |= IE_STORE_SELL;
 		}
 
 		//check if store buys stolen items

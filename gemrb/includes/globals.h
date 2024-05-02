@@ -138,6 +138,7 @@ enum class GFFlags : uint32_t {
 	HIGHLIGHT_OUTLINE_ONLY,         // all
 	IWD_REST_SPAWNS,                // iwd1, not bgs or iwdee
 	HAS_CONTINUATION,               // all but iwds
+	SELLABLE_CRITS_NO_CONV,         // bg1, iwd1
 
 	count // must be last
 };
