@@ -1531,8 +1531,30 @@ bool Game::EveryoneDead() const
 	return true;
 }
 
-//runs all area scripts
+// determine if we should start some music
+static bool ShouldChangeSong(bool combatChange)
+{
+	bool doChangeSong = false;
+	if (combatChange) {
+		doChangeSong = true;
+	} else if (!core->GetMusicMgr()->IsPlaying()) {
+		// perhaps a StartMusic action stopped the area music?
+		// (we should probably find a less silly way to handle this,
+		// because nothing can ever stop area music now...)
 
+		// Call ChangeSong only once per round in order to prevent spam
+		// calls every tick in areas without music.
+		static unsigned int ticks = 0;
+		ticks++;
+		doChangeSong = ticks >= core->Time.round_size;
+		if (doChangeSong) {
+			ticks = 0;
+		}
+	} // else nothing to change
+	return doChangeSong;
+}
+
+// runs all area scripts
 void Game::UpdateScripts()
 {
 	Update();
@@ -1543,43 +1565,19 @@ void Game::UpdateScripts()
 		Maps[idx]->UpdateScripts();
 	}
 
-	// determine if we should start some music
-	bool doChangeSong;
-	bool doChangeSongHard;
-
+	bool combatEnded = false;
 	if (PartyAttack) {
 		//ChangeSong will set the battlesong only if CombatCounter is nonzero
 		CombatCounter = 150;
-		doChangeSong = true;
-		doChangeSongHard = true;
 	} else if (CombatCounter) {
-		//Change song if combatcounter goes down to 0
 		CombatCounter--;
-		doChangeSong = !CombatCounter;
-		doChangeSongHard = false;
-	} else if (!core->GetMusicMgr()->IsPlaying()) {
-		// perhaps a StartMusic action stopped the area music?
-		// (we should probably find a less silly way to handle this,
-		// because nothing can ever stop area music now..)
-
-		// Call ChangeSong only once per round in order to prevent spam
-		// calls every tick in areas without music.
-		static unsigned int ticks = 0;
-		ticks++;
-
-		doChangeSong = ticks >= core->Time.round_size;
-		doChangeSongHard = false;
-
-		if (doChangeSong) {
-			ticks = 0;
-		}
-	} else {
-		// nothing to change
-		doChangeSong = false;
-		doChangeSongHard = false;
+		if (!CombatCounter) combatEnded = true;
 	}
-	if (doChangeSong) {
-		ChangeSong(false, doChangeSongHard);
+
+	// change song if we got attacked, combat stopped or perhaps if nothing is playing
+	// hard switch only at combat start
+	if (ShouldChangeSong(PartyAttack || combatEnded)) {
+		ChangeSong(false, PartyAttack);
 	}
 
 	if (StateOverrideTime)
