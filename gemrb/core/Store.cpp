@@ -65,15 +65,15 @@ Store::~Store(void)
 	}
 }
 
-bool Store::IsItemAvailable(unsigned int slot) const
+bool Store::IsItemAvailable(const STOItem* item) const
 {
-	const Game *game = core->GetGame();
+	// integer values are handled in the importer, here we actually check any set conditions
 	//0     - not infinite, not conditional
 	//-1    - infinite
 	//other - pst trigger ref
-
-	const Condition *triggers = items[slot]->triggers;
+	const Condition* triggers = item->triggers;
 	if (triggers) {
+		const Game* game = core->GetGame();
 		Scriptable *shopper = game->GetSelectedPCSingle(false);
 		return triggers->Evaluate(shopper) != 0;
 	}
@@ -86,8 +86,8 @@ int Store::GetRealStockSize() const
 	if (!HasTriggers) {
 		return count;
 	}
-	for (unsigned int i=0;i<ItemsCount;i++) {
-		if (!IsItemAvailable(i) ) {
+	for (const STOItem* item : items) {
+		if (!IsItemAvailable(item)) {
 			count--;
 		}
 	}
@@ -186,10 +186,10 @@ STOItem *Store::GetItem(unsigned int idx, bool usetrigger) const
 		return items[idx];
 	}
 
-	for (unsigned int i=0;i<ItemsCount;i++) {
-		if (IsItemAvailable(i)) {
+	for (STOItem* item : items) {
+		if (IsItemAvailable(item)) {
 			if (!idx) {
-				return items[i];
+				return item;
 			}
 			idx--;
 		}
@@ -200,12 +200,12 @@ STOItem *Store::GetItem(unsigned int idx, bool usetrigger) const
 unsigned int Store::FindItem(const ResRef &itemname, bool usetrigger) const
 {
 	for (unsigned int i=0;i<ItemsCount;i++) {
+		const STOItem* temp = items[i];
 		if (usetrigger) {
-			if (!IsItemAvailable(i) ) {
+			if (!IsItemAvailable(temp)) {
 				continue;
 			}
 		}
-		const STOItem *temp = items[i];
 		if (itemname == temp->ItemResRef) {
 			return i;
 		}
@@ -215,11 +215,10 @@ unsigned int Store::FindItem(const ResRef &itemname, bool usetrigger) const
 
 STOItem *Store::FindItem(const CREItem *item, bool exact) const
 {
-	for (unsigned int i=0;i<ItemsCount;i++) {
-		if (!IsItemAvailable(i) ) {
+	for (STOItem* temp : items) {
+		if (!IsItemAvailable(temp)) {
 			continue;
 		}
-		STOItem *temp = items[i];
 
 		if (item->ItemResRef != temp->ItemResRef) {
 			continue;
@@ -242,8 +241,7 @@ STOItem *Store::FindItem(const CREItem *item, bool exact) const
 unsigned int Store::CountItems(const ResRef& itemRef) const
 {
 	unsigned int count = 0;
-	for (unsigned int i = 0; i < ItemsCount; i++) {
-		const STOItem* storeItem = items[i];
+	for (const STOItem* storeItem : items) {
 		if (itemRef == storeItem->ItemResRef) {
 			count += storeItem->AmountInStock;
 		}

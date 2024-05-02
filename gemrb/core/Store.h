@@ -192,7 +192,7 @@ public: //queries
 private:
 	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
 	STOItem *FindItem(const CREItem *item, bool exact) const;
-	bool IsItemAvailable(unsigned int slot) const;
+	bool IsItemAvailable(const STOItem* item) const;
 };
 
 }
