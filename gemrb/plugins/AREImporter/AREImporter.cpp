@@ -531,7 +531,7 @@ void AREImporter::GetSongs(DataStream* str, Map* map, std::vector<Ambient*>& amb
 			ambi->appearance ^= dayBits; // night: bits 0-5 + 19-23, [dusk till dawn]
 		}
 	}
-	// bgt ar7300 has a nigth ambient only in the first slot
+	// bgt ar7300 has a night ambient only in the first slot
 	if (ambi) {
 		ambients.push_back(ambi);
 	}
