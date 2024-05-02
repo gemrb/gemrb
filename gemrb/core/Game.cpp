@@ -2164,10 +2164,7 @@ void Game::ChangeSong(bool always, bool force) const
 		Song = SONG_BATTLE;
 		BattleSong++;
 	} else {
-		//will select SONG_DAY or SONG_NIGHT
-		Trigger parameters;
-		parameters.int0Parameter = 0; // TIMEOFDAY_DAY, while dusk, dawn and night we treat as night
-		Song = int(GameScript::TimeOfDay(nullptr, &parameters) != 1);
+		Song = 0xffff; // will select SONG_DAY or SONG_NIGHT
 		BattleSong = 0;
 	}
 	//area may override the song played (stick in battlemusic)

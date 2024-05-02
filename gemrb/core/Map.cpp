@@ -2381,23 +2381,22 @@ bool Map::SpawnsAlive() const
 
 void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 {
-	size_t pl = SongList[SongType];
-	bool isBG1 = core->HasFeature(GFFlags::BREAKABLE_WEAPONS); // preliminary BG1 test
-	Game* game = core->GetGame();
-	const PluginHolder<MusicMgr>& musicMgr = core->GetMusicMgr();
-
 	// Some subareas don't have their own songlist. IWDs do nothing about it,
 	// while other games support continuation values:
 	// * -1 for last master area's song of the same entry,
 	// * -2 for current area's day/night song
 	// Eg. bg1 AR2607 (intro candlekeep ambush south), AR2302 (friendly arm inn 2nd floor)
-	if (pl == size_t(-2)) {
+	if (SongType == 0xffff || SongList[SongType] == ieDword(-2)) {
 		// select SONG_DAY or SONG_NIGHT
 		Trigger parameters;
 		parameters.int0Parameter = 0; // TIMEOFDAY_DAY, while dusk, dawn and night we treat as night
 		SongType = int(GameScript::TimeOfDay(nullptr, &parameters) != 1);
-		pl = SongList[SongType];
 	}
+	size_t pl = SongList[SongType];
+
+	bool isBG1 = core->HasFeature(GFFlags::BREAKABLE_WEAPONS); // preliminary BG1 test
+	Game* game = core->GetGame();
+	const PluginHolder<MusicMgr>& musicMgr = core->GetMusicMgr();
 
 	// Test for non-zero pl in order to keep subareas quiet which disable
 	// music explicitely with pl=0.
