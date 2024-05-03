@@ -8021,7 +8021,7 @@ bool Actor::ShouldDrawCircle() const
 		} else if (IsPC()) {
 			// selectable
 			drawcircle = markerfeedback >= 3;
-		} else if (Modified[IE_EA] >= EA_EVILCUTOFF) {
+		} else if (Modified[IE_EA] >= EA_EVILCUTOFF && core->GetGame()->IsTargeted(GetGlobalID())) {
 			// hostile
 			drawcircle = markerfeedback >= 4;
 		} else if (Modified[IE_EA] >= EA_EVILCUTOFF && extraLevel) {
