@@ -8010,7 +8010,10 @@ bool Actor::ShouldDrawCircle() const
 	if (!(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		// check marker feedback level
 		ieDword markerfeedback = core->GetDictionary().Get("GUI Feedback Level", 4);
-		if (Selected) {
+		if (Over) {
+			// hovered creature
+			drawcircle = markerfeedback >= 1;
+		} else if (Selected) {
 			// selected creature
 			drawcircle = markerfeedback >= 2;
 		} else if (IsPC()) {
