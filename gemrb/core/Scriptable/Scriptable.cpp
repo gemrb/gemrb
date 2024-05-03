@@ -1649,7 +1649,8 @@ void Selectable::DrawCircle(const Point& p) const
 		mix = GlobalColorCycle.Blend(overColor, selectedColor);
 		col = &mix;
 	} else if (IsPC()) {
-		col = &overColor;
+		// don't dim white
+		if (*col != ColorWhite) col = &overColor;
 	}
 
 	if (sprite) {
