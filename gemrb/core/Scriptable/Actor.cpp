@@ -8009,6 +8009,8 @@ bool Actor::ShouldDrawCircle() const
 
 	if (!(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		// check marker feedback level
+		// bg2 had one level more, treating 5 differently and adding 6
+		ieDword extraLevel = core->HasFeature(GFFlags::JOURNAL_HAS_SECTIONS);
 		ieDword markerfeedback = core->GetDictionary().Get("GUI Feedback Level", 4);
 		if (Over) {
 			// hovered creature
@@ -8022,9 +8024,12 @@ bool Actor::ShouldDrawCircle() const
 		} else if (Modified[IE_EA] >= EA_EVILCUTOFF) {
 			// hostile
 			drawcircle = markerfeedback >= 4;
+		} else if (Modified[IE_EA] >= EA_EVILCUTOFF && extraLevel) {
+			// hostile
+			drawcircle = markerfeedback >= 5;
 		} else {
 			// all
-			drawcircle = markerfeedback >= 5;
+			drawcircle = markerfeedback >= 5 + extraLevel;
 		}
 	}
 	
