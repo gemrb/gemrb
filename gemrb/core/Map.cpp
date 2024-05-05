@@ -552,13 +552,13 @@ void Map::MoveToNewArea(const ResRef &area, const ieVariable& entrance, unsigned
 		// (north first, then south) but it doesn't seem to matter
 		if (direction & ADIRF_NORTH) {
 			X = map->TMap->XCellCount * 32;
-			Y = 0;
+			Y = 64;
 		} else if (direction & ADIRF_EAST) {
 			X = map->TMap->XCellCount * 64;
 			Y = map->TMap->YCellCount * 32;
 		} else if (direction & ADIRF_SOUTH) {
 			X = map->TMap->XCellCount * 32;
-			Y = map->TMap->YCellCount * 64;
+			Y = map->TMap->YCellCount * 64 - 64;
 		} else if (direction & ADIRF_WEST) {
 			X = 0;
 			Y = map->TMap->YCellCount * 32;
