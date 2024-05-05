@@ -389,7 +389,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 					distFromStart[smptChildIdx] = newDist;
 				}
 			// Fall back to A-star path
-			} else if (IsWalkableTo(nmptCurrent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
+			} else {
 				unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
 				if (newDist < oldDist) {
 					parents[smptChildIdx] = nmptCurrent;
