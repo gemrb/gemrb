@@ -347,16 +347,14 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			nmptDest = nmptCurrent;
 			foundPath = true;
 			break;
-		} else if (minDistance) {
-			if (parents[smptCurrentIdx] != nmptCurrent &&
-					SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist) {
-				if (!(flags & PF_SIGHT) || IsVisibleLOS(nmptCurrent, d)) {
-					smptDest = smptCurrent;
-					nmptDest = nmptCurrent;
-					foundPath = true;
-					break;
-				}
-			}
+		} else if (minDistance &&
+			   parents[smptCurrentIdx] != nmptCurrent &&
+			   SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist &&
+			   (!(flags & PF_SIGHT) || IsVisibleLOS(nmptCurrent, d))) {
+			smptDest = smptCurrent;
+			nmptDest = nmptCurrent;
+			foundPath = true;
+			break;
 		}
 		isClosed[smptCurrentIdx] = true;
 
