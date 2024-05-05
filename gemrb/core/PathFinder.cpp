@@ -338,7 +338,8 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 		NavmapPoint nmptCurrent = open.top().point;
 		open.pop();
 		SearchmapPoint smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
-		if (parents[smptCurrent.y * mapSize.w + smptCurrent.x].IsZero()) {
+		int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
+		if (parents[smptCurrentIdx].IsZero()) {
 			continue;
 		}
 
@@ -347,7 +348,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			foundPath = true;
 			break;
 		} else if (minDistance) {
-			if (parents[smptCurrent.y * mapSize.w + smptCurrent.x] != nmptCurrent &&
+			if (parents[smptCurrentIdx] != nmptCurrent &&
 					SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist) {
 				if (!(flags & PF_SIGHT) || IsVisibleLOS(nmptCurrent, d)) {
 					smptDest = smptCurrent;
@@ -357,7 +358,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 				}
 			}
 		}
-		isClosed[smptCurrent.y * mapSize.w + smptCurrent.x] = true;
+		isClosed[smptCurrentIdx] = true;
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
@@ -365,7 +366,8 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			// Outside map
 			if (smptChild.x < 0 ||	smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
-			if (isClosed[smptChild.y * mapSize.w + smptChild.x]) continue;
+			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
+			if (isClosed[smptChildIdx]) continue;
 			// If there's an actor, check it can be bumped away
 			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 			bool childIsUnbumpable = childActor && childActor != caller && (flags & PF_ACTORS_ARE_BLOCKING || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
@@ -379,25 +381,25 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			const float_t HEURISTIC_WEIGHT = 1.5;
 			SearchmapPoint smptCurrent2 = Map::ConvertCoordToTile(nmptCurrent);
 			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
-			unsigned short oldDist = distFromStart[smptChild.y * mapSize.w + smptChild.x];
+			unsigned short oldDist = distFromStart[smptChildIdx];
 			// Theta-star path if there is LOS
 			if (IsWalkableTo(nmptParent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
 				SearchmapPoint smptParent = Map::ConvertCoordToTile(nmptParent);
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
-					parents[smptChild.y * mapSize.w + smptChild.x] = nmptParent;
-					distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;
+					parents[smptChildIdx] = nmptParent;
+					distFromStart[smptChildIdx] = newDist;
 				}
 			// Fall back to A-star path
 			} else if (IsWalkableTo(nmptCurrent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
 				unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
 				if (newDist < oldDist) {
-					parents[smptChild.y * mapSize.w + smptChild.x] = nmptCurrent;
-					distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;
+					parents[smptChildIdx] = nmptCurrent;
+					distFromStart[smptChildIdx] = newDist;
 				}
 			}
 
-			if (distFromStart[smptChild.y * mapSize.w + smptChild.x] < oldDist) {
+			if (distFromStart[smptChildIdx] < oldDist) {
 				// Calculate heuristic
 				int xDist = smptChild.x - smptDest.x;
 				int yDist = smptChild.y - smptDest.y;
@@ -407,7 +409,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 				int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
 				float_t distance = std::hypot(xDist, yDist);
 				float_t heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
-				float_t estDist = distFromStart[smptChild.y * mapSize.w + smptChild.x] + heuristic;
+				float_t estDist = distFromStart[smptChildIdx] + heuristic;
 				PQNode newNode(nmptChild, estDist);
 				open.emplace(newNode);
 			}
