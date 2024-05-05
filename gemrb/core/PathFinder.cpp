@@ -372,7 +372,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			if (childIsUnbumpable) continue;
 
 			PathMapFlags childBlockStatus = GetBlockedInRadius(nmptChild, size);
-			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR | PathMapFlags::TRAVEL));
+			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR));
 			if (childBlocked) continue;
 
 			// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster

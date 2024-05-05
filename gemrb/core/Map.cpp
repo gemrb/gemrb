@@ -2473,6 +2473,9 @@ PathMapFlags Map::GetBlockedTile(const SearchmapPoint& p, int size) const
 PathMapFlags Map::GetBlockedTile(const SearchmapPoint& p) const
 {
 	PathMapFlags ret = tileProps.QuerySearchMap(p);
+	if (bool(ret & PathMapFlags::TRAVEL)) {
+		ret |= PathMapFlags::PASSABLE;
+	}
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR))) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
@@ -2573,7 +2576,7 @@ bool Map::IsVisibleLOS(const Point &s, const Point &d, const Actor *caller) cons
 bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const
 {
 	PathMapFlags ret = GetBlockedInLine(s, d, true, caller);
-	PathMapFlags mask = PathMapFlags::PASSABLE | PathMapFlags::TRAVEL | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
+	PathMapFlags mask = PathMapFlags::PASSABLE | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
 	return bool(ret & mask);
 }
 
