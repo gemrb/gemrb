@@ -349,10 +349,6 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			// Already visited
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
 			if (isClosed[smptChildIdx]) continue;
-			// If there's an actor, check it can be bumped away
-			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
-			bool childIsUnbumpable = childActor && childActor != caller && (flags & PF_ACTORS_ARE_BLOCKING || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
-			if (childIsUnbumpable) continue;
 
 			PathMapFlags childBlockStatus;
 			if (size > 2) {
@@ -362,6 +358,11 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			}
 			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR));
 			if (childBlocked) continue;
+
+			// If there's an actor, check it can be bumped away
+			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
+			bool childIsUnbumpable = childActor && childActor != caller && (flags & PF_ACTORS_ARE_BLOCKING || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
+			if (childIsUnbumpable) continue;
 
 			// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 			const float_t HEURISTIC_WEIGHT = 1.5;
