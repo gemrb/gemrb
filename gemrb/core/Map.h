@@ -585,7 +585,7 @@ public:
 	void AdjustPosition(Point& goal, const Size& startingRadius = ZeroSize, int size = -1) const;
 	void AdjustPositionNavmap(Point& goal, const Size& radius = ZeroSize) const;
 	/* Finds the path which leads the farthest from d */
-	PathListNode* RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const;
+	PathListNode* RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const;
 	PathListNode* RandomWalk(const Point &s, int size, int radius, const Actor *caller) const;
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy() const;

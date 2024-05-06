@@ -2244,7 +2244,7 @@ void Movable::RunAwayFrom(const Point &Source, int PathLength, bool noBackAway)
 {
 	ClearPath(true);
 	area->ClearSearchMapFor(this);
-	path = area->RunAway(Pos, Source, circleSize, PathLength, !noBackAway, As<Actor>());
+	path = area->RunAway(Pos, Source, PathLength, !noBackAway, As<Actor>());
 	HandleAnkhegStance(false);
 }
 

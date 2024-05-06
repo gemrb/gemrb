@@ -59,7 +59,7 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand{{0.000, -0.383, -0
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
 
 // Find the best path of limited length that brings us the farthest from d
-PathListNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const
+PathListNode* Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const
 {
 	if (!caller || !caller->GetSpeed()) return nullptr;
 	Point p = s;
@@ -71,7 +71,7 @@ PathListNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, in
 	if (std::abs(dx) <= 0.333 && std::abs(dy) <= 0.333) return nullptr;
 	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
 		Point rad(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy));
-		if (!(GetBlockedInRadius(rad, size) & PathMapFlags::PASSABLE)) {
+		if (!(GetBlockedInRadius(rad, caller->circleSize) & PathMapFlags::PASSABLE)) {
 			tries++;
 			// Give up and call the pathfinder if backed into a corner
 			// should we return nullptr instead, so we don't accidentally get closer to d?
@@ -86,7 +86,7 @@ PathListNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, in
 	}
 	int flags = PF_SIGHT;
 	if (backAway) flags |= PF_BACKAWAY;
-	return FindPath(s, p, size, size, flags, caller);
+	return FindPath(s, p, caller->circleSize, caller->circleSize, flags, caller);
 }
 
 PathListNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *caller) const
