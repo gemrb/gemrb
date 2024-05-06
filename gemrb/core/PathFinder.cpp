@@ -354,7 +354,12 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			bool childIsUnbumpable = childActor && childActor != caller && (flags & PF_ACTORS_ARE_BLOCKING || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
 
-			PathMapFlags childBlockStatus = GetBlockedInRadius(nmptChild, size);
+			PathMapFlags childBlockStatus;
+			if (size > 2) {
+				childBlockStatus = GetBlockedInRadiusTile(smptChild, size);
+			} else {
+				childBlockStatus = GetBlockedTile(smptChild);
+			}
 			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR));
 			if (childBlocked) continue;
 
