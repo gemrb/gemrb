@@ -128,23 +128,6 @@ PathListNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor 
 	return step;
 }
 
-bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking) const
-{
-	int flags = PF_SIGHT;
-	if (actorsAreBlocking) flags |= PF_ACTORS_ARE_BLOCKING;
-	PathListNode *path = FindPath(s, d, size, 0, flags);
-	bool targetUnreachable = path == nullptr;
-	if (!targetUnreachable) {
-		PathListNode *thisNode = path;
-		while (thisNode) {
-			PathListNode *nextNode = thisNode->Next;
-			delete thisNode;
-			thisNode = nextNode;
-		}
-	}
-	return targetUnreachable;
-}
-
 PathListNode *Map::GetLine(const Point &start, int Steps, orient_t Orientation, int flags) const
 {
 	Point dest = start;
