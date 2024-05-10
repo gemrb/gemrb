@@ -86,14 +86,6 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 		return LoadFromStream(cfgStream);
 	}
 
-#ifdef SYSCONF_DIR
-	path = PathJoinExt(SYSCONF_DIR, name, "cfg" );
-	if (cfgStream.Open(path))
-	{
-		return LoadFromStream(cfgStream);
-	}
-#endif
-
 #ifndef ANDROID
 #ifndef WIN32
 	// Now try XDG_CONFIG_HOME, with the standard fallback of ~/.config/gemrb
@@ -120,6 +112,14 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 		return LoadFromStream(cfgStream);
 	}
 #endif
+
+#ifdef SYSCONF_DIR
+	path = PathJoinExt(SYSCONF_DIR, name, "cfg");
+	if (cfgStream.Open(path)) {
+		return LoadFromStream(cfgStream);
+	}
+#endif
+
 	// Don't try with default binary name if we have tried it already
 	if (name != PACKAGE) {
 		path = PathJoinExt(datadir, PACKAGE, "cfg");
