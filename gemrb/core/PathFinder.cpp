@@ -316,7 +316,24 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
 	open.emplace(PQNode(nmptSource, 0));
 	bool foundPath = false;
+	bool usePlainThetaStar = gamedata->GetMiscRule("LAZY_THETA_STAR") == 0;
 	unsigned int squaredMinDist = minDistance * minDistance;
+
+	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
+	constexpr float_t HEURISTIC_WEIGHT = 1.5;
+	auto getHeuristic = [&](SearchmapPoint& smptChild, int& smptChildIdx) {
+		// Calculate heuristic
+		int xDist = smptChild.x - smptDest.x;
+		int yDist = smptChild.y - smptDest.y;
+		// Tie-breaking used to smooth out the path
+		int dxCross = smptDest.x - smptSource.x;
+		int dyCross = smptDest.y - smptSource.y;
+		int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
+		double distance = std::hypot(xDist, yDist);
+		double heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
+		double estDist = distFromStart[smptChildIdx] + heuristic;
+		return estDist;
+	};
 
 	while (!open.empty()) {
 		NavmapPoint nmptCurrent = open.top().point;
@@ -365,41 +382,69 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 			bool childIsUnbumpable = childActor && childActor != caller && (actorsAreBlocking || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
 
-			// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
-			const float_t HEURISTIC_WEIGHT = 1.5;
 			SearchmapPoint smptCurrent2 = Map::ConvertCoordToTile(nmptCurrent);
 			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
 			unsigned short oldDist = distFromStart[smptChildIdx];
-			// Theta-star path if there is LOS
-			if (IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
+
+			if (usePlainThetaStar) {
+				// Theta-star path if there is LOS
+				if (IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
+					SearchmapPoint smptParent = Map::ConvertCoordToTile(nmptParent);
+					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
+					if (newDist < oldDist) {
+						parents[smptChildIdx] = nmptParent;
+						distFromStart[smptChildIdx] = newDist;
+					}
+				// Fall back to A-star path
+				} else {
+					unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
+					if (newDist < oldDist) {
+						parents[smptChildIdx] = nmptCurrent;
+						distFromStart[smptChildIdx] = newDist;
+					}
+				}
+
+				if (distFromStart[smptChildIdx] < oldDist) {
+					PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
+					open.emplace(newNode);
+				}
+			} else {
+				// Lazy Theta star*
 				SearchmapPoint smptParent = Map::ConvertCoordToTile(nmptParent);
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
+				int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
 				if (newDist < oldDist) {
 					parents[smptChildIdx] = nmptParent;
 					distFromStart[smptChildIdx] = newDist;
 				}
-			// Fall back to A-star path
-			} else {
-				unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
-				if (newDist < oldDist) {
-					parents[smptChildIdx] = nmptCurrent;
-					distFromStart[smptChildIdx] = newDist;
-				}
-			}
 
-			if (distFromStart[smptChildIdx] < oldDist) {
-				// Calculate heuristic
-				int xDist = smptChild.x - smptDest.x;
-				int yDist = smptChild.y - smptDest.y;
-				// Tie-breaking used to smooth out the path
-				int dxCross = smptDest.x - smptSource.x;
-				int dyCross = smptDest.y - smptSource.y;
-				int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
-				float_t distance = std::hypot(xDist, yDist);
-				float_t heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
-				float_t estDist = distFromStart[smptChildIdx] + heuristic;
-				PQNode newNode(nmptChild, estDist);
-				open.emplace(newNode);
+				if (distFromStart[smptChildIdx] < oldDist) {
+					// Theta-star path if there is LOS
+					if (!IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
+						// Fall back to A-star path
+						distFromStart[smptChildIdx] = std::numeric_limits<unsigned short>::max();
+						// Find already visited neighbour with shortest: path from start + path to child
+						for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
+							NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
+							SearchmapPoint smptVis = Map::ConvertCoordToTile(nmptVis);
+							// Outside map
+							if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
+							// Only consider already visited
+							if (!isClosed[smptVis.y * mapSize.w + smptVis.x]) continue;
+
+							unsigned short oldVisDist = distFromStart[smptChildIdx];
+							unsigned short newDist = distFromStart[smptVis.y * mapSize.w + smptVis.x] + Distance(smptVis, smptChild);
+							if (newDist < oldVisDist) {
+								parents[smptChildIdx] = nmptVis;
+								distFromStart[smptChildIdx] = newDist;
+							}
+						}
+						if (distFromStart[smptChildIdx] >= oldDist) continue;
+					}
+
+					PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
+					open.emplace(newNode);
+				}
 			}
 		}
 	}

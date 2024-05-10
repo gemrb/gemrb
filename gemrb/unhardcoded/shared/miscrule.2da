@@ -9,5 +9,6 @@ DEFAULT_AC                   10
 ATTACK_ROLL_DICE_SIDES       20
 RARE_SELECT_CHANCE           5
 ITEM_CASTERLEVEL             10
+LAZY_THETA_STAR              1
 
 # a table with assorted game logic constants
