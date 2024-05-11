@@ -480,6 +480,9 @@ Targets *GetMyTarget(const Scriptable *Sender, const Actor *actor, Targets *para
 	}
 	parameters->Clear();
 	if (actor) {
+		// NOTE: bgs just checked a separate variable, only set in Attack actions when
+		// the target changed, so this is potentially wrong (spell actions could change LastTarget)
+		// in vanilla games it's only used once, in iwd2
 		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastTarget);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
