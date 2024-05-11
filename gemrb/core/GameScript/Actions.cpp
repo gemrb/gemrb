@@ -6815,6 +6815,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	if (Sender != tar && !(itm->Flags & IE_ITEM_NO_INVIS) && target->IsInvisibleTo(Sender)) {
 		Sender->ReleaseCurrentAction();
 		Sender->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
+		displaymsg->DisplayConstantStringName(HCStrings::NoSeeNoCast, GUIColors::RED, Sender);
 		core->Autopause(AUTOPAUSE::NOTARGET, Sender);
 		gamedata->FreeItem(itm, itemres, false);
 		return;

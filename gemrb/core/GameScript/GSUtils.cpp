@@ -2723,6 +2723,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		if (Sender != tar && !(flags & SC_NOINTERRUPT) && !(spl->Flags & SF_TARGETS_INVISIBLE) && target->IsInvisibleTo(Sender)) {
 			Sender->ReleaseCurrentAction();
 			Sender->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
+			displaymsg->DisplayConstantStringName(HCStrings::NoSeeNoCast, GUIColors::RED, Sender);
 			core->Autopause(AUTOPAUSE::NOTARGET, Sender);
 			gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 			return;
