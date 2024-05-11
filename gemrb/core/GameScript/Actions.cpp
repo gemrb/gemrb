@@ -6766,7 +6766,10 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
-	if (!tar) {
+	const Actor* target = Scriptable::As<const Actor>(tar);
+	if (!tar ||
+	    (tar->GetInternalFlag() & (IF_ACTIVE | IF_VISIBLE)) != (IF_ACTIVE | IF_VISIBLE) ||
+	    (target && target->GetStat(IE_AVATARREMOVAL))) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -6810,7 +6813,6 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	}
 
 	// make sure we can still see the target
-	const Actor* target = Scriptable::As<const Actor>(tar);
 	const Item* itm = gamedata->GetItem(itemres, true);
 	if (Sender != tar && !(itm->Flags & IE_ITEM_NO_INVIS) && target->IsInvisibleTo(Sender)) {
 		Sender->ReleaseCurrentAction();

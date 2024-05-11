@@ -1502,7 +1502,12 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	if (tar) {
 		// release if target is invisible to sender (because of death or invisbility spell)
-		if (tar->IsInvisibleTo(Sender) || (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD)){
+		// the original didn't check for dead directly, but it did check area match (we move instead, below)
+		// only for Attack, AttackNoSound, AttackOneRound, maybe not AttackReevaluate
+		if (tar->IsInvisibleTo(Sender) ||
+		    (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD) ||
+		    (tar->GetInternalFlag() & (IF_ACTIVE | IF_VISIBLE)) != (IF_ACTIVE | IF_VISIBLE) ||
+		    tar->GetStat(IE_AVATARREMOVAL)) {
 			attacker->StopAttack();
 			Sender->ReleaseCurrentAction();
 			attacker->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
@@ -2720,7 +2725,10 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		// make sure we can still see the target
 		const Actor* target = Scriptable::As<const Actor>(tar);
 		const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
-		if (Sender != tar && !(flags & SC_NOINTERRUPT) && !(spl->Flags & SF_TARGETS_INVISIBLE) && target->IsInvisibleTo(Sender)) {
+		if (Sender != tar && target && !(flags & SC_NOINTERRUPT) &&
+		    ((!(spl->Flags & SF_TARGETS_INVISIBLE) && target->IsInvisibleTo(Sender)) ||
+		     (tar->GetInternalFlag() & (IF_ACTIVE | IF_VISIBLE)) != (IF_ACTIVE | IF_VISIBLE) ||
+		     target->GetStat(IE_AVATARREMOVAL))) {
 			Sender->ReleaseCurrentAction();
 			Sender->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
 			displaymsg->DisplayConstantStringName(HCStrings::NoSeeNoCast, GUIColors::RED, Sender);
