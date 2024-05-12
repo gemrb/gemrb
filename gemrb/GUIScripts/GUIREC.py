@@ -665,7 +665,7 @@ def GetResistances(pc):
 	stats = []
 	# only bg2 displayed all the resistances, but it is useful information
 	# Resistances
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2() or GameCheck.IsBG2EE():
 		stats.append(32204)
 	elif not GameCheck.IsBG1():
 		stats.append (15544)
