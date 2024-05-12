@@ -6264,7 +6264,6 @@ void Actor::StopAttack()
 	SetStance(IE_ANI_READY);
 	lastattack = 0;
 	secondround = false;
-	//InternalFlags|=IF_TARGETGONE; //this is for the trigger!
 	if (InParty) {
 		core->Autopause(AUTOPAUSE::NOTARGET, this);
 	}
