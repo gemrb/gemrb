@@ -1057,7 +1057,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, JournalSection section, ieByte group
 	// pst/bg2 also has a sound attached to the base string, so play it manually
 	StringBlock sb = core->strings->GetStringBlock(strJournalChange);
 	if (sb.Sound.IsEmpty()) return true;
-	core->GetAudioDrv()->Play(StringView(sb.Sound), SFX_CHAN_DIALOG);
+	core->GetAudioDrv()->Play(StringView(sb.Sound), SFXChannel::Dialog);
 
 	return true;
 }
@@ -2223,24 +2223,24 @@ void Game::StartRainOrSnow(bool conditional, ieWord w)
 		if (WeatherBits&WB_INCREASESTORM) {
 			//already raining
 			if (GameTime&1) {
-				core->PlaySound(DS_LIGHTNING1, SFX_CHAN_AREA_AMB);
+				core->PlaySound(DS_LIGHTNING1, SFXChannel::MainAmbient);
 			} else {
-				core->PlaySound(DS_LIGHTNING2, SFX_CHAN_AREA_AMB);
+				core->PlaySound(DS_LIGHTNING2, SFXChannel::MainAmbient);
 			}
 		} else {
 			//start raining (far)
-			core->PlaySound(DS_LIGHTNING3, SFX_CHAN_AREA_AMB);
+			core->PlaySound(DS_LIGHTNING3, SFXChannel::MainAmbient);
 		}
 	}
 	if (w&WB_SNOW) {
-		core->PlaySound(DS_SNOW, SFX_CHAN_AREA_AMB);
+		core->PlaySound(DS_SNOW, SFXChannel::MainAmbient);
 		weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
 		weather->SetColorIndex(SPARK_COLOR_WHITE);
 		return;
 	}
 	if (w&WB_RAIN) {
-		core->PlaySound(DS_RAIN, SFX_CHAN_AREA_AMB);
+		core->PlaySound(DS_RAIN, SFXChannel::MainAmbient);
 		weather->SetType(SP_TYPE_LINE, SP_PATH_RAIN, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
 		// colors re-d from iwd2

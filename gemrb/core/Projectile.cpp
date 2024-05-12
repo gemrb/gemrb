@@ -331,7 +331,7 @@ void Projectile::Setup()
 		flags |= GEM_SND_LOOPING;
 	}
 
-	travel_handle.sound = core->GetAudioDrv()->Play(FiringSound, SFX_CHAN_MISSILE, Pos, flags);
+	travel_handle.sound = core->GetAudioDrv()->Play(FiringSound, SFXChannel::Missile, Pos, flags);
 
 	//create more projectiles
 	if(ExtFlags&PEF_ITERATION) {
@@ -546,7 +546,7 @@ void Projectile::UpdateSound()
 			flags |= GEM_SND_LOOPING;
 		}
 
-		travel_handle.sound = core->GetAudioDrv()->Play(ArrivalSound, SFX_CHAN_MISSILE, Pos, flags);
+		travel_handle.sound = core->GetAudioDrv()->Play(ArrivalSound, SFXChannel::Missile, Pos, flags);
 		SFlags|=PSF_SOUND2;
 	}
 }
@@ -1406,7 +1406,7 @@ void Projectile::SpawnFragments(const Holder<ProjectileExtension>& extension) co
 
 void Projectile::InitExplodingPhase1() const
 {
-	core->GetAudioDrv()->Play(Extension->SoundRes, SFX_CHAN_MISSILE, Pos, GEM_SND_SPATIAL);
+	core->GetAudioDrv()->Play(Extension->SoundRes, SFXChannel::Missile, Pos, GEM_SND_SPATIAL);
 
 	// play VVC in center
 	if (!(Extension->AFlags & PAF_VVC)) {
@@ -1691,7 +1691,7 @@ Projectile::ProjectileState Projectile::GetNextExplosionState() {
 		InitExplodingPhase1();
 		nextState = ProjectileState::EXPLODING_AGAIN;
 	} else {
-		core->GetAudioDrv()->Play(Extension->AreaSound, SFX_CHAN_MISSILE, Pos, GEM_SND_SPATIAL);
+		core->GetAudioDrv()->Play(Extension->AreaSound, SFXChannel::Missile, Pos, GEM_SND_SPATIAL);
 	}
 	
 	if (Extension->Spread) {

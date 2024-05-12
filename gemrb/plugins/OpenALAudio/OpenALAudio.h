@@ -127,7 +127,7 @@ public:
 	~OpenALAudioDriver(void) override;
 	void PrintDeviceList() const;
 	bool Init(void) override;
-	Holder<SoundHandle> Play(StringView ResRef, unsigned int channel,
+	Holder<SoundHandle> Play(StringView ResRef, SFXChannel channel,
 					const Point&, unsigned int flags = 0,
 					tick_t *length = nullptr) override;
 	void UpdateVolume(unsigned int flags) override;

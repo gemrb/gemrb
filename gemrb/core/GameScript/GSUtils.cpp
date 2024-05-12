@@ -528,13 +528,13 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 		}
 
 		if (flags&DS_QUEUE) soundFlags |= GEM_SND_QUEUE;
-		
-		unsigned int channel = SFX_CHAN_DIALOG;
+
+		SFXChannel channel = SFXChannel::Dialog;
 		if (flags & DS_CONST && actor) {
 			if (actor->InParty > 0) {
-				channel = SFX_CHAN_CHAR0 + actor->InParty - 1;
+				channel = SFXChannel(ieByte(SFXChannel::Char0) + actor->InParty - 1);
 			} else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				channel = SFX_CHAN_MONSTER;
+				channel = SFXChannel::Monster;
 			}
 		}
 		
@@ -2963,7 +2963,7 @@ void AddXPCore(const Action *parameters, bool divide)
 		// give xp to everyone
 		core->GetGame()->ShareXP(atoi(xpvalue), 0);
 	}
-	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
+	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
 }
 
 int NumItemsCore(Scriptable *Sender, const Trigger *parameters)

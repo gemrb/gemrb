@@ -377,7 +377,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		unsigned int flag = (uint32_t(flags) & (GEM_SND_SPEECH | GEM_SND_QUEUE));
 
 		// Narrator's error announcements (ambush, incomplete party)
-		unsigned int channel = SoundResRef.BeginsWith("ERROR") ? SFX_CHAN_NARRATOR : SFX_CHAN_DIALOG;
+		SFXChannel channel = SoundResRef.BeginsWith("ERROR") ? SFXChannel::Narrator : SFXChannel::Dialog;
 		core->GetAudioDrv()->Play(SoundResRef, channel, Point(), flag);
 	}
 	if (bool(flags & STRING_FLAGS::STRREFON)) {

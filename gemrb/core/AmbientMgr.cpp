@@ -279,7 +279,7 @@ tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword tim
 		return nextdelay;
 	}
 
-	unsigned int channel = ambient->GetFlags() & IE_AMBI_LOOPING ? (ambient->GetFlags() & IE_AMBI_MAIN ? SFX_CHAN_AREA_AMB : SFX_CHAN_AMB_LOOP) : SFX_CHAN_AMB_OTHER;
+	SFXChannel channel = ambient->GetFlags() & IE_AMBI_LOOPING ? (ambient->GetFlags() & IE_AMBI_MAIN ? SFXChannel::MainAmbient : SFXChannel::AmbientLoop) : SFXChannel::AmbientOther;
 	totalgain = ambient->GetTotalGain() * core->GetAudioDrv()->GetVolume(channel) / 100;
 
 	unsigned int v = core->GetDictionary().Get("Volume Ambients", 100);

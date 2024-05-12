@@ -40,7 +40,8 @@ namespace GemRB {
 class SDLAudioSoundHandle : public SoundHandle 
 {
 public:
-	SDLAudioSoundHandle(Mix_Chunk *chunk, int channel, bool relative) : mixChunk(chunk), chunkChannel(channel), sndRelative(relative) { };
+	SDLAudioSoundHandle(Mix_Chunk* chunk, SFXChannel channel, bool relative)
+		: mixChunk(chunk), chunkChannel(int(channel)), sndRelative(relative) {};
 	void SetPos(const Point&) final;
 	bool Playing() final;
 	void Stop() final;
@@ -112,7 +113,7 @@ public:
 	SDLAudio(void);
 	~SDLAudio(void) override;
 	bool Init(void) override;
-	Holder<SoundHandle> Play(StringView ResRef, unsigned int channel,
+	Holder<SoundHandle> Play(StringView ResRef, SFXChannel channel,
 				 const Point&, unsigned int flags = 0, tick_t* length = nullptr) override;
 	int CreateStream(ResourceHolder<SoundMgr>) override;
 	bool Play() override;

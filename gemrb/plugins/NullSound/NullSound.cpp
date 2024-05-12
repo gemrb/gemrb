@@ -40,7 +40,7 @@ bool NullSound::Init(void)
 	return true;
 }
 
-Holder<SoundHandle> NullSound::Play(StringView, unsigned int, const Point&, unsigned int, tick_t *len)
+Holder<SoundHandle> NullSound::Play(StringView, SFXChannel, const Point&, unsigned int, tick_t* len)
 {
 	if (len) *len = 1000; //Returning 1 Second Length
 	return Holder<SoundHandle>();

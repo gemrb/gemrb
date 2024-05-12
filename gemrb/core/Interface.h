@@ -29,6 +29,7 @@
 #include "exports.h"
 #include "globals.h"
 
+#include "Audio.h"
 #include "EnumIndex.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
@@ -546,8 +547,8 @@ public:
 	int GetMouseScrollSpeed() const;
 
 	/** plays stock gui sound referenced by index */
-	Holder<SoundHandle> PlaySound(size_t idx, unsigned int channel) const;
-	Holder<SoundHandle> PlaySound(size_t idx, unsigned int channel, const Point& p, unsigned int flags = 0) const;
+	Holder<SoundHandle> PlaySound(size_t idx, SFXChannel channel) const;
+	Holder<SoundHandle> PlaySound(size_t idx, SFXChannel channel, const Point& p, unsigned int flags = 0) const;
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);

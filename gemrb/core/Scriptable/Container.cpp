@@ -180,14 +180,14 @@ void Container::TryPickLock(Actor* actor)
 	if (stat < LockDifficulty) {
 		displaymsg->DisplayMsgAtLocation(HCStrings::LockpickFailed, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
-		core->PlaySound(DS_PICKFAIL, SFX_CHAN_HITS); //AMB_D21
+		core->PlaySound(DS_PICKFAIL, SFXChannel::Hits); // AMB_D21
 		return;
 	}
 	SetContainerLocked(false);
 	core->GetGameControl()->ResetTargetMode();
 	displaymsg->DisplayMsgAtLocation(HCStrings::LockpickDone, FT_ANY, actor, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
-	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS); //AMB_D21D
+	core->PlaySound(DS_PICKLOCK, SFXChannel::Hits); // AMB_D21D
 	ImmediateEvent();
 	int xp = gamedata->GetXPBonus(XP_LOCKPICK, actor->GetXPLevel(1));
 	const Game *game = core->GetGame();

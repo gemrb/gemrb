@@ -220,7 +220,7 @@ Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t &time_length)
 	return chunk;
 }
 
-Holder<SoundHandle> SDLAudio::Play(StringView ResRef, unsigned int channel,
+Holder<SoundHandle> SDLAudio::Play(StringView ResRef, SFXChannel channel,
 	const Point& p, unsigned int flags, tick_t *length)
 {
 	Mix_Chunk *chunk;

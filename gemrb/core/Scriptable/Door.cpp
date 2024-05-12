@@ -116,12 +116,12 @@ void Door::ToggleTiles(int State, int playsound)
 	if (State) {
 		state = !closedIndex;
 		if (playsound && !OpenSound.IsEmpty()) {
-			core->GetAudioDrv()->Play(OpenSound, SFX_CHAN_ACTIONS, toOpen[0], GEM_SND_SPATIAL);
+			core->GetAudioDrv()->Play(OpenSound, SFXChannel::Actions, toOpen[0], GEM_SND_SPATIAL);
 		}
 	} else {
 		state = closedIndex;
 		if (playsound && !CloseSound.IsEmpty()) {
-			core->GetAudioDrv()->Play(CloseSound, SFX_CHAN_ACTIONS, toOpen[0], GEM_SND_SPATIAL);
+			core->GetAudioDrv()->Play(CloseSound, SFXChannel::Actions, toOpen[0], GEM_SND_SPATIAL);
 		}
 	}
 	for (const auto& tile : tiles) {
@@ -158,13 +158,13 @@ void Door::SetDoorLocked(int Locked, int playsound)
 		// only close it in pst, needed for Dead nations (see 4a3e1cb4ef)
 		if (core->HasFeature(GFFlags::REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
 		if (playsound && !LockSound.IsEmpty())
-			core->GetAudioDrv()->Play(LockSound, SFX_CHAN_ACTIONS, toOpen[0], GEM_SND_SPATIAL);
+			core->GetAudioDrv()->Play(LockSound, SFXChannel::Actions, toOpen[0], GEM_SND_SPATIAL);
 	}
 	else {
 		if (!(Flags & DOOR_LOCKED)) return;
 		Flags&=~DOOR_LOCKED;
 		if (playsound && !UnLockSound.IsEmpty())
-			core->GetAudioDrv()->Play(UnLockSound, SFX_CHAN_ACTIONS, toOpen[0], GEM_SND_SPATIAL);
+			core->GetAudioDrv()->Play(UnLockSound, SFXChannel::Actions, toOpen[0], GEM_SND_SPATIAL);
 	}
 }
 
@@ -291,7 +291,7 @@ void Door::TryDetectSecret(int skill, ieDword actorID)
 	if (Visible()) return;
 	if (skill > (signed)DiscoveryDiff) {
 		Flags |= DOOR_FOUND;
-		core->PlaySound(DS_FOUNDSECRET, SFX_CHAN_HITS);
+		core->PlaySound(DS_FOUNDSECRET, SFXChannel::Hits);
 		AddTrigger(TriggerEntry(trigger_detected, actorID));
 		AddTrigger(TriggerEntry(trigger_secreddoordetected, GetGlobalID())); // ee
 	}
@@ -314,7 +314,7 @@ void Highlightable::SetTrapDetected(int x)
 		return;
 	TrapDetected = x;
 	if(TrapDetected) {
-		core->PlaySound(DS_FOUNDSECRET, SFX_CHAN_HITS);
+		core->PlaySound(DS_FOUNDSECRET, SFXChannel::Hits);
 		core->Autopause(AUTOPAUSE::TRAP, this);
 	}
 }
@@ -355,7 +355,7 @@ void Highlightable::TryDisarm(Actor* actor)
 		const Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
 		core->GetGameControl()->ResetTargetMode();
-		core->PlaySound(DS_DISARMED, SFX_CHAN_HITS);
+		core->PlaySound(DS_DISARMED, SFXChannel::Hits);
 	} else {
 		AddTrigger(TriggerEntry(trigger_disarmfailed, actor->GetGlobalID()));
 		if (core->HasFeature(GFFlags::RULES_3ED)) {
@@ -393,14 +393,14 @@ void Door::TryPickLock(Actor* actor)
 	if (stat < (signed)LockDifficulty) {
 		displaymsg->DisplayMsgAtLocation(HCStrings::LockpickFailed, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
-		core->PlaySound(DS_PICKFAIL, SFX_CHAN_HITS);
+		core->PlaySound(DS_PICKFAIL, SFXChannel::Hits);
 		return;
 	}
 	SetDoorLocked( false, true);
 	core->GetGameControl()->ResetTargetMode();
 	displaymsg->DisplayMsgAtLocation(HCStrings::LockpickDone, FT_ANY, actor, actor);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
-	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS);
+	core->PlaySound(DS_PICKLOCK, SFXChannel::Hits);
 	ImmediateEvent();
 	int xp = gamedata->GetXPBonus(XP_LOCKPICK, actor->GetXPLevel(1));
 	const Game *game = core->GetGame();
