@@ -2079,8 +2079,12 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 
 		// the original first queued them all similarly to DialogHandler::DialogChoose
 		if (target->Type != ST_ACTOR) {
-			response->actions.insert(response->actions.begin(), GenerateAction("SetInterrupt(FALSE)"));
-			response->actions.push_back(GenerateAction("SetInterrupt(TRUE)"));
+			Action* interrupt = GenerateAction("SetInterrupt(FALSE)");
+			interrupt->IncRef(); // SetInterrupt is an instant, so we need to ensure StartCutScene can safely delete it
+			response->actions.insert(response->actions.begin(), interrupt);
+			interrupt = GenerateAction("SetInterrupt(TRUE)");
+			interrupt->IncRef();
+			response->actions.push_back(interrupt);
 		}
 		rS->responses[0]->Execute(target);
 
