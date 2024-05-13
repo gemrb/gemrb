@@ -272,7 +272,7 @@ Holder<SoundHandle> SDLAudio::Play(StringView ResRef, SFXChannel channel,
 	}
 
 	// TODO: we need something like static_ptr_cast
-	return Holder<SoundHandle>(new SDLAudioSoundHandle(chunk, chan, flags));
+	return Holder<SoundHandle>(new SDLAudioSoundHandle(chunk, SFXChannel(chan), flags));
 }
 
 bool SDLAudio::Pause()
