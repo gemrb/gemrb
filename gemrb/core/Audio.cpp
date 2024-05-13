@@ -61,6 +61,14 @@ float Audio::GetReverb(SFXChannel channel) const
 	return channels[channel].getReverb();
 }
 
+float Audio::GetHeight(SFXChannel channel) const
+{
+	if (channel >= SFXChannel::count) {
+		return 0.0f;
+	}
+	return channels[channel].getHeight(channel);
+}
+
 Holder<SoundHandle> Audio::PlayMB(const String& resource, SFXChannel channel, const Point& p, unsigned int flags, tick_t* length)
 {
 	auto mbString = MBStringFromString(resource);

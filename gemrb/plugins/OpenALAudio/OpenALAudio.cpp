@@ -450,7 +450,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, SFXChannel channe
 	}
 
 	ALfloat SourcePos[] = {
-		float(p.x), float(p.y), 0.0f
+		float(p.x), float(p.y), GetHeight(channel)
 	};
 	ALfloat SourceVel[] = {
 		0.0f, 0.0f, 0.0f

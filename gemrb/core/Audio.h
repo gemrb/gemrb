@@ -87,6 +87,7 @@ public:
 	virtual ~SoundHandle() = default;
 };
 
+static const EnumArray<SFXChannel, float> channelHeights { 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F };
 class GEM_EXPORT Channel {
 public:
 	Channel() = default;
@@ -99,6 +100,7 @@ public:
 	void setVolume(int vol) { volume = vol; }
 	float getReverb() const { return reverb; }
 	void setReverb(float r) { reverb = r; }
+	float getHeight(SFXChannel channel) const { return channelHeights[channel]; }
 
 private:
 	std::string name;
@@ -152,6 +154,8 @@ public:
 	SFXChannel GetChannel(const std::string& name) const;
 	int GetVolume(SFXChannel channel) const;
 	float GetReverb(SFXChannel channel) const;
+	float GetHeight(SFXChannel channel) const;
+
 protected:
 	AmbientMgr* ambim = nullptr;
 	EnumArray<SFXChannel, Channel> channels;
