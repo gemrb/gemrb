@@ -319,17 +319,6 @@ Interface::Interface(CoreSettings&& cfg)
 		}
 	}
 
-	// most of the old gemrb override files can be found here,
-	// so they have a lower priority than the game files and can more easily be modded
-	path = PathJoin(config.GemRBUnhardcodedPath, "unhardcoded", config.GameType);
-	if (config.GameType == "auto") {
-		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
-	} else {
-		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-	}
-	path = PathJoin(config.GemRBUnhardcodedPath, "unhardcoded", "shared");
-	gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
 	Log(MESSAGE, "Core", "Initializing KEY Importer...");
 	path_t ChitinPath = PathJoin(config.GamePath, "chitin.key");
 	if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
@@ -340,6 +329,17 @@ Interface::Interface(CoreSettings&& cfg)
 - or the game is running (Windows only).");
 		throw CIE("The path must point to a game directory with a readable chitin.key file.");
 	}
+
+	// most of the old gemrb override files can be found here,
+	// so they have a lower priority than the game files and can more easily be modded
+	path = PathJoin(config.GemRBUnhardcodedPath, "unhardcoded", config.GameType);
+	if (config.GameType == "auto") {
+		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
+	} else {
+		gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	}
+	path = PathJoin(config.GemRBUnhardcodedPath, "unhardcoded", "shared");
+	gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	fogRenderer = std::make_unique<FogRenderer>(config.SpriteFoW);
 
