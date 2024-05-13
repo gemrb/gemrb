@@ -24,47 +24,15 @@ namespace GemRB {
 
 const TypeID Audio::ID = { "Audio" };
 
-Audio::Audio(void)
+void Audio::UpdateChannel(const std::string& name, int idx, int volume, float reverb)
 {
-	// create the built-in default channels (sndchann.2da)
-	std::array<std::string, int(SFXChannel::count)> channelNames {
-		"NARRATIO", "AREA_AMB", "ACTIONS", "SWINGS", "CASTING", "GUI", "DIALOG", "CHARACT0", "CHARACT1",
-		"CHARACT2", "CHARACT3", "CHARACT4", "CHARACT5", "CHARACT6", "CHARACT7", "CHARACT8", "CHARACT9",
-		"MONSTER", "HITS", "MISSILE", "AMBIENTL", "AMBIENTN", "WALKINGC", "WALKINGM", "ARMOR"
-	};
-	for (SFXChannel channelID : EnumIterator<SFXChannel>()) {
-		channels[channelID] = Channel(channelNames[int(channelID)]);
-	}
-}
+	channels[idx] = Channel(name);
 
-void Audio::SetChannelVolume(const std::string& name, int volume)
-{
-	if (volume > 100) {
-		volume = 100;
-	} else if (volume < 0) {
-		volume = 0;
-	}
+	volume = Clamp(volume, 0, 100);
+	channels[idx].setVolume(volume);
 
-	SFXChannel channel = GetChannel(name);
-	if (channel == SFXChannel::count) {
-		return; // ignore, since only the fixed set of channels are used, usable
-	}
-	channels[channel].setVolume(volume);
-}
-
-void Audio::SetChannelReverb(const std::string& name, float reverb)
-{
-	if (reverb > 1.0f) {
-		reverb = 1.0f;
-	} else if (reverb < 0.0f) {
-		reverb = 0.0f;
-	}
-
-	SFXChannel channel = GetChannel(name);
-	if (channel == SFXChannel::count) {
-		return;
-	}
-	channels[channel].setReverb(reverb);
+	reverb = Clamp(reverb, 0.0f, 100.0f);
+	channels[idx].setReverb(reverb);
 }
 
 SFXChannel Audio::GetChannel(const std::string& name) const

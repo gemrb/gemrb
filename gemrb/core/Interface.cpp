@@ -892,10 +892,13 @@ bool Interface::ReadSoundChannelsTable() const
 		// translate some alternative names for the IWDs
 		if (rowname == "ACTION") rowname = "ACTIONS";
 		else if (rowname == "SWING") rowname = "SWINGS";
-		AudioDriver->SetChannelVolume(rowname, tm->QueryFieldSigned<int>(i, ivol));
+
+		int volume = tm->QueryFieldSigned<int>(i, ivol);
+		float reverb = 0.0f;
 		if (irev != TableMgr::npos) {
-			AudioDriver->SetChannelReverb(rowname, atof(tm->QueryField(i, irev).c_str()));
+			reverb = atof(tm->QueryField(i, irev).c_str());
 		}
+		AudioDriver->UpdateChannel(rowname, i, volume, reverb);
 	}
 	return true;
 }

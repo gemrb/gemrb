@@ -110,7 +110,6 @@ class GEM_EXPORT Audio : public Plugin {
 public:
 	static const TypeID ID;
 public:
-	Audio(void);
 	virtual bool Init(void) = 0;
 	virtual Holder<SoundHandle> Play(
 		StringView ResRef,
@@ -149,8 +148,7 @@ public:
 				int channels, short* memory, int size, int samplerate) = 0;
 	virtual void UpdateMapAmbient(const MapReverbProperties&) {};
 
-	void SetChannelVolume(const std::string& name, int volume);
-	void SetChannelReverb(const std::string& name, float reverb);
+	void UpdateChannel(const std::string& name, int idx, int volume, float reverb);
 	SFXChannel GetChannel(const std::string& name) const;
 	int GetVolume(SFXChannel channel) const;
 	float GetReverb(SFXChannel channel) const;
