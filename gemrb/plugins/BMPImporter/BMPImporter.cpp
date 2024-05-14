@@ -64,6 +64,10 @@ bool BMPImporter::Import(DataStream* str)
 		Log(ERROR, "BMPImporter", "OS/2 Bitmap, not supported.");
 		return false;
 	}
+
+	bool isV3or5 = (Size == 56) || (Size == 124);
+	hasAlpha = isV3or5;
+
 	ieDword tmp;
 	str->ReadDword(tmp);
 	size.w = tmp;
@@ -73,25 +77,21 @@ bool BMPImporter::Import(DataStream* str)
 	str->ReadWord(BitCount);
 	str->ReadDword(Compression);
 	str->ReadDword(ImageSize);
-	//24 = the already read bytes 3x4+2x2+2x4
-	//this is normally 16
-	str->Seek( Size-24, GEM_CURRENT_POS );
-	//str->ReadDword(Hres);
-	//str->ReadDword(Vres);
-	//str->ReadDword(ColorsUsed);
-	//str->ReadDword(ColorsImportant);
-	if (Compression != 0) {
+
+	if (Compression != 0 && !(Compression == 3 && isV3or5)) {
 		Log(ERROR, "BMPImporter", "Compressed {}-bits Image, not supported.", BitCount);
 		return false;
 	}
+
 	//COLORTABLE
 	if (BitCount <= 8) {
+		str->Seek( Size-24, GEM_CURRENT_POS );
 		if (BitCount == 8)
 			NumColors = 256;
 		else
 			NumColors = 16;
 		PaletteColors = (Color *)malloc(4 * NumColors);
-//		memset(Palette, 0, 4 * NumColors);
+
 		for (unsigned int i = 0; i < NumColors; i++) {
 			str->Read(&PaletteColors[i].b, 1);
 			str->Read(&PaletteColors[i].g, 1);
@@ -100,6 +100,37 @@ bool BMPImporter::Import(DataStream* str)
 			PaletteColors[i].a = (PaletteColors[i].a == 0) ? 0xff : PaletteColors[i].a;
 		}
 	}
+
+	uint32_t rMask = 0xFF;
+	uint32_t gMask = 0xFF << 8;
+	uint32_t bMask = 0xFF << 16;
+	uint32_t aMask = 0xFF << 24;
+
+	if (isV3or5 && Compression == 3) {
+		str->Seek(16, GEM_CURRENT_POS);
+		str->ReadDword(rMask);
+		str->ReadDword(gMask);
+		str->ReadDword(bMask);
+		str->ReadDword(aMask);
+	}
+
+	auto normshift = [](uint32_t mask) {
+		if (mask == 0xFFu << 24) {
+			return 24;
+		} else if (mask == 0xFF << 16) {
+			return 16;
+		} else if (mask == 0xFF << 8) {
+			return 8;
+		} else {
+			return 0;
+		}
+	};
+
+	uint32_t rNormShift = normshift(rMask);
+	uint32_t gNormShift = normshift(gMask);
+	uint32_t bNormShift = normshift(bMask);
+	uint32_t aNormShift = normshift(aMask);
+
 	str->Seek( DataOffset, GEM_STREAM_START );
 	//no idea if we have to swap this or not
 	//RASTERDATA
@@ -117,12 +148,11 @@ bool BMPImporter::Import(DataStream* str)
 			Log(ERROR, "BMPImporter", "BitCount {} is not supported.", BitCount);
 			return false;
 	}
-	//if(BitCount!=4)
-	//{
+
 	if (PaddedRowLength & 3) {
 		PaddedRowLength += 4 - ( PaddedRowLength & 3 );
 	}
-	//}
+
 	void* rpixels = malloc(PaddedRowLength * size.h);
 	str->Read(rpixels, PaddedRowLength * size.h);
 	if (BitCount == 32) {
@@ -130,14 +160,19 @@ bool BMPImporter::Import(DataStream* str)
 		pixels = malloc(numbytes);
 		unsigned int * dest = ( unsigned int * ) pixels;
 		dest += size.Area();
-		const unsigned char* src = (const unsigned char *) rpixels;
+
+		const uint32_t *src = static_cast<const uint32_t*>(rpixels);
 		for (int i = size.h; i; i--) {
 			dest -= size.w;
-			// BGRX
-			for (int j=0; j < size.w; ++j)
-				dest[j] = (0xFF << 24) | (src[j*4+0] << 16) |
-				          (src[j*4+1] << 8) | (src[j*4+2]);
-			src += PaddedRowLength;
+			// masks -> (A)BGR
+			for (int j = 0; j < size.w; ++j) {
+				uint32_t pixelValue = (isV3or5 ? ((src[j] & aMask) >> aNormShift) : 0xFF) << 24;
+				dest[j] = pixelValue
+					| (((src[j] & bMask) >> bNormShift) << 16)
+					| (((src[j] & gMask) >> gNormShift) << 8)
+					| ((src[j] & rMask) >> rNormShift);
+			}
+			src += PaddedRowLength / 4;
 		}
 	} else if (BitCount == 24) {
 		//convert to 32 bits on the fly
@@ -201,12 +236,13 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 {
 	Holder<Sprite2D> spr;
 	if (BitCount == 32) {
-		constexpr uint32_t red_mask = 0x000000ff;
-		constexpr uint32_t green_mask = 0x0000ff00;
-		constexpr uint32_t blue_mask = 0x00ff0000;
-		PixelFormat fmt(4, red_mask, green_mask, blue_mask, 0);
+		constexpr uint32_t redMask = 0x000000ff;
+		constexpr uint32_t greenMask = 0x0000ff00;
+		constexpr uint32_t blueMask = 0x00ff0000;
+		uint32_t alphaMask = hasAlpha ? 0xff000000 : 0;
+		PixelFormat fmt(4, redMask, greenMask, blueMask, alphaMask);
 		fmt.HasColorKey = true;
-		fmt.ColorKey = green_mask | (0xff << 24);
+		fmt.ColorKey = greenMask | (0xff << 24);
 
 		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h), nullptr, fmt);
 		memcpy(spr->LockSprite(), pixels, size.Area() * 4);

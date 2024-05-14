@@ -34,6 +34,7 @@ private:
 	/*, ColorsUsed, ColorsImportant*/
 	ieWord Planes = 0;
 	ieWord BitCount = 0;
+	bool hasAlpha = false;
 
 	//COLORTABLE
 	ieDword NumColors = 0;
