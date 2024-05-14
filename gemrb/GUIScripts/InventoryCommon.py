@@ -328,7 +328,7 @@ def DisplayItem (slotItem, itemtype):
 	# description icon (not present in iwds)
 	if not GameCheck.IsIWD1() and not GameCheck.IsIWD2():
 		Button = Window.GetControl (7)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | (0 if GameCheck.IsBG2EE() else IE_GUI_BUTTON_CENTER_PICTURES) | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		if GameCheck.IsPST():
 			Button.SetItemIcon (slotItem["ItemResRef"], 1) # no DescIcon
 		else:
