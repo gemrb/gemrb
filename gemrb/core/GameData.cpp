@@ -304,7 +304,7 @@ Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int fra
 {
 	Holder<Sprite2D> tspr;
 	auto af = GetFactoryResourceAs<const AnimationFactory>(resRef, IE_BAM_CLASS_ID, silent);
-	if (!af) return 0;
+	if (!af) return nullptr;
 	if (cycle == -1)
 		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );
 	else
