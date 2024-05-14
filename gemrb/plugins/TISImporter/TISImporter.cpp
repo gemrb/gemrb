@@ -136,6 +136,7 @@ void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
 		lastPVRZPage = dataBlock.pvrzPage;
 	}
 
+	if (!lastPVRZ) return;
 	auto sprite = lastPVRZ->GetSprite2D(Region{dataBlock.source.x, dataBlock.source.y, static_cast<int>(TileSize), static_cast<int>(TileSize)});
 	if (!sprite) {
 		return;
