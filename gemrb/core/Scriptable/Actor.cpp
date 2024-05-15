@@ -4133,6 +4133,7 @@ static void ChunkActor(Actor* actor)
 	for (auto animID : bodyParts) {
 		Actor* copy = actor->CopySelf(true);
 		map->ClearSearchMapFor(copy);
+		copy->SetBase(IE_GOLD, 0);
 		copy->SetStance(IE_ANI_TWITCH); // force only one loop of the animation
 		copy->SetAnimationID(animID);
 		copy->SetBase(IE_DONOTJUMP, DNJ_UNHINDERED);
