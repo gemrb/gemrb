@@ -412,7 +412,6 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 				// Lazy Theta star*
 				SearchmapPoint smptParent = Map::ConvertCoordToTile(nmptParent);
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
-				int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
 				if (newDist < oldDist) {
 					parents[smptChildIdx] = nmptParent;
 					distFromStart[smptChildIdx] = newDist;
@@ -433,7 +432,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 							if (!isClosed[smptVis.y * mapSize.w + smptVis.x]) continue;
 
 							unsigned short oldVisDist = distFromStart[smptChildIdx];
-							unsigned short newDist = distFromStart[smptVis.y * mapSize.w + smptVis.x] + Distance(smptVis, smptChild);
+							newDist = distFromStart[smptVis.y * mapSize.w + smptVis.x] + Distance(smptVis, smptChild);
 							if (newDist < oldVisDist) {
 								parents[smptChildIdx] = nmptVis;
 								distFromStart[smptChildIdx] = newDist;

@@ -43,7 +43,7 @@ private:
 public:
 	ResRef key;
 
-	SrcVector(const ResRef& resource);
+	explicit SrcVector(const ResRef& resource);
 
 	ieStrRef RandomRef() const;
 	bool IsEmpty() const { return strings.empty(); };
