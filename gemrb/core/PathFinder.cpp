@@ -321,7 +321,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 	constexpr float_t HEURISTIC_WEIGHT = 1.5;
-	auto getHeuristic = [&](SearchmapPoint& smptChild, int& smptChildIdx) {
+	auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) {
 		// Calculate heuristic
 		int xDist = smptChild.x - smptDest.x;
 		int yDist = smptChild.y - smptDest.y;
