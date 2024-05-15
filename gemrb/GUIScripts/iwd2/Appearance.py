@@ -231,6 +231,7 @@ def GetColor():
 	CancelButton.OnPress (CancelPress)
 	CancelButton.MakeEscape()
 
+	ColorPicker.ShowModal (MODAL_SHADOW_GRAY)
 	ColorPicker.Focus()
 	return
 
