@@ -6814,7 +6814,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 
 	// make sure we can still see the target
 	const Item* itm = gamedata->GetItem(itemres, true);
-	if (Sender != tar && !(itm->Flags & IE_ITEM_NO_INVIS) && target->IsInvisibleTo(Sender)) {
+	if (Sender != tar && !(itm->Flags & IE_ITEM_NO_INVIS) && target && target->IsInvisibleTo(Sender)) {
 		Sender->ReleaseCurrentAction();
 		Sender->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
 		displaymsg->DisplayConstantStringName(HCStrings::NoSeeNoCast, GUIColors::RED, Sender);
