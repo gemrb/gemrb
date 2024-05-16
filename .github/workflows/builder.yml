@@ -71,6 +71,7 @@ jobs:
         tarpath=/Applications/GemRB.app
 
         # there are no tags, so improvise
+        ls
         version=$({ date +%F; git describe --always; } | tr -d '\n') || exit 14
         file=gemrb-$version.tar.bz2
         tar cjf $file $tarpath || exit 15
