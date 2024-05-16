@@ -83,6 +83,11 @@ bool p2DAImporter::Open(std::unique_ptr<DataStream> str)
 		
 		auto sv = StringView(&line[pos + 1], line.length() - pos - 1);
 		rows.emplace_back(Explode<StringView, cell_t>(sv, ' ', std::max<size_t>(1, colNames.size() - 1)));
+		auto& row = rows.back();
+		// Explode may have returned trailing space as the last but empty item
+		if (!row.empty() && row.back().length() == 0) {
+			row.pop_back();
+		}
 	}
 
 	assert(rows.size() < std::numeric_limits<index_t>::max());

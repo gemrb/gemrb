@@ -41,7 +41,7 @@ public:
 };
 
 TEST_P(p2DAImporter_Test, GetRowCount) {
-	EXPECT_EQ(unit.GetRowCount(), 7);
+	EXPECT_EQ(unit.GetRowCount(), 8);
 }
 
 TEST_P(p2DAImporter_Test, GetColNamesCount) {
@@ -51,6 +51,7 @@ TEST_P(p2DAImporter_Test, GetColNamesCount) {
 TEST_P(p2DAImporter_Test, GetColumnCount) {
 	EXPECT_EQ(unit.GetColumnCount(), 4);
 	EXPECT_EQ(unit.GetColumnCount(6), 3);
+	EXPECT_EQ(unit.GetColumnCount(7), 2);
 }
 
 TEST_P(p2DAImporter_Test, QueryField) {
@@ -89,7 +90,8 @@ TEST_P(p2DAImporter_Test, GetRowName) {
 	EXPECT_EQ(unit.GetRowName(0), std::string{"STRENGTH"});
 	EXPECT_EQ(unit.GetRowName(6), std::string{"SQUEEZENESS"});
 
-	EXPECT_EQ(unit.GetRowName(7), std::string{});
+	EXPECT_EQ(unit.GetRowName(7), std::string{"MADNESS"});
+	EXPECT_EQ(unit.GetRowName(8), std::string{});
 }
 
 TEST_P(p2DAImporter_Test, FindTableValue) {
