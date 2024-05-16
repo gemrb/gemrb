@@ -73,12 +73,11 @@ jobs:
         # there are no tags, so improvise
         version=$({ date +%F; git describe --always; } | tr -d '\n') || exit 14
         file=gemrb-$version.tar.bz2
-        tar cvjf $file $tarpath || exit 15
-        ls -lh $file
+        tar cjf $file $tarpath || exit 15
 
         filepath="$filepath/$file"
-        scp -v $file \
-        gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/Buildbot\\\ Binaries/$filepath
+        scp -v "$file" \
+        "gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath"
 
   linux:
     name: Linux AppImage build
