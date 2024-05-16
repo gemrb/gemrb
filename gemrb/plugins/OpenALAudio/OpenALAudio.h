@@ -132,7 +132,7 @@ public:
 					tick_t *length = nullptr) override;
 	void UpdateVolume(unsigned int flags) override;
 	bool CanPlay() override;
-	void ResetMusics() override;
+	void ResetMusics() final;
 	bool Play() override;
 	bool Stop() override;
 	bool Pause() override;

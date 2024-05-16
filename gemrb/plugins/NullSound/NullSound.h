@@ -38,7 +38,7 @@ public:
 	bool Pause() override;
 	bool Resume() override;
 	bool CanPlay() override;
-	void ResetMusics() override;
+	void ResetMusics() final;
 	void UpdateListenerPos(const Point&) override;
 	Point GetListenerPos() override;
 	void UpdateVolume(unsigned int) override {}
