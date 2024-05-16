@@ -3834,8 +3834,7 @@ int Interface::GetLoreBonus(int column, int value) const
 	//no lorebon in iwd2 - lore is a skill
 	if (HasFeature(GFFlags::RULES_3ED)) return 0;
 
-	if (column<0 || column>0)
-		return -9999;
+	if (column != 0) return -9999;
 
 	return abilityTables->lorebon[value];
 }
@@ -3845,8 +3844,7 @@ int Interface::GetWisdomBonus(int column, int value) const
 	if (abilityTables->wisbon.empty()) return 0;
 
 	// xp bonus
-	if (column<0 || column>0)
-		return -9999;
+	if (column != 0) return -9999;
 
 	return abilityTables->wisbon[value];
 }
