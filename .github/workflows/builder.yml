@@ -68,16 +68,9 @@ jobs:
       run: |
         # NOTE: only do it on clang builds if we ever add more compilers
         filepath=Apple/OSX
-        tarpath=/Applications/GemRB.app
+        tarpath=/Applications/gemrb.app
 
         # there are no tags, so improvise
-        ls /Applications
-        echo "-----------------------------------------------------------------"
-        ls gemrb
-        echo "-----------------------------------------------------------------"
-        ls build/gemrb
-        echo "-----------------------------------------------------------------"
-        ls build/iprefix
         version=$({ date +%F; git describe --always; } | tr -d '\n') || exit 14
         file=gemrb-$version.tar.bz2
         tar cjf $file $tarpath || exit 15
