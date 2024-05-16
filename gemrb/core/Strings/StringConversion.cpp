@@ -55,7 +55,7 @@ static String StringFromEncodedData(const void* inptr, size_t length, const std:
 	iconv_close(cd);
 
 	if (ret == static_cast<size_t>(-1)) {
-		Log(ERROR, "String", "iconv failed to convert string {} from {} to UTF-16 with error: {}", in, encoding, strerror(errno));
+		Log(ERROR, "String", "iconv failed to convert string from {} to UTF-16 with error: {}", encoding, strerror(errno));
 		return u"";
 	}
 
