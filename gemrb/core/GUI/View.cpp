@@ -173,7 +173,7 @@ Regions View::DirtySuperViewRegions() const
 	// if we are opaque we cover everything and dont care about the superview
 	// if we arent but we need to redraw then we simply report our entire area
 
-	if (IsOpaque()) {
+	if (IsOpaque() || frame.size.IsInvalid()) {
 		return {};
 	}
 
