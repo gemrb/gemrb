@@ -1150,7 +1150,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			ieDword range = MAX_OPERATING_DISTANCE + speaker->GetBase(IE_DIALOGRANGE);
 			if ( scr->GetCurrentArea()!=target->GetCurrentArea() ||
 				PersonalDistance(scr, target)>range) {
-				MoveNearerTo(swap ? target : Sender, swap ? Sender : target, MAX_OPERATING_DISTANCE);
+				MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
 				return;
 			}
 		}
