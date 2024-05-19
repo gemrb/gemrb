@@ -36,12 +36,11 @@
 #include "Scriptable/Actor.h"
 #include "Streams/FileStream.h"
 #include "System/VFS.h"
+#include "fmt/chrono.h"
 
 #include <cassert>
 #include <set>
 #include <ctime>
-
-#include <fmt/chrono.h>
 
 #ifdef VITA
 #include <dirent.h>

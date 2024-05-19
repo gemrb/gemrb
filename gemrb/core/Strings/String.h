@@ -23,12 +23,12 @@
 
 #include "StringView.h"
 
+#include "fmt/xchar.h"
+
 #include <algorithm>
 #include <cwctype>
 #include <string>
 #include <vector>
-
-#include <fmt/xchar.h>
 
 #define WHITESPACE_STRING_W u"\n\t\r "
 #define WHITESPACE_STRING "\n\t\r "

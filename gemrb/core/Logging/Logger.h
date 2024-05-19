@@ -28,7 +28,7 @@
 #include "exports.h"
 #include "EnumIndex.h"
 
-#include <fmt/color.h>
+#include "fmt/color.h"
 
 #include <atomic>
 #include <condition_variable>

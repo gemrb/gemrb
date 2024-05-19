@@ -36,9 +36,9 @@
 
 #include "GameScript/GSUtils.h"
 #include "Scriptable/Actor.h"
+#include "fmt/ranges.h"
 
 #include <cstdio>
-#include <fmt/ranges.h>
 
 namespace GemRB {
 

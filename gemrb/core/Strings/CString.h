@@ -21,7 +21,8 @@
 
 #include "exports.h"
 #include "StringView.h"
-#include <fmt/format.h>
+
+#include "fmt/format.h"
 
 #include <algorithm>
 #include <cassert>

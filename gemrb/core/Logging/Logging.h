@@ -30,9 +30,9 @@
 
 #include "Logging/Logger.h"
 #include "Strings/String.h"
+#include "fmt/std.h"
 
 #include <cstdarg>
-#include <fmt/std.h>
 
 namespace GemRB {
 

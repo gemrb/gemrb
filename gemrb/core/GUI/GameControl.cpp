@@ -46,10 +46,10 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
+#include "fmt/ranges.h"
 
 #include <array>
 #include <cmath>
-#include <fmt/ranges.h>
 
 namespace GemRB {
 
