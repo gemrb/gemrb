@@ -535,6 +535,14 @@ ENDFUNCTION()
 FUNCTION(CONFIGURE_RPI_SPECIFICS)
 	# check for RaspberryPi
 	FIND_FILE(RPI NAMES bcm_host.h PATHS "/opt/vc/include")
+
+	IF(RPI AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+		MESSAGE(FATAL_ERROR
+			"GCC v12/13 have shown to cause a mysterious and severe bug on RPi (see issue #2088)."
+			" Please use Clang in the meantime, or check if a newer GCC version may work again."
+		)
+	ENDIF()
+
 	# By default, Pi0 to Pi3 models use the legacy (Broadcom) GLESv2 drivers, from /opt/vc.
 	# Newer models (Pi4) don't support it, using the open source MESA drivers.
 	# NOTE: the Pi3B(+) models can also run with open source MESA drivers, but support for it must be explicitely enabled
