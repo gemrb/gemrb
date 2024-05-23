@@ -671,7 +671,9 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 		for (int x = 0; x < vertexCount; x++) {
 			str->ReadPoint(points[x]);
 		}
-		auto poly = std::make_shared<Gem_Polygon>(std::move(points), &bbox);
+		// recalculate the bbox if it was not provided
+		auto poly = std::make_shared<Gem_Polygon>(std::move(points), bbox.size.IsInvalid() ? nullptr : &bbox);
+		bbox = poly->BBox;
 		ip = map->TMap->AddInfoPoint(ipName, ipType, poly);
 	}
 
