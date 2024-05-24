@@ -504,7 +504,7 @@ public:
 	Container *GetContainerByGlobalID(ieDword objectID) const;
 	InfoPoint *GetInfoPointByGlobalID(ieDword objectID) const;
 	Actor* GetActorByGlobalID(ieDword objectID) const;
-	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius) const;
+	Actor* GetActorInRadius(const Point& p, int flags, unsigned int radius, const Scriptable* checker = nullptr) const;
 	std::vector<Actor *> GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see = NULL) const;
 	const std::vector<Actor *> &GetAllActors() const { return actors; }
 	std::vector<Actor*> GetActorsInRect(const Region& rgn, int excludeFlags) const;

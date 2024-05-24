@@ -779,8 +779,8 @@ void Map::UpdateScripts()
 		} else if (actor->GetStep() && actor->GetSpeed()) {
 			// Make actors pathfind if there are others nearby
 			// in order to avoid bumping when possible
-			const Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
-			if (nearActor && nearActor != actor) {
+			const Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF, actor->GetAnims()->GetCircleSize(), actor);
+			if (nearActor) {
 				actor->NewPath();
 			}
 			DoStepForActor(actor, time);
@@ -2093,12 +2093,12 @@ Actor* Map::GetActor(const Point &p, int flags, const Movable *checker) const
 	return NULL;
 }
 
-Actor* Map::GetActorInRadius(const Point &p, int flags, unsigned int radius) const
+Actor* Map::GetActorInRadius(const Point& p, int flags, unsigned int radius, const Scriptable* checker) const
 {
 	for (auto actor : actors) {
 		if (PersonalDistance( p, actor ) > radius)
 			continue;
-		if (!actor->ValidTarget(flags) ) {
+		if (!actor->ValidTarget(flags, checker)) {
 			continue;
 		}
 		return actor;
