@@ -538,7 +538,7 @@ public:
 	int GetPathLength() const;
 //inliners to protect data consistency
 	inline PathListNode * GetStep() {
-		if (!step) {
+		if (!step && area) {
 			DoStep((unsigned int) ~0);
 		}
 		return step;
