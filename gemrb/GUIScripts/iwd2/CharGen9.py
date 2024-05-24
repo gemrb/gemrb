@@ -185,10 +185,12 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, GemRB.HasFeat (MyChar, FEAT_TOUGHNESS) * 3, 0)
 	LUCommon.SetupHP (MyChar)
 
-	TmpTable=GemRB.LoadTable ("repstart")
-	t = TmpTable.GetValue (GemRB.GetVar ("Alignment"), 0)
+	# must be set, see #2091
+	TmpTable = GemRB.LoadTable ("repstart")
+	t = TmpTable.GetValue (GemRB.GetVar ("Alignment") - 1, 0) * 10
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
-	TmpTable=GemRB.LoadTable ("strtgold")
+
+	TmpTable = GemRB.LoadTable ("strtgold")
 	a = TmpTable.GetValue (Class, 1) #number of dice
 	b = TmpTable.GetValue (Class, 0) #size
 	c = TmpTable.GetValue (Class, 2) #adjustment
