@@ -2195,8 +2195,8 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		if (overMe && (overMe->Type == ST_DOOR || overMe->Type == ST_CONTAINER || (overMe->Type == ST_TRAVEL && targetMode == TargetMode::None))) {
 			// move to the object before trying to interact with it
 			Actor* mainActor = GetMainSelectedActor();
-			if (mainActor && overMe->Type == ST_CONTAINER) {
-				CreateMovement(mainActor, p, false, tryToRun); // let one actor handle loot and containers
+			if (mainActor && overMe->Type != ST_TRAVEL) {
+				CreateMovement(mainActor, p, false, tryToRun); // let one actor handle doors, loot and containers
 			} else {
 				CommandSelectedMovement(p, true, false, tryToRun);
 			}
