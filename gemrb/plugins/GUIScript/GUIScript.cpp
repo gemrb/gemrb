@@ -7908,6 +7908,7 @@ static PyObject* GemRB_ConsoleWindowLog(PyObject * /*self*/, PyObject* args)
 {
 	LogLevel logLevel;
 	PARSE_ARGS(args, "b", &logLevel);
+	if (logLevel >= LogLevel::count) logLevel = LogLevel::DEBUG;
 
 	SetConsoleWindowLogLevel(logLevel);
 	Py_RETURN_NONE;
