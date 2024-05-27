@@ -552,7 +552,7 @@ static const ActionLink actionnames[] = {
 	{"changeaiscript", GameScript::ChangeAIScript, 0},
 	{"changeaitype", GameScript::ChangeAIType, 0},
 	{"changealignment", GameScript::ChangeAlignment, 0},
-	{"changeallegiance", GameScript::ChangeAllegiance, 0},
+	{"changeallegiance", GameScript::ChangeEnemyAlly, 0},
 	{"changeanimation", GameScript::ChangeAnimation, 0},
 	{"changeanimationnoeffect", GameScript::ChangeAnimationNoEffect, 0},
 	{"changeclass", GameScript::ChangeClass, 0},
@@ -563,7 +563,7 @@ static const ActionLink actionnames[] = {
 	{"changedialogue", GameScript::ChangeDialogue, 0},
 	{"changegender", GameScript::ChangeGender, 0},
 	{"changegeneral", GameScript::ChangeGeneral, 0},
-	{"changeenemyally", GameScript::ChangeAllegiance, 0}, //this is the same
+	{"changeenemyally", GameScript::ChangeEnemyAlly, 0},
 	{"changefaction", GameScript::SetFaction, 0}, //pst
 	{"changerace", GameScript::ChangeRace, 0},
 	{"changespecifics", GameScript::ChangeSpecifics, 0},

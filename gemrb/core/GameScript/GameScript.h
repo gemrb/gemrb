@@ -949,13 +949,13 @@ public: //Script Functions
 	static void ChangeAIScript(Scriptable* Sender, Action* parameters);
 	static void ChangeAIType(Scriptable* Sender, Action* parameters);
 	static void ChangeAlignment(Scriptable* Sender, Action* parameters);
-	static void ChangeAllegiance(Scriptable* Sender, Action* parameters);
 	static void ChangeAnimation(Scriptable* Sender, Action* parameters);
 	static void ChangeAnimationNoEffect(Scriptable* Sender, Action* parameters);
 	static void ChangeClass(Scriptable* Sender, Action* parameters);
 	static void ChangeColor(Scriptable* Sender, Action* parameters);
 	static void ChangeDestination(Scriptable* Sender, Action* parameters);
 	static void ChangeDialogue(Scriptable* Sender, Action* parameters);
+	static void ChangeEnemyAlly(Scriptable* Sender, Action* parameters);
 	static void ChangeGender(Scriptable* Sender, Action* parameters);
 	static void ChangeGeneral(Scriptable* Sender, Action* parameters);
 	static void ChangeRace(Scriptable* Sender, Action* parameters);

@@ -225,7 +225,7 @@ void GameScript::RemoveFamiliar(Scriptable* Sender, Action* /*parameters*/)
 	actor->SetBase(IE_EA, EA_NEUTRAL);
 }
 
-void GameScript::ChangeAllegiance(Scriptable* Sender, Action* parameters)
+void GameScript::ChangeEnemyAlly(Scriptable* Sender, Action* parameters)
 {
 	Scriptable *scr = Sender;
 	if (parameters->objects[1]) {
