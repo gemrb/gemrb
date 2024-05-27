@@ -3963,8 +3963,8 @@ void Map::SetBackground(const ResRef &bgResRef, ieDword duration)
 
 Actor* Map::GetRandomEnemySeen(const Actor* origin) const
 {
-	int type = GetGroup(origin);
-	if (type == 2) {
+	GroupType type = GetGroup(origin);
+	if (type == GroupType::Neutral) {
 		return nullptr; //no enemies
 	}
 
@@ -3972,11 +3972,11 @@ Actor* Map::GetRandomEnemySeen(const Actor* origin) const
 	std::vector<Actor*> neighbours = GetAllActorsInRadius(origin->Pos, flags, origin->GetBase(IE_VISUALRANGE), origin);
 	Actor* victim = neighbours[RAND<size_t>(0, neighbours.size() - 1)];
 
-	if (type) { // origin is PC
+	if (type == GroupType::PC) {
 		if (victim->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 			return victim;
 		}
-	} else {
+	} else { // GroupType::Enemy
 		if (victim->GetStat(IE_EA) <= EA_GOODCUTOFF) {
 			return victim;
 		}

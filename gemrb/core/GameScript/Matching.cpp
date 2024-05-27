@@ -589,9 +589,9 @@ Targets *ClosestEnemySummoned(const Scriptable *origin, Targets *parameters, int
 	}
 	const Actor *sender = static_cast<const Actor*>(origin);
 	//determining the allegiance of the origin
-	int type = GetGroup(sender);
+	GroupType type = GetGroup(sender);
 
-	if (type==2) {
+	if (type == GroupType::Neutral) {
 		parameters->Clear();
 		return parameters;
 	}
@@ -608,12 +608,12 @@ Targets *ClosestEnemySummoned(const Scriptable *origin, Targets *parameters, int
 			t = parameters->GetNextTarget(m, ST_ACTOR);
 			continue;
 		}
-		if (type) { //origin is PC
+		if (type == GroupType::PC) {
 			if (tmp->GetStat(IE_EA) <= EA_GOODCUTOFF) {
 				t = parameters->GetNextTarget(m, ST_ACTOR);
 				continue;
 			}
-		} else {
+		} else { // GroupType::Enemy
 			if (tmp->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 				t = parameters->GetNextTarget(m, ST_ACTOR);
 				continue;
@@ -641,9 +641,9 @@ Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, un
 	}
 	const Actor *actor = static_cast<const Actor*>(origin);
 	//determining the allegiance of the origin
-	int type = GetGroup(actor);
+	GroupType type = GetGroup(actor);
 
-	if (type==2) {
+	if (type == GroupType::Neutral) {
 		parameters->Clear();
 		return parameters;
 	}
@@ -660,7 +660,7 @@ Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, un
 			t = parameters->RemoveTargetAt(m);
 			continue;
 		}
-		if (type) { //origin is PC
+		if (type == GroupType::PC) {
 			if (actor->GetStat(IE_EA) <= EA_EVILCUTOFF) {
 				t=parameters->RemoveTargetAt(m);
 				continue;
@@ -684,8 +684,8 @@ Targets* XthNearestEnemyOf(Targets* parameters, int count, int gaFlags, bool far
 		return parameters;
 	}
 	// determining the allegiance of the origin
-	int type = GetGroup(origin);
-	if (type == 2) {
+	GroupType type = GetGroup(origin);
+	if (type == GroupType::Neutral) {
 		return parameters;
 	}
 
@@ -703,11 +703,11 @@ Targets* XthNearestEnemyOf(Targets* parameters, int count, int gaFlags, bool far
 			// deliberately underflow later, so we can reuse the rest of the code
 			distance = -distance;
 		}
-		if (type) { //origin is PC
+		if (type == GroupType::PC) {
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 				parameters->AddTarget(ac, distance, gaFlags);
 			}
-		} else {
+		} else { // GroupType::Enemy
 			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
 				parameters->AddTarget(ac, distance, gaFlags);
 			}

@@ -19,7 +19,6 @@
  */
 
 #include "GameScript/GSUtils.h"
-#include "GameScript/Matching.h"
 
 #include "strrefs.h"
 #include "defsounds.h"
@@ -2338,14 +2337,13 @@ bool DiffCore(ieDword a, ieDword b, int diffMode)
 	}
 }
 
-int GetGroup(const Actor *actor)
+GroupType GetGroup(const Actor* actor)
 {
-	int type = 2; //neutral, has no enemies
+	GroupType type = GroupType::Neutral;
 	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-		type = 1; //PC
-	}
-	else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-		type = 0;
+		type = GroupType::PC;
+	} else if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+		type = GroupType::Enemy;
 	}
 	return type;
 }
@@ -2353,11 +2351,11 @@ int GetGroup(const Actor *actor)
 Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho)
 {
 	//determining the allegiance of the origin
-	int type = GetGroup(origin);
+	GroupType type = GetGroup(origin);
 
 	//neutral has no enemies
-	if (type==2) {
-		return NULL;
+	if (type == GroupType::Neutral) {
+		return nullptr;
 	}
 
 	Targets *tgts = new Targets();
@@ -2380,12 +2378,11 @@ Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho)
 		}
 
 		int distance = Distance(ac, origin);
-		if (type) { //origin is PC
+		if (type == GroupType::PC) {
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 				tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 			}
-		}
-		else {
+		} else { // GroupType::Enemy
 			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
 				tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 			}
