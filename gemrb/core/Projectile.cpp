@@ -260,7 +260,8 @@ void Projectile::Setup()
 	//but also makes the caster immune to the effect
 	if (Extension) {
 		if (Extension->AFlags&PAF_CONE) {
-			NewOrientation = Orientation = GetOrient(Pos, Destination);
+			// no need to recalculate orientation
+			// Pos and Destination should be the same here already and would then autoresolve to S
 			Destination=Pos;
 			ExtFlags|=PEF_NO_TRAVEL;
 		}
