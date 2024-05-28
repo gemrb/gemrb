@@ -5278,7 +5278,7 @@ int fx_hold_creature_no_icon (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_hold_creature_no_icon(%2d): Value: %d, IDS: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	//actually the original engine just skips this effect if the target is dead
-	if ( STATE_GET(STATE_DEAD) ) {
+	if (STATE_GET(STATE_DEAD) || core->InCutSceneMode()) {
 		return FX_NOT_APPLIED;
 	}
 
