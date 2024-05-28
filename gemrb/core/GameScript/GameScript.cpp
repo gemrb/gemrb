@@ -2086,7 +2086,7 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 			interrupt->IncRef();
 			response->actions.push_back(interrupt);
 		}
-		rS->responses[0]->Execute(target);
+		response->Execute(target);
 
 		// NOTE: this will break blocking instants, if there are any
 		target->ReleaseCurrentAction();
