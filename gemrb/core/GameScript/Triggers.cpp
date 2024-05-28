@@ -3337,7 +3337,7 @@ int GameScript::AttackedBy(Scriptable *Sender, const Trigger *parameters)
 {
 	bool match = Sender->MatchTriggerWithObject(trigger_attackedby, parameters->objectParameter, parameters->int0Parameter);
 	const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
-	if (match && target && Sender->Type == ST_ACTOR) {
+	if (match && target && target != Sender && Sender->Type == ST_ACTOR) {
 		Sender->objects.LastMarked = target->GetGlobalID();
 	}
 	return match;
