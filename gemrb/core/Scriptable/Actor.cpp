@@ -7425,7 +7425,11 @@ void Actor::UpdateActorState()
 		//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
 		// however some critters don't have that long animations (eg. squirrel 0xC400)
 		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
-			GetCurrentArea()->AddProjectile(attackProjectile, Pos, objects.LastTargetPersistent, false);
+			// using LastTarget so multiattack actors do stop if scripts instruct them to
+			// LastTargetPersistent fixed the fact that you could get an "x: (critical) hit" combat message, but then
+			// no damage if the target was gone or reset. However at the same time it means we could continue
+			// attacking enemies when they turned neutral — which is worse
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, objects.LastTarget, false);
 			attackProjectile = NULL;
 		}
 	}
