@@ -4733,7 +4733,7 @@ std::string Actor::dump() const
 	buffer.append("\n");
 
 	AppendFormat(buffer, "current HP:{}\n", BaseStats[IE_HITPOINTS] );
-	AppendFormat(buffer, "Mod[IE_ANIMATION_ID]: 0x{:^4X} ResRef:{} Stance: {}\n", Modified[IE_ANIMATION_ID], anims->ResRefBase, GetStance());
+	AppendFormat(buffer, "Mod[IE_ANIMATION_ID]: 0x{:^4X} ResRef:{} Stance: {}\n", Modified[IE_ANIMATION_ID], anims ? anims->ResRefBase : "unknown", GetStance());
 	AppendFormat(buffer, "TURNUNDEADLEVEL: {} current: {}\n", BaseStats[IE_TURNUNDEADLEVEL], Modified[IE_TURNUNDEADLEVEL]);
 	AppendFormat(buffer, "Colors:    ");
 	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID) ) {
@@ -5905,7 +5905,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 		//can't talk to hostile
 		if (Modified[IE_EA]>=EA_EVILCUTOFF) return false;
 		// neither to bats and birds
-		if (anims->GetCircleSize() == 0) return false;
+		if (anims && anims->GetCircleSize() == 0) return false;
 		break;
 	}
 	if (ga_flags&GA_NO_DEAD) {
