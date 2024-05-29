@@ -5925,7 +5925,6 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 		}
 	}
 	if (ga_flags & GA_ONLY_BUMPABLE) {
-		if (core->InCutSceneMode()) return false;
 		if (core->GetGame()->CombatCounter) return false;
 		if (GetStat(IE_EA) >= EA_EVILCUTOFF) return false;
 		// Skip sitting patrons
@@ -5933,7 +5932,6 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 		if (IsMoving()) return false;
 	}
 	if (ga_flags & GA_CAN_BUMP) {
-		if (core->InCutSceneMode()) return false;
 		if (core->GetGame()->CombatCounter) return false;
 		if (!((IsPartyMember() && GetStat(IE_EA) < EA_GOODCUTOFF) || GetStat(IE_NPCBUMP))) return false;
 	}
