@@ -499,7 +499,7 @@ void Map::NormalizeDeltas(float_t &dx, float_t &dy, float_t factor)
 	float_t dxOrig = dx;
 	float_t dyOrig = dy;
 	if (dx == 0.0) {
-		dy = STEP_RADIUS;
+		dy = STEP_RADIUS * 0.75f;
 	} else if (dy == 0.0) {
 		dx = STEP_RADIUS;
 	} else {
