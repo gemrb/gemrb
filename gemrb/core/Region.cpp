@@ -86,6 +86,19 @@ bool Point::isWithinRadius(int r, const Point& p) const noexcept
 	return (d.x * d.x) + (d.y * d.y) <= r * r;
 }
 
+bool Point::IsWithinEllipse(int r, const Point& p, int a, int b) const noexcept
+{
+	Point d = operator-(p);
+
+	// check ellipse bbox first
+	if (d.x < -r * a || d.x > r * a) return false;
+	if (d.y < -r * b || d.y > r * b) return false;
+
+	// then compare with calculated ellipse distance
+	int ar = b * b * d.x * d.x + a * a * d.y * d.y;
+	return ar <= a * a * b * b * r * r;
+}
+
 Size::Size(int w, int h) noexcept
 {
 	this->w = w;

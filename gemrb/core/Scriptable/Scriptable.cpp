@@ -1669,17 +1669,7 @@ bool Selectable::IsOver(const Point &P) const
 	int csize = circleSize;
 	if (csize < 2) csize = 2;
 
-	int dx = P.x - Pos.x;
-	int dy = P.y - Pos.y;
-
-	// check rectangle first
-	if (dx < -(csize-1)*16 || dx > (csize-1)*16) return false;
-	if (dy < -(csize-1)*12 || dy > (csize-1)*12) return false;
-
-	// then check ellipse
-	int r = 9*dx*dx + 16*dy*dy; // 48^2 * ( (dx/16)^2 + (dy/12)^2 )
-
-	return (r <= 48*48*(csize-1)*(csize-1));
+	return P.IsWithinEllipse(csize - 1, Pos);
 }
 
 bool Selectable::IsSelected() const
