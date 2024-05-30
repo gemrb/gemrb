@@ -69,7 +69,7 @@ public:
 	}
 
 	// true if p is within the circle of radius r centered at p
-	bool isWithinRadius(int r, const Point& p) const noexcept;
+	bool IsWithinRadius(int r, const Point& p) const noexcept;
 	bool IsWithinEllipse(int r, const Point& p, int a = 16, int b = 12) const noexcept;
 
 	int x = 0;

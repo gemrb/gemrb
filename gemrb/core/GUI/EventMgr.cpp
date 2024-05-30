@@ -209,10 +209,7 @@ void EventMgr::DispatchEvent(Event&& e) const
 				if (VideoDriver->InTextInput())
 					VideoDriver->StopTextInput();
 
-				if (btn == repeatButton
-					&& e.time <= lastMouseDown + DCDelay
-					&& repeatPos.isWithinRadius(mouseClickRadius, se.Pos())
-				) {
+				if (btn == repeatButton && e.time <= lastMouseDown + DCDelay && repeatPos.IsWithinRadius(mouseClickRadius, se.Pos())) {
 					repeatCount++;
 				} else {
 					repeatCount = 1;

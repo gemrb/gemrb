@@ -217,7 +217,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, float_t an
 	while (step < maxStep) {
 		auto it = std::find_if(exclude.begin(), exclude.end(), [&](const Point& p) {
 			// look for points within some radius
-			return p.isWithinRadius(radius, dest);
+			return p.IsWithinRadius(radius, dest);
 		});
 
 		if (it != exclude.end()) {
