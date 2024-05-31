@@ -1667,8 +1667,13 @@ void Selectable::DrawCircle(const Point& p) const
 bool Selectable::IsOver(const Point &P) const
 {
 	int csize = circleSize;
-	if (csize < 2) csize = 2;
-
+	if (csize < 2) {
+		Point d = P - Pos;
+		if (d.x < -16 || d.x > 16) return false;
+		if (d.y < -12 || d.y > 12) return false;
+		return true;
+	}
+	// TODO: make sure to match the actual blocking shape; use GetEllipseSize/GetEllipseOffset instead?
 	return P.IsWithinEllipse(csize - 1, Pos);
 }
 
