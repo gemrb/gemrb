@@ -330,7 +330,7 @@
 0xE780    MBA5      MBA5       MBA5       MBA5       9          2          1          *
 0xE790    MBA6      MBA6       MBA6       MBA6       9          2          1          *
 0xE7A0    MBAI      MBAI       MBAI       MBAI       9          2          1          *
-0xE7AC    MBAI      MBAI       MBAI       MBAI       9          4          1          *
+0xE7AC    MBAI      MBAI       MBAI       MBAI       9          1          1          *
 0xE7B0    MBOA      MBOA       MBOA       MBOA       9          2          1          *
 0xE7C0    MABW      MABW       MABW       MABW       9          2          1          *
 0xE7D0    MMAL      MMAL       MMAL       MMAL       9          2          1          *
