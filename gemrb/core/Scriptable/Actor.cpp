@@ -5444,6 +5444,27 @@ bool Actor::CheckOnDeath()
 	if (InternalFlags&IF_CLEANUP) {
 		return true;
 	}
+
+	// drop loot ASAP, in case scripts will DestroySelf the actor before we can clean up
+	Game* game = core->GetGame();
+	bool disintegrated = LastDamageType & DAMAGE_DISINTEGRATE;
+	if (InternalFlags & IF_JUSTDIED && !(InternalFlags & IF_DUMPED)) {
+		// items seem to be dropped at the moment of death in the original but this
+		// can't go in Die() because that is called from effects and dropping items
+		// might change effects! so we just drop everything here
+
+		// disintegration destroys normal items if difficulty level is high enough
+		if (disintegrated && GameDifficulty > DIFF_CORE) {
+			inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
+		}
+		// drop everything remaining, but ignore TNO, as he needs to keep his gear
+		if (game->protagonist != PM_NO || GetScriptName() != game->GetPC(0, false)->GetScriptName()) {
+			DropItem("", 0);
+		}
+		InternalFlags |= IF_DUMPED;
+		ClearCurrentStanceAnims();
+	}
+
 	// FIXME
 	if (InternalFlags&IF_JUSTDIED || CurrentAction || GetNextAction() || GetStance() == IE_ANI_DIE) {
 		return false; //actor is currently dying, let him die first
@@ -5464,21 +5485,6 @@ bool Actor::CheckOnDeath()
 	ClearActions();
 	//missed the opportunity of Died()
 	InternalFlags&=~IF_JUSTDIED;
-
-	// items seem to be dropped at the moment of death in the original but this
-	// can't go in Die() because that is called from effects and dropping items
-	// might change effects! so we just drop everything here
-
-	// disintegration destroys normal items if difficulty level is high enough
-	bool disintegrated = LastDamageType & DAMAGE_DISINTEGRATE;
-	if (disintegrated && GameDifficulty > DIFF_CORE) {
-		inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
-	}
-	// drop everything remaining, but ignore TNO, as he needs to keep his gear
-	Game *game = core->GetGame();
-	if (game->protagonist != PM_NO || GetScriptName() != game->GetPC(0, false)->GetScriptName()) {
-		DropItem("", 0);
-	}
 
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9

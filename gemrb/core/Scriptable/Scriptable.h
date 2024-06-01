@@ -114,6 +114,7 @@ class Sprite2D;
 //#define IF_PARTYRESTED   0x200000 //party rested trigger event
 #define IF_FORCEUPDATE   0x400000
 #define IF_TRIGGER_AP    0x800000
+#define IF_DUMPED        0x1000000
 
 //the actor should stop attacking
 #define IF_STOPATTACK (IF_JUSTDIED|IF_REALLYDIED|IF_CLEANUP|IF_IDLE)
