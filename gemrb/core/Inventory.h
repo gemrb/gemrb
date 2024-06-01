@@ -316,7 +316,7 @@ public:
 	/** Finds best ranged weapon if any and reports status */
 	bool CanEquipRanged(int& maxDamage, ieDword& bestSlot) const;
 	/** Equips best weapon */
-	void EquipBestWeapon(int flags);
+	bool EquipBestWeapon(int flags);
 	/** returns the struct of the usable items, returns true if there are more */
 	bool GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int startindex, int count) const;
 	/** returns the exclusion bits */
