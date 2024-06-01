@@ -3216,6 +3216,10 @@ int fx_set_diseased_state(Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	default:
 		damage = 1;
+		// per second
+		if (core->GetGame()->GameTime % target->GetAdjustedTime(aRound)) {
+			return FX_APPLIED;
+		}
 		break;
 	}
 	//percent
