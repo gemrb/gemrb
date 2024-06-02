@@ -1887,6 +1887,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 
 	if ((targetMode == TargetMode::Cast) && spellCount) {
 		//we'll get the container back from the coordinates
+		target_types |= GA_POINT;
 		TryToCast(actor, container->Pos);
 		//Do not reset target_mode, TryToCast does it for us!!
 		return;
@@ -2244,6 +2245,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	//add a check if you don't want some random monster handle doors and such
 	if (targetMode == TargetMode::Cast && !(gamedata->GetSpecialSpell(spellName) & SPEC_AREA)) {
 		//the player is using an item or spell on the ground
+		target_types |= GA_POINT;
 		TryToCast(selectedActor, p);
 	} else if (!overMe) {
 		return;
