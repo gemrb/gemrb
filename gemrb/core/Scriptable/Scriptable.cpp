@@ -889,6 +889,12 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry, int extraFlags)
 	for (const auto& neighbour : nearActors) {
 		neighbour->AddTrigger(entry);
 	}
+
+	std::vector<Scriptable*> nearOthers = area->GetScriptablesInRect(Pos, 15);
+	for (const auto& neighbour : nearOthers) {
+		neighbour->AddTrigger(entry);
+	}
+
 	area->AddTrigger(entry);
 }
 

@@ -2106,6 +2106,36 @@ Scriptable* Map::GetScriptable(const Point& p, int flags, const Movable* checker
 	return nullptr;
 }
 
+// deliberately excluding actors
+std::vector<Scriptable*> Map::GetScriptablesInRect(const Point& p, unsigned int radius) const
+{
+	std::vector<Scriptable*> neighbours;
+	Region rect(p, Size());
+	radius = Feet2Pixels(radius, 0);
+	rect.ExpandAllSides(radius);
+	rect.y += radius / 4;
+	rect.h -= radius / 2;
+
+	size_t i = TMap->GetDoorCount();
+	while (i--) {
+		Door* door = TMap->GetDoor(i);
+		if (door->BBox.IntersectsRegion(rect)) neighbours.emplace_back(door);
+	}
+
+	i = TMap->GetContainerCount();
+	while (i--) {
+		Container* cont = TMap->GetContainer(i);
+		if (cont->BBox.IntersectsRegion(rect)) neighbours.emplace_back(cont);
+	}
+
+	i = TMap->GetInfoPointCount();
+	while (i--) {
+		InfoPoint* ip = TMap->GetInfoPoint(i);
+		if (ip->BBox.IntersectsRegion(rect)) neighbours.emplace_back(ip);
+	}
+	return neighbours;
+}
+
 Actor* Map::GetActor(const Point &p, int flags, const Movable *checker) const
 {
 	for (auto actor : actors) {
@@ -2152,7 +2182,6 @@ std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsign
 	}
 	return neighbours;
 }
-
 
 Actor* Map::GetActor(const ieVariable& Name, int flags) const
 {

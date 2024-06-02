@@ -513,6 +513,7 @@ public:
 	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;
 	Scriptable* GetScriptable(const Point& p, int flags, const Movable* checker = nullptr) const;
 	Scriptable *GetScriptableByDialog(const ResRef& resref) const;
+	std::vector<Scriptable*> GetScriptablesInRect(const Point& p, unsigned int radius) const;
 	Actor *GetItemByDialog(const ResRef& resref) const;
 	Actor *GetActorByResource(const ResRef& resref) const;
 	Actor *GetActorByScriptName(const ieVariable& name) const;
