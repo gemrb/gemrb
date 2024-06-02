@@ -1278,7 +1278,7 @@ int Scriptable::CastSpell(Scriptable* target, bool deplete, bool instant, bool n
 	}
 
 	objects.LastTargetPos = target->Pos;
-	if (target->Type==ST_ACTOR) {
+	if (target->Type == ST_ACTOR || target->Type == ST_CONTAINER || target->Type == ST_DOOR) {
 		objects.LastSpellTarget = target->GetGlobalID();
 	}
 
