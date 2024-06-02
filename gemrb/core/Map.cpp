@@ -2080,6 +2080,32 @@ Actor* Map::GetActorByGlobalID(ieDword objectID) const
  GA_POINT     64  - not actor specific
  GA_NO_HIDDEN 128 - hidden actors don't play
 */
+Scriptable* Map::GetScriptable(const Point& p, int flags, const Movable* checker) const
+{
+	auto actor = GetActor(p, flags, checker);
+	if (actor) return actor;
+
+	size_t i = TMap->GetDoorCount();
+	while (i--) {
+		Door* door = TMap->GetDoor(i);
+		if (door->IsOver(p)) return door;
+	}
+
+	i = TMap->GetContainerCount();
+	while (i--) {
+		Container* cont = TMap->GetContainer(i);
+		if (cont->IsOver(p)) return cont;
+	}
+
+	i = TMap->GetInfoPointCount();
+	while (i--) {
+		InfoPoint* ip = TMap->GetInfoPoint(i);
+		if (ip->IsOver(p)) return ip;
+	}
+
+	return nullptr;
+}
+
 Actor* Map::GetActor(const Point &p, int flags, const Movable *checker) const
 {
 	for (auto actor : actors) {

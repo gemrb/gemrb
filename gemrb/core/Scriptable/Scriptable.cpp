@@ -970,7 +970,7 @@ void Scriptable::CastSpellPointEnd(int level, bool keepStance)
 		break;
 	}
 
-	Actor* target = area->GetActor(objects.LastTargetPos, GA_NO_UNSCHEDULED | GA_NO_HIDDEN);
+	Scriptable* target = area->GetScriptable(objects.LastTargetPos, GA_NO_UNSCHEDULED | GA_NO_HIDDEN);
 	if (target) {
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
 		target->objects.LastSpellOnMe = spellID;
@@ -1044,7 +1044,7 @@ void Scriptable::CastSpellEnd(int level, bool keepStance)
 		break;
 	}
 
-	Actor* target = area->GetActorByGlobalID(objects.LastSpellTarget);
+	Scriptable* target = area->GetScriptableByGlobalID(objects.LastSpellTarget);
 	if (target) {
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
 		target->objects.LastSpellOnMe = spellID;

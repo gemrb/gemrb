@@ -511,6 +511,7 @@ public:
 	Actor* GetActor(const ieVariable& Name, int flags) const;
 	Actor* GetActor(int i, bool any) const;
 	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;
+	Scriptable* GetScriptable(const Point& p, int flags, const Movable* checker = nullptr) const;
 	Scriptable *GetScriptableByDialog(const ResRef& resref) const;
 	Actor *GetItemByDialog(const ResRef& resref) const;
 	Actor *GetActorByResource(const ResRef& resref) const;
