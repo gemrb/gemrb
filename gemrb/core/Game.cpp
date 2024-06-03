@@ -2447,6 +2447,7 @@ bool Game::CheckPartyBanter() const
 void Game::CheckAreaComment()
 {
 	if (CombatCounter) return;
+	if (core->InCutSceneMode()) return;
 	if (GameTime % 600 != 0) return;
 	if (RAND(1, 100) > 16) return; // yep, the original used 16 %
 
