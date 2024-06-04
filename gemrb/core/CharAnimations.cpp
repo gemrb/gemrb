@@ -994,7 +994,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			}
 		}
 
-		auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(NewResRef, IE_BAM_CLASS_ID);
+		auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(NewResRef, IE_BAM_CLASS_ID, true);
 
 		if (!af) {
 			if (part < actorPartCount) {
@@ -1006,6 +1006,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 				continue;
 			}
 		}
+		Log(MESSAGE, "CharAnimations", "Found {}", NewResRef);
 
 		SharedAnim newanim(af->GetCycle(Cycle));
 
