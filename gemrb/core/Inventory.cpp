@@ -337,6 +337,7 @@ void Inventory::KillSlot(size_t index)
 	}
 	const CREItem *item = Slots[index];
 	if (!item) {
+		CacheAllWeaponInfo();
 		return;
 	}
 
@@ -350,6 +351,7 @@ void Inventory::KillSlot(size_t index)
 
 	int effect = core->QuerySlotEffects((unsigned int) index);
 	if (!effect) {
+		CacheAllWeaponInfo();
 		return;
 	}
 	RemoveSlotEffects(index);
@@ -376,11 +378,10 @@ void Inventory::KillSlot(size_t index)
 				RemoveSlotEffects(FindTypedRangedWeapon(header->ProjectileQualifier));
 				equip = FindRangedProjectile(header->ProjectileQualifier);
 				if (equip != IW_NO_EQUIPPED) {
-					EquipItem(GetWeaponSlot(equip));
+					recache = !EquipItem(GetWeaponSlot(equip));
 				} else {
-					EquipBestWeapon(EQUIP_MELEE);
+					recache = !EquipBestWeapon(EQUIP_MELEE);
 				}
-				recache = false;
 			}
 			UpdateWeaponAnimation();
 			break;
@@ -390,7 +391,7 @@ void Inventory::KillSlot(size_t index)
 			if (eqslot == (int)index) {
 				recache = false;
 				if ((int) index == SLOT_MAGIC) {
-					EquipBestWeapon(EQUIP_MELEE | EQUIP_RANGED | EQUIP_FORCE);
+					recache = !EquipBestWeapon(EQUIP_MELEE | EQUIP_RANGED | EQUIP_FORCE);
 					break;
 				}
 				SetEquippedSlot(IW_NO_EQUIPPED, 0);
@@ -417,9 +418,8 @@ void Inventory::KillSlot(size_t index)
 			type = header->ProjectileQualifier;
 			weaponslot = FindTypedRangedWeapon(type);
 			if (weaponslot == SLOT_FIST) { // a ranged weapon was not found - freshly unequipped
-				EquipBestWeapon(EQUIP_MELEE);
+				recache = !EquipBestWeapon(EQUIP_MELEE);
 				UpdateWeaponAnimation();
-				recache = false;
 				break;
 			}
 
@@ -444,11 +444,10 @@ void Inventory::KillSlot(size_t index)
 
 			equip = FindRangedProjectile(header->ProjectileQualifier);
 			if (equip != IW_NO_EQUIPPED) {
-				EquipItem(GetWeaponSlot(equip));
+				recache = !EquipItem(GetWeaponSlot(equip));
 			} else {
-				EquipBestWeapon(EQUIP_MELEE);
+				recache = !EquipBestWeapon(EQUIP_MELEE);
 			}
-			recache = false;
 			gamedata->FreeItem(itm2, item2->ItemResRef, false);
 
 			// reset Equipped if it is a ranged weapon slot
