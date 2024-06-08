@@ -577,8 +577,8 @@ private:
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
 	void UpdateFatigue();
-	int GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity);
-	int GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
+	int GetSneakAttackDamage(Actor* target, const WeaponInfo& wi, int& multiplier, bool weaponImmunity);
+	int GetBackstabDamage(const Actor* target, const WeaponInfo& wi, int multiplier, int damage) const;
 	/** for IE_EXISTANCEDELAY */
 	void PlayExistenceSounds();
 	TableMgr::index_t GetKitIndex (ieDword kit, ieDword baseclass=0) const;
@@ -846,7 +846,7 @@ public:
 	/* calculates strength (dexterity) based damage adjustment */
 	int WeaponDamageBonus(const WeaponInfo &wi) const;
 	/* handles critical, backstab, etc. damage modifications */
-	void ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool &critical);
+	void ModifyWeaponDamage(const WeaponInfo& wi, Actor* target, int& damage, bool& critical);
 	/* adjusts damage dealt to this actor, handles mirror images  */
 	void ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype);
 	/* returns the hp adjustment based on constitution */

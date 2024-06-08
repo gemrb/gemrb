@@ -6989,14 +6989,10 @@ void Actor::PerformAttack(ieDword gameTime)
 	} else {
 		usedLeftHand = (bool) ((attacksperround - attackcount) & 1);
 	}
+	// anything in the left hand at all?
+	if (usedLeftHand && !weaponInfo[usedLeftHand].extHeader) usedLeftHand = false;
 
-	WeaponInfo& wi = weaponInfo[usedLeftHand];
-	if (!wi.extHeader && usedLeftHand) {
-		// nothing in left hand, use right
-		wi = weaponInfo[0];
-		usedLeftHand = false;
-	}
-
+	const WeaponInfo& wi = weaponInfo[usedLeftHand];
 	const ITMExtHeader* hittingheader = wi.extHeader;
 	int tohit;
 	int DamageBonus, CriticalBonus;
@@ -9120,7 +9116,7 @@ static ieDword AdjustEnchantment(const Actor* wielder, const Actor* target, cons
 	return enchantment;
 }
 
-void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool &critical)
+void Actor::ModifyWeaponDamage(const WeaponInfo& wi, Actor* target, int& damage, bool& critical)
 {
 	//Calculate weapon based damage bonuses (strength bonus, dexterity bonus, backstab)
 	ieDword adjustedEnchantment = AdjustEnchantment(this, target, wi);
@@ -9214,7 +9210,8 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 	damage += extraDamage;
 }
 
-int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity) {
+int Actor::GetSneakAttackDamage(Actor* target, const WeaponInfo& wi, int& multiplier, bool weaponImmunity)
+{
 	ieDword always = Modified[IE_ALWAYSBACKSTAB];
 	bool invisible = Modified[IE_STATE_ID] & state_invisible;
 	int sneakAttackDamage = 0;
@@ -9234,7 +9231,6 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 
 	if (!target->Modified[IE_DISABLEBACKSTAB] && !weaponImmunity && !dodgy) {
 		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(HCStrings::BackstabFail, GUIColors::WHITE);
-		wi.backstabbing = false;
 		return 0;
 	}
 
@@ -9278,7 +9274,7 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 	return sneakAttackDamage;
 }
 
-int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier, int damage) const
+int Actor::GetBackstabDamage(const Actor* target, const WeaponInfo& wi, int multiplier, int damage) const
 {
 	ieDword always = Modified[IE_ALWAYSBACKSTAB];
 	bool invisible = Modified[IE_STATE_ID] & state_invisible;
@@ -9300,7 +9296,6 @@ int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier
 	if (target->Modified[IE_DISABLEBACKSTAB]) {
 		// The backstab seems to have failed
 		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(HCStrings::BackstabFail, GUIColors::WHITE);
-		wi.backstabbing = false;
 	} else {
 		if (wi.backstabbing) {
 			backstabDamage = multiplier * damage;

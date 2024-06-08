@@ -12218,7 +12218,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	leftorright = leftorright&1;
-	WeaponInfo wi = actor->weaponInfo[leftorright && actor->IsDualWielding()];
+	const WeaponInfo& wi = actor->weaponInfo[leftorright && actor->IsDualWielding()];
 	const ITMExtHeader* hittingheader = wi.extHeader; // same header, except for ranged weapons it is the ammo header
 	int tohit=20;
 	int DamageBonus=0;
