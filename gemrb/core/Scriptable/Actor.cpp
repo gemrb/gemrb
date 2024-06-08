@@ -7004,7 +7004,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	if (PCStats) {
-		PCStats->RegisterFavourite(weaponInfo[usedLeftHand && IsDualWielding()].item->Name, FAV_WEAPON);
+		PCStats->RegisterFavourite(weaponInfo[usedLeftHand].item->Name, FAV_WEAPON);
 	}
 
 	//if this is the first call of the round, we need to update next attack
@@ -7042,7 +7042,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	std::string buffer;
 	//debug messages
-	if (usedLeftHand && IsDualWielding()) {
+	if (usedLeftHand) {
 		buffer.append("(Off) ");
 	} else {
 		buffer.append("(Main) ");
