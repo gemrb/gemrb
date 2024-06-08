@@ -203,7 +203,6 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 		}
 
 		// this is needed so eg. Range trigger gets a good object
-		// HACK: our parsing of Attack([0]) is broken
 		if (!filtered) {
 			// if no filters were applied..
 			assert(!tgts);
@@ -219,13 +218,35 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 	return tgts;
 }
 
+static bool IsTargetingAnyone(const Object* oC)
+{
+	// make sure no other targeting/matching is at play
+	if (oC->objectFields[0] == -1) return false;
+	if (!oC->objectNameRef.IsEmpty()) return false;
+	for (int i = 0; i < MaxObjectNesting; i++) {
+		if (oC->objectFilters[i] > 0) return false;
+	}
+
+	int sum = 0;
+	for (int j = 0; j < ObjectIDSCount; j++) {
+		sum += oC->objectFields[j];
+	}
+	return sum == 0;
+}
+
 Targets *GetAllObjects(const Map *map, Scriptable *Sender, const Object *oC, int ga_flags)
 {
 	if (!oC) {
 		//return all objects
 		return GetAllActors(Sender, ga_flags);
 	}
-	Targets* tgts = EvaluateObject(map, Sender, oC, ga_flags);
+	Targets* tgts;
+	if (IsTargetingAnyone(oC)) { // handle [ANYONE]/[0] directly
+		tgts = GetAllActors(Sender, ga_flags);
+		if (tgts) tgts->Pop(); // remove self
+	} else {
+		tgts = EvaluateObject(map, Sender, oC, ga_flags);
+	}
 	//if we couldn't find an endpoint by name or object qualifiers
 	//it is not an Actor, but could still be a Door or Container (scriptable)
 	if (!tgts && oC->objectName[0]) {

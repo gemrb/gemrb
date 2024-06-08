@@ -44,6 +44,7 @@ public:
 	Targets() noexcept {};
 
 	size_t Count() const;
+	void Pop() { objects.pop_front(); };
 	targettype* RemoveTargetAt(targetlist::iterator& m);
 	const targettype* GetNextTarget(targetlist::iterator& m, ScriptableType type);
 	const targettype* GetLastTarget(ScriptableType type);

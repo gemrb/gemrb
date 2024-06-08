@@ -1607,6 +1607,7 @@ static int GetIdsValue(const char *&symbol, const ResRef& idsname)
 		symbolName[x] = *symbol;
 		symbol++;
 	}
+	if (symbolName.substr(0, 6) == "anyone") return 0;
 	return valHook->GetValue(symbolName);
 }
 
