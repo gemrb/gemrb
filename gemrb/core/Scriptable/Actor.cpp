@@ -7169,7 +7169,8 @@ void Actor::PerformAttack(ieDword gameTime)
 			displaymsg->DisplayMsgAtLocation(HCStrings::CriticalMiss, FT_COMBAT, this, this, GUIColors::WHITE);
 			VerbalConstant(Verbal::CritMiss);
 		}
-		if (wi.wflags & WEAPON_RANGED) {//no need for this with melee weapon!
+		ApplyCriticalEffect(this, target, wi, false);
+		if (wi.wflags & WEAPON_RANGED) { // no need for this with melee weapons!
 			UseItem(wi.slot, (ieDword) -2, target, UI_MISS|UI_NOAURA);
 		} else if (core->HasFeature(GFFlags::BREAKABLE_WEAPONS) && InParty) {
 			//break sword
@@ -7180,7 +7181,6 @@ void Actor::PerformAttack(ieDword gameTime)
 				inventory.EquipBestWeapon(EQUIP_MELEE);
 			}
 		}
-		ApplyCriticalEffect(this, target, wi, false);
 		ResetState();
 		return;
 	}
