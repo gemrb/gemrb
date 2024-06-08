@@ -3881,12 +3881,7 @@ static bool CheckConfusionOverride(Actor* actor)
 		case 1:
 			// ees, maybe vanilla, called "GroupAttack([ANYONE])"
 			// that's the same as Attack due to the param passed
-			// HACK: replace with [0] (ANYONE) once we support that (Nearest matches Sender like in the original)
-			if (RandomFlip()) {
-				actionString = "Attack(NearestEnemyOf(Myself))";
-			} else {
-				actionString = "Attack([PC])";
-			}
+			actionString = "Attack([ANYONE])";
 			break;
 		case 2:
 			if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {

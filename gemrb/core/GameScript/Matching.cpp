@@ -193,7 +193,6 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 		if (!ac) continue; // is this check really needed?
 		// don't return Sender in IDS targeting!
 		// unless it's pst, which relies on it in 3012cut2-3012cut7.bcs
-		// FIXME: do we need more fine-grained control?
 		// FIXME: stop abusing old GF flags
 		if (!core->HasFeature(GFFlags::AREA_OVERRIDE) && ac == Sender) continue;
 
