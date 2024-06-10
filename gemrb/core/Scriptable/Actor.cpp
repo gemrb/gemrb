@@ -335,7 +335,7 @@ Actor::Actor()
 	: Movable( ST_ACTOR )
 {
 	ResetPathTries();
-	nextComment = 100 + RAND(0, 350); // 7-30s delay
+	Timers.nextComment = 100 + RAND(0, 350); // 7-30s delay
 
 	inventory.SetInventoryType(ieInventoryType::CREATURE);
 
@@ -554,16 +554,16 @@ void Actor::SetCircleSize()
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC || Modified[IE_CHECKFORBERSERK]) {
 		color = ColorYellow;
 		normalIdx = 5;
-	} else if (gc && ((gc->InDialog() && gc->dialoghandler->IsTarget(this)) || remainingTalkSoundTime > 0)) {
+	} else if (gc && ((gc->InDialog() && gc->dialoghandler->IsTarget(this)) || Timers.remainingTalkSoundTime > 0)) {
 		color = ColorWhite;
 		normalIdx = 3; //?? made up
 
-		if (remainingTalkSoundTime > 0) {
+		if (Timers.remainingTalkSoundTime > 0) {
 			/**
 			 * Approximation: pulsating at about 2Hz over a notable radius growth.
 			 * Maybe check this relation for dragons and rats, too.
 			 */
-			oscillationFactor = 1.1F + std::sin(double(remainingTalkSoundTime) * (4 * M_PI) / 1000) * 0.1F;
+			oscillationFactor = 1.1F + std::sin(double(Timers.remainingTalkSoundTime) * (4 * M_PI) / 1000) * 0.1F;
 		}
 	} else {
 		switch (Modified[IE_EA]) {
@@ -2930,10 +2930,10 @@ void Actor::RefreshHP() {
 
 	// temporary con bonuses also modify current HP; this can kill! (EE behavior)
 	// but skip on game load, while old bonuses are still re-applied
-	if (!(BaseStats[IE_STATE_ID]&STATE_DEAD) && checkHP != 2 && bonus != lastConBonus) {
-		BaseStats[IE_HITPOINTS] += bonus - lastConBonus;
+	if (!(BaseStats[IE_STATE_ID] & STATE_DEAD) && checkHP != 2 && bonus != Timers.lastConBonus) {
+		BaseStats[IE_HITPOINTS] += bonus - Timers.lastConBonus;
 	}
-	lastConBonus = bonus;
+	Timers.lastConBonus = bonus;
 }
 
 int Actor::GetStyleExtraAPR(ieDword& warriorLevel) const
@@ -3090,19 +3090,18 @@ void Actor::UpdateFatigue()
 	}
 
 	bool updated = false;
-	if (!TicksLastRested) {
+	if (!Timers.lastRested) {
 		// just loaded the game; approximate last rest
-		TicksLastRested = game->GameTime - (2*core->Time.hour_size) * (2*GetBase(IE_FATIGUE)+1);
+		Timers.lastRested = game->GameTime - (2 * core->Time.hour_size) * (2 * GetBase(IE_FATIGUE) + 1);
 		updated = true;
-	} else if (LastFatigueCheck) {
-		ieDword FatigueDiff = (game->GameTime - TicksLastRested) / (4*core->Time.hour_size)
-		                    - (LastFatigueCheck - TicksLastRested) / (4*core->Time.hour_size);
+	} else if (Timers.lastFatigueCheck) {
+		ieDword FatigueDiff = (game->GameTime - Timers.lastRested) / (4 * core->Time.hour_size) - (Timers.lastFatigueCheck - Timers.lastRested) / (4 * core->Time.hour_size);
 		if (FatigueDiff) {
 			NewBase(IE_FATIGUE, FatigueDiff, MOD_ADDITIVE);
 			updated = true;
 		}
 	}
-	LastFatigueCheck = game->GameTime;
+	Timers.lastFatigueCheck = game->GameTime;
 
 	if (!core->HasFeature(GFFlags::AREA_OVERRIDE)) {
 		// pst has TNO regeneration stored there
@@ -3123,19 +3122,19 @@ void Actor::UpdateFatigue()
 		AddPortraitIcon(PI_FATIGUE);
 		if (updated) {
 			// stagger the complaint, so long travels don't cause a fatigue choir
-			FatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
+			Timers.fatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
 		}
 	} else {
 		// the icon can be added manually; eg. by spcl321 in bg2 (berserker enrage)
 		if (!fxqueue.HasEffectWithParam(fx_display_portrait_icon_ref, PI_FATIGUE)) {
 			DisablePortraitIcon(PI_FATIGUE);
 		}
-		FatigueComplaintDelay = 0;
+		Timers.fatigueComplaintDelay = 0;
 	}
 
-	if (FatigueComplaintDelay) {
-		FatigueComplaintDelay--;
-		if (!FatigueComplaintDelay) {
+	if (Timers.fatigueComplaintDelay) {
+		Timers.fatigueComplaintDelay--;
+		if (!Timers.fatigueComplaintDelay) {
 			VerbalConstant(Verbal::Tired, gamedata->GetVBData("SPECIAL_COUNT"));
 		}
 	}
@@ -3789,11 +3788,11 @@ void Actor::PlayExistenceSounds()
 
 	const Game *game = core->GetGame();
 	ieDword time = game->GameTime;
-	if (time/nextComment > 1) { // first run, not adjusted for game time yet
-		nextComment += time;
+	if (time / Timers.nextComment > 1) { // first run, not adjusted for game time yet
+		Timers.nextComment += time;
 	}
 
-	if (nextComment >= time) return;
+	if (Timers.nextComment >= time) return;
 
 	ieDword delay = Modified[IE_EXISTANCEDELAY];
 	if (delay == (ieDword) -1) return;
@@ -3803,17 +3802,17 @@ void Actor::PlayExistenceSounds()
 
 	auto audio = core->GetAudioDrv();
 	Point listener = audio->GetListenerPos();
-	if (nextComment && !Immobile() && WithinAudibleRange(this, listener)) {
+	if (Timers.nextComment && !Immobile() && WithinAudibleRange(this, listener)) {
 		//setup as an ambient
 		ieStrRef strref = GetVerbalConstant(Verbal::Existence1, 5);
 		if (strref == ieStrRef::INVALID) {
-			nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
+			Timers.nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
 			return;
 		}
 
 		StringBlock sb = core->strings->GetStringBlock(strref);
 		if (sb.Sound.IsEmpty()) {
-			nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
+			Timers.nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
 			return;
 		}
 
@@ -3828,7 +3827,7 @@ void Actor::PlayExistenceSounds()
 		}
 	}
 
-	nextComment = time + RAND(delay*1/4, delay*7/4);
+	Timers.nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
 }
 
 static void ForceOverrideAction(Actor* actor, std::string actionString)
@@ -3925,9 +3924,9 @@ bool Actor::OverrideActions()
 
 	// each round also re-confuse the actor
 	// use the combat round size as the original;  also skald song duration matches it
-	bool roundPassed = game->GameTime - lastOverrideCheck > GetAdjustedTime(core->Time.attack_round_size);
+	bool roundPassed = game->GameTime - Timers.lastOverrideCheck > GetAdjustedTime(core->Time.attack_round_size);
 	if (roundPassed && CheckConfusionOverride(this)) {
-		lastOverrideCheck = game->GameTime;
+		Timers.lastOverrideCheck = game->GameTime;
 		return true;
 	}
 
@@ -4489,7 +4488,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 void Actor::PlayWalkSound()
 {
 	tick_t thisTime = GetMilliseconds();
-	if (thisTime<nextWalk) return;
+	if (thisTime < Timers.nextWalkSound) return;
 	int chosenWalkSnd = anims->GetWalkSoundCount();
 	if (!chosenWalkSnd) return;
 
@@ -4515,7 +4514,7 @@ void Actor::PlayWalkSound()
 	tick_t len = 0;
 	SFXChannel channel = InParty ? SFXChannel::WalkChar : SFXChannel::WalkMonster;
 	core->GetAudioDrv()->Play(Sound, channel, Pos, 0, &len);
-	nextWalk = ieDword(thisTime + len);
+	Timers.nextWalkSound = ieDword(thisTime + len);
 }
 
 // guesses from audio:               bone  chain studd leather splint none other plate
@@ -5430,7 +5429,7 @@ void Actor::SetPersistent(int partyslot)
 void Actor::DestroySelf()
 {
 	InternalFlags|=IF_CLEANUP;
-	RemovalTime = 0;
+	Timers.removalTime = 0;
 	// clear search map so that a new actor can immediately go there
 	// (via ChangeAnimationCore)
 	if (area)
@@ -5553,15 +5552,15 @@ bool Actor::CheckOnDeath()
 
 	ieDword time = core->GetGame()->GameTime;
 	if (!pstflags && Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) {
-		RemovalTime = time;
+		Timers.removalTime = time;
 		return true;
 	}
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
-	RemovalTime = time + core->Time.day_size; // keep corpse around for a day
+	Timers.removalTime = time + core->Time.day_size; // keep corpse around for a day
 
 	//if chunked death, then return true
 	if (LastDamageType & DAMAGE_CHUNKING) {
-		RemovalTime = time;
+		Timers.removalTime = time;
 		return true;
 	}
 	return false;
@@ -6265,7 +6264,7 @@ void Actor::FaceTarget(const Scriptable *target)
 void Actor::StopAttack()
 {
 	SetStance(IE_ANI_READY);
-	lastattack = 0;
+	Timers.lastAttack = 0;
 	secondround = false;
 	if (InParty) {
 		core->Autopause(AUTOPAUSE::NOTARGET, this);
@@ -6425,14 +6424,13 @@ int Actor::BAB2APR(int pBAB, int pBABDecrement, int CheckRapidShot) const
 //so it is safe to do cleanup here (it will be called only once)
 void Actor::InitRound(ieDword gameTime)
 {
-	lastInit = gameTime;
 	secondround = !secondround;
 
 	//reset variables used in PerformAttack
 	attackcount = 0;
 	attacksperround = 0;
-	nextattack = 0;
-	lastattack = 0;
+	Timers.nextAttack = 0;
+	Timers.lastAttack = 0;
 
 	//add one for second round to get an extra attack only if we
 	//are x/2 attacks per round
@@ -6451,7 +6449,7 @@ void Actor::InitRound(ieDword gameTime)
 
 	//set our apr and starting round time
 	attacksperround = attackcount;
-	roundTime = gameTime;
+	Timers.roundStart = gameTime;
 
 	//print a little message :)
 	Log(MESSAGE, "InitRound", "Name: {} | Attacks: {} | Start: {}", fmt::WideToChar{ShortName}, attacksperround, gameTime);
@@ -6917,7 +6915,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		game->PartyAttack = true;
 	}
 
-	if (!roundTime || (gameTime-roundTime > core->Time.attack_round_size)) { // the original didn't use a normal round
+	if (!Timers.roundStart || (gameTime - Timers.roundStart > core->Time.attack_round_size)) { // the original didn't use a normal round
 		// TODO: do we need cleverness for secondround here?
 		InitRound(gameTime);
 	}
@@ -6925,7 +6923,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	//only return if we don't have any attacks left this round
 	if (attackcount==0) {
 		// this is also part of the UpdateActorState hack below. sorry!
-		lastattack = gameTime;
+		Timers.lastAttack = gameTime;
 		return;
 	}
 
@@ -6938,9 +6936,9 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	//don't continue if we can't make the attack yet
 	//we check lastattack because we will get the same gameTime a few times
-	if ((nextattack > gameTime) || (gameTime == lastattack)) {
+	if (Timers.nextAttack > gameTime || gameTime == Timers.lastAttack) {
 		// fuzzie added the following line as part of the UpdateActorState hack below
-		lastattack = gameTime;
+		Timers.lastAttack = gameTime;
 		return;
 	}
 
@@ -7006,7 +7004,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	//if this is the first call of the round, we need to update next attack
-	if (nextattack == 0) {
+	if (Timers.nextAttack == 0) {
 		// initiative calculation (lucky 1d6-1 + item speed + speed stat + constant):
 		// speed contains the bonus from the physical speed stat and the proficiency level
 		int spdfactor = hittingheader->Speed + speed;
@@ -7015,10 +7013,10 @@ void Actor::PerformAttack(ieDword gameTime)
 		spdfactor = Clamp(spdfactor + LuckyRoll(1, 6, -4, LR_NEGATIVE), 0, 10);
 
 		//(round_size/attacks_per_round)*(initiative) is the first delta
-		nextattack = core->Time.round_size*spdfactor/(attacksperround*10) + gameTime;
+		Timers.nextAttack = core->Time.round_size * spdfactor / (attacksperround * 10) + gameTime;
 
 		//we can still attack this round if we have a speed factor of 0
-		if (nextattack > gameTime) {
+		if (Timers.nextAttack > gameTime) {
 			return;
 		}
 	}
@@ -7035,8 +7033,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	//figure out the time for our next attack since the old time has the initiative
 	//in it, we only have to add the basic delta
 	attackcount--;
-	nextattack += (core->Time.round_size/attacksperround);
-	lastattack = gameTime;
+	Timers.nextAttack += core->Time.round_size / attacksperround;
+	Timers.lastAttack = gameTime;
 
 	std::string buffer;
 	//debug messages
@@ -7047,7 +7045,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	if (attacksperround) {
 		AppendFormat(buffer, "Left: {} | ", attackcount);
-		AppendFormat(buffer, "Next: {} ", nextattack);
+		AppendFormat(buffer, "Next: {} ", Timers.nextAttack);
 	}
 	if (fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 1) || fxqueue.HasEffectWithParam(fx_puppetmarker_ref, 2)) { // illusions can't hit
 		ResetState();
@@ -7392,15 +7390,15 @@ void Actor::UpdateActorState()
 		game->SelectActor(this, false, SELECT_NORMAL);
 	}
 
-	if (remainingTalkSoundTime > 0) {
+	if (Timers.remainingTalkSoundTime > 0) {
 		tick_t currentTick = GetMilliseconds();
-		tick_t diffTime = currentTick - lastTalkTimeCheckAt;
-		lastTalkTimeCheckAt = currentTick;
+		tick_t diffTime = currentTick - Timers.lastTalkTimeCheckAt;
+		Timers.lastTalkTimeCheckAt = currentTick;
 
-		if (diffTime >= remainingTalkSoundTime) {
-			remainingTalkSoundTime = 0;
+		if (diffTime >= Timers.remainingTalkSoundTime) {
+			Timers.remainingTalkSoundTime = 0;
 		} else {
-			remainingTalkSoundTime -= diffTime;
+			Timers.remainingTalkSoundTime -= diffTime;
 		}
 		SetCircleSize();
 	}
@@ -7473,7 +7471,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	}
 
 	// use the combat round size as the original;  also skald song duration matches it
-	int roundFraction = (gameTime - roundTime) % GetAdjustedTime(core->Time.attack_round_size);
+	int roundFraction = (gameTime - Timers.roundStart) % GetAdjustedTime(core->Time.attack_round_size);
 
 	//actually, iwd2 has autosearch, also, this is useful for dayblindness
 	//apply the modal effect about every second (pst and iwds have round sizes that are not multiples of 15)
@@ -7486,7 +7484,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	// but we shouldn't be resetting rounds/attacks just because the actor
 	// wandered away, the action code should probably be responsible somehow
 	// see also line above (search for comment containing UpdateActorState)!
-	if (objects.LastTarget && lastattack && lastattack < (gameTime - 1)) {
+	if (objects.LastTarget && Timers.lastAttack && Timers.lastAttack < (gameTime - 1)) {
 		const Actor* target = area->GetActorByGlobalID(objects.LastTarget);
 		if (!target || target->GetStat(IE_STATE_ID) & STATE_DEAD ||
 			(target->GetStance() == IE_ANI_WALK && target->GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE)) {
@@ -7495,7 +7493,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 			Log(COMBAT, "Attack", "(Leaving attack)");
 		}
 
-		lastattack = 0;
+		Timers.lastAttack = 0;
 	}
 
 	if (Modal.State == Modal::None && !Modal.LingeringCount) {
@@ -7882,11 +7880,11 @@ bool Actor::HibernateIfAble()
 // even if a creature is offscreen, they should still get an AI update every 3 ticks
 bool Actor::ForceScriptCheck()
 {
-	if (!lastScriptCheck) lastScriptCheck = Ticks;
+	if (!Timers.lastScriptCheck) Timers.lastScriptCheck = Ticks;
 
-	lastScriptCheck++;
-	if (lastScriptCheck - Ticks >= 3) {
-		lastScriptCheck = Ticks;
+	Timers.lastScriptCheck++;
+	if (Timers.lastScriptCheck - Ticks >= 3) {
+		Timers.lastScriptCheck = Ticks;
 		return true;
 	}
 	return false;
@@ -8841,7 +8839,7 @@ void Actor::Rest(int hours)
 			}
 		}
 	} else {
-		TicksLastRested = LastFatigueCheck = core->GetGame()->GameTime;
+		Timers.lastRested = Timers.lastFatigueCheck = core->GetGame()->GameTime;
 		SetBase (IE_FATIGUE, 0);
 		SetBase (IE_INTOXICATION, 0);
 		inventory.ChargeAllItems (0);
@@ -10271,7 +10269,7 @@ bool Actor::BlocksSearchMap() const
 //return true if the actor doesn't want to use an entrance
 bool Actor::CannotPassEntrance(ieDword exitID) const
 {
-	if (LastExit!=exitID) {
+	if (Timers.lastExit != exitID) {
 		return true;
 	}
 
@@ -10293,8 +10291,8 @@ void Actor::UseExit(ieDword exitID) {
 		InternalFlags&=~IF_USEEXIT;
 		LastArea = Area;
 		UsedExit.Reset();
-		if (LastExit) {
-			const Scriptable *ip = area->GetInfoPointByGlobalID(LastExit);
+		if (Timers.lastExit) {
+			const Scriptable* ip = area->GetInfoPointByGlobalID(Timers.lastExit);
 			if (ip) {
 				const ieVariable& ipName = ip->GetScriptName();
 				if (!ipName.IsEmpty()) {
@@ -10303,7 +10301,7 @@ void Actor::UseExit(ieDword exitID) {
 			}
 		}
 	}
-	LastExit = exitID;
+	Timers.lastExit = exitID;
 }
 
 // luck increases the minimum roll per dice, but only up to the number of dice sides;
@@ -10801,10 +10799,10 @@ void Actor::ResetCommentTime()
 {
 	Game* game = core->GetGame();
 	if (bored_time) {
-		nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
+		Timers.nextComment = game->GameTime + core->Roll(5, 1000, bored_time / 2);
 	} else {
 		game->nextBored = 0;
-		nextComment = game->GameTime + core->Roll(10, 500, 150);
+		Timers.nextComment = game->GameTime + core->Roll(10, 500, 150);
 	}
 }
 
@@ -11155,8 +11153,8 @@ const std::string& Actor::GetKitName(ieDword kitID) const
 }
 
 void Actor::SetAnimatedTalking (tick_t length) {
-	remainingTalkSoundTime = std::max(remainingTalkSoundTime, length);
-	lastTalkTimeCheckAt = GetMilliseconds();
+	Timers.remainingTalkSoundTime = std::max(Timers.remainingTalkSoundTime, length);
+	Timers.lastTalkTimeCheckAt = GetMilliseconds();
 }
 
 bool Actor::HasPlayerClass() const

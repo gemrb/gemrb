@@ -329,6 +329,24 @@ struct SaveInfo {
 	int prevRoll = -1;
 };
 
+struct TimerData {
+	ieDword lastExit = 0; // the global ID of the exit to be used
+	ieDword lastOverrideCheck = 0; // confusion timer to limit overriding actions to once per round
+	ieDword lastAttack = 0; // time of the last attack
+	ieDword nextAttack = 0; // time of our next attack
+	ieDword nextComment = 0; // do something random (area comment, interaction)
+	ieDword nextWalkSound = 0; // when to play the next walk sound
+	ieDword roundStart = 0; // time the last combat round started
+	ieDword removalTime = 0;
+	ieDword fatigueComplaintDelay = 0; // stagger tired messages
+	ieDword lastScriptCheck = 0;
+	int lastConBonus;
+	tick_t lastRested = 0;
+	tick_t lastFatigueCheck = 0;
+	tick_t remainingTalkSoundTime = 0;
+	tick_t lastTalkTimeCheckAt = 0;
+};
+
 enum DamageFlags {
 	DrainFromTarget = 0,
 	DrainFromSource = 1,
@@ -426,7 +444,7 @@ public:
 	PCStatsStruct::StateArray previousStates;
 	ResRef SmallPortrait;
 	ResRef LargePortrait;
-	/** 0: NPC, 1-8 party slot */
+	/** 0: NPC, 1+: party slot */
 	ieByte InParty = 0;
 	
 	ieStrRef ShortStrRef = ieStrRef(-1);
@@ -449,7 +467,6 @@ public:
 	int creVersion = 0;
 	//in game or area actor header
 	ieDword TalkCount = 0;
-	ieDword RemovalTime = 0;
 	//FIXME: this is definitely not the same in bg2, in bg2 there are joinable npcs
 	//which keep a matrix of counters
 	ieDword InteractCount = 0; // this is accessible in iwd2, probably exists in other games too
@@ -458,9 +475,9 @@ public:
 	ToHitStats ToHit;
 	WeaponInfo weaponInfo[2]{};
 	ModalState Modal{};
+	TimerData Timers {};
 
 	bool usedLeftHand = false; // which weaponInfo index was used in an attack last
-	ieDword LastExit = 0;    // the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
 	ResRef LastArea;
 	AnimRef ShieldRef;
@@ -484,12 +501,7 @@ public:
 	vvcSet vfxQueue = vvcSet(VVCSort); // sorted so we can distinguish effects infront and behind
 	std::vector<bool> projectileImmunity; // classic bitfield
 	Holder<SoundHandle> casting_sound;
-	ieDword roundTime = 0;           // these are timers for attack rounds
 	ieDword panicMode = PANIC_NONE;  // runaway, berserk or randomwalk
-	ieDword nextComment = 0; // do something random (area comment, interaction)
-	int FatigueComplaintDelay = 0;   // stagger tired messages
-	ieDword lastInit = 0;
-	ieDword lastOverrideCheck = 0;
 	//how many attacks left in this round, must be public for cleave opcode
 	int attackcount = 0;
 
@@ -532,22 +544,12 @@ private:
 	//true every second round of attack
 	bool secondround = false;
 	int attacksperround = 0;
-	//time of our next attack
-	ieDword nextattack = 0;
-	ieDword nextWalk = 0;
-	ieDword lastattack = 0;
 	//trap we're trying to disarm
 	ieDword disarmTrap = 0;
 	ieDword InTrap = 0;
 	char AttackStance = 0;
 	/*The projectile bringing the current attack*/
 	Projectile* attackProjectile = nullptr;
-	tick_t TicksLastRested = 0;
-	tick_t LastFatigueCheck = 0;
-	tick_t remainingTalkSoundTime = 0;
-	tick_t lastTalkTimeCheckAt = 0;
-	ieDword lastScriptCheck = 0;
-	int lastConBonus;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Point& p, BlitFlags flags,
 						 const std::vector<AnimationPart>& anims, const Color& tint) const;
@@ -1081,8 +1083,6 @@ public:
 	void ReleaseCurrentAction() override;
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(const Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
-	tick_t GetLastRested() const { return TicksLastRested; }
-	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	ieDword GetActiveClass() const;
 	bool IsKitInactive() const;

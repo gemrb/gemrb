@@ -1175,7 +1175,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	}
 	act->SetOrientation(ClampToOrientation(orientation), false);
 	act->TalkCount = talkCount;
-	act->RemovalTime = removalTime;
+	act->Timers.removalTime = removalTime;
 	act->RefreshEffects();
 	return true;
 }
@@ -2189,7 +2189,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map) const
 		stream->WriteDword(0); //actor animation, unused
 		stream->WriteWord(ac->GetOrientation());
 		stream->WriteWord(0); //unknown
-		stream->WriteDword(ac->RemovalTime);
+		stream->WriteDword(ac->Timers.removalTime);
 		stream->WriteWord(ac->maxWalkDistance);
 		stream->WriteWord(0); //more unknowns
 		stream->WriteDword(ac->appearance);

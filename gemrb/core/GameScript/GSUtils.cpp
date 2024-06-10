@@ -1480,7 +1480,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	// if held or disabled, etc, then cannot start or continue attacking
 	if (attacker->Immobile()) {
-		attacker->roundTime = 0;
+		attacker->Timers.roundStart = 0;
 		Sender->ReleaseCurrentAction();
 		return;
 	}

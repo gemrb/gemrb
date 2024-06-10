@@ -1449,7 +1449,8 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		// update everyone in party, so they think no time has passed
 		// nobody else, including familiars, gets luck penalties from fatigue
 		for (const auto& pc : PCs) {
-			pc->IncreaseLastRested(add);
+			pc->Timers.lastRested += add;
+			pc->Timers.lastFatigueCheck += add;
 		}
 	}
 

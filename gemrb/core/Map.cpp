@@ -2251,7 +2251,7 @@ void Map::PurgeArea(bool items)
 				continue;
 			}
 
-			if (ac->RemovalTime > core->GetGame()->GameTime) {
+			if (ac->Timers.removalTime > core->GetGame()->GameTime) {
 				continue;
 			}
 

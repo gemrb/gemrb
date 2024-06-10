@@ -11756,7 +11756,7 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 			}
 			GameScript* restscript = new GameScript(resRef, tar, 0, false);
 			if (restscript->Update()) {
-				// there could be several steps involved, so we can't reliably check tar->GetLastRested()
+				// there could be several steps involved, so we can't reliably check tar->Timers.lastRested
 				dreamed = 1;
 			}
 			delete restscript;
