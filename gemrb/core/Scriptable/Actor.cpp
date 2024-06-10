@@ -3925,8 +3925,11 @@ bool Actor::OverrideActions()
 
 	// each round also re-confuse the actor
 	// use the combat round size as the original;  also skald song duration matches it
-	int roundFraction = (game->GameTime - roundTime) % GetAdjustedTime(core->Time.attack_round_size);
-	if (!roundFraction && CheckConfusionOverride(this)) return true;
+	bool roundPassed = game->GameTime - lastOverrideCheck > GetAdjustedTime(core->Time.attack_round_size);
+	if (roundPassed && CheckConfusionOverride(this)) {
+		lastOverrideCheck = game->GameTime;
+		return true;
+	}
 
 	// feeblemind
 	if (Modified[IE_STATE_ID] & STATE_FEEBLE) {

@@ -489,6 +489,7 @@ public:
 	ieDword nextComment = 0; // do something random (area comment, interaction)
 	int FatigueComplaintDelay = 0;   // stagger tired messages
 	ieDword lastInit = 0;
+	ieDword lastOverrideCheck = 0;
 	//how many attacks left in this round, must be public for cleave opcode
 	int attackcount = 0;
 
