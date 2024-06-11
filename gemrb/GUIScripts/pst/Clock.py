@@ -21,7 +21,7 @@ import GUICommon
 from GUIDefines import *
 
 def CreateClockButton(Button):
-	Button.SetAnimation ("WMTIME")
+	Button.SetAnimation ("WMTIME", 0, A_ANI_GAMEANIM)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.OnPress (lambda: GemRB.GamePause (2, 0))

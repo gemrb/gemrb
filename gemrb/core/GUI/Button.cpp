@@ -20,7 +20,6 @@
 
 #include "GUI/Button.h"
 
-#include "GUI/GameControl.h"
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
@@ -37,8 +36,6 @@
 
 #include <utility>
 
-#define IS_PORTRAIT (Picture && ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT))
-
 namespace GemRB {
 
 Button::Button(const Region& frame)
@@ -53,7 +50,7 @@ Button::Button(const Region& frame)
 
 Button::~Button()
 {
-	delete animation;
+	SetAnimation(nullptr);
 	SetImage(ButtonImage::None, nullptr);
 	ClearPictureList();
 
@@ -111,7 +108,10 @@ void Button::SetImage(ButtonImage type, Holder<Sprite2D> img)
 void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (animation && animation->HasEnded()) {
+		auto sprite = animation->Current();
 		SetAnimation(nullptr);
+		SetPicture(sprite);
+		PerformAction(Action::EndReached);
 	}
 }
 
@@ -187,21 +187,23 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			VideoDriver->BlitSprite( Picture, rb.origin, &rb );
 		} else {
 			Region r(picPos.x, picPos.y, (Picture->Frame.w * Clipping), Picture->Frame.h);
-			VideoDriver->BlitSprite(Picture, Picture->Frame.origin + r.origin, &r);
+			BlitFlags bf = IsDisabled() ? BlitFlags::SEPIA : BlitFlags::NONE;
+			VideoDriver->BlitSprite(Picture, Picture->Frame.origin + r.origin, &r, bf);
 		}
 	}
 
 	// Button animation
-	if (animation && animation->Current()) {
+	if (animation) {
 		auto AnimPicture = animation->Current();
 		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
 		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
 		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
 
+		BlitFlags bf = bool(animation->flags & Animation::Flags::BlendBlack) ? BlitFlags::ONE_MINUS_DST : BlitFlags::BLENDED;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			VideoDriver->BlitSprite( AnimPicture, r.origin + AnimPicture->Frame.origin, &r );
+			VideoDriver->BlitSprite(AnimPicture, r.origin + AnimPicture->Frame.origin, &r, bf);
 		} else {
-			VideoDriver->BlitSprite( AnimPicture, r.origin, &r );
+			VideoDriver->BlitSprite(AnimPicture, r.origin, &r, bf);
 		}
 	}
 
@@ -231,7 +233,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	}
 
 	// Button label
-	if (hasText && ! ( flags & IE_GUI_BUTTON_NO_TEXT )) {
+	if (hasText) {
 		// FIXME: hopefully there's no button which sinks when selected
 		//   AND has text label
 		//else if (State == IE_GUI_BUTTON_PRESSED || State == IE_GUI_BUTTON_SELECTED) {
@@ -252,7 +254,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			align |= IE_FONT_ALIGN_MIDDLE;
 
 		Region r = rgn;
-		if (IS_PORTRAIT) {
+		if (Picture) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
@@ -301,24 +303,8 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	}
 }
 
-void Button::FlagsChanged(unsigned int /*oldflags*/)
-{
-	if (animation) {
-		animation->flags = SpriteAnimation::PLAY_NORMAL;
-		if (flags & IE_GUI_BUTTON_PLAYRANDOM) {
-			animation->flags |= SpriteAnimation::PLAY_RANDOM;
-		}
-		if (flags & IE_GUI_BUTTON_PLAYONCE) {
-			animation->flags |= SpriteAnimation::PLAY_ONCE;
-		}
-		if (flags & IE_GUI_BUTTON_PLAYALWAYS) {
-			animation->flags |= SpriteAnimation::PLAY_ALWAYS;
-		}
-	}
-}
-
 /** Sets the Button State */
-void Button::SetState(State state)
+void Button::SetState(State state, bool setval)
 {
 	if (state > LOCKED_PRESSED) {// If wrong value inserted
 		return;
@@ -330,7 +316,15 @@ void Button::SetState(State state)
 	if (ButtonState != state) {
 		MarkDirty();
 		ButtonState = state;
+		if (setval && ButtonState == SELECTED) {
+			UpdateDictValue();
+		}
 	}
+}
+
+void Button::SetState(State state)
+{
+	return SetState(state, true);
 }
 
 bool Button::IsAnimated() const
@@ -436,29 +430,6 @@ String Button::TooltipText() const
 	return Control::TooltipText();
 }
 
-Holder<Sprite2D> Button::Cursor() const
-{
-	if (IS_PORTRAIT) {
-		const GameControl* gc = core->GetGameControl();
-		if (gc) {
-			Holder<Sprite2D> cur = gc->GetTargetActionCursor();
-			if (cur) return cur;
-		}
-	}
-	return Control::Cursor();
-}
-
-bool Button::AcceptsDragOperation(const DragOp& dop) const
-{
-	// FIXME: this implementation is obviously not future proof
-	// portrait buttons accept other portraits and dropped items
-	if (IS_PORTRAIT) {
-		return true;
-	}
-	
-	return Control::AcceptsDragOperation(dop);
-}
-
 void Button::CompleteDragOperation(const DragOp& dop)
 {
 	if (dop.dragView == this) {
@@ -471,10 +442,7 @@ void Button::CompleteDragOperation(const DragOp& dop)
 
 Holder<Sprite2D> Button::DragCursor() const
 {
-	if (IS_PORTRAIT) {
-		// TODO: would it be an enhancement to actually use the portrait for the drag icon?
-		return core->Cursors[IE_CURSOR_SWAP];
-	} else if (Picture) {
+	if (Picture) {
 		return Picture;
 	}
 	
@@ -484,7 +452,7 @@ Holder<Sprite2D> Button::DragCursor() const
 /** Mouse Button Down */
 bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	ActionKey key(Action::DragDropDest);
+	ActionKey key(Control::Action::DragDropDest);
 	if (core->GetDraggedItem() && !SupportsAction(key)) {
 		return true;
 	}
@@ -508,7 +476,7 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 	bool drag = core->GetDraggedItem () != NULL;
 
 	if (drag && me.repeats == 1) {
-		ActionKey key(Action::DragDropDest);
+		ActionKey key(Control::Action::DragDropDest);
 		if (SupportsAction(key)) {
 			return PerformAction(key);
 		} else {
@@ -523,7 +491,9 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		SetState(UNPRESSED);
 	}
 
-	DoToggle();
+	if (me.button == GEM_MB_ACTION) {
+		DoToggle();
+	}
 	return Control::OnMouseUp(me, mod);
 }
 
@@ -600,19 +570,15 @@ void Button::UpdateState(value_t Sum)
 		return;
 	}
 	
-	State state = UNPRESSED;
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		//radio button, exact value
-		state = Sum == GetValue() ? SELECTED : UNPRESSED;
+		State state = Sum == GetValue() ? SELECTED : UNPRESSED;
+		SetState(state);
 	} else if (flags & IE_GUI_BUTTON_CHECKBOX) {
 		//checkbox, bitvalue
-		state = bool(Sum & GetValue()) ? SELECTED : UNPRESSED;
-	} else {
-		//other buttons, nothing to redraw
-		return;
+		State state = bool(Sum & GetValue()) ? SELECTED : UNPRESSED;
+		SetState(state, false);
 	}
-
-	SetState(state);
 }
 
 void Button::DoToggle()
@@ -643,8 +609,14 @@ void Button::SetAnimation(SpriteAnimation* anim)
 {
 	delete animation;
 	animation = anim;
-	FlagsChanged(flags); // sync animation flags
-	
+
+	const auto& key = fmt::format("{}_ANIM", ControlID);
+	if (animation) {
+		core->GetDictionary().Set(key, true);
+	} else {
+		core->GetDictionary().Erase(key);
+	}
+
 	MarkDirty();
 }
 

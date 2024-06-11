@@ -35,6 +35,7 @@ def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
 
 	Window.AddAlias("WIN_INV")
+	Window.OnFocus(UpdateInventoryWindow)
 	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
 
 	#ground items scrollbar
@@ -99,16 +100,13 @@ def InitInventoryWindow (Window):
 			Button.SetSprites ("STONSLOT",0,0,1,2,3)
 
 	GemRB.SetVar ("TopIndex", 0)
-	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
 
 	return
 
-def UpdateInventoryWindow (Window = None):
+def UpdateInventoryWindow (Window):
 	"""Redraws the inventory window and resets TopIndex."""
 
-	if Window == None:
-		Window = GemRB.GetView("WIN_INV")
-
+	Window.OnClose(InventoryCommon.InventoryClosed)
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
@@ -126,8 +124,6 @@ def UpdateInventoryWindow (Window = None):
 
 ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
 OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
-
-InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
 
 def RefreshInventoryWindow (Window):
 	"""Partial redraw without resetting TopIndex."""

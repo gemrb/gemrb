@@ -94,7 +94,14 @@ def Exec(cmd):
 		if con:
 			sys.stdout = OutputCapture(stdout)
 
-		return eval(cmd)
+		locals = {} # we dont want to expose our locals
+		modend = cmd.find('.')
+		if modend > -1:
+			import importlib
+			importlib.invalidate_caches()
+			modname = cmd[0:modend]
+			locals[modname] = importlib.import_module(modname)
+		return eval(cmd, globals(), locals)
 	except (SyntaxError, NameError, TypeError, ZeroDivisionError) as error:
 		if con:
 			con.Append("[color=ffffff]" + cmd + ": [/color][color=ff0000]" + str(error) + "[/color]\n")

@@ -368,7 +368,7 @@ def RunGame(MyChar):
 	playmode = GemRB.GetVar ("PlayMode")
 	GemRB.SetVar ("ImportedChar", 0)
 		
-	if playmode >=0:
+	if playmode is not None:
 		CharGenCommon.close()
 		GemRB.SaveCharacter (MyChar, "gembak")
 		GemRB.EnterGame()

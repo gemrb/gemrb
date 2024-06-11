@@ -91,7 +91,7 @@ def OpenSaveWindow ():
 def ScrollBarPress():
 	Window = SaveWindow
 	# draw load game portraits
-	Pos = GemRB.GetVar ("TopIndex")
+	Pos = GemRB.GetVar ("TopIndex") or 0
 	for i in range (4):
 		ActPos = Pos + i
 
@@ -165,7 +165,7 @@ def DeleteGamePress():
 	global ConfirmWindow
 
 	SaveWindow.SetVisible(False)
-	ConfirmWindow=GemRB.LoadWindow (3)
+	ConfirmWindow=GemRB.LoadWindow (3, "GUISAVE")
 
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (28639)
@@ -197,7 +197,7 @@ def OpenSaveDetailWindow ():
 
 		return
 
-	SaveDetailWindow = Window = GemRB.LoadWindow (1)
+	SaveDetailWindow = Window = GemRB.LoadWindow (1, "GUISAVE")
 
 	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
 

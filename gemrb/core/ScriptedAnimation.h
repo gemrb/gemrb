@@ -36,7 +36,7 @@ class DataStream;
 class Sprite2D;
 
 //scripted animation flags 
-#define S_ANI_PLAYONCE        8        //(same as area animation)
+#define S_ANI_PLAYONCE	Animation::Flags::Once
 
 // transparent 1, translucent 2
 #define IE_VVC_TRANSPARENT	0x00000002

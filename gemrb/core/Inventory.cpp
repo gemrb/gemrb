@@ -670,7 +670,7 @@ void Inventory::TryEquipAll(int slot)
 	}
 }
 
-int Inventory::AddStoreItem(STOItem* item, int action)
+int Inventory::AddStoreItem(STOItem* item, StoreActionType action)
 {
 	CREItem *temp;
 	int ret = -1;
@@ -684,7 +684,7 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 
 		//except the Expired flag
 		temp->Expired=0;
-		if (action==STA_STEAL && !core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		if (action == StoreActionType::Steal && !core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
 			temp->Flags |= IE_INV_ITEM_STOLEN; // "steel" in pst
 		}
 		temp->Flags &= ~IE_INV_ITEM_SELECTED;

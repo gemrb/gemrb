@@ -20,6 +20,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import GUIClasses
+import PortraitWindow
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
@@ -53,7 +54,7 @@ def OnLoad():
 	# remove the cheat input textedit
 	OptionsWindow.RemoveSubview(OptionsWindow.GetControl(3))
 
-	ActionsWindow = GUICommonWindows.OpenPortraitWindow(0, WINDOW_BOTTOM|WINDOW_HCENTER)
+	ActionsWindow = PortraitWindow.OpenPortraitWindow(0, WINDOW_BOTTOM|WINDOW_HCENTER)
 	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	ActionsWindow.AddAlias("ACTWIN")
 	ActionsWindow.AddAlias("HIDE_CUT", 1)

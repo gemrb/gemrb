@@ -99,8 +99,7 @@ WindowManager::~WindowManager()
 
 Window* WindowManager::LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition pos)
 {
-	if (ref) // is the winpack changing?
-		guifact->LoadWindowPack(ref);
+	guifact->LoadWindowPack(ref);
 
 	Window* win = GetWindow(WindowID, ref);
 	if (!win) {

@@ -66,7 +66,7 @@ def OnLoad():
 
 def ScrollBarPress():
 	global PartySelectWindow, PartyCount
-	Pos = GemRB.GetVar("TopIndex")
+	Pos = GemRB.GetVar("TopIndex") or 0
 	for i in range(0, 6):
 		ActPos = Pos + i
 		Button = PartySelectWindow.GetControl(i)

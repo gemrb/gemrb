@@ -50,7 +50,7 @@ def OnLoad():
 			AnimButton = StartWindow.CreateButton (0xfff0001, 57, 333, 100, 100);
 		AnimButton.SetAnimation ("MMTRCHB")
 		AnimButton.SetState (IE_GUI_BUTTON_LOCKED)
-		AnimButton.SetFlags (IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
+		AnimButton.SetFlags (IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
 
 	ProtocolButton = StartWindow.GetControl(0x00)
 	NewGameButton = StartWindow.GetControl(0x02)

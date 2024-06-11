@@ -2052,7 +2052,7 @@ void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
 		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
-	anim->Flags &=~A_ANI_PLAYONCE;
+	anim->animFlags &=~ Animation::Flags::Once;
 }
 
 void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
@@ -2062,7 +2062,7 @@ void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
 		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
-	anim->Flags |= A_ANI_PLAYONCE;
+	anim->animFlags |= Animation::Flags::Once;
 }
 
 void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
@@ -2265,8 +2265,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	if (direction == WMPDirection::NONE && keyAreaVisited) {
 		direction = WMPDirection::WEST;
 	}
-	core->GetDictionary().SetAs("Travel", direction);
-	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenTravelWindow" );
+	core->GetGUIScriptEngine()->RunFunction("GUIMA", "OpenTravelWindow", direction);
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
 }

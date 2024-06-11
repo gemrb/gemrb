@@ -213,6 +213,13 @@ ItemDragOp::ItemDragOp(CREItem* item)
 	dragDummy.BindDictVariable("itembutton", Control::INVALID_VALUE);
 }
 
+ItemDragOp::~ItemDragOp() {
+	Window* win = GetWindow(0, "WIN_INV");
+	if (win) {
+		win->Focus();
+	}
+}
+
 Interface::Interface(CoreSettings&& cfg)
 : config(std::move(cfg))
 {
@@ -659,7 +666,7 @@ void Interface::HandleEvents()
 
 		const Window* win = GetWindow(0, "PORTWIN");
 		if (win) {
-			guiscript->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
+			guiscript->RunFunction("PortraitWindow", "UpdatePortraitWindow", true);
 		}
 	}
 
@@ -3334,6 +3341,7 @@ void Interface::CloseCurrentStore()
 {
 	gamedata->SaveStore(CurrentStore);
 	CurrentStore = NULL;
+	vars.Set("BARTER_PC", 0);
 }
 
 Store *Interface::SetCurrentStore(const ResRef &resName, ieDword owner)
@@ -3348,9 +3356,13 @@ Store *Interface::SetCurrentStore(const ResRef &resName, ieDword owner)
 	}
 
 	CurrentStore = gamedata->GetStore(resName);
-	if (CurrentStore == NULL) {
-		return NULL;
+	if (CurrentStore == nullptr) {
+		vars.Set("BARTER_PC", 0);
+		return nullptr;
 	}
+	// this is set when opening the store and not updated when changing PC
+	// TODO: seems like it would be a good enhancement to set this to the selected PC with the highest charisma
+	vars.Set("BARTER_PC", game->GetSelectedPCSingle());
 	if (owner) {
 		CurrentStore->SetOwnerID(owner);
 	}
@@ -4026,9 +4038,7 @@ int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieD
 // see 8cff52b3c8 if this needs to be resurrected at some point
 void Interface::WaitForDisc(int disc_number, const path_t& path)
 {
-	vars.Set("WaitForDisc", disc_number);
-
-	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
+	GetGUIScriptEngine()->RunFunction("GUICommonWindows", "OpenWaitForDiscWindow", disc_number);
 	do {
 		winmgr->DrawWindows();
 		for (const auto& cd : config.CD[disc_number - 1]) {
