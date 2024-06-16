@@ -115,12 +115,9 @@ so we can improve our process and documentation!
 ## Axioms of Style
 
 1. When in doubt, follow the style of the existing function or file.
-   - When creating a new file, follow the style of existing files, pe. Game.h/.cpp.
-     - Do not forget to include the license header.
-2. Code indentation is done with single tabulators.
-3. Spaces around operators (foo += bar;).
-4. Try to avoid creating very long lines. There is no set maximum.
-5. Sort includes by type (module, project, system) and alphabetically.
+2. Clang-format is enforced as a pre-commit hook. It's best if you
+configure your editor to run it for you. If you need to do it manually,
+check out `git clang-format`.
 
 
 ## Useful links
@@ -153,6 +150,16 @@ Check out `admin/enable-ie-git-diff` if you want `git log` and others to be able
 to display diffs of included binary files (spells and other overrides).
 
 - `make test` will run the core test suite if you built with googletest installed
+
+- `git blame` ignoring reformatting commits
+
+The `.git-blame-ignore-revs` specifies which commits git should ignore when
+finding the last time a line was changed. Many tools use it by default,
+except git itself, so you need to run:
+
+   git config --add blame.ignoreRevsFile .git-blame-ignore-revs
+
+If you're using cmake, this has been done for you.
 
 
 ## Version tracking
