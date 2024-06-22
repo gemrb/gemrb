@@ -1284,22 +1284,20 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		case AOT_PILE:
 			// draw piles
 			if (!bgoverride) {
-				const Container* c = TMap->GetContainer(pileIdx - 1);
-				
-				BlitFlags flags = SetDrawingStencilForScriptable(c, viewport);
+				BlitFlags flags = SetDrawingStencilForScriptable(pile, viewport);
 				flags |= BlitFlags::COLOR_MOD | BlitFlags::BLENDED;
 				
 				if (timestop) {
 					flags |= BlitFlags::GREY;
 				}
 				
-				Color tint = GetLighting(c->Pos);
+				Color tint = GetLighting(pile->Pos);
 				game->ApplyGlobalTint(tint, flags);
 
-				if (c->Highlight || (debugFlags & DEBUG_SHOW_CONTAINERS)) {
-					c->Draw(true, viewport, tint, flags);
+				if (pile->Highlight || (debugFlags & DEBUG_SHOW_CONTAINERS)) {
+					pile->Draw(true, viewport, tint, flags);
 				} else {
-					c->Draw(false, viewport, tint, flags);
+					pile->Draw(false, viewport, tint, flags);
 				}
 				pile = GetNextPile(pileIdx);
 			}
