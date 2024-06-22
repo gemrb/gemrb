@@ -148,7 +148,7 @@ Gem_Polygon *GetPolygon2DA(ieDword index);
 void AddXPCore(const Action *parameters, bool divide = false);
 int NumItemsCore(Scriptable *Sender, const Trigger *parameters);
 unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parameters);
-int NumImmuneToSpellLevelCore(Scriptable *Sender, const Trigger *parameters);
+unsigned int NumImmuneToSpellLevelCore(Scriptable* Sender, const Trigger* parameters);
 void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags);
 void MoveGlobalObjectCore(Scriptable* Sender, const Action* parameters, int flags);
 

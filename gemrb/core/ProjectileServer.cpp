@@ -79,14 +79,12 @@ ProjectileServer::ProjectileServer() noexcept
 			rows=254;
 		}
 		explosions.resize(rows);
-		while(rows--) {
-			int i;
-
-			for(i=0;i<AP_RESCNT;i++) {
+		while (rows) {
+			--rows;
+			for (int i = 0; i < AP_RESCNT; i++) {
 				explosions[rows].resources[i] = explist->QueryField(rows, i);
 			}
-			//using i so the flags field will always be after the resources
-			explosions[rows].flags = explist->QueryFieldSigned<int>(rows,i);
+			explosions[rows].flags = explist->QueryFieldSigned<int>(rows, AP_RESCNT);
 		}
 	}
 }

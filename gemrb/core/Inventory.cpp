@@ -2000,12 +2000,12 @@ void Inventory::ChargeAllItems(int hours) const
 int Inventory::FindStealableItem()
 {
 	unsigned int slotcnt = Slots.size();
-	unsigned int start = core->Roll(1, slotcnt, -1);
+	int start = core->Roll(1, slotcnt, -1);
 	int inc = start & 1 ? 1 : -1;
 
 	Log(DEBUG, "Inventory", "Start Slot: {}, increment: {}", start, inc);
 	for (unsigned int i = 0; i < slotcnt; ++i) {
-		int slot = (slotcnt - 1 + start + i * inc) % slotcnt;
+		int slot = ((signed) slotcnt - 1 + start + (signed) i * inc) % slotcnt;
 		const CREItem *item = Slots[slot];
 		//can't steal empty slot
 		if (!item) continue;

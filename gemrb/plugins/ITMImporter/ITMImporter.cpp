@@ -128,7 +128,7 @@ static void AddZZFeatures(Item *s)
 	// append the new equipping effects (tohit+damage)
 	for (unsigned int i=0; i < sizeof(zzRefs)/sizeof(*zzRefs); i++) {
 		Effect *fx = EffectQueue::CreateEffect(zzRefs[i], IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
-		fx->Parameter3 = bonus;
+		fx->Parameter3 = static_cast<ieDword>(bonus);
 		fx->SourceRef = s->Name;
 		// use the space reserved earlier
 		s->equipping_features[s->EquippingFeatureCount - 1 - i] = fx;

@@ -1666,9 +1666,8 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 	case '"':
 		//Scriptable Name
 		src++;
-		int i;
-		for (i=0;i<(int) sizeof(object->objectName)-1 && *src && *src!='"';i++)
-		{
+		uint8_t i;
+		for (i = 0; i < static_cast<uint8_t>(sizeof(object->objectName) - 1) && *src && *src != '"'; i++) {
 			object->objectName[i] = *src;
 			src++;
 		}
@@ -3009,7 +3008,7 @@ unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parame
 
 static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
 static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
-int NumImmuneToSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
+unsigned int NumImmuneToSpellLevelCore(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
 	const Actor* actor = Scriptable::As<Actor>(target);

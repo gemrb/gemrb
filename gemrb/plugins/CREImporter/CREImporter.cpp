@@ -2326,6 +2326,7 @@ int CREImporter::PutKnownSpells(DataStream *stream, const Actor *actor) const
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
 		for (unsigned int j=0;j<level;j++) {
 			unsigned int count = actor->spellbook.GetKnownSpellsCount(i, j);
+			if (!count) continue;
 			for (int k=count-1;k>=0;k--) {
 				const CREKnownSpell *ck = actor->spellbook.GetKnownSpell(i, j, k);
 				assert(ck);

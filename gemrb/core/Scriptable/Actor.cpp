@@ -9857,8 +9857,8 @@ int Actor::GetSkill(unsigned int skill, bool ids) const
 		skill = stat2skill[skill];
 	}
 	if (skill >= skillstats.size()) return -1;
-	int ret = GetStat(skillstats[skill][0]);
-	int base = GetBase(skillstats[skill][0]);
+	int64_t ret = GetStat(skillstats[skill][0]);
+	ieDword base = GetBase(skillstats[skill][0]);
 	int modStat = skillstats[skill][1];
 	// only give other boni for trained skills or those that don't require it
 	// untrained trained skills are not usable!
