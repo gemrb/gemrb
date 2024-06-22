@@ -49,7 +49,7 @@ SrcVector::SrcVector(const ResRef& resource)
 
 	ieDword size = 0;
 	str->ReadDword(size);
-	if (size == DataStream::Error) return;
+	if (size == ieDword(DataStream::Error)) return;
 	strings.resize(size);
 
 	while (size--) {
