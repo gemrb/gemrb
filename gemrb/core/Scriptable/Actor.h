@@ -618,7 +618,7 @@ public:
 	/** sets the actor's position, calculating with the nojump flag*/
 	void SetPosition(const Point& nmptTarget, bool jump, const Size& radius = Size(), int size = -1);
 	/** you better use SetStat, this stuff is only for special cases*/
-	void SetAnimationID(unsigned int AnimID);
+	void SetAnimationID(stat_t animID);
 	/** returns the animations */
 	CharAnimations* GetAnims() const;
 	/** returns the gender of actor for cg sound - illusions are tricky */

@@ -326,7 +326,7 @@ static int avBase, avStance;
 struct avType {
 	ResRef avresref;
 	AutoTable avtable;
-	int stat;
+	unsigned int stat = 0;
 };
 
 static std::vector<avType> avPrefix;
@@ -420,7 +420,7 @@ void Actor::SetName(ieStrRef strref, unsigned char type)
 	SetName(std::move(name), type);
 }
 
-void Actor::SetAnimationID(unsigned int AnimID)
+void Actor::SetAnimationID(stat_t animID)
 {
 	//if the palette is locked, then it will be transferred to the new animation
 	Holder<Palette> recover = nullptr;
@@ -441,14 +441,14 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 
 	// hacking PST no palette
-	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID) && (AnimID & 0xf000) == 0xe000) {
+	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID) && (animID & 0xf000) == 0xe000) {
 		if (BaseStats[IE_COLORCOUNT]) {
-			Log(WARNING, "Actor", "Animation ID {:#x} is supposed to be real colored (no recoloring), patched creature", AnimID);
+			Log(WARNING, "Actor", "Animation ID {:#x} is supposed to be real colored (no recoloring), patched creature", animID);
 		}
 		BaseStats[IE_COLORCOUNT] = 0;
 	}
 
-	anims = new CharAnimations(AnimID & 0xffff, BaseStats[IE_ARMOR_TYPE]);
+	anims = new CharAnimations(animID & 0xffff, BaseStats[IE_ARMOR_TYPE]);
 	if (!anims || anims->ResRefBase.IsEmpty()) {
 		delete anims;
 		anims = nullptr;
@@ -483,21 +483,21 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		TableMgr::index_t row = TableMgr::npos;
 		static AutoTable extspeed = gamedata->LoadTable("moverate", true);
 		if (extspeed) {
-			const std::string& animHex = fmt::format("{:#04x}", AnimID);
+			const std::string& animHex = fmt::format("{:#04x}", animID);
 			row = extspeed->FindTableValue(0UL, animHex);
 			if (row != TableMgr::npos) {
 				int rate = extspeed->QueryFieldSigned<int>(row, 1);
 				SetBase(IE_MOVEMENTRATE, rate);
 			}
 		} else {
-			Log(MESSAGE, "Actor", "No moverate.2da found, using animation ({:#x}) for speed fallback!", AnimID);
+			Log(MESSAGE, "Actor", "No moverate.2da found, using animation ({:#x}) for speed fallback!", animID);
 		}
 		if (row == TableMgr::npos) {
 			const auto* anim = anims->GetAnimation(IE_ANI_WALK, S);
 			if (anim) {
 				SetBase(IE_MOVEMENTRATE, anim->at(0)->GetFrameCount());
 			} else {
-				Log(WARNING, "Actor", "Unable to determine movement rate for animation {:#x}!", AnimID);
+				Log(WARNING, "Actor", "Unable to determine movement rate for animation {:#x}!", animID);
 			}
 		}
 	}
@@ -2219,8 +2219,6 @@ static void InitActorTables()
 				avPrefix[i].avtable = gamedata->LoadTable(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
 					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0, 0));
-				} else {
-					avPrefix[i].stat = -1;
 				}
 			}
 		}
@@ -10937,9 +10935,9 @@ bool Actor::IsInvisibleTo(const Scriptable *checker) const
 int Actor::UpdateAnimationID(bool derived)
 {
 	// the base animation id
-	int AnimID = avBase;
-	int StatID = derived?GetSafeStat(IE_ANIMATION_ID):avBase;
-	if (AnimID<0 || StatID<AnimID || StatID>AnimID+0x1000) return 1; //no change
+	stat_t newAnimID = avBase;
+	stat_t curAnimID = derived ? GetSafeStat(IE_ANIMATION_ID) : avBase;
+	if (newAnimID == 0 || curAnimID < newAnimID || curAnimID > newAnimID + 0x1000) return 1; // no change
 	if (!InParty) return 1; //too many bugs caused by buggy game data, we change only PCs
 
 	// tables for additive modifiers of the animation id (race, gender, class)
@@ -10948,16 +10946,15 @@ int Actor::UpdateAnimationID(bool derived)
 		if (!tm) {
 			return -3;
 		}
-		StatID = av.stat;
-		StatID = derived?GetSafeStat(StatID):GetBase( StatID );
 
-		AnimID += tm->QueryFieldSigned<int>(StatID, 0);
+		stat_t animModStat = derived ? GetSafeStat(av.stat) : GetBase(av.stat);
+		newAnimID += tm->QueryFieldUnsigned<stat_t>(animModStat, 0);
 	}
-	if (BaseStats[IE_ANIMATION_ID] != (stat_t) AnimID) {
-		SetBase(IE_ANIMATION_ID, (stat_t) AnimID);
+	if (BaseStats[IE_ANIMATION_ID] != newAnimID) {
+		SetBase(IE_ANIMATION_ID, newAnimID);
 	}
 	if (!derived) {
-		SetAnimationID(AnimID);
+		SetAnimationID(newAnimID);
 		//setting PST's starting stance to 18
 		if (avStance !=-1) {
 			SetStance( avStance );
