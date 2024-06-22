@@ -11589,7 +11589,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 			break;
 		case TARGET_NONE:
 			gc->ResetTargetMode();
-			actor->UseItem(itemdata.slot, static_cast<ieDword>(itemdata.headerindex), nullptr, flags);
+			actor->UseItem(itemdata.slot, static_cast<int>(itemdata.headerindex), nullptr, flags);
 			break;
 		case TARGET_AREA:
 			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_POINT, itemdata.TargetNumber);

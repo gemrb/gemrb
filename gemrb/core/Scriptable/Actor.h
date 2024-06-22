@@ -935,12 +935,12 @@ public:
 	/* Sets equipped Quick slot, if header is -1, then use the current one */
 	HCStrings SetEquippedQuickSlot(int slot, int header);
 	/* Uses an item on the target or point */
-	bool TryUsingMagicDevice(const Item* item, ieDword header);
+	bool TryUsingMagicDevice(const Item* item, int header);
 	bool RequiresUMD(const Item* item) const;
-	bool UseItemPoint(ieDword slot, ieDword header, const Point &point, ieDword flags);
-	bool UseItem(ieDword slot, ieDword header, const Scriptable *target, ieDword flags, int damage = 0);
+	bool UseItemPoint(ieDword slot, int header, const Point& point, ieDword flags);
+	bool UseItem(ieDword slot, int header, const Scriptable* target, ieDword flags, int damage = 0);
 	/* Deducts a charge from an item */
-	void ChargeItem(ieDword slot, ieDword header, CREItem *item, const Item *itm, bool silent, bool expend = true);
+	void ChargeItem(ieDword slot, int header, CREItem* item, const Item* itm, bool silent, bool expend = true);
 	/* If it returns true, then default AC=10 and the lesser the better */
 	static int IsReverseToHit();
 	/* initialize the action buttons based on class. If forced, it will override

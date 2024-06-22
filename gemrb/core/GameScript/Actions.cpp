@@ -6774,7 +6774,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	int Slot;
-	ieDword header;
+	int header;
 	ieDword flags = 0; // aura pollution is on for everyone
 	ResRef itemres;
 
@@ -6848,7 +6848,7 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	int Slot;
-	ieDword header;
+	int header;
 	ResRef itemres;
 	ieDword flags;
 

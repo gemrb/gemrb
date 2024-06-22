@@ -7167,7 +7167,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 		ApplyCriticalEffect(this, target, wi, false);
 		if (wi.wflags & WEAPON_RANGED) { // no need for this with melee weapons!
-			UseItem(wi.slot, (ieDword) -2, target, UI_MISS|UI_NOAURA);
+			UseItem(wi.slot, -2, target, UI_MISS | UI_NOAURA);
 		} else if (core->HasFeature(GFFlags::BREAKABLE_WEAPONS) && InParty) {
 			//break sword
 			// a random roll on-hit (perhaps critical failure too)
@@ -7184,7 +7184,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (!success) {
 		//hit failed
 		if (wi.wflags&WEAPON_RANGED) {//Launch the projectile anyway
-			UseItem(wi.slot, (ieDword)-2, target, UI_MISS|UI_NOAURA);
+			UseItem(wi.slot, -2, target, UI_MISS | UI_NOAURA);
 		}
 		ResetState();
 		buffer.append("[Missed]");
@@ -7213,7 +7213,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		buffer.append("[Hit]");
 		Log(COMBAT, "Attack", "{}", buffer);
 	}
-	UseItem(wi.slot, wi.wflags&WEAPON_RANGED?-2:-1, target, (critical?UI_CRITICAL:0)|UI_NOAURA, damage);
+	UseItem(wi.slot, wi.wflags & WEAPON_RANGED ? -2 : -1, target, (critical ? UI_CRITICAL : 0) | UI_NOAURA, damage);
 	ResetState();
 }
 
@@ -8938,7 +8938,7 @@ bool Actor::RequiresUMD(const Item* item) const
 	return true;
 }
 
-bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
+bool Actor::TryUsingMagicDevice(const Item* item, int header)
 {
 	if (!RequiresUMD(item)) return true;
 
@@ -8985,7 +8985,7 @@ bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
 //if target is a non living scriptable, then we simply shoot for its position
 //the fx should get a NULL target, and handle itself by using the position
 //(shouldn't crash when target is NULL)
-bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDword flags)
+bool Actor::UseItemPoint(ieDword slot, int header, const Point& target, ieDword flags)
 {
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
@@ -9319,7 +9319,7 @@ int Actor::GetBackstabDamage(const Actor* target, const WeaponInfo& wi, int mult
 	return backstabDamage;
 }
 
-bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDword flags, int damage)
+bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword flags, int damage)
 {
 	assert(target);
 	const Actor *tar = Scriptable::As<Actor>(target);
@@ -9363,9 +9363,9 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 
 	// ChargeItem can break the item, now invalidating everything, so look things up in advance
 	int weaponTypeIdx = 0;
-	bool ranged = header == (ieDword) -2;
+	bool ranged = header == -2;
 	ieDword projectileAnim = 0;
-	if (((int) header < 0) && !(flags & UI_MISS)) { // using a weapon
+	if (header < 0 && !(flags & UI_MISS)) { // using a weapon
 		const ITMExtHeader* which = itm->GetWeaponHeader(ranged);
 		if (!which) return false; // eg. misc8u equipped by saemon havarian (ppsaem3), part of the silver sword and actually has a header, just untyped
 		weaponTypeIdx = which->DamageType;
@@ -9384,7 +9384,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 	pro->SetCaster(GetGlobalID(), gamedata->GetMiscRule("ITEM_CASTERLEVEL"));
 	if (flags & UI_FAKE) {
 		delete pro;
-	} else if (((int) header < 0) && !(flags & UI_MISS)) { // using a weapon
+	} else if (header < 0 && !(flags & UI_MISS)) { // using a weapon
 		Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, weapon_damagetype[weaponTypeIdx] << 16, FX_DURATION_INSTANT_LIMITED);
 		AttackEffect->Projectile = projectileAnim;
 		AttackEffect->Target = FX_TARGET_PRESET;
@@ -9417,7 +9417,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDw
 	return true;
 }
 
-void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, const Item *itm, bool silent, bool expend)
+void Actor::ChargeItem(ieDword slot, int header, CREItem* item, const Item* itm, bool silent, bool expend)
 {
 	if (!itm) {
 		item = inventory.GetSlotItem(slot);
