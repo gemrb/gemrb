@@ -3220,7 +3220,8 @@ bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& r
 	}
 
 	while (count) {
-		Actor* creature = gamedata->GetCreature(sg ? (*sg)[--count] : creResRef);
+		--count;
+		Actor* creature = gamedata->GetCreature(sg ? (*sg)[count] : creResRef);
 		if (!creature) {
 			continue;
 		}
