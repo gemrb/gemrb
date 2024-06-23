@@ -1660,22 +1660,20 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 			Owner->AddTrigger(TriggerEntry(trigger_summoned, ab->GetGlobalID()));
 		}
 
-		if (!animRes.IsEmpty()) {
-			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(animRes, false);
-			if (vvc) {
-				//This is the final position of the summoned creature
-				//not the original target point
-				vvc->Pos = ab->Pos;
-				//force vvc to play only once
-				vvc->PlayOnce();
-				map->AddVVCell(vvc);
+		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(animRes, false);
+		if (vvc) {
+			// This is the final position of the summoned creature
+			// not the original target point
+			vvc->Pos = ab->Pos;
+			// force vvc to play only once
+			vvc->PlayOnce();
+			map->AddVVCell(vvc);
 
-				//set up the summon disable effect
-				Effect *newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);
-				if (newfx) {
-					newfx->Duration = vvc->GetSequenceDuration(Time.defaultTicksPerSec) * 9 / 10 + core->GetGame()->GameTime;
-					ApplyEffect(newfx, ab, ab);
-				}
+			// set up the summon disable effect
+			Effect* newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);
+			if (newfx) {
+				newfx->Duration = vvc->GetSequenceDuration(Time.defaultTicksPerSec) * 9 / 10 + core->GetGame()->GameTime;
+				ApplyEffect(newfx, ab, ab);
 			}
 		}
 
