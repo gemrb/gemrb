@@ -3307,13 +3307,13 @@ void Map::UpdateSpawns() const
 	}
 	ieDword time = core->GetGame()->GameTime;
 	for (auto spawn : spawns) {
-		if ((spawn->Method & (SPF_NOSPAWN|SPF_WAIT)) == (SPF_NOSPAWN|SPF_WAIT)) {
-			//only reactivate the spawn point if the party cannot currently see it;
-			//also make sure the party has moved away some
-			if (spawn->NextSpawn < time && !IsVisible(spawn->Pos) &&
-				!GetActorInRadius(spawn->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_NEUTRAL|GA_NO_UNSCHEDULED, SPAWN_RANGE * 2)) {
-				spawn->Method &= ~SPF_WAIT;
-			}
+		if ((spawn->Method & (SPF_NOSPAWN | SPF_WAIT)) != (SPF_NOSPAWN | SPF_WAIT)) continue;
+
+		// only reactivate the spawn point if the party cannot currently see it;
+		// also make sure the party has moved away some
+		if (spawn->NextSpawn < time && !IsVisible(spawn->Pos) &&
+		    !GetActorInRadius(spawn->Pos, GA_NO_DEAD | GA_NO_ENEMY | GA_NO_NEUTRAL | GA_NO_UNSCHEDULED, SPAWN_RANGE * 2)) {
+			spawn->Method &= ~SPF_WAIT;
 		}
 	}
 }
