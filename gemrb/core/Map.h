@@ -290,6 +290,13 @@ enum MAP_DEBUG_FLAGS : uint32_t {
 	DEBUG_SHOW_FOG_ALL			= (DEBUG_SHOW_FOG_UNEXPLORED|DEBUG_SHOW_FOG_INVISIBLE),
 };
 
+struct TrackingData {
+	ResRef areaName;
+	ieStrRef text = ieStrRef::INVALID;
+	bool enabled = false;
+	int difficulty = 0;
+};
+
 using aniIterator = std::list<AreaAnimation>::iterator;
 using scaIterator = std::list<VEFObject*>::const_iterator;
 using proIterator = std::list<Projectile*>::const_iterator;
@@ -372,9 +379,7 @@ public:
 
 private:
 	uint32_t debugFlags = 0;
-	ieStrRef trackString = ieStrRef::INVALID;
-	int trackFlag = 0;
-	ieWord trackDiff = 0;
+	TrackingData tracking;
 
 	std::list<AreaAnimation> animations;
 	std::vector< Actor*> actors;

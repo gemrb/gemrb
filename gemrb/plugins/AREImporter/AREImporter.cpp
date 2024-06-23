@@ -59,14 +59,7 @@ using namespace GemRB;
 //something non signed, non ascii
 #define UNINITIALIZED_BYTE  0x11
 
-struct ResRefToStrRef {
-	ResRef areaName;
-	ieStrRef text;
-	bool trackFlag;
-	int difficulty;
-};
-
-static std::vector<ResRefToStrRef> tracks;
+static std::vector<TrackingData> tracks;
 PluginHolder<DataFileMgr> INInote;
 
 static void ReadAutonoteINI()
@@ -145,10 +138,10 @@ static int GetTrackString(const ResRef &areaName)
 		for (TableMgr::index_t i = 0; i < trackcount; i++) {
 			const char *poi = tm->QueryField(i,0).c_str();
 			if (poi[0]=='O' && poi[1]=='_') {
-				tracks[i].trackFlag=false;
+				tracks[i].enabled = false;
 				poi+=2;
 			} else {
-				tracks[i].trackFlag = trackFlag;
+				tracks[i].enabled = trackFlag;
 			}
 			tracks[i].text = ieStrRef(atoi(poi));
 			tracks[i].difficulty = tm->QueryFieldSigned<int>(i,1);
@@ -1481,7 +1474,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	map->MasterArea = core->GetGame()->MasterArea(map->GetScriptRef());
 	int idx = GetTrackString(resRef);
 	if (idx>=0) {
-		map->SetTrackString(tracks[idx].text, tracks[idx].trackFlag, tracks[idx].difficulty);
+		map->SetTrackString(tracks[idx].text, tracks[idx].enabled, tracks[idx].difficulty);
 	} else {
 		map->SetTrackString(ieStrRef(-1), false, 0);
 	}

@@ -3770,9 +3770,9 @@ void Map::ClearTrap(Actor *actor, ieDword InTrap) const
 
 void Map::SetTrackString(ieStrRef strref, int flg, int difficulty)
 {
-	trackString = strref;
-	trackFlag = flg;
-	trackDiff = (ieWord) difficulty;
+	tracking.text = strref;
+	tracking.enabled = flg;
+	tracking.difficulty = difficulty;
 }
 
 bool Map::DisplayTrackString(const Actor *target) const
@@ -3785,21 +3785,21 @@ bool Map::DisplayTrackString(const Actor *target) const
 	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		// ~Wilderness Lore check. Wilderness Lore (skill + D20 roll + WIS modifier) =  %d vs. ((Area difficulty pct / 5) + 10) = %d ( Skill + WIS MOD = %d ).~
 		skill += target->LuckyRoll(1, 20, 0) + target->GetAbilityBonus(IE_WIS);
-		success = skill > (trackDiff/5 + 10);
+		success = skill > (tracking.difficulty / 5 + 10);
 	} else {
 		skill += (target->GetStat(IE_LEVEL)/3)*5 + target->GetStat(IE_WIS)*5;
-		success = core->Roll(1, 100, trackDiff) > skill;
+		success = core->Roll(1, 100, tracking.difficulty) > skill;
 	}
 	if (!success) {
 		displaymsg->DisplayConstantStringName(HCStrings::TrackingFailed, GUIColors::LIGHTGREY, target);
 		return true;
 	}
-	if (trackFlag) {
-			core->GetTokenDictionary()["CREATURE"] = core->GetString(trackString);
-			displaymsg->DisplayConstantStringName(HCStrings::Tracking, GUIColors::LIGHTGREY, target);
-			return false;
+	if (tracking.enabled) {
+		core->GetTokenDictionary()["CREATURE"] = core->GetString(tracking.text);
+		displaymsg->DisplayConstantStringName(HCStrings::Tracking, GUIColors::LIGHTGREY, target);
+		return false;
 	}
-	displaymsg->DisplayStringName(trackString, GUIColors::LIGHTGREY, target, STRING_FLAGS::NONE);
+	displaymsg->DisplayStringName(tracking.text, GUIColors::LIGHTGREY, target, STRING_FLAGS::NONE);
 	return false;
 }
 
