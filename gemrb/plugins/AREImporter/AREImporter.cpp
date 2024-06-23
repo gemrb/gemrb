@@ -20,8 +20,8 @@
 
 #include "AREImporter.h"
 
-#include "strrefs.h"
 #include "ie_cursors.h"
+#include "strrefs.h"
 
 #include "ActorMgr.h"
 #include "Ambient.h"
@@ -33,13 +33,12 @@
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Interface.h"
-#include "PathFinder.h"
-#include "Palette.h"
 #include "PluginMgr.h"
 #include "ProjectileServer.h"
 #include "RNG.h"
-#include "Plugins/TileMapMgr.h"
+
 #include "GameScript/GameScript.h"
+#include "Plugins/TileMapMgr.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
