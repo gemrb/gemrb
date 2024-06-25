@@ -93,7 +93,7 @@ struct ConfigCache {
 	ieDword warCries = 1;
 	ieDword critHitShake = 1;
 	ieDword preferSneakAttack = 0;
-	int gameDifficulty = DIFF_CORE;
+	int gameDifficulty = Difficulty::Core;
 	ieDword noExtraDifficultyDmg = 0;
 	ieDword storyMode = 0;
 	int difficultyLuckMod = 0;
@@ -1563,10 +1563,10 @@ GEM_EXPORT void UpdateActorConfig()
 	auto& vars = core->GetDictionary();
 	Game *game = core->GetGame();
 	if (CFGCache.gameDifficulty || (game && game->HOFMode)) {
-		CFGCache.gameDifficulty = DIFF_INSANE;
+		CFGCache.gameDifficulty = Difficulty::Insane;
 		if (game) game->HOFMode = true;
 		// also set it for GUIOPT
-		vars.Set("Difficulty Level", DIFF_INSANE - 1);
+		vars.Set("Difficulty Level", Difficulty::Insane - 1);
 	} else {
 		CFGCache.gameDifficulty = core->GetDictionary().Get("Difficulty Level", 0);
 		CFGCache.gameDifficulty++; // slider starts at 0, real levels at 1
@@ -1574,8 +1574,8 @@ GEM_EXPORT void UpdateActorConfig()
 	ieDword newMode = core->GetDictionary().Get("Story Mode", 0);
 	if (newMode != CFGCache.storyMode) {
 		if (newMode) {
-			CFGCache.gameDifficulty = DIFF_EASY;
-			vars.Set("Difficulty Level", DIFF_EASY - 1U);
+			CFGCache.gameDifficulty = Difficulty::Easy;
+			vars.Set("Difficulty Level", Difficulty::Easy - 1U);
 
 			// add all the immunities and bonuses to party
 			for (int i = 0; game && i < game->GetPartySize(false); i++) {
@@ -1591,7 +1591,7 @@ GEM_EXPORT void UpdateActorConfig()
 		}
 		CFGCache.storyMode = newMode;
 	}
-	CFGCache.gameDifficulty = Clamp(CFGCache.gameDifficulty, DIFF_EASY, DIFF_INSANE);
+	CFGCache.gameDifficulty = Clamp<int>(CFGCache.gameDifficulty, Difficulty::Easy, Difficulty::Insane);
 	// cache hot path mods
 	CFGCache.difficultyLuckMod = gamedata->GetDifficultyMod(2, CFGCache.gameDifficulty);
 	CFGCache.difficultyDamageMod = gamedata->GetDifficultyMod(0, CFGCache.gameDifficulty);
@@ -4230,7 +4230,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 
 	if (damage > 0) {
 		// instant chunky death if the actor is petrified or frozen
-		bool allowChunking = !Modified[IE_DISABLECHUNKING] && (!InParty || CFGCache.gameDifficulty > DIFF_NORMAL) && !Modified[IE_MINHITPOINTS];
+		bool allowChunking = !Modified[IE_DISABLECHUNKING] && (!InParty || CFGCache.gameDifficulty > Difficulty::Normal) && !Modified[IE_MINHITPOINTS];
 		if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && allowChunking) {
 			damage = 123456; // arbitrarily high for death; won't be displayed
 			LastDamageType |= DAMAGE_CHUNKING;
@@ -5452,7 +5452,7 @@ bool Actor::CheckOnDeath()
 		// might change effects! so we just drop everything here
 
 		// disintegration destroys normal items if difficulty level is high enough
-		if (disintegrated && CFGCache.gameDifficulty > DIFF_CORE) {
+		if (disintegrated && CFGCache.gameDifficulty > Difficulty::Core) {
 			inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
 		}
 		// drop everything remaining, but ignore TNO, as he needs to keep his gear
@@ -6045,7 +6045,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 
 	ieDword kit = GetStat(IE_KIT);
 
-	if ((flags & LS_STATS) && CFGCache.gameDifficulty > DIFF_NORMAL) {
+	if ((flags & LS_STATS) && CFGCache.gameDifficulty > Difficulty::Normal) {
 		// chance to learn roll
 		int roll = LuckyRoll(1, 100, 0);
 		// adjust the roll for specialist mages
