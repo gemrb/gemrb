@@ -39,6 +39,8 @@
 #include "SrcMgr.h"
 #include "TableMgr.h"
 
+#include "Scriptable/Actor.h"
+
 #include <map>
 #include <unordered_map>
 #include <vector>
@@ -186,7 +188,7 @@ public:
 	ieByte GetItemAnimation(const ResRef& itemRef);
 	const std::vector<ItemUseType>& GetItemUse();
 	int GetMiscRule(const TableMgr::key_t& rowName);
-	int GetDifficultyMod(ieDword mod, int difficulty);
+	int GetDifficultyMod(ieDword mod, Difficulty difficulty);
 	int GetXPBonus(ieDword bonusType, ieDword level);
 	int GetVBData(const TableMgr::key_t& rowName);
 

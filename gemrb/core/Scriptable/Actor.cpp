@@ -93,7 +93,7 @@ struct ConfigCache {
 	ieDword warCries = 1;
 	ieDword critHitShake = 1;
 	ieDword preferSneakAttack = 0;
-	int gameDifficulty = Difficulty::Core;
+	Difficulty gameDifficulty = Difficulty::Core;
 	ieDword noExtraDifficultyDmg = 0;
 	ieDword storyMode = 0;
 	int difficultyLuckMod = 0;
@@ -1558,24 +1558,24 @@ GEM_EXPORT void UpdateActorConfig()
 
 	//Handle Game Difficulty and Nightmare Mode
 	// iwd2 had it saved in the GAM, iwd1 only relied on the ini value
-	CFGCache.gameDifficulty = core->GetDictionary().Get("Nightmare Mode", 0);
+	bool nightMare = core->GetDictionary().Get("Nightmare Mode", 0);
 
 	auto& vars = core->GetDictionary();
 	Game *game = core->GetGame();
-	if (CFGCache.gameDifficulty || (game && game->HOFMode)) {
+	if (nightMare || (game && game->HOFMode)) {
 		CFGCache.gameDifficulty = Difficulty::Insane;
 		if (game) game->HOFMode = true;
 		// also set it for GUIOPT
-		vars.Set("Difficulty Level", Difficulty::Insane - 1);
+		vars.Set("Difficulty Level", UnderType(Difficulty::Hard));
 	} else {
-		CFGCache.gameDifficulty = core->GetDictionary().Get("Difficulty Level", 0);
-		CFGCache.gameDifficulty++; // slider starts at 0, real levels at 1
+		int diff = core->GetDictionary().Get("Difficulty Level", 0);
+		CFGCache.gameDifficulty = Difficulty(++diff); // slider starts at 0, real levels at 1
 	}
 	ieDword newMode = core->GetDictionary().Get("Story Mode", 0);
 	if (newMode != CFGCache.storyMode) {
 		if (newMode) {
 			CFGCache.gameDifficulty = Difficulty::Easy;
-			vars.Set("Difficulty Level", Difficulty::Easy - 1U);
+			vars.Set("Difficulty Level", UnderType(Difficulty::Default));
 
 			// add all the immunities and bonuses to party
 			for (int i = 0; game && i < game->GetPartySize(false); i++) {
@@ -1591,7 +1591,7 @@ GEM_EXPORT void UpdateActorConfig()
 		}
 		CFGCache.storyMode = newMode;
 	}
-	CFGCache.gameDifficulty = Clamp<int>(CFGCache.gameDifficulty, Difficulty::Easy, Difficulty::Insane);
+	CFGCache.gameDifficulty = Clamp(CFGCache.gameDifficulty, Difficulty::Easy, Difficulty::Insane);
 	// cache hot path mods
 	CFGCache.difficultyLuckMod = gamedata->GetDifficultyMod(2, CFGCache.gameDifficulty);
 	CFGCache.difficultyDamageMod = gamedata->GetDifficultyMod(0, CFGCache.gameDifficulty);

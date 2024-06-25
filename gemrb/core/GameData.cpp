@@ -1009,7 +1009,7 @@ int GameData::GetMiscRule(const TableMgr::key_t& rowName)
 	return miscRule->QueryFieldSigned<int>(rowName, "VALUE");
 }
 
-int GameData::GetDifficultyMod(ieDword mod, int difficulty)
+int GameData::GetDifficultyMod(ieDword mod, Difficulty difficulty)
 {
 	static bool ignore = false;
 	if (ignore) {
@@ -1022,7 +1022,7 @@ int GameData::GetDifficultyMod(ieDword mod, int difficulty)
 		return 0;
 	}
 
-	return difficultyLevels->QueryFieldSigned<int>(mod, difficulty);
+	return difficultyLevels->QueryFieldSigned<int>(mod, UnderType(difficulty));
 }
 
 int GameData::GetXPBonus(ieDword bonusType, ieDword level)

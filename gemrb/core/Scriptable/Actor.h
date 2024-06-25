@@ -125,7 +125,7 @@ enum class Modal : ieWord {
 #define PANIC_RANDOMWALK 3
 
 //Game Difficulty
-enum Difficulty {
+enum class Difficulty {
 	Default,
 	Easy,
 	Normal,
