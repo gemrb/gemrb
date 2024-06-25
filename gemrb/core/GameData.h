@@ -186,7 +186,7 @@ public:
 	ieByte GetItemAnimation(const ResRef& itemRef);
 	const std::vector<ItemUseType>& GetItemUse();
 	int GetMiscRule(const TableMgr::key_t& rowName);
-	int GetDifficultyMod(ieDword mod, ieDword difficulty);
+	int GetDifficultyMod(ieDword mod, int difficulty);
 	int GetXPBonus(ieDword bonusType, ieDword level);
 	int GetVBData(const TableMgr::key_t& rowName);
 

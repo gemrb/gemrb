@@ -1009,7 +1009,7 @@ int GameData::GetMiscRule(const TableMgr::key_t& rowName)
 	return miscRule->QueryFieldSigned<int>(rowName, "VALUE");
 }
 
-int GameData::GetDifficultyMod(ieDword mod, ieDword difficulty)
+int GameData::GetDifficultyMod(ieDword mod, int difficulty)
 {
 	static bool ignore = false;
 	if (ignore) {

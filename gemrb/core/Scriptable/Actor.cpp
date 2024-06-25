@@ -85,19 +85,22 @@ static const ieVariable CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 
 //verbal constant specific data
 static EnumArray<Verbal> VCMap;
-static ieDword sel_snd_freq = 0;
-static ieDword cmd_snd_freq = 0;
-static ieDword crit_hit_scr_shake = 1;
-static ieDword bored_time = 3000;
-static ieDword footsteps = 1;
-static ieDword war_cries = 1;
-static ieDword GameDifficulty = DIFF_CORE;
-static ieDword StoryMode = 0;
-static ieDword NoExtraDifficultyDmg = 0;
-static ieDword PreferSneakAttack = 0;
-static int DifficultyLuckMod = 0;
-static int DifficultyDamageMod = 0;
-static int DifficultySaveMod = 0;
+struct ConfigCache {
+	ieDword selectionSndFreq = 0;
+	ieDword commandSndFreq = 0;
+	ieDword boredTimeout = 3000;
+	ieDword footstepSnds = 1;
+	ieDword warCries = 1;
+	ieDword critHitShake = 1;
+	ieDword preferSneakAttack = 0;
+	int gameDifficulty = DIFF_CORE;
+	ieDword noExtraDifficultyDmg = 0;
+	ieDword storyMode = 0;
+	int difficultyLuckMod = 0;
+	int difficultyDamageMod = 0;
+	int difficultySaveMod = 0;
+};
+static ConfigCache CFGCache;
 
 #define MAX_FEATV 4294967295U // 1<<32-1 (used for the triple-stat feat handling)
 
@@ -1537,41 +1540,41 @@ static int IsClassFromName (const std::string& name)
 
 GEM_EXPORT void UpdateActorConfig()
 {
-	crit_hit_scr_shake = core->GetDictionary().Get("Critical Hit Screen Shake", 1);
+	CFGCache.critHitShake = core->GetDictionary().Get("Critical Hit Screen Shake", 1);
 
 	unsigned int effectTextLevel = core->GetDictionary().Get("Effect Text Level", 0);
 	core->SetFeedbackLevel(effectTextLevel);
 
-	sel_snd_freq = core->GetDictionary().Get("Selection Sounds Frequency", 0);
-	cmd_snd_freq = core->GetDictionary().Get("Command Sounds Frequency", 0);
+	CFGCache.selectionSndFreq = core->GetDictionary().Get("Selection Sounds Frequency", 0);
+	CFGCache.commandSndFreq = core->GetDictionary().Get("Command Sounds Frequency", 0);
 	// only pst has the whole gamut for these two options
-	if (!(effectTextLevel & FT_SELECTION)) sel_snd_freq = 0;
-	if (!(effectTextLevel & FT_ACTIONS)) cmd_snd_freq = 0;
+	if (!(effectTextLevel & FT_SELECTION)) CFGCache.selectionSndFreq = 0;
+	if (!(effectTextLevel & FT_ACTIONS)) CFGCache.commandSndFreq = 0;
 
-	bored_time = core->GetDictionary().Get("Bored Timeout", 3000);
-	footsteps = core->GetDictionary().Get("Footsteps", 1);
-	war_cries = core->GetDictionary().Get("Attack Sounds", 1);
-	PreferSneakAttack = core->GetDictionary().Get("3E Thief Sneak Attack", 0);
+	CFGCache.boredTimeout = core->GetDictionary().Get("Bored Timeout", 3000);
+	CFGCache.footstepSnds = core->GetDictionary().Get("Footsteps", 1);
+	CFGCache.warCries = core->GetDictionary().Get("Attack Sounds", 1);
+	CFGCache.preferSneakAttack = core->GetDictionary().Get("3E Thief Sneak Attack", 0);
 
 	//Handle Game Difficulty and Nightmare Mode
 	// iwd2 had it saved in the GAM, iwd1 only relied on the ini value
-	GameDifficulty = core->GetDictionary().Get("Nightmare Mode", 0);
+	CFGCache.gameDifficulty = core->GetDictionary().Get("Nightmare Mode", 0);
 
 	auto& vars = core->GetDictionary();
 	Game *game = core->GetGame();
-	if (GameDifficulty || (game && game->HOFMode)) {
-		GameDifficulty = DIFF_INSANE;
+	if (CFGCache.gameDifficulty || (game && game->HOFMode)) {
+		CFGCache.gameDifficulty = DIFF_INSANE;
 		if (game) game->HOFMode = true;
 		// also set it for GUIOPT
 		vars.Set("Difficulty Level", DIFF_INSANE - 1);
 	} else {
-		GameDifficulty = core->GetDictionary().Get("Difficulty Level", 0);
-		GameDifficulty++; // slider starts at 0, real levels at 1
+		CFGCache.gameDifficulty = core->GetDictionary().Get("Difficulty Level", 0);
+		CFGCache.gameDifficulty++; // slider starts at 0, real levels at 1
 	}
 	ieDword newMode = core->GetDictionary().Get("Story Mode", 0);
-	if (newMode != StoryMode) {
+	if (newMode != CFGCache.storyMode) {
 		if (newMode) {
-			GameDifficulty = DIFF_EASY;
+			CFGCache.gameDifficulty = DIFF_EASY;
 			vars.Set("Difficulty Level", DIFF_EASY - 1U);
 
 			// add all the immunities and bonuses to party
@@ -1586,16 +1589,16 @@ GEM_EXPORT void UpdateActorConfig()
 				core->ApplySpell("OHSMODE2", pc, pc, 0);
 			}
 		}
-		StoryMode = newMode;
+		CFGCache.storyMode = newMode;
 	}
-	GameDifficulty = Clamp((int) GameDifficulty, DIFF_EASY, DIFF_INSANE);
+	CFGCache.gameDifficulty = Clamp(CFGCache.gameDifficulty, DIFF_EASY, DIFF_INSANE);
 	// cache hot path mods
-	DifficultyLuckMod = gamedata->GetDifficultyMod(2, GameDifficulty);
-	DifficultyDamageMod = gamedata->GetDifficultyMod(0, GameDifficulty);
-	DifficultySaveMod = gamedata->GetDifficultyMod(3, GameDifficulty);
+	CFGCache.difficultyLuckMod = gamedata->GetDifficultyMod(2, CFGCache.gameDifficulty);
+	CFGCache.difficultyDamageMod = gamedata->GetDifficultyMod(0, CFGCache.gameDifficulty);
+	CFGCache.difficultySaveMod = gamedata->GetDifficultyMod(3, CFGCache.gameDifficulty);
 
 	// iwd has a config option for leniency
-	NoExtraDifficultyDmg = core->GetDictionary().Get("Suppress Extra Difficulty Damage", 0);
+	CFGCache.noExtraDifficultyDmg = core->GetDictionary().Get("Suppress Extra Difficulty Damage", 0);
 }
 
 static void ReadModalStates()
@@ -3019,7 +3022,7 @@ void Actor::RefreshPCStats() {
 	UpdateFatigue();
 
 	// add luck bonus from difficulty
-	Modified[IE_LUCK] += DifficultyLuckMod;
+	Modified[IE_LUCK] += CFGCache.difficultyLuckMod;
 
 	// regenerate actors with high enough constitution
 	int rate = GetConHealAmount();
@@ -3274,7 +3277,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 	}
 
 	// general bonuses
-	if (Modified[IE_EA] != EA_PC) ret += DifficultySaveMod;
+	if (Modified[IE_EA] != EA_PC) ret += CFGCache.difficultySaveMod;
 	// (half)elven resistance to enchantment, gnomish to illusions and dwarven to spells
 	if ((BaseStats[IE_RACE] == 2 || BaseStats[IE_RACE] == 3) && fx->PrimaryType == 4) ret += 2;
 	if (BaseStats[IE_RACE] == 6 && fx->PrimaryType == 5) ret += 2;
@@ -3650,7 +3653,7 @@ void Actor::PlaySelectionSound(bool force)
 {
 	playedCommandSound = false;
 	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
-	unsigned int frequency = sel_snd_freq + pstflags;
+	unsigned int frequency = CFGCache.selectionSndFreq + pstflags;
 	if (force || (!pstflags && frequency > 2)) frequency = 5;
 	switch (frequency) {
 		case 1:
@@ -3696,7 +3699,7 @@ void Actor::PlaySelectionSound(bool force)
 
 void Actor::PlayWarCry(int range) const
 {
-	if (!war_cries) return;
+	if (!CFGCache.warCries) return;
 
 	bool found = VerbalConstant(Verbal::BattleCry, range, DS_CIRCLE);
 	// for monsters also try their 2da/ini file sounds
@@ -3715,7 +3718,7 @@ void Actor::CommandActor(Action* action, bool clearPath)
 	AddAction(action); // now do this new thing
 
 	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
-	switch (cmd_snd_freq + pstflags) {
+	switch (CFGCache.commandSndFreq + pstflags) {
 		case 1:
 			return;
 		case 2:
@@ -4209,8 +4212,8 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		// adjust enemy damage according to difficulty settings:
 		// -50%, -25%, 0, 50%, 100%, 150%
 		if (act->GetStat(IE_EA) > EA_GOODCUTOFF) {
-			int adjustmentPercent = DifficultyDamageMod;
-			if (!NoExtraDifficultyDmg || adjustmentPercent < 0) {
+			int adjustmentPercent = CFGCache.difficultyDamageMod;
+			if (!CFGCache.noExtraDifficultyDmg || adjustmentPercent < 0) {
 				damage += (damage * adjustmentPercent)/100;
 			}
 		}
@@ -4227,7 +4230,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 
 	if (damage > 0) {
 		// instant chunky death if the actor is petrified or frozen
-		bool allowChunking = !Modified[IE_DISABLECHUNKING] && (!InParty || GameDifficulty > DIFF_NORMAL) && !Modified[IE_MINHITPOINTS];
+		bool allowChunking = !Modified[IE_DISABLECHUNKING] && (!InParty || CFGCache.gameDifficulty > DIFF_NORMAL) && !Modified[IE_MINHITPOINTS];
 		if (Modified[IE_STATE_ID] & (STATE_FROZEN|STATE_PETRIFIED) && allowChunking) {
 			damage = 123456; // arbitrarily high for death; won't be displayed
 			LastDamageType |= DAMAGE_CHUNKING;
@@ -5449,7 +5452,7 @@ bool Actor::CheckOnDeath()
 		// might change effects! so we just drop everything here
 
 		// disintegration destroys normal items if difficulty level is high enough
-		if (disintegrated && GameDifficulty > DIFF_CORE) {
+		if (disintegrated && CFGCache.gameDifficulty > DIFF_CORE) {
 			inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
 		}
 		// drop everything remaining, but ignore TNO, as he needs to keep his gear
@@ -6042,7 +6045,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 
 	ieDword kit = GetStat(IE_KIT);
 
-	if ((flags & LS_STATS) && (GameDifficulty>DIFF_NORMAL) ) {
+	if ((flags & LS_STATS) && CFGCache.gameDifficulty > DIFF_NORMAL) {
 		// chance to learn roll
 		int roll = LuckyRoll(1, 100, 0);
 		// adjust the roll for specialist mages
@@ -7453,7 +7456,7 @@ void Actor::UpdateActorState()
 		// dialog, pause game
 		if (!(core->GetGameControl()->GetDialogueFlags() & (DF_IN_DIALOG | DF_FREEZE_SCRIPTS))) {
 			// footsteps option set, stance
-			if (footsteps && GetStance() == IE_ANI_WALK) {
+			if (CFGCache.footstepSnds && GetStance() == IE_ANI_WALK) {
 				PlayWalkSound();
 			}
 		}
@@ -7663,9 +7666,9 @@ void Actor::Heal(int hp)
 void Actor::AddExperience(int exp, int combat)
 {
 	int bonus = core->GetWisdomBonus(0, Modified[IE_WIS]);
-	int adjustmentPercent = gamedata->GetDifficultyMod(1, GameDifficulty);
+	int adjustmentPercent = gamedata->GetDifficultyMod(1, CFGCache.gameDifficulty);
 	// the "Suppress Extra Difficulty Damage" also switches off the XP bonus
-	if (combat && (!NoExtraDifficultyDmg || adjustmentPercent < 0)) {
+	if (combat && (!CFGCache.noExtraDifficultyDmg || adjustmentPercent < 0)) {
 		bonus += adjustmentPercent;
 	}
 	bonus += GetFavoredPenalties();
@@ -9127,12 +9130,12 @@ void Actor::ModifyWeaponDamage(const WeaponInfo& wi, Actor* target, int& damage,
 	} else if (multiplier > 1) {
 		// TODO: limit sneak attack to once per enemy? EEs did it via backstab.spl, used besides any custom BackstabResRef
 		static const AutoTable sneakTable = gamedata->LoadTable("sneakatt", true);
-		if (PreferSneakAttack && sneakTable) { // ee externalization
+		if (CFGCache.preferSneakAttack && sneakTable) { // ee externalization
 			std::string rowName = GetClassName(GetActiveClass());
 			int rowIdx = sneakTable->GetRowIndex(rowName);
 			int dice = sneakTable->QueryFieldSigned<int>(rowIdx, level - 1);
 			extraDamage = LuckyRoll(dice, 6, 0, 0, target);
-		} else if (PreferSneakAttack) {
+		} else if (CFGCache.preferSneakAttack) {
 			extraDamage = LuckyRoll(int(level / 4) + 1, 6, 0, 0, target); // 1d6 + 1d6 per 4 levels
 		} else {
 			// aDnD backstabbing
@@ -9143,14 +9146,14 @@ void Actor::ModifyWeaponDamage(const WeaponInfo& wi, Actor* target, int& damage,
 		int spellPower = level;
 		if (!BackstabResRef.IsEmpty()) { // ee externalization
 			static const AutoTable cripTable = gamedata->LoadTable("crippstr", true);
-			if (cripTable && PreferSneakAttack) {
+			if (cripTable && CFGCache.preferSneakAttack) {
 				std::string rowName = GetClassName(GetActiveClass());
 				int rowIdx = cripTable->GetRowIndex(rowName);
 				spellPower = cripTable->QueryFieldSigned<int>(rowIdx, level - 1) + 1;
 			}
 			// extra spell delivery via fx_change_backstab
 			core->ApplySpell(BackstabResRef, target, this, spellPower);
-		} else if (PreferSneakAttack) {
+		} else if (CFGCache.preferSneakAttack) {
 			// Crippling Strike causes the victim to suffer a -1 to hit and damage rolls. The effect expires one turn later.
 			int malus = - int((level - 1) / 4);
 			Effect* fx = EffectQueue::CreateEffect(fx_to_hit_modifier_ref, malus, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
@@ -9190,7 +9193,7 @@ void Actor::ModifyWeaponDamage(const WeaponInfo& wi, Actor* target, int& damage,
 			damage *= wi.critmulti;
 
 			// check if critical hit needs a screenshake
-			if (crit_hit_scr_shake && (InParty || target->InParty) ) {
+			if (CFGCache.critHitShake && (InParty || target->InParty)) {
 				core->timer.SetScreenShake(Point(10, -10), core->Time.defaultTicksPerSec);
 			}
 
@@ -10796,8 +10799,8 @@ bool Actor::IsPartyMember() const
 void Actor::ResetCommentTime()
 {
 	Game* game = core->GetGame();
-	if (bored_time) {
-		Timers.nextComment = game->GameTime + core->Roll(5, 1000, bored_time / 2);
+	if (CFGCache.boredTimeout) {
+		Timers.nextComment = game->GameTime + core->Roll(5, 1000, CFGCache.boredTimeout / 2);
 	} else {
 		game->nextBored = 0;
 		Timers.nextComment = game->GameTime + core->Roll(10, 500, 150);
@@ -11218,7 +11221,7 @@ void Actor::PlayArmorSound() const
 	if (!Ticks) return;
 	if (Modified[IE_STATE_ID] & STATE_SILENCED) return;
 	// peculiar original behaviour: always for pcs, while the rest only clank if footstep sounds are on
-	if (!footsteps && !InParty) return;
+	if (!CFGCache.footstepSnds && !InParty) return;
 	// pst is missing the resources
 	if (pstflags) return;
 
