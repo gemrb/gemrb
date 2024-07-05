@@ -1407,7 +1407,7 @@ If row is specified, it can also append text to existing rows.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [TextArea_Clear](TextArea_Clear.md), [Control_SetText](Control_SetText.md), [Control_QueryText](Control_QueryText.md)"
+**See also:** [Control_SetText](Control_SetText.md), [Control_QueryText](Control_QueryText.md)"
 );
 
 static PyObject* GemRB_TextArea_Append(PyObject* self, PyObject* args)
@@ -3460,7 +3460,7 @@ static PyObject* GemRB_Button_SetPictureClipping(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetPicture__doc,
 "===== Button_SetPicture =====\n\
 \n\
-**Metaclass Prototype:** SetPicture (PictureResRef, DefaultResRef)\n\
+**Metaclass Prototype:** SetPicture (PictureResRef[, DefaultResRef])\n\
 \n\
 **Description:** Sets the Picture of a Button Control from a BMP file or a Sprite2D.\n\
 \n\
