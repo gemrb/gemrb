@@ -58,6 +58,8 @@ def GetUsableMemorizedSpells(actor, BookType):
 				continue
 			spellResRefs.append (resref)
 			Spell = GemRB.GetSpell(resref)
+			if not Spell:
+				continue
 			Spell['BookType'] = BookType # just another sorting key
 			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"], 1<<BookType) # crucial!
 			if Spell['SpellIndex'] == -1:
