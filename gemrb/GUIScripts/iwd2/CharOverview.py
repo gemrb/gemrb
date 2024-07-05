@@ -141,6 +141,10 @@ def UpdateOverview(CurrentStep):
 	
 	MyChar = GemRB.GetVar ("Slot")
 
+	if CurrentStep == 1:
+		TextAreaControl.Clear ()
+		PortraitButton.SetPicture (None)
+
 	if CurrentStep > 1:
 		name = GemRB.GetToken('CHARNAME')
 		if not name:
