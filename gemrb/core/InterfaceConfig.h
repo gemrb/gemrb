@@ -100,7 +100,7 @@ struct CoreSettings {
 	int LogColor = -1; // -1 is to automatically determine
 	bool CheatFlag = false; /** Cheats enabled? */
 	int MaxPartySize = 6;
-	int GUIEnhancements = 0;
+	int GUIEnhancements = 7;
 
 	bool KeepCache = false;
 	bool MultipleQuickSaves = false;
