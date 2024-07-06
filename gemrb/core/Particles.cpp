@@ -283,6 +283,11 @@ int Particles::Update()
 		return drawn;
 	}
 
+	// emulate 30 FPS
+	tick_t time = GetMilliseconds();
+	if (time - lastUpdate < 1000 / 30) return drawn;
+	lastUpdate = time;
+
 	if (timetolive) {
 		if (timetolive<core->GetGame()->GameTime) {
 			spawn_type = SP_SPAWN_NONE;

@@ -29,6 +29,7 @@
 
 #include "RGBAColor.h"
 #include "exports.h"
+#include "globals.h"
 #include "ie_types.h"
 
 #include "Region.h"
@@ -125,6 +126,7 @@ public:
 private:
 	std::vector<Element> points;
 	ieDword timetolive = 0;
+	tick_t lastUpdate = 0;
 //	ieDword target;    //could be 0, in that case target is pos
 	ieWord size = 0;       // spark number
 	ieWord last_insert = 0;// last spark idx added
