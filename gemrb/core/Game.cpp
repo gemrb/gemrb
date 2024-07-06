@@ -768,6 +768,7 @@ int Game::DelMap(unsigned int index, int forced)
 
 	// if a familiar isn't executing EscapeArea, it warps to the protagonist
 	for (auto& npc : NPCs) {
+		if (!npc->GetCurrentArea()) continue;
 		if (npc->GetBase(IE_EA) == EA_FAMILIAR && (!npc->GetCurrentAction() || npc->GetCurrentAction()->actionID != 108)) {
 			npc->SetPosition(PCs[0]->Pos, true);
 		}
