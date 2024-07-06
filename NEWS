@@ -1,4 +1,4 @@
-GemRB git (64fb7c):
+GemRB git (e46fb65e):
   New features:
     - 
     - full i18n (language) support, custom journal entries
@@ -6,6 +6,7 @@ GemRB git (64fb7c):
     - chunking approximation
     - small test suite, tracy support
     - iwd2 identification variants and speed data
+    - nwn-for-bg2 compatibility
 
   Improved features:
     - 
