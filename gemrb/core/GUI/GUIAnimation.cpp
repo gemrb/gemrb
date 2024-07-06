@@ -122,6 +122,13 @@ tick_t SpriteAnimation::CalculateNextFrameDelta()
 			delta = 15;
 		}
 	}
+
+	// maintain the same speed at higher drawing frequencies
+	if (core->config.CapFPS > 0) {
+		delta = delta * core->config.CapFPS / 30;
+	} else {
+		delta *= 3; // random guess, since it will fluctuate and depend on the monitor
+	}
 	return delta;
 }
 
