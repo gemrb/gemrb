@@ -247,7 +247,9 @@ Interface::Interface(CoreSettings&& cfg)
 	if (!config.KeepCache) DelTree(config.CachePath, false);
 	
 	vars = std::move(config.vars);
-	vars.Set("MaxPartySize", config.MaxPartySize); // for simple GUIScript access
+	// for simple GUIScript access
+	vars.Set("MaxPartySize", config.MaxPartySize);
+	vars.Set("GUIEnhancements", config.GUIEnhancements);
 
 	LoadPlugins();
 	InitVideo();
