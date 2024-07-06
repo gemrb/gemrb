@@ -774,6 +774,12 @@ int Game::DelMap(unsigned int index, int forced)
 		}
 	}
 
+	// one last script execution, so the Vacant trigger is more likely to run (pst ar0109)
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		map->ExecuteScript(MAX_SCRIPTS);
+		map->ProcessActions();
+	}
+
 	map->PurgeArea(false);
 
 	// if there are still selected actors on the map (e.g. summons)
