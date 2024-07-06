@@ -773,6 +773,8 @@ int Game::DelMap(unsigned int index, int forced)
 		}
 	}
 
+	map->PurgeArea(false);
+
 	// if there are still selected actors on the map (e.g. summons)
 	// unselect them now before they get axed
 	for (auto m = selected.begin(); m != selected.end();) {

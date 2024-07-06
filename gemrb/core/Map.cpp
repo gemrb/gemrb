@@ -2908,7 +2908,7 @@ void Map::RemoveActor(Actor* actor)
 
 //returns true if none of the partymembers are on the map
 //and noone is trying to follow the party out
-bool Map::CanFree()
+bool Map::CanFree() const
 {
 	for (const auto& actor : actors) {
 		if (actor->IsPartyMember()) {
@@ -2938,8 +2938,6 @@ bool Map::CanFree()
 			return false;
 		}
 	}
-	//we expect the area to be swapped out, so we simply remove the corpses now
-	PurgeArea(false);
 	return true;
 }
 
