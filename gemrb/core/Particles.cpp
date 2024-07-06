@@ -166,8 +166,7 @@ void Particles::Draw(Point p)
 	const Game *game = core->GetGame();
 
 	if (owner) {
-		p.x-=pos.x;
-		p.y-=pos.y;
+		p -= pos.origin;
 	}
 	ieWord i = size;
 	while (i--) {
