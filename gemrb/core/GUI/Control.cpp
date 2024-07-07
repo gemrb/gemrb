@@ -58,7 +58,7 @@ void Control::SetAction(ControlEventHandler handler, Control::Action type, Event
 void Control::SetAction(Responder handler, const ActionKey& key)
 {
 	if (handler) {
-		actions[key] = handler;
+		actions[key] = std::move(handler);
 	} else {
 		// delete the entry if there is one instead of setting it to NULL
 		const auto& it = actions.find(key);

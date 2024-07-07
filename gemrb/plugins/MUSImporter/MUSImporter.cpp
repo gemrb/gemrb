@@ -282,7 +282,7 @@ void MUSImporter::PlayMusic(const ieVariable& name)
 
 	ResourceHolder<SoundMgr> sound = manager.GetResourceHolder<SoundMgr>(FName, true);
 	if (sound) {
-		int soundID = core->GetAudioDrv()->CreateStream( sound );
+		int soundID = core->GetAudioDrv()->CreateStream(std::move(sound));
 		if (soundID == -1) {
 			core->GetAudioDrv()->Stop();
 		}

@@ -1783,7 +1783,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					i++;
 					src++;
 				}
-				Action* act = GenerateAction( action);
+				Action* act = GenerateAction(std::move(action));
 				if (!act) {
 					delete newAction;
 					return NULL;

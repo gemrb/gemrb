@@ -613,7 +613,7 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	return PyObject_FromHolder<TableMgr>(tab);
+	return PyObject_FromHolder<TableMgr>(std::move(tab));
 }
 
 PyDoc_STRVAR( GemRB_Table_GetValue__doc,
@@ -1617,7 +1617,7 @@ static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (game) {
-		game->SetTimedEvent(handler, rounds);
+		game->SetTimedEvent(std::move(handler), rounds);
 	}
 	Py_RETURN_NONE;
 }
@@ -1658,7 +1658,7 @@ static PyObject* GemRB_Window_SetAction(PyObject* self, PyObject* args)
 	if (PyCallable_Check(func)) {
 		handler = PythonWindowCallback(func);
 	}
-	win->SetAction(handler, static_cast<Window::Action>(key));
+	win->SetAction(std::move(handler), static_cast<Window::Action>(key));
 	Py_RETURN_NONE;
 }
 
@@ -1709,7 +1709,7 @@ static PyObject* GemRB_Control_SetAction(PyObject* self, PyObject* args)
 		if (PyCallable_Check(func)) {
 			handler = PythonControlCallback(func);
 		}
-		ctrl->SetAction(handler, type, button, mod, count);
+		ctrl->SetAction(std::move(handler), type, button, mod, count);
 
 		Py_RETURN_NONE;
 	}
@@ -2132,9 +2132,9 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			auto font = fontname ? core->GetFont(ResRefFromPy(fontname)) : nullptr;
 			WorldMapControl* wmap = nullptr;
 			if (pyColorNormal) {
-				wmap = new WorldMapControl(rgn, font, ColorFromPy(pyColorNormal), ColorFromPy(pyColorSelected), ColorFromPy(pyColorNotVisited));
+				wmap = new WorldMapControl(rgn, std::move(font), ColorFromPy(pyColorNormal), ColorFromPy(pyColorSelected), ColorFromPy(pyColorNotVisited));
 			} else {
-				wmap = new WorldMapControl(rgn, font);
+				wmap = new WorldMapControl(rgn, std::move(font));
 			}
 			
 			auto bam = gamedata->GetFactoryResourceAs<AnimationFactory>(ResRefFromPy(anim), IE_BAM_CLASS_ID);
@@ -2328,7 +2328,7 @@ static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 		if (!pic) {
 			return RuntimeError("Failed to acquire the picture!\n");
 		}
-		view->SetBackground(pic);
+		view->SetBackground(std::move(pic));
 	}
 
 	Py_RETURN_NONE;
@@ -2478,13 +2478,13 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 		}
 		Holder<Sprite2D> tspr;
 		tspr = af->GetFrame((AnimationFactory::index_t) unpressed, (unsigned char) cycle);
-		btn->SetImage(ButtonImage::Unpressed, tspr);
+		btn->SetImage(ButtonImage::Unpressed, std::move(tspr));
 		tspr = af->GetFrame((AnimationFactory::index_t) pressed, (unsigned char) cycle);
-		btn->SetImage(ButtonImage::Pressed, tspr);
+		btn->SetImage(ButtonImage::Pressed, std::move(tspr));
 		tspr = af->GetFrame((AnimationFactory::index_t) selected, (unsigned char) cycle);
-		btn->SetImage(ButtonImage::Selected, tspr);
+		btn->SetImage(ButtonImage::Selected, std::move(tspr));
 		tspr = af->GetFrame((AnimationFactory::index_t) disabled, (unsigned char) cycle);
-		btn->SetImage(ButtonImage::Disabled, tspr);
+		btn->SetImage(ButtonImage::Disabled, std::move(tspr));
 
 		Py_RETURN_NONE;
 	}
@@ -3497,7 +3497,7 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 			return RuntimeError("Picture resource not found!\n");
 		}
 
-		btn->SetPicture(pic);
+		btn->SetPicture(std::move(pic));
 	}
 
 	Py_RETURN_NONE;
@@ -3635,7 +3635,7 @@ static PyObject* SetButtonBAM(Button* btn, StringView ResRef, AnimationFactory::
 		Picture->SetPalette( newpal );
 	}
 
-	btn->SetPicture( Picture );
+	btn->SetPicture(std::move(Picture));
 
 	//no incref! (happens in caller if necessary)
 	return Py_None;
@@ -3698,7 +3698,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	const ResRef ref = ResRefFromPy(pyRef);
 	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(ref, IE_BAM_CLASS_ID);
 	ABORT_IF_NULL(af);
-	SpriteAnimation* anim = new SpriteAnimation(af, Cycle);
+	SpriteAnimation* anim = new SpriteAnimation(std::move(af), Cycle);
 
 	anim->blitFlags = static_cast<BlitFlags>(Blend);
 	
@@ -4481,7 +4481,7 @@ static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS(args, "O", &Slot);
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
-	auto name = save->GetName();
+	const auto& name = save->GetName();
 
 	return PyString_FromStringObj(name);
 }
@@ -6357,8 +6357,8 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		newstats.Happiness = oldstats.Happiness;
 		newstats.SoundFolder = oldstats.SoundFolder;
 		newstats.States = oldstats.States;
-		
-		oldstats = newstats;
+
+		oldstats = std::move(newstats);
 	}
 
 	actor->SetOver( false );
@@ -6566,8 +6566,7 @@ static PyObject *SetItemIcon(Button* btn, const ResRef& ItemResRef, int Which, i
 			}
 	}
 
-	if (setpicture)
-		btn->SetPicture( Picture );
+	if (setpicture) btn->SetPicture(std::move(Picture));
 	if (tooltip) {
 		//later getitemname could also return tooltip stuff
 		SetViewTooltipFromRef(btn, item->GetItemName(tooltip==2));
@@ -9701,7 +9700,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (text.length() > 0) {
-		map->AddMapNote(point, MapNote(text, color, false));
+		map->AddMapNote(point, MapNote(std::move(text), color, false));
 	} else {
 		map->RemoveMapNote(point);
 	}
@@ -10401,7 +10400,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	SetButtonCycle(bam, btn, (char) row.bytes[0], ButtonImage::Unpressed);
 	SetButtonCycle(bam, btn, (char) row.bytes[1], ButtonImage::Pressed);
 	SetButtonCycle(bam, btn, (char) row.bytes[2], ButtonImage::Selected);
-	SetButtonCycle(bam, btn, (char) row.bytes[3], ButtonImage::Disabled);
+	SetButtonCycle(std::move(bam), btn, (char) row.bytes[3], ButtonImage::Disabled);
 	btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, BitOp::NAND);
 	PyObject *Event = PyUnicode_FromFormat("Action%sPressed", GUIEvent[Index].c_str());
 	PyObject *func = PyDict_GetItem(dict, Event);
@@ -10551,7 +10550,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			SetButtonCycle(bam, btn, 1, ButtonImage::Pressed);
 			SetButtonCycle(bam, btn, 2, ButtonImage::Selected);
 			SetButtonCycle(bam, btn, 3, ButtonImage::Disabled);
-			btn->SetPicture( Picture );
+			btn->SetPicture(std::move(Picture));
 			btn->SetState(Button::UNPRESSED);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BitOp::SET);
 

@@ -999,7 +999,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS) ) {
 		std::string soundFolder = TLKStringFromString(ac->PCStats->SoundFolder);
 		soundFolder.resize(ieVariable::Size);
-		stream->WriteStringLC(soundFolder, ieVariable::Size);
+		stream->WriteStringLC(std::move(soundFolder), ieVariable::Size);
 	}
 	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		//I don't know how many fields are actually used in IWD2 saved game

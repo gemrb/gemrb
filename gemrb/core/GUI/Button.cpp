@@ -430,7 +430,7 @@ String Button::TooltipText() const
 				break;
 		}
 		String tt = ((tooltip.length()) ? tooltip : QueryText());
-		tt = (tt.length()) ? s + u": " + tt : s;
+		tt = (tt.length()) ? std::move(s) + u": " + tt : std::move(s);
 		return tt;
 	}
 	return Control::TooltipText();

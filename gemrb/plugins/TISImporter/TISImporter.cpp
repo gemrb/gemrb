@@ -87,10 +87,10 @@ Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
 		for (size_t i = 0; i < count; i++) {
 			frames.push_back(GetTile(secondary[i]));
 		}
-		Animation sec = Animation(frames);
-		return new Tile(ani, std::move(sec));
+		Animation sec = Animation(std::move(frames));
+		return new Tile(std::move(ani), std::move(sec));
 	}
-	return new Tile(ani);
+	return new Tile(std::move(ani));
 }
 
 Holder<Sprite2D> TISImporter::GetTile(int index)

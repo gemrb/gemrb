@@ -7692,7 +7692,7 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 			return lhs.second < rhs.second;
 		});
 		if (fav->second != 0) token = StringFromTLK(fav->first);
-		core->GetTokenDictionary()[favtok] = token;
+		core->GetTokenDictionary()[favtok] = std::move(token);
 		SetTokenAsString(cnttok, fav->second);
 	};
 

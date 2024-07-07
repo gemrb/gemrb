@@ -417,10 +417,10 @@ void Game::InitActorPos(Actor *actor) const
 	
 	//start.2da row labels
 	static const std::string mode[PMODE_COUNT] = { "NORMAL", "TUTORIAL", "EXPANSION" };
-	const auto xpos = start->QueryField(mode[playmode],"XPOS");
-	const auto ypos = start->QueryField(mode[playmode],"YPOS");
-	const auto area = start->QueryField(mode[playmode],"AREA");
-	const auto rot = start->QueryField(mode[playmode],"ROT");
+	const auto& xpos = start->QueryField(mode[playmode], "XPOS");
+	const auto& ypos = start->QueryField(mode[playmode], "YPOS");
+	const auto& area = start->QueryField(mode[playmode], "AREA");
+	const auto& rot = start->QueryField(mode[playmode], "ROT");
 
 	actor->Pos.x = actor->Destination.x = strta->QueryFieldSigned<int>(strta->GetRowIndex(xpos), ip);
 	actor->Pos.y = actor->Destination.y = strta->QueryFieldSigned<int>(strta->GetRowIndex(ypos), ip);

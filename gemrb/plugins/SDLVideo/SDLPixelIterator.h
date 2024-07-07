@@ -49,7 +49,7 @@ inline PixelFormat PixelFormatForSurface(SDL_Surface* surf, Holder<Palette> pal 
 		fmt->colorkey,
 		bool(surf->flags & SDL_SRCCOLORKEY),
 #endif
-		false, pal
+		false, std::move(pal)
 	};
 }
 

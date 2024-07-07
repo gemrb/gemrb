@@ -4415,7 +4415,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 		if (detailed) {
 			// 3 choices depending on resistance and boni
 			// iwd2 also has two Tortoise Shell (spell) absorption strings
-			tokens["TYPE"] = type_name;
+			tokens["TYPE"] = std::move(type_name);
 			SetTokenAsString("AMOUNT", damage);
 
 			HCStrings strref;
@@ -4466,7 +4466,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 		if (detailed) {
 			//<DAMAGEE> was immune to my <TYPE> damage
 			tokens["DAMAGEE"] = GetName();
-			tokens["TYPE"] = type_name;
+			tokens["TYPE"] = std::move(type_name);
 			displaymsg->DisplayConstantStringName(HCStrings::DamageImmunity, GUIColors::WHITE, hitter);
 		} else if (DisplayMessage::HasStringReference(HCStrings::DamageImmunity) && DisplayMessage::HasStringReference(HCStrings::Damage1)) {
 			// bg2
@@ -8739,7 +8739,7 @@ String Actor::GetSoundFolder(int full, const ResRef& overrideSet) const
 			soundset = fmt::format(u"{}", PCStats->SoundFolder);
 		}
 	} else {
-		soundset = wSet;
+		soundset = std::move(wSet);
 	}
 
 	return soundset;

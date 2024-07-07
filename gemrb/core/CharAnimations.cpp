@@ -565,7 +565,7 @@ void CharAnimations::SetupColors(PaletteType type)
 			}
 			Holder<Palette> tmppal = gamedata->GetPalette(PaletteResRef[type]);
 			if (tmppal) {
-				PartPalettes[type] = tmppal;
+				PartPalettes[type] = std::move(tmppal);
 			} else {
 				PaletteResRef[type].Reset();
 			}
@@ -3014,9 +3014,9 @@ Holder<Sprite2D> GetPaperdollImage(const ResRef& resref, const ieDword* colors, 
 	for (AnimationFactory::index_t i = 0; i < af->GetCycleSize(0); ++i) {
 		auto spr = af->GetFrame(i, 0);
 		if (first == nullptr) {
-			first = spr;
+			first = std::move(spr);
 		} else if (second == nullptr && spr != first) {
-			second = spr;
+			second = std::move(spr);
 			break;
 		}
 	}

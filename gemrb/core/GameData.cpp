@@ -934,7 +934,7 @@ const std::vector<int>& GameData::GetBonusSpells(int ability)
 			for (TableMgr::index_t i = 0; i < splLevels; i++) {
 				bonuses[i] = mxSplBon->QueryFieldSigned<int>(row, i);
 			}
-			bonusSpells[statValue] = bonuses;
+			bonusSpells[statValue] = std::move(bonuses);
 		}
 	}
 

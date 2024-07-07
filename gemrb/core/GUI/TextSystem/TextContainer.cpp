@@ -785,7 +785,7 @@ void TextContainer::DrawContents(const Layout& layout, Point dp)
 		
 		auto it = FindCursorRegion(layout);
 		if (it != layout.regions.end()) {
-			auto cursorRegion = static_cast<const TextLayout&>(**it);
+			const auto& cursorRegion = static_cast<const TextLayout&>(**it);
 			size_t begin = cursorRegion.beginCharIdx;
 			const Region& rect = cursorRegion.region;
 			cursorPoint = rect.origin;
@@ -912,7 +912,7 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 				if (layout) {
 					it = FindCursorRegion(*layout);
 					assert(it != layout->regions.end());
-					auto cursorRegion = static_cast<const TextLayout&>(**it);
+					const auto& cursorRegion = static_cast<const TextLayout&>(**it);
 					offset = cursorPos - cursorRegion.beginCharIdx;
 				} else { // cursor is at end of text
 					return true;
@@ -931,7 +931,7 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 				}
 				
 				if (it != layout->regions.end()) {
-					auto cursorRegion = static_cast<const TextLayout&>(**it);
+					const auto& cursorRegion = static_cast<const TextLayout&>(**it);
 					size_t length = cursorRegion.endCharIdx - cursorRegion.beginCharIdx;
 					cursorPos = cursorRegion.beginCharIdx + std::min(offset, length);
 					MarkDirty();

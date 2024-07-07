@@ -555,7 +555,7 @@ void DirectoryIterator::SetFilterPredicate(FileFilterPredicate p, bool chain)
 	if (chain && predicate) {
 		predicate = std::make_shared<AndPredicate<path_t>>(predicate, p);
 	} else {
-		predicate = p;
+		predicate = std::move(p);
 	}
 	Rewind();
 }

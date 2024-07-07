@@ -169,7 +169,7 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 	if (hasPalette) {
 		Holder<Palette> pal = MakeHolder<Palette>();
 		int ck = GetPalette(256, pal->col);
-		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, (ck >= 0), ck);
+		PixelFormat fmt = PixelFormat::Paletted8Bit(std::move(pal), (ck >= 0), ck);
 		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h), buffer, fmt);
 	} else {
 		constexpr ieDword blue_mask = 0x00ff0000;
