@@ -209,9 +209,9 @@ You can check what we're working towards in the current release by reading the
 NEWS file and, as far as bugtracker backlog goes, by looking at the version's
 [milestone](https://github.com/gemrb/gemrb/milestones).
 
-The plan for 0.9.3 is to work on iwd2 completability, annoying pst oddities,
+The plan for 0.9.4 is to work on iwd2 completability, annoying pst oddities,
 deal with some postponed issues, and whatever piques the contributor's fancy.
 
-We're looking for ninjas to help with GLESv2 support (no hw, see
-[#938](https://github.com/gemrb/gemrb/issues/938)) and a full-fledged installer
-for windows [#612](https://github.com/gemrb/gemrb/issues/612).
+We're looking for ninjas to help with python porting, a SDL_ttf backend,
+GLESv2 support (no hw, see [#938](https://github.com/gemrb/gemrb/issues/938)) and
+a full-fledged installer for windows [#612](https://github.com/gemrb/gemrb/issues/612).
