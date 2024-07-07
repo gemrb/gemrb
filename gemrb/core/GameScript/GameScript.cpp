@@ -1992,7 +1992,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 					return false;
 				}
 
-				if (lastAction == a) {
+				if (lastResponseBlock == a) {
 					// we presumably don't want any further execution?
 					// this one is a bit more complicated, due to possible
 					// interactions with Continue() (lastAction here is always
@@ -2012,7 +2012,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 				// yes we must :)
 				MySelf->Stop();
 			}
-			lastAction = a;
+			lastResponseBlock = a;
 		}
 		running = true;
 		continueExecution = rB->responseSet->Execute(MySelf) != 0;

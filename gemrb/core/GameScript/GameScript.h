@@ -504,7 +504,7 @@ private: //Internal Functions
 	Scriptable* const MySelf;
 	ResRef Name;
 	Script* script;
-	size_t lastAction = -1;
+	size_t lastResponseBlock = -1;
 	int scriptlevel;
 public: //Script Functions
 	static int ID_Alignment(const Actor *actor, int parameter);
