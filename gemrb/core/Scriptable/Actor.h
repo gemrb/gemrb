@@ -993,7 +993,7 @@ public:
 	/* Checks if the actor is dualclassed */
 	bool IsDualClassed() const;
 	/* Returns an exact copy of this actor */
-	Actor *CopySelf(bool mislead) const;
+	Actor* CopySelf(bool mislead, bool effects = true) const;
 	static ieDword GetClassID(ieDword isClass);
 	const std::string& GetClassName(ieDword classID) const;
 	const std::string& GetKitName(ieDword kitID) const;

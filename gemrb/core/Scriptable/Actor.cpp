@@ -4129,7 +4129,7 @@ static void ChunkActor(Actor* actor)
 	static EffectRef fx_remove_creature_ref = { "RemoveCreature", -1 };
 	constexpr std::array<int, 7> bodyParts = { 0x200, 0x200, 0x210, 0x220, 0x230, 0x240, 0x240 };
 	for (auto animID : bodyParts) {
-		Actor* copy = actor->CopySelf(true);
+		Actor* copy = actor->CopySelf(true, false);
 		map->ClearSearchMapFor(copy);
 		copy->SetBase(IE_GOLD, 0);
 		copy->SetStance(IE_ANI_TWITCH); // force only one loop of the animation
@@ -10117,7 +10117,7 @@ bool Actor::IsDualClassed() const
 	return CountBits(Modified[IE_MC_FLAGS] & MC_WAS_ANY) == 1;
 }
 
-Actor *Actor::CopySelf(bool mislead) const
+Actor* Actor::CopySelf(bool mislead, bool effects) const
 {
 	Actor *newActor = new Actor();
 
@@ -10169,7 +10169,9 @@ Actor *Actor::CopySelf(bool mislead) const
 	newActor->SetStance( IE_ANI_READY );
 
 	//copy the running effects
-	newActor->AddEffects(EffectQueue(fxqueue));
+	if (effects) {
+		newActor->AddEffects(EffectQueue(fxqueue));
+	}
 	return newActor;
 }
 
