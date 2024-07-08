@@ -2075,7 +2075,10 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	}
 
 	// clear whatever is currently on screen
+	const GameControl* gc = GetGameControl();
+	bool inCutScene = gc && gc->GetScreenFlags().Test(ScreenFlags::Cutscene);
 	SetCutSceneMode(true);
+
 	Region screen(0, 0, config.Width, config.Height);
 	Window* win = winmgr->MakeWindow(screen);
 	win->SetFlags(Window::Borderless|Window::NoSounds, BitOp::OR);
@@ -2086,7 +2089,10 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	mp->Play(win);
 	win->Close();
 	winmgr->SetCursorFeedback(cur);
-	SetCutSceneMode(false);
+	// only reset if it wasn't active before we started or if there's no game yet
+	if (!inCutScene) {
+		SetCutSceneMode(false);
+	}
 	if (sound_override) {
 		sound_override->Stop();
 		sound_override.reset();
