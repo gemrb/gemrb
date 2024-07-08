@@ -84,7 +84,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 	ProfsWindow = window
 	ProfsCallback = callback
 	ProfsTableOffset = profTableOffset
-	ProfsType = type
+	ProfsType = proftype
 	ProfsScrollBar = None
 
 	if proftype == LUPROFS_TYPE_CHARGEN and (GameCheck.IsBG1() or GameCheck.IsBG2()): #chargen
@@ -285,6 +285,8 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 			# it also has different ordering than ProfsTable
 			col = ClassWeaponsTable.GetColumnIndex (ProfsTable.GetRowName(i))
 			maxprof = ClassWeaponsTable.GetValue (ProfsColumn, col)
+			# the above is underreporting for lvl1 fighters, but it doesn't matter,
+			# since there are enough prof types and the relevant code does use profsmax.2da
 		else:
 			maxprof = ProfsTable.GetValue(i+ProfsTableOffset, ProfsColumn)
 		if maxprof > currentprof:
