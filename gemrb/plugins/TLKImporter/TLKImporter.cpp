@@ -126,9 +126,6 @@ static inline const Actor* GetActorFromSlot(int slot)
 		if (gc) {
 			act = gc->dialoghandler->GetSpeaker();
 		}
-		if (!act) {
-			act = core->GetFirstSelectedActor();
-		}
 		return act;
 	}
 	const Game *game = core->GetGame();
@@ -155,6 +152,10 @@ String TLKImporter::CharName(int slot) const
 	const Actor *act = GetActorFromSlot(slot);
 	if (act) {
 		return act->GetName();
+	}
+	if (!act) {
+		act = core->GetFirstSelectedActor();
+		if (act) return act->GetName();
 	}
 	return u"?";
 }
