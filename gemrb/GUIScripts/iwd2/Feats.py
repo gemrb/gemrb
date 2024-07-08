@@ -240,7 +240,8 @@ def OpenFeatsWindow(chargen=0):
 			if Level <= 9 and Level+LevelDiff >= 9:
 				GemRB.SetFeat (pc, FEAT_IMPROVED_EVASION, 1)
 
-	RaceName = CommonTables.Races.GetRowName (Race)
+	RaceIndex = CommonTables.Races.FindValue (3, Race)
+	RaceName = CommonTables.Races.GetRowName (RaceIndex)
 	# could use column ID as well, but they tend to change :)
 	RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN")
 
