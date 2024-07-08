@@ -118,7 +118,7 @@ bool TLKImporter::Open(DataStream* stream)
 		0	 - PROTAGONIST
 		1-9 - PLAYERx
 */
-static inline Actor *GetActorFromSlot(int slot)
+static inline const Actor* GetActorFromSlot(int slot)
 {
 	if (slot==-1) {
 		const GameControl *gc = core->GetGameControl();
