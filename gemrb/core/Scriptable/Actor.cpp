@@ -5472,6 +5472,8 @@ bool Actor::CheckOnDeath()
 	}
 	//don't mess with the already deceased
 	if (BaseStats[IE_STATE_ID]&STATE_DEAD) {
+		// delayed cleanup of chunked actors, see below
+		if (LastDamageType & DAMAGE_CHUNKING && Timers.removalTime < core->GetGame()->GameTime) return true;
 		return false;
 	}
 	// don't destroy actors currently in a dialog
@@ -5559,10 +5561,11 @@ bool Actor::CheckOnDeath()
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
 	Timers.removalTime = time + core->Time.day_size; // keep corpse around for a day
 
-	//if chunked death, then return true
+	// if chunked death, don't return true either, so delayed effects and scripts have more time
+	// bg2 ar0809 bodhi needs this if the pool is cleansed; her replacement to bat form uses a 1s delay
 	if (LastDamageType & DAMAGE_CHUNKING) {
-		Timers.removalTime = time;
-		return true;
+		Timers.removalTime = time + 2 * core->Time.defaultTicksPerSec;
+		return false;
 	}
 	return false;
 }
