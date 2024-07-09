@@ -1293,6 +1293,7 @@ void GameControl::UpdateCursor()
 	
 	overMe = overDoor = area->TMap->GetDoor(gameMousePos);
 	// ignore infopoints and containers beneath doors
+	// pst mortuary door right above the starting position is a good test
 	if (overDoor) {
 		if (overDoor->Visible()) {
 			nextCursor = overDoor->GetCursor(targetMode, lastCursor);
@@ -1317,8 +1318,12 @@ void GameControl::UpdateCursor()
 			return;
 		}
 
-		if (!overMe) {
-			overMe = overContainer = area->TMap->GetContainer(gameMousePos);
+		// let containers override infopoints if at the same location
+		// needed in bg2 ar0809 or you can't get the loot on the altar
+		// how ar3201 and a bunch in the pst mortuary (eg. near Ei-vene) show it as a usability win as well
+		overContainer = area->TMap->GetContainer(gameMousePos);
+		if (overContainer) {
+			overMe = overContainer;
 		}
 	}
 
