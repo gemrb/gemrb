@@ -4117,9 +4117,6 @@ void Actor::CheckCleave()
 // NOTE: only does the visual part of chunking
 static void ChunkActor(Actor* actor)
 {
-	ieDword gore = core->GetDictionary().Get("Gore", 0);
-	if (!gore) return;
-
 	Map* map = actor->GetCurrentArea();
 	if (!map->IsVisible(actor->Pos)) return; // protect against ctrl-shift-y
 
@@ -5289,7 +5286,8 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	//remove IDLE so the actor gets a chance to die properly
 	InternalFlags&=~IF_IDLE;
 
-	if (LastDamageType & DAMAGE_CHUNKING) {
+	ieDword gore = core->GetDictionary().Get("Gore", 0);
+	if (LastDamageType & DAMAGE_CHUNKING && gore) {
 		ChunkActor(this);
 	} else if (GetStance() != IE_ANI_DIE) {
 		SetStance(IE_ANI_DIE);
