@@ -842,7 +842,9 @@ def InitStoreRumourWindow (Window):
 
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
+		# ... in case any mod adds rumours, since there are no such stores by default
 		Window.AliasControls ({ 'STOTITLE' : 0x1000000a, 'STOGOLD' : 0x1000000b})
+		Window.DeleteControl (16)
 	else:
 		Window.AliasControls ({ 'STOTITLE' : 0x10000011, 'STOGOLD' : 0x10000012})
 

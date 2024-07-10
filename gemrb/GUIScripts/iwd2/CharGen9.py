@@ -121,6 +121,8 @@ def BioPress():
 	Button.SetText (36788)
 	Button.OnPress (BioCancelPress)
 
+	Window.DeleteControl (3)
+
 	EditControl = Window.GetControl (4)
 	BioData = GemRB.GetToken("BIO")
 	if BioData == "":

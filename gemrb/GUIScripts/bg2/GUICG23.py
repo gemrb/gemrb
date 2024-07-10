@@ -27,6 +27,7 @@ def OnLoad ():
 
 	BioWindow = GemRB.LoadWindow (23, "GUICG")
 	CharGenCommon.PositionCharGenWin(BioWindow)
+	BioWindow.DeleteControl (5)
 
 	EditTextArea = BioWindow.ReplaceSubview(3, IE_GUI_TEXTAREA, "NORMAL")
 	BIO = GemRB.GetToken("BIO")

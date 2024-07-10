@@ -509,9 +509,12 @@ def OpenBiographyEditWindow ():
 	# 23 and 24 were deleted and replaced in iwd
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		SubCustomizeWindow = GemRB.LoadWindow (51)
+		SubCustomizeWindow.DeleteControl (3)
 	else:
 		SubCustomizeWindow = GemRB.LoadWindow (23)
-		
+		if GameCheck.IsBG2 ():
+			SubCustomizeWindow.DeleteControl (6)
+
 	SubCustomizeWindow.AddAlias("SUB_WIN", 0)
 
 	ClearButton = SubCustomizeWindow.GetControl (5)

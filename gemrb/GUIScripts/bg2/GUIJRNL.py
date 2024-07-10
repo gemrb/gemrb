@@ -156,6 +156,8 @@ def AddUserEntry ():
 	# used a separate, stripped down, window
 	Window = GemRB.LoadWindow (9, "GUIJRNL")
 
+	Window.DeleteControl (5)
+
 	Text = Window.ReplaceSubview (0, IE_GUI_TEXTAREA, "NORMAL")
 	Text.SetFlags (IE_GUI_TEXTAREA_EDITABLE, OP_OR)
 	Text.SetColor (ColorBlackish, TA_COLOR_NORMAL)
