@@ -1767,27 +1767,46 @@ int fx_intelligence_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x14 State:Invisible
 // this is more complex, there is a half-invisibility state
 // and there is a hidden state
-int fx_set_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_set_invisible_state(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	switch (fx->Parameter2) {
-	case 1:
-			STATE_SET(STATE_INVIS2); // TODO: actually use STATE_INVIS2 in code
-			// intentional fallthrough
-	case 0:
+	case 0: // normal
 		if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
-			STATE_SET( STATE_PST_INVIS );
+			STATE_SET(STATE_PST_INVIS);
 		} else {
-			STATE_SET( STATE_INVISIBLE );
+			STATE_SET(STATE_INVISIBLE);
 		}
 		if (fx->FirstApply || fx->TimingMode != FX_DURATION_INSTANT_PERMANENT) {
-			target->ToHit.HandleFxBonus(4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+			target->ToHit.HandleFxBonus(4, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
 		}
+		break;
+	case 1: // improved
+		// in the originals the improved invisibility spells included two opcodes
+		if (fx->FirstApply && core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+			Effect* invisibility = EffectQueue::CreateEffectCopy(fx, fx_set_invisible_state_ref, 0, 0);
+			core->ApplyEffect(invisibility, target, Owner);
+		}
+		// changes to "weak invisibility" once detected, allowing weapon attacks, since the
+		// regular invisibility is gone, but not spell attacks
+		// this is done in Actor::CureInvisibility in case any user would care about the Parameter2 difference
+		STATE_SET(STATE_INVIS2);
 		break;
 	case 2:// EE: weak invisibility, like improved after being revealed (no backstabbing)
 		STATE_SET(STATE_INVIS2);
+		break;
 	default:
 		break;
 	}
+
+	if (fx->Parameter2 > 0 && core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		// unpopular, but they hardcoded the saving throw bonuses in the ees to avoid stacking issues
+		HandleBonus(target, IE_SAVEVSDEATH, 4, fx->TimingMode);
+		HandleBonus(target, IE_SAVEVSWANDS, 4, fx->TimingMode);
+		HandleBonus(target, IE_SAVEVSPOLY, 4, fx->TimingMode);
+		HandleBonus(target, IE_SAVEVSBREATH, 4, fx->TimingMode);
+		HandleBonus(target, IE_SAVEVSSPELL, 4, fx->TimingMode);
+	}
+
 	ieDword Trans = fx->Parameter4;
 	if (fx->Parameter3) {
 		if (Trans >= 240) {

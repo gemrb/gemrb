@@ -10413,6 +10413,21 @@ void Actor::CureInvisibility()
 			AddTrigger(TriggerEntry(trigger_becamevisible));
 		}
 	}
+
+	// change improved to weak invisibility once detected
+	if (Modified[IE_STATE_ID] & STATE_INVIS2) {
+		// unfortunately HasEffectWithParam returns const
+		static EffectRef fx_set_invisible_state_ref = { "State:Invisible", -1 };
+		static int invisOpcode = EffectQueue::ResolveEffect(fx_set_invisible_state_ref);
+		auto fxIter = fxqueue.GetFirstEffect();
+		Effect* fx = fxqueue.GetNextEffect(fxIter);
+		while (fx) {
+			if (fx->Opcode == ieDword(invisOpcode) && fx->Parameter2 == 1) {
+				fx->Parameter2 = 2;
+			}
+			fx = fxqueue.GetNextEffect(fxIter);
+		}
+	}
 }
 
 // removes the sanctuary effect
