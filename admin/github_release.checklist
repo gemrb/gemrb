@@ -23,7 +23,7 @@ Release:
 - [ ] Finalise choice of version number, eg. v1.2.3
 - [ ] Amend Roadmap in contributing.md
 - [ ] Final `NEWS` update
-- [ ] Update version number in `gemrb/includes/globals.h`
+- [ ] Update version number in `gemrb/core/InterfaceConfig.h` and `.github/ISSUE_TEMPLATE/bug_report.md`
 - [ ] Add a git tag and push it (make sure to push together with something else, so the build won't be skipped)
     ```
         ver=0.8.2
@@ -33,14 +33,14 @@ Release:
 - [ ] Create the source tarball with `make dist`
   - [ ] Add any missing files to the cmake install targets and recreate the tarball
   - [ ] Add any new files from fetch-demo-data to the cmake dist target
-  - [ ] Add any new extranoeus files to `.gitattributes` and recreate
+  - [ ] Add any new extraneous files to `.gitattributes` and recreate
   - [ ] Build it and run the minimal test or more: `gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample`
 
 Deployment:
 - [ ] Promote the new tag to a release on GitHub
 - [ ] Write docs (a template is available in `admin/announcement.template`):
   - [ ] Forum announcements
-  - [ ] Release notes if needed (configuration changes, notes for packagers)
+  - [ ] Release notes (configuration changes, notes for packagers) - use previous as a template
 - [ ] SourceForge
   - [ ] Upload source package to SourceForge, maintaining the naming format under Releases
   - [ ] Upload any release notes alongside as Readme.md
@@ -51,9 +51,10 @@ version=0.9.0
 
 cd /home/frs/project/gemrb/Buildbot\ Binaries
 mkdir -p ../Releases/$version
-cp Windows/AppVeyor/$(ls Windows/AppVeyor/ -1rt | tail -n1) ../Releases/$version/gemrb-win32-v$version.zip
-cp Apple/OSX/$(ls Apple/OSX/ -1rt | tail -n1) ../Releases/$version/gemrb-macos-v$version.tar.bz2
-cp Linux/$(ls Linux/ -1rt | tail -n1) ../Releases/$version/gemrb-linux-v$version.AppImage
+cp -v Windows/AppVeyor/$(ls Windows/AppVeyor/ -1rt | tail -n1) ../Releases/$version/gemrb-win32-v$version.zip
+cp -v Apple/OSX/$(ls Apple/OSX/ -1rt | tail -n1) ../Releases/$version/gemrb-macos-v$version.tar.bz2
+cp -v Apple/ARM64/$(ls Apple/ARM/64 -1rt | tail -n1) ../Releases/$version/gemrb-macos-arm64-v$version.zip
+cp -v $(find Linux/ -name "*$version*" | tail -n1) ../Releases/$version/gemrb-linux-v$version.AppImage
 ```
 
   - [ ] Mark release builds as OS defaults on SourceForge as appropriate; mark the source for everyone else
@@ -74,4 +75,4 @@ Post-release:
 - [ ] Run `admin/restart_news.sh` to restart the NEWS cycle
 - [ ] If the manpage changed (`git log v0.8.6.. gemrb.6.in`), adapt the web copy (pandoc can convert it to markdown)
 - [ ] Close old milestone
-- [ ] update bug report template version numbers
+- [ ] Close old project and create new one from template, redo its milestone rule
