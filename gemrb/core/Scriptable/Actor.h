@@ -1069,7 +1069,7 @@ public:
 	int GetTotalArmorFailure() const;
 	int GetArmorFailure(int &armor, int &shield) const;
 	bool ShouldStopAttack() const;
-	bool IsInvisibleTo(const Scriptable *checker) const;
+	bool IsInvisibleTo(const Scriptable* checker, bool improved = false) const;
 	int UpdateAnimationID(bool derived);
 	void MovementCommand(std::string command);
 	/* shows hp/maxhp as overhead text */

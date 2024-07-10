@@ -6873,6 +6873,11 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 		}
 	}
 
+	// are we invisible? Relevant for improved invisibility, perhaps also in iwd2
+	if (!third && IsInvisibleTo(attacker, true)) {
+		defense += 4;
+	}
+
 	defense -= fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,attacker);
 	return defense;
 }
@@ -10924,7 +10929,8 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 }
 
 // checks whether the actor is visible to another scriptable
-bool Actor::IsInvisibleTo(const Scriptable *checker) const
+// with "improved", any invisibility will do, not just normal, but it won't look at sanctuary
+bool Actor::IsInvisibleTo(const Scriptable* checker, bool improved) const
 {
 	// consider underground ankhegs completely invisible to everyone
 	if (GetStance() == IE_ANI_WALK && GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE) {
@@ -10936,8 +10942,14 @@ bool Actor::IsInvisibleTo(const Scriptable *checker) const
 	if (checker2) {
 		canSeeInvisibles = checker2->GetSafeStat(IE_SEEINVISIBLE);
 	}
-	bool invisible = GetSafeStat(IE_STATE_ID) & state_invisible;
-	if (!canSeeInvisibles && (invisible || HasSpellState(SS_SANCTUARY))) {
+	if (canSeeInvisibles) return false;
+
+	if (GetSafeStat(IE_STATE_ID) & state_invisible) return true;
+	if (improved) {
+		if (GetSafeStat(IE_STATE_ID) & STATE_INVIS2) {
+			return true;
+		}
+	} else if (HasSpellState(SS_SANCTUARY)) {
 		return true;
 	}
 
