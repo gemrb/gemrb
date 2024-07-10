@@ -183,7 +183,7 @@ public:
 	bool SetAutoResizeFlags(unsigned short arg_flags, BitOp opcode);
 	unsigned short AutoResizeFlags() const { return autoresizeFlags; }
 
-	void SetVisible(bool vis);
+	void SetVisible(bool vis) { SetFlags(Invisible, vis ? BitOp::NAND : BitOp::OR); }
 	bool IsVisible() const;
 	void SetDisabled(bool disable) { SetFlags(Disabled, disable ? BitOp::OR : BitOp::NAND); }
 	bool IsDisabled() const { return flags&Disabled; }

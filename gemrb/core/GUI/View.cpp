@@ -141,14 +141,6 @@ void View::InvalidateSubviews(const Region& rgn) const
 	}
 }
 
-void View::SetVisible(bool vis) {
-	SetFlags(Invisible, vis ? BitOp::NAND : BitOp::OR);
-
-	if (superView != nullptr) {
-		superView->MarkDirty();
-	}
-}
-
 bool View::IsVisible() const
 {
 	bool isVisible = !(flags&Invisible);
@@ -185,7 +177,7 @@ Regions View::DirtySuperViewRegions() const
 		return {};
 	}
 
-	if (NeedsDraw()) {
+	if (NeedsDraw() || !IsVisible()) {
 		return { frame };
 	}
 
