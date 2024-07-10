@@ -173,7 +173,11 @@ Regions View::DirtySuperViewRegions() const
 	// if we are opaque we cover everything and dont care about the superview
 	// if we arent but we need to redraw then we simply report our entire area
 
-	if (IsOpaque() || frame.size.IsInvalid()) {
+	if (IsOpaque()) {
+		return {};
+	}
+	// HACK to ignore scrollbars, but not windows #2099
+	if (!IsVisible() && frame.size.IsInvalid() && frame.size.h < 400) {
 		return {};
 	}
 
