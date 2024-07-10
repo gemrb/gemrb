@@ -1,20 +1,18 @@
-GemRB git (e46fb65e):
+GemRB v0.9.3 (2024-07-10):
   New features:
-    - 
     - full i18n (language) support, custom journal entries
-    - BMP v3 and v5 support
     - chunking approximation
+    - BMP v3 and v5 support
     - small test suite, tracy support
     - iwd2 identification variants and speed data
     - nwn-for-bg2 compatibility
 
   Improved features:
-    - 
-    - area music
+    - area music, creature & area sounds
     - colored logging, pathfinding, drawing
-    - switched to c++14, build system
     - ee compat, effects, modals, projectiles, familiars
-    - iwd2 & pst worldmap, creature & area sounds
+    - iwd2 & pst worldmap
+    - switched to c++14, build system
     - bugfixes
 
 GemRB v0.9.2 (2023-07-08):
