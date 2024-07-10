@@ -8270,7 +8270,10 @@ int fx_slow_poison(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	auto f = target->fxqueue.GetFirstEffect();
 	Effect* poison = target->fxqueue.GetNextEffect(f);
 	while (poison) {
-		if (poison->Opcode != poisonOpcode) continue;
+		if (poison->Opcode != poisonOpcode) {
+			poison = target->fxqueue.GetNextEffect(f);
+			continue;
+		}
 
 		switch (poison->Parameter2) {
 			case RPD_SECONDS:
