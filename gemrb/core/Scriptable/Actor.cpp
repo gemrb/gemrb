@@ -6857,8 +6857,10 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 		}
 	}
 
+	if (!attacker) return defense;
+
 	// is the attacker invisible? We don't care if we know the right uncanny dodge
-	if (attacker && attacker->IsInvisibleTo(this)) {
+	if (attacker->IsInvisibleTo(this)) {
 		if (third) {
 			if ((GetStat(IE_UNCANNY_DODGE) & 0x100) == 0) {
 				// oops, we lose the dex bonus (like flatfooted)
@@ -6871,9 +6873,7 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 		}
 	}
 
-	if (attacker) {
-		defense -= fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,attacker);
-	}
+	defense -= fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref,attacker);
 	return defense;
 }
 
