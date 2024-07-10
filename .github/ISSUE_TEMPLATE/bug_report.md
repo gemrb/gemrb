@@ -38,9 +38,9 @@ If applicable, add screenshots to help explain your problem.
 
 GemRB version (check as many as you know apply)
 - [ ] master as of this issue
+- [ ] 0.9.3
 - [ ] 0.9.2
 - [ ] 0.9.1
-- [ ] 0.9.0
 
 Video Driver (check as many as you know apply)
 - [ ] SDL1.2
