@@ -4651,7 +4651,11 @@ void Actor::PlaySwingSound(const WeaponInfo &wi) const
 			break;
 	}
 	if (vb != vb.end()) {
-		bool found = VerbalConstant(*vb);
+		bool found = false;
+		// limit to once per round so high APR actors don't spam
+		if (!InParty || attackcount == attacksperround) {
+			VerbalConstant(*vb);
+		}
 		// retry with 2da for soundsets, since they only checked one thing
 		if (!found) {
 			ResRef sound2;
