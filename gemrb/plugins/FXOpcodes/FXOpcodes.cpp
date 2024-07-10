@@ -4476,7 +4476,6 @@ int fx_force_visible (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 		BASE_STATE_CURE(STATE_INVISIBLE);
 	}
 	target->fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref,0);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref,2);
 
 	//fix the hiding puppet while mislead bug, by
 	if (target->GetSafeStat(IE_PUPPETTYPE)==1) {
