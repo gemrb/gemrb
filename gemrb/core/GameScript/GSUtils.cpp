@@ -2723,7 +2723,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		const Actor* target = Scriptable::As<const Actor>(tar);
 		const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
 		if (Sender != tar && target && !(flags & SC_NOINTERRUPT) &&
-		    ((!(spl->Flags & SF_TARGETS_INVISIBLE) && target->IsInvisibleTo(Sender)) ||
+		    ((!(spl->Flags & SF_TARGETS_INVISIBLE) && target->IsInvisibleTo(Sender, 7)) ||
 		     (tar->GetInternalFlag() & (IF_ACTIVE | IF_VISIBLE)) != (IF_ACTIVE | IF_VISIBLE) ||
 		     target->GetStat(IE_AVATARREMOVAL))) {
 			Sender->ReleaseCurrentAction();

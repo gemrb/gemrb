@@ -6864,7 +6864,7 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 	if (!attacker) return defense;
 
 	// is the attacker invisible? We don't care if we know the right uncanny dodge
-	if (attacker->IsInvisibleTo(this)) {
+	if (attacker->IsInvisibleTo(this, 3)) {
 		if (third) {
 			if ((GetStat(IE_UNCANNY_DODGE) & 0x100) == 0) {
 				// oops, we lose the dex bonus (like flatfooted)
@@ -6878,7 +6878,7 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 	}
 
 	// are we invisible? Relevant for improved invisibility, perhaps also in iwd2
-	if (!third && IsInvisibleTo(attacker, true)) {
+	if (!third && IsInvisibleTo(attacker, 3)) {
 		defense += 4;
 	}
 
@@ -10697,7 +10697,7 @@ bool Actor::TryToHideIWD2()
 }
 
 //cannot target actor (used by GUI)
-bool Actor::Untargetable(const ResRef& spellRef) const
+bool Actor::Untargetable(const ResRef& spellRef, const Actor* source) const
 {
 	if (!spellRef.IsEmpty()) {
 		const Spell *spl = gamedata->GetSpell(spellRef, true);
@@ -10707,7 +10707,7 @@ bool Actor::Untargetable(const ResRef& spellRef) const
 		}
 		gamedata->FreeSpell(spl, spellRef, false);
 	}
-	return IsInvisibleTo(NULL);
+	return IsInvisibleTo(source, 7);
 }
 
 //it is futile to try to harm target (used by AI scripts)
@@ -10933,8 +10933,11 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 }
 
 // checks whether the actor is visible to another scriptable
-// with "improved", any invisibility will do, not just normal, but it won't look at sanctuary
-bool Actor::IsInvisibleTo(const Scriptable* checker, bool improved) const
+// flags:
+// - 1: normal invisibility
+// - 2: improved or weak invisibility
+// - 4: sanctuary
+bool Actor::IsInvisibleTo(const Scriptable* checker, int flags) const
 {
 	// consider underground ankhegs completely invisible to everyone
 	if (GetStance() == IE_ANI_WALK && GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE) {
@@ -10948,14 +10951,9 @@ bool Actor::IsInvisibleTo(const Scriptable* checker, bool improved) const
 	}
 	if (canSeeInvisibles) return false;
 
-	if (GetSafeStat(IE_STATE_ID) & state_invisible) return true;
-	if (improved) {
-		if (GetSafeStat(IE_STATE_ID) & STATE_INVIS2) {
-			return true;
-		}
-	} else if (HasSpellState(SS_SANCTUARY)) {
-		return true;
-	}
+	if (flags & 1 && GetSafeStat(IE_STATE_ID) & state_invisible) return true;
+	if (flags & 2 && GetSafeStat(IE_STATE_ID) & STATE_INVIS2) return true;
+	if (flags & 4 && HasSpellState(SS_SANCTUARY)) return true;
 
 	return false;
 }
