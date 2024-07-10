@@ -6858,10 +6858,16 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 	}
 
 	// is the attacker invisible? We don't care if we know the right uncanny dodge
-	if (third && attacker && attacker->GetStat(state_invisible)) {
-		if ((GetStat(IE_UNCANNY_DODGE) & 0x100) == 0) {
-			// oops, we lose the dex bonus (like flatfooted)
-			defense -= AC.GetDexterityBonus();
+	if (attacker && attacker->IsInvisibleTo(this)) {
+		if (third) {
+			if ((GetStat(IE_UNCANNY_DODGE) & 0x100) == 0) {
+				// oops, we lose the dex bonus (like flatfooted)
+				defense -= AC.GetDexterityBonus();
+			}
+		} else {
+			if (wflags & WEAPON_MELEE && attacker->GetStat(IE_BACKSTABDAMAGEMULTIPLIER) > 1) {
+				defense -= AC.GetDexterityBonus();
+			}
 		}
 	}
 
