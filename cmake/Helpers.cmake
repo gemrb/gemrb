@@ -99,7 +99,7 @@ FUNCTION(CONFIGURE_COMPILER)
 			VALUE "stringop-overread"
 		)
 
-		IF(CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 13)
+		IF(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13)
 			# too much noise from false positives
 			STRING(APPEND CMAKE_CXX_FLAGS " -Wno-stringop-truncation -Wno-stringop-overflow -Wno-stringop-overread")
 		ENDIF ()
