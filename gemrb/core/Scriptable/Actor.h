@@ -500,7 +500,6 @@ public:
 	AnimRef ShieldRef;
 	AnimRef HelmetRef;
 	AnimRef WeaponRef;
-	unsigned char WeaponType = 0;
 	ieDword multiclass = 0;
 	bool GotLUFeedback = false;
 	int WMLevelMod = 0;

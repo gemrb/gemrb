@@ -398,6 +398,7 @@ void CharAnimations::SetRangedType(int rt)
 
 void CharAnimations::SetWeaponType(unsigned char wt)
 {
+	if (wt == IE_ANI_WEAPON_INVALID) return;
 	if (wt != WeaponType) {
 		WeaponType = wt;
 		DropAnims();
