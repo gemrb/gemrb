@@ -1951,9 +1951,10 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	}
 
 	door->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
-	actor->TargetDoor = door->GetGlobalID();
 	// internal gemrb toggle door action hack - should we use UseDoor instead?
-	actor->CommandActor(GenerateAction("NIDSpecial9()"));
+	Action* toggle = GenerateAction("NIDSpecial9()");
+	toggle->int0Parameter = door->GetGlobalID();
+	actor->CommandActor(toggle);
 }
 
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)

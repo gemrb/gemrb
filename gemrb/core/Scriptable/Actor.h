@@ -510,8 +510,6 @@ public:
 	Point FollowOffset;//follow lastfollowed at this offset
 	bool Spawned = false; // has been created by a spawn point
 
-	ieDword TargetDoor = 0;
-
 	EffectQueue fxqueue;
 	
 	vvcDict vfxDict;
