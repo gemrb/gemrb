@@ -4881,11 +4881,31 @@ ieDword Actor::GetXPLevel(int modified) const
 	return ieDword(average);
 }
 
+// iwd2 adds a +1 bonus for cleric kits using/casting their boon innates
+static int GetIWD2BoonBonus(const Actor* act)
+{
+	int bonus = 0;
+	if (!third) return 0;
+	if (!act->GetClericLevel()) return 0;
+
+	// no need to check for kits, since if you don't have it, you don't get the spell
+	// they're SPIN263 - SPIN271
+	if (!act->SpellResRef.BeginsWith("SPIN2")) return 0;
+	int num = atoi(act->SpellResRef.c_str() + 4);
+	if (num >= 263 && num <= 271) {
+		bonus = 1;
+	}
+
+	return bonus;
+}
+
 // returns the guessed caster level by passed spell type
 // FIXME: add more logic for cross-type kits (like avengers)?
 // FIXME: iwd2 does the right thing at least for spells cast from spellbooks;
 //        that is, it takes the correct level, not first or average or min or max.
 //        We need to propagate the spellbook info all through here. :/
+//        ... or do we? iwd2re suggests it does take the max, see link below
+//        https://github.com/alexbatalov/iwd2-re/blob/4fa36bcd6c33e0d35c9e273561aa683aece88490/src/CGameSprite.cpp#L12585
 //        NOTE: this is only problematic for multiclassed actors
 ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 {
@@ -4955,6 +4975,12 @@ int Actor::CastingLevelBonus(int level, int type)
 		break;
 	case IE_SPL_WIZARD:
 		bonus = GetWildMod(level) + GetStat(IE_CASTINGLEVELBONUSMAGE);
+		break;
+	case IE_SPL_INNATE:
+		bonus = GetIWD2BoonBonus(this);
+		break;
+	default:
+		break;
 	}
 
 	return bonus;
