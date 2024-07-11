@@ -455,7 +455,6 @@ public:
 	ieByteSigned DeathCounters[4]{}; // PST specific (good, law, lady, murder)
 
 	ResRef BardSong;               //custom bard song (updated by fx)
-	ResRef BackstabResRef = "*";         //apply on successful backstab
 
 	std::unique_ptr<PCStatsStruct> PCStats;
 	PCStatsStruct::StateArray previousStates;
@@ -487,14 +486,10 @@ public:
 	//which keep a matrix of counters
 	ieDword InteractCount = 0; // this is accessible in iwd2, probably exists in other games too
 	ieDword appearance = 0xffffff; // schedule
-	ArmorClass AC;
-	ToHitStats ToHit;
-	WeaponInfo weaponInfo[2]{};
 	ModalState Modal{};
 	TimerData Timers {};
 	IgnoredFields ignoredFields {};
 
-	bool usedLeftHand = false; // which weaponInfo index was used in an attack last
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
 	ResRef LastArea;
 	AnimRef ShieldRef;
@@ -504,8 +499,6 @@ public:
 	bool GotLUFeedback = false;
 	int WMLevelMod = 0;
 
-	int LastDamageType = 0;
-	int LastDamage = 0;
 	Point FollowOffset;//follow lastfollowed at this offset
 	bool Spawned = false; // has been created by a spawn point
 
@@ -516,8 +509,16 @@ public:
 	std::vector<bool> projectileImmunity; // classic bitfield
 	Holder<SoundHandle> casting_sound;
 	PanicMode panicMode = PanicMode::None; // runaway, berserk or randomwalk
-	//how many attacks left in this round, must be public for cleave opcode
-	int attackcount = 0;
+
+	// public combat related data
+	ArmorClass AC;
+	ToHitStats ToHit;
+	WeaponInfo weaponInfo[2] {};
+	int attackcount = 0; // how many attacks left in this round, must be public for cleave opcode
+	bool usedLeftHand = false; // which weaponInfo index was used in an attack last
+	int LastDamageType = 0;
+	int LastDamage = 0;
+	ResRef BackstabResRef = "*"; // apply on successful backstab
 
 	PolymorphCache* polymorphCache = nullptr; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods{};
@@ -546,15 +547,16 @@ private:
 	int walkScale = 0;
 	// true when command has been played after select
 	bool playedCommandSound = false;
-	//true every second round of attack
-	bool secondround = false;
-	int attacksperround = 0;
+
 	//trap we're trying to disarm
 	ieDword disarmTrap = 0;
 	ieDword InTrap = 0;
+
 	char AttackStance = 0;
-	/*The projectile bringing the current attack*/
-	Projectile* attackProjectile = nullptr;
+	Projectile* attackProjectile = nullptr; // regular weapon payload projectile
+	bool secondround = false; // true every second round of attack
+	int attacksperround = 0;
+
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Point& p, BlitFlags flags,
 						 const std::vector<AnimationPart>& anims, const Color& tint) const;
