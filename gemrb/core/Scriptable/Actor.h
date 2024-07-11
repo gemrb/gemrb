@@ -333,7 +333,6 @@ struct SaveInfo {
 };
 
 struct TimerData {
-	ieDword lastExit = 0; // the global ID of the exit to be used
 	ieDword lastOverrideCheck = 0; // confusion timer to limit overriding actions to once per round
 	ieDword lastAttack = 0; // time of the last attack
 	ieDword nextAttack = 0; // time of our next attack
@@ -348,6 +347,11 @@ struct TimerData {
 	tick_t lastFatigueCheck = 0;
 	tick_t remainingTalkSoundTime = 0;
 	tick_t lastTalkTimeCheckAt = 0;
+	// delay all maxhp checks until we completely load all effects
+	// set after modifying maxhp, adjusts hp next tick
+	int checkHP = 2;
+	// to determine that a tick has passed
+	ieDword checkHPTime = 0;
 };
 
 // misc fields we (currently) only load and save to maintain save compatibility
@@ -490,6 +494,7 @@ public:
 	TimerData Timers {};
 	IgnoredFields ignoredFields {};
 
+	ieDword lastExit = 0; // the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
 	ResRef LastArea;
 	AnimRef ShieldRef;
@@ -523,11 +528,6 @@ public:
 	PolymorphCache* polymorphCache = nullptr; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods{};
 	ieDword* spellStates = nullptr;
-	// delay all maxhp checks until we completely load all effects
-	// set after modifying maxhp, adjusts hp next tick
-	int checkHP = 2;
-	// to determine that a tick has passed
-	ieDword checkHPTime = 0;
 
 	Region drawingRegion;
 private:

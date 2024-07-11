@@ -1154,7 +1154,7 @@ static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 
 static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 {
-	if (actor->checkHP == 2) return;
+	if (actor->Timers.checkHP == 2) return;
 	if (actor->GetInternalFlag() & IF_REALLYDIED) return;
 
 	int maxhp = (signed) actor->GetSafeStat(IE_MAXHITPOINTS);
@@ -1186,9 +1186,9 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 
 static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
-	if (!actor->checkHP) {
-		actor->checkHP = 1;
-		actor->checkHPTime = core->GetGame()->GameTime;
+	if (!actor->Timers.checkHP) {
+		actor->Timers.checkHP = 1;
+		actor->Timers.checkHPTime = core->GetGame()->GameTime;
 	}
 }
 
@@ -1243,7 +1243,7 @@ static void pcf_stat_dex(Actor *actor, ieDword oldValue, ieDword newValue)
 static void pcf_stat_con(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	pcf_stat(actor, newValue, IE_CON);
-	if (!actor->checkHP) {
+	if (!actor->Timers.checkHP) {
 		pcf_hitpoint(actor, 0, actor->BaseStats[IE_HITPOINTS]);
 	}
 	if (third) {
@@ -2753,11 +2753,11 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 
 	//delayed HP adjustment hack (after max HP modification)
 	//as it's triggered by PCFs from the previous tick, it should probably run before current PCFs
-	if (first && checkHP == 2) {
+	if (first && Timers.checkHP == 2) {
 		//could not set this in the constructor
-		checkHPTime = game->GameTime;
-	} else if (checkHP && checkHPTime != game->GameTime) {
-		checkHP = 0;
+		Timers.checkHPTime = game->GameTime;
+	} else if (Timers.checkHP && Timers.checkHPTime != game->GameTime) {
+		Timers.checkHP = 0;
 		if (!(BaseStats[IE_STATE_ID] & STATE_DEAD)) pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
 	}
 
@@ -2931,7 +2931,7 @@ void Actor::RefreshHP() {
 
 	// temporary con bonuses also modify current HP; this can kill! (EE behavior)
 	// but skip on game load, while old bonuses are still re-applied
-	if (!(BaseStats[IE_STATE_ID] & STATE_DEAD) && checkHP != 2 && bonus != Timers.lastConBonus) {
+	if (!(BaseStats[IE_STATE_ID] & STATE_DEAD) && Timers.checkHP != 2 && bonus != Timers.lastConBonus) {
 		BaseStats[IE_HITPOINTS] += bonus - Timers.lastConBonus;
 	}
 	Timers.lastConBonus = bonus;
@@ -10288,7 +10288,7 @@ bool Actor::BlocksSearchMap() const
 //return true if the actor doesn't want to use an entrance
 bool Actor::CannotPassEntrance(ieDword exitID) const
 {
-	if (Timers.lastExit != exitID) {
+	if (lastExit != exitID) {
 		return true;
 	}
 
@@ -10310,8 +10310,8 @@ void Actor::UseExit(ieDword exitID) {
 		InternalFlags&=~IF_USEEXIT;
 		LastArea = Area;
 		UsedExit.Reset();
-		if (Timers.lastExit) {
-			const Scriptable* ip = area->GetInfoPointByGlobalID(Timers.lastExit);
+		if (lastExit) {
+			const Scriptable* ip = area->GetInfoPointByGlobalID(lastExit);
 			if (ip) {
 				const ieVariable& ipName = ip->GetScriptName();
 				if (!ipName.IsEmpty()) {
@@ -10320,7 +10320,7 @@ void Actor::UseExit(ieDword exitID) {
 			}
 		}
 	}
-	Timers.lastExit = exitID;
+	lastExit = exitID;
 }
 
 // luck increases the minimum roll per dice, but only up to the number of dice sides;
