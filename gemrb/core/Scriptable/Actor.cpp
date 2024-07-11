@@ -880,7 +880,7 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	if (lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
 		int panicMode = RAND(0, 2); // PANIC_RANDOMWALK etc.
 		displaymsg->DisplayConstantStringName(HCStrings(int(HCStrings::MoraleBerserk) + panicMode), GUIColors::WHITE, actor);
-		actor->Panic(game->GetActorByGlobalID(actor->objects.LastAttacker), panicMode + 1);
+		actor->Panic(game->GetActorByGlobalID(actor->objects.LastAttacker), PanicMode(panicMode + 1));
 	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
 		// recover from panic, since morale has risen again
 		// but only if we have really just recovered, so panic from other
@@ -3749,7 +3749,7 @@ void Actor::IdleActions(bool nonidle)
 	const Map *map = GetCurrentArea();
 	if (!map) return;
 	//and not in panic
-	if (panicMode!=PANIC_NONE) return;
+	if (panicMode != PanicMode::None) return;
 
 	const Game *game = core->GetGame();
 	//there is no combat
@@ -3942,7 +3942,7 @@ bool Actor::OverrideActions()
 	return false;
 }
 
-void Actor::Panic(const Scriptable *attacker, int panicmode)
+void Actor::Panic(const Scriptable* attacker, PanicMode mode)
 {
 	auto PanicAction = [](unsigned short actionID) {
 		return actionID == 184 || actionID == 85 || actionID == 124;
@@ -3956,12 +3956,12 @@ void Actor::Panic(const Scriptable *attacker, int panicmode)
 	VerbalConstant(Verbal::Panic, gamedata->GetVBData("SPECIAL_COUNT"));
 
 	Action *action;
-	if (panicmode == PANIC_RUNAWAY && (!attacker || attacker->Type!=ST_ACTOR)) {
-		panicmode = PANIC_RANDOMWALK;
+	if (mode == PanicMode::RunAway && (!attacker || attacker->Type != ST_ACTOR)) {
+		mode = PanicMode::RandomWalk;
 	}
 
-	switch(panicmode) {
-	case PANIC_RUNAWAY:
+	switch (mode) {
+	case PanicMode::RunAway:
 		if (core->HasFeature(GFFlags::IWD_MAP_DIMENSIONS)) { // iwd troll scripts are incompatible with full panic
 			action = GenerateActionDirect("RunAwayFrom([-1],300)", attacker);
 		} else {
@@ -3969,11 +3969,11 @@ void Actor::Panic(const Scriptable *attacker, int panicmode)
 		}
 		SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 		break;
-	case PANIC_RANDOMWALK:
+	case PanicMode::RandomWalk:
 		action = GenerateAction( "RandomWalk()" );
 		SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 		break;
-	case PANIC_BERSERK:
+	case PanicMode::Berserk:
 		action = GenerateAction( "Berserk()" );
 		BaseStats[IE_CHECKFORBERSERK]=3;
 		//SetBaseBit(IE_STATE_ID, STATE_BERSERK, true);
@@ -5085,7 +5085,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 					core->ApplySpell(ResRef("panic"), this, cleric, level);
 				} else {
 					Log(DEBUG, "Actor", "Panic from turning!");
-					Panic(cleric, PANIC_RUNAWAY);
+					Panic(cleric, PanicMode::RunAway);
 				}
 			}
 		}
@@ -5115,7 +5115,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 		Die(cleric);
 	} else if (turnlevel >= level + turnPanicLevelMod) {
 		Log(DEBUG, "Actor", "Panic from turning!");
-		Panic(cleric, PANIC_RUNAWAY);
+		Panic(cleric, PanicMode::RunAway);
 	}
 }
 

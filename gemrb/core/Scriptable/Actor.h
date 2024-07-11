@@ -118,11 +118,12 @@ enum class Modal : ieWord {
 #define GD_CHECK       1
 #define GD_FEEDBACK    2 //(also check)
 
-//Panic modes
-#define PANIC_NONE       0
-#define PANIC_BERSERK    1
-#define PANIC_RUNAWAY    2
-#define PANIC_RANDOMWALK 3
+enum class PanicMode {
+	None,
+	Berserk,
+	RunAway,
+	RandomWalk
+};
 
 //Game Difficulty
 enum class Difficulty {
@@ -503,7 +504,7 @@ public:
 	vvcSet vfxQueue = vvcSet(VVCSort); // sorted so we can distinguish effects infront and behind
 	std::vector<bool> projectileImmunity; // classic bitfield
 	Holder<SoundHandle> casting_sound;
-	ieDword panicMode = PANIC_NONE;  // runaway, berserk or randomwalk
+	PanicMode panicMode = PanicMode::None; // runaway, berserk or randomwalk
 	//how many attacks left in this round, must be public for cleave opcode
 	int attackcount = 0;
 
@@ -727,7 +728,7 @@ public:
 	/** handle idle actions, that shouldn't mess with scripting */
 	void IdleActions(bool nonidle);
 	/* sets the actor in panic (turn/morale break) */
-	void Panic(const Scriptable *attacker, int panicmode);
+	void Panic(const Scriptable* attacker, PanicMode mode);
 	/* sets a multi class flag (actually this is a lot of else too) */
 	void SetMCFlag(ieDword bitmask, BitOp op);
 	/* inlined dialogue start */

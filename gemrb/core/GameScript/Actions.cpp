@@ -5014,7 +5014,7 @@ void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)
 	if (!act) {
 		return;
 	}
-	act->Panic(NULL, PANIC_RANDOMWALK);
+	act->Panic(nullptr, PanicMode::RandomWalk);
 }
 
 // All Calm() does is apply op4 on the target as if it was applied by the script runner

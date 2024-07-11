@@ -568,7 +568,7 @@ int fx_chill_touch (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
 	if (STAT_GET(IE_GENERAL)==GEN_UNDEAD) {
-		target->Panic(Owner, PANIC_RUNAWAY);
+		target->Panic(Owner, PanicMode::RunAway);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -1652,7 +1652,7 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 	{
 	case 0: //command
 		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
-		target->Panic(Owner, PANIC_RUNAWAY);
+		target->Panic(Owner, PanicMode::RunAway);
 		break;
 	case 1://rebuke
 		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
@@ -1667,7 +1667,7 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	case 3://panic
 		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
-		target->Panic(Owner, PANIC_RUNAWAY);
+		target->Panic(Owner, PanicMode::RunAway);
 		break;
 	default://depends on caster
 		if (fx->Parameter1) {
