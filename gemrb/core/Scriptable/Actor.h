@@ -350,6 +350,20 @@ struct TimerData {
 	tick_t lastTalkTimeCheckAt = 0;
 };
 
+// misc fields we (currently) only load and save to maintain save compatibility
+struct IgnoredFields {
+	ieByte unknownIWDByte1 = 0;
+	ieByte difficultyMargin = 0; // only used in iwd2, but resolved on load
+	/**
+	 * We don't know how to profit of them, but PST needs them saved.
+	 * Otherwise, some actors are badly drawn, like TNO but not Morte.
+	 * bit 0 for a "plasma" effect: palette color entries shift by one index position per cycle update
+	 * bit 1 is for enabling pulsating for the particular color range (we store them in IE_COLOR*)
+	 *   it periodically reduces brightness to ~50% and back to full
+	 */
+	ieByte pstColorBytes[10] {};
+};
+
 enum DamageFlags {
 	DrainFromTarget = 0,
 	DrainFromSource = 1,
@@ -462,7 +476,6 @@ public:
 	// boolean fields from iwd1 and iwd2
 	ieByte SetDeathVar = 0;
 	ieByte IncKillCount = 0;
-	ieByte UnknownField = 0;
 
 	Inventory inventory;
 	Spellbook spellbook;
@@ -479,6 +492,7 @@ public:
 	WeaponInfo weaponInfo[2]{};
 	ModalState Modal{};
 	TimerData Timers {};
+	IgnoredFields ignoredFields {};
 
 	bool usedLeftHand = false; // which weaponInfo index was used in an attack last
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
@@ -510,22 +524,13 @@ public:
 
 	PolymorphCache* polymorphCache = nullptr; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods{};
-	ieByte DifficultyMargin = 0;
 	ieDword* spellStates = nullptr;
 	// delay all maxhp checks until we completely load all effects
 	// set after modifying maxhp, adjusts hp next tick
 	int checkHP = 2;
 	// to determine that a tick has passed
 	ieDword checkHPTime = 0;
-	/**
-	 * We don't know how to profit of them, but PST needs them saved.
-	 * Otherwise, some actors are badly drawn, like TNO but not Morte.
-	 * bit 0 for a "plasma" effect: palette color entries shift by one index position per cycle update
-	 * bit 1 is for enabling pulsating for the particular color range (we store them in IE_COLOR*)
-	 *   it periodically reduces brightness to ~50% and back to full
-	 */
-	ieByte pstColorBytes[10]{};
-	
+
 	Region drawingRegion;
 private:
 	String LongName;

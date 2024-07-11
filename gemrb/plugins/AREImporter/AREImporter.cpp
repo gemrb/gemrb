@@ -1155,7 +1155,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 			}
 		}
 	}
-	act->DifficultyMargin = difficultyMargin;
+	act->ignoredFields.difficultyMargin = difficultyMargin;
 
 	if (!dialog.IsEmpty()) {
 		act->SetDialog(dialog);
@@ -2177,7 +2177,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map) const
 		stream->WriteDword(0); //used fields flag always 0 for saved areas
 		stream->WriteWord(ac->Spawned);
 		stream->WriteFilling(1); // letter
-		stream->WriteScalar(ac->DifficultyMargin);
+		stream->WriteScalar(ac->ignoredFields.difficultyMargin);
 		stream->WriteDword(0); //actor animation, unused
 		stream->WriteWord(ac->GetOrientation());
 		stream->WriteWord(0); //unknown

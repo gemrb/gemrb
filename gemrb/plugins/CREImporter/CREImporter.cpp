@@ -1045,7 +1045,7 @@ void CREImporter::GetActorPST(Actor *act)
 		str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_COLORS + i]);
 	}
 	act->BaseStats[IE_COLORCOUNT] = colorCount;
-	str->Read(act->pstColorBytes, 10); // color location in IESDP, sort of a palette index and flags
+	str->Read(act->ignoredFields.pstColorBytes, 10); // color location in IESDP, sort of a palette index and flags
 	str->Seek(21, GEM_CURRENT_POS);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPECIES]); // offset: 0x311
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TEAM]);
@@ -1568,7 +1568,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_AVATARREMOVAL]); //hidden
 	str->Read( &act->SetDeathVar, 1); //set death variable
 	str->Read( &act->IncKillCount, 1); //increase kill count
-	str->Read( &act->UnknownField, 1);
+	str->Read(&act->ignoredFields.unknownIWDByte1, 1);
 	for (int i = 0; i < 5; i++) {
 		str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_INTERNAL_0 + i]);
 	}
@@ -1752,7 +1752,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	}
 	str->Read( &act->SetDeathVar, 1); //set death variable
 	str->Read( &act->IncKillCount, 1); //increase kill count
-	str->Read( &act->UnknownField, 1);
+	str->Read(&act->ignoredFields.unknownIWDByte1, 1);
 	for (int i = 0; i < 5; i++) {
 		str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_INTERNAL_0 + i]);
 	}
@@ -2231,7 +2231,7 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor) const
 	for (int i = 0; i < 7; i++) {
 		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_COLORS + i]);
 	}
-	stream->Write(actor->pstColorBytes, 10);
+	stream->Write(actor->ignoredFields.pstColorBytes, 10);
 	stream->WriteFilling(21);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPECIES]);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TEAM]);
@@ -2255,7 +2255,7 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_AVATARREMOVAL]);
 	stream->Write( &actor->SetDeathVar, 1);
 	stream->Write( &actor->IncKillCount, 1);
-	stream->Write( &actor->UnknownField, 1); //unknown
+	stream->Write(&actor->ignoredFields.unknownIWDByte1, 1);
 	for (int i = 0; i < 5; i++) {
 		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_INTERNAL_0 + i]);
 	}
@@ -2285,7 +2285,7 @@ int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_AVATARREMOVAL]);
 	stream->WriteScalar(actor->SetDeathVar);
 	stream->WriteScalar(actor->IncKillCount);
-	stream->WriteScalar(actor->UnknownField); //unknown
+	stream->WriteScalar(actor->ignoredFields.unknownIWDByte1);
 	for (int i = 0; i < 5; i++) {
 		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_INTERNAL_0 + i]);
 	}
