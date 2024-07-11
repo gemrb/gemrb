@@ -726,9 +726,10 @@ void Map::UpdateScripts()
 	ieDword time = game->Ticks; // make sure everything moves at the same time
 
 	//Run actor scripts (only for 0 priority)
-	size_t q = queue[PR_SCRIPT].size();
+	const auto& runQueue = queue[int(Priority::RunScripts)];
+	size_t q = runQueue.size();
 	while (q--) {
-		Actor* actor = queue[PR_SCRIPT][q];
+		Actor* actor = runQueue[q];
 		//actor just moved away, don't run its script from this side
 		if (actor->GetCurrentArea()!=this) {
 			continue;
@@ -790,9 +791,10 @@ void Map::UpdateScripts()
 	}
 
 	//clean up effects on dead actors too
-	q = queue[PR_DISPLAY].size();
+	const auto& displayQueue = queue[int(Priority::Display)];
+	q = displayQueue.size();
 	while(q--) {
-		Actor* actor = queue[PR_DISPLAY][q];
+		Actor* actor = displayQueue[q];
 		actor->fxqueue.Cleanup();
 	}
 
@@ -837,10 +839,11 @@ void Map::UpdateScripts()
 			continue;
 		}
 
-		q = queue[PR_SCRIPT].size();
+		const auto& runQueue = queue[int(Priority::RunScripts)];
+		q = runQueue.size();
 		ieDword exitID = ip->GetGlobalID();
 		while (q--) {
-			Actor *actor = queue[PR_SCRIPT][q];
+			Actor* actor = runQueue[q];
 			if (ip->Type == ST_PROXIMITY) {
 				if (ip->Entered(actor)) {
 					// if trap triggered, then mark actor
@@ -1036,13 +1039,13 @@ Container* Map::GetNextPile(size_t& index) const
 Actor *Map::GetNextActor(int &q, size_t &index) const
 {
 	while (true) {
-		switch(q) {
-			case PR_SCRIPT:
+		switch (Priority(q)) {
+			case Priority::RunScripts:
 				if (index--)
 					return queue[q][index];
 				q--;
 				return nullptr;
-			case PR_DISPLAY:
+			case Priority::Display:
 				if (index--)
 					return queue[q][index];
 				q--;
@@ -1232,7 +1235,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	//drawing queues 1 and 0
 	//starting with lower priority
 	//so displayed, but inactive actors (dead) will be drawn over
-	int q = PR_DISPLAY;
+	int q = int(Priority::Display);
 	size_t index = queue[q].size();
 	Actor* actor = GetNextActor(q, index);
 
@@ -2695,20 +2698,20 @@ bool Map::BehindWall(const Point& pos, const Region& r) const
 	return !polys.first.empty();
 }
 
-int Map::SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) const
+Priority Map::SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) const
 {
 	ieDword stance = actor->GetStance();
 	ieDword internalFlag = actor->GetInternalFlag();
 	bool scheduled = actor->Schedule(gameTime, false);
 
-	int priority;
+	Priority priority;
 	if (internalFlag & IF_ACTIVE) {
 		if (stance == IE_ANI_TWITCH && (internalFlag & IF_IDLE)) {
-			priority = PR_DISPLAY; // only draw
+			priority = Priority::Display; // only draw
 		} else if (scheduled) {
-			priority = PR_SCRIPT; // run scripts and display
+			priority = Priority::RunScripts; // run scripts and display
 		} else {
-			priority = PR_IGNORE; // don't run scripts for out of schedule actors
+			priority = Priority::Ignore; // don't run scripts for out of schedule actors
 		}
 
 		if (IsVisible(actor->Pos) && !actor->GetStat(IE_AVATARREMOVAL)) {
@@ -2716,12 +2719,12 @@ int Map::SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) const
 		}
 		// dead actors are always visible on the map, but run no scripts
 	} else if (stance == IE_ANI_TWITCH || stance == IE_ANI_DIE) {
-		priority = PR_DISPLAY;
+		priority = Priority::Display;
 	} else {
 		bool visible = IsVisible(actor->Pos);
 		// even if a creature is offscreen, they should still get an AI update every 3 ticks
 		if (scheduled && (visible || actor->ForceScriptCheck()))  {
-			priority = PR_SCRIPT; // run scripts and display, activated now
+			priority = Priority::RunScripts; // run scripts and display, activated now
 			// more like activate!
 			actor->Activate();
 			if (visible && !actor->GetStat(IE_AVATARREMOVAL)) {
@@ -2729,7 +2732,7 @@ int Map::SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) const
 				hostilesNew |= HandleAutopauseForVisible(actor, !hostilesVisible);
 			}
 		} else {
-			priority = PR_IGNORE;
+			priority = Priority::Ignore;
 		}
 	}
 	return priority;
@@ -2740,11 +2743,11 @@ int Map::SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) const
 void Map::GenerateQueues()
 {
 	unsigned int i=(unsigned int) actors.size();
-	for (int priority = 0; priority < QUEUE_COUNT; priority++) {
+	for (const Priority priority : EnumIterator<Priority, Priority::RunScripts, Priority::Ignore>()) {
 		if (lastActorCount[priority] != i) {
 			lastActorCount[priority] = i;
 		}
-		queue[priority].clear();
+		queue[int(priority)].clear();
 	}
 
 	ieDword gametime = core->GetGame()->GameTime;
@@ -2757,11 +2760,10 @@ void Map::GenerateQueues()
 			continue;
 		}
 
-		int priority = SetPriority(actor, hostilesNew, gametime);
-		//we ignore priority 2
-		if (priority>=PR_IGNORE) continue;
+		Priority priority = SetPriority(actor, hostilesNew, gametime);
+		if (priority >= Priority::Ignore) continue;
 
-		queue[priority].push_back(actor);
+		queue[int(priority)].push_back(actor);
 	}
 	hostilesVisible = hostilesNew;
 }

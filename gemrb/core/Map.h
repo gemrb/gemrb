@@ -263,13 +263,14 @@ public:
 
 enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJECTILE, AOT_PILE};
 
-//i believe we need only the active actors/visible inactive actors queues
-#define QUEUE_COUNT 2
-
 //priorities when handling actors, we really ignore the third one
-#define PR_SCRIPT  0
-#define PR_DISPLAY 1
-#define PR_IGNORE  2
+enum class Priority : uint8_t {
+	RunScripts, // run scripts and display
+	Display, // only draw
+	Ignore, // also queue count
+
+	count
+};
 
 enum MAP_DEBUG_FLAGS : uint32_t {
 	DEBUG_SHOW_INFOPOINTS   	= 0x01,
@@ -391,8 +392,8 @@ private:
 	std::vector< Ambient*> ambients;
 	std::vector<MapNote> mapnotes;
 	std::vector< Spawn*> spawns;
-	std::vector<Actor*> queue[QUEUE_COUNT];
-	unsigned int lastActorCount[QUEUE_COUNT]{};
+	std::vector<Actor*> queue[int(Priority::Ignore)];
+	EnumArray<Priority, unsigned int> lastActorCount;
 	bool hostilesVisible = false;
 
 	VideoBufferPtr wallStencil = nullptr;
@@ -687,7 +688,7 @@ private:
 
 	void GenerateQueues();
 	void SortQueues();
-	int SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) const;
+	Priority SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) const;
 	//Actor* GetRoot(int priority, int &index);
 	void DeleteActor(size_t idx);
 	//actor uses travel region
