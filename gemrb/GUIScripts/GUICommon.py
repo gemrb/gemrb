@@ -214,7 +214,7 @@ def AddClassAbility (pc, ab):
 		GemRB.Log (LOG_ERROR, "AddClassAbilities", "Unknown class ability (type): " + ab)
 
 def MakeSpellCount (pc, spell, count):
-	have = GemRB.CountSpells (pc, spell, 1)
+	have = GemRB.CountSpells (pc, spell, -1)
 	if count<=have:
 		return
 	# only used for innates, which are all level 1
