@@ -29,6 +29,8 @@ from ie_restype import RES_SPL
 from ie_spells import LS_MEMO
 from GUIDefines import *
 
+FeatSPLs = []
+
 # barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
 # same order as in classes.2da / class IDs
 Levels = [ IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
@@ -202,6 +204,8 @@ def SetSpellFocus (pc):
 
 # make sure this function remains idempotent
 def LearnFeatInnates (pc, party, setup):
+	global FeatSPLs
+
 	# npcs don't have these feat spells yet, eg. 00solbas is missing power attack
 	# party members are handled more sanely during cg/level up
 	if setup or not party:
@@ -223,6 +227,13 @@ def LearnFeatInnates (pc, party, setup):
 	if setup == True:
 		return
 
+	# cache feat spell existence checks, since this gets called on every actor
+	if not FeatSPLs:
+		for i in range(96): # MAX_FEATS
+			featSPL = "FEAT{:02x}".format(i)
+			if GemRB.HasResource (featSPL, RES_SPL, 1):
+				FeatSPLs.append (featSPL)
+
 	# feats with spell payloads
 	# these spells have non-permanent timing, don't survive saves, so
 	# we have to reapply them on everyone
@@ -231,7 +242,7 @@ def LearnFeatInnates (pc, party, setup):
 		if not level:
 			continue
 		featSPL = "FEAT{:02x}".format(i)
-		if GemRB.HasResource (featSPL, RES_SPL, 1):
+		if featSPL in FeatSPLs:
 			GemRB.ApplySpell (pc, featSPL, pc)
 
 def ApplyFeatsIWD2(MyChar):
