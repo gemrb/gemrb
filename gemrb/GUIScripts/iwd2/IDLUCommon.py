@@ -187,6 +187,30 @@ def LearnFeatInnates (pc):
 	SetSpell (pc, "SPIN278", FEAT_HAMSTRING)
 	SetSpell (pc, "SPIN279", FEAT_RAPID_SHOT)
 
+	# recheck if we need to do anything about new spell focus feats
+	SPLFocusTable = GemRB.LoadTable ("splfocus")
+	for i in range(SPLFocusTable.GetRowCount()):
+		Row = SPLFocusTable.GetRowName (i)
+		Stat = SPLFocusTable.GetValue (Row, "STAT", GTV_STAT)
+		if not Stat:
+			continue
+		Column = GemRB.GetPlayerStat (pc, Stat)
+		if not Column:
+			continue
+		bonus = SPLFocusTable.GetValue (i, Column)
+		if not bonus:
+			continue
+		# ok, so we have the feat and it does have a bonus assigned in the table
+		# make sure we don't duplicate the effect, since it is cummulative
+		focused = GemRB.CountEffects (pc, "SpellFocus", bonus, i)
+		if focused:
+			continue
+		# what if we're upgrading to greater spell focus? Remove and readd
+		focused = GemRB.CountEffects (pc, "SpellFocus", -1, i)
+		if focused:
+			GemRB.DispelEffect (pc, "SpellFocus", i)
+		GemRB.ApplyEffect (pc, "SpellFocus", bonus, i, "", "", "", "SPLFOCUS", 1)
+
 def ApplyFeatsIWD2(MyChar):
 	# npcs don't have these feat spells yet, eg. 00solbas is missing power attack
 	if GemRB.GetPlayerStat (MyChar, IE_EA) != 2: # EA_PC
@@ -232,18 +256,4 @@ def ApplyFeatsIWD2(MyChar):
 	else:
 		GemRB.RemoveSpell (MyChar, "SPIN232")
 
-	# remove any previous SPLFOCUS
-	#GemRB.ApplyEffect(MyChar, "RemoveEffects", 0, 0, "SPLFOCUS")
-	# spell focus stats
-	SPLFocusTable = GemRB.LoadTable ("splfocus")
-	for i in range(SPLFocusTable.GetRowCount()):
-		Row = SPLFocusTable.GetRowName (i)
-		Stat = SPLFocusTable.GetValue (Row, "STAT", GTV_STAT)
-		if Stat:
-			Column = GemRB.GetPlayerStat (MyChar, Stat)
-			if Column:
-				Value = SPLFocusTable.GetValue (i, Column)
-				if Value:
-					# add the effect, value could be 2 or 4, timing mode is 8 - so it is not saved
-					GemRB.ApplyEffect (MyChar, "SpellFocus", Value, i, "", "", "", "SPLFOCUS", 8)
 	return
