@@ -661,6 +661,11 @@ def UpdateActionsWindow ():
 	#we are sure there is only one actor selected
 	pc = GemRB.GameGetFirstSelectedActor ()
 
+	# iwd2 summons all use the group actionbar!
+	if GameCheck.IsIWD2 () and GemRB.GetPlayerStat (pc, IE_EA) != 2: # EA_PC
+		GroupControls ()
+		return
+
 	level = GemRB.GetVar ("ActionLevel")
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == UAW_STANDARD:
