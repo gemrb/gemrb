@@ -472,17 +472,10 @@ def ApplyFeats(MyChar):
 	if not GameCheck.IsIWD2():
 		return
 
-	#feats giving a single innate ability
-	SetSpell(MyChar, "SPIN111", FEAT_WILDSHAPE_BOAR)
-	SetSpell(MyChar, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
-	SetSpell(MyChar, "SPIN231", FEAT_ENVENOM_WEAPON)
-	SetSpell(MyChar, "SPIN245", FEAT_WILDSHAPE_PANTHER)
-	SetSpell(MyChar, "SPIN246", FEAT_WILDSHAPE_SHAMBLER)
-	SetSpell(MyChar, "SPIN275", FEAT_POWER_ATTACK)
-	SetSpell(MyChar, "SPIN276", FEAT_EXPERTISE)
-	SetSpell(MyChar, "SPIN277", FEAT_ARTERIAL_STRIKE)
-	SetSpell(MyChar, "SPIN278", FEAT_HAMSTRING)
-	SetSpell(MyChar, "SPIN279", FEAT_RAPID_SHOT)
+	# npcs don't have these feat spells yet, eg. 00solbas is missing power attack
+	if GemRB.GetPlayerStat (MyChar, IE_EA) != 2: # EA_PC
+		import IDLUCommon
+		IDLUCommon.LearnFeatInnates (MyChar)
 
 	#extra rage
 	level = GemRB.GetPlayerStat(MyChar, IE_LEVELBARBARIAN)

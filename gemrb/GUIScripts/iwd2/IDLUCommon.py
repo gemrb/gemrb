@@ -24,7 +24,7 @@ import CommonTables
 import GUICommon
 import Spellbook
 from ie_stats import *
-from ie_feats import FEAT_EXTRA_SHAPESHIFTING
+from ie_feats import *
 from GUIDefines import *
 
 # barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
@@ -158,3 +158,16 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 				# actually checks level+1 (runs if level-1 has memorizations)
 				Spellbook.LearnPriestSpells (pc, slevel, booktype, BaseClassName)
 				break
+
+def LearnFeatInnates (pc):
+	from LUCommon import SetSpell
+	SetSpell (pc, "SPIN111", FEAT_WILDSHAPE_BOAR)
+	SetSpell (pc, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
+	SetSpell (pc, "SPIN231", FEAT_ENVENOM_WEAPON)
+	SetSpell (pc, "SPIN245", FEAT_WILDSHAPE_PANTHER)
+	SetSpell (pc, "SPIN246", FEAT_WILDSHAPE_SHAMBLER)
+	SetSpell (pc, "SPIN275", FEAT_POWER_ATTACK)
+	SetSpell (pc, "SPIN276", FEAT_EXPERTISE)
+	SetSpell (pc, "SPIN277", FEAT_ARTERIAL_STRIKE)
+	SetSpell (pc, "SPIN278", FEAT_HAMSTRING)
+	SetSpell (pc, "SPIN279", FEAT_RAPID_SHOT)
