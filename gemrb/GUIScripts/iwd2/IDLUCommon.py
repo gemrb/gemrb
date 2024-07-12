@@ -25,6 +25,7 @@ import GUICommon
 import Spellbook
 from ie_stats import *
 from ie_feats import *
+from ie_restype import RES_SPL
 from ie_spells import LS_MEMO
 from GUIDefines import *
 
@@ -200,25 +201,41 @@ def SetSpellFocus (pc):
 		GemRB.ApplyEffect (pc, "SpellFocus", bonus, i, "", "", "", "SPLFOCUS", 1)
 
 # make sure this function remains idempotent
-def LearnFeatInnates (pc):
-	SetSpell (pc, "SPIN111", FEAT_WILDSHAPE_BOAR)
-	SetSpell (pc, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
-	SetSpell (pc, "SPIN231", FEAT_ENVENOM_WEAPON)
-	SetSpell (pc, "SPIN245", FEAT_WILDSHAPE_PANTHER)
-	SetSpell (pc, "SPIN246", FEAT_WILDSHAPE_SHAMBLER)
-	SetSpell (pc, "SPIN275", FEAT_POWER_ATTACK)
-	SetSpell (pc, "SPIN276", FEAT_EXPERTISE)
-	SetSpell (pc, "SPIN277", FEAT_ARTERIAL_STRIKE)
-	SetSpell (pc, "SPIN278", FEAT_HAMSTRING)
-	SetSpell (pc, "SPIN279", FEAT_RAPID_SHOT)
+def LearnFeatInnates (pc, party, setup):
+	# npcs don't have these feat spells yet, eg. 00solbas is missing power attack
+	# party members are handled more sanely during cg/level up
+	if setup or not party:
+		SetSpell (pc, "SPIN111", FEAT_WILDSHAPE_BOAR)
+		SetSpell (pc, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
+		SetSpell (pc, "SPIN231", FEAT_ENVENOM_WEAPON)
+		SetSpell (pc, "SPIN245", FEAT_WILDSHAPE_PANTHER)
+		SetSpell (pc, "SPIN246", FEAT_WILDSHAPE_SHAMBLER)
+		SetSpell (pc, "SPIN275", FEAT_POWER_ATTACK)
+		SetSpell (pc, "SPIN276", FEAT_EXPERTISE)
+		SetSpell (pc, "SPIN277", FEAT_ARTERIAL_STRIKE)
+		SetSpell (pc, "SPIN278", FEAT_HAMSTRING)
+		SetSpell (pc, "SPIN279", FEAT_RAPID_SHOT)
 
-	# recheck if we need to do anything about new spell focus feats
-	SetSpellFocus (pc)
+		# recheck if we need to do anything about new spell focus feats
+		SetSpellFocus (pc)
+
+	# apply the rest on area entry
+	if setup == True:
+		return
+
+	# feats with spell payloads
+	# these spells have non-permanent timing, don't survive saves, so
+	# we have to reapply them on everyone
+	for i in range(96): # MAX_FEATS
+		level = GemRB.HasFeat (pc, i)
+		if not level:
+			continue
+		featSPL = "FEAT{:02x}".format(i)
+		if GemRB.HasResource (featSPL, RES_SPL, 1):
+			GemRB.ApplySpell (pc, featSPL, pc)
 
 def ApplyFeatsIWD2(MyChar):
-	# npcs don't have these feat spells yet, eg. 00solbas is missing power attack
-	if MyChar > 1000: # did we get passed a global id?
-		LearnFeatInnates (MyChar)
+	LearnFeatInnates (MyChar, MyChar < 1000, False) # did we get passed a global id?
 
 	# extra rage
 	level = GemRB.GetPlayerStat (MyChar, IE_LEVELBARBARIAN)

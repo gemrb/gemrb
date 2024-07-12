@@ -5855,17 +5855,6 @@ void Actor::InitStatsOnLoad()
 //most feats are simulated via spells (feat<xx>)
 void Actor::ApplyFeats()
 {
-	ResRef feat;
-
-	for(int i=0;i<MAX_FEATS;i++) {
-		int level = GetFeat(i);
-		feat.Format("FEAT{:02x}", i);
-		if (level) {
-			if (gamedata->Exists(feat, IE_SPL_CLASS_ID, true)) {
-				core->ApplySpell(feat, this, this, level);
-			}
-		}
-	}
 	//apply scripted feats
 	ScriptEngine::FunctionParameters params;
 	if (InParty) {

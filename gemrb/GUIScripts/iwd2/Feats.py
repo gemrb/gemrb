@@ -422,7 +422,7 @@ def NextPress(save=1):
 
 		# learn the feat spells
 		# for chargen we do it at the last phase instead
-		IDLUCommon.LearnFeatInnates (pc)
+		IDLUCommon.LearnFeatInnates (pc, pc, 2)
 
 		# open up the next levelup window
 		import Spells

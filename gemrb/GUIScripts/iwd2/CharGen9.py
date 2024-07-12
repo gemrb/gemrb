@@ -218,7 +218,7 @@ def NextPress():
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 
 	# feats are set already in the Feats step, but not all their consequences, since users could backpedal
-	IDLUCommon.LearnFeatInnates (MyChar)
+	IDLUCommon.LearnFeatInnates (MyChar, MyChar, True)
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")

@@ -38,5 +38,5 @@ def LoadPartyCharacters():
 			# ensure they get all their feat spells
 			# eg. Mordakai of Thay doesn't get his spell focus until
 			# the next level up with feats otherwise
-			IDLUCommon.LearnFeatInnates (j)
+			IDLUCommon.LearnFeatInnates (j, j, True)
 	return
