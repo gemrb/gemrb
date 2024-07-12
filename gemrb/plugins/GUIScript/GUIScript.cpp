@@ -11961,7 +11961,7 @@ This function cam be used to add stats that are stored in effect blocks.\n\
 \n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
-  * opcode   - the effect opcode (for values see effects.ids)\n\
+  * opcode   - the effect opcode name (for values see effects.ids)\n\
   * param1   - parameter 1 for the opcode\n\
   * param2   - parameter 2 for the opcode\n\
   * resref   - (optional) resource reference to set in effect\n\
@@ -12035,7 +12035,7 @@ If a parameter is set to -1, it will be ignored.\n\
 \n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
-  * opcode   - the effect opcode (for values see effects.ids)\n\
+  * opcode   - the effect opcode name (for values see effects.ids)\n\
   * param1   - parameter 1 for the opcode\n\
   * param2   - parameter 2 for the opcode\n\
   * resref   - optional resource reference to match the effect\n\
@@ -12044,7 +12044,7 @@ If a parameter is set to -1, it will be ignored.\n\
 \n\
 **Examples:**\n\
 \n\
-    res = GemRB.CountEffect (MyChar, 'HLA', -1, -1, AbilityName)\n\
+    res = GemRB.CountEffects (MyChar, 'HLA', -1, -1, AbilityName)\n\
 \n\
 The above example returns how many HLA effects were applied on the character.\n\
 \n\
