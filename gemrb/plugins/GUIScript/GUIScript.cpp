@@ -12032,10 +12032,11 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_CountEffects__doc,
 "===== CountEffects =====\n\
 \n\
-**Prototype:** GemRB.CountEffects (globalID, opcode, param1, param2[, resref])\n\
+**Prototype:** GemRB.CountEffects (globalID, opcode, param1, param2[, resref='', source=''])\n\
 \n\
 **Description:** Counts how many matching effects are applied on the actor. \n\
 If a parameter is set to -1, it will be ignored.\n\
+If a opcode is set to '', any opcode will be matched.\n\
 \n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
@@ -12043,6 +12044,7 @@ If a parameter is set to -1, it will be ignored.\n\
   * param1   - parameter 1 for the opcode\n\
   * param2   - parameter 2 for the opcode\n\
   * resref   - optional resource reference to match the effect\n\
+  * source   - optional resource reference to match the effect source\n\
 \n\
 **Return value:** the count\n\
 \n\
@@ -12061,13 +12063,14 @@ static PyObject* GemRB_CountEffects(PyObject * /*self*/, PyObject* args)
 	const char *opcodename;
 	int param1, param2;
 	PyObject* resref = nullptr;
-	PARSE_ARGS(args,  "isii|O", &globalID, &opcodename, &param1, &param2, &resref);
+	PyObject* sourceRef = nullptr;
+	PARSE_ARGS(args, "isii|OO", &globalID, &opcodename, &param1, &param2, &resref, &sourceRef);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
 	work_ref.Name=opcodename;
 	work_ref.opcode=-1;
-	ieDword ret = actor->fxqueue.CountEffects(work_ref, param1, param2, ResRefFromPy(resref));
+	ieDword ret = actor->fxqueue.CountEffects(work_ref, param1, param2, ResRefFromPy(resref), ResRefFromPy(sourceRef));
 	return PyLong_FromLong(ret);
 }
 

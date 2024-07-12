@@ -343,13 +343,15 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 
 //return the count of effects with matching parameters
 //useful for effects where there is no separate stat to see
-ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const ResRef &resource) const
+ieDword EffectQueue::CountEffects(EffectRef& effect_reference, ieDword param1, ieDword param2, const ResRef& resource, const ResRef& source) const
 {
-	Globals::ResolveEffectRef(effect_reference);
-	if( effect_reference.opcode<0) {
-		return 0;
+	if (effect_reference.Name[0]) {
+		Globals::ResolveEffectRef(effect_reference);
+		if (effect_reference.opcode < 0) {
+			return 0;
+		}
 	}
-	return CountEffects(effect_reference.opcode, param1, param2, resource);
+	return CountEffects(effect_reference.opcode, param1, param2, resource, source);
 }
 
 //Change the location of an existing effect
@@ -2214,17 +2216,19 @@ Effect *EffectQueue::GetNextEffect(queue_t::iterator &f)
 	return nullptr;
 }
 
-ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2, const ResRef &resource) const
+ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2, const ResRef& resource, const ResRef& source) const
 {
 	ieDword cnt = 0;
 
 	for (const auto& fx : effects) {
-		MATCH_OPCODE()
+		if (opcode != 0xffffffff)
+			MATCH_OPCODE()
 		if( param1!=0xffffffff)
 			MATCH_PARAM1()
 		if( param2!=0xffffffff)
 			MATCH_PARAM2()
 		if (!resource.IsEmpty() && fx.Resource != resource) continue;
+		if (!source.IsEmpty() && fx.SourceRef != source) continue;
 		cnt++;
 	}
 	return cnt;
