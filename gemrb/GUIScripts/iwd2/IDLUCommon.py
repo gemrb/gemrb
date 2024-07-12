@@ -25,6 +25,7 @@ import GUICommon
 import Spellbook
 from ie_stats import *
 from ie_feats import *
+from ie_spells import LS_MEMO
 from GUIDefines import *
 
 # barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
@@ -159,8 +160,22 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 				Spellbook.LearnPriestSpells (pc, slevel, booktype, BaseClassName)
 				break
 
+def SetSpell(pc, SpellName, Feat):
+	if GemRB.HasFeat (pc, Feat):
+		MakeSpellCount(pc, SpellName, 1)
+	else:
+		GemRB.RemoveSpell(pc, SpellName)
+	return
+
+def MakeSpellCount (pc, spell, count):
+	have = GemRB.CountSpells (pc, spell, -1)
+	if count <= have:
+		return
+	# only used for innates, which are all level 1
+	Spellbook.LearnSpell (pc, spell, IE_IWD2_SPELL_INNATE, 0, count - have, LS_MEMO)
+	return
+
 def LearnFeatInnates (pc):
-	from LUCommon import SetSpell
 	SetSpell (pc, "SPIN111", FEAT_WILDSHAPE_BOAR)
 	SetSpell (pc, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
 	SetSpell (pc, "SPIN231", FEAT_ENVENOM_WEAPON)

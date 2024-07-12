@@ -213,14 +213,6 @@ def AddClassAbility (pc, ab):
 	else:
 		GemRB.Log (LOG_ERROR, "AddClassAbilities", "Unknown class ability (type): " + ab)
 
-def MakeSpellCount (pc, spell, count):
-	have = GemRB.CountSpells (pc, spell, -1)
-	if count<=have:
-		return
-	# only used for innates, which are all level 1
-	Spellbook.LearnSpell (pc, spell, IE_IWD2_SPELL_INNATE, 0, count-have, LS_MEMO)
-	return
-
 # remove all class abilities up to the given level
 # for dual-classing mainly
 def RemoveClassAbilities (pc, table, Level):

@@ -472,9 +472,9 @@ def ApplyFeats(MyChar):
 	if not GameCheck.IsIWD2():
 		return
 
+	import IDLUCommon
 	# npcs don't have these feat spells yet, eg. 00solbas is missing power attack
 	if GemRB.GetPlayerStat (MyChar, IE_EA) != 2: # EA_PC
-		import IDLUCommon
 		IDLUCommon.LearnFeatInnates (MyChar)
 
 	#extra rage
@@ -487,7 +487,7 @@ def ApplyFeats(MyChar):
 			GemRB.RemoveSpell(MyChar, "SPIN260")
 			Spell = "SPIN236"
 		cnt = GemRB.GetPlayerStat (MyChar, IE_FEAT_EXTRA_RAGE) + (level + 3) // 4
-		GUICommon.MakeSpellCount(MyChar, Spell, cnt)
+		IDLUCommon.MakeSpellCount (MyChar, Spell, cnt)
 	else:
 		GemRB.RemoveSpell(MyChar, "SPIN236")
 		GemRB.RemoveSpell(MyChar, "SPIN260")
@@ -496,7 +496,7 @@ def ApplyFeats(MyChar):
 	level = GemRB.GetPlayerStat(MyChar, IE_LEVELPALADIN)
 	if level>1:
 		cnt = GemRB.GetPlayerStat (MyChar, IE_FEAT_EXTRA_SMITING) + 1
-		GUICommon.MakeSpellCount(MyChar, "SPIN152", cnt)
+		IDLUCommon.MakeSpellCount (MyChar, "SPIN152", cnt)
 	else:
 		GemRB.RemoveSpell(MyChar, "SPIN152")
 
@@ -506,14 +506,14 @@ def ApplyFeats(MyChar):
 		cnt = GUICommon.GetAbilityBonus(MyChar, IE_CHR) + 3
 		if cnt<1: cnt = 1
 		cnt += GemRB.GetPlayerStat (MyChar, IE_FEAT_EXTRA_TURNING)
-		GUICommon.MakeSpellCount(MyChar, "SPIN970", cnt)
+		IDLUCommon.MakeSpellCount (MyChar, "SPIN970", cnt)
 	else:
 		GemRB.RemoveSpell(MyChar, "SPIN970")
 
 	#stunning fist
 	if GemRB.HasFeat (MyChar, FEAT_STUNNING_FIST):
 		cnt = GemRB.GetPlayerStat(MyChar, IE_CLASSLEVELSUM) // 4
-		GUICommon.MakeSpellCount(MyChar, "SPIN232", cnt)
+		IDLUCommon.MakeSpellCount (MyChar, "SPIN232", cnt)
 	else:
 		GemRB.RemoveSpell(MyChar, "SPIN232")
 
@@ -532,11 +532,3 @@ def ApplyFeats(MyChar):
 					#add the effect, value could be 2 or 4, timing mode is 8 - so it is not saved
 					GemRB.ApplyEffect(MyChar, "SpellFocus", Value, i,"","","","SPLFOCUS", 8)
 	return
-
-def SetSpell(pc, SpellName, Feat):
-	if GemRB.HasFeat (pc, Feat):
-		GUICommon.MakeSpellCount(pc, SpellName, 1)
-	else:
-		GemRB.RemoveSpell(pc, SpellName)
-	return
-
