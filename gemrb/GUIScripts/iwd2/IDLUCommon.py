@@ -186,3 +186,64 @@ def LearnFeatInnates (pc):
 	SetSpell (pc, "SPIN277", FEAT_ARTERIAL_STRIKE)
 	SetSpell (pc, "SPIN278", FEAT_HAMSTRING)
 	SetSpell (pc, "SPIN279", FEAT_RAPID_SHOT)
+
+def ApplyFeatsIWD2(MyChar):
+	# npcs don't have these feat spells yet, eg. 00solbas is missing power attack
+	if GemRB.GetPlayerStat (MyChar, IE_EA) != 2: # EA_PC
+		LearnFeatInnates (MyChar)
+
+	# extra rage
+	level = GemRB.GetPlayerStat (MyChar, IE_LEVELBARBARIAN)
+	if level > 0:
+		if level >= 15:
+			GemRB.RemoveSpell (MyChar, "SPIN236")
+			Spell = "SPIN260"
+		else:
+			GemRB.RemoveSpell (MyChar, "SPIN260")
+			Spell = "SPIN236"
+		cnt = GemRB.GetPlayerStat (MyChar, IE_FEAT_EXTRA_RAGE) + (level + 3) // 4
+		MakeSpellCount (MyChar, Spell, cnt)
+	else:
+		GemRB.RemoveSpell(MyChar, "SPIN236")
+		GemRB.RemoveSpell(MyChar, "SPIN260")
+
+	# extra smiting
+	level = GemRB.GetPlayerStat(MyChar, IE_LEVELPALADIN)
+	if level > 1:
+		cnt = GemRB.GetPlayerStat (MyChar, IE_FEAT_EXTRA_SMITING) + 1
+		MakeSpellCount (MyChar, "SPIN152", cnt)
+	else:
+		GemRB.RemoveSpell (MyChar, "SPIN152")
+
+	# extra turning
+	level = GemRB.GetPlayerStat (MyChar, IE_TURNUNDEADLEVEL)
+	if level>0:
+		cnt = GUICommon.GetAbilityBonus (MyChar, IE_CHR) + 3
+		if cnt<1: cnt = 1
+		cnt += GemRB.GetPlayerStat (MyChar, IE_FEAT_EXTRA_TURNING)
+		MakeSpellCount (MyChar, "SPIN970", cnt)
+	else:
+		GemRB.RemoveSpell (MyChar, "SPIN970")
+
+	# stunning fist
+	if GemRB.HasFeat (MyChar, FEAT_STUNNING_FIST):
+		cnt = GemRB.GetPlayerStat(MyChar, IE_CLASSLEVELSUM) // 4
+		MakeSpellCount (MyChar, "SPIN232", cnt)
+	else:
+		GemRB.RemoveSpell (MyChar, "SPIN232")
+
+	# remove any previous SPLFOCUS
+	#GemRB.ApplyEffect(MyChar, "RemoveEffects", 0, 0, "SPLFOCUS")
+	# spell focus stats
+	SPLFocusTable = GemRB.LoadTable ("splfocus")
+	for i in range(SPLFocusTable.GetRowCount()):
+		Row = SPLFocusTable.GetRowName (i)
+		Stat = SPLFocusTable.GetValue (Row, "STAT", GTV_STAT)
+		if Stat:
+			Column = GemRB.GetPlayerStat (MyChar, Stat)
+			if Column:
+				Value = SPLFocusTable.GetValue (i, Column)
+				if Value:
+					# add the effect, value could be 2 or 4, timing mode is 8 - so it is not saved
+					GemRB.ApplyEffect (MyChar, "SpellFocus", Value, i, "", "", "", "SPLFOCUS", 8)
+	return
