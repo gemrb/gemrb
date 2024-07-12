@@ -11478,7 +11478,7 @@ This function can be used to add abilities that are stored as spells \n\
 **Parameters:**\n\
   * globalID - party ID or global ID of the actor to use\n\
   * resref   - spell resource reference\n\
-  * casterID - global id of the desired caster\n\
+  * casterID - global id of the desired caster or the index in the party\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -11497,7 +11497,11 @@ static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 
 	Actor *caster = NULL;
 	const Map *map = game->GetCurrentArea();
-	if (map) caster = map->GetActorByGlobalID(casterID);
+	if (casterID < 1000) {
+		caster = game->FindPC(casterID);
+	} else if (map) {
+		caster = map->GetActorByGlobalID(casterID);
+	}
 	if (!caster) caster = game->GetActorByGlobalID(casterID);
 	if (!caster) caster = actor;
 
