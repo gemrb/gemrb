@@ -8043,7 +8043,7 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 PyDoc_STRVAR( GemRB_CountSpells__doc,
 "===== CountSpells =====\n\
 \n\
-**Prototype:** GemRB.CountSpells (PartyID, SpellName[, SpellType, Flag])\n\
+**Prototype:** GemRB.CountSpells (PartyID, SpellName[, SpellType=-1, Flag=0])\n\
 \n\
 **Description:** Returns number of memorized spells of given name and type \n\
 in PC's spellbook. If flag is set then spent spells are also count.\n\
@@ -8051,7 +8051,11 @@ in PC's spellbook. If flag is set then spent spells are also count.\n\
 **Parameters:**\n\
   * PartyID   - the PC's position in the party\n\
   * SpellName - spell to count\n\
-  * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
+  * SpellType:\n\
+    - -1 - any\n\
+    - 0 - priest\n\
+    - 1 - wizard\n\
+    - 2 - innate\n\
   * Flag      - count depleted spells too?\n\
 \n\
 **Return value:** integer\n\
