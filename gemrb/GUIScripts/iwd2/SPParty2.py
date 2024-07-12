@@ -18,6 +18,7 @@
 #
 #Single Player Party Select
 import GemRB
+import IDLUCommon
 from GameCheck import MAX_PARTY_SIZE
 
 def OnLoad():
@@ -34,4 +35,8 @@ def LoadPartyCharacters():
 		CharName = GemRB.GetINIPartyKey(Tag, Key, "")
 		if CharName !="":
 			GemRB.CreatePlayer(CharName, j, 1)
+			# ensure they get all their feat spells
+			# eg. Mordakai of Thay doesn't get his spell focus until
+			# the next level up with feats otherwise
+			IDLUCommon.LearnFeatInnates (j)
 	return
