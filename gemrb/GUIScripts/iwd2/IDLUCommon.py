@@ -175,20 +175,7 @@ def MakeSpellCount (pc, spell, count):
 	Spellbook.LearnSpell (pc, spell, IE_IWD2_SPELL_INNATE, 0, count - have, LS_MEMO)
 	return
 
-# make sure this function remains idempotent
-def LearnFeatInnates (pc):
-	SetSpell (pc, "SPIN111", FEAT_WILDSHAPE_BOAR)
-	SetSpell (pc, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
-	SetSpell (pc, "SPIN231", FEAT_ENVENOM_WEAPON)
-	SetSpell (pc, "SPIN245", FEAT_WILDSHAPE_PANTHER)
-	SetSpell (pc, "SPIN246", FEAT_WILDSHAPE_SHAMBLER)
-	SetSpell (pc, "SPIN275", FEAT_POWER_ATTACK)
-	SetSpell (pc, "SPIN276", FEAT_EXPERTISE)
-	SetSpell (pc, "SPIN277", FEAT_ARTERIAL_STRIKE)
-	SetSpell (pc, "SPIN278", FEAT_HAMSTRING)
-	SetSpell (pc, "SPIN279", FEAT_RAPID_SHOT)
-
-	# recheck if we need to do anything about new spell focus feats
+def SetSpellFocus (pc):
 	SPLFocusTable = GemRB.LoadTable ("splfocus")
 	for i in range(SPLFocusTable.GetRowCount()):
 		Row = SPLFocusTable.GetRowName (i)
@@ -211,6 +198,22 @@ def LearnFeatInnates (pc):
 		if focused:
 			GemRB.DispelEffect (pc, "SpellFocus", i)
 		GemRB.ApplyEffect (pc, "SpellFocus", bonus, i, "", "", "", "SPLFOCUS", 1)
+
+# make sure this function remains idempotent
+def LearnFeatInnates (pc):
+	SetSpell (pc, "SPIN111", FEAT_WILDSHAPE_BOAR)
+	SetSpell (pc, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
+	SetSpell (pc, "SPIN231", FEAT_ENVENOM_WEAPON)
+	SetSpell (pc, "SPIN245", FEAT_WILDSHAPE_PANTHER)
+	SetSpell (pc, "SPIN246", FEAT_WILDSHAPE_SHAMBLER)
+	SetSpell (pc, "SPIN275", FEAT_POWER_ATTACK)
+	SetSpell (pc, "SPIN276", FEAT_EXPERTISE)
+	SetSpell (pc, "SPIN277", FEAT_ARTERIAL_STRIKE)
+	SetSpell (pc, "SPIN278", FEAT_HAMSTRING)
+	SetSpell (pc, "SPIN279", FEAT_RAPID_SHOT)
+
+	# recheck if we need to do anything about new spell focus feats
+	SetSpellFocus (pc)
 
 def ApplyFeatsIWD2(MyChar):
 	# npcs don't have these feat spells yet, eg. 00solbas is missing power attack
