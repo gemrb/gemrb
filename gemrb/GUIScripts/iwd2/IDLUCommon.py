@@ -175,6 +175,7 @@ def MakeSpellCount (pc, spell, count):
 	Spellbook.LearnSpell (pc, spell, IE_IWD2_SPELL_INNATE, 0, count - have, LS_MEMO)
 	return
 
+# make sure this function remains idempotent
 def LearnFeatInnates (pc):
 	SetSpell (pc, "SPIN111", FEAT_WILDSHAPE_BOAR)
 	SetSpell (pc, "SPIN197", FEAT_MAXIMIZED_ATTACKS)
@@ -213,7 +214,7 @@ def LearnFeatInnates (pc):
 
 def ApplyFeatsIWD2(MyChar):
 	# npcs don't have these feat spells yet, eg. 00solbas is missing power attack
-	if GemRB.GetPlayerStat (MyChar, IE_EA) != 2: # EA_PC
+	if MyChar > 1000: # did we get passed a global id?
 		LearnFeatInnates (MyChar)
 
 	# extra rage
