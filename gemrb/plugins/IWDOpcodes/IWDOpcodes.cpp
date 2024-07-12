@@ -2906,8 +2906,8 @@ int fx_cleave (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//FIXME:the previous opponent must be dead by now, or this code won't work
 	if (SeeCore(target, Enemy, false) ) {
 		const Actor* enemy = map->GetActorByGlobalID(target->objects.LastSeen);
-		//50 is more like our current weapon range
-		if (enemy && PersonalDistance(enemy, target) < 50 && target->objects.LastSeen != target->objects.LastTarget) {
+		int weaponRange = target->GetWeaponRange(target->usedLeftHand);
+		if (enemy && WithinPersonalRange(enemy, target, weaponRange) && target->objects.LastSeen != target->objects.LastTarget) {
 			displaymsg->DisplayConstantStringNameValue(HCStrings::Cleave, GUIColors::WHITE, target, fx->Parameter1);
 			target->attackcount=fx->Parameter1;
 			target->FaceTarget(enemy);
