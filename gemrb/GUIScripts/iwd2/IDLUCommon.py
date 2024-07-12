@@ -242,7 +242,10 @@ def LearnFeatInnates (pc, party, setup):
 		if not level:
 			continue
 		featSPL = "FEAT{:02x}".format(i)
-		if featSPL in FeatSPLs:
+		if featSPL not in FeatSPLs:
+			continue
+		# make sure it's not applied already if called from level up
+		if setup != 2 or GemRB.CountEffects (pc, "", -1, -1, "", featSPL) == 0:
 			GemRB.ApplySpell (pc, featSPL, pc)
 
 def ApplyFeatsIWD2(MyChar):
