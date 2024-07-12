@@ -219,6 +219,7 @@ def LearnFeatInnates (pc, party, setup):
 		SetSpell (pc, "SPIN277", FEAT_ARTERIAL_STRIKE)
 		SetSpell (pc, "SPIN278", FEAT_HAMSTRING)
 		SetSpell (pc, "SPIN279", FEAT_RAPID_SHOT)
+		LearnExtraFeats (pc)
 
 		# recheck if we need to do anything about new spell focus feats
 		SetSpellFocus (pc)
@@ -248,9 +249,8 @@ def LearnFeatInnates (pc, party, setup):
 		if setup != 2 or GemRB.CountEffects (pc, "", -1, -1, "", featSPL) == 0:
 			GemRB.ApplySpell (pc, featSPL, pc)
 
-def ApplyFeatsIWD2(MyChar):
-	LearnFeatInnates (MyChar, MyChar < 1000, False) # did we get passed a global id?
-
+# make sure this function remains idempotent
+def LearnExtraFeats (MyChar):
 	# extra rage
 	level = GemRB.GetPlayerStat (MyChar, IE_LEVELBARBARIAN)
 	if level > 0:
@@ -290,5 +290,3 @@ def ApplyFeatsIWD2(MyChar):
 		MakeSpellCount (MyChar, "SPIN232", cnt)
 	else:
 		GemRB.RemoveSpell (MyChar, "SPIN232")
-
-	return
