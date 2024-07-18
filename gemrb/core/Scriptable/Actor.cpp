@@ -3945,7 +3945,7 @@ bool Actor::OverrideActions()
 void Actor::Panic(const Scriptable* attacker, PanicMode mode)
 {
 	auto PanicAction = [](unsigned short actionID) {
-		return actionID == 184 || actionID == 85 || actionID == 124;
+		return actionID == 184 || actionID == 85 || actionID == 124 || actionID == 29;
 	};
 	if (GetStat(IE_STATE_ID) & STATE_PANIC && (!CurrentAction || PanicAction(CurrentAction->actionID))) {
 		Log(DEBUG, "Actor", "Already panicked!");
