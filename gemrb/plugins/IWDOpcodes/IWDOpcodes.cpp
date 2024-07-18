@@ -1651,26 +1651,66 @@ int fx_animal_rage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0x118 TurnUndead2 iwd2
 int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print("fx_turn_undead2(%2d): Level: %d Type %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	if (fx->FirstApply) {
+		core->GetAudioDrv()->Play("ACT_06", SFXChannel::Monster, target->Pos, GEM_SND_SPATIAL);
+	}
+	target->SetSpellState(SS_TURNED);
+
+	// caster-dependent logic for undead ward, as per original
+	// it poorly redid what we have in fx_turn_undead3, passing bad params
+	if (fx->Parameter2 == 4) {
+		const Actor* turner = GetCasterObject();
+		int check = turner->LuckyRoll(1, 20, 1) + turner->GetAbilityBonus(IE_CHR);
+		int levelMod = check < 10 ? (check - 9) / 3 - 1 : (check - 10) / 3;
+		ieDword maxTurnableLevel = Clamp<ieDword>(turner->GetStat(IE_TURNUNDEADLEVEL) + levelMod, 0, 50);
+		ieDword levelSum = target->GetStat(IE_CLASSLEVELSUM);
+
+		if (maxTurnableLevel < levelSum) {
+			// unaffected
+			core->GetTokenDictionary()["RESOURCE"] = StringFromASCII(fx->SourceRef);
+			displaymsg->DisplayConstantStringName(HCStrings::ResResisted, GUIColors::WHITE, target);
+			return FX_NOT_APPLIED;
+		}
+
+		// convert to one of the other main 4 modes
+		if (GameScript::ID_Alignment(turner, AL_EVIL)) {
+			fx->Parameter2 = fx->CasterLevel <= levelSum * 2;
+		} else {
+			fx->Parameter2 = (fx->CasterLevel <= levelSum * 2) + 2;
+		}
+	}
+
 	switch (fx->Parameter2)
 	{
 	case 0: //command
+		static EffectRef fx_control_undead_ref = { "ControlUndead", -1 };
+		// replace with a control effect
+		fx->Opcode = EffectQueue::ResolveEffect(fx_control_undead_ref);
+		fx->Parameter2 = 4;
+		// also set fx->TimingMode to FX_DURATION_ABSOLUTE for some reason
+		displaymsg->DisplayStringName(core->GetString(ieStrRef::COMMANDED), GUIColors::WHITE, target);
 		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
-		target->Panic(Owner, PanicMode::RunAway);
 		break;
 	case 1://rebuke
-		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
-		if (target->SetSpellState(SS_REBUKED)) {
-			//display string rebuked
+		target->SetSpellState(SS_REBUKED);
+		if (fx->FirstApply) {
+			target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
+			displaymsg->DisplayStringName(core->GetString(ieStrRef::REBUKED), GUIColors::WHITE, target);
 		}
-		target->AC.HandleFxBonus(-4, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+		target->AC.HandleFxBonus(-2, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
 		break;
 	case 2://destroy
-		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
+		if (fx->FirstApply) {
+			target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
+		}
+		target->LastDamageType |= DAMAGE_CHUNKING;
 		target->Die(Owner);
 		break;
 	case 3://panic
-		target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
+		if (fx->FirstApply) {
+			target->AddTrigger(TriggerEntry(trigger_turnedby, Owner->GetGlobalID()));
+			displaymsg->DisplayStringName(core->GetString(ieStrRef::TURNED), GUIColors::WHITE, target);
+		}
 		target->Panic(Owner, PanicMode::RunAway);
 		break;
 	default://depends on caster

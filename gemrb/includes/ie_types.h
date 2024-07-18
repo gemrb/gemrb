@@ -78,7 +78,12 @@ enum class ieStrRef : ieDword {
 	MD_SUCCESS = 24198,
 	HEAL = 28895,
 	DAMAGE = 22036,
-	
+
+	// iwd2 refs
+	REBUKED = 20827,
+	TURNED = 20828,
+	COMMANDED = 41023,
+
 	// params to DisplayRollStringName
 	ROLL0 = 112,
 	ROLL1 = 20460,
