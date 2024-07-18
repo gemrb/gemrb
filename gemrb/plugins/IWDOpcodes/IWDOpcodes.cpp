@@ -225,6 +225,8 @@ static int fx_arterial_strike (Scriptable* Owner, Actor* target, Effect* fx); //
 static int fx_hamstring (Scriptable* Owner, Actor* target, Effect* fx); //456
 static int fx_rapid_shot (Scriptable* Owner, Actor* target, Effect* fx); //457
 
+static int fx_turn_undead3(Scriptable* Owner, Actor* target, Effect* fx); // 511
+
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectDesc effectnames[] = {
 	EffectDesc("ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, 0, -1), //0
@@ -342,7 +344,9 @@ static EffectDesc effectnames[] = {
 	EffectDesc("ArterialStrike", fx_arterial_strike, 0, -1), //455
 	EffectDesc("HamString", fx_hamstring, 0, -1), //456
 	EffectDesc("RapidShot", fx_rapid_shot, 0, -1), //457
-	EffectDesc(NULL, NULL, 0, 0),
+
+	EffectDesc("TurnUndead3", fx_turn_undead3, 0, -1), // 511
+	EffectDesc(nullptr, nullptr, 0, 0),
 };
 
 //effect refs used in this module
@@ -1680,6 +1684,64 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 			target->Turn(Owner, actor->GetStat(IE_TURNUNDEADLEVEL));
 		}
 		break;
+	}
+	return FX_APPLIED;
+}
+
+// 511 TurnUndead3 gemrb helper opcode substituting a hardcoded iwd2 projectile
+// we apply it to the user only and then it does its own targeting of fx_turn_undead2
+int fx_turn_undead3(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
+{
+	const Actor* turner = target;
+	if (!turner || turner->Type != ST_ACTOR) {
+		return FX_NOT_APPLIED;
+	}
+	const Map* area = turner->GetCurrentArea();
+	if (!area) return FX_NOT_APPLIED;
+
+	// highest undead level one can turn
+	int check = turner->LuckyRoll(1, 20, 1) + turner->GetAbilityBonus(IE_CHR);
+	int levelMod = check < 10 ? (check - 9) / 3 - 1 : (check - 10) / 3;
+	int maxTurnableLevel = turner->GetStat(IE_TURNUNDEADLEVEL) + levelMod;
+
+	// just a hardcoded +2 instead of the turner's level as per 3e
+	int maxTurnedLevels = turner->LuckyRoll(2, 6, 2) + turner->GetAbilityBonus(IE_CHR);
+	if (turner->HasFeat(FEAT_IMPROVED_TURNING)) {
+		maxTurnedLevels += 2;
+	}
+
+	int flags = GA_NO_SELF | GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED;
+	const auto& targets = area->GetAllActorsInRadius(target->Pos, flags, turner->GetBase(IE_VISUALRANGE) / 2, turner);
+	int turnUndeadStat = turner->GetStat(IE_TURNUNDEADLEVEL);
+	for (auto subTarget : targets) {
+		// turn only once, possible with multiple clerics, paladins
+		// unlike in the other games, there's no turning of paladins
+		if (subTarget->GetStat(IE_GENERAL) != GEN_UNDEAD || subTarget->HasSpellState(SS_TURNED)) {
+			continue;
+		}
+
+		int levelSum = subTarget->GetStat(IE_CLASSLEVELSUM);
+		// original bug or bad late design revert: maxTurnedLevels is never decreased
+		// in effect there is no limit to how many actors turning can affect
+		// bug2: it can happen that maxTurnedLevels < maxTurnableLevel,
+		// reducing the overall turning impact
+		if (maxTurnableLevel < levelSum || maxTurnedLevels < levelSum) {
+			continue;
+		}
+
+		ResRef turningSpell;
+		if (GameScript::ID_Alignment(turner, AL_EVIL)) {
+			if (turnUndeadStat < levelSum * 2) {
+				turningSpell = "EffTU2";
+			} else {
+				turningSpell = "EffTU1";
+			}
+		} else if (turnUndeadStat < levelSum * 2) {
+			turningSpell = "EffTU4";
+		} else {
+			turningSpell = "EffTU3";
+		}
+		core->ApplySpell(turningSpell, subTarget, target, turnUndeadStat); // caster level doesn't really matter
 	}
 	return FX_APPLIED;
 }
