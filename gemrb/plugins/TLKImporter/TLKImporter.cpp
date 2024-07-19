@@ -122,7 +122,7 @@ static inline const Actor* GetActorFromSlot(int slot)
 {
 	if (slot==-1) {
 		const GameControl *gc = core->GetGameControl();
-		Actor* act = nullptr;
+		const Actor* act = nullptr;
 		if (gc) {
 			act = gc->dialoghandler->GetSpeaker();
 		}
