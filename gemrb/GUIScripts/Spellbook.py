@@ -577,7 +577,7 @@ def CannotLearnSlotSpell ():
 		return LSR_LEVEL
 
 	spell_count = GemRB.GetKnownSpellsCount (pc, booktype, level-1)
-	if spell_count >= GemRB.GetAbilityBonus (IE_INT, 2, dumbness):
+	if not GameCheck.IsIWD2 () and spell_count >= GemRB.GetAbilityBonus (IE_INT, 2, dumbness):
 		return LSR_FULL
 
 	return 0
