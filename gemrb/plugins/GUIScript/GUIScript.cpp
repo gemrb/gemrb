@@ -8087,7 +8087,7 @@ number of all spells of the given type.\n\
 **Parameters:**\n\
   * PartyID   - the PC's position in the party\n\
   * SpellType - 0 - priest, 1 - wizard, 2 - innate\n\
-  * Level     - the known spell's level\n\
+  * Level     - the known spell's level (-1 for any level)\n\
 \n\
 **Return value:** numeric\n\
 \n\
