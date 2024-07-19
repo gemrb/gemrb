@@ -1152,6 +1152,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	colorUnusable = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
 	Button.SetBorder (2, colorUnusable, 0, 1)
 	colorUMD = {'r' : 255, 'g' : 255, 'b' : 0, 'a' : 64}
+	colorGreen =  {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 64}
 
 	Button.SetText ("")
 	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
@@ -1163,12 +1164,21 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 			tooltips = { "inventory": 82, "ground": 83, "container": "" }
 		Button.SetTooltip (tooltips[Type])
 		Button.EnableBorder (0, 0)
+		Button.EnableBorder (1, 0)
 		Button.EnableBorder (2, 0)
 		return
 
 	item = GemRB.GetItem (Slot['ItemResRef'])
 	identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
 	magical = item["Enchantment"] > 0
+
+	# gemrb extension based on ImprovedGUI - mark scrolls that the pc hasn't learned yet
+	scroll = False
+	knowsScroll = False
+	if Slot["Flags"] & IE_INV_ITEM_IDENTIFIED and GemRB.GetVar ("GUIEnhancements") & GE_MARK_SCROLLS:
+		scroll = item["Function"] & ITM_F_READ
+	if scroll and not Spellbook.HasSorcererBook (pc):
+		knowsScroll = Spellbook.CannotLearnSlotSpell (Slot) == LSR_KNOWN
 
 	# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
 	if item["MaxStackAmount"] > 1:
@@ -1190,10 +1200,18 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 		# enable yellow overlay for "use magical device"
 		if usable & 0x100000:
 			Button.SetBorder (2, colorUMD, 1, 1)
+			# unset green border
+			Button.EnableBorder (1, 0)
+		elif scroll and not knowsScroll:
+			# set green border
+			Button.SetBorder (1, colorGreen, 1)
 		else:
 			Button.EnableBorder (2, 0)
+			# unset green border
+			Button.EnableBorder (1, 0)
 	else:
 		Button.SetBorder (2, colorUnusable, 1, 1)
+		Button.EnableBorder (1, 0)
 
 	if magical and GameCheck.IsIWD2 ():
 		Button.SetFlags (IE_GUI_BUTTON_HORIZONTAL, OP_OR)
