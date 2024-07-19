@@ -1122,8 +1122,10 @@ def RefreshHelpWindow ():
 			Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
 			Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
+		title = ""
 		if DescTable:
 			title = DescTable.GetValue (i+startrow+TopIndex, titlecol)
+		if title != "*":
 			Label.SetText (title)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetVarAssoc ("Selected", i+TopIndex)
