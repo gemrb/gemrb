@@ -1680,10 +1680,10 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 	}
 
+	static EffectRef fx_control_undead_ref = { "ControlUndead", -1 };
 	switch (fx->Parameter2)
 	{
 	case 0: //command
-		static EffectRef fx_control_undead_ref = { "ControlUndead", -1 };
 		// replace with a control effect
 		fx->Opcode = EffectQueue::ResolveEffect(fx_control_undead_ref);
 		fx->Parameter2 = 4;
