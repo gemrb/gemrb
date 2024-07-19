@@ -344,7 +344,7 @@ def DisplayItem (slotItem, itemtype):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ClassName = GUICommon.GetClassRowName (pc)
 	SpellBookType = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
-	if SpellBookType == "*" or SpellBookType == "MXSPLSRC":
+	if SpellBookType == "*" or Spellbook.HasSorcererBook (pc):
 		read = 0
 	# furthermore there might be school exclusions present
 	if read:
