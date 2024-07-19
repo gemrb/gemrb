@@ -1090,11 +1090,11 @@ def UpdateHelpWindow ():
 
 	startrow = HelpTable.GetValue (Topic, 4)
 	if startrow<0:
-		i=-startrow-10
-	elif DescTable:
-		i = DescTable.GetRowCount ()-10-startrow
-
-	if i<1: i=1
+		i = -startrow - 10
+	else:
+		if DescTable:
+			i = DescTable.GetRowCount () - 10 - startrow
+		if i < 0: i = 0
 
 	ScrollBar = Window.GetControl (4)
 	ScrollBar.SetVarAssoc ("TopIndex", i)
