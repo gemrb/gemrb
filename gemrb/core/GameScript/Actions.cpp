@@ -3115,6 +3115,20 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 	}
 
 	actor->SetBase(IE_AVATARREMOVAL, parameters->int0Parameter);
+	const Map* map = actor->GetCurrentArea();
+	if (!map || !actor->BlocksSearchMap()) return;
+
+	if (parameters->int0Parameter == 0) {
+		// move feet lice away — it can happen we "spawned" on others
+		// Map::BlockSearchMapFor() is not enough
+		int flags = GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED;
+		const auto& neighbours = map->GetAllActorsInRadius(actor->Pos, flags, actor->circleSize);
+		for (auto& neighbour : neighbours) {
+			neighbour->SetPosition(neighbour->Pos, true);
+		}
+	} else {
+		map->ClearSearchMapFor(actor);
+	}
 }
 
 //i have absolutely no idea why this is needed when we have HideCreature
