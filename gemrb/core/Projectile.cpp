@@ -968,7 +968,9 @@ int Projectile::CalculateTargetFlag() const
 		return flags;
 	}
 	// iwd2 ar6050 has doors casting chain lightning :)
-	if (caster && caster->Type != ST_ACTOR && checkingEA) {
+	// at the same time that's not correct for the rack in ar6101
+	// let's say doors have no enemies, while infopoints do
+	if (caster && caster->Type == ST_DOOR && checkingEA) {
 		return flags;
 	}
 	// make everyone an enemy of neutrals
