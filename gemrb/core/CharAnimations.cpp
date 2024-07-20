@@ -306,7 +306,7 @@ unsigned char CharAnimations::MaybeOverrideStance(unsigned char stance) const
 void CharAnimations::MaybeUpdateMainPalette(const Animation& anim) {
 	if (previousStanceID != stanceID && GetAnimType() != IE_ANI_TWO_PIECE) {
 		// Test if the palette in question is actually different to the one loaded.
-		if (*PartPalettes[PAL_MAIN] != *anim.GetFrame(0)->GetPalette()) {
+		if (!PartPalettes[PAL_MAIN] || *PartPalettes[PAL_MAIN] != *anim.GetFrame(0)->GetPalette()) {
 			PaletteResRef[PAL_MAIN].Reset();
 
 			PartPalettes[PAL_MAIN] = MakeHolder<Palette>(*anim.GetFrame(0)->GetPalette());
