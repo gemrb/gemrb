@@ -38,6 +38,7 @@
 #include "Item.h"
 #include "Map.h"
 #include "MusicMgr.h"
+#include "Projectile.h" // for ProHeights
 #include "SaveGameIterator.h"
 #include "ScriptEngine.h"
 #include "TileMap.h"
@@ -7471,6 +7472,7 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	} else {
 		fx->Pos = parameters->pointParameter;
 	}
+	fx->Pos.y += int(ProHeights::Normal); // negate future ZPos
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, NULL, src);
 
