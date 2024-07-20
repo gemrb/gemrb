@@ -2785,6 +2785,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	} else {
 		duration = Sender->CastSpell(tar, flags & SC_DEPLETE, flags & SC_INSTANT, flags & SC_NOINTERRUPT, level);
 	}
+	if (Sender->Type == ST_DOOR) duration = 0;
 	if (duration == -1) {
 		// some kind of error
 		parameters->int2Parameter = 0;
@@ -2905,6 +2906,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	} else {
 		duration = Sender->CastSpellPoint(parameters->pointParameter, flags & SC_DEPLETE, flags & SC_INSTANT, flags & SC_NOINTERRUPT, level);
 	}
+	if (Sender->Type == ST_DOOR) duration = 0;
 	if (duration == -1) {
 		// some kind of error
 		Sender->ReleaseCurrentAction();
