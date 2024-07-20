@@ -37,6 +37,7 @@
 #include "GUI/GameControl.h"
 #include "GUI/TextSystem/Font.h"
 #include "RNG.h"
+#include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
  
 #include <utility>
@@ -818,6 +819,9 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 			// see the traps in the duergar/assassin battle in bg2 dungeon
 			// see also function below - maybe we should fix Pos instead
 			origin = ((InfoPoint *)this)->TrapLaunch;
+		} else if (Type == ST_DOOR) {
+			// iwd2 ar6050 doors need the same; the closed outline is moved to the map corner
+			origin = As<const Door>(this)->TrapLaunch;
 		}
 
 		if (caster) {

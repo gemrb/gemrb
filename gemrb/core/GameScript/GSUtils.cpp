@@ -2455,7 +2455,9 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const 
 	}
 
 	if (!target.IsZero()) {
-		float_t angle = AngleFromPoints(Sender->Pos, target);
+		Point pos = Sender->Pos;
+		if (Sender->Type == ST_DOOR) pos = Scriptable::As<const Door>(Sender)->TrapLaunch;
+		float_t angle = AngleFromPoints(pos, target);
 		return Feet2Pixels(dist, angle);
 	}
 
