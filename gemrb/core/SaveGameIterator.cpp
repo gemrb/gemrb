@@ -525,7 +525,7 @@ static int CanSave()
 		const Actor *actor = game->GetPC(i, true);
 		// can't save while (party) actors are in helpless or dead states
 		// STATE_NOSAVE tracks actors not to be stored in GAM, not game saveability
-		if (actor->GetStat(IE_STATE_ID) & (STATE_NOSAVE|STATE_MINDLESS)) {
+		if (actor->GetStat(IE_STATE_ID) & (STATE_NOSAVE | STATE_MINDLESS) || actor->GetStat(IE_CHECKFORBERSERK)) {
 			//some actor is in nosave state
 			displaymsg->DisplayMsgCentered(HCStrings::CantSaveNoCtrl, FT_ANY, GUIColors::XPCHANGE);
 			return 5;

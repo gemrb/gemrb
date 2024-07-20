@@ -1725,7 +1725,7 @@ bool Game::CanPartyRest(RestChecks checks, ieStrRef* err) const
 
 	if (checks & RestChecks::InControl) {
 		for (const auto& pc : PCs) {
-			if (pc->GetStat(IE_STATE_ID) & STATE_MINDLESS) {
+			if (pc->GetStat(IE_STATE_ID) & STATE_MINDLESS || pc->GetStat(IE_CHECKFORBERSERK)) {
 				// You cannot rest at this time because you do not have control of all your party members
 				*err = DisplayMessage::GetStringReference(HCStrings::CantRestNoControl);
 				return false;
