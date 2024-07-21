@@ -2515,6 +2515,7 @@ int GameScript::ExtendedStateCheck(Scriptable *Sender, const Trigger *parameters
 		return 0;
 	}
 
+	// list available in extstate.ids
 	if (actor->GetStat(IE_EXTSTATE_ID) & parameters->int0Parameter) {
 		return 1;
 	}
