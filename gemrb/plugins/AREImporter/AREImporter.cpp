@@ -713,6 +713,18 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	} else {
 		ip->Scripts[0] = new GameScript(script0, ip);
 	}
+
+	if (ip->Type != ST_TRAVEL || !ip->outline) return;
+	// mark the searchmap under travel regions as passable (not travel)
+	for (int i = 0; i < ip->BBox.w; i += 8) {
+		for (int j = 0; j < ip->BBox.h; j += 6) {
+			NavmapPoint sample(ip->BBox.x + i, ip->BBox.y + j);
+			if (!ip->outline->PointIn(sample)) continue;
+			SearchmapPoint below = map->ConvertCoordToTile(sample);
+			PathMapFlags tmp = map->tileProps.QuerySearchMap(below);
+			map->tileProps.PaintSearchMap(below, tmp | PathMapFlags::PASSABLE);
+		}
+	}
 }
 
 void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
