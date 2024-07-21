@@ -1306,7 +1306,7 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 
 	// try the actual move, if we are not already moving there
 	if (!actor->InMove() || actor->Destination != parameters->pointParameter) {
-		actor->WalkTo( parameters->pointParameter, 0 );
+		actor->WalkTo(parameters->pointParameter, parameters->int0Parameter);
 	}
 
 	// give up if we can't move there (no path was found)

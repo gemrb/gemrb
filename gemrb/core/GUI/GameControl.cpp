@@ -288,6 +288,10 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool
 		// check again because GenerateAction can fail (non PST)
 		if (!action) {
 			action = GenerateAction(fmt::format("MoveToPoint([{}.{}])", p.x, p.y));
+			if (overMe && overMe->Type == ST_TRAVEL) {
+				// gemrb extension to make travel through nearly blocked regions less painful
+				action->int0Parameter = MAX_TRAVELING_DISTANCE / 10; // empirical
+			}
 		}
 	}
 
