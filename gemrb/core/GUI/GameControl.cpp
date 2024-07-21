@@ -2205,7 +2205,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			if (mainActor && overMe->Type != ST_TRAVEL) {
 				CreateMovement(mainActor, p, false, tryToRun); // let one actor handle doors, loot and containers
 			} else {
-				CommandSelectedMovement(p, true, false, tryToRun);
+				CommandSelectedMovement(p, overMe->Type != ST_TRAVEL, false, tryToRun);
 			}
 		}
 
@@ -2273,7 +2273,6 @@ void GameControl::PerformSelectedAction(const Point& p)
 				game->selected[i]->UseExit(exitID);
 			}
 		}
-		CommandSelectedMovement(p, false);
 		if (HandleActiveRegion(Scriptable::As<InfoPoint>(overMe), selectedActor, p)) {
 			core->SetEventFlag(EF_RESETTARGET);
 		}
