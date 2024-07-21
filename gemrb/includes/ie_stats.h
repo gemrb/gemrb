@@ -171,16 +171,16 @@ namespace GemRB {
 #define EXTSTATE_ANIMAL_RAGE 0x00000800
 #define EXTSTATE_NO_HP       0x00001000  //disable hp info in berserk mode
 #define EXTSTATE_BERSERK     0x00002000
-#define EXTSTATE_NO_BACKSTAB 0x00004000
+#define EXTSTATE_NO_BACKSTAB 0x00004000 // implemented via IE_DISABLEBACKSTAB
 #define EXTSTATE_FLOATTEXTS  0x00008000  //weapon chatting (IWD)
-#define EXTSTATE_UNSTUN      0x00010000  //receiving damage will unstun
+#define EXTSTATE_UNSTUN      0x00010000 // TODO: receiving damage will unstun
 #define EXTSTATE_DEAF        0x00020000
-#define EXTSTATE_CHAOTICCMD  0x00040000
-#define EXTSTATE_MISCAST     0x00080000
-#define EXTSTATE_PAIN        0x00100000
-#define EXTSTATE_MALISON     0x00200000
-#define EXTSTATE_BLOODRAGE   0x00400000
-#define EXTSTATE_CATSGRACE   0x00800000
+#define EXTSTATE_CHAOTICCMD  0x00040000 // set by the spell manually
+#define EXTSTATE_MISCAST     0x00080000 // set by the spell manually
+#define EXTSTATE_PAIN        0x00100000 // set by the spell manually
+#define EXTSTATE_MALISON     0x00200000 // set by the spell manually
+#define EXTSTATE_BLOODRAGE   0x00400000 // set by the spell manually
+#define EXTSTATE_CATSGRACE   0x00800000 // set by the spell manually
 #define EXTSTATE_MOLD        0x01000000
 #define EXTSTATE_SHROUD      0x02000000
 #define EXTSTATE_STATIC_CHARGE 0x04000000

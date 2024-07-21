@@ -1139,6 +1139,7 @@ int fx_set_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case 1: //always berserk
 		target->SetSpellState(SS_BERSERK);
+		EXTSTATE_SET(EXTSTATE_BERSERK);
 		STAT_SET(IE_BERSERKSTAGE2, 1);
 		// intentional fallthrough
 	default:
@@ -2251,6 +2252,7 @@ int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 		STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
 		if (fx->Parameter2 || !core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 			target->SetSpellState(SS_NOAWAKE);
+			EXTSTATE_SET(EXTSTATE_DOESNT_AWAKEN_ON_DAMAGE);
 		}
 		if (fx->IsVariable) {
 			target->SetSpellState(SS_PRONE);
@@ -8425,6 +8427,7 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 		displaymsg->DisplayConstantStringName(HCStrings::StaticDissipate, GUIColors::WHITE, target);
 		return FX_APPLIED;
 	}
+	victim->Modified[IE_EXTSTATE_ID] |= EXTSTATE_STATIC_CHARGE;
 
 	// ee style
 	if (fx->Opcode == 0x14d) {

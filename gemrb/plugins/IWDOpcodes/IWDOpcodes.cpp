@@ -1602,6 +1602,7 @@ int fx_animal_rage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//param2==1 sets only the spell state
 	if (fx->Parameter2) {
 		target->SetSpellState( SS_ANIMALRAGE);
+		EXTSTATE_SET(EXTSTATE_ANIMAL_RAGE);
 		return FX_APPLIED;
 	}
 
