@@ -4121,8 +4121,9 @@ void GameScript::TakePartyItem(Scriptable* Sender, Action* parameters)
 	const Game *game = core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,IE_INV_ITEM_UNDROPPABLE,IE_INV_ITEM_UNSTEALABLE);
-		if (res!=MIC_NOITEM) return;
+		Actor* pc = game->GetPC(i, false);
+		MIC res = MoveItemCore(pc, Sender, parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE, IE_INV_ITEM_UNSTEALABLE);
+		if (res != MIC::NoItem) return;
 	}
 }
 
@@ -4134,8 +4135,8 @@ void GameScript::TakePartyItemNum(Scriptable* Sender, Action* parameters)
 	int i=game->GetPartySize(false);
 	while (i-- && count) {
 		Actor *pc = game->GetPC(i, false);
-		int res = MoveItemCore(pc, Sender, parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE, IE_INV_ITEM_UNSTEALABLE, 1);
-		if (res == MIC_GOTITEM) {
+		MIC res = MoveItemCore(pc, Sender, parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE, IE_INV_ITEM_UNSTEALABLE, 1);
+		if (res == MIC::GotItem) {
 			i++;
 			count--;
 		}
@@ -4149,7 +4150,7 @@ void GameScript::TakePartyItemRange(Scriptable* Sender, Action* parameters)
 	while (i--) {
 		Actor *ac = game->GetPC(i,false);
 		if (Distance(Sender, ac)<MAX_OPERATING_DISTANCE) {
-			while (MoveItemCore(ac, Sender, parameters->string0Parameter,IE_INV_ITEM_UNDROPPABLE,IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM) { }
+			while (MoveItemCore(ac, Sender, parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE, IE_INV_ITEM_UNSTEALABLE) == MIC::GotItem) {}
 		}
 	}
 }
@@ -4159,7 +4160,7 @@ void GameScript::TakePartyItemAll(Scriptable* Sender, Action* parameters)
 	const Game *game = core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		while (MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,IE_INV_ITEM_UNDROPPABLE, IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM) { }
+		while (MoveItemCore(game->GetPC(i, false), Sender, parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE, IE_INV_ITEM_UNSTEALABLE) == MIC::GotItem) {}
 	}
 }
 
@@ -4542,7 +4543,7 @@ void GameScript::GivePartyAllEquipment(Scriptable *Sender, Action* /*parameters*
 		//don't try to give self, it would be an infinite loop
 		if (tar == scr)
 			continue;
-		while(MoveItemCore(Sender, tar, "",0,0)!=MIC_NOITEM) { }
+		while (MoveItemCore(Sender, tar, "", 0, 0) != MIC::NoItem) {}
 	}
 }
 
@@ -4577,7 +4578,7 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 	}
 	//move all movable item from the target to the Sender
 	//the rest will be dropped at the feet of Sender
-	while(MoveItemCore(tar, Sender, "",0,0)!=MIC_NOITEM) { }
+	while (MoveItemCore(tar, Sender, "", 0, 0) != MIC::NoItem) {}
 	Sender->ReleaseCurrentAction();
 }
 
@@ -4596,7 +4597,7 @@ void GameScript::MoveInventory(Scriptable *Sender, Action* parameters)
 		return;
 	//move all movable item from the target to the Sender
 	//the rest will be dropped at the feet of Sender
-	while(MoveItemCore(src, tar, "",0,0)!=MIC_NOITEM) { }
+	while (MoveItemCore(src, tar, "", 0, 0) != MIC::NoItem) {}
 }
 
 void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
@@ -4696,17 +4697,17 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		return;
 	}
 
-	int ret = MIC_NOITEM;
+	MIC ret = MIC::NoItem;
 	if (slot != -1) {
 		CREItem* item = scr->inventory.RemoveItem(slot);
-		ret = snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
-		if (ret != ASI_SUCCESS) {
+		int rc = snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
+		if (rc != ASI_SUCCESS) {
 			map->AddItemToLocation(snd->Pos, item);
-			ret = MIC_FULL;
+			ret = MIC::Full;
 		}
 	}
 
-	if (ret==MIC_NOITEM) {
+	if (ret == MIC::NoItem) {
 		int money=0;
 		//go for money too
 		if (scr->GetStat(IE_GOLD)>0) {
@@ -4726,7 +4727,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		if (ASI_SUCCESS != snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY)) {
 			// drop it at my feet
 			map->AddItemToLocation(snd->Pos, item);
-			ret = MIC_FULL;
+			ret = MIC::Full;
 		}
 	}
 
@@ -4736,7 +4737,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	int xp = gamedata->GetXPBonus(XP_PICKPOCKET, scr->GetXPLevel(1));
 	core->GetGame()->ShareXP(xp, SX_DIVIDE);
 
-	if (ret == MIC_FULL && snd->InParty) {
+	if (ret == MIC::Full && snd->InParty) {
 		if (!core->HasFeature(GFFlags::PST_STATE_FLAGS)) snd->VerbalConstant(Verbal::InventoryFull);
 		if (reportFailure) displaymsg->DisplayMsgAtLocation(HCStrings::PickpocketInventoryFull, FT_ANY, Sender, Sender, GUIColors::WHITE);
 	}
@@ -4790,8 +4791,8 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 		int j = game->GetPartySize(false);
 		while (j--) {
 			Actor *tar = game->GetPC(j, false);
-			int res = MoveItemCore(tar, Sender, tab->QueryField(i,0), 0, IE_INV_ITEM_UNSTEALABLE);
-			if (res==MIC_GOTITEM) {
+			MIC res = MoveItemCore(tar, Sender, tab->QueryField(i, 0), 0, IE_INV_ITEM_UNSTEALABLE);
+			if (res == MIC::GotItem) {
 				j++;
 				count--;
 			}

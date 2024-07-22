@@ -634,7 +634,7 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 // transferring item from Sender to target
 //if target has no inventory, the item will be destructed
 //if target can't get it, it will be dropped at its feet
-int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, int flags, int setflag, int count)
+MIC MoveItemCore(Scriptable* Sender, Scriptable* target, const ResRef& resref, int flags, int setflag, int count)
 {
 	Inventory *myinv;
 	Map *map;
@@ -643,7 +643,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 	bool gotitem = false;
 
 	if (!target) {
-		return MIC_INVALID;
+		return MIC::Invalid;
 	}
 	map=Sender->GetCurrentArea();
 	Actor* tmp = nullptr;
@@ -657,7 +657,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 			myinv=&((Container *) Sender)->inventory;
 			break;
 		default:
-			return MIC_INVALID;
+			return MIC::Invalid;
 	}
 	CREItem *item;
 	myinv->RemoveItem(resref, flags, &item, count);
@@ -675,7 +675,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 
 	if (!item) {
 		// nothing was removed
-		return MIC_NOITEM;
+		return MIC::NoItem;
 	}
 
 	item->Flags|=setflag;
@@ -701,7 +701,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 
 	if (!myinv) {
 		delete item;
-		return MIC_GOTITEM; // actually it was lost, not gained
+		return MIC::GotItem; // actually it was lost, not gained
 	}
 	if ( myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) !=ASI_SUCCESS) {
 		// drop it at my feet
@@ -712,12 +712,12 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const ResRef& resref, i
 			}
 			displaymsg->DisplayMsgCentered(HCStrings::InventoryFullItemDrop, FT_ANY, GUIColors::XPCHANGE);
 		}
-		return MIC_FULL;
+		return MIC::Full;
 	}
 	if (gotitem && !lostitem) {
 		displaymsg->DisplayMsgCentered(HCStrings::GotItem, FT_ANY, GUIColors::XPCHANGE);
 	}
-	return MIC_GOTITEM;
+	return MIC::GotItem;
 }
 
 void PolymorphCopyCore(const Actor *src, Actor *tar)
