@@ -649,8 +649,6 @@ public:
 	stat_t GetSafeStat(unsigned int StatIndex) const;
 	/** Sets a Stat Value (unsaved) */
 	bool SetStat(unsigned int StatIndex, stat_t Value, int pcf);
-	/** Returns the difference */
-	int GetMod(unsigned int StatIndex) const;
 	/** Returns a Stat Base Value */
 	ieDword GetBase(unsigned int StatIndex) const;
 	/** Sets a Base Stat Value */

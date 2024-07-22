@@ -2483,13 +2483,6 @@ bool Actor::SetStat(unsigned int StatIndex, stat_t Value, int pcf)
 	return true;
 }
 
-int Actor::GetMod(unsigned int StatIndex) const
-{
-	if (StatIndex >= MAX_STATS) {
-		return 0xdadadada;
-	}
-	return (signed) Modified[StatIndex] - (signed) BaseStats[StatIndex];
-}
 /** Returns a Stat Base Value */
 ieDword Actor::GetBase(unsigned int StatIndex) const
 {
