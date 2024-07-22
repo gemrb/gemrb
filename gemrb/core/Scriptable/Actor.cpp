@@ -1738,12 +1738,9 @@ static void InitActorTables()
 	}
 
 	int abilityMax = core->GetMaximumAbility();
-	maximum_values[IE_STR] = abilityMax;
-	maximum_values[IE_INT] = abilityMax;
-	maximum_values[IE_DEX] = abilityMax;
-	maximum_values[IE_CON] = abilityMax;
-	maximum_values[IE_CHR] = abilityMax;
-	maximum_values[IE_WIS] = abilityMax;
+	for (auto& stat : { IE_STR, IE_INT, IE_DEX, IE_CON, IE_CHR, IE_WIS }) {
+		maximum_values[stat] = abilityMax;
+	}
 	if (ReverseToHit) {
 		//all games except iwd2
 		maximum_values[IE_ARMORCLASS]=20;
