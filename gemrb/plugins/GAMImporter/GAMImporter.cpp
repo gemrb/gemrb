@@ -491,10 +491,10 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	actor->Modal.State = pcInfo.ModalState;
 	actor->SetModalSpell(actor->Modal.State, {});
 
+	actor->PCStats = std::make_unique<PCStatsStruct>(std::move(ps));
 	actor->SetPersistent(slot);
 	actor->Selected = pcInfo.Selected;
-	
-	actor->PCStats = std::make_unique<PCStatsStruct>(std::move(ps));
+
 	return actor;
 }
 
