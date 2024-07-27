@@ -290,10 +290,6 @@ static EffectRef fx_remove_portrait_icon_ref = { "Icon:Remove", -1 };
 static EffectRef fx_unpause_caster_ref = { "Cure:CasterHold", -1 };
 static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
 static EffectRef fx_puppetmarker_ref = { "PuppetMarker", -1 };
-static EffectRef fx_stoneskin_ref = { "StoneSkinModifier", -1 };
-static EffectRef fx_stoneskin2_ref = { "StoneSkin2Modifier", -1 };
-static EffectRef fx_aegis_ref = { "Aegis", -1 };
-static EffectRef fx_cloak_ref = { "Overlay", -1 };
 static EffectRef fx_damage_ref = { "Damage", -1 };
 static EffectRef fx_melee_ref = { "SetMeleeEffect", -1 };
 static EffectRef fx_ranged_ref = { "SetRangedEffect", -1 };
@@ -7295,6 +7291,10 @@ int Actor::GetDamageReduction(int resist_stat, ieDword weaponEnchantment) const
 /*Always call this on the suffering actor */
 void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype)
 {
+	static EffectRef fx_stoneskin_ref = { "StoneSkinModifier", -1 };
+	static EffectRef fx_stoneskin2_ref = { "StoneSkin2Modifier", -1 };
+	static EffectRef fx_aegis_ref = { "Aegis", -1 };
+	static EffectRef fx_cloak_ref = { "Overlay", -1 };
 	Actor* attacker = Scriptable::As<Actor>(hitter);
 
 	//guardian mantle for PST
