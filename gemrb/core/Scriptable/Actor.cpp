@@ -7295,6 +7295,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	static EffectRef fx_stoneskin2_ref = { "StoneSkin2Modifier", -1 };
 	static EffectRef fx_aegis_ref = { "Aegis", -1 };
 	static EffectRef fx_cloak_ref = { "Overlay", -1 };
+	static EffectRef fx_ironskins_ref = { "IronSkins", -1 }; // iwd2 stone- and ironskin
 	Actor* attacker = Scriptable::As<Actor>(hitter);
 
 	//guardian mantle for PST
@@ -7304,6 +7305,11 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			damage = 0;
 			return;
 		}
+	}
+
+	ieDword weaponEnchantment = 0;
+	if (attacker) {
+		weaponEnchantment = attacker->weaponInfo[attacker->usedLeftHand].enchantment;
 	}
 
 	// only check stone skins if damage type is physical
@@ -7332,6 +7338,16 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			damage = 0;
 			return;
 		}
+
+		// iwd-style ironskins with damage reduction handled below
+		if (third && HasSpellState(SS_STONESKIN) && weaponEnchantment < 5) {
+			int soak = std::min(damage, 10);
+			fxqueue.DecreaseParam3OfEffect(fx_ironskins_ref, soak, 0);
+			Modified[IE_RESISTCRUSHING] = 10;
+			Modified[IE_RESISTPIERCING] = 10;
+			Modified[IE_RESISTSLASHING] = 10;
+			Modified[IE_RESISTMISSILE] = 10;
+		}
 	}
 
 	if (damage>0) {
@@ -7354,7 +7370,6 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 				// flat resistance, eg. 10/- or eg. 5/+2 for physical types
 				// for actors we need special care for damage reduction - traps (...) don't have enchanted weapons
 				if (attacker && it->second.reduction) {
-					ieDword weaponEnchantment = attacker->weaponInfo[attacker->usedLeftHand].enchantment;
 					// disregard other resistance boni when checking whether to skip reduction
 					resisted = GetDamageReduction(it->second.resist_stat, weaponEnchantment);
 				} else {
