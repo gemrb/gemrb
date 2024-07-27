@@ -155,6 +155,16 @@ bool GlobalTimer::Update()
 	if (!map) {
 		goto end;
 	}
+
+	// don't update scripts if we're fading in or out
+	if (fadeToCounter || fadeFromCounter != fadeFromMax) {
+		map->UpdateFog(); // needed eg. when meeting Yoshimo for the first time
+		if (thisTime) {
+			game->RealTime++;
+		}
+		goto end;
+	}
+
 	//do spell effects expire in dialogs?
 	//if yes, then we should remove this condition
 	if (!gc->InDialog() || !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
