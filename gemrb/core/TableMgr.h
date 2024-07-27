@@ -58,8 +58,7 @@ public:
 	virtual index_t GetColNamesCount() const = 0;
 	/** Returns the actual number of Columns in a row */
 	virtual index_t GetColumnCount(index_t row = 0) const = 0;
-	/** Returns a pointer to a zero terminated 2da element,
-	 * 0,0 returns the default value, it may return NULL */
+	/** Returns a pointer to a zero terminated 2da element */
 	virtual const std::string& QueryField(index_t row, index_t column) const = 0;
 
 	/** Returns a pointer to a zero terminated 2da element,
