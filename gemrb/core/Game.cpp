@@ -1283,7 +1283,8 @@ bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 		}
 
 		const Map* map = pc->GetCurrentArea();
-		if (map && map != area) {
+		if (!map) return true; // ok for familiars
+		if (map != area) {
 			return false;
 		}
 		if (Distance(p, pc) > MAX_TRAVELING_DISTANCE) {
