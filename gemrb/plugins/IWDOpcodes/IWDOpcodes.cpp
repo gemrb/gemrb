@@ -1747,7 +1747,7 @@ int fx_turn_undead3(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 
 	// just a hardcoded +2 instead of the turner's level as per 3e
 	int maxTurnedLevels = turner->LuckyRoll(2, 6, 2) + turner->GetAbilityBonus(IE_CHR);
-	if (turner->HasFeat(FEAT_IMPROVED_TURNING)) {
+	if (turner->HasFeat(Feat::ImprovedTurning)) {
 		maxTurnedLevels += 2;
 	}
 
@@ -2276,7 +2276,7 @@ int fx_control (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//check for slippery mind feat success
 	const Game *game = core->GetGame();
-	if (fx->FirstApply && target->HasFeat(FEAT_SLIPPERY_MIND)) {
+	if (fx->FirstApply && target->HasFeat(Feat::SlipperyMind)) {
 		fx->Parameter3 = 1;
 		fx->Parameter4 = game->GameTime+core->Time.round_size;
 	}
@@ -3258,7 +3258,7 @@ int fx_power_attack (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_power_attack(%2d)", fx->Opcode);
 
-	if (!target->HasFeat(FEAT_POWER_ATTACK)) return FX_NOT_APPLIED;
+	if (!target->HasFeat(Feat::PowerAttack)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
 	ieDword x=target->PCStats->ExtraSettings[ES_POWERATTACK];
@@ -3285,7 +3285,7 @@ int fx_expertise (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //up to feat_expertise count (player's choice)
 	// print("fx_expertise(%2d)", fx->Opcode);
 
-	if (!target->HasFeat(FEAT_EXPERTISE)) return FX_NOT_APPLIED;
+	if (!target->HasFeat(Feat::Expertise)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
 	ieDword x=target->PCStats->ExtraSettings[ES_EXPERTISE];
@@ -3310,7 +3310,7 @@ int fx_arterial_strike (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_arterial_strike(%2d)", fx->Opcode);
 	//arterial strike doesn't work for npcs?
-	if (!target->HasFeat(FEAT_ARTERIAL_STRIKE)) return FX_NOT_APPLIED;
+	if (!target->HasFeat(Feat::ArterialStrike)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
 	if (target->PCStats->ExtraSettings[ES_ARTERIAL]) {
@@ -3343,7 +3343,7 @@ int fx_hamstring (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_hamstring(%2d)", fx->Opcode);
 	//hamstring doesn't work for npcs?
-	if (!target->HasFeat(FEAT_HAMSTRING)) return FX_NOT_APPLIED;
+	if (!target->HasFeat(Feat::Hamstring)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
 	if (target->PCStats->ExtraSettings[ES_HAMSTRING]) {
@@ -3375,7 +3375,7 @@ int fx_rapid_shot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_rapid_shot(%2d)", fx->Opcode);
 	//rapid shot doesn't work for npcs?
-	if (!target->HasFeat(FEAT_RAPID_SHOT)) return FX_NOT_APPLIED;
+	if (!target->HasFeat(Feat::RapidShot)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
 	if (target->PCStats->ExtraSettings[ES_RAPIDSHOT]) {

@@ -1016,9 +1016,10 @@ static inline int CheckMagicResistance(const Actor* actor, const Effect* fx, con
 		int roll = core->Roll(1, 20, 0);
 		ieDword check = fx->CasterLevel + roll;
 		int penetration = 0;
-		// +2/+4 level bonus from the (greater) spell penetration feat
-		if (caster && caster->HasFeat(FEAT_SPELL_PENETRATION)) {
-			penetration += 2 * caster->GetStat(IE_FEAT_SPELL_PENETRATION);
+		if (caster) {
+			// +2/+4 level bonus from the (greater) spell penetration feat
+			int feat = caster->GetFeat(Feat::SpellPenetration);
+			penetration += 2 * feat;
 		}
 		check += penetration;
 		resisted = (signed) check < (signed) val;
@@ -1100,7 +1101,7 @@ static int CheckSaves(Actor* actor, Effect* fx)
 			fx->Parameter1 /= 2;
 		}
 		// improved evasion: take only half damage even though we failed the save
-		if (globals.iwd2fx && fx->IsSaveForHalfDamage && actor->HasFeat(FEAT_IMPROVED_EVASION)) {
+		if (globals.iwd2fx && fx->IsSaveForHalfDamage && actor->HasFeat(Feat::ImprovedEvasion)) {
 			fx->Parameter1 /= 2;
 		}
 	}

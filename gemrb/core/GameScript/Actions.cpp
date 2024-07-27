@@ -6919,9 +6919,10 @@ void GameScript::AddFeat(Scriptable* Sender, Action* parameters)
 	int value = parameters->int1Parameter;
 	//default is increase by 1
 	if (!value) value = 1;
-	value += actor->GetFeat(parameters->int0Parameter);
+	Feat feat = static_cast<Feat>(parameters->int0Parameter);
+	value += actor->GetFeat(feat);
 	//SetFeatValue will handle edges
-	actor->SetFeatValue(parameters->int0Parameter, value);
+	actor->SetFeatValue(feat, value);
 }
 
 void GameScript::MatchHP(Scriptable* Sender, Action* parameters)

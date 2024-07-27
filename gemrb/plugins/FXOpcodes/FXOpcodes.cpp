@@ -3086,7 +3086,7 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!STATE_GET(STATE_BLIND)) {
 		STATE_SET( STATE_BLIND );
 		//the feat normally exists only in IWD2, but won't hurt
-		if (!target->GetFeat(FEAT_BLIND_FIGHT)) {
+		if (!target->HasFeat(Feat::BlindFight)) {
 			target->AddPortraitIcon(PI_BLIND);
 			if (reverse) {
 				//BG2

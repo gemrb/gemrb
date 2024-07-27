@@ -26,6 +26,7 @@
 #include "Scriptable/PCStatStruct.h"
 
 #include "exports.h"
+#include "ie_feats.h"
 #include "ie_stats.h" // using definitions as described in stats.ids
 #include "ie_types.h"
 #include "strrefs.h"
@@ -71,7 +72,6 @@ enum CREVersion {
 
 #define MAX_STATS 256
 #define MAX_LEVEL 128
-#define MAX_FEATS 96 //3*sizeof(ieDword)
 
 //lucky roll
 #define LR_CRITICAL    1
@@ -955,9 +955,9 @@ public:
 	int GetAbilityBonus(unsigned int ability, int value = -1) const;
 	int GetSkillStat(unsigned int skill) const;
 	int GetSkill(unsigned int skill, bool ids=false) const;
-	int GetFeat(unsigned int feat) const;
-	void SetFeat(unsigned int feat, BitOp mode);
-	void SetFeatValue(unsigned int feat, int value, bool init = true);
+	int GetFeat(Feat idx) const;
+	void SetFeat(Feat feat, BitOp mode);
+	void SetFeatValue(Feat idx, int value, bool init = true);
 	void SetUsedWeapon(AnimRef, const std::array<ieWord, 3>& meleeAnimation,
 		unsigned char WeaponType = IE_ANI_WEAPON_INVALID);
 	void SetUsedShield(AnimRef, unsigned char WeaponType = IE_ANI_WEAPON_INVALID);
@@ -978,7 +978,7 @@ public:
 	/* Checks a spellstate */
 	bool HasSpellState(unsigned int spellstate) const;
 	/* Checks a feat */
-	bool HasFeat(unsigned int featindex) const;
+	bool HasFeat(Feat feat) const;
 	/* Reports projectile immunity, nonzero if immune */
 	ieDword ImmuneToProjectile(ieDword projectile) const;
 	/* Sets projectile immunity */

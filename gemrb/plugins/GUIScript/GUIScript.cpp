@@ -10154,7 +10154,8 @@ actor has the passed feat id (from ie_feats.py).\n\
 
 static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, featindex;
+	int globalID;
+	Feat featindex;
 	PARSE_ARGS( args, "ii", &globalID, &featindex );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -10180,11 +10181,13 @@ PyDoc_STRVAR( GemRB_SetFeat__doc,
 
 static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, featindex, value;
-	PARSE_ARGS( args,  "iii", &globalID, &featindex, &value );
+	int globalID;
+	int value;
+	Feat featIndex;
+	PARSE_ARGS(args, "iii", &globalID, &featIndex, &value);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-	actor->SetFeatValue(featindex, value, false);
+	actor->SetFeatValue(featIndex, value, false);
 	Py_RETURN_NONE;
 }
 
