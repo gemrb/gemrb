@@ -10156,7 +10156,7 @@ static PyObject* GemRB_HasFeat(PyObject * /*self*/, PyObject* args)
 {
 	int globalID;
 	Feat featindex;
-	PARSE_ARGS( args, "ii", &globalID, &featindex );
+	PARSE_ARGS(args, "ib", &globalID, &featindex);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 	return PyLong_FromLong(actor->GetFeat(featindex));
@@ -10184,7 +10184,7 @@ static PyObject* GemRB_SetFeat(PyObject * /*self*/, PyObject* args)
 	int globalID;
 	int value;
 	Feat featIndex;
-	PARSE_ARGS(args, "iii", &globalID, &featIndex, &value);
+	PARSE_ARGS(args, "ibi", &globalID, &featIndex, &value);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 	actor->SetFeatValue(featIndex, value, false);
