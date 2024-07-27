@@ -6714,7 +6714,7 @@ int Actor::GetToHit(ieDword Flags, const Actor *target)
 
 	if (target) {
 		// if the target is using a ranged weapon while we're meleeing, we get a +4 bonus
-		if ((Flags & WEAPON_STYLEMASK) != WEAPON_RANGED && target->weaponInfo[0].wflags & WEAPON_RANGED) {
+		if ((Flags & WEAPON_STYLEMASK) != WEAPON_RANGED && target->weaponInfo[usedLeftHand].wflags & WEAPON_RANGED) {
 			generic += 4;
 		}
 

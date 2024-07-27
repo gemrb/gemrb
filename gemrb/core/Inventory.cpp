@@ -1629,7 +1629,7 @@ void Inventory::BreakItemSlot(ieDword slot)
 	//if it is the magic weapon slot, don't break it, just remove it, because it couldn't be removed
 	//or for pst, just remove it as there is no breaking (the replacement item is a sound)
 	// also don't break ranged weapons (eg. when running out of throwing axes)
-	if (slot == (unsigned int) SLOT_MAGIC || core->HasFeature(GFFlags::HAS_PICK_SOUND) || Owner->weaponInfo[0].wflags & WEAPON_RANGED) {
+	if (slot == (unsigned int) SLOT_MAGIC || core->HasFeature(GFFlags::HAS_PICK_SOUND) || Owner->weaponInfo[Owner->usedLeftHand].wflags & WEAPON_RANGED) {
 		newItem.Reset();
 	} else {
 		newItem = itm->ReplacementItem;
