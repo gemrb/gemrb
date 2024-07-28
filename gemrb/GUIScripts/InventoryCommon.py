@@ -351,7 +351,7 @@ def DisplayItem (slotItem, itemtype):
 		read = GemRB.CanUseItemType (SLOT_ALL, slotItem['ItemResRef'], pc, False)
 	container = (itemtype & 1) and (item["Function"]&ITM_F_CONTAINER)
 	dialog = (itemtype & 1) and (item["Dialog"]!="" and item["Dialog"]!="*")
-	familiar = (itemtype & 1) and (item["Type"] == 38) and (item["Flags"] & IE_INV_ITEM_UNDROPPABLE)
+	familiar = (itemtype & 1) and (item["Type"] == 38) and (slotItem["Flags"] & IE_INV_ITEM_UNDROPPABLE)
 
 	# The "conversable" bit in PST actually means "usable", eg clot charm
 	# unlike BG2 (which only has the bit set on SW2H14 Lilarcor)
