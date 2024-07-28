@@ -2509,7 +2509,7 @@ void Game::MovePCs(const ResRef& targetArea, const Point& targetPoint, int orien
 void Game::MoveFamiliars(const ResRef& targetArea, const Point& targetPoint, int orientation) const
 {
 	for (const auto& npc : NPCs) {
-		if (npc->GetBase(IE_EA) == EA_FAMILIAR) {
+		if (npc->GetBase(IE_EA) == EA_FAMILIAR && npc->GetCurrentArea()) {
 			MoveBetweenAreasCore(npc, targetArea, targetPoint, orientation, true);
 		}
 	}
