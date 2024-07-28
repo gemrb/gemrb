@@ -2420,10 +2420,11 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 
 	// check for ActionOverride
 	// actions use the second and third object, so this is only set when overridden (see GenerateActionCore)
-	if (aC->objects[0]) {
-		Scriptable* scr = GetScriptableFromObject(Sender, aC->objects[0]);
+	const Object* overrider = aC->objects[0];
+	if (overrider) {
+		Scriptable* scr = GetScriptableFromObject(Sender, overrider);
 		if (CheckDeadException(scr, actionID)) {
-			scr = GetScriptableFromObject(Sender, aC->objects[0], GA_NO_DEAD);
+			scr = GetScriptableFromObject(Sender, overrider, GA_NO_DEAD);
 		}
 		aC->IncRef(); // if aC is us, we don't want it deleted!
 		Sender->ReleaseCurrentAction();
@@ -2436,9 +2437,13 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			ScriptDebugLog(DebugMode::ACTIONS, "Sender {} ran ActionOverride on {}", Sender->GetScriptName(), scr->GetScriptName());
 			HandleActionOverride(scr, aC);
 		} else {
-			Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
-			aC->objects[0]->dump();
-			aC->dump();
+			// skip showing errors when party size is lower than the (original) max
+			bool pc = overrider->objectFilters[0] >= 21 && overrider->objectFilters[0] < 27; // Player2-Player6
+			if (!pc) {
+				Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
+				overrider->dump();
+				aC->dump();
+			}
 		}
 		aC->Release();
 		return;
