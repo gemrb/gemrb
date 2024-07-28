@@ -257,16 +257,16 @@ EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_
 			fx.Target = FX_TARGET_PRESET;
 		}
 
-		if (fx.Target != FX_TARGET_SELF) {
-			fx.Projectile = pro;
-			fxqueue.AddEffect(new Effect(fx));
-		} else {
+		if (fx.Target == FX_TARGET_SELF) {
 			fx.Projectile = 0;
 			fx.Pos = pos;
 			// effects should be able to affect non living targets
 			//This is done by NULL target, the position should be enough
 			//to tell which non-actor object is affected
 			selfqueue.AddEffect(new Effect(fx));
+		} else {
+			fx.Projectile = pro;
+			fxqueue.AddEffect(new Effect(fx));
 		}
 	}
 	if (self && selfqueue) {

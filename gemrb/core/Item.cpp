@@ -110,16 +110,16 @@ EffectQueue Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, 
 			fx->Target = FX_TARGET_PRESET;
 		}
 
-		if (fx->Target != FX_TARGET_SELF) {
-			fx->Projectile = pro;
-			fxqueue.AddEffect(new Effect(*fx));
-		} else {
+		if (fx->Target == FX_TARGET_SELF) {
 			fx->Projectile = 0;
 			fx->Pos = pos;
 			if (target) {
 				//core->ApplyEffect(fx, target, self);
 				selfqueue.AddEffect(new Effect(*fx));
 			}
+		} else {
+			fx->Projectile = pro;
+			fxqueue.AddEffect(new Effect(*fx));
 		}
 	}
 	if (target && selfqueue.GetEffectsCount()) {
