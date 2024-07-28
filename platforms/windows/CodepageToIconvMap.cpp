@@ -82,6 +82,7 @@ const CodepageIconvMap codepageIconvMap = {{
 	{51936, "EUC-CN"}, /* EUC Simplified Chinese; Chinese Simplified (EUC) */
 	{51949, "euc-kr"}, /* EUC Korean */
 	{54936, "GB18030"}, /* Windows XP and later: GB18030 Simplified Chinese (4 byte); Chinese Simplified (GB18030) */
+	{65001, "utf-8"}, /* Opt-in on Windows 11 or later. */
 }};
 
 }
