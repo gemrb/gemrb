@@ -7655,7 +7655,7 @@ void GameScript::ChunkCreature(Scriptable *Sender, Action* parameters)
 
 void GameScript::MultiPlayerSync(Scriptable* Sender, Action* /*parameters*/)
 {
-	Sender->SetWait(1);
+	Sender->SetWait(2);
 }
 
 void GameScript::DestroyAllFragileEquipment(Scriptable* Sender, Action* parameters)
