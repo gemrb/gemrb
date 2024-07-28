@@ -8216,7 +8216,11 @@ int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx)
 	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
 		return FX_NOT_APPLIED;
 	}
-	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
+	if (fx->Pos.IsInvalid()) {
+		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
+	} else {
+		core->ApplySpellPoint(fx->Resource, target->GetCurrentArea(), fx->Pos, Owner, fx->Power);
+	}
 	return FX_NOT_APPLIED;
 }
 
