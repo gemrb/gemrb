@@ -4417,7 +4417,7 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	if (slot == -1) {
 		CObject<SaveGame> save(obj);
 
-		return PyLong_FromLong(sgip->CreateSaveGame(save, PyString_AsStringView(folder)));
+		return PyLong_FromLong(sgip->CreateSaveGame(save, PyString_AsStringObj(folder)));
 	} else {
 		return PyLong_FromLong(sgip->CreateSaveGame(slot, core->config.MultipleQuickSaves));
 	}
