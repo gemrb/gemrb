@@ -150,6 +150,9 @@ void* readonly_mmap(void *fd);
 void munmap(void *start, size_t);
 #endif
 
+GEM_EXPORT bool RemoveDirectory(const path_t& path);
+GEM_EXPORT bool UnlinkFile(const path_t& path);
+
 class GEM_EXPORT DirectoryIterator {
 public:
 	enum Flags {

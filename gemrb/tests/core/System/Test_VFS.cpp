@@ -21,11 +21,15 @@
 
 #include <gtest/gtest.h>
 
+#include "Streams/FileStream.h"
+#include "Strings/StringConversion.h"
 #include "System/VFS.h"
 
 #define IS_CASE_INSENSITIVE (WIN32 || __APPLE__)
 
 namespace GemRB {
+
+path_t getTempPath();
 
 TEST(DirectoryIterator_Test, DirectoryIteration) {
 	path_t scanDir = PathJoin("tests", "resources", "VFS", "encoding");
@@ -146,6 +150,99 @@ TEST(VFS_Test, ResolveCase) {
 	EXPECT_EQ(path, fmt::format("tests{0}resoUrces{0}vfs{0}encoding{0}file_ÄÖÜ.txt", SPathDelimiter));
 #else
 	EXPECT_EQ(path, "tests/resources/VFS/encoding/file_äöü.txt");
+#endif
+}
+
+TEST(VFS_Test, MakeDirectory) {
+	auto tempPath = getTempPath();
+
+	auto newDirectoryPath = PathJoin(tempPath, "new_directory");
+	EXPECT_TRUE(MakeDirectory(newDirectoryPath));
+	EXPECT_TRUE(DirExists(newDirectoryPath));
+	RemoveDirectory(newDirectoryPath);
+
+	auto umlautPath = PathJoin(tempPath, "test_ÖÄü");
+	EXPECT_TRUE(MakeDirectory(umlautPath));
+	EXPECT_TRUE(DirExists(umlautPath));
+	RemoveDirectory(umlautPath);
+}
+
+TEST(VFS_Test, MakeDirectories) {
+	auto tempPath = getTempPath();
+
+	auto newDirectoryPath = PathJoin(tempPath, "test", "new");
+	EXPECT_TRUE(MakeDirectories(newDirectoryPath));
+	EXPECT_TRUE(DirExists(newDirectoryPath));
+	RemoveDirectory(newDirectoryPath);
+	RemoveDirectory(PathJoin(tempPath, "test"));
+
+	auto umlautPath = PathJoin(tempPath, "test_Ö", "ü");
+	EXPECT_TRUE(MakeDirectories(umlautPath));
+	EXPECT_TRUE(DirExists(umlautPath));
+	RemoveDirectory(newDirectoryPath);
+	RemoveDirectory(PathJoin(tempPath, "test_Ö"));
+}
+
+TEST(VFS_Test, RemoveDirectory) {
+	auto tempPath = getTempPath();
+
+	auto newDirectoryPath = PathJoin(tempPath, "test", "new2");
+	EXPECT_TRUE(MakeDirectories(newDirectoryPath));
+	EXPECT_TRUE(RemoveDirectory(newDirectoryPath));
+	EXPECT_FALSE(DirExists(newDirectoryPath));
+	RemoveDirectory(PathJoin(tempPath, "test"));
+
+	auto umlautDirectoryPath = PathJoin(tempPath, "test_Ö", "ü");
+	EXPECT_TRUE(MakeDirectories(umlautDirectoryPath));
+	EXPECT_TRUE(RemoveDirectory(umlautDirectoryPath));
+	EXPECT_FALSE(DirExists(umlautDirectoryPath));
+	RemoveDirectory(PathJoin(tempPath, "test_Ö"));
+}
+
+TEST(VFS_Test, UnlinkFile) {
+	auto tempPath = getTempPath();
+
+	auto filePath = PathJoin(tempPath, "test.txt");
+	{
+		FileT file;
+		file.OpenNew(filePath);
+	}
+	EXPECT_TRUE(UnlinkFile(filePath));
+	EXPECT_FALSE(FileExists(filePath));
+
+	auto umlautFilePath = PathJoin(tempPath, "test_äß.txt");
+	{
+		FileT file;
+		file.OpenNew(umlautFilePath);
+	}
+	EXPECT_TRUE(UnlinkFile(umlautFilePath));
+	EXPECT_FALSE(FileExists(umlautFilePath));
+}
+
+path_t getTempPath() {
+#ifdef WIN32
+	constexpr DWORD pathLength = MAX_PATH + 1;
+	WCHAR tempPath[pathLength] = L"";
+
+	DWORD length = GetTempPath(pathLength, tempPath);
+	if (length == 0) {
+		assert(false);
+	}
+
+	auto result = RecodedStringFromWideStringBytes(reinterpret_cast<const char16_t*>(tempPath), length * 2, "UTF-8");
+	result.resize(length);
+
+	return result;
+#else
+	char* tmpDir = getenv("TMPDIR");
+	if (tmpDir == nullptr) {
+		tmpDir = getenv("TMP");
+	}
+	if (tmpDir == nullptr) {
+		return "/tmp";
+	}
+
+	return tmpDir;
 #endif
 }
 

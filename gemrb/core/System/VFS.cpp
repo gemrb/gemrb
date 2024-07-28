@@ -405,14 +405,15 @@ static bool MakeDirectory(StringView path)
 	char* end = const_cast<char*>(path.end());
 	std::swap(*end, term); // use swap because end may be a delimiter or a terminator
 #ifdef WIN32
-#define mkdir(path, mode) _mkdir(path)
-#endif
+	auto widePath = StringFromUtf8(path);
+
+	bool ret = _wmkdir(reinterpret_cast<const wchar_t*>(widePath.c_str())) == 0 || errno == EEXIST;
+#else
 	bool ret = mkdir(path.c_str(), S_IRWXU) == 0 || errno == EEXIST;
+#endif
+
 	std::swap(*end, term);
 	return ret;
-#ifdef WIN32
-#undef mkdir
-#endif
 }
 
 bool MakeDirectory(const path_t& path)
@@ -529,6 +530,24 @@ void* readonly_mmap(void *vfd) {
 }
 
 #endif
+
+bool UnlinkFile(const path_t& path) {
+#ifdef WIN32
+	auto widePath = StringFromUtf8(path);
+	return _wunlink(reinterpret_cast<const wchar_t*>(widePath.c_str())) == 0 || errno == ENOENT;
+#else
+	return unlink(path.c_str()) == 0 || errno == ENOENT;
+#endif
+}
+
+bool RemoveDirectory(const path_t& path) {
+#ifdef WIN32
+	auto widePath = StringFromUtf8(path);
+	return _wrmdir(reinterpret_cast<const wchar_t*>(widePath.c_str())) == 0 || errno == ENOENT;
+#else
+	return rmdir(path.c_str()) == 0 || errno == ENOENT;
+#endif
+}
 
 DirectoryIterator::DirectoryIterator(path_t path)
 : Path(std::move(FixPath(path)))
