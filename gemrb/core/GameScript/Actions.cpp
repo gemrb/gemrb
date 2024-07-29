@@ -7375,12 +7375,11 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 
 	// voice
 	core->GetAudioDrv()->Play(parameters->string0Parameter, channel, Sender->Pos, GEM_SND_SPEECH | GEM_SND_QUEUE | GEM_SND_SPATIAL);
-	// starting sound, played at the same time, but on a different channel
-	core->GetAudioDrv()->Play(parameters->string1Parameter, SFXChannel::Casting, Sender->Pos, GEM_SND_QUEUE | GEM_SND_SPATIAL);
+	// string1Parameter has the starting sound, played at the same time, but on SFXChannel::Casting
 	// NOTE: only a few uses have also an ending sound that plays when the effect ends (also stopping Sound1)
 	// but we don't even read all three string parameters, as Action stores just two
 	// seems like a waste of memory to impose it on everyone, just for these few users
-	// if it happens at some point, fx->Resource = parameters->string2Parameter and deal with it in the effect
+	// (ok, many actions take three, but one is the variable context, so gets merged; here we actually end up with 1 and 3)
 
 	const Actor* caster = Scriptable::As<Actor>(Sender);
 	int adjustedDuration = 0;
@@ -7398,6 +7397,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED_TICKS;
 	fx->Duration = adjustedDuration;
 	fx->Target = FX_TARGET_PRESET;
+	fx->Resource = parameters->string1Parameter;
 	//int2param isn't actually used in the original engine
 
 	core->ApplyEffect(fx, actor, src);

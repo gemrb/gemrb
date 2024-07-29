@@ -4621,6 +4621,13 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		//simulate sparkle casting glows
 		target->ApplyEffectCopy(fx, fx_sparkle_ref, Owner, fx->Parameter2, 3);
 	}
+
+	// Resource contains the termination sound from when used from GameScript::SpellCastEffect
+	// the channel is a guess
+	if (fx->Duration - core->GetGame()->GameTime == 1 && !fx->Resource.IsEmpty()) {
+		core->GetAudioDrv()->Play(fx->Resource, SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+	}
+
 	// TODO: this opcode is also affected by slow/haste
 	return FX_NOT_APPLIED;
 }
