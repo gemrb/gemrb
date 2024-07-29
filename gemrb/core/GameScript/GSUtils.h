@@ -49,7 +49,7 @@ extern std::array<TriggerFunction, MAX_TRIGGERS> triggers;
 extern std::array<ActionFunction, MAX_ACTIONS> actions;
 extern std::array<ObjectFunction, MAX_OBJECTS> objects;
 extern std::array<IDSFunction, MAX_OBJECT_FIELDS> idtargets;
-extern std::array<short, MAX_ACTIONS> actionflags;
+extern std::array<uint16_t, MAX_ACTIONS> actionflags;
 extern std::array<short, MAX_TRIGGERS> triggerflags;
 extern ResRefRCCache<Script> BcsCache; //cache for scripts
 extern int ObjectIDSCount;

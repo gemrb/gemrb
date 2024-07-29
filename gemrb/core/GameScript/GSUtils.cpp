@@ -64,7 +64,7 @@ std::array<TriggerFunction, MAX_TRIGGERS> triggers;
 std::array<ActionFunction, MAX_ACTIONS> actions;
 std::array<ObjectFunction, MAX_OBJECTS> objects;
 std::array<IDSFunction, MAX_OBJECT_FIELDS> idtargets;
-std::array<short, MAX_ACTIONS> actionflags;
+std::array<uint16_t, MAX_ACTIONS> actionflags;
 std::array<short, MAX_TRIGGERS> triggerflags;
 ResRefRCCache<Script> BcsCache; //cache for scripts
 int ObjectIDSCount = 7;

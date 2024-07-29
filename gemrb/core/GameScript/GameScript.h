@@ -447,7 +447,7 @@ enum RunAwayFlags {
 struct ActionLink {
 	const char* Name;
 	ActionFunction Function;
-	short Flags;
+	uint16_t Flags;
 };
 
 struct ObjectLink {
