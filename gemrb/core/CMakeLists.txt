@@ -68,6 +68,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GameScript/Matching.cpp
 	GameScript/Objects.cpp
 	GameScript/ParseBCS.cpp
+	GameScript/ParseText.cpp
 	GameScript/Targets.cpp
 	GameScript/Triggers.cpp
 	GUI/GUIScriptInterface.cpp
