@@ -86,6 +86,7 @@ enum class EscapeArea {
 
 #define ACF_OVERRIDE 1 // was this action invoked via ActionOverride?
 #define ACF_REALLOW_SCRIPTS 0x1000 // gemrb internal
+#define ACF_MISSING_OBJECT  0x2000 // used for detection of [ANYONE], since it has the same signature as no object, but is not the same
 #define ACF_FOLLOW_DONE 0x10000000 // Bubb: written during CGameSprite::Follow(), I believe it means the MoveToPoint() ended with ACTION_DONE
 // NOTE: if it ever becomes useful, this is where it came into play
 // CGameSprite::Follow() is used in the Follow action, as well as when Leader() is used in
@@ -96,6 +97,7 @@ enum class EscapeArea {
 #define TF_NEGATE  1   //negate trigger result
 #define TF_APPLIED 2   //set in living when trigger applied
 #define TF_ADDED   4   //set in scriptable when trigger added/applied
+#define TF_MISSING_OBJECT 8 // used for detection of [ANYONE], since it has the same signature as no object, but is not the same
 
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING		5

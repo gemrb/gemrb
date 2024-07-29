@@ -508,6 +508,7 @@ Trigger* GenerateTrigger(std::string string)
 		Log(ERROR, "GameScript", "Malformed scripting trigger: '{}'", string);
 		return nullptr;
 	}
+	if (triggerflags[trigger->triggerID] & TF_HAS_OBJECT && !trigger->objectParameter) trigger->flags |= TF_MISSING_OBJECT;
 	return trigger;
 }
 
@@ -544,6 +545,10 @@ Action* GenerateAction(std::string actionString)
 	action = GenerateActionCore(src, str, actionID);
 	if (!action) {
 		Log(ERROR, "GameScript", "Malformed scripting action: '{}'", actionString);
+		return nullptr;
+	}
+	if (actionflags[action->actionID] & AF_HAS_OBJECT && !action->objects[0] && !action->objects[1]) {
+		action->flags |= ACF_MISSING_OBJECT;
 	}
 
 	return action;

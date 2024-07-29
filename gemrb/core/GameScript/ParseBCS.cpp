@@ -143,6 +143,7 @@ static Trigger* ReadTrigger(DataStream* stream)
 
 	stream->ReadLine(line);
 	tR->objectParameter = DecodeObject(line);
+	if (triggerflags[tR->triggerID] & TF_HAS_OBJECT && !tR->objectParameter) tR->flags |= TF_MISSING_OBJECT;
 
 	stream->ReadLine(line);
 	// discard invalid triggers, so they won't cause a crash
@@ -274,6 +275,10 @@ Response* GameScript::ReadResponse(DataStream* stream)
 				aC->int0Parameter = -1;
 			}
 		}
+		if (actionflags[aC->actionID] & AF_HAS_OBJECT && !aC->objects[0] && !aC->objects[1]) {
+			aC->flags |= ACF_MISSING_OBJECT;
+		}
+
 		rE->actions.push_back(aC);
 
 		stream->ReadLine(line);
