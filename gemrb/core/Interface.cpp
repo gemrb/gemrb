@@ -2976,7 +2976,7 @@ void Interface::DelTree(const path_t& path, bool onlysave) const
 		const path_t& name = dir.GetName();
 		if (!onlysave || SavedExtension(name) ) {
 			path_t dtmp = dir.GetFullPath();
-			unlink(dtmp.c_str());
+			UnlinkFile(dtmp);
 		}
 	} while (++dir);
 }
@@ -3573,7 +3573,7 @@ int Interface::SwapoutArea(Map *map) const
 {
 	auto RemoveFromCache = [&](const ResRef& resref, SClass_ID classID) {
 		path_t filename = PathJoinExt(config.CachePath, resref, TypeExt(classID));
-		unlink(filename.c_str());
+		UnlinkFile(filename);
 	};
 
 	//refuse to save ambush areas, for example

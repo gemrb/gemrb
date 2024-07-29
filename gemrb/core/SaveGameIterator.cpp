@@ -718,7 +718,7 @@ void SaveGameIterator::DeleteSaveGame(const Holder<SaveGame>& game) const
 	}
 
 	core->DelTree(game->GetPath(), false); //remove all files from folder
-	rmdir(game->GetPath().c_str());
+	RemoveDirectory(game->GetPath());
 }
 
 }
