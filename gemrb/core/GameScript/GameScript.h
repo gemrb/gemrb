@@ -382,6 +382,7 @@ using IDSFunction = int (*)(const Actor*, int parameter);
 #define TF_CONDITION    1 //this isn't a trigger, just a condition (0x4000)
 #define TF_SAVED        2 //trigger is in svtriobj.ids
 #define TF_MERGESTRINGS 8 //same value as actions' mergestring
+#define TF_HAS_OBJECT   16 // whether it has an object parameter
 
 struct TriggerLink {
 	const char* Name;
@@ -437,6 +438,7 @@ struct TriggerLink {
 #define AF_SCR_INSTANT  8192 //instant script actions
 #define AF_INSTANT      (AF_DLG_INSTANT|AF_SCR_INSTANT) //only iwd2 treats them separately; 12288
 #define AF_IWD2_OVERRIDE 16384 // marking actions that require special attention when clearing during ActionOverride
+#define AF_HAS_OBJECT    32768 // whether it has an object parameter
 
 enum RunAwayFlags {
 	LeaveArea = 1,

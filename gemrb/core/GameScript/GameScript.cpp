@@ -1423,6 +1423,7 @@ static void SetupTriggers()
 		if (wasCondition) {
 			triggerflags[i] |= TF_CONDITION;
 		}
+		if (name.find("o:") != std::string::npos) triggerflags[i] |= TF_HAS_OBJECT;
 	}
 
 	// retry resolving previously missing triggers
@@ -1478,6 +1479,7 @@ static void SetupActions()
 		}
 		actions[i] = poi->Function;
 		actionflags[i] = poi->Flags;
+		if (name.find("o:") != std::string::npos) actionflags[i] |= AF_HAS_OBJECT;
 	}
 
 	// retry resolving previously missing actions
@@ -1580,6 +1582,7 @@ static void SetupOverrideActions()
 		}
 		actions[i] = poi->Function;
 		actionflags[i] = poi->Flags;
+		if (name.find("o:") != std::string::npos) actionflags[i] |= AF_HAS_OBJECT;
 	}
 }
 
@@ -1622,6 +1625,7 @@ static void SetupOverrideTriggers()
 		}
 		triggers[i] = poi->Function;
 		triggerflags[i] = tf;
+		if (trName.find("o:") != std::string::npos) triggerflags[i] |= TF_HAS_OBJECT;
 	}
 }
 
