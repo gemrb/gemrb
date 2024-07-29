@@ -473,6 +473,7 @@ extern void ScriptDebugLog(DebugMode bit, const char* message, ARGS&&... args)
 	Log(DEBUG, "GameScript", message, std::forward<ARGS>(args)...);
 }
 extern int RandomNumValue;
+extern int NextTriggerObjectID;
 
 class GEM_EXPORT GameScript {
 public:
@@ -497,7 +498,6 @@ private: //Internal Functions
 	ResponseBlock* ReadResponseBlock(DataStream* stream);
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);
-	Trigger* ReadTrigger(DataStream* stream);
 	static int InParty(Scriptable *Sender, const Trigger *parameters, bool allowdead);
 
 	// Internal variables

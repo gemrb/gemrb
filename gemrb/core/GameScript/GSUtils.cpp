@@ -78,6 +78,7 @@ std::vector<ResRef> ObjectIDSTableNames;
 int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
 int RandomNumValue;
+int NextTriggerObjectID;
 Gem_Polygon **polygons;
 
 int GetReaction(const Actor *target, const Scriptable *Sender)
