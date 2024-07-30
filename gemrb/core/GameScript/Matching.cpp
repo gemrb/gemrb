@@ -217,22 +217,6 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 	return tgts;
 }
 
-static bool IsTargetingAnyone(const Object* oC)
-{
-	// make sure no other targeting/matching is at play
-	if (oC->objectFields[0] == -1) return false;
-	if (!oC->objectNameRef.IsEmpty()) return false;
-	for (int i = 0; i < MaxObjectNesting; i++) {
-		if (oC->objectFilters[i] > 0) return false;
-	}
-
-	int sum = 0;
-	for (int j = 0; j < ObjectIDSCount; j++) {
-		sum += oC->objectFields[j];
-	}
-	return sum == 0;
-}
-
 Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Action* parameters, int gaFlags)
 {
 	return GetAllObjects(map, Sender, parameters->objects[1], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
@@ -243,17 +227,19 @@ Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Trigger* parame
 	return GetAllObjects(map, Sender, parameters->objectParameter, gaFlags, parameters->flags & TF_MISSING_OBJECT);
 }
 
-Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Object* oC, int ga_flags, bool /*anyone*/)
+Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Object* oC, int ga_flags, bool anyone)
 {
-	if (!oC) {
+	// jump through hoops for [ANYONE]
+	if (!oC && !anyone) {
 		//return all objects
 		return GetAllActors(Sender, ga_flags);
 	}
 
 	Targets* tgts;
-	if (IsTargetingAnyone(oC)) { // handle [ANYONE]/[0] directly
+	if (anyone) {
 		tgts = GetAllActors(Sender, ga_flags);
 		if (tgts) tgts->Pop(); // remove self
+		return tgts;
 	} else {
 		tgts = EvaluateObject(map, Sender, oC, ga_flags);
 	}
@@ -486,7 +472,7 @@ int GetObjectCount(Scriptable* Sender, const Trigger* parameters)
 
 int GetObjectCount(Scriptable* Sender, const Object* oC, bool anyone)
 {
-	if (!oC) {
+	if (!oC && !anyone) {
 		return 0;
 	}
 	// EvaluateObject will return [PC]
@@ -512,7 +498,7 @@ int GetObjectLevelCount(Scriptable* Sender, const Trigger* parameters)
 {
 	const Object* oC = parameters->objectParameter;
 	bool anyone = parameters->flags & TF_MISSING_OBJECT;
-	if (!oC) {
+	if (!oC && !anyone) {
 		return 0;
 	}
 	// EvaluateObject will return [PC]
