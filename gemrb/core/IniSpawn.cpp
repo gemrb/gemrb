@@ -691,7 +691,7 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 			object.objectFields[i] = critter.Spec[i];
 		}
 
-		int cnt = GetObjectCount(map, &object);
+		int cnt = GetObjectCount(map, &object, false);
 		if (cnt >= critter.TotalQuantity) {
 			return;
 		}

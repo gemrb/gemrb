@@ -311,7 +311,7 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::i
 	Scriptable* tar;
 
 	if (parameters->objects[1]) {
-		tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+		tar = GetScriptableFromObject(Sender, parameters);
 		if (!tar) {
 			//could be an animation
 			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectNameVar);
@@ -603,7 +603,7 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 	} else {
 		flags |= GA_NO_DEAD;
 	}
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters->objectParameter, flags);
+	const Scriptable* tar = GetScriptableFromObject(Sender, parameters, flags);
 	/* don't set LastSeen if this isn't an actor */
 	if (!tar) {
 		return 0;
@@ -837,7 +837,7 @@ static Point FindOffScreenPoint(const Scriptable* Sender, int flags, int phase)
 
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 {
-	Scriptable* tmp = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Scriptable* tmp = GetScriptableFromObject(Sender, parameters);
 	//if there is nothing to copy, don't spawn anything
 	if (flags & CC_COPY && (!tmp || tmp->Type != ST_ACTOR)) {
 		return;
@@ -1093,7 +1093,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 
 	ScriptDebugLog(DebugMode::VARIABLES, "BeginDialog core");
 
-	tar = GetStoredActorFromObject(Sender, parameters->objects[1], GA_NO_DEAD);
+	tar = GetStoredActorFromObject(Sender, parameters, GA_NO_DEAD);
 	if (Flags & BD_OWN) {
 		scr = tar;
 	} else {
@@ -1399,7 +1399,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	const Scriptable *target = GetStoredActorFromObject(Sender, parameters->objects[1]);
+	const Scriptable* target = GetStoredActorFromObject(Sender, parameters);
 	if (!target) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2261,7 +2261,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		seeflag = GA_NO_DEAD;
 	}
 
-	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1], seeflag );
+	Scriptable* tar = GetStoredActorFromObject(Sender, parameters, seeflag);
 	if (!tar) {
 		parameters->int2Parameter = 0;
 		Sender->ReleaseCurrentAction();
@@ -2521,7 +2521,7 @@ void AddXPCore(const Action *parameters, bool divide)
 
 int NumItemsCore(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
+	const Scriptable* target = GetScriptableFromObject(Sender, parameters);
 	if (!target) {
 		return 0;
 	}
@@ -2543,7 +2543,7 @@ static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };
 static EffectRef fx_level_bounce_dec_ref = { "Bounce:SpellLevelDec", -1 };
 unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
+	const Scriptable* target = GetScriptableFromObject(Sender, parameters);
 	const Actor* actor = Scriptable::As<Actor>(target);
 	if (!actor) {
 		return 0;
@@ -2566,7 +2566,7 @@ static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
 static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
 unsigned int NumImmuneToSpellLevelCore(Scriptable* Sender, const Trigger* parameters)
 {
-	const Scriptable* target = GetScriptableFromObject(Sender, parameters->objectParameter);
+	const Scriptable* target = GetScriptableFromObject(Sender, parameters);
 	const Actor* actor = Scriptable::As<Actor>(target);
 	if (!actor) {
 		return 0;
@@ -2621,7 +2621,7 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 
 	Point start = parameters->pointParameter;
 	if (!(flags & RunAwayFlags::UsePoint)) {
-		const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
+		const Scriptable* tar = GetStoredActorFromObject(Sender, parameters);
 		if (!tar) {
 			Sender->ReleaseCurrentAction();
 			return;
@@ -2651,12 +2651,12 @@ void RunAwayFromCore(Scriptable* Sender, const Action* parameters, int flags)
 
 void MoveGlobalObjectCore(Scriptable* Sender, const Action* parameters, int flags)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters->objects[1]);
+	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return;
 	}
-	const Scriptable* to = GetScriptableFromObject(Sender, parameters->objects[2]);
+	const Scriptable* to = GetScriptableFromObject2(Sender, parameters);
 	if (!to) return;
 	const Map* map = to->GetCurrentArea();
 	if (!map) return;

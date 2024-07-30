@@ -7465,7 +7465,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	if (map) {
 		Object oC;
 		oC.objectFields[0]=EA_ENEMY;
-		Targets *tgts = GetAllObjects(map, target, &oC, GA_NO_DEAD);
+		Targets* tgts = GetAllObjects(map, target, &oC, GA_NO_DEAD, false);
 		if (!tgts) {
 			// no enemy to jump to
 			return FX_NOT_APPLIED;

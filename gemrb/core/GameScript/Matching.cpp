@@ -233,12 +233,23 @@ static bool IsTargetingAnyone(const Object* oC)
 	return sum == 0;
 }
 
-Targets *GetAllObjects(const Map *map, Scriptable *Sender, const Object *oC, int ga_flags)
+Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Action* parameters, int gaFlags)
+{
+	return GetAllObjects(map, Sender, parameters->objects[1], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
+}
+
+Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Trigger* parameters, int gaFlags)
+{
+	return GetAllObjects(map, Sender, parameters->objectParameter, gaFlags, parameters->flags & TF_MISSING_OBJECT);
+}
+
+Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Object* oC, int ga_flags, bool /*anyone*/)
 {
 	if (!oC) {
 		//return all objects
 		return GetAllActors(Sender, ga_flags);
 	}
+
 	Targets* tgts;
 	if (IsTargetingAnyone(oC)) { // handle [ANYONE]/[0] directly
 		tgts = GetAllActors(Sender, ga_flags);
@@ -308,7 +319,12 @@ Scriptable *GetActorObject(const TileMap *TMap, const ieVariable& name)
 }
 
 // blocking actions need to store some kinds of objects between ticks
-Scriptable *GetStoredActorFromObject(Scriptable *Sender, const Object *oC, int ga_flags)
+Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Action* parameters, int gaFlags)
+{
+	return GetStoredActorFromObject(Sender, parameters->objects[1], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
+}
+
+Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Object* oC, int ga_flags, bool anyone)
 {
 	Scriptable *tar = NULL;
 	const Actor* target;
@@ -321,7 +337,7 @@ Scriptable *GetStoredActorFromObject(Scriptable *Sender, const Object *oC, int g
 		}
 		return NULL; // target invalid/gone
 	}
-	tar = GetScriptableFromObject(Sender, oC, ga_flags);
+	tar = GetScriptableFromObject(Sender, oC, ga_flags, anyone);
 	target = Scriptable::As<Actor>(tar);
 	// maybe store the target if it's an actor..
 	// .. but we only want objects created via objectFilters
@@ -331,12 +347,27 @@ Scriptable *GetStoredActorFromObject(Scriptable *Sender, const Object *oC, int g
 	return tar;
 }
 
-Scriptable *GetScriptableFromObject(Scriptable *Sender, const Object *oC, int ga_flags)
+Scriptable* GetScriptableFromObject(Scriptable* Sender, const Trigger* parameters, int gaFlags)
+{
+	return GetScriptableFromObject(Sender, parameters->objectParameter, gaFlags, parameters->flags & TF_MISSING_OBJECT);
+}
+
+Scriptable* GetScriptableFromObject(Scriptable* Sender, const Action* parameters, int gaFlags)
+{
+	return GetScriptableFromObject(Sender, parameters->objects[1], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
+}
+
+Scriptable* GetScriptableFromObject2(Scriptable* Sender, const Action* parameters, int gaFlags)
+{
+	return GetScriptableFromObject(Sender, parameters->objects[2], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
+}
+
+Scriptable* GetScriptableFromObject(Scriptable* Sender, const Object* oC, int gaFlags, bool anyone)
 {
 	Scriptable *aC = nullptr;
 
 	const Game *game = core->GetGame();
-	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, ga_flags);
+	Targets* tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, gaFlags, anyone);
 	if (tgts) {
 		//now this could return other than actor objects
 		aC = tgts->GetTarget(0, ST_ANY);
@@ -447,7 +478,13 @@ bool MatchActor(const Scriptable *Sender, ieDword actorID, const Object *oC)
 	return true;
 }
 
-int GetObjectCount(Scriptable *Sender, const Object *oC)
+int GetObjectCount(Scriptable* Sender, const Trigger* parameters)
+{
+	const Object* oC = parameters->objectParameter;
+	return GetObjectCount(Sender, oC, parameters->flags & TF_MISSING_OBJECT);
+}
+
+int GetObjectCount(Scriptable* Sender, const Object* oC, bool anyone)
 {
 	if (!oC) {
 		return 0;
@@ -455,7 +492,7 @@ int GetObjectCount(Scriptable *Sender, const Object *oC)
 	// EvaluateObject will return [PC]
 	// GetAllObjects will also return Myself (evaluates object filters)
 	// i believe we need the latter here
-	Targets* tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0);
+	Targets* tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0, anyone);
 	int count = 0; // silly fallback to avoid potential crashes
 	if (tgts) {
 		count = static_cast<int>(tgts->Count());
@@ -471,15 +508,17 @@ int GetObjectCount(Scriptable *Sender, const Object *oC)
 //evaluates object filters
 //also check numcreaturesgtmylevel(myself,0) with
 //actor having at high level
-int GetObjectLevelCount(Scriptable *Sender, const Object *oC)
+int GetObjectLevelCount(Scriptable* Sender, const Trigger* parameters)
 {
+	const Object* oC = parameters->objectParameter;
+	bool anyone = parameters->flags & TF_MISSING_OBJECT;
 	if (!oC) {
 		return 0;
 	}
 	// EvaluateObject will return [PC]
 	// GetAllObjects will also return Myself (evaluates object filters)
 	// i believe we need the latter here
-	Targets* tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0);
+	Targets* tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, 0, anyone);
 	int count = 0;
 	if (tgts) {
 		targetlist::iterator m;
