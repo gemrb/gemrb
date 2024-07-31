@@ -158,7 +158,7 @@ bool GlobalTimer::Update()
 
 	// don't update scripts if we're fading in or out
 	if (fadeToCounter || fadeFromCounter != fadeFromMax) {
-		map->UpdateFog(); // needed eg. when meeting Yoshimo for the first time
+		if (!fadeToCounter) map->UpdateFog(); // needed eg. when meeting Yoshimo for the first time
 		if (thisTime) {
 			game->RealTime++;
 		}
