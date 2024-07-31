@@ -576,7 +576,7 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 			dist = snd->Modified[IE_VISUALRANGE];
 			if (halveRange) dist /= 2;
 		} else {
-			dist = VOODOO_VISUAL_RANGE;
+			dist = VOODOO_VISUAL_RANGE; // NOTE: perhaps we should use the parameter from LOS if that was used
 			los = false;
 		}
 
