@@ -604,7 +604,6 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 		flags |= GA_NO_DEAD;
 	}
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters, flags);
-	/* don't set LastSeen if this isn't an actor */
 	if (!tar) {
 		return 0;
 	}
@@ -621,7 +620,9 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 			return 1;
 		}
 		// NOTE: Detect supposedly doesn't set LastMarked — disable on GA_DETECT if needed
-		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR && Sender!=tar) {
+		// don't set LastSeen if this isn't an actor ... except in iwd2, since ar6104 61pvpost.bcs relies on it
+		bool setSeen = core->HasFeature(GFFlags::RULES_3ED) || Sender->Type == ST_ACTOR;
+		if (setSeen && tar->Type == ST_ACTOR && Sender != tar) {
 			Actor* snd = static_cast<Actor*>(Sender);
 			snd->objects.LastSeen = tar->GetGlobalID();
 			snd->objects.LastMarked = tar->GetGlobalID();

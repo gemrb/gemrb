@@ -23,6 +23,7 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
 #include "GameScript/Targets.h"
+#include "Scriptable/InfoPoint.h"
 
 #include "DialogHandler.h"
 #include "Game.h"
@@ -199,11 +200,22 @@ Targets *GameScript::LastSeenBy(const Scriptable *Sender, Targets *parameters, i
 	if (!actor && Sender->Type == ST_ACTOR) {
 		actor = static_cast<const Actor*>(Sender);
 	}
-	parameters->Clear();
+
 	if (actor) {
 		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastSeen);
+		parameters->Clear();
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
+		}
+	} else {
+		// try with regions for iwd2
+		const InfoPoint* ip = static_cast<InfoPoint*>(parameters->GetTarget(0, ST_PROXIMITY));
+		parameters->Clear();
+		if (ip) {
+			Actor* target = ip->GetCurrentArea()->GetActorByGlobalID(ip->objects.LastSeen);
+			if (target) {
+				parameters->AddTarget(target, 0, ga_flags);
+			}
 		}
 	}
 	return parameters;
