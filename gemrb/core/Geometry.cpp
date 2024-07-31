@@ -37,6 +37,7 @@ static float pseudoAtan2(float y, float x)
 	// Extract the sign bits
 	uint32_t xS = signMask & (uint32_t&) x;
 	uint32_t yS = signMask & (uint32_t&) y;
+	if (xS == 0 && yS == 0) return 0;
 
 	// Determine the quadrant offset
 	float q = float((~xS & yS) >> 29 | xS >> 30);
