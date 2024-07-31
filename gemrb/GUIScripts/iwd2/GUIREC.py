@@ -228,6 +228,8 @@ def GetFavoredClass (pc, code):
 # returns the effective character level modifier
 def GetECL (pc):
 	RaceIndex = IDLUCommon.GetRace (pc)
+	if RaceIndex == None:
+		return 0
 	RaceRowName = CommonTables.Races.GetRowName (RaceIndex)
 	return CommonTables.Races.GetValue (RaceRowName, "ECL")
 
