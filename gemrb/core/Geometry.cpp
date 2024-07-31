@@ -61,6 +61,7 @@ float_t AngleFromPoints(const Point& p1, const Point& p2, bool exact)
 {
 	float_t xdiff = p1.x - p2.x;
 	float_t ydiff = p1.y - p2.y;
+	if (xdiff == 0 && ydiff == 0) return 0;
 
 	float_t angle;
 	if (exact) {
