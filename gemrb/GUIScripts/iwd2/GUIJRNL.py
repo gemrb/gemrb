@@ -62,6 +62,7 @@ def UpdateJournalWindow (Window):
 
 	# text area
 	Text = Window.GetControl (1)
+	Text.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
 	Text.Clear ()
 
 	JournalText = ""
