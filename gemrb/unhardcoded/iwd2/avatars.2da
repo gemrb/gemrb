@@ -428,7 +428,7 @@
 0xE8B9     MYUH       MYUH       MYUH       MYUH       9          2          1          *
 0xEF1D     MMAD       MMAD       MMAD       MMAD       9          2          1          *
 0xF029     MWI4       MWI4       MWI4       MWI4       9          2          1          *
-0xF308     MGFI       MGFI       MGFI       MGFI       9          4          1          *
+0xF308     MGFI       MGFI       MGFI       MGFI       9          3          1          *
 0xF40B     MSAH       MSAH       MSAH       MSAH       9          2          1          *
 0xF41B     MSAT       MSAT       MSAT       MSAT       9          2          1          *
 0xF50B     MDRM       MDRM       MDRM       MDRM       9          4          1          *
