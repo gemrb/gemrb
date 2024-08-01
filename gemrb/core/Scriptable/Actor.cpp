@@ -10330,7 +10330,7 @@ void Actor::UseExit(ieDword exitID) {
 		InternalFlags|=IF_USEEXIT;
 	} else {
 		InternalFlags&=~IF_USEEXIT;
-		LastArea = Area;
+		LastArea = AreaName;
 		UsedExit.Reset();
 		if (lastExit) {
 			const Scriptable* ip = area->GetInfoPointByGlobalID(lastExit);

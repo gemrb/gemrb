@@ -603,7 +603,7 @@ void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
 	// it didn't check they were in the same area
 	// we just do it instantly for simplicity
 	if (actor == protagonist) {
-		core->GetGame()->MoveFamiliars(actor->Area, actor->Pos, -1);
+		core->GetGame()->MoveFamiliars(actor->AreaName, actor->Pos, -1);
 	}
 }
 
@@ -714,7 +714,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
 		//if the actor isn't in the source area, we don't care
-		if (tar->Area != parameters->resref0Parameter) {
+		if (tar->AreaName != parameters->resref0Parameter) {
 			continue;
 		}
 		// no need of CreateMovementEffect, party members are always moved immediately
@@ -724,7 +724,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 	while (i--) {
 		Actor *tar = game->GetNPC(i);
 		//if the actor isn't in the source area, we don't care
-		if (tar->Area != parameters->resref0Parameter) {
+		if (tar->AreaName != parameters->resref0Parameter) {
 			continue;
 		}
 		//if the actor is currently in a loaded area, remove it from there
@@ -733,9 +733,9 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 			map->RemoveActor(tar);
 		}
 		//update the target's area to the destination
-		tar->Area = parameters->resref1Parameter;
+		tar->AreaName = parameters->resref1Parameter;
 		//if the destination area is currently loaded, move the actor there now
-		if (game->FindMap(tar->Area)) {
+		if (game->FindMap(tar->AreaName)) {
 			MoveBetweenAreasCore(tar, parameters->resref1Parameter, parameters->pointParameter, -1, true);
 		}
 	}
@@ -1506,7 +1506,7 @@ void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters
 		GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
 		if (act && gle) {
 			gle->Pos = act->Pos;
-			gle->AreaResRef = act->Area;
+			gle->AreaResRef = act->AreaName;
 		}
 	}
 }

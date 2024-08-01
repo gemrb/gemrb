@@ -2559,7 +2559,7 @@ void GameControl::ChangeMap(const Actor *pc, bool forced)
 {
 	//swap in the area of the actor
 	Game* game = core->GetGame();
-	if (forced || (pc && pc->Area != game->CurrentArea)) {
+	if (forced || (pc && pc->AreaName != game->CurrentArea)) {
 		// disable so that drawing and events dispatched doesn't happen while there is not an area
 		// we are single threaded, but game loading runs its own event loop which will cause events/drawing to come in
 		SetDisabled(true);
@@ -2569,7 +2569,7 @@ void GameControl::ChangeMap(const Actor *pc, bool forced)
 		overMe = nullptr;
 		/*this is loadmap, because we need the index, not the pointer*/
 		if (pc) {
-			game->GetMap(pc->Area, true);
+			game->GetMap(pc->AreaName, true);
 		} else {
 			ResRef oldMaster = game->LastMasterArea; // only update it for party travel
 			game->GetMap(game->CurrentArea, true);

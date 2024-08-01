@@ -1340,7 +1340,7 @@ static EffectRef fx_movetoarea_ref = { "MoveToArea", -1 };
 
 bool CreateMovementEffect(Actor* actor, const ResRef& area, const Point &position, int face)
 {
-	if (actor->Area == area) return false; //no need of this for intra area movement
+	if (actor->AreaName == area) return false; // no need of this for intra area movement
 
 	Effect *fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
 	if (!fx) return false;

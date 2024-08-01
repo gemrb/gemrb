@@ -594,7 +594,7 @@ void IniSpawn::RespawnNameless()
 	if (NamelessSpawnPoint.IsZero()) {
 		game->JoinParty(nameless, JP_INITPOS);
 		NamelessSpawnPoint=nameless->Pos;
-		NamelessSpawnArea = nameless->Area;
+		NamelessSpawnArea = nameless->AreaName;
 	}
 
 	nameless->Resurrect(NamelessSpawnPoint);

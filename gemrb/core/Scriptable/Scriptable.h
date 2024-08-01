@@ -522,7 +522,7 @@ public:
 	Movable& operator=(const Movable&) = delete;
 
 	Point Destination = Pos;
-	ResRef Area;
+	ResRef AreaName;
 	Point HomeLocation;//spawnpoint, return here after rest
 	ieWord maxWalkDistance = 0; // maximum random walk distance from home
 public:

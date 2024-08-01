@@ -1942,7 +1942,7 @@ void Map::MarkVisited(const Actor *actor) const
 void Map::AddActor(Actor* actor, bool init)
 {
 	//setting the current area for the actor as this one
-	actor->Area = scriptName;
+	actor->AreaName = scriptName;
 	if (!HasActor(actor)) {
 		actors.push_back( actor );
 	}
@@ -1982,7 +1982,7 @@ void Map::DeleteActor(size_t idx)
 		ClearSearchMapFor( actor );
 		//remove the area reference from the actor
 		actor->SetMap(NULL);
-		actor->Area.Reset();
+		actor->AreaName.Reset();
 		objectStencils.erase(actor);
 		//don't destroy the object in case it is a persistent object
 		//otherwise there is a dead reference causing a crash on save
@@ -2900,7 +2900,7 @@ void Map::RemoveActor(Actor* actor)
 			actor->ClearPath(true);
 			ClearSearchMapFor(actor);
 			actor->SetMap(NULL);
-			actor->Area.Reset();
+			actor->AreaName.Reset();
 			actors.erase( actors.begin()+i );
 			return;
 		}

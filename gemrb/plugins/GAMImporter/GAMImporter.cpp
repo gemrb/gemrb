@@ -197,7 +197,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		newGame->JoinParty( actor, actor->Selected?JP_SELECT:0 );
 		// potentially override the current area, now that the pcs are loaded
 		if (newGame->version != GAM_VER_PST && static_cast<ieWord>(actor->InParty - 1) == newGame->NPCAreaViewed) {
-			newGame->CurrentArea = actor->Area;
+			newGame->CurrentArea = actor->AreaName;
 			newGame->AnotherArea = newGame->CurrentArea;
 		}
 	}
@@ -485,7 +485,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 
 	actor->ReinitQuickSlots();
 	actor->Destination = actor->Pos = pcInfo.Pos;
-	actor->Area = pcInfo.Area;
+	actor->AreaName = pcInfo.Area;
 	actor->SetOrientation(ClampToOrientation(pcInfo.Orientation), false);
 	actor->TalkCount = pcInfo.TalkCount;
 	actor->Modal.State = pcInfo.ModalState;
@@ -864,7 +864,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	//seems to be accepted by all
 	stream->WriteFilling(8);
 	stream->WriteDword(ac->GetOrientation());
-	stream->WriteResRefUC(ac->Area);
+	stream->WriteResRefUC(ac->AreaName);
 	stream->WritePoint(ac->Pos);
 	//no viewport, we cheat
 	stream->WriteWord(ac->Pos.x - core->config.Width / 2);

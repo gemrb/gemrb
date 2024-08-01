@@ -5456,7 +5456,7 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				map->RemoveActor( target );
 			}
 			//set the destination area
-			target->Area = fx->Resource;
+			target->AreaName = fx->Resource;
 			return FX_APPLIED;
 		}
 	}
@@ -7720,7 +7720,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 			GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
 			if (act && gle) {
 				gle->Pos = act->Pos;
-				gle->AreaResRef = act->Area;
+				gle->AreaResRef = act->AreaName;
 			}
 		}
 		break;
@@ -7733,7 +7733,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 			GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
 			if (act && gle) {
 				gle->Pos = act->Pos;
-				gle->AreaResRef = act->Area;
+				gle->AreaResRef = act->AreaName;
 			}
 		}
 	}

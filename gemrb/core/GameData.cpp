@@ -99,7 +99,7 @@ int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool 
 		actor->creVersion = VersionOverride;
 	}
 
-	actor->Area = core->GetGame()->CurrentArea;
+	actor->AreaName = core->GetGame()->CurrentArea;
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		actor->SetStance( IE_ANI_TWITCH );
 	} else {
