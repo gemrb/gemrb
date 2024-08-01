@@ -3118,8 +3118,8 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 	if (parameters->int0Parameter == 0) {
 		// move feet lice away — it can happen we "spawned" on others
 		// Map::BlockSearchMapFor() is not enough
-		int flags = GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED;
-		const auto& neighbours = map->GetAllActorsInRadius(actor->Pos, flags, actor->circleSize);
+		int flags = GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED | GA_NO_SELF;
+		const auto& neighbours = map->GetAllActorsInRadius(actor->Pos, flags, actor->circleSize, actor);
 		for (auto& neighbour : neighbours) {
 			neighbour->SetPosition(neighbour->Pos, true);
 		}
