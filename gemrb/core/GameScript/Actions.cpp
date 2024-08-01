@@ -4418,7 +4418,10 @@ void GameScript::FillSlot(Scriptable *Sender, Action* parameters)
 	}
 }
 
-//iwd2 also has a flag for unequip (it might collide with original!)
+// iwd2 also has a flag for unequip (it collides with the original!)
+// it's basically EquipItemEx(S:Object*,I:EquipUnEquip*) from the ees,
+// with xequip.ids having 1 for equipping, 0 for unequipping
+// luckily iwd2 always uses both params
 void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
@@ -4431,8 +4434,8 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 	}
 
 	int slot2;
-
-	if (parameters->int0Parameter) {
+	bool zeroEquips = !core->HasFeature(GFFlags::RULES_3ED);
+	if (parameters->int0Parameter == zeroEquips) {
 		//unequip item, and move it to the inventory
 		slot2 = SLOT_ONLYINVENTORY;
 	} else {
