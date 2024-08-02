@@ -2092,19 +2092,15 @@ int Response::Execute(Scriptable* Sender)
 	int ret = 0; // continue or not
 	for (size_t i = 0; i < actions.size(); i++) {
 		Action* aC = actions[i];
-		switch (actionflags[aC->actionID] & AF_MASK) {
-			case AF_IMMEDIATE:
-				GameScript::ExecuteAction( Sender, aC );
-				ret = 0;
-				break;
-			case AF_NONE:
-				Sender->AddAction( aC );
-				ret = 0;
-				break;
-			case AF_CONTINUE: // this is never reached, since Continue also has AF_IMMEDIATE
-			case AF_MASK:
-				ret = 1;
-				break;
+		if ((actionflags[aC->actionID] & AF_MASK) == AF_IMMEDIATE) {
+			GameScript::ExecuteAction(Sender, aC);
+			ret = 0;
+		} else if ((actionflags[aC->actionID] & AF_MASK) == AF_NONE) {
+			Sender->AddAction(aC);
+			ret = 0;
+		} else if ((actionflags[aC->actionID] & AF_MASK) == AF_MASK) {
+			// covers also AF_CONTINUE, since Continue, the only user, also has AF_IMMEDIATE
+			ret = 1;
 		}
 	}
 	return ret;
