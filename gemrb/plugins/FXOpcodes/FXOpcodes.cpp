@@ -8257,7 +8257,7 @@ int fx_iwd_visual_spell_hit(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	pro->SetCaster(fx->CasterID, fx->CasterLevel);
 
-	if (target) {
+	if (target && !fx->Parameter4) {
 		// I believe the spell hit projectiles don't follow anyone
 		map->AddProjectile(pro, target->Pos, target->GetGlobalID(), true);
 	} else {

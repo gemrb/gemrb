@@ -7432,15 +7432,33 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	// int1Parameter was supposed to be height ... but was unused
+	// these projectiles hardcoded a -100 y offset:
+	// 69 RIGHTEOUS_WRATH_OF_THE_FAITHFUL_GROUND
+	// 74 BLADE_BARRIER_BACK
+	// 76 CIRCLE_OF_BONES_BACK
+	// 98 UNDEAD_WARD
+	// 104 MONSTER_SUMMONING_CIRCLE
+	// 105 ANIMAL_SUMMONING_CIRCLE
+	// 106 EARTH_SUMMONING_CIRCLE
+	// 107 FIRE_SUMMONING_CIRCLE
+	// 108 WATER_SUMMONING_CIRCLE
+	std::array<int, 9> exceptions = { 69, 74, 76, 98, 104, 105, 106, 107, 108 };
+	fx->Pos = tar->Pos;
+	fx->Pos.y += int(ProHeights::Normal); // negate future ZPos
+	for (auto& pro : exceptions) {
+		if (parameters->int0Parameter == pro) {
+			fx->Pos.y -= 100;
+			break;
+		}
+	}
+
 	//vvc type
 	fx->Parameter2 = parameters->int0Parameter + 0x1001;
-	//height (not sure if this is in the opcode, but seems acceptable)
-	fx->Parameter1 = parameters->int1Parameter;
 	fx->Parameter4 = 1; // mark for special treatment
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
-	fx->Pos = tar->Pos;
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, target, src);
 }
