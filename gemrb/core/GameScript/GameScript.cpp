@@ -1843,7 +1843,7 @@ bool GameScript::Update(bool *continuing, bool *done)
 					// eg. a Wait in the middle of the response would eventually cause a recheck of conditions
 					// we presumably don't want any further execution?
 					// this one is a bit more complicated, due to possible
-					// interactions with Continue() (lastAction here is always
+					// interactions with Continue() (lastResponseBlock here is always
 					// the first block encountered), needs more testing
 					// we've had a colorful history with this block (look at GF_SKIPUPDATE_HACK), but:
 					// - bg2 *does* need this (ar1516 irenicus fight doesn't work properly otherwise); spirit trolls (trollsp01 in ar1506) work regardless
