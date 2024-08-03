@@ -2088,15 +2088,24 @@ int ResponseSet::Execute(Scriptable* Sender)
 
 //continue is effective only as the last action in the block
 // in iwd2, unlike the rest, instants do get immediately executed
+// (if continue will be used, this happens regardless of the queue)
 // we know in bg2 this is not the case (c829de45), hence people getting confused why
 // SetGlobal calls don't affect conditions after their block was continued from
 int Response::Execute(Scriptable* Sender)
 {
 	int ret = 0; // continue or not
+	if (actions.empty()) return ret;
+
 	bool iwd2 = core->HasFeature(GFFlags::EFFICIENT_OR);
+	Action* last = actions.back();
+	bool hasContinue = false;
+	if (iwd2 && actionflags[last->actionID] & AF_CONTINUE) {
+		hasContinue = true;
+	}
+
 	for (size_t i = 0; i < actions.size(); i++) {
 		Action* aC = actions[i];
-		bool iwd2Instant = iwd2 && actionflags[aC->actionID] & AF_INSTANT;
+		bool iwd2Instant = hasContinue && actionflags[aC->actionID] & AF_INSTANT;
 		if ((actionflags[aC->actionID] & AF_MASK) == AF_IMMEDIATE || iwd2Instant) {
 			GameScript::ExecuteAction(Sender, aC);
 			ret = 0;
