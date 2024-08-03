@@ -827,8 +827,8 @@ static const ActionLink actionnames[] = {
 	{"movetosavedlocation", GameScript::MoveToSavedLocation,AF_MERGESTRINGS|AF_BLOCKING},
 	//take care of the typo in the original bg2 action.ids
 	{"movetosavedlocationn", GameScript::MoveToSavedLocation, AF_MERGESTRINGS|AF_BLOCKING},
-	{"moveviewobject", GameScript::MoveViewObject, AF_BLOCKING},
-	{"moveviewpoint", GameScript::MoveViewPoint, AF_BLOCKING},
+	{"moveviewobject", GameScript::MoveViewObject, 0},
+	{"moveviewpoint", GameScript::MoveViewPoint, 0},
 	{"moveviewpointuntildone", GameScript::MoveViewPoint, 0},
 	{"multiplayersync", GameScript::MultiPlayerSync, 0},
 	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING|AF_DIRECT|AF_ALIVE},//we use this for dialogs, hack

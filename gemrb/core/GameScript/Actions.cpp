@@ -1142,14 +1142,21 @@ void GameScript::SmallWaitRandom(Scriptable* Sender, Action* parameters)
 	assert(Sender->CurrentActionState >= 0);
 }
 
-void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
+// these two don't appear to be blocking at all - also marked as instant in all but iwd2
+// this test script for the bg1 start clearly doesn't wait for the move to finish
+// IF
+// 	HotKey(K)
+// THEN
+// 	RESPONSE #100
+// 		MoveViewPoint([1400.500],10)
+// 		MoveToPoint([1400.500])
+// END
+void GameScript::MoveViewPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	// disable centering if anything enabled it before us (eg. LeaveAreaLUA as in movie02a.bcs)
 	GameControl *gc = core->GetGameControl();
 	gc->SetScreenFlags(ScreenFlags::CenterOnActor, BitOp::NAND);
 	core->timer.SetMoveViewPort( parameters->pointParameter, parameters->int0Parameter<<1, true );
-	Sender->SetWait(1); // todo, blocking?
-	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
@@ -1160,8 +1167,6 @@ void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	core->timer.SetMoveViewPort( scr->Pos, parameters->int0Parameter<<1, true );
-	Sender->SetWait(1); // todo, blocking?
-	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
