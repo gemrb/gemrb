@@ -1169,6 +1169,24 @@ void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 	core->timer.SetMoveViewPort( scr->Pos, parameters->int0Parameter<<1, true );
 }
 
+void GameScript::MoveViewPointUntilDone(Scriptable* Sender, Action* parameters)
+{
+	// skip after first run
+	if (Sender->CurrentActionTicks) {
+		if (core->timer.ViewportIsMoving()) {
+			return;
+		} else {
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+	}
+
+	// disable centering if anything enabled it before us (eg. LeaveAreaLUA as in movie02a.bcs)
+	GameControl* gc = core->GetGameControl();
+	gc->SetScreenFlags(ScreenFlags::CenterOnActor, BitOp::NAND);
+	core->timer.SetMoveViewPort(parameters->pointParameter, parameters->int0Parameter << 1, true);
+}
+
 void GameScript::AddWayPoint(Scriptable* Sender, Action* parameters)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
