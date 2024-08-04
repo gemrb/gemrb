@@ -2093,6 +2093,7 @@ int ResponseSet::Execute(Scriptable* Sender)
 // SetGlobal calls don't affect conditions after their block was continued from
 int Response::Execute(Scriptable* Sender)
 {
+	static bool startActive = core->HasFeature(GFFlags::START_ACTIVE);
 	int ret = 0; // continue or not
 	if (actions.empty()) return ret;
 
@@ -2107,6 +2108,9 @@ int Response::Execute(Scriptable* Sender)
 		Action* aC = actions[i];
 		bool iwd2Instant = hasContinue && actionflags[aC->actionID] & AF_INSTANT;
 		if ((actionflags[aC->actionID] & AF_MASK) == AF_IMMEDIATE || iwd2Instant) {
+			// mimicking AddAction
+			Sender->SetInternalFlag(IF_ACTIVE, BitOp::OR);
+			if (startActive) Sender->SetInternalFlag(IF_IDLE, BitOp::NAND);
 			GameScript::ExecuteAction(Sender, aC);
 			ret = 0;
 		} else if ((actionflags[aC->actionID] & AF_MASK) == AF_NONE) {
