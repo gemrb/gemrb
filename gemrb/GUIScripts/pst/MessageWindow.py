@@ -28,6 +28,7 @@ import GUICommonWindows
 import CommonWindow
 import GUIWORLD
 import Clock
+import PortraitWindow
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
@@ -59,14 +60,13 @@ def OnLoad():
 	MWindow.AddAlias("HIDE_CUT", 0)
 	MWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1, WINDOW_BOTTOM|WINDOW_HCENTER)
-	#PortraitWindow.AddAlias("HIDE_CUT", 3)
-	PortraitWindow.AddAlias("NOT_DLG", 2)
-	PortraitWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	PortraitWin = PortraitWindow.OpenPortraitWindow (WINDOW_BOTTOM|WINDOW_HCENTER)
+	PortraitWin.AddAlias("NOT_DLG", 2)
+	PortraitWin.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
-	pframe = PortraitWindow.GetFrame()
+	pframe = PortraitWin.GetFrame()
 	pframe['x'] -= 16
-	PortraitWindow.SetFrame(pframe)
+	PortraitWin.SetFrame(pframe)
 
 	MessageTA = MWindow.GetControl (1)
 	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)

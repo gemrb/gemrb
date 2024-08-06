@@ -92,7 +92,7 @@ def CloseAll(win):
 def OpenQuestsWindow ():
 	global QuestsList, QuestDesc
 	
-	QuestsWindow = GemRB.LoadWindow (1)
+	QuestsWindow = GemRB.LoadWindow (1, "GUIJRNL")
 	
 	def OnJournalAssignedPress ():
 		global selected_quest_class
@@ -137,7 +137,7 @@ def OpenQuestsWindow ():
 	Button.OnPress (lambda: CloseAll(QuestsWindow))
 
 	QuestsList = List = QuestsWindow.GetControl (1)
-	List.SetVarAssoc ('SelectedQuest', -1)
+	List.SetVarAssoc ('SelectedQuest', None)
 	List.OnSelect (OnJournalQuestSelect)
 
 	QuestDesc = QuestsWindow.GetControl (3)
@@ -152,7 +152,7 @@ def OnJournalQuestSelect ():
 	QuestDesc.SetText (int (q[1])) 
 	
 def PopulateQuestsList ():
-	GemRB.SetVar ('SelectedQuest', -1)
+	GemRB.SetVar ('SelectedQuest', None)
 	QuestDesc.Clear ()
 	
 	lookup = lambda quest: int(GemRB.GetINIQuestsKey (str (quest[0]), 'title', '0'))
@@ -235,7 +235,7 @@ def EvaluateAllQuests ():
 def OpenBeastsWindow ():
 	global BeastsList, BeastImage, BeastDesc
 	
-	BeastsWindow = GemRB.LoadWindow (2)
+	BeastsWindow = GemRB.LoadWindow (2, "GUIJRNL")
 
 	# PC
 	Button = BeastsWindow.GetControl (5)
@@ -260,7 +260,7 @@ def OpenBeastsWindow ():
 	Button.OnPress (lambda: CloseAll(BeastsWindow))
 
 	BeastsList = List = BeastsWindow.GetControl (0)
-	List.SetVarAssoc ('SelectedBeast', -1)
+	List.SetVarAssoc ('SelectedBeast', None)
 	List.OnSelect (OnJournalBeastSelect)
 
 	BeastImage = BeastsWindow.CreateButton (8, 19, 19, 281, 441)
@@ -297,7 +297,7 @@ def OnJournalNPCPress ():
 
 
 def PopulateBeastsList ():
-	GemRB.SetVar ('SelectedBeast', -1)
+	GemRB.SetVar ('SelectedBeast', None)
 	BeastDesc.Clear ()
 	BeastImage.SetPicture ('default')
 
@@ -325,7 +325,7 @@ def EvaluateAllBeasts ():
 ###################################################
 
 def OpenLogWindow ():
-	LogWindow = GemRB.LoadWindow (3)
+	LogWindow = GemRB.LoadWindow (3, "GUIJRNL")
 
 	# Back
 	Button = LogWindow.GetControl (1)

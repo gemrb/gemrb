@@ -26,6 +26,7 @@
 
 #include <cstdint>
 #include <map>
+#include <memory>
 #include <typeinfo>
 #include <vector>
 
@@ -107,7 +108,7 @@ public:
 	class GEM_EXPORT Parameter {
 		struct TypeInterface {
 			virtual ~TypeInterface() noexcept = default;
-			virtual TypeInterface* Clone() const = 0;
+			virtual std::unique_ptr<TypeInterface> Clone() const = 0;
 			virtual const std::type_info& Type() const = 0;
 		};
 
@@ -116,9 +117,9 @@ public:
 			T value;
 			explicit ConcreteType(T value) : value(value) {}
 
-			TypeInterface *Clone() const override
+			std::unique_ptr<TypeInterface> Clone() const override
 			{
-				return new ConcreteType(value);
+				return std::make_unique<ConcreteType>(value);
 			}
 
 			const std::type_info& Type() const override {
@@ -126,15 +127,36 @@ public:
 			}
 		};
 
-		TypeInterface* ptr = nullptr;
+		std::unique_ptr<TypeInterface> ptr;
 		
 		template<typename T>
 		using Concrete_t = ConcreteType<std::add_const_t<T>>;
 
 	public:
-		template <typename T>
+		explicit Parameter(bool value) {
+			ptr = std::make_unique<Concrete_t<bool>>(value);
+		}
+
+		template <typename T, std::enable_if_t<!std::is_integral<T>::value && !std::is_enum<T>::value>...>
 		explicit Parameter(T value) {
-			ptr = new Concrete_t<T>(value);
+			ptr = std::make_unique<Concrete_t<T>>(value);
+		}
+
+		template <typename ENUM, std::enable_if_t<std::is_enum<ENUM>::value>...>
+		explicit Parameter(ENUM value)
+		: Parameter(UnderType(value))
+		{}
+
+		template <typename INT, std::enable_if_t<std::is_integral<INT>::value && std::is_signed<INT>::value>...>
+		explicit Parameter(INT value)
+		{
+			ptr = std::make_unique<Concrete_t<long>>(value);
+		}
+
+		template <typename INT, std::enable_if_t<std::is_integral<INT>::value && std::is_unsigned<INT>::value>...>
+		explicit Parameter(INT value)
+		{
+			ptr = std::make_unique<Concrete_t<unsigned long>>(value);
 		}
 
 		Parameter() noexcept = default;
@@ -153,17 +175,17 @@ public:
 			return Swap(tmp);
 		}
 
-		~Parameter() {
-			delete ptr;
-		}
-
 		const std::type_info& Type() const {
 			return ptr ? ptr->Type() : typeid(void);
+		}
+		
+		bool IsNull() const noexcept {
+			return ptr == nullptr;
 		}
 
 		template <typename T>
 		const T& Value() const {
-			Concrete_t<T>* type = dynamic_cast<Concrete_t<T>*>(ptr);
+			Concrete_t<T>* type = dynamic_cast<Concrete_t<T>*>(ptr.get());
 			if (type) {
 				return type->value;
 			}
@@ -184,8 +206,16 @@ public:
 	/** Load Script */
 	virtual bool LoadScript(const std::string& filename) = 0;
 	/** Run Function */
-	virtual bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) = 0;
-	bool RunFunction(const char* Modulename, const char* FunctionName, bool report_error = true);
+	virtual Parameter RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) = 0;
+	
+	Parameter RunFunction(const char* ModuleName, const char* FunctionName, bool report_error = true);
+	
+	template<typename ARG>
+	std::enable_if_t<!std::is_same<std::remove_reference_t<ARG>, FunctionParameters>::value, Parameter>
+	RunFunction(const char* ModuleName, const char* FunctionName, ARG&& arg, bool report_error = true) {
+		FunctionParameters params {Parameter(std::forward<ARG>(arg))};
+		return RunFunction(ModuleName, FunctionName, params, report_error);
+	}
 	/** Exec a single String */
 	virtual bool ExecString(const std::string &string, bool feedback) = 0;
 };

@@ -26,7 +26,7 @@ def OnLoad():
 	GemRB.SetVar("Race",0) #race
 	GemRB.SetVar("Class",0) #class
 	GemRB.SetVar("Class Kit",0) #class
-	GemRB.SetVar("Alignment",-1) #alignment
+	GemRB.SetVar("Alignment", None) #alignment
 
 	GUICommonWindows.PortraitWindow = None
 

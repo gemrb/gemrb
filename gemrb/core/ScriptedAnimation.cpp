@@ -30,7 +30,6 @@
 #include "Interface.h"
 #include "Light.h"
 #include "Logging/Logging.h"
-#include "Map.h"
 #include "Video/Pixels.h"
 #include "Sprite2D.h"
 
@@ -97,7 +96,7 @@ Animation* ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, Anima
 		//vvcs are always paused
 		anim->gameAnimation = true;
 		if (!loop) {
-			anim->Flags |= S_ANI_PLAYONCE;
+			anim->flags |= S_ANI_PLAYONCE;
 		}
 		anim->fps = FrameRate;
 	}
@@ -192,9 +191,9 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 		}
 		//onset and release phases are to be played only once
 		if (anims[p_onset])
-			anims[p_onset]->Flags |= S_ANI_PLAYONCE;
+			anims[p_onset]->flags |= S_ANI_PLAYONCE;
 		if (anims[p_release])
-			anims[p_release]->Flags |= S_ANI_PLAYONCE;
+			anims[p_release]->flags |= S_ANI_PLAYONCE;
 	}
 	SequenceFlags = IE_VVC_BAM|IE_VVC_LOOP;
 
@@ -365,7 +364,7 @@ void ScriptedAnimation::PlayOnce()
 	SequenceFlags &= ~IE_VVC_LOOP;
 	for (Animation *anim : anims) {
 		if (anim) {
-			anim->Flags |= S_ANI_PLAYONCE;
+			anim->flags |= S_ANI_PLAYONCE;
 		}
 	}
 	if (twin) {

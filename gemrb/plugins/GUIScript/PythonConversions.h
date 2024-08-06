@@ -198,7 +198,7 @@ Region RectFromPy(PyObject* obj);
 
 template <class STR>
 STR ASCIIStringFromPy(PyObject* obj) {
-	if (obj == nullptr) return STR();
+	if (obj == nullptr || obj == Py_None) return STR();
 
 	auto ref = DecRef(PyUnicode_AsEncodedString, obj, "ascii", "strict");
 	if (ref) {

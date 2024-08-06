@@ -1037,7 +1037,7 @@ def CloseHelpWindow ():
 def OpenHelpWindow ():
 	global HelpTable, InformationWindow
 
-	InformationWindow = Window = GemRB.LoadWindow (57)
+	InformationWindow = Window = GemRB.LoadWindow (57, "GUIREC")
 
 	HelpTable = GemRB.LoadTable ("topics")
 	GemRB.SetVar("Topic", 0)
@@ -1162,7 +1162,7 @@ def CloseLUWindow ():
 def OpenLevelUpWindow ():
 	global LUWindow, LevelDiff
 
-	LUWindow = Window = GemRB.LoadWindow (54)
+	LUWindow = Window = GemRB.LoadWindow (54, "GUIREC")
 
 	# Figure out the level difference
 	# the original ignored all but the fighter row in xplevel.2da
@@ -1187,7 +1187,7 @@ def OpenLevelUpWindow ():
 
 	# 2-12 are the class name buttons
 	# 15-25 are the class level labels
-	GemRB.SetVar ("LUClass", -1)
+	GemRB.SetVar ("LUClass", None)
 	for i in range(2,13):
 		Button = Window.GetControl (i)
 		Label = Window.GetControl (0x10000000 + i+13)
@@ -1236,7 +1236,7 @@ def LUClassPress ():
 
 	# display class info
 	TextArea = Window.GetControl (13)
-	i = GemRB.GetVar ("LUClass")
+	i = GemRB.GetVar ("LUClass") or 0
 	ClassDesc = CommonTables.Classes.GetRowName (i)
 	ClassDesc = CommonTables.Classes.GetValue (ClassDesc, "DESC_REF", GTV_REF)
 	TextArea.SetText (ClassDesc)
@@ -1333,7 +1333,7 @@ def OpenLUKitWindow ():
 		LUNextPress ()
 		return
 
-	LUKitWindow = Window = GemRB.LoadWindow (6)
+	LUKitWindow = Window = GemRB.LoadWindow (6, "GUIREC")
 
 	# title
 	Label = Window.GetControl (0x10000000)
@@ -1357,7 +1357,7 @@ def OpenLUKitWindow ():
     # skip to the first kit of this class
 	kitOffset = hasKits
 
-	GemRB.SetVar ("LUKit", -1)
+	GemRB.SetVar ("LUKit", None)
 	for i in range(9):
 		Button = Window.GetControl (i+2)
 
@@ -1384,8 +1384,8 @@ def LUKitPress ():
 
 	# display kit info
 	TextArea = Window.GetControl (13)
-	i = GemRB.GetVar ("LUKit")
-	LUClass = GemRB.GetVar ("LUClass")
+	i = GemRB.GetVar ("LUKit") or 0
+	LUClass = GemRB.GetVar ("LUClass") or 0
 	LUClassName = CommonTables.Classes.GetRowName (LUClass)
 	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
 	kitOffset = CommonTables.Classes.FindValue ("CLASS", LUClassID)
@@ -1424,17 +1424,17 @@ def LUNextPress ():
 def FinishLevelUp():
 	# kit
 	pc = GemRB.GameGetSelectedPCSingle ()
-	LUKit = GemRB.GetVar ("LUKit")
+	LUKit = GemRB.GetVar ("LUKit") or 0
 
 	# saving throws
-	LUClass = GemRB.GetVar ("LUClass") # index, not ID
+	LUClass = GemRB.GetVar ("LUClass") or 0 # index, not ID
 	LUClassName = CommonTables.Classes.GetRowName (LUClass)
 	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
 	IDLUCommon.SetupSavingThrows (pc, LUClassID)
 
 	# hit points
 	Levels = [ GemRB.GetPlayerStat (pc, l) for l in IDLUCommon.Levels ]
-	LevelDiff = GemRB.GetVar ("LevelDiff")
+	LevelDiff = GemRB.GetVar ("LevelDiff") or 0
 	LevelDiffs = [ 0 ] * len(Levels)
 	LevelDiffs[LUClass] = LevelDiff
 	# SetupHP expects the target level already
@@ -1466,7 +1466,7 @@ def FinishLevelUp():
 
 	# now we're finally done
 	GemRB.SetVar ("LevelDiff", 0)
-	GemRB.SetVar ("LUClass", -1)
+	GemRB.SetVar ("LUClass", None)
 	GemRB.SetVar ("LUKit", 0)
 
 	UpdateRecordsWindow (RecordsWindow)

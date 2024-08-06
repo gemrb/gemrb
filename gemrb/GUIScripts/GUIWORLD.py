@@ -65,10 +65,6 @@ def DialogStarted ():
 	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
 
-	# disable the 1-6 hotkeys, so they'll work for choosing answers
-	if GemRB.GetView ("PORTWIN"):
-		GUICommonWindows.UpdatePortraitWindow ()
-
 	ContinueWindow = OpenDialogButton(9)
 
 def DialogEnded ():

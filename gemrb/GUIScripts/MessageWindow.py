@@ -24,6 +24,7 @@ import GemRB
 import GameCheck
 import GUICommon
 import GUICommonWindows
+import PortraitWindow
 
 from GUIDefines import *
 
@@ -73,16 +74,16 @@ def OnLoad():
 	OptionsWindow.AddAlias("NOT_DLG", 1)
 	
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow(1)
-	PortraitWindow.AddAlias("HIDE_CUT", 3)
-	PortraitWindow.AddAlias("NOT_DLG", 2)
+	PortraitWin = PortraitWindow.OpenPortraitWindow(1)
+	PortraitWin.AddAlias("HIDE_CUT", 3)
+	PortraitWin.AddAlias("NOT_DLG", 2)
 
 	# 1280 and higher don't have this control
 	Button = OptionsWindow.GetControl (10)
 	if Button:
 		Button.OnPress (lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
-		Button = PortraitWindow.GetControl (8)
-		Button.OnPress (lambda: ToggleWindowMinimize(PortraitWindow, GS_PORTRAITPANE))
+		Button = PortraitWin.GetControl (8)
+		Button.OnPress (lambda: ToggleWindowMinimize(PortraitWin, GS_PORTRAITPANE))
 
 	UpdateControlStatus(True)
 

@@ -191,8 +191,6 @@ public:
 	void ResetTargetMode();
 	void UpdateTargetMode();
 
-	// returns the default cursor fitting the targeting mode
-	Holder<Sprite2D> GetTargetActionCursor() const;
 	Holder<Sprite2D> Cursor() const override;
 
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, const Point& p);
@@ -246,6 +244,9 @@ protected:
 	bool OnMouseWheelScroll(const Point& delta) override;
 	
 	bool OnControllerButtonDown(const ControllerEvent& ce) override;
+	
+	// returns the default cursor fitting the targeting mode
+	static Holder<Sprite2D> GetTargetActionCursor(TargetMode mode);
 };
 
 }

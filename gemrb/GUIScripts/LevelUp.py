@@ -74,7 +74,7 @@ def OpenLevelUpWindow():
 	global OldHPMax, OldSaves, OldLore, OldThaco, DeltaDSpells, DeltaWSpells
 	global NewDSpells, NewWSpells, OldDSpells, OldWSpells, pc, HLACount, ClassName, IsDual
 
-	LevelUpWindow = GemRB.LoadWindow (3)
+	LevelUpWindow = GemRB.LoadWindow (3, "GUIREC")
 
 	if GameCheck.IsBG2():
 		InfoButton = LevelUpWindow.GetControl (125)
@@ -486,7 +486,7 @@ def LevelUpDonePress():
 	"""Updates the PC with the new choices.
 
 	Closes the window when finished."""
-	import GUICommonWindows
+	import PortraitWindow
 	import GUIREC
 
 	# proficiencies
@@ -521,7 +521,7 @@ def LevelUpDonePress():
 
 	if LevelUpWindow:
 		LevelUpWindow.Close()
-	GUICommonWindows.UpdatePortraitWindow ()
+	PortraitWindow.UpdatePortraitWindow()
 	return
 
 def LevelUpHLAPress ():

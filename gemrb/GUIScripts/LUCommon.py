@@ -93,6 +93,9 @@ def GetLevelDiff (actor, Level):
 
 def CanLevelUp(actor):
 	"""Returns true if the actor can level up."""
+	
+	if GameCheck.IsGemRBDemo ():
+		return False
 
 	# get our class and placements for Multi'd and Dual'd characters
 	Class = GUICommon.GetClassRowName (actor)
@@ -108,7 +111,7 @@ def CanLevelUp(actor):
 		GemRB.GetPlayerStat (actor, IE_LEVEL3)]
 
 	if GemRB.GetPlayerStat(actor, IE_LEVELDRAIN)>0:
-		return 0
+		return False
 
 	if GameCheck.IsIWD2():
 		import GUIREC
@@ -126,10 +129,10 @@ def CanLevelUp(actor):
 
 		tmpNext = GetNextLevelExp (lvls[SwitcherClass], SwitcherClass)
 		if (tmpNext != 0 or lvls[SwitcherClass] == 0) and tmpNext <= xp[SwitcherClass]:
-			return 1
+			return True
 		#ignore the rest of this function, to avoid false positives
 		#other classes can only be achieved by hacking the game somehow
-		return 0
+		return False
 
 	if Multi[0] > 1: # multiclassed
 		xp = xp // Multi[0] # divide the xp evenly between the classes
@@ -138,10 +141,10 @@ def CanLevelUp(actor):
 			TmpClassName = GUICommon.GetClassRowName (Multi[i+1], "class")
 			tmpNext = GetNextLevelExp (Levels[i], TmpClassName)
 			if (tmpNext != 0 or Levels[i] == 0) and tmpNext <= xp:
-				return 1
+				return True
 
 		# didn't find a class that could level
-		return 0
+		return False
 	elif Dual[0] > 0: # dual classed
 		# get the class we can level
 		if Dual[0] == 3:

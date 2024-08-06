@@ -280,7 +280,7 @@ def CancelPress():
 	return
 
 def StartOver():
-	StartOverWindow = GemRB.LoadWindow(53)
+	StartOverWindow = GemRB.LoadWindow(53, "GUICG")
 	
 	def RestartGen():
 		StartOverWindow.Close()

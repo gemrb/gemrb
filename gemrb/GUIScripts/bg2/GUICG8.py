@@ -47,7 +47,7 @@ def OnLoad():
 			break
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
-	GemRB.SetVar ("Race", -1)
+	GemRB.SetVar ("Race", None)
 	for i in range(2, RaceCount+2):
 		Button = RaceWindow.GetControl(i)
 		Button.SetText(CommonTables.Races.GetValue(i-2,0) )

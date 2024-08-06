@@ -78,7 +78,7 @@ def SetupSavingThrows (pc, Class, Chargen=False):
 
 	# class-based saving throw progression
 	# get the actual xp level of the passed class
-	LevelDiff = GemRB.GetVar ("LevelDiff") # only set during level-up
+	LevelDiff = GemRB.GetVar ("LevelDiff") or 0 # only set during level-up
 	Level = GemRB.GetPlayerStat(pc, Levels[Class-1]) + LevelDiff
 	Level -= 1 # we'll use it as row index only
 
@@ -114,7 +114,7 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 	level = 1
 	if not chargen:
 		# LevelDiff + whatever caster level of this type we already had
-		level = GemRB.GetVar ("LevelDiff")
+		level = GemRB.GetVar ("LevelDiff") or 0
 		classIndex = CommonTables.Classes.GetRowIndex (BaseClassName)
 		level += GemRB.GetPlayerStat (pc, Levels[classIndex], 1)
 
