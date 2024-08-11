@@ -2419,7 +2419,7 @@ void GameScript::SetDoorFlag(Scriptable* Sender, Action* parameters)
 	}
 	// take care of iwd2 flag bit differences as in AREIMporter's FixIWD2DoorFlags
 	// ... it matters for exactly 1 user from the original data (20ctord3.bcs)
-	if (core->HasFeature(GFFlags::RULES_3ED) && flag == DOOR_KEY) {
+	if (core->HasFeature(GFFlags::RULES_3ED) && flag == DOOR_KEY) { // requesting SEETHROUGH
 		flag = DOOR_TRANSPARENT;
 	}
 

@@ -514,7 +514,7 @@ void Scriptable::ProcessActions()
 		if (WaitCounter) {
 			break;
 		}
-		//break execution in case of blocking action
+		// break execution in case of blocking action (AF_BLOCKING)
 		if (CurrentAction) {
 			break;
 		}

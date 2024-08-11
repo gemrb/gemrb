@@ -214,8 +214,9 @@ float_t Feet2Pixels(int feet, float_t angle)
 }
 
 /* Audible range was confirmed to be 3x visual range in EEs, accounting for isometric scaling
- a nd more than 1x visual range in others;
+ and more than 1x visual range in others;
  in EE, the '48' (3*16) default can be set by the 'Audible Range' option in baldur.lua
+ It can also be seen in iwd2 RE.
 
  This is a bit tricky, it has been show to not be very consistent. The game used a double value of visual
  range in several places, so we will use '3 * visual_range / 2' */
