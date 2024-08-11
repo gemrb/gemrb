@@ -2114,7 +2114,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 	int r = collisionLookaheadRadius;
 	for (; r > 0 && !actorInTheWay; r--) {
 		auto xCollision = Pos.x + dx * r;
-		auto yCollision = Pos.y + dy * r * 0.75; // FIXME: should this really be skewed?
+		auto yCollision = Pos.y + dy * r; // NormalizeDeltas already adjusted dy for perspective
 		Point nmptCollision(xCollision, yCollision);
 		actorInTheWay = area->GetActor(nmptCollision, GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF, this);
 	}
