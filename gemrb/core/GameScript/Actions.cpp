@@ -4611,7 +4611,7 @@ void GameScript::MoveInventory(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	Scriptable* tar = GetScriptableFromObject2(Sender, parameters);
-	if (!tar || tar->Type!=ST_ACTOR) {
+	if (!tar) {
 		return;
 	}
 	//don't try to move to self, it would create infinite loop
