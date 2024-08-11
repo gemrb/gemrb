@@ -938,10 +938,11 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			case 'm': //prints a debug dump (ctrl-m in the original game too)
 				if (overMe && overMe->Type != ST_ACTOR) {
 					fmt::println("{}", overMe->dump());
-				} else {
+				} else if (lastActor) {
 					DumpActorInfo(ActorDump::Stats, area);
+				} else {
+					game->GetCurrentArea()->dump(false);
 				}
-				game->GetCurrentArea()->dump(false);
 				break;
 			case 'n': //prints a list of all the live actors in the area
 				game->GetCurrentArea()->dump(true);
