@@ -47,7 +47,7 @@ void GlobalTimer::Freeze()
 
 bool GlobalTimer::IsFading() const
 {
-	return fadeToCounter || fadeFromCounter != fadeFromMax;
+	return fadeToCounter || fadeFromCounter != fadeFromMax; // add fadeOutFallback if needed, doesn't seem outright right
 }
 
 bool GlobalTimer::ViewportIsMoving() const
@@ -197,11 +197,20 @@ end:
 	return true;
 }
 
-
 void GlobalTimer::DoFadeStep(ieDword count) {
 	WindowManager* wm = core->GetWindowManager();
+	if (fadeOutFallback > 0) {
+		--fadeOutFallback;
+		// activate fallback if no fade out was scheduled
+		if (fadeOutFallback == 0) {
+			wm->FadeColor.a = 0;
+			return;
+		}
+	}
+
 	if (fadeToCounter) {
-		
+		if (fadeOutFallback > 0) ++fadeOutFallback;
+
 		if (count > fadeToCounter) {
 			fadeToCounter = 0;
 			fadeToFactor = 1;
@@ -225,11 +234,8 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 				fadeToCounter=fadeFromMax;
 				fadeToFactor = 1;
 			}
-			wm->FadeColor.a = 255 * (double( fadeFromMax - fadeFromCounter ) / fadeFromMax / fadeFromFactor);
 		}
-	}
-	if (fadeFromCounter==fadeFromMax) {
-		wm->FadeColor.a = 0;
+		wm->FadeColor.a = 255 * (double(fadeFromMax - fadeFromCounter) / fadeFromMax / fadeFromFactor);
 	}
 }
 
@@ -240,8 +246,9 @@ void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 	}
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
-	//stay black for a while
-	fadeFromCounter = core->Time.fade_reset;
+	// set up a fallback in case FadeFromColor was not called
+	fadeOutFallback = core->Time.fade_reset;
+	fadeFromCounter = 0;
 	fadeFromMax = 0;
 	fadeToFactor = factor;
 }
@@ -251,6 +258,7 @@ void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 	if (!Count) {
 		Count = 2 * core->Time.defaultTicksPerSec;
 	}
+	fadeOutFallback = 0;
 	fadeFromCounter = 0;
 	fadeFromMax = Count;
 	fadeFromFactor = factor;
