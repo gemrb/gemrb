@@ -518,6 +518,10 @@ void Scriptable::ProcessActions()
 		if (CurrentAction) {
 			break;
 		}
+		// break execution if a fade was started (it pauses script processing, so this can only be true once here)
+		if (core->timer.IsFading()) {
+			break;
+		}
 		//break execution in case of movement
 		//we should not actually break here, or else fix waypoints
 		if (InMove()) {

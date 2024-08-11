@@ -45,6 +45,11 @@ void GlobalTimer::Freeze()
 	game->RealTime++;
 }
 
+bool GlobalTimer::IsFading() const
+{
+	return fadeToCounter || fadeFromCounter != fadeFromMax;
+}
+
 bool GlobalTimer::ViewportIsMoving() const
 {
 	return shakeCounter || (!goal.IsInvalid() && goal != currentVP.origin);
@@ -157,12 +162,12 @@ bool GlobalTimer::Update()
 	}
 
 	// don't update scripts if we're fading in or out
-	if (fadeToCounter || fadeFromCounter != fadeFromMax) {
+	if (IsFading()) {
 		if (!fadeToCounter) map->UpdateFog(); // needed eg. when meeting Yoshimo for the first time
 		if (thisTime) {
 			game->RealTime++;
 		}
-		goto end;
+		return false;
 	}
 
 	//do spell effects expire in dialogs?

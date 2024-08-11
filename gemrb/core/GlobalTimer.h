@@ -55,6 +55,7 @@ public:
 
 	void Freeze();
 	bool Update();
+	bool IsFading() const;
 	bool ViewportIsMoving() const;
 	void DoStep(int count);
 	void SetMoveViewPort(Point p, int spd, bool center);
