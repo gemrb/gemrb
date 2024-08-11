@@ -148,6 +148,11 @@ bool GlobalTimer::Update()
 		goto end;
 	}
 
+	// init fallback duration here, since it's not known in the ctor
+	if (lastFadeDuration == 0) {
+		lastFadeDuration = core->Time.fade_default;
+	}
+
 	if (UpdateViewport(thisTime) == false) {
 		return false;
 	}
@@ -241,8 +246,11 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 
 void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 {
-	if (!Count) {
-		Count = core->Time.fade_default;
+	// oddly, if a 0 is passed, the last used duration is used (first time the engine default)
+	if (Count) {
+		lastFadeDuration = Count;
+	} else {
+		Count = lastFadeDuration;
 	}
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
@@ -255,8 +263,10 @@ void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 
 void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 {
-	if (!Count) {
-		Count = core->Time.fade_default;
+	if (Count) {
+		lastFadeDuration = Count;
+	} else {
+		Count = lastFadeDuration;
 	}
 	fadeOutFallback = 0;
 	fadeFromCounter = 0;

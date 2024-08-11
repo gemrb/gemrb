@@ -30,6 +30,7 @@ namespace GemRB {
 class GEM_EXPORT GlobalTimer {
 private:
 	tick_t startTime = 0; //forcing an update;
+	tick_t lastFadeDuration = 0;
 
 	tick_t fadeToCounter = 0;
 	tick_t fadeToMax = 0;
