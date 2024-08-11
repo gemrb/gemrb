@@ -847,12 +847,13 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 {
 	Point gameMousePos = GameMousePos();
 	Highlightable* over = Scriptable::As<Highlightable>(overMe);
+	Game* game = core->GetGame();
+
 	//cheatkeys with ctrl-
 	if (Mod & GEM_MOD_CTRL) {
 		if (!core->CheatEnabled()) {
 			return false;
 		}
-		Game* game = core->GetGame();
 		Map* area = game->GetCurrentArea( );
 		if (!area)
 			return false;
@@ -904,7 +905,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				}
 				if (lastActor && !(lastActor->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE)) {
 					int size = game->GetPartySize(true);
-					if (size < 2 || lastActor->GetCurrentArea() != game->GetCurrentArea()) break;
+					if (size < 2 || lastActor->GetCurrentArea() != area) break;
 					for (int i = core->Roll(1, size, 0); i < 2*size; i++) {
 						const Actor *target = game->GetPC(i % size, true);
 						if (target == lastActor) continue;
@@ -941,11 +942,11 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				} else if (lastActor) {
 					DumpActorInfo(ActorDump::Stats, area);
 				} else {
-					game->GetCurrentArea()->dump(false);
+					area->dump(false);
 				}
 				break;
 			case 'n': //prints a list of all the live actors in the area
-				game->GetCurrentArea()->dump(true);
+				area->dump(true);
 				break;
 			// o
 			case 'p': //center on actor
@@ -1110,7 +1111,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 		}
 		return true; //return from cheatkeys
 	}
-	const Game* game = core->GetGame();
+
 	switch (Key.keycode) {
 //FIXME: move these to guiscript
 		case ' ': //soft pause
