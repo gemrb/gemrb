@@ -606,6 +606,12 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 
 int Inventory::AddSlotItem(CREItem* item, int slot, int slottype, bool ranged)
 {
+	// just dump into containers if a specific slot wasn't requested
+	if (InventoryType == ieInventoryType::HEAP && slot < 0) {
+		AddItem(item);
+		return ASI_SUCCESS;
+	}
+
 	int twohanded = item->Flags&IE_INV_ITEM_TWOHANDED;
 	if (slot >= 0) {
 		if ((unsigned)slot >= Slots.size()) {
