@@ -840,6 +840,7 @@ bool Interface::ReadGameTimeTable()
 	Time.day_sec = Time.hour_sec * 24; // move to table if pst turns out to be different
 	Time.day_size = Time.day_sec * Time.defaultTicksPerSec;
 	Time.fade_reset = table->QueryFieldUnsigned<unsigned int>("FADE_RESET", "DURATION");
+	Time.fade_default = table->QueryFieldUnsigned<unsigned int>("FADE_DEFAULT", "DURATION");
 
 	return true;
 }

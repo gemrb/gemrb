@@ -242,7 +242,7 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 {
 	if (!Count) {
-		Count = 2 * core->Time.defaultTicksPerSec;
+		Count = core->Time.fade_default;
 	}
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
@@ -256,7 +256,7 @@ void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 {
 	if (!Count) {
-		Count = 2 * core->Time.defaultTicksPerSec;
+		Count = core->Time.fade_default;
 	}
 	fadeOutFallback = 0;
 	fadeFromCounter = 0;

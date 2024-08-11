@@ -120,6 +120,7 @@ struct TimeStruct {
 	unsigned int hour_size;
 	unsigned int day_sec;
 	unsigned int day_size;
+	unsigned int fade_default = 20;
 	unsigned int fade_reset;
 
 	int GetHour(unsigned int time) const { return (time / defaultTicksPerSec) % day_sec / hour_sec; }
