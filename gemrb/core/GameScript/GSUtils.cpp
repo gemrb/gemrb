@@ -483,7 +483,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 
 	ResRef buffer;
 	if (soundpath == nullptr || soundpath[0] == '\0') {
-		StringBlock sb = core->strings->GetStringBlock( Strref );
+		StringBlock sb = core->strings->GetStringBlock(Strref, STRING_FLAGS::RESOLVE_TAGS);
 		if (!sb.Sound.IsEmpty()) {
 			buffer = sb.Sound;
 			soundpath = buffer.c_str();
