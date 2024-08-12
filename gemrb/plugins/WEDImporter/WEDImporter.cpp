@@ -376,7 +376,19 @@ std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
 		str->ReadWord(idx);
 	}
 
-	size_t groupSize = ceilf(overlays[0].size.w / 10.0f) * ceilf(overlays[0].size.h / 7.5f);
+	auto ceilInt = [](int32_t v, int32_t div) {
+		if (v % div == 0) {
+			return v / div;
+		}
+
+		return (v + (div - (v % div))) / div;
+	};
+
+	// was error-prone w.r.t. IEEE754 optimization: ceilf(overlays[0].size.w / 10.0f) * ceilf(overlays[0].size.h / 7.5f)
+	auto w = overlays[0].size.w;
+	auto h = overlays[0].size.h * 2;
+	size_t groupSize = ceilInt(w, 10) * ceilInt(h, 15);
+
 	std::vector<WallPolygonGroup> polygonGroups;
 	polygonGroups.reserve(groupSize);
 
