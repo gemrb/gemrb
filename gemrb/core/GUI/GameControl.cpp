@@ -935,6 +935,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			case 'M':
 				DumpActorInfo(ActorDump::Anims, area);
+				FlushLogs();
 				break;
 			case 'm': //prints a debug dump (ctrl-m in the original game too)
 				if (overMe && overMe->Type != ST_ACTOR) {
@@ -944,9 +945,11 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				} else {
 					area->dump(false);
 				}
+				FlushLogs();
 				break;
 			case 'n': //prints a list of all the live actors in the area
 				area->dump(true);
+				FlushLogs();
 				break;
 			// o
 			case 'p': //center on actor
