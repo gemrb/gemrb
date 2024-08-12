@@ -98,6 +98,11 @@ void AddLogWriter(Logger::WriterPtr&& writer)
 	}
 }
 
+void FlushLogs()
+{
+	if (logger) logger->Flush();
+}
+
 static void addGemRBLog(const CoreSettings& config)
 {
 	path_t path = PathJoin<false>(config.GamePath, "GemRB.log");

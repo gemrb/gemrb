@@ -42,6 +42,7 @@ public:
 	StreamLogWriter& operator=(const StreamLogWriter&) = delete;
 
 	void WriteLogMessage(const Logger::LogMessage& msg) override;
+	void Flush() override;
 
 private:
 	ANSIColor color;

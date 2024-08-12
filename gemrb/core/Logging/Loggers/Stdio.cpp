@@ -38,6 +38,11 @@ StreamLogWriter::~StreamLogWriter()
 	fclose(stream);
 }
 
+void StreamLogWriter::Flush()
+{
+	fflush(stream);
+}
+
 static const LOG_FMT& LevelFormat(ANSIColor color, LogLevel level)
 {
 	static LOG_FMT nullfmt;

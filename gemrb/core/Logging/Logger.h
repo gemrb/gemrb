@@ -81,6 +81,7 @@ public:
 			WriteLogMessage(LogMessage(logLevel, owner, message, fmt));
 		}
 		virtual void WriteLogMessage(const Logger::LogMessage& msg)=0;
+		virtual void Flush() {};
 	};
 
 	using WriterPtr = std::shared_ptr<LogWriter>;
@@ -107,6 +108,7 @@ public:
 
 	void LogMsg(LogLevel, const char* owner, const char* message, LOG_FMT fmt);
 	void LogMsg(LogMessage&& msg);
+	void Flush();
 };
 
 }

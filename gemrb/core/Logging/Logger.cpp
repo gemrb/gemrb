@@ -103,4 +103,13 @@ void Logger::LogMsg(LogMessage&& msg)
 	}
 }
 
+void Logger::Flush()
+{
+	cv.notify_all();
+	std::lock_guard<std::mutex> l(writerLock);
+	for (const auto& writer : writers) {
+		writer->Flush();
+	}
+}
+
 }

@@ -40,6 +40,7 @@ GEM_EXPORT void ToggleLogging(bool);
 GEM_EXPORT void AddLogWriter(Logger::WriterPtr&&);
 GEM_EXPORT void SetConsoleWindowLogLevel(LogLevel level);
 GEM_EXPORT void LogMsg(Logger::LogMessage&& msg);
+GEM_EXPORT void FlushLogs();
 
 template<typename... ARGS>
 void Log(LogLevel level, const char* owner, const char* message, ARGS&&... args)
