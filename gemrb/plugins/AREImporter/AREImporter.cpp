@@ -1890,10 +1890,11 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 
 		stream->WriteVariable(d->GetScriptName());
 		stream->WriteResRef( d->ID);
+		ieDword flags = d->Flags;
 		if (map->version == 16) {
-			d->Flags = FixIWD2DoorFlags(d->Flags, true);
+			flags = FixIWD2DoorFlags(d->Flags, true);
 		}
-		stream->WriteDword(d->Flags);
+		stream->WriteDword(flags);
 		stream->WriteDword(VertIndex);
 		auto open = d->OpenTriggerArea();
 		ieWord tmpWord = static_cast<ieWord>(open ? open->Count() : 0);
