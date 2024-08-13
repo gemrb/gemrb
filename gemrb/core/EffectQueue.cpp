@@ -2378,7 +2378,7 @@ bool EffectQueue::HasHostileEffects() const
 
 // returns true if the target matches iwd ids targeting
 // usually this is used to restrict an effect to specific targets
-bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx)
+bool EffectQueue::CheckIWDTargeting(const Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect* fx)
 {
 	const IWDIDSEntry& entry = gamedata->GetSpellProt(type);
 	ieDword idx = entry.stat;

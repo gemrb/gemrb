@@ -339,7 +339,7 @@ public:
 	/** just checks if it is a particularly stupid effect that needs its target reset */
 	static bool OverrideTarget(const Effect *fx);
 	bool HasHostileEffects() const;
-	static bool CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx = nullptr);
+	static bool CheckIWDTargeting(const Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect* fx = nullptr);
 private:
 	/** counts effects of specific opcode, parameters and resource */
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const ResRef& = ResRef(), const ResRef& = ResRef()) const;
