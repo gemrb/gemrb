@@ -88,7 +88,7 @@ static int ParseIntParam(const char*& src, const char*& str)
 		}
 	}
 	// no IDS table
-	return strtosigned<int>(src, (char**) &src);
+	return strtosigned<int>(src, const_cast<char**>(&src));
 }
 
 static void ParseIdsTarget(const char*& src, Object*& object)
@@ -198,9 +198,9 @@ Action* GenerateActionCore(const char* src, const char* str, unsigned short acti
 				case 'p': // Point
 					SKIP_ARGUMENT();
 					src++; // skip [
-					newAction->pointParameter.x = strtosigned<int>(src, (char**) &src, 10);
+					newAction->pointParameter.x = strtosigned<int>(src, const_cast<char**>(&src), 10);
 					src++; // skip .
-					newAction->pointParameter.y = strtosigned<int>(src, (char**) &src, 10);
+					newAction->pointParameter.y = strtosigned<int>(src, const_cast<char**>(&src), 10);
 					src++; // skip ]
 					break;
 
@@ -378,9 +378,9 @@ Trigger* GenerateTriggerCore(const char* src, const char* str, int trIndex, int 
 				case 'p': // Point
 					SKIP_ARGUMENT();
 					src++; // skip [
-					newTrigger->pointParameter.x = strtosigned<int>(src, (char**) &src, 10);
+					newTrigger->pointParameter.x = strtosigned<int>(src, const_cast<char**>(&src), 10);
 					src++; // skip .
-					newTrigger->pointParameter.y = strtosigned<int>(src, (char**) &src, 10);
+					newTrigger->pointParameter.y = strtosigned<int>(src, const_cast<char**>(&src), 10);
 					src++; // skip ]
 					break;
 

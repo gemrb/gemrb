@@ -1677,7 +1677,7 @@ int fx_turn_undead2 (Scriptable* Owner, Actor* target, Effect* fx)
 		if (GameScript::ID_Alignment(turner, AL_EVIL)) {
 			fx->Parameter2 = fx->CasterLevel <= levelSum * 2;
 		} else {
-			fx->Parameter2 = (fx->CasterLevel <= levelSum * 2) + 2;
+			fx->Parameter2 = ieDword(fx->CasterLevel <= levelSum * 2) + 2;
 		}
 	}
 

@@ -2098,7 +2098,7 @@ int Response::Execute(Scriptable* Sender)
 	if (actions.empty()) return ret;
 
 	bool iwd2 = core->HasFeature(GFFlags::EFFICIENT_OR);
-	Action* last = actions.back();
+	const Action* last = actions.back();
 	bool hasContinue = false;
 	if (iwd2 && actionflags[last->actionID] & AF_CONTINUE) {
 		hasContinue = true;
@@ -2233,20 +2233,9 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		AppendFormat(buffer, "Sender: {}\n", Sender->GetScriptName());
 		Log(WARNING, "GameScript", "{}", buffer);
 	}
+
 	ActionFunction func = actions[actionID];
-	if (func) {
-		// turning off interruptible flag
-		// uninterruptible actions will set it back
-		if (Sender->Type==ST_ACTOR) {
-			Sender->Activate();
-			if (actionflags[actionID] & AF_ALIVE && Sender->GetInternalFlag() & IF_STOPATTACK) {
-				Log(WARNING, "GameScript", "{}", "Aborted action due to death!");
-				Sender->ReleaseCurrentAction();
-				return;
-			}
-		}
-		func( Sender, aC );
-	} else {
+	if (!func) {
 		actions[actionID] = NoAction;
 		std::string buffer("Unknown ");
 		PrintAction(buffer, actionID);
@@ -2254,6 +2243,18 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	// turning off interruptible flag
+	// uninterruptible actions will set it back
+	if (Sender->Type == ST_ACTOR) {
+		Sender->Activate();
+		if (actionflags[actionID] & AF_ALIVE && Sender->GetInternalFlag() & IF_STOPATTACK) {
+			Log(WARNING, "GameScript", "{}", "Aborted action due to death!");
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+	}
+	func(Sender, aC);
 
 	//don't bother with special flow control actions
 	if (actionflags[actionID] & AF_IMMEDIATE) {

@@ -720,7 +720,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 		for (int j = 0; j < ip->BBox.h; j += 6) {
 			NavmapPoint sample(ip->BBox.x + i, ip->BBox.y + j);
 			if (!ip->outline->PointIn(sample)) continue;
-			SearchmapPoint below = map->ConvertCoordToTile(sample);
+			SearchmapPoint below = Map::ConvertCoordToTile(sample);
 			PathMapFlags tmp = map->tileProps.QuerySearchMap(below);
 			map->tileProps.PaintSearchMap(below, tmp | PathMapFlags::PASSABLE);
 		}

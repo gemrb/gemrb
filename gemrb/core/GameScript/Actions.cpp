@@ -7469,7 +7469,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	std::array<int, 9> exceptions = { 69, 74, 76, 98, 104, 105, 106, 107, 108 };
 	fx->Pos = tar->Pos;
 	fx->Pos.y += int(ProHeights::Normal); // negate future ZPos
-	for (auto& pro : exceptions) {
+	for (const auto& pro : exceptions) {
 		if (parameters->int0Parameter == pro) {
 			fx->Pos.y -= 100;
 			break;
