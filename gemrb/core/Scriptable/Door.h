@@ -100,9 +100,9 @@ public:
 	ieWord ac = 0;
 private:
 	void ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const;
-	void UpdateDoor();
 	bool BlockedOpen(int Open, int ForceOpen) const;
 public:
+	void UpdateDoor();
 	void ToggleTiles(int State, int playsound = false);
 	void SetName(const ResRef &Name); // sets door ID
 	void SetTiles(std::vector<ieWord>);

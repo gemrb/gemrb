@@ -2428,6 +2428,10 @@ void GameScript::SetDoorFlag(Scriptable* Sender, Action* parameters)
 	} else {
 		door->Flags&=~flag;
 	}
+	if (flag & DOOR_TRANSPARENT) {
+		// SetDoorOpen takes care of this for DOOR_OPEN and DOOR_LOCKED doesn't matter
+		door->UpdateDoor();
+	}
 }
 
 void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
