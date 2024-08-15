@@ -1919,6 +1919,8 @@ bool Map::HandleAutopauseForVisible(Actor *actor, bool doPause) const
 //call this once, after area was loaded
 void Map::InitActors()
 {
+	if (core->config.UseAsLibrary) return;
+
 	// setting the map can run effects, so play on the safe side and ignore any actors that might get added
 	size_t i = actors.size();
 	while (i--) {

@@ -473,6 +473,7 @@ public:
 	{
 		return game;
 	}
+	void SetGame(Game* newGame) { game = newGame; };
 	/** Gets the Calendar class */
 	Calendar * GetCalendar() const
 	{

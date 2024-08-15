@@ -2993,6 +2993,8 @@ void Interface::DelTree(const path_t& path, bool onlysave) const
 
 void Interface::LoadProgress(int percent)
 {
+	if (config.UseAsLibrary) return;
+
 	WindowManager::CursorFeedback cur = winmgr->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	winmgr->DrawWindows();
 	winmgr->SetCursorFeedback(cur);
