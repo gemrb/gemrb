@@ -1007,7 +1007,6 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 				continue;
 			}
 		}
-		Log(MESSAGE, "CharAnimations", "Found {}", NewResRef);
 
 		SharedAnim newanim(af->GetCycle(Cycle));
 
