@@ -176,6 +176,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	config.MaxPartySize = std::min(std::max(1, config.MaxPartySize), 10);
 	CONFIG_INT("MouseFeedback", config.MouseFeedback);
 	CONFIG_INT("MultipleQuickSaves", config.MultipleQuickSaves);
+	CONFIG_INT("UseAsLibrary", config.UseAsLibrary);
 	CONFIG_INT("RepeatKeyDelay", config.ActionRepeatDelay);
 	CONFIG_INT("SaveAsOriginal", config.SaveAsOriginal);
 	CONFIG_INT("SpriteFogOfWar", config.SpriteFoW);

@@ -343,16 +343,18 @@ Interface::Interface(CoreSettings&& cfg)
 	path = PathJoin(config.GemRBUnhardcodedPath, "unhardcoded", "shared");
 	gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	fogRenderer = std::make_unique<FogRenderer>(config.SpriteFoW);
+	if (!config.UseAsLibrary) {
+		fogRenderer = std::make_unique<FogRenderer>(config.SpriteFoW);
 
-	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
-	SetNextScript("Start"); // Start is the first script executed
-	guiscript = MakePluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
-	if (guiscript == nullptr) {
-		throw CIE("Missing GUI Script Engine.");
-	}
-	if (!guiscript->Init()) {
-		throw CIE("Failed to initialize GUI Script.");
+		Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
+		SetNextScript("Start"); // Start is the first script executed
+		guiscript = MakePluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
+		if (guiscript == nullptr) {
+			throw CIE("Missing GUI Script Engine.");
+		}
+		if (!guiscript->Init()) {
+			throw CIE("Failed to initialize GUI Script.");
+		}
 	}
 
 	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
@@ -393,19 +395,20 @@ Interface::Interface(CoreSettings&& cfg)
 	ieDword brightness = vars.Get("Brightness Correction", 0);
 	ieDword contrast = vars.Get("Gamma Correction", 0);
 
-	int createDisplayResult =
-	VideoDriver->CreateDisplay(
+	if (!config.UseAsLibrary) {
+		int createDisplayResult =
+			VideoDriver->CreateDisplay(
 				Size(config.Width, config.Height),
 				config.Bpp,
 				fullscreen,
 				config.GameName.c_str(),
-				config.CapFPS == 0
-		);
+				config.CapFPS == 0);
 
-	if (createDisplayResult == GEM_ERROR) {
-		throw CIE("Cannot initialize shaders.");
+		if (createDisplayResult == GEM_ERROR) {
+			throw CIE("Cannot initialize shaders.");
+		}
+		VideoDriver->SetGamma(brightness, contrast);
 	}
-	VideoDriver->SetGamma(brightness, contrast);
 
 	// We use this for the game's state exclusively
 	ieDword maxRefreshRate = vars.Get("Maximum Frame Rate", 30);
@@ -482,9 +485,11 @@ Interface::Interface(CoreSettings&& cfg)
 		throw CIE("Cannot find defsound.2da.");
 	}
 
-	LoadSprites();
-	LoadFonts();
-	gamedata->PreloadColors();
+	if (!config.UseAsLibrary) {
+		LoadSprites();
+		LoadFonts();
+		gamedata->PreloadColors();
+	}
 
 	Log(MESSAGE, "Core", "Initializing string constants...");
 	displaymsg = new DisplayMessage();
@@ -494,10 +499,12 @@ Interface::Interface(CoreSettings&& cfg)
 		throw CIE("Failed to load Window Manager.");
 	}
 
-	Log(MESSAGE, "Core", "Initializing Window Manager...");
-	winmgr = new WindowManager(VideoDriver, std::move(guifact));
-	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
-	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(config.MouseFeedback));
+	if (!config.UseAsLibrary) {
+		Log(MESSAGE, "Core", "Initializing Window Manager...");
+		winmgr = new WindowManager(VideoDriver, std::move(guifact));
+		RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
+		winmgr->SetCursorFeedback(WindowManager::CursorFeedback(config.MouseFeedback));
+	}
 
 	QuitFlag = QF_CHANGESCRIPT;
 
@@ -564,11 +571,13 @@ Interface::Interface(CoreSettings&& cfg)
 	Log(MESSAGE, "Core", "Reading game script tables...");
 	InitializeIEScript();
 
-	Log(MESSAGE, "Core", "Initializing keymap tables...");
-	keymap = new KeyMap();
-	ret = keymap->InitializeKeyMap("keymap.ini", "keymap");
-	if (!ret) {
-		Log(WARNING, "Core", "Failed to initialize keymaps.");
+	if (!config.UseAsLibrary) {
+		Log(MESSAGE, "Core", "Initializing keymap tables...");
+		keymap = new KeyMap();
+		ret = keymap->InitializeKeyMap("keymap.ini", "keymap");
+		if (!ret) {
+			Log(WARNING, "Core", "Failed to initialize keymaps.");
+		}
 	}
 
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
@@ -1417,7 +1426,7 @@ void Interface::LoadGemRBINI()
 
 	int ttMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", 10 );
 
-	if (!tooltipBG.IsEmpty()) {
+	if (!tooltipBG.IsEmpty() && !config.UseAsLibrary) {
 		auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(tooltipBG, IE_BAM_CLASS_ID);
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (anim) {

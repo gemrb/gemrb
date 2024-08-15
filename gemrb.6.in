@@ -485,6 +485,11 @@ If set to
 .IR 1 ,
 original aspect ratio is preserved while game area is scaled to native PS Vita resolution. It is enabled by default.
 
+.TP
+.BR UseAsLibrary =INT
+If set to non-zero, disables some engine features to facilitate independent
+use of GemRB libraries. The default is 0.
+
 .\"###################################################
 .SH FILES
 .PD 0
