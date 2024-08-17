@@ -94,6 +94,7 @@ struct CoreSettings {
 	int Bpp = 32;
 	bool DrawFPS = false;
 	int CapFPS = 0;
+	bool FullScreen = false;
 	bool SpriteFoW = false;
 	uint32_t debugMode = 0;
 	bool Logging = true;

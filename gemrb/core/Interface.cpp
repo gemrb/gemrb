@@ -408,6 +408,10 @@ Interface::Interface(CoreSettings&& cfg)
 			throw CIE("Cannot initialize shaders.");
 		}
 		VideoDriver->SetGamma(brightness, contrast);
+
+		if (config.FullScreen) {
+			VideoDriver->SetFullscreenMode(true);
+		}
 	}
 
 	// We use this for the game's state exclusively
