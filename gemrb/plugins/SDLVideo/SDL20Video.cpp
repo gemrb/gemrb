@@ -148,25 +148,7 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 #endif
 
-
-#ifdef SDL_RESOLUTION_INDEPENDANCE
-	SDL_DisplayMode current;
-
-	int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
-
-	if (should_be_zero != 0) {
-		Log(ERROR, "SDL 2 Driver", "couldnt get resolution: {}", SDL_GetError());
-		return GEM_ERROR;
-	}
-
-	Log(DEBUG, "SDL 2 Driver", "Game Resolution: {}x{}, Screen Resolution: {}x{}",
-		screenSize.w, screenSize.h, current.w, current.h);
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, current.w, current.h, winFlags);
-#else
-
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenSize.w, screenSize.h, winFlags);
-#endif
-
 	if (window == NULL) {
 		Log(ERROR, "SDL 2 Driver", "couldnt create window: {}", SDL_GetError());
 		return GEM_ERROR;

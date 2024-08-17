@@ -58,7 +58,6 @@ OPTION(DISABLE_WERROR "Do not treat warnings as errors" OFF)
 OPTION(USE_TRACY "Build with Tracy support" OFF)
 
 OPTION(USE_SDL_CONTROLLER_API "Enable SDL controller APIs. (disable if you plan on handling controller input in an external program like gptokeyb)" ON)
-OPTION(SDL_RESOLUTION_INDEPENDANCE "Scale the window to the size of the screen with pixel scaling." OFF)
 
 #VCPKG dll deployment is circumvented because it doesn't currently work for gemrb
 IF(WIN32 AND _VCPKG_INSTALLED_DIR)

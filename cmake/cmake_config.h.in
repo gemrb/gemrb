@@ -22,5 +22,4 @@
 #cmakedefine SUPPORTS_MEMSTREAM ${SUPPORTS_MEMSTREAM}
 #cmakedefine BAKE_ICON 1
 #cmakedefine USE_SDL_CONTROLLER_API 1
-#cmakedefine SDL_RESOLUTION_INDEPENDANCE 1
 #endif
