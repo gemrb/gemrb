@@ -30,24 +30,24 @@
 
 namespace GemRB {
 
-//door flags
+// door flags; iwd2 differences are remapped in the importer
 #define DOOR_OPEN        1
 #define DOOR_LOCKED      2
 #define DOOR_RESET       4   //reset trap
 #define DOOR_DETECTABLE  8   //trap detectable
 #define DOOR_BROKEN      16  //door is broken (force opened)
 #define DOOR_CANTCLOSE   32  // used in BG1 (at least TotSC). Prevents random closing of doors in CGameDoor::CompressTime. (The random closing is only done when more than a hour of ingame time passed.) 
-#define DOOR_LINKED      64   //info trigger linked to this door, iwd2: DETECTED in the ids
+#define DOOR_LINKED      64   // info trigger linked to this door (see LinkedInfo, INFO_DOOR), iwd2: DETECTED (used, but no code)
 #define DOOR_SECRET      128  //door is secret
 #define DOOR_FOUND       256  //secret door found
 #define DOOR_TRANSPARENT 512  //obscures vision (LOCKEDINFOTEXT in iwd2)
 #define DOOR_KEY         1024 //key removed when used (SEETHROUGH in iwd2)
 #define DOOR_SLIDE       2048 //impeded blocks ignored (WARNINGINFOTEXT in iwd2)
-#define DOOR_WARNINGTEXTDISPLAYED 0x1000 // iwd2
+#define DOOR_WARNINGTEXTDISPLAYED 0x1000 // iwd2 after DOOR_WARNINGINFOTEXT's warning was shown; cleared when closing the door
 #define DOOR_HIDDEN      8192 // iwd2, ignore the door
 #define DOOR_USEUPKEY    0x4000 // iwd2, treating as identical to DOOR_KEY
 #define DOOR_LOCKEDINFOTEXT 0x8000 // iwd2, use custom text instead of default "Locked"
-#define DOOR_WARNINGINFOTEXT 0x10000
+#define DOOR_WARNINGINFOTEXT 0x10000 // iwd2, display warning when trying to open a door, unused in game
 
 class GEM_EXPORT DoorTrigger {
 	WallPolygonGroup openWalls;
@@ -89,7 +89,7 @@ public:
 	Point toOpen[2];
 	ResRef OpenSound;
 	ResRef CloseSound;
-	ResRef LockSound;
+	ResRef LockSound; // these two are gemrb extensions
 	ResRef UnLockSound;
 	ieDword DiscoveryDiff = 0;
 	ieDword LockDifficulty = 0; //this is a dword?
