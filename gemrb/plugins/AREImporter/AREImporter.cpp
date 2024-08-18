@@ -899,7 +899,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	str->ReadPoint(toOpen[0]);
 	str->ReadPoint(toOpen[1]);
 	str->ReadStrRef(openStrRef);
-	if (core->HasFeature(GFFlags::AUTOMAP_INI) ) {
+	if (core->HasFeature(GFFlags::AUTOMAP_INI) || map->version == 16) { // true in all games? IESDP has 24 bits for v1 too
 		char tmp[25];
 		str->Read(tmp, 24);
 		tmp[24] = 0;
