@@ -1874,6 +1874,48 @@ bool Highlightable::TryBashLock(Actor* actor, ieWord lockDifficulty, HCStrings f
 	return true;
 }
 
+bool Highlightable::TryPickLock(Actor* actor, ieWord lockDifficulty, ieStrRef customFailStr, HCStrings failStr)
+{
+	if (lockDifficulty == 100) {
+		if (customFailStr != ieStrRef::INVALID) {
+			displaymsg->DisplayStringName(customFailStr, GUIColors::XPCHANGE, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+		} else {
+			displaymsg->DisplayMsgAtLocation(failStr, FT_ANY, actor, actor, GUIColors::XPCHANGE);
+		}
+		return false;
+	}
+
+	int stat = actor->GetStat(IE_LOCKPICKING);
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		int skill = actor->GetSkill(IE_LOCKPICKING);
+		if (skill == 0) { // a trained skill, make sure we fail
+			stat = 0;
+		} else {
+			stat *= 7; // convert to percent (magic 7 is from RE)
+			int dexmod = actor->GetAbilityBonus(IE_DEX);
+			stat += dexmod; // the original didn't use it, so let's not multiply it
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL11, GUIColors::LIGHTGREY, actor, stat - dexmod, lockDifficulty, dexmod);
+		}
+	}
+	if (stat < (int) lockDifficulty) {
+		displaymsg->DisplayMsgAtLocation(HCStrings::LockpickFailed, FT_ANY, actor, actor, GUIColors::XPCHANGE);
+		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
+		core->PlaySound(DS_PICKFAIL, SFXChannel::Hits);
+		return false;
+	}
+
+	core->GetGameControl()->ResetTargetMode();
+	displaymsg->DisplayMsgAtLocation(HCStrings::LockpickDone, FT_ANY, actor, actor);
+	core->PlaySound(DS_PICKLOCK, SFXChannel::Hits);
+	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
+	ImmediateEvent();
+
+	int xp = gamedata->GetXPBonus(XP_LOCKPICK, actor->GetXPLevel(1));
+	const Game* game = core->GetGame();
+	game->ShareXP(xp, SX_DIVIDE);
+	return true;
+}
+
 //detect this trap, using a skill, skill could be set to 256 for 'sure'
 //skill is the all around modified trap detection skill
 //a trapdetectiondifficulty of 100 means impossible detection short of a spell

@@ -489,6 +489,7 @@ public:
 	virtual bool TriggerTrap(int skill, ieDword ID);
 	bool TryUnlock(Actor *actor, bool removekey) const;
 	bool TryBashLock(Actor* actor, ieWord lockDifficulty, HCStrings failStr);
+	bool TryPickLock(Actor* actor, ieWord lockDifficulty, ieStrRef customFailStr, HCStrings failStr);
 };
 
 class GEM_EXPORT Movable : public Selectable {

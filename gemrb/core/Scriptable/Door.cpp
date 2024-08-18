@@ -370,41 +370,9 @@ void Highlightable::TryDisarm(Actor* actor)
 
 void Door::TryPickLock(Actor* actor)
 {
-	if (LockDifficulty == 100) {
-		if (LockedStrRef != ieStrRef::INVALID) {
-			displaymsg->DisplayStringName(LockedStrRef, GUIColors::XPCHANGE, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
-		} else {
-			displaymsg->DisplayMsgAtLocation(HCStrings::DoorNotPickable, FT_ANY, actor, actor, GUIColors::XPCHANGE);
-		}
-		return;
-	}
-	int stat = actor->GetStat(IE_LOCKPICKING);
-	if (core->HasFeature(GFFlags::RULES_3ED)) {
-		int skill = actor->GetSkill(IE_LOCKPICKING);
-		if (skill == 0) { // a trained skill, make sure we fail
-			stat = 0;
-		} else {
-			stat *= 7; // convert to percent (magic 7 is from RE)
-			int dexmod = actor->GetAbilityBonus(IE_DEX);
-			stat += dexmod; // the original didn't use it, so let's not multiply it
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL11, GUIColors::LIGHTGREY, actor, stat-dexmod, LockDifficulty, dexmod);
-		}
-	}
-	if (stat < (signed)LockDifficulty) {
-		displaymsg->DisplayMsgAtLocation(HCStrings::LockpickFailed, FT_ANY, actor, actor, GUIColors::XPCHANGE);
-		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
-		core->PlaySound(DS_PICKFAIL, SFXChannel::Hits);
-		return;
-	}
-	SetDoorLocked( false, true);
-	core->GetGameControl()->ResetTargetMode();
-	displaymsg->DisplayMsgAtLocation(HCStrings::LockpickDone, FT_ANY, actor, actor);
-	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
-	core->PlaySound(DS_PICKLOCK, SFXChannel::Hits);
-	ImmediateEvent();
-	int xp = gamedata->GetXPBonus(XP_LOCKPICK, actor->GetXPLevel(1));
-	const Game *game = core->GetGame();
-	game->ShareXP(xp, SX_DIVIDE);
+	if (!Highlightable::TryPickLock(actor, LockDifficulty, LockedStrRef, HCStrings::DoorNotPickable)) return;
+
+	SetDoorLocked(false, true);
 }
 
 void Door::TryBashLock(Actor *actor)
