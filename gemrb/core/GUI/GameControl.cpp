@@ -1937,11 +1937,8 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	if ((targetMode == TargetMode::Cast) && spellCount) {
 		//we'll get the door back from the coordinates
-		const Point *p = door->toOpen;
-		const Point *otherp = door->toOpen+1;
-		if (Distance(*p,actor)>Distance(*otherp,actor)) {
-			p=otherp;
-		}
+		unsigned int dist;
+		const Point* p = door->GetClosestApproach(actor, dist);
 		TryToCast(actor, *p);
 		return;
 	}

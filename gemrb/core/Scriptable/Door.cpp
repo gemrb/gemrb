@@ -470,6 +470,19 @@ int Door::GetCursor(TargetMode targetMode, int lastCursor) const
 	return Cursor;
 }
 
+const Point* Door::GetClosestApproach(Scriptable* src, unsigned int& distance) const
+{
+	const Point* p = &toOpen[0];
+	unsigned int dist1 = Distance(toOpen[0], src);
+	unsigned int dist2 = Distance(toOpen[1], src);
+	distance = dist1;
+	if (dist1 > dist2) {
+		p = &toOpen[1];
+		distance = dist2;
+	}
+	return p;
+}
+
 std::string Door::dump() const
 {
 	std::string buffer;
