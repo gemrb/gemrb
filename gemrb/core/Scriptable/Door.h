@@ -46,7 +46,7 @@ namespace GemRB {
 #define DOOR_WARNINGTEXTDISPLAYED 0x1000 // iwd2
 #define DOOR_HIDDEN      8192 // iwd2, ignore the door
 #define DOOR_USEUPKEY    0x4000 // iwd2, treating as identical to DOOR_KEY
-#define DOOR_LOCKEDINFOTEXT 0x8000
+#define DOOR_LOCKEDINFOTEXT 0x8000 // iwd2, use custom text instead of default "Locked"
 #define DOOR_WARNINGINFOTEXT 0x10000
 
 class GEM_EXPORT DoorTrigger {
