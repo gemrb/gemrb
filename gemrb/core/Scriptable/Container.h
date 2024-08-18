@@ -55,7 +55,7 @@ public:
 	int GetCursor(TargetMode targetMode, int lastCursor) const;
 
 	void TryPickLock(Actor* actor);
-	void TryBashLock(Actor *actor);
+	void TryBashLock(Actor* actor) override;
 	bool TryUnlock(Actor *actor) const;
 	std::string dump() const override;
 	int TrapResets() const override { return Flags & CONT_RESET; }

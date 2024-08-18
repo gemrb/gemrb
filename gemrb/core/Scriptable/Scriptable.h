@@ -456,6 +456,8 @@ public:
 	virtual int TrapResets() const = 0;
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
+	virtual void TryBashLock(Actor* actor) = 0;
+
 public:
 	std::shared_ptr<Gem_Polygon> outline = nullptr;
 	Color outlineColor = ColorBlack;

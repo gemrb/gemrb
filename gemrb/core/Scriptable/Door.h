@@ -112,7 +112,7 @@ public:
 	int IsOpen() const;
 	bool HitTest(const Point& p) const;
 	void TryPickLock(Actor* actor);
-	void TryBashLock(Actor* actor) ;
+	void TryBashLock(Actor* actor) override;
 	bool TryUnlock(Actor *actor) const;
 	void TryDetectSecret(int skill, ieDword actorID);
 	bool Visible() const;

@@ -6564,15 +6564,12 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Door *door = nullptr;
-	Container *container = nullptr;
 	const Point* pos;
 	unsigned int distance;
 	if (target->Type == ST_DOOR) {
-		door = static_cast<Door*>(target);
+		Door* door = static_cast<Door*>(target);
 		pos = door->GetClosestApproach(Sender, distance);
 	} else if(target->Type == ST_CONTAINER) {
-		container = static_cast<Container*>(target);
 		pos = &target->Pos;
 		distance = PersonalDistance(*pos, Sender);
 	} else {
@@ -6590,11 +6587,7 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 	gc->SetTargetMode(TargetMode::Attack); // for bashing doors too
 
 	// try to bash it
-	if (door) {
-		door->TryBashLock(actor);
-	} else if (container) {
-		container->TryBashLock(actor);
-	}
+	static_cast<Highlightable*>(target)->TryBashLock(actor);
 
 	Sender->ReleaseCurrentAction();
 }
