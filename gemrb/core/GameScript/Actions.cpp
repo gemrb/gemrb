@@ -2546,11 +2546,7 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 	actor->SetOrientation(actor->Pos, *p, false);
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		if (locked) {
-			if (type==ST_DOOR) {
-				door->TryPickLock(actor);
-			} else {
-				container->TryPickLock(actor);
-			}
+			lockMount->TryPickLock(actor);
 		} else {
 			//notlocked
 			//displaymsg->DisplayString(HCStrings::NotLocked);

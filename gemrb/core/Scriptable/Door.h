@@ -111,7 +111,7 @@ public:
 	void SetDoorOpen(int Open, int playsound, ieDword openerID, bool addTrigger = true);
 	int IsOpen() const;
 	bool HitTest(const Point& p) const;
-	void TryPickLock(Actor* actor);
+	void TryPickLock(Actor* actor) override;
 	void TryBashLock(Actor* actor) override;
 	bool TryUnlock(Actor *actor) const;
 	void TryDetectSecret(int skill, ieDword actorID);

@@ -457,6 +457,7 @@ public:
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
 	virtual void TryBashLock(Actor* actor) = 0;
+	virtual void TryPickLock(Actor* actor) = 0;
 	virtual bool IsLocked() const { return false; }
 
 public:

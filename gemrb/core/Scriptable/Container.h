@@ -54,7 +54,7 @@ public:
 	void Draw(bool highlight, const Region &screen, Color tint, BlitFlags flags) const;
 	int GetCursor(TargetMode targetMode, int lastCursor) const;
 
-	void TryPickLock(Actor* actor);
+	void TryPickLock(Actor* actor) override;
 	void TryBashLock(Actor* actor) override;
 	bool TryUnlock(Actor *actor) const;
 	std::string dump() const override;
