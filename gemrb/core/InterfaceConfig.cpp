@@ -167,6 +167,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	CONFIG_INT("DoubleClickDelay", config.DoubleClickDelay);
 	CONFIG_INT("DrawFPS", config.DrawFPS);
 	CONFIG_INT("CapFPS", config.CapFPS);
+	CONFIG_INT("FullScreen", config.FullScreen);
 	CONFIG_INT("EnableCheatKeys", config.CheatFlag);
 	CONFIG_INT("GCDebug", config.DebugFlags);
 	CONFIG_INT("GUIEnhancements", config.GUIEnhancements);
@@ -342,6 +343,8 @@ CoreSettings LoadFromArgs(int argc, char *argv[])
 		} else if (stricmp(argv[i], "-q") == 0) {
 			// quiet mode
 			settings.Set("AudioDriver", "none");
+		} else if (stricmp(argv[i], "-f") == 0) {
+			settings.Set("FullScreen", "1");
 		} else if (stricmp(argv[i], "--color") == 0) {
 			if (i < argc - 1) settings.Set("LogColor", argv[++i]);
 		} else {
