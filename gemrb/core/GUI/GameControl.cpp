@@ -518,7 +518,7 @@ void GameControl::OutlineDoors() const
 
 		door->Highlight = true;
 		if (targetMode != TargetMode::None) {
-			if (door->Visible() && (door->Flags & DOOR_LOCKED)) {
+			if (door->Visible() && door->IsLocked()) {
 				// only highlight targetable doors
 				door->outlineColor = displaymsg->GetColor(GUIColors::HOVERTARGETABLE);
 			}
@@ -546,7 +546,7 @@ void GameControl::OutlineContainers() const
 			container->Highlight = true;
 			if (targetMode == TargetMode::None) {
 				container->outlineColor = displaymsg->GetColor(GUIColors::HOVERCONTAINER);
-			} else if (container->Flags & CONT_LOCKED) {
+			} else if (container->IsLocked()) {
 				container->outlineColor = displaymsg->GetColor(GUIColors::HOVERTARGETABLE);
 			}
 		}

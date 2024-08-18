@@ -2520,7 +2520,6 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 	Door *door = NULL;
 	Container *container = NULL;
 	ScriptableType type = tar->Type;
-	ieDword flags;
 
 	switch (type) {
 	case ST_DOOR:
@@ -2531,22 +2530,22 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 			return;
 		}
 		p = door->GetClosestApproach(Sender, distance);
-		flags = door->Flags&DOOR_LOCKED;
 		break;
 	case ST_CONTAINER:
 		container = static_cast<Container*>(tar);
 		p = &container->Pos;
 		distance = Distance(*p, Sender);
-		flags = container->Flags&CONT_LOCKED;
 		break;
 	default:
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
+	Highlightable* lockMount = static_cast<Highlightable*>(tar);
+	bool locked = lockMount->IsLocked();
 	actor->SetOrientation(actor->Pos, *p, false);
 	if (distance <= MAX_OPERATING_DISTANCE) {
-		if (flags) {
+		if (locked) {
 			if (type==ST_DOOR) {
 				door->TryPickLock(actor);
 			} else {

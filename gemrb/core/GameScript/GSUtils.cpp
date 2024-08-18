@@ -1550,18 +1550,11 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		!CanSee(attacker, target, true, 0)) {
 		MoveNearerTo(attacker, target, Feet2Pixels(weaponRange, angle));
 		return;
-	} else if (target->Type == ST_DOOR) {
-		//Forcing a lock does not launch the trap...
-		Door* door = static_cast<Door*>(target);
-		if(door->Flags & DOOR_LOCKED) {
-			door->TryBashLock(attacker);
-		}
-		Sender->ReleaseCurrentAction();
-		return;
-	} else if (target->Type == ST_CONTAINER) {
-		Container* cont = static_cast<Container*>(target);
-		if(cont->Flags & CONT_LOCKED) {
-			cont->TryBashLock(attacker);
+	} else if (target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
+		// Forcing a lock does not launch the trap...
+		Highlightable* lockMount = static_cast<Highlightable*>(target);
+		if (lockMount->IsLocked()) {
+			lockMount->TryBashLock(attacker);
 		}
 		Sender->ReleaseCurrentAction();
 		return;

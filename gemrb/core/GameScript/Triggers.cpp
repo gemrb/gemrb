@@ -2581,7 +2581,7 @@ int GameScript::OpenState(Scriptable *Sender, const Trigger *parameters)
 		case ST_CONTAINER:
 		{
 			const Container *cont = static_cast<const Container*>(tar);
-			return !(cont->Flags&CONT_LOCKED) == !parameters->int0Parameter;
+			return !cont->IsLocked() == !parameters->int0Parameter;
 		}
 		default:; //to remove a warning
 	}
@@ -2598,18 +2598,9 @@ int GameScript::IsLocked(Scriptable *Sender, const Trigger *parameters)
 		Log(DEBUG, "GameScript", "Sender: {}", Sender->GetScriptName());
 		return 0;
 	}
-	switch(tar->Type) {
-		case ST_DOOR:
-		{
-			const Door *door = static_cast<const Door*>(tar);
-			return !!(door->Flags&DOOR_LOCKED);
-		}
-		case ST_CONTAINER:
-		{
-			const Container *cont = static_cast<const Container*>(tar);
-			return !!(cont->Flags&CONT_LOCKED);
-		}
-		default:; //to remove a warning
+	const Highlightable* lockMount = static_cast<const Highlightable*>(tar);
+	if (lockMount) {
+		return lockMount->IsLocked();
 	}
 	Log(ERROR, "GameScript", "IsLocked: Not a door/container: {}", tar->GetScriptName());
 	return 0;

@@ -58,6 +58,7 @@ public:
 	void TryBashLock(Actor* actor) override;
 	bool TryUnlock(Actor *actor) const;
 	std::string dump() const override;
+	bool IsLocked() const override { return Flags & CONT_LOCKED; }
 	int TrapResets() const override { return Flags & CONT_RESET; }
 	bool CanDetectTrap() const override;
 private:

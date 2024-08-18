@@ -118,6 +118,7 @@ public:
 	bool Visible() const;
 	int GetCursor(TargetMode targetMode, int lastCursor) const;
 	std::string dump() const override;
+	bool IsLocked() const override { return Flags & DOOR_LOCKED; }
 	int TrapResets() const override { return Flags & DOOR_RESET; }
 	bool CantAutoClose() const { return Flags & (DOOR_CANTCLOSE | DOOR_LOCKED); }
 	void SetNewOverlay(Holder<TileOverlay> Overlay);
