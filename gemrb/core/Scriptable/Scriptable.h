@@ -24,6 +24,7 @@
 #include "exports.h"
 #include "ie_cursors.h"
 #include "ie_types.h"
+#include "strrefs.h"
 
 #include "CharAnimations.h"
 #include "OverHeadText.h"
@@ -483,6 +484,7 @@ public:
 	//returns true if trap has been triggered, tumble skill???
 	virtual bool TriggerTrap(int skill, ieDword ID);
 	bool TryUnlock(Actor *actor, bool removekey) const;
+	bool TryBashLock(Actor* actor, ieWord lockDifficulty, HCStrings failStr);
 };
 
 class GEM_EXPORT Movable : public Selectable {

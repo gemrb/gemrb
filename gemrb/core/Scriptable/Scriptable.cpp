@@ -1839,6 +1839,41 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
 	return true;
 }
 
+bool Highlightable::TryBashLock(Actor* actor, ieWord lockDifficulty, HCStrings failStr)
+{
+	// Get the strength bonus against lock difficulty
+	int bonus;
+	unsigned int roll;
+
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		bonus = actor->GetAbilityBonus(IE_STR);
+		roll = actor->LuckyRoll(1, 100, bonus, 0);
+	} else {
+		int str = actor->GetStat(IE_STR);
+		int strEx = actor->GetStat(IE_STREXTRA);
+		bonus = core->GetStrengthBonus(2, str, strEx); // BEND_BARS_LIFT_GATES
+		roll = actor->LuckyRoll(1, 10, bonus, 0);
+	}
+
+	actor->FaceTarget(this);
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		// ~Bash door check. Roll %d + %d Str mod > %d door DC.~
+		// there is no separate string for non-doors
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL1, GUIColors::LIGHTGREY, actor, roll, bonus, lockDifficulty);
+	}
+
+	if (roll < lockDifficulty || lockDifficulty == 100) {
+		displaymsg->DisplayMsgAtLocation(failStr, FT_ANY, actor, actor, GUIColors::XPCHANGE);
+		return false;
+	}
+
+	// This is ok, bashdoor also sends the unlocked trigger
+	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
+	ImmediateEvent();
+	core->GetGameControl()->ResetTargetMode();
+	return true;
+}
+
 //detect this trap, using a skill, skill could be set to 256 for 'sure'
 //skill is the all around modified trap detection skill
 //a trapdetectiondifficulty of 100 means impossible detection short of a spell
