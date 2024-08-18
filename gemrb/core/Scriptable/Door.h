@@ -93,7 +93,7 @@ public:
 	ResRef UnLockSound;
 	ieDword DiscoveryDiff = 0;
 	ieDword LockDifficulty = 0; //this is a dword?
-	ieStrRef OpenStrRef = ieStrRef::INVALID;
+	ieStrRef LockedStrRef = ieStrRef::INVALID;
 	ieStrRef NameStrRef = ieStrRef::INVALID;
 	// unused, but learned from IE DEV info
 	ieWord hp = 0;

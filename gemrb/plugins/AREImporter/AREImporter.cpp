@@ -1001,7 +1001,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 		door->CloseSound = gamedata->defaultSounds[DEF_CLOSE];
 	}
 	if (!openStrRef) openStrRef = ieStrRef(-1); // rewrite 0 to -1
-	door->OpenStrRef = openStrRef;
+	door->LockedStrRef = openStrRef;
 
 	door->DiscoveryDiff = discoveryDiff;
 	door->LockDifficulty = lockRemoval;
@@ -1947,7 +1947,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		//opening locations
 		stream->WritePoint(d->toOpen[0]);
 		stream->WritePoint(d->toOpen[1]);
-		stream->WriteStrRef(d->OpenStrRef);
+		stream->WriteStrRef(d->LockedStrRef);
 		if (core->HasFeature(GFFlags::AUTOMAP_INI) ) {
 			stream->WriteString(d->LinkedInfo, 24);
 		} else {

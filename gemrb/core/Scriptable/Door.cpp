@@ -371,8 +371,8 @@ void Highlightable::TryDisarm(Actor* actor)
 void Door::TryPickLock(Actor* actor)
 {
 	if (LockDifficulty == 100) {
-		if (OpenStrRef != ieStrRef::INVALID) {
-			displaymsg->DisplayStringName(OpenStrRef, GUIColors::XPCHANGE, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+		if (LockedStrRef != ieStrRef::INVALID) {
+			displaymsg->DisplayStringName(LockedStrRef, GUIColors::XPCHANGE, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		} else {
 			displaymsg->DisplayMsgAtLocation(HCStrings::DoorNotPickable, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		}

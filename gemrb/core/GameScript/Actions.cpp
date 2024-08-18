@@ -2643,8 +2643,8 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* parameters)
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		actor->SetOrientation(actor->Pos, *otherp, false);
 		if (!door->TryUnlock(actor)) {
-			if (door->Flags & DOOR_LOCKEDINFOTEXT && door->OpenStrRef != ieStrRef::INVALID) {
-				displaymsg->DisplayString(door->OpenStrRef, GUIColors::LIGHTGREY, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+			if (door->Flags & DOOR_LOCKEDINFOTEXT && door->LockedStrRef != ieStrRef::INVALID) {
+				displaymsg->DisplayString(door->LockedStrRef, GUIColors::LIGHTGREY, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 			} else {
 				displaymsg->DisplayMsgAtLocation(HCStrings::DoorLocked, FT_MISC, door, actor);
 			}
