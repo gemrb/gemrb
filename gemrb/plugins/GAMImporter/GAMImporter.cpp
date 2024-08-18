@@ -730,18 +730,13 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 	for (const auto& entry : game->locals) {
 		//global variables are locals for game, that's why the local/global confusion
 
-		/* PST hates to have some variables lowercased. */
-		if (core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
-			/* This is one anomaly that must have a space injected (PST crashes otherwise). */
-			if (entry.first == "dictionary_githzerai_hjacknir") {
-				tmpname = "DICTIONARY_GITHZERAI_ HJACKNIR";
-			} else {
-				tmpname = MakeVariable(entry.first);
-			}
-		} else {
-			tmpname = MakeVariable(entry.first);
+		tmpname = MakeVariable(entry.first);
+		/* This is one anomaly that must have a space injected (PST crashes otherwise). */
+		if (tmpname == "dictionary_githzerai_hjacknir") {
+			tmpname = "DICTIONARY_GITHZERAI_ HJACKNIR";
 		}
 
+		/* PST hates to have some variables lowercased. */
 		stream->WriteVariableUC(tmpname);
 		stream->WriteFilling(8);
 		stream->WriteDword(entry.second);
