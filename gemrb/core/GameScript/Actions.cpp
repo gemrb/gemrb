@@ -1983,7 +1983,7 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 	}
 }
 
-void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
+void GameScript::ScreenShake(Scriptable* /*Sender*/, Action* parameters)
 {
 	if (parameters->int1Parameter) { //IWD2 has a different profile
 		Point p(parameters->int1Parameter, parameters->int2Parameter);
@@ -1991,8 +1991,6 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 	} else {
 		core->timer.SetScreenShake(parameters->pointParameter, parameters->int0Parameter);
 	}
-	Sender->SetWait( parameters->int0Parameter );
-	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::UnhideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)

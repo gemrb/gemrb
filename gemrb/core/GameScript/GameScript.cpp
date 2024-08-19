@@ -936,7 +936,7 @@ static const ActionLink actionnames[] = {
 	{"savelocation", GameScript::SaveLocation, 0},
 	{"saveplace", GameScript::SaveLocation, 0},
 	{"saveobjectlocation", GameScript::SaveObjectLocation, 0},
-	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
+	{"screenshake", GameScript::ScreenShake, 0},
 	{"selectweaponability", GameScript::SelectWeaponAbility, 0},
 	{"sendtrigger", GameScript::SendTrigger, 0},
 	{"setanimstate", GameScript::PlaySequence, AF_ALIVE},//pst

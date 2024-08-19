@@ -166,8 +166,8 @@ bool GlobalTimer::Update()
 		goto end;
 	}
 
-	// don't update scripts if we're fading in or out
-	if (IsFading()) {
+	// don't update scripts if we're fading in or out or shaking the screen
+	if (IsFading() || shakeCounter) {
 		if (!fadeToCounter) map->UpdateFog(); // needed eg. when meeting Yoshimo for the first time
 		if (thisTime) {
 			game->RealTime++;
