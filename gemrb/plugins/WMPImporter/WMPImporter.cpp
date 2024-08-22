@@ -134,7 +134,7 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 	// Load location icon bam
 	auto af = gamedata->GetFactoryResourceAs<AnimationFactory>(m->MapIconResRef, IE_BAM_CLASS_ID);
 	if (af) {
-		m->SetMapIcons(af);
+		m->SetMapIcons(std::move(af));
 	}
 
 	str->Seek( AreaEntriesOffset, GEM_STREAM_START );

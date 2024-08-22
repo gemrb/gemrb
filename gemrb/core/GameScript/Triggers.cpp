@@ -2598,7 +2598,7 @@ int GameScript::IsLocked(Scriptable *Sender, const Trigger *parameters)
 		Log(DEBUG, "GameScript", "Sender: {}", Sender->GetScriptName());
 		return 0;
 	}
-	const Highlightable* lockMount = static_cast<const Highlightable*>(tar);
+	const Highlightable* lockMount = Scriptable::As<Highlightable>(tar);
 	if (lockMount) {
 		return lockMount->IsLocked();
 	}
