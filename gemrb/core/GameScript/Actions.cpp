@@ -7454,6 +7454,9 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, target, src);
+
+	// see note in SpellHitEffectPoint, helps with #2109 efreeti all spawning at the same time
+	Sender->SetWait(3);
 }
 
 void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
