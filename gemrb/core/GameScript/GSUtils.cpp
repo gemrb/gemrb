@@ -333,6 +333,16 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::i
 	if (!actor) {
 		return;
 	}
+
+	// WTF, as if AWAKE (adjective, not verb, the normal stance) and EMERGE are reversed in iwd2!?
+	// it's visible even with party members: PlaySequence(Player2,AWAKE)
+	// will have him stand up, while EMERGE will only glitch for a tick or two
+	if (value == IE_ANI_AWAKE) {
+		value = IE_ANI_EMERGE;
+	} else if (value == IE_ANI_EMERGE) {
+		value = IE_ANI_AWAKE;
+	}
+
 	// it should play out the sequence once and stop
 	actor->SetStance( value );
 	// it's a blocking action family, but the original didn't actually block
