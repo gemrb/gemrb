@@ -681,6 +681,7 @@ private:
 	void DrawPortal(const InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport) const;
 	void DrawOverheadText() const;
+	void DrawWallPolygons(const Region& viewport) const;
 
 	Size PropsSize() const noexcept;
 	Size FogMapSize() const;

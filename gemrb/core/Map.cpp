@@ -1387,39 +1387,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 	// Show wallpolygons
 	if (debugFlags & (DEBUG_SHOW_WALLS_ALL|DEBUG_SHOW_DOORS_DISABLED)) {
-		const auto& viewportWallsAll = WallsIntersectingRegion(viewport, true);
-		for (const auto& poly : viewportWallsAll.first) {
-			const Point& origin = poly->BBox.origin - viewport.origin;
-
-			if (poly->wall_flag&WF_DISABLED) {
-				if (debugFlags & DEBUG_SHOW_DOORS_DISABLED) {
-					VideoDriver->DrawPolygon( poly.get(), origin, ColorGray, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS);
-				}
-				continue;
-			}
-
-			if ((debugFlags & (DEBUG_SHOW_WALLS|DEBUG_SHOW_WALLS_ANIM_COVER)) == 0) {
-				continue;
-			}
-
-			Color c = ColorYellow;
-
-			if (debugFlags & DEBUG_SHOW_WALLS_ANIM_COVER) {
-				if (poly->wall_flag & WF_COVERANIMS) {
-					// darker yellow for walls with WF_COVERANIMS
-					c.r -= 0x80;
-					c.g -= 0x80;
-				}
-			} else if ((debugFlags & DEBUG_SHOW_WALLS) == 0) {
-				continue;
-			}
-
-			VideoDriver->DrawPolygon( poly.get(), origin, c, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS);
-			
-			if (poly->wall_flag & WF_BASELINE) {
-				VideoDriver->DrawLine(poly->base0 - viewport.origin, poly->base1 - viewport.origin, ColorMagenta);
-			}
-		}
+		DrawWallPolygons(viewport);
 	}
 }
 
@@ -1449,6 +1417,41 @@ void Map::DrawOverheadText() const
 	count = actors.size();
 	while (count--) {
 		actors[count]->overHead.Draw();
+	}
+}
+
+void Map::DrawWallPolygons(const Region& viewport) const
+{
+	const auto& viewportWallsAll = WallsIntersectingRegion(viewport, true);
+	for (const auto& poly : viewportWallsAll.first) {
+		const Point& origin = poly->BBox.origin - viewport.origin;
+
+		if (poly->wall_flag & WF_DISABLED) {
+			if (debugFlags & DEBUG_SHOW_DOORS_DISABLED) {
+				VideoDriver->DrawPolygon(poly.get(), origin, ColorGray, true, BlitFlags::BLENDED | BlitFlags::HALFTRANS);
+			}
+			continue;
+		}
+
+		if ((debugFlags & (DEBUG_SHOW_WALLS | DEBUG_SHOW_WALLS_ANIM_COVER)) == 0) {
+			continue;
+		}
+
+		Color c = ColorYellow;
+		if (debugFlags & DEBUG_SHOW_WALLS_ANIM_COVER) {
+			if (poly->wall_flag & WF_COVERANIMS) {
+				// darker yellow for walls with WF_COVERANIMS
+				c.r -= 0x80;
+				c.g -= 0x80;
+			}
+		} else if ((debugFlags & DEBUG_SHOW_WALLS) == 0) {
+			continue;
+		}
+
+		VideoDriver->DrawPolygon(poly.get(), origin, c, true, BlitFlags::BLENDED | BlitFlags::HALFTRANS);
+		if (poly->wall_flag & WF_BASELINE) {
+			VideoDriver->DrawLine(poly->base0 - viewport.origin, poly->base1 - viewport.origin, ColorMagenta);
+		}
 	}
 }
 
