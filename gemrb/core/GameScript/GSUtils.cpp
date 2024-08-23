@@ -344,9 +344,20 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::i
 	}
 
 	// it should play out the sequence once and stop
+	// does not reset the stance back once done; if the stance doesn't autotransition,
+	// the actor will remain in the same one (eg. IE_ANI_DIE, IE_ANI_TWITCH, 17/IE_ANI_GET_UP)
 	actor->SetStance( value );
+
 	// it's a blocking action family, but the original didn't actually block
-	// TODO: reset the stance back once done
+	// give some time for 1 cycle of the new stance animation to play out
+	// interestingly 16==our sleep crashes; seq.ids has sleep at our IE_ANI_GET_UP though
+	CharAnimations* ca = actor->GetAnims();
+	orient_t face = actor->GetOrientation();
+	Animation* stanceAnim = ca->GetAnimation(value, face)->at(0).get();
+
+	int duration = stanceAnim->GetFrameCount() * core->Time.defaultTicksPerSec / stanceAnim->fps;
+	// 0x7F06 djinnis don't have any twitch frames, but it doesn't matter for the (only?) use in 61cefsum
+	actor->SetWait(duration);
 }
 
 void TransformItemCore(Actor *actor, const Action *parameters, bool onlyone)
