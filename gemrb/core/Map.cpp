@@ -1380,37 +1380,8 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	};
 	fogRenderer.DrawFog(mapData);
 
-	size_t ipCount = 0;
-	while (true) {
-		//For each InfoPoint in the map
-		InfoPoint* ip = TMap->GetInfoPoint(ipCount++);
-		if (!ip) break;
-		ip->overHead.Draw();
-	}
-
-	size_t cnCount = 0;
-	while (true) {
-		//For each Container in the map
-		Container* cn = TMap->GetContainer(cnCount++);
-		if (!cn) break;
-		cn->overHead.Draw();
-	}
-
-	size_t drCount = 0;
-	while (true) {
-		//For each Door in the map
-		Door* dr = TMap->GetDoor(drCount++);
-		if (!dr) break;
-		dr->overHead.Draw();
-	}
-
-	size_t i = actors.size();
-	while (i--) {
-		//For each Actor present
-		//This must go AFTER the fog!
-		//(maybe we should be using the queue?)
-		actors[i]->overHead.Draw();
-	}
+	// This must go AFTER the fog!
+	DrawOverheadText();
 
 	oldGameTime = gametime;
 
@@ -1449,6 +1420,35 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 				VideoDriver->DrawLine(poly->base0 - viewport.origin, poly->base1 - viewport.origin, ColorMagenta);
 			}
 		}
+	}
+}
+
+void Map::DrawOverheadText() const
+{
+	size_t count = 0;
+	while (true) {
+		InfoPoint* ip = TMap->GetInfoPoint(count++);
+		if (!ip) break;
+		ip->overHead.Draw();
+	}
+
+	count = 0;
+	while (true) {
+		Container* cont = TMap->GetContainer(count++);
+		if (!cont) break;
+		cont->overHead.Draw();
+	}
+
+	count = 0;
+	while (true) {
+		Door* door = TMap->GetDoor(count++);
+		if (!door) break;
+		door->overHead.Draw();
+	}
+
+	count = actors.size();
+	while (count--) {
+		actors[count]->overHead.Draw();
 	}
 }
 

@@ -680,6 +680,7 @@ private:
 	void DrawDebugOverlay(const Region &vp, uint32_t dFlags) const;
 	void DrawPortal(const InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport) const;
+	void DrawOverheadText() const;
 
 	Size PropsSize() const noexcept;
 	Size FogMapSize() const;

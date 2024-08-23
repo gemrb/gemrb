@@ -390,8 +390,6 @@ public:
 	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0) const;
 	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0) const;
 	void SendTriggerToAll(TriggerEntry entry, int extraFlags = 0);
-	/* re/draws overhead text on the map screen */
-	void DrawOverheadText();
 	virtual Region DrawingRegion() const;
 	/* check if casting is allowed at all */
 	int CanCast(const ResRef& SpellRef, bool verbose = true);
