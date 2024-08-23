@@ -430,8 +430,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	}
 
 	// update the tiles and tilecount (eg. door0304 in Edwin's Docks (ar0300) entrance
-	for (size_t i = 0; i < tm->GetDoorCount(); i++) {
-		Door* door = tm->GetDoor(i);
+	for (const auto& door : tm->GetDoors()) {
 		bool baseClosed, oldOpen = door->IsOpen();
 		door->SetTiles(tmm->GetDoorIndices(door->ID, baseClosed));
 		// reset open state to the one in the old wed

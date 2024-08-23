@@ -550,8 +550,7 @@ Targets *XthNearestDoor(Targets *parameters, unsigned int count)
 	if (count>i) {
 		return parameters;
 	}
-	while (i--) {
-		Door *door = map->TMap->GetDoor(i);
+	for (const auto& door : map->TMap->GetDoors()) {
 		unsigned int dist = Distance(origin->Pos, door->Pos);
 		parameters->AddTarget(door, dist, 0);
 	}

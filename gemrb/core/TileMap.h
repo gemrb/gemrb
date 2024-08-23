@@ -53,6 +53,7 @@ public:
 	Door* GetDoor(size_t idx) const;
 	Door* GetDoor(const ieVariable& Name) const;
 	size_t GetDoorCount() const { return doors.size(); }
+	const auto& GetDoors() const { return doors; }
 	//update doors for a new overlay
 	void UpdateDoors();
 	void AutoLockDoors() const;
@@ -65,6 +66,7 @@ public:
 	Container* GetContainerByPosition(const Point &position, int type=-1) const;
 	Container* GetContainer(const ieVariable& Name) const;
 	Container* GetContainer(size_t idx) const;
+	const auto& GetContainers() const { return containers; }
 	/* cleans up empty heaps, returns 1 if container removed*/
 	int CleanupContainer(Container *container);
 	size_t GetContainerCount() const { return containers.size(); }
@@ -73,6 +75,7 @@ public:
 	InfoPoint* GetInfoPoint(const Point &position, bool detectable) const;
 	InfoPoint* GetInfoPoint(const ieVariable& Name) const;
 	InfoPoint* GetInfoPoint(size_t idx) const;
+	const auto& GetInfoPoints() const { return infoPoints; }
 	InfoPoint* GetTravelTo(const ResRef& Destination) const;
 	InfoPoint* AdjustNearestTravel(Point& p) const;
 	size_t GetInfoPointCount() const { return infoPoints.size(); }

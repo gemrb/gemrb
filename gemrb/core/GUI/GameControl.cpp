@@ -469,8 +469,7 @@ void GameControl::OutlineInfoPoints() const
 	const Game* game = core->GetGame();
 	const Map* area = game->GetCurrentArea();
 
-	InfoPoint* infoPoint;
-	for (size_t idx = 0; (infoPoint = area->TMap->GetInfoPoint(idx)); idx++) {
+	for (const auto& infoPoint : area->TMap->GetInfoPoints()) {
 		infoPoint->Highlight = false;
 
 		if (infoPoint->VisibleTrap(0)) {
@@ -491,8 +490,7 @@ void GameControl::OutlineDoors() const
 	const Game* game = core->GetGame();
 	const Map* area = game->GetCurrentArea();
 
-	Door* door;
-	for (size_t idx = 0; (door = area->TMap->GetDoor(idx)); idx++) {
+	for (const auto& door : area->TMap->GetDoors()) {
 		door->Highlight = false;
 		if (door->Flags & DOOR_HIDDEN) {
 			continue;
@@ -535,9 +533,7 @@ void GameControl::OutlineContainers() const
 	const Game* game = core->GetGame();
 	const Map* area = game->GetCurrentArea();
 
-	Container* container;
-	for (size_t idx = 0; (container = area->TMap->GetContainer(idx)); ++idx) {
-		container->Highlight = false;
+	for (const auto& container : area->TMap->GetContainers()) {
 		if (container->Flags & CONT_DISABLED) {
 			continue;
 		}

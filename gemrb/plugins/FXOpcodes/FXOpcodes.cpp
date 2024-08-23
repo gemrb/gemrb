@@ -4882,15 +4882,11 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	const TileMap *TMap = target->GetCurrentArea()->TMap;
 
-	size_t Count = 0;
-	while (true) {
-		Door* door = TMap->GetDoor( Count++ );
-		if (!door)
-			break;
+	for (const auto& door : TMap->GetDoors()) {
 		if (WithinRange(target, door->Pos, range)) {
 			door->TryDetectSecret(skill, id);
 			if (detecttraps && door->Visible()) {
-			//when was door trap noticed
+				// when was door trap noticed
 				door->DetectTrap(skill, id);
 			}
 		}
@@ -4900,11 +4896,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Count = 0;
-	while (true) {
-		Container* container = TMap->GetContainer( Count++ );
-		if (!container)
-			break;
+	for (const auto& container : TMap->GetContainers()) {
 		if (WithinRange(target, container->Pos, range)) {
 			//when was door trap noticed
 			container->DetectTrap(skill, id);
@@ -4912,11 +4904,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 
-	Count = 0;
-	while (true) {
-		InfoPoint* trap = TMap->GetInfoPoint( Count++ );
-		if (!trap)
-			break;
+	for (const auto& trap : TMap->GetInfoPoints()) {
 		if (WithinRange(target, trap->Pos, range)) {
 			//when was door trap noticed
 			trap->DetectTrap(skill, id);
