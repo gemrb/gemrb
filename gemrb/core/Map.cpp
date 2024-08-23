@@ -2227,11 +2227,14 @@ void Map::PurgeArea(bool items)
 	//2. remove any non critical items
 	if (items) {
 		for (const auto& c : TMap->GetContainers()) {
-			unsigned int j=c->inventory.GetSlotCount();
-			while (j--) {
-				const CREItem *itemslot = c->inventory.GetSlotItem(j);
-				if (itemslot->Flags&IE_INV_ITEM_CRITICAL) {
-					continue;
+			if (c->containerType == IE_CONTAINER_PILE) {
+				unsigned int j = c->inventory.GetSlotCount();
+				while (j--) {
+					const CREItem* itemslot = c->inventory.GetSlotItem(j);
+					if (itemslot->Flags & IE_INV_ITEM_CRITICAL) {
+						continue;
+					}
+					c->inventory.RemoveItem(j);
 				}
 			}
 			TMap->CleanupContainer(c);
