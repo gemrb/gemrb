@@ -169,6 +169,7 @@ bool GlobalTimer::Update()
 	// don't update scripts if we're fading in or out or shaking the screen
 	if (IsFading() || shakeCounter) {
 		if (!fadeToCounter) map->UpdateFog(); // needed eg. when meeting Yoshimo for the first time
+		if (shakeCounter) map->UpdateProjectiles(); // needed when Lothar is destroying the wall
 		if (thisTime) {
 			game->RealTime++;
 		}
