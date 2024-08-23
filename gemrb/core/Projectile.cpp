@@ -228,7 +228,7 @@ void Projectile::GetSmokeAnim()
 void Projectile::Setup()
 {
 	tint = ColorGray;
-	timeStartStep = core->Time.Ticks2Ms(core->GetGame()->Ticks);
+	timeStartStep = GetMilliseconds();
 
 	const Actor* act = area->GetActorByGlobalID(Caster);
 	if (act && ExtFlags & PEF_TEXT) {
@@ -746,7 +746,7 @@ Projectile::ProjectileState Projectile::DoStep()
 	unsigned int timePerPx = static_cast<unsigned int>(1 * core->Time.Ticks2Ms(1) / Speed);
 	static constexpr unsigned int slowDownFactor = 2; // TODO: empirical, shouldn't be needed!
 	unsigned int timePerStep = slowDownFactor * timePerPx;
-	tick_t time =  core->Time.Ticks2Ms(core->GetGame()->Ticks);
+	tick_t time =  GetMilliseconds();
 	auto step = path.begin();
 	if (stepIdx) {
 		step += stepIdx;
