@@ -27,6 +27,9 @@
 #include <tracy/TracyOpenGL.hpp>
 #endif
 
+// don't move this up
+#include <SDL2/SDL_syswm.h>
+
 using namespace GemRB;
 
 #ifdef BAKE_ICON
@@ -150,9 +153,31 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenSize.w, screenSize.h, winFlags);
 	if (window == NULL) {
-		Log(ERROR, "SDL 2 Driver", "couldnt create window: {}", SDL_GetError());
+		Log(ERROR, "SDL 2 Driver", "couldn't create window: {}", SDL_GetError());
 		return GEM_ERROR;
 	}
+
+#if SDL_VERSION_ATLEAST(2, 0, 16)
+	// On some slow devices (RPi) it's the fastest to try launching the game from TTY
+	// so SDL2 will do EGL + KMS. Unfortunately, a true fullscreen may be painfully slow
+	// at high resolutions. So instead, do a window at the same aspect ratio instead at next smallest
+	// resolution. Less pixels will gain much more performance while looking identical to a display full screen.
+	//
+	// In a window manager, there is probably little to gain anyway, and more powerful devices won't need anything like this.
+	SDL_SysWMinfo wmInfo;
+	auto infoResult = SDL_GetWindowWMInfo(window, &wmInfo);
+	if (infoResult && wmInfo.subsystem == SDL_SYSWM_KMSDRM) {
+		SDL_DisplayMode currentMode;
+
+		// SDL won't know the display size until it has tried
+		SetFullscreenMode(true);
+		if (SDL_GetCurrentDisplayMode(0, &currentMode) == 0) {
+			CalculateCustomFullscreen(&currentMode);
+			Log(MESSAGE, "SDL2", "Will perform a soft-fullscreen to {}x{}", customFullscreenSize.w, customFullscreenSize.h);
+		}
+		SetFullscreenMode(false);
+	}
+#endif
 
 #ifdef BAKE_ICON
 	SetWindowIcon(window);
@@ -243,6 +268,25 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 	SDL_StopTextInput(); // for some reason this is enabled from start
 
 	return GEM_OK;
+}
+
+void SDL20VideoDriver::CalculateCustomFullscreen(const SDL_DisplayMode *mode) {
+	// Only cover the case when screen is larger than the actual game window
+	if (!(mode->w >= screenSize.w && mode->h >= screenSize.h)) {
+		return;
+	}
+
+	// Only cover the case when width and height have the same alignment in both cases
+	if (!(mode->w/mode->h > 0 && screenSize.w/screenSize.h > 0)) {
+		return;
+	}
+
+	// e. g. display is 1920x1080, game is 1024x768 -> fullscreen window 1366x768
+	auto width = (mode->w * screenSize.h) / mode->h;
+	if (width % 2 != 0) {
+		width += 1;
+	}
+	customFullscreenSize = { width, screenSize.h };
 }
 
 VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
@@ -1009,13 +1053,27 @@ void SDL20VideoDriver::SetGamma(int newBrightness, int newContrast)
 bool SDL20VideoDriver::SetFullscreenMode(bool set)
 {
 	Uint32 flags = 0;
-	if (set) {
-		flags = SDL_WINDOW_FULLSCREEN_DESKTOP|SDL_WINDOW_BORDERLESS;
-	}
-	if (SDL_SetWindowFullscreen(window, flags) == GEM_OK) {
+	if (customFullscreenSize.IsInvalid()) {
+		if (set) {
+			flags = SDL_WINDOW_FULLSCREEN_DESKTOP|SDL_WINDOW_BORDERLESS;
+		}
+		if (SDL_SetWindowFullscreen(window, flags) == GEM_OK) {
+			fullscreen = set;
+			return true;
+		}
+	} else {
+		SDL_SetWindowFullscreen(window, 0);
+
+		if (set) {
+			SDL_SetWindowSize(window, customFullscreenSize.w, customFullscreenSize.h);
+		} else {
+			SDL_SetWindowSize(window, screenSize.w, screenSize.h);
+		}
 		fullscreen = set;
+
 		return true;
 	}
+
 	return false;
 }
 
