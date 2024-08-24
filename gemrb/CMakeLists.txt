@@ -1,3 +1,6 @@
+IF(USE_TRACY)
+  ADD_SUBDIRECTORY(plugins/Tracy)
+ENDIF()
 ADD_SUBDIRECTORY( core )
 
 # GUIScripts and override go directly in the bundle
