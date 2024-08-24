@@ -2052,17 +2052,17 @@ void Game::CastOnRest() const
 //timestop effect
 void Game::TimeStop(Actor* owner, ieDword end)
 {
-	timestop_owner=owner;
-	timestop_end=end;
+	timestopper = owner;
+	timestopEnd = end;
 }
 
 // check if the passed actor is a victim of timestop
 bool Game::TimeStoppedFor(const Actor* target) const
 {
-	if (!timestop_owner) {
+	if (!timestopper) {
 		return false;
 	}
-	if (target == timestop_owner || target->GetStat(IE_DISABLETIMESTOP)) {
+	if (target == timestopper || target->GetStat(IE_DISABLETIMESTOP)) {
 		return false;
 	}
 	return true;
@@ -2343,13 +2343,13 @@ ieByte *Game::AllocateMazeData()
 
 int Game::RemainingTimestop() const
 {
-	int remaining = timestop_end - GameTime;
+	int remaining = timestopEnd - GameTime;
 	return remaining > 0 ? remaining : 0;
 }
 
 bool Game::IsTimestopActive() const
 {
-	return timestop_end > GameTime;
+	return timestopEnd > GameTime;
 }
 
 bool Game::RandomEncounter(ResRef& BaseArea) const

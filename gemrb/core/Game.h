@@ -306,8 +306,9 @@ public:
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();
-	Actor *timestop_owner = nullptr;
-	ieDword timestop_end = 0;
+	Actor* timestopper = nullptr;
+	ieDword timestopEnd = 0;
+
 public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID) const;
@@ -494,8 +495,8 @@ public:
 	/** Checks if any timestop effects are active */
 	bool IsTimestopActive() const;
 	int RemainingTimestop() const;
-	Actor *GetTimestopOwner() const { return timestop_owner; };
-	void SetTimestopOwner(Actor *owner) { timestop_owner = owner; };
+	Actor* GetTimestopOwner() const { return timestopper; };
+	void SetTimestopOwner(Actor* owner) { timestopper = owner; };
 	/** Checks the bounty encounters (used in bg1) */
 	bool RandomEncounter(ResRef& baseArea) const;
 	/** Resets the area and bored comment timers of the whole party */
