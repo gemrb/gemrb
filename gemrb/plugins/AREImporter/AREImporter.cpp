@@ -1165,6 +1165,10 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 				act->DestroySelf();
 			}
 		}
+		// temporary hack while ar6104 causes pathfinding problems
+		if (act->GetScriptName() == "Troll_11" && map->GetScriptName() == "ar6104") {
+			act->DestroySelf();
+		}
 	}
 	act->ignoredFields.difficultyMargin = difficultyMargin;
 
