@@ -384,9 +384,9 @@
 0xEA00     MSHR       MSHR       MSHR       MSHR       9          2          1          *
 0xEBB1     MSHR       MSHR       MSHR       MSHR       9          2          1          *
 0xEBF1     MARU       MARU       MARU       MARU       9          2          1          *
-0xEA10     MCRD       MCRD       MCRD       MCRD       9          2          1          *
+0xEA10     MCRD       MCRD       MCRD       MCRD       16         2          1          *
 0xE908     MSH1       MSH1       MSH1       MSH1       9          2          1          *
-0xEA20     MCRD       MCRD       MCRD       MCRD       9          2          1          *
+0xEA20     MCRD       MCRD       MCRD       MCRD       16         2          1          *
 0xEB00     MSKT       MSKT       MSKT       MSKT       9          2          1          *
 0xF019     MSKT       MSKT       MSKT       MSKT       9          2          1          *
 0xEB10     MSKA       MSKA       MSKA       MSKA       9          2          1          *
@@ -403,11 +403,11 @@
 0xF008     MSKA       MSKA       MSKA       MSKA       9          2          1          *
 0xED00     MYU1       MYU1       MYU1       MYU1       9          2          1          *
 0xF10E     MYU1       MYU1       MYU1       MYU1       9          2          1          *
-0xED10     MYU2       MYU2       MYU2       MYU2       9          2          1          *
-0xF11E     MYU2       MYU2       MYU2       MYU2       9          2          1          *
+0xED10     MYU2       MYU2       MYU2       MYU2       16         2          1          *
+0xF11E     MYU2       MYU2       MYU2       MYU2       16         2          1          *
 0xED19     MGLA       MGLA       MGLA       MGLA       9          2          1          *
-0xED20     MYU3       MYU3       MYU3       MYU3       9          2          1          *
-0xE8A1     MYU3       MYU3       MYU3       MYU3       9          2          1          *
+0xED20     MYU3       MYU3       MYU3       MYU3       16         2          1          *
+0xE8A1     MYU3       MYU3       MYU3       MYU3       16         2          1          *
 0xED28     MLEM       MLEM       MLEM       MLEM       9          2          1          *
 0xEE08     MWEB       MWEB       MWEB       MWEB       9          2          1          *
 0xEE18     MWRA       MWRA       MWRA       MWRA       9          2          1          *

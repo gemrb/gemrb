@@ -337,7 +337,7 @@
 0xEC10     MWI2       MWI2       MWI2       MWI2       9          2          1          *
 0xEC20     MWI3       MWI3       MWI3       MWI3       9          2          1          *
 0xED00     MYU1       MYU1       MYU1       MYU1       9          2          1          *
-0xED10     MYU2       MYU2       MYU2       MYU2       9          2          1          *
+0xED10     MYU2       MYU2       MYU2       MYU2       16         2          1          *
 0xED20     MYU3       MYU3       MYU3       MYU3       16         2          1          *
 0xEE00     MZO2       MZO2       MZO2       MZO2       9          2          1          *
 0xEE10     MZO3       MZO3       MZO3       MZO3       9          2          1          *
