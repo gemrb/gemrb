@@ -4445,7 +4445,20 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 		slot2 = SLOT_AUTOEQUIP;
 	}
 	CREItem *si = actor->inventory.RemoveItem(slot);
-	if (si && actor->inventory.AddSlotItem(si, slot2) == ASI_FAILED) {
+	if (!si) {
+		actor->ReinitQuickSlots();
+		return;
+	}
+
+	// try the same slot first if it would be eligible
+	if (slot2 == SLOT_AUTOEQUIP) {
+		if (actor->inventory.AddSlotItem(si, slot) != ASI_FAILED) {
+			actor->ReinitQuickSlots();
+			return;
+		}
+	}
+
+	if (actor->inventory.AddSlotItem(si, slot2) == ASI_FAILED) {
 		Map *map = Sender->GetCurrentArea();
 		if (map) {
 			//drop item at the feet of the character instead of destroying it
