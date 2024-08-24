@@ -1,6 +1,6 @@
 2DA V1.0
 *
-           BITS       SCRIPT     ICON       STRREF     EFFECTS	FLAGS
+           SLOTTYPE   ID         RESREF     TOOLTIP    EFFECTS	FLAGS
 10         0          -1         *          0          2        0
 7          1          5          IVPIEARL   31580      1        0 
 6          2          6          IVPICHST   32798      1        0 

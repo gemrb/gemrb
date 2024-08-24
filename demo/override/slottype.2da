@@ -1,6 +1,6 @@
 2DA V1.0
 *
-           BITS       SCRIPT     ICON       STRREF     EFFECT	FLAGS
+           SLOTTYPE   ID         RESREF     TOOLTIP    EFFECT	FLAGS
 10         0          0          *          0          2	0
 6          1          13         STONHELM   93         7	2
 1          2          11         STONARM    91         1	2
