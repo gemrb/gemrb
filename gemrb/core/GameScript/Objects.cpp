@@ -163,13 +163,14 @@ Targets *GameScript::LastTrigger(const Scriptable *Sender, Targets *parameters, 
 
 Targets *GameScript::LastMarkedObject(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
-	const Actor *actor = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
-	if (!actor && Sender->Type == ST_ACTOR) {
-		actor = static_cast<const Actor*>(Sender);
+	// not sure if this is even needed, can LastMarkedObject get nested at all?
+	const Scriptable* sender = parameters->GetTarget(0, ST_ACTOR);
+	if (!sender) {
+		sender = Sender;
 	}
 	parameters->Clear();
-	if (actor) {
-		Actor* target = actor->GetCurrentArea()->GetActorByGlobalID(actor->objects.LastMarked);
+	if (sender) {
+		Actor* target = sender->GetCurrentArea()->GetActorByGlobalID(sender->objects.LastMarked);
 		if (target) {
 			parameters->AddTarget(target, 0, ga_flags);
 		}
