@@ -281,10 +281,15 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 		(*it)->RenderOnDisplay(renderer);
 	}
 
+	{
+		TRACY(ZoneScopedN("SDL_RenderPresent"));
+		SDL_RenderPresent( renderer );
+	}
 #if USE_OPENGL_BACKEND
 	TRACY(TracyGpuCollect);
 #endif
-	SDL_RenderPresent( renderer );
+
+	TRACY(FrameMark);
 }
 
 SDLVideoDriver::vid_buf_t* SDL20VideoDriver::ScratchBuffer() const

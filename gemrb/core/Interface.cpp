@@ -1017,7 +1017,6 @@ void Interface::Main()
 			fps->Print(fpsRgn, String(fpsstring), IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, {ColorWhite, ColorBlack});
 		}
 
-		TRACY(FrameMark);
 	} while (VideoDriver->SwapBuffers(config.CapFPS) == GEM_OK && !(QuitFlag&QF_KILL));
 	QuitGame(0);
 }
