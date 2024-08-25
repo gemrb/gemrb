@@ -224,6 +224,7 @@ private:
 	GLSLProgram* blitRGBAShader = nullptr;
 	float brightness = 1.0;
 	float contrast = 1.0;
+	Size customFullscreenSize;
 public:
 	SDL20VideoDriver() noexcept;
 	~SDL20VideoDriver() noexcept override;
@@ -286,6 +287,8 @@ private:
 	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* = nullptr);
 
 	int GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const;
+
+	void CalculateCustomFullscreen(const SDL_DisplayMode *mode);
 };
 
 }

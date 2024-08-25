@@ -165,7 +165,7 @@ IF(WIN32)
 ENDIF()
 
 IF(USE_TRACY)
-  TARGET_LINK_LIBRARIES(gemrb_core TracyClient)
+  TARGET_LINK_LIBRARIES(gemrb_core Tracy)
 ENDIF()
 
 target_compile_definitions(gemrb_core PRIVATE _USE_MATH_DEFINES)
