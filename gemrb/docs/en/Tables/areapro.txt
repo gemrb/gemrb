@@ -26,4 +26,7 @@ Values for the FLAGS bitfield -
 areapro.2da data could be completely incorporated into the projectile file, it is supplied
 only for some BG2 spells that don't use the extended projectile format.
 
+Use 255 for "Set off animation" in the projectile area extension in DLTCEP to avoid using
+this table accidentally.
+
 See projectile.txt for more information.
