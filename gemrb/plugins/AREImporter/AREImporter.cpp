@@ -1141,22 +1141,22 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	act->appearance = schedule;
 	// copying the scripting name into the actor
 	// if the CreatureAreaFlag was set to 8
+	// AF_NAME_OVERRIDE == AF_ENABLED, used for something else in IWD2
 	if ((flags & AF_NAME_OVERRIDE) || core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) {
 		act->SetScriptName(defaultName);
 	}
 	// IWD2 specific hacks
 	if (core->HasFeature(GFFlags::RULES_3ED)) {
-		// This flag is used for something else in IWD2
-		if (flags & AF_NAME_OVERRIDE) {
-			act->BaseStats[IE_EA] = EA_EVILCUTOFF;
-		}
 		if (flags & AF_SEEN_PARTY) {
 			act->SetMCFlag(MC_SEENPARTY, BitOp::OR);
 		}
 		if (flags & AF_INVULNERABLE) {
 			act->SetMCFlag(MC_INVULNERABLE, BitOp::OR);
 		}
-		if (!(flags & AF_ENABLED)) {
+		if (flags & AF_ENABLED) {
+			act->BaseStats[IE_EA] = EA_EVILCUTOFF;
+			act->SetMCFlag(MC_ENABLED, BitOp::OR);
+		} else {
 			// DifficultyMargin - only enable actors that are difficult enough vs the area difficulty
 			// 1 - area difficulty 1
 			// 2 - area difficulty 2
