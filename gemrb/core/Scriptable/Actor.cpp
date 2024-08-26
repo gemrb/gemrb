@@ -1307,7 +1307,9 @@ static void handle_overlay(Actor *actor, ieDword idx)
 	sca->SetBlend();
 
 	// always draw it for party members; the rest must not be invisible to have it;
-	// this is just a guess, maybe there are extra conditions (MC_HIDDEN? IE_AVATARREMOVAL?)
+	// this is just a guess, maybe there are extra conditions
+	// IE_AVATARREMOVAL and unscheduled get handled by not drawing anything at all
+	// MC_ENABLED is not perfectly understood
 	if (!actor->InParty && actor->Modified[IE_STATE_ID] & state_invisible && !(hc_flags[idx] & HC_INVISIBLE)) {
 		delete sca;
 		return;
@@ -10976,6 +10978,11 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 // - 4: sanctuary
 bool Actor::IsInvisibleTo(const Scriptable* checker, int flags) const
 {
+	if (third) {
+		// this is a guess, in the original it was used in several visibility checks
+		if (!(GetSafeStat(IE_MC_FLAGS) & MC_ENABLED)) return true;
+	}
+
 	// consider underground ankhegs completely invisible to everyone
 	if (GetStance() == IE_ANI_WALK && GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE) {
 		return true;

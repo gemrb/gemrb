@@ -3104,7 +3104,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 //HideCreature hides only the visuals of a creature
 //(feet circle and avatar)
 //the scripts of the creature are still running
-//iwd2 stores this flag in the MC field (MC_HIDDEN)
+// iwd2 stores this flag in the MC field (MC_ENABLED)
 void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters);

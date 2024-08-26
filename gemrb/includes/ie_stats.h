@@ -208,7 +208,7 @@ namespace GemRB {
 #define MC_LARGE_CREATURE       0x2000  // creature is subject to alternative melee damage (BG2), overlaps with MC_PLOT_CRITICAL
 #define MC_LIMBO_CREATURE       0x4000
 #define MC_BEENINPARTY          0x8000
-#define MC_ENABLED              0x8000  // TODO iwd2 override; used like activate/deactivate?
+#define MC_ENABLED              0x8000 // iwd2 bit instead of MC_BEENINPARTY; used similar to avatar removal, activate/deactivate
 #define MC_SEENPARTY            0x10000 //iwd2, TODO: non-iwd2: restore item in hand
 #define MC_INVULNERABLE         0x20000 //iwd2
 #define MC_NONTHREATENING_ENEMY 0x40000 // iwd2, barrels/kegs
