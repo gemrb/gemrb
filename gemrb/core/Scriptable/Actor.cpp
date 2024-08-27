@@ -4061,7 +4061,9 @@ bool Actor::CheckSpellDisruption(int damage) const
 
 bool Actor::HandleCastingStance(const ResRef& spellResRef, bool deplete, bool instant)
 {
-	if (deplete && !spellbook.HaveSpell(spellResRef, HS_DEPLETE)) {
+	// iwd2 doesn't care, eg. Izbelah in the Volcano will cast Temporal Statis without having it
+	// AND using a normal Spell(Myself,2081)
+	if (deplete && !spellbook.HaveSpell(spellResRef, HS_DEPLETE) && !third) {
 		SetStance(IE_ANI_READY);
 		return true;
 	}
