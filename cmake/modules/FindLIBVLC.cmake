@@ -25,22 +25,30 @@ FIND_PATH(LIBVLC_INCLUDE_DIR vlc/vlc.h
   "/usr/include/vlc"
   "/usr/local/include"
   "/usr/local/include/vlc"
+  "/Applications/VLC.app/Contents/MacOS/include"
+  "/Applications/VLC.app/Contents/MacOS/include/vlc"
   #mingw
   c:/msys/local/include
+  "C:/Program Files (x86)/VideoLAN/VLC/sdk/include"
+  "C:/Program Files/VideoLAN/VLC/sdk/include"
   NO_DEFAULT_PATH
   )
 FIND_PATH(LIBVLC_INCLUDE_DIR vlc.h)
 
 #Put here path to custom location
 #example: /home/user/vlc/lib etc..
-FIND_LIBRARY(LIBVLC_LIBRARY NAMES vlc PATHS
+FIND_LIBRARY(LIBVLC_LIBRARY NAMES vlc libvlc PATHS
   "$ENV{LIBVLC_LIBRARY_PATH}"
   "$ENV{LIB_DIR}/lib"
+  "/Applications/VLC.app/Contents/MacOS/lib"
+  "/Applications/VLC.app/Contents/MacOS/plugins"
   #mingw
   c:/msys/local/lib
+  "C:/Program Files (x86)/VideoLAN/VLC/sdk/lib"
+  "C:/Program Files/VideoLAN/VLC/sdk/lib"
   NO_DEFAULT_PATH
   )
-FIND_LIBRARY(LIBVLC_LIBRARY NAMES vlc)
+FIND_LIBRARY(LIBVLC_LIBRARY NAMES vlc libvlc)
 
 IF (LIBVLC_INCLUDE_DIR AND LIBVLC_LIBRARY)
   # we require this function from 2.0
