@@ -4089,7 +4089,7 @@ void Actor::CheckCleave()
 		cleave = 0;
 	}
 	if(cleave) {
-		Effect * fx = EffectQueue::CreateEffect(fx_cleave_ref, attackcount, 0, FX_DURATION_INSTANT_LIMITED);
+		Effect* fx = EffectQueue::CreateEffect(fx_cleave_ref, attackcount + 1, 0, FX_DURATION_INSTANT_LIMITED);
 		if (fx) {
 			fx->Duration = core->Time.round_sec;
 			core->ApplyEffect(fx, this, this);
@@ -7459,8 +7459,10 @@ void Actor::UpdateActorState()
 			// LastTargetPersistent fixed the fact that you could get an "x: (critical) hit" combat message, but then
 			// no damage if the target was gone or reset. However at the same time it means we could continue
 			// attacking enemies when they turned neutral — which is worse
-			GetCurrentArea()->AddProjectile(attackProjectile, Pos, objects.LastTarget, false);
-			attackProjectile = NULL;
+			// but it's also needed for cleave and now the counter case above works with LastTargetPersistent as well,
+			// as ClearActions resets attackProjectile
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, objects.LastTargetPersistent, false);
+			attackProjectile = nullptr;
 		}
 	}
 	

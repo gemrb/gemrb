@@ -3000,6 +3000,14 @@ static int fx_cleave(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		const Actor* enemy = map->GetActorByGlobalID(target->objects.LastSeen);
 		int weaponRange = target->GetWeaponRange(target->usedLeftHand);
 		if (enemy && WithinPersonalRange(enemy, target, weaponRange)) {
+			target->attackcount = fx->Parameter1;
+			target->Timers.lastAttack = 0;
+			target->Timers.nextAttack = core->GetGame()->GameTime;
+			target->FaceTarget(enemy);
+			target->objects.LastTarget = target->objects.LastSeen;
+			target->objects.LastTargetPersistent = target->objects.LastSeen;
+			target->PerformAttack(core->GetGame()->GameTime);
+
 			// ~Cleave feat adds another level %d attack.~
 			// uses the max tohit bonus (tested), but game always displayed "level 1"
 			int oldFeedBack = core->GetDictionary().Get("EnableRollFeedback", 0);
@@ -3007,10 +3015,6 @@ static int fx_cleave(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL20, GUIColors::WHITE, target, target->ToHit.GetTotal());
 			core->GetDictionary().Set("EnableRollFeedback", oldFeedBack);
 
-			target->attackcount=fx->Parameter1;
-			target->FaceTarget(enemy);
-			target->objects.LastTarget = target->objects.LastSeen;
-			target->objects.LastTargetPersistent = target->objects.LastSeen;
 			//linger around for more
 			return FX_APPLIED;
 		}
