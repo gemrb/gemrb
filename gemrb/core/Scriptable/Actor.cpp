@@ -10981,8 +10981,6 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 bool Actor::IsInvisibleTo(const Scriptable* checker, int flags) const
 {
 	if (third) {
-		// this is a guess, in the original it was used in several visibility checks
-		if (!(GetSafeStat(IE_MC_FLAGS) & MC_ENABLED)) return true;
 	}
 
 	// consider underground ankhegs completely invisible to everyone

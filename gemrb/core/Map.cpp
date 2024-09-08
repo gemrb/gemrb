@@ -1883,7 +1883,9 @@ void Map::ActorSpottedByPlayer(const Actor *actor) const
 // that should trigger pause.
 bool Map::HandleAutopauseForVisible(Actor *actor, bool doPause) const
 {
-	if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_STOPATTACK)) {
+	// this MC_ENABLED use looks more like MC_BEENINPARTY it replaced; leftover?
+	if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_STOPATTACK) &&
+		(!core->HasFeature(GFFlags::RULES_3ED) || !(actor->GetSafeStat(IE_MC_FLAGS) & MC_ENABLED))) {
 		if (doPause && !(actor->GetInternalFlag() & IF_TRIGGER_AP))
 			core->Autopause(AUTOPAUSE::ENEMY, actor);
 		actor->SetInternalFlag(IF_TRIGGER_AP, BitOp::OR);
