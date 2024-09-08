@@ -2311,12 +2311,7 @@ int GameScript::See(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::Detect(Scriptable *Sender, const Trigger *parameters)
 {
-	Trigger *params = new Trigger;
-	params->int0Parameter = 1; //seedead/invis
-	params->objectParameter = parameters->objectParameter;
-	int see = SeeCore(Sender, params, 0);
-	params->objectParameter = nullptr;
-	params->Release();
+	int see = SeeCore(Sender, parameters, 2);
 	if (!see) {
 		return 0;
 	}

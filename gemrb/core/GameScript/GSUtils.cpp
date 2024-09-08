@@ -614,14 +614,18 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 
 //non actors can see too (reducing function to LOS)
 //non actors can be seen too (reducing function to LOS)
-int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
+int SeeCore(Scriptable* Sender, const Trigger* parameters, int extraFlags)
 {
 	//see dead; unscheduled actors are never visible, though
 	int flags = GA_NO_UNSCHEDULED;
 
-	if (parameters->int0Parameter) {
+	if (extraFlags & 3) { // Detect sees all, LOS most probably a bug
 		flags |= GA_DETECT;
-	} else {
+	}
+	if (!(extraFlags & 2)) {
+		flags |= GA_NO_HIDDEN;
+	}
+	if (!parameters->int0Parameter) { // can See see deaders?
 		flags |= GA_NO_DEAD;
 	}
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters, flags);
@@ -629,14 +633,9 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 		return 0;
 	}
 
-	// ignore invisible targets for direct matching
-	if (! parameters->int0Parameter) {
-		flags |= GA_NO_HIDDEN;
-	}
-
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
-		if (justlos) {
+		if (extraFlags & 1) { // just LOS
 			Sender->objects.LastTrigger = tar->GetGlobalID();
 			return 1;
 		}

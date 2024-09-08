@@ -1640,7 +1640,7 @@ static int fx_animal_rage(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			Enemy->objectParameter->objectFields[0] = EA_ALLY;
 		}
 		//see the nearest enemy
-		if (SeeCore(target, Enemy, false)) {
+		if (SeeCore(target, Enemy, 0)) {
 			target->FaceTarget(target->GetCurrentArea()->GetActorByGlobalID(target->objects.LastSeen));
 			//this is highly unsure
 			//fx->Parameter1=1;
@@ -3007,7 +3007,7 @@ static int fx_cleave(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//reset attackcount to a previous number and hack the current opponent to another enemy nearby
 	//SeeCore returns the closest living enemy
 	//FIXME:the previous opponent must be dead by now, or this code won't work
-	if (SeeCore(target, Enemy, false) ) {
+	if (SeeCore(target, Enemy, 0)) {
 		const Actor* enemy = map->GetActorByGlobalID(target->objects.LastSeen);
 		int weaponRange = target->GetWeaponRange(target->usedLeftHand);
 		if (enemy && WithinPersonalRange(enemy, target, weaponRange) && target->objects.LastSeen != target->objects.LastTarget) {
