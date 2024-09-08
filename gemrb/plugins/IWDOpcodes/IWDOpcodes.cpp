@@ -36,9 +36,6 @@
 
 using namespace GemRB;
 
-//a scripting object for enemy (used for enemy in line of sight check)
-static Trigger *Enemy = NULL;
-
 #define PI_PROTFROMEVIL 9
 #define PI_FREEACTION   19
 #define PI_BARKSKIN     20
@@ -375,25 +372,9 @@ static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
 static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 
-static void Cleanup()
-{
-	if (Enemy) {
-		delete Enemy;
-	}
-	Enemy=NULL;
-}
-
 static void RegisterIWDOpcodes(const CoreSettings&)
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
-
-	//create enemy trigger object for enemy in line of sight check
-	if (!Enemy) {
-		Enemy = new Trigger;
-		Object *o = new Object;
-		Enemy->objectParameter = o;
-		o->objectFields[0]=EA_ENEMY;
-	}
 }
 
 //iwd got a hardcoded 'fireshield' system
@@ -1634,13 +1615,16 @@ static int fx_animal_rage(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//attack them
 	if (!target->objects.LastTarget) {
 		//depends on whom it considers enemy
+		Trigger enemy;
+		enemy.objectParameter = new Object;
 		if (STAT_GET(IE_EA)<EA_EVILCUTOFF) {
-			Enemy->objectParameter->objectFields[0] = EA_ENEMY;
+			enemy.objectParameter->objectFields[0] = EA_ENEMY;
 		} else {
-			Enemy->objectParameter->objectFields[0] = EA_ALLY;
+			enemy.objectParameter->objectFields[0] = EA_ALLY;
 		}
+
 		//see the nearest enemy
-		if (SeeCore(target, Enemy, 0)) {
+		if (SeeCore(target, &enemy, 0)) {
 			target->FaceTarget(target->GetCurrentArea()->GetActorByGlobalID(target->objects.LastSeen));
 			//this is highly unsure
 			//fx->Parameter1=1;
@@ -3007,7 +2991,14 @@ static int fx_cleave(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//reset attackcount to a previous number and hack the current opponent to another enemy nearby
 	//SeeCore returns the closest living enemy
 	//FIXME:the previous opponent must be dead by now, or this code won't work
-	if (SeeCore(target, Enemy, 0)) {
+	Trigger enemies;
+	enemies.objectParameter = new Object;
+	if (STAT_GET(IE_EA) < EA_EVILCUTOFF) {
+		enemies.objectParameter->objectFields[0] = EA_ENEMY;
+	} else {
+		enemies.objectParameter->objectFields[0] = EA_ALLY;
+	}
+	if (SeeCore(target, &enemies, 0)) {
 		const Actor* enemy = map->GetActorByGlobalID(target->objects.LastSeen);
 		int weaponRange = target->GetWeaponRange(target->usedLeftHand);
 		if (enemy && WithinPersonalRange(enemy, target, weaponRange) && target->objects.LastSeen != target->objects.LastTarget) {
@@ -3402,5 +3393,4 @@ static int fx_rapid_shot(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 GEMRB_PLUGIN(0x4F172B2, "Effect opcodes for the icewind branch of the games")
 PLUGIN_INITIALIZER(RegisterIWDOpcodes)
-PLUGIN_CLEANUP(Cleanup)
 END_PLUGIN()
