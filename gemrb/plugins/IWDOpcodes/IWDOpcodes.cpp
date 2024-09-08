@@ -2982,7 +2982,6 @@ static int fx_barbarian_rage(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //442 Cleave
 static int fx_cleave(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_cleave(%2d) Amount:%d", fx->Opcode, fx->Parameter1);
 	//just remain dormant after first apply for the remaining duration (possibly disabling more cleaves)
 	if (!fx->FirstApply) return FX_APPLIED;
 	const Map *map = target->GetCurrentArea();
@@ -2990,7 +2989,6 @@ static int fx_cleave(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//reset attackcount to a previous number and hack the current opponent to another enemy nearby
 	//SeeCore returns the closest living enemy
-	//FIXME:the previous opponent must be dead by now, or this code won't work
 	Trigger enemies;
 	enemies.objectParameter = new Object;
 	if (STAT_GET(IE_EA) < EA_EVILCUTOFF) {
@@ -3001,7 +2999,7 @@ static int fx_cleave(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (SeeCore(target, &enemies, 0)) {
 		const Actor* enemy = map->GetActorByGlobalID(target->objects.LastSeen);
 		int weaponRange = target->GetWeaponRange(target->usedLeftHand);
-		if (enemy && WithinPersonalRange(enemy, target, weaponRange) && target->objects.LastSeen != target->objects.LastTarget) {
+		if (enemy && WithinPersonalRange(enemy, target, weaponRange)) {
 			// ~Cleave feat adds another level %d attack.~
 			// uses the max tohit bonus (tested), but game always displayed "level 1"
 			int oldFeedBack = core->GetDictionary().Get("EnableRollFeedback", 0);

@@ -4276,13 +4276,8 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		core->GetGame()->SetReputation(core->GetGame()->Reputation + gamedata->GetReputationMod(1));
 	}
 
+	bool killed = (damage > chp) && !Modified[IE_MINHITPOINTS];
 	if (damage > 0) {
-		//if this kills us, check if attacker could cleave
-		bool killed = (damage > chp) && !Modified[IE_MINHITPOINTS];
-		if (act && killed) {
-			act->CheckCleave();
-		}
-
 		// temporarily turn on an extended state, so we don't need to pass an extra param
 		// don't bother unsetting, since it will be gone the next tick and a combination of a
 		// sleeping target and several damage payloads in the same tick are unlikely
@@ -4325,6 +4320,11 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		// unstun for that one special stun type
 		// run fx_cure_stun_state instead if it turns out not to be enough
 		if (HasSpellState(SS_AWAKE)) fxqueue.RemoveAllEffectsWithParam(fx_set_stun_state_ref, 1);
+
+		// if this killed us, check if attacker could cleave
+		if (act && killed) {
+			act->CheckCleave();
+		}
 	}
 
 	InternalFlags |= IF_ACTIVE;
