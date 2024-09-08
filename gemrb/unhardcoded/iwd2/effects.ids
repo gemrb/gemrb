@@ -355,8 +355,10 @@ IDS
 439	OffscreenAIModifier
 440	BarbarianRage
 441	MovementRateModifier4
+442	Cleave
 443	MissileDamageReduction
 444	TensersTransformation
+445	SlipperyMind
 446	SmiteEvil
 447	Restoration
 448	AlicornLance
