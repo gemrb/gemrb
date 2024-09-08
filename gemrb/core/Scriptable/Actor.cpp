@@ -4093,9 +4093,6 @@ void Actor::CheckCleave()
 		if (fx) {
 			fx->Duration = core->Time.round_sec;
 			core->ApplyEffect(fx, this, this);
-			// ~Cleave feat adds another level %d attack.~
-			// uses the max tohit bonus (tested), but game always displayed "level 1"
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL20, GUIColors::LIGHTGREY, this, ToHit.GetTotal());
 		}
 	}
 }
