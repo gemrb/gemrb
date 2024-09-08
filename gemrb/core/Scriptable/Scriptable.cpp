@@ -85,7 +85,7 @@ Scriptable::~Scriptable(void)
 	if (CurrentAction) {
 		ReleaseCurrentAction();
 	}
-	ClearActions();
+	ClearActions(4);
 	for (auto& script : Scripts) {
 		delete script;
 	}
@@ -461,6 +461,7 @@ void Scriptable::ClearActions(int skipFlags)
 
 	if (Type == ST_ACTOR) {
 		Interrupt();
+		if (skipFlags != 4) As<Actor>(this)->ResetAttackProjectile();
 	} else {
 		NoInterrupt();
 	}
@@ -504,7 +505,7 @@ void Scriptable::ProcessActions()
 			CurrentActionTicks++;
 		}
 		if (!CurrentAction) {
-			ClearActions();
+			ClearActions(4);
 			// clear lastAction here if you'll ever need it after exiting the loop
 			break;
 		}

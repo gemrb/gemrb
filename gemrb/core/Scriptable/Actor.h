@@ -38,6 +38,7 @@
 #include "Inventory.h"
 #include "Palette.h"
 #include "Polygon.h"
+#include "Projectile.h"
 #include "Spellbook.h"
 #include "Video/Video.h"
 
@@ -707,6 +708,7 @@ public:
 	{
 		return attackProjectile;
 	}
+	void ResetAttackProjectile() { attackProjectile = nullptr; }
 	void SetName(String str, unsigned char type);
 	void SetName(ieStrRef strref, unsigned char type);
 	/* Returns by how much movement speed should be divided to account for loot weight */
