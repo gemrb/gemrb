@@ -5017,7 +5017,7 @@ void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
 	}
 
 	const Actor *target;
-	if (!act->GetStat(IE_BERSERKSTAGE2) && (core->Roll(1,100,0)<50) ) {
+	if (!act->GetStat(IE_BERSERKSTAGE2) && RAND(0, 1)) {
 		//anyone
 		target = GetNearestEnemyOf(map, act, ORIGIN_SEES_ENEMY);
 	} else {
