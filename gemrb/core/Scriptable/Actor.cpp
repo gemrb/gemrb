@@ -10980,6 +10980,12 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 bool Actor::IsInvisibleTo(const Scriptable* checker, int flags) const
 {
 	if (third) {
+		// also false if the current action is a dialog one (8, 137, 198)
+		// create a new flag and ids file if actually needed
+		// it seems unlikely, since triggers had to already match to get to the action
+		// but in the original it did matter for matching in dialogs
+		// let's just try checking that instead
+		if (core->GetGameControl()->InDialog()) return false;
 	}
 
 	// consider underground ankhegs completely invisible to everyone
