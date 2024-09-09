@@ -64,6 +64,12 @@ static inline bool DoObjectIDSCheck(const Object *oC, const Actor *ac, bool *fil
 
 /* do object filtering: Myself, LastAttackerOf(Player1), etc */
 static inline Targets *DoObjectFiltering(const Scriptable *Sender, Targets *tgts, const Object *oC, int ga_flags) {
+	// at least in iwd2, this ignores invisibility, except for filters that check the area (like NearestEnemyOf)
+	// for simplicity we disable it for all and reenable it in XthNearestEnemyOf
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		ga_flags &= ~GA_NO_HIDDEN;
+	}
+
 	targetlist::iterator m;
 	const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 	while (tt) {
@@ -734,6 +740,11 @@ Targets* XthNearestEnemyOf(Targets* parameters, int count, int gaFlags, bool far
 	GroupType type = GetGroup(origin);
 	if (type == GroupType::Neutral) {
 		return parameters;
+	}
+
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		// also (re)enable visibility checks that were disabled in DoObjectFiltering
+		gaFlags |= GA_NO_HIDDEN;
 	}
 
 	const Map* map = origin->GetCurrentArea();
