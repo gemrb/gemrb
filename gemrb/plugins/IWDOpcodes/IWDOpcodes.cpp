@@ -1624,7 +1624,7 @@ static int fx_animal_rage(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 
 		//see the nearest enemy
-		if (SeeCore(target, &enemy, 0)) {
+		if (SeeCore(target, &enemy, 4)) {
 			target->FaceTarget(target->GetCurrentArea()->GetActorByGlobalID(target->objects.LastSeen));
 			//this is highly unsure
 			//fx->Parameter1=1;
@@ -2996,7 +2996,7 @@ static int fx_cleave(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		enemies.objectParameter->objectFields[0] = EA_ALLY;
 	}
-	if (SeeCore(target, &enemies, 0)) {
+	if (SeeCore(target, &enemies, 4)) {
 		const Actor* enemy = map->GetActorByGlobalID(target->objects.LastSeen);
 		int weaponRange = target->GetWeaponRange(target->usedLeftHand);
 		if (enemy && WithinPersonalRange(enemy, target, weaponRange)) {

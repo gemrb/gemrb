@@ -2302,10 +2302,18 @@ int GameScript::IsMarkedSpell(Scriptable *Sender, const Trigger *parameters)
 	return scr->objects.LastMarkedSpell == parameters->int0Parameter;
 }
 
-
+// NOTE: iwd2 See() itself really does not care about GA_NO_HIDDEN, it all depends on prior object resolution
+// eg. See(Protagonist, 0) and See(LastAttackerOf(Myself), 0) would ignore it, but
+// See([PC], 0), See(NearestEnemyOf(Myself), 0) and probably See("you",0) wouldn't.
+// As a practical example: Targos dock's Reig will See() the pc on approach even if the pc invisible or
+// sanctuaried. He has MC_SEENPARTY, but can do it without that too; has no effects or special stats
 int GameScript::See(Scriptable *Sender, const Trigger *parameters)
 {
-	int see = SeeCore(Sender, parameters, 0);
+	int flags = 4;
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		flags = 0;
+	}
+	int see = SeeCore(Sender, parameters, flags);
 	return see;
 }
 
@@ -2317,7 +2325,7 @@ int GameScript::Detect(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::LOS(Scriptable *Sender, const Trigger *parameters)
 {
-	int see=SeeCore(Sender, parameters, 1);
+	int see = SeeCore(Sender, parameters, 5);
 	if (!see) {
 		return 0;
 	}

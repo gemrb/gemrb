@@ -622,7 +622,7 @@ int SeeCore(Scriptable* Sender, const Trigger* parameters, int extraFlags)
 	if (extraFlags & 3) { // Detect sees all, LOS most probably a bug
 		flags |= GA_DETECT;
 	}
-	if (!(extraFlags & 2)) {
+	if (extraFlags & 4) {
 		flags |= GA_NO_HIDDEN;
 	}
 	if (!parameters->int0Parameter) { // can See see deaders?
