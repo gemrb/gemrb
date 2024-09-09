@@ -2312,10 +2312,7 @@ int GameScript::See(Scriptable *Sender, const Trigger *parameters)
 int GameScript::Detect(Scriptable *Sender, const Trigger *parameters)
 {
 	int see = SeeCore(Sender, parameters, 2);
-	if (!see) {
-		return 0;
-	}
-	return 1;
+	return see;
 }
 
 int GameScript::LOS(Scriptable *Sender, const Trigger *parameters)
