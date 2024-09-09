@@ -731,7 +731,7 @@ Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, un
 
 Targets* XthNearestEnemyOf(Targets* parameters, int count, int gaFlags, bool farthest)
 {
-	const Actor* origin = (const Actor*) parameters->GetTarget(0, ST_ACTOR);
+	Actor* origin = static_cast<Actor*>(parameters->GetTarget(0, ST_ACTOR));
 	parameters->Clear();
 	if (!origin) {
 		return parameters;
@@ -743,6 +743,12 @@ Targets* XthNearestEnemyOf(Targets* parameters, int count, int gaFlags, bool far
 	}
 
 	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		// odd iwd2 detail for actors, turn off extra true seeing first (yes, permanently)
+		// only happened for *NearestEnemyOf and FarthestEnemyOf
+		if (origin->GetSafeStat(IE_MC_FLAGS) & MC_SEENPARTY && origin->GetSafeStat(IE_EA) > EA_NOTEVIL) {
+			origin->SetMCFlag(MC_SEENPARTY, BitOp::NAND);
+		}
+
 		// also (re)enable visibility checks that were disabled in DoObjectFiltering
 		gaFlags |= GA_NO_HIDDEN;
 	}

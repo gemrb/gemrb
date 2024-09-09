@@ -209,7 +209,7 @@ namespace GemRB {
 #define MC_LIMBO_CREATURE       0x4000
 #define MC_BEENINPARTY          0x8000
 #define MC_ENABLED              0x8000 // iwd2 bit instead of MC_BEENINPARTY; used similar to avatar removal, activate/deactivate
-#define MC_SEENPARTY            0x10000 //iwd2, TODO: non-iwd2: restore item in hand
+#define MC_SEENPARTY            0x10000 // iwd2 true seeing for most visibility checks, TODO: non-iwd2: restore item in hand
 #define MC_INVULNERABLE         0x20000 //iwd2
 #define MC_NONTHREATENING_ENEMY 0x40000 // iwd2, barrels/kegs, seems to be only used through scripts
 #define MC_NO_TALK              0x80000 //ignore dialoginterrupt

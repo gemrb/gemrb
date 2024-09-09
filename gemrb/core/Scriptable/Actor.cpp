@@ -10980,6 +10980,8 @@ int Actor::GetArmorFailure(int &armor, int &shield) const
 bool Actor::IsInvisibleTo(const Scriptable* checker, int flags) const
 {
 	if (third) {
+		if (GetSafeStat(IE_MC_FLAGS) & MC_SEENPARTY) return false;
+
 		// also false if the current action is a dialog one (8, 137, 198)
 		// create a new flag and ids file if actually needed
 		// it seems unlikely, since triggers had to already match to get to the action
