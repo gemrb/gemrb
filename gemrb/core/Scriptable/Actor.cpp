@@ -9438,7 +9438,7 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 		if (ranged) {
 			fxqueue.AddWeaponEffects(&pro->GetEffects(), fx_ranged_ref);
 		} else {
-			// EEs add a a single bit to fx_melee for only applying with monk fists
+			// EEs add a single bit to fx_melee for only applying with monk fists
 			int param2 = (inventory.FistsEquipped() && GetMonkLevel()) ? 4 : 0;
 			fxqueue.AddWeaponEffects(&pro->GetEffects(), fx_melee_ref, param2);
 			// ignore timestop

@@ -134,8 +134,8 @@ protected:
 
 class GEM_EXPORT Object : protected Canary {
 public:
-	int objectFields[MAX_OBJECT_FIELDS]{};
-	int objectFilters[MAX_NESTING]{};
+	int objectFields[MAX_OBJECT_FIELDS] {}; // eg. [PC.0.0.UNDEAD]
+	int objectFilters[MAX_NESTING] {}; // eg. Myself or LastTargetedBy(LastAttackerOf(Player1))
 	Region objectRect{};
 	
 	union {

@@ -42,6 +42,8 @@ static inline Targets* ReturnScriptableAsTarget(Scriptable *sc)
 }
 
 /* do IDS filtering: [PC], [ENEMY], etc */
+// at least in iwd2, it is explicitly confirmed that these respect visibility,
+// but that is handled outside this function
 static inline bool DoObjectIDSCheck(const Object *oC, const Actor *ac, bool *filtered) {
 	for (int j = 0; j < ObjectIDSCount; j++) {
 		if (!oC->objectFields[j]) {
@@ -671,6 +673,7 @@ Targets *ClosestEnemySummoned(const Scriptable *origin, Targets *parameters, int
 	return parameters;
 }
 
+// bg2 and ee only
 Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags)
 {
 	if (origin->Type != ST_ACTOR) {

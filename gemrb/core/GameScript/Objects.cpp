@@ -110,6 +110,7 @@ Targets *GameScript::TenthNearestDoor(const Scriptable */*Sender*/, Targets *par
 //in iwd2 this is the Gabber!!!
 //but also, if there is no gabber, it is the first PC
 //probably it is simply the nearest exportable character...
+// alt info for iwd2: the protagonist is the selected party member with the left-most portrait instead of gabber (the fallback matches)
 Targets *GameScript::Protagonist(const Scriptable *Sender, Targets *parameters, int ga_flags)
 {
 	parameters->Clear();

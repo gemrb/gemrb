@@ -313,7 +313,7 @@ int ToHitStats::GetTotalForAttackNum(unsigned int number) const
 	}
 	number--;
 	// compute the cascaded values
-	// at low levels with poor stats, even the total can be negatice
+	// at low levels with poor stats, even the total can be negative
 	return total-number*babDecrement;
 }
 
