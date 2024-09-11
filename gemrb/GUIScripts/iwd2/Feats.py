@@ -213,7 +213,7 @@ def OpenFeatsWindow(chargen=0):
 
 	if chargen:
 		pc = GemRB.GetVar ("Slot")
-		Race = GemRB.GetVar ("Race")
+		Race = CommonTables.Races.FindValue (3, GemRB.GetVar ("Race"))
 		ClassIndex = GemRB.GetVar ("Class") - 1
 		Level = LevelDiff = 1
 		ButtonCount = 10
