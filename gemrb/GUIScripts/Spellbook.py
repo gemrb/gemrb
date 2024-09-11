@@ -725,7 +725,14 @@ def LearnFromScroll (pc, slot):
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	spell_ref = GemRB.GetItem (slot_item['ItemResRef'])['Spell']
 
-	ret = GemRB.LearnSpell (pc, spell_ref, LS_STATS|LS_ADDXP)
+	bookType = -1
+	if GameCheck.IsIWD2 ():
+		# figure out the correct spellbook, giving mages precedence
+		if GemRB.GetPlayerStat (pc, IE_LEVELMAGE):
+			bookType = 1 << IE_IWD2_SPELL_WIZARD
+		elif GemRB.GetPlayerStat (pc, IE_LEVELBARD):
+			bookType = 1 << IE_IWD2_SPELL_BARD
+	ret = GemRB.LearnSpell (pc, spell_ref, LS_STATS | LS_ADDXP, bookType)
 
 	# destroy the scroll, just one in case of a stack
 	GemRB.RemoveItem (pc, slot, 1)
