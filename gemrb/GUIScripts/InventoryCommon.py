@@ -343,8 +343,7 @@ def DisplayItem (slotItem, itemtype):
 	# only mages and bards can learn spells
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ClassName = GUICommon.GetClassRowName (pc)
-	SpellBookType = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
-	if SpellBookType == "*" or Spellbook.HasSorcererBook (pc):
+	if not (GemRB.GetPlayerStat (pc, IE_LEVELBARD) or GemRB.GetPlayerStat (pc, IE_LEVELMAGE) or ClassName != "MAGE"):
 		read = 0
 	# furthermore there might be school exclusions present
 	if read:
