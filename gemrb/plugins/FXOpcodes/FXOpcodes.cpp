@@ -2239,6 +2239,12 @@ int fx_set_unconscious_state (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
+	// elven progeny is immune in iwd2
+	int race = target->GetStat(IE_RACE);
+	if (core->HasFeature(GFFlags::RULES_3ED) && (race == 2 || race == 3)) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (fx->FirstApply) {
 		target->ApplyEffectCopy(fx, fx_animation_stance_ref, Owner, 0, IE_ANI_SLEEP);
 		Effect* standUp = EffectQueue::CreateEffect(fx_animation_stance_ref, 0, IE_ANI_GET_UP, FX_DURATION_DELAY_LIMITED);
