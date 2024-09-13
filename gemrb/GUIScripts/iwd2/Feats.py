@@ -213,7 +213,8 @@ def OpenFeatsWindow(chargen=0):
 
 	if chargen:
 		pc = GemRB.GetVar ("Slot")
-		Race = CommonTables.Races.FindValue (3, GemRB.GetVar ("Race"))
+		Race = GemRB.GetVar ("Race")
+		RaceIndex = CommonTables.Races.FindValue (3, Race)
 		ClassIndex = GemRB.GetVar ("Class") - 1
 		Level = LevelDiff = 1
 		ButtonCount = 10
@@ -221,6 +222,7 @@ def OpenFeatsWindow(chargen=0):
 	else:
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Race = IDLUCommon.GetRace (pc)
+		RaceIndex = Race
 		# instead of the base class, lookup its kit if any
 		# luckily you can only have one kit per class
 		ClassIndex = GemRB.GetVar ("LUClass")
@@ -240,7 +242,6 @@ def OpenFeatsWindow(chargen=0):
 			if Level <= 9 and Level+LevelDiff >= 9:
 				GemRB.SetFeat (pc, FEAT_IMPROVED_EVASION, 1)
 
-	RaceIndex = CommonTables.Races.FindValue (3, Race)
 	RaceName = CommonTables.Races.GetRowName (RaceIndex)
 	# could use column ID as well, but they tend to change :)
 	RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN")
