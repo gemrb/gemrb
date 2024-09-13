@@ -1396,11 +1396,7 @@ def LUKitPress ():
 	# set it to the kit value, so we don't need these gimnastics later
 	kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
 	GemRB.SetVar ("LUKit", kitID)
-	pc = GemRB.GameGetSelectedPCSingle ()
-	HandleSpecFlagExclusion(pc, LUClassID, kitID)
-
-	oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
-	GemRB.SetPlayerStat (pc, IE_KIT, oldKits|kitID)
+	GemRB.SetVar ("LUKitJustSet", LUClassID)
 
 # continue with level up via chargen methods
 def LUNextPress ():
@@ -1411,6 +1407,15 @@ def LUNextPress ():
 
 	# grant an ability point or three (each 4 levels)
 	pc = GemRB.GameGetSelectedPCSingle ()
+
+	if GemRB.GetVar ("LUKitJustSet") != 0:
+		oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
+		kitID = GemRB.GetVar ("LUKit")
+		GemRB.SetPlayerStat (pc, IE_KIT, oldKits | kitID)
+
+		HandleSpecFlagExclusion(pc, GemRB.GetVar ("LUKitJustSet"), kitID)
+		GemRB.SetVar ("LUKitJustSet", 0)
+
 	levelSum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
 	rankDiff = (levelSum+LevelDiff)//4 - levelSum//4
 	if rankDiff > 0:
