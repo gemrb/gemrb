@@ -17,16 +17,12 @@
 
 #Put here path to custom location
 #example: /home/user/vlc/include etc..
-FIND_PATH(LIBVLC_INCLUDE_DIR vlc/vlc.h
+FIND_PATH(LIBVLC_INCLUDE_DIR vlc.h PATH_SUFFIXES vlc PATHS
   "$ENV{LIBVLC_INCLUDE_PATH}"
   "$ENV{LIB_DIR}/include"
-  "$ENV{LIB_DIR}/include/vlc"
   "/usr/include"
-  "/usr/include/vlc"
   "/usr/local/include"
-  "/usr/local/include/vlc"
   "/Applications/VLC.app/Contents/MacOS/include"
-  "/Applications/VLC.app/Contents/MacOS/include/vlc"
   #mingw
   c:/msys/local/include
   "C:/Program Files (x86)/VideoLAN/VLC/sdk/include"
