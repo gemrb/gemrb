@@ -751,7 +751,8 @@ void Map::UpdateScripts()
 		if (!game->StateOverrideFlag && !game->StateOverrideTime) {
 			// STATE_SLEEP allows actions if they are in actsleep.ids, so don't skip it here
 			// most holders and stunners set STATE_HELPLESS (while the original checked IE_HELD)
-			if (actor->GetStat(IE_STATE_ID) & STATE_HELPLESS) {
+			// iwd2 kegs start are helpless in the data already though - consolidate at some point
+			if ((actor->GetStat(IE_STATE_ID) & STATE_HELPLESS) && (!core->HasFeature(GFFlags::RULES_3ED) || actor->GetStat(IE_RACE) != 190)) {
 				actor->SetInternalFlag(IF_JUSTDIED, BitOp::NAND);
 				continue;
 			}
