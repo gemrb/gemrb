@@ -2097,8 +2097,9 @@ static int fx_protection_from_evil(Scriptable* /*Owner*/, Actor* target, Effect*
 	//
 	if (target->SetSpellState( SS_PROTFROMEVIL)) return FX_APPLIED;
 	target->AddPortraitIcon(PI_PROTFROMEVIL);
-	//+2 to all saving throws
+	//+2 to all saving throws and AC
 	HandleSaveBoni(target, 2, fx->TimingMode);
+	target->AC.SetDeflectionBonus(2, 0);
 
 	// immunity to control is handled in fx_control
 	return FX_APPLIED;
