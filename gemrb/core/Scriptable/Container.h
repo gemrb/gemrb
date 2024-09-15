@@ -43,8 +43,6 @@ class GEM_EXPORT Container : public Highlightable {
 public:
 	Container(void);
 	void SetContainerLocked(bool lock);
-	//turns the container to a pile
-	void DestroyContainer();
 	//removes an item from the container's inventory
 	CREItem *RemoveItem(unsigned int idx, unsigned int count);
 	//adds an item to the container's inventory

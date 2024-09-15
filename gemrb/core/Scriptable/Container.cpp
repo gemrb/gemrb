@@ -102,18 +102,6 @@ void Container::SetContainerLocked(bool lock)
 	}
 }
 
-//This function doesn't exist in the original IE, destroys a container
-//turning it to a ground pile
-void Container::DestroyContainer()
-{
-	//it is already a groundpile?
-	if (containerType == IE_CONTAINER_PILE)
-		return;
-	containerType = IE_CONTAINER_PILE;
-	RefreshGroundIcons();
-	//probably we should stop the script or trigger it, whatever
-}
-
 //Takes an item from the container's inventory and returns its pointer
 CREItem *Container::RemoveItem(unsigned int idx, unsigned int count)
 {
