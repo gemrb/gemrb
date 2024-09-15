@@ -29,7 +29,7 @@ FIND_PATH(LIBVLC_INCLUDE_DIR vlc.h PATH_SUFFIXES vlc PATHS
   "C:/Program Files/VideoLAN/VLC/sdk/include"
   NO_DEFAULT_PATH
   )
-FIND_PATH(LIBVLC_INCLUDE_DIR PATH_SUFFIXES vlc vlc.h)
+FIND_PATH(LIBVLC_INCLUDE_DIR vlc.h PATH_SUFFIXES vlc)
 
 #Put here path to custom location
 #example: /home/user/vlc/lib etc..
