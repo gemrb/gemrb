@@ -2229,7 +2229,9 @@ void Map::PurgeArea(bool items)
 	}
 	//2. remove any non critical items
 	if (items) {
-		for (const auto& c : TMap->GetContainers()) {
+		size_t containerCount = TMap->GetContainerCount();
+		while (containerCount--) {
+			Container* c = TMap->GetContainer(containerCount);
 			if (c->containerType == IE_CONTAINER_PILE) {
 				unsigned int j = c->inventory.GetSlotCount();
 				while (j--) {
@@ -3472,7 +3474,10 @@ Spawn *Map::GetSpawnRadius(const Point &point, unsigned int radius) const
 int Map::ConsolidateContainers()
 {
 	int itemcount = 0;
-	for (const auto& c : TMap->GetContainers()) {
+	// CleanupContainer potentially removes the container
+	size_t containerCount = TMap->GetContainerCount();
+	while (containerCount--) {
+		Container* c = TMap->GetContainer(containerCount);
 		if (TMap->CleanupContainer(c) ) {
 			objectStencils.erase(c);
 			continue;

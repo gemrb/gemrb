@@ -7796,7 +7796,9 @@ void GameScript::DestroyGroundPiles(Scriptable* Sender, Action* /*parameters*/)
 	const Map* map = Sender->GetCurrentArea();
 	if (!map) return;
 	TileMap* tm = map->GetTileMap();
-	for (const auto& pile : tm->GetContainers()) {
+	size_t containerCount = tm->GetContainerCount();
+	while (containerCount--) {
+		Container* pile = tm->GetContainer(containerCount);
 		if (pile->containerType != IE_CONTAINER_PILE) continue;
 
 		pile->inventory.DestroyItem("", 0,(ieDword) ~0); //destroy any and all
