@@ -93,7 +93,7 @@ protected:
 	bool freePixels = true;
 	
 	PixelFormat format;
-	uint16_t pitch;
+	uint16_t pitch = 0;
 	
 	virtual void UpdatePalette() noexcept {};
 	virtual void UpdateColorKey() noexcept {};
