@@ -3531,10 +3531,17 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 	Container *othercontainer;
 	othercontainer = GetPile(Pos);
 
-	for (const auto& c : TMap->GetContainers()) {
-		if (c->containerType == IE_CONTAINER_PILE && IsExplored(c->Pos)) {
+	size_t containerCount = TMap->GetContainerCount();
+	while (containerCount--) {
+		Container* c = TMap->GetContainer(containerCount);
+		if (c->containerType == IE_CONTAINER_PILE && c != othercontainer && IsExplored(c->Pos)) {
 			//transfer the pile to the other container
 			MergePiles(c, othercontainer);
+			// remove now empty pile immediately
+			if (TMap->CleanupContainer(c)) {
+				objectStencils.erase(c);
+				continue;
+			}
 		}
 	}
 
