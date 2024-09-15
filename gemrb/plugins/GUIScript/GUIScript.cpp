@@ -9342,7 +9342,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (!Sound.IsEmpty()) {
 			core->GetAudioDrv()->Play(Sound, SFXChannel::GUI);
 		}
-		if (res == 2) {
+		if (res == ASI_SUCCESS) {
 			// Whole amount was placed
 			core->ReleaseDraggedItem ();
 		}

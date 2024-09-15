@@ -122,7 +122,7 @@ int Container::AddItem(CREItem *item)
 	if (containerType == IE_CONTAINER_PILE && inventory.GetSlotCount() <= MAX_GROUND_ICON_DRAWN) {
 		RefreshGroundIcons();
 	}
-	return 2;
+	return ASI_SUCCESS;
 }
 
 void Container::RefreshGroundIcons()
