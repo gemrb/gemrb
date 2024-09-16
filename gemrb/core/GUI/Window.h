@@ -98,6 +98,7 @@ private:
 	
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	void DrawAfterSubviews(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 
 	// attempt to set focus to view. return the focused view which is view if success or the currently focused view (if any) on failure
 	View* TrySetFocus(View* view);

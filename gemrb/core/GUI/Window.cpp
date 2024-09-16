@@ -166,6 +166,13 @@ const VideoBufferPtr& Window::DrawWithoutComposition()
 	return backBuffer;
 }
 
+void Window::DrawAfterSubviews(const Region& /*drawFrame*/, const Region& /*clip*/) {
+	if (IsDisabled()) {
+		Region winrgn(Point(), Dimensions());
+		VideoDriver->DrawRect(winrgn, ColorBlack, true, BlitFlags::HALFTRANS | BlitFlags::BLENDED);
+	}
+}
+
 void Window::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	backBuffer->SetOrigin(frame.origin);

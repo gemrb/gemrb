@@ -143,7 +143,7 @@ void View::InvalidateSubviews(const Region& rgn) const
 
 bool View::IsVisible() const
 {
-	bool isVisible = !(flags&Invisible);
+	bool isVisible = !(frame.size.IsInvalid() || (flags & Invisible));
 	if (superView && isVisible) {
 		return superView->IsVisible();
 	}
@@ -173,15 +173,11 @@ Regions View::DirtySuperViewRegions() const
 	// if we are opaque we cover everything and dont care about the superview
 	// if we arent but we need to redraw then we simply report our entire area
 
-	if (IsOpaque()) {
-		return {};
-	}
-	// HACK to ignore scrollbars, but not windows #2099
-	if (!IsVisible() && frame.size.IsInvalid() && frame.size.h < 400) {
+	if (IsOpaque() || !IsVisible()) {
 		return {};
 	}
 
-	if (NeedsDraw() || !IsVisible()) {
+	if (NeedsDraw()) {
 		return { frame };
 	}
 
@@ -248,6 +244,7 @@ void View::DrawBackground(const Region* rgn) const
 
 void View::Draw()
 {
+	TRACY(ZoneScoped);
 	if (flags&Invisible) return;
 
 	const Region clip = VideoDriver->GetScreenClip();
@@ -272,6 +269,10 @@ void View::Draw()
 
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews();
+	// Overlays like when disabled
+	if (needsDraw) {
+		DrawAfterSubviews(drawFrame, intersect);
+	}
 	DidDraw(drawFrame, intersect); // notify subclasses that drawing finished
 	dirty = false;
 

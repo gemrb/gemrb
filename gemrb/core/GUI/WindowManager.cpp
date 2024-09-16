@@ -653,10 +653,6 @@ void WindowManager::DrawWindows() const
 		}
 
 		win->Draw();
-		if (win->IsDisabled()) {
-			Region winrgn(Point(), win->Dimensions());
-			video->DrawRect(winrgn, ColorBlack, true, BlitFlags::HALFTRANS | BlitFlags::BLENDED);
-		}
 	}
 
 	video->PushDrawingBuffer(HUDBuf);
