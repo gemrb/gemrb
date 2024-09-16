@@ -2325,7 +2325,11 @@ int GameScript::Detect(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::LOS(Scriptable *Sender, const Trigger *parameters)
 {
-	int see = SeeCore(Sender, parameters, 5);
+	int flags = 5;
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		flags = 3;
+	}
+	int see = SeeCore(Sender, parameters, flags);
 	if (!see) {
 		return 0;
 	}

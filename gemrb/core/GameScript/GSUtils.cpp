@@ -619,7 +619,7 @@ int SeeCore(Scriptable* Sender, const Trigger* parameters, int extraFlags)
 	//see dead; unscheduled actors are never visible, though
 	int flags = GA_NO_UNSCHEDULED;
 
-	if (extraFlags & 3) { // Detect sees all, LOS most probably a bug
+	if (extraFlags & 2) { // Detect sees all
 		flags |= GA_DETECT;
 	}
 	if (extraFlags & 4) {
