@@ -8217,9 +8217,9 @@ int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx)
 	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
 		return FX_NOT_APPLIED;
 	}
-	if (fx->Pos.IsInvalid()) {
+	if (fx->Target != FX_TARGET_SELF) {
 		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
-	} else {
+	} else { // demon summoning spells
 		core->ApplySpellPoint(fx->Resource, target->GetCurrentArea(), fx->Pos, Owner, fx->Power);
 	}
 	return FX_NOT_APPLIED;
