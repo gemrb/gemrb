@@ -187,7 +187,7 @@ bool Container::TryUnlock(Actor *actor) const
 
 bool Container::CanDetectTrap() const
 {
-	return Trapped && TrapDetectionDiff != 0;
+	return Trapped && (core->HasFeature(GFFlags::RULES_3ED) || TrapDetectionDiff != 0);
 }
 
 }
