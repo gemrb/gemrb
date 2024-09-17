@@ -4868,7 +4868,11 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 		case 1:
 			//find traps
-			skill = target->GetStat(IE_TRAPS);
+			if (core->HasFeature(GFFlags::RULES_3ED)) {
+				skill = target->GetSkill(IE_SEARCH);
+			} else {
+				skill = target->GetStat(IE_TRAPS);
+			}
 			break;
 		case 3:
 			//detect secret doors
