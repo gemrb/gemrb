@@ -90,7 +90,7 @@
 namespace GemRB {
 
 GEM_EXPORT PluginHolder<Video> VideoDriver;
-GEM_EXPORT Interface* core = NULL;
+GEM_EXPORT Interface* core = nullptr;
 
 struct AbilityTables {
 	using AbilityTable = std::vector<ieWordSigned>;
@@ -589,7 +589,7 @@ Interface::Interface(CoreSettings&& cfg)
 #ifdef HAVE_REALPATH
 	if (unhardcodedTypePath[0] == '.') {
 		// canonicalize the relative path; usually from running from the build dir
-		char *absolutePath = realpath(unhardcodedTypePath.c_str(), NULL);
+		char* absolutePath = realpath(unhardcodedTypePath.c_str(), nullptr);
 		if (absolutePath) {
 			unhardcodedTypePath = absolutePath;
 			free(absolutePath);
@@ -618,8 +618,8 @@ Interface::Interface(CoreSettings&& cfg)
 
 Interface::~Interface() noexcept
 {
-	WindowManager::CursorMouseUp = NULL;
-	WindowManager::CursorMouseDown = NULL;
+	WindowManager::CursorMouseUp = nullptr;
+	WindowManager::CursorMouseDown = nullptr;
 
 	delete winmgr;
 
@@ -1575,7 +1575,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 	static EffectRef fx_summon_disable_ref = { "AvatarRemovalModifier", -1 };
 	//maximum number of monsters summoned
 	int cnt=10;
-	Actor * ab = NULL;
+	Actor* ab = nullptr;
 	const Actor *summoner = nullptr;
 
 	Map *map;
@@ -1862,7 +1862,7 @@ Tooltip Interface::CreateTooltip() const
 	colors.fg = displaymsg->GetColor(GUIColors::TOOLTIP);
 	colors.bg = displaymsg->GetColor(GUIColors::TOOLTIPBG);
 
-	TooltipBackground* bg = NULL;
+	TooltipBackground* bg = nullptr;
 	if (TooltipBG) {
 		bg = new TooltipBackground(*TooltipBG);
 	}
@@ -2307,7 +2307,7 @@ void Interface::SetCutSceneMode(bool active)
 	if (active) {
 		GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CloseTopWindow");
 	} else {
-		SetCutSceneRunner(NULL);
+		SetCutSceneRunner(nullptr);
 	}
 }
 
@@ -2350,11 +2350,11 @@ void Interface::QuitGame(int BackToMain)
 	//delete game, worldmap
 	if (game) {
 		delete game;
-		game=NULL;
+		game = nullptr;
 	}
 	if (worldmap) {
 		delete worldmap;
-		worldmap=NULL;
+		worldmap = nullptr;
 	}
 	if (BackToMain) {
 		SetNextScript("Start");
@@ -2500,7 +2500,7 @@ void Interface::UpdateWorldMap(const ResRef& wmResRef)
 	DataStream* wmp_str = gamedata->GetResourceStream(wmResRef, IE_WMP_CLASS_ID);
 	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
 
-	if (!wmp_str || !wmp_mgr || !wmp_mgr->Open(wmp_str, NULL)) {
+	if (!wmp_str || !wmp_mgr || !wmp_mgr->Open(wmp_str, nullptr)) {
 		Log(ERROR, "Core", "Could not update world map {}", wmResRef);
 		return;
 	}
@@ -3104,7 +3104,7 @@ CREItem *Interface::ReadItem(DataStream *str) const
 	CREItem *itm = new CREItem();
 	if (ReadItem(str, itm)) return itm;
 	delete itm;
-	return NULL;
+	return nullptr;
 }
 
 CREItem *Interface::ReadItem(DataStream *str, CREItem *itm) const
@@ -3119,7 +3119,7 @@ CREItem *Interface::ReadItem(DataStream *str, CREItem *itm) const
 		SanitizeItem(itm);
 		return itm;
 	}
-	return NULL;
+	return nullptr;
 }
 
 //Make sure the item attributes are valid
@@ -3331,7 +3331,7 @@ int Interface::CloseCurrentContainer()
 	}
 	//remove empty ground piles on closeup
 	CurrentContainer->GetCurrentArea()->TMap->CleanupContainer(CurrentContainer);
-	CurrentContainer = NULL;
+	CurrentContainer = nullptr;
 	return 0;
 }
 
@@ -3354,7 +3354,7 @@ Store *Interface::GetCurrentStore()
 void Interface::CloseCurrentStore()
 {
 	gamedata->SaveStore(CurrentStore);
-	CurrentStore = NULL;
+	CurrentStore = nullptr;
 }
 
 Store *Interface::SetCurrentStore(const ResRef &resName, ieDword owner)
@@ -3369,8 +3369,8 @@ Store *Interface::SetCurrentStore(const ResRef &resName, ieDword owner)
 	}
 
 	CurrentStore = gamedata->GetStore(resName);
-	if (CurrentStore == NULL) {
-		return NULL;
+	if (CurrentStore == nullptr) {
+		return nullptr;
 	}
 	if (owner) {
 		CurrentStore->SetOwnerID(owner);
@@ -3420,7 +3420,7 @@ Holder<SoundHandle> Interface::PlaySound(size_t index, SFXChannel channel, const
 	if (index <= gamedata->defaultSounds.size()) {
 		return AudioDriver->Play(gamedata->defaultSounds[index], channel, p, flags);
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor *Interface::GetFirstSelectedPC(bool forced)
@@ -3451,7 +3451,7 @@ Actor *Interface::GetFirstSelectedActor()
 	if (!game->selected.empty()) {
 		return game->selected[0];
 	}
-	return NULL;
+	return nullptr;
 }
 
 bool Interface::HasCurrentArea() const
@@ -3573,7 +3573,7 @@ Effect *Interface::GetEffect(const ResRef& resname, int level, const Point &p)
 	//Don't free this reference, it is cached!
 	Effect *effect = gamedata->GetEffect(resname);
 	if (!effect) {
-		return NULL;
+		return nullptr;
 	}
 	if (!level) {
 		level = 1;
@@ -3884,7 +3884,7 @@ bool Interface::SetPause(PauseState pause, int flags) const
 	GameControl *gc = GetGameControl();
 
 	//don't allow soft pause in cutscenes and dialog
-	if (!(flags&PF_FORCED) && InCutSceneMode()) gc = NULL;
+	if (!(flags & PF_FORCED) && InCutSceneMode()) gc = nullptr;
 
 	if (gc && ((bool)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) != (bool)pause)) { // already paused
 		HCStrings strref;
