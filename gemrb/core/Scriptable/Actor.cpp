@@ -3931,7 +3931,7 @@ void Actor::Panic(const Scriptable* attacker, PanicMode mode)
 	auto PanicAction = [](unsigned short actionID) {
 		return actionID == 184 || actionID == 85 || actionID == 124 || actionID == 29;
 	};
-	if (GetStat(IE_STATE_ID) & STATE_DEAD) {
+	if (GetStat(IE_STATE_ID) & STATE_DEAD || InternalFlags & IF_REALLYDIED) {
 		return;
 	}
 	if (GetStat(IE_STATE_ID) & STATE_PANIC && (!CurrentAction || PanicAction(CurrentAction->actionID))) {
