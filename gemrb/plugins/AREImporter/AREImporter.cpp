@@ -602,7 +602,8 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	if (16 == map->version) {
 		str->ReadPoint(pos); // OverridePoint in NI
 		if (pos.IsZero()) {
-			str->ReadPoint(pos); // AlternatePoint in NI
+			str->ReadScalar(pos.x); // AlternatePoint in NI
+			str->ReadScalar(pos.y);
 		} else {
 			str->Seek(8, GEM_CURRENT_POS);
 		}
