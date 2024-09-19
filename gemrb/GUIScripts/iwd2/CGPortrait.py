@@ -43,14 +43,15 @@ def OnLoad ():
 	AppearanceWindow = GemRB.LoadWindow (11, "GUICG")
 	CharOverview.PositionCharGenWin(AppearanceWindow)
 
-	#Load the Portraits Table
+	# Load the Portraits Table, sorted by gender col (1: m, 2: f)
 	PortraitsTable = GemRB.LoadTable ("PICTURES")
-	PortraitsStart = PortraitsTable.FindValue (0, 2)
-	FemaleCount = PortraitsTable.GetRowCount () - PortraitsStart + 1
+	FemalePortraitsStart = PortraitsTable.FindValue (0, 2)
+	FemaleCount = PortraitsTable.GetRowCount () - FemalePortraitsStart
+
 	if Gender == 2:
-		LastPortrait = GemRB.Roll (1, FemaleCount, PortraitsStart-1)
+		LastPortrait = GemRB.Roll (1, FemaleCount, FemalePortraitsStart - 1)
 	else:
-		LastPortrait = GemRB.Roll (1, PortraitsTable.GetRowCount()-FemaleCount, 0)
+		LastPortrait = GemRB.Roll (1, PortraitsTable.GetRowCount() - FemaleCount, -1)
 
 	PortraitButton = AppearanceWindow.GetControl (1)
 	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -76,12 +77,9 @@ def OnLoad ():
 	CustomButton.OnPress (CustomPress)
 	DoneButton.OnPress (NextPress)
 
-	while True:
-		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
-			SetPicture ()
-			break
-		LastPortrait = LastPortrait + 1
+	SetPicture ()
 	AppearanceWindow.Focus()
+
 	return
 
 def RightPress ():
