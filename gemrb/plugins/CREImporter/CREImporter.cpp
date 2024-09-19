@@ -1553,10 +1553,9 @@ void CREImporter::GetActorIWD2(Actor *act)
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CHR]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALE]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALEBREAK]);
-	//HatedRace is a list of races, so this is skipped here
-	str->Seek(1, GEM_CURRENT_POS);
-	//act->BaseStats[IE_HATEDRACE]=tmpByte;
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_MORALERECOVERYTIME]);
+	act->BaseStats[IE_MORALERECOVERYTIME] *= 60; // guess since IWD2 uses 1 here
+	str->Seek(1, GEM_CURRENT_POS);
 	//No KIT word order magic for IWD2
 	str->ReadDword(act->BaseStats[IE_KIT]);
 	ReadScript(act, SCR_OVERRIDE);
@@ -2131,7 +2130,9 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CHR]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MORALE]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MORALEBREAK]);
-		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MORALERECOVERYTIME]);
+		tmpByte = actor->BaseStats[IE_MORALERECOVERYTIME];
+		tmpByte /= 60;
+		stream->WriteScalar<Actor::stat_t, ieByte>(tmpByte);
 		// unknown byte
 		stream->WriteFilling(1);
 		// no kit word order magic for iwd2
