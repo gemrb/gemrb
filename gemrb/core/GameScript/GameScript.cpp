@@ -2106,7 +2106,7 @@ int Response::Execute(Scriptable* Sender)
 
 	for (size_t i = 0; i < actions.size(); i++) {
 		Action* aC = actions[i];
-		bool iwd2Instant = hasContinue && actionflags[aC->actionID] & AF_INSTANT;
+		bool iwd2Instant = hasContinue && actionflags[aC->actionID] & AF_SCR_INSTANT;
 		if ((actionflags[aC->actionID] & AF_MASK) == AF_IMMEDIATE || iwd2Instant) {
 			// mimicking AddAction
 			Sender->SetInternalFlag(IF_ACTIVE, BitOp::OR);
