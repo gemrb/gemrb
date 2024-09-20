@@ -5523,7 +5523,7 @@ bool Actor::CheckOnDeath()
 		}
 
 	} else {
-		IncrementDeathVariable(game->locals, "{}", KillVar);
+		UpdateOrCreateVariable(game->locals, KillVar, 1); // always set to 1, not beyond
 		IncrementDeathVariable(game->locals, Interface::GetDeathVarFormat(), scriptName);
 	}
 
