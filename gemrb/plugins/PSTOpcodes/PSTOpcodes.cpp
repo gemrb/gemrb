@@ -411,6 +411,7 @@ int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 // SPPR601.SPL heal: 5 grey 16d8 7
 // SPWI113.SPL missile of patience:  1 grey 16d6 0
 // SPWI115.SPL blindness: 5 grey 16d6 3
+// SPWI116.SPL tongues: 100 red 16d4 1
 // SPWI120.SPL vilquar's eye: 5 grey 16d6 3
 // SPWI202.SPL black-barbed curse: 5 grey 16d6 3
 // SPWI203.SPL black-barbed shield: 5 grey 16d6 3
