@@ -8322,22 +8322,20 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 		}
 
 		if (!currentStance.shadow.empty()) {
-			const Game* game = core->GetGame();
-			// infravision, independent of light map and global light
-			if (HasBodyHeat() &&
-				game->PartyHasInfravision() &&
-				!game->IsDay() &&
-				(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
-				Color irTint = Color(255, 120, 120, tint.a);
-
-				/* IWD2: infravision is white, not red. */
-				if(core->HasFeature(GFFlags::RULES_3ED)) {
-					irTint = Color(255, 255, 255, tint.a);
-				}
-
-				DrawActorSprite(drawPos, flags, currentStance.shadow, irTint);
-			} else {
 				DrawActorSprite(drawPos, flags, currentStance.shadow, tint);
+		}
+
+		const Game* game = core->GetGame();
+		// infravision, independent of light map and global light
+		if (HasBodyHeat() &&
+			game->PartyHasInfravision() &&
+			!game->IsDay() &&
+			(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
+			tint = Color(255, 120, 120, tint.a);
+
+			/* IWD2: infravision is white, not red. */
+			if(core->HasFeature(GFFlags::RULES_3ED)) {
+				tint = Color(255, 255, 255, tint.a);
 			}
 		}
 
