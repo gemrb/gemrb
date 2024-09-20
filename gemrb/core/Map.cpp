@@ -1139,7 +1139,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 	// Map Drawing Strategy
 	// 1. Draw background
-	// 2. Draw overlays (weather)
+	// 2. Draw overlays (weather) and target reticles
 	// 3. Create a stencil set: a WF_COVERANIMS wall stencil and an opaque wall stencil
 	// 4. set the video stencil buffer to animWallStencil
 	// 5. Draw background animations (BlitFlags::STENCIL_GREEN)
@@ -1177,6 +1177,9 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 		TMap->DrawOverlays( viewport, rain, flags );
 	}
+
+	// draw reticles before actors
+	core->GetGameControl()->DrawTargetReticles();
 
 	const auto& viewportWalls = WallsIntersectingRegion(viewport, false);
 	RedrawScreenStencil(viewport, viewportWalls.first);

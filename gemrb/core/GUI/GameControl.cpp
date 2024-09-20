@@ -609,20 +609,6 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		VideoDriver->DrawRect(r, ColorGreen, false );
 	}
 
-	const Point& gameMousePos = GameMousePos();
-	// draw reticles
-	if (isFormationRotation) {
-		float_t angle = AngleFromPoints(gameMousePos, gameClickPoint);
-		DrawFormation(game->selected, gameClickPoint, angle);
-	} else {
-		for (const auto& selectee : game->selected) {
-			assert(selectee);
-			if (selectee->ShouldDrawReticle()) {
-				DrawTargetReticle(selectee, selectee->Destination - vpOrigin);
-			}
-		}
-	}
-
 	// Draw path
 	if (drawPath) {
 		PathListNode* node = drawPath;
@@ -651,6 +637,23 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 				SetDisplayText(u"", 0);
 			} else {
 				DisplayTextTime--;
+			}
+		}
+	}
+}
+
+void GameControl::DrawTargetReticles() const
+{
+	const Point& gameMousePos = GameMousePos();
+	const Game* game = core->GetGame();
+	if (isFormationRotation) {
+		float_t angle = AngleFromPoints(gameMousePos, gameClickPoint);
+		DrawFormation(game->selected, gameClickPoint, angle);
+	} else {
+		for (const auto& selectee : game->selected) {
+			assert(selectee);
+			if (selectee->ShouldDrawReticle()) {
+				DrawTargetReticle(selectee, selectee->Destination - vpOrigin);
 			}
 		}
 	}
