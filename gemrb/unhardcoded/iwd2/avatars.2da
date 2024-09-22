@@ -143,7 +143,7 @@
 0x7202     MBER       MBER       MBER       MBER       3          2          CA         *
 0x7203     MBER       MBER       MBER       MBER       3          2          PO         *
 0x7300     MEAE       MEAE       MEAE       MEAE       4          2          1          *
-0x7301     MEAS       MEAS       MEAS       MEAS       4          2          1          *
+0x7302     MEAE       MEAE       MEAE       MEAE       4          2          SH         *
 0x7310     MFIE       MFIE       MFIE       MFIE       4          2          1          *
 0x7311     MFIS       MFIS       MFIS       MFIS       4          2          1          *
 0x7320     MAIR       MAIR       MAIR       MAIR       4          2          1          *
