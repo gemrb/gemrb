@@ -5344,8 +5344,10 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 			if (act->InParty) {
 				//adjust kill statistics here
 				auto& stat = act->PCStats;
+				stat_t xp = Modified[IE_XPVALUE];
+				if (third) xp = game->GetXPFromCR(xp);
 				if (stat) {
-					stat->NotifyKill(Modified[IE_XPVALUE], ShortStrRef);
+					stat->NotifyKill(xp, ShortStrRef);
 				}
 				InternalFlags|=IF_GIVEXP;
 			}
