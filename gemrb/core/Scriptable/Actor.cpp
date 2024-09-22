@@ -5338,27 +5338,24 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		if (area) SendTriggerToAll(TriggerEntry(trigger_partymemberdied, GetGlobalID()), GA_NO_SELF | GA_NO_ENEMY);
 		game->PartyMemberDied(this);
 		core->Autopause(AUTOPAUSE::DEAD, this);
-	} else {
-		// sometimes we want to skip xp giving and favourite registration
-		if (grantXP && act) {
-			if (act->InParty) {
-				//adjust kill statistics here
-				auto& stat = act->PCStats;
-				stat_t xp = Modified[IE_XPVALUE];
-				if (third) xp = game->GetXPFromCR(xp);
-				if (stat) {
-					stat->NotifyKill(xp, ShortStrRef);
-				}
-				InternalFlags|=IF_GIVEXP;
+	} else if (grantXP && act) { // sometimes we want to skip xp giving and favourite registration
+		if (act->InParty) {
+			// adjust kill statistics here
+			auto& stat = act->PCStats;
+			stat_t xp = Modified[IE_XPVALUE];
+			if (third) xp = game->GetXPFromCR(xp);
+			if (stat) {
+				stat->NotifyKill(xp, ShortStrRef);
 			}
+			InternalFlags |= IF_GIVEXP;
+		}
 
-			// friendly party summons' kills also grant xp
-			if (act->Modified[IE_SEX] == SEX_SUMMON && act->Modified[IE_EA] == EA_CONTROLLED) {
-				InternalFlags|=IF_GIVEXP;
-			} else if (act->Modified[IE_EA] == EA_FAMILIAR) {
-				// familiar's kills also grant xp
-				InternalFlags|=IF_GIVEXP;
-			}
+		// friendly party summons' kills also grant xp
+		if (act->Modified[IE_SEX] == SEX_SUMMON && act->Modified[IE_EA] == EA_CONTROLLED) {
+			InternalFlags |= IF_GIVEXP;
+		} else if (act->Modified[IE_EA] == EA_FAMILIAR) {
+			// familiar's kills also grant xp
+			InternalFlags |= IF_GIVEXP;
 		}
 	}
 
