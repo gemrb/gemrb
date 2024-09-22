@@ -4109,6 +4109,9 @@ static void ChunkActor(Actor* actor)
 	// TODO: play chunky animation / particles #128
 	// for now fake a fountain by spawning more actors to explode
 	actor->SetBase(IE_ANIMATION_ID, 0x220);
+	// disable movement etc., just in case
+	actor->SetBaseBit(IE_STATE_ID, STATE_STUNNED, true);
+
 	static EffectRef fx_remove_creature_ref = { "RemoveCreature", -1 };
 	constexpr std::array<int, 7> bodyParts = { 0x200, 0x200, 0x210, 0x220, 0x230, 0x240, 0x240 };
 	for (auto animID : bodyParts) {
