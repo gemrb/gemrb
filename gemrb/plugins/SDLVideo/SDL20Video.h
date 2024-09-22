@@ -177,7 +177,7 @@ public:
 
 			const Uint8* src = static_cast<const Uint8*>(pixelBuf);
 			for (int xy = 0; xy < bufDest.w * bufDest.h; ++xy) {
-				const Color& c = pal->col[*src++];
+				const Color& c = pal->GetColorAt(*src++);
 				*dst++ = (c.r << pxfmt->Rshift) | (c.g << pxfmt->Gshift) | (c.b << pxfmt->Bshift) | (c.a << pxfmt->Ashift);
 				if (hasalpha == false) {
 					dst = (Uint32*)((Uint8*)dst - 1);

@@ -20,59 +20,77 @@
 
 #include "Palette.h"
 
-#include "Interface.h"
-
 namespace GemRB {
 
-#define MUL    2
+Palette::Palette(bool named) noexcept : named(named) {}
 
 Palette::Palette(const Color &color, const Color &back) noexcept
 : Palette()
 {
-	col[0] = Color(0, 0xff, 0, 0);
-	for (int i = 1; i < 256; i++) {
+	colors[0] = Color(0, 0xff, 0, 0);
+	for (size_t i = 1; i < colors.size(); i++) {
 		float_t p = i / 255.0f;
-		col[i].r = std::min<int>(back.r * (1 - p) + color.r * p, 255);
-		col[i].g = std::min<int>(back.g * (1 - p) + color.g * p, 255);
-		col[i].b = std::min<int>(back.b * (1 - p) + color.b * p, 255);
+		colors[i].r = std::min<int>(back.r * (1 - p) + color.r * p, 255);
+		colors[i].g = std::min<int>(back.g * (1 - p) + color.g * p, 255);
+		colors[i].b = std::min<int>(back.b * (1 - p) + color.b * p, 255);
 		// FIXME: alpha value changed to opaque to fix these palettes on SDL 2
 		// I'm not sure if the previous implementation had a purpose, but historically the alpha is ignored in IE
-		col[i].a = 0xff;
+		colors[i].a = 0xff;
 	}
-}
 
-void Palette::UpdateAlpha() noexcept
-{
-	// skip index 0 which is always the color key
-	for (int i = 1; i < 256; ++i) {
-		if (col[i].a != 0xff) {
-			alpha = true;
-			return;
-		}
-	}
-	
-	alpha = false;
-}
-
-void Palette::CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst) const noexcept
-{
-	// no update to alpha or version, hence being private
-	std::copy(srcBeg, srcEnd, dst);
-}
-
-void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst) noexcept
-{
-	CopyColorRangePrivate(srcBeg, srcEnd, &col[dst]);
-	UpdateAlpha();
-	version++;
+	updateVersion();
 }
 
 bool Palette::operator==(const Palette& other) const noexcept {
-	return memcmp(col, other.col, sizeof(col)) == 0;
+	return version == other.version;
 }
 
 bool Palette::operator!=(const Palette& other) const noexcept {
 	return !(*this == other);
+}
+
+Palette::Colors::const_iterator Palette::cbegin() const noexcept {
+	return colors.cbegin();
+}
+
+Palette::Colors::const_iterator Palette::cend() const noexcept {
+	return colors.cend();
+}
+
+Palette::Colors::const_reference Palette::operator[](size_t pos) const {
+	return GetColorAt(pos);
+}
+
+void Palette::SetColor(size_t index, const Color& c) {
+	colors[index] = c;
+	updateVersion();
+}
+
+const Color* Palette::ColorData() const {
+	return colors.data();
+}
+
+Palette::Colors::const_reference Palette::GetColorAt(size_t pos) const {
+	return colors[pos];
+}
+
+Hash Palette::GetVersion() const {
+	return version;
+}
+
+bool Palette::IsNamed() const {
+	return named;
+}
+
+void Palette::updateVersion() {
+	Hasher hasher;
+
+	for (size_t i = 0; i < colors.size(); ++i) {
+		const auto& color = colors[i];
+		hasher.Feed(color.Packed());
+	}
+
+	version = hasher.GetHash();
 }
 
 }

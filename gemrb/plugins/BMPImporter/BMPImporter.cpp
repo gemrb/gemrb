@@ -249,7 +249,7 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 		spr->UnlockSprite();
 	} else if (BitCount == 8) {
 		Holder<Palette> pal = MakeHolder<Palette>(PaletteColors, PaletteColors + NumColors);
-		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, pal->col[0] == ColorGreen, 0);
+		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, pal->GetColorAt(0) == ColorGreen, 0);
 		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h), nullptr, fmt);
 		const uint8_t* src = static_cast<uint8_t*>(pixels);
 		const uint8_t* end = src + size.Area();
@@ -262,18 +262,21 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 	return spr;
 }
 
-int BMPImporter::GetPalette(int colors, Color* pal)
+int BMPImporter::GetPalette(int colors, Palette& pal)
 {
 	if (BitCount > 8) {
 		return ImageMgr::GetPalette(colors, pal);
 	}
 
+	Palette::Colors buffer;
 	for (int i = 0; i < colors; i++) {
-		pal[i].r = PaletteColors[i % NumColors].r;
-		pal[i].g = PaletteColors[i % NumColors].g;
-		pal[i].b = PaletteColors[i % NumColors].b;
-		pal[i].a = 0xff;
+		buffer[i].r = PaletteColors[i % NumColors].r;
+		buffer[i].g = PaletteColors[i % NumColors].g;
+		buffer[i].b = PaletteColors[i % NumColors].b;
+		buffer[i].a = 0xff;
 	}
+
+	pal.CopyColors(0, buffer.cbegin(), buffer.cbegin() + colors);
 	return -1;
 }
 

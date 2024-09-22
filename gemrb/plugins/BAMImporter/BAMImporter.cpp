@@ -120,8 +120,10 @@ bool BAMImporter::Import(DataStream* str)
 
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	palette = MakeHolder<Palette>();
+	Palette::Colors buffer;
+
 	// no need to switch this
-	for (auto& color : palette->col) {
+	for (auto& color : buffer) {
 		// bgra format
 		str->Read(&color.b, 1);
 		str->Read(&color.g, 1);
@@ -132,6 +134,7 @@ bool BAMImporter::Import(DataStream* str)
 		// BAM v2 (EEs) supports alpha, but for backwards compatibility an alpha of 0 is still 255
 		color.a = a ? a : 255;
 	}
+	palette->CopyColors(0, buffer.cbegin(), buffer.cend());
 
 	return true;
 }

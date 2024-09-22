@@ -45,9 +45,9 @@ MVEPlay::MVEPlay() noexcept
 	g_palette = MakeHolder<Palette>();
 
 	// these colors don't change
-	g_palette->col[0] = ColorBlack;
+	g_palette->SetColor(1, ColorBlack);
 	//Set color 255 to be our subtitle color
-	g_palette->col[255] = Color(50,50,50,255);
+	g_palette->SetColor(255, Color(50,50,50,255));
 }
 
 bool MVEPlay::Import(DataStream* str)
@@ -94,12 +94,14 @@ void MVEPlay::showFrame(const unsigned char* buf, unsigned int bufw, unsigned in
 void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count) const
 {
 	p = p + (start * 3);
+	Palette::Colors buffer;
 	for (unsigned int i = start; i < start+count; i++) {
-		g_palette->col[i].r = ( *p++ ) << 2;
-		g_palette->col[i].g = ( *p++ ) << 2;
-		g_palette->col[i].b = ( *p++ ) << 2;
-		g_palette->col[i].a = 0xff;
+		buffer[i].r = ( *p++ ) << 2;
+		buffer[i].g = ( *p++ ) << 2;
+		buffer[i].b = ( *p++ ) << 2;
+		buffer[i].a = 0xff;
 	}
+	g_palette->CopyColors(start, buffer.cbegin() + start, buffer.cbegin() + start + count);
 }
 
 int MVEPlay::setAudioStream() const

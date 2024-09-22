@@ -393,19 +393,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const Region& src, const Region& dst, BlitFlags flags, const SDL_Color* tint)
 {
-	BlitFlags version = BlitFlags::NONE;
-#if !USE_OPENGL_BACKEND
-	// we need to isolate flags that require software rendering to use as the "version"
-	version = (BlitFlags::GREY | BlitFlags::SEPIA) & flags;
-#endif
-	// WARNING: software fallback == slow
-	if (spr->Format().Bpp == 1 && (flags & BlitFlags::ALPHA_MOD)) {
-		version |= BlitFlags::ALPHA_MOD;
-		flags &= ~spr->RenderWithFlags(version, reinterpret_cast<const Color*>(tint));
-	} else {
-		flags &= ~spr->RenderWithFlags(version);
-	}
-
+	flags &= ~spr->PrepareForRendering(flags, reinterpret_cast<const Color*>(tint));
 	SDL_Texture* tex = spr->GetTexture(renderer);
 	BlitSpriteNativeClipped(tex, src, dst, flags, tint);
 }

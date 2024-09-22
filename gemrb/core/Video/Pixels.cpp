@@ -182,18 +182,20 @@ void PixelFormatIterator::ReadRGBA(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& 
 		case 2:
 			pixel = *static_cast<uint16_t*>(imp->pixel);
 			break;
-		case 1:
+		case 1: {
 			pixel = *static_cast<uint8_t*>(imp->pixel);
-			r = format.palette->col[pixel].r;
-			g = format.palette->col[pixel].g;
-			b = format.palette->col[pixel].b;
+			auto& c = format.palette->GetColorAt(pixel);
+			r = c.r;
+			g = c.g;
+			b = c.b;
 
 			if (format.HasColorKey && pixel == format.ColorKey) {
 				a = 0;
 			} else {
-				a = format.palette->col[pixel].a;
+				a = c.a;
 			}
 			return;
+		}
 		default:
 			ERROR_UNKNOWN_BPP;
 	}

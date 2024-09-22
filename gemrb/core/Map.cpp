@@ -162,7 +162,7 @@ int TileProps::QueryElevation(const Point& p) const noexcept
 Color TileProps::QueryLighting(const Point& p) const noexcept
 {
 	uint8_t val = QueryTileProp(p, Property::LIGHTING);
-	return propImage->GetPalette()->col[val];
+	return propImage->GetPalette()->GetColorAt(val);
 }
 
 void TileProps::PaintSearchMap(const Point& p, PathMapFlags value) const noexcept
@@ -1668,6 +1668,8 @@ BlitFlags Map::SetDrawingStencilForProjectile(const Projectile* pro, const Regio
 void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 {
 	const static struct DebugPalettes {
+		Palette::Colors buffer;
+
 		Holder<Palette> searchMapPal;
 		Holder<Palette> materialMapPal;
 		Holder<Palette> heightMapPal;
@@ -1675,42 +1677,45 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		
 		DebugPalettes() noexcept {
 			searchMapPal = MakeHolder<Palette>();
-			std::fill_n(&searchMapPal->col[0], 256, Color()); // passable is transparent
-			searchMapPal->col[0] = Color(128, 64, 64, 128); // IMPASSABLE, red-ish
+			std::fill_n(buffer.begin(), 256, Color()); // passable is transparent
+			buffer[0] = Color(128, 64, 64, 128); // IMPASSABLE, red-ish
 			
 			for (uint8_t i = 1; i < 255; ++i) {
 				if (i & uint8_t(PathMapFlags::SIDEWALL)) {
-					searchMapPal->col[uint8_t(PathMapFlags::SIDEWALL)] = Color(64, 64, 128, 128); // blues-ish
+					buffer[uint8_t(PathMapFlags::SIDEWALL)] = Color(64, 64, 128, 128); // blues-ish
 				} else if (i & uint8_t(PathMapFlags::ACTOR)) {
-					searchMapPal->col[i] = Color(128, 64, 128, 128); // actor, purple-ish
+					buffer[i] = Color(128, 64, 128, 128); // actor, purple-ish
 				} else if ((i & uint8_t(PathMapFlags::PASSABLE)) == 0) {
 					// anything else that isnt PASSABLE
-					searchMapPal->col[i] = ColorGray;
+					buffer[i] = ColorGray;
 				}
 			}
-			
+			searchMapPal->CopyColors(0, buffer.cbegin(), buffer.cbegin() + 16);
+
 			materialMapPal = MakeHolder<Palette>();
-			materialMapPal->col[0] = ColorBlack; // impassable, light blocking
-			materialMapPal->col[1] = Color(0xB9, 0xAB, 0x79, 128); // sand
-			materialMapPal->col[2] = Color(0x6C, 0x4D, 0x2E, 128); // wood
-			materialMapPal->col[3] = Color(0x6C, 0x4D, 0x2E, 128); // wood
-			materialMapPal->col[4] = Color(0x84, 0x86, 0x80, 128); // stone
-			materialMapPal->col[5] = Color(0, 0xFF, 0, 128); // grass
-			materialMapPal->col[6] = ColorBlue; // water
-			materialMapPal->col[7] = Color(0x84, 0x86, 0x80, 128); // stone
-			materialMapPal->col[8] = ColorWhite; // obstacle, non light blocking
-			materialMapPal->col[9] = Color(0x6C, 0x4D, 0x2E, 128); // wood
-			materialMapPal->col[10] = ColorGray; // wall, impassable
-			materialMapPal->col[11] = ColorBlue; // water
-			materialMapPal->col[12] = ColorBlueDark; // water, impassable
-			materialMapPal->col[13] = Color(0xFF, 0x00, 0xFF, 128); // roof
-			materialMapPal->col[14] = Color(128, 0, 128, 128); // exit
-			materialMapPal->col[15] = Color(0, 0xFF, 0, 128); // grass
-			
+			buffer[0] = ColorBlack; // impassable, light blocking
+			buffer[1] = Color(0xB9, 0xAB, 0x79, 128); // sand
+			buffer[2] = Color(0x6C, 0x4D, 0x2E, 128); // wood
+			buffer[3] = Color(0x6C, 0x4D, 0x2E, 128); // wood
+			buffer[4] = Color(0x84, 0x86, 0x80, 128); // stone
+			buffer[5] = Color(0, 0xFF, 0, 128); // grass
+			buffer[6] = ColorBlue; // water
+			buffer[7] = Color(0x84, 0x86, 0x80, 128); // stone
+			buffer[8] = ColorWhite; // obstacle, non light blocking
+			buffer[9] = Color(0x6C, 0x4D, 0x2E, 128); // wood
+			buffer[10] = ColorGray; // wall, impassable
+			buffer[11] = ColorBlue; // water
+			buffer[12] = ColorBlueDark; // water, impassable
+			buffer[13] = Color(0xFF, 0x00, 0xFF, 128); // roof
+			buffer[14] = Color(128, 0, 128, 128); // exit
+			buffer[15] = Color(0, 0xFF, 0, 128); // grass
+			materialMapPal->CopyColors(0, buffer.cbegin(), buffer.cbegin() + 16);
+
 			heightMapPal = MakeHolder<Palette>();
 			for (uint8_t i = 0; i < 255; ++i) {
-				heightMapPal->col[i] = Color(i, i, i, 128);
+				buffer[i] = Color(i, i, i, 128);
 			}
+			heightMapPal->CopyColors(0, buffer.cbegin(), buffer.cend());
 		}
 	} debugPalettes;
 	
@@ -1734,13 +1739,13 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 			Color col;
 			if (dFlags & DEBUG_SHOW_SEARCHMAP) {
 				auto val = tileProps.QueryTileProp(p, TileProps::Property::SEARCH_MAP);
-				col = debugPalettes.searchMapPal->col[val];
+				col = debugPalettes.searchMapPal->GetColorAt(val);
 			} else if (dFlags & DEBUG_SHOW_MATERIALMAP) {
 				auto val = tileProps.QueryMaterial(p);
-				col = debugPalettes.materialMapPal->col[val];
+				col = debugPalettes.materialMapPal->GetColorAt(val);
 			} else if (dFlags & DEBUG_SHOW_HEIGHTMAP) {
 				auto val = tileProps.QueryTileProp(p, TileProps::Property::ELEVATION);
-				col = debugPalettes.heightMapPal->col[val];
+				col = debugPalettes.heightMapPal->GetColorAt(val);
 			} else if (dFlags & DEBUG_SHOW_LIGHTMAP) {
 				col = tileProps.QueryLighting(p);
 			}

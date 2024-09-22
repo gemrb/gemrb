@@ -349,9 +349,11 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 	Color ck = ColorBlack;
 	if (flags & (BlitFlags::ONE_MINUS_DST | BlitFlags::DST | BlitFlags::SRC)) {
 		// FIXME: this is a hack. the video driver just needs to be able to ignore the color key during any blending
-		if (pal && pal->col[0] != ColorBlack) {
-			ck = pal->col[0];
-			pal->CopyColorRange(&ColorBlack, &ColorBlack + 1, 0);
+		if (pal) {
+			ck = pal->GetColorAt(0);
+			if (ck != ColorBlack) {
+				pal->SetColor(0, ColorBlack);
+			}
 		}
 	}
 
@@ -363,7 +365,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 	}
 	
 	if (ck != ColorBlack) {
-		pal->CopyColorRange(&ck, &ck + 1, 0);
+		pal->SetColor(0, ck);
 	}
 }
 

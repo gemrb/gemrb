@@ -30,26 +30,33 @@ namespace GemRB {
 
 class SDLSurfaceSprite2D : public Sprite2D {
 public:
-	using version_t = uint64_t;
+	using version_t = Hash;
 
 protected:
-	SDL_Surface* surface = nullptr; // the actual surface backing the sprite, changes to it invalidate 'renderedSurface'
-	mutable version_t palVersion = 0; // the format.palette version applied to 'surface'
-	mutable SDL_Surface* renderedSurface = nullptr; // a cached surface matching 'version'
-	mutable version_t version = 0; // the flags used to render 'renderedSurface'
-	
-	void UpdateSurfacePalette() const noexcept;
+	SDL_Surface* surface = nullptr;
+
+	mutable BlitFlags appliedBlitFlags = BlitFlags::NONE;
+	mutable Color appliedTint;
+	mutable bool surfaceInvalidated = false;
+
+	mutable version_t palVersion;
+	mutable Holder<Palette> shadedPalette;
+	mutable version_t shadedPaletteVersion;
+
 	void UpdatePalette() noexcept override;
 	void UpdateColorKey() noexcept override;
+	void UpdateSurfaceAndPalette() noexcept;
+	virtual void OnSurfaceUpdate() const noexcept {}
 
-	bool IsPaletteStale() const noexcept;
-	// restore the sprite to version 0 (aka original) and free the versioned resources
-	// an 8 bit sprite will be also implicitly restored by SetPalette()
-	virtual void Invalidate() const noexcept;
-	
-	// return a copy of the surface or the palette if 8 bit
-	// this copy is what is returned from GetSurface for rendering
-	void* NewVersion(version_t version) const noexcept;
+private:
+	void EnsureShadedPalette() const noexcept;
+	bool NeedToReshade(const Color* tint, BlitFlags flags) const noexcept;
+	bool NeedToUpdatePalette() const noexcept;
+	void ShadePalette(BlitFlags renderFlags, const Color* tint) const noexcept;
+	void UpdatePalettesState(bool flagsChanged) const noexcept;
+	void UpdatePaletteForSurface(const Palette& pal) const noexcept;
+	void Invalidate() noexcept;
+
 public:
 	SDLSurfaceSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	SDLSurfaceSprite2D(const Region&, const PixelFormat& fmt) noexcept;
@@ -60,17 +67,14 @@ public:
 
 	const void* LockSprite() const override;
 	void* LockSprite() override;
-	void UnlockSprite() const override;
+	void UnlockSprite() override;
 
 	bool HasTransparency() const noexcept override;
 	bool ConvertFormatTo(const PixelFormat& tofmt) noexcept override;
 
-	SDL_Surface* GetSurface() const { return renderedSurface; };
+	SDL_Surface* GetSurface() const;
 	
-	// render to 'renderedSurface' any supported options passed in 'flags'
-	// returns the flags which were successfully applied
-	// operations are not cumulative and don't permanently alter the 'surface'
-	BlitFlags RenderWithFlags(BlitFlags flags, const Color* = nullptr) const noexcept;
+	BlitFlags PrepareForRendering(BlitFlags flags, const Color* = nullptr) const noexcept;
 };
 
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -81,8 +85,8 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 	mutable Uint32 texFormat = SDL_PIXELFORMAT_UNKNOWN;
 	mutable SDL_Texture* texture = nullptr;
 	mutable bool staleTexture = false;
-	
-	void Invalidate() const noexcept override;
+
+	void OnSurfaceUpdate() const noexcept override;
 public:
 	SDLTextureSprite2D(const SDLTextureSprite2D&) noexcept;
 	SDLTextureSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;

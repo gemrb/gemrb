@@ -429,7 +429,7 @@ void Actor::SetAnimationID(stat_t animID)
 		// Take ownership so the palette won't be deleted
 		if (recover) {
 			paletteResRef = anims->PaletteResRef[PAL_MAIN];
-			if (recover->named) {
+			if (recover->IsNamed()) {
 				recover = gamedata->GetPalette(paletteResRef);
 			}
 		}
@@ -7864,8 +7864,11 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 	
 	if (!anims->lockPalette) {
 		flags |= BlitFlags::COLOR_MOD;
+
+		if (tint.a < 255) {
+			flags |= BlitFlags::ALPHA_MOD;
+		}
 	}
-	flags |= BlitFlags::ALPHA_MOD;
 
 	for (const auto& part : animParts) {
 		const Animation* anim = part.first;
@@ -7873,11 +7876,11 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
-			if (TranslucentShadows && palette) {
-				ieByte tmpa = palette->col[1].a;
-				palette->col[1].a /= 2;
+			if (palette) {
+				auto shadowColor = palette->GetColorAt(1);
+				shadowColor.a = TranslucentShadows ? 128 : 255;
+				palette->SetColor(1, shadowColor);
 				VideoDriver->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
-				palette->col[1].a = tmpa;
 			} else {
 				VideoDriver->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
 			}

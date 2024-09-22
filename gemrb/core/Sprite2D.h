@@ -117,7 +117,7 @@ public:
 
 	virtual const void* LockSprite() const;
 	virtual void* LockSprite();
-	virtual void UnlockSprite() const {};
+	virtual void UnlockSprite() {};
 
 	const PixelFormat& Format() const noexcept { return format; }
 	Color GetPixel(const Point&) const noexcept;

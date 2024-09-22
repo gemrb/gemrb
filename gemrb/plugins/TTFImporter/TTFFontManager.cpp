@@ -103,10 +103,11 @@ Holder<Font> TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/,
 {
 	Holder<Palette> pal = MakeHolder<Palette>(ColorWhite, ColorBlack);
 	
+	Palette::Colors buffer;
 	// FIXME: we probably dont need to do this
 	// Font already can do blending between fg and bg colors
 	for (int i = 1; i < 256; ++i) {
-		Color& c = pal->col[i];
+		auto c = pal->GetColorAt(i);
 		unsigned int m = (c.r + c.g + c.b) / 3;
 		if (m > 2) {
 			int tmp = m * MUL;
@@ -114,8 +115,11 @@ Holder<Font> TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/,
 		} else {
 			c.a = 0;
 		}
+		buffer[i] = c;
 	}
-	
+
+	pal->CopyColors(1, buffer.cbegin() + 1, buffer.cend());
+
 	FT_Error error = 0;
 	ieWord lineHeight = 0, baseline = 0;
 	/* Make sure that our font face is scalable (global metrics) */

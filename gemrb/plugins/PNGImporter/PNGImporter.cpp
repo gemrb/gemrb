@@ -168,7 +168,7 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 	Holder<Sprite2D> spr;
 	if (hasPalette) {
 		Holder<Palette> pal = MakeHolder<Palette>();
-		int ck = GetPalette(256, pal->col);
+		int ck = GetPalette(256, *pal);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(std::move(pal), (ck >= 0), ck);
 		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h), buffer, fmt);
 	} else {
@@ -186,7 +186,7 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 	return spr;
 }
 
-int PNGImporter::GetPalette(int colors, Color* pal)
+int PNGImporter::GetPalette(int colors, Palette& pal)
 {
 	if (!hasPalette) {
 		return ImageMgr::GetPalette(colors, pal);
@@ -200,16 +200,19 @@ int PNGImporter::GetPalette(int colors, Color* pal)
 	int num_alpha = 0;
 	png_get_tRNS(inf->png_ptr, inf->info_ptr, &alpha, &num_alpha, nullptr);
 	
+	Palette::Colors buffer;
 	for (int i = 0; i < colors; i++) {
-		pal[i].r = palette[i%num_palette].red;
-		pal[i].g = palette[i%num_palette].green;
-		pal[i].b = palette[i%num_palette].blue;
+		buffer[i].r = palette[i%num_palette].red;
+		buffer[i].g = palette[i%num_palette].green;
+		buffer[i].b = palette[i%num_palette].blue;
 		if (i < num_alpha) {
-			pal[i].a = alpha[i];
+			buffer[i].a = alpha[i];
 		} else {
-			pal[i].a = 0xff;
+			buffer[i].a = 0xff;
 		}
 	}
+
+	pal.CopyColors(0, buffer.cbegin(), buffer.cend());
 	
 	return (num_alpha == 1) ? 0 : -1;
 }

@@ -146,11 +146,16 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 		if (font->background) {
 			invertedSheet = Sheet->copy();
 			auto invertedPalette = MakeHolder<Palette>(*font->palette);
-			for (auto& c : invertedPalette->col) {
+
+			Palette::Colors buffer;
+			for (size_t i = 0; i < buffer.size(); ++i) {
+				auto c = invertedPalette->GetColorAt(i);
 				c.r = 255 - c.r;
 				c.g = 255 - c.g;
 				c.b = 255 - c.b;
+				buffer[i] = c;
 			}
+			invertedPalette->CopyColors(0, buffer.cbegin(), buffer.cend());
 			invertedSheet->SetPalette(invertedPalette);
 		}
 	}
