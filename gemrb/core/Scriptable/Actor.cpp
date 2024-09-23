@@ -8233,7 +8233,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	} else if (State & STATE_BLUR) {
 		//can't move this, because there is permanent blur state where
 		//there is no effect (just state bit)
-		trans = 128;
+		trans = 160;
 	}
 
 	tint.a = 255 - trans;
