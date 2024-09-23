@@ -6325,6 +6325,8 @@ ieDword Actor::GetNumberOfAttacks()
 		if (fx) bonus -= 2;
 		fx = fxqueue.HasEffectWithParam(fx_set_diseased_state_ref, RPD_CONTAGION);
 		if (fx) bonus -= 2;
+		// iwd2 uses only regular haste
+		if (GetStat(IE_STATE_ID) & STATE_HASTED) bonus += 2;
 	} else {
 		base = GetStat(IE_NUMBEROFATTACKS);
 		if (inventory.FistsEquipped()) {
