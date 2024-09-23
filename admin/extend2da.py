@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # GemRB - Infinity Engine Emulator
 # Copyright (C) 2011 The GemRB Project
 #
