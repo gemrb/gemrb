@@ -2801,6 +2801,8 @@ void CharAnimations::PulseRGBModifiers()
 
 static inline void applyMod(const Color& src, Color& dest, const RGBModifier& mod) noexcept
 {
+	dest.a = src.a;
+
 	if (mod.speed == -1) {
 		if (mod.type == RGBModifier::TINT) {
 			dest.r = ((unsigned int)src.r * mod.rgb.r)>>8;
