@@ -46,8 +46,8 @@ public:
 
 // More like a smoke test
 TEST_P(BMPImporter_Test, GetPalette) {
-	std::array<Color, 2> colors;
-	EXPECT_EQ(unit.GetPalette(2, colors.data()), -1);
+	Palette pal;
+	EXPECT_EQ(unit.GetPalette(2, pal), -1);
 }
 
 INSTANTIATE_TEST_SUITE_P(

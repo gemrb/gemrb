@@ -26,7 +26,7 @@ namespace GemRB {
 
 const TypeID ImageMgr::ID = { "ImageMgr" };
 
-int ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
+int ImageMgr::GetPalette(int /*colors*/, Palette& /*pal*/)
 {
 	return -1;
 }

@@ -262,7 +262,7 @@ static TileProps MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day
 		}
 		
 		if (hmit.clip.PointInside(pos)) {
-			b = hmpal->col[*hmit].r; // pick any channel, they are all the same
+			b = hmpal->GetColorAt(*hmit).r; // pick any channel, they are all the same
 			++hmit;
 		}
 		

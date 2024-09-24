@@ -44,7 +44,7 @@ public:
 	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;
 	Holder<Sprite2D> GetSprite2D(Region&&) override;
-	int GetPalette(int colors, Color* pal) override;
+	int GetPalette(int colors, Palette& pal) override;
 
 private:
 	std::tuple<uint16_t, uint16_t> extractPalette(size_t offset, std::array<uint8_t, 6>& colors) const;

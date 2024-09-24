@@ -429,7 +429,7 @@ void Actor::SetAnimationID(stat_t animID)
 		// Take ownership so the palette won't be deleted
 		if (recover) {
 			paletteResRef = anims->PaletteResRef[PAL_MAIN];
-			if (recover->named) {
+			if (recover->IsNamed()) {
 				recover = gamedata->GetPalette(paletteResRef);
 			}
 		}
@@ -7864,8 +7864,11 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 	
 	if (!anims->lockPalette) {
 		flags |= BlitFlags::COLOR_MOD;
+
+		if (tint.a < 255) {
+			flags |= BlitFlags::ALPHA_MOD;
+		}
 	}
-	flags |= BlitFlags::ALPHA_MOD;
 
 	for (const auto& part : animParts) {
 		const Animation* anim = part.first;
@@ -7873,11 +7876,11 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
-			if (TranslucentShadows && palette) {
-				ieByte tmpa = palette->col[1].a;
-				palette->col[1].a /= 2;
+			if (palette) {
+				auto shadowColor = palette->GetColorAt(1);
+				shadowColor.a = TranslucentShadows ? 128 : 255;
+				palette->SetColor(1, shadowColor);
 				VideoDriver->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
-				palette->col[1].a = tmpa;
 			} else {
 				VideoDriver->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
 			}
@@ -8233,7 +8236,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	} else if (State & STATE_BLUR) {
 		//can't move this, because there is permanent blur state where
 		//there is no effect (just state bit)
-		trans = 128;
+		trans = 160;
 	}
 
 	tint.a = 255 - trans;
@@ -8322,22 +8325,20 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 		}
 
 		if (!currentStance.shadow.empty()) {
-			const Game* game = core->GetGame();
-			// infravision, independent of light map and global light
-			if (HasBodyHeat() &&
-				game->PartyHasInfravision() &&
-				!game->IsDay() &&
-				(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
-				Color irTint = Color(255, 120, 120, tint.a);
-
-				/* IWD2: infravision is white, not red. */
-				if(core->HasFeature(GFFlags::RULES_3ED)) {
-					irTint = Color(255, 255, 255, tint.a);
-				}
-
-				DrawActorSprite(drawPos, flags, currentStance.shadow, irTint);
-			} else {
 				DrawActorSprite(drawPos, flags, currentStance.shadow, tint);
+		}
+
+		const Game* game = core->GetGame();
+		// infravision, independent of light map and global light
+		if (HasBodyHeat() &&
+			game->PartyHasInfravision() &&
+			!game->IsDay() &&
+			(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
+			tint = Color(255, 120, 120, tint.a);
+
+			/* IWD2: infravision is white, not red. */
+			if(core->HasFeature(GFFlags::RULES_3ED)) {
+				tint = Color(255, 255, 255, tint.a);
 			}
 		}
 

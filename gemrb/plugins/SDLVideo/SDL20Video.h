@@ -177,7 +177,7 @@ public:
 
 			const Uint8* src = static_cast<const Uint8*>(pixelBuf);
 			for (int xy = 0; xy < bufDest.w * bufDest.h; ++xy) {
-				const Color& c = pal->col[*src++];
+				const Color& c = pal->GetColorAt(*src++);
 				*dst++ = (c.r << pxfmt->Rshift) | (c.g << pxfmt->Gshift) | (c.b << pxfmt->Bshift) | (c.a << pxfmt->Ashift);
 				if (hasalpha == false) {
 					dst = (Uint32*)((Uint8*)dst - 1);
@@ -285,6 +285,7 @@ private:
 	void BlitSpriteNativeClipped(SDL_Texture* spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL);
 
 	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* = nullptr);
+	void SetTextureBlendMode(SDL_Texture *texture, BlitFlags flags) const;
 
 	int GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const;
 

@@ -36,6 +36,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Map.cpp
 	MapReverb.cpp
 	MoviePlayer.cpp
+	MurmurHash.cpp
 	Palette.cpp
 	PalettedImageMgr.cpp
 	Particles.cpp

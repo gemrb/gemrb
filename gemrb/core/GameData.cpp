@@ -151,9 +151,8 @@ Holder<Palette> GameData::GetPalette(const ResRef& resname)
 		return NULL;
 	}
 
-	Holder<Palette> palette = MakeHolder<Palette>();
-	im->GetPalette(256,palette->col);
-	palette->named=true;
+	Holder<Palette> palette = MakeHolder<Palette>(true);
+	im->GetPalette(256, *palette);
 	PaletteCache[resname] = palette;
 	return palette;
 }

@@ -65,10 +65,10 @@ void Container::Draw(bool highlight, const Region& vp, Color tint, BlitFlags fla
 		} else {
 			const Color trans;
 			Holder<Palette> p = icon->GetPalette();
-			Color tmpc = p->col[1];
-			p->CopyColorRange(&trans, &trans + 1, 1);
+			Color tmpc = p->GetColorAt(1);
+			p->SetColor(1, trans);
 			VideoDriver->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
-			p->CopyColorRange(&tmpc, &tmpc + 1, 1);
+			p->SetColor(1, tmpc);
 		}
 	}
 }

@@ -393,19 +393,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const Region& src, const Region& dst, BlitFlags flags, const SDL_Color* tint)
 {
-	BlitFlags version = BlitFlags::NONE;
-#if !USE_OPENGL_BACKEND
-	// we need to isolate flags that require software rendering to use as the "version"
-	version = (BlitFlags::GREY | BlitFlags::SEPIA) & flags;
-#endif
-	// WARNING: software fallback == slow
-	if (spr->Format().Bpp == 1 && (flags & BlitFlags::ALPHA_MOD)) {
-		version |= BlitFlags::ALPHA_MOD;
-		flags &= ~spr->RenderWithFlags(version, reinterpret_cast<const Color*>(tint));
-	} else {
-		flags &= ~spr->RenderWithFlags(version);
-	}
-
+	flags &= ~spr->PrepareForRendering(flags, reinterpret_cast<const Color*>(tint));
 	SDL_Texture* tex = spr->GetTexture(renderer);
 	BlitSpriteNativeClipped(tex, src, dst, flags, tint);
 }
@@ -453,7 +441,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 			SDL_SetTextureAlphaMod(ScratchBuffer(), alpha);
 		}
 		SDL_SetRenderTarget(renderer, CurrentRenderBuffer());
-		SDL_SetTextureBlendMode(ScratchBuffer(), SDL_BLENDMODE_BLEND);
+		SetTextureBlendMode(ScratchBuffer(), flags);
 		ret = SDL_RenderCopy(renderer, ScratchBuffer(), &drect, &drect);
 	} else {
 		UpdateRenderTarget();
@@ -598,7 +586,16 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	} else {
 		SDL_SetTextureColorMod(texture, 0xff, 0xff, 0xff);
 	}
-	
+
+	SetTextureBlendMode(texture, flags);
+
+	SDL_RendererFlip flipflags = (flags & BlitFlags::MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags & BlitFlags::MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
+
+	return SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, nullptr, flipflags);
+}
+
+void SDL20VideoDriver::SetTextureBlendMode(SDL_Texture *texture, BlitFlags flags) const {
 	if (flags & BlitFlags::ADD) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
 	} else if (flags & BlitFlags::MOD) {
@@ -618,11 +615,6 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	} else {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
 	}
-
-	SDL_RendererFlip flipflags = (flags & BlitFlags::MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
-	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags & BlitFlags::MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
-
-	return SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, nullptr, flipflags);
 }
 
 void SDL20VideoDriver::DrawRawGeometry(

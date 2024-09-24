@@ -23,8 +23,10 @@
 #include "RGBAColor.h"
 #include "exports.h"
 #include "ie_types.h"
+#include "MurmurHash.h"
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstdint>
 #include <cstring>
@@ -46,35 +48,45 @@ struct RGBModifier {
 
 class GEM_EXPORT Palette
 {
-private:
-	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst) const noexcept;
-	void UpdateAlpha() noexcept;
 public:
+	using Colors = std::array<Color, 256>;
+
+	Palette(bool named = false) noexcept;
 	Palette(const Color &color, const Color &back) noexcept;
 
-	Palette(const Color* begin, const Color* end) noexcept
+	template <class Iterator>
+	Palette(const Iterator begin, const Iterator end) noexcept
 	: Palette() {
-		std::copy(begin, end, col);
-		UpdateAlpha();
+		std::copy(begin, end, colors.begin());
+		updateVersion();
 	}
 
-	Palette() noexcept = default;
+	bool HasAlpha() const noexcept { return true; /* Drop when SDL1 is gone. */ }
 
-	Color col[256]; //< RGB or RGBA 8 bit palette
-	bool named = false; //< true if the palette comes from a bmp and cached
-
-	unsigned short GetVersion() const noexcept { return version; }
-
-	bool HasAlpha() const noexcept { return alpha; }
-
-	void CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst) noexcept;
 	bool operator==(const Palette&) const noexcept;
 	bool operator!=(const Palette&) const noexcept;
+
+	Colors::const_iterator cbegin() const noexcept;
+	Colors::const_iterator cend() const noexcept;
+	Colors::const_reference operator[](size_t pos) const;
+
+	template <class Iterator>
+	void CopyColors(size_t offset, Iterator begin, Iterator end) {
+		std::copy(begin, end, colors.begin() + offset);
+		updateVersion();
+	}
+
+	const Color* ColorData() const;
+	Colors::const_reference GetColorAt(size_t pos) const;
+	Hash GetVersion() const;
+	bool IsNamed() const;
+	void SetColor(size_t index, const Color& c);
 private:
-	unsigned short version = 0;
-	bool alpha = false; // true if any colors in the palette have an alpha < 255
-	// FIXME: version is not enough since `col` is public
-	// must make it private to fully capture changes to it
+	Colors colors;
+	Hash version;
+	bool named = false; // true if the palette comes from a bmp and cached
+
+	void updateVersion();
 };
 
 }

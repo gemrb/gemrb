@@ -77,6 +77,8 @@ static const ieByte SixteenToFive[3*MAX_ORIENT]={
 	10,10,11,11,12,12,13,13,14,14,13,13,12,12,11,11
 };
 
+static ieDword TranslucentShadows = 0;
+
 Animation* ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, Animation::index_t cycle, Animation::index_t i, bool loop) const
 {
 	Animation::index_t c = cycle;
@@ -322,6 +324,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	}
 
 	SetPhase(P_ONSET);
+	TranslucentShadows = core->GetDictionary().Get("Translucent Shadows", 0);
 
 	delete stream;
 }
@@ -402,7 +405,7 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 
 	constexpr int PALSIZE = 12;
 	const auto& pal16 = core->GetPalette16(gradient);
-	palette->CopyColorRange(&pal16[0], &pal16[PALSIZE], start);
+	palette->CopyColors(start, &pal16[0], &pal16[PALSIZE]);
 
 	if (twin) {
 		twin->SetPalette(gradient, start);
@@ -722,10 +725,9 @@ void ScriptedAnimation::GetPaletteCopy()
 		if (!spr) continue;
 
 		palette = MakeHolder<Palette>(*spr->GetPalette());
-		Color shadowalpha = palette->col[1];
-		shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
-		palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
-		//we need only one palette, so break here
+		auto shadowColor = palette->GetColorAt(1);
+		shadowColor.a = TranslucentShadows ? 128 : 255;
+		palette->SetColor(1, shadowColor);
 		break;
 	}
 }

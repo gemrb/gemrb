@@ -382,7 +382,7 @@ Holder<Sprite2D> PVRZImporter::getSprite2DDXT5(Region&& region) const {
 	return {spr};
 }
 
-int PVRZImporter::GetPalette(int, Color*) {
+int PVRZImporter::GetPalette(int, Palette&) {
 	return -1;
 }
 

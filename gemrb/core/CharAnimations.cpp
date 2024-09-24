@@ -543,7 +543,7 @@ void CharAnimations::SetupColors(PaletteType type)
 		*/
 		for (int i = 0; i < colorcount; i++) {
 			const auto& pal32 = core->GetPalette32(static_cast<uint8_t>(Colors[i]));
-			PartPalettes[PAL_MAIN]->CopyColorRange(&pal32[0], &pal32[32], static_cast<uint8_t>(dest));
+			PartPalettes[PAL_MAIN]->CopyColors(dest, &pal32[0], &pal32[32]);
 			dest +=size;
 		}
 
@@ -2801,6 +2801,8 @@ void CharAnimations::PulseRGBModifiers()
 
 static inline void applyMod(const Color& src, Color& dest, const RGBModifier& mod) noexcept
 {
+	dest.a = src.a;
+
 	if (mod.speed == -1) {
 		if (mod.type == RGBModifier::TINT) {
 			dest.r = ((unsigned int)src.r * mod.rgb.r)>>8;
@@ -2883,66 +2885,73 @@ Palette SetupRGBModification(const Holder<Palette>& src, const RGBModifier* mods
 	unsigned int type) noexcept
 {
 	Palette pal;
+	Palette::Colors buffer;
 
 	const RGBModifier* tmods = mods+(8*type);
 	int i;
 
-	for (i = 0; i < 4; ++i)
-		pal.col[i] = src->col[i];
+	std::copy(src->cbegin(), src->cbegin() + 4, buffer.begin());
+	auto srcData = src->ColorData();
 
 	for (i = 0; i < 12; ++i)
-		applyMod(src->col[0x04+i], pal.col[0x04+i], tmods[0]);
+		applyMod(srcData[0x04+i], buffer[0x04+i], tmods[0]);
 	for (i = 0; i < 12; ++i)
-		applyMod(src->col[0x10+i], pal.col[0x10+i], tmods[1]);
+		applyMod(srcData[0x10+i], buffer[0x10+i], tmods[1]);
 	for (i = 0; i < 12; ++i)
-		applyMod(src->col[0x1c+i], pal.col[0x1c+i], tmods[2]);
+		applyMod(srcData[0x1c+i], buffer[0x1c+i], tmods[2]);
 	for (i = 0; i < 12; ++i)
-		applyMod(src->col[0x28+i], pal.col[0x28+i], tmods[3]);
+		applyMod(srcData[0x28+i], buffer[0x28+i], tmods[3]);
 	for (i = 0; i < 12; ++i)
-		applyMod(src->col[0x34+i], pal.col[0x34+i], tmods[4]);
+		applyMod(srcData[0x34+i], buffer[0x34+i], tmods[4]);
 	for (i = 0; i < 12; ++i)
-		applyMod(src->col[0x40+i], pal.col[0x40+i], tmods[5]);
+		applyMod(srcData[0x40+i], buffer[0x40+i], tmods[5]);
 	for (i = 0; i < 12; ++i)
-		applyMod(src->col[0x4c+i], pal.col[0x4c+i], tmods[6]);
+		applyMod(srcData[0x4c+i], buffer[0x4c+i], tmods[6]);
 	for (i = 0; i < 8; ++i)
-		applyMod(src->col[0x58+i], pal.col[0x58+i], tmods[1]);
+		applyMod(srcData[0x58+i], buffer[0x58+i], tmods[1]);
 	for (i = 0; i < 8; ++i)
-		applyMod(src->col[0x60+i], pal.col[0x60+i], tmods[2]);
+		applyMod(srcData[0x60+i], buffer[0x60+i], tmods[2]);
 	for (i = 0; i < 8; ++i)
-		applyMod(src->col[0x68+i], pal.col[0x68+i], tmods[1]);
+		applyMod(srcData[0x68+i], buffer[0x68+i], tmods[1]);
 	for (i = 0; i < 8; ++i)
-		applyMod(src->col[0x70+i], pal.col[0x70+i], tmods[0]);
+		applyMod(srcData[0x70+i], buffer[0x70+i], tmods[0]);
 	for (i = 0; i < 8; ++i)
-		applyMod(src->col[0x78+i], pal.col[0x78+i], tmods[4]);
+		applyMod(srcData[0x78+i], buffer[0x78+i], tmods[4]);
 	for (i = 0; i < 8; ++i)
-		applyMod(src->col[0x80+i], pal.col[0x80+i], tmods[4]);
+		applyMod(srcData[0x80+i], buffer[0x80+i], tmods[4]);
 	for (i = 0; i < 8; ++i)
-		applyMod(src->col[0x88+i], pal.col[0x88+i], tmods[1]);
+		applyMod(srcData[0x88+i], buffer[0x88+i], tmods[1]);
 	for (i = 0; i < 24; ++i)
-		applyMod(src->col[0x90+i], pal.col[0x90+i], tmods[4]);
+		applyMod(srcData[0x90+i], buffer[0x90+i], tmods[4]);
+
+	std::copy(src->cbegin() + 0xA8, src->cbegin() + 0xA8 + 8, buffer.begin() + 0xA8);
 
 	for (i = 0; i < 8; ++i)
-		pal.col[0xA8+i] = src->col[0xA8+i];
-
-	for (i = 0; i < 8; ++i)
-		applyMod(src->col[0xB0+i], pal.col[0xB0+i], tmods[3]);
+		applyMod(srcData[0xB0+i], buffer[0xB0+i], tmods[3]);
 	for (i = 0; i < 72; ++i)
-		applyMod(src->col[0xB8+i], pal.col[0xB8+i], tmods[4]);
-	
+		applyMod(srcData[0xB8+i], buffer[0xB8+i], tmods[4]);
+
+	pal.CopyColors(0, buffer.cbegin(), buffer.cend());
+
 	return pal;
 }
 
 Palette SetupGlobalRGBModification(const Holder<Palette>& src, const RGBModifier& mod) noexcept
 {
 	Palette pal;
+	Palette::Colors buffer;
+
+	auto srcData = src->ColorData();
 	// don't modify the transparency and shadow colour
 	for (int i = 0; i < 2; ++i) {
-		pal.col[i] = src->col[i];
+		buffer[i] = srcData[i];
 	}
 
 	for (int i = 2; i < 256; ++i) {
-		applyMod(src->col[i], pal.col[i], mod);
+		applyMod(srcData[i], buffer[i], mod);
 	}
+
+	pal.CopyColors(0, buffer.cbegin(), buffer.cend());
 
 	return pal;
 }
@@ -2952,6 +2961,7 @@ Palette SetupPaperdollColours(const ieDword* colors, unsigned int type) noexcept
 	unsigned int s = Clamp<ieDword>(8*type, 0, 8*sizeof(ieDword)-1);
 	constexpr uint8_t numCols = 12;
 	Palette pal;
+	Palette::Colors buffer;
 
 	enum PALETTES : uint8_t
 	{
@@ -2961,38 +2971,40 @@ Palette SetupPaperdollColours(const ieDword* colors, unsigned int type) noexcept
 
 	for (uint8_t idx = METAL; idx < END; ++idx) {
 		const auto& pal16 = core->GetPalette16(colors[idx]>>s);
-		pal.CopyColorRange(&pal16[0], &pal16[numCols], 0x04 + (idx * 12));
+		std::copy(&pal16[0], &pal16[numCols], buffer.begin() + 0x04 + (idx * 12));
 	}
 	
 	//minor
-	memcpy(&pal.col[0x58], &pal.col[0x11], 8 * sizeof(Color));
+	memcpy(&buffer[0x58], &buffer[0x11], 8 * sizeof(Color));
 	//major
-	memcpy(&pal.col[0x60], &pal.col[0x1d], 8 * sizeof(Color));
+	memcpy(&buffer[0x60], &buffer[0x1d], 8 * sizeof(Color));
 	//minor
-	memcpy(&pal.col[0x68], &pal.col[0x11], 8 * sizeof(Color));
+	memcpy(&buffer[0x68], &buffer[0x11], 8 * sizeof(Color));
 	//metal
-	memcpy(&pal.col[0x70], &pal.col[0x05], 8 * sizeof(Color));
+	memcpy(&buffer[0x70], &buffer[0x05], 8 * sizeof(Color));
 	//leather
-	memcpy(&pal.col[0x78], &pal.col[0x35], 8 * sizeof(Color));
+	memcpy(&buffer[0x78], &buffer[0x35], 8 * sizeof(Color));
 	//leather
-	memcpy(&pal.col[0x80], &pal.col[0x35], 8 * sizeof(Color));
+	memcpy(&buffer[0x80], &buffer[0x35], 8 * sizeof(Color));
 	//minor
-	memcpy(&pal.col[0x88], &pal.col[0x11], 8 * sizeof(Color));
+	memcpy(&buffer[0x88], &buffer[0x11], 8 * sizeof(Color));
 
 	for (int i = 0x90; i < 0xA8; i += 0x08) {
 		//leather
-		memcpy(&pal.col[i], &pal.col[0x35], 8 * sizeof(Color));
+		memcpy(&buffer[i], &buffer[0x35], 8 * sizeof(Color));
 	}
 
 	//skin
-	memcpy(&pal.col[0xB0], &pal.col[0x29], 8 * sizeof(Color));
+	memcpy(&buffer[0xB0], &buffer[0x29], 8 * sizeof(Color));
 
 	for (int i = 0xB8; i < 0xFF; i += 0x08) {
 		//leather
-		memcpy(&pal.col[i], &pal.col[0x35], 8 * sizeof(Color));
+		memcpy(&buffer[i], &buffer[0x35], 8 * sizeof(Color));
 	}
 
-	pal.col[1] = Color(0, 0, 0, 128); // shadows are always half trans black
+	buffer[1] = Color(0, 0, 0, 255); // shadows, will be half-trans'ed when required
+
+	pal.CopyColors(0, buffer.cbegin(), buffer.cend());
 	return pal;
 }
 

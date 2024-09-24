@@ -47,11 +47,11 @@ public:
 	 * Returns image palette.
 	 *
 	 * @param[in] colors Number of colors to return.
-	 * @param[out] pal Array to fill with colors.
+	 * @param[out] pal Palette to fill with colors.
 	 *
 	 * This does nothing if there is no palette.
 	 */
-	virtual int GetPalette(int colors, Color* pal);
+	virtual int GetPalette(int colors, Palette& pal);
 	
 	Size GetSize() const { return size; }
 
