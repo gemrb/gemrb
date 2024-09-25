@@ -2581,8 +2581,10 @@ int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 		int type, level;
 
 		//writing out spell page headers
-		for (type=IE_IWD2_SPELL_BARD;type<IE_IWD2_SPELL_DOMAIN;type++) for(level=0;level<9;level++) {
-			PutIWD2Spellpage(stream, actor, (ieIWD2SpellType) type, level);
+		for (type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
+			for (level = 0; level < 9; level++) {
+				PutIWD2Spellpage(stream, actor, (ieIWD2SpellType) type, level);
+			}
 		}
 
 		//writing out domain page headers
