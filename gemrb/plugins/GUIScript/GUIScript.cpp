@@ -4933,6 +4933,7 @@ PyDoc_STRVAR( GemRB_GameSetPartyGold__doc,
 \n\
 **Parameters:**\n\
   * Gold - the target party gold amount\n\
+  * feedback - optional, off by default\n\
 \n\
 **Return value:** N/A\n\
 \n\
