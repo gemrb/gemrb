@@ -171,7 +171,7 @@ def SetSpell(pc, SpellName, Feat):
 	return
 
 def MakeSpellCount (pc, spell, count):
-	have = GemRB.CountSpells (pc, spell, -1)
+	have = GemRB.CountSpells (pc, spell, -1, 1)
 	if count <= have:
 		return
 	# only used for innates, which are all level 1
