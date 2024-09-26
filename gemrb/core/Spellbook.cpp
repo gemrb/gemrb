@@ -520,6 +520,14 @@ int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned 
 		}
 		spl->Level = static_cast<ieWord>(level);
 		spl->Type = gm->FindSpellType(spell->Name, spl->Level, clsmsk, kit);
+		// only add memo and bail out if spell is already known
+		// make sure the level and type match, so domain spells are handled properly
+		// we should probably be idempotent like that in other games as well
+		if (KnowSpell(spl->SpellResRef, spl->Type, level)) {
+			int ret = MemorizeSpell(spl, memo);
+			delete spl;
+			return ret ? spell->SpellLevel : 0;
+		} // else learn normally
 	} else {
 		//not IWD2
 		if (spell->SpellType<6) {
