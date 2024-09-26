@@ -296,17 +296,29 @@ bool Spellbook::KnowSpell(int spellid, int type) const
 }
 
 //if resref=="" then it is a knownanyspell
-bool Spellbook::KnowSpell(const ResRef& resref) const
+bool Spellbook::KnowSpell(const ResRef& resref, int type, int level) const
 {
-	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
+	auto SubKnowSpell = [&](int i) {
 		for (const auto& spellMemo : spells[i]) {
 			for (const auto& knownSpell : spellMemo->known_spells) {
+				if (level != -1 && knownSpell->Level != level) {
+					continue;
+				}
 				if (knownSpell->SpellResRef != resref) {
 					continue;
 				}
 				return true;
 			}
 		}
+		return false;
+	};
+
+	if (type == -1) {
+		for (int i = 0; i < NUM_BOOK_TYPES; i++) {
+			if (SubKnowSpell(i)) return true;
+		}
+	} else {
+		if (SubKnowSpell(type)) return true;
 	}
 	return false;
 }
