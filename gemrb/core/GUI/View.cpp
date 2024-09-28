@@ -72,6 +72,10 @@ void View::SetCursor(Holder<Sprite2D> c)
 	cursor = std::move(c);
 }
 
+View* View::GetEventProxy() const {
+	return eventProxy;
+}
+
 void View::SetEventProxy(View* proxy)
 {
 	while (proxy && proxy->eventProxy) {

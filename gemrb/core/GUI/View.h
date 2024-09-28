@@ -259,6 +259,7 @@ public:
 	/* override the standard cursors. default does not override (returns NULL). */
 	virtual Holder<Sprite2D> Cursor() const { return cursor; }
 	void SetCursor(Holder<Sprite2D> c);
+	View* GetEventProxy() const;
 	void SetEventProxy(View* proxy);
 
 	// GUIScripting
