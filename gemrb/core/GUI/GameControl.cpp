@@ -738,6 +738,9 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				SelectActor(i, false);
 			}
 			break;
+		case ' ': //soft pause
+			core->TogglePause();
+			break;
 		case '=':
 			SelectActor(-1);
 			break;
@@ -1116,9 +1119,6 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 
 	switch (Key.keycode) {
 //FIXME: move these to guiscript
-		case ' ': //soft pause
-			core->TogglePause();
-			break;
 		case GEM_TAB: // remove overhead partymember hp/maxhp
 			for (int pm = 0; pm < game->GetPartySize(false); pm++) {
 				Actor *pc = game->GetPC(pm, true);

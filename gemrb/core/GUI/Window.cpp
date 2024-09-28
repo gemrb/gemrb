@@ -641,7 +641,17 @@ bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 		return true;
 	}
 
-	return ScrollView::OnKeyPress(key, mod);
+	if (ScrollView::OnKeyPress(key, mod)) {
+		return true;
+	}
+
+	// This way, we can assign GameControl as EP and handle some left-over keys,
+	// e.g. Pause from the Container window.
+	if (GetEventProxy()) {
+		return View::KeyPress(key, mod);
+	}
+
+	return false;
 }
 
 bool Window::OnControllerButtonDown(const ControllerEvent& ce)

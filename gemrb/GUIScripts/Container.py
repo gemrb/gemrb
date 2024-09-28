@@ -143,6 +143,8 @@ def OpenContainerWindow ():
 			ActWin.SetVisible (False)
 
 	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	ContainerWindow.SetEventProxy(GUICommon.GameControl)
+
 	# fix wrong height in the guiw10.chu and reposition
 	# that chu is also used as a base for some arbitrary resolutions
 	if GameCheck.IsBG2 () and GemRB.GetSystemVariable (SV_HEIGHT) >= 768:
