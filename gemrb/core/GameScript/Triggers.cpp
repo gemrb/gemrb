@@ -2150,7 +2150,6 @@ int GameScript::CheckSkillGT(Scriptable *Sender, const Trigger *parameters)
 	int sk = actor->GetSkill(parameters->int1Parameter, true);
 	if (sk<0) return 0;
 	if (sk > parameters->int0Parameter) {
-		Sender->SetLastTrigger(trigger_checkstat, actor->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -2206,6 +2205,7 @@ int GameScript::CheckStatLT(Scriptable *Sender, const Trigger *parameters)
 	}
 
 	if ((signed) actor->GetStat(stat) < parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_checkstat, actor->GetGlobalID());
 		return 1;
 	}
 	return 0;
