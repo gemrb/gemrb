@@ -2127,7 +2127,12 @@ int GameScript::CheckStat(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if ((signed) actor->GetStat(parameters->int1Parameter) == parameters->int0Parameter) {
+	int stat = parameters->int1Parameter;
+	if (parameters->flags & TF_PRECOMPILED) {
+		stat = OverrideStatsIDS(stat);
+	}
+
+	if ((signed) actor->GetStat(stat) == parameters->int0Parameter) {
 		Sender->SetLastTrigger(trigger_checkstat, actor->GetGlobalID());
 		return 1;
 	}
@@ -2159,7 +2164,12 @@ int GameScript::CheckStatGT(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if ((signed) actor->GetStat(parameters->int1Parameter) > parameters->int0Parameter) {
+	int stat = parameters->int1Parameter;
+	if (parameters->flags & TF_PRECOMPILED) {
+		stat = OverrideStatsIDS(stat);
+	}
+
+	if ((signed) actor->GetStat(stat) > parameters->int0Parameter) {
 		Sender->SetLastTrigger(trigger_checkstat, actor->GetGlobalID());
 		return 1;
 	}
@@ -2190,7 +2200,12 @@ int GameScript::CheckStatLT(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if ((signed) actor->GetStat(parameters->int1Parameter) < parameters->int0Parameter) {
+	int stat = parameters->int1Parameter;
+	if (parameters->flags & TF_PRECOMPILED) {
+		stat = OverrideStatsIDS(stat);
+	}
+
+	if ((signed) actor->GetStat(stat) < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;

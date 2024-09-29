@@ -2692,4 +2692,19 @@ void MoveGlobalObjectCore(Scriptable* Sender, const Action* parameters, int flag
 	}
 }
 
+// account for iwd2 stats.ids differences
+int OverrideStatsIDS(int stat)
+{
+	if (!core->HasFeature(GFFlags::RULES_3ED)) return stat;
+
+	// ideally we'd look it up again by symbol name, but we don't expect changes to these numbers
+	std::map<int, int> badStats { { 12, 25 }, { 25, 115 }, { 89, 152 }, { 90, 135 }, { 91, 177 }, { 92, 180 }, { 93, 222 }, { 94, 123 }, { 95, 216 }, { 96, 240 }, { 97, 241 }, { 98, 242 }, { 99, 243 }, { 100, 34 }, { 101, 244 }, { 102, 245 }, { 103, 246 }, { 104, 69 }, { 105, 247 }, { 106, 68 } };
+	auto it = badStats.find(stat);
+	if (it == badStats.end()) {
+		return stat;
+	} else {
+		return it->second;
+	}
+}
+
 }

@@ -396,6 +396,9 @@ void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 	}
 
 	ieDword value = parameters->int1Parameter;
+	if (parameters->flags & ACF_PRECOMPILED) {
+		value = OverrideStatsIDS(value);
+	}
 	if (parameters->int2Parameter==1) { // basically statmod.ids entries, but there's only two
 		value+=actor->GetBase(parameters->int0Parameter);
 	}
