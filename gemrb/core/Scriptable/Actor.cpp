@@ -5334,7 +5334,8 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		killerPC = act->InParty > 0;
 	}
 
-	bool isKeg = third && GetStat(IE_RACE) == 190; // skip kegs
+	stat_t race = GetStat(IE_RACE);
+	bool isKeg = third && (race == 190 || (race == 0 && GetStat(IE_GENERAL) == 0));
 	if (InParty) {
 		if (area) SendTriggerToAll(TriggerEntry(trigger_partymemberdied, GetGlobalID()), GA_NO_SELF | GA_NO_ENEMY);
 		game->PartyMemberDied(this);
