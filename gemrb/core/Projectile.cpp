@@ -1512,7 +1512,7 @@ void Projectile::SpawnChild(size_t idx, bool firstExplosion, const Point& offset
 		max = Extension->ConeWidth;
 		add = (Orientation * 45 - max) / 2;
 	}
-	max = RAND(1, max) + add;
+	max = RAND(1, max ? max : 90) + add;
 	float_t degree = max * M_PI / 180;
 	newdest.x = (int) -(rad * std::sin(degree));
 	newdest.y = (int) (rad * std::cos(degree));
