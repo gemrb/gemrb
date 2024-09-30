@@ -179,11 +179,11 @@ void SDLSurfaceSprite2D::ShadePalette(BlitFlags renderflags, const Color* tint) 
 	for (size_t i = 1; i < 256; ++i) {
 		buffer[i] = format.palette->GetColorAt(i);
 
-		if (renderflags&BlitFlags::COLOR_MOD) {
+		if (renderflags & BlitFlags::COLOR_MOD && tint) {
 			ShaderTint(*tint, buffer[i]);
 		}
 
-		if (renderflags & BlitFlags::ALPHA_MOD) {
+		if (renderflags & BlitFlags::ALPHA_MOD && tint) {
 			buffer[i].a = tint->a;
 		}
 
