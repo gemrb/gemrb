@@ -267,6 +267,30 @@ bool Inventory::IsSlotEmpty(unsigned int slot) const
 	return !HasItemInSlot("", slot);
 }
 
+/** Assume Colors.get() retrieves the color from colors.2da
+Assume GUIEnhancement is a bitmask with enhancements (32nd bit for this feature)
+Assume container.Inventory.isEmpty() checks if the container is empty */
+void UpdateContainerColor(Container& container, uint32_t GUIDefines) {
+    Color containerColor;
+
+    /** Check if the GUIEnhancement bit 32 is enabled */
+    if (GUIEnhancement & (1 << 32)) { /** Bit 32 is active */
+        if (container.Inventory.isEmpty()) {
+            /** Set color to gray if the container is empty */
+            containerColor = Colors.get("LIGHT_GREY"); 
+        } else {
+            /** Set color to default (cyan or any other color for non-empty containers) */
+            containerColor = Colors.get("ALTCONTAINER"); 
+        }
+    } else {
+        /** If GUIEnhancement bit 32 is not set, retain the original color*/
+        containerColor = Colors.get("ALTCONTAINER");
+    }
+
+    /** Apply the color to the container's UI rendering */
+    container.SetColor(containerColor);
+}
+
 bool Inventory::HasItemType(ieDword type) const
 {
 	if (type>255) return false;

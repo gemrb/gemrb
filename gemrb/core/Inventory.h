@@ -220,6 +220,8 @@ public:
 	/** looks for a particular item in a slot */
 	bool HasItemInSlot(const ResRef& resref, unsigned int slot) const;
 	bool IsSlotEmpty(unsigned int slot) const;
+	/** highlights empty slots in gray instead of cyan */
+	void UpdateContainerColor(Container& container, uint32_t GUIDefines);
 	/** returns true if contains one itemtype equipped */
 	bool HasItemType(ieDword type) const;
 	/** Looks for a particular item in the inventory.
