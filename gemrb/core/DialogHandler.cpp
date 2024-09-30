@@ -271,7 +271,22 @@ void DialogHandler::DialogChooseInitial(Scriptable* target, Actor* tgta) const
 	// executing actions directly does not work, because dialog
 	// needs to end before final actions are executed due to
 	// actions making new dialogs!
-	if (!(target->GetInternalFlag() & IF_NOINT)) {
+	// should we just queue dialog actions in front instead?
+	// for now clear only if the state potentially has actions at all
+	// ar6100 61izbela.bcs needs it to reenable the area exit
+	bool payload = true;
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		auto ds = dlg->GetState(initialState);
+		if (!ds) return;
+		payload = false;
+		for (const auto& transition : ds->transitions) {
+			if (!transition->actions.empty()) {
+				payload = true;
+				break;
+			}
+		}
+	}
+	if (payload && !(target->GetInternalFlag() & IF_NOINT)) {
 		target->Stop();
 	}
 }
