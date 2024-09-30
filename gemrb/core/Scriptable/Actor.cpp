@@ -5334,12 +5334,13 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		killerPC = act->InParty > 0;
 	}
 
+	bool isKeg = third && GetStat(IE_RACE) == 190; // skip kegs
 	if (InParty) {
 		if (area) SendTriggerToAll(TriggerEntry(trigger_partymemberdied, GetGlobalID()), GA_NO_SELF | GA_NO_ENEMY);
 		game->PartyMemberDied(this);
 		core->Autopause(AUTOPAUSE::DEAD, this);
 	} else if (grantXP && act) { // sometimes we want to skip xp giving and favourite registration
-		if (act->InParty) {
+		if (killerPC && !isKeg) {
 			// adjust kill statistics here
 			auto& stat = act->PCStats;
 			stat_t xp = Modified[IE_XPVALUE];
@@ -5351,9 +5352,9 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		}
 
 		// friendly party summons' kills also grant xp
-		if (act->Modified[IE_SEX] == SEX_SUMMON && act->Modified[IE_EA] == EA_CONTROLLED) {
+		if (act->Modified[IE_SEX] == SEX_SUMMON && act->Modified[IE_EA] == EA_CONTROLLED && !isKeg) {
 			InternalFlags |= IF_GIVEXP;
-		} else if (act->Modified[IE_EA] == EA_FAMILIAR) {
+		} else if (act->Modified[IE_EA] == EA_FAMILIAR && !isKeg) {
 			// familiar's kills also grant xp
 			InternalFlags |= IF_GIVEXP;
 		}
