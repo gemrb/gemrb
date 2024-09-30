@@ -1845,10 +1845,12 @@ bool Highlightable::TryBashLock(Actor* actor, ieWord lockDifficulty, HCStrings f
 	// Get the strength bonus against lock difficulty
 	int bonus;
 	unsigned int roll;
+	ieWord adjLockDiff = lockDifficulty;
 
 	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		bonus = actor->GetAbilityBonus(IE_STR);
-		roll = actor->LuckyRoll(1, 100, bonus, 0);
+		roll = RAND(1, 20) + bonus;
+		adjLockDiff = lockDifficulty / 6 + 9;
 	} else {
 		int str = actor->GetStat(IE_STR);
 		int strEx = actor->GetStat(IE_STREXTRA);
@@ -1860,10 +1862,10 @@ bool Highlightable::TryBashLock(Actor* actor, ieWord lockDifficulty, HCStrings f
 	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		// ~Bash door check. Roll %d + %d Str mod > %d door DC.~
 		// there is no separate string for non-doors
-		displaymsg->DisplayRollStringName(ieStrRef::ROLL1, GUIColors::LIGHTGREY, actor, roll, bonus, lockDifficulty);
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL1, GUIColors::LIGHTGREY, actor, roll, bonus, adjLockDiff);
 	}
 
-	if (roll < lockDifficulty || lockDifficulty == 100) {
+	if (roll < adjLockDiff || lockDifficulty == 100) {
 		displaymsg->DisplayMsgAtLocation(failStr, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		return false;
 	}
