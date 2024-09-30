@@ -1896,7 +1896,6 @@ bool Highlightable::TryPickLock(Actor* actor, ieWord lockDifficulty, ieStrRef cu
 		} else {
 			stat *= 7; // convert to percent (magic 7 is from RE)
 			int dexmod = actor->GetAbilityBonus(IE_DEX);
-			stat += dexmod; // the original didn't use it, so let's not multiply it
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL11, GUIColors::LIGHTGREY, actor, stat - dexmod, lockDifficulty, dexmod);
 		}
 	}
@@ -1935,8 +1934,8 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 	if (third) {
 		//~Search (detect traps) check. Search skill %d vs. trap's difficulty %d (searcher's %d INT bonus).~
 		int bonus = detective->GetAbilityBonus(IE_INT);
-		displaymsg->DisplayRollStringName(ieStrRef::ROLL13, GUIColors::LIGHTGREY, detective, skill - bonus, TrapDetectionDiff, bonus);
-		check = (skill + bonus) * 7;
+		displaymsg->DisplayRollStringName(ieStrRef::ROLL13, GUIColors::LIGHTGREY, detective, skill - bonus, TrapDetectionDiff / 5, bonus);
+		check = skill * 7;
 	} else {
 		check = skill/2 + core->Roll(1, skill/2, 0);
 	}
