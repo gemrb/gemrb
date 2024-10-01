@@ -98,21 +98,17 @@ class Sprite2D;
 #define IF_RUNNING    128   //actor is running
 //these bits could be set by a WalkTo
 #define IF_RUNFLAGS   (IF_RUNNING|IF_NORETICLE|IF_NOINT)
-//#define IF_BECAMEVISIBLE 0x100//actor just became visible (trigger event)
 #define IF_INITIALIZED   0x200
 #define IF_USEDSAVE      0x400  //actor needed saving throws
 #define IF_GOTAREA    0x800     //actor already moved to an area
 #define IF_USEEXIT       0x1000 //
 #define IF_INTRAP        0x2000 //actor is currently in a trap (intrap trigger event)
-//#define IF_WASINDIALOG   0x4000 //actor just left dialog
 #define IF_PST_WMAPPING  0x8000 // trying to use the worldmap for travel
 
 //scriptable flags
 #define IF_ACTIVE        0x10000
 #define IF_VISIBLE       0x40000
-//#define IF_ONCREATION    0x80000
 #define IF_IDLE          0x100000
-//#define IF_PARTYRESTED   0x200000 //party rested trigger event
 #define IF_FORCEUPDATE   0x400000
 #define IF_TRIGGER_AP    0x800000
 #define IF_DUMPED        0x1000000

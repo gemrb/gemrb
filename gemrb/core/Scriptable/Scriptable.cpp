@@ -593,7 +593,6 @@ void Scriptable::Activate()
 
 void Scriptable::PartyRested()
 {
-	//InternalFlags |=IF_PARTYRESTED;
 	AddTrigger(TriggerEntry(trigger_partyrested));
 }
 
