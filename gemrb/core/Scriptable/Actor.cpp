@@ -5258,6 +5258,42 @@ static void IncrementOrCreateVariable(ieVarsMap& vars, const ieVariable& key, ie
 	}
 }
 
+bool Actor::ProcessKillXP(const Actor* killerActor, bool grantXP)
+{
+	if (InParty || !grantXP || !killerActor) return false;
+
+	stat_t race = GetStat(IE_RACE);
+	// exclude iwd2 kegs, war drums and the like
+	bool isKeg = third && (race == 190 || (race == 0 && GetStat(IE_GENERAL) == 0));
+	if (isKeg) return false;
+
+	grantXP = false;
+	// pc kills grant xp
+	if (killerActor->InParty > 0) {
+		// adjust kill statistics here
+		stat_t xp = Modified[IE_XPVALUE];
+		if (third) xp = core->GetGame()->GetXPFromCR(xp);
+		auto& stat = killerActor->PCStats;
+		if (stat) {
+			stat->NotifyKill(xp, ShortStrRef);
+		}
+		grantXP = true;
+	}
+
+	// friendly party summons' kills also grant xp
+	if (killerActor->Modified[IE_SEX] == SEX_SUMMON && killerActor->Modified[IE_EA] == EA_CONTROLLED) {
+		grantXP = true;
+	} else if (killerActor->Modified[IE_EA] == EA_FAMILIAR) {
+		// familiar's kills also grant xp
+		grantXP = true;
+	}
+	if (!grantXP) return false;
+
+	// finally give experience to party, taking CR into account if needed
+	core->GetGame()->ShareXP(Modified[IE_XPVALUE], sharexp);
+	return true;
+}
+
 void Actor::Die(Scriptable *killer, bool grantXP)
 {
 	if (InternalFlags&IF_REALLYDIED) {
@@ -5334,53 +5370,27 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 		killerPC = act->InParty > 0;
 	}
 
-	stat_t race = GetStat(IE_RACE);
-	bool isKeg = third && (race == 190 || (race == 0 && GetStat(IE_GENERAL) == 0));
 	if (InParty) {
 		if (area) SendTriggerToAll(TriggerEntry(trigger_partymemberdied, GetGlobalID()), GA_NO_SELF | GA_NO_ENEMY);
 		game->PartyMemberDied(this);
 		core->Autopause(AUTOPAUSE::DEAD, this);
-	} else if (grantXP && act) { // sometimes we want to skip xp giving and favourite registration
-		if (killerPC && !isKeg) {
-			// adjust kill statistics here
-			auto& stat = act->PCStats;
-			stat_t xp = Modified[IE_XPVALUE];
-			if (third) xp = game->GetXPFromCR(xp);
-			if (stat) {
-				stat->NotifyKill(xp, ShortStrRef);
-			}
-			InternalFlags |= IF_GIVEXP;
-		}
-
-		// friendly party summons' kills also grant xp
-		if (act->Modified[IE_SEX] == SEX_SUMMON && act->Modified[IE_EA] == EA_CONTROLLED && !isKeg) {
-			InternalFlags |= IF_GIVEXP;
-		} else if (act->Modified[IE_EA] == EA_FAMILIAR && !isKeg) {
-			// familiar's kills also grant xp
-			InternalFlags |= IF_GIVEXP;
-		}
 	}
 
-	// XP seems to be handed at out at the moment of death
-	if (InternalFlags&IF_GIVEXP) {
-		//give experience to party
-		game->ShareXP(Modified[IE_XPVALUE], sharexp );
-
-		if (!InParty && act && act->GetStat(IE_EA) <= EA_CONTROLLABLE && !core->InCutSceneMode()) {
-			// adjust reputation if the corpse was:
-			// an innocent, a member of the Flaming Fist or something evil
-			int repmod = 0;
-			if (Modified[IE_CLASS] == CLASS_INNOCENT) {
-				repmod = gamedata->GetReputationMod(0);
-			} else if (Modified[IE_CLASS] == CLASS_FLAMINGFIST) {
-				repmod = gamedata->GetReputationMod(3);
-			}
-			if (GameScript::ID_Alignment(this,AL_EVIL) ) {
-				repmod += gamedata->GetReputationMod(7);
-			}
-			if (repmod) {
-				game->SetReputation(game->Reputation + repmod);
-			}
+	bool gaveXP = ProcessKillXP(act, grantXP);
+	if (gaveXP && act->GetStat(IE_EA) <= EA_CONTROLLABLE && !core->InCutSceneMode()) {
+		// adjust reputation if the corpse was:
+		// an innocent, a member of the Flaming Fist or something evil
+		int repmod = 0;
+		if (Modified[IE_CLASS] == CLASS_INNOCENT) {
+			repmod = gamedata->GetReputationMod(0);
+		} else if (Modified[IE_CLASS] == CLASS_FLAMINGFIST) {
+			repmod = gamedata->GetReputationMod(3);
+		}
+		if (GameScript::ID_Alignment(this, AL_EVIL)) {
+			repmod += gamedata->GetReputationMod(7);
+		}
+		if (repmod) {
+			game->SetReputation(game->Reputation + repmod);
 		}
 	}
 

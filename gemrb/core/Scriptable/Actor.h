@@ -604,6 +604,8 @@ private:
 	int CalculateSpeedFromRate(bool feedback) const;
 	int CalculateSpeedFromINI(bool feedback) const;
 	void IncrementDeathVariable(Game::kaputz_t& vars, const char *format, StringView name) const;
+	/* give kill xp if appropriate */
+	bool ProcessKillXP(const Actor* killerActor, bool grantXP);
 
 	stats_t ResetStats(bool init);
 	void RefreshEffects(bool init, const stats_t& prev);

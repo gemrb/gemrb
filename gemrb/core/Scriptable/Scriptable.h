@@ -88,7 +88,6 @@ class Sprite2D;
 #define INFO_DOOR	 2048 //info trigger blocked by door
 
 //internal actor flags
-#define IF_GIVEXP     1     //give xp for this death
 #define IF_JUSTDIED   2     //Died() will return true
 #define IF_FROMGAME   4     //this is an NPC or PC
 #define IF_REALLYDIED 8     //real death happened, actor will be set to dead
