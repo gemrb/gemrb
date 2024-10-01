@@ -3022,7 +3022,11 @@ int fx_damage_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_damage_bonus_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	STAT_MOD( IE_DAMAGEBONUS );
+	if (core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) {
+		return fx_damage_bonus_modifier2(nullptr, target, fx);
+	} else {
+		STAT_MOD(IE_DAMAGEBONUS);
+	}
 	//the basestat is not saved, so no FX_PERMANENT
 	return FX_APPLIED;
 }
