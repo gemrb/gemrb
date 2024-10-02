@@ -4046,12 +4046,14 @@ bool Actor::CheckSpellDisruption(int damage) const
 		return true;
 	}
 
-	int roll = core->Roll(1, 20, 0);
+	int roll = LuckyRoll(1, 20, 0);
 	int concentration = GetSkill(IE_CONCENTRATION);
 	int bonus = 0;
-	// combat casting bonus only applies when injured
-	if (HasFeat(Feat::CombatCasting) && Modified[IE_MAXHITPOINTS] != Modified[IE_HITPOINTS]) {
+	if (HasFeat(Feat::CombatCasting)) {
 		bonus += 4;
+	}
+	if (GetStat(IE_MC_FLAGS) & MC_NO_DISRUPTION) {
+		concentration += 10;
 	}
 	// ~Spell Disruption check (d20 + Concentration + Combat Casting bonus) %d + %d + %d vs. (10 + damageTaken + spellLevel)  = 10 + %d + %d.~
 	if (GameScript::ID_ClassMask(this, 0x6ee)) { // 0x6ee == CLASSMASK_GROUP_CASTERS
