@@ -10029,7 +10029,13 @@ operator is >=.\n\
   * partyslot - the characters position in the party\n\
   * a_stat ... d_stat - stat IDs\n\
   * a_value ... d_value - stat value limits\n\
-  * a_op ... d_op - operator to use for comparing x_stat to x_value\n\
+  * a_op ... d_op - operator to use for comparing x_stat to x_value:\n\
+    * 0: less or equals\n\
+    * 1: equals\n\
+    * 2: less than\n\
+    * 3: greater than\n\
+    * 4: greater or equals\n\
+    * 5: not equals\n\
 \n\
 **Return value:** bool\n\
 \n\
