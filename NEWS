@@ -1,14 +1,14 @@
-GemRB git (7443f6):
+GemRB git (6edaef):
   New features:
     - 
-    - iwd2 is now fully completable?
+    - iwd2 is now fully completable!
     - iwd2 turn undead
     - option to more easily use GemRB as a library
     - option to highlight learnable scrolls
 
   Improved features:
     - 
-    - text encoding, drawing speed
+    - text encoding, drawing speed, drawing
     - feats, animations
     - scripting, projectiles, effects, movement speed
     - bugfixes
