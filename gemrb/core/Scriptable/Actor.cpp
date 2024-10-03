@@ -4125,6 +4125,11 @@ static void ChunkActor(Actor* actor)
 		copy->SetBase(IE_DONOTJUMP, DNJ_UNHINDERED);
 		copy->MoveTo(actor->Pos + OrientedOffset(RandomOrientation(), RAND(5, 40)));
 		copy->SetBase(IE_DONOTJUMP, 0); // revert, so we get occlusion
+
+		for (uint8_t i = 0; i < MAX_SCRIPTS; ++i) {
+			copy->SetScript(ResRef{}, i, false);
+		}
+
 		// make it expire
 		copy->SetInternalFlag(IF_REALLYDIED, BitOp::OR);
 		Effect* fx = EffectQueue::CreateEffect(fx_remove_creature_ref, 0, 0, FX_DURATION_DELAY_PERMANENT);
