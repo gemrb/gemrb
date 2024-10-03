@@ -83,8 +83,8 @@ public:
 	Region& OpenBBox = BBox; // an alias for the base class BBox
 	Region ClosedBBox;
 	//impeded blocks
-	std::vector<Point> open_ib; //impeded blocks stored in a Point array
-	std::vector<Point> closed_ib;
+	std::vector<SearchmapPoint> open_ib; // impeded blocks stored in a Point array
+	std::vector<SearchmapPoint> closed_ib;
 
 	Point toOpen[2];
 	ResRef OpenSound;
@@ -99,7 +99,7 @@ public:
 	ieWord hp = 0;
 	ieWord ac = 0;
 private:
-	void ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const;
+	void ImpedeBlocks(const std::vector<SearchmapPoint>& points, PathMapFlags value) const;
 	bool BlockedOpen(int Open, int ForceOpen) const;
 public:
 	void UpdateDoor();

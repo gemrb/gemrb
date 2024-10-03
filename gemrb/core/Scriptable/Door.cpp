@@ -65,9 +65,9 @@ Door::Door(Holder<TileOverlay> Overlay, DoorTrigger&& trigger)
 {
 }
 
-void Door::ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const
+void Door::ImpedeBlocks(const std::vector<SearchmapPoint>& points, PathMapFlags value) const
 {
-	for (const Point& point : points) {
+	for (const SearchmapPoint& point : points) {
 		PathMapFlags tmp = area->tileProps.QuerySearchMap(point) & PathMapFlags::NOTDOOR;
 		area->tileProps.PaintSearchMap(point, tmp|value);
 	}
@@ -208,14 +208,14 @@ std::shared_ptr<Gem_Polygon> Door::ClosedTriggerArea() const
 //also mark actors to fix position
 bool Door::BlockedOpen(int Open, int ForceOpen) const
 {
-	const std::vector<Point> *points = Open ? &open_ib : &closed_ib;
+	const std::vector<SearchmapPoint>* points = Open ? &open_ib : &closed_ib;
 	bool blocked = false;
 
 	//getting all impeded actors flagged for jump
 	Region rgn;
 	rgn.w = 16;
 	rgn.h = 12;
-	for(const Point& p : *points) {
+	for (const SearchmapPoint& p : *points) {
 		rgn.origin = Map::ConvertCoordFromTile(p);
 		PathMapFlags tmp = area->tileProps.QuerySearchMap(p) & PathMapFlags::ACTOR;
 		if (tmp != PathMapFlags::IMPASSABLE) {

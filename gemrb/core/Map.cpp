@@ -85,7 +85,7 @@ const Size& TileProps::GetSize() const noexcept
 	return size;
 }
 
-void TileProps::SetTileProp(const Point& p, Property prop, uint8_t val) noexcept
+void TileProps::SetTileProp(const SearchmapPoint& p, Property prop, uint8_t val) noexcept
 {
 	if (size.PointInside(p)) {
 		uint32_t& c = propPtr[p.y * size.w + p.x];
@@ -110,7 +110,7 @@ void TileProps::SetTileProp(const Point& p, Property prop, uint8_t val) noexcept
 	}
 }
 
-uint8_t TileProps::QueryTileProp(const Point& p, Property prop) const noexcept
+uint8_t TileProps::QueryTileProp(const SearchmapPoint& p, Property prop) const noexcept
 {
 	if (size.PointInside(p)) {
 		const uint32_t c = propPtr[p.y * size.w + p.x];
@@ -138,17 +138,17 @@ uint8_t TileProps::QueryTileProp(const Point& p, Property prop) const noexcept
 	return -1;
 }
 
-PathMapFlags TileProps::QuerySearchMap(const Point& p) const noexcept
+PathMapFlags TileProps::QuerySearchMap(const SearchmapPoint& p) const noexcept
 {
 	return static_cast<PathMapFlags>(QueryTileProp(p, Property::SEARCH_MAP));
 }
 
-uint8_t TileProps::QueryMaterial(const Point& p) const noexcept
+uint8_t TileProps::QueryMaterial(const SearchmapPoint& p) const noexcept
 {
 	return QueryTileProp(p, Property::MATERIAL);
 }
 
-int TileProps::QueryElevation(const Point& p) const noexcept
+int TileProps::QueryElevation(const SearchmapPoint& p) const noexcept
 {
 	// Heightmaps are greyscale images where the top of the world is white and the bottom is black.
 	// this covers the range -7 – +7
@@ -159,13 +159,13 @@ int TileProps::QueryElevation(const Point& p) const noexcept
 	return val * output_range / input_range - 7;
 }
 
-Color TileProps::QueryLighting(const Point& p) const noexcept
+Color TileProps::QueryLighting(const SearchmapPoint& p) const noexcept
 {
 	uint8_t val = QueryTileProp(p, Property::LIGHTING);
 	return propImage->GetPalette()->GetColorAt(val);
 }
 
-void TileProps::PaintSearchMap(const Point& p, PathMapFlags value) const noexcept
+void TileProps::PaintSearchMap(const SearchmapPoint& p, PathMapFlags value) const noexcept
 {
 	if (!size.PointInside(p)) {
 		return;
@@ -176,7 +176,7 @@ void TileProps::PaintSearchMap(const Point& p, PathMapFlags value) const noexcep
 }
 
 // Valid values are - PathMapFlags::UNMARKED, PathMapFlags::PC, PathMapFlags::NPC
-void TileProps::PaintSearchMap(const Point& Pos, uint16_t blocksize, const PathMapFlags value) const noexcept
+void TileProps::PaintSearchMap(const SearchmapPoint& Pos, uint16_t blocksize, const PathMapFlags value) const noexcept
 {
 	// We block a circle of radius size-1 around (px,py)
 	// TODO: recheck that this matches originals
@@ -185,9 +185,8 @@ void TileProps::PaintSearchMap(const Point& Pos, uint16_t blocksize, const PathM
 	// Note: this is a larger circle than the one tested in GetBlocked.
 	// This means that an actor can get closer to a wall than to another
 	// actor. This matches the behaviour of the original BG2.
-	
-	auto PaintIfPassable = [this, value](const Point& pos)
-	{
+
+	auto PaintIfPassable = [this, value](const SearchmapPoint& pos) {
 		PathMapFlags mapval = QuerySearchMap(pos);
 		if (mapval != PathMapFlags::IMPASSABLE) {
 			PathMapFlags newVal = (mapval & PathMapFlags::NOTACTOR) | value;
@@ -202,13 +201,13 @@ void TileProps::PaintSearchMap(const Point& Pos, uint16_t blocksize, const PathM
 	const auto points = PlotCircle(Pos, r);
 	for (size_t i = 0; i < points.size(); i += 2)
 	{
-		const Point& p1 = points[i];
-		const Point& p2 = points[i + 1];
+		const SearchmapPoint& p1 = points[i];
+		const SearchmapPoint& p2 = points[i + 1];
 		assert(p1.y == p2.y);
 		assert(p2.x <= p1.x);
 		
 		for (int x = p2.x; x <= p1.x; ++x) {
-			PaintIfPassable(Point(x, p1.y));
+			PaintIfPassable(SearchmapPoint(x, p1.y));
 		}
 	}
 }
@@ -428,7 +427,7 @@ static inline bool MustSave(const Actor *actor)
 	return true;
 }
 
-Point Map::ConvertCoordToTile(const Point& p)
+SearchmapPoint Map::ConvertCoordToTile(const Point& p)
 {
 	return Point(p.x / 16, p.y / 12);
 }
@@ -1733,8 +1732,8 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		for(int y=0;y<h;y++) {
 			block.x = x * 16 - (vp.x % 16);
 			block.y = y * 12 - (vp.y % 12);
-			
-			Point p = Point(x, y) + ConvertCoordToTile(vp.origin);
+
+			SearchmapPoint p = SearchmapPoint(x, y) + ConvertCoordToTile(vp.origin);
 
 			Color col;
 			if (dFlags & DEBUG_SHOW_SEARCHMAP) {
@@ -2457,13 +2456,13 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 
 int Map::GetHeight(const Point &p) const
 {
-	Point tilePos = Map::ConvertCoordToTile(p);
+	SearchmapPoint tilePos = Map::ConvertCoordToTile(p);
 	return tileProps.QueryElevation(tilePos);
 }
 
 Color Map::GetLighting(const Point &p) const
 {
-	Point tilePos = Map::ConvertCoordToTile(p);
+	SearchmapPoint tilePos = Map::ConvertCoordToTile(p);
 	return tileProps.QueryLighting(tilePos);
 }
 
@@ -3081,7 +3080,7 @@ WMPDirection Map::WhichEdge(const Point &s) const
 	}
 	// FIXME: is this backwards?
 	const Size& mapSize = PropsSize();
-	Point tileP = ConvertCoordToTile(s);
+	SearchmapPoint tileP = ConvertCoordToTile(s);
 	tileP.x *= mapSize.h;
 	tileP.y *= mapSize.w;
 	if (tileP.x > tileP.y) { //north or east
@@ -3579,7 +3578,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 Container *Map::GetPile(Point position)
 {
 	//converting to search square
-	Point smPos = ConvertCoordToTile(position);
+	SearchmapPoint smPos = ConvertCoordToTile(position);
 	ieVariable pileName;
 	pileName.Format("heap_{}.{}", smPos.x, smPos.y);
 	// pixel position is centered on search square, we convert back and forth to round off

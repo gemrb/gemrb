@@ -339,17 +339,17 @@ public:
 	explicit TileProps(Holder<Sprite2D> props) noexcept;
 	
 	const Size& GetSize() const noexcept;
-	
-	void SetTileProp(const Point& p, Property prop, uint8_t val) noexcept;
-	uint8_t QueryTileProp(const Point& p, Property prop) const noexcept;
-	
-	PathMapFlags QuerySearchMap(const Point& p) const noexcept;
-	uint8_t QueryMaterial(const Point& p) const noexcept;
-	int QueryElevation(const Point& p) const noexcept;
-	Color QueryLighting(const Point& p) const noexcept;
-	
-	void PaintSearchMap(const Point&, PathMapFlags value) const noexcept;
-	void PaintSearchMap(const Point& Pos, uint16_t blocksize, PathMapFlags value) const noexcept;
+
+	void SetTileProp(const SearchmapPoint& p, Property prop, uint8_t val) noexcept;
+	uint8_t QueryTileProp(const SearchmapPoint& p, Property prop) const noexcept;
+
+	PathMapFlags QuerySearchMap(const SearchmapPoint& p) const noexcept;
+	uint8_t QueryMaterial(const SearchmapPoint& p) const noexcept;
+	int QueryElevation(const SearchmapPoint& p) const noexcept;
+	Color QueryLighting(const SearchmapPoint& p) const noexcept;
+
+	void PaintSearchMap(const SearchmapPoint&, PathMapFlags value) const noexcept;
+	void PaintSearchMap(const SearchmapPoint& Pos, uint16_t blocksize, PathMapFlags value) const noexcept;
 };
 
 class GEM_EXPORT Map : public Scriptable {
@@ -436,7 +436,7 @@ public:
 	Map(TileMap *tm, TileProps tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
 	static void NormalizeDeltas(float_t &dx, float_t &dy, float_t factor = 1);
-	static Point ConvertCoordToTile(const Point&);
+	static SearchmapPoint ConvertCoordToTile(const Point&);
 	static Point ConvertCoordFromTile(const Point&);
 
 	/** prints useful information on console */

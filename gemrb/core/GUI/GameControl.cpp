@@ -1422,7 +1422,7 @@ void GameControl::DebugPaint(const Point& p, bool sample) const noexcept
 {
 	if (DebugFlags & (DEBUG_SHOW_SEARCHMAP | DEBUG_SHOW_MATERIALMAP | DEBUG_SHOW_HEIGHTMAP | DEBUG_SHOW_LIGHTMAP)) {
 		Map* map = CurrentArea();
-		Point tile = Map::ConvertCoordToTile(p);
+		SearchmapPoint tile = Map::ConvertCoordToTile(p);
 		TileProps::Property prop = TileProps::Property::SEARCH_MAP;
 		if (DebugFlags & DEBUG_SHOW_MATERIALMAP) {
 			prop = TileProps::Property::MATERIAL;
