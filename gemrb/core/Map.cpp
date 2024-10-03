@@ -3582,16 +3582,15 @@ Container *Map::GetPile(Point position)
 	Point smPos = ConvertCoordToTile(position);
 	ieVariable pileName;
 	pileName.Format("heap_{}.{}", smPos.x, smPos.y);
-	//pixel position is centered on search square
-	Point upperLeft = position;
-	position.x += 8;
-	position.y += 6;
-	Container *container = TMap->GetContainer(position,IE_CONTAINER_PILE);
+	// pixel position is centered on search square, we convert back and forth to round off
+	Point upperLeft = ConvertCoordFromTile(smPos);
+	Point center = upperLeft + Point(8, 6);
+	Container* container = TMap->GetContainer(center, IE_CONTAINER_PILE);
 	if (!container) {
 		container = AddContainer(pileName, IE_CONTAINER_PILE, nullptr);
-		container->Pos=position;
+		container->Pos = center;
 		//bounding box covers the search square
-		container->BBox = Region::RegionFromPoints(upperLeft, Point(position.x + 8, position.y + 6));
+		container->BBox = Region::RegionFromPoints(upperLeft, Point(center.x + 8, center.y + 6));
 	}
 	return container;
 }
