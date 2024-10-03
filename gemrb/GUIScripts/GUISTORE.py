@@ -1807,11 +1807,11 @@ def GetRealPrice (pc, mode, Item, Slot):
 	if mode == "buy":
 		mod = Store['BuyMarkup']
 		if GemRB.HasFeat(pc, FEAT_MERCANTILE_BACKGROUND):
-			mod -= 5
+			mod += 5
 	else:
 		mod = Store['SellMarkup']
 		if GemRB.HasFeat(pc, FEAT_MERCANTILE_BACKGROUND):
-			mod += 5
+			mod -= 5
 
 	# depreciation works like this:
 	# - if you sell the item the first time, SellMarkup is used;
