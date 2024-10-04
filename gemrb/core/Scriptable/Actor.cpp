@@ -9361,11 +9361,6 @@ void Actor::ModifyWeaponDamage(const WeaponInfo& wi, Actor* target, int& damage,
 			//multiply the damage with the critical multiplier
 			damage *= wi.critmulti;
 
-			// check if critical hit needs a screenshake
-			if (CFGCache.critHitShake && (InParty || target->InParty)) {
-				core->timer.SetScreenShake(Point(10, -10), core->Time.defaultTicksPerSec);
-			}
-
 			//apply the dirty fighting spell
 			if (HasFeat(Feat::DirtyFighting)) {
 				core->ApplySpell(DirtyFightingRef, target, this, multiplier);
@@ -9580,6 +9575,11 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 		}
 		attackProjectile = pro;
 		attackProjectile->SFlags &= ~PSF_FLYING;
+		// check if critical hit needs a screenshake
+		bool pm = InParty || (target->Type == ST_ACTOR && Scriptable::As<Actor>(target)->InParty);
+		if (flags & UI_CRITICAL && CFGCache.critHitShake && pm) {
+			attackProjectile->Shake = 10;
+		}
 	} else { // launch it now as we are not attacking
 		SetOrientation(Pos, target->Pos, false);
 		GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
