@@ -515,6 +515,15 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, SFXChannel channe
 	// AL_SOURCE_RELATIVE = source pos & co to be interpreted as if listener was at (0, 0, 0)
 	alSourcei(Source, AL_SOURCE_RELATIVE, !(flags & GEM_SND_SPATIAL));
 	alSourcefv(Source, AL_POSITION, SourcePos);
+
+	if (flags & GEM_SND_SPATIAL) {
+		auto keepDistance = std::max(screenSize.w, screenSize.h);
+		auto offsetDistance = keepDistance * 4;
+		alSourcei(Source, AL_REFERENCE_DISTANCE, keepDistance);
+		alSourcei(Source, AL_MAX_DISTANCE, offsetDistance);
+		alSourcei(Source, AL_ROLLOFF_FACTOR, 25);
+	}
+
 	checkALError("Unable to set audio parameters", WARNING);
 
 #ifdef HAVE_OPENAL_EFX_H

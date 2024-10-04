@@ -1081,6 +1081,8 @@ void Interface::InitAudio()
 	if (!ret) {
 		Log(WARNING, "Core", "Failed to read channel table.");
 	}
+
+	AudioDriver->SetScreenSize(Size(config.Width, config.Height));
 }
 
 void Interface::LoadPlugins() const

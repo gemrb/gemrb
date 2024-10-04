@@ -88,6 +88,7 @@ public:
 };
 
 static const EnumArray<SFXChannel, float> channelHeights { 0.0F, 0.0F, 100.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F };
+
 class GEM_EXPORT Channel {
 public:
 	Channel() = default;
@@ -155,10 +156,12 @@ public:
 	int GetVolume(SFXChannel channel) const;
 	float GetReverb(SFXChannel channel) const;
 	float GetHeight(SFXChannel channel) const;
+	void SetScreenSize(Size size) { screenSize = size; }
 
 protected:
 	AmbientMgr* ambim = nullptr;
 	EnumArray<SFXChannel, Channel> channels;
+	Size screenSize;
 };
 
 }
