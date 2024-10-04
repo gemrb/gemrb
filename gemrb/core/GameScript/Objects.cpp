@@ -116,24 +116,44 @@ Targets *GameScript::Protagonist(const Scriptable *Sender, Targets *parameters, 
 	parameters->Clear();
 	//this sucks but IWD2 is like that...
 	static bool charnameisgabber = core->HasFeature(GFFlags::CHARNAMEISGABBER);
-	if (charnameisgabber) {
-		const GameControl* gc = core->GetGameControl();
-		if (gc) {
-			parameters->AddTarget(gc->dialoghandler->GetSpeaker(), 0, ga_flags);
-		}
-		if (parameters->Count()) {
-			return parameters;
-		}
-		//ok, this will return the nearest PC in the first slot
-		const Game *game = core->GetGame();
-		int i = game->GetPartySize(false);
-		while(i--) {
-			Actor *target = game->GetPC(i,false);
-			parameters->AddTarget(target, Distance(Sender, target), ga_flags);
-		}
+	if (!charnameisgabber) {
+		parameters->AddTarget(core->GetGame()->GetPC(0, false), 0, ga_flags);
 		return parameters;
 	}
-	parameters->AddTarget(core->GetGame()->GetPC(0, false), 0, ga_flags);
+
+	const GameControl* gc = core->GetGameControl();
+	if (gc) {
+		parameters->AddTarget(gc->dialoghandler->GetSpeaker(), 0, ga_flags);
+	}
+	if (parameters->Count()) {
+		return parameters;
+	}
+
+	if (core->HasFeature(GFFlags::RULES_3ED)) { // limit to iwd2 for now, unclear if iwd is the same
+		// grab the selected pc with the lowest party ID; if needed fully emulate PartySlotN
+		const Game* game = core->GetGame();
+		int minPID = 100;
+		Actor* target = nullptr;
+		for (auto& act : game->selected) {
+			if (act->InParty < minPID) {
+				minPID = act->InParty;
+				target = act;
+			}
+		}
+		if (target) {
+			parameters->AddTarget(target, Distance(Sender, target), ga_flags);
+		} else { // the original didn't handle this
+			parameters->AddTarget(core->GetGame()->GetPC(0, false), 0, ga_flags);
+		}
+	} else {
+		// ok, this will return the nearest PC in the first slot
+		const Game* game = core->GetGame();
+		int i = game->GetPartySize(false);
+		while (i--) {
+			Actor* target = game->GetPC(i, false);
+			parameters->AddTarget(target, Distance(Sender, target), ga_flags);
+		}
+	}
 	return parameters;
 }
 
