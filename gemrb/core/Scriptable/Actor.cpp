@@ -315,9 +315,6 @@ static const ResRef CripplingStrikeRef = "cripstr";
 static const ResRef DirtyFightingRef = "dirty";
 static const ResRef ArterialStrikeRef = "artstr";
 
-static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
-	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
-
 static int avBase, avStance;
 struct avType {
 	ResRef avresref;
@@ -4511,6 +4508,73 @@ void Actor::PlayWalkSound()
 	Timers.nextWalkSound = ieDword(thisTime + len);
 }
 
+// damage types in weapon headers:
+// 0 none
+// 1 DAMAGE_PIERCING
+// 2 DAMAGE_CRUSHING
+// 3 DAMAGE_SLASHING
+// 4 DAMAGE_MISSILE (DAMAGE_PIERCINGMISSILE in iwd2 - gets reduced also for piercing; plain missile seems to be missing)
+// 5 DAMAGE_STUNNING
+// these are new in iwd2:
+// 6 DAMAGE_PIERCING or DAMAGE_CRUSHING (pick more effectual type)
+// 7 DAMAGE_PIERCING or DAMAGE_SLASHING (pick more effectual type)
+// 8 DAMAGE_CRUSHING or DAMAGE_SLASHING (pick more effectual type)
+// 9 DAMAGE_CRUSHINGMISSILE (blunt missile, reduced by both types)
+int Actor::ConvertDamageType(int headerDmgType) const
+{
+	auto getResistance = [this](int dmgType) {
+		auto it = core->DamageInfoMap.find(dmgType);
+		if (it == core->DamageInfoMap.end()) {
+			return 0;
+		}
+		return static_cast<signed>(GetSafeStat(it->second.resist_stat));
+	};
+
+	int dmgType = DAMAGE_CRUSHING;
+	switch (headerDmgType) {
+		case 1:
+			dmgType = DAMAGE_PIERCING;
+			break;
+		case 3:
+			dmgType = DAMAGE_SLASHING;
+			break;
+		case 4:
+			if (third) {
+				dmgType = DAMAGE_PIERCINGMISSILE;
+			} else {
+				dmgType = DAMAGE_MISSILE;
+			}
+			break;
+		case 5:
+			dmgType = DAMAGE_STUNNING;
+			break;
+		case 6:
+			if (getResistance(DAMAGE_CRUSHING) > getResistance(DAMAGE_PIERCING)) {
+				dmgType = DAMAGE_PIERCING;
+			}
+			break;
+		case 7:
+			dmgType = DAMAGE_SLASHING;
+			if (getResistance(DAMAGE_SLASHING) > getResistance(DAMAGE_PIERCING)) {
+				dmgType = DAMAGE_PIERCING;
+			}
+			break;
+		case 8:
+			if (getResistance(DAMAGE_CRUSHING) > getResistance(DAMAGE_SLASHING)) {
+				dmgType = DAMAGE_SLASHING;
+			}
+			break;
+		case 9:
+			dmgType = DAMAGE_CRUSHINGMISSILE;
+			break;
+		case 2:
+		default:
+			break;
+	}
+
+	return dmgType;
+}
+
 // guesses from audio:               bone  chain studd leather splint none other plate
 static const char* const armor_types[8] = { "BN", "CH", "CL", "LR", "ML", "MM", "MS", "PT" };
 static const char* const dmg_types[5] = { "PC", "SL", "BL", "ML", "RK" };
@@ -6826,13 +6890,11 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 	}
 }
 
-int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) const
+int Actor::GetDefense(int headerDamageType, ieDword wflags, const Actor* attacker) const
 {
 	//specific damage type bonus.
 	int defense = 0;
-	if(DamageType > 5)
-		DamageType = 0;
-	switch (weapon_damagetype[DamageType]) {
+	switch (ConvertDamageType(headerDamageType)) {
 	case DAMAGE_CRUSHING:
 		defense += GetStat(IE_ACCRUSHINGMOD);
 		break;
@@ -6862,7 +6924,7 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 				//single-weapon style applies to all ac
 				stars = GetStars(IE_PROFICIENCYSINGLEWEAPON);
 				defense += gamedata->GetWeaponStyleBonus(3, stars, 0);
-			} else if (weapon_damagetype[DamageType] == DAMAGE_MISSILE) {
+			} else if (ConvertDamageType(headerDamageType) == DAMAGE_MISSILE) {
 				//sword-shield style applies only to missile ac
 				stars = GetStars(IE_PROFICIENCYSWORDANDSHIELD);
 				defense += gamedata->GetWeaponStyleBonus(2, stars, 6);
@@ -9448,7 +9510,7 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 	if (flags & UI_FAKE) {
 		delete pro;
 	} else if (header < 0 && !(flags & UI_MISS)) { // using a weapon
-		Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, weapon_damagetype[weaponTypeIdx] << 16, FX_DURATION_INSTANT_LIMITED);
+		Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, ConvertDamageType(weaponTypeIdx) << 16, FX_DURATION_INSTANT_LIMITED);
 		AttackEffect->Projectile = projectileAnim;
 		AttackEffect->Target = FX_TARGET_PRESET;
 		AttackEffect->Parameter3 = 1;

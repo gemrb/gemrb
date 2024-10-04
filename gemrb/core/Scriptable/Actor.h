@@ -568,6 +568,8 @@ private:
 	ieVariable GetActorNameByID(ieDword ID) const;
 	/* checks a weapon quick slot and resets it to fist if it is empty */
 	void CheckWeaponQuickSlot(unsigned int which) const;
+	/* converts to damage type from weapon type to one used by effects */
+	int ConvertDamageType(int headerDmgType) const;
 	/* helper for usability checks */
 	HCStrings CheckUsability(const Item* item) const;
 	/* Set up all the missing stats on load time, or after level up */
@@ -841,7 +843,7 @@ public:
 	int GetToHit(ieDword Flags, const Actor *target);
 	void GetTHAbilityBonus(ieDword Flags);
 	/* gets the defense against an attack */
-	int GetDefense(int DamageType, ieDword wflags, const Actor *attacker) const;
+	int GetDefense(int headerDamageType, ieDword wflags, const Actor* attacker) const;
 	/* returns the number of allocated proficiency points (stars) */
 	int GetStars(stat_t proficiency) const;
 	int GetStyleExtraAPR(ieDword& warriorLevel) const;

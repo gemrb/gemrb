@@ -23,7 +23,7 @@
 
 namespace GemRB {
 
-//damage types
+// damage types in effects
 #define DAMAGE_CRUSHING 0
 #define DAMAGE_ACID     1
 #define DAMAGE_COLD     2
@@ -45,6 +45,7 @@ namespace GemRB {
 
 #define DAMAGE_CHUNKING 0x8000
 #define DAMAGE_DISINTEGRATE 0x10000 // internal gemrb marker
+
 //damage levels
 #define DL_CRITICAL 0
 #define DL_BLOOD  1
