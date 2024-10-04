@@ -4347,9 +4347,13 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		damagelevel = 2;
 	}
 
-	if (damagetype & (DAMAGE_FIRE|DAMAGE_MAGICFIRE)) {
+	if (damagetype & DAMAGE_FIRE) {
 		PlayDamageAnimation(DL_FIRE + damagelevel);
-	} else if (damagetype & (DAMAGE_COLD|DAMAGE_MAGICCOLD)) {
+	} else if (!third && damagetype & DAMAGE_MAGICFIRE) {
+		PlayDamageAnimation(DL_FIRE + damagelevel);
+	} else if (damagetype & DAMAGE_COLD) {
+		PlayDamageAnimation(DL_COLD + damagelevel);
+	} else if (!third && damagetype & DAMAGE_MAGICCOLD) {
 		PlayDamageAnimation(DL_COLD + damagelevel);
 	} else if (damagetype & DAMAGE_ELECTRICITY) {
 		PlayDamageAnimation(DL_ELECTRICITY + damagelevel);
@@ -4594,16 +4598,30 @@ void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix
 		case DAMAGE_MISSILE: type = 4; break;  //missile
 		case DAMAGE_ELECTRICITY: type = 5; levels = false; break; //electricity
 		case DAMAGE_COLD:
-		case DAMAGE_MAGICCOLD:
 			type = 6;
 			levels = false;
+			break;
+		case DAMAGE_MAGICCOLD: // and DAMAGE_CRUSHINGMISSILE
+			if (third) {
+				type = 3;
+			} else {
+				type = 6;
+				levels = false;
+			}
 			break;
 		case DAMAGE_MAGIC: type = 7; levels = false; break;
 		case DAMAGE_STUNNING: type = -3; break;
 		case DAMAGE_FIRE: // the only odd one out
-		case DAMAGE_MAGICFIRE:
 			core->GetAudioDrv()->Play("FIRE", SFXChannel::Hits, Pos, GEM_SND_SPATIAL);
 			return;
+		case DAMAGE_MAGICFIRE: // and DAMAGE_PIERCINGMISSILE
+			if (third) {
+				type = 4;
+			} else {
+				core->GetAudioDrv()->Play("FIRE", SFXChannel::Hits, Pos, GEM_SND_SPATIAL);
+				return;
+			}
+			break;
 		default: return;                       //other
 	}
 
@@ -6907,6 +6925,10 @@ int Actor::GetDefense(int headerDamageType, ieDword wflags, const Actor* attacke
 	case DAMAGE_MISSILE:
 		defense += GetStat(IE_ACMISSILEMOD);
 		break;
+	case DAMAGE_PIERCINGMISSILE:
+	case DAMAGE_CRUSHINGMISSILE:
+		if (third) defense += GetStat(IE_ACMISSILEMOD);
+		break;
 	//What about stunning ?
 	default :
 		break;
@@ -7403,7 +7425,11 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 
 	// only check stone skins if damage type is physical
 	// DAMAGE_CRUSHING is 0, so we can't AND with it to check for its presence
-	if (!(damagetype & ~(DAMAGE_PIERCING | DAMAGE_SLASHING | DAMAGE_MISSILE))) {
+	int stoneskinTypes = DAMAGE_PIERCING | DAMAGE_SLASHING | DAMAGE_MISSILE;
+	if (third) {
+		stoneskinTypes |= DAMAGE_PIERCINGMISSILE | DAMAGE_CRUSHINGMISSILE;
+	}
+	if (!(damagetype & ~stoneskinTypes)) {
 		int stoneskins = Modified[IE_STONESKINS];
 		if (stoneskins) {
 			//pst style damage soaking from cloak of warding
