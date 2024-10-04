@@ -570,6 +570,8 @@ private:
 	void CheckWeaponQuickSlot(unsigned int which) const;
 	/* converts to damage type from weapon type to one used by effects */
 	int ConvertDamageType(int headerDmgType) const;
+	/* handle damage type based resistances, bonuses and immunities */
+	int HandleDamageTypeMods(int dmgType, Actor* attacker, int& damage, ieDword weaponEnchantment) const;
 	/* helper for usability checks */
 	HCStrings CheckUsability(const Item* item) const;
 	/* Set up all the missing stats on load time, or after level up */

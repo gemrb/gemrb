@@ -7465,57 +7465,8 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 		}
 	}
 
-	if (damage>0) {
-		// check damage type immunity / resistance / susceptibility
-		std::multimap<ieDword, DamageInfoStruct>::iterator it;
-		it = core->DamageInfoMap.find(damagetype);
-		if (it == core->DamageInfoMap.end()) {
-			Log(ERROR, "ModifyDamage", "Unhandled damagetype: {}", damagetype);
-		} else if (it->second.resist_stat) {
-			// check for bonuses for specific damage types
-			if (core->HasFeature(GFFlags::SPECIFIC_DMG_BONUS) && attacker) {
-				int bonus = attacker->fxqueue.BonusForParam2(fx_damage_bonus_modifier_ref, it->second.iwd_mod_type);
-				if (bonus) {
-					resisted -= int (damage * bonus / 100.0);
-					Log(COMBAT, "ModifyDamage", "Bonus damage of {}({:+d}%), neto: {}", int(damage * bonus / 100.0), bonus, -resisted);
-				}
-			}
-			// damage type with a resistance stat
-			if (third) {
-				// flat resistance, eg. 10/- or eg. 5/+2 for physical types
-				// for actors we need special care for damage reduction - traps (...) don't have enchanted weapons
-				if (attacker && it->second.reduction) {
-					// disregard other resistance boni when checking whether to skip reduction
-					resisted = GetDamageReduction(it->second.resist_stat, weaponEnchantment);
-					// check if we're dealing with special missile types
-					if (damagetype == DAMAGE_PIERCINGMISSILE) {
-						resisted += (signed) GetSafeStat(IE_RESISTPIERCING);
-					} else if (damagetype == DAMAGE_CRUSHINGMISSILE) {
-						resisted += (signed) GetSafeStat(IE_RESISTCRUSHING);
-					}
-				} else {
-					resisted += (signed)GetSafeStat(it->second.resist_stat);
-				}
-				damage -= resisted;
-			} else {
-				int resistance = (signed)GetSafeStat(it->second.resist_stat);
-				// avoid buggy data
-				if ((unsigned)std::abs(resistance) > maximum_values[it->second.resist_stat]) {
-					resistance = 0;
-					Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value ({}).", resistance);
-				}
-				resisted += (int) (damage * resistance/100.0);
-				damage -= resisted;
-			}
-			Log(COMBAT, "ModifyDamage", "Resisted {} of {} at {}% resistance to {}", resisted, damage + resisted, GetSafeStat(it->second.resist_stat), damagetype);
-			// PST and BG1 may actually heal on negative damage
-			if (damage <= 0) {
-				resisted = DR_IMMUNE;
-				if (!core->HasFeature(GFFlags::HEAL_ON_100PLUS)) {
-					damage = 0;
-				}
-			}
-		}
+	if (damage > 0) {
+		resisted = HandleDamageTypeMods(damagetype, attacker, damage, weaponEnchantment);
 	}
 
 	// don't complain when sarevok is 100% resistant in the cutscene that grants you the slayer form
@@ -7527,6 +7478,68 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 			core->Autopause(AUTOPAUSE::UNUSABLE, this);
 		}
 	}
+}
+
+// check damage type immunity / resistance / susceptibility
+int Actor::HandleDamageTypeMods(int dmgType, Actor* attacker, int& damage, ieDword weaponEnchantment) const
+{
+	std::multimap<ieDword, DamageInfoStruct>::iterator it;
+	it = core->DamageInfoMap.find(dmgType);
+	if (it == core->DamageInfoMap.end()) {
+		Log(ERROR, "ModifyDamage", "Unhandled damagetype: {}", dmgType);
+		return 0;
+	}
+
+	if (!it->second.resist_stat) {
+		return 0;
+	}
+
+	// check for bonuses for specific damage types
+	int resisted = 0;
+	if (core->HasFeature(GFFlags::SPECIFIC_DMG_BONUS) && attacker) {
+		int bonus = attacker->fxqueue.BonusForParam2(fx_damage_bonus_modifier_ref, it->second.iwd_mod_type);
+		if (bonus) {
+			resisted -= static_cast<int>(damage * bonus / 100.0);
+			Log(COMBAT, "ModifyDamage", "Bonus damage of {}({:+d}%), neto: {}", int(damage * bonus / 100.0), bonus, -resisted);
+		}
+	}
+
+	// damage type with a resistance stat
+	int resistance = static_cast<int>(GetSafeStat(it->second.resist_stat));
+	if (third) {
+		// flat resistance, eg. 10/- or eg. 5/+2 for physical types
+		// for actors we need special care for damage reduction - traps (...) don't have enchanted weapons
+		if (attacker && it->second.reduction) {
+			// disregard other resistance boni when checking whether to skip reduction
+			resisted = GetDamageReduction(it->second.resist_stat, weaponEnchantment);
+			// check if we're dealing with special missile types
+			if (dmgType == DAMAGE_PIERCINGMISSILE) {
+				resisted += static_cast<int>(GetSafeStat(IE_RESISTPIERCING));
+			} else if (dmgType == DAMAGE_CRUSHINGMISSILE) {
+				resisted += static_cast<int>(GetSafeStat(IE_RESISTCRUSHING));
+			}
+		} else {
+			resisted += resistance;
+		}
+	} else {
+		// avoid buggy data
+		if ((unsigned) std::abs(resistance) > maximum_values[it->second.resist_stat]) {
+			resistance = 0;
+			Log(DEBUG, "ModifyDamage", "Ignoring bad damage resistance value ({}).", resistance);
+		}
+		resisted += static_cast<int>(damage * resistance / 100.0);
+	}
+	damage -= resisted;
+	Log(COMBAT, "ModifyDamage", "Resisted {} of {} at {}% resistance to {}", resisted, damage + resisted, GetSafeStat(it->second.resist_stat), dmgType);
+
+	// PST and BG1 may actually heal on negative damage
+	if (damage <= 0) {
+		resisted = DR_IMMUNE;
+		if (!core->HasFeature(GFFlags::HEAL_ON_100PLUS)) {
+			damage = 0;
+		}
+	}
+	return resisted;
 }
 
 void Actor::UpdateActorState()
