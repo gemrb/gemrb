@@ -24,6 +24,9 @@ namespace GemRB {
 
 const TypeID Audio::ID = { "Audio" };
 
+// walking/armor sounds are too loud relative to other noises
+static const EnumArray<SFXChannel, float> channelVolumeMultipliers { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.3f, 0.3f, 0.1f };
+
 void Audio::UpdateChannel(const std::string& name, int idx, int volume, float reverb)
 {
 	channels[idx] = Channel(name);
@@ -50,7 +53,7 @@ int Audio::GetVolume(SFXChannel channel) const
 	if (channel >= SFXChannel::count) {
 		return 100;
 	}
-	return channels[channel].getVolume();
+	return channels[channel].getVolume() * channelVolumeMultipliers[channel];
 }
 
 float Audio::GetReverb(SFXChannel channel) const

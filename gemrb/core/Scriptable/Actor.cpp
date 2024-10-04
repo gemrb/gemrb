@@ -4508,7 +4508,7 @@ void Actor::PlayWalkSound()
 
 	tick_t len = 0;
 	SFXChannel channel = InParty ? SFXChannel::WalkChar : SFXChannel::WalkMonster;
-	core->GetAudioDrv()->Play(Sound, channel, Pos, 0, &len);
+	core->GetAudioDrv()->Play(Sound, channel, Pos, GEM_SND_SPATIAL, &len);
 	Timers.nextWalkSound = ieDword(thisTime + len);
 }
 
