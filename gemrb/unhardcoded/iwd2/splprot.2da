@@ -14,8 +14,8 @@
 10         RACE       152        5          race/not_elemental 
 11         RACE       159        1          race/fungus 
 12         RACE       159        5          race/not_fungus 
-13         0x102      3          0          huge_creature 
-14         0x102      3          3          not_huge_creature 
+13         0x102      3          3          huge_creature
+14         0x102      3          0          not_huge_creature
 15         RACE       2          1          race/elf   
 16         RACE       2          5          race/not_elf 
 17         RACE       166        1          race/umberhulk 
