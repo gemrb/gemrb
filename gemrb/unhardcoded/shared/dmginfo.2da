@@ -12,9 +12,9 @@ DAMAGE_MAGIC           117        MAGICDAMAGERESISTANCE 0x40       5       0
 DAMAGE_MISSILE         118        RESISTMISSILE         0x80       10      1
 DAMAGE_SLASHING        119        RESISTSLASHING        0x100      7       1
 DAMAGE_MAGICFIRE       122        RESISTMAGICFIRE       0x200      11      0
-DAMAGE_PIERCINGMISSILE 118        RESISTMISSILE         0x80       -1      1
+DAMAGE_PIERCINGMISSILE 120        RESISTMISSILE         0x200      10      1
 DAMAGE_MAGICCOLD       124        RESISTMAGICCOLD       0x400      12      0
-DAMAGE_CRUSHINGMISSILE 118        RESISTMISSILE         0x80       -1      1
+DAMAGE_CRUSHINGMISSILE 121        RESISTMISSILE         0x400      10      1
 DAMAGE_STUNNING        121        0                     0x800      13      0
 DAMAGE_SOULEATER       117        0                     0x1000     -1      0
 DAMAGE_DISEASE         126        0                     0x4000     -1      0
