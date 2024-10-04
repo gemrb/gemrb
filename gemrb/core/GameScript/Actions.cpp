@@ -6389,6 +6389,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 	store->BuyMarkup = parameters->int1Parameter;
 	// additional markup, is this depreciation? Yes
 	store->DepreciationRate = parameters->int2Parameter;
+	core->CloseCurrentStore(); // will also save it
 	if (has_current) {
 		//setting back old store (this will save our current store)
 		core->SetCurrentStore(current, owner);
