@@ -7461,6 +7461,12 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 				if (attacker && it->second.reduction) {
 					// disregard other resistance boni when checking whether to skip reduction
 					resisted = GetDamageReduction(it->second.resist_stat, weaponEnchantment);
+					// check if we're dealing with special missile types
+					if (damagetype == DAMAGE_PIERCINGMISSILE) {
+						resisted += (signed) GetSafeStat(IE_RESISTPIERCING);
+					} else if (damagetype == DAMAGE_CRUSHINGMISSILE) {
+						resisted += (signed) GetSafeStat(IE_RESISTCRUSHING);
+					}
 				} else {
 					resisted += (signed)GetSafeStat(it->second.resist_stat);
 				}
