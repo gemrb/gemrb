@@ -53,6 +53,7 @@ public:
 	}
 	bool Import(DataStream* stream) override;
 	int read_samples(short* buffer, int count) override;
+	int ReadSamplesIntoChannels(char *channel1, char *channel2, int numSamples) override;
 };
 
 }

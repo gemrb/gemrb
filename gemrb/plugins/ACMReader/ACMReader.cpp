@@ -108,6 +108,35 @@ int ACMReader::read_samples(short* buffer, int count)
 	return res;
 }
 
+static constexpr size_t CHANNEL_SPLIT_SAMPLE_SIZE = 2048;
+
+int ACMReader::ReadSamplesIntoChannels(char *channel1, char *channel2, int numSamples) {
+	std::vector<char> buffer;
+	// sample: 2 channels à 2 bytes ...
+	buffer.resize(CHANNEL_SPLIT_SAMPLE_SIZE * 4);
+
+	// ... but read_samples needs twice the read for the same number of samples
+	auto samplesRead = read_samples(reinterpret_cast<short*>(buffer.data()), CHANNEL_SPLIT_SAMPLE_SIZE * 2) / 2;
+	auto totalSamples = samplesRead;
+
+	size_t z = 0;
+	do {
+		for (decltype(samplesRead) i = 0; i < samplesRead; ++i) {
+			auto bufferOffset = i * 4;
+			channel1[z]   = buffer[bufferOffset];
+			channel1[z+1] = buffer[bufferOffset + 1];
+			channel2[z]   = buffer[bufferOffset + 2];
+			channel2[z+1] = buffer[bufferOffset + 3];
+			z += 2;
+		}
+
+		samplesRead = read_samples(reinterpret_cast<short*>(buffer.data()), CHANNEL_SPLIT_SAMPLE_SIZE * 2) / 2;
+		totalSamples += samplesRead;
+	} while (samplesRead > 0 && totalSamples <= numSamples);
+
+	return totalSamples;
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x10373EE, "ACM File Importer")

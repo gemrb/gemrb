@@ -19,6 +19,7 @@
 #include "WAVReader.h"
 
 #include <utility>
+#include <vector>
 
 using namespace GemRB;
 
@@ -88,6 +89,35 @@ int RawPCMReader::read_samples(short* buffer, int count)
 	}
 	samples_left -= res;
 	return res;
+}
+
+static constexpr size_t CHANNEL_SPLIT_BUFFER_SIZE = 4096;
+
+int RawPCMReader::ReadSamplesIntoChannels(char *channel1, char *channel2, int numSamples) {
+	std::vector<char> buffer;
+	buffer.resize(CHANNEL_SPLIT_BUFFER_SIZE);
+
+	uint8_t bytesPerChannel = is16bit ? 2 : 1;
+	uint8_t bytesPerSample = 2 * bytesPerChannel;
+	auto samplesRead = str->Read(buffer.data(), CHANNEL_SPLIT_BUFFER_SIZE) / bytesPerSample;
+	auto totalSamples = samplesRead;
+
+	size_t z = 0;
+	do {
+		for (decltype(samplesRead) i = 0; i < samplesRead; ++i) {
+			auto bufferOffset = i * bytesPerSample;
+			for (uint8_t j = 0; j < bytesPerChannel; ++j) {
+				channel1[z+j] = buffer[bufferOffset + j];
+				channel2[z+j] = buffer[bufferOffset + j + 2];
+			}
+			z += bytesPerChannel;
+		}
+
+		totalSamples += samplesRead;
+		samplesRead = str->Read(buffer.data(), CHANNEL_SPLIT_BUFFER_SIZE) / bytesPerSample;
+	} while (samplesRead > 0 && totalSamples <= numSamples);
+
+	return totalSamples;
 }
 
 bool WavPCMReader::Import(DataStream* stream)
