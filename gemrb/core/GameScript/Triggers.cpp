@@ -4821,6 +4821,8 @@ int GameScript::Summoned(Scriptable* Sender, const Trigger* parameters)
 	return Sender->MatchTrigger(trigger_summoned, summon->GetGlobalID());
 }
 
+// unused, but perhaps wrong; for us Sender and target will always match
+// target could be the trap triggerer, but then we need to change what we emit
 int GameScript::Reset(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* target = GetScriptableFromObject(Sender, parameters);

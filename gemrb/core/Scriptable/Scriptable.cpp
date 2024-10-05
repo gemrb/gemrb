@@ -1771,8 +1771,6 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 	if (!Scripts[0] && EnterWav.IsEmpty()) {
 		return false;
 	}
-	AddTrigger(TriggerEntry(trigger_entered, ID));
-	AddTrigger(TriggerEntry(trigger_traptriggered, ID)); // for that one user in bg2
 
 	// the second part is a hack to deal with bg2's ar1401 lava floor trap ("muck"), which doesn't have the repeating bit set
 	// just testing TrapDetectionDiff/TrapRemovalDiff is not good enough as DeadThiefProx in the initial bg2 chamber exit is
@@ -1784,6 +1782,11 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 	} else if (third || scriptName != "muck") {
 		Trapped = false;
 	}
+
+	// add these two last, so LastTrigger points to the trap triggerer (test case: iwd2 ar6100 walkway traps)
+	AddTrigger(TriggerEntry(trigger_entered, ID));
+	AddTrigger(TriggerEntry(trigger_traptriggered, ID)); // for that one user in bg2
+
 	return true;
 }
 
