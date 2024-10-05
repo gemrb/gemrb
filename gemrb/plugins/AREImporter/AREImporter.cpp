@@ -872,6 +872,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 		doorFlags = FixIWD2DoorFlags(doorFlags, false);
 	}
 	if (AreaType & AT_OUTDOOR) doorFlags |= DOOR_TRANSPARENT; // actually true only for fog-of-war, excluding other actors
+
 	str->ReadDword(openFirstVertex);
 	str->ReadWord(openVerticesCount);
 	str->ReadWord(closedVerticesCount);
@@ -941,6 +942,15 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	auto indices = tmm->GetDoorIndices(shortName, baseClosed);
 	if (core->HasFeature(GFFlags::REVERSE_DOOR)) {
 		baseClosed = !baseClosed;
+	}
+
+	// iwd2 workaround: two ar6051 doors, acting as switches have detectable traps in the original, yet are missing the bit
+	// looking at the original, it checks it, no script sets it on them, it's just bonkers
+	// they are marked as detected already in the data, but don't appear as such
+	if (longName == "AR6051_Lava_Switch" || longName == "AR6051_Acid_Switch") {
+		doorFlags |= DOOR_DETECTABLE;
+		trapDetect = 30;
+		trapDetected = 0;
 	}
 
 	auto closedPolys = tmm->ClosedDoorPolygons();
