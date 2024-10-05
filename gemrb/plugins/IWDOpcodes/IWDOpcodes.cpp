@@ -368,7 +368,6 @@ static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 }; //0x
 static EffectRef fx_umberhulk_gaze_ref = { "UmberHulkGaze", -1 }; //0x100
 static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 }; //401
 static EffectRef fx_cast_spell_on_condition_ref = { "CastSpellOnCondition", -1 };
-static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
 static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 
@@ -1540,18 +1539,14 @@ static int fx_shroud_of_flame2(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (target->SetSpellState( SS_FLAMESHROUD)) return FX_APPLIED;
-	if (target->fxqueue.HasEffect(fx_shroud_of_flame2_ref)) return FX_APPLIED;
+	if (target->SetSpellState(SS_FLAMESHROUD)) return FX_APPLIED;
 
 	EXTSTATE_SET(EXTSTATE_SHROUD); //just for compatibility
-
-	if(core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->SetColorMod(0xff, RGBModifier::ADD, 1, Color(0xa0, 0, 0, 0));
-	}
+	target->SetColorMod(0xff, RGBModifier::ADD, 10, Color(0xa0, 0, 0, 0));
 
 	//timing
 	ieDword time = core->GetGame()->GameTime;
-	if (fx->Parameter4 == time || time % core->Time.round_size) {
+	if (!fx->FirstApply && (fx->Parameter4 == time || time % core->Time.round_size)) {
 		return FX_APPLIED;
 	}
 	fx->Parameter4=time;
@@ -1567,10 +1562,10 @@ static int fx_shroud_of_flame2(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Actor *caster = GetCasterObject();
 	core->ApplySpell(firedmg, target, caster, fx->Power);
 
-	if (!fx->Resource2.IsEmpty()) {
-		core->ApplySpell(fx->Resource2, target, caster, fx->Power);
-	} else {
+	if (fx->Resource2.IsEmpty()) {
 		core->ApplySpell(resref_sof2, target, caster, fx->Power);
+	} else {
+		core->ApplySpell(fx->Resource2, target, caster, fx->Power);
 	}
 	return FX_APPLIED;
 }
