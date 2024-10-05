@@ -598,7 +598,8 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 			if (halveRange) dist /= 2;
 		} else {
 			dist = VOODOO_VISUAL_RANGE; // NOTE: perhaps we should use the parameter from LOS if that was used
-			los = false;
+			// iwd2 ar6102 SeeDeadMandal would detect you over a thick side wall otherwise
+			los = core->HasFeature(GFFlags::RULES_3ED);
 		}
 
 		if (!WithinRange(target, Sender->Pos, dist)) {
