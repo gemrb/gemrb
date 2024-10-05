@@ -294,8 +294,11 @@ void Door::TryDetectSecret(int skill, ieDword actorID)
 	if (skill > (signed)DiscoveryDiff) {
 		Flags |= DOOR_FOUND;
 		core->PlaySound(DS_FOUNDSECRET, SFXChannel::Hits);
-		AddTrigger(TriggerEntry(trigger_detected, actorID));
-		AddTrigger(TriggerEntry(trigger_secreddoordetected, GetGlobalID())); // ee
+		if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+			AddTrigger(TriggerEntry(trigger_secreddoordetected, GetGlobalID()));
+		} else {
+			AddTrigger(TriggerEntry(trigger_detected, actorID));
+		}
 	}
 }
 
