@@ -559,7 +559,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Damage", fx_damage, EFFECT_DICED, -1 ),
 	EffectDesc("DamageAnimation", fx_damage_animation, 0, -1 ),
 	EffectDesc("DamageBonusModifier", fx_damage_bonus_modifier, 0, -1 ),
-	EffectDesc("DamageBonusModifier2", fx_damage_bonus_modifier, 0, -1), //49 (iwd, ee)
+	EffectDesc("DamageBonusModifier2", fx_damage_bonus_modifier2, 0, -1), // 49 (iwd, ee)
 	EffectDesc("DamageLuckModifier", fx_damageluck_modifier, 0, -1 ),
 	EffectDesc("DamageVsCreature", fx_generic_effect, 0, -1 ),
 	EffectDesc("Death", fx_death, 0, -1 ),
