@@ -1793,7 +1793,13 @@ int fx_set_invisible_state(Scriptable* Owner, Actor* target, Effect* fx)
 		STATE_SET(STATE_INVIS2);
 		break;
 	case 2:// EE: weak invisibility, like improved after being revealed (no backstabbing)
-		STATE_SET(STATE_INVIS2);
+		// iwd2 sets the main state instead
+		// otherwise the druergar thralls in ar5300 just loop trying to go invisible (53dufit2.bcs)
+		if (core->HasFeature(GFFlags::RULES_3ED)) {
+			STATE_SET(STATE_INVISIBLE);
+		} else {
+			STATE_SET(STATE_INVIS2);
+		}
 		break;
 	default:
 		break;
@@ -4507,6 +4513,9 @@ int fx_force_visible (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 		BASE_STATE_CURE(STATE_INVISIBLE);
 	}
 	target->fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref,0);
+	if (core->HasFeature(GFFlags::RULES_3ED)) { // see fx_set_invisible_state
+		target->fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref, 2);
+	}
 
 	//fix the hiding puppet while mislead bug, by
 	if (target->GetSafeStat(IE_PUPPETTYPE)==1) {
