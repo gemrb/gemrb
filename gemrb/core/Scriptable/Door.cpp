@@ -289,7 +289,7 @@ bool Door::TryUnlock(Actor *actor) const
 
 void Door::TryDetectSecret(int skill, ieDword actorID)
 {
-	if (Type != ST_DOOR) return;
+	if (Type != ST_DOOR || !(Flags & DOOR_SECRET)) return;
 	if (Visible()) return;
 	if (skill > (signed)DiscoveryDiff) {
 		Flags |= DOOR_FOUND;
