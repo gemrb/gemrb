@@ -170,6 +170,20 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType
 		// rgn.h will be adjusted automatically, we don't need to worry about accidentally hiding other msgs
 		scrollOffset.y -= 2;
 	}
+
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		// first draw a background layer for better contrast
+		Region rgnBG(rgn);
+
+		// how big will be the laid out text?
+		// make it a Font::Print flag bit in the future?
+		Font::StringSizeMetrics metrics { rgnBG.size, 0, 0, true };
+		Size stringSize = core->GetTextFont()->StringSize(text, &metrics);
+		rgnBG.h = stringSize.h;
+		rgnBG.ExpandAllSides(3);
+		static constexpr Color TranslucentBlack { 0x00, 0x00, 0x00, 0x9f };
+		VideoDriver->DrawRect(rgnBG, TranslucentBlack, true, BlitFlags::BLENDED);
+	}
 	core->GetTextFont()->Print(rgn, text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, fontColor);
 
 	return true;
