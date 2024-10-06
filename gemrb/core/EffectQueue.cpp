@@ -1088,6 +1088,15 @@ static int CheckSaves(Actor* actor, Effect* fx)
 			// sadly there's no feat or stat for it
 			if (globals.iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
 				fx->Parameter1 = 0;
+				// Evades effects from <RESOURCE>~
+				if (fx->SourceRef.IsEmpty()) {
+					displaymsg->DisplayConstantStringName(HCStrings::Evaded2, GUIColors::WHITE, actor);
+				} else {
+					const Spell* spl = gamedata->GetSpell(fx->SourceRef, true);
+					assert(spl);
+					core->GetTokenDictionary()["RESOURCE"] = core->GetString(spl->SpellName);
+					displaymsg->DisplayConstantStringName(HCStrings::Evaded1, GUIColors::WHITE, actor);
+				}
 				return FX_NOT_APPLIED;
 			} else {
 				fx->Parameter1 /= 2;
