@@ -151,7 +151,7 @@ public:
 				int channels, short* memory, int size, int samplerate) = 0;
 	virtual void UpdateMapAmbient(const MapReverbProperties&) {};
 
-	void UpdateChannel(const std::string& name, int idx, int volume, float reverb);
+	void UpdateChannel(const std::string& name, int volume, float reverb);
 	SFXChannel GetChannel(const std::string& name) const;
 	int GetVolume(SFXChannel channel) const;
 	float GetReverb(SFXChannel channel) const;

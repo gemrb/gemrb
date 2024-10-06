@@ -914,7 +914,7 @@ bool Interface::ReadSoundChannelsTable() const
 		if (irev != TableMgr::npos) {
 			reverb = atof(tm->QueryField(i, irev).c_str());
 		}
-		AudioDriver->UpdateChannel(rowname, i, volume, reverb);
+		AudioDriver->UpdateChannel(rowname, volume, reverb);
 	}
 	return true;
 }

@@ -24,11 +24,42 @@ namespace GemRB {
 
 const TypeID Audio::ID = { "Audio" };
 
-// walking/armor sounds are too loud relative to other noises
-static const EnumArray<SFXChannel, float> channelVolumeMultipliers { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.3f, 0.3f, 0.1f };
+static std::unordered_map<std::string, SFXChannel> channelEnumMap = {
+	{"NARRATIO", SFXChannel::Narrator},
+	{"AREA_AMB", SFXChannel::MainAmbient},
+	{"ACTIONS",  SFXChannel::Actions},
+	{"SWINGS",   SFXChannel::Swings},
+	{"CASTING",  SFXChannel::Casting},
+	{"GUI",      SFXChannel::GUI},
+	{"DIALOG",   SFXChannel::Dialog},
+	{"CHARACT0", SFXChannel::Char0},
+	{"CHARACT1", SFXChannel::Char1},
+	{"CHARACT2", SFXChannel::Char2},
+	{"CHARACT3", SFXChannel::Char3},
+	{"CHARACT4", SFXChannel::Char4},
+	{"CHARACT5", SFXChannel::Char5},
+	{"CHARACT6", SFXChannel::Char6},
+	{"CHARACT7", SFXChannel::Char7},
+	{"CHARACT8", SFXChannel::Char8},
+	{"CHARACT9", SFXChannel::Char9},
+	{"MONSTER",  SFXChannel::Monster},
+	{"HITS",     SFXChannel::Hits},
+	{"MISSILE",  SFXChannel::Missile},
+	{"AMBIENTL", SFXChannel::AmbientLoop},
+	{"AMBIENTN", SFXChannel::AmbientOther},
+	{"WALKINGC", SFXChannel::WalkChar},
+	{"WALKINGM", SFXChannel::WalkMonster},
+	{"ARMOR",    SFXChannel::Armor}
+};
 
-void Audio::UpdateChannel(const std::string& name, int idx, int volume, float reverb)
+void Audio::UpdateChannel(const std::string& name, int volume, float reverb)
 {
+	auto it = channelEnumMap.find(name);
+	if (it == channelEnumMap.cend()) {
+		return;
+	}
+
+	auto idx = it->second;
 	channels[idx] = Channel(name);
 
 	volume = Clamp(volume, 0, 100);
@@ -53,7 +84,7 @@ int Audio::GetVolume(SFXChannel channel) const
 	if (channel >= SFXChannel::count) {
 		return 100;
 	}
-	return channels[channel].getVolume() * channelVolumeMultipliers[channel];
+	return channels[channel].getVolume();
 }
 
 float Audio::GetReverb(SFXChannel channel) const
