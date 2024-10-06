@@ -72,7 +72,7 @@ private:
 	// NOTE: some are currently left out, like BonusAgainstCreature and all the real separate AC-mod stats
 	//   (in case of change) recheck all the introduced GetTotal()s with this in mind - before they were Modified[IE_ARMORCLASS] only
 
-	void SetBonus(int &current, int bonus, int mod);
+	void SetBonus(int& current, int bonus, int mod, bool cumulative = false);
 	void RefreshTotal();
 };
 

@@ -30,14 +30,14 @@ static bool third = false;
 /*
  * Shared code between the classes
  */
-static void SetBonusInternal(int& current, int bonus, int mod)
+static void SetBonusInternal(int& current, int bonus, int mod, bool cumulative = false)
 {
 	int newBonus = current;
 	int tmp;
 
 	switch (mod) {
 		case 0: // cumulative modifier
-			if (!third) {
+			if (!third || cumulative) {
 				newBonus += bonus;
 				break;
 			}
@@ -152,12 +152,13 @@ void ArmorClass::SetWisdomBonus(int bonus, int mod)
 
 void ArmorClass::SetGenericBonus(int bonus, int mod)
 {
-	SetBonus(genericBonus, bonus, mod);
+	// iwd2 generic AC bonus is the only stacking one
+	SetBonus(genericBonus, bonus, mod, true);
 }
 
-void ArmorClass::SetBonus(int& current, int bonus, int mod)
+void ArmorClass::SetBonus(int& current, int bonus, int mod, bool cumulative)
 {
-	SetBonusInternal(current, bonus, mod);
+	SetBonusInternal(current, bonus, mod, cumulative);
 	RefreshTotal();
 }
 
