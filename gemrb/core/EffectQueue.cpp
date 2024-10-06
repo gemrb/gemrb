@@ -1082,29 +1082,29 @@ static int CheckSaves(Actor* actor, Effect* fx)
 			}
 		}
 	}
-	if (saved) {
-		if (fx->IsSaveForHalfDamage || ((int) fx->Opcode == fx_damage_ref.opcode && fx->IsVariable & DamageFlags::SaveForHalf)) {
-			// if we have evasion, we take no damage
-			// sadly there's no feat or stat for it
-			if (globals.iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
-				fx->Parameter1 = 0;
-				// Evades effects from <RESOURCE>~
-				if (fx->SourceRef.IsEmpty()) {
-					displaymsg->DisplayConstantStringName(HCStrings::Evaded2, GUIColors::WHITE, actor);
-				} else {
-					const Spell* spl = gamedata->GetSpell(fx->SourceRef, true);
-					assert(spl);
-					core->GetTokenDictionary()["RESOURCE"] = core->GetString(spl->SpellName);
-					displaymsg->DisplayConstantStringName(HCStrings::Evaded1, GUIColors::WHITE, actor);
-				}
-				return FX_NOT_APPLIED;
+
+	bool saveForHalf = fx->IsSaveForHalfDamage || ((int) fx->Opcode == fx_damage_ref.opcode && fx->IsVariable & DamageFlags::SaveForHalf);
+	if (saved && saveForHalf) {
+		// if we have evasion, we take no damage
+		// sadly there's no feat or stat for it
+		if (globals.iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
+			fx->Parameter1 = 0;
+			// Evades effects from <RESOURCE>~
+			if (fx->SourceRef.IsEmpty()) {
+				displaymsg->DisplayConstantStringName(HCStrings::Evaded2, GUIColors::WHITE, actor);
 			} else {
-				fx->Parameter1 /= 2;
+				const Spell* spl = gamedata->GetSpell(fx->SourceRef, true);
+				assert(spl);
+				core->GetTokenDictionary()["RESOURCE"] = core->GetString(spl->SpellName);
+				displaymsg->DisplayConstantStringName(HCStrings::Evaded1, GUIColors::WHITE, actor);
 			}
-		} else {
-			Log(MESSAGE, "EffectQueue", "{} saved against effect: {}", fmt::WideToChar{actor->GetName()}, globals.Opcodes[fx->Opcode].Name);
 			return FX_NOT_APPLIED;
+		} else {
+			fx->Parameter1 /= 2;
 		}
+	} else if (saved) {
+		Log(MESSAGE, "EffectQueue", "{} saved against effect: {}", fmt::WideToChar { actor->GetName() }, globals.Opcodes[fx->Opcode].Name);
+		return FX_NOT_APPLIED;
 	} else {
 		if ((int) fx->Opcode == fx_damage_ref.opcode && fx->IsVariable & DamageFlags::FailForHalf) {
 			fx->Parameter1 /= 2;
