@@ -44,6 +44,7 @@ public:
 	 * @returns Number of samples read.
 	 */
 	virtual int read_samples( short* memory, int cnt ) = 0 ;
+	virtual int ReadSamplesIntoChannels(char *channel1, char *channel2, int numSamples) = 0;
 	int get_channels() const
 	{
 		return channels;

@@ -914,7 +914,7 @@ bool Interface::ReadSoundChannelsTable() const
 		if (irev != TableMgr::npos) {
 			reverb = atof(tm->QueryField(i, irev).c_str());
 		}
-		AudioDriver->UpdateChannel(rowname, i, volume, reverb);
+		AudioDriver->UpdateChannel(rowname, volume, reverb);
 	}
 	return true;
 }
@@ -1081,6 +1081,8 @@ void Interface::InitAudio()
 	if (!ret) {
 		Log(WARNING, "Core", "Failed to read channel table.");
 	}
+
+	AudioDriver->SetScreenSize(Size(config.Width, config.Height));
 }
 
 void Interface::LoadPlugins() const

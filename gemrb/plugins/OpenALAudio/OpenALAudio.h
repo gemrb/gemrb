@@ -34,6 +34,7 @@
 
 #include <mutex>
 #include <thread>
+#include <utility>
 
 #if __APPLE__
 #include <OpenAL/OpenAL.h> // umbrella include for all the headers we want
@@ -69,9 +70,13 @@ public:
 	void Invalidate() { parent = 0; }
 };
 
+using OpenALuintPair = std::pair<ALuint, ALuint>;
+
 struct AudioStream {
-	ALuint Buffer = 0;
-	ALuint Source = 0;
+	// Spatial stereo is laid out as two sources and buffers,
+	// for every other case, just the first value is relevant.
+	OpenALuintPair buffers = {0, 0};
+	OpenALuintPair sources = {0, 0};
 	int Duration = 0;
 	bool free = true;
 	bool ambient = false;
@@ -79,45 +84,60 @@ struct AudioStream {
 	bool delete_buffers = false;
 
 	void ClearIfStopped();
+	bool ClearIfStopped(ALuint source);
 	void ClearProcessedBuffers() const;
+	void ClearProcessedBuffers(ALuint source) const;
 	void ForceClear();
+	void SetPitch(int pitch) const;
+	void SetPos(const Point&) const;
+	void SetVolume(int volume) const;
+	void StopLooping() const;
+	void Stop() const;
+	void Stop(ALuint source) const;
 
 	Holder<OpenALSoundHandle> handle;
 };
 
 struct CacheEntry {
-	ALuint Buffer;
+	OpenALuintPair Buffer;
 	tick_t Length;
 
-	CacheEntry(ALuint buffer, tick_t length) : Buffer(buffer), Length(length) {}
+	CacheEntry(OpenALuintPair buffer, tick_t length) : Buffer(buffer), Length(length) {}
 	CacheEntry(const CacheEntry&) = delete;
 	CacheEntry(CacheEntry && other) noexcept : Buffer(other.Buffer), Length(other.Length) {
-		other.Buffer = 0;
+		other.Buffer = {0, 0};
 	}
 	CacheEntry& operator=(const CacheEntry&) = delete;
 	CacheEntry& operator=(CacheEntry && other) noexcept {
 		this->Buffer = other.Buffer;
-		other.Buffer = 0;
+		other.Buffer = {0, 0};
 		this->Length = other.Length;
 
 		return *this;
 	}
 
 	void evictionNotice() {
-		Buffer = 0;
+		Buffer = {0, 0};
 	}
 
 	~CacheEntry() {
-		if (Buffer != 0) {
-			alDeleteBuffers(1, &Buffer);
+		alDeleteBuffers(1, &Buffer.first);
+		if (Buffer.second != 0) {
+			alDeleteBuffers(1, &Buffer.second);
 		}
 	}
 };
 
 struct OpenALPlaying {
 	bool operator()(const CacheEntry& entry) const {
-		alDeleteBuffers(1, &entry.Buffer);
-		return alGetError() == AL_NO_ERROR;
+		alDeleteBuffers(1, &entry.Buffer.first);
+		bool success = alGetError() == AL_NO_ERROR;
+
+		if (success && entry.Buffer.second) {
+			alDeleteBuffers(1, &entry.Buffer.second);
+		}
+
+		return success;
 	}
 };
 
@@ -151,6 +171,7 @@ public:
 				int size, int samplerate) override;
 	void UpdateMapAmbient(const MapReverbProperties&) override;
 private:
+	int QueueALBuffers(OpenALuintPair source, OpenALuintPair buffer) const;
 	int QueueALBuffer(ALuint source, ALuint buffer) const;
 
 private:
@@ -175,7 +196,7 @@ private:
 	ALuint efxEffect = 0;
 	MapReverbProperties reverbProperties;
 
-	ALuint loadSound(StringView ResRef, tick_t &time_length);
+	OpenALuintPair loadSound(StringView ResRef, tick_t &time_length, bool spatial = false);
 	int CountAvailableSources(int limit);
 	bool evictBuffer();
 	void clearBufferCache(bool force);
@@ -183,6 +204,8 @@ private:
 	static int MusicManager(void* args);
 
 	bool InitEFX(void);
+	ALuint CreateAndConfigSource(ALuint source, ieDword volume, ALint loop, unsigned int flags, const Point& p, SFXChannel channel) const;
+	void ConfigSource(ALuint source, ieDword volume, ALint loop, unsigned int flags, const Point& p, SFXChannel channel) const;
 };
 
 }

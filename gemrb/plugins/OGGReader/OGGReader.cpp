@@ -124,6 +124,11 @@ int OGGReader::read_samples(short* buffer, int count)
 	return samples_got;
 }
 
+int OGGReader::ReadSamplesIntoChannels(char* /*channel1*/, char* /*channel2*/, int /*numSamples*/) {
+	assert(false);
+	return 0;
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x18C310C3, "OGG File Importer")
