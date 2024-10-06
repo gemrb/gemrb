@@ -2501,6 +2501,10 @@ static int fx_area_effect(Scriptable* Owner, Actor* target, Effect* fx)
 		map = game->GetCurrentArea();
 	}
 
+	if (!map) {
+		return fx->Parameter2 & AE_REPEAT ? FX_APPLIED : FX_NOT_APPLIED;
+	}
+
 	if (fx->FirstApply) {
 		if (!fx->Parameter3) {
 			fx->Parameter3 = core->Time.defaultTicksPerSec;
@@ -2510,7 +2514,7 @@ static int fx_area_effect(Scriptable* Owner, Actor* target, Effect* fx)
 		fx->Parameter4 = 0;
 	}
 
-	if (fx->Parameter4>=game->GameTime) {
+	if (fx->Parameter4 >= game->GameTime) {
 		return FX_APPLIED;
 	}
 
