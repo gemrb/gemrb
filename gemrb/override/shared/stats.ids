@@ -7,6 +7,7 @@ IDS
 5          ACPIERCINGMOD
 6          ACSLASHINGMOD
 7          THAC0
+7          TOHIT
 8          NUMBEROFATTACKS
 9          SAVEVSDEATH
 10         SAVEVSWANDS
