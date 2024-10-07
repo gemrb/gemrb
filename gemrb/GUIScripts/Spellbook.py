@@ -346,8 +346,8 @@ def GetIWD2Spells (kit, usability, level, baseClass = -1):
 		if badSchools == -1:
 			badSchools = 0
 	else:
-		# only wizards have alignment and school restrictions
-		kit = usability = 0
+		# only wizards care about spell schools
+		kit = 0
 
 	spellsTable = GemRB.LoadTable ("listspll")
 	spellCount = spellsTable.GetRowCount ()
@@ -457,7 +457,7 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 		rowName = CommonTables.ClassSkills.GetRowName (row)
 		Class = CommonTables.Classes.GetValue (rowName, "ID", GTV_INT)
 		spells = GetIWD2Spells (0, Usability, Level, Class)
-		spells = [e[0] for e in spells] # ignore the second member
+		spells = [e[0] for e in filter(lambda s: s[1], spells)] # skip disallowed spells
 		return spells
 
 	SpellsTable = GemRB.LoadTable ("spells")
