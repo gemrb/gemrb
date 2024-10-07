@@ -368,6 +368,7 @@ public:
 	size_t SlotTypes = 0; // this is the same as the inventory size
 	ResRef GlobalScript = "BALDUR";
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };
+	Holder<SoundHandle> strrefHandle = nullptr;
 
 	std::vector<Holder<Sprite2D> > Cursors;
 	std::array<std::array<Holder<Sprite2D>, 6>, MAX_CIRCLE_SIZE> GroundCircles;

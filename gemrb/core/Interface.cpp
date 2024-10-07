@@ -2015,6 +2015,10 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		music->HardEnd();
 	AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 	if (ambim) ambim->Deactivate();
+	if (strrefHandle) {
+		strrefHandle->Stop();
+		strrefHandle.reset();
+	}
 
 	ResourceHolder<MoviePlayer> mp = gamedata->GetResourceHolder<MoviePlayer>(actualMovieRef);
 	if (!mp) {

@@ -383,7 +383,7 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 
 		// Narrator's error announcements (ambush, incomplete party)
 		SFXChannel channel = SoundResRef.BeginsWith("ERROR") ? SFXChannel::Narrator : SFXChannel::Dialog;
-		core->GetAudioDrv()->Play(SoundResRef, channel, Point(), flag);
+		core->strrefHandle = core->GetAudioDrv()->Play(SoundResRef, channel, Point(), flag);
 	}
 	if (bool(flags & STRING_FLAGS::STRREFON)) {
 		string = fmt::format(u"{}: {}", ieDword(strref), string);
