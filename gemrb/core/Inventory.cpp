@@ -284,7 +284,7 @@ int Inventory::CountItems(const ResRef &resRef, bool stacks, bool checkBags) con
 	while (slot--) {
 		const CREItem* item = Slots[slot];
 		if (!item) continue;
-		if (item->ItemResRef == resRef) {
+		if (resRef.IsEmpty() || item->ItemResRef == resRef) {
 			if (stacks && (item->Flags & IE_INV_ITEM_STACKED)) {
 				count += item->Usages[0];
 				assert(count != 0);
