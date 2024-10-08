@@ -667,13 +667,13 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 
 		ieByte difficulty = map->AreaDifficulty;
 		switch (difficulty) {
-		case 0:
+		case 1:
 			diff_bit = CF_NO_DIFF_1;
 			break;
-		case 1:
+		case 2:
 			diff_bit = CF_NO_DIFF_2;
 			break;
-		case 2:
+		case 4:
 			diff_bit = CF_NO_DIFF_3;
 			break;
 		default:
