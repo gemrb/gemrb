@@ -719,7 +719,7 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 		SetVariable(map, critter.PointSelectVar, value + 1, critter.PointSelectContext);
 	}
 
-	SetVariable(map, critter.SpecVar, specvar + (ieDword) critter.SpecVarInc, critter.SpecContext);
+	SetVariable(map, critter.SpecVar, ieDword((int) specvar + critter.SpecVarInc), critter.SpecContext);
 	map->AddActor(cre, true);
 	for (x = 0; x < 9; x++) {
 		if (critter.SetSpec[x]) {
