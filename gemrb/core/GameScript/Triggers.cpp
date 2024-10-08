@@ -2132,6 +2132,11 @@ int GameScript::CheckStat(Scriptable *Sender, const Trigger *parameters)
 		stat = OverrideStatsIDS(stat);
 	}
 
+	// cripple for this stat, since it's only really used once and we use it differently'
+	if (stat == IE_ENCUMBRANCE) {
+		return 0;
+	}
+
 	if ((signed) actor->GetStat(stat) == parameters->int0Parameter) {
 		Sender->SetLastTrigger(trigger_checkstat, actor->GetGlobalID());
 		return 1;
@@ -2168,6 +2173,12 @@ int GameScript::CheckStatGT(Scriptable *Sender, const Trigger *parameters)
 		stat = OverrideStatsIDS(stat);
 	}
 
+
+	// cripple for this stat, since it's only really used once and we use it differently'
+	if (stat == IE_ENCUMBRANCE) {
+		return 0;
+	}
+
 	if ((signed) actor->GetStat(stat) > parameters->int0Parameter) {
 		Sender->SetLastTrigger(trigger_checkstat, actor->GetGlobalID());
 		return 1;
@@ -2202,6 +2213,11 @@ int GameScript::CheckStatLT(Scriptable *Sender, const Trigger *parameters)
 	int stat = parameters->int1Parameter;
 	if (parameters->flags & TF_PRECOMPILED) {
 		stat = OverrideStatsIDS(stat);
+	}
+
+	// cripple for this stat, since it's only really used once and we use it differently'
+	if (stat == IE_ENCUMBRANCE) {
+		return 0;
 	}
 
 	if ((signed) actor->GetStat(stat) < parameters->int0Parameter) {
