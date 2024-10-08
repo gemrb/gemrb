@@ -519,10 +519,16 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, StringView critt
 	AssignScripts(inifile, critter, crittername);
 
 	// remaining flag bits
-	// area diff flags disable spawns based on game difficulty in iwd2
-	static const std::map<int, std::string> flagNames = { { CF_DEATHVAR, "death_scriptname" }, { CF_FACTION, "death_faction" }, { CF_TEAM, "death_team" }, { CF_BUDDY, "auto_buddy" }, { CF_NO_DIFF_1, "area_diff_1" }, { CF_NO_DIFF_2, "area_diff_2" }, { CF_NO_DIFF_3, "area_diff_3" } };
+	static const std::map<int, std::string> flagNames = { { CF_DEATHVAR, "death_scriptname" }, { CF_FACTION, "death_faction" }, { CF_TEAM, "death_team" }, { CF_BUDDY, "auto_buddy" } };
 	for (const auto& flag : flagNames)  {
 		if (inifile->GetKeyAsBool(crittername, flag.second, false)) {
+			critter.Flags |= flag.first;
+		}
+	}
+	// area diff flags disable spawns based on game difficulty in iwd2, but they are all on by default
+	static const std::map<int, std::string> flagNames2 = { { CF_NO_DIFF_1, "area_diff_1" }, { CF_NO_DIFF_2, "area_diff_2" }, { CF_NO_DIFF_3, "area_diff_3" } };
+	for (const auto& flag : flagNames2)  {
+		if (!inifile->GetKeyAsBool(crittername, flag.second, true)) {
 			critter.Flags |= flag.first;
 		}
 	}
