@@ -663,9 +663,9 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 	}
 
 	if (critter.Flags & CF_NO_DIFF_MASK) {
-		ieDword diff_bit;
+		int diff_bit;
 
-		ieDword difficulty = core->GetDictionary().Get("Difficulty Level", 0);
+		ieByte difficulty = map->AreaDifficulty;
 		switch (difficulty) {
 		case 0:
 			diff_bit = CF_NO_DIFF_1;
