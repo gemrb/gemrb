@@ -1183,9 +1183,8 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	}
 	act->ignoredFields.difficultyMargin = difficultyMargin;
 
-	if (!dialog.IsEmpty()) {
-		act->SetDialog(dialog);
-	}
+	act->SetDialog(dialog);
+
 	for (int j = 0; j < 8; j++) {
 		if (!scripts[j].IsEmpty()) {
 			act->SetScript(scripts[j], j);
