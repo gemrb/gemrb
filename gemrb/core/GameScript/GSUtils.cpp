@@ -348,6 +348,9 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::i
 	// the actor will remain in the same one (eg. IE_ANI_DIE, IE_ANI_TWITCH, 17/IE_ANI_GET_UP)
 	actor->SetStance( value );
 
+	// return at least until we fix the extra stance ids
+	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) return;
+
 	// it's a blocking action family, but the original didn't actually block
 	// give some time for 1 cycle of the new stance animation to play out
 	// interestingly 16==our sleep crashes; seq.ids has sleep at our IE_ANI_GET_UP though
