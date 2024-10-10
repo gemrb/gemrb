@@ -130,8 +130,7 @@ static void AddZZFeatures(Item *s)
 		Effect *fx = EffectQueue::CreateEffect(zzRefs[i], IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
 		fx->Parameter3 = static_cast<ieDword>(bonus);
 		fx->SourceRef = s->Name;
-		// use the space reserved earlier
-		s->equipping_features[s->EquippingFeatureCount - 1 - i] = fx;
+		s->equipping_features.push_back(fx);
 	}
 }
 
