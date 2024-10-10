@@ -1801,6 +1801,7 @@ void Map::UpdateProjectiles()
 		if ((*it)->IsStillIntact()) {
 			++it;
 		} else {
+			delete *it;
 			it = projectiles.erase(it);
 		}
 	}
