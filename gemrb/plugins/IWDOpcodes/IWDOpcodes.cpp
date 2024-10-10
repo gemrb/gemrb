@@ -400,6 +400,7 @@ static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effe
 			newfx->DiceThrown = fx->DiceThrown;
 			newfx->DiceSides = fx->DiceSides;
 			newfx->Resource = fx->Resource;
+			newfx->SourceRef = fx->SourceRef;
 			core->ApplyEffect(newfx, victim, Owner);
 		}
 	}
