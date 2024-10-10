@@ -64,17 +64,6 @@ class Map;
 #define CF_DISABLE_RENDERER 0x10000
 #define CF_SAFEST_POINT 0x20000
 
-//spec ids flags
-#define AI_EA		0
-#define AI_FACTION	1
-#define AI_TEAM		2
-#define AI_GENERAL	3
-#define AI_RACE		4
-#define AI_CLASS	5
-#define AI_SPECIFICS	6
-#define AI_GENDER	7
-#define AI_ALIGNMENT	8
-
 struct CritterEntry {
 	std::vector<ResRef> CreFile;        //spawn one of these creatures
 	ieByte Spec[9] {}; // existence check IDS qualifier

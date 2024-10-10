@@ -39,10 +39,6 @@
 
 namespace GemRB {
 
-static const int StatValues[9]={
-IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC,
-IE_SEX, IE_ALIGNMENT };
-
 static PluginHolder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 {
 	//the lack of spawn ini files is not a serious problem, happens all the time
@@ -494,7 +490,7 @@ CritterEntry IniSpawn::ReadCreature(const DataFileMgr* inifile, StringView critt
 	critter.Orientation2 = ps;
 
 	static const std::string aiStats[] = { "ai_ea", "ai_faction", "ai_team", "ai_general", "ai_race", "ai_class", "ai_specifics", "ai_gender", "ai_alignment" };
-	for (int i = AI_EA; i <= AI_ALIGNMENT; i++)  {
+	for (int i = 0; i < 9; i++) {
 		ps = inifile->GetKeyAsInt(crittername, aiStats[i], -1);
 		if (ps != -1) critter.SetSpec[i] = static_cast<ieByte>(ps);
 	}
@@ -727,6 +723,8 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 
 	SetVariable(map, critter.SpecVar, ieDword((int) specvar + critter.SpecVarInc), critter.SpecContext);
 	map->AddActor(cre, true);
+
+	static const int StatValues[9] = { IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT };
 	for (x = 0; x < 9; x++) {
 		if (critter.SetSpec[x]) {
 			cre->SetBase(StatValues[x], critter.SetSpec[x]);
