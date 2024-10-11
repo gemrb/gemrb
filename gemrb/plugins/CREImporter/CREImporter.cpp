@@ -43,16 +43,6 @@ static std::vector<ResRef> snglist; //IE_IWD2_SPELL_SONG
 static std::vector<ResRef> shplist; //IE_IWD2_SPELL_SHAPE
 static const ResRef EmptyResRef;
 
-struct LevelAndKit
-{
-	unsigned int level;
-	unsigned int kit;
-	
-	LevelAndKit(unsigned int level, unsigned int kit) noexcept
-	: level(level), kit(kit)
-	{}
-};
-
 class SpellEntry
 {
 public:
@@ -64,7 +54,7 @@ public:
 	void AddLevel(unsigned int level, unsigned int kit);
 private:
 	ResRef spell;
-	std::vector<LevelAndKit> levels;
+	std::unordered_map<unsigned int, unsigned int> kitAndLevel;
 };
 
 const ResRef& SpellEntry::GetSpell() const
@@ -74,22 +64,22 @@ const ResRef& SpellEntry::GetSpell() const
 
 const ResRef& SpellEntry::FindSpell(unsigned int level, unsigned int kit) const
 {
-	for (const auto& entry : levels) {
-		if (entry.kit == kit && entry.level == level) {
-			return spell;
-		}
+	const auto it = kitAndLevel.find(kit);
+	if (it == kitAndLevel.cend()) {
+		return EmptyResRef;
 	}
-	return EmptyResRef;
+
+	return it->second == level ? spell : EmptyResRef;
 }
 
 int SpellEntry::FindSpell(unsigned int kit) const
 {
-	for (const auto& entry : levels) {
-		if (entry.kit == kit) {
-			return entry.level;
-		}
+	const auto it = kitAndLevel.find(kit);
+	if (it == kitAndLevel.cend()) {
+		return -1;
 	}
-	return -1;
+
+	return it->second;
 }
 
 static int FindSpell(const ResRef& spellref, std::vector<SpellEntry*>& list)
@@ -113,21 +103,14 @@ void SpellEntry::SetSpell(const ResRef& spl)
 	spell = spl;
 }
 
-void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
+void SpellEntry::AddLevel(unsigned int level, unsigned int kit)
 {
-	if(!level) {
+	if (!level) {
 		return;
 	}
 
 	level--; // convert to 0-based for internal use
-	for (const auto& entry : levels) {
-		if (entry.kit == kit && entry.level == level) {
-			Log(WARNING, "CREImporter", "Skipping duplicate spell list table entry for: {}", spell);
-			return;
-		}
-	}
-	
-	levels.emplace_back(level, kit);
+	kitAndLevel[kit] = level;
 }
 
 static int IsInnate(const ResRef& name)
@@ -428,10 +411,17 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 			index = FindSpell(spellRef, splList);
 			assert (index != TableMgr::npos);
 		}
-		list[index] = new SpellEntry;
-		list[index]->SetSpell(tab->QueryField(i, lastCol));
+
+		// IWD2 listdomn has SPWI903 twice
+		auto&& listItem = list[index];
+		if (listItem == nullptr) {
+			listItem = new SpellEntry;
+			listItem->SetSpell(tab->QueryField(i, lastCol));
+		}
+
 		for (TableMgr::index_t col = 0; col < lastCol; ++col) {
-			list[index]->AddLevel(tab->QueryFieldSigned<int>(i, col), col);
+			auto level = tab->QueryFieldSigned<int>(i, col);
+			listItem->AddLevel(level, col);
 		}
 	}
 }
