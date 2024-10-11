@@ -281,8 +281,8 @@ void GlobalTimer::SetScreenShake(const Point &shake, int count)
 {
 	shakeVec.x = std::abs(shake.x);
 	shakeVec.y = std::abs(shake.y);
-	shakeCounter = count + 1;
-	
+	shakeCounter = std::max(0, count + 1);
+
 	if (goal.IsInvalid()) {
 		const GameControl* gc = core->GetGameControl();
 		currentVP = gc->Viewport();
