@@ -785,9 +785,7 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 	SetScript(cre, critter.AreaScript, SCR_AREA);
 	SetScript(cre, critter.SpecificScript, SCR_SPECIFICS);
 
-	if (!critter.Dialog.IsEmpty()) {
-		cre->SetDialog(critter.Dialog);
-	}
+	cre->SetDialog(critter.Dialog);
 }
 
 void IniSpawn::SpawnGroup(SpawnEntry& event) const

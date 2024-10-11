@@ -6207,11 +6207,6 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 	return LSR_OK;
 }
 
-void Actor::SetDialog(const ResRef &resref)
-{
-	Dialog = resref;
-}
-
 Holder<Sprite2D> Actor::CopyPortrait(int which) const
 {
 	ResRef portrait = which ? SmallPortrait : LargePortrait;
