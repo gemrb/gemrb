@@ -368,8 +368,8 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 		case 2:
 			a = owner->GetBase(IE_HITPOINTS);
 			b = target->GetBase(IE_HITPOINTS);
-			owner->SetBase(IE_HITPOINTS, a);
-			target->SetBase(IE_HITPOINTS, b);
+			owner->SetBase(IE_HITPOINTS, b);
+			target->SetBase(IE_HITPOINTS, a);
 			//fallthrough
 		default:
 			return FX_NOT_APPLIED;
