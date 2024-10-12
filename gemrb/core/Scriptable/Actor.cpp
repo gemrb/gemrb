@@ -544,7 +544,7 @@ void Actor::SetCircleSize()
 	if (UnselectableTimer) {
 		color = ColorMagenta;
 		normalIdx = 4;
-	} else if (Modified[IE_STATE_ID] & STATE_PANIC || Modified[IE_CHECKFORBERSERK]) {
+	} else if (Modified[IE_STATE_ID] & STATE_PANIC || (Modified[IE_STATE_ID] & STATE_BERSERK && Modified[IE_CHECKFORBERSERK])) {
 		color = ColorYellow;
 		normalIdx = 5;
 	} else if (gc && ((gc->InDialog() && gc->dialoghandler->IsTarget(this)) || Timers.remainingTalkSoundTime > 0)) {
