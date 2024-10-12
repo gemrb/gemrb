@@ -876,9 +876,7 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 		// but only if we have really just recovered, so panic from other
 		// sources isn't affected
 		if ((actor->Modified[IE_MORALE]-1 == actor->Modified[IE_MORALEBREAK]) || (actor->Modified[IE_MORALEBREAK] == 0) ) {
-			if (!third || !(actor->Modified[IE_SPECFLAGS]&SPECF_DRIVEN)) {
-				actor->SetBaseBit(IE_STATE_ID, STATE_PANIC, false);
-			}
+			actor->SetBaseBit(IE_STATE_ID, STATE_PANIC, false);
 		}
 	}
 	//for new colour
@@ -11447,7 +11445,7 @@ bool Actor::ShouldModifyMorale() const
 
 	// in HoF, everyone else becomes immune to morale failure ("Mental Fortitude" in iwd2)
 	if (core->GetGame()->HOFMode) {
-		return Modified[IE_EA] == EA_PC;
+		return Modified[IE_EA] == EA_PC && !(Modified[IE_SPECFLAGS] & SPECF_DRIVEN);
 	}
 
 	return true;
