@@ -399,15 +399,16 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 	}
 	TableMgr::index_t index;
 	for (TableMgr::index_t i = 0; i < count; ++i) {
+		ResRef spellRef = tab->QueryField(i, lastCol);
+
 		if (indexlist) {
 			index = i;
 		} else {
-			// find the correct index in listspll.2da
-			ResRef spellRef = tab->QueryField(i, lastCol);
 			// the table has disabled spells in it and they all have the first two chars replaced by '*'
 			if (IsStar(spellRef)) {
 				continue;
 			}
+			// find the correct index in listspll.2da
 			index = FindSpell(spellRef, splList);
 			assert (index != TableMgr::npos);
 		}
@@ -416,7 +417,7 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 		auto&& listItem = list[index];
 		if (listItem == nullptr) {
 			listItem = new SpellEntry;
-			listItem->SetSpell(tab->QueryField(i, lastCol));
+			listItem->SetSpell(spellRef);
 		}
 
 		for (TableMgr::index_t col = 0; col < lastCol; ++col) {
