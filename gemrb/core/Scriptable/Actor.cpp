@@ -2941,8 +2941,8 @@ void Actor::RefreshPCStats() {
 	const Game *game = core->GetGame();
 	//morale recovery every xth AI cycle ... except for pst pcs
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
-	if (mrec && ShouldModifyMorale()) {
-		if (!(game->GameTime%mrec)) {
+	if (mrec) {
+		if (ShouldModifyMorale() && !(game->GameTime % mrec)) {
 			int morale = (signed) BaseStats[IE_MORALE];
 			if (morale < 10) {
 				NewBase(IE_MORALE, 1, MOD_ADDITIVE);
@@ -2950,6 +2950,8 @@ void Actor::RefreshPCStats() {
 				SetBase(IE_MORALE, GetBase(IE_MORALE) - 1);
 			}
 		}
+	} else {
+		SetBase(IE_MORALE, 10);
 	}
 
 	// handle intoxication
