@@ -5744,7 +5744,6 @@ int fx_familiar_marker(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 		if (fam) {
 			//upgrade successful
-			//TODO: copy stuff from old familiar if needed
 			target->DestroySelf();
 			return FX_NOT_APPLIED;
 		}
