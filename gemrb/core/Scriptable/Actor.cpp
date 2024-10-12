@@ -862,6 +862,11 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 {
 	if (!actor->ShouldModifyMorale()) return;
 
+	if ((signed) actor->BaseStats[IE_MORALE] < 0) {
+		actor->BaseStats[IE_MORALE] = 0;
+		actor->Modified[IE_MORALE] = 0;
+	}
+
 	// no panic if we're doing something forcibly
 	const Game* game = core->GetGame();
 	bool overriding = actor->GetCurrentAction() && actor->GetCurrentAction()->flags & ACF_OVERRIDE;
@@ -878,6 +883,8 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 		if ((actor->Modified[IE_MORALE]-1 == actor->Modified[IE_MORALEBREAK]) || (actor->Modified[IE_MORALEBREAK] == 0) ) {
 			actor->SetBaseBit(IE_STATE_ID, STATE_PANIC, false);
 		}
+	} else if (actor->BaseStats[IE_MORALE] > 20) {
+		actor->BaseStats[IE_MORALE] = 20;
 	}
 	//for new colour
 	actor->SetCircleSize();
