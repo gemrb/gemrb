@@ -865,7 +865,7 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	// no panic if we're doing something forcibly
 	const Game* game = core->GetGame();
 	bool overriding = actor->GetCurrentAction() && actor->GetCurrentAction()->flags & ACF_OVERRIDE;
-	overriding = overriding || (game->StateOverrideFlag && game->StateOverrideTime);
+	overriding = overriding || core->InCutSceneMode() || (game->StateOverrideFlag && game->StateOverrideTime);
 	bool lowMorale = actor->Modified[IE_MORALE] <= actor->Modified[IE_MORALEBREAK];
 	if (lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
 		// in iwd2 this is heavily biased towards running (80%, 10%, 10%)
