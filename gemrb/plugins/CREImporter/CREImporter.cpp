@@ -156,8 +156,7 @@ static int IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
 	for (size_t i = 0; i < splCount; i++) {
 		if (domList[i] && domList[i]->Equals(name)) {
 			int lev = domList[i]->FindSpell(kit);
-			if (lev == -1) return -1;
-			level = static_cast<unsigned short>(lev);
+			if (lev == -1 || lev != level) return -1;
 			return static_cast<int>(i);
 		}
 	}
@@ -177,7 +176,6 @@ static int IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
 
 ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const
 {
-	level = 0;
 	if (IsSong(name)>=0) return IE_IWD2_SPELL_SONG;
 	if (IsShape(name)>=0) return IE_IWD2_SPELL_SHAPE;
 	if (IsInnate(name)>=0) return IE_IWD2_SPELL_INNATE;
@@ -194,6 +192,7 @@ ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, uns
 	if (IsDomain(name, level, kit2) >= 0) return IE_IWD2_SPELL_DOMAIN;
 
 	// try harder for the rest
+	level = 0;
 	for (const auto& spell : splList) {
 		if (!spell || !spell->Equals(name)) {
 			continue;
