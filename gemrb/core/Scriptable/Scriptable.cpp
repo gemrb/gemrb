@@ -970,6 +970,7 @@ void Scriptable::CastSpellPointEnd(int level, bool keepStance)
 	CreateProjectile(SpellResRef, 0, level, false);
 
 	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
+	ieDword oldLastTrigger = objects.LastTrigger;
 	// NOTE: unused in iwd2, so the fact that it has no stored spelltype is of no consequence
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
 	switch (nSpellType) {
@@ -989,6 +990,8 @@ void Scriptable::CastSpellPointEnd(int level, bool keepStance)
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
 		target->objects.LastSpellOnMe = spellID;
 	}
+	// restore LastTrigger as bg2 otygrate.bcs relies on it; mangles trigger_spellcast for the caster
+	objects.LastTrigger = oldLastTrigger;
 
 	ResetCastingState(caster);
 }
@@ -1044,6 +1047,7 @@ void Scriptable::CastSpellEnd(int level, bool keepStance)
 	CreateProjectile(SpellResRef, objects.LastSpellTarget, level, GetSpellDistance(SpellResRef, this) == 0xffffffff);
 
 	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
+	ieDword oldLastTrigger = objects.LastTrigger;
 	// NOTE: unused in iwd2, so the fact that it has no stored spelltype is of no consequence
 	ieDword spellID = ResolveSpellNumber(SpellResRef);
 	switch (nSpellType) {
@@ -1063,6 +1067,8 @@ void Scriptable::CastSpellEnd(int level, bool keepStance)
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
 		target->objects.LastSpellOnMe = spellID;
 	}
+	// restore LastTrigger as bg2 otygrate.bcs relies on it; mangles trigger_spellcast for the caster
+	objects.LastTrigger = oldLastTrigger;
 
 	ResetCastingState(caster);
 }
