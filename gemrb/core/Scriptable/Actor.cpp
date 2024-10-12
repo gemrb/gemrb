@@ -856,9 +856,7 @@ void Actor::ApplyClab(const ResRef& clab, ieDword max, int remove, int diff)
 	}
 }
 
-//call this when morale or moralebreak changed
-//cannot use old or new value, because it is called two ways
-static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
+static void pcf_morale(Actor* actor, ieDword oldValue, ieDword newValue)
 {
 	if (!actor->ShouldModifyMorale()) return;
 
@@ -869,25 +867,36 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 
 	// no panic if we're doing something forcibly
 	const Game* game = core->GetGame();
+	int diff = static_cast<int>(newValue) - static_cast<int>(oldValue);
 	bool overriding = actor->GetCurrentAction() && actor->GetCurrentAction()->flags & ACF_OVERRIDE;
 	overriding = overriding || core->InCutSceneMode() || (game->StateOverrideFlag && game->StateOverrideTime);
+	overriding = overriding || oldValue == 0; // first run
+	bool panicked = actor->BaseStats[IE_STATE_ID] & STATE_PANIC;
 	bool lowMorale = actor->Modified[IE_MORALE] <= actor->Modified[IE_MORALEBREAK];
-	if (lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
+	if (!panicked && lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
 		// in iwd2 this is heavily biased towards running (80%, 10%, 10%)
 		PanicMode panicMode = static_cast<PanicMode>(RAND(1, 3));
 		actor->Panic(game->GetActorByGlobalID(actor->objects.LastAttacker), panicMode, true);
-	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
+	} else if (panicked && diff > 0) {
 		// recover from panic, since morale has risen again
 		// but only if we have really just recovered, so panic from other
 		// sources isn't affected
-		if ((actor->Modified[IE_MORALE]-1 == actor->Modified[IE_MORALEBREAK]) || (actor->Modified[IE_MORALEBREAK] == 0) ) {
+		bool recovered = (actor->Modified[IE_MORALE] - diff <= actor->Modified[IE_MORALEBREAK]) && !lowMorale;
+		if (recovered || actor->Modified[IE_MORALEBREAK] == 0) {
 			actor->SetBaseBit(IE_STATE_ID, STATE_PANIC, false);
+			actor->ClearActions();
 		}
 	} else if (actor->BaseStats[IE_MORALE] > 20) {
 		actor->BaseStats[IE_MORALE] = 20;
 	}
 	//for new colour
 	actor->SetCircleSize();
+}
+
+static void pcf_morale_break(Actor* actor, ieDword oldValue, ieDword newValue)
+{
+	// massage params, so diff in pcf_morale works for both stats
+	pcf_morale(actor, 0, newValue - oldValue);
 }
 
 static void UpdateHappiness(Actor *actor) {
@@ -1491,7 +1500,7 @@ static const PostChangeFunctionType post_change_functions[MAX_STATS] = {
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, pcf_intoxication, //1f
 	nullptr, nullptr, pcf_level_fighter, nullptr, pcf_stat_str, nullptr, pcf_stat_int, pcf_stat_wis,
-	pcf_stat_dex, pcf_stat_con, pcf_stat_cha, nullptr, pcf_xp, pcf_gold, pcf_morale, nullptr, //2f
+	pcf_stat_dex, pcf_stat_con, pcf_stat_cha, nullptr, pcf_xp, pcf_gold, pcf_morale_break, nullptr, // 2f
 	pcf_reputation, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, pcf_entangle, pcf_sanctuary, //3f
 	pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level_mage, pcf_level_thief, nullptr, nullptr,
@@ -10252,7 +10261,7 @@ void Actor::CreateDerivedStats()
 				if (!level) continue;
 				BaseStats[levelslotsiwd2[i]] += 12;
 			}
-			// NOTE: this is a guess, reports vary
+			// NOTE: this is a guess, reports vary, iwd2 manually does it when checking saves
 			// the attribute increase already contributes +5
 			for (int i = 0; i <= IE_SAVEWILL - IE_SAVEFORTITUDE; i++) {
 				BaseStats[savingThrows[i]] += 5;
