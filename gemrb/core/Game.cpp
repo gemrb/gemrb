@@ -1186,7 +1186,6 @@ void Game::LoadCRTable()
 	}
 }
 
-// FIXME: figure out the real mechanism
 int Game::GetXPFromCR(int cr) const
 {
 	if (!crtable) {
@@ -1202,8 +1201,7 @@ int Game::GetXPFromCR(int cr) const
 	cr = Clamp(cr, 1, MAX_CRLEVEL);
 	Log(MESSAGE, "Game", "Challenge Rating: {}, party level: {}", cr, level);
 	// it also has a column for cr 0.25 and 0.5, so let's treat cr as a 1-based index
-	// but testing shows something else affects it further, so we divide by 2 to match
-	// the net is full of claims of halved values, so perhaps just a quick final rebalancing tweak
+	// the original halved too, perhaps just a quick final rebalancing tweak
 	return crtable[level-1][cr-1]/2;
 }
 
