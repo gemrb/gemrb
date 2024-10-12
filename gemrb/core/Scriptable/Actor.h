@@ -737,7 +737,7 @@ public:
 	/** handle idle actions, that shouldn't mess with scripting */
 	void IdleActions(bool nonidle);
 	/* sets the actor in panic (turn/morale break) */
-	void Panic(const Scriptable* attacker, PanicMode mode);
+	void Panic(const Scriptable* attacker, PanicMode mode, bool extraFeedback = false);
 	/* sets a multi class flag (actually this is a lot of else too) */
 	void SetMCFlag(ieDword bitmask, BitOp op);
 	/* inlined dialogue start */

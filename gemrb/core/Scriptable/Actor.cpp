@@ -868,9 +868,9 @@ static void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/
 	overriding = overriding || (game->StateOverrideFlag && game->StateOverrideTime);
 	bool lowMorale = actor->Modified[IE_MORALE] <= actor->Modified[IE_MORALEBREAK];
 	if (lowMorale && actor->Modified[IE_MORALEBREAK] != 0 && !overriding) {
-		int panicMode = RAND(0, 2); // PANIC_RANDOMWALK etc.
-		displaymsg->DisplayConstantStringName(HCStrings(int(HCStrings::MoraleBerserk) + panicMode), GUIColors::WHITE, actor);
-		actor->Panic(game->GetActorByGlobalID(actor->objects.LastAttacker), PanicMode(panicMode + 1));
+		// in iwd2 this is heavily biased towards running (80%, 10%, 10%)
+		PanicMode panicMode = static_cast<PanicMode>(RAND(1, 3));
+		actor->Panic(game->GetActorByGlobalID(actor->objects.LastAttacker), panicMode, true);
 	} else if (actor->Modified[IE_STATE_ID]&STATE_PANIC) {
 		// recover from panic, since morale has risen again
 		// but only if we have really just recovered, so panic from other
@@ -3923,7 +3923,7 @@ bool Actor::OverrideActions()
 	return false;
 }
 
-void Actor::Panic(const Scriptable* attacker, PanicMode mode)
+void Actor::Panic(const Scriptable* attacker, PanicMode mode, bool extraFeedback)
 {
 	auto PanicAction = [](unsigned short actionID) {
 		return actionID == 184 || actionID == 85 || actionID == 124 || actionID == 29;
@@ -3937,12 +3937,16 @@ void Actor::Panic(const Scriptable* attacker, PanicMode mode)
 	}
 
 	if (InParty) core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
+	if (extraFeedback) {
+		displaymsg->DisplayConstantStringName(HCStrings(int(HCStrings::MoraleBerserk) + int(mode) - 1), GUIColors::WHITE, this);
+	}
 	VerbalConstant(Verbal::Panic, gamedata->GetVBData("SPECIAL_COUNT"));
 
 	Action *action;
 	if (mode == PanicMode::RunAway && (!attacker || attacker->Type != ST_ACTOR)) {
 		mode = PanicMode::RandomWalk;
 	}
+	// iwd2 also set a marker field to 1
 
 	switch (mode) {
 	case PanicMode::RunAway:
@@ -3960,13 +3964,12 @@ void Actor::Panic(const Scriptable* attacker, PanicMode mode)
 	case PanicMode::Berserk:
 		action = GenerateAction( "Berserk()" );
 		BaseStats[IE_CHECKFORBERSERK]=3;
-		//SetBaseBit(IE_STATE_ID, STATE_BERSERK, true);
 		break;
 	default:
 		return;
 	}
 	if (action) {
-		ReleaseCurrentAction();
+		ReleaseCurrentAction(); // iwd2 even cleared the queue
 		AddActionInFront(action);
 	} else {
 		Log(ERROR, "Actor", "Cannot generate panic action");
