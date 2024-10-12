@@ -519,7 +519,13 @@ int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned 
 			level = spell->SpellLevel-1;
 		}
 		spl->Level = static_cast<ieWord>(level);
-		spl->Type = gm->FindSpellType(spell->Name, spl->Level, clsmsk, kit);
+		// just use clsmsk directly as a book type if we passed it on
+		// or if it has only one bit set by chance
+		if (CountBits(clsmsk) == 1) {
+			spl->Type = std::log2(clsmsk);
+		} else {
+			spl->Type = gm->FindSpellType(spell->Name, spl->Level, clsmsk, kit);
+		}
 		// only add memo and bail out if spell is already known
 		// make sure the level and type match, so domain spells are handled properly
 		// we should probably be idempotent like that in other games as well
