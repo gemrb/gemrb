@@ -76,6 +76,7 @@ using namespace GemRB;
 #define PI_HOLY     59
 #define PI_BOUNCE   65
 #define PI_BOUNCE2  67
+#define PI_PETRIFIED 71
 
 #define PI_CONTINGENCY 75
 #define PI_BLOODRAGE 76 //iwd2
@@ -2358,8 +2359,17 @@ int fx_bonus_wizard_spells (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x2B Cure:Petrification
 int fx_cure_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
-	// print("fx_cure_petrified_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	BASE_STATE_CURE( STATE_PETRIFIED );
+	// auto-join them back in iwd2, since there's no dialog available
+	if (core->HasFeature(GFFlags::RULES_3ED) && !target->InParty && target->GetBase(IE_MC_FLAGS) & MC_EXPORTABLE) {
+		core->GetGame()->JoinParty(target, 0);
+		target->SetBase(IE_EA, EA_PC);
+		target->SetScript("DEFAULT", AI_SCRIPT_LEVEL, true);
+		target->SetScript(ResRef(), SCR_RACE, true);
+		target->SetScript(ResRef(), SCR_GENERAL, true);
+		target->SetScript("DPLAYER2", SCR_DEFAULT, false);
+		target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_PETRIFIED); // the spell doesn't do it
+	}
 	return FX_NOT_APPLIED;
 }
 
