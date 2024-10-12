@@ -4049,7 +4049,7 @@ bool Actor::CheckSpellDisruption(int damage) const
 	if (HasFeat(Feat::CombatCasting)) {
 		bonus += 4;
 	}
-	if (GetStat(IE_MC_FLAGS) & MC_NO_DISRUPTION) {
+	if (GetStat(IE_SPECFLAGS) & SPECF_DRIVEN) {
 		concentration += 10;
 	}
 	// ~Spell Disruption check (d20 + Concentration + Combat Casting bonus) %d + %d + %d vs. (10 + damageTaken + spellLevel)  = 10 + %d + %d.~

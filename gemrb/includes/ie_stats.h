@@ -190,7 +190,6 @@ namespace GemRB {
 
 //Multiclass flags
 #define MC_SHOWLONGNAME         0x0001 // in iwd2 this supposedly prevents casting disruption from damage
-#define MC_NO_DISRUPTION        0x0001 // but it is set on non-casters only (all halfgoblins) and most have no scripts
 #define MC_REMOVE_CORPSE        0x0002
 #define MC_KEEP_CORPSE          0x0004
 #define MC_WAS_FIGHTER		0x0008
