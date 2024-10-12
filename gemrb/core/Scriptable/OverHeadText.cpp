@@ -179,8 +179,10 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType
 		// make it a Font::Print flag bit in the future?
 		Font::StringSizeMetrics metrics { rgnBG.size, 0, 0, true };
 		Size stringSize = core->GetTextFont()->StringSize(text, &metrics);
-		rgnBG.h = stringSize.h;
+		rgnBG.size = stringSize;
 		rgnBG.ExpandAllSides(3);
+		// recenter if we shrunk
+		rgnBG.x += (200 - rgnBG.w) / 2 + 3;
 		static constexpr Color TranslucentBlack { 0x00, 0x00, 0x00, 0x9f };
 		VideoDriver->DrawRect(rgnBG, TranslucentBlack, true, BlitFlags::BLENDED);
 	}
