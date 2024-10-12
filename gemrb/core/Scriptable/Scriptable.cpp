@@ -1663,8 +1663,8 @@ void Selectable::DrawCircle(const Point& p) const
 		mix = GlobalColorCycle.Blend(overColor, selectedColor);
 		col = &mix;
 	} else if (IsPC()) {
-		// don't dim white
-		if (*col != ColorWhite) col = &overColor;
+		// only dim base EA colors
+		if (*col == ColorGreen || *col == ColorBlue || *col == ColorRed) col = &overColor;
 	}
 
 	if (sprite) {
