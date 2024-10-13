@@ -3672,7 +3672,7 @@ Optionally Flags can be used to specify the animation flags.\n\
 **Parameters:** \n\
   * GButton - the button\n\
   * Animation - resref of the animation, or a list of Sprite2D\
-  * Cycle - (optional) number of the cycle to use if using a BAM, otherwise the duration (in ticks) required for the animation.\n\
+  * Cycle - (optional) number of the cycle to use if using a BAM, otherwise the duration (in ms) required for the animation.\n\
   * Flags - (optional) set the animation flags \n\
   * Cols - (optional) a list of Colors to apply as the palette\n\
 \n\
