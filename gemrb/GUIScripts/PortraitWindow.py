@@ -88,8 +88,8 @@ def SetupDamageInfo (Button):
 
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		HPLabel = Button.Window.GetControl(99 + pc)
+		HPLabel.SetColor (color, TA_COLOR_NORMAL)
 		HPLabel.SetText (ratio_str)
-		HPLabel.SetColor (color)
 
 # returns buttons and a numerical index
 # does nothing new in iwd2 due to layout
@@ -214,9 +214,11 @@ def AddStatusFlagLabel (Button, i):
 # overlay a label, so we can display the hp with the correct font. Regular button label
 #   is used by effect icons
 def AddHPLabel (Button, i):
-	label = Button.CreateLabel (99 + i, "NUMFONT", "", IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_LEFT | IE_FONT_SINGLE_LINE)
-	label.SetColor(ColorWhitish)
-	label.SetFrame(Button.GetInsetFrame(2, 2, 2, 2))
+	iwd1 = GameCheck.IsIWD1 ()
+	frame = Button.GetInsetFrame (3 + iwd1 * 3, 2, 2, 1 + iwd1);
+	label = Button.CreateTextArea (99 + i, frame["x"], frame["y"], frame["w"], 10, "NUMFONT")
+	label.SetColor (ColorBlackish, TA_COLOR_BACKGROUND)
+	label.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	return label
 
 def SetupButtonBorders (Button):
