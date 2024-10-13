@@ -114,19 +114,19 @@ def UpdateButtonAnimation(Button):
 		cycle = 8
 	elif state & STATE_PETRIFIED:
 		cycle = 7
-	elif state & STATE_PANIC:
+	elif state & STATE_PANIC: # frozen?
 		cycle = 6
 	elif state & STATE_POISONED:
-		cycle = 2
+		cycle = 2 # and 3
 	elif hp < hp_max / 2:
-		cycle = 4
+		cycle = 4 # and 5
 	else:
-		cycle = 0
+		cycle = 0 # and 1
 
 	portrait = GemRB.GetPlayerPortrait (pcID, 0)
 	pic = portrait["ResRef"]
 
-	if cycle < 6: # a "random" animation
+	if cycle < 6: # a "random" animation, other cycles are not animated
 		def phase2(btn):
 			switch = random.randint(0, 29) == 0
 			btn.SetAnimation(pic, cycle + int(switch), A_ANI_PLAYONCE)
@@ -139,6 +139,7 @@ def UpdateButtonAnimation(Button):
 		Button.OnAnimEnd (phase2)
 	else:
 		Button.SetAnimation(pic, cycle, A_ANI_PLAYONCE)
+		Button.OnAnimEnd (None)
 	return
 
 def UpdatePortraitButton(Button):
@@ -175,9 +176,7 @@ def UpdatePortraitButton(Button):
 		ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 		ButtonHP.SetText ("{} / {}".format(hp, hp_max))
 
-	animated = GemRB.GetVar("{}_ANIM".format(Button.ControlID))
-	if animated:
-		return # we are finishing an animation, when it concludes it will call UpdateButtonAnimation
+	GemRB.GetVar ("{}_ANIM".format(Button.ControlID))
 
 	UpdateButtonAnimation(Button)
 	return
