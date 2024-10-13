@@ -93,6 +93,7 @@ def InitJournalWindow (JournalWindow):
 	if Chapter > 65535:
 		Chapter = 0
 
+	UpdateLogWindow (JournalWindow)
 	return
 
 def ToggleOrderWindow ():
@@ -260,8 +261,8 @@ def UpdateLogWindow (JournalWindow):
 		Text.Append (JournalTitle + JournalText)
 	return
 
-ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateLogWindow, True)
-OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow, UpdateLogWindow, True)
+ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, None, True)
+OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow, None, True)
 
 ###################################################
 def PrevChapterPress ():

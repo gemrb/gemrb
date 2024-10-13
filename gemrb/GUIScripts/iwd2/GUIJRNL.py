@@ -51,7 +51,7 @@ def InitJournalWindow (Window):
 	Button.OnPress (JournalNextSectionPress)
 
 	Chapter = GemRB.GetGameVar("chapter")
-
+	UpdateJournalWindow (JournalWindow)
 	return
 
 ###################################################
@@ -84,8 +84,8 @@ def UpdateJournalWindow (Window):
 		JournalText = JournalText + GemRB.GetString(je['Text']) + "\n\n"
 	Text.SetText (JournalText)
 
-ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateJournalWindow)
-OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow, UpdateJournalWindow)
+ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, None, True)
+OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow, None, True)
 
 
 ###################################################
