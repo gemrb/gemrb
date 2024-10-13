@@ -222,15 +222,11 @@ def NextPress():
 	if KitWindow:
 		KitWindow.Close ()
 
-	#make gnomes always kitted
 	KitIndex = GemRB.GetVar ("Class Kit")
-	MageSchool = GemRB.GetVar ("MAGESCHOOL")
-	if MageSchool and not KitIndex:
-		KitIndex = CommonTables.KitList.FindValue (6, SchoolList.GetValue (MageSchool, 3))
-
-	#save the kit
-	KitValue = (0x4000 + KitIndex)
-	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
+	if ClassName == "MAGE":
+		GemRB.SetVar("MAGESCHOOL", KitIndex)
+	Kit = CommonTables.KitList.GetValue(KitIndex, 6)
+	GemRB.SetPlayerStat (MyChar, IE_KIT, Kit)
 
 	GemRB.SetNextScript("CharGen4") #abilities
 	return
