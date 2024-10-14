@@ -598,6 +598,8 @@ static void ApplyClab_internal(Actor* actor, const ResRef& clab, int level, bool
 	AutoTable table = gamedata->LoadTable(clab);
 	if (!table) return;
 
+	int innate = core->HasFeature(GFFlags::HAS_SPELLLIST) ? IE_IWD2_SPELL_INNATE : 0; // others ignore the passed type
+
 	TableMgr::index_t row = table->GetRowCount();
 	int maxLevel = level;
 	// don't remove clabs from levels we haven't attained yet, just in case they contain non-sticky
@@ -619,7 +621,7 @@ static void ApplyClab_internal(Actor* actor, const ResRef& clab, int level, bool
 				if (remove) {
 					actor->spellbook.RemoveSpell(clabRef);
 				} else {
-					actor->LearnSpell(clabRef, LS_MEMO);
+					actor->LearnSpell(clabRef, LS_MEMO, 0, 1 << innate);
 				}
 			} else if (res.BeginsWith("FA_")) {//iwd2 only: innate name strref
 				//memorize these?
