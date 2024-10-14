@@ -812,6 +812,9 @@ void Interface::HandleFlags() noexcept
 
 			winmgr->FadeColor = Color();
 
+			// rearrange party slots
+			game->ConsolidateParty();
+
 			GameControl* gc = StartGameControl();
 			guiscript->LoadScript( "Game" );
 			guiscript->RunFunction( "Game", "EnterGame" );
@@ -821,9 +824,6 @@ void Interface::HandleFlags() noexcept
 			if (actor) {
 				gc->ChangeMap(actor, true);
 			}
-
-			//rearrange party slots
-			game->ConsolidateParty();
 
 			Window* gamewin = winmgr->GetGameWindow();
 			gamewin->AddSubviewInFrontOfView(gc);
