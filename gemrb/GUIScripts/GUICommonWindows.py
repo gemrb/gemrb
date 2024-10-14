@@ -723,6 +723,7 @@ def UpdateActionsWindow ():
 	else:
 		print("Invalid action level:", level)
 		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+		UpdateActionsWindow ()
 	return
 
 def ActionQWeaponPressed (which):
