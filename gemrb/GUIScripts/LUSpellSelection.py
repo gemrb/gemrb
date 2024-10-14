@@ -291,12 +291,10 @@ def SpellsDonePress ():
 
 	# save all the spells
 	if not Memorization:
+		sbt = SpellBookType if IWD2 else -1
 		for i in range (len (Spells[SpellLevel])):
 			if SpellBook[i]: # we need to learn this spell
-				if IWD2:
-					GemRB.LearnSpell (pc, Spells[SpellLevel][i][0], 0, 1<<SpellBookType)
-				else:
-					GemRB.LearnSpell (pc, Spells[SpellLevel][i][0])
+				GemRB.LearnSpell (pc, Spells[SpellLevel][i][0], 0, sbt)
 
 		# check to see if we need to update again
 		for i in range (SpellLevel+1, 9):

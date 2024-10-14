@@ -8435,6 +8435,8 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
+	if (Booktype != -1) Booktype = 1 << Booktype;
+
 	int ret = actor->LearnSpell(ResRefFromPy(Spell), Flags, Booktype, Level); // returns 0 on success
 	if (!ret) core->SetEventFlag( EF_ACTION );
 	return PyLong_FromLong(ret);

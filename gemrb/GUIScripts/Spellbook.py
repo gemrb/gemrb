@@ -585,11 +585,11 @@ def CannotLearnSlotSpell (si = None):
 def LearnPriestSpell (pc, spell, bookType, level):
 	if GameCheck.IsIWD2():
 		if bookType == IE_IWD2_SPELL_DOMAIN:
-			GemRB.LearnSpell (pc, spell, 0, 1 << bookType, level)
+			GemRB.LearnSpell (pc, spell, 0, bookType, level)
 		else:
 			# perhaps forcing would be fine here too, but it's untested and
 			# iwd2 cleric schools grant certain spells at different levels
-			GemRB.LearnSpell (pc, spell, 0, 1 << bookType)
+			GemRB.LearnSpell (pc, spell, 0, bookType)
 	else:
 		GemRB.LearnSpell (pc, spell)
 
@@ -729,9 +729,9 @@ def LearnFromScroll (pc, slot):
 	if GameCheck.IsIWD2 ():
 		# figure out the correct spellbook, giving mages precedence
 		if GemRB.GetPlayerStat (pc, IE_LEVELMAGE):
-			bookType = 1 << IE_IWD2_SPELL_WIZARD
+			bookType = IE_IWD2_SPELL_WIZARD
 		elif GemRB.GetPlayerStat (pc, IE_LEVELBARD):
-			bookType = 1 << IE_IWD2_SPELL_BARD
+			bookType = IE_IWD2_SPELL_BARD
 	ret = GemRB.LearnSpell (pc, spell_ref, LS_STATS | LS_ADDXP, bookType)
 
 	# destroy the scroll, just one in case of a stack

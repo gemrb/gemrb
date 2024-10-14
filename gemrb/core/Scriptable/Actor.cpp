@@ -627,7 +627,7 @@ static void ApplyClab_internal(Actor* actor, const ResRef& clab, int level, bool
 				if (remove) {
 					actor->fxqueue.RemoveAllEffects(clabRef);
 				} else {
-					actor->LearnSpell(clabRef, LS_MEMO | LS_LEARN, IE_IWD2_SPELL_INNATE);
+					actor->LearnSpell(clabRef, LS_MEMO | LS_LEARN, 1 << IE_IWD2_SPELL_INNATE);
 					actor->spellbook.RemoveSpell(clabRef);
 					core->ApplySpell(clabRef, actor, actor, 0);
 				}
@@ -636,7 +636,7 @@ static void ApplyClab_internal(Actor* actor, const ResRef& clab, int level, bool
 				if (remove) {
 					actor->fxqueue.RemoveAllEffects(clabRef);
 				} else {
-					actor->LearnSpell(clabRef, LS_LEARN, IE_IWD2_SPELL_SONG);
+					actor->LearnSpell(clabRef, LS_LEARN, 1 << IE_IWD2_SPELL_SONG);
 					actor->spellbook.RemoveSpell(clabRef);
 					core->ApplySpell(clabRef, actor, actor, 0);
 				}
