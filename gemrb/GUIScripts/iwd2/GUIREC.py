@@ -1408,7 +1408,7 @@ def LUNextPress ():
 	# grant an ability point or three (each 4 levels)
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	if GemRB.GetVar ("LUKitJustSet") != 0:
+	if (GemRB.GetVar ("LUKitJustSet") or 0) != 0:
 		oldKits = GemRB.GetPlayerStat (pc, IE_KIT, 1)
 		kitID = GemRB.GetVar ("LUKit")
 		GemRB.SetPlayerStat (pc, IE_KIT, oldKits | kitID)
