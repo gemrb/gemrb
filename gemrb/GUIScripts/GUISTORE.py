@@ -61,7 +61,6 @@ else:
 RepModTable = None
 SpellTable = None
 PreviousPC = 0
-BarteringPC = 0
 MaxAmount = 0
 BuySum = 0
 SellSum = 0
@@ -183,7 +182,7 @@ def OpenStoreWindow ():
 	global StoreWindow
 	global store_funcs
 	global SpellTable, RepModTable
-	global Inventory, BarteringPC
+	global Inventory
 	global CureTable
 
 	Inventory = GemRB.GetView ("WIN_INV") is not None
@@ -206,7 +205,6 @@ def OpenStoreWindow ():
 	Store = GemRB.GetStore ()
 	#based on shop type, these buttons will change
 	store_buttons = Store['StoreButtons']
-	BarteringPC = GemRB.GameGetFirstSelectedPC ()
 	
 	# we have to load the "top win" first
 	# the code doesn't permit a "normal win" to sit between 2 "top win"
@@ -1763,6 +1761,7 @@ def GetRealPrice (pc, mode, Item, Slot):
 			mod = max(mod, 20)
 	else:
 		# charisma modifier (in percent)
+		BarteringPC = GemRB.GetVar("BARTER_PC");
 		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
 
 		# reputation modifier (in percent, but absolute)
