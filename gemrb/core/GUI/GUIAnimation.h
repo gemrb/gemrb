@@ -130,16 +130,13 @@ private:
 	uint8_t cycle = 0;
 	uint8_t frame = 0;
 	unsigned int anim_phase = 0;
-	bool has_palette = false;
-	ieDword colors[8] {};
 	tick_t nextFrameTime = 0;
 
 	tick_t CalculateNextFrameDelta();
 	Holder<Sprite2D> GenerateNext(tick_t time) override;
 public:
-	explicit SpriteAnimation(std::shared_ptr<const AnimationFactory> af, int Cycle = 0);
+	SpriteAnimation(float fps, std::shared_ptr<const AnimationFactory> af, int Cycle = 0);
 	//report if the current resource is the same as descripted by the params
-	void SetPaletteGradients(const ieDword *col);
 	bool HasEnded() const override;
 
 	tick_t Time() const { return nextFrameTime; }
@@ -152,6 +149,7 @@ public:
 	} flags = PLAY_NORMAL;
 	
 	BlitFlags blitFlags = BlitFlags::BLENDED;
+	float fps = 10.0f;
 };
 
 }

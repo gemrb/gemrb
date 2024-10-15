@@ -3692,10 +3692,8 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	const ResRef ref = ResRefFromPy(pyRef);
 	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(ref, IE_BAM_CLASS_ID);
 	ABORT_IF_NULL(af);
-	SpriteAnimation* anim = new SpriteAnimation(std::move(af), Cycle);
 
-	anim->blitFlags = static_cast<BlitFlags>(Blend);
-	
+	float fps = ANI_DEFAULT_FRAMERATE;
 	if (cols) {
 		ieDword indices[8] {};
 		Py_ssize_t min = std::min<Py_ssize_t>(8, PyList_Size(cols));
@@ -3703,9 +3701,16 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 			PyObject* item = PyList_GetItem(cols, i);
 			indices[i] = static_cast<ieDword>(PyLong_AsLong(item));
 		}
-		anim->SetPaletteGradients(indices);
+		// assumes all sprites share a palette
+		auto spr = af->GetFrameWithoutCycle(0);
+		auto pal = spr->GetPalette();
+		*pal = SetupPaperdollColours(indices, 0);
+		fps = 10.0f; // FIXME: why do we slow these down?
 	}
-	
+
+	SpriteAnimation* anim = new SpriteAnimation(fps, af, Cycle);
+	anim->blitFlags = static_cast<BlitFlags>(Blend);
+
 	btn->SetAnimation(anim);
 
 	Py_RETURN_NONE;

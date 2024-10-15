@@ -20,7 +20,6 @@
 #include "GUIAnimation.h"
 
 #include "AnimationFactory.h"
-#include "GUI/Button.h"
 #include "Interface.h"
 #include "RNG.h"
 
@@ -78,17 +77,11 @@ bool ColorAnimation::HasEnded() const
 	return repeat ? false : current == end;
 }
 
-SpriteAnimation::SpriteAnimation(std::shared_ptr<const AnimationFactory> af, int cycle)
-: bam(std::move(af)), cycle(cycle)
+SpriteAnimation::SpriteAnimation(float fps, std::shared_ptr<const AnimationFactory> af, int cycle)
+: bam(std::move(af)), cycle(cycle), fps(fps)
 {
 	assert(bam);
 	nextFrameTime = begintime + CalculateNextFrameDelta();
-}
-
-void SpriteAnimation::SetPaletteGradients(const ieDword *col)
-{
-	memcpy(colors, col, 8*sizeof(ieDword));
-	has_palette = true;
 }
 
 tick_t SpriteAnimation::CalculateNextFrameDelta()
@@ -116,11 +109,7 @@ tick_t SpriteAnimation::CalculateNextFrameDelta()
 		}
 	} else {
 		frame++;
-		if (has_palette) {
-			delta = 100;  //hack for slower movement
-		} else {
-			delta = 15;
-		}
+		delta = 1000 / fps;
 	}
 
 	// maintain the same speed at higher drawing frequencies
@@ -162,11 +151,6 @@ Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
 		// I guess we just return the existing frame...
 		// we already did the palette manipulation (probably)
 		return current;
-	}
-
-	if (has_palette) {
-		Holder<Palette> palette = pic->GetPalette();
-		*palette = SetupPaperdollColours(colors, 0);
 	}
 	
 	pic->renderFlags |= blitFlags;
