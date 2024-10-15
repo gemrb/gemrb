@@ -8713,9 +8713,10 @@ the slot will not be looked up again.\n\
 
 static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, Slot;
+	int globalID;
+	int idx;
 	int translated = 0; // inventory slots are numbered differently in CRE and need to be remapped
-	PARSE_ARGS( args,  "ii|i", &globalID, &Slot, &translated);
+	PARSE_ARGS(args, "ii|i", &globalID, &idx, &translated);
 	const CREItem *si;
 	int header = -1;
 
@@ -8725,12 +8726,9 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 		GET_GAME();
 		GET_ACTOR_GLOBAL();
 
-		if (!translated) {
-			Slot = core->QuerySlot(Slot);
-		}
-		header = actor->PCStats->GetHeaderForSlot(Slot);
-
-		si = actor->inventory.GetSlotItem( Slot );
+		auto slot = translated ? idx : core->QuerySlot(idx);
+		header = actor->PCStats->GetHeaderForSlot(slot);
+		si = actor->inventory.GetSlotItem(slot);
 	}
 	if (! si) {
 		Py_RETURN_NONE;
@@ -8742,6 +8740,8 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Usages2", PyLong_FromLong(si->Usages[2]));
 	PyDict_SetItemString(dict, "Flags", PyLong_FromLong(si->Flags));
 	PyDict_SetItemString(dict, "Header", PyLong_FromLong(header));
+	PyDict_SetItemString(dict, "Slot", PyLong_FromLong(idx));
+	PyDict_SetItemString(dict, "PC", PyLong_FromLong(globalID));
 
 	return dict;
 }

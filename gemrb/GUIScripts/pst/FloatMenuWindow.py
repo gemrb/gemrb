@@ -84,8 +84,8 @@ def UseWeapon ():
 	GemRB.SetEquippedQuickSlot (pc, float_menu_selected)
 	return
 
-def DoSingleAction ():
-	i = GemRB.GetVar ('ItemButton')
+def DoSingleAction (btn):
+	i = btn.Value
 	OpenFloatMenuWindow ()
 	if i == 0:
 		GUIMA.OpenMapWindow ()
@@ -192,7 +192,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	for i in range (SLOT_COUNT):
 		Button = Window.GetControl (CID_SLOTS + i)
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		Button.SetVarAssoc ('ItemButton', i)
+		Button.SetVarAssoc ("ItemButton", i)
 		Button.SetFont ('NUMBER')
 		Button.SetPushOffset (0, 0)
 
@@ -391,21 +391,19 @@ def UpdateFloatMenuItem (pc, i, weapons):
 		#Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Button.OnPress (SelectItem)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		#Button.SetVarAssoc ('ItemButton', i)
 		return
 
 	ClearSlot (i)
 
 
-def SelectItem ():
+def SelectItem (btn):
 	global float_menu_selected
 
-	Button = GemRB.GetVar ('ItemButton')
 	#simulating radiobutton+checkbox hybrid
-	if float_menu_selected == Button:
+	if float_menu_selected == btn.Value:
 		float_menu_selected = None
 	else:
-		float_menu_selected = Button
+		float_menu_selected = btn.Value
 	if GUICommon.UsingTouchInput ():
 		FloatMenuWindow.Close ()
 	else:
