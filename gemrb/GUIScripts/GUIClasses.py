@@ -335,12 +335,14 @@ class GButton(GControl):
 		'SetPictureClipping': _GemRB.Button_SetPictureClipping,
 		'SetPicture': _GemRB.Button_SetPicture,
 		'SetPLT': _GemRB.Button_SetPLT,
-		'SetBAM': _GemRB.Button_SetBAM,
 		'SetSpellIcon': _GemRB.Button_SetSpellIcon,
 		'SetItemIcon': _GemRB.Button_SetItemIcon,
 		'SetActionIcon': _GemRB.Button_SetActionIcon,
 		'SetAnimation': _GemRB.Button_SetAnimation,
 	}
+	
+	def SetBAM(self, resref, cycle, frame, pal = -1):
+		return self.SetPicture(GemRB.GetSprite(resref, pal, cycle, frame))
 
 	def MakeDefault(self, glob=False):
 		# return key
