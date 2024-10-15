@@ -340,7 +340,7 @@ def UpdatePortraitWindow ():
 
 			if pcID == GemRB.GetVar("DLG_SPEAKER"):
 				flag = bytearray([154]) # dialog icon
-			elif pcID == pc and GemRB.GetView("WIN_STORE") and not GemRB.GetView("WIN_INV"): # don't show in bags
+			elif pcID == GemRB.GetVar("BARTER_PC") and not GemRB.GetView("WIN_INV"): # don't show in bags
 				flag = bytearray([155]) # shopping icon
 
 		if LUCommon.CanLevelUp (pcID):
