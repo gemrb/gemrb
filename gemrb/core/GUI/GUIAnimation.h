@@ -127,9 +127,7 @@ class AnimationFactory;
 class GEM_EXPORT SpriteAnimation : public GUIAnimation<Holder<Sprite2D>> {
 private:
 	std::shared_ptr<const AnimationFactory> bam;
-	uint8_t cycle = 0;
 	uint8_t frame = 0;
-	unsigned int anim_phase = 0;
 	tick_t nextFrameTime = 0;
 
 	tick_t CalculateNextFrameDelta();
@@ -143,12 +141,13 @@ public:
 	
 	enum RepeatFlags : uint8_t {
 		PLAY_NORMAL		= 0,  // play in a loop
-		PLAY_RANDOM		= 1,
 		PLAY_ONCE		= 2,  // play and stop at end
 		PLAY_ALWAYS		= 4   // play even when game is paused
 	} flags = PLAY_NORMAL;
 	
 	BlitFlags blitFlags = BlitFlags::BLENDED;
+
+	uint8_t cycle = 0;
 	float fps = 10.0f;
 };
 

@@ -81,44 +81,12 @@ SpriteAnimation::SpriteAnimation(float fps, std::shared_ptr<const AnimationFacto
 : bam(std::move(af)), cycle(cycle), fps(fps)
 {
 	assert(bam);
-	nextFrameTime = begintime + CalculateNextFrameDelta();
+	nextFrameTime = begintime;
 }
 
 tick_t SpriteAnimation::CalculateNextFrameDelta()
 {
-	tick_t delta = 0;
-	if (flags & PLAY_RANDOM) {
-		// simple Finite-State Machine
-		if (anim_phase == 0) {
-			frame = 0;
-			anim_phase = 1;
-			// note: the granularity of time should be
-			// one of twenty values from [500, 10000]
-			// but not the full range.
-			delta = 500 + 500 * RAND(0, 19);
-			cycle &= ~1;
-		} else if (anim_phase == 1) {
-			if (!RAND(0,29)) {
-				cycle |= 1;
-			}
-			anim_phase = 2;
-			delta = 100;
-		} else {
-			frame++;
-			delta = 100;
-		}
-	} else {
-		frame++;
-		delta = 1000 / fps;
-	}
-
-	// maintain the same speed at higher drawing frequencies
-	if (core->config.CapFPS > 0) {
-		delta = delta * core->config.CapFPS / 30;
-	} else {
-		delta *= 3; // random guess, since it will fluctuate and depend on the monitor
-	}
-	return delta;
+	return 1000.0f / fps;
 }
 
 Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
@@ -133,8 +101,9 @@ Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
 
 	nextFrameTime = time + CalculateNextFrameDelta();
 	assert(nextFrameTime);
-	
+
 	Holder<Sprite2D> pic = bam->GetFrame(frame, cycle);
+	frame++;
 
 	if (pic == nullptr) {
 		//stopping at end frame
@@ -142,7 +111,6 @@ Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
 			nextFrameTime = 0;
 			return current;
 		}
-		anim_phase = 0;
 		frame = 0;
 		pic = bam->GetFrame(0, cycle);
 	}
@@ -152,7 +120,7 @@ Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
 		// we already did the palette manipulation (probably)
 		return current;
 	}
-	
+
 	pic->renderFlags |= blitFlags;
 
 	return pic;

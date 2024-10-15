@@ -62,9 +62,8 @@ class Palette;
 //#define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag; labeled "no word wrap"
 //end of hardcoded part
 #define IE_GUI_BUTTON_NO_TEXT      0x00010000   // don't draw button label
-#define IE_GUI_BUTTON_PLAYRANDOM   0x00020000
-#define IE_GUI_BUTTON_PLAYONCE     0x00040000
-#define IE_GUI_BUTTON_PLAYALWAYS   0x00080000   // play even when game is paused
+#define IE_GUI_BUTTON_PLAYONCE     0x00020000
+#define IE_GUI_BUTTON_PLAYALWAYS   0x00040000   // play even when game is paused
 
 #define IE_GUI_BUTTON_CENTER_PICTURES 0x00100000 // center button's PictureList
 #define IE_GUI_BUTTON_BG1_PAPERDOLL   0x00200000 // BG1-style paperdoll PictureList

@@ -16,6 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
+import random
+
 import GemRB
 import GUICommonWindows
 from GUIDefines import *
@@ -64,6 +66,8 @@ def OpenPortraitWindow (pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
 		Button.SetVarAssoc("portrait", pcID) # neeeded for drag/drop
 		Button.SetHotKey(chr(ord('1') + i), 0, True)
+		Button.SetFlags (IE_GUI_BUTTON_PLAYONCE, OP_OR)
+		Button.OnAnimEnd (UpdateButtonAnimation)
 		SetupButtonBorders (Button)
 			
 		ButtonHP = Window.GetControl (6 + i)
@@ -90,17 +94,12 @@ def UpdatePortraitWindow ():
 
 	return
 
-def UpdatePortraitButton(Button):
+def UpdateButtonAnimation(Button):
 	"""Selects the correct portrait cycle depending on character state"""
 	# note: there are actually two portraits per chr, eg PPPANN (static), WMPANN (animated)
-	pcID = Button.ControlID + 1
-	portrait = GemRB.GetPlayerPortrait (pcID, 0)
-	if not portrait:
-		Button.SetVisible (False)
-		return
 
-	Button.SetVisible (True)
-	
+	pcID = Button.ControlID + 1
+
 	state = GemRB.GetPlayerStat (pcID, IE_STATE_ID)
 	hp = GemRB.GetPlayerStat (pcID, IE_HITPOINTS)
 	hp_max = GemRB.GetPlayerStat (pcID, IE_MAXHITPOINTS)
@@ -120,10 +119,36 @@ def UpdatePortraitButton(Button):
 	else:
 		cycle = 0
 
-	if cycle < 6:
-		Button.SetFlags (IE_GUI_BUTTON_PLAYRANDOM, OP_OR)
+	portrait = GemRB.GetPlayerPortrait (pcID, 0)
+	pic = portrait["ResRef"]
 
-	Button.SetAnimation(portrait["ResRef"], cycle)
+	if cycle < 6: # a "random" animation
+		def phase2(btn):
+			switch = random.randint(0, 29) == 0
+			btn.SetAnimation(pic, cycle + int(switch))
+			btn.OnAnimEnd (UpdateButtonAnimation)
+		# note: the granularity of time should be
+		# one of twenty values from [500, 10000]
+		# but not the full range.
+		duration = 500 + 500 * random.randint(0, 19);
+		Button.SetAnimation([GemRB.GetSprite(pic, -1, cycle, 0)], duration)
+		Button.OnAnimEnd (phase2)
+	else:
+		Button.SetAnimation(pic, cycle)
+	return
+
+def UpdatePortraitButton(Button):
+	pcID = Button.ControlID + 1
+	portrait = GemRB.GetPlayerPortrait (pcID, 0)
+	if not portrait:
+		Button.SetVisible(False)
+		Button.SetAnimation(None)
+		return
+
+	Button.SetVisible (True)
+
+	hp = GemRB.GetPlayerStat (pcID, IE_HITPOINTS)
+	hp_max = GemRB.GetPlayerStat (pcID, IE_MAXHITPOINTS)
 
 	if hp_max < 1 or hp == "?":
 		ratio = 0.0
@@ -145,4 +170,9 @@ def UpdatePortraitButton(Button):
 		op = OP_NAND
 	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 
+	animated = GemRB.GetVar("{}_ANIM".format(Button.ControlID))
+	if animated:
+		return # we are finishing an animation, when it concludes it will call UpdateButtonAnimation
+
+	UpdateButtonAnimation(Button)
 	return
