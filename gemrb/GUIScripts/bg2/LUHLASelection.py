@@ -37,6 +37,9 @@ Classes = []		# << classes (ids)
 Level = []		# << levels for each class
 EnhanceGUI = 0		# << toggle for scrollbar and 25th hla slot
 
+# setup our scroll index
+GemRB.SetVar("HLATopIndex", 0)
+
 def OpenHLAWindow (actor, numclasses, classes, levels):
 	"""Opens the HLA selection window."""
 
@@ -84,8 +87,6 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 		# setup extra 25th HLA slot:
 		HLAWindow.CreateButton (24, 231, 345, 42, 42)
 		if ( len (HLAAbilities) > 25):
-			# setup our scroll index
-			GemRB.SetVar("HLATopIndex", 0)
 			# setup scrollbar
 			ScrollBar = HLAWindow.CreateScrollBar (1000, {'x' : 290, 'y' : 142, 'w' : 16, 'h' : 252}, "GUISCRCW")
 			ScrollBar.OnChange (HLAShowAbilities)

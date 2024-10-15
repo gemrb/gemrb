@@ -589,7 +589,7 @@ def OpenSkillsWindow ():
 			DCSkillsRedraw, [0,0,0], [1,1,1], NewClassId, False)
 
 	#just go back if we can't assign skills
-	if GemRB.GetVar ("SkillPointsLeft") <= 0:
+	if not GemRB.GetVar ("SkillPointsLeft"):
 		DCSkillsWindow.Close ()
 		return
 

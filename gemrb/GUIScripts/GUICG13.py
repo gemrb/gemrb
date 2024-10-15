@@ -143,7 +143,7 @@ def GetColor():
 	ColorPicker = GemRB.LoadWindow(14)
 	if GameCheck.IsBG2 ():
 		CharGenCommon.PositionCharGenWin (ColorPicker, -2, -1)
-	GemRB.SetVar("Selected",-1)
+	GemRB.SetVar("Selected", None)
 	btnFlags = IE_GUI_BUTTON_PICTURE
 	btnState = IE_GUI_BUTTON_LOCKED
 	if GameCheck.IsBG2 ():

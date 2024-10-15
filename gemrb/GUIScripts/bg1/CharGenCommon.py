@@ -95,7 +95,7 @@ class CharGen:
 
 		AcceptButton = CharGenWindow.GetControl (8)
 		playmode = GemRB.GetVar ("PlayMode")
-		if playmode>=0:
+		if playmode is not None:
 			AcceptButton.SetText (11962)
 		else:
 			AcceptButton.SetText (13956)

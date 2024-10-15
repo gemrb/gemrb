@@ -1165,7 +1165,7 @@ def SpellPressed ():
 		Type = Spell // 1000
 	Spell = Spell % 1000
 	slot = GemRB.GetVar ("QSpell")
-	if slot>=0:
+	if slot is not None:
 		#setup quickspell slot
 		#if spell has no target, return
 		#otherwise continue with casting
@@ -1179,7 +1179,7 @@ def SpellPressed ():
 		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 		GemRB.SetVar("Type", 0)
 	GemRB.SpellCast (pc, Type, Spell)
-	if GemRB.GetVar ("Type")!=-1:
+	if GemRB.GetVar ("Type") is not None:
 		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 		#init spell list
 		GemRB.SpellCast (pc, -1, 0)
@@ -1370,7 +1370,7 @@ def TopWindowClosed(window):
 			GemRB.DropDraggedItem (pc, -2)
 
 	# for worldmap purposes
-	GemRB.SetVar ("Travel", -1)
+	GemRB.SetVar ("Travel", None)
 
 	#don't go back to multi selection mode when going to the store screen
 	if not GemRB.GetVar ("Inventory"):

@@ -102,7 +102,7 @@ def RunGame(MyChar):
 		GemRB.ChargeSpells (MyChar)
 
 	playmode = GemRB.GetVar ("PlayMode")
-	if playmode >=0:
+	if playmode is not None:
 		GemRB.SaveCharacter (MyChar, "gembak")
 		#LETS PLAY!!
 		import CharGenCommon, CommonWindow

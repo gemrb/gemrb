@@ -472,7 +472,7 @@ def InitStoreIdentifyWindow (Window):
 
 	PositionStoreWinRelativeTo(Window)
 
-	GemRB.SetVar ("Index", -1)
+	GemRB.SetVar ("Index", None)
 	GemRB.SetVar ("TopIndex", 0)
 
 	if GameCheck.IsPST():
@@ -537,7 +537,7 @@ def UpdateStoreIdentifyWindow (Window):
 	Count = len(inventory_slots)
 	ScrollBar = Window.GetControl (7)
 	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, max(0, Count - ItemButtonCount))
-	GemRB.SetVar ("Index", -1)
+	GemRB.SetVar ("Index", None)
 	RedrawStoreIdentifyWindow (Window)
 	return
 
@@ -644,7 +644,7 @@ def UpdateStoreStealWindow (Window):
 	RightCount = len(inventory_slots)
 	ScrollBar = Window.GetControlAlias ('SWRSBAR')
 	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, max(0, RightCount - ItemButtonCount))
-	GemRB.SetVar ("LeftIndex", -1)
+	GemRB.SetVar ("LeftIndex", None)
 	LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 	RedrawStoreStealWindow (Window)
 	return
@@ -723,7 +723,7 @@ ToggleStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"
 OpenStoreDonateWindow = GUICommonWindows.CreateTopWinLoader(windowIDs["donate"], "GUISTORE", GUICommonWindows.OpenWindowOnce, InitStoreDonateWindow, UpdateStoreDonateWindow, False, StoreWindowPlacement)
 
 def InitStoreHealWindow (Window):
-	GemRB.SetVar ("Index", -1)
+	GemRB.SetVar ("Index", None)
 	GemRB.SetVar ("TopIndex", 0)
 
 	Window.AddAlias('WINHEAL')
@@ -981,7 +981,7 @@ def UpdateStoreRentWindow (Window):
 	RentIndex = GemRB.GetVar ("RentIndex")
 	Button = Window.GetControlAlias ('RENTBTN')
 	Label = Window.GetControlAlias ('RENTLBL')
-	if RentIndex>=0:
+	if RentIndex is not None:
 		TextArea = Window.GetControlAlias ('RENTTA')
 		TextArea.SetText (roomdesc[RentIndex])
 		price = Store['StoreRoomPrices'][RentIndex]
@@ -1663,7 +1663,7 @@ def RedrawStoreStealWindow (Window):
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# also disable the button if the inventory is full
-	if LeftIndex>=0 and selected_count <= free_slots:
+	if LeftIndex is not None and selected_count <= free_slots:
 		LeftButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -2005,7 +2005,7 @@ def RentConfirm (Window0):
 		TextArea = Window.GetControlAlias('RENTTA')
 		GemRB.SetToken ("HP", str(healFor))
 		TextArea.SetText (strrefs["restedfor"])
-		GemRB.SetVar ("RentIndex", -1)
+		GemRB.SetVar ("RentIndex", None)
 		Button = Window.GetControl (RentIndex+4)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	return

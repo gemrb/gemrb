@@ -34,7 +34,7 @@ def OnLoad():
 
 	MyChar = GemRB.GetVar ("Slot")
 
-	GemRB.SetVar("Alignment",-1)
+	GemRB.SetVar("Alignment", None)
 	
 	KitName = GUICommon.GetClassRowName (MyChar)
 

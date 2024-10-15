@@ -85,7 +85,7 @@ def RedrawContainerWindow ():
 			Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
 			callback = TakeItemContainer
 		else:
-			Button.SetVarAssoc ("LeftIndex", -1)
+			Button.SetVarAssoc ("LeftIndex", None)
 			callback = None
 		if GameCheck.IsPST():
 			GUICommonWindows.SetItemButton (Window, Button, Slot, callback, None)
@@ -106,7 +106,7 @@ def RedrawContainerWindow ():
 			Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 			callback = DropItemContainer
 		else:
-			Button.SetVarAssoc ("RightIndex", -1)
+			Button.SetVarAssoc ("RightIndex", None)
 			callback = None
 		if GameCheck.IsPST():
 			GUICommonWindows.SetItemButton (Window, Button, Slot, callback, None)
@@ -263,7 +263,7 @@ def LeaveContainer ():
 
 def DropItemContainer ():
 	RightIndex = GemRB.GetVar ("RightIndex")
-	if RightIndex < 0:
+	if RightIndex is None:
 		return
 
 	#we need to get the right slot number
@@ -277,7 +277,7 @@ def DropItemContainer ():
 
 def TakeItemContainer ():
 	LeftIndex = GemRB.GetVar ("LeftIndex")
-	if LeftIndex < 0:
+	if LeftIndex is None:
 		return
 
 	if LeftIndex >= Container['ItemCount']:
