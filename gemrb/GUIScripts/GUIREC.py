@@ -824,7 +824,7 @@ def GetReputation (repvalue):
 def OpenInformationWindow ():
 	global InformationWindow
 
-	InformationWindow = Window = GemRB.LoadWindow (4)
+	InformationWindow = Window = GemRB.LoadWindow (4, "GUIREC")
 
 	# Biography
 	Button = Window.GetControl (26)
@@ -929,7 +929,7 @@ def OpenInformationWindow ():
 def OpenKitInfoWindow ():
 	global KitInfoWindow
 
-	KitInfoWindow = GemRB.LoadWindow (24)
+	KitInfoWindow = GemRB.LoadWindow (24, "GUIREC")
 
 	#back button (setting first, to be less error prone)
 	DoneButton = KitInfoWindow.GetControl (2)
@@ -988,7 +988,7 @@ def OpenColorWindow ():
 	MajorColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
 	SkinColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
 	HairColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-	Window = GemRB.LoadWindow (21)
+	Window = GemRB.LoadWindow (21, "GUIREC")
 	Window.AddAlias("SUB_WIN", 0)
 
 	PaperdollButton = Window.GetControl (0)
@@ -1074,7 +1074,7 @@ def SetMajorColor ():
 	return
 
 def OpenColorPicker ():
-	Window = GemRB.LoadWindow (22)
+	Window = GemRB.LoadWindow (22, "GUIREC")
 	Window.AddAlias("SUB_WIN", 1)
 
 	GemRB.SetVar ("Selected", None)

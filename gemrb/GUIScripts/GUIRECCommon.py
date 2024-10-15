@@ -74,7 +74,7 @@ def OpenCustomizeWindow ():
 	ScriptsTable = GemRB.LoadTable ("SCRPDESC")
 	GUIREC.ColorTable = GemRB.LoadTable ("CLOWNCOL")
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
-	CustomizeWindow = GemRB.LoadWindow (17)
+	CustomizeWindow = GemRB.LoadWindow (17, "GUIREC")
 
 	PortraitSelectButton = CustomizeWindow.GetControl (0)
 	PortraitSelectButton.SetText (11961)
@@ -127,7 +127,7 @@ def OpenCustomizeWindow ():
 def OpenPortraitSelectWindow ():
 	global PortraitPictureButton
 
-	SubCustomizeWindow = GemRB.LoadWindow (18)
+	SubCustomizeWindow = GemRB.LoadWindow (18, "GUIREC")
 	SubCustomizeWindow.AddAlias("SUB_WIN", 0)
 
 	PortraitPictureButton = SubCustomizeWindow.GetControl (0)
@@ -195,7 +195,7 @@ def OpenCustomPortraitWindow ():
 	global PortraitList1, PortraitList2
 	global RowCount1, RowCount2
 
-	Window = GemRB.LoadWindow (19)
+	Window = GemRB.LoadWindow (19, "GUIREC")
 	Window.AddAlias("SUB_WIN", 1)
 
 	CustomPortraitDoneButton = Window.GetControl (10)
@@ -297,7 +297,7 @@ def OpenSoundWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	OldVoiceSet = GemRB.GetPlayerSound (pc)
-	SubCustomizeWindow = GemRB.LoadWindow (20)
+	SubCustomizeWindow = GemRB.LoadWindow (20, "GUIREC")
 	SubCustomizeWindow.AddAlias("SUB_WIN", 0)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
@@ -396,7 +396,7 @@ def OpenScriptWindow ():
 	global ScriptTextArea, SelectedTextArea
 	global options
 
-	SubCustomizeWindow = GemRB.LoadWindow (11)
+	SubCustomizeWindow = GemRB.LoadWindow (11, "GUIREC")
 	SubCustomizeWindow.AddAlias("SUB_WIN", 0)
 
 	ScriptTextArea = SubCustomizeWindow.GetControl (2)
@@ -508,10 +508,10 @@ def OpenBiographyEditWindow ():
 
 	# 23 and 24 were deleted and replaced in iwd
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-		SubCustomizeWindow = GemRB.LoadWindow (51)
+		SubCustomizeWindow = GemRB.LoadWindow (51, "GUIREC")
 		SubCustomizeWindow.DeleteControl (3)
 	else:
-		SubCustomizeWindow = GemRB.LoadWindow (23)
+		SubCustomizeWindow = GemRB.LoadWindow (23, "GUIREC")
 		if GameCheck.IsBG2 ():
 			SubCustomizeWindow.DeleteControl (6)
 
@@ -575,7 +575,7 @@ def DoneBiographyWindow (ta):
 	return
 
 def OpenBiographyWindow ():
-	BiographyWindow = GemRB.LoadWindow (12)
+	BiographyWindow = GemRB.LoadWindow (12, "GUIREC")
 
 	TextArea = BiographyWindow.GetControl (0)
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -606,7 +606,7 @@ def GetProtagonistBiography (pc):
 def OpenExportWindow ():
 	global ExportWindow, NameField, ExportDoneButton
 
-	ExportWindow = GemRB.LoadWindow (13)
+	ExportWindow = GemRB.LoadWindow (13, "GUIREC")
 
 	TextArea = ExportWindow.GetControl (2)
 	TextArea.SetText (10962)

@@ -38,7 +38,7 @@ def OnLoad():
 	PortraitButton = MainWindow.GetControl (12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
-	ImportWindow = GemRB.LoadWindow(20)
+	ImportWindow = GemRB.LoadWindow(20, "GUICG")
 	CharOverview.PositionCharGenWin (ImportWindow)
 
 	TextAreaControl = ImportWindow.GetControl(4)

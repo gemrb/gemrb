@@ -1324,7 +1324,7 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 	else:
 		return
 
-	Window = GemRB.LoadWindow (wid)
+	Window = GemRB.LoadWindow (wid, "GUISTORE")
 	if store == STORE_MAIN:
 		Index = GemRB.GetVar ("LeftIndex")
 	else:
@@ -2036,7 +2036,7 @@ def RentRoom ():
 	return
 
 def ErrorWindow (strref):
-	Window = GemRB.LoadWindow (windowIDs["error"])
+	Window = GemRB.LoadWindow (windowIDs["error"], "GUISTORE")
 
 	TextArea = Window.GetControl (3)
 	TextArea.SetText (strref)

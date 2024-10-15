@@ -293,7 +293,7 @@ def RefreshSpellBookLevel (update=True):
 
 def OpenSpellBookSpellInfoWindow (btn):
 	global SpellBookSpellInfoWindow
-	SpellBookSpellInfoWindow = Window = GemRB.LoadWindow (3)
+	SpellBookSpellInfoWindow = Window = GemRB.LoadWindow (3, "GUISPL")
 
 	#back
 	Button = Window.GetControl (5)
@@ -351,7 +351,7 @@ def OpenSpellBookSpellRemoveWindow ():
 		SpellBookSpellUnmemorizeWindow = None
 		return
 
-	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
+	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5, "GUISPL")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)

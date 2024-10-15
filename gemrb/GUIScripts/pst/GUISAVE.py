@@ -165,7 +165,7 @@ def DeleteGamePress():
 	global ConfirmWindow
 
 	SaveWindow.SetVisible(False)
-	ConfirmWindow=GemRB.LoadWindow (3)
+	ConfirmWindow=GemRB.LoadWindow (3, "GUISAVE")
 
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (28639)
@@ -197,7 +197,7 @@ def OpenSaveDetailWindow ():
 
 		return
 
-	SaveDetailWindow = Window = GemRB.LoadWindow (1)
+	SaveDetailWindow = Window = GemRB.LoadWindow (1, "GUISAVE")
 
 	Pos = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("SaveIdx")
 

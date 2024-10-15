@@ -74,7 +74,7 @@ def OpenLevelUpWindow():
 	global OldHPMax, OldSaves, OldLore, OldThaco, DeltaDSpells, DeltaWSpells
 	global NewDSpells, NewWSpells, OldDSpells, OldWSpells, pc, HLACount, ClassName, IsDual
 
-	LevelUpWindow = GemRB.LoadWindow (3)
+	LevelUpWindow = GemRB.LoadWindow (3, "GUIREC")
 
 	if GameCheck.IsBG2():
 		InfoButton = LevelUpWindow.GetControl (125)

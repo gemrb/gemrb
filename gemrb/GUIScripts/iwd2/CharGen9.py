@@ -104,7 +104,7 @@ def BioPress():
 	global BioWindow, EditControl, BioData
 
 	BioData = GemRB.GetToken("BIO")
-	BioWindow = Window = GemRB.LoadWindow (51)
+	BioWindow = Window = GemRB.LoadWindow (51, "GUICG")
 	Button = Window.GetControl (5)
 	Button.SetText (2240)
 	Button.OnPress (RevertPress)

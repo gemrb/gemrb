@@ -1037,7 +1037,7 @@ def CloseHelpWindow ():
 def OpenHelpWindow ():
 	global HelpTable, InformationWindow
 
-	InformationWindow = Window = GemRB.LoadWindow (57)
+	InformationWindow = Window = GemRB.LoadWindow (57, "GUIREC")
 
 	HelpTable = GemRB.LoadTable ("topics")
 	GemRB.SetVar("Topic", 0)
@@ -1162,7 +1162,7 @@ def CloseLUWindow ():
 def OpenLevelUpWindow ():
 	global LUWindow, LevelDiff
 
-	LUWindow = Window = GemRB.LoadWindow (54)
+	LUWindow = Window = GemRB.LoadWindow (54, "GUIREC")
 
 	# Figure out the level difference
 	# the original ignored all but the fighter row in xplevel.2da
@@ -1333,7 +1333,7 @@ def OpenLUKitWindow ():
 		LUNextPress ()
 		return
 
-	LUKitWindow = Window = GemRB.LoadWindow (6)
+	LUKitWindow = Window = GemRB.LoadWindow (6, "GUIREC")
 
 	# title
 	Label = Window.GetControl (0x10000000)

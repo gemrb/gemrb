@@ -100,7 +100,7 @@ def OnLoad ():
 def CreateCharPress ():
 	global PartyFormationWindow, CreateCharWindow
 
-	CreateCharWindow = GemRB.LoadWindow (3)
+	CreateCharWindow = GemRB.LoadWindow (3, "GUISP")
 
 	CreateButton = CreateCharWindow.GetControl (0)
 	CreateButton.OnPress (CreateCharCreatePress)

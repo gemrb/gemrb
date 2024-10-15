@@ -652,7 +652,7 @@ def OpenInformationWindow ():
 
 		return
 
-	InformationWindow = Window = GemRB.LoadWindow (5)
+	InformationWindow = Window = GemRB.LoadWindow (5, "GUIREC")
 
 	# Biography
 	Button = Window.GetControl (1)
@@ -759,7 +759,7 @@ def OpenBiographyWindow ():
 		InformationWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
-	BiographyWindow = Window = GemRB.LoadWindow (12)
+	BiographyWindow = Window = GemRB.LoadWindow (12, "GUIREC")
 
 	# These are used to get the bio
 	pc = GemRB.GameGetSelectedPCSingle ()

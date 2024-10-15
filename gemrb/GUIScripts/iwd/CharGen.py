@@ -563,7 +563,7 @@ def GenderPress():
 	global CharGenWindow, GenderWindow, GenderDoneButton, GenderTextArea
 	global MyChar
 
-	GenderWindow = GemRB.LoadWindow (1)
+	GenderWindow = GemRB.LoadWindow (1, "GUICG")
 	GemRB.SetVar ("Gender", 0)
 	GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
 
@@ -638,7 +638,7 @@ def PortraitSelect():
 	global CharGenWindow, PortraitWindow, Portrait, PortraitPortraitButton
 	global MyChar
 
-	PortraitWindow = GemRB.LoadWindow (11)
+	PortraitWindow = GemRB.LoadWindow (11, "GUICG")
 
 	# this is not the correct one, but I don't know which is
 	Portrait = 0
@@ -784,7 +784,7 @@ def PortraitCustomPress():
 	global RowCount1, RowCount2
 	global CustomWindow
 
-	CustomWindow = Window = GemRB.LoadWindow (18)
+	CustomWindow = Window = GemRB.LoadWindow (18, "GUICG")
 	PortraitList1 = Window.GetControl (2)
 	RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 1))
 	PortraitList1.OnSelect (CGLargeCustomPortrait)
@@ -846,7 +846,7 @@ def CGPortraitCancelPress():
 def RacePress():
 	global CharGenWindow, RaceWindow, RaceDoneButton, RaceTextArea
 
-	RaceWindow = GemRB.LoadWindow (8)
+	RaceWindow = GemRB.LoadWindow (8, "GUICG")
 	GemRB.SetVar ("Race", 0)
 
 	for i in range (2, 8):
@@ -914,7 +914,7 @@ def RaceCancelPress():
 def ClassPress():
 	global CharGenWindow, ClassWindow, ClassTextArea, ClassDoneButton
 
-	ClassWindow = GemRB.LoadWindow (2)
+	ClassWindow = GemRB.LoadWindow (2, "GUICG")
 	ClassCount = CommonTables.Classes.GetRowCount ()
 	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
 	RaceName = CommonTables.Races.GetRowName (RaceRow)
@@ -993,7 +993,7 @@ def ClassMultiPress():
 	global ClassWindow, ClassMultiWindow, ClassMultiTextArea, ClassMultiDoneButton
 
 	ClassWindow.SetVisible(False)
-	ClassMultiWindow = GemRB.LoadWindow (10)
+	ClassMultiWindow = GemRB.LoadWindow (10, "GUICG")
 	ClassCount = CommonTables.Classes.GetRowCount ()
 	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
 	RaceName = CommonTables.Races.GetRowName (RaceRow)
@@ -1062,7 +1062,7 @@ def KitPress():
 	global ClassWindow, KitWindow, KitTextArea, KitDoneButton
 
 	ClassWindow.SetVisible(False)
-	KitWindow = GemRB.LoadWindow (12)
+	KitWindow = GemRB.LoadWindow (12, "GUICG")
 
 	#only mage class (1) has schools. It is the sixth button
 	GemRB.SetVar ("Class", 6)
@@ -1163,7 +1163,7 @@ def ClassCancelPress():
 def AlignmentPress():
 	global CharGenWindow, AlignmentWindow, AlignmentTextArea, AlignmentDoneButton
 
-	AlignmentWindow = GemRB.LoadWindow (3)
+	AlignmentWindow = GemRB.LoadWindow (3, "GUICG")
 	ClassAlignmentTable = GemRB.LoadTable ("alignmnt")
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	GemRB.SetVar ("Alignment", 0)
@@ -1237,7 +1237,7 @@ def AbilitiesPress():
 	global AbilitiesRaceAddTable, AbilitiesRaceReqTable, AbilitiesClassReqTable
 	global HasStrExtra
 
-	AbilitiesWindow = GemRB.LoadWindow (4)
+	AbilitiesWindow = GemRB.LoadWindow (4, "GUICG")
 	AbilitiesRaceAddTable = GemRB.LoadTable ("ABRACEAD")
 	AbilitiesRaceReqTable = GemRB.LoadTable ("ABRACERQ")
 	AbilitiesClassReqTable = GemRB.LoadTable ("ABCLASRQ")
@@ -1566,7 +1566,7 @@ def SkillsPress():
 def SkillsSelect():
 	global CharGenWindow, SkillsWindow, SkillsTextArea, SkillsDoneButton, SkillsPointsLeft
 
-	SkillsWindow = GemRB.LoadWindow (6)
+	SkillsWindow = GemRB.LoadWindow (6, "GUICG")
 
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL),
 		GemRB.GetPlayerStat (MyChar, IE_LEVEL2),
@@ -1629,7 +1629,7 @@ def SkillsCancelPress():
 def RacialEnemySelect():
 	global CharGenWindow, RacialEnemyWindow, RacialEnemyTextArea, RacialEnemyDoneButton
 
-	RacialEnemyWindow = GemRB.LoadWindow (15)
+	RacialEnemyWindow = GemRB.LoadWindow (15, "GUICG")
 	RacialEnemyCount = RacialEnemyTable.GetRowCount ()
 
 	for i in range (2, 8):
@@ -1710,7 +1710,7 @@ def ProficienciesSelect():
 	global CharGenWindow, ProficienciesWindow, ProficienciesTextArea
 	global ProficienciesPointsLeft, ProficienciesDoneButton, ProfsMaxTable
 
-	ProficienciesWindow = GemRB.LoadWindow (9)
+	ProficienciesWindow = GemRB.LoadWindow (9, "GUICG")
 	ProfsTable = GemRB.LoadTable ("profs")
 	ProfsMaxTable = GemRB.LoadTable ("profsmax")
 	ClassWeaponsTable = GemRB.LoadTable ("clasweap")
@@ -1894,7 +1894,7 @@ def ProficienciesCancelPress():
 def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	global CharGenWindow, MageSpellsWindow, MageSpellsTextArea, MageSpellsDoneButton, MageSpellsSelectPointsLeft, Learnable
 
-	MageSpellsWindow = GemRB.LoadWindow (7)
+	MageSpellsWindow = GemRB.LoadWindow (7, "GUICG")
 	#kit (school), alignment, level
 	k = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	t = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
@@ -2008,7 +2008,7 @@ def MageSpellsCancelPress():
 def MageSpellsMemorize(SpellTable, Level, SpellLevel):
 	global CharGenWindow, MageMemorizeWindow, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft
 
-	MageMemorizeWindow = GemRB.LoadWindow (16)
+	MageMemorizeWindow = GemRB.LoadWindow (16, "GUICG")
 	MaxSpellsMageTable = GemRB.LoadTable (SpellTable)
 	MageSpellBook = GemRB.GetVar ("MageSpellBook")
 	GemRB.SetVar ("MageMemorized", 0)
@@ -2133,7 +2133,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 	global CharGenWindow, PriestMemorizeWindow, Learnable, ClassFlag
 	global PriestMemorizeTextArea, PriestMemorizeDoneButton, PriestMemorizePointsLeft
 
-	PriestMemorizeWindow = GemRB.LoadWindow (17)
+	PriestMemorizeWindow = GemRB.LoadWindow (17, "GUICG")
 	t = CommonTables.Aligns.GetValue (GemRB.GetVar ("Alignment")-1, 3)
 	Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, t, SpellLevel)
 
@@ -2244,7 +2244,7 @@ def AppearancePress():
 	global AppearanceMajorButton, AppearanceMinorButton
 	global HairColor, SkinColor, MajorColor, MinorColor
 
-	AppearanceWindow = GemRB.LoadWindow (13)
+	AppearanceWindow = GemRB.LoadWindow (13, "GUICG")
 	AppearanceTable = GemRB.LoadTable ("PORTCOLR")
 
 	if Portrait<0:
@@ -2350,7 +2350,7 @@ def AppearanceColorChoice (CurrentColor):
 	global AppearanceWindow, AppearanceColorWindow
 
 	AppearanceWindow.SetVisible(False)
-	AppearanceColorWindow = GemRB.LoadWindow (14)
+	AppearanceColorWindow = GemRB.LoadWindow (14, "GUICG")
 	AppearanceColorTable = GemRB.LoadTable ("clowncol")
 	ColorType = GemRB.GetVar ("ColorType")
 	GemRB.SetVar ("SelectedColor", CurrentColor)
@@ -2419,7 +2419,7 @@ def CharSoundSelect():
 	global CharGenWindow, CharSoundWindow, CharSoundTable, CharSoundStrings
 	global CharSoundVoiceList, VerbalConstants
 
-	CharSoundWindow = GemRB.LoadWindow (19)
+	CharSoundWindow = GemRB.LoadWindow (19, "GUICG")
 	CharSoundTable = GemRB.LoadTable ("CHARSND")
 	CharSoundStrings = GemRB.LoadTable ("CHARSTR")
 
@@ -2496,7 +2496,7 @@ def CharSoundCancelPress():
 def BiographyPress():
 	global CharGenWindow, BiographyWindow, BiographyTextArea
 
-	BiographyWindow = GemRB.LoadWindow (51)
+	BiographyWindow = GemRB.LoadWindow (51, "GUICG")
 
 	BiographyWindow.DeleteControl (3)
 
@@ -2558,7 +2558,7 @@ def BiographyDonePress():
 def NamePress():
 	global CharGenWindow, NameWindow, NameDoneButton, NameField
 
-	NameWindow = GemRB.LoadWindow (5)
+	NameWindow = GemRB.LoadWindow (5, "GUICG")
 
 	NameDoneButton = NameWindow.GetControl (0)
 	NameDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -2616,7 +2616,7 @@ def ImportPress():
 	global CharGenWindow, ImportWindow
 	global CharImportList
 
-	ImportWindow = GemRB.LoadWindow (20)
+	ImportWindow = GemRB.LoadWindow (20, "GUICG")
 
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(10963)

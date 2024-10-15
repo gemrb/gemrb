@@ -1644,8 +1644,7 @@ def OpenPSTDeathWindow ():
 		# will also exit to the main menu
 
 	# reuse the main error window
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	Window = GemRB.LoadWindow (25)
+	Window = GemRB.LoadWindow (25, GUICommon.GetWindowPack())
 	Label = Window.GetControl (0xfffffff) # -1 in the CHU
 	Label.SetText (48155)
 	Button = Window.GetControl (1)

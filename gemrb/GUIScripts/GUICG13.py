@@ -140,7 +140,7 @@ def DonePress():
 def GetColor():
 	global ColorPicker
 
-	ColorPicker = GemRB.LoadWindow(14)
+	ColorPicker = GemRB.LoadWindow(14, "GUICG")
 	if GameCheck.IsBG2 ():
 		CharGenCommon.PositionCharGenWin (ColorPicker, -2, -1)
 	GemRB.SetVar("Selected", None)

@@ -73,7 +73,7 @@ def DualClassWindow ():
 	NewClassId = 0
 	
 	# set up our main window
-	DCMainWindow = GemRB.LoadWindow (5)
+	DCMainWindow = GemRB.LoadWindow (5, "GUIREC")
 
 	# done button (off)
 	DCMainDoneButton = DCMainWindow.GetControl (2)
@@ -313,7 +313,7 @@ def DCMainClassPress ():
 	GemRB.SetVar ("DCClass", DCClass)
 
 	# open the window
-	DCClassWindow = GemRB.LoadWindow (6)
+	DCClassWindow = GemRB.LoadWindow (6, "GUIREC")
 
 	# string refs for the given classes
 	DCClassStrings = []
@@ -476,7 +476,7 @@ def DCOpenProfsWindow ():
 	global DCProfsWindow, DCProfsDoneButton
 
 	# load up our window and set some basic variables
-	DCProfsWindow = GemRB.LoadWindow (15)
+	DCProfsWindow = GemRB.LoadWindow (15, "GUIREC")
 	NewClassId = CommonTables.Classes.GetValue (ClassName, "ID", GTV_INT)
 	if GameCheck.IsBG2():
 		LUProfsSelection.SetupProfsWindow (pc, \
@@ -579,7 +579,7 @@ def OpenSkillsWindow ():
 
 	global DCSkillsWindow, DCSkillsDoneButton
 
-	DCSkillsWindow = GemRB.LoadWindow (7)
+	DCSkillsWindow = GemRB.LoadWindow (7, "GUIREC")
 	if GameCheck.IsBG2():
 		LUSkillsSelection.SetupSkillsWindow (pc, \
 			LUSkillsSelection.LUSKILLS_TYPE_DUALCLASS, DCSkillsWindow, DCSkillsRedraw, classid=NewClassId)
