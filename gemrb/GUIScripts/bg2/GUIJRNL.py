@@ -162,16 +162,7 @@ def AddUserEntry ():
 	Text.SetFlags (IE_GUI_TEXTAREA_EDITABLE, OP_OR)
 	Text.SetColor (ColorBlackish, TA_COLOR_NORMAL)
 	Text.SetColor (ColorGray, TA_COLOR_BACKGROUND)
-	# disable the 1-6 hotkeys, so we can't lose focus
-	if GemRB.GetView ("PORTWIN"):
-		PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (GemRB.GetView ("PORTWIN"))
-		for i, Button in PortraitButtons.items():
-			Button.SetHotKey (None)
 	Text.Focus ()
-
-	def OnClose ():
-		if GemRB.GetView ("PORTWIN"):
-			GUICommonWindows.UpdatePortraitWindow ()
 
 	# title
 	Label = Window.GetControl (0x10000005)
@@ -194,7 +185,6 @@ def AddUserEntry ():
 	Button.SetText (13957)
 	Button.OnPress (lambda: DeleteEntry (Window))
 
-	Window.SetAction (OnClose, ACTION_WINDOW_CLOSED)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 def UpdateLogWindow (JournalWindow):
