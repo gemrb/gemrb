@@ -1155,11 +1155,16 @@ PyDoc_STRVAR( GemRB_GetView__doc,
 
 static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 {
+	PyObject* pyid = nullptr;
+	PyObject* lookup = nullptr;
+	PARSE_ARGS(args, "O|O", &lookup, &pyid);
+
 	// for convenience we allow an alias to default to the lowest valid id
 	// the typical use case is typically wanting to specify a string name for a single control
 	ScriptingId id = 0;
-	PyObject* lookup = NULL;
-	PARSE_ARGS( args, "O|l", &lookup, &id );
+	if (pyid && pyid != Py_None) {
+		id = PyLong_AsUnsignedLong(pyid);
+	}
 
 	const View* view = nullptr;
 	if (PyUnicode_Check(lookup)) {
