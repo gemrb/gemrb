@@ -94,10 +94,9 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
-
 	Actor *oldTarget = GetLocalActorByGlobalID(targetID);
-	speakerID = spk->GetGlobalID();
-	targetID = tgt->GetGlobalID();
+	SetSpeaker(spk);
+	SetTarget(tgt);
 	if (!originalTargetID) originalTargetID = targetID;
 	if (tgt->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) tgt;
@@ -173,8 +172,8 @@ void DialogHandler::EndDialog(bool try_to_break)
 
 	Actor *tmp = GetSpeaker();
 	Actor *target = Scriptable::As<Actor>(GetTarget());
-	speakerID = 0;
-	targetID = 0;
+	SetTarget(nullptr);
+	SetSpeaker(nullptr);
 	originalTargetID = 0;
 
 	if (tmp) {
@@ -384,8 +383,9 @@ int DialogHandler::DialogChooseTransition(unsigned int choose, Scriptable*& targ
 		EndDialog();
 		return -1;
 	}
+
 	Actor* oldTarget = GetLocalActorByGlobalID(targetID);
-	targetID = tgt->GetGlobalID();
+	SetTarget(tgt);
 	if (tgta) tgta->SetCircleSize();
 	if (oldTarget) oldTarget->SetCircleSize();
 	target = tgt;
@@ -476,7 +476,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	return true;
 }
 
-Actor *DialogHandler::GetLocalActorByGlobalID(ieDword ID)
+Actor* DialogHandler::GetLocalActorByGlobalID(ieDword ID) const
 {
 	if (!ID) return nullptr;
 
@@ -489,20 +489,51 @@ Actor *DialogHandler::GetLocalActorByGlobalID(ieDword ID)
 	return area->GetActorByGlobalID(ID);
 }
 
-Scriptable *DialogHandler::GetTarget() const
+Scriptable* DialogHandler::GetTarget() const
 {
-	const Game *game = core->GetGame();
-	if (!game) return nullptr;
-
-	Map *area = game->GetCurrentArea();
-	if (!area) return nullptr;
-
-	return area->GetScriptableByGlobalID(targetID);
+	return GetLocalActorByGlobalID(targetID);
 }
 
-Actor *DialogHandler::GetSpeaker()
+Actor* DialogHandler::GetSpeaker() const
 {
 	return GetLocalActorByGlobalID(speakerID);
+}
+
+bool DialogHandler::IsSpeaker(const Scriptable* scr) const
+{
+	return speakerID == scr->GetGlobalID();
+}
+
+static ScriptID SetVar(const StringView& var, ScriptID& id, const Scriptable* scr)
+{
+	if (scr) {
+		id = scr->GetGlobalID();
+	} else {
+		id = 0;
+	}
+
+	const Actor* actor = scr->As<const Actor>(scr);
+	if (actor) {
+		core->GetDictionary().Set(var, actor->InParty);
+	} else {
+		core->GetDictionary().Set(var, 0);
+	}
+	return id;
+}
+
+ScriptID DialogHandler::SetSpeaker(const Scriptable* scr)
+{
+	return SetVar("DLG_SPEAKER", speakerID, scr);
+}
+
+bool DialogHandler::IsTarget(const Scriptable* scr) const
+{
+	return targetID == scr->GetGlobalID();
+}
+
+ScriptID DialogHandler::SetTarget(const Scriptable* scr)
+{
+	return SetVar("DLG_TARGET", targetID, scr);
 }
 
 }

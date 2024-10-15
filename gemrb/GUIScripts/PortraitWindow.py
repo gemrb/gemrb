@@ -337,11 +337,10 @@ def UpdatePortraitWindow ():
 			# as far as I can tell only BG2 has icons for talk or store
 			flag = bytearray([238])
 
-			if pc == pcID:
-				if GemRB.GetView("WIN_STORE"):
-					flag = bytearray([155]) # shopping icon
-				elif GemRB.GetGUIFlags() & GS_DIALOG:
-					flag = bytearray([154]) # dialog icon
+			if pcID == GemRB.GetVar("DLG_SPEAKER"):
+				flag = bytearray([154]) # dialog icon
+			elif pcID == pc and GemRB.GetView("WIN_STORE") and not GemRB.GetView("WIN_INV"): # don't show in bags
+				flag = bytearray([155]) # shopping icon
 
 		if LUCommon.CanLevelUp (pcID):
 			if GameCheck.IsBG2():
