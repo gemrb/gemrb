@@ -5910,45 +5910,26 @@ static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args, "i", &index );
 
 	GET_GAME();
-
-	game->SelectPCSingle( index );
-
-	Py_RETURN_NONE;
+	return PyBool_FromLong(game->SelectPCSingle(index));
 }
 
 PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
 "===== GameGetSelectedPCSingle =====\n\
 \n\
-**Prototype:** GemRB.GameGetSelectedPCSingle ([flag=0])\n\
+**Prototype:** GemRB.GameGetSelectedPCSingle ()\n\
 \n\
-**Description:** If flag is 0 or omitted, then returns currently active pc \n\
-in non-walk environment (i.e. in shops, inventory, ...).  If flag is set to \n\
-non-zero, then returns the currently speaking PC. \n\
-\n\
-**Parameters:**\n\
-  * flag - 0/1\n\
+**Description:** Returns currently active pc \n\
+in non-walk environment (i.e. in shops, inventory, ...).\n\
 \n\
 **Return value:** PartyID (1-10) or 0 if there is no such PC\n\
 \n\
 **See also:** [GameSelectPC](GameSelectPC.md), [GameSelectPCSingle](GameSelectPCSingle.md)"
 );
 
-static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_GameGetSelectedPCSingle(PyObject* /*self*/, PyObject* /*args*/)
 {
-	int flag = 0;
-	PARSE_ARGS( args,  "|i", &flag );
 	GET_GAME();
 
-	if (flag) {
-		GET_GAMECONTROL();
-
-		const Actor *ac = gc->dialoghandler->GetSpeaker();
-		int ret = 0;
-		if (ac) {
-			ret = ac->InParty;
-		}
-		return PyLong_FromLong(ret);
-	}
 	return PyLong_FromLong(game->GetSelectedPCSingle());
 }
 
