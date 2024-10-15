@@ -78,7 +78,7 @@ def InitMapWindow (Window):
 
 	# World Map
 	def OpenWorldMap():
-		GemRB.SetVar("Travel", -1)
+		GemRB.SetVar("Travel", None)
 		OpenTravelWindow()
 
 	Button = Window.GetControl (1)

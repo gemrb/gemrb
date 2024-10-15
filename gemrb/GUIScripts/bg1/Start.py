@@ -89,7 +89,7 @@ def PregenPress():
 	GemRB.SetVar("PlayMode",0) #loadgame needs this hack
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
-	GemRB.SetVar("PlayMode",-1)
+	GemRB.SetVar("PlayMode", None)
 	GemRB.SetNextScript("CharGen")
 	return
 

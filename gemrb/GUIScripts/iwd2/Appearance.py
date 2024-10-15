@@ -192,7 +192,7 @@ def GetColor():
 	global ColorPicker, ColorIndex, PickedColor
 
 	ColorPicker=GemRB.LoadWindow(14)
-	GemRB.SetVar("Selected",-1)
+	GemRB.SetVar("Selected", None)
 	for i in range(33):
 		Button = ColorPicker.GetControl(i)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)

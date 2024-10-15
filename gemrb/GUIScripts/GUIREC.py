@@ -1077,7 +1077,7 @@ def OpenColorPicker ():
 	Window = GemRB.LoadWindow (22)
 	Window.AddAlias("SUB_WIN", 1)
 
-	GemRB.SetVar ("Selected",-1)
+	GemRB.SetVar ("Selected", None)
 	for i in range (1,35):
 		Button = Window.GetControl (i)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)

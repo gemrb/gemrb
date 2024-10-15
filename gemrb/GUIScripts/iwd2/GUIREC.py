@@ -1187,7 +1187,7 @@ def OpenLevelUpWindow ():
 
 	# 2-12 are the class name buttons
 	# 15-25 are the class level labels
-	GemRB.SetVar ("LUClass", -1)
+	GemRB.SetVar ("LUClass", None)
 	for i in range(2,13):
 		Button = Window.GetControl (i)
 		Label = Window.GetControl (0x10000000 + i+13)
@@ -1357,7 +1357,7 @@ def OpenLUKitWindow ():
     # skip to the first kit of this class
 	kitOffset = hasKits
 
-	GemRB.SetVar ("LUKit", -1)
+	GemRB.SetVar ("LUKit", None)
 	for i in range(9):
 		Button = Window.GetControl (i+2)
 
@@ -1471,7 +1471,7 @@ def FinishLevelUp():
 
 	# now we're finally done
 	GemRB.SetVar ("LevelDiff", 0)
-	GemRB.SetVar ("LUClass", -1)
+	GemRB.SetVar ("LUClass", None)
 	GemRB.SetVar ("LUKit", 0)
 
 	UpdateRecordsWindow (RecordsWindow)

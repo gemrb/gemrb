@@ -4025,10 +4025,17 @@ core, these are described in different places:\n\
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Variable;
-	unsigned long value;
-	PARSE_ARGS(args, "Ok", &Variable, &value);
+	PyObject* pynum = nullptr;
+	PARSE_ARGS(args, "OO", &Variable, &pynum);
+	
+	Control::value_t val = Control::INVALID_VALUE;
+	if (PyLong_Check(pynum)) {
+		val = Control::value_t(PyLong_AsUnsignedLongMask(pynum));
+	} else if (pynum != Py_None) {
+		return RuntimeError("Expected a numeric or None type.");
+	}
 
-	core->GetDictionary().Set(PyString_AsStringView(Variable), value);
+	core->GetDictionary().Set(PyString_AsStringView(Variable), val);
 
 	//this is a hack to update the settings deeper in the core
 	UpdateActorConfig();
@@ -4115,17 +4122,14 @@ controls could affect the same variable.\n\
 static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* Variable;
-	PARSE_ARGS( args, "O", &Variable );
+	PARSE_ARGS(args, "O", &Variable);
 
-	ieDword value = core->GetDictionary().Get(PyString_AsStringView(Variable), 0);
-	if (!value) {
-		return PyLong_FromLong(0);
+	int32_t value = core->GetDictionary().Get(PyString_AsStringView(Variable), -1);
+	if (value == -1) {
+		Py_RETURN_NONE;
 	}
 
-	// A PyLong is internally (probably) a long. Since we sometimes set
-	// variables to -1, cast value to a signed integer first, so it is
-	// sign-extended into a long if long is larger than int.
-	return PyLong_FromLong((int)value);
+	return PyLong_FromLong(value);
 }
 
 PyDoc_STRVAR( GemRB_CheckVar__doc,
