@@ -523,7 +523,7 @@ static PyObject* GemRB_EndCutSceneMode(PyObject * /*self*/, PyObject* /*args*/)
 PyDoc_STRVAR( GemRB_LoadWindow__doc,
 "===== LoadWindow =====\n\
 \n\
-**Prototype:** GemRB.LoadWindow (WindowID[, windowPack, position])\n\
+**Prototype:** GemRB.LoadWindow (WindowID, windowPack[, position])\n\
 \n\
 **Description:** Returns a Window. You must call LoadWindowPack before using \n\
 this command. The window won't be displayed. If LoadWindowPack() set nonzero \n\
@@ -545,7 +545,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	int WindowID = -1;
 	Window::WindowPosition pos = Window::PosCentered;
 	char* ref = NULL;
-	PARSE_ARGS(args, "i|si", &WindowID, &ref, &pos);
+	PARSE_ARGS(args, "is|i", &WindowID, &ref, &pos);
 
 	Window* win = core->GetWindowManager()->LoadWindow(WindowID, ScriptingGroup_t(ref), pos);
 	ABORT_IF_NULL(win);

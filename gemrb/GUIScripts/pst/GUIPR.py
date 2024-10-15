@@ -151,7 +151,7 @@ def PriestNextLevelPress ():
 
 
 def OpenPriestSpellInfoWindow (btn):
-	Window = GemRB.LoadWindow (4)
+	Window = GemRB.LoadWindow (4, "GUIPR")
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
@@ -194,7 +194,7 @@ def OnPriestMemorizeSpell (btn):
 
 
 def OpenPriestSpellUnmemorizeWindow (btn):
-	Window = GemRB.LoadWindow (6)
+	Window = GemRB.LoadWindow (6, "GUIPR")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (2)

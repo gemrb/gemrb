@@ -149,7 +149,7 @@ def MageNextLevelPress ():
 		UpdateMageWindow ()
 
 def OpenMageSpellInfoWindow (btn):
-	Window = GemRB.LoadWindow (4)
+	Window = GemRB.LoadWindow (4, "GUIMG")
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
@@ -193,7 +193,7 @@ def OnMageMemorizeSpell (btn):
 
 
 def OpenMageSpellUnmemorizeWindow (btn):
-	Window = GemRB.LoadWindow (6)
+	Window = GemRB.LoadWindow (6, "GUIMG")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (2)

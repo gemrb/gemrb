@@ -198,7 +198,7 @@ def OpenConfirmWindow (btn):
 	global ConfirmWindow, SaveButton
 
 	Pos = GemRB.GetVar ("TopIndex") + btn.Value
-	ConfirmWindow = GemRB.LoadWindow (1)
+	ConfirmWindow = GemRB.LoadWindow (1, "GUISAVE")
 
 	AreaPreview = ConfirmWindow.GetControl (0)
 	if Pos < len(Games):
@@ -285,7 +285,7 @@ def DeleteGameConfirm (delIndex):
 def DeleteGamePress (btn):
 	global ConfirmWindow
 
-	ConfirmWindow = GemRB.LoadWindow (ctrl_offset[12])
+	ConfirmWindow = GemRB.LoadWindow (ctrl_offset[12], "GUISAVE")
 	ConfirmWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 	ConfirmWindow.ShowModal (MODAL_SHADOW_GRAY)
 

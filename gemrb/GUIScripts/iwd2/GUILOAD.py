@@ -154,7 +154,7 @@ def DeleteGameCancel ():
 def DeleteGamePress (btn):
 	global ConfirmWindow
 
-	ConfirmWindow=GemRB.LoadWindow (1)
+	ConfirmWindow=GemRB.LoadWindow (1, "GUILOAD")
 	ConfirmWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 
 	Text=ConfirmWindow.GetControl (0)

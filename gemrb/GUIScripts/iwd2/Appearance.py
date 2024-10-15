@@ -191,7 +191,7 @@ def CancelPress():
 def GetColor():
 	global ColorPicker, ColorIndex, PickedColor
 
-	ColorPicker=GemRB.LoadWindow(14)
+	ColorPicker=GemRB.LoadWindow(14, "GUICG")
 	GemRB.SetVar("Selected", None)
 	for i in range(33):
 		Button = ColorPicker.GetControl(i)

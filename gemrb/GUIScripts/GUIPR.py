@@ -190,7 +190,7 @@ def RefreshPriestLevel ():
 	return
 
 def OpenPriestSpellInfoWindow (btn):
-	Window = GemRB.LoadWindow (3)
+	Window = GemRB.LoadWindow (3, "GUIPR")
 
 	#back
 	Button = Window.GetControl (5)
@@ -238,7 +238,7 @@ def OnPriestMemorizeSpell (btn):
 	return
 
 def OpenPriestSpellRemoveWindow ():
-	Window = GemRB.LoadWindow (5)
+	Window = GemRB.LoadWindow (5, "GUIPR")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -264,7 +264,7 @@ def OpenPriestSpellRemoveWindow ():
 	return
 
 def OpenPriestSpellUnmemorizeWindow (btn):
-	Window = GemRB.LoadWindow (5)
+	Window = GemRB.LoadWindow (5, "GUIPR")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)

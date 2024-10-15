@@ -92,7 +92,7 @@ def CloseAll(win):
 def OpenQuestsWindow ():
 	global QuestsList, QuestDesc
 	
-	QuestsWindow = GemRB.LoadWindow (1)
+	QuestsWindow = GemRB.LoadWindow (1, "GUIJRNL")
 	
 	def OnJournalAssignedPress ():
 		global selected_quest_class
@@ -235,7 +235,7 @@ def EvaluateAllQuests ():
 def OpenBeastsWindow ():
 	global BeastsList, BeastImage, BeastDesc
 	
-	BeastsWindow = GemRB.LoadWindow (2)
+	BeastsWindow = GemRB.LoadWindow (2, "GUIJRNL")
 
 	# PC
 	Button = BeastsWindow.GetControl (5)
@@ -325,7 +325,7 @@ def EvaluateAllBeasts ():
 ###################################################
 
 def OpenLogWindow ():
-	LogWindow = GemRB.LoadWindow (3)
+	LogWindow = GemRB.LoadWindow (3, "GUIJRNL")
 
 	# Back
 	Button = LogWindow.GetControl (1)

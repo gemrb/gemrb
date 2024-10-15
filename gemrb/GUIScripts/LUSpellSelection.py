@@ -140,7 +140,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			SpellsPickButton.OnPress (SpellsPickPress)
 			SpellsPickButton.SetText(34210)
 	else:
-		SpellsWindow = GemRB.LoadWindow (8)
+		SpellsWindow = GemRB.LoadWindow (8, "GUICG")
 		if IWD2:
 			DoneButton = SpellsWindow.GetControl (33)
 			SpellsTextArea = SpellsWindow.GetControl(30)

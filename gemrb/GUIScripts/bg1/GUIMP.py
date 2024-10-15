@@ -79,7 +79,7 @@ def OnLoad():
 
 def ExitPress():
 	global PartyFormationWindow, ExitWindow
-	ExitWindow = GemRB.LoadWindow(7)
+	ExitWindow = GemRB.LoadWindow(7, "GUIMP")
 
 	TextArea = ExitWindow.GetControl(0)
 	TextArea.SetText(11329)
