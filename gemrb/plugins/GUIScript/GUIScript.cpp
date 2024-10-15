@@ -3572,27 +3572,63 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Button_SetBAM__doc,
-"===== Button_SetBAM =====\n\
+PyDoc_STRVAR(GemRB_GetSprite__doc,
+"===== GetSprite =====\n\
 \n\
-**Metaclass Prototype:** SetBAM (BAMResRef, CycleIndex, FrameIndex[, col1])\n\
+**Prototype:** GemRB.GetSprite (resref[, grad, cycle, frame])\n\
 \n\
-**Description:** Sets the Picture of a Button Control from a BAM file. If \n\
+**Description:** Return a Sprite2D for a given resref. If \n\
 the supplied color gradient value is the default -1, then no palette change, \n\
-if it is >=0, then it changes the 4-16 palette entries of the bam. Since it \n\
+if it is >=0, then it changes the 4-16 palette entries of the Sprite palette. Since it \n\
 uses 12 colors palette, it has issues in PST.\n\
 \n\
 **Parameters:**\n\
-  * BAMResRef - the name of the BAM animation (a .bam resref)\n\
-  * CycleIndex, FrameIndex - the cycle and frame index of the picture in the bam\n\
-  * col1 - the gradient number, (-1 no gradient)\n\
+  * resref - the name of the BAM animation (a .bam resref)\n\
+  * grad - the gradient number, (-1 is no gradient)\n\
+  * cycle, frame - the cycle and frame index of the picture in the bam\n\
 \n\
-**Return value:** N/A\n\
-\n\
-**See also:** [Button_SetPLT](Button_SetPLT.md), [Button_SetPicture](Button_SetPicture.md), [Button_SetSprites](Button_SetSprites.md)"
+**Return value:** N/A\n"
 );
 
-static PyObject* SetButtonBAM(Button* btn, StringView ResRef, AnimationFactory::index_t CycleIndex, AnimationFactory::index_t FrameIndex, int col1)
+static PyObject* GemRB_GetSprite(PyObject* /*self*/, PyObject* args)
+{
+	int cycle = 0;
+	int frame = 0;
+	int palidx = -1;
+	PyObject* pyObj;
+	PARSE_ARGS(args,  "O|iii", &pyObj, &palidx, &cycle, &frame);
+
+	Holder<Sprite2D> spr;
+	if (PyUnicode_Check(pyObj)) {
+		const ResRef& resref = ResRefFromPy(pyObj);
+		auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(resref, IE_BAM_CLASS_ID);
+		if (af) {
+			spr = af->GetFrame(frame, cycle);
+		}
+	}
+
+	if (spr == nullptr) {
+		spr = SpriteFromPy(pyObj);
+	}
+
+	if (spr == nullptr) {
+		Py_RETURN_NONE;
+	}
+
+	if (palidx >= 0) {
+		spr = spr->copy();
+		auto pal = spr->GetPalette();
+		ABORT_IF_NULL(pal);
+		Holder<Palette> newpal = MakeHolder<Palette>(*pal);
+		const auto& pal16 = core->GetPalette16(static_cast<uint8_t>(palidx));
+		newpal->CopyColors(4, &pal16[0], &pal16[12]);
+		spr->SetPalette(newpal);
+	}
+
+	return PyObject_FromHolder<Sprite2D>(spr);
+}
+
+static PyObject* SetButtonBAM(Button* btn, StringView ResRef)
 {
 	ABORT_IF_NULL(btn);
 
@@ -3605,42 +3641,15 @@ static PyObject* SetButtonBAM(Button* btn, StringView ResRef, AnimationFactory::
 	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(ResRef, IE_BAM_CLASS_ID);
 	if (!af)
 		return NULL;
-	Holder<Sprite2D> Picture = af->GetFrame (FrameIndex, CycleIndex);
+	Holder<Sprite2D> Picture = af->GetFrame(0, 0);
 
 	if (!Picture) {
 		return NULL;
 	}
-
-	if (col1 >= 0) {
-		Picture = Picture->copy();
-
-		Holder<Palette> newpal = MakeHolder<Palette>(*Picture->GetPalette());
-		const auto& pal16 = core->GetPalette16(static_cast<uint8_t>(col1));
-		newpal->CopyColors(4, &pal16[0],&pal16[12]);
-		Picture->SetPalette( newpal );
-	}
-
 	btn->SetPicture(std::move(Picture));
 
 	//no incref! (happens in caller if necessary)
 	return Py_None;
-}
-
-static PyObject* GemRB_Button_SetBAM(PyObject* self, PyObject* args)
-{
-	int CycleIndex;
-	int FrameIndex;
-	int col1 = -1;
-	PyObject* ResRef;
-	PARSE_ARGS(args,  "OOii|i", &self,
-			   &ResRef, &CycleIndex, &FrameIndex, &col1);
-
-	Button* btn = GetView<Button>(self);
-	PyObject* ret = SetButtonBAM(btn, PyString_AsStringView(ResRef), (AnimationFactory::index_t) CycleIndex, (AnimationFactory::index_t) FrameIndex, col1);
-	if (ret) {
-		Py_INCREF(ret);
-	}
-	return ret;
 }
 
 PyDoc_STRVAR( GemRB_Button_SetAnimation__doc,
@@ -10843,7 +10852,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 		case ACT_WEAPON3:
 		case ACT_WEAPON4:
 		{
-			SetButtonBAM(btn, "stonweap",0,0,-1);
+			SetButtonBAM(btn, "stonweap");
 			ieDword slot;
 			if (magicweapon!=0xffff) {
 				slot = magicweapon;
@@ -10889,7 +10898,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 		}
 		break;
 		case ACT_IWDQSPELL:
-			SetButtonBAM(btn, "stonspel",0,0,-1);
+			SetButtonBAM(btn, "stonspel");
 			if (actor->creVersion == CREVersion::V2_2 && i > 3) {
 				tmp = i-3;
 			} else {
@@ -10897,7 +10906,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			}
 			goto jump_label2;
 		case ACT_IWDQSONG:
-			SetButtonBAM(btn, "stonsong",0,0,-1);
+			SetButtonBAM(btn, "stonsong");
 			if (actor->creVersion == CREVersion::V2_2 && i > 3) {
 				tmp = i-3;
 			} else {
@@ -10905,7 +10914,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			}
 			goto jump_label2;
 		case ACT_IWDQSPEC:
-			SetButtonBAM(btn, "stonspec",0,0,-1);
+			SetButtonBAM(btn, "stonspec");
 			if (actor->creVersion == CREVersion::V2_2 && i > 3) {
 				tmp = i-3;
 			} else {
@@ -10915,7 +10924,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 		case ACT_QSPELL1:
 		case ACT_QSPELL2:
 		case ACT_QSPELL3:
-			SetButtonBAM(btn, "stonspel",0,0,-1);
+			SetButtonBAM(btn, "stonspel");
 			tmp = action-ACT_QSPELL1;
 jump_label2:
 		{
@@ -10954,7 +10963,7 @@ jump_label2:
 			tmp=4;
 jump_label:
 		{
-			SetButtonBAM(btn, "stonitem",0,0,-1);
+			SetButtonBAM(btn, "stonitem");
 			ieDword slot = actor->PCStats->QuickItemSlots[tmp];
 			if (slot!=0xffff) {
 				//no slot translation required
@@ -13071,6 +13080,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetSpell, METH_VARARGS),
 	METHOD(GetSpelldata, METH_VARARGS),
 	METHOD(GetSpelldataIndex, METH_VARARGS),
+	METHOD(GetSprite, METH_VARARGS),
 	METHOD(GetSlotItem, METH_VARARGS),
 	METHOD(GetSlots, METH_VARARGS),
 	METHOD(GetSystemVariable, METH_VARARGS),
@@ -13166,7 +13176,6 @@ static PyMethodDef GemRBMethods[] = {
 static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_EnableBorder, METH_VARARGS),
 	METHOD(Button_SetActionIcon, METH_VARARGS),
-	METHOD(Button_SetBAM, METH_VARARGS),
 	METHOD(Button_SetBorder, METH_VARARGS),
 	METHOD(Button_SetFont, METH_VARARGS),
 	METHOD(Button_SetHotKey, METH_VARARGS),
