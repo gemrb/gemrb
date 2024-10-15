@@ -53,7 +53,7 @@ Button::Button(const Region& frame)
 
 Button::~Button()
 {
-	delete animation;
+	SetAnimation(nullptr);
 	SetImage(ButtonImage::None, nullptr);
 	ClearPictureList();
 
@@ -306,9 +306,6 @@ void Button::FlagsChanged(unsigned int /*oldflags*/)
 {
 	if (animation) {
 		animation->flags = SpriteAnimation::PLAY_NORMAL;
-		if (flags & IE_GUI_BUTTON_PLAYRANDOM) {
-			animation->flags |= SpriteAnimation::PLAY_RANDOM;
-		}
 		if (flags & IE_GUI_BUTTON_PLAYONCE) {
 			animation->flags |= SpriteAnimation::PLAY_ONCE;
 		}
@@ -646,8 +643,15 @@ void Button::SetAnimation(SpriteAnimation* anim)
 {
 	delete animation;
 	animation = anim;
-	FlagsChanged(flags); // sync animation flags
-	
+
+	const auto& key = fmt::format("{}_ANIM", ControlID);
+	if (animation) {
+		FlagsChanged(flags); // sync animation flags
+		core->GetDictionary().Set(key, true);
+	} else {
+		core->GetDictionary().Erase(key);
+	}
+
 	MarkDirty();
 }
 

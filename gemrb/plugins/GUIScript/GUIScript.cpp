@@ -3655,14 +3655,16 @@ static PyObject* SetButtonBAM(Button* btn, StringView ResRef)
 PyDoc_STRVAR( GemRB_Button_SetAnimation__doc,
 "===== Button_SetAnimation =====\n\
 \n\
-**Metaclass Prototype:** SetAnimation (BAMResRef[, Cycle, Blend, Cols])\n\
+**Metaclass Prototype:** SetAnimation (Animation[, Cycle, Flags, Cols])\n\
 \n\
-**Description:**  Sets the animation of a Control (usually a Button) from \n\
-a BAM file. Optionally an animation cycle could be set too.\n\
+**Description:**  Sets the animation of a Button from\n\
+a BAM file with optional cycle or a list of Sprite2D objects and a duration.\n\
+Optionally Flags can be used to specify the animation flags.\n\
 \n\
 **Parameters:** \n\
-  * BAMResRef - resref of the animation\n\
-  * Cycle - (optional) number of the cycle to use\n\
+  * GButton - the button\n\
+  * Animation - resref of the animation, or a list of Sprite2D\
+  * Cycle - (optional) number of the cycle to use if using a BAM, otherwise the duration (in ticks) required for the animation.\n\
   * Blend - (optional) set the blend mode, default is BLENDED \n\
   * Cols - (optional) a list of Colors to apply as the palette\n\
 \n\
@@ -3671,16 +3673,16 @@ a BAM file. Optionally an animation cycle could be set too.\n\
 
 static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 {
-	PyObject* pyRef = nullptr;
+	PyObject* pyAnim = nullptr;
 	int Cycle = 0;
 	int Blend = BlitFlags::BLENDED;
 	PyObject* cols = nullptr;
-	PARSE_ARGS(args,  "OO|iiO", &self, &pyRef, &Cycle, &Blend, &cols);
+	PARSE_ARGS(args,  "OO|iiO", &self, &pyAnim, &Cycle, &Blend, &cols);
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
 
-	if (pyRef == Py_None) {
+	if (pyAnim == Py_None) {
 		btn->SetAnimation(nullptr);
 		Py_RETURN_NONE;
 	}
@@ -3688,12 +3690,30 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	if (cols && !PyList_Check(cols)) {
 		return RuntimeError("Invalid argument for 'cols'");
 	}
-	
-	const ResRef ref = ResRefFromPy(pyRef);
-	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(ref, IE_BAM_CLASS_ID);
+
+	float fps = 10.0f;
+	std::shared_ptr<AnimationFactory> af;
+	if (PyUnicode_Check(pyAnim)) {
+		const ResRef& ref = ResRefFromPy(pyAnim);
+		af = gamedata->GetFactoryResourceAs<AnimationFactory>(ref, IE_BAM_CLASS_ID);
+		ABORT_IF_NULL(af);
+	} else if (PyList_Check(pyAnim)) {
+		std::vector<Holder<Sprite2D>> frames;
+		for (Py_ssize_t i = 0; i < PyList_Size(pyAnim); ++i) {
+			PyObject* item = PyList_GetItem(pyAnim, i);
+			frames.push_back(SpriteFromPy(item));
+		}
+		std::vector<AnimationFactory::CycleEntry> cycles(1, {AnimationFactory::index_t(frames.size()), 0});
+		std::vector<AnimationFactory::index_t> flt(frames.size());
+		std::iota(flt.begin(), flt.end(), 0);
+
+		fps = frames.size() / (Cycle / 1000.0f);
+		Cycle = 0;
+		af = std::make_shared<AnimationFactory>("", std::move(frames), std::move(cycles), std::move(flt));
+	}
+
 	ABORT_IF_NULL(af);
 
-	float fps = ANI_DEFAULT_FRAMERATE;
 	if (cols) {
 		ieDword indices[8] {};
 		Py_ssize_t min = std::min<Py_ssize_t>(8, PyList_Size(cols));
@@ -13077,6 +13097,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetString, METH_VARARGS),
 	METHOD(GetSpellFailure, METH_VARARGS),
 	METHOD(GetSpellCastOn, METH_VARARGS),
+	METHOD(GetSprite, METH_VARARGS),
 	METHOD(GetSlotType, METH_VARARGS),
 	METHOD(GetStore, METH_VARARGS),
 	METHOD(GetStoreDrink, METH_VARARGS),
