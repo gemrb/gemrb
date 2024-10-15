@@ -1530,23 +1530,23 @@ def PortraitButtonOnShiftPress (btn):
 
 def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
-	from PortraitWindow import GetPortraitButtonPairs
+	from PortraitWindow import GetPortraitButtons
 
 	PortraitWin = GemRB.GetView("PORTWIN")
 	# FIXME: hack. If defined, display single selection
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
-		PortraitButtons = GetPortraitButtonPairs (PortraitWin)
-		for i, Button in PortraitButtons.items():
-			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
+		PortraitButtons = GetPortraitButtons (PortraitWin)
+		for Button in PortraitButtons:
+			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (Button.Value))
 	else:
 		sel = GemRB.GameGetSelectedPCSingle ()
 		GUICommon.UpdateMageSchool (sel)
 
-		PortraitButtons = GetPortraitButtonPairs (PortraitWin)
-		for i, Button in PortraitButtons.items():
-			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
+		PortraitButtons = GetPortraitButtons (PortraitWin)
+		for Button in PortraitButtons:
+			Button.EnableBorder (FRAME_PC_SELECTED, Button.Value == sel)
 
 	Container.CloseContainerWindow()
 	if SelectionChangeHandler:
