@@ -236,8 +236,8 @@ def OpenStoreWindow ():
 		Button.SetVarAssoc ("Action", i)
 		# iwd2 has no steal window
 		if GameCheck.IsIWD2() and Action == 2:
-			Action = -1
-		if Action>=0:
+			Action = None
+		if Action is not None:
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 				Button.SetSprites ("GUISTBBC", Action, 1,2,0,0)
@@ -945,7 +945,7 @@ def InitStoreRentWindow (Window):
 		ok = Store['StoreRoomPrices'][i]
 		Button = Window.GetControl (i)
 		Button.OnPress (lambda: UpdateStoreRentWindow(Window))
-		if ok<0:
+		if not ok:
 			Button.SetState (IE_GUI_BUTTON_DISABLED) #disabled room icons are selected, not disabled
 		else:
 			Button.SetVarAssoc ("RentIndex", i)
@@ -960,7 +960,7 @@ def InitStoreRentWindow (Window):
 			#remove this line if you fixed guistore
 			Button.SetSprites ("GUISTROC",0, 1,2,0,3)
 		
-		if ok<0:
+		if not ok:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 		else:
 			Button.SetVarAssoc ("RentIndex", i)

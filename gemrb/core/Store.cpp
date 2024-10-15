@@ -96,53 +96,53 @@ int Store::GetRealStockSize() const
 
 bool Store::IsBag() const
 {
-	return Type == StoreType::BG2CONT || Type == StoreType::IWD2CONT;
+	return Type == StoreType::BG2Cont || Type == StoreType::IWD2Cont;
 }
 
-int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
+StoreActionFlags Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 {
-	int ret;
+	StoreActionFlags ret;
 
 	//don't allow any movement of undroppable items
 	if (invflags&IE_INV_ITEM_UNDROPPABLE ) {
-		ret = 0;
+		ret = StoreActionFlags::None;
 	} else {
-		ret = IE_STORE_BUY|IE_STORE_SELL|IE_STORE_STEAL;
+		ret = StoreActionFlags::Buy | StoreActionFlags::Sell | StoreActionFlags::Steal;
 	}
 	if (invflags&IE_INV_ITEM_UNSTEALABLE) {
-		ret &= ~IE_STORE_STEAL;
+		ret &= ~StoreActionFlags::Steal;
 	}
 	if (!(invflags&IE_INV_ITEM_IDENTIFIED) ) {
-		ret |= IE_STORE_ID;
+		ret |= StoreActionFlags::ID;
 	}
 
 	// can't buy/sell if store doesn't allow it at all
-	if (!(Flags&IE_STORE_SELL))
-		ret &= ~IE_STORE_SELL;
-	if (!(Flags&IE_STORE_BUY))
-		ret &= ~IE_STORE_BUY;
+	if (!(Flags & StoreActionFlags::Sell))
+		ret &= ~StoreActionFlags::Sell;
+	if (!(Flags & StoreActionFlags::Buy))
+		ret &= ~StoreActionFlags::Buy;
 
-	if (pc && Type < StoreType::BG2CONT) {
+	if (pc && Type < StoreType::BG2Cont) {
 		//don't allow selling of non destructible items
 		if (!(invflags & IE_INV_ITEM_DESTRUCTIBLE)) {
-			ret &= ~IE_STORE_SELL;
+			ret &= ~StoreActionFlags::Sell;
 		}
 
 		//don't allow selling of critical items (they could still be put in bags) ... unless the shop is special
 		bool critical = invflags & IE_INV_ITEM_CRITICAL;
-		if (critical && !(Flags & IE_STORE_BUYCRITS)) {
-			ret &= ~IE_STORE_SELL;
+		if (critical && !(Flags & StoreActionFlags::BuyCrits)) {
+			ret &= ~StoreActionFlags::Sell;
 		}
 
 		// ... however some games determine sellability differently
 		bool sellable = critical && !(invflags & IE_INV_ITEM_CONVERSABLE);
 		if (sellable && core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
-			ret |= IE_STORE_SELL;
+			ret |= StoreActionFlags::Sell;
 		}
 
 		//check if store buys stolen items
-		if ((invflags&IE_INV_ITEM_STOLEN) && !(Flags&IE_STORE_FENCE) ) {
-			ret &= ~IE_STORE_SELL;
+		if ((invflags & IE_INV_ITEM_STOLEN) && !(Flags & StoreActionFlags::Fence)) {
+			ret &= ~StoreActionFlags::Sell;
 		}
 	}
 
@@ -157,7 +157,7 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 	}
 
 	//Even if the store doesn't purchase the item, it can still ID it
-	return ret & ~IE_STORE_SELL;
+	return ret & ~StoreActionFlags::Sell;
 }
 
 STOCure *Store::GetCure(unsigned int idx) const
@@ -263,7 +263,7 @@ void Store::RechargeItem(CREItem *item) const
 	//bag      0   1   0   1
 	//flag     0   0   1   1
 	//recharge 1   0   0   1
-	if (IsBag() != !(Flags&IE_STORE_RECHARGE)) {
+	if (IsBag() != !(Flags & StoreActionFlags::ReCharge)) {
 		bool feature = core->HasFeature(GFFlags::SHOP_RECHARGE);
 		for (size_t i = 0; i < item->Usages.size(); i++) {
 			const ITMExtHeader *h = itm->GetExtHeader(i);

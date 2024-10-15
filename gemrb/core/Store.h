@@ -41,28 +41,30 @@ namespace GemRB {
 class CREItem;
 class Condition;
 
-enum class StoreType { STORE = 0, TAVERN = 1, INN = 2, TEMPLE = 3,
-BG2CONT = 4, IWD2CONT = 5, BAG = 6 };
+enum class StoreType : uint8_t { Store = 0, Tavern = 1, Inn = 2, Temple = 3, BG2Cont = 4, IWD2Cont = 5, Bag = 6, count };
 
-using StoreActionType = enum StoreActionType : int16_t { STA_BUYSELL = 0, STA_IDENTIFY = 1, STA_STEAL = 2,
-STA_CURE = 3, STA_DONATE = 4, STA_DRINK = 5, STA_ROOMRENT = 6, STA_OPTIONAL = 0x80 };
+enum class StoreActionType : uint8_t { Optional = 0x80, None = 0x7f,
+	BuySell = 0, Identify = 1, Steal = 2, Cure = 3, Donate = 4, Drink = 5, RoomRent = 6, count };
 
-#define IE_STORE_BUY      1
-#define IE_STORE_SELL     2
-#define IE_STORE_ID       4
-#define IE_STORE_STEAL    8
-#define IE_STORE_DONATE   16     //gemrb extension
-#define IE_STORE_CURE     32
-#define IE_STORE_DRINK    64
-#define IE_STORE_SELECT   0x40   //valid when these flags used as store action
-#define IE_STORE_RENT     128    //gemrb extension
-#define IE_STORE_QUALITY  0x600  //2 bits
+FLAG_ENUM StoreActionFlags : uint32_t  {
+	None     = 0,
+	Buy      = 1,
+	Sell     = 2,
+	ID       = 4,
+	Steal    = 8,
+	Donate   = 16,     //gemrb extension
+	Cure     = 32,
+	Drink    = 64,
+	Select   = 0x40,   //valid when these flags used as store action
+	Rent     = 128,    //gemrb extension
+	//QUALITY  = 0x400 | 0x200,  //2 bits
 // unknown 0x800
-#define IE_STORE_FENCE    0x1000 //
-#define IE_STORE_NOREPADJ 0x2000 // Reputation doesn't affect prices (BGEE)
-#define IE_STORE_RECHARGE 0x4000 //gemrb extension, if set, store won't recharge
-#define IE_STORE_BUYCRITS 0x8000 // User allowed to sell critical items (BGEE)
-#define IE_STORE_CAPACITY 0x10000 //used for error reporting purposes
+	Fence    = 0x1000, //
+	NoRepAdj = 0x2000, // Reputation doesn't affect prices (BGEE)
+	ReCharge = 0x4000, //gemrb extension, if set, store won't recharge
+	BuyCrits = 0x8000, // User allowed to sell critical items (BGEE)
+	Capacity = 0x10000 //used for error reporting purposes
+};
 
 /**
  * @struct STOItem
@@ -133,9 +135,9 @@ public:
 	std::vector<ieDword> purchased_categories;
 
 	ResRef Name;
-	StoreType Type = StoreType::STORE;
+	StoreType Type = StoreType::Store;
 	ieStrRef StoreName = ieStrRef::INVALID;
-	ieDword Flags = 0;
+	StoreActionFlags Flags = StoreActionFlags::None;
 	ieDword SellMarkup = 0;
 	ieDword BuyMarkup = 0;
 	ieDword DepreciationRate = 0;
@@ -167,7 +169,7 @@ public:
 	ieDword StoreOwnerID = 0;
 
 public: //queries
-	int AcceptableItemType(ieDword type, ieDword invflags, bool pc) const;
+	StoreActionFlags AcceptableItemType(ieDword type, ieDword invflags, bool pc) const;
 	STOCure *GetCure(unsigned int idx) const;
 	STODrink *GetDrink(unsigned int idx) const;
 	STOItem *GetItem(unsigned int idx, bool usetrigger) const;
