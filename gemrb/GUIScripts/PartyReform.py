@@ -58,7 +58,7 @@ def UpdateReformWindow (Window, select):
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-	PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (Window, 1, "horizontal")
+	PortraitButtons = PortraitWindow.GetPortraitButtonPairs (Window, 1, "horizontal")
 	for i in PortraitButtons:
 		Button = PortraitButtons[i]
 		if i + 1 not in RemovablePCs:
@@ -140,7 +140,7 @@ def OpenReformPartyWindow ():
 			RemovablePCs.append (i)
 
 	# PC portraits
-	PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (Window, 1, "horizontal")
+	PortraitButtons = PortraitWindow.GetPortraitButtonPairs (Window, 1, "horizontal")
 	for j in PortraitButtons:
 		Button = PortraitButtons[j]
 		Button.SetState (IE_GUI_BUTTON_LOCKED)

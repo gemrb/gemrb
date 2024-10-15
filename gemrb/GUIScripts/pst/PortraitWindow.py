@@ -21,6 +21,9 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 
+def GetPortraitButtonPairs(Window):
+	return {i : Window.GetControl(i) for i in range(6)}
+
 def PortraitButtonHPOnPress (btn):
 	id = btn.ControlID - 6
 	hbs = GemRB.GetVar('Health Bar Settings')
@@ -49,7 +52,7 @@ def OpenPortraitWindow (pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	Button.SetTooltip (11942)
 	Button.OnPress (GUICommonWindows.RestPress)
 
-	PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (Window)
+	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.items():
 		pcID = i + 1
 
@@ -76,7 +79,7 @@ def UpdatePortraitWindow ():
 
 	Window = GemRB.GetView("PORTWIN")
 
-	PortraitButtons = GUICommonWindows.GetPortraitButtonPairs (Window)
+	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.items():
 		pcID = i + 1
 
