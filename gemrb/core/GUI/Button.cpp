@@ -32,7 +32,6 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Logging/Logging.h"
-#include "Map.h"
 #include "Palette.h"
 
 #include <utility>
@@ -197,7 +196,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
 		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
 
-		BlitFlags bf = (animation->flags & A_ANI_BLEND) ? BlitFlags::ONE_MINUS_DST : BlitFlags::BLENDED;
+		BlitFlags bf = bool(animation->flags & Animation::Flags::BlendBlack) ? BlitFlags::ONE_MINUS_DST : BlitFlags::BLENDED;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
 			VideoDriver->BlitSprite(AnimPicture, r.origin + AnimPicture->Frame.origin, &r, bf);
 		} else {

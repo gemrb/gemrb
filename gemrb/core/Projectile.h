@@ -31,17 +31,20 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include "Animation.h"
 #include "Orientation.h"
 #include "EffectQueue.h"
-#include "Map.h"
 #include "Palette.h"
 #include "PathFinder.h"
 #include "Audio.h"
 #include "Video/Video.h"
 
 #include <list>
+#include <map>
 
 namespace GemRB {
+
+class AnimationFactory;
 
 // various special heights/Zs hardcoded in the originals
 enum class ProHeights {

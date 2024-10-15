@@ -19,7 +19,6 @@
 
 #include "GUIAnimation.h"
 
-#include "Animation.h"
 #include "Interface.h"
 #include "RNG.h"
 
@@ -79,7 +78,7 @@ bool ColorAnimation::HasEnded() const
 
 SpriteAnimation::SpriteAnimation(std::shared_ptr<Animation> a)
 : GUIAnimation(/*anim->starttime*/ 0), anim(std::move(a)),
-flags(anim->Flags), gameAnimation(anim->gameAnimation)
+flags(anim->flags), gameAnimation(anim->gameAnimation)
 {
 	assert(anim);
 	current = anim->CurrentFrame();

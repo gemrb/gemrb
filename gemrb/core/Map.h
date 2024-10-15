@@ -91,26 +91,6 @@ enum MapEnv : ieWord {
 	AT_PST_DAYNIGHT 	= 0x400
 };
 
-//area animation flags
-#define A_ANI_ACTIVE          1        //if not set, animation is invisible
-#define A_ANI_BLEND           2        //blend
-#define A_ANI_NO_SHADOW       4        //lightmap doesn't affect it
-#define A_ANI_PLAYONCE        8        //stop after endframe
-#define A_ANI_SYNC            16       //synchronised draw (skip frames if needed)
-#define A_ANI_RANDOM_START    32       //starts with a random frame in the start range
-#define A_ANI_NO_WALL         64       //draw after walls (walls don't cover it)
-#define A_ANI_NOT_IN_FOG      0x80     //not visible in fog of war
-#define A_ANI_BACKGROUND      0x100    //draw before actors (actors cover it)
-#define A_ANI_ALLCYCLES       0x200    //draw all cycles, not just the cycle specified
-#define A_ANI_PALETTE         0x400    //has own palette set
-#define A_ANI_MIRROR          0x800    //mirrored
-#define A_ANI_COMBAT          0x1000   //draw in combat too
-#define A_ANI_PSTBIT14        0x2000   // PST-only: unknown and rare, see #163 for area list
-// TODO: BGEE extended flags:
-// 0x2000: Use WBM resref
-// 0x4000: Draw stenciled (can be used to stencil animations using the water overlay mask of the tileset, eg. to give water surface a more natural look)
-// 0x8000: Use PVRZ resref
-
 #define ANI_PRI_BACKGROUND	-9999
 
 //creature area flags
@@ -223,13 +203,40 @@ class GEM_EXPORT AreaAnimation {
 public:
 	using index_t = Animation::index_t;
 
+	enum class Flags : uint32_t {
+		None			= 0,
+		Active			= UnderType(Animation::Flags::Active),		// if not set, animation is invisible
+		BlendBlack		= UnderType(Animation::Flags::BlendBlack),	// blend black as transparent
+		NoShadow		= 4,										// lightmap doesn't affect it
+		Once	    	= UnderType(Animation::Flags::Once),		// stop after endframe
+		Sync			= UnderType(Animation::Flags::Sync),		// synchronised draw (skip frames if needed)
+		RandStart	    = UnderType(Animation::Flags::RandStart),	// starts with a random frame in the start range
+		NoWall			= 64,		// draw after walls (walls don't cover it)
+		NotInFog		= 0x80,		// not visible in fog of war
+		Background		= 0x100,	// draw before actors (actors cover it)
+		AllCycles		= 0x200,	// draw all cycles, not just the cycle specified
+		Palette			= 0x400,	// has own palette set
+		Mirror			= 0x800,	// mirrored
+		Combat			= 0x1000,	// draw in combat too
+		PSTBit14		= 0x2000	// PST-only: unknown and rare, see #163 for area list
+// TODO: BGEE extended flags:
+// 0x2000: Use WBM resref
+// 0x4000: Draw stenciled (can be used to stencil animations using the water overlay mask of the tileset, eg. to give water surface a more natural look)
+// 0x8000: Use PVRZ resref
+	};
+	
 	std::vector<Animation> animation;
 	//dwords, or stuff combining to a dword
 	Point Pos;
 	ieDword appearance = 0;
-	ieDword Flags = 0;
+
+	union {
+		Animation::Flags animFlags;
+		Flags flags = Flags::None;
+	};
+
 	// flags that must be touched by PST a bit only
-	ieDword originalFlags = 0;
+	Flags originalFlags = Flags::None;
 	//these are on one dword
 	index_t sequence = 0;
 	index_t frame = 0;

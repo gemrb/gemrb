@@ -1207,12 +1207,12 @@ void AREImporter::GetAreaAnimation(DataStream* str, Map* map) const
 	str->ReadResRef(anim.BAM);
 	str->ReadWord(anim.sequence);
 	str->ReadWord(anim.frame);
-	str->ReadDword(anim.Flags);
-	anim.originalFlags = anim.Flags;
+	str->ReadEnum(anim.flags);
+	anim.originalFlags = anim.flags;
 	str->ReadScalar(anim.height);
 	if (core->HasFeature(GFFlags::IMPLICIT_AREAANIM_BACKGROUND)) {
 		anim.height = ANI_PRI_BACKGROUND;
-		anim.Flags |= A_ANI_NO_WALL;
+		anim.flags |= AreaAnimation::Flags::NoWall;
 	}
 	str->ReadWord(anim.transparency);
 	ieWord startFrameRange;
@@ -1221,7 +1221,7 @@ void AREImporter::GetAreaAnimation(DataStream* str, Map* map) const
 	if (anim.startchance <= 0) {
 		anim.startchance = 100; // percentage of starting a cycle
 	}
-	if (startFrameRange && (anim.Flags & A_ANI_RANDOM_START)) {
+	if (startFrameRange && bool(anim.flags & AreaAnimation::Flags::RandStart)) {
 		anim.frame = RAND<AreaAnimation::index_t>(0, startFrameRange - 1);
 	}
 	anim.startFrameRange = 0; // this will never get resaved (iirc)
@@ -1653,23 +1653,24 @@ void AREImporter::AdjustPSTFlags(AreaAnimation &areaAnim) const
 	 * The actual use of bits in PST map anims isn't fully solved here.
 	 */
 
-	#define PST_ANI_NO_WALL 0x0008  // A_ANI_PLAYONCE in other games
-	#define PST_ANI_BLEND 0x0100  // A_ANI_BACKGROUND in other games
+	// rename flags for clarity
+	#define PST_ANI_NO_WALL AreaAnimation::Flags::Once
+	#define PST_ANI_BLEND AreaAnimation::Flags::Background
 
-	areaAnim.Flags = 0;             // Clear everything
+	areaAnim.flags = AreaAnimation::Flags::None; // Clear everything
 
 	// Set default-on flags (currently only A_ANI_SYNC)
-	areaAnim.Flags |= A_ANI_SYNC;
+	areaAnim.flags |= AreaAnimation::Flags::Sync;
 
 	// Copy still-relevant A_ANI_* flags
-	areaAnim.Flags |= areaAnim.originalFlags & A_ANI_ACTIVE;
+	areaAnim.flags |= areaAnim.originalFlags & AreaAnimation::Flags::Active;
 
 	// Map known flags
-	if (areaAnim.originalFlags & PST_ANI_BLEND) {
-		areaAnim.Flags |= A_ANI_BLEND;
+	if (bool(areaAnim.originalFlags & PST_ANI_BLEND)) {
+		areaAnim.flags |= AreaAnimation::Flags::BlendBlack;
 	}
-	if (areaAnim.originalFlags & PST_ANI_NO_WALL) {
-		areaAnim.Flags |= A_ANI_NO_WALL;
+	if (bool(areaAnim.originalFlags & PST_ANI_NO_WALL)) {
+		areaAnim.flags |= AreaAnimation::Flags::NoWall;
 	}
 }
 
@@ -2257,10 +2258,10 @@ int AREImporter::PutAnimations(DataStream *stream, const Map *map) const
 
 		if (core->HasFeature(GFFlags::AUTOMAP_INI)) {
 			/* PST toggles the active bit only, and we need to keep the rest. */
-			ieDword flags = (an->originalFlags & ~A_ANI_ACTIVE) | (an->Flags & A_ANI_ACTIVE);
-			stream->WriteDword(flags);
+			auto flags = (an->originalFlags & ~AreaAnimation::Flags::Active) | (an->flags & AreaAnimation::Flags::Active);
+			stream->WriteEnum(flags);
 		} else {
-			stream->WriteDword(an->Flags);
+			stream->WriteEnum(an->flags);
 		}
 
 		stream->WriteScalar(an->height);

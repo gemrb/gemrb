@@ -3725,10 +3725,11 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 		fps = 10.0f; // FIXME: why do we slow these down?
 	}
 
-	constexpr auto A_ANI_GAMEANIM = A_ANI_NO_SHADOW; // repurpose this flag that isnt used for animations
+	constexpr auto GAMEANIM = Animation::Flags::Unused; // repurpose the unused bit
+	Animation::Flags animFlags = Animation::Flags(flags);
 	anim->fps = fps;
-	anim->Flags = (flags | A_ANI_ACTIVE) & ~A_ANI_GAMEANIM;
-	anim->gameAnimation = (flags & A_ANI_GAMEANIM);
+	anim->flags = (animFlags | Animation::Flags::Active) & ~GAMEANIM;
+	anim->gameAnimation = bool(animFlags & GAMEANIM);
 
 	btn->SetAnimation(new SpriteAnimation(anim));
 
@@ -9686,12 +9687,10 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	anim.appearance=0xffffffff; //scheduled for every hour
 	anim.Name = resref;
 	anim.BAM = resref;
-	anim.Flags=Flags;
+	anim.flags = AreaAnimation::Flags(Flags);
 	anim.sequence = static_cast<AreaAnimation::index_t>(Cycle);
 	anim.height=Height;
-	if (Flags&A_ANI_ACTIVE) {
-		map->AddAnimation(std::move(anim));
-	}
+	map->AddAnimation(std::move(anim));
 	Py_RETURN_NONE;
 }
 
