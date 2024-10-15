@@ -23,8 +23,13 @@ import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 
-def GetPortraitButtonPairs(Window):
-	return {i : Window.GetControl(i) for i in range(6)}
+def GetPortraitButtons(Window, *args):
+	list = []
+	for i in range(6):
+		btn = Window.GetControl(i)
+		btn.SetVarAssoc("portrait", i + 1)
+		list.append(btn)
+	return list
 
 def PortraitButtonHPOnPress (btn):
 	id = btn.ControlID - 6
@@ -49,9 +54,9 @@ def OpenPortraitWindow (pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	Button.SetTooltip (11942)
 	Button.OnPress (GUICommonWindows.RestPress)
 
-	PortraitButtons = GetPortraitButtonPairs (Window)
-	for i, Button in PortraitButtons.items():
-		pcID = i + 1
+	PortraitButtons = GetPortraitButtons (Window)
+	for Button in PortraitButtons:
+		pcID = Button.Value
 
 		Button.OnRightPress (GUICommonWindows.OpenInventoryWindowClick)
 		Button.OnPress (GUICommonWindows.PortraitButtonOnPress)
@@ -59,12 +64,11 @@ def OpenPortraitWindow (pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button.SetAction (GUICommonWindows.ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
 		Button.SetAction (GUICommonWindows.ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 		Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
-		Button.SetVarAssoc("portrait", pcID) # neeeded for drag/drop
-		Button.SetHotKey(chr(ord('1') + i), 0, True)
+		Button.SetHotKey(chr(ord('0') + pcID), 0, True)
 		Button.OnAnimEnd (UpdateButtonAnimation)
 		SetupButtonBorders (Button)
-			
-		ButtonHP = Window.GetControl (6 + i)
+
+		ButtonHP = Window.GetControl (5 + pcID)
 		ButtonHP.SetFlags(IE_GUI_BUTTON_PICTURE, OP_SET)
 		ButtonHP.SetBAM('FILLBAR', 0, 0, -1)
 		ButtonHP.OnPress(PortraitButtonHPOnPress)
@@ -77,9 +81,9 @@ def UpdatePortraitWindow ():
 
 	Window = GemRB.GetView("PORTWIN")
 
-	PortraitButtons = GetPortraitButtonPairs (Window)
-	for i, Button in PortraitButtons.items():
-		pcID = i + 1
+	PortraitButtons = GetPortraitButtons (Window)
+	for Button in PortraitButtons:
+		pcID = Button.Value
 
 		if pcID <= GemRB.GetPartySize():
 			Button.SetAction(lambda btn, pc=pcID: GemRB.GameControlLocateActor(pc), IE_ACT_MOUSE_ENTER)

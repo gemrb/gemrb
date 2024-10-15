@@ -58,16 +58,16 @@ def UpdateReformWindow (Window, select):
 	else:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-	PortraitButtons = PortraitWindow.GetPortraitButtonPairs (Window, 1, "horizontal")
-	for i in PortraitButtons:
-		Button = PortraitButtons[i]
-		if i + 1 not in RemovablePCs:
+	PortraitButtons = PortraitWindow.GetPortraitButtons (Window, 1, "horizontal")
+	for Button in PortraitButtons:
+		pc = Button.Value
+		if pc not in RemovablePCs:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	for i in RemovablePCs:
 		idx = RemovablePCs.index(i)
-		if idx not in PortraitButtons:
+		if idx >= len(PortraitButtons):
 			continue # for saved games with higher party count than the current setup supports
 		Button = PortraitButtons[idx]
 		Button.EnableBorder (FRAME_PC_SELECTED, select == i)
@@ -139,9 +139,8 @@ def OpenReformPartyWindow ():
 			RemovablePCs.append (i)
 
 	# PC portraits
-	PortraitButtons = PortraitWindow.GetPortraitButtonPairs (Window, 1, "horizontal")
-	for j in PortraitButtons:
-		Button = PortraitButtons[j]
+	PortraitButtons = PortraitWindow.GetPortraitButtons (Window, 1, "horizontal")
+	for Button in PortraitButtons:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON | IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 		color = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
