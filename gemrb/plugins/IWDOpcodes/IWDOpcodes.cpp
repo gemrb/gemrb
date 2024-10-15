@@ -28,6 +28,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "Map.h"
 #include "ProjectileServer.h" //needs for alter_animation
 #include "Spell.h"
 #include "damages.h"

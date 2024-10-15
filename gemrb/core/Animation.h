@@ -39,6 +39,17 @@ class GEM_EXPORT Animation {
 public:
 	using index_t = uint16_t;
 	using frame_t = Holder<Sprite2D>;
+	
+	enum class Flags : uint8_t {
+		None 		= 0,
+		Active 		= 1,
+		BlendBlack 	= 2,
+		Unused		= 4, // keep compatible with AreaAnimation::Flags
+		Once		= 8,
+		Sync		= 16,
+		RandStart	= 32,
+		AnimMask	= 0xc4, // ignore unused bits
+	};
 
 	bool endReached = false;
 	index_t frameIdx = 0;
@@ -47,7 +58,7 @@ public:
 	bool playReversed = false;
 	bool gameAnimation = false; // is it affected by pausing?
 	Region animArea;
-	ieDword Flags = 0;
+	Flags flags = Flags::None;
 
 	explicit Animation(std::vector<frame_t>) noexcept;
 	Animation() noexcept = default;

@@ -2073,7 +2073,7 @@ void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
 		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
-	anim->Flags &=~A_ANI_PLAYONCE;
+	anim->animFlags &=~ Animation::Flags::Once;
 }
 
 void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
@@ -2083,7 +2083,7 @@ void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
 		Log(WARNING, "Actions", "Script error: No Animation Named \"{}\"", parameters->objects[1]->objectName);
 		return;
 	}
-	anim->Flags |= A_ANI_PLAYONCE;
+	anim->animFlags |= Animation::Flags::Once;
 }
 
 void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)

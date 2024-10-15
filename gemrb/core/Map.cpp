@@ -1050,7 +1050,7 @@ AreaAnimation* Map::GetNextAreaAnimation(aniIterator& iter, ieDword gametime) co
 		if (!a.Schedule(gametime)) {
 			continue;
 		}
-		if ((a.Flags & A_ANI_NOT_IN_FOG) ? !IsVisible(a.Pos) : !IsExplored(a.Pos)) {
+		if (bool(a.flags & AreaAnimation::Flags::NotInFog) ? !IsVisible(a.Pos) : !IsExplored(a.Pos)) {
 			continue;
 		}
 
@@ -1196,7 +1196,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		}
 		
 		Color tint = ColorWhite;
-		if (a->Flags & A_ANI_NO_SHADOW) {
+		if (bool(a->flags & AreaAnimation::Flags::NoShadow)) {
 			tint = GetLighting(a->Pos);
 		}
 		
@@ -1613,7 +1613,7 @@ BlitFlags Map::SetDrawingStencilForAreaAnimation(const AreaAnimation* anim, cons
 		return BlitFlags::NONE; // not behind a wall, no stencil required
 	}
 
-	return (anim->Flags & A_ANI_NO_WALL) ? BlitFlags::NONE : BlitFlags::STENCIL_GREEN;
+	return bool(anim->flags & AreaAnimation::Flags::NoWall) ? BlitFlags::NONE : BlitFlags::STENCIL_GREEN;
 }
 
 // test case: vvc played when summoning a creature (it's not attached to the actor as most spell vfx)
@@ -3798,7 +3798,7 @@ AreaAnimation& AreaAnimation::operator=(const AreaAnimation& src) noexcept
 	if (this != &src) {
 		animation = src.animation;
 		sequence = src.sequence;
-		Flags = src.Flags;
+		flags = src.flags;
 		originalFlags = src.originalFlags;
 		Pos = src.Pos;
 		appearance = src.appearance;
@@ -3850,9 +3850,9 @@ void AreaAnimation::InitAnimation()
 		//a possible gemrb feature to have this flag settable in .are
 		ret.gameAnimation = true;
 		ret.SetFrame(frame); // sanity check it first
-		ret.Flags = Flags;
+		ret.flags = animFlags & ~Animation::Flags::AnimMask;
 		ret.pos = Pos;
-		if (ret.Flags & A_ANI_MIRROR) {
+		if (bool(flags & Flags::Mirror)) {
 			ret.MirrorAnimation(BlitFlags::MIRRORX);
 		}
 
@@ -3863,7 +3863,7 @@ void AreaAnimation::InitAnimation()
 	animation.reserve(animcount);
 	index_t existingcount = std::min<index_t>(animation.size(), animcount);
 
-	if (Flags & A_ANI_ALLCYCLES && animcount > 0) {
+	if (bool(flags & Flags::AllCycles) && animcount > 0) {
 		index_t i = 0;
 		for (; i < existingcount; ++i) {
 			animation[i] = GetAnimationPiece(i);
@@ -3875,21 +3875,21 @@ void AreaAnimation::InitAnimation()
 		animation.push_back(GetAnimationPiece(sequence));
 	}
 	
-	if (Flags & A_ANI_PALETTE) {
+	if (bool(flags & Flags::Palette)) {
 		SetPalette(PaletteRef);
 	}
 }
 
 void AreaAnimation::SetPalette(const ResRef &pal)
 {
-	Flags |= A_ANI_PALETTE;
+	flags |= Flags::Palette;
 	PaletteRef = pal;
 	palette = gamedata->GetPalette(PaletteRef);
 }
 
 bool AreaAnimation::Schedule(ieDword gametime) const
 {
-	if (!(Flags&A_ANI_ACTIVE) ) {
+	if (!(flags & Flags::Active)) {
 		return false;
 	}
 
@@ -3899,7 +3899,7 @@ bool AreaAnimation::Schedule(ieDword gametime) const
 
 int AreaAnimation::GetHeight() const
 {
-	return (Flags&A_ANI_BACKGROUND) ? ANI_PRI_BACKGROUND : height;
+	return (bool(flags & Flags::Background)) ? ANI_PRI_BACKGROUND : height;
 }
 
 Region AreaAnimation::DrawingRegion() const
@@ -3917,23 +3917,23 @@ Region AreaAnimation::DrawingRegion() const
 	return r;
 }
 
-void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags flags) const
+void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags bf) const
 {	
 	if (transparency) {
 		tint.a = 255 - transparency;
-		flags |= BlitFlags::ALPHA_MOD;
+		bf |= BlitFlags::ALPHA_MOD;
 	} else {
 		tint.a = 255;
 	}
-	
-	if (Flags & A_ANI_BLEND) {
-		flags |= BlitFlags::ONE_MINUS_DST;
+
+	if (bool(flags & Flags::BlendBlack)) {
+		bf |= BlitFlags::ONE_MINUS_DST;
 	}
 
 	size_t ac = animation.size();
 	while (ac--) {
 		const Animation& anim = animation[ac];
-		VideoDriver->BlitGameSpriteWithPalette(anim.CurrentFrame(), palette, Pos - viewport.origin, flags, tint);
+		VideoDriver->BlitGameSpriteWithPalette(anim.CurrentFrame(), palette, Pos - viewport.origin, bf, tint);
 	}
 }
 

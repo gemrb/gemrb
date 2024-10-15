@@ -20,6 +20,7 @@
 #ifndef Animations_h
 #define Animations_h
 
+#include "Animation.h"
 #include "Holder.h"
 #include "Region.h"
 #include "Sprite2D.h"
@@ -128,8 +129,6 @@ private:
 	bool HasEnded() const override;
 };
 
-class Animation;
-
 class GEM_EXPORT SpriteAnimation : public GUIAnimation<Holder<Sprite2D>> {
 private:
 	std::shared_ptr<Animation> anim;
@@ -140,7 +139,7 @@ public:
 
 	bool HasEnded() const override;
 	
-	ieDword& flags;
+	Animation::Flags& flags;
 	bool& gameAnimation;
 };
 

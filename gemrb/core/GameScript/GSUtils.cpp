@@ -2135,9 +2135,9 @@ void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, boo
 	}
 
 	BitOp op = flag ? BitOp::OR : BitOp::NAND;
-	SetBits<ieDword>(anim->Flags, A_ANI_ACTIVE, op);
+	SetBits(anim->flags, AreaAnimation::Flags::Active, op);
 	for (size_t i = 0; i < anim->animation.size(); ++i) {
-		SetBits<ieDword>(anim->animation[i].Flags, A_ANI_ACTIVE, op);
+		SetBits(anim->animation[i].flags, Animation::Flags::Active, op);
 	}
 }
 

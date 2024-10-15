@@ -27,7 +27,6 @@
 #include "ImageMgr.h"
 #include "Interface.h"
 #include "Logging/Logging.h"
-#include "Map.h"
 #include "Palette.h"
 #include "RNG.h"
 
@@ -1079,12 +1078,12 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			case IE_ANI_ATTACK_JAB:
 			case IE_ANI_ATTACK_SLASH:
 			case IE_ANI_ATTACK_BACKSLASH:
-				newanim->Flags |= A_ANI_PLAYONCE;
+				newanim->flags |= Animation::Flags::Once;
 				break;
 			case IE_ANI_EMERGE:
 			case IE_ANI_GET_UP:
 				newanim->playReversed = true;
-				newanim->Flags |= A_ANI_PLAYONCE;
+				newanim->flags |= Animation::Flags::Once;
 				break;
 		}
 		switch (AnimType) {
@@ -1261,7 +1260,7 @@ const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char
 		case IE_ANI_ATTACK_JAB:
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_ATTACK_BACKSLASH:
-			animation->Flags |= A_ANI_PLAYONCE;
+			animation->flags |= Animation::Flags::Once;
 			break;
 		default:
 			break;
