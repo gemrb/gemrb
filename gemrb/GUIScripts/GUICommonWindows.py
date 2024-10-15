@@ -46,7 +46,6 @@ FRAME_PC_TARGET   = 1
 
 CurrentWindow = None
 ActionBarControlOffset = 0
-ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
 
 if GameCheck.IsIWD2():
 	MageSpellsKey = 'Spellbook'
@@ -57,10 +56,6 @@ elif GameCheck.IsPST():
 else:
 	MageSpellsKey = 'Wizard_Spells'
 	CharacterStatsKey = 'Character_Record'
-
-StatesFont = "STATES2"
-if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-	StatesFont = "STATES"
 
 #The following tables deal with the different control indexes and string refs of each game
 #so that actual interface code can be game neutral
@@ -315,8 +310,8 @@ def AIPress (toggle=1):
 		OptionsWindow = GemRB.GetView("OPTWIN")
 		Button = OptionsWindow.GetControl (OptionControl['Toggle_AI'])
 	else:
-		PortraitWindow = GemRB.GetView("PORTWIN")
-		Button = PortraitWindow.GetControl (OptionControl['Toggle_AI'])
+		PortraitWin = GemRB.GetView("PORTWIN")
+		Button = PortraitWin.GetControl (OptionControl['Toggle_AI'])
 
 	if toggle:
 		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_XOR)
@@ -619,7 +614,7 @@ def UpdateActionsWindow ():
 	except RuntimeError:
 		return
 
-	PortraitWindow = GemRB.GetView("PORTWIN")
+	PortraitWin = GemRB.GetView("PORTWIN")
 	ActionsWindow = GemRB.GetView("ACTWIN")
 
 	if not GameCheck.IsIWD2():
@@ -627,7 +622,7 @@ def UpdateActionsWindow ():
 		ActionBarControlOffset = 0
 		UpdateClock ()
 	else:
-		CurrentWindow = PortraitWindow
+		CurrentWindow = PortraitWin
 		ActionBarControlOffset = 6 # set it here too, since we get called before menu setup
 
 	if GameCheck.IsPST():
@@ -1487,118 +1482,6 @@ def ToggleWindow(id, pack, pos=WINDOW_CENTER):
 	else:
 		return GemRB.LoadWindow(id, pack, pos)
 
-# returns buttons and a numerical index
-# does nothing new in pst, iwd2 due to layout
-# in the rest, it will enable extra button generation for higher resolutions
-# Mode determines arrangement direction, horizontal being for party reform and potentially save/load
-def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
-	pairs = {}
-
-	if not Window:
-		return pairs
-
-	oldSlotCount = 6 + ExtraSlots
-
-	for i in range(min(oldSlotCount, MAX_PARTY_SIZE + ExtraSlots)): # the default chu/game limit or less
-		pairs[i] = Window.GetControl(i)
-
-	# nothing left to do
-	PartySize = GemRB.GetPartySize ()
-	if PartySize <= oldSlotCount:
-		return pairs
-
-	if GameCheck.IsIWD2() or GameCheck.IsPST():
-		# set Mode = "horizontal" once we can create enough space
-		GemRB.Log(LOG_ERROR, "GetPortraitButtonPairs", "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ...")
-		return pairs
-
-	# GUIWORLD doesn't have a separate portraits window, so we need to skip
-	# all this magic when reforming an overflowing party
-	if PartySize > MAX_PARTY_SIZE:
-		return pairs
-
-	# generate new buttons by copying from existing ones
-	firstButton = pairs[0]
-	firstRect = firstButton.GetFrame ()
-	buttonHeight = firstRect["h"]
-	buttonWidth = firstRect["w"]
-	xOffset = firstRect["x"]
-	yOffset = firstRect["y"]
-	windowRect = Window.GetFrame()
-	windowHeight = windowRect["h"]
-	windowWidth = windowRect["w"]
-	limit = limitStep = 0
-	scale = 0
-	portraitGap = 0
-	if Mode ==  "horizontal":
-		xOffset += 3*buttonWidth  # width of other controls in party reform; we'll draw on the other side (atleast in guiw8, guiw10 has no need for this)
-		maxWidth = windowWidth - xOffset
-		limit = maxWidth
-		limitStep = buttonWidth
-	else:
-		# reduce it by existing slots + 0 slots in framed views (eg. inventory) and
-		# 1 in main game control (for spacing and any other controls below (ai/select all in bg2))
-		maxHeight = windowHeight - buttonHeight * PartySize - buttonHeight // 2
-		if windowHeight != ScreenHeight:
-			maxHeight += buttonHeight // 2
-		limit = maxHeight
-		# for framed views, limited to 6, we downscale the buttons to fit, clipping their portraits
-		if maxHeight < buttonHeight:
-			unused = -40 if GameCheck.IsBG1() else 20 # remaining unused space below the portraits
-			scale = 1
-			portraitGap = buttonHeight
-			buttonHeight = (windowHeight + unused) // PartySize
-			if portraitGap == buttonHeight:
-				scale = 0 # ensure idempotence, eg. when this gets called on click
-			portraitGap = portraitGap - buttonHeight - 2 # 2 for a quasi border
-			limit = windowHeight - buttonHeight * 6 + unused
-		limitStep = buttonHeight
-
-	for i in range(len(pairs), PartySize):
-		if limitStep > limit:
-			raise SystemExit("Not enough window space for so many party members (portraits), bailing out! %d vs width/height of %d/%d" %(limit, buttonWidth, buttonHeight))
-		nextID = 1000 + i
-		control = Window.GetControl (nextID)
-		if control:
-			pairs[i] = control
-			continue
-		if Mode ==  "horizontal":
-			Window.CreateButton (nextID, xOffset+i*buttonWidth, yOffset, buttonWidth, buttonHeight)
-		else:
-			# vertical
-			Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset+i*2*scale, buttonWidth, buttonHeight)
-
-		button = Window.GetControl (nextID)
-		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
-		button.SetVarAssoc ("portrait", i + 1)
-		SetupButtonBorders (Window, button, i)
-		button.SetFont (StatesFont)
-		button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-
-		button.OnRightPress (OpenInventoryWindowClick)
-		button.OnPress (PortraitButtonOnPress)
-		button.OnShiftPress (PortraitButtonOnShiftPress)
-		button.SetAction (PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
-		button.SetAction (ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
-		button.SetAction (ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
-
-		pairs[i] = button
-		limit -= limitStep
-
-	# move the buttons back up, to combine the freed space
-	if scale:
-		for i in range(PartySize - 1):
-			button = pairs[i]
-			button.SetSize (buttonWidth, buttonHeight)
-			if i == 0:
-				continue # don't move the first portrait
-			rect = button.GetFrame ()
-			x = rect["x"]
-			y = rect["y"]
-			button.SetPos (x, y-portraitGap*i)
-
-	return pairs
-
 def OpenInventoryWindowClick (btn):
 	import GUIINV
 	GemRB.GameSelectPC (btn.Value, True, SELECT_REPLACE)
@@ -1658,13 +1541,14 @@ def PortraitButtonOnShiftPress (btn):
 
 def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
+	from PortraitWindow import GetPortraitButtonPairs
 
-	PortraitWindow = GemRB.GetView("PORTWIN")
+	PortraitWin = GemRB.GetView("PORTWIN")
 	# FIXME: hack. If defined, display single selection
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
-		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
+		PortraitButtons = GetPortraitButtonPairs (PortraitWin)
 		for i, Button in PortraitButtons.items():
 			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
 		if SelectionChangeMultiHandler:
@@ -1673,7 +1557,7 @@ def SelectionChanged ():
 		sel = GemRB.GameGetSelectedPCSingle ()
 		GUICommon.UpdateMageSchool (sel)
 
-		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
+		PortraitButtons = GetPortraitButtonPairs (PortraitWin)
 		for i, Button in PortraitButtons.items():
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 
