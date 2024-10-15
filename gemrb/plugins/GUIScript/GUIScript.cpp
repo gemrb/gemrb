@@ -7067,27 +7067,62 @@ returns it in a dictionary.\n\
 "
 );
 
-#define STOREBUTTON_COUNT 7
-#define STORETYPE_COUNT 7
-static const int16_t storebuttons[STORETYPE_COUNT][STOREBUTTON_COUNT] = {
-	//store
-	{ STA_BUYSELL, STA_IDENTIFY | STA_OPTIONAL, STA_STEAL | STA_OPTIONAL, STA_DONATE | STA_OPTIONAL, STA_CURE | STA_OPTIONAL, STA_DRINK | STA_OPTIONAL, STA_ROOMRENT | STA_OPTIONAL },
-	// tavern
-	{ STA_DRINK, STA_BUYSELL | STA_OPTIONAL, STA_IDENTIFY | STA_OPTIONAL, STA_STEAL | STA_OPTIONAL, STA_DONATE | STA_OPTIONAL, STA_CURE | STA_OPTIONAL, STA_ROOMRENT | STA_OPTIONAL},
-	// inn
-	{ STA_ROOMRENT, STA_BUYSELL | STA_OPTIONAL, STA_DRINK | STA_OPTIONAL, STA_STEAL | STA_OPTIONAL, STA_IDENTIFY | STA_OPTIONAL, STA_DONATE | STA_OPTIONAL, STA_CURE | STA_OPTIONAL},
-	// temple
-	{ STA_CURE,  STA_DONATE | STA_OPTIONAL, STA_BUYSELL | STA_OPTIONAL, STA_IDENTIFY | STA_OPTIONAL, STA_STEAL | STA_OPTIONAL, STA_DRINK | STA_OPTIONAL, STA_ROOMRENT | STA_OPTIONAL},
-	// iwd container
-	{ STA_BUYSELL, -1, -1, -1, -1, -1, -1},
-	// no need to steal from your own container (original engine had STEAL instead of DRINK)
-	{ STA_BUYSELL, STA_IDENTIFY | STA_OPTIONAL, STA_DRINK | STA_OPTIONAL, STA_CURE | STA_OPTIONAL, -1, -1, -1},
-	// gemrb specific store type: (temple 2), added steal, removed identify
-	{ STA_BUYSELL, STA_STEAL | STA_OPTIONAL, STA_DONATE | STA_OPTIONAL, STA_CURE | STA_OPTIONAL} };
+constexpr Py_ssize_t STORE_BUTTON_COUNT = 7;
+using StoreButtons = std::array<StoreActionType, STORE_BUTTON_COUNT>;
+static EnumArray<StoreType, StoreButtons> storebuttons {
+	StoreButtons
+	{ //store
+		StoreActionType::BuySell,
+		StoreActionType::Identify | StoreActionType::Optional,
+		StoreActionType::Steal | StoreActionType::Optional,
+		StoreActionType::Donate | StoreActionType::Optional,
+		StoreActionType::Cure | StoreActionType::Optional,
+		StoreActionType::Drink | StoreActionType::Optional,
+		StoreActionType::RoomRent | StoreActionType::Optional
+	}, StoreButtons { // tavern
+		StoreActionType::Drink,
+		StoreActionType::BuySell | StoreActionType::Optional,
+		StoreActionType::Identify | StoreActionType::Optional,
+		StoreActionType::Steal | StoreActionType::Optional,
+		StoreActionType::Donate | StoreActionType::Optional,
+		StoreActionType::Cure | StoreActionType::Optional,
+		StoreActionType::RoomRent | StoreActionType::Optional
+	}, StoreButtons { // inn
+		StoreActionType::RoomRent,
+		StoreActionType::BuySell | StoreActionType::Optional,
+		StoreActionType::Drink | StoreActionType::Optional,
+		StoreActionType::Steal | StoreActionType::Optional,
+		StoreActionType::Identify | StoreActionType::Optional,
+		StoreActionType::Donate | StoreActionType::Optional,
+		StoreActionType::Cure | StoreActionType::Optional
+	}, StoreButtons { // temple
+		StoreActionType::Cure,
+		StoreActionType::Donate | StoreActionType::Optional,
+		StoreActionType::BuySell | StoreActionType::Optional,
+		StoreActionType::Identify | StoreActionType::Optional,
+		StoreActionType::Steal | StoreActionType::Optional,
+		StoreActionType::Drink | StoreActionType::Optional,
+		StoreActionType::RoomRent | StoreActionType::Optional
+	}, StoreButtons { // iwd container
+		StoreActionType::BuySell,
+		StoreActionType::None, StoreActionType::None, StoreActionType::None, StoreActionType::None, StoreActionType::None, StoreActionType::None
+	}, StoreButtons { // no need to steal from your own container (original engine had STEAL instead of DRINK)
+		StoreActionType::BuySell,
+		StoreActionType::Identify | StoreActionType::Optional,
+		StoreActionType::Drink | StoreActionType::Optional,
+		StoreActionType::Cure | StoreActionType::Optional,
+		StoreActionType::None, StoreActionType::None, StoreActionType::None
+	}, StoreButtons { // gemrb specific store type: (temple 2), added steal, removed identify
+		StoreActionType::BuySell,
+		StoreActionType::Steal | StoreActionType::Optional,
+		StoreActionType::Donate | StoreActionType::Optional,
+		StoreActionType::Cure | StoreActionType::Optional,
+		StoreActionType::None, StoreActionType::None, StoreActionType::None
+	} };
 
 //buy/sell, identify, steal, cure, donate, drink, rent
-static const int16_t storeBits[7] = { IE_STORE_BUY | IE_STORE_SELL, IE_STORE_ID, IE_STORE_STEAL,
-	IE_STORE_CURE, IE_STORE_DONATE, IE_STORE_DRINK, IE_STORE_RENT };
+static const EnumArray<StoreActionType, StoreActionFlags> storeBits { StoreActionFlags::Buy | StoreActionFlags::Sell, StoreActionFlags::ID, StoreActionFlags::Steal,
+	StoreActionFlags::Cure, StoreActionFlags::Donate, StoreActionFlags::Drink, StoreActionFlags::Rent };
 
 static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 {
@@ -7105,8 +7140,8 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	if (!store) {
 		Py_RETURN_NONE;
 	}
-	if (store->Type > StoreType::BAG) {
-		store->Type = StoreType::BAG;
+	if (store->Type > StoreType::Bag) {
+		store->Type = StoreType::Bag;
 	}
 
 	PyObject* dict = PyDict_New();
@@ -7119,35 +7154,40 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "StoreOwner", DecRef(PyLong_FromLong, store->GetOwnerID() ));
 	PyObject* p = PyTuple_New(store->RoomPrices.size());
 
-	for (int i = 0, j = 1; i < 4; i++) {
-		int16_t k;
-		if (store->AvailableRooms&j) {
-			k = static_cast<int16_t>(store->RoomPrices[i]);
+	for (Py_ssize_t i = 0; i < 4; i++) {
+		ieDword bit = 1 << i;
+		if (store->AvailableRooms & bit) {
+			ieDword k = store->RoomPrices[i];
+			PyTuple_SetItem(p, i, PyLong_FromLong(k));
 		} else {
-			k = -1;
+			Py_INCREF(Py_None);
+			PyTuple_SetItem(p, i, Py_None);
 		}
-		PyTuple_SetItem(p, i, PyLong_FromLong(k));
-		j<<=1;
 	}
 	PyDict_SetItemString(dict, "StoreRoomPrices", p);
 
-	p = PyTuple_New( STOREBUTTON_COUNT );
-	int j = 0;
-	for (auto k : storebuttons[static_cast<int>(store->Type)]) {
-		if (k&STA_OPTIONAL) {
-			k&=~STA_OPTIONAL;
+	p = PyTuple_New(STORE_BUTTON_COUNT);
+	Py_ssize_t i = 0;
+	for (auto bit : storebuttons[store->Type]) {
+		if (bool(bit & StoreActionType::Optional)) {
+			bit &= ~StoreActionType::Optional;
 			//check if the type was disabled
-			if (!(store->Flags & storeBits[k])) {
+			if (!(store->Flags & storeBits[bit])) {
 				continue;
 			}
+		} else if (bit == StoreActionType::None) {
+			continue;
 		}
-		PyTuple_SetItem(p, j++, PyLong_FromLong(k));
+		PyTuple_SetItem(p, i++, PyLong_FromLong(under_t<StoreActionType>(bit)));
 	}
-	for (; j < STOREBUTTON_COUNT; j++) {
-		PyTuple_SetItem(p, j, PyLong_FromLong(-1));
+
+	for (; i < STORE_BUTTON_COUNT; ++i) {
+		Py_INCREF(Py_None);
+		PyTuple_SetItem(p, i, Py_None);
 	}
+
 	PyDict_SetItemString(dict, "StoreButtons", p);
-	PyDict_SetItemString(dict, "StoreFlags", DecRef(PyLong_FromLong, store->Flags));
+	PyDict_SetItemString(dict, "StoreFlags", DecRef(PyLong_FromLong, under_t<StoreActionFlags>(store->Flags)));
 	PyDict_SetItemString(dict, "TavernRumour", DecRef(PyString_FromResRef, store->RumoursTavern));
 	PyDict_SetItemString(dict, "TempleRumour", DecRef(PyString_FromResRef, store->RumoursTemple));
 	PyDict_SetItemString(dict, "IDPrice", DecRef(PyLong_FromLong, store->IDPrice));
@@ -7190,7 +7230,7 @@ for buying, selling, identifying or stealing. If Type is 1, then this is a \n\
 
 static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 {
-	int globalID, Slot, ret;
+	int globalID, Slot;
 	int type = 0;
 	PARSE_ARGS( args,  "ii|i", &globalID, &Slot, &type);
 	GET_GAME();
@@ -7230,40 +7270,40 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 		return PyLong_FromLong(0);
 	}
 
-	ret = store->AcceptableItemType( item->ItemType, Flags, type == 0 || type == 2 );
+	StoreActionFlags ret = store->AcceptableItemType( item->ItemType, Flags, type == 0 || type == 2 );
 
 	//don't allow putting a bag into itself
 	if (ItemResRef == store->Name) {
-		ret &= ~IE_STORE_SELL;
+		ret &= ~StoreActionFlags::Sell;
 	}
 	//this is a hack to report on selected items
 	if (Flags & IE_INV_ITEM_SELECTED) {
-		ret |= IE_STORE_SELECT;
+		ret |= StoreActionFlags::Select;
 	}
 
 	//don't allow overstuffing bags
 	if (store->Capacity && store->Capacity<=store->GetRealStockSize()) {
-		ret = (ret | IE_STORE_CAPACITY) & ~IE_STORE_SELL;
+		ret = (ret | StoreActionFlags::Capacity) & ~StoreActionFlags::Sell;
 	}
 
 	//buying into bags respects bags' limitations
 	if (rhstore && type != 0) {
-		int accept = rhstore->AcceptableItemType(item->ItemType, Flags, true);
-		if (!(accept & IE_STORE_SELL)) {
-			ret &= ~IE_STORE_BUY;
+		StoreActionFlags accept = rhstore->AcceptableItemType(item->ItemType, Flags, true);
+		if (!(accept & StoreActionFlags::Sell)) {
+			ret &= ~StoreActionFlags::Buy;
 		}
 		//probably won't happen in sane games, but doesn't hurt to check
-		if (!(accept & IE_STORE_BUY)) {
-			ret &= ~IE_STORE_SELL;
+		if (!(accept & StoreActionFlags::Buy)) {
+			ret &= ~StoreActionFlags::Sell;
 		}
 
 		if (rhstore->Capacity && rhstore->Capacity<=rhstore->GetRealStockSize()) {
-			ret = (ret | IE_STORE_CAPACITY) & ~IE_STORE_BUY;
+			ret = (ret | StoreActionFlags::Capacity) & ~StoreActionFlags::Buy;
 		}
 	}
 
 	gamedata->FreeItem( item, ItemResRef, false );
-	return PyLong_FromLong(ret);
+	return PyLong_FromLong(under_t<StoreActionFlags>(ret));
 }
 
 PyDoc_STRVAR( GemRB_FindStoreItem__doc,
@@ -7369,11 +7409,11 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 }
 
 // a bunch of duplicated code moved from GemRB_ChangeStoreItem()
-static int SellBetweenStores(STOItem* si, int action, Store *store)
+static int SellBetweenStores(STOItem* si, StoreActionFlags action, Store *store)
 {
 	CREItem ci(si);
 	ci.Flags &= ~IE_INV_ITEM_SELECTED;
-	if (action == IE_STORE_STEAL) {
+	if (action == StoreActionFlags::Steal) {
 		ci.Flags |= IE_INV_ITEM_STOLEN;
 	}
 
@@ -7426,9 +7466,9 @@ the PC's inventory.\n\
 static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, Slot;
-	int action;
+	int actint;
 	int res = ASI_FAILED;
-	PARSE_ARGS( args,  "iii", &globalID, &Slot, &action);
+	PARSE_ARGS( args,  "iii", &globalID, &Slot, &actint);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -7436,22 +7476,27 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
+
+	StoreActionFlags action = static_cast<StoreActionFlags>(actint);
+	
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch"
 	switch (action) {
-	case IE_STORE_STEAL:
-	case IE_STORE_BUY:
+	case StoreActionFlags::Steal:
+	case StoreActionFlags::Buy:
 	{
 		STOItem* si = store->GetItem( Slot, true );
 		if (!si) {
 			return RuntimeError("Store item not found!");
 		}
 		//always stealing only one item
-		if (action == IE_STORE_STEAL) {
+		if (action == StoreActionFlags::Steal) {
 			si->PurchasedAmount=1;
 		}
 		if (!rhstore) {
 			//the amount of items is stored in si->PurchasedAmount
 			//it will adjust AmountInStock/PurchasedAmount
-			actor->inventory.AddStoreItem(si, action == IE_STORE_STEAL ? STA_STEAL : STA_BUYSELL);
+			actor->inventory.AddStoreItem(si, action == StoreActionFlags::Steal ? StoreActionType::Steal : StoreActionType::BuySell);
 		} else {
 			SellBetweenStores(si, action, rhstore);
 		}
@@ -7480,7 +7525,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		res = ASI_SUCCESS;
 		break;
 	}
-	case IE_STORE_ID:
+	case StoreActionFlags::ID:
 	{
 		if (!rhstore) {
 			CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
@@ -7498,7 +7543,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		res = ASI_SUCCESS;
 		break;
 	}
-	case IE_STORE_SELECT|IE_STORE_BUY:
+	case StoreActionFlags::Select | StoreActionFlags::Buy:
 	{
 		STOItem* si = store->GetItem( Slot, true );
 		if (!si) {
@@ -7514,8 +7559,8 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		break;
 	}
 
-	case IE_STORE_SELECT|IE_STORE_SELL:
-	case IE_STORE_SELECT|IE_STORE_ID:
+	case StoreActionFlags::Select | StoreActionFlags::Sell:
+	case StoreActionFlags::Select | StoreActionFlags::ID:
 	{
 		if (!rhstore) {
 			//this is not removeitem, because the item is just marked
@@ -7539,7 +7584,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		res = ASI_SUCCESS;
 		break;
 	}
-	case IE_STORE_SELL:
+	case StoreActionFlags::Sell:
 	{
 		//store/bag is at full capacity
 		if (store->Capacity && (store->Capacity <= store->GetRealStockSize()) ) {
@@ -7582,6 +7627,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	default:
 		break;
 	}
+#pragma GCC diagnostic pop
 	return PyLong_FromLong(res);
 }
 

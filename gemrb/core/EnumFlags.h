@@ -23,6 +23,18 @@
 
 #include <type_traits>
 
+#ifdef __has_attribute
+#define HAS_ATTRIBUTE(x) __has_attribute(x)
+#else
+#define HAS_ATTRIBUTE(x) 0
+#endif
+
+#if HAS_ATTRIBUTE(flag_enum)
+#define FLAG_ENUM enum class __attribute__((flag_enum))
+#else
+#define FLAG_ENUM enum class
+#endif
+
 template <typename ENUM>
 using under_t = std::underlying_type_t<ENUM>;
 
