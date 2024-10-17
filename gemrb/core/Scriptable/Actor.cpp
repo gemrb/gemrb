@@ -2453,6 +2453,11 @@ Actor::stat_t Actor::ClampStat(unsigned int StatIndex, stat_t Value) const
 		return Value;
 	}
 
+	// don't clamp, it's a bit field
+	if (StatIndex == IE_SANCTUARY) {
+		return Value;
+	}
+
 	if ((signed) Value < -100) {
 		Value = (stat_t) -100;
 	} else {
