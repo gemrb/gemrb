@@ -3691,7 +3691,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 		return RuntimeError("Invalid argument for 'cols'");
 	}
 
-	float fps = 10.0f;
+	float fps = ANI_DEFAULT_FRAMERATE;
 	std::shared_ptr<Animation> anim;
 	if (PyUnicode_Check(pyAnim)) {
 		const ResRef& ref = ResRefFromPy(pyAnim);
@@ -3722,7 +3722,6 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 		auto spr = anim->GetFrame(0);
 		auto pal = spr->GetPalette();
 		*pal = SetupPaperdollColours(indices, 0);
-		fps = 10.0f; // FIXME: why do we slow these down?
 	}
 
 	constexpr auto GAMEANIM = Animation::Flags::Unused; // repurpose the unused bit
