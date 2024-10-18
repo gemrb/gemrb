@@ -349,10 +349,14 @@ def UpdateItemDisplay(Window, slotItem, itemtype):
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	drink = (itemtype & 1) and (item["Function"]&ITM_F_DRINK)
 	read = (itemtype & 1) and (item["Function"]&ITM_F_READ)
-	# only mages and bards can learn spells
+	# only mages and some bards can learn spells (externalize this to clskills.2da?)
 	ClassName = GUICommon.GetClassRowName (pc)
-	if not (GemRB.GetPlayerStat (pc, IE_LEVELBARD) or GemRB.GetPlayerStat (pc, IE_LEVELMAGE) or ClassName != "MAGE"):
-		read = 0
+	if GameCheck.IsIWD2 ():
+		if GemRB.GetPlayerStat (pc, IE_LEVELMAGE) == 0:
+			read = 0
+	else:
+		if "MAGE" not in ClassName and "BARD" not in ClassName:
+			read = 0
 	# furthermore there might be school exclusions present
 	if read:
 		read = GemRB.CanUseItemType (SLOT_ALL, slotItem['ItemResRef'], pc, False)
