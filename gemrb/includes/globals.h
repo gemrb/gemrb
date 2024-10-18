@@ -158,7 +158,6 @@ GEM_EXPORT unsigned int Distance(const Scriptable *a, const Scriptable *b);
 GEM_EXPORT unsigned int SquaredDistance(const Scriptable *a, const Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(const Scriptable *a, const Scriptable *b);
 GEM_EXPORT unsigned int SquaredPersonalDistance(const Scriptable *a, const Scriptable *b);
-GEM_EXPORT unsigned int SquaredMapDistance(const Scriptable *a, const Scriptable *b);
 GEM_EXPORT unsigned int PersonalLineDistance(const Point& v, const Point& w, const Scriptable* s, float_t* proj);
 GEM_EXPORT float_t Feet2Pixels(int feet, float_t angle);
 GEM_EXPORT bool WithinAudibleRange(const Actor *actor, const Point &dest);

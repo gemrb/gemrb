@@ -1536,7 +1536,9 @@ int GameScript::Range(Scriptable *Sender, const Trigger *parameters)
 	if (Sender->Type == ST_ACTOR) {
 		Sender->objects.LastMarked = scr->GetGlobalID();
 	}
-	int distance = SquaredMapDistance(Sender, scr);
+	SearchmapPoint senderPos = Map::ConvertCoordToTile(Sender->Pos);
+	SearchmapPoint targetPos = Map::ConvertCoordToTile(scr->Pos);
+	int distance = SquaredDistance(senderPos, targetPos);
 	bool matched = DiffCore(distance, (parameters->int0Parameter + 1) * (parameters->int0Parameter + 1), parameters->int1Parameter);
 	if (matched) {
 		Sender->SetLastTrigger(trigger_range, scr->GetGlobalID());

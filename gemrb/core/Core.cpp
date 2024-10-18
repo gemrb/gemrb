@@ -84,14 +84,6 @@ unsigned int SquaredPersonalDistance(const Point &p, const Scriptable *b)
 	return (unsigned int) ret;
 }
 
-/** Calculates map distance between 2 scriptables */
-unsigned int SquaredMapDistance(const Scriptable *a, const Scriptable *b)
-{
-	long x = a->Pos.x / 16 - b->Pos.x / 16;
-	long y = a->Pos.y / 12 - b->Pos.y / 12;
-	return (unsigned int)(x*x + y*y);
-}
-
 /** Calculates distance between 2 scriptables */
 unsigned int Distance(const Scriptable *a, const Scriptable *b)
 {
