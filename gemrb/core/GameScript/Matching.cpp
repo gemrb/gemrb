@@ -106,7 +106,7 @@ static EffectRef fx_protection_creature_ref = { "Protection:Creature", -1 };
 
 static inline bool DoObjectChecks(const Map* map, const Scriptable* Sender, Actor* target, int &dist, bool ignoreinvis = false, const Object* oC = nullptr)
 {
-	dist = SquaredMapDistance(Sender, target); // good enough for sorting actors, but we don't use it below
+	dist = SquaredDistance(Sender, target); // good enough for sorting actors, but we don't use it below
 
 	// TODO: what do we check for non-actors?
 	// non-actors have a visual range (15), we should do visual range and LOS
