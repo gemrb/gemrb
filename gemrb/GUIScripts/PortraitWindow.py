@@ -80,6 +80,7 @@ def SetupDamageInfo (Button):
 		hpBar.SetBAM ("GUIHITPT", band, 0)
 		hpBar.SetPictureClipping (ratio)
 		hpBar.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		hpBar.SetState (IE_GUI_BUTTON_LOCKED)
 
 	ratio_str = ""
 	if hp != "?":
