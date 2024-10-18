@@ -152,7 +152,6 @@ class Scriptable;
 class Actor;
 
 GEM_EXPORT unsigned int Distance(const Point &pos, const Scriptable *b);
-GEM_EXPORT unsigned int SquaredMapDistance(const Point &pos, const Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(const Point &p, const Scriptable *b);
 GEM_EXPORT unsigned int SquaredPersonalDistance(const Point &pos, const Scriptable *b);
 GEM_EXPORT unsigned int Distance(const Scriptable *a, const Scriptable *b);

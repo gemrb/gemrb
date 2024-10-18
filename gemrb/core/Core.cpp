@@ -50,14 +50,6 @@ namespace GemRB {
 
 //// Globally used functions
 
-/** Calculates distance squared from a point to a scriptable */
-unsigned int SquaredMapDistance(const Point &p, const Scriptable *b)
-{
-	long x = p.x / 16 - b->Pos.x / 16;
-	long y = p.y / 12 - b->Pos.y / 12;
-	return (unsigned int)(x*x + y*y);
-}
-
 /** Calculates distance between 2 points */
 unsigned int Distance(const Point &p, const Scriptable *b)
 {
