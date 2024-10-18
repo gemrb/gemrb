@@ -137,6 +137,8 @@ GEM_EXPORT path_t ExtractFileFromPath(const path_t&);
 
 GEM_EXPORT bool MakeDirectories(const path_t& path) WARN_UNUSED;
 GEM_EXPORT bool MakeDirectory(const path_t& path) WARN_UNUSED;
+// removes all files from directory
+GEM_EXPORT void DelTree(const path_t& path, bool onlySave);
 
 GEM_EXPORT path_t HomePath();
 

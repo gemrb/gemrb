@@ -438,6 +438,24 @@ bool MakeDirectories(const path_t& path)
 	return true;
 }
 
+void DelTree(const path_t& path, bool onlySave)
+{
+	if (path.empty()) return; // don't delete the root filesystem :)
+
+	DirectoryIterator dir(path);
+	dir.SetFlags(DirectoryIterator::Files);
+	if (!dir) {
+		return;
+	}
+	do {
+		const path_t& name = dir.GetName();
+		if (!onlySave || core->SavedExtension(name)) {
+			path_t dtmp = dir.GetFullPath();
+			UnlinkFile(dtmp);
+		}
+	} while (++dir);
+}
+
 GEM_EXPORT path_t HomePath()
 {
 	const char* home = getenv("HOME");

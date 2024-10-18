@@ -2989,24 +2989,6 @@ bool Interface::StupidityDetector(const path_t& path) const
 	return false;
 }
 
-void Interface::DelTree(const path_t& path, bool onlysave) const
-{
-	if (path.empty()) return; //Don't delete the root filesystem :)
-
-	DirectoryIterator dir(path);
-	dir.SetFlags(DirectoryIterator::Files);
-	if (!dir) {
-		return;
-	}
-	do {
-		const path_t& name = dir.GetName();
-		if (!onlysave || SavedExtension(name) ) {
-			path_t dtmp = dir.GetFullPath();
-			UnlinkFile(dtmp);
-		}
-	} while (++dir);
-}
-
 void Interface::LoadProgress(int percent)
 {
 	if (config.UseAsLibrary) return;

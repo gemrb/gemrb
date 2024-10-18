@@ -381,7 +381,7 @@ void SaveGameIterator::PruneQuickSave(StringView folder) const
 		//prune second path
 		std::string from = FormatQuickSavePath(myslots[hole]);
 		myslots.erase(myslots.begin()+hole);
-		core->DelTree(from, false);
+		DelTree(from, false);
 		rmdir(from.c_str());
 	}
 	//shift paths, always do this, because they are aging
@@ -575,7 +575,7 @@ static bool CreateSavePath(path_t& path, int index, StringView slotname)
 	path_t dir = fmt::format("{:09d}-{}", index, slotname);
 	path = PathJoin(path, dir);
 	//this is required in case the old slot wasn't recognised but still there
-	core->DelTree(path, false);
+	DelTree(path, false);
 	if (!MakeDirectory(path)) {
 		Log(ERROR, "SaveGameIterator", "Unable to create save game directory '{}'", path);
 		return false;
@@ -717,7 +717,7 @@ void SaveGameIterator::DeleteSaveGame(const Holder<SaveGame>& game) const
 		return;
 	}
 
-	core->DelTree(game->GetPath(), false); //remove all files from folder
+	DelTree(game->GetPath(), false); // remove all files from folder
 	RemoveDirectory(game->GetPath());
 }
 
