@@ -36,7 +36,7 @@ protected:
 	T current;
 	
 public:
-	GUIAnimation(tick_t begin) noexcept
+	explicit GUIAnimation(tick_t begin) noexcept
 	: begintime(begin) {}
 
 	GUIAnimation() noexcept
@@ -135,7 +135,7 @@ private:
 
 	Holder<Sprite2D> GenerateNext(tick_t time) override;
 public:
-	SpriteAnimation(std::shared_ptr<Animation> anim);
+	explicit SpriteAnimation(std::shared_ptr<Animation> anim);
 
 	bool HasEnded() const override;
 	
