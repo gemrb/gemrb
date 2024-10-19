@@ -4928,11 +4928,9 @@ void Actor::SetPosition(const Point& nmptTarget, bool jump, const Size& radius, 
 {
 	ResetPathTries();
 	ClearPath(true);
-	Point p, q;
-	p.x = nmptTarget.x / 16;
-	p.y = nmptTarget.y / 12;
+	SearchmapPoint p = Map::ConvertCoordToTile(nmptTarget);
 
-	q = p;
+	SearchmapPoint q = p;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
 		const Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
