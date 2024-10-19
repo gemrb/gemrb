@@ -2085,7 +2085,7 @@ void Movable::MoveLine(int steps, orient_t orient)
 		return;
 	}
 	// DoStep takes care of stopping on walls if necessary
-	path = area->GetLine(Pos, steps, orient);
+	path = area->GetLineEnd(Pos, steps, orient);
 }
 
 orient_t Movable::GetNextFace() const
