@@ -609,25 +609,6 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		VideoDriver->DrawRect(r, ColorGreen, false );
 	}
 
-	// Draw path
-	if (drawPath) {
-		PathListNode* node = drawPath;
-		while (true) {
-			Point p = Map::ConvertCoordFromTile(node->point) + Point(8, 6);
-			if (!node->Parent) {
-				VideoDriver->DrawCircle( p, 2, ColorRed );
-			} else {
-				Point old = Map::ConvertCoordFromTile(node->Parent->point) + Point(8, 6);
-				VideoDriver->DrawLine(old, p, ColorGreen);
-			}
-			if (!node->Next) {
-				VideoDriver->DrawCircle( p, 2, ColorGreen );
-				break;
-			}
-			node = node->Next;
-		}
-	}
-
 	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && !DisplayText.empty()) {
 		Font::PrintColors colors = { displaymsg->GetColor(GUIColors::FLOAT_TXT_INFO), ColorBlack };
 		core->GetTextFont()->Print(screen, DisplayText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, colors);
