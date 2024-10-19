@@ -259,7 +259,7 @@ Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, orient_t
 	return path;
 }
 
-PathListNode *Map::GetLine(const Point &p, int steps, orient_t orient) const
+PathListNode* Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
 {
 	PathListNode *step = new PathListNode;
 	step->point.x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
