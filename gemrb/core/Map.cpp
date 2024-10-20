@@ -777,7 +777,7 @@ void Map::UpdateScripts()
 			if (!actor->GetRandomBackoff() && actor->GetSpeed() > 0) {
 				actor->NewPath();
 			}
-		} else if (actor->GetStep() && actor->GetSpeed()) {
+		} else if (actor->InMove() && actor->GetSpeed()) {
 			// Make actors pathfind if there are others nearby
 			// in order to avoid bumping when possible
 			const Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF, actor->GetAnims()->GetCircleSize(), actor);
@@ -1757,19 +1757,18 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		// draw also pathfinding waypoints
 		const Actor *act = core->GetFirstSelectedActor();
 		if (!act) return;
-		const PathListNode *path = act->GetPath();
-		if (!path) return;
-		const PathListNode *step = path->Next;
+		const Path& path = act->GetPath();
+		if (path.empty()) return;
 		Color waypoint(0, 64, 128, 128); // darker blue-ish
-		int i = 0;
+		size_t i = 0;
 		block.w = 8;
 		block.h = 6;
-		while (step) {
-			block.x = (step->point.x+64) - vp.x;
-			block.y = (step->point.y+6) - vp.y;
-			Log(DEBUG, "Map", "Waypoint {} at {}", i, step->point);
+		while (i < path.size()) {
+			const PathNode& step = path[i];
+			block.x = (step.point.x + 64) - vp.x;
+			block.y = (step.point.y + 6) - vp.y;
+			Log(DEBUG, "Map", "Waypoint {} at {}", i, step.point);
 			VideoDriver->DrawRect(block, waypoint);
-			step = step->Next;
 			i++;
 		}
 	}

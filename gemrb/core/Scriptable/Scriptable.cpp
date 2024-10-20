@@ -541,7 +541,7 @@ bool Scriptable::InMove() const
 		return false;
 	}
 	Movable *me = (Movable *) this;
-	return me->GetStep() != NULL;
+	return !me->GetPath().empty();
 }
 
 void Scriptable::SetWait(tick_t time)
@@ -1963,50 +1963,28 @@ bool Highlightable::PossibleToSeeTrap() const
  * Movable Class *
  *****************/
 
-Movable::~Movable(void)
+PathNode Movable::GetNextStep(int x) const
 {
-	if (path) {
-		ClearPath(true);
+	size_t next = currentStep + x;
+	if (next < path.size()) {
+		return path[next];
+	} else {
+		return {};
 	}
-}
-
-int Movable::GetPathLength() const
-{
-	const PathListNode *node = GetNextStep(0);
-	if (!node) return 0;
-
-	int i = 0;
-	while (node->Next) {
-		i++;
-		node = node->Next;
-	}
-	return i;
-}
-
-PathListNode *Movable::GetNextStep(int x) const
-{
-	if (!step) {
-		error("GetNextStep", "Hit with step = null");
-	}
-	PathListNode *node = step;
-	while(node && x--) {
-		node = node->Next;
-	}
-	return node;
 }
 
 Point Movable::GetMostLikelyPosition() const
 {
-	if (!path) {
+	if (path.empty()) {
 		return Pos;
 	}
 
 //actually, sometimes middle path would be better, if
 //we stand in Destination already
-	int halfway = GetPathLength()/2;
-	const PathListNode *node = GetNextStep(halfway);
-	if (node) {
-		return Map::ConvertCoordFromTile(node->point) + Point(8, 6);
+	int halfway = path.size() / 2;
+	const PathNode& node = GetNextStep(halfway);
+	if (!node.point.IsZero()) {
+		return Map::ConvertCoordFromTile(node.point) + Point(8, 6);
 	}
 	return Destination;
 }
@@ -2081,11 +2059,11 @@ void Movable::SetAttackMoveChances(const std::array<ieWord, 3>& amc)
 //this could be used for WingBuffet as well
 void Movable::MoveLine(int steps, orient_t orient)
 {
-	if (path || !steps) {
+	if (!path.empty() || !steps) {
 		return;
 	}
 	// DoStep takes care of stopping on walls if necessary
-	path = area->GetLineEnd(Pos, steps, orient);
+	path.push_back(area->GetLineEnd(Pos, steps, orient));
 }
 
 orient_t Movable::GetNextFace() const
@@ -2159,7 +2137,7 @@ void Movable::BumpBack()
 void Movable::DoStep(unsigned int walkScale, ieDword time) {
 	// Only bump back if not moving
 	// Actors can be bumped while moving if they are backing off
-	if (!path) {
+	if (path.empty()) {
 		if (IsBumped()) {
 			BumpBack();
 		}
@@ -2172,17 +2150,14 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		timeStartStep = time;
 		return;
 	}
-	if (!step) {
-		step = path;
-		timeStartStep = time;
-		return;
-	}
-
 	if (time <= timeStartStep) {
 		return;
 	}
 
-	Point nmptStep = step->point;
+	const PathNode& step = path[currentStep];
+	assert(!step.point.IsZero());
+
+	Point nmptStep = step.point;
 	float_t dx = nmptStep.x - Pos.x;
 	float_t dy = nmptStep.y - Pos.y;
 	Map::NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / float_t(walkScale));
@@ -2210,7 +2185,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 	bool blocksSearch = BlocksSearchMap();
 	if (actorInTheWay && blocksSearch && actorInTheWay->BlocksSearchMap()) {
 		// Give up instead of bumping if you are close to the goal
-		if (!(step->Next) && PersonalDistance(nmptStep, this) < MAX_OPERATING_DISTANCE) {
+		if (currentStep == path.size() && PersonalDistance(nmptStep, this) < MAX_OPERATING_DISTANCE) {
 			ClearPath(true);
 			NewOrientation = Orientation;
 			// Do not call ReleaseCurrentAction() since other actions
@@ -2221,7 +2196,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		}
 		if (actor && actor->ValidTarget(GA_CAN_BUMP) && actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
 			actorInTheWay->BumpAway();
-		} else if (r == 1 || actorInTheWay->GetPath()) {
+		} else if (r == 1 || !actorInTheWay->GetPath().empty()) {
 			// only back off if the immediate step is blocked or if the blocker is moving
 			// it's better to make a single step if possible, to avoid backoff loops
 			Backoff();
@@ -2249,12 +2224,11 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		area->tileProps.PaintSearchMap(Map::ConvertCoordToTile(Pos), circleSize, flag);
 	}
 
-	SetOrientation(step->orient, false);
+	SetOrientation(step.orient, false);
 	timeStartStep = time;
 	if (Pos == nmptStep) {
-		if (step->Next) {
-			step = step->Next;
-		} else {
+		++currentStep;
+		if (currentStep >= path.size()) {
 			ClearPath(true);
 			NewOrientation = Orientation;
 			pathfindingDistance = circleSize;
@@ -2270,30 +2244,24 @@ void Movable::AdjustPosition()
 
 void Movable::AddWayPoint(const Point &Des)
 {
-	if (!path) {
+	if (path.empty()) {
 		WalkTo(Des);
 		return;
 	}
 	Destination = Des;
 	//it is tempting to use 'step' here, as it could
 	//be about half of the current path already
-	PathListNode *endNode = path;
-	while(endNode->Next) {
-		endNode = endNode->Next;
-	}
-	Point p = endNode->point;
+	Point p = path[path.size() - 1].point;
 	area->ClearSearchMapFor(this);
-	PathListNode* path2 = area->FindPath(p, Des, circleSize);
+	Path path2 = area->FindPath(p, Des, circleSize);
 	// if the waypoint is too close to the current position, no path is generated
-	if (!path2) {
+	if (path2.empty()) {
 		if (BlocksSearchMap()) {
 			area->BlockSearchMapFor(this);
 		}
 		return;
 	}
-	endNode->Next = path2;
-	//probably it is wise to connect it both ways?
-	path2->Parent = endNode;
+	path.insert(path.end(), path2.begin(), path2.end());
 }
 
 // This function is called at each tick if an actor is following another actor
@@ -2301,7 +2269,7 @@ void Movable::AddWayPoint(const Point &Des)
 void Movable::WalkTo(const Point &Des, int distance)
 {
 	// Only rate-limit when moving
-	if ((GetPath() || InMove()) && prevTicks && Ticks < prevTicks + 2) {
+	if (!path.empty() && prevTicks && Ticks < prevTicks + 2) {
 		return;
 	}
 
@@ -2322,16 +2290,16 @@ void Movable::WalkTo(const Point &Des, int distance)
 	}
 
 	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
-	PathListNode* newPath = area->FindPath(Pos, Des, circleSize, distance, PF_SIGHT | PF_ACTORS_ARE_BLOCKING, actor);
-	if (!newPath && actor && actor->ValidTarget(GA_CAN_BUMP)) {
+	Path newPath = area->FindPath(Pos, Des, circleSize, distance, PF_SIGHT | PF_ACTORS_ARE_BLOCKING, actor);
+	if (newPath.empty() && actor && actor->ValidTarget(GA_CAN_BUMP)) {
 		Log(DEBUG, "WalkTo", "{} re-pathing ignoring actors", fmt::WideToChar{actor->GetShortName()});
 		newPath = area->FindPath(Pos, Des, circleSize, distance, PF_SIGHT, actor);
 	}
 
-	if (newPath) {
+	if (!newPath.empty()) {
 		ClearPath(false);
 		path = newPath;
-		step = path;
+		currentStep = 0;
 		HandleAnkhegStance(false);
 	}  else {
 		pathfindingDistance = std::max(circleSize, distance);
@@ -2351,7 +2319,7 @@ void Movable::RunAwayFrom(const Point &Source, int PathLength, bool noBackAway)
 
 void Movable::RandomWalk(bool can_stop, bool run)
 {
-	if (path) {
+	if (!path.empty()) {
 		return;
 	}
 	// if not continuous random walk, then stops for a while
@@ -2406,12 +2374,12 @@ void Movable::RandomWalk(bool can_stop, bool run)
 
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
-	path = area->RandomWalk(Pos, circleSize, maxWalkDistance ? maxWalkDistance : 5, As<Actor>());
+	path.push_back(area->RandomWalk(Pos, circleSize, maxWalkDistance ? maxWalkDistance : 5, As<Actor>()));
 	if (BlocksSearchMap()) {
 		area->BlockSearchMapFor(this);
 	}
-	if (path) {
-		Destination = path->point;
+	if (!path.empty()) {
+		Destination = path[0].point;
 	} else {
 		randomWalkCounter = 0;
 		WalkTo(HomeLocation);
@@ -2453,14 +2421,8 @@ void Movable::ClearPath(bool resetDestination)
 		HandleAnkhegStance(true);
 		InternalFlags &= ~IF_NORETICLE;
 	}
-	PathListNode* thisNode = path;
-	while (thisNode) {
-		PathListNode* nextNode = thisNode->Next;
-		delete thisNode;
-		thisNode = nextNode;
-	}
-	path = nullptr;
-	step = nullptr;
+	path.clear();
+	currentStep = 0;
 	//don't call ReleaseCurrentAction
 }
 
@@ -2469,7 +2431,7 @@ void Movable::HandleAnkhegStance(bool emerge)
 {
 	const Actor* actor = As<Actor>();
 	int nextStance = emerge ? IE_ANI_EMERGE : IE_ANI_HIDE;
-	if (actor && path && StanceID != nextStance && actor->GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE) {
+	if (actor && !path.empty() && StanceID != nextStance && actor->GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE) {
 		SetStance(nextStance);
 		SetWait(15); // both stances have 15 frames, at 15 fps
 	}
