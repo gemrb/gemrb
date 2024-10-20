@@ -59,7 +59,78 @@ struct PathNode {
 	Point point;
 	orient_t orient;
 };
-using Path = std::vector<PathNode>;
+
+struct Path {
+	std::vector<PathNode> nodes;
+	size_t currentStep = 0;
+	using iterator = std::vector<PathNode>::iterator;
+	using const_iterator = std::vector<PathNode>::const_iterator;
+
+	explicit operator bool() const noexcept
+	{
+		return !nodes.empty();
+	}
+	bool Empty() const
+	{
+		return nodes.empty();
+	}
+	size_t Size() const
+	{
+		return nodes.size();
+	}
+	void Clear()
+	{
+		nodes.clear();
+		currentStep = 0;
+	}
+	PathNode GetStep(size_t idx) const
+	{
+		return nodes[idx];
+	}
+	PathNode GetCurrentStep() const
+	{
+		return nodes[currentStep];
+	}
+	PathNode GetNextStep(size_t x) const
+	{
+		size_t next = currentStep + x;
+		if (next < nodes.size()) {
+			return nodes[next];
+		} else {
+			return {};
+		}
+	}
+	iterator AppendStep(PathNode&& step)
+	{
+		nodes.push_back(std::move(step));
+		return nodes.end() - 1;
+	}
+	void PrependStep(PathNode& step)
+	{
+		nodes.insert(nodes.begin(), std::move(step));
+	}
+	void AppendPath(const Path& path2)
+	{
+		nodes.insert(nodes.end(), path2.cbegin(), path2.cend());
+	}
+	iterator begin() noexcept
+	{
+		return nodes.begin();
+	}
+	iterator end() noexcept
+	{
+		return nodes.end();
+	}
+	const_iterator cbegin() const noexcept
+	{
+		return nodes.cbegin();
+	}
+	const_iterator cend() const noexcept
+	{
+		return nodes.cend();
+	}
+};
+static_assert(std::is_nothrow_move_constructible<Path>::value, "Path should be noexcept MoveConstructible");
 
 enum {
 	PF_SIGHT = 1,

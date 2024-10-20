@@ -7979,7 +7979,7 @@ void Actor::NewPath()
 		return;
 	}
 	WalkTo(savedDest, InternalFlags, pathfindingDistance);
-	if (GetPath().empty()) {
+	if (!GetPath()) {
 		IncrementPathTries();
 	}
 }

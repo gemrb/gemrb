@@ -701,7 +701,7 @@ Projectile::ProjectileState Projectile::DoStep()
 		}
 	}
 
-	if (path.empty()) {
+	if (!path) {
 		return GetNextTravelState();
 	}
 
@@ -748,6 +748,7 @@ Projectile::ProjectileState Projectile::DoStep()
 	static constexpr unsigned int slowDownFactor = 2; // TODO: empirical, shouldn't be needed!
 	unsigned int timePerStep = slowDownFactor * timePerPx;
 	tick_t time =  GetMilliseconds();
+	//auto step = path.GetStep(stepIdx);
 	auto step = path.begin();
 	if (stepIdx) {
 		step += stepIdx;
@@ -919,7 +920,7 @@ void Projectile::MoveTo(Map *map, const Point &Des)
 
 void Projectile::ClearPath()
 {
-	path.clear();
+	path.Clear();
 	stepIdx = 0;
 }
 
