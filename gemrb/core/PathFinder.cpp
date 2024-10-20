@@ -59,16 +59,16 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand{{0.000, -0.383, -0
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
 
 // Find the best path of limited length that brings us the farthest from d
-PathListNode* Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const
+Path Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const
 {
-	if (!caller || !caller->GetSpeed()) return nullptr;
+	if (!caller || !caller->GetSpeed()) return {};
 	Point p = s;
 	float_t dx = s.x - d.x;
 	float_t dy = s.y - d.y;
 	char xSign = 1, ySign = 1;
 	size_t tries = 0;
 	NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / caller->GetSpeed());
-	if (std::abs(dx) <= 0.333 && std::abs(dy) <= 0.333) return nullptr;
+	if (std::abs(dx) <= 0.333 && std::abs(dy) <= 0.333) return {};
 	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
 		Point rad(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy));
 		if (!(GetBlockedInRadius(rad, caller->circleSize) & PathMapFlags::PASSABLE)) {
@@ -89,9 +89,9 @@ PathListNode* Map::RunAway(const Point& s, const Point& d, int maxPathLength, bo
 	return FindPath(s, p, caller->circleSize, caller->circleSize, flags, caller);
 }
 
-PathListNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *caller) const
+PathNode Map::RandomWalk(const Point& s, int size, int radius, const Actor* caller) const
 {
-	if (!caller || !caller->GetSpeed()) return nullptr;
+	if (!caller || !caller->GetSpeed()) return {};
 	NavmapPoint p = s;
 	size_t i = RAND<size_t>(0, RAND_DEGREES_OF_FREEDOM - 1);
 	float_t dx = 3 * dxRand[i];
@@ -104,7 +104,7 @@ PathListNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor 
 			tries++;
 			// Give up if backed into a corner
 			if (tries > RAND_DEGREES_OF_FREEDOM) {
-				return nullptr;
+				return {};
 			}
 			// Random rotation
 			i = RAND<size_t>(0, RAND_DEGREES_OF_FREEDOM - 1);
@@ -121,14 +121,14 @@ PathListNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor 
 		p.x -= dx;
 		p.y -= dy;
 	}
-	PathListNode *step = new PathListNode;
+	PathNode randomStep;
 	const Size& mapSize = PropsSize();
-	step->point = Clamp(p, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
-	step->orient = GetOrient(s, p);
-	return step;
+	randomStep.point = Clamp(p, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
+	randomStep.orient = GetOrient(s, p);
+	return randomStep;
 }
 
-PathListNode *Map::GetLine(const Point &start, int Steps, orient_t Orientation, int flags) const
+Path Map::GetLinePath(const Point& start, int Steps, orient_t Orientation, int flags) const
 {
 	Point dest = start;
 
@@ -152,63 +152,10 @@ PathListNode *Map::GetLine(const Point &start, int Steps, orient_t Orientation, 
 	dest.x += Steps * mult * xoff + 0.5;
 	dest.y += Steps * mult * yoff + 0.5;
 
-	return GetLine(start, dest, 2, Orientation, flags);
+	return GetLinePath(start, dest, 2, Orientation, flags);
 }
 
-PathListNode *Map::GetLine(const Point &start, const Point &dest, int Speed, orient_t Orientation, int flags) const
-{
-	PathListNode *StartNode = new PathListNode;
-	PathListNode *Return = StartNode;
-	StartNode->point = start;
-	StartNode->orient = Orientation;
-
-	int Count = 0;
-	int Max = Distance(start, dest);
-	for (int Steps = 0; Steps < Max; Steps++) {
-		Point p;
-		p.x = start.x + ((dest.x - start.x) * Steps / Max);
-		p.y = start.y + ((dest.y - start.y) * Steps / Max);
-
-		//the path ends here as it would go off the screen, causing problems
-		//maybe there is a better way, but i needed a quick hack to fix
-		//the crash in projectiles
-		if (p.x < 0 || p.y < 0) {
-			return Return;
-		}
-		
-		const Size& mapSize = PropsSize();
-		if (p.x > mapSize.w * 16 || p.y > mapSize.h * 12) {
-			return Return;
-		}
-
-		if (!Count) {
-			StartNode->Next = new PathListNode;
-			StartNode->Next->Parent = StartNode;
-			StartNode = StartNode->Next;
-			Count = Speed;
-		} else {
-			Count--;
-		}
-
-		StartNode->point = p;
-		StartNode->orient = Orientation;
-		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
-		if (wall) switch (flags) {
-			case GL_REBOUND:
-				Orientation = ReflectOrientation(Orientation);
-				// TODO: recalculate dest (mirror it)
-				break;
-			case GL_PASS:
-				break;
-			default: //premature end
-				return Return;
-		}
-	}
-
-	return Return;
-}
-
-Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, orient_t Orientation, int flags) const
+Path Map::GetLinePath(const Point& start, const Point& dest, int Speed, orient_t Orientation, int flags) const
 {
 	int Count = 0;
 	int Max = Distance(start, dest);
@@ -259,20 +206,20 @@ Path Map::GetLinePath(const Point &start, const Point &dest, int Speed, orient_t
 	return path;
 }
 
-PathListNode* Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
+PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
 {
-	PathListNode *step = new PathListNode;
-	step->point.x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
-	step->point.y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
+	PathNode lineEnd;
+	lineEnd.point.x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
+	lineEnd.point.y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
 	const Size& mapSize = PropsSize();
-	step->point = Clamp(step->point, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
-	step->orient = GetOrient(p, step->point);
-	return step;
+	lineEnd.point = Clamp(lineEnd.point, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
+	lineEnd.orient = GetOrient(p, lineEnd.point);
+	return lineEnd;
 }
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
-PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance, int flags, const Actor *caller) const
+Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller) const
 {
 	TRACY(ZoneScoped);
 	if (InDebugMode(DebugMode::PATHFINDER))
@@ -293,19 +240,19 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
-	
-	if (nmptDest == nmptSource) return nullptr;
-	
+
+	if (nmptDest == nmptSource) return {};
+
 	SearchmapPoint smptSource = Map::ConvertCoordToTile(nmptSource);
 	SearchmapPoint smptDest = Map::ConvertCoordToTile(nmptDest);
 	
 	if (minDistance < size && !(GetBlockedInRadiusTile(smptDest, size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
 		Log(DEBUG, "FindPath", "{} can't fit in destination", fmt::WideToChar{caller ? caller->GetShortName() : u"nullptr"});
-		return nullptr;
+		return {};
 	}
 
 	const Size& mapSize = PropsSize();
-	if (!mapSize.PointInside(smptSource)) return nullptr;
+	if (!mapSize.PointInside(smptSource)) return {};
 
 	// Initialize data structures
 	FibonacciHeap<PQNode> open;
@@ -449,29 +396,25 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 	}
 
 	if (foundPath) {
-		PathListNode *resultPath = nullptr;
+		Path resultPath;
 		NavmapPoint nmptCurrent = nmptDest;
 		NavmapPoint nmptParent;
 		SearchmapPoint smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
-		while (!resultPath || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
+		while (resultPath.empty() || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
 			nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
-			PathListNode *newStep = new PathListNode;
-			newStep->point = nmptCurrent;
-			newStep->Next = resultPath;
+			PathNode newStep { nmptCurrent, S };
 			// movement in general allows characters to walk backwards given that
 			// the destination is behind the character (within a threshold), and
 			// that the distance isn't too far away
 			// we approximate that with a relaxed collinearity check and intentionally
 			// skip the first step, otherwise it doesn't help with iwd beetles in ar1015
-			if (flags & PF_BACKAWAY && resultPath && std::abs(area2(nmptCurrent, resultPath->point, nmptParent)) < 300) {
-				newStep->orient = GetOrient(nmptCurrent, nmptParent);
+			if (flags & PF_BACKAWAY && !resultPath.empty() && std::abs(area2(nmptCurrent, resultPath[0].point, nmptParent)) < 300) {
+				newStep.orient = GetOrient(nmptCurrent, nmptParent);
 			} else {
-				newStep->orient = GetOrient(nmptParent, nmptCurrent);
+				newStep.orient = GetOrient(nmptParent, nmptCurrent);
 			}
-			if (resultPath) {
-				resultPath->Parent = newStep;
-			}
-			resultPath = newStep;
+
+			resultPath.insert(resultPath.begin(), newStep);
 			nmptCurrent = nmptParent;
 
 			smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
@@ -485,7 +428,7 @@ PathListNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, u
 		}
 	}
 
-	return nullptr;
+	return {};
 }
 
 void Map::NormalizeDeltas(float_t &dx, float_t &dy, float_t factor)

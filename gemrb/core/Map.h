@@ -50,7 +50,6 @@ class GameControl;
 class IniSpawn;
 class Palette;
 class Particles;
-struct PathListNode;
 class Projectile;
 class ScriptedAnimation;
 class TileMap;
@@ -600,17 +599,16 @@ public:
 	void AdjustPosition(Point& goal, const Size& startingRadius = ZeroSize, int size = -1) const;
 	void AdjustPositionNavmap(Point& goal, const Size& radius = ZeroSize) const;
 	/* Finds the path which leads the farthest from d */
-	PathListNode* RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const;
-	PathListNode* RandomWalk(const Point &s, int size, int radius, const Actor *caller) const;
+	Path RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const;
+	PathNode RandomWalk(const Point& s, int size, int radius, const Actor* caller) const;
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy() const;
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
-	PathListNode* GetLineEnd(const Point& start, int steps, orient_t orient) const;
-	PathListNode* GetLine(const Point &start, int Steps, orient_t Orientation, int flags) const;
-	PathListNode* GetLine(const Point &start, const Point &dest, int speed, orient_t Orientation, int flags) const;
+	PathNode GetLineEnd(const Point& start, int steps, orient_t orient) const;
+	Path GetLinePath(const Point& start, int Steps, orient_t Orientation, int flags) const;
 	Path GetLinePath(const Point &start, const Point &dest, int speed, orient_t Orientation, int flags) const;
 	/* Finds the path which leads to near d */
-	PathListNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor *caller = NULL) const;
+	Path FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr) const;
 
 	bool IsVisible(const Point &p) const;
 	bool IsExplored(const Point &p) const;

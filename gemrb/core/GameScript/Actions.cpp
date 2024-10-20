@@ -5727,17 +5727,16 @@ void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* /*parameters*/
 	if (actor->BlocksSearchMap()) {
 		area->ClearSearchMapFor(actor);
 	}
-	const auto path = area->RandomWalk(actor->Pos, actor->circleSize, std::max<int>(5, actor->maxWalkDistance), actor);
+	const auto randomStep = area->RandomWalk(actor->Pos, actor->circleSize, std::max<int>(5, actor->maxWalkDistance), actor);
 	if (actor->BlocksSearchMap()) {
 		area->BlockSearchMapFor(actor);
 	}
-	if (path) {
+	if (!randomStep.point.IsZero()) {
 		Action* moveAction = GenerateAction("MoveToPoint()");
-		moveAction->pointParameter = path->point;
+		moveAction->pointParameter = randomStep.point;
 		Action* randomWalk = GenerateAction("RandomWalkContinuous()");
 		actor->AddActionInFront(randomWalk);
 		actor->AddActionInFront(moveAction);
-		delete path;
 	}
 
 	actor->ReleaseCurrentAction();

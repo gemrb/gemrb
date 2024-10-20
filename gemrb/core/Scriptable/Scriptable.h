@@ -28,6 +28,7 @@
 
 #include "CharAnimations.h"
 #include "OverHeadText.h"
+#include "PathFinder.h"
 
 #include <list>
 #include <map>
@@ -46,7 +47,7 @@ class InfoPoint;
 class Map;
 class Movable;
 class Object;
-struct PathListNode;
+struct PathNode;
 class Projectile;
 class Scriptable;
 class Selectable;
@@ -494,8 +495,8 @@ private: //these seem to be sensitive, so get protection
 	orient_t NewOrientation = S;
 	std::array<ieWord, 3> AttackMovements = { 100, 0, 0 };
 
-	PathListNode* path = nullptr; // whole path
-	PathListNode* step = nullptr; // actual step
+	Path path; // whole path
+	size_t currentStep = 0; // current step on the path
 	unsigned int prevTicks = 0;
 	int bumpBackTries = 0;
 	bool pathAbandoned = false;
@@ -520,7 +521,6 @@ public:
 	}
 	using Selectable::Selectable;
 	Movable(const Movable&) = delete;
-	~Movable() override;
 	Movable& operator=(const Movable&) = delete;
 
 	Point Destination = Pos;
@@ -533,20 +533,12 @@ public:
 	void BumpAway();
 	void BumpBack();
 	inline bool IsBumped() const { return bumped; }
-	PathListNode *GetNextStep(int x) const;
-	inline PathListNode *GetPath() const { return path; };
+	PathNode GetNextStep(int x) const;
+	inline const Path& GetPath() const { return path; };
 	inline int GetPathTries() const	{ return pathTries; }
 	inline void IncrementPathTries() { pathTries++; }
 	inline void ResetPathTries() { pathTries = 0; }
-	int GetPathLength() const;
-//inliners to protect data consistency
-	inline PathListNode * GetStep() {
-		if (!step && area) {
-			DoStep((unsigned int) ~0);
-		}
-		return step;
-	}
-
+	// inliners to protect data consistency
 	inline bool IsMoving() const {
 		return (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN);
 	}
