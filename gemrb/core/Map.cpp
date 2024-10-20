@@ -1758,13 +1758,13 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		const Actor *act = core->GetFirstSelectedActor();
 		if (!act) return;
 		const Path& path = act->GetPath();
-		if (path.empty()) return;
+		if (!path) return;
 		Color waypoint(0, 64, 128, 128); // darker blue-ish
 		size_t i = 0;
 		block.w = 8;
 		block.h = 6;
-		while (i < path.size()) {
-			const PathNode& step = path[i];
+		while (i < path.Size()) {
+			const PathNode& step = path.GetStep(i);
 			block.x = (step.point.x + 64) - vp.x;
 			block.y = (step.point.y + 6) - vp.y;
 			Log(DEBUG, "Map", "Waypoint {} at {}", i, step.point);

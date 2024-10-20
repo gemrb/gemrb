@@ -161,8 +161,8 @@ Path Map::GetLinePath(const Point& start, const Point& dest, int Speed, orient_t
 	int Max = Distance(start, dest);
 	Point diff = dest - start;
 	Path path;
-	path.reserve(Max);
-	path.push_back(PathNode {start, Orientation});
+	path.nodes.reserve(Max);
+	path.AppendStep(PathNode { start, Orientation });
 	auto StartNode = path.begin();
 	for (int Steps = 0; Steps < Max; Steps++) {
 		Point p;
@@ -182,7 +182,7 @@ Path Map::GetLinePath(const Point& start, const Point& dest, int Speed, orient_t
 		}
 
 		if (!Count) {
-			StartNode = path.insert(path.end(), {p, Orientation});
+			StartNode = path.AppendStep({ p, Orientation });
 			Count = Speed;
 		} else {
 			Count--;
@@ -400,7 +400,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		NavmapPoint nmptCurrent = nmptDest;
 		NavmapPoint nmptParent;
 		SearchmapPoint smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
-		while (resultPath.empty() || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
+		while (!resultPath || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
 			nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
 			PathNode newStep { nmptCurrent, S };
 			// movement in general allows characters to walk backwards given that
@@ -408,13 +408,13 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			// that the distance isn't too far away
 			// we approximate that with a relaxed collinearity check and intentionally
 			// skip the first step, otherwise it doesn't help with iwd beetles in ar1015
-			if (flags & PF_BACKAWAY && !resultPath.empty() && std::abs(area2(nmptCurrent, resultPath[0].point, nmptParent)) < 300) {
+			if (flags & PF_BACKAWAY && resultPath && std::abs(area2(nmptCurrent, resultPath.GetStep(0).point, nmptParent)) < 300) {
 				newStep.orient = GetOrient(nmptCurrent, nmptParent);
 			} else {
 				newStep.orient = GetOrient(nmptParent, nmptCurrent);
 			}
 
-			resultPath.insert(resultPath.begin(), newStep);
+			resultPath.PrependStep(newStep);
 			nmptCurrent = nmptParent;
 
 			smptCurrent = Map::ConvertCoordToTile(nmptCurrent);

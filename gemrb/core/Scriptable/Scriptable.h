@@ -496,7 +496,6 @@ private: //these seem to be sensitive, so get protection
 	std::array<ieWord, 3> AttackMovements = { 100, 0, 0 };
 
 	Path path; // whole path
-	size_t currentStep = 0; // current step on the path
 	unsigned int prevTicks = 0;
 	int bumpBackTries = 0;
 	bool pathAbandoned = false;
