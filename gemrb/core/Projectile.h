@@ -264,7 +264,6 @@ private:
 	orient_t Orientation = S;
 	orient_t NewOrientation = S;
 	Path path; // whole path
-	size_t stepIdx = 0; // actual step in path
 	//similar to normal actors
 	Map *area = nullptr;
 	Point Pos = Point(-1, -1);
@@ -421,7 +420,6 @@ public:
 	bool IsStillIntact() const;
 	static Point GetStartOffset(const Actor* actor);
 private:
-	void ClearPath();
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
 	AnimArray CreateAnimations(const ResRef& bam, ieByte seq);
