@@ -689,7 +689,7 @@ Projectile::ProjectileState Projectile::DoStep()
 	if (pathcounter) {
 		pathcounter--;
 	} else {
-		ClearPath();
+		path.Clear();
 	}
 
 	//intro trailing, drawn only once at the beginning
@@ -706,7 +706,7 @@ Projectile::ProjectileState Projectile::DoStep()
 	}
 
 	if (Pos == Destination) {
-		ClearPath();
+		path.Clear();
 		return GetNextTravelState();
 	}
 
@@ -748,12 +748,8 @@ Projectile::ProjectileState Projectile::DoStep()
 	static constexpr unsigned int slowDownFactor = 2; // TODO: empirical, shouldn't be needed!
 	unsigned int timePerStep = slowDownFactor * timePerPx;
 	tick_t time =  GetMilliseconds();
-	//auto step = path.GetStep(stepIdx);
-	auto step = path.begin();
-	if (stepIdx) {
-		step += stepIdx;
-	}
 
+	auto step = path.begin() + path.currentStep;
 	auto start = step;
 	auto last = --path.end();
 	tick_t count = timePerStep ? (time - timeStartStep) / timePerStep : 0;
@@ -771,14 +767,14 @@ Projectile::ProjectileState Projectile::DoStep()
 
 	SetOrientation (step->orient, false);
 	Pos = step->point;
-	stepIdx = step - path.begin();
+	path.currentStep = step - path.begin();
 
 	if (travel_handle) {
 		travel_handle->SetPos(Pos);
 	}
 	
 	if (step == last) {
-		ClearPath();
+		path.Clear();
 		NewOrientation = Orientation;
 		return GetNextTravelState();
 	}
@@ -817,7 +813,7 @@ ieDword Projectile::GetCaster() const
 
 void Projectile::NextTarget(const Point &p)
 {
-	ClearPath();
+	path.Clear();
 	Destination = p;
 	if (!Speed) {
 		Pos = Destination;
@@ -916,12 +912,6 @@ void Projectile::MoveTo(Map *map, const Point &Des)
 		Pos += GetStartOffset(area->GetActorByGlobalID(Caster));
 	}
 	Destination = Des;
-}
-
-void Projectile::ClearPath()
-{
-	path.Clear();
-	stepIdx = 0;
 }
 
 int Projectile::CalculateTargetFlag() const
