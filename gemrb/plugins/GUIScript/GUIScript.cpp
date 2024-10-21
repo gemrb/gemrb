@@ -532,7 +532,7 @@ then moved by (screen size - winpack size) / 2\n\
 \n\
 **Parameters:**\n\
   * a window ID, see the .chu file specification\n\
-  * windowPack: which window pack (.chu) to take the window from (defaults to current)\n\
+  * windowPack: which window pack (.chu) to take the window from\n\
   * position: where to place it on screen (defaults to WINDOW_CENTER, see GUIDefines.py)\n\
 \n\
 **Return value:** GWindow\n\
