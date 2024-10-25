@@ -24,9 +24,9 @@
 #include "Resource.h"
 #include "Sprite2D.h"
 #include "Tooltip.h"
-#include "Video/Video.h"
 
 #include "GUI/Window.h"
+#include "Video/Video.h"
 
 #include <deque>
 
@@ -37,24 +37,23 @@ class Sprite2D;
 
 using WindowList = std::deque<Window*>;
 
-struct ToolTipData
-{
+struct ToolTipData {
 	Tooltip tt;
 	tick_t time = 0;
 	Holder<SoundHandle> tooltip_sound;
 	bool reset = false;
-	
+
 	explicit ToolTipData(Tooltip tt)
-	: tt(std::move(tt)) {}
+		: tt(std::move(tt)) {}
 };
 
 class GEM_EXPORT WindowManager {
 public:
 	enum CursorFeedback {
-		MOUSE_ALL			= 0,
-		MOUSE_NO_CURSOR		= 1,
-		MOUSE_NO_TOOLTIPS	= 2,
-		MOUSE_NONE			= MOUSE_NO_CURSOR|MOUSE_NO_TOOLTIPS
+		MOUSE_ALL = 0,
+		MOUSE_NO_CURSOR = 1,
+		MOUSE_NO_TOOLTIPS = 2,
+		MOUSE_NONE = MOUSE_NO_CURSOR | MOUSE_NO_TOOLTIPS
 	} cursorFeedback;
 
 	static Holder<Sprite2D> CursorMouseUp;
@@ -66,11 +65,13 @@ public:
 		const WindowManager& wm;
 
 		explicit HUDLock(const WindowManager& wm)
-		: wm(wm) {
+			: wm(wm)
+		{
 			wm.video->PushDrawingBuffer(wm.HUDBuf);
 		}
 
-		~HUDLock() {
+		~HUDLock()
+		{
 			wm.video->PopDrawingBuffer();
 		}
 	};
@@ -118,13 +119,13 @@ private:
 public:
 	WindowManager(PluginHolder<Video> vid, std::shared_ptr<GUIFactory>);
 	~WindowManager();
-	
+
 	WindowManager(const WindowManager&) = delete;
-	
+
 	Window* LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition = Window::PosCentered);
 	Window* CreateWindow(ScriptingId WindowID, const Region&);
 	Window* MakeWindow(const Region& rgn);
-	
+
 	void CloseWindow(Window* win);
 	void CloseAllWindows() const;
 

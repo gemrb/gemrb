@@ -28,20 +28,24 @@ namespace GemRB {
 class ViewScriptingRef : public ScriptingRef<View> {
 private:
 	ScriptingGroup_t group;
+
 public:
 	ViewScriptingRef(View* view, ScriptingId id, ScriptingGroup_t group)
-	: ScriptingRef(view, id), group(group) {}
+		: ScriptingRef(view, id), group(group) {}
 
-	const ScriptingGroup_t& ScriptingGroup() const override {
+	const ScriptingGroup_t& ScriptingGroup() const override
+	{
 		return group;
 	}
 
 	// class to instantiate on the script side (Python)
-	ScriptingClassId ScriptingClass() const override {
-		return {"View"};
+	ScriptingClassId ScriptingClass() const override
+	{
+		return { "View" };
 	};
 
-	virtual ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t scriptingGroup) const {
+	virtual ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t scriptingGroup) const
+	{
 		return new ViewScriptingRef(this->GetObject(), id, scriptingGroup);
 	}
 
@@ -51,21 +55,24 @@ public:
 class WindowScriptingRef : public ViewScriptingRef {
 public:
 	using RefType = Window*;
-	
+
 	WindowScriptingRef(Window* win, ScriptingId id, ScriptingGroup_t winpack)
-	: ViewScriptingRef(win, id, winpack) {}
+		: ViewScriptingRef(win, id, winpack) {}
 
 	// class to instantiate on the script side (Python)
-	ScriptingClassId ScriptingClass() const override {
+	ScriptingClassId ScriptingClass() const override
+	{
 		static ScriptingClassId cls("Window");
 		return cls;
 	};
 
-	ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t group) const override {
+	ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t group) const override
+	{
 		return new WindowScriptingRef(static_cast<Window*>(GetObject()), id, group);
 	}
-	
-	Window* GetWindow() const noexcept {
+
+	Window* GetWindow() const noexcept
+	{
 		return static_cast<Window*>(GetObject());
 	}
 };
@@ -73,12 +80,13 @@ public:
 class ControlScriptingRef : public ViewScriptingRef {
 public:
 	using RefType = Control*;
-	
+
 	ControlScriptingRef(Control* ctrl, ScriptingId id, ScriptingGroup_t group)
-	: ViewScriptingRef(ctrl, id, group) {}
+		: ViewScriptingRef(ctrl, id, group) {}
 
 	// class to instantiate on the script side (Python)
-	ScriptingClassId ScriptingClass() const override {
+	ScriptingClassId ScriptingClass() const override
+	{
 		const Control* ctrl = static_cast<const Control*>(GetObject());
 
 		// would just use type_info here, but its implementation specific...
@@ -107,11 +115,13 @@ public:
 		}
 	};
 
-	ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t group) const override {
+	ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t group) const override
+	{
 		return new ControlScriptingRef(static_cast<Control*>(GetObject()), id, group);
 	}
-	
-	Control* GetControl() const noexcept {
+
+	Control* GetControl() const noexcept
+	{
 		return static_cast<Control*>(GetObject());
 	}
 };
@@ -125,21 +135,24 @@ GEM_EXPORT Control* GetControl(ScriptingId id, const Window* win);
 GEM_EXPORT const ControlScriptingRef* GetControlRef(ScriptingId id, const Window* win);
 GEM_EXPORT const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id, const ControlScriptingRef* existing = nullptr);
 
-template <class T>
-T* GetView(const ViewScriptingRef* ref) noexcept {
+template<class T>
+T* GetView(const ViewScriptingRef* ref) noexcept
+{
 	if (ref) {
 		return dynamic_cast<T*>(ref->GetObject());
 	}
 	return nullptr;
 }
 
-template <class T>
-T* GetControl(ScriptingId id, const Window* win) {
+template<class T>
+T* GetControl(ScriptingId id, const Window* win)
+{
 	return dynamic_cast<T*>(GetControl(id, win));
 }
 
-template <class T>
-T* GetControl(ScriptingGroup_t group, ScriptingId id) {
+template<class T>
+T* GetControl(ScriptingGroup_t group, ScriptingId id)
+{
 	auto ref = static_cast<const ControlScriptingRef*>(ScriptEngine::GetScriptingRef(group, id));
 	return GetView<T>(ref);
 }

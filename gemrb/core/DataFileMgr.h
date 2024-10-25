@@ -28,13 +28,14 @@
 #ifndef DATAFILEMGR_H
 #define DATAFILEMGR_H
 
+#include "Plugin.h"
+
+#include "Streams/DataStream.h"
+#include "Strings/StringMap.h"
+
 #include <algorithm>
 #include <memory>
 #include <vector>
-
-#include "Plugin.h"
-#include "Streams/DataStream.h"
-#include "Strings/StringMap.h"
 
 namespace GemRB {
 
@@ -55,26 +56,31 @@ public:
 	explicit KeyValueGroup(std::string name)
 		: name(std::move(name)) {}
 
-	const std::string& GetName() const {
+	const std::string& GetName() const
+	{
 		return name;
 	}
 
-	auto begin() const {
+	auto begin() const
+	{
 		return kvMap.begin();
 	}
 
-	auto end() const {
+	auto end() const
+	{
 		return kvMap.end();
 	}
 
-	size_t size() const {
+	size_t size() const
+	{
 		return kvMap.size();
 	}
 
 	template<typename T>
 	T GetAs(StringView key, const T) const = delete;
 
-	bool AddLine(StringView iniLine) {
+	bool AddLine(StringView iniLine)
+	{
 		auto equalsPos = FindFirstOf(iniLine, "=");
 		if (equalsPos == std::string::npos) {
 			return false;
@@ -105,7 +111,8 @@ public:
 };
 
 template<>
-inline StringView KeyValueGroup::GetAs<StringView>(StringView key, const StringView Default) const {
+inline StringView KeyValueGroup::GetAs<StringView>(StringView key, const StringView Default) const
+{
 	auto result = kvMap.Get(key);
 	if (result != nullptr) {
 		return static_cast<StringView>(*result);
@@ -115,7 +122,8 @@ inline StringView KeyValueGroup::GetAs<StringView>(StringView key, const StringV
 }
 
 template<>
-inline int KeyValueGroup::GetAs<int>(StringView key, const int Default) const {
+inline int KeyValueGroup::GetAs<int>(StringView key, const int Default) const
+{
 	auto result = kvMap.Get(key);
 	if (result != nullptr) {
 		return atoi(result->c_str());
@@ -125,7 +133,8 @@ inline int KeyValueGroup::GetAs<int>(StringView key, const int Default) const {
 }
 
 template<>
-inline float KeyValueGroup::GetAs<float>(StringView key, const float Default) const {
+inline float KeyValueGroup::GetAs<float>(StringView key, const float Default) const
+{
 	auto result = kvMap.Get(key);
 	if (result != nullptr) {
 		return static_cast<float>(atof(result->c_str()));
@@ -135,7 +144,8 @@ inline float KeyValueGroup::GetAs<float>(StringView key, const float Default) co
 }
 
 template<>
-inline bool KeyValueGroup::GetAs<bool>(StringView key, const bool Default) const {
+inline bool KeyValueGroup::GetAs<bool>(StringView key, const bool Default) const
+{
 	auto result = kvMap.Get(key);
 	if (result != nullptr) {
 		const auto str = result->c_str();

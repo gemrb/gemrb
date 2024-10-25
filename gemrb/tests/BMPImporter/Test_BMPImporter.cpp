@@ -17,10 +17,10 @@
  *
  */
 
-#include <gtest/gtest.h>
-
 #include "../../core/Streams/FileStream.h"
 #include "../../plugins/BMPImporter/BMPImporter.h"
+
+#include <gtest/gtest.h>
 
 namespace GemRB {
 
@@ -36,8 +36,9 @@ protected:
 	const path_t path;
 
 public:
-	void SetUp() override {
-		auto stream = new FileStream{};
+	void SetUp() override
+	{
+		auto stream = new FileStream {};
 
 		assert(stream->Open(GetParam()));
 		assert(unit.Open(stream));
@@ -45,7 +46,8 @@ public:
 };
 
 // More like a smoke test
-TEST_P(BMPImporter_Test, GetPalette) {
+TEST_P(BMPImporter_Test, GetPalette)
+{
 	Palette pal;
 	EXPECT_EQ(unit.GetPalette(2, pal), -1);
 }
@@ -57,9 +59,6 @@ INSTANTIATE_TEST_SUITE_P(
 		SAMPLE_FILE,
 		SAMPLE_FILE_8B,
 		SAMPLE_FILE_V3,
-		SAMPLE_FILE_V5
-	)
-);
+		SAMPLE_FILE_V5));
 
 }
-

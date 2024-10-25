@@ -21,16 +21,15 @@
 #ifndef ITMIMPORTER_H
 #define ITMIMPORTER_H
 
-#include "ItemMgr.h"
-
 #include "ie_types.h"
 
 #include "Item.h"
+#include "ItemMgr.h"
 
 namespace GemRB {
 
-#define ITM_VER_BG 10
-#define ITM_VER_PST 11
+#define ITM_VER_BG   10
+#define ITM_VER_PST  11
 #define ITM_VER_IWD2 20
 
 class ITMImporter : public ItemMgr {
@@ -38,12 +37,12 @@ private:
 	int version = 0;
 
 public:
-	Item* GetItem(Item *s) override;
-	
+	Item* GetItem(Item* s) override;
+
 private:
 	bool Import(DataStream* stream) override;
-	void GetExtHeader(const Item *s, ITMExtHeader* eh);
-	Effect *GetFeature(const Item *s);
+	void GetExtHeader(const Item* s, ITMExtHeader* eh);
+	Effect* GetFeature(const Item* s);
 };
 
 

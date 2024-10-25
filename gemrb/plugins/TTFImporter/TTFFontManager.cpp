@@ -18,9 +18,10 @@
  *
  */
 
+#include "TTFFontManager.h"
+
 #include "Palette.h"
 #include "TTFFont.h"
-#include "TTFFontManager.h"
 
 namespace GemRB {
 
@@ -30,8 +31,8 @@ FT_Library library = NULL;
 
 static void loadFT(const CoreSettings&)
 {
-	FT_Error error = FT_Init_FreeType( &library );
-	if ( error ) {
+	FT_Error error = FT_Init_FreeType(&library);
+	if (error) {
 		LogFTError(error);
 	}
 }
@@ -39,7 +40,7 @@ static void loadFT(const CoreSettings&)
 static void destroyFT()
 {
 	if (library) {
-		FT_Done_FreeType( library );
+		FT_Done_FreeType(library);
 		library = NULL;
 	}
 }
@@ -54,15 +55,15 @@ bool TTFFontManager::Import(DataStream* stream)
 	Close();
 	if (stream) {
 		FT_Error error;
-		ftStream = new std::remove_pointer_t<FT_Stream>{};
-		ftStream->read = [](FT_Stream TTFStream, unsigned long	offset, unsigned char* buffer, unsigned long count)
-		-> unsigned long {
+		ftStream = new std::remove_pointer_t<FT_Stream> {};
+		ftStream->read = [](FT_Stream TTFStream, unsigned long offset, unsigned char* buffer, unsigned long count)
+			-> unsigned long {
 			DataStream* dstream = static_cast<DataStream*>(TTFStream->descriptor.pointer);
 			dstream->Seek(offset, GEM_STREAM_START);
 			return dstream->Read(buffer, count);
 		};
-		
-		ftStream->close = [](FT_Stream TTFStream){
+
+		ftStream->close = [](FT_Stream TTFStream) {
 			delete static_cast<DataStream*>(TTFStream->descriptor.pointer);
 			delete TTFStream;
 		};
@@ -75,14 +76,14 @@ bool TTFFontManager::Import(DataStream* stream)
 		FT_Open_Args args = FT_Open_Args();
 		args.flags = FT_OPEN_STREAM;
 		args.stream = ftStream;
-		
-		error = FT_Open_Face( library, &args, 0, &face );
-		if( error ) {
+
+		error = FT_Open_Face(library, &args, 0, &face);
+		if (error) {
 			LogFTError(error);
 			Close();
 			return false;
 		}
-		
+
 		// we always convert to UTF-16
 		// TODO: maybe we should allow an override encoding?
 		FT_Select_Charmap(face, FT_ENCODING_UNICODE);
@@ -102,7 +103,7 @@ void TTFFontManager::Close()
 Holder<Font> TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/, bool /*background*/)
 {
 	Holder<Palette> pal = MakeHolder<Palette>(ColorWhite, ColorBlack);
-	
+
 	Palette::Colors buffer;
 	// FIXME: we probably dont need to do this
 	// Font already can do blending between fg and bg colors
@@ -123,11 +124,11 @@ Holder<Font> TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/,
 	FT_Error error = 0;
 	ieWord lineHeight = 0, baseline = 0;
 	/* Make sure that our font face is scalable (global metrics) */
-	if ( FT_IS_SCALABLE(face) ) {
+	if (FT_IS_SCALABLE(face)) {
 		FT_Fixed scale;
 		/* Set the character size and use default DPI (72) */
-		error = FT_Set_Pixel_Sizes( face, 0, pxSize );
-		if( error ) {
+		error = FT_Set_Pixel_Sizes(face, 0, pxSize);
+		if (error) {
 			LogFTError(error);
 		} else {
 			/* Get the scalable font metrics for this font */
@@ -144,13 +145,13 @@ Holder<Font> TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/,
 		 * or series of fonts to grab from the non-scalable format.
 		 * It is not the point size of the font.
 		 * */
-		if ( pxSize >= face->num_fixed_sizes )
+		if (pxSize >= face->num_fixed_sizes)
 			pxSize = face->num_fixed_sizes - 1;
-		
-		error = FT_Set_Pixel_Sizes( face,
-								   face->available_sizes[pxSize].height,
-								   face->available_sizes[pxSize].width );
-		
+
+		error = FT_Set_Pixel_Sizes(face,
+					   face->available_sizes[pxSize].height,
+					   face->available_sizes[pxSize].width);
+
 		if (error) {
 			LogFTError(error);
 		}
@@ -159,13 +160,13 @@ Holder<Font> TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/,
 		 * non-scalable fonts must be determined differently
 		 * or sometimes cannot be determined.
 		 * */
-		
+
 		lineHeight = face->available_sizes[pxSize].height;
 		//font->lineskip = FT_CEIL(font->ascent);
 		//font->underline_offset = FT_FLOOR(face->underline_position);
 		//font->underline_height = FT_FLOOR(face->underline_thickness);
 	}
-	
+
 	return MakeHolder<TTFFont>(pal, face, lineHeight, baseline);
 }
 

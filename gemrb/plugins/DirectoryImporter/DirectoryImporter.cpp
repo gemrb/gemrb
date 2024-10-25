@@ -20,8 +20,9 @@
 
 #include "globals.h"
 
-#include "Logging/Logging.h"
 #include "ResourceDesc.h"
+
+#include "Logging/Logging.h"
 #include "Streams/FileStream.h"
 
 using namespace GemRB;
@@ -43,29 +44,29 @@ static bool FindIn(const path_t& path, StringView resRef, const path_t& type)
 	return FileExists(PathJoinExt(path, resRef, type));
 }
 
-static FileStream *SearchIn(const path_t& path, StringView resRef, const path_t& type)
+static FileStream* SearchIn(const path_t& path, StringView resRef, const path_t& type)
 {
 	return FileStream::OpenFile(PathJoinExt(path, resRef, type));
 }
 
 bool DirectoryImporter::HasResource(StringView resname, SClass_ID type)
 {
-	return FindIn( path, resname, TypeExt(type) );
+	return FindIn(path, resname, TypeExt(type));
 }
 
-bool DirectoryImporter::HasResource(StringView resname, const ResourceDesc &type)
+bool DirectoryImporter::HasResource(StringView resname, const ResourceDesc& type)
 {
-	return FindIn( path, resname, type.GetExt() );
+	return FindIn(path, resname, type.GetExt());
 }
 
 DataStream* DirectoryImporter::GetResource(StringView resname, SClass_ID type)
 {
-	return SearchIn( path, resname, TypeExt(type) );
+	return SearchIn(path, resname, TypeExt(type));
 }
 
-DataStream* DirectoryImporter::GetResource(StringView resname, const ResourceDesc &type)
+DataStream* DirectoryImporter::GetResource(StringView resname, const ResourceDesc& type)
 {
-	return SearchIn( path, resname, type.GetExt() );
+	return SearchIn(path, resname, type.GetExt());
 }
 
 bool CachedDirectoryImporter::Open(const path_t& dir, std::string desc)
@@ -110,7 +111,7 @@ bool CachedDirectoryImporter::HasResource(StringView resname, SClass_ID type)
 	return cache.find(filename) != cache.cend();
 }
 
-bool CachedDirectoryImporter::HasResource(StringView resname, const ResourceDesc &type)
+bool CachedDirectoryImporter::HasResource(StringView resname, const ResourceDesc& type)
 {
 	const path_t& filename = ConstructFilename(resname, type.GetExt());
 	return cache.find(filename) != cache.cend();
@@ -129,7 +130,7 @@ DataStream* CachedDirectoryImporter::GetResource(StringView resname, SClass_ID t
 	return FileStream::OpenFile(buf);
 }
 
-DataStream* CachedDirectoryImporter::GetResource(StringView resname, const ResourceDesc &type)
+DataStream* CachedDirectoryImporter::GetResource(StringView resname, const ResourceDesc& type)
 {
 	const path_t& filename = ConstructFilename(resname, type.GetExt());
 	const auto lookup = cache.find(filename);

@@ -27,16 +27,18 @@
 
 namespace GemRB {
 
-Gem_Polygon::Gem_Polygon(std::vector<Point>&& points, const Region *bbox)
-: vertices(std::move(points))
+Gem_Polygon::Gem_Polygon(std::vector<Point>&& points, const Region* bbox)
+	: vertices(std::move(points))
 {
 	assert(vertices.size() >= 3);
 
-	if(bbox) BBox=*bbox;
-	else RecalcBBox();
-	
+	if (bbox)
+		BBox = *bbox;
+	else
+		RecalcBBox();
+
 	assert(!BBox.size.IsInvalid());
-	
+
 	Rasterize();
 }
 
@@ -56,22 +58,24 @@ void Gem_Polygon::Rasterize()
 		int ledge = trap.left_edge;
 		int redge = trap.right_edge;
 		const Point& a = vertices[ledge];
-		const Point& b = vertices[(ledge+1)%(Count())];
+		const Point& b = vertices[(ledge + 1) % (Count())];
 		const Point& c = vertices[redge];
-		const Point& d = vertices[(redge+1)%(Count())];
+		const Point& d = vertices[(redge + 1) % (Count())];
 
 		for (int y = y_top; y < y_bot; ++y) {
 			int py = y + BBox.y;
 
-			int lt = (b.x * (py - a.y) + a.x * (b.y - py))/(b.y - a.y);
-			int rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y) + 1;
+			int lt = (b.x * (py - a.y) + a.x * (b.y - py)) / (b.y - a.y);
+			int rt = (d.x * (py - c.y) + c.x * (d.y - py)) / (d.y - c.y) + 1;
 
 			lt -= BBox.x;
 			rt -= BBox.x;
 
 			if (lt < 0) lt = 0;
 			if (rt >= BBox.w) rt = BBox.w - 1;
-			if (lt >= rt) { continue; } // clipped
+			if (lt >= rt) {
+				continue;
+			} // clipped
 
 			bool merged = false;
 			for (auto& seg : rasterData[y]) {
@@ -109,22 +113,22 @@ void Gem_Polygon::RecalcBBox()
 	BBox.y = vertices[0].y;
 	BBox.w = vertices[0].x;
 	BBox.h = vertices[0].y;
-	for(size_t i=1; i<vertices.size(); i++) {
-		if(vertices[i].x<BBox.x) {
+	for (size_t i = 1; i < vertices.size(); i++) {
+		if (vertices[i].x < BBox.x) {
 			BBox.x = vertices[i].x;
 		}
-		if(vertices[i].x>BBox.w) {
+		if (vertices[i].x > BBox.w) {
 			BBox.w = vertices[i].x;
 		}
-		if(vertices[i].y<BBox.y) {
+		if (vertices[i].y < BBox.y) {
 			BBox.y = vertices[i].y;
 		}
-		if(vertices[i].y>BBox.h) {
+		if (vertices[i].y > BBox.h) {
 			BBox.h = vertices[i].y;
 		}
 	}
-	BBox.w-=BBox.x;
-	BBox.h-=BBox.y;
+	BBox.w -= BBox.x;
+	BBox.h -= BBox.y;
 }
 
 bool Gem_Polygon::PointIn(const Point& p) const
@@ -156,10 +160,9 @@ bool Gem_Polygon::IntersectsRect(const Region& rect) const
 	// and we can avoid a more expensive search
 
 	if (PointIn(rect.origin) ||
-		PointIn(rect.x + rect.w, rect.y) ||
-		PointIn(rect.x, rect.y + rect.h) ||
-		PointIn(rect.Maximum()))
-	{
+	    PointIn(rect.x + rect.w, rect.y) ||
+	    PointIn(rect.x, rect.y + rect.h) ||
+	    PointIn(rect.Maximum())) {
 		return true;
 	}
 
@@ -196,9 +199,9 @@ struct ScanlineInt {
 			return false;
 
 		const Point& a = p->vertices[pi];
-		const Point& b = p->vertices[(pi+1)%(p->Count())];
+		const Point& b = p->vertices[(pi + 1) % (p->Count())];
 		const Point& c = p->vertices[i2.pi];
-		const Point& d = p->vertices[(i2.pi+1)%(p->Count())];
+		const Point& d = p->vertices[(i2.pi + 1) % (p->Count())];
 
 		int dx1 = a.x - b.x;
 		int dx2 = c.x - d.x;
@@ -219,7 +222,6 @@ struct ScanlineInt {
 
 		return false;
 	}
-
 };
 
 std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
@@ -228,7 +230,7 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 	size_t count = vertices.size();
 
 	std::vector<int> ys;
-	ys.reserve(2*count);
+	ys.reserve(2 * count);
 
 	// y coords of vertices
 	for (unsigned int i = 0; i < count; ++i)
@@ -238,15 +240,15 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 	// y coords of self-intersections
 	for (unsigned int i1 = 0; i1 < count; ++i1) {
 		const Point& a = vertices[i1];
-		const Point& b = vertices[(i1+1)%count];
+		const Point& b = vertices[(i1 + 1) % count];
 
 		// intersections with horizontal lines don't matter
 		if (a.y == b.y) continue;
 
-		for (unsigned int i2 = i1+2; i2 < count; ++i2) {
+		for (unsigned int i2 = i1 + 2; i2 < count; ++i2) {
 			const Point& c = vertices[i2];
-			const Point& d = vertices[(i2+1)%count];
-			
+			const Point& d = vertices[(i2 + 1) % count];
+
 			// intersections with horizontal lines don't matter
 			if (c.y == d.y) continue;
 
@@ -281,12 +283,12 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 		// Determine all scanline intersections at level nexty.
 		// This includes edges which have their lower vertex at nexty,
 		// but excludes edges with their upper vertex at nexty.
-		// (We're taking the intersections along the 'upper' edge of 
+		// (We're taking the intersections along the 'upper' edge of
 		// the nexty scanline.)
 		ints.clear();
 		for (unsigned int i = 0; i < count; ++i) {
 			const Point& a = vertices[i];
-			const Point& b = vertices[(i+1)%count];
+			const Point& b = vertices[(i + 1) % count];
 
 			if (a.y == b.y) continue;
 
@@ -294,13 +296,13 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 				if (b.y - nexty < 0) {
 					is.x = a.x;
 					is.pi = i;
-					ints.push_back(is);			
+					ints.push_back(is);
 				}
 			} else if (b.y == nexty) {
 				if (a.y - nexty < 0) {
 					is.x = b.x;
 					is.pi = i;
-					ints.push_back(is);	
+					ints.push_back(is);
 				}
 			} else {
 				int x;
@@ -316,18 +318,17 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 		unsigned int newtcount = (unsigned int) (ints.size() / 2);
 
 		for (unsigned int i = 0; i < newtcount; ++i) {
-			t.left_edge = ints[2*i].pi;
-			t.right_edge = ints[2*i+1].pi;
+			t.left_edge = ints[2 * i].pi;
+			t.right_edge = ints[2 * i + 1].pi;
 
-			
+
 			bool found = false;
 
 			// merge trapezoids with old one if it's just a continuation
 			for (auto& oldt : trapezoids) {
 				if (oldt.y2 == cury &&
-					oldt.left_edge == t.left_edge &&
-					oldt.right_edge == t.right_edge)
-				{
+				    oldt.left_edge == t.left_edge &&
+				    oldt.right_edge == t.right_edge) {
 					oldt.y2 = nexty;
 					found = true;
 					break;
@@ -347,22 +348,22 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 
 
 // wall polygons
-void Wall_Polygon::SetBaseline(const Point &a, const Point &b)
+void Wall_Polygon::SetBaseline(const Point& a, const Point& b)
 {
-	if ((a.x<b.x) || ((a.x==b.x) && (a.y<b.y)) ) {
-		base0=a;
-		base1=b;
+	if ((a.x < b.x) || ((a.x == b.x) && (a.y < b.y))) {
+		base0 = a;
+		base1 = b;
 		return;
 	}
-	base0=b;
-	base1=a;
+	base0 = b;
+	base1 = a;
 }
 
-bool Wall_Polygon::PointBehind(const Point &p) const
+bool Wall_Polygon::PointBehind(const Point& p) const
 {
-	if (wall_flag&WF_DISABLED)
+	if (wall_flag & WF_DISABLED)
 		return false;
-	if (wall_flag&WF_BASELINE) {
+	if (wall_flag & WF_BASELINE) {
 		if (base0.x > base1.x)
 			return left(base0, base1, p);
 		else

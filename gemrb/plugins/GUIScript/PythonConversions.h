@@ -20,46 +20,51 @@
 #define PYTHON_CONVERSIONS_H
 
 // NOTE: Python.h has to be included first.
-#include "GUIScript.h"
-
-#include "Region.h"
 #include "RGBAColor.h"
+
+#include "GUIScript.h"
+#include "Region.h"
 #include "Sprite2D.h"
-#include "TableMgr.h"
 #include "SymbolMgr.h"
+#include "TableMgr.h"
+
 #include "Logging/Logging.h"
 #include "Strings/String.h"
 
 namespace GemRB {
 
-class DecRef
-{
+class DecRef {
 	PyObject* obj = nullptr;
+
 public:
 	template<typename FUNC, typename... ARGS>
-	explicit DecRef(FUNC fn, ARGS&&... args) {
+	explicit DecRef(FUNC fn, ARGS&&... args)
+	{
 		obj = fn(std::forward<ARGS>(args)...);
 	}
-	
-	~DecRef() {
+
+	~DecRef()
+	{
 		Py_XDECREF(obj);
 	}
-	
-	operator PyObject* () const {
+
+	operator PyObject*() const
+	{
 		return obj;
 	}
-	
-	explicit operator bool() const noexcept {
+
+	explicit operator bool() const noexcept
+	{
 		return obj != nullptr;
 	}
 };
 
-template <typename T, template<class> class PTR = Holder>
+template<typename T, template<class> class PTR = Holder>
 class CObject final {
 public:
 	using CAP_T = PTR<T>;
-	
-	explicit operator PyObject* () const
+
+	explicit operator PyObject*() const
 	{
 		if (pycap) {
 			Py_INCREF(pycap);
@@ -68,18 +73,18 @@ public:
 			Py_RETURN_NONE;
 		}
 	}
-	
-	operator CAP_T () const
+
+	operator CAP_T() const
 	{
 		static CAP_T none;
 		return cap ? cap->ptr : none;
 	}
 
-	explicit CObject(PyObject *obj)
+	explicit CObject(PyObject* obj)
 	{
 		if (obj == Py_None)
 			return;
-		PyObject *id = PyObject_GetAttrString(obj, "ID");
+		PyObject* id = PyObject_GetAttrString(obj, "ID");
 		if (id)
 			obj = id;
 		else
@@ -98,7 +103,7 @@ public:
 	{
 		if (ptr) {
 			Capsule* newcap = new Capsule(std::move(ptr));
-			PyObject *obj = PyCapsule_New(newcap, T::ID.description, PyRelease);
+			PyObject* obj = PyCapsule_New(newcap, T::ID.description, PyRelease);
 			if (obj == nullptr) {
 				// PyCapsule_New could theoretically fail
 				delete newcap;
@@ -112,24 +117,25 @@ public:
 			Py_DECREF(kwargs);
 		}
 	}
-	
-	~CObject() {
+
+	~CObject()
+	{
 		Py_XDECREF(pycap);
 	}
-	
+
 private:
-	static void PyRelease(PyObject *obj)
+	static void PyRelease(PyObject* obj)
 	{
 		void* ptr = PyCapsule_GetPointer(obj, T::ID.description);
 		assert(ptr);
 		delete static_cast<Capsule*>(ptr);
 	}
-	
+
 	struct Capsule {
 		CAP_T ptr;
-		
+
 		explicit Capsule(CAP_T ptr)
-		: ptr(std::move(ptr))
+			: ptr(std::move(ptr))
 		{}
 	};
 	Capsule* cap = nullptr;
@@ -144,9 +150,10 @@ class PyStringWrapper {
 	char* str = nullptr;
 	PyObject* object = nullptr;
 	Py_ssize_t len = 0;
-	
+
 public:
-	PyStringWrapper(PyObject* obj, const char* encoding) noexcept {
+	PyStringWrapper(PyObject* obj, const char* encoding) noexcept
+	{
 		if (PyUnicode_Check(obj)) {
 			PyObject* temp_bytes = PyUnicode_AsEncodedString(obj, encoding, "backslashreplace"); // Owned reference
 			if (temp_bytes != NULL) {
@@ -167,20 +174,23 @@ public:
 			PyBytes_AsStringAndSize(obj, &str, &len);
 		}
 	}
-	
+
 	PyStringWrapper(const PyStringWrapper&) = delete;
 	PyStringWrapper& operator=(const PyStringWrapper&) = delete;
-	
-	PyStringWrapper(PyStringWrapper&& wrap) {
+
+	PyStringWrapper(PyStringWrapper&& wrap)
+	{
 		std::swap(wrap.str, str);
 		std::swap(wrap.object, object);
 	}
 
-	operator StringView() const noexcept {
+	operator StringView() const noexcept
+	{
 		return StringView(str, len);
 	}
-	
-	~PyStringWrapper() noexcept {
+
+	~PyStringWrapper() noexcept
+	{
 		Py_DECREF(object);
 	}
 };
@@ -196,8 +206,9 @@ Point PointFromPy(PyObject* obj);
 
 Region RectFromPy(PyObject* obj);
 
-template <class STR>
-STR ASCIIStringFromPy(PyObject* obj) {
+template<class STR>
+STR ASCIIStringFromPy(PyObject* obj)
+{
 	if (obj == nullptr || obj == Py_None) return STR();
 
 	auto ref = DecRef(PyUnicode_AsEncodedString, obj, "ascii", "strict");
@@ -207,7 +218,8 @@ STR ASCIIStringFromPy(PyObject* obj) {
 	return STR();
 }
 
-inline ResRef ResRefFromPy(PyObject* obj) {
+inline ResRef ResRefFromPy(PyObject* obj)
+{
 	return ASCIIStringFromPy<ResRef>(obj);
 }
 
@@ -235,26 +247,26 @@ PyObject* PyString_FromStringView(StringView sv);
 PyObject* PyString_FromStringObj(const std::string&);
 PyObject* PyString_FromStringObj(const String&);
 
-String PyString_AsStringObj(PyObject *obj);
+String PyString_AsStringObj(PyObject* obj);
 
-template <typename STR>
+template<typename STR>
 PyObject* PyString_FromASCII(const STR& str)
 {
 	// PyUnicode_FromStringAndSize expects UTF-8 data, ascii is compatible with that
 	return PyUnicode_FromStringAndSize(str.c_str(), str.length());
 }
 
-template <typename T>
+template<typename T>
 PyObject* PyObject_FromHolder(Holder<T> h)
 {
 	return static_cast<PyObject*>(CObject<T>(std::move(h)));
 }
 
-template <typename T, PyObject* (*F)(T), class Container>
-PyObject* MakePyList(const Container &source)
+template<typename T, PyObject* (*F)(T), class Container>
+PyObject* MakePyList(const Container& source)
 {
 	size_t size = source.size();
-	PyObject *list = PyList_New(size);
+	PyObject* list = PyList_New(size);
 	for (size_t i = 0; i < size; ++i) {
 		// SET_ITEM might be preferable to SetItem here, but MSVC6 doesn't like it.
 		PyList_SetItem(list, i, F(source[i]));
@@ -262,8 +274,8 @@ PyObject* MakePyList(const Container &source)
 	return list;
 }
 
-template <typename T, class Container>
-PyObject* MakePyList(const Container &source)
+template<typename T, class Container>
+PyObject* MakePyList(const Container& source)
 {
 	return MakePyList<Holder<T>, &PyObject_FromHolder<T>, Container>(source);
 }

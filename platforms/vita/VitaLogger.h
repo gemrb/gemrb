@@ -25,7 +25,8 @@ namespace GemRB {
 
 class GEM_EXPORT VitaLogger : public Logger::LogWriter {
 public:
-	VitaLogger(log_level level) : Logger::LogWriter(level) {};
+	VitaLogger(log_level level)
+		: Logger::LogWriter(level) {};
 
 protected:
 	void LogInternal(log_level, const char*, const char*, log_color) override;

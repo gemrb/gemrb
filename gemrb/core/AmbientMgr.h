@@ -43,7 +43,7 @@ public:
 
 	void Reset();
 	void UpdateVolume(unsigned short value);
-	void SetAmbients(const std::vector<Ambient*> &a);
+	void SetAmbients(const std::vector<Ambient*>& a);
 	void RemoveAmbients(const std::vector<Ambient*>& oldAmbients);
 
 	void Activate(StringView name); // hard play ;-)
@@ -57,17 +57,18 @@ private:
 
 private:
 	mutable std::mutex ambientsMutex;
-	std::vector<Ambient *> ambients;
-	std::atomic_bool active {false};
+	std::vector<Ambient*> ambients;
+	std::atomic_bool active { false };
 
 	mutable std::recursive_mutex mutex;
 	std::thread player;
 	std::condition_variable_any cond;
-	std::atomic_bool playing {true};
+	std::atomic_bool playing { true };
 
 	class AmbientSource {
 	public:
-		explicit AmbientSource(const Ambient* a) noexcept : ambient(a) {};
+		explicit AmbientSource(const Ambient* a) noexcept
+			: ambient(a) {};
 		AmbientSource(const AmbientSource&) = delete;
 		~AmbientSource();
 		AmbientSource& operator=(const AmbientSource&) = delete;
@@ -75,6 +76,7 @@ private:
 		void HardStop();
 		void SetVolume(unsigned short volume) const;
 		const Ambient* GetAmbient() const { return ambient; };
+
 	private:
 		int stream = -1;
 		const Ambient* ambient;
@@ -83,7 +85,7 @@ private:
 		size_t nextref = 0;
 		unsigned int totalgain = 0;
 
-		bool IsHeard(const Point &listener) const;
+		bool IsHeard(const Point& listener) const;
 		tick_t Enqueue() const;
 	};
 	std::vector<AmbientSource*> ambientSources;

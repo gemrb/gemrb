@@ -33,8 +33,8 @@ Video::Video() noexcept
 {
 	// Initialize gamma correction tables
 	for (int i = 0; i < 256; i++) {
-		Gamma22toGamma10[i] = (unsigned char)(0.5 + (pow (i/255.0, 2.2/1.0) * 255.0));
-		Gamma10toGamma22[i] = (unsigned char)(0.5 + (pow (i/255.0, 1.0/2.2) * 255.0));
+		Gamma22toGamma10[i] = (unsigned char) (0.5 + (pow(i / 255.0, 2.2 / 1.0) * 255.0));
+		Gamma10toGamma22[i] = (unsigned char) (0.5 + (pow(i / 255.0, 1.0 / 2.2) * 255.0));
 	}
 }
 
@@ -146,9 +146,9 @@ int Video::SwapBuffers(int fpscap)
 	}
 
 	if (fpscap > 0) {
-		tick_t lim = 1000/fpscap;
+		tick_t lim = 1000 / fpscap;
 		tick_t time = GetMilliseconds();
-		if (( time - lastTime ) < lim) {
+		if ((time - lastTime) < lim) {
 			Wait(lim - int(time - lastTime));
 			time = GetMilliseconds();
 		}
@@ -213,7 +213,7 @@ void Video::BlitSprite(const Holder<Sprite2D>& spr, Point p, const Region* clip,
 }
 
 void Video::BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const Holder<Palette>& pal, const Point& p,
-									  BlitFlags flags, Color tint)
+				      BlitFlags flags, Color tint)
 {
 	if (pal) {
 		Holder<Palette> oldpal = spr->GetPalette();
@@ -231,12 +231,12 @@ Holder<Sprite2D> Video::SpriteScaleDown(const Holder<Sprite2D>& sprite, unsigned
 	scaledFrame.w /= ratio;
 	scaledFrame.h /= ratio;
 
-	unsigned int* pixels = (unsigned int *) malloc( scaledFrame.w * scaledFrame.h * 4 );
+	unsigned int* pixels = (unsigned int*) malloc(scaledFrame.w * scaledFrame.h * 4);
 	int i = 0;
 
 	for (int y = 0; y < scaledFrame.h; y++) {
 		for (int x = 0; x < scaledFrame.w; x++) {
-			Color c = SpriteGetPixelSum( sprite, x, y, ratio );
+			Color c = SpriteGetPixelSum(sprite, x, y, ratio);
 
 			*(pixels + i++) = c.r + (c.g << 8) + (c.b << 16) + (c.a << 24);
 		}
@@ -255,8 +255,8 @@ Color Video::SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xb
 {
 	// TODO: turn this into one of our software "shaders"
 	Color sum;
-	unsigned int count = ratio*ratio;
-	unsigned int r=0, g=0, b=0, a=0;
+	unsigned int count = ratio * ratio;
+	unsigned int r = 0, g = 0, b = 0, a = 0;
 
 	for (unsigned int x = 0; x < ratio; x++) {
 		for (unsigned int y = 0; y < ratio; y++) {
@@ -301,7 +301,7 @@ static Color ApplyFlagsForColor(const Color& inCol, BlitFlags& flags)
 	}
 
 	// clear handled flags
-	flags &= ~(BlitFlags::HALFTRANS|BlitFlags::GREY|BlitFlags::SEPIA|BlitFlags::COLOR_MOD);
+	flags &= ~(BlitFlags::HALFTRANS | BlitFlags::GREY | BlitFlags::SEPIA | BlitFlags::COLOR_MOD);
 	return outC;
 }
 

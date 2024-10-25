@@ -27,18 +27,18 @@
 
 using namespace GemRB;
 
-#define BMP_HEADER_SIZE  54
+#define BMP_HEADER_SIZE 54
 
 BMPImporter::~BMPImporter(void)
 {
 	free(PaletteColors);
-	free( pixels );
+	free(pixels);
 }
 
 bool BMPImporter::Import(DataStream* str)
 {
 	//we release the previous pixel data
-	free( pixels );
+	free(pixels);
 	pixels = NULL;
 	free(PaletteColors);
 	PaletteColors = nullptr;
@@ -47,13 +47,13 @@ bool BMPImporter::Import(DataStream* str)
 	char Signature[2];
 	ieDword FileSize, DataOffset;
 
-	str->Read( Signature, 2 );
-	if (strncmp( Signature, "BM", 2 ) != 0) {
+	str->Read(Signature, 2);
+	if (strncmp(Signature, "BM", 2) != 0) {
 		Log(ERROR, "BMPImporter", "Not a valid BMP File.");
 		return false;
 	}
 	str->ReadDword(FileSize);
-	str->Seek( 4, GEM_CURRENT_POS );
+	str->Seek(4, GEM_CURRENT_POS);
 	str->ReadDword(DataOffset);
 
 	//BITMAPINFOHEADER
@@ -85,12 +85,12 @@ bool BMPImporter::Import(DataStream* str)
 
 	//COLORTABLE
 	if (BitCount <= 8) {
-		str->Seek( Size-24, GEM_CURRENT_POS );
+		str->Seek(Size - 24, GEM_CURRENT_POS);
 		if (BitCount == 8)
 			NumColors = 256;
 		else
 			NumColors = 16;
-		PaletteColors = (Color *)malloc(4 * NumColors);
+		PaletteColors = (Color*) malloc(4 * NumColors);
 
 		for (unsigned int i = 0; i < NumColors; i++) {
 			str->Read(&PaletteColors[i].b, 1);
@@ -131,7 +131,7 @@ bool BMPImporter::Import(DataStream* str)
 	uint32_t bNormShift = normshift(bMask);
 	uint32_t aNormShift = normshift(aMask);
 
-	str->Seek( DataOffset, GEM_STREAM_START );
+	str->Seek(DataOffset, GEM_STREAM_START);
 	//no idea if we have to swap this or not
 	//RASTERDATA
 	switch (BitCount) {
@@ -150,7 +150,7 @@ bool BMPImporter::Import(DataStream* str)
 	}
 
 	if (PaddedRowLength & 3) {
-		PaddedRowLength += 4 - ( PaddedRowLength & 3 );
+		PaddedRowLength += 4 - (PaddedRowLength & 3);
 	}
 
 	void* rpixels = malloc(PaddedRowLength * size.h);
@@ -158,19 +158,16 @@ bool BMPImporter::Import(DataStream* str)
 	if (BitCount == 32) {
 		int numbytes = size.Area() * 4;
 		pixels = malloc(numbytes);
-		unsigned int * dest = ( unsigned int * ) pixels;
+		unsigned int* dest = (unsigned int*) pixels;
 		dest += size.Area();
 
-		const uint32_t *src = static_cast<const uint32_t*>(rpixels);
+		const uint32_t* src = static_cast<const uint32_t*>(rpixels);
 		for (int i = size.h; i; i--) {
 			dest -= size.w;
 			// masks -> (A)BGR
 			for (int j = 0; j < size.w; ++j) {
 				uint32_t pixelValue = (isV3or5 ? ((src[j] & aMask) >> aNormShift) : 0xFF) << 24;
-				dest[j] = pixelValue
-					| (((src[j] & bMask) >> bNormShift) << 16)
-					| (((src[j] & gMask) >> gNormShift) << 8)
-					| ((src[j] & rMask) >> rNormShift);
+				dest[j] = pixelValue | (((src[j] & bMask) >> bNormShift) << 16) | (((src[j] & gMask) >> gNormShift) << 8) | ((src[j] & rMask) >> rNormShift);
 			}
 			src += PaddedRowLength / 4;
 		}
@@ -178,15 +175,15 @@ bool BMPImporter::Import(DataStream* str)
 		//convert to 32 bits on the fly
 		int numbytes = size.Area() * 4;
 		pixels = malloc(numbytes);
-		unsigned int * dest = ( unsigned int * ) pixels;
+		unsigned int* dest = (unsigned int*) pixels;
 		dest += size.Area();
-		const unsigned char* src = (const unsigned char *) rpixels;
+		const unsigned char* src = (const unsigned char*) rpixels;
 		for (int i = size.h; i; i--) {
 			dest -= size.w;
 			// BGR
 			for (int j = 0; j < size.w; ++j)
-				dest[j] = (0xFF << 24) | (src[j*3+0] << 16) |
-				          (src[j*3+1] << 8) | (src[j*3+2]);
+				dest[j] = (0xFF << 24) | (src[j * 3 + 0] << 16) |
+					(src[j * 3 + 1] << 8) | (src[j * 3 + 2]);
 			src += PaddedRowLength;
 		}
 		BitCount = 32;
@@ -195,16 +192,16 @@ bool BMPImporter::Import(DataStream* str)
 	} else if (BitCount == 4) {
 		Read4To8(rpixels);
 	}
-	free( rpixels );
+	free(rpixels);
 	return true;
 }
 
-void BMPImporter::Read8To8(const void *rpixels)
+void BMPImporter::Read8To8(const void* rpixels)
 {
 	pixels = malloc(size.Area());
-	unsigned char * dest = ( unsigned char * ) pixels;
+	unsigned char* dest = (unsigned char*) pixels;
 	dest += size.Area();
-	const unsigned char* src = (const unsigned char *) rpixels;
+	const unsigned char* src = (const unsigned char*) rpixels;
 	for (int i = size.h; i; i--) {
 		dest -= size.w;
 		memcpy(dest, src, size.w);
@@ -212,20 +209,20 @@ void BMPImporter::Read8To8(const void *rpixels)
 	}
 }
 
-void BMPImporter::Read4To8(const void *rpixels)
+void BMPImporter::Read4To8(const void* rpixels)
 {
 	BitCount = 8;
 	pixels = malloc(size.Area());
-	unsigned char * dest = ( unsigned char * ) pixels;
+	unsigned char* dest = (unsigned char*) pixels;
 	dest += size.Area();
-	const unsigned char* src = (const unsigned char *) rpixels;
+	const unsigned char* src = (const unsigned char*) rpixels;
 	for (int i = size.h; i; i--) {
 		dest -= size.w;
 		for (int j = 0; j < size.w; ++j) {
-			if (!(j&1)) {
-				dest[j] = ((unsigned) src[j/2])>>4;
+			if (!(j & 1)) {
+				dest[j] = ((unsigned) src[j / 2]) >> 4;
 			} else {
-				dest[j] = src[j/2]&15;
+				dest[j] = src[j / 2] & 15;
 			}
 		}
 		src += PaddedRowLength;
@@ -244,13 +241,13 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 		fmt.HasColorKey = true;
 		fmt.ColorKey = greenMask | (0xff << 24);
 
-		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h), nullptr, fmt);
+		spr = VideoDriver->CreateSprite(Region(0, 0, size.w, size.h), nullptr, fmt);
 		memcpy(spr->LockSprite(), pixels, size.Area() * 4);
 		spr->UnlockSprite();
 	} else if (BitCount == 8) {
 		Holder<Palette> pal = MakeHolder<Palette>(PaletteColors, PaletteColors + NumColors);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, pal->GetColorAt(0) == ColorGreen, 0);
-		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h), nullptr, fmt);
+		spr = VideoDriver->CreateSprite(Region(0, 0, size.w, size.h), nullptr, fmt);
 		const uint8_t* src = static_cast<uint8_t*>(pixels);
 		const uint8_t* end = src + size.Area();
 		auto dst = spr->GetIterator();
@@ -283,5 +280,5 @@ int BMPImporter::GetPalette(int colors, Palette& pal)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xD768B1, "BMP File Reader")
-PLUGIN_IE_RESOURCE(BMPImporter, "bmp", (ieWord)IE_BMP_CLASS_ID)
+PLUGIN_IE_RESOURCE(BMPImporter, "bmp", (ieWord) IE_BMP_CLASS_ID)
 END_PLUGIN()

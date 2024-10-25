@@ -20,7 +20,6 @@
 #define PYTHON_ERRORS_H
 
 #include <Python.h>
-
 #include <string>
 
 namespace GemRB {

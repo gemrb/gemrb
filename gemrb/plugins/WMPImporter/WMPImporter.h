@@ -21,11 +21,10 @@
 #ifndef WMPIMPORTER_H
 #define WMPIMPORTER_H
 
-#include "WorldMapMgr.h"
-
 #include "ie_types.h"
 
 #include "WorldMap.h"
+#include "WorldMapMgr.h"
 
 namespace GemRB {
 
@@ -47,19 +46,20 @@ public:
 	~WMPImporter() override;
 	WMPImporter& operator=(const WMPImporter&) = delete;
 	bool Open(DataStream* stream1, DataStream* stream2) override;
-	WorldMapArray *GetWorldMapArray() const override;
+	WorldMapArray* GetWorldMapArray() const override;
 
-	int GetStoredFileSize(WorldMapArray *wmap, unsigned int index) override;
-	int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray *wmap) const override;
+	int GetStoredFileSize(WorldMapArray* wmap, unsigned int index) override;
+	int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray* wmap) const override;
+
 private:
-	void GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) const;
+	void GetWorldMap(DataStream* str, WorldMap* m, unsigned int index) const;
 
-	WMPAreaEntry GetAreaEntry(DataStream *str) const;
-	WMPAreaLink* GetAreaLink(DataStream *str, WMPAreaLink* al) const;
-	int PutMaps(DataStream *stream1, DataStream *stream2, const WorldMapArray *wmap) const;
-	int PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned int index) const;
-	int PutLinks(DataStream *stream, const WorldMap *wmap) const;
-	int PutAreas(DataStream *stream, const WorldMap *wmap) const;
+	WMPAreaEntry GetAreaEntry(DataStream* str) const;
+	WMPAreaLink* GetAreaLink(DataStream* str, WMPAreaLink* al) const;
+	int PutMaps(DataStream* stream1, DataStream* stream2, const WorldMapArray* wmap) const;
+	int PutMap(DataStream* stream, const WorldMapArray* wmap, unsigned int index) const;
+	int PutLinks(DataStream* stream, const WorldMap* wmap) const;
+	int PutAreas(DataStream* stream, const WorldMap* wmap) const;
 };
 
 

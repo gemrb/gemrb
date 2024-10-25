@@ -36,7 +36,7 @@ const EnumArray<LogLevel, LOG_FMT> Logger::LevelFormat {
 const LOG_FMT Logger::MSG_STYLE = fmt::fg(fmt::color::ghost_white);
 
 Logger::Logger(std::deque<WriterPtr> writers)
-: writers(std::move(writers))
+	: writers(std::move(writers))
 {}
 
 Logger::~Logger()

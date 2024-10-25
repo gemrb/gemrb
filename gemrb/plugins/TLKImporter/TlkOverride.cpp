@@ -23,11 +23,12 @@
 #include "TlkOverride.h"
 
 #include "Interface.h"
+
 #include "Logging/Logging.h"
 
 #include <algorithm>
-#include <cstdio>
 #include <cassert>
+#include <cstdio>
 
 using namespace GemRB;
 
@@ -51,13 +52,13 @@ bool CTlkOverride::Init()
 
 	char Signature[8];
 
-	memset(Signature,0,8);
-	toh_str->Read( Signature, 4 );
-	if (strncmp( Signature, "TLK ", 4 ) != 0) {
+	memset(Signature, 0, 8);
+	toh_str->Read(Signature, 4);
+	if (strncmp(Signature, "TLK ", 4) != 0) {
 		Log(ERROR, "TLKImporter", "Not a valid TOH file.");
 		return false;
 	}
-	toh_str->Seek( 8, GEM_CURRENT_POS );
+	toh_str->Seek(8, GEM_CURRENT_POS);
 	toh_str->ReadDword(AuxCount);
 	if (tot_str->ReadScalar<strpos_t, int32_t>(FreeOffset) != 4) {
 		FreeOffset = DataStream::InvalidPos;
@@ -85,17 +86,16 @@ strret_t CTlkOverride::GetLength(strpos_t offset)
 	strpos_t tmp = offset;
 	char buffer[SEGMENT_SIZE];
 
-	if (tot_str->Seek(offset+8, GEM_STREAM_START) != GEM_OK) {
+	if (tot_str->Seek(offset + 8, GEM_STREAM_START) != GEM_OK) {
 		return 0;
 	}
 
 	strret_t length = 0;
-	do
-	{
-		if (tot_str->Seek(tmp+8, GEM_STREAM_START) != GEM_OK) {
+	do {
+		if (tot_str->Seek(tmp + 8, GEM_STREAM_START) != GEM_OK) {
 			return 0;
 		}
-		memset(buffer,0,sizeof(buffer));
+		memset(buffer, 0, sizeof(buffer));
 		tot_str->Read(buffer, SEGMENT_SIZE);
 		tot_str->ReadScalar<strpos_t, int32_t>(tmp);
 		if (tmp != DataStream::InvalidPos) {
@@ -120,17 +120,17 @@ char* CTlkOverride::GetString(strpos_t offset)
 	}
 
 	//assuming char is one byte
-	char *ret = (char *) malloc(length+1);
-	char *pos = ret;
-	ret[length]=0;
-	while(length) {
-		tot_str->Seek(offset+8, GEM_STREAM_START);
+	char* ret = (char*) malloc(length + 1);
+	char* pos = ret;
+	ret[length] = 0;
+	while (length) {
+		tot_str->Seek(offset + 8, GEM_STREAM_START);
 		strret_t tmp = std::min<strret_t>(length, SEGMENT_SIZE);
 		tot_str->Read(pos, tmp);
-		tot_str->Seek(SEGMENT_SIZE-tmp, GEM_CURRENT_POS);
+		tot_str->Seek(SEGMENT_SIZE - tmp, GEM_CURRENT_POS);
 		tot_str->ReadScalar<strpos_t, int32_t>(offset);
-		length-=tmp;
-		pos+=tmp;
+		length -= tmp;
+		pos += tmp;
 	}
 	return ret;
 }
@@ -152,8 +152,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 	//set the backpointer of the first string segment
 	strpos_t backp = DataStream::InvalidPos;
 
-	do
-	{
+	do {
 		//fill the backpointer
 		tot_str->Seek(offset + 4, GEM_STREAM_START);
 		tot_str->WriteScalar<strpos_t, int32_t>(backp);
@@ -170,7 +169,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 			if (offset != DataStream::InvalidPos) {
 				strpos_t freep = offset;
 				offset = DataStream::InvalidPos;
-				tot_str->Seek(-4,GEM_CURRENT_POS);
+				tot_str->Seek(-4, GEM_CURRENT_POS);
 				tot_str->WriteScalar<strpos_t, int32_t>(offset);
 				ReleaseSegment(freep);
 			}
@@ -180,10 +179,10 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const String& string)
 		if (offset == DataStream::InvalidPos) {
 			//no more space, but we need some
 			offset = ClaimFreeSegment();
-			tot_str->Seek(-4,GEM_CURRENT_POS);
+			tot_str->Seek(-4, GEM_CURRENT_POS);
 			tot_str->WriteScalar<strpos_t, int32_t>(offset);
 		}
-	} while(length);
+	} while (length);
 
 	return strref;
 }
@@ -192,7 +191,7 @@ strpos_t CTlkOverride::ClaimFreeSegment()
 {
 	strpos_t offset = FreeOffset;
 	strpos_t pos = tot_str->GetPos();
-	
+
 	if (offset == DataStream::InvalidPos) {
 		offset = tot_str->Size();
 	} else {
@@ -271,7 +270,7 @@ ieStrRef CTlkOverride::GetNewStrRef(ieStrRef strref)
 	toh_str->WriteDword(entry.pitchVariance);
 	toh_str->WriteScalar<strpos_t, int32_t>(entry.offset);
 	AuxCount++;
-	toh_str->Seek(12,GEM_STREAM_START);
+	toh_str->Seek(12, GEM_STREAM_START);
 	toh_str->WriteDword(AuxCount);
 	return entry.strref;
 }
@@ -282,19 +281,19 @@ strpos_t CTlkOverride::LocateString(ieStrRef strref)
 	ieDword offset;
 
 	if (!toh_str) return DataStream::InvalidPos;
-	toh_str->Seek(TOH_HEADER_SIZE,GEM_STREAM_START);
-	for(ieDword i=0;i<AuxCount;i++) {
+	toh_str->Seek(TOH_HEADER_SIZE, GEM_STREAM_START);
+	for (ieDword i = 0; i < AuxCount; i++) {
 		toh_str->ReadStrRef(strref2);
-		toh_str->Seek(20,GEM_CURRENT_POS);
+		toh_str->Seek(20, GEM_CURRENT_POS);
 		toh_str->ReadDword(offset);
-		if (strref2==strref) {
+		if (strref2 == strref) {
 			return offset;
 		}
 	}
 	return DataStream::InvalidPos;
 }
 
-char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t &Length)
+char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t& Length)
 {
 	char* string = nullptr;
 	strpos_t offset = LocateString(strref);
@@ -305,7 +304,7 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t &Length)
 		Length = strlen(string);
 	} else {
 		Length = 0;
-		string = ( char* ) malloc( 1 );
+		string = (char*) malloc(1);
 		string[0] = 0;
 	}
 
@@ -364,4 +363,3 @@ DataStream* CTlkOverride::GetAuxTlk(bool create)
 		return nullptr;
 	}
 }
-

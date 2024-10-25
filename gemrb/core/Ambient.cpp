@@ -17,8 +17,9 @@
  *
  *
  */
- 
+
 #include "Ambient.h"
+
 #include "RNG.h"
 
 #include <algorithm>
@@ -29,7 +30,7 @@ ieWord Ambient::GetTotalGain() const
 {
 	ieWord g = gain;
 	if (gainVariance != 0) {
-		ieWord var = std::min(gainVariance, (ieWord) (gain/2));
+		ieWord var = std::min(gainVariance, (ieWord) (gain / 2));
 		g += RAND(0, 2 * var) - var;
 	}
 	return g;

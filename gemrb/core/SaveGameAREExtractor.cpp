@@ -15,11 +15,13 @@
  *
  *
  */
+#include "SaveGameAREExtractor.h"
+
 #include "Interface.h"
+
 #include "Logging/Logging.h"
 #include "Streams/FileCache.h"
 #include "Streams/FileStream.h"
-#include "SaveGameAREExtractor.h"
 
 namespace GemRB {
 
@@ -27,7 +29,8 @@ SaveGameAREExtractor::SaveGameAREExtractor(Holder<SaveGame> saveGame)
 	: saveGame(std::move(saveGame))
 {}
 
-int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trackLocations) {
+int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream* destStream, bool trackLocations)
+{
 	if (saveGame == nullptr) {
 		return GEM_OK;
 	}
@@ -42,7 +45,7 @@ int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trac
 	}
 
 	using BufferT = std::array<uint8_t, 4096>;
-	BufferT buffer{};
+	BufferT buffer {};
 	int32_t i = 0;
 
 	size_t relativeLocation = 0;
@@ -81,7 +84,8 @@ int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trac
 	return i;
 }
 
-int32_t SaveGameAREExtractor::createCacheBlob() {
+int32_t SaveGameAREExtractor::createCacheBlob()
+{
 	if (areLocations.empty()) {
 		return 0;
 	}
@@ -101,7 +105,8 @@ int32_t SaveGameAREExtractor::createCacheBlob() {
 	return areEntries;
 }
 
-int32_t SaveGameAREExtractor::extractARE(const ResRef& key) {
+int32_t SaveGameAREExtractor::extractARE(const ResRef& key)
+{
 	auto it = areLocations.find(key);
 	if (it != areLocations.cend() && extractByEntry(key, it) != GEM_OK) {
 		return GEM_ERROR;
@@ -110,7 +115,8 @@ int32_t SaveGameAREExtractor::extractARE(const ResRef& key) {
 	return GEM_OK;
 }
 
-int32_t SaveGameAREExtractor::extractByEntry(const ResRef& key, RegistryT::const_iterator it) {
+int32_t SaveGameAREExtractor::extractByEntry(const ResRef& key, RegistryT::const_iterator it)
+{
 	auto saveGameStream = saveGame->GetSave();
 	if (saveGameStream == nullptr) {
 		return GEM_ERROR;
@@ -146,11 +152,13 @@ bool SaveGameAREExtractor::isRunningSaveGame(const SaveGame& otherGame) const
 	return saveGame->GetSaveID() == otherGame.GetSaveID();
 }
 
-void SaveGameAREExtractor::registerLocation(const ResRef& resRef, unsigned long pos) {
+void SaveGameAREExtractor::registerLocation(const ResRef& resRef, unsigned long pos)
+{
 	areLocations.emplace(resRef, pos);
 }
 
-void SaveGameAREExtractor::updateSaveGame(size_t offset) {
+void SaveGameAREExtractor::updateSaveGame(size_t offset)
+{
 	if (saveGame == nullptr) {
 		return;
 	}

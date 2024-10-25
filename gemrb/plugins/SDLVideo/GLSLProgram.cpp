@@ -1,13 +1,13 @@
-#include <cstdio>
-#include <cstring>
-#include <fstream>
-#include <algorithm>
-#include <cctype>
-#include <sstream>
+#include "GLSLProgram.h"
 
 #include "System/VFS.h" // for PathDelimiter
 
-#include "GLSLProgram.h"
+#include <algorithm>
+#include <cctype>
+#include <cstdio>
+#include <cstring>
+#include <fstream>
+#include <sstream>
 
 using namespace GemRB;
 
@@ -29,7 +29,7 @@ GLSLProgram* GLSLProgram::Create(const std::string& vertexSource, const std::str
 }
 
 GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std::string fragmentSourceFileName,
-		GLuint programID)
+					  GLuint programID)
 {
 	std::string vertexContent;
 	std::string fragmentContent;
@@ -138,7 +138,7 @@ bool GLSLProgram::buildProgram(const std::string& vertexSource, const std::strin
 	} else {
 		GLsizei numAttachedShaders = 0;
 		// Assume there is nothing but VS & FS.
-		GLuint shaderIDs[2] = {0};
+		GLuint shaderIDs[2] = { 0 };
 		glGetAttachedShaders(program, 2, &numAttachedShaders, shaderIDs);
 
 		for (GLsizei i = 0; i < numAttachedShaders; ++i) {
@@ -174,7 +174,7 @@ bool GLSLProgram::buildProgram(const std::string& vertexSource, const std::strin
 	glDeleteShader(fragmentId);
 	if (program != 0) {
 		int count = -1;
-		glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count); 
+		glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &count);
 		for (int i = 0; i < count; i++) {
 			int name_len = -1;
 			int num = -1;
@@ -208,16 +208,13 @@ bool GLSLProgram::storeUniformLocation(const std::string& uniformName)
 {
 	if (uniforms.find(uniformName) == uniforms.end()) {
 		GLint location = glGetUniformLocation(program, uniformName.c_str());
-		if (location == -1)
-		{
+		if (location == -1) {
 			GLSLProgram::errMessage = "GLSLProgram error: Invalid uniform location";
 			return false;
 		}
 		uniforms[uniformName] = location;
 		return true;
-	}
-	else
-	{
+	} else {
 		GLSLProgram::errMessage = "GLSLProgram error: Uniform already stored";
 		return true;
 	}
@@ -273,8 +270,7 @@ bool GLSLProgram::SetUniformMatrixValue(const std::string& uniformName, const un
 {
 	GLint location = getUniformLocation(uniformName);
 	if (location == -1) return false;
-	switch (size)
-	{
+	switch (size) {
 		case 2:
 			glUniformMatrix2fv(location, count, GL_FALSE, value);
 			return true;
@@ -351,6 +347,7 @@ GLint GLSLProgram::GetAttribLocation(const std::string& attribName) const
 	return glGetAttribLocation(program, attribName.c_str());
 }
 
-GLuint GLSLProgram::GetProgramID() const {
+GLuint GLSLProgram::GetProgramID() const
+{
 	return program;
 }

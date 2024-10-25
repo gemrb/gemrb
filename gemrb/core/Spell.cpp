@@ -29,6 +29,7 @@
 #include "Interface.h"
 #include "Projectile.h"
 #include "ProjectileServer.h"
+
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
@@ -39,17 +40,20 @@ struct SpellTables {
 		ieDword val1;
 		ieDword val2;
 	};
-	
+
 	std::vector<SpellFocus> spellfocus;
 	unsigned int damageOpcode = 0;
 	bool pstflags = false;
-	
-	static const SpellTables& Get() {
+
+	static const SpellTables& Get()
+	{
 		static SpellTables tables;
 		return tables;
 	}
+
 private:
-	SpellTables() {
+	SpellTables()
+	{
 		EffectRef dmgref = { "Damage", -1 };
 		damageOpcode = EffectQueue::ResolveEffect(dmgref);
 
@@ -91,26 +95,32 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 //otherwise set to caster level
 static EffectRef fx_casting_glow_ref = { "CastingGlow", -1 };
 
-void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) const
+void Spell::AddCastingGlow(EffectQueue* fxqueue, ieDword duration, int gender) const
 {
 	char g, t;
-	Effect *fx;
+	Effect* fx;
 	ResRef Resource;
 
 	int cgsound = CastingSound;
-	if (cgsound>=0 && duration > 1) {
+	if (cgsound >= 0 && duration > 1) {
 		//bg2 style
-		if(cgsound&0x100) {
+		if (cgsound & 0x100) {
 			//if duration is less than 3, use only the background sound
 			g = 's';
-			if (duration>3) {
-				switch(gender) {
-				//selection of these sounds is almost purely on whim
-				//though the sounds of devas/demons are probably better this way
-				//all other cases (mostly elementals/animals) don't have sound
-				//externalise if you don't mind another 2da
-				case SEX_MALE: case SEX_SUMMON_DEMON: g = 'm'; break;
-				case SEX_FEMALE: case SEX_BOTH: g = 'f'; break;
+			if (duration > 3) {
+				switch (gender) {
+					//selection of these sounds is almost purely on whim
+					//though the sounds of devas/demons are probably better this way
+					//all other cases (mostly elementals/animals) don't have sound
+					//externalise if you don't mind another 2da
+					case SEX_MALE:
+					case SEX_SUMMON_DEMON:
+						g = 'm';
+						break;
+					case SEX_FEMALE:
+					case SEX_BOTH:
+						g = 'f';
+						break;
 				}
 			}
 		} else {
@@ -121,7 +131,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 				g = 'm';
 			}
 		}
-		if (SpellType==IE_SPL_PRIEST) {
+		if (SpellType == IE_SPL_PRIEST) {
 			t = 'p';
 		} else {
 			t = 'm';
@@ -133,7 +143,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 			Resource.Format("CHA_{}{}{:02d}", g, t, std::min(cgsound & 0xff, 99));
 		}
 		// only actors have fxqueue's and also the parent function checks for that
-		Actor *caster = (Actor *) fxqueue->GetOwner();
+		Actor* caster = (Actor*) fxqueue->GetOwner();
 		caster->casting_sound = core->GetAudioDrv()->Play(Resource, SFXChannel::Casting, caster->Pos, GEM_SND_SPATIAL);
 	}
 
@@ -171,23 +181,23 @@ static void AdjustPSTDurations(const Spell* spl, Effect& fx, size_t ignoreFx)
 	}
 }
 
-EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro)
+EffectQueue Spell::GetEffectBlock(Scriptable* self, const Point& pos, int block_index, int level, ieDword pro)
 {
 	bool pstFriendly = false;
 	std::vector<Effect>* features;
 	size_t count;
 	const auto& tables = SpellTables::Get();
-	Actor *caster = Scriptable::As<Actor>(self);
+	Actor* caster = Scriptable::As<Actor>(self);
 
 	//iwd2 has this hack
-	if (block_index>=0) {
+	if (block_index >= 0) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
 			features = &ext_headers[0].features;
 			count = ext_headers[0].features.size();
 		} else {
 			features = &ext_headers[block_index].features;
 			count = ext_headers[block_index].features.size();
-			if (tables.pstflags && !(ext_headers[block_index].Hostile&4)) {
+			if (tables.pstflags && !(ext_headers[block_index].Hostile & 4)) {
 				pstFriendly = true;
 			}
 		}
@@ -221,7 +231,7 @@ EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_
 		//pst spells contain a friendly flag in the spell header
 		// while iwd spells never set this bit
 		if (fx.Opcode == tables.damageOpcode && !pstFriendly) {
-			fx.SourceFlags|=SF_HOSTILE;
+			fx.SourceFlags |= SF_HOSTILE;
 		}
 		fx.CasterID = self ? self->GetGlobalID() : 0; // needed early for check_type, reset later
 		fx.SpellLevel = SpellLevel;
@@ -238,11 +248,16 @@ EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_
 			//TODO: the usual problem: which saving throw is better? Easy fix in the data file.
 			if (fx.PrimaryType < tables.spellfocus.size()) {
 				ieDword stat = tables.spellfocus[fx.PrimaryType].stat;
-				if (stat>0) {
+				if (stat > 0) {
 					switch (caster->Modified[stat]) {
-						case 0: break;
-						case 1: fx.SavingThrowBonus += tables.spellfocus[fx.PrimaryType].val1; break;
-						default: fx.SavingThrowBonus += tables.spellfocus[fx.PrimaryType].val2; break;
+						case 0:
+							break;
+						case 1:
+							fx.SavingThrowBonus += tables.spellfocus[fx.PrimaryType].val1;
+							break;
+						default:
+							fx.SavingThrowBonus += tables.spellfocus[fx.PrimaryType].val2;
+							break;
 					}
 				}
 			}
@@ -275,15 +290,15 @@ EffectQueue Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_
 	return fxqueue;
 }
 
-Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const Point &target)
+Projectile* Spell::GetProjectile(Scriptable* self, int header, int level, const Point& target)
 {
-	const SPLExtHeader *seh = GetExtHeader(header);
+	const SPLExtHeader* seh = GetExtHeader(header);
 	if (!seh) {
 		Log(ERROR, "Spell", "Cannot retrieve spell header!!! required header: {}, maximum: {}",
-			header, ext_headers.size());
+		    header, ext_headers.size());
 		return NULL;
 	}
-	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
+	Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->features.size()) {
 		EffectQueue fxqueue = GetEffectBlock(self, target, header, level, seh->ProjectileAnimation);
 		pro->SetEffects(std::move(fxqueue));
@@ -314,7 +329,7 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 //get the casting distance of the spell
 //it depends on the casting level of the actor
 //if actor isn't given, then the first header is used
-unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
+unsigned int Spell::GetCastingDistance(Scriptable* Sender) const
 {
 	int level = 0;
 	unsigned int limit = VOODOO_VISUAL_RANGE;
@@ -324,18 +339,18 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 		limit = actor->GetStat(IE_VISUALRANGE);
 	}
 
-	if (level<1) {
+	if (level < 1) {
 		level = 1;
 	}
 	int idx = GetHeaderIndexFromLevel(level);
-	const SPLExtHeader *seh = GetExtHeader(idx);
+	const SPLExtHeader* seh = GetExtHeader(idx);
 	if (!seh) {
 		Log(ERROR, "Spell", "Cannot retrieve spell header!!! required header: {}, maximum: {}",
-			idx, ext_headers.size());
+		    idx, ext_headers.size());
 		return 0;
 	}
 
-	if (seh->Target==TARGET_DEAD) {
+	if (seh->Target == TARGET_DEAD) {
 		return 0xffffffff;
 	}
 	return std::min((unsigned int) seh->Range, limit);

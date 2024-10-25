@@ -23,9 +23,9 @@
 
 #include "Plugin.h"
 #include "Tile.h"
-#include "Streams/DataStream.h"
 
 #include "Plugins/export.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 
@@ -33,7 +33,7 @@ class GEM_PLUGIN_EXPORT TileSetMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Tile* GetTile(const std::vector<ieWord>& indexes,
-		unsigned short* secondary = NULL) = 0;
+			      unsigned short* secondary = NULL) = 0;
 };
 
 }

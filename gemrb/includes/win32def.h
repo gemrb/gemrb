@@ -26,7 +26,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #ifndef NOMINMAX
-#define NOMINMAX
+	#define NOMINMAX
 #endif
 
 #define UNICODE
@@ -35,13 +35,13 @@
 #define NOUSER
 
 #ifdef _DEBUG
-#include <crtdbg.h>
+	#include <crtdbg.h>
 #endif
 
 #include <Windows.h>
 #include <ntverp.h>
 #if defined(VER_PRODUCTBUILD) && VER_PRODUCTBUILD >= 8100
-#include <VersionHelpers.h>
+	#include <VersionHelpers.h>
 #endif
 
-#endif  //! WIN32DEF_H
+#endif //! WIN32DEF_H

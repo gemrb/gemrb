@@ -40,13 +40,13 @@ using IDWTELEM = short;
 /**
  * Scantable.
  */
-typedef struct ScanTable{
-    const uint8_t *scantable;
-    uint8_t permutated[64];
-    uint8_t raster_end[64];
+typedef struct ScanTable {
+	const uint8_t* scantable;
+	uint8_t permutated[64];
+	uint8_t raster_end[64];
 } ScanTable;
 
-void ff_init_scantable(uint8_t *, ScanTable *st, const uint8_t *src_scantable);
+void ff_init_scantable(uint8_t*, ScanTable* st, const uint8_t* src_scantable);
 
 /**
  * Empty mmx state.
@@ -63,11 +63,11 @@ extern int mm_flags;
 #define DECLARE_ALIGNED_16(t, v) DECLARE_ALIGNED(16, t, v)
 #define DECLARE_ALIGNED_8(t, v)  DECLARE_ALIGNED(8, t, v)
 
-#define mm_flags 0
+#define mm_flags     0
 #define mm_support() 0
 
 #ifndef STRIDE_ALIGN
-#   define STRIDE_ALIGN 8
+	#define STRIDE_ALIGN 8
 #endif
 
 /* FFT computation */
@@ -79,20 +79,20 @@ using FFTSample = float;
 struct MDCTContext;
 
 typedef struct FFTComplex {
-    FFTSample re, im;
+	FFTSample re, im;
 } FFTComplex;
 
 typedef struct FFTContext {
-    int nbits;
-    int inverse;
-    uint16_t *revtab;
-    FFTComplex *exptab;
-    FFTComplex *exptab1; /* only used by SSE code */
-    FFTComplex *tmp_buf;
-    void (*fft_permute)(struct FFTContext *s, FFTComplex *z);
-    void (*fft_calc)(const struct FFTContext *s, FFTComplex *z);
-    int split_radix;
-    int permutation;
+	int nbits;
+	int inverse;
+	uint16_t* revtab;
+	FFTComplex* exptab;
+	FFTComplex* exptab1; /* only used by SSE code */
+	FFTComplex* tmp_buf;
+	void (*fft_permute)(struct FFTContext* s, FFTComplex* z);
+	void (*fft_calc)(const struct FFTContext* s, FFTComplex* z);
+	int split_radix;
+	int permutation;
 #define FF_MDCT_PERM_NONE       0
 #define FF_MDCT_PERM_INTERLEAVE 1
 } FFTContext;
@@ -102,9 +102,9 @@ extern FFTSample* const ff_cos_tabs[17];
 #define COSTABLE_CONST
 #define SINTABLE_CONST
 
-#define COSTABLE(size) COSTABLE_CONST FFTSample ff_cos_##size[size/2]
+#define COSTABLE(size) COSTABLE_CONST FFTSample ff_cos_##size[size / 2]
 
-#define SINTABLE(size) SINTABLE_CONST FFTSample ff_sin_##size[size/2]
+#define SINTABLE(size) SINTABLE_CONST FFTSample ff_sin_##size[size / 2]
 
 extern COSTABLE(16);
 extern COSTABLE(32);
@@ -145,59 +145,59 @@ extern SINTABLE(65536);
  * @param nbits           log2 of the length of the input array
  * @param inverse         if 0 perform the forward transform, if 1 perform the inverse
  */
-int ff_fft_init(FFTContext *s, int nbits, int inverse);
-void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
-void ff_fft_calc_c(const FFTContext *s, FFTComplex *z);
+int ff_fft_init(FFTContext* s, int nbits, int inverse);
+void ff_fft_permute_c(FFTContext* s, FFTComplex* z);
+void ff_fft_calc_c(const FFTContext* s, FFTComplex* z);
 
 /**
  * Do the permutation needed BEFORE calling ff_fft_calc().
  */
-static inline void ff_fft_permute(FFTContext *s, FFTComplex *z)
+static inline void ff_fft_permute(FFTContext* s, FFTComplex* z)
 {
-    s->fft_permute(s, z);
+	s->fft_permute(s, z);
 }
 /**
  * Do a complex FFT with the parameters defined in ff_fft_init(). The
  * input data must be permuted before. No 1.0/sqrt(n) normalization is done.
  */
-static inline void ff_fft_calc(const FFTContext *s, FFTComplex *z)
+static inline void ff_fft_calc(const FFTContext* s, FFTComplex* z)
 {
-    s->fft_calc(s, z);
+	s->fft_calc(s, z);
 }
-void ff_fft_end(FFTContext *s);
+void ff_fft_end(FFTContext* s);
 
 /**
  * Generate a sine window.
  * @param   window  pointer to half window
  * @param   n       size of half window
  */
-void ff_sine_window_init(float *window, int n);
-extern float ff_sine_128 [ 128];
-extern float ff_sine_256 [ 256];
-extern float ff_sine_512 [ 512];
+void ff_sine_window_init(float* window, int n);
+extern float ff_sine_128[128];
+extern float ff_sine_256[256];
+extern float ff_sine_512[512];
 extern float ff_sine_1024[1024];
 extern float ff_sine_2048[2048];
 extern float ff_sine_4096[4096];
-extern float * const ff_sine_windows[6];
+extern float* const ff_sine_windows[6];
 
 /* Real Discrete Fourier Transform */
 
 enum RDFTransformType {
-    RDFT,
-    IRDFT,
-    RIDFT,
-    IRIDFT
+	RDFT,
+	IRDFT,
+	RIDFT,
+	IRIDFT
 };
 
 typedef struct {
-    int nbits;
-    int inverse;
-    int sign_convention;
+	int nbits;
+	int inverse;
+	int sign_convention;
 
-    /* pre/post rotation tables */
-    FFTSample *tcos;
-    FFTSample *tsin;
-    FFTContext fft;
+	/* pre/post rotation tables */
+	FFTSample* tcos;
+	FFTSample* tsin;
+	FFTContext fft;
 } RDFTContext;
 
 /**
@@ -205,17 +205,17 @@ typedef struct {
  * @param nbits           log2 of the length of the input array
  * @param trans           the type of transform
  */
-int ff_rdft_init(RDFTContext *s, int nbits, enum RDFTransformType trans);
-void ff_rdft_calc(RDFTContext *s, FFTSample *data);
-void ff_rdft_end(RDFTContext *s);
+int ff_rdft_init(RDFTContext* s, int nbits, enum RDFTransformType trans);
+void ff_rdft_calc(RDFTContext* s, FFTSample* data);
+void ff_rdft_end(RDFTContext* s);
 
 /* Discrete Cosine Transform */
 
 typedef struct {
-    int nbits;
-    int inverse;
-    FFTComplex *data;
-    FFTContext fft;
+	int nbits;
+	int inverse;
+	FFTComplex* data;
+	FFTContext fft;
 } DCTContext;
 
 /**
@@ -223,8 +223,8 @@ typedef struct {
  * @param nbits           log2 of the length of the input array
  * @param inverse         >0 forward transform, <0 inverse transform
  */
-int ff_dct_init(DCTContext *s, int nbits, int inverse);
-void ff_dct_calc(DCTContext *s, FFTSample *data);
-void ff_dct_end(DCTContext *s);
+int ff_dct_init(DCTContext* s, int nbits, int inverse);
+void ff_dct_calc(DCTContext* s, FFTSample* data);
+void ff_dct_end(DCTContext* s);
 
 #endif /* AVCODEC_DSPUTIL_H */

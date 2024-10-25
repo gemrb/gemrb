@@ -22,7 +22,6 @@
 #define CHUIMPORTER_H
 
 #include "GUI/GUIFactory.h"
-
 #include "Streams/DataStream.h"
 
 namespace GemRB {
@@ -35,6 +34,7 @@ class CHUImporter : public GUIFactory {
 	ieDword WindowCount = 0;
 	ieDword CTOffset = 0;
 	ieDword WEOffset = 0;
+
 public:
 	/** Returns the number of available windows */
 	unsigned int GetWindowsCount() const override;

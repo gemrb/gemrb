@@ -24,18 +24,19 @@
  * default memory allocator for libavutil
  */
 
+#include "common.h"
+
 #include <climits>
 #include <cstdlib>
 #include <cstring>
-#include "common.h"
 
 /* You can redefine av_malloc and av_free in your project to use your
    memory allocator. You do not need to suppress this file because the
    linker will do it automatically. */
 
-void *av_malloc(unsigned int size)
+void* av_malloc(unsigned int size)
 {
-	void *ptr = NULL;
+	void* ptr = NULL;
 
 	/* let's disallow possibly ambiguous cases */
 	if (size > (INT_MAX - 16) || !size)
@@ -50,22 +51,22 @@ void *av_malloc(unsigned int size)
 	ptr = memalign(16, size);
 #else
 	ptr = malloc(size + 16);
-	if(!ptr)
+	if (!ptr)
 		return ptr;
-	long diff = ((-(size_t)ptr - 1) & 15) + 1;
-	ptr = (char*)ptr + diff;
-	((char*)ptr)[-1] = diff;
+	long diff = ((-(size_t) ptr - 1) & 15) + 1;
+	ptr = (char*) ptr + diff;
+	((char*) ptr)[-1] = diff;
 #endif
 
 	return ptr;
 }
 
-void av_free(void *ptr)
+void av_free(void* ptr)
 {
 	/* XXX: this test should not be needed on most libcs */
 	if (ptr)
 #if !defined(HAVE_POSIX_MEMALIGN) && !defined(HAVE_ALIGNED_MALLOC) && !defined(HAVE_MEMALIGN)
-		free((char*)ptr - ((char*)ptr)[-1]);
+		free((char*) ptr - ((char*) ptr)[-1]);
 #elif HAVE_ALIGNED_MALLOC
 		_aligned_free(ptr);
 #else
@@ -73,7 +74,7 @@ void av_free(void *ptr)
 #endif
 }
 
-void av_freep(void **arg)
+void av_freep(void** arg)
 {
 	av_free(*arg);
 	*arg = NULL;

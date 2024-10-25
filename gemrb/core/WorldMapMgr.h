@@ -29,6 +29,7 @@
 
 #include "Plugin.h"
 #include "WorldMap.h"
+
 #include "Streams/DataStream.h"
 
 namespace GemRB {
@@ -43,8 +44,8 @@ public:
 	virtual bool Open(DataStream* stream1, DataStream* stream2) = 0;
 	virtual WorldMapArray* GetWorldMapArray() const = 0;
 
-	virtual int GetStoredFileSize(WorldMapArray *wmap, unsigned int index) = 0;
-	virtual int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray *wmap) const = 0;
+	virtual int GetStoredFileSize(WorldMapArray* wmap, unsigned int index) = 0;
+	virtual int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray* wmap) const = 0;
 };
 
 }

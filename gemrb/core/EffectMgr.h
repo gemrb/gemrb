@@ -30,6 +30,7 @@
 
 #include "Effect.h"
 #include "Plugin.h"
+
 #include "Streams/DataStream.h"
 
 namespace GemRB {
@@ -47,7 +48,7 @@ public:
 	virtual Effect* GetEffectV1() = 0;
 	virtual Effect* GetEffectV20() = 0;
 	/** Fills the stream with Effect v2 data loaded from the effect*/
-	virtual void PutEffectV2(DataStream *stream, const Effect *fx) = 0;
+	virtual void PutEffectV2(DataStream* stream, const Effect* fx) = 0;
 };
 
 }

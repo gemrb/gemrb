@@ -30,6 +30,7 @@
 
 #include "Control.h"
 #include "ScrollView.h"
+
 #include "Video/Video.h"
 
 #include <set>
@@ -47,19 +48,20 @@ class WindowManager;
 
 using WindowActionResponder = View::ActionResponder<Window*>;
 
-class GEM_EXPORT Window : public ScrollView, public WindowActionResponder {
+class GEM_EXPORT Window : public ScrollView,
+			  public WindowActionResponder {
 public:
 	// !!! Keep these synchronized with GUIDefines.py !!!
 	enum WindowPosition {
-		PosTop = 1,		// top
-		PosBottom = 2,	// bottom
-		PosVmid = 3,	// top + bottom = vmid
-		PosLeft = 4,	// left
-		PosRight = 8,	// right
-		PosHmid = 12,	// left + right = hmid
-		PosCentered = 15// top + bottom + left + right = center
+		PosTop = 1, // top
+		PosBottom = 2, // bottom
+		PosVmid = 3, // top + bottom = vmid
+		PosLeft = 4, // left
+		PosRight = 8, // right
+		PosHmid = 12, // left + right = hmid
+		PosCentered = 15 // top + bottom + left + right = center
 	};
-	
+
 	// Colors of modal window shadow
 	// !!! Keep these synchronized with GUIDefines.py !!!
 	enum class ModalShadow {
@@ -70,21 +72,21 @@ public:
 	ModalShadow modalShadow = ModalShadow::None;
 
 	enum WindowFlags {
-		Draggable = 1,			// window can be dragged (by clicking anywhere in its frame) a la PST radial menu
-		Borderless = 2,			// window will not draw the ornate borders (see WindowManager::DrawWindows)
-		DestroyOnClose = 4,		// window will be deleted on close rather then hidden and sent to the back
-		AlphaChannel = 8,		// Create window with RGBA buffer suitable for creating non rectangular windows
+		Draggable = 1, // window can be dragged (by clicking anywhere in its frame) a la PST radial menu
+		Borderless = 2, // window will not draw the ornate borders (see WindowManager::DrawWindows)
+		DestroyOnClose = 4, // window will be deleted on close rather then hidden and sent to the back
+		AlphaChannel = 8, // Create window with RGBA buffer suitable for creating non rectangular windows
 		Modal = 16,
-		NoSounds = 32			// doesn't play the open/close sounds
+		NoSounds = 32 // doesn't play the open/close sounds
 	};
-	
+
 	enum Action : WindowActionResponder::Action {
 		// !!! Keep these synchronized with GUIDefines.py !!!
 		Closed = 0,
 		GainedFocus = 1,
 		LostFocus = 2
 	};
-	
+
 	using WindowEventHandler = WindowActionResponder::Responder;
 
 private:
@@ -95,7 +97,7 @@ private:
 
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 	void SizeChanged(const Size&) override;
-	
+
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	void DrawAfterSubviews(const Region& /*drawFrame*/, const Region& /*clip*/) override;
@@ -111,16 +113,16 @@ private:
 	inline void DispatchTouchDown(View*, const TouchEvent& te, unsigned short /*Mod*/);
 	inline void DispatchTouchUp(View*, const TouchEvent& te, unsigned short /*Mod*/);
 	inline void DispatchTouchGesture(View*, const GestureEvent& gesture);
-	
+
 	inline bool DispatchKey(View*, const Event&);
-	
+
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
-	
+
 	bool OnMouseDrag(const MouseEvent&) override;
 	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
-	
+
 	bool OnControllerButtonDown(const ControllerEvent& ce) override;
-	
+
 	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
 public:
@@ -129,7 +131,7 @@ public:
 	void Close();
 	void Focus();
 	bool DisplayModal(ModalShadow = ModalShadow::None);
-	
+
 	void FocusLost();
 	void FocusGained();
 	bool HasFocus() const;
@@ -150,15 +152,15 @@ public:
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
 	bool UnRegisterHotKeyCallback(const EventMgr::EventCallback&, KeyboardKey key);
-	
-	bool IsOpaque() const override { return (Flags()&AlphaChannel) == 0; }
+
+	bool IsOpaque() const override { return (Flags() & AlphaChannel) == 0; }
 	bool HitTest(const Point& p) const override;
 
 	bool InActionHandler() const;
 	void SetAction(Responder handler, const ActionKey& key) override;
 	bool PerformAction(const ActionKey& action) override;
 	bool SupportsAction(const ActionKey& action) override;
-	
+
 private: // Private attributes
 	using KeyMap = std::map<KeyboardKey, EventMgr::EventCallback>;
 
@@ -168,14 +170,14 @@ private: // Private attributes
 	View* focusView = nullptr; // keyboard focus
 	View* trackingView = nullptr; // out of bounds mouse tracking
 	View* hoverView = nullptr; // view the mouse was last over
-	
+
 	Point dragOrigin;
 	UniqueDragOp drag;
 	tick_t lastMouseMoveTime;
 
 	VideoBufferPtr backBuffer = nullptr;
 	WindowManager& manager;
-	
+
 	WindowEventHandler eventHandlers[3];
 };
 

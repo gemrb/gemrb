@@ -50,17 +50,17 @@ enum class WMPDirection : uint8_t {
 };
 
 /** Area is visible on WorldMap */
-#define WMP_ENTRY_VISIBLE    0x1
+#define WMP_ENTRY_VISIBLE 0x1
 /** Area is visible on WorldMap only when party is in adjacent area */
-#define WMP_ENTRY_ADJACENT   0x2
+#define WMP_ENTRY_ADJACENT 0x2
 /** Area can be travelled into from WorldMap */
 #define WMP_ENTRY_ACCESSIBLE 0x4
 /** Area has already been visited by party */
-#define WMP_ENTRY_VISITED    0x8
+#define WMP_ENTRY_VISITED 0x8
 /** Area can be travelled into from WorldMap */
-#define WMP_ENTRY_WALKABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE)
+#define WMP_ENTRY_WALKABLE (WMP_ENTRY_VISIBLE | WMP_ENTRY_ACCESSIBLE)
 /** Area can be passed through when travelling directly to some more distant area on WorldMap */
-#define WMP_ENTRY_PASSABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED)
+#define WMP_ENTRY_PASSABLE (WMP_ENTRY_VISIBLE | WMP_ENTRY_ACCESSIBLE | WMP_ENTRY_VISITED)
 
 
 /**
@@ -75,11 +75,12 @@ public:
 	void SetAreaStatus(ieDword status, BitOp op);
 
 	//! return the map icon of this location. Free the sprite afterwards.
-	Holder<Sprite2D> GetMapIcon(const AnimationFactory *bam);
+	Holder<Sprite2D> GetMapIcon(const AnimationFactory* bam);
 	// note that this is only valid after GetMapIcon has been called
 	bool HighlightSelected() const { return SingleFrame; }
 	String GetCaption();
 	String GetTooltip();
+
 private:
 	ieDword AreaStatus = 0;
 	Holder<Sprite2D> MapIcon = nullptr;
@@ -133,6 +134,7 @@ public: //struct members
 	ieDword Flags = 0;
 
 	std::shared_ptr<AnimationFactory> bam;
+
 private: //non-struct members
 	Holder<Sprite2D> MapMOS = nullptr;
 	std::vector<WMPAreaEntry> area_entries;
@@ -140,6 +142,7 @@ private: //non-struct members
 	std::vector<int> Distances;
 	std::vector<int> GotHereFrom;
 	size_t encounterArea = -1;
+
 public:
 	WorldMap() noexcept = default;
 
@@ -147,13 +150,13 @@ public:
 	Holder<Sprite2D> GetMapMOS() const { return MapMOS; }
 	void SetMapMOS(Holder<Sprite2D> newmos);
 	int GetEntryCount() const { return (int) area_entries.size(); }
-	WMPAreaEntry *GetEntry(unsigned int index) { return &area_entries[index]; }
-	const WMPAreaEntry *GetEntry(unsigned int index) const { return &area_entries[index]; }
+	WMPAreaEntry* GetEntry(unsigned int index) { return &area_entries[index]; }
+	const WMPAreaEntry* GetEntry(unsigned int index) const { return &area_entries[index]; }
 	int GetLinkCount() const { return (int) area_links.size(); }
-	const WMPAreaLink *GetLink(unsigned int index) const { return &area_links[index]; }
+	const WMPAreaLink* GetLink(unsigned int index) const { return &area_links[index]; }
 	void SetAreaEntry(unsigned int index, WMPAreaEntry&& areaentry);
 	void InsertAreaLink(size_t idx, WMPDirection dir, WMPAreaLink&& arealink);
-	void SetAreaLink(unsigned int index, const WMPAreaLink *arealink);
+	void SetAreaLink(unsigned int index, const WMPAreaLink* arealink);
 	void AddAreaEntry(WMPAreaEntry&& ae);
 	void AddAreaLink(WMPAreaLink&& al);
 	/** Calculates the distances from A, call this when first on an area */
@@ -161,10 +164,10 @@ public:
 	/** Returns the precalculated distance to area B */
 	int GetDistance(const ResRef& A) const;
 	/** Returns the link between area A and area B */
-	WMPAreaLink *GetLink(const ResRef& A, const ResRef& B);
+	WMPAreaLink* GetLink(const ResRef& A, const ResRef& B);
 	/** Returns the area link we will fall into if we head in B direction */
 	/** If the area name differs it means we are in a random encounter */
-	WMPAreaLink *GetEncounterLink(const ResRef& B, bool &encounter);
+	WMPAreaLink* GetEncounterLink(const ResRef& B, bool& encounter);
 	/** Sets area status */
 	void SetAreaStatus(const ResRef&, int Bits, BitOp Op);
 	/** Gets area pointer and index from area name.
@@ -175,8 +178,9 @@ public:
 	const WMPAreaEntry* GetArea(const ResRef& areaName) const;
 	/** Finds an area name closest to the given area */
 	const WMPAreaEntry* FindNearestEntry(const ResRef& areaName) const;
-	void SetEncounterArea(const ResRef& area, const WMPAreaLink *link);
+	void SetEncounterArea(const ResRef& area, const WMPAreaLink* link);
 	void ClearEncounterArea();
+
 private:
 	/** updates visibility of adjacent areas, called from CalculateDistances */
 	void UpdateAreaVisibility(const ResRef& areaName, WMPDirection direction);
@@ -192,6 +196,7 @@ private:
 	mutable std::vector<WorldMap> maps; // FIXME: our constness is all screwed up
 	size_t CurrentMap = 0;
 	bool single = true;
+
 public:
 	explicit WorldMapArray(size_t count);
 
@@ -199,9 +204,9 @@ public:
 	void SetSingle(bool arg) { single = arg; }
 	size_t GetMapCount() const { return maps.size(); }
 	size_t GetCurrentMapIndex() const { return CurrentMap; }
-	WorldMap *NewWorldMap(size_t index);
-	WorldMap *GetWorldMap(size_t index) const { return &maps[index]; }
-	WorldMap *GetCurrentMap() const { return &maps[CurrentMap]; }
+	WorldMap* NewWorldMap(size_t index);
+	WorldMap* GetWorldMap(size_t index) const { return &maps[index]; }
+	WorldMap* GetCurrentMap() const { return &maps[CurrentMap]; }
 	void SetWorldMap(size_t index);
 	void SetCurrentMap(size_t index) { CurrentMap = index; }
 	size_t FindAndSetCurrentMap(const ResRef& area);

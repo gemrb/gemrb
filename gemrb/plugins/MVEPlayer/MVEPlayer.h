@@ -21,11 +21,10 @@
 #ifndef MVEPLAY_H
 #define MVEPLAY_H
 
-#include "MoviePlayer.h"
-
-#include "mve_player.h"
-
 #include "globals.h"
+
+#include "MoviePlayer.h"
+#include "mve_player.h"
 
 namespace GemRB {
 
@@ -48,8 +47,8 @@ private:
 	int setAudioStream() const;
 	void freeAudioStream(int stream) const;
 	void queueBuffer(int stream, unsigned short bits,
-				int channels, short* memory,
-				int size, int samplerate) const;
+			 int channels, short* memory,
+			 int size, int samplerate) const;
 
 protected:
 	bool DecodeFrame(VideoBuffer&) override;

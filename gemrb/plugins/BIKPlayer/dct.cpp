@@ -26,69 +26,69 @@
 
 #include "dsputil.h"
 
-av_cold int ff_dct_init(DCTContext *s, int nbits, int inverse)
+av_cold int ff_dct_init(DCTContext* s, int nbits, int inverse)
 {
-    int n = 1 << nbits;
+	int n = 1 << nbits;
 
-    s->nbits    = nbits;
-    s->inverse  = inverse;
+	s->nbits = nbits;
+	s->inverse = inverse;
 
-    s->data = (struct FFTComplex *) av_malloc(sizeof(FFTComplex) * 2 * n);
-    if (!s->data)
-        return -1;
+	s->data = (struct FFTComplex*) av_malloc(sizeof(FFTComplex) * 2 * n);
+	if (!s->data)
+		return -1;
 
-    if (ff_fft_init(&s->fft, nbits+1, inverse) < 0)
-        return -1;
+	if (ff_fft_init(&s->fft, nbits + 1, inverse) < 0)
+		return -1;
 
-    return 0;
+	return 0;
 }
 
-static void ff_dct_calc_c(DCTContext *s, FFTSample *data)
+static void ff_dct_calc_c(DCTContext* s, FFTSample* data)
 {
-    int n = 1<<s->nbits;
-    int i;
+	int n = 1 << s->nbits;
+	int i;
 
-#define ROTATE(i,n) (-M_PI*((n)-0.5f)*(i)/(n))
-    if (s->inverse) {
-        for(i=0; i < n; i++) {
-            s->data[i].re = (float) (2 * data[i] * std::cos(ROTATE(i, n)));
-            s->data[i].im = (float) (2 * data[i] * std::sin(ROTATE(i, n)));
-        }
-        s->data[n].re = 0;
-        s->data[n].im = 0;
-        for(i=0; i<n-1; i++) {
-            s->data[n+i+1].re = (float) (-2 * data[n - (i + 1)] * std::cos(ROTATE(n + i + 1, n)));
-            s->data[n+i+1].im = (float) (-2 * data[n - (i + 1)] * std::sin(ROTATE(n + i + 1, n)));
-        }
-    }else{
-        for(i=0; i < n; i++) {
-            s->data[i].re = data[n - (i+1)];
-            s->data[i].im = 0;
-            s->data[n+i].re = data[i];
-            s->data[n+i].im = 0;
-        }
-    }
+#define ROTATE(i, n) (-M_PI * ((n) - 0.5f) * (i) / (n))
+	if (s->inverse) {
+		for (i = 0; i < n; i++) {
+			s->data[i].re = (float) (2 * data[i] * std::cos(ROTATE(i, n)));
+			s->data[i].im = (float) (2 * data[i] * std::sin(ROTATE(i, n)));
+		}
+		s->data[n].re = 0;
+		s->data[n].im = 0;
+		for (i = 0; i < n - 1; i++) {
+			s->data[n + i + 1].re = (float) (-2 * data[n - (i + 1)] * std::cos(ROTATE(n + i + 1, n)));
+			s->data[n + i + 1].im = (float) (-2 * data[n - (i + 1)] * std::sin(ROTATE(n + i + 1, n)));
+		}
+	} else {
+		for (i = 0; i < n; i++) {
+			s->data[i].re = data[n - (i + 1)];
+			s->data[i].im = 0;
+			s->data[n + i].re = data[i];
+			s->data[n + i].im = 0;
+		}
+	}
 
-    ff_fft_permute(&s->fft, s->data);
-    ff_fft_calc(&s->fft, s->data);
+	ff_fft_permute(&s->fft, s->data);
+	ff_fft_calc(&s->fft, s->data);
 
-    if (s->inverse) {
-        for(i=0; i < n; i++)
-            data[i] = s->data[n-(i+1)].re / (2 * n);
-    }else {
-        for(i=0; i < n; i++)
-            data[i] =  (float) (s->data[i].re / (2 * std::cos(ROTATE(i, n))));
-    }
+	if (s->inverse) {
+		for (i = 0; i < n; i++)
+			data[i] = s->data[n - (i + 1)].re / (2 * n);
+	} else {
+		for (i = 0; i < n; i++)
+			data[i] = (float) (s->data[i].re / (2 * std::cos(ROTATE(i, n))));
+	}
 #undef ROTATE
 }
 
-void ff_dct_calc(DCTContext *s, FFTSample *data)
+void ff_dct_calc(DCTContext* s, FFTSample* data)
 {
-    ff_dct_calc_c(s, data);
+	ff_dct_calc_c(s, data);
 }
 
-av_cold void ff_dct_end(DCTContext *s)
+av_cold void ff_dct_end(DCTContext* s)
 {
-    ff_fft_end(&s->fft);
-    av_freep((void **) &s->data);
+	ff_fft_end(&s->fft);
+	av_freep((void**) &s->data);
 }

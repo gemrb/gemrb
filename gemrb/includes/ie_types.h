@@ -29,6 +29,7 @@
 #define IE_TYPES_H
 
 #include "Platform.h"
+
 #include "Strings/CString.h"
 #include "Strings/StringView.h"
 
@@ -49,12 +50,12 @@ using ieDwordSigned = int32_t;
 enum class ieStrRef : ieDword {
 	INVALID = ieDword(-1),
 	//the original games used these strings for custom biography (another quirk of the IE)
-	BIO_START = 62016,            //first BIO string
-	BIO_END   = (BIO_START + 5),  //last BIO string
+	BIO_START = 62016, //first BIO string
+	BIO_END = (BIO_START + 5), //last BIO string
 	OVERRIDE_START = 450000,
 	// not actually an ieStrRef, but can be &'ded with an ieStrRef to determine which TLK (eg dialogf.tlk) to use
 	ALTREF = 0x0100000,
-	
+
 	// NOTE: all strrefs below this point are contextual
 	// the names given match our hardcoded usage and shouldn't be expected to resolve to something sensical in all games
 	// consider adding trailing comments for which games they apply to
@@ -116,17 +117,19 @@ using ResRef = FixedSizeString<8, strnicmp>;
 
 using ieVarsMap = std::unordered_map<ieVariable, ieDword, CstrHashCI>;
 
-template <typename STR>
-inline bool IsStar(const STR& str) {
+template<typename STR>
+inline bool IsStar(const STR& str)
+{
 	return str[0] == '*';
 }
 
-inline ieVariable MakeVariable(const StringView& sv) {
+inline ieVariable MakeVariable(const StringView& sv)
+{
 	ieVariable var;
 	uint8_t count = var.Size - 1;
 	auto dest = var.begin();
 	auto source = sv.begin();
-	while(count-- && source != sv.end()) {
+	while (count-- && source != sv.end()) {
 		// TODO: we shouldnt call towlower here. ieVariable is case insensitive
 		// we probably should be calling WriteVariableLC in the writers instead
 		char c = std::towlower(*source++);
@@ -143,22 +146,24 @@ inline ieVariable MakeVariable(const StringView& sv) {
 // over our own format_as (I've also tried formatter and operator<<)
 namespace fmt {
 
-template <>
+template<>
 struct formatter<GemRB::ieVariable> : public fmt::formatter<const char*> {
-	template <typename FormatContext>
-	auto format(const GemRB::ieVariable& str, FormatContext &ctx) const -> decltype(ctx.out()) {
+	template<typename FormatContext>
+	auto format(const GemRB::ieVariable& str, FormatContext& ctx) const -> decltype(ctx.out())
+	{
 		return fmt::formatter<const char*>::format(str.c_str(), ctx);
 	}
 };
 
-template <>
+template<>
 struct formatter<GemRB::ResRef> : public fmt::formatter<const char*> {
-	template <typename FormatContext>
-	auto format(const GemRB::ResRef& str, FormatContext &ctx) const -> decltype(ctx.out()) {
+	template<typename FormatContext>
+	auto format(const GemRB::ResRef& str, FormatContext& ctx) const -> decltype(ctx.out())
+	{
 		return fmt::formatter<const char*>::format(str.c_str(), ctx);
 	}
 };
 
 }
 
-#endif  //! IE_TYPES_H
+#endif //! IE_TYPES_H

@@ -20,9 +20,9 @@
 
 #include "GameScript/GSUtils.h"
 
-#include "strrefs.h"
 #include "defsounds.h"
 #include "ie_feats.h"
+#include "strrefs.h"
 #include "voodooconst.h"
 
 #include "AmbientMgr.h"
@@ -36,18 +36,19 @@
 #include "Interface.h"
 #include "Item.h"
 #include "Map.h"
+#include "RNG.h"
+#include "ScriptedAnimation.h"
 #include "Spell.h"
 #include "StringMgr.h"
 #include "TableMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
 #include "WorldMap.h"
+
 #include "GUI/GameControl.h"
-#include "RNG.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
-#include "ScriptedAnimation.h"
 
 #include <cstdio>
 
@@ -79,9 +80,9 @@ int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
 int RandomNumValue;
 int NextTriggerObjectID;
-Gem_Polygon **polygons;
+Gem_Polygon** polygons;
 
-int GetReaction(const Actor *target, const Scriptable *Sender)
+int GetReaction(const Actor* target, const Scriptable* Sender)
 {
 	int reaction = 10;
 
@@ -119,7 +120,7 @@ ieWordSigned GetHappiness(const Scriptable* Sender, int reputation)
 		return 0;
 	}
 
-	int alignment = ab->GetStat(IE_ALIGNMENT)&AL_GE_MASK; //good / evil
+	int alignment = ab->GetStat(IE_ALIGNMENT) & AL_GE_MASK; //good / evil
 	// handle unset alignment
 	if (!alignment) {
 		alignment = AL_GE_NEUTRAL;
@@ -133,7 +134,7 @@ ieWordSigned GetHappiness(const Scriptable* Sender, int reputation)
 	return 0;
 }
 
-int GetHPPercent(const Scriptable *Sender)
+int GetHPPercent(const Scriptable* Sender)
 {
 	const Actor* ab = Scriptable::As<Actor>(Sender);
 	if (!ab) {
@@ -141,17 +142,17 @@ int GetHPPercent(const Scriptable *Sender)
 	}
 
 	int hp1 = ab->GetStat(IE_MAXHITPOINTS);
-	if (hp1<1) {
+	if (hp1 < 1) {
 		return 0;
 	}
 	int hp2 = ab->GetBase(IE_HITPOINTS);
-	if (hp2<1) {
+	if (hp2 < 1) {
 		return 0;
 	}
-	return hp2*100/hp1;
+	return hp2 * 100 / hp1;
 }
 
-void HandleBitMod(ieDword &value1, ieDword value2, BitOp opcode)
+void HandleBitMod(ieDword& value1, ieDword value2, BitOp opcode)
 {
 	SetBits(value1, value2, opcode);
 }
@@ -163,15 +164,15 @@ static const StringView spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "SP
 
 //this function handles the polymorphism of Spell[RES] actions
 //it returns spellres
-bool ResolveSpellName(ResRef& spellRes, const Action *parameters)
+bool ResolveSpellName(ResRef& spellRes, const Action* parameters)
 {
 	if (!parameters->resref0Parameter.IsEmpty()) {
 		spellRes = parameters->resref0Parameter;
 	} else {
 		//resolve spell
-		int type = parameters->int0Parameter/1000;
-		int spellid = parameters->int0Parameter%1000;
-		if (type>4) {
+		int type = parameters->int0Parameter / 1000;
+		int spellid = parameters->int0Parameter % 1000;
+		if (type > 4) {
 			return false;
 		}
 		spellRes.Format("{}{:03d}", spell_suffices[type], spellid);
@@ -182,10 +183,10 @@ bool ResolveSpellName(ResRef& spellRes, const Action *parameters)
 void ResolveSpellName(ResRef& spellRes, ieDword number)
 {
 	//resolve spell
-	unsigned int type = number/1000;
-	int spellid = number%1000;
-	if (type>4) {
-		type=0;
+	unsigned int type = number / 1000;
+	int spellid = number % 1000;
+	if (type > 4) {
+		type = 0;
 	}
 	spellRes.Format("{}{:03d}", spell_suffices[type], spellid);
 }
@@ -207,10 +208,10 @@ ieDword ResolveSpellNumber(const ResRef& spellRef)
 	return 0xffffffff;
 }
 
-bool ResolveItemName(ResRef& itemres, const Actor *act, ieDword Slot)
+bool ResolveItemName(ResRef& itemres, const Actor* act, ieDword Slot)
 {
-	const CREItem *itm = act->inventory.GetSlotItem(Slot);
-	if(itm) {
+	const CREItem* itm = act->inventory.GetSlotItem(Slot);
+	if (itm) {
 		itemres = itm->ItemResRef;
 		return gamedata->Exists(itemres, IE_ITM_CLASS_ID);
 	}
@@ -239,14 +240,14 @@ bool StoreHasItemCore(const ResRef& storename, const ResRef& itemname)
 
 	bool ret = false;
 	//don't use triggers (pst style), it would be possible to create infinite loops
-	if (store->FindItem(itemname, false) != (unsigned int)-1) {
-		ret=true;
+	if (store->FindItem(itemname, false) != (unsigned int) -1) {
+		ret = true;
 	}
 	// Don't call gamedata->SaveStore, we don't change it, and it remains cached.
 	return ret;
 }
 
-static bool StoreGetItemCore(CREItem &item, const ResRef& storename, const ResRef& itemname, unsigned int count)
+static bool StoreGetItemCore(CREItem& item, const ResRef& storename, const ResRef& itemname, unsigned int count)
 {
 	Store* store = gamedata->GetStore(storename);
 	if (!store) {
@@ -258,7 +259,7 @@ static bool StoreGetItemCore(CREItem &item, const ResRef& storename, const ResRe
 	unsigned int idx = store->FindItem(itemname, false);
 	if (idx == (unsigned int) -1) return false;
 
-	STOItem *si = store->GetItem(idx, false);
+	STOItem* si = store->GetItem(idx, false);
 	item.CopySTOItem(si);
 	if (item.MaxStackAmount) {
 		item.Usages[0] = count;
@@ -275,10 +276,10 @@ static bool StoreGetItemCore(CREItem &item, const ResRef& storename, const ResRe
 	return true;
 }
 
-void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
+void ClickCore(Scriptable* Sender, const MouseEvent& me, int speed)
 {
 	Point mp = me.Pos();
-	const Map *map = Sender->GetCurrentArea();
+	const Map* map = Sender->GetCurrentArea();
 	if (!map) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -290,10 +291,10 @@ void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 		return;
 	}
 	GlobalTimer& timer = core->timer;
-	timer.SetMoveViewPort( mp, speed, true );
+	timer.SetMoveViewPort(mp, speed, true);
 	timer.DoStep(0);
 	if (timer.ViewportIsMoving()) {
-		Sender->AddActionInFront( Sender->GetCurrentAction() );
+		Sender->AddActionInFront(Sender->GetCurrentAction());
 		Sender->SetWait(1);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -306,7 +307,7 @@ void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 	Sender->ReleaseCurrentAction();
 }
 
-void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::index_t value)
+void PlaySequenceCore(Scriptable* Sender, const Action* parameters, Animation::index_t value)
 {
 	Scriptable* tar;
 
@@ -314,11 +315,11 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::i
 		tar = GetScriptableFromObject(Sender, parameters);
 		if (!tar) {
 			//could be an animation
-			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectNameVar);
+			AreaAnimation* anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectNameVar);
 			if (anim) {
 				//set animation's cycle to parameters->int0Parameter;
-				anim->sequence=value;
-				anim->frame=0;
+				anim->sequence = value;
+				anim->frame = 0;
 				anim->animation.clear();
 				anim->InitAnimation();
 			}
@@ -346,7 +347,7 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::i
 	// it should play out the sequence once and stop
 	// does not reset the stance back once done; if the stance doesn't autotransition,
 	// the actor will remain in the same one (eg. IE_ANI_DIE, IE_ANI_TWITCH, 17/IE_ANI_GET_UP)
-	actor->SetStance( value );
+	actor->SetStance(value);
 
 	// return at least until we fix the extra stance ids
 	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) return;
@@ -363,11 +364,11 @@ void PlaySequenceCore(Scriptable *Sender, const Action *parameters, Animation::i
 	actor->SetWait(duration);
 }
 
-void TransformItemCore(Actor *actor, const Action *parameters, bool onlyone)
+void TransformItemCore(Actor* actor, const Action* parameters, bool onlyone)
 {
 	int i = actor->inventory.GetSlotCount();
-	while(i--) {
-		const CREItem *item = actor->inventory.GetSlotItem(i);
+	while (i--) {
+		const CREItem* item = actor->inventory.GetSlotItem(i);
 		if (!item) {
 			continue;
 		}
@@ -382,19 +383,19 @@ void TransformItemCore(Actor *actor, const Action *parameters, bool onlyone)
 }
 
 //check if an inventory (container or actor) has item (could be recursive ?)
-bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword flags)
+bool HasItemCore(const Inventory* inventory, const ResRef& itemname, ieDword flags)
 {
 	if (itemname.IsEmpty()) return false;
 	if (inventory->HasItem(itemname, flags)) {
 		return true;
 	}
-	int i=inventory->GetSlotCount();
+	int i = inventory->GetSlotCount();
 	while (i--) {
 		//maybe we could speed this up if we mark bag items with a flags bit
-		const CREItem *itemslot = inventory->GetSlotItem(i);
+		const CREItem* itemslot = inventory->GetSlotItem(i);
 		if (!itemslot)
 			continue;
-		const Item *item = gamedata->GetItem(itemslot->ItemResRef);
+		const Item* item = gamedata->GetItem(itemslot->ItemResRef);
 		if (!item)
 			continue;
 		bool ret = false;
@@ -424,15 +425,15 @@ bool RemoveStoreItem(const ResRef& storeName, const ResRef& itemName, ieDword co
 }
 
 //finds and takes an item from a container in the given inventory
-static bool GetItemContainer(CREItem &itemslot2, const Inventory *inventory, const ResRef& itemname, int count)
+static bool GetItemContainer(CREItem& itemslot2, const Inventory* inventory, const ResRef& itemname, int count)
 {
-	int i=inventory->GetSlotCount();
+	int i = inventory->GetSlotCount();
 	while (i--) {
 		//maybe we could speed this up if we mark bag items with a flags bit
-		const CREItem *itemslot = inventory->GetSlotItem(i);
+		const CREItem* itemslot = inventory->GetSlotItem(i);
 		if (!itemslot)
 			continue;
-		const Item *item = gamedata->GetItem(itemslot->ItemResRef);
+		const Item* item = gamedata->GetItem(itemslot->ItemResRef);
 		if (!item)
 			continue;
 		bool ret = core->CheckItemType(item, SLOT_BAG);
@@ -455,7 +456,7 @@ void DisplayStringCoreVC(Scriptable* Sender, Verbal vc, int flags)
 	}
 
 	Log(MESSAGE, "GameScript", "Displaying string on: {}", Sender->GetScriptName());
-	
+
 	ieStrRef Strref = ieStrRef::INVALID;
 	flags |= DS_CONST;
 
@@ -472,7 +473,7 @@ void DisplayStringCoreVC(Scriptable* Sender, Verbal vc, int flags)
 		actor->GetVerbalConstantSound(soundRef, vc, flags & DS_RESOLVED);
 		std::string sound;
 		if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
-			sound = fmt::format("{}{}{}", fmt::WideToChar{actor->PCStats->SoundFolder}, PathDelimiter, soundRef);
+			sound = fmt::format("{}{}{}", fmt::WideToChar { actor->PCStats->SoundFolder }, PathDelimiter, soundRef);
 		} else {
 			sound = soundRef.c_str();
 		}
@@ -516,7 +517,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 			if (flags & DS_CONSOLE) {
 				//can't play the sound here, we have to delay action
 				//and for that, we have to know how long the text takes
-				if(flags&DS_NONAME) {
+				if (flags & DS_NONAME) {
 					displaymsg->DisplayString(sb.text);
 				} else {
 					// Default color is white, color for party is different.
@@ -551,7 +552,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 			soundFlags |= GEM_SND_SPATIAL;
 		}
 
-		if (flags&DS_QUEUE) soundFlags |= GEM_SND_QUEUE;
+		if (flags & DS_QUEUE) soundFlags |= GEM_SND_QUEUE;
 
 		SFXChannel channel = SFXChannel::Dialog;
 		if (flags & DS_CONST && actor) {
@@ -561,7 +562,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 				channel = SFXChannel::Monster;
 			}
 		}
-		
+
 		tick_t len = 0;
 		core->GetAudioDrv()->Play(StringView(soundpath), channel, pos, soundFlags, &len);
 		tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
@@ -570,33 +571,33 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 			actor->SetAnimatedTalking(len);
 		}
 
-		if ((counter != 0) && (flags &DS_WAIT) )
-			Sender->SetWait( counter );
+		if ((counter != 0) && (flags & DS_WAIT))
+			Sender->SetWait(counter);
 	}
 }
 
-int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int seeflag, bool halveRange)
+int CanSee(const Scriptable* Sender, const Scriptable* target, bool range, int seeflag, bool halveRange)
 {
-	if (target->Type==ST_ACTOR) {
-		const Actor *tar = static_cast<const Actor*>(target);
+	if (target->Type == ST_ACTOR) {
+		const Actor* tar = static_cast<const Actor*>(target);
 
 		if (!tar->ValidTarget(seeflag, Sender)) {
 			return 0;
 		}
 	}
 
-	const Map *map = target->GetCurrentArea();
+	const Map* map = target->GetCurrentArea();
 	//if (!(seeflag&GA_GLOBAL)) {
-		if (!map || map!=Sender->GetCurrentArea() ) {
-			return 0;
-		}
+	if (!map || map != Sender->GetCurrentArea()) {
+		return 0;
+	}
 	//}
 
 	if (range) {
 		unsigned int dist;
 		bool los = true;
 		if (Sender->Type == ST_ACTOR) {
-			const Actor *snd = static_cast<const Actor*>(Sender);
+			const Actor* snd = static_cast<const Actor*>(Sender);
 			dist = snd->Modified[IE_VISUALRANGE];
 			if (halveRange) dist /= 2;
 		} else {
@@ -638,7 +639,7 @@ int SeeCore(Scriptable* Sender, const Trigger* parameters, int extraFlags)
 	}
 
 	//both are actors
-	if (CanSee(Sender, tar, true, flags) ) {
+	if (CanSee(Sender, tar, true, flags)) {
 		if (extraFlags & 1) { // just LOS
 			Sender->objects.LastTrigger = tar->GetGlobalID();
 			return 1;
@@ -662,8 +663,8 @@ int SeeCore(Scriptable* Sender, const Trigger* parameters, int extraFlags)
 //if target can't get it, it will be dropped at its feet
 MIC MoveItemCore(Scriptable* Sender, Scriptable* target, const ResRef& resref, int flags, int setflag, int count)
 {
-	Inventory *myinv;
-	Map *map;
+	Inventory* myinv;
+	Map* map;
 	// track whether we are dealing with our party and need to display feedback
 	bool lostitem = false;
 	bool gotitem = false;
@@ -671,21 +672,21 @@ MIC MoveItemCore(Scriptable* Sender, Scriptable* target, const ResRef& resref, i
 	if (!target) {
 		return MIC::Invalid;
 	}
-	map=Sender->GetCurrentArea();
+	map = Sender->GetCurrentArea();
 	Actor* tmp = nullptr;
-	switch(Sender->Type) {
+	switch (Sender->Type) {
 		case ST_ACTOR:
 			tmp = Scriptable::As<Actor>(Sender);
 			myinv = &tmp->inventory;
 			if (tmp->InParty) lostitem = true;
 			break;
 		case ST_CONTAINER:
-			myinv=&((Container *) Sender)->inventory;
+			myinv = &((Container*) Sender)->inventory;
 			break;
 		default:
 			return MIC::Invalid;
 	}
-	CREItem *item;
+	CREItem* item;
 	myinv->RemoveItem(resref, flags, &item, count);
 
 	//there was no item in the inventory itself, try with containers in the inventory
@@ -704,9 +705,9 @@ MIC MoveItemCore(Scriptable* Sender, Scriptable* target, const ResRef& resref, i
 		return MIC::NoItem;
 	}
 
-	item->Flags|=setflag;
+	item->Flags |= setflag;
 	Actor* targetActor = Scriptable::As<Actor>(target);
-	switch(target->Type) {
+	switch (target->Type) {
 		case ST_ACTOR:
 			if (targetActor->GetBase(IE_EA) == EA_FAMILIAR) {
 				targetActor = core->GetGame()->FindPC(1);
@@ -715,7 +716,7 @@ MIC MoveItemCore(Scriptable* Sender, Scriptable* target, const ResRef& resref, i
 			if (targetActor->InParty) gotitem = true;
 			break;
 		case ST_CONTAINER:
-			myinv=&((Container *) target)->inventory;
+			myinv = &((Container*) target)->inventory;
 			break;
 		default:
 			myinv = NULL;
@@ -729,7 +730,7 @@ MIC MoveItemCore(Scriptable* Sender, Scriptable* target, const ResRef& resref, i
 		delete item;
 		return MIC::GotItem; // actually it was lost, not gained
 	}
-	if ( myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) !=ASI_SUCCESS) {
+	if (myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) != ASI_SUCCESS) {
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
 		if (gotitem) {
@@ -746,17 +747,17 @@ MIC MoveItemCore(Scriptable* Sender, Scriptable* target, const ResRef& resref, i
 	return MIC::GotItem;
 }
 
-void PolymorphCopyCore(const Actor *src, Actor *tar)
+void PolymorphCopyCore(const Actor* src, Actor* tar)
 {
-	tar->SetBase(IE_ANIMATION_ID, src->GetStat(IE_ANIMATION_ID) );
+	tar->SetBase(IE_ANIMATION_ID, src->GetStat(IE_ANIMATION_ID));
 
-	tar->SetBase(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE) );
-	for (int i=0;i<7;i++) {
-		tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
+	tar->SetBase(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE));
+	for (int i = 0; i < 7; i++) {
+		tar->SetBase(IE_COLORS + i, src->GetStat(IE_COLORS + i));
 	}
 
 	tar->SetName(src->GetShortName(), 0);
-	tar->SetName(src->GetName(),1);
+	tar->SetName(src->GetName(), 1);
 	//add more attribute copying
 }
 
@@ -812,7 +813,7 @@ static Point FindOffScreenPoint(const Scriptable* Sender, int flags, int phase)
 	int currentStep = RAND(0, 3);
 	int slowlyIncrements = 0;
 
-	const Map *map = Sender->GetCurrentArea();
+	const Map* map = Sender->GetCurrentArea();
 	Point walkableStartPoint;
 	Point walkableGoal;
 	if (flags & CC_OBJECT) {
@@ -877,7 +878,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	if (!ab) {
 		Log(ERROR, "GameScript", "Failed to create creature! (missing creature file {}?)",
-			parameters->string0Parameter);
+		    parameters->string0Parameter);
 		// maybe this should abort()?
 		return;
 	}
@@ -890,7 +891,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 
 	Point pnt;
-	const Scriptable *referer = Sender;
+	const Scriptable* referer = Sender;
 
 	switch (flags & CC_MASK) {
 		//creates creature just off the screen
@@ -902,10 +903,10 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 				pnt = FindOffScreenPoint(referer, flags, 1);
 			}
 			break;
-		case CC_OBJECT://use object + offset
-			if (tmp) Sender=tmp;
+		case CC_OBJECT: //use object + offset
+			if (tmp) Sender = tmp;
 			//fall through
-		case CC_OFFSET://use sender + offset
+		case CC_OFFSET: //use sender + offset
 			pnt = parameters->pointParameter + Sender->Pos;
 			break;
 		default: //absolute point, but -1,-1 means AtFeet
@@ -920,14 +921,14 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 			break;
 	}
 
-	Map *map = Sender->GetCurrentArea();
+	Map* map = Sender->GetCurrentArea();
 	map->AddActor(ab, true);
 	ab->SetPosition(pnt, flags & CC_CHECK_IMPASSABLE);
 	ab->SetOrientation(ClampToOrientation(parameters->int0Parameter), false);
 
 	// also set it as Sender's LastMarkedObject (fixes worg rider dismount killing players)
 	if (Sender->Type == ST_ACTOR) {
-		Actor *actor = static_cast<Actor*>(Sender);
+		Actor* actor = static_cast<Actor*>(Sender);
 		actor->objects.LastMarked = ab->GetGlobalID();
 	}
 
@@ -940,11 +941,11 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 
 	if (flags & CC_COPY) {
-		PolymorphCopyCore((const Actor *) tmp, ab);
+		PolymorphCopyCore((const Actor*) tmp, ab);
 	}
 }
 
-static ScriptedAnimation *GetVVCEffect(const ResRef& effect, int iterations)
+static ScriptedAnimation* GetVVCEffect(const ResRef& effect, int iterations)
 {
 	if (effect.IsEmpty()) {
 		return nullptr;
@@ -965,15 +966,15 @@ static ScriptedAnimation *GetVVCEffect(const ResRef& effect, int iterations)
 
 void CreateVisualEffectCore(Actor* target, const ResRef& effect, int iterations)
 {
-	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
+	ScriptedAnimation* vvc = GetVVCEffect(effect, iterations);
 	if (vvc) {
-		target->AddVVCell( vvc );
+		target->AddVVCell(vvc);
 	}
 }
 
 void CreateVisualEffectCore(const Scriptable* Sender, const Point& position, const ResRef& effect, int iterations)
 {
-	Map *area = Sender->GetCurrentArea();
+	Map* area = Sender->GetCurrentArea();
 	if (!area) {
 		Log(WARNING, "GSUtils", "Skipping visual effect positioning due to missing area!");
 		return;
@@ -997,7 +998,7 @@ void ChangeAnimationCore(Actor* src, const ResRef& replacement, bool effect)
 {
 	Actor* tar = gamedata->GetCreature(replacement);
 	if (tar) {
-		Map *map = src->GetCurrentArea();
+		Map* map = src->GetCurrentArea();
 		Point pos = src->Pos;
 		// make sure to copy the HP, to avoid things like magically-healing trolls
 		tar->BaseStats[IE_HITPOINTS] = src->BaseStats[IE_HITPOINTS];
@@ -1020,8 +1021,8 @@ static bool NearEdge(const Scriptable* escapee)
 
 void EscapeAreaCore(Scriptable* Sender, const Point& p, const ResRef& area, const Point& enter, EscapeArea flags, int wait)
 {
-	if (Sender->CurrentActionTicks<100) {
-		if (!p.IsInvalid() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
+	if (Sender->CurrentActionTicks < 100) {
+		if (!p.IsInvalid() && PersonalDistance(p, Sender) > MAX_OPERATING_DISTANCE) {
 			//MoveNearerTo will return 0, if the actor is in move
 			//it will return 1 (the fourth parameter) if the target is unreachable
 			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE, 1) && !NearEdge(Sender)) {
@@ -1051,22 +1052,25 @@ void EscapeAreaCore(Scriptable* Sender, const Point& p, const ResRef& area, cons
 		Sender->SetWait(wait);
 	}
 	Sender->ReleaseCurrentAction();
-	Action * action = GenerateAction(std::move(Tmp));
-	Sender->AddActionInFront( action );
+	Action* action = GenerateAction(std::move(Tmp));
+	Sender->AddActionInFront(action);
 }
 
-static void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
+static void GetTalkPositionFromScriptable(Scriptable* scr, Point& position)
 {
 	const InfoPoint* ip;
 	switch (scr->Type) {
-		case ST_AREA: case ST_GLOBAL:
+		case ST_AREA:
+		case ST_GLOBAL:
 			position = scr->Pos; //fake
 			break;
 		case ST_ACTOR:
 			//if there are other moveables, put them here
-			position = ((Movable *) scr)->GetMostLikelyPosition();
+			position = ((Movable*) scr)->GetMostLikelyPosition();
 			break;
-		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+		case ST_TRIGGER:
+		case ST_PROXIMITY:
+		case ST_TRAVEL:
 			ip = Scriptable::As<InfoPoint>(scr);
 			if (ip->GetUsePoint()) {
 				position = ip->UsePoint;
@@ -1074,7 +1078,8 @@ static void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 			}
 			position = ip->TalkPos;
 			break;
-		case ST_DOOR: case ST_CONTAINER:
+		case ST_DOOR:
+		case ST_CONTAINER:
 			position = static_cast<Highlightable*>(scr)->TrapLaunch;
 			break;
 		default: // ST_ANY
@@ -1082,7 +1087,7 @@ static void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 	}
 }
 
-void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest)
+void GetPositionFromScriptable(const Scriptable* scr, Point& position, bool dest)
 {
 	if (!dest) {
 		position = scr->Pos;
@@ -1091,21 +1096,25 @@ void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest
 
 	const InfoPoint* ip;
 	switch (scr->Type) {
-		case ST_AREA: case ST_GLOBAL:
+		case ST_AREA:
+		case ST_GLOBAL:
 			position = scr->Pos; //fake
 			break;
 		case ST_ACTOR:
-		//if there are other moveables, put them here
+			//if there are other moveables, put them here
 			position = static_cast<const Movable*>(scr)->GetMostLikelyPosition();
 			break;
-		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+		case ST_TRIGGER:
+		case ST_PROXIMITY:
+		case ST_TRAVEL:
 			ip = Scriptable::As<InfoPoint>(scr);
 			if (ip->GetUsePoint()) {
 				position = ip->UsePoint;
 				break;
 			}
 		// intentional fallthrough
-		case ST_DOOR: case ST_CONTAINER:
+		case ST_DOOR:
+		case ST_CONTAINER:
 			position = static_cast<const Highlightable*>(scr)->TrapLaunch;
 		default: // ST_ANY
 			break;
@@ -1114,7 +1123,7 @@ void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest
 
 void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 {
-	Scriptable* tar = NULL, *scr = NULL;
+	Scriptable *tar = NULL, *scr = NULL;
 
 	ScriptDebugLog(DebugMode::VARIABLES, "BeginDialog core");
 
@@ -1127,7 +1136,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	if (!scr) {
 		assert(Sender);
 		Log(ERROR, "GameScript", "Speaker for dialog couldn't be found (Sender: {}, Type: {}) Flags:{}.",
-			Sender->GetScriptName(), Sender->Type, Flags);
+		    Sender->GetScriptName(), Sender->Type, Flags);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1137,9 +1146,9 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		return;
 	}
 
-	if (!tar || tar->Type!=ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		Log(ERROR, "GameScript", "Target for dialog couldn't be found (Sender: {}, Type: {}).",
-			Sender->GetScriptName(), Sender->Type);
+		    Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
 			Sender->As<const Actor>()->dump();
 		}
@@ -1154,11 +1163,11 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		return;
 	}
 
-	const Actor *speaker = Scriptable::As<Actor>(scr);
-	Actor *target = (Actor *) tar;
+	const Actor* speaker = Scriptable::As<Actor>(scr);
+	Actor* target = (Actor*) tar;
 	bool swap = false;
 	if (speaker) {
-		if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
+		if (speaker->GetStat(IE_STATE_ID) & STATE_DEAD) {
 			Log(ERROR, "GameScript", "Speaker is dead, cannot start dialogue. Speaker and target are:");
 			speaker->dump();
 			target->dump();
@@ -1166,23 +1175,25 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			return;
 		}
 		//making sure speaker is the protagonist, player, actor
-		const Actor *protagonist = core->GetGame()->GetPC(0, false);
-		if (target == protagonist) swap = true;
-		else if (speaker != protagonist && target->InParty) swap = true;
+		const Actor* protagonist = core->GetGame()->GetPC(0, false);
+		if (target == protagonist)
+			swap = true;
+		else if (speaker != protagonist && target->InParty)
+			swap = true;
 		//CHECKDIST works only for mobile scriptables
-		if (Flags&BD_CHECKDIST) {
+		if (Flags & BD_CHECKDIST) {
 			//DialogueRange is set in IWD
 			ieDword range = MAX_OPERATING_DISTANCE + speaker->GetBase(IE_DIALOGRANGE);
-			if ( scr->GetCurrentArea()!=target->GetCurrentArea() ||
-				PersonalDistance(scr, target)>range) {
+			if (scr->GetCurrentArea() != target->GetCurrentArea() ||
+			    PersonalDistance(scr, target) > range) {
 				MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
 				return;
 			}
 		}
 	} else {
 		//pst style dialog with trigger points
-		swap=true;
-		if (Flags&BD_CHECKDIST) {
+		swap = true;
+		if (Flags & BD_CHECKDIST) {
 			Point TalkPos;
 
 			if (target->InMove()) {
@@ -1190,9 +1201,9 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 				return;
 			}
 			GetTalkPositionFromScriptable(scr, TalkPos);
-			if (PersonalDistance(TalkPos, target)>MAX_OPERATING_DISTANCE ) {
+			if (PersonalDistance(TalkPos, target) > MAX_OPERATING_DISTANCE) {
 				//try to force the target to come closer???
-				if(!MoveNearerTo(target, TalkPos, MAX_OPERATING_DISTANCE, 1))
+				if (!MoveNearerTo(target, TalkPos, MAX_OPERATING_DISTANCE, 1))
 					return;
 			}
 		}
@@ -1228,7 +1239,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		case BD_STRING0:
 			Dialog = parameters->string0Parameter;
 			if (Flags & BD_SETDIALOG) {
-				scr->SetDialog( Dialog );
+				scr->SetDialog(Dialog);
 			}
 			break;
 		case BD_SOURCE:
@@ -1243,15 +1254,17 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		case BD_TARGET:
 			// Don't check for the target being non-interruptible if we swapped speakers
 			// or if the speaker is the target, otherwise do (and request feedback on failure).
-			if (swap || speaker==target) Dialog = scr->GetDialog();
-			else Dialog = target->GetDialog(GD_FEEDBACK);
+			if (swap || speaker == target)
+				Dialog = scr->GetDialog();
+			else
+				Dialog = target->GetDialog(GD_FEEDBACK);
 			break;
 		case BD_RESERVED:
 			//what if playerdialog was initiated from Player2?
 			Dialog = "PLAYER1";
 			break;
 		case BD_INTERACT: //using the source for the dialog
-			const Game *game = core->GetGame();
+			const Game* game = core->GetGame();
 			if (game->BanterBlockFlag || game->BanterBlockTime) {
 				Log(MESSAGE, "GameScript", "Banterblock disabled interaction.");
 				Sender->ReleaseCurrentAction();
@@ -1274,18 +1287,18 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	// moved this here from InitDialog, because InitDialog doesn't know which side is which
 	// post-swap (and non-actors always have IF_NOINT set) .. also added a check that it's
 	// actually busy doing something, for the same reason
-	const Action *curact = target->GetCurrentAction();
-	if ((speaker != target) && (target->GetInternalFlag()&IF_NOINT) && \
-	  (!curact && target->GetNextAction())) {
+	const Action* curact = target->GetCurrentAction();
+	if ((speaker != target) && (target->GetInternalFlag() & IF_NOINT) &&
+	    (!curact && target->GetNextAction())) {
 		core->GetTokenDictionary()["TARGET"] = target->GetName();
 		displaymsg->DisplayConstantString(HCStrings::TargetBusy, GUIColors::RED);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
-	if (speaker!=target) {
+	if (speaker != target) {
 		if (swap) {
-			Scriptable *tmp = tar;
+			Scriptable* tmp = tar;
 			tar = scr;
 			scr = tmp;
 		} else if (!(Flags & BD_INTERRUPT)) {
@@ -1304,7 +1317,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		const Game* game = core->GetGame();
 		for (int i = game->GetPartySize(false) - 1; i >= 0; --i) {
-			Actor *pc = game->GetPC(i, false);
+			Actor* pc = game->GetPC(i, false);
 			pc->ClearActions(2);
 		}
 	}
@@ -1314,21 +1327,21 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 	// Update orientation and potentially stance
 	// sarevok's resurrection cutscene shows a need for this (cut206a)
 	// however we do not want to affect lying actors (eg. Malla from tob)
-	if (scr!=tar) {
-		if (scr->Type==ST_ACTOR) {
+	if (scr != tar) {
+		if (scr->Type == ST_ACTOR) {
 			// might not be equal to speaker anymore due to swapping
-			Actor *talker = (Actor *) scr;
-			if (!talker->Immobile() && !(talker->GetStat(IE_STATE_ID) & STATE_SLEEP) && !(talker->AppearanceFlags&APP_NOTURN)) {
+			Actor* talker = (Actor*) scr;
+			if (!talker->Immobile() && !(talker->GetStat(IE_STATE_ID) & STATE_SLEEP) && !(talker->AppearanceFlags & APP_NOTURN)) {
 				talker->SetOrientation(scr->Pos, tar->Pos, true);
 				if (talker->InParty) {
 					talker->SetStance(IE_ANI_READY);
 				}
 			}
 		}
-		if (tar->Type==ST_ACTOR) {
+		if (tar->Type == ST_ACTOR) {
 			// might not be equal to target anymore due to swapping
-			Actor *talkee = static_cast<Actor*>(tar);
-			if (!talkee->Immobile() && !(talkee->GetStat(IE_STATE_ID) & STATE_SLEEP) && !(talkee->AppearanceFlags&APP_NOTURN)) {
+			Actor* talkee = static_cast<Actor*>(tar);
+			if (!talkee->Immobile() && !(talkee->GetStat(IE_STATE_ID) & STATE_SLEEP) && !(talkee->AppearanceFlags & APP_NOTURN)) {
 				talkee->SetOrientation(tar->Pos, scr->Pos, true);
 				if (talkee->InParty) {
 					talkee->SetStance(IE_ANI_READY);
@@ -1362,11 +1375,11 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 
 static EffectRef fx_movetoarea_ref = { "MoveToArea", -1 };
 
-bool CreateMovementEffect(Actor* actor, const ResRef& area, const Point &position, int face)
+bool CreateMovementEffect(Actor* actor, const ResRef& area, const Point& position, int face)
 {
 	if (actor->AreaName == area) return false; // no need of this for intra area movement
 
-	Effect *fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
+	Effect* fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
 	if (!fx) return false;
 	fx->SetPosition(position);
 	fx->Resource = area;
@@ -1374,10 +1387,10 @@ bool CreateMovementEffect(Actor* actor, const ResRef& area, const Point &positio
 	return true;
 }
 
-void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &position, int face, bool adjust)
+void MoveBetweenAreasCore(Actor* actor, const ResRef& area, const Point& position, int face, bool adjust)
 {
 	Log(MESSAGE, "GameScript", "MoveBetweenAreas: {} to {} [{}.{}] face: {}",
-			fmt::WideToChar{actor->GetShortName()}, area, position.x, position.y, face);
+	    fmt::WideToChar { actor->GetShortName() }, area, position.x, position.y, face);
 	Map* map1 = actor->GetCurrentArea();
 	Map* map2;
 	Game* game = core->GetGame();
@@ -1387,9 +1400,9 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 		//to the target area if adjust==true
 		map2 = game->GetMap(area, false);
 		if (map1) {
-			map1->RemoveActor( actor );
+			map1->RemoveActor(actor);
 		}
-		map2->AddActor( actor, true );
+		map2->AddActor(actor, true);
 
 		// update the worldmap if needed
 		if (actor->InParty) {
@@ -1403,12 +1416,12 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 	}
 	actor->SetPosition(position, adjust);
 	actor->SetStance(IE_ANI_READY);
-	if (face !=-1) {
+	if (face != -1) {
 		actor->SetOrientation(ClampToOrientation(face), false);
 	}
 	// should this perhaps be a 'selected' check or similar instead?
 	if (actor->InParty) {
-		GameControl *gc=core->GetGameControl();
+		GameControl* gc = core->GetGameControl();
 		gc->SetScreenFlags(ScreenFlags::CenterOnActor, BitOp::OR);
 	}
 }
@@ -1417,7 +1430,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 //if int0parameter is !=0, then it will try only x times
 // for this family of actions, familiars cannot walk through a transition (that's flagged to allow NPCs to pass)
 // ... but we don't check areas/chasing here anyway
-void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee)
+void MoveToObjectCore(Scriptable* Sender, Action* parameters, ieDword flags, bool untilsee)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
 	if (!actor) {
@@ -1440,7 +1453,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		actor->ClearPath(true);
 		return;
 	} else {
-		if (PersonalDistance(actor, target)<MAX_OPERATING_DISTANCE) {
+		if (PersonalDistance(actor, target) < MAX_OPERATING_DISTANCE) {
 			if (flags & IF_NOINT) {
 				actor->Interrupt();
 			}
@@ -1454,7 +1467,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 
 	//hopefully this hack will prevent lockups
 	if (!actor->InMove()) {
-		if (flags&IF_NOINT) {
+		if (flags & IF_NOINT) {
 			actor->Interrupt();
 		}
 		Sender->ReleaseCurrentAction();
@@ -1471,34 +1484,34 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 	}
 }
 
-bool CreateItemCore(CREItem *item, const ResRef &resref, int a, int b, int c)
+bool CreateItemCore(CREItem* item, const ResRef& resref, int a, int b, int c)
 {
 	item->ItemResRef = resref;
 	if (!core->ResolveRandomItem(item))
 		return false;
-	if (a==-1) {
+	if (a == -1) {
 		//use the default charge counts of the item
-		const Item *origitem = gamedata->GetItem(item->ItemResRef);
+		const Item* origitem = gamedata->GetItem(item->ItemResRef);
 		if (origitem) {
-			for(int i=0;i<3;i++) {
-				const ITMExtHeader *e = origitem->GetExtHeader(i);
-				item->Usages[i]=e?e->Charges:0;
+			for (int i = 0; i < 3; i++) {
+				const ITMExtHeader* e = origitem->GetExtHeader(i);
+				item->Usages[i] = e ? e->Charges : 0;
 			}
 			gamedata->FreeItem(origitem, item->ItemResRef, false);
 		}
 	} else {
-		item->Usages[0]=(ieWord) a;
-		item->Usages[1]=(ieWord) b;
-		item->Usages[2]=(ieWord) c;
+		item->Usages[0] = (ieWord) a;
+		item->Usages[1] = (ieWord) b;
+		item->Usages[2] = (ieWord) c;
 	}
-	item->Flags=0;
-	item->Expired=0;
+	item->Flags = 0;
+	item->Expired = 0;
 	core->SanitizeItem(item);
 	return true;
 }
 
 //It is possible to attack CONTAINERS/DOORS as well!!!
-void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
+void AttackCore(Scriptable* Sender, Scriptable* target, int flags)
 {
 	Actor* attacker = Scriptable::As<Actor>(Sender);
 	assert(attacker);
@@ -1514,14 +1527,14 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	// mislead and projected images can't attack
 	int puppet = attacker->GetStat(IE_PUPPETMASTERTYPE);
 	if (puppet && puppet < 3) {
-		Log(DEBUG, "AttackCore", "Tried attacking with an illusionary copy: {}!", fmt::WideToChar{attacker->GetName()});
+		Log(DEBUG, "AttackCore", "Tried attacking with an illusionary copy: {}!", fmt::WideToChar { attacker->GetName() });
 		return;
 	}
 
 	const Actor* tar = Scriptable::As<Actor>(target);
 	if (attacker == tar) {
 		Sender->ReleaseCurrentAction();
-		Log(WARNING, "AttackCore", "Tried attacking itself: {}!", fmt::WideToChar{tar->GetName()});
+		Log(WARNING, "AttackCore", "Tried attacking itself: {}!", fmt::WideToChar { tar->GetName() });
 		return;
 	}
 
@@ -1536,7 +1549,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			attacker->StopAttack();
 			Sender->ReleaseCurrentAction();
 			attacker->AddTrigger(TriggerEntry(trigger_targetunreachable, tar->GetGlobalID()));
-			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: {}!", fmt::WideToChar{tar->GetName()});
+			Log(WARNING, "AttackCore", "Tried attacking invisible/dead actor: {}!", fmt::WideToChar { tar->GetName() });
 			return;
 		}
 	}
@@ -1549,7 +1562,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		Sender->ReleaseCurrentAction();
 		assert(tar);
 		attacker->AddTrigger(TriggerEntry(trigger_unusable, tar->GetGlobalID()));
-		Log(WARNING, "AttackCore", "Weapon unusable: {}!", fmt::WideToChar{attacker->GetName()});
+		Log(WARNING, "AttackCore", "Weapon unusable: {}!", fmt::WideToChar { attacker->GetName() });
 		return;
 	}
 
@@ -1569,9 +1582,9 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	float_t angle = AngleFromPoints(attacker->Pos, target->Pos);
 	if (attacker->GetCurrentArea() != target->GetCurrentArea() ||
-		!WithinPersonalRange(attacker, target, weaponRange) ||
-		!attacker->GetCurrentArea()->IsVisibleLOS(attacker->Pos, target->Pos) ||
-		!CanSee(attacker, target, true, 0)) {
+	    !WithinPersonalRange(attacker, target, weaponRange) ||
+	    !attacker->GetCurrentArea()->IsVisibleLOS(attacker->Pos, target->Pos) ||
+	    !CanSee(attacker, target, true, 0)) {
 		MoveNearerTo(attacker, target, Feet2Pixels(weaponRange, angle));
 		return;
 	} else if (target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
@@ -1591,7 +1604,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	attacker->PerformAttack(core->GetGame()->GameTime);
 }
 
-void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, int dont_release)
+void MoveNearerTo(Scriptable* Sender, const Scriptable* target, int distance, int dont_release)
 {
 	Point p;
 
@@ -1602,9 +1615,9 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 		return;
 	}
 
-	const Map *myarea = Sender->GetCurrentArea();
-	const Map *hisarea = target->GetCurrentArea();
-	if (hisarea && hisarea!=myarea) {
+	const Map* myarea = Sender->GetCurrentArea();
+	const Map* hisarea = target->GetCurrentArea();
+	if (hisarea && hisarea != myarea) {
 		target = myarea->GetTileMap()->GetTravelTo(hisarea->GetScriptRef());
 
 		if (!target) {
@@ -1635,7 +1648,7 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 //It is not always good to release the current action if target is unreachable
 //we should also raise the trigger TargetUnreachable (if this is an Attack, at least)
 //i hacked only this low level function, didn't need the higher ones so far
-int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_release)
+int MoveNearerTo(Scriptable* Sender, const Point& p, int distance, int dont_release)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
 	if (!actor) {
@@ -1671,7 +1684,7 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 // Normal (disabled) - If either the first or second parameter is negative.
 // Point form: [x.y.range.unused] - If the fourth parameter is negative.
 // Rect form: [left.top.right.bottom] (which we convert to a normal Region on load)
-bool IsInObjectRect(const Point &pos, const Region &rect)
+bool IsInObjectRect(const Point& pos, const Region& rect)
 {
 	if (!HasAdditionalRect) return true;
 	if (rect.x < 0 || rect.y < 0) return true;
@@ -1691,10 +1704,10 @@ bool IsInObjectRect(const Point &pos, const Region &rect)
 	}
 }
 
-static Object *ObjectCopy(const Object *object)
+static Object* ObjectCopy(const Object* object)
 {
 	if (!object) return NULL;
-	Object *newObject = new Object();
+	Object* newObject = new Object();
 	memcpy(newObject->objectFields, object->objectFields, sizeof(newObject->objectFields));
 	memcpy(newObject->objectFilters, object->objectFilters, sizeof(newObject->objectFilters));
 	newObject->objectRect = object->objectRect;
@@ -1702,9 +1715,9 @@ static Object *ObjectCopy(const Object *object)
 	return newObject;
 }
 
-Action *ParamCopy(const Action *parameters)
+Action* ParamCopy(const Action* parameters)
 {
-	Action *newAction = new Action(true);
+	Action* newAction = new Action(true);
 	newAction->actionID = parameters->actionID;
 	newAction->int0Parameter = parameters->int0Parameter;
 	newAction->int1Parameter = parameters->int1Parameter;
@@ -1712,15 +1725,15 @@ Action *ParamCopy(const Action *parameters)
 	newAction->pointParameter = parameters->pointParameter;
 	newAction->string0Parameter = parameters->string0Parameter;
 	newAction->string1Parameter = parameters->string1Parameter;
-	for (int c=0;c<3;c++) {
-		newAction->objects[c]= ObjectCopy( parameters->objects[c] );
+	for (int c = 0; c < 3; c++) {
+		newAction->objects[c] = ObjectCopy(parameters->objects[c]);
 	}
 	return newAction;
 }
 
-Action *ParamCopyNoOverride(const Action *parameters)
+Action* ParamCopyNoOverride(const Action* parameters)
 {
-	Action *newAction = new Action(true);
+	Action* newAction = new Action(true);
 	newAction->actionID = parameters->actionID;
 	newAction->int0Parameter = parameters->int0Parameter;
 	newAction->int1Parameter = parameters->int1Parameter;
@@ -1728,15 +1741,15 @@ Action *ParamCopyNoOverride(const Action *parameters)
 	newAction->pointParameter = parameters->pointParameter;
 	newAction->string0Parameter = parameters->string0Parameter;
 	newAction->string1Parameter = parameters->string1Parameter;
-	newAction->objects[0]= NULL;
-	newAction->objects[1]= ObjectCopy( parameters->objects[1] );
-	newAction->objects[2]= ObjectCopy( parameters->objects[2] );
+	newAction->objects[0] = NULL;
+	newAction->objects[1] = ObjectCopy(parameters->objects[1]);
+	newAction->objects[2] = ObjectCopy(parameters->objects[2]);
 	return newAction;
 }
 
 void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, VarContext context)
 {
-	ieVariable key{VarName};
+	ieVariable key { VarName };
 
 	auto SetLocalVariable = [=](ieVarsMap& vars, const ieVariable& key, ieDword value) {
 		auto lookup = vars.find(key);
@@ -1755,7 +1768,7 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 			varName++;
 		}
 		context.Format("{:.6}", VarName);
-		key = ieVariable{varName};
+		key = ieVariable { varName };
 	}
 	ScriptDebugLog(DebugMode::VARIABLES, "Setting variable(\"{}{}\", {})", context, VarName, value);
 
@@ -1767,7 +1780,7 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 		SetLocalVariable(Sender->locals, key, value);
 		return;
 	}
-	Game *game = core->GetGame();
+	Game* game = core->GetGame();
 	if (HasKaputz && context == "KAPUTZ") {
 		SetLocalVariable(game->kaputz, key, value);
 		return;
@@ -1785,14 +1798,14 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 	}
 }
 
-void SetPointVariable(Scriptable *Sender, const StringParam& VarName, const Point &p, const VarContext& Context)
+void SetPointVariable(Scriptable* Sender, const StringParam& VarName, const Point& p, const VarContext& Context)
 {
 	SetVariable(Sender, VarName, ((p.y & 0xFFFF) << 16) | (p.x & 0xFFFF), Context);
 }
 
-ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarContext context, bool *valid)
+ieDword CheckVariable(const Scriptable* Sender, const StringParam& VarName, VarContext context, bool* valid)
 {
-	ieVariable key{VarName};
+	ieVariable key { VarName };
 
 	auto GetLocalVariable = [](const ieVarsMap& vars, VarContext context, const ieVariable& key) -> ieDword {
 		auto lookup = vars.find(key);
@@ -1811,22 +1824,22 @@ ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarC
 			varName++;
 		}
 		context.Format("{:.6}", VarName);
-		key = ieVariable{varName};
+		key = ieVariable { varName };
 	}
-	
+
 	if (context == "MYAREA") {
 		return GetLocalVariable(Sender->GetCurrentArea()->locals, context, key);
 	}
-	
+
 	if (context == "LOCALS") {
 		return GetLocalVariable(Sender->locals, context, key);
 	}
-	
-	const Game *game = core->GetGame();
+
+	const Game* game = core->GetGame();
 	if (HasKaputz && context == "KAPUTZ") {
 		return GetLocalVariable(game->kaputz, context, key);
 	}
-	
+
 	if (context == "GLOBAL") {
 		return GetLocalVariable(game->locals, context, key);
 	} else {
@@ -1843,22 +1856,22 @@ ieDword CheckVariable(const Scriptable *Sender, const StringParam& VarName, VarC
 	return 0;
 }
 
-Point CheckPointVariable(const Scriptable *Sender, const StringParam& VarName, const VarContext& Context, bool *valid)
+Point CheckPointVariable(const Scriptable* Sender, const StringParam& VarName, const VarContext& Context, bool* valid)
 {
 	ieDword val = CheckVariable(Sender, VarName, Context, valid);
 	return Point(val & 0xFFFF, val >> 16);
 }
 
 // checks if a variable exists in any context
-bool VariableExists(const Scriptable *Sender, const StringParam& VarName, const VarContext& context)
+bool VariableExists(const Scriptable* Sender, const StringParam& VarName, const VarContext& context)
 {
-	const Game *game = core->GetGame();
+	const Game* game = core->GetGame();
 
 	auto hasLocalVariable = [](const ieVarsMap& vars, const ieVariable& key) -> bool {
 		return vars.find(key) != vars.cend();
 	};
 
-	ieVariable key{VarName};
+	ieVariable key { VarName };
 
 	if (hasLocalVariable(Sender->GetCurrentArea()->locals, key)) {
 		return true;
@@ -1918,7 +1931,7 @@ GroupType GetGroup(const Actor* actor)
 	return type;
 }
 
-Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho)
+Actor* GetNearestEnemyOf(const Map* map, const Actor* origin, int whoseeswho)
 {
 	//determining the allegiance of the origin
 	GroupType type = GetGroup(origin);
@@ -1928,21 +1941,21 @@ Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho)
 		return nullptr;
 	}
 
-	Targets *tgts = new Targets();
+	Targets* tgts = new Targets();
 
 	int i = map->GetActorCount(true);
-	Actor *ac;
+	Actor* ac;
 	while (i--) {
-		ac=map->GetActor(i,true);
+		ac = map->GetActor(i, true);
 		if (ac == origin) continue;
 
-		if (whoseeswho&ENEMY_SEES_ORIGIN) {
-			if (!CanSee(ac, origin, true, GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
+		if (whoseeswho & ENEMY_SEES_ORIGIN) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD | GA_NO_UNSCHEDULED)) {
 				continue;
 			}
 		}
-		if (whoseeswho&ORIGIN_SEES_ENEMY) {
-			if (!CanSee(ac, origin, true, GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
+		if (whoseeswho & ORIGIN_SEES_ENEMY) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD | GA_NO_UNSCHEDULED)) {
 				continue;
 			}
 		}
@@ -1950,11 +1963,11 @@ Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho)
 		int distance = Distance(ac, origin);
 		if (type == GroupType::PC) {
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+				tgts->AddTarget(ac, distance, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 			}
 		} else { // GroupType::Enemy
 			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+				tgts->AddTarget(ac, distance, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 			}
 		}
 	}
@@ -1963,29 +1976,29 @@ Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho)
 	return ac;
 }
 
-Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho)
+Actor* GetNearestOf(const Map* map, const Actor* origin, int whoseeswho)
 {
-	Targets *tgts = new Targets();
+	Targets* tgts = new Targets();
 
 	int i = map->GetActorCount(true);
-	Actor *ac;
+	Actor* ac;
 	while (i--) {
-		ac=map->GetActor(i,true);
+		ac = map->GetActor(i, true);
 		if (ac == origin) continue;
 
-		if (whoseeswho&ENEMY_SEES_ORIGIN) {
-			if (!CanSee(ac, origin, true, GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
+		if (whoseeswho & ENEMY_SEES_ORIGIN) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD | GA_NO_UNSCHEDULED)) {
 				continue;
 			}
 		}
-		if (whoseeswho&ORIGIN_SEES_ENEMY) {
-			if (!CanSee(ac, origin, true, GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
+		if (whoseeswho & ORIGIN_SEES_ENEMY) {
+			if (!CanSee(ac, origin, true, GA_NO_DEAD | GA_NO_UNSCHEDULED)) {
 				continue;
 			}
 		}
 
 		int distance = Distance(ac, origin);
-		tgts->AddTarget(ac, distance, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+		tgts->AddTarget(ac, distance, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 	}
 	ac = static_cast<Actor*>(tgts->GetTarget(0, ST_ACTOR));
 	delete tgts;
@@ -1998,7 +2011,7 @@ Point GetEntryPoint(const ResRef& areaname, const ResRef& entryname)
 	if (!tab) {
 		return {};
 	}
-	const char *tmpstr = tab->QueryField(areaname, entryname).c_str();
+	const char* tmpstr = tab->QueryField(areaname, entryname).c_str();
 	Point p;
 	sscanf(tmpstr, "%d.%d", &p.x, &p.y);
 	return p;
@@ -2020,7 +2033,7 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const 
 
 	//make possible special return values (like 0xffffffff means the spell doesn't need distance)
 	//this is used with special targeting mode (3)
-	if (dist>0xff000000) {
+	if (dist > 0xff000000) {
 		return 0xffffffff;
 	}
 
@@ -2049,7 +2062,7 @@ unsigned int GetItemDistance(const ResRef& itemres, int header, float_t angle)
 
 	//make possible special return values (like 0xffffffff means the item doesn't need distance)
 	//this is used with special targeting mode (3)
-	if (dist>0xff000000) {
+	if (dist > 0xff000000) {
 		return 0xffffffff;
 	}
 
@@ -2057,7 +2070,7 @@ unsigned int GetItemDistance(const ResRef& itemres, int header, float_t angle)
 }
 
 //read the wish 2da
-void SetupWishCore(Scriptable *Sender, TableMgr::index_t column, int picks)
+void SetupWishCore(Scriptable* Sender, TableMgr::index_t column, int picks)
 {
 	// in the original, picks was at first the number of wish choices to set up,
 	// but then it was hard coded to 5 (and SetupWishObject disused)
@@ -2075,25 +2088,25 @@ void SetupWishCore(Scriptable *Sender, TableMgr::index_t column, int picks)
 	// just cutting the 1-25 range into four pieces (roughly how the djinn dialog works)
 	TableMgr::index_t cols = tm->GetColumnCount();
 	if (column > cols) {
-		column = (column-1)/6;
+		column = (column - 1) / 6;
 		if (column == 4) column = RAND(0, 3);
 	}
 
 	ieVariable varname;
 	for (int i = 0; i < 99; i++) {
 		varname.Format("wishpower{:02d}", i);
-		if(CheckVariable(Sender, varname, "GLOBAL") ) {
+		if (CheckVariable(Sender, varname, "GLOBAL")) {
 			SetVariable(Sender, varname, 0, "GLOBAL");
 		}
 	}
 
-	if (count<picks) {
+	if (count < picks) {
 		for (int i = 0; i < count; i++) {
-			selects[i]=i;
+			selects[i] = i;
 		}
 	} else {
 		for (int i = 0; i < picks; i++) {
-			selects[i]=RAND(0, count-1);
+			selects[i] = RAND(0, count - 1);
 
 			int j = 0;
 			while (j < i) {
@@ -2117,15 +2130,15 @@ void SetupWishCore(Scriptable *Sender, TableMgr::index_t column, int picks)
 	}
 }
 
-void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, bool flag)
+void AmbientActivateCore(const Scriptable* Sender, const Action* parameters, bool flag)
 {
-	AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation(parameters->variable0Parameter);
+	AreaAnimation* anim = Sender->GetCurrentArea()->GetAnimation(parameters->variable0Parameter);
 	if (!anim) {
-		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectNameVar );
+		anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectNameVar);
 	}
 	if (!anim) {
 		// iwd2 expects this behaviour in ar6001 by (de)activating sound_portal
-		AmbientMgr *ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
+		AmbientMgr* ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
 		if (flag) {
 			ambientmgr->Activate(parameters->objects[1]->objectName);
 		} else {
@@ -2141,19 +2154,19 @@ void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, boo
 	}
 }
 
-#define MAX_ISLAND_POLYGONS  10
+#define MAX_ISLAND_POLYGONS 10
 
 //read a polygon 2da
-Gem_Polygon *GetPolygon2DA(ieDword index)
+Gem_Polygon* GetPolygon2DA(ieDword index)
 {
 	ResRef resRef;
 
-	if (index>=MAX_ISLAND_POLYGONS) {
+	if (index >= MAX_ISLAND_POLYGONS) {
 		return NULL;
 	}
 
 	if (!polygons) {
-		polygons = (Gem_Polygon **) calloc(MAX_ISLAND_POLYGONS, sizeof(Gem_Polygon *) );
+		polygons = (Gem_Polygon**) calloc(MAX_ISLAND_POLYGONS, sizeof(Gem_Polygon*));
 	}
 	if (polygons[index]) {
 		return polygons[index];
@@ -2167,9 +2180,9 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	if (!cnt) {
 		return NULL;
 	}
-	
+
 	std::vector<Point> p(cnt);
-	while(cnt--) {
+	while (cnt--) {
 		p[cnt].x = tm->QueryFieldSigned<int>(cnt, 0);
 		p[cnt].y = tm->QueryFieldSigned<int>(cnt, 1);
 	}
@@ -2178,7 +2191,8 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	return polygons[index];
 }
 
-static bool InterruptSpellcasting(Scriptable* Sender) {
+static bool InterruptSpellcasting(Scriptable* Sender)
+{
 	Actor* caster = Scriptable::As<Actor>(Sender);
 	if (!caster) return false;
 
@@ -2207,7 +2221,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 		const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
 		if (!spl) return false;
 
-		const SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
+		const SPLExtHeader* seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
 		bool invalidTarget = seh && seh->Target != TARGET_DEAD;
 		gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 		if (!invalidTarget) return false;
@@ -2222,7 +2236,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 }
 
 // shared spellcasting action code for casting on scriptables
-void SpellCore(Scriptable *Sender, Action *parameters, int flags)
+void SpellCore(Scriptable* Sender, Action* parameters, int flags)
 {
 	ResRef spellResRef;
 	int level = 0;
@@ -2257,7 +2271,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 	// use the passed level instead of the caster's casting level
 	// if it's still 0 afterwards, it will revert to the caster's level
-	if (flags&SC_SETLEVEL) {
+	if (flags & SC_SETLEVEL) {
 		if (parameters->resref0Parameter.IsEmpty()) {
 			level = parameters->int1Parameter; // int0 was the spell id
 		} else {
@@ -2275,7 +2289,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	//parse target
 	int seeflag = 0;
 	unsigned int dist = GetSpellDistance(spellResRef, Sender);
-	if ((flags&SC_NO_DEAD) && dist != 0xffffffff) {
+	if ((flags & SC_NO_DEAD) && dist != 0xffffffff) {
 		seeflag = GA_NO_DEAD;
 	}
 
@@ -2307,14 +2321,14 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 
 		//move near to target
-		if ((flags&SC_RANGE_CHECK) && dist != 0xffffffff) {
+		if ((flags & SC_RANGE_CHECK) && dist != 0xffffffff) {
 			if (PersonalDistance(tar, Sender) > dist) {
 				MoveNearerTo(Sender, tar, dist);
 				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 				return;
 			}
 			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, tar->Pos)) {
-				if (!(spl->Flags&SF_NO_LOS)) {
+				if (!(spl->Flags & SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					MoveNearerTo(Sender, tar, dist);
 					return;
@@ -2338,7 +2352,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 	}
 
-	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
+	if ((flags & SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
 		return;
 	}
 
@@ -2366,13 +2380,13 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 			Sender->CurrentActionState = duration;
 			parameters->int2Parameter = 0;
 		}
-		if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
+		if (!(flags & SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
 			parameters->int2Parameter = 0;
 			Sender->ReleaseCurrentAction();
 		}
 		return;
 	}
-	if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
+	if (!(flags & SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
 		parameters->int2Parameter = 0;
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2380,10 +2394,10 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 	if (Sender->objects.LastSpellTarget) {
 		//if target was set, fire spell
-		Sender->CastSpellEnd(level, flags&SC_INSTANT);
+		Sender->CastSpellEnd(level, flags & SC_INSTANT);
 	} else if (!Sender->objects.LastTargetPos.IsInvalid()) {
 		//the target was converted to a point
-		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
+		Sender->CastSpellPointEnd(level, flags & SC_INSTANT);
 	} else {
 		Log(ERROR, "GameScript", "SpellCore: Action ({}) lost target somewhere!", parameters->actionID);
 	}
@@ -2393,7 +2407,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 
 // shared spellcasting action code for casting on the ground
-void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
+void SpellPointCore(Scriptable* Sender, Action* parameters, int flags)
 {
 	ResRef spellResRef;
 	int level = 0;
@@ -2416,7 +2430,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 
 	// use the passed level instead of the caster's casting level
 	// if it's still 0 afterwards, it will revert to the caster's level
-	if (flags&SC_SETLEVEL) {
+	if (flags & SC_SETLEVEL) {
 		if (parameters->resref0Parameter.IsEmpty()) {
 			level = parameters->int1Parameter;
 		} else {
@@ -2433,15 +2447,15 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 
 		//move near to target
-		if (flags&SC_RANGE_CHECK) {
+		if (flags & SC_RANGE_CHECK) {
 			unsigned int dist = GetSpellDistance(spellResRef, Sender, parameters->pointParameter);
 			if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
 				MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
 				return;
 			}
 			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, parameters->pointParameter)) {
-				const Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
-				if (!(spl->Flags&SF_NO_LOS)) {
+				const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
+				if (!(spl->Flags & SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
 					return;
@@ -2459,7 +2473,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		act->SetModal(Modal::None);
 	}
 
-	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
+	if ((flags & SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
 		return;
 	}
 
@@ -2486,26 +2500,26 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 			Sender->CurrentActionState = duration;
 			parameters->int2Parameter = 0;
 		}
-		if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
+		if (!(flags & SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
 			Sender->ReleaseCurrentAction();
 		}
 		return;
 	}
-	if (!(flags&SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
+	if (!(flags & SC_NOINTERRUPT) && InterruptSpellcasting(Sender)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	if (!Sender->objects.LastTargetPos.IsInvalid()) {
 		//if target was set, fire spell
-		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
+		Sender->CastSpellPointEnd(level, flags & SC_INSTANT);
 	} else {
 		Log(ERROR, "GameScript", "SpellPointCore: Action ({}) lost target somewhere!", parameters->actionID);
 	}
 	Sender->ReleaseCurrentAction();
 }
 
-void AddXPCore(const Action *parameters, bool divide)
+void AddXPCore(const Action* parameters, bool divide)
 {
 	AutoTable xptable;
 
@@ -2522,14 +2536,14 @@ void AddXPCore(const Action *parameters, bool divide)
 		Log(ERROR, "GameScript", "Can't perform AddXP2DA/AddXPVar!");
 		return;
 	}
-	const char *xpvalue = xptable->QueryField(parameters->string0Parameter, "0").c_str(); // level is unused
+	const char* xpvalue = xptable->QueryField(parameters->string0Parameter, "0").c_str(); // level is unused
 
 	if (divide) {
 		// force divide party xp
 		core->GetGame()->ShareXP(atoi(xpvalue), SX_DIVIDE);
 	} else if (xpvalue[0] == 'P' && xpvalue[1] == '_') {
 		// divide party xp
-		core->GetGame()->ShareXP(atoi(xpvalue+2), SX_DIVIDE);
+		core->GetGame()->ShareXP(atoi(xpvalue + 2), SX_DIVIDE);
 	} else {
 		// give xp to everyone
 		core->GetGame()->ShareXP(atoi(xpvalue), 0);
@@ -2537,14 +2551,14 @@ void AddXPCore(const Action *parameters, bool divide)
 	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
 }
 
-int NumItemsCore(Scriptable *Sender, const Trigger *parameters)
+int NumItemsCore(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* target = GetScriptableFromObject(Sender, parameters);
 	if (!target) {
 		return 0;
 	}
 
-	const Inventory *inventory = nullptr;
+	const Inventory* inventory = nullptr;
 	if (target->Type == ST_ACTOR) {
 		inventory = &(static_cast<const Actor*>(target)->inventory);
 	} else if (target->Type == ST_CONTAINER) {
@@ -2559,7 +2573,7 @@ int NumItemsCore(Scriptable *Sender, const Trigger *parameters)
 
 static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };
 static EffectRef fx_level_bounce_dec_ref = { "Bounce:SpellLevelDec", -1 };
-unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
+unsigned int NumBouncingSpellLevelCore(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* target = GetScriptableFromObject(Sender, parameters);
 	const Actor* actor = Scriptable::As<Actor>(target);
@@ -2571,7 +2585,7 @@ unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parame
 	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
 		bounceCount = 0xFFFFFFFF;
 	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
+		const Effect* fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
 		if (fx) {
 			bounceCount = fx->Parameter1;
 		}
@@ -2594,7 +2608,7 @@ unsigned int NumImmuneToSpellLevelCore(Scriptable* Sender, const Trigger* parame
 	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
 		bounceCount = 0xFFFFFFFF;
 	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
+		const Effect* fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
 		if (fx) {
 			bounceCount = fx->Parameter1;
 		}

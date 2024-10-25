@@ -24,14 +24,14 @@
 
 namespace GemRB {
 
-AnimationFactory::AnimationFactory(const ResRef &resref,
-								   std::vector<Holder<Sprite2D>> f,
-								   std::vector<CycleEntry> c,
-								   std::vector<index_t> flt)
-: FactoryObject(resref, IE_BAM_CLASS_ID),
-frames(std::move(f)),
-cycles(std::move(c)),
-FLTable(std::move(flt))
+AnimationFactory::AnimationFactory(const ResRef& resref,
+				   std::vector<Holder<Sprite2D>> f,
+				   std::vector<CycleEntry> c,
+				   std::vector<index_t> flt)
+	: FactoryObject(resref, IE_BAM_CLASS_ID),
+	  frames(std::move(f)),
+	  cycles(std::move(c)),
+	  FLTable(std::move(flt))
 {
 	assert(frames.size() < InvalidIndex);
 	assert(cycles.size() < InvalidIndex);
@@ -62,15 +62,15 @@ Holder<Sprite2D> AnimationFactory::GetFrame(index_t index, index_t cycle) const
 	}
 	index_t ff = cycles[cycle].FirstFrame;
 	index_t fc = cycles[cycle].FramesCount;
-	if(index >= fc) {
+	if (index >= fc) {
 		return nullptr;
 	}
-	return frames[FLTable[ff+index]];
+	return frames[FLTable[ff + index]];
 }
 
 Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(index_t index) const
 {
-	if(index >= frames.size()) {
+	if (index >= frames.size()) {
 		return NULL;
 	}
 	return frames[index];

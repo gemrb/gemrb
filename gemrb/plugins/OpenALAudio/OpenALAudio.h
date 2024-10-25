@@ -21,15 +21,14 @@
 #ifndef OPENALAUDIO_H_INCLUDED
 #define OPENALAUDIO_H_INCLUDED
 
-#include "Audio.h"
-
-#include "AmbientMgr.h"
-
 #include "ie_types.h"
 
+#include "AmbientMgr.h"
+#include "Audio.h"
 #include "LRUCache.h"
 #include "MusicMgr.h"
 #include "SoundMgr.h"
+
 #include "Streams/FileStream.h"
 
 #include <mutex>
@@ -37,21 +36,21 @@
 #include <utility>
 
 #if __APPLE__
-#include <OpenAL/OpenAL.h> // umbrella include for all the headers we want
+	#include <OpenAL/OpenAL.h> // umbrella include for all the headers we want
 #else
-#include "al.h"
-#include "alc.h"
-#ifdef HAVE_OPENAL_EFX_H
-# include "efx.h"
-#endif
+	#include "al.h"
+	#include "alc.h"
+	#ifdef HAVE_OPENAL_EFX_H
+		#include "efx.h"
+	#endif
 #endif
 
-#define RETRY 5
-#define BUFFER_CACHE_SIZE 100
-#define MAX_STREAMS 30
-#define MUSICBUFFERS 10
+#define RETRY              5
+#define BUFFER_CACHE_SIZE  100
+#define MAX_STREAMS        30
+#define MUSICBUFFERS       10
 #define REFERENCE_DISTANCE 50
-#define ACM_BUFFERSIZE 8192
+#define ACM_BUFFERSIZE     8192
 
 #define LISTENER_HEIGHT 200.0f
 
@@ -59,10 +58,11 @@ namespace GemRB {
 
 class OpenALSoundHandle : public SoundHandle {
 protected:
-	struct AudioStream *parent;
+	struct AudioStream* parent;
 
 public:
-	explicit OpenALSoundHandle(AudioStream *p) : parent(p) { }
+	explicit OpenALSoundHandle(AudioStream* p)
+		: parent(p) {}
 	void SetPos(const Point&) override;
 	bool Playing() override;
 	void Stop() override;
@@ -75,8 +75,8 @@ using OpenALuintPair = std::pair<ALuint, ALuint>;
 struct AudioStream {
 	// Spatial stereo is laid out as two sources and buffers,
 	// for every other case, just the first value is relevant.
-	OpenALuintPair buffers = {0, 0};
-	OpenALuintPair sources = {0, 0};
+	OpenALuintPair buffers = { 0, 0 };
+	OpenALuintPair sources = { 0, 0 };
 	int Duration = 0;
 	bool free = true;
 	bool ambient = false;
@@ -102,25 +102,31 @@ struct CacheEntry {
 	OpenALuintPair Buffer;
 	tick_t Length;
 
-	CacheEntry(OpenALuintPair buffer, tick_t length) : Buffer(buffer), Length(length) {}
+	CacheEntry(OpenALuintPair buffer, tick_t length)
+		: Buffer(buffer), Length(length) {}
 	CacheEntry(const CacheEntry&) = delete;
-	CacheEntry(CacheEntry && other) noexcept : Buffer(other.Buffer), Length(other.Length) {
-		other.Buffer = {0, 0};
+	CacheEntry(CacheEntry&& other) noexcept
+		: Buffer(other.Buffer), Length(other.Length)
+	{
+		other.Buffer = { 0, 0 };
 	}
 	CacheEntry& operator=(const CacheEntry&) = delete;
-	CacheEntry& operator=(CacheEntry && other) noexcept {
+	CacheEntry& operator=(CacheEntry&& other) noexcept
+	{
 		this->Buffer = other.Buffer;
-		other.Buffer = {0, 0};
+		other.Buffer = { 0, 0 };
 		this->Length = other.Length;
 
 		return *this;
 	}
 
-	void evictionNotice() {
-		Buffer = {0, 0};
+	void evictionNotice()
+	{
+		Buffer = { 0, 0 };
 	}
 
-	~CacheEntry() {
+	~CacheEntry()
+	{
 		alDeleteBuffers(1, &Buffer.first);
 		if (Buffer.second != 0) {
 			alDeleteBuffers(1, &Buffer.second);
@@ -129,7 +135,8 @@ struct CacheEntry {
 };
 
 struct OpenALPlaying {
-	bool operator()(const CacheEntry& entry) const {
+	bool operator()(const CacheEntry& entry) const
+	{
 		alDeleteBuffers(1, &entry.Buffer.first);
 		bool success = alGetError() == AL_NO_ERROR;
 
@@ -148,8 +155,8 @@ public:
 	void PrintDeviceList() const;
 	bool Init(void) override;
 	Holder<SoundHandle> Play(StringView ResRef, SFXChannel channel,
-					const Point&, unsigned int flags = 0,
-					tick_t *length = nullptr) override;
+				 const Point&, unsigned int flags = 0,
+				 tick_t* length = nullptr) override;
 	void UpdateVolume(unsigned int flags) override;
 	bool CanPlay() override;
 	void ResetMusics() final;
@@ -162,14 +169,15 @@ public:
 	Point GetListenerPos() override;
 	bool ReleaseStream(int stream, bool HardStop) override;
 	int SetupNewStream(int x, int y, int z,
-					ieWord gain, bool point, int ambientRange) override;
+			   ieWord gain, bool point, int ambientRange) override;
 	tick_t QueueAmbient(int stream, const ResRef& sound) override;
 	void SetAmbientStreamVolume(int stream, int volume) override;
 	void SetAmbientStreamPitch(int stream, int pitch) override;
 	void QueueBuffer(int stream, unsigned short bits,
-				int channels, short* memory,
-				int size, int samplerate) override;
+			 int channels, short* memory,
+			 int size, int samplerate) override;
 	void UpdateMapAmbient(const MapReverbProperties&) override;
+
 private:
 	int QueueALBuffers(OpenALuintPair source, OpenALuintPair buffer) const;
 	int QueueALBuffer(ALuint source, ALuint buffer) const;
@@ -179,14 +187,14 @@ private:
 	ALuint MusicSource = 0;
 	bool MusicPlaying = false;
 	std::recursive_mutex musicMutex;
-	ALuint MusicBuffer[MUSICBUFFERS]{};
+	ALuint MusicBuffer[MUSICBUFFERS] {};
 	ResourceHolder<SoundMgr> MusicReader;
-	LRUCache<CacheEntry, OpenALPlaying> buffercache{BUFFER_CACHE_SIZE};
+	LRUCache<CacheEntry, OpenALPlaying> buffercache { BUFFER_CACHE_SIZE };
 	AudioStream speech;
 	AudioStream streams[MAX_STREAMS];
 	int num_streams = 0;
 
-	std::atomic_bool stayAlive {true};
+	std::atomic_bool stayAlive { true };
 	short* music_memory;
 	std::thread musicThread;
 
@@ -196,7 +204,7 @@ private:
 	ALuint efxEffect = 0;
 	MapReverbProperties reverbProperties;
 
-	OpenALuintPair loadSound(StringView ResRef, tick_t &time_length, bool spatial = false);
+	OpenALuintPair loadSound(StringView ResRef, tick_t& time_length, bool spatial = false);
 	int CountAvailableSources(int limit);
 	bool evictBuffer();
 	void clearBufferCache(bool force);

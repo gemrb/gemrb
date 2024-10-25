@@ -23,6 +23,7 @@
 
 #include "Plugin.h"
 #include "Projectile.h"
+
 #include "Streams/DataStream.h"
 
 namespace GemRB {
@@ -30,7 +31,7 @@ namespace GemRB {
 class GEM_EXPORT ProjectileMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
-	virtual Projectile* GetProjectile( Projectile *) = 0;
+	virtual Projectile* GetProjectile(Projectile*) = 0;
 };
 
 }

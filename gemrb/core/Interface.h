@@ -33,20 +33,21 @@
 #include "EnumIndex.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
-#include "GUI/Control.h"
-#include "GUI/Tooltip.h"
 #include "Holder.h"
 #include "ImageMgr.h"
 #include "InterfaceConfig.h"
 #include "Orientation.h"
 #include "SaveGameAREExtractor.h"
-#include "Strings/StringMap.h"
 #include "StringMgr.h"
 #include "TableMgr.h"
 
+#include "GUI/Control.h"
+#include "GUI/Tooltip.h"
+#include "Strings/StringMap.h"
+
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 namespace GemRB {
 
@@ -141,60 +142,60 @@ public:
 	bool WeightOdds;
 
 	ItemList(std::vector<ResRef> refs, int label)
-	: ResRefs(std::move(refs))
+		: ResRefs(std::move(refs))
 	{
 		if ((ResRefs.size() & 1) && label == 2) {
-			WeightOdds=true;
+			WeightOdds = true;
 		} else {
-			WeightOdds=false;
+			WeightOdds = false;
 		}
 	}
 };
 
 //quitflags
-#define QF_NORMAL        0
-#define QF_QUITGAME      1 // Quit current game
-#define QF_EXITGAME      2 // Quit current game and then set QF_KILL
-#define QF_CHANGESCRIPT  4
-#define QF_LOADGAME      8
-#define QF_ENTERGAME     16
-#define QF_KILL			32 // Exit GemRB
+#define QF_NORMAL       0
+#define QF_QUITGAME     1 // Quit current game
+#define QF_EXITGAME     2 // Quit current game and then set QF_KILL
+#define QF_CHANGESCRIPT 4
+#define QF_LOADGAME     8
+#define QF_ENTERGAME    16
+#define QF_KILL         32 // Exit GemRB
 
 //events that are called out of drawwindow
 //they wait until the condition is right
-#define EF_CONTROL       1        //updates the game window statuses
-#define EF_SHOWMAP       2        //starts worldmap
-#define EF_PORTRAIT      4        //updates portraits
-#define EF_ACTION        8        //updates the actions bar
-#define EF_UPDATEANIM    16       //updates avatar animation
-#define EF_SEQUENCER     32       //starts sequencer/contingency creation
-#define EF_IDENTIFY      64       //starts identify screen
-#define EF_SELECTION     128      //selection changed
-#define EF_OPENSTORE     256      //open store window
-#define EF_EXPANSION     512      //upgrade game request
-#define EF_CREATEMAZE    1024     //call the maze generator
-#define EF_RESETTARGET   2048     //reset the mouse cursor
-#define EF_TARGETMODE    4096     //update the mouse cursor
-#define EF_TEXTSCREEN    8192     //start a textscreen
+#define EF_CONTROL     1 //updates the game window statuses
+#define EF_SHOWMAP     2 //starts worldmap
+#define EF_PORTRAIT    4 //updates portraits
+#define EF_ACTION      8 //updates the actions bar
+#define EF_UPDATEANIM  16 //updates avatar animation
+#define EF_SEQUENCER   32 //starts sequencer/contingency creation
+#define EF_IDENTIFY    64 //starts identify screen
+#define EF_SELECTION   128 //selection changed
+#define EF_OPENSTORE   256 //open store window
+#define EF_EXPANSION   512 //upgrade game request
+#define EF_CREATEMAZE  1024 //call the maze generator
+#define EF_RESETTARGET 2048 //reset the mouse cursor
+#define EF_TARGETMODE  4096 //update the mouse cursor
+#define EF_TEXTSCREEN  8192 //start a textscreen
 
 //autopause
 enum class AUTOPAUSE : ieDword {
-	UNUSABLE     = 0,
-	ATTACKED     = 1,
-	HIT          = 2,
-	WOUNDED      = 3,
-	DEAD         = 4,
-	NOTARGET     = 5,
-	ENDROUND     = 6,
-	ENEMY        = 7,
-	TRAP         = 8,
-	SPELLCAST    = 9,
-	GENERIC      = 10  //needed for Android stuff
+	UNUSABLE = 0,
+	ATTACKED = 1,
+	HIT = 2,
+	WOUNDED = 3,
+	DEAD = 4,
+	NOTARGET = 5,
+	ENDROUND = 6,
+	ENEMY = 7,
+	TRAP = 8,
+	SPELLCAST = 9,
+	GENERIC = 10 //needed for Android stuff
 };
 
 //pause flags
-#define PF_QUIET  1        //no feedback
-#define PF_FORCED 2        //pause even in cutscene/dialog
+#define PF_QUIET  1 //no feedback
+#define PF_FORCED 2 //pause even in cutscene/dialog
 
 /** ea relations (derivated from 2 actor's EA value) */
 #define EAR_FRIEND  0
@@ -202,41 +203,41 @@ enum class AUTOPAUSE : ieDword {
 #define EAR_HOSTILE 2
 
 /** Max size of actor's ground circle (PST) */
-#define MAX_CIRCLE_SIZE  3
+#define MAX_CIRCLE_SIZE 3
 
 /** Summoning */
-#define EAM_SOURCEALLY 0
+#define EAM_SOURCEALLY  0
 #define EAM_SOURCEENEMY 1
-#define EAM_ENEMY   2
-#define EAM_ALLY    3
-#define EAM_NEUTRAL 4
-#define EAM_DEFAULT 5
+#define EAM_ENEMY       2
+#define EAM_ALLY        3
+#define EAM_NEUTRAL     4
+#define EAM_DEFAULT     5
 //
-#define STAT_CON_HP_NORMAL   0
-#define STAT_CON_HP_WARRIOR  1
-#define STAT_CON_HP_MIN      2
-#define STAT_CON_HP_REGEN    3
-#define STAT_CON_FATIGUE     4
-#define STAT_CON_TNO_REGEN   4
+#define STAT_CON_HP_NORMAL  0
+#define STAT_CON_HP_WARRIOR 1
+#define STAT_CON_HP_MIN     2
+#define STAT_CON_HP_REGEN   3
+#define STAT_CON_FATIGUE    4
+#define STAT_CON_TNO_REGEN  4
 
-#define STAT_DEX_REACTION    0
-#define STAT_DEX_MISSILE     1
-#define STAT_DEX_AC          2
+#define STAT_DEX_REACTION 0
+#define STAT_DEX_MISSILE  1
+#define STAT_DEX_AC       2
 
-#define STAT_INT_LEARN       0
-#define STAT_INT_MAXLEVEL    1
-#define STAT_INT_MAXNUMBER   2
+#define STAT_INT_LEARN     0
+#define STAT_INT_MAXLEVEL  1
+#define STAT_INT_MAXNUMBER 2
 
 //sloteffects (querysloteffect returns it)
-#define SLOT_EFFECT_NONE     0
-#define SLOT_EFFECT_ITEM     1 //normal equipped item
-#define SLOT_EFFECT_FIST     2 //fist slot
-#define SLOT_EFFECT_MAGIC    3 //magic weapon slot
-#define SLOT_EFFECT_MELEE    4 //normal weapon slot
-#define SLOT_EFFECT_MISSILE  5 //quiver slots
-#define SLOT_EFFECT_LEFT     6 //shield (left hand) slot
-#define SLOT_EFFECT_HEAD     7 //head slot
-#define SLOT_EFFECT_ALIAS    100 // marker for aliased slots
+#define SLOT_EFFECT_NONE    0
+#define SLOT_EFFECT_ITEM    1 //normal equipped item
+#define SLOT_EFFECT_FIST    2 //fist slot
+#define SLOT_EFFECT_MAGIC   3 //magic weapon slot
+#define SLOT_EFFECT_MELEE   4 //normal weapon slot
+#define SLOT_EFFECT_MISSILE 5 //quiver slots
+#define SLOT_EFFECT_LEFT    6 //shield (left hand) slot
+#define SLOT_EFFECT_HEAD    7 //head slot
+#define SLOT_EFFECT_ALIAS   100 // marker for aliased slots
 
 enum class PauseState {
 	Off = 0,
@@ -271,7 +272,7 @@ struct ItemDragOp : public Control::ControlDragOp {
 
 	explicit ItemDragOp(CREItem* item);
 	~ItemDragOp();
-	
+
 private:
 	static Control dragDummy;
 };
@@ -281,8 +282,7 @@ private:
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
  */
 
-class GEM_EXPORT Interface
-{
+class GEM_EXPORT Interface {
 public:
 	using tokens_t = std::unordered_map<ieVariable, String, CstrHashCI>;
 
@@ -297,7 +297,7 @@ private:
 	PluginHolder<ScriptEngine> guiscript;
 	std::unique_ptr<FogRenderer> fogRenderer;
 	GameControl* gamectrl = nullptr;
-	SaveGameIterator *sgiterator = nullptr;
+	SaveGameIterator* sgiterator = nullptr;
 	tokens_t tokens;
 	StringMap<std::vector<ieDword>> lists;
 	variables_t vars;
@@ -315,7 +315,7 @@ private:
 	ResRef TextCursorBam;
 	ResRef ScrollCursorBam;
 	ResRef GroundCircleBam[MAX_CIRCLE_SIZE];
-	int GroundCircleScale[MAX_CIRCLE_SIZE]{};
+	int GroundCircleScale[MAX_CIRCLE_SIZE] {};
 
 	ResRefMap<Holder<Font>> fonts;
 	ResRef ButtonFontResRef;
@@ -329,11 +329,11 @@ private:
 	ResRef Palette32;
 	ResRef Palette256;
 	std::vector<ColorPal<256>> palettes256;
-	std::vector<ColorPal<32>>  palettes32;
-	std::vector<ColorPal<16>>  palettes16;
+	std::vector<ColorPal<32>> palettes32;
+	std::vector<ColorPal<16>> palettes16;
 
 	std::vector<ieDword> slotmatrix; // itemtype vs slottype
-	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
+	std::vector<std::vector<int>> itemtypedata; //armor failure, critical multiplier, critical range
 	std::vector<SlotType> slotTypes;
 	TableMgr::index_t ItemTypes = 0;
 
@@ -351,8 +351,8 @@ private:
 	path_t nextScript;
 
 	std::deque<Timer> timers;
-	KeyMap *keymap = nullptr;
-	Scriptable *CutSceneRunner = nullptr;
+	KeyMap* keymap = nullptr;
+	Scriptable* CutSceneRunner = nullptr;
 
 	int MaximumAbility = 0;
 
@@ -371,17 +371,18 @@ public:
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };
 	Holder<SoundHandle> strrefHandle = nullptr;
 
-	std::vector<Holder<Sprite2D> > Cursors;
+	std::vector<Holder<Sprite2D>> Cursors;
 	std::array<std::array<Holder<Sprite2D>, 6>, MAX_CIRCLE_SIZE> GroundCircles;
 	std::vector<ieVariable> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
-	TimeStruct Time{};
+	TimeStruct Time {};
+
 public:
 	explicit Interface(CoreSettings&& config);
 	~Interface() noexcept;
-	
+
 	Interface(const Interface&) = delete;
-	
+
 	//TODO: Core Methods in Interface Class
 	void SetFeature(GFFlags flag);
 	void ClearFeature(GFFlags flag);
@@ -407,24 +408,24 @@ public:
 	PluginHolder<ScriptEngine> GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor
 	may apply a single fx on the summoned creature normally an unsummon effect */
-	Actor *SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, const Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod = true);
+	Actor* SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable* Owner, const Actor* target, const Point& position, int eamod, int level, Effect* fx, bool sexmod = true);
 	/** Get the Window Manager */
-	WindowManager *GetWindowManager() const { return winmgr; };
-	
+	WindowManager* GetWindowManager() const { return winmgr; };
+
 	void ToggleViewsVisible(bool visible, const ScriptingGroup_t& group);
 	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
 	void LoadInitialValues(const ResRef& name, ieVarsMap& map) const;
 
 	Tooltip CreateTooltip() const;
 	/** returns the label which should receive game messages (overrides messagetextarea) */
-	Label *GetMessageLabel() const;
+	Label* GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
-	TextArea *GetMessageTextArea() const;
+	TextArea* GetMessageTextArea() const;
 	void SetFeedbackLevel(int level);
 	/** returns true if the passed feedback type is enabled */
 	bool HasFeedback(int type) const;
 	/** Get the SaveGameIterator */
-	SaveGameIterator * GetSaveGameIterator() const;
+	SaveGameIterator* GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */
 	variables_t& GetDictionary();
 	/** Get the Token Dictionary */
@@ -445,8 +446,8 @@ public:
 	/** Generates traditional random number xdy+z */
 	int Roll(int dice, int size, int add) const;
 	/** store the scriptable running the cutscene */
-	void SetCutSceneRunner(Scriptable *runner);
-	Scriptable *GetCutSceneRunner() const { return CutSceneRunner; };
+	void SetCutSceneRunner(Scriptable* runner);
+	Scriptable* GetCutSceneRunner() const { return CutSceneRunner; };
 	/** Enables/Disables the CutScene Mode */
 	void SetCutSceneMode(bool active);
 	/** returns true if in cutscene mode */
@@ -454,36 +455,36 @@ public:
 	/** Updates the Game Script Engine State */
 	bool GSUpdate(bool update);
 	/** Get the Party INI Interpreter */
-	DataFileMgr * GetPartyINI() const
+	DataFileMgr* GetPartyINI() const
 	{
 		return INIparty.get();
 	}
-	DataFileMgr * GetBeastsINI() const
+	DataFileMgr* GetBeastsINI() const
 	{
 		return INIbeasts.get();
 	}
-	DataFileMgr * GetQuestsINI() const
+	DataFileMgr* GetQuestsINI() const
 	{
 		return INIquests.get();
 	}
-	DataFileMgr * GetResDataINI() const
+	DataFileMgr* GetResDataINI() const
 	{
 		return INIresdata.get();
 	}
 	/** Gets the Game class */
-	Game * GetGame() const
+	Game* GetGame() const
 	{
 		return game;
 	}
 	void SetGame(Game* newGame) { game = newGame; };
 	/** Gets the Calendar class */
-	Calendar * GetCalendar() const
+	Calendar* GetCalendar() const
 	{
 		return calendar;
 	}
 
 	/** Gets the KeyMap class */
-	KeyMap * GetKeyMap() const
+	KeyMap* GetKeyMap() const
 	{
 		return keymap;
 	}
@@ -491,7 +492,7 @@ public:
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
 	WorldMap* GetWorldMap() const;
 	WorldMap* GetWorldMap(const ResRef& area) const;
-	GameControl *GetGameControl() const { return game ? gamectrl : nullptr; }
+	GameControl* GetGameControl() const { return game ? gamectrl : nullptr; }
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
 	/** sets up load game */
@@ -506,7 +507,7 @@ public:
 
 	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY) const;
 
-	size_t GetInventorySize() const { return SlotTypes-1; }
+	size_t GetInventorySize() const { return SlotTypes - 1; }
 	ieDword FindSlot(unsigned int idx) const;
 	ieDword QuerySlot(unsigned int idx) const;
 	ieDword QuerySlotType(unsigned int idx) const;
@@ -522,7 +523,7 @@ public:
 	int GetCriticalMultiplier(unsigned int itemtype) const;
 	int GetCriticalRange(unsigned int itemtype) const;
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
-	int CanUseItemType(int slottype, const Item *item, const Actor *actor = nullptr, bool feedback = false, bool equipped = false) const;
+	int CanUseItemType(int slottype, const Item* item, const Actor* actor = nullptr, bool feedback = false, bool equipped = false) const;
 	int CheckItemType(const Item* item, int slotType) const;
 	/*returns 0,1,2 based on how the file should be saved */
 	int SavedExtension(const path_t& filename) const;
@@ -534,17 +535,17 @@ public:
 	const ItemDragOp* GetDraggedItem() const { return DraggedItem.get(); }
 	/* use this only when the dragged item is dropped */
 	void ReleaseDraggedItem();
-	CREItem *ReadItem(DataStream *str) const;
-	CREItem *ReadItem(DataStream *str, CREItem *itm) const;
-	void SanitizeItem(CREItem *item) const;
-	bool ResolveRandomItem(CREItem *itm) const;
+	CREItem* ReadItem(DataStream* str) const;
+	CREItem* ReadItem(DataStream* str, CREItem* itm) const;
+	void SanitizeItem(CREItem* item) const;
+	bool ResolveRandomItem(CREItem* itm) const;
 	ieStrRef GetRumour(const ResRef& resname);
-	Container *GetCurrentContainer();
+	Container* GetCurrentContainer();
 	int CloseCurrentContainer();
-	void SetCurrentContainer(const Actor *actor, Container *arg, bool flag = false);
-	Store *GetCurrentStore();
+	void SetCurrentContainer(const Actor* actor, Container* arg, bool flag = false);
+	Store* GetCurrentStore();
 	void CloseCurrentStore();
-	Store *SetCurrentStore(const ResRef &resName, ieDword owner);
+	Store* SetCurrentStore(const ResRef& resName, ieDword owner);
 	void SetMouseScrollSpeed(int speed);
 	int GetMouseScrollSpeed() const;
 
@@ -553,8 +554,8 @@ public:
 	Holder<SoundHandle> PlaySound(size_t idx, SFXChannel channel, const Point& p, unsigned int flags = 0) const;
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
-	Actor *GetFirstSelectedPC(bool forced);
-	Actor *GetFirstSelectedActor();
+	Actor* GetFirstSelectedPC(bool forced);
+	Actor* GetFirstSelectedActor();
 	/** is an area loaded? (prefer Game::GetCurrentArea if including Game.h makes sense) */
 	bool HasCurrentArea() const;
 	/** returns a cursor sprite (not cached) */
@@ -564,7 +565,7 @@ public:
 	void DisableGameControl(bool disable) const;
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	returns gold value! */
-	int CanMoveItem(const CREItem *item) const;
+	int CanMoveItem(const CREItem* item) const;
 	int GetMaximumAbility() const;
 	int GetStrengthBonus(int column, int value, int ex) const;
 	int GetIntelligenceBonus(int column, int value) const;
@@ -575,17 +576,17 @@ public:
 	int GetWisdomBonus(int column, int value) const;
 
 	/** applies the spell on the target */
-	void ApplySpell(const ResRef& spellRef, Actor *target, Scriptable *caster, int level) const;
+	void ApplySpell(const ResRef& spellRef, Actor* target, Scriptable* caster, int level) const;
 	/** applies the spell on the area or on a scriptable object */
-	void ApplySpellPoint(const ResRef& spellRef, Map *area, const Point &pos, Scriptable *caster, int level) const;
+	void ApplySpellPoint(const ResRef& spellRef, Map* area, const Point& pos, Scriptable* caster, int level) const;
 	/** applies a single effect on the target */
-	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster) const;
+	int ApplyEffect(Effect* fx, Actor* target, Scriptable* caster) const;
 	/** applies an effect queue on the target */
-	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster) const;
-	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p) const;
-	Effect *GetEffect(const ResRef& resname, int level, const Point &p);
+	int ApplyEffectQueue(EffectQueue* fxqueue, Actor* actor, Scriptable* caster) const;
+	int ApplyEffectQueue(EffectQueue* fxqueue, Actor* actor, Scriptable* caster, Point p) const;
+	Effect* GetEffect(const ResRef& resname, int level, const Point& p);
 	/** dumps an area object to the cache */
-	int SwapoutArea(Map *map) const;
+	int SwapoutArea(Map* map) const;
 	/** saves (exports a character to the characters folder */
 	int WriteCharacter(StringView name, const Actor* actor) const;
 	/** saves the game object to the destination folder */
@@ -599,9 +600,9 @@ public:
 	/** returns true the passed pause setting was applied. false otherwise. */
 	bool SetPause(PauseState pause, int flags = 0) const;
 	/** receives an autopause reason, returns true if autopause was accepted and successful */
-	bool Autopause(AUTOPAUSE flag, Scriptable *target) const;
+	bool Autopause(AUTOPAUSE flag, Scriptable* target) const;
 	/** registers engine opcodes */
-	void RegisterOpcodes(int count, const EffectDesc *opcodes) const;
+	void RegisterOpcodes(int count, const EffectDesc* opcodes) const;
 	/** reads a list of resrefs into an array, returns array size */
 	bool ReadResRefTable(const ResRef& tablename, std::vector<ResRef>& data);
 	/** Returns up to 3 resources from resref, choosing rows randomly
@@ -619,9 +620,10 @@ public:
 	const ieVariable& GetMusicPlaylist(size_t SongType) const;
 	void DisableMusicPlaylist(size_t SongType);
 	/** Returns the DeathVarFormat of the day */
-	static const char *GetDeathVarFormat();
+	static const char* GetDeathVarFormat();
 	/** Saves config variables to a file */
 	bool SaveConfig();
+
 private:
 	void LoadPlugins() const;
 	void LoadSprites();
@@ -629,7 +631,7 @@ private:
 	void LoadGemRBINI();
 	/** Load the encoding table selected in gemrb.cfg */
 	bool LoadEncoding();
-	
+
 	void InitVideo() const;
 	void InitAudio();
 
@@ -711,11 +713,11 @@ public:
 
 	inline void SetEventFlag(int Flag)
 	{
-		EventFlag|=Flag;
+		EventFlag |= Flag;
 	}
 	inline void ResetEventFlag(int Flag)
 	{
-		EventFlag&=~Flag;
+		EventFlag &= ~Flag;
 	}
 	inline void ResetActionBar()
 	{
@@ -731,10 +733,11 @@ public:
 	Timer& SetTimer(const EventHandler&, tick_t interval, int repeats = -1);
 };
 
-extern GEM_EXPORT Interface * core;
+extern GEM_EXPORT Interface* core;
 
 template<typename T>
-void SetTokenAsString(const ieVariable& key, T&& newValue) {
+void SetTokenAsString(const ieVariable& key, T&& newValue)
+{
 	core->GetTokenDictionary()[key] = fmt::format(u"{}", std::forward<T>(newValue));
 }
 

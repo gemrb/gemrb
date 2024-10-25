@@ -21,10 +21,12 @@
 #define __GemRB__View__
 
 #include "globals.h"
-#include "GUI/EventMgr.h"
+
 #include "Holder.h"
 #include "Region.h"
 #include "ScriptEngine.h"
+
+#include "GUI/EventMgr.h"
 
 #include <list>
 #include <memory>
@@ -41,36 +43,37 @@ public:
 	struct GEM_EXPORT DragOp {
 		View* dragView = nullptr;
 		View* dropView = nullptr;
-		
+
 		Holder<Sprite2D> cursor;
-		
+
 		DragOp(View* v, Holder<Sprite2D> cursor);
 		virtual ~DragOp();
 	};
-	
+
 	using UniqueDragOp = std::unique_ptr<DragOp>;
-	
+
 	enum AutoresizeFlags {
 		// when a superview frame changes...
 		ResizeNone = 0,
 		ResizeTop = 1 << 0, // keep my top relative to my super
 		ResizeBottom = 1 << 1, // keep my bottom relative to my super
-		ResizeVertical = ResizeTop|ResizeBottom, // top+bottom effectively resizes me vertically
+		ResizeVertical = ResizeTop | ResizeBottom, // top+bottom effectively resizes me vertically
 		ResizeLeft = 1 << 3, // keep my left relative to my super
 		ResizeRight = 1 << 4, // keep my right relative to my super
 		ResizeHorizontal = ResizeLeft | ResizeRight, // left + right effectively resizes me horizontally
-		ResizeAll = ResizeVertical|ResizeHorizontal, // resize me relative to my super
-		
+		ResizeAll = ResizeVertical | ResizeHorizontal, // resize me relative to my super
+
 		// TODO: move these to TextContainer
-		RESIZE_WIDTH = 1 << 27,		// resize the view horizontally if horizontal content exceeds width
-		RESIZE_HEIGHT = 1 << 26	// resize the view vertically if vertical content exceeds width
+		RESIZE_WIDTH = 1 << 27, // resize the view horizontally if horizontal content exceeds width
+		RESIZE_HEIGHT = 1 << 26 // resize the view vertically if vertical content exceeds width
 	};
-	
+
 	enum ViewFlags {
 		Invisible = 1 << 30,
 		Disabled = 1 << 29,
 		IgnoreEvents = 1 << 28
 	};
+
 private:
 	Color backgroundColor;
 	Holder<Sprite2D> background;
@@ -78,7 +81,7 @@ private:
 	std::vector<ViewScriptingRef*> scriptingRefs;
 
 	mutable bool dirty = true;
-	
+
 	View* eventProxy = nullptr;
 
 protected:
@@ -121,26 +124,26 @@ private:
 	virtual void FlagsChanged(unsigned int /*oldflags*/) {}
 	virtual void SizeChanged(const Size&) {}
 	virtual void OriginChanged(const Point&) {}
-	
+
 	// See Draw() for restrictions
 	virtual void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) {}
 	// See Draw() for restrictions
 	virtual void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) {}
-	
+
 	virtual bool IsPerPixelScrollable() const { return true; }
-	
+
 	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group);
 
 protected:
 	void ClearScriptingRefs() noexcept;
 
 	void ResizeSubviews(const Size& oldsize);
-	
+
 	// these events make no sense to forward
 	virtual void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) {}
 	virtual void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) {}
 	virtual void OnTextInput(const TextEvent& /*te*/) {}
-	
+
 	// default view implementation does nothing but ignore the event
 	virtual bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; }
 	virtual bool OnKeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; }
@@ -153,16 +156,16 @@ protected:
 	virtual bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 	virtual bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 	virtual bool OnTouchGesture(const GestureEvent& gesture);
-	
+
 	virtual bool OnControllerAxis(const ControllerEvent&);
 	virtual bool OnControllerButtonDown(const ControllerEvent&);
 	virtual bool OnControllerButtonUp(const ControllerEvent&);
-	
+
 	virtual bool IsAnimated() const { return false; }
 	virtual bool IsOpaque() const;
 
 public:
-	#include "ViewInterfaces.h"
+#include "ViewInterfaces.h"
 
 	bool debuginfo = false;
 
@@ -187,7 +190,7 @@ public:
 	void SetVisible(bool vis) { SetFlags(Invisible, vis ? BitOp::NAND : BitOp::OR); }
 	bool IsVisible() const;
 	void SetDisabled(bool disable) { SetFlags(Disabled, disable ? BitOp::OR : BitOp::NAND); }
-	bool IsDisabled() const { return flags&Disabled; }
+	bool IsDisabled() const { return flags & Disabled; }
 	virtual bool IsDisabledCursor() const;
 	virtual bool IsReceivingEvents() const;
 
@@ -214,7 +217,7 @@ public:
 	Point ConvertPointFromWindow(const Point&) const;
 	Point ConvertPointToScreen(const Point&) const;
 	Point ConvertPointFromScreen(const Point&) const;
-	
+
 	Region ConvertRegionToSuper(Region) const;
 	Region ConvertRegionFromSuper(Region) const;
 	Region ConvertRegionToWindow(Region) const;
@@ -222,7 +225,7 @@ public:
 	Region ConvertRegionToScreen(Region) const;
 	Region ConvertRegionFromScreen(Region) const;
 
-	virtual bool CanLockFocus() const { return (flags&(IgnoreEvents|Disabled)) == 0; };
+	virtual bool CanLockFocus() const { return (flags & (IgnoreEvents | Disabled)) == 0; };
 	virtual bool CanUnlockFocus() const { return true; };
 	virtual void DidFocus() {}
 	virtual void DidUnFocus() {}
@@ -249,7 +252,7 @@ public:
 	void TouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 	void TouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 	void TouchGesture(const GestureEvent& gesture);
-	
+
 	void ControllerAxis(const ControllerEvent&);
 	void ControllerButtonDown(const ControllerEvent&);
 	void ControllerButtonUp(const ControllerEvent&);

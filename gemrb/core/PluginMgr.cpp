@@ -20,7 +20,7 @@
 
 namespace GemRB {
 
-PluginMgr *PluginMgr::Get()
+PluginMgr* PluginMgr::Get()
 {
 	static PluginMgr mgr;
 	return &mgr;
@@ -83,7 +83,7 @@ void PluginMgr::RunCleanup() const
 
 bool PluginMgr::RegisterDriver(const TypeID* type, const std::string& name, PluginFunc create)
 {
-	driver_map &map = drivers[type];
+	driver_map& map = drivers[type];
 	driver_map::const_iterator iter = map.find(name);
 	if (iter != map.end())
 		return false;
@@ -93,7 +93,7 @@ bool PluginMgr::RegisterDriver(const TypeID* type, const std::string& name, Plug
 
 PluginHolder<Plugin> PluginMgr::GetDriver(const TypeID* type, const std::string& name)
 {
-	driver_map &map = drivers[type];
+	driver_map& map = drivers[type];
 	if (map.begin() == map.end())
 		return NULL;
 	driver_map::const_iterator iter = map.find(name);

@@ -20,15 +20,16 @@
 
 #include "Compressor.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "PluginMgr.h"
+
+#include "Logging/Logging.h"
 
 using namespace GemRB;
 
-int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor& areExtractor)
+int SAVImporter::DecompressSaveGame(DataStream* compressed, SaveGameAREExtractor& areExtractor)
 {
 	char Signature[8];
-	compressed->Read( Signature, 8 );
+	compressed->Read(Signature, 8);
 	if (strncmp(Signature, "SAV V1.0", 8) != 0) {
 		return GEM_ERROR;
 	}
@@ -76,14 +77,13 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 			core->LoadProgress(static_cast<int>(percent));
 			last_percent = percent;
 		}
-	}
-	while(Current);
+	} while (Current);
 
 	return GEM_OK;
 }
 
 //this one can create .sav files only
-int SAVImporter::CreateArchive(DataStream *compressed)
+int SAVImporter::CreateArchive(DataStream* compressed)
 {
 	if (!compressed) {
 		return GEM_ERROR;
@@ -94,7 +94,7 @@ int SAVImporter::CreateArchive(DataStream *compressed)
 	return GEM_OK;
 }
 
-int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
+int SAVImporter::AddToSaveGame(DataStream* str, DataStream* uncompressed)
 {
 	size_t fnlen = uncompressed->filename.length() + 1;
 	strpos_t declen = uncompressed->Size();
@@ -108,20 +108,21 @@ int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	str->WriteDword(complen);
 
 	PluginHolder<Compressor> comp = MakePluginHolder<Compressor>(PLUGIN_COMPRESSION_ZLIB);
-	comp->Compress( str, uncompressed );
+	comp->Compress(str, uncompressed);
 
 	//writing compressed length (calculated)
 	strpos_t Pos2 = str->GetPos();
 	complen = ieDword(Pos2 - Pos - sizeof(ieDword)); //calculating the compressed stream size
 	str->Seek(Pos, GEM_STREAM_START); //going back to the placeholder
-	str->WriteDword(complen);       //updating size
-	str->Seek(Pos2, GEM_STREAM_START);//resuming work
+	str->WriteDword(complen); //updating size
+	str->Seek(Pos2, GEM_STREAM_START); //resuming work
 	return GEM_OK;
 }
 
-int SAVImporter::AddToSaveGameCompressed(DataStream *str, DataStream *compressed) {
+int SAVImporter::AddToSaveGameCompressed(DataStream* str, DataStream* compressed)
+{
 	using BufferT = std::array<uint8_t, 4096>;
-	BufferT buffer{};
+	BufferT buffer {};
 
 	BufferT::size_type remaining = compressed->Size();
 	while (remaining > 0) {

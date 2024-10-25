@@ -47,7 +47,7 @@
 
 namespace GemRB {
 
-static const ResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
+static const ResRef SevenEyes[7] = { "spin126", "spin127", "spin128", "spin129", "spin130", "spin131", "spin132" };
 
 class Actor;
 class ScriptedAnimation;
@@ -83,14 +83,13 @@ struct SurgeSpell {
 // item usability array
 struct ItemUseType {
 	ResRef table; // which table contains the stat usability flags
-	ieByte stat;  // which actor stat we talk about
-	ieByte mcol;  // which column should be matched against the stat
-	ieByte vcol;  // which column has the bit value for it
+	ieByte stat; // which actor stat we talk about
+	ieByte mcol; // which column should be matched against the stat
+	ieByte vcol; // which column has the bit value for it
 	ieByte which; // which item dword should be used (1 = kit)
 };
 
-class GEM_EXPORT GameData : public ResourceManager
-{
+class GEM_EXPORT GameData : public ResourceManager {
 public:
 	GameData() = default;
 	GameData(const GameData&) = delete;
@@ -113,36 +112,36 @@ public:
 
 	Holder<Palette> GetPalette(const ResRef& resname);
 
-	Item* GetItem(const ResRef &resname, bool silent=false);
-	void FreeItem(Item const *itm, const ResRef &name, bool free=false);
-	Spell* GetSpell(const ResRef &resname, bool silent=false);
-	void FreeSpell(const Spell *spl, const ResRef &name, bool free = false);
-	Effect* GetEffect(const ResRef &resname);
-	void FreeEffect(const Effect *eff, const ResRef &name, bool free = false);
+	Item* GetItem(const ResRef& resname, bool silent = false);
+	void FreeItem(Item const* itm, const ResRef& name, bool free = false);
+	Spell* GetSpell(const ResRef& resname, bool silent = false);
+	void FreeSpell(const Spell* spl, const ResRef& name, bool free = false);
+	Effect* GetEffect(const ResRef& resname);
+	void FreeEffect(const Effect* eff, const ResRef& name, bool free = false);
 
 	/** creates a vvc/bam animation object at point */
-	ScriptedAnimation* GetScriptedAnimation(const ResRef &resRef, bool doublehint);
+	ScriptedAnimation* GetScriptedAnimation(const ResRef& resRef, bool doublehint);
 
 	/** creates a composite vef/2da animation */
 	VEFObject* GetVEFObject(const ResRef& vefRef, bool doublehint);
 
 	/** returns a single sprite (not cached) from a BAM resource */
-	Holder<Sprite2D> GetBAMSprite(const ResRef &resRef, int cycle, int frame, bool silent=false);
+	Holder<Sprite2D> GetBAMSprite(const ResRef& resRef, int cycle, int frame, bool silent = false);
 
 	/* returns a single BAM or static image sprite, checking in that order */
 	Holder<Sprite2D> GetAnySprite(const ResRef& resRef, int cycle, int frame, bool silent = true);
 
 	/** returns factory resource, currently works only with animations */
 	Factory::object_t GetFactoryResource(const ResRef& resName, SClass_ID type, bool silent = false);
-	
-	template <typename T>
+
+	template<typename T>
 	std::shared_ptr<T> GetFactoryResourceAs(const ResRef& resName, SClass_ID type, bool silent = false)
 	{
 		static_assert(std::is_base_of<FactoryObject, T>::value, "T must be a FactoryObject.");
 		return std::static_pointer_cast<T>(GetFactoryResource(resName, type, silent));
 	}
 
-	template <typename T, typename... ARGS>
+	template<typename T, typename... ARGS>
 	std::shared_ptr<T> AddFactoryResource(ARGS&&... args)
 	{
 		static_assert(std::is_base_of<FactoryObject, T>::value, "T must be a FactoryObject.");
@@ -151,21 +150,21 @@ public:
 		return obj;
 	}
 
-	Store* GetStore(const ResRef &resRef);
+	Store* GetStore(const ResRef& resRef);
 	/// Saves a store to the cache and frees it.
 	void SaveStore(Store* store);
 	/// Saves all stores in the cache
 	void SaveAllStores();
 
 	// itemsnd.2da functions
-	bool GetItemSound(ResRef &Sound, ieDword ItemType, AnimRef ID, ieDword Col);
+	bool GetItemSound(ResRef& Sound, ieDword ItemType, AnimRef ID, ieDword Col);
 	int GetSwingCount(ieDword ItemType);
 
 	int GetRacialTHAC0Bonus(ieDword proficiency, const std::string& raceName);
 	bool HasInfravision(const std::string& raceName);
-	int GetSpellAbilityDie(const Actor *target, int which);
+	int GetSpellAbilityDie(const Actor* target, int which);
 	int GetTrapSaveBonus(ieDword level, int cls);
-	int GetTrapLimit(Scriptable *trapper);
+	int GetTrapLimit(Scriptable* trapper);
 	int GetSummoningLimit(ieDword sex);
 	void PreloadColors();
 	const Color& GetColor(const TableMgr::key_t& row) const;
@@ -173,7 +172,7 @@ public:
 	int GetWeaponStyleAPRBonus(int row, int col);
 	int GetReputationMod(int column);
 	/** Returns the virtual worldmap entry of a sub-area (pst-only) */
-	int GetAreaAlias(const ResRef &areaName);
+	int GetAreaAlias(const ResRef& areaName);
 	int GetSpecialSpell(const ResRef& resref);
 	const std::vector<SpecialSpellType>& GetSpecialSpells() const { return SpecialSpells; }
 	int CheckSpecialSpell(const ResRef& resRef, const Actor* actor);
@@ -196,9 +195,11 @@ public:
 	inline void SetStepTime(int st) { stepTime = st; }
 	inline int GetTextSpeed() const { return TextScreenSpeed; }
 	inline void SetTextSpeed(int speed) { TextScreenSpeed = speed; }
+
 private:
 	void ReadItemSounds();
 	void ReadSpellProtTable();
+
 private:
 	ResRefRCCache<Item> ItemCache;
 	ResRefRCCache<Spell> SpellCache;
@@ -218,9 +219,9 @@ private:
 	std::vector<std::vector<int>> bonusSpells;
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
-	Size weaponStyleAPRBonusMax{};
+	Size weaponStyleAPRBonusMax {};
 	// 4 styles and 4 star levels, 7 bonus types
-	std::array<std::array<std::array<int, 7>, 4>, 4> weaponStyleBoni{};
+	std::array<std::array<std::array<int, 7>, 4>, 4> weaponStyleBoni {};
 	ResRefMap<ieByte> itemAnims;
 	std::vector<ItemUseType> itemUse;
 
@@ -233,7 +234,7 @@ public:
 	SrcMgr SrcManager;
 };
 
-extern GEM_EXPORT GameData * gamedata;
+extern GEM_EXPORT GameData* gamedata;
 
 }
 

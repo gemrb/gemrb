@@ -20,24 +20,22 @@
 
 // GemRB.cpp : Defines the entry point for the application.
 
-#include <clocale> //language encoding
-
 #include "Interface.h"
 #include "VitaLogger.h"
 
-#include <psp2/kernel/processmgr.h>
-#include <psp2/power.h>
-#include <psp2/apputil.h>
-
 #include <Python.h>
 #include <SDL.h>
+#include <clocale> //language encoding
+#include <psp2/apputil.h>
+#include <psp2/kernel/processmgr.h>
+#include <psp2/power.h>
 
 // allocating memory for application on Vita
 int _newlib_heap_size_user = 344 * 1024 * 1024;
-char *vitaArgv[3];
+char* vitaArgv[3];
 char configPath[25];
 
-void VitaSetArguments(int *argc, char **argv[])
+void VitaSetArguments(int* argc, char** argv[])
 {
 	SceAppUtilInitParam appUtilParam;
 	SceAppUtilBootParam appUtilBootParam;
@@ -48,13 +46,13 @@ void VitaSetArguments(int *argc, char **argv[])
 	memset(&eventParam, 0, sizeof(SceAppUtilAppEventParam));
 	sceAppUtilReceiveAppEvent(&eventParam);
 	int vitaArgc = 1;
-	vitaArgv[0] = (char*)"";
+	vitaArgv[0] = (char*) "";
 	// 0x05 probably corresponds to psla event sent from launcher screen of the app in LiveArea
 	if (eventParam.type == 0x05) {
 		char buffer[2048];
 		memset(buffer, 0, 2048);
 		sceAppUtilAppEventParseLiveArea(&eventParam, buffer);
-		vitaArgv[1] = (char*)"-c";
+		vitaArgv[1] = (char*) "-c";
 		sprintf(configPath, "ux0:data/GemRB/%s.cfg", buffer);
 		vitaArgv[2] = configPath;
 		vitaArgc = 3;
@@ -71,24 +69,24 @@ int main(int argc, char* argv[])
 	scePowerSetBusClockFrequency(222);
 	scePowerSetGpuClockFrequency(222);
 	scePowerSetGpuXbarClockFrequency(166);
-	
+
 	mallopt(M_TRIM_THRESHOLD, 20 * 1024);
 
 	// Selecting game config from init params
 	VitaSetArguments(&argc, &argv);
 
 	setlocale(LC_ALL, "");
-	
+
 	AddLogWriter(createVitaLogger());
 	ToggleLogging(true);
 
 	SanityCheck();
-	
+
 	//Py_Initialize crashes on Vita otherwise
 	Py_NoSiteFlag = 1;
 	Py_IgnoreEnvironmentFlag = 1;
 	Py_NoUserSiteDirectory = 1;
-	
+
 	try {
 		Interface gemrb(LoadFromArgs(argc, argv));
 		gemrb.Main();
@@ -97,12 +95,12 @@ int main(int argc, char* argv[])
 		ToggleLogging(false);
 		return sceKernelExitProcess(GEM_ERROR);
 	}
-	
-#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
+
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1, 3, 0)
 	constexpr int32_t VITA_FULLSCREEN_WIDTH = 960;
 	constexpr int32_t VITA_FULLSCREEN_HEIGHT = 544;
-	
-	if (width != VITA_FULLSCREEN_WIDTH || height != VITA_FULLSCREEN_HEIGHT)	{
+
+	if (width != VITA_FULLSCREEN_WIDTH || height != VITA_FULLSCREEN_HEIGHT) {
 		SDL_Rect vitaDestRect;
 		vitaDestRect.x = 0;
 		vitaDestRect.y = 0;
@@ -127,7 +125,7 @@ int main(int argc, char* argv[])
 				vitaDestRect.w = VITA_FULLSCREEN_WIDTH;
 				vitaDestRect.h = VITA_FULLSCREEN_HEIGHT;
 			}
-			
+
 			SDL_SetVideoModeBilinear(true);
 		} else {
 			//center game area

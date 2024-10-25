@@ -25,22 +25,23 @@
 #include "ImageMgr.h"
 #include "Palette.h"
 #include "PluginMgr.h"
-#include "Video/Video.h"
-#include "Video/RLE.h"
+
 #include "Streams/FileStream.h"
+#include "Video/RLE.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
 
 bool BAMImporter::Import(DataStream* str)
 {
 	char Signature[8];
-	str->Read( Signature, 8 );
-	if (strncmp( Signature, "BAMCV1  ", 8 ) == 0) {
-		str->Seek( 4, GEM_CURRENT_POS );
+	str->Read(Signature, 8);
+	if (strncmp(Signature, "BAMCV1  ", 8) == 0) {
+		str->Seek(4, GEM_CURRENT_POS);
 		str = DecompressStream(str);
 		if (!str)
 			return false;
-		str->Read( Signature, 8 );
+		str->Read(Signature, 8);
 	}
 
 	version = BAMVersion::V1;
@@ -118,7 +119,7 @@ bool BAMImporter::Import(DataStream* str)
 		return true;
 	}
 
-	str->Seek( PaletteOffset, GEM_STREAM_START );
+	str->Seek(PaletteOffset, GEM_STREAM_START);
 	palette = MakeHolder<Palette>();
 	Palette::Colors buffer;
 
@@ -129,7 +130,7 @@ bool BAMImporter::Import(DataStream* str)
 		str->Read(&color.g, 1);
 		str->Read(&color.r, 1);
 		unsigned char a;
-		str->Read( &a, 1 );
+		str->Read(&a, 1);
 
 		// BAM v2 (EEs) supports alpha, but for backwards compatibility an alpha of 0 is still 255
 		color.a = a ? a : 255;
@@ -176,9 +177,10 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 	return spr;
 }
 
-Holder<Sprite2D> BAMImporter::GetV2Frame(const FrameEntry& frame) {
+Holder<Sprite2D> BAMImporter::GetV2Frame(const FrameEntry& frame)
+{
 	size_t frameSize = frame.bounds.size.Area() * 4;
-	uint8_t *frameData = static_cast<uint8_t*>(malloc(frameSize));
+	uint8_t* frameData = static_cast<uint8_t*>(malloc(frameSize));
 	std::fill(frameData, frameData + frameSize, 0);
 
 	size_t dataBlockOffset = DataStart + frame.location.v2.dataBlockIdx * sizeof(BAMV2DataBlock);
@@ -198,10 +200,11 @@ Holder<Sprite2D> BAMImporter::GetV2Frame(const FrameEntry& frame) {
 	}
 
 	PixelFormat fmt = PixelFormat::ARGB32Bit();
-	return {VideoDriver->CreateSprite(frame.bounds, frameData, fmt)};
+	return { VideoDriver->CreateSprite(frame.bounds, frameData, fmt) };
 }
 
-void BAMImporter::Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock, uint8_t *frameData) {
+void BAMImporter::Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock, uint8_t* frameData)
+{
 	// The page is likely to be the same for many sequential accesses
 	if (!lastPVRZ || dataBlock.pvrzPage != lastPVRZPage) {
 		auto resRef = fmt::format("mos{:04d}", dataBlock.pvrzPage);
@@ -210,7 +213,7 @@ void BAMImporter::Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock,
 		lastPVRZPage = dataBlock.pvrzPage;
 	}
 
-	auto sprite = lastPVRZ->GetSprite2D(Region{dataBlock.source.x, dataBlock.source.y, dataBlock.size.w, dataBlock.size.h});
+	auto sprite = lastPVRZ->GetSprite2D(Region { dataBlock.source.x, dataBlock.source.y, dataBlock.size.w, dataBlock.size.h });
 	if (!sprite) {
 		return;
 	}
@@ -224,8 +227,7 @@ void BAMImporter::Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock,
 		std::copy(
 			spritePixels + offset,
 			spritePixels + offset + sprite->Frame.w * 4,
-			frameData + destOffset
-		);
+			frameData + destOffset);
 	}
 
 	sprite->UnlockSprite();
@@ -243,22 +245,22 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 	if (count == 0) return {};
 
 	std::vector<index_t> FLT(count);
-	str->Seek( FLTOffset, GEM_STREAM_START );
+	str->Seek(FLTOffset, GEM_STREAM_START);
 	str->Read(&FLT[0], count * sizeof(ieWord));
 	return FLT;
 }
 
-std::shared_ptr<AnimationFactory> BAMImporter::GetAnimationFactory(const ResRef &resref, bool allowCompression)
+std::shared_ptr<AnimationFactory> BAMImporter::GetAnimationFactory(const ResRef& resref, bool allowCompression)
 {
 	std::vector<Holder<Sprite2D>> animframes;
 
 	if (version == BAMVersion::V1) {
-		str->Seek( DataStart, GEM_STREAM_START );
+		str->Seek(DataStart, GEM_STREAM_START);
 		strpos_t length = str->Remains();
 		if (length == 0) return nullptr;
 
 		auto FLT = CacheFLT();
-		uint8_t *data = (uint8_t*)malloc(length);
+		uint8_t* data = (uint8_t*) malloc(length);
 		str->Read(data, length);
 
 		for (const auto& frameInfo : frames) {
@@ -287,20 +289,20 @@ std::shared_ptr<AnimationFactory> BAMImporter::GetAnimationFactory(const ResRef 
 If the Global Animation Palette is NULL, returns NULL. */
 Holder<Sprite2D> BAMImporter::GetPalette()
 {
-	unsigned char * pixels = ( unsigned char * ) malloc( 256 );
-	unsigned char * p = pixels;
+	unsigned char* pixels = (unsigned char*) malloc(256);
+	unsigned char* p = pixels;
 	for (int i = 0; i < 256; i++) {
-		*p++ = ( unsigned char ) i;
+		*p++ = (unsigned char) i;
 	}
 	PixelFormat fmt = PixelFormat::Paletted8Bit(palette);
-	return VideoDriver->CreateSprite(Region(0,0,16,16), pixels, fmt);
+	return VideoDriver->CreateSprite(Region(0, 0, 16, 16), pixels, fmt);
 }
-
-#include "BAMFontManager.h"
 
 #include "plugindef.h"
 
+#include "BAMFontManager.h"
+
 GEMRB_PLUGIN(0x3AD6427A, "BAM File Importer")
-PLUGIN_IE_RESOURCE(BAMFontManager, "bam", (ieWord)IE_BAM_CLASS_ID)
+PLUGIN_IE_RESOURCE(BAMFontManager, "bam", (ieWord) IE_BAM_CLASS_ID)
 PLUGIN_CLASS(IE_BAM_CLASS_ID, ImporterPlugin<BAMImporter>)
 END_PLUGIN()

@@ -21,9 +21,9 @@
 #ifndef INIIMPORTER_H
 #define INIIMPORTER_H
 
-#include "DataFileMgr.h"
-
 #include "globals.h"
+
+#include "DataFileMgr.h"
 
 #include <cstring>
 #include <unordered_map>
@@ -52,7 +52,8 @@ public:
 
 private:
 	template<typename T>
-	T GetAs(StringView Tag, StringView Key, const T Default) const {
+	T GetAs(StringView Tag, StringView Key, const T Default) const
+	{
 		auto result = find(Tag);
 		if (result != end()) {
 			return result->GetAs<T>(Key, Default);

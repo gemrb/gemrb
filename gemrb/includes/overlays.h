@@ -25,12 +25,12 @@
 
 namespace GemRB {
 
-#define OVERLAY_COUNT  32
+#define OVERLAY_COUNT 32
 
 #define OV_SANCTUARY   0
 #define OV_ENTANGLE    1
-#define OV_WISP        2  //iwd2
-#define OV_SPELLTRAP   2  //bg2
+#define OV_WISP        2 //iwd2
+#define OV_SPELLTRAP   2 //bg2
 #define OV_SHIELDGLOBE 3
 #define OV_GREASE      4
 #define OV_WEB         5
@@ -52,8 +52,8 @@ namespace GemRB {
 #define OV_GLATH2      21
 #define OV_SEVENEYES   22
 #define OV_SEVENEYES2  23
-#define OV_BOUNCE      24  //bouncing, but not in iwd2
-#define OV_BOUNCE2     25  //bouncing activated, but not in iwd2
+#define OV_BOUNCE      24 //bouncing, but not in iwd2
+#define OV_BOUNCE2     25 //bouncing activated, but not in iwd2
 #define OV_FIRESHIELD1 26
 #define OV_FIRESHIELD2 27
 #define OV_ICESHIELD1  28

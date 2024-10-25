@@ -20,9 +20,8 @@
 #define PYTHON_HELPERS_H
 
 // Python.h needs to be included first.
-#include "GUIScript.h"
-
 #include "Callback.h"
+#include "GUIScript.h"
 
 #include "GUI/Control.h"
 #include "GUI/GUIScriptInterface.h"
@@ -30,20 +29,21 @@
 
 namespace GemRB {
 
-template <typename R>
-R noop(PyObject*) {
+template<typename R>
+R noop(PyObject*)
+{
 	return R();
 }
 
-template <typename R, R (*F)(PyObject*)>
+template<typename R, R (*F)(PyObject*)>
 bool CallPython(PyObject* function, PyObject* args = NULL, R* retVal = NULL)
 {
 	if (!function) {
 		return false;
 	}
 
-	PyObject *ret = PyObject_CallObject(function, args);
-	Py_XDECREF( args );
+	PyObject* ret = PyObject_CallObject(function, args);
+	Py_XDECREF(args);
 	if (ret == NULL) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();
@@ -62,12 +62,12 @@ bool CallPython(PyObject* function, PyObject* args = NULL, R* retVal = NULL)
 inline bool CallPython(PyObject* function, PyObject* args = NULL)
 {
 	int ret(-1);
-	return CallPython<int, noop<int> >(function, args, &ret);
+	return CallPython<int, noop<int>>(function, args, &ret);
 }
 
 struct PythonCallback {
 	explicit PythonCallback(PyObject* fn)
-	: Function(fn)
+		: Function(fn)
 	{
 		assert(Py_IsInitialized());
 		if (Function && PyCallable_Check(Function)) {
@@ -76,30 +76,34 @@ struct PythonCallback {
 			Function = NULL;
 		}
 	}
-	
-	PythonCallback(const PythonCallback& pcb)
-	: PythonCallback(pcb.Function) {}
 
-	virtual ~PythonCallback() {
+	PythonCallback(const PythonCallback& pcb)
+		: PythonCallback(pcb.Function) {}
+
+	virtual ~PythonCallback()
+	{
 		Py_XDECREF(Function);
 	}
 
-	virtual void operator()() const {
+	virtual void operator()() const
+	{
 		CallPython(Function);
 	}
 
 protected:
-	PyObject *Function = nullptr;
+	PyObject* Function = nullptr;
 };
 
-template <class R, class ARG_T>
+template<class R, class ARG_T>
 struct PythonComplexCallback : public PythonCallback {
-	explicit PythonComplexCallback(PyObject* fn) : PythonCallback(fn) {}
-	
-	PyObject* GetArgs(ARG_T arg) const {
+	explicit PythonComplexCallback(PyObject* fn)
+		: PythonCallback(fn) {}
+
+	PyObject* GetArgs(ARG_T arg) const
+	{
 		PyObject* func_code = PyObject_GetAttrString(Function, "__code__");
 		if (!func_code) return nullptr;
-		
+
 		PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
 		const long count = PyLong_AsLong(co_argcount);
 		PyObject* args = nullptr;
@@ -109,17 +113,19 @@ struct PythonComplexCallback : public PythonCallback {
 		}
 		Py_DECREF(func_code);
 		Py_DECREF(co_argcount);
-		
+
 		return args;
 	}
-	
-	virtual PyObject* BuildArgs(ARG_T, PyObject* obj, long) const {
+
+	virtual PyObject* BuildArgs(ARG_T, PyObject* obj, long) const
+	{
 		// default implementation just passes the py_object to the callback
 		// override to pass other args
 		return Py_BuildValue("(N)", obj);
 	}
 
-	R operator()(ARG_T arg) const {
+	R operator()(ARG_T arg) const
+	{
 		if (!Function) {
 			return;
 		}

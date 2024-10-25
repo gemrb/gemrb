@@ -45,6 +45,7 @@ private:
 
 	//OTHER
 	unsigned int PaddedRowLength = 0;
+
 public:
 	BMPImporter() noexcept = default;
 	BMPImporter(const BMPImporter&) = delete;
@@ -56,8 +57,8 @@ public:
 	int GetPalette(int colors, Palette& pal) override;
 
 private:
-	void Read8To8(const void *rpixels);
-	void Read4To8(const void *rpixels);
+	void Read8To8(const void* rpixels);
+	void Read4To8(const void* rpixels);
 };
 
 }

@@ -24,7 +24,7 @@
 #include "Interface.h"
 
 #ifdef USE_TRACY
-#include <tracy/TracyOpenGL.hpp>
+	#include <tracy/TracyOpenGL.hpp>
 #endif
 
 // don't move this up
@@ -33,12 +33,12 @@
 using namespace GemRB;
 
 #ifdef BAKE_ICON
-#include "gemrb-icon.h"
+	#include "gemrb-icon.h"
 
 static void SetWindowIcon(SDL_Window* window)
 {
 	// gemrb_icon and gemrb_icon_size are generated in gemrb-icon.h
-	SDL_RWops* const iconStream = SDL_RWFromConstMem((void *) gemrb_icon, gemrb_icon_size);
+	SDL_RWops* const iconStream = SDL_RWFromConstMem((void*) gemrb_icon, gemrb_icon_size);
 	if (!iconStream) {
 		Log(WARNING, "SDL 2 Driver", "Failed to create icon stream.");
 		return;
@@ -59,20 +59,20 @@ SDL20VideoDriver::SDL20VideoDriver() noexcept
 	window = NULL;
 
 	stencilAlphaBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
-													 SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
-													 SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-	
+							 SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
+							 SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+
 	oneMinusDstBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR, SDL_BLENDFACTOR_ONE,
-													SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR,
-													SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
-	
+							SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR,
+							SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
+
 	dstBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_DST_COLOR, SDL_BLENDFACTOR_ONE,
-											SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_DST_COLOR,
-											SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
-	
+						SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_DST_COLOR,
+						SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
+
 	srcBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_COLOR, SDL_BLENDFACTOR_ONE,
-											SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_SRC_COLOR,
-											SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
+						SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_SRC_COLOR,
+						SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
 
 	// WARNING: do _not_ call opengl here
 	// all function pointers will be NULL
@@ -131,16 +131,16 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, core->config.ScaleQuality.c_str());
 
 #if USE_OPENGL_BACKEND
-#if USE_OPENGL_API
+	#if USE_OPENGL_API
 	const char* driverName = "opengl";
-#elif USE_GLES_API
+	#elif USE_GLES_API
 	const char* driverName = "opengles2";
-#endif
+	#endif
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, driverName);
 #endif
 
 #if SDL_VERSION_ATLEAST(2, 0, 10)
-	if (sdl2_runtime_version >= SDL_VERSIONNUM(2,0,10)) {
+	if (sdl2_runtime_version >= SDL_VERSIONNUM(2, 0, 10)) {
 		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 	}
 #endif
@@ -223,9 +223,9 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 		return GEM_ERROR;
 	}
 
-#if defined(_WIN32) && defined(USE_OPENGL_API)
+	#if defined(_WIN32) && defined(USE_OPENGL_API)
 	glewInit();
-#endif
+	#endif
 
 	TRACY(TracyGpuContext);
 
@@ -233,11 +233,11 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 	scratchBuffer->Clear();
 
 	// Try to grab the texture shader program of SDL
-	static const SDL_Rect r = {0, 0, 1, 1};
+	static const SDL_Rect r = { 0, 0, 1, 1 };
 	SDL_RenderCopy(renderer, ScratchBuffer(), &r, &r);
-#if SDL_VERSION_ATLEAST(2, 0, 10)
+	#if SDL_VERSION_ATLEAST(2, 0, 10)
 	SDL_RenderFlush(renderer);
-#endif
+	#endif
 
 	GLuint rgbaProgramID = 0;
 	glGetIntegerv(GL_CURRENT_PROGRAM, reinterpret_cast<GLint*>(&rgbaProgramID));
@@ -270,14 +270,15 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title, bool vsync)
 	return GEM_OK;
 }
 
-void SDL20VideoDriver::CalculateCustomFullscreen(const SDL_DisplayMode *mode) {
+void SDL20VideoDriver::CalculateCustomFullscreen(const SDL_DisplayMode* mode)
+{
 	// Only cover the case when screen is larger than the actual game window
 	if (!(mode->w >= screenSize.w && mode->h >= screenSize.h)) {
 		return;
 	}
 
 	// Only cover the case when width and height have the same alignment in both cases
-	if (!(mode->w/mode->h > 0 && screenSize.w/screenSize.h > 0)) {
+	if (!(mode->w / mode->h > 0 && screenSize.w / screenSize.h > 0)) {
 		return;
 	}
 
@@ -294,7 +295,7 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 	Uint32 format = SDLPixelFormatFromBufferFormat(fmt, renderer);
 	if (format == SDL_PIXELFORMAT_UNKNOWN)
 		return nullptr;
-	
+
 	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w, r.h);
 	if (tex == nullptr) {
 		Log(ERROR, "SDL 2", "{}", SDL_GetError());
@@ -327,7 +328,7 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 
 	{
 		TRACY(ZoneScopedN("SDL_RenderPresent"));
-		SDL_RenderPresent( renderer );
+		SDL_RenderPresent(renderer);
 	}
 #if USE_OPENGL_BACKEND
 	TRACY(TracyGpuCollect);
@@ -367,8 +368,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 		return ret;
 	}
 
-	if (screenClip.size == screenSize)
-	{
+	if (screenClip.size == screenSize) {
 		// Some SDL backends complain on having a clip rect of the entire renderer size
 		// I'm not sure if it is an SDL bug; possibly its just 0 based so it is out of bounds?
 		SDL_RenderSetClipRect(renderer, NULL);
@@ -403,14 +403,14 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 	TRACY(ZoneScoped);
 	SDL_Rect srect = RectFromRegion(srgn);
 	SDL_Rect drect = RectFromRegion(drgn);
-	
+
 	int ret = 0;
 #if USE_OPENGL_BACKEND
 	UpdateRenderTarget();
 	ret = RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
-#if SDL_VERSION_ATLEAST(2, 0, 10)
+	#if SDL_VERSION_ATLEAST(2, 0, 10)
 	SDL_RenderFlush(renderer);
-#endif
+	#endif
 #else
 	if (flags & BlitFlags::STENCIL_MASK) {
 		// 1. clear scratchpad segment
@@ -422,7 +422,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 
 		SDL_Texture* stencilTex = CurrentStencilBuffer();
 		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
-		RenderCopyShaded(texSprite, &srect, &drect, flags & ~(BlitFlags::ALPHA_MOD|BlitFlags::HALFTRANS), tint);
+		RenderCopyShaded(texSprite, &srect, &drect, flags & ~(BlitFlags::ALPHA_MOD | BlitFlags::HALFTRANS), tint);
 		// alpha masking only
 		SDL_Rect stencilRect = drect;
 		stencilRect.x -= stencilBuffer->Origin().x;
@@ -434,7 +434,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Reg
 			if (flags & BlitFlags::ALPHA_MOD) {
 				alpha = tint->a;
 			}
-			
+
 			if (flags & BlitFlags::HALFTRANS) {
 				alpha /= 2;
 			}
@@ -460,26 +460,26 @@ void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 	const Region& r = buf->Rect();
 	Point origin = r.origin + p;
 
-	const Region& srect = {0, 0, r.w, r.h};
-	const Region& drect = {origin, r.size};
+	const Region& srect = { 0, 0, r.w, r.h };
+	const Region& drect = { origin, r.size };
 	BlitSpriteNativeClipped(tex, srect, drect, flags, reinterpret_cast<const SDL_Color*>(&tint));
 }
 
 int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* srcrect,
-									   const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* tint)
+				       const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* tint)
 {
 #if USE_OPENGL_BACKEND
-#if SDL_VERSION_ATLEAST(2, 0, 10)
+	#if SDL_VERSION_ATLEAST(2, 0, 10)
 	SDL_RenderFlush(renderer);
-#endif
+	#endif
 
 	uint32_t format = 0;
 	SDL_QueryTexture(texture, &format, nullptr, nullptr, nullptr);
 	blitRGBAShader->Use();
-	
+
 	blitRGBAShader->SetUniformValue("s_sprite", 1, 0);
 	blitRGBAShader->SetUniformValue("s_stencil", 1, 1);
-	
+
 	bool isRGBA = SDL_ISPIXELFORMAT_ALPHA(format);
 	blitRGBAShader->SetUniformValue("u_rgba", 1, isRGBA ? 1 : 0);
 
@@ -527,7 +527,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		float scaleX = 0.0f;
 		float scaleY = 0.0f;
 		SDL_RenderGetScale(renderer, &scaleX, &scaleY);
-		
+
 		SDL_Rect stencilRect = *dstrect;
 		stencilRect.x -= stencilBuffer->Origin().x;
 		stencilRect.y -= stencilBuffer->Origin().y;
@@ -537,7 +537,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 			stencilTexY = -static_cast<GLfloat>(dstrect->y);
 		}
 
-#if !SDL_VERSION_ATLEAST(2, 0, 18)
+	#if !SDL_VERSION_ATLEAST(2, 0, 18)
 		// In versions earlier, SDL uses a different vertex setup in case
 		// of flipping: (-w/2, -h/2) to (w/2, h/2) that are transformed by
 		// the OpenGL backend via matrices.
@@ -545,19 +545,19 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 			stencilTexX = dstrect->w / 2.0f + stencilRect.x;
 			stencilTexY = dstrect->h / 2.0f + stencilRect.y;
 		}
-#endif
+	#endif
 
 		stencilTexW = 1.0f / (static_cast<float>(texW) * scaleX);
 		stencilTexH = 1.0f / (static_cast<float>(texH) * scaleY);
 
 		GLfloat mat[3][3] = {
-			{ stencilTexW,        0.0f, 0.0f },
-			{        0.0f, stencilTexH, 0.0f },
+			{ stencilTexW, 0.0f, 0.0f },
+			{ 0.0f, stencilTexH, 0.0f },
 			{ stencilTexX * stencilTexW, stencilTexY * stencilTexH, 1.0f }
 		};
 
 		blitRGBAShader->SetUniformMatrixValue("u_stencilMat", 3, 1, reinterpret_cast<GLfloat*>(&mat));
-		
+
 		// Ask OpenGL about the texture handle (that lies hidden in SDL_Texture otherwise)
 		auto curTexture = std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
 		SDL_GL_BindTexture(curTexture, nullptr, nullptr);
@@ -569,16 +569,16 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		glBindTexture(GL_TEXTURE_2D, stencilTextureID);
 	}
 #endif
-	
+
 	Uint8 alpha = SDL_ALPHA_OPAQUE;
 	if (flags & BlitFlags::ALPHA_MOD) {
 		alpha = tint->a;
 	}
-	
+
 	if (flags & BlitFlags::HALFTRANS) {
 		alpha /= 2;
 	}
-	
+
 	SDL_SetTextureAlphaMod(texture, alpha);
 
 	if (flags & BlitFlags::COLOR_MOD) {
@@ -595,7 +595,8 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	return SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, nullptr, flipflags);
 }
 
-void SDL20VideoDriver::SetTextureBlendMode(SDL_Texture *texture, BlitFlags flags) const {
+void SDL20VideoDriver::SetTextureBlendMode(SDL_Texture* texture, BlitFlags flags) const
+{
 	if (flags & BlitFlags::ADD) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
 	} else if (flags & BlitFlags::MOD) {
@@ -620,8 +621,8 @@ void SDL20VideoDriver::SetTextureBlendMode(SDL_Texture *texture, BlitFlags flags
 void SDL20VideoDriver::DrawRawGeometry(
 	const std::vector<float>& vertices,
 	const std::vector<Color>& colors,
-	BlitFlags blitFlags
-) {
+	BlitFlags blitFlags)
+{
 #if SDL_VERSION_ATLEAST(2, 0, 18)
 	if (blitFlags & BlitFlags::BLENDED) {
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -636,23 +637,22 @@ void SDL20VideoDriver::DrawRawGeometry(
 		nullptr,
 		vertices.data(),
 		2 * sizeof(float),
-		#if SDL_VERSION_ATLEAST(2, 0, 20)
+	#if SDL_VERSION_ATLEAST(2, 0, 20)
 		reinterpret_cast<const SDL_Color*>(colors.data()),
-		#else
+	#else
 		reinterpret_cast<const int*>(colors.data()),
-		#endif
+	#endif
 		sizeof(Color),
 		nullptr,
 		0,
 		vertices.size() / 2,
 		nullptr,
 		0,
-		0
-	);
+		0);
 #else
-	(void)vertices;
-	(void)colors;
-	(void)blitFlags;
+	(void) vertices;
+	(void) colors;
+	(void) blitFlags;
 #endif
 }
 
@@ -708,8 +708,7 @@ void SDL20VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& orig
 	if (fill) {
 		UpdateRenderTarget(&color, flags);
 
-		for (const auto& lineSegments : poly->rasterData)
-		{
+		for (const auto& lineSegments : poly->rasterData) {
 			for (const auto& segment : lineSegments) {
 				// SDL_RenderDrawLines actually is for drawing polygons so it is, ironically, not what we want
 				// when drawing the "rasterized" data. doing so would work ok most of the time, but other times
@@ -743,7 +742,7 @@ Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr&
 	unsigned int Height = r.h ? r.h : screenSize.h;
 
 	static const PixelFormat fmt(3, 0x00ff0000, 0x0000ff00, 0x000000ff, 0);
-	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0,0, Width, Height), fmt);
+	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0, 0, Width, Height), fmt);
 
 	SDL_Texture* target = SDL_GetRenderTarget(renderer);
 	if (buf) {
@@ -761,7 +760,7 @@ Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr&
 	return Holder<Sprite2D>(screenshot);
 }
 
-int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const
+int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger (&fingers)[FINGER_MAX], SDL_TouchID device) const
 {
 	int numf = SDL_GetNumTouchFingers(device);
 
@@ -783,7 +782,7 @@ int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], 
 	return numf;
 }
 
-int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
+int SDL20VideoDriver::ProcessEvent(const SDL_Event& event)
 {
 	int modstate = GetModState(SDL_GetModState());
 	Event e;
@@ -792,7 +791,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 #ifdef USE_SDL_CONTROLLER_API
 		case SDL_CONTROLLERDEVICEREMOVED:
 			if (gameController != nullptr) {
-				const SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
+				const SDL_GameController* removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
 				if (removedController == gameController) {
 					SDL_GameControllerClose(gameController);
 					gameController = nullptr;
@@ -829,7 +828,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_FINGERDOWN: // fallthrough
 		case SDL_FINGERUP:
 			{
-				TouchEvent::Finger fingers[1] = { };
+				TouchEvent::Finger fingers[1] = {};
 				fingers[0].x = event.tfinger.x * screenSize.w;
 				fingers[0].y = event.tfinger.y * screenSize.h;
 				fingers[0].deltaX = event.tfinger.dx * screenSize.w;
@@ -844,7 +843,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		// For swipes only. Gestures requiring pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
 			{
-				TouchEvent::Finger fingers[FINGER_MAX] = { }; // 0 init
+				TouchEvent::Finger fingers[FINGER_MAX] = {}; // 0 init
 				int numf = GetTouchFingers(fingers, event.mgesture.touchId);
 
 				Event touch = EventMgr::CreateTouchEvent(fingers, numf, true, event.tfinger.pressure);
@@ -858,16 +857,15 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			// TODO: this could be useful for predefining gestures
 			// might work better than manually programming everything
 			break;
-		case SDL_MULTIGESTURE:// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
+		case SDL_MULTIGESTURE: // use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
 			{
-				TouchEvent::Finger fingers[FINGER_MAX] = { }; // 0 init
+				TouchEvent::Finger fingers[FINGER_MAX] = {}; // 0 init
 				int numf = GetTouchFingers(fingers, event.mgesture.touchId);
 
 				// TODO: it may make more sense to calculate the pressure as an avg?
 				Event touch = EventMgr::CreateTouchEvent(fingers, numf, true, 0.0);
 				e = EventMgr::CreateTouchGesture(touch.touch, event.mgesture.dTheta, event.mgesture.dDist);
-				if (e.gesture.deltaX != 0 || e.gesture.deltaY != 0)
-				{
+				if (e.gesture.deltaX != 0 || e.gesture.deltaY != 0) {
 					e.mod = modstate;
 					EvntManager->DispatchEvent(std::move(e));
 				}
@@ -878,7 +876,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				if (SDL_TOUCH_MOUSEID == event.wheel.which) {
 					break;
 				}
-				
+
 				// HACK: some mouse devices report the delta in pixels, but others (like regular mouse wheels) are going to be in "clicks"
 				// there is no good way to find which is the case so heuristically we will just switch if we see a delta larger than one
 				// hopefully no devices will be merging several repeated wheel clicks together
@@ -886,14 +884,14 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				if (event.wheel.y > 1 || event.wheel.x > 1) {
 					unitIsPixels = true;
 				}
-				
+
 				int speed = unitIsPixels ? 1 : core->GetMouseScrollSpeed();
 				if (SDL_GetModState() & KMOD_SHIFT) {
 					e = EventMgr::CreateMouseWheelEvent(Point(event.wheel.y * speed, event.wheel.x * speed));
 				} else {
 					e = EventMgr::CreateMouseWheelEvent(Point(event.wheel.x * speed, event.wheel.y * speed));
 				}
-				
+
 				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
@@ -914,7 +912,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			e = EventMgr::CreateRedrawRequestEvent();
 			EvntManager->DispatchEvent(std::move(e));
 			break;
-		case SDL_WINDOWEVENT://SDL 1.2
+		case SDL_WINDOWEVENT: //SDL 1.2
 			switch (event.window.event) {
 				case SDL_WINDOWEVENT_LEAVE:
 					if (core->config.GUIEnhancements & 8) core->DisableGameControl(true);
@@ -922,17 +920,17 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				case SDL_WINDOWEVENT_ENTER:
 					if (core->config.GUIEnhancements & 8) core->DisableGameControl(false);
 					break;
-				case SDL_WINDOWEVENT_MINIMIZED://SDL 1.3
+				case SDL_WINDOWEVENT_MINIMIZED: //SDL 1.3
 					// We pause the game and audio when the window is minimized.
 					// on iOS/Android this happens when leaving the application or when play is interrupted (ex phone call)
 					// but it's annoying on desktops, so we try to detect them
 					if (TouchInputEnabled()) {
-						core->GetAudioDrv()->Pause();//this is for ANDROID mostly
+						core->GetAudioDrv()->Pause(); //this is for ANDROID mostly
 						core->SetPause(PauseState::On);
 					}
 					break;
 				case SDL_WINDOWEVENT_RESTORED: //SDL 1.3
-					core->GetAudioDrv()->Resume();//this is for ANDROID mostly
+					core->GetAudioDrv()->Resume(); //this is for ANDROID mostly
 					break;
 				// SDL_WINDOWEVENT_RESIZED and SDL_WINDOWEVENT_SIZE_CHANGED are handled automatically
 				default:
@@ -955,12 +953,9 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				 * As being SDL2-only, try to query the clipboard state to
 				 * paste when middle clicking the mouse.
 				 */
-				
-				if (event.button.button == SDL_BUTTON_MIDDLE
-					&& event.type == SDL_MOUSEBUTTONDOWN
-					&& SDL_HasClipboardText()
-				) {
-					char *pasteValue = SDL_GetClipboardText();
+
+				if (event.button.button == SDL_BUTTON_MIDDLE && event.type == SDL_MOUSEBUTTONDOWN && SDL_HasClipboardText()) {
+					char* pasteValue = SDL_GetClipboardText();
 
 					if (pasteValue != NULL) {
 						e = EventMgr::CreateTextEvent(pasteValue);
@@ -1005,7 +1000,7 @@ void SDL20VideoDriver::StartTextInput()
 	// UseSoftKeyboard probably has no effect since SDL delegates SDL_StartTextInput to the OS
 	// on iOS this is going to be a user preference and depends on a physical keyboard presence
 #if ANDROID
-	if (core->UseSoftKeyboard){
+	if (core->UseSoftKeyboard) {
 		SDL_StartTextInput();
 	} else {
 		Event e = EvntManager->CreateTextEvent(L"");
@@ -1027,7 +1022,8 @@ bool SDL20VideoDriver::TouchInputEnabled()
 	return SDL_GetNumTouchDevices() > 0;
 }
 
-bool SDL20VideoDriver::CanDrawRawGeometry() const {
+bool SDL20VideoDriver::CanDrawRawGeometry() const
+{
 #if SDL_VERSION_ATLEAST(2, 0, 18)
 	return true;
 #else
@@ -1038,8 +1034,8 @@ bool SDL20VideoDriver::CanDrawRawGeometry() const {
 void SDL20VideoDriver::SetGamma(int newBrightness, int newContrast)
 {
 	// Steps chosen empirically to give ranges close to originals.
-	brightness = 1.0 + (float)newBrightness * 0.0015;
-	contrast = 1.0 + (float)newContrast * 0.05;
+	brightness = 1.0 + (float) newBrightness * 0.0015;
+	contrast = 1.0 + (float) newContrast * 0.05;
 }
 
 bool SDL20VideoDriver::SetFullscreenMode(bool set)
@@ -1047,7 +1043,7 @@ bool SDL20VideoDriver::SetFullscreenMode(bool set)
 	Uint32 flags = 0;
 	if (customFullscreenSize.IsInvalid()) {
 		if (set) {
-			flags = SDL_WINDOW_FULLSCREEN_DESKTOP|SDL_WINDOW_BORDERLESS;
+			flags = SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_BORDERLESS;
 		}
 		if (SDL_SetWindowFullscreen(window, flags) == GEM_OK) {
 			fullscreen = set;
@@ -1072,7 +1068,7 @@ bool SDL20VideoDriver::SetFullscreenMode(bool set)
 bool SDL20VideoDriver::ToggleGrabInput()
 {
 	bool isGrabbed = SDL_GetWindowGrab(window);
-	SDL_SetWindowGrab(window, (SDL_bool)!isGrabbed);
+	SDL_SetWindowGrab(window, (SDL_bool) !isGrabbed);
 	return (isGrabbed != SDL_GetWindowGrab(window));
 }
 

@@ -23,8 +23,9 @@
 #include "RGBAColor.h"
 
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "Sprite2D.h"
+
+#include "Logging/Logging.h"
 #include "Video/Video.h"
 
 using namespace GemRB;
@@ -42,10 +43,10 @@ bool TISImporter::Open(DataStream* stream)
 	delete str;
 	str = stream;
 	char Signature[8];
-	str->Read( Signature, 8 );
+	str->Read(Signature, 8);
 	headerShift = 0;
 	if (Signature[0] == 'T' && Signature[1] == 'I' && Signature[2] == 'S') {
-		if (strncmp( Signature, "TIS V1  ", 8 ) != 0) {
+		if (strncmp(Signature, "TIS V1  ", 8) != 0) {
 			Log(ERROR, "TISImporter", "Not a Valid TIS file!");
 			return false;
 		}
@@ -61,13 +62,13 @@ bool TISImporter::Open(DataStream* stream)
 			hasPVRData = true;
 			TilesSectionLen = 0xc;
 		}
-		str->Seek( -8, GEM_CURRENT_POS );
+		str->Seek(-8, GEM_CURRENT_POS);
 	}
 	return true;
 }
 
 Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
-						   unsigned short* secondary)
+			   unsigned short* secondary)
 {
 	size_t count = indexes.size();
 	std::vector<Animation::frame_t> frames;
@@ -75,13 +76,13 @@ Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
 	for (size_t i = 0; i < count; i++) {
 		frames.push_back(GetTile(indexes[i]));
 	}
-	
+
 	Animation ani = Animation(std::move(frames));
 	//pause key stops animation
 	ani.gameAnimation = true;
 	//the turning crystal in ar3202 (bg1) requires animations to be synced
 	ani.frameIdx = 0;
-	
+
 	if (secondary) {
 		frames.clear();
 		for (size_t i = 0; i < count; i++) {
@@ -114,9 +115,9 @@ Holder<Sprite2D> TISImporter::GetTilePVR(int index)
 	Blit(dataBlock, imageData);
 
 	PixelFormat fmt = PixelFormat::ARGB32Bit();
-	Region region{0, 0, static_cast<int>(TileSize), static_cast<int>(TileSize)};
+	Region region { 0, 0, static_cast<int>(TileSize), static_cast<int>(TileSize) };
 
-	return {VideoDriver->CreateSprite(region, imageData, fmt)};
+	return { VideoDriver->CreateSprite(region, imageData, fmt) };
 }
 
 void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
@@ -137,7 +138,7 @@ void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
 	}
 
 	if (!lastPVRZ) return;
-	auto sprite = lastPVRZ->GetSprite2D(Region{dataBlock.source.x, dataBlock.source.y, static_cast<int>(TileSize), static_cast<int>(TileSize)});
+	auto sprite = lastPVRZ->GetSprite2D(Region { dataBlock.source.x, dataBlock.source.y, static_cast<int>(TileSize), static_cast<int>(TileSize) });
 	if (!sprite) {
 		return;
 	}
@@ -150,8 +151,7 @@ void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
 		std::copy(
 			spritePixels + offset,
 			spritePixels + offset + sprite->Frame.w * 4,
-			frameData + destOffset
-		);
+			frameData + destOffset);
 	}
 
 	sprite->UnlockSprite();
@@ -159,37 +159,37 @@ void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
 
 Holder<Sprite2D> TISImporter::GetTilePaletted(int index)
 {
-	strpos_t pos = index *(1024+4096) + headerShift;
+	strpos_t pos = index * (1024 + 4096) + headerShift;
 	if (str->Size() < pos + 1024 + 4096) {
 		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
-		
+
 		if (badTile == nullptr) {
 			// we only want to generate a single bad tile on demand
 			Holder<Palette> pal = MakeHolder<Palette>();
 			PixelFormat fmt = PixelFormat::Paletted8Bit(std::move(pal));
-			badTile = VideoDriver->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+			badTile = VideoDriver->CreateSprite(Region(0, 0, 64, 64), nullptr, fmt);
 		}
-		
+
 		// try to only report error once per file
-		static const TISImporter *last_corrupt = nullptr;
+		static const TISImporter* last_corrupt = nullptr;
 		if (last_corrupt != this) {
 			Log(ERROR, "TISImporter", "Corrupt WED file encountered; couldn't find any more tiles at tile {}", index);
 			last_corrupt = this;
 		}
-	
+
 		return badTile;
 	}
-	
+
 	Holder<Palette> pal = MakeHolder<Palette>();
 	PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
 	colorkey_t ck = 0;
-	
+
 	auto ckTest = [](const Color& c) {
 		// work around bad data in BG2 AR1700
 		return c.r <= 4 && c.b <= 4 && c.g >= 78;
 	};
 
-	str->Seek( pos, GEM_STREAM_START );
+	str->Seek(pos, GEM_STREAM_START);
 	Palette::Colors buffer;
 	str->Read(buffer.data(), 1024);
 
@@ -203,14 +203,14 @@ Holder<Sprite2D> TISImporter::GetTilePaletted(int index)
 	}
 
 	pal->CopyColors(0, buffer.cbegin(), buffer.cend());
-	
+
 	fmt.ColorKey = ck;
 	fmt.HasColorKey = pal->GetColorAt(ck) == ColorGreen;
 
-	auto spr = VideoDriver->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+	auto spr = VideoDriver->CreateSprite(Region(0, 0, 64, 64), nullptr, fmt);
 	uint8_t* pixels = static_cast<uint8_t*>(spr->LockSprite());
 	str->Read(pixels, 4096);
-	
+
 	// work around bad data in BG2 AR1700
 	for (int i = 0; i < 4096; ++i) {
 		uint8_t& val = pixels[i];
@@ -220,7 +220,7 @@ Holder<Sprite2D> TISImporter::GetTilePaletted(int index)
 			val = ck;
 		}
 	}
-	
+
 	spr->UnlockSprite();
 	return spr;
 }

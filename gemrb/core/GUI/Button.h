@@ -44,21 +44,21 @@ namespace GemRB {
 class SpriteAnimation;
 class Palette;
 
-#define IE_GUI_BUTTON_NO_IMAGE     0x00000001   // don't draw image (BAM)
-#define IE_GUI_BUTTON_PICTURE      0x00000002   // draw picture (BMP, MOS, ...)
-#define IE_GUI_BUTTON_SOUND        0x00000004
-#define IE_GUI_BUTTON_CAPS         0x00000008   // convert text to uppercase
-#define IE_GUI_BUTTON_CHECKBOX     0x00000010   // or radio button
-#define IE_GUI_BUTTON_RADIOBUTTON  0x00000020   // sticks in a state
+#define IE_GUI_BUTTON_NO_IMAGE    0x00000001 // don't draw image (BAM)
+#define IE_GUI_BUTTON_PICTURE     0x00000002 // draw picture (BMP, MOS, ...)
+#define IE_GUI_BUTTON_SOUND       0x00000004
+#define IE_GUI_BUTTON_CAPS        0x00000008 // convert text to uppercase
+#define IE_GUI_BUTTON_CHECKBOX    0x00000010 // or radio button
+#define IE_GUI_BUTTON_RADIOBUTTON 0x00000020 // sticks in a state
 
 //these bits are hardcoded in the .chu structure
-#define IE_GUI_BUTTON_ALIGN_LEFT   0x00000100
-#define IE_GUI_BUTTON_ALIGN_RIGHT  0x00000200
-#define IE_GUI_BUTTON_ALIGN_TOP    0x00000400
-#define IE_GUI_BUTTON_ALIGN_BOTTOM 0x00000800
-#define IE_GUI_BUTTON_ALIGNMENT_FLAGS (IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_BOTTOM)
-#define IE_GUI_BUTTON_ANCHOR       0x00001000
-#define IE_GUI_BUTTON_LOWERCASE    0x00002000
+#define IE_GUI_BUTTON_ALIGN_LEFT      0x00000100
+#define IE_GUI_BUTTON_ALIGN_RIGHT     0x00000200
+#define IE_GUI_BUTTON_ALIGN_TOP       0x00000400
+#define IE_GUI_BUTTON_ALIGN_BOTTOM    0x00000800
+#define IE_GUI_BUTTON_ALIGNMENT_FLAGS (IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_BOTTOM)
+#define IE_GUI_BUTTON_ANCHOR          0x00001000
+#define IE_GUI_BUTTON_LOWERCASE       0x00002000
 //#define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag; labeled "no word wrap"
 //end of hardcoded part
 
@@ -68,7 +68,7 @@ class Palette;
 #define IE_GUI_BUTTON_NO_TOOLTIP      0x00800000
 
 //composite button flags
-#define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
+#define IE_GUI_BUTTON_NORMAL 0x00000004 // default button, doesn't stick
 
 /** Border/frame settings for a button */
 struct ButtonBorder {
@@ -114,7 +114,7 @@ public:
 		FAKEPRESSED,
 		LOCKED_PRESSED // all the same as LOCKED
 	};
-	
+
 	explicit Button(const Region& frame);
 	Button(const Button&) = delete;
 	~Button() override;
@@ -137,9 +137,9 @@ public:
 	/** Add picture to the end of the list of Pictures */
 	void StackPicture(const Holder<Sprite2D>& newPicture);
 	/** Sets border/frame parameters */
-	void SetBorder(int index, const Region&, const Color &color, bool enabled = false, bool filled = false);
+	void SetBorder(int index, const Region&, const Color& color, bool enabled = false, bool filled = false);
 	/** Sets horizontal overlay, used in portrait hp overlay */
-	void SetHorizontalOverlay(double clip, const Color &src, const Color &dest);
+	void SetHorizontalOverlay(double clip, const Color& src, const Color& dest);
 	/** Sets font used for drawing button label */
 	void SetFont(Holder<Font> newfont);
 	/** Enables or disables specified border/frame */
@@ -154,9 +154,9 @@ public:
 	/** Refreshes the button from a radio group */
 	void UpdateState(value_t Sum) override;
 	/** Set palette used for drawing button label in normal state.  */
-	void SetTextColor(const Color &color);
+	void SetTextColor(const Color& color);
 	/** Sets percent (0-1.0) of width for clipping picture */
-	void SetPictureClipping(double clip)  { Clipping = clip; }
+	void SetPictureClipping(double clip) { Clipping = clip; }
 	/** Set explicit anchor point for text */
 	void SetAnchor(int x, int y);
 	/** Set offset pictures and label move when button is pressed */
@@ -188,7 +188,7 @@ private: // Private attributes
 	/** Offset pictures and label move when the button is pressed. */
 	Point PushOffset = Point(2, 2);
 	/** frame settings */
-	ButtonBorder borders[MAX_NUM_BORDERS]{};
+	ButtonBorder borders[MAX_NUM_BORDERS] {};
 
 	EventMgr::EventCallback HotKeyCallback;
 
@@ -197,7 +197,8 @@ private: // Private attributes
 		short mod = 0;
 		bool global = false;
 
-		explicit operator bool() const {
+		explicit operator bool() const
+		{
 			return key != '\0';
 		}
 	} hotKey;
@@ -205,7 +206,7 @@ private: // Private attributes
 	void UnregisterHotKey();
 
 	bool HandleHotKey(const Event&);
-	bool HitTest (const Point&) const override;
+	bool HitTest(const Point&) const override;
 	void DoToggle();
 
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;

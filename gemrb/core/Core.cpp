@@ -24,22 +24,22 @@
  * @author The GemRB Project
  */
 
-#include "globals.h"
 #include "exports.h"
+#include "globals.h"
 
 #include "Interface.h"
+
 #include "Scriptable/Actor.h"
 
-#include <cmath>
 #include <cctype>
-
+#include <cmath>
 #include <iostream>
 
 #ifdef WIN32
 
 BOOL WINAPI DllEntryPoint(HINSTANCE, DWORD, LPVOID);
 BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
-	LPVOID /*lpvReserved*/)
+			  LPVOID /*lpvReserved*/)
 {
 	return true;
 }
@@ -51,7 +51,7 @@ namespace GemRB {
 //// Globally used functions
 
 /** Calculates distance between 2 points */
-unsigned int Distance(const Point &p, const Scriptable *b)
+unsigned int Distance(const Point& p, const Scriptable* b)
 {
 	long x = p.x - b->Pos.x;
 	long y = p.y - b->Pos.y;
@@ -59,33 +59,33 @@ unsigned int Distance(const Point &p, const Scriptable *b)
 }
 
 constexpr int DistanceFactor = 4; // ignore angle, go for the bigger size between [3, 4]
-unsigned int PersonalDistance(const Point &p, const Scriptable *b)
+unsigned int PersonalDistance(const Point& p, const Scriptable* b)
 {
 	long x = p.x - b->Pos.x;
 	long y = p.y - b->Pos.y;
 	auto ret = std::hypot(x, y);
-	if (b->Type==ST_ACTOR) {
+	if (b->Type == ST_ACTOR) {
 		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * DistanceFactor;
 	}
-	if (ret<0) return (unsigned int) 0;
+	if (ret < 0) return (unsigned int) 0;
 	return (unsigned int) ret;
 }
 
 constexpr int SquaredDistanceFactor = 14; // ignore angle, roughly middle of an elliptic [9, 16]
-unsigned int SquaredPersonalDistance(const Point &p, const Scriptable *b)
+unsigned int SquaredPersonalDistance(const Point& p, const Scriptable* b)
 {
 	long x = p.x - b->Pos.x;
 	long y = p.y - b->Pos.y;
 	int ret = static_cast<int>(x * x + y * y);
-	if (b->Type==ST_ACTOR) {
+	if (b->Type == ST_ACTOR) {
 		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * SquaredDistanceFactor;
 	}
-	if (ret<0) return (unsigned int) 0;
+	if (ret < 0) return (unsigned int) 0;
 	return (unsigned int) ret;
 }
 
 /** Calculates distance between 2 scriptables */
-unsigned int Distance(const Scriptable *a, const Scriptable *b)
+unsigned int Distance(const Scriptable* a, const Scriptable* b)
 {
 	long x = a->Pos.x - b->Pos.x;
 	long y = a->Pos.y - b->Pos.y;
@@ -93,43 +93,44 @@ unsigned int Distance(const Scriptable *a, const Scriptable *b)
 }
 
 /** Calculates distance squared between 2 scriptables */
-unsigned int SquaredDistance(const Scriptable *a, const Scriptable *b)
+unsigned int SquaredDistance(const Scriptable* a, const Scriptable* b)
 {
 	return SquaredDistance(a->Pos, b->Pos);
 }
 
 /** Calculates distance between 2 scriptables, including feet circle if applicable */
-unsigned int PersonalDistance(const Scriptable *a, const Scriptable *b)
+unsigned int PersonalDistance(const Scriptable* a, const Scriptable* b)
 {
 	long x = a->Pos.x - b->Pos.x;
 	long y = a->Pos.y - b->Pos.y;
 	auto ret = std::hypot(x, y);
-	if (a->Type==ST_ACTOR) {
+	if (a->Type == ST_ACTOR) {
 		ret -= static_cast<const Actor*>(a)->CircleSize2Radius() * DistanceFactor;
 	}
-	if (b->Type==ST_ACTOR) {
+	if (b->Type == ST_ACTOR) {
 		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * DistanceFactor;
 	}
-	if (ret<0) return (unsigned int) 0;
+	if (ret < 0) return (unsigned int) 0;
 	return (unsigned int) ret;
 }
 
-unsigned int SquaredPersonalDistance(const Scriptable *a, const Scriptable *b)
+unsigned int SquaredPersonalDistance(const Scriptable* a, const Scriptable* b)
 {
 	long x = a->Pos.x - b->Pos.x;
 	long y = a->Pos.y - b->Pos.y;
 	int ret = static_cast<int>(x * x + y * y);
-	if (a->Type==ST_ACTOR) {
+	if (a->Type == ST_ACTOR) {
 		ret -= static_cast<const Actor*>(a)->CircleSize2Radius() * SquaredDistanceFactor;
 	}
-	if (b->Type==ST_ACTOR) {
+	if (b->Type == ST_ACTOR) {
 		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * SquaredDistanceFactor;
 	}
-	if (ret<0) return (unsigned int) 0;
+	if (ret < 0) return (unsigned int) 0;
 	return (unsigned int) ret;
 }
 
-unsigned int PersonalLineDistance(const Point& v, const Point& w, const Scriptable* s, float_t* proj) {
+unsigned int PersonalLineDistance(const Point& v, const Point& w, const Scriptable* s, float_t* proj)
+{
 	float_t t;
 	Point p;
 
@@ -204,19 +205,19 @@ float_t Feet2Pixels(int feet, float_t angle)
 
  This is a bit tricky, it has been show to not be very consistent. The game used a double value of visual
  range in several places, so we will use '3 * visual_range / 2' */
-bool WithinAudibleRange(const Actor *actor, const Point &dest)
+bool WithinAudibleRange(const Actor* actor, const Point& dest)
 {
 	int distance = (3 * actor->GetStat(IE_VISUALRANGE)) / 2;
 	return WithinRange(actor, dest, distance);
 }
 
-bool WithinRange(const Scriptable *actor, const Point &dest, int distance)
+bool WithinRange(const Scriptable* actor, const Point& dest, int distance)
 {
 	float_t angle = AngleFromPoints(actor->Pos, dest);
 	return Distance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 
-bool WithinPersonalRange(const Scriptable *actor, const Point &dest, int distance)
+bool WithinPersonalRange(const Scriptable* actor, const Point& dest, int distance)
 {
 	float_t angle = AngleFromPoints(actor->Pos, dest);
 	return PersonalDistance(dest, actor) <= Feet2Pixels(distance, angle);
@@ -240,24 +241,22 @@ int EARelation(const Scriptable* Owner, const Actor* target)
 
 	ieDword eat = target->GetStat(IE_EA);
 
-	if (eao<=EA_GOODCUTOFF) {
-		
-		if (eat<=EA_GOODCUTOFF) {
+	if (eao <= EA_GOODCUTOFF) {
+		if (eat <= EA_GOODCUTOFF) {
 			return EAR_FRIEND;
 		}
-		if (eat>=EA_EVILCUTOFF) {
+		if (eat >= EA_EVILCUTOFF) {
 			return EAR_HOSTILE;
 		}
 
 		return EAR_NEUTRAL;
 	}
 
-	if (eao>=EA_EVILCUTOFF) {
-
-		if (eat<=EA_GOODCUTOFF) {
+	if (eao >= EA_EVILCUTOFF) {
+		if (eat <= EA_GOODCUTOFF) {
 			return EAR_HOSTILE;
 		}
-		if (eat>=EA_EVILCUTOFF) {
+		if (eat >= EA_EVILCUTOFF) {
 			return EAR_FRIEND;
 		}
 

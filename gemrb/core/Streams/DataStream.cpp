@@ -21,6 +21,7 @@
 #include "DataStream.h"
 
 #include "errors.h"
+
 #include "Resource.h"
 
 #include <cctype>
@@ -38,15 +39,15 @@ bool DataStream::NeedEndianSwap() const noexcept
 bool DataStream::CheckEncrypted()
 {
 	ieWord two = 0x0000; // if size < 2, two won't be initialized
-	Seek( 0, GEM_STREAM_START );
-	Read( &two, 2 );
+	Seek(0, GEM_STREAM_START);
+	Read(&two, 2);
 	if (two == 0xFFFF) {
 		Pos = 0;
 		Encrypted = true;
 		size -= 2;
 		return true;
 	}
-	Seek( 0, GEM_STREAM_START );
+	Seek(0, GEM_STREAM_START);
 	Encrypted = false;
 	return false;
 }
@@ -54,12 +55,12 @@ bool DataStream::CheckEncrypted()
 void DataStream::ReadDecrypted(void* buf, strpos_t encSize) const
 {
 	for (unsigned int i = 0; i < encSize; i++)
-		( ( unsigned char * ) buf )[i] ^= GEM_ENCRYPTION_KEY[( Pos + i ) & 63];
+		((unsigned char*) buf)[i] ^= GEM_ENCRYPTION_KEY[(Pos + i) & 63];
 }
 
 void DataStream::Rewind()
 {
-	Seek( Encrypted ? 2 : 0, GEM_STREAM_START );
+	Seek(Encrypted ? 2 : 0, GEM_STREAM_START);
 	Pos = 0;
 }
 
@@ -75,24 +76,24 @@ strpos_t DataStream::Size() const
 
 strpos_t DataStream::Remains() const
 {
-	return size-Pos;
+	return size - Pos;
 }
 
 strret_t DataStream::WriteFilling(strpos_t len)
 {
 	const static char zerobuf[256] = {};
-	
+
 	strret_t ret = 0;
 	while (len >= sizeof(zerobuf)) {
 		ret += Write(zerobuf, sizeof(zerobuf));
 		len -= sizeof(zerobuf);
 	}
-	
+
 	ret += Write(zerobuf, len);
 	return ret;
 }
 
-strret_t DataStream::ReadPoint(Point &p)
+strret_t DataStream::ReadPoint(Point& p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish
 	strret_t ret = ReadScalar<int, ieWordSigned>(p.x);
@@ -100,7 +101,7 @@ strret_t DataStream::ReadPoint(Point &p)
 	return ret;
 }
 
-strret_t DataStream::WritePoint(const Point &p)
+strret_t DataStream::WritePoint(const Point& p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish
 	strret_t ret = WriteScalar<int, ieWordSigned>(p.x);
@@ -169,7 +170,8 @@ DataStream* DataStream::Clone() const noexcept
 	return NULL;
 }
 
-void DataStream::SetBigEndianness(bool isBE) noexcept {
+void DataStream::SetBigEndianness(bool isBE) noexcept
+{
 	IsDataBigEndian = isBE;
 }
 

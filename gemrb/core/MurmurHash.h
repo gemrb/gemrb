@@ -20,9 +20,9 @@
 #ifndef H_GEMRB_MURMUR_HASH
 #define H_GEMRB_MURMUR_HASH
 
-#include <cstdint>
-
 #include "exports.h"
+
+#include <cstdint>
 
 namespace GemRB {
 
@@ -37,14 +37,15 @@ struct GEM_EXPORT MurmurHash {
 };
 
 class GEM_EXPORT MurmurHash3_32 {
-	public:
-		MurmurHash3_32() {};
+public:
+	MurmurHash3_32() {};
 
-		void Feed(uint32_t value);
-		MurmurHash GetHash() const;
-	private:
-		uint32_t state = 0;
-		uint32_t calls = 0;
+	void Feed(uint32_t value);
+	MurmurHash GetHash() const;
+
+private:
+	uint32_t state = 0;
+	uint32_t calls = 0;
 };
 
 using Hasher = MurmurHash3_32;

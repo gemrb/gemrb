@@ -22,17 +22,17 @@
 #define H_PLUGINS_EXPORT
 
 #ifndef STATIC_LINK
-#	ifdef WIN32
-#		define GEM_PLUGIN_EXPORT __declspec(dllexport)
-#	else
-#		ifdef __GNUC__
-#			define GEM_PLUGIN_EXPORT __attribute__ ((visibility("default")))
-#		endif
-#	endif
+	#ifdef WIN32
+		#define GEM_PLUGIN_EXPORT __declspec(dllexport)
+	#else
+		#ifdef __GNUC__
+			#define GEM_PLUGIN_EXPORT __attribute__((visibility("default")))
+		#endif
+	#endif
 #endif
 
 #ifndef GEM_PLUGIN_EXPORT
-#	define GEM_PLUGIN_EXPORT
+	#define GEM_PLUGIN_EXPORT
 #endif
 
 #endif

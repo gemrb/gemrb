@@ -29,7 +29,7 @@
 namespace GemRB {
 
 Progressbar::Progressbar(const Region& frame, unsigned short KnobStepsCount)
-: Control(frame), KnobStepsCount(KnobStepsCount)
+	: Control(frame), KnobStepsCount(KnobStepsCount)
 {
 	ControlType = IE_GUI_PROGRESSBAR;
 
@@ -55,7 +55,7 @@ void Progressbar::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	ieDword val = GetValue();
 
-	if((val >= 100) && KnobStepsCount && BackGround2) {
+	if ((val >= 100) && KnobStepsCount && BackGround2) {
 		//animated progbar end stage
 		VideoDriver->BlitSprite(BackGround2, rgn.origin);
 		return; //done for animated progbar
@@ -63,7 +63,7 @@ void Progressbar::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 	unsigned int Count;
 
-	if(!KnobStepsCount) {
+	if (!KnobStepsCount) {
 		//linear progressbar (pst, iwd)
 		const Size& size = BackGround2->Frame.size;
 		//this is the PST/IWD specific part
@@ -78,7 +78,7 @@ void Progressbar::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	}
 
 	//animated progressbar (bg2)
-	Count=val*KnobStepsCount/100;
+	Count = val * KnobStepsCount / 100;
 	for (unsigned int i = 0; i < Count && PBarAnim; i++) {
 		Holder<Sprite2D> Knob = PBarAnim->GetFrame(i);
 		VideoDriver->BlitSprite(Knob, Point());
@@ -102,7 +102,7 @@ void Progressbar::SetImages(Holder<Sprite2D> bg, Holder<Sprite2D> cap)
 	MarkDirty();
 }
 
-void Progressbar::SetAnimation(Animation *arg)
+void Progressbar::SetAnimation(Animation* arg)
 {
 	delete PBarAnim;
 	PBarAnim = arg;

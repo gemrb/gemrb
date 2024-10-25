@@ -6,11 +6,11 @@
 
 namespace GemRB {
 
-Map::MapReverb::MapReverb (MapEnv env, id_t reverbID)
+Map::MapReverb::MapReverb(MapEnv env, id_t reverbID)
 {
 	AutoTable reverbs = gamedata->LoadTable("reverb");
-	
-	MapReverbProperties _properties = {EFX_REVERB_GENERIC, true};
+
+	MapReverbProperties _properties = { EFX_REVERB_GENERIC, true };
 	properties = _properties;
 
 	profile_t reverbProfile = EFX_PROFILE_REVERB_INVALID;
@@ -21,7 +21,7 @@ Map::MapReverb::MapReverb (MapEnv env, id_t reverbID)
 
 		/* If still nothing, fallback to something Ok. */
 		if (EFX_PROFILE_REVERB_INVALID == reverbProfile) {
-			if (env & (AT_OUTDOOR|AT_CITY|AT_FOREST)) {
+			if (env & (AT_OUTDOOR | AT_CITY | AT_FOREST)) {
 				reverbProfile = loadProperties(reverbs, EFX_PROFILE_OUTSIDE);
 			} else if (env & AT_DUNGEON) {
 				reverbProfile = loadProperties(reverbs, EFX_PROFILE_DUNGEON);
@@ -33,7 +33,7 @@ Map::MapReverb::MapReverb (MapEnv env, id_t reverbID)
 }
 
 Map::MapReverb::MapReverb(MapEnv env, const ResRef& mapref)
-: MapReverb(env, obtainProfile(mapref))
+	: MapReverb(env, obtainProfile(mapref))
 {}
 
 Map::MapReverb::profile_t Map::MapReverb::loadProperties(const AutoTable& reverbs, id_t reverbIdx)
@@ -46,19 +46,19 @@ Map::MapReverb::profile_t Map::MapReverb::loadProperties(const AutoTable& reverb
 
 	/* Limited to values seemingly used. */
 	if (efxProfileName == "ARENA") {
-		MapReverbProperties _properties = {EFX_REVERB_ARENA, false};
+		MapReverbProperties _properties = { EFX_REVERB_ARENA, false };
 		properties = _properties;
 	} else if (efxProfileName == "AUDITORIUM") {
-		MapReverbProperties _properties = {EFX_REVERB_AUDITORIUM, false};
+		MapReverbProperties _properties = { EFX_REVERB_AUDITORIUM, false };
 		properties = _properties;
 	} else if (efxProfileName == "CITY") {
-		MapReverbProperties _properties = {EFX_REVERB_CITY, false};
+		MapReverbProperties _properties = { EFX_REVERB_CITY, false };
 		properties = _properties;
 	} else if (efxProfileName == "FOREST") {
-		MapReverbProperties _properties = {EFX_REVERB_FOREST, false};
+		MapReverbProperties _properties = { EFX_REVERB_FOREST, false };
 		properties = _properties;
 	} else if (efxProfileName == "ROOM") {
-		MapReverbProperties _properties = {EFX_REVERB_ROOM, false};
+		MapReverbProperties _properties = { EFX_REVERB_ROOM, false };
 		properties = _properties;
 	}
 
@@ -72,7 +72,8 @@ Map::MapReverb::profile_t Map::MapReverb::loadProperties(const AutoTable& reverb
 	return reverbIdx;
 }
 
-Map::MapReverb::id_t Map::MapReverb::obtainProfile(const ResRef& mapref) {
+Map::MapReverb::id_t Map::MapReverb::obtainProfile(const ResRef& mapref)
+{
 	const AutoTable& reverbMapping = gamedata->LoadTable("reverbs", true);
 	if (!reverbMapping) return EFX_PROFILE_REVERB_INVALID;
 	TableMgr::index_t rows = reverbMapping->GetRowCount();

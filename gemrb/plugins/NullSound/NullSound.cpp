@@ -107,19 +107,15 @@ bool NullSound::ReleaseStream(int, bool)
 
 void NullSound::SetAmbientStreamVolume(int, int)
 {
-
 }
 
 void NullSound::SetAmbientStreamPitch(int, int)
 {
-
 }
 
 void NullSound::QueueBuffer(int, unsigned short, int, short*, int, int)
 {
-
 }
-
 
 
 #include "plugindef.h"

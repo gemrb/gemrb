@@ -21,6 +21,7 @@
 #include "Light.h"
 
 #include "Geometry.h"
+
 #include "Video/Video.h"
 
 namespace GemRB {
@@ -29,8 +30,9 @@ static Holder<Palette> GetLightPalette() noexcept
 {
 	static struct Init {
 		Holder<Palette> pal;
-		Init() noexcept {
-			Color cols[256] {ColorBlack};
+		Init() noexcept
+		{
+			Color cols[256] { ColorBlack };
 			for (int i = 1; i < 256; ++i) {
 				cols[i] = ColorWhite;
 				cols[i].a = i;
@@ -44,22 +46,22 @@ static Holder<Palette> GetLightPalette() noexcept
 
 Holder<Sprite2D> CreateLight(const Size& size, uint8_t intensity) noexcept
 {
-	uint8_t* px = (uint8_t*)calloc(size.w, size.h);
-	
+	uint8_t* px = (uint8_t*) calloc(size.w, size.h);
+
 	const Point& radii = size.Center();
 	const float maxr = std::max<float>(radii.x, radii.y);
 	Region r(Point() - radii, size);
-	
+
 	const auto points = PlotEllipse(r);
 	for (size_t i = 0; i < points.size(); i += 4) {
 		const Point& q1 = points[i];
 		const Point& q2 = points[i + 1];
 		assert(q1.y == q2.y);
-		
+
 		const Point& q3 = points[i + 2];
 		const Point& q4 = points[i + 3];
 		assert(q3.y == q4.y);
-		
+
 		for (int x = q1.x; x >= 0; --x) {
 			// by the power of Pythagoras
 			uint8_t hyp = std::hypot<uint8_t>(x, q1.y);

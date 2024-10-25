@@ -21,15 +21,15 @@
 #define GAMECONTROLDEFS_H
 
 // dialog flags
-#define DF_IN_DIALOG      1
-#define DF_TALKCOUNT      2
-#define DF_UNBREAKABLE    4
-#define DF_FREEZE_SCRIPTS 8
-#define DF_INTERACT       16
-#define DF_IN_CONTAINER   32
+#define DF_IN_DIALOG          1
+#define DF_TALKCOUNT          2
+#define DF_UNBREAKABLE        4
+#define DF_FREEZE_SCRIPTS     8
+#define DF_INTERACT           16
+#define DF_IN_CONTAINER       32
 #define DF_OPENCONTINUEWINDOW 64
-#define DF_OPENENDWINDOW 128
-#define DF_POSTPONE_SCRIPTS 256
+#define DF_OPENENDWINDOW      128
+#define DF_POSTPONE_SCRIPTS   256
 
 // screen flags
 // !!! Keep these synchronized with GUIDefines.py !!!

@@ -26,10 +26,10 @@
 #ifndef GUIFACTORY_H
 #define GUIFACTORY_H
 
+#include "Plugin.h"
+
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/WindowManager.h"
-
-#include "Plugin.h"
 
 namespace GemRB {
 
@@ -52,7 +52,6 @@ public:
 	virtual bool LoadWindowPack(const ScriptingGroup_t&) = 0;
 	/** Creates a Window in the Window Manager */
 	Window* CreateWindow(ScriptingId winId, const Region& rgn) const;
-
 };
 
 }

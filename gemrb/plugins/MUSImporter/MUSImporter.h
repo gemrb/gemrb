@@ -22,8 +22,8 @@
 #define MUSIMPORTER_H
 
 #include "MusicMgr.h"
-
 #include "ResourceManager.h"
+
 #include "Streams/FileStream.h"
 
 #include <cstdio>
@@ -52,12 +52,14 @@ private:
 	int PLpos = 0;
 	int PLnext = -1;
 	FileStream* str;
-	std::vector< PLString> playlist;
+	std::vector<PLString> playlist;
 	unsigned int lastSound = 0xffffffff;
 	ResourceManager manager;
+
 private:
 	void PlayMusic(int pos);
 	void PlayMusic(const ieVariable& name);
+
 public:
 	MUSImporter();
 	MUSImporter(const MUSImporter&) = delete;

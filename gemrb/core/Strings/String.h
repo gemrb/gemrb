@@ -26,30 +26,31 @@
 #include "fmt/xchar.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cwctype>
 #include <string>
 #include <vector>
 
 #define WHITESPACE_STRING_W u"\n\t\r "
-#define WHITESPACE_STRING "\n\t\r "
+#define WHITESPACE_STRING   "\n\t\r "
 
 #define WHITESPACE_STRING_VIEW(StrT) \
-StringViewT<StrT>((sizeof(typename StrT::value_type) == 1) ? (const typename StrT::value_type*)WHITESPACE_STRING : (const typename StrT::value_type*)WHITESPACE_STRING_W, sizeof(WHITESPACE_STRING) - 1)
+	StringViewT<StrT>((sizeof(typename StrT::value_type) == 1) ? (const typename StrT::value_type*) WHITESPACE_STRING : (const typename StrT::value_type*) WHITESPACE_STRING_W, sizeof(WHITESPACE_STRING) - 1)
 
 namespace GemRB {
 
 using String = std::u16string;
 
-template <typename STR>
+template<typename STR>
 using StringViewT = StringViewImp<std::add_const_t<typename STR::value_type>>;
 
-template <typename STR>
+template<typename STR>
 STR StringFromView(StringViewT<STR> sv)
 {
 	return STR(sv.c_str(), sv.length());
 }
 
-template <typename STR>
+template<typename STR>
 typename STR::size_type FindFirstOf(const STR& s, StringViewT<STR> sv, typename STR::size_type pos = 0) noexcept
 {
 	if (pos >= s.length() || s.empty()) {
@@ -59,10 +60,10 @@ typename STR::size_type FindFirstOf(const STR& s, StringViewT<STR> sv, typename 
 	return iter == s.end() ? STR::npos : std::distance(s.begin(), iter);
 }
 
-template <typename STR, typename IT>
+template<typename STR, typename IT>
 IT FindNotOf(IT first, IT last, StringViewT<STR> s) noexcept
 {
-	for (; first != last ; ++first) {
+	for (; first != last; ++first) {
 		if (std::find(s.begin(), s.end(), *first) == s.end()) {
 			return first;
 		}
@@ -70,7 +71,7 @@ IT FindNotOf(IT first, IT last, StringViewT<STR> s) noexcept
 	return last;
 }
 
-template <typename STR>
+template<typename STR>
 typename STR::size_type FindFirstNotOf(const STR& s, StringViewT<STR> sv, typename STR::size_type pos = 0) noexcept
 {
 	if (pos >= s.length() || s.length() == 0) {
@@ -81,7 +82,7 @@ typename STR::size_type FindFirstNotOf(const STR& s, StringViewT<STR> sv, typena
 	return iter == s.end() ? STR::npos : static_cast<typename STR::size_type>(std::distance(s.begin(), iter));
 }
 
-template <typename STR>
+template<typename STR>
 typename STR::size_type FindLastNotOf(const STR& s, StringViewT<STR> sv, typename STR::size_type pos = STR::npos, bool reverse = false) noexcept
 {
 	if (pos >= s.length()) {
@@ -97,7 +98,7 @@ typename STR::size_type FindLastNotOf(const STR& s, StringViewT<STR> sv, typenam
 	return iter == iterEnd ? STR::npos : s.length() - 1 - static_cast<typename STR::size_type>(std::distance(s.rbegin(), iter));
 }
 
-template <typename STR>
+template<typename STR>
 void RTrim(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
 {
 	auto pos = FindLastNotOf(string, chars);
@@ -109,20 +110,20 @@ void RTrim(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
 	}
 }
 
-template <typename STR>
+template<typename STR>
 STR RTrimCopy(STR string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
 {
 	RTrim(string, chars);
 	return string;
 }
 
-template <typename STR>
+template<typename STR>
 void LTrim(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
 {
 	string.erase(0, FindFirstNotOf(string, chars));
 }
 
-template <typename STR>
+template<typename STR>
 void TrimString(STR& string, StringViewT<STR> chars = WHITESPACE_STRING_VIEW(STR))
 {
 	LTrim(string, chars);
@@ -136,8 +137,7 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', s
 	elements.reserve(lim + 1);
 	size_t beg = FindFirstNotOf(str, WHITESPACE_STRING_VIEW(STR));
 	size_t cur = beg;
-	for (; cur < str.length(); ++cur)
-	{
+	for (; cur < str.length(); ++cur) {
 		if (str[cur] == delim) {
 			if (str[beg] == delim) {
 				elements.emplace_back();
@@ -169,41 +169,47 @@ std::vector<RET> Explode(const STR& str, typename STR::value_type delim = ',', s
 	return elements;
 }
 
-template <typename STR>
-StringViewT<STR> SubStr(const STR& str, typename STR::size_type pos, typename STR::size_type len = STR::npos) {
+template<typename STR>
+StringViewT<STR> SubStr(const STR& str, typename STR::size_type pos, typename STR::size_type len = STR::npos)
+{
 	if (len == STR::npos) len = str.length() - pos;
 	assert(pos + len <= str.length());
 	return StringViewT<STR>(&str[0] + pos, len);
 }
 
-template <typename CIT, typename IT>
-GEM_EXPORT_T IT StringToLower(CIT it, CIT end, IT dest) {
+template<typename CIT, typename IT>
+GEM_EXPORT_T IT StringToLower(CIT it, CIT end, IT dest)
+{
 	for (; it != end; ++it, ++dest) {
 		*dest = std::towlower(*it);
 	}
 	return dest;
 }
 
-template <typename T>
-GEM_EXPORT_T void StringToLower(T& str) {
+template<typename T>
+GEM_EXPORT_T void StringToLower(T& str)
+{
 	StringToLower(std::begin(str), std::end(str), std::begin(str));
 }
 
-template <typename CIT, typename IT>
-GEM_EXPORT_T IT StringToUpper(CIT it, CIT end, IT dest) {
+template<typename CIT, typename IT>
+GEM_EXPORT_T IT StringToUpper(CIT it, CIT end, IT dest)
+{
 	for (; it != end; ++it, ++dest) {
 		*dest = std::towupper(*it);
 	}
 	return dest;
 }
 
-template <typename T>
-GEM_EXPORT_T void StringToUpper(T& str) {
+template<typename T>
+GEM_EXPORT_T void StringToUpper(T& str)
+{
 	StringToUpper(std::begin(str), std::end(str), std::begin(str));
 }
 
-template<typename ...ARGS>
-std::string& AppendFormat(std::string& str, const std::string& fmt, ARGS&& ...args) {
+template<typename... ARGS>
+std::string& AppendFormat(std::string& str, const std::string& fmt, ARGS&&... args)
+{
 	std::string formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
 	return str += formatted;
 }

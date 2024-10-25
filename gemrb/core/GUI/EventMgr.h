@@ -29,11 +29,12 @@
 #define EVENTMGR_H
 
 #include "exports.h"
-#include "ie_types.h"
 #include "globals.h"
+#include "ie_types.h"
 
 #include "Callback.h"
 #include "Region.h"
+
 #include "Strings/String.h"
 
 #include <bitset>
@@ -47,34 +48,34 @@ namespace GemRB {
 class Control;
 class Window;
 
-#define GEM_LEFT		0x81
-#define GEM_RIGHT		0x82
-#define GEM_UP			0x83
-#define GEM_DOWN		0x84
-#define GEM_DELETE		0x85
-#define GEM_RETURN		0x86
-#define GEM_BACKSP		0x87
-#define GEM_TAB			0x88
-#define GEM_ALT			0x89
-#define GEM_HOME		0x8a
-#define GEM_END			0x8b
-#define GEM_ESCAPE		0x8c
-#define GEM_PGUP		0x8d
-#define GEM_PGDOWN		0x8e
-#define GEM_GRAB		0x8f
+#define GEM_LEFT   0x81
+#define GEM_RIGHT  0x82
+#define GEM_UP     0x83
+#define GEM_DOWN   0x84
+#define GEM_DELETE 0x85
+#define GEM_RETURN 0x86
+#define GEM_BACKSP 0x87
+#define GEM_TAB    0x88
+#define GEM_ALT    0x89
+#define GEM_HOME   0x8a
+#define GEM_END    0x8b
+#define GEM_ESCAPE 0x8c
+#define GEM_PGUP   0x8d
+#define GEM_PGDOWN 0x8e
+#define GEM_GRAB   0x8f
 
 // 0x90 - 0x9f reserved for function keys (1-16)
 #define GEM_FUNCTIONX(x) \
-	((KeyboardKey)(0x8F + x))
+	((KeyboardKey) (0x8F + x))
 
-#define GEM_MOD_SHIFT           1
-#define GEM_MOD_CTRL            2
-#define GEM_MOD_ALT             4
+#define GEM_MOD_SHIFT 1
+#define GEM_MOD_CTRL  2
+#define GEM_MOD_ALT   4
 
 // Mouse buttons
-#define GEM_MB_ACTION           1
-#define GEM_MB_MIDDLE           2
-#define GEM_MB_MENU             4
+#define GEM_MB_ACTION 1
+#define GEM_MB_MIDDLE 2
+#define GEM_MB_MENU   4
 
 #define FINGER_MAX 5
 
@@ -115,10 +116,10 @@ struct GEM_EXPORT EventBase {
 
 struct GEM_EXPORT ScreenEvent : public EventBase {
 	// can't use Point due to non-trivial constructor
-	int x,y; // mouse position at time of event
+	int x, y; // mouse position at time of event
 	int deltaX, deltaY; // the vector of motion/scroll
 
-	Point Pos() const { return Point(x,y); }
+	Point Pos() const { return Point(x, y); }
 	Point Delta() const { return Point(deltaX, deltaY); }
 };
 
@@ -126,7 +127,8 @@ struct GEM_EXPORT MouseEvent : public ScreenEvent {
 	ButtonMask buttonStates;
 	EventButton button;
 
-	bool ButtonState(unsigned short btn) const {
+	bool ButtonState(unsigned short btn) const
+	{
 		return buttonStates & btn;
 	}
 };
@@ -182,7 +184,7 @@ struct GEM_EXPORT Event {
 		TouchDown,
 
 		TextInput, // clipboard or faux event sent to signal the soft keyboard+temp disable hotkeys
-		
+
 		ControllerAxis,
 		ControllerButtonUp,
 		ControllerButtonDown,
@@ -214,11 +216,11 @@ struct GEM_EXPORT Event {
 		AllTouchMask = TouchGestureMask | TouchUpMask | TouchDownMask,
 
 		TextInputMask = 1 << TextInput,
-		
+
 		ControllerAxisMask = 1 << ControllerAxis,
 		ControllerButtonUpMask = 1 << ControllerButtonUp,
 		ControllerButtonDownMask = 1 << ControllerButtonDown,
-		
+
 		AllControllerMask = ControllerAxisMask | ControllerButtonUpMask | ControllerButtonDownMask,
 
 		RedrawRequestMask = 1 << RedrawRequest,
@@ -227,7 +229,7 @@ struct GEM_EXPORT Event {
 		AllEventsMask = 0xffffffffU
 	};
 
-	static EventTypeMask EventMaskFromType (EventType type) { return static_cast<EventTypeMask>(1U << type); };
+	static EventTypeMask EventMaskFromType(EventType type) { return static_cast<EventTypeMask>(1U << type); };
 
 	union {
 		MouseEvent mouse;
@@ -263,7 +265,7 @@ public:
 	using buttonbits = std::bitset<sizeof(short) * CHAR_BIT>;
 	using EventCallback = Callback<bool, const Event&>;
 	using TapMonitorId = size_t;
-	
+
 	static constexpr int mouseClickRadius = 5; // radius for repeat click events
 	static constexpr int mouseDragRadius = 10; // radius for drag events
 
@@ -282,7 +284,7 @@ public:
 
 	static Event CreateTextEvent(const char* text);
 	static Event CreateTextEvent(const String& text);
-	
+
 	static Event CreateControllerAxisEvent(InputAxis axis, int delta, float pct);
 	static Event CreateControllerButtonEvent(EventButton btn, bool down);
 
@@ -308,7 +310,7 @@ private:
 	static Point mousePos;
 
 	static std::map<uint64_t, TouchEvent::Finger> fingerStates;
-	
+
 	static buttonbits controllerButtonStates;
 
 public:
@@ -323,7 +325,7 @@ public:
 	static const TouchEvent::Finger* FingerState(uint64_t id) { return (fingerStates.count(id)) ? &fingerStates[id] : NULL; };
 	static bool FingerDown();
 	static ieByte NumFingersDown() { return fingerStates.size(); };
-	
+
 	static bool ControllerButtonState(EventButton btn);
 };
 

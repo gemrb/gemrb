@@ -46,16 +46,16 @@ enum class EscapeArea {
 };
 
 //displaystring flags
-#define DS_WAIT    1
-#define DS_HEAD    2
-#define DS_CONSOLE 4
-#define DS_CONST   8
-#define DS_NONAME  16
-#define DS_SILENT  32
-#define DS_SPEECH  64
-#define DS_AREA    128
-#define DS_QUEUE   256
-#define DS_CIRCLE  512
+#define DS_WAIT     1
+#define DS_HEAD     2
+#define DS_CONSOLE  4
+#define DS_CONST    8
+#define DS_NONAME   16
+#define DS_SILENT   32
+#define DS_SPEECH   64
+#define DS_AREA     128
+#define DS_QUEUE    256
+#define DS_CIRCLE   512
 #define DS_RESOLVED 1024
 
 //markspellandobject (iwd2)
@@ -67,42 +67,42 @@ enum class EscapeArea {
 #define MSO_IGNORE_NULL    32
 
 // delta.ids (pst)
-#define DM_LOWER   1
-#define DM_RAISE   2
-#define DM_SET     3
+#define DM_LOWER 1
+#define DM_RAISE 2
+#define DM_SET   3
 
 //attack core flags
-#define AC_NO_SOUND   1
-#define AC_RUNNING    2
+#define AC_NO_SOUND 1
+#define AC_RUNNING  2
 
 //spelll core flags
-#define SC_NO_DEAD      1
-#define SC_RANGE_CHECK  2
-#define SC_DEPLETE      4
-#define SC_SETLEVEL     8
-#define SC_INSTANT      16
-#define SC_AURA_CHECK   32
-#define SC_NOINTERRUPT  64
+#define SC_NO_DEAD     1
+#define SC_RANGE_CHECK 2
+#define SC_DEPLETE     4
+#define SC_SETLEVEL    8
+#define SC_INSTANT     16
+#define SC_AURA_CHECK  32
+#define SC_NOINTERRUPT 64
 
-#define ACF_OVERRIDE 1 // was this action invoked via ActionOverride?
+#define ACF_OVERRIDE        1 // was this action invoked via ActionOverride?
 #define ACF_REALLOW_SCRIPTS 0x1000 // gemrb internal
 #define ACF_MISSING_OBJECT  0x2000 // used for detection of [ANYONE], since it has the same signature as no object, but is not the same
-#define ACF_PRECOMPILED 0x4000 // whether it came from a bcs
-#define ACF_FOLLOW_DONE 0x10000000 // Bubb: written during CGameSprite::Follow(), I believe it means the MoveToPoint() ended with ACTION_DONE
+#define ACF_PRECOMPILED     0x4000 // whether it came from a bcs
+#define ACF_FOLLOW_DONE     0x10000000 // Bubb: written during CGameSprite::Follow(), I believe it means the MoveToPoint() ended with ACTION_DONE
 // NOTE: if it ever becomes useful, this is where it came into play
 // CGameSprite::Follow() is used in the Follow action, as well as when Leader() is used in
 // combination with FollowObjectFormation(), Formation(), MoveToObject(), and MoveToPoint().
 // Leader() is also used internally when processing the "Follow the Leader" group formation.
 
 //trigger flags stored in triggers in .bcs files
-#define TF_NEGATE  1   //negate trigger result
-#define TF_APPLIED 2   //set in living when trigger applied
-#define TF_ADDED   4   //set in scriptable when trigger added/applied
+#define TF_NEGATE         1 //negate trigger result
+#define TF_APPLIED        2 //set in living when trigger applied
+#define TF_ADDED          4 //set in scriptable when trigger added/applied
 #define TF_MISSING_OBJECT 8 // used for detection of [ANYONE], since it has the same signature as no object, but is not the same
-#define TF_PRECOMPILED 16 // whether it came from a bcs
+#define TF_PRECOMPILED    16 // whether it came from a bcs
 
-#define MAX_OBJECT_FIELDS	10
-#define MAX_NESTING		5
+#define MAX_OBJECT_FIELDS 10
+#define MAX_NESTING       5
 
 using StringParam = FixedSizeString<64, strnicmp>;
 static_assert(std::is_standard_layout<StringParam>::value, "Fixed Size String must be standard layout for use in unions");
@@ -110,6 +110,7 @@ static_assert(std::is_standard_layout<StringParam>::value, "Fixed Size String mu
 class Canary {
 private:
 	volatile unsigned long canary;
+
 protected:
 	Canary() noexcept // protected constructor
 	{
@@ -138,8 +139,8 @@ class GEM_EXPORT Object : protected Canary {
 public:
 	int objectFields[MAX_OBJECT_FIELDS] {}; // eg. [PC.0.0.UNDEAD]
 	int objectFilters[MAX_NESTING] {}; // eg. Myself or LastTargetedBy(LastAttackerOf(Player1))
-	Region objectRect{};
-	
+	Region objectRect {};
+
 	union {
 		StringParam objectName;
 		ieVariable objectNameVar;
@@ -147,7 +148,8 @@ public:
 	};
 
 public:
-	Object() noexcept : objectName() {};
+	Object() noexcept
+		: objectName() {};
 
 	std::string dump(bool print = true) const;
 	void Release()
@@ -159,7 +161,8 @@ public:
 
 class GEM_EXPORT Trigger final : protected Canary {
 public:
-	Trigger() noexcept : string0Parameter(), string1Parameter() {};
+	Trigger() noexcept
+		: string0Parameter(), string1Parameter() {};
 	~Trigger() final
 	{
 		if (objectParameter) {
@@ -167,7 +170,7 @@ public:
 			objectParameter = nullptr;
 		}
 	}
-	int Evaluate(Scriptable *Sender) const;
+	int Evaluate(Scriptable* Sender) const;
 
 	unsigned short triggerID = 0;
 	int int0Parameter = 0;
@@ -176,13 +179,13 @@ public:
 	int int2Parameter = 0;
 	Point pointParameter;
 	Object* objectParameter = nullptr;
-	
+
 	union {
 		StringParam string0Parameter;
 		ieVariable variable0Parameter;
 		ResRef resref0Parameter;
 	};
-	
+
 	union {
 		StringParam string1Parameter;
 		ieVariable variable1Parameter;
@@ -212,7 +215,7 @@ public:
 	{
 		delete this;
 	}
-	bool Evaluate(Scriptable *Sender) const;
+	bool Evaluate(Scriptable* Sender) const;
 
 	std::vector<Trigger*> triggers;
 };
@@ -220,7 +223,7 @@ public:
 class GEM_EXPORT Action final : protected Canary {
 public:
 	explicit Action(bool autoFree) noexcept
-	: string0Parameter(), string1Parameter()
+		: string0Parameter(), string1Parameter()
 	{
 		//changed now
 		if (autoFree) {
@@ -240,18 +243,18 @@ public:
 	}
 
 	unsigned short actionID = 0;
-	Object* objects[3]{};
+	Object* objects[3] {};
 	int int0Parameter = 0;
 	Point pointParameter;
 	int int1Parameter = 0;
 	int int2Parameter = 0;
-	
+
 	union {
 		StringParam string0Parameter; // keep largest type first to 0 fill everything
 		ieVariable variable0Parameter;
 		ResRef resref0Parameter;
 	};
-	
+
 	union {
 		StringParam string1Parameter; // keep largest type first to 0 fill everything
 		ieVariable variable1Parameter;
@@ -259,10 +262,13 @@ public:
 	};
 
 	uint32_t flags = 0;
+
 private:
 	int RefCount = 0;
+
 public:
-	int GetRef() const {
+	int GetRef() const
+	{
 		return RefCount;
 	}
 
@@ -273,7 +279,7 @@ public:
 		AssertCanary(__func__);
 		if (!RefCount) {
 			error("GameScript", "WARNING!!! Double Freeing in {}: Line {}", __FILE__,
-				__LINE__);
+			      __LINE__);
 		}
 		RefCount--;
 		if (!RefCount) {
@@ -286,7 +292,7 @@ public:
 		RefCount++;
 		if (RefCount >= 65536) {
 			error("GameScript", "Refcount increased to: {} in action {}", RefCount,
-				actionID);
+			      actionID);
 		}
 	}
 };
@@ -379,10 +385,10 @@ public:
 
 using TriggerFunction = int (*)(Scriptable*, const Trigger*);
 using ActionFunction = void (*)(Scriptable*, Action*);
-using ObjectFunction = Targets* (*)(const Scriptable*, Targets*, int ga_flags);
+using ObjectFunction = Targets* (*) (const Scriptable*, Targets*, int ga_flags);
 using IDSFunction = int (*)(const Actor*, int parameter);
 
-#define TF_NONE		0
+#define TF_NONE         0
 #define TF_CONDITION    1 //this isn't a trigger, just a condition (0x4000)
 #define TF_SAVED        2 //trigger is in svtriobj.ids
 #define TF_MERGESTRINGS 8 //same value as actions' mergestring
@@ -395,25 +401,25 @@ struct TriggerLink {
 };
 
 //createcreature flags
-#define CC_OFFSET    1
-#define CC_OBJECT    2
-#define CC_OFFSCREEN 3
-#define CC_MASK      3
-#define CC_CHECK_IMPASSABLE  4  //adjust position (searchmap)
-#define CC_PLAY_ANIM 8          //play animation
-#define CC_STRING1   16         //resref is in second string
-#define CC_CHECK_OVERLAP 32     //other actors
-#define CC_COPY      64         //copy appearance
-#define CC_SCRIPTNAME 128       //scriptname in 2nd string
+#define CC_OFFSET           1
+#define CC_OBJECT           2
+#define CC_OFFSCREEN        3
+#define CC_MASK             3
+#define CC_CHECK_IMPASSABLE 4 //adjust position (searchmap)
+#define CC_PLAY_ANIM        8 //play animation
+#define CC_STRING1          16 //resref is in second string
+#define CC_CHECK_OVERLAP    32 //other actors
+#define CC_COPY             64 //copy appearance
+#define CC_SCRIPTNAME       128 //scriptname in 2nd string
 
 //begindialog flags
 #define BD_STRING0   0
 #define BD_TARGET    1
 #define BD_SOURCE    2
-#define BD_RESERVED  3  //playerX resref
-#define BD_INTERACT  4  //banter dialogs
-#define BD_LOCMASK   7  //where is the dialog resref
-#define BD_TALKCOUNT 8  //increases talkcount
+#define BD_RESERVED  3 //playerX resref
+#define BD_INTERACT  4 //banter dialogs
+#define BD_LOCMASK   7 //where is the dialog resref
+#define BD_TALKCOUNT 8 //increases talkcount
 #define BD_SETDIALOG 16 //also sets dialog (for string0)
 #define BD_CHECKDIST 32 //checks distance, if needs, walks up
 #define BD_OWN       64 //source == target, works for player only
@@ -425,22 +431,22 @@ struct TriggerLink {
 #define AF_NONE         0
 #define AF_IMMEDIATE    1
 #define AF_CONTINUE     2
-#define AF_MASK         3   //none, immediate or continue
+#define AF_MASK         3 //none, immediate or continue
 #define AF_BLOCKING     4
 #define AF_MERGESTRINGS 8
 //we could use this flag to restrict player scripts from using dangerous
 //opcodes, it would be a very useful and easy to implement feature!
-#define AF_RESTRICTED   16
+#define AF_RESTRICTED 16
 //#define AF_RESTRICTED_LEVEL2  32 //maybe we could use 2 bits for this???
-#define AF_SCRIPTLEVEL  64  //this hack will transfer scriptlevel to int0parameter at runtime (changecurrentscript relies on it)
-#define AF_INVALID      128
-#define AF_DIRECT       256 //this hack will transfer target from gamecontrol to object1 at compile time
-#define AF_ALIVE        512 //only alive actors can do this
-#define AF_CHASE        1024 // ??? actions involving movement ???
-#define AF_SLEEP        2048 //only awake actors can do this
-#define AF_DLG_INSTANT  4096 //instant dialog actions
-#define AF_SCR_INSTANT  8192 //instant script actions
-#define AF_INSTANT      (AF_DLG_INSTANT|AF_SCR_INSTANT) //only iwd2 treats them separately; 12288
+#define AF_SCRIPTLEVEL   64 //this hack will transfer scriptlevel to int0parameter at runtime (changecurrentscript relies on it)
+#define AF_INVALID       128
+#define AF_DIRECT        256 //this hack will transfer target from gamecontrol to object1 at compile time
+#define AF_ALIVE         512 //only alive actors can do this
+#define AF_CHASE         1024 // ??? actions involving movement ???
+#define AF_SLEEP         2048 //only awake actors can do this
+#define AF_DLG_INSTANT   4096 //instant dialog actions
+#define AF_SCR_INSTANT   8192 //instant script actions
+#define AF_INSTANT       (AF_DLG_INSTANT | AF_SCR_INSTANT) //only iwd2 treats them separately; 12288
 #define AF_IWD2_OVERRIDE 16384 // marking actions that require special attention when clearing during ActionOverride
 #define AF_HAS_OBJECT    32768 // whether it has an object parameter
 
@@ -466,10 +472,10 @@ struct IDSLink {
 	IDSFunction Function;
 };
 
-#define MAX_TRIGGERS			300
-#define MAX_ACTIONS			500
-#define MAX_OBJECTS			256
-#define AI_SCRIPT_LEVEL 4             //the script level of special ai scripts
+#define MAX_TRIGGERS    300
+#define MAX_ACTIONS     500
+#define MAX_OBJECTS     256
+#define AI_SCRIPT_LEVEL 4 //the script level of special ai scripts
 
 template<typename... ARGS>
 extern void ScriptDebugLog(DebugMode bit, const char* message, ARGS&&... args)
@@ -484,27 +490,28 @@ extern int NextTriggerObjectID;
 class GEM_EXPORT GameScript {
 public:
 	GameScript(const ResRef& ResRef, Scriptable* Myself,
-		int ScriptLevel = 0, bool AIScript = false);
+		   int ScriptLevel = 0, bool AIScript = false);
 	GameScript(const GameScript&) = delete;
 	~GameScript();
 	GameScript& operator=(const GameScript&) = delete;
 
-	bool dead = false;      // Script replaced itself with another and should be deleted when done running
-	bool running = false;   // Script is currently running so defer any deletion to caller
+	bool dead = false; // Script replaced itself with another and should be deleted when done running
+	bool running = false; // Script is currently running so defer any deletion to caller
 
 	ResRef GetName() const { return Name; }
 	static void ExecuteString(Scriptable* Sender, std::string string);
 	static int EvaluateString(Scriptable* Sender, const char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 
-	bool Update(bool *continuing = NULL, bool *done = NULL);
+	bool Update(bool* continuing = NULL, bool* done = NULL);
 	void EvaluateAllBlocks(bool testConditions = false);
+
 private: //Internal Functions
 	Script* CacheScript(const ResRef& ResRef, bool AIScript);
 	ResponseBlock* ReadResponseBlock(DataStream* stream);
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);
-	static int InParty(Scriptable *Sender, const Trigger *parameters, bool allowdead);
+	static int InParty(Scriptable* Sender, const Trigger* parameters, bool allowdead);
 
 	// Internal variables
 	Scriptable* const MySelf;
@@ -512,409 +519,410 @@ private: //Internal Functions
 	Script* script;
 	size_t lastResponseBlock = -1;
 	int scriptlevel;
+
 public: //Script Functions
-	static int ID_Alignment(const Actor *actor, int parameter);
-	static int ID_Allegiance(const Actor *actor, int parameter);
-	static int ID_AVClass(const Actor *actor, int parameter);
-	static int ID_Class(const Actor *actor, int parameter);
-	static int ID_ClassMask(const Actor *actor, int parameter);
-	static int ID_Faction(const Actor *actor, int parameter);
-	static int ID_Gender(const Actor *actor, int parameter);
-	static int ID_General(const Actor *actor, int parameter);
-	static int ID_Race(const Actor *actor, int parameter);
-	static int ID_Specific(const Actor *actor, int parameter);
-	static int ID_Subrace(const Actor *actor, int parameter);
-	static int ID_Team(const Actor *actor, int parameter);
+	static int ID_Alignment(const Actor* actor, int parameter);
+	static int ID_Allegiance(const Actor* actor, int parameter);
+	static int ID_AVClass(const Actor* actor, int parameter);
+	static int ID_Class(const Actor* actor, int parameter);
+	static int ID_ClassMask(const Actor* actor, int parameter);
+	static int ID_Faction(const Actor* actor, int parameter);
+	static int ID_Gender(const Actor* actor, int parameter);
+	static int ID_General(const Actor* actor, int parameter);
+	static int ID_Race(const Actor* actor, int parameter);
+	static int ID_Specific(const Actor* actor, int parameter);
+	static int ID_Subrace(const Actor* actor, int parameter);
+	static int ID_Team(const Actor* actor, int parameter);
 
 	//Triggers
-	static int ActionListEmpty(Scriptable *Sender, const Trigger *parameters);
-	static int ActuallyInCombat(Scriptable *Sender, const Trigger *parameters);
-	static int Acquired(Scriptable *Sender, const Trigger *parameters);
-	static int Alignment(Scriptable *Sender, const Trigger *parameters);
-	static int Allegiance(Scriptable *Sender, const Trigger *parameters);
-	static int AnimationID(Scriptable *Sender, const Trigger *parameters);
-	static int AnimState(Scriptable *Sender, const Trigger *parameters);
-	static int AnyPCOnMap(Scriptable *Sender, const Trigger *parameters);
-	static int AnyPCSeesEnemy(Scriptable *Sender, const Trigger *parameters);
-	static int AreaCheck(Scriptable *Sender, const Trigger *parameter);
+	static int ActionListEmpty(Scriptable* Sender, const Trigger* parameters);
+	static int ActuallyInCombat(Scriptable* Sender, const Trigger* parameters);
+	static int Acquired(Scriptable* Sender, const Trigger* parameters);
+	static int Alignment(Scriptable* Sender, const Trigger* parameters);
+	static int Allegiance(Scriptable* Sender, const Trigger* parameters);
+	static int AnimationID(Scriptable* Sender, const Trigger* parameters);
+	static int AnimState(Scriptable* Sender, const Trigger* parameters);
+	static int AnyPCOnMap(Scriptable* Sender, const Trigger* parameters);
+	static int AnyPCSeesEnemy(Scriptable* Sender, const Trigger* parameters);
+	static int AreaCheck(Scriptable* Sender, const Trigger* parameter);
 	static int AreaCheckAllegiance(Scriptable* Sender, const Trigger* parameters);
-	static int AreaCheckObject(Scriptable *Sender, const Trigger *parameter);
-	static int AreaFlag(Scriptable *Sender, const Trigger *parameter);
-	static int AreaRestDisabled(Scriptable *Sender, const Trigger *parameter);
-	static int AreaStartsWith(Scriptable *Sender, const Trigger *parameter); //InWatchersKeep
-	static int AreaType(Scriptable *Sender, const Trigger *parameter);
-	static int Assign(Scriptable */*Sender*/, const Trigger */*parameters*/);
-	static int AtLocation(Scriptable *Sender, const Trigger *parameter);
-	static int AttackedBy(Scriptable *Sender, const Trigger *parameters);
-	static int BecameVisible(Scriptable *Sender, const Trigger *parameters);
-	static int BeenInParty(Scriptable *Sender, const Trigger */*parameters*/);
-	static int BitCheck(Scriptable *Sender, const Trigger *parameters);
-	static int BitCheckExact(Scriptable *Sender, const Trigger *parameters);
-	static int BitGlobal_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int BouncingSpellLevel(Scriptable *Sender, const Trigger *parameters);
-	static int BreakingPoint(Scriptable *Sender, const Trigger *parameters);
+	static int AreaCheckObject(Scriptable* Sender, const Trigger* parameter);
+	static int AreaFlag(Scriptable* Sender, const Trigger* parameter);
+	static int AreaRestDisabled(Scriptable* Sender, const Trigger* parameter);
+	static int AreaStartsWith(Scriptable* Sender, const Trigger* parameter); //InWatchersKeep
+	static int AreaType(Scriptable* Sender, const Trigger* parameter);
+	static int Assign(Scriptable* /*Sender*/, const Trigger* /*parameters*/);
+	static int AtLocation(Scriptable* Sender, const Trigger* parameter);
+	static int AttackedBy(Scriptable* Sender, const Trigger* parameters);
+	static int BecameVisible(Scriptable* Sender, const Trigger* parameters);
+	static int BeenInParty(Scriptable* Sender, const Trigger* /*parameters*/);
+	static int BitCheck(Scriptable* Sender, const Trigger* parameters);
+	static int BitCheckExact(Scriptable* Sender, const Trigger* parameters);
+	static int BitGlobal_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int BouncingSpellLevel(Scriptable* Sender, const Trigger* parameters);
+	static int BreakingPoint(Scriptable* Sender, const Trigger* parameters);
 	static int ButtonDisabled(Scriptable* Sender, const Trigger* parameters);
-	static int CalendarDay(Scriptable *Sender, const Trigger *parameters);
-	static int CalendarDayGT(Scriptable *Sender, const Trigger *parameters);
-	static int CalendarDayLT(Scriptable *Sender, const Trigger *parameters);
-	static int CalledByName(Scriptable *Sender, const Trigger *parameters);
+	static int CalendarDay(Scriptable* Sender, const Trigger* parameters);
+	static int CalendarDayGT(Scriptable* Sender, const Trigger* parameters);
+	static int CalendarDayLT(Scriptable* Sender, const Trigger* parameters);
+	static int CalledByName(Scriptable* Sender, const Trigger* parameters);
 	static int CanEquipRanged(Scriptable* Sender, const Trigger* /*parameters*/);
 	static int CanTurn(Scriptable* Sender, const Trigger* parameters);
-	static int ChargeCount(Scriptable *Sender, const Trigger *parameters);
-	static int CharName(Scriptable *Sender, const Trigger *parameters);
-	static int CheckAreaDiffLevel(Scriptable */*Sender*/, const Trigger *parameters);
-	static int CheckDoorFlags(Scriptable *Sender, const Trigger *parameters);
-	static int CheckPartyAverageLevel(Scriptable *Sender, const Trigger *parameters);
-	static int CheckPartyLevel(Scriptable *Sender, const Trigger *parameters);
-	static int CheckSkill(Scriptable *Sender, const Trigger *parameters);
-	static int CheckSkillGT(Scriptable *Sender, const Trigger *parameters);
-	static int CheckSkillLT(Scriptable *Sender, const Trigger *parameters);
-	static int CheckSpellState(Scriptable *Sender, const Trigger *parameters);
-	static int CheckStat(Scriptable *Sender, const Trigger *parameters);
-	static int CheckStatGT(Scriptable *Sender, const Trigger *parameters);
-	static int CheckStatLT(Scriptable *Sender, const Trigger *parameters);
-	static int Class(Scriptable *Sender, const Trigger *parameters);
-	static int ClassEx(Scriptable *Sender, const Trigger *parameters);
-	static int ClassLevel(Scriptable *Sender, const Trigger *parameters);
-	static int ClassLevelGT(Scriptable *Sender, const Trigger *parameters);
-	static int ClassLevelLT(Scriptable *Sender, const Trigger *parameters);
-	static int Clicked(Scriptable *Sender, const Trigger *parameters);
-	static int Closed(Scriptable *Sender, const Trigger *parameters);
-	static int CombatCounter(Scriptable *Sender, const Trigger *parameters);
-	static int CombatCounterGT(Scriptable *Sender, const Trigger *parameters);
-	static int CombatCounterLT(Scriptable *Sender, const Trigger *parameters);
-	static int Contains(Scriptable *Sender, const Trigger *parameters);
-	static int CreatureHidden( Scriptable* Sender, const Trigger *parameters);
-	static int CurrentAmmo(Scriptable *Sender, const Trigger *parameters);
-	static int CurrentAreaIs(Scriptable *Sender, const Trigger *parameters);
+	static int ChargeCount(Scriptable* Sender, const Trigger* parameters);
+	static int CharName(Scriptable* Sender, const Trigger* parameters);
+	static int CheckAreaDiffLevel(Scriptable* /*Sender*/, const Trigger* parameters);
+	static int CheckDoorFlags(Scriptable* Sender, const Trigger* parameters);
+	static int CheckPartyAverageLevel(Scriptable* Sender, const Trigger* parameters);
+	static int CheckPartyLevel(Scriptable* Sender, const Trigger* parameters);
+	static int CheckSkill(Scriptable* Sender, const Trigger* parameters);
+	static int CheckSkillGT(Scriptable* Sender, const Trigger* parameters);
+	static int CheckSkillLT(Scriptable* Sender, const Trigger* parameters);
+	static int CheckSpellState(Scriptable* Sender, const Trigger* parameters);
+	static int CheckStat(Scriptable* Sender, const Trigger* parameters);
+	static int CheckStatGT(Scriptable* Sender, const Trigger* parameters);
+	static int CheckStatLT(Scriptable* Sender, const Trigger* parameters);
+	static int Class(Scriptable* Sender, const Trigger* parameters);
+	static int ClassEx(Scriptable* Sender, const Trigger* parameters);
+	static int ClassLevel(Scriptable* Sender, const Trigger* parameters);
+	static int ClassLevelGT(Scriptable* Sender, const Trigger* parameters);
+	static int ClassLevelLT(Scriptable* Sender, const Trigger* parameters);
+	static int Clicked(Scriptable* Sender, const Trigger* parameters);
+	static int Closed(Scriptable* Sender, const Trigger* parameters);
+	static int CombatCounter(Scriptable* Sender, const Trigger* parameters);
+	static int CombatCounterGT(Scriptable* Sender, const Trigger* parameters);
+	static int CombatCounterLT(Scriptable* Sender, const Trigger* parameters);
+	static int Contains(Scriptable* Sender, const Trigger* parameters);
+	static int CreatureHidden(Scriptable* Sender, const Trigger* parameters);
+	static int CurrentAmmo(Scriptable* Sender, const Trigger* parameters);
+	static int CurrentAreaIs(Scriptable* Sender, const Trigger* parameters);
 	static int CutSceneBroken(Scriptable* /*Sender*/, const Trigger* /*parameters*/);
-	static int DamageTaken(Scriptable *Sender, const Trigger *parameters);
-	static int DamageTakenGT(Scriptable *Sender, const Trigger *parameters);
-	static int DamageTakenLT(Scriptable *Sender, const Trigger *parameters);
-	static int Dead(Scriptable *Sender, const Trigger *parameters);
-	static int Delay(Scriptable *Sender, const Trigger *parameters);
-	static int Detect(Scriptable *Sender, const Trigger *parameters);
-	static int Detected(Scriptable *Sender, const Trigger *parameters);
-	static int Die(Scriptable *Sender, const Trigger *parameters);
-	static int Died(Scriptable *Sender, const Trigger *parameters);
-	static int Difficulty(Scriptable *Sender, const Trigger *parameters);
-	static int DifficultyGT(Scriptable *Sender, const Trigger *parameters);
-	static int DifficultyLT(Scriptable *Sender, const Trigger *parameters);
-	static int Disarmed(Scriptable *Sender, const Trigger *parameters);
-	static int DisarmFailed(Scriptable *Sender, const Trigger *parameters);
-	static int E(Scriptable */*Sender*/, const Trigger *parameters);
-	static int Entered(Scriptable *Sender, const Trigger *parameters);
-	static int EntirePartyOnMap(Scriptable *Sender, const Trigger *parameters);
-	static int Exists(Scriptable *Sender, const Trigger *parameters);
-	static int ExtendedStateCheck(Scriptable *Sender, const Trigger *parameters);
-	static int ExtraProficiency(Scriptable *Sender, const Trigger *parameters);
-	static int ExtraProficiencyGT(Scriptable *Sender, const Trigger *parameters);
-	static int ExtraProficiencyLT(Scriptable *Sender, const Trigger *parameters);
-	static int Eval(Scriptable */*Sender*/, const Trigger */*parameters*/);
-	static int Faction(Scriptable *Sender, const Trigger *parameters);
-	static int FallenPaladin(Scriptable *Sender, const Trigger *parameters);
-	static int FallenRanger(Scriptable *Sender, const Trigger *parameters);
-	static int False(Scriptable *Sender, const Trigger *parameters);
-	static int ForceMarkedSpell_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int Frame(Scriptable *Sender, const Trigger *parameters);
-	static int Gender(Scriptable *Sender, const Trigger *parameters);
-	static int General(Scriptable *Sender, const Trigger *parameters);
-	static int G_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int Global(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalAndGlobal_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalBAndGlobal_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalBAndGlobalExact(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalBitGlobal_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalGT(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalGTGlobal(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalLT(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalLTGlobal(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalOrGlobal_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalsEqual(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalsGT(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalsLT(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalTimerExact(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalTimerExpired(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalTimerNotExpired(Scriptable *Sender, const Trigger *parameters);
-	static int GlobalTimerStarted(Scriptable *Sender, const Trigger *parameters);
-	static int GGT_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int GLT_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int GT(Scriptable */*Sender*/, const Trigger *parameters);
-	static int Happiness(Scriptable *Sender, const Trigger *parameters);
-	static int HappinessGT(Scriptable *Sender, const Trigger *parameters);
-	static int HappinessLT(Scriptable *Sender, const Trigger *parameters);
-	static int HarmlessClosed(Scriptable *Sender, const Trigger *parameters);
-	static int HarmlessEntered(Scriptable *Sender, const Trigger *parameters);
-	static int HarmlessOpened(Scriptable *Sender, const Trigger *parameters);
-	static int HasBounceEffects(Scriptable *Sender, const Trigger *parameters);
-	static int HasDLC(Scriptable */*Sender*/, const Trigger */*parameters*/);
-	static int HasImmunityEffects(Scriptable *Sender, const Trigger *parameters);
-	static int HasInnateAbility(Scriptable *Sender, const Trigger *parameters);
-	static int HasItem(Scriptable *Sender, const Trigger *parameters);
+	static int DamageTaken(Scriptable* Sender, const Trigger* parameters);
+	static int DamageTakenGT(Scriptable* Sender, const Trigger* parameters);
+	static int DamageTakenLT(Scriptable* Sender, const Trigger* parameters);
+	static int Dead(Scriptable* Sender, const Trigger* parameters);
+	static int Delay(Scriptable* Sender, const Trigger* parameters);
+	static int Detect(Scriptable* Sender, const Trigger* parameters);
+	static int Detected(Scriptable* Sender, const Trigger* parameters);
+	static int Die(Scriptable* Sender, const Trigger* parameters);
+	static int Died(Scriptable* Sender, const Trigger* parameters);
+	static int Difficulty(Scriptable* Sender, const Trigger* parameters);
+	static int DifficultyGT(Scriptable* Sender, const Trigger* parameters);
+	static int DifficultyLT(Scriptable* Sender, const Trigger* parameters);
+	static int Disarmed(Scriptable* Sender, const Trigger* parameters);
+	static int DisarmFailed(Scriptable* Sender, const Trigger* parameters);
+	static int E(Scriptable* /*Sender*/, const Trigger* parameters);
+	static int Entered(Scriptable* Sender, const Trigger* parameters);
+	static int EntirePartyOnMap(Scriptable* Sender, const Trigger* parameters);
+	static int Exists(Scriptable* Sender, const Trigger* parameters);
+	static int ExtendedStateCheck(Scriptable* Sender, const Trigger* parameters);
+	static int ExtraProficiency(Scriptable* Sender, const Trigger* parameters);
+	static int ExtraProficiencyGT(Scriptable* Sender, const Trigger* parameters);
+	static int ExtraProficiencyLT(Scriptable* Sender, const Trigger* parameters);
+	static int Eval(Scriptable* /*Sender*/, const Trigger* /*parameters*/);
+	static int Faction(Scriptable* Sender, const Trigger* parameters);
+	static int FallenPaladin(Scriptable* Sender, const Trigger* parameters);
+	static int FallenRanger(Scriptable* Sender, const Trigger* parameters);
+	static int False(Scriptable* Sender, const Trigger* parameters);
+	static int ForceMarkedSpell_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int Frame(Scriptable* Sender, const Trigger* parameters);
+	static int Gender(Scriptable* Sender, const Trigger* parameters);
+	static int General(Scriptable* Sender, const Trigger* parameters);
+	static int G_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int Global(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalAndGlobal_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalBAndGlobal_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalBAndGlobalExact(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalBitGlobal_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalGT(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalGTGlobal(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalLT(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalLTGlobal(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalOrGlobal_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalsEqual(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalsGT(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalsLT(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalTimerExact(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalTimerExpired(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalTimerNotExpired(Scriptable* Sender, const Trigger* parameters);
+	static int GlobalTimerStarted(Scriptable* Sender, const Trigger* parameters);
+	static int GGT_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int GLT_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int GT(Scriptable* /*Sender*/, const Trigger* parameters);
+	static int Happiness(Scriptable* Sender, const Trigger* parameters);
+	static int HappinessGT(Scriptable* Sender, const Trigger* parameters);
+	static int HappinessLT(Scriptable* Sender, const Trigger* parameters);
+	static int HarmlessClosed(Scriptable* Sender, const Trigger* parameters);
+	static int HarmlessEntered(Scriptable* Sender, const Trigger* parameters);
+	static int HarmlessOpened(Scriptable* Sender, const Trigger* parameters);
+	static int HasBounceEffects(Scriptable* Sender, const Trigger* parameters);
+	static int HasDLC(Scriptable* /*Sender*/, const Trigger* /*parameters*/);
+	static int HasImmunityEffects(Scriptable* Sender, const Trigger* parameters);
+	static int HasInnateAbility(Scriptable* Sender, const Trigger* parameters);
+	static int HasItem(Scriptable* Sender, const Trigger* parameters);
 	static int HasItemCategory(Scriptable* Sender, const Trigger* parameters);
-	static int HasItemEquipped(Scriptable *Sender, const Trigger *parameters);
+	static int HasItemEquipped(Scriptable* Sender, const Trigger* parameters);
 	static int HasItemEquippedReal(Scriptable* Sender, const Trigger* parameters);
-	static int HasItemSlot(Scriptable *Sender, const Trigger *parameters);
-	static int HasItemTypeSlot(Scriptable *Sender, const Trigger *parameters);
-	static int HasWeaponEquipped(Scriptable *Sender, const Trigger *parameters);
-	static int HaveAnySpells(Scriptable *Sender, const Trigger *parameters);
-	static int HaveSpellParty(Scriptable *Sender, const Trigger *parameters);
-	static int HaveSpell(Scriptable *Sender, const Trigger *parameters);
-	static int HaveUsableWeaponEquipped(Scriptable *Sender, const Trigger *parameters);
-	static int Heard(Scriptable *Sender, const Trigger *parameters);
-	static int Help_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int HelpEX(Scriptable *Sender, const Trigger *parameters);
-	static int HitBy(Scriptable *Sender, const Trigger *parameters);
-	static int HotKey(Scriptable *Sender, const Trigger *parameters);
-	static int HP(Scriptable *Sender, const Trigger *parameters);
-	static int HPGT(Scriptable *Sender, const Trigger *parameters);
-	static int HPLost(Scriptable *Sender, const Trigger *parameters);
-	static int HPLostGT(Scriptable *Sender, const Trigger *parameters);
-	static int HPLostLT(Scriptable *Sender, const Trigger *parameters);
-	static int HPLT(Scriptable *Sender, const Trigger *parameters);
-	static int HPPercent(Scriptable *Sender, const Trigger *parameters);
-	static int HPPercentGT(Scriptable *Sender, const Trigger *parameters);
-	static int HPPercentLT(Scriptable *Sender, const Trigger *parameters);
-	static int ImmuneToSpellLevel(Scriptable *Sender, const Trigger *parameters);
-	static int InActiveArea(Scriptable *Sender, const Trigger *parameter);
-	static int InCutSceneMode(Scriptable *Sender, const Trigger *parameter);
-	static int InLine(Scriptable *Sender, const Trigger *parameter);
-	static int InMyArea(Scriptable *Sender, const Trigger *parameter);
-	static int InMyGroup(Scriptable *Sender, const Trigger *parameter);
-	static int InParty(Scriptable *Sender, const Trigger *parameters);
-	static int InPartyAllowDead(Scriptable *Sender, const Trigger *parameters);
-	static int InPartySlot(Scriptable *Sender, const Trigger *parameters);
-	static int InteractingWith(Scriptable *Sender, const Trigger *parameters);
-	static int Internal(Scriptable *Sender, const Trigger *parameters);
-	static int InternalGT(Scriptable *Sender, const Trigger *parameters);
-	static int InternalLT(Scriptable *Sender, const Trigger *parameters);
-	static int InTrap(Scriptable *Sender, const Trigger *parameters);
-	static int InventoryFull(Scriptable *Sender, const Trigger *parameter);
-	static int InWeaponRange(Scriptable *Sender, const Trigger *parameter);
+	static int HasItemSlot(Scriptable* Sender, const Trigger* parameters);
+	static int HasItemTypeSlot(Scriptable* Sender, const Trigger* parameters);
+	static int HasWeaponEquipped(Scriptable* Sender, const Trigger* parameters);
+	static int HaveAnySpells(Scriptable* Sender, const Trigger* parameters);
+	static int HaveSpellParty(Scriptable* Sender, const Trigger* parameters);
+	static int HaveSpell(Scriptable* Sender, const Trigger* parameters);
+	static int HaveUsableWeaponEquipped(Scriptable* Sender, const Trigger* parameters);
+	static int Heard(Scriptable* Sender, const Trigger* parameters);
+	static int Help_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int HelpEX(Scriptable* Sender, const Trigger* parameters);
+	static int HitBy(Scriptable* Sender, const Trigger* parameters);
+	static int HotKey(Scriptable* Sender, const Trigger* parameters);
+	static int HP(Scriptable* Sender, const Trigger* parameters);
+	static int HPGT(Scriptable* Sender, const Trigger* parameters);
+	static int HPLost(Scriptable* Sender, const Trigger* parameters);
+	static int HPLostGT(Scriptable* Sender, const Trigger* parameters);
+	static int HPLostLT(Scriptable* Sender, const Trigger* parameters);
+	static int HPLT(Scriptable* Sender, const Trigger* parameters);
+	static int HPPercent(Scriptable* Sender, const Trigger* parameters);
+	static int HPPercentGT(Scriptable* Sender, const Trigger* parameters);
+	static int HPPercentLT(Scriptable* Sender, const Trigger* parameters);
+	static int ImmuneToSpellLevel(Scriptable* Sender, const Trigger* parameters);
+	static int InActiveArea(Scriptable* Sender, const Trigger* parameter);
+	static int InCutSceneMode(Scriptable* Sender, const Trigger* parameter);
+	static int InLine(Scriptable* Sender, const Trigger* parameter);
+	static int InMyArea(Scriptable* Sender, const Trigger* parameter);
+	static int InMyGroup(Scriptable* Sender, const Trigger* parameter);
+	static int InParty(Scriptable* Sender, const Trigger* parameters);
+	static int InPartyAllowDead(Scriptable* Sender, const Trigger* parameters);
+	static int InPartySlot(Scriptable* Sender, const Trigger* parameters);
+	static int InteractingWith(Scriptable* Sender, const Trigger* parameters);
+	static int Internal(Scriptable* Sender, const Trigger* parameters);
+	static int InternalGT(Scriptable* Sender, const Trigger* parameters);
+	static int InternalLT(Scriptable* Sender, const Trigger* parameters);
+	static int InTrap(Scriptable* Sender, const Trigger* parameters);
+	static int InventoryFull(Scriptable* Sender, const Trigger* parameter);
+	static int InWeaponRange(Scriptable* Sender, const Trigger* parameter);
 	static int INI(Scriptable* /*Sender*/, const Trigger* parameters);
-	static int IsAClown(Scriptable *Sender, const Trigger *parameters);
-	static int IsActive(Scriptable *Sender, const Trigger *parameters);
-	static int IsCreatureAreaFlag( Scriptable* Sender, const Trigger *parameters);
-	static int IsCreatureHiddenInShadows( Scriptable* Sender, const Trigger *parameters);
-	static int IsGabber(Scriptable *Sender, const Trigger *parameters);
-	static int IsExtendedNight(Scriptable *Sender, const Trigger *parameters);
-	static int IsFacingObject(Scriptable *Sender, const Trigger *parameters);
-	static int IsFacingSavedRotation(Scriptable *Sender, const Trigger *parameters);
+	static int IsAClown(Scriptable* Sender, const Trigger* parameters);
+	static int IsActive(Scriptable* Sender, const Trigger* parameters);
+	static int IsCreatureAreaFlag(Scriptable* Sender, const Trigger* parameters);
+	static int IsCreatureHiddenInShadows(Scriptable* Sender, const Trigger* parameters);
+	static int IsGabber(Scriptable* Sender, const Trigger* parameters);
+	static int IsExtendedNight(Scriptable* Sender, const Trigger* parameters);
+	static int IsFacingObject(Scriptable* Sender, const Trigger* parameters);
+	static int IsFacingSavedRotation(Scriptable* Sender, const Trigger* parameters);
 	static int IsForcedRandomEncounterActive(Scriptable* /*Sender*/, const Trigger* /*parameters*/);
-	static int IsInGuardianMantle(Scriptable *Sender, const Trigger *parameters);
-	static int IsLocked(Scriptable *Sender, const Trigger *parameters);
-	static int IsMarkedSpell(Scriptable *Sender, const Trigger *parameters);
-	static int IsOverMe(Scriptable *Sender, const Trigger *parameters);
-	static int IsPathCriticalObject( Scriptable* Sender, const Trigger *parameters);
-	static int IsPlayerNumber( Scriptable* Sender, const Trigger *parameters);
-	static int IsRotation(Scriptable *Sender, const Trigger *parameters);
-	static int IsSpellTargetValid( Scriptable* Sender, const Trigger *parameters);
-	static int IsTeamBitOn(Scriptable *Sender, const Trigger *parameters);
-	static int IsTouchGUI(Scriptable */*Sender*/, const Trigger */*parameters*/);
-	static int IsValidForPartyDialog(Scriptable *Sender, const Trigger *parameters);
-	static int IsWeaponRanged(Scriptable *Sender, const Trigger *parameters);
-	static int IsWeather(Scriptable *Sender, const Trigger *parameters);
-	static int ItemIsIdentified(Scriptable *Sender, const Trigger *parameters);
-	static int Joins(Scriptable *Sender, const Trigger *parameters);
-	static int Kit(Scriptable *Sender, const Trigger *parameters);
-	static int Killed(Scriptable *Sender, const Trigger *parameters);
-	static int KnowSpell(Scriptable *Sender, const Trigger *parameters);
-	static int LastMarkedObject_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int LastPersonTalkedTo(Scriptable *Sender, const Trigger *parameters);
-	static int Leaves(Scriptable *Sender, const Trigger *parameters);
-	static int Level(Scriptable *Sender, const Trigger *parameters);
-	static int LevelGT(Scriptable *Sender, const Trigger *parameters);
-	static int LevelLT(Scriptable *Sender, const Trigger *parameters);
-	static int LevelInClass(Scriptable *Sender, const Trigger *parameters);
-	static int LevelInClassGT(Scriptable *Sender, const Trigger *parameters);
-	static int LevelInClassLT(Scriptable *Sender, const Trigger *parameters);
-	static int LevelParty(Scriptable *Sender, const Trigger *parameters);
-	static int LevelPartyGT(Scriptable *Sender, const Trigger *parameters);
-	static int LevelPartyLT(Scriptable *Sender, const Trigger *parameters);
-	static int LocalsEqual(Scriptable *Sender, const Trigger *parameters);
-	static int LocalsGT(Scriptable *Sender, const Trigger *parameters);
-	static int LocalsLT(Scriptable *Sender, const Trigger *parameters);
-	static int LOS(Scriptable *Sender, const Trigger *parameters);
-	static int LT(Scriptable */*Sender*/, const Trigger *parameters);
-	static int ModalState(Scriptable *Sender, const Trigger *parameters);
-	static int Morale(Scriptable *Sender, const Trigger *parameters);
-	static int MoraleGT(Scriptable *Sender, const Trigger *parameters);
-	static int MoraleLT(Scriptable *Sender, const Trigger *parameters);
-	static int MovementRate(Scriptable *Sender, const Trigger *parameters);
-	static int MovementRateGT(Scriptable *Sender, const Trigger *parameters);
-	static int MovementRateLT(Scriptable *Sender, const Trigger *parameters);
-	static int NamelessBitTheDust(Scriptable *Sender, const Trigger *parameters);
-	static int NearbyDialog(Scriptable *Sender, const Trigger *parameters);
-	static int NearLocation(Scriptable *Sender, const Trigger *parameters);
-	static int NearSavedLocation(Scriptable *Sender, const Trigger *parameters);
-	static int NightmareModeOn(Scriptable *Sender, const Trigger *parameters);
-	static int NotStateCheck(Scriptable *Sender, const Trigger *parameters);
-	static int NullDialog(Scriptable *Sender, const Trigger *parameters);
-	static int NumBouncingSpellLevel(Scriptable *Sender, const Trigger *parameters);
-	static int NumBouncingSpellLevelGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumBouncingSpellLevelLT(Scriptable *Sender, const Trigger *parameters);
-	static int NumCreatures(Scriptable *Sender, const Trigger *parameters);
-	static int NumCreaturesAtMyLevel(Scriptable *Sender, const Trigger *parameters);
-	static int NumCreaturesGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumCreaturesGTMyLevel(Scriptable *Sender, const Trigger *parameters);
-	static int NumCreaturesLT(Scriptable *Sender, const Trigger *parameters);
-	static int NumCreaturesLTMyLevel(Scriptable *Sender, const Trigger *parameters);
-	static int NumCreatureVsParty(Scriptable *Sender, const Trigger *parameters);
-	static int NumCreatureVsPartyGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumCreatureVsPartyLT(Scriptable *Sender, const Trigger *parameters);
-	static int NumDead(Scriptable *Sender, const Trigger *parameters);
-	static int NumDeadGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumDeadLT(Scriptable *Sender, const Trigger *parameters);
-	static int NumImmuneToSpellLevel(Scriptable *Sender, const Trigger *parameters);
-	static int NumImmuneToSpellLevelGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumImmuneToSpellLevelLT(Scriptable *Sender, const Trigger *parameters);
-	static int NumItems(Scriptable *Sender, const Trigger *parameters);
-	static int NumItemsGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumItemsLT(Scriptable *Sender, const Trigger *parameters);
-	static int NumItemsParty(Scriptable *Sender, const Trigger *parameters);
-	static int NumItemsPartyGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumItemsPartyLT(Scriptable *Sender, const Trigger *parameters);
-	static int NumMirrorImages(Scriptable *Sender, const Trigger *parameters);
-	static int NumMirrorImagesGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumMirrorImagesLT(Scriptable *Sender, const Trigger *parameters);
+	static int IsInGuardianMantle(Scriptable* Sender, const Trigger* parameters);
+	static int IsLocked(Scriptable* Sender, const Trigger* parameters);
+	static int IsMarkedSpell(Scriptable* Sender, const Trigger* parameters);
+	static int IsOverMe(Scriptable* Sender, const Trigger* parameters);
+	static int IsPathCriticalObject(Scriptable* Sender, const Trigger* parameters);
+	static int IsPlayerNumber(Scriptable* Sender, const Trigger* parameters);
+	static int IsRotation(Scriptable* Sender, const Trigger* parameters);
+	static int IsSpellTargetValid(Scriptable* Sender, const Trigger* parameters);
+	static int IsTeamBitOn(Scriptable* Sender, const Trigger* parameters);
+	static int IsTouchGUI(Scriptable* /*Sender*/, const Trigger* /*parameters*/);
+	static int IsValidForPartyDialog(Scriptable* Sender, const Trigger* parameters);
+	static int IsWeaponRanged(Scriptable* Sender, const Trigger* parameters);
+	static int IsWeather(Scriptable* Sender, const Trigger* parameters);
+	static int ItemIsIdentified(Scriptable* Sender, const Trigger* parameters);
+	static int Joins(Scriptable* Sender, const Trigger* parameters);
+	static int Kit(Scriptable* Sender, const Trigger* parameters);
+	static int Killed(Scriptable* Sender, const Trigger* parameters);
+	static int KnowSpell(Scriptable* Sender, const Trigger* parameters);
+	static int LastMarkedObject_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int LastPersonTalkedTo(Scriptable* Sender, const Trigger* parameters);
+	static int Leaves(Scriptable* Sender, const Trigger* parameters);
+	static int Level(Scriptable* Sender, const Trigger* parameters);
+	static int LevelGT(Scriptable* Sender, const Trigger* parameters);
+	static int LevelLT(Scriptable* Sender, const Trigger* parameters);
+	static int LevelInClass(Scriptable* Sender, const Trigger* parameters);
+	static int LevelInClassGT(Scriptable* Sender, const Trigger* parameters);
+	static int LevelInClassLT(Scriptable* Sender, const Trigger* parameters);
+	static int LevelParty(Scriptable* Sender, const Trigger* parameters);
+	static int LevelPartyGT(Scriptable* Sender, const Trigger* parameters);
+	static int LevelPartyLT(Scriptable* Sender, const Trigger* parameters);
+	static int LocalsEqual(Scriptable* Sender, const Trigger* parameters);
+	static int LocalsGT(Scriptable* Sender, const Trigger* parameters);
+	static int LocalsLT(Scriptable* Sender, const Trigger* parameters);
+	static int LOS(Scriptable* Sender, const Trigger* parameters);
+	static int LT(Scriptable* /*Sender*/, const Trigger* parameters);
+	static int ModalState(Scriptable* Sender, const Trigger* parameters);
+	static int Morale(Scriptable* Sender, const Trigger* parameters);
+	static int MoraleGT(Scriptable* Sender, const Trigger* parameters);
+	static int MoraleLT(Scriptable* Sender, const Trigger* parameters);
+	static int MovementRate(Scriptable* Sender, const Trigger* parameters);
+	static int MovementRateGT(Scriptable* Sender, const Trigger* parameters);
+	static int MovementRateLT(Scriptable* Sender, const Trigger* parameters);
+	static int NamelessBitTheDust(Scriptable* Sender, const Trigger* parameters);
+	static int NearbyDialog(Scriptable* Sender, const Trigger* parameters);
+	static int NearLocation(Scriptable* Sender, const Trigger* parameters);
+	static int NearSavedLocation(Scriptable* Sender, const Trigger* parameters);
+	static int NightmareModeOn(Scriptable* Sender, const Trigger* parameters);
+	static int NotStateCheck(Scriptable* Sender, const Trigger* parameters);
+	static int NullDialog(Scriptable* Sender, const Trigger* parameters);
+	static int NumBouncingSpellLevel(Scriptable* Sender, const Trigger* parameters);
+	static int NumBouncingSpellLevelGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumBouncingSpellLevelLT(Scriptable* Sender, const Trigger* parameters);
+	static int NumCreatures(Scriptable* Sender, const Trigger* parameters);
+	static int NumCreaturesAtMyLevel(Scriptable* Sender, const Trigger* parameters);
+	static int NumCreaturesGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumCreaturesGTMyLevel(Scriptable* Sender, const Trigger* parameters);
+	static int NumCreaturesLT(Scriptable* Sender, const Trigger* parameters);
+	static int NumCreaturesLTMyLevel(Scriptable* Sender, const Trigger* parameters);
+	static int NumCreatureVsParty(Scriptable* Sender, const Trigger* parameters);
+	static int NumCreatureVsPartyGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumCreatureVsPartyLT(Scriptable* Sender, const Trigger* parameters);
+	static int NumDead(Scriptable* Sender, const Trigger* parameters);
+	static int NumDeadGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumDeadLT(Scriptable* Sender, const Trigger* parameters);
+	static int NumImmuneToSpellLevel(Scriptable* Sender, const Trigger* parameters);
+	static int NumImmuneToSpellLevelGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumImmuneToSpellLevelLT(Scriptable* Sender, const Trigger* parameters);
+	static int NumItems(Scriptable* Sender, const Trigger* parameters);
+	static int NumItemsGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumItemsLT(Scriptable* Sender, const Trigger* parameters);
+	static int NumItemsParty(Scriptable* Sender, const Trigger* parameters);
+	static int NumItemsPartyGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumItemsPartyLT(Scriptable* Sender, const Trigger* parameters);
+	static int NumMirrorImages(Scriptable* Sender, const Trigger* parameters);
+	static int NumMirrorImagesGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumMirrorImagesLT(Scriptable* Sender, const Trigger* parameters);
 	static int NumKilledByParty(Scriptable* /*Sender*/, const Trigger* parameters);
 	static int NumKilledByPartyGT(Scriptable* /*Sender*/, const Trigger* parameters);
 	static int NumKilledByPartyLT(Scriptable* /*Sender*/, const Trigger* parameters);
-	static int NumTimesInteracted(Scriptable *Sender, const Trigger *parameters);
-	static int NumTimesInteractedGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumTimesInteractedLT(Scriptable *Sender, const Trigger *parameters);
-	static int NumTimesInteractedObject(Scriptable *Sender, const Trigger *parameters);
-	static int NumTimesInteractedObjectGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumTimesInteractedObjectLT(Scriptable *Sender, const Trigger *parameters);
-	static int NumTimesTalkedTo(Scriptable *Sender, const Trigger *parameters);
-	static int NumTimesTalkedToGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumTimesTalkedToLT(Scriptable *Sender, const Trigger *parameters);
-	static int NumTrappingSpellLevel(Scriptable *Sender, const Trigger *parameters);
-	static int NumTrappingSpellLevelGT(Scriptable *Sender, const Trigger *parameters);
-	static int NumTrappingSpellLevelLT(Scriptable *Sender, const Trigger *parameters);
-	static int ObjectActionListEmpty(Scriptable *Sender, const Trigger *parameters);
-	static int OnCreation(Scriptable *Sender, const Trigger *parameters);
-	static int OnIsland(Scriptable *Sender, const Trigger *parameters);
-	static int OnScreen(Scriptable *Sender, const Trigger *parameters);
-	static int Opened(Scriptable *Sender, const Trigger *parameters);
-	static int OpenFailed(Scriptable *Sender, const Trigger *parameters);
-	static int OpenState(Scriptable *Sender, const Trigger *parameters);
-	static int Or(Scriptable *Sender, const Trigger *parameters);
-	static int OriginalClass(Scriptable *Sender, const Trigger *parameters);
-	static int OutOfAmmo(Scriptable *Sender, const Trigger *parameters);
-	static int OwnsFloaterMessage(Scriptable *Sender, const Trigger *parameters);
-	static int PartyCountEQ(Scriptable *Sender, const Trigger *parameters);
-	static int PartyCountGT(Scriptable *Sender, const Trigger *parameters);
-	static int PartyCountLT(Scriptable *Sender, const Trigger *parameters);
-	static int PartyCountAliveEQ(Scriptable *Sender, const Trigger *parameters);
-	static int PartyCountAliveGT(Scriptable *Sender, const Trigger *parameters);
-	static int PartyCountAliveLT(Scriptable *Sender, const Trigger *parameters);
-	static int PartyGold(Scriptable *Sender, const Trigger *parameters);
-	static int PartyGoldGT(Scriptable *Sender, const Trigger *parameters);
-	static int PartyGoldLT(Scriptable *Sender, const Trigger *parameters);
-	static int PartyHasItem(Scriptable *Sender, const Trigger *parameters);
-	static int PartyHasItemIdentified(Scriptable *Sender, const Trigger *parameters);
-	static int PartyMemberDied(Scriptable *Sender, const Trigger *parameters);
-	static int PartyRested(Scriptable *Sender, const Trigger *parameters);
-	static int PCCanSeePoint(Scriptable *Sender, const Trigger *parameters);
-	static int PCInStore(Scriptable *Sender, const Trigger *parameters);
-	static int PersonalSpaceDistance(Scriptable *Sender, const Trigger *parameters);
-	static int PickLockFailed(Scriptable *Sender, const Trigger *parameters);
-	static int PickpocketFailed(Scriptable *Sender, const Trigger *parameters);
-	static int Proficiency(Scriptable *Sender, const Trigger *parameters);
-	static int ProficiencyGT(Scriptable *Sender, const Trigger *parameters);
-	static int ProficiencyLT(Scriptable *Sender, const Trigger *parameters);
-	static int Race(Scriptable *Sender, const Trigger *parameters);
-	static int RandomNum(Scriptable *Sender, const Trigger *parameters);
-	static int RandomNumGT(Scriptable *Sender, const Trigger *parameters);
-	static int RandomNumLT(Scriptable *Sender, const Trigger *parameters);
-	static int RandomStatCheck(Scriptable *Sender, const Trigger *parameters);
-	static int Range(Scriptable *Sender, const Trigger *parameters);
-	static int Reaction(Scriptable *Sender, const Trigger *parameters);
-	static int ReactionLT(Scriptable *Sender, const Trigger *parameters);
-	static int ReactionGT(Scriptable *Sender, const Trigger *parameters);
-	static int RealGlobalTimerExact(Scriptable *Sender, const Trigger *parameters);
-	static int RealGlobalTimerExpired(Scriptable *Sender, const Trigger *parameters);
-	static int RealGlobalTimerNotExpired(Scriptable *Sender, const Trigger *parameters);
-	static int ReceivedOrder(Scriptable *Sender, const Trigger *parameters);
-	static int Reputation(Scriptable *Sender, const Trigger *parameters);
-	static int ReputationGT(Scriptable *Sender, const Trigger *parameters);
-	static int ReputationLT(Scriptable *Sender, const Trigger *parameters);
+	static int NumTimesInteracted(Scriptable* Sender, const Trigger* parameters);
+	static int NumTimesInteractedGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumTimesInteractedLT(Scriptable* Sender, const Trigger* parameters);
+	static int NumTimesInteractedObject(Scriptable* Sender, const Trigger* parameters);
+	static int NumTimesInteractedObjectGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumTimesInteractedObjectLT(Scriptable* Sender, const Trigger* parameters);
+	static int NumTimesTalkedTo(Scriptable* Sender, const Trigger* parameters);
+	static int NumTimesTalkedToGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumTimesTalkedToLT(Scriptable* Sender, const Trigger* parameters);
+	static int NumTrappingSpellLevel(Scriptable* Sender, const Trigger* parameters);
+	static int NumTrappingSpellLevelGT(Scriptable* Sender, const Trigger* parameters);
+	static int NumTrappingSpellLevelLT(Scriptable* Sender, const Trigger* parameters);
+	static int ObjectActionListEmpty(Scriptable* Sender, const Trigger* parameters);
+	static int OnCreation(Scriptable* Sender, const Trigger* parameters);
+	static int OnIsland(Scriptable* Sender, const Trigger* parameters);
+	static int OnScreen(Scriptable* Sender, const Trigger* parameters);
+	static int Opened(Scriptable* Sender, const Trigger* parameters);
+	static int OpenFailed(Scriptable* Sender, const Trigger* parameters);
+	static int OpenState(Scriptable* Sender, const Trigger* parameters);
+	static int Or(Scriptable* Sender, const Trigger* parameters);
+	static int OriginalClass(Scriptable* Sender, const Trigger* parameters);
+	static int OutOfAmmo(Scriptable* Sender, const Trigger* parameters);
+	static int OwnsFloaterMessage(Scriptable* Sender, const Trigger* parameters);
+	static int PartyCountEQ(Scriptable* Sender, const Trigger* parameters);
+	static int PartyCountGT(Scriptable* Sender, const Trigger* parameters);
+	static int PartyCountLT(Scriptable* Sender, const Trigger* parameters);
+	static int PartyCountAliveEQ(Scriptable* Sender, const Trigger* parameters);
+	static int PartyCountAliveGT(Scriptable* Sender, const Trigger* parameters);
+	static int PartyCountAliveLT(Scriptable* Sender, const Trigger* parameters);
+	static int PartyGold(Scriptable* Sender, const Trigger* parameters);
+	static int PartyGoldGT(Scriptable* Sender, const Trigger* parameters);
+	static int PartyGoldLT(Scriptable* Sender, const Trigger* parameters);
+	static int PartyHasItem(Scriptable* Sender, const Trigger* parameters);
+	static int PartyHasItemIdentified(Scriptable* Sender, const Trigger* parameters);
+	static int PartyMemberDied(Scriptable* Sender, const Trigger* parameters);
+	static int PartyRested(Scriptable* Sender, const Trigger* parameters);
+	static int PCCanSeePoint(Scriptable* Sender, const Trigger* parameters);
+	static int PCInStore(Scriptable* Sender, const Trigger* parameters);
+	static int PersonalSpaceDistance(Scriptable* Sender, const Trigger* parameters);
+	static int PickLockFailed(Scriptable* Sender, const Trigger* parameters);
+	static int PickpocketFailed(Scriptable* Sender, const Trigger* parameters);
+	static int Proficiency(Scriptable* Sender, const Trigger* parameters);
+	static int ProficiencyGT(Scriptable* Sender, const Trigger* parameters);
+	static int ProficiencyLT(Scriptable* Sender, const Trigger* parameters);
+	static int Race(Scriptable* Sender, const Trigger* parameters);
+	static int RandomNum(Scriptable* Sender, const Trigger* parameters);
+	static int RandomNumGT(Scriptable* Sender, const Trigger* parameters);
+	static int RandomNumLT(Scriptable* Sender, const Trigger* parameters);
+	static int RandomStatCheck(Scriptable* Sender, const Trigger* parameters);
+	static int Range(Scriptable* Sender, const Trigger* parameters);
+	static int Reaction(Scriptable* Sender, const Trigger* parameters);
+	static int ReactionLT(Scriptable* Sender, const Trigger* parameters);
+	static int ReactionGT(Scriptable* Sender, const Trigger* parameters);
+	static int RealGlobalTimerExact(Scriptable* Sender, const Trigger* parameters);
+	static int RealGlobalTimerExpired(Scriptable* Sender, const Trigger* parameters);
+	static int RealGlobalTimerNotExpired(Scriptable* Sender, const Trigger* parameters);
+	static int ReceivedOrder(Scriptable* Sender, const Trigger* parameters);
+	static int Reputation(Scriptable* Sender, const Trigger* parameters);
+	static int ReputationGT(Scriptable* Sender, const Trigger* parameters);
+	static int ReputationLT(Scriptable* Sender, const Trigger* parameters);
 	static int Reset(Scriptable* Sender, const Trigger* parameters);
-	static int School(Scriptable *Sender, const Trigger *parameters);
+	static int School(Scriptable* Sender, const Trigger* parameters);
 	static int SecretDoorDetected(Scriptable* Sender, const Trigger* parameters);
-	static int See(Scriptable *Sender, const Trigger *parameters);
-	static int Sequence(Scriptable *Sender, const Trigger *parameters);
-	static int SetLastMarkedObject(Scriptable *Sender, const Trigger *parameters);
-	static int SetMarkedSpell_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int SetSpellTarget(Scriptable *Sender, const Trigger *parameters);
-	static int Specifics(Scriptable *Sender, const Trigger *parameters);
-	static int SpellCast(Scriptable *Sender, const Trigger *parameters);
-	static int SpellCastInnate(Scriptable *Sender, const Trigger *parameters);
-	static int SpellCastOnMe(Scriptable *Sender, const Trigger *parameters);
-	static int SpellCastPriest(Scriptable *Sender, const Trigger *parameters);
-	static int StateCheck(Scriptable *Sender, const Trigger *parameters);
-	static int StealFailed(Scriptable *Sender, const Trigger *parameters);
-	static int StoreHasItem(Scriptable *Sender, const Trigger *parameters);
-	static int StoryModeOn(Scriptable *Sender, const Trigger */*parameters*/);
-	static int StuffGlobalRandom(Scriptable *Sender, const Trigger *parameters);
-	static int SubRace(Scriptable *Sender, const Trigger *parameters);
+	static int See(Scriptable* Sender, const Trigger* parameters);
+	static int Sequence(Scriptable* Sender, const Trigger* parameters);
+	static int SetLastMarkedObject(Scriptable* Sender, const Trigger* parameters);
+	static int SetMarkedSpell_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int SetSpellTarget(Scriptable* Sender, const Trigger* parameters);
+	static int Specifics(Scriptable* Sender, const Trigger* parameters);
+	static int SpellCast(Scriptable* Sender, const Trigger* parameters);
+	static int SpellCastInnate(Scriptable* Sender, const Trigger* parameters);
+	static int SpellCastOnMe(Scriptable* Sender, const Trigger* parameters);
+	static int SpellCastPriest(Scriptable* Sender, const Trigger* parameters);
+	static int StateCheck(Scriptable* Sender, const Trigger* parameters);
+	static int StealFailed(Scriptable* Sender, const Trigger* parameters);
+	static int StoreHasItem(Scriptable* Sender, const Trigger* parameters);
+	static int StoryModeOn(Scriptable* Sender, const Trigger* /*parameters*/);
+	static int StuffGlobalRandom(Scriptable* Sender, const Trigger* parameters);
+	static int SubRace(Scriptable* Sender, const Trigger* parameters);
 	static int Summoned(Scriptable* Sender, const Trigger* parameters);
-	static int SummoningLimit(Scriptable *Sender, const Trigger *parameters);
-	static int SummoningLimitGT(Scriptable *Sender, const Trigger *parameters);
-	static int SummoningLimitLT(Scriptable *Sender, const Trigger *parameters);
-	static int Switch(Scriptable*/*Sender*/, const Trigger* /*parameters*/);
-	static int SystemVariable_Trigger(Scriptable *Sender, const Trigger *parameters);
-	static int TargetUnreachable(Scriptable *Sender, const Trigger *parameters);
-	static int Team(Scriptable *Sender, const Trigger *parameters);
-	static int Time(Scriptable *Sender, const Trigger *parameters);
-	static int TimeGT(Scriptable *Sender, const Trigger *parameters);
-	static int TimeLT(Scriptable *Sender, const Trigger *parameters);
-	static int TimeOfDay(Scriptable *Sender, const Trigger *parameters);
-	static int TimerActive(Scriptable *Sender, const Trigger *parameters);
-	static int TimerExpired(Scriptable *Sender, const Trigger *parameters);
-	static int TimeStopCounter(Scriptable */*Sender*/, const Trigger *parameters);
-	static int TimeStopCounterGT(Scriptable */*Sender*/, const Trigger *parameters);
-	static int TimeStopCounterLT(Scriptable */*Sender*/, const Trigger *parameters);
-	static int TimeStopObject(Scriptable *Sender, const Trigger *parameters);
-	static int TookDamage(Scriptable *Sender, const Trigger *parameters);
-	static int TotalItemCnt(Scriptable *Sender, const Trigger *parameters);
-	static int TotalItemCntExclude(Scriptable *Sender, const Trigger *parameters);
-	static int TotalItemCntExcludeGT(Scriptable *Sender, const Trigger *parameters);
-	static int TotalItemCntExcludeLT(Scriptable *Sender, const Trigger *parameters);
-	static int TotalItemCntGT(Scriptable *Sender, const Trigger *parameters);
-	static int TotalItemCntLT(Scriptable *Sender, const Trigger *parameters);
-	static int TrapTriggered(Scriptable *Sender, const Trigger *parameters);
-	static int TriggerTrigger(Scriptable *Sender, const Trigger *parameters);
-	static int TriggerSetGlobal(Scriptable *Sender, const Trigger *parameters);
-	static int True(Scriptable *Sender, const Trigger *parameters);
-	static int TurnedBy(Scriptable *Sender, const Trigger *parameters);
-	static int Unlocked(Scriptable *Sender, const Trigger *parameters);
-	static int UnselectableVariable(Scriptable *Sender, const Trigger *parameters);
-	static int UnselectableVariableGT(Scriptable *Sender, const Trigger *parameters);
-	static int UnselectableVariableLT(Scriptable *Sender, const Trigger *parameters);
-	static int Unusable(Scriptable *Sender, const Trigger *parameters);
-	static int UsedExit(Scriptable *Sender, const Trigger *parameters);
-	static int Vacant(Scriptable *Sender, const Trigger *parameters);
-	static int WalkedToTrigger(Scriptable *Sender, const Trigger *parameters);
-	static int WasInDialog(Scriptable *Sender, const Trigger *parameters);
+	static int SummoningLimit(Scriptable* Sender, const Trigger* parameters);
+	static int SummoningLimitGT(Scriptable* Sender, const Trigger* parameters);
+	static int SummoningLimitLT(Scriptable* Sender, const Trigger* parameters);
+	static int Switch(Scriptable* /*Sender*/, const Trigger* /*parameters*/);
+	static int SystemVariable_Trigger(Scriptable* Sender, const Trigger* parameters);
+	static int TargetUnreachable(Scriptable* Sender, const Trigger* parameters);
+	static int Team(Scriptable* Sender, const Trigger* parameters);
+	static int Time(Scriptable* Sender, const Trigger* parameters);
+	static int TimeGT(Scriptable* Sender, const Trigger* parameters);
+	static int TimeLT(Scriptable* Sender, const Trigger* parameters);
+	static int TimeOfDay(Scriptable* Sender, const Trigger* parameters);
+	static int TimerActive(Scriptable* Sender, const Trigger* parameters);
+	static int TimerExpired(Scriptable* Sender, const Trigger* parameters);
+	static int TimeStopCounter(Scriptable* /*Sender*/, const Trigger* parameters);
+	static int TimeStopCounterGT(Scriptable* /*Sender*/, const Trigger* parameters);
+	static int TimeStopCounterLT(Scriptable* /*Sender*/, const Trigger* parameters);
+	static int TimeStopObject(Scriptable* Sender, const Trigger* parameters);
+	static int TookDamage(Scriptable* Sender, const Trigger* parameters);
+	static int TotalItemCnt(Scriptable* Sender, const Trigger* parameters);
+	static int TotalItemCntExclude(Scriptable* Sender, const Trigger* parameters);
+	static int TotalItemCntExcludeGT(Scriptable* Sender, const Trigger* parameters);
+	static int TotalItemCntExcludeLT(Scriptable* Sender, const Trigger* parameters);
+	static int TotalItemCntGT(Scriptable* Sender, const Trigger* parameters);
+	static int TotalItemCntLT(Scriptable* Sender, const Trigger* parameters);
+	static int TrapTriggered(Scriptable* Sender, const Trigger* parameters);
+	static int TriggerTrigger(Scriptable* Sender, const Trigger* parameters);
+	static int TriggerSetGlobal(Scriptable* Sender, const Trigger* parameters);
+	static int True(Scriptable* Sender, const Trigger* parameters);
+	static int TurnedBy(Scriptable* Sender, const Trigger* parameters);
+	static int Unlocked(Scriptable* Sender, const Trigger* parameters);
+	static int UnselectableVariable(Scriptable* Sender, const Trigger* parameters);
+	static int UnselectableVariableGT(Scriptable* Sender, const Trigger* parameters);
+	static int UnselectableVariableLT(Scriptable* Sender, const Trigger* parameters);
+	static int Unusable(Scriptable* Sender, const Trigger* parameters);
+	static int UsedExit(Scriptable* Sender, const Trigger* parameters);
+	static int Vacant(Scriptable* Sender, const Trigger* parameters);
+	static int WalkedToTrigger(Scriptable* Sender, const Trigger* parameters);
+	static int WasInDialog(Scriptable* Sender, const Trigger* parameters);
 	static int WeaponCanDamage(Scriptable* Sender, const Trigger* parameters);
 	static int WeaponEffectiveVs(Scriptable* Sender, const Trigger* parameters);
-	static int Xor(Scriptable *Sender, const Trigger *parameters);
-	static int XP(Scriptable *Sender, const Trigger *parameters);
-	static int XPGT(Scriptable *Sender, const Trigger *parameters);
-	static int XPLT(Scriptable *Sender, const Trigger *parameters);
+	static int Xor(Scriptable* Sender, const Trigger* parameters);
+	static int XP(Scriptable* Sender, const Trigger* parameters);
+	static int XPGT(Scriptable* Sender, const Trigger* parameters);
+	static int XPLT(Scriptable* Sender, const Trigger* parameters);
 
 	//Actions
 	static void Activate(Scriptable* Sender, Action* parameters);
 	static void ActivatePortalCursor(Scriptable* Sender, Action* parameters);
 	static void AddAreaFlag(Scriptable* Sender, Action* parameters);
 	static void AddAreaType(Scriptable* Sender, Action* parameters);
-	static void AddExperienceParty(Scriptable *Sender, Action* parameters);
-	static void AddExperiencePartyCR(Scriptable *Sender, Action* parameters);
-	static void AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters);
+	static void AddExperienceParty(Scriptable* Sender, Action* parameters);
+	static void AddExperiencePartyCR(Scriptable* Sender, Action* parameters);
+	static void AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters);
 	static void AddFamiliar(Scriptable* Sender, Action* parameters);
-	static void AddFeat(Scriptable *Sender, Action* parameters);
+	static void AddFeat(Scriptable* Sender, Action* parameters);
 	static void AddGlobals(Scriptable* Sender, Action* parameters);
 	static void AddHP(Scriptable* Sender, Action* parameters);
 	static void AddJournalEntry(Scriptable* Sender, Action* parameters);
@@ -925,11 +933,11 @@ public: //Script Functions
 	static void AddSuperKit(Scriptable* Sender, Action* parameters);
 	static void AddWayPoint(Scriptable* Sender, Action* parameters);
 	static void AddWorldmapAreaFlag(Scriptable* /*Sender*/, Action* parameters);
-	static void AddXP2DA(Scriptable *Sender, Action* parameters);
-	static void AddXPObject(Scriptable *Sender, Action* parameters);
-	static void AddXPVar(Scriptable *Sender, Action* parameters);
+	static void AddXP2DA(Scriptable* Sender, Action* parameters);
+	static void AddXPObject(Scriptable* Sender, Action* parameters);
+	static void AddXPVar(Scriptable* Sender, Action* parameters);
 	static void AddXPWorth(Scriptable* Sender, Action* parameters);
-	static void AdvanceTime(Scriptable *Sender, Action* parameters);
+	static void AdvanceTime(Scriptable* Sender, Action* parameters);
 	static void Ally(Scriptable* Sender, Action* parameters);
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
 	static void AnkhegEmerge(Scriptable* Sender, Action* parameters);
@@ -970,7 +978,7 @@ public: //Script Functions
 	static void ChangeStatGlobal(Scriptable* Sender, Action* parameters);
 	static void ChangeStoreMarkup(Scriptable* Sender, Action* parameters);
 	static void ChangeTileState(Scriptable* Sender, Action* parameters);
-	static void ChunkCreature(Scriptable *Sender, Action* parameters);
+	static void ChunkCreature(Scriptable* Sender, Action* parameters);
 	static void ClearActions(Scriptable* Sender, Action* parameters);
 	static void ClearAllActions(Scriptable* Sender, Action* parameters);
 	static void ClearPartyEffects(Scriptable* Sender, Action* parameters);
@@ -990,7 +998,7 @@ public: //Script Functions
 	static void CreateCreatureDoor(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureImpassable(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureImpassableAllowOverlap(Scriptable* Sender,
-		Action* parameters);
+							 Action* parameters);
 	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectCopy(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectDoor(Scriptable* Sender, Action* parameters);
@@ -999,20 +1007,20 @@ public: //Script Functions
 	static void CreateCreatureOffScreen(Scriptable* Sender, Action* parameters);
 	static void CreateItem(Scriptable* Sender, Action* parameters);
 	static void CreateItemNumGlobal(Scriptable* Sender, Action* parameters);
-	static void CreatePartyGold(Scriptable *Sender, Action *parameters);
+	static void CreatePartyGold(Scriptable* Sender, Action* parameters);
 	static void CreateVisualEffect(Scriptable* Sender, Action* parameters);
 	static void CreateVisualEffectObject(Scriptable* Sender,
-		Action* parameters);
+					     Action* parameters);
 	static void CreateVisualEffectObjectSticky(Scriptable* Sender,
-		Action* parameters);
+						   Action* parameters);
 	static void CutSceneID(Scriptable* Sender, Action* parameters);
 	static void Damage(Scriptable* Sender, Action* parameters);
-	static void DayNight(Scriptable *Sender, Action* parameters);
+	static void DayNight(Scriptable* Sender, Action* parameters);
 	static void Deactivate(Scriptable* Sender, Action* parameters);
 	static void Debug(Scriptable* Sender, Action* parameters);
 	static void DemoEnd(Scriptable* Sender, Action* parameters);
 	static void DestroyAllDestructableEquipment(Scriptable* Sender,
-		Action* parameters);
+						    Action* parameters);
 	static void DestroyAllEquipment(Scriptable* Sender, Action* parameters);
 	static void DestroyAllFragileEquipment(Scriptable* Sender, Action* parameters);
 	static void DestroyGold(Scriptable* Sender, Action* parameters);
@@ -1054,15 +1062,15 @@ public: //Script Functions
 	static void EscapeAreaNoSee(Scriptable* Sender, Action* parameters);
 	static void EscapeAreaObject(Scriptable* Sender, Action* parameters);
 	static void EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters);
-	static void EquipItem(Scriptable *Sender, Action *parameters);
-	static void EquipMostDamagingMelee(Scriptable *Sender, Action *parameters);
-	static void EquipRanged(Scriptable *Sender, Action *parameters);
-	static void EquipWeapon(Scriptable *Sender, Action *parameters);
+	static void EquipItem(Scriptable* Sender, Action* parameters);
+	static void EquipMostDamagingMelee(Scriptable* Sender, Action* parameters);
+	static void EquipRanged(Scriptable* Sender, Action* parameters);
+	static void EquipWeapon(Scriptable* Sender, Action* parameters);
 	static void ExitPocketPlane(Scriptable* Sender, Action* parameters);
 	static void ExpansionEndCredits(Scriptable* Sender, Action* parameters);
-	static void Explore(Scriptable *Sender, Action *parameters);
-	static void ExploreMapChunk(Scriptable *Sender, Action *parameters);
-	static void ExportParty(Scriptable *Sender, Action *parameters);
+	static void Explore(Scriptable* Sender, Action* parameters);
+	static void ExploreMapChunk(Scriptable* Sender, Action* parameters);
+	static void ExportParty(Scriptable* Sender, Action* parameters);
 	static void Face(Scriptable* Sender, Action* parameters);
 	static void FaceObject(Scriptable* Sender, Action* parameters);
 	static void FaceSavedLocation(Scriptable* Sender, Action* parameters);
@@ -1070,9 +1078,9 @@ public: //Script Functions
 	static void FadeToAndFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
 	static void FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters);
-	static void FillSlot(Scriptable *Sender, Action* parameters);
+	static void FillSlot(Scriptable* Sender, Action* parameters);
 	static void FindTraps(Scriptable* Sender, Action* parameters);
-	static void FixEngineRoom(Scriptable *Sender, Action* parameters);
+	static void FixEngineRoom(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixed(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixedRnd(Scriptable* Sender, Action* parameters);
 	static void FloatMessageRnd(Scriptable* Sender, Action* parameters);
@@ -1172,7 +1180,7 @@ public: //Script Functions
 	static void MoveGlobalObject(Scriptable* Sender, Action* parameters);
 	static void MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameters);
 	static void MoveGlobalsTo(Scriptable* Sender, Action* parameters);
-	static void MoveInventory(Scriptable *Sender, Action* parameters);
+	static void MoveInventory(Scriptable* Sender, Action* parameters);
 	static void MoveToCampaign(Scriptable* /*Sender*/, Action* parameters);
 	static void MoveToCenterOfScreen(Scriptable* Sender, Action* parameters);
 	static void MoveToExpansion(Scriptable* Sender, Action* parameters);
@@ -1195,7 +1203,7 @@ public: //Script Functions
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
 	static void OverrideAreaDifficulty(Scriptable* Sender, Action* parameters);
 	static void Panic(Scriptable* Sender, Action* parameters);
-	static void PauseGame(Scriptable *Sender, Action* parameters);
+	static void PauseGame(Scriptable* Sender, Action* parameters);
 	static void PermanentStatChange(Scriptable* Sender, Action* parameters);
 	static void PickLock(Scriptable* Sender, Action* parameters);
 	static void PickPockets(Scriptable* Sender, Action* parameters);
@@ -1244,11 +1252,11 @@ public: //Script Functions
 	static void ReputationSet(Scriptable* Sender, Action* parameters);
 	static void ResetMorale(Scriptable* Sender, Action* parameters);
 	static void ResetPlayerAI(Scriptable* Sender, Action* parameters);
-	static void RestorePartyLocation(Scriptable *Sender, Action* parameters);
-	static void Rest(Scriptable *Sender, Action* parameters);
-	static void RestNoSpells(Scriptable *Sender, Action* parameters);
-	static void RestParty(Scriptable *Sender, Action* parameters);
-	static void RestUntilHealed(Scriptable *Sender, Action* parameters);
+	static void RestorePartyLocation(Scriptable* Sender, Action* parameters);
+	static void Rest(Scriptable* Sender, Action* parameters);
+	static void RestNoSpells(Scriptable* Sender, Action* parameters);
+	static void RestParty(Scriptable* Sender, Action* parameters);
+	static void RestUntilHealed(Scriptable* Sender, Action* parameters);
 	static void ReturnToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void ReturnToSavedLocationDelete(Scriptable* Sender, Action* parameters);
 	static void ReturnToStartLocation(Scriptable* Sender, Action* parameters);
@@ -1276,7 +1284,7 @@ public: //Script Functions
 	static void SetAreaScript(Scriptable* Sender, Action* parameters);
 	static void SetArmourLevel(Scriptable* Sender, Action* parameters);
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
-	static void SetBestWeapon(Scriptable *Sender, Action *parameters);
+	static void SetBestWeapon(Scriptable* Sender, Action* parameters);
 	static void SetCursorState(Scriptable* Sender, Action* parameters);
 	static void SetCreatureAreaFlag(Scriptable* Sender, Action* parameters);
 	static void SetCriticalPathObject(Scriptable* Sender, Action* parameters);
@@ -1363,10 +1371,10 @@ public: //Script Functions
 	static void StartDialogueInterrupt(Scriptable* Sender, Action* parameters);
 	static void StartDialogueNoSet(Scriptable* Sender, Action* parameters);
 	static void StartDialogueNoSetInterrupt(Scriptable* Sender,
-		Action* parameters);
+						Action* parameters);
 	static void StartDialogueOverride(Scriptable* Sender, Action* parameters);
 	static void StartDialogueOverrideInterrupt(Scriptable* Sender,
-		Action* parameters);
+						   Action* parameters);
 	static void StartMovie(Scriptable* Sender, Action* parameters);
 	static void StartMusic(Scriptable* Sender, Action* parameters);
 	static void StartRainNow(Scriptable* Sender, Action* parameters);
@@ -1380,7 +1388,7 @@ public: //Script Functions
 	static void StaticStart(Scriptable* Sender, Action* parameters);
 	static void StaticStop(Scriptable* Sender, Action* parameters);
 	static void StopMoving(Scriptable* Sender, Action* parameters);
-	static void StorePartyLocation(Scriptable *Sender, Action* parameters);
+	static void StorePartyLocation(Scriptable* Sender, Action* parameters);
 	static void Swing(Scriptable* Sender, Action* parameters);
 	static void SwingOnce(Scriptable* Sender, Action* parameters);
 	static void TakeCreatureItems(Scriptable* Sender, Action* parameters);
@@ -1406,7 +1414,7 @@ public: //Script Functions
 	static void TriggerWalkTo(Scriptable* Sender, Action* parameters);
 	static void Turn(Scriptable* Sender, Action* parameters);
 	static void TurnAMT(Scriptable* Sender, Action* parameters);
-	static void UndoExplore(Scriptable *Sender, Action *parameters);
+	static void UndoExplore(Scriptable* Sender, Action* parameters);
 	static void Unhide(Scriptable* Sender, Action* parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Unlock(Scriptable* Sender, Action* parameters);
@@ -1421,132 +1429,132 @@ public: //Script Functions
 	static void WaitAnimation(Scriptable* Sender, Action* parameters);
 	static void WaitRandom(Scriptable* Sender, Action* parameters);
 	static void Weather(Scriptable* Sender, Action* parameters);
-	static void XEquipItem(Scriptable *Sender, Action *parameters);
+	static void XEquipItem(Scriptable* Sender, Action* parameters);
 
 	//Objects
-	static Targets *BestAC(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* BestAC(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* EighthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *EighthNearest(const Scriptable *Sender, Targets *parameters, int ga_flagss);
+	static Targets* EighthNearest(const Scriptable* Sender, Targets* parameters, int ga_flagss);
 	static Targets* EighthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *EighthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flagss);
-	static Targets *EighthNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flagss);
-	static Targets *EighthNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flagss);
-	static Targets *EighthNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* EighthNearestDoor(const Scriptable* Sender, Targets* parameters, int ga_flagss);
+	static Targets* EighthNearestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flagss);
+	static Targets* EighthNearestEnemyOfType(const Scriptable* Sender, Targets* parameters, int ga_flagss);
+	static Targets* EighthNearestMyGroupOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* Familiar(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* FamiliarSummoner(const Scriptable* Sender, Targets* parameters, int ga_flags);
-	static Targets *Farthest(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *FarthestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* Farthest(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* FarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* FifthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *FifthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* FifthNearest(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* FifthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *FifthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *FifthNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *FifthNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *FifthNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* FifthNearestDoor(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* FifthNearestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* FifthNearestEnemyOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* FifthNearestMyGroupOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* FourthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *FourthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* FourthNearest(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* FourthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *FourthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *FourthNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *FourthNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *FourthNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Gabber(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *GroupOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LastAttackerOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LastCommandedBy(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LastHeardBy(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LastHelp(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LastHitter(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* FourthNearestDoor(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* FourthNearestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* FourthNearestEnemyOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* FourthNearestMyGroupOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Gabber(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* GroupOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LastAttackerOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LastCommandedBy(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LastHeardBy(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LastHelp(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LastHitter(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* LastKilled(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *LastMarkedObject(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LastSeenBy(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LastSummonerOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LastTalkedToBy(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LastTargetedBy(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LastTrigger(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LeaderOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *LeastDamagedOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *MostDamagedOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Myself(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *MyTarget(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Nearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* LastMarkedObject(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LastSeenBy(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LastSummonerOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LastTalkedToBy(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LastTargetedBy(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LastTrigger(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LeaderOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* LeastDamagedOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* MostDamagedOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Myself(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* MyTarget(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Nearest(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* NearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *NearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *NearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *NearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *NearestEnemySummoned(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *NearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *NearestPC(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* NearestDoor(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* NearestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* NearestEnemyOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* NearestEnemySummoned(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* NearestMyGroupOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* NearestPC(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* NinthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *NinthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* NinthNearest(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* NinthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *NinthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *NinthNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *NinthNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *NinthNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Nothing(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* NinthNearestDoor(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* NinthNearestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* NinthNearestEnemyOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* NinthNearestMyGroupOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Nothing(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* PartySlot1(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets* PartySlot2(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets* PartySlot3(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets* PartySlot4(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets* PartySlot5(const Scriptable* Sender, Targets* parameters, int gaFlags);
 	static Targets* PartySlot6(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *Player1(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player1Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player2(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player2Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player3(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player3Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player4(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player4Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player5(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player5Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player6(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player6Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Protagonist(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *ProtectedBy(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *ProtectorOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* Player1(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player1Fill(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player2(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player2Fill(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player3(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player3Fill(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player4(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player4Fill(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player5(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player5Fill(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player6(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player6Fill(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Protagonist(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* ProtectedBy(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* ProtectorOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* SecondFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *SecondNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* SecondNearest(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* SecondNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *SecondNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SecondNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SecondNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SecondNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SelectedCharacter(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* SecondNearestDoor(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SecondNearestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SecondNearestEnemyOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SecondNearestMyGroupOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SelectedCharacter(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* SeventhFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *SeventhNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* SeventhNearest(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* SeventhNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *SeventhNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SeventhNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SeventhNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SeventhNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* SeventhNearestDoor(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SeventhNearestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SeventhNearestEnemyOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SeventhNearestMyGroupOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* SixthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *SixthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* SixthNearest(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* SixthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *SixthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SixthNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SixthNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SixthNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *SpellTarget(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *StrongestOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *StrongestOfMale(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* SixthNearestDoor(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SixthNearestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SixthNearestEnemyOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SixthNearestMyGroupOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* SpellTarget(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* StrongestOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* StrongestOfMale(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* TenthFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *TenthNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* TenthNearest(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* TenthNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *TenthNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *TenthNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *TenthNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *TenthNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* TenthNearestDoor(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* TenthNearestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* TenthNearestEnemyOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* TenthNearestMyGroupOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* ThirdFarthestEnemyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *ThirdNearest(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* ThirdNearest(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* ThirdNearestAllyOf(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *ThirdNearestDoor(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *ThirdNearestEnemyOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *ThirdNearestEnemyOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *ThirdNearestMyGroupOfType(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *WeakestOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *WorstAC(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* ThirdNearestDoor(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* ThirdNearestEnemyOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* ThirdNearestEnemyOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* ThirdNearestMyGroupOfType(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* WeakestOf(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* WorstAC(const Scriptable* Sender, Targets* parameters, int ga_flags);
 
 	/*GemRB extensions/actions*/
 	static void RunAwayFromPoint(Scriptable* Sender, Action* parameters);
@@ -1554,22 +1562,22 @@ public: //Script Functions
 	static void UnloadArea(Scriptable* Sender, Action* parameters);
 
 	/*GemRB extensions/objects*/
-	static Targets *Player7(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player7Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* Player7(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player7Fill(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* PartySlot7(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *Player8(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player8Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* Player8(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player8Fill(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* PartySlot8(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *Player9(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player9Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* Player9(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player9Fill(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* PartySlot9(const Scriptable* Sender, Targets* parameters, int gaFlags);
-	static Targets *Player10(const Scriptable *Sender, Targets *parameters, int ga_flags);
-	static Targets *Player10Fill(const Scriptable *Sender, Targets *parameters, int ga_flags);
+	static Targets* Player10(const Scriptable* Sender, Targets* parameters, int ga_flags);
+	static Targets* Player10Fill(const Scriptable* Sender, Targets* parameters, int ga_flags);
 	static Targets* PartySlot10(const Scriptable* Sender, Targets* parameters, int gaFlags);
 };
 
 GEM_EXPORT Action* GenerateAction(std::string String);
-GEM_EXPORT Action *GenerateActionDirect(std::string string, const Scriptable *object);
+GEM_EXPORT Action* GenerateActionDirect(std::string string, const Scriptable* object);
 GEM_EXPORT Trigger* GenerateTrigger(std::string string);
 
 void InitializeIEScript();

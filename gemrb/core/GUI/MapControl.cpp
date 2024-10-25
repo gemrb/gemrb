@@ -34,10 +34,10 @@
 namespace GemRB {
 
 MapControl::MapControl(const Region& frame, std::shared_ptr<const AnimationFactory> af)
-: Control(frame), mapFlags(std::move(af))
+	: Control(frame), mapFlags(std::move(af))
 {
 	ControlType = IE_GUI_MAP;
-	SetValueRange({NO_NOTES, EDIT_NOTE});
+	SetValueRange({ NO_NOTES, EDIT_NOTE });
 	UpdateMap();
 }
 
@@ -71,7 +71,7 @@ void MapControl::DrawFog(const Region& rgn) const
 
 		for (p.x = 0; p.x < rgn.w; ++p.x) {
 			gameP.x = int(p.x * double(mapsize.w) / mosRgn.w);
-			
+
 			bool visible = MyMap->IsExplored(gameP);
 			if (!visible) {
 				points.push_back(p + rgn.origin);
@@ -81,28 +81,28 @@ void MapControl::DrawFog(const Region& rgn) const
 
 	VideoDriver->DrawPoints(points, ColorBlack);
 }
-	
+
 Point MapControl::ConvertPointToGame(Point p) const
 {
 	const Size mapsize = MyMap->GetSize();
-	
+
 	// mos is centered... first convert p to mos coordinates
 	// mos is in win coordinates (to make things easy elsewhere)
 	p = ConvertPointToSuper(p) - mosRgn.origin;
-	
+
 	p.x = int(p.x * double(mapsize.w) / mosRgn.w);
 	p.y = int(p.y * double(mapsize.h) / mosRgn.h);
-	
+
 	return p;
 }
-	
+
 Point MapControl::ConvertPointFromGame(Point p) const
 {
 	const Size mapsize = MyMap->GetSize();
-	
+
 	p.x = int(p.x * double(mosRgn.w) / mapsize.w);
 	p.y = int(p.y * double(mosRgn.h) / mapsize.h);
-	
+
 	// mos is centered... convert p from mos coordinates
 	return p + mosRgn.origin;
 }
@@ -111,14 +111,13 @@ void MapControl::UpdateState(value_t val)
 {
 	SetValue(val);
 }
-	
+
 void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	UpdateMap();
 
 	if (LinkedLabel) {
-		if (GetValue() == EDIT_NOTE)
-		{
+		if (GetValue() == EDIT_NOTE) {
 			LinkedLabel->SetFlags(IgnoreEvents, BitOp::NAND);
 			LinkedLabel->SetFocus();
 		} else {
@@ -128,7 +127,7 @@ void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 
 	if (MapMOS) {
 		const Size& mosSize = MapMOS->Frame.size;
-		const Point center(frame.w/2 - mosSize.w/2, frame.h/2 - mosSize.h/2);
+		const Point center(frame.w / 2 - mosSize.w / 2, frame.h / 2 - mosSize.h / 2);
 		mosRgn = Region(Origin() + center, mosSize);
 	} else {
 		mosRgn = Region(Point(), Dimensions());
@@ -155,7 +154,7 @@ Region MapControl::GetViewport() const
 void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	VideoDriver->DrawRect(rgn, ColorBlack, true);
-		
+
 	if (MyMap == nullptr) {
 		return;
 	}
@@ -168,27 +167,27 @@ void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		DrawFog(mosRgn);
 
 	Region vp = GetViewport();
-	VideoDriver->DrawRect(vp, ColorGreen, false );
-	
+	VideoDriver->DrawRect(vp, ColorGreen, false);
+
 	// Draw PCs' ellipses
-	const Game *game = core->GetGame();
+	const Game* game = core->GetGame();
 	int i = game->GetPartySize(true);
 	while (i--) {
-		const Actor *actor = game->GetPC(i, true);
-		if (MyMap->HasActor(actor) ) {
+		const Actor* actor = game->GetPC(i, true);
+		if (MyMap->HasActor(actor)) {
 			const Point pos = ConvertPointFromGame(actor->Pos);
 			const Size s(6, 4);
 			const Region r(pos - s.Center(), s);
-			VideoDriver->DrawEllipse(r, actor->Selected ? ColorGreen : ColorGreenDark );
+			VideoDriver->DrawEllipse(r, actor->Selected ? ColorGreen : ColorGreenDark);
 		}
 	}
 	// Draw Map notes, could be turned off in bg2
 	// we use the common control value to handle it, because then we
 	// don't need another interface
 	if (GetValue() != NO_NOTES) {
-		i = MyMap -> GetMapNoteCount();
+		i = MyMap->GetMapNoteCount();
 		while (i--) {
-			const MapNote& mn = MyMap -> GetMapNote(i);
+			const MapNote& mn = MyMap->GetMapNote(i);
 
 			// Skip unexplored map notes unless they are player added
 			// PST draws user notes regardless of visibility
@@ -226,12 +225,12 @@ void MapControl::ClickHandle(const MouseEvent&) const
 void MapControl::UpdateViewport(Point vp)
 {
 	Region vp2 = GetViewport();
-	vp.x -= vp2.w/2;
-	vp.y -= vp2.h/2;
+	vp.x -= vp2.w / 2;
+	vp.y -= vp2.h / 2;
 	vp = ConvertPointToGame(vp);
-	
+
 	// clear any previously scheduled moves and then do it asap, so it works while paused
-	core->timer.SetMoveViewPort( vp, 0, false );
+	core->timer.SetMoveViewPort(vp, 0, false);
 
 	MarkDirty();
 }
@@ -285,7 +284,7 @@ bool MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	UpdateCursor();
 	return true;
 }
-	
+
 /** Mouse Over Event */
 bool MapControl::OnMouseOver(const MouseEvent& me)
 {
@@ -304,7 +303,7 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 		const MapNote* mn = MapNoteAtPoint(p);
 		if (mn) {
 			notePos = mn->Pos;
-			
+
 			if (LinkedLabel) {
 				LinkedLabel->SetText(mn->text);
 			}
@@ -322,7 +321,7 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 	UpdateCursor();
 	return true;
 }
-	
+
 bool MapControl::OnMouseDrag(const MouseEvent& me)
 {
 	if (GetValue() == VIEW_NOTES) {
@@ -338,7 +337,7 @@ bool MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
 
-	switch(GetValue()) {
+	switch (GetValue()) {
 		case EDIT_NOTE:
 			SetValue(VIEW_NOTES);
 			break;

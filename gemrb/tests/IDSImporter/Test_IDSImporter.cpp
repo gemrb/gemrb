@@ -17,10 +17,10 @@
  *
  */
 
-#include <gtest/gtest.h>
-
 #include "../../core/Streams/FileStream.h"
 #include "../../plugins/IDSImporter/IDSImporter.h"
+
+#include <gtest/gtest.h>
 
 namespace GemRB {
 
@@ -33,40 +33,45 @@ protected:
 	const path_t path;
 
 public:
-	void SetUp() override {
-		auto stream = new FileStream{};
+	void SetUp() override
+	{
+		auto stream = new FileStream {};
 
 		assert(stream->Open(GetParam()));
-		assert(unit.Open(std::unique_ptr<DataStream>{stream}));
+		assert(unit.Open(std::unique_ptr<DataStream> { stream }));
 	}
 };
 
-TEST_P(IDSImporter_Test, GetValueByString) {
+TEST_P(IDSImporter_Test, GetValueByString)
+{
 	// first matches
-	EXPECT_EQ(unit.GetValue(StringView{"AXEFLM"}), 8);
-	EXPECT_EQ(unit.GetValue(StringView{"SPSMPUFF"}), 43);
-	EXPECT_EQ(unit.GetValue(StringView{"spsMpuff"}), 43);
+	EXPECT_EQ(unit.GetValue(StringView { "AXEFLM" }), 8);
+	EXPECT_EQ(unit.GetValue(StringView { "SPSMPUFF" }), 43);
+	EXPECT_EQ(unit.GetValue(StringView { "spsMpuff" }), 43);
 
-	EXPECT_EQ(unit.GetValue(StringView{"HMGRML"}), -1);
+	EXPECT_EQ(unit.GetValue(StringView { "HMGRML" }), -1);
 }
 
-TEST_P(IDSImporter_Test, GetValueByInt) {
-	EXPECT_EQ(unit.GetValue(8), std::string{"axeflm"});
-	EXPECT_EQ(unit.GetValue(9), std::string{"axeflm"});
-	EXPECT_EQ(unit.GetValue(44), std::string{"spsmpuff"});
+TEST_P(IDSImporter_Test, GetValueByInt)
+{
+	EXPECT_EQ(unit.GetValue(8), std::string { "axeflm" });
+	EXPECT_EQ(unit.GetValue(9), std::string { "axeflm" });
+	EXPECT_EQ(unit.GetValue(44), std::string { "spsmpuff" });
 
-	EXPECT_EQ(unit.GetValue(2), std::string{});
-	EXPECT_EQ(unit.GetValue(200), std::string{});
+	EXPECT_EQ(unit.GetValue(2), std::string {});
+	EXPECT_EQ(unit.GetValue(200), std::string {});
 }
 
-TEST_P(IDSImporter_Test, GetStringIndex) {
-	EXPECT_EQ(unit.GetStringIndex(0), std::string{"axeflm"});
-	EXPECT_EQ(unit.GetStringIndex(10), std::string{"arghxxl"});
+TEST_P(IDSImporter_Test, GetStringIndex)
+{
+	EXPECT_EQ(unit.GetStringIndex(0), std::string { "axeflm" });
+	EXPECT_EQ(unit.GetStringIndex(10), std::string { "arghxxl" });
 
-	EXPECT_EQ(unit.GetStringIndex(100), std::string{});
+	EXPECT_EQ(unit.GetStringIndex(100), std::string {});
 }
 
-TEST_P(IDSImporter_Test, GetValueIndex) {
+TEST_P(IDSImporter_Test, GetValueIndex)
+{
 	EXPECT_EQ(unit.GetValueIndex(0), 8);
 	EXPECT_EQ(unit.GetValueIndex(10), 45);
 
@@ -77,14 +82,16 @@ TEST_P(IDSImporter_Test, GetValueIndex) {
 #endif
 }
 
-TEST_P(IDSImporter_Test, FindString) {
-	EXPECT_EQ(unit.FindString(StringView{"SPSMPUFF"}), 9);
-	EXPECT_EQ(unit.FindString(StringView{"axeflm"}), 1);
+TEST_P(IDSImporter_Test, FindString)
+{
+	EXPECT_EQ(unit.FindString(StringView { "SPSMPUFF" }), 9);
+	EXPECT_EQ(unit.FindString(StringView { "axeflm" }), 1);
 
-	EXPECT_EQ(unit.FindString(StringView{"HMGRML"}), -1);
+	EXPECT_EQ(unit.FindString(StringView { "HMGRML" }), -1);
 }
 
-TEST_P(IDSImporter_Test, FindValue) {
+TEST_P(IDSImporter_Test, FindValue)
+{
 	EXPECT_EQ(unit.FindValue(45), 11);
 	EXPECT_EQ(unit.FindValue(8), 0);
 
@@ -92,11 +99,13 @@ TEST_P(IDSImporter_Test, FindValue) {
 	EXPECT_EQ(unit.FindValue(100), -1);
 }
 
-TEST_P(IDSImporter_Test, GetSize) {
+TEST_P(IDSImporter_Test, GetSize)
+{
 	EXPECT_EQ(unit.GetSize(), 12);
 }
 
-TEST_P(IDSImporter_Test, GetHighestValue) {
+TEST_P(IDSImporter_Test, GetHighestValue)
+{
 	EXPECT_EQ(unit.GetHighestValue(), 58);
 }
 
@@ -105,8 +114,6 @@ INSTANTIATE_TEST_SUITE_P(
 	IDSImporter_Test,
 	testing::Values(
 		SAMPLE_FILE,
-		ENC_SAMPLE_FILE
-	)
-);
+		ENC_SAMPLE_FILE));
 
 }

@@ -22,20 +22,21 @@
 #define GUISCRIPT_H
 
 // NOTE: Python.h has to be included first.
-#include <Python.h>
 #include "ScriptEngine.h"
+
+#include <Python.h>
 
 namespace GemRB {
 
 class View;
 
 enum {
-   SV_BPP,
-   SV_WIDTH,
-   SV_HEIGHT,
-   SV_GAMEPATH,
-   SV_TOUCH,
-   SV_SAVEPATH
+	SV_BPP,
+	SV_WIDTH,
+	SV_HEIGHT,
+	SV_GAMEPATH,
+	SV_TOUCH,
+	SV_SAVEPATH
 };
 
 class GUIScript : public ScriptEngine {
@@ -59,22 +60,22 @@ public:
 	/** Run Function */
 	Parameter RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
 
-	PyObject *RunPyFunction(const char* moduleName, const char* fname, const FunctionParameters& params, bool report_error = true);
-	PyObject *RunPyFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
+	PyObject* RunPyFunction(const char* moduleName, const char* fname, const FunctionParameters& params, bool report_error = true);
+	PyObject* RunPyFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 	/** Exec a single File */
 	bool ExecFile(const char* file);
 	/** Exec a single String */
-	bool ExecString(const std::string &string, bool feedback=false) override;
+	bool ExecString(const std::string& string, bool feedback = false) override;
 
 	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*) const;
 	PyObject* ConstructObject(const std::string& pyclassname, ScriptingId id) const;
 	PyObject* ConstructObject(const std::string& pyclassname, PyObject* pArgs, PyObject* kwArgs = nullptr) const;
-	
+
 	const ScriptingRefBase* GetScriptingRef(PyObject* obj) const;
 	void AssignViewAttributes(PyObject* obj, View* view) const;
 };
 
-extern GUIScript *gs;
+extern GUIScript* gs;
 
 }
 

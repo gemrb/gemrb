@@ -55,7 +55,7 @@ public:
 	class SubtitleSet {
 		Color col;
 		Holder<Font> font;
-	
+
 	public:
 		explicit SubtitleSet(Holder<Font> fnt, Color col = ColorWhite)
 			: col(col), font(std::move(fnt))
@@ -67,13 +67,14 @@ public:
 
 		virtual size_t NextSubtitleFrame() const = 0;
 		virtual const String& SubtitleAtFrame(size_t) const = 0;
-		
-		void RenderInBuffer(VideoBuffer& buffer, size_t frame) const {
+
+		void RenderInBuffer(VideoBuffer& buffer, size_t frame) const
+		{
 			if (frame >= NextSubtitleFrame()) {
 				buffer.Clear();
 				const String& str = SubtitleAtFrame(frame);
 				Region rect(Point(), buffer.Size());
-				font->Print(rect, str, IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE, {col, ColorBlack});
+				font->Print(rect, str, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, { col, ColorBlack });
 			}
 		}
 	};
@@ -124,8 +125,9 @@ class MoviePlayerControls : public View {
 private:
 	// currently dont have any real controls
 	void DrawSelf(const Region& /*drawFrame*/, const Region& /*clip*/) override {}
-	
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/) override {
+
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/) override
+	{
 		KeyboardKey keycode = Key.keycode;
 		switch (keycode) {
 			case 's':
@@ -138,15 +140,16 @@ private:
 
 		return true;
 	}
-	
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override {
+
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override
+	{
 		player.Stop();
 		return true;
 	}
 
 public:
 	explicit MoviePlayerControls(MoviePlayer& player)
-	: View(Region(Point(), player.Dimensions())), player(player) {}
+		: View(Region(Point(), player.Dimensions())), player(player) {}
 };
 
 }

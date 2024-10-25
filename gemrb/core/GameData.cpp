@@ -42,6 +42,7 @@
 #include "SpellMgr.h"
 #include "StoreMgr.h"
 #include "VEFObject.h"
+
 #include "Scriptable/Actor.h"
 #include "Streams/FileStream.h"
 
@@ -53,10 +54,10 @@ GEM_EXPORT GameData* gamedata;
 
 GameData::~GameData()
 {
-	PaletteCache.clear ();
+	PaletteCache.clear();
 
 	while (!stores.empty()) {
-		Store *store = stores.begin()->second;
+		Store* store = stores.begin()->second;
 		stores.erase(stores.begin());
 		delete store;
 	}
@@ -75,7 +76,7 @@ Actor* GameData::GetCreature(const ResRef& creature, unsigned int PartySlot)
 
 int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool character, int VersionOverride)
 {
-	DataStream *stream;
+	DataStream* stream;
 
 	Actor* actor;
 	if (character) {
@@ -91,7 +92,7 @@ int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool 
 		actor = GetCreature(creature, PartySlot);
 	}
 
-	if ( !actor ) {
+	if (!actor) {
 		return -1;
 	}
 
@@ -101,9 +102,9 @@ int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool 
 
 	actor->AreaName = core->GetGame()->CurrentArea;
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
-		actor->SetStance( IE_ANI_TWITCH );
+		actor->SetStance(IE_ANI_TWITCH);
 	} else {
-		actor->SetStance( IE_ANI_AWAKE );
+		actor->SetStance(IE_ANI_AWAKE);
 	}
 	actor->SetOrientation(S, false);
 
@@ -131,7 +132,7 @@ AutoTable GameData::LoadTable(const ResRef& tableRef, bool silent)
 		return nullptr;
 	}
 
-	if (!tm->Open(std::unique_ptr<DataStream>{str})) {
+	if (!tm->Open(std::unique_ptr<DataStream> { str })) {
 		return nullptr;
 	}
 
@@ -157,13 +158,13 @@ Holder<Palette> GameData::GetPalette(const ResRef& resname)
 	return palette;
 }
 
-Item* GameData::GetItem(const ResRef &resname, bool silent)
+Item* GameData::GetItem(const ResRef& resname, bool silent)
 {
 	if (resname.IsEmpty()) {
 		return nullptr;
 	}
 
-	Item *item = ItemCache.GetResource(resname);
+	Item* item = ItemCache.GetResource(resname);
 	if (item) {
 		return item;
 	}
@@ -181,18 +182,18 @@ Item* GameData::GetItem(const ResRef &resname, bool silent)
 }
 
 //you can supply name for faster access
-void GameData::FreeItem(Item const* /*itm*/, const ResRef &name, bool free)
+void GameData::FreeItem(Item const* /*itm*/, const ResRef& name, bool free)
 {
 	ItemCache.DecRef(name, free);
 }
 
-Spell* GameData::GetSpell(const ResRef &resname, bool silent)
+Spell* GameData::GetSpell(const ResRef& resname, bool silent)
 {
 	if (resname.IsEmpty()) {
 		return nullptr;
 	}
 
-	Spell *spell = SpellCache.GetResource(resname);
+	Spell* spell = SpellCache.GetResource(resname);
 	if (spell) {
 		return spell;
 	}
@@ -213,14 +214,14 @@ Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 	return newSpell;
 }
 
-void GameData::FreeSpell(const Spell* /*spl*/, const ResRef &name, bool free)
+void GameData::FreeSpell(const Spell* /*spl*/, const ResRef& name, bool free)
 {
 	SpellCache.DecRef(name, free);
 }
 
-Effect* GameData::GetEffect(const ResRef &resname)
+Effect* GameData::GetEffect(const ResRef& resname)
 {
-	const Effect *effect = EffectCache.GetResource(resname);
+	const Effect* effect = EffectCache.GetResource(resname);
 	if (effect) {
 		return new Effect(*effect);
 	}
@@ -247,25 +248,25 @@ Effect* GameData::GetEffect(const ResRef &resname)
 	return effectCopy;
 }
 
-void GameData::FreeEffect(const Effect* /*eff*/, const ResRef &name, bool free)
+void GameData::FreeEffect(const Effect* /*eff*/, const ResRef& name, bool free)
 {
 	EffectCache.DecRef(name, free);
 }
 
 //if the default setup doesn't fit for an animation
 //create a vvc for it!
-ScriptedAnimation* GameData::GetScriptedAnimation(const ResRef &effect, bool doublehint)
+ScriptedAnimation* GameData::GetScriptedAnimation(const ResRef& effect, bool doublehint)
 {
-	ScriptedAnimation *ret = NULL;
+	ScriptedAnimation* ret = NULL;
 
-	if (Exists( effect, IE_VVC_CLASS_ID, true ) ) {
-		DataStream *ds = GetResourceStream(effect, IE_VVC_CLASS_ID);
+	if (Exists(effect, IE_VVC_CLASS_ID, true)) {
+		DataStream* ds = GetResourceStream(effect, IE_VVC_CLASS_ID);
 		ret = new ScriptedAnimation(ds);
 	} else {
 		auto af = GetFactoryResourceAs<AnimationFactory>(effect, IE_BAM_CLASS_ID);
 		if (af) {
 			ret = new ScriptedAnimation();
-			ret->LoadAnimationFactory(*af, doublehint?2:0);
+			ret->LoadAnimationFactory(*af, doublehint ? 2 : 0);
 		}
 	}
 	if (ret) {
@@ -299,15 +300,15 @@ VEFObject* GameData::GetVEFObject(const ResRef& vefRef, bool doublehint)
 
 // Return single BAM frame as a sprite. Use if you want one frame only,
 // otherwise it's not efficient
-Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int frame, bool silent)
+Holder<Sprite2D> GameData::GetBAMSprite(const ResRef& resRef, int cycle, int frame, bool silent)
 {
 	Holder<Sprite2D> tspr;
 	auto af = GetFactoryResourceAs<const AnimationFactory>(resRef, IE_BAM_CLASS_ID, silent);
 	if (!af) return nullptr;
 	if (cycle == -1)
-		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );
+		tspr = af->GetFrameWithoutCycle((unsigned short) frame);
 	else
-		tspr = af->GetFrame( (unsigned short) frame, (unsigned char) cycle );
+		tspr = af->GetFrame((unsigned short) frame, (unsigned char) cycle);
 	return tspr;
 }
 
@@ -334,39 +335,39 @@ Factory::object_t GameData::GetFactoryResource(const ResRef& resName, SClass_ID 
 	if (objectIndex != -1) return factory.GetFactoryObject(objectIndex);
 
 	switch (type) {
-	case IE_BAM_CLASS_ID:
-	{
-		DataStream* str = GetResourceStream(resName, type, silent);
-		if (str) {
-			auto importer = GetImporter<AnimationMgr>(IE_BAM_CLASS_ID, str);
-			if (importer == nullptr) {
-				return nullptr;
+		case IE_BAM_CLASS_ID:
+			{
+				DataStream* str = GetResourceStream(resName, type, silent);
+				if (str) {
+					auto importer = GetImporter<AnimationMgr>(IE_BAM_CLASS_ID, str);
+					if (importer == nullptr) {
+						return nullptr;
+					}
+
+					auto af = importer->GetAnimationFactory(resName);
+					factory.AddFactoryObject(af);
+					return af;
+				}
+				return NULL;
 			}
+		case IE_BMP_CLASS_ID:
+			{
+				ResourceHolder<ImageMgr> img = GetResourceHolder<ImageMgr>(resName, silent);
+				if (img) {
+					auto fact = img->GetImageFactory(resName);
+					factory.AddFactoryObject(fact);
+					return fact;
+				}
 
-			auto af = importer->GetAnimationFactory(resName);
-			factory.AddFactoryObject(af);
-			return af;
-		}
-		return NULL;
-	}
-	case IE_BMP_CLASS_ID:
-	{
-		ResourceHolder<ImageMgr> img = GetResourceHolder<ImageMgr>(resName, silent);
-		if (img) {
-			auto fact = img->GetImageFactory(resName);
-			factory.AddFactoryObject(fact);
-			return fact;
-		}
-
-		return NULL;
-	}
-	default:
-		Log(MESSAGE, "KEYImporter", "{} files are not supported!", TypeExt(type));
-		return nullptr;
+				return NULL;
+			}
+		default:
+			Log(MESSAGE, "KEYImporter", "{} files are not supported!", TypeExt(type));
+			return nullptr;
 	}
 }
 
-Store* GameData::GetStore(const ResRef &resRef)
+Store* GameData::GetStore(const ResRef& resRef)
 {
 	StoreMap::iterator it = stores.find(resRef);
 	if (it != stores.end()) {
@@ -387,7 +388,7 @@ Store* GameData::GetStore(const ResRef &resRef)
 	if (store == nullptr) {
 		return nullptr;
 	}
-	
+
 	store->Name = resRef;
 	stores[store->Name] = store;
 	return store;
@@ -446,7 +447,7 @@ void GameData::ReadItemSounds()
 	}
 }
 
-bool GameData::GetItemSound(ResRef &Sound, ieDword ItemType, AnimRef ID, ieDword Col)
+bool GameData::GetItemSound(ResRef& Sound, ieDword ItemType, AnimRef ID, ieDword Col)
 {
 	Sound.Reset();
 
@@ -461,7 +462,7 @@ bool GameData::GetItemSound(ResRef &Sound, ieDword ItemType, AnimRef ID, ieDword
 	if (!ID.IsEmpty() && ID[1] == 'A') {
 		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A' (pst)
 		//item animation types
-		ItemType = ItemSounds.size()-4 + ID[0]-'1';
+		ItemType = ItemSounds.size() - 4 + ID[0] - '1';
 	}
 
 	if (ItemType >= (ieDword) ItemSounds.size()) {
@@ -506,7 +507,7 @@ bool GameData::HasInfravision(const std::string& raceName)
 	return racialInfravision->QueryFieldSigned<int>(raceName, "VALUE") & 1;
 }
 
-int GameData::GetSpellAbilityDie(const Actor *target, int which)
+int GameData::GetSpellAbilityDie(const Actor* target, int which)
 {
 	AutoTable spellAbilityDie = LoadTable("clssplab", true);
 	if (!spellAbilityDie) {
@@ -527,7 +528,7 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 	return trapSaveBonus->QueryFieldSigned<int>(level - 1, cls - 1);
 }
 
-int GameData::GetTrapLimit(Scriptable *trapper)
+int GameData::GetTrapLimit(Scriptable* trapper)
 {
 	AutoTable trapLimit = LoadTable("traplimt", true);
 
@@ -535,7 +536,7 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 		return 6; // not using table default, since EE's file has it at 0
 	}
 
-	const Actor *caster = (Actor *) trapper;
+	const Actor* caster = (Actor*) trapper;
 	ieDword kit = caster->GetStat(IE_KIT);
 	std::string rowName;
 	if (kit != 0x4000) { // KIT_BASECLASS
@@ -704,7 +705,7 @@ int GameData::GetReputationMod(int column)
 }
 
 // reads to and from table of area name mappings for the pst worldmap
-int GameData::GetAreaAlias(const ResRef &areaName)
+int GameData::GetAreaAlias(const ResRef& areaName)
 {
 	static bool ignore = false;
 	if (ignore) {
@@ -970,7 +971,7 @@ ieByte GameData::GetItemAnimation(const ResRef& itemRef)
 const std::vector<ItemUseType>& GameData::GetItemUse()
 {
 	static bool ignore = false;
-	static const std::vector<ItemUseType> NoData{};
+	static const std::vector<ItemUseType> NoData {};
 	if (ignore) {
 		return NoData;
 	}

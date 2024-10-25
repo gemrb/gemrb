@@ -19,19 +19,20 @@
  */
 
 #include "Effect.h"
+
 #include "EffectQueue.h" // this is only needed for a hack in Effect::Persistent
 #include "Interface.h"
 
 namespace GemRB {
 
 //don't modify position in case it was already set
-void Effect::SetPosition(const Point &p)
+void Effect::SetPosition(const Point& p)
 {
 	if (Pos.IsInvalid()) {
 		Pos = p;
 	}
 }
-void Effect::SetSourcePosition(const Point &p)
+void Effect::SetSourcePosition(const Point& p)
 {
 	if (Source.IsInvalid()) {
 		Source = p;
@@ -98,7 +99,7 @@ Effect& Effect::operator=(const Effect& rhs) noexcept
 bool Effect::operator==(const Effect& rhs) const noexcept
 {
 	if (this == &rhs) return true;
-	
+
 	if (Opcode != rhs.Opcode) return false;
 	if (Target != rhs.Target) return false;
 	if (Power != rhs.Power) return false;
@@ -138,20 +139,21 @@ bool Effect::operator==(const Effect& rhs) const noexcept
 	if (RandomValue != rhs.RandomValue) return false;
 	if (SpellLevel != rhs.SpellLevel) return false;
 
-	if (IsVariable && VariableName != rhs.VariableName) return false;
-	else return Resource == rhs.Resource && Resource2 == rhs.Resource2 && Resource3 == rhs.Resource3 && Resource4 == rhs.Resource4;
-	
+	if (IsVariable && VariableName != rhs.VariableName)
+		return false;
+	else
+		return Resource == rhs.Resource && Resource2 == rhs.Resource2 && Resource3 == rhs.Resource3 && Resource4 == rhs.Resource4;
 }
 
 //returns true if the effect supports simplified duration
 bool Effect::HasDuration() const
 {
-	switch(TimingMode) {
-	case FX_DURATION_INSTANT_LIMITED: //simple duration
-	case FX_DURATION_DELAY_LIMITED:   //delayed duration
-	case FX_DURATION_DELAY_PERMANENT: //simple delayed
-	// not supporting FX_DURATION_INSTANT_LIMITED_TICKS, since it's in ticks
-		return true;
+	switch (TimingMode) {
+		case FX_DURATION_INSTANT_LIMITED: //simple duration
+		case FX_DURATION_DELAY_LIMITED: //delayed duration
+		case FX_DURATION_DELAY_PERMANENT: //simple delayed
+			// not supporting FX_DURATION_INSTANT_LIMITED_TICKS, since it's in ticks
+			return true;
 	}
 	return false;
 }
@@ -163,7 +165,7 @@ bool Effect::Persistent() const
 	// but if they weren't processed, e.g. in a global actor, we must save them
 	// TODO: do we really need to special-case this? leaving it for now - fuzzie
 	static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
-	if (Opcode == (ieDword)EffectQueue::ResolveEffect(fx_variable_ref)) {
+	if (Opcode == (ieDword) EffectQueue::ResolveEffect(fx_variable_ref)) {
 		return true;
 	}
 

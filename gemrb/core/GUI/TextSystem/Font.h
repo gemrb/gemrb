@@ -32,10 +32,11 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "globals.h"
 #include "exports.h"
+#include "globals.h"
 
 #include "SpriteSheet.h"
+
 #include "Strings/String.h"
 
 #include <deque>
@@ -57,9 +58,9 @@ enum FontStyle {
 #define IE_FONT_ALIGN_TOP    0x10
 #define IE_FONT_ALIGN_MIDDLE 0x20
 // optimization to make printing faster when text should be on a single line
-#define IE_FONT_SINGLE_LINE  0x40
+#define IE_FONT_SINGLE_LINE 0x40
 // work around to use the region passed to Font::Print as if it were the actual print size when the text cant actually fit the region
-#define IE_FONT_NO_CALC		 0x80
+#define IE_FONT_NO_CALC 0x80
 
 struct Glyph {
 	const Size size;
@@ -69,7 +70,7 @@ struct Glyph {
 	const ieByte* pixels;
 
 	Glyph(const Size& size, Point pos, const ieByte* pixels, ieWord pitch)
-	: size(size), pos(pos), pitch(pitch), pixels(pixels) {};
+		: size(size), pos(pos), pitch(pitch), pixels(pixels) {};
 };
 
 /**
@@ -92,39 +93,42 @@ class GEM_EXPORT Font {
 	 until either the page is full, or until a call to a print method is made.
 	 To avoid generating more than one partial page, subsequent calls to add new glyphs will destroy the partial Sprite (not the source pixels of course)
 	*/
+
 public:
 	struct PrintColors {
 		Color fg;
 		Color bg;
 	};
-	
+
 	struct StringSizeMetrics {
 		// specify behavior of StringSize based on values of struct
 		// StringSize will modify the struct with the results
-		Size size;		// maximum size allowed; updated with actual size <= initial value
+		Size size; // maximum size allowed; updated with actual size <= initial value
 		size_t numChars; // maximum characters to size (0 implies no limit); updated with the count of characters that fit within size <= initial value
 		uint32_t numLines; // maximum number of lines to allow (use 0 for unlimited); updated with the actual number of lines that were used
-		bool forceBreak;// whether or not a break can occur without whitespace; updated to false if initially true and no force break occurred
+		bool forceBreak; // whether or not a break can occur without whitespace; updated to false if initially true and no force break occurred
 	};
 
 private:
 	class GlyphAtlasPage : public SpriteSheet<ieWord> {
-		private:
-			using GlyphMap = std::map<ieWord, Glyph>;
-			GlyphMap glyphs;
-			ieByte* pageData; // current raw page being built
-			int pageXPos = 0; // current position on building page
-			Font* font;
-			Holder<Sprite2D> invertedSheet;
-		public:
-			GlyphAtlasPage(Size pageSize, Font* font);
-			GlyphAtlasPage(const GlyphAtlasPage&) = delete;
-			GlyphAtlasPage& operator=(const GlyphAtlasPage&) = delete;
-			~GlyphAtlasPage() override {
-				if (Sheet == NULL) {
-					free(pageData);
-				}
+	private:
+		using GlyphMap = std::map<ieWord, Glyph>;
+		GlyphMap glyphs;
+		ieByte* pageData; // current raw page being built
+		int pageXPos = 0; // current position on building page
+		Font* font;
+		Holder<Sprite2D> invertedSheet;
+
+	public:
+		GlyphAtlasPage(Size pageSize, Font* font);
+		GlyphAtlasPage(const GlyphAtlasPage&) = delete;
+		GlyphAtlasPage& operator=(const GlyphAtlasPage&) = delete;
+		~GlyphAtlasPage() override
+		{
+			if (Sheet == NULL) {
+				free(pageData);
 			}
+		}
 		bool AddGlyph(ieWord chr, const Glyph& g);
 		const Glyph& GlyphForChr(ieWord chr) const;
 
@@ -140,7 +144,8 @@ private:
 		const Glyph* glyph = nullptr;
 
 		GlyphIndexEntry() noexcept = default;
-		GlyphIndexEntry(ieWord c, ieWord p, const Glyph* g) : chr(c), pageIdx(p), glyph(g) {}
+		GlyphIndexEntry(ieWord c, ieWord p, const Glyph* g)
+			: chr(c), pageIdx(p), glyph(g) {}
 	};
 
 	using GlyphIndex = std::vector<GlyphIndexEntry>;
@@ -164,11 +169,11 @@ private:
 	void CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph*);
 	// Blit to the sprite or screen if canvas is NULL
 	size_t RenderText(const String&, Region&, ieByte alignment, const PrintColors*,
-					  Point* = NULL, ieByte** canvas = NULL, bool grow = false) const;
+			  Point* = NULL, ieByte** canvas = NULL, bool grow = false) const;
 	// render a single line of text. called by RenderText()
 	size_t RenderLine(const String& string, const Region& rgn,
-					  Point& dp, const PrintColors*, ieByte** canvas = NULL) const;
-	
+			  Point& dp, const PrintColors*, ieByte** canvas = NULL) const;
+
 	size_t Print(Region rgn, const String& string, ieByte Alignment, const PrintColors* colors, Point* point = nullptr) const;
 
 public:
@@ -185,17 +190,17 @@ public:
 	//allow reading but not setting glyphs
 	virtual const Glyph& GetGlyph(ieWord chr) const;
 
-	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
+	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const { return 0; };
 
 	// return the number of glyphs printed
 	// the "point" parameter can be passed with a start point for rendering
 	// it will be filled with the point inside 'rgn' where the string ends upon return
-	
+
 	size_t Print(const Region& rgn, const String& string, ieByte Alignment, Point* point = nullptr) const;
 	size_t Print(const Region& rgn, const String& string, ieByte Alignment, const PrintColors& colors, Point* point = nullptr) const;
-	
+
 	size_t Print(Region rgn, const String& string,
-				 Holder<Palette> hicolor, ieByte Alignment, Point* point = nullptr) const;
+		     Holder<Palette> hicolor, ieByte Alignment, Point* point = nullptr) const;
 
 	/** Returns size of the string rendered in this font in pixels */
 	Size StringSize(const String&, StringSizeMetrics* metrics = NULL) const;

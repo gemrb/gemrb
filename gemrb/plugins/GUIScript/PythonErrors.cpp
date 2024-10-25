@@ -25,7 +25,7 @@ namespace GemRB {
 static PyObject* PyError(PyObject* err, const char* msg)
 {
 	PyErr_Print();
-	PyErr_SetString( err, msg );
+	PyErr_SetString(err, msg);
 	return NULL; // must return NULL
 }
 

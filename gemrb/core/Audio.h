@@ -21,17 +21,16 @@
 #ifndef AUDIO_H_INCLUDED
 #define AUDIO_H_INCLUDED
 
-#include <vector>
-
 #include "globals.h"
 
 #include "EnumIndex.h"
+#include "Holder.h"
 #include "MapReverb.h"
 #include "Plugin.h"
 #include "Resource.h"
-#include "Holder.h"
 
 #include <string>
+#include <vector>
 
 namespace GemRB {
 
@@ -39,7 +38,7 @@ namespace GemRB {
 #define GEM_SND_LOOPING 2
 #define GEM_SND_SPEECH  4 // STRING_FLAGS::SPEECH
 #define GEM_SND_QUEUE   8
-#define GEM_SND_EFX    16
+#define GEM_SND_EFX     16
 
 #define GEM_SND_VOL_MUSIC    1
 #define GEM_SND_VOL_AMBIENTS 2
@@ -93,7 +92,7 @@ class GEM_EXPORT Channel {
 public:
 	Channel() = default;
 	explicit Channel(std::string str)
-	: name(std::move(str))
+		: name(std::move(str))
 	{}
 
 	const std::string& getName() const { return name; }
@@ -112,6 +111,7 @@ private:
 class GEM_EXPORT Audio : public Plugin {
 public:
 	static const TypeID ID;
+
 public:
 	virtual bool Init(void) = 0;
 	virtual Holder<SoundHandle> Play(
@@ -119,8 +119,7 @@ public:
 		SFXChannel channel,
 		const Point&,
 		unsigned int flags = 0,
-		tick_t *length = nullptr
-	) = 0;
+		tick_t* length = nullptr) = 0;
 	Holder<SoundHandle> PlayMB(
 		const String& resource,
 		SFXChannel channel,
@@ -128,8 +127,10 @@ public:
 		unsigned int flags = 0,
 		tick_t* length = nullptr);
 	Holder<SoundHandle> Play(StringView ResRef, SFXChannel channel, tick_t* length = nullptr)
-			{ return Play(ResRef, channel, Point(), 0, length); }
-	
+	{
+		return Play(ResRef, channel, Point(), 0, length);
+	}
+
 	virtual AmbientMgr* GetAmbientMgr() { return ambim; }
 	virtual void UpdateVolume(unsigned int flags = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS) = 0;
 	virtual bool CanPlay() = 0;
@@ -141,14 +142,14 @@ public:
 	virtual int CreateStream(ResourceHolder<SoundMgr>) = 0;
 	virtual void UpdateListenerPos(const Point&) = 0;
 	virtual Point GetListenerPos() = 0;
-	virtual bool ReleaseStream(int stream, bool HardStop=false ) = 0;
+	virtual bool ReleaseStream(int stream, bool HardStop = false) = 0;
 	virtual int SetupNewStream(int x, int y, int z,
-				ieWord gain, bool point, int ambientRange) = 0;
+				   ieWord gain, bool point, int ambientRange) = 0;
 	virtual tick_t QueueAmbient(int stream, const ResRef& sound) = 0;
 	virtual void SetAmbientStreamVolume(int stream, int volume) = 0;
 	virtual void SetAmbientStreamPitch(int stream, int pitch) = 0;
 	virtual void QueueBuffer(int stream, unsigned short bits,
-				int channels, short* memory, int size, int samplerate) = 0;
+				 int channels, short* memory, int size, int samplerate) = 0;
 	virtual void UpdateMapAmbient(const MapReverbProperties&) {};
 
 	void UpdateChannel(const std::string& name, int volume, float reverb);

@@ -40,11 +40,11 @@ class Map;
 
 class GEM_EXPORT MapMgr : public ImporterBase {
 public:
-	virtual bool ChangeMap(Map *map, bool day_or_night) = 0;
+	virtual bool ChangeMap(Map* map, bool day_or_night) = 0;
 	virtual Map* GetMap(const ResRef& ResRef, bool day_or_night) = 0;
 
-	virtual int GetStoredFileSize(Map *map) = 0;
-	virtual int PutArea(DataStream* stream, const Map *map) const = 0;
+	virtual int GetStoredFileSize(Map* map) = 0;
+	virtual int PutArea(DataStream* stream, const Map* map) const = 0;
 };
 
 }

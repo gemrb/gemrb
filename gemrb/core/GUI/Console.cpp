@@ -21,12 +21,13 @@
 #include "GUI/Console.h"
 
 #include "Interface.h"
+
 #include "Streams/FileStream.h"
 
 namespace GemRB {
 
 Console::Console(const Region& frame, TextArea* ta)
-: TextEdit(frame, -1, Point(3, 3))
+	: TextEdit(frame, -1, Point(3, 3))
 {
 	ControlEventHandler onReturn = [this](const Control*) {
 		Execute(QueryText());
@@ -47,7 +48,8 @@ Console::Console(const Region& frame, TextArea* ta)
 				SetText(c->QueryText());
 			}
 			SetFocus();
-		}, TextArea::Action::Select);
+		},
+				    TextArea::Action::Select);
 	}
 
 	LoadHistory();
@@ -66,7 +68,7 @@ void Console::UpdateTextArea()
 			options.push_back(History.Retrieve(i));
 			options.back().first = int(i) + 1;
 		}
-		
+
 		textArea->SetValue(INVALID_VALUE);
 		textArea->SetSelectOptions(options, false);
 		// TODO: if we add a method to TextArea to return the TextContainer for a given select option
@@ -150,11 +152,11 @@ void Console::SaveHistory() const noexcept
 	size_t histSize = std::min(History.Size(), HistoryMaxSize);
 	for (size_t i = histSize - 1; signed(i) >= 0; i--) {
 		const String& cmd = History.Retrieve(i).second;
-		commands += fmt::format("{}\n", fmt::WideToChar{cmd});
+		commands += fmt::format("{}\n", fmt::WideToChar { cmd });
 	}
 
 	path_t filePath = PathJoin<false>(core->config.GamePath, "gemrb_console.txt");
-	FileStream *histFile = new FileStream();
+	FileStream* histFile = new FileStream();
 	if (histFile->Create(filePath)) {
 		histFile->Write(commands.c_str(), commands.size());
 		histFile->Close();
@@ -165,7 +167,7 @@ void Console::SaveHistory() const noexcept
 void Console::LoadHistory()
 {
 	path_t filePath = PathJoin(core->config.GamePath, "gemrb_console.txt");
-	FileStream *histFile = FileStream::OpenFile(filePath);
+	FileStream* histFile = FileStream::OpenFile(filePath);
 	if (histFile) {
 		std::string line;
 		while (histFile->ReadLine(line) != DataStream::Error) {

@@ -27,14 +27,14 @@ namespace GemRB {
 
 class MVEPlayer {
 protected:
-	class MVEPlay *host;
-	char *buffer;
+	class MVEPlay* host;
+	char* buffer;
 	unsigned int buffersize;
 	unsigned int chunk_size;
 	unsigned int chunk_offset;
 
-	_GstMveDemuxStream *video_data;
-	unsigned short *video_back_buf;
+	_GstMveDemuxStream* video_data;
+	unsigned short* video_back_buf;
 	bool truecolour;
 	bool video_rendered_frame;
 
@@ -42,7 +42,7 @@ protected:
 	int audio_num_channels;
 	unsigned short audio_sample_rate;
 	unsigned short audio_sample_size;
-	short *audio_buffer;
+	short* audio_buffer;
 	int audio_stream;
 
 	bool playsound;
@@ -53,7 +53,7 @@ protected:
 	bool verify_header();
 	bool process_chunk();
 	bool process_segment(unsigned short len,
-			unsigned char type, unsigned char version);
+			     unsigned char type, unsigned char version);
 
 	void segment_create_timer();
 
@@ -68,12 +68,12 @@ protected:
 	void segment_audio_data(bool silent);
 
 public:
-	explicit MVEPlayer(class MVEPlay *file);
+	explicit MVEPlayer(class MVEPlay* file);
 	~MVEPlayer();
 
 	bool start_playback();
 	bool next_frame();
-	
+
 	bool is_truecolour() const { return truecolour; }
 };
 

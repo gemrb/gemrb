@@ -21,7 +21,6 @@
 #define PATHFINDER_H
 
 #include "EnumFlags.h"
-
 #include "Orientation.h"
 #include "Region.h"
 #include "Resource.h"
@@ -143,19 +142,20 @@ enum {
 // to sort nodes by their (heuristic) distance from the destination
 class PQNode {
 public:
-	PQNode(Point p, float_t l) : point(p), dist(l) {};
-	PQNode() : point(Point(0, 0)), dist(0) {};
+	PQNode(Point p, float_t l)
+		: point(p), dist(l) {};
+	PQNode()
+		: point(Point(0, 0)), dist(0) {};
 
 	Point point;
 	float_t dist;
 
-	friend bool operator < (const PQNode &lhs, const PQNode &rhs) { return lhs.dist < rhs.dist;}
-	friend bool operator > (const PQNode &lhs, const PQNode &rhs){ return rhs < lhs; }
-	friend bool operator <= (const PQNode &lhs, const PQNode &rhs){ return !(lhs > rhs); }
-	friend bool operator >= (const PQNode &lhs, const PQNode &rhs){ return !(lhs < rhs); }
-	friend bool operator == (const PQNode &lhs, const PQNode &rhs) { return lhs.point == rhs.point; }
-	friend bool operator != (const PQNode &lhs, const PQNode &rhs) { return !(lhs == rhs); }
-
+	friend bool operator<(const PQNode& lhs, const PQNode& rhs) { return lhs.dist < rhs.dist; }
+	friend bool operator>(const PQNode& lhs, const PQNode& rhs) { return rhs < lhs; }
+	friend bool operator<=(const PQNode& lhs, const PQNode& rhs) { return !(lhs > rhs); }
+	friend bool operator>=(const PQNode& lhs, const PQNode& rhs) { return !(lhs < rhs); }
+	friend bool operator==(const PQNode& lhs, const PQNode& rhs) { return lhs.point == rhs.point; }
+	friend bool operator!=(const PQNode& lhs, const PQNode& rhs) { return !(lhs == rhs); }
 };
 
 }

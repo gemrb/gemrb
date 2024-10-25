@@ -21,9 +21,9 @@
 #ifndef P2DAIMPORTER_H
 #define P2DAIMPORTER_H
 
-#include "TableMgr.h"
-
 #include "globals.h"
+
+#include "TableMgr.h"
 
 #include <cstring>
 #include <vector>
@@ -39,6 +39,7 @@ private:
 	std::vector<cell_t> rowNames;
 	std::vector<row_t> rows;
 	std::string defVal;
+
 public:
 	static index_t npos;
 

@@ -43,4 +43,4 @@ bool SetDebugMode(DebugMode modes, BitOp op = BitOp::SET) noexcept;
 
 }
 
-#endif  // DEBUG_H
+#endif // DEBUG_H

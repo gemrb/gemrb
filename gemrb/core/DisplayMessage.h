@@ -27,14 +27,15 @@
 #ifndef DISPLAYMESSAGE_H
 #define DISPLAYMESSAGE_H
 
-#include "EnumIndex.h"
+#include "RGBAColor.h"
 #include "exports.h"
 #include "strrefs.h"
-#include "StringMgr.h"
-#include "RGBAColor.h"
 
-#include <string>
+#include "EnumIndex.h"
+#include "StringMgr.h"
+
 #include <map>
+#include <string>
 
 namespace GemRB {
 
@@ -63,8 +64,8 @@ enum class GUIColors : uint8_t {
 	FLOAT_TXT_OTHER,
 	TRAPCOLOR,
 	HOVERTARGETABLE,
-	MSG,       // non-dialog actor console messages: existence sounds, etc.
-	MSGPARTY,  // non-dialog party characters console messages: selection subtitles, etc.
+	MSG, // non-dialog actor console messages: existence sounds, etc.
+	MSGPARTY, // non-dialog party characters console messages: selection subtitles, etc.
 	TA_LB_OPTIONS, // textarea listbox options
 	TA_LB_HOVER,
 	TA_LB_SELECTED,
@@ -74,8 +75,7 @@ enum class GUIColors : uint8_t {
 
 class Scriptable;
 
-class GEM_EXPORT DisplayMessage
-{
+class GEM_EXPORT DisplayMessage {
 private:
 	struct StrRefs {
 		std::string loadedTable;
@@ -90,16 +90,16 @@ private:
 	};
 	static StrRefs SRefs;
 	static void LoadStringRefs();
-	
+
 	static bool EnableRollFeedback();
 	static String ResolveStringRef(ieStrRef);
-	
+
 	/** returns the speaker's color and name */
-	Color GetSpeakerColor(String& name, const Scriptable *&speaker) const;
+	Color GetSpeakerColor(String& name, const Scriptable*& speaker) const;
 	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(String text, const Color &color, const Scriptable *speaker) const;
+	void DisplayStringName(String text, const Color& color, const Scriptable* speaker) const;
 	/** displays a string in the textarea */
-	void DisplayString(String text, const Color &color, Scriptable *target) const;
+	void DisplayString(String text, const Color& color, Scriptable* target) const;
 	std::map<GUIColors, std::string> GetAllColors() const;
 	const std::map<GUIColors, std::string> GUIColorNames = DisplayMessage::GetAllColors();
 
@@ -111,20 +111,20 @@ public:
 	Color GetColor(const GUIColors color) const;
 	const std::string& GetColorName(GUIColors idx) const;
 	/** displays any string in the textarea */
-	void DisplayMarkupString(String txt) const;	
+	void DisplayMarkupString(String txt) const;
 	/** displays a string constant in the textarea */
 	void DisplayConstantString(HCStrings stridx, GUIColors color, Scriptable* speaker = nullptr) const;
 	/** displays a string constant followed by a number in the textarea */
-	void DisplayConstantStringValue(HCStrings stridx, GUIColors color, ieDword value) const;	
+	void DisplayConstantStringValue(HCStrings stridx, GUIColors color, ieDword value) const;
 	/** displays actor name - action : parameter */
 	void DisplayConstantStringName(HCStrings stridx, GUIColors color, const Scriptable* speaker) const;
 	void DisplayConstantStringName(HCStrings stridx, const Color& color, const Scriptable* speaker) const;
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
-	void DisplayConstantStringAction(HCStrings stridx, GUIColors color, const Scriptable* actor, const Scriptable* target) const;	
+	void DisplayConstantStringAction(HCStrings stridx, GUIColors color, const Scriptable* actor, const Scriptable* target) const;
 	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(String text, GUIColors color, const Scriptable *speaker) const;
-	void DisplayStringName(ieStrRef stridx, GUIColors color, const Scriptable *speaker, STRING_FLAGS flags) const;
-	void DisplayStringName(ieStrRef stridx, const Color &color, const Scriptable *speaker, STRING_FLAGS flags) const;
+	void DisplayStringName(String text, GUIColors color, const Scriptable* speaker) const;
+	void DisplayStringName(ieStrRef stridx, GUIColors color, const Scriptable* speaker, STRING_FLAGS flags) const;
+	void DisplayStringName(ieStrRef stridx, const Color& color, const Scriptable* speaker, STRING_FLAGS flags) const;
 	/** displays a string constant in the textarea, starting with speaker's name, also replaces one numeric value (it is a format string) */
 	void DisplayConstantStringNameValue(HCStrings stridx, GUIColors color, const Scriptable* speaker, int value) const;
 	/** displays actor name - action : parameter */
@@ -132,13 +132,14 @@ public:
 	/** displays a string in the textarea */
 	void DisplayString(const String& text) const;
 	void DisplayString(ieStrRef stridx, GUIColors color, STRING_FLAGS flags) const;
-	void DisplayString(const String& text, GUIColors color, Scriptable *target) const;
+	void DisplayString(const String& text, GUIColors color, Scriptable* target) const;
 	void DisplayString(ieStrRef stridx, const Color& color, STRING_FLAGS flags) const;
 	void DisplayMsgAtLocation(HCStrings strIdx, int type, Scriptable* owner, const Scriptable* trigger = nullptr, GUIColors color = GUIColors::LIGHTGREY) const;
 	void DisplayMsgCentered(HCStrings strIdx, int type, GUIColors color = GUIColors::LIGHTGREY) const;
 	/** iwd2 hidden roll debugger */
-	template<typename ...ARGS>
-	void DisplayRollStringName(ieStrRef stridx, GUIColors color, const Scriptable *speaker, ARGS&& ...args) const {
+	template<typename... ARGS>
+	void DisplayRollStringName(ieStrRef stridx, GUIColors color, const Scriptable* speaker, ARGS&&... args) const
+	{
 		if (EnableRollFeedback()) {
 			String fmt = ResolveStringRef(stridx);
 			String formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
@@ -147,7 +148,7 @@ public:
 	}
 };
 
-extern GEM_EXPORT DisplayMessage * displaymsg;
+extern GEM_EXPORT DisplayMessage* displaymsg;
 
 }
 

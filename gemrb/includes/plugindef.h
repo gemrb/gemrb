@@ -101,15 +101,15 @@
 #ifndef PLUGINDEF_H
 #define PLUGINDEF_H
 
+#include "Platform.h"
 #include "exports.h"
 
 #include "InterfaceConfig.h"
 #include "PluginMgr.h"
-#include "Platform.h"
 
 namespace GemRB {
 
-template <typename T>
+template<typename T>
 struct CreatePlugin {
 	static PluginHolder<Plugin> func()
 	{
@@ -117,9 +117,9 @@ struct CreatePlugin {
 	}
 };
 
-template <typename Res>
+template<typename Res>
 struct CreateResource {
-	static ResourceHolder<Resource> func(DataStream *str)
+	static ResourceHolder<Resource> func(DataStream* str)
 	{
 		auto res = std::make_shared<Res>();
 		if (res->Open(str)) {
@@ -136,81 +136,86 @@ GEM_EXPORT_DLL const char* GemRBPlugin_Version();
 
 #ifndef STATIC_LINK
 
-#ifdef WIN32
+	#ifdef WIN32
 
-BOOL APIENTRY DllMain(HANDLE, DWORD,	LPVOID);
-BOOL APIENTRY DllMain(HANDLE /*hModule*/, DWORD  /*ul_reason_for_call*/,
-	LPVOID /*lpReserved*/)
+BOOL APIENTRY DllMain(HANDLE, DWORD, LPVOID);
+BOOL APIENTRY DllMain(HANDLE /*hModule*/, DWORD /*ul_reason_for_call*/,
+		      LPVOID /*lpReserved*/)
 {
 	return true;
 }
 
-#endif
+	#endif
 
 GEM_EXPORT_DLL const char* GemRBPlugin_Version()
 {
 	return VERSION_GEMRB;
 }
 
-#define GEMRB_PLUGIN(id, desc)					\
-	namespace { using namespace GemRB;			\
-	GEM_EXPORT_DLL PluginID GemRBPlugin_ID() {		\
-		return id;					\
-	}							\
-	GEM_EXPORT_DLL const char* GemRBPlugin_Description() {	\
-		return desc;					\
-	}							\
-	GEM_EXPORT_DLL bool GemRBPlugin_Register(PluginMgr *mgr) {
+	#define GEMRB_PLUGIN(id, desc) \
+		namespace { \
+			using namespace GemRB; \
+			GEM_EXPORT_DLL PluginID GemRBPlugin_ID() \
+			{ \
+				return id; \
+			} \
+			GEM_EXPORT_DLL const char* GemRBPlugin_Description() \
+			{ \
+				return desc; \
+			} \
+			GEM_EXPORT_DLL bool GemRBPlugin_Register(PluginMgr* mgr) \
+			{
+	#define PLUGIN_CLASS(id, cls) \
+		if (!mgr->RegisterPlugin(id, &CreatePlugin<cls>::func)) \
+			return false;
 
-#define PLUGIN_CLASS(id, cls)					\
-	if (!mgr->RegisterPlugin(id, &CreatePlugin<cls>::func ))\
-		return false;
+	#define PLUGIN_DRIVER(cls, name) \
+		mgr->RegisterDriver(&cls::ID, name, &CreatePlugin<cls>::func);
 
-#define PLUGIN_DRIVER(cls, name)					\
-	mgr->RegisterDriver(&cls::ID, name, &CreatePlugin<cls>::func ); \
+	#define PLUGIN_RESOURCE(cls, ext) \
+		mgr->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext);
 
-#define PLUGIN_RESOURCE(cls, ext)				\
-	mgr->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext);
+	#define PLUGIN_IE_RESOURCE(cls, ext, ie_id) \
+		mgr->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext, ie_id);
 
-#define PLUGIN_IE_RESOURCE(cls, ext, ie_id)			\
-	mgr->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext, ie_id);
-
-#define PLUGIN_INITIALIZER(func)				\
+	#define PLUGIN_INITIALIZER(func) \
 		mgr->RegisterInitializer(func);
-#define PLUGIN_CLEANUP(func)					\
+	#define PLUGIN_CLEANUP(func) \
 		mgr->RegisterCleanup(func);
 
-		/* mgr is not null (this makes mgr used) */
-#define END_PLUGIN()						\
-		return mgr!=0;					\
-	}							\
-	}
+	/* mgr is not null (this makes mgr used) */
+	#define END_PLUGIN() \
+		return mgr != 0; \
+		} \
+		}
 
 #else /* STATIC_LINK */
 
-#define GEMRB_PLUGIN(id, desc)	\
-	namespace { using namespace GemRB;			\
+	#define GEMRB_PLUGIN(id, desc) \
+		namespace { \
+			using namespace GemRB; \
 		bool doRegisterPlugin IGNORE_UNUSED = (
 
-#define PLUGIN_CLASS(id, cls)					\
-		PluginMgr::Get()->RegisterPlugin(id, &CreatePlugin<cls>::func ),
+	#define PLUGIN_CLASS(id, cls) \
+		PluginMgr::Get()->RegisterPlugin(id, &CreatePlugin<cls>::func),
 
-#define PLUGIN_DRIVER(cls, name)					\
-		PluginMgr::Get()->RegisterDriver(&cls::ID, name, &CreatePlugin<cls>::func ),
+	#define PLUGIN_DRIVER(cls, name) \
+		PluginMgr::Get()->RegisterDriver(&cls::ID, name, &CreatePlugin<cls>::func),
 
-#define PLUGIN_RESOURCE(cls, ext)				\
+	#define PLUGIN_RESOURCE(cls, ext) \
 		PluginMgr::Get()->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext),
 
-#define PLUGIN_IE_RESOURCE(cls, ext, ie_id)			\
+	#define PLUGIN_IE_RESOURCE(cls, ext, ie_id) \
 		PluginMgr::Get()->RegisterResource(&cls::ID, &CreateResource<cls>::func, ext, ie_id),
 
-#define PLUGIN_INITIALIZER(func)				\
+	#define PLUGIN_INITIALIZER(func) \
 		PluginMgr::Get()->RegisterInitializer(func),
-#define PLUGIN_CLEANUP(func)					\
+	#define PLUGIN_CLEANUP(func) \
 		PluginMgr::Get()->RegisterCleanup(func),
 
-#define END_PLUGIN()						\
-		true); }
+	#define END_PLUGIN() \
+		true); \
+		}
 
 #endif /* STATIC_LINK */
 

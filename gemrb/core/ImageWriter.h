@@ -21,6 +21,7 @@
 
 #include "Plugin.h"
 #include "Sprite2D.h"
+
 #include "Streams/DataStream.h"
 
 namespace GemRB {
@@ -28,7 +29,7 @@ namespace GemRB {
 class GEM_EXPORT ImageWriter : public Plugin {
 public:
 	/** Writes an Sprite2D to a stream and frees the sprite. */
-	virtual void PutImage(DataStream *output, Holder<Sprite2D> sprite) = 0;
+	virtual void PutImage(DataStream* output, Holder<Sprite2D> sprite) = 0;
 };
 
 }

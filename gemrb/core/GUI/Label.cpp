@@ -23,6 +23,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Sprite2D.h"
+
 #include "GUI/Window.h"
 
 namespace GemRB {
@@ -33,7 +34,7 @@ Label::Label(const Region& frame, Holder<Font> fnt, const String& string)
 	ControlType = IE_GUI_LABEL;
 	font = std::move(fnt);
 
-	SetAlignment(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE);
+	SetAlignment(IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE);
 	SetFlags(IgnoreEvents, BitOp::OR);
 	SetText(string);
 }
@@ -53,8 +54,7 @@ void Label::DrawSelf(const Region& rgn, const Region& /*clip*/)
 void Label::SetText(String string)
 {
 	Text = std::move(string);
-	if (Alignment == IE_FONT_ALIGN_CENTER
-		&& core->HasFeature( GFFlags::LOWER_LABEL_TEXT )) {
+	if (Alignment == IE_FONT_ALIGN_CENTER && core->HasFeature(GFFlags::LOWER_LABEL_TEXT)) {
 		StringToLower(Text);
 	}
 	MarkDirty();

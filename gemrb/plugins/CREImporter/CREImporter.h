@@ -55,59 +55,61 @@ private:
 	int QWPCount = 0; // weapons
 	int QSPCount = 0; // spells
 	int QITCount = 0; // items
+
 public:
 	CREImporter(void);
 
 	bool Import(DataStream* stream) override;
 	Actor* GetActor(unsigned char is_in_party) override;
 
-	ieWord FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const override;
+	ieWord FindSpellType(const ResRef& name, unsigned short& level, unsigned int clsMask, unsigned int kit) const override;
 
 	//returns saved size, updates internal offsets before save
-	int GetStoredFileSize(const Actor *ac) override;
+	int GetStoredFileSize(const Actor* ac) override;
 	//saves file
-	int PutActor(DataStream *stream, const Actor *actor, bool chr = false) override;
+	int PutActor(DataStream* stream, const Actor* actor, bool chr = false) override;
+
 private:
 	/** sets up some variables based on creature version for serializing the object */
 	void SetupSlotCounts();
 	/** writes out the chr header */
-	void WriteChrHeader(DataStream *stream, const Actor *actor);
+	void WriteChrHeader(DataStream* stream, const Actor* actor);
 	/** reads the chr header data (into PCStatStructs) */
-	void ReadChrHeader(Actor *actor);
+	void ReadChrHeader(Actor* actor);
 	/** skips the chr header */
-	bool SeekCreHeader(char *Signature);
-	void GetActorPST(Actor *actor);
+	bool SeekCreHeader(char* Signature);
+	void GetActorPST(Actor* actor);
 	size_t GetActorGemRB(Actor* act);
-	void GetActorBG(Actor *actor);
-	void GetActorIWD1(Actor *actor);
-	void GetActorIWD2(Actor *actor);
-	ieDword GetIWD2SpellpageSize(const Actor *actor, ieIWD2SpellType type, int level) const;
-	void GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int count);
+	void GetActorBG(Actor* actor);
+	void GetActorIWD1(Actor* actor);
+	void GetActorIWD2(Actor* actor);
+	ieDword GetIWD2SpellpageSize(const Actor* actor, ieIWD2SpellType type, int level) const;
+	void GetIWD2Spellpage(Actor* act, ieIWD2SpellType type, int level, int count);
 	void ReadInventory(Actor*, size_t);
 	void ReadSpellbook(Actor* act);
 	void ReadEffects(Actor* actor);
 	Effect* GetEffect();
-	void ReadScript(Actor *actor, int ScriptLevel);
-	void ReadDialog(Actor *actor);
+	void ReadScript(Actor* actor, int ScriptLevel);
+	void ReadDialog(Actor* actor);
 	CREKnownSpell* GetKnownSpell();
-	CRESpellMemorization* GetSpellMemorization(Actor *act);
+	CRESpellMemorization* GetSpellMemorization(Actor* act);
 	CREMemorizedSpell* GetMemorizedSpell();
 	CREItem* GetItem();
 	void SetupColor(ieDword&) const;
 
-	int PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize) const;
-	int PutActorPST(DataStream *stream, const Actor *actor) const;
-	int PutActorBG(DataStream *stream, const Actor *actor) const;
-	int PutActorIWD1(DataStream *stream, const Actor *actor) const;
-	int PutActorIWD2(DataStream *stream, const Actor *actor) const;
-	int PutIWD2Spellpage(DataStream *stream, const Actor *actor, ieIWD2SpellType type, int level) const;
-	int PutKnownSpells(DataStream *stream, const Actor *actor) const;
-	int PutSpellPages(DataStream *stream, const Actor *actor) const;
-	int PutMemorizedSpells(DataStream *stream, const Actor *actor) const;
-	int PutEffects(DataStream *stream, const Actor *actor) const;
-	int PutVariables(DataStream *stream, const Actor *actor) const;
-	int PutInventory(DataStream *stream, const Actor *actor, unsigned int size) const;
-	int PutHeader(DataStream *stream, const Actor *actor) const;
+	int PutActorGemRB(DataStream* stream, const Actor* actor, ieDword InvSize) const;
+	int PutActorPST(DataStream* stream, const Actor* actor) const;
+	int PutActorBG(DataStream* stream, const Actor* actor) const;
+	int PutActorIWD1(DataStream* stream, const Actor* actor) const;
+	int PutActorIWD2(DataStream* stream, const Actor* actor) const;
+	int PutIWD2Spellpage(DataStream* stream, const Actor* actor, ieIWD2SpellType type, int level) const;
+	int PutKnownSpells(DataStream* stream, const Actor* actor) const;
+	int PutSpellPages(DataStream* stream, const Actor* actor) const;
+	int PutMemorizedSpells(DataStream* stream, const Actor* actor) const;
+	int PutEffects(DataStream* stream, const Actor* actor) const;
+	int PutVariables(DataStream* stream, const Actor* actor) const;
+	int PutInventory(DataStream* stream, const Actor* actor, unsigned int size) const;
+	int PutHeader(DataStream* stream, const Actor* actor) const;
 };
 
 }

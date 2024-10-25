@@ -21,8 +21,9 @@
 #include "SDLVideo.h"
 
 #include "Interface.h"
-#include "Video/RLE.h"
 #include "SDLPixelIterator.h"
+
+#include "Video/RLE.h"
 
 using namespace GemRB;
 
@@ -122,14 +123,14 @@ static SDL_Keycode TranslateKeycode(SDLKey sym)
 		case SDLK_F12:
 			//assuming they come sequentially,
 			//also, there is no need to ever produce more than 12
-			return GEM_FUNCTIONX(1) + sym-SDLK_F1;
+			return GEM_FUNCTIONX(1) + sym - SDLK_F1;
 		default:
 			break;
 	}
 	return sym;
 }
 
-int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
+int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 {
 	if (!EvntManager)
 		return GEM_ERROR;
@@ -160,16 +161,33 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			// reenable special numpad keys unless numlock is off
 			if (SDL_GetModState() & KMOD_NUM) {
 				switch (sym) {
-					case SDLK_KP1: sym = SDLK_1; break;
-					case SDLK_KP2: sym = SDLK_2; break;
-					case SDLK_KP3: sym = SDLK_3; break;
-					case SDLK_KP4: sym = SDLK_4; break;
+					case SDLK_KP1:
+						sym = SDLK_1;
+						break;
+					case SDLK_KP2:
+						sym = SDLK_2;
+						break;
+					case SDLK_KP3:
+						sym = SDLK_3;
+						break;
+					case SDLK_KP4:
+						sym = SDLK_4;
+						break;
 					// 5 is not special
-					case SDLK_KP6: sym = SDLK_6; break;
-					case SDLK_KP7: sym = SDLK_7; break;
-					case SDLK_KP8: sym = SDLK_8; break;
-					case SDLK_KP9: sym = SDLK_9; break;
-					default: break;
+					case SDLK_KP6:
+						sym = SDLK_6;
+						break;
+					case SDLK_KP7:
+						sym = SDLK_7;
+						break;
+					case SDLK_KP8:
+						sym = SDLK_8;
+						break;
+					case SDLK_KP9:
+						sym = SDLK_9;
+						break;
+					default:
+						break;
 				}
 			}
 			key = TranslateKeycode(sym);
@@ -179,7 +197,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				if (InTextInput() && modstate == 0) {
 					return GEM_OK;
 				}
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
 				e.keyboard.character = SDL_GetKeyFromScancode(event.key.keysym.scancode);
 #else
 				e.keyboard.character = event.key.keysym.unicode;
@@ -238,7 +256,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, const PixelFormat& fmt)
 {
 	if (fmt.RLE) {
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
 		// SDL2 should not allow RLE sprites so convert it
 		void* newpixels = DecodeRLEData(static_cast<uint8_t*>(pixels), rgn.size, fmt.ColorKey);
 		free(pixels);
@@ -253,7 +271,7 @@ Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, c
 }
 
 void SDLVideoDriver::BlitSprite(const Holder<Sprite2D>& spr, const Region& src, Region dst,
-								BlitFlags flags, Color tint)
+				BlitFlags flags, Color tint)
 {
 	dst.x -= spr->Frame.x;
 	dst.y -= spr->Frame.y;
@@ -261,7 +279,7 @@ void SDLVideoDriver::BlitSprite(const Holder<Sprite2D>& spr, const Region& src, 
 }
 
 void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D>& spr, const Point& p,
-									BlitFlags flags, Color tint)
+				    BlitFlags flags, Color tint)
 {
 	Region srect(Point(0, 0), spr->Frame.size);
 	Region drect = Region(p - spr->Frame.origin, spr->Frame.size);
@@ -292,7 +310,7 @@ void SDLVideoDriver::DrawCircleImp(const Point& origin, uint16_t r, const Color&
 
 void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, const Region& dst, BlitFlags flags, const Color* tint)
 {
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
 	// in SDL2 SDL_RenderCopyEx will flip the src rect internally if BlitFlags::MIRRORX or BlitFlags::MIRRORY is set
 	// instead of doing this and then reversing it in that case only for SDL to reverse it yet again
 	// lets just not worry about clipping on SDL2. the backends handle all of that for us unlike with SDL 1 where we
@@ -326,16 +344,16 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 
 	assert(dclipped.w == src.w && dclipped.h == src.h);
 
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
 	dclipped = dst;
 	src = originalSrc;
 #endif
 
-	if (spr->renderFlags&BlitFlags::MIRRORX) {
+	if (spr->renderFlags & BlitFlags::MIRRORX) {
 		flags ^= BlitFlags::MIRRORX;
 	}
 
-	if (spr->renderFlags&BlitFlags::MIRRORY) {
+	if (spr->renderFlags & BlitFlags::MIRRORY) {
 		flags ^= BlitFlags::MIRRORY;
 	}
 
@@ -344,7 +362,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 	if (!spr->HasTransparency()) {
 		flags &= ~BlitFlags::BLENDED;
 	}
-	
+
 	auto pal = spr->GetPalette();
 	Color ck = ColorBlack;
 	if (flags & (BlitFlags::ONE_MINUS_DST | BlitFlags::DST | BlitFlags::SRC)) {
@@ -360,10 +378,10 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 	if (spr->Format().RLE) {
 		BlitSpriteRLEClipped(spr, src, dclipped, flags, tint);
 	} else {
-		const sprite_t* native = static_cast<const sprite_t*>(spr.get ());
+		const sprite_t* native = static_cast<const sprite_t*>(spr.get());
 		BlitSpriteNativeClipped(native, src, dclipped, flags, reinterpret_cast<const SDL_Color*>(tint));
 	}
-	
+
 	if (ck != ColorBlack) {
 		pal->SetColor(0, ck);
 	}
@@ -374,11 +392,11 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 bool SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors)
 {
 	if (pal) {
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
 		return SDL_SetPaletteColors(surf->format->palette, pal, 0, numcolors) == 0;
 #else
 		// const_cast because SDL doesn't alter this and we want our interface to be const correct
-		return SDL_SetPalette( surf, SDL_LOGPAL, const_cast<SDL_Color*>(pal), 0, numcolors );
+		return SDL_SetPalette(surf, SDL_LOGPAL, const_cast<SDL_Color*>(pal), 0, numcolors);
 #endif
 	}
 	return -1;

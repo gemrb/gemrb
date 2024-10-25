@@ -22,10 +22,11 @@
 
 namespace GemRB {
 
-Palette::Palette(bool named) noexcept : named(named) {}
+Palette::Palette(bool named) noexcept
+	: named(named) {}
 
-Palette::Palette(const Color &color, const Color &back) noexcept
-: Palette()
+Palette::Palette(const Color& color, const Color& back) noexcept
+	: Palette()
 {
 	colors[0] = Color(0, 0xff, 0, 0);
 	for (size_t i = 1; i < colors.size(); i++) {
@@ -41,48 +42,59 @@ Palette::Palette(const Color &color, const Color &back) noexcept
 	updateVersion();
 }
 
-bool Palette::operator==(const Palette& other) const noexcept {
+bool Palette::operator==(const Palette& other) const noexcept
+{
 	return version == other.version;
 }
 
-bool Palette::operator!=(const Palette& other) const noexcept {
+bool Palette::operator!=(const Palette& other) const noexcept
+{
 	return !(*this == other);
 }
 
-Palette::Colors::const_iterator Palette::cbegin() const noexcept {
+Palette::Colors::const_iterator Palette::cbegin() const noexcept
+{
 	return colors.cbegin();
 }
 
-Palette::Colors::const_iterator Palette::cend() const noexcept {
+Palette::Colors::const_iterator Palette::cend() const noexcept
+{
 	return colors.cend();
 }
 
-Palette::Colors::const_reference Palette::operator[](size_t pos) const {
+Palette::Colors::const_reference Palette::operator[](size_t pos) const
+{
 	return GetColorAt(pos);
 }
 
-void Palette::SetColor(size_t index, const Color& c) {
+void Palette::SetColor(size_t index, const Color& c)
+{
 	colors[index] = c;
 	updateVersion();
 }
 
-const Color* Palette::ColorData() const {
+const Color* Palette::ColorData() const
+{
 	return colors.data();
 }
 
-Palette::Colors::const_reference Palette::GetColorAt(size_t pos) const {
+Palette::Colors::const_reference Palette::GetColorAt(size_t pos) const
+{
 	return colors[pos];
 }
 
-Hash Palette::GetVersion() const {
+Hash Palette::GetVersion() const
+{
 	return version;
 }
 
-bool Palette::IsNamed() const {
+bool Palette::IsNamed() const
+{
 	return named;
 }
 
-void Palette::updateVersion() {
+void Palette::updateVersion()
+{
 	Hasher hasher;
 
 	for (size_t i = 0; i < colors.size(); ++i) {

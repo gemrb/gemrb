@@ -16,15 +16,15 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <cstdint>
-
 #include "swab.h"
 
+#include <cstdint>
+
 // we use this because it works with overlapping buffers (undefined in POSIX)
-void swab_const (const void *bfrom, void *bto, long n)
+void swab_const(const void* bfrom, void* bto, long n)
 {
-	const char *from = (const char *) bfrom;
-	char *to = (char *) bto;
+	const char* from = (const char*) bfrom;
+	char* to = (char*) bto;
 
 	n &= ~((long) 1);
 	while (n > 1) {
@@ -35,14 +35,15 @@ void swab_const (const void *bfrom, void *bto, long n)
 	}
 }
 
-void swabs (void *buf, long n)
+void swabs(void* buf, long n)
 {
 	swab_const(buf, buf, n);
 }
 
-bool IsBigEndian() {
+bool IsBigEndian()
+{
 	const static uint16_t endiantest = 1;
-	const static bool isBigEndian = ((char *)&endiantest)[1] == 1;
+	const static bool isBigEndian = ((char*) &endiantest)[1] == 1;
 
 	return isBigEndian;
 }

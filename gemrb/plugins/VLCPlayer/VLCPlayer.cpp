@@ -19,6 +19,7 @@
  */
 
 #include "VLCPlayer.h"
+
 #include "Video/Video.h"
 
 using namespace GemRB;
@@ -76,9 +77,9 @@ bool VLCPlayer::DecodeFrame(VideoBuffer& buf)
 	}
 
 	buf.CopyPixels(Region(0, 0, movieSize.w, movieSize.h),
-				   planes[0], &pitches[0], // Y or RGB
-				   planes[1], &pitches[1], // U
-				   planes[2], &pitches[2]);// V
+		       planes[0], &pitches[0], // Y or RGB
+		       planes[1], &pitches[1], // U
+		       planes[2], &pitches[2]); // V
 	return true;
 }
 
@@ -96,7 +97,7 @@ void VLCPlayer::DestroyPlayer()
 
 // static vlc callbacks
 
-void* VLCPlayer::lock(void *data, void **planes)
+void* VLCPlayer::lock(void* data, void** planes)
 {
 	const VLCPlayer* player = static_cast<const VLCPlayer*>(data);
 
@@ -107,7 +108,7 @@ void* VLCPlayer::lock(void *data, void **planes)
 	return nullptr; // we are using a single buffer so return nullptr
 }
 
-unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned *height, unsigned *pitches, unsigned *lines)
+unsigned VLCPlayer::setup(void** opaque, char* chroma, unsigned* width, unsigned* height, unsigned* pitches, unsigned* lines)
 {
 	VLCPlayer* player = static_cast<VLCPlayer*>(*opaque);
 	int w = *width;

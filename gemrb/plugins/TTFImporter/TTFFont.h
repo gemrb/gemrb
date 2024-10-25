@@ -22,14 +22,13 @@
 #define __GemRB__TTFFont__
 
 #include "Freetype.h"
+#include "Holder.h"
 
 #include "GUI/TextSystem/Font.h"
-#include "Holder.h"
 
 namespace GemRB {
 
-class TTFFont : public Font
-{
+class TTFFont : public Font {
 private:
 	FT_Face face = nullptr;
 

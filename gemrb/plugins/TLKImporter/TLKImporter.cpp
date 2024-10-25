@@ -18,9 +18,6 @@
  *
  */
 
-#include <tuple>
-#include <utility>
-
 #include "TLKImporter.h"
 
 #include "Audio.h"
@@ -28,17 +25,21 @@
 #include "DialogHandler.h"
 #include "Game.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "TableMgr.h"
+
 #include "GUI/GameControl.h"
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
+
+#include <tuple>
+#include <utility>
 
 using namespace GemRB;
 
 TLKImporter::TLKImporter(void)
 {
 	if (core->HasFeature(GFFlags::CHARNAMEISGABBER)) {
-		charname=-1;
+		charname = -1;
 	}
 
 	AutoTable tm = gamedata->LoadTable("gender", true);
@@ -51,13 +52,13 @@ TLKImporter::TLKImporter(void)
 
 		auto& entry =
 			gtmap.emplace(
-					std::piecewise_construct,
-					std::forward_as_tuple(key),
-					std::forward_as_tuple()
-			).first->second;
-		entry.type = tm->QueryFieldSigned<int>(i,0);
-		entry.male = tm->QueryFieldAsStrRef(i,1);
-		entry.female = tm->QueryFieldAsStrRef(i,2);
+				     std::piecewise_construct,
+				     std::forward_as_tuple(key),
+				     std::forward_as_tuple())
+				.first->second;
+		entry.type = tm->QueryFieldSigned<int>(i, 0);
+		entry.male = tm->QueryFieldAsStrRef(i, 1);
+		entry.female = tm->QueryFieldAsStrRef(i, 2);
 	}
 }
 
@@ -94,8 +95,8 @@ bool TLKImporter::Open(DataStream* stream)
 	delete str;
 	str = stream;
 	char Signature[8];
-	str->Read( Signature, 8 );
-	if (strncmp( Signature, "TLK\x20V1\x20\x20", 8 ) != 0) {
+	str->Read(Signature, 8);
+	if (strncmp(Signature, "TLK\x20V1\x20\x20", 8) != 0) {
 		Log(ERROR, "TLKImporter", "Not a valid TLK File.");
 		return false;
 	}
@@ -120,19 +121,19 @@ bool TLKImporter::Open(DataStream* stream)
 */
 static inline const Actor* GetActorFromSlot(int slot)
 {
-	if (slot==-1) {
-		const GameControl *gc = core->GetGameControl();
+	if (slot == -1) {
+		const GameControl* gc = core->GetGameControl();
 		const Actor* act = nullptr;
 		if (gc) {
 			act = gc->dialoghandler->GetSpeaker();
 		}
 		return act;
 	}
-	const Game *game = core->GetGame();
+	const Game* game = core->GetGame();
 	if (!game) {
 		return NULL;
 	}
-	if (slot==0) {
+	if (slot == 0) {
 		return game->GetPC(0, false); //protagonist
 	}
 	return game->FindPC(slot);
@@ -140,7 +141,7 @@ static inline const Actor* GetActorFromSlot(int slot)
 
 String TLKImporter::Gabber() const
 {
-	const Actor *act = core->GetGameControl()->dialoghandler->GetSpeaker();
+	const Actor* act = core->GetGameControl()->dialoghandler->GetSpeaker();
 	if (act) {
 		return act->GetName();
 	}
@@ -149,7 +150,7 @@ String TLKImporter::Gabber() const
 
 String TLKImporter::CharName(int slot) const
 {
-	const Actor *act = GetActorFromSlot(slot);
+	const Actor* act = GetActorFromSlot(slot);
 	if (act) {
 		return act->GetName();
 	}
@@ -163,7 +164,7 @@ String TLKImporter::CharName(int slot) const
 ieStrRef TLKImporter::ClassStrRef(int slot) const
 {
 	int clss = 0;
-	const Actor *act = GetActorFromSlot(slot);
+	const Actor* act = GetActorFromSlot(slot);
 	if (act) {
 		clss = act->GetActiveClass();
 	}
@@ -179,9 +180,9 @@ ieStrRef TLKImporter::ClassStrRef(int slot) const
 ieStrRef TLKImporter::RaceStrRef(int slot) const
 {
 	int race = 0;
-	const Actor *act = GetActorFromSlot(slot);
+	const Actor* act = GetActorFromSlot(slot);
 	if (act) {
-		race=act->GetStat(IE_RACE);
+		race = act->GetStat(IE_RACE);
 	}
 
 	AutoTable tab = gamedata->LoadTable("races");
@@ -189,13 +190,13 @@ ieStrRef TLKImporter::RaceStrRef(int slot) const
 		return ieStrRef::INVALID;
 	}
 	TableMgr::index_t row = tab->FindTableValue(3, race, 0);
-	return tab->QueryFieldAsStrRef(row,0);
+	return tab->QueryFieldAsStrRef(row, 0);
 }
 
 ieStrRef TLKImporter::GenderStrRef(int slot, ieStrRef malestrref, ieStrRef femalestrref) const
 {
-	const Actor *act = GetActorFromSlot(slot);
-	if (act && (act->GetStat(IE_SEX)==SEX_FEMALE) ) {
+	const Actor* act = GetActorFromSlot(slot);
+	if (act && (act->GetStat(IE_SEX) == SEX_FEMALE)) {
 		return femalestrref;
 	}
 	return malestrref;
@@ -271,8 +272,7 @@ String TLKImporter::BuiltinToken(const ieVariable& Token)
 String TLKImporter::ResolveTags(const String& source)
 {
 	const size_t strLen = source.length();
-	auto mystrncpy = [&source, &strLen](ieVariable& tok, size_t idx, wchar_t delim)
-	{
+	auto mystrncpy = [&source, &strLen](ieVariable& tok, size_t idx, wchar_t delim) {
 		char* dest = tok.begin();
 		auto maxlength = std::min(sizeof(ieVariable) - 1, strLen);
 		while (idx < source.length() && (source[idx] != delim) && maxlength--) {
@@ -282,7 +282,7 @@ String TLKImporter::ResolveTags(const String& source)
 		*dest = '\0';
 		return idx;
 	};
-	
+
 	ieVariable Token;
 	String dest;
 	for (size_t i = 0; source[i]; i++) {
@@ -291,7 +291,6 @@ String TLKImporter::ResolveTags(const String& source)
 			i = mystrncpy(Token, i + 1, u'>');
 			String resolvedToken = BuiltinToken(Token);
 			if (resolvedToken.empty()) {
-
 				auto& tokens = core->GetTokenDictionary();
 				auto lookup = tokens.find(Token);
 				if (lookup != tokens.cend()) {
@@ -353,17 +352,17 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 	} else {
 		ieDword Volume, Pitch, StrOffset;
 		ieDword l;
-		if (str->Seek( 18 + (ieDword(strref) * 0x1A), GEM_STREAM_START ) == GEM_ERROR) {
+		if (str->Seek(18 + (ieDword(strref) * 0x1A), GEM_STREAM_START) == GEM_ERROR) {
 			return u"";
 		}
 		str->ReadWord(type);
-		str->ReadResRef( SoundResRef );
+		str->ReadResRef(SoundResRef);
 		// volume and pitch variance fields are known to be unused at minimum in bg1
 		str->ReadDword(Volume);
 		str->ReadDword(Pitch);
 		str->ReadDword(StrOffset);
 		str->ReadDword(l);
-				
+
 		if (type & 1) {
 			if (str->Seek(StrOffset + Offset, GEM_STREAM_START) == GEM_ERROR) {
 				return u"";
@@ -412,8 +411,8 @@ StringBlock TLKImporter::GetStringBlock(ieStrRef strref, STRING_FLAGS flags)
 	}
 	str->ReadWord(type);
 	ResRef soundRef;
-	str->ReadResRef( soundRef );
-	return StringBlock(GetString( strref, flags ), soundRef);
+	str->ReadResRef(soundRef);
+	return StringBlock(GetString(strref, flags), soundRef);
 }
 
 #include "plugindef.h"

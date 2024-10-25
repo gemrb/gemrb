@@ -32,8 +32,8 @@ namespace GemRB {
 GEM_EXPORT float_t AngleFromPoints(const Point& p1, const Point& p2, bool exact = false);
 GEM_EXPORT float_t AngleFromPoints(float_t y, float_t x);
 GEM_EXPORT Point RotatePoint(const Point& p, float_t angle);
-GEM_EXPORT unsigned int Distance(const Point &pos, const Point &pos2);
-GEM_EXPORT unsigned int SquaredDistance(const Point &pos, const Point &pos2);
+GEM_EXPORT unsigned int Distance(const Point& pos, const Point& pos2);
+GEM_EXPORT unsigned int SquaredDistance(const Point& pos, const Point& pos2);
 
 // returns twice the area of triangle a, b, c.
 // (can also be negative depending on orientation of a,b,c)

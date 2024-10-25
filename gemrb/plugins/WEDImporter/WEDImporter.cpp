@@ -22,8 +22,9 @@
 
 #include "GameData.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "PluginMgr.h"
+
+#include "Logging/Logging.h"
 #include "Plugins/TileSetMgr.h"
 
 #include <iterator>
@@ -31,7 +32,7 @@
 using namespace GemRB;
 
 //the net sizeof(wed_polygon) is 0x12 but not all compilers know that
-#define WED_POLYGON_SIZE  0x12
+#define WED_POLYGON_SIZE 0x12
 
 WEDImporter::~WEDImporter(void)
 {
@@ -46,8 +47,8 @@ bool WEDImporter::Open(DataStream* stream)
 	delete str;
 	str = stream;
 	char Signature[8];
-	str->Read( Signature, 8 );
-	if (strncmp( Signature, "WED V1.3", 8 ) != 0) {
+	str->Read(Signature, 8);
+	if (strncmp(Signature, "WED V1.3", 8) != 0) {
 		Log(ERROR, "WEDImporter", "This file is not a valid WED File! Actual signature: {}", Signature);
 		return false;
 	}
@@ -64,19 +65,19 @@ bool WEDImporter::Open(DataStream* stream)
 	//   WORD    nChanceOfSnow; - most likely unused, since it's present in the ARE file
 	//   DWORD   dwFlags;
 
-	str->Seek( OverlaysOffset, GEM_STREAM_START );
+	str->Seek(OverlaysOffset, GEM_STREAM_START);
 	for (unsigned int i = 0; i < OverlaysCount; i++) {
 		Overlay o;
 		str->ReadSize(o.size);
-		str->ReadResRef( o.TilesetResRef );
+		str->ReadResRef(o.TilesetResRef);
 		str->ReadWord(o.UniqueTileCount);
 		str->ReadWord(o.MovementType);
 		str->ReadDword(o.TilemapOffset);
 		str->ReadDword(o.TILOffset);
-		overlays.push_back( o );
+		overlays.push_back(o);
 	}
 	//Reading the Secondary Header
-	str->Seek( SecHeaderOffset, GEM_STREAM_START );
+	str->Seek(SecHeaderOffset, GEM_STREAM_START);
 	str->ReadDword(WallPolygonsCount);
 	str->ReadDword(PolygonsOffset);
 	str->ReadDword(VerticesOffset);
@@ -115,7 +116,7 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 		return -1;
 	}
 	PluginHolder<TileSetMgr> tis = MakePluginHolder<TileSetMgr>(IE_TIS_CLASS_ID);
-	tis->Open( tisfile );
+	tis->Open(tisfile);
 	auto over = MakeHolder<TileOverlay>(newOverlays->size);
 	for (int y = 0; y < newOverlays->size.h; y++) {
 		for (int x = 0; x < newOverlays->size.w; x++) {
@@ -126,8 +127,8 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 			str->ReadWord(startindex);
 			str->ReadWord(count);
 			str->ReadWord(secondary);
-			str->Read( &overlaymask, 1 ); // bFlags in the original
-			str->Read( &animspeed, 1 );
+			str->Read(&overlaymask, 1); // bFlags in the original
+			str->Read(&animspeed, 1);
 			// WORD    wFlags in the original (currently unused)
 			if (animspeed == 0) {
 				animspeed = ANI_DEFAULT_FRAMERATE;
@@ -150,7 +151,7 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 			delete tile;
 		}
 	}
-	
+
 	if (rain) {
 		tm->AddRainOverlay(std::move(over));
 	} else {
@@ -160,7 +161,7 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 }
 
 //this will replace the tileset of an existing tilemap, or create a new one
-TileMap* WEDImporter::GetTileMap(TileMap *tm) const
+TileMap* WEDImporter::GetTileMap(TileMap* tm) const
 {
 	int usedoverlays;
 	bool freenew = false;
@@ -182,48 +183,48 @@ TileMap* WEDImporter::GetTileMap(TileMap *tm) const
 		return NULL;
 	}
 	// rain_overlays[0] is never used
-	tm->AddRainOverlay( NULL );
+	tm->AddRainOverlay(NULL);
 
 	//reading additional overlays
-	int mask=2;
-	for(ieDword i=1;i<OverlaysCount;i++) {
+	int mask = 2;
+	for (ieDword i = 1; i < OverlaysCount; i++) {
 		//skipping unused overlays
-		if (!(mask&usedoverlays)) {
-			tm->AddOverlay( NULL );
-			tm->AddRainOverlay( NULL );
+		if (!(mask & usedoverlays)) {
+			tm->AddOverlay(NULL);
+			tm->AddRainOverlay(NULL);
 		} else {
 			// FIXME: should fix AddOverlay not to load an overlay twice if there's no rain version!!
 			AddOverlay(tm, &overlays.at(i), false);
 			AddOverlay(tm, &overlays.at(i), true);
 		}
-		mask<<=1;
+		mask <<= 1;
 	}
 	return tm;
 }
 
 void WEDImporter::GetDoorPolygonCount(ieWord count, ieDword offset)
 {
-	ieDword basecount = offset-PolygonsOffset;
-	if (basecount%WED_POLYGON_SIZE) {
-		basecount+=WED_POLYGON_SIZE;
+	ieDword basecount = offset - PolygonsOffset;
+	if (basecount % WED_POLYGON_SIZE) {
+		basecount += WED_POLYGON_SIZE;
 		Log(WARNING, "WEDImporter", "Found broken door polygon header!");
 	}
-	ieDword polycount = basecount/WED_POLYGON_SIZE+count-WallPolygonsCount;
-	if (polycount>DoorPolygonsCount) {
-		DoorPolygonsCount=polycount;
+	ieDword polycount = basecount / WED_POLYGON_SIZE + count - WallPolygonsCount;
+	if (polycount > DoorPolygonsCount) {
+		DoorPolygonsCount = polycount;
 	}
 }
 
 WallPolygonGroup WEDImporter::ClosedDoorPolygons() const
 {
-	size_t index = (ClosedPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
+	size_t index = (ClosedPolyOffset - PolygonsOffset) / WED_POLYGON_SIZE;
 	size_t count = ClosedPolyCount;
 	return MakeGroupFromTableEntries(index, count);
 }
 
 WallPolygonGroup WEDImporter::OpenDoorPolygons() const
 {
-	size_t index = (OpenPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
+	size_t index = (OpenPolyOffset - PolygonsOffset) / WED_POLYGON_SIZE;
 	size_t count = OpenPolyCount;
 	return MakeGroupFromTableEntries(index, count);
 }
@@ -235,8 +236,8 @@ std::vector<ieWord> WEDImporter::GetDoorIndices(const ResRef& resref, bool& Base
 	unsigned int i;
 
 	for (i = 0; i < DoorsCount; i++) {
-		str->Seek( DoorsOffset + ( i * 0x1A ), GEM_STREAM_START );
-		str->ReadResRef( Name );
+		str->Seek(DoorsOffset + (i * 0x1A), GEM_STREAM_START);
+		str->ReadResRef(Name);
 		if (Name == resref)
 			break;
 	}
@@ -255,7 +256,7 @@ std::vector<ieWord> WEDImporter::GetDoorIndices(const ResRef& resref, bool& Base
 	str->ReadDword(ClosedPolyOffset);
 
 	//Reading Door Tile Cells
-	str->Seek( DoorTilesOffset + ( DoorTileStart * 2 ), GEM_STREAM_START );
+	str->Seek(DoorTilesOffset + (DoorTileStart * 2), GEM_STREAM_START);
 	auto DoorTiles = std::vector<ieWord>(DoorTileCount);
 	str->Read(&DoorTiles[0], DoorTileCount * sizeof(ieWord));
 
@@ -268,7 +269,7 @@ void WEDImporter::ReadWallPolygons()
 	for (ieDword i = 0; i < DoorsCount; i++) {
 		constexpr uint8_t doorSize = 0x1A;
 		constexpr uint8_t polyOffset = 14;
-		str->Seek( DoorsOffset + polyOffset + ( i * doorSize ), GEM_STREAM_START );
+		str->Seek(DoorsOffset + polyOffset + (i * doorSize), GEM_STREAM_START);
 
 		str->ReadWord(OpenPolyCount);
 		str->ReadWord(ClosedPolyCount);
@@ -279,7 +280,7 @@ void WEDImporter::ReadWallPolygons()
 		GetDoorPolygonCount(ClosedPolyCount, ClosedPolyOffset);
 	}
 
-	ieDword polygonCount = WallPolygonsCount+DoorPolygonsCount;
+	ieDword polygonCount = WallPolygonsCount + DoorPolygonsCount;
 
 	struct wed_polygon {
 		ieDword FirstVertex;
@@ -289,11 +290,11 @@ void WEDImporter::ReadWallPolygons()
 	};
 
 	polygonTable.resize(polygonCount);
-	wed_polygon *PolygonHeaders = new wed_polygon[polygonCount];
+	wed_polygon* PolygonHeaders = new wed_polygon[polygonCount];
 
-	str->Seek (PolygonsOffset, GEM_STREAM_START);
-	
-	for (ieDword i=0; i < polygonCount; i++) {
+	str->Seek(PolygonsOffset, GEM_STREAM_START);
+
+	for (ieDword i = 0; i < polygonCount; i++) {
 		str->ReadDword(PolygonHeaders[i].FirstVertex);
 		str->ReadDword(PolygonHeaders[i].CountVertex);
 		str->ReadWord(PolygonHeaders[i].Flags); // two bytes: mode and height in the original bg2
@@ -309,17 +310,17 @@ void WEDImporter::ReadWallPolygons()
 		rect.h -= rect.y;
 	}
 
-	for (ieDword i=0; i < polygonCount; i++) {
-		str->Seek (PolygonHeaders[i].FirstVertex*4+VerticesOffset, GEM_STREAM_START);
+	for (ieDword i = 0; i < polygonCount; i++) {
+		str->Seek(PolygonHeaders[i].FirstVertex * 4 + VerticesOffset, GEM_STREAM_START);
 		//compose polygon
 		ieDword count = PolygonHeaders[i].CountVertex;
-		if (count<3) {
+		if (count < 3) {
 			//danger, danger
 			continue;
 		}
-		ieDword flags = PolygonHeaders[i].Flags&~(WF_BASELINE|WF_HOVER);
+		ieDword flags = PolygonHeaders[i].Flags & ~(WF_BASELINE | WF_HOVER);
 		Point base0, base1;
-		if (PolygonHeaders[i].Flags&WF_HOVER) {
+		if (PolygonHeaders[i].Flags & WF_HOVER) {
 			count -= 2;
 			str->ReadPoint(base0);
 			str->ReadPoint(base1);
@@ -332,8 +333,8 @@ void WEDImporter::ReadWallPolygons()
 			points[j] = vertex;
 		}
 
-		if (!(flags&WF_BASELINE) ) {
-			if (PolygonHeaders[i].Flags&WF_BASELINE) {
+		if (!(flags & WF_BASELINE)) {
+			if (PolygonHeaders[i].Flags & WF_BASELINE) {
 				base0 = points[0];
 				base1 = points[1];
 				flags |= WF_BASELINE;
@@ -343,7 +344,7 @@ void WEDImporter::ReadWallPolygons()
 		const Region& rgn = PolygonHeaders[i].rect;
 		if (!rgn.size.IsInvalid()) { // PST AR0600 is known to have a polygon with 0 height
 			polygonTable[i] = std::make_shared<Wall_Polygon>(std::move(points), &rgn);
-			if (flags&WF_BASELINE) {
+			if (flags & WF_BASELINE) {
 				polygonTable[i]->SetBaseline(base0, base1);
 			}
 			if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
@@ -352,7 +353,7 @@ void WEDImporter::ReadWallPolygons()
 			polygonTable[i]->SetPolygonFlag(flags);
 		}
 	}
-	delete [] PolygonHeaders;
+	delete[] PolygonHeaders;
 }
 
 WallPolygonGroup WEDImporter::MakeGroupFromTableEntries(size_t idx, size_t cnt) const
@@ -368,7 +369,7 @@ WallPolygonGroup WEDImporter::MakeGroupFromTableEntries(size_t idx, size_t cnt) 
 
 std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
 {
-	str->Seek (PLTOffset, GEM_STREAM_START);
+	str->Seek(PLTOffset, GEM_STREAM_START);
 	size_t PLTSize = (VerticesOffset > PLTOffset ? VerticesOffset - PLTOffset : PLTOffset - VerticesOffset) / 2;
 	std::vector<ieWord> PLT(PLTSize);
 
@@ -392,7 +393,7 @@ std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
 	std::vector<WallPolygonGroup> polygonGroups;
 	polygonGroups.reserve(groupSize);
 
-	str->Seek (WallGroupsOffset, GEM_STREAM_START);
+	str->Seek(WallGroupsOffset, GEM_STREAM_START);
 	for (size_t i = 0; i < groupSize; ++i) {
 		ieWord index, count;
 		str->ReadWord(index);

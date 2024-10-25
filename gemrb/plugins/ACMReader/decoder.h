@@ -29,6 +29,7 @@ private:
 	int* memory_buffer = nullptr;
 	void sub_4d3fcc(short* memory, int* buffer, int sb_size, int blocks) const;
 	void sub_4d420c(int* memory, int* buffer, int sb_size, int blocks) const;
+
 public:
 	explicit CSubbandDecoder(int lev_cnt)
 		: levels(lev_cnt), block_size(1 << lev_cnt)
@@ -37,7 +38,7 @@ public:
 	virtual ~CSubbandDecoder()
 	{
 		if (memory_buffer) {
-			free( memory_buffer );
+			free(memory_buffer);
 		}
 	}
 

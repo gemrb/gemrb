@@ -22,6 +22,7 @@
 
 #include "AnimationFactory.h"
 #include "GameData.h"
+
 #include "Video/Video.h"
 
 namespace GemRB {
@@ -34,7 +35,7 @@ EnumArray<FogRenderer::Direction, Holder<Sprite2D>> FogRenderer::LoadFogSprites(
 	if (!anim) {
 		return {};
 	}
-	
+
 	EnumArray<FogRenderer::Direction, Holder<Sprite2D>> sprites;
 
 	sprites[Direction::N] = anim->GetFrame(0, 0); // horizontal edge
@@ -45,19 +46,20 @@ EnumArray<FogRenderer::Direction, Holder<Sprite2D>> FogRenderer::LoadFogSprites(
 	sprites[Direction::E] = sprites[Direction::W];
 	sprites[Direction::NE] = sprites[Direction::NW];
 	sprites[Direction::SE] = sprites[Direction::NE];
-	
+
 	return sprites;
 }
 
-FogRenderer::FogRenderer(bool doBAMRendering) :
-	videoCanRenderGeometry(!doBAMRendering && VideoDriver->CanDrawRawGeometry()),
-	fogVertices(24),
-	fogColors(12)
+FogRenderer::FogRenderer(bool doBAMRendering)
+	: videoCanRenderGeometry(!doBAMRendering && VideoDriver->CanDrawRawGeometry()),
+	  fogVertices(24),
+	  fogColors(12)
 {
 	fogSprites = LoadFogSprites();
 }
 
-void FogRenderer::DrawFog(const FogMapData& mapData) {
+void FogRenderer::DrawFog(const FogMapData& mapData)
+{
 	const Size& fogSize = mapData.fogSize;
 	auto largeFog = mapData.largeFog;
 
@@ -79,7 +81,7 @@ void FogRenderer::DrawFog(const FogMapData& mapData) {
 		int shroudedQueue = 0;
 		int x = start.x;
 		for (; x < end.x; x++) {
-			Point cell{x, y};
+			Point cell { x, y };
 
 			if (IsUncovered(cell, mapData.exploredMask)) {
 				if (unexploredQueue) {
@@ -119,20 +121,23 @@ void FogRenderer::DrawFog(const FogMapData& mapData) {
 	}
 }
 
-Point FogRenderer::ConvertPointToFog(Point p) {
+Point FogRenderer::ConvertPointToFog(Point p)
+{
 	return Point(p.x / 32, p.y / 32);
 }
 
-Point FogRenderer::ConvertPointToScreen(int x, int y) const {
+Point FogRenderer::ConvertPointToScreen(int x, int y) const
+{
 	x = (x - start.x) * CELL_SIZE + p0.x;
 	y = (y - start.y) * CELL_SIZE + p0.y;
 
 	return Point(x, y);
 }
 
-void FogRenderer::DrawExploredCell(Point p, const Bitmap *exploredMask) {
+void FogRenderer::DrawExploredCell(Point p, const Bitmap* exploredMask)
+{
 	auto IsExplored = [=](int x, int y) {
-		return IsUncovered({x, y}, exploredMask);
+		return IsUncovered({ x, y }, exploredMask);
 	};
 	Point sp = ConvertPointToScreen(p.x, p.y);
 
@@ -163,9 +168,10 @@ void FogRenderer::DrawExploredCell(Point p, const Bitmap *exploredMask) {
 	}
 }
 
-void FogRenderer::DrawVisibleCell(Point p, const Bitmap *visibleMask) {
+void FogRenderer::DrawVisibleCell(Point p, const Bitmap* visibleMask)
+{
 	auto IsVisible = [=](int x, int y) {
-		return IsUncovered({x, y}, visibleMask);
+		return IsUncovered({ x, y }, visibleMask);
 	};
 	Point sp = ConvertPointToScreen(p.x, p.y);
 
@@ -196,11 +202,13 @@ void FogRenderer::DrawVisibleCell(Point p, const Bitmap *visibleMask) {
 	}
 }
 
-void FogRenderer::DrawFogCellBAM(Point p, Direction direction, BlitFlags flags) {
+void FogRenderer::DrawFogCellBAM(Point p, Direction direction, BlitFlags flags)
+{
 	VideoDriver->BlitGameSprite(fogSprites[direction], p, flags | BAM_FLAGS[direction]);
 }
 
-void FogRenderer::DrawFogCellVertices(Point p, Direction direction, BlitFlags flags) {
+void FogRenderer::DrawFogCellVertices(Point p, Direction direction, BlitFlags flags)
+{
 	SetFogVerticesByOrigin(p);
 
 	// don't always make center vertices dark, see below
@@ -220,9 +228,9 @@ void FogRenderer::DrawFogCellVertices(Point p, Direction direction, BlitFlags fl
 		fillBits |= (3 << 10) | (1 << 1) | (1 << 8);
 	}
 
-	Color baseColor{0, 0, 0, 255};
+	Color baseColor { 0, 0, 0, 255 };
 	if (flags & BlitFlags::HALFTRANS) {
-		baseColor = {0, 0, 0, 128};
+		baseColor = { 0, 0, 0, 128 };
 	}
 
 	for (size_t i = 0; i < fogColors.size(); ++i) {
@@ -242,7 +250,8 @@ void FogRenderer::DrawFogCellVertices(Point p, Direction direction, BlitFlags fl
 	VideoDriver->DrawRawGeometry(fogVertices, fogColors, BlitFlags::BLENDED);
 }
 
-void FogRenderer::DrawFogSmoothing(Point p, Direction direction, BlitFlags flags, Direction adjacentDir) {
+void FogRenderer::DrawFogSmoothing(Point p, Direction direction, BlitFlags flags, Direction adjacentDir)
+{
 	// We need this when relying on smooth, alpha interpolation. The FOGOWAR.bam patterns
 	// cannot be simply replaced by one triangle fan: Given how the interpolation works, there
 	// will be ugly eges since usually the darkening is notable for way too long. We could also
@@ -271,9 +280,9 @@ void FogRenderer::DrawFogSmoothing(Point p, Direction direction, BlitFlags flags
 		fillBits |= (1 << 8) | (1 << 10);
 	}
 
-	Color baseColor{0, 0, 0, 255};
+	Color baseColor { 0, 0, 0, 255 };
 	if (flags & BlitFlags::HALFTRANS) {
-		baseColor = {0, 0, 0, 128};
+		baseColor = { 0, 0, 0, 128 };
 	}
 
 	for (size_t i = 0; i < fogColors.size(); ++i) {
@@ -287,7 +296,8 @@ void FogRenderer::DrawFogSmoothing(Point p, Direction direction, BlitFlags flags
 	VideoDriver->DrawRawGeometry(fogVertices, fogColors, BlitFlags::BLENDED);
 }
 
-bool FogRenderer::DrawFogCellByDirection(Point p, Direction direction, BlitFlags flags) {
+bool FogRenderer::DrawFogCellByDirection(Point p, Direction direction, BlitFlags flags)
+{
 	if (videoCanRenderGeometry) {
 		DrawFogCellVertices(p, direction, flags);
 		// accepts any adjacent-direction setup in one call
@@ -297,7 +307,8 @@ bool FogRenderer::DrawFogCellByDirection(Point p, Direction direction, BlitFlags
 	}
 }
 
-bool FogRenderer::DrawFogCellByDirectionBAMs(Point p, Direction direction, BlitFlags flags) {
+bool FogRenderer::DrawFogCellByDirectionBAMs(Point p, Direction direction, BlitFlags flags)
+{
 	// suppress compiler warnings about case not in enum by using UnderType
 	switch (UnderType(direction) & 0xF) {
 		case UnderType(Direction::N):
@@ -310,27 +321,27 @@ bool FogRenderer::DrawFogCellByDirectionBAMs(Point p, Direction direction, BlitF
 		case UnderType(Direction::SE):
 			DrawFogCellBAM(p, direction, flags);
 			return true;
-		case UnderType(Direction::N|Direction::S):
+		case UnderType(Direction::N | Direction::S):
 			DrawFogCellBAM(p, Direction::N, flags);
 			DrawFogCellBAM(p, Direction::S, flags);
 			return true;
-		case UnderType(Direction::NW|Direction::SW):
+		case UnderType(Direction::NW | Direction::SW):
 			DrawFogCellBAM(p, Direction::NW, flags);
 			DrawFogCellBAM(p, Direction::SW, flags);
 			return true;
-		case UnderType(Direction::W|Direction::E):
+		case UnderType(Direction::W | Direction::E):
 			DrawFogCellBAM(p, Direction::W, flags);
 			DrawFogCellBAM(p, Direction::E, flags);
 			return true;
-		case UnderType(Direction::NW|Direction::NE):
+		case UnderType(Direction::NW | Direction::NE):
 			DrawFogCellBAM(p, Direction::NW, flags);
 			DrawFogCellBAM(p, Direction::NE, flags);
 			return true;
-		case UnderType(Direction::NE|Direction::SE):
+		case UnderType(Direction::NE | Direction::SE):
 			DrawFogCellBAM(p, Direction::NE, flags);
 			DrawFogCellBAM(p, Direction::SE, flags);
 			return true;
-		case UnderType(Direction::SW|Direction::SE):
+		case UnderType(Direction::SW | Direction::SE):
 			DrawFogCellBAM(p, Direction::SW, flags);
 			DrawFogCellBAM(p, Direction::SE, flags);
 			return true;
@@ -339,7 +350,8 @@ bool FogRenderer::DrawFogCellByDirectionBAMs(Point p, Direction direction, BlitF
 	}
 }
 
-void FogRenderer::DrawVPBorder(Point p, Direction direction, const Region& r, BlitFlags flags) {
+void FogRenderer::DrawVPBorder(Point p, Direction direction, const Region& r, BlitFlags flags)
+{
 	if (videoCanRenderGeometry) {
 		DrawFogCellVertices(p, direction, OPAQUE_FOG);
 	} else {
@@ -347,7 +359,8 @@ void FogRenderer::DrawVPBorder(Point p, Direction direction, const Region& r, Bl
 	}
 }
 
-void FogRenderer::DrawVPBorders() {
+void FogRenderer::DrawVPBorders()
+{
 	// the amount of fuzzing to apply to map edges when the viewport overscans
 	constexpr int FUZZ_AMT = 8;
 
@@ -382,7 +395,7 @@ void FogRenderer::DrawVPBorders() {
 	}
 
 	if (vp.x + vp.w > mapSize.w) { // east border
-		Region r(mapSize.w -vp.x, std::max(0, -vp.y), vp.x + vp.w - mapSize.w, mapSize.h);
+		Region r(mapSize.w - vp.x, std::max(0, -vp.y), vp.x + vp.w - mapSize.w, mapSize.h);
 		VideoDriver->DrawRect(r, ColorBlack, true);
 		r.x -= FUZZ_AMT;
 		r.w = FUZZ_AMT;
@@ -392,18 +405,21 @@ void FogRenderer::DrawVPBorders() {
 	}
 }
 
-void FogRenderer::FillFog(Point p, int numRowItems, BlitFlags flags) {
+void FogRenderer::FillFog(Point p, int numRowItems, BlitFlags flags)
+{
 	Region r(p, Size(CELL_SIZE * numRowItems, CELL_SIZE));
 	VideoDriver->DrawRect(r, ColorBlack, true, flags);
 }
 
-bool FogRenderer::IsUncovered(Point p, const Bitmap *mask) {
+bool FogRenderer::IsUncovered(Point p, const Bitmap* mask)
+{
 	if (mask == nullptr) return true;
 
 	return mask->GetAt(p, false);
 }
 
-void FogRenderer::SetFogVerticesByOrigin(Point p) {
+void FogRenderer::SetFogVerticesByOrigin(Point p)
+{
 	// Triangle fan of 4: center
 	fogVertices[0] = fogVertices[6] = fogVertices[12] = fogVertices[18] = p.x + CELL_SIZE / 2;
 	fogVertices[1] = fogVertices[7] = fogVertices[13] = fogVertices[19] = p.y + CELL_SIZE / 2;

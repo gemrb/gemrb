@@ -21,9 +21,8 @@
 #ifndef GemRB_TTFFont_h
 #define GemRB_TTFFont_h
 
-#include "Freetype.h"
-
 #include "FontManager.h"
+#include "Freetype.h"
 
 namespace GemRB {
 

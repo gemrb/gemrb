@@ -33,10 +33,10 @@ public:
 	void SetEnter(const ResRef& resref);
 	bool TriggerTrap(int skill, ieDword ID) override;
 	//call this to check if an actor entered the trigger zone
-	bool Entered(Actor *actor);
+	bool Entered(Actor* actor);
 	ieDword GetUsePoint() const;
 	//checks if the actor may use this travel trigger
-	int CheckTravel(const Actor *actor) const;
+	int CheckTravel(const Actor* actor) const;
 	std::string dump() const override;
 	int TrapResets() const override { return Flags & TRAP_RESET; }
 	bool CanDetectTrap() const override;

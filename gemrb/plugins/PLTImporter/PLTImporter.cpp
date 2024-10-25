@@ -23,6 +23,7 @@
 #include "RGBAColor.h"
 
 #include "Interface.h"
+
 #include "Logging/Logging.h"
 #include "Video/Video.h"
 
@@ -38,34 +39,34 @@ bool PLTImporter::Import(DataStream* str)
 	char Signature[8];
 	unsigned short unknown[4];
 
-	str->Read( Signature, 8 );
-	if (strncmp( Signature, "PLT V1  ", 8 ) != 0) {
+	str->Read(Signature, 8);
+	if (strncmp(Signature, "PLT V1  ", 8) != 0) {
 		Log(WARNING, "PLTImporter", "Not a valid PLT File.");
 		core->UseCorruptedHack = true;
 		return false;
 	}
 
-	str->Read( unknown, 8 );
+	str->Read(unknown, 8);
 	str->ReadDword(Width);
 	str->ReadDword(Height);
 
-	pixels = malloc( Width * Height * 2 );
-	str->Read( pixels, Width * Height * 2 );
+	pixels = malloc(Width * Height * 2);
+	str->Read(pixels, Width * Height * 2);
 	return true;
 }
 
 Holder<Sprite2D> PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 {
-	static int pperm[8]={3,6,0,5,4,1,2,7};
+	static int pperm[8] = { 3, 6, 0, 5, 4, 1, 2, 7 };
 	ColorPal<256> Palettes[8];
 	for (int i = 0; i < 8; i++) {
-		Palettes[i] = core->GetPalette256(paletteIndex[pperm[i]] >> (8*type));
+		Palettes[i] = core->GetPalette256(paletteIndex[pperm[i]] >> (8 * type));
 	}
-	unsigned char * p = ( unsigned char * ) malloc( Width * Height * 4 );
-	unsigned char * dest = p;
+	unsigned char* p = (unsigned char*) malloc(Width * Height * 4);
+	unsigned char* dest = p;
 	const unsigned char* src = nullptr;
 	for (int y = Height - 1; y >= 0; y--) {
-		src = ( unsigned char * ) pixels + ( y * Width * 2 );
+		src = (unsigned char*) pixels + (y * Width * 2);
 		for (unsigned int x = 0; x < Width; x++) {
 			unsigned char intensity = *src++;
 			unsigned char palindex = *src++;
@@ -85,7 +86,7 @@ Holder<Sprite2D> PLTImporter::GetSprite2D(unsigned int type, ieDword paletteInde
 	fmt.HasColorKey = true;
 	fmt.ColorKey = green_mask;
 
-	Holder<Sprite2D> spr = VideoDriver->CreateSprite(Region(0,0,Width,Height), p, fmt);
+	Holder<Sprite2D> spr = VideoDriver->CreateSprite(Region(0, 0, Width, Height), p, fmt);
 	spr->Frame.x = 0;
 	spr->Frame.y = 0;
 	return spr;
@@ -94,5 +95,5 @@ Holder<Sprite2D> PLTImporter::GetSprite2D(unsigned int type, ieDword paletteInde
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x8D0C64F, "PLT File Importer")
-PLUGIN_IE_RESOURCE(PLTImporter, "plt", (ieWord)IE_PLT_CLASS_ID)
+PLUGIN_IE_RESOURCE(PLTImporter, "plt", (ieWord) IE_PLT_CLASS_ID)
 END_PLUGIN()

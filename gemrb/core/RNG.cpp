@@ -18,10 +18,11 @@
  *
  */
 
-#include <ctime>
-
 #include "RNG.h"
+
 #include "Logging/Logging.h"
+
+#include <ctime>
 
 namespace GemRB {
 
@@ -32,9 +33,10 @@ namespace GemRB {
  * which means that the RNG is seeded only once which means that it is ok to use the
  * timestamp for seeding (because it can only be used once per second).
  */
-RNG::RNG() {
+RNG::RNG()
+{
 	time_t now = time(NULL);
-	const unsigned char *ptr = (unsigned char *) &now;
+	const unsigned char* ptr = (unsigned char*) &now;
 	uint32_t seed = 0;
 
 	/* The actual value of a time_t may not be portable, so we compute a “hash” of the
@@ -53,7 +55,8 @@ RNG::RNG() {
 /**
  * Singleton.
  */
-RNG& RNG::getInstance() {
+RNG& RNG::getInstance()
+{
 	static thread_local RNG instance;
 	return instance;
 }

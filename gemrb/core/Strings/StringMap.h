@@ -52,10 +52,12 @@ class StringMap {
 	using Key_t = HeterogeneousStringKey;
 	using Map_t = std::unordered_map<Key_t, V, HASH, CMP>;
 	Map_t map;
+
 public:
 	using value_type = V;
 
-	const V& Set(const StringView& key, V value) {
+	const V& Set(const StringView& key, V value)
+	{
 		auto it = map.find(key);
 		if (it == map.end()) {
 			auto ins = map.insert(std::make_pair(key.MakeString(), std::move(value)));
@@ -67,26 +69,31 @@ public:
 		return it->second;
 	}
 
-	template <typename T>
-	auto SetAs(const StringView& key, T value) {
+	template<typename T>
+	auto SetAs(const StringView& key, T value)
+	{
 		static_assert(sizeof(T) <= sizeof(V), "Cannot truncate value. Use Set() and static_cast if it must be done.");
 		return Set(key, static_cast<V>(value));
 	}
 
-	void Merge(StringMap&& other) {
+	void Merge(StringMap&& other)
+	{
 		map.insert(std::make_move_iterator(other.map.begin()),
-				   std::make_move_iterator(other.map.end()));
+			   std::make_move_iterator(other.map.end()));
 	}
 
-	void Erase(const StringView& key) {
+	void Erase(const StringView& key)
+	{
 		map.erase(key);
 	}
 
-	WARN_UNUSED bool Contains(const StringView& key) const {
+	WARN_UNUSED bool Contains(const StringView& key) const
+	{
 		return map.count(key);
 	}
 
-	WARN_UNUSED const V* Get(const StringView& key) const {
+	WARN_UNUSED const V* Get(const StringView& key) const
+	{
 		auto it = map.find(key);
 		if (it == map.end()) {
 			return nullptr;
@@ -95,7 +102,8 @@ public:
 		}
 	}
 
-	WARN_UNUSED const V& Get(const StringView& key, const V& fallback) const {
+	WARN_UNUSED const V& Get(const StringView& key, const V& fallback) const
+	{
 		auto it = map.find(key);
 		if (it == map.end()) {
 			return fallback;
@@ -111,15 +119,18 @@ public:
 		return static_cast<T>(Get(key, static_cast<V>(fallback)));
 	}
 
-	auto size() const {
+	auto size() const
+	{
 		return map.size();
 	}
 
-	auto begin() const {
+	auto begin() const
+	{
 		return map.begin();
 	}
 
-	auto end() const {
+	auto end() const
+	{
 		return map.end();
 	}
 };

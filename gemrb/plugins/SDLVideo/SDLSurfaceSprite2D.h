@@ -60,7 +60,7 @@ private:
 public:
 	SDLSurfaceSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
 	SDLSurfaceSprite2D(const Region&, const PixelFormat& fmt) noexcept;
-	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept;
+	SDLSurfaceSprite2D(const SDLSurfaceSprite2D& obj) noexcept;
 	~SDLSurfaceSprite2D() noexcept override;
 
 	Holder<Sprite2D> copy() const override;
@@ -73,11 +73,11 @@ public:
 	bool ConvertFormatTo(const PixelFormat& tofmt) noexcept override;
 
 	SDL_Surface* GetSurface() const;
-	
+
 	BlitFlags PrepareForRendering(BlitFlags flags, const Color* = nullptr) const noexcept;
 };
 
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
 // TODO: this is a lazy implementation
 // it would probably be better to not inherit from SDLSurfaceSprite2D
 // the hard part is handling the palettes ourselves
@@ -87,6 +87,7 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 	mutable bool staleTexture = false;
 
 	void OnSurfaceUpdate() const noexcept override;
+
 public:
 	SDLTextureSprite2D(const SDLTextureSprite2D&) noexcept;
 	SDLTextureSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
@@ -94,11 +95,11 @@ public:
 	~SDLTextureSprite2D() noexcept override;
 
 	Holder<Sprite2D> copy() const override;
-	
+
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
 };
 #endif
 
 }
 
-#endif  // ! SDLSURFACESPRITE2D_H
+#endif // ! SDLSURFACESPRITE2D_H

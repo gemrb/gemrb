@@ -25,7 +25,6 @@
  */
 
 
-
 #ifndef GAME_H
 #define GAME_H
 
@@ -34,12 +33,13 @@
 
 #include "Callback.h"
 #include "Resource.h"
-#include "Scriptable/Scriptable.h"
+
 #include "Scriptable/PCStatStruct.h"
+#include "Scriptable/Scriptable.h"
 #include "Video/Video.h"
 
-#include <atomic>
 #include <array>
+#include <atomic>
 #include <vector>
 
 namespace GemRB {
@@ -53,25 +53,25 @@ class TableMgr;
 #define BESTIARY_SIZE 260
 
 //ShareXP flags
-#define SX_DIVIDE  1   //divide XP among team members
-#define SX_CR      2   //use challenge rating resolution
-#define SX_COMBAT  4   //combat xp, adjusted by difficulty
+#define SX_DIVIDE 1 //divide XP among team members
+#define SX_CR     2 //use challenge rating resolution
+#define SX_COMBAT 4 //combat xp, adjusted by difficulty
 
 //joinparty flags
-#define JP_JOIN     1  //refresh join time
-#define JP_INITPOS  2  //init startpos
-#define JP_SELECT   4  //select the actor after joining
+#define JP_JOIN    1 //refresh join time
+#define JP_INITPOS 2 //init startpos
+#define JP_SELECT  4 //select the actor after joining
 
 //protagonist mode
-#define PM_NO       0  //no death checks
-#define PM_YES      1  //if protagonist dies, game over
-#define PM_TEAM     2  //if team dies, game over
+#define PM_NO   0 //no death checks
+#define PM_YES  1 //if protagonist dies, game over
+#define PM_TEAM 2 //if team dies, game over
 
 // Flags bits for SelectActor()
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define SELECT_NORMAL   0x00
-#define SELECT_REPLACE  0x01 // when selecting actor, deselect all others
-#define SELECT_QUIET    0x02 // do not run handler when changing selection
+#define SELECT_NORMAL  0x00
+#define SELECT_REPLACE 0x01 // when selecting actor, deselect all others
+#define SELECT_QUIET   0x02 // do not run handler when changing selection
 
 // Flags bits for EveryoneNearPoint()
 enum ENP {
@@ -81,37 +81,37 @@ enum ENP {
 };
 
 // GUI Control Status flags (saved in game)
-#define CS_PARTY_AI  1   //enable party AI
-#define CS_MEDIUM    2   //medium dialog
-#define CS_LARGE     6   //large dialog, both bits set
+#define CS_PARTY_AI       1 //enable party AI
+#define CS_MEDIUM         2 //medium dialog
+#define CS_LARGE          6 //large dialog, both bits set
 #define CS_DIALOGSIZEMASK 6
-#define CS_DIALOG    8   //dialog is running
-#define CS_HIDEGUI   16  //hide all gui
-#define CS_ACTION    32  //hide action pane
-#define CS_PORTRAIT  64  //hide portrait pane
-#define CS_MAPNOTES  128 //hide mapnotes
+#define CS_DIALOG         8 //dialog is running
+#define CS_HIDEGUI        16 //hide all gui
+#define CS_ACTION         32 //hide action pane
+#define CS_PORTRAIT       64 //hide portrait pane
+#define CS_MAPNOTES       128 //hide mapnotes
 
 //Weather bits
-#define WB_NORMAL    0
-#define WB_RAIN      1
-#define WB_SNOW      2
-#define WB_FOG       3
-#define WB_TYPEMASK  3
-#define WB_LIGHTRAIN 4
+#define WB_NORMAL     0
+#define WB_RAIN       1
+#define WB_SNOW       2
+#define WB_FOG        3
+#define WB_TYPEMASK   3
+#define WB_LIGHTRAIN  4
 #define WB_MEDIUMRAIN 8
-#define WB_HEAVYRAIN 12
-#define WB_RAINMASK  12
-#define WB_LIGHTWIND 0x10
-#define WB_MEDWIND   0x20
+#define WB_HEAVYRAIN  12
+#define WB_RAINMASK   12
+#define WB_LIGHTWIND  0x10
+#define WB_MEDWIND    0x20
 #define WB_STRONGWING 0x30
-#define WB_WINDMASK  0x30
+#define WB_WINDMASK   0x30
 
-#define WB_RARELIGHTNING 0x40
-#define WB_MEDLIGHTNING  0x80
+#define WB_RARELIGHTNING  0x40
+#define WB_MEDLIGHTNING   0x80
 #define WB_HEAVYLIGHTNING 0xc0
-#define WB_LIGHTNINGMASK 0xc0
-#define WB_INCREASESTORM   0x100
-#define WB_HASWEATHER 0x200
+#define WB_LIGHTNINGMASK  0xc0
+#define WB_INCREASESTORM  0x100
+#define WB_HASWEATHER     0x200
 
 // Rest flags
 enum RestChecks {
@@ -123,10 +123,10 @@ enum RestChecks {
 };
 
 // Song types, index in ARE song section (hardcoded and in musics.ids for scripts (iwd))
-#define SONG_DAY        0
-#define SONG_NIGHT      1
+#define SONG_DAY   0
+#define SONG_NIGHT 1
 // SONG_BATTLE_WIN
-#define SONG_BATTLE     3
+#define SONG_BATTLE 3
 // SONG_BATTLE_LOSE
 // SONG_MISC0-4
 
@@ -145,11 +145,11 @@ enum class JournalSection : uint8_t {
 
 struct GAMJournalEntry {
 	ieStrRef Text;
-	ieDword  GameTime; // in game time seconds
-	ieByte   Chapter;
-	ieByte   unknown09;
-	ieByte   Section;
-	ieByte   Group;   // this is a GemRB extension
+	ieDword GameTime; // in game time seconds
+	ieByte Chapter;
+	ieByte unknown09;
+	ieByte Section;
+	ieByte Group; // this is a GemRB extension
 };
 
 // Saved location of party member.
@@ -171,36 +171,36 @@ struct maze_entry {
 
 struct maze_header {
 	ieDword maze_sizex, maze_sizey;
-	ieDword pos1x, pos1y;  //nordom's position
-	ieDword pos2x, pos2y;  //main hall position
-	ieDword pos3x, pos3y;  //foyer entrance
-	ieDword pos4x, pos4y;  //unknown
-	ieDword trapcount;     //based on map size
-	ieDword initialized;   //set to 1
-	ieDword unknown2c;     //unknown
-	ieDword unknown30;     //unknown
+	ieDword pos1x, pos1y; //nordom's position
+	ieDword pos2x, pos2y; //main hall position
+	ieDword pos3x, pos3y; //foyer entrance
+	ieDword pos4x, pos4y; //unknown
+	ieDword trapcount; //based on map size
+	ieDword initialized; //set to 1
+	ieDword unknown2c; //unknown
+	ieDword unknown30; //unknown
 };
 
-#define MAZE_ENTRY_SIZE sizeof(maze_entry)
-#define MAZE_HEADER_SIZE sizeof(maze_header)
-#define MAZE_MAX_DIM 8
-#define MAZE_ENTRY_COUNT (MAZE_MAX_DIM*MAZE_MAX_DIM)
-#define MAZE_DATA_SIZE (MAZE_ENTRY_COUNT*MAZE_ENTRY_SIZE+MAZE_HEADER_SIZE)
+#define MAZE_ENTRY_SIZE          sizeof(maze_entry)
+#define MAZE_HEADER_SIZE         sizeof(maze_header)
+#define MAZE_MAX_DIM             8
+#define MAZE_ENTRY_COUNT         (MAZE_MAX_DIM * MAZE_MAX_DIM)
+#define MAZE_DATA_SIZE           (MAZE_ENTRY_COUNT * MAZE_ENTRY_SIZE + MAZE_HEADER_SIZE)
 #define MAZE_DATA_SIZE_HARDCODED 1720
 
 //maze header indices
-#define MH_POS1X      0
-#define MH_POS1Y      1
-#define MH_POS2X      2
-#define MH_POS2Y      3
-#define MH_POS3X      4
-#define MH_POS3Y      5
-#define MH_POS4X      6
-#define MH_POS4Y      7
-#define MH_TRAPCOUNT  8
-#define MH_INITED     9
-#define MH_UNKNOWN2C  10
-#define MH_UNKNOWN30  11
+#define MH_POS1X     0
+#define MH_POS1Y     1
+#define MH_POS2X     2
+#define MH_POS2Y     3
+#define MH_POS3X     4
+#define MH_POS3Y     5
+#define MH_POS4X     6
+#define MH_POS4Y     7
+#define MH_TRAPCOUNT 8
+#define MH_INITED    9
+#define MH_UNKNOWN2C 10
+#define MH_UNKNOWN30 11
 
 //maze entry indices
 #define ME_OVERRIDE   0
@@ -211,10 +211,10 @@ struct maze_header {
 #define ME_VISITED    5
 
 //ME_WALL bitfields
-#define WALL_SOUTH    1
-#define WALL_NORTH    2
-#define WALL_EAST     4
-#define WALL_WEST     8
+#define WALL_SOUTH 1
+#define WALL_NORTH 2
+#define WALL_EAST  4
+#define WALL_WEST  8
 
 #define MAX_CRLEVEL 32
 
@@ -234,23 +234,25 @@ public:
 
 	Game(void);
 	~Game(void) override;
+
 private:
-	std::vector< Actor*> PCs;
-	std::vector< Actor*> NPCs;
-	std::vector< Map*> Maps;
-	std::vector< GAMJournalEntry*> Journals;
-	std::vector< GAMLocationEntry*> savedpositions;
-	std::vector< GAMLocationEntry*> planepositions;
+	std::vector<Actor*> PCs;
+	std::vector<Actor*> NPCs;
+	std::vector<Map*> Maps;
+	std::vector<GAMJournalEntry*> Journals;
+	std::vector<GAMLocationEntry*> savedpositions;
+	std::vector<GAMLocationEntry*> planepositions;
 	std::vector<ResRef> mastarea;
-	std::vector<std::vector<ResRef> > npclevels;
-	CRRow *crtable = nullptr;
+	std::vector<std::vector<ResRef>> npclevels;
+	CRRow* crtable = nullptr;
 	ResRef restmovies[8];
 	ResRef daymovies[8];
 	ResRef nightmovies[8];
 	int MapIndex = -1;
 	ResRef Familiars[9];
+
 public:
-	std::vector< Actor*> selected;
+	std::vector<Actor*> selected;
 	int version = 0;
 	kaputz_t kaputz;
 	std::array<ieByte, BESTIARY_SIZE> beasts;
@@ -270,10 +272,10 @@ public:
 	int protagonist = PM_YES;
 	/** if party size exceeds this amount, a callback will be called */
 	size_t partysize = 6;
-	std::atomic_uint32_t GameTime {0};
+	std::atomic_uint32_t GameTime { 0 };
 	ieDword RealTime = 0;
 	ieWord WhichFormation = 0; // 0-4 index into Formations, not an actual formation!
-	ieWord  Formations[5]{};
+	ieWord Formations[5] {};
 	ieDword PartyGold = 0;
 	ieWord NPCAreaViewed = 0;
 	ieWord WeatherBits = 0;
@@ -296,13 +298,14 @@ public:
 	ieDword FamiliarOwner = 0; // IWDEE: which player has the familiar? InParty - 1
 	FixedSizeString<20> RandomEncounterEntry;
 
-	Particles *weather = nullptr;
+	Particles* weather = nullptr;
 	int event_timer = 0;
 	EventHandler event_handler = nullptr;
 	bool hasInfra = false;
 	bool familiarBlock = false;
 	bool PartyAttack = false;
 	bool HOFMode = false;
+
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();
@@ -318,23 +321,23 @@ public:
 	Actor* FindPC(unsigned int partyID) const;
 	Actor* FindNPC(unsigned int partyID) const;
 	/** Finds a global actor by global ID */
-	Actor *GetGlobalActorByGlobalID(ieDword globalID) const;
+	Actor* GetGlobalActorByGlobalID(ieDword globalID) const;
 	/** Finds an actor in party, returns slot, if not there, returns -1*/
-	int InParty(const Actor *pc) const;
+	int InParty(const Actor* pc) const;
 	/** Finds an actor in store, returns slot, if not there, returns -1*/
-	int InStore(const Actor *pc) const;
+	int InStore(const Actor* pc) const;
 	/** Finds an actor in party by scripting name*/
 	Actor* FindPC(const ieVariable& deathVar) const;
 	/** Finds an actor in store by scripting name*/
 	Actor* FindNPC(const ieVariable& deathVar) const;
 	/** Sets the area and position of the actor to the starting position */
-	void InitActorPos(Actor *actor) const;
+	void InitActorPos(Actor* actor) const;
 	/** Joins party */
-	int JoinParty(Actor* pc, int join=JP_JOIN);
+	int JoinParty(Actor* pc, int join = JP_JOIN);
 	/** Return current party size */
 	int GetPartySize(bool onlyAlive) const;
 	/** Returns the npcs count */
-	int GetNPCCount() const { return (int)NPCs.size(); }
+	int GetNPCCount() const { return (int) NPCs.size(); }
 	/** Sends the hotkey trigger to all selected pcs */
 	void SendHotKey(unsigned long key) const;
 	/** Select PC for non-walking environment (shops, inventory, ...) */
@@ -360,14 +363,14 @@ public:
 	 * use it for the biggest safety, change = true will change the current map */
 	Map* GetMap(const ResRef& areaName, bool change);
 	/** Returns slot of the map if found */
-	int FindMap(const ResRef &resRef) const;
+	int FindMap(const ResRef& resRef) const;
 	int AddMap(Map* map);
 	/** Determine if area is master area*/
-	bool MasterArea(const ResRef &area) const;
+	bool MasterArea(const ResRef& area) const;
 	/** Dynamically adding an area to master areas*/
-	void SetMasterArea(const ResRef &area);
+	void SetMasterArea(const ResRef& area);
 	/** place persistent actors in the fresly loaded area*/
-	void PlacePersistents(Map *map, const ResRef &resRef);
+	void PlacePersistents(Map* map, const ResRef& resRef);
 	/** Returns slot of the map, if it was already loaded,
 	 * don't load it again, set changepf == true,
 	 * if you want to change the pathfinder too. */
@@ -408,20 +411,23 @@ public:
 	const ResRef& GetFamiliar(size_t index) const;
 	void SetFamiliar(const ResRef& familiar, size_t index);
 
-	bool IsBeastKnown(unsigned int index) const {
+	bool IsBeastKnown(unsigned int index) const
+	{
 		if (index >= BESTIARY_SIZE) {
 			return false;
 		}
 		return beasts[index] != 0;
 	}
-	void SetBeastKnown(unsigned int index) {
+	void SetBeastKnown(unsigned int index)
+	{
 		if (index >= BESTIARY_SIZE) {
 			return;
 		}
 		beasts[index] = 1;
 	}
-	ieWord GetFormation() const {
-		if (WhichFormation>4) {
+	ieWord GetFormation() const
+	{
+		if (WhichFormation > 4) {
 			return 0;
 		}
 		return Formations[WhichFormation];
@@ -439,7 +445,7 @@ public:
 	bool EveryoneDead() const;
 	/** returns true if no one moves */
 	bool EveryoneStopped() const;
-	bool EveryoneNearPoint(const Map *map, const Point &p, int flags) const;
+	bool EveryoneNearPoint(const Map* map, const Point& p, int flags) const;
 	/** a party member just died now */
 	void PartyMemberDied(const Actor*) const;
 	/** Increments chapter variable and refreshes kill stats */
@@ -459,7 +465,7 @@ public:
 	/** Adds or removes gold */
 	void AddGold(int add);
 	/** Adds ticks to game time */
-	void AdvanceTime(ieDword add, bool fatigue=true);
+	void AdvanceTime(ieDword add, bool fatigue = true);
 	/** Runs the script engine on the global script and the area scripts
 	areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
@@ -468,16 +474,16 @@ public:
 	/** runs area functionality, sets partyrested trigger */
 	bool RestParty(RestChecks checks, int dream, int hp);
 	/** timestop effect initiated by actor */
-	void TimeStop(Actor *actor, ieDword end);
+	void TimeStop(Actor* actor, ieDword end);
 	/** check if the passed actor is a victim of timestop */
 	bool TimeStoppedFor(const Actor* target = nullptr) const;
 	/** updates the infravision info */
 	void Infravision();
 	/** applies the global tint if it is needed */
-	void ApplyGlobalTint(Color &tint, BlitFlags &flags) const;
+	void ApplyGlobalTint(Color& tint, BlitFlags& flags) const;
 	/** gets the colour which should be applied over the game area,
 	may return NULL */
-	const Color *GetGlobalTint() const;
+	const Color* GetGlobalTint() const;
 	/** returns true if party has infravision */
 	bool PartyHasInfravision() const { return hasInfra; }
 	/** draw weather */
@@ -489,9 +495,9 @@ public:
 	/** Dumps information about the object */
 	std::string dump() const override;
 	/** Finds an actor by global ID */
-	Actor *GetActorByGlobalID(ieDword objectID) const;
+	Actor* GetActorByGlobalID(ieDword objectID) const;
 	/** Allocates maze data */
-	ieByte *AllocateMazeData();
+	ieByte* AllocateMazeData();
 	/** Checks if any timestop effects are active */
 	bool IsTimestopActive() const;
 	int RemainingTimestop() const;
@@ -513,7 +519,7 @@ public:
 	void CheckAreaComment();
 
 private:
-	ResRef *GetDream(Map *area);
+	ResRef* GetDream(Map* area);
 	void CastOnRest() const;
 	void PlayerDream() const;
 	void TextDream();
@@ -521,4 +527,4 @@ private:
 
 }
 
-#endif  // ! GAME_H
+#endif // ! GAME_H

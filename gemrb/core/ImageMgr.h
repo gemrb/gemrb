@@ -25,6 +25,7 @@
 
 #include "Resource.h"
 #include "Sprite2D.h"
+
 #include "Streams/DataStream.h"
 
 namespace GemRB {
@@ -37,7 +38,7 @@ class ImageFactory;
 class GEM_EXPORT ImageMgr : public Resource {
 public:
 	static const TypeID ID;
-	
+
 public:
 	/** Returns a \ref Sprite2D containing the image. */
 	virtual Holder<Sprite2D> GetSprite2D() = 0;
@@ -52,7 +53,7 @@ public:
 	 * This does nothing if there is no palette.
 	 */
 	virtual int GetPalette(int colors, Palette& pal);
-	
+
 	Size GetSize() const { return size; }
 
 	/**
@@ -61,6 +62,7 @@ public:
 	 * @param[in] ResRef name of image represented by factory.
 	 */
 	std::shared_ptr<ImageFactory> GetImageFactory(const ResRef& ref);
+
 protected:
 	Size size;
 };

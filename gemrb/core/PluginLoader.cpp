@@ -18,10 +18,12 @@
 
 #include "PluginLoader.h"
 
-#include "InterfaceConfig.h"
-#include "Logging/Logging.h"
 #include "Platform.h"
+
+#include "InterfaceConfig.h"
 #include "PluginMgr.h"
+
+#include "Logging/Logging.h"
 #include "System/FileFilters.h"
 
 #include <cstdio>
@@ -29,11 +31,11 @@
 #include <set>
 
 #if defined(HAVE_DLFCN_H)
-#include <dlfcn.h>
+	#include <dlfcn.h>
 #endif
 
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
-# include <cassert>
+	#include <cassert>
 #endif
 
 namespace GemRB {
@@ -46,44 +48,44 @@ using LibHandle = void*;
 
 namespace GemRB {
 
-class PluginMgr;
+	class PluginMgr;
 
 }
 
 struct PluginDesc {
 	LibHandle handle;
 	PluginID ID;
-	const char *Description;
+	const char* Description;
 	bool (*Register)(PluginMgr*);
 };
 
-using Version_t = const char* (*)(void);
-using Description_t = const char* (*)(void);
+using Version_t = const char* (*) (void);
+using Description_t = const char* (*) (void);
 using ID_t = PluginID (*)();
 using Register_t = bool (*)(PluginMgr*);
 
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
-using voidvoid = void* (*)(void);
-static inline voidvoid my_dlsym(void *handle, const char *symbol)
+using voidvoid = void* (*) (void);
+static inline voidvoid my_dlsym(void* handle, const char* symbol)
 {
-	void *value = dlsym(handle,symbol);
+	void* value = dlsym(handle, symbol);
 	voidvoid ret;
-	assert(sizeof(ret)==sizeof(value) );
-	memcpy(&ret, &value, sizeof(ret) );
+	assert(sizeof(ret) == sizeof(value));
+	memcpy(&ret, &value, sizeof(ret));
 	return ret;
 }
 #else
-#define my_dlsym dlsym
+	#define my_dlsym dlsym
 #endif
 
 #ifdef WIN32
-#define STRSAFE_NO_DEPRECATE
-#include <strsafe.h>
-#define FREE_PLUGIN( handle )  FreeLibrary( handle )
-#define GET_PLUGIN_SYMBOL( handle, name )  GetProcAddress( handle, name )
+	#define STRSAFE_NO_DEPRECATE
+	#include <strsafe.h>
+	#define FREE_PLUGIN(handle)             FreeLibrary(handle)
+	#define GET_PLUGIN_SYMBOL(handle, name) GetProcAddress(handle, name)
 #else
-#define FREE_PLUGIN( handle )  dlclose( handle )
-#define GET_PLUGIN_SYMBOL( handle, name )  my_dlsym( handle, name )
+	#define FREE_PLUGIN(handle)             dlclose(handle)
+	#define GET_PLUGIN_SYMBOL(handle, name) my_dlsym(handle, name)
 #endif
 
 #ifdef WIN32
@@ -119,34 +121,34 @@ static bool LoadPlugin(const char* pluginpath)
 
 	//using C bindings, so we don't need to jump through extra hoops
 	//with the symbol name
-	Version_t LibVersion = ( Version_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Version" );
-	if (LibVersion==NULL) {
+	Version_t LibVersion = (Version_t) (void*) GET_PLUGIN_SYMBOL(hMod, "GemRBPlugin_Version");
+	if (LibVersion == NULL) {
 		Log(ERROR, "PluginLoader", "Skipping invalid plugin \"{}\".", pluginpath);
-		FREE_PLUGIN( hMod );
+		FREE_PLUGIN(hMod);
 		return false;
 	}
-	if (strcmp(LibVersion(), VERSION_GEMRB) ) {
+	if (strcmp(LibVersion(), VERSION_GEMRB)) {
 		Log(ERROR, "PluginLoader", "Skipping plugin \"{}\" with version mismatch.", pluginpath);
-		FREE_PLUGIN( hMod );
+		FREE_PLUGIN(hMod);
 		return false;
 	}
 
-	Description_t Description = ( Description_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Description" );
-	ID_t ID = ( ID_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_ID" );
-	Register_t Register = ( Register_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Register" );
+	Description_t Description = (Description_t) (void*) GET_PLUGIN_SYMBOL(hMod, "GemRBPlugin_Description");
+	ID_t ID = (ID_t) (void*) GET_PLUGIN_SYMBOL(hMod, "GemRBPlugin_ID");
+	Register_t Register = (Register_t) (void*) GET_PLUGIN_SYMBOL(hMod, "GemRBPlugin_Register");
 
 	static std::set<PluginID> libs;
 	PluginDesc desc = { hMod, ID(), Description(), Register };
 
 	if (libs.find(desc.ID) != libs.end()) {
 		Log(WARNING, "PluginLoader", "Plug-in \"{}\" already loaded!", pluginpath);
-		FREE_PLUGIN( hMod );
+		FREE_PLUGIN(hMod);
 		return false;
 	}
 	if (desc.Register != NULL) {
 		if (!desc.Register(PluginMgr::Get())) {
 			Log(WARNING, "PluginLoader", "Plugin Registration Failed! Perhaps a duplicate?");
-			FREE_PLUGIN( hMod );
+			FREE_PLUGIN(hMod);
 		}
 	}
 	libs.insert(desc.ID);

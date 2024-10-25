@@ -35,16 +35,16 @@ namespace GemRB {
 
 const Glyph& TTFFont::AliasBlank(ieWord chr) const
 {
-	((TTFFont*)this)->CreateAliasForChar(0, chr);
+	((TTFFont*) this)->CreateAliasForChar(0, chr);
 	return Font::GetGlyph(chr);
 }
 
 const Glyph& TTFFont::GetGlyph(ieWord chr) const
 {
 	if (!core->TLKEncoding.multibyte) {
-		char* oldchar = (char*)&chr;
+		char* oldchar = (char*) &chr;
 		ieWord unicodeChr = 0;
-		char* newchar = (char*)&unicodeChr;
+		char* newchar = (char*) &unicodeChr;
 		size_t in = (core->TLKEncoding.widechar) ? 2 : 1;
 		size_t out = 2;
 
@@ -92,8 +92,8 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		return AliasBlank(chr);
 	}
 
-	error = FT_Load_Glyph( face, index, FT_LOAD_DEFAULT | FT_LOAD_TARGET_MONO);
-	if( error ) {
+	error = FT_Load_Glyph(face, index, FT_LOAD_DEFAULT | FT_LOAD_TARGET_MONO);
+	if (error) {
 		LogFTError(error);
 		return AliasBlank(chr);
 	}
@@ -129,7 +129,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 
 	/* Render the glyph */
 	error = FT_Render_Glyph(glyph, FT_RENDER_MODE_NORMAL);
-	if( error ) {
+	if (error) {
 		LogFTError(error);
 		return AliasBlank(chr);
 	}
@@ -149,11 +149,11 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		return AliasBlank(chr);
 	}
 
-	pixels = (uint8_t*)malloc(sprSize.w * sprSize.h);
+	pixels = (uint8_t*) malloc(sprSize.w * sprSize.h);
 	uint8_t* dest = pixels;
 	const uint8_t* src = bitmap->buffer;
 
-	for( int row = 0; row < sprSize.h; row++ ) {
+	for (int row = 0; row < sprSize.h; row++) {
 		// TODO: handle italics. we will need to offset the row by font->glyph_italics * row i think.
 		memcpy(dest, src, sprSize.w);
 		dest += sprSize.w;
@@ -168,7 +168,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, 0);
 	Holder<Sprite2D> spr = VideoDriver->CreateSprite(r, pixels, fmt);
 	// FIXME: casting away const
-	const Glyph& ret = ((TTFFont*)this)->CreateGlyphForCharSprite(chr, spr);
+	const Glyph& ret = ((TTFFont*) this)->CreateGlyphForCharSprite(chr, spr);
 	return ret;
 }
 
@@ -176,7 +176,7 @@ int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
 {
 	FT_UInt leftIndex = FT_Get_Char_Index(face, leftChr);
 	FT_UInt rightIndex = FT_Get_Char_Index(face, rightChr);
-	FT_Vector kerning = {0,0};
+	FT_Vector kerning = { 0, 0 };
 	// FT_KERNING_DEFAULT is "grid fitted". we will end up with a scaled multiple of 64
 	FT_Error error = FT_Get_Kerning(face, leftIndex, rightIndex, FT_KERNING_DEFAULT, &kerning);
 	if (error) {
@@ -184,11 +184,11 @@ int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
 		return 0;
 	}
 	// kerning is in 26.6 format. basically divide by 64 to get the number of pixels.
-	return (int)(-kerning.x / 64);
+	return (int) (-kerning.x / 64);
 }
 
 TTFFont::TTFFont(Holder<Palette> pal, FT_Face face, int lineheight, int baseline)
-: Font(std::move(pal), lineheight, baseline, false), face(face)
+	: Font(std::move(pal), lineheight, baseline, false), face(face)
 {
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it
 	// ttf fonts dont produce glyphs for whitespace

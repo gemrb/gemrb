@@ -21,6 +21,7 @@
 #include "globals.h"
 
 #include "ResourceDesc.h"
+
 #include "Streams/FileStream.h"
 
 using namespace GemRB;

@@ -32,7 +32,7 @@
 #include "ie_types.h"
 #include "strrefs.h"
 
-#include "Item.h"  //needs item for itmextheader
+#include "Item.h" //needs item for itmextheader
 #include "Store.h"
 
 #include <vector>
@@ -42,10 +42,10 @@ namespace GemRB {
 class Map;
 
 //AddSlotItem return values
-#define ASI_FAILED     0
-#define ASI_PARTIAL    1
-#define ASI_SUCCESS    2
-#define ASI_SWAPPED    3 //not returned normally, but Gui uses this value
+#define ASI_FAILED  0
+#define ASI_PARTIAL 1
+#define ASI_SUCCESS 2
+#define ASI_SWAPPED 3 //not returned normally, but Gui uses this value
 
 //AddSlotItem extra slot ID's
 #define SLOT_AUTOEQUIP     -1
@@ -63,7 +63,7 @@ class Map;
 #define SLOT_WEAPON    256
 #define SLOT_QUIVER    512
 #define SLOT_CLOAK     1024
-#define SLOT_ITEM      2048  //quick item
+#define SLOT_ITEM      2048 //quick item
 #define SLOT_SCROLL    4096
 #define SLOT_BAG       8192
 #define SLOT_POTION    16384
@@ -74,7 +74,7 @@ class Map;
 #define SLOT_UMD_MASK  (0x100000 - 1)
 
 //weapon slot types (1000==not equipped)
-#define IW_NO_EQUIPPED  1000
+#define IW_NO_EQUIPPED 1000
 
 /** Inventory types */
 enum class ieInventoryType {
@@ -88,17 +88,17 @@ using ieCREItemFlagBits = enum ieCREItemFlagBits : uint32_t {
 	IE_INV_ITEM_UNSTEALABLE = 2,
 	IE_INV_ITEM_STOLEN = 4, // denotes steel items in pst
 	//in iwd/iwd2 this flag means 'magical', some hack is needed
-	IE_INV_ITEM_UNDROPPABLE =8,
+	IE_INV_ITEM_UNDROPPABLE = 8,
 	//just recently acquired
-	IE_INV_ITEM_ACQUIRED = 0x10,	//this is a gemrb extension
+	IE_INV_ITEM_ACQUIRED = 0x10, //this is a gemrb extension
 	//is this item destructible normally?
-	IE_INV_ITEM_DESTRUCTIBLE = 0x20,//this is a gemrb extension
+	IE_INV_ITEM_DESTRUCTIBLE = 0x20, //this is a gemrb extension
 	//is this item already equipped?
-	IE_INV_ITEM_EQUIPPED = 0x40,	//this is a gemrb extension
+	IE_INV_ITEM_EQUIPPED = 0x40, //this is a gemrb extension
 	//selected for sale, using the same bit, hope it is ok
-	IE_INV_ITEM_SELECTED = 0x40,    //this is a gemrb extension
+	IE_INV_ITEM_SELECTED = 0x40, //this is a gemrb extension
 	//is this item stackable?
-	IE_INV_ITEM_STACKED = 0x80,	//this is a gemrb extension
+	IE_INV_ITEM_STACKED = 0x80, //this is a gemrb extension
 	//these flags are coming from the original item, but these are immutable
 	IE_INV_ITEM_CRITICAL = 0x100, //coming from original item
 	IE_INV_ITEM_TWOHANDED = 0x200,
@@ -119,13 +119,13 @@ using ieCREItemFlagBits = enum ieCREItemFlagBits : uint32_t {
 	IE_INV_ITEM_ADAMANTINE = 0x4000000,
 };
 
-#define IE_INV_DEPLETABLE (IE_INV_ITEM_MAGICAL|IE_INV_ITEM_DESTRUCTIBLE)
+#define IE_INV_DEPLETABLE (IE_INV_ITEM_MAGICAL | IE_INV_ITEM_DESTRUCTIBLE)
 
 //equip flags
 #define EQUIP_NONE   0
-#define EQUIP_MELEE 1
+#define EQUIP_MELEE  1
 #define EQUIP_RANGED 2
-#define EQUIP_FORCE 4
+#define EQUIP_FORCE  4
 
 // a mash of useful data fields from Item, ITMExtHeader and potentially CREItem
 struct ItemExtHeader {
@@ -172,11 +172,11 @@ public:
 	int MaxStackAmount = 0;
 
 	CREItem() noexcept = default;
-	explicit CREItem(const STOItem *item)
+	explicit CREItem(const STOItem* item)
 	{
 		CopySTOItem(item);
 	};
-	void CopySTOItem(const STOItem *item)
+	void CopySTOItem(const STOItem* item)
 	{
 		ItemResRef = item->ItemResRef;
 		Expired = 0; // PurchasedAmount in STOItem
@@ -204,19 +204,20 @@ private:
 	ieWord EquippedHeader = 0;
 	/** this isn't saved */
 	ieDword ItemExcl = 0;
-	ieDword ItemTypes[8]{}; // 256 bits
-public: 
+	ieDword ItemTypes[8] {}; // 256 bits
+
+public:
 	Inventory() noexcept = default;
 	Inventory(const Inventory&) = delete;
 	virtual ~Inventory();
 	Inventory& operator=(const Inventory&) = delete;
 
 	/** duplicates the source inventory into the current one, marking items as undroppable */
-	void CopyFrom(const Actor *source);
+	void CopyFrom(const Actor* source);
 	/** adds an item to the inventory */
-	void AddItem(CREItem *item);
+	void AddItem(CREItem* item);
 	/** Returns number of items in the inventory */
-	int CountItems(const ResRef &resRef, bool charges, bool checkBags = false) const;
+	int CountItems(const ResRef& resRef, bool charges, bool checkBags = false) const;
 	/** looks for a particular item in a slot */
 	bool HasItemInSlot(const ResRef& resref, unsigned int slot) const;
 	bool IsSlotEmpty(unsigned int slot) const;
@@ -224,13 +225,13 @@ public:
 	bool HasItemType(ieDword type) const;
 	/** Looks for a particular item in the inventory.
 	 * flags: see ieCREItemFlagBits */
-	bool HasItem(const ResRef &resref, ieDword flags) const;
+	bool HasItem(const ResRef& resref, ieDword flags) const;
 
 	void SetInventoryType(ieInventoryType arg);
 	void SetOwner(Actor* act) { Owner = act; }
 
 	/** returns number of all slots in the inventory */
-	int GetSlotCount() const { return (int)Slots.size(); }
+	int GetSlotCount() const { return (int) Slots.size(); }
 
 	/** sets inventory size, for the first time */
 	void SetSlotCount(size_t size);
@@ -240,7 +241,7 @@ public:
 	 * If count !=0 it splits the item and returns only requested amount */
 	CREItem* RemoveItem(unsigned int slot, unsigned int count = 0);
 	/** returns slot of removed item, you can delete the removed item */
-	int RemoveItem(const ResRef& resref, unsigned int flags, CREItem **res_item, int count = 0);
+	int RemoveItem(const ResRef& resref, unsigned int flags, CREItem** res_item, int count = 0);
 
 	/** adds CREItem to the inventory. If slot == -1, finds
 	** first eligible slot, eventually splitting the item to
@@ -259,7 +260,7 @@ public:
 	/** returns the number of destroyed items */
 	unsigned int DestroyItem(const ResRef& resref, ieDword flags, ieDword count);
 	void SetSlotItem(CREItem* item, unsigned int slot);
-	int GetWeight() const {return Weight;}
+	int GetWeight() const { return Weight; }
 
 	bool ItemsAreCompatible(const CREItem* target, const CREItem* source) const;
 	//depletes charged items
@@ -267,19 +268,19 @@ public:
 	//charges recharging items
 	void ChargeAllItems(int hours) const;
 	/** Finds the first slot of named item, if resref is empty, finds the first filled! slot */
-	int FindItem(const ResRef &resref, unsigned int flags, unsigned int skip=0) const;
-	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, const Point &loc);
-	bool DropItemAtLocation(const ResRef& resRef, unsigned int flags, Map *map, const Point &loc);
-	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX=false);
+	int FindItem(const ResRef& resref, unsigned int flags, unsigned int skip = 0) const;
+	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map* map, const Point& loc);
+	bool DropItemAtLocation(const ResRef& resRef, unsigned int flags, Map* map, const Point& loc);
+	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX = false);
 	int GetEquipped() const;
 	int GetEquippedHeader() const;
-	const ITMExtHeader *GetEquippedExtHeader(int header=0) const;
+	const ITMExtHeader* GetEquippedExtHeader(int header = 0) const;
 	void SetEquipped(ieWordSigned slot, ieWord header);
 	//right hand
 	int GetEquippedSlot() const;
 	//left hand
 	int GetShieldSlot() const;
-	void AddSlotEffects( ieDword slot);
+	void AddSlotEffects(ieDword slot);
 	//void AddAllEffects();
 	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(ieDword slot) const;
@@ -292,9 +293,9 @@ public:
 	bool EquipItem(ieDword slot);
 	bool UnEquipItem(ieDword slot, bool removecurse) const;
 	/** Returns equipped weapon, also its slot */
-	CREItem *GetUsedWeapon(bool leftorright, int &slot) const;
+	CREItem* GetUsedWeapon(bool leftorright, int& slot) const;
 	/** returns slot of launcher weapon currently equipped */
-	int FindRangedWeapon() const; 
+	int FindRangedWeapon() const;
 	/** returns slot of launcher weapon for specified projectile type */
 	int FindTypedRangedWeapon(unsigned int type) const;
 	/** returns slot of launcher weapon for projectile in specified slot */
@@ -332,7 +333,7 @@ public:
 	/** checks if any equipped item provides critical hit aversion */
 	bool ProvidesCriticalAversion() const;
 	/** tries to merge the passed item with the one in the passed slot */
-	int MergeItems(int slot, CREItem *item);
+	int MergeItems(int slot, CREItem* item);
 	bool FistsEquipped() const;
 	bool MagicSlotEquipped() const;
 	//setting important constants
@@ -358,15 +359,16 @@ public:
 	static int GetInventorySlot();
 	int InBackpack(int slot) const;
 	void CacheAllWeaponInfo() const;
+
 private:
 	void CalculateWeight(void);
 	int FindRangedProjectile(unsigned int type) const;
 	// called by KillSlot
 	void RemoveSlotEffects(size_t slot);
 	void KillSlot(size_t index);
-	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot) const;
+	inline Item* GetItemPointer(ieDword slot, CREItem*& Slot) const;
 	void UpdateWeaponAnimation();
-	void UpdateShieldAnimation(const Item *it);
+	void UpdateShieldAnimation(const Item* it);
 	void CacheWeaponInfo(bool leftOrRight) const;
 };
 

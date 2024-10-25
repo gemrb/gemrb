@@ -26,7 +26,7 @@
 
 namespace GemRB {
 
-void SanityCheck(const char *ver)
+void SanityCheck(const char* ver)
 {
 	if (strcmp(ver, VERSION_GEMRB) != 0) {
 		error("Core", "Version check failed: core version {} doesn't match caller's version {}!", VERSION_GEMRB, ver);
@@ -48,16 +48,16 @@ static InterfaceConfig LoadFromStream(DataStream& cfgStream)
 		if (pos == std::string::npos || line[pos] == '#') {
 			continue;
 		}
-		
+
 		auto parts = Explode<std::string, std::string>(line, '=', 1);
 		if (parts.size() < 2) {
 			Log(WARNING, "Config", "Invalid line {}: {}", lineno, line);
 			continue;
 		}
-		
+
 		auto& key = parts[0];
 		TrimString(key);
-		
+
 		auto& val = parts[1];
 		TrimString(val);
 
@@ -80,14 +80,14 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 	datadir = GemDataPath();
 #endif
 	path_t path = PathJoinExt(datadir, name, "cfg");
-	
+
 	FileStream cfgStream;
 	if (cfgStream.Open(path)) {
 		return LoadFromStream(cfgStream);
 	}
 
 #ifndef ANDROID
-#ifndef WIN32
+	#ifndef WIN32
 	// Now try XDG_CONFIG_HOME, with the standard fallback of ~/.config/gemrb
 	datadir = HomePath();
 	path_t confpath;
@@ -101,13 +101,12 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 	if (cfgStream.Open(path)) {
 		return LoadFromStream(cfgStream);
 	}
-#endif
+	#endif
 
 	// Now try ~/.gemrb folder
 	path_t tmp = PathJoin(datadir, ".gemrb");
 	path = PathJoinExt(tmp, name, "cfg");
-	if (cfgStream.Open(path))
-	{
+	if (cfgStream.Open(path)) {
 		Log(WARNING, "Interface", "~/.gemrb as a config location is deprecated, please use ~/.config/gemrb!");
 		return LoadFromStream(cfgStream);
 	}
@@ -124,35 +123,32 @@ static InterfaceConfig LoadDefaultCFG(const char* appName)
 	if (name != PACKAGE) {
 		path = PathJoinExt(datadir, PACKAGE, "cfg");
 
-		if (cfgStream.Open(path))
-		{
+		if (cfgStream.Open(path)) {
 			return LoadFromStream(cfgStream);
 		}
 
 #ifdef SYSCONF_DIR
 		path = PathJoinExt(SYSCONF_DIR, PACKAGE, "cfg");
-		
-		if (cfgStream.Open(path))
-		{
+
+		if (cfgStream.Open(path)) {
 			return LoadFromStream(cfgStream);
 		}
 #endif
 	}
 	// if all else has failed try current directory
 	path = PathJoinExt(".", PACKAGE, "cfg");
-	
-	if (cfgStream.Open(path))
-	{
+
+	if (cfgStream.Open(path)) {
 		return LoadFromStream(cfgStream);
 	}
-	
+
 	return {}; // we don't require a config
 }
 
 CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 {
 	CoreSettings config;
-	
+
 	auto CONFIG_INT = [&cfg](const std::string& key, auto& field) {
 		using INT = std::remove_reference_t<decltype(field)>;
 
@@ -198,14 +194,14 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 			cfg.Erase(key);
 		}
 	};
-	
+
 	auto CONFIG_PATH = [&CONFIG_STRING](const std::string& key, path_t& field, const path_t& fallback = "") {
 		CONFIG_STRING(key, field);
-		
+
 		if (field.empty()) {
 			field = fallback;
 		}
-		
+
 		ResolveFilePath(field);
 	};
 
@@ -306,7 +302,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	}
 
 	for (int i = 0; i < MAX_CD; i++) {
-		char keyname[] = { 'C', 'D', char('1'+i), '\0' };
+		char keyname[] = { 'C', 'D', char('1' + i), '\0' };
 		value = cfg.Get(keyname, "");
 		if (value.length()) {
 			config.CD[i] = Explode<std::string, std::string>(value, PathListSeparator);
@@ -321,21 +317,21 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 			config.CD[i].emplace_back(name);
 		}
 	}
-	
+
 	// everything else still remaining in cfg is populated into the variables
 	for (const auto& pair : cfg) {
 		config.vars.Set(pair.first, atoi(pair.second.c_str()));
 	}
-	
+
 	return config;
 }
 
-CoreSettings LoadFromArgs(int argc, char *argv[])
+CoreSettings LoadFromArgs(int argc, char* argv[])
 {
 	InterfaceConfig settings;
 	bool loadedCFG = false;
 	// skip arg0 (it is just gemrb)
-	for (int i=1; i < argc; i++) {
+	for (int i = 1; i < argc; i++) {
 		if (stricmp(argv[i], "-c") == 0) {
 			// settings passed on the CLI override anything in the file
 			settings.Merge(LoadFromCFG(argv[++i]));
@@ -353,8 +349,7 @@ CoreSettings LoadFromArgs(int argc, char *argv[])
 		}
 	}
 
-	if (loadedCFG == false)
-	{
+	if (loadedCFG == false) {
 		// Find basename of this program. It does the same as basename (3),
 		// but that's probably missing on some archs
 		const char* appName = strrchr(argv[0], PathDelimiter);

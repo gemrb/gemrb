@@ -17,34 +17,37 @@
  *
  */
 
-#include <gtest/gtest.h>
-
 #include "Strings/StringView.h"
+
+#include <gtest/gtest.h>
 
 namespace GemRB {
 
-TEST(StringView_Test, Equality) {
-	EXPECT_EQ(StringView{"abc"}, StringView{"abc"});
-	EXPECT_EQ(StringView{}, StringView{});
+TEST(StringView_Test, Equality)
+{
+	EXPECT_EQ(StringView { "abc" }, StringView { "abc" });
+	EXPECT_EQ(StringView {}, StringView {});
 
-	EXPECT_NE(StringView{"abc"}, StringView{"abcd"});
-	EXPECT_NE(StringView{"123"}, StringView{"abc"});
+	EXPECT_NE(StringView { "abc" }, StringView { "abcd" });
+	EXPECT_NE(StringView { "123" }, StringView { "abc" });
 }
 
-TEST(StringView_Test, clear) {
-	StringView unit{"abc"};
+TEST(StringView_Test, clear)
+{
+	StringView unit { "abc" };
 	unit.clear();
 
 	EXPECT_EQ(unit.length(), 0);
 	EXPECT_TRUE(unit.empty());
 }
 
-TEST(StringView_Test, erase) {
-	StringView unit{"abcd"};
+TEST(StringView_Test, erase)
+{
+	StringView unit { "abcd" };
 	unit.erase(3);
 
 	EXPECT_EQ(unit.length(), 3);
-	EXPECT_EQ(unit, StringView{"abc"});
+	EXPECT_EQ(unit, StringView { "abc" });
 }
 
 }

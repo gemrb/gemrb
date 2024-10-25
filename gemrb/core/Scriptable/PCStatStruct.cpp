@@ -19,6 +19,7 @@
  */
 
 #include "Scriptable/PCStatStruct.h"
+
 #include "Logging/Logging.h"
 
 #include <cstring>
@@ -33,38 +34,38 @@ void PCStatsStruct::IncrementChapter()
 
 void PCStatsStruct::NotifyKill(ieDword xp, ieStrRef name)
 {
-	if (BestKilledXP<=xp) {
+	if (BestKilledXP <= xp) {
 		BestKilledXP = xp;
 		BestKilledName = name;
 	}
 
 	KillsTotalXP += xp;
 	KillsChapterXP += xp;
-	KillsTotalCount ++;
-	KillsChapterCount ++;
+	KillsTotalCount++;
+	KillsChapterCount++;
 }
 
 //init quick weapon/item slots
 void PCStatsStruct::SetQuickItemSlot(int idx, int slot, int headerindex)
 {
-	if (slot>=0) {
-		QuickItemSlots[idx]=(ieWord) slot;
+	if (slot >= 0) {
+		QuickItemSlots[idx] = (ieWord) slot;
 	}
-	QuickItemHeaders[idx]=(ieWord) headerindex;
+	QuickItemHeaders[idx] = (ieWord) headerindex;
 }
 
 void PCStatsStruct::InitQuickSlot(unsigned int which, ieWord slot, ieWord headerIndex)
 {
 	if (!which) {
 		for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
-			if (slot==QuickItemSlots[i]) {
+			if (slot == QuickItemSlots[i]) {
 				QuickItemHeaders[i] = headerIndex;
 				return;
 			}
 		}
 
 		for (int i = 0; i < MAX_QUICKWEAPONSLOT; i++) {
-			if (slot==QuickWeaponSlots[i]) {
+			if (slot == QuickWeaponSlots[i]) {
 				QuickWeaponHeaders[i] = headerIndex;
 				return;
 			}
@@ -78,88 +79,108 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, ieWord slot, ieWord header
 	ieWord slot2;
 	ieWord header;
 
-	if (slot==0xffff) {
+	if (slot == 0xffff) {
 		slot2 = 0xffff;
 		header = 0xffff;
-	}
-	else {
-		slot2 = slot+1;
+	} else {
+		slot2 = slot + 1;
 		header = 0;
 	}
-	switch(which) {
-	case ACT_QSLOT1: SetQuickItemSlot(0, slot, headerIndex); break;
-	case ACT_QSLOT2: SetQuickItemSlot(1, slot, headerIndex); break;
-	case ACT_QSLOT3: SetQuickItemSlot(2, slot, headerIndex); break;
-	case ACT_QSLOT4: SetQuickItemSlot(3, slot, headerIndex); break;
-	case ACT_QSLOT5: SetQuickItemSlot(4, slot, headerIndex); break;
-	case ACT_IWDQITEM:
-	case ACT_IWDQITEM+1:
-	case ACT_IWDQITEM+2:
-	case ACT_IWDQITEM+3:
-	case ACT_IWDQITEM+4:
-/*	case ACT_IWDQITEM+5: // crashy from here on until we do do/use 9 quickslots
+	switch (which) {
+		case ACT_QSLOT1:
+			SetQuickItemSlot(0, slot, headerIndex);
+			break;
+		case ACT_QSLOT2:
+			SetQuickItemSlot(1, slot, headerIndex);
+			break;
+		case ACT_QSLOT3:
+			SetQuickItemSlot(2, slot, headerIndex);
+			break;
+		case ACT_QSLOT4:
+			SetQuickItemSlot(3, slot, headerIndex);
+			break;
+		case ACT_QSLOT5:
+			SetQuickItemSlot(4, slot, headerIndex);
+			break;
+		case ACT_IWDQITEM:
+		case ACT_IWDQITEM + 1:
+		case ACT_IWDQITEM + 2:
+		case ACT_IWDQITEM + 3:
+		case ACT_IWDQITEM + 4:
+			/*	case ACT_IWDQITEM+5: // crashy from here on until we do do/use 9 quickslots
 	case ACT_IWDQITEM+6:
 	case ACT_IWDQITEM+7:
 	case ACT_IWDQITEM+8:
 	case ACT_IWDQITEM+9:*/
-		SetQuickItemSlot(which - ACT_IWDQITEM, slot, headerIndex);
-		break;
-	case ACT_WEAPON1:
-		QuickWeaponSlots[0]=slot;
-		QuickWeaponHeaders[0]=header;
-		QuickWeaponSlots[4]=slot2;
-		QuickWeaponHeaders[4]=header;
-		break;
-	case ACT_WEAPON2:
-		QuickWeaponSlots[1]=slot;
-		QuickWeaponHeaders[1]=header;
-		QuickWeaponSlots[5]=slot2;
-		QuickWeaponHeaders[5]=header;
-		break;
-	case ACT_WEAPON3:
-		QuickWeaponSlots[2]=slot;
-		QuickWeaponHeaders[2]=header;
-		QuickWeaponSlots[6]=slot2;
-		QuickWeaponHeaders[6]=header;
-		break;
-	case ACT_WEAPON4:
-		QuickWeaponSlots[3]=slot;
-		QuickWeaponHeaders[3]=header;
-		QuickWeaponSlots[7]=slot2;
-		QuickWeaponHeaders[7]=header;
-		break;
-	default:
-		Log(DEBUG, "PCSS", "InitQuickSlot: unknown which/slot {}/{}", which, slot);
+			SetQuickItemSlot(which - ACT_IWDQITEM, slot, headerIndex);
+			break;
+		case ACT_WEAPON1:
+			QuickWeaponSlots[0] = slot;
+			QuickWeaponHeaders[0] = header;
+			QuickWeaponSlots[4] = slot2;
+			QuickWeaponHeaders[4] = header;
+			break;
+		case ACT_WEAPON2:
+			QuickWeaponSlots[1] = slot;
+			QuickWeaponHeaders[1] = header;
+			QuickWeaponSlots[5] = slot2;
+			QuickWeaponHeaders[5] = header;
+			break;
+		case ACT_WEAPON3:
+			QuickWeaponSlots[2] = slot;
+			QuickWeaponHeaders[2] = header;
+			QuickWeaponSlots[6] = slot2;
+			QuickWeaponHeaders[6] = header;
+			break;
+		case ACT_WEAPON4:
+			QuickWeaponSlots[3] = slot;
+			QuickWeaponHeaders[3] = header;
+			QuickWeaponSlots[7] = slot2;
+			QuickWeaponHeaders[7] = header;
+			break;
+		default:
+			Log(DEBUG, "PCSS", "InitQuickSlot: unknown which/slot {}/{}", which, slot);
 	}
 }
 
 //returns both the inventory slot and the header index associated to a quickslot
-void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex) const
+void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord& slot, ieWord& headerindex) const
 {
 	int idx;
 
-	switch(which) {
-	case ACT_QSLOT1: idx = 0; break;
-	case ACT_QSLOT2: idx = 1; break;
-	case ACT_QSLOT3: idx = 2; break;
-	case ACT_QSLOT4: idx = 3; break;
-	case ACT_QSLOT5: idx = 4; break;
-	case ACT_IWDQITEM:
-	case ACT_IWDQITEM+1:
-	case ACT_IWDQITEM+2:
-	case ACT_IWDQITEM+3:
-	case ACT_IWDQITEM+4:
-/*	case ACT_IWDQITEM+5: // crashy from here on until we do do/use 9 quickslots
+	switch (which) {
+		case ACT_QSLOT1:
+			idx = 0;
+			break;
+		case ACT_QSLOT2:
+			idx = 1;
+			break;
+		case ACT_QSLOT3:
+			idx = 2;
+			break;
+		case ACT_QSLOT4:
+			idx = 3;
+			break;
+		case ACT_QSLOT5:
+			idx = 4;
+			break;
+		case ACT_IWDQITEM:
+		case ACT_IWDQITEM + 1:
+		case ACT_IWDQITEM + 2:
+		case ACT_IWDQITEM + 3:
+		case ACT_IWDQITEM + 4:
+			/*	case ACT_IWDQITEM+5: // crashy from here on until we do do/use 9 quickslots
 	case ACT_IWDQITEM+6:
 	case ACT_IWDQITEM+7:
 	case ACT_IWDQITEM+8:
 	case ACT_IWDQITEM+9:*/
-		idx = which - ACT_IWDQITEM;
-		break;
-	default: error("Core", "Unknown Quickslot accessed '{}'.", which);
+			idx = which - ACT_IWDQITEM;
+			break;
+		default:
+			error("Core", "Unknown Quickslot accessed '{}'.", which);
 	}
-	slot=QuickItemSlots[idx];
-	headerindex=QuickItemHeaders[idx];
+	slot = QuickItemSlots[idx];
+	headerindex = QuickItemHeaders[idx];
 }
 
 //return the item extended header assigned to an inventory slot (the ability to use)
@@ -167,11 +188,11 @@ void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &he
 int PCStatsStruct::GetHeaderForSlot(int slot) const
 {
 	for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
-		if(QuickItemSlots[i]==slot) return (ieWordSigned) QuickItemHeaders[i];
+		if (QuickItemSlots[i] == slot) return (ieWordSigned) QuickItemHeaders[i];
 	}
 
 	for (int i = 0; i < MAX_QUICKWEAPONSLOT; i++) {
-		if(QuickWeaponSlots[i]==slot) return (ieWordSigned) QuickWeaponHeaders[i];
+		if (QuickWeaponSlots[i] == slot) return (ieWordSigned) QuickWeaponHeaders[i];
 	}
 	return -1;
 }
@@ -241,7 +262,7 @@ std::string PCStatsStruct::GetStateString() const
 }
 
 void PCStatsStruct::EnableState(state_t icon)
-{	
+{
 	for (auto& state : States) {
 		if (state.state == InvalidState) {
 			state.state = icon;

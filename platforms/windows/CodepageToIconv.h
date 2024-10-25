@@ -20,8 +20,8 @@
 #define CODEPAGE_TO_ICONV_H
 
 #include <array>
-#include <utility>
 #include <cstdint>
+#include <utility>
 
 namespace GemRB {
 

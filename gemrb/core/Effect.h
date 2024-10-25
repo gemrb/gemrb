@@ -39,37 +39,37 @@ namespace GemRB {
 #define FAKE_VARIABLE_MARKER 1
 
 // Effect target types
-#define FX_TARGET_UNKNOWN    0
-#define FX_TARGET_SELF       1
-#define FX_TARGET_PRESET     2
-#define FX_TARGET_PARTY      3
-#define FX_TARGET_ALL        4
-#define FX_TARGET_ALL_BUT_PARTY   5
-#define FX_TARGET_OWN_SIDE   6
-#define FX_TARGET_OTHER_SIDE 7
-#define FX_TARGET_ALL_BUT_SELF 8
-#define FX_TARGET_ORIGINAL   9
+#define FX_TARGET_UNKNOWN       0
+#define FX_TARGET_SELF          1
+#define FX_TARGET_PRESET        2
+#define FX_TARGET_PARTY         3
+#define FX_TARGET_ALL           4
+#define FX_TARGET_ALL_BUT_PARTY 5
+#define FX_TARGET_OWN_SIDE      6
+#define FX_TARGET_OTHER_SIDE    7
+#define FX_TARGET_ALL_BUT_SELF  8
+#define FX_TARGET_ORIGINAL      9
 
 // Effect duration/timing types
-#define FX_DURATION_INSTANT_LIMITED          0
-#define FX_DURATION_INSTANT_PERMANENT        1
-#define FX_DURATION_INSTANT_WHILE_EQUIPPED   2
-#define FX_DURATION_DELAY_LIMITED            3 //this contains a relative onset time (delay) also used as duration, transforms to 0 when applied
-#define FX_DURATION_DELAY_PERMANENT          4 //this transforms to 9 (i guess)
-#define FX_DURATION_DELAY_UNSAVED            5 //this transforms to 8
-#define FX_DURATION_DELAY_LIMITED_PENDING    6 //this contains an absolute onset time and a duration
-#define FX_DURATION_AFTER_EXPIRES            7 //this is a delayed non permanent effect (resolves to JUST_EXPIRED)
-#define FX_DURATION_PERMANENT_UNSAVED        8
-#define FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES   9//this is a special permanent
-#define FX_DURATION_INSTANT_LIMITED_TICKS    10 // same as 0, but in ticks instead of seconds
-#define FX_DURATION_JUST_EXPIRED             (FX_DURATION_INSTANT_LIMITED_TICKS + 1) // internal
-#define MAX_TIMING_MODE                      (FX_DURATION_JUST_EXPIRED + 1)
-#define FX_DURATION_ABSOLUTE                 0x1000
+#define FX_DURATION_INSTANT_LIMITED                 0
+#define FX_DURATION_INSTANT_PERMANENT               1
+#define FX_DURATION_INSTANT_WHILE_EQUIPPED          2
+#define FX_DURATION_DELAY_LIMITED                   3 //this contains a relative onset time (delay) also used as duration, transforms to 0 when applied
+#define FX_DURATION_DELAY_PERMANENT                 4 //this transforms to 9 (i guess)
+#define FX_DURATION_DELAY_UNSAVED                   5 //this transforms to 8
+#define FX_DURATION_DELAY_LIMITED_PENDING           6 //this contains an absolute onset time and a duration
+#define FX_DURATION_AFTER_EXPIRES                   7 //this is a delayed non permanent effect (resolves to JUST_EXPIRED)
+#define FX_DURATION_PERMANENT_UNSAVED               8
+#define FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES 9 //this is a special permanent
+#define FX_DURATION_INSTANT_LIMITED_TICKS           10 // same as 0, but in ticks instead of seconds
+#define FX_DURATION_JUST_EXPIRED                    (FX_DURATION_INSTANT_LIMITED_TICKS + 1) // internal
+#define MAX_TIMING_MODE                             (FX_DURATION_JUST_EXPIRED + 1)
+#define FX_DURATION_ABSOLUTE                        0x1000
 
 // Effect resistance types
-#define FX_NO_RESIST_NO_DISPEL      0
-#define FX_CAN_DISPEL               1
-#define FX_CAN_RESIST_CAN_DISPEL     1
+#define FX_NO_RESIST_NO_DISPEL   0
+#define FX_CAN_DISPEL            1
+#define FX_CAN_RESIST_CAN_DISPEL 1
 //#define FX_CAN_RESIST_NO_DISPEL     2   // same as 0 (not resistible, not dispellable)
 #define FX_NO_RESIST_CAN_DISPEL    3
 #define FX_NO_RESIST_BYPASS_BOUNCE 4 // EE bit to bypass deflection/reflection/trap opcodes
@@ -80,8 +80,8 @@ namespace GemRB {
 // Effect save flags (ToBEx, EE)
 #define SF_LINE_PRO_NO_PRIMARY   0x400 // TODO:  ee, ignore primary target, line AoE projectile doesn’t affect end target
 #define SF_LINE_PRO_NO_SECONDARY 0x800 // TODO: ee, ignore secondary target, line AoE projectile doesn’t affect targets in the line
-#define SF_BYPASS_MIRROR_IMAGE 0x1000000
-#define SF_IGNORE_DIFFICULTY   0x2000000
+#define SF_BYPASS_MIRROR_IMAGE   0x1000000
+#define SF_IGNORE_DIFFICULTY     0x2000000
 
 /**
  * @class Effect
@@ -110,13 +110,13 @@ struct GEM_EXPORT Effect {
 	ieDword Power = 0; // the effect level
 	ieDword Parameter1 = 0;
 	ieDword Parameter2 = 0;
-	ieWord TimingMode = 0;   //0x1000 -- no need of conversion
+	ieWord TimingMode = 0; //0x1000 -- no need of conversion
 	ieWord unknown2 = 0;
 	ieDword Resistance = 0;
 	ieDword Duration = 0;
 	ieWord ProbabilityRangeMax = 0;
 	ieWord ProbabilityRangeMin = 0;
-	
+
 	union {
 		ResourceGroup resources; // keep largest type first to 0 fill everything
 		ieVariable VariableName;
@@ -150,30 +150,31 @@ struct GEM_EXPORT Effect {
 	ieDword SourceType = 0; //1-item, 2-spell
 	ResRef SourceRef;
 	ieDword SourceFlags = 0;
-	ieDword Projectile = 0;          //9c
+	ieDword Projectile = 0; //9c
 	ieDwordSigned InventorySlot = 0; //a0
 	//Original engine had a VariableName here, but it is stored in the resource fields
-	ieDword CasterLevel = 0;  //c4 in both
-	ieDword FirstApply = 0;   //c8 in bg2, cc in iwd2
+	ieDword CasterLevel = 0; //c4 in both
+	ieDword FirstApply = 0; //c8 in bg2, cc in iwd2
 	ieDword SecondaryType = 0;
 	ieDword SecondaryDelay = 0; //still not sure about this
-	ieDword CasterID = 0;       //10c in bg2 (not saved?)
+	ieDword CasterID = 0; //10c in bg2 (not saved?)
 	// These are not in the IE files, but are our precomputed values
 	ieDword RandomValue = 0;
 
 	ieDword SpellLevel = 0; // Power does not always contain the Source level, which is needed in iwd2; items will be left at 0
+
 public:
 	//don't modify position in case it was already set
-	void SetPosition(const Point &p);
-	void SetSourcePosition(const Point &p);
-	
+	void SetPosition(const Point& p);
+	void SetSourcePosition(const Point& p);
+
 	Effect() noexcept
-	: resources()
+		: resources()
 	{
 		// must define our own empty ctor due to union type
 		// union is already 0 initialized so there is nothing else to do
 	}
-	
+
 	Effect(const Effect& rhs) noexcept;
 
 	Effect& operator=(const Effect& rhs) noexcept;
@@ -181,10 +182,10 @@ public:
 	~Effect() noexcept = default;
 
 	bool operator==(const Effect& rhs) const noexcept;
-	
+
 	//returns true if the effect supports simplified duration
 	bool HasDuration() const;
-	
+
 	//returns true if the effect must be saved
 	bool Persistent() const;
 
@@ -193,4 +194,4 @@ public:
 
 }
 
-#endif  // ! EFFECT_H
+#endif // ! EFFECT_H

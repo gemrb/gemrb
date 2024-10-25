@@ -30,6 +30,7 @@ private:
 	ieDword Width = 0;
 	ieDword Height = 0;
 	void* pixels = nullptr;
+
 public:
 	PLTImporter() noexcept = default;
 	PLTImporter(const PLTImporter&) = delete;

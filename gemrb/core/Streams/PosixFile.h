@@ -20,15 +20,16 @@
 #ifndef POSIX_FILE_H
 #define POSIX_FILE_H
 
-#include <cstdio>
-
 #include "File.h"
+
+#include <cstdio>
 
 namespace GemRB {
 
 class GEM_EXPORT PosixFile : public File {
 private:
 	FILE* file = nullptr;
+
 public:
 	PosixFile() noexcept = default;
 	PosixFile(const File&) = delete;

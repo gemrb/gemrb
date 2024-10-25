@@ -32,11 +32,12 @@
 #include "ie_types.h"
 
 #include "Animation.h"
-#include "Orientation.h"
+#include "Audio.h"
 #include "EffectQueue.h"
+#include "Orientation.h"
 #include "Palette.h"
 #include "PathFinder.h"
-#include "Audio.h"
+
 #include "Video/Video.h"
 
 #include <list>
@@ -56,77 +57,77 @@ enum class ProHeights {
 };
 
 //projectile spark flags
-#define PSF_SPARKS  1
-#define PSF_FLYING  2
-#define PSF_LOOPING 4         //looping sound
-#define PSF_LOOPING2 8        //looping second sound
+#define PSF_SPARKS        1
+#define PSF_FLYING        2
+#define PSF_LOOPING       4 //looping sound
+#define PSF_LOOPING2      8 //looping second sound
 #define PSF_IGNORE_CENTER 16
-#define PSF_BACKGROUND 32
+#define PSF_BACKGROUND    32
 //gemrb specific internal flag
-#define PSF_SOUND2  0x80000000//already started sound2
+#define PSF_SOUND2 0x80000000 //already started sound2
 
 //projectile travel flags
-#define PTF_COLOUR  1       //fake colours
-#define PTF_SMOKE   2       //has smoke
+#define PTF_COLOUR 1 //fake colours
+#define PTF_SMOKE  2 //has smoke
 // bg2: 4 smoke is false colored
-#define PTF_TINT    8       //tint projectile
+#define PTF_TINT 8 //tint projectile
 // bg2: 10 height
-#define PTF_SHADOW  32      //has shadow bam
-#define PTF_LIGHT   64      //has light shadow / glow
-#define PTF_TRANS   128     // glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
-#define PTF_BRIGHTEN 256    //brighten alpha; CPROJECTILEBAMFILEFORMAT_FLAGS_BRIGHTEST in bg2
-#define PTF_BLEND	512		// glBlendFunc(GL_DST_COLOR, GL_ONE);
+#define PTF_SHADOW      32 //has shadow bam
+#define PTF_LIGHT       64 //has light shadow / glow
+#define PTF_TRANS       128 // glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
+#define PTF_BRIGHTEN    256 //brighten alpha; CPROJECTILEBAMFILEFORMAT_FLAGS_BRIGHTEST in bg2
+#define PTF_BLEND       512 // glBlendFunc(GL_DST_COLOR, GL_ONE);
 #define PTF_TRANS_BLEND (PTF_TRANS | PTF_BLEND) // glBlendFunc(GL_SRC_COLOR, GL_ONE); IWD only?
 // 0x100 and 0x200: FLAGS_BRIGHTESTIFFAST BRIGHTEST3DONLYOFF
 #define PTF_TIMELESS 0x4000 // GemRB extension to differentiate projectiles that ignore timestop
 
 //projectile extended travel flags (gemrb specific)
-#define PEF_BOUNCE     1       //bounce from walls (lightning bolt)
-#define PEF_CONTINUE   2       //continue as a travel projectile after trigger (lightning bolt)
+#define PEF_BOUNCE   1 //bounce from walls (lightning bolt)
+#define PEF_CONTINUE 2 //continue as a travel projectile after trigger (lightning bolt)
 //TODO: This can probably be replaced by an area projectile trigger (like skull trap, glyph)
-#define PEF_FREEZE     4       //stay around (ice dagger)
-#define PEF_NO_TRAVEL  8       //all instant projectiles (draw upon holy might, finger of death)
-#define PEF_TRAIL      16      //trail bams facing value uses the same field as the travel projectile (otherwise it defaults to 9) (shout in iwd)
-#define PEF_CURVE      32      //curved path (magic missile)
-#define PEF_RANDOM     64      //random starting frame for animation (?)
-#define PEF_PILLAR     128     //draw all cycles simultaneously on top of each other (call lightning, flamestrike)
-#define PEF_HALFTRANS  256     //half-transparency (holy might)
-#define PEF_TINT       512     //use palette gradient as tint
-#define PEF_ITERATION  1024    //create another projectile of type-1 (magic missiles)
-#define PEF_DEFSPELL   2048    //always apply the default spell on the caster
-#define PEF_FALLING    4096    //projectile falls down vertically (cow)
-#define PEF_INCOMING   8192    //projectile falls in on trajectory (comet)
-#define PEF_LINE       16384   //solid line between source and target (agannazar's scorcher)
-#define PEF_WALL       32768   //solid line in front of source, crossing target (wall of fire)
+#define PEF_FREEZE     4 //stay around (ice dagger)
+#define PEF_NO_TRAVEL  8 //all instant projectiles (draw upon holy might, finger of death)
+#define PEF_TRAIL      16 //trail bams facing value uses the same field as the travel projectile (otherwise it defaults to 9) (shout in iwd)
+#define PEF_CURVE      32 //curved path (magic missile)
+#define PEF_RANDOM     64 //random starting frame for animation (?)
+#define PEF_PILLAR     128 //draw all cycles simultaneously on top of each other (call lightning, flamestrike)
+#define PEF_HALFTRANS  256 //half-transparency (holy might)
+#define PEF_TINT       512 //use palette gradient as tint
+#define PEF_ITERATION  1024 //create another projectile of type-1 (magic missiles)
+#define PEF_DEFSPELL   2048 //always apply the default spell on the caster
+#define PEF_FALLING    4096 //projectile falls down vertically (cow)
+#define PEF_INCOMING   8192 //projectile falls in on trajectory (comet)
+#define PEF_LINE       16384 //solid line between source and target (agannazar's scorcher)
+#define PEF_WALL       32768 //solid line in front of source, crossing target (wall of fire)
 #define PEF_BACKGROUND 0x10000 //draw under target,overrides flying (dimension door)
 #define PEF_POP        0x20000 //draw travel bam, then shadow, then travel bam backwards
 #define PEF_UNPOP      0x40000 //draw shadow, then travel bam (this is an internal flag)
 //TODO: The next flag is probably not needed, it is done by a separate area hit animation
-#define PEF_FADE       0x80000 //gradually fade on spot if used with PEF_FREEZE (ice dagger) 
-#define PEF_TEXT       0x100000//display text during setup
-#define PEF_WANDERING  0x200000//random movement (no real path)
-#define PEF_CYCLE      0x400000//random cycle
-#define PEF_RGB        0x800000//rgb pulse on hit
-#define PEF_TOUCH      0x1000000//successful to hit roll needed
-#define PEF_NOTIDS     0x2000000//negate IDS check
-#define PEF_NOTIDS2    0x4000000//negate secondary IDS check
-#define PEF_BOTH       0x8000000//both IDS check must succeed
-#define PEF_DELAY      0x10000000//delay payload until travel projectile cycle ends
+#define PEF_FADE      0x80000 //gradually fade on spot if used with PEF_FREEZE (ice dagger)
+#define PEF_TEXT      0x100000 //display text during setup
+#define PEF_WANDERING 0x200000 //random movement (no real path)
+#define PEF_CYCLE     0x400000 //random cycle
+#define PEF_RGB       0x800000 //rgb pulse on hit
+#define PEF_TOUCH     0x1000000 //successful to hit roll needed
+#define PEF_NOTIDS    0x2000000 //negate IDS check
+#define PEF_NOTIDS2   0x4000000 //negate secondary IDS check
+#define PEF_BOTH      0x8000000 //both IDS check must succeed
+#define PEF_DELAY     0x10000000 //delay payload until travel projectile cycle ends
 
 //projectile area flags
-#define PAF_VISIBLE    1      //the travel projectile is visible until explosion; CPROJECTILEAREAFILEFORMAT_FLAGS_CENTERBAM
-#define PAF_INANIMATE  2      //target inanimates
-#define PAF_TRIGGER    4      //explosion needs to be triggered
+#define PAF_VISIBLE    1 //the travel projectile is visible until explosion; CPROJECTILEAREAFILEFORMAT_FLAGS_CENTERBAM
+#define PAF_INANIMATE  2 //target inanimates
+#define PAF_TRIGGER    4 //explosion needs to be triggered
 #define PAF_DELAYED    8 // one explosion at a time, a delayed trigger
-#define PAF_SECONDARY  16     //secondary projectiles at explosion
-#define PAF_FRAGMENT   32     //fragments (charanimation) at explosion
-#define PAF_ENEMY      64     //target party or not party
-#define PAF_PARTY      128    //target party
-#define PAF_TARGET     (64|128)
+#define PAF_SECONDARY  16 //secondary projectiles at explosion
+#define PAF_FRAGMENT   32 //fragments (charanimation) at explosion
+#define PAF_ENEMY      64 //target party or not party
+#define PAF_PARTY      128 //target party
+#define PAF_TARGET     (64 | 128)
 #define PAF_LEV_MAGE   256
 #define PAF_LEV_CLERIC 512
-#define PAF_VVC        1024   // played at center
-#define PAF_CONE       2048   //enable cone shape
+#define PAF_VVC        1024 // played at center
+#define PAF_CONE       2048 //enable cone shape
 #define PAF_NO_WALL    0x1000 //pass through walls; CPROJECTILEAREAFILEFORMAT_FLAGS_IGNORELOS
 #define PAF_TRIGGER_D  0x2000 //delayed trigger (only if animation is over 30); CPROJECTILEAREAFILEFORMAT_FLAGS_CENTERBAMWAIT
 #define PAF_DELAY      0x4000 // CPROJECTILEAREAFILEFORMAT_FLAGS_FORCEINITIALDELAY
@@ -136,35 +137,34 @@ enum class ProHeights {
 //this functionality was hardcoded in the original engine, so the bit flags are
 //completely arbitrary (i assign them as need arises)
 //child projectiles need to be tinted (example: stinking cloud, counter example: fireball)
-#define APF_TINT      1
+#define APF_TINT 1
 //child projectiles fill the whole area (example: stinking cloud, counter example: fireball)
-#define APF_FILL      2
+#define APF_FILL 2
 //child projectiles start in their destination (example: icestorm, counter example: fireball)
-#define APF_SCATTER   4
+#define APF_SCATTER 4
 //the explosion vvc has gradient (example: icestorm, counter example: fireball)
-#define APF_VVCPAL    8
+#define APF_VVCPAL 8
 //there is an additional added scatter after the initial spreading ring
-#define APF_SPREAD    16
+#define APF_SPREAD 16
 //the spread projectile needs gradient colouring,not tint (example:web, counter example: stinking cloud)
-#define APF_PALETTE   32
+#define APF_PALETTE 32
 //use both animations in the spread
-#define APF_BOTH      64
+#define APF_BOTH 64
 //more child projectiles
-#define APF_MORE      128
+#define APF_MORE 128
 //apply spell on caster if failed to find target
 #define APF_SPELLFAIL 256
-//multiple directions 
-#define APF_MULTIDIR  512
+//multiple directions
+#define APF_MULTIDIR 512
 //target HD counting
-#define APF_COUNT_HD  1024
+#define APF_COUNT_HD 1024
 //target flag enemy ally switched
 #define APF_INVERT_TARGET 2048
 //tiled AoE animation
-#define APF_TILED 4096
+#define APF_TILED    4096
 #define APF_PLAYONCE 8192
 
-struct ProjectileExtension
-{
+struct ProjectileExtension {
 	ieDword AFlags;
 	ieWord TriggerRadius;
 	ieWord ExplosionRadius;
@@ -176,11 +176,11 @@ struct ProjectileExtension
 	ieByte ExplType;
 	ieWord ExplColor; // a byte in the original, followed by padding
 	ieWord ExplProjIdx;
-	ResRef VVCRes;  //used for areapro.2da second resref (center animation)
+	ResRef VVCRes; //used for areapro.2da second resref (center animation)
 	ieWord ConeWidth;
 	//these are GemRB specific (from areapro.2da)
-	ieDword APFlags;    //areapro.2da flags
-	ResRef Spread;    //areapro.2da first resref
+	ieDword APFlags; //areapro.2da flags
+	ResRef Spread; //areapro.2da first resref
 	ResRef Secondary; //areapro.2da third resref
 	ResRef AreaSound; //areapro.2da second sound resource
 	//used for target or HD counting
@@ -189,17 +189,16 @@ struct ProjectileExtension
 	Point tileCoord;
 };
 
-class GEM_EXPORT Projectile
-{
+class GEM_EXPORT Projectile {
 private:
 	enum class ProjectileState {
 		NEW,
-		TRAVELLING,       // moving towards target
+		TRAVELLING, // moving towards target
 		AWAITING_TRIGGER, // hovering over target, waiting to trigger
-		HIT,              // hit target
-		EXPLODING,        // first explosion
-		EXPLODING_AGAIN,  // any subsequent explosion
-		BURNING_DOWN,     // children still there
+		HIT, // hit target
+		EXPLODING, // first explosion
+		EXPLODING_AGAIN, // any subsequent explosion
+		BURNING_DOWN, // children still there
 		EXPIRED
 	};
 
@@ -244,13 +243,13 @@ public:
 	ieWord LightY = 0;
 	ieWord LightZ = 0;
 	ResRef PaletteRes;
-	ieByte Gradients[7]{};
+	ieByte Gradients[7] {};
 	ieByte SmokeSpeed = 0;
-	ieByte SmokeGrad[7]{};
+	ieByte SmokeGrad[7] {};
 	ieByte Aim = 0; // original bg2: m_numDirections, a list of {1, 5, 9}
 	ieWord SmokeAnimID = 0;
 	ResRef TrailBAM[3];
-	ieWord TrailSpeed[3]{};
+	ieWord TrailSpeed[3] {};
 	unsigned int Range = 0;
 	//these are public but not in the .pro file
 	Holder<ProjectileExtension> Extension;
@@ -265,14 +264,14 @@ private:
 	orient_t NewOrientation = S;
 	Path path; // whole path
 	//similar to normal actors
-	Map *area = nullptr;
+	Map* area = nullptr;
 	Point Pos = Point(-1, -1);
 	int ZPos = 0;
 	Point Destination = Pos;
 	Point Origin;
-	ieDword Caster = 0;    // the globalID of the caster actor
-	int Level = 0;         // the caster's level
-	ieDword Target = 0;    // the globalID of target actor
+	ieDword Caster = 0; // the globalID of the caster actor
+	int Level = 0; // the caster's level
+	ieDword Target = 0; // the globalID of target actor
 	ieDword FakeTarget = 0; // a globalID for target that isn't followed
 	std::map<ieDword, uint32_t> lineTargets; // a list of PEF_LINE targets
 	ProjectileState state = ProjectileState::NEW;
@@ -299,57 +298,63 @@ private:
 	int pathcounter = 0x7fff;
 	int bend = 0;
 	int drawSpark = 0;
-	
+
 	struct LoopStop {
 		Holder<SoundHandle> sound;
-		
-		~LoopStop() noexcept {
+
+		~LoopStop() noexcept
+		{
 			if (sound) {
 				//allow an explosion sound to finish completely
 				sound->StopLooping();
 			}
 		}
-		
+
 		LoopStop() noexcept = default;
-		
+
 		LoopStop(const LoopStop& ls) noexcept
-		: sound(ls.sound) {}
-		
+			: sound(ls.sound) {}
+
 		LoopStop(LoopStop&& ls) noexcept
 		{
 			std::swap(sound, ls.sound);
 		}
-		
-		LoopStop& operator=(const LoopStop& ls) noexcept {
+
+		LoopStop& operator=(const LoopStop& ls) noexcept
+		{
 			if (this != &ls) {
 				sound = ls.sound;
 			}
 			return *this;
 		}
-		
-		LoopStop& operator=(LoopStop&& ls) noexcept {
+
+		LoopStop& operator=(LoopStop&& ls) noexcept
+		{
 			if (this != &ls) {
 				std::swap(sound, ls.sound);
 			}
 			return *this;
 		}
-		
-		SoundHandle* operator->() noexcept {
+
+		SoundHandle* operator->() noexcept
+		{
 			return sound.get();
 		}
-		
-		explicit operator bool() const noexcept {
+
+		explicit operator bool() const noexcept
+		{
 			return bool(sound);
 		}
 	} travel_handle;
+
 public:
 	void SetCaster(ieDword t, int level);
 	ieDword GetCaster() const;
-	bool FailedIDS(const Actor *target) const;
+	bool FailedIDS(const Actor* target) const;
 	bool IsWaitingForTrigger() const;
 	void SetTarget(ieDword t, bool fake);
-	void SetTarget(const Point &p);
-	bool PointInRadius(const Point &p) const;
+	void SetTarget(const Point& p);
+	bool PointInRadius(const Point& p) const;
 	void Cleanup();
 
 	Point GetPos() const { return Pos; }
@@ -360,43 +365,49 @@ public:
 	inline ieWord GetType() const { return type; }
 	//This assumes that the effect queue cannot be bigger than 65535
 	//which is a sane expectation
-	EffectQueue& GetEffects() {
-		return effects;
-	}
-	
-	const EffectQueue& GetEffects() const {
+	EffectQueue& GetEffects()
+	{
 		return effects;
 	}
 
-	inline orient_t GetOrientation() const {
+	const EffectQueue& GetEffects() const
+	{
+		return effects;
+	}
+
+	inline orient_t GetOrientation() const
+	{
 		return Orientation;
 	}
 	//no idea if projectiles got height, using y
-	inline int GetHeight() const {
+	inline int GetHeight() const
+	{
 		//if projectile is drawn absolutely on the ground
-		if (SFlags&PSF_BACKGROUND) {
+		if (SFlags & PSF_BACKGROUND) {
 			return 0;
 		}
 		//if projectile is drawn behind target (not behind everyone)
-		if (ExtFlags&PEF_BACKGROUND) {
+		if (ExtFlags & PEF_BACKGROUND) {
 			return Pos.y - int(ProHeights::Background);
 		}
 
 		return Pos.y + ZPos;
 	}
 
-	void SetIdentifiers(const ResRef &name, size_t idx);
+	void SetIdentifiers(const ResRef& name, size_t idx);
 
-	void SetEffectsCopy(const EffectQueue& eq, const Point &source);
+	void SetEffectsCopy(const EffectQueue& eq, const Point& source);
 
 	//don't forget to set effects to NULL when the projectile discharges
 	//unexploded projectiles are responsible to destruct their payload
 
-	inline void SetEffects(EffectQueue&& fx) {
+	inline void SetEffects(EffectQueue&& fx)
+	{
 		effects = std::move(fx);
 	}
 
-	inline void SetOrientation(orient_t value, bool slow) {
+	inline void SetOrientation(orient_t value, bool slow)
+	{
 		//MAX_ORIENT == 16, so we can do this
 		NewOrientation = value;
 		if (!slow) {
@@ -408,7 +419,7 @@ public:
 	//sets how long a created travel projectile will hover over a spot
 	//before vanishing (without the need of area extension)
 	void SetDelay(int delay);
-	void MoveTo(Map *map, const Point &Des);
+	void MoveTo(Map* map, const Point& Des);
 	//handle phases, return 0 when expired
 	void Update();
 	void UpdateChildren();
@@ -416,9 +427,10 @@ public:
 	//draw object
 	void Draw(const Region& screen, BlitFlags flags);
 	void SetGradient(int gradient, bool tinted);
-	void StaticTint(const Color &newtint);
+	void StaticTint(const Color& newtint);
 	bool IsStillIntact() const;
 	static Point GetStartOffset(const Actor* actor);
+
 private:
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
@@ -427,7 +439,7 @@ private:
 	AnimArray CreateCompositeAnimation(const AnimationFactory& af, ieByte seq) const;
 	//oriented animations (also simple ones)
 	AnimArray CreateOrientedAnimations(const AnimationFactory& af, ieByte seq) const;
-	void GetPaletteCopy(const AnimArray&, Holder<Palette> &pal) const;
+	void GetPaletteCopy(const AnimArray&, Holder<Palette>& pal) const;
 	void GetSmokeAnim();
 	//apply spells and effects on the target, only in single travel mode
 	//area effect projectiles call a separate single travel projectile for each affected target
@@ -445,7 +457,7 @@ private:
 	ProjectileState GetNextTravelState();
 	ProjectileState GetNextExplosionState();
 	//drop a BAM or VVC on the trail path, return the length of the animation
-	int AddTrail(const ResRef& BAM, const ieByte *pal) const;
+	int AddTrail(const ResRef& BAM, const ieByte* pal) const;
 	ProjectileState DoStep();
 	void LineTarget(); // line projectiles (walls, scorchers)
 	void LineTarget(Path::const_iterator beg, Path::const_iterator end);
@@ -474,13 +486,13 @@ private:
 	//logic to resolve the explosion count (may be based on caster level)
 	int CalculateExplosionCount() const;
 
-	Actor *GetTarget();
-	void NextTarget(const Point &p);
+	Actor* GetTarget();
+	void NextTarget(const Point& p);
 	bool HasBeenHitRecently(ieDword targetID, uint32_t time) const;
-	void SetupPalette(const AnimArray&, Holder<Palette> &pal, const ieByte *gradients) const;
+	void SetupPalette(const AnimArray&, Holder<Palette>& pal, const ieByte* gradients) const;
 
 	void Draw(const Holder<Sprite2D>& spr, const Point& p,
-			  BlitFlags flags, Color overrideTint) const;
+		  BlitFlags flags, Color overrideTint) const;
 };
 
 static_assert(std::is_nothrow_move_constructible<Projectile>::value, "Projectile should be noexcept MoveConstructible");

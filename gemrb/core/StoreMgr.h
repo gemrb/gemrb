@@ -30,6 +30,7 @@
 
 #include "Plugin.h"
 #include "Store.h"
+
 #include "Streams/DataStream.h"
 
 namespace GemRB {
@@ -42,9 +43,9 @@ namespace GemRB {
 class GEM_EXPORT StoreMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
-	virtual Store* GetStore(Store *s) = 0;
+	virtual Store* GetStore(Store* s) = 0;
 
-	virtual bool PutStore(DataStream* stream, Store *s) = 0;
+	virtual bool PutStore(DataStream* stream, Store* s) = 0;
 };
 
 }

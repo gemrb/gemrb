@@ -22,6 +22,7 @@
 #define WEDIMPORTER_H
 
 #include "Polygon.h"
+
 #include "Plugins/TileMapMgr.h"
 
 #include <vector>
@@ -73,7 +74,7 @@ public:
 	WEDImporter& operator=(const WEDImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	//if tilemap already exists, don't create it
-	TileMap* GetTileMap(TileMap *tm) const override;
+	TileMap* GetTileMap(TileMap* tm) const override;
 	std::vector<ieWord> GetDoorIndices(const ResRef&, bool& BaseClosed) override;
 
 	std::vector<WallPolygonGroup> GetWallGroups() const override;

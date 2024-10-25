@@ -24,6 +24,7 @@
 #include "exports.h"
 
 #include "Tile.h"
+
 #include "Video/Video.h"
 
 #include <vector>
@@ -34,18 +35,19 @@ class GEM_EXPORT TileOverlay {
 public:
 	Size size;
 	std::vector<Tile> tiles;
+
 public:
 	using TileOverlayPtr = Holder<TileOverlay>;
 
 	explicit TileOverlay(Size size) noexcept;
 	TileOverlay(const TileOverlay&) noexcept = delete;
 	TileOverlay& operator=(const TileOverlay&) noexcept = delete;
-	
+
 	TileOverlay(TileOverlay&&) noexcept = default;
 	TileOverlay& operator=(TileOverlay&&) noexcept = default;
 
 	void AddTile(Tile&& tile);
-	void Draw(const Region& viewport, std::vector<TileOverlayPtr> &overlays, BlitFlags flags) const;
+	void Draw(const Region& viewport, std::vector<TileOverlayPtr>& overlays, BlitFlags flags) const;
 };
 
 }

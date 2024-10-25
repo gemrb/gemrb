@@ -34,7 +34,7 @@ int ZLibManager::Decompress(DataStream* dest, DataStream* source, unsigned int s
 {
 	unsigned char bufferin[INPUTSIZE];
 	unsigned char bufferout[OUTPUTSIZE];
-	z_stream stream{};
+	z_stream stream {};
 
 	stream.zalloc = Z_NULL;
 	stream.zfree = Z_NULL;
@@ -90,7 +90,7 @@ int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 {
 	unsigned char bufferin[INPUTSIZE];
 	unsigned char bufferout[OUTPUTSIZE];
-	z_stream stream{};
+	z_stream stream {};
 
 	stream.zalloc = Z_NULL;
 	stream.zfree = Z_NULL;
@@ -110,7 +110,7 @@ int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 			//Read doesn't allow partial reads, but provides Remains
 			unsigned long remains = std::min<unsigned long>(source->Remains(), std::numeric_limits<uInt>::max());
 			stream.avail_in = std::min<uInt>(static_cast<uInt>(remains), INPUTSIZE);
-			if (source->Read( bufferin, stream.avail_in) != (int) stream.avail_in) {
+			if (source->Read(bufferin, stream.avail_in) != (int) stream.avail_in) {
 				return GEM_ERROR;
 			}
 		}

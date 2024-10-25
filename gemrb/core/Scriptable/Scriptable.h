@@ -54,10 +54,10 @@ class Selectable;
 class Spell;
 class Sprite2D;
 
-#define MAX_GROUND_ICON_DRAWN   3
+#define MAX_GROUND_ICON_DRAWN 3
 
 /** The distance between PC's who are about to enter a new area */
-#define MAX_TRAVELING_DISTANCE      400
+#define MAX_TRAVELING_DISTANCE 400
 
 // script levels / slots (scrlev.ids)
 #define SCR_OVERRIDE  0
@@ -80,64 +80,71 @@ class Sprite2D;
 #define TRAVEL_PARTY    4
 #define TRAP_DETECTABLE 8
 //#define TRAP_ENEMY	 16 // "trap set off by enemy" in NI, unused
-#define TRAP_TUTORIAL	 32 //active only when in tutorial mode
-#define TRAP_NPC	64 // "trap set off by NPC"
-#define TRAP_SILENT	128 // "trigger silent" / "no string", used in pst
-#define TRAP_DEACTIVATED  256
-#define _TRAVEL_NONPC      512
-#define _TRAP_USEPOINT       1024 //override usage point of travel regions (used for sound in PST traps)
-#define INFO_DOOR	 2048 //info trigger blocked by door
+#define TRAP_TUTORIAL    32 //active only when in tutorial mode
+#define TRAP_NPC         64 // "trap set off by NPC"
+#define TRAP_SILENT      128 // "trigger silent" / "no string", used in pst
+#define TRAP_DEACTIVATED 256
+#define _TRAVEL_NONPC    512
+#define _TRAP_USEPOINT   1024 //override usage point of travel regions (used for sound in PST traps)
+#define INFO_DOOR        2048 //info trigger blocked by door
 
 //internal actor flags
-#define IF_JUSTDIED   2     //Died() will return true
-#define IF_FROMGAME   4     //this is an NPC or PC
-#define IF_REALLYDIED 8     //real death happened, actor will be set to dead
-#define IF_NORETICLE  16    //draw reticle (target mark)
-#define IF_NOINT      32    //cannot interrupt the actions of this actor (save is not possible!)
-#define IF_CLEANUP    64    //actor died chunky death, or other total destruction
-#define IF_RUNNING    128   //actor is running
+#define IF_JUSTDIED   2 //Died() will return true
+#define IF_FROMGAME   4 //this is an NPC or PC
+#define IF_REALLYDIED 8 //real death happened, actor will be set to dead
+#define IF_NORETICLE  16 //draw reticle (target mark)
+#define IF_NOINT      32 //cannot interrupt the actions of this actor (save is not possible!)
+#define IF_CLEANUP    64 //actor died chunky death, or other total destruction
+#define IF_RUNNING    128 //actor is running
 //these bits could be set by a WalkTo
-#define IF_RUNFLAGS   (IF_RUNNING|IF_NORETICLE|IF_NOINT)
-#define IF_INITIALIZED   0x200
-#define IF_USEDSAVE      0x400  //actor needed saving throws
-#define IF_GOTAREA    0x800     //actor already moved to an area
-#define IF_USEEXIT       0x1000 //
-#define IF_INTRAP        0x2000 //actor is currently in a trap (intrap trigger event)
-#define IF_PST_WMAPPING  0x8000 // trying to use the worldmap for travel
+#define IF_RUNFLAGS     (IF_RUNNING | IF_NORETICLE | IF_NOINT)
+#define IF_INITIALIZED  0x200
+#define IF_USEDSAVE     0x400 //actor needed saving throws
+#define IF_GOTAREA      0x800 //actor already moved to an area
+#define IF_USEEXIT      0x1000 //
+#define IF_INTRAP       0x2000 //actor is currently in a trap (intrap trigger event)
+#define IF_PST_WMAPPING 0x8000 // trying to use the worldmap for travel
 
 //scriptable flags
-#define IF_ACTIVE        0x10000
-#define IF_VISIBLE       0x40000
-#define IF_IDLE          0x100000
-#define IF_FORCEUPDATE   0x400000
-#define IF_TRIGGER_AP    0x800000
-#define IF_DUMPED        0x1000000
+#define IF_ACTIVE      0x10000
+#define IF_VISIBLE     0x40000
+#define IF_IDLE        0x100000
+#define IF_FORCEUPDATE 0x400000
+#define IF_TRIGGER_AP  0x800000
+#define IF_DUMPED      0x1000000
 
 //the actor should stop attacking
-#define IF_STOPATTACK (IF_JUSTDIED|IF_REALLYDIED|IF_CLEANUP|IF_IDLE)
+#define IF_STOPATTACK (IF_JUSTDIED | IF_REALLYDIED | IF_CLEANUP | IF_IDLE)
 
 //CheckTravel return value
-#define CT_CANTMOVE       0 //inactive
-#define CT_ACTIVE         1 //actor can move
-#define CT_GO_CLOSER      2 //entire team would move, but not close enough
-#define CT_WHOLE          3 //team can move
-#define CT_SELECTED       4 //not all selected actors are there
-#define CT_MOVE_SELECTED  5 //all selected can move
+#define CT_CANTMOVE      0 //inactive
+#define CT_ACTIVE        1 //actor can move
+#define CT_GO_CLOSER     2 //entire team would move, but not close enough
+#define CT_WHOLE         3 //team can move
+#define CT_SELECTED      4 //not all selected actors are there
+#define CT_MOVE_SELECTED 5 //all selected can move
 
 //xp bonus types (for xpbonus.2da)
 #define XP_LOCKPICK   0
 #define XP_DISARM     1
 #define XP_LEARNSPELL 2
-#define XP_PICKPOCKET  3 // gemrb extension
+#define XP_PICKPOCKET 3 // gemrb extension
 
-#define MAX_PATH_TRIES 8
+#define MAX_PATH_TRIES      8
 #define MAX_BUMP_BACK_TRIES 16
-#define MAX_RAND_WALK 10
+#define MAX_RAND_WALK       10
 
 using ScriptID = ieDword;
 
-using ScriptableType = enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
-	ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7, ST_ANY = 8 };
+using ScriptableType = enum ScriptableType { ST_ACTOR = 0,
+					     ST_PROXIMITY = 1,
+					     ST_TRIGGER = 2,
+					     ST_TRAVEL = 3,
+					     ST_DOOR = 4,
+					     ST_CONTAINER = 5,
+					     ST_AREA = 6,
+					     ST_GLOBAL = 7,
+					     ST_ANY = 8 };
 
 enum {
 	trigger_acquired = 0x1, // unused and broken in the original
@@ -186,7 +193,7 @@ enum {
 	trigger_breakingpoint = 0x5c,
 	trigger_pickpocketfailed = 0x5d,
 	trigger_stealfailed = 0x5e,
-	trigger_disarmfailed  = 0x5f,
+	trigger_disarmfailed = 0x5f,
 	trigger_picklockfailed = 0x60,
 	trigger_clicked = 0x70,
 	trigger_triggerclick = 0x79, // pst; we map it to trigger_clicked
@@ -219,9 +226,12 @@ enum {
 };
 
 struct TriggerEntry {
-	explicit TriggerEntry(unsigned short id) : triggerID(id) { }
-	TriggerEntry(unsigned short id, ieDword p1) : triggerID(id), param1(p1) { }
-	TriggerEntry(unsigned short id, ieDword p1, ieDword p2) : triggerID(id), param1(p1), param2(p2) { }
+	explicit TriggerEntry(unsigned short id)
+		: triggerID(id) {}
+	TriggerEntry(unsigned short id, ieDword p1)
+		: triggerID(id), param1(p1) {}
+	TriggerEntry(unsigned short id, ieDword p1, ieDword p2)
+		: triggerID(id), param1(p1), param2(p2) {}
 
 	unsigned short triggerID;
 	ieDword param1 = 0;
@@ -265,18 +275,21 @@ public:
 	Scriptable(const Scriptable&) = delete;
 	virtual ~Scriptable();
 	Scriptable& operator=(const Scriptable&) = delete;
+
 private:
 	tick_t WaitCounter = 0;
 	std::map<ieDword, ieDword> scriptTimers;
 	ScriptID globalID = 0;
+
 protected: //let Actor access this
 	std::list<TriggerEntry> triggers;
-	Map *area = nullptr;
+	Map* area = nullptr;
 	ieVariable scriptName;
 	ieDword InternalFlags = 0; // for triggers
 	ResRef Dialog;
-	std::list< Action*> actionQueue;
+	std::list<Action*> actionQueue;
 	Action* CurrentAction = nullptr;
+
 public:
 	ScriptableType Type = ST_ACTOR;
 	Point Pos;
@@ -307,7 +320,7 @@ public:
 
 	// more scripting state
 	ieVarsMap locals;
-	OverHeadText overHead{this};
+	OverHeadText overHead { this };
 	StoredObjects objects {};
 	ieDword UnselectableTimer = 0;
 	ieDword UnselectableType = 0;
@@ -317,23 +330,26 @@ public:
 	int SpellHeader = 0;
 	ResRef SpellResRef;
 	bool InterruptCasting = false;
+
 public:
-	
-	template <class RETURN, class PARAM>
+	template<class RETURN, class PARAM>
 	static constexpr auto As(PARAM* obj)
-	-> typename std::conditional_t<std::is_const<PARAM>::value, const RETURN*, RETURN*> {
+		-> typename std::conditional_t<std::is_const<PARAM>::value, const RETURN*, RETURN*>
+	{
 		static_assert(std::is_base_of<Scriptable, RETURN>::value, "Attempted bad Scriptable cast!");
 		// dynamic_cast will return nullptr if the cast is invalid
 		return dynamic_cast<decltype(As<RETURN, PARAM>(obj))>(obj);
 	}
 
-	template <class RETURN>
-	RETURN* As() {
+	template<class RETURN>
+	RETURN* As()
+	{
 		return Scriptable::As<RETURN>(this);
 	}
-	
-	template <class RETURN>
-	constexpr RETURN* As() const {
+
+	template<class RETURN>
+	constexpr RETURN* As() const
+	{
 		return Scriptable::As<RETURN>(this);
 	}
 
@@ -342,9 +358,9 @@ public:
 	{
 		return Dialog;
 	}
-	void SetDialog(const ResRef &resref);
+	void SetDialog(const ResRef& resref);
 	void SetFloatingText(char*);
-	void SetScript(const ResRef &aScript, int idx, bool ai = false);
+	void SetScript(const ResRef& aScript, int idx, bool ai = false);
 	void SetSpellResRef(const ResRef& resref);
 	void SetWait(tick_t time);
 	tick_t GetWait() const;
@@ -360,7 +376,7 @@ public:
 	void SetInternalFlag(unsigned int value, BitOp mode);
 	const ieVariable& GetScriptName() const;
 	Map* GetCurrentArea() const;
-	void SetMap(Map *map);
+	void SetMap(Map* map);
 	void SetScriptName(const ieVariable& text);
 	//call this to enable script running as soon as possible
 	void ImmediateEvent();
@@ -385,15 +401,15 @@ public:
 	void AddTrigger(TriggerEntry trigger);
 	void SetLastTrigger(ieDword triggerID, ieDword scriptableID);
 	bool MatchTrigger(unsigned short id, ieDword param = 0) const;
-	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0) const;
-	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0) const;
+	bool MatchTriggerWithObject(short unsigned int id, const Object* obj, ieDword param = 0) const;
+	const TriggerEntry* GetMatchingTrigger(unsigned short id, unsigned int notflags = 0) const;
 	void SendTriggerToAll(TriggerEntry entry, int extraFlags = 0);
 	virtual Region DrawingRegion() const;
 	/* check if casting is allowed at all */
 	int CanCast(const ResRef& SpellRef, bool verbose = true);
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
-	void SpellcraftCheck(const Actor *caster, const ResRef& spellRef);
+	void SpellcraftCheck(const Actor* caster, const ResRef& spellRef);
 	/* internal spellcasting shortcuts */
 	void DirectlyCastSpellPoint(const Point& target, const ResRef& spellRef, int level, bool keepStance, bool deplete);
 	void DirectlyCastSpell(Scriptable* target, const ResRef& spellRef, int level, bool keepStance, bool deplete);
@@ -412,14 +428,15 @@ public:
 	bool AuraPolluted();
 	ieDword GetLocal(const ieVariable& key, ieDword fallback) const;
 	virtual std::string dump() const = 0;
+
 private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(bool instant, Scriptable* target = nullptr, int level = 0);
 	/* also part of the spellcasting process, creating the projectile */
 	void CreateProjectile(const ResRef& spellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the weird/awesome wild surges */
-	bool HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl, Actor *caster);
-	void ModifyProjectile(Projectile* &pro, Spell* spl, ieDword tgt, int level);
+	bool HandleHardcodedSurge(const ResRef& surgeSpell, const Spell* spl, Actor* caster);
+	void ModifyProjectile(Projectile*& pro, Spell* spl, ieDword tgt, int level);
 	void ResetCastingState(Actor* caster);
 	void DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const;
 };
@@ -427,6 +444,7 @@ private:
 class GEM_EXPORT Selectable : public Scriptable {
 public:
 	using Scriptable::Scriptable;
+
 public:
 	ieWord Selected = 0; // could be 0x80 for unselectable
 	bool Over = false;
@@ -435,14 +453,15 @@ public:
 	Holder<Sprite2D> circleBitmap[2] = {};
 	int circleSize = 0;
 	float_t sizeFactor = 1.0f;
+
 public:
-	void SetBBox(const Region &newBBox);
+	void SetBBox(const Region& newBBox);
 	void DrawCircle(const Point& p) const;
-	bool IsOver(const Point &Pos) const;
+	bool IsOver(const Point& Pos) const;
 	void SetOver(bool over);
 	bool IsSelected() const;
 	void Select(int Value);
-	void SetCircle(int size, float_t, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle);
+	void SetCircle(int size, float_t, const Color& color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle);
 	int CircleSize2Radius() const;
 };
 
@@ -469,8 +488,9 @@ public:
 	ResRef KeyResRef;
 	//play this wav file when stepping on the trap (on PST)
 	ResRef EnterWav;
+
 public:
-	bool IsOver(const Point &Place) const;
+	bool IsOver(const Point& Place) const;
 	void DrawOutline(Point origin) const;
 	void SetCursor(unsigned char CursorIndex);
 
@@ -483,7 +503,7 @@ public:
 	bool VisibleTrap(int only_detected) const;
 	//returns true if trap has been triggered, tumble skill???
 	virtual bool TriggerTrap(int skill, ieDword ID);
-	bool TryUnlock(Actor *actor, bool removekey) const;
+	bool TryUnlock(Actor* actor, bool removekey) const;
 	bool TryBashLock(Actor* actor, ieWord lockDifficulty, HCStrings failStr);
 	bool TryPickLock(Actor* actor, ieWord lockDifficulty, ieStrRef customFailStr, HCStrings failStr);
 };
@@ -499,6 +519,7 @@ private: //these seem to be sensitive, so get protection
 	unsigned int prevTicks = 0;
 	int bumpBackTries = 0;
 	bool pathAbandoned = false;
+
 protected:
 	ieDword timeStartStep = 0;
 	//the # of previous tries to pick up a new walkpath
@@ -508,6 +529,7 @@ protected:
 	bool bumped = false;
 	int pathfindingDistance = circleSize;
 	int randomWalkCounter = 0;
+
 public:
 	inline int GetRandomBackoff() const
 	{
@@ -524,31 +546,39 @@ public:
 
 	Point Destination = Pos;
 	ResRef AreaName;
-	Point HomeLocation;//spawnpoint, return here after rest
+	Point HomeLocation; //spawnpoint, return here after rest
 	ieWord maxWalkDistance = 0; // maximum random walk distance from home
+
 public:
-	inline void ImpedeBumping() { oldPos = Pos; bumped = false; }
+	inline void ImpedeBumping()
+	{
+		oldPos = Pos;
+		bumped = false;
+	}
 	void AdjustPosition();
 	void BumpAway();
 	void BumpBack();
 	inline bool IsBumped() const { return bumped; }
 	PathNode GetNextStep(int x) const;
 	inline const Path& GetPath() const { return path; };
-	inline int GetPathTries() const	{ return pathTries; }
+	inline int GetPathTries() const { return pathTries; }
 	inline void IncrementPathTries() { pathTries++; }
 	inline void ResetPathTries() { pathTries = 0; }
 	// inliners to protect data consistency
-	inline bool IsMoving() const {
+	inline bool IsMoving() const
+	{
 		return (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN);
 	}
 
 	orient_t GetNextFace() const;
 
-	inline orient_t GetOrientation() const {
+	inline orient_t GetOrientation() const
+	{
 		return Orientation;
 	}
 
-	inline unsigned char GetStance() const {
+	inline unsigned char GetStance() const
+	{
 		return StanceID;
 	}
 
@@ -557,13 +587,13 @@ public:
 	void SetOrientation(const Point& from, const Point& to, bool slow);
 	void SetAttackMoveChances(const std::array<ieWord, 3>& amc);
 	virtual void DoStep(unsigned int walkScale, ieDword time = 0);
-	void AddWayPoint(const Point &Des);
-	void RunAwayFrom(const Point &Des, int PathLength, bool noBackAway);
+	void AddWayPoint(const Point& Des);
+	void RunAwayFrom(const Point& Des, int PathLength, bool noBackAway);
 	void RandomWalk(bool can_stop, bool run);
 	int GetRandomWalkCounter() const { return randomWalkCounter; };
 	void MoveLine(int steps, orient_t Orient);
-	void WalkTo(const Point &Des, int MinDistance = 0);
-	void MoveTo(const Point &Des);
+	void WalkTo(const Point& Des, int MinDistance = 0);
+	void MoveTo(const Point& Des);
 	void Stop(int flags = 0) override;
 	void ClearPath(bool resetDestination = true);
 	void HandleAnkhegStance(bool emerge);

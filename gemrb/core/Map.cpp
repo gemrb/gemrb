@@ -22,6 +22,9 @@
 
 #include "Map.h"
 
+#include "ie_cursors.h"
+#include "strrefs.h"
+
 #include "Ambient.h"
 #include "AmbientMgr.h"
 #include "Audio.h"
@@ -29,57 +32,56 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Geometry.h"
+#include "ImageMgr.h"
 #include "IniSpawn.h"
 #include "Interface.h"
 #include "MapMgr.h"
 #include "MusicMgr.h"
-#include "ImageMgr.h"
 #include "Palette.h"
 #include "Particles.h"
 #include "PluginMgr.h"
 #include "Projectile.h"
+#include "RNG.h"
 #include "SaveGameIterator.h"
 #include "ScriptedAnimation.h"
 #include "TileMap.h"
 #include "VEFObject.h"
-#include "Video/Video.h"
-#include "strrefs.h"
-#include "ie_cursors.h"
-#include "GameScript/GSUtils.h"
+
 #include "GUI/GameControl.h"
 #include "GUI/Window.h"
-#include "RNG.h"
+#include "GameScript/GSUtils.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
+#include "Video/Video.h"
 
 #include <array>
 #include <cassert>
 #include <limits>
-#include <utility>
 #include <unordered_map>
+#include <utility>
 
 namespace GemRB {
 
 static constexpr unsigned int MAX_CIRCLESIZE = 8;
 
 const PixelFormat TileProps::pixelFormat(0, 0, 0, 0,
-										 searchMapShift, materialMapShift,
-										 heightMapShift, lightMapShift,
-										 searchMapMask, materialMapMask,
-										 heightMapMask, lightMapMask,
-										 4, 32, 0, false, false, nullptr);
+					 searchMapShift, materialMapShift,
+					 heightMapShift, lightMapShift,
+					 searchMapMask, materialMapMask,
+					 heightMapMask, lightMapMask,
+					 4, 32, 0, false, false, nullptr);
 
 TileProps::TileProps(Holder<Sprite2D> props) noexcept
-: propImage(std::move(props))
+	: propImage(std::move(props))
 {
 	propPtr = static_cast<uint32_t*>(propImage->LockSprite());
 	size = propImage->Frame.size;
-	
+
 	assert(propImage->Format().Bpp == 4);
 	assert(propImage->GetPitch() == size.w * 4);
 }
-	
+
 const Size& TileProps::GetSize() const noexcept
 {
 	return size;
@@ -170,7 +172,7 @@ void TileProps::PaintSearchMap(const SearchmapPoint& p, PathMapFlags value) cons
 	if (!size.PointInside(p)) {
 		return;
 	}
-	
+
 	uint32_t& pixel = propPtr[p.y * size.w + p.x];
 	pixel = (pixel & ~searchMapMask) | (uint32_t(value) << propImage->Format().Rshift);
 }
@@ -197,15 +199,14 @@ void TileProps::PaintSearchMap(const SearchmapPoint& Pos, uint16_t blocksize, co
 
 	blocksize = Clamp<uint16_t>(blocksize, 1, MAX_CIRCLESIZE);
 	uint16_t r = blocksize - 1;
-	
+
 	const auto points = PlotCircle(Pos, r);
-	for (size_t i = 0; i < points.size(); i += 2)
-	{
+	for (size_t i = 0; i < points.size(); i += 2) {
 		const SearchmapPoint& p1 = points[i];
 		const SearchmapPoint& p2 = points[i + 1];
 		assert(p1.y == p2.y);
 		assert(p2.x <= p1.x);
-		
+
 		for (int x = p2.x; x <= p1.x; ++x) {
 			PaintIfPassable(SearchmapPoint(x, p1.y));
 		}
@@ -214,14 +215,16 @@ void TileProps::PaintSearchMap(const SearchmapPoint& Pos, uint16_t blocksize, co
 
 struct Spawns {
 	ResRefMap<SpawnGroup> vars;
-	
-	static const Spawns& Get() {
+
+	static const Spawns& Get()
+	{
 		static Spawns spawns;
 		return spawns;
 	}
 
 private:
-	Spawns() noexcept {
+	Spawns() noexcept
+	{
 		AutoTable tab = gamedata->LoadTable("spawngrp", true);
 
 		if (!tab)
@@ -229,15 +232,15 @@ private:
 
 		TableMgr::index_t i = tab->GetColNamesCount();
 		while (i--) {
-			TableMgr::index_t j=tab->GetRowCount();
+			TableMgr::index_t j = tab->GetRowCount();
 			std::vector<ResRef> resrefs(j);
 			while (j--) {
 				if (tab->QueryField(j, i) != tab->QueryDefault()) break;
 			}
-			if (j>0) {
+			if (j > 0) {
 				//difficulty
 				int level = tab->QueryFieldSigned<int>(0, i);
-				for (;j;j--) {
+				for (; j; j--) {
 					resrefs[j - 1] = tab->QueryField(j, i);
 				}
 				ResRef GroupName = tab->GetColumnName(i);
@@ -253,7 +256,8 @@ struct Explore {
 	int VisibilityPerimeter = 0; // calculated from MaxVisibility
 	std::array<std::vector<Point>, MaxVisibility> VisibilityMasks;
 
-	static const Explore& Get() {
+	static const Explore& Get()
+	{
 		static Explore explore;
 		return explore;
 	}
@@ -261,9 +265,9 @@ struct Explore {
 private:
 	void AddLOS(int destx, int desty, int slot)
 	{
-		for (int i=0;i<MaxVisibility;i++) {
-			int x = ((destx*i + MaxVisibility/2) / MaxVisibility) * 16;
-			int y = ((desty*i + MaxVisibility/2) / MaxVisibility) * 12;
+		for (int i = 0; i < MaxVisibility; i++) {
+			int x = ((destx * i + MaxVisibility / 2) / MaxVisibility) * 16;
+			int y = ((desty * i + MaxVisibility / 2) / MaxVisibility) * 12;
 			if (LargeFog) {
 				x += 16;
 				y += 12;
@@ -273,21 +277,22 @@ private:
 		}
 	}
 
-	Explore() noexcept {
+	Explore() noexcept
+	{
 		LargeFog = !core->HasFeature(GFFlags::SMALL_FOG);
 
 		//circle perimeter size for MaxVisibility
 		int x = MaxVisibility;
 		int y = 0;
-		int xc = 1 - ( 2 * MaxVisibility );
+		int xc = 1 - (2 * MaxVisibility);
 		int yc = 1;
 		int re = 0;
-		while (x>=y) {
-			VisibilityPerimeter+=8;
+		while (x >= y) {
+			VisibilityPerimeter += 8;
 			y++;
 			re += yc;
 			yc += 2;
-			if (( ( 2 * re ) + xc ) > 0) {
+			if (((2 * re) + xc) > 0) {
 				x--;
 				re += xc;
 				xc += 2;
@@ -300,23 +305,23 @@ private:
 
 		x = MaxVisibility;
 		y = 0;
-		xc = 1 - ( 2 * MaxVisibility );
+		xc = 1 - (2 * MaxVisibility);
 		yc = 1;
 		re = 0;
 		VisibilityPerimeter = 0;
-		while (x>=y) {
-			AddLOS (x, y, VisibilityPerimeter++);
-			AddLOS (-x, y, VisibilityPerimeter++);
-			AddLOS (-x, -y, VisibilityPerimeter++);
-			AddLOS (x, -y, VisibilityPerimeter++);
-			AddLOS (y, x, VisibilityPerimeter++);
-			AddLOS (-y, x, VisibilityPerimeter++);
-			AddLOS (-y, -x, VisibilityPerimeter++);
-			AddLOS (y, -x, VisibilityPerimeter++);
+		while (x >= y) {
+			AddLOS(x, y, VisibilityPerimeter++);
+			AddLOS(-x, y, VisibilityPerimeter++);
+			AddLOS(-x, -y, VisibilityPerimeter++);
+			AddLOS(x, -y, VisibilityPerimeter++);
+			AddLOS(y, x, VisibilityPerimeter++);
+			AddLOS(-y, x, VisibilityPerimeter++);
+			AddLOS(-y, -x, VisibilityPerimeter++);
+			AddLOS(y, -x, VisibilityPerimeter++);
 			y++;
 			re += yc;
 			yc += 2;
-			if (( ( 2 * re ) + xc ) > 0) {
+			if (((2 * re) + xc) > 0) {
 				x--;
 				re += xc;
 				xc += 2;
@@ -325,7 +330,7 @@ private:
 	}
 };
 
-static inline AnimationObjectType SelectObject(const Actor *actor, int q, const AreaAnimation *a, const VEFObject *sca, const Particles *spark, const Projectile *pro, const Container *pile)
+static inline AnimationObjectType SelectObject(const Actor* actor, int q, const AreaAnimation* a, const VEFObject* sca, const Particles* spark, const Projectile* pro, const Container* pile)
 {
 	int actorh;
 	if (actor) {
@@ -344,7 +349,7 @@ static inline AnimationObjectType SelectObject(const Actor *actor, int q, const 
 
 	int scah;
 	if (sca) {
-		scah = sca->Pos.y;//+sca->ZPos;
+		scah = sca->Pos.y; //+sca->ZPos;
 	} else {
 		scah = 0x7fffffff;
 	}
@@ -352,7 +357,7 @@ static inline AnimationObjectType SelectObject(const Actor *actor, int q, const 
 	int spah;
 	if (spark) {
 		//no idea if this should be plus or minus (or here at all)
-		spah = spark->GetHeight();//+spark->pos.h;
+		spah = spark->GetHeight(); //+spark->pos.h;
 	} else {
 		spah = 0x7fffffff;
 	}
@@ -375,7 +380,7 @@ static inline AnimationObjectType SelectObject(const Actor *actor, int q, const 
 	// one of them is guaranteed to have a sane value, so we don't need
 	// to care that 0x7fffffff can repeat; same heights for others are
 	// dealt with the chosen specific order of comparisons
-	int lowest = std::min({proh, spah, aah, scah, actorh});
+	int lowest = std::min({ proh, spah, aah, scah, actorh });
 	if (lowest == proh) return AOT_PROJECTILE;
 	if (lowest == spah) return AOT_SPARK;
 	if (lowest == aah) return AOT_AREA;
@@ -384,7 +389,7 @@ static inline AnimationObjectType SelectObject(const Actor *actor, int q, const 
 }
 
 MapNote::MapNote(String txt, ieWord c, bool readonly)
-: text(std::move(txt)), readonly(readonly)
+	: text(std::move(txt)), readonly(readonly)
 {
 	color = Clamp<ieWord>(c, 0, 8);
 	//update custom strref
@@ -392,7 +397,7 @@ MapNote::MapNote(String txt, ieWord c, bool readonly)
 }
 
 MapNote::MapNote(ieStrRef ref, ieWord c, bool readonly)
-: strref(ref), readonly(readonly)
+	: strref(ref), readonly(readonly)
 {
 	color = Clamp<ieWord>(c, 0, 8);
 	text = core->GetString(ref);
@@ -400,16 +405,16 @@ MapNote::MapNote(ieStrRef ref, ieWord c, bool readonly)
 
 const Color& MapNote::GetColor() const
 {
-	static const Color colors[]={
-	 ColorBlack,
-	 ColorGray,
-	 ColorViolet,
-	 ColorGreen,
-	 ColorOrange,
-	 ColorRed,
-	 ColorBlue,
-	 ColorBlueDark,
-	 ColorGreenDark
+	static const Color colors[] = {
+		ColorBlack,
+		ColorGray,
+		ColorViolet,
+		ColorGreen,
+		ColorOrange,
+		ColorRed,
+		ColorBlue,
+		ColorBlueDark,
+		ColorGreenDark
 	};
 
 	return colors[color];
@@ -417,7 +422,7 @@ const Color& MapNote::GetColor() const
 
 //returns true if creature must be embedded in the area
 //npcs in saved game shouldn't be embedded either
-static inline bool MustSave(const Actor *actor)
+static inline bool MustSave(const Actor* actor)
 {
 	if (actor->Persistent()) {
 		return false;
@@ -437,11 +442,13 @@ Point Map::ConvertCoordFromTile(const Point& p)
 	return Point(p.x * 16, p.y * 12);
 }
 
-Map::Map(TileMap *tm, TileProps props, Holder<Sprite2D> sm)
-: Scriptable(ST_AREA),
-TMap(tm), tileProps(std::move(props)),
-SmallMap(std::move(sm)),
-ExploredBitmap(FogMapSize(), uint8_t(0x00)), VisibleBitmap(FogMapSize(), uint8_t(0x00))
+Map::Map(TileMap* tm, TileProps props, Holder<Sprite2D> sm)
+	: Scriptable(ST_AREA),
+	  TMap(tm),
+	  tileProps(std::move(props)),
+	  SmallMap(std::move(sm)),
+	  ExploredBitmap(FogMapSize(), uint8_t(0x00)),
+	  VisibleBitmap(FogMapSize(), uint8_t(0x00))
 {
 	area = this;
 	MasterArea = core->GetGame()->MasterArea(scriptName);
@@ -450,8 +457,8 @@ ExploredBitmap(FogMapSize(), uint8_t(0x00)), VisibleBitmap(FogMapSize(), uint8_t
 Map::~Map(void)
 {
 	//close the current container if it was owned by this map, this avoids a crash
-	const Container *c = core->GetCurrentContainer();
-	if (c && c->GetCurrentArea()==this) {
+	const Container* c = core->GetCurrentContainer();
+	if (c && c->GetCurrentArea() == this) {
 		core->CloseCurrentContainer();
 	}
 
@@ -484,7 +491,7 @@ Map::~Map(void)
 		delete particle;
 	}
 
-	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
+	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
 	ambim->RemoveAmbients(ambients);
 	for (auto ambient : ambients) {
 		delete ambient;
@@ -495,13 +502,13 @@ void Map::SetTileMapProps(TileProps props)
 {
 	tileProps = std::move(props);
 }
-	
+
 const MapReverbProperties& Map::GetReverbProperties() const
 {
 	if (reverb) {
 		return reverb->properties;
 	}
-	static const MapReverbProperties none {EFX_REVERB_GENERIC, true};
+	static const MapReverbProperties none { EFX_REVERB_GENERIC, true };
 	return none;
 }
 
@@ -510,7 +517,7 @@ void Map::AutoLockDoors() const
 	GetTileMap()->AutoLockDoors();
 }
 
-void Map::MoveToNewArea(const ResRef &area, const ieVariable& entrance, unsigned int direction, int EveryOne, Actor *actor) const
+void Map::MoveToNewArea(const ResRef& area, const ieVariable& entrance, unsigned int direction, int EveryOne, Actor* actor) const
 {
 	//change loader MOS image here
 	//check worldmap entry, if that doesn't contain anything,
@@ -534,14 +541,14 @@ void Map::MoveToNewArea(const ResRef &area, const ieVariable& entrance, unsigned
 		Log(ERROR, "Map", "Invalid map: {}", area);
 		return;
 	}
-	const Entrance *ent = nullptr;
+	const Entrance* ent = nullptr;
 	if (!entrance.IsEmpty()) {
-		ent = map->GetEntrance( entrance );
+		ent = map->GetEntrance(entrance);
 		if (!ent) {
 			Log(ERROR, "Map", "Invalid entrance '{}' for area {}", entrance, area);
 		}
 	}
-	int X,Y, face;
+	int X, Y, face;
 	if (!ent) {
 		// no entrance found, try using direction flags
 
@@ -567,7 +574,7 @@ void Map::MoveToNewArea(const ResRef &area, const ieVariable& entrance, unsigned
 		} else {
 			// crashes in original engine
 			Log(WARNING, "Map", "WARNING!!! EntryPoint '{}' does not exist and direction {} is invalid",
-				entrance, direction);
+			    entrance, direction);
 			X = map->TMap->XCellCount * 64;
 			Y = map->TMap->YCellCount * 64;
 		}
@@ -607,26 +614,29 @@ void Map::MoveToNewArea(const ResRef &area, const ieVariable& entrance, unsigned
 	}
 }
 
-void Map::UseExit(Actor *actor, InfoPoint *ip)
+void Map::UseExit(Actor* actor, InfoPoint* ip)
 {
-	const Game *game = core->GetGame();
+	const Game* game = core->GetGame();
 
 	int EveryOne = ip->CheckTravel(actor);
-	switch(EveryOne) {
-	case CT_GO_CLOSER:
-		if (LastGoCloser<game->Ticks) {
-			displaymsg->DisplayMsgCentered(HCStrings::WholeParty, FT_ANY, GUIColors::WHITE);
-			LastGoCloser = game->Ticks + core->Time.round_size;
-		}
-		if (game->EveryoneStopped()) {
-			ip->Flags&=~TRAP_RESET; //exit triggered
-		}
-		return;
-		//no ingame message for these events
-	case CT_CANTMOVE: case CT_SELECTED:
-		return;
-	case CT_ACTIVE: case CT_WHOLE: case CT_MOVE_SELECTED:
-		break;
+	switch (EveryOne) {
+		case CT_GO_CLOSER:
+			if (LastGoCloser < game->Ticks) {
+				displaymsg->DisplayMsgCentered(HCStrings::WholeParty, FT_ANY, GUIColors::WHITE);
+				LastGoCloser = game->Ticks + core->Time.round_size;
+			}
+			if (game->EveryoneStopped()) {
+				ip->Flags &= ~TRAP_RESET; //exit triggered
+			}
+			return;
+			//no ingame message for these events
+		case CT_CANTMOVE:
+		case CT_SELECTED:
+			return;
+		case CT_ACTIVE:
+		case CT_WHOLE:
+		case CT_MOVE_SELECTED:
+			break;
 	}
 
 	if (!ip->Destination.IsEmpty()) {
@@ -638,14 +648,14 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	if (ip->Scripts[0]) {
 		ip->AddTrigger(TriggerEntry(trigger_entered, actor->GetGlobalID()));
 		// FIXME
-		ip->ExecuteScript( 1 );
+		ip->ExecuteScript(1);
 		ip->ProcessActions();
 	}
 }
 
 //Draw two overlapped animations to achieve the original effect
 //PlayOnce makes sure that if we stop drawing them, they will go away
-void Map::DrawPortal(const InfoPoint *ip, int enable)
+void Map::DrawPortal(const InfoPoint* ip, int enable)
 {
 	// TODO: fix this hardcoded resource reference
 	static const ResRef portalResRef = "EF03TPR3";
@@ -716,12 +726,12 @@ void Map::UpdateScripts()
 	// below starts a cutscene, hiding the mouse. - wjp, 20060805
 	if (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) return;
 
-	Game *game = core->GetGame();
+	Game* game = core->GetGame();
 	bool timestop = game->IsTimestopActive();
 	if (!timestop) {
 		game->SetTimestopOwner(NULL);
 	}
-	
+
 	ieDword time = game->Ticks; // make sure everything moves at the same time
 
 	//Run actor scripts (only for 0 priority)
@@ -730,7 +740,7 @@ void Map::UpdateScripts()
 	while (q--) {
 		Actor* actor = runQueue[q];
 		//actor just moved away, don't run its script from this side
-		if (actor->GetCurrentArea()!=this) {
+		if (actor->GetCurrentArea() != this) {
 			continue;
 		}
 
@@ -771,7 +781,7 @@ void Map::UpdateScripts()
 		actor->Update();
 		actor->UpdateActorState();
 		actor->SetSpeed(false);
-		
+
 		if (actor->GetRandomBackoff()) {
 			actor->DecreaseBackoff();
 			if (!actor->GetRandomBackoff() && actor->GetSpeed() > 0) {
@@ -793,7 +803,7 @@ void Map::UpdateScripts()
 	//clean up effects on dead actors too
 	const auto& displayQueue = queue[int(Priority::Display)];
 	q = displayQueue.size();
-	while(q--) {
+	while (q--) {
 		Actor* actor = displayQueue[q];
 		actor->fxqueue.Cleanup();
 	}
@@ -812,18 +822,18 @@ void Map::UpdateScripts()
 	int ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
-		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
+		InfoPoint* ip = TMap->GetInfoPoint(ipCount++);
 		if (!ip)
 			break;
 
 		if (ip->IsPortal()) {
-			DrawPortal(ip, ip->Trapped&PORTAL_TRAVEL);
+			DrawPortal(ip, ip->Trapped & PORTAL_TRAVEL);
 		}
 
 		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
 		// InfoPoints of all types don't run scripts if TRAP_DEACTIVATED is set
 		// (eg, TriggerActivation changes this, see lightning room from SoA)
-		int wasActive = (!(ip->Flags&TRAP_DEACTIVATED) ) || (ip->Type==ST_TRAVEL);
+		int wasActive = (!(ip->Flags & TRAP_DEACTIVATED)) || (ip->Type == ST_TRAVEL);
 		if (!wasActive) continue;
 
 		if (ip->Type == ST_TRIGGER) {
@@ -874,17 +884,18 @@ void Map::UpdateScripts()
 	SortQueues();
 }
 
-ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
+ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point& p) const
 {
 	struct TerrainSounds {
 		ResRefMap<std::array<ResRef, 16>> refs;
-		
-		TerrainSounds() noexcept {
+
+		TerrainSounds() noexcept
+		{
 			AutoTable tm = gamedata->LoadTable("terrain");
 			assert(tm);
 			TableMgr::index_t rc = tm->GetRowCount() - 2;
 			while (rc--) {
-				ResRef group = tm->GetRowName(rc+2);
+				ResRef group = tm->GetRowName(rc + 2);
 				refs[group] = {};
 				int i = 0;
 				for (auto& ref : refs[group]) {
@@ -893,7 +904,7 @@ ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 			}
 		}
 	} static const terrainsounds;
-	
+
 	if (terrainsounds.refs.count(resref)) {
 		uint8_t type = tileProps.QueryMaterial(Map::ConvertCoordToTile(p));
 		const auto& array = terrainsounds.refs.at(resref);
@@ -903,35 +914,34 @@ ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 	return ResRef();
 }
 
-void Map::DoStepForActor(Actor *actor, ieDword time) const
+void Map::DoStepForActor(Actor* actor, ieDword time) const
 {
 	int walkScale = actor->GetSpeed();
 	// Immobile, dead and actors in another map can't walk here
-	if (actor->Immobile() || walkScale == 0 || actor->GetCurrentArea() != this
-		|| !actor->ValidTarget(GA_NO_DEAD)) {
+	if (actor->Immobile() || walkScale == 0 || actor->GetCurrentArea() != this || !actor->ValidTarget(GA_NO_DEAD)) {
 		return;
 	}
 
-	if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
+	if (!(actor->GetBase(IE_STATE_ID) & STATE_CANTMOVE)) {
 		actor->DoStep(walkScale, time);
 	}
 }
 
-void Map::BlockSearchMapFor(const Movable *actor) const
+void Map::BlockSearchMapFor(const Movable* actor) const
 {
 	auto flag = actor->IsPC() ? PathMapFlags::PC : PathMapFlags::NPC;
 	tileProps.PaintSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, flag);
 }
 
-void Map::ClearSearchMapFor(const Movable *actor) const
+void Map::ClearSearchMapFor(const Movable* actor) const
 {
-	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF|GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3, actor);
+	std::vector<Actor*> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF | GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE * 3, actor);
 	tileProps.PaintSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, PathMapFlags::UNMARKED);
 
 	// Restore the searchmap areas of any nearby actors that could
 	// have been cleared by this BlockSearchMap(..., PathMapFlags::UNMARKED).
 	// (Necessary since blocked areas of actors may overlap.)
-	for (const Actor *neighbour : nearActors) {
+	for (const Actor* neighbour : nearActors) {
 		if (neighbour->BlocksSearchMap()) {
 			BlockSearchMapFor(neighbour);
 		}
@@ -952,7 +962,7 @@ Size Map::PropsSize() const noexcept
 }
 
 // Returns true if map at (x;y) was explored, else false.
-bool Map::FogTileUncovered(const Point &p, const Bitmap* mask) const
+bool Map::FogTileUncovered(const Point& p, const Bitmap* mask) const
 {
 	if (mask == nullptr) return true;
 
@@ -970,7 +980,7 @@ void Map::DrawHighlightables(const Region& viewport) const
 		// how's ar9103 chest has a Pos outside itself, so we check the bounding box instead
 		// FIXME: inefficient, check for overlap in AREImporter and only recheck here if a flag was set
 		const Door* door = TMap->GetDoor(c->BBox.Center());
-		if (door && !(door->Flags & (DOOR_OPEN| DOOR_TRANSPARENT))) continue;
+		if (door && !(door->Flags & (DOOR_OPEN | DOOR_TRANSPARENT))) continue;
 		if (c->Highlight) {
 			c->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_CONTAINERS) {
@@ -1018,7 +1028,7 @@ Container* Map::GetNextPile(size_t& index) const
 	return nullptr;
 }
 
-Actor *Map::GetNextActor(int &q, size_t &index) const
+Actor* Map::GetNextActor(int& q, size_t& index) const
 {
 	while (true) {
 		switch (Priority(q)) {
@@ -1041,7 +1051,6 @@ Actor *Map::GetNextActor(int &q, size_t &index) const
 
 AreaAnimation* Map::GetNextAreaAnimation(aniIterator& iter, ieDword gametime) const
 {
-
 	while (true) {
 		if (iter == animations.end()) {
 			return nullptr;
@@ -1058,18 +1067,18 @@ AreaAnimation* Map::GetNextAreaAnimation(aniIterator& iter, ieDword gametime) co
 	}
 }
 
-Particles *Map::GetNextSpark(const spaIterator &iter) const
+Particles* Map::GetNextSpark(const spaIterator& iter) const
 {
-	if (iter==particles.end()) {
+	if (iter == particles.end()) {
 		return NULL;
 	}
 	return *iter;
 }
 
 //doesn't increase iterator, because we might need to erase it from the list
-Projectile *Map::GetNextProjectile(const proIterator &iter) const
+Projectile* Map::GetNextProjectile(const proIterator& iter) const
 {
-	if (iter==projectiles.end()) {
+	if (iter == projectiles.end()) {
 		return NULL;
 	}
 	return *iter;
@@ -1092,17 +1101,17 @@ const Projectile* Map::GetNextTrap(proIterator& iter, int flags) const
 	return pro;
 }
 
-size_t Map::GetProjectileCount(proIterator &iter) const
+size_t Map::GetProjectileCount(proIterator& iter) const
 {
 	iter = projectiles.begin();
 	return projectiles.size();
 }
 
-int Map::GetTrapCount(proIterator &iter) const
+int Map::GetTrapCount(proIterator& iter) const
 {
 	int cnt = 0;
-	iter=projectiles.begin();
-	while(GetNextTrap(iter)) {
+	iter = projectiles.begin();
+	while (GetNextTrap(iter)) {
 		cnt++;
 	}
 	//
@@ -1112,9 +1121,9 @@ int Map::GetTrapCount(proIterator &iter) const
 
 
 //doesn't increase iterator, because we might need to erase it from the list
-VEFObject *Map::GetNextScriptedAnimation(const scaIterator &iter) const
+VEFObject* Map::GetNextScriptedAnimation(const scaIterator& iter) const
 {
-	if (iter==vvcCells.end()) {
+	if (iter == vvcCells.end()) {
 		return NULL;
 	}
 	return *iter;
@@ -1126,7 +1135,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	assert(TMap);
 	debugFlags = dFlags;
 
-	Game *game = core->GetGame();
+	Game* game = core->GetGame();
 	ieDword gametime = game->GameTime;
 	static ieDword oldGameTime = 0;
 	bool timestop = game->IsTimestopActive();
@@ -1165,16 +1174,16 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 		if (timestop) {
 			flags = BlitFlags::GREY;
-		} else if (AreaFlags&AF_DREAM) {
+		} else if (AreaFlags & AF_DREAM) {
 			flags = BlitFlags::SEPIA;
 		}
 
 		if (HasWeather()) {
 			//zero when the weather particles are all gone
-			rain = game->weather->GetPhase()-P_EMPTY;
+			rain = game->weather->GetPhase() - P_EMPTY;
 		}
 
-		TMap->DrawOverlays( viewport, rain, flags );
+		TMap->DrawOverlays(viewport, rain, flags);
 	}
 
 	// draw reticles before actors
@@ -1183,23 +1192,23 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	const auto& viewportWalls = WallsIntersectingRegion(viewport, false);
 	RedrawScreenStencil(viewport, viewportWalls.first);
 	VideoDriver->SetStencilBuffer(wallStencil);
-	
+
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
 
 	auto DrawAreaAnimation = [&, this](AreaAnimation* a) {
 		BlitFlags flags = SetDrawingStencilForAreaAnimation(a, viewport);
 		flags |= BlitFlags::COLOR_MOD | BlitFlags::BLENDED;
-		
+
 		if (timestop) {
 			flags |= BlitFlags::GREY;
 		}
-		
+
 		Color tint = ColorWhite;
 		if (bool(a->flags & AreaAnimation::Flags::NoShadow)) {
 			tint = GetLighting(a->Pos);
 		}
-		
+
 		game->ApplyGlobalTint(tint, flags);
 
 		a->Draw(viewport, tint, flags);
@@ -1230,132 +1239,132 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	size_t pileIdx = 0;
 	const Container* pile = GetNextPile(pileIdx);
 
-	VEFObject *sca = GetNextScriptedAnimation(scaidx);
-	Projectile *pro = GetNextProjectile(proidx);
-	Particles *spark = GetNextSpark(spaidx);
+	VEFObject* sca = GetNextScriptedAnimation(scaidx);
+	Projectile* pro = GetNextProjectile(proidx);
+	Particles* spark = GetNextSpark(spaidx);
 
 	// TODO: In at least HOW/IWD2 actor ground circles will be hidden by
 	// an area animation with height > 0 even if the actors themselves are not
 	// hidden by it.
 
 	while (actor || a || sca || spark || pro || pile) {
-		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
-		case AOT_ACTOR:
-			bool visible;
-			visible = false;
-			// always update the animations even if we arent visible
-			if (actor->UpdateDrawingState() && IsExplored(actor->Pos)) {
-				// apparently birds and the dead are always visible?
-				visible = IsVisible(actor->Pos) || actor->Modified[IE_DONOTJUMP] & DNJ_BIRD || actor->GetInternalFlag() & IF_REALLYDIED;
-				if (visible) {
-					BlitFlags flags = SetDrawingStencilForScriptable(actor, viewport);
-					if (game->TimeStoppedFor(actor)) {
-						// when time stops, almost everything turns dull grey,
-						// the caster and immune actors being the most notable exceptions
+		switch (SelectObject(actor, q, a, sca, spark, pro, pile)) {
+			case AOT_ACTOR:
+				bool visible;
+				visible = false;
+				// always update the animations even if we arent visible
+				if (actor->UpdateDrawingState() && IsExplored(actor->Pos)) {
+					// apparently birds and the dead are always visible?
+					visible = IsVisible(actor->Pos) || actor->Modified[IE_DONOTJUMP] & DNJ_BIRD || actor->GetInternalFlag() & IF_REALLYDIED;
+					if (visible) {
+						BlitFlags flags = SetDrawingStencilForScriptable(actor, viewport);
+						if (game->TimeStoppedFor(actor)) {
+							// when time stops, almost everything turns dull grey,
+							// the caster and immune actors being the most notable exceptions
+							flags |= BlitFlags::GREY;
+						}
+
+						Color baseTint = area->GetLighting(actor->Pos);
+						Color tint(baseTint);
+						game->ApplyGlobalTint(tint, flags);
+						actor->Draw(viewport, baseTint, tint, flags | BlitFlags::BLENDED);
+					}
+				}
+
+				if (!visible || (actor->GetInternalFlag() & (IF_REALLYDIED | IF_ACTIVE)) == (IF_REALLYDIED | IF_ACTIVE)) {
+					actor->SetInternalFlag(IF_TRIGGER_AP, BitOp::NAND);
+					// turning actor inactive if there is no action next turn
+					actor->HibernateIfAble();
+				}
+				actor = GetNextActor(q, index);
+				break;
+			case AOT_PILE:
+				// draw piles
+				if (!bgoverride) {
+					BlitFlags flags = SetDrawingStencilForScriptable(pile, viewport);
+					flags |= BlitFlags::COLOR_MOD | BlitFlags::BLENDED;
+
+					if (timestop) {
 						flags |= BlitFlags::GREY;
 					}
 
-					Color baseTint = area->GetLighting(actor->Pos);
-					Color tint(baseTint);
+					Color tint = GetLighting(pile->Pos);
 					game->ApplyGlobalTint(tint, flags);
-					actor->Draw(viewport, baseTint, tint, flags | BlitFlags::BLENDED);
-				}
-			}
 
-			if (!visible || (actor->GetInternalFlag() & (IF_REALLYDIED | IF_ACTIVE)) == (IF_REALLYDIED | IF_ACTIVE)) {
-				actor->SetInternalFlag(IF_TRIGGER_AP, BitOp::NAND);
-				// turning actor inactive if there is no action next turn
-				actor->HibernateIfAble();
-			}
-			actor = GetNextActor(q, index);
-			break;
-		case AOT_PILE:
-			// draw piles
-			if (!bgoverride) {
-				BlitFlags flags = SetDrawingStencilForScriptable(pile, viewport);
-				flags |= BlitFlags::COLOR_MOD | BlitFlags::BLENDED;
-				
-				if (timestop) {
-					flags |= BlitFlags::GREY;
+					if (pile->Highlight || (debugFlags & DEBUG_SHOW_CONTAINERS)) {
+						pile->Draw(true, viewport, tint, flags);
+					} else {
+						pile->Draw(false, viewport, tint, flags);
+					}
+					pile = GetNextPile(pileIdx);
 				}
-				
-				Color tint = GetLighting(pile->Pos);
-				game->ApplyGlobalTint(tint, flags);
-
-				if (pile->Highlight || (debugFlags & DEBUG_SHOW_CONTAINERS)) {
-					pile->Draw(true, viewport, tint, flags);
+				break;
+			case AOT_AREA:
+				a = DrawAreaAnimation(a);
+				break;
+			case AOT_SCRIPTED:
+				bool endReached;
+				endReached = sca->UpdateDrawingState(-1);
+				if (endReached) {
+					delete sca;
+					scaidx = vvcCells.erase(scaidx);
 				} else {
-					pile->Draw(false, viewport, tint, flags);
-				}
-				pile = GetNextPile(pileIdx);
-			}
-			break;
-		case AOT_AREA:
-			a = DrawAreaAnimation(a);
-			break;
-		case AOT_SCRIPTED:
-			bool endReached;
-			endReached = sca->UpdateDrawingState(-1);
-			if (endReached) {
-				delete sca;
-				scaidx = vvcCells.erase(scaidx);
-			} else {
-				VideoDriver->SetStencilBuffer(wallStencil);
-				Color tint = GetLighting(sca->Pos);
-				tint.a = 255;
+					VideoDriver->SetStencilBuffer(wallStencil);
+					Color tint = GetLighting(sca->Pos);
+					tint.a = 255;
 
-				BlitFlags flags = SetDrawingStencilForScriptedAnimation(sca->GetSingleObject(), viewport, 0);
-				if (timestop) {
-					flags |= BlitFlags::GREY;
+					BlitFlags flags = SetDrawingStencilForScriptedAnimation(sca->GetSingleObject(), viewport, 0);
+					if (timestop) {
+						flags |= BlitFlags::GREY;
+					}
+					game->ApplyGlobalTint(tint, flags);
+					sca->Draw(viewport, tint, 0, flags);
+					scaidx++;
 				}
-				game->ApplyGlobalTint(tint, flags);
-				sca->Draw(viewport, tint, 0, flags);
-				scaidx++;
-			}
-			sca = GetNextScriptedAnimation(scaidx);
-			break;
-		case AOT_PROJECTILE:
-			{
-				BlitFlags flags = SetDrawingStencilForProjectile(pro, viewport);
-				pro->Draw(viewport, flags);
-				pro = GetNextProjectile(++proidx);
-			}
-			break;
-		case AOT_SPARK:
-			int drawn;
-			if (gametime > oldGameTime) {
-				drawn = spark->Update();
-			} else {
-				drawn = 1;
-			}
-			if (drawn) {
-				// no wallgroup stenciling needed, in the original these were always drawn
-				spark->Draw(viewport.origin);
-				spaidx++;
-			} else {
-				delete spark;
-				spaidx = particles.erase(spaidx);
-			}
-			spark = GetNextSpark(spaidx);
-			break;
-		default:
-			error("Map", "Trying to draw unknown animation type.");
+				sca = GetNextScriptedAnimation(scaidx);
+				break;
+			case AOT_PROJECTILE:
+				{
+					BlitFlags flags = SetDrawingStencilForProjectile(pro, viewport);
+					pro->Draw(viewport, flags);
+					pro = GetNextProjectile(++proidx);
+				}
+				break;
+			case AOT_SPARK:
+				int drawn;
+				if (gametime > oldGameTime) {
+					drawn = spark->Update();
+				} else {
+					drawn = 1;
+				}
+				if (drawn) {
+					// no wallgroup stenciling needed, in the original these were always drawn
+					spark->Draw(viewport.origin);
+					spaidx++;
+				} else {
+					delete spark;
+					spaidx = particles.erase(spaidx);
+				}
+				spark = GetNextSpark(spaidx);
+				break;
+			default:
+				error("Map", "Trying to draw unknown animation type.");
 		}
 	}
 
 	VideoDriver->SetStencilBuffer(NULL);
-	
+
 	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
 	game->DrawWeather(update_scripts);
-	
+
 	if (dFlags & (DEBUG_SHOW_LIGHTMAP | DEBUG_SHOW_HEIGHTMAP | DEBUG_SHOW_MATERIALMAP | DEBUG_SHOW_SEARCHMAP)) {
 		DrawDebugOverlay(viewport, dFlags);
 	}
-	
+
 	const Bitmap* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : &ExploredBitmap;
 	const Bitmap* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : &VisibleBitmap;
 
-	FogMapData mapData{
+	FogMapData mapData {
 		exploredBits,
 		visibleBits,
 		viewport,
@@ -1371,7 +1380,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	oldGameTime = gametime;
 
 	// Show wallpolygons
-	if (debugFlags & (DEBUG_SHOW_WALLS_ALL|DEBUG_SHOW_DOORS_DISABLED)) {
+	if (debugFlags & (DEBUG_SHOW_WALLS_ALL | DEBUG_SHOW_DOORS_DISABLED)) {
 		DrawWallPolygons(viewport);
 	}
 }
@@ -1438,12 +1447,12 @@ WallPolygonSet Map::WallsIntersectingRegion(Region r, bool includeDisabled, cons
 
 	constexpr uint32_t groupHeight = 480;
 	constexpr uint32_t groupWidth = 640;
-	
+
 	if (r.x < 0) {
 		r.w += r.x;
 		r.x = 0;
 	}
-	
+
 	if (r.y < 0) {
 		r.h += r.y;
 		r.y = 0;
@@ -1463,16 +1472,16 @@ WallPolygonSet Map::WallsIntersectingRegion(Region r, bool includeDisabled, cons
 	for (uint32_t y = ymin; y < ymax; ++y) {
 		for (uint32_t x = xmin; x < xmax; ++x) {
 			const auto& group = wallGroups[y * pitch + x];
-			
+
 			for (const auto& wp : group) {
-				if ((wp->wall_flag&WF_DISABLED) && includeDisabled == false) {
+				if ((wp->wall_flag & WF_DISABLED) && includeDisabled == false) {
 					continue;
 				}
-				
+
 				if (!r.IntersectsRegion(wp->BBox)) {
 					continue;
 				}
-				
+
 				if (loc == nullptr || wp->PointBehind(*loc)) {
 					infront.push_back(wp);
 				} else {
@@ -1489,7 +1498,7 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 {
 	VideoBufferPtr stencil = nullptr;
 	Color debugColor = ColorGray;
-	
+
 	const bool behindWall = !walls.first.empty();
 	const bool inFrontOfWall = !walls.second.empty();
 
@@ -1504,7 +1513,7 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 				stencil = pair.first;
 			}
 		}
-		
+
 		if (stencil == nullptr) {
 			Region stencilRgn = Region(objectRgn.origin - viewPortOrigin, objectRgn.size);
 			if (stencilRgn.size.IsInvalid()) {
@@ -1522,21 +1531,21 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 			stencil->SetOrigin(objectRgn.origin - viewPortOrigin);
 			DrawStencil(stencil, objectRgn, walls.first);
 		}
-		
+
 		debugColor = ColorRed;
 	} else {
 		stencil = wallStencil;
-		
+
 		if (behindWall) {
 			debugColor = ColorBlue;
 		} else if (inFrontOfWall) {
 			debugColor = ColorMagenta;
 		}
 	}
-	
+
 	assert(stencil);
 	VideoDriver->SetStencilBuffer(stencil);
-	
+
 	if (debugFlags & DEBUG_SHOW_WALLS) {
 		const Region& r = Region(objectRgn.origin - viewPortOrigin, objectRgn.size);
 		VideoDriver->DrawRect(r, debugColor, false);
@@ -1552,15 +1561,15 @@ BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, cons
 			return BlitFlags::NONE;
 		}
 	}
-	
+
 	const Region& bbox = scriptable->DrawingRegion();
 	if (bbox.IntersectsRegion(vp) == false) {
 		return BlitFlags::NONE;
 	}
-	
+
 	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &scriptable->Pos);
 	SetDrawingStencilForObject(scriptable, bbox, walls, vp.origin);
-	
+
 	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {
 		return BlitFlags::NONE; // not behind a wall, no stencil required
@@ -1589,7 +1598,7 @@ BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, cons
 			flags |= BlitFlags::STENCIL_RED;
 		}
 	}
-	
+
 	assert(flags & BlitFlags::STENCIL_MASK); // we needed a stencil so we must require a stencil flag
 	return flags;
 }
@@ -1600,14 +1609,14 @@ BlitFlags Map::SetDrawingStencilForAreaAnimation(const AreaAnimation* anim, cons
 	if (bbox.IntersectsRegion(vp) == false) {
 		return BlitFlags::NONE;
 	}
-	
+
 	Point p = anim->Pos;
 	p.y += anim->height;
 
 	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &p);
-	
+
 	SetDrawingStencilForObject(anim, bbox, walls, vp.origin);
-	
+
 	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {
 		return BlitFlags::NONE; // not behind a wall, no stencil required
@@ -1664,7 +1673,7 @@ BlitFlags Map::SetDrawingStencilForProjectile(const Projectile* pro, const Regio
 	return flags;
 }
 
-void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
+void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 {
 	const static struct DebugPalettes {
 		Palette::Colors buffer;
@@ -1673,12 +1682,13 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 		Holder<Palette> materialMapPal;
 		Holder<Palette> heightMapPal;
 		// lightmap pal is the sprite pal
-		
-		DebugPalettes() noexcept {
+
+		DebugPalettes() noexcept
+		{
 			searchMapPal = MakeHolder<Palette>();
 			std::fill_n(buffer.begin(), 256, Color()); // passable is transparent
 			buffer[0] = Color(128, 64, 64, 128); // IMPASSABLE, red-ish
-			
+
 			for (uint8_t i = 1; i < 255; ++i) {
 				if (i & uint8_t(PathMapFlags::SIDEWALL)) {
 					buffer[uint8_t(PathMapFlags::SIDEWALL)] = Color(64, 64, 128, 128); // blues-ish
@@ -1717,19 +1727,19 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 			heightMapPal->CopyColors(0, buffer.cbegin(), buffer.cend());
 		}
 	} debugPalettes;
-	
-	Region block(0,0,16,12);
 
-	int w = vp.w/16+2;
-	int h = vp.h/12+2;
-	
+	Region block(0, 0, 16, 12);
+
+	int w = vp.w / 16 + 2;
+	int h = vp.h / 12 + 2;
+
 	BlitFlags flags = BlitFlags::BLENDED;
 	if (dFlags & DEBUG_SHOW_LIGHTMAP) {
 		flags |= BlitFlags::HALFTRANS;
 	}
 
-	for(int x=0;x<w;x++) {
-		for(int y=0;y<h;y++) {
+	for (int x = 0; x < w; x++) {
+		for (int y = 0; y < h; y++) {
 			block.x = x * 16 - (vp.x % 16);
 			block.y = y * 12 - (vp.y % 12);
 
@@ -1748,14 +1758,14 @@ void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 			} else if (dFlags & DEBUG_SHOW_LIGHTMAP) {
 				col = tileProps.QueryLighting(p);
 			}
-			
+
 			VideoDriver->DrawRect(block, col, true, flags);
 		}
 	}
-	
+
 	if (dFlags & DEBUG_SHOW_SEARCHMAP) {
 		// draw also pathfinding waypoints
-		const Actor *act = core->GetFirstSelectedActor();
+		const Actor* act = core->GetFirstSelectedActor();
 		if (!act) return;
 		const Path& path = act->GetPath();
 		if (!path) return;
@@ -1779,7 +1789,7 @@ void Map::AddAnimation(AreaAnimation anim)
 {
 	int Height = anim.GetHeight();
 	auto iter = animations.begin();
-	for (; (iter != animations.end()) && (iter->GetHeight() < Height); ++iter) ;
+	for (; (iter != animations.end()) && (iter->GetHeight() < Height); ++iter);
 	animations.insert(iter, std::move(anim));
 }
 
@@ -1795,7 +1805,7 @@ void Map::UpdateEffects()
 
 void Map::UpdateProjectiles()
 {
-	for (auto it = projectiles.begin(); it != projectiles.end(); ) {
+	for (auto it = projectiles.begin(); it != projectiles.end();) {
 		(*it)->Update();
 		if ((*it)->IsStillIntact()) {
 			++it;
@@ -1833,22 +1843,22 @@ int Map::CountSummons(ieDword flags, ieDword sex) const
 {
 	int count = 0;
 
-	for (const Actor *actor : actors) {
-		if (!actor->ValidTarget(flags) ) {
+	for (const Actor* actor : actors) {
+		if (!actor->ValidTarget(flags)) {
 			continue;
 		}
-		if (actor->GetStat(IE_SEX)==sex) {
+		if (actor->GetStat(IE_SEX) == sex) {
 			count++;
 		}
 	}
 	return count;
 }
 
-bool Map::AnyEnemyNearPoint(const Point &p) const
+bool Map::AnyEnemyNearPoint(const Point& p) const
 {
 	ieDword gametime = core->GetGame()->GameTime;
-	for (const Actor *actor : actors) {
-		if (!actor->Schedule(gametime, true) ) {
+	for (const Actor* actor : actors) {
+		if (!actor->Schedule(gametime, true)) {
 			continue;
 		}
 		if (actor->ShouldStopAttack()) {
@@ -1860,7 +1870,7 @@ bool Map::AnyEnemyNearPoint(const Point &p) const
 		if (Distance(actor->Pos, p) > SPAWN_RANGE) {
 			continue;
 		}
-		if (actor->GetStat(IE_EA)<=EA_EVILCUTOFF) {
+		if (actor->GetStat(IE_EA) <= EA_EVILCUTOFF) {
 			continue;
 		}
 
@@ -1869,13 +1879,13 @@ bool Map::AnyEnemyNearPoint(const Point &p) const
 	return false;
 }
 
-void Map::ActorSpottedByPlayer(const Actor *actor) const
+void Map::ActorSpottedByPlayer(const Actor* actor) const
 {
 	size_t animID;
 
-	if(core->HasFeature(GFFlags::HAS_BEASTS_INI)) {
+	if (core->HasFeature(GFFlags::HAS_BEASTS_INI)) {
 		animID = actor->BaseStats[IE_ANIMATION_ID];
-		if(core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
+		if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
 			animID &= 0xff;
 		}
 		if (animID < CharAnimations::GetAvatarsCount()) {
@@ -1889,11 +1899,11 @@ void Map::ActorSpottedByPlayer(const Actor *actor) const
 // actors were already seen on the map.  We used to check AnyPCInCombat,
 // which is less reliable.  Returns true if this is a hostile enemy
 // that should trigger pause.
-bool Map::HandleAutopauseForVisible(Actor *actor, bool doPause) const
+bool Map::HandleAutopauseForVisible(Actor* actor, bool doPause) const
 {
 	// this MC_ENABLED use looks more like MC_BEENINPARTY it replaced; leftover?
 	if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_STOPATTACK) &&
-		(!core->HasFeature(GFFlags::RULES_3ED) || !(actor->GetSafeStat(IE_MC_FLAGS) & MC_ENABLED))) {
+	    (!core->HasFeature(GFFlags::RULES_3ED) || !(actor->GetSafeStat(IE_MC_FLAGS) & MC_ENABLED))) {
 		if (doPause && !(actor->GetInternalFlag() & IF_TRIGGER_AP))
 			core->Autopause(AUTOPAUSE::ENEMY, actor);
 		actor->SetInternalFlag(IF_TRIGGER_AP, BitOp::OR);
@@ -1910,13 +1920,13 @@ void Map::InitActors()
 	// setting the map can run effects, so play on the safe side and ignore any actors that might get added
 	size_t i = actors.size();
 	while (i--) {
-		Actor *actor = actors[i];
+		Actor* actor = actors[i];
 		actor->SetMap(this);
 		MarkVisited(actor);
 	}
 }
 
-void Map::MarkVisited(const Actor *actor) const
+void Map::MarkVisited(const Actor* actor) const
 {
 	if (actor->InParty && core->HasFeature(GFFlags::AREA_VISITED_VAR)) {
 		ieVariable key;
@@ -1932,7 +1942,7 @@ void Map::AddActor(Actor* actor, bool init)
 	//setting the current area for the actor as this one
 	actor->AreaName = scriptName;
 	if (!HasActor(actor)) {
-		actors.push_back( actor );
+		actors.push_back(actor);
 	}
 	if (init) {
 		actor->SetMap(this);
@@ -1943,9 +1953,9 @@ void Map::AddActor(Actor* actor, bool init)
 bool Map::AnyPCSeesEnemy() const
 {
 	ieDword gametime = core->GetGame()->GameTime;
-	for (const Actor *actor : actors) {
-		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
-			if (IsVisible(actor->Pos) && actor->Schedule(gametime, true) ) {
+	for (const Actor* actor : actors) {
+		if (actor->Modified[IE_EA] >= EA_EVILCUTOFF) {
+			if (IsVisible(actor->Pos) && actor->Schedule(gametime, true)) {
 				return true;
 			}
 		}
@@ -1963,11 +1973,11 @@ void Map::DeleteActor(size_t idx)
 	Actor* actor = actors[idx];
 	if (actor) {
 		actor->Stop(); // just in case
-		Game *game = core->GetGame();
+		Game* game = core->GetGame();
 		//this makes sure that a PC will be demoted to NPC
-		game->LeaveParty( actor );
+		game->LeaveParty(actor);
 		//this frees up the spot under the feet circle
-		ClearSearchMapFor( actor );
+		ClearSearchMapFor(actor);
 		//remove the area reference from the actor
 		actor->SetMap(NULL);
 		actor->AreaName.Reset();
@@ -1982,11 +1992,11 @@ void Map::DeleteActor(size_t idx)
 	actors.erase(actors.begin() + idx);
 }
 
-Scriptable *Map::GetScriptableByGlobalID(ieDword objectID)
+Scriptable* Map::GetScriptableByGlobalID(ieDword objectID)
 {
 	if (!objectID) return NULL;
-	
-	Scriptable *scr = GetActorByGlobalID(objectID);
+
+	Scriptable* scr = GetActorByGlobalID(objectID);
 	if (scr)
 		return scr;
 
@@ -2008,7 +2018,7 @@ Scriptable *Map::GetScriptableByGlobalID(ieDword objectID)
 	return scr;
 }
 
-Door *Map::GetDoorByGlobalID(ieDword objectID) const
+Door* Map::GetDoorByGlobalID(ieDword objectID) const
 {
 	if (!objectID) return NULL;
 
@@ -2020,7 +2030,7 @@ Door *Map::GetDoorByGlobalID(ieDword objectID) const
 	return nullptr;
 }
 
-Container *Map::GetContainerByGlobalID(ieDword objectID) const
+Container* Map::GetContainerByGlobalID(ieDword objectID) const
 {
 	if (!objectID) return NULL;
 
@@ -2032,7 +2042,7 @@ Container *Map::GetContainerByGlobalID(ieDword objectID) const
 	return nullptr;
 }
 
-InfoPoint *Map::GetInfoPointByGlobalID(ieDword objectID) const
+InfoPoint* Map::GetInfoPointByGlobalID(ieDword objectID) const
 {
 	if (!objectID) return NULL;
 
@@ -2050,7 +2060,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID) const
 		return nullptr;
 	}
 	for (const auto& actor : actors) {
-		if (actor->GetGlobalID()==objectID) {
+		if (actor->GetGlobalID() == objectID) {
 			return actor;
 		}
 	}
@@ -2107,12 +2117,12 @@ std::vector<Scriptable*> Map::GetScriptablesInRect(const Point& p, unsigned int 
 	return neighbours;
 }
 
-Actor* Map::GetActor(const Point &p, int flags, const Movable *checker) const
+Actor* Map::GetActor(const Point& p, int flags, const Movable* checker) const
 {
 	for (auto actor : actors) {
-		if (!actor->IsOver( p ))
+		if (!actor->IsOver(p))
 			continue;
-		if (!actor->ValidTarget(flags, checker) ) {
+		if (!actor->ValidTarget(flags, checker)) {
 			continue;
 		}
 		return actor;
@@ -2123,7 +2133,7 @@ Actor* Map::GetActor(const Point &p, int flags, const Movable *checker) const
 Actor* Map::GetActorInRadius(const Point& p, int flags, unsigned int radius, const Scriptable* checker) const
 {
 	for (auto actor : actors) {
-		if (PersonalDistance( p, actor ) > radius)
+		if (PersonalDistance(p, actor) > radius)
 			continue;
 		if (!actor->ValidTarget(flags, checker)) {
 			continue;
@@ -2133,17 +2143,17 @@ Actor* Map::GetActorInRadius(const Point& p, int flags, unsigned int radius, con
 	return NULL;
 }
 
-std::vector<Actor *> Map::GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see) const
+std::vector<Actor*> Map::GetAllActorsInRadius(const Point& p, int flags, unsigned int radius, const Scriptable* see) const
 {
-	std::vector<Actor *> neighbours;
+	std::vector<Actor*> neighbours;
 	for (auto actor : actors) {
 		if (!WithinRange(actor, p, radius)) {
 			continue;
 		}
-		if (!actor->ValidTarget(flags, see) ) {
+		if (!actor->ValidTarget(flags, see)) {
 			continue;
 		}
-		if (!(flags&GA_NO_LOS)) {
+		if (!(flags & GA_NO_LOS)) {
 			//line of sight visibility
 			if (!IsVisibleLOS(actor->Pos, p)) {
 				continue;
@@ -2159,7 +2169,7 @@ Actor* Map::GetActor(const ieVariable& Name, int flags) const
 	for (auto actor : actors) {
 		if (actor->GetScriptName() == Name) {
 			// there can be more with the same scripting name, see bg2/ar0014.baf
-			if (!actor->ValidTarget(flags) ) {
+			if (!actor->ValidTarget(flags)) {
 				continue;
 			}
 			return actor;
@@ -2174,7 +2184,7 @@ int Map::GetActorCount(bool any) const
 		return (int) actors.size();
 	}
 	int ret = 0;
-	for (const Actor *actor : actors) {
+	for (const Actor* actor : actors) {
 		if (MustSave(actor)) {
 			ret++;
 		}
@@ -2185,13 +2195,13 @@ int Map::GetActorCount(bool any) const
 void Map::JumpActors(bool jump) const
 {
 	for (auto actor : actors) {
-		if (actor->Modified[IE_DONOTJUMP]&DNJ_JUMP) {
+		if (actor->Modified[IE_DONOTJUMP] & DNJ_JUMP) {
 			if (jump && !(actor->GetStat(IE_DONOTJUMP) & DNJ_BIRD)) {
 				ClearSearchMapFor(actor);
 				AdjustPositionNavmap(actor->Pos);
 				actor->ImpedeBumping();
 			}
-			actor->SetBase(IE_DONOTJUMP,0);
+			actor->SetBase(IE_DONOTJUMP, 0);
 		}
 	}
 }
@@ -2199,7 +2209,7 @@ void Map::JumpActors(bool jump) const
 void Map::SelectActors() const
 {
 	for (auto actor : actors) {
-		if (actor->Modified[IE_EA]<EA_CONTROLLABLE) {
+		if (actor->Modified[IE_EA] < EA_CONTROLLABLE) {
 			core->GetGame()->SelectActor(actor, true, SELECT_QUIET);
 		}
 	}
@@ -2213,11 +2223,11 @@ void Map::PurgeArea(bool items)
 	//1. remove dead actors without 'keep corpse' flag
 	size_t i = actors.size();
 	while (i--) {
-		Actor *ac = actors[i];
+		Actor* ac = actors[i];
 		//we're going to drop the map from memory so clear the reference
 		ac->SetMap(NULL);
 
-		if (ac->Modified[IE_STATE_ID]&STATE_NOSAVE) {
+		if (ac->Modified[IE_STATE_ID] & STATE_NOSAVE) {
 			if (ac->Modified[IE_MC_FLAGS] & MC_KEEP_CORPSE) {
 				continue;
 			}
@@ -2231,7 +2241,7 @@ void Map::PurgeArea(bool items)
 				continue;
 			}
 			//even if you delete it, be very careful!
-			DeleteActor (i);
+			DeleteActor(i);
 		}
 	}
 	//2. remove any non critical items
@@ -2255,10 +2265,10 @@ void Map::PurgeArea(bool items)
 	}
 	// 3. reset living neutral actors to their HomeLocation,
 	// in case they RandomWalked/flew themselves into a "corner" (mirroring original behaviour)
-	for (Actor *actor : actors) {
+	for (Actor* actor : actors) {
 		if (!actor->GetRandomWalkCounter()) continue;
 		if (actor->GetStat(IE_MC_FLAGS) & MC_IGNORE_RETURN) continue;
-		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ALLY|GA_NO_ENEMY)) continue;
+		if (!actor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_ALLY | GA_NO_ENEMY)) continue;
 		if (!actor->HomeLocation.IsZero() && !actor->HomeLocation.IsInvalid() && actor->Pos != actor->HomeLocation) {
 			actor->Pos = actor->HomeLocation;
 		}
@@ -2270,10 +2280,10 @@ Actor* Map::GetActor(int index, bool any) const
 	if (any) {
 		return actors[index];
 	}
-	unsigned int i=0;
-	while (i<actors.size() ) {
-		Actor *ac = actors[i++];
-		if (MustSave(ac) ) {
+	unsigned int i = 0;
+	while (i < actors.size()) {
+		Actor* ac = actors[i++];
+		if (MustSave(ac)) {
 			if (!index--) {
 				return ac;
 			}
@@ -2282,7 +2292,7 @@ Actor* Map::GetActor(int index, bool any) const
 	return NULL;
 }
 
-Scriptable *Map::GetScriptableByDialog(const ResRef &resref) const
+Scriptable* Map::GetScriptableByDialog(const ResRef& resref) const
 {
 	for (auto actor : actors) {
 		//if a busy or hostile actor shouldn't be found
@@ -2316,9 +2326,9 @@ Scriptable *Map::GetScriptableByDialog(const ResRef &resref) const
 // currently only looks at the party, since it is enough for the only known user
 // relies on an override item we create, with the resref matching the dialog one!
 // currently only handles dmhead, since no other users have been found yet (to avoid checking whole inventory)
-Actor *Map::GetItemByDialog(const ResRef &resref) const
+Actor* Map::GetItemByDialog(const ResRef& resref) const
 {
-	const Game *game = core->GetGame();
+	const Game* game = core->GetGame();
 	// choose the owner of the dialog via passed dialog ref
 	if (resref != ResRef("dmhead")) {
 		Log(WARNING, "Map", "Encountered new candidate item for GetItemByDialog? {}", resref);
@@ -2328,23 +2338,23 @@ Actor *Map::GetItemByDialog(const ResRef &resref) const
 
 	int i = game->GetPartySize(true);
 	while (i--) {
-		const Actor *pc = game->GetPC(i, true);
+		const Actor* pc = game->GetPC(i, true);
 		int slot = pc->inventory.FindItem(itemref, 0);
 		if (slot == -1) continue;
-		const CREItem *citem = pc->inventory.GetSlotItem(slot);
+		const CREItem* citem = pc->inventory.GetSlotItem(slot);
 		if (!citem) continue;
-		const Item *item = gamedata->GetItem(citem->ItemResRef);
+		const Item* item = gamedata->GetItem(citem->ItemResRef);
 		if (!item) continue;
 		if (item->Dialog != resref) continue;
 
 		// finally, spawn (dmhead.cre) from our override as a substitute talker
 		// the cre file is set up to be invisible, invincible and immune to several things
-		Actor *surrogate = gamedata->GetCreature(resref);
+		Actor* surrogate = gamedata->GetCreature(resref);
 		if (!surrogate) {
 			error("Map", "GetItemByDialog found the right item, but creature is missing: {}!", resref);
 			// error is fatal
 		}
-		Map *map = pc->GetCurrentArea();
+		Map* map = pc->GetCurrentArea();
 		map->AddActor(surrogate, true);
 		surrogate->SetPosition(pc->Pos, false);
 
@@ -2354,7 +2364,7 @@ Actor *Map::GetItemByDialog(const ResRef &resref) const
 }
 
 //this function finds an actor by its original resref (not correct yet)
-Actor *Map::GetActorByResource(const ResRef& resref) const
+Actor* Map::GetActorByResource(const ResRef& resref) const
 {
 	for (auto actor : actors) {
 		if (actor->GetScriptName().BeginsWith(resref)) { //temporarily!
@@ -2364,7 +2374,7 @@ Actor *Map::GetActorByResource(const ResRef& resref) const
 	return NULL;
 }
 
-Actor *Map::GetActorByScriptName(const ieVariable& name) const
+Actor* Map::GetActorByScriptName(const ieVariable& name) const
 {
 	for (auto actor : actors) {
 		if (actor->GetScriptName() == name) {
@@ -2381,20 +2391,19 @@ std::vector<Actor*> Map::GetActorsInRect(const Region& rgn, int excludeFlags) co
 	for (auto actor : actors) {
 		if (!actor->ValidTarget(excludeFlags))
 			continue;
-		if (!rgn.PointInside(actor->Pos)
-			&& !actor->IsOver(rgn.origin)) // imagine drawing a tiny box inside the circle, but not over the center
+		if (!rgn.PointInside(actor->Pos) && !actor->IsOver(rgn.origin)) // imagine drawing a tiny box inside the circle, but not over the center
 			continue;
 
 		actorlist.push_back(actor);
 	}
-	
+
 	return actorlist;
 }
 
 bool Map::SpawnsAlive() const
 {
 	for (const auto& actor : actors) {
-		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED))
+		if (!actor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED))
 			continue;
 		if (actor->Spawned) {
 			return true;
@@ -2454,20 +2463,20 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	}
 }
 
-int Map::GetHeight(const Point &p) const
+int Map::GetHeight(const Point& p) const
 {
 	SearchmapPoint tilePos = Map::ConvertCoordToTile(p);
 	return tileProps.QueryElevation(tilePos);
 }
 
-Color Map::GetLighting(const Point &p) const
+Color Map::GetLighting(const Point& p) const
 {
 	SearchmapPoint tilePos = Map::ConvertCoordToTile(p);
 	return tileProps.QueryLighting(tilePos);
 }
 
 // a more thorough, but more expensive version for the cases when it matters
-PathMapFlags Map::GetBlocked(const Point &p, int size) const
+PathMapFlags Map::GetBlocked(const Point& p, int size) const
 {
 	if (size == -1) {
 		return GetBlocked(p);
@@ -2478,7 +2487,7 @@ PathMapFlags Map::GetBlocked(const Point &p, int size) const
 
 // The default behavior is for actors to be blocking
 // If they shouldn't be, the caller should check for PathMapFlags::PASSABLE | PathMapFlags::ACTOR
-PathMapFlags Map::GetBlocked(const Point &p) const
+PathMapFlags Map::GetBlocked(const Point& p) const
 {
 	return GetBlockedTile(ConvertCoordToTile(p));
 }
@@ -2500,7 +2509,7 @@ PathMapFlags Map::GetBlockedTile(const SearchmapPoint& p) const
 	if (bool(ret & PathMapFlags::TRAVEL)) {
 		ret |= PathMapFlags::PASSABLE;
 	}
-	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR))) {
+	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR))) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
 	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
@@ -2525,7 +2534,7 @@ PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	size = Clamp<uint16_t>(size, 2, MAX_CIRCLESIZE);
 	uint16_t r = size - 2;
-	
+
 	std::vector<Point> points;
 	if (r == 0) { // avoid generating 16 identical points
 		points.push_back(tp);
@@ -2533,13 +2542,12 @@ PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size
 	} else {
 		points = PlotCircle(tp, r);
 	}
-	for (size_t i = 0; i < points.size(); i += 2)
-	{
+	for (size_t i = 0; i < points.size(); i += 2) {
 		const Point& p1 = points[i];
 		const Point& p2 = points[i + 1];
 		assert(p1.y == p2.y);
 		assert(p2.x <= p1.x);
-		
+
 		for (int x = p2.x; x <= p1.x; ++x) {
 			PathMapFlags flags = GetBlockedTile(SearchmapPoint(x, p1.y));
 			if (stopOnImpassable && flags == PathMapFlags::IMPASSABLE) {
@@ -2549,7 +2557,7 @@ PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size
 		}
 	}
 
-	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR|PathMapFlags::SIDEWALL))) {
+	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR | PathMapFlags::SIDEWALL))) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
 	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
@@ -2559,7 +2567,7 @@ PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size
 	return ret;
 }
 
-PathMapFlags Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller) const
+PathMapFlags Map::GetBlockedInLine(const Point& s, const Point& d, bool stopOnImpassable, const Actor* caller) const
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	Point p = s;
@@ -2579,7 +2587,7 @@ PathMapFlags Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 		}
 		ret |= blockStatus;
 	}
-	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR|PathMapFlags::SIDEWALL))) {
+	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR | PathMapFlags::SIDEWALL))) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
 	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
@@ -2590,14 +2598,14 @@ PathMapFlags Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 }
 
 // PathMapFlags::SIDEWALL obstructs LOS, while PathMapFlags::IMPASSABLE doesn't
-bool Map::IsVisibleLOS(const Point &s, const Point &d, const Actor *caller) const
+bool Map::IsVisibleLOS(const Point& s, const Point& d, const Actor* caller) const
 {
 	PathMapFlags ret = GetBlockedInLine(s, d, false, caller);
 	return !bool(ret & PathMapFlags::SIDEWALL);
 }
 
 // Used by the pathfinder, so PathMapFlags::IMPASSABLE obstructs walkability
-bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const
+bool Map::IsWalkableTo(const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller) const
 {
 	PathMapFlags ret = GetBlockedInLine(s, d, true, caller);
 	PathMapFlags mask = PathMapFlags::PASSABLE | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
@@ -2692,7 +2700,7 @@ Priority Map::SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) con
 	} else {
 		bool visible = IsVisible(actor->Pos);
 		// even if a creature is offscreen, they should still get an AI update every 3 ticks
-		if (scheduled && (visible || actor->ForceScriptCheck()))  {
+		if (scheduled && (visible || actor->ForceScriptCheck())) {
 			priority = Priority::RunScripts; // run scripts and display, activated now
 			// more like activate!
 			actor->Activate();
@@ -2711,7 +2719,7 @@ Priority Map::SetPriority(Actor* actor, bool& hostilesNew, ieDword gameTime) con
 //it should be extended to wallgroups, animations, effects!
 void Map::GenerateQueues()
 {
-	unsigned int i=(unsigned int) actors.size();
+	unsigned int i = (unsigned int) actors.size();
 	for (const Priority priority : EnumIterator<Priority, Priority::RunScripts, Priority::Ignore>()) {
 		if (lastActorCount[priority] != i) {
 			lastActorCount[priority] = i;
@@ -2725,7 +2733,7 @@ void Map::GenerateQueues()
 		Actor* actor = actors[i];
 
 		if (actor->CheckOnDeath()) {
-			DeleteActor( i );
+			DeleteActor(i);
 			continue;
 		}
 
@@ -2757,7 +2765,7 @@ void Map::AddProjectile(Projectile* pro)
 	projectiles.insert(iter, pro);
 }
 
-void Map::AddProjectile(Projectile *pro, const Point &source, ieDword actorID, bool fake)
+void Map::AddProjectile(Projectile* pro, const Point& source, ieDword actorID, bool fake)
 {
 	pro->MoveTo(this, source);
 	pro->SetupZPos();
@@ -2765,7 +2773,7 @@ void Map::AddProjectile(Projectile *pro, const Point &source, ieDword actorID, b
 	AddProjectile(pro);
 }
 
-void Map::AddProjectile(Projectile* pro, const Point &source, const Point &dest)
+void Map::AddProjectile(Projectile* pro, const Point& source, const Point& dest)
 {
 	pro->MoveTo(this, source);
 	pro->SetupZPos();
@@ -2775,18 +2783,18 @@ void Map::AddProjectile(Projectile* pro, const Point &source, const Point &dest)
 
 //returns the longest duration of the VVC cell named 'resource' (if it exists)
 //if P is empty, the position won't be checked
-ieDword Map::HasVVCCell(const ResRef &resource, const Point &p) const
+ieDword Map::HasVVCCell(const ResRef& resource, const Point& p) const
 {
 	ieDword ret = 0;
 
-	for (const VEFObject *vvc: vvcCells) {
+	for (const VEFObject* vvc : vvcCells) {
 		if (!p.IsInvalid() && vvc->Pos != p) continue;
 
 		if (resource != vvc->ResName) continue;
-		const ScriptedAnimation *sca = vvc->GetSingleObject();
+		const ScriptedAnimation* sca = vvc->GetSingleObject();
 		if (sca) {
 			ieDword tmp = sca->GetSequenceDuration(core->Time.defaultTicksPerSec) - sca->GetCurrentFrame();
-			if (tmp>ret) {
+			if (tmp > ret) {
 				ret = tmp;
 			}
 		} else {
@@ -2806,11 +2814,11 @@ void Map::AddVVCell(VEFObject* vvc)
 {
 	scaIterator iter;
 
-	for(iter=vvcCells.begin();iter!=vvcCells.end() && (*iter)->Pos.y < vvc->Pos.y; iter++) ;
+	for (iter = vvcCells.begin(); iter != vvcCells.end() && (*iter)->Pos.y < vvc->Pos.y; iter++);
 	vvcCells.insert(iter, vvc);
 }
 
-AreaAnimation *Map::GetAnimation(const ieVariable& Name)
+AreaAnimation* Map::GetAnimation(const ieVariable& Name)
 {
 	for (auto& anim : animations) {
 		if (anim.Name == Name) {
@@ -2820,27 +2828,27 @@ AreaAnimation *Map::GetAnimation(const ieVariable& Name)
 	return nullptr;
 }
 
-Spawn *Map::AddSpawn(const ieVariable& Name, const Point &p, std::vector<ResRef>&& creatures)
+Spawn* Map::AddSpawn(const ieVariable& Name, const Point& p, std::vector<ResRef>&& creatures)
 {
 	Spawn* sp = new Spawn();
 	sp->Name = MakeVariable(Name);
-	
+
 	sp->Pos = p;
 	sp->Creatures = std::move(creatures);
-	spawns.push_back( sp );
+	spawns.push_back(sp);
 	return sp;
 }
 
-void Map::AddEntrance(const ieVariable& Name, const Point &p, short Face)
+void Map::AddEntrance(const ieVariable& Name, const Point& p, short Face)
 {
 	Entrance* ent = new Entrance();
 	ent->Name = Name;
 	ent->Pos = p;
 	ent->Face = (ieWord) Face;
-	entrances.push_back( ent );
+	entrances.push_back(ent);
 }
 
-Entrance *Map::GetEntrance(const ieVariable& Name) const
+Entrance* Map::GetEntrance(const ieVariable& Name) const
 {
 	for (auto entrance : entrances) {
 		if (entrance->Name == Name) {
@@ -2850,9 +2858,9 @@ Entrance *Map::GetEntrance(const ieVariable& Name) const
 	return NULL;
 }
 
-bool Map::HasActor(const Actor *actor) const
+bool Map::HasActor(const Actor* actor) const
 {
-	for (const Actor *act : actors) {
+	for (const Actor* act : actors) {
 		if (act == actor) {
 			return true;
 		}
@@ -2862,7 +2870,7 @@ bool Map::HasActor(const Actor *actor) const
 
 void Map::RemoveActor(Actor* actor)
 {
-	size_t i=actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		if (actors[i] == actor) {
 			//path is invalid outside this area, but actions may be valid
@@ -2870,7 +2878,7 @@ void Map::RemoveActor(Actor* actor)
 			ClearSearchMapFor(actor);
 			actor->SetMap(NULL);
 			actor->AreaName.Reset();
-			actors.erase( actors.begin()+i );
+			actors.erase(actors.begin() + i);
 			return;
 		}
 	}
@@ -2886,11 +2894,11 @@ bool Map::CanFree() const
 			return false;
 		}
 
-		if (actor->GetInternalFlag()&IF_USEEXIT) {
+		if (actor->GetInternalFlag() & IF_USEEXIT) {
 			return false;
 		}
 
-		const Action *current = actor->GetCurrentAction();
+		const Action* current = actor->GetCurrentAction();
 		// maybe we should also catch non-interruptible actions (!actor->CurrentActionInterruptible)
 		// but it has not been needed yet
 		if (current && actionflags[current->actionID] & AF_CHASE) {
@@ -2935,8 +2943,8 @@ std::string Map::dump(bool show_actors) const
 	if (show_actors) {
 		buffer.append("\n");
 		for (const auto actor : actors) {
-			if (actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
-				AppendFormat(buffer, "Actor: {} ({} {}) at {}\n", fmt::WideToChar{actor->GetName()}, actor->GetGlobalID(), actor->GetScriptName(), actor->Pos);
+			if (actor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED)) {
+				AppendFormat(buffer, "Actor: {} ({} {}) at {}\n", fmt::WideToChar { actor->GetName() }, actor->GetGlobalID(), actor->GetScriptName(), actor->Pos);
 			}
 		}
 	}
@@ -2953,7 +2961,7 @@ bool Map::AdjustPositionX(SearchmapPoint& goal, const Size& radius, int size) co
 	int maxx = goal.x + radius.w + 1;
 
 	const Size& mapSize = PropsSize();
-	
+
 	if (maxx > mapSize.w)
 		maxx = mapSize.w;
 
@@ -3056,23 +3064,23 @@ void Map::AdjustPosition(SearchmapPoint& goal, const Size& startingRadius, int s
 	}
 }
 
-Point Map::ConvertPointToFog(const Point &p) const
+Point Map::ConvertPointToFog(const Point& p) const
 {
 	return Point(p.x / 32, p.y / 32);
 }
 
-bool Map::IsVisible(const Point &pos) const
+bool Map::IsVisible(const Point& pos) const
 {
 	return FogTileUncovered(ConvertPointToFog(pos), &VisibleBitmap);
 }
 
-bool Map::IsExplored(const Point &pos) const
+bool Map::IsExplored(const Point& pos) const
 {
 	return FogTileUncovered(ConvertPointToFog(pos), &ExploredBitmap);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
-WMPDirection Map::WhichEdge(const Point &s) const
+WMPDirection Map::WhichEdge(const Point& s) const
 {
 	if (!(GetBlocked(s) & PathMapFlags::TRAVEL)) {
 		Log(DEBUG, "Map", "Not a travel region {}?", s);
@@ -3099,13 +3107,13 @@ WMPDirection Map::WhichEdge(const Point &s) const
 //--------ambients----------------
 void Map::SetAmbients(std::vector<Ambient*> ambs, MapReverb::id_t id)
 {
-	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
+	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
 	ambim->RemoveAmbients(ambients);
 	for (auto ambient : ambients) {
 		delete ambient;
 	}
 	ambients = std::move(ambs);
-	
+
 	reverbID = id;
 	if (reverbID != EFX_PROFILE_REVERB_INVALID) {
 		reverb = std::make_unique<MapReverb>(AreaType, reverbID);
@@ -3116,7 +3124,7 @@ void Map::SetAmbients(std::vector<Ambient*> ambs, MapReverb::id_t id)
 
 void Map::SetupAmbients() const
 {
-	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
+	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
 	ambim->Reset();
 	ambim->SetAmbients(ambients);
 }
@@ -3131,14 +3139,14 @@ void Map::AddMapNote(const Point& point, ieWord color, ieStrRef strref, bool rea
 	AddMapNote(point, MapNote(strref, color, readonly));
 }
 
-void Map::AddMapNote(const Point &point, MapNote note)
+void Map::AddMapNote(const Point& point, MapNote note)
 {
 	RemoveMapNote(point);
 	mapnotes.push_back(std::move(note));
 	mapnotes.back().Pos = point;
 }
 
-void Map::RemoveMapNote(const Point &point)
+void Map::RemoveMapNote(const Point& point)
 {
 	std::vector<MapNote>::iterator it = mapnotes.begin();
 	for (; it != mapnotes.end(); ++it) {
@@ -3174,7 +3182,7 @@ void Map::LoadIniSpawn()
 bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& radius, ieWord rwdist, int* difficulty, unsigned int* creCount)
 {
 	bool spawned = false;
-	const SpawnGroup *sg = nullptr;
+	const SpawnGroup* sg = nullptr;
 	bool first = (creCount ? *creCount == 0 : true);
 	int level = (difficulty ? *difficulty : core->GetGame()->GetTotalPartyLevel(true));
 	size_t count = 1;
@@ -3216,18 +3224,18 @@ bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& r
 	if (spawned && sg && difficulty) {
 		*difficulty -= sg->Level();
 	}
-		
+
 	return spawned;
 }
 
-void Map::TriggerSpawn(Spawn *spawn)
+void Map::TriggerSpawn(Spawn* spawn)
 {
 	//is it still active
 	if (!spawn->Enabled) {
 		return;
 	}
 	//temporarily disabled?
-	if ((spawn->Method & (SPF_NOSPAWN|SPF_WAIT)) == (SPF_NOSPAWN|SPF_WAIT)) {
+	if ((spawn->Method & (SPF_NOSPAWN | SPF_WAIT)) == (SPF_NOSPAWN | SPF_WAIT)) {
 		return;
 	}
 
@@ -3241,7 +3249,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	bool day = core->GetGame()->IsDay();
 	int chance = RAND(0, 99);
 	if ((day && chance > spawn->DayChance) ||
-		(!day && chance > spawn->NightChance)) {
+	    (!day && chance > spawn->NightChance)) {
 		spawn->NextSpawn = time + spawn->Frequency * core->Time.defaultTicksPerSec * 60;
 		spawn->Method |= SPF_WAIT;
 		return;
@@ -3257,7 +3265,6 @@ void Map::TriggerSpawn(Spawn *spawn)
 		if (++i >= spawn->Creatures.size()) {
 			i = 0;
 		}
-		
 	}
 	//disable spawnpoint
 	if (spawn->Method & SPF_ONCE || !(spawn->Method & SPF_NOSPAWN)) {
@@ -3296,7 +3303,7 @@ current) is compared against (party level * rest header difficulty). If it's
 greater, the spawning is aborted. If all the other conditions are true, at
 least one creature is summoned, regardless the difficulty cap.
 */
-int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
+int Map::CheckRestInterruptsAndPassTime(const Point& pos, int hours, int day)
 {
 	Game* game = core->GetGame();
 	if (!RestHeader.CreatureNum || !RestHeader.Enabled || !RestHeader.Maximum) {
@@ -3305,7 +3312,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	}
 
 	//based on ingame timer
-	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
+	int chance = day ? RestHeader.DayChance : RestHeader.NightChance;
 	bool interrupt = RAND(0, 99) < chance;
 	if (!interrupt) {
 		game->AdvanceTime(hours * core->Time.hour_size);
@@ -3341,7 +3348,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	if (spawnamount < 1) spawnamount = 1;
 	// this loop is a bit odd, since we only check the interrupt chance once
 	// the only way this not to return immediately at hour 0 is from a data error
-	for (int i=0;i<hours;i++) {
+	for (int i = 0; i < hours; i++) {
 		int idx = RAND(0, RestHeader.CreatureNum - 1);
 		const Actor* creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
 		if (!creature) {
@@ -3359,7 +3366,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	}
 	return 0;
 }
-	
+
 Size Map::GetSize() const
 {
 	return TMap->GetMapSize();
@@ -3370,7 +3377,7 @@ void Map::FillExplored(bool explored)
 	ExploredBitmap.fill(explored ? 0xff : 0x00);
 }
 
-void Map::ExploreTile(const Point &p, bool fogOnly)
+void Map::ExploreTile(const Point& p, bool fogOnly)
 {
 	Point fogP = ConvertPointToFog(p);
 
@@ -3378,14 +3385,14 @@ void Map::ExploreTile(const Point &p, bool fogOnly)
 	if (!fogSize.PointInside(fogP)) {
 		return;
 	}
-	
+
 	ExploredBitmap[fogP] = true;
 	if (!fogOnly) {
 		VisibleBitmap[fogP] = true;
 	}
 }
 
-void Map::ExploreMapChunk(const Point &Pos, int range, int los)
+void Map::ExploreMapChunk(const Point& Pos, int range, int los)
 {
 	Point Tile;
 	const Explore& explore = Explore::Get();
@@ -3399,7 +3406,7 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 		bool block = false;
 		bool sidewall = false;
 		bool fogOnly = false;
-		for (int i=0;i<range;i++) {
+		for (int i = 0; i < range; i++) {
 			Tile.x = Pos.x + explore.VisibilityMasks[i][p].x;
 			Tile.y = Pos.y + explore.VisibilityMasks[i][p].y;
 
@@ -3411,13 +3418,13 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 			if (!block) {
 				PathMapFlags type = GetBlocked(Tile);
 				if (bool(type & PathMapFlags::NO_SEE)) {
-					block=true;
+					block = true;
 				} else if (bool(type & PathMapFlags::SIDEWALL)) {
 					sidewall = true;
 				} else if (sidewall) {
 					block = true;
-				// outdoor doors are automatically transparent (DOOR_TRANSPARENT)
-				// as a heuristic, exclude cities to avoid unnecessary shrouding
+					// outdoor doors are automatically transparent (DOOR_TRANSPARENT)
+					// as a heuristic, exclude cities to avoid unnecessary shrouding
 				} else if (bool(type & PathMapFlags::DOOR_IMPASSABLE) && AreaType & AT_OUTDOOR && !(AreaType & AT_CITY)) {
 					fogOnly = true;
 				}
@@ -3435,24 +3442,24 @@ void Map::UpdateFog()
 {
 	TRACY(ZoneScoped);
 	VisibleBitmap.fill(0);
-	
+
 	std::set<Spawn*> potentialSpawns;
 	for (const auto actor : actors) {
 		if (!actor->Modified[IE_EXPLORE]) continue;
 
 		int state = actor->Modified[IE_STATE_ID];
 		if (state & STATE_CANTSEE) continue;
-		
+
 		int vis2 = actor->Modified[IE_VISUALRANGE];
-		if ((state&STATE_BLIND) || (vis2<2)) vis2=2; //can see only themselves
-		ExploreMapChunk (actor->Pos, vis2+actor->GetAnims()->GetCircleSize(), 1);
-		
-		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
+		if ((state & STATE_BLIND) || (vis2 < 2)) vis2 = 2; //can see only themselves
+		ExploreMapChunk(actor->Pos, vis2 + actor->GetAnims()->GetCircleSize(), 1);
+
+		Spawn* sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {
 			potentialSpawns.insert(sp);
 		}
 	}
-	
+
 	for (Spawn* spawn : potentialSpawns) {
 		TriggerSpawn(spawn);
 	}
@@ -3468,7 +3475,7 @@ Spawn* Map::GetSpawn(const ieVariable& Name) const
 	return nullptr;
 }
 
-Spawn *Map::GetSpawnRadius(const Point &point, unsigned int radius) const
+Spawn* Map::GetSpawnRadius(const Point& point, unsigned int radius) const
 {
 	for (auto spawn : spawns) {
 		if (Distance(point, spawn->Pos) < radius) {
@@ -3485,7 +3492,7 @@ int Map::ConsolidateContainers()
 	size_t containerCount = TMap->GetContainerCount();
 	while (containerCount--) {
 		Container* c = TMap->GetContainer(containerCount);
-		if (TMap->CleanupContainer(c) ) {
+		if (TMap->CleanupContainer(c)) {
 			objectStencils.erase(c);
 			continue;
 		}
@@ -3495,11 +3502,11 @@ int Map::ConsolidateContainers()
 }
 
 // merges pile 1 into pile 2
-static void MergePiles(Container *donorPile, Container *pile)
+static void MergePiles(Container* donorPile, Container* pile)
 {
 	unsigned int i = donorPile->inventory.GetSlotCount();
 	while (i--) {
-		CREItem *item = donorPile->RemoveItem(i, 0);
+		CREItem* item = donorPile->RemoveItem(i, 0);
 		int count = pile->inventory.CountItems(item->ItemResRef, false);
 		if (count == 0) {
 			pile->AddItem(item);
@@ -3511,7 +3518,7 @@ static void MergePiles(Container *donorPile, Container *pile)
 		while (count) {
 			int slot = pile->inventory.FindItem(item->ItemResRef, 0, --count);
 			assert(slot != -1);
-			const CREItem *otheritem = pile->inventory.GetSlotItem(slot);
+			const CREItem* otheritem = pile->inventory.GetSlotItem(slot);
 			if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
 				// already full (or nonstackable), nothing to do here
 				skipped--;
@@ -3532,10 +3539,10 @@ static void MergePiles(Container *donorPile, Container *pile)
 	}
 }
 
-void Map::MoveVisibleGroundPiles(const Point &Pos)
+void Map::MoveVisibleGroundPiles(const Point& Pos)
 {
 	//creating the container at the given position
-	Container *othercontainer;
+	Container* othercontainer;
 	othercontainer = GetPile(Pos);
 
 	size_t containerCount = TMap->GetContainerCount();
@@ -3561,7 +3568,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 
 	// sort by removing all items that have copies and readding them at the end
 	while (i--) {
-		const CREItem *item = othercontainer->inventory.GetSlotItem(i);
+		const CREItem* item = othercontainer->inventory.GetSlotItem(i);
 		int count = othercontainer->inventory.CountItems(item->ItemResRef, false);
 		if (count == 1) continue;
 
@@ -3569,13 +3576,13 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 			int slot = othercontainer->inventory.FindItem(item->ItemResRef, 0, --count);
 			if (slot == -1) continue;
 			// containers don't really care about position, so every new item is placed at the last spot
-			CREItem *newItem = othercontainer->RemoveItem(slot, 0);
+			CREItem* newItem = othercontainer->RemoveItem(slot, 0);
 			othercontainer->AddItem(newItem);
 		}
 	}
 }
 
-Container *Map::GetPile(Point position)
+Container* Map::GetPile(Point position)
 {
 	//converting to search square
 	SearchmapPoint smPos = ConvertCoordToTile(position);
@@ -3594,28 +3601,28 @@ Container *Map::GetPile(Point position)
 	return container;
 }
 
-void Map::AddItemToLocation(const Point &position, CREItem *item)
+void Map::AddItemToLocation(const Point& position, CREItem* item)
 {
-	Container *container = GetPile(position);
+	Container* container = GetPile(position);
 	container->AddItem(item);
 }
 
 Container* Map::AddContainer(const ieVariable& Name, unsigned short Type,
-							 const std::shared_ptr<Gem_Polygon>& outline)
+			     const std::shared_ptr<Gem_Polygon>& outline)
 {
 	Container* c = new Container();
-	c->SetScriptName( Name );
+	c->SetScriptName(Name);
 	c->containerType = Type;
 	c->outline = outline;
 	c->SetMap(this);
 	if (outline) {
 		c->BBox = outline->BBox;
 	}
-	TMap->AddContainer( c );
+	TMap->AddContainer(c);
 	return c;
 }
 
-int Map::GetCursor(const Point &p) const
+int Map::GetCursor(const Point& p) const
 {
 	if (!IsExplored(p)) {
 		return IE_CURSOR_INVALID;
@@ -3632,7 +3639,7 @@ int Map::GetCursor(const Point &p) const
 
 bool Map::HasWeather() const
 {
-	if ((AreaType & (AT_WEATHER|AT_OUTDOOR) ) != (AT_WEATHER|AT_OUTDOOR) ) {
+	if ((AreaType & (AT_WEATHER | AT_OUTDOOR)) != (AT_WEATHER | AT_OUTDOOR)) {
 		return false;
 	}
 	return core->GetDictionary().Get("Weather", true);
@@ -3640,20 +3647,20 @@ bool Map::HasWeather() const
 
 int Map::GetWeather() const
 {
-	if (Rain>=core->Roll(1,100,0) ) {
-		if (Lightning>=core->Roll(1,100,0) ) {
-			return WB_RARELIGHTNING|WB_RAIN;
+	if (Rain >= core->Roll(1, 100, 0)) {
+		if (Lightning >= core->Roll(1, 100, 0)) {
+			return WB_RARELIGHTNING | WB_RAIN;
 		}
 		return WB_RAIN;
 	}
-	if (Snow>=core->Roll(1,100,0) ) {
+	if (Snow >= core->Roll(1, 100, 0)) {
 		return WB_SNOW;
 	}
 	// TODO: handle WB_FOG the same way when we start drawing it
 	return WB_NORMAL;
 }
 
-void Map::FadeSparkle(const Point &pos, bool forced) const
+void Map::FadeSparkle(const Point& pos, bool forced) const
 {
 	for (auto particle : particles) {
 		if (particle->MatchPos(pos)) {
@@ -3668,7 +3675,7 @@ void Map::FadeSparkle(const Point &pos, bool forced) const
 	}
 }
 
-void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &pos, unsigned int FragAnimID, int Zpos)
+void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point& pos, unsigned int FragAnimID, int Zpos)
 {
 	int style, path, grow, size, width, ttl;
 
@@ -3677,46 +3684,45 @@ void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &po
 	}
 
 	//the high word is ignored in the original engine (compatibility hack)
-	switch(type&0xffff) {
-	case SPARKLE_SHOWER: //simple falling sparks
-		path = SP_PATH_FALL;
-		grow = SP_SPAWN_FULL;
-		size = 100;
-		width = 40;
-		ttl = duration;
-		break;
-	case SPARKLE_PUFF:
-		path = SP_PATH_FOUNT; //sparks go up and down
-		grow = SP_SPAWN_SOME;
-		size = 40;
-		width = 40;
-		ttl = core->GetGame()->GameTime+Zpos;
-		break;
-	case SPARKLE_EXPLOSION: //this isn't in the original engine, but it is a nice effect to have
-		path = SP_PATH_EXPL;
-		grow = SP_SPAWN_SOME;
-		size = 10;
-		width = 40;
-		ttl = core->GetGame()->GameTime+Zpos;
-		break;
-	default:
-		path = SP_PATH_FLIT;
-		grow = SP_SPAWN_SOME;
-		size = 100;
-		width = 40;
-		ttl = duration;
-		break;
+	switch (type & 0xffff) {
+		case SPARKLE_SHOWER: //simple falling sparks
+			path = SP_PATH_FALL;
+			grow = SP_SPAWN_FULL;
+			size = 100;
+			width = 40;
+			ttl = duration;
+			break;
+		case SPARKLE_PUFF:
+			path = SP_PATH_FOUNT; //sparks go up and down
+			grow = SP_SPAWN_SOME;
+			size = 40;
+			width = 40;
+			ttl = core->GetGame()->GameTime + Zpos;
+			break;
+		case SPARKLE_EXPLOSION: //this isn't in the original engine, but it is a nice effect to have
+			path = SP_PATH_EXPL;
+			grow = SP_SPAWN_SOME;
+			size = 10;
+			width = 40;
+			ttl = core->GetGame()->GameTime + Zpos;
+			break;
+		default:
+			path = SP_PATH_FLIT;
+			grow = SP_SPAWN_SOME;
+			size = 100;
+			width = 40;
+			ttl = duration;
+			break;
 	}
-	Particles *sparkles = new Particles(size);
+	Particles* sparkles = new Particles(size);
 	sparkles->SetOwner(this);
-	sparkles->SetRegion(pos.x-width/2, pos.y-Zpos, width, Zpos);
+	sparkles->SetRegion(pos.x - width / 2, pos.y - Zpos, width, Zpos);
 	sparkles->SetTimeToLive(ttl);
 
 	if (FragAnimID) {
 		style = SP_TYPE_BITMAP;
 		sparkles->SetBitmap(FragAnimID);
-	}
-	else {
+	} else {
 		style = SP_TYPE_POINT;
 	}
 	sparkles->SetType(style, path, grow);
@@ -3724,18 +3730,18 @@ void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &po
 	sparkles->SetPhase(P_GROW);
 
 	spaIterator iter;
-	for(iter=particles.begin(); (iter!=particles.end()) && ((*iter)->GetHeight()<pos.y); iter++) ;
+	for (iter = particles.begin(); (iter != particles.end()) && ((*iter)->GetHeight() < pos.y); iter++);
 	particles.insert(iter, sparkles);
 }
 
 //remove flags from actor if it has left the trigger area it had last entered
-void Map::ClearTrap(Actor *actor, ieDword InTrap) const
+void Map::ClearTrap(Actor* actor, ieDword InTrap) const
 {
-	const InfoPoint *trap = TMap->GetInfoPoint(InTrap);
+	const InfoPoint* trap = TMap->GetInfoPoint(InTrap);
 	if (!trap || !trap->outline) {
 		actor->SetInTrap(0);
 	} else {
-		if(!trap->outline->PointIn(actor->Pos)) {
+		if (!trap->outline->PointIn(actor->Pos)) {
 			actor->SetInTrap(0);
 		}
 	}
@@ -3748,7 +3754,7 @@ void Map::SetTrackString(ieStrRef strref, int flg, int difficulty)
 	tracking.difficulty = difficulty;
 }
 
-bool Map::DisplayTrackString(const Actor *target) const
+bool Map::DisplayTrackString(const Actor* target) const
 {
 	// this stat isn't saved
 	// according to the HoW manual the chance of success is:
@@ -3760,7 +3766,7 @@ bool Map::DisplayTrackString(const Actor *target) const
 		skill += target->LuckyRoll(1, 20, 0) + target->GetAbilityBonus(IE_WIS);
 		success = skill > (tracking.difficulty / 5 + 10);
 	} else {
-		skill += (target->GetStat(IE_LEVEL)/3)*5 + target->GetStat(IE_WIS)*5;
+		skill += (target->GetStat(IE_LEVEL) / 3) * 5 + target->GetStat(IE_WIS) * 5;
 		success = core->Roll(1, 100, tracking.difficulty) > skill;
 	}
 	if (!success) {
@@ -3778,15 +3784,15 @@ bool Map::DisplayTrackString(const Actor *target) const
 
 // returns a lightness level in the range of [0-100]
 // since the lightmap is much smaller than the area, we need to interpolate
-unsigned int Map::GetLightLevel(const Point &p) const
+unsigned int Map::GetLightLevel(const Point& p) const
 {
 	Color c = GetLighting(p);
 	// at night/dusk/dawn the lightmap color is adjusted by the color overlay. (Only get's darker.)
-	const Color *tint = core->GetGame()->GetGlobalTint();
+	const Color* tint = core->GetGame()->GetGlobalTint();
 	if (tint) {
-		return ((c.r-tint->r)*114 + (c.g-tint->g)*587 + (c.b-tint->b)*299)/2550;
+		return ((c.r - tint->r) * 114 + (c.g - tint->g) * 587 + (c.b - tint->b) * 299) / 2550;
 	}
-	return (c.r*114+c.g*587+c.b*299)/2550;
+	return (c.r * 114 + c.g * 587 + c.b * 299) / 2550;
 }
 
 ////////////////////AreaAnimation//////////////////
@@ -3821,7 +3827,7 @@ AreaAnimation& AreaAnimation::operator=(const AreaAnimation& src) noexcept
 	return *this;
 }
 
-AreaAnimation::AreaAnimation(const AreaAnimation &src) noexcept
+AreaAnimation::AreaAnimation(const AreaAnimation& src) noexcept
 {
 	operator=(src);
 }
@@ -3833,18 +3839,17 @@ void AreaAnimation::InitAnimation()
 		Log(ERROR, "Map", "Cannot load animation: {}", BAM);
 		return;
 	}
-	
-	auto GetAnimationPiece = [af, this](index_t animCycle)
-	{
+
+	auto GetAnimationPiece = [af, this](index_t animCycle) {
 		Animation ret;
-		Animation *anim = af->GetCycle(animCycle);
+		Animation* anim = af->GetCycle(animCycle);
 		if (!anim)
 			anim = af->GetCycle(0);
-		
+
 		assert(anim);
 		ret = std::move(*anim);
 		delete anim;
-		
+
 		//this will make the animation stop when the game is stopped
 		//a possible gemrb feature to have this flag settable in .are
 		ret.gameAnimation = true;
@@ -3873,13 +3878,13 @@ void AreaAnimation::InitAnimation()
 	} else if (animcount) {
 		animation.push_back(GetAnimationPiece(sequence));
 	}
-	
+
 	if (bool(flags & Flags::Palette)) {
 		SetPalette(PaletteRef);
 	}
 }
 
-void AreaAnimation::SetPalette(const ResRef &pal)
+void AreaAnimation::SetPalette(const ResRef& pal)
 {
 	flags |= Flags::Palette;
 	PaletteRef = pal;
@@ -3906,18 +3911,18 @@ Region AreaAnimation::DrawingRegion() const
 	Region r(Pos, Size());
 	size_t ac = animation.size();
 	while (ac--) {
-		const Animation &anim = animation[ac];
+		const Animation& anim = animation[ac];
 		Region animRgn = anim.animArea;
 		animRgn.x += Pos.x;
 		animRgn.y += Pos.y;
-		
+
 		r.ExpandToRegion(animRgn);
 	}
 	return r;
 }
 
-void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags bf) const
-{	
+void AreaAnimation::Draw(const Region& viewport, Color tint, BlitFlags bf) const
+{
 	if (transparency) {
 		tint.a = 255 - transparency;
 		bf |= BlitFlags::ALPHA_MOD;
@@ -3948,7 +3953,7 @@ void AreaAnimation::Update()
 bool Map::ChangeMap(bool day_or_night)
 {
 	//no need of change if the area is not extended night
-	if (!(AreaType&AT_EXTENDED_NIGHT)) return false;
+	if (!(AreaType & AT_EXTENDED_NIGHT)) return false;
 	//no need of change if the area already has the right tilemap
 	if ((DayNight == day_or_night) && GetTileMap()) return false;
 
@@ -3964,9 +3969,9 @@ bool Map::ChangeMap(bool day_or_night)
 	return true;
 }
 
-void Map::SeeSpellCast(Scriptable *caster, ieDword spell) const
+void Map::SeeSpellCast(Scriptable* caster, ieDword spell) const
 {
-	if (caster->Type!=ST_ACTOR) {
+	if (caster->Type != ST_ACTOR) {
 		return;
 	}
 
@@ -3980,7 +3985,7 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell) const
 	caster->AddTrigger(TriggerEntry(triggerType, caster->GetGlobalID(), spell));
 }
 
-void Map::SetBackground(const ResRef &bgResRef, ieDword duration)
+void Map::SetBackground(const ResRef& bgResRef, ieDword duration)
 {
 	ResourceHolder<ImageMgr> bmp = gamedata->GetResourceHolder<ImageMgr>(bgResRef);
 

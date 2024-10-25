@@ -19,14 +19,16 @@
  */
 
 #include "GUI/Control.h"
-#include "GUI/GUIScriptInterface.h"
-#include "GUI/Window.h"
+
+#include "ie_cursors.h"
 
 #include "Debug.h"
-#include "ie_cursors.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "Sprite2D.h"
+
+#include "GUI/GUIScriptInterface.h"
+#include "GUI/Window.h"
+#include "Logging/Logging.h"
 
 #include <cstdio>
 #include <cstring>
@@ -38,7 +40,7 @@ tick_t Control::ActionRepeatDelay = 250;
 const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeric_limits<value_t>::max());
 
 Control::Control(const Region& frame)
-: View(frame) // dont pass superview to View constructor
+	: View(frame) // dont pass superview to View constructor
 {
 	SetValueRange(MaxValueRange);
 }
@@ -49,7 +51,7 @@ Control::~Control()
 }
 
 void Control::SetAction(ControlEventHandler handler, Control::Action type, EventButton button,
-						Event::EventMods mod, short count)
+			Event::EventMods mod, short count)
 {
 	ControlActionKey key(type, mod, button, count);
 	return SetAction(std::move(handler), key);
@@ -91,7 +93,7 @@ bool Control::PerformAction(const ActionKey& key)
 	if (IsDisabled()) {
 		return false;
 	}
-	
+
 	const auto& it = actions.find(key);
 	if (it != actions.end()) {
 		if (!window) {
@@ -106,7 +108,7 @@ bool Control::PerformAction(const ActionKey& key)
 
 void Control::FlagsChanged(unsigned int /*oldflags*/)
 {
-	if (actionTimer && (flags&Disabled)) {
+	if (actionTimer && (flags & Disabled)) {
 		ClearActionTimer();
 	}
 }
@@ -133,7 +135,7 @@ Control::value_t Control::SetValue(value_t val)
 {
 	value_t oldVal = Value;
 	Value = Clamp(val, range.first, range.second);
-	
+
 	if (oldVal != Value) {
 		if (IsDictBound()) {
 			UpdateDictValue();
@@ -163,14 +165,14 @@ void Control::UpdateDictValue() noexcept
 	if (!IsDictBound()) {
 		return;
 	}
-	
+
 	// set this even when the value doesn't change
 	// if a radio is clicked, then one of its siblings, the siblings value won't change
 	// but we expect the dictionary to reflect the selected value
 	auto& vars = core->GetDictionary();
 	BitOp op = GetDictOp();
 	value_t curVal = op == BitOp::SET ? INVALID_VALUE : 0;
-	std::string key{VarName.c_str()};
+	std::string key { VarName.c_str() };
 
 	auto lookup = vars.Get(key);
 	if (lookup != nullptr) {
@@ -227,7 +229,7 @@ void Control::ClearActionTimer()
 
 void Control::StartActionTimer(const ControlEventHandler& action, tick_t delay)
 {
-	EventHandler h = [this, action] () {
+	EventHandler h = [this, action]() {
 		// update the timer to use the actual repeatDelay
 		SetActionInterval(repeatDelay);
 
@@ -247,12 +249,12 @@ View::UniqueDragOp Control::DragOperation()
 	if (actionTimer) {
 		return nullptr;
 	}
-	
+
 	ActionKey key(Action::DragDropCreate);
-	
+
 	if (SupportsAction(key)) {
 		// we have to use a timer so that the dragop is set before the callback is called
-		EventHandler h = [this, key] () {
+		EventHandler h = [this, key]() {
 			return actions[key](this);
 		};
 
@@ -269,7 +271,7 @@ bool Control::AcceptsDragOperation(const DragOp& dop) const
 		// if 2 controls share the same VarName we assume they are swappable...
 		return (VarName == cdop->Source()->VarName);
 	}
-	
+
 	return View::AcceptsDragOperation(dop);
 }
 
@@ -341,7 +343,7 @@ bool Control::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 	if (key.keycode == GEM_RETURN) {
 		return PerformAction();
 	}
-	
+
 	return View::OnKeyPress(key, mod);
 }
 

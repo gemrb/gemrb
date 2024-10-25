@@ -26,7 +26,7 @@
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
+
 #include "GUI/Button.h"
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/Label.h"
@@ -35,6 +35,7 @@
 #include "GUI/Slider.h"
 #include "GUI/TextArea.h"
 #include "GUI/TextEdit.h"
+#include "Logging/Logging.h"
 
 using namespace GemRB;
 
@@ -71,7 +72,7 @@ static void GetButton(DataStream* str, Control*& ctrl, const Region& ctrlFrame, 
 	ieByte y2;
 
 	str->ReadResRef(bamFile);
-	str->Read(&cycle, 1 );
+	str->Read(&cycle, 1);
 	str->Read(&flagsByte, 1);
 	ieDword Flags = static_cast<ieDword>(flagsByte) << 8;
 	str->Read(&unpressedIndex, 1);
@@ -356,7 +357,7 @@ static void GetScrollbar(DataStream* str, Control*& ctrl, const Region& ctrlFram
 	str->ReadResRef(bamResRef);
 	str->ReadWord(cycle);
 
-	auto bam =gamedata->GetFactoryResourceAs<const AnimationFactory>(bamResRef, IE_BAM_CLASS_ID);
+	auto bam = gamedata->GetFactoryResourceAs<const AnimationFactory>(bamResRef, IE_BAM_CLASS_ID);
 	if (!bam) {
 		Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: {}", bamResRef);
 		return;

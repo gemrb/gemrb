@@ -28,26 +28,27 @@
 #ifndef SCROLLBAR_H
 #define SCROLLBAR_H
 
-#include "GUI/Control.h"
+#include "exports.h"
 
 #include "Sprite2D.h"
 
-#include "exports.h"
+#include "GUI/Control.h"
 
 namespace GemRB {
 
 class Sprite2D;
 
-#define UP_PRESS	 0x0001
-#define DOWN_PRESS   0x0010
-#define SLIDER_GRAB  0x0100
+#define UP_PRESS          0x0001
+#define DOWN_PRESS        0x0010
+#define SLIDER_GRAB       0x0100
 #define SLIDER_HORIZONTAL 0x1000
 
 /**
  * @class ScrollBar
  * Widget displaying scrollbars for paging in long text windows
  */
-class GEM_EXPORT ScrollBar : public Control, public View::Scrollable {
+class GEM_EXPORT ScrollBar : public Control,
+			     public View::Scrollable {
 public:
 	enum IMAGE_TYPE {
 		IMAGE_UP_UNPRESSED = 0,
@@ -84,13 +85,14 @@ private: //Private attributes
 	unsigned short State = 0;
 
 private:
-	void Init(const Holder<Sprite2D> images[IMAGE_COUNT]) {
+	void Init(const Holder<Sprite2D> images[IMAGE_COUNT])
+	{
 		ControlType = IE_GUI_SCROLLBAR;
 		State = 0;
 		StepIncrement = 1;
 		Size s = frame.size;
 
-		for(int i=0; i < IMAGE_COUNT; i++) {
+		for (int i = 0; i < IMAGE_COUNT; i++) {
 			Frames[i] = images[i];
 			assert(Frames[i]);
 			s.w = std::max(s.w, Frames[i]->Frame.w);
@@ -105,9 +107,9 @@ private:
 	int GetFrameHeight(int frame) const;
 	/** Range of the slider in pixels. The height - buttons - slider */
 	int SliderPxRange() const;
-	
+
 	bool IsPerPixelScrollable() const override { return false; }
-	
+
 protected:
 	/** Mouse Button Down */
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
@@ -117,7 +119,7 @@ protected:
 	bool OnMouseDrag(const MouseEvent&) override;
 	/** Mouse Wheel Scroll Event */
 	bool OnMouseWheelScroll(const Point& delta) override;
-	
+
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
 };
 

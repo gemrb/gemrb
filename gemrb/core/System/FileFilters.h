@@ -27,10 +27,11 @@ struct ExtFilter : Predicate<path_t> {
 	path_t extension;
 
 	explicit ExtFilter(path_t ext)
-	: extension(std::move(ext))
+		: extension(std::move(ext))
 	{}
 
-	bool operator()(const path_t& filename) const override {
+	bool operator()(const path_t& filename) const override
+	{
 		size_t extpos = filename.find_last_of('.');
 		if (extpos != path_t::npos) {
 			return stricmp(&filename[extpos + 1], extension.data()) == 0;
@@ -43,10 +44,11 @@ struct EndsWithFilter : Predicate<path_t> {
 	path_t endMatch;
 
 	explicit EndsWithFilter(path_t endString)
-	: endMatch(std::move(endString))
+		: endMatch(std::move(endString))
 	{}
 
-	bool operator()(const path_t& fname) const override {
+	bool operator()(const path_t& fname) const override
+	{
 		if (fname.empty()) return false;
 		// this filter ignores file extension
 		size_t rpos = fname.find_last_of('.');

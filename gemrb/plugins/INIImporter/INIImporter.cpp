@@ -68,28 +68,32 @@ bool INIImporter::Open(std::unique_ptr<DataStream> str)
 			startedSection = false;
 		} else {
 			Log(ERROR, "INIImporter", "Bad Line in file: {}, Section: [{}], Entry: '{}'",
-				str->filename, lastTag->GetName(), strbuf);
+			    str->filename, lastTag->GetName(), strbuf);
 		}
 	}
 
 	return true;
 }
 
-INIImporter::KeyValueGroupIterator INIImporter::begin() const {
+INIImporter::KeyValueGroupIterator INIImporter::begin() const
+{
 	return tags.begin();
 }
 
-INIImporter::KeyValueGroupIterator INIImporter::end() const {
+INIImporter::KeyValueGroupIterator INIImporter::end() const
+{
 	return tags.end();
 }
 
-INIImporter::KeyValueGroupIterator INIImporter::find(StringView tag) const {
+INIImporter::KeyValueGroupIterator INIImporter::find(StringView tag) const
+{
 	return std::find_if(tags.begin(), tags.end(), [tag](const auto& t) {
 		return stricmp(t.GetName().c_str(), tag.c_str()) == 0;
 	});
 }
 
-size_t INIImporter::GetTagsCount() const {
+size_t INIImporter::GetTagsCount() const
+{
 	return tags.size();
 }
 

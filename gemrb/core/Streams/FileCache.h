@@ -23,7 +23,7 @@
 
 namespace GemRB {
 
-GEM_EXPORT DataStream* CacheCompressedStream(DataStream *stream, const path_t& filename, int length = 0, bool overwrite = false);
+GEM_EXPORT DataStream* CacheCompressedStream(DataStream* stream, const path_t& filename, int length = 0, bool overwrite = false);
 
 }
 

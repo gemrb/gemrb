@@ -33,27 +33,29 @@ namespace GemRB {
 class GEM_EXPORT Tile {
 public:
 	Tile(Animation a1, Animation a2) noexcept
-	: anim{std::make_unique<Animation>(std::move(a1)), std::make_unique<Animation>(std::move(a2))}
+		: anim { std::make_unique<Animation>(std::move(a1)), std::make_unique<Animation>(std::move(a2)) }
 	{}
 
 	explicit Tile(Animation animation) noexcept
-	: anim{std::make_unique<Animation>(std::move(animation)), nullptr }
+		: anim { std::make_unique<Animation>(std::move(animation)), nullptr }
 	{}
-	
+
 	Tile(const Tile&) noexcept = delete;
 	Tile& operator=(const Tile& rhs) noexcept = delete;
-	
+
 	Tile(Tile&&) noexcept = default;
 	Tile& operator=(Tile&&) noexcept = default;
-	
-	Animation* GetAnimation() const noexcept {
+
+	Animation* GetAnimation() const noexcept
+	{
 		if (anim[tileIndex]) {
 			return anim[tileIndex].get();
 		}
 		return anim[0].get();
 	}
-	
-	Animation* GetAnimation(int idx) const noexcept {
+
+	Animation* GetAnimation(int idx) const noexcept
+	{
 		return anim[idx].get();
 	}
 

@@ -24,21 +24,19 @@
 #include "Audio.h"
 #include "LRUCache.h"
 
+#include <SDL_mixer.h>
 #include <mutex>
 #include <vector>
 
-#include <SDL_mixer.h>
-
-#define AMBIENT_CHANNELS 8
-#define MIXER_CHANNELS 16
-#define BUFFER_CACHE_SIZE 100
-#define AUDIO_DISTANCE_ROLLOFF_MOD 1.3
+#define AMBIENT_CHANNELS             8
+#define MIXER_CHANNELS               16
+#define BUFFER_CACHE_SIZE            100
+#define AUDIO_DISTANCE_ROLLOFF_MOD   1.3
 #define AMBIENT_DISTANCE_ROLLOFF_MOD 5
 
 namespace GemRB {
 
-class SDLAudioSoundHandle : public SoundHandle 
-{
+class SDLAudioSoundHandle : public SoundHandle {
 public:
 	SDLAudioSoundHandle(Mix_Chunk* chunk, SFXChannel channel, bool relative)
 		: mixChunk(chunk), chunkChannel(int(channel)), sndRelative(relative) {};
@@ -49,13 +47,13 @@ public:
 	void Invalidate() const {}
 
 private:
-	Mix_Chunk *mixChunk;
+	Mix_Chunk* mixChunk;
 	int chunkChannel;
 	bool sndRelative;
 };
 
 struct BufferedData {
-	char *buf;
+	char* buf;
 	unsigned int size;
 };
 
@@ -66,16 +64,20 @@ struct SDLAudioStream {
 };
 
 struct CacheEntry {
-	Mix_Chunk *chunk;
+	Mix_Chunk* chunk;
 	unsigned int Length;
 
-	CacheEntry(Mix_Chunk *chunk, tick_t length) : chunk(chunk), Length(length) {}
+	CacheEntry(Mix_Chunk* chunk, tick_t length)
+		: chunk(chunk), Length(length) {}
 	CacheEntry(const CacheEntry&) = delete;
-	CacheEntry(CacheEntry && other) : chunk(other.chunk), Length(other.Length) {
+	CacheEntry(CacheEntry&& other)
+		: chunk(other.chunk), Length(other.Length)
+	{
 		other.chunk = nullptr;
 	}
 	CacheEntry& operator=(const CacheEntry&) = delete;
-	CacheEntry& operator=(CacheEntry && other) {
+	CacheEntry& operator=(CacheEntry&& other)
+	{
 		this->chunk = other.chunk;
 		other.chunk = nullptr;
 		this->Length = other.Length;
@@ -85,7 +87,8 @@ struct CacheEntry {
 
 	void evictionNotice() const {}
 
-	~CacheEntry() {
+	~CacheEntry()
+	{
 		if (chunk != nullptr) {
 			free(chunk->abuf);
 			free(chunk);
@@ -132,17 +135,17 @@ public:
 	void SetAmbientStreamVolume(int stream, int gain) override;
 	void SetAmbientStreamPitch(int stream, int pitch) override;
 	void QueueBuffer(int stream, unsigned short bits, int channels,
-				short* memory, int size, int samplerate) override;
+			 short* memory, int size, int samplerate) override;
 
 private:
 	void FreeBuffers();
 
-	static void SetAudioStreamVolume(uint8_t *stream, int len, int volume);
-	static void music_callback(void *udata, uint8_t *stream, int len);
-	static void buffer_callback(void *udata, uint8_t *stream, int len);
+	static void SetAudioStreamVolume(uint8_t* stream, int len, int volume);
+	static void music_callback(void* udata, uint8_t* stream, int len);
+	static void buffer_callback(void* udata, uint8_t* stream, int len);
 	bool evictBuffer();
 	void clearBufferCache();
-	Mix_Chunk* loadSound(StringView ResRef, tick_t &time_length);
+	Mix_Chunk* loadSound(StringView ResRef, tick_t& time_length);
 
 	Point listenerPos;
 	ResourceHolder<SoundMgr> MusicReader;

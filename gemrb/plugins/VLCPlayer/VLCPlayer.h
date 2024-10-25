@@ -21,9 +21,9 @@
 #ifndef VLCPLAY_H
 #define VLCPLAY_H
 
-#include <vlc/vlc.h>
-
 #include "MoviePlayer.h"
+
+#include <vlc/vlc.h>
 
 namespace GemRB {
 
@@ -43,18 +43,20 @@ namespace GemRB {
 
 class VLCPlayer : public MoviePlayer {
 private:
-	enum {Y, U, V};
-	char* planes[3]{};
+	enum { Y,
+	       U,
+	       V };
+	char* planes[3] {};
 
-	libvlc_instance_t *libvlc;
-	libvlc_media_player_t *mediaPlayer = nullptr;
+	libvlc_instance_t* libvlc;
+	libvlc_media_player_t* mediaPlayer = nullptr;
 
 	// libvlc_video_set_callbacks
-	static void display(void *data, void *id);
-	static void* lock(void *data, void **planes);
+	static void display(void* data, void* id);
+	static void* lock(void* data, void** planes);
 
 	// libvlc_video_set_format_callbacks
-	static unsigned setup(void **opaque, char *chroma, unsigned *width, unsigned *height, unsigned *pitches, unsigned *lines);
+	static unsigned setup(void** opaque, char* chroma, unsigned* width, unsigned* height, unsigned* pitches, unsigned* lines);
 
 	bool DecodeFrame(VideoBuffer&) override;
 	void DestroyPlayer();

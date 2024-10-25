@@ -39,10 +39,11 @@ class GEM_EXPORT ResourceSource : public Plugin {
 public:
 	virtual bool Open(const path_t& filename, std::string description) = 0;
 	virtual bool HasResource(StringView resname, SClass_ID type) = 0;
-	virtual bool HasResource(StringView resname, const ResourceDesc &type) = 0;
+	virtual bool HasResource(StringView resname, const ResourceDesc& type) = 0;
 	virtual DataStream* GetResource(StringView resname, SClass_ID type) = 0;
-	virtual DataStream* GetResource(StringView resname, const ResourceDesc &type) = 0;
+	virtual DataStream* GetResource(StringView resname, const ResourceDesc& type) = 0;
 	const std::string& GetDescription() const { return description; }
+
 protected:
 	std::string description;
 };

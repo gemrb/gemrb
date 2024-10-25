@@ -17,13 +17,14 @@
  *
  *
  */
- 
+
 #ifndef AMBIENT_H
 #define AMBIENT_H
 
 #include "exports.h"
 #include "globals.h"
 #include "ie_types.h"
+
 #include "Resource.h"
 
 #include <bitset>
@@ -33,11 +34,11 @@
 namespace GemRB {
 
 #define IE_AMBI_ENABLED 1
-#define IE_AMBI_LOOPING 2	/* useless: if unset, the original looped the sound only when the game isn't paused */
-#define IE_AMBI_MAIN    4	/* ignore origin/radius */
-#define IE_AMBI_RANDOM  8	/* random selection instead of sequential */
-#define IE_AMBI_HIMEM	16	/* skip on low-mem systems */
-#define IE_AMBI_NOSAVE	32	/* GemRB internal flag: don't save to area */
+#define IE_AMBI_LOOPING 2 /* useless: if unset, the original looped the sound only when the game isn't paused */
+#define IE_AMBI_MAIN    4 /* ignore origin/radius */
+#define IE_AMBI_RANDOM  8 /* random selection instead of sequential */
+#define IE_AMBI_HIMEM   16 /* skip on low-mem systems */
+#define IE_AMBI_NOSAVE  32 /* GemRB internal flag: don't save to area */
 
 class GEM_EXPORT Ambient {
 public:
@@ -60,7 +61,7 @@ public:
 	ieDword GetTotalPitch() const;
 	ieDword GetAppearance() const { return appearance; }
 	ieDword GetFlags() const { return flags; }
-	
+
 	void SetActive() { flags |= IE_AMBI_ENABLED; };
 	void SetInactive() { flags &= ~IE_AMBI_ENABLED; };
 
@@ -69,9 +70,9 @@ public:
 	Point origin;
 	std::vector<ResRef> sounds;
 	ieWord radius = 0;
-	ieWord gain = 0;	// percent
+	ieWord gain = 0; // percent
 	ieWord gainVariance = 0;
-	tick_t interval = 0;	// no pauses if zero
+	tick_t interval = 0; // no pauses if zero
 	tick_t intervalVariance = 0;
 	ieDword pitchVariance = 0;
 	ieDword appearance = 0;

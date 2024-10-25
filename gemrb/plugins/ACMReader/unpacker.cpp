@@ -62,22 +62,22 @@ const unsigned char Table3[121] = {
 };
 
 const FillerProc Fillers[32] = {
-	&CValueUnpacker::zero_fill, & CValueUnpacker::return0,
-	& CValueUnpacker::return0, & CValueUnpacker::linear_fill,
-	& CValueUnpacker::linear_fill, & CValueUnpacker::linear_fill,
-	& CValueUnpacker::linear_fill, & CValueUnpacker::linear_fill,
-	& CValueUnpacker::linear_fill, & CValueUnpacker::linear_fill,
-	& CValueUnpacker::linear_fill, & CValueUnpacker::linear_fill,
-	& CValueUnpacker::linear_fill, & CValueUnpacker::linear_fill,
-	& CValueUnpacker::linear_fill, & CValueUnpacker::linear_fill,
-	& CValueUnpacker::linear_fill, & CValueUnpacker::k1_3bits,
-	& CValueUnpacker::k1_2bits, & CValueUnpacker::t1_5bits,
-	& CValueUnpacker::k2_4bits, & CValueUnpacker::k2_3bits,
-	& CValueUnpacker::t2_7bits, & CValueUnpacker::k3_5bits,
-	& CValueUnpacker::k3_4bits, & CValueUnpacker::return0,
-	& CValueUnpacker::k4_5bits, & CValueUnpacker::k4_4bits,
-	& CValueUnpacker::return0, & CValueUnpacker::t3_7bits,
-	& CValueUnpacker::return0, & CValueUnpacker::return0
+	&CValueUnpacker::zero_fill, &CValueUnpacker::return0,
+	&CValueUnpacker::return0, &CValueUnpacker::linear_fill,
+	&CValueUnpacker::linear_fill, &CValueUnpacker::linear_fill,
+	&CValueUnpacker::linear_fill, &CValueUnpacker::linear_fill,
+	&CValueUnpacker::linear_fill, &CValueUnpacker::linear_fill,
+	&CValueUnpacker::linear_fill, &CValueUnpacker::linear_fill,
+	&CValueUnpacker::linear_fill, &CValueUnpacker::linear_fill,
+	&CValueUnpacker::linear_fill, &CValueUnpacker::linear_fill,
+	&CValueUnpacker::linear_fill, &CValueUnpacker::k1_3bits,
+	&CValueUnpacker::k1_2bits, &CValueUnpacker::t1_5bits,
+	&CValueUnpacker::k2_4bits, &CValueUnpacker::k2_3bits,
+	&CValueUnpacker::t2_7bits, &CValueUnpacker::k3_5bits,
+	&CValueUnpacker::k3_4bits, &CValueUnpacker::return0,
+	&CValueUnpacker::k4_5bits, &CValueUnpacker::k4_4bits,
+	&CValueUnpacker::return0, &CValueUnpacker::t3_7bits,
+	&CValueUnpacker::return0, &CValueUnpacker::return0
 };
 
 inline void CValueUnpacker::prepare_bits(int bits)
@@ -90,7 +90,7 @@ inline void CValueUnpacker::prepare_bits(int bits)
 				remains = UNPACKER_BUFFER_SIZE;
 			buffer_bit_offset = UNPACKER_BUFFER_SIZE - remains;
 			if (buffer_bit_offset != UNPACKER_BUFFER_SIZE)
-				stream->Read( bits_buffer + buffer_bit_offset, remains);
+				stream->Read(bits_buffer + buffer_bit_offset, remains);
 		}
 		//our stream read returns -1 instead of 0 on failure
 		//comparing with 1 will solve annoying interface changes
@@ -100,13 +100,13 @@ inline void CValueUnpacker::prepare_bits(int bits)
 		} else {
 			one_byte = 0;
 		}
-		next_bits |= ( ( unsigned int ) one_byte << avail_bits );
+		next_bits |= ((unsigned int) one_byte << avail_bits);
 		avail_bits += 8;
 	}
 }
 int CValueUnpacker::get_bits(int bits)
 {
-	prepare_bits( bits );
+	prepare_bits(bits);
 	int res = next_bits;
 	avail_bits -= bits;
 	next_bits >>= bits;
@@ -118,7 +118,7 @@ int CValueUnpacker::init_unpacker()
 	if (amp_buffer) {
 		free(amp_buffer);
 	}
-	amp_buffer =(short *) malloc(sizeof(short)*0x10000);
+	amp_buffer = (short*) malloc(sizeof(short) * 0x10000);
 	if (!amp_buffer) {
 		return 0;
 	}
@@ -128,22 +128,22 @@ int CValueUnpacker::init_unpacker()
 int CValueUnpacker::get_one_block(int* block)
 {
 	block_ptr = block;
-	int pwr = get_bits( 4 ) & 0xF, val = get_bits( 16 ) & 0xFFFF,
-		count = 1 << pwr, v = 0;
+	int pwr = get_bits(4) & 0xF, val = get_bits(16) & 0xFFFF,
+	    count = 1 << pwr, v = 0;
 
 	for (int i = 0; i < count; i++) {
-		buff_middle[i] = ( short ) v;
+		buff_middle[i] = (short) v;
 		v += val;
 	}
 	v = -val;
 	for (int i = 0; i < count; i++) {
-		buff_middle[-i - 1] = ( short ) v;
+		buff_middle[-i - 1] = (short) v;
 		v -= val;
 	}
 
 	for (int pass = 0; pass < sb_size; pass++) {
-		int ind = get_bits( 5 ) & 0x1F;
-		if (!( ( this->*Fillers[ind] ) ( pass, ind ) )) {
+		int ind = get_bits(5) & 0x1F;
+		if (!((this->*Fillers[ind])(pass, ind))) {
 			return 0;
 		}
 	}
@@ -160,21 +160,21 @@ int CValueUnpacker::return0(int /*pass*/, int /*ind*/)
 int CValueUnpacker::zero_fill(int pass, int /*ind*/)
 {
 	//Eng: used when the whole column #pass is zero-filled
-	int* sb_ptr = &block_ptr[pass], step = sb_size, i = subblocks;
+	int *sb_ptr = &block_ptr[pass], step = sb_size, i = subblocks;
 	do {
 		*sb_ptr = 0;
 		sb_ptr += step;
-	} while (( --i ) != 0);
+	} while ((--i) != 0);
 	return 1;
 }
 
 int CValueUnpacker::linear_fill(int pass, int ind)
 {
-	int mask = ( 1 << ind ) - 1;
+	int mask = (1 << ind) - 1;
 	const short* lb_ptr = buff_middle + int(((size_t) -1) << (ind - 1));
 
 	for (int i = 0; i < subblocks; i++)
-		block_ptr[i * sb_size + pass] = lb_ptr[get_bits( ind ) & mask];
+		block_ptr[i * sb_size + pass] = lb_ptr[get_bits(ind) & mask];
 	return 1;
 }
 int CValueUnpacker::k1_3bits(int pass, int /*ind*/)
@@ -183,19 +183,20 @@ int CValueUnpacker::k1_3bits(int pass, int /*ind*/)
 	// efficiency (bits per value): 3-p0-2.5*p00, p00 - cnt of paired zeros, p0 - cnt of single zeros.
 	//Eng: it makes sense to use, when the freqnecy of paired zeros (p00) is greater than 2/3
 	for (int i = 0; i < subblocks; i++) {
-		prepare_bits( 3 );
-		if (( next_bits & 1 ) == 0) {
+		prepare_bits(3);
+		if ((next_bits & 1) == 0) {
 			avail_bits--;
 			next_bits >>= 1;
-			block_ptr[i * sb_size + pass] = 0; if (( ++i ) == subblocks)
-												break;
 			block_ptr[i * sb_size + pass] = 0;
-		} else if (( next_bits & 2 ) == 0) {
+			if ((++i) == subblocks)
+				break;
+			block_ptr[i * sb_size + pass] = 0;
+		} else if ((next_bits & 2) == 0) {
 			avail_bits -= 2;
 			next_bits >>= 2;
 			block_ptr[i * sb_size + pass] = 0;
 		} else {
-			block_ptr[i * sb_size + pass] = ( next_bits & 4 ) ?
+			block_ptr[i * sb_size + pass] = (next_bits & 4) ?
 				buff_middle[1] :
 				buff_middle[-1];
 			avail_bits -= 3;
@@ -210,13 +211,13 @@ int CValueUnpacker::k1_2bits(int pass, int /*ind*/)
 	// efficiency: 2-P0. P0 - cnt of any zero (P0 = p0 + p00)
 	//Eng: use it when P0 > 1/3
 	for (int i = 0; i < subblocks; i++) {
-		prepare_bits( 2 );
-		if (( next_bits & 1 ) == 0) {
+		prepare_bits(2);
+		if ((next_bits & 1) == 0) {
 			avail_bits--;
 			next_bits >>= 1;
 			block_ptr[i * sb_size + pass] = 0;
 		} else {
-			block_ptr[i * sb_size + pass] = ( next_bits & 2 ) ?
+			block_ptr[i * sb_size + pass] = (next_bits & 2) ?
 				buff_middle[1] :
 				buff_middle[-1];
 			avail_bits -= 2;
@@ -232,14 +233,14 @@ int CValueUnpacker::t1_5bits(int pass, int /*ind*/)
 	// use it when P0 <= 1/3
 	for (int i = 0; i < subblocks; i++) {
 		int bits = get_bits(5) & 0x1f;
-		bits = ( int ) Table1[bits];
+		bits = (int) Table1[bits];
 
-		block_ptr[i * sb_size + pass] = buff_middle[-1 + ( bits & 3 )];
-		if (( ++i ) == subblocks)
+		block_ptr[i * sb_size + pass] = buff_middle[-1 + (bits & 3)];
+		if ((++i) == subblocks)
 			break;
 		bits >>= 2;
-		block_ptr[i * sb_size + pass] = buff_middle[-1 + ( bits & 3 )];
-		if (( ++i ) == subblocks)
+		block_ptr[i * sb_size + pass] = buff_middle[-1 + (bits & 3)];
+		if ((++i) == subblocks)
 			break;
 		bits >>= 2;
 		block_ptr[i * sb_size + pass] = buff_middle[-1 + bits];
@@ -252,21 +253,22 @@ int CValueUnpacker::k2_4bits(int pass, int /*ind*/)
 	// efficiency: 4-2*p0-3.5*p00, p00 - cnt of paired zeros, p0 - cnt of single zeros.
 	//Eng: makes sense to use when p00>2/3
 	for (int i = 0; i < subblocks; i++) {
-		prepare_bits( 4 );
-		if (( next_bits & 1 ) == 0) {
+		prepare_bits(4);
+		if ((next_bits & 1) == 0) {
 			avail_bits--;
 			next_bits >>= 1;
-			block_ptr[i * sb_size + pass] = 0; if (( ++i ) == subblocks)
-												break;
 			block_ptr[i * sb_size + pass] = 0;
-		} else if (( next_bits & 2 ) == 0) {
+			if ((++i) == subblocks)
+				break;
+			block_ptr[i * sb_size + pass] = 0;
+		} else if ((next_bits & 2) == 0) {
 			avail_bits -= 2;
 			next_bits >>= 2;
 			block_ptr[i * sb_size + pass] = 0;
 		} else {
-			block_ptr[i * sb_size + pass] = ( next_bits & 8 ) ?
-				( ( next_bits & 4 ) ? buff_middle[2] : buff_middle[1] ) :
-				( ( next_bits & 4 ) ? buff_middle[-1] : buff_middle[-2] );
+			block_ptr[i * sb_size + pass] = (next_bits & 8) ?
+				((next_bits & 4) ? buff_middle[2] : buff_middle[1]) :
+				((next_bits & 4) ? buff_middle[-1] : buff_middle[-2]);
 			avail_bits -= 4;
 			next_bits >>= 4;
 		}
@@ -279,15 +281,15 @@ int CValueUnpacker::k2_3bits(int pass, int /*ind*/)
 	// efficiency: 3-2*P0, P0 - cnt of any zero (P0 = p0 + p00)
 	//Eng: use when P0>1/3
 	for (int i = 0; i < subblocks; i++) {
-		prepare_bits( 3 );
-		if (( next_bits & 1 ) == 0) {
+		prepare_bits(3);
+		if ((next_bits & 1) == 0) {
 			avail_bits--;
 			next_bits >>= 1;
 			block_ptr[i * sb_size + pass] = 0;
 		} else {
-			block_ptr[i * sb_size + pass] = ( next_bits & 4 ) ?
-				( ( next_bits & 2 ) ? buff_middle[2] : buff_middle[1] ) :
-				( ( next_bits & 2 ) ? buff_middle[-1] : buff_middle[-2] );
+			block_ptr[i * sb_size + pass] = (next_bits & 4) ?
+				((next_bits & 2) ? buff_middle[2] : buff_middle[1]) :
+				((next_bits & 2) ? buff_middle[-1] : buff_middle[-2]);
 			avail_bits -= 3;
 			next_bits >>= 3;
 		}
@@ -303,12 +305,12 @@ int CValueUnpacker::t2_7bits(int pass, int /*ind*/)
 		int bits = get_bits(7) & 0x7f;
 		short val = Table2[bits];
 
-		block_ptr[i * sb_size + pass] = buff_middle[-2 + ( val & 7 )];
-		if (( ++i ) == subblocks)
+		block_ptr[i * sb_size + pass] = buff_middle[-2 + (val & 7)];
+		if ((++i) == subblocks)
 			break;
 		val >>= 3;
-		block_ptr[i * sb_size + pass] = buff_middle[-2 + ( val & 7 )];
-		if (( ++i ) == subblocks)
+		block_ptr[i * sb_size + pass] = buff_middle[-2 + (val & 7)];
+		if ((++i) == subblocks)
 			break;
 		val >>= 3;
 		block_ptr[i * sb_size + pass] = buff_middle[-2 + val];
@@ -321,26 +323,27 @@ int CValueUnpacker::k3_5bits(int pass, int /*ind*/)
 	// efficiency: 5-3*p0-4.5*p00-p1, p00 - cnt of paired zeros, p0 - cnt of single zeros, p1 - cnt of +/- 1.
 	// can be used when frequency of paired zeros (p00) is greater than 2/3
 	for (int i = 0; i < subblocks; i++) {
-		prepare_bits( 5 );
-		if (( next_bits & 1 ) == 0) {
+		prepare_bits(5);
+		if ((next_bits & 1) == 0) {
 			avail_bits--;
 			next_bits >>= 1;
-			block_ptr[i * sb_size + pass] = 0; if (( ++i ) == subblocks)
-												break;
 			block_ptr[i * sb_size + pass] = 0;
-		} else if (( next_bits & 2 ) == 0) {
+			if ((++i) == subblocks)
+				break;
+			block_ptr[i * sb_size + pass] = 0;
+		} else if ((next_bits & 2) == 0) {
 			avail_bits -= 2;
 			next_bits >>= 2;
 			block_ptr[i * sb_size + pass] = 0;
-		} else if (( next_bits & 4 ) == 0) {
-			block_ptr[i * sb_size + pass] = ( next_bits & 8 ) ?
-					buff_middle[1] :
-					buff_middle[-1];
-				avail_bits -= 4;
-				next_bits >>= 4;
+		} else if ((next_bits & 4) == 0) {
+			block_ptr[i * sb_size + pass] = (next_bits & 8) ?
+				buff_middle[1] :
+				buff_middle[-1];
+			avail_bits -= 4;
+			next_bits >>= 4;
 		} else {
 			avail_bits -= 5;
-			int val = ( next_bits & 0x18 ) >> 3;
+			int val = (next_bits & 0x18) >> 3;
 			next_bits >>= 5;
 			if (val >= 2)
 				val += 3;
@@ -354,19 +357,19 @@ int CValueUnpacker::k3_4bits(int pass, int /*ind*/)
 	// fills with values: -3, -2, -1, 0, 1, 2, 3.
 	// efficiency: 4-3*P0-p1, P0 - cnt of all zeros (P0 = p0 + p00), p1 - cnt of +/- 1.
 	for (int i = 0; i < subblocks; i++) {
-		prepare_bits( 4 );
-		if (( next_bits & 1 ) == 0) {
+		prepare_bits(4);
+		if ((next_bits & 1) == 0) {
 			avail_bits--;
 			next_bits >>= 1;
 			block_ptr[i * sb_size + pass] = 0;
-		} else if (( next_bits & 2 ) == 0) {
+		} else if ((next_bits & 2) == 0) {
 			avail_bits -= 3;
-			block_ptr[i * sb_size + pass] = ( next_bits & 4 ) ?
+			block_ptr[i * sb_size + pass] = (next_bits & 4) ?
 				buff_middle[1] :
 				buff_middle[-1];
 			next_bits >>= 3;
 		} else {
-			int val = ( next_bits &0xC ) >> 2;
+			int val = (next_bits & 0xC) >> 2;
 			avail_bits -= 4;
 			next_bits >>= 4;
 			if (val >= 2)
@@ -382,19 +385,20 @@ int CValueUnpacker::k4_5bits(int pass, int /*ind*/)
 	// efficiency: 5-3*p0-4.5*p00, p00 - cnt of paired zeros, p0 - cnt of single zeros.
 	//Eng: makes sense to use when p00>2/3
 	for (int i = 0; i < subblocks; i++) {
-		prepare_bits( 5 );
-		if (( next_bits & 1 ) == 0) {
+		prepare_bits(5);
+		if ((next_bits & 1) == 0) {
 			avail_bits--;
 			next_bits >>= 1;
-			block_ptr[i * sb_size + pass] = 0; if (( ++i ) == subblocks)
-												break;
 			block_ptr[i * sb_size + pass] = 0;
-		} else if (( next_bits & 2 ) == 0) {
+			if ((++i) == subblocks)
+				break;
+			block_ptr[i * sb_size + pass] = 0;
+		} else if ((next_bits & 2) == 0) {
 			avail_bits -= 2;
 			next_bits >>= 2;
 			block_ptr[i * sb_size + pass] = 0;
 		} else {
-			int val = ( next_bits &0x1C ) >> 2;
+			int val = (next_bits & 0x1C) >> 2;
 			if (val >= 4)
 				val++;
 			block_ptr[i * sb_size + pass] = buff_middle[-4 + val];
@@ -409,13 +413,13 @@ int CValueUnpacker::k4_4bits(int pass, int /*ind*/)
 	// fills with values: +/-4, +/-3, +/-2, +/-1, 0, and double zeros
 	// efficiency: 4-3*P0, P0 - cnt of all zeros (both single and paired).
 	for (int i = 0; i < subblocks; i++) {
-		prepare_bits( 4 );
-		if (( next_bits & 1 ) == 0) {
+		prepare_bits(4);
+		if ((next_bits & 1) == 0) {
 			avail_bits--;
 			next_bits >>= 1;
 			block_ptr[i * sb_size + pass] = 0;
 		} else {
-			int val = ( next_bits &0xE ) >> 1;
+			int val = (next_bits & 0xE) >> 1;
 			avail_bits -= 4;
 			next_bits >>= 4;
 			if (val >= 4)
@@ -433,8 +437,8 @@ int CValueUnpacker::t3_7bits(int pass, int /*ind*/)
 		int bits = get_bits(7) & 0x7f;
 		unsigned char val = Table3[bits];
 
-		block_ptr[i * sb_size + pass] = buff_middle[-5 + ( val & 0xF )];
-		if (( ++i ) == subblocks)
+		block_ptr[i * sb_size + pass] = buff_middle[-5 + (val & 0xF)];
+		if ((++i) == subblocks)
 			break;
 		val >>= 4;
 		block_ptr[i * sb_size + pass] = buff_middle[-5 + val];

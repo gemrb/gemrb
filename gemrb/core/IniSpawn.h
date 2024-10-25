@@ -45,59 +45,59 @@ class Map;
 
 //critter flags
 #define CF_IGNORECANSEE 1
-#define CF_DEATHVAR    2
-#define CF_NO_DIFF_1 4
-#define CF_NO_DIFF_2 8
-#define CF_NO_DIFF_3 16
+#define CF_DEATHVAR     2
+#define CF_NO_DIFF_1    4
+#define CF_NO_DIFF_2    8
+#define CF_NO_DIFF_3    16
 // 32
-#define CF_INC_INDEX 64
-#define CF_HOLD_POINT 128
-#define CF_NO_DIFF_MASK 28
-#define CF_CHECK_NAME 256
-#define CF_GOOD 512
-#define CF_LAW 1024
-#define CF_LADY 2048
-#define CF_MURDER 4096
-#define CF_FACTION 8192
-#define CF_TEAM 16384
-#define CF_BUDDY 0x8000
+#define CF_INC_INDEX        64
+#define CF_HOLD_POINT       128
+#define CF_NO_DIFF_MASK     28
+#define CF_CHECK_NAME       256
+#define CF_GOOD             512
+#define CF_LAW              1024
+#define CF_LADY             2048
+#define CF_MURDER           4096
+#define CF_FACTION          8192
+#define CF_TEAM             16384
+#define CF_BUDDY            0x8000
 #define CF_DISABLE_RENDERER 0x10000
-#define CF_SAFEST_POINT 0x20000
+#define CF_SAFEST_POINT     0x20000
 
 struct CritterEntry {
-	std::vector<ResRef> CreFile;        //spawn one of these creatures
+	std::vector<ResRef> CreFile; //spawn one of these creatures
 	ieByte Spec[9] {}; // existence check IDS qualifier
-	ieByte SetSpec[9]{};  // set IDS qualifier
+	ieByte SetSpec[9] {}; // set IDS qualifier
 	ieVariable ScriptName; // existence check scripting name
-	ieVariable SpecVar;       //condition variable
-	ResRef SpecContext;     //condition variable context
-	ResRef OverrideScript;  //override override script
+	ieVariable SpecVar; //condition variable
+	ResRef SpecContext; //condition variable context
+	ResRef OverrideScript; //override override script
 	ResRef ClassScript; // override class script
-	ResRef RaceScript;      //override race script
-	ResRef GeneralScript;   //override general script
-	ResRef DefaultScript;   //override default script
-	ResRef AreaScript;      //override area script
-	ResRef SpecificScript;  //override specific script
-	ResRef Dialog;          //override dialog
+	ResRef RaceScript; //override race script
+	ResRef GeneralScript; //override general script
+	ResRef DefaultScript; //override default script
+	ResRef AreaScript; //override area script
+	ResRef SpecificScript; //override specific script
+	ResRef Dialog; //override dialog
 	ResRef PointSelectContext;
 	ieVariable PointSelectVar; // holds spawn point index to use
 	ResRef SaveSelectedPointContext = "GLOBAL";
 	ieVariable SaveSelectedPoint; // a var to save the selected spawn point location to
 	ResRef SaveSelectedFacingContext = "GLOBAL";
 	ieVariable SaveSelectedFacing; // a var to save the selected spawn point orientation to
-	Point SpawnPoint;         //spawn point
+	Point SpawnPoint; //spawn point
 	std::string SpawnPointsDef; // the unparsed available spawn points
-	char SpawnMode = '\0';    // the spawn point selection mode
-	int SpecVarOperator = 0;  // operation performed on spec var
-	int SpecVarValue = 0;     // using this value with the operation
-	int SpecVarInc = 0;       // add this to spec var at each spawn
-	int Orientation = 0;      // spawn orientation
-	int Orientation2 = 0;     // spawn orientation if the spawn point doesn't specify it
-	int Flags = 0;            // CF_IGNORENOSEE, CF_DEATHVAR, etc
-	int TotalQuantity = 0;    // total number
-	int SpawnCount = 0;       // create quantity
-	ieDword TimeOfDay = 0;    // spawn time of day (defaults to anytime)
-	ieByte DeathCounters[4]{}; // 4 bytes
+	char SpawnMode = '\0'; // the spawn point selection mode
+	int SpecVarOperator = 0; // operation performed on spec var
+	int SpecVarValue = 0; // using this value with the operation
+	int SpecVarInc = 0; // add this to spec var at each spawn
+	int Orientation = 0; // spawn orientation
+	int Orientation2 = 0; // spawn orientation if the spawn point doesn't specify it
+	int Flags = 0; // CF_IGNORENOSEE, CF_DEATHVAR, etc
+	int TotalQuantity = 0; // total number
+	int SpawnCount = 0; // create quantity
+	ieDword TimeOfDay = 0; // spawn time of day (defaults to anytime)
+	ieByte DeathCounters[4] {}; // 4 bytes
 };
 
 /**
@@ -119,9 +119,9 @@ public:
 struct VariableSpec {
 	ieVariable Name {};
 	ieDword Value = 0;
-	
+
 	VariableSpec(const ieVariable& name, ieDword val)
-	: Name(name), Value(val)
+		: Name(name), Value(val)
 	{}
 };
 
@@ -152,6 +152,7 @@ private:
 	int GetDiffMode(const ieVariable& keyword) const;
 	void PrepareSpawnPoints(const DataFileMgr* iniFile, StringView critterName, CritterEntry& critter) const;
 	void SelectSpawnPoint(CritterEntry& critter) const;
+
 public:
 	/* called by action of the same name */
 	void SetNamelessDeath(const ResRef& area, const Point& pos, ieDword state);
@@ -164,4 +165,4 @@ public:
 
 }
 
-#endif  // ! INISPAWN_H
+#endif // ! INISPAWN_H

@@ -27,10 +27,10 @@
 #ifndef WORLDMAPCONTROL_H
 #define WORLDMAPCONTROL_H
 
+#include "exports.h"
+
 #include "GUI/Control.h"
 #include "GUI/GUIAnimation.h"
-
-#include "exports.h"
 
 namespace GemRB {
 
@@ -44,7 +44,8 @@ class WorldMapControl;
  * allowing travelling between areas.
  */
 
-class GEM_EXPORT WorldMapControl : public Control, public View::Scrollable {
+class GEM_EXPORT WorldMapControl : public Control,
+				   public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
@@ -52,7 +53,7 @@ private:
 
 public:
 	WorldMapControl(const Region& frame, Holder<Font> font);
-	WorldMapControl(const Region& frame, Holder<Font> font, const Color &normal, const Color &selected, const Color &notvisited);
+	WorldMapControl(const Region& frame, Holder<Font> font, const Color& normal, const Color& selected, const Color& notvisited);
 
 	/** Allows modification of the scrolling factor from outside */
 	void ScrollDelta(const Point& delta) override;
@@ -60,7 +61,7 @@ public:
 
 	Point Pos;
 	/** pointer to last pointed area */
-	WMPAreaEntry *Area = nullptr;
+	WMPAreaEntry* Area = nullptr;
 	Holder<Sprite2D> areaIndicator;
 	ColorAnimation hoverAnim;
 
@@ -92,7 +93,6 @@ private:
 	Color color_selected;
 	/** Label color of a not yet visited area */
 	Color color_notvisited;
-
 };
 
 }

@@ -43,22 +43,22 @@ enum orient_t : uint8_t {
 			   |
 			   |
 	*/
-	S		= 0,
-	SSW		= 1,
-	SW		= 2,
-	WSW		= 3,
-	W		= 4,
-	WNW		= 5,
-	NW		= 6,
-	NNW		= 7,
-	N 		= 8,
-	NNE 	= 9,
-	NE 		= 10,
-	ENE 	= 11,
-	E 		= 12,
-	ESE 	= 13,
-	SE 		= 14,
-	SSE 	= 15,
+	S = 0,
+	SSW = 1,
+	SW = 2,
+	WSW = 3,
+	W = 4,
+	WNW = 5,
+	NW = 6,
+	NNW = 7,
+	N = 8,
+	NNE = 9,
+	NE = 10,
+	ENE = 11,
+	E = 12,
+	ESE = 13,
+	SE = 14,
+	SSE = 15,
 
 	// this is not a valid orientation
 	INVALID = 16,
@@ -146,7 +146,8 @@ inline Point OrientedOffset(orient_t face, int offset)
 	return Point(x * offset, y * offset);
 }
 
-inline orient_t GetNextFace(orient_t old, orient_t next) {
+inline orient_t GetNextFace(orient_t old, orient_t next)
+{
 	if (old != next) {
 		if (ClampToOrientation(next - old) <= MAX_ORIENT / 2) {
 			old = NextOrientation(old);

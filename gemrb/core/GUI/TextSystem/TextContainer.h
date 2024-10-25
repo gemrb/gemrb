@@ -38,9 +38,9 @@ class TextContainer;
 
 struct LayoutRegion {
 	Region region;
-	
+
 	explicit LayoutRegion(Region r)
-	: region(std::move(r)) {}
+		: region(std::move(r)) {}
 };
 
 using LayoutRegions = std::vector<std::shared_ptr<LayoutRegion>>;
@@ -48,7 +48,8 @@ using LayoutRegions = std::vector<std::shared_ptr<LayoutRegion>>;
 // interface for both content and content containers
 // can instantiate to produce empty areas in layout
 class Content {
-friend class ContentContainer;
+	friend class ContentContainer;
+
 protected:
 	// content doesn't have an x, y (-1, -1) unless we want absolute positioning
 	// same applies for the dimensions, 0x0 implies unlimited area
@@ -56,7 +57,8 @@ protected:
 	ContentContainer* parent = nullptr;
 
 public:
-	explicit Content(const Size& size) : frame(Point(0, 0), size) {};
+	explicit Content(const Size& size)
+		: frame(Point(0, 0), size) {};
 	virtual ~Content() noexcept = default;
 
 	virtual Size ContentFrame() const { return frame.size; };
@@ -69,20 +71,20 @@ protected:
 
 
 // Content classes
-class TextSpan final : public Content
-{
-friend class TextContainer;
+class TextSpan final : public Content {
+	friend class TextContainer;
+
 private:
 	String text;
 	const Holder<Font> font;
 	Font::PrintColors* colors = nullptr;
-	
+
 	struct TextLayoutRegion : LayoutRegion {
 		size_t beginCharIdx;
 		size_t endCharIdx;
-		
+
 		TextLayoutRegion(Region r, size_t begin, size_t end)
-		: LayoutRegion(std::move(r)), beginCharIdx(begin), endCharIdx(end) {}
+			: LayoutRegion(std::move(r)), beginCharIdx(begin), endCharIdx(end) {}
 	};
 
 public:
@@ -93,7 +95,7 @@ public:
 	TextSpan(const TextSpan&) = delete;
 	~TextSpan() final;
 	TextSpan& operator=(const TextSpan&) = delete;
-	
+
 	void ClearColors();
 	void SetColors(const Color& fg, const Color& bg);
 
@@ -111,8 +113,7 @@ private:
 };
 
 
-class ImageSpan : public Content
-{
+class ImageSpan : public Content {
 private:
 	Holder<Sprite2D> image;
 
@@ -125,8 +126,7 @@ protected:
 
 
 // Content container classes
-class ContentContainer : public View
-{
+class ContentContainer : public View {
 public:
 	using ContentList = std::list<Content*>;
 
@@ -136,19 +136,20 @@ public:
 		ieByte bottom;
 		ieByte left;
 
-		Margin() : top(0), right(0), bottom(0), left(0) {}
+		Margin()
+			: top(0), right(0), bottom(0), left(0) {}
 
 		explicit Margin(ieByte top)
-		: top(top), right(top), bottom(top), left(top) {}
+			: top(top), right(top), bottom(top), left(top) {}
 
 		Margin(ieByte top, ieByte right)
-		: top(top), right(right), bottom(top), left(right) {}
+			: top(top), right(right), bottom(top), left(right) {}
 
 		Margin(ieByte top, ieByte right, ieByte bottom)
-		: top(top), right(right), bottom(bottom), left(right) {}
+			: top(top), right(right), bottom(bottom), left(right) {}
 
 		Margin(ieByte top, ieByte right, ieByte bottom, ieByte left)
-		: top(top), right(right), bottom(bottom), left(left) {}
+			: top(top), right(right), bottom(bottom), left(left) {}
 	};
 
 protected:
@@ -157,22 +158,26 @@ protected:
 	struct Layout {
 		const Content* content;
 		LayoutRegions regions;
-		
+
 		Layout(const Content* c, LayoutRegions rgns)
-		: content(c), regions(std::move(rgns)) {
+			: content(c), regions(std::move(rgns))
+		{
 			assert(!regions.empty());
 		}
 
-		bool operator==(const Content* c) const {
+		bool operator==(const Content* c) const
+		{
 			return c == content;
 		}
 
-		bool operator<(const Point& p) const {
+		bool operator<(const Point& p) const
+		{
 			const Region& r = regions.back()->region;
 			return r.y < p.y || (r.x < p.x && r.y == p.y);
 		}
 
-		bool PointInside(const Point& p) const {
+		bool PointInside(const Point& p) const
+		{
 			for (const auto& layoutRegion : regions) {
 				const Region r = layoutRegion->region;
 				if (r.PointInside(p)) {
@@ -208,7 +213,7 @@ public:
 	const Region* ContentRegionForRect(const Region& rect) const;
 	Region BoundingBoxForContent(const Content*) const;
 	Region BoundingBoxForLayout(const LayoutRegions&) const;
-	
+
 	void SetMargin(Margin m);
 	void SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte left);
 	inline void SetMargin(ieByte top, ieByte right, ieByte bottom) { SetMargin(top, right, bottom, right); }
@@ -228,12 +233,12 @@ protected:
 
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	virtual void DrawContents(const Layout& contentLayout, Point point);
-	
+
 	void SizeChanged(const Size& oldSize) override;
 
 private:
 	virtual void ContentRemoved(const Content* /*content*/) {};
-	
+
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 };
@@ -274,7 +279,7 @@ public:
 	TextContainer(const TextContainer&) = delete;
 	~TextContainer() override;
 	TextContainer& operator=(const TextContainer&) = delete;
-	
+
 	// relative to cursor pos
 	void InsertText(const String& text);
 	void DeleteText(size_t len);
@@ -297,7 +302,7 @@ public:
 	void CursorHome();
 	void CursorEnd();
 	void AdvanceCursor(int);
-	
+
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
 	bool OnMouseDrag(const MouseEvent& /*me*/) override;
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;

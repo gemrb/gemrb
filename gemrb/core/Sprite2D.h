@@ -27,15 +27,16 @@
 #ifndef SPRITE2D_H
 #define SPRITE2D_H
 
-#include <cstddef>
-
 #include "RGBAColor.h"
 #include "exports.h"
 
 #include "Palette.h"
-#include "Video/Pixels.h"
 #include "Region.h"
 #include "TypeID.h"
+
+#include "Video/Pixels.h"
+
+#include <cstddef>
 
 namespace GemRB {
 
@@ -72,29 +73,29 @@ enum BlitFlags : uint32_t {
 class GEM_EXPORT Sprite2D {
 public:
 	static const TypeID ID;
-	
+
 	using Iterator = PixelFormatIterator;
 	Iterator GetIterator(IPixelIterator::Direction xdir = IPixelIterator::Forward,
-						 IPixelIterator::Direction ydir = IPixelIterator::Forward);
+			     IPixelIterator::Direction ydir = IPixelIterator::Forward);
 
 	Iterator GetIterator(IPixelIterator::Direction xdir,
-						 IPixelIterator::Direction ydir,
-						 const Region& clip);
-	
+			     IPixelIterator::Direction ydir,
+			     const Region& clip);
+
 	Iterator GetIterator(IPixelIterator::Direction xdir = IPixelIterator::Forward,
-						 IPixelIterator::Direction ydir = IPixelIterator::Forward) const;
+			     IPixelIterator::Direction ydir = IPixelIterator::Forward) const;
 
 	Iterator GetIterator(IPixelIterator::Direction xdir,
-						 IPixelIterator::Direction ydir,
-						 const Region& clip) const;
+			     IPixelIterator::Direction ydir,
+			     const Region& clip) const;
 
 protected:
 	void* pixels = nullptr;
 	bool freePixels = true;
-	
+
 	PixelFormat format;
 	uint16_t pitch = 0;
-	
+
 	virtual void UpdatePalette() noexcept {};
 	virtual void UpdateColorKey() noexcept {};
 
@@ -104,7 +105,7 @@ public:
 
 	Sprite2D(const Region&, void* pixels, const PixelFormat& fmt, uint16_t pitch) noexcept;
 	Sprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
-	Sprite2D(const Sprite2D &obj) noexcept;
+	Sprite2D(const Sprite2D& obj) noexcept;
 	Sprite2D(Sprite2D&&) noexcept;
 	virtual ~Sprite2D() noexcept;
 
@@ -112,7 +113,7 @@ public:
 
 	virtual bool HasTransparency() const noexcept;
 	bool IsPixelTransparent(const Point& p) const noexcept;
-	
+
 	uint16_t GetPitch() const noexcept { return pitch; }
 
 	virtual const void* LockSprite() const;
@@ -123,7 +124,7 @@ public:
 	Color GetPixel(const Point&) const noexcept;
 	Holder<Palette> GetPalette() const noexcept { return format.palette; }
 	void SetPalette(const Holder<Palette>& pal);
-	
+
 	/* GetColorKey: either a px value or a palette index if sprite has a palette. */
 	colorkey_t GetColorKey() const noexcept { return format.ColorKey; }
 	/* SetColorKey: either a px value or a palette index if sprite has a palette. */
@@ -134,4 +135,4 @@ public:
 
 }
 
-#endif  // ! SPRITE2D_H
+#endif // ! SPRITE2D_H

@@ -36,7 +36,7 @@ Calendar::Calendar(void)
 	days.resize(monthNameCount);
 
 	for (size_t i = 0; i < monthNameCount; i++) {
-		days[i] = tab->QueryFieldSigned<int>(i,0);
+		days[i] = tab->QueryFieldSigned<int>(i, 0);
 		daysInYear += days[i];
 		monthNames[i] = tab->QueryFieldAsStrRef(i, 1);
 	}
@@ -44,7 +44,7 @@ Calendar::Calendar(void)
 
 void Calendar::GetMonthName(int dayAndMonth) const
 {
-	int month=1;
+	int month = 1;
 
 	for (size_t i = 0; i < monthNames.size(); ++i) {
 		if (dayAndMonth < days[i]) {
@@ -55,7 +55,7 @@ void Calendar::GetMonthName(int dayAndMonth) const
 		}
 		dayAndMonth -= days[i];
 		//ignoring single days (they are not months)
-		if (days[i]!=1) month++;
+		if (days[i] != 1) month++;
 	}
 }
 

@@ -19,6 +19,7 @@
  */
 
 #include "Sprite2D.h"
+
 #include "Video/RLE.h"
 
 namespace GemRB {
@@ -31,7 +32,7 @@ Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelI
 }
 
 Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir,
-										 const Region& clip)
+					 const Region& clip)
 {
 	if (renderFlags & BlitFlags::MIRRORX) xdir = IPixelIterator::Direction(int(xdir) * -1);
 	if (renderFlags & BlitFlags::MIRRORY) ydir = IPixelIterator::Direction(int(ydir) * -1);
@@ -44,7 +45,7 @@ Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelI
 }
 
 Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir,
-										 const Region& clip) const
+					 const Region& clip) const
 {
 	if (renderFlags & BlitFlags::MIRRORX) xdir = IPixelIterator::Direction(int(xdir) * -1);
 	if (renderFlags & BlitFlags::MIRRORY) ydir = IPixelIterator::Direction(int(ydir) * -1);
@@ -52,22 +53,22 @@ Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelI
 }
 
 Sprite2D::Sprite2D(const Region& rgn, void* pixels, const PixelFormat& fmt, uint16_t pitch) noexcept
-: pixels(pixels), freePixels(pixels), format(fmt), pitch(pitch), Frame(rgn)
+	: pixels(pixels), freePixels(pixels), format(fmt), pitch(pitch), Frame(rgn)
 {}
 
 Sprite2D::Sprite2D(const Region& frame, void* pixels, const PixelFormat& fmt) noexcept
-: Sprite2D(frame, pixels, fmt, frame.w)
+	: Sprite2D(frame, pixels, fmt, frame.w)
 {}
 
-Sprite2D::Sprite2D(const Sprite2D &obj) noexcept
-: Sprite2D(obj.Frame, obj.pixels, obj.format, obj.pitch)
+Sprite2D::Sprite2D(const Sprite2D& obj) noexcept
+	: Sprite2D(obj.Frame, obj.pixels, obj.format, obj.pitch)
 {
 	renderFlags = obj.renderFlags;
 	freePixels = false;
 }
 
 Sprite2D::Sprite2D(Sprite2D&& obj) noexcept
-: Sprite2D(obj.Frame, obj.pixels, obj.format, obj.pitch)
+	: Sprite2D(obj.Frame, obj.pixels, obj.format, obj.pitch)
 {
 	renderFlags = obj.renderFlags;
 }
@@ -118,14 +119,14 @@ void Sprite2D::SetPalette(const Holder<Palette>& pal)
 	assert(pal != nullptr);
 
 	if (pal == format.palette) return;
-	
+
 	if (format.RLE) {
 		format.palette = pal;
 	} else {
 		// we don't use shared palettes because it is a performance bottleneck on SDL2
 		format.palette = MakeHolder<Palette>(*pal);
 	}
-	
+
 	UpdatePalette();
 }
 

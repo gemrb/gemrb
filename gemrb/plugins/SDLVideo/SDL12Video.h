@@ -36,11 +36,11 @@ private:
 public:
 	SDL12VideoDriver() noexcept;
 	~SDL12VideoDriver() noexcept override;
-	
-	int Init(void) override;
-	void SetWindowTitle(const char *title) override { SDL_WM_SetCaption(title, 0); };
 
-	Holder<Sprite2D> GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;
+	int Init(void) override;
+	void SetWindowTitle(const char* title) override { SDL_WM_SetCaption(title, 0); };
+
+	Holder<Sprite2D> GetScreenshot(Region r, const VideoBufferPtr& buf = nullptr) override;
 
 	bool SetFullscreenMode(bool set) override;
 
@@ -55,7 +55,7 @@ public:
 	void SetGamma(int brightness, int contrast) override;
 
 	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
-						 Color tint = Color()) override;
+			     Color tint = Color()) override;
 
 private:
 	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt) override;
@@ -68,15 +68,15 @@ private:
 	SDLVideoDriver::vid_buf_t* ScratchBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
-	
+
 	IAlphaIterator* StencilIterator(BlitFlags flags, const Region& dst) const;
 
-	int ProcessEvent(const SDL_Event & event) override;
+	int ProcessEvent(const SDL_Event& event) override;
 
 	void BlitSpriteRLEClipped(const Holder<Sprite2D>& spr, const Region& src, const Region& dst,
-							  BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL) override;
+				  BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL) override;
 	void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst,
-								 BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;
+				     BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;
 
 	void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst, BlitFlags flags, Color tint);
 	void BlitSpriteNativeClipped(SDL_Surface* surf, SDL_Rect* src, SDL_Rect* dst, BlitFlags flags, Color tint);
@@ -100,7 +100,7 @@ class SDLSurfaceVideoBuffer : public VideoBuffer {
 
 public:
 	SDLSurfaceVideoBuffer(SDL_Surface* surf, const Point& p)
-	: VideoBuffer(Region(p, ::GemRB::Size(surf->w, surf->h)))
+		: VideoBuffer(Region(p, ::GemRB::Size(surf->w, surf->h)))
 	{
 		assert(surf);
 		buffer = surf;
@@ -108,11 +108,13 @@ public:
 		VideoBuffer::Clear();
 	}
 
-	~SDLSurfaceVideoBuffer() override {
+	~SDLSurfaceVideoBuffer() override
+	{
 		SDL_FreeSurface(buffer);
 	}
 
-	void Clear(const Region& rgn) override {
+	void Clear(const Region& rgn) override
+	{
 		SDL_Rect r = RectFromRegion(rgn);
 		if (buffer->flags & SDL_SRCCOLORKEY) {
 			SDL_FillRect(buffer, &r, buffer->format->colorkey);
@@ -121,30 +123,33 @@ public:
 		}
 	}
 
-	SDL_Surface* Surface() {
+	SDL_Surface* Surface()
+	{
 		return buffer;
 	}
 
-	bool RenderOnDisplay(void* display) const override {
+	bool RenderOnDisplay(void* display) const override
+	{
 		SDL_Surface* sdldisplay = static_cast<SDL_Surface*>(display);
 		SDL_Rect dst = RectFromRegion(rect);
-		SDL_BlitSurface( buffer, NULL, sdldisplay, &dst );
+		SDL_BlitSurface(buffer, NULL, sdldisplay, &dst);
 		return true;
 	}
 
-	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) override {
+	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) override
+	{
 		SDL_Surface* sprite = NULL;
 
 		// we can safely const_cast pixelBuf because the surface is destroyed before return and we dont alter it
 
 		// FIXME: this should support everything from Video::BufferFormat
 		if (buffer->format->BitsPerPixel == 16) { // RGB555
-			sprite = SDL_CreateRGBSurfaceFrom( const_cast<void*>(pixelBuf), bufDest.w, bufDest.h, 16, 2 * bufDest.w, 0x7C00, 0x03E0, 0x001F, 0 );
+			sprite = SDL_CreateRGBSurfaceFrom(const_cast<void*>(pixelBuf), bufDest.w, bufDest.h, 16, 2 * bufDest.w, 0x7C00, 0x03E0, 0x001F, 0);
 		} else { // RGBPAL8
-			sprite = SDL_CreateRGBSurfaceFrom( const_cast<void*>(pixelBuf), bufDest.w, bufDest.h, 8, bufDest.w, 0, 0, 0, 0 );
+			sprite = SDL_CreateRGBSurfaceFrom(const_cast<void*>(pixelBuf), bufDest.w, bufDest.h, 8, bufDest.w, 0, 0, 0, 0);
 			va_list args;
 			va_start(args, pitch);
-			Palette *pal = va_arg(args, Palette *);
+			Palette* pal = va_arg(args, Palette*);
 			memcpy(sprite->format->palette->colors, pal->col, sprite->format->palette->ncolors * 4);
 			va_end(args);
 		}
@@ -162,32 +167,34 @@ class SDLOverlayVideoBuffer : public VideoBuffer {
 
 public:
 	SDLOverlayVideoBuffer(const Point& p, SDL_Overlay* overlay)
-	: VideoBuffer(Region(p, ::GemRB::Size(overlay->w, overlay->h)))
+		: VideoBuffer(Region(p, ::GemRB::Size(overlay->w, overlay->h)))
 	{
 		assert(overlay);
 		this->overlay = overlay;
 		changed = false;
 	}
 
-	~SDLOverlayVideoBuffer() override {
+	~SDLOverlayVideoBuffer() override
+	{
 		SDL_FreeYUVOverlay(overlay);
 	}
 
 	void Clear(const Region&) override {}
 
-	bool RenderOnDisplay(void* /*display*/) const override {
+	bool RenderOnDisplay(void* /*display*/) const override
+	{
 		if (changed) {
 			SDL_Rect dest = RectFromRegion(rect);
 			SDL_DisplayYUVOverlay(overlay, &dest);
 			changed = false;
-			
+
 			// IMPORTANT: if we ever wanted to combine rendering of overlay buffers with other buffers
 			// we would need to blit the result back to the display buffer
 			// I'm commenting it out because we currently only use these overlays for video
 			// and we need all the CPU we can get for that
 			// additionally, the changed flag probably won't work at that point
-			
-			
+
+
 			//SDL_Surface* sdldisplay = static_cast<SDL_Surface*>(display);
 			//SDL_Surface* sdl_disp = SDL_GetVideoSurface();
 			//SDL_LowerBlit(sdl_disp, &dest, sdldisplay, &dest);
@@ -195,11 +202,14 @@ public:
 		return false;
 	}
 
-	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) override {
+	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) override
+	{
 		va_list args;
 		va_start(args, pitch);
 
-		enum {Y, U, V};
+		enum { Y,
+		       U,
+		       V };
 		const ieByte* planes[3];
 		unsigned int strides[3];
 
@@ -214,7 +224,7 @@ public:
 
 		SDL_LockYUVOverlay(overlay);
 		for (unsigned int plane = 0; plane < 3; plane++) {
-			const unsigned char *data = planes[plane];
+			const unsigned char* data = planes[plane];
 			unsigned int size = overlay->pitches[plane];
 			if (strides[plane] < size) {
 				size = strides[plane];
@@ -223,7 +233,7 @@ public:
 			unsigned int destoffset = 0;
 			for (int i = 0; i < ((plane == 0) ? bufDest.h : (bufDest.h / 2)); i++) {
 				memcpy(overlay->pixels[plane] + destoffset,
-					   data + srcoffset, size);
+				       data + srcoffset, size);
 				srcoffset += strides[plane];
 				destoffset += overlay->pitches[plane];
 			}

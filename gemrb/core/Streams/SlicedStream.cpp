@@ -20,9 +20,9 @@
 
 #include "SlicedStream.h"
 
-#include "MemoryStream.h"
-
 #include "errors.h"
+
+#include "MemoryStream.h"
 
 #include "Logging/Logging.h"
 
@@ -53,7 +53,7 @@ strret_t SlicedStream::Read(void* dest, strpos_t length)
 {
 	//we don't allow partial reads anyway, so it isn't a problem that
 	//i don't adjust length here (partial reads are evil)
-	if (Pos+length>size ) {
+	if (Pos + length > size) {
 		return Error;
 	}
 
@@ -63,7 +63,7 @@ strret_t SlicedStream::Read(void* dest, strpos_t length)
 		return Error;
 	}
 	if (Encrypted) {
-		ReadDecrypted( dest, c );
+		ReadDecrypted(dest, c);
 	}
 	Pos += c;
 	return c;
@@ -90,7 +90,7 @@ stroff_t SlicedStream::Seek(stroff_t newpos, strpos_t type)
 	}
 	str->Seek(startpos + Pos /*+ (Encrypted ? 2 : 0)*/, GEM_STREAM_START);
 	//we went past the buffer
-	if (Pos>size) {
+	if (Pos > size) {
 		Log(ERROR, "Streams", "Invalid seek position: {} (limit: {})", Pos, size);
 		return Error;
 	}
@@ -105,12 +105,12 @@ DataStream* SliceStream(DataStream* str, strpos_t startpos, strpos_t size, bool 
 		if (preservepos)
 			oldpos = str->GetPos();
 		str->Seek(startpos, GEM_STREAM_START);
-		char *data = (char*)malloc(size);
+		char* data = (char*) malloc(size);
 		str->Read(data, size);
 		if (preservepos)
 			str->Seek(oldpos, GEM_STREAM_START);
 
-		DataStream *mem = new MemoryStream(str->originalfile.c_str(), data, size);
+		DataStream* mem = new MemoryStream(str->originalfile.c_str(), data, size);
 		return mem;
 	} else
 		return new SlicedStream(str, startpos, size);

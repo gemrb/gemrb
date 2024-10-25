@@ -17,18 +17,18 @@
  */
 
 #include "Logging/Logging.h"
-#include "Streams/FileStream.h"
-#include "Logging/Loggers/Stdio.h"
 
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/TextArea.h"
+#include "Logging/Loggers/Stdio.h"
+#include "Streams/FileStream.h"
 
 #include <cstdarg>
 #include <memory>
 #include <vector>
 
 #ifndef STATIC_LINK
-# define STATIC_LINK
+	#define STATIC_LINK
 #endif
 #include "plugindef.h"
 
@@ -52,20 +52,20 @@ void ToggleLogging(bool enable)
 static void ConsoleWinLogMsg(const LogMessage& msg)
 {
 	if (msg.level > CWLL || msg.level < INTERNAL) return;
-	
+
 	TextArea* ta = GetControl<TextArea>("CONSOLE", 1);
-	
+
 	if (ta) {
 		auto GetRGB = [](const fmt::text_style& style) {
 			return style.get_foreground().value.rgb_color;
 		};
-		
+
 		LogLevel level = msg.level == INTERNAL ? FATAL : msg.level;
 		const auto& format = Logger::LevelFormat[level];
 		const auto& FMT = FMT_STRING(u"[color={:X}]{}: [/color][color={:X}]{}[/color]\n");
 		// MessageWindow supports only colors
 		ta->AppendText(fmt::format(FMT, GetRGB(msg.format), StringFromTLK(msg.owner),
-								   GetRGB(format), StringFromTLK(msg.message)));
+					   GetRGB(format), StringFromTLK(msg.message)));
 	}
 }
 
@@ -115,7 +115,7 @@ static void addGemRBLog(const CoreSettings& config)
 		if (file) {
 			AddLogWriter(createStreamLogWriter(file));
 		} else {
-			Log (WARNING, "Logger", "Could not create a log file, skipping!");
+			Log(WARNING, "Logger", "Could not create a log file, skipping!");
 		}
 	}
 }

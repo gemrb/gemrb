@@ -23,16 +23,17 @@
 #include "AmbientMgr.h"
 #include "GameData.h"
 #include "Interface.h" // GetMusicMgr()
-#include "Logging/Logging.h"
 #include "MusicMgr.h"
 #include "SoundMgr.h"
+
+#include "Logging/Logging.h"
 
 #include <SDL.h>
 #include <SDL_mixer.h>
 
 using namespace GemRB;
 
-static void SetChannelPosition(const Point &listenerPos, const Point &p, int channel, float rolloff)
+static void SetChannelPosition(const Point& listenerPos, const Point& p, int channel, float rolloff)
 {
 	int16_t angle = AngleFromPoints(listenerPos, p) * 180 / M_PI - 90;
 	if (angle < 0) {
@@ -69,7 +70,8 @@ void SDLAudioSoundHandle::StopLooping()
 	Mix_FadeOutChannel(chunkChannel, 1000);
 }
 
-SDLAudio::SDLAudio(void) : buffercache(BUFFER_CACHE_SIZE)
+SDLAudio::SDLAudio(void)
+	: buffercache(BUFFER_CACHE_SIZE)
 {
 }
 
@@ -101,22 +103,22 @@ bool SDLAudio::Init(void)
 		return false;
 	}
 
-	Mix_QuerySpec(&audio_rate, (Uint16 *)&audio_format, &audio_channels);
+	Mix_QuerySpec(&audio_rate, (Uint16*) &audio_format, &audio_channels);
 	Mix_ReserveChannels(AMBIENT_CHANNELS + 1); // for speech and ambients
 	ambim = new AmbientMgr();
 
 	return true;
 }
 
-void SDLAudio::SetAudioStreamVolume(uint8_t *stream, int len, int volume)
+void SDLAudio::SetAudioStreamVolume(uint8_t* stream, int len, int volume)
 {
 	// since it's at max volume by default
 	if (volume == MIX_MAX_VOLUME)
 		return;
-	uint8_t *mixData = new uint8_t[len];
+	uint8_t* mixData = new uint8_t[len];
 	memcpy(mixData, stream, len * sizeof(uint8_t));
 	memset(stream, 0, len); // mix audio data against silence
-#if SDL_VERSION_ATLEAST(2,0,0)
+#if SDL_VERSION_ATLEAST(2, 0, 0)
 	SDL_MixAudioFormat(stream, mixData, MIX_DEFAULT_FORMAT, len, MIX_MAX_VOLUME);
 #else
 	SDL_MixAudio(stream, mixData, len, MIX_MAX_VOLUME);
@@ -124,7 +126,7 @@ void SDLAudio::SetAudioStreamVolume(uint8_t *stream, int len, int volume)
 	delete[] mixData;
 }
 
-void SDLAudio::music_callback(void *udata, uint8_t *stream, int len)
+void SDLAudio::music_callback(void* udata, uint8_t* stream, int len)
 {
 	ieDword volume = core->GetDictionary().Get("Volume Music", 100);
 
@@ -133,16 +135,16 @@ void SDLAudio::music_callback(void *udata, uint8_t *stream, int len)
 		return;
 	}
 
-	uint8_t *mixerStream = stream;
+	uint8_t* mixerStream = stream;
 	int mixerLen = len;
 
-	SDLAudio *driver = (SDLAudio *)udata;
+	SDLAudio* driver = (SDLAudio*) udata;
 
 	do {
 		std::lock_guard<std::recursive_mutex> l(driver->MusicMutex);
 
 		int num_samples = len / 2;
-		int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
+		int cnt = driver->MusicReader->read_samples((short*) stream, num_samples);
 
 		// Done?
 		if (cnt == num_samples)
@@ -161,14 +163,14 @@ void SDLAudio::music_callback(void *udata, uint8_t *stream, int len)
 			Mix_HookMusic(NULL, NULL);
 			break;
 		}
-	} while(true);
+	} while (true);
 
 	SetAudioStreamVolume(mixerStream, mixerLen, MIX_MAX_VOLUME * volume / 100);
 }
 
-Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t &time_length)
+Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t& time_length)
 {
-	Mix_Chunk *chunk = nullptr;
+	Mix_Chunk* chunk = nullptr;
 
 	if (ResRef.empty()) {
 		return chunk;
@@ -189,18 +191,18 @@ Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t &time_length)
 	int riff_chans = acm->get_channels();
 	int samplerate = acm->get_samplerate();
 	// Use 16-bit word for memory allocation because read_samples takes a 16 bit alignment
-	short *memory = (short*) malloc(cnt*2);
+	short* memory = (short*) malloc(cnt * 2);
 	//multiply always with 2 because it is in 16 bits
-	int cnt1 = acm->read_samples( memory, cnt ) * 2;
+	int cnt1 = acm->read_samples(memory, cnt) * 2;
 	//Sound Length in milliseconds
 	time_length = ((cnt / riff_chans) * 1000) / samplerate;
 
 	// convert our buffer, if necessary
 	SDL_AudioCVT cvt;
 	SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, riff_chans, samplerate,
-			audio_format, audio_channels, audio_rate);
-	cvt.buf = (Uint8*)malloc(cnt1*cvt.len_mult);
-	memcpy(cvt.buf, (char*)memory, cnt1);
+			  audio_format, audio_channels, audio_rate);
+	cvt.buf = (Uint8*) malloc(cnt1 * cvt.len_mult);
+	memcpy(cvt.buf, (char*) memory, cnt1);
 	cvt.len = cnt1;
 	SDL_ConvertAudio(&cvt);
 
@@ -208,7 +210,7 @@ Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t &time_length)
 	free(memory);
 
 	// make SDL_mixer chunk
-	chunk = Mix_QuickLoad_RAW(cvt.buf, cvt.len*cvt.len_ratio);
+	chunk = Mix_QuickLoad_RAW(cvt.buf, cvt.len * cvt.len_ratio);
 	if (!chunk) {
 		Log(ERROR, "SDLAudio", "Error loading chunk!");
 		free(cvt.buf);
@@ -221,9 +223,9 @@ Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t &time_length)
 }
 
 Holder<SoundHandle> SDLAudio::Play(StringView ResRef, SFXChannel channel,
-	const Point& p, unsigned int flags, tick_t *length)
+				   const Point& p, unsigned int flags, tick_t* length)
 {
-	Mix_Chunk *chunk;
+	Mix_Chunk* chunk;
 
 	if (ResRef.empty()) {
 		if (flags & GEM_SND_SPEECH) {
@@ -312,7 +314,7 @@ bool SDLAudio::Play()
 		return false;
 	}
 	MusicPlaying = true;
-	Mix_HookMusic((void (*)(void*, Uint8*, int))music_callback, this);
+	Mix_HookMusic((void (*)(void*, Uint8*, int)) music_callback, this);
 	return true;
 }
 
@@ -354,7 +356,7 @@ Point SDLAudio::GetListenerPos()
 	return listenerPos;
 }
 
-void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
+void SDLAudio::buffer_callback(void* udata, uint8_t* stream, int len)
 {
 	// Check only movie volume, since ambiens aren't supported right now
 	ieDword volume = core->GetDictionary().Get("Volume Movie", 100);
@@ -364,10 +366,10 @@ void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
 		return;
 	}
 
-	uint8_t *mixerStream = stream;
+	uint8_t* mixerStream = stream;
 	int mixerLen = len;
 
-	SDLAudio *driver = (SDLAudio *)udata;
+	SDLAudio* driver = (SDLAudio*) udata;
 	unsigned int remaining = len;
 
 	while (remaining && !driver->buffers.empty()) {
@@ -399,7 +401,7 @@ void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
 }
 
 int SDLAudio::SetupNewStream(int x, int y, int z,
-			ieWord gain, bool point, int ambientRange)
+			     ieWord gain, bool point, int ambientRange)
 {
 	std::lock_guard<std::recursive_mutex> l(MusicMutex);
 
@@ -425,14 +427,14 @@ int SDLAudio::SetupNewStream(int x, int y, int z,
 	}
 
 	// TODO: maybe don't ignore these
-	(void)z;
+	(void) z;
 
 	Log(MESSAGE, "SDLAudio", "SDLAudio allocating stream...");
 
 	// TODO: buggy
 	MusicPlaying = false;
 	curr_buffer_offset = 0;
-	Mix_HookMusic((void (*)(void*, Uint8*, int))buffer_callback, this);
+	Mix_HookMusic((void (*)(void*, Uint8*, int)) buffer_callback, this);
 	return 0;
 }
 
@@ -447,7 +449,7 @@ tick_t SDLAudio::QueueAmbient(int stream, const ResRef& sound)
 	}
 
 	tick_t time_length;
-	Mix_Chunk *chunk = loadSound(sound, time_length);
+	Mix_Chunk* chunk = loadSound(sound, time_length);
 
 	if (chunk == nullptr) {
 		return -1;
@@ -478,7 +480,7 @@ bool SDLAudio::ReleaseStream(int stream, bool HardStop)
 
 	Log(MESSAGE, "SDLAudio", "Releasing stream...");
 
-	(void)HardStop;
+	(void) HardStop;
 	Stop();
 	FreeBuffers();
 
@@ -496,7 +498,7 @@ void SDLAudio::FreeBuffers()
 
 void SDLAudio::SetAmbientStreamVolume(int stream, int volume)
 {
- 	Mix_Volume(stream, MIX_MAX_VOLUME * volume  / 100);
+	Mix_Volume(stream, MIX_MAX_VOLUME * volume / 100);
 }
 
 void SDLAudio::SetAmbientStreamPitch(int, int)
@@ -505,7 +507,7 @@ void SDLAudio::SetAmbientStreamPitch(int, int)
 }
 
 void SDLAudio::QueueBuffer(int stream, unsigned short bits,
-			int channels, short* memory, int size, int samplerate)
+			   int channels, short* memory, int size, int samplerate)
 {
 	if (stream != 0) {
 		return;
@@ -519,21 +521,21 @@ void SDLAudio::QueueBuffer(int stream, unsigned short bits,
 	if (bits != 16 || channels != audio_channels || samplerate != audio_rate) {
 		SDL_AudioCVT cvt;
 		if (SDL_BuildAudioCVT(&cvt, (bits == 8 ? AUDIO_S8 : AUDIO_S16SYS), channels, samplerate,
-				audio_format, audio_channels, audio_rate) == 0) {
+				      audio_format, audio_channels, audio_rate) == 0) {
 			Log(ERROR, "SDLAudio", "Couldn't convert video stream! trying to convert {} bits, {} channels, {} rate",
-				bits, channels, samplerate);
+			    bits, channels, samplerate);
 			return;
 		}
-		cvt.buf = (Uint8*)malloc(size*cvt.len_mult);
+		cvt.buf = (Uint8*) malloc(size * cvt.len_mult);
 		memcpy(cvt.buf, memory, size);
 		cvt.len = size;
 		SDL_ConvertAudio(&cvt);
 
-		d.size = cvt.len*cvt.len_ratio;
-		d.buf = (char *)cvt.buf;
+		d.size = cvt.len * cvt.len_ratio;
+		d.buf = (char*) cvt.buf;
 	} else {
 		d.size = size;
-		d.buf = (char *)malloc(d.size);
+		d.buf = (char*) malloc(d.size);
 		memcpy(d.buf, memory, d.size);
 	}
 

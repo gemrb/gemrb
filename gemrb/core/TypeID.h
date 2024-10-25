@@ -25,7 +25,7 @@ namespace GemRB {
 
 class TypeID {
 public:
-	const char *description;
+	const char* description;
 };
 
 }

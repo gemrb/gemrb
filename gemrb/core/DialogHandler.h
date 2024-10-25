@@ -41,14 +41,14 @@ public:
 
 	Scriptable* GetTarget() const;
 	Actor* GetSpeaker() const;
-	bool InDialog(const Scriptable *scr) const { return IsSpeaker(scr) || IsTarget(scr); }
-	bool IsSpeaker(const Scriptable *scr) const;
-	bool IsTarget(const Scriptable *scr) const;
-	ScriptID SetSpeaker(const Scriptable *scr);
-	ScriptID SetTarget(const Scriptable *scr);
+	bool InDialog(const Scriptable* scr) const { return IsSpeaker(scr) || IsTarget(scr); }
+	bool IsSpeaker(const Scriptable* scr) const;
+	bool IsTarget(const Scriptable* scr) const;
+	ScriptID SetSpeaker(const Scriptable* scr);
+	ScriptID SetTarget(const Scriptable* scr);
 
 	bool InitDialog(Scriptable* speaker, Scriptable* target, const ResRef& dlgref, ieDword si = -1);
-	void EndDialog(bool try_to_break=false);
+	void EndDialog(bool try_to_break = false);
 	bool DialogChoose(unsigned int choose);
 
 private:

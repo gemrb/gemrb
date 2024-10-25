@@ -22,6 +22,7 @@
 #define TISIMPORTER_H
 
 #include "ImageMgr.h"
+
 #include "Plugins/TileSetMgr.h"
 
 namespace GemRB {
@@ -47,6 +48,7 @@ private:
 	Holder<Sprite2D> GetTilePaletted(int index);
 	Holder<Sprite2D> GetTilePVR(int index);
 	void Blit(const TISPVRBlock& dataBlock, uint8_t* frameData);
+
 public:
 	TISImporter() noexcept = default;
 	TISImporter(const TISImporter&) = delete;
@@ -54,7 +56,7 @@ public:
 	TISImporter& operator=(const TISImporter&) = delete;
 	bool Open(DataStream* stream) override;
 	Tile* GetTile(const std::vector<ieWord>& indexes,
-		unsigned short* secondary = NULL) override;
+		      unsigned short* secondary = NULL) override;
 	Holder<Sprite2D> GetTile(int index);
 };
 

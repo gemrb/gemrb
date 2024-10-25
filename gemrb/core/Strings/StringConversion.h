@@ -19,15 +19,15 @@
 #ifndef STRING_CONV_H
 #define STRING_CONV_H
 
+#include "ie_types.h"
+
 #include "CString.h"
 #include "String.h"
 #include "StringView.h"
-#include "ie_types.h"
 
 namespace GemRB {
 
-struct EncodingStruct
-{
+struct EncodingStruct {
 	std::string encoding = "ISO-8859-1";
 	bool widechar = false;
 	bool multibyte = false;
@@ -35,7 +35,7 @@ struct EncodingStruct
 };
 
 // String creators
-GEM_EXPORT char* ConvertCharEncoding(const char * string, const char * from, const char* to);
+GEM_EXPORT char* ConvertCharEncoding(const char* string, const char* from, const char* to);
 GEM_EXPORT String StringFromEncodedView(const StringView& view, const EncodingStruct& encoding);
 GEM_EXPORT String StringFromASCII(const StringView& asciiview);
 GEM_EXPORT String StringFromTLK(const StringView& tlkview);
@@ -53,13 +53,14 @@ struct WideToChar {
 	const GemRB::String& string;
 };
 
-template <>
+template<>
 struct formatter<WideToChar> {
 	// FIXME: parser doesnt do anything
 	static constexpr auto parse(const format_parse_context& ctx) -> decltype(ctx.begin()) { return ctx.begin(); }
 
-	template <typename FormatContext>
-	auto format(const WideToChar& wstr, FormatContext& ctx) -> decltype(ctx.out()) {
+	template<typename FormatContext>
+	auto format(const WideToChar& wstr, FormatContext& ctx) -> decltype(ctx.out())
+	{
 		const auto mbstr = GemRB::MBStringFromString(wstr.string);
 		return format_to(ctx.out(), "{}", mbstr);
 	}

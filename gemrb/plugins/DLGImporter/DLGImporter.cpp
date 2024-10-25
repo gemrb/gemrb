@@ -21,6 +21,7 @@
 #include "DLGImporter.h"
 
 #include "Interface.h"
+
 #include "GameScript/GameScript.h"
 #include "Streams/FileStream.h"
 
@@ -29,8 +30,8 @@ using namespace GemRB;
 bool DLGImporter::Import(DataStream* str)
 {
 	char Signature[8];
-	str->Read( Signature, 8 );
-	if (strnicmp( Signature, "DLG V1.0", 8 ) != 0) {
+	str->Read(Signature, 8);
+	if (strnicmp(Signature, "DLG V1.0", 8) != 0) {
 		Log(ERROR, "DLGImporter", "Not a valid DLG File...");
 		Version = 0;
 		return false;
@@ -38,10 +39,9 @@ bool DLGImporter::Import(DataStream* str)
 	str->ReadDword(StatesCount);
 	str->ReadDword(StatesOffset);
 	// bg2
-	if (StatesOffset == 0x34 ) {
+	if (StatesOffset == 0x34) {
 		Version = 104;
-	}
-	else {
+	} else {
 		Version = 100;
 	}
 	str->ReadDword(TransitionsCount);
@@ -54,8 +54,7 @@ bool DLGImporter::Import(DataStream* str)
 	str->ReadDword(ActionsCount);
 	if (Version == 104) {
 		str->ReadDword(Flags);
-	}
-	else {
+	} else {
 		// only bg2 has the Flags field in the disk format
 		// some games default to unpaused, while others don't
 		// iwd/how relies on this for ar2112 dialog with arundel
@@ -67,7 +66,7 @@ bool DLGImporter::Import(DataStream* str)
 
 Dialog* DLGImporter::GetDialog() const
 {
-	if(!Version) {
+	if (!Version) {
 		return NULL;
 	}
 	Dialog* d = new Dialog();
@@ -76,36 +75,35 @@ Dialog* DLGImporter::GetDialog() const
 	d->Order.resize(StatesCount);
 	d->initialStates.resize(StatesCount);
 	for (unsigned int i = 0; i < StatesCount; i++) {
-		DialogState* ds = GetDialogState( d, i );
+		DialogState* ds = GetDialogState(d, i);
 		d->initialStates[i] = ds;
 	}
 	return d;
 }
 
-DialogState* DLGImporter::GetDialogState(Dialog *d, unsigned int index) const
+DialogState* DLGImporter::GetDialogState(Dialog* d, unsigned int index) const
 {
 	DialogState* ds = new DialogState();
 	//16 = sizeof(State)
-	str->Seek( StatesOffset + ( index * 16 ), GEM_STREAM_START );
-	ieDword  FirstTransitionIndex;
-	ieDword  TriggerIndex;
+	str->Seek(StatesOffset + (index * 16), GEM_STREAM_START);
+	ieDword FirstTransitionIndex;
+	ieDword TriggerIndex;
 	str->ReadStrRef(ds->StrRef);
 	str->ReadDword(FirstTransitionIndex);
 	str->ReadDword(ds->transitionsCount);
 	str->ReadDword(TriggerIndex);
-	ds->condition = GetStateTrigger( TriggerIndex );
-	ds->transitions = GetTransitions( FirstTransitionIndex, ds->transitionsCount );
-	if (TriggerIndex<StatesCount)
+	ds->condition = GetStateTrigger(TriggerIndex);
+	ds->transitions = GetTransitions(FirstTransitionIndex, ds->transitionsCount);
+	if (TriggerIndex < StatesCount)
 		d->Order[TriggerIndex] = index;
 	return ds;
 }
 
 std::vector<DialogTransition*> DLGImporter::GetTransitions(unsigned int firstIndex, unsigned int count) const
 {
-	
 	std::vector<DialogTransition*> trans(count);
 	for (unsigned int i = 0; i < count; i++) {
-		trans[i] = GetTransition( firstIndex + i );
+		trans[i] = GetTransition(firstIndex + i);
 	}
 	return trans;
 }
@@ -116,7 +114,7 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 		return NULL;
 	}
 	//32 = sizeof(Transition)
-	str->Seek( TransitionsOffset + ( index * 32 ), GEM_STREAM_START );
+	str->Seek(TransitionsOffset + (index * 32), GEM_STREAM_START);
 	DialogTransition* dt = new DialogTransition();
 	str->ReadDword(dt->Flags);
 	str->ReadStrRef(dt->textStrRef);
@@ -131,16 +129,15 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 	ieDword ActionIndex;
 	str->ReadDword(TriggerIndex);
 	str->ReadDword(ActionIndex);
-	str->ReadResRef( dt->Dialog );
+	str->ReadResRef(dt->Dialog);
 	str->ReadDword(dt->stateIndex);
-	if (dt->Flags &IE_DLG_TR_TRIGGER) {
-		dt->condition = GetTransitionTrigger( TriggerIndex );
-	}
-	else {
+	if (dt->Flags & IE_DLG_TR_TRIGGER) {
+		dt->condition = GetTransitionTrigger(TriggerIndex);
+	} else {
 		dt->condition = NULL;
 	}
 	if (dt->Flags & IE_DLG_TR_ACTION) {
-		dt->actions = GetAction( ActionIndex );
+		dt->actions = GetAction(ActionIndex);
 	}
 	return dt;
 }
@@ -150,29 +147,29 @@ static char** GetStrings(const char* string, unsigned int& count);
 Condition* DLGImporter::GetCondition(const char* string) const
 {
 	unsigned int count;
-	char **lines = GetStrings( string, count );
-	Condition *condition = new Condition();
+	char** lines = GetStrings(string, count);
+	Condition* condition = new Condition();
 	for (size_t i = 0; i < count; ++i) {
-		Trigger *trigger = GenerateTrigger(lines[i]);
+		Trigger* trigger = GenerateTrigger(lines[i]);
 		if (!trigger) {
 			Log(WARNING, "DLGImporter", "Can't compile trigger: {}", lines[i]);
 		} else {
 			condition->triggers.push_back(trigger);
 		}
-		free( lines[i] );
+		free(lines[i]);
 	}
-	free( lines );
+	free(lines);
 	return condition;
 }
 
 Condition* DLGImporter::GetStateTrigger(unsigned int index) const
 {
-	if ((signed)index == -1) index = 0;
+	if ((signed) index == -1) index = 0;
 	if (index >= StateTriggersCount) {
 		return NULL;
 	}
 	//8 = sizeof(VarOffset)
-	str->Seek( StateTriggersOffset + ( index * 8 ), GEM_STREAM_START );
+	str->Seek(StateTriggersOffset + (index * 8), GEM_STREAM_START);
 	ieDword Offset, Length;
 	str->ReadDword(Offset);
 	str->ReadDword(Length);
@@ -182,12 +179,12 @@ Condition* DLGImporter::GetStateTrigger(unsigned int index) const
 	if (!Length) {
 		return NULL;
 	}
-	str->Seek( Offset, GEM_STREAM_START );
-	char* string = ( char* ) malloc( Length + 1 );
-	str->Read( string, Length );
+	str->Seek(Offset, GEM_STREAM_START);
+	char* string = (char*) malloc(Length + 1);
+	str->Read(string, Length);
 	string[Length] = 0;
-	Condition *condition = GetCondition(string);
-	free( string );
+	Condition* condition = GetCondition(string);
+	free(string);
 	return condition;
 }
 
@@ -196,16 +193,16 @@ Condition* DLGImporter::GetTransitionTrigger(unsigned int index) const
 	if (index >= TransitionTriggersCount) {
 		return NULL;
 	}
-	str->Seek( TransitionTriggersOffset + ( index * 8 ), GEM_STREAM_START );
+	str->Seek(TransitionTriggersOffset + (index * 8), GEM_STREAM_START);
 	ieDword Offset, Length;
 	str->ReadDword(Offset);
 	str->ReadDword(Length);
-	str->Seek( Offset, GEM_STREAM_START );
-	char* string = ( char* ) malloc( Length + 1 );
-	str->Read( string, Length );
+	str->Seek(Offset, GEM_STREAM_START);
+	char* string = (char*) malloc(Length + 1);
+	str->Read(string, Length);
 	string[Length] = 0;
-	Condition *condition = GetCondition(string);
-	free( string );
+	Condition* condition = GetCondition(string);
+	free(string);
 	return condition;
 }
 
@@ -214,29 +211,29 @@ std::vector<Action*> DLGImporter::GetAction(unsigned int index) const
 	if (index >= ActionsCount) {
 		return std::vector<Action*>();
 	}
-	str->Seek( ActionsOffset + ( index * 8 ), GEM_STREAM_START );
+	str->Seek(ActionsOffset + (index * 8), GEM_STREAM_START);
 	ieDword Offset, Length;
 	str->ReadDword(Offset);
 	str->ReadDword(Length);
-	str->Seek( Offset, GEM_STREAM_START );
-	char* string = ( char* ) malloc( Length + 1 );
-	str->Read( string, Length );
+	str->Seek(Offset, GEM_STREAM_START);
+	char* string = (char*) malloc(Length + 1);
+	str->Read(string, Length);
 	string[Length] = 0;
 	unsigned int count;
-	char ** lines = GetStrings( string, count );
+	char** lines = GetStrings(string, count);
 	std::vector<Action*> actions;
 	for (size_t i = 0; i < count; ++i) {
-		Action *action = GenerateAction(lines[i]);
+		Action* action = GenerateAction(lines[i]);
 		if (!action) {
 			Log(WARNING, "DLGImporter", "Can't compile action: {}", lines[i]);
 		} else {
 			action->IncRef();
 			actions.push_back(action);
 		}
-		free( lines[i] );
+		free(lines[i]);
 	}
-	free( lines );
-	free( string );
+	free(lines);
+	free(string);
 	return actions;
 }
 
@@ -313,10 +310,10 @@ static char** GetStrings(const char* string, unsigned int& count)
 				if (quotes && level) {
 					level--;
 					if (level == 0) {
-						if(!ignore) {
+						if (!ignore) {
 							count++;
 						}
-						ignore=false;
+						ignore = false;
 					}
 				}
 				break;
@@ -334,38 +331,38 @@ static char** GetStrings(const char* string, unsigned int& count)
 				break;
 		}
 	}
-	if(!count) {
+	if (!count) {
 		return NULL;
 	}
-	char** strings = ( char** ) calloc( count, sizeof( char* ) );
+	char** strings = (char**) calloc(count, sizeof(char*));
 	if (strings == NULL) {
 		count = 0;
 		return strings;
 	}
 	poi = string;
-	for (int i = 0; i < (int)count; i++) {
-		while (MyIsSpace( *poi ))
+	for (int i = 0; i < (int) count; i++) {
+		while (MyIsSpace(*poi))
 			poi++;
 		// pst/dmebbeth.dlg: CheckStatGT (Protagonist, 13., INT)
-		if (*poi == '.' && *(poi+1) == ',') {
+		if (*poi == '.' && *(poi + 1) == ',') {
 			poi++;
 		}
 		// pst/d300mer8.dlg: TransformPartyItem("Tankard", "TankardF",1,0,0);\r\nSetGlobal("Mebbeth_Quest","GLOBAL",10)
 		if (!strncmp(poi, ";\r\nSetGlobal", 12)) {
 			poi++;
 		}
-		int len = GetActionLength( poi );
-		if((*poi=='/') && (*(poi+1)=='/') ) {
-			poi+=len;
+		int len = GetActionLength(poi);
+		if ((*poi == '/') && (*(poi + 1) == '/')) {
+			poi += len;
 			i--;
 			continue;
 		}
-		strings[i] = ( char * ) malloc( len + 1 );
+		strings[i] = (char*) malloc(len + 1);
 		int j;
-		for (j = 0; len; poi++,len--) {
-			if (isspace( *poi ))
+		for (j = 0; len; poi++, len--) {
+			if (isspace(*poi))
 				continue;
-			if (*poi == '.' && *(poi+1) == ',')
+			if (*poi == '.' && *(poi + 1) == ',')
 				continue;
 			strings[i][j++] = *poi;
 		}

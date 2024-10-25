@@ -21,16 +21,16 @@
 namespace GemRB {
 
 HeterogeneousStringKey::HeterogeneousStringKey(std::string str) noexcept
-: keyBuf(std::make_unique<std::string>(std::move(str))),
-key(*keyBuf)
+	: keyBuf(std::make_unique<std::string>(std::move(str))),
+	  key(*keyBuf)
 {}
 
 HeterogeneousStringKey::HeterogeneousStringKey(StringView sv) noexcept
-: key(sv)
+	: key(sv)
 {}
 
 HeterogeneousStringKey::HeterogeneousStringKey(const HeterogeneousStringKey& other) noexcept
-: HeterogeneousStringKey(other.key.MakeString())
+	: HeterogeneousStringKey(other.key.MakeString())
 {}
 
 HeterogeneousStringKey& HeterogeneousStringKey::operator=(const HeterogeneousStringKey& other) noexcept

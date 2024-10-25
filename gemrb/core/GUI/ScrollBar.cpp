@@ -27,13 +27,13 @@
 namespace GemRB {
 
 ScrollBar::ScrollBar(const Region& frame, const Holder<Sprite2D> images[IMAGE_COUNT])
-: Control(frame)
+	: Control(frame)
 {
 	Init(images);
 }
 
 ScrollBar::ScrollBar(const ScrollBar& sb)
-: Control(sb.Frame())
+	: Control(sb.Frame())
 {
 	Init(sb.Frames);
 
@@ -53,10 +53,7 @@ ScrollBar& ScrollBar::operator=(const ScrollBar& sb)
 
 int ScrollBar::SliderPxRange() const
 {
-	return frame.h
-			- GetFrameHeight(IMAGE_SLIDER)
-			- GetFrameHeight(IMAGE_DOWN_UNPRESSED)
-			- GetFrameHeight(IMAGE_UP_UNPRESSED);
+	return frame.h - GetFrameHeight(IMAGE_SLIDER) - GetFrameHeight(IMAGE_DOWN_UNPRESSED) - GetFrameHeight(IMAGE_UP_UNPRESSED);
 }
 
 int ScrollBar::GetFrameHeight(int frame) const
@@ -67,7 +64,7 @@ int ScrollBar::GetFrameHeight(int frame) const
 void ScrollBar::ScrollDelta(const Point& delta)
 {
 	Point p = Point(-delta.x, -delta.y);
-	int xy = *((State&SLIDER_HORIZONTAL) ? &p.x : &p.y);
+	int xy = *((State & SLIDER_HORIZONTAL) ? &p.x : &p.y);
 	if (xy == 0) return;
 
 	if (p.y > 0) {
@@ -92,10 +89,10 @@ Point ScrollBar::AxisPosFromValue() const
 {
 	const ValueRange& range = GetValueRange();
 	if (range.second <= range.first) return Point();
-	
+
 	Point p;
 	int xy = round((SliderPxRange() / double(range.second - range.first)) * GetValue());
-	if (State&SLIDER_HORIZONTAL) {
+	if (State & SLIDER_HORIZONTAL) {
 		p.x = xy;
 	} else {
 		p.y = xy;
@@ -138,7 +135,7 @@ void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 	unsigned int domy = (frame.h - doMy);
 
 	//draw the up button
-	if (( State & UP_PRESS ) != 0) {
+	if ((State & UP_PRESS) != 0) {
 		VideoDriver->BlitSprite(Frames[IMAGE_UP_PRESSED], drawFrame.origin);
 	} else {
 		VideoDriver->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.origin);
@@ -150,7 +147,7 @@ void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 	if (maxy > upMy + doMy) {
 		// draw the trough
 		if (stepy) {
-			Region rgn( drawFrame.x, drawFrame.y + upMy, drawFrame.w, domy - upMy);
+			Region rgn(drawFrame.x, drawFrame.y + upMy, drawFrame.w, domy - upMy);
 			for (int dy = drawFrame.y + upMy; dy < maxy; dy += stepy) {
 				//TROUGH surely exists if it has a nonzero height
 				Point p = Frames[IMAGE_TROUGH]->Frame.origin;
@@ -160,7 +157,7 @@ void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 			}
 		}
 		// draw the slider
-		int slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2 );
+		int slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2);
 		// FIXME: doesn't respect SLIDER_HORIZONTAL
 		int sly = AxisPosFromValue().y;
 		Point p = drawFrame.origin + Frames[IMAGE_SLIDER]->Frame.origin;
@@ -169,7 +166,7 @@ void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 		VideoDriver->BlitSprite(Frames[IMAGE_SLIDER], p);
 	}
 	//draw the down button
-	if (( State & DOWN_PRESS ) != 0) {
+	if ((State & DOWN_PRESS) != 0) {
 		VideoDriver->BlitSprite(Frames[IMAGE_DOWN_PRESSED], Point(drawFrame.x, maxy));
 	} else {
 		VideoDriver->BlitSprite(Frames[IMAGE_DOWN_UNPRESSED], Point(drawFrame.x, maxy));
@@ -186,7 +183,7 @@ bool ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 		// this happens when a scrollbar is used as an event proxy for a windows
 		return false;
 	}
-	if (p.y <= GetFrameHeight(IMAGE_UP_UNPRESSED) ) {
+	if (p.y <= GetFrameHeight(IMAGE_UP_UNPRESSED)) {
 		State |= UP_PRESS;
 		ScrollUp();
 		return true;
@@ -203,12 +200,12 @@ bool ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	if (p.y >= sliderPos && p.y <= sliderPos + GetFrameHeight(IMAGE_SLIDER)) {
 		// FIXME: hack. we shouldnt mess with the sprite position should we?
 		// scrollbars may share images, so no, we shouldn't do this. need to fix or odd behavior will occur when 2 scrollbars are visible.
-		Frames[IMAGE_SLIDER]->Frame.y = p.y - sliderPos - GetFrameHeight(IMAGE_SLIDER)/2;
+		Frames[IMAGE_SLIDER]->Frame.y = p.y - sliderPos - GetFrameHeight(IMAGE_SLIDER) / 2;
 		return true;
 	}
 	// FIXME: assumes IMAGE_UP_UNPRESSED.h == IMAGE_DOWN_UNPRESSED.h
 	int offset = GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
-	if (State&SLIDER_HORIZONTAL) {
+	if (State & SLIDER_HORIZONTAL) {
 		p.x -= offset;
 	} else {
 		p.y -= offset;
@@ -231,7 +228,7 @@ bool ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 bool ScrollBar::OnMouseWheelScroll(const Point& delta)
 {
 	const ValueRange& range = GetValueRange();
-	if (State == 0 && range.second > 0){ // don't allow mousewheel to do anything if the slider is being interacted with already.
+	if (State == 0 && range.second > 0) { // don't allow mousewheel to do anything if the slider is being interacted with already.
 		// FIXME: implement horizontal check
 		// IsPerPixelScrollable() is false for ScrollBar so `delta` is in steps
 		ScrollBySteps(-delta.y);
@@ -243,12 +240,12 @@ bool ScrollBar::OnMouseWheelScroll(const Point& delta)
 /** Mouse Drag Event */
 bool ScrollBar::OnMouseDrag(const MouseEvent& me)
 {
-	if (State&SLIDER_GRAB) {
+	if (State & SLIDER_GRAB) {
 		Point p = ConvertPointFromScreen(me.Pos());
 		Point slideroffset(Frames[IMAGE_SLIDER]->Frame.x, Frames[IMAGE_SLIDER]->Frame.y);
 		// FIXME: assumes IMAGE_UP_UNPRESSED.h == IMAGE_DOWN_UNPRESSED.h
 		int offset = GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
-		if (State&SLIDER_HORIZONTAL) {
+		if (State & SLIDER_HORIZONTAL) {
 			p.x -= offset;
 		} else {
 			p.y -= offset;
@@ -260,24 +257,24 @@ bool ScrollBar::OnMouseDrag(const MouseEvent& me)
 
 bool ScrollBar::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
-	if ( State == 0 ) {
+	if (State == 0) {
 		switch (key.keycode) {
 			// TODO: should probably only handle keys corresponding to scroll direction
 			case GEM_UP:
-			ScrollUp();
-			return true;
+				ScrollUp();
+				return true;
 			case GEM_DOWN:
-			ScrollDown();
-			return true;
+				ScrollDown();
+				return true;
 			case GEM_LEFT:
-			// TODO: implement horizontal scrollbars
-			return true;
+				// TODO: implement horizontal scrollbars
+				return true;
 			case GEM_RIGHT:
-			// TODO: implement horizontal scrollbars
-			return true;
+				// TODO: implement horizontal scrollbars
+				return true;
 		}
 	}
-	
+
 	return Control::OnKeyPress(key, mod);
 }
 

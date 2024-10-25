@@ -21,6 +21,7 @@
 #include "Pixels.h"
 
 #include "RLE.h"
+
 #include "Logging/Logging.h"
 
 namespace GemRB {
@@ -35,9 +36,9 @@ IPixelIterator* PixelFormatIterator::InitImp(void* pixel, int pitch) const noexc
 				p.y = clip.h - 1;
 			if (xdir == Reverse)
 				p.x = clip.w - 1;
-			
+
 			return FindRLEPos(rledata, pitch, p, format.ColorKey);
-		} (static_cast<uint8_t*>(pixel));
+		}(static_cast<uint8_t*>(pixel));
 		return new RLEIterator(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), format.ColorKey);
 	} else {
 		pixel = [this, pitch](uint8_t* pixels) {
@@ -50,8 +51,8 @@ IPixelIterator* PixelFormatIterator::InitImp(void* pixel, int pitch) const noexc
 
 			pixels += (clip.y * pitch) + (clip.x * format.Bpp);
 			return pixels;
-		} (static_cast<uint8_t*>(pixel));
-		
+		}(static_cast<uint8_t*>(pixel));
+
 		switch (format.Bpp) {
 			case 4:
 				return new PixelIterator<uint32_t>(static_cast<uint32_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
@@ -68,17 +69,17 @@ IPixelIterator* PixelFormatIterator::InitImp(void* pixel, int pitch) const noexc
 }
 
 PixelFormatIterator::PixelFormatIterator(void* pixels, int pitch, const PixelFormat& fmt, const Region& clip) noexcept
-: PixelFormatIterator(pixels, pitch, fmt, Forward, Forward, clip)
+	: PixelFormatIterator(pixels, pitch, fmt, Forward, Forward, clip)
 {}
 
 PixelFormatIterator::PixelFormatIterator(void* pixels, int pitch, const PixelFormat& fmt, Direction x, Direction y, const Region& clip) noexcept
-: IPixelIterator(pixels, pitch, x, y), format(fmt), clip(clip)
+	: IPixelIterator(pixels, pitch, x, y), format(fmt), clip(clip)
 {
 	imp = InitImp(pixels, pitch);
 }
 
 PixelFormatIterator::PixelFormatIterator(const PixelFormatIterator& orig) noexcept
-: IPixelIterator(orig), format(orig.format)
+	: IPixelIterator(orig), format(orig.format)
 {
 	clip = orig.clip;
 	imp = orig.imp->Clone();
@@ -95,7 +96,7 @@ PixelFormatIterator PixelFormatIterator::end(const PixelFormatIterator& beg) noe
 		// already at the end
 		return PixelFormatIterator(beg);
 	}
-	
+
 	Direction xdir = (beg.xdir == Forward) ? Reverse : Forward;
 	Direction ydir = (beg.ydir == Forward) ? Reverse : Forward;
 	PixelFormatIterator it(beg);
@@ -182,20 +183,21 @@ void PixelFormatIterator::ReadRGBA(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& 
 		case 2:
 			pixel = *static_cast<uint16_t*>(imp->pixel);
 			break;
-		case 1: {
-			pixel = *static_cast<uint8_t*>(imp->pixel);
-			auto& c = format.palette->GetColorAt(pixel);
-			r = c.r;
-			g = c.g;
-			b = c.b;
+		case 1:
+			{
+				pixel = *static_cast<uint8_t*>(imp->pixel);
+				auto& c = format.palette->GetColorAt(pixel);
+				r = c.r;
+				g = c.g;
+				b = c.b;
 
-			if (format.HasColorKey && pixel == format.ColorKey) {
-				a = 0;
-			} else {
-				a = c.a;
+				if (format.HasColorKey && pixel == format.ColorKey) {
+					a = 0;
+				} else {
+					a = c.a;
+				}
+				return;
 			}
-			return;
-		}
 		default:
 			ERROR_UNKNOWN_BPP;
 	}
@@ -207,7 +209,7 @@ void PixelFormatIterator::ReadRGBA(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& 
 	g = (v << format.Gloss) + (v >> (8 - (format.Gloss << 1)));
 	v = (pixel & format.Bmask) >> format.Bshift;
 	b = (v << format.Bloss) + (v >> (8 - (format.Bloss << 1)));
-	if(format.Amask) {
+	if (format.Amask) {
 		v = (pixel & format.Amask) >> format.Ashift;
 		a = (v << format.Aloss) + (v >> (8 - (format.Aloss << 1)));
 	} else if (format.HasColorKey && pixel == format.ColorKey) {
@@ -228,10 +230,7 @@ void PixelFormatIterator::WriteRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) 
 		return;
 	}
 
-	uint32_t pixel = (r >> format.Rloss) << format.Rshift
-	| (g >> format.Gloss) << format.Gshift
-	| (b >> format.Bloss) << format.Bshift
-	| ((a >> format.Aloss) << format.Ashift & format.Amask);
+	uint32_t pixel = (r >> format.Rloss) << format.Rshift | (g >> format.Gloss) << format.Gshift | (b >> format.Bloss) << format.Bshift | ((a >> format.Aloss) << format.Ashift & format.Amask);
 
 	switch (format.Bpp) {
 		case 4:

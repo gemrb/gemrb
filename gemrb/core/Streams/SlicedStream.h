@@ -21,18 +21,18 @@
 #ifndef SLICEDSTREAM_H
 #define SLICEDSTREAM_H
 
-#include "DataStream.h"
-
 #include "exports.h"
+
+#include "DataStream.h"
 
 namespace GemRB {
 
-class GEM_EXPORT SlicedStream : public DataStream
-{
+class GEM_EXPORT SlicedStream : public DataStream {
 private:
-//	bool autoFree;
+	//	bool autoFree;
 	strpos_t startpos;
 	DataStream* str;
+
 public:
 	SlicedStream(const DataStream* cfs, strpos_t startPos, strpos_t streamSize);
 	~SlicedStream() override;

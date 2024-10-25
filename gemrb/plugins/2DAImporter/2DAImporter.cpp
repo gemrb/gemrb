@@ -52,7 +52,7 @@ bool p2DAImporter::Open(std::unique_ptr<DataStream> str)
 	} else { // no whitespace
 		defVal = line;
 	}
-	
+
 	auto NextLine = [&]() -> bool {
 		while (str->ReadLine(line) != DataStream::Error) {
 			if (line[0] != '#') { // allow comments
@@ -61,12 +61,12 @@ bool p2DAImporter::Open(std::unique_ptr<DataStream> str)
 		}
 		return false;
 	};
-	
+
 	NextLine();
 	size_t end = line.find_first_not_of(WHITESPACE_STRING);
 	if (end != std::string::npos)
 		colNames = Explode<StringView, cell_t>(StringView(line, end), ' ');
-	
+
 	rowNames.reserve(10);
 	rows.reserve(10);
 	while (NextLine()) {
@@ -80,7 +80,7 @@ bool p2DAImporter::Open(std::unique_ptr<DataStream> str)
 		}
 
 		rowNames.emplace_back(line.substr(0, pos));
-		
+
 		auto sv = StringView(&line[pos + 1], line.length() - pos - 1);
 		rows.emplace_back(Explode<StringView, cell_t>(sv, ' ', std::max<size_t>(1, colNames.size() - 1)));
 		auto& row = rows.back();
@@ -175,7 +175,7 @@ p2DAImporter::index_t p2DAImporter::FindTableValue(index_t col, long val, index_
 {
 	index_t max = GetRowCount();
 	for (index_t row = start; row < max; row++) {
-		const std::string& ret = QueryField( row, col );
+		const std::string& ret = QueryField(row, col);
 		long Value;
 		if (valid_signednumber(ret.c_str(), Value) && (Value == val))
 			return row;
@@ -187,7 +187,7 @@ p2DAImporter::index_t p2DAImporter::FindTableValue(index_t col, const key_t& val
 {
 	index_t max = GetRowCount();
 	for (index_t row = start; row < max; row++) {
-		const std::string& ret = QueryField( row, col );
+		const std::string& ret = QueryField(row, col);
 		if (StringCompKey(ret, val))
 			return row;
 	}

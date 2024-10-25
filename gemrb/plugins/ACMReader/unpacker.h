@@ -39,7 +39,7 @@ private:
 	unsigned int next_bits = 0; // new bits
 	int avail_bits = 0; // count of new bits
 	unsigned char bits_buffer[UNPACKER_BUFFER_SIZE];
-	std::ptrdiff_t buffer_bit_offset{UNPACKER_BUFFER_SIZE};
+	std::ptrdiff_t buffer_bit_offset { UNPACKER_BUFFER_SIZE };
 
 	int sb_size;
 	short* amp_buffer = nullptr;
@@ -49,6 +49,7 @@ private:
 	// Reading routines
 	void prepare_bits(int bits); // request bits
 	int get_bits(int bits); // request and return next bits
+
 public:
 	// These functions are used to fill the buffer with the amplitude values
 	int return0(int pass, int ind);
@@ -89,6 +90,6 @@ public:
 	int get_one_block(int* block);
 };
 
-using FillerProc = int (CValueUnpacker::*) (int pass, int ind);
+using FillerProc = int (CValueUnpacker::*)(int pass, int ind);
 
 #endif

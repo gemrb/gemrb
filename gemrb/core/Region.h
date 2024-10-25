@@ -45,13 +45,13 @@ class GEM_EXPORT Point {
 public:
 	Point() noexcept = default;
 	Point(int x, int y) noexcept;
-	
-	bool operator==(const Point &pnt) const noexcept;
-	bool operator!=(const Point &pnt) const noexcept;
+
+	bool operator==(const Point& pnt) const noexcept;
+	bool operator!=(const Point& pnt) const noexcept;
 
 	Point operator+(const Point& p) const noexcept;
 	Point operator-(const Point& p) const noexcept;
-	
+
 	Point& operator+=(const Point& rhs) noexcept;
 	Point& operator-=(const Point& rhs) noexcept;
 
@@ -60,11 +60,13 @@ public:
 	bool IsZero() const noexcept; // (0, 0)
 	bool IsInvalid() const noexcept; // (-1, -1)
 
-	inline void reset() noexcept {
+	inline void reset() noexcept
+	{
 		x = y = 0;
 	}
 
-	inline void Invalidate() noexcept {
+	inline void Invalidate() noexcept
+	{
 		x = y = -1;
 	}
 
@@ -82,19 +84,20 @@ public:
 	int h = 0;
 	Size() noexcept = default;
 	Size(int, int) noexcept;
-		
-	inline void reset() noexcept {
+
+	inline void reset() noexcept
+	{
 		w = h = 0;
 	}
 
 	bool operator==(const Size& size) const noexcept;
 	bool operator!=(const Size& size) const noexcept;
-	
+
 	Point Center() const noexcept { return Point(w / 2, h / 2); }
 	int Area() const noexcept { return w * h; }
 	bool IsZero() const noexcept { return w == 0 && h == 0; }
 	bool IsInvalid() const noexcept { return w <= 0 || h <= 0; }
-	
+
 	bool PointInside(const Point& p) const noexcept { return p.x >= 0 && p.x < w && p.y >= 0 && p.y < h; }
 };
 
@@ -109,7 +112,7 @@ public:
 	// Point and Size must be first and in this order
 	Point origin;
 	Size size;
-	
+
 	// unfortunately anonymous structs are an extension in C++...
 	int& x = origin.x;
 	int& y = origin.y;
@@ -120,13 +123,13 @@ public:
 	Region(int x, int y, int w, int h) noexcept;
 	Region(const Point& p, const Size& s) noexcept;
 	Region(const Region&) noexcept;
-	
+
 	Region& operator=(const Region&) noexcept;
 
 	bool operator==(const Region& rgn) const noexcept;
 	bool operator!=(const Region& rgn) const noexcept;
 
-	bool PointInside(const Point &p) const noexcept;
+	bool PointInside(const Point& p) const noexcept;
 	bool RectInside(const Region& r) const noexcept;
 
 	bool IntersectsRegion(const Region& rgn) const noexcept;
@@ -136,12 +139,13 @@ public:
 	Point Maximum() const noexcept { return Point(x + w, y + h); }
 	// returns the point of intersection between Region and the line (extending to infinity) from the Center to p
 	Point Intercept(const Point& p) const noexcept;
-	
+
 	void ExpandToPoint(const Point& p) noexcept;
 	void ExpandToRegion(const Region& r) noexcept;
 	void ExpandAllSides(int amt) noexcept;
-	
-	static Region RegionEnclosingRegions(const Region& r1, const Region& r2) {
+
+	static Region RegionEnclosingRegions(const Region& r1, const Region& r2)
+	{
 		Point min;
 		Point max;
 
@@ -154,7 +158,8 @@ public:
 	}
 
 	template<typename T>
-	static Region RegionEnclosingRegions(T regions) {
+	static Region RegionEnclosingRegions(T regions)
+	{
 		if (regions.empty()) return Region();
 		typename T::const_iterator it = regions.begin();
 		// start with the complete first rect
@@ -167,7 +172,8 @@ public:
 		return bounds;
 	}
 
-	static Region RegionFromPoints(const Point& p1, const Point& p2) {
+	static Region RegionFromPoints(const Point& p1, const Point& p2)
+	{
 		int dx = p2.x - p1.x;
 		int dy = p2.y - p1.y;
 
@@ -186,11 +192,12 @@ using Regions = std::vector<Region>;
 
 namespace fmt {
 
-template <>
+template<>
 struct formatter<GemRB::Point> {
 	char presentation = 'd';
-	
-	auto parse(const format_parse_context& ctx) -> decltype(ctx.begin()) {
+
+	auto parse(const format_parse_context& ctx) -> decltype(ctx.begin())
+	{
 		// [ctx.begin(), ctx.end()) is a character range that contains a part of
 		// the format string starting from the format specifications to be parsed,
 		// e.g. in
@@ -207,13 +214,14 @@ struct formatter<GemRB::Point> {
 		// TODO: implement parsing
 		return it;
 	}
-	
-	template <typename FormatContext>
-	auto format(const GemRB::Point& p, FormatContext &ctx) -> decltype(ctx.out()) {
+
+	template<typename FormatContext>
+	auto format(const GemRB::Point& p, FormatContext& ctx) -> decltype(ctx.out())
+	{
 		return format_to(ctx.out(), "({:d}, {:d})", p.x, p.y);
 	}
 };
 
 }
 
-#endif  // ! REGION_H
+#endif // ! REGION_H

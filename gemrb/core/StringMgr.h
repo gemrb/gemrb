@@ -30,6 +30,7 @@
 
 #include "Plugin.h"
 #include "Resource.h"
+
 #include "Streams/DataStream.h"
 
 namespace GemRB {
@@ -46,20 +47,20 @@ struct StringBlock {
 	StringBlock() noexcept = default;
 
 	StringBlock(String text, const ResRef& soundRef) noexcept
-	: text(std::move(text)), Sound(soundRef) {}
-	
+		: text(std::move(text)), Sound(soundRef) {}
+
 	StringBlock(StringBlock&&) noexcept = default;
 	StringBlock(const StringBlock&) = delete;
 };
 
 enum class STRING_FLAGS : uint32_t {
-	NONE			= 0,
-	STRREFON		= 1,
-	SOUND 			= 2,
-	SPEECH			= 4,
-	ALLOW_ZERO		= 8, // 0 strref is allowed
-	RESOLVE_TAGS	= 16,
-	STRREFOFF		= 256,
+	NONE = 0,
+	STRREFON = 1,
+	SOUND = 2,
+	SPEECH = 4,
+	ALLOW_ZERO = 8, // 0 strref is allowed
+	RESOLVE_TAGS = 16,
+	STRREFOFF = 256,
 	// iwd2 also used 0x8000 to mark removed ctlk entries for recycling
 };
 
@@ -82,4 +83,4 @@ public:
 
 }
 
-#endif  // ! STRINGMGR_H
+#endif // ! STRINGMGR_H

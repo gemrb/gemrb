@@ -27,7 +27,8 @@
 
 namespace GemRB {
 
-Color ColorFromPy(PyObject* obj) {
+Color ColorFromPy(PyObject* obj)
+{
 	if (obj && PyDict_Check(obj)) {
 		Color c;
 		// PyLong_AsLong may return -1 on error and we would like this to = 0
@@ -51,7 +52,8 @@ Color ColorFromPy(PyObject* obj) {
 	return Color();
 }
 
-Point PointFromPy(PyObject* obj) {
+Point PointFromPy(PyObject* obj)
+{
 	if (PyDict_Check(obj)) {
 		Point p;
 		PyObject* pyVal = PyDict_GetItemString(obj, "x");
@@ -63,7 +65,8 @@ Point PointFromPy(PyObject* obj) {
 	return Point();
 }
 
-Region RectFromPy(PyObject* obj) {
+Region RectFromPy(PyObject* obj)
+{
 	if (PyDict_Check(obj)) {
 		Region r;
 		PyObject* pyVal = PyDict_GetItemString(obj, "x");
@@ -105,7 +108,7 @@ PluginHolder<SymbolMgr> GetSymbols(PyObject* obj)
 Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 {
 	Holder<Sprite2D> pic;
-	if (PyObject_TypeCheck( pypic, &PyUnicode_Type )) {
+	if (PyObject_TypeCheck(pypic, &PyUnicode_Type)) {
 		ResourceHolder<ImageMgr> im = gamedata->GetResourceHolder<ImageMgr>(PyString_AsStringView(pypic));
 		if (im) {
 			pic = im->GetSprite2D();
@@ -131,7 +134,7 @@ PyObject* PyString_FromResRef(const ResRef& resRef)
 {
 	return PyString_FromASCII(resRef);
 }
-	
+
 PyObject* PyString_FromStringObj(const std::string& s)
 {
 	return PyUnicode_Decode(s.c_str(), s.length(), core->TLKEncoding.encoding.c_str(), "strict");
@@ -180,7 +183,7 @@ String PyString_AsStringObj(PyObject* obj)
 		cd = iconv_open("UTF-16LE", encoding.c_str());
 	}
 
-	if (cd == (iconv_t)-1) {
+	if (cd == (iconv_t) -1) {
 		Log(ERROR, "PythonConversions", "iconv_open(UTF-16, {}) failed with error: {}", encoding, strerror(errno));
 		return u"";
 	}

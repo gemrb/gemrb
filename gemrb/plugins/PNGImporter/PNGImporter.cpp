@@ -24,6 +24,7 @@
 #include "globals.h"
 
 #include "ImageFactory.h"
+
 #include "Video/Video.h"
 
 // CHECKME: how should we include png.h ? (And how should we check for it?)
@@ -32,9 +33,9 @@
 using namespace GemRB;
 
 static void DataStream_png_read_data(png_structp png_ptr,
-		 png_bytep data, png_size_t length)
+				     png_bytep data, png_size_t length)
 {
-	void *read_io_ptr = png_get_io_ptr(png_ptr);
+	void* read_io_ptr = png_get_io_ptr(png_ptr);
 	DataStream* str = static_cast<DataStream*>(read_io_ptr);
 	str->Read(data, length);
 }
@@ -64,7 +65,7 @@ void PNGImporter::Close()
 	if (inf) {
 		if (inf->png_ptr) {
 			png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr,
-				&inf->end_info);
+						&inf->end_info);
 		}
 		inf->png_ptr = 0;
 		inf->info_ptr = 0;
@@ -87,18 +88,16 @@ bool PNGImporter::Import(DataStream* stream)
 		return false;
 
 	inf->info_ptr = png_create_info_struct(inf->png_ptr);
-	if (!inf->info_ptr)
-	{
-		png_destroy_read_struct(&inf->png_ptr, (png_infopp)NULL,
-			(png_infopp)NULL);
+	if (!inf->info_ptr) {
+		png_destroy_read_struct(&inf->png_ptr, (png_infopp) NULL,
+					(png_infopp) NULL);
 		return false;
 	}
 
 	inf->end_info = png_create_info_struct(inf->png_ptr);
-	if (!inf->end_info)
-	{
+	if (!inf->end_info) {
 		png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr,
-			(png_infopp)NULL);
+					(png_infopp) NULL);
 		return false;
 	}
 
@@ -116,12 +115,11 @@ bool PNGImporter::Import(DataStream* stream)
 	int bit_depth, color_type;
 	int interlace_type, compression_type, filter_method;
 	png_get_IHDR(inf->png_ptr, inf->info_ptr, &width, &height,
-		 &bit_depth, &color_type,
-		 &interlace_type, &compression_type, &filter_method);
+		     &bit_depth, &color_type,
+		     &interlace_type, &compression_type, &filter_method);
 
 	if (color_type != PNG_COLOR_TYPE_PALETTE &&
-		png_get_valid(inf->png_ptr, inf->info_ptr, PNG_INFO_tRNS))
-	{
+	    png_get_valid(inf->png_ptr, inf->info_ptr, PNG_INFO_tRNS)) {
 		// if not indexed, turn transparency info into alpha
 		// (if indexed, we use it directly for colorkeying)
 		png_set_tRNS_to_alpha(inf->png_ptr);
@@ -146,13 +144,13 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 {
 	unsigned char* buffer = 0;
 	png_bytep* row_pointers = new png_bytep[size.h];
-	buffer = (unsigned char *) malloc((hasPalette?1:4) * size.Area());
+	buffer = (unsigned char*) malloc((hasPalette ? 1 : 4) * size.Area());
 	for (int i = 0; i < size.h; ++i)
-		row_pointers[i] = static_cast<png_bytep>(&buffer[(hasPalette?1:4) * i * size.w]);
+		row_pointers[i] = static_cast<png_bytep>(&buffer[(hasPalette ? 1 : 4) * i * size.w]);
 
 	if (setjmp(png_jmpbuf(inf->png_ptr))) {
 		delete[] row_pointers;
-		free( buffer );
+		free(buffer);
 		png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
 		return NULL;
 	}
@@ -170,15 +168,15 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 		Holder<Palette> pal = MakeHolder<Palette>();
 		int ck = GetPalette(256, *pal);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(std::move(pal), (ck >= 0), ck);
-		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h), buffer, fmt);
+		spr = VideoDriver->CreateSprite(Region(0, 0, size.w, size.h), buffer, fmt);
 	} else {
 		constexpr ieDword blue_mask = 0x00ff0000;
 		constexpr ieDword green_mask = 0x0000ff00;
 		constexpr ieDword red_mask = 0x000000ff;
 		constexpr ieDword alpha_mask = 0xff000000;
 		static const PixelFormat fmt(4, red_mask, green_mask, blue_mask, alpha_mask);
-		spr = VideoDriver->CreateSprite(Region(0,0, size.w, size.h),
-												   buffer, fmt);
+		spr = VideoDriver->CreateSprite(Region(0, 0, size.w, size.h),
+						buffer, fmt);
 	}
 
 	png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
@@ -195,16 +193,16 @@ int PNGImporter::GetPalette(int colors, Palette& pal)
 	png_colorp palette;
 	int num_palette;
 	png_get_PLTE(inf->png_ptr, inf->info_ptr, &palette, &num_palette);
-	
+
 	png_bytep alpha;
 	int num_alpha = 0;
 	png_get_tRNS(inf->png_ptr, inf->info_ptr, &alpha, &num_alpha, nullptr);
-	
+
 	Palette::Colors buffer;
 	for (int i = 0; i < colors; i++) {
-		buffer[i].r = palette[i%num_palette].red;
-		buffer[i].g = palette[i%num_palette].green;
-		buffer[i].b = palette[i%num_palette].blue;
+		buffer[i].r = palette[i % num_palette].red;
+		buffer[i].g = palette[i % num_palette].green;
+		buffer[i].b = palette[i % num_palette].blue;
 		if (i < num_alpha) {
 			buffer[i].a = alpha[i];
 		} else {
@@ -213,12 +211,12 @@ int PNGImporter::GetPalette(int colors, Palette& pal)
 	}
 
 	pal.CopyColors(0, buffer.cbegin(), buffer.cend());
-	
+
 	return (num_alpha == 1) ? 0 : -1;
 }
 
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x11C3EB12, "PNG File Importer")
-PLUGIN_IE_RESOURCE(PNGImporter, "png", (ieWord)IE_PNG_CLASS_ID)
+PLUGIN_IE_RESOURCE(PNGImporter, "png", (ieWord) IE_PNG_CLASS_ID)
 END_PLUGIN()

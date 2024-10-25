@@ -36,7 +36,7 @@ class GEM_EXPORT StreamLogWriter : public Logger::LogWriter {
 public:
 	StreamLogWriter(LogLevel, FILE*, ANSIColor color);
 	~StreamLogWriter() override;
-	
+
 	StreamLogWriter(const StreamLogWriter&) = delete;
 
 	StreamLogWriter& operator=(const StreamLogWriter&) = delete;

@@ -24,13 +24,14 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Sprite2D.h"
+
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
 namespace GemRB {
 
 TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
-: Control(frame), textContainer(Region(Point(), Dimensions()), core->GetTextFont())
+	: Control(frame), textContainer(Region(Point(), Dimensions()), core->GetTextFont())
 {
 	ControlType = IE_GUI_EDIT;
 
@@ -43,8 +44,8 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 	max = maxLength;
 	textContainer.SetMargin(p.y, p.x);
 
-	SetFlags(Alpha|Numeric, BitOp::OR);
-	
+	SetFlags(Alpha | Numeric, BitOp::OR);
+
 	textContainer.SetEventProxy(this);
 }
 
@@ -71,7 +72,7 @@ bool TextEdit::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 		PerformAction(Action::Done);
 		return true;
 	}
-	
+
 	// textContainer.OnKeyPress only handles deletion and navigation
 	// text is handled in TextEdit::OnTextInput
 	if (textContainer.OnKeyPress(key, mod)) {
@@ -99,7 +100,7 @@ void TextEdit::OnTextInput(const TextEvent& te)
 			break;
 		}
 	}
-	
+
 	textContainer.InsertText(te.text.substr(0, i));
 }
 

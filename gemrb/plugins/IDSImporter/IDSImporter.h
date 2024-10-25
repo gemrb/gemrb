@@ -19,13 +19,14 @@
  */
 
 #ifndef IDSIMPORTER_H
-#define IDSIMPORTER_H
+	#define IDSIMPORTER_H
 
-#include "SymbolMgr.h"
-#include "Strings/StringView.h"
+	#include "SymbolMgr.h"
 
-#include <utility>
-#include <vector>
+	#include "Strings/StringView.h"
+
+	#include <utility>
+	#include <vector>
 
 namespace GemRB {
 
@@ -51,5 +52,3 @@ public:
 
 #endif
 }
-
-

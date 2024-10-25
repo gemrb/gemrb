@@ -22,6 +22,7 @@
 
 #include "GameData.h"
 #include "ImageMgr.h"
+
 #include "Logging/Logging.h"
 
 using namespace GemRB;
@@ -34,7 +35,7 @@ WMPImporter::~WMPImporter(void)
 
 bool WMPImporter::Open(DataStream* stream1, DataStream* stream2)
 {
-	if ((stream1 == NULL) && (stream2 == NULL) ) {
+	if ((stream1 == NULL) && (stream2 == NULL)) {
 		return false;
 	}
 	delete str1;
@@ -45,10 +46,10 @@ bool WMPImporter::Open(DataStream* stream1, DataStream* stream2)
 	char Signature[8];
 
 	if (str1) {
-		str1->Read( Signature, 8 );
-		if (strncmp( Signature, "WMAPV1.0", 8 ) != 0) {
+		str1->Read(Signature, 8);
+		if (strncmp(Signature, "WMAPV1.0", 8) != 0) {
 			Log(ERROR, "WMPImporter", "'{}' is not a valid WMP File",
-				stream1->filename);
+			    stream1->filename);
 			return false;
 		}
 		str1->ReadDword(WorldMapsCount1);
@@ -59,10 +60,10 @@ bool WMPImporter::Open(DataStream* stream1, DataStream* stream2)
 	}
 
 	if (str2) {
-		str2->Read( Signature, 8 );
-		if (strncmp( Signature, "WMAPV1.0", 8 ) != 0) {
+		str2->Read(Signature, 8);
+		if (strncmp(Signature, "WMAPV1.0", 8) != 0) {
 			Log(ERROR, "WMPImporter", "'{}' is not a valid WMP File",
-				stream2->filename);
+			    stream2->filename);
 			return false;
 		}
 		str2->ReadDword(WorldMapsCount2);
@@ -82,31 +83,30 @@ WorldMapArray* WMPImporter::GetWorldMapArray() const
 
 	WorldMapArray* ma = new WorldMapArray(WorldMapsCount);
 	for (unsigned int i = 0; i < WorldMapsCount1; i++) {
-		WorldMap *m = ma->NewWorldMap( i );
-		GetWorldMap( str1, m, i );
+		WorldMap* m = ma->NewWorldMap(i);
+		GetWorldMap(str1, m, i);
 	}
 
 	for (unsigned int i = 0; i < WorldMapsCount2; i++) {
-		WorldMap *m = ma->NewWorldMap( i + WorldMapsCount1);
-		GetWorldMap( str2, m, i );
+		WorldMap* m = ma->NewWorldMap(i + WorldMapsCount1);
+		GetWorldMap(str2, m, i);
 	}
 	return ma;
 }
 
-void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) const
+void WMPImporter::GetWorldMap(DataStream* str, WorldMap* m, unsigned int index) const
 {
 	unsigned int WorldMapsOffset;
 	ieDword AreaEntriesCount, AreaEntriesOffset, AreaLinksCount, AreaLinksOffset;
 
-	if (index && str==str2) {
-		WorldMapsOffset=WorldMapsOffset2;
-	}
-	else {
-		WorldMapsOffset=WorldMapsOffset1;
+	if (index && str == str2) {
+		WorldMapsOffset = WorldMapsOffset2;
+	} else {
+		WorldMapsOffset = WorldMapsOffset1;
 	}
 
-	str->Seek( WorldMapsOffset + index * 184, GEM_STREAM_START );
-	str->ReadResRef( m->MapResRef );
+	str->Seek(WorldMapsOffset + index * 184, GEM_STREAM_START);
+	str->ReadResRef(m->MapResRef);
 	str->ReadDword(m->Width);
 	str->ReadDword(m->Height);
 	str->ReadDword(m->MapNumber);
@@ -117,7 +117,7 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 	str->ReadDword(AreaEntriesOffset);
 	str->ReadDword(AreaLinksOffset);
 	str->ReadDword(AreaLinksCount);
-	str->ReadResRef( m->MapIconResRef );
+	str->ReadResRef(m->MapIconResRef);
 	str->ReadDword(m->Flags); // TODO: use; only present in EE, so make sure to ignore in other games, since it's not guaranteed to be 0
 
 	// Load map bitmap
@@ -137,7 +137,7 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 		m->SetMapIcons(std::move(af));
 	}
 
-	str->Seek( AreaEntriesOffset, GEM_STREAM_START );
+	str->Seek(AreaEntriesOffset, GEM_STREAM_START);
 
 
 	WMPAreaLink al;
@@ -145,14 +145,13 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 		m->SetAreaEntry(i, GetAreaEntry(str));
 	}
 
-	str->Seek( AreaLinksOffset, GEM_STREAM_START );
+	str->Seek(AreaLinksOffset, GEM_STREAM_START);
 	for (unsigned int i = 0; i < AreaLinksCount; i++) {
-		m->SetAreaLink(i,GetAreaLink(str, &al));
+		m->SetAreaLink(i, GetAreaLink(str, &al));
 	}
-
 }
 
-WMPAreaEntry WMPImporter::GetAreaEntry(DataStream *str) const
+WMPAreaEntry WMPImporter::GetAreaEntry(DataStream* str) const
 {
 	WMPAreaEntry ae;
 
@@ -177,12 +176,12 @@ WMPAreaEntry WMPImporter::GetAreaEntry(DataStream *str) const
 		str->ReadDword(ae.AreaLinksIndex[dir]);
 		str->ReadDword(ae.AreaLinksCount[dir]);
 	}
-	str->Seek( 128, GEM_CURRENT_POS );
+	str->Seek(128, GEM_CURRENT_POS);
 
 	return ae;
 }
 
-WMPAreaLink* WMPImporter::GetAreaLink(DataStream *str, WMPAreaLink* al) const
+WMPAreaLink* WMPImporter::GetAreaLink(DataStream* str, WMPAreaLink* al) const
 {
 	str->ReadDword(al->AreaIndex);
 	str->ReadVariable(al->DestEntryPoint);
@@ -192,12 +191,12 @@ WMPAreaLink* WMPImporter::GetAreaLink(DataStream *str, WMPAreaLink* al) const
 		str->ReadResRef(ref);
 	}
 	str->ReadDword(al->EncounterChance);
-	str->Seek( 128, GEM_CURRENT_POS );
+	str->Seek(128, GEM_CURRENT_POS);
 
 	return al;
 }
 
-int WMPImporter::GetStoredFileSize(WorldMapArray *wmap, unsigned int index)
+int WMPImporter::GetStoredFileSize(WorldMapArray* wmap, unsigned int index)
 {
 	assert(!index || !wmap->IsSingle());
 
@@ -205,7 +204,7 @@ int WMPImporter::GetStoredFileSize(WorldMapArray *wmap, unsigned int index)
 	int WorldMapsOffset;
 
 	WorldMapsCount = wmap->GetMapCount();
-	if (index>WorldMapsCount || index>1) return 0;
+	if (index > WorldMapsCount || index > 1) return 0;
 
 	WorldMapsOffset = headersize;
 	if (index) {
@@ -214,7 +213,7 @@ int WMPImporter::GetStoredFileSize(WorldMapArray *wmap, unsigned int index)
 		WorldMapsCount1 = 0;
 	}
 
-	for (unsigned int i=index;i<WorldMapsCount; i++) {
+	for (unsigned int i = index; i < WorldMapsCount; i++) {
 		if (index) {
 			WorldMapsCount2++;
 		} else {
@@ -222,7 +221,7 @@ int WMPImporter::GetStoredFileSize(WorldMapArray *wmap, unsigned int index)
 		}
 
 		headersize += 184;
-		const WorldMap *map = wmap->GetWorldMap(i);
+		const WorldMap* map = wmap->GetWorldMap(i);
 
 		headersize += map->GetEntryCount() * 240;
 		headersize += map->GetLinkCount() * 216;
@@ -236,36 +235,35 @@ int WMPImporter::GetStoredFileSize(WorldMapArray *wmap, unsigned int index)
 
 	if (index) {
 		WorldMapsOffset2 = WorldMapsOffset;
-	}
-	else {
+	} else {
 		WorldMapsOffset1 = WorldMapsOffset;
 	}
 	return headersize;
 }
 
-int WMPImporter::PutWorldMap(DataStream *stream1, DataStream *stream2, WorldMapArray *wmap) const
+int WMPImporter::PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray* wmap) const
 {
 	if (!stream1 || !wmap) {
 		return -1;
 	}
 
-	stream1->Write( "WMAPV1.0", 8);
+	stream1->Write("WMAPV1.0", 8);
 	stream1->WriteDword(WorldMapsCount1);
 	stream1->WriteDword(WorldMapsOffset1);
 
 	if (stream2 && !wmap->IsSingle()) {
-		stream2->Write( "WMAPV1.0", 8);
+		stream2->Write("WMAPV1.0", 8);
 		stream2->WriteDword(WorldMapsCount2);
 		stream2->WriteDword(WorldMapsOffset2);
 	}
-	return PutMaps( stream1, stream2, wmap);
+	return PutMaps(stream1, stream2, wmap);
 }
 
-int WMPImporter::PutLinks(DataStream *stream, const WorldMap *wmap) const
+int WMPImporter::PutLinks(DataStream* stream, const WorldMap* wmap) const
 {
 	unsigned int cnt = wmap->GetLinkCount();
 	for (unsigned i = 0; i < cnt; i++) {
-		const WMPAreaLink *al = wmap->GetLink(i);
+		const WMPAreaLink* al = wmap->GetLink(i);
 
 		stream->WriteDword(al->AreaIndex);
 		stream->WriteVariableUC(al->DestEntryPoint);
@@ -280,13 +278,13 @@ int WMPImporter::PutLinks(DataStream *stream, const WorldMap *wmap) const
 	return 0;
 }
 
-int WMPImporter::PutAreas(DataStream *stream, const WorldMap *wmap) const
+int WMPImporter::PutAreas(DataStream* stream, const WorldMap* wmap) const
 {
 	ieDword tmpDword;
 	unsigned int cnt = wmap->GetEntryCount();
 
-	for(unsigned i=0;i<cnt;i++) {
-		const WMPAreaEntry *ae = wmap->GetEntry(i);
+	for (unsigned i = 0; i < cnt; i++) {
+		const WMPAreaEntry* ae = wmap->GetEntry(i);
 
 		stream->WriteResRefUC(ae->AreaName);
 		stream->WriteResRefUC(ae->AreaResRef);
@@ -300,7 +298,7 @@ int WMPImporter::PutAreas(DataStream *stream, const WorldMap *wmap) const
 		stream->WriteDword(coord);
 		stream->WriteStrRef(ae->LocCaptionName);
 		stream->WriteStrRef(ae->LocTooltipName);
-		stream->WriteResRef( ae->LoadScreenResRef );
+		stream->WriteResRef(ae->LoadScreenResRef);
 
 		for (WMPDirection dir : EnumIterator<WMPDirection>()) {
 			stream->WriteDword(ae->AreaLinksIndex[dir]);
@@ -311,18 +309,18 @@ int WMPImporter::PutAreas(DataStream *stream, const WorldMap *wmap) const
 	return 0;
 }
 
-int WMPImporter::PutMaps(DataStream *stream1, DataStream *stream2, const WorldMapArray *wmap) const
+int WMPImporter::PutMaps(DataStream* stream1, DataStream* stream2, const WorldMapArray* wmap) const
 {
 	int ret = PutMap(stream1, wmap, 0);
 	if (ret) return ret;
 
-	if (stream2 && !wmap->IsSingle() ) {
+	if (stream2 && !wmap->IsSingle()) {
 		ret = PutMap(stream2, wmap, 1);
 	}
 	return ret;
 }
 
-int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned int index) const
+int WMPImporter::PutMap(DataStream* stream, const WorldMapArray* wmap, unsigned int index) const
 {
 	unsigned int WorldMapsOffset;
 	unsigned int count;
@@ -341,7 +339,7 @@ int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned 
 	ieDword AreaEntriesOffset = WorldMapsOffset + count * 184;
 	ieDword AreaLinksOffset = AreaEntriesOffset;
 	for (unsigned int i = index; i < WorldMapsCount; i++) {
-		const WorldMap *map = wmap->GetWorldMap(i);
+		const WorldMap* map = wmap->GetWorldMap(i);
 
 		AreaLinksOffset += map->GetEntryCount() * 240;
 		if (!wmap->IsSingle() && !index) {
@@ -353,11 +351,11 @@ int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned 
 	for (unsigned int i = index; i < WorldMapsCount; i++) {
 		ieDword AreaEntriesCount, AreaLinksCount;
 
-		const WorldMap *map = wmap->GetWorldMap(i);
+		const WorldMap* map = wmap->GetWorldMap(i);
 		AreaLinksCount = map->GetLinkCount();
 		AreaEntriesCount = map->GetEntryCount();
 
-		stream->WriteResRef( map->MapResRef );
+		stream->WriteResRef(map->MapResRef);
 		stream->WriteDword(map->Width);
 		stream->WriteDword(map->Height);
 		stream->WriteDword(map->MapNumber);
@@ -370,7 +368,7 @@ int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned 
 		stream->WriteDword(AreaEntriesOffset);
 		stream->WriteDword(AreaLinksOffset);
 		stream->WriteDword(AreaLinksCount);
-		stream->WriteResRef( map->MapIconResRef );
+		stream->WriteResRef(map->MapIconResRef);
 		stream->WriteDword(map->Flags);
 		AreaEntriesOffset += AreaEntriesCount * 240;
 		AreaLinksOffset += AreaLinksCount * 216;
@@ -384,9 +382,9 @@ int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned 
 
 	//area entries
 	for (unsigned int i = index; i < WorldMapsCount; i++) {
-		const WorldMap *map = wmap->GetWorldMap(i);
+		const WorldMap* map = wmap->GetWorldMap(i);
 
-		ret = PutAreas( stream, map);
+		ret = PutAreas(stream, map);
 		if (ret) {
 			return ret;
 		}
@@ -397,9 +395,9 @@ int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned 
 
 	//links
 	for (unsigned int i = index; i < WorldMapsCount; i++) {
-		const WorldMap *map = wmap->GetWorldMap(i);
+		const WorldMap* map = wmap->GetWorldMap(i);
 
-		ret = PutLinks( stream, map);
+		ret = PutLinks(stream, map);
 		if (ret) {
 			return ret;
 		}

@@ -28,11 +28,11 @@
 #ifndef SLIDER_H
 #define SLIDER_H
 
-#include "GUI/Control.h"
-
 #include "exports.h"
 
 #include "Sprite2D.h"
+
+#include "GUI/Control.h"
 
 namespace GemRB {
 
@@ -46,17 +46,17 @@ namespace GemRB {
  * with a limited range
  */
 
-class GEM_EXPORT Slider : public Control  {
+class GEM_EXPORT Slider : public Control {
 private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
-	
+
 	// set position based on a point expressed in local (frame) coordinates
 	void SetPosition(const Point& p);
 
 public:
 	Slider(const Region& frame, Point KnobPos,
-		   short KnobStep, unsigned short KnobStepsCount);
+	       short KnobStep, unsigned short KnobStepsCount);
 
 	/** Returns the actual Slider Position */
 	unsigned int GetPosition() const;
@@ -65,7 +65,7 @@ public:
 	/** Sets the selected image */
 	void SetImage(unsigned char type, const Holder<Sprite2D>& img);
 	/** Sets the State of the Slider */
-	void SetState(int arg) { State=(unsigned char) arg; }
+	void SetState(int arg) { State = (unsigned char) arg; }
 	/** Refreshes a slider which is associated with VariableName */
 	void UpdateState(value_t) override;
 

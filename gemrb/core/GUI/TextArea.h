@@ -21,14 +21,14 @@
 #ifndef TEXTAREA_H
 #define TEXTAREA_H
 
+#include "RGBAColor.h"
+#include "exports.h"
+
 #include "GUI/Control.h"
 #include "GUI/ScrollView.h"
 #include "GUI/TextSystem/Font.h"
 #include "GUI/TextSystem/GemMarkup.h"
 #include "GUI/TextSystem/TextContainer.h"
-
-#include "RGBAColor.h"
-#include "exports.h"
 
 #include <vector>
 
@@ -44,29 +44,32 @@ using Option_t = size_t;
  * It is usually scrolled with a ScrollBar widget
  */
 
-class GEM_EXPORT TextArea final : public Control, public View::Scrollable {
+class GEM_EXPORT TextArea final : public Control,
+				  public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
-	
+
 	class OptionContext {
 		OptionId_t id = -1;
 		Option_t idx = -1;
-		
+
 	public:
 		OptionContext() noexcept = default;
 		OptionContext(OptionId_t id, Option_t opt) noexcept
-		: id(id), idx(opt) {}
-		
-		bool operator==(const OptionContext& rhs) const noexcept {
+			: id(id), idx(opt) {}
+
+		bool operator==(const OptionContext& rhs) const noexcept
+		{
 			return id == rhs.id && idx == rhs.idx;
 		}
-		
-		bool operator!=(const OptionContext& rhs) const noexcept {
+
+		bool operator!=(const OptionContext& rhs) const noexcept
+		{
 			return !operator==(rhs);
 		}
 	};
-	
+
 	class SpanSelector : public ContentContainer {
 		struct OptSpan : public TextContainer {
 			OptSpan(const Region& frame, Holder<Font> font, const Color& fg, const Color& bg)
@@ -74,15 +77,17 @@ private:
 			{
 				SetColors(fg, bg);
 			}
-			
+
 			// forward OnMouseLeave to superview (SpanSelector) as a mouse over
-			void OnMouseLeave(const MouseEvent& me, const DragOp*) override {
+			void OnMouseLeave(const MouseEvent& me, const DragOp*) override
+			{
 				assert(superView);
 				superView->MouseOver(me);
 			}
 
 			bool Editable() const override { return false; }
 		};
+
 	private:
 		TextArea& ta;
 		TextContainer* hoverSpan = nullptr;
@@ -113,34 +118,34 @@ private:
 		SpanSelector(TextArea& ta, const std::vector<const String*>&, bool numbered, ContentContainer::Margin m = Margin());
 		~SpanSelector() override;
 
-		size_t NumOpts() const { return size;};
+		size_t NumOpts() const { return size; };
 		void MakeSelection(Option_t idx);
 		TextContainer* Selection() const { return selectedSpan; }
 		Option_t SelectionIdx() const { return selected; }
 		OptionContext Context() const { return OptionContext(id, selected); }
-		
+
 		bool CanLockFocus() const override { return false; }
 	};
 
 public:
 	enum COLOR_TYPE {
-		COLOR_NORMAL = 0,	// standard text color
-		COLOR_INITIALS,	// color for finit. used only is some cases.
+		COLOR_NORMAL = 0, // standard text color
+		COLOR_INITIALS, // color for finit. used only is some cases.
 		COLOR_BACKGROUND, // the background color for all text
-		COLOR_OPTIONS,	// normal palette for selectable options (dialog/listbox)
-		COLOR_HOVER,	// color for hovering options (dialog/listbox)
-		COLOR_SELECTED,	// selected list box/dialog option.
-		
+		COLOR_OPTIONS, // normal palette for selectable options (dialog/listbox)
+		COLOR_HOVER, // color for hovering options (dialog/listbox)
+		COLOR_SELECTED, // selected list box/dialog option.
+
 		COLOR_TYPE_COUNT
 	};
 
 	TextArea(const Region& frame, Holder<Font> text);
 	TextArea(const Region& frame, Holder<Font> text, Holder<Font> caps);
-	
+
 	~TextArea() final;
 
 	bool IsOpaque() const override { return false; }
-	
+
 	void SetColor(const Color&, COLOR_TYPE);
 
 	/** Sets the Actual Text */
@@ -164,7 +169,7 @@ public:
 
 	void SetScrollbar(ScrollBar*);
 	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered);
-	
+
 	void SelectAvailableOption(Option_t idx);
 	/** Set Selectable */
 	void SetSelectable(bool val);
@@ -179,7 +184,7 @@ public:
 	void UpdateState(value_t opt) override;
 	void DidFocus() override;
 	void DidUnFocus() override;
-	
+
 	void AddSubviewInFrontOfView(View*, const View* = NULL) override;
 
 private: // Private attributes
@@ -200,7 +205,7 @@ private: // Private attributes
 	GemMarkupParser parser;
 	ContentContainer::Margin textMargins;
 
-	Color colors[COLOR_TYPE_COUNT] = {ColorWhite};
+	Color colors[COLOR_TYPE_COUNT] = { ColorWhite };
 	Holder<Palette> invertedText;
 
 private: //internal functions
@@ -228,9 +233,9 @@ public: //Events
 
 	enum TextAreaFlags {
 		// !!! Keep these synchronized with GUIDefines.py !!!
-		AutoScroll = 1,   // TextArea will automatically scroll when new text is appended
+		AutoScroll = 1, // TextArea will automatically scroll when new text is appended
 		ClearHistory = 2, // TextArea will automatically purge old data as new data is added
-		Editable = 4      // TextArea text is editable
+		Editable = 4 // TextArea text is editable
 	};
 
 	void ClearSelectOptions();

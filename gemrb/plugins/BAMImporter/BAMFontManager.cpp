@@ -19,6 +19,7 @@
  */
 
 #include "BAMFontManager.h"
+
 #include "Palette.h"
 #include "Sprite2D.h"
 
@@ -41,7 +42,7 @@ bool BAMFontManager::Import(DataStream* stream)
 	if (resRef.BeginsWith("STATES")) {
 		isStateFont = true;
 	}
-	
+
 	str = nullptr; // hand ownership over to bamImp
 	return bamImp->Open(stream);
 }
@@ -63,7 +64,7 @@ Holder<Font> BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*styl
 		// Hack to work around original data where the "top row icons" have inverted x and y positions (ie level up icon)
 		// isStateFont is set in Open() and simply compares the first 6 characters of the file with "STATES"
 		// since state icons should all be the same size/position we can just take the position of the first one
-		static const ieWord topIconCycles[] = {254 /* level up icon */, 153 /* dialog icon */, 154 /* store icon */, 37 /* separator glyph (like '-')*/};
+		static const ieWord topIconCycles[] = { 254 /* level up icon */, 153 /* dialog icon */, 154 /* store icon */, 37 /* separator glyph (like '-')*/ };
 		for (size_t i = 0; i < 3; i++) {
 			Holder<Sprite2D> spr = af->GetFrame(0, topIconCycles[i]);
 			if (spr->Frame.x > 0) // not all datasets are messed up here
@@ -100,9 +101,9 @@ Holder<Font> BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*styl
 			if (isNumeric) {
 				chr = frame + '0';
 			} else {
-				chr = ((frame << 8) | (cycle&0x00ff)) + 1;
+				chr = ((frame << 8) | (cycle & 0x00ff)) + 1;
 			}
-			Sprite2D *key = spr.get();
+			Sprite2D* key = spr.get();
 			auto i = tmp.find(key);
 			if (i != tmp.end()) {
 				// opimization for when glyphs are shared between cycles

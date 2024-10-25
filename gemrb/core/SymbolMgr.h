@@ -25,10 +25,11 @@
 #ifndef SYMBOLMGR_H
 #define SYMBOLMGR_H
 
-#include <memory>
-
 #include "Plugin.h"
+
 #include "Streams/DataStream.h"
+
+#include <memory>
 
 namespace GemRB {
 
@@ -53,4 +54,4 @@ public:
 
 }
 
-#endif  // ! SYMBOLMGR_H
+#endif // ! SYMBOLMGR_H

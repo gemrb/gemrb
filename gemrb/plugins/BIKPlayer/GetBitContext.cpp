@@ -18,30 +18,33 @@
  *
  */
 
-// code derived from FFMPEG's libavcodec/get_bits.h 
-// copyright (c) 2004 Michael Niedermayer <michaelni@gmx.at> 
-// and binkaudio.cpp 
+// code derived from FFMPEG's libavcodec/get_bits.h
+// copyright (c) 2004 Michael Niedermayer <michaelni@gmx.at>
+// and binkaudio.cpp
 // Copyright (c) 2007-2009 Peter Ross (pross@xvid.org)
-// Copyright (c) 2009 Daniel Verkamp (daniel@drv.nu) 
+// Copyright (c) 2009 Daniel Verkamp (daniel@drv.nu)
 
 #include "GetBitContext.h"
+
 #include "Logging/Logging.h"
 
 //don't return more than 25 bits this way
-unsigned int GetBitContext::get_bits(int n) {
+unsigned int GetBitContext::get_bits(int n)
+{
 	unsigned int tmp;
 
-	tmp = AV_RL32(buffer+(index>>3))>>(index&7);
-	index+=n;
-	return tmp& (0xffffffff>>(32-n));
+	tmp = AV_RL32(buffer + (index >> 3)) >> (index & 7);
+	index += n;
+	return tmp & (0xffffffff >> (32 - n));
 }
 
 //peek at the next <25 bits (without bumping the bit counter)
-unsigned int GetBitContext::peek_bits(int n) const {
+unsigned int GetBitContext::peek_bits(int n) const
+{
 	unsigned int tmp;
 
-	tmp = AV_RL32(buffer+(index>>3))>>(index&7);
-	return tmp& (0xffffffff>>(32-n));
+	tmp = AV_RL32(buffer + (index >> 3)) >> (index & 7);
+	return tmp & (0xffffffff >> (32 - n));
 }
 
 //i think, this get_bits_long could be simple get_bits (less than 25 bits taken)
@@ -50,7 +53,7 @@ float GetBitContext::get_float()
 	int power = get_bits(5);
 	float f = ldexpf((float) get_bits_long(23), power - 23);
 	if (get_bits(1))
-	    f = -f;
+		f = -f;
 	return f;
 }
 
@@ -60,27 +63,28 @@ void GetBitContext::get_bits_align32()
 	if (n) skip_bits(n);
 }
 
-unsigned int GetBitContext::get_bits_long(int n) 
+unsigned int GetBitContext::get_bits_long(int n)
 {
-	if(n<=17) return get_bits(n);
+	if (n <= 17)
+		return get_bits(n);
 	else {
-	    int ret= get_bits(16);
-	    return ret | (get_bits(n-16) << 16);
+		int ret = get_bits(16);
+		return ret | (get_bits(n - 16) << 16);
 	}
-} 
+}
 
-void GetBitContext::init_get_bits(const uint8_t *b, int bit_size)
+void GetBitContext::init_get_bits(const uint8_t* b, int bit_size)
 {
-	int buffer_size = (bit_size+7)>>3;
-	if(buffer_size < 0 || bit_size < 0) {
-	    buffer_size = bit_size = 0;
-	    buffer = NULL;
+	int buffer_size = (bit_size + 7) >> 3;
+	if (buffer_size < 0 || bit_size < 0) {
+		buffer_size = bit_size = 0;
+		buffer = NULL;
 	}
 
 	buffer = b;
 	size_in_bits = bit_size;
 	buffer_end = buffer + buffer_size;
-	index=0;
+	index = 0;
 }
 
 //bink video related from bink.c
@@ -91,37 +95,37 @@ void GetBitContext::init_get_bits(const uint8_t *b, int bit_size)
  *
  * @param tree pointer for storing tree data
  */
-void GetBitContext::read_tree(Tree *tree)
+void GetBitContext::read_tree(Tree* tree)
 {
 	uint8_t tmp1[16], tmp2[16], *in = tmp1, *out = tmp2;
 
 	tree->vlc_num = get_bits(4);
 	if (!tree->vlc_num) {
-	    for (int i = 0; i < 16; i++)
-	        tree->syms[i] = i;
-	    return;
+		for (int i = 0; i < 16; i++)
+			tree->syms[i] = i;
+		return;
 	}
 	if (get_bits(1)) {
-	    int len = get_bits(3);
-	    memset(tmp1, 0, sizeof(tmp1));
-	    for (int i = 0; i <= len; i++) {
-	        tree->syms[i] = get_bits(4);
-	        tmp1[tree->syms[i]] = 1;
-	    }
-	    for (int i = 0; i < 16; i++)
-	        if (!tmp1[i])
-	            tree->syms[++len] = i;
+		int len = get_bits(3);
+		memset(tmp1, 0, sizeof(tmp1));
+		for (int i = 0; i <= len; i++) {
+			tree->syms[i] = get_bits(4);
+			tmp1[tree->syms[i]] = 1;
+		}
+		for (int i = 0; i < 16; i++)
+			if (!tmp1[i])
+				tree->syms[++len] = i;
 	} else {
-	    int len = get_bits(2);
-	    for (int i = 0; i < 16; i++)
-	        in[i] = i;
-	    for (int i = 0; i <= len; i++) {
-	        int size = 1 << i;
-	        for (int t = 0; t < 16; t += size << 1)
-	            merge(out + t, in + t, size);
-	        std::swap(in, out);
-	    }
-	    memcpy(tree->syms, in, 16);
+		int len = get_bits(2);
+		for (int i = 0; i < 16; i++)
+			in[i] = i;
+		for (int i = 0; i <= len; i++) {
+			int size = 1 << i;
+			for (int t = 0; t < 16; t += size << 1)
+				merge(out + t, in + t, size);
+			std::swap(in, out);
+		}
+		memcpy(tree->syms, in, 16);
 	}
 }
 
@@ -133,29 +137,29 @@ void GetBitContext::read_tree(Tree *tree)
  * @param src  pointer to the head of the first list (the second lists starts at src+size)
  * @param size input lists size
  */
-void GetBitContext::merge(uint8_t *dst, const uint8_t *src, int size)
+void GetBitContext::merge(uint8_t* dst, const uint8_t* src, int size)
 {
-	const uint8_t *src2 = src + size;
+	const uint8_t* src2 = src + size;
 	int size2 = size;
 
 	do {
-	    if (!get_bits(1)) {
-	        *dst++ = *src++;
-	        size--;
-	    } else {
-	        *dst++ = *src2++;
-	        size2--;
-	    }
+		if (!get_bits(1)) {
+			*dst++ = *src++;
+			size--;
+		} else {
+			*dst++ = *src2++;
+			size2--;
+		}
 	} while (size && size2);
 
 	while (size--)
-	    *dst++ = *src++;
+		*dst++ = *src++;
 	while (size2--)
-	    *dst++ = *src2++;
+		*dst++ = *src2++;
 }
 
 
-void GetBitContext::debug(const char *prefix) const
+void GetBitContext::debug(const char* prefix) const
 {
 	Log(GemRB::ERROR, "BIKPlayer", "{}: {}", prefix, index);
 }
@@ -168,94 +172,94 @@ int VLC::alloc_table(int size)
 	int index = table_size;
 	table_size += size;
 	if (table_size > table_allocated) {
-	        abort(); //cant do anything, init_vlc() is used with too little memory
+		abort(); //cant do anything, init_vlc() is used with too little memory
 	}
 	return index;
 }
 
 int VLC::build_table(int table_nb_bits, int nb_codes,
-	             const void* bitsTable, int bits_wrap, int bits_size,
-	             const void *codes, int codes_wrap, int codes_size,
-	             uint32_t code_prefix, int n_prefix, int flags)
+		     const void* bitsTable, int bits_wrap, int bits_size,
+		     const void* codes, int codes_wrap, int codes_size,
+		     uint32_t code_prefix, int n_prefix, int flags)
 {
 	int n;
 	uint32_t code_prefix2;
 	uint32_t code;
-	int16_t (*p_table)[2];
+	int16_t(*p_table)[2];
 
 	int tableSize = 1 << table_nb_bits;
 	int table_index = alloc_table(tableSize);
 	if (table_index < 0 || table_nb_bits > 30 || n_prefix > 31)
-	    return -1;
+		return -1;
 	p_table = &table[table_index];
 
 	for (int i = 0; i < tableSize; i++) {
-	    p_table[i][1] = 0; //bits
-	    p_table[i][0] = -1; //codes
+		p_table[i][1] = 0; //bits
+		p_table[i][0] = -1; //codes
 	}
 
 	/* first pass: map codes and compute auxiliary table sizes */
 	for (int i = 0; i < nb_codes; i++) {
-	    GET_DATA(n, bitsTable, i, bits_wrap, bits_size);
-	    GET_DATA(code, codes, i, codes_wrap, codes_size);
-	    /* we accept tables with holes */
-	    if (n <= 0)
-	        continue;
-	    int symbol = i;
-	    /* if code matches the prefix, it is in the table */
-	    n -= n_prefix;
-	    if(flags & INIT_VLC_LE)
-	        code_prefix2= code & ((1 << n_prefix)-1);
-	    else
-	        code_prefix2= code >> n;
-	    if (n > 0 && code_prefix2 == code_prefix) {
-	        if (n <= table_nb_bits) {
-	            /* no need to add another table */
-	            int j = (code << (table_nb_bits - n)) & (tableSize - 1);
-	            int nb = 1 << (table_nb_bits - n);
-	            for (int k = 0; k < nb; k++) {
-	                if(flags & INIT_VLC_LE)
-	                    j = (code >> n_prefix) + (k<<n);
-	                if (p_table[j][1] /*bits*/ != 0) {
-	                    //av_log(NULL, AV_LOG_ERROR, "incorrect codes\n");
-	                    return -1;
-	                }
-	                p_table[j][1] = n; //bits
-	                p_table[j][0] = symbol;
-	                j++;
-	            }
-	        } else {
-	            n -= table_nb_bits;
-	            int j = (code >> ((flags & INIT_VLC_LE) ? n_prefix : n)) & ((1 << table_nb_bits) - 1);
-	            /* compute table size */
-	            int n1 = -p_table[j][1]; //bits
-	            if (n > n1)
-	                n1 = n;
-	            p_table[j][1] = -n1; //bits
-	        }
-	    }
+		GET_DATA(n, bitsTable, i, bits_wrap, bits_size);
+		GET_DATA(code, codes, i, codes_wrap, codes_size);
+		/* we accept tables with holes */
+		if (n <= 0)
+			continue;
+		int symbol = i;
+		/* if code matches the prefix, it is in the table */
+		n -= n_prefix;
+		if (flags & INIT_VLC_LE)
+			code_prefix2 = code & ((1 << n_prefix) - 1);
+		else
+			code_prefix2 = code >> n;
+		if (n > 0 && code_prefix2 == code_prefix) {
+			if (n <= table_nb_bits) {
+				/* no need to add another table */
+				int j = (code << (table_nb_bits - n)) & (tableSize - 1);
+				int nb = 1 << (table_nb_bits - n);
+				for (int k = 0; k < nb; k++) {
+					if (flags & INIT_VLC_LE)
+						j = (code >> n_prefix) + (k << n);
+					if (p_table[j][1] /*bits*/ != 0) {
+						//av_log(NULL, AV_LOG_ERROR, "incorrect codes\n");
+						return -1;
+					}
+					p_table[j][1] = n; //bits
+					p_table[j][0] = symbol;
+					j++;
+				}
+			} else {
+				n -= table_nb_bits;
+				int j = (code >> ((flags & INIT_VLC_LE) ? n_prefix : n)) & ((1 << table_nb_bits) - 1);
+				/* compute table size */
+				int n1 = -p_table[j][1]; //bits
+				if (n > n1)
+					n1 = n;
+				p_table[j][1] = -n1; //bits
+			}
+		}
 	}
 
 	/* second pass : fill auxiliary tables recursively */
 	for (int i = 0; i < tableSize; i++) {
-	    n = p_table[i][1]; //bits
-	    if (n < 0) {
-	        n = -n;
-	        if (n > table_nb_bits) {
-	            n = table_nb_bits;
-	            p_table[i][1] = -n; //bits
-	        }
-	        int index = build_table(n, nb_codes,
-	                                bitsTable, bits_wrap, bits_size,
-	                            codes, codes_wrap, codes_size,
-	                            (flags & INIT_VLC_LE) ? (code_prefix | (i << n_prefix)) : ((code_prefix << table_nb_bits) | i),
-	                            n_prefix + table_nb_bits, flags);
-	        if (index < 0)
-	            return -1;
-	        /* note: realloc has been done, so reload tables */
-	        p_table = &table[table_index];
-	        p_table[i][0] = index; //code
-	    }
+		n = p_table[i][1]; //bits
+		if (n < 0) {
+			n = -n;
+			if (n > table_nb_bits) {
+				n = table_nb_bits;
+				p_table[i][1] = -n; //bits
+			}
+			int index = build_table(n, nb_codes,
+						bitsTable, bits_wrap, bits_size,
+						codes, codes_wrap, codes_size,
+						(flags & INIT_VLC_LE) ? (code_prefix | (i << n_prefix)) : ((code_prefix << table_nb_bits) | i),
+						n_prefix + table_nb_bits, flags);
+			if (index < 0)
+				return -1;
+			/* note: realloc has been done, so reload tables */
+			p_table = &table[table_index];
+			p_table[i][0] = index; //code
+		}
 	}
 	return table_index;
 }
@@ -287,29 +291,28 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	 with av_free_static(), 0 if free_vlc() will be used.
 */
 int VLC::init_vlc(int nb_bits, int nb_codes,
-	         const void *p_bits, int bits_wrap, int bits_size,
-	         const void *codes, int codes_wrap, int codes_size,
-	         int flags)
+		  const void* p_bits, int bits_wrap, int bits_size,
+		  const void* codes, int codes_wrap, int codes_size,
+		  int flags)
 {
 	bits = nb_bits;
-	if(table_size) {
-	if(table_size == table_allocated) {
-		return 0;
-	} else if(table_size) {
-		//trying to reallocate static table
-		return -1;
+	if (table_size) {
+		if (table_size == table_allocated) {
+			return 0;
+		} else if (table_size) {
+			//trying to reallocate static table
+			return -1;
 		}
 	}
-	
+
 	if (build_table(nb_bits, nb_codes, p_bits, bits_wrap, bits_size,
-		codes, codes_wrap, codes_size, 0, 0, flags) < 0) {
+			codes, codes_wrap, codes_size, 0, 0, flags) < 0) {
 		//no need of freeing this, it was allocated statically
 		//av_freep((void **) &table);
 		return -1;
 	}
-	if(table_size != table_allocated) {
+	if (table_size != table_allocated) {
 		//av_log(NULL, AV_LOG_ERROR, "needed %d had %d\n", table_size, table_allocated);
 	}
 	return 0;
 }
-

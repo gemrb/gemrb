@@ -22,13 +22,14 @@
 
 #include "Compressor.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "PluginMgr.h"
-#include "Streams/SlicedStream.h"
+
+#include "Logging/Logging.h"
 #include "Streams/FileCache.h"
 #include "Streams/FileStream.h"
+#include "Streams/SlicedStream.h"
 #if defined(SUPPORTS_MEMSTREAM)
-#include "Streams/MappedFileMemoryStream.h"
+	#include "Streams/MappedFileMemoryStream.h"
 #endif
 
 using namespace GemRB;
@@ -64,17 +65,17 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const path_t& pa
 		ieDword complen, declen;
 		compressed->ReadDword(declen);
 		compressed->ReadDword(complen);
-		if (comp->Decompress( &out, compressed, complen ) != GEM_OK) {
+		if (comp->Decompress(&out, compressed, complen) != GEM_OK) {
 			return NULL;
 		}
 		finalsize = out.GetPos();
-		if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
+		if ((int) (finalsize * (10.0 / unCompBifSize)) != laststep) {
 			laststep++;
 		}
 	}
 	out.Close(); // This is necessary, since windows won't open the file otherwise.
 #if defined(SUPPORTS_MEMSTREAM)
-	return new MappedFileMemoryStream{path};
+	return new MappedFileMemoryStream { path };
 #else
 	return FileStream::OpenFile(path);
 #endif
@@ -99,20 +100,20 @@ int BIFImporter::OpenArchive(const path_t& path)
 	path_t cachePath = PathJoin(core->config.CachePath, ExtractFileFromPath(path));
 	char Signature[8];
 #if defined(SUPPORTS_MEMSTREAM)
-	auto cacheStream = new MappedFileMemoryStream{cachePath.c_str()};
+	auto cacheStream = new MappedFileMemoryStream { cachePath.c_str() };
 
 	if (!cacheStream->isOk()) {
 		delete cacheStream;
 
-		auto file = new MappedFileMemoryStream{path};
+		auto file = new MappedFileMemoryStream { path };
 		if (!file->isOk()) {
 			delete file;
 #else
 	stream = FileStream::OpenFile(cachePath);
 
 	if (!stream) {
-		FileStream *file = FileStream::OpenFile(path);
-	if (!file) {
+		FileStream* file = FileStream::OpenFile(path);
+		if (!file) {
 #endif
 			return GEM_ERROR;
 		}
@@ -127,7 +128,7 @@ int BIFImporter::OpenArchive(const path_t& path)
 		} else if (strncmp(Signature, "BIFCV1.0", 8) == 0) {
 			stream = DecompressBIFC(file, cachePath.c_str());
 			delete file;
-		} else if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
+		} else if (strncmp(Signature, "BIFFV1  ", 8) == 0) {
 			file->Seek(0, GEM_STREAM_START);
 			stream = file;
 		} else {
@@ -143,9 +144,9 @@ int BIFImporter::OpenArchive(const path_t& path)
 	if (!stream)
 		return GEM_ERROR;
 
-	stream->Read( Signature, 8 );
+	stream->Read(Signature, 8);
 
-	if (strncmp( Signature, "BIFFV1  ", 8 ) != 0) {
+	if (strncmp(Signature, "BIFFV1  ", 8) != 0) {
 		return GEM_ERROR;
 	}
 
@@ -157,17 +158,17 @@ DataStream* BIFImporter::GetStream(unsigned long Resource, unsigned long Type)
 	if (Type == IE_TIS_CLASS_ID) {
 		unsigned int srcResLoc = Resource & 0xFC000;
 		for (unsigned int i = 0; i < tentcount; i++) {
-			if (( tentries[i].resLocator & 0xFC000 ) == srcResLoc) {
-				return SliceStream( stream, tentries[i].dataOffset,
-							tentries[i].tileSize * tentries[i].tilesCount );
+			if ((tentries[i].resLocator & 0xFC000) == srcResLoc) {
+				return SliceStream(stream, tentries[i].dataOffset,
+						   tentries[i].tileSize * tentries[i].tilesCount);
 			}
 		}
 	} else {
 		ieDword srcResLoc = Resource & 0x3FFF;
 		for (ieDword i = 0; i < fentcount; i++) {
-			if (( fentries[i].resLocator & 0x3FFF ) == srcResLoc) {
-				return SliceStream( stream, fentries[i].dataOffset,
-							fentries[i].fileSize );
+			if ((fentries[i].resLocator & 0x3FFF) == srcResLoc) {
+				return SliceStream(stream, fentries[i].dataOffset,
+						   fentries[i].fileSize);
 			}
 		}
 	}
@@ -180,7 +181,7 @@ int BIFImporter::ReadBIF()
 	stream->ReadDword(fentcount);
 	stream->ReadDword(tentcount);
 	stream->ReadDword(foffset);
-	stream->Seek( foffset, GEM_STREAM_START );
+	stream->Seek(foffset, GEM_STREAM_START);
 	fentries = new FileEntry[fentcount];
 	tentries = new TileEntry[tentcount];
 	if (!fentries || !tentries) {

@@ -28,6 +28,7 @@
 #include "Interface.h"
 #include "Projectile.h"
 #include "ProjectileServer.h"
+
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
@@ -72,15 +73,15 @@ ieStrRef Item::GetItemDesc(bool identified) const
 
 //-1 will return equipping feature block
 //otherwise returns the n'th feature block
-EffectQueue Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, ieDwordSigned invslot, ieDword pro) const
+EffectQueue Item::GetEffectBlock(Scriptable* self, const Point& pos, int usage, ieDwordSigned invslot, ieDword pro) const
 {
-	Effect *const *features = nullptr;
+	Effect* const* features = nullptr;
 	size_t count;
 
 	if (usage >= int(ext_headers.size())) {
 		return {};
 	}
-	if (usage>=0) {
+	if (usage >= 0) {
 		features = ext_headers[usage].features.data();
 		count = ext_headers[usage].features.size();
 	} else {
@@ -95,7 +96,7 @@ EffectQueue Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, 
 	static int casterLevel = gamedata->GetMiscRule("ITEM_CASTERLEVEL");
 
 	for (size_t i = 0; i < count; ++i) {
-		Effect *fx = features[i];
+		Effect* fx = features[i];
 		fx->InventorySlot = invslot;
 		fx->CasterLevel = casterLevel;
 		fx->CasterID = self->GetGlobalID();
@@ -129,10 +130,10 @@ EffectQueue Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, 
 	//adding a pulse effect for weapons (PST)
 	//if it is an equipping effect block
 	if (usage == -1 && WieldColor != 0xffff && Flags & IE_ITEM_PULSATING) {
-		Effect *tmp = BuildGlowEffect(WieldColor);
+		Effect* tmp = BuildGlowEffect(WieldColor);
 		if (tmp) {
 			tmp->InventorySlot = invslot;
-			tmp->Projectile=pro;
+			tmp->Projectile = pro;
 			fxqueue.AddEffect(tmp);
 		}
 	}
@@ -141,11 +142,11 @@ EffectQueue Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, 
 
 /** returns the average damage this weapon would cause */
 // there might not be any target, so we can't consider also AltDiceThrown ...
-int Item::GetDamagePotential(bool ranged, const ITMExtHeader *&header) const
+int Item::GetDamagePotential(bool ranged, const ITMExtHeader*& header) const
 {
 	header = GetWeaponHeader(ranged);
 	if (header) {
-		return header->DiceThrown*(header->DiceSides+1)/2+header->DamageBonus;
+		return header->DiceThrown * (header->DiceSides + 1) / 2 + header->DamageBonus;
 	}
 	return -1;
 }
@@ -153,17 +154,17 @@ int Item::GetDamagePotential(bool ranged, const ITMExtHeader *&header) const
 int Item::GetWeaponHeaderNumber(bool ranged) const
 {
 	for (size_t ehc = 0; ehc < ext_headers.size(); ehc++) {
-		const ITMExtHeader *ext_header = &ext_headers[ehc];
-		if (ext_header->Location!=ITEM_LOC_WEAPON) {
+		const ITMExtHeader* ext_header = &ext_headers[ehc];
+		if (ext_header->Location != ITEM_LOC_WEAPON) {
 			continue;
 		}
 		unsigned char AType = ext_header->AttackType;
 		if (ranged) {
-			if ((AType!=ITEM_AT_PROJECTILE) && (AType!=ITEM_AT_BOW) ) {
+			if ((AType != ITEM_AT_PROJECTILE) && (AType != ITEM_AT_BOW)) {
 				continue;
 			}
 		} else {
-			if (AType!=ITEM_AT_MELEE) {
+			if (AType != ITEM_AT_MELEE) {
 				continue;
 			}
 		}
@@ -175,11 +176,11 @@ int Item::GetWeaponHeaderNumber(bool ranged) const
 int Item::GetEquipmentHeaderNumber(int cnt) const
 {
 	for (size_t ehc = 0; ehc < ext_headers.size(); ehc++) {
-		const ITMExtHeader *ext_header = &ext_headers[ehc];
-		if (ext_header->Location!=ITEM_LOC_EQUIPMENT) {
+		const ITMExtHeader* ext_header = &ext_headers[ehc];
+		if (ext_header->Location != ITEM_LOC_EQUIPMENT) {
 			continue;
 		}
-		if (ext_header->AttackType!=ITEM_AT_MAGIC) {
+		if (ext_header->AttackType != ITEM_AT_MAGIC) {
 			continue;
 		}
 
@@ -192,10 +193,10 @@ int Item::GetEquipmentHeaderNumber(int cnt) const
 	return 0xffff; //invalid extheader number
 }
 
-const ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
+const ITMExtHeader* Item::GetWeaponHeader(bool ranged) const
 {
 	//start from the beginning
-	return GetExtHeader(GetWeaponHeaderNumber(ranged)) ;
+	return GetExtHeader(GetWeaponHeaderNumber(ranged));
 }
 
 // returns the requested extended header
@@ -212,7 +213,7 @@ const ITMExtHeader* Item::GetExtHeader(int which) const
 
 int Item::UseCharge(std::array<ieWord, CHARGE_COUNTERS>& charges, int header, bool expend) const
 {
-	const ITMExtHeader *ieh = GetExtHeader(header);
+	const ITMExtHeader* ieh = GetExtHeader(header);
 	if (!ieh) return 0;
 	int type = ieh->ChargeDepletion;
 
@@ -223,14 +224,14 @@ int Item::UseCharge(std::array<ieWord, CHARGE_COUNTERS>& charges, int header, bo
 	ccount = charges[header];
 
 	//if the item started from 0 charges, then it isn't depleting
-	if (ieh->Charges==0) {
+	if (ieh->Charges == 0) {
 		return CHG_NONE;
 	}
 	if (expend) {
 		charges[header] = --ccount;
 	}
 
-	if (ccount>0) {
+	if (ccount > 0) {
 		return CHG_NONE;
 	}
 	if (type == CHG_NONE) {
@@ -240,19 +241,19 @@ int Item::UseCharge(std::array<ieWord, CHARGE_COUNTERS>& charges, int header, bo
 }
 
 //returns a projectile loaded with the effect queue
-Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &target, ieDwordSigned invslot, int miss) const
+Projectile* Item::GetProjectile(Scriptable* self, int header, const Point& target, ieDwordSigned invslot, int miss) const
 {
-	const ITMExtHeader *eh = GetExtHeader(header);
+	const ITMExtHeader* eh = GetExtHeader(header);
 	if (!eh) {
 		return NULL;
 	}
 	ieDword idx = eh->ProjectileAnimation;
-	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(idx);
-	int usage ;
-	if (header>= 0)
+	Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(idx);
+	int usage;
+	if (header >= 0)
 		usage = header;
 	else
-		usage = GetWeaponHeaderNumber(header==-2);
+		usage = GetWeaponHeaderNumber(header == -2);
 	if (!miss) {
 		pro->SetEffects(GetEffectBlock(self, target, usage, invslot, idx));
 	}
@@ -262,7 +263,7 @@ Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &targe
 }
 
 //this is the implementation of the weapon glow effect in PST
-Effect *Item::BuildGlowEffect(int gradient) const
+Effect* Item::BuildGlowEffect(int gradient) const
 {
 	static EffectRef glowRef = { "Color:PulseRGB", -1 };
 	//this type of colour uses PAL32, a PST specific palette
@@ -277,10 +278,10 @@ Effect *Item::BuildGlowEffect(int gradient) const
 
 unsigned int Item::GetCastingDistance(int idx) const
 {
-	const ITMExtHeader *seh = GetExtHeader(idx);
+	const ITMExtHeader* seh = GetExtHeader(idx);
 	if (!seh) {
 		Log(ERROR, "Item", "Cannot retrieve item header!!! required header: {}, maximum: {}",
-			idx, (int) ext_headers.size());
+		    idx, (int) ext_headers.size());
 		return 0;
 	}
 	return (unsigned int) seh->Range;
@@ -288,7 +289,7 @@ unsigned int Item::GetCastingDistance(int idx) const
 
 static EffectRef fx_damage_ref = { "Damage", -1 };
 // returns a vector with details about any extended headers containing fx_damage
-std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(const ITMExtHeader *header) const
+std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(const ITMExtHeader* header) const
 {
 	ieDword damage_opcode = EffectQueue::ResolveEffect(fx_damage_ref);
 	std::multimap<ieDword, DamageInfoStruct>::iterator it;

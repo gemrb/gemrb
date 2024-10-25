@@ -45,21 +45,21 @@ public:
 	int GetGenericBonus() const { return genericBonus; };
 
 	void ResetAll();
-	void SetOwner(Actor *owner);
+	void SetOwner(Actor* owner);
 	// no total, it is always kept up to date with RefreshTotal
-	void SetNatural(int AC, int mod=1);
-	void SetDeflectionBonus(int bonus, int mod=1);
-	void SetArmorBonus(int bonus, int mod=1);
-	void SetShieldBonus(int bonus, int mod=1);
-	void SetDexterityBonus(int bonus, int mod=1);
-	void SetWisdomBonus(int bonus, int mod=1);
-	void SetGenericBonus(int bonus, int mod=1);
+	void SetNatural(int AC, int mod = 1);
+	void SetDeflectionBonus(int bonus, int mod = 1);
+	void SetArmorBonus(int bonus, int mod = 1);
+	void SetShieldBonus(int bonus, int mod = 1);
+	void SetDexterityBonus(int bonus, int mod = 1);
+	void SetWisdomBonus(int bonus, int mod = 1);
+	void SetGenericBonus(int bonus, int mod = 1);
 
 	void HandleFxBonus(int mod, bool permanent);
 	std::string dump() const;
 
 private:
-	Actor *Owner = nullptr;
+	Actor* Owner = nullptr;
 	int total; // modified stat
 	int natural = 0; // base stat
 
@@ -96,23 +96,23 @@ public:
 	int GetTotalForAttackNum(unsigned int number) const;
 
 	void ResetAll();
-	void SetOwner(Actor *owner);
+	void SetOwner(Actor* owner);
 	// no total, it is always kept up to date with RefreshTotal
-	void SetBase(int tohit, int mod=1);
-	void SetProficiencyBonus(int bonus, int mod=1);
-	void SetArmorBonus(int bonus, int mod=1);
-	void SetShieldBonus(int bonus, int mod=1);
-	void SetAbilityBonus(int bonus, int mod=1);
-	void SetWeaponBonus(int bonus, int mod=1);
-	void SetGenericBonus(int bonus, int mod=1);
-	void SetFxBonus(int bonus, int mod=1);
+	void SetBase(int tohit, int mod = 1);
+	void SetProficiencyBonus(int bonus, int mod = 1);
+	void SetArmorBonus(int bonus, int mod = 1);
+	void SetShieldBonus(int bonus, int mod = 1);
+	void SetAbilityBonus(int bonus, int mod = 1);
+	void SetWeaponBonus(int bonus, int mod = 1);
+	void SetGenericBonus(int bonus, int mod = 1);
+	void SetFxBonus(int bonus, int mod = 1);
 
 	void SetBABDecrement(int decrement);
 	void HandleFxBonus(int mod, bool permanent);
 	std::string dump() const;
 
 private:
-	Actor *Owner = nullptr;
+	Actor* Owner = nullptr;
 	int total; // modified stat, now really containing all the boni
 	int base = 0; // base stat
 	int babDecrement = 0; // 3ed, used for calculating the tohit value of succeeding attacks
@@ -126,7 +126,7 @@ private:
 	int genericBonus; // "other"
 	int fxBonus; // split off from the generic bonus for hacky reasons
 
-	void SetBonus(int &current, int bonus, int mod);
+	void SetBonus(int& current, int bonus, int mod);
 	void RefreshTotal();
 };
 

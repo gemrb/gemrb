@@ -25,34 +25,33 @@
 
 #include "globals.h"
 
-#include <cmath>
-#include <cstdint>
 #include <cctype>
-#include <cstdint>
 #include <cerrno>
 #include <climits>
+#include <cmath>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
- 
+
 #define av_const
 #define av_cold
 #define av_flatten
 #define attribute_deprecated
 #define av_unused
-#define av_uninit(x) x
+#define av_uninit(x)     x
 #define av_always_inline inline
 
-void *av_malloc(unsigned int size);
-void av_free(void *ptr);
-void av_freep(void **ptr);
+void* av_malloc(unsigned int size);
+void av_free(void* ptr);
+void av_freep(void** ptr);
 
 /**
  * data needed to decode 4-bit Huffman-coded value 
  */
 typedef struct Tree {
-    int     vlc_num;  ///< tree number (in bink_trees[])
-    uint8_t syms[16]; ///< leaf value to symbol mapping
+	int vlc_num; ///< tree number (in bink_trees[])
+	uint8_t syms[16]; ///< leaf value to symbol mapping
 } Tree;
-  
+
 #endif /* AVUTIL_COMMON_H */

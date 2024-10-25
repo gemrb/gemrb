@@ -20,10 +20,6 @@
 
 #include "GUI/Button.h"
 
-#include "GUI/EventMgr.h"
-#include "GUI/ScrollBar.h"
-#include "GUI/Window.h"
-
 #include "defsounds.h"
 #include "ie_cursors.h"
 
@@ -31,8 +27,12 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "Palette.h"
+
+#include "GUI/EventMgr.h"
+#include "GUI/ScrollBar.h"
+#include "GUI/Window.h"
+#include "Logging/Logging.h"
 
 #include <utility>
 
@@ -130,7 +130,7 @@ void Button::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	// Button image
-	if (!( flags & IE_GUI_BUTTON_NO_IMAGE )) {
+	if (!(flags & IE_GUI_BUTTON_NO_IMAGE)) {
 		Holder<Sprite2D> Image;
 
 		switch (ButtonState) {
@@ -162,7 +162,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 	// Button picture
 	Point picPos;
-	if (Picture && (flags & IE_GUI_BUTTON_PICTURE) ) {
+	if (Picture && (flags & IE_GUI_BUTTON_PICTURE)) {
 		// Picture is drawn centered
 		picPos.x = (rgn.w / 2) - (Picture->Frame.w / 2) + rgn.x;
 		picPos.y = (rgn.h / 2) - (Picture->Frame.h / 2) + rgn.y;
@@ -184,7 +184,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			}
 
 			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w, buttonHeight);
-			VideoDriver->BlitSprite( Picture, rb.origin, &rb );
+			VideoDriver->BlitSprite(Picture, rb.origin, &rb);
 		} else {
 			Region r(picPos.x, picPos.y, (Picture->Frame.w * Clipping), Picture->Frame.h);
 			BlitFlags bf = IsDisabled() ? BlitFlags::SEPIA : BlitFlags::NONE;
@@ -195,9 +195,9 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	// Button animation
 	if (animation) {
 		auto AnimPicture = animation->Current();
-		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
-		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
-		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
+		int xOffs = (frame.w / 2) - (AnimPicture->Frame.w / 2);
+		int yOffs = (frame.h / 2) - (AnimPicture->Frame.h / 2);
+		Region r(rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h);
 
 		BlitFlags bf = bool(animation->flags & Animation::Flags::BlendBlack) ? BlitFlags::ONE_MINUS_DST : BlitFlags::BLENDED;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
@@ -208,7 +208,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	}
 
 	// Composite pictures (paperdolls/description icons)
-	if (!PictureList.empty() && (flags & IE_GUI_BUTTON_PICTURE) ) {
+	if (!PictureList.empty() && (flags & IE_GUI_BUTTON_PICTURE)) {
 		auto iter = PictureList.begin();
 		Point offset;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
@@ -219,8 +219,8 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			// Display as-is
 		} else {
 			// Center the first picture, and align the rest to that
-			offset.x = frame.w / 2 - (*iter)->Frame.w/2 + (*iter)->Frame.x;
-			offset.y = frame.h / 2 - (*iter)->Frame.h/2 + (*iter)->Frame.y;
+			offset.x = frame.w / 2 - (*iter)->Frame.w / 2 + (*iter)->Frame.x;
+			offset.y = frame.h / 2 - (*iter)->Frame.h / 2 + (*iter)->Frame.y;
 		}
 
 		BlitFlags blitFlags = BlitFlags::NONE;
@@ -258,13 +258,13 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
 			r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
-		} else if (flags&IE_GUI_BUTTON_ANCHOR) {
+		} else if (flags & IE_GUI_BUTTON_ANCHOR) {
 			r.x += Anchor.x;
 			r.y += Anchor.y;
 			r.w -= Anchor.x;
 			r.h -= Anchor.y;
 		} else {
-			Font::StringSizeMetrics metrics {r.size, 0, 0, false};
+			Font::StringSizeMetrics metrics { r.size, 0, 0, false };
 			font->StringSize(Text, &metrics);
 
 			if (metrics.numLines == 1 && (IE_GUI_BUTTON_ALIGNMENT_FLAGS & flags)) {
@@ -275,7 +275,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 				r.ExpandAllSides(-5);
 			}
 		}
-		
+
 		Color c = textColor;
 		if (ButtonState == DISABLED || IsDisabled()) {
 			c.r *= 0.66;
@@ -283,16 +283,16 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			c.b *= 0.66;
 		}
 
-		Font::PrintColors colors {c, ColorBlack};
+		Font::PrintColors colors { c, ColorBlack };
 		font->Print(r, Text, align, colors);
 	}
 
-	if (! (flags&IE_GUI_BUTTON_NO_IMAGE)) {
+	if (!(flags & IE_GUI_BUTTON_NO_IMAGE)) {
 		for (const ButtonBorder& border : borders) {
 			if (!border.enabled) continue;
 
 			const Region& frRect = border.rect;
-			Region r = Region( rgn.origin + frRect.origin, frRect.size );
+			Region r = Region(rgn.origin + frRect.origin, frRect.size);
 			if (pulseBorder && !border.filled) {
 				Color mix = GlobalColorCycle.Blend(ColorWhite, border.color);
 				VideoDriver->DrawRect(r, mix, border.filled, BlitFlags::BLENDED);
@@ -306,7 +306,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 /** Sets the Button State */
 void Button::SetState(State state, bool setval)
 {
-	if (state > LOCKED_PRESSED) {// If wrong value inserted
+	if (state > LOCKED_PRESSED) { // If wrong value inserted
 		return;
 	}
 
@@ -347,19 +347,18 @@ bool Button::IsAnimated() const
 bool Button::IsOpaque() const
 {
 	bool opaque = Control::IsOpaque();
-	if (!opaque && animation && animation->Current())
-	{
+	if (!opaque && animation && animation->Current()) {
 		auto AnimPicture = animation->Current();
 		opaque = !AnimPicture->HasTransparency();
 	}
-	if (!opaque && Picture && !(flags&IE_GUI_BUTTON_NO_IMAGE)) {
+	if (!opaque && Picture && !(flags & IE_GUI_BUTTON_NO_IMAGE)) {
 		opaque = !Picture->HasTransparency();
 	}
-	
+
 	return opaque;
 }
 
-void Button::SetBorder(int index, const Region& rgn, const Color &color, bool enabled, bool filled)
+void Button::SetBorder(int index, const Region& rgn, const Color& color, bool enabled, bool filled)
 {
 	if (index >= MAX_NUM_BORDERS)
 		return;
@@ -436,7 +435,7 @@ void Button::CompleteDragOperation(const DragOp& dop)
 		// this was the dragged view
 		EnableBorder(1, false);
 	}
-	
+
 	Control::CompleteDragOperation(dop);
 }
 
@@ -445,7 +444,7 @@ Holder<Sprite2D> Button::DragCursor() const
 	if (Picture) {
 		return Picture;
 	}
-	
+
 	return Control::DragCursor();
 }
 
@@ -456,7 +455,7 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 	if (core->GetDraggedItem() && !SupportsAction(key)) {
 		return true;
 	}
-    
+
 	if (me.button == GEM_MB_ACTION) {
 		if (ButtonState == LOCKED) {
 			SetState(LOCKED_PRESSED);
@@ -473,7 +472,7 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 /** Mouse Button Up */
 bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
-	bool drag = core->GetDraggedItem () != NULL;
+	bool drag = core->GetDraggedItem() != NULL;
 
 	if (drag && me.repeats == 1) {
 		ActionKey key(Control::Action::DragDropDest);
@@ -542,10 +541,10 @@ void Button::SetText(String string)
 {
 	Text = std::move(string);
 	if (Text.length()) {
-		if (flags&IE_GUI_BUTTON_LOWERCASE)
-			StringToLower( Text );
-		else if (flags&IE_GUI_BUTTON_CAPS)
-			StringToUpper( Text );
+		if (flags & IE_GUI_BUTTON_LOWERCASE)
+			StringToLower(Text);
+		else if (flags & IE_GUI_BUTTON_CAPS)
+			StringToUpper(Text);
 		hasText = true;
 	} else {
 		hasText = false;
@@ -558,7 +557,7 @@ BitOp Button::GetDictOp() const noexcept
 	if (flags & IE_GUI_BUTTON_CHECKBOX) {
 		return BitOp::XOR;
 	}
-	
+
 	return BitOp::SET;
 }
 
@@ -569,7 +568,7 @@ void Button::UpdateState(value_t Sum)
 		// FIXME: buttons should be able to both be disabled and reflect their state
 		return;
 	}
-	
+
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		//radio button, exact value
 		State state = Sum == GetValue() ? SELECTED : UNPRESSED;
@@ -649,15 +648,15 @@ bool Button::HitTest(const Point& p) const
 }
 
 // Set palette used for drawing button label in normal state
-void Button::SetTextColor(const Color &color)
+void Button::SetTextColor(const Color& color)
 {
 	textColor = color;
 	MarkDirty();
 }
 
-void Button::SetHorizontalOverlay(double clip, const Color& src, const Color &dest)
+void Button::SetHorizontalOverlay(double clip, const Color& src, const Color& dest)
 {
-	if ((Clipping>clip) || !(flags&IE_GUI_BUTTON_HORIZONTAL) ) {
+	if ((Clipping > clip) || !(flags & IE_GUI_BUTTON_HORIZONTAL)) {
 		flags |= IE_GUI_BUTTON_HORIZONTAL;
 
 		overlayAnim = ColorAnimation(src, dest, false);
@@ -668,18 +667,18 @@ void Button::SetHorizontalOverlay(double clip, const Color& src, const Color &de
 
 void Button::SetAnchor(int x, int y)
 {
-	Anchor = Point(x,y);
+	Anchor = Point(x, y);
 }
 
 void Button::SetPushOffset(int x, int y)
 {
-	PushOffset = Point(x,y);
+	PushOffset = Point(x, y);
 }
 
 bool Button::SetHotKey(KeyboardKey key, short mod, bool global)
 {
 	UnregisterHotKey();
-	
+
 	if (key == 0) {
 		return true;
 	}

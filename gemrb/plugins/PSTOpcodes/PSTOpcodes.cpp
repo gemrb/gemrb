@@ -24,86 +24,86 @@
 #include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
-#include "GUI/WindowManager.h"
 #include "Interface.h"
 #include "Map.h"
 #include "RNG.h"
+#include "ScriptedAnimation.h"
 #include "TableMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
-#include "Video/Video.h" //for tints
 
+#include "GUI/WindowManager.h"
 #include "GameScript/GSUtils.h"
 #include "Scriptable/Actor.h"
-#include "ScriptedAnimation.h"
+#include "Video/Video.h" //for tints
 
 using namespace GemRB;
 
 // TODO: recheck 0x52 is Incite Berserk Attack and implement; currently mapped to bg1 SetAIScript in effect.ids
-int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx);//6e
-int fx_set_status (Scriptable* Owner, Actor* target, Effect* fx);//ba
-int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx);//bb
-int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx);//bc
-int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx);//c0
+int fx_retreat_from(Scriptable* Owner, Actor* target, Effect* fx); //6e
+int fx_set_status(Scriptable* Owner, Actor* target, Effect* fx); //ba
+int fx_play_bam_blended(Scriptable* Owner, Actor* target, Effect* fx); //bb
+int fx_play_bam_not_blended(Scriptable* Owner, Actor* target, Effect* fx); //bc
+int fx_transfer_hp(Scriptable* Owner, Actor* target, Effect* fx); //c0
 //int fx_shake_screen (Scriptable* Owner, Actor* target, Effect* fx);//c1 already implemented in fxopcodes
-int fx_flash_screen (Scriptable* Owner, Actor* target, Effect* fx);//c2
-int fx_tint_screen (Scriptable* Owner, Actor* target, Effect* fx);//c3
-int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx);//c4
-int fx_multiple_vvc (Scriptable* Owner, Actor* target, Effect* fx);//c5 //gemrb specific
+int fx_flash_screen(Scriptable* Owner, Actor* target, Effect* fx); //c2
+int fx_tint_screen(Scriptable* Owner, Actor* target, Effect* fx); //c3
+int fx_special_effect(Scriptable* Owner, Actor* target, Effect* fx); //c4
+int fx_multiple_vvc(Scriptable* Owner, Actor* target, Effect* fx); //c5 //gemrb specific
 //int fx_modify_global ((Scriptable* Owner, Actor* target, Effect* fx);//c6 already implemented in fxopcodes
-int fx_change_background (Scriptable* Owner, Actor* target, Effect* fx);//c7 //gemrb specific
+int fx_change_background(Scriptable* Owner, Actor* target, Effect* fx); //c7 //gemrb specific
 //unknown 0xc7-c8
-int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx);//c9
+int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx); //c9
 //unknown 0xca
-int fx_bless (Scriptable* Owner, Actor* target, Effect* fx);//82 (this is a modified effect)
-int fx_curse (Scriptable* Owner, Actor* target, Effect* fx);//cb
-int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx);//cc
-int fx_move_view (Scriptable* Owner, Actor* target, Effect* fx);//cd
-int fx_embalm (Scriptable* Owner, Actor* target, Effect* fx);//ce
-int fx_stop_all_action (Scriptable* Owner, Actor* target, Effect* fx);//cf
-int fx_iron_fist (Scriptable* Owner, Actor* target, Effect* fx);//d0
-int fx_hostile_image(Scriptable* Owner, Actor* target, Effect* fx);//d1
-int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx);//d2
-int fx_jumble_curse (Scriptable* Owner, Actor* target, Effect* fx);//d3
-int fx_speak_with_dead (Scriptable* Owner, Actor* target, Effect* fx);//d4
+int fx_bless(Scriptable* Owner, Actor* target, Effect* fx); //82 (this is a modified effect)
+int fx_curse(Scriptable* Owner, Actor* target, Effect* fx); //cb
+int fx_prayer(Scriptable* Owner, Actor* target, Effect* fx); //cc
+int fx_move_view(Scriptable* Owner, Actor* target, Effect* fx); //cd
+int fx_embalm(Scriptable* Owner, Actor* target, Effect* fx); //ce
+int fx_stop_all_action(Scriptable* Owner, Actor* target, Effect* fx); //cf
+int fx_iron_fist(Scriptable* Owner, Actor* target, Effect* fx); //d0
+int fx_hostile_image(Scriptable* Owner, Actor* target, Effect* fx); //d1
+int fx_detect_evil(Scriptable* Owner, Actor* target, Effect* fx); //d2
+int fx_jumble_curse(Scriptable* Owner, Actor* target, Effect* fx); //d3
+int fx_speak_with_dead(Scriptable* Owner, Actor* target, Effect* fx); //d4
 
 //the engine sorts these, feel free to use any order
 static EffectDesc effectnames[] = {
-	EffectDesc("Bless", fx_bless, 0, -1 ),//82
-	EffectDesc("ChangeBackground", fx_change_background, EFFECT_NO_ACTOR, -1 ), //c6
-	EffectDesc("Curse", fx_curse, 0, -1 ),//cb
-	EffectDesc("DetectEvil", fx_detect_evil, 0, -1 ), //d2
-	EffectDesc("Embalm", fx_embalm, 0, -1 ), //0xce
-	EffectDesc("FlashScreen", fx_flash_screen, EFFECT_NO_ACTOR, -1 ), //c2
-	EffectDesc("HostileImage", fx_hostile_image, 0, -1 ),//d1
-	EffectDesc("IronFist", fx_iron_fist, 0, -1 ), //d0
-	EffectDesc("JumbleCurse", fx_jumble_curse, 0, -1 ), //d3
-	EffectDesc("MoveView", fx_move_view, EFFECT_NO_ACTOR, -1 ),//cd
-	EffectDesc("MultipleVVC", fx_multiple_vvc, EFFECT_NO_ACTOR, -1 ), //c5
-	EffectDesc("Overlay", fx_overlay, 0, -1 ), //c9
-	EffectDesc("PlayBAM1", fx_play_bam_blended, 0, -1 ), //bb
-	EffectDesc("PlayBAM2", fx_play_bam_not_blended, 0, -1 ),//bc
-	EffectDesc("PlayBAM3", fx_play_bam_not_blended, 0, -1 ), //bd
-	EffectDesc("PlayBAM4", fx_play_bam_not_blended, 0, -1 ), //be
-	EffectDesc("PlayBAM5", fx_play_bam_not_blended, 0, -1 ), //bf
-	EffectDesc("Prayer", fx_prayer, 0, -1 ),//cc
-	EffectDesc("RetreatFrom", fx_retreat_from, 0, -1 ),//6e
-	EffectDesc("SetStatus", fx_set_status, 0, -1 ), //ba
-	EffectDesc("SpeakWithDead", fx_speak_with_dead, 0, -1 ), //d4
-	EffectDesc("SpecialEffect", fx_special_effect, 0, -1 ),//c4
-	EffectDesc("StopAllAction", fx_stop_all_action, EFFECT_NO_ACTOR, -1 ), //cf
-	EffectDesc("TintScreen", fx_tint_screen, EFFECT_NO_ACTOR, -1 ), //c3
-	EffectDesc("TransferHP", fx_transfer_hp, EFFECT_DICED, -1 ), //c0
+	EffectDesc("Bless", fx_bless, 0, -1), //82
+	EffectDesc("ChangeBackground", fx_change_background, EFFECT_NO_ACTOR, -1), //c6
+	EffectDesc("Curse", fx_curse, 0, -1), //cb
+	EffectDesc("DetectEvil", fx_detect_evil, 0, -1), //d2
+	EffectDesc("Embalm", fx_embalm, 0, -1), //0xce
+	EffectDesc("FlashScreen", fx_flash_screen, EFFECT_NO_ACTOR, -1), //c2
+	EffectDesc("HostileImage", fx_hostile_image, 0, -1), //d1
+	EffectDesc("IronFist", fx_iron_fist, 0, -1), //d0
+	EffectDesc("JumbleCurse", fx_jumble_curse, 0, -1), //d3
+	EffectDesc("MoveView", fx_move_view, EFFECT_NO_ACTOR, -1), //cd
+	EffectDesc("MultipleVVC", fx_multiple_vvc, EFFECT_NO_ACTOR, -1), //c5
+	EffectDesc("Overlay", fx_overlay, 0, -1), //c9
+	EffectDesc("PlayBAM1", fx_play_bam_blended, 0, -1), //bb
+	EffectDesc("PlayBAM2", fx_play_bam_not_blended, 0, -1), //bc
+	EffectDesc("PlayBAM3", fx_play_bam_not_blended, 0, -1), //bd
+	EffectDesc("PlayBAM4", fx_play_bam_not_blended, 0, -1), //be
+	EffectDesc("PlayBAM5", fx_play_bam_not_blended, 0, -1), //bf
+	EffectDesc("Prayer", fx_prayer, 0, -1), //cc
+	EffectDesc("RetreatFrom", fx_retreat_from, 0, -1), //6e
+	EffectDesc("SetStatus", fx_set_status, 0, -1), //ba
+	EffectDesc("SpeakWithDead", fx_speak_with_dead, 0, -1), //d4
+	EffectDesc("SpecialEffect", fx_special_effect, 0, -1), //c4
+	EffectDesc("StopAllAction", fx_stop_all_action, EFFECT_NO_ACTOR, -1), //cf
+	EffectDesc("TintScreen", fx_tint_screen, EFFECT_NO_ACTOR, -1), //c3
+	EffectDesc("TransferHP", fx_transfer_hp, EFFECT_DICED, -1), //c0
 	EffectDesc(nullptr, nullptr, 0, 0),
 };
 
 static void RegisterTormentOpcodes(const CoreSettings&)
 {
-	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectDesc ) - 1, effectnames );
+	core->RegisterOpcodes(sizeof(effectnames) / sizeof(EffectDesc) - 1, effectnames);
 }
 
 //retreat_from (works only in PST) - forces target to run away/walk away from Owner
-int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_retreat_from(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_retreat_from(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
@@ -113,10 +113,10 @@ int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//distance to run
 	if (!fx->Parameter3) {
-		fx->Parameter3=100;
+		fx->Parameter3 = 100;
 	}
 
-	if (fx->Parameter2==8) {
+	if (fx->Parameter2 == 8) {
 		//backs away from owner
 		target->RunAwayFrom(Owner->Pos, fx->Parameter3, false);
 		//one shot
@@ -125,7 +125,7 @@ int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//walks (7) or runs away (all others) from owner
 	target->RunAwayFrom(Owner->Pos, fx->Parameter3, true);
-	if (fx->Parameter2!=7) {
+	if (fx->Parameter2 != 7) {
 		target->SetRunFlags(IF_RUNNING);
 	}
 
@@ -134,20 +134,20 @@ int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0xba fx_set_status
-int fx_set_status (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_set_status(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_set_status(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter1) {
-		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			BASE_STATE_SET (fx->Parameter2);
+		if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+			BASE_STATE_SET(fx->Parameter2);
 		} else {
-			STATE_SET (fx->Parameter2);
+			STATE_SET(fx->Parameter2);
 		}
 	} else {
-		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			BASE_STATE_CURE (fx->Parameter2);
+		if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+			BASE_STATE_CURE(fx->Parameter2);
 		} else {
-			STATE_CURE (fx->Parameter2);
+			STATE_CURE(fx->Parameter2);
 		}
 	}
 	return FX_PERMANENT;
@@ -167,7 +167,7 @@ static void SetRGBMod(ieDword color, ScriptedAnimation* sca)
 //bb fx_play_bam_bb (play multi-part blended sticky animation)
 // 1 repeats
 // 2 not sticky (override default)
-int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_play_bam_blended(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	bool playonce;
 
@@ -177,13 +177,13 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!Owner)
 		return FX_NOT_APPLIED;
 	//delay effect
-	Map *area = Owner->GetCurrentArea();
+	Map* area = Owner->GetCurrentArea();
 	if (!area)
 		return FX_APPLIED;
 
 	//play once set to true
 	//check tearring.itm (0xbb effect)
-	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(fx->Resource, true);
+	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, true);
 	if (!sca)
 		return FX_NOT_APPLIED;
 
@@ -192,32 +192,32 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter1) {
 		SetRGBMod(fx->Parameter1, sca);
 	}
-	if ((fx->TimingMode==FX_DURATION_INSTANT_LIMITED) && (fx->Parameter2&1) ) {
-		playonce=false;
+	if ((fx->TimingMode == FX_DURATION_INSTANT_LIMITED) && (fx->Parameter2 & 1)) {
+		playonce = false;
 	} else {
-		playonce=true;
+		playonce = true;
 	}
 	if (playonce) {
 		sca->PlayOnce();
 	} else {
-		if (fx->Parameter2&1) {
+		if (fx->Parameter2 & 1) {
 			//four cycles, duration is in millisecond
 			sca->SetDefaultDuration(sca->GetSequenceDuration(core->Time.defaultTicksPerSec));
 		} else {
-			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
+			sca->SetDefaultDuration(fx->Duration - core->GetGame()->Ticks);
 		}
 	}
 	//convert it to an area VVC
 	if (!target) {
-		fx->Parameter2|=2;
+		fx->Parameter2 |= 2;
 	}
 
-	if (fx->Parameter2&2) {
+	if (fx->Parameter2 & 2) {
 		sca->Pos = fx->Pos;
 		area->AddVVCell(sca);
 	} else {
 		assert(target);
-		ScriptedAnimation *twin = sca->DetachTwin();
+		ScriptedAnimation* twin = sca->DetachTwin();
 		if (twin) {
 			target->AddVVCell(twin);
 		}
@@ -234,7 +234,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 //twin animation:                   0x30000
 //background animation:             0x10000
 //foreground animation:             0x20000
-int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_play_bam_not_blended(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	bool playonce;
 	bool doublehint;
@@ -245,68 +245,68 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!Owner)
 		return FX_NOT_APPLIED;
 
-	Map *area = Owner->GetCurrentArea();
+	Map* area = Owner->GetCurrentArea();
 	if (!area)
 		return FX_APPLIED;
 
 	//play once set to true
 	//check tearring.itm (0xbb effect)
-	if ((fx->Parameter2&0x30000)==0x30000) {
+	if ((fx->Parameter2 & 0x30000) == 0x30000) {
 		doublehint = true;
 	} else {
 		doublehint = false;
 	}
-	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(fx->Resource, doublehint);
+	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, doublehint);
 	if (!sca)
 		return FX_NOT_APPLIED;
 
-	switch (fx->Parameter2&0x300000) {
-	case 0x300000:
-		sca->SetBlend(); //per pixel transparency
-		break;
-	case 0x200000: //this is an insane combo
-		sca->SetBlend(); //per pixel transparency
-		sca->SetFade((ieByte) fx->Parameter1, fx->DiceSides); //per surface transparency
-		break;
-	case 0x100000: //per surface transparency
-		sca->SetFade((ieByte) fx->Parameter1, fx->DiceSides);
-		break;
-	default:
-		if (fx->Parameter1) {
-			SetRGBMod(fx->Parameter1, sca);
-		}
+	switch (fx->Parameter2 & 0x300000) {
+		case 0x300000:
+			sca->SetBlend(); //per pixel transparency
+			break;
+		case 0x200000: //this is an insane combo
+			sca->SetBlend(); //per pixel transparency
+			sca->SetFade((ieByte) fx->Parameter1, fx->DiceSides); //per surface transparency
+			break;
+		case 0x100000: //per surface transparency
+			sca->SetFade((ieByte) fx->Parameter1, fx->DiceSides);
+			break;
+		default:
+			if (fx->Parameter1) {
+				SetRGBMod(fx->Parameter1, sca);
+			}
 	}
-	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
-		playonce=false;
+	if (fx->TimingMode == FX_DURATION_INSTANT_LIMITED) {
+		playonce = false;
 	} else {
-		playonce=true;
+		playonce = true;
 	}
-	switch (fx->Parameter2&0x30000) {
-	case 0x20000://foreground
-		sca->ZOffset += 9999;
-		sca->YOffset += 9999;
-		break;
-	case 0x30000: //both
-		sca->ZOffset += 9999;
-		sca->YOffset += 9999;
-		if (sca->twin) {
-			sca->twin->ZOffset -= 9999;
-			sca->twin->YOffset -= 9999;
-		}
-		break;
-	default: //background
-		sca->ZOffset -= 9999;
-		sca->YOffset -= 9999;
-		break;
+	switch (fx->Parameter2 & 0x30000) {
+		case 0x20000: //foreground
+			sca->ZOffset += 9999;
+			sca->YOffset += 9999;
+			break;
+		case 0x30000: //both
+			sca->ZOffset += 9999;
+			sca->YOffset += 9999;
+			if (sca->twin) {
+				sca->twin->ZOffset -= 9999;
+				sca->twin->YOffset -= 9999;
+			}
+			break;
+		default: //background
+			sca->ZOffset -= 9999;
+			sca->YOffset -= 9999;
+			break;
 	}
 	if (playonce) {
 		sca->PlayOnce();
 	} else {
-		sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
+		sca->SetDefaultDuration(fx->Duration - core->GetGame()->Ticks);
 	}
-	ScriptedAnimation *twin = sca->DetachTwin();
+	ScriptedAnimation* twin = sca->DetachTwin();
 
-	if (target && (fx->Parameter2&4096)) {
+	if (target && (fx->Parameter2 & 4096)) {
 		if (twin) {
 			target->AddVVCell(twin);
 		}
@@ -315,12 +315,12 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 		//the random placement works only when it is not sticky
 		int x = 0;
 		int y = 0;
-		if (fx->Parameter2&1) {
+		if (fx->Parameter2 & 1) {
 			ieWord tmp = RAND<ieWord>();
-			x = tmp&31;
-			y = (tmp>>5)&31;
+			x = tmp & 31;
+			y = (tmp >> 5) & 31;
 		}
-		
+
 		sca->Pos = fx->Pos;
 		sca->XOffset -= x;
 		sca->YOffset -= y;
@@ -337,34 +337,40 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0xc0 fx_transfer_hp
-int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_transfer_hp(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_transfer_hp(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
-	if (Owner->Type!=ST_ACTOR) {
+	if (Owner->Type != ST_ACTOR) {
 		return FX_NOT_APPLIED;
 	}
 
-	Actor *owner = GetCasterObject();
+	Actor* owner = GetCasterObject();
 
 	if (owner == target || !owner || !target) {
 		return FX_NOT_APPLIED;
 	}
 
-	Actor *receiver;
-	Actor *donor;
-	int a,b;
+	Actor* receiver;
+	Actor* donor;
+	int a, b;
 
 	//handle variable level hp drain (for blood bridge)
 	if (fx->IsVariable) {
-		fx->Parameter1+=fx->CasterLevel;
-		fx->IsVariable=0;
+		fx->Parameter1 += fx->CasterLevel;
+		fx->IsVariable = 0;
 	}
 
-	switch(fx->Parameter2) {
+	switch (fx->Parameter2) {
 		case 3:
-		case 0: receiver = target; donor = owner; break;
+		case 0:
+			receiver = target;
+			donor = owner;
+			break;
 		case 4:
-		case 1: receiver = owner; donor = target; break;
+		case 1:
+			receiver = owner;
+			donor = target;
+			break;
 		case 2:
 			a = owner->GetBase(IE_HITPOINTS);
 			b = target->GetBase(IE_HITPOINTS);
@@ -374,13 +380,13 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 		default:
 			return FX_NOT_APPLIED;
 	}
-	int damage = receiver->GetStat(IE_MAXHITPOINTS)-receiver->GetStat(IE_HITPOINTS);
-	if (damage>(signed) fx->Parameter1) {
-		damage=(signed) fx->Parameter1;
+	int damage = receiver->GetStat(IE_MAXHITPOINTS) - receiver->GetStat(IE_HITPOINTS);
+	if (damage > (signed) fx->Parameter1) {
+		damage = (signed) fx->Parameter1;
 	}
 	if (damage) {
 		damage = donor->Damage(damage, fx->Parameter2, owner, MOD_ADDITIVE, fx->SavingThrowType);
-		receiver->NewBase( IE_HITPOINTS, damage, MOD_ADDITIVE );
+		receiver->NewBase(IE_HITPOINTS, damage, MOD_ADDITIVE);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -388,10 +394,10 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 //0xc1 fx_shake_screen this is already implemented in BG2
 
 //0xc2 fx_flash_screen
-int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_flash_screen(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_flash_screen(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
-	const unsigned char* bytes = (const unsigned char *) &fx->Parameter1;
+	const unsigned char* bytes = (const unsigned char*) &fx->Parameter1;
 	Color c(bytes[0], bytes[1], bytes[2], 0xff);
 	core->GetWindowManager()->FadeColor = c;
 	//this needs to be at least 2 for any effect
@@ -457,7 +463,7 @@ static int ColorBoundInfringed(const Color& curGlobalTint, const Color& tintMin,
 	}
 }
 
-int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_tint_screen(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	Color fadeColor = Color::FromABGR(fx->Parameter1); // usually gray
 	ieDword type = fx->Parameter2;
@@ -470,7 +476,7 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 	Color tintMin;
 	Color tintMax;
-	static const Color tintNone{};
+	static const Color tintNone {};
 	Color step; // the amount the engine adds to each color parameter of the current area tint every AI tick
 	if (type & 8) {
 		tintMin = ColorBlack;
@@ -495,10 +501,10 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		tintMax = fadeColor;
 		ieDword div = fx->IsVariable == 0 ? fx->Parameter4 : fx->IsVariable;
 		step = (fadeColor - initialTint) / div;
-// 		if (ColorBoundInfringed(core->GetWindowManager()->FadeColor + step, tintMin, tintMax) != 0) {
-// 			core->GetWindowManager()->FadeColor = tintNone;
-// 			return FX_NOT_APPLIED;
-// 		}
+		// 		if (ColorBoundInfringed(core->GetWindowManager()->FadeColor + step, tintMin, tintMax) != 0) {
+		// 			core->GetWindowManager()->FadeColor = tintNone;
+		// 			return FX_NOT_APPLIED;
+		// 		}
 	}
 
 	// only update the color during the initial fade in
@@ -610,7 +616,7 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 //0xc4 fx_special_effect
 //it is a mystery, why they needed to make this effect
-int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_special_effect(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_special_effect(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	//param2 determines the effect's behaviour
@@ -620,7 +626,7 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	//  adds a play bam opcode to the projectile
 	//2 - raise dead projectile - the projectile itself has the effect (why is it so complicated)
 
-	switch(fx->Parameter2) {
+	switch (fx->Parameter2) {
 		case 0:
 			fx->Resource = "ADDER";
 			break;
@@ -643,19 +649,19 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 //0xc5 fx_multiple_vvc
 //this is a gemrb specific opcode to support the rune of torment projectile
 //it plays multiple vvc's with a given delay and duration
-int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
+int fx_multiple_vvc(Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_multiple_vvc(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 
-	Map *area = Owner->GetCurrentArea();
+	Map* area = Owner->GetCurrentArea();
 	if (!area)
 		return FX_NOT_APPLIED;
 
-	VEFObject *vef = gamedata->GetVEFObject(fx->Resource, true);
+	VEFObject* vef = gamedata->GetVEFObject(fx->Resource, true);
 	if (vef) {
 		area->AddVVCell(vef);
 	}
-/*
+	/*
 	AutoTable tab(fx->Resource);
 	if (!tab)
 		return FX_NOT_APPLIED;
@@ -684,10 +690,10 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 
 //0xc6 ChangeBackground
 //GemRB specific, to support BMP area background changes (desert hell projectile)
-int fx_change_background (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_change_background(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_change_background(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
-	Map *map = core->GetGame()->GetCurrentArea();
+	Map* map = core->GetGame()->GetCurrentArea();
 	if (map) {
 		map->SetBackground(fx->Resource, fx->Duration);
 	}
@@ -715,18 +721,18 @@ static EffectRef fx_miscast_ref = { "MiscastMagicModifier", -1 };
 static EffectRef fx_set_state_ref = { "SetStatus", -1 };
 static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 
-static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int param2)
+static inline int DamageLastHitter(Effect* fx, Actor* target, int param1, int param2)
 {
 	if (!fx->Parameter3) {
 		return FX_NOT_APPLIED;
 	}
 
-	const Map *map = target->GetCurrentArea();
+	const Map* map = target->GetCurrentArea();
 	Actor* actor = map->GetActorByGlobalID(target->objects.LastHitter);
 	if (actor && PersonalDistance(target, actor) < 30) {
-		const TriggerEntry *entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
+		const TriggerEntry* entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
 		if (entry) {
-			Effect *newFX = EffectQueue::CreateEffect(fx_damage_opcode_ref, param1, param2 << 16, FX_DURATION_INSTANT_PERMANENT);
+			Effect* newFX = EffectQueue::CreateEffect(fx_damage_opcode_ref, param1, param2 << 16, FX_DURATION_INSTANT_PERMANENT);
 			newFX->Target = FX_TARGET_PRESET;
 			newFX->Power = fx->Power;
 			newFX->Source = fx->Source;
@@ -743,7 +749,7 @@ static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int pa
 	return FX_APPLIED;
 }
 
-static inline void ConvertTiming(Effect *fx, int Duration)
+static inline void ConvertTiming(Effect* fx, int Duration)
 {
 	// GameTime will be added in by EffectQueue
 	fx->Duration = Duration ? Duration * core->Time.defaultTicksPerSec : 1;
@@ -753,7 +759,7 @@ static inline void ConvertTiming(Effect *fx, int Duration)
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 }
 
-int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_overlay(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (!target) {
@@ -762,176 +768,177 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 	int terminate = FX_APPLIED;
 	bool playonce = false;
 	ieDword tint = 0;
-	Effect *newfx;
+	Effect* newfx;
 	ieDword tmp;
 
 	//special effects based on fx_param2
 	// PST:EE also exploded this into separate opcodes with more parameters and using a bam/vvc instead of an internal projectile
 	if (fx->FirstApply) {
-		switch(fx->Parameter2) {
-		case 0: //cloak of warding
-			ConvertTiming (fx, 5 * fx->CasterLevel);
-			fx->Parameter3 = RAND(3, 12) + fx->CasterLevel;
-			break;
-		case 1: //shield
-			ConvertTiming(fx, 25 * fx->CasterLevel);
+		switch (fx->Parameter2) {
+			case 0: //cloak of warding
+				ConvertTiming(fx, 5 * fx->CasterLevel);
+				fx->Parameter3 = RAND(3, 12) + fx->CasterLevel;
+				break;
+			case 1: //shield
+				ConvertTiming(fx, 25 * fx->CasterLevel);
 
-			target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 3, 16);
-			target->ApplyEffectCopy(fx, fx_breath_ref, Owner, 1, 0);
-			target->ApplyEffectCopy(fx, fx_death_ref, Owner, 1, 0);
-			target->ApplyEffectCopy(fx, fx_poly_ref, Owner, 1, 0);
-			target->ApplyEffectCopy(fx, fx_spell_ref, Owner, 1, 0);
-			target->ApplyEffectCopy(fx, fx_wands_ref, Owner, 1, 0);
+				target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 3, 16);
+				target->ApplyEffectCopy(fx, fx_breath_ref, Owner, 1, 0);
+				target->ApplyEffectCopy(fx, fx_death_ref, Owner, 1, 0);
+				target->ApplyEffectCopy(fx, fx_poly_ref, Owner, 1, 0);
+				target->ApplyEffectCopy(fx, fx_spell_ref, Owner, 1, 0);
+				target->ApplyEffectCopy(fx, fx_wands_ref, Owner, 1, 0);
 
-			break;
-		case 2: //black barbed shield
-			// don't stack
-			tmp = fx->Projectile;
-			fx->Projectile = 0;
-			target->fxqueue.RemoveAllEffectsWithProjectile(tmp);
-			fx->Projectile = tmp;
+				break;
+			case 2: //black barbed shield
+				// don't stack
+				tmp = fx->Projectile;
+				fx->Projectile = 0;
+				target->fxqueue.RemoveAllEffectsWithProjectile(tmp);
+				fx->Projectile = tmp;
 
-			ConvertTiming(fx, RAND(10, 30));
-			target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 2, 0);
-			fx->Parameter3=0xffffffff;
-			break;
-		case 3: //pain mirror
-			fx->Parameter3 = 1;
-			ConvertTiming (fx, 5 * fx->CasterLevel);
-			target->ApplyEffectCopy(fx, fx_colorpulse_ref, Owner, 0xFAFF7000, 0x30000C);
-			break;
-		case 4: //guardian mantle
-			ConvertTiming (fx, 50 + 5 * fx->CasterLevel);
-			break;
-		case 5: //shroud of shadows
-			// should be 5d4 + 10 per level, but the original spell doesn't use the opcode
-			// unhardcoded in our sshadow.spl with 10s as the flat bonus instead of rolling
-			break;
-		case 6: //duplication
-			core->GetAudioDrv()->Play("magic02", SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
-			break;
-		case 7: //armor
-			target->ApplyEffectCopy(fx, fx_colorchange_ref, Owner, 0x825A2800, -1);
-			target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 6, 16);
-			break;
-		case 8: //antimagic shell
-			{
-				newfx = EffectQueue::CreateEffectCopy(fx, fx_dispel_ref, 100, 0);
-				newfx->Power = 10;
+				ConvertTiming(fx, RAND(10, 30));
+				target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 2, 0);
+				fx->Parameter3 = 0xffffffff;
+				break;
+			case 3: //pain mirror
+				fx->Parameter3 = 1;
+				ConvertTiming(fx, 5 * fx->CasterLevel);
+				target->ApplyEffectCopy(fx, fx_colorpulse_ref, Owner, 0xFAFF7000, 0x30000C);
+				break;
+			case 4: //guardian mantle
+				ConvertTiming(fx, 50 + 5 * fx->CasterLevel);
+				break;
+			case 5: //shroud of shadows
+				// should be 5d4 + 10 per level, but the original spell doesn't use the opcode
+				// unhardcoded in our sshadow.spl with 10s as the flat bonus instead of rolling
+				break;
+			case 6: //duplication
+				core->GetAudioDrv()->Play("magic02", SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+				break;
+			case 7: //armor
+				target->ApplyEffectCopy(fx, fx_colorchange_ref, Owner, 0x825A2800, -1);
+				target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 6, 16);
+				break;
+			case 8: //antimagic shell
+				{
+					newfx = EffectQueue::CreateEffectCopy(fx, fx_dispel_ref, 100, 0);
+					newfx->Power = 10;
+					core->ApplyEffect(newfx, target, Owner);
+
+					for (int i = 0; i < 2; i++) {
+						target->ApplyEffectCopy(fx, fx_miscast_ref, Owner, 100, i);
+					}
+
+					for (int i = 1; i < 10; i++) {
+						target->ApplyEffectCopy(fx, fx_protection_ref, Owner, i, 0);
+					}
+					target->ApplyEffectCopy(fx, fx_magicdamage_ref, Owner, 100, 0);
+					target->ApplyEffectCopy(fx, fx_set_state_ref, Owner, 1, STATE_ANTIMAGIC);
+				}
+				break;
+			case 9:
+			case 10: //unused
+			default:
+				break;
+			case 11: //flame walk
+				ConvertTiming(fx, 10 + 10 * fx->CasterLevel);
+
+				target->ApplyEffectCopy(fx, fx_single_color_pulse_ref, Owner, 0xFF00, 0x400040);
+
+				newfx = EffectQueue::CreateEffectCopy(fx, fx_colorchange_ref, 0x64FA00, 0x50005);
+				newfx->IsVariable = 0x23; // delay for 35 ticks
+				newfx->TimingMode = FX_DURATION_DELAY_LIMITED;
 				core->ApplyEffect(newfx, target, Owner);
 
-				for (int i = 0; i < 2; i++) {
-					target->ApplyEffectCopy(fx, fx_miscast_ref, Owner, 100, i);
+				target->ApplyEffectCopy(fx, fx_resistfire_ref, Owner, 50, 1);
+				target->ApplyEffectCopy(fx, fx_resistmfire_ref, Owner, 50, 1);
+				break;
+			case 12: //protection from evil
+				ConvertTiming(fx, 10 * fx->CasterLevel);
+
+				target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 2, 0);
+				target->ApplyEffectCopy(fx, fx_breath_ref, Owner, 2, 0);
+				target->ApplyEffectCopy(fx, fx_death_ref, Owner, 2, 0);
+				target->ApplyEffectCopy(fx, fx_poly_ref, Owner, 2, 0);
+				target->ApplyEffectCopy(fx, fx_spell_ref, Owner, 2, 0);
+				target->ApplyEffectCopy(fx, fx_wands_ref, Owner, 2, 0);
+				//terminate = FX_NOT_APPLIED;
+				break;
+			case 13: //conflagration
+				ConvertTiming(fx, 50); // NOTE: the description is conflicting with itself, stating both 50s and 5s/level
+				playonce = true;
+				break;
+			case 14: //infernal shield
+				tint = 0x5EC2FE;
+				ConvertTiming(fx, 5 * fx->CasterLevel);
+
+				target->ApplyEffectCopy(fx, fx_resistfire_ref, Owner, 150, 1);
+				target->ApplyEffectCopy(fx, fx_resistmfire_ref, Owner, 150, 1);
+				break;
+			case 15: //submerge the will
+				tint = 0x538D90;
+				ConvertTiming(fx, 12 * fx->CasterLevel);
+
+				target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 2, 16);
+				target->ApplyEffectCopy(fx, fx_breath_ref, Owner, 1, 0);
+				target->ApplyEffectCopy(fx, fx_death_ref, Owner, 1, 0);
+				target->ApplyEffectCopy(fx, fx_poly_ref, Owner, 1, 0);
+				target->ApplyEffectCopy(fx, fx_spell_ref, Owner, 1, 0);
+				target->ApplyEffectCopy(fx, fx_wands_ref, Owner, 1, 0);
+				break;
+			case 16: //balance in all things
+				tint = 0x615AB4;
+				fx->Parameter3 = fx->CasterLevel / 4;
+				ConvertTiming(fx, 5 * fx->CasterLevel);
+
+				target->ApplyEffectCopy(fx, fx_colorpulse_ref, Owner, 0x615AB400, 0x30000C);
+				playonce = true;
+				break;
+			case 17: // gemrb extension: strength spells
+				// bump strength, but only up to a limit
+				// if anyone complains about Improved strength having class based limits, add them to clssplab.2da
+				// duration and saving bonus fields are reused; these are eff v1
+				ieDword strLimit = fx->Duration - 1;
+				int bonus = core->Roll(1, gamedata->GetSpellAbilityDie(target, 1), fx->SavingThrowBonus);
+				if (target->Modified[IE_STR] + bonus >= strLimit) {
+					bonus = std::max((ieDword) 0, target->Modified[IE_STR] + bonus - strLimit);
 				}
 
-				for (int i = 1; i < 10; i++) {
-					target->ApplyEffectCopy(fx, fx_protection_ref, Owner, i, 0);
+				// don't stack strength spells
+				// potentially too aggressive, since the durations vary a lot — did old ones just get suppressed?
+				int duration = core->Time.hour_sec * fx->CasterLevel;
+				if (fx->SavingThrowBonus == 1) { // power of one - 286
+					duration /= 2;
+					target->fxqueue.RemoveAllEffectsWithProjectile(222);
+					target->fxqueue.RemoveAllEffectsWithProjectile(227);
+				} else if (fx->SavingThrowBonus == 4) { // improved strength - 227
+					duration = 5 * fx->CasterLevel;
+					target->fxqueue.RemoveAllEffectsWithProjectile(222);
+					target->fxqueue.RemoveAllEffectsWithProjectile(286);
+				} else { // strength - 222
+					target->fxqueue.RemoveAllEffectsWithProjectile(227);
+					target->fxqueue.RemoveAllEffectsWithProjectile(286);
 				}
-				target->ApplyEffectCopy(fx, fx_magicdamage_ref, Owner, 100, 0);
-				target->ApplyEffectCopy(fx, fx_set_state_ref, Owner, 1, STATE_ANTIMAGIC);
-			}
-			break;
-		case 9: case 10: //unused
-		default:
-			break;
-		case 11: //flame walk
-			ConvertTiming(fx, 10 + 10 * fx->CasterLevel);
+				tmp = fx->Projectile;
+				fx->Projectile = 0;
+				target->fxqueue.RemoveAllEffectsWithProjectile(tmp);
+				fx->Projectile = tmp;
+				ConvertTiming(fx, duration);
 
-			target->ApplyEffectCopy(fx, fx_single_color_pulse_ref, Owner, 0xFF00, 0x400040);
+				// improved strength also has a pulse we need to adjust
+				Effect* efx = const_cast<Effect*>(target->fxqueue.HasEffectWithSource(fx_colorpulse_ref, fx->SourceRef)); // FIXME: const_cast
+				if (efx) {
+					ConvertTiming(efx, duration);
+				}
 
-			newfx = EffectQueue::CreateEffectCopy(fx, fx_colorchange_ref, 0x64FA00, 0x50005);
-			newfx->IsVariable = 0x23; // delay for 35 ticks
-			newfx->TimingMode = FX_DURATION_DELAY_LIMITED;
-			core->ApplyEffect(newfx, target, Owner);
-
-			target->ApplyEffectCopy(fx, fx_resistfire_ref, Owner, 50, 1);
-			target->ApplyEffectCopy(fx, fx_resistmfire_ref, Owner, 50, 1);
-			break;
-		case 12: //protection from evil
-			ConvertTiming (fx, 10 * fx->CasterLevel);
-
-			target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 2, 0);
-			target->ApplyEffectCopy(fx, fx_breath_ref, Owner, 2, 0);
-			target->ApplyEffectCopy(fx, fx_death_ref, Owner, 2, 0);
-			target->ApplyEffectCopy(fx, fx_poly_ref, Owner, 2, 0);
-			target->ApplyEffectCopy(fx, fx_spell_ref, Owner, 2, 0);
-			target->ApplyEffectCopy(fx, fx_wands_ref, Owner, 2, 0);
-			//terminate = FX_NOT_APPLIED;
-			break;
-		case 13: //conflagration
-			ConvertTiming(fx, 50); // NOTE: the description is conflicting with itself, stating both 50s and 5s/level
-			playonce = true;
-			break;
-		case 14: //infernal shield
-			tint = 0x5EC2FE;
-			ConvertTiming (fx, 5 * fx->CasterLevel);
-
-			target->ApplyEffectCopy(fx, fx_resistfire_ref, Owner, 150, 1);
-			target->ApplyEffectCopy(fx, fx_resistmfire_ref, Owner, 150, 1);
-			break;
-		case 15: //submerge the will
-			tint = 0x538D90;
-			ConvertTiming (fx, 12 * fx->CasterLevel);
-
-			target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 2, 16);
-			target->ApplyEffectCopy(fx, fx_breath_ref, Owner, 1, 0);
-			target->ApplyEffectCopy(fx, fx_death_ref, Owner, 1, 0);
-			target->ApplyEffectCopy(fx, fx_poly_ref, Owner, 1, 0);
-			target->ApplyEffectCopy(fx, fx_spell_ref, Owner, 1, 0);
-			target->ApplyEffectCopy(fx, fx_wands_ref, Owner, 1, 0);
-			break;
-		case 16: //balance in all things
-			tint = 0x615AB4;
-			fx->Parameter3 = fx->CasterLevel/4;
-			ConvertTiming (fx, 5 * fx->CasterLevel);
-
-			target->ApplyEffectCopy(fx, fx_colorpulse_ref, Owner, 0x615AB400, 0x30000C);
-			playonce = true;
-			break;
-		case 17: // gemrb extension: strength spells
-			// bump strength, but only up to a limit
-			// if anyone complains about Improved strength having class based limits, add them to clssplab.2da
-			// duration and saving bonus fields are reused; these are eff v1
-			ieDword strLimit = fx->Duration - 1;
-			int bonus = core->Roll(1, gamedata->GetSpellAbilityDie(target, 1), fx->SavingThrowBonus);
-			if (target->Modified[IE_STR] + bonus >= strLimit) {
-				bonus = std::max((ieDword) 0, target->Modified[IE_STR] + bonus - strLimit);
-			}
-
-			// don't stack strength spells
-			// potentially too aggressive, since the durations vary a lot — did old ones just get suppressed?
-			int duration = core->Time.hour_sec * fx->CasterLevel;
-			if (fx->SavingThrowBonus == 1) { // power of one - 286
-				duration /= 2;
-				target->fxqueue.RemoveAllEffectsWithProjectile(222);
-				target->fxqueue.RemoveAllEffectsWithProjectile(227);
-			} else if (fx->SavingThrowBonus == 4) { // improved strength - 227
-				duration = 5 * fx->CasterLevel;
-				target->fxqueue.RemoveAllEffectsWithProjectile(222);
-				target->fxqueue.RemoveAllEffectsWithProjectile(286);
-			} else { // strength - 222
-				target->fxqueue.RemoveAllEffectsWithProjectile(227);
-				target->fxqueue.RemoveAllEffectsWithProjectile(286);
-			}
-			tmp = fx->Projectile;
-			fx->Projectile = 0;
-			target->fxqueue.RemoveAllEffectsWithProjectile(tmp);
-			fx->Projectile = tmp;
-			ConvertTiming (fx, duration);
-
-			// improved strength also has a pulse we need to adjust
-			Effect *efx = const_cast<Effect*>(target->fxqueue.HasEffectWithSource(fx_colorpulse_ref, fx->SourceRef)); // FIXME: const_cast
-			if (efx) {
-				ConvertTiming (efx, duration);
-			}
-
-			target->ApplyEffectCopy(fx, fx_str_ref, Owner, bonus, 0);
-			playonce = true; // there's no resource set any way
-			break;
+				target->ApplyEffectCopy(fx, fx_str_ref, Owner, bonus, 0);
+				playonce = true; // there's no resource set any way
+				break;
 		}
 
 		if (!target->HasVVCCell(fx->Resource)) {
-			ScriptedAnimation *sca = gamedata->GetScriptedAnimation(fx->Resource, true);
+			ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, true);
 			if (sca) {
 				if (tint) {
 					SetRGBMod(tint, sca);
@@ -940,10 +947,10 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 				if (playonce) {
 					sca->PlayOnce();
 				} else {
-					sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
+					sca->SetDefaultDuration(fx->Duration - core->GetGame()->Ticks);
 				}
 				sca->SetEffectOwned(true);
-				ScriptedAnimation *twin = sca->DetachTwin();
+				ScriptedAnimation* twin = sca->DetachTwin();
 				if (twin) {
 					target->AddVVCell(twin);
 				}
@@ -956,57 +963,58 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 	if (range.first == range.second) {
 		return FX_NOT_APPLIED;
 	}
-	
+
 	for (; range.first != range.second; ++range.first) {
 		range.first->second->active = true;
 	}
 
-	switch(fx->Parameter2) {
-	case 0: //cloak of warding
-		if (fx->Parameter3<=0) {
-			return FX_NOT_APPLIED;
-		}
-		//flag for removal trigger
-		target->Modified[IE_STONESKINS]=1;
-		break;
-	case 2: //black barbed shield (damage opponents)
-		if (target->objects.LastHitter) {
-			terminate = DamageLastHitter(fx, target, core->Roll(2, 6, 0), 16);
-		}
-		break;
-	case 3: case 16: //pain mirror or balance in all things
-		if (target->objects.LastHitter) {
-			terminate = DamageLastHitter(fx, target, target->LastDamage, target->LastDamageType);
-		}
-		break;
-	case 4:
-		//this is not the original position, but the immunity stat was already used for things like this
-		//as an added benefit, HasImmunityEffects also works with the pst spell
-		STAT_BIT_OR( IE_IMMUNITY, IMM_GUARDIAN);
-		break;
-	case 5:
-		break;
-	case 6:
-		STATE_SET(STATE_EE_DUPL);
-		break;
-	case 7:
-		break;
-	case 8: //antimagic shell
-		if (!target->HasVVCCell("S061GLWB") ) {
-			ScriptedAnimation *sca = gamedata->GetScriptedAnimation("S061GLWB", false);
-			if (sca) {
-				sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
-				target->AddVVCell(sca);
+	switch (fx->Parameter2) {
+		case 0: //cloak of warding
+			if (fx->Parameter3 <= 0) {
+				return FX_NOT_APPLIED;
 			}
-		}
-		break;
-	case 11:
-	case 12:
-	case 13:
-	case 14:
-	case 15:
-		break;
-	default:;
+			//flag for removal trigger
+			target->Modified[IE_STONESKINS] = 1;
+			break;
+		case 2: //black barbed shield (damage opponents)
+			if (target->objects.LastHitter) {
+				terminate = DamageLastHitter(fx, target, core->Roll(2, 6, 0), 16);
+			}
+			break;
+		case 3:
+		case 16: //pain mirror or balance in all things
+			if (target->objects.LastHitter) {
+				terminate = DamageLastHitter(fx, target, target->LastDamage, target->LastDamageType);
+			}
+			break;
+		case 4:
+			//this is not the original position, but the immunity stat was already used for things like this
+			//as an added benefit, HasImmunityEffects also works with the pst spell
+			STAT_BIT_OR(IE_IMMUNITY, IMM_GUARDIAN);
+			break;
+		case 5:
+			break;
+		case 6:
+			STATE_SET(STATE_EE_DUPL);
+			break;
+		case 7:
+			break;
+		case 8: //antimagic shell
+			if (!target->HasVVCCell("S061GLWB")) {
+				ScriptedAnimation* sca = gamedata->GetScriptedAnimation("S061GLWB", false);
+				if (sca) {
+					sca->SetDefaultDuration(fx->Duration - core->GetGame()->Ticks);
+					target->AddVVCell(sca);
+				}
+			}
+			break;
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+			break;
+		default:;
 	}
 	//PST doesn't keep these effects applied, but we do, because we don't have
 	//separate stats for these effects.
@@ -1019,45 +1027,45 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 //static EffectRef fx_glow_ref = { "Color:PulseRGBGlobal", -1 };
 //pst bless effect spawns a color glow automatically
 //but i would rather use the IWD2 method
-int fx_bless (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_bless(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_curse(%2d): Par1: %d", fx->Opcode, fx->Parameter1);
 	//this bit is the same as the invisibility bit in other games
 	//it should be considered what if we replace the pst invis bit
 	//with this one (losing binary compatibility, gaining easier
 	//invis checks at core level)
-	if (STATE_GET (STATE_BLESS) ) //curse is non-cumulative
+	if (STATE_GET(STATE_BLESS)) //curse is non-cumulative
 		return FX_NOT_APPLIED;
 
 	target->SetColorMod(255, RGBModifier::ADD, 0x18, Color(0xc8, 0xc8, 0xc8, 0));
 
-	STATE_SET( STATE_BLESS );
-	target->ToHit.HandleFxBonus(- signed(fx->Parameter1), fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
-	STAT_SUB( IE_SAVEVSDEATH, fx->Parameter1);
-	STAT_SUB( IE_SAVEVSWANDS, fx->Parameter1);
-	STAT_SUB( IE_SAVEVSPOLY, fx->Parameter1);
-	STAT_SUB( IE_SAVEVSBREATH, fx->Parameter1);
-	STAT_SUB( IE_SAVEVSSPELL, fx->Parameter1);
+	STATE_SET(STATE_BLESS);
+	target->ToHit.HandleFxBonus(-signed(fx->Parameter1), fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
+	STAT_SUB(IE_SAVEVSDEATH, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSWANDS, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSPOLY, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSBREATH, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSSPELL, fx->Parameter1);
 	return FX_APPLIED;
 }
 
 //0xcb fx_curse
-int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_curse(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_curse(%2d): Par1: %d", fx->Opcode, fx->Parameter1);
 	//this bit is the same as the invisibility bit in other games
 	//it should be considered what if we replace the pst invis bit
 	//with this one (losing binary compatibility, gaining easier
 	//invis checks at core level)
-	if (STATE_GET (STATE_PST_CURSE) ) //curse is non cumulative
+	if (STATE_GET(STATE_PST_CURSE)) //curse is non cumulative
 		return FX_NOT_APPLIED;
-	STATE_SET( STATE_PST_CURSE );
-	target->ToHit.HandleFxBonus(- signed(fx->Parameter1), fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
-	STAT_SUB( IE_SAVEVSDEATH, fx->Parameter1);
-	STAT_SUB( IE_SAVEVSWANDS, fx->Parameter1);
-	STAT_SUB( IE_SAVEVSPOLY, fx->Parameter1);
-	STAT_SUB( IE_SAVEVSBREATH, fx->Parameter1);
-	STAT_SUB( IE_SAVEVSSPELL, fx->Parameter1);
+	STATE_SET(STATE_PST_CURSE);
+	target->ToHit.HandleFxBonus(-signed(fx->Parameter1), fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
+	STAT_SUB(IE_SAVEVSDEATH, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSWANDS, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSPOLY, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSBREATH, fx->Parameter1);
+	STAT_SUB(IE_SAVEVSSPELL, fx->Parameter1);
 	return FX_APPLIED;
 }
 
@@ -1065,28 +1073,33 @@ int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 static EffectRef fx_curse_ref = { "Curse", -1 };
 static EffectRef fx_bless_ref = { "Bless", -1 };
 
-int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_prayer(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_prayer(%2d): Par1: %d", fx->Opcode, fx->Parameter1);
 	int ea = target->GetStat(IE_EA);
 	int type;
-	if (ea>EA_EVILCUTOFF) type = 1;
-	else if (ea<EA_GOODCUTOFF) type = 0;
-	else return FX_NOT_APPLIED;  //what happens if the target goes neutral during the effect? if the effect remains, make this FX_APPLIED
+	if (ea > EA_EVILCUTOFF)
+		type = 1;
+	else if (ea < EA_GOODCUTOFF)
+		type = 0;
+	else
+		return FX_NOT_APPLIED; //what happens if the target goes neutral during the effect? if the effect remains, make this FX_APPLIED
 
-	const Map *map = target->GetCurrentArea();
+	const Map* map = target->GetCurrentArea();
 	int i = map->GetActorCount(true);
-	while(i--) {
-		Actor *tar=map->GetActor(i,true);
+	while (i--) {
+		Actor* tar = map->GetActor(i, true);
 		ea = tar->GetStat(IE_EA);
-		if (ea>EA_EVILCUTOFF) type^=1;
-		else if (ea>EA_GOODCUTOFF) continue;
+		if (ea > EA_EVILCUTOFF)
+			type ^= 1;
+		else if (ea > EA_GOODCUTOFF)
+			continue;
 		//this isn't a real perma effect, just applying the effect now
 		//no idea how this should work with spell resistances, etc
 		//lets assume it is never resisted
 		//the effect will be destructed by ApplyEffect (not anymore)
 		//the effect is copied to a new memory area
-		Effect *newfx = EffectQueue::CreateEffect(type?fx_curse_ref:fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
+		Effect* newfx = EffectQueue::CreateEffect(type ? fx_curse_ref : fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
 		newfx->Source = fx->Source;
 		newfx->Duration = 60;
 		core->ApplyEffect(newfx, tar, Owner);
@@ -1095,10 +1108,10 @@ int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //0xcd fx_move_view
-int fx_move_view (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_move_view(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_move_view(%2d): Speed: %d", fx->Opcode, fx->Parameter1);
-	const Map *map = core->GetGame()->GetCurrentArea();
+	const Map* map = core->GetGame()->GetCurrentArea();
 	if (map) {
 		core->timer.SetMoveViewPort(fx->Pos, fx->Parameter1, true);
 	}
@@ -1106,32 +1119,32 @@ int fx_move_view (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xce fx_embalm
-int fx_embalm (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_embalm(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_embalm(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
-	if (STATE_GET (STATE_EMBALM) ) //embalm is non cumulative
+	if (STATE_GET(STATE_EMBALM)) //embalm is non cumulative
 		return FX_NOT_APPLIED;
-	STATE_SET( STATE_EMBALM );
+	STATE_SET(STATE_EMBALM);
 	if (!fx->Parameter1) {
 		if (fx->Parameter2) {
-			fx->Parameter1=fx->CasterLevel*2;
+			fx->Parameter1 = fx->CasterLevel * 2;
 		} else {
-			fx->Parameter1=core->Roll(1,6,1);
+			fx->Parameter1 = core->Roll(1, 6, 1);
 		}
 	}
-	STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1);
-	BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
+	STAT_ADD(IE_MAXHITPOINTS, fx->Parameter1);
+	BASE_ADD(IE_HITPOINTS, fx->Parameter1);
 	if (fx->Parameter2) {
-		target->AC.HandleFxBonus(2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+		target->AC.HandleFxBonus(2, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
 	} else {
-		target->AC.HandleFxBonus(1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+		target->AC.HandleFxBonus(1, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
 	}
 	return FX_APPLIED;
 }
 
 //0xcf fx_stop_all_action
 // FIXME: supposedly was (closer to) cutscene mode; recheck with spwi308 or any other users
-int fx_stop_all_action (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_stop_all_action(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (fx->Parameter2) {
 		core->GetGame()->TimeStop(nullptr, 0);
@@ -1143,7 +1156,7 @@ int fx_stop_all_action (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 //0xd0 fx_iron_fist
 //GemRB extension: lets you specify not hardcoded values
-int fx_iron_fist (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_iron_fist(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword toHitBonus = 3;
 	ieDword damageBonus = 6;
@@ -1159,12 +1172,12 @@ int fx_iron_fist (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xd1 fx_hostile_image (Spell Effect: Soul Exodus)
 int fx_hostile_image(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	Log(ERROR, "PSTOpcodes","fx_hostile_image: not implemented! Source: {}", fx->Source);
+	Log(ERROR, "PSTOpcodes", "fx_hostile_image: not implemented! Source: {}", fx->Source);
 	return FX_NOT_APPLIED;
 }
 
 //0xd2 fx_detect_evil
-int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx)
+int fx_detect_evil(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (fx->FirstApply) {
 		// fix duration, which was hardcoded in the original (50 + 25/level, max 5 min)
@@ -1173,36 +1186,36 @@ int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx)
 	ieDword type = fx->Parameter2;
 	//default is alignment/evil/speed 30/range 10
 	if (!type) type = 0x08031e0a;
-	int speed = (type&0xff00)>>8;
-	if (!speed) speed=30;
-	if (!(core->GetGame()->GameTime%speed)) {
+	int speed = (type & 0xff00) >> 8;
+	if (!speed) speed = 30;
+	if (!(core->GetGame()->GameTime % speed)) {
 		ieDword color = fx->Parameter1;
 		//default is magenta (rgba)
 		if (!color) color = 0xff00ff00;
-		Effect *newfx = EffectQueue::CreateEffect(fx_single_color_pulse_ref, color, speed<<16, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
-		newfx->Target=FX_TARGET_PRESET;
-		
+		Effect* newfx = EffectQueue::CreateEffect(fx_single_color_pulse_ref, color, speed << 16, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
+		newfx->Target = FX_TARGET_PRESET;
+
 		EffectQueue fxqueue;
 		fxqueue.SetOwner(Owner);
 		fxqueue.AddEffect(newfx);
 
 		//don't detect self? if yes, then use NULL as last parameter
-		fxqueue.AffectAllInRange(target->GetCurrentArea(), target->Pos, (type&0xff000000)>>24, (type&0xff0000)>>16, (type&0xff)*10, target);
+		fxqueue.AffectAllInRange(target->GetCurrentArea(), target->Pos, (type & 0xff000000) >> 24, (type & 0xff0000) >> 16, (type & 0xff) * 10, target);
 	}
 	return FX_APPLIED;
 }
 
 //0xd3 fx_jumble_curse
-int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_jumble_curse(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_jumble_curse(%2d)", fx->Opcode);
 
-	if (STATE_GET( STATE_DEAD) ) {
+	if (STATE_GET(STATE_DEAD)) {
 		return FX_NOT_APPLIED;
 	}
-	const Game *game = core->GetGame();
+	const Game* game = core->GetGame();
 	//do a hiccup every 75th refresh
-	if (fx->Parameter3/75!=fx->Parameter4/75) {
+	if (fx->Parameter3 / 75 != fx->Parameter4 / 75) {
 		//hiccups
 		//PST has this hardcoded deep in the engine
 		//gemrb lets you specify the strref in P#1
@@ -1212,22 +1225,22 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->overHead.SetText(std::move(tmpstr));
 		target->GetHit();
 	}
-	fx->Parameter4=fx->Parameter3;
-	fx->Parameter3=game->GameTime;
-	STAT_SET( IE_DEADMAGIC, 1);
-	STAT_SET( IE_SPELLFAILUREMAGE, 100);
-	STAT_SET( IE_SPELLFAILUREPRIEST, 100);
-	STAT_SET( IE_SPELLFAILUREINNATE, 100);
+	fx->Parameter4 = fx->Parameter3;
+	fx->Parameter3 = game->GameTime;
+	STAT_SET(IE_DEADMAGIC, 1);
+	STAT_SET(IE_SPELLFAILUREMAGE, 100);
+	STAT_SET(IE_SPELLFAILUREPRIEST, 100);
+	STAT_SET(IE_SPELLFAILUREINNATE, 100);
 	return FX_APPLIED;
 }
 
 //0xd4 fx_speak_with_dead
 //This opcode is directly employed by the speak with dead projectile in the original engine
 //In GemRB it is used in a custom spell
-int fx_speak_with_dead (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_speak_with_dead(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_speak_with_dead(%2d)", fx->Opcode);
-	if (!STATE_GET( STATE_DEAD) ) {
+	if (!STATE_GET(STATE_DEAD)) {
 		return FX_NOT_APPLIED;
 	}
 	if (fx->FirstApply) fx->Parameter4 = fx->Duration - core->GetGame()->GameTime;

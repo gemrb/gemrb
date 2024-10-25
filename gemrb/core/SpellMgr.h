@@ -29,6 +29,7 @@
 
 #include "Plugin.h"
 #include "Spell.h"
+
 #include "Streams/DataStream.h"
 
 namespace GemRB {
@@ -41,7 +42,7 @@ namespace GemRB {
 class GEM_EXPORT SpellMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
-	virtual Spell* GetSpell(Spell *spl, bool silent=false) = 0;
+	virtual Spell* GetSpell(Spell* spl, bool silent = false) = 0;
 };
 
 }

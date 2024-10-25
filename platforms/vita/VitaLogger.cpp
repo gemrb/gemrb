@@ -18,7 +18,7 @@
 
 #include "VitaLogger.h"
 
-#include <psp2/kernel/clib.h> 
+#include <psp2/kernel/clib.h>
 
 #define printf sceClibPrintf
 

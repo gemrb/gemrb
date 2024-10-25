@@ -20,11 +20,12 @@
 #include "View.h"
 
 #include "Debug.h"
+#include "Interface.h"
+#include "Sprite2D.h"
+
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/TextSystem/Font.h"
-#include "Interface.h"
-#include "Sprite2D.h"
 #include "Video/Video.h"
 
 #include <typeinfo>
@@ -34,10 +35,11 @@
 namespace GemRB {
 
 View::DragOp::DragOp(View* v, Holder<Sprite2D> cursor)
-: dragView(v), cursor(std::move(cursor))
+	: dragView(v), cursor(std::move(cursor))
 {}
 
-View::DragOp::~DragOp() {
+View::DragOp::~DragOp()
+{
 	dragView->CompleteDragOperation(*this);
 }
 
@@ -48,7 +50,7 @@ View::View(const Region& frame)
 View::~View()
 {
 	ClearScriptingRefs();
-	
+
 	if (superView) {
 		superView->RemoveSubview(this);
 	}
@@ -72,7 +74,8 @@ void View::SetCursor(Holder<Sprite2D> c)
 	cursor = std::move(c);
 }
 
-View* View::GetEventProxy() const {
+View* View::GetEventProxy() const
+{
 	return eventProxy;
 }
 
@@ -81,7 +84,7 @@ void View::SetEventProxy(View* proxy)
 	while (proxy && proxy->eventProxy) {
 		proxy = proxy->eventProxy;
 	}
-	
+
 	eventProxy = proxy;
 }
 
@@ -104,7 +107,7 @@ void View::MarkDirty()
 bool View::NeedsDraw() const
 {
 	// cull anything that can't be seen
-	if (frame.size.IsInvalid() || (flags&Invisible)) return false;
+	if (frame.size.IsInvalid() || (flags & Invisible)) return false;
 
 	// check ourselves
 	if (dirty || IsAnimated()) {
@@ -164,7 +167,7 @@ bool View::IsDisabledCursor() const
 
 bool View::IsReceivingEvents() const
 {
-	bool getEvents = !(flags&(IgnoreEvents|Invisible|Disabled));
+	bool getEvents = !(flags & (IgnoreEvents | Invisible | Disabled));
 	if (superView && getEvents) {
 		return superView->IsReceivingEvents();
 	}
@@ -205,7 +208,7 @@ void View::DrawSubviews() const
 
 Region View::DrawingFrame() const
 {
-	return Region(ConvertPointToWindow(Point(0,0)), Dimensions());
+	return Region(ConvertPointToWindow(Point(0, 0)), Dimensions());
 }
 
 bool View::HasBackground() const
@@ -249,7 +252,7 @@ void View::DrawBackground(const Region* rgn) const
 void View::Draw()
 {
 	TRACY(ZoneScoped);
-	if (flags&Invisible) return;
+	if (flags & Invisible) return;
 
 	const Region clip = VideoDriver->GetScreenClip();
 	const Region& drawFrame = DrawingFrame();
@@ -301,16 +304,16 @@ void View::Draw()
 
 				std::string formatted = fmt::format("id: {}  grp: {}  \nflgs: {}\ntype:{}", id, ref->ScriptingGroup(), flags, typeid(*this).name());
 				const String& string = StringFromASCII(formatted);
-				
+
 				Region r = drawFrame;
 				r.w = win ? win->Frame().w - r.x : Frame().w - r.x;
-				Font::StringSizeMetrics metrics = {r.size, 0, 0, true};
+				Font::StringSizeMetrics metrics = { r.size, 0, 0, true };
 				fnt->StringSize(string, &metrics);
 				r.h = metrics.size.h;
 				r.w = metrics.size.w;
 				VideoDriver->SetScreenClip(nullptr);
 				VideoDriver->DrawRect(r, ColorBlack, true);
-				fnt->Print(r, string, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT, {ColorWhite, ColorBlack});
+				fnt->Print(r, string, IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_LEFT, { ColorWhite, ColorBlack });
 			}
 		}
 	}
@@ -406,7 +409,7 @@ Region View::ConvertRegionFromScreen(Region r) const
 void View::AddSubviewInFrontOfView(View* front, const View* back)
 {
 	if (front == nullptr) return;
-	
+
 	// remember, being "in front" means coming after in the list
 	auto it = subViews.begin();
 	if (back != nullptr) {
@@ -424,19 +427,19 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 		if (super != nullptr) {
 			front->superView->RemoveSubview(front);
 		}
-		
+
 		subViews.insert(it, front);
 	}
 
 	front->superView = this;
 	front->MarkDirty(); // must redraw the control now
-	
+
 	View* ancestor = this;
 	do {
 		ancestor->SubviewAdded(front, this);
 		ancestor = ancestor->superView;
 	} while (ancestor);
-	
+
 	front->AddedToView(this);
 }
 
@@ -457,13 +460,13 @@ View* View::RemoveSubview(const View* view) noexcept
 
 	subView->superView = NULL;
 	subView->RemovedFromView(this);
-	
+
 	View* ancestor = this;
 	do {
 		ancestor->SubviewRemoved(subView, this);
 		ancestor = ancestor->superView;
 	} while (ancestor);
-	
+
 	return subView;
 }
 
@@ -475,7 +478,7 @@ View* View::RemoveFromSuperview()
 	}
 	return super;
 }
-	
+
 void View::AddedToWindow(Window* newwin)
 {
 	window = newwin;
@@ -489,7 +492,7 @@ void View::AddedToView(View* view)
 	Window* newwin = view->GetWindow();
 	if (newwin == NULL)
 		newwin = dynamic_cast<Window*>(view);
-	
+
 	if (newwin != window) {
 		AddedToWindow(newwin);
 	}
@@ -505,7 +508,7 @@ bool View::IsOpaque() const
 	if (backgroundColor.a == 0xff) {
 		return true;
 	}
-	
+
 	return background && background->HasTransparency() == false;
 }
 
@@ -623,9 +626,9 @@ void View::SetFrameOrigin(const Point& p)
 {
 	Point oldP = frame.origin;
 	if (oldP == p) return;
-	
+
 	frame.origin = p;
-	
+
 	MarkDirty();
 	OriginChanged(oldP);
 }
@@ -661,7 +664,7 @@ bool View::SetFlags(unsigned int arg_flags, BitOp opcode)
 
 	return ret;
 }
-	
+
 bool View::SetAutoResizeFlags(unsigned short arg_flags, BitOp opcode)
 {
 	return SetBits(autoresizeFlags, arg_flags, opcode);
@@ -677,23 +680,23 @@ void View::SetTooltip(const String& string)
 // otherwise attempts to handle the event by calling "OnEvent"
 // if the event is unhandled, bubble it up to the superview
 #define HandleEvent1(meth, p1) \
-HandleEvent(meth(p1))
+	HandleEvent(meth(p1))
 
 #define HandleEvent2(meth, p1, p2) \
-HandleEvent(meth(p1, p2))
-	
+	HandleEvent(meth(p1, p2))
+
 #define HandleEvent(meth) \
-if (eventProxy) { \
-	eventProxy->On ## meth; \
-	return; \
-} \
-\
-if ((flags&(Disabled|IgnoreEvents)) == 0) { \
-	bool handled = On ## meth; \
-	if (handled == false && superView) { \
-		superView->meth; \
+	if (eventProxy) { \
+		eventProxy->On##meth; \
+		return; \
 	} \
-}
+\
+	if ((flags & (Disabled | IgnoreEvents)) == 0) { \
+		bool handled = On##meth; \
+		if (handled == false && superView) { \
+			superView->meth; \
+		} \
+	}
 
 bool View::KeyPress(const KeyboardEvent& key, unsigned short mod)
 {
@@ -760,8 +763,7 @@ void View::MouseUp(const MouseEvent& me, unsigned short mod)
 
 void View::MouseWheelScroll(const Point& delta)
 {
-	if ((eventProxy && !eventProxy->IsPerPixelScrollable())
-		|| (eventProxy == nullptr && !IsPerPixelScrollable())) {
+	if ((eventProxy && !eventProxy->IsPerPixelScrollable()) || (eventProxy == nullptr && !IsPerPixelScrollable())) {
 		Point scaledDelta;
 		int speed = core->GetMouseScrollSpeed();
 
@@ -770,13 +772,13 @@ void View::MouseWheelScroll(const Point& delta)
 		} else if (delta.x > 0) {
 			scaledDelta.x = std::max<int>(delta.x / speed, 1);
 		}
-		
+
 		if (delta.y < 0) {
 			scaledDelta.y = std::min<int>(delta.y / speed, -1);
 		} else if (delta.y > 0) {
 			scaledDelta.y = std::max<int>(delta.y / speed, 1);
 		}
-		
+
 		HandleEvent1(MouseWheelScroll, scaledDelta);
 	} else {
 		HandleEvent1(MouseWheelScroll, delta);
@@ -858,27 +860,22 @@ bool View::OnControllerAxis(const ControllerEvent& ce)
 
 bool View::OnControllerButtonDown(const ControllerEvent& ce)
 {
-	if (ce.button == CONTROLLER_BUTTON_A
-		|| ce.button == CONTROLLER_BUTTON_B
-		|| ce.button == CONTROLLER_BUTTON_LEFTSTICK)
-	{
+	if (ce.button == CONTROLLER_BUTTON_A || ce.button == CONTROLLER_BUTTON_B || ce.button == CONTROLLER_BUTTON_LEFTSTICK) {
 		MouseEvent me = MouseEventFromController(ce, true);
 		// TODO: we might want to add modifiers for "trigger" buttons
 		return OnMouseDown(me, 0);
 	}
-	
-	if (ce.button == CONTROLLER_BUTTON_START)
-	{
+
+	if (ce.button == CONTROLLER_BUTTON_START) {
 		core->TogglePause();
 		return true;
 	}
-	
-	if (ce.button == CONTROLLER_BUTTON_GUIDE)
-	{
+
+	if (ce.button == CONTROLLER_BUTTON_GUIDE) {
 		VideoDriver->StartTextInput();
 		return true;
 	}
-	
+
 	// TODO: we might want to add modifiers for "trigger" buttons
 	KeyboardEvent ke = KeyEventFromController(ce);
 	return OnKeyPress(ke, 0);
@@ -886,15 +883,12 @@ bool View::OnControllerButtonDown(const ControllerEvent& ce)
 
 bool View::OnControllerButtonUp(const ControllerEvent& ce)
 {
-	if (ce.button == CONTROLLER_BUTTON_A
-		|| ce.button == CONTROLLER_BUTTON_B
-		|| ce.button == CONTROLLER_BUTTON_LEFTSTICK)
-	{
+	if (ce.button == CONTROLLER_BUTTON_A || ce.button == CONTROLLER_BUTTON_B || ce.button == CONTROLLER_BUTTON_LEFTSTICK) {
 		MouseEvent me = MouseEventFromController(ce, false);
 		// TODO: we might want to add modifiers for "trigger" buttons
 		return OnMouseUp(me, 0);
 	}
-	
+
 	// TODO: we might want to add modifiers for "trigger" buttons
 	KeyboardEvent ke = KeyEventFromController(ce);
 	return OnKeyRelease(ke, 0);
@@ -925,7 +919,7 @@ const ViewScriptingRef* View::RemoveScriptingRef(const ViewScriptingRef* ref)
 	static ScriptingId id = 0;
 	return ReplaceScriptingRef(ref, id++, "__DEL__");
 }
-	
+
 void View::ClearScriptingRefs() noexcept
 {
 	for (auto rit = scriptingRefs.begin(); rit != scriptingRefs.end();) {
@@ -937,12 +931,12 @@ void View::ClearScriptingRefs() noexcept
 		rit = scriptingRefs.erase(rit);
 	}
 }
-	
+
 ViewScriptingRef* View::CreateScriptingRef(ScriptingId id, ScriptingGroup_t group)
 {
 	return new ViewScriptingRef(this, id, group);
 }
-	
+
 const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, const ScriptingGroup_t& group)
 {
 	ViewScriptingRef* ref = CreateScriptingRef(id, group);
@@ -960,10 +954,10 @@ const ViewScriptingRef* View::GetScriptingRef(ScriptingId id, ScriptingGroup_t g
 	auto it = std::find_if(scriptingRefs.begin(), scriptingRefs.end(), [&](const ViewScriptingRef* ref) {
 		return ref->Id == id && ref->ScriptingGroup() == group;
 	});
-	
+
 	return (it != scriptingRefs.end()) ? *it : nullptr;
 }
-	
+
 const ViewScriptingRef* View::GetScriptingRef() const
 {
 	if (scriptingRefs.empty()) {

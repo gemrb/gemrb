@@ -19,10 +19,11 @@
  */
 
 #include "GUI/EventMgr.h"
-#include "Logging/Logging.h"
-#include "Video/Video.h"
 
 #include "globals.h"
+
+#include "Logging/Logging.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -91,7 +92,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 
 KeyboardEvent KeyEventFromController(const ControllerEvent& ce)
 {
-	KeyboardEvent ke{};
+	KeyboardEvent ke {};
 
 	// TODO: probably want more than the DPad
 	switch (ce.button) {
@@ -469,7 +470,8 @@ Event EventMgr::CreateControllerButtonEvent(EventButton btn, bool down)
 	return e;
 }
 
-Event EventMgr::CreateRedrawRequestEvent() {
+Event EventMgr::CreateRedrawRequestEvent()
+{
 	Event e = {};
 	e.type = Event::RedrawRequest;
 

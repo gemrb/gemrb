@@ -21,14 +21,15 @@
 #include "Platform.h"
 
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif
 
-GEM_EXPORT bool IsBigEndian();
-GEM_EXPORT void swab_const(const void *bfrom, void *bto, long n);
-GEM_EXPORT void swabs(void *buf, long n);
+	GEM_EXPORT bool IsBigEndian();
+	GEM_EXPORT void swab_const(const void* bfrom, void* bto, long n);
+	GEM_EXPORT void swabs(void* buf, long n);
 
 #if defined(__cplusplus)
-}  /* extern "C" */
+} /* extern "C" */
 #endif
 #endif

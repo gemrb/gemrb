@@ -23,16 +23,16 @@
 
 #include "Plugin.h"
 #include "TileMap.h"
-#include "Streams/DataStream.h"
 
 #include "Plugins/export.h"
+#include "Streams/DataStream.h"
 
 namespace GemRB {
 
 class GEM_PLUGIN_EXPORT TileMapMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
-	virtual TileMap* GetTileMap(TileMap *tm) const = 0;
+	virtual TileMap* GetTileMap(TileMap* tm) const = 0;
 	virtual std::vector<ieWord> GetDoorIndices(const ResRef&, bool& BaseClosed) = 0;
 	virtual WallPolygonGroup OpenDoorPolygons() const = 0;
 	virtual WallPolygonGroup ClosedDoorPolygons() const = 0;

@@ -19,11 +19,12 @@
 #ifndef DIRIMP_H
 #define DIRIMP_H
 
-#include <set>
-
 #include "ResourceSource.h"
+
 #include "Strings/CString.h"
 #include "System/VFS.h"
+
+#include <set>
 
 namespace GemRB {
 
@@ -38,10 +39,10 @@ public:
 	bool Open(const path_t& dir, std::string desc) override;
 	/** predicts the availability of a resource */
 	bool HasResource(StringView resname, SClass_ID type) override;
-	bool HasResource(StringView resname, const ResourceDesc &type) override;
+	bool HasResource(StringView resname, const ResourceDesc& type) override;
 	/** returns resource */
 	DataStream* GetResource(StringView resname, SClass_ID type) override;
-	DataStream* GetResource(StringView resname, const ResourceDesc &type) override;
+	DataStream* GetResource(StringView resname, const ResourceDesc& type) override;
 };
 
 class CachedDirectoryImporter : public DirectoryImporter {
@@ -55,10 +56,10 @@ public:
 	void Refresh();
 	/** predicts the availability of a resource */
 	bool HasResource(StringView resname, SClass_ID type) override;
-	bool HasResource(StringView resname, const ResourceDesc &type) override;
+	bool HasResource(StringView resname, const ResourceDesc& type) override;
 	/** returns resource */
 	DataStream* GetResource(StringView resname, SClass_ID type) override;
-	DataStream* GetResource(StringView resname, const ResourceDesc &type) override;
+	DataStream* GetResource(StringView resname, const ResourceDesc& type) override;
 };
 
 

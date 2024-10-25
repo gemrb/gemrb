@@ -20,34 +20,35 @@
 
 #include <psp2/kernel/iofilemgr.h>
 
-#define S_IREAD SCE_S_IRUSR
+#define S_IREAD  SCE_S_IRUSR
 #define S_IWRITE SCE_S_IWUSR
-#define S_IEXEC SCE_S_IXUSR
+#define S_IEXEC  SCE_S_IXUSR
 
-struct DIR
-{
-	DIR() : is_first(true) {}
+struct DIR {
+	DIR()
+		: is_first(true) {}
 
 	bool is_first;
 	SceUID descriptor;
 };
 
-struct dirent
-{
-	dirent() : d_name(nullptr) {}
+struct dirent {
+	dirent()
+		: d_name(nullptr) {}
 
-	void assign(std::string&& value) {
+	void assign(std::string&& value)
+	{
 		buffer = std::move(value);
 		d_name = buffer.data();
 	}
 
 	std::string buffer;
-	char *d_name;
+	char* d_name;
 };
 
-inline DIR* opendir(const char *filename)
+inline DIR* opendir(const char* filename)
 {
-	auto *dir = new DIR{};
+	auto* dir = new DIR {};
 	dir->descriptor = sceIoDopen(filename);
 
 	if (dir->descriptor <= 0) {
@@ -58,7 +59,7 @@ inline DIR* opendir(const char *filename)
 	return dir;
 }
 
-inline dirent* readdir(DIR *dir)
+inline dirent* readdir(DIR* dir)
 {
 	static dirent de;
 	//vitasdk kind of skips current directory entry..
@@ -75,18 +76,18 @@ inline dirent* readdir(DIR *dir)
 	return &de;
 }
 
-inline void closedir(DIR *dir)
+inline void closedir(DIR* dir)
 {
 	sceIoDclose(dir->descriptor);
 	delete dir;
 }
 
-inline int mkdir(const char *path, SceMode mode)
+inline int mkdir(const char* path, SceMode mode)
 {
 	return sceIoMkdir(path, mode);
 }
 
-inline int rmdir(const char *path)
+inline int rmdir(const char* path)
 {
 	return sceIoRemove(path);
 }

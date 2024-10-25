@@ -35,11 +35,13 @@ class TypeID;
 class GEM_EXPORT ResourceDesc {
 public:
 	using CreateFunc = ResourceHolder<Resource> (*)(DataStream*);
+
 private:
-	const TypeID *type;
+	const TypeID* type;
 	path_t ext;
 	ieWord keyType; // IE Specific
 	CreateFunc create;
+
 public:
 	/**
 	 * Create resource descriptor.

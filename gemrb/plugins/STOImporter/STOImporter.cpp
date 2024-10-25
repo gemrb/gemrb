@@ -25,6 +25,7 @@
 #include "Interface.h"
 #include "Inventory.h"
 #include "PluginMgr.h"
+
 #include "GameScript/GameScript.h"
 
 using namespace GemRB;
@@ -42,14 +43,14 @@ bool STOImporter::Open(DataStream* stream)
 	delete str;
 	str = stream;
 	char Signature[8];
-	str->Read( Signature, 8 );
-	if (strncmp( Signature, "STORV1.0", 8 ) == 0) {
+	str->Read(Signature, 8);
+	if (strncmp(Signature, "STORV1.0", 8) == 0) {
 		version = 10;
-	} else if (strncmp( Signature, "STORV1.1", 8 ) == 0) {
+	} else if (strncmp(Signature, "STORV1.1", 8) == 0) {
 		version = 11;
-	} else if (strncmp( Signature, "STORV9.0", 8 ) == 0) {
+	} else if (strncmp(Signature, "STORV9.0", 8) == 0) {
 		version = 90;
-	} else if (strncmp( Signature, "STORV0.0", 8 ) == 0) {
+	} else if (strncmp(Signature, "STORV0.0", 8) == 0) {
 		//GemRB's internal version with all known fields supported
 		version = 0;
 	} else {
@@ -60,7 +61,7 @@ bool STOImporter::Open(DataStream* stream)
 	return true;
 }
 
-Store* STOImporter::GetStore(Store *s)
+Store* STOImporter::GetStore(Store* s)
 {
 	if (!s)
 		return NULL;
@@ -81,33 +82,33 @@ Store* STOImporter::GetStore(Store *s)
 	str->ReadDword(s->DepreciationRate);
 	str->ReadWord(s->StealFailureChance);
 	str->ReadWord(s->Capacity); //will be overwritten for V9.0
-	str->Read( s->unknown, 8 );
+	str->Read(s->unknown, 8);
 	str->ReadDword(s->PurchasedCategoriesOffset);
 	str->ReadDword(s->PurchasedCategoriesCount);
 	str->ReadDword(s->ItemsOffset);
 	str->ReadDword(shopType);
 	str->ReadDword(s->Lore);
 	str->ReadDword(s->IDPrice);
-	str->ReadResRef( s->RumoursTavern );
+	str->ReadResRef(s->RumoursTavern);
 	str->ReadDword(s->DrinksOffset);
 	str->ReadDword(s->DrinksCount);
-	str->ReadResRef( s->RumoursTemple );
+	str->ReadResRef(s->RumoursTemple);
 	str->ReadDword(s->AvailableRooms);
 	for (unsigned int& roomPrice : s->RoomPrices) {
 		str->ReadDword(roomPrice);
 	}
 	str->ReadDword(s->CuresOffset);
 	str->ReadDword(s->CuresCount);
-	str->Read( s->unknown2, 36 );
+	str->Read(s->unknown2, 36);
 
 	if (version == 90) { //iwd stores
 		ieDword tmp;
 
 		str->ReadDword(tmp);
 		s->Capacity = (ieWord) tmp;
-		str->Read( s->unknown3, 80 );
+		str->Read(s->unknown3, 80);
 	} else {
-		memset( s->unknown3, 0, 80 );
+		memset(s->unknown3, 0, 80);
 	}
 
 	s->purchased_categories.resize(s->PurchasedCategoriesCount);
@@ -115,23 +116,23 @@ Store* STOImporter::GetStore(Store *s)
 	s->drinks.resize(s->DrinksCount);
 	s->cures.resize(s->CuresCount);
 
-	str->Seek( s->PurchasedCategoriesOffset, GEM_STREAM_START );
-	GetPurchasedCategories( s );
+	str->Seek(s->PurchasedCategoriesOffset, GEM_STREAM_START);
+	GetPurchasedCategories(s);
 
-	str->Seek( s->ItemsOffset, GEM_STREAM_START );
+	str->Seek(s->ItemsOffset, GEM_STREAM_START);
 	std::vector<STOItem*> toDelete;
 	for (auto& item : s->items) {
 		item = new STOItem;
 		GetItem(item, s);
-		const Item *itm = gamedata->GetItem(item->ItemResRef, true);
+		const Item* itm = gamedata->GetItem(item->ItemResRef, true);
 		// some iwd2 stores like 60sheemi contain crap
 		if (itm && signed(itm->ItemNameIdentified) == -1) {
 			toDelete.push_back(item);
 			continue;
 		}
 		//it is important to handle this field as signed
-		if (item->InfiniteSupply>0) {
-			std::string TriggerCode = core->GetMBString( (ieStrRef) item->InfiniteSupply );
+		if (item->InfiniteSupply > 0) {
+			std::string TriggerCode = core->GetMBString((ieStrRef) item->InfiniteSupply);
 			// there can be multiple triggers, so we use a Condition to handle them
 			// all and avoid the need for custom parsing
 			PluginHolder<DialogMgr> dm = GetImporter<DialogMgr>(IE_DLG_CLASS_ID);
@@ -139,20 +140,20 @@ Store* STOImporter::GetStore(Store *s)
 
 			//if there are no triggers, GetRealStockSize is simpler
 			//also it is compatible only with pst/gemrb saved stores
-			s->HasTriggers=true;
+			s->HasTriggers = true;
 		}
 	}
 	for (const auto& item : toDelete) {
 		s->RemoveItem(item);
 	}
 
-	str->Seek( s->DrinksOffset, GEM_STREAM_START );
+	str->Seek(s->DrinksOffset, GEM_STREAM_START);
 	for (auto& drink : s->drinks) {
 		drink = new STODrink;
 		GetDrink(drink);
 	}
 
-	str->Seek( s->CuresOffset, GEM_STREAM_START );
+	str->Seek(s->CuresOffset, GEM_STREAM_START);
 	for (auto& cure : s->cures) {
 		cure = new STOCure;
 		GetCure(cure);
@@ -161,9 +162,9 @@ Store* STOImporter::GetStore(Store *s)
 	return s;
 }
 
-void STOImporter::GetItem(STOItem *it, const Store *s)
+void STOImporter::GetItem(STOItem* it, const Store* s)
 {
-	CREItem *tmpCREItem = new CREItem();
+	CREItem* tmpCREItem = new CREItem();
 	core->ReadItem(str, tmpCREItem);
 
 	//fix item properties if necessary
@@ -206,7 +207,7 @@ void STOImporter::GetItem(STOItem *it, const Store *s)
 	}
 }
 
-void STOImporter::GetDrink(STODrink *dr)
+void STOImporter::GetDrink(STODrink* dr)
 {
 	str->ReadResRef(dr->RumourResRef);
 	str->ReadStrRef(dr->DrinkName);
@@ -214,7 +215,7 @@ void STOImporter::GetDrink(STODrink *dr)
 	str->ReadDword(dr->Strength);
 }
 
-void STOImporter::GetCure(STOCure *cu)
+void STOImporter::GetCure(STOCure* cu)
 {
 	str->ReadResRef(cu->CureResRef);
 	str->ReadDword(cu->Price);
@@ -228,7 +229,7 @@ void STOImporter::GetPurchasedCategories(Store* s)
 }
 
 //call this before any write, it updates offsets!
-void STOImporter::CalculateStoredFileSize(Store *s) const
+void STOImporter::CalculateStoredFileSize(Store* s) const
 {
 	int headersize;
 
@@ -266,14 +267,14 @@ void STOImporter::CalculateStoredFileSize(Store *s) const
 	s->ItemsOffset = headersize;
 }
 
-void STOImporter::PutPurchasedCategories(DataStream *stream, const Store* s) const
+void STOImporter::PutPurchasedCategories(DataStream* stream, const Store* s) const
 {
 	for (unsigned int i = 0; i < s->PurchasedCategoriesCount; i++) {
 		stream->WriteDword(s->purchased_categories[i]);
 	}
 }
 
-void STOImporter::PutHeader(DataStream *stream, const Store *s)
+void STOImporter::PutHeader(DataStream* stream, const Store* s)
 {
 	ResRef signature = "STORV0.0";
 
@@ -290,43 +291,44 @@ void STOImporter::PutHeader(DataStream *stream, const Store *s)
 	stream->WriteWord(s->StealFailureChance);
 
 	switch (version) {
-	case 10: case 0: // bg2, gemrb
-		stream->WriteWord(s->Capacity);
-		break;
-	default:
-		stream->WriteWord(0);
-		break;
+		case 10:
+		case 0: // bg2, gemrb
+			stream->WriteWord(s->Capacity);
+			break;
+		default:
+			stream->WriteWord(0);
+			break;
 	}
-	
 
-	stream->Write( s->unknown, 8);
+
+	stream->Write(s->unknown, 8);
 	stream->WriteDword(s->PurchasedCategoriesOffset);
 	stream->WriteDword(s->PurchasedCategoriesCount);
 	stream->WriteDword(s->ItemsOffset);
 	stream->WriteDword(s->items.size());
 	stream->WriteDword(s->Lore);
 	stream->WriteDword(s->IDPrice);
-	stream->WriteResRef( s->RumoursTavern);
+	stream->WriteResRef(s->RumoursTavern);
 	stream->WriteDword(s->DrinksOffset);
 	stream->WriteDword(s->DrinksCount);
-	stream->WriteResRef( s->RumoursTemple);
+	stream->WriteResRef(s->RumoursTemple);
 	stream->WriteDword(s->AvailableRooms);
 	for (unsigned int roomPrice : s->RoomPrices) {
 		stream->WriteDword(roomPrice);
 	}
 	stream->WriteDword(s->CuresOffset);
 	stream->WriteDword(s->CuresCount);
-	stream->Write (s->unknown3, 36);  //use these as padding
-	if (version==90) {
+	stream->Write(s->unknown3, 36); //use these as padding
+	if (version == 90) {
 		ieDword tmpDword = s->Capacity;
 		stream->WriteDword(tmpDword);
-		stream->Write( s->unknown3, 80); //writing out original fillers
+		stream->Write(s->unknown3, 80); //writing out original fillers
 	}
 }
 
-void STOImporter::PutItems(DataStream *stream, const Store *store) const
+void STOImporter::PutItems(DataStream* stream, const Store* store) const
 {
-	for (const STOItem *it : store->items) {
+	for (const STOItem* it : store->items) {
 		stream->WriteResRef(it->ItemResRef);
 		stream->WriteWord(it->PurchasedAmount);
 		for (unsigned short usage : it->Usages) {
@@ -334,7 +336,7 @@ void STOImporter::PutItems(DataStream *stream, const Store *store) const
 		}
 		stream->WriteDword(it->Flags);
 		stream->WriteDword(it->AmountInStock);
-		if (version==11) {
+		if (version == 11) {
 			stream->WriteScalar<ieDwordSigned>(it->InfiniteSupply);
 			stream->WriteScalar<ieDwordSigned>(it->InfiniteSupply);
 			stream->Write(it->unknown2, 56);
@@ -344,7 +346,7 @@ void STOImporter::PutItems(DataStream *stream, const Store *store) const
 	}
 }
 
-void STOImporter::PutCures(DataStream *stream, const Store *s) const
+void STOImporter::PutCures(DataStream* stream, const Store* s) const
 {
 	for (const auto& c : s->cures) {
 		stream->WriteResRef(c->CureResRef);
@@ -352,7 +354,7 @@ void STOImporter::PutCures(DataStream *stream, const Store *s) const
 	}
 }
 
-void STOImporter::PutDrinks(DataStream *stream, const Store *s) const
+void STOImporter::PutDrinks(DataStream* stream, const Store* s) const
 {
 	for (const auto& d : s->drinks) {
 		stream->WriteResRef(d->RumourResRef);
@@ -363,7 +365,7 @@ void STOImporter::PutDrinks(DataStream *stream, const Store *s) const
 }
 
 //saves the store into a datastream, be it memory or file
-bool STOImporter::PutStore(DataStream *stream, Store *store)
+bool STOImporter::PutStore(DataStream* stream, Store* store)
 {
 	if (!stream || !store) {
 		return false;

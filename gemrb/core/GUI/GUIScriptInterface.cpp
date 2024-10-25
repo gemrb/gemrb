@@ -85,7 +85,7 @@ const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId 
 		}
 	}
 
-	ctrl->ControlID = (ieDword)id;
+	ctrl->ControlID = (ieDword) id;
 
 	if (existing) {
 		return static_cast<const ControlScriptingRef*>(ctrl->ReplaceScriptingRef(existing, id, group));

@@ -26,14 +26,15 @@
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "Palette.h"
 #include "RNG.h"
 
+#include "Logging/Logging.h"
+
 namespace GemRB {
 
-static const ieByte SixteenToNine[16]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
-static const ieByte SixteenToFive[16]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
+static const ieByte SixteenToNine[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1 };
+static const ieByte SixteenToFive[16] = { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 2, 2, 1, 1 };
 
 static const int zOrder_TwoPiece[2] = { 1, 0 };
 
@@ -72,25 +73,26 @@ struct EquipResRefData {
 	unsigned char Cycle;
 };
 
-CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
+CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept
+{
 	AutoTable Avatars = gamedata->LoadTable("avatars");
 	if (!Avatars) {
 		error("CharAnimations", "A critical animation file is missing!");
 	}
 	TableMgr::index_t AvatarsCount = Avatars->GetRowCount();
 	table.resize(AvatarsCount);
-	const DataFileMgr *resdata = core->GetResDataINI();
+	const DataFileMgr* resdata = core->GetResDataINI();
 	for (TableMgr::index_t i = 0; i < AvatarsCount; ++i) {
 		table[i].AnimID = strtounsigned<unsigned int>(Avatars->GetRowName(i).c_str());
 		table[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1);
 		table[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2);
 		table[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3);
 		table[i].Prefixes[3] = Avatars->QueryField(i, AV_PREFIX4);
-		table[i].AnimationType = Avatars->QueryFieldUnsigned<ieByte>(i,AV_ANIMTYPE);
-		table[i].CircleSize = Avatars->QueryFieldUnsigned<ieByte>(i,AV_CIRCLESIZE);
+		table[i].AnimationType = Avatars->QueryFieldUnsigned<ieByte>(i, AV_ANIMTYPE);
+		table[i].CircleSize = Avatars->QueryFieldUnsigned<ieByte>(i, AV_CIRCLESIZE);
 		table[i].PaletteType = Avatars->QueryField(i, AV_USE_PALETTE);
 
-		char size = Avatars->QueryField(i,AV_SIZE)[0];
+		char size = Avatars->QueryField(i, AV_SIZE)[0];
 		if (size == '*') {
 			size = 0;
 		}
@@ -99,7 +101,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		table[i].WalkScale = 0;
 		table[i].RunScale = 0;
 		table[i].Bestiary = -1;
-		
+
 		for (unsigned char j = 0; j < MAX_ANIMS; j++) {
 			table[i].StanceOverride[j] = j;
 		}
@@ -110,30 +112,30 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			if (lookup == resdata->end() || lookup->size() == 0) continue;
 
 			float walkscale = resdata->GetKeyAsFloat(section, "walkscale", 0.0f);
-			if (walkscale != 0.0f) table[i].WalkScale = (int)(1000.0f / walkscale);
+			if (walkscale != 0.0f) table[i].WalkScale = (int) (1000.0f / walkscale);
 			float runscale = resdata->GetKeyAsFloat(section, "runscale", 0.0f);
-			if (runscale != 0.0f) table[i].RunScale = (int)(1000.0f / runscale);
+			if (runscale != 0.0f) table[i].RunScale = (int) (1000.0f / runscale);
 			table[i].Bestiary = resdata->GetKeyAsInt(section, "bestiary", -1);
 		}
 	}
-	
-	std::sort(table.begin(), table.end(),[](const AvatarStruct &a, const AvatarStruct &b) {
+
+	std::sort(table.begin(), table.end(), [](const AvatarStruct& a, const AvatarStruct& b) {
 		return a.AnimID < b.AnimID;
 	});
 
 	AutoTable blood = gamedata->LoadTable("bloodclr");
 	if (blood) {
 		TableMgr::index_t rows = blood->GetRowCount();
-		for(TableMgr::index_t i = 0; i < rows; ++i) {
+		for (TableMgr::index_t i = 0; i < rows; ++i) {
 			char value = 0;
 			unsigned int flags = 0;
 			unsigned int rmin = 0;
 			unsigned int rmax = 0xffff;
 
-			valid_signednumber(blood->QueryField(i,0).c_str(), value);
-			valid_unsignednumber(blood->QueryField(i,1).c_str(), rmin);
-			valid_unsignednumber(blood->QueryField(i,2).c_str(), rmax);
-			valid_unsignednumber(blood->QueryField(i,3).c_str(), flags);
+			valid_signednumber(blood->QueryField(i, 0).c_str(), value);
+			valid_unsignednumber(blood->QueryField(i, 1).c_str(), rmin);
+			valid_unsignednumber(blood->QueryField(i, 2).c_str(), rmax);
+			valid_unsignednumber(blood->QueryField(i, 3).c_str(), flags);
 			if (rmin > rmax || rmax > 0xffff) {
 				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: {:#x} {:#x}-{:#x} ", value, rmin, rmax);
 				continue;
@@ -157,9 +159,9 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			ieByte range = 0;
 
 			value = walk->QueryField(i, 0);
-			valid_unsignednumber(walk->QueryField(i,1).c_str(), rmin);
-			valid_unsignednumber(walk->QueryField(i,2).c_str(), rmax);
-			valid_unsignednumber(walk->QueryField(i,3).c_str(), range);
+			valid_unsignednumber(walk->QueryField(i, 1).c_str(), rmin);
+			valid_unsignednumber(walk->QueryField(i, 2).c_str(), rmax);
+			valid_unsignednumber(walk->QueryField(i, 3).c_str(), range);
 			if (IsStar(value)) {
 				value.Reset();
 				range = 0;
@@ -237,7 +239,6 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			}
 		}
 	}
-
 }
 
 size_t CharAnimations::GetAvatarsCount()
@@ -245,20 +246,20 @@ size_t CharAnimations::GetAvatarsCount()
 	return AvatarTableLoader::Get().size();
 }
 
-const AvatarStruct &CharAnimations::GetAvatarStruct(size_t RowNum)
+const AvatarStruct& CharAnimations::GetAvatarStruct(size_t RowNum)
 {
 	return AvatarTableLoader::Get()[RowNum];
 }
 
 unsigned int CharAnimations::GetAnimationID() const
 {
-	if (AvatarsRowNum==~0u) return 0;
+	if (AvatarsRowNum == ~0u) return 0;
 	return AvatarTable[AvatarsRowNum].AnimID;
 }
 
 int CharAnimations::GetCircleSize() const
 {
-	if (AvatarsRowNum==~0u) return -1;
+	if (AvatarsRowNum == ~0u) return -1;
 	return AvatarTable[AvatarsRowNum].CircleSize;
 }
 
@@ -271,38 +272,39 @@ const ResRef& CharAnimations::GetPaletteType() const
 
 int CharAnimations::GetAnimType() const
 {
-	if (AvatarsRowNum==~0u) return -1;
+	if (AvatarsRowNum == ~0u) return -1;
 	return AvatarTable[AvatarsRowNum].AnimationType;
 }
 
 char CharAnimations::GetSize() const
 {
-	if (AvatarsRowNum==~0u) return 0;
+	if (AvatarsRowNum == ~0u) return 0;
 	return AvatarTable[AvatarsRowNum].Size;
 }
 
 int CharAnimations::GetBloodColor() const
 {
-	if(AvatarsRowNum==~0u) return 0;
+	if (AvatarsRowNum == ~0u) return 0;
 	return AvatarTable[AvatarsRowNum].BloodColor;
 }
 
 unsigned int CharAnimations::GetFlags() const
 {
-	if(AvatarsRowNum==~0u) return 0;
+	if (AvatarsRowNum == ~0u) return 0;
 	return AvatarTable[AvatarsRowNum].Flags;
 }
 
 unsigned char CharAnimations::MaybeOverrideStance(unsigned char stance) const
 {
-	if(AvatarsRowNum==~0u) return stance;
+	if (AvatarsRowNum == ~0u) return stance;
 	return AvatarTable[AvatarsRowNum].StanceOverride[stance];
 }
 /*
  * For some actors (Arundel, FFG, fire giants) a new stance requires a
  * different palette to use. Presumably, this is relevant for PAL_MAIN only.
  */
-void CharAnimations::MaybeUpdateMainPalette(const Animation& anim) {
+void CharAnimations::MaybeUpdateMainPalette(const Animation& anim)
+{
 	if (previousStanceID != stanceID && GetAnimType() != IE_ANI_TWO_PIECE) {
 		// Test if the palette in question is actually different to the one loaded.
 		if (!PartPalettes[PAL_MAIN] || *PartPalettes[PAL_MAIN] != *anim.GetFrame(0)->GetPalette()) {
@@ -314,7 +316,7 @@ void CharAnimations::MaybeUpdateMainPalette(const Animation& anim) {
 	}
 }
 
-const ResRef &CharAnimations::GetWalkSound() const
+const ResRef& CharAnimations::GetWalkSound() const
 {
 	if (AvatarsRowNum == ~0U) return EmptyRef;
 	return AvatarTable[AvatarsRowNum].WalkSound;
@@ -322,50 +324,50 @@ const ResRef &CharAnimations::GetWalkSound() const
 
 int CharAnimations::GetWalkSoundCount() const
 {
-	if(AvatarsRowNum==~0u) return 0;
+	if (AvatarsRowNum == ~0u) return 0;
 	return AvatarTable[AvatarsRowNum].WalkSoundCount;
 }
 
 int CharAnimations::GetActorPartCount() const
 {
-	if (AvatarsRowNum==~0u) return -1;
+	if (AvatarsRowNum == ~0u) return -1;
 	switch (AvatarTable[AvatarsRowNum].AnimationType) {
-	case IE_ANI_NINE_FRAMES: //dragon animations
-		return 9;
-	case IE_ANI_FOUR_FRAMES: //wyvern animations
-	case IE_ANI_FOUR_FRAMES_2: //demogorgon animations
-		return 4;
-	case IE_ANI_TWO_PIECE:   //ankheg animations
-		return 2;
-	case IE_ANI_PST_GHOST:   //special pst anims
-		if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[1])) {
-			return 1;
-		}
-		if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[2])) {
+		case IE_ANI_NINE_FRAMES: //dragon animations
+			return 9;
+		case IE_ANI_FOUR_FRAMES: //wyvern animations
+		case IE_ANI_FOUR_FRAMES_2: //demogorgon animations
+			return 4;
+		case IE_ANI_TWO_PIECE: //ankheg animations
 			return 2;
-		}
-		if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[3])) {
-			return 3;
-		}
-		return 4;
-	default:
-		return 1;
+		case IE_ANI_PST_GHOST: //special pst anims
+			if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[1])) {
+				return 1;
+			}
+			if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[2])) {
+				return 2;
+			}
+			if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[3])) {
+				return 3;
+			}
+			return 4;
+		default:
+			return 1;
 	}
 }
 
 int CharAnimations::GetTotalPartCount() const
 {
-	if (AvatarsRowNum==~0u) return -1;
+	if (AvatarsRowNum == ~0u) return -1;
 	switch (AvatarTable[AvatarsRowNum].AnimationType) {
-	case IE_ANI_FOUR_FILES:
-	case IE_ANI_FOUR_FILES_2:
-		return GetActorPartCount() + 1; // only weapon
-	case IE_ANI_CODE_MIRROR:
-		return GetActorPartCount() + 3; // equipment
-	case IE_ANI_TWENTYTWO:
-		return GetActorPartCount() + 3; // equipment
-	default:
-		return GetActorPartCount();
+		case IE_ANI_FOUR_FILES:
+		case IE_ANI_FOUR_FILES_2:
+			return GetActorPartCount() + 1; // only weapon
+		case IE_ANI_CODE_MIRROR:
+			return GetActorPartCount() + 3; // equipment
+		case IE_ANI_TWENTYTWO:
+			return GetActorPartCount() + 3; // equipment
+		default:
+			return GetActorPartCount();
 	}
 }
 
@@ -380,7 +382,7 @@ const ResRef& CharAnimations::GetArmourLevel(int ArmourLevel) const
 
 void CharAnimations::SetArmourLevel(int ArmourLevel)
 {
-	if (AvatarsRowNum==~0u) return;
+	if (AvatarsRowNum == ~0u) return;
 	//ignore ArmourLevel for the static pst anims (all sprites are displayed)
 	if (AvatarTable[AvatarsRowNum].AnimationType == IE_ANI_PST_GHOST) {
 		ArmourLevel = 0;
@@ -436,31 +438,30 @@ void CharAnimations::SetOffhandRef(AnimRef ref)
 	ModPartPalettes[PAL_OFFHAND] = nullptr;
 }
 
-void CharAnimations::LockPalette(const ieDword *gradients)
+void CharAnimations::LockPalette(const ieDword* gradients)
 {
 	if (lockPalette) return;
 	//cannot lock colors for PST animations
-	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1)
-	{
+	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
 		return;
 	}
 	//force initialisation of animation
-	SetColors( gradients );
+	SetColors(gradients);
 	GetAnimation(stanceID, S);
 	if (PartPalettes[PAL_MAIN]) {
-		lockPalette=true;
+		lockPalette = true;
 	}
 }
 
 // NOTE: change if MAX_ANIMS is increased
 //                                          0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
-static const char StancePrefix[] =        {'3','2','5','5','4','4','2','2','5','4','1','3','3','3','4','1','4','4','4'};
-static const char CyclePrefix[] =         {'0','0','1','1','1','1','0','0','1','1','0','0','0','0','1','1','1','1','1'};
-static const unsigned int CycleOffset[] = { 0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9, 18,  0,  0,  0,  0,  0 };
+static const char StancePrefix[] = { '3', '2', '5', '5', '4', '4', '2', '2', '5', '4', '1', '3', '3', '3', '4', '1', '4', '4', '4' };
+static const char CyclePrefix[] = { '0', '0', '1', '1', '1', '1', '0', '0', '1', '1', '0', '0', '0', '0', '1', '1', '1', '1', '1' };
+static const unsigned int CycleOffset[] = { 0, 0, 0, 0, 0, 9, 0, 0, 0, 18, 0, 0, 9, 18, 0, 0, 0, 0, 0 };
 
-#define NINE_FRAMES_PALETTE(stance)	((PaletteType) (StancePrefix[stance] - '1'))
+#define NINE_FRAMES_PALETTE(stance) ((PaletteType) (StancePrefix[stance] - '1'))
 
-void CharAnimations::SetColors(const ieDword *arg)
+void CharAnimations::SetColors(const ieDword* arg)
 {
 	Colors = arg;
 	SetupColors(PAL_MAIN);
@@ -505,7 +506,7 @@ void CharAnimations::SetupColors(PaletteType type)
 	if (!Colors) {
 		return;
 	}
-	
+
 	const ResRef& paletteType = GetPaletteType();
 
 	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
@@ -524,8 +525,8 @@ void CharAnimations::SetupColors(PaletteType type)
 		int colorcount = Colors[6];
 		constexpr int size = 32;
 		//the color count shouldn't be more than 6!
-		if (colorcount>6) colorcount=6;
-		int dest = 256-colorcount*size;
+		if (colorcount > 6) colorcount = 6;
+		int dest = 256 - colorcount * size;
 		bool needmod = false;
 		if (GlobalColorMod.type != RGBModifier::NONE) {
 			needmod = true;
@@ -543,7 +544,7 @@ void CharAnimations::SetupColors(PaletteType type)
 		for (int i = 0; i < colorcount; i++) {
 			const auto& pal32 = core->GetPalette32(static_cast<uint8_t>(Colors[i]));
 			PartPalettes[PAL_MAIN]->CopyColors(dest, &pal32[0], &pal32[32]);
-			dest +=size;
+			dest += size;
 		}
 
 		if (needmod) {
@@ -556,7 +557,7 @@ void CharAnimations::SetupColors(PaletteType type)
 	} else if (type <= PAL_MAIN_5 && paletteType != "0" && !paletteType.IsEmpty()) {
 		//handling special palettes like MBER_BL (black bear)
 		if (paletteType != "1") {
-			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
+			if (GetAnimType() == IE_ANI_NINE_FRAMES) {
 				PaletteResRef[type].Format("{:.4}_{:.2}{:c}", ResRefBase, paletteType, '1' + type);
 			} else if (ResRefBase == "MFIE") { // hack for magic golems
 				PaletteResRef[type].Format("{:.4}{:.2}B", ResRefBase, paletteType);
@@ -600,7 +601,7 @@ void CharAnimations::SetupColors(PaletteType type)
 			if (GlobalColorMod.type != RGBModifier::NONE) {
 				*ModPartPalettes[type] = SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
 			} else {
-				*ModPartPalettes[type] = SetupRGBModification(PartPalettes[type],ColorMods, type);
+				*ModPartPalettes[type] = SetupRGBModification(PartPalettes[type], ColorMods, type);
 			}
 		} else {
 			ModPartPalettes[type] = nullptr;
@@ -615,13 +616,17 @@ Holder<Palette> CharAnimations::GetPartPalette(int part) const
 	if (GetAnimType() == IE_ANI_NINE_FRAMES) {
 		//these animations use several palettes
 		type = NINE_FRAMES_PALETTE(stanceID);
-	}
-	else if (GetAnimType() == IE_ANI_FOUR_FRAMES_2) return nullptr;
+	} else if (GetAnimType() == IE_ANI_FOUR_FRAMES_2)
+		return nullptr;
 	// always use unmodified BAM palette for the supporting part
-	else if (GetAnimType() == IE_ANI_TWO_PIECE && part == 1) return nullptr;
-	else if (part == actorPartCount) type = PAL_WEAPON;
-	else if (part == actorPartCount+1) type = PAL_OFFHAND;
-	else if (part == actorPartCount+2) type = PAL_HELMET;
+	else if (GetAnimType() == IE_ANI_TWO_PIECE && part == 1)
+		return nullptr;
+	else if (part == actorPartCount)
+		type = PAL_WEAPON;
+	else if (part == actorPartCount + 1)
+		type = PAL_OFFHAND;
+	else if (part == actorPartCount + 2)
+		type = PAL_HELMET;
 
 	if (ModPartPalettes[type])
 		return ModPartPalettes[type];
@@ -629,7 +634,8 @@ Holder<Palette> CharAnimations::GetPartPalette(int part) const
 	return PartPalettes[type];
 }
 
-Holder<Palette> CharAnimations::GetShadowPalette() const {
+Holder<Palette> CharAnimations::GetShadowPalette() const
+{
 	return shadowPalette;
 }
 
@@ -644,7 +650,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		ColorMods[i].speed = 0;
 		// make initial phase depend on location to make the pulse appear
 		// less even
-		ColorMods[i].phase = 5*i;
+		ColorMods[i].phase = 5 * i;
 		ColorMods[i].locked = false;
 	}
 	GlobalColorMod.type = RGBModifier::NONE;
@@ -654,16 +660,16 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	GlobalColorMod.rgb = Color();
 
 	AvatarsRowNum = GetAvatarsCount();
-	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID) ) {
-		ieDword tmp = AnimID&0xf000;
-		if (tmp==0x6000 || tmp==0xe000) {
-			AnimID&=0xff;
+	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
+		ieDword tmp = AnimID & 0xf000;
+		if (tmp == 0x6000 || tmp == 0xe000) {
+			AnimID &= 0xff;
 		}
 	}
 
 	while (AvatarsRowNum--) {
-		if (AvatarTable[AvatarsRowNum].AnimID<=AnimID) {
-			SetArmourLevel( ArmourLevel );
+		if (AvatarTable[AvatarsRowNum].AnimID <= AnimID) {
+			SetArmourLevel(ArmourLevel);
 			return;
 		}
 	}
@@ -931,8 +937,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 	bool lastFrameOnly = false;
 	//pst (and some other) animations don't have separate animations for sleep/die
 	if (Stance == IE_ANI_TWITCH &&
-		(AnimType >= IE_ANI_PST_ANIMATION_1 || MaybeOverrideStance(IE_ANI_DIE) == stanceID))
-	{
+	    (AnimType >= IE_ANI_PST_ANIMATION_1 || MaybeOverrideStance(IE_ANI_DIE) == stanceID)) {
 		lastFrameOnly = true;
 	}
 
@@ -952,12 +957,11 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 	int partCount = GetTotalPartCount();
 	int actorPartCount = GetActorPartCount();
 	if (partCount <= 0) return nullptr;
-	
+
 	PartAnim newparts(partCount);
 
 	EquipResRefData equipment;
-	for (int part = 0; part < partCount; ++part)
-	{
+	for (int part = 0; part < partCount; ++part) {
 		// NewResRef is based on the prefix ResRef and various suffixes
 		ResRef NewResRef;
 		unsigned char Cycle = 0;
@@ -978,7 +982,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 				if (WeaponRef[0] == 0) continue;
 				// weapon
 				GetEquipmentResRef(WeaponRef, false, NewResRef, Cycle, equipment);
-			} else if (part == actorPartCount+1) {
+			} else if (part == actorPartCount + 1) {
 				if (OffhandRef[0] == 0) continue;
 				if (WeaponType == IE_ANI_WEAPON_2H) continue;
 				// off-hand
@@ -987,7 +991,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 				} else { // IE_ANI_WEAPON_2W
 					GetEquipmentResRef(OffhandRef, true, NewResRef, Cycle, equipment);
 				}
-			} else if (part == actorPartCount+2) {
+			} else if (part == actorPartCount + 2) {
 				if (HelmetRef[0] == 0) continue;
 				// helmet
 				GetEquipmentResRef(HelmetRef, false, NewResRef, Cycle, equipment);
@@ -999,7 +1003,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 		if (!af) {
 			if (part < actorPartCount) {
 				Log(ERROR, "CharAnimations", "Couldn't create animationfactory: {} ({:#x})",
-						NewResRef, GetAnimationID());
+				    NewResRef, GetAnimationID());
 				return nullptr;
 			} else {
 				// not fatal if animation for equipment is missing
@@ -1030,7 +1034,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			//animations which need a GlobalColorMod (mgir for example)
 
 			//if (!palette[PAL_MAIN] && ((GlobalColorMod.type!=RGBModifier::NONE) || (NoPalette()!=1)) ) {
-			if(!PartPalettes[ptype]) {
+			if (!PartPalettes[ptype]) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
 				PartPalettes[ptype] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
@@ -1044,12 +1048,12 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 				PartPalettes[PAL_WEAPON] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
 				SetupColors(PAL_WEAPON);
 			}
-		} else if (part == actorPartCount+1) {
+		} else if (part == actorPartCount + 1) {
 			if (!PartPalettes[PAL_OFFHAND]) {
 				PartPalettes[PAL_OFFHAND] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
 				SetupColors(PAL_OFFHAND);
 			}
-		} else if (part == actorPartCount+2) {
+		} else if (part == actorPartCount + 2) {
 			if (!PartPalettes[PAL_HELMET]) {
 				PartPalettes[PAL_HELMET] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
 				SetupColors(PAL_HELMET);
@@ -1107,13 +1111,12 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			default:
 				break;
 		}
-		
+
 		newparts[part] = newanim;
 
 		// make animarea of part 0 encompass the animarea of the other parts
 		if (part > 0)
 			newparts[0]->AddAnimArea(newanim.get());
-
 	}
 
 	switch (AnimType) {
@@ -1162,7 +1165,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 					orient = newparts;
 				}
 			}
-			break; 
+			break;
 
 		case IE_ANI_PST_ANIMATION_3: //no stc just std
 		case IE_ANI_PST_ANIMATION_2: //no std just stc
@@ -1188,7 +1191,8 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 	return &Anims[stanceID][Orient];
 }
 
-const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char stance, orient_t orientation) {
+const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char stance, orient_t orientation)
+{
 	if (GetTotalPartCount() <= 0 || IE_ANI_TWENTYTWO != GetAnimType()) {
 		return nullptr;
 	}
@@ -1242,7 +1246,7 @@ const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char
 	if (!animation) {
 		return nullptr;
 	}
-	
+
 	newparts[0] = animation;
 
 	if (!shadowPalette) {
@@ -1277,27 +1281,27 @@ const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char
 	return &shadowAnimations[newStanceID][orientation];
 }
 
-static const int one_file[MAX_ANIMS] = {2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
+static const int one_file[MAX_ANIMS] = { 2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4 };
 
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
-					 orient_t Orient, ResRef& NewResRef, unsigned char& Cycle,
-					 int Part, EquipResRefData& EquipData) const
+				   orient_t Orient, ResRef& NewResRef, unsigned char& Cycle,
+				   int Part, EquipResRefData& EquipData) const
 {
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FRAMES:
-			AddFFSuffix( NewResRef, StanceID, Cycle, Orient, Part );
+			AddFFSuffix(NewResRef, StanceID, Cycle, Orient, Part);
 			break;
 
 		case IE_ANI_FOUR_FRAMES_2:
-			AddFF2Suffix( NewResRef, StanceID, Cycle, Orient, Part );
+			AddFF2Suffix(NewResRef, StanceID, Cycle, Orient, Part);
 			break;
 
 		case IE_ANI_NINE_FRAMES:
-			AddNFSuffix( NewResRef, StanceID, Cycle, Orient, Part );
+			AddNFSuffix(NewResRef, StanceID, Cycle, Orient, Part);
 			break;
 
 		case IE_ANI_CODE_MIRROR:
-			AddVHRSuffix( NewResRef, StanceID, Cycle, Orient, EquipData );
+			AddVHRSuffix(NewResRef, StanceID, Cycle, Orient, EquipData);
 			break;
 
 		case IE_ANI_BIRD:
@@ -1320,15 +1324,15 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_SIX_FILES:
-			AddSixSuffix( NewResRef, StanceID, Cycle, Orient );
+			AddSixSuffix(NewResRef, StanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_TWENTYTWO: //5+3 animations
-			AddMHRSuffix( NewResRef, StanceID, Cycle, Orient, EquipData );
+			AddMHRSuffix(NewResRef, StanceID, Cycle, Orient, EquipData);
 			break;
 
 		case IE_ANI_TWO_FILES_2: //4+4 animations
-			AddLR2Suffix( NewResRef, StanceID, Cycle, Orient );
+			AddLR2Suffix(NewResRef, StanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_TWO_FILES_3: //IWD style anims
@@ -1336,7 +1340,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_TWO_FILES_3B: //IWD style anims
-			AddMMR2Suffix( NewResRef, StanceID, Cycle, Orient );
+			AddMMR2Suffix(NewResRef, StanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_TWO_FILES_3C: //IWD style anims
@@ -1349,45 +1353,45 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_TWO_FILES_5:
-			AddTwoFiles5Suffix( NewResRef, StanceID, Cycle, Orient );
+			AddTwoFiles5Suffix(NewResRef, StanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_TWO_FILES:
-			AddTwoFileSuffix(NewResRef, StanceID, Cycle, Orient );
+			AddTwoFileSuffix(NewResRef, StanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_FOUR_FILES:
-			AddLRSuffix( NewResRef, StanceID, Cycle, Orient, EquipData );
+			AddLRSuffix(NewResRef, StanceID, Cycle, Orient, EquipData);
 			break;
 
 		case IE_ANI_FOUR_FILES_2:
-			AddLRSuffix2( NewResRef, StanceID, Cycle, Orient, EquipData );
+			AddLRSuffix2(NewResRef, StanceID, Cycle, Orient, EquipData);
 			break;
 
 		case IE_ANI_FOUR_FILES_3:
-			AddHLSuffix( NewResRef, StanceID, Cycle, Orient );
+			AddHLSuffix(NewResRef, StanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_SIX_FILES_2: //MOGR (variant of FOUR_FILES)
-			AddLR3Suffix( NewResRef, StanceID, Cycle, Orient );
+			AddLR3Suffix(NewResRef, StanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_TWO_PIECE: //MAKH
-			AddTwoPieceSuffix( NewResRef, StanceID, Cycle, Orient, Part );
+			AddTwoPieceSuffix(NewResRef, StanceID, Cycle, Orient, Part);
 			break;
 
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
-			AddVHR2Suffix( NewResRef, StanceID, Cycle, Orient );
+			AddVHR2Suffix(NewResRef, StanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_CODE_MIRROR_3: // like IE_ANI_CODE_MIRROR_2 but with fewer cycles in g26
-			AddVHR3Suffix( NewResRef, StanceID, Cycle, Orient );
+			AddVHR3Suffix(NewResRef, StanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_PST_ANIMATION_1:
 		case IE_ANI_PST_ANIMATION_2:
 		case IE_ANI_PST_ANIMATION_3:
-			AddPSTSuffix( NewResRef, StanceID, Cycle, Orient );
+			AddPSTSuffix(NewResRef, StanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_PST_STAND:
@@ -1405,8 +1409,8 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 }
 
 void CharAnimations::GetEquipmentResRef(AnimRef equipRef, bool offhand,
-										ResRef& dest, unsigned char& Cycle,
-										const EquipResRefData& equip) const
+					ResRef& dest, unsigned char& Cycle,
+					const EquipResRefData& equip) const
 {
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FILES:
@@ -1430,7 +1434,7 @@ const int* CharAnimations::GetZOrder(unsigned char Orient) const
 		case IE_ANI_CODE_MIRROR:
 			return zOrder_Mirror16[Orient];
 		case IE_ANI_TWENTYTWO:
-			return zOrder_8[Orient/2];
+			return zOrder_8[Orient / 2];
 		case IE_ANI_FOUR_FILES:
 			return nullptr; // FIXME
 		case IE_ANI_TWO_PIECE:
@@ -1442,44 +1446,52 @@ const int* CharAnimations::GetZOrder(unsigned char Orient) const
 
 
 void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
-								  unsigned char& Cycle, orient_t Orient) const
+				  unsigned char& Cycle, orient_t Orient) const
 {
-	const char *Prefix;
-	static const char prefixes[2][4] = {"sf2", "sf1"};
+	const char* Prefix;
+	static const char prefixes[2][4] = { "sf2", "sf1" };
 
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_ATTACK_JAB:
 		case IE_ANI_ATTACK_BACKSLASH:
-			Cycle=SixteenToFive[Orient];
-			Prefix="at1"; break;
+			Cycle = SixteenToFive[Orient];
+			Prefix = "at1";
+			break;
 		case IE_ANI_DAMAGE:
-			Cycle=SixteenToFive[Orient];
-			Prefix="hit"; break;
+			Cycle = SixteenToFive[Orient];
+			Prefix = "hit";
+			break;
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
-			Cycle=SixteenToFive[Orient];
-			Prefix="gup"; break;
+			Cycle = SixteenToFive[Orient];
+			Prefix = "gup";
+			break;
 		case IE_ANI_AWAKE:
-			Cycle=SixteenToFive[Orient];
-			Prefix="std"; break;
+			Cycle = SixteenToFive[Orient];
+			Prefix = "std";
+			break;
 		case IE_ANI_READY:
-			Cycle=SixteenToFive[Orient];
-			Prefix="stc"; break;
+			Cycle = SixteenToFive[Orient];
+			Prefix = "stc";
+			break;
 		case IE_ANI_DIE:
 		case IE_ANI_SLEEP:
 		case IE_ANI_TWITCH:
-			Cycle=SixteenToFive[Orient];
-			Prefix="dfb"; break;
+			Cycle = SixteenToFive[Orient];
+			Prefix = "dfb";
+			break;
 		case IE_ANI_RUN:
-			Cycle=SixteenToNine[Orient];
-			Prefix="run"; break;
+			Cycle = SixteenToNine[Orient];
+			Prefix = "run";
+			break;
 		case IE_ANI_WALK:
-			Cycle=SixteenToNine[Orient];
-			Prefix="wlk"; break;
+			Cycle = SixteenToNine[Orient];
+			Prefix = "wlk";
+			break;
 		case IE_ANI_HEAD_TURN:
-			Cycle=SixteenToFive[Orient];
+			Cycle = SixteenToFive[Orient];
 
 			for (int i = RandomFlip(); i < 2; ++i) {
 				dest.Format("{}{}{}", ResRefBase[0], prefixes[i], ResRefBase.begin() + 1);
@@ -1491,25 +1503,27 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
 			Prefix = "stc";
 			break;
 		case IE_ANI_PST_START:
-			Cycle=0;
-			Prefix="ms1"; break;
+			Cycle = 0;
+			Prefix = "ms1";
+			break;
 		default: //just in case
-			Cycle=SixteenToFive[Orient];
-			Prefix="stc"; break;
+			Cycle = SixteenToFive[Orient];
+			Prefix = "stc";
+			break;
 	}
 	dest.Format("{}{}{}", ResRefBase[0], Prefix, ResRefBase.begin() + 1);
 }
 
 void CharAnimations::AddVHR2Suffix(ResRef& dest, unsigned char StanceID,
-								   unsigned char& Cycle, orient_t Orient) const
+				   unsigned char& Cycle, orient_t Orient) const
 {
-	Cycle=SixteenToNine[Orient];
+	Cycle = SixteenToNine[Orient];
 
 	switch (StanceID) {
 		case IE_ANI_ATTACK: //temporarily
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest.Append("g21");
-			Cycle+=9;
+			Cycle += 9;
 			break;
 
 		case IE_ANI_ATTACK_SLASH:
@@ -1518,34 +1532,34 @@ void CharAnimations::AddVHR2Suffix(ResRef& dest, unsigned char StanceID,
 
 		case IE_ANI_ATTACK_JAB:
 			dest.Append("g22");
-			Cycle+=18;
+			Cycle += 18;
 			break;
 
 		case IE_ANI_CAST: //looping
 			dest.Append("g25");
-			Cycle+=45;
+			Cycle += 45;
 			break;
 
-		case IE_ANI_CONJURE://ending
+		case IE_ANI_CONJURE: //ending
 			dest.Append("g26");
-			Cycle+=54;
+			Cycle += 54;
 			break;
 
 		case IE_ANI_SHOOT:
 			dest.Append("g24");
-			Cycle+=27;
+			Cycle += 27;
 			break;
 
 		case IE_ANI_HEAD_TURN:
 		case IE_ANI_AWAKE:
 			dest.Append("g12");
-			Cycle+=18;
+			Cycle += 18;
 			break;
 
 		case IE_ANI_SLEEP:
 		case IE_ANI_TWITCH:
 			dest.Append("g15");
-			Cycle+=45;
+			Cycle += 45;
 			break;
 
 		case IE_ANI_DIE:
@@ -1553,17 +1567,17 @@ void CharAnimations::AddVHR2Suffix(ResRef& dest, unsigned char StanceID,
 		case IE_ANI_GET_UP:
 		case IE_ANI_PST_START:
 			dest.Append("g14");
-			Cycle+=36;
+			Cycle += 36;
 			break;
 
 		case IE_ANI_DAMAGE:
 			dest.Append("g13");
-			Cycle+=27;
+			Cycle += 27;
 			break;
 
 		case IE_ANI_READY:
 			dest.Append("g1");
-			Cycle+=9;
+			Cycle += 9;
 			break;
 
 		case IE_ANI_WALK:
@@ -1579,15 +1593,15 @@ void CharAnimations::AddVHR2Suffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddVHR3Suffix(ResRef& dest, unsigned char StanceID,
-								   unsigned char& Cycle, orient_t Orient) const
+				   unsigned char& Cycle, orient_t Orient) const
 {
-	Cycle=SixteenToNine[Orient];
+	Cycle = SixteenToNine[Orient];
 
 	switch (StanceID) {
 		case IE_ANI_ATTACK: //temporarily
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest.Append("g21");
-			Cycle+=9;
+			Cycle += 9;
 			break;
 
 		case IE_ANI_ATTACK_SLASH:
@@ -1595,32 +1609,32 @@ void CharAnimations::AddVHR3Suffix(ResRef& dest, unsigned char StanceID,
 			break;
 
 		case IE_ANI_ATTACK_JAB:
-		case IE_ANI_CONJURE://ending
+		case IE_ANI_CONJURE: //ending
 			dest.Append("g22");
-			Cycle+=18;
+			Cycle += 18;
 			break;
 
 		case IE_ANI_CAST: //looping
 			dest.Append("g22");
-			Cycle+=27;
+			Cycle += 27;
 			break;
 
 		case IE_ANI_SHOOT:
 			dest.Append("g23");
-			Cycle+=27;
+			Cycle += 27;
 			break;
 
 		case IE_ANI_HEAD_TURN:
 		case IE_ANI_AWAKE:
 		case IE_ANI_HIDE:
 			dest.Append("g12");
-			Cycle+=18;
+			Cycle += 18;
 			break;
 
 		case IE_ANI_SLEEP:
 		case IE_ANI_TWITCH:
 			dest.Append("g15");
-			Cycle+=45;
+			Cycle += 45;
 			break;
 
 		case IE_ANI_DIE:
@@ -1628,17 +1642,17 @@ void CharAnimations::AddVHR3Suffix(ResRef& dest, unsigned char StanceID,
 		case IE_ANI_GET_UP:
 		case IE_ANI_PST_START:
 			dest.Append("g14");
-			Cycle+=36;
+			Cycle += 36;
 			break;
 
 		case IE_ANI_DAMAGE:
 			dest.Append("g13");
-			Cycle+=27;
+			Cycle += 27;
 			break;
 
 		case IE_ANI_READY:
 			dest.Append("g1");
-			Cycle+=9;
+			Cycle += 9;
 			break;
 
 		case IE_ANI_WALK:
@@ -1651,9 +1665,9 @@ void CharAnimations::AddVHR3Suffix(ResRef& dest, unsigned char StanceID,
 
 // Note: almost like SixSuffix
 void CharAnimations::AddFFSuffix(ResRef& dest, unsigned char StanceID,
-								 unsigned char& Cycle, orient_t Orient, int Part) const
+				 unsigned char& Cycle, orient_t Orient, int Part) const
 {
-	Cycle=SixteenToNine[Orient];
+	Cycle = SixteenToNine[Orient];
 	switch (StanceID) {
 		case IE_ANI_WALK:
 			dest.Append("g1");
@@ -1709,14 +1723,13 @@ void CharAnimations::AddFFSuffix(ResRef& dest, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "Four frames Animation: unhandled stance: {} {}", dest, StanceID);
-
 	}
 	dest[dest.length()] = static_cast<char>(Part + '1');
 }
 
 // demigorgon's 4-part animation
 void CharAnimations::AddFF2Suffix(ResRef& dest, unsigned char StanceID,
-								  unsigned char& Cycle, orient_t Orient, int Part) const
+				  unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	Cycle = SixteenToNine[Orient];
 	switch (StanceID) {
@@ -1771,7 +1784,6 @@ void CharAnimations::AddFF2Suffix(ResRef& dest, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "Four frames 2 Animation: unhandled stance: {} {}", dest, StanceID);
-
 	}
 
 	// change the placeholder 0 to a part number
@@ -1779,16 +1791,16 @@ void CharAnimations::AddFF2Suffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddNFSuffix(ResRef& dest, unsigned char StanceID,
-								 unsigned char& Cycle, orient_t Orient, int Part) const
+				 unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	Cycle = SixteenToNine[Orient];
-	
+
 	std::string prefix = fmt::format("{}{}{}{}{}", dest, StancePrefix[StanceID], (Part + 1) % 100, CyclePrefix[StanceID], Cycle);
 	if (prefix.length() > 8) {
 		prefix.resize(8);
 	}
 	StringToLower(prefix.begin(), prefix.end(), dest.begin());
-	Cycle=(ieByte) (Cycle+CycleOffset[StanceID]);
+	Cycle = (ieByte) (Cycle + CycleOffset[StanceID]);
 }
 
 //Attack
@@ -1804,7 +1816,7 @@ static const prefix_t RangedPrefix[] = { "sa", "sx", "ss" };
 static const prefix_t RangedPrefixOld[] = { "sa", "sx", "a1" };
 
 void CharAnimations::AddVHRSuffix(ResRef& dest, unsigned char StanceID,
-								  unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
+				  unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
 	Cycle = SixteenToNine[Orient];
 	switch (StanceID) {
@@ -1878,7 +1890,7 @@ void CharAnimations::AddVHRSuffix(ResRef& dest, unsigned char StanceID,
 			break;
 
 		case IE_ANI_READY:
-			if ( WeaponType == IE_ANI_WEAPON_2H ) {
+			if (WeaponType == IE_ANI_WEAPON_2H) {
 				dest.Append("g13");
 				Cycle += 27;
 			} else {
@@ -1912,8 +1924,8 @@ void CharAnimations::AddVHRSuffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::GetVHREquipmentRef(ResRef& dest, unsigned char& Cycle,
-										AnimRef equipRef, bool offhand,
-										const EquipResRefData& equip) const
+					AnimRef equipRef, bool offhand,
+					const EquipResRefData& equip) const
 {
 	Cycle = equip.Cycle;
 
@@ -1925,7 +1937,7 @@ void CharAnimations::GetVHREquipmentRef(ResRef& dest, unsigned char& Cycle,
 }
 
 void CharAnimations::AddSixSuffix(ResRef& dest, unsigned char StanceID,
-								  unsigned char& Cycle, orient_t Orient) const
+				  unsigned char& Cycle, orient_t Orient) const
 {
 	switch (StanceID) {
 		case IE_ANI_WALK:
@@ -1984,22 +1996,21 @@ void CharAnimations::AddSixSuffix(ResRef& dest, unsigned char StanceID,
 
 		default:
 			error("CharAnimation", "Six Animation: unhandled stance: {} {}", dest, StanceID);
-
 	}
-	if (Orient>9) {
+	if (Orient > 9) {
 		dest.Append("e");
 	}
 }
 
 void CharAnimations::AddLR2Suffix(ResRef& dest, unsigned char StanceID,
-								  unsigned char& Cycle, orient_t Orient) const
+				  unsigned char& Cycle, orient_t Orient) const
 {
 	Orient = orient_t(Orient / 2);
 
 	switch (StanceID) {
 		case IE_ANI_READY:
 		case IE_ANI_CAST: //looping
-		case IE_ANI_CONJURE://ending
+		case IE_ANI_CONJURE: //ending
 		case IE_ANI_HIDE:
 		case IE_ANI_WALK:
 		case IE_ANI_AWAKE:
@@ -2033,7 +2044,7 @@ void CharAnimations::AddLR2Suffix(ResRef& dest, unsigned char StanceID,
 		default:
 			error("CharAnimation", "LR2 Animation: unhandled stance: {} {}", dest, StanceID);
 	}
-	if (Orient>=4) {
+	if (Orient >= 4) {
 		dest.Append("g1e");
 	} else {
 		dest.Append("g1");
@@ -2041,7 +2052,7 @@ void CharAnimations::AddLR2Suffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddMHRSuffix(ResRef& dest, unsigned char StanceID,
-								  unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
+				  unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
 	Orient = orient_t(Orient / 2);
 
@@ -2068,20 +2079,20 @@ void CharAnimations::AddMHRSuffix(ResRef& dest, unsigned char StanceID,
 		case IE_ANI_READY:
 			dest.Append("g1");
 			EquipData.Suffix = "g1";
-			if ( WeaponType == IE_ANI_WEAPON_2W ) {
+			if (WeaponType == IE_ANI_WEAPON_2W) {
 				Cycle = 24 + Orient;
 			} else {
 				Cycle = 8 + Orient;
 			}
 			break;
 
-		case IE_ANI_CAST://looping
+		case IE_ANI_CAST: //looping
 			dest.Append("ca");
 			EquipData.Suffix = "ca";
 			Cycle = Orient;
 			break;
 
-		case IE_ANI_CONJURE://ending
+		case IE_ANI_CONJURE: //ending
 			dest.Append("ca");
 			EquipData.Suffix = "ca";
 			Cycle = 8 + Orient;
@@ -2144,7 +2155,7 @@ void CharAnimations::AddMHRSuffix(ResRef& dest, unsigned char StanceID,
 		default:
 			error("CharAnimation", "MHR Animation: unhandled stance: {} {}", dest, StanceID);
 	}
-	if (Orient>=5) {
+	if (Orient >= 5) {
 		dest.Append("e");
 		EquipData.Suffix.Append("e");
 	}
@@ -2156,8 +2167,8 @@ void CharAnimations::AddMHRSuffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::GetMHREquipmentRef(ResRef& dest, unsigned char& Cycle,
-										AnimRef equipRef, bool offhand,
-										const EquipResRefData& equip) const
+					AnimRef equipRef, bool offhand,
+					const EquipResRefData& equip) const
 {
 	Cycle = equip.Cycle;
 	if (offhand) {
@@ -2169,9 +2180,9 @@ void CharAnimations::GetMHREquipmentRef(ResRef& dest, unsigned char& Cycle,
 }
 
 void CharAnimations::AddTwoFileSuffix(ResRef& dest, unsigned char StanceID,
-									  unsigned char& Cycle, orient_t Orient) const
+				      unsigned char& Cycle, orient_t Orient) const
 {
-	switch(StanceID) {
+	switch (StanceID) {
 		case IE_ANI_HEAD_TURN:
 			Cycle = 16 + Orient / 2;
 			break;
@@ -2202,11 +2213,11 @@ void CharAnimations::AddTwoFileSuffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddTwoFiles5Suffix(ResRef& dest, unsigned char StanceID,
-										unsigned char& Cycle, orient_t Orient) const
+					unsigned char& Cycle, orient_t Orient) const
 {
-	Cycle=SixteenToNine[Orient];
+	Cycle = SixteenToNine[Orient];
 
-	switch(StanceID) {
+	switch (StanceID) {
 		case IE_ANI_WALK:
 			dest.Append("g1");
 			break;
@@ -2275,7 +2286,7 @@ void CharAnimations::AddTwoFiles5Suffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddLRSuffix2(ResRef& dest, unsigned char StanceID,
-								  unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
+				  unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
@@ -2340,7 +2351,7 @@ void CharAnimations::AddLRSuffix2(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddTwoPieceSuffix(ResRef& dest, unsigned char StanceID,
-									   unsigned char& Cycle, orient_t Orient, int Part) const
+				       unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	if (Part == 1) {
 		dest.Append("d");
@@ -2398,7 +2409,7 @@ void CharAnimations::AddTwoPieceSuffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddLRSuffix(ResRef& dest, unsigned char StanceID,
-								 unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
+				 unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
@@ -2467,8 +2478,8 @@ void CharAnimations::AddLRSuffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::GetLREquipmentRef(ResRef& dest, unsigned char& Cycle,
-									   AnimRef equipRef, bool /*offhand*/,
-									   const EquipResRefData& equip) const
+				       AnimRef equipRef, bool /*offhand*/,
+				       const EquipResRefData& equip) const
 {
 	Cycle = equip.Cycle;
 	dest.Format("{}{}{}", ResRefBase, equipRef, equip.Suffix);
@@ -2476,7 +2487,7 @@ void CharAnimations::GetLREquipmentRef(ResRef& dest, unsigned char& Cycle,
 
 //Only for the ogre animation (MOGR)
 void CharAnimations::AddLR3Suffix(ResRef& dest, unsigned char StanceID,
-								  unsigned char& Cycle, orient_t Orient) const
+				  unsigned char& Cycle, orient_t Orient) const
 {
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
@@ -2534,7 +2545,7 @@ void CharAnimations::AddLR3Suffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddMMR2Suffix(ResRef& dest, unsigned char StanceID,
-								   unsigned char& Cycle, orient_t Orient) const
+				   unsigned char& Cycle, orient_t Orient) const
 {
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
@@ -2544,40 +2555,40 @@ void CharAnimations::AddMMR2Suffix(ResRef& dest, unsigned char StanceID,
 		case IE_ANI_CONJURE:
 		case IE_ANI_CAST:
 			dest.Append("a1");
-			Cycle = ( Orient / 2 );
+			Cycle = (Orient / 2);
 			break;
 
 		case IE_ANI_SHOOT:
 			dest.Append("a4");
-			Cycle = ( Orient / 2 );
+			Cycle = (Orient / 2);
 			break;
 
 		case IE_ANI_AWAKE:
 		case IE_ANI_READY:
 			dest.Append("sd");
-			Cycle = ( Orient / 2 );
+			Cycle = (Orient / 2);
 			break;
 
 		case IE_ANI_HEAD_TURN:
 			dest.Append("sc");
-			Cycle = ( Orient / 2 );
+			Cycle = (Orient / 2);
 			break;
 
 		case IE_ANI_DAMAGE:
 			dest.Append("gh");
-			Cycle = ( Orient / 2 );
+			Cycle = (Orient / 2);
 			break;
 
 		case IE_ANI_DIE:
 			dest.Append("de");
-			Cycle = ( Orient / 2 );
+			Cycle = (Orient / 2);
 			break;
 
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
 		case IE_ANI_PST_START:
 			dest.Append("gu");
-			Cycle = ( Orient / 2 );
+			Cycle = (Orient / 2);
 			break;
 
 			//Unknown... maybe only a transparency effect apply
@@ -2586,17 +2597,17 @@ void CharAnimations::AddMMR2Suffix(ResRef& dest, unsigned char StanceID,
 
 		case IE_ANI_SLEEP:
 			dest.Append("sl");
-			Cycle = ( Orient / 2 );
+			Cycle = (Orient / 2);
 			break;
 
 		case IE_ANI_TWITCH:
 			dest.Append("tw");
-			Cycle = ( Orient / 2 );
+			Cycle = (Orient / 2);
 			break;
 
 		case IE_ANI_WALK:
 			dest.Append("wk");
-			Cycle = ( Orient / 2 );
+			Cycle = (Orient / 2);
 			break;
 		default:
 			error("CharAnimation", "MMR Animation: unhandled stance: {} {}", dest, StanceID);
@@ -2607,7 +2618,7 @@ void CharAnimations::AddMMR2Suffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddMMRSuffix(ResRef& dest, unsigned char StanceID,
-								  unsigned char& Cycle, orient_t Orient, bool mirror) const
+				  unsigned char& Cycle, orient_t Orient, bool mirror) const
 {
 	if (mirror) {
 		Cycle = SixteenToFive[Orient];
@@ -2684,7 +2695,7 @@ void CharAnimations::AddMMRSuffix(ResRef& dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddHLSuffix(ResRef& dest, unsigned char StanceID,
-								 unsigned char& Cycle, orient_t Orient) const
+				 unsigned char& Cycle, orient_t Orient) const
 {
 	//even orientations in 'h', odd in 'l', and since the WALK animation
 	//with fewer orientations is first in h, all other stances in that
@@ -2692,7 +2703,6 @@ void CharAnimations::AddHLSuffix(ResRef& dest, unsigned char StanceID,
 	unsigned char offset = ((Orient % 2) ^ 1) * 8;
 
 	switch (StanceID) {
-
 		case IE_ANI_WALK:
 			//only available in 8 orientations instead of the usual 16
 			Cycle = 0 + Orient / 2;
@@ -2754,18 +2764,17 @@ void CharAnimations::PulseRGBModifiers()
 
 	if (time - lastModUpdate > 400) lastModUpdate = time - 40;
 
-	tick_t inc = (time - lastModUpdate)/40;
-	
+	tick_t inc = (time - lastModUpdate) / 40;
+
 	if (GlobalColorMod.type != RGBModifier::NONE &&
-		GlobalColorMod.speed > 0)
-	{
+	    GlobalColorMod.speed > 0) {
 		GlobalColorMod.phase += inc;
 		for (bool& c : change) {
 			c = true;
 		}
 
 		// reset if done
-		if (GlobalColorMod.phase > 2*GlobalColorMod.speed) {
+		if (GlobalColorMod.phase > 2 * GlobalColorMod.speed) {
 			GlobalColorMod.type = RGBModifier::NONE;
 			GlobalColorMod.phase = 0;
 			GlobalColorMod.speed = 0;
@@ -2775,11 +2784,10 @@ void CharAnimations::PulseRGBModifiers()
 
 	for (size_t i = 0; i < PAL_MAX * 8; ++i) {
 		if (ColorMods[i].type != RGBModifier::NONE &&
-			ColorMods[i].speed > 0)
-		{
-			change[i>>3] = true;
+		    ColorMods[i].speed > 0) {
+			change[i >> 3] = true;
 			ColorMods[i].phase += inc;
-			if (ColorMods[i].phase > 2*ColorMods[i].speed) {
+			if (ColorMods[i].phase > 2 * ColorMods[i].speed) {
 				ColorMods[i].type = RGBModifier::NONE;
 				ColorMods[i].phase = 0;
 				ColorMods[i].speed = 0;
@@ -2795,7 +2803,7 @@ void CharAnimations::PulseRGBModifiers()
 		}
 	}
 
-	lastModUpdate += inc*40;
+	lastModUpdate += inc * 40;
 }
 
 static inline void applyMod(const Color& src, Color& dest, const RGBModifier& mod) noexcept
@@ -2804,72 +2812,71 @@ static inline void applyMod(const Color& src, Color& dest, const RGBModifier& mo
 
 	if (mod.speed == -1) {
 		if (mod.type == RGBModifier::TINT) {
-			dest.r = ((unsigned int)src.r * mod.rgb.r)>>8;
-			dest.g = ((unsigned int)src.g * mod.rgb.g)>>8;
-			dest.b = ((unsigned int)src.b * mod.rgb.b)>>8;
+			dest.r = ((unsigned int) src.r * mod.rgb.r) >> 8;
+			dest.g = ((unsigned int) src.g * mod.rgb.g) >> 8;
+			dest.b = ((unsigned int) src.b * mod.rgb.b) >> 8;
 		} else if (mod.type == RGBModifier::BRIGHTEN) {
-			unsigned int r = (unsigned int)src.r * mod.rgb.r;
+			unsigned int r = (unsigned int) src.r * mod.rgb.r;
 			if (r & (~0x7FF)) r = 0x7FF;
 			dest.r = r >> 3;
 
-			unsigned int g = (unsigned int)src.g * mod.rgb.g;
+			unsigned int g = (unsigned int) src.g * mod.rgb.g;
 			if (g & (~0x7FF)) g = 0x7FF;
 			dest.g = g >> 3;
 
-			unsigned int b = (unsigned int)src.b * mod.rgb.b;
+			unsigned int b = (unsigned int) src.b * mod.rgb.b;
 			if (b & (~0x7FF)) b = 0x7FF;
 			dest.b = b >> 3;
 		} else if (mod.type == RGBModifier::ADD) {
-			unsigned int r = (unsigned int)src.r + mod.rgb.r;
+			unsigned int r = (unsigned int) src.r + mod.rgb.r;
 			if (r & (~0xFF)) r = 0xFF;
 			dest.r = r;
 
-			unsigned int g = (unsigned int)src.g + mod.rgb.g;
+			unsigned int g = (unsigned int) src.g + mod.rgb.g;
 			if (g & (~0xFF)) g = 0xFF;
 			dest.g = g;
 
-			unsigned int b = (unsigned int)src.b + mod.rgb.b;
+			unsigned int b = (unsigned int) src.b + mod.rgb.b;
 			if (b & (~0xFF)) b = 0xFF;
 			dest.b = b;
 		} else {
 			dest = src;
 		}
 	} else if (mod.speed > 0) {
-
 		// TODO: a sinewave will probably look better
-		int phase = (mod.phase % (2*mod.speed));
+		int phase = (mod.phase % (2 * mod.speed));
 		if (phase > mod.speed) {
-			phase = 512 - (256*phase)/mod.speed;
+			phase = 512 - (256 * phase) / mod.speed;
 		} else {
-			phase = (256*phase)/mod.speed;
+			phase = (256 * phase) / mod.speed;
 		}
 
 		if (mod.type == RGBModifier::TINT) {
-			dest.r = ((unsigned int)src.r * (256*256 + phase*mod.rgb.r - 256*phase))>>16;
-			dest.g = ((unsigned int)src.g * (256*256 + phase*mod.rgb.g - 256*phase))>>16;
-			dest.b = ((unsigned int)src.b * (256*256 + phase*mod.rgb.b - 256*phase))>>16;
+			dest.r = ((unsigned int) src.r * (256 * 256 + phase * mod.rgb.r - 256 * phase)) >> 16;
+			dest.g = ((unsigned int) src.g * (256 * 256 + phase * mod.rgb.g - 256 * phase)) >> 16;
+			dest.b = ((unsigned int) src.b * (256 * 256 + phase * mod.rgb.b - 256 * phase)) >> 16;
 		} else if (mod.type == RGBModifier::BRIGHTEN) {
-			unsigned int r = src.r + (256*256 + phase*mod.rgb.r - 256*phase);
+			unsigned int r = src.r + (256 * 256 + phase * mod.rgb.r - 256 * phase);
 			if (r & (~0x7FFFF)) r = 0x7FFFF;
 			dest.r = r >> 11;
 
-			unsigned int g = src.g * (256*256 + phase*mod.rgb.g - 256*phase);
+			unsigned int g = src.g * (256 * 256 + phase * mod.rgb.g - 256 * phase);
 			if (g & (~0x7FFFF)) g = 0x7FFFF;
 			dest.g = g >> 11;
 
-			unsigned int b = src.b * (256*256 + phase*mod.rgb.b - 256*phase);
+			unsigned int b = src.b * (256 * 256 + phase * mod.rgb.b - 256 * phase);
 			if (b & (~0x7FFFF)) b = 0x7FFFF;
 			dest.b = b >> 11;
 		} else if (mod.type == RGBModifier::ADD) {
-			unsigned int r = src.r + ((phase*mod.rgb.r)>>8);
+			unsigned int r = src.r + ((phase * mod.rgb.r) >> 8);
 			if (r & (~0xFF)) r = 0xFF;
 			dest.r = r;
 
-			unsigned int g = src.g + ((phase*mod.rgb.g)>>8);
+			unsigned int g = src.g + ((phase * mod.rgb.g) >> 8);
 			if (g & (~0xFF)) g = 0xFF;
 			dest.g = g;
 
-			unsigned int b = src.b + ((phase*mod.rgb.b)>>8);
+			unsigned int b = src.b + ((phase * mod.rgb.b) >> 8);
 			if (b & (~0xFF)) b = 0xFF;
 			dest.b = b;
 		} else {
@@ -2881,54 +2888,54 @@ static inline void applyMod(const Color& src, Color& dest, const RGBModifier& mo
 }
 
 Palette SetupRGBModification(const Holder<Palette>& src, const RGBModifier* mods,
-	unsigned int type) noexcept
+			     unsigned int type) noexcept
 {
 	Palette pal;
 	Palette::Colors buffer;
 
-	const RGBModifier* tmods = mods+(8*type);
+	const RGBModifier* tmods = mods + (8 * type);
 	int i;
 
 	std::copy(src->cbegin(), src->cbegin() + 4, buffer.begin());
 	auto srcData = src->ColorData();
 
 	for (i = 0; i < 12; ++i)
-		applyMod(srcData[0x04+i], buffer[0x04+i], tmods[0]);
+		applyMod(srcData[0x04 + i], buffer[0x04 + i], tmods[0]);
 	for (i = 0; i < 12; ++i)
-		applyMod(srcData[0x10+i], buffer[0x10+i], tmods[1]);
+		applyMod(srcData[0x10 + i], buffer[0x10 + i], tmods[1]);
 	for (i = 0; i < 12; ++i)
-		applyMod(srcData[0x1c+i], buffer[0x1c+i], tmods[2]);
+		applyMod(srcData[0x1c + i], buffer[0x1c + i], tmods[2]);
 	for (i = 0; i < 12; ++i)
-		applyMod(srcData[0x28+i], buffer[0x28+i], tmods[3]);
+		applyMod(srcData[0x28 + i], buffer[0x28 + i], tmods[3]);
 	for (i = 0; i < 12; ++i)
-		applyMod(srcData[0x34+i], buffer[0x34+i], tmods[4]);
+		applyMod(srcData[0x34 + i], buffer[0x34 + i], tmods[4]);
 	for (i = 0; i < 12; ++i)
-		applyMod(srcData[0x40+i], buffer[0x40+i], tmods[5]);
+		applyMod(srcData[0x40 + i], buffer[0x40 + i], tmods[5]);
 	for (i = 0; i < 12; ++i)
-		applyMod(srcData[0x4c+i], buffer[0x4c+i], tmods[6]);
+		applyMod(srcData[0x4c + i], buffer[0x4c + i], tmods[6]);
 	for (i = 0; i < 8; ++i)
-		applyMod(srcData[0x58+i], buffer[0x58+i], tmods[1]);
+		applyMod(srcData[0x58 + i], buffer[0x58 + i], tmods[1]);
 	for (i = 0; i < 8; ++i)
-		applyMod(srcData[0x60+i], buffer[0x60+i], tmods[2]);
+		applyMod(srcData[0x60 + i], buffer[0x60 + i], tmods[2]);
 	for (i = 0; i < 8; ++i)
-		applyMod(srcData[0x68+i], buffer[0x68+i], tmods[1]);
+		applyMod(srcData[0x68 + i], buffer[0x68 + i], tmods[1]);
 	for (i = 0; i < 8; ++i)
-		applyMod(srcData[0x70+i], buffer[0x70+i], tmods[0]);
+		applyMod(srcData[0x70 + i], buffer[0x70 + i], tmods[0]);
 	for (i = 0; i < 8; ++i)
-		applyMod(srcData[0x78+i], buffer[0x78+i], tmods[4]);
+		applyMod(srcData[0x78 + i], buffer[0x78 + i], tmods[4]);
 	for (i = 0; i < 8; ++i)
-		applyMod(srcData[0x80+i], buffer[0x80+i], tmods[4]);
+		applyMod(srcData[0x80 + i], buffer[0x80 + i], tmods[4]);
 	for (i = 0; i < 8; ++i)
-		applyMod(srcData[0x88+i], buffer[0x88+i], tmods[1]);
+		applyMod(srcData[0x88 + i], buffer[0x88 + i], tmods[1]);
 	for (i = 0; i < 24; ++i)
-		applyMod(srcData[0x90+i], buffer[0x90+i], tmods[4]);
+		applyMod(srcData[0x90 + i], buffer[0x90 + i], tmods[4]);
 
 	std::copy(src->cbegin() + 0xA8, src->cbegin() + 0xA8 + 8, buffer.begin() + 0xA8);
 
 	for (i = 0; i < 8; ++i)
-		applyMod(srcData[0xB0+i], buffer[0xB0+i], tmods[3]);
+		applyMod(srcData[0xB0 + i], buffer[0xB0 + i], tmods[3]);
 	for (i = 0; i < 72; ++i)
-		applyMod(srcData[0xB8+i], buffer[0xB8+i], tmods[4]);
+		applyMod(srcData[0xB8 + i], buffer[0xB8 + i], tmods[4]);
 
 	pal.CopyColors(0, buffer.cbegin(), buffer.cend());
 
@@ -2957,22 +2964,27 @@ Palette SetupGlobalRGBModification(const Holder<Palette>& src, const RGBModifier
 
 Palette SetupPaperdollColours(const ieDword* colors, unsigned int type) noexcept
 {
-	unsigned int s = Clamp<ieDword>(8*type, 0, 8*sizeof(ieDword)-1);
+	unsigned int s = Clamp<ieDword>(8 * type, 0, 8 * sizeof(ieDword) - 1);
 	constexpr uint8_t numCols = 12;
 	Palette pal;
 	Palette::Colors buffer;
 
-	enum PALETTES : uint8_t
-	{
-		METAL = 0, MINOR, MAJOR, SKIN, LEATHER, ARMOR, HAIR,
+	enum PALETTES : uint8_t {
+		METAL = 0,
+		MINOR,
+		MAJOR,
+		SKIN,
+		LEATHER,
+		ARMOR,
+		HAIR,
 		END
 	};
 
 	for (uint8_t idx = METAL; idx < END; ++idx) {
-		const auto& pal16 = core->GetPalette16(colors[idx]>>s);
+		const auto& pal16 = core->GetPalette16(colors[idx] >> s);
 		std::copy(&pal16[0], &pal16[numCols], buffer.begin() + 0x04 + (idx * 12));
 	}
-	
+
 	//minor
 	memcpy(&buffer[0x58], &buffer[0x11], 8 * sizeof(Color));
 	//major
@@ -3018,7 +3030,7 @@ Holder<Sprite2D> GetPaperdollImage(const ResRef& resref, const ieDword* colors, 
 	if (af->GetFrameCount() < 2) {
 		return nullptr;
 	}
-	
+
 	// mod paperdolls can be unsorted (Longer Road Irenicus cycle: 1 1 0)
 	Holder<Sprite2D> first;
 	Holder<Sprite2D> second;

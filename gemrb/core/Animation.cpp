@@ -23,18 +23,19 @@
 #include "EnumFlags.h"
 #include "Game.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
-#include "Sprite2D.h"
 #include "RNG.h"
+#include "Sprite2D.h"
+
+#include "Logging/Logging.h"
 
 namespace GemRB {
 
 Animation::Animation(std::vector<frame_t> fr) noexcept
-: frames(std::move(fr))
+	: frames(std::move(fr))
 {
 	size_t count = frames.size();
 	assert(count > 0);
-	frameIdx = RAND<index_t>(0, count-1);
+	frameIdx = RAND<index_t>(0, count - 1);
 	flags = Flags::Active;
 
 	for (const frame_t& frame : frames) {

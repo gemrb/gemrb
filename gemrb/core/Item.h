@@ -30,10 +30,10 @@
 
 #include "exports.h"
 #include "ie_types.h"
-#include "Resource.h"
 
 #include "CharAnimations.h"
 #include "EffectQueue.h"
+#include "Resource.h"
 
 #include <vector>
 
@@ -56,12 +56,12 @@ class Projectile;
 #define IE_ITEM_STOLEN       0x00000400 // TODO: ee offhanded
 #define IE_ITEM_CONVERSABLE  0x00000800
 #define IE_ITEM_PULSATING    0x00001000 // TODO: ee fake offhand
-#define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN ) // beware: StoreActionFlags::BUYCRITS may override the first half
+#define IE_ITEM_UNSELLABLE   (IE_ITEM_CRITICAL | IE_ITEM_STOLEN) // beware: StoreActionFlags::BUYCRITS may override the first half
 // see IESDP for details
-#define IE_ITEM_FORCE_2H     0x00002000 // TODO: ee, Force two-handed animation DISABLE_OFFHAND
-#define IE_ITEM_NOT_OFFHAND  0x00004000 // ee, not usable in off-hand
-#define IE_ITEM_INV_USABLE   0x00008000 // TODO: ee, only pstee: usable in inventory, shared with IE_ITEM_ADAMANTINE
-#define IE_ITEM_ADAMANTINE   0x00008000 // bgee: adamantine (itemflag.ids)
+#define IE_ITEM_FORCE_2H    0x00002000 // TODO: ee, Force two-handed animation DISABLE_OFFHAND
+#define IE_ITEM_NOT_OFFHAND 0x00004000 // ee, not usable in off-hand
+#define IE_ITEM_INV_USABLE  0x00008000 // TODO: ee, only pstee: usable in inventory, shared with IE_ITEM_ADAMANTINE
+#define IE_ITEM_ADAMANTINE  0x00008000 // bgee: adamantine (itemflag.ids)
 //tobex modder extensions, please note, these are not copied into the local slot bits
 #define IE_ITEM_NO_DISPEL    0x01000000 // disables destruction by dispelling; named BODYPART in ee
 #define IE_ITEM_TOGGLE_CRITS 0x02000000 //toggles critical hit avertion
@@ -69,39 +69,39 @@ class Projectile;
 
 
 //Extended header recharge flags
-#define IE_ITEM_USESTRENGTH  1          //weapon, EE splits it in two
-#define IE_ITEM_BREAKABLE    2          //weapon
-#define IE_ITEM_USESTRENGTH_DMG  4      // EE
-#define IE_ITEM_USESTRENGTH_HIT  8      // EE
-#define IE_ITEM_USEDEXTERITY 16         //gemrb weapon finesse (move this if tobex implements it elsewhere)
-#define IE_ITEM_HOSTILE      0x400      //equipment
-#define IE_ITEM_RECHARGE     0x800      //equipment
-#define IE_ITEM_BYPASS       0x10000    //weapon (bypass shield and armor bonus)
-#define IE_ITEM_KEEN         0x20000    //weapon
+#define IE_ITEM_USESTRENGTH     1 //weapon, EE splits it in two
+#define IE_ITEM_BREAKABLE       2 //weapon
+#define IE_ITEM_USESTRENGTH_DMG 4 // EE
+#define IE_ITEM_USESTRENGTH_HIT 8 // EE
+#define IE_ITEM_USEDEXTERITY    16 //gemrb weapon finesse (move this if tobex implements it elsewhere)
+#define IE_ITEM_HOSTILE         0x400 //equipment
+#define IE_ITEM_RECHARGE        0x800 //equipment
+#define IE_ITEM_BYPASS          0x10000 //weapon (bypass shield and armor bonus)
+#define IE_ITEM_KEEN            0x20000 //weapon
 
 //modder extensions
-#define IE_ITEM_BACKSTAB     0x01000000 //can used for backstab (ranged weapon)
+#define IE_ITEM_BACKSTAB 0x01000000 //can used for backstab (ranged weapon)
 
 //item use locations (weapons are not listed in equipment list)
-#define ITEM_LOC_WEAPON    1   //this is a weapon slot (uses thac0 etc)
-#define ITEM_LOC_EQUIPMENT 3   //this slot appears on equipment list
+#define ITEM_LOC_WEAPON    1 //this is a weapon slot (uses thac0 etc)
+#define ITEM_LOC_EQUIPMENT 3 //this slot appears on equipment list
 //other item locations appear useless
 
 //attack types
 #define ITEM_AT_MELEE      1
 #define ITEM_AT_PROJECTILE 2
 #define ITEM_AT_MAGIC      3
-#define ITEM_AT_BOW	4
+#define ITEM_AT_BOW        4
 
 //target types
-#define TARGET_INVALID  0          //all the rest (default)
-#define TARGET_CREA  1             //single living creature
-#define TARGET_INV   2             //inventory item (not used?)
-#define TARGET_DEAD  3             //creature, item or point
-#define TARGET_AREA  4             //point target
-#define TARGET_SELF  5             //self
-#define TARGET_UNKNOWN 6           //unknown (use default)
-#define TARGET_NONE  7             //self
+#define TARGET_INVALID 0 //all the rest (default)
+#define TARGET_CREA    1 //single living creature
+#define TARGET_INV     2 //inventory item (not used?)
+#define TARGET_DEAD    3 //creature, item or point
+#define TARGET_AREA    4 //point target
+#define TARGET_SELF    5 //self
+#define TARGET_UNKNOWN 6 //unknown (use default)
+#define TARGET_NONE    7 //self
 
 //projectile qualifiers
 #define PROJ_ARROW  1
@@ -229,9 +229,10 @@ public:
 	ieWord WieldColor = 0;
 
 	// PST and IWD2 only
-	char unknown[26]{};
+	char unknown[26] {};
 	// flag items to mutually exclusive to equip
 	ieDword ItemExcl = 0;
+
 public:
 	ieStrRef GetItemName(bool identified) const;
 	ieStrRef GetItemDesc(bool identified) const;
@@ -245,24 +246,24 @@ public:
 	}
 
 	//-1 will return the equipping feature block
-	EffectQueue GetEffectBlock(Scriptable *self, const Point &pos, int header, ieDwordSigned invslot, ieDword pro) const;
+	EffectQueue GetEffectBlock(Scriptable* self, const Point& pos, int header, ieDwordSigned invslot, ieDword pro) const;
 	//returns a projectile created from an extended header
 	//if miss is non-zero, then no effects will be loaded
-	Projectile *GetProjectile(Scriptable *self, int header, const Point &target, ieDwordSigned invslot, int miss) const;
+	Projectile* GetProjectile(Scriptable* self, int header, const Point& target, ieDwordSigned invslot, int miss) const;
 	//Builds an equipping glow effect from gradient colour
 	//this stuff is not item specific, could be moved elsewhere
-	Effect *BuildGlowEffect(int gradient) const;
+	Effect* BuildGlowEffect(int gradient) const;
 	//returns the average damage of the weapon (doesn't check for special effects)
-	int GetDamagePotential(bool ranged, const ITMExtHeader *&header) const;
+	int GetDamagePotential(bool ranged, const ITMExtHeader*& header) const;
 	//returns the weapon header
-	const ITMExtHeader *GetWeaponHeader(bool ranged) const;
+	const ITMExtHeader* GetWeaponHeader(bool ranged) const;
 	int GetWeaponHeaderNumber(bool ranged) const;
 	int GetEquipmentHeaderNumber(int cnt) const;
 	const ITMExtHeader* GetExtHeader(int which) const;
 	size_t GetExtHeaderCount() const { return ext_headers.size(); };
 	unsigned int GetCastingDistance(int header) const;
 	// returns  a vector with details about any extended headers containing fx_damage with a 100% probability
-	std::vector<DMGOpcodeInfo> GetDamageOpcodesDetails(const ITMExtHeader *header) const;
+	std::vector<DMGOpcodeInfo> GetDamageOpcodesDetails(const ITMExtHeader* header) const;
 };
 
 }

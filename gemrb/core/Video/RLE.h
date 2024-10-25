@@ -28,7 +28,7 @@ namespace GemRB {
 inline uint8_t* DecodeRLEData(const uint8_t* p, const Size& size, colorkey_t colorKey)
 {
 	size_t pixelCount = size.w * size.h;
-	uint8_t* buffer = (uint8_t*)malloc(pixelCount);
+	uint8_t* buffer = (uint8_t*) malloc(pixelCount);
 
 	size_t transQueue = 0;
 	for (size_t i = 0; i < pixelCount;) {
@@ -46,7 +46,7 @@ inline uint8_t* DecodeRLEData(const uint8_t* p, const Size& size, colorkey_t col
 			}
 		}
 	}
-	
+
 	return buffer;
 }
 
@@ -63,31 +63,33 @@ inline uint8_t* FindRLEPos(uint8_t* rledata, int pitch, const Point& p, colorkey
 	return rledata;
 }
 
-class RLEIterator : public PixelIterator<uint8_t>
-{
+class RLEIterator : public PixelIterator<uint8_t> {
 	uint8_t* dataPos = nullptr;
 	colorkey_t colorkey = 0;
 	uint16_t transQueue = 0;
+
 public:
 	RLEIterator(uint8_t* p, Size s, colorkey_t ck)
-	: RLEIterator(p, Forward, Forward, s, ck)
+		: RLEIterator(p, Forward, Forward, s, ck)
 	{}
 
 	RLEIterator(uint8_t* p, Direction x, Direction y, Size s, colorkey_t ck)
-	: PixelIterator(p, x, y, s, s.w), dataPos(p), colorkey(ck)
+		: PixelIterator(p, x, y, s, s.w), dataPos(p), colorkey(ck)
 	{}
 
-	IPixelIterator* Clone() const noexcept override {
+	IPixelIterator* Clone() const noexcept override
+	{
 		return new RLEIterator(*this);
 	}
 
-	void Advance(int dx) noexcept override {
+	void Advance(int dx) noexcept override
+	{
 		if (dx == 0 || size.IsInvalid()) return;
-		
+
 		int pixelsToAdvance = xdir * dx;
 		int rowsToAdvance = std::abs(pixelsToAdvance / size.w);
 		int tmpx = pos.x + pixelsToAdvance % size.w;
-		
+
 		if (tmpx < 0) {
 			++rowsToAdvance;
 			tmpx = size.w + tmpx;
@@ -95,7 +97,7 @@ public:
 			++rowsToAdvance;
 			tmpx = tmpx - size.w;
 		}
-		
+
 		if (dx < 0) {
 			pos.y -= rowsToAdvance;
 		} else {
@@ -104,7 +106,7 @@ public:
 
 		pos.x = tmpx;
 		assert(pos.x >= 0 && pos.x < size.w);
-		
+
 		while (pixelsToAdvance) {
 			if (transQueue) {
 				// dataPos is pointing to a "count" field
@@ -137,8 +139,9 @@ public:
 			}
 		}
 	}
-	
-	const Point& Position() const noexcept override {
+
+	const Point& Position() const noexcept override
+	{
 		return pos;
 	}
 };

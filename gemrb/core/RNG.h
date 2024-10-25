@@ -34,24 +34,26 @@ namespace GemRB {
 
 // silence bogus warning
 #ifdef _MSC_VER
-#pragma warning(disable : 4146)
+	#pragma warning(disable : 4146)
 #endif
 
 class GEM_EXPORT RNG {
-	private:
+private:
 	RNG();
 
 	std::mt19937_64 engine;
-	public:
+
+public:
 	static RNG& getInstance();
-	
+
 	/**
 	 * It is possible to generate random numbers from [-min, +/-max].
 	 * It is only necessary that the upper bound is larger or equal to the lower bound - with the exception
 	 * that someone wants something like rand() % -foo.
 	 */
 	template<typename NUM_T = int32_t>
-	NUM_T rand(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept {
+	NUM_T rand(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept
+	{
 		NUM_T signum = 1;
 		if (min == max) {
 			// For complete fairness and equal timing, this should be a roll, but let's skip it anyway
@@ -71,8 +73,9 @@ class GEM_EXPORT RNG {
 		NUM_T randomNum = distribution(engine);
 		return signum * randomNum;
 	}
-	
-	bool randPct(float_t pct) noexcept {
+
+	bool randPct(float_t pct) noexcept
+	{
 		std::bernoulli_distribution distribution(pct);
 		return distribution(engine);
 	}
@@ -80,32 +83,35 @@ class GEM_EXPORT RNG {
 
 template<typename NUM_T = int32_t>
 std::enable_if_t<sizeof(NUM_T) >= sizeof(short), NUM_T>
-RAND(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept {
+	RAND(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept
+{
 	return RNG::getInstance().rand(min, max);
 }
 
 template<typename NUM_T>
 std::enable_if_t<sizeof(NUM_T) < sizeof(short), NUM_T>
-RAND(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept {
+	RAND(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept
+{
 	return NUM_T(RNG::getInstance().rand<short>(min, max));
 }
 
 inline Point RandomPoint(int xmin = 0, int xmax = std::numeric_limits<int>::max() - 1,
-						 int ymin = 0, int ymax = std::numeric_limits<int>::max() - 1)
+			 int ymin = 0, int ymax = std::numeric_limits<int>::max() - 1)
 {
 	auto x = RAND(xmin, xmax);
 	auto y = RAND(ymin, ymax);
 	return Point(x, y);
 }
 
-inline bool RandomFlip() noexcept {
+inline bool RandomFlip() noexcept
+{
 	return RNG::getInstance().rand(0, 1);
 }
 
 }
 
 #ifdef _MSC_VER
-#pragma warning(default : 4146)
+	#pragma warning(default : 4146)
 #endif
 
 #endif

@@ -32,6 +32,7 @@ namespace GemRB {
 class GEM_EXPORT ImageFactory : public FactoryObject {
 private:
 	Holder<Sprite2D> bitmap;
+
 public:
 	ImageFactory(const ResRef& resref, Holder<Sprite2D> bitmap);
 

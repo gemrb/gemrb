@@ -26,7 +26,8 @@
 namespace GemRB {
 
 enum class MOSVersion {
-	V1, V2
+	V1,
+	V2
 };
 
 struct MOSV2DataBlock {
@@ -42,7 +43,8 @@ private:
 	ieWord Cols = 0;
 	ieWord Rows = 0;
 	union U {
-		constexpr U() noexcept : v1{} {} // only for compiler happiness
+		constexpr U() noexcept
+			: v1 {} {} // only for compiler happiness
 		struct {
 			ieDword BlockSize = 0;
 			ieDword PalOffset = 0;
@@ -59,6 +61,7 @@ private:
 	void Blit(const MOSV2DataBlock& dataBlock, uint8_t* data);
 	Holder<Sprite2D> GetSprite2Dv1();
 	Holder<Sprite2D> GetSprite2Dv2();
+
 public:
 	MOSImporter() noexcept = default;
 	bool Import(DataStream* stream) override;

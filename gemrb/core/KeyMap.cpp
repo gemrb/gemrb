@@ -18,16 +18,18 @@
  *
  */
 
+#include "KeyMap.h"
+
+#include "Interface.h"
+#include "ScriptEngine.h"
+#include "TableMgr.h"
+
+#include "Logging/Logging.h"
+#include "Streams/FileStream.h"
+
 #include <tuple>
 #include <unordered_set>
 #include <utility>
-
-#include "KeyMap.h"
-#include "Interface.h"
-#include "Logging/Logging.h"
-#include "TableMgr.h"
-#include "ScriptEngine.h"
-#include "Streams/FileStream.h"
 
 namespace GemRB {
 
@@ -56,14 +58,14 @@ bool KeyMap::InitializeKeyMap(const path_t& inifile, const ResRef& tablefile)
 	std::string line;
 	while (config->ReadLine(line) != DataStream::Error) {
 		if (line.length() == 0 ||
-			(line[0] == '#') ||
-			(line[0] == '[') ||
-			(line[0] == '\r') ||
-			(line[0] == '\n') ||
-			(line[0] == ';')) {
+		    (line[0] == '#') ||
+		    (line[0] == '[') ||
+		    (line[0] == '\r') ||
+		    (line[0] == '\n') ||
+		    (line[0] == ';')) {
 			continue;
 		}
-		
+
 		StringToLower(line);
 		auto parts = Explode<std::string, std::string>(line, '=', 1);
 		if (parts.size() < 2) {
@@ -115,7 +117,7 @@ bool KeyMap::InitializeKeyMap(const path_t& inifile, const ResRef& tablefile)
 bool KeyMap::ResolveKey(unsigned short key, int group) const
 {
 	// FIXME: key is 2 bytes, but we ignore one. Some non english keyboards won't like this.
-	char keystr[2] = {(char)key, 0};
+	char keystr[2] = { (char) key, 0 };
 	if (key < 128) {
 		Log(MESSAGE, "KeyMap", "Looking up key: {} ({}) ", key, keystr);
 	} else {

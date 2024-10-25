@@ -31,11 +31,12 @@
 #include "PluginMgr.h"
 #include "ScriptEngine.h"
 #include "TableMgr.h"
-#include "Video/Video.h"
-#include "GameScript/GameScript.h"
-#include "GameScript/GSUtils.h"
+
 #include "GUI/GameControl.h"
 #include "GUI/TextArea.h"
+#include "GameScript/GSUtils.h"
+#include "GameScript/GameScript.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -57,13 +58,13 @@ DialogHandler::~DialogHandler(void)
 
 void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 {
-	if (!tr || !(tr->Flags&IE_DLG_TR_JOURNAL)) return;
+	if (!tr || !(tr->Flags & IE_DLG_TR_JOURNAL)) return;
 
 	int Section = 0;
-	if (tr->Flags&IE_DLG_UNSOLVED) {
+	if (tr->Flags & IE_DLG_UNSOLVED) {
 		Section |= 1; // quests
 	}
-	if (tr->Flags&IE_DLG_SOLVED) {
+	if (tr->Flags & IE_DLG_SOLVED) {
 		Section |= 2; // completed
 	}
 
@@ -85,7 +86,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	dlg = dm->GetDialog();
 
 	if (!dlg) {
-		Log(ERROR, "DialogHandler", "Cannot start dialog ({}): {} with {}", dialogRef, fmt::WideToChar{spk->GetName()}, fmt::WideToChar{tgt->GetName()});
+		Log(ERROR, "DialogHandler", "Cannot start dialog ({}): {} with {}", dialogRef, fmt::WideToChar { spk->GetName() }, fmt::WideToChar { tgt->GetName() });
 		return false;
 	}
 
@@ -94,12 +95,12 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
-	Actor *oldTarget = GetLocalActorByGlobalID(targetID);
+	Actor* oldTarget = GetLocalActorByGlobalID(targetID);
 	SetSpeaker(spk);
 	SetTarget(tgt);
 	if (!originalTargetID) originalTargetID = targetID;
-	if (tgt->Type==ST_ACTOR) {
-		Actor *tar = (Actor *) tgt;
+	if (tgt->Type == ST_ACTOR) {
+		Actor* tar = (Actor*) tgt;
 		// TODO: verify
 		spk->objects.LastTalker = targetID;
 		tar->objects.LastTalker = speakerID;
@@ -107,7 +108,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	}
 	if (oldTarget) oldTarget->SetCircleSize();
 
-	GameControl *gc = core->GetGameControl();
+	GameControl* gc = core->GetGameControl();
 
 	if (!gc)
 		return false;
@@ -144,7 +145,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	//Bit 1: EscapeArea()
 	//Bit 2: nothing (but since the action was hostile, it behaves similar to bit 0)
 	unsigned int flags = DF_IN_DIALOG;
-	if (!(dlg->Flags&7) ) {
+	if (!(dlg->Flags & 7)) {
 		flags |= DF_FREEZE_SCRIPTS;
 	}
 	gc->SetDialogueFlags(flags, BitOp::OR);
@@ -170,8 +171,8 @@ void DialogHandler::EndDialog(bool try_to_break)
 		ta->ClearSelectOptions();
 	}
 
-	Actor *tmp = GetSpeaker();
-	Actor *target = Scriptable::As<Actor>(GetTarget());
+	Actor* tmp = GetSpeaker();
+	Actor* target = Scriptable::As<Actor>(GetTarget());
 	SetTarget(nullptr);
 	SetSpeaker(nullptr);
 	originalTargetID = 0;
@@ -189,7 +190,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 
 	core->ToggleViewsEnabled(true, "NOT_DLG");
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
-	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
+	core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DialogEnded");
 	//restoring original size
 	core->GetGame()->SetControlStatus(CS_DIALOG, BitOp::NAND);
 	GameControl* gc = core->GetGameControl();
@@ -216,7 +217,7 @@ static Actor* FindBanter(const Scriptable* target, const ResRef& dialog)
 	return target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
 }
 
-static int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& options, Scriptable* target)
+static int GetDialogOptions(const DialogState* ds, std::vector<SelectOption>& options, Scriptable* target)
 {
 	int idx = 0;
 	// first looking for a 'continue' opportunity, the order is descending (a la IE)
@@ -424,7 +425,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	}
 	Actor* tgta = nullptr;
 	if (target->Type == ST_ACTOR) {
-		tgta = (Actor *)target;
+		tgta = (Actor*) target;
 	}
 
 	int si;
@@ -444,7 +445,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		if (si < 0) return false;
 	}
 
-	ds = dlg->GetState( si );
+	ds = dlg->GetState(si);
 	if (!ds) {
 		Log(WARNING, "DialogHandler", "Can't find next dialog");
 		EndDialog();
@@ -456,7 +457,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		Holder<Sprite2D> portrait = tgta->CopyPortrait(1);
 		ta->SetSpeakerPicture(std::move(portrait));
 		ta->AppendText(u"\n");
-		displaymsg->DisplayStringName( ds->StrRef, GUIColors::DIALOG, target, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
+		displaymsg->DisplayStringName(ds->StrRef, GUIColors::DIALOG, target, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 	}
 
 	std::vector<SelectOption> dialogOptions;

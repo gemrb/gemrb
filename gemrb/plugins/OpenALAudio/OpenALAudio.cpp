@@ -22,20 +22,22 @@
 
 #include "GameData.h"
 #include "Interface.h"
+
 #include "Logging/Logging.h"
 
 #include <cassert>
 #include <cstdio>
 
 #ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
 using namespace GemRB;
 
-template <typename TO, typename FROM>
-TO fnptr_cast(FROM ptr) {
+template<typename TO, typename FROM>
+TO fnptr_cast(FROM ptr)
+{
 	union {
 		FROM ptr_from;
 		TO ptr_to;
@@ -56,7 +58,8 @@ static LPALEFFECTF alEffectf = NULL;
 static LPALAUXILIARYEFFECTSLOTI alAuxiliaryEffectSloti = NULL;
 #endif
 
-static bool checkALError(const char* msg, LogLevel level) {
+static bool checkALError(const char* msg, LogLevel level)
+{
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {
 		Log(level, "OpenAL", "{}: {:#x} - {}", msg, error, alGetString(error));
@@ -65,7 +68,8 @@ static bool checkALError(const char* msg, LogLevel level) {
 	return false;
 }
 
-static void showALCError(const char* msg, LogLevel level, ALCdevice *device) {
+static void showALCError(const char* msg, LogLevel level, ALCdevice* device)
+{
 	int error = alcGetError(device);
 	if (error != AL_NO_ERROR) {
 		Log(level, "OpenAL", "{}: {:#x}", msg, error);
@@ -74,32 +78,37 @@ static void showALCError(const char* msg, LogLevel level, ALCdevice *device) {
 	}
 }
 
-void OpenALSoundHandle::SetPos(const Point& p) {
+void OpenALSoundHandle::SetPos(const Point& p)
+{
 	if (!parent) return;
 
 	parent->SetPos(p);
 }
 
-bool OpenALSoundHandle::Playing() {
+bool OpenALSoundHandle::Playing()
+{
 	if (!parent) return false;
 
 	parent->ClearIfStopped();
 	return parent != 0;
 }
 
-void OpenALSoundHandle::Stop() {
+void OpenALSoundHandle::Stop()
+{
 	if (!parent) return;
 
 	parent->ForceClear();
 }
 
-void OpenALSoundHandle::StopLooping() {
+void OpenALSoundHandle::StopLooping()
+{
 	if (!parent) return;
 
 	parent->StopLooping();
 }
 
-void AudioStream::ClearProcessedBuffers() const {
+void AudioStream::ClearProcessedBuffers() const
+{
 	if (sources.first) {
 		ClearProcessedBuffers(sources.first);
 	}
@@ -111,12 +120,12 @@ void AudioStream::ClearProcessedBuffers() const {
 void AudioStream::ClearProcessedBuffers(ALuint Source) const
 {
 	ALint processed = 0;
-	alGetSourcei( Source, AL_BUFFERS_PROCESSED, &processed );
+	alGetSourcei(Source, AL_BUFFERS_PROCESSED, &processed);
 	checkALError("Failed to get processed buffers", WARNING);
 
 	if (processed > 0) {
-		ALuint * b = new ALuint[processed];
-		alSourceUnqueueBuffers( Source, processed, b );
+		ALuint* b = new ALuint[processed];
+		alSourceUnqueueBuffers(Source, processed, b);
 		checkALError("Failed to unqueue buffers", WARNING);
 
 		if (delete_buffers) {
@@ -126,9 +135,9 @@ void AudioStream::ClearProcessedBuffers(ALuint Source) const
 				why Apple's implementation of alSourceUnqueueBuffers seems to delay (threading thing?)
 				and possible how better to deal with this.
 			*/
-			do{
+			do {
 				alDeleteBuffers(processed, b);
-			}while(alGetError() != AL_NO_ERROR);
+			} while (alGetError() != AL_NO_ERROR);
 #else
 			alDeleteBuffers(processed, b);
 			checkALError("Failed to delete buffers", WARNING);
@@ -137,10 +146,10 @@ void AudioStream::ClearProcessedBuffers(ALuint Source) const
 
 		delete[] b;
 	}
-
 }
 
-void AudioStream::ClearIfStopped() {
+void AudioStream::ClearIfStopped()
+{
 	if (free || locked) return;
 
 	bool sourceDeleted = ClearIfStopped(sources.first);
@@ -153,8 +162,8 @@ void AudioStream::ClearIfStopped() {
 		locked = false;
 		delete_buffers = false;
 		ambient = false;
-		sources = {0, 0};
-		buffers = {0, 0};
+		sources = { 0, 0 };
+		buffers = { 0, 0 };
 		if (handle) {
 			handle->Invalidate();
 			handle.reset();
@@ -170,12 +179,11 @@ bool AudioStream::ClearIfStopped(ALuint Source)
 	}
 
 	ALint state;
-	alGetSourcei( Source, AL_SOURCE_STATE, &state );
+	alGetSourcei(Source, AL_SOURCE_STATE, &state);
 	if (!checkALError("Failed to check source state", WARNING) &&
-			state == AL_STOPPED)
-	{
+	    state == AL_STOPPED) {
 		ClearProcessedBuffers();
-		alDeleteSources( 1, &Source );
+		alDeleteSources(1, &Source);
 		checkALError("Failed to delete source", WARNING);
 
 		return true;
@@ -184,7 +192,8 @@ bool AudioStream::ClearIfStopped(ALuint Source)
 	return false;
 }
 
-void AudioStream::Stop() const {
+void AudioStream::Stop() const
+{
 	Stop(sources.first);
 	if (sources.second) {
 		Stop(sources.second);
@@ -198,14 +207,16 @@ void AudioStream::ForceClear()
 	ClearIfStopped();
 }
 
-void AudioStream::Stop(ALuint source) const {
+void AudioStream::Stop(ALuint source) const
+{
 	if (!source || !alIsSource(source)) return;
 
 	alSourceStop(source);
 	checkALError("Failed to stop source", WARNING);
 }
 
-void AudioStream::StopLooping() const {
+void AudioStream::StopLooping() const
+{
 	alSourcei(sources.first, AL_LOOPING, 0);
 	if (sources.second) {
 		alSourcei(sources.second, AL_LOOPING, 0);
@@ -213,7 +224,8 @@ void AudioStream::StopLooping() const {
 	checkALError("Unable to stop audio loop", WARNING);
 }
 
-void AudioStream::SetPitch(int pitch) const {
+void AudioStream::SetPitch(int pitch) const
+{
 	float fPitch = 0.01f * pitch;
 
 	alSourcef(sources.first, AL_PITCH, fPitch);
@@ -223,7 +235,8 @@ void AudioStream::SetPitch(int pitch) const {
 	checkALError("Unable to set ambient pitch", WARNING);
 }
 
-void AudioStream::SetPos(const Point& p) const {
+void AudioStream::SetPos(const Point& p) const
+{
 	ALfloat SourcePos[] = {
 		float(p.x), float(p.y), 0.0f
 	};
@@ -235,7 +248,8 @@ void AudioStream::SetPos(const Point& p) const {
 	checkALError("Unable to set source position", WARNING);
 }
 
-void AudioStream::SetVolume(int volume) const {
+void AudioStream::SetVolume(int volume) const
+{
 	float fVolume = 0.01f * volume;
 
 	alSourcef(sources.first, AL_GAIN, fVolume);
@@ -254,15 +268,15 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 
 void OpenALAudioDriver::PrintDeviceList() const
 {
-	const char *deviceList;
+	const char* deviceList;
 
 	if (alcIsExtensionPresent(nullptr, (const ALchar*) "ALC_ENUMERATION_EXT") == AL_TRUE) { // try out enumeration extension
 		Log(MESSAGE, "OpenAL", "Usable audio output devices:");
 		deviceList = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
 
-		while(deviceList && *deviceList) {
-			Log(MESSAGE,"OpenAL", "Devices: {}", deviceList);
-			deviceList+=strlen(deviceList)+1;
+		while (deviceList && *deviceList) {
+			Log(MESSAGE, "OpenAL", "Devices: {}", deviceList);
+			deviceList += strlen(deviceList) + 1;
 		}
 		return;
 	}
@@ -275,39 +289,39 @@ bool OpenALAudioDriver::Init(void)
 	const char* renderer = alGetString(AL_RENDERER);
 	const char* vendor = alGetString(AL_VENDOR);
 	Log(MESSAGE, "OpenAL", "Initializing OpenAL driver:\nAL Version: {}\nAL Renderer: {}\nAL Vendor: {}",
-		version ? version : "", renderer ? renderer : "", vendor ? vendor : "");
+	    version ? version : "", renderer ? renderer : "", vendor ? vendor : "");
 
-	ALCdevice *device;
-	ALCcontext *context;
+	ALCdevice* device;
+	ALCcontext* context;
 
-	device = alcOpenDevice (NULL);
+	device = alcOpenDevice(NULL);
 	if (device == NULL) {
 		showALCError("Failed to open device", ERROR, device);
 		PrintDeviceList();
 		return false;
 	}
 
-	context = alcCreateContext (device, NULL);
+	context = alcCreateContext(device, NULL);
 	if (context == NULL) {
 		showALCError("Failed to create context", ERROR, device);
-		alcCloseDevice (device);
+		alcCloseDevice(device);
 		return false;
 	}
 
-	if (!alcMakeContextCurrent (context)) {
+	if (!alcMakeContextCurrent(context)) {
 		showALCError("Failed to select context", ERROR, device);
-		alcDestroyContext (context);
-		alcCloseDevice (device);
+		alcDestroyContext(context);
+		alcCloseDevice(device);
 		return false;
 	}
 	alutContext = context;
 
 	//1 for speech
-	int sources = CountAvailableSources(MAX_STREAMS+1);
+	int sources = CountAvailableSources(MAX_STREAMS + 1);
 	num_streams = sources - 1;
 
 	Log(MESSAGE, "OpenAL", "Allocated {} streams.{}",
-		num_streams, (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ));
+	    num_streams, (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : ""));
 
 	musicThread = std::thread(&OpenALAudioDriver::MusicManager, this);
 
@@ -323,9 +337,10 @@ bool OpenALAudioDriver::Init(void)
 	return true;
 }
 
-bool OpenALAudioDriver::InitEFX(void) {
+bool OpenALAudioDriver::InitEFX(void)
+{
 #ifdef HAVE_OPENAL_EFX_H
-	ALCdevice *device = alcGetContextsDevice (alutContext);
+	ALCdevice* device = alcGetContextsDevice(alutContext);
 	ALCint auxSends = 0;
 	hasEFX = false;
 
@@ -382,9 +397,9 @@ bool OpenALAudioDriver::InitEFX(void) {
 
 int OpenALAudioDriver::CountAvailableSources(int limit)
 {
-	ALuint* src = new ALuint[limit+2];
+	ALuint* src = new ALuint[limit + 2];
 	int i;
-	for (i = 0; i < limit+2; ++i) {
+	for (i = 0; i < limit + 2; ++i) {
 		alGenSources(1, &src[i]);
 		if (alGetError() != AL_NO_ERROR)
 			break;
@@ -411,11 +426,11 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	}
 
 	stayAlive = false;
-	
+
 	// AmigaOS4 should be built with -athread=native or this may not work
 	musicThread.join();
 
-	for(int i =0; i<num_streams; i++) {
+	for (int i = 0; i < num_streams; i++) {
 		streams[i].ForceClear();
 	}
 	speech.ForceClear();
@@ -428,14 +443,14 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	}
 #endif
 
-	ALCdevice *device;
+	ALCdevice* device;
 
-	alcMakeContextCurrent (NULL);
+	alcMakeContextCurrent(NULL);
 
-	device = alcGetContextsDevice (alutContext);
-	alcDestroyContext (alutContext);
-	if (alcGetError (device) == ALC_NO_ERROR) {
-		alcCloseDevice (device);
+	device = alcGetContextsDevice(alutContext);
+	alcDestroyContext(alutContext);
+	if (alcGetError(device) == ALC_NO_ERROR) {
+		alcCloseDevice(device);
 	}
 	alutContext = NULL;
 
@@ -444,10 +459,10 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	delete ambim;
 }
 
-std::pair<ALuint, ALuint> OpenALAudioDriver::loadSound(StringView ResRef, tick_t &time_length, bool spatial)
+std::pair<ALuint, ALuint> OpenALAudioDriver::loadSound(StringView ResRef, tick_t& time_length, bool spatial)
 {
 	if (ResRef.empty()) {
-		return {0, 0};
+		return { 0, 0 };
 	}
 
 	auto entry = buffercache.Lookup(ResRef);
@@ -456,11 +471,11 @@ std::pair<ALuint, ALuint> OpenALAudioDriver::loadSound(StringView ResRef, tick_t
 		return entry->Buffer;
 	}
 
-	ALuint buffers[2] = {0, 0};
+	ALuint buffers[2] = { 0, 0 };
 
 	ResourceHolder<SoundMgr> acm = gamedata->GetResourceHolder<SoundMgr>(ResRef);
 	if (!acm) {
-		return {0, 0};
+		return { 0, 0 };
 	}
 
 	unsigned int channels = acm->get_channels();
@@ -469,7 +484,7 @@ std::pair<ALuint, ALuint> OpenALAudioDriver::loadSound(StringView ResRef, tick_t
 
 	alGenBuffers(spatialStereo ? 2 : 1, buffers);
 	if (checkALError("Unable to create sound buffer", ERROR)) {
-		return {0, 0};
+		return { 0, 0 };
 	}
 
 	int samplerate = acm->get_samplerate();
@@ -503,17 +518,17 @@ std::pair<ALuint, ALuint> OpenALAudioDriver::loadSound(StringView ResRef, tick_t
 	if (checkALError("Unable to fill buffer", ERROR)) {
 		alDeleteBuffers(spatialStereo ? 2 : 1, buffers);
 		checkALError("Error deleting buffer", WARNING);
-		return {0, 0};
+		return { 0, 0 };
 	}
 
-	std::pair<ALuint, ALuint> bufferPair {buffers[0], buffers[1]};
+	std::pair<ALuint, ALuint> bufferPair { buffers[0], buffers[1] };
 	buffercache.SetAt(ResRef, bufferPair, time_length);
 
 	return bufferPair;
 }
 
 Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, SFXChannel channel, const Point& p,
-	unsigned int flags, tick_t *length)
+					    unsigned int flags, tick_t* length)
 {
 	if (ResRef.empty()) {
 		auto source = speech.sources.first;
@@ -597,7 +612,8 @@ Holder<SoundHandle> OpenALAudioDriver::Play(StringView ResRef, SFXChannel channe
 	return stream->handle;
 }
 
-ALuint OpenALAudioDriver::CreateAndConfigSource(ALuint source, ieDword volume, ALint loop, unsigned int flags, const Point& p, SFXChannel channel) const {
+ALuint OpenALAudioDriver::CreateAndConfigSource(ALuint source, ieDword volume, ALint loop, unsigned int flags, const Point& p, SFXChannel channel) const
+{
 	if (!source || !alIsSource(source)) {
 		alGenSources(1, &source);
 
@@ -611,7 +627,8 @@ ALuint OpenALAudioDriver::CreateAndConfigSource(ALuint source, ieDword volume, A
 	return source;
 }
 
-void OpenALAudioDriver::ConfigSource(ALuint source, ieDword volume, ALint loop, unsigned int flags, const Point& p, SFXChannel channel) const {
+void OpenALAudioDriver::ConfigSource(ALuint source, ieDword volume, ALint loop, unsigned int flags, const Point& p, SFXChannel channel) const
+{
 	ALfloat sourceVel[] = {
 		0.0f, 0.0f, 0.0f
 	};
@@ -681,12 +698,12 @@ void OpenALAudioDriver::ResetMusics()
 	if (MusicSource && alIsSource(MusicSource)) {
 		alSourceStop(MusicSource);
 		checkALError("Unable to stop music source", WARNING);
-		alDeleteSources(1, &MusicSource );
+		alDeleteSources(1, &MusicSource);
 		checkALError("Unable to delete music source", WARNING);
 		MusicSource = 0;
-		for (int i=0; i<MUSICBUFFERS; i++) {
+		for (int i = 0; i < MUSICBUFFERS; i++) {
 			if (alIsBuffer(MusicBuffer[i])) {
-				alDeleteBuffers(1, MusicBuffer+i);
+				alDeleteBuffers(1, MusicBuffer + i);
 				checkALError("Unable to delete music buffer", WARNING);
 			}
 		}
@@ -706,14 +723,14 @@ bool OpenALAudioDriver::Play()
 bool OpenALAudioDriver::Stop()
 {
 	std::lock_guard<std::recursive_mutex> l(musicMutex);
-	
-	if (!MusicSource || !alIsSource( MusicSource )) {
+
+	if (!MusicSource || !alIsSource(MusicSource)) {
 		return false;
 	}
-	alSourceStop( MusicSource );
+	alSourceStop(MusicSource);
 	checkALError("Unable to stop music source", WARNING);
 	MusicPlaying = false;
-	alDeleteSources( 1, &MusicSource );
+	alDeleteSources(1, &MusicSource);
 	checkALError("Unable to delete music source", WARNING);
 	MusicSource = 0;
 	return true;
@@ -722,7 +739,7 @@ bool OpenALAudioDriver::Stop()
 bool OpenALAudioDriver::Pause()
 {
 	std::lock_guard<std::recursive_mutex> l(musicMutex);
-	if (!MusicSource || !alIsSource( MusicSource )) {
+	if (!MusicSource || !alIsSource(MusicSource)) {
 		return false;
 	}
 	alSourcePause(MusicSource);
@@ -737,7 +754,7 @@ bool OpenALAudioDriver::Resume()
 {
 	{
 		std::lock_guard<std::recursive_mutex> l(musicMutex);
-		if (!MusicSource || !alIsSource( MusicSource )) {
+		if (!MusicSource || !alIsSource(MusicSource)) {
 			return false;
 		}
 		alSourcePlay(MusicSource);
@@ -759,14 +776,14 @@ int OpenALAudioDriver::CreateStream(ResourceHolder<SoundMgr> newMusic)
 	}
 
 	if (MusicBuffer[0] == 0) {
-		alGenBuffers( MUSICBUFFERS, MusicBuffer );
+		alGenBuffers(MUSICBUFFERS, MusicBuffer);
 		if (checkALError("Unable to create music buffers", ERROR)) {
 			return -1;
 		}
 	}
 
 	if (MusicSource == 0) {
-		alGenSources( 1, &MusicSource );
+		alGenSources(1, &MusicSource);
 		if (checkALError("Unable to create music source", ERROR)) {
 			alDeleteBuffers(MUSICBUFFERS, MusicBuffer);
 			return -1;
@@ -780,12 +797,12 @@ int OpenALAudioDriver::CreateStream(ResourceHolder<SoundMgr> newMusic)
 		};
 
 		ieDword volume = core->GetDictionary().Get("Volume Music", 0);
-		alSourcef( MusicSource, AL_PITCH, 1.0f );
-		alSourcef( MusicSource, AL_GAIN, 0.01f * volume );
-		alSourcei( MusicSource, AL_SOURCE_RELATIVE, 1 );
-		alSourcefv( MusicSource, AL_POSITION, SourcePos );
-		alSourcefv( MusicSource, AL_VELOCITY, SourceVel );
-		alSourcei( MusicSource, AL_LOOPING, 0 );
+		alSourcef(MusicSource, AL_PITCH, 1.0f);
+		alSourcef(MusicSource, AL_GAIN, 0.01f * volume);
+		alSourcei(MusicSource, AL_SOURCE_RELATIVE, 1);
+		alSourcefv(MusicSource, AL_POSITION, SourcePos);
+		alSourcefv(MusicSource, AL_VELOCITY, SourceVel);
+		alSourcei(MusicSource, AL_LOOPING, 0);
 		checkALError("Unable to set music parameters", WARNING);
 	}
 
@@ -801,7 +818,7 @@ void OpenALAudioDriver::UpdateListenerPos(const Point& p)
 Point OpenALAudioDriver::GetListenerPos()
 {
 	ALfloat listen[3];
-	alGetListenerfv( AL_POSITION, listen );
+	alGetListenerfv(AL_POSITION, listen);
 	if (checkALError("Unable to get listener pos", ERROR)) return {};
 	return Point(listen[0], listen[1]);
 }
@@ -824,7 +841,7 @@ bool OpenALAudioDriver::ReleaseStream(int streamIdx, bool HardStop)
 
 //This one is used for movies and ambients.
 int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
-		            ieWord gain, bool point, int ambientRange)
+				      ieWord gain, bool point, int ambientRange)
 {
 	// Find a free (or finished) stream for this sound
 	int streamIdx = -1;
@@ -847,22 +864,22 @@ int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 	}
 
 	ALfloat position[] = { (float) x, (float) y, (float) z };
-	alSourcef( source, AL_PITCH, 1.0f );
-	alSourcefv( source, AL_POSITION, position );
-	alSourcei( source, AL_LOOPING, 0 );
-	alSourcef( source, AL_GAIN, 0.01f * gain );
+	alSourcef(source, AL_PITCH, 1.0f);
+	alSourcefv(source, AL_POSITION, position);
+	alSourcei(source, AL_LOOPING, 0);
+	alSourcef(source, AL_GAIN, 0.01f * gain);
 	// under default sound distance model (AL_INVERSE_DISTANCE_CLAMPED) the formula is:
 	//   dist = max(dist, AL_REFERENCE_DISTANCE);
 	//   dist = min(dist, AL_MAX_DISTANCE);
 	//   gain = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE + AL_ROLLOFF_FACTOR * (dist – AL_REFERENCE_DISTANCE) );
 	// ambientRange also works as cut-off distance, so reducing the volume earlier
 	alSourcei(source, AL_REFERENCE_DISTANCE, ambientRange > 0 ? (ambientRange / 2) : REFERENCE_DISTANCE);
-	alSourcei( source, AL_ROLLOFF_FACTOR, point ? 1 : 0 );
+	alSourcei(source, AL_ROLLOFF_FACTOR, point ? 1 : 0);
 	checkALError("Unable to set stream parameters", WARNING);
 
 	auto& stream = streams[streamIdx];
-	stream.buffers = {0, 0};
-	stream.sources = {source, 0};
+	stream.buffers = { 0, 0 };
+	stream.sources = { source, 0 };
 	stream.free = false;
 	stream.ambient = ambientRange > 0;
 	stream.locked = true;
@@ -889,7 +906,7 @@ tick_t OpenALAudioDriver::QueueAmbient(int streamIdx, const ResRef& sound)
 
 	assert(!stream.delete_buffers);
 
-	if (QueueALBuffers({source, 0}, {Buffer, 0}) != GEM_OK) {
+	if (QueueALBuffers({ source, 0 }, { Buffer, 0 }) != GEM_OK) {
 		return GEM_ERROR;
 	}
 
@@ -941,7 +958,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 		std::lock_guard<std::recursive_mutex> l(driver->musicMutex);
 		if (driver->MusicPlaying) {
 			ALint state;
-			alGetSourcei( driver->MusicSource, AL_SOURCE_STATE, &state );
+			alGetSourcei(driver->MusicSource, AL_SOURCE_STATE, &state);
 			if (checkALError("Unable to query music source state", ERROR)) {
 				driver->MusicPlaying = false;
 				return -1;
@@ -959,17 +976,17 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					alSourcei(driver->MusicSource, AL_BUFFER, 0);
 					checkALError("Unable to detach buffers from music source.", WARNING);
 					for (unsigned int buffer : driver->MusicBuffer) {
-						driver->MusicReader->read_samples( driver->music_memory, ACM_BUFFERSIZE >> 1 );
+						driver->MusicReader->read_samples(driver->music_memory, ACM_BUFFERSIZE >> 1);
 						alBufferData(buffer, AL_FORMAT_STEREO16,
-							driver->music_memory, ACM_BUFFERSIZE,
-							driver->MusicReader->get_samplerate() );
+							     driver->music_memory, ACM_BUFFERSIZE,
+							     driver->MusicReader->get_samplerate());
 					}
 					checkALError("Unable to buffer data.", ERROR);
 					// FIXME: determine if we should error out if any data fails to buffer
-					alSourceQueueBuffers( driver->MusicSource, MUSICBUFFERS, driver->MusicBuffer );
+					alSourceQueueBuffers(driver->MusicSource, MUSICBUFFERS, driver->MusicBuffer);
 					if (!checkALError("Unable to queue buffer.", ERROR)) {
-						if (driver->MusicSource && alIsSource( driver->MusicSource )) {
-							alSourcePlay( driver->MusicSource );
+						if (driver->MusicSource && alIsSource(driver->MusicSource)) {
+							alSourcePlay(driver->MusicSource);
 							if (!checkALError("Error playing music source", ERROR)) {
 								// no errors happened
 								bFinished = AL_FALSE;
@@ -982,8 +999,8 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					return -1;
 				case AL_STOPPED:
 					Log(MESSAGE, "OpenAL", "WARNING: Buffer Underrun. AutoRestarting Stream Playback");
-					if (driver->MusicSource && alIsSource( driver->MusicSource )) {
-						alSourcePlay( driver->MusicSource );
+					if (driver->MusicSource && alIsSource(driver->MusicSource)) {
+						alSourcePlay(driver->MusicSource);
 						checkALError("Error playing music source", ERROR);
 					}
 					break;
@@ -991,7 +1008,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					break;
 			}
 			ALint processed;
-			alGetSourcei( driver->MusicSource, AL_BUFFERS_PROCESSED, &processed );
+			alGetSourcei(driver->MusicSource, AL_BUFFERS_PROCESSED, &processed);
 			if (checkALError("Unable to query music source state", ERROR)) {
 				driver->MusicPlaying = false;
 				return -1;
@@ -999,15 +1016,15 @@ int OpenALAudioDriver::MusicManager(void* arg)
 			if (processed > 0) {
 				while (processed) {
 					ALuint BufferID;
-					alSourceUnqueueBuffers( driver->MusicSource, 1, &BufferID );
+					alSourceUnqueueBuffers(driver->MusicSource, 1, &BufferID);
 					if (checkALError("Unable to unqueue music buffers", ERROR)) {
 						driver->MusicPlaying = false;
 						return -1;
 					}
 					if (bFinished == AL_FALSE) {
 						int size = ACM_BUFFERSIZE;
-						int cnt = driver->MusicReader->read_samples( driver->music_memory, ACM_BUFFERSIZE >> 1 );
-						size -= ( cnt * 2 );
+						int cnt = driver->MusicReader->read_samples(driver->music_memory, ACM_BUFFERSIZE >> 1);
+						size -= (cnt * 2);
 						if (size != 0)
 							bFinished = AL_TRUE;
 						if (bFinished) {
@@ -1015,21 +1032,21 @@ int OpenALAudioDriver::MusicManager(void* arg)
 							core->GetMusicMgr()->PlayNext();
 							if (driver->MusicPlaying) {
 								Log(MESSAGE, "OpenAL", "Queuing New Music");
-								driver->MusicReader->read_samples( ( driver->music_memory + cnt ), size >> 1 );
+								driver->MusicReader->read_samples((driver->music_memory + cnt), size >> 1);
 								bFinished = AL_FALSE;
 							} else {
 								Log(MESSAGE, "OpenAL", "No Other Music to play");
-								memset( driver->music_memory + cnt, 0, size );
+								memset(driver->music_memory + cnt, 0, size);
 								driver->MusicPlaying = false;
 								break;
 							}
 						}
-						alBufferData( BufferID, AL_FORMAT_STEREO16, driver->music_memory, ACM_BUFFERSIZE, driver->MusicReader->get_samplerate() );
+						alBufferData(BufferID, AL_FORMAT_STEREO16, driver->music_memory, ACM_BUFFERSIZE, driver->MusicReader->get_samplerate());
 						if (checkALError("Unable to buffer music data", ERROR)) {
 							driver->MusicPlaying = false;
 							return -1;
 						}
-						alSourceQueueBuffers( driver->MusicSource, 1, &BufferID );
+						alSourceQueueBuffers(driver->MusicSource, 1, &BufferID);
 						if (checkALError("Unable to queue music buffers", ERROR)) {
 							driver->MusicPlaying = false;
 							return -1;
@@ -1045,8 +1062,8 @@ int OpenALAudioDriver::MusicManager(void* arg)
 
 //This one is used for movies, might be useful for others ?
 void OpenALAudioDriver::QueueBuffer(int streamIdx, unsigned short bits,
-		        int channels, short* memory,
-		        int size, int samplerate)
+				    int channels, short* memory,
+				    int size, int samplerate)
 {
 	auto& stream = streams[streamIdx];
 	stream.delete_buffers = true;
@@ -1064,7 +1081,7 @@ void OpenALAudioDriver::QueueBuffer(int streamIdx, unsigned short bits,
 		return;
 	}
 
-	QueueALBuffers({stream.sources.first, 0}, {Buffer, 0});
+	QueueALBuffers({ stream.sources.first, 0 }, { Buffer, 0 });
 }
 
 int OpenALAudioDriver::QueueALBuffers(OpenALuintPair sources, OpenALuintPair buffers) const
@@ -1100,7 +1117,8 @@ int OpenALAudioDriver::QueueALBuffers(OpenALuintPair sources, OpenALuintPair buf
 	return GEM_OK;
 }
 
-int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer) const {
+int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer) const
+{
 	ALint type;
 
 	alGetSourcei(source, AL_SOURCE_TYPE, &type);
@@ -1116,7 +1134,8 @@ int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer) const {
 	return GEM_OK;
 }
 
-void OpenALAudioDriver::UpdateMapAmbient(const MapReverbProperties& props) {
+void OpenALAudioDriver::UpdateMapAmbient(const MapReverbProperties& props)
+{
 	if (hasEFX) {
 		reverbProperties = props;
 		hasReverbProperties = true;
@@ -1147,14 +1166,14 @@ void OpenALAudioDriver::UpdateMapAmbient(const MapReverbProperties& props) {
 		alAuxiliaryEffectSloti(efxEffectSlot, AL_EFFECTSLOT_EFFECT, efxEffect);
 #else
 		// avoid warnings for unused members
-		(void)efxEffectSlot;
-		(void)efxEffect;
+		(void) efxEffectSlot;
+		(void) efxEffect;
 #endif
 	}
 }
 
 #ifdef __clang__
-#pragma clang diagnostic pop
+	#pragma clang diagnostic pop
 #endif
 
 #include "plugindef.h"

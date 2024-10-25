@@ -32,6 +32,7 @@ private:
 	PNGInternal* inf;
 
 	bool hasPalette = false;
+
 public:
 	PNGImporter(void);
 	PNGImporter(const PNGImporter&) = delete;

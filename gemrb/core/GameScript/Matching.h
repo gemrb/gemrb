@@ -20,10 +20,10 @@
 #ifndef MATCHING_H
 #define MATCHING_H
 
+#include "exports.h"
+
 #include "GameScript/GameScript.h"
 #include "GameScript/Targets.h"
-
-#include "exports.h"
 
 namespace GemRB {
 
@@ -45,18 +45,18 @@ Scriptable* GetScriptableFromObject2(Scriptable* Sender, const Action* parameter
 Scriptable* GetScriptableFromObject(Scriptable* Sender, const Object* oC, int gaFlags = 0, bool anyone = false);
 Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Action* parameters, int gaFlags = 0);
 Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Object* oC, int ga_flags = 0, bool anyone = false);
-Scriptable *GetActorObject(const TileMap *TMap, const ieVariable& name);
+Scriptable* GetActorObject(const TileMap* TMap, const ieVariable& name);
 
-Targets *GetMyTarget(const Scriptable *Sender, const Actor *actor, Targets *parameters, int ga_flags);
-Targets *XthNearestOf(Targets *parameters, int count, int ga_flags);
-Targets *XthNearestDoor(Targets *parameters, unsigned int count);
-Targets *XthNearestEnemyOf(Targets *parameters, int count, int gaFlags, bool farthest = false);
-Targets *ClosestEnemySummoned(const Scriptable *origin, Targets *parameters, int ga_flags);
-Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
-Targets *XthNearestMyGroupOfType(const Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
+Targets* GetMyTarget(const Scriptable* Sender, const Actor* actor, Targets* parameters, int ga_flags);
+Targets* XthNearestOf(Targets* parameters, int count, int ga_flags);
+Targets* XthNearestDoor(Targets* parameters, unsigned int count);
+Targets* XthNearestEnemyOf(Targets* parameters, int count, int gaFlags, bool farthest = false);
+Targets* ClosestEnemySummoned(const Scriptable* origin, Targets* parameters, int ga_flags);
+Targets* XthNearestEnemyOfType(const Scriptable* origin, Targets* parameters, unsigned int count, int ga_flags);
+Targets* XthNearestMyGroupOfType(const Scriptable* origin, Targets* parameters, unsigned int count, int ga_flags);
 
 /* returns true if actor matches the object specs. */
-bool MatchActor(const Scriptable *Sender, ieDword ID, const Object *oC);
+bool MatchActor(const Scriptable* Sender, ieDword ID, const Object* oC);
 /* returns the number of actors matching the IDS targeting */
 int GetObjectCount(Scriptable* Sender, const Trigger* parameters);
 int GetObjectCount(Scriptable* Sender, const Object* oC, bool anyone = false);

@@ -26,7 +26,7 @@
 namespace GemRB {
 
 TooltipBackground::TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> left, Holder<Sprite2D> right)
-: background(std::move(bg)), leftbg(std::move(left)), rightbg(std::move(right))
+	: background(std::move(bg)), leftbg(std::move(left)), rightbg(std::move(right))
 {
 	assert(background);
 	assert((leftbg && rightbg) || (!leftbg && !rightbg));
@@ -81,16 +81,16 @@ void TooltipBackground::Draw(Region rgn) const
 	dp.x -= (animationPos / 2); // start @ left curl pos
 
 	// calculate the unrolled region
-	Region bgclip(dp + Point(leftbg->Frame.w, -background->Frame.y), Size(animationPos+1, background->Frame.h));
+	Region bgclip(dp + Point(leftbg->Frame.w, -background->Frame.y), Size(animationPos + 1, background->Frame.h));
 	bgclip.w -= leftbg->Frame.w + rightbg->Frame.w;
 
 	// draw unrolled paper
 	// note that there is transparency at the edges... this will get covered up by the right curl's Xpos offset
-	VideoDriver->BlitSprite(background, Point(dp.x + background->Frame.x+3, dp.y), &bgclip);
-	
+	VideoDriver->BlitSprite(background, Point(dp.x + background->Frame.x + 3, dp.y), &bgclip);
+
 	// draw left paper curl
 	VideoDriver->BlitSprite(leftbg, dp);
-	
+
 	// draw right paper curl (note it's sprite has a non 0 xpos)
 	VideoDriver->BlitSprite(rightbg, Point(dp.x + animationPos - 1, dp.y));
 
@@ -99,7 +99,7 @@ void TooltipBackground::Draw(Region rgn) const
 
 	// advance the animation
 	int maxw = std::min(MaxTextSize().w, rgn.w) + leftbg->Frame.w + rightbg->Frame.w;
-	if (animationPos < maxw ) {
+	if (animationPos < maxw) {
 		animationPos += animationSpeed;
 	} else {
 		animationPos = maxw;
@@ -117,10 +117,10 @@ void Tooltip::SetText(const String& t)
 {
 	text = t;
 
-	Font::StringSizeMetrics metrics = {Size(), 0, 0, true};
+	Font::StringSizeMetrics metrics = { Size(), 0, 0, true };
 	// NOTE: arbitrary fallback size which doesn't come into play with original data
 	metrics.size = background ? background->MaxTextSize() : Size(128, 128);
-	textSize = font->StringSize( text, &metrics );
+	textSize = font->StringSize(text, &metrics);
 
 	if (background)
 		background->Reset();
@@ -139,16 +139,16 @@ void Tooltip::Draw(const Point& pos) const
 
 	Region textr(pos, textSize);
 	// the tooltip is centered at pos
-	textr.x -= textr.w/2;
+	textr.x -= textr.w / 2;
 
 	if (background) {
 		const Size& maxs = background->MaxTextSize();
-		
+
 		background->Draw(textr);
 		textr.h = maxs.h;
-		textr.y = pos.y - textr.h/2;
+		textr.y = pos.y - textr.h / 2;
 	}
-	
+
 	font->Print(textr, text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, colors);
 }
 

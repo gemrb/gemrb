@@ -26,6 +26,7 @@
 #define LOGGER_H
 
 #include "exports.h"
+
 #include "EnumIndex.h"
 
 #include "fmt/color.h"
@@ -64,38 +65,40 @@ public:
 		std::string owner;
 		std::string message;
 		LOG_FMT format;
-		
+
 		LogMessage(LogLevel level, std::string owner, std::string message, LOG_FMT fmt)
-		: level(level), owner(std::move(owner)), message(std::move(message)), format(fmt) {}
+			: level(level), owner(std::move(owner)), message(std::move(message)), format(fmt) {}
 	};
 
 	class LogWriter {
 	public:
 		std::atomic<LogLevel> level;
-		
-		explicit LogWriter(LogLevel level) : level(level) {}
+
+		explicit LogWriter(LogLevel level)
+			: level(level) {}
 		virtual ~LogWriter() noexcept = default;
 
 		void WriteLogMessage(LogLevel logLevel, const char* owner, const char* message, LOG_FMT fmt)
 		{
 			WriteLogMessage(LogMessage(logLevel, owner, message, fmt));
 		}
-		virtual void WriteLogMessage(const Logger::LogMessage& msg)=0;
+		virtual void WriteLogMessage(const Logger::LogMessage& msg) = 0;
 		virtual void Flush() {};
 	};
 
 	using WriterPtr = std::shared_ptr<LogWriter>;
+
 private:
 	using QueueType = std::deque<LogMessage>;
 	QueueType messageQueue;
 	std::deque<WriterPtr> writers;
-	
-	std::atomic_bool running {true};
+
+	std::atomic_bool running { true };
 	std::condition_variable cv;
 	std::mutex queueLock;
 	std::mutex writerLock;
 	std::thread loggingThread;
-	
+
 	void threadLoop();
 	void ProcessMessages(QueueType queue);
 	void StartProcessingThread();
@@ -103,7 +106,7 @@ private:
 public:
 	explicit Logger(std::deque<WriterPtr>);
 	~Logger();
-	
+
 	void AddLogWriter(WriterPtr writer);
 
 	void LogMsg(LogLevel, const char* owner, const char* message, LOG_FMT fmt);

@@ -19,6 +19,7 @@
  */
 
 #include "Freetype.h"
+
 #include "Logging/Logging.h"
 
 namespace GemRB {
@@ -26,17 +27,22 @@ namespace GemRB {
 void LogFTError(FT_Error errCode)
 {
 #undef __FTERRORS_H__
-#define FT_ERRORDEF( e, v, s )  { e, s },
-#define FT_ERROR_START_LIST     {
-#define FT_ERROR_END_LIST       { 0, 0 } };
+#define FT_ERRORDEF(e, v, s) { e, s },
+#define FT_ERROR_START_LIST  {
+#define FT_ERROR_END_LIST \
+	{ \
+		0, 0 \
+	} \
+	} \
+	;
 
 	static const struct
 	{
-		int          err_code;
-		const char*  err_msg;
+		int err_code;
+		const char* err_msg;
 	} ft_errors[] =
 #include FT_ERRORS_H
-	const char *err_msg;
+		const char * err_msg;
 
 	err_msg = NULL;
 	for (const auto ftError : ft_errors) {
@@ -45,7 +51,7 @@ void LogFTError(FT_Error errCode)
 			break;
 		}
 	}
-	if ( !err_msg ) {
+	if (!err_msg) {
 		err_msg = "unknown FreeType error";
 	}
 	Log(ERROR, "FreeType", "{}", err_msg);

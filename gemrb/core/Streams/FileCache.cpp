@@ -20,17 +20,18 @@
 
 #include "Compressor.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "PluginMgr.h"
+
+#include "Logging/Logging.h"
 #include "Streams/FileStream.h"
 #if defined(SUPPORTS_MEMSTREAM)
-#include "Streams/MappedFileMemoryStream.h"
+	#include "Streams/MappedFileMemoryStream.h"
 #endif
 #include "System/VFS.h"
 
 namespace GemRB {
 
-DataStream* CacheCompressedStream(DataStream *stream, const path_t& filename, int length, bool overwrite)
+DataStream* CacheCompressedStream(DataStream* stream, const path_t& filename, int length, bool overwrite)
 {
 	path_t fname = ExtractFileFromPath(filename);
 	path_t path = PathJoin(core->config.CachePath, fname);
@@ -49,7 +50,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const path_t& filename, in
 		stream->Seek(length, GEM_CURRENT_POS);
 	}
 #if defined(SUPPORTS_MEMSTREAM)
-	return new MappedFileMemoryStream{path};
+	return new MappedFileMemoryStream { path };
 #else
 	return FileStream::OpenFile(path);
 #endif

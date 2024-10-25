@@ -30,6 +30,7 @@
 
 #include "exports.h"
 #include "ie_types.h"
+
 #include "Resource.h"
 
 #include <vector>
@@ -45,27 +46,27 @@ class Spell;
 #define HS_DEPLETE 1
 
 //LearnSpell flags
-#define LS_ADDXP   1   //give xp for learning it
-#define LS_LEARN   2   //give message when learned it
-#define LS_STATS   4   //check stats (alignment, etc)
-#define LS_MEMO    8   //memorize it instantly (add innate)
-#define LS_NOXP    16  //disable giving of xp (LS_ADDXP)
+#define LS_ADDXP 1 //give xp for learning it
+#define LS_LEARN 2 //give message when learned it
+#define LS_STATS 4 //check stats (alignment, etc)
+#define LS_MEMO  8 //memorize it instantly (add innate)
+#define LS_NOXP  16 //disable giving of xp (LS_ADDXP)
 
 //LearnSpell return values
 #define LSR_OK      0
-#define LSR_KNOWN   1  //already knows
-#define LSR_INVALID 2  //invalid resref
-#define LSR_FAILED  3  //failed stat roll
-#define LSR_STAT    4  //insufficient stat (can't learn the spell due to low stat)
-#define LSR_LEVEL   5  //insufficient level (low mage, etc level)
-#define LSR_FULL    6  //can't learn more spells of this level (due to level)
+#define LSR_KNOWN   1 //already knows
+#define LSR_INVALID 2 //invalid resref
+#define LSR_FAILED  3 //failed stat roll
+#define LSR_STAT    4 //insufficient stat (can't learn the spell due to low stat)
+#define LSR_LEVEL   5 //insufficient level (low mage, etc level)
+#define LSR_FULL    6 //can't learn more spells of this level (due to level)
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 using ieSpellType = enum ieSpellType {
 	IE_SPELL_TYPE_PRIEST = 0,
 	IE_SPELL_TYPE_WIZARD = 1,
 	IE_SPELL_TYPE_INNATE = 2,
-	IE_SPELL_TYPE_SONG = 3     //not in spellbook
+	IE_SPELL_TYPE_SONG = 3 //not in spellbook
 };
 
 #define NUM_SPELLTYPES 3
@@ -133,7 +134,7 @@ struct SpellExtHeader {
 
 class GEM_EXPORT Spellbook {
 private:
-	std::vector<CRESpellMemorization*> *spells;
+	std::vector<CRESpellMemorization*>* spells;
 	std::vector<SpellExtHeader*> spellinfo;
 	int sorcerer = 0;
 	int innate;
@@ -147,18 +148,19 @@ private:
 	/** regenerates the spellinfo list */
 	void GenerateSpellInfo();
 	/** looks up the spellinfo list for an element */
-	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, const ResRef& name) const;
+	SpellExtHeader* FindSpellInfo(unsigned int level, unsigned int type, const ResRef& name) const;
 	/** removes all instances of a spell from a given page */
 	void RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRef);
 	/** adds a spell to the book, internal */
-	bool AddKnownSpell(CREKnownSpell *spl, int memo);
+	bool AddKnownSpell(CREKnownSpell* spl, int memo);
 	/** Adds a new CRESpellMemorization, to the *end* only */
 	bool AddSpellMemorization(CRESpellMemorization* sm);
 
 	bool HaveSpell(int spellid, int type, ieDword flags);
 	bool KnowSpell(int spellid, int type) const;
 	void RemoveSpell(int spellid, int type);
-public: 
+
+public:
 	Spellbook();
 	Spellbook(const Spellbook&) = delete;
 	~Spellbook();
@@ -168,9 +170,9 @@ public:
 
 	void FreeSpellPage(CRESpellMemorization* sm);
 	/** duplicates the source spellbook into the current one */
-	void CopyFrom(const Actor *source);
+	void CopyFrom(const Actor* source);
 	/** Check if the spell is memorised, optionally deplete it (casting) */
-	bool HaveSpell(const ResRef &resref, ieDword flags);
+	bool HaveSpell(const ResRef& resref, ieDword flags);
 	bool HaveSpell(int spellid, ieDword flags);
 
 	int CountSpells(const ResRef& resref, unsigned int type, int flag) const;
@@ -179,7 +181,7 @@ public:
 	bool KnowSpell(int spellid) const;
 
 	/** returns a CRESpellMemorization pointer */
-	CRESpellMemorization *GetSpellMemorization(unsigned int type, unsigned int level);
+	CRESpellMemorization* GetSpellMemorization(unsigned int type, unsigned int level);
 	int GetTypes() const;
 	bool IsIWDSpellBook() const;
 	unsigned int GetSpellLevelCount(int type) const;
@@ -201,7 +203,7 @@ public:
 	/** sets the book type */
 	void SetBookType(int clss);
 	/** adds a spell to the book, returns experience if learned */
-	int LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned int kit, int level=-1);
+	int LearnSpell(Spell* spell, int memo, unsigned int clsmsk, unsigned int kit, int level = -1);
 	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index) const;
 	unsigned int GetMemorizedSpellsCount(int type, bool real) const;
 	unsigned int GetMemorizedSpellsCount(int type, unsigned int level, bool real) const;
@@ -221,7 +223,7 @@ public:
 	bool UnmemorizeSpell(const ResRef& spellRef, bool deplete, uint8_t flags = 0);
 
 	/** finds the first spell needing to rememorize */
-	CREMemorizedSpell* FindUnchargedSpell(int type, int level=0) const;
+	CREMemorizedSpell* FindUnchargedSpell(int type, int level = 0) const;
 
 	/** Sets spell from memorized as 'not-yet-cast' */
 	bool ChargeSpell(CREMemorizedSpell* spl);
@@ -243,16 +245,16 @@ public:
 	unsigned int GetSpellInfoSize(int type);
 
 	/** generates a custom spellinfo list for fx_select_spell */
-	void SetCustomSpellInfo(const std::vector<ResRef>& data, const ResRef &spell, int type);
+	void SetCustomSpellInfo(const std::vector<ResRef>& data, const ResRef& spell, int type);
 
 	/** invalidates the spellinfo list */
 	void ClearSpellInfo();
 
 	/** lists spells of a type */
-	bool GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count);
+	bool GetSpellInfo(SpellExtHeader* array, int type, int startindex, int count);
 
 	/** find the first spell matching resref (returns index+1) */
-	int FindSpellInfo(SpellExtHeader *array, const ResRef& spellName, unsigned int type);
+	int FindSpellInfo(SpellExtHeader* array, const ResRef& spellName, unsigned int type);
 
 	/** Dumps spellbook to stdout for debugging */
 	std::string dump(bool print = true) const;

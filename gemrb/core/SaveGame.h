@@ -24,6 +24,7 @@
 #include "exports.h"
 
 #include "ResourceManager.h"
+
 #include "System/VFS.h"
 
 namespace GemRB {
@@ -34,6 +35,7 @@ class Sprite2D;
 class GEM_EXPORT SaveGame {
 public:
 	static const TypeID ID;
+
 public:
 	SaveGame(path_t path, const path_t& name, const ResRef& prefix, std::string slotname, int pCount, int saveID);
 
@@ -72,6 +74,7 @@ public:
 	DataStream* GetGame() const;
 	DataStream* GetWmap(int idx) const;
 	DataStream* GetSave() const;
+
 private:
 	path_t Path;
 	String Name;

@@ -21,13 +21,14 @@
 #include "GUI/Slider.h"
 
 #include "Interface.h"
+
 #include "GUI/Window.h"
 
 namespace GemRB {
 
 Slider::Slider(const Region& frame, Point pos,
-			   short KnobStep, unsigned short KnobStepsCount)
-: Control(frame), KnobPos(pos)
+	       short KnobStep, unsigned short KnobStepsCount)
+	: Control(frame), KnobPos(pos)
 {
 	ControlType = IE_GUI_SLIDER;
 	this->KnobStep = KnobStep;
@@ -75,7 +76,7 @@ void Slider::SetPosition(const Point& p)
 	int mx = KnobPos.x;
 	int xmx = p.x - mx;
 	unsigned int oldPos = Pos;
-	
+
 	if (p.x < mx) {
 		SetPosition(0);
 	} else {
@@ -129,15 +130,15 @@ void Slider::SetImage(unsigned char type, const Holder<Sprite2D>& img)
 bool Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	MarkDirty();
-	int mx = (KnobPos.x + ( Pos * KnobStep ) - Knob->Frame.x);
+	int mx = (KnobPos.x + (Pos * KnobStep) - Knob->Frame.x);
 	int my = (KnobPos.y - Knob->Frame.y);
 	int Mx = (mx + Knob->Frame.w);
 	int My = (my + Knob->Frame.h);
 
 	Point p = ConvertPointFromScreen(me.Pos());
 
-	if (( p.x >= mx ) && ( p.y >= my )) {
-		if (( p.x <= Mx ) && ( p.y <= My )) {
+	if ((p.x >= mx) && (p.y >= my)) {
+		if ((p.x <= Mx) && (p.y <= My)) {
 			State = IE_GUI_SLIDER_GRABBEDKNOB;
 			return true;
 		}

@@ -17,10 +17,11 @@
 #include <cassert>
 
 #ifndef WIN32
-#include <sys/mman.h>
+	#include <sys/mman.h>
 #endif
 
 #include "MappedFileMemoryStream.h"
+
 #include "System/VFS.h"
 
 #include <sys/stat.h>
@@ -29,12 +30,12 @@ namespace GemRB {
 
 MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)
 	: MemoryStream(fileName.c_str(), nullptr, 0),
-		fileHandle(nullptr),
-		fileOpened(false),
-		fileMapped(false)
+	  fileHandle(nullptr),
+	  fileOpened(false),
+	  fileMapped(false)
 {
 #ifdef WIN32
-	TCHAR t_name[MAX_PATH] = {0};
+	TCHAR t_name[MAX_PATH] = { 0 };
 	mbstowcs(t_name, fileName.c_str(), MAX_PATH - 1);
 
 	this->fileHandle =
@@ -45,8 +46,7 @@ MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)
 			nullptr,
 			OPEN_EXISTING,
 			FILE_ATTRIBUTE_NORMAL,
-			nullptr
-		);
+			nullptr);
 	this->fileOpened = fileHandle != INVALID_HANDLE_VALUE;
 
 	if (fileOpened) {
@@ -60,7 +60,7 @@ MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)
 	this->fileOpened = fileHandle != nullptr;
 
 	if (fileOpened) {
-		struct stat statData{};
+		struct stat statData {};
 		int ret = fstat(fileno(static_cast<FILE*>(fileHandle)), &statData);
 		assert(ret != -1);
 		this->size = statData.st_size;
@@ -73,15 +73,18 @@ MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)
 	}
 }
 
-bool MappedFileMemoryStream::isOk() const {
+bool MappedFileMemoryStream::isOk() const
+{
 	return fileOpened && fileMapped;
 }
 
-DataStream* MappedFileMemoryStream::Clone() const noexcept {
+DataStream* MappedFileMemoryStream::Clone() const noexcept
+{
 	return new MappedFileMemoryStream(originalfile);
 }
 
-strret_t MappedFileMemoryStream::Read(void* dest, strpos_t length) {
+strret_t MappedFileMemoryStream::Read(void* dest, strpos_t length)
+{
 	if (!fileMapped) {
 		return Error;
 	}
@@ -89,7 +92,8 @@ strret_t MappedFileMemoryStream::Read(void* dest, strpos_t length) {
 	return MemoryStream::Read(dest, length);
 }
 
-stroff_t MappedFileMemoryStream::Seek(stroff_t pos, strpos_t startPos) {
+stroff_t MappedFileMemoryStream::Seek(stroff_t pos, strpos_t startPos)
+{
 	if (!fileMapped) {
 		return InvalidPos;
 	}
@@ -97,11 +101,13 @@ stroff_t MappedFileMemoryStream::Seek(stroff_t pos, strpos_t startPos) {
 	return MemoryStream::Seek(pos, startPos);
 }
 
-strret_t MappedFileMemoryStream::Write(const void*, strpos_t) {
+strret_t MappedFileMemoryStream::Write(const void*, strpos_t)
+{
 	return Error;
 }
 
-MappedFileMemoryStream::~MappedFileMemoryStream() {
+MappedFileMemoryStream::~MappedFileMemoryStream()
+{
 	if (fileMapped) {
 		munmap(data, size);
 	}

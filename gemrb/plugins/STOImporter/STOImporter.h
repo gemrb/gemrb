@@ -21,11 +21,10 @@
 #ifndef STOIMPORTER_H
 #define STOIMPORTER_H
 
-#include "StoreMgr.h"
-
 #include "ie_types.h"
 
 #include "Store.h"
+#include "StoreMgr.h"
 
 namespace GemRB {
 
@@ -41,24 +40,24 @@ public:
 	~STOImporter() override;
 	STOImporter& operator=(const STOImporter&) = delete;
 	bool Open(DataStream* stream) override;
-	Store* GetStore(Store *store) override;
+	Store* GetStore(Store* store) override;
 
 	//returns saved size, updates internal offsets before save
-	void CalculateStoredFileSize(Store *st) const;
+	void CalculateStoredFileSize(Store* st) const;
 	//saves file
-	bool PutStore(DataStream *stream, Store *store) override;
+	bool PutStore(DataStream* stream, Store* store) override;
 
 private:
-	void GetItem(STOItem *item, const Store* s);
-	void GetDrink(STODrink *drink);
-	void GetCure(STOCure *cure);
+	void GetItem(STOItem* item, const Store* s);
+	void GetDrink(STODrink* drink);
+	void GetCure(STOCure* cure);
 	void GetPurchasedCategories(Store* s);
 
-	void PutItems(DataStream *stream, const Store* s) const;
-	void PutDrinks(DataStream *stream, const Store* s) const;
-	void PutCures(DataStream *stream, const Store* s) const;
-	void PutPurchasedCategories(DataStream *stream, const Store* s) const;
-	void PutHeader(DataStream *stream, const Store *store);
+	void PutItems(DataStream* stream, const Store* s) const;
+	void PutDrinks(DataStream* stream, const Store* s) const;
+	void PutCures(DataStream* stream, const Store* s) const;
+	void PutPurchasedCategories(DataStream* stream, const Store* s) const;
+	void PutHeader(DataStream* stream, const Store* store);
 };
 
 

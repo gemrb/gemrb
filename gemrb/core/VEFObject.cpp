@@ -25,24 +25,27 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "ScriptedAnimation.h"
 #include "TableMgr.h"
-#include "Video/Video.h"
+
+#include "Logging/Logging.h"
 #include "Streams/DataStream.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
-VEFObject::VEFObject(ScriptedAnimation *sca)
+VEFObject::VEFObject(ScriptedAnimation* sca)
 {
 	Pos = sca->Pos;
 	ResName = sca->ResName;
-	SingleObject=true;
+	SingleObject = true;
 	ScheduleEntry entry;
 	entry.start = core->GetGame()->GameTime;
-	if (sca->Duration==0xffffffff) entry.length = 0xffffffff;
-	else entry.length = sca->Duration+entry.start;
-	entry.offset = Point(0,0);
+	if (sca->Duration == 0xffffffff)
+		entry.length = 0xffffffff;
+	else
+		entry.length = sca->Duration + entry.start;
+	entry.offset = Point(0, 0);
 	entry.type = VEFTypes::VVC;
 	entry.ptr = sca;
 	entry.resourceName = sca->ResName;
@@ -56,29 +59,29 @@ VEFObject::~VEFObject()
 
 void VEFObject::Init()
 {
-	for(auto& entry : entries) {
+	for (auto& entry : entries) {
 		if (!entry.ptr) continue;
-		switch(entry.type) {
+		switch (entry.type) {
 			case VEFTypes::BAM:
 			case VEFTypes::VVC:
-				delete (ScriptedAnimation *)entry.ptr;
+				delete (ScriptedAnimation*) entry.ptr;
 				break;
 			case VEFTypes::VEF:
 			case VEFTypes::_2DA:
-				delete (VEFObject *)entry.ptr;
+				delete (VEFObject*) entry.ptr;
 				break;
 			default:; //error, no suitable destructor
 		}
 	}
 }
 
-void VEFObject::AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, VEFTypes type, ieDword gtime)
+void VEFObject::AddEntry(const ResRef& res, ieDword st, ieDword len, Point pos, VEFTypes type, ieDword gtime)
 {
 	ScheduleEntry entry;
 
 	entry.resourceName = res;
-	entry.start = gtime+st;
-	if (len!=0xffffffff) len+=entry.start;
+	entry.start = gtime + st;
+	if (len != 0xffffffff) len += entry.start;
 	entry.length = len;
 	entry.offset = pos;
 	entry.type = type;
@@ -86,21 +89,21 @@ void VEFObject::AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, 
 	entries.push_back(entry);
 }
 
-ScriptedAnimation *VEFObject::CreateCell(const ResRef &res, ieDword start, ieDword end)
+ScriptedAnimation* VEFObject::CreateCell(const ResRef& res, ieDword start, ieDword end)
 {
-	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(res, false);
-	if (sca && end!=0xffffffff) {
+	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(res, false);
+	if (sca && end != 0xffffffff) {
 		sca->SetDefaultDuration(core->Time.defaultTicksPerSec * (end - start));
 	}
 	return sca;
 }
 
-VEFObject *VEFObject::CreateObject(const ResRef &res, SClass_ID id)
+VEFObject* VEFObject::CreateObject(const ResRef& res, SClass_ID id)
 {
-	if (gamedata->Exists( res, id, true) ) {
-		VEFObject *obj = new VEFObject();
+	if (gamedata->Exists(res, id, true)) {
+		VEFObject* obj = new VEFObject();
 
-		if (id==IE_2DA_CLASS_ID) {
+		if (id == IE_2DA_CLASS_ID) {
 			obj->Load2DA(res);
 		} else {
 			DataStream* stream = gamedata->GetResourceStream(res, id);
@@ -122,7 +125,7 @@ bool VEFObject::UpdateDrawingState(int orientation)
 		if (entry.length < GameTime) continue;
 
 		if (!entry.ptr) {
-			switch(entry.type) {
+			switch (entry.type) {
 				case VEFTypes::_2DA: // original gemrb implementation of composite video effects
 					entry.ptr = CreateObject(entry.resourceName, IE_2DA_CLASS_ID);
 					if (entry.ptr) {
@@ -132,7 +135,7 @@ bool VEFObject::UpdateDrawingState(int orientation)
 					// intentional fallthrough
 				case VEFTypes::VEF: // vanilla engine implementation of composite video effects
 					entry.ptr = CreateObject(entry.resourceName, IE_VEF_CLASS_ID);
-					if (entry.ptr ) {
+					if (entry.ptr) {
 						break;
 					}
 					// fall back to BAM or VVC
@@ -144,53 +147,53 @@ bool VEFObject::UpdateDrawingState(int orientation)
 				default:;
 			}
 		}
-		
+
 		if (!entry.ptr) entry.type = VEFTypes::INVALID;
-				
+
 		bool ended = true;
-		switch(entry.type) {
-		case VEFTypes::BAM:
-		case VEFTypes::VVC:
-			{
-				ScriptedAnimation* anim = static_cast<ScriptedAnimation*>(entry.ptr);
-				orient_t orient = orientation == -1 ? anim->Orientation : ClampToOrientation(orientation);
-				ended = anim->UpdateDrawingState(orient);
-			}
-			break;
-		case VEFTypes::_2DA:
-		case VEFTypes::VEF:
-			ended = ((VEFObject *) entry.ptr)->UpdateDrawingState(orientation);
-			break;
-		default:
-			break;
+		switch (entry.type) {
+			case VEFTypes::BAM:
+			case VEFTypes::VVC:
+				{
+					ScriptedAnimation* anim = static_cast<ScriptedAnimation*>(entry.ptr);
+					orient_t orient = orientation == -1 ? anim->Orientation : ClampToOrientation(orientation);
+					ended = anim->UpdateDrawingState(orient);
+				}
+				break;
+			case VEFTypes::_2DA:
+			case VEFTypes::VEF:
+				ended = ((VEFObject*) entry.ptr)->UpdateDrawingState(orientation);
+				break;
+			default:
+				break;
 		}
-		
+
 		if (ended) return true;
-		
+
 		drawQueue.push_back(entry);
 	}
 	return false;
 }
 
-void VEFObject::Draw(const Region &vp, const Color &p_tint, int height, BlitFlags flags) const
+void VEFObject::Draw(const Region& vp, const Color& p_tint, int height, BlitFlags flags) const
 {
 	for (const auto& entry : drawQueue) {
 		switch (entry.type) {
-		case VEFTypes::BAM:
-		case VEFTypes::VVC:
-			((ScriptedAnimation *)entry.ptr)->Draw(vp, p_tint, height, flags);
-			break;
-		case VEFTypes::_2DA:
-		case VEFTypes::VEF:
-			((VEFObject *)entry.ptr)->Draw(vp, p_tint, height, flags);
-			break;
-		default:
-			break;
+			case VEFTypes::BAM:
+			case VEFTypes::VVC:
+				((ScriptedAnimation*) entry.ptr)->Draw(vp, p_tint, height, flags);
+				break;
+			case VEFTypes::_2DA:
+			case VEFTypes::VEF:
+				((VEFObject*) entry.ptr)->Draw(vp, p_tint, height, flags);
+				break;
+			default:
+				break;
 		}
 	}
 }
 
-void VEFObject::Load2DA(const ResRef &resource)
+void VEFObject::Load2DA(const ResRef& resource)
 {
 	Init();
 	AutoTable tab = gamedata->LoadTable(resource);
@@ -202,21 +205,21 @@ void VEFObject::Load2DA(const ResRef &resource)
 	ResName = resource;
 	ieDword GameTime = core->GetGame()->GameTime;
 	TableMgr::index_t rows = tab->GetRowCount();
-	while(rows--) {
+	while (rows--) {
 		Point offset;
 		int delay, duration;
 		ResRef subResource;
 
-		offset.x = tab->QueryFieldSigned<int>(rows,0);
-		offset.y = tab->QueryFieldSigned<int>(rows,1);
-		delay = tab->QueryFieldSigned<int>(rows,3);
-		duration = tab->QueryFieldSigned<int>(rows,4);
+		offset.x = tab->QueryFieldSigned<int>(rows, 0);
+		offset.y = tab->QueryFieldSigned<int>(rows, 1);
+		delay = tab->QueryFieldSigned<int>(rows, 3);
+		duration = tab->QueryFieldSigned<int>(rows, 4);
 		subResource = tab->QueryField(rows, 2);
 		AddEntry(subResource, delay, duration, offset, VEFTypes::VVC, GameTime);
 	}
 }
 
-void VEFObject::ReadEntry(DataStream *stream)
+void VEFObject::ReadEntry(DataStream* stream)
 {
 	ieDword start;
 	ieDword tmp;
@@ -232,16 +235,16 @@ void VEFObject::ReadEntry(DataStream *stream)
 	stream->ReadDword(tmp); //unknown field (could be position?)
 	stream->ReadDword(length);
 	stream->ReadDword(type);
-	stream->ReadResRef( resource);
+	stream->ReadResRef(resource);
 	stream->ReadDword(continuous);
-	stream->Seek( 49*4, GEM_CURRENT_POS); //skip empty fields
+	stream->Seek(49 * 4, GEM_CURRENT_POS); //skip empty fields
 
 	if (continuous) length = -1;
 	ieDword GameTime = core->GetGame()->GameTime;
 	AddEntry(resource, start, length, position, static_cast<VEFTypes>(type), GameTime);
 }
 
-void VEFObject::LoadVEF(DataStream *stream)
+void VEFObject::LoadVEF(DataStream* stream)
 {
 	Init();
 	if (!stream) {
@@ -253,7 +256,7 @@ void VEFObject::LoadVEF(DataStream *stream)
 	ieDword count1, count2;
 
 	stream->Read(Signature, 8);
-	if (memcmp( Signature, "VEF V1.0", 8 ) != 0) {
+	if (memcmp(Signature, "VEF V1.0", 8) != 0) {
 		Log(ERROR, "VEFObject", "Not a valid VEF File: {}", ResName);
 		delete stream;
 		return;
@@ -265,25 +268,25 @@ void VEFObject::LoadVEF(DataStream *stream)
 	stream->ReadDword(count2);
 
 	stream->Seek(offset1, GEM_STREAM_START);
-	for (i=0;i<count1;i++) {
+	for (i = 0; i < count1; i++) {
 		ReadEntry(stream);
 	}
 
 	stream->Seek(offset2, GEM_STREAM_START);
-	for (i=0;i<count2;i++) {
+	for (i = 0; i < count2; i++) {
 		ReadEntry(stream);
 	}
 }
 
-ScriptedAnimation *VEFObject::GetSingleObject() const
+ScriptedAnimation* VEFObject::GetSingleObject() const
 {
-	ScriptedAnimation *sca = NULL;
+	ScriptedAnimation* sca = NULL;
 
 	if (SingleObject) {
 		if (!entries.empty()) {
 			const ScheduleEntry& entry = entries[0];
 			if (entry.type == VEFTypes::VVC || entry.type == VEFTypes::BAM) {
-				sca = (ScriptedAnimation *)entry.ptr;
+				sca = (ScriptedAnimation*) entry.ptr;
 			}
 		}
 	}

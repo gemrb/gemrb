@@ -26,26 +26,27 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#define IE_GUI_BUTTON		0
-#define IE_GUI_PROGRESSBAR	1 //gemrb extension
-#define IE_GUI_SLIDER		2
-#define IE_GUI_EDIT		3
-#define IE_GUI_TEXTAREA		5
-#define IE_GUI_LABEL		6
-#define IE_GUI_SCROLLBAR	7
-#define IE_GUI_WORLDMAP         8 // gemrb extension
-#define IE_GUI_MAP              9 // gemrb extension
-#define IE_GUI_CONSOLE		10 // gemrb extension
-#define IE_GUI_VIEW			254 // gemrb extension
-#define IE_GUI_INVALID          255
+#define IE_GUI_BUTTON      0
+#define IE_GUI_PROGRESSBAR 1 //gemrb extension
+#define IE_GUI_SLIDER      2
+#define IE_GUI_EDIT        3
+#define IE_GUI_TEXTAREA    5
+#define IE_GUI_LABEL       6
+#define IE_GUI_SCROLLBAR   7
+#define IE_GUI_WORLDMAP    8 // gemrb extension
+#define IE_GUI_MAP         9 // gemrb extension
+#define IE_GUI_CONSOLE     10 // gemrb extension
+#define IE_GUI_VIEW        254 // gemrb extension
+#define IE_GUI_INVALID     255
 
 #include "RGBAColor.h"
 #include "exports.h"
 #include "globals.h"
 
 #include "Callback.h"
-#include "GUI/View.h"
 #include "Timer.h"
+
+#include "GUI/View.h"
 
 #include <limits>
 #include <map>
@@ -56,13 +57,13 @@ class Control;
 class Sprite2D;
 
 #define ACTION_CAST(a) \
-static_cast<Control::Action>(a)
+	static_cast<Control::Action>(a)
 
 #define ACTION_IS_SCREEN(a) \
-(a <= Control::HoverEnd)
+	(a <= Control::HoverEnd)
 
-#define ACTION_DEFAULT ControlActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
-#define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
+#define ACTION_DEFAULT   ControlActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
+#define ACTION_CUSTOM(x) ACTION_CAST(Control::CustomAction + int(x))
 
 /**
  * @class Control
@@ -72,7 +73,8 @@ static_cast<Control::Action>(a)
 using ControlActionResponder = View::ActionResponder<Control*>;
 using ControlEventHandler = ControlActionResponder::Responder;
 
-class GEM_EXPORT Control : public View, public ControlActionResponder {
+class GEM_EXPORT Control : public View,
+			   public ControlActionResponder {
 public: // Public attributes
 	enum Action : ControlActionResponder::Action {
 		// !!! Keep these synchronized with GUIDefines.py !!!
@@ -94,38 +96,41 @@ public: // Public attributes
 
 		CustomAction // entry value for defining custom actions in subclasses. Must be last in enum.
 	};
-	
+
 	struct ControlDragOp : public DragOp {
 		explicit ControlDragOp(Control* c)
-		: DragOp(c, c->DragCursor()){}
-		
-		Control* Source() const {
+			: DragOp(c, c->DragCursor()) {}
+
+		Control* Source() const
+		{
 			return static_cast<Control*>(dragView);
 		}
-		
-		Control* Destination() const {
+
+		Control* Destination() const
+		{
 			return static_cast<Control*>(dropView);
 		}
-		
-		~ControlDragOp() override {
+
+		~ControlDragOp() override
+		{
 			Control* src = Source();
 			ActionKey srckey(Action::DragDropSource);
-			
+
 			Control* dst = Destination();
 			ActionKey dstkey(Action::DragDropDest);
-			
+
 			if (dst) { // only send actions for successful drags
 				if (src->SupportsAction(srckey)) {
 					src->PerformAction(srckey);
 				}
-				
+
 				if (dst->SupportsAction(dstkey)) {
 					dst->PerformAction(dstkey);
 				}
 			}
 		}
 	};
-	
+
 	using varname_t = ieVariable;
 	using value_t = ieDword;
 	static constexpr value_t INVALID_VALUE = value_t(-1);
@@ -152,14 +157,14 @@ public:
 	bool IsFocused() const;
 
 	bool TracksMouseDown() const override { return bool(actionTimer); }
-	
+
 	UniqueDragOp DragOperation() override;
 	bool AcceptsDragOperation(const DragOp&) const override;
 	virtual Holder<Sprite2D> DragCursor() const;
 
 	//Events
 	void SetAction(Responder handler, Action type, EventButton button = 0,
-                   Event::EventMods mod = 0, short count = 0);
+		       Event::EventMods mod = 0, short count = 0);
 	void SetAction(Responder handler, const ActionKey& key = ACTION_DEFAULT) override;
 	void SetActionInterval(tick_t interval = ActionRepeatDelay);
 
@@ -171,22 +176,23 @@ public:
 
 	using ValueRange = std::pair<value_t, value_t>;
 	const static ValueRange MaxValueRange;
-	
+
 	value_t GetValue() const { return Value; }
 	ValueRange GetValueRange() const { return range; }
-	
+
 	value_t SetValue(value_t val);
 	value_t SetValueRange(ValueRange range = MaxValueRange);
 	value_t SetValueRange(value_t min, value_t max = std::numeric_limits<value_t>::max());
-	
+
 	void BindDictVariable(const varname_t& var, value_t val, ValueRange valRange = MaxValueRange) noexcept;
 	bool IsDictBound() const noexcept;
 	const varname_t& DictVariable() const noexcept { return VarName; }
 
 protected:
 	using ActionKey = ControlActionResponder::ActionKey;
-	struct ControlActionKey : public ActionKey {		
-		static uint32_t BuildKeyValue(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0) {
+	struct ControlActionKey : public ActionKey {
+		static uint32_t BuildKeyValue(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0)
+		{
 			// pack the parameters into the 32 bit key...
 			// we will only support the lower 8 bits for each, however. (more than enough for our purposes)
 			uint32_t key = 0;
@@ -199,13 +205,13 @@ protected:
 		}
 
 		ControlActionKey(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0)
-		: ActionKey(BuildKeyValue(type, mod, button, count) ) {}
+			: ActionKey(BuildKeyValue(type, mod, button, count)) {}
 	};
-	
+
 	void UpdateDictValue() noexcept;
 
 	void FlagsChanged(unsigned int /*oldflags*/) override;
-	
+
 	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
 	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) override;
@@ -213,7 +219,7 @@ protected:
 
 	bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/) override;
 	bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/) override;
-	
+
 	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
 
 	void ClearActionTimer();
@@ -230,11 +236,11 @@ private:
 	value_t Value = INVALID_VALUE;
 	ValueRange range;
 	varname_t VarName;
-	
+
 	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
 	void HandleTouchActionTimer();
-	
+
 	virtual BitOp GetDictOp() const noexcept { return BitOp::SET; }
 };
 

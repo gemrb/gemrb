@@ -25,11 +25,10 @@
 
 // make a category to force SDLUIKitDelegate to return our class name
 @interface SDLUIKitDelegate (GemDelegate)
-+ (NSString *)getAppDelegateClassName; //override this SDL method so an instance of our subclass is used
++ (NSString*)getAppDelegateClassName; // override this SDL method so an instance of our subclass is used
 @end
 
-@interface GEM_AppDelegate : SDLUIKitDelegate <GEM_ConfControllerDelegate>
-{
+@interface GEM_AppDelegate : SDLUIKitDelegate <GEM_ConfControllerDelegate> {
 	GEM_ConfController* confControl;
 
 	UIWindow* configWin;

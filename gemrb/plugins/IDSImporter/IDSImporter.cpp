@@ -40,12 +40,12 @@ bool IDSImporter::Open(std::unique_ptr<DataStream> str)
 		if (line.length() == 0) {
 			continue;
 		}
-		
+
 		auto parts = Explode<std::string, std::string>(line, ' ', 1);
 		if (parts.size() < 2) {
 			continue; // bad data?
 		}
-		
+
 		int val = strtosigned<int>(parts[0].c_str(), nullptr, 0);
 		StringToLower(parts[1]);
 		pairs.emplace_back(val, std::move(parts[1]));
@@ -91,7 +91,7 @@ int IDSImporter::GetValueIndex(size_t Index) const
 int IDSImporter::FindString(StringView str) const
 {
 	int i = static_cast<int>(pairs.size());
-	while(i--) {
+	while (i--) {
 		if (strnicmp(pairs[i].second.c_str(), str.c_str(), str.length()) == 0) {
 			return i;
 		}
@@ -102,8 +102,8 @@ int IDSImporter::FindString(StringView str) const
 int IDSImporter::FindValue(int val) const
 {
 	int i = static_cast<int>(pairs.size());
-	while(i--) {
-		if(pairs[i].first == val) {
+	while (i--) {
+		if (pairs[i].first == val) {
 			return i;
 		}
 	}

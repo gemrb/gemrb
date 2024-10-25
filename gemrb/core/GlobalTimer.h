@@ -49,9 +49,10 @@ private:
 
 	void DoFadeStep(ieDword count);
 	bool UpdateViewport(tick_t time);
+
 public:
 	GlobalTimer() noexcept = default;
-	
+
 	GlobalTimer(GlobalTimer&&) noexcept = default;
 	GlobalTimer& operator=(GlobalTimer&&) noexcept = default;
 

@@ -33,16 +33,16 @@ class GEM_EXPORT AnimationFactory : public FactoryObject {
 public:
 	using index_t = Animation::index_t;
 	static constexpr index_t InvalidIndex = index_t(-1);
-	
+
 	struct CycleEntry {
 		index_t FramesCount;
 		index_t FirstFrame;
 	};
 
-	AnimationFactory(const ResRef &resref,
-					 std::vector<Holder<Sprite2D>> frames,
-					 std::vector<CycleEntry> cycles,
-					 std::vector<index_t> FLTable);
+	AnimationFactory(const ResRef& resref,
+			 std::vector<Holder<Sprite2D>> frames,
+			 std::vector<CycleEntry> cycles,
+			 std::vector<index_t> FLTable);
 
 	Animation* GetCycle(index_t cycle) const noexcept;
 	/** No descriptions */
@@ -51,11 +51,11 @@ public:
 	index_t GetCycleCount() const { return cycles.size(); }
 	index_t GetFrameCount() const { return frames.size(); }
 	index_t GetCycleSize(index_t idx) const;
-	
+
 private:
 	std::vector<Holder<Sprite2D>> frames;
 	std::vector<CycleEntry> cycles;
-	std::vector<index_t> FLTable;	// Frame Lookup Table
+	std::vector<index_t> FLTable; // Frame Lookup Table
 };
 
 }

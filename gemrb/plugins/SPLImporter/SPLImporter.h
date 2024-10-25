@@ -21,11 +21,10 @@
 #ifndef SPLIMPORTER_H
 #define SPLIMPORTER_H
 
-#include "SpellMgr.h"
-
 #include "ie_types.h"
 
 #include "Spell.h"
+#include "SpellMgr.h"
 
 namespace GemRB {
 
@@ -41,10 +40,11 @@ public:
 	~SPLImporter() override;
 	SPLImporter& operator=(const SPLImporter&) = delete;
 	bool Open(DataStream* stream) override;
-	Spell* GetSpell(Spell *spl, bool silent=false) override;
+	Spell* GetSpell(Spell* spl, bool silent = false) override;
+
 private:
-	void GetExtHeader(const Spell *s, SPLExtHeader* eh);
-	Effect *GetFeature(const Spell *s);
+	void GetExtHeader(const Spell* s, SPLExtHeader* eh);
+	Effect* GetFeature(const Spell* s);
 };
 
 

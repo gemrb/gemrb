@@ -23,22 +23,23 @@
 
 #include "exports.h"
 #include "globals.h"
+
 #include "Resource.h"
 
 #include <vector>
 
 namespace GemRB {
 
-#define IE_DLG_TR_TEXT     0x01
-#define IE_DLG_TR_TRIGGER  0x02
-#define IE_DLG_TR_ACTION   0x04
-#define IE_DLG_TR_FINAL    0x08
-#define IE_DLG_TR_JOURNAL  0x10
+#define IE_DLG_TR_TEXT    0x01
+#define IE_DLG_TR_TRIGGER 0x02
+#define IE_DLG_TR_ACTION  0x04
+#define IE_DLG_TR_FINAL   0x08
+#define IE_DLG_TR_JOURNAL 0x10
 // unknown 0x20 ("Interrupt is an interjection"; only [so far] visible result is duplication of responses)
-#define IE_DLG_UNSOLVED    0x40
-#define IE_DLG_ADDJOURNAL  0x80 // Add Journal note (works implicitly — bg2Sections[0] is the default)
-#define IE_DLG_SOLVED      0x100
-#define IE_DLG_IMMEDIATE   0x200 // 1=Immediate execution of script actions, 0=Delayed execution of script actions (BGEE)
+#define IE_DLG_UNSOLVED   0x40
+#define IE_DLG_ADDJOURNAL 0x80 // Add Journal note (works implicitly — bg2Sections[0] is the default)
+#define IE_DLG_SOLVED     0x100
+#define IE_DLG_IMMEDIATE  0x200 // 1=Immediate execution of script actions, 0=Delayed execution of script actions (BGEE)
 // TODO: implement EE extensions
 // bit 10: Clear actions (BGEE)
 
@@ -71,8 +72,10 @@ public:
 	Dialog(const Dialog&) = delete;
 	~Dialog();
 	Dialog& operator=(const Dialog&) = delete;
+
 private:
 	void FreeDialogState(DialogState* ds);
+
 public:
 	void AddState(DialogState* ds);
 	DialogState* GetState(unsigned int index) const;

@@ -27,16 +27,19 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Item.h"
+
 #include "GameScript/GameScript.h"
 
 namespace GemRB {
 
-STOItem::STOItem(const CREItem *item) {
+STOItem::STOItem(const CREItem* item)
+{
 	CopyCREItem(item);
 }
 
 // beware of triggers leaking if you're writing to a non-blank STOItem
-void STOItem::CopyCREItem(const CREItem *item) {
+void STOItem::CopyCREItem(const CREItem* item)
+{
 	ItemResRef = item->ItemResRef;
 	PurchasedAmount = 0; // Expired in STOItem
 	Usages = item->Usages;
@@ -74,7 +77,7 @@ bool Store::IsItemAvailable(const STOItem* item) const
 	const Condition* triggers = item->triggers;
 	if (triggers) {
 		const Game* game = core->GetGame();
-		Scriptable *shopper = game->GetSelectedPCSingle(false);
+		Scriptable* shopper = game->GetSelectedPCSingle(false);
 		return triggers->Evaluate(shopper) != 0;
 	}
 	return true;
@@ -104,15 +107,15 @@ StoreActionFlags Store::AcceptableItemType(ieDword type, ieDword invflags, bool 
 	StoreActionFlags ret;
 
 	//don't allow any movement of undroppable items
-	if (invflags&IE_INV_ITEM_UNDROPPABLE ) {
+	if (invflags & IE_INV_ITEM_UNDROPPABLE) {
 		ret = StoreActionFlags::None;
 	} else {
 		ret = StoreActionFlags::Buy | StoreActionFlags::Sell | StoreActionFlags::Steal;
 	}
-	if (invflags&IE_INV_ITEM_UNSTEALABLE) {
+	if (invflags & IE_INV_ITEM_UNSTEALABLE) {
 		ret &= ~StoreActionFlags::Steal;
 	}
-	if (!(invflags&IE_INV_ITEM_IDENTIFIED) ) {
+	if (!(invflags & IE_INV_ITEM_IDENTIFIED)) {
 		ret |= StoreActionFlags::ID;
 	}
 
@@ -160,7 +163,7 @@ StoreActionFlags Store::AcceptableItemType(ieDword type, ieDword invflags, bool 
 	return ret & ~StoreActionFlags::Sell;
 }
 
-STOCure *Store::GetCure(unsigned int idx) const
+STOCure* Store::GetCure(unsigned int idx) const
 {
 	if (idx >= CuresCount) {
 		return nullptr;
@@ -168,7 +171,7 @@ STOCure *Store::GetCure(unsigned int idx) const
 	return cures[idx];
 }
 
-STODrink *Store::GetDrink(unsigned int idx) const
+STODrink* Store::GetDrink(unsigned int idx) const
 {
 	if (idx >= DrinksCount) {
 		return nullptr;
@@ -177,7 +180,7 @@ STODrink *Store::GetDrink(unsigned int idx) const
 }
 
 //We need this weirdness for PST item lookup
-STOItem *Store::GetItem(unsigned int idx, bool usetrigger) const
+STOItem* Store::GetItem(unsigned int idx, bool usetrigger) const
 {
 	if (!HasTriggers || !usetrigger) {
 		if (idx >= items.size()) {
@@ -197,7 +200,7 @@ STOItem *Store::GetItem(unsigned int idx, bool usetrigger) const
 	return NULL;
 }
 
-unsigned int Store::FindItem(const ResRef &itemname, bool usetrigger) const
+unsigned int Store::FindItem(const ResRef& itemname, bool usetrigger) const
 {
 	unsigned int count = items.size();
 	for (unsigned int i = 0; i < count; i++) {
@@ -214,7 +217,7 @@ unsigned int Store::FindItem(const ResRef &itemname, bool usetrigger) const
 	return (unsigned int) -1;
 }
 
-STOItem *Store::FindItem(const CREItem *item, bool exact) const
+STOItem* Store::FindItem(const CREItem* item, bool exact) const
 {
 	for (STOItem* temp : items) {
 		if (!IsItemAvailable(temp)) {
@@ -252,9 +255,9 @@ unsigned int Store::CountItems(const ResRef& itemRef) const
 
 //some stores can recharge items - in original engine apparently all stores
 //did this. In gemrb there is a flag.
-void Store::RechargeItem(CREItem *item) const
+void Store::RechargeItem(CREItem* item) const
 {
-	const Item *itm = gamedata->GetItem(item->ItemResRef);
+	const Item* itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {
 		return;
 	}
@@ -266,26 +269,25 @@ void Store::RechargeItem(CREItem *item) const
 	if (IsBag() != !(Flags & StoreActionFlags::ReCharge)) {
 		bool feature = core->HasFeature(GFFlags::SHOP_RECHARGE);
 		for (size_t i = 0; i < item->Usages.size(); i++) {
-			const ITMExtHeader *h = itm->GetExtHeader(i);
+			const ITMExtHeader* h = itm->GetExtHeader(i);
 			if (!h) {
 				item->Usages[i] = 0;
 				continue;
 			}
-			if ((feature || h->RechargeFlags&IE_ITEM_RECHARGE)
-			    && item->Usages[i] < h->Charges)
+			if ((feature || h->RechargeFlags & IE_ITEM_RECHARGE) && item->Usages[i] < h->Charges)
 				item->Usages[i] = h->Charges;
 		}
 	}
 	gamedata->FreeItem(itm, item->ItemResRef, false);
 }
 
-void Store::IdentifyItem(CREItem *item) const
+void Store::IdentifyItem(CREItem* item) const
 {
 	if ((item->Flags & IE_INV_ITEM_IDENTIFIED) || IsBag()) {
 		return;
 	}
 
-	const Item *itm = gamedata->GetItem(item->ItemResRef);
+	const Item* itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {
 		return;
 	}
@@ -296,11 +298,11 @@ void Store::IdentifyItem(CREItem *item) const
 	gamedata->FreeItem(itm, item->ItemResRef, false);
 }
 
-void Store::AddItem(CREItem *item)
+void Store::AddItem(CREItem* item)
 {
 	IdentifyItem(item);
 	RechargeItem(item);
-	STOItem *temp = FindItem(item, true);
+	STOItem* temp = FindItem(item, true);
 
 	if (temp) {
 		if (temp->InfiniteSupply == -1) {
@@ -339,15 +341,15 @@ void Store::AddItem(CREItem *item)
 		temp->AmountInStock = item->Usages[0];
 		temp->Usages[0] = 1;
 	}
-	items.push_back (temp );
+	items.push_back(temp);
 }
 
-void Store::RemoveItem(const STOItem *itm)
+void Store::RemoveItem(const STOItem* itm)
 {
 	size_t i = items.size();
-	while(i--) {
-		if (items[i]==itm) {
-			items.erase(items.begin()+i);
+	while (i--) {
+		if (items[i] == itm) {
+			items.erase(items.begin() + i);
 			break;
 		}
 	}

@@ -19,9 +19,9 @@
 
 #include "ScrollView.h"
 
-#include "GUI/ScrollBar.h"
-
 #include "GUIScriptInterface.h"
+
+#include "GUI/ScrollBar.h"
 #include "Logging/Logging.h"
 #include "Video/Video.h"
 
@@ -40,17 +40,17 @@ void ScrollView::ContentView::SizeChanged(const Size& oldsize)
 	ResizeToSubviews();
 	sv->ScrollDelta(Point(dx, dy));
 }
-	
+
 void ScrollView::ContentView::SubviewAdded(View* /*view*/, View* /*parent*/)
 {
 	ResizeToSubviews();
 }
-	
+
 void ScrollView::ContentView::SubviewRemoved(View* /*view*/, View* /*parent*/)
 {
 	ResizeToSubviews();
 }
-	
+
 void ScrollView::ContentView::ResizeToSubviews()
 {
 	assert(superView);
@@ -81,19 +81,19 @@ void ScrollView::ContentView::ResizeToSubviews()
 		sv->UpdateScrollbars();
 	}
 }
-	
+
 void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region& clip)
 {
 	const ScrollView* parent = static_cast<const ScrollView*>(superView);
-	
+
 	Region clipArea = parent->ContentRegion();
 	Point origin = parent->ConvertPointToWindow(clipArea.origin);
 	clipArea.x = origin.x;
 	clipArea.y = origin.y;
-	
+
 	const Region intersect = clip.Intersect(clipArea);
 	if (intersect.size.IsInvalid()) return; // outside the window/screen
-	
+
 	// clip drawing to the ContentRegion, then restore after drawing
 	VideoDriver->SetScreenClip(&intersect);
 }
@@ -104,11 +104,11 @@ void ScrollView::ContentView::DidDraw(const Region& /*drawFrame*/, const Region&
 }
 
 ScrollView::ScrollView(const Region& frame)
-: View(frame), contentView(Region())
+	: View(frame), contentView(Region())
 {
 	View::AddSubviewInFrontOfView(&contentView);
 	contentView.SetFrame(Region(Point(), frame.size));
-	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, BitOp::OR);
+	contentView.SetFlags(RESIZE_WIDTH | RESIZE_HEIGHT, BitOp::OR);
 	contentView.SetAutoResizeFlags(ResizeAll, BitOp::SET);
 
 	SetVScroll(nullptr);
@@ -118,7 +118,7 @@ ScrollView::ScrollView(const Region& frame)
 ScrollView::~ScrollView()
 {
 	View::RemoveSubview(&contentView); // no delete
-	
+
 	delete hscroll;
 	delete vscroll;
 }
@@ -133,14 +133,14 @@ void ScrollView::SetVScroll(ScrollBar* sbar)
 			Log(ERROR, "ScrollView", "Unable to add scrollbars: missing default scrollbar template.");
 		} else {
 			sbar = new ScrollBar(*sbar);
-			
+
 			Region sbFrame = sbar->Frame();
 			sbFrame.x = frame.w - sbFrame.w;
 			sbFrame.y = 0;
 			sbFrame.h = frame.h;
-			
+
 			sbar->SetFrame(sbFrame);
-			sbar->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, BitOp::SET);
+			sbar->SetAutoResizeFlags(ResizeRight | ResizeTop | ResizeBottom, BitOp::SET);
 			savedSBSize.w = sbFrame.w;
 		}
 	}
@@ -152,10 +152,11 @@ void ScrollView::SetVScroll(ScrollBar* sbar)
 	if (sbar) {
 		// ensure scrollbars are on top
 		View::AddSubviewInFrontOfView(sbar, &contentView);
-		
+
 		sbar->SetAction([this](Control* sb) {
 			ScrollbarValueChange(static_cast<ScrollBar*>(sb));
-		}, Control::ValueChange);
+		},
+				Control::ValueChange);
 	}
 }
 
@@ -214,11 +215,11 @@ void ScrollView::UpdateScrollbars()
 		vscroll->SetValue(-contentFrame.origin.y);
 	}
 }
-	
+
 void ScrollView::ScrollbarValueChange(const ScrollBar* sb)
 {
 	const Point& origin = contentView.Origin();
-	
+
 	if (sb == hscroll) {
 		Point p(-int(sb->GetValue()), origin.y);
 		ScrollTo(p);
@@ -229,7 +230,7 @@ void ScrollView::ScrollbarValueChange(const ScrollBar* sb)
 		Log(ERROR, "ScrollView", "ScrollbarValueChange for unknown scrollbar");
 	}
 }
-	
+
 void ScrollView::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (animation) {
@@ -237,7 +238,7 @@ void ScrollView::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 		contentView.SetFrameOrigin(animation.Next(GetMilliseconds()));
 	}
 }
-	
+
 void ScrollView::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (animation) {
@@ -245,16 +246,16 @@ void ScrollView::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 		contentView.SetFrameOrigin(animation.end);
 	}
 }
-	
+
 Region ScrollView::ContentRegion() const
 {
-	Region cr = Region(Point(0,0), Dimensions());
+	Region cr = Region(Point(0, 0), Dimensions());
 	if (hscroll && hscroll->IsVisible()) {
 		cr.h -= hscroll->Frame().h;
 	}
 	if (vscroll && vscroll->IsVisible()) {
 		const Region& sframe = vscroll->Frame();
-		
+
 		if (sframe.x == 0) {
 			// scrollbar is the leftmost view
 			cr.x += sframe.w;
@@ -270,14 +271,14 @@ Region ScrollView::ContentRegion() const
 	}
 	return cr;
 }
-	
+
 void ScrollView::FlagsChanged(unsigned int /*oldflags*/)
 {
-	if (Flags()&IgnoreEvents) {
+	if (Flags() & IgnoreEvents) {
 		if (hscroll) {
 			ToggleScrollbar(hscroll, false);
 		}
-		
+
 		if (vscroll) {
 			ToggleScrollbar(vscroll, false);
 		}
@@ -357,7 +358,7 @@ void ScrollView::ScrollTo(Point newP, ieDword duration)
 	UpdateScrollbars();
 
 	// set up animation if required
-	if  (duration) {
+	if (duration) {
 		animation = PointAnimation(current, newP, duration);
 	} else {
 		// cancel the existing animation (if any)
@@ -404,7 +405,7 @@ bool ScrollView::OnMouseDrag(const MouseEvent& me)
 		ScrollDelta(me.Delta());
 		return true;
 	}
-	
+
 	return false;
 }
 

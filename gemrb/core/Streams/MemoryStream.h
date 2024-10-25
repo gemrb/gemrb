@@ -21,16 +21,16 @@
 #ifndef MEMORYSTREAM_H
 #define MEMORYSTREAM_H
 
-#include "DataStream.h"
-
 #include "exports.h"
+
+#include "DataStream.h"
 
 namespace GemRB {
 
-class GEM_EXPORT MemoryStream : public DataStream
-{
+class GEM_EXPORT MemoryStream : public DataStream {
 protected:
-	char *data;
+	char* data;
+
 public:
 	MemoryStream(const path_t& name, void* data, strpos_t size);
 	~MemoryStream() override;

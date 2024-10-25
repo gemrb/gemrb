@@ -34,9 +34,9 @@ class Font;
 class GEM_EXPORT AnimationMgr : public ImporterBase {
 public:
 	using index_t = AnimationFactory::index_t;
-	
+
 	virtual index_t GetCycleSize(index_t Cycle) = 0;
-	virtual std::shared_ptr<AnimationFactory> GetAnimationFactory(const ResRef &resref, bool allowCompression = true) = 0;
+	virtual std::shared_ptr<AnimationFactory> GetAnimationFactory(const ResRef& resref, bool allowCompression = true) = 0;
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	virtual Holder<Sprite2D> GetPalette() = 0;

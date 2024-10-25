@@ -34,12 +34,14 @@
 // Moving to each node in the path thus becomes an automatic regulation problem
 // which is solved with a P regulator, see Scriptable.cpp
 
+#include "PathFinder.h"
+
 #include "Debug.h"
 #include "FibonacciHeap.h"
 #include "GameData.h"
 #include "Map.h"
-#include "PathFinder.h"
 #include "RNG.h"
+
 #include "Scriptable/Actor.h"
 
 #include <array>
@@ -50,13 +52,13 @@ namespace GemRB {
 constexpr size_t DEGREES_OF_FREEDOM = 4;
 constexpr size_t RAND_DEGREES_OF_FREEDOM = 16;
 constexpr unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
-constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent{{1, 0, -1, 0}};
-constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent{{0, 1, 0, -1}};
+constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent { { 1, 0, -1, 0 } };
+constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent { { 0, 1, 0, -1 } };
 
 // Cosines
-constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand{{0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383}};
+constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383 } };
 // Sines
-constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
+constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand { { 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924 } };
 
 // Find the best path of limited length that brings us the farthest from d
 Path Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const
@@ -117,7 +119,7 @@ PathNode Map::RandomWalk(const Point& s, int size, int radius, const Actor* call
 			p.y += dy;
 		}
 	}
-	while (!(GetBlockedInRadius(p + Point(dx, dy), size) & (PathMapFlags::PASSABLE|PathMapFlags::ACTOR))) {
+	while (!(GetBlockedInRadius(p + Point(dx, dy), size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
 		p.x -= dx;
 		p.y -= dy;
 	}
@@ -175,7 +177,7 @@ Path Map::GetLinePath(const Point& start, const Point& dest, int Speed, orient_t
 		if (p.x < 0 || p.y < 0) {
 			return path;
 		}
-		
+
 		const Size& mapSize = PropsSize();
 		if (p.x > mapSize.w * 16 || p.y > mapSize.h * 12) {
 			return path;
@@ -192,15 +194,15 @@ Path Map::GetLinePath(const Point& start, const Point& dest, int Speed, orient_t
 
 		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
 		if (wall) switch (flags) {
-			case GL_REBOUND:
-				Orientation = ReflectOrientation(Orientation);
-				// TODO: recalculate dest (mirror it)
-				break;
-			case GL_PASS:
-				break;
-			default: //premature end
-				return path;
-		}
+				case GL_REBOUND:
+					Orientation = ReflectOrientation(Orientation);
+					// TODO: recalculate dest (mirror it)
+					break;
+				case GL_PASS:
+					break;
+				default: //premature end
+					return path;
+			}
 	}
 
 	return path;
@@ -224,10 +226,9 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	TRACY(ZoneScoped);
 	if (InDebugMode(DebugMode::PATHFINDER))
 		Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}",
-			s, d,
-			fmt::WideToChar{caller ? caller->GetShortName() : u"nullptr"},
-			minDistance, size
-		);
+		    s, d,
+		    fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" },
+		    minDistance, size);
 	bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
@@ -245,9 +246,9 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 
 	SearchmapPoint smptSource = Map::ConvertCoordToTile(nmptSource);
 	SearchmapPoint smptDest = Map::ConvertCoordToTile(nmptDest);
-	
+
 	if (minDistance < size && !(GetBlockedInRadiusTile(smptDest, size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
-		Log(DEBUG, "FindPath", "{} can't fit in destination", fmt::WideToChar{caller ? caller->GetShortName() : u"nullptr"});
+		Log(DEBUG, "FindPath", "{} can't fit in destination", fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" });
 		return {};
 	}
 
@@ -310,7 +311,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
 			SearchmapPoint smptChild = Map::ConvertCoordToTile(nmptChild);
 			// Outside map
-			if (smptChild.x < 0 ||	smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
+			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
 			if (isClosed[smptChildIdx]) continue;
@@ -342,7 +343,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 						parents[smptChildIdx] = nmptParent;
 						distFromStart[smptChildIdx] = newDist;
 					}
-				// Fall back to A-star path
+					// Fall back to A-star path
 				} else {
 					unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
 					if (newDist < oldDist) {
@@ -422,7 +423,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		return resultPath;
 	} else if (InDebugMode(DebugMode::PATHFINDER)) {
 		if (caller) {
-			Log(DEBUG, "FindPath", "Pathing failed for {}", fmt::WideToChar{caller->GetShortName()});
+			Log(DEBUG, "FindPath", "Pathing failed for {}", fmt::WideToChar { caller->GetShortName() });
 		} else {
 			Log(DEBUG, "FindPath", "Pathing failed");
 		}
@@ -431,7 +432,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	return {};
 }
 
-void Map::NormalizeDeltas(float_t &dx, float_t &dy, float_t factor)
+void Map::NormalizeDeltas(float_t& dx, float_t& dy, float_t factor)
 {
 	constexpr float_t STEP_RADIUS = 2.0;
 

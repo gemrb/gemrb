@@ -30,9 +30,11 @@
 #include "SClassID.h" // For PluginID
 #include "exports.h"
 #include "globals.h"
+
 #include "Plugin.h"
-#include "Plugins/ImporterPlugin.h"
 #include "ResourceDesc.h"
+
+#include "Plugins/ImporterPlugin.h"
 
 #include <cstring>
 #include <list>
@@ -55,20 +57,24 @@ class GEM_EXPORT PluginMgr {
 public:
 	using ResourceFunc = ResourceHolder<Resource> (*)(DataStream*);
 	using PluginFunc = PluginHolder<Plugin> (*)();
+
 public:
 	/** Return global instance of PluginMgr */
 	static PluginMgr* Get();
+
 private:
 	PluginMgr() noexcept {};
+
 private:
-	std::map< SClass_ID, PluginFunc> plugins;
-	std::map< const TypeID*, std::vector<ResourceDesc> > resources;
+	std::map<SClass_ID, PluginFunc> plugins;
+	std::map<const TypeID*, std::vector<ResourceDesc>> resources;
 	/** Array of initializer functions */
 	std::vector<void (*)(const CoreSettings&)> initializerFunctions;
 	/** Array of cleanup functions */
 	std::vector<void (*)(void)> cleanupFunctions;
 	using driver_map = std::map<std::string, PluginFunc>;
 	std::map<const TypeID*, driver_map> drivers;
+
 public:
 	size_t GetPluginCount() const { return plugins.size(); }
 	bool IsAvailable(SClass_ID plugintype) const;
@@ -132,18 +138,21 @@ public:
 	PluginHolder<Plugin> GetDriver(const TypeID* type, const std::string& name);
 };
 
-template <typename T>
-PluginHolder<T> MakePluginHolder(PluginID id) {
+template<typename T>
+PluginHolder<T> MakePluginHolder(PluginID id)
+{
 	return std::static_pointer_cast<T>(PluginMgr::Get()->GetPlugin(id));
 }
 
-template <typename T>
-PluginHolder<ImporterPlugin<T>> MakeImporterPluginHolder(PluginID id) {
+template<typename T>
+PluginHolder<ImporterPlugin<T>> MakeImporterPluginHolder(PluginID id)
+{
 	return MakePluginHolder<ImporterPlugin<T>>(id);
 }
 
-template <typename T>
-PluginHolder<T> GetImporter(PluginID id) {
+template<typename T>
+PluginHolder<T> GetImporter(PluginID id)
+{
 	auto plugin = MakeImporterPluginHolder<T>(id);
 	if (plugin) {
 		return plugin->GetImporter();
@@ -151,8 +160,9 @@ PluginHolder<T> GetImporter(PluginID id) {
 	return nullptr;
 }
 
-template <typename T>
-PluginHolder<T> GetImporter(PluginID id, DataStream* str) {
+template<typename T>
+PluginHolder<T> GetImporter(PluginID id, DataStream* str)
+{
 	auto plugin = MakeImporterPluginHolder<T>(id);
 	if (plugin) {
 		return plugin->GetImporter(str);

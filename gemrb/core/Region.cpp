@@ -107,7 +107,7 @@ Size::Size(int w, int h) noexcept
 
 bool Size::operator==(const Size& size) const noexcept
 {
-	return (w == size.w &&  h == size.h);
+	return (w == size.w && h == size.h);
 }
 
 bool Size::operator!=(const Size& size) const noexcept
@@ -133,17 +133,17 @@ Region::Region(int x, int y, int w, int h) noexcept
 	this->h = h;
 }
 
-Region::Region(const Point &p, const Size& s) noexcept
+Region::Region(const Point& p, const Size& s) noexcept
 {
 	origin = p;
 	size = s;
 }
 
-Region::Region(const Region &r) noexcept
-: origin(r.origin), size(r.size)
+Region::Region(const Region& r) noexcept
+	: origin(r.origin), size(r.size)
 {}
 
-Region& Region::operator=(const Region &rhs) noexcept
+Region& Region::operator=(const Region& rhs) noexcept
 {
 	if (&rhs != this) {
 		origin = rhs.origin;
@@ -152,7 +152,7 @@ Region& Region::operator=(const Region &rhs) noexcept
 	return *this;
 }
 
-bool Region::PointInside(const Point &p) const noexcept
+bool Region::PointInside(const Point& p) const noexcept
 {
 	if ((p.x < x) || (p.x >= (x + w))) {
 		return false;
@@ -176,16 +176,16 @@ bool Region::RectInside(const Region& r) const noexcept
 
 bool Region::IntersectsRegion(const Region& rgn) const noexcept
 {
-	if (x >= ( rgn.x + rgn.w )) {
+	if (x >= (rgn.x + rgn.w)) {
 		return false; // entirely to the right of rgn
 	}
-	if (( x + w ) <= rgn.x) {
+	if ((x + w) <= rgn.x) {
 		return false; // entirely to the left of rgn
 	}
-	if (y >= ( rgn.y + rgn.h )) {
+	if (y >= (rgn.y + rgn.h)) {
 		return false; // entirely below rgn
 	}
-	if (( y + h ) <= rgn.y) {
+	if ((y + h) <= rgn.y) {
 		return false; // entirely above rgn
 	}
 	return true;
@@ -206,7 +206,7 @@ Point Region::Intercept(const Point& p) const noexcept
 	const Point& mid = Center();
 	const Point& min = origin;
 	const Point& max = Maximum();
-	
+
 	if (p.x == mid.x) return Point(p.x, (p.y < min.y) ? min.y : max.y); // vert line
 	if (p.y == mid.y) return Point((p.x < min.x) ? min.x : max.x, p.y); // horiz line
 
@@ -221,7 +221,7 @@ Point Region::Intercept(const Point& p) const noexcept
 		int newY = m * (max.x - p.x) + p.y;
 		if (min.y <= newY && newY <= max.y) return Point(max.x, newY);
 	}
-	
+
 	if (p.y <= mid.y) { // check "top" side
 		int newX = (min.y - p.y) / m + p.x;
 		if (min.x <= newX && newX <= max.x) return Point(newX, min.y);
@@ -231,7 +231,7 @@ Point Region::Intercept(const Point& p) const noexcept
 		int newX = (max.y - p.y) / m + p.x;
 		if (min.x <= newX && newX <= max.x) return Point(newX, max.y);
 	}
-	
+
 	assert(p == mid || PointInside(p));
 	return p;
 }
@@ -244,7 +244,7 @@ void Region::ExpandToPoint(const Point& p) noexcept
 	} else if (p.x > x + w) {
 		w = p.x - x;
 	}
-	
+
 	if (p.y < y) {
 		h += y - p.y;
 		y = p.y;

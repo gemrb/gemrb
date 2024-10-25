@@ -79,11 +79,11 @@ void AmbientMgr::AmbientsSet(const std::vector<Ambient*>& a)
 	}
 }
 
-void AmbientMgr::RemoveAmbients(const std::vector<Ambient*> &oldAmbients)
+void AmbientMgr::RemoveAmbients(const std::vector<Ambient*>& oldAmbients)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	// manually deleting ambientSources as regenerating them causes a several second pause
-	for (auto it = ambientSources.begin(); it != ambientSources.end(); ) {
+	for (auto it = ambientSources.begin(); it != ambientSources.end();) {
 		auto ambientSource = *it;
 		bool deleted = false;
 		for (const auto& ambient : oldAmbients) {
@@ -97,7 +97,7 @@ void AmbientMgr::RemoveAmbients(const std::vector<Ambient*> &oldAmbients)
 		if (!deleted) ++it;
 	}
 
-	for (auto it = ambients.begin(); it != ambients.end(); ) {
+	for (auto it = ambients.begin(); it != ambients.end();) {
 		bool deleted = false;
 		for (const auto& ambient : oldAmbients) {
 			if (*it == ambient) {
@@ -112,7 +112,7 @@ void AmbientMgr::RemoveAmbients(const std::vector<Ambient*> &oldAmbients)
 }
 
 
-void AmbientMgr::SetAmbients(const std::vector<Ambient*> &a)
+void AmbientMgr::SetAmbients(const std::vector<Ambient*>& a)
 {
 	std::lock_guard<std::mutex> l(ambientsMutex);
 	ambients = a;
@@ -317,7 +317,7 @@ tick_t AmbientMgr::AmbientSource::Enqueue() const
 	return core->GetAudioDrv()->QueueAmbient(stream, ambient->sounds[nextref]);
 }
 
-bool AmbientMgr::AmbientSource::IsHeard(const Point &listener) const
+bool AmbientMgr::AmbientSource::IsHeard(const Point& listener) const
 {
 	return Distance(listener, ambient->GetOrigin()) <= ambient->GetRadius();
 }

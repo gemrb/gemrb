@@ -26,10 +26,11 @@
 #ifndef MAPCONTROL_H
 #define MAPCONTROL_H
 
-#include "AnimationFactory.h"
-#include "GUI/Control.h"
-
 #include "exports.h"
+
+#include "AnimationFactory.h"
+
+#include "GUI/Control.h"
 
 namespace GemRB {
 
@@ -45,18 +46,18 @@ class MapNote;
 class GEM_EXPORT MapControl : public Control {
 private:
 	enum NOTE_STATE : Control::value_t {
-		NO_NOTES	= 0,
-		VIEW_NOTES 	= 1,
-		SET_NOTE	= 2,
-		REVEAL		= 3,
-		EDIT_NOTE	= 4
+		NO_NOTES = 0,
+		VIEW_NOTES = 1,
+		SET_NOTE = 2,
+		REVEAL = 3,
+		EDIT_NOTE = 4
 	};
 
 	Region mosRgn;
 	Point notePos;
 
 	std::shared_ptr<const AnimationFactory> mapFlags;
-	
+
 public:
 	// Small map bitmap
 	Holder<Sprite2D> MapMOS;
@@ -68,7 +69,7 @@ public:
 	MapControl(const Region& frame, std::shared_ptr<const AnimationFactory> af);
 
 	bool IsAnimated() const override { return true; } // map must constantly update actor positions
-	
+
 	void UpdateState(value_t) override;
 
 private:
@@ -86,10 +87,10 @@ private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	void DrawFog(const Region& rgn) const;
-	
+
 	Point ConvertPointToGame(Point) const;
 	Point ConvertPointFromGame(Point) const;
-	
+
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
 	/** Mouse Over Event */

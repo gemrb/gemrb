@@ -44,15 +44,15 @@ class GEM_EXPORT Gem_Polygon {
 public:
 	using LineSegment = std::pair<Point, Point>;
 
-	Gem_Polygon(std::vector<Point>&&, const Region *bbox = nullptr);
+	Gem_Polygon(std::vector<Point>&&, const Region* bbox = nullptr);
 
 	Region BBox;
 	std::vector<Point> vertices;
 	std::vector<std::vector<LineSegment>> rasterData; // same as vertices, but relative to BBox
 
-	size_t Count() const {return vertices.size();}
+	size_t Count() const { return vertices.size(); }
 
-	bool PointIn(const Point &p) const;
+	bool PointIn(const Point& p) const;
 	bool PointIn(int x, int y) const;
 
 	bool IntersectsRect(const Region&) const;
@@ -66,7 +66,7 @@ public:
 //DITHER means the polygon only dithers what it covers
 
 #define WF_BASELINE 1
-#define WF_DITHER 2
+#define WF_DITHER   2
 //this is used only externally, but converted to baseline on load time
 #define WF_HOVER 4
 // cover animations
@@ -74,17 +74,17 @@ public:
 // door polygons are not always drawn
 #define WF_DISABLED 0x80
 
-class GEM_EXPORT Wall_Polygon: public Gem_Polygon {
+class GEM_EXPORT Wall_Polygon : public Gem_Polygon {
 public:
 	using Gem_Polygon::Gem_Polygon;
 	//is the point above the baseline
-	bool PointBehind(const Point &p) const;
+	bool PointBehind(const Point& p) const;
 	ieDword GetPolygonFlag() const { return wall_flag; }
-	void SetPolygonFlag(ieDword flg) { wall_flag=flg; }
-	void SetBaseline(const Point &a, const Point &b);
+	void SetPolygonFlag(ieDword flg) { wall_flag = flg; }
+	void SetBaseline(const Point& a, const Point& b);
 
 	void SetDisabled(bool disabled);
-	
+
 public:
 	ieDword wall_flag = 0;
 	Point base0, base1;

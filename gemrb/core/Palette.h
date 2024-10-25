@@ -23,6 +23,7 @@
 #include "RGBAColor.h"
 #include "exports.h"
 #include "ie_types.h"
+
 #include "MurmurHash.h"
 
 #include <algorithm>
@@ -46,17 +47,17 @@ struct RGBModifier {
 	bool locked;
 };
 
-class GEM_EXPORT Palette
-{
+class GEM_EXPORT Palette {
 public:
 	using Colors = std::array<Color, 256>;
 
 	Palette(bool named = false) noexcept;
-	Palette(const Color &color, const Color &back) noexcept;
+	Palette(const Color& color, const Color& back) noexcept;
 
-	template <class Iterator>
+	template<class Iterator>
 	Palette(const Iterator begin, const Iterator end) noexcept
-	: Palette() {
+		: Palette()
+	{
 		std::copy(begin, end, colors.begin());
 		updateVersion();
 	}
@@ -70,8 +71,9 @@ public:
 	Colors::const_iterator cend() const noexcept;
 	Colors::const_reference operator[](size_t pos) const;
 
-	template <class Iterator>
-	void CopyColors(size_t offset, Iterator begin, Iterator end) {
+	template<class Iterator>
+	void CopyColors(size_t offset, Iterator begin, Iterator end)
+	{
 		std::copy(begin, end, colors.begin() + offset);
 		updateVersion();
 	}
@@ -81,6 +83,7 @@ public:
 	Hash GetVersion() const;
 	bool IsNamed() const;
 	void SetColor(size_t index, const Color& c);
+
 private:
 	Colors colors;
 	Hash version;

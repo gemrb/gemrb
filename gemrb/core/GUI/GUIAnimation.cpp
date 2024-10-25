@@ -25,7 +25,7 @@
 namespace GemRB {
 
 // so far everything we need uses this cycle
-static const uint8_t ColorCycleSteps[] = {6,4,2,0,2,4,6,8};
+static const uint8_t ColorCycleSteps[] = { 6, 4, 2, 0, 2, 4, 6, 8 };
 ColorCycle GlobalColorCycle(7);
 
 void ColorCycle::AdvanceTime(tick_t time)
@@ -38,9 +38,9 @@ Color ColorCycle::Blend(const Color& c1, const Color& c2) const
 	Color mix;
 	// we dont waste our time with the alpha component
 	mix.a = c1.a;
-	mix.r = (c1.r * step + c2.r * (8-step)) >> 3;
-	mix.g = (c1.g * step + c2.g * (8-step)) >> 3;
-	mix.b = (c1.b * step + c2.b * (8-step)) >> 3;
+	mix.r = (c1.r * step + c2.r * (8 - step)) >> 3;
+	mix.g = (c1.g * step + c2.g * (8 - step)) >> 3;
+	mix.b = (c1.b * step + c2.b * (8 - step)) >> 3;
 	return mix;
 }
 
@@ -48,7 +48,7 @@ bool PointAnimation::HasEnded() const
 {
 	return current == end;
 }
-	
+
 Point PointAnimation::GenerateNext(tick_t curTime)
 {
 	if (curTime < endtime) {
@@ -77,8 +77,7 @@ bool ColorAnimation::HasEnded() const
 }
 
 SpriteAnimation::SpriteAnimation(std::shared_ptr<Animation> a)
-: GUIAnimation(/*anim->starttime*/ 0), anim(std::move(a)),
-flags(anim->flags), gameAnimation(anim->gameAnimation)
+	: GUIAnimation(/*anim->starttime*/ 0), anim(std::move(a)), flags(anim->flags), gameAnimation(anim->gameAnimation)
 {
 	assert(anim);
 	current = anim->CurrentFrame();

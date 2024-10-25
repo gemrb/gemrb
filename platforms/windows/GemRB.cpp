@@ -21,12 +21,14 @@
 // GemRB.cpp : Defines the entry point for the application.
 
 #include "win32def.h"
-#include <clocale> //language encoding
 
 #include "Interface.h"
-#include "Logging/Logging.h"
-#include "Logging/Loggers/Stdio.h"
 #include "PluginMgr.h"
+
+#include "Logging/Loggers/Stdio.h"
+#include "Logging/Logging.h"
+
+#include <clocale> //language encoding
 
 using namespace GemRB;
 

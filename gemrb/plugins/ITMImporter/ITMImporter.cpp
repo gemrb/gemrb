@@ -31,7 +31,7 @@
 using namespace GemRB;
 
 static std::vector<int> profs;
-std::map<wchar_t,ieByte> zzmap;
+std::map<wchar_t, ieByte> zzmap;
 
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
@@ -83,12 +83,12 @@ static int GetProficiency(ieDword ItemType)
 bool ITMImporter::Import(DataStream* str)
 {
 	char Signature[8];
-	str->Read( Signature, 8 );
-	if (strncmp( Signature, "ITM V1  ", 8 ) == 0) {
+	str->Read(Signature, 8);
+	if (strncmp(Signature, "ITM V1  ", 8) == 0) {
 		version = 10;
-	} else if (strncmp( Signature, "ITM V1.1", 8 ) == 0) {
+	} else if (strncmp(Signature, "ITM V1.1", 8) == 0) {
 		version = 11;
-	} else if (strncmp( Signature, "ITM V2.0", 8 ) == 0) {
+	} else if (strncmp(Signature, "ITM V2.0", 8) == 0) {
 		version = 20;
 	} else {
 		Log(WARNING, "ITMImporter", "This file is not a valid ITM file! Actual signature: {}", Signature);
@@ -102,7 +102,7 @@ bool ITMImporter::Import(DataStream* str)
 // bg1 already handled it with external effects, so this was actually not necessary
 // Example: ZZ05WE, +1 bonus vs lawful alignments or Giant Killer (+1, +4 vs. Giants)
 // NOTE: the original did not increment enchantment level nor weapon speed
-static void AddZZFeatures(Item *s)
+static void AddZZFeatures(Item* s)
 {
 	// the targeting code (3rd char) is: digit = align(ment), letter = race
 	wchar_t targetIDS = towupper(s->Name[2]);
@@ -126,66 +126,66 @@ static void AddZZFeatures(Item *s)
 	static EffectRef zzRefs[] = { { "ToHitVsCreature", -1 }, { "DamageVsCreature", -1 } };
 
 	// append the new equipping effects (tohit+damage)
-	for (unsigned int i=0; i < sizeof(zzRefs)/sizeof(*zzRefs); i++) {
-		Effect *fx = EffectQueue::CreateEffect(zzRefs[i], IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
+	for (unsigned int i = 0; i < sizeof(zzRefs) / sizeof(*zzRefs); i++) {
+		Effect* fx = EffectQueue::CreateEffect(zzRefs[i], IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
 		fx->Parameter3 = static_cast<ieDword>(bonus);
 		fx->SourceRef = s->Name;
 		s->equipping_features.push_back(fx);
 	}
 }
 
-Item* ITMImporter::GetItem(Item *s)
+Item* ITMImporter::GetItem(Item* s)
 {
-	ieByte k1,k2,k3,k4;
+	ieByte k1, k2, k3, k4;
 
-	if( !s) {
+	if (!s) {
 		return NULL;
 	}
 	str->ReadStrRef(s->ItemName);
 	str->ReadStrRef(s->ItemNameIdentified);
-	str->ReadResRef( s->ReplacementItem );
+	str->ReadResRef(s->ReplacementItem);
 	str->ReadDword(s->Flags);
 	str->ReadWord(s->ItemType);
 	str->ReadDword(s->UsabilityBitmask);
 	str->ReadRTrimString(s->AnimationType, 2);
-	str->Read( &s->MinLevel, 1 );
-	str->Read( &s->unknown1, 1 );
-	str->Read( &s->MinStrength,1 );
-	str->Read( &s->unknown2, 1 );
-	str->Read( &s->MinStrengthBonus, 1 );
-	str->Read( &k1,1 );
-	str->Read( &s->MinIntelligence, 1 );
-	str->Read( &k2,1 );
-	str->Read( &s->MinDexterity, 1 );
-	str->Read( &k3,1 );
-	str->Read( &s->MinWisdom, 1 );
-	str->Read( &k4,1 );
-	s->KitUsability=(k1<<24) | (k2<<16) | (k3<<8) | k4; //bg2/iwd2 specific
-	str->Read( &s->MinConstitution, 1 );
-	str->Read( &s->WeaProf, 1 ); //bg2 specific
+	str->Read(&s->MinLevel, 1);
+	str->Read(&s->unknown1, 1);
+	str->Read(&s->MinStrength, 1);
+	str->Read(&s->unknown2, 1);
+	str->Read(&s->MinStrengthBonus, 1);
+	str->Read(&k1, 1);
+	str->Read(&s->MinIntelligence, 1);
+	str->Read(&k2, 1);
+	str->Read(&s->MinDexterity, 1);
+	str->Read(&k3, 1);
+	str->Read(&s->MinWisdom, 1);
+	str->Read(&k4, 1);
+	s->KitUsability = (k1 << 24) | (k2 << 16) | (k3 << 8) | k4; //bg2/iwd2 specific
+	str->Read(&s->MinConstitution, 1);
+	str->Read(&s->WeaProf, 1); //bg2 specific
 
 	//hack for non bg2 weapon proficiencies
 	if (!s->WeaProf) {
 		s->WeaProf = GetProficiency(s->ItemType);
 	}
 
-	str->Read( &s->MinCharisma, 1 );
-	str->Read( &s->unknown3, 1 );
+	str->Read(&s->MinCharisma, 1);
+	str->Read(&s->unknown3, 1);
 	str->ReadDword(s->Price);
 	str->ReadWord(s->MaxStackAmount);
 
 	//hack for non stacked items, so MaxStackAmount could be used as a boolean
-	if (s->MaxStackAmount==1) {
+	if (s->MaxStackAmount == 1) {
 		s->MaxStackAmount = 0;
 	}
 
-	str->ReadResRef( s->ItemIcon );
+	str->ReadResRef(s->ItemIcon);
 	str->ReadWord(s->LoreToID);
-	str->ReadResRef( s->GroundIcon );
+	str->ReadResRef(s->GroundIcon);
 	str->ReadDword(s->Weight);
 	str->ReadStrRef(s->ItemDesc);
 	str->ReadStrRef(s->ItemDescIdentified);
-	str->ReadResRef( s->DescriptionIcon );
+	str->ReadResRef(s->DescriptionIcon);
 	str->ReadDword(s->Enchantment);
 	str->ReadDword(s->ExtHeaderOffset);
 	ieWord headerCount;
@@ -195,22 +195,22 @@ Item* ITMImporter::GetItem(Item *s)
 	str->ReadWord(s->EquippingFeatureCount);
 
 	s->WieldColor = 0xffff;
-	memset( s->unknown, 0, 26 );
+	memset(s->unknown, 0, 26);
 
 	//skipping header data for iwd2
 	if (version == ITM_VER_IWD2) {
-		str->Read( s->unknown, 16 );
+		str->Read(s->unknown, 16);
 	}
 	if (version == ITM_VER_PST) {
 		//pst data
-		str->ReadResRef( s->Dialog );
+		str->ReadResRef(s->Dialog);
 		str->ReadStrRef(s->DialogName);
 		ieWord WieldColor;
 		str->ReadWord(WieldColor);
 		if (s->AnimationType[0]) {
 			s->WieldColor = WieldColor;
 		}
-		str->Read( s->unknown, 26 );
+		str->Read(s->unknown, 26);
 	} else if (dialogTable) {
 		//all non pst
 		TableMgr::index_t row = dialogTable->GetRowIndex(s->Name);
@@ -231,9 +231,9 @@ Item* ITMImporter::GetItem(Item *s)
 	s->ext_headers = std::vector<ITMExtHeader>(headerCount);
 
 	for (ieWord i = 0; i < headerCount; i++) {
-		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
+		str->Seek(s->ExtHeaderOffset + i * 56, GEM_STREAM_START);
 		ITMExtHeader* eh = &s->ext_headers[i];
-		GetExtHeader( s, eh );
+		GetExtHeader(s, eh);
 		// set the tooltip
 		if (tooltipTable) {
 			TableMgr::index_t row = tooltipTable->GetRowIndex(s->Name);
@@ -253,8 +253,8 @@ Item* ITMImporter::GetItem(Item *s)
 	//48 is the size of the feature block
 	s->equipping_features.reserve(s->EquippingFeatureCount + extraFeatureCount);
 
-	str->Seek( s->FeatureBlockOffset + 48*s->EquippingFeatureOffset,
-			GEM_STREAM_START );
+	str->Seek(s->FeatureBlockOffset + 48 * s->EquippingFeatureOffset,
+		  GEM_STREAM_START);
 	for (unsigned int i = 0; i < s->EquippingFeatureCount; i++) {
 		s->equipping_features.push_back(GetFeature(s));
 	}
@@ -271,18 +271,18 @@ Item* ITMImporter::GetItem(Item *s)
 #define IT_DAGGER     0x10
 #define IT_SHORTSWORD 0x13
 
-void ITMImporter::GetExtHeader(const Item *s, ITMExtHeader* eh)
+void ITMImporter::GetExtHeader(const Item* s, ITMExtHeader* eh)
 {
 	ieByte tmpByte;
 	ieWord ProjectileType;
 
-	str->Read( &eh->AttackType,1 );
-	str->Read( &eh->IDReq,1 );
-	str->Read( &eh->Location,1 );
+	str->Read(&eh->AttackType, 1);
+	str->Read(&eh->IDReq, 1);
+	str->Read(&eh->Location, 1);
 	str->Read(&eh->AltDiceSides, 1);
-	str->ReadResRef( eh->UseIcon );
-	str->Read( &eh->Target,1 );
-	str->Read( &tmpByte,1 );
+	str->ReadResRef(eh->UseIcon);
+	str->Read(&eh->Target, 1);
+	str->Read(&tmpByte, 1);
 	if (!tmpByte) {
 		tmpByte = 1;
 	}
@@ -305,7 +305,7 @@ void ITMImporter::GetExtHeader(const Item *s, ITMExtHeader* eh)
 	str->ReadDword(eh->RechargeFlags);
 
 	//hack for default weapon finesse
-	if (s->ItemType==IT_DAGGER || s->ItemType==IT_SHORTSWORD) eh->RechargeFlags^=IE_ITEM_USEDEXTERITY;
+	if (s->ItemType == IT_DAGGER || s->ItemType == IT_SHORTSWORD) eh->RechargeFlags ^= IE_ITEM_USEDEXTERITY;
 
 	str->ReadWord(eh->ProjectileAnimation);
 	//for some odd reasons 0 and 1 are the same
@@ -341,22 +341,22 @@ void ITMImporter::GetExtHeader(const Item *s, ITMExtHeader* eh)
 		//1->1
 		//2->2
 		//3->4
-		pq |= (1<<ProjectileType)>>1;
+		pq |= (1 << ProjectileType) >> 1;
 	}
 	eh->ProjectileQualifier = pq;
 
 	//48 is the size of the feature block
 	eh->features.reserve(featureCount);
-	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
+	str->Seek(s->FeatureBlockOffset + 48 * eh->FeatureOffset, GEM_STREAM_START);
 	for (ieWord i = 0; i < featureCount; i++) {
 		eh->features.push_back(GetFeature(s));
 	}
 }
 
-Effect* ITMImporter::GetFeature(const Item *s)
+Effect* ITMImporter::GetFeature(const Item* s)
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
-	eM->Open( str, false );
+	eM->Open(str, false);
 	Effect* fx = eM->GetEffect();
 	fx->SourceRef = s->Name;
 	return fx;

@@ -24,6 +24,7 @@
 #include "globals.h"
 
 #include "Plugin.h"
+
 #include "Plugins/export.h"
 
 namespace GemRB {

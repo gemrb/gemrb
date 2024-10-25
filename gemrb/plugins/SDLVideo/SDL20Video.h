@@ -21,11 +21,11 @@
 #ifndef SDL20VideoDRIVER_H
 #define SDL20VideoDRIVER_H
 
-#include "SDLVideo.h"
 #include "SDLSurfaceSprite2D.h"
+#include "SDLVideo.h"
 
 #if USE_OPENGL_BACKEND
-#include "GLSLProgram.h"
+	#include "GLSLProgram.h"
 #else
 class GLSLProgram {};
 #endif
@@ -33,7 +33,8 @@ class GLSLProgram {};
 namespace GemRB {
 
 Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat, SDL_Renderer*);
-Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* renderer = NULL) {
+Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* renderer = NULL)
+{
 	switch (fmt) {
 		case Video::BufferFormat::RGB555:
 			return SDL_PIXELFORMAT_RGB555;
@@ -67,7 +68,7 @@ class SDLTextureVideoBuffer : public VideoBuffer {
 	SDL_Texture* texture;
 	SDL_Renderer* renderer;
 
-	 // the format of the pixel data the client thinks we use, we may have to convert in CopyPixels()
+	// the format of the pixel data the client thinks we use, we may have to convert in CopyPixels()
 	Uint32 inputFormat; // the SDL pixel format equivalent of the requested Video::BufferFormat
 	Uint32 nativeFormat; // the SDL pixel format of the texture
 
@@ -77,7 +78,8 @@ class SDLTextureVideoBuffer : public VideoBuffer {
 	SDL_Surface* conversionBuffer = nullptr;
 
 private:
-	static Region TextureRegion(SDL_Texture* tex, const Point& p) {
+	static Region TextureRegion(SDL_Texture* tex, const Point& p)
+	{
 		int w, h;
 		SDL_QueryTexture(tex, NULL, NULL, &w, &h);
 		return Region(p, ::GemRB::Size(w, h));
@@ -85,7 +87,7 @@ private:
 
 public:
 	SDLTextureVideoBuffer(const Point& p, SDL_Texture* texture, Video::BufferFormat fmt, SDL_Renderer* renderer)
-	: VideoBuffer(TextureRegion(texture, p)), texture(texture), renderer(renderer), inputFormat(SDLPixelFormatFromBufferFormat(fmt, NULL))
+		: VideoBuffer(TextureRegion(texture, p)), texture(texture), renderer(renderer), inputFormat(SDLPixelFormatFromBufferFormat(fmt, NULL))
 	{
 		assert(texture);
 		assert(renderer);
@@ -100,12 +102,14 @@ public:
 		Clear();
 	}
 
-	~SDLTextureVideoBuffer() override {
+	~SDLTextureVideoBuffer() override
+	{
 		SDL_DestroyTexture(texture);
 		SDL_FreeSurface(conversionBuffer);
 	}
 
-	void Clear() override {
+	void Clear() override
+	{
 		SDL_SetRenderTarget(renderer, texture);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
 #if SDL_COMPILEDVERSION == SDL_VERSIONNUM(2, 0, 10)
@@ -118,19 +122,22 @@ public:
 #endif
 		SDL_RenderClear(renderer);
 	}
-	
-	void Clear(const SDL_Rect& rgn) {
+
+	void Clear(const SDL_Rect& rgn)
+	{
 		SDL_SetRenderTarget(renderer, texture);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 		SDL_RenderFillRect(renderer, &rgn);
 	}
-	
-	void Clear(const Region& rgn) override {
+
+	void Clear(const Region& rgn) override
+	{
 		return Clear(RectFromRegion(rgn));
 	}
 
-	bool RenderOnDisplay(void* display) const override {
+	bool RenderOnDisplay(void* display) const override
+	{
 		SDL_Renderer* targetRenderer = static_cast<SDL_Renderer*>(display);
 		SDL_Rect dst = RectFromRegion(rect);
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
@@ -141,7 +148,8 @@ public:
 		return true;
 	}
 
-	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) override {
+	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) override
+	{
 		int sdlpitch = bufDest.w * SDL_BYTESPERPIXEL(nativeFormat);
 		SDL_Rect dest = RectFromRegion(bufDest);
 
@@ -149,7 +157,9 @@ public:
 			va_list args;
 			va_start(args, pitch);
 
-			enum Planes {Y, U, V};
+			enum Planes { Y,
+				      U,
+				      V };
 			const ieByte* planes[3];
 			unsigned int strides[3];
 
@@ -168,7 +178,7 @@ public:
 			// SDL_ConvertPixels doesn't support palettes... must do it ourselves
 			va_list args;
 			va_start(args, pitch);
-			const Palette *pal = va_arg(args, Palette *);
+			const Palette* pal = va_arg(args, Palette*);
 			va_end(args);
 
 			Uint32* dst = static_cast<Uint32*>(conversionBuffer->pixels);
@@ -180,7 +190,7 @@ public:
 				const Color& c = pal->GetColorAt(*src++);
 				*dst++ = (c.r << pxfmt->Rshift) | (c.g << pxfmt->Gshift) | (c.b << pxfmt->Bshift) | (c.a << pxfmt->Ashift);
 				if (hasalpha == false) {
-					dst = (Uint32*)((Uint8*)dst - 1);
+					dst = (Uint32*) ((Uint8*) dst - 1);
 				}
 			}
 
@@ -225,15 +235,16 @@ private:
 	float brightness = 1.0;
 	float contrast = 1.0;
 	Size customFullscreenSize;
+
 public:
 	SDL20VideoDriver() noexcept;
 	~SDL20VideoDriver() noexcept override;
 
 	int Init() override;
 
-	void SetWindowTitle(const char *title) override { SDL_SetWindowTitle(window, title); };
+	void SetWindowTitle(const char* title) override { SDL_SetWindowTitle(window, title); };
 
-	Holder<Sprite2D> GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;
+	Holder<Sprite2D> GetScreenshot(Region r, const VideoBufferPtr& buf = nullptr) override;
 	bool SetFullscreenMode(bool set) override;
 	void SetGamma(int brightness, int contrast) override;
 	bool ToggleGrabInput() override;
@@ -242,18 +253,19 @@ public:
 	void StartTextInput() override;
 	void StopTextInput() override;
 	bool InTextInput() override;
-	
+
 	bool TouchInputEnabled() override;
 	bool CanDrawRawGeometry() const override;
 
 	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
-						 Color tint = Color()) override;
+			     Color tint = Color()) override;
 
 	void DrawRawGeometry(const std::vector<float>& vertices, const std::vector<Color>& colors, BlitFlags blitFlags) override;
+
 private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat) override;
 
-	int ProcessEvent(const SDL_Event & event) override;
+	int ProcessEvent(const SDL_Event& event) override;
 
 	int CreateSDLDisplay(const char* title, bool vsync) override;
 	void SwapBuffers(VideoBuffers& buffers) override;
@@ -279,17 +291,17 @@ private:
 	void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags) override;
 
 	void BlitSpriteRLEClipped(const Holder<Sprite2D>& /*spr*/, const Region& /*src*/, const Region& /*dst*/,
-							  BlitFlags /*flags*/ = BlitFlags::NONE, const Color* /*tint*/ = NULL) override { assert(false); } // SDL2 does not support this
+				  BlitFlags /*flags*/ = BlitFlags::NONE, const Color* /*tint*/ = NULL) override { assert(false); } // SDL2 does not support this
 	void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst,
-								 BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;
+				     BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;
 	void BlitSpriteNativeClipped(SDL_Texture* spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL);
 
 	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* = nullptr);
-	void SetTextureBlendMode(SDL_Texture *texture, BlitFlags flags) const;
+	void SetTextureBlendMode(SDL_Texture* texture, BlitFlags flags) const;
 
-	int GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const;
+	int GetTouchFingers(TouchEvent::Finger (&fingers)[FINGER_MAX], SDL_TouchID device) const;
 
-	void CalculateCustomFullscreen(const SDL_DisplayMode *mode);
+	void CalculateCustomFullscreen(const SDL_DisplayMode* mode);
 };
 
 }

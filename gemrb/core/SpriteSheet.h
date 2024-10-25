@@ -30,7 +30,7 @@
 
 namespace GemRB {
 
-template <typename KeyType>
+template<typename KeyType>
 class SpriteSheet {
 protected:
 	Region SheetRegion; // FIXME: this is only needed because of a subclass
@@ -41,20 +41,23 @@ public:
 
 public:
 	explicit SpriteSheet(Holder<Sprite2D> sheet)
-	: Sheet(std::move(sheet)) {
+		: Sheet(std::move(sheet))
+	{
 		SheetRegion = Sheet->Frame;
 	};
-	
+
 	SpriteSheet() noexcept = default;
 
 	virtual ~SpriteSheet() noexcept = default;
 
-	const Region& operator[](KeyType key) {
+	const Region& operator[](KeyType key)
+	{
 		return RegionMap[key];
 	}
 
 	// return the passed in region, clipped to the sprite dimensions or a region with -1 w/h if outside the sprite bounds
-	const Region& MapSheetSegment(KeyType key, const Region& rgn) {
+	const Region& MapSheetSegment(KeyType key, const Region& rgn)
+	{
 		Region intersection = rgn.Intersect(SheetRegion);
 		if (!intersection.size.IsInvalid()) {
 			if (RegionMap.emplace(key, intersection).second) {
@@ -63,11 +66,12 @@ public:
 			// FIXME: should we return something like Region(0,0,0,0) here?
 			// maybe we should just use Atlas[key] = intersection too.
 		}
-		const static Region nullRgn(0,0, -1,-1);
+		const static Region nullRgn(0, 0, -1, -1);
 		return nullRgn;
 	}
 
-	void Draw(KeyType key, const Region& dest, BlitFlags flags, const Color& tint) const {
+	void Draw(KeyType key, const Region& dest, BlitFlags flags, const Color& tint) const
+	{
 		const auto& i = RegionMap.find(key);
 		if (i != RegionMap.end()) {
 			VideoDriver->BlitSprite(Sheet, i->second, dest, flags, tint);
@@ -77,4 +81,4 @@ public:
 
 }
 
-#endif  // ! SPRITESHEET_H
+#endif // ! SPRITESHEET_H

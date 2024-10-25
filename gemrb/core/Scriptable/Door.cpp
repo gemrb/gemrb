@@ -27,16 +27,16 @@
 #include "Interface.h"
 #include "Projectile.h"
 #include "TileMap.h"
-#include "GameScript/GSUtils.h"
+
 #include "GUI/GameControl.h"
+#include "GameScript/GSUtils.h"
 #include "Scriptable/InfoPoint.h"
 
 namespace GemRB {
 
 DoorTrigger::DoorTrigger(std::shared_ptr<Gem_Polygon> openTrigger, WallPolygonGroup&& openWalls,
-			std::shared_ptr<Gem_Polygon> closedTrigger, WallPolygonGroup&& closedWalls)
-: openWalls(std::move(openWalls)), closedWalls(std::move(closedWalls)),
-openTrigger(std::move(openTrigger)), closedTrigger(std::move(closedTrigger))
+			 std::shared_ptr<Gem_Polygon> closedTrigger, WallPolygonGroup&& closedWalls)
+	: openWalls(std::move(openWalls)), closedWalls(std::move(closedWalls)), openTrigger(std::move(openTrigger)), closedTrigger(std::move(closedTrigger))
 {}
 
 void DoorTrigger::SetState(bool open)
@@ -61,7 +61,7 @@ std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon(bool open) const
 }
 
 Door::Door(Holder<TileOverlay> Overlay, DoorTrigger&& trigger)
-: Highlightable( ST_DOOR ), overlay(std::move(Overlay)), doorTrigger(std::move(trigger))
+	: Highlightable(ST_DOOR), overlay(std::move(Overlay)), doorTrigger(std::move(trigger))
 {
 }
 
@@ -69,19 +69,19 @@ void Door::ImpedeBlocks(const std::vector<SearchmapPoint>& points, PathMapFlags 
 {
 	for (const SearchmapPoint& point : points) {
 		PathMapFlags tmp = area->tileProps.QuerySearchMap(point) & PathMapFlags::NOTDOOR;
-		area->tileProps.PaintSearchMap(point, tmp|value);
+		area->tileProps.PaintSearchMap(point, tmp | value);
 	}
 }
 
 void Door::UpdateDoor()
 {
-	doorTrigger.SetState(Flags&DOOR_OPEN);
+	doorTrigger.SetState(Flags & DOOR_OPEN);
 	outline = doorTrigger.StatePolygon();
 
 	if (outline) {
 		// update the Scriptable position
-		Pos.x = outline->BBox.x + outline->BBox.w/2;
-		Pos.y = outline->BBox.y + outline->BBox.h/2;
+		Pos.x = outline->BBox.x + outline->BBox.w / 2;
+		Pos.y = outline->BBox.y + outline->BBox.h / 2;
 	}
 
 	PathMapFlags pmdflags;
@@ -91,21 +91,22 @@ void Door::UpdateDoor()
 	} else {
 		//both door flags are needed here, one for transparency the other
 		//is for passability
-		pmdflags = PathMapFlags::DOOR_OPAQUE|PathMapFlags::DOOR_IMPASSABLE;
+		pmdflags = PathMapFlags::DOOR_OPAQUE | PathMapFlags::DOOR_IMPASSABLE;
 	}
-	if (Flags &DOOR_OPEN) {
+	if (Flags & DOOR_OPEN) {
 		ImpedeBlocks(closed_ib, PathMapFlags::IMPASSABLE);
 		ImpedeBlocks(open_ib, pmdflags);
-	}
-	else {
+	} else {
 		ImpedeBlocks(open_ib, PathMapFlags::IMPASSABLE);
 		ImpedeBlocks(closed_ib, pmdflags);
 	}
 
-	InfoPoint *ip = area->TMap->GetInfoPoint(LinkedInfo);
+	InfoPoint* ip = area->TMap->GetInfoPoint(LinkedInfo);
 	if (ip) {
-		if (Flags&DOOR_OPEN) ip->Flags&=~INFO_DOOR;
-		else ip->Flags|=INFO_DOOR;
+		if (Flags & DOOR_OPEN)
+			ip->Flags &= ~INFO_DOOR;
+		else
+			ip->Flags |= INFO_DOOR;
 	}
 }
 
@@ -129,11 +130,11 @@ void Door::ToggleTiles(int State, int playsound)
 	}
 
 	//set door_open as state
-	Flags = (Flags & ~DOOR_OPEN) | (State == !core->HasFeature(GFFlags::REVERSE_DOOR) );
+	Flags = (Flags & ~DOOR_OPEN) | (State == !core->HasFeature(GFFlags::REVERSE_DOOR));
 }
 
 //this is the short name (not the scripting name)
-void Door::SetName(const ResRef &name)
+void Door::SetName(const ResRef& name)
 {
 	ID = name;
 }
@@ -154,15 +155,14 @@ void Door::SetDoorLocked(int Locked, int playsound)
 {
 	if (Locked) {
 		if (Flags & DOOR_LOCKED) return;
-		Flags|=DOOR_LOCKED;
+		Flags |= DOOR_LOCKED;
 		// only close it in pst, needed for Dead nations (see 4a3e1cb4ef)
 		if (core->HasFeature(GFFlags::REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
 		if (playsound && !LockSound.IsEmpty())
 			core->GetAudioDrv()->Play(LockSound, SFXChannel::Actions, toOpen[0], GEM_SND_SPATIAL);
-	}
-	else {
+	} else {
 		if (!(Flags & DOOR_LOCKED)) return;
-		Flags&=~DOOR_LOCKED;
+		Flags &= ~DOOR_LOCKED;
 		if (playsound && !UnLockSound.IsEmpty())
 			core->GetAudioDrv()->Play(UnLockSound, SFXChannel::Actions, toOpen[0], GEM_SND_SPATIAL);
 	}
@@ -171,7 +171,7 @@ void Door::SetDoorLocked(int Locked, int playsound)
 int Door::IsOpen() const
 {
 	int ret = core->HasFeature(GFFlags::REVERSE_DOOR);
-	if (Flags&DOOR_OPEN) {
+	if (Flags & DOOR_OPEN) {
 		ret = !ret;
 	}
 	return ret;
@@ -179,14 +179,14 @@ int Door::IsOpen() const
 
 bool Door::HitTest(const Point& p) const
 {
-	if (Flags&DOOR_HIDDEN) {
+	if (Flags & DOOR_HIDDEN) {
 		return false;
 	}
 
 	auto doorpoly = doorTrigger.StatePolygon();
 	if (doorpoly) {
 		if (!doorpoly->PointIn(p)) return false;
-	} else if (Flags&DOOR_OPEN) {
+	} else if (Flags & DOOR_OPEN) {
 		if (!OpenBBox.PointInside(p)) return false;
 	} else {
 		if (!ClosedBBox.PointInside(p)) return false;
@@ -219,7 +219,7 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 		rgn.origin = Map::ConvertCoordFromTile(p);
 		PathMapFlags tmp = area->tileProps.QuerySearchMap(p) & PathMapFlags::ACTOR;
 		if (tmp != PathMapFlags::IMPASSABLE) {
-			auto actors = area->GetActorsInRect(rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			auto actors = area->GetActorsInRect(rgn, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 			for (Actor* actor : actors) {
 				if (actor->GetBase(IE_DONOTJUMP)) {
 					continue;
@@ -230,7 +230,7 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 		}
 	}
 
-	if ((Flags&DOOR_SLIDE) || ForceOpen) {
+	if ((Flags & DOOR_SLIDE) || ForceOpen) {
 		return false;
 	}
 	return blocked;
@@ -242,7 +242,7 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword openerID, bool addTrigge
 		//the door cannot be blocked when opening,
 		//but the actors will be pushed
 		//BlockedOpen will mark actors to be pushed
-		if (BlockedOpen(Open,0) && !Open) {
+		if (BlockedOpen(Open, 0) && !Open) {
 			//clear up the blocking actors
 			area->JumpActors(false);
 			return;
@@ -262,7 +262,7 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword openerID, bool addTrigge
 		// iwd2 ar6051 pit traps (eg. the lava switch door) also show it's not true there
 		// except perhaps sometimes on closing?
 		if (!core->HasFeature(GFFlags::REVERSE_DOOR) && !core->HasFeature(GFFlags::RULES_3ED)) {
-			SetDoorLocked(false,playsound);
+			SetDoorLocked(false, playsound);
 		}
 	} else if (addTrigger) {
 		if (Trapped) {
@@ -278,12 +278,12 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword openerID, bool addTrigge
 	core->SetEventFlag(EF_TARGETMODE);
 }
 
-bool Door::TryUnlock(Actor *actor) const
+bool Door::TryUnlock(Actor* actor) const
 {
-	if (!(Flags&DOOR_LOCKED)) return true;
+	if (!(Flags & DOOR_LOCKED)) return true;
 
 	// don't remove key in PS:T!
-	bool removekey = !core->HasFeature(GFFlags::REVERSE_DOOR) && Flags&DOOR_KEY;
+	bool removekey = !core->HasFeature(GFFlags::REVERSE_DOOR) && Flags & DOOR_KEY;
 	return Highlightable::TryUnlock(actor, removekey);
 }
 
@@ -291,7 +291,7 @@ void Door::TryDetectSecret(int skill, ieDword actorID)
 {
 	if (Type != ST_DOOR || !(Flags & DOOR_SECRET)) return;
 	if (Visible()) return;
-	if (skill > (signed)DiscoveryDiff) {
+	if (skill > (signed) DiscoveryDiff) {
 		Flags |= DOOR_FOUND;
 		core->PlaySound(DS_FOUNDSECRET, SFXChannel::Hits);
 		if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
@@ -308,17 +308,18 @@ bool Door::Visible() const
 	return (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND)) && !(Flags & DOOR_HIDDEN);
 }
 
-void Door::SetNewOverlay(Holder<TileOverlay> Overlay) {
+void Door::SetNewOverlay(Holder<TileOverlay> Overlay)
+{
 	overlay = std::move(Overlay);
 	ToggleTiles(IsOpen(), false);
 }
 
 void Highlightable::SetTrapDetected(int x)
 {
-	if(x == TrapDetected)
+	if (x == TrapDetected)
 		return;
 	TrapDetected = x;
-	if(TrapDetected) {
+	if (TrapDetected) {
 		core->PlaySound(DS_FOUNDSECRET, SFXChannel::Hits);
 		core->Autopause(AUTOPAUSE::TRAP, this);
 	}
@@ -337,12 +338,12 @@ void Highlightable::TryDisarm(Actor* actor)
 		skill = actor->GetSkill(IE_TRAPS);
 		roll = core->Roll(1, 20, 0);
 		bonus = actor->GetAbilityBonus(IE_INT);
-		trapDC = TrapRemovalDiff/7 + 10; // oddity from the original
+		trapDC = TrapRemovalDiff / 7 + 10; // oddity from the original
 		if (skill == 0) { // a trained skill
 			trapDC = 100;
 		}
 	} else {
-		roll = core->Roll(1, skill/2, 0);
+		roll = core->Roll(1, skill / 2, 0);
 		skill /= 2;
 	}
 
@@ -353,11 +354,11 @@ void Highlightable::TryDisarm(Actor* actor)
 		Trapped = 0;
 		if (core->HasFeature(GFFlags::RULES_3ED)) {
 			// ~Successful Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, GUIColors::LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, GUIColors::LIGHTGREY, actor, roll, skill - bonus, bonus, trapDC);
 		}
 		displaymsg->DisplayMsgAtLocation(HCStrings::DisarmDone, FT_ANY, actor, actor);
 		int xp = gamedata->GetXPBonus(XP_DISARM, actor->GetXPLevel(1));
-		const Game *game = core->GetGame();
+		const Game* game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
 		core->GetGameControl()->ResetTargetMode();
 		core->PlaySound(DS_DISARMED, SFXChannel::Hits);
@@ -365,7 +366,7 @@ void Highlightable::TryDisarm(Actor* actor)
 		AddTrigger(TriggerEntry(trigger_disarmfailed, actor->GetGlobalID()));
 		if (core->HasFeature(GFFlags::RULES_3ED)) {
 			// ~Failed Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, GUIColors::LIGHTGREY, actor, roll, skill-bonus, bonus, trapDC);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, GUIColors::LIGHTGREY, actor, roll, skill - bonus, bonus, trapDC);
 		}
 		displaymsg->DisplayMsgAtLocation(HCStrings::DisarmFail, FT_ANY, actor, actor);
 		TriggerTrap(skill, actor->GetGlobalID());
@@ -380,7 +381,7 @@ void Door::TryPickLock(Actor* actor)
 	SetDoorLocked(false, true);
 }
 
-void Door::TryBashLock(Actor *actor)
+void Door::TryBashLock(Actor* actor)
 {
 	if (!Highlightable::TryBashLock(actor, LockDifficulty, HCStrings::DoorBashFail)) return;
 
@@ -431,7 +432,7 @@ const Point* Door::GetClosestApproach(Scriptable* src, unsigned int& distance) c
 std::string Door::dump() const
 {
 	std::string buffer;
-	AppendFormat(buffer, "Debugdump of Door {}:\n", GetScriptName() );
+	AppendFormat(buffer, "Debugdump of Door {}:\n", GetScriptName());
 	AppendFormat(buffer, "Door Global ID: {}\n", GetGlobalID());
 	AppendFormat(buffer, "Position: {}\n", Pos);
 	AppendFormat(buffer, "Door Open: {}\n", YesNo(IsOpen()));

@@ -28,19 +28,21 @@ namespace GemRB {
 
 class Palette;
 
-template <typename T>
+template<typename T>
 class CircularBuffer {
 private:
 	using CacheIterator = typename std::deque<T>::iterator;
 	std::deque<T> _cache;
 	size_t _maxSize;
+
 public:
 	explicit CircularBuffer(size_t max)
 	{
 		_maxSize = max;
 	};
 
-	void Append(T item, bool unique = true) {
+	void Append(T item, bool unique = true)
+	{
 		if (unique) {
 			CacheIterator it = std::find(_cache.begin(), _cache.end(), item);
 			if (it != _cache.end()) {
@@ -68,12 +70,12 @@ public:
 		static T none;
 		return none;
 	}
-	
+
 	CacheIterator begin()
 	{
 		return _cache.begin();
 	}
-	
+
 	CacheIterator end()
 	{
 		return _cache.end();

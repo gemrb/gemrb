@@ -26,31 +26,32 @@
  */
 
 #include "mve_player.h"
+
+#include "Audio.h"
+#include "Interface.h"
 #include "MVEPlayer.h"
 #include "gstmvedemux.h"
 #include "mve.h"
 
-#include "Audio.h"
-#include "Interface.h"
-
 using namespace std::chrono;
 
 /* mvevideodec8.cpp */
-extern int ipvideo_decode_frame8 (const GstMveDemuxStream * s,
-	const unsigned char *data, unsigned short len);
+extern int ipvideo_decode_frame8(const GstMveDemuxStream* s,
+				 const unsigned char* data, unsigned short len);
 /* mvevideodec16.cpp */
-extern int ipvideo_decode_frame16 (const GstMveDemuxStream * s,
-	const unsigned char *data, unsigned short len);
+extern int ipvideo_decode_frame16(const GstMveDemuxStream* s,
+				  const unsigned char* data, unsigned short len);
 /* mveaudiodec.cpp */
-extern void ipaudio_uncompress (short *buffer,
-	unsigned short buf_len, const unsigned char *data, unsigned char channels);
+extern void ipaudio_uncompress(short* buffer,
+			       unsigned short buf_len, const unsigned char* data, unsigned char channels);
 
 namespace GemRB {
 
 /*
  * constructor: doesn't really do anything
  */
-MVEPlayer::MVEPlayer(class MVEPlay *file) {
+MVEPlayer::MVEPlayer(class MVEPlay* file)
+{
 	buffer = NULL;
 	host = file;
 	done = false;
@@ -69,7 +70,8 @@ MVEPlayer::MVEPlayer(class MVEPlay *file) {
 	truecolour = video_rendered_frame = audio_compressed = false;
 }
 
-MVEPlayer::~MVEPlayer() {
+MVEPlayer::~MVEPlayer()
+{
 	if (buffer) free(buffer);
 	if (audio_buffer) free(audio_buffer);
 
@@ -90,7 +92,8 @@ MVEPlayer::~MVEPlayer() {
  * high-level movie playback
  */
 
-bool MVEPlayer::start_playback() {
+bool MVEPlayer::start_playback()
+{
 	if (!verify_header()) return false;
 
 	/*
@@ -106,7 +109,8 @@ bool MVEPlayer::start_playback() {
 	return true;
 }
 
-bool MVEPlayer::next_frame() {
+bool MVEPlayer::next_frame()
+{
 	if (host->lastTime > seconds(0)) host->timer_wait(host->frame_wait);
 
 	video_rendered_frame = false;
@@ -124,13 +128,14 @@ bool MVEPlayer::next_frame() {
  * parsing/demuxing
  */
 
-bool MVEPlayer::request_data(unsigned int len) {
+bool MVEPlayer::request_data(unsigned int len)
+{
 	if (!buffer) {
-		buffer = (char*)malloc(len);
+		buffer = (char*) malloc(len);
 		buffersize = len;
 	} else {
 		if (len > buffersize) {
-			buffer = (char*)realloc(buffer, len);
+			buffer = (char*) realloc(buffer, len);
 			buffersize = len;
 		}
 	}
@@ -138,7 +143,8 @@ bool MVEPlayer::request_data(unsigned int len) {
 	return true;
 }
 
-bool MVEPlayer::verify_header() {
+bool MVEPlayer::verify_header()
+{
 	if (!request_data(MVE_PREAMBLE_SIZE)) return false;
 	if (memcmp(buffer, MVE_PREAMBLE, MVE_PREAMBLE_SIZE) != 0) {
 		Log(ERROR, "MVEPlayer", "MVE preamble didn't match!");
@@ -147,12 +153,13 @@ bool MVEPlayer::verify_header() {
 	return true;
 }
 
-bool MVEPlayer::process_chunk() {
+bool MVEPlayer::process_chunk()
+{
 	if (!request_data(4)) return false;
 	chunk_offset = 0;
 	chunk_size = GST_READ_UINT16_LE(buffer);
 	unsigned int chunk_type = GST_READ_UINT16_LE(buffer + 2);
-	(void)chunk_type; /* we don't care */
+	(void) chunk_type; /* we don't care */
 
 	while (chunk_offset < chunk_size) {
 		chunk_offset += 4;
@@ -174,7 +181,8 @@ bool MVEPlayer::process_chunk() {
 	return true;
 }
 
-bool MVEPlayer::process_segment(unsigned short len, unsigned char type, unsigned char version) {
+bool MVEPlayer::process_segment(unsigned short len, unsigned char type, unsigned char version)
+{
 	if (!request_data(len)) return false;
 
 	switch (type) {
@@ -218,7 +226,9 @@ bool MVEPlayer::process_segment(unsigned short len, unsigned char type, unsigned
 		case MVE_OC_PLAY_VIDEO:
 			segment_video_play();
 			break;
-		case 0x13: case 0x14: case 0x15:
+		case 0x13:
+		case 0x14:
+		case 0x15:
 			/* ignore these */
 			break;
 		default:
@@ -232,7 +242,8 @@ bool MVEPlayer::process_segment(unsigned short len, unsigned char type, unsigned
  * timer handling
  */
 
-void MVEPlayer::segment_create_timer() {
+void MVEPlayer::segment_create_timer()
+{
 	/* new frame every (timer_rate * timer_subdiv) microseconds */
 	unsigned int timer_rate = GST_READ_UINT32_LE(buffer);
 	unsigned short timer_subdiv = GST_READ_UINT16_LE(buffer + 4);
@@ -244,10 +255,11 @@ void MVEPlayer::segment_create_timer() {
  * video handling
  */
 
-void MVEPlayer::segment_video_init(unsigned char version) {
+void MVEPlayer::segment_video_init(unsigned char version)
+{
 	unsigned short width = GST_READ_UINT16_LE(buffer) << 3;
 	unsigned short height = GST_READ_UINT16_LE(buffer + 2) << 3;
-/* count is unused
+	/* count is unused
 	unsigned short count = 1;
 	if (version > 0) count = GST_READ_UINT16_LE(buffer + 4);
 */
@@ -264,45 +276,49 @@ void MVEPlayer::segment_video_init(unsigned char version) {
 	if (video_back_buf) free(video_back_buf);
 
 	unsigned int size = width * height * (truecolour ? 2 : 1);
-	video_back_buf = (guint16 *)malloc(size * 2);
+	video_back_buf = (guint16*) malloc(size * 2);
 	memset(video_back_buf, 0, size * 2);
 
-	video_data = (GstMveDemuxStream *)malloc(sizeof(GstMveDemuxStream));
+	video_data = (GstMveDemuxStream*) malloc(sizeof(GstMveDemuxStream));
 	video_data->code_map = NULL;
 	video_data->width = width;
 	video_data->height = height;
 	video_data->back_buf1 = video_back_buf;
-	video_data->back_buf2 = video_back_buf + size/2;
+	video_data->back_buf2 = video_back_buf + size / 2;
 	video_data->max_block_offset = (height - 7) * width - 8;
 }
 
-void MVEPlayer::segment_video_mode() {
+void MVEPlayer::segment_video_mode()
+{
 	host->movieSize.w = GST_READ_UINT16_LE(buffer);
 	host->movieSize.h = GST_READ_UINT16_LE(buffer + 2);
 
 	unsigned short flags = GST_READ_UINT16_LE(buffer + 4);
-	(void)flags; /* unknown/unused */
+	(void) flags; /* unknown/unused */
 }
 
-void MVEPlayer::segment_video_palette() {
+void MVEPlayer::segment_video_palette()
+{
 	unsigned short palette_start = GST_READ_UINT16_LE(buffer);
 	unsigned short palette_count = GST_READ_UINT16_LE(buffer + 2);
 
-	char *palette = buffer + 4;
+	char* palette = buffer + 4;
 
-	host->setPalette((unsigned char *)palette - (3 * palette_start), palette_start, palette_count);
+	host->setPalette((unsigned char*) palette - (3 * palette_start), palette_start, palette_count);
 }
 
-void MVEPlayer::segment_video_codemap(unsigned short size) {
+void MVEPlayer::segment_video_codemap(unsigned short size)
+{
 	if (!video_data) return; /* return failure? */
 
 	/* alas, a cornucopia of memory management! */
 	if (video_data->code_map) free(video_data->code_map);
-	video_data->code_map = (guint8*)malloc(size);
+	video_data->code_map = (guint8*) malloc(size);
 	memcpy(video_data->code_map, buffer, size);
 }
 
-void MVEPlayer::segment_video_data(unsigned short size) {
+void MVEPlayer::segment_video_data(unsigned short size)
+{
 	/* check for valid code_map? */
 
 	unsigned short cur_frame = GST_READ_UINT16_LE(buffer);
@@ -311,29 +327,36 @@ void MVEPlayer::segment_video_data(unsigned short size) {
 	unsigned short y_offset = GST_READ_UINT16_LE(buffer + 6);
 	unsigned short x_size = GST_READ_UINT16_LE(buffer + 8);
 	unsigned short y_size = GST_READ_UINT16_LE(buffer + 10);
-	(void)cur_frame; (void)last_frame; (void)x_offset; (void)y_offset;
-	(void)x_size; (void)y_size; /* unused? */
+	(void) cur_frame;
+	(void) last_frame;
+	(void) x_offset;
+	(void) y_offset;
+	(void) x_size;
+	(void) y_size; /* unused? */
 	unsigned short flags = GST_READ_UINT16_LE(buffer + 12);
 
-	const char *data = buffer + 14;
+	const char* data = buffer + 14;
 
 	if (flags & MVE_VIDEO_DELTA_FRAME) {
-		guint16 *temp = video_data->back_buf1;
+		guint16* temp = video_data->back_buf1;
 		video_data->back_buf1 = video_data->back_buf2;
 		video_data->back_buf2 = temp;
 	}
 
 	/* might want to check result code.. */
-	if (truecolour) ipvideo_decode_frame16(video_data, (const unsigned char *)data, size);
-	else ipvideo_decode_frame8(video_data, (const unsigned char *)data, size);
+	if (truecolour)
+		ipvideo_decode_frame16(video_data, (const unsigned char*) data, size);
+	else
+		ipvideo_decode_frame8(video_data, (const unsigned char*) data, size);
 }
 
-void MVEPlayer::segment_video_play() {
+void MVEPlayer::segment_video_play()
+{
 	if (host->video_frameskip) {
 		host->video_frameskip--;
 		host->video_skippedframes++;
 	} else {
-		host->showFrame( (guint8 *) video_data->back_buf1, video_data->width, video_data->height);
+		host->showFrame((guint8*) video_data->back_buf1, video_data->width, video_data->height);
 	}
 
 	video_rendered_frame = true;
@@ -343,7 +366,8 @@ void MVEPlayer::segment_video_play() {
  * audio handling
  */
 
-void MVEPlayer::segment_audio_init(unsigned char version) {
+void MVEPlayer::segment_audio_init(unsigned char version)
+{
 	if (!playsound) return;
 
 	audio_stream = host->setAudioStream();
@@ -369,20 +393,21 @@ void MVEPlayer::segment_audio_init(unsigned char version) {
 	min_buffer_len *= audio_num_channels;
 	if (audio_sample_size == 16) min_buffer_len *= 2;
 	if (audio_buffer) free(audio_buffer);
-	audio_buffer = (short *)malloc(min_buffer_len);
+	audio_buffer = (short*) malloc(min_buffer_len);
 
-/*	Log(DEBUG, "MVEPlayer", "Movie audio: Sample rate {}, {} channels, {} bit, requested buffer size {:#x}, {}",
+	/*	Log(DEBUG, "MVEPlayer", "Movie audio: Sample rate {}, {} channels, {} bit, requested buffer size {:#x}, {}",
 		audio_sample_rate, audio_num_channels, audio_sample_size, min_buffer_len, audio_compressed ? "compressed" : "uncompressed");*/
 }
 
-void MVEPlayer::segment_audio_data(bool silent) {
+void MVEPlayer::segment_audio_data(bool silent)
+{
 	if (!playsound) return;
 
 	unsigned short seq_index = GST_READ_UINT16_LE(buffer);
-	(void)seq_index; /* we don't care */
+	(void) seq_index; /* we don't care */
 	unsigned short stream_mask = GST_READ_UINT16_LE(buffer + 2);
 	unsigned short audio_size = GST_READ_UINT16_LE(buffer + 4);
-	const char *data = buffer + 6;
+	const char* data = buffer + 6;
 
 	if (stream_mask & MVE_DEFAULT_AUDIO_STREAM) {
 		if (silent) {
@@ -390,7 +415,7 @@ void MVEPlayer::segment_audio_data(bool silent) {
 		} else {
 			/* should we check size of audio_buffer? */
 			if (audio_compressed)
-				ipaudio_uncompress(audio_buffer, audio_size, (const unsigned char *)data, audio_num_channels);
+				ipaudio_uncompress(audio_buffer, audio_size, (const unsigned char*) data, audio_num_channels);
 			else
 				memcpy(audio_buffer, data, audio_size);
 		}

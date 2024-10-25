@@ -40,13 +40,13 @@ bool EFFImporter::Open(DataStream* stream, bool autoFree)
 	str = stream;
 	this->autoFree = autoFree;
 	char Signature[8];
-	str->Read( Signature, 8 );
-	if (strncmp( Signature, "EFF V2.0", 8 ) == 0) {
+	str->Read(Signature, 8);
+	if (strncmp(Signature, "EFF V2.0", 8) == 0) {
 		version = 20;
 	} else {
 		version = 1;
 	}
-	str->Seek( -8, GEM_CURRENT_POS );
+	str->Seek(-8, GEM_CURRENT_POS);
 	return true;
 }
 
@@ -55,7 +55,8 @@ bool EFFImporter::Open(DataStream* stream, bool autoFree)
 //if level>than maximum affected or level<than minimum affected, then the
 //effect is resisted
 // copy the info into the EFFV2 fields (separate), so it is clearer
-static inline void fixAffectedLevels(Effect *fx) {
+static inline void fixAffectedLevels(Effect* fx)
+{
 	if (fx->DiceSides > 0 || fx->DiceThrown > 0) {
 		//cloudkill needs these in this order
 		fx->MinAffectedLevel = fx->DiceSides;
@@ -67,10 +68,9 @@ Effect* EFFImporter::GetEffect()
 {
 	if (version == 1) {
 		return GetEffectV1();
-	}
-	else {
+	} else {
 		// Skip over Signature1
-		str->Seek( 8, GEM_CURRENT_POS );
+		str->Seek(8, GEM_CURRENT_POS);
 		return GetEffectV20();
 	}
 }
@@ -84,29 +84,29 @@ Effect* EFFImporter::GetEffectV1()
 
 	str->ReadWord(tmpWord);
 	fx->Opcode = tmpWord;
-	str->Read( &tmpByte, 1 );
+	str->Read(&tmpByte, 1);
 	fx->Target = tmpByte;
-	str->Read( &tmpByte, 1 );
+	str->Read(&tmpByte, 1);
 	fx->Power = tmpByte;
 	str->ReadDword(fx->Parameter1);
 	str->ReadDword(fx->Parameter2);
-	str->Read( &tmpByte, 1 );
+	str->Read(&tmpByte, 1);
 	fx->TimingMode = tmpByte;
-	str->Read( &tmpByte, 1 );
+	str->Read(&tmpByte, 1);
 	fx->Resistance = tmpByte;
 	str->ReadDword(fx->Duration);
-	str->Read( &tmpByte, 1 );
+	str->Read(&tmpByte, 1);
 	fx->ProbabilityRangeMax = tmpByte;
-	str->Read( &tmpByte, 1 );
+	str->Read(&tmpByte, 1);
 	fx->ProbabilityRangeMin = tmpByte;
-	str->ReadResRef( fx->Resource );
+	str->ReadResRef(fx->Resource);
 	str->ReadDword(fx->DiceThrown);
 	str->ReadDword(fx->DiceSides);
 	str->ReadDword(fx->SavingThrowType);
 	str->ReadDword(fx->SavingThrowBonus);
 	str->ReadWord(fx->IsVariable);
 	str->ReadWord(fx->IsSaveForHalfDamage);
-	fixAffectedLevels( fx );
+	fixAffectedLevels(fx);
 
 	fx->Pos.Invalidate();
 	fx->Source.Invalidate();
@@ -129,7 +129,7 @@ Effect* EFFImporter::GetEffectV20()
 	str->ReadDword(fx->Duration);
 	str->ReadWord(fx->ProbabilityRangeMax);
 	str->ReadWord(fx->ProbabilityRangeMin);
-	str->ReadResRef( fx->Resource );
+	str->ReadResRef(fx->Resource);
 	str->ReadDword(fx->DiceThrown);
 	str->ReadDword(fx->DiceSides);
 	str->ReadDword(fx->SavingThrowType);
@@ -145,8 +145,8 @@ Effect* EFFImporter::GetEffectV20()
 	str->ReadDword(fx->Parameter4);
 	str->ReadDword(fx->Parameter5);
 	str->ReadDword(fx->Parameter6);
-	str->ReadResRef( fx->Resource2 );
-	str->ReadResRef( fx->Resource3 );
+	str->ReadResRef(fx->Resource2);
+	str->ReadResRef(fx->Resource3);
 	str->ReadDword(tmp);
 	fx->Source.x = tmp;
 	str->ReadDword(tmp);
@@ -160,13 +160,13 @@ Effect* EFFImporter::GetEffectV20()
 	str->ReadDword(fx->SourceFlags);
 	str->ReadDword(fx->Projectile);
 	str->ReadDword(tmp);
-	fx->InventorySlot=(ieDwordSigned) (tmp);
+	fx->InventorySlot = (ieDwordSigned) (tmp);
 	//Variable simply overwrites the resource fields (Keep them grouped)
 	//They have to be continuous
 	if (fx->IsVariable) {
 		str->ReadVariable(fx->VariableName);
 	} else {
-		str->Seek( 32, GEM_CURRENT_POS);
+		str->Seek(32, GEM_CURRENT_POS);
 	}
 	str->ReadDword(fx->CasterLevel);
 	str->Seek(4, GEM_CURRENT_POS); // FirstApply
@@ -176,8 +176,9 @@ Effect* EFFImporter::GetEffectV20()
 	return fx;
 }
 
-void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
-	ieDword tmpDword1,tmpDword2;
+void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
+{
+	ieDword tmpDword1, tmpDword2;
 
 	stream->WriteFilling(8); //signature
 	stream->WriteDword(fx->Opcode);

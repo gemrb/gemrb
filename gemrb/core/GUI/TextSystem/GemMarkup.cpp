@@ -32,22 +32,60 @@ static Color ParseColor(const String& colorString)
 	for (size_t i = 0; i < size; ++i) {
 		uint32_t nibble = 0;
 		switch (colorString[i]) {
-			case u'0': nibble = 0x0; break;
-			case u'1': nibble = 0x1; break;
-			case u'2': nibble = 0x2; break;
-			case u'3': nibble = 0x3; break;
-			case u'4': nibble = 0x4; break;
-			case u'5': nibble = 0x5; break;
-			case u'6': nibble = 0x6; break;
-			case u'7': nibble = 0x7; break;
-			case u'8': nibble = 0x8; break;
-			case u'9': nibble = 0x9; break;
-			case u'a': case u'A': nibble = 0xA; break;
-			case u'b': case u'B': nibble = 0xB; break;
-			case u'c': case u'C': nibble = 0xC; break;
-			case u'd': case u'D': nibble = 0xD; break;
-			case u'e': case u'E': nibble = 0xE; break;
-			case u'f': case u'F': nibble = 0xF; break;
+			case u'0':
+				nibble = 0x0;
+				break;
+			case u'1':
+				nibble = 0x1;
+				break;
+			case u'2':
+				nibble = 0x2;
+				break;
+			case u'3':
+				nibble = 0x3;
+				break;
+			case u'4':
+				nibble = 0x4;
+				break;
+			case u'5':
+				nibble = 0x5;
+				break;
+			case u'6':
+				nibble = 0x6;
+				break;
+			case u'7':
+				nibble = 0x7;
+				break;
+			case u'8':
+				nibble = 0x8;
+				break;
+			case u'9':
+				nibble = 0x9;
+				break;
+			case u'a':
+			case u'A':
+				nibble = 0xA;
+				break;
+			case u'b':
+			case u'B':
+				nibble = 0xB;
+				break;
+			case u'c':
+			case u'C':
+				nibble = 0xC;
+				break;
+			case u'd':
+			case u'D':
+				nibble = 0xD;
+				break;
+			case u'e':
+			case u'E':
+				nibble = 0xE;
+				break;
+			case u'f':
+			case u'F':
+				nibble = 0xF;
+				break;
 		}
 		color |= nibble << (28 - (i * 4));
 	}
@@ -65,7 +103,7 @@ GemMarkupParser::GemMarkupParser()
 }
 
 GemMarkupParser::GemMarkupParser(const Holder<Font> ftext, Font::PrintColors textCols,
-								 const Holder<Font> finit, Font::PrintColors initCols)
+				 const Holder<Font> finit, Font::PrintColors initCols)
 {
 	state = TEXT;
 	ResetAttributes(ftext, textCols, finit, initCols);
@@ -73,7 +111,7 @@ GemMarkupParser::GemMarkupParser(const Holder<Font> ftext, Font::PrintColors tex
 
 void GemMarkupParser::ResetAttributes(const Holder<Font> ftext, Font::PrintColors textCols, const Holder<Font> finit, Font::PrintColors initCols)
 {
-	while(!context.empty()) context.pop();
+	while (!context.empty()) context.pop();
 	textBg = textCols.bg;
 	context.emplace(ftext, textCols, finit, initCols);
 }
@@ -87,7 +125,7 @@ void GemMarkupParser::Reset()
 }
 
 GemMarkupParser::ParseState
-GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContainer& container)
+	GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContainer& container)
 {
 	size_t tagPos = text.find_first_of('[');
 	if (tagPos != 0) {
@@ -171,7 +209,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 							--it;
 							state = OPEN_TAG;
 						}
-						
+
 						token = saved + token;
 						saved.clear();
 						if (token.length() && token != u"\n") {
@@ -187,7 +225,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 				switch (*it) {
 					case u']':
 						context.emplace(attributes);
-						context.top().SetTextColor({ParseColor(token), textBg});
+						context.top().SetTextColor({ ParseColor(token), textBg });
 						state = TEXT;
 						token.clear();
 						continue;
@@ -198,10 +236,9 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 					std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> conv;
 					std::wstring wToken = conv.from_bytes(
 						reinterpret_cast<const char*>(&token[0]),
-						reinterpret_cast<const char*>(&token[0] + token.size())
-					);
+						reinterpret_cast<const char*>(&token[0] + token.size()));
 					// state icons, invalid as unicode, so we cant translate in Python
-					wchar_t chr = (wchar_t)wcstoul(wToken.c_str(), nullptr, 0);
+					wchar_t chr = (wchar_t) wcstoul(wToken.c_str(), nullptr, 0);
 					token.clear();
 					token.push_back(chr);
 					state = TEXT;

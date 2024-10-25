@@ -20,6 +20,7 @@
 #define GEMMARKUP_H
 
 #include "TextContainer.h"
+
 #include "Strings/String.h"
 
 #include <map>
@@ -39,11 +40,11 @@ public:
 
 	GemMarkupParser();
 	GemMarkupParser(const Holder<Font> ftext, Font::PrintColors textCols,
-					const Holder<Font> finit, Font::PrintColors initCols);
+			const Holder<Font> finit, Font::PrintColors initCols);
 	~GemMarkupParser() noexcept = default;
 
 	void ResetAttributes(const Holder<Font> ftext, Font::PrintColors textCols,
-						 const Holder<Font> finit, Font::PrintColors initCols);
+			     const Holder<Font> finit, Font::PrintColors initCols);
 
 	void Reset();
 
@@ -52,18 +53,18 @@ public:
 
 private:
 	class TextAttributes {
-		private:
+	private:
 		Font::PrintColors textColor;
 		Font::PrintColors swapColor;
 
-		public:
+	public:
 		Holder<Font> TextFont;
 		Holder<Font> SwapFont;
 
-		public:
+	public:
 		TextAttributes(const Holder<Font> text, Font::PrintColors textColor,
-					   const Holder<Font> init, Font::PrintColors initColor)
-		: textColor(textColor), swapColor(initColor), TextFont(text), SwapFont(init)
+			       const Holder<Font> init, Font::PrintColors initColor)
+			: textColor(textColor), swapColor(initColor), TextFont(text), SwapFont(init)
 		{
 			assert(TextFont && SwapFont);
 		}
@@ -71,16 +72,19 @@ private:
 		TextAttributes(const TextAttributes& ta) = default;
 		TextAttributes& operator=(const TextAttributes& ta) = default;
 
-		void SwapFonts() {
+		void SwapFonts()
+		{
 			std::swap(TextFont, SwapFont);
 			std::swap(textColor, swapColor);
 		}
 
-		void SetTextColor(const Font::PrintColors& c) {
+		void SetTextColor(const Font::PrintColors& c)
+		{
 			textColor = c;
 		}
 
-		const Font::PrintColors& TextColor() const {
+		const Font::PrintColors& TextColor() const
+		{
 			return textColor;
 		}
 	};

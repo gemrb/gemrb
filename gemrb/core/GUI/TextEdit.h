@@ -76,8 +76,8 @@ public:
 
 	enum TextEditFlags {
 		// !!! Keep these synchronized with GUIDefines.py !!!
-		Alpha = 1,		// TextEdit accepts alpha input
-		Numeric = 2 	// TextEdit accepts numeric input
+		Alpha = 1, // TextEdit accepts alpha input
+		Numeric = 2 // TextEdit accepts numeric input
 	};
 
 	TextEdit(const Region& frame, unsigned short maxLength, Point p);

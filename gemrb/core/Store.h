@@ -31,6 +31,7 @@
 #include "exports.h"
 #include "globals.h"
 #include "ie_types.h"
+
 #include "Resource.h"
 
 #include <vector>
@@ -41,29 +42,44 @@ namespace GemRB {
 class CREItem;
 class Condition;
 
-enum class StoreType : uint8_t { Store = 0, Tavern = 1, Inn = 2, Temple = 3, BG2Cont = 4, IWD2Cont = 5, Bag = 6, count };
+enum class StoreType : uint8_t { Store = 0,
+				 Tavern = 1,
+				 Inn = 2,
+				 Temple = 3,
+				 BG2Cont = 4,
+				 IWD2Cont = 5,
+				 Bag = 6,
+				 count };
 
-enum class StoreActionType : uint8_t { Optional = 0x80, None = 0x7f,
-	BuySell = 0, Identify = 1, Steal = 2, Cure = 3, Donate = 4, Drink = 5, RoomRent = 6, count };
+enum class StoreActionType : uint8_t { Optional = 0x80,
+				       None = 0x7f,
+				       BuySell = 0,
+				       Identify = 1,
+				       Steal = 2,
+				       Cure = 3,
+				       Donate = 4,
+				       Drink = 5,
+				       RoomRent = 6,
+				       count };
 
-FLAG_ENUM StoreActionFlags : uint32_t  {
-	None     = 0,
-	Buy      = 1,
-	Sell     = 2,
-	ID       = 4,
-	Steal    = 8,
-	Donate   = 16,     //gemrb extension
-	Cure     = 32,
-	Drink    = 64,
-	Rent     = 128,    //gemrb extension
+FLAG_ENUM StoreActionFlags : uint32_t {
+	None = 0,
+	Buy = 1,
+	Sell = 2,
+	ID = 4,
+	Steal = 8,
+	Donate = 16, //gemrb extension
+	Cure = 32,
+	Drink = 64,
+	Rent = 128, //gemrb extension
 	//QUALITY  = 0x400 | 0x200,  //2 bits
-// unknown 0x800
-	Fence    = 0x1000, //
+	// unknown 0x800
+	Fence = 0x1000, //
 	NoRepAdj = 0x2000, // Reputation doesn't affect prices (BGEE)
 	ReCharge = 0x4000, //gemrb extension, if set, store won't recharge
 	BuyCrits = 0x8000, // User allowed to sell critical items (BGEE)
 	Capacity = 0x10000, //used for error reporting purposes
-	Select   = 0x20000
+	Select = 0x20000
 };
 
 /**
@@ -81,16 +97,16 @@ struct GEM_EXPORT STOItem {
 	ieDword AmountInStock = 0;
 	ieDwordSigned InfiniteSupply = 0;
 	// V1.1
-	Condition *triggers = nullptr;
+	Condition* triggers = nullptr;
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
 
 	STOItem() noexcept = default;
-	explicit STOItem(const CREItem *item);
+	explicit STOItem(const CREItem* item);
 	STOItem(const STOItem&) = delete;
 	~STOItem();
 	STOItem& operator=(const STOItem&) = delete;
-	void CopyCREItem(const CREItem *item);
+	void CopyCREItem(const CREItem* item);
 };
 
 
@@ -170,29 +186,30 @@ public:
 
 public: //queries
 	StoreActionFlags AcceptableItemType(ieDword type, ieDword invflags, bool pc) const;
-	STOCure *GetCure(unsigned int idx) const;
-	STODrink *GetDrink(unsigned int idx) const;
-	STOItem *GetItem(unsigned int idx, bool usetrigger) const;
+	STOCure* GetCure(unsigned int idx) const;
+	STODrink* GetDrink(unsigned int idx) const;
+	STOItem* GetItem(unsigned int idx, bool usetrigger) const;
 	/** Evaluates item availability triggers */
 	int GetRealStockSize() const;
 	/** Recharges item */
-	void RechargeItem(CREItem *item) const;
+	void RechargeItem(CREItem* item) const;
 	/** Identifies item according to store lore */
-	void IdentifyItem(CREItem *item) const;
+	void IdentifyItem(CREItem* item) const;
 	/** Adds a new item to the store (selling) */
 	void AddItem(CREItem* item);
-	void RemoveItem(const STOItem *itm);
+	void RemoveItem(const STOItem* itm);
 	void RemoveItemByName(const ResRef& itemName, ieDword count = 0);
 	/** Returns index of item */
-	unsigned int FindItem(const ResRef &item, bool usetrigger) const;
+	unsigned int FindItem(const ResRef& item, bool usetrigger) const;
 	unsigned int CountItems(const ResRef& itemRef) const;
-	const char *GetOwner() const;
+	const char* GetOwner() const;
 	ieDword GetOwnerID() const;
 	void SetOwnerID(ieDword owner);
 	bool IsBag() const;
+
 private:
 	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
-	STOItem *FindItem(const CREItem *item, bool exact) const;
+	STOItem* FindItem(const CREItem* item, bool exact) const;
 	bool IsItemAvailable(const STOItem* item) const;
 };
 

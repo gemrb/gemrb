@@ -20,13 +20,14 @@
 #define OGGREADER_H
 
 #include "SoundMgr.h"
+
 #include "Streams/DataStream.h"
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #if defined __APPLE_CC__ || defined __MINGW64__
-#define OV_EXCLUDE_STATIC_CALLBACKS
+	#define OV_EXCLUDE_STATIC_CALLBACKS
 #endif
 #include <vorbis/vorbisfile.h>
 
@@ -36,10 +37,11 @@ class OGGReader : public SoundMgr {
 private:
 	OggVorbis_File OggStream;
 	int samples_left = 0; // count of unread samples
+
 public:
 	OGGReader()
 	{
-		memset(&OggStream, 0, sizeof(OggStream) );
+		memset(&OggStream, 0, sizeof(OggStream));
 	}
 	OGGReader(const OGGReader&) = delete;
 	OGGReader& operator=(const OGGReader&) = delete;
@@ -53,7 +55,7 @@ public:
 	}
 	bool Import(DataStream* stream) override;
 	int read_samples(short* buffer, int count) override;
-	int ReadSamplesIntoChannels(char *channel1, char *channel2, int numSamples) override;
+	int ReadSamplesIntoChannels(char* channel1, char* channel2, int numSamples) override;
 };
 
 }

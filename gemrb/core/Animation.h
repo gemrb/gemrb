@@ -25,30 +25,30 @@
 #include "exports.h"
 #include "globals.h"
 
-#include "Region.h"
 #include "Holder.h"
+#include "Region.h"
 #include "Sprite2D.h"
 
 #include <vector>
 
 namespace GemRB {
 
-#define ANI_DEFAULT_FRAMERATE	15.0f
+#define ANI_DEFAULT_FRAMERATE 15.0f
 
 class GEM_EXPORT Animation {
 public:
 	using index_t = uint16_t;
 	using frame_t = Holder<Sprite2D>;
-	
+
 	enum class Flags : uint8_t {
-		None 		= 0,
-		Active 		= 1,
-		BlendBlack 	= 2,
-		Unused		= 4, // keep compatible with AreaAnimation::Flags
-		Once		= 8,
-		Sync		= 16,
-		RandStart	= 32,
-		AnimMask	= 0xc4, // ignore unused bits
+		None = 0,
+		Active = 1,
+		BlendBlack = 2,
+		Unused = 4, // keep compatible with AreaAnimation::Flags
+		Once = 8,
+		Sync = 16,
+		RandStart = 32,
+		AnimMask = 0xc4, // ignore unused bits
 	};
 
 	bool endReached = false;
@@ -62,8 +62,9 @@ public:
 
 	explicit Animation(std::vector<frame_t>) noexcept;
 	Animation() noexcept = default;
-	
-	explicit operator bool() const {
+
+	explicit operator bool() const
+	{
 		return GetFrameCount();
 	}
 
@@ -83,6 +84,7 @@ public:
 	index_t GetCurrentFrameIndex() const;
 	/** add other animation's animarea to self */
 	void AddAnimArea(const Animation* slave);
+
 private:
 	std::vector<frame_t> frames;
 	tick_t starttime = 0;

@@ -23,21 +23,21 @@
 
 namespace GemRB {
 
-class GEM_EXPORT Bitmap final
-{
+class GEM_EXPORT Bitmap final {
 	uint8_t* data = nullptr;
 	Size size;
 	int bytes;
-	
+
 	struct BitProxy {
 		uint8_t& byte;
 		uint8_t bit;
-		
+
 		BitProxy(uint8_t& byte, uint8_t bit) noexcept
-		: byte(byte), bit(bit)
+			: byte(byte), bit(bit)
 		{}
-		
-		void operator=(bool set) noexcept {
+
+		void operator=(bool set) noexcept
+		{
 			if (set) {
 				byte |= (1 << bit);
 			} else {
@@ -45,34 +45,37 @@ class GEM_EXPORT Bitmap final
 			}
 		}
 	};
-	
+
 public:
 	explicit Bitmap(const Size& size) noexcept
-	: size(size)
+		: size(size)
 	{
 		bytes = CeilDiv<int>(size.w * size.h, 8);
 		data = new uint8_t[bytes];
 	}
-	
+
 	Bitmap(const Size& s, uint8_t pattern) noexcept
-	: Bitmap(s)
+		: Bitmap(s)
 	{
 		fill(pattern);
 	}
-	
+
 	explicit Bitmap(const Size& size, const uint8_t* in) noexcept
-	: Bitmap(size) {
+		: Bitmap(size)
+	{
 		std::copy(in, in + bytes, data);
 	}
 
-	~Bitmap() noexcept {
-		delete [] data;
+	~Bitmap() noexcept
+	{
+		delete[] data;
 	}
-	
+
 	Bitmap(const Bitmap& bm) noexcept
-	: Bitmap(bm.size, bm.data) {}
-	
-	Bitmap& operator=(const Bitmap& bm) noexcept {
+		: Bitmap(bm.size, bm.data) {}
+
+	Bitmap& operator=(const Bitmap& bm) noexcept
+	{
 		if (&bm != this) {
 			size = bm.size;
 			bytes = bm.bytes;
@@ -80,14 +83,16 @@ public:
 		}
 		return *this;
 	}
-	
-	Bitmap(Bitmap&& other) noexcept {
+
+	Bitmap(Bitmap&& other) noexcept
+	{
 		std::swap(data, other.data);
 		size = other.size;
 		bytes = other.bytes;
 	}
 
-	Bitmap& operator=(Bitmap&& other) noexcept {
+	Bitmap& operator=(Bitmap&& other) noexcept
+	{
 		if (&other != this) {
 			std::swap(data, other.data);
 			size = other.size;
@@ -95,57 +100,69 @@ public:
 		}
 		return *this;
 	}
-	
-	BitProxy operator[](int i) noexcept {
+
+	BitProxy operator[](int i) noexcept
+	{
 		div_t res = std::div(i, 8);
 		return BitProxy(data[res.quot], res.rem);
 	}
-	
-	bool operator[](int i) const noexcept {
+
+	bool operator[](int i) const noexcept
+	{
 		div_t res = std::div(i, 8);
 		return data[res.quot] & (1 << res.rem);
 	}
-	
-	BitProxy operator[](const Point& p) noexcept {
+
+	BitProxy operator[](const Point& p) noexcept
+	{
 		return operator[](p.y * size.w + p.x);
 	}
-	
-	bool operator[](const Point& p) const noexcept {
+
+	bool operator[](const Point& p) const noexcept
+	{
 		return operator[](p.y * size.w + p.x);
 	}
-	
-	bool GetAt(const Point& p, bool oobval) const noexcept {
+
+	bool GetAt(const Point& p, bool oobval) const noexcept
+	{
 		if (!size.PointInside(p)) {
 			return oobval;
 		}
 		return operator[](p.y * size.w + p.x);
 	}
-	
-	uint8_t* begin() noexcept {
+
+	uint8_t* begin() noexcept
+	{
 		return data;
 	}
-	
-	uint8_t* end() noexcept {
-		return data + bytes;
-	}
-	
-	const uint8_t* begin() const noexcept {
-		return data;
-	}
-	
-	const uint8_t* end() const noexcept {
+
+	uint8_t* end() noexcept
+	{
 		return data + bytes;
 	}
 
-	Size GetSize() const noexcept {
+	const uint8_t* begin() const noexcept
+	{
+		return data;
+	}
+
+	const uint8_t* end() const noexcept
+	{
+		return data + bytes;
+	}
+
+	Size GetSize() const noexcept
+	{
 		return size;
 	}
-	
-	int Bytes() const noexcept {
+
+	int Bytes() const noexcept
+	{
 		return bytes;
 	}
-	
-	void fill(uint8_t pattern) noexcept {
+
+	void fill(uint8_t pattern) noexcept
+	{
 		std::fill(begin(), end(), pattern);
 	}
 };

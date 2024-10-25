@@ -23,8 +23,9 @@
 #include "globals.h"
 
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "ResourceDesc.h"
+
+#include "Logging/Logging.h"
 #include "Streams/FileStream.h"
 
 using namespace GemRB;
@@ -40,7 +41,7 @@ static path_t AddCBF(path_t file)
 	return file;
 }
 
-static bool PathExists(BIFEntry *entry, const path_t& path)
+static bool PathExists(BIFEntry* entry, const path_t& path)
 {
 	entry->path = PathJoin(path, entry->name);
 	if (FileExists(entry->path)) {
@@ -54,7 +55,7 @@ static bool PathExists(BIFEntry *entry, const path_t& path)
 	return false;
 }
 
-static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist)
+static bool PathExists(BIFEntry* entry, const std::vector<std::string>& pathlist)
 {
 	for (const auto& path : pathlist) {
 		if (PathExists(entry, path)) {
@@ -65,7 +66,7 @@ static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist
 	return false;
 }
 
-static void FindBIF(BIFEntry *entry)
+static void FindBIF(BIFEntry* entry)
 {
 	entry->cd = 0;
 	entry->found = PathExists(entry, core->config.GamePath);
@@ -93,7 +94,7 @@ static void FindBIF(BIFEntry *entry)
 bool KEYImporter::Open(const path_t& resfile, std::string desc)
 {
 	description = std::move(desc);
-	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
+	if (!core->IsAvailable(IE_BIF_CLASS_ID)) {
 		Log(ERROR, "KEYImporter", "An Archive Plug-in is not Available");
 		return false;
 	}
@@ -114,8 +115,8 @@ bool KEYImporter::Open(const path_t& resfile, std::string desc)
 	}
 	Log(MESSAGE, "KEYImporter", "Checking file type...");
 	char Signature[8];
-	f->Read( Signature, 8 );
-	if (strncmp( Signature, "KEY V1  ", 8 ) != 0) {
+	f->Read(Signature, 8);
+	if (strncmp(Signature, "KEY V1  ", 8) != 0) {
 		Log(ERROR, "KEYImporter", "File has an Invalid Signature.");
 		delete f;
 		return false;
@@ -127,22 +128,22 @@ bool KEYImporter::Open(const path_t& resfile, std::string desc)
 	f->ReadDword(BifOffset);
 	f->ReadDword(ResOffset);
 	Log(MESSAGE, "KEYImporter", "BIF Files Count: {} (Starting at {} Bytes)",
-			BifCount, BifOffset );
+	    BifCount, BifOffset);
 	Log(MESSAGE, "KEYImporter", "RES Count: {} (Starting at {} Bytes)",
-		ResCount, ResOffset);
-	f->Seek( BifOffset, GEM_STREAM_START );
+	    ResCount, ResOffset);
+	f->Seek(BifOffset, GEM_STREAM_START);
 
 	ieDword BifLen, ASCIIZOffset;
 	ieWord ASCIIZLen;
 	for (unsigned int i = 0; i < BifCount; i++) {
 		BIFEntry be;
-		f->Seek( BifOffset + ( 12 * i ), GEM_STREAM_START );
+		f->Seek(BifOffset + (12 * i), GEM_STREAM_START);
 		f->ReadDword(BifLen);
 		f->ReadDword(ASCIIZOffset);
 		f->ReadWord(ASCIIZLen);
 		f->ReadWord(be.BIFLocator);
 		be.name.resize(ASCIIZLen);
-		f->Seek( ASCIIZOffset, GEM_STREAM_START );
+		f->Seek(ASCIIZOffset, GEM_STREAM_START);
 		f->Read(&be.name[0], ASCIIZLen);
 
 		// IWD ToTL: \\data\\zcHMar.bif
@@ -157,9 +158,9 @@ bool KEYImporter::Open(const path_t& resfile, std::string desc)
 				be.name[p] = PathDelimiter;
 		}
 		FindBIF(&be);
-		biffiles.push_back( be );
+		biffiles.push_back(be);
 	}
-	f->Seek( ResOffset, GEM_STREAM_START );
+	f->Seek(ResOffset, GEM_STREAM_START);
 
 	MapKey key;
 	ieDword ResLocator;
@@ -183,10 +184,10 @@ bool KEYImporter::Open(const path_t& resfile, std::string desc)
 
 bool KEYImporter::HasResource(StringView resname, SClass_ID type)
 {
-	return resources.find({ResRef(resname), type}) != resources.cend();
+	return resources.find({ ResRef(resname), type }) != resources.cend();
 }
 
-bool KEYImporter::HasResource(StringView resname, const ResourceDesc &type)
+bool KEYImporter::HasResource(StringView resname, const ResourceDesc& type)
 {
 	return HasResource(resname, type.GetKeyType());
 }
@@ -196,12 +197,12 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 	if (type == 0)
 		return NULL;
 
-	const auto lookup = resources.find({resname, type});
+	const auto lookup = resources.find({ resname, type });
 	if (lookup == resources.cend())
 		return 0;
 
 	auto ResLocator = lookup->second;
-	unsigned int bifnum = ( ResLocator & 0xFFF00000 ) >> 20;
+	unsigned int bifnum = (ResLocator & 0xFFF00000) >> 20;
 
 	// supports BIFF-less, KEY'd games (demo)
 	if (bifnum >= biffiles.size()) {
@@ -210,7 +211,7 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 
 	if (!biffiles[bifnum].found) {
 		Log(ERROR, "KEYImporter", "Cannot find {}... Resource unavailable.",
-				biffiles[bifnum].name);
+		    biffiles[bifnum].name);
 		return NULL;
 	}
 
@@ -220,7 +221,7 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 		return NULL;
 	}
 
-	DataStream* ret = ai->GetStream( ResLocator, type );
+	DataStream* ret = ai->GetStream(ResLocator, type);
 	if (ret) {
 		ret->filename.Format("{}.{}", resname, TypeExt(type));
 		StringToLower(ret->filename);
@@ -233,10 +234,10 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 DataStream* KEYImporter::GetResource(StringView resname, SClass_ID type)
 {
 	//the word masking is a hack for synonyms, currently used for bcs==bs
-	return GetStream(ResRef(resname), type&0xFFFF);
+	return GetStream(ResRef(resname), type & 0xFFFF);
 }
 
-DataStream* KEYImporter::GetResource(StringView resname, const ResourceDesc &type)
+DataStream* KEYImporter::GetResource(StringView resname, const ResourceDesc& type)
 {
 	return GetStream(ResRef(resname), type.GetKeyType());
 }

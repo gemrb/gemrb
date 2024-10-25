@@ -21,28 +21,28 @@
 #ifndef __GemRB__InterfaceConfig__
 #define __GemRB__InterfaceConfig__
 
+#include "exports.h"
+
+#include "Strings/StringMap.h"
+#include "System/VFS.h"
+
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-#include "exports.h"
-#include "Strings/StringMap.h"
-#include "System/VFS.h"
-
 // This is changed by both cmake and AppVeyor (CmakeLists.txt and .appveyor.yml)
 #define VERSION_GEMRB "0.9.3-git"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
-#define PACKAGE "GemRB"
+#define PACKAGE      "GemRB"
 
 //the maximum supported game CD count
 #define MAX_CD 6
 
 namespace GemRB {
 
-class CoreInitializationException : public std::runtime_error
-{
+class CoreInitializationException : public std::runtime_error {
 public:
 	using std::runtime_error::runtime_error;
 };
@@ -112,7 +112,7 @@ struct CoreSettings {
 	std::string AudioDriverName = "openal";
 	std::string SkipPlugin;
 	std::string DelayPlugin;
-	
+
 	int DoubleClickDelay = 250;
 	uint32_t DebugFlags = 0;
 	uint32_t ActionRepeatDelay = 250;
@@ -125,7 +125,7 @@ struct CoreSettings {
 
 using InterfaceConfig = StringMap<std::string>;
 
-GEM_EXPORT CoreSettings LoadFromArgs(int argc, char *argv[]);
+GEM_EXPORT CoreSettings LoadFromArgs(int argc, char* argv[]);
 GEM_EXPORT CoreSettings LoadFromDictionary(InterfaceConfig);
 GEM_EXPORT InterfaceConfig LoadFromCFG(const path_t& file);
 GEM_EXPORT void SanityCheck(const char* ver = VERSION_GEMRB);

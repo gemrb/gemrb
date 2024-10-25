@@ -52,7 +52,7 @@ bool ScriptEngine::UnregisterScriptingRef(const ScriptingRefBase* ref)
 
 ScriptEngine::Parameter ScriptEngine::RunFunction(const char* Modulename, const char* FunctionName, bool report_error)
 {
-	return RunFunction(Modulename, FunctionName, FunctionParameters{}, report_error);
+	return RunFunction(Modulename, FunctionName, FunctionParameters {}, report_error);
 }
 
 }

@@ -45,6 +45,7 @@ public:
 	int CreateSaveGame(Holder<SaveGame>, StringView slotname, bool force = false) const;
 	int CreateSaveGame(int index, bool mqs = false) const;
 	Holder<SaveGame> GetSaveGame(const String& slotname);
+
 private:
 	bool RescanSaveGames();
 	static Holder<SaveGame> BuildSaveGame(std::string slotname);

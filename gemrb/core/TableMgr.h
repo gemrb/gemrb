@@ -28,12 +28,13 @@
 #ifndef TABLEMGR_H
 #define TABLEMGR_H
 
-#include <memory>
-
 #include "globals.h"
 
-#include "Strings/StringView.h"
 #include "Plugin.h"
+
+#include "Strings/StringView.h"
+
+#include <memory>
 
 namespace GemRB {
 
@@ -67,19 +68,22 @@ public:
 	{
 		return QueryField(GetRowIndex(row), GetColumnIndex(column));
 	}
-	
-	template <typename RET_T, typename ROW_T, typename COL_T>
-	RET_T QueryFieldUnsigned(const ROW_T& row, const COL_T& column) const {
+
+	template<typename RET_T, typename ROW_T, typename COL_T>
+	RET_T QueryFieldUnsigned(const ROW_T& row, const COL_T& column) const
+	{
 		return strtounsigned<RET_T>(QueryField(row, column).c_str());
 	}
-	
-	template <typename RET_T, typename ROW_T, typename COL_T>
-	RET_T QueryFieldSigned(const ROW_T& row, const COL_T& column) const {
+
+	template<typename RET_T, typename ROW_T, typename COL_T>
+	RET_T QueryFieldSigned(const ROW_T& row, const COL_T& column) const
+	{
 		return strtosigned<RET_T>(QueryField(row, column).c_str());
 	}
-	
-	template <typename ROW_T, typename COL_T>
-	ieStrRef QueryFieldAsStrRef(const ROW_T& row, const COL_T& column) const {
+
+	template<typename ROW_T, typename COL_T>
+	ieStrRef QueryFieldAsStrRef(const ROW_T& row, const COL_T& column) const
+	{
 		auto field = QueryFieldUnsigned<ieDword>(row, column);
 		return static_cast<ieStrRef>(field);
 	}
@@ -103,4 +107,4 @@ using AutoTable = PluginHolder<TableMgr>;
 
 }
 
-#endif  // ! TABLEMGR_H
+#endif // ! TABLEMGR_H

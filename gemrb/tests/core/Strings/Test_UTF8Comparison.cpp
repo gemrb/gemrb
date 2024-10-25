@@ -17,21 +17,23 @@
  *
  */
 
-#include <gtest/gtest.h>
-
 #include "Strings/UTF8Comparison.h"
+
+#include <gtest/gtest.h>
 
 namespace GemRB {
 
 #ifdef WIN32
 
-TEST(UTF8Comparison_Test, UTF8_stricmp_Equality) {
+TEST(UTF8Comparison_Test, UTF8_stricmp_Equality)
+{
 	GTEST_SKIP() << "Not applicable to Windows.";
 }
 
 #else
 
-TEST(UTF8Comparison_Test, UTF8_stricmp_Equality) {
+TEST(UTF8Comparison_Test, UTF8_stricmp_Equality)
+{
 	EXPECT_TRUE(UTF8_stricmp("abc", "abc"));
 	EXPECT_FALSE(UTF8_stricmp("abc", "ab"));
 	EXPECT_FALSE(UTF8_stricmp("ab", "abc"));

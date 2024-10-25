@@ -27,11 +27,11 @@
 #ifndef LABEL_H
 #define LABEL_H
 
-#include "GUI/Control.h"
-#include "GUI/TextSystem/Font.h"
-
 #include "RGBAColor.h"
 #include "exports.h"
+
+#include "GUI/Control.h"
+#include "GUI/TextSystem/Font.h"
 
 namespace GemRB {
 

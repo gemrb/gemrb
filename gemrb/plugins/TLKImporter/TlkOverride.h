@@ -37,8 +37,7 @@ constexpr strret_t SEGMENT_SIZE = 512;
 // this mimics normal TLK entries with a bunch of unused / not useful fields
 // the originals passed it around whole, but since custom entries were never
 // used outside the UI, the flags and sound fields don't matter
-struct EntryType
-{
+struct EntryType {
 	ieStrRef strref = ieStrRef::INVALID;
 	ieDword flags = 0;
 	ResRef soundRef;
@@ -49,8 +48,7 @@ struct EntryType
 	static constexpr strpos_t FileSize = 28; // size in bytes for this structure in the TLK file
 };
 
-class CTlkOverride  
-{
+class CTlkOverride {
 private:
 	DataStream* tot_str = nullptr;
 	DataStream* toh_str = nullptr;
@@ -59,14 +57,15 @@ private:
 	strpos_t NextStrRef = DataStream::InvalidPos;
 
 	void CloseResources();
-	DataStream *GetAuxHdr(bool create);
-	DataStream *GetAuxTlk(bool create);
+	DataStream* GetAuxHdr(bool create);
+	DataStream* GetAuxTlk(bool create);
 	ieStrRef GetNewStrRef(ieStrRef strref);
 	strpos_t LocateString(ieStrRef strref);
 	strpos_t ClaimFreeSegment();
 	void ReleaseSegment(strpos_t offset);
-	char *GetString(strpos_t offset);
+	char* GetString(strpos_t offset);
 	strret_t GetLength(strpos_t offset);
+
 public:
 	CTlkOverride() noexcept = default;
 	CTlkOverride(const CTlkOverride&) = delete;
@@ -74,7 +73,7 @@ public:
 	CTlkOverride& operator=(const CTlkOverride&) = delete;
 
 	bool Init();
-	char *ResolveAuxString(ieStrRef strref, size_t &Length);
+	char* ResolveAuxString(ieStrRef strref, size_t& Length);
 	ieStrRef UpdateString(ieStrRef strref, const String& newvalue);
 	ieStrRef GetNextStrRef();
 };

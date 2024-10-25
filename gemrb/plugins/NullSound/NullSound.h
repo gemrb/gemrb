@@ -31,7 +31,7 @@ public:
 	~NullSound(void) override;
 	bool Init(void) override;
 	Holder<SoundHandle> Play(StringView ResRef, SFXChannel channel,
-		const Point&, unsigned int flags = 0, tick_t *length = nullptr) override;
+				 const Point&, unsigned int flags = 0, tick_t* length = nullptr) override;
 	int CreateStream(ResourceHolder<SoundMgr>) override;
 	bool Play() override;
 	bool Stop() override;
@@ -49,7 +49,7 @@ public:
 	void SetAmbientStreamVolume(int stream, int gain) override;
 	void SetAmbientStreamPitch(int stream, int pitch) override;
 	void QueueBuffer(int stream, unsigned short bits, int channels,
-				short* memory, int size, int samplerate) override;
+			 short* memory, int size, int samplerate) override;
 
 private:
 	Point pos;

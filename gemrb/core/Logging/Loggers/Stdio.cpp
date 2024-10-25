@@ -18,17 +18,17 @@
 
 #include "Logging/Loggers/Stdio.h"
 
+#include "plugindef.h"
+
 #include "Logging/Logging.h"
 #include "Streams/FileStream.h"
 
 #include <cstdio>
 
-#include "plugindef.h"
-
 namespace GemRB {
 
 StreamLogWriter::StreamLogWriter(LogLevel level, FILE* stream, ANSIColor color)
-: Logger::LogWriter(level), color(color), stream(stream)
+	: Logger::LogWriter(level), color(color), stream(stream)
 {
 	assert(stream);
 }
@@ -92,7 +92,7 @@ void StreamLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 {
 	static constexpr char RESET[] = "\x1b[0m";
 	static const auto F_STRING = FMT_STRING("[{}{:/>{}}{}]: {}\n");
-	
+
 	static const std::string LogLevelText[] = {
 		"FATAL",
 		"ERROR",
@@ -156,11 +156,11 @@ Logger::WriterPtr createStdioLogWriter()
 	ANSIColor color = ANSIColor::None;
 #ifdef WIN32
 	color = ANSIColor::Basic;
-#if defined(VER_PRODUCTBUILD) && VER_PRODUCTBUILD >= 8100
+	#if defined(VER_PRODUCTBUILD) && VER_PRODUCTBUILD >= 8100
 	if (IsWindows10OrGreater()) { // FIXME: this isnt exactly right, true color support was added in 1703
 		color = ANSIColor::True;
 	}
-#endif
+	#endif
 #elif defined(HAVE_UNISTD_H)
 	if (isatty(STDOUT_FILENO)) {
 		color = ANSIColor::Basic;

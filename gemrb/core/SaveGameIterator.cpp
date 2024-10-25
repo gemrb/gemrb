@@ -31,6 +31,7 @@
 #include "SaveGameMgr.h"
 #include "Sprite2D.h"
 #include "TableMgr.h"
+
 #include "GUI/GameControl.h"
 #include "GUI/WindowManager.h"
 #include "Scriptable/Actor.h"
@@ -39,11 +40,11 @@
 #include "fmt/chrono.h"
 
 #include <cassert>
-#include <set>
 #include <ctime>
+#include <set>
 
 #ifdef VITA
-#include <dirent.h>
+	#include <dirent.h>
 #endif
 
 namespace GemRB {
@@ -51,7 +52,7 @@ namespace GemRB {
 const TypeID SaveGame::ID = { "SaveGame" };
 
 /** Extract date from save game ds into Date. */
-static std::string ParseGameDate(DataStream *ds)
+static std::string ParseGameDate(DataStream* ds)
 {
 	char Signature[8];
 	ieDword GameTime;
@@ -83,9 +84,9 @@ static std::string ParseGameDate(DataStream *ds)
 	}
 	delete ds;
 
-	int hours = ((int)GameTime)/core->Time.hour_sec;
-	int days = hours/24;
-	hours -= days*24;
+	int hours = ((int) GameTime) / core->Time.hour_sec;
+	int days = hours / 24;
+	hours -= days * 24;
 	std::string a;
 	std::string b;
 	std::string c;
@@ -107,14 +108,14 @@ static std::string ParseGameDate(DataStream *ds)
 		}
 	}
 	if (hours || a.empty()) {
-		if (!a.empty()) b=core->GetMBString(ieStrRef::DATE1); // and
+		if (!a.empty()) b = core->GetMBString(ieStrRef::DATE1); // and
 		if (hours == 1) {
 			c = core->GetMBString(DisplayMessage::GetStringReference(HCStrings::Hour), STRING_FLAGS::NONE);
 		} else {
 			c = core->GetMBString(DisplayMessage::GetStringReference(HCStrings::Hours), STRING_FLAGS::NONE);
 		}
 	}
-	
+
 	if (!b.empty()) {
 		return a + " " + b + " " + c;
 	} else {
@@ -123,7 +124,7 @@ static std::string ParseGameDate(DataStream *ds)
 }
 
 SaveGame::SaveGame(path_t path, const path_t& name, const ResRef& prefix, std::string slotname, int pCount, int saveID)
-: Path(std::move(path)), Prefix(prefix), SlotName(std::move(slotname))
+	: Path(std::move(path)), Prefix(prefix), SlotName(std::move(slotname))
 {
 	static const auto DATE_FMT = FMT_STRING("{:%a %Od %b %T %EY}");
 	PortraitCount = pCount;
@@ -197,8 +198,8 @@ static int GetHole(int n)
 {
 	int mask = 1;
 	int value = 0;
-	while(n&mask) {
-		mask<<=1;
+	while (n & mask) {
+		mask <<= 1;
 		value++;
 	}
 	return value;
@@ -215,8 +216,7 @@ static int IsQuickSaveSlot(StringView match, StringView slotname)
 	if (cnt != 2) {
 		return 0;
 	}
-	if (strnicmp(savegameName, match.c_str(), sizeof(savegameName)) != 0)
-	{
+	if (strnicmp(savegameName, match.c_str(), sizeof(savegameName)) != 0) {
 		return 0;
 	}
 	return savegameNumber;
@@ -238,7 +238,7 @@ static bool IsSaveGameSlot(const path_t& Path, const path_t& slotname)
 		//The matcher didn't match: either this is not a valid dir
 		//or the SAVEGAME_DIRECTORY_MATCHER needs updating.
 		Log(ERROR, "SaveGameIterator", "Invalid savegame directory '{}' in {}.",
-			slotname, Path);
+		    slotname, Path);
 		return false;
 	}
 
@@ -310,7 +310,7 @@ bool SaveGameIterator::RescanSaveGames()
 	return true;
 }
 
-const std::vector<Holder<SaveGame> >& SaveGameIterator::GetSaveGames()
+const std::vector<Holder<SaveGame>>& SaveGameIterator::GetSaveGames()
 {
 	RescanSaveGames();
 
@@ -334,7 +334,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(std::string slotname)
 	//lets leave space for the filenames
 	path_t Path = PathJoin(core->config.SavePath, SaveDir(), slotname);
 
-	char savegameName[255]={0};
+	char savegameName[255] = { 0 };
 	int savegameNumber = 0;
 
 	sscanf(slotname.c_str(), SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName);
@@ -353,8 +353,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(std::string slotname)
 
 void SaveGameIterator::PruneQuickSave(StringView folder) const
 {
-	auto FormatQuickSavePath = [folder](int i)
-	{
+	auto FormatQuickSavePath = [folder](int i) {
 		return fmt::format(FMT_STRING("{}{}{}{:09d}-{}"), core->config.SavePath, SaveDir(), SPathDelimiter, i, folder);
 	};
 
@@ -364,8 +363,8 @@ void SaveGameIterator::PruneQuickSave(StringView folder) const
 		int tmp = IsQuickSaveSlot(folder, saveSlot->GetSlotName());
 		if (tmp) {
 			size_t pos = myslots.size();
-			while(pos-- && myslots[pos]>tmp) ;
-			myslots.insert(myslots.begin()+pos+1,tmp);
+			while (pos-- && myslots[pos] > tmp);
+			myslots.insert(myslots.begin() + pos + 1, tmp);
 		}
 	}
 	//now we got an integer array in myslots
@@ -375,12 +374,12 @@ void SaveGameIterator::PruneQuickSave(StringView folder) const
 		return;
 	}
 
-	int n=myslots[size-1];
+	int n = myslots[size - 1];
 	size_t hole = GetHole(n);
-	if (hole<size) {
+	if (hole < size) {
 		//prune second path
 		std::string from = FormatQuickSavePath(myslots[hole]);
-		myslots.erase(myslots.begin()+hole);
+		myslots.erase(myslots.begin() + hole);
 		DelTree(from, false);
 		rmdir(from.c_str());
 	}
@@ -388,7 +387,7 @@ void SaveGameIterator::PruneQuickSave(StringView folder) const
 	size = myslots.size();
 	for (size_t i = size; i > 0; i--) {
 		std::string from = FormatQuickSavePath(myslots[i]);
-		std::string to = FormatQuickSavePath(myslots[i]+1);
+		std::string to = FormatQuickSavePath(myslots[i] + 1);
 		int errnum = rename(from.c_str(), to.c_str());
 		if (errnum) {
 			error("SaveGameIterator", "Rename error {} when pruning quicksaves!", errnum);
@@ -399,11 +398,11 @@ void SaveGameIterator::PruneQuickSave(StringView folder) const
 /** Save game to given directory */
 static bool DoSaveGame(const path_t& Path, bool overrideRunning)
 {
-	const Game *game = core->GetGame();
+	const Game* game = core->GetGame();
 	//saving areas to cache currently in memory
 	unsigned int mc = (unsigned int) game->GetLoadedMapCount();
 	while (mc--) {
-		Map *map = game->GetMap(mc);
+		Map* map = game->GetMap(mc);
 		if (core->SwapoutArea(map)) {
 			return false;
 		}
@@ -434,8 +433,8 @@ static bool DoSaveGame(const path_t& Path, bool overrideRunning)
 	}
 
 	//Create portraits
-	for (int i = 0; i < game->GetPartySize( false ); i++) {
-		const Actor *actor = game->GetPC( i, false );
+	for (int i = 0; i < game->GetPartySize(false); i++) {
+		const Actor* actor = game->GetPC(i, false);
 		Holder<Sprite2D> portrait = actor->CopyPortrait(true);
 
 		if (portrait) {
@@ -458,7 +457,7 @@ static bool DoSaveGame(const path_t& Path, bool overrideRunning)
 	// scale down to get more of the screen and reduce the size
 	preview = VideoDriver->SpriteScaleDown(preview, 5);
 	FileStream outfile;
-	outfile.Create( Path, core->GameNameResRef.c_str(), IE_BMP_CLASS_ID );
+	outfile.Create(Path, core->GameNameResRef.c_str(), IE_BMP_CLASS_ID);
 	im->PutImage(&outfile, std::move(preview));
 
 	return true;
@@ -475,12 +474,12 @@ static int CanSave()
 		return 1;
 	}
 
-	const Store *store = core->GetCurrentStore();
+	const Store* store = core->GetCurrentStore();
 	if (store) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSaveStore, FT_ANY, GUIColors::XPCHANGE);
 		return 1; //can't save while store is open
 	}
-	const GameControl *gc = core->GetGameControl();
+	const GameControl* gc = core->GetGameControl();
 	if (!gc) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return -1; //no gamecontrol!!!
@@ -490,7 +489,7 @@ static int CanSave()
 		return 2; //can't save while in dialog
 	}
 
-	const Game *game = core->GetGame();
+	const Game* game = core->GetGame();
 	if (!game) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return -1;
@@ -500,7 +499,7 @@ static int CanSave()
 		return 3;
 	}
 
-	const Map *map = game->GetCurrentArea();
+	const Map* map = game->GetCurrentArea();
 	if (!map) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return -1;
@@ -514,15 +513,15 @@ static int CanSave()
 		return 10;
 	}
 
-	if (map->AreaFlags&AF_NOSAVE) {
+	if (map->AreaFlags & AF_NOSAVE) {
 		//cannot save in area
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return 4;
 	}
 
 	int i = game->GetPartySize(true);
-	while(i--) {
-		const Actor *actor = game->GetPC(i, true);
+	while (i--) {
+		const Actor* actor = game->GetPC(i, true);
 		// can't save while (party) actors are in helpless or dead states
 		// STATE_NOSAVE tracks actors not to be stored in GAM, not game saveability
 		if (actor->GetStat(IE_STATE_ID) & (STATE_NOSAVE | STATE_MINDLESS) || actor->GetStat(IE_CHECKFORBERSERK)) {
@@ -530,7 +529,7 @@ static int CanSave()
 			displaymsg->DisplayMsgCentered(HCStrings::CantSaveNoCtrl, FT_ANY, GUIColors::XPCHANGE);
 			return 5;
 		}
-		if (actor->GetCurrentArea()!=map) {
+		if (actor->GetCurrentArea() != map) {
 			//scattered
 			displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 			return 6;
@@ -548,8 +547,8 @@ static int CanSave()
 		}
 	}
 
-	Point pc1 =  game->GetPC(0, true)->Pos;
-	std::vector<Actor *> nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD|GA_NO_UNSCHEDULED, 15);
+	Point pc1 = game->GetPC(0, true)->Pos;
+	std::vector<Actor*> nearActors = map->GetAllActorsInRadius(pc1, GA_NO_DEAD | GA_NO_UNSCHEDULED, 15);
 	for (const auto& neighbour : nearActors) {
 		if (neighbour->GetInternalFlag() & IF_NOINT) {
 			// dialog about to start or similar
@@ -637,7 +636,8 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 	return GEM_OK;
 }
 
-int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const String& slotname, bool force) const {
+int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const String& slotname, bool force) const
+{
 	auto mbSlotName = MBStringFromString(slotname);
 	return CreateSaveGame(std::move(save), StringView { mbSlotName }, force);
 }

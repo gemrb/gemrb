@@ -21,11 +21,11 @@
 #ifndef KEYIMP_H
 #define KEYIMP_H
 
+#include "PluginMgr.h"
+#include "Resource.h"
 #include "ResourceSource.h"
 
 #include "Plugins/IndexedArchive.h"
-#include "PluginMgr.h"
-#include "Resource.h"
 #include "System/VFS.h"
 
 #include <unordered_map>
@@ -50,20 +50,23 @@ struct MapKey {
 	uint64_t type = 0;
 
 	MapKey() = default;
-	MapKey(const ResRef& ref, uint64_t type) : ref{ref}, type{type} {}
-	MapKey(ResRef && ref, uint64_t type) : ref{std::move(ref)}, type{type} {}
+	MapKey(const ResRef& ref, uint64_t type)
+		: ref { ref }, type { type } {}
+	MapKey(ResRef&& ref, uint64_t type)
+		: ref { std::move(ref) }, type { type } {}
 
-	bool operator==(const MapKey& other) const {
+	bool operator==(const MapKey& other) const
+	{
 		return ref == other.ref && type == other.type;
 	}
 };
 
 struct MapKeyHash {
-	size_t operator()(const MapKey& key) const {
-		uint64_t h{key.type};
-		
-		for (const char c : key.ref)
-		{
+	size_t operator()(const MapKey& key) const
+	{
+		uint64_t h { key.type };
+
+		for (const char c : key.ref) {
 			h = (h << 5) + h + tolower(c);
 		}
 
@@ -80,19 +83,20 @@ struct KEYCache {
 
 class KEYImporter : public ResourceSource {
 private:
-	std::vector< BIFEntry> biffiles;
+	std::vector<BIFEntry> biffiles;
 	std::unordered_map<MapKey, ieDword, MapKeyHash> resources;
 
 	/** Gets the stream associated to a RESKey */
-	DataStream *GetStream(const ResRef&, ieWord type);
+	DataStream* GetStream(const ResRef&, ieWord type);
+
 public:
 	bool Open(const path_t& file, std::string desc) override;
 	/* predicts the availability of a resource */
 	bool HasResource(StringView resname, SClass_ID type) override;
-	bool HasResource(StringView resname, const ResourceDesc &type) override;
+	bool HasResource(StringView resname, const ResourceDesc& type) override;
 	/* returns resource */
 	DataStream* GetResource(StringView resname, SClass_ID type) override;
-	DataStream* GetResource(StringView resname, const ResourceDesc &type) override;
+	DataStream* GetResource(StringView resname, const ResourceDesc& type) override;
 };
 
 }

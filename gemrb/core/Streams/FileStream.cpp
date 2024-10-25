@@ -21,20 +21,21 @@
 #include "FileStream.h"
 
 #include "Interface.h"
+
 #include "Logging/Logging.h"
 
 namespace GemRB {
 
 #ifdef WIN32
 
-#define TCHAR_NAME(name) \
-	TCHAR t_name[MAX_PATH] = {0}; \
-	mbstowcs(t_name, name, MAX_PATH - 1);
+	#define TCHAR_NAME(name) \
+		TCHAR t_name[MAX_PATH] = { 0 }; \
+		mbstowcs(t_name, name, MAX_PATH - 1);
 
 #endif
 
 FileStream::FileStream(FileT&& f)
-: str(std::move(f))
+	: str(std::move(f))
 {}
 
 FileStream::FileStream(void)
@@ -133,7 +134,7 @@ strret_t FileStream::Read(void* dest, strpos_t length)
 	}
 	//we don't allow partial reads anyway, so it isn't a problem that
 	//i don't adjust length here (partial reads are evil)
-	if (Pos+length>size ) {
+	if (Pos + length > size) {
 		return Error;
 	}
 	size_t c = str.Read(dest, length);
@@ -141,7 +142,7 @@ strret_t FileStream::Read(void* dest, strpos_t length)
 		return Error;
 	}
 	if (Encrypted) {
-		ReadDecrypted( dest, c );
+		ReadDecrypted(dest, c);
 	}
 	Pos += c;
 	return c;
@@ -159,7 +160,7 @@ strret_t FileStream::Write(const void* src, strpos_t length)
 		return Error;
 	}
 	Pos += c;
-	if (Pos>size) {
+	if (Pos > size) {
 		size = Pos;
 	}
 	return c;
@@ -188,7 +189,7 @@ strret_t FileStream::Seek(stroff_t newpos, strpos_t type)
 		default:
 			return Error;
 	}
-	if (Pos>size) {
+	if (Pos > size) {
 		Log(ERROR, "Streams", "Invalid seek position {} in file {} (limit: {})", Pos, filename, size);
 		return Error;
 	}
@@ -197,7 +198,7 @@ strret_t FileStream::Seek(stroff_t newpos, strpos_t type)
 
 FileStream* FileStream::OpenFile(const path_t& filename)
 {
-	FileStream *fs = new FileStream();
+	FileStream* fs = new FileStream();
 	if (fs->Open(filename))
 		return fs;
 

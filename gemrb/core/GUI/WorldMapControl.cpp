@@ -26,6 +26,7 @@
 #include "Game.h"
 #include "Interface.h"
 #include "WorldMap.h"
+
 #include "GUI/EventMgr.h"
 #include "GUI/TextSystem/Font.h"
 #include "GUI/Window.h"
@@ -38,9 +39,9 @@ WorldMapControl::WorldMapControl(const Region& frame, Holder<Font> font, const C
 	color_normal = normal;
 	color_selected = selected;
 	color_notvisited = notvisited;
-	
+
 	hoverAnim = ColorAnimation(displaymsg->GetColor(GUIColors::MAPICNBG), color_selected, true);
-	
+
 	ControlType = IE_GUI_WORLDMAP;
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 	const Game* game = core->GetGame();
@@ -48,20 +49,21 @@ WorldMapControl::WorldMapControl(const Region& frame, Holder<Font> font, const C
 	currentArea = game->CurrentArea;
 	int entry = gamedata->GetAreaAlias(currentArea);
 	if (entry >= 0) {
-		const WMPAreaEntry *m = worldmap->GetEntry(entry);
+		const WMPAreaEntry* m = worldmap->GetEntry(entry);
 		currentArea = m->AreaResRef;
 	}
 
 	// ensure the current area and any variable triggered additions are
 	// visible immediately and without the need for area travel
 	worldmap->CalculateDistances(currentArea, WMPDirection::NONE);
-	
+
 	SetAction([this](const Control* /*this*/) {
 		//this also updates visible locations
 		WorldMap* map = core->GetWorldMap();
 		uint8_t dir = static_cast<uint8_t>(GetValue());
 		map->CalculateDistances(currentArea, EnumIndex<WMPDirection>(dir));
-	}, Control::ValueChange);
+	},
+		  Control::ValueChange);
 }
 
 WorldMapControl::WorldMapControl(const Region& frame, Holder<Font> font)
@@ -84,10 +86,10 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	auto MapToScreen = [&rgn, this](const Point& p) {
 		return rgn.origin - Pos + p;
 	};
-	
+
 	WorldMap* worldmap = core->GetWorldMap();
 
-	VideoDriver->BlitSprite( worldmap->GetMapMOS(), MapToScreen(Point()));
+	VideoDriver->BlitSprite(worldmap->GetMapMOS(), MapToScreen(Point()));
 
 	std::vector<Point> potentialIndicators;
 	unsigned int ec = worldmap->GetEntryCount();
@@ -96,13 +98,13 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	if (nearest) current = nearest->AreaName;
 
 	for (unsigned int i = 0; i < ec; i++) {
-		WMPAreaEntry *m = worldmap->GetEntry(i);
-		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
+		WMPAreaEntry* m = worldmap->GetEntry(i);
+		if (!(m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 
 		Point offset = MapToScreen(m->pos);
 		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam.get());
 		if (icon) {
-			BlitFlags flags =  core->HasFeature(GFFlags::AUTOMAP_INI) ? BlitFlags::BLENDED : (BlitFlags::BLENDED | BlitFlags::COLOR_MOD);
+			BlitFlags flags = core->HasFeature(GFFlags::AUTOMAP_INI) ? BlitFlags::BLENDED : (BlitFlags::BLENDED | BlitFlags::COLOR_MOD);
 			if (m == Area && m->HighlightSelected()) {
 				VideoDriver->BlitGameSprite(icon, offset, flags, hoverAnim.Current());
 			} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
@@ -136,8 +138,8 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 	// draw labels in separate pass, so icons don't overlap them
 	for (unsigned int i = 0; i < ec; i++) {
-		WMPAreaEntry *m = worldmap->GetEntry(i);
-		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
+		WMPAreaEntry* m = worldmap->GetEntry(i);
+		if (!(m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 		const String caption = m->GetCaption();
 		if (ftext == nullptr || caption.empty())
 			continue;
@@ -147,7 +149,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		const Region& icon_frame = icon->Frame;
 		Point p = m->pos - icon_frame.origin;
 		Region r2 = Region(MapToScreen(p), icon_frame.size);
-		
+
 		Font::PrintColors colors;
 		if (Area == m) {
 			colors.fg = hoverAnim.Current();
@@ -156,13 +158,13 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		} else {
 			colors.fg = color_normal;
 		}
-		
+
 		colors.bg = displaymsg->GetColor(GUIColors::MAPTXTBG);
 
 		Size ts = ftext->StringSize(caption);
 		ts.w += 10;
-		ftext->Print(Region(Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts),
-					 caption, 0, colors);
+		ftext->Print(Region(Point(r2.x + (r2.w - ts.w) / 2, r2.y + r2.h), ts),
+			     caption, 0, colors);
 	}
 }
 
@@ -206,12 +208,12 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 	Point p = ConvertPointFromScreen(me.Pos());
 	Point mapOff = p + Pos;
 
-	const WMPAreaEntry *oldArea = Area;
+	const WMPAreaEntry* oldArea = Area;
 	Area = nullptr;
 
 	unsigned int ec = worldmap->GetEntryCount();
 	for (unsigned int i = 0; i < ec; i++) {
-		WMPAreaEntry *ae = worldmap->GetEntry(i);
+		WMPAreaEntry* ae = worldmap->GetEntry(i);
 
 		if ((ae->GetAreaStatus() & WMP_ENTRY_WALKABLE) != WMP_ENTRY_WALKABLE) {
 			continue; //invisible or inaccessible
@@ -272,7 +274,7 @@ void WorldMapControl::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 bool WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	if (me.button == GEM_MB_ACTION) {
-		SetCursor(core->Cursors[IE_CURSOR_GRAB+1]);
+		SetCursor(core->Cursors[IE_CURSOR_GRAB + 1]);
 	}
 	return true;
 }

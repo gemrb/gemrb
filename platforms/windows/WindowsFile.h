@@ -27,6 +27,7 @@ namespace GemRB {
 class GEM_EXPORT WindowsFile : public File {
 private:
 	HANDLE file = INVALID_HANDLE_VALUE;
+
 public:
 	WindowsFile() noexcept = default;
 	WindowsFile(const WindowsFile&) = delete;

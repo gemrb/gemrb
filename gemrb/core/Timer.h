@@ -21,9 +21,9 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include "Callback.h"
-
 #include "globals.h"
+
+#include "Callback.h"
 
 namespace GemRB {
 
@@ -39,29 +39,33 @@ private:
 	int repeats;
 
 private:
-	void NextFireDate() {
+	void NextFireDate()
+	{
 		fireDate = GetMilliseconds() + interval;
 	}
 
 public:
 	Timer(TimeInterval i, const EventHandler& handler, int repeats = -1)
-	: action(handler), repeats(repeats)
+		: action(handler), repeats(repeats)
 	{
 		valid = true;
 		interval = i;
 		NextFireDate();
 	}
 
-	~Timer() {
+	~Timer()
+	{
 		Invalidate();
 	}
 
-	void SetInterval(TimeInterval i) {
+	void SetInterval(TimeInterval i)
+	{
 		fireDate += (i - interval);
 		interval = i;
 	}
 
-	void Update(TimeInterval time) {
+	void Update(TimeInterval time)
+	{
 		if (fireDate <= time) {
 			action();
 			if (repeats != 0) {
@@ -75,12 +79,14 @@ public:
 		}
 	}
 
-	void Invalidate() {
+	void Invalidate()
+	{
 		valid = false;
 		action = nullptr;
 	}
 
-	bool IsRunning() const {
+	bool IsRunning() const
+	{
 		return valid;
 	}
 };

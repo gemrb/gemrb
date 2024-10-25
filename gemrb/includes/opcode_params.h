@@ -34,51 +34,51 @@ namespace GemRB {
 #define RPD_POINTS  2
 #define RPD_SECONDS 3
 //only poison
-#define RPD_ROUNDS  4
-#define RPD_TURNS   5
+#define RPD_ROUNDS 4
+#define RPD_TURNS  5
 //iwd2 specific poison types
 #define RPD_SNAKE   6
 #define RPD_7       7
 #define RPD_ENVENOM 8
 //only disease
-#define RPD_STR 4
-#define RPD_DEX 5
-#define RPD_CON 6
-#define RPD_INT 7
-#define RPD_WIS 8
-#define RPD_CHA 9
+#define RPD_STR  4
+#define RPD_DEX  5
+#define RPD_CON  6
+#define RPD_INT  7
+#define RPD_WIS  8
+#define RPD_CHA  9
 #define RPD_SLOW 10
 //HoW specific disease types
-#define RPD_MOLD 11
-#define RPD_MOLD2 12 
+#define RPD_MOLD  11
+#define RPD_MOLD2 12
 //iwd2 specific disease types
 #define RPD_CONTAGION 13
-#define RPD_PEST 14
-#define RPD_DOLOR 15
+#define RPD_PEST      14
+#define RPD_DOLOR     15
 
 //appply spell on condition
-#define COND_GOTHIT 0
-#define COND_NEAR 1
-#define COND_HP_HALF 2
-#define COND_HP_QUART 3
-#define COND_HP_LOW 4
-#define COND_HELPLESS 5
-#define COND_POISONED 6
-#define COND_ATTACKED 7
-#define COND_NEAR4 8
-#define COND_NEAR10 9
-#define COND_EVERYROUND 10
-#define COND_TOOKDAMAGE 11
-#define COND_KILLER 12
-#define COND_TIMEOFDAY 13
-#define COND_NEARX 14
-#define COND_STATECHECK 15
-#define COND_DIED_ME 16
-#define COND_DIED_ANY 17
-#define COND_TURNEDBY 18
-#define COND_HP_LT 19
+#define COND_GOTHIT        0
+#define COND_NEAR          1
+#define COND_HP_HALF       2
+#define COND_HP_QUART      3
+#define COND_HP_LOW        4
+#define COND_HELPLESS      5
+#define COND_POISONED      6
+#define COND_ATTACKED      7
+#define COND_NEAR4         8
+#define COND_NEAR10        9
+#define COND_EVERYROUND    10
+#define COND_TOOKDAMAGE    11
+#define COND_KILLER        12
+#define COND_TIMEOFDAY     13
+#define COND_NEARX         14
+#define COND_STATECHECK    15
+#define COND_DIED_ME       16
+#define COND_DIED_ANY      17
+#define COND_TURNEDBY      18
+#define COND_HP_LT         19
 #define COND_HP_PERCENT_LT 20
-#define COND_SPELLSTATE 21
+#define COND_SPELLSTATE    21
 
 //resources for the seven eyes effect
 #define EYE_MIND   0
@@ -106,8 +106,8 @@ namespace GemRB {
 #define SS_BADPRAYER    13
 #define SS_GOODRECIT    14
 #define SS_BADRECIT     15
-#define SS_RIGHTEOUS    16    //allied
-#define SS_RIGHTEOUS2   17    //allied and same alignment
+#define SS_RIGHTEOUS    16 //allied
+#define SS_RIGHTEOUS2   17 //allied and same alignment
 #define SS_STONESKIN    18
 #define SS_IRONSKIN     19
 #define SS_SANCTUARY    20
@@ -168,59 +168,59 @@ namespace GemRB {
 #define SS_ANTIMAGIC    75
 #define SS_POWERATTACK  76
 //more powerattack
-#define SS_EXPERTISE    81
+#define SS_EXPERTISE 81
 //more expertise
-#define SS_ARTERIAL     86
-#define SS_HAMSTRING    87
-#define SS_RAPIDSHOT    88
-#define SS_IRONBODY     89
-#define SS_TENSER       90
-#define SS_SMITEEVIL    91
-#define SS_ALICORNLANCE 92
-#define SS_LIGHTNING    93
-#define SS_CHAMPIONS    94
-#define SS_BONECIRCLE   95
-#define SS_CLOAKOFFEAR  96
-#define SS_PESTILENCE   97
-#define SS_CONTAGION    98
-#define SS_BANE         99
-#define SS_DEFENSIVE    100
-#define SS_DESTRUCTION  101
-#define SS_DOLOROUS     102
-#define SS_DOOM         103
-#define SS_EXALTATION   104
-#define SS_FAERIEFIRE   105
-#define SS_FINDTRAPS    106
-#define SS_GREATERLATH  107
-#define SS_MAGICRESIST  108
-#define SS_NPROTECTION  109
-#define SS_PROTFROMFIRE 110
+#define SS_ARTERIAL          86
+#define SS_HAMSTRING         87
+#define SS_RAPIDSHOT         88
+#define SS_IRONBODY          89
+#define SS_TENSER            90
+#define SS_SMITEEVIL         91
+#define SS_ALICORNLANCE      92
+#define SS_LIGHTNING         93
+#define SS_CHAMPIONS         94
+#define SS_BONECIRCLE        95
+#define SS_CLOAKOFFEAR       96
+#define SS_PESTILENCE        97
+#define SS_CONTAGION         98
+#define SS_BANE              99
+#define SS_DEFENSIVE         100
+#define SS_DESTRUCTION       101
+#define SS_DOLOROUS          102
+#define SS_DOOM              103
+#define SS_EXALTATION        104
+#define SS_FAERIEFIRE        105
+#define SS_FINDTRAPS         106
+#define SS_GREATERLATH       107
+#define SS_MAGICRESIST       108
+#define SS_NPROTECTION       109
+#define SS_PROTFROMFIRE      110
 #define SS_PROTFROMLIGHTNING 111
-#define SS_ELEMENTAL    112
-#define SS_LATHANDER    113
-#define SS_SLOWPOISON   114
-#define SS_SPELLSHIELD  115
-#define SS_STATICCHARGE 116
-#define SS_ACIDARROW    117
-#define SS_FREEZING     118
-#define SS_PROTFROMACID 119
-#define SS_PROTFROMELEC 120
-#define SS_PFNMISSILES  121
-#define SS_PROTFROMPETR 122
-#define SS_ENFEEBLEMENT 123
-#define SS_SEVENEYES    124
+#define SS_ELEMENTAL         112
+#define SS_LATHANDER         113
+#define SS_SLOWPOISON        114
+#define SS_SPELLSHIELD       115
+#define SS_STATICCHARGE      116
+#define SS_ACIDARROW         117
+#define SS_FREEZING          118
+#define SS_PROTFROMACID      119
+#define SS_PROTFROMELEC      120
+#define SS_PFNMISSILES       121
+#define SS_PROTFROMPETR      122
+#define SS_ENFEEBLEMENT      123
+#define SS_SEVENEYES         124
 //#define SS_SOULEATER    125
-#define SS_LOWERRESIST  140
-#define SS_LUCK         141
-#define SS_VOCALIZE     157
+#define SS_LOWERRESIST   140
+#define SS_LUCK          141
+#define SS_VOCALIZE      157
 #define SS_BARBARIANRAGE 159
 #define SS_GREATERRAGE   160
 //tested for this, splstate is wrong or this entry has two uses
 #define SS_DAYBLINDNESS 178
 #define SS_REBUKED      179
 
-#define SS_PRONE        249 // prevented the engine from moving a creature with STATE_SLEEPING to the backlist
-#define SS_DISEASED     250
+#define SS_PRONE    249 // prevented the engine from moving a creature with STATE_SLEEPING to the backlist
+#define SS_DISEASED 250
 
 }
 

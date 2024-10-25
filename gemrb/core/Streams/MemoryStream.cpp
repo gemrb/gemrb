@@ -27,7 +27,7 @@
 namespace GemRB {
 
 MemoryStream::MemoryStream(const path_t& name, void* data, strpos_t size)
-	: data((char*)data)
+	: data((char*) data)
 {
 	this->size = size;
 	originalfile = name;
@@ -41,7 +41,7 @@ MemoryStream::~MemoryStream()
 
 DataStream* MemoryStream::Clone() const noexcept
 {
-	void *copy = malloc(size);
+	void* copy = malloc(size);
 	memcpy(copy, data, size);
 	return new MemoryStream(originalfile.c_str(), copy, size);
 }
@@ -50,13 +50,13 @@ strret_t MemoryStream::Read(void* dest, strpos_t length)
 {
 	//we don't allow partial reads anyway, so it isn't a problem that
 	//i don't adjust length here (partial reads are evil)
-	if (Pos+length>size ) {
+	if (Pos + length > size) {
 		return Error;
 	}
 
 	memcpy(dest, data + Pos + (Encrypted ? 2 : 0), length);
 	if (Encrypted) {
-		ReadDecrypted( dest, length );
+		ReadDecrypted(dest, length);
 	}
 	Pos += length;
 	return length;
@@ -64,11 +64,11 @@ strret_t MemoryStream::Read(void* dest, strpos_t length)
 
 strret_t MemoryStream::Write(const void* src, strpos_t length)
 {
-	if (Pos+length>size ) {
+	if (Pos + length > size) {
 		//error("MemoryStream", "We don't support appending to memory streams yet.");
 		return Error;
 	}
-	memcpy(data+Pos, src, length);
+	memcpy(data + Pos, src, length);
 	Pos += length;
 	return length;
 }
@@ -92,7 +92,7 @@ stroff_t MemoryStream::Seek(stroff_t newpos, strpos_t type)
 			return InvalidPos;
 	}
 	//we went past the buffer
-	if (Pos>size) {
+	if (Pos > size) {
 		Log(ERROR, "Streams", "Invalid seek position: {} (limit: {})", Pos, size);
 		return InvalidPos;
 	}

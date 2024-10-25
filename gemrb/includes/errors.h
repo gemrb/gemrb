@@ -22,9 +22,9 @@
 
 namespace GemRB {
 
-#define GEM_OK 0
+#define GEM_OK    0
 #define GEM_ERROR -1
-#define GEM_EOF -2
+#define GEM_EOF   -2
 
 }
 

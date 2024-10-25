@@ -34,7 +34,7 @@ inline PixelFormat PixelFormatForSurface(SDL_Surface* surf, Holder<Palette> pal 
 		assert(fmt->palette->ncolors <= 256);
 		const Color* begin = reinterpret_cast<const Color*>(fmt->palette->colors);
 		const Color* end = begin + fmt->palette->ncolors;
-		
+
 		pal = MakeHolder<Palette>(begin, end);
 	}
 	return PixelFormat {
@@ -42,7 +42,7 @@ inline PixelFormat PixelFormatForSurface(SDL_Surface* surf, Holder<Palette> pal 
 		fmt->Rshift, fmt->Gshift, fmt->Bshift, fmt->Ashift,
 		fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask,
 		fmt->BytesPerPixel, fmt->BitsPerPixel,
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
 		[surf]() { Uint32 ck; SDL_GetColorKey(surf, &ck); return ck; }(),
 		bool(SDL_HasColorKey(surf)),
 #else
@@ -53,7 +53,8 @@ inline PixelFormat PixelFormatForSurface(SDL_Surface* surf, Holder<Palette> pal 
 	};
 }
 
-inline Region SurfaceRect(const SDL_Surface* surf) {
+inline Region SurfaceRect(const SDL_Surface* surf)
+{
 	return Region(0, 0, surf->w, surf->h);
 }
 
@@ -62,12 +63,13 @@ struct SDLPixelIteratorWrapper {
 	// therefore when we call MakeSDLPixelIterator we need to have the PixelFormat returned as well
 	PixelFormat format;
 	SDLPixelIterator it;
-	
+
 	SDLPixelIteratorWrapper(SDL_Surface* surf, IPixelIterator::Direction x, IPixelIterator::Direction y, const Region& clip)
-	: format(PixelFormatForSurface(surf)), it(surf->pixels, surf->pitch, format, x, y, clip)
+		: format(PixelFormatForSurface(surf)), it(surf->pixels, surf->pitch, format, x, y, clip)
 	{}
-	
-	operator SDLPixelIterator&() {
+
+	operator SDLPixelIterator&()
+	{
 		return it;
 	}
 };
@@ -89,8 +91,8 @@ inline SDLPixelIteratorWrapper MakeSDLPixelIterator(SDL_Surface* surf, const Reg
 
 template<class BLENDER>
 static void ColorFill(const Color& c,
-				 SDLPixelIterator dst, const SDLPixelIterator& dstend,
-				 const BLENDER& blender)
+		      SDLPixelIterator dst, const SDLPixelIterator& dstend,
+		      const BLENDER& blender)
 {
 	for (; dst != dstend; ++dst) {
 		Color dstc;
@@ -104,9 +106,9 @@ static void ColorFill(const Color& c,
 
 template<class BLENDER>
 static void Blit(SDLPixelIterator src,
-				 SDLPixelIterator dst, const SDLPixelIterator& dstend,
-				 IAlphaIterator& mask,
-				 const BLENDER& blender)
+		 SDLPixelIterator dst, const SDLPixelIterator& dstend,
+		 IAlphaIterator& mask,
+		 const BLENDER& blender)
 {
 	for (; dst != dstend; ++dst, ++src, ++mask) {
 		Color srcc, dstc;
@@ -119,9 +121,9 @@ static void Blit(SDLPixelIterator src,
 	}
 }
 
-template <typename BLENDER>
+template<typename BLENDER>
 static void BlitBlendedRect(SDLPixelIterator& src, SDLPixelIterator& dst,
-							BLENDER blender, IAlphaIterator* maskIt)
+			    BLENDER blender, IAlphaIterator* maskIt)
 {
 	SDLPixelIterator dstend = SDLPixelIterator::end(dst);
 

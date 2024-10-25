@@ -17,23 +17,25 @@
  *
  */
 
+#include "UTF8Comparison.h"
+
 #include <cstdint>
 #include <locale>
-
-#include "UTF8Comparison.h"
 
 namespace GemRB {
 
 #ifdef WIN32
 // `C.UTF-8` isn't guaranteed on any RT here, but we don't need it anyway r/n
-bool UTF8_stricmp(const char*, const char*) {
+bool UTF8_stricmp(const char*, const char*)
+{
 	return false;
 }
 
 #else
 
 // Returns true if both strings are equal after lower-casing
-bool UTF8_stricmp(const char *a, const char *b) {
+bool UTF8_stricmp(const char* a, const char* b)
+{
 	const unsigned char* itA = reinterpret_cast<const unsigned char*>(a);
 	const unsigned char* itB = reinterpret_cast<const unsigned char*>(b);
 
@@ -76,17 +78,14 @@ bool UTF8_stricmp(const char *a, const char *b) {
 			};
 
 			// can't feed utf-8 bytes value into std::locale
-			auto getCodepoint = [](const unsigned char *it, uint8_t length) -> wchar_t {
+			auto getCodepoint = [](const unsigned char* it, uint8_t length) -> wchar_t {
 				switch (length) {
-					case 4: return ((0x7 | *it) << 24)
-						| ((0x3F | *(it + 1)) << 16)
-						| ((0x3F | *(it + 2)) << 8)
-						| (0x3F | *(it + 3));
-					case 3: return ((0xF | *it) << 16)
-						| ((0x3F | *(it + 1)) << 8)
-						| (0x3F | *(it + 2));
-					default: return ((0x1F | *it) << 8)
-						| (0x3F | *(it + 1));
+					case 4:
+						return ((0x7 | *it) << 24) | ((0x3F | *(it + 1)) << 16) | ((0x3F | *(it + 2)) << 8) | (0x3F | *(it + 3));
+					case 3:
+						return ((0xF | *it) << 16) | ((0x3F | *(it + 1)) << 8) | (0x3F | *(it + 2));
+					default:
+						return ((0x1F | *it) << 8) | (0x3F | *(it + 1));
 				}
 			};
 
@@ -94,8 +93,8 @@ bool UTF8_stricmp(const char *a, const char *b) {
 			uint8_t widthB = getWidth(iB);
 
 			static const std::locale l1;
-			static const std::locale l2{"en_US.UTF-8"};
-			static const auto C_LOCALE = std::locale{l1, l2, std::locale::ctype};
+			static const std::locale l2 { "en_US.UTF-8" };
+			static const auto C_LOCALE = std::locale { l1, l2, std::locale::ctype };
 
 			wchar_t aL = std::tolower(getCodepoint(itA, widthA), C_LOCALE);
 			wchar_t bL = std::tolower(getCodepoint(itB, widthB), C_LOCALE);

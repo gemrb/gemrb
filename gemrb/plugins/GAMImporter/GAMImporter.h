@@ -19,21 +19,20 @@
  */
 
 #ifndef GAMIMPORTER_H
-#define GAMIMPORTER_H
+	#define GAMIMPORTER_H
 
-#include "SaveGameMgr.h"
-
-#include "ActorMgr.h"
+	#include "ActorMgr.h"
+	#include "SaveGameMgr.h"
 
 namespace GemRB {
 
-#define GAM_VER_GEMRB  0 
-#define GAM_VER_BG  10   
-#define GAM_VER_IWD 11  
-#define GAM_VER_PST 12 
-#define GAM_VER_BG2 20 
-#define GAM_VER_TOB 21 
-#define GAM_VER_IWD2 22
+	#define GAM_VER_GEMRB 0
+	#define GAM_VER_BG    10
+	#define GAM_VER_IWD   11
+	#define GAM_VER_PST   12
+	#define GAM_VER_BG2   20
+	#define GAM_VER_TOB   21
+	#define GAM_VER_IWD2  22
 
 class GAMImporter : public SaveGameMgr {
 private:
@@ -55,14 +54,16 @@ private:
 	ieDword SavedLocCount = 0;
 	ieDword PPLocOffset = 0;
 	ieDword PPLocCount = 0;
+
 public:
 	GAMImporter() noexcept = default;
 
-	Game* LoadGame(Game *newGame, int ver_override = 0) override;
+	Game* LoadGame(Game* newGame, int ver_override = 0) override;
 
-	int GetStoredFileSize(const Game *game) override;
+	int GetStoredFileSize(const Game* game) override;
 	/* stores a gane in the savegame folder */
-	int PutGame(DataStream *stream, Game *game) const override;
+	int PutGame(DataStream* stream, Game* game) const override;
+
 private:
 	bool Import(DataStream* stream) override;
 
@@ -70,24 +71,22 @@ private:
 	void GetPCStats(PCStatsStruct& ps, bool extended);
 	GAMJournalEntry* GetJournalEntry();
 
-	int PutHeader(DataStream *stream, const Game *game) const;
+	int PutHeader(DataStream* stream, const Game* game) const;
 	int PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, ieDword CREOffset, ieDword GAMVersion) const;
-	int PutPCs(DataStream *stream, const Game *game) const;
-	int PutNPCs(DataStream *stream, const Game *game) const;
-	int PutJournals(DataStream *stream, const Game *game) const;
-	int PutVariables( DataStream *stream, const Game *game) const;
-	int PutKillVars(DataStream *stream, const Game *game) const;
-	void GetMazeHeader(void *memory) const;
-	void GetMazeEntry(void *memory) const;
-	void PutMazeHeader(DataStream *stream, void *memory) const;
-	void PutMazeEntry(DataStream *stream, void *memory) const;
-	int PutMaze(DataStream *stream, const Game *game) const;
-	int PutFamiliars(DataStream *stream, const Game *game) const;
-	int PutSavedLocations(DataStream *stream, Game *game) const;
-	int PutPlaneLocations(DataStream *stream, Game *game) const;
+	int PutPCs(DataStream* stream, const Game* game) const;
+	int PutNPCs(DataStream* stream, const Game* game) const;
+	int PutJournals(DataStream* stream, const Game* game) const;
+	int PutVariables(DataStream* stream, const Game* game) const;
+	int PutKillVars(DataStream* stream, const Game* game) const;
+	void GetMazeHeader(void* memory) const;
+	void GetMazeEntry(void* memory) const;
+	void PutMazeHeader(DataStream* stream, void* memory) const;
+	void PutMazeEntry(DataStream* stream, void* memory) const;
+	int PutMaze(DataStream* stream, const Game* game) const;
+	int PutFamiliars(DataStream* stream, const Game* game) const;
+	int PutSavedLocations(DataStream* stream, Game* game) const;
+	int PutPlaneLocations(DataStream* stream, Game* game) const;
 };
 
 #endif
 }
-
-

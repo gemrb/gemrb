@@ -30,13 +30,13 @@ bool ACMReader::Import(DataStream* str)
 
 	char Signature[4];
 	ieDword SignatureDword;
-	str->Read( Signature, 4 );
-	str->Seek( 0, GEM_STREAM_START );
+	str->Read(Signature, 4);
+	str->Seek(0, GEM_STREAM_START);
 	str->ReadDword(SignatureDword);
-	if (!memcmp( Signature, "WAVC", 4 )) {
-		str->Seek( 28, GEM_STREAM_START );
+	if (!memcmp(Signature, "WAVC", 4)) {
+		str->Seek(28, GEM_STREAM_START);
 	} else if (SignatureDword == IP_ACM_SIG) {
-		str->Seek( 0, GEM_STREAM_START );
+		str->Seek(0, GEM_STREAM_START);
 	} else {
 		return false;
 	}
@@ -53,23 +53,23 @@ bool ACMReader::Import(DataStream* str)
 	if (hdr.signature != IP_ACM_SIG) {
 		return false;
 	}
-	samples_left = ( samples = hdr.samples );
+	samples_left = (samples = hdr.samples);
 	channels = hdr.channels;
 	samplerate = hdr.rate;
 	//levels = hdr.levels;
 	//subblocks = hdr.subblocks;
 
-	block_size = ( 1 << levels ) * subblocks;
+	block_size = (1 << levels) * subblocks;
 	//using malloc for simple arrays (supposed to be faster)
-	block = (int *) malloc(sizeof(int)*block_size);
+	block = (int*) malloc(sizeof(int) * block_size);
 	if (!block) {
 		return false;
 	}
-	unpacker = new CValueUnpacker( levels, subblocks, str );
+	unpacker = new CValueUnpacker(levels, subblocks, str);
 	if (!unpacker || !unpacker->init_unpacker()) {
 		return false;
 	}
-	decoder = new CSubbandDecoder( levels );
+	decoder = new CSubbandDecoder(levels);
 	if (!decoder || !decoder->init_decoder()) {
 		return false;
 	}
@@ -77,13 +77,13 @@ bool ACMReader::Import(DataStream* str)
 }
 int ACMReader::make_new_samples()
 {
-	if (!unpacker->get_one_block( block )) {
+	if (!unpacker->get_one_block(block)) {
 		return 0;
 	}
 
-	decoder->decode_data( block, subblocks );
+	decoder->decode_data(block, subblocks);
 	values = block;
-	samples_ready = ( block_size > samples_left ) ? samples_left : block_size;
+	samples_ready = (block_size > samples_left) ? samples_left : block_size;
 	samples_left -= samples_ready;
 
 	return 1;
@@ -99,7 +99,7 @@ int ACMReader::read_samples(short* buffer, int count)
 			if (!make_new_samples())
 				break;
 		}
-		*buffer = ( short ) ( ( *values ) >> levels );
+		*buffer = (short) ((*values) >> levels);
 		values++;
 		buffer++;
 		res += 1;
@@ -110,7 +110,8 @@ int ACMReader::read_samples(short* buffer, int count)
 
 static constexpr size_t CHANNEL_SPLIT_SAMPLE_SIZE = 2048;
 
-int ACMReader::ReadSamplesIntoChannels(char *channel1, char *channel2, int numSamples) {
+int ACMReader::ReadSamplesIntoChannels(char* channel1, char* channel2, int numSamples)
+{
 	std::vector<char> buffer;
 	// sample: 2 channels à 2 bytes ...
 	buffer.resize(CHANNEL_SPLIT_SAMPLE_SIZE * 4);
@@ -123,10 +124,10 @@ int ACMReader::ReadSamplesIntoChannels(char *channel1, char *channel2, int numSa
 	do {
 		for (decltype(samplesRead) i = 0; i < samplesRead; ++i) {
 			auto bufferOffset = i * 4;
-			channel1[z]   = buffer[bufferOffset];
-			channel1[z+1] = buffer[bufferOffset + 1];
-			channel2[z]   = buffer[bufferOffset + 2];
-			channel2[z+1] = buffer[bufferOffset + 3];
+			channel1[z] = buffer[bufferOffset];
+			channel1[z + 1] = buffer[bufferOffset + 1];
+			channel2[z] = buffer[bufferOffset + 2];
+			channel2[z + 1] = buffer[bufferOffset + 3];
 			z += 2;
 		}
 
@@ -140,6 +141,6 @@ int ACMReader::ReadSamplesIntoChannels(char *channel1, char *channel2, int numSa
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x10373EE, "ACM File Importer")
-PLUGIN_IE_RESOURCE(ACMReader, "acm", (ieWord)IE_ACM_CLASS_ID)
-PLUGIN_IE_RESOURCE(ACMReader, "wav", (ieWord)IE_WAV_CLASS_ID)
+PLUGIN_IE_RESOURCE(ACMReader, "acm", (ieWord) IE_ACM_CLASS_ID)
+PLUGIN_IE_RESOURCE(ACMReader, "wav", (ieWord) IE_WAV_CLASS_ID)
 END_PLUGIN()

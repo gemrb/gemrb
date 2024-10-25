@@ -35,8 +35,8 @@
 #include "Polygon.h"
 #include "Sprite2D.h"
 
-#include <deque>
 #include <algorithm>
+#include <deque>
 
 namespace GemRB {
 
@@ -48,20 +48,21 @@ protected:
 	Region rect;
 
 public:
-	explicit VideoBuffer(const Region& r) : rect(r) {}
+	explicit VideoBuffer(const Region& r)
+		: rect(r) {}
 	virtual ~VideoBuffer() noexcept = default;
-	
+
 	::GemRB::Size Size() const { return rect.size; }
 	Point Origin() const { return rect.origin; }
-	Region Rect() const  { return rect; }
-	
+	Region Rect() const { return rect; }
+
 	void SetOrigin(const Point& p) { rect.origin = p; }
 
-	virtual void Clear() { Clear({0, 0, rect.w, rect.h}); };
+	virtual void Clear() { Clear({ 0, 0, rect.w, rect.h }); };
 	virtual void Clear(const Region& rgn) = 0;
 	// CopyPixels takes at least one void* buffer with implied pitch of Region.w, otherwise alternating pairs of buffers and their corresponding pitches
 	virtual void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) = 0;
-	
+
 	virtual bool RenderOnDisplay(void* display) const = 0;
 };
 
@@ -79,10 +80,10 @@ public:
 	enum class BufferFormat {
 		DISPLAY, // whatever format the video driver thinks is best for the display
 		DISPLAY_ALPHA, // the same RGB format as DISPLAY, but forces an alpha if DISPLAY doesn't provide one
-		RGBPAL8,	// 8 bit palettized
+		RGBPAL8, // 8 bit palettized
 		RGB555, // 16 bit RGB (truecolor)
 		RGBA8888, // Standard 8 bits per channel with alpha
-		YV12    // YUV format for BIK videos
+		YV12 // YUV format for BIK videos
 	};
 
 protected:
@@ -114,8 +115,8 @@ protected:
 	void DestroyBuffers();
 
 private:
-	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
-	virtual void SwapBuffers(VideoBuffers&)=0;
+	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat) = 0;
+	virtual void SwapBuffers(VideoBuffers&) = 0;
 	virtual int PollEvents() = 0;
 	virtual int CreateDriverDisplay(const char* title, bool vsync) = 0;
 
@@ -127,7 +128,7 @@ private:
 	virtual void DrawEllipseImp(const Region& rect, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags) = 0;
 	virtual void DrawLineImp(const Point& p1, const Point& p2, const Color& color, BlitFlags flags) = 0;
-	virtual void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)=0;
+	virtual void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) = 0;
 
 public:
 	Video() noexcept;
@@ -136,7 +137,7 @@ public:
 	virtual int Init(void) = 0;
 
 	int CreateDisplay(const Size&, int bpp, bool fullscreen, const char* title, bool vsync);
-	virtual void SetWindowTitle(const char *title) = 0;
+	virtual void SetWindowTitle(const char* title) = 0;
 
 	/** Toggles GemRB between fullscreen and windowed mode. */
 	bool ToggleFullscreenMode();
@@ -163,21 +164,21 @@ public:
 	virtual bool CanDrawRawGeometry() const { return false; }
 
 	virtual Holder<Sprite2D> CreateSprite(const Region&, void* pixels, const PixelFormat&) = 0;
-	
+
 	void BlitSprite(const Holder<Sprite2D>& spr, Point p,
-					const Region* clip = nullptr, BlitFlags = BlitFlags::NONE);
-	
+			const Region* clip = nullptr, BlitFlags = BlitFlags::NONE);
+
 	virtual void BlitSprite(const Holder<Sprite2D>& spr, const Region& src, Region dst,
-							BlitFlags flags, Color tint = Color()) = 0;
+				BlitFlags flags, Color tint = Color()) = 0;
 
 	virtual void BlitGameSprite(const Holder<Sprite2D>& spr, const Point& p,
-								BlitFlags flags, Color tint = Color()) = 0;
+				    BlitFlags flags, Color tint = Color()) = 0;
 
 	void BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const Holder<Palette>& pal, const Point& p,
-								   BlitFlags flags, Color tint);
+				       BlitFlags flags, Color tint);
 
 	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
-								 Color tint = Color()) = 0;
+				     Color tint = Color()) = 0;
 
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */

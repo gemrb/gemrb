@@ -21,18 +21,18 @@
 #include "TextArea.h"
 
 #include "Interface.h"
-#include "Logging/Logging.h"
 
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
+#include "Logging/Logging.h"
 
 #include <utility>
 
 namespace GemRB {
-	
+
 TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const String*>& opts, bool numbered, Margin m)
-: ContentContainer(Region(0, 0, ta.Frame().w, 0)), ta(ta)
+	: ContentContainer(Region(0, 0, ta.Frame().w, 0)), ta(ta)
 {
 	SetFlags(RESIZE_WIDTH, BitOp::NAND);
 
@@ -47,9 +47,9 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	Region r(origin, Dimensions());
 	r.w = std::max(r.w - margin.left - margin.right, 0);
 	r.h = std::max(r.h - margin.top - margin.bottom, 0);
-	
-	Font::PrintColors optionColors {ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]};
-	Font::PrintColors selectedCol {ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]};
+
+	Font::PrintColors optionColors { ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND] };
+	Font::PrintColors selectedCol { ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND] };
 
 	for (size_t i = 0; i < opts.size(); i++) {
 		TextContainer* selOption = new OptSpan(r, ta.ftext, optionColors.fg, optionColors.bg);
@@ -71,21 +71,21 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 		}
 		r.y += selOption->Dimensions().h;
 	}
-	
+
 	SetFrameSize(Size(r.w, r.y)); // r.y is not a typo, its the location where the next option would have been
 
 	if (numbered) {
 		// in a sane world we would simply focus the window and this View
 		// unfortunately, focusing the window makes it overlap with the portwin/optwin...
-		EventMgr::EventCallback cb = METHOD_CALLBACK( &SpanSelector::KeyEvent, this);
+		EventMgr::EventCallback cb = METHOD_CALLBACK(&SpanSelector::KeyEvent, this);
 		id = EventMgr::RegisterEventMonitor(cb, Event::KeyDownMask);
 	} else {
 		id = -1;
 	}
 
-	assert((Flags()&RESIZE_WIDTH) == 0);
+	assert((Flags() & RESIZE_WIDTH) == 0);
 }
-	
+
 TextArea::SpanSelector::~SpanSelector()
 {
 	EventMgr::UnRegisterEventMonitor(id);
@@ -111,7 +111,7 @@ void TextArea::SpanSelector::SizeChanged(const Size&)
 		}
 		r.y += selOption->Dimensions().h;
 	}
-	
+
 	frame.h = std::max(frame.h, r.y + margin.bottom);
 }
 
@@ -157,7 +157,7 @@ void TextArea::SpanSelector::MakeSelection(Option_t idx)
 		selectedSpan->SetColors(ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]);
 	}
 	selectedSpan = optspan;
-	
+
 	if (selectedSpan) {
 		selectedSpan->SetColors(ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]);
 	}
@@ -172,7 +172,7 @@ TextContainer* TextArea::SpanSelector::TextAtPoint(const Point& p)
 	// container only has text, so...
 	return static_cast<TextContainer*>(SubviewAt(p, true, false));
 }
-	
+
 TextContainer* TextArea::SpanSelector::TextAtIndex(Option_t idx)
 {
 	if (subViews.empty() || idx > subViews.size() - 1) {
@@ -188,10 +188,10 @@ bool TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
 	TextContainer* span = TextAtPoint(p);
-	
+
 	if (hoverSpan || span)
 		MarkDirty();
-	
+
 	ClearHover();
 	if (span) {
 		hoverSpan = span;
@@ -199,22 +199,24 @@ bool TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
 	}
 	return true;
 }
-	
+
 bool TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
 	const TextContainer* span = TextAtPoint(p);
-	
+
 	if (span) {
 		std::list<View*>::reverse_iterator it = subViews.rbegin();
 		unsigned int idx = 0;
-		while (*it++ != span) { ++idx; }
-		
+		while (*it++ != span) {
+			++idx;
+		}
+
 		MakeSelection(idx);
 	}
 	return true;
 }
-	
+
 void TextArea::SpanSelector::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 {
 	ClearHover();
@@ -222,7 +224,7 @@ void TextArea::SpanSelector::OnMouseLeave(const MouseEvent& me, const DragOp* op
 }
 
 TextArea::TextArea(const Region& frame, Holder<Font> text)
-: TextArea(frame, text, text)
+	: TextArea(frame, text, text)
 {}
 
 TextArea::TextArea(const Region& frame, Holder<Font> text, Holder<Font> caps)
@@ -246,8 +248,8 @@ TextArea::TextArea(const Region& frame, Holder<Font> text, Holder<Font> caps)
 
 	scrollview.SetScrollIncrement(LineHeight());
 	scrollview.SetAutoResizeFlags(ResizeAll, BitOp::SET);
-	scrollview.SetFlags(View::IgnoreEvents, (Flags()&View::IgnoreEvents) ? BitOp::OR : BitOp::NAND);
-	
+	scrollview.SetFlags(View::IgnoreEvents, (Flags() & View::IgnoreEvents) ? BitOp::OR : BitOp::NAND);
+
 	BindDictVariable("Selected", Control::INVALID_VALUE);
 }
 
@@ -319,15 +321,14 @@ Region TextArea::UpdateTextFrame()
 		scrollview.Update();
 		return textContainer->Frame();
 	}
-	return Region(Point(0,0), Size(cr.w + cr.x, 0));
+	return Region(Point(0, 0), Size(cr.w + cr.x, 0));
 }
 
 void TextArea::UpdateScrollview()
 {
-	if (Flags()&AutoScroll
-		&& dialogBeginNode) {
+	if (Flags() & AutoScroll && dialogBeginNode) {
 		assert(textContainer && selectOptions);
-		
+
 		Region textFrame = UpdateTextFrame();
 		textFrame.y = textFrame.h;
 		textFrame.h = selectOptions->Frame().h;
@@ -359,7 +360,7 @@ void TextArea::UpdateScrollview()
 	} else if (!core->HasFeature(GFFlags::DIALOGUE_SCROLLS)) {
 		scrollview.Update();
 	}
-	
+
 	Region textFrame = UpdateTextFrame();
 	if (selectOptions) {
 		textFrame.y = textFrame.h;
@@ -370,18 +371,18 @@ void TextArea::UpdateScrollview()
 
 void TextArea::FlagsChanged(unsigned int oldflags)
 {
-	if (Flags()&View::IgnoreEvents) {
+	if (Flags() & View::IgnoreEvents) {
 		scrollview.SetFlags(View::IgnoreEvents, BitOp::OR);
-	} else if (oldflags&View::IgnoreEvents) {
+	} else if (oldflags & View::IgnoreEvents) {
 		scrollview.SetFlags(View::IgnoreEvents, BitOp::NAND);
 	}
 
-	if (Flags()&Editable) {
+	if (Flags() & Editable) {
 		assert(textContainer);
 		textContainer->SetFlags(View::IgnoreEvents, BitOp::NAND);
 		textContainer->SetEventProxy(NULL);
 		SetEventProxy(textContainer);
-	} else if (oldflags&Editable) {
+	} else if (oldflags & Editable) {
 		assert(textContainer);
 		textContainer->SetFlags(View::IgnoreEvents, BitOp::OR);
 		textContainer->SetEventProxy(&scrollview);
@@ -400,7 +401,7 @@ void TextArea::SetColor(const Color& color, COLOR_TYPE idx)
 {
 	assert(idx < COLOR_TYPE_COUNT);
 	colors[idx] = color;
-	parser.ResetAttributes(ftext, {colors[COLOR_NORMAL], colors[COLOR_BACKGROUND]}, finit, {colors[COLOR_INITIALS], colors[COLOR_BACKGROUND]});
+	parser.ResetAttributes(ftext, { colors[COLOR_NORMAL], colors[COLOR_BACKGROUND] }, finit, { colors[COLOR_INITIALS], colors[COLOR_BACKGROUND] });
 	textContainer->SetColors(colors[COLOR_NORMAL], colors[COLOR_BACKGROUND]);
 }
 
@@ -479,7 +480,7 @@ void TextArea::AppendText(String text)
 					// see BG2 chargen
 					s.w += 3;
 				}
-				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, {colors[COLOR_INITIALS], colors[COLOR_BACKGROUND]}, &s);
+				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, { colors[COLOR_INITIALS], colors[COLOR_BACKGROUND] }, &s);
 				textContainer->AppendContent(dc);
 				textpos++;
 				// FIXME: assuming we have more text!
@@ -497,8 +498,7 @@ void TextArea::AppendText(String text)
 
 	UpdateScrollview();
 
-	if (flags&AutoScroll && !selectOptions)
-	{
+	if (flags & AutoScroll && !selectOptions) {
 		// scroll to the bottom
 		int bottom = ContentHeight() - frame.h;
 		if (bottom > 0)
@@ -551,9 +551,9 @@ void TextArea::UpdateState(value_t opt)
 		selectOptions->MakeSelection(-1);
 		return;
 	}
-	
+
 	Option_t optIdx = std::distance(values.begin(), it);
-	
+
 	// only run the handlers if the context has changed, or the selection is different
 	// note that handlers can trigger reentrancy back here
 	if (optionContext != selectOptions->Context() || optIdx != selectOptions->SelectionIdx()) {
@@ -561,7 +561,7 @@ void TextArea::UpdateState(value_t opt)
 
 		// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
 		selectOptions->MakeSelection(optIdx);
-	
+
 		SetValue(values[optIdx]);
 		PerformAction(Action::Select);
 	}
@@ -579,14 +579,14 @@ void TextArea::UpdateStateWithSelection(Option_t optIdx)
 
 void TextArea::DidFocus()
 {
-	if (Flags()&Editable) {
+	if (Flags() & Editable) {
 		textContainer->DidFocus();
 	}
 }
 
 void TextArea::DidUnFocus()
 {
-	if (Flags()&Editable) {
+	if (Flags() & Editable) {
 		textContainer->DidUnFocus();
 	}
 }
@@ -598,7 +598,7 @@ void TextArea::AddSubviewInFrontOfView(View* front, const View* back)
 	const View* target = back ? back : &scrollview;
 	View::AddSubviewInFrontOfView(front, target);
 }
-	
+
 int TextArea::TextHeight() const
 {
 	return textContainer ? textContainer->Dimensions().h : 0;
@@ -646,9 +646,9 @@ void TextArea::SetScrollbar(ScrollBar* sb)
 {
 	const Region& sbr = sb->Frame();
 	const Region& tar = Frame();
-	
+
 	ContentContainer::Margin margins = GetMargins();
-	
+
 	Region combined = Region::RegionEnclosingRegions(sbr, tar);
 	margins.top += tar.y - combined.y;
 	margins.left += tar.x - combined.x;
@@ -661,7 +661,7 @@ void TextArea::SetScrollbar(ScrollBar* sb)
 
 	SetFrame(combined);
 	SetMargins(margins);
-	
+
 	Point origin = ConvertPointFromWindow(sb->Frame().origin);
 	sb->SetFrameOrigin(origin);
 
@@ -726,7 +726,7 @@ void TextArea::ClearText()
 	textContainer->SetColors(colors[COLOR_NORMAL], colors[COLOR_BACKGROUND]);
 	textContainer->SetMargin(textMargins);
 	textContainer->callback = METHOD_CALLBACK(&TextArea::TextChanged, this);
-	if (Flags()&Editable) {
+	if (Flags() & Editable) {
 		textContainer->SetFlags(View::IgnoreEvents, BitOp::NAND);
 		SetEventProxy(textContainer);
 	} else {

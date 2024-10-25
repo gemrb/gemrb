@@ -24,6 +24,7 @@
 #include "ie_types.h"
 
 #include "Resource.h"
+
 #include "Streams/DataStream.h"
 
 namespace GemRB {
@@ -43,8 +44,8 @@ public:
 	 * @param[in] cnt number of samples to read.
 	 * @returns Number of samples read.
 	 */
-	virtual int read_samples( short* memory, int cnt ) = 0 ;
-	virtual int ReadSamplesIntoChannels(char *channel1, char *channel2, int numSamples) = 0;
+	virtual int read_samples(short* memory, int cnt) = 0;
+	virtual int ReadSamplesIntoChannels(char* channel1, char* channel2, int numSamples) = 0;
 	int get_channels() const
 	{
 		return channels;
@@ -57,6 +58,7 @@ public:
 	{
 		return samples;
 	} // returns the total samples count
+
 protected:
 	int samples = 0; // total count of sound samples
 	int channels = 0;

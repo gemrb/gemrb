@@ -28,6 +28,7 @@
 #define CONSOLE_H
 
 #include "CircularBuffer.h"
+
 #include "GUI/TextArea.h"
 #include "GUI/TextEdit.h"
 
@@ -47,7 +48,7 @@ constexpr size_t HistoryMaxSize = 10;
 class GEM_EXPORT Console final : public TextEdit {
 private:
 	/** History Buffer */
-	CircularBuffer<SelectOption> History{HistoryMaxSize};
+	CircularBuffer<SelectOption> History { HistoryMaxSize };
 	/** History Position and size */
 	TextArea* textArea = nullptr;
 	// an index into Hiostory, except when > History.size() which indicates a new entry

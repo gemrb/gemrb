@@ -21,11 +21,11 @@
 #ifndef PVRZIMP_H
 #define PVRZIMP_H
 
+#include "ImageMgr.h"
+
 #include <array>
 #include <tuple>
 #include <vector>
-
-#include "ImageMgr.h"
 
 namespace GemRB {
 

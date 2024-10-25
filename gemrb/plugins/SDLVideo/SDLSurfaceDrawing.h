@@ -21,14 +21,17 @@
 #ifndef SURFACE_DRAWING_H
 #define SURFACE_DRAWING_H
 
+// clang-format off
+// order matters
 #include <SDL.h>
+// clang-format on
 
-#include <cmath>
-
+#include "Polygon.h"
 #include "SDLPixelIterator.h"
 
 #include "Logging/Logging.h"
-#include "Polygon.h"
+
+#include <cmath>
 
 namespace GemRB {
 
@@ -47,7 +50,7 @@ inline bool PointClipped(const SDL_Surface* surf, const Point& p)
 	return false;
 }
 
-#if SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
 template<typename T>
 inline const SDL_Rect& RectFromRegion(T& rgn)
 {
@@ -56,7 +59,7 @@ inline const SDL_Rect& RectFromRegion(T& rgn)
 #else
 inline SDL_Rect RectFromRegion(const Region& rgn)
 {
-	SDL_Rect rect = {Sint16(rgn.x), Sint16(rgn.y), Uint16(rgn.w), Uint16(rgn.h)};
+	SDL_Rect rect = { Sint16(rgn.x), Sint16(rgn.y), Uint16(rgn.w), Uint16(rgn.h) };
 	return rect;
 }
 #endif
@@ -69,11 +72,11 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 	p = Clamp(p, clip.origin, clip.Maximum());
 	if (PointClipped(dst, p)) return;
 
-	Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
+	Uint32* px = ((Uint32*) dst->pixels) + (p.y * dst->pitch / 4) + p.x;
 
 	if (SHADE != SHADER::NONE) {
 		Color dstc;
-		SDL_GetRGB( *px, dst->format, &dstc.r, &dstc.g, &dstc.b );
+		SDL_GetRGB(*px, dst->format, &dstc.r, &dstc.g, &dstc.b);
 		if (SHADE == SHADER::TINT) {
 			ShaderTint(color, dstc);
 		} else {
@@ -89,7 +92,7 @@ template<SHADER SHADE = SHADER::NONE>
 void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, const Region& clip, const Color& srcc)
 {
 	const SDL_PixelFormat* fmt = surface->format;
-	SDL_LockSurface( surface );
+	SDL_LockSurface(surface);
 
 	std::vector<Point>::const_iterator it;
 	it = points.begin();
@@ -104,7 +107,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 		switch (fmt->BytesPerPixel) {
 			case 1:
 				if (SHADE != SHADER::NONE) {
-					SDL_GetRGB( *dst, surface->format, &dstc.r, &dstc.g, &dstc.b );
+					SDL_GetRGB(*dst, surface->format, &dstc.r, &dstc.g, &dstc.b);
 					if (SHADE == SHADER::TINT) {
 						ShaderTint(srcc, dstc);
 					} else {
@@ -117,7 +120,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 				break;
 			case 2:
 				if (SHADE != SHADER::NONE) {
-					SDL_GetRGB( *reinterpret_cast<Uint16*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b );
+					SDL_GetRGB(*reinterpret_cast<Uint16*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b);
 					if (SHADE == SHADER::TINT) {
 						ShaderTint(srcc, dstc);
 					} else {
@@ -129,10 +132,10 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 				}
 				break;
 			case 3:
-			{
-				// FIXME: implement alpha blending for this... or nix it
-				// is this even used?
-				/*
+				{
+					// FIXME: implement alpha blending for this... or nix it
+					// is this even used?
+					/*
 				Uint32 val = SDL_MapRGB(surface->format, srcc.r, srcc.g, srcc.b);
 	#if SDL_BYTEORDER == SDL_LIL_ENDIAN
 				pixel[0] = val & 0xff;
@@ -144,11 +147,11 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 				pixel[0] = (val >> 16) & 0xff;
 	#endif
 				*/
-			}
+				}
 				break;
 			case 4:
 				if (SHADE != SHADER::NONE) {
-					SDL_GetRGB( *reinterpret_cast<Uint32*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b );
+					SDL_GetRGB(*reinterpret_cast<Uint32*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b);
 					if (SHADE == SHADER::TINT) {
 						ShaderTint(srcc, dstc);
 					} else {
@@ -165,7 +168,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 		}
 	}
 
-	SDL_UnlockSurface( surface );
+	SDL_UnlockSurface(surface);
 }
 
 template<SHADER SHADE = SHADER::NONE>
@@ -203,7 +206,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, con
 		r.h = 1;
 		auto dstit = MakeSDLPixelIterator(dst, r.Intersect(clip));
 		auto dstend = SDLPixelIterator::end(dstit);
-		
+
 		if (SHADE == SHADER::TINT) {
 			const static TintDst<false> blender;
 			ColorFill(color, dstit, dstend, blender);
@@ -212,7 +215,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, con
 			ColorFill(color, dstit, dstend, blender);
 		}
 	} else {
-		Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
+		Uint32* px = ((Uint32*) dst->pixels) + (p.y * dst->pitch / 4) + p.x;
 		Uint32 c = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
 
 		int numPx = std::min(x2 - p.x, dst->w - p.x);
@@ -284,7 +287,7 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 	if (longLen == 0) {
 		decInc = 0;
 	} else {
-		decInc = ( shortLen * 65536 ) / longLen;
+		decInc = (shortLen * 65536) / longLen;
 	}
 
 	// the numper of "points" is the length of the hypotenuse
@@ -305,8 +308,8 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 		if (yLonger) {
 			if (longLen > 0) {
 				longLen += p1.y;
-				for (int j = 0x8000 + ( p1.x << 16 ); p1.y <= longLen; ++p1.y) {
-					newp = Point( j >> 16, p1.y );
+				for (int j = 0x8000 + (p1.x << 16); p1.y <= longLen; ++p1.y) {
+					newp = Point(j >> 16, p1.y);
 					if (clip.PointInside(newp))
 						s_points.push_back(newp);
 					j += decInc;
@@ -314,8 +317,8 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 				break;
 			}
 			longLen += p1.y;
-			for (int j = 0x8000 + ( p1.x << 16 ); p1.y >= longLen; --p1.y) {
-				newp = Point( j >> 16, p1.y );
+			for (int j = 0x8000 + (p1.x << 16); p1.y >= longLen; --p1.y) {
+				newp = Point(j >> 16, p1.y);
 				if (clip.PointInside(newp))
 					s_points.push_back(newp);
 				j -= decInc;
@@ -325,8 +328,8 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 
 		if (longLen > 0) {
 			longLen += p1.x;
-			for (int j = 0x8000 + ( p1.y << 16 ); p1.x <= longLen; ++p1.x) {
-				newp = Point( p1.x, j >> 16 );
+			for (int j = 0x8000 + (p1.y << 16); p1.x <= longLen; ++p1.x) {
+				newp = Point(p1.x, j >> 16);
 				if (clip.PointInside(newp))
 					s_points.push_back(newp);
 				j += decInc;
@@ -334,8 +337,8 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 			break;
 		}
 		longLen += p1.x;
-		for (int j = 0x8000 + ( p1.y << 16 ); p1.x >= longLen; --p1.x) {
-			newp = Point( p1.x, j >> 16 );
+		for (int j = 0x8000 + (p1.y << 16); p1.x >= longLen; --p1.x) {
+			newp = Point(p1.x, j >> 16);
 			if (clip.PointInside(newp))
 				s_points.push_back(newp);
 			j -= decInc;
@@ -350,9 +353,8 @@ void DrawLinesSurface(SDL_Surface* surface, const std::vector<Point>& points, co
 {
 	size_t count = points.size();
 	assert(count % 2 == 0);
-	for (size_t i = 0; i < count; i+=2)
-	{
-		DrawLineSurface<SHADE>(surface, points[i], points[i+1], clip, color);
+	for (size_t i = 0; i < count; i += 2) {
+		DrawLineSurface<SHADE>(surface, points[i], points[i + 1], clip, color);
 	}
 }
 
@@ -360,8 +362,7 @@ template<SHADER SHADE = SHADER::NONE>
 void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Point& origin, const Region& clip, const Color& color, bool fill)
 {
 	if (fill) {
-		for (const auto& lineSegments : poly->rasterData)
-		{
+		for (const auto& lineSegments : poly->rasterData) {
 			for (const auto& segment : lineSegments) {
 				DrawHLineSurface<SHADE>(surface, segment.first + origin, (segment.second + origin).x, clip, color);
 			}
@@ -374,19 +375,19 @@ void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Poi
 		// Point is trivial and clear() should be constant
 		static std::vector<Point> s_points;
 		s_points.clear();
-		s_points.resize(poly->Count()*2); // resize, not reserve! (it won't shrink the capacity FYI)
+		s_points.resize(poly->Count() * 2); // resize, not reserve! (it won't shrink the capacity FYI)
 
 		const Point& p = poly->vertices[0] - poly->BBox.origin + origin;
 		s_points[0].x = p.x;
 		s_points[0].y = p.y;
 
 		size_t j = 1;
-		for (size_t i = 1; i < poly->Count(); ++i, j+=2) {
+		for (size_t i = 1; i < poly->Count(); ++i, j += 2) {
 			// this is not a typo. one point ends the previous line, the next begins the next line
 			const Point& v = poly->vertices[i] - poly->BBox.origin + origin;
 			s_points[j].x = v.x;
 			s_points[j].y = v.y;
-			s_points[j+1] = s_points[j];
+			s_points[j + 1] = s_points[j];
 		}
 		// reconnect with start point
 		s_points[j].x = p.x;

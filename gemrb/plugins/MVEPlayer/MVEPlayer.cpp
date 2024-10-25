@@ -24,8 +24,9 @@
 
 #include "Audio.h"
 #include "Interface.h"
-#include "Logging/Logging.h"
 #include "Palette.h"
+
+#include "Logging/Logging.h"
 #include "Video/Video.h"
 
 #include <cassert>
@@ -37,7 +38,7 @@ static const char MVESignature[] = "Interplay MVE File\x1A";
 static const int MVE_SIGNATURE_LEN = 19;
 
 MVEPlay::MVEPlay() noexcept
-: decoder(this)
+	: decoder(this)
 {
 	video = VideoDriver;
 	validVideo = false;
@@ -47,7 +48,7 @@ MVEPlay::MVEPlay() noexcept
 	// these colors don't change
 	g_palette->SetColor(1, ColorBlack);
 	//Set color 255 to be our subtitle color
-	g_palette->SetColor(255, Color(50,50,50,255));
+	g_palette->SetColor(255, Color(50, 50, 50, 255));
 }
 
 bool MVEPlay::Import(DataStream* str)
@@ -55,12 +56,12 @@ bool MVEPlay::Import(DataStream* str)
 	validVideo = false;
 
 	char Signature[MVE_SIGNATURE_LEN];
-	str->Read( Signature, MVE_SIGNATURE_LEN );
-	if (memcmp( Signature, MVESignature, MVE_SIGNATURE_LEN ) != 0) {
+	str->Read(Signature, MVE_SIGNATURE_LEN);
+	if (memcmp(Signature, MVESignature, MVE_SIGNATURE_LEN) != 0) {
 		return false;
 	}
 
-	str->Seek( 0, GEM_STREAM_START );
+	str->Seek(0, GEM_STREAM_START);
 
 	validVideo = decoder.start_playback();
 	return validVideo;
@@ -75,8 +76,8 @@ bool MVEPlay::DecodeFrame(VideoBuffer& buf)
 
 unsigned int MVEPlay::fileRead(void* buf, unsigned int count)
 {
-	strret_t numread = str->Read( buf, count );
-	return ( numread == count );
+	strret_t numread = str->Read(buf, count);
+	return (numread == count);
 }
 
 void MVEPlay::showFrame(const unsigned char* buf, unsigned int bufw, unsigned int bufh)
@@ -95,10 +96,10 @@ void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count) const
 {
 	p = p + (start * 3);
 	Palette::Colors buffer;
-	for (unsigned int i = start; i < start+count; i++) {
-		buffer[i].r = ( *p++ ) << 2;
-		buffer[i].g = ( *p++ ) << 2;
-		buffer[i].b = ( *p++ ) << 2;
+	for (unsigned int i = start; i < start + count; i++) {
+		buffer[i].r = (*p++) << 2;
+		buffer[i].g = (*p++) << 2;
+		buffer[i].b = (*p++) << 2;
 		buffer[i].a = 0xff;
 	}
 	g_palette->CopyColors(start, buffer.cbegin() + start, buffer.cbegin() + start + count);
@@ -106,8 +107,8 @@ void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count) const
 
 int MVEPlay::setAudioStream() const
 {
-	ieDword volume = core->GetDictionary().Get("Volume Movie", 0) ;
-	int source = core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume, false, false) ;
+	ieDword volume = core->GetDictionary().Get("Volume Movie", 0);
+	int source = core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume, false, false);
 	return source;
 }
 
@@ -118,16 +119,16 @@ void MVEPlay::freeAudioStream(int stream) const
 }
 
 void MVEPlay::queueBuffer(int stream, unsigned short bits,
-			int channels, short* memory,
-			int size, int samplerate) const
+			  int channels, short* memory,
+			  int size, int samplerate) const
 {
 	if (stream > -1)
-		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate) ;
+		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate);
 }
 
 
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x218963DC, "MVE Video Player")
-PLUGIN_IE_RESOURCE(MVEPlay, "mve", (ieWord)IE_MVE_CLASS_ID)
+PLUGIN_IE_RESOURCE(MVEPlay, "mve", (ieWord) IE_MVE_CLASS_ID)
 END_PLUGIN()
