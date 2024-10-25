@@ -110,7 +110,7 @@ void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	if (animation && animation->HasEnded()) {
 		auto sprite = animation->Current();
 		SetAnimation(nullptr);
-		SetPicture(sprite);
+		SetPicture(std::move(sprite));
 		PerformAction(Action::EndReached);
 	}
 }

@@ -3557,7 +3557,7 @@ static PyObject* GemRB_GetSprite(PyObject* /*self*/, PyObject* args)
 		spr->SetPalette(newpal);
 	}
 
-	return PyObject_FromHolder<Sprite2D>(spr);
+	return PyObject_FromHolder<Sprite2D>(std::move(spr));
 }
 
 static PyObject* SetButtonBAM(Button* btn, StringView ResRef)
@@ -3661,7 +3661,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	anim->flags = (animFlags | Animation::Flags::Active) & ~GAMEANIM;
 	anim->gameAnimation = bool(animFlags & GAMEANIM);
 
-	btn->SetAnimation(new SpriteAnimation(anim));
+	btn->SetAnimation(new SpriteAnimation(std::move(anim)));
 
 	Py_RETURN_NONE;
 }

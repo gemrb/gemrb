@@ -2302,7 +2302,7 @@ void Movable::WalkTo(const Point& Des, int distance)
 
 	if (newPath) {
 		ClearPath(false);
-		path = newPath;
+		path = std::move(newPath);
 		HandleAnkhegStance(false);
 	} else {
 		pathfindingDistance = std::max(circleSize, distance);
