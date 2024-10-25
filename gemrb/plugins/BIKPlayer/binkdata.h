@@ -22,6 +22,7 @@
 #ifndef AVCODEC_BINKDATA_H
 #define AVCODEC_BINKDATA_H
 
+// clang-format off
 /** Bink DCT and residue 8x8 block scan order */
 static const uint8_t bink_scan[64] = {
      0,  1,  8,  9,  2,  3, 10, 11,
@@ -608,6 +609,6 @@ static const uint32_t bink_inter_quant[16][64] = {
  0x282F0E, 0x1F927D, 0x16C2FF, 0x127AD9, 0x168D83, 0x0B7F50, 0x0CBAAA, 0x06E86E,
 },
 };
-
+// clang-format on
 
 #endif /* AVCODEC_BINKDATA_H */
