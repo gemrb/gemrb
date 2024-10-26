@@ -555,7 +555,6 @@ public:
 		oldPos = Pos;
 		bumped = false;
 	}
-	void AdjustPosition();
 	void BumpAway();
 	void BumpBack();
 	inline bool IsBumped() const { return bumped; }

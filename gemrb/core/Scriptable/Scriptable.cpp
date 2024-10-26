@@ -2241,12 +2241,6 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	}
 }
 
-void Movable::AdjustPosition()
-{
-	area->AdjustPosition(Pos);
-	ImpedeBumping();
-}
-
 void Movable::AddWayPoint(const Point& Des)
 {
 	if (!path) {
