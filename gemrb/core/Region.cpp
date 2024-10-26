@@ -22,14 +22,60 @@
 
 namespace GemRB {
 
-bool Point::operator==(const Point& pnt) const noexcept
+bool BasePoint::operator==(const BasePoint& pnt) const noexcept
 {
 	return (x == pnt.x) && (y == pnt.y);
 }
 
-bool Point::operator!=(const Point& pnt) const noexcept
+bool BasePoint::operator!=(const BasePoint& pnt) const noexcept
 {
 	return !(*this == pnt);
+}
+
+BasePoint BasePoint::operator-(const BasePoint& p) const noexcept
+{
+	return BasePoint(x - p.x, y - p.y);
+}
+
+BasePoint BasePoint::operator+(const BasePoint& p) const noexcept
+{
+	return BasePoint(x + p.x, y + p.y);
+}
+
+BasePoint::BasePoint(int x, int y) noexcept
+{
+	this->x = x;
+	this->y = y;
+}
+
+bool BasePoint::IsZero() const noexcept
+{
+	return (x == 0) && (y == 0);
+}
+
+bool BasePoint::IsInvalid() const noexcept
+{
+	return (x == -1) && (y == -1);
+}
+
+bool BasePoint::IsWithinRadius(int r, const BasePoint& p) const noexcept
+{
+	BasePoint d = operator-(p);
+	// sqrt is slow, just check a^2 + b^2 = c^2 <= r^2
+	return (d.x * d.x) + (d.y * d.y) <= r * r;
+}
+
+bool BasePoint::IsWithinEllipse(int r, const BasePoint& p, int a, int b) const noexcept
+{
+	BasePoint d = operator-(p);
+
+	// check ellipse bbox first
+	if (d.x < -r * a || d.x > r * a) return false;
+	if (d.y < -r * b || d.y > r * b) return false;
+
+	// then compare with calculated ellipse distance
+	int ar = b * b * d.x * d.x + a * a * d.y * d.y;
+	return ar <= a * a * b * b * r * r;
 }
 
 Point Point::operator+(const Point& p) const noexcept
@@ -63,40 +109,9 @@ Point& Point::operator/(int div) noexcept
 	return *this;
 }
 
-Point::Point(int x, int y) noexcept
+SearchmapPoint SearchmapPoint::operator+(const SearchmapPoint& p) const noexcept
 {
-	this->x = x;
-	this->y = y;
-}
-
-bool Point::IsZero() const noexcept
-{
-	return (x == 0) && (y == 0);
-}
-
-bool Point::IsInvalid() const noexcept
-{
-	return (x == -1) && (y == -1);
-}
-
-bool Point::IsWithinRadius(int r, const Point& p) const noexcept
-{
-	Point d = operator-(p);
-	// sqrt is slow, just check a^2 + b^2 = c^2 <= r^2
-	return (d.x * d.x) + (d.y * d.y) <= r * r;
-}
-
-bool Point::IsWithinEllipse(int r, const Point& p, int a, int b) const noexcept
-{
-	Point d = operator-(p);
-
-	// check ellipse bbox first
-	if (d.x < -r * a || d.x > r * a) return false;
-	if (d.y < -r * b || d.y > r * b) return false;
-
-	// then compare with calculated ellipse distance
-	int ar = b * b * d.x * d.x + a * a * d.y * d.y;
-	return ar <= a * a * b * b * r * r;
+	return SearchmapPoint(x + p.x, y + p.y);
 }
 
 Size::Size(int w, int h) noexcept

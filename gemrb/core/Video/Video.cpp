@@ -311,13 +311,13 @@ void Video::DrawRect(const Region& rgn, const Color& color, bool fill, BlitFlags
 	DrawRectImp(rgn, c, fill, flags);
 }
 
-void Video::DrawPoint(const Point& p, const Color& color, BlitFlags flags)
+void Video::DrawPoint(const BasePoint& p, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawPointImp(p, c, flags);
 }
 
-void Video::DrawPoints(const std::vector<Point>& points, const Color& color, BlitFlags flags)
+void Video::DrawPoints(const std::vector<BasePoint>& points, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawPointsImp(points, c, flags);
@@ -341,7 +341,7 @@ void Video::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Colo
 	DrawPolygonImp(poly, origin, c, fill, flags);
 }
 
-void Video::DrawLine(const Point& p1, const Point& p2, const Color& color, BlitFlags flags)
+void Video::DrawLine(const BasePoint& p1, const BasePoint& p2, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawLineImp(p1, p2, c, flags);

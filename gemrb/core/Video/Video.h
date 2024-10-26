@@ -122,12 +122,12 @@ private:
 
 	// the actual drawing implementations
 	virtual void DrawRectImp(const Region& rgn, const Color& color, bool fill, BlitFlags flags) = 0;
-	virtual void DrawPointImp(const Point&, const Color& color, BlitFlags flags) = 0;
-	virtual void DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) = 0;
+	virtual void DrawPointImp(const BasePoint&, const Color& color, BlitFlags flags) = 0;
+	virtual void DrawPointsImp(const std::vector<BasePoint>& points, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawCircleImp(const Point& origin, uint16_t r, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawEllipseImp(const Region& rect, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags) = 0;
-	virtual void DrawLineImp(const Point& p1, const Point& p2, const Color& color, BlitFlags flags) = 0;
+	virtual void DrawLineImp(const BasePoint& start, const BasePoint& end, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) = 0;
 
 public:
@@ -186,8 +186,8 @@ public:
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true, BlitFlags flags = BlitFlags::NONE);
 
-	void DrawPoint(const Point&, const Color& color, BlitFlags flags = BlitFlags::NONE);
-	void DrawPoints(const std::vector<Point>& points, const Color& color, BlitFlags flags = BlitFlags::NONE);
+	void DrawPoint(const BasePoint&, const Color& color, BlitFlags flags = BlitFlags::NONE);
+	void DrawPoints(const std::vector<BasePoint>& points, const Color& color, BlitFlags flags = BlitFlags::NONE);
 
 	// draw a circle at origin with radius r
 	void DrawCircle(const Point& origin, uint16_t r, const Color& color, BlitFlags flags = BlitFlags::NONE);
@@ -196,7 +196,7 @@ public:
 	/** Draws a polygon on the screen */
 	void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, BlitFlags flags = BlitFlags::NONE);
 	/** Draws a line segment */
-	void DrawLine(const Point& p1, const Point& p2, const Color& color, BlitFlags flags = BlitFlags::NONE);
+	void DrawLine(const BasePoint& p1, const BasePoint& p2, const Color& color, BlitFlags flags = BlitFlags::NONE);
 	void DrawLines(const std::vector<Point>& points, const Color& color, BlitFlags flags = BlitFlags::NONE);
 	virtual void DrawRawGeometry(
 		const std::vector<float>& /*vertices*/,

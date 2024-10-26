@@ -41,21 +41,16 @@ namespace GemRB {
  * Point in 2d-space: [x, y]
  */
 
-class GEM_EXPORT Point {
+class GEM_EXPORT BasePoint {
 public:
-	Point() noexcept = default;
-	Point(int x, int y) noexcept;
+	BasePoint() noexcept = default;
+	BasePoint(int x, int y) noexcept;
 
-	bool operator==(const Point& pnt) const noexcept;
-	bool operator!=(const Point& pnt) const noexcept;
+	BasePoint operator+(const BasePoint& p) const noexcept;
+	BasePoint operator-(const BasePoint& p) const noexcept;
 
-	Point operator+(const Point& p) const noexcept;
-	Point operator-(const Point& p) const noexcept;
-
-	Point& operator+=(const Point& rhs) noexcept;
-	Point& operator-=(const Point& rhs) noexcept;
-
-	Point& operator/(int div) noexcept;
+	bool operator==(const BasePoint& pnt) const noexcept;
+	bool operator!=(const BasePoint& pnt) const noexcept;
 
 	bool IsZero() const noexcept; // (0, 0)
 	bool IsInvalid() const noexcept; // (-1, -1)
@@ -71,11 +66,41 @@ public:
 	}
 
 	// true if p is within the circle of radius r centered at p
-	bool IsWithinRadius(int r, const Point& p) const noexcept;
-	bool IsWithinEllipse(int r, const Point& p, int a = 16, int b = 12) const noexcept;
+	bool IsWithinRadius(int r, const BasePoint& p) const noexcept;
+	bool IsWithinEllipse(int r, const BasePoint& p, int a = 16, int b = 12) const noexcept;
 
 	int x = 0;
 	int y = 0;
+};
+
+class GEM_EXPORT Point : public BasePoint {
+public:
+	Point() noexcept = default;
+	Point(int x, int y) noexcept
+		: BasePoint(x, y) {};
+
+	Point operator+(const Point& p) const noexcept;
+	Point operator-(const Point& p) const noexcept;
+
+	Point& operator+=(const Point& rhs) noexcept;
+	Point& operator-=(const Point& rhs) noexcept;
+
+	Point& operator/(int div) noexcept;
+};
+
+class GEM_EXPORT SearchmapPoint : public BasePoint {
+public:
+	SearchmapPoint() noexcept = default;
+	SearchmapPoint(int x, int y) noexcept
+		: BasePoint(x, y) {};
+	explicit SearchmapPoint(const Point& p) noexcept
+	{
+		x = p.x / 16;
+		y = p.y / 12;
+	}
+
+	SearchmapPoint operator+(const SearchmapPoint& p) const noexcept;
+	Point ToNavmapPoint() const { return Point(x * 16, y * 12); };
 };
 
 class GEM_EXPORT Size {
@@ -98,7 +123,7 @@ public:
 	bool IsZero() const noexcept { return w == 0 && h == 0; }
 	bool IsInvalid() const noexcept { return w <= 0 || h <= 0; }
 
-	bool PointInside(const Point& p) const noexcept { return p.x >= 0 && p.x < w && p.y >= 0 && p.y < h; }
+	bool PointInside(const BasePoint& p) const noexcept { return p.x >= 0 && p.x < w && p.y >= 0 && p.y < h; }
 };
 
 /**

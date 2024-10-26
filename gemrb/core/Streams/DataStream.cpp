@@ -93,7 +93,7 @@ strret_t DataStream::WriteFilling(strpos_t len)
 	return ret;
 }
 
-strret_t DataStream::ReadPoint(Point& p)
+strret_t DataStream::ReadPoint(BasePoint& p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish
 	strret_t ret = ReadScalar<int, ieWordSigned>(p.x);
@@ -101,7 +101,7 @@ strret_t DataStream::ReadPoint(Point& p)
 	return ret;
 }
 
-strret_t DataStream::WritePoint(const Point& p)
+strret_t DataStream::WritePoint(const BasePoint& p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish
 	strret_t ret = WriteScalar<int, ieWordSigned>(p.x);

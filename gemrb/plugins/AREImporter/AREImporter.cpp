@@ -722,7 +722,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 		for (int j = 0; j < ip->BBox.h; j += 6) {
 			NavmapPoint sample(ip->BBox.x + i, ip->BBox.y + j);
 			if (!ip->outline->PointIn(sample)) continue;
-			SearchmapPoint below = Map::ConvertCoordToTile(sample);
+			SearchmapPoint below { sample };
 			PathMapFlags tmp = map->tileProps.QuerySearchMap(below);
 			map->tileProps.PaintSearchMap(below, tmp | PathMapFlags::PASSABLE);
 		}
@@ -966,7 +966,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	// Reading Open Impeded blocks
 	str->Seek(VerticesOffset + openFirstImpeded * 4, GEM_STREAM_START);
 	door->open_ib.resize(openImpededCount);
-	for (Point& point : door->open_ib) {
+	for (SearchmapPoint& point : door->open_ib) {
 		str->ReadPoint(point);
 	}
 
@@ -974,7 +974,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	str->Seek(VerticesOffset + closedFirstImpeded * 4, GEM_STREAM_START);
 
 	door->closed_ib.resize(closedImpededCount);
-	for (Point& point : door->closed_ib) {
+	for (SearchmapPoint& point : door->closed_ib) {
 		str->ReadPoint(point);
 	}
 	door->SetMap(map);
@@ -1981,6 +1981,14 @@ int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword& VertIndex
 int AREImporter::PutPoints(DataStream* stream, const std::vector<Point>& points) const
 {
 	for (const Point& p : points) {
+		stream->WritePoint(p);
+	}
+	return 0;
+}
+
+int AREImporter::PutPoints(DataStream* stream, const std::vector<SearchmapPoint>& points) const
+{
+	for (const SearchmapPoint& p : points) {
 		stream->WritePoint(p);
 	}
 	return 0;

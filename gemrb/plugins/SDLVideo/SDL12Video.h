@@ -84,13 +84,13 @@ private:
 
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags) override;
 
-	void DrawLineImp(const Point& p1, const Point& p2, const Color& color, BlitFlags flags) override;
+	void DrawLineImp(const BasePoint& start, const BasePoint& end, const Color& color, BlitFlags flags);
 	void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) override;
 
 	void DrawRectImp(const Region& rgn, const Color& color, bool fill, BlitFlags flags) override;
 
-	void DrawPointImp(const Point& p, const Color& color, BlitFlags flags) override;
-	void DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) override;
+	void DrawPointImp(const BasePoint& p, const Color& color, BlitFlags flags) override;
+	void DrawPointsImp(const std::vector<BasePoint>& points, const Color& color, BlitFlags flags) override;
 
 	void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags) override;
 };

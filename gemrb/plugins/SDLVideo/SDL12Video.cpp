@@ -411,7 +411,7 @@ void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 	}
 }
 
-void SDL12VideoDriver::DrawPointImp(const Point& p, const Color& color, BlitFlags flags)
+void SDL12VideoDriver::DrawPointImp(const BasePoint& p, const Color& color, BlitFlags flags)
 {
 	if (flags & BlitFlags::BLENDED && color.a < 0xff) {
 		DrawPointSurface<SHADER::BLEND>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
@@ -422,7 +422,7 @@ void SDL12VideoDriver::DrawPointImp(const Point& p, const Color& color, BlitFlag
 	}
 }
 
-void SDL12VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
+void SDL12VideoDriver::DrawPointsImp(const std::vector<BasePoint>& points, const Color& color, BlitFlags flags)
 {
 	if (flags & BlitFlags::BLENDED && color.a < 0xff) {
 		DrawPointsSurface<SHADER::BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
@@ -455,7 +455,7 @@ void SDL12VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& orig
 	}
 }
 
-void SDL12VideoDriver::DrawLineImp(const Point& start, const Point& end, const Color& color, BlitFlags flags)
+void SDL12VideoDriver::DrawLineImp(const BasePoint& start, const BasePoint& end, const Color& color, BlitFlags flags)
 {
 	if (flags & BlitFlags::BLENDED && color.a < 0xff) {
 		DrawLineSurface<SHADER::BLEND>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);

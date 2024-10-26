@@ -656,7 +656,7 @@ void SDL20VideoDriver::DrawRawGeometry(
 #endif
 }
 
-void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
+void SDL20VideoDriver::DrawPointsImp(const std::vector<BasePoint>& points, const Color& color, BlitFlags flags)
 {
 	DrawSDLPoints(reinterpret_cast<const std::vector<SDL_Point>&>(points), reinterpret_cast<const SDL_Color&>(color), flags);
 }
@@ -670,7 +670,7 @@ void SDL20VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const
 	SDL_RenderDrawPoints(renderer, &points[0], int(points.size()));
 }
 
-void SDL20VideoDriver::DrawPointImp(const Point& p, const Color& color, BlitFlags flags)
+void SDL20VideoDriver::DrawPointImp(const BasePoint& p, const Color& color, BlitFlags flags)
 {
 	UpdateRenderTarget(&color, flags);
 	SDL_RenderDrawPoint(renderer, p.x, p.y);
@@ -687,7 +687,7 @@ void SDL20VideoDriver::DrawSDLLines(const std::vector<SDL_Point>& points, const 
 	SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
 }
 
-void SDL20VideoDriver::DrawLineImp(const Point& p1, const Point& p2, const Color& color, BlitFlags flags)
+void SDL20VideoDriver::DrawLineImp(const BasePoint& p1, const BasePoint& p2, const Color& color, BlitFlags flags)
 {
 	UpdateRenderTarget(&color, flags);
 	SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);

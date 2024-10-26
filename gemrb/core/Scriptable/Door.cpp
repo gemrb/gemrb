@@ -216,7 +216,7 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 	rgn.w = 16;
 	rgn.h = 12;
 	for (const SearchmapPoint& p : *points) {
-		rgn.origin = Map::ConvertCoordFromTile(p);
+		rgn.origin = p.ToNavmapPoint();
 		PathMapFlags tmp = area->tileProps.QuerySearchMap(p) & PathMapFlags::ACTOR;
 		if (tmp != PathMapFlags::IMPASSABLE) {
 			auto actors = area->GetActorsInRect(rgn, GA_NO_DEAD | GA_NO_UNSCHEDULED);

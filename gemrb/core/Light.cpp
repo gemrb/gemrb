@@ -54,12 +54,12 @@ Holder<Sprite2D> CreateLight(const Size& size, uint8_t intensity) noexcept
 
 	const auto points = PlotEllipse(r);
 	for (size_t i = 0; i < points.size(); i += 4) {
-		const Point& q1 = points[i];
-		const Point& q2 = points[i + 1];
+		const BasePoint& q1 = points[i];
+		const BasePoint& q2 = points[i + 1];
 		assert(q1.y == q2.y);
 
-		const Point& q3 = points[i + 2];
-		const Point& q4 = points[i + 3];
+		const BasePoint& q3 = points[i + 2];
+		const BasePoint& q4 = points[i + 3];
 		assert(q3.y == q4.y);
 
 		for (int x = q1.x; x >= 0; --x) {

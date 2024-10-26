@@ -188,8 +188,8 @@ public:
 		return WriteString<STR>(src, len);
 	}
 
-	strret_t ReadPoint(Point&);
-	strret_t WritePoint(const Point&);
+	strret_t ReadPoint(BasePoint&);
+	strret_t WritePoint(const BasePoint&);
 	strret_t ReadSize(class Size&);
 	strret_t ReadRegion(Region&, bool asPoints = false);
 

@@ -80,7 +80,7 @@ Point RotatePoint(const Point& p, float_t angle)
 }
 
 /** Calculates distance between 2 points */
-unsigned int Distance(const Point& p, const Point& q)
+unsigned int Distance(const BasePoint& p, const BasePoint& q)
 {
 	long x = p.x - q.x;
 	long y = p.y - q.y;
@@ -88,7 +88,7 @@ unsigned int Distance(const Point& p, const Point& q)
 }
 
 /** Calculates squared distance between 2 points */
-unsigned int SquaredDistance(const Point& p, const Point& q)
+unsigned int SquaredDistance(const BasePoint& p, const BasePoint& q)
 {
 	long x = p.x - q.x;
 	long y = p.y - q.y;
@@ -97,13 +97,13 @@ unsigned int SquaredDistance(const Point& p, const Point& q)
 
 // returns twice the area of triangle a, b, c.
 // (can also be negative depending on orientation of a,b,c)
-int area2(const Point& a, const Point& b, const Point& c)
+int area2(const BasePoint& a, const BasePoint& b, const BasePoint& c)
 {
 	return (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y);
 }
 
 // return (c is to the left of a-b)
-bool left(const Point& a, const Point& b, const Point& c)
+bool left(const BasePoint& a, const BasePoint& b, const BasePoint& c)
 {
 	return (area2(a, b, c) > 0);
 }
@@ -151,11 +151,11 @@ bool intersectSegmentScanline(const Point& a, const Point& b, int y, int& x)
 	return true;
 }
 
-std::vector<Point> PlotCircle(const Point& origin, uint16_t r, uint8_t octants) noexcept
+std::vector<BasePoint> PlotCircle(const BasePoint& origin, uint16_t r, uint8_t octants) noexcept
 {
 	// Uses the 2nd order Bresenham's Circle Algorithm: https://funloop.org/post/2021-03-15-bresenham-circle-drawing-algorithm.html
 
-	std::vector<Point> points;
+	std::vector<BasePoint> points;
 	points.reserve(6 * r); // 6 is 2𝜋 rounded down
 
 	auto GenOctants = [&origin, &points, octants](int x, int y) noexcept {
@@ -215,7 +215,7 @@ std::vector<Point> PlotCircle(const Point& origin, uint16_t r, uint8_t octants) 
 	return points;
 }
 
-std::vector<Point> PlotEllipse(const Region& rect) noexcept
+std::vector<BasePoint> PlotEllipse(const Region& rect) noexcept
 {
 	if (rect.size.IsInvalid()) {
 		return {};
@@ -225,8 +225,8 @@ std::vector<Point> PlotEllipse(const Region& rect) noexcept
 		return PlotCircle(rect.Center(), (rect.w / 2) - 1);
 	}
 
-	Point p1 = rect.origin;
-	Point p2 = rect.Maximum() - Point(1, 1); // we must contain inside the rect, so subtract 1px
+	BasePoint p1 = rect.origin;
+	BasePoint p2 = rect.Maximum() - Point(1, 1); // we must contain inside the rect, so subtract 1px
 
 	int a = p2.x - p1.x;
 	int b = p2.y - p1.y;
@@ -241,13 +241,13 @@ std::vector<Point> PlotEllipse(const Region& rect) noexcept
 	a *= 8 * a;
 	b1 = 8 * b * b;
 
-	std::vector<Point> points;
+	std::vector<BasePoint> points;
 	points.reserve(rect.size.Area());
 
 	do {
-		points.emplace_back(Point(p2.x, p1.y)); /*   I. Quadrant */
+		points.emplace_back(p2.x, p1.y); /*   I. Quadrant */
 		points.emplace_back(p1); /*  II. Quadrant */
-		points.emplace_back(Point(p1.x, p2.y)); /* III. Quadrant */
+		points.emplace_back(p1.x, p2.y); /* III. Quadrant */
 		points.emplace_back(p2); /*  IV. Quadrant */
 
 		e2 = 2 * err;
@@ -264,10 +264,10 @@ std::vector<Point> PlotEllipse(const Region& rect) noexcept
 	} while (p1.x <= p2.x);
 
 	while (p1.y - p2.y < b) { /* too early stop of flat ellipses a=1 */
-		points.emplace_back(Point(p1.x - 1, p1.y)); /* -> finish tip of ellipse */
-		points.emplace_back(Point(p2.x + 1, p1.y++));
-		points.emplace_back(Point(p1.x - 1, p2.y));
-		points.emplace_back(Point(p2.x + 1, p2.y--));
+		points.emplace_back(p1.x - 1, p1.y); /* -> finish tip of ellipse */
+		points.emplace_back(p2.x + 1, p1.y++);
+		points.emplace_back(p1.x - 1, p2.y);
+		points.emplace_back(p2.x + 1, p2.y--);
 	}
 
 	return points;

@@ -32,15 +32,15 @@ namespace GemRB {
 GEM_EXPORT float_t AngleFromPoints(const Point& p1, const Point& p2, bool exact = false);
 GEM_EXPORT float_t AngleFromPoints(float_t y, float_t x);
 GEM_EXPORT Point RotatePoint(const Point& p, float_t angle);
-GEM_EXPORT unsigned int Distance(const Point& pos, const Point& pos2);
-GEM_EXPORT unsigned int SquaredDistance(const Point& pos, const Point& pos2);
+GEM_EXPORT unsigned int Distance(const BasePoint& p, const BasePoint& q);
+GEM_EXPORT unsigned int SquaredDistance(const BasePoint& p, const BasePoint& q);
 
 // returns twice the area of triangle a, b, c.
 // (can also be negative depending on orientation of a,b,c)
-GEM_EXPORT int area2(const Point& a, const Point& b, const Point& c);
+GEM_EXPORT int area2(const BasePoint& a, const BasePoint& b, const BasePoint& c);
 
 // return (c is to the left of a-b)
-GEM_EXPORT bool left(const Point& a, const Point& b, const Point& c);
+GEM_EXPORT bool left(const BasePoint& a, const BasePoint& b, const BasePoint& c);
 
 GEM_EXPORT bool collinear(const Point& a, const Point& b, const Point& c);
 
@@ -67,11 +67,10 @@ GEM_EXPORT bool intersectSegmentScanline(const Point& a, const Point& b, int y, 
    5 ⋰  ⋮  ⋱4
 	  7  6
  */
-GEM_EXPORT std::vector<Point> PlotCircle(const Point& origin, uint16_t radius, uint8_t octants = 0xff) noexcept;
+GEM_EXPORT std::vector<BasePoint> PlotCircle(const BasePoint& origin, uint16_t r, uint8_t octants = 0xff) noexcept;
 
 // return a vector of Points composing an ellipse bounded by rect
-GEM_EXPORT std::vector<Point> PlotEllipse(const Region& rect) noexcept;
-
+GEM_EXPORT std::vector<BasePoint> PlotEllipse(const Region& rect) noexcept;
 }
 
 #endif /* GEOMETRY_H */

@@ -335,8 +335,8 @@ void GameControl::DrawArrowMarker(const Point& p, const Color& color) const
 void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Point& p) const
 {
 	uint8_t offset = GlobalColorCycle.Step() >> 1;
-	Point offsetH = Point(offset, 0);
-	Point offsetV = Point(0, offset);
+	BasePoint offsetH = BasePoint(offset, 0);
+	BasePoint offsetV = BasePoint(0, offset);
 
 	/* segments should not go outside selection radius */
 	uint16_t xradius = (size * 4) - 5;
@@ -344,23 +344,23 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 	const Size s(xradius * 2, yradius * 2);
 	const Region r(p - s.Center(), s);
 
-	std::vector<Point> points = PlotEllipse(r);
+	std::vector<BasePoint> points = PlotEllipse(r);
 	assert(points.size() % 4 == 0);
 
 	// a line bisecting the ellipse diagonally
 	const Point adj(size + 1, 0);
-	Point b1 = r.origin - adj;
-	Point b2 = r.Maximum() + adj;
+	BasePoint b1 = r.origin - adj;
+	BasePoint b2 = r.Maximum() + adj;
 
 	size_t i = 0;
 	// points are ordered per quadrant, so we can process 4 each iteration
 	// at first, 2 points will be the left segment and 2 will be the right segment
 	for (; i < points.size(); i += 4) {
 		// each point is in a different quadrant
-		const Point& q1 = points[i];
-		const Point& q2 = points[i + 1];
-		const Point& q3 = points[i + 2];
-		const Point& q4 = points[i + 3];
+		const BasePoint& q1 = points[i];
+		const BasePoint& q2 = points[i + 1];
+		const BasePoint& q3 = points[i + 2];
+		const BasePoint& q4 = points[i + 3];
 
 		if (left(b1, b2, q1)) {
 			// remaining points are top and bottom segments
@@ -376,10 +376,11 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 	assert(i < points.size() - 4);
 
 	// the current points are the ends of the side segments
-	VideoDriver->DrawLine(points[i++] + offsetH, p + offsetH, color); // begin right segment
-	VideoDriver->DrawLine(points[i++] - offsetH, p - offsetH, color); // begin left segment
-	VideoDriver->DrawLine(points[i++] - offsetH, p - offsetH, color); // end left segment
-	VideoDriver->DrawLine(points[i++] + offsetH, p + offsetH, color); // end right segment
+	BasePoint p2(p);
+	VideoDriver->DrawLine(points[i++] + offsetH, p2 + offsetH, color); // begin right segment
+	VideoDriver->DrawLine(points[i++] - offsetH, p2 - offsetH, color); // begin left segment
+	VideoDriver->DrawLine(points[i++] - offsetH, p2 - offsetH, color); // end left segment
+	VideoDriver->DrawLine(points[i++] + offsetH, p2 + offsetH, color); // end right segment
 
 	b1 = r.origin + adj;
 	b2 = r.Maximum() - adj;
@@ -392,17 +393,17 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 	}
 
 	// the current points are the ends of the top/bottom segments
-	VideoDriver->DrawLine(points[i++] + offsetV, p + offsetV, color); // begin top segment
-	VideoDriver->DrawLine(points[i++] + offsetV, p + offsetV, color); // end top segment
-	VideoDriver->DrawLine(points[i++] - offsetV, p - offsetV, color); // begin bottom segment
-	VideoDriver->DrawLine(points[i++] - offsetV, p - offsetV, color); // end bottom segment
+	VideoDriver->DrawLine(points[i++] + offsetV, p2 + offsetV, color); // begin top segment
+	VideoDriver->DrawLine(points[i++] + offsetV, p2 + offsetV, color); // end top segment
+	VideoDriver->DrawLine(points[i++] - offsetV, p2 - offsetV, color); // begin bottom segment
+	VideoDriver->DrawLine(points[i++] - offsetV, p2 - offsetV, color); // end bottom segment
 
 	// remaining points are top/bottom segments
 	for (; i < points.size(); i += 4) {
-		const Point& q1 = points[i];
-		const Point& q2 = points[i + 1];
-		const Point& q3 = points[i + 2];
-		const Point& q4 = points[i + 3];
+		const BasePoint& q1 = points[i];
+		const BasePoint& q2 = points[i + 1];
+		const BasePoint& q3 = points[i + 2];
+		const BasePoint& q4 = points[i + 3];
 
 		VideoDriver->DrawPoint(q1 + offsetV, color);
 		VideoDriver->DrawPoint(q2 + offsetV, color);
@@ -1406,7 +1407,7 @@ void GameControl::DebugPaint(const Point& p, bool sample) const noexcept
 {
 	if (DebugFlags & (DEBUG_SHOW_SEARCHMAP | DEBUG_SHOW_MATERIALMAP | DEBUG_SHOW_HEIGHTMAP | DEBUG_SHOW_LIGHTMAP)) {
 		Map* map = CurrentArea();
-		SearchmapPoint tile = Map::ConvertCoordToTile(p);
+		SearchmapPoint tile { p };
 		TileProps::Property prop = TileProps::Property::SEARCH_MAP;
 		if (DebugFlags & DEBUG_SHOW_MATERIALMAP) {
 			prop = TileProps::Property::MATERIAL;

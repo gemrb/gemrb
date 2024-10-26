@@ -453,8 +453,6 @@ public:
 	Map(TileMap* tm, TileProps tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
 	static void NormalizeDeltas(float_t& dx, float_t& dy, float_t factor = 1);
-	static SearchmapPoint ConvertCoordToTile(const Point&);
-	static Point ConvertCoordFromTile(const Point&);
 
 	/** prints useful information on console */
 	std::string dump() const override { return dump(false); };
@@ -516,12 +514,12 @@ public:
 
 	ResRef GetScriptRef() const { return GetScriptName(); }
 
-	int GetHeight(const Point& p) const;
-	Color GetLighting(const Point& p) const;
+	int GetHeight(const NavmapPoint& p) const;
+	Color GetLighting(const NavmapPoint& p) const;
 
-	PathMapFlags GetBlockedInRadius(const Point&, unsigned int size, bool stopOnImpassable = true) const;
-	PathMapFlags GetBlocked(const Point&) const;
-	PathMapFlags GetBlocked(const Point&, int size) const;
+	PathMapFlags GetBlockedInRadius(const NavmapPoint&, unsigned int size, bool stopOnImpassable = true) const;
+	PathMapFlags GetBlocked(const NavmapPoint&) const;
+	PathMapFlags GetBlocked(const NavmapPoint&, int size) const;
 	Scriptable* GetScriptableByGlobalID(ieDword objectID);
 	Door* GetDoorByGlobalID(ieDword objectID) const;
 	Container* GetContainerByGlobalID(ieDword objectID) const;
@@ -592,7 +590,7 @@ public:
 	/* this function returns/creates a pile container at position */
 	Container* AddContainer(const ieVariable& Name, unsigned short Type,
 				const std::shared_ptr<Gem_Polygon>& outline);
-	Container* GetPile(Point position);
+	Container* GetPile(const NavmapPoint& position);
 	void AddItemToLocation(const Point& position, CREItem* item);
 
 	Size GetSize() const;
@@ -607,7 +605,7 @@ public:
 	void UpdateFog();
 	//PathFinder
 	/* Finds the nearest passable point */
-	void AdjustPosition(Point& goal, const Size& startingRadius = ZeroSize, int size = -1) const;
+	void AdjustPosition(SearchmapPoint& goal, const Size& startingRadius = ZeroSize, int size = -1) const;
 	void AdjustPositionNavmap(Point& goal, const Size& radius = ZeroSize) const;
 	/* Finds the path which leads the farthest from d */
 	Path RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const;
@@ -627,7 +625,7 @@ public:
 	bool IsWalkableTo(const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller) const;
 
 	/* returns edge direction of map boundary, only worldmap regions */
-	WMPDirection WhichEdge(const Point& s) const;
+	WMPDirection WhichEdge(const NavmapPoint& s) const;
 
 	//ambients
 	void SetAmbients(std::vector<Ambient*> ambient, MapReverb::id_t reverbID = EFX_PROFILE_REVERB_INVALID);
@@ -716,7 +714,7 @@ private:
 	bool AdjustPositionY(SearchmapPoint& goal, const Size& radius, int size = -1) const;
 
 	void UpdateSpawns() const;
-	PathMapFlags GetBlockedInLine(const Point& s, const Point& d, bool stopOnImpassable, const Actor* caller = NULL) const;
+	PathMapFlags GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, const Actor* caller = nullptr) const;
 	void AddProjectile(Projectile* pro);
 
 	// same as GetBlocked, but in TileCoords

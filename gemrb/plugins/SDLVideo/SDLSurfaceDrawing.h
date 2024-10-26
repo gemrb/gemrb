@@ -37,7 +37,7 @@ namespace GemRB {
 
 static_assert(std::is_trivially_destructible<Point>::value, "Expected Point to be trivially destructable.");
 
-inline bool PointClipped(const SDL_Surface* surf, const Point& p)
+inline bool PointClipped(const SDL_Surface* surf, const BasePoint& p)
 {
 	if (p.x < 0 || p.x >= surf->w) {
 		return true;
@@ -65,11 +65,11 @@ inline SDL_Rect RectFromRegion(const Region& rgn)
 #endif
 
 template<SHADER SHADE = SHADER::NONE>
-void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color& color)
+void DrawPointSurface(SDL_Surface* dst, BasePoint p, const Region& clip, const Color& color)
 {
 	assert(dst->format->BitsPerPixel == 32); // we could easily support others if we have to
 
-	p = Clamp(p, clip.origin, clip.Maximum());
+	p = Clamp<BasePoint>(p, clip.origin, clip.Maximum());
 	if (PointClipped(dst, p)) return;
 
 	Uint32* px = ((Uint32*) dst->pixels) + (p.y * dst->pitch / 4) + p.x;

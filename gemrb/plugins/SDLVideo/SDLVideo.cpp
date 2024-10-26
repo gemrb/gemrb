@@ -298,13 +298,13 @@ Region SDLVideoDriver::CurrentRenderClip() const
 
 void SDLVideoDriver::DrawEllipseImp(const Region& rect, const Color& color, BlitFlags flags)
 {
-	const std::vector<Point> points = PlotEllipse(rect);
+	const std::vector<BasePoint> points = PlotEllipse(rect);
 	DrawPoints(points, color, flags);
 }
 
 void SDLVideoDriver::DrawCircleImp(const Point& origin, uint16_t r, const Color& color, BlitFlags flags)
 {
-	const std::vector<Point> points = PlotCircle(origin, r, 0xff);
+	const std::vector<BasePoint> points = PlotCircle(origin, r, 0xff);
 	DrawPoints(points, color, flags);
 }
 
