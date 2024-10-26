@@ -1988,7 +1988,7 @@ Point Movable::GetMostLikelyPosition() const
 	size_t halfway = path.Size() / 2;
 	const PathNode& node = path.GetNextStep(halfway);
 	if (!node.point.IsZero()) {
-		return Map::ConvertCoordFromTile(node.point) + Point(8, 6);
+		return node.point + Point(8, 6);
 	}
 	return Destination;
 }
