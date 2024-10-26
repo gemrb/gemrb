@@ -13293,7 +13293,7 @@ static PyObject* ParamToPython(const GUIScript::Parameter& p)
 		return PyLong_FromLong(p.Value<long>());
 	} else if (type == typeid(unsigned long)) {
 		return PyLong_FromUnsignedLong(p.Value<unsigned long>());
-	} else if (type == typeid(nullptr_t)) {
+	} else if (type == typeid(std::nullptr_t)) {
 		Py_RETURN_NONE;
 	} else if (type == typeid(bool)) {
 		return PyBool_FromLong(p.Value<bool>());
