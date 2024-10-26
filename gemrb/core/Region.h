@@ -78,6 +78,22 @@ public:
 	int y = 0;
 };
 
+struct GEM_EXPORT SearchmapPoint {
+	SearchmapPoint() noexcept = default;
+	SearchmapPoint(int x, int y) noexcept // non-converting!
+		: x(x), y(y) {};
+	SearchmapPoint(const Point& p) noexcept
+		: x(p.x / 16), y(p.y / 12) {};
+
+	SearchmapPoint operator+(const SearchmapPoint& p) const noexcept;
+	bool operator==(const SearchmapPoint& pnt) const noexcept;
+
+	Point ToNavmapPoint() const { return Point(x * 16, y * 12); };
+
+	int x = 0;
+	int y = 0;
+};
+
 class GEM_EXPORT Size {
 public:
 	int w = 0;
@@ -99,6 +115,7 @@ public:
 	bool IsInvalid() const noexcept { return w <= 0 || h <= 0; }
 
 	bool PointInside(const Point& p) const noexcept { return p.x >= 0 && p.x < w && p.y >= 0 && p.y < h; }
+	bool PointInside(const SearchmapPoint& p) const noexcept { return p.x >= 0 && p.x < w && p.y >= 0 && p.y < h; }
 };
 
 /**

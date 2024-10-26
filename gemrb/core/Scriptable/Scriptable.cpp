@@ -2226,7 +2226,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	oldPos = Pos;
 	if (actor && blocksSearch) {
 		auto flag = actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
-		area->tileProps.PaintSearchMap(Map::ConvertCoordToTile(Pos), circleSize, flag);
+		area->tileProps.PaintSearchMap(SearchmapPoint(Pos), circleSize, flag);
 	}
 
 	SetOrientation(step.orient, false);

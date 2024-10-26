@@ -244,8 +244,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 
 	if (nmptDest == nmptSource) return {};
 
-	SearchmapPoint smptSource = Map::ConvertCoordToTile(nmptSource);
-	SearchmapPoint smptDest = Map::ConvertCoordToTile(nmptDest);
+	SearchmapPoint smptSource { nmptSource };
+	SearchmapPoint smptDest { nmptDest };
 
 	if (minDistance < size && !(GetBlockedInRadiusTile(smptDest, size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
 		Log(DEBUG, "FindPath", "{} can't fit in destination", fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" });
@@ -286,7 +286,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	while (!open.empty()) {
 		NavmapPoint nmptCurrent = open.top().point;
 		open.pop();
-		SearchmapPoint smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
+		SearchmapPoint smptCurrent { nmptCurrent };
 		int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
 		if (parents[smptCurrentIdx].IsZero()) {
 			continue;
@@ -309,7 +309,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
-			SearchmapPoint smptChild = Map::ConvertCoordToTile(nmptChild);
+			SearchmapPoint smptChild { nmptChild };
 			// Outside map
 			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
@@ -330,14 +330,14 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			bool childIsUnbumpable = childActor && childActor != caller && (actorsAreBlocking || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
 
-			SearchmapPoint smptCurrent2 = Map::ConvertCoordToTile(nmptCurrent);
+			SearchmapPoint smptCurrent2 { nmptCurrent };
 			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
 			unsigned short oldDist = distFromStart[smptChildIdx];
 
 			if (usePlainThetaStar) {
 				// Theta-star path if there is LOS
 				if (IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
-					SearchmapPoint smptParent = Map::ConvertCoordToTile(nmptParent);
+					SearchmapPoint smptParent { nmptParent };
 					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 					if (newDist < oldDist) {
 						parents[smptChildIdx] = nmptParent;
@@ -358,7 +358,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 				}
 			} else {
 				// Lazy Theta star*
-				SearchmapPoint smptParent = Map::ConvertCoordToTile(nmptParent);
+				SearchmapPoint smptParent { nmptParent };
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
 					parents[smptChildIdx] = nmptParent;
@@ -373,7 +373,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 						// Find already visited neighbour with shortest: path from start + path to child
 						for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
 							NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
-							SearchmapPoint smptVis = Map::ConvertCoordToTile(nmptVis);
+							SearchmapPoint smptVis { nmptVis };
 							// Outside map
 							if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
 							// Only consider already visited
@@ -400,7 +400,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		Path resultPath;
 		NavmapPoint nmptCurrent = nmptDest;
 		NavmapPoint nmptParent;
-		SearchmapPoint smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
+		SearchmapPoint smptCurrent = { nmptCurrent };
 		while (!resultPath || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
 			nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
 			PathNode newStep { nmptCurrent, S };
@@ -418,7 +418,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			resultPath.PrependStep(newStep);
 			nmptCurrent = nmptParent;
 
-			smptCurrent = Map::ConvertCoordToTile(nmptCurrent);
+			smptCurrent = SearchmapPoint(nmptCurrent);
 		}
 		return resultPath;
 	} else if (InDebugMode(DebugMode::PATHFINDER)) {

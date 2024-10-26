@@ -79,22 +79,6 @@ Point RotatePoint(const Point& p, float_t angle)
 	return Point(newx, newy);
 }
 
-/** Calculates distance between 2 points */
-unsigned int Distance(const Point& p, const Point& q)
-{
-	long x = p.x - q.x;
-	long y = p.y - q.y;
-	return (unsigned int) std::hypot(x, y);
-}
-
-/** Calculates squared distance between 2 points */
-unsigned int SquaredDistance(const Point& p, const Point& q)
-{
-	long x = p.x - q.x;
-	long y = p.y - q.y;
-	return static_cast<unsigned int>(x * x + y * y);
-}
-
 // returns twice the area of triangle a, b, c.
 // (can also be negative depending on orientation of a,b,c)
 int area2(const Point& a, const Point& b, const Point& c)
@@ -149,70 +133,6 @@ bool intersectSegmentScanline(const Point& a, const Point& b, int y, int& x)
 
 	x = a.x + ((b.x - a.x) * y1) / (y1 - y2);
 	return true;
-}
-
-std::vector<Point> PlotCircle(const Point& origin, uint16_t r, uint8_t octants) noexcept
-{
-	// Uses the 2nd order Bresenham's Circle Algorithm: https://funloop.org/post/2021-03-15-bresenham-circle-drawing-algorithm.html
-
-	std::vector<Point> points;
-	points.reserve(6 * r); // 6 is 2𝜋 rounded down
-
-	auto GenOctants = [&origin, &points, octants](int x, int y) noexcept {
-		// points are emplaced in octant order
-
-		if (octants & 1 << 0) {
-			points.emplace_back(origin + Point(y, x));
-		}
-		if (octants & 1 << 1) {
-			points.emplace_back(origin + Point(-y, x));
-		}
-		if (octants & 1 << 2) {
-			points.emplace_back(origin + Point(x, y));
-		}
-		if (octants & 1 << 3) {
-			points.emplace_back(origin + Point(-x, y));
-		}
-		if (octants & 1 << 4) {
-			points.emplace_back(origin + Point(x, -y));
-		}
-		if (octants & 1 << 5) {
-			points.emplace_back(origin + Point(-x, -y));
-		}
-		if (octants & 1 << 6) {
-			points.emplace_back(origin + Point(y, -x));
-		}
-		if (octants & 1 << 7) {
-			points.emplace_back(origin + Point(-y, -x));
-		}
-	};
-
-	int x = 0;
-	int y = r;
-	int fm = 1 - r;
-	int de = 3; // east vector
-	int dse = -2 * r + 5; // SE vector
-
-	// do the middle row first
-	GenOctants(x, y);
-
-	while (x < y) {
-		if (fm <= 0) {
-			fm += de;
-		} else {
-			fm += dse;
-			dse += 2;
-			--y;
-		}
-
-		de += 2;
-		dse += 2;
-		++x;
-
-		GenOctants(x, y);
-	}
-
-	return points;
 }
 
 std::vector<Point> PlotEllipse(const Region& rect) noexcept

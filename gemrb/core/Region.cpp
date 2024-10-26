@@ -99,6 +99,16 @@ bool Point::IsWithinEllipse(int r, const Point& p, int a, int b) const noexcept
 	return ar <= a * a * b * b * r * r;
 }
 
+SearchmapPoint SearchmapPoint::operator+(const SearchmapPoint& rhs) const noexcept
+{
+	return SearchmapPoint(x + rhs.x, y + rhs.y);
+}
+
+bool SearchmapPoint::operator==(const SearchmapPoint& pnt) const noexcept
+{
+	return (x == pnt.x) && (y == pnt.y);
+}
+
 Size::Size(int w, int h) noexcept
 {
 	this->w = w;

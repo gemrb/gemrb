@@ -432,16 +432,6 @@ static inline bool MustSave(const Actor* actor)
 	return true;
 }
 
-SearchmapPoint Map::ConvertCoordToTile(const Point& p)
-{
-	return Point(p.x / 16, p.y / 12);
-}
-
-Point Map::ConvertCoordFromTile(const Point& p)
-{
-	return Point(p.x * 16, p.y * 12);
-}
-
 Map::Map(TileMap* tm, TileProps props, Holder<Sprite2D> sm)
 	: Scriptable(ST_AREA),
 	  TMap(tm),
@@ -906,7 +896,7 @@ ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point& p) const
 	} static const terrainsounds;
 
 	if (terrainsounds.refs.count(resref)) {
-		uint8_t type = tileProps.QueryMaterial(Map::ConvertCoordToTile(p));
+		uint8_t type = tileProps.QueryMaterial(SearchmapPoint(p));
 		const auto& array = terrainsounds.refs.at(resref);
 		return array[type];
 	}
@@ -930,13 +920,13 @@ void Map::DoStepForActor(Actor* actor, ieDword time) const
 void Map::BlockSearchMapFor(const Movable* actor) const
 {
 	auto flag = actor->IsPC() ? PathMapFlags::PC : PathMapFlags::NPC;
-	tileProps.PaintSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, flag);
+	tileProps.PaintSearchMap(SearchmapPoint(actor->Pos), actor->circleSize, flag);
 }
 
 void Map::ClearSearchMapFor(const Movable* actor) const
 {
 	std::vector<Actor*> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF | GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE * 3, actor);
-	tileProps.PaintSearchMap(ConvertCoordToTile(actor->Pos), actor->circleSize, PathMapFlags::UNMARKED);
+	tileProps.PaintSearchMap(SearchmapPoint(actor->Pos), actor->circleSize, PathMapFlags::UNMARKED);
 
 	// Restore the searchmap areas of any nearby actors that could
 	// have been cleared by this BlockSearchMap(..., PathMapFlags::UNMARKED).
@@ -1743,7 +1733,7 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 			block.x = x * 16 - (vp.x % 16);
 			block.y = y * 12 - (vp.y % 12);
 
-			SearchmapPoint p = SearchmapPoint(x, y) + ConvertCoordToTile(vp.origin);
+			SearchmapPoint p = SearchmapPoint(x, y) + SearchmapPoint(vp.origin);
 
 			Color col;
 			if (dFlags & DEBUG_SHOW_SEARCHMAP) {
@@ -2463,20 +2453,20 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	}
 }
 
-int Map::GetHeight(const Point& p) const
+int Map::GetHeight(const NavmapPoint& p) const
 {
-	SearchmapPoint tilePos = Map::ConvertCoordToTile(p);
+	SearchmapPoint tilePos { p };
 	return tileProps.QueryElevation(tilePos);
 }
 
-Color Map::GetLighting(const Point& p) const
+Color Map::GetLighting(const NavmapPoint& p) const
 {
-	SearchmapPoint tilePos = Map::ConvertCoordToTile(p);
+	SearchmapPoint tilePos { p };
 	return tileProps.QueryLighting(tilePos);
 }
 
 // a more thorough, but more expensive version for the cases when it matters
-PathMapFlags Map::GetBlocked(const Point& p, int size) const
+PathMapFlags Map::GetBlocked(const NavmapPoint& p, int size) const
 {
 	if (size == -1) {
 		return GetBlocked(p);
@@ -2487,9 +2477,9 @@ PathMapFlags Map::GetBlocked(const Point& p, int size) const
 
 // The default behavior is for actors to be blocking
 // If they shouldn't be, the caller should check for PathMapFlags::PASSABLE | PathMapFlags::ACTOR
-PathMapFlags Map::GetBlocked(const Point& p) const
+PathMapFlags Map::GetBlocked(const NavmapPoint& p) const
 {
-	return GetBlockedTile(ConvertCoordToTile(p));
+	return GetBlockedTile(SearchmapPoint(p));
 }
 
 // p is in tile coords
@@ -2519,12 +2509,11 @@ PathMapFlags Map::GetBlockedTile(const SearchmapPoint& p) const
 }
 
 // p is in map coords
-PathMapFlags Map::GetBlockedInRadius(const Point& p, unsigned int size, bool stopOnImpassable) const
+PathMapFlags Map::GetBlockedInRadius(const NavmapPoint& p, unsigned int size, bool stopOnImpassable) const
 {
-	return GetBlockedInRadiusTile(ConvertCoordToTile(p), size, stopOnImpassable);
+	return GetBlockedInRadiusTile(SearchmapPoint(p), size, stopOnImpassable);
 }
 
-// p is in tile coords
 PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size, const bool stopOnImpassable) const
 {
 	// We check a circle of radius size-2 around (px,py)
@@ -2535,7 +2524,7 @@ PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size
 	size = Clamp<uint16_t>(size, 2, MAX_CIRCLESIZE);
 	uint16_t r = size - 2;
 
-	std::vector<Point> points;
+	std::vector<SearchmapPoint> points;
 	if (r == 0) { // avoid generating 16 identical points
 		points.push_back(tp);
 		points.push_back(tp);
@@ -2543,8 +2532,8 @@ PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size
 		points = PlotCircle(tp, r);
 	}
 	for (size_t i = 0; i < points.size(); i += 2) {
-		const Point& p1 = points[i];
-		const Point& p2 = points[i + 1];
+		const SearchmapPoint& p1 = points[i];
+		const SearchmapPoint& p2 = points[i + 1];
 		assert(p1.y == p2.y);
 		assert(p2.x <= p1.x);
 
@@ -2567,11 +2556,11 @@ PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size
 	return ret;
 }
 
-PathMapFlags Map::GetBlockedInLine(const Point& s, const Point& d, bool stopOnImpassable, const Actor* caller) const
+PathMapFlags Map::GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, const Actor* caller) const
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
-	Point p = s;
-	const SearchmapPoint sms = ConvertCoordToTile(s);
+	NavmapPoint p = s;
+	SearchmapPoint sms { s };
 	float_t factor = caller && caller->GetSpeed() ? float_t(gamedata->GetStepTime()) / float_t(caller->GetSpeed()) : 1;
 	while (p != d) {
 		float_t dx = d.x - p.x;
@@ -2579,7 +2568,7 @@ PathMapFlags Map::GetBlockedInLine(const Point& s, const Point& d, bool stopOnIm
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
-		if (sms == ConvertCoordToTile(p)) continue;
+		if (sms == SearchmapPoint(p)) continue;
 
 		PathMapFlags blockStatus = GetBlocked(p);
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
@@ -3020,7 +3009,7 @@ bool Map::AdjustPositionY(SearchmapPoint& goal, const Size& radius, int size) co
 
 void Map::AdjustPositionNavmap(NavmapPoint& goal, const Size& radius) const
 {
-	SearchmapPoint smptGoal = ConvertCoordToTile(goal);
+	SearchmapPoint smptGoal { goal };
 	AdjustPosition(smptGoal, radius);
 	goal.x = smptGoal.x * 16 + 8;
 	goal.y = smptGoal.y * 12 + 6;
@@ -3080,7 +3069,7 @@ bool Map::IsExplored(const Point& pos) const
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
-WMPDirection Map::WhichEdge(const Point& s) const
+WMPDirection Map::WhichEdge(const NavmapPoint& s) const
 {
 	if (!(GetBlocked(s) & PathMapFlags::TRAVEL)) {
 		Log(DEBUG, "Map", "Not a travel region {}?", s);
@@ -3088,7 +3077,7 @@ WMPDirection Map::WhichEdge(const Point& s) const
 	}
 	// FIXME: is this backwards?
 	const Size& mapSize = PropsSize();
-	SearchmapPoint tileP = ConvertCoordToTile(s);
+	SearchmapPoint tileP { s };
 	tileP.x *= mapSize.h;
 	tileP.y *= mapSize.w;
 	if (tileP.x > tileP.y) { //north or east
@@ -3582,14 +3571,14 @@ void Map::MoveVisibleGroundPiles(const Point& Pos)
 	}
 }
 
-Container* Map::GetPile(Point position)
+Container* Map::GetPile(const NavmapPoint& position)
 {
 	//converting to search square
-	SearchmapPoint smPos = ConvertCoordToTile(position);
+	SearchmapPoint smPos { position };
 	ieVariable pileName;
 	pileName.Format("heap_{}.{}", smPos.x, smPos.y);
 	// pixel position is centered on search square, we convert back and forth to round off
-	Point upperLeft = ConvertCoordFromTile(smPos);
+	Point upperLeft = smPos.ToNavmapPoint();
 	Point center = upperLeft + Point(8, 6);
 	Container* container = TMap->GetContainer(center, IE_CONTAINER_PILE);
 	if (!container) {

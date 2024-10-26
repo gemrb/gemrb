@@ -52,7 +52,6 @@ enum class PathMapFlags : uint8_t {
 };
 
 using NavmapPoint = Point;
-using SearchmapPoint = Point;
 
 struct PathNode {
 	Point point;

@@ -78,6 +78,7 @@ private:
 	CREItem* GetItem();
 	int PutHeader(DataStream* stream, const Map* map) const;
 	int PutPoints(DataStream* stream, const std::vector<Point>&) const;
+	int PutPoints(DataStream* stream, const std::vector<SearchmapPoint>& points) const;
 	int PutDoors(DataStream* stream, const Map* map, ieDword& VertIndex) const;
 	int PutItems(DataStream* stream, const Map* map) const;
 	int PutContainers(DataStream* stream, const Map* map, ieDword& VertIndex) const;

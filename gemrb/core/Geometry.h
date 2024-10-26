@@ -32,8 +32,21 @@ namespace GemRB {
 GEM_EXPORT float_t AngleFromPoints(const Point& p1, const Point& p2, bool exact = false);
 GEM_EXPORT float_t AngleFromPoints(float_t y, float_t x);
 GEM_EXPORT Point RotatePoint(const Point& p, float_t angle);
-GEM_EXPORT unsigned int Distance(const Point& pos, const Point& pos2);
-GEM_EXPORT unsigned int SquaredDistance(const Point& pos, const Point& pos2);
+template<class T, typename = std::enable_if_t<!std::is_pointer<T>::value>>
+GEM_EXPORT unsigned int Distance(const T& p, const T& q)
+{
+	long x = p.x - q.x;
+	long y = p.y - q.y;
+	return (unsigned int) std::hypot(x, y);
+}
+
+template<class T, typename = std::enable_if_t<!std::is_pointer<T>::value>>
+GEM_EXPORT unsigned int SquaredDistance(const T& p, const T& q)
+{
+	long x = p.x - q.x;
+	long y = p.y - q.y;
+	return static_cast<unsigned int>(x * x + y * y);
+}
 
 // returns twice the area of triangle a, b, c.
 // (can also be negative depending on orientation of a,b,c)
@@ -67,7 +80,70 @@ GEM_EXPORT bool intersectSegmentScanline(const Point& a, const Point& b, int y, 
    5 ⋰  ⋮  ⋱4
 	  7  6
  */
-GEM_EXPORT std::vector<Point> PlotCircle(const Point& origin, uint16_t radius, uint8_t octants = 0xff) noexcept;
+template<class T>
+GEM_EXPORT std::vector<T> PlotCircle(const T& origin, uint16_t r, uint8_t octants = 0xff) noexcept
+{
+	// Uses the 2nd order Bresenham's Circle Algorithm: https://funloop.org/post/2021-03-15-bresenham-circle-drawing-algorithm.html
+
+	std::vector<T> points;
+	points.reserve(6 * r); // 6 is 2𝜋 rounded down
+
+	auto GenOctants = [&origin, &points, octants](int x, int y) noexcept {
+		// points are emplaced in octant order
+
+		if (octants & 1 << 0) {
+			points.emplace_back(origin + T(y, x));
+		}
+		if (octants & 1 << 1) {
+			points.emplace_back(origin + T(-y, x));
+		}
+		if (octants & 1 << 2) {
+			points.emplace_back(origin + T(x, y));
+		}
+		if (octants & 1 << 3) {
+			points.emplace_back(origin + T(-x, y));
+		}
+		if (octants & 1 << 4) {
+			points.emplace_back(origin + T(x, -y));
+		}
+		if (octants & 1 << 5) {
+			points.emplace_back(origin + T(-x, -y));
+		}
+		if (octants & 1 << 6) {
+			points.emplace_back(origin + T(y, -x));
+		}
+		if (octants & 1 << 7) {
+			points.emplace_back(origin + T(-y, -x));
+		}
+	};
+
+	int x = 0;
+	int y = r;
+	int fm = 1 - r;
+	int de = 3; // east vector
+	int dse = -2 * r + 5; // SE vector
+
+	// do the middle row first
+	GenOctants(x, y);
+
+	while (x < y) {
+		if (fm <= 0) {
+			fm += de;
+		} else {
+			fm += dse;
+			dse += 2;
+			--y;
+		}
+
+		de += 2;
+		dse += 2;
+		++x;
+
+		GenOctants(x, y);
+	}
+
+	return points;
+}
 
 // return a vector of Points composing an ellipse bounded by rect
 GEM_EXPORT std::vector<Point> PlotEllipse(const Region& rect) noexcept;
