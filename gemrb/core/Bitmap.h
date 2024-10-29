@@ -113,17 +113,17 @@ public:
 		return data[res.quot] & (1 << res.rem);
 	}
 
-	BitProxy operator[](const Point& p) noexcept
+	BitProxy operator[](const BasePoint& p) noexcept
 	{
 		return operator[](p.y * size.w + p.x);
 	}
 
-	bool operator[](const Point& p) const noexcept
+	bool operator[](const BasePoint& p) const noexcept
 	{
 		return operator[](p.y * size.w + p.x);
 	}
 
-	bool GetAt(const Point& p, bool oobval) const noexcept
+	bool GetAt(const BasePoint& p, bool oobval) const noexcept
 	{
 		if (!size.PointInside(p)) {
 			return oobval;

@@ -271,7 +271,7 @@ inline size_t CountBits(const T& i)
 	return bits.count();
 }
 
-template<typename T>
+template<typename T, std::enable_if_t<std::is_scalar<T>::value, bool> = true>
 inline T Clamp(const T& n, const T& lower, const T& upper)
 {
 	return std::max(lower, std::min(n, upper));
@@ -285,10 +285,10 @@ inline DST Clamp(const SRC& n)
 	return static_cast<DST>(Clamp<SRC>(n, std::numeric_limits<DST>::min(), std::numeric_limits<DST>::max()));
 }
 
-template<>
-inline Point Clamp(const Point& p, const Point& lower, const Point& upper)
+template<typename T, std::enable_if_t<std::is_base_of<BasePoint, T>::value, bool> = true>
+inline T Clamp(const T& p, const T& lower, const T& upper)
 {
-	Point ret;
+	T ret;
 	ret.x = std::max(lower.x, std::min(p.x, upper.x));
 	ret.y = std::max(lower.y, std::min(p.y, upper.y));
 	return ret;

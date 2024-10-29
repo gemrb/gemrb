@@ -57,6 +57,23 @@ struct FogMapData {
 	int largeFog;
 };
 
+class FogPoint : public BasePoint {
+public:
+	FogPoint() noexcept = default;
+	FogPoint(int x, int y) noexcept
+		: BasePoint(x, y) {};
+	explicit FogPoint(const Point& p)
+	{
+		x = p.x / 32; // FogRenderer::CELL_SIZE
+		y = p.y / 32; // FogRenderer::CELL_SIZE
+	}
+
+	FogPoint operator+(const FogPoint& p) const noexcept
+	{
+		return FogPoint(x + p.x, y + p.y);
+	}
+};
+
 class GEM_EXPORT FogRenderer {
 private:
 	bool videoCanRenderGeometry = false;
@@ -65,8 +82,8 @@ private:
 
 	Region vp;
 	Size mapSize;
-	Point start;
-	Point end;
+	FogPoint start;
+	FogPoint end;
 	Point p0;
 
 	enum class Direction : uint8_t {
@@ -103,20 +120,19 @@ public:
 	void DrawFog(const FogMapData& mapData);
 
 private:
-	Point ConvertPointToScreen(int x, int y) const;
-	static Point ConvertPointToFog(Point p);
-	void DrawExploredCell(Point cellPoint, const Bitmap* mask);
+	Point ConvertFogPointToScreen(int x, int y) const;
+	void DrawExploredCell(FogPoint cellPoint, const Bitmap* mask);
 	void DrawFogCellBAM(Point p, Direction direction, BlitFlags flags);
 	void DrawFogCellVertices(Point p, Direction direction, BlitFlags flags);
 	bool DrawFogCellByDirection(Point p, Direction direction, BlitFlags flags);
 	bool DrawFogCellByDirectionBAMs(Point p, Direction direction, BlitFlags flags);
 	bool DrawFogCellByDirectionVertices(Point p, Direction direction, BlitFlags flags);
 	void DrawFogSmoothing(Point p, Direction direction, BlitFlags flags, Direction adjacentDir);
-	void DrawVisibleCell(Point cellPoint, const Bitmap* mask);
+	void DrawVisibleCell(FogPoint cellPoint, const Bitmap* mask);
 	void DrawVPBorder(Point p, Direction direction, const Region& r, BlitFlags flags);
 	void DrawVPBorders();
 	void FillFog(Point p, int numRowItems, BlitFlags flags);
-	static bool IsUncovered(Point cellPoint, const Bitmap* mask);
+	static bool IsUncovered(FogPoint cellPoint, const Bitmap* mask);
 	void SetFogVerticesByOrigin(Point p);
 };
 

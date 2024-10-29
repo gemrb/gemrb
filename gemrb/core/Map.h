@@ -700,7 +700,6 @@ private:
 	Size PropsSize() const noexcept;
 	Size FogMapSize() const;
 	bool FogTileUncovered(const Point& p, const Bitmap*) const;
-	Point ConvertPointToFog(const Point& p) const;
 
 	void GenerateQueues();
 	void SortQueues();

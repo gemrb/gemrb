@@ -957,7 +957,7 @@ bool Map::FogTileUncovered(const Point& p, const Bitmap* mask) const
 	if (mask == nullptr) return true;
 
 	// out of bounds is always foggy
-	return mask->GetAt(p, false);
+	return mask->GetAt(FogPoint(p), false);
 }
 
 void Map::DrawHighlightables(const Region& viewport) const
@@ -3053,19 +3053,14 @@ void Map::AdjustPosition(SearchmapPoint& goal, const Size& startingRadius, int s
 	}
 }
 
-Point Map::ConvertPointToFog(const Point& p) const
-{
-	return Point(p.x / 32, p.y / 32);
-}
-
 bool Map::IsVisible(const Point& pos) const
 {
-	return FogTileUncovered(ConvertPointToFog(pos), &VisibleBitmap);
+	return FogTileUncovered(pos, &VisibleBitmap);
 }
 
 bool Map::IsExplored(const Point& pos) const
 {
-	return FogTileUncovered(ConvertPointToFog(pos), &ExploredBitmap);
+	return FogTileUncovered(pos, &ExploredBitmap);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
@@ -3368,7 +3363,7 @@ void Map::FillExplored(bool explored)
 
 void Map::ExploreTile(const Point& p, bool fogOnly)
 {
-	Point fogP = ConvertPointToFog(p);
+	FogPoint fogP { p };
 
 	const Size fogSize = FogMapSize();
 	if (!fogSize.PointInside(fogP)) {

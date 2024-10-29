@@ -66,8 +66,9 @@ void FogRenderer::DrawFog(const FogMapData& mapData)
 	// Unbind this data from the object when there is more than one public method
 	this->vp = mapData.vp;
 	this->mapSize = mapData.mapSize;
-	this->start = Clamp(ConvertPointToFog(vp.origin), Point(), Point(fogSize.w, fogSize.h));
-	this->end = Clamp(ConvertPointToFog(vp.Maximum()) + Point(2 + largeFog, 2 + largeFog), Point(), Point(fogSize.w, fogSize.h));
+	FogPoint fogSizePoint(fogSize.w, fogSize.h);
+	this->start = Clamp(FogPoint(vp.origin), FogPoint(), fogSizePoint);
+	this->end = Clamp(FogPoint(vp.Maximum()) + FogPoint(2 + largeFog, 2 + largeFog), FogPoint(), fogSizePoint);
 
 	this->p0 = {
 		(start.x * CELL_SIZE - vp.x) - (largeFog * CELL_SIZE / 2),
@@ -81,17 +82,17 @@ void FogRenderer::DrawFog(const FogMapData& mapData)
 		int shroudedQueue = 0;
 		int x = start.x;
 		for (; x < end.x; x++) {
-			Point cell { x, y };
+			FogPoint cell { x, y };
 
 			if (IsUncovered(cell, mapData.exploredMask)) {
 				if (unexploredQueue) {
-					FillFog(ConvertPointToScreen(cell.x - unexploredQueue, cell.y), unexploredQueue, OPAQUE_FOG);
+					FillFog(ConvertFogPointToScreen(cell.x - unexploredQueue, cell.y), unexploredQueue, OPAQUE_FOG);
 					unexploredQueue = 0;
 				}
 
 				if (IsUncovered(cell, mapData.visibleMask)) {
 					if (shroudedQueue) {
-						FillFog(ConvertPointToScreen(cell.x - shroudedQueue, cell.y), shroudedQueue, TRANSPARENT_FOG);
+						FillFog(ConvertFogPointToScreen(cell.x - shroudedQueue, cell.y), shroudedQueue, TRANSPARENT_FOG);
 						shroudedQueue = 0;
 					}
 					DrawVisibleCell(cell, mapData.visibleMask);
@@ -105,28 +106,23 @@ void FogRenderer::DrawFog(const FogMapData& mapData)
 				// coalesce all horizontally adjacent unexplored cells
 				++unexploredQueue;
 				if (shroudedQueue) {
-					FillFog(ConvertPointToScreen(cell.x - shroudedQueue, cell.y), shroudedQueue, TRANSPARENT_FOG);
+					FillFog(ConvertFogPointToScreen(cell.x - shroudedQueue, cell.y), shroudedQueue, TRANSPARENT_FOG);
 					shroudedQueue = 0;
 				}
 			}
 		}
 
 		if (shroudedQueue) {
-			FillFog(ConvertPointToScreen(x - (shroudedQueue + unexploredQueue), y), shroudedQueue, TRANSPARENT_FOG);
+			FillFog(ConvertFogPointToScreen(x - (shroudedQueue + unexploredQueue), y), shroudedQueue, TRANSPARENT_FOG);
 		}
 
 		if (unexploredQueue) {
-			FillFog(ConvertPointToScreen(x - unexploredQueue, y), unexploredQueue, OPAQUE_FOG);
+			FillFog(ConvertFogPointToScreen(x - unexploredQueue, y), unexploredQueue, OPAQUE_FOG);
 		}
 	}
 }
 
-Point FogRenderer::ConvertPointToFog(Point p)
-{
-	return Point(p.x / 32, p.y / 32);
-}
-
-Point FogRenderer::ConvertPointToScreen(int x, int y) const
+Point FogRenderer::ConvertFogPointToScreen(int x, int y) const
 {
 	x = (x - start.x) * CELL_SIZE + p0.x;
 	y = (y - start.y) * CELL_SIZE + p0.y;
@@ -134,12 +130,12 @@ Point FogRenderer::ConvertPointToScreen(int x, int y) const
 	return Point(x, y);
 }
 
-void FogRenderer::DrawExploredCell(Point p, const Bitmap* exploredMask)
+void FogRenderer::DrawExploredCell(FogPoint p, const Bitmap* exploredMask)
 {
 	auto IsExplored = [=](int x, int y) {
 		return IsUncovered({ x, y }, exploredMask);
 	};
-	Point sp = ConvertPointToScreen(p.x, p.y);
+	Point sp = ConvertFogPointToScreen(p.x, p.y);
 
 	Direction dirs = IsExplored(p.x, p.y - 1) ? Direction::O : Direction::N;
 	if (!IsExplored(p.x - 1, p.y)) dirs |= Direction::W;
@@ -168,12 +164,12 @@ void FogRenderer::DrawExploredCell(Point p, const Bitmap* exploredMask)
 	}
 }
 
-void FogRenderer::DrawVisibleCell(Point p, const Bitmap* visibleMask)
+void FogRenderer::DrawVisibleCell(FogPoint p, const Bitmap* visibleMask)
 {
 	auto IsVisible = [=](int x, int y) {
 		return IsUncovered({ x, y }, visibleMask);
 	};
-	Point sp = ConvertPointToScreen(p.x, p.y);
+	Point sp = ConvertFogPointToScreen(p.x, p.y);
 
 	Direction dirs = IsVisible(p.x, p.y - 1) ? Direction::O : Direction::N;
 	if (!IsVisible(p.x - 1, p.y)) dirs |= Direction::W;
@@ -411,7 +407,7 @@ void FogRenderer::FillFog(Point p, int numRowItems, BlitFlags flags)
 	VideoDriver->DrawRect(r, ColorBlack, true, flags);
 }
 
-bool FogRenderer::IsUncovered(Point p, const Bitmap* mask)
+bool FogRenderer::IsUncovered(FogPoint p, const Bitmap* mask)
 {
 	if (mask == nullptr) return true;
 
