@@ -75,9 +75,7 @@ public:
 
 class GEM_EXPORT Point : public BasePoint {
 public:
-	Point() noexcept = default;
-	Point(int x, int y) noexcept
-		: BasePoint(x, y) {};
+	using BasePoint::BasePoint;
 
 	Point operator+(const Point& p) const noexcept;
 	Point operator-(const Point& p) const noexcept;
@@ -90,9 +88,7 @@ public:
 
 class GEM_EXPORT SearchmapPoint : public BasePoint {
 public:
-	SearchmapPoint() noexcept = default;
-	SearchmapPoint(int x, int y) noexcept
-		: BasePoint(x, y) {};
+	using BasePoint::BasePoint;
 	explicit SearchmapPoint(const Point& p) noexcept
 	{
 		x = p.x / 16;

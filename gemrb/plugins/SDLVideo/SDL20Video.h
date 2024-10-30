@@ -280,7 +280,7 @@ private:
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags = BlitFlags::NONE) override;
 	void DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags = BlitFlags::NONE);
 
-	void DrawLineImp(const BasePoint& start, const BasePoint& end, const Color& color, BlitFlags flags);
+	void DrawLineImp(const BasePoint& start, const BasePoint& end, const Color& color, BlitFlags flags) override;
 	void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) override;
 
 	void DrawRectImp(const Region& rgn, const Color& color, bool fill, BlitFlags flags) override;
