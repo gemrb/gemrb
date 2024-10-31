@@ -10331,11 +10331,7 @@ void Actor::CreateDerivedStats()
 				if (!level) continue;
 				BaseStats[levelslotsiwd2[i]] += 12;
 			}
-			// NOTE: this is a guess, reports vary, iwd2 manually does it when checking saves
-			// the attribute increase already contributes +5
-			for (int i = 0; i <= IE_SAVEWILL - IE_SAVEFORTITUDE; i++) {
-				BaseStats[savingThrows[i]] += 5;
-			}
+			BaseStats[IE_SPECFLAGS] |= SPECF_DRIVEN;
 		} else {
 			BaseStats[IE_NUMBEROFATTACKS] += 2; // 1 more APR
 			ToHit.HandleFxBonus(5, true);
