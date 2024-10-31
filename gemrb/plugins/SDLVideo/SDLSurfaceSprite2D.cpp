@@ -178,8 +178,10 @@ void SDLSurfaceSprite2D::EnsureShadedPalette() const noexcept
 void SDLSurfaceSprite2D::ShadePalette(BlitFlags renderflags, const Color* tint) const noexcept
 {
 	Palette::Colors buffer;
+	buffer[0] = format.palette->GetColorAt(0);
 
-	for (size_t i = 1; i < 256; ++i) {
+	size_t startIndex = format.HasColorKey ? 1 : 0;
+	for (size_t i = startIndex; i < 256; ++i) {
 		buffer[i] = format.palette->GetColorAt(i);
 
 		if (renderflags & BlitFlags::COLOR_MOD && tint) {
@@ -197,7 +199,7 @@ void SDLSurfaceSprite2D::ShadePalette(BlitFlags renderflags, const Color* tint) 
 		}
 	}
 
-	shadedPalette->CopyColors(1, buffer.cbegin() + 1, buffer.cend());
+	shadedPalette->CopyColors(0, buffer.cbegin(), buffer.cend());
 }
 
 bool SDLSurfaceSprite2D::NeedToUpdatePalette() const noexcept
