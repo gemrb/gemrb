@@ -1457,8 +1457,8 @@ void CREImporter::GetActorIWD2(Actor* act)
 
 	ieByteSigned tmpByte;
 	str->ReadScalar(tmpByte);
-	act->ToHit.SetBase(tmpByte); //Unknown in CRE V2.2
-	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_NUMBEROFATTACKS]); //Unknown in CRE V2.2
+	act->ToHit.SetBase(tmpByte);
+	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_NUMBEROFATTACKS]);
 	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSDEATH]); //Fortitude Save in V2.2
 	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSWANDS]); //Reflex Save in V2.2
 	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_SAVEVSPOLY]); // will Save in V2.2
@@ -1478,6 +1478,7 @@ void CREImporter::GetActorIWD2(Actor* act)
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_FATIGUE]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INTOXICATION]);
 	str->ReadScalar<Actor::stat_t, ieByteSigned>(act->BaseStats[IE_LUCK]);
+	// 1 byte turn undead — we recalculate anyway
 	str->Seek(34, GEM_CURRENT_POS); //unknowns
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_CLASSLEVELSUM]); //total levels
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVELBARBARIAN]);
@@ -1497,6 +1498,7 @@ void CREImporter::GetActorIWD2(Actor* act)
 	}
 	ReadScript(act, SCR_SPECIFICS);
 	ReadScript(act, SCR_AREA);
+	// 1 byte enchantment level?
 	str->Seek(4, GEM_CURRENT_POS);
 	str->ReadDword(act->BaseStats[IE_FEATS1]);
 	str->ReadDword(act->BaseStats[IE_FEATS2]);
