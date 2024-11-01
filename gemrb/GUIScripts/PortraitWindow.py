@@ -173,7 +173,7 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 			# vertical
 			button = Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset+i*2*scale, buttonWidth, buttonHeight)
 
-		button.SetVarAssoc("PC", i + 1)
+		button.SetVarAssoc("portrait", i + 1)
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
 		SetupButtonBorders (button)
 		button.SetFont (StatesFont)
