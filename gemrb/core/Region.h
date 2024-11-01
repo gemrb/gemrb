@@ -89,6 +89,7 @@ public:
 class GEM_EXPORT SearchmapPoint : public BasePoint {
 public:
 	using BasePoint::BasePoint;
+	SearchmapPoint() noexcept = default;
 	explicit SearchmapPoint(const Point& p) noexcept
 	{
 		x = p.x / 16;
