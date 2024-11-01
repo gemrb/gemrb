@@ -366,7 +366,7 @@ public:
 	Color QueryLighting(const SearchmapPoint& p) const noexcept;
 
 	void PaintSearchMap(const SearchmapPoint&, PathMapFlags value) const noexcept;
-	void PaintSearchMap(const SearchmapPoint& Pos, uint16_t blocksize, PathMapFlags value) const noexcept;
+	void PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, PathMapFlags value) const noexcept;
 };
 
 class GEM_EXPORT Map : public Scriptable {

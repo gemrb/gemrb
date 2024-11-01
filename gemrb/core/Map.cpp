@@ -178,7 +178,7 @@ void TileProps::PaintSearchMap(const SearchmapPoint& p, PathMapFlags value) cons
 }
 
 // Valid values are - PathMapFlags::UNMARKED, PathMapFlags::PC, PathMapFlags::NPC
-void TileProps::PaintSearchMap(const SearchmapPoint& Pos, uint16_t blocksize, const PathMapFlags value) const noexcept
+void TileProps::PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, const PathMapFlags value) const noexcept
 {
 	// We block a circle of radius size-1 around (px,py)
 	// TODO: recheck that this matches originals
@@ -200,7 +200,7 @@ void TileProps::PaintSearchMap(const SearchmapPoint& Pos, uint16_t blocksize, co
 	blocksize = Clamp<uint16_t>(blocksize, 1, MAX_CIRCLESIZE);
 	uint16_t r = blocksize - 1;
 
-	const auto points = PlotCircle(Pos, r);
+	const auto points = PlotCircle(p, r);
 	for (size_t i = 0; i < points.size(); i += 2) {
 		const BasePoint& p1 = points[i];
 		const BasePoint& p2 = points[i + 1];
