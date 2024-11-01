@@ -278,7 +278,7 @@ namespace GemRB {
 #define IE_CON                       41
 #define IE_CHR                       42
 #define IE_XPVALUE                   43
-#define IE_CR                        43 //for iwd2, not sure if this is a good idea yet
+#define IE_CR                        43 // for iwd2, replaces IE_XPVALUE by a later value
 #define IE_XP                        44
 #define IE_GOLD                      45
 #define IE_MORALEBREAK               46
