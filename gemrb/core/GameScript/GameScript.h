@@ -437,7 +437,7 @@ struct TriggerLink {
 //we could use this flag to restrict player scripts from using dangerous
 //opcodes, it would be a very useful and easy to implement feature!
 #define AF_RESTRICTED 16
-//#define AF_RESTRICTED_LEVEL2  32 //maybe we could use 2 bits for this???
+#define AF_DIALOG        32 // whether it starts a dialog
 #define AF_SCRIPTLEVEL   64 //this hack will transfer scriptlevel to int0parameter at runtime (changecurrentscript relies on it)
 #define AF_INVALID       128
 #define AF_DIRECT        256 //this hack will transfer target from gamecontrol to object1 at compile time
