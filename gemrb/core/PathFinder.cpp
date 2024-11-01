@@ -264,7 +264,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
 	open.emplace(PQNode(nmptSource, 0));
 	bool foundPath = false;
-	bool usePlainThetaStar = gamedata->GetMiscRule("LAZY_THETA_STAR") == 0;
+	static bool usePlainThetaStar = gamedata->GetMiscRule("LAZY_THETA_STAR") == 0;
 	unsigned int squaredMinDist = minDistance * minDistance;
 
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster

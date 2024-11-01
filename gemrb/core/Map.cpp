@@ -115,7 +115,7 @@ void TileProps::SetTileProp(const SearchmapPoint& p, Property prop, uint8_t val)
 uint8_t TileProps::QueryTileProp(const SearchmapPoint& p, Property prop) const noexcept
 {
 	if (size.PointInside(p)) {
-		const uint32_t c = propPtr[p.y * size.w + p.x];
+		const uint32_t& c = propPtr[p.y * size.w + p.x];
 		switch (prop) {
 			case Property::SEARCH_MAP:
 				return (c & searchMapMask) >> searchMapShift;
