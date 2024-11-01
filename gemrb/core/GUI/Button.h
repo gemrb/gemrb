@@ -144,6 +144,8 @@ public:
 	void SetFont(Holder<Font> newfont);
 	/** Enables or disables specified border/frame */
 	void EnableBorder(int index, bool enabled);
+	/** Enables or disables border pulsation */
+	void EnablePulsating(bool pulse) { pulseBorder = pulse; }
 
 	String QueryText() const override { return Text; }
 	String TooltipText() const override;

@@ -39,6 +39,7 @@
 #include "TileMap.h"
 #include "damages.h"
 
+#include "GUI/Button.h"
 #include "GUI/EventMgr.h"
 #include "GUI/TextArea.h"
 #include "GUI/WindowManager.h"
@@ -1233,8 +1234,24 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	}
 
 	Actor* lastActor = area->GetActorByGlobalID(lastActorID);
+
+	// (un)highlight portrait border for pcs
+	auto PulsateBorder = [&lastActor](bool enable) {
+		if (!lastActor || !lastActor->InParty) return;
+
+		const Window* win = GemRB::GetWindow(0, "PORTWIN");
+		if (!win) return;
+
+		Button* btn = GetControl<Button>(lastActor->InParty - 1, win);
+		if (!btn) return;
+		bool selected = lastActor->IsSelected();
+		if (!selected) btn->EnableBorder(0, enable);
+		btn->EnablePulsating(enable);
+	};
+
 	if (lastActor) {
 		lastActor->SetOver(false);
+		PulsateBorder(false);
 	}
 
 	Point gameMousePos = GameMousePos();
@@ -1255,6 +1272,7 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	}
 
 	SetLastActor(lastActor);
+	PulsateBorder(true);
 
 	return true;
 }
