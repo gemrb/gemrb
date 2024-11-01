@@ -1083,7 +1083,7 @@ PyDoc_STRVAR(GemRB_View_AddAlias__doc,
 \n\
 **Description:** Adds an additional entry to the Scripting engine under\n\
 AliasGroup with AliasID and binds it to the view, optionally\n\
-overwriteing an existing entry.\n\
+overwriting an existing entry.\n\
 \n\
 **Parameters:**\n\
   * GView - the control's reference\n\
