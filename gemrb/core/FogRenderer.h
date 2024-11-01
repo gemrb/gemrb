@@ -60,6 +60,7 @@ struct FogMapData {
 class FogPoint : public BasePoint {
 public:
 	using BasePoint::BasePoint;
+	FogPoint() noexcept = default;
 	explicit FogPoint(const Point& p)
 	{
 		x = p.x / 32; // FogRenderer::CELL_SIZE
