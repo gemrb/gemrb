@@ -1146,7 +1146,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	}
 
 	map->AddActor(act, false);
-	act->Pos = pos;
+	act->SetPos(pos);
 	act->Destination = destination;
 	act->HomeLocation = destination;
 	act->maxWalkDistance = maxDistance;

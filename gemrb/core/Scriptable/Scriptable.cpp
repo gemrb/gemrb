@@ -2224,9 +2224,10 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	Pos.x += dx;
 	Pos.y += dy;
 	oldPos = Pos;
+	SMPos = SearchmapPoint(Pos);
 	if (actor && blocksSearch) {
 		auto flag = actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
-		area->tileProps.PaintSearchMap(SearchmapPoint(Pos), circleSize, flag);
+		area->tileProps.PaintSearchMap(SMPos, circleSize, flag);
 	}
 
 	SetOrientation(step.orient, false);
@@ -2389,7 +2390,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 void Movable::MoveTo(const Point& Des)
 {
 	area->ClearSearchMapFor(this);
-	Pos = Des;
+	SetPos(Des);
 	oldPos = Des;
 	Destination = Des;
 	if (BlocksSearchMap()) {

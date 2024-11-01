@@ -484,7 +484,8 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	GetPCStats(ps, extended);
 
 	actor->ReinitQuickSlots();
-	actor->Destination = actor->Pos = pcInfo.Pos;
+	actor->Destination = pcInfo.Pos;
+	actor->SetPos(pcInfo.Pos);
 	actor->AreaName = pcInfo.Area;
 	actor->SetOrientation(ClampToOrientation(pcInfo.Orientation), false);
 	actor->TalkCount = pcInfo.TalkCount;

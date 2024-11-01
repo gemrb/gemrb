@@ -429,6 +429,7 @@ void Game::InitActorPos(Actor* actor) const
 
 	actor->Pos.x = actor->Destination.x = strta->QueryFieldSigned<int>(strta->GetRowIndex(xpos), ip);
 	actor->Pos.y = actor->Destination.y = strta->QueryFieldSigned<int>(strta->GetRowIndex(ypos), ip);
+	actor->SMPos = SearchmapPoint(actor->Pos);
 	actor->HomeLocation = actor->Pos;
 	actor->SetOrientation(ClampToOrientation(strta->QueryFieldSigned<int>(strta->GetRowIndex(rot), ip)), false);
 
@@ -925,6 +926,7 @@ bool Game::CheckForReplacementActor(size_t i)
 				error("Game::CheckForReplacementActor", "GetNPC failed: cannot find act!");
 			} else {
 				newact->Pos = act->Pos; // the map is not loaded yet, so no SetPosition
+				newact->SMPos = act->SMPos;
 				newact->TalkCount = act->TalkCount;
 				newact->InteractCount = act->InteractCount;
 				newact->AreaName = act->AreaName;

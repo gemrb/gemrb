@@ -548,6 +548,7 @@ public:
 	ResRef AreaName;
 	Point HomeLocation; //spawnpoint, return here after rest
 	ieWord maxWalkDistance = 0; // maximum random walk distance from home
+	SearchmapPoint SMPos; // Pos in searchmap space
 
 public:
 	inline void ImpedeBumping()
@@ -600,6 +601,11 @@ public:
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition() const;
 	virtual bool BlocksSearchMap() const = 0;
+	void SetPos(const NavmapPoint& pos)
+	{
+		Pos = pos;
+		SMPos = SearchmapPoint(pos);
+	};
 };
 }
 
