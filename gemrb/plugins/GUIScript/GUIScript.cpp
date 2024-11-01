@@ -9791,7 +9791,7 @@ static PyObject* GemRB_RevealArea(PyObject* /*self*/, PyObject* args)
 	Point p(x, y);
 	GET_GAME();
 	GET_MAP();
-	map->ExploreMapChunk(p, radius, Value);
+	map->ExploreMapChunk(SearchmapPoint(p), radius, Value);
 
 	Py_RETURN_NONE;
 }

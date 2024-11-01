@@ -6915,7 +6915,7 @@ int fx_farsee(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 	}
-	map->ExploreMapChunk(fx->Pos, fx->Parameter1, fx->Parameter2 & 8);
+	map->ExploreMapChunk(SearchmapPoint(fx->Pos), fx->Parameter1, fx->Parameter2 & 8);
 	return FX_NOT_APPLIED;
 }
 

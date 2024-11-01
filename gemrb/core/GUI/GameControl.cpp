@@ -980,7 +980,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				PrintCollection("variables", core->GetDictionary());
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
-				area->ExploreMapChunk(gameMousePos, RAND(0, 29), 1);
+				area->ExploreMapChunk(SearchmapPoint(gameMousePos), RAND(0, 29), 1);
 				break;
 			case 'w': // consolidates found ground piles under the pointed pc
 				area->MoveVisibleGroundPiles(gameMousePos);

@@ -66,6 +66,11 @@ public:
 		x = p.x / 32; // FogRenderer::CELL_SIZE
 		y = p.y / 32; // FogRenderer::CELL_SIZE
 	}
+	explicit FogPoint(const SearchmapPoint& p)
+	{
+		x = p.x * 16 / 32; // FogRenderer::CELL_SIZE
+		y = p.y * 12 / 32; // FogRenderer::CELL_SIZE
+	}
 
 	FogPoint operator+(const FogPoint& p) const noexcept
 	{

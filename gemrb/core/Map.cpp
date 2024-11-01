@@ -254,7 +254,7 @@ struct Explore {
 	int LargeFog;
 	static constexpr int MaxVisibility = 30;
 	int VisibilityPerimeter = 0; // calculated from MaxVisibility
-	std::array<std::vector<Point>, MaxVisibility> VisibilityMasks;
+	std::array<std::vector<SearchmapPoint>, MaxVisibility> VisibilityMasks;
 
 	static const Explore& Get()
 	{
@@ -266,11 +266,11 @@ private:
 	void AddLOS(int destx, int desty, int slot)
 	{
 		for (int i = 0; i < MaxVisibility; i++) {
-			int x = ((destx * i + MaxVisibility / 2) / MaxVisibility) * 16;
-			int y = ((desty * i + MaxVisibility / 2) / MaxVisibility) * 12;
+			int x = (destx * i + MaxVisibility / 2) / MaxVisibility;
+			int y = (desty * i + MaxVisibility / 2) / MaxVisibility;
 			if (LargeFog) {
-				x += 16;
-				y += 12;
+				x++;
+				y++;
 			}
 			VisibilityMasks[i][slot].x = x;
 			VisibilityMasks[i][slot].y = y;
@@ -3361,10 +3361,8 @@ void Map::FillExplored(bool explored)
 	ExploredBitmap.fill(explored ? 0xff : 0x00);
 }
 
-void Map::ExploreTile(const Point& p, bool fogOnly)
+void Map::ExploreTile(const FogPoint& fogP, bool fogOnly)
 {
-	FogPoint fogP { p };
-
 	const Size fogSize = FogMapSize();
 	if (!fogSize.PointInside(fogP)) {
 		return;
@@ -3376,9 +3374,10 @@ void Map::ExploreTile(const Point& p, bool fogOnly)
 	}
 }
 
-void Map::ExploreMapChunk(const Point& Pos, int range, int los)
+void Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los)
 {
-	Point Tile;
+	SearchmapPoint tile;
+	FogPoint fogTile;
 	const Explore& explore = Explore::Get();
 
 	if (range > Explore::MaxVisibility) {
@@ -3391,16 +3390,16 @@ void Map::ExploreMapChunk(const Point& Pos, int range, int los)
 		bool sidewall = false;
 		bool fogOnly = false;
 		for (int i = 0; i < range; i++) {
-			Tile.x = Pos.x + explore.VisibilityMasks[i][p].x;
-			Tile.y = Pos.y + explore.VisibilityMasks[i][p].y;
+			tile = pos + explore.VisibilityMasks[i][p];
+			fogTile = FogPoint(tile);
 
 			if (!los) {
-				ExploreTile(Tile, fogOnly);
+				ExploreTile(fogTile, fogOnly);
 				continue;
 			}
 
 			if (!block) {
-				PathMapFlags type = GetBlocked(Tile);
+				PathMapFlags type = GetBlockedTile(tile);
 				if (bool(type & PathMapFlags::NO_SEE)) {
 					block = true;
 				} else if (bool(type & PathMapFlags::SIDEWALL)) {
@@ -3417,7 +3416,7 @@ void Map::ExploreMapChunk(const Point& Pos, int range, int los)
 				Pass--;
 				if (!Pass) break;
 			}
-			ExploreTile(Tile, fogOnly);
+			ExploreTile(fogTile, fogOnly);
 		}
 	}
 }
@@ -3436,7 +3435,7 @@ void Map::UpdateFog()
 
 		int vis2 = actor->Modified[IE_VISUALRANGE];
 		if ((state & STATE_BLIND) || (vis2 < 2)) vis2 = 2; //can see only themselves
-		ExploreMapChunk(actor->Pos, vis2 + actor->GetAnims()->GetCircleSize(), 1);
+		ExploreMapChunk(actor->SMPos, vis2 + actor->GetAnims()->GetCircleSize(), 1);
 
 		Spawn* sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {

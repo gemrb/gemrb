@@ -5399,7 +5399,7 @@ void GameScript::ExploreMapChunk(Scriptable* Sender, Action* parameters)
 	ExploreMapChunk will reveal both visibility/explored map, but the
 	visibility will fade in the next update cycle (which is quite frequent)
 	*/
-	map->ExploreMapChunk(parameters->pointParameter, parameters->int0Parameter, parameters->int1Parameter);
+	map->ExploreMapChunk(SearchmapPoint(parameters->pointParameter), parameters->int0Parameter, parameters->int1Parameter);
 }
 
 void GameScript::StartStore(Scriptable* Sender, Action* parameters)
