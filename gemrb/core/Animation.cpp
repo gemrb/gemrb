@@ -30,13 +30,14 @@
 
 namespace GemRB {
 
-Animation::Animation(std::vector<frame_t> fr) noexcept
+Animation::Animation(std::vector<frame_t> fr, float customFPS) noexcept
 	: frames(std::move(fr))
 {
 	size_t count = frames.size();
 	assert(count > 0);
 	frameIdx = RAND<index_t>(0, count - 1);
 	flags = Flags::Active;
+	fps = customFPS;
 
 	for (const frame_t& frame : frames) {
 		if (!frame) continue;

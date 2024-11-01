@@ -3637,7 +3637,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 		}
 
 		fps = frames.size() / (cycle / 1000.0f);
-		anim = std::make_shared<Animation>(std::move(frames));
+		anim = std::make_shared<Animation>(std::move(frames), fps);
 	}
 
 	ABORT_IF_NULL(anim);

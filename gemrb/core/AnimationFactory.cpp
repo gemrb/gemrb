@@ -20,6 +20,7 @@
 
 #include "AnimationFactory.h"
 
+#include "Interface.h"
 #include "Sprite2D.h"
 
 namespace GemRB {
@@ -36,6 +37,7 @@ AnimationFactory::AnimationFactory(const ResRef& resref,
 	assert(frames.size() < InvalidIndex);
 	assert(cycles.size() < InvalidIndex);
 	assert(FLTable.size() < InvalidIndex);
+	fps = core->GetAnimationFPS(resRef);
 }
 
 Animation* AnimationFactory::GetCycle(index_t cycle) const noexcept
@@ -51,7 +53,7 @@ Animation* AnimationFactory::GetCycle(index_t cycle) const noexcept
 		animframes.push_back(frames[FLTable[i]]);
 	}
 	assert(cycles[cycle].FramesCount == animframes.size());
-	return new Animation(std::move(animframes));
+	return new Animation(std::move(animframes), fps);
 }
 
 /* returns the required frame of the named cycle, cycle defaults to 0 */

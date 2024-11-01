@@ -77,7 +77,7 @@ Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
 		frames.push_back(GetTile(indexes[i]));
 	}
 
-	Animation ani = Animation(std::move(frames));
+	Animation ani = Animation(std::move(frames), ANI_DEFAULT_FRAMERATE);
 	//pause key stops animation
 	ani.gameAnimation = true;
 	//the turning crystal in ar3202 (bg1) requires animations to be synced
@@ -88,7 +88,7 @@ Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
 		for (size_t i = 0; i < count; i++) {
 			frames.push_back(GetTile(secondary[i]));
 		}
-		Animation sec = Animation(std::move(frames));
+		Animation sec = Animation(std::move(frames), ANI_DEFAULT_FRAMERATE);
 		return new Tile(std::move(ani), std::move(sec));
 	}
 	return new Tile(std::move(ani));

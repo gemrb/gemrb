@@ -731,6 +731,7 @@ public:
 	PluginHolder<Audio> GetAudioDrv(void) const;
 
 	Timer& SetTimer(const EventHandler&, tick_t interval, int repeats = -1);
+	float GetAnimationFPS(const ResRef& anim) const;
 };
 
 extern GEM_EXPORT Interface* core;

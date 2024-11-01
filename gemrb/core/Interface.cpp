@@ -4105,4 +4105,19 @@ void Interface::SetNextScript(const path_t& script)
 	QuitFlag |= QF_CHANGESCRIPT;
 }
 
+float Interface::GetAnimationFPS(const ResRef& anim) const
+{
+	AutoTable animFPS = gamedata->LoadTable("animfps", true);
+	if (!animFPS) return ANI_DEFAULT_FRAMERATE;
+
+	static TableMgr::index_t rows = animFPS->GetRowCount();
+	for (TableMgr::index_t i = 0; i < rows; ++i) {
+		if (anim != animFPS->GetRowName(i)) continue;
+
+		float fps = animFPS->QueryFieldUnsigned<unsigned int>(i, 0);
+		return fps;
+	}
+	return ANI_DEFAULT_FRAMERATE;
+}
+
 }

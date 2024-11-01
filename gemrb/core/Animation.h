@@ -60,7 +60,7 @@ public:
 	Region animArea;
 	Flags flags = Flags::None;
 
-	explicit Animation(std::vector<frame_t>) noexcept;
+	explicit Animation(std::vector<frame_t>, float customFPS) noexcept;
 	Animation() noexcept = default;
 
 	explicit operator bool() const

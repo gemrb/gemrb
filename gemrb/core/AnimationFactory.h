@@ -56,6 +56,7 @@ private:
 	std::vector<Holder<Sprite2D>> frames;
 	std::vector<CycleEntry> cycles;
 	std::vector<index_t> FLTable; // Frame Lookup Table
+	float fps = ANI_DEFAULT_FRAMERATE; // comes from animfps.2da
 };
 
 }
