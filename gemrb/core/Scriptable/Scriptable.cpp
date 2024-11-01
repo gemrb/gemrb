@@ -2334,6 +2334,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 			turnAction->int0Parameter = 3;
 			// remove and readd ourselves, so the turning gets a chance to run
 			ReleaseCurrentAction();
+			ClearPath(false);
 			AddActionInFront(me);
 			AddActionInFront(turnAction);
 			return;
@@ -2371,12 +2372,13 @@ void Movable::RandomWalk(bool can_stop, bool run)
 
 	//the 5th parameter is controlling the orientation of the actor
 	//0 - back away, 1 - face direction
-	path.AppendStep(area->RandomWalk(Pos, circleSize, maxWalkDistance ? maxWalkDistance : 5, As<Actor>()));
+	PathNode randomStep = area->RandomWalk(Pos, circleSize, maxWalkDistance ? maxWalkDistance : 5, As<Actor>());
 	if (BlocksSearchMap()) {
 		area->BlockSearchMapFor(this);
 	}
-	if (path) {
-		Destination = path.GetStep(0).point;
+	if (!randomStep.point.IsZero()) {
+		Destination = randomStep.point;
+		path.PrependStep(randomStep); // start or end doesn't matter, since the path is currently empty
 	} else {
 		randomWalkCounter = 0;
 		WalkTo(HomeLocation);
