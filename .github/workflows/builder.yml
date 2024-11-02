@@ -104,7 +104,7 @@ jobs:
       run: |
         mkdir build && cd build
         cmake --version
-        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DSTATIC_LINK=1 -DAPPIMAGE=1 -DUSE_TESTS=ON
+        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DAPPIMAGE=1 -DUSE_TESTS=ON
 
     - name: Compiler cache (sccache)
       uses: actions/cache@v4
