@@ -614,7 +614,7 @@ int CanSee(const Scriptable* Sender, const Scriptable* target, bool range, int s
 		}
 	}
 
-	return map->IsVisibleLOS(target->Pos, Sender->Pos);
+	return map->IsVisibleLOS(target->SMPos, Sender->SMPos);
 }
 
 //non actors can see too (reducing function to LOS)
@@ -2327,7 +2327,7 @@ void SpellCore(Scriptable* Sender, Action* parameters, int flags)
 				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 				return;
 			}
-			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, tar->Pos)) {
+			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, tar->SMPos)) {
 				if (!(spl->Flags & SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					MoveNearerTo(Sender, tar, dist);
@@ -2453,7 +2453,7 @@ void SpellPointCore(Scriptable* Sender, Action* parameters, int flags)
 				MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
 				return;
 			}
-			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, parameters->pointParameter)) {
+			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, SearchmapPoint(parameters->pointParameter))) {
 				const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
 				if (!(spl->Flags & SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
