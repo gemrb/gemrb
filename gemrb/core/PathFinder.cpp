@@ -232,9 +232,10 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
+	SearchmapPoint smptDest0 { d };
 	NavmapPoint nmptDest = d;
 	NavmapPoint nmptSource = s;
-	if (!(GetBlockedInRadius(d, size) & PathMapFlags::PASSABLE)) {
+	if (!(GetBlockedInRadiusTile(smptDest0, size) & PathMapFlags::PASSABLE)) {
 		// If the desired target is blocked, find the path
 		// to the nearest reachable point.
 		// Also avoid bumping a still actor out of its position,
@@ -299,7 +300,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		} else if (minDistance &&
 			   parents[smptCurrentIdx] != nmptCurrent &&
 			   SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist &&
-			   (!(flags & PF_SIGHT) || IsVisibleLOS(nmptCurrent, d))) {
+			   (!(flags & PF_SIGHT) || IsVisibleLOS(smptCurrent, smptDest0))) { // FIXME: should probably be smptDest
 			smptDest = smptCurrent;
 			nmptDest = nmptCurrent;
 			foundPath = true;
