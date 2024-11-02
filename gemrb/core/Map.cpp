@@ -2586,10 +2586,45 @@ PathMapFlags Map::GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, b
 	return ret;
 }
 
+PathMapFlags Map::GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, const Actor* caller) const
+{
+	PathMapFlags ret = PathMapFlags::IMPASSABLE;
+	SearchmapPoint p = s;
+	float_t factor = caller && caller->GetSpeed() ? float_t(gamedata->GetStepTime()) / float_t(caller->GetSpeed()) : 1;
+	while (p != d) {
+		float_t dx = d.x - p.x;
+		float_t dy = d.y - p.y;
+		NormalizeDeltas(dx, dy, factor);
+		p.x += dx;
+		p.y += dy;
+		if (s == p) continue;
+
+		PathMapFlags blockStatus = GetBlockedTile(p);
+		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
+			return PathMapFlags::IMPASSABLE;
+		}
+		ret |= blockStatus;
+	}
+	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR | PathMapFlags::SIDEWALL))) {
+		ret &= ~PathMapFlags::PASSABLE;
+	}
+	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
+		ret = PathMapFlags::SIDEWALL;
+	}
+
+	return ret;
+}
+
 // PathMapFlags::SIDEWALL obstructs LOS, while PathMapFlags::IMPASSABLE doesn't
 bool Map::IsVisibleLOS(const Point& s, const Point& d, const Actor* caller) const
 {
 	PathMapFlags ret = GetBlockedInLine(s, d, false, caller);
+	return !bool(ret & PathMapFlags::SIDEWALL);
+}
+
+bool Map::IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller) const
+{
+	PathMapFlags ret = GetBlockedInLineTile(s, d, false, caller);
 	return !bool(ret & PathMapFlags::SIDEWALL);
 }
 

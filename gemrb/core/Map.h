@@ -622,6 +622,7 @@ public:
 	bool IsVisible(const Point& p) const;
 	bool IsExplored(const Point& p) const;
 	bool IsVisibleLOS(const Point& s, const Point& d, const Actor* caller = NULL) const;
+	bool IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller = nullptr) const;
 	bool IsWalkableTo(const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller) const;
 
 	/* returns edge direction of map boundary, only worldmap regions */
@@ -714,6 +715,7 @@ private:
 
 	void UpdateSpawns() const;
 	PathMapFlags GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, const Actor* caller = nullptr) const;
+	PathMapFlags GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, const Actor* caller = nullptr) const;
 	void AddProjectile(Projectile* pro);
 
 	// same as GetBlocked, but in TileCoords

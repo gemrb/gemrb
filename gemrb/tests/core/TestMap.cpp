@@ -64,6 +64,8 @@ const Interface* MapTest::gemrb = nullptr;
 
 static Point badPaths[] = { Point(1270, 640), Point(1071, 699), Point(1170, 967), Point(1126, 601) };
 static Point goodPaths[] = { Point(1126, 601), Point(685, 655), Point(720, 496), Point(1056, 336) };
+static SearchmapPoint badPaths2[] = { SearchmapPoint(badPaths[0]), SearchmapPoint(badPaths[1]), SearchmapPoint(badPaths[2]), SearchmapPoint(badPaths[3]) };
+static SearchmapPoint goodPaths2[] = { SearchmapPoint(goodPaths[0]), SearchmapPoint(goodPaths[1]), SearchmapPoint(goodPaths[2]), SearchmapPoint(goodPaths[3]) };
 
 TEST_F(MapTest, GetBlockedInLineTest1)
 {
@@ -78,4 +80,34 @@ TEST_F(MapTest, GetBlockedInLineTest1)
 	}
 }
 
+TEST_F(MapTest, GetBlockedInLineTileTest1)
+{
+	// same point
+	EXPECT_TRUE(map->IsVisibleLOS(badPaths2[0], badPaths2[0], nullptr));
+
+	// random points
+	for (int i = 0; i < 3; i++) {
+		EXPECT_FALSE(map->IsVisibleLOS(badPaths2[i], badPaths2[i + 1], nullptr)) << "i: " << i << std::endl;
+
+		EXPECT_TRUE(map->IsVisibleLOS(goodPaths2[i], goodPaths2[i + 1], nullptr)) << "i: " << i << std::endl;
+	}
+}
+
+// test GetBlockedInLineTile == GetBlockedInLine
+TEST_F(MapTest, GetBlockedInLineTestDouble)
+{
+	// same point
+	EXPECT_TRUE(map->IsVisibleLOS(badPaths[0], badPaths[0], nullptr));
+
+	// random points
+	for (int i = 0; i < 3; i++) {
+		EXPECT_EQ(map->IsVisibleLOS(badPaths[i], badPaths[i + 1], nullptr),
+			  map->IsVisibleLOS(badPaths2[i], badPaths2[i + 1], nullptr))
+			<< "i: " << i << std::endl;
+
+		EXPECT_EQ(map->IsVisibleLOS(goodPaths[i], goodPaths[i + 1], nullptr),
+			  map->IsVisibleLOS(goodPaths2[i], goodPaths2[i + 1], nullptr))
+			<< "i: " << i << std::endl;
+	}
+}
 }
