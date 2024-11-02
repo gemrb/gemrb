@@ -293,6 +293,7 @@ protected: //let Actor access this
 public:
 	ScriptableType Type = ST_ACTOR;
 	Point Pos;
+	SearchmapPoint SMPos; // Pos in searchmap space
 	Region BBox;
 	ieStrRef DialogName = ieStrRef::INVALID;
 
@@ -428,6 +429,11 @@ public:
 	bool AuraPolluted();
 	ieDword GetLocal(const ieVariable& key, ieDword fallback) const;
 	virtual std::string dump() const = 0;
+	void SetPos(const NavmapPoint& pos)
+	{
+		Pos = pos;
+		SMPos = SearchmapPoint(pos);
+	};
 
 private:
 	/* used internally to handle start of spellcasting */
@@ -548,7 +554,6 @@ public:
 	ResRef AreaName;
 	Point HomeLocation; //spawnpoint, return here after rest
 	ieWord maxWalkDistance = 0; // maximum random walk distance from home
-	SearchmapPoint SMPos; // Pos in searchmap space
 
 public:
 	inline void ImpedeBumping()
@@ -601,11 +606,6 @@ public:
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition() const;
 	virtual bool BlocksSearchMap() const = 0;
-	void SetPos(const NavmapPoint& pos)
-	{
-		Pos = pos;
-		SMPos = SearchmapPoint(pos);
-	};
 };
 }
 

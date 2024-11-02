@@ -82,6 +82,7 @@ void Door::UpdateDoor()
 		// update the Scriptable position
 		Pos.x = outline->BBox.x + outline->BBox.w / 2;
 		Pos.y = outline->BBox.y + outline->BBox.h / 2;
+		SetPos(Pos);
 	}
 
 	PathMapFlags pmdflags;

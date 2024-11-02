@@ -686,9 +686,9 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	ip->UsePoint = pos;
 	// FIXME: PST doesn't use this field
 	if (ip->GetUsePoint()) {
-		ip->Pos = ip->UsePoint;
+		ip->SetPos(ip->UsePoint);
 	} else {
-		ip->Pos = bbox.Center();
+		ip->SetPos(bbox.Center());
 	}
 	ip->Destination = destination;
 	ip->EntranceName = entrance;
@@ -803,7 +803,7 @@ void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
 		c = map->AddContainer(containerName, containerType, poly);
 	}
 
-	c->Pos = pos;
+	c->SetPos(pos);
 	c->LockDifficulty = lockDiff;
 	c->Flags = containerFlags;
 	c->TrapDetectionDiff = trapDetDiff;
