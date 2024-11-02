@@ -333,12 +333,12 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 
 			SearchmapPoint smptCurrent2 { nmptCurrent };
 			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
+			SearchmapPoint smptParent { nmptParent };
 			unsigned short oldDist = distFromStart[smptChildIdx];
 
 			if (usePlainThetaStar) {
 				// Theta-star path if there is LOS
-				if (IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
-					SearchmapPoint smptParent { nmptParent };
+				if (IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
 					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 					if (newDist < oldDist) {
 						parents[smptChildIdx] = nmptParent;
@@ -359,7 +359,6 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 				}
 			} else {
 				// Lazy Theta star*
-				SearchmapPoint smptParent { nmptParent };
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
 					parents[smptChildIdx] = nmptParent;
@@ -368,7 +367,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 
 				if (distFromStart[smptChildIdx] < oldDist) {
 					// Theta-star path if there is LOS
-					if (!IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
+					if (!IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
 						// Fall back to A-star path
 						distFromStart[smptChildIdx] = std::numeric_limits<unsigned short>::max();
 						// Find already visited neighbour with shortest: path from start + path to child

@@ -2636,6 +2636,13 @@ bool Map::IsWalkableTo(const Point& s, const Point& d, bool actorsAreBlocking, c
 	return bool(ret & mask);
 }
 
+bool Map::IsWalkableTo(const SearchmapPoint& s, const SearchmapPoint& d, bool actorsAreBlocking, const Actor* caller) const
+{
+	PathMapFlags ret = GetBlockedInLineTile(s, d, true, caller);
+	PathMapFlags mask = PathMapFlags::PASSABLE | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
+	return bool(ret & mask);
+}
+
 void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 {
 	// FIXME: how do we know if a door changed state?

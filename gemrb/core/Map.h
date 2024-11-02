@@ -624,6 +624,7 @@ public:
 	bool IsVisibleLOS(const Point& s, const Point& d, const Actor* caller = NULL) const;
 	bool IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller = nullptr) const;
 	bool IsWalkableTo(const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller) const;
+	bool IsWalkableTo(const SearchmapPoint& s, const SearchmapPoint& d, bool actorsAreBlocking, const Actor* caller) const;
 
 	/* returns edge direction of map boundary, only worldmap regions */
 	WMPDirection WhichEdge(const NavmapPoint& s) const;
