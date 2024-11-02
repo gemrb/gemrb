@@ -36,7 +36,11 @@ public:
 	// set up core and the first map from the demo
 	static void SetUpTestSuite()
 	{
+#if defined(WIN32) || defined(__APPLE__)
+		const char* argv[] = { "tester", "-c", "demo/tester.cfg" };
+#else
 		const char* argv[] = { "tester", "-c", "../../../demo/tester.cfg" };
+#endif
 		auto cfg = LoadFromArgs(3, const_cast<char**>(argv));
 		gemrb = new Interface(std::move(cfg));
 
