@@ -262,6 +262,7 @@ Interface::Interface(CoreSettings&& cfg)
 	vars.Set("GUIEnhancements", config.GUIEnhancements);
 
 	LoadPlugins();
+	FlushLogs();
 	InitVideo();
 
 	// ask the driver if a touch device is in use
