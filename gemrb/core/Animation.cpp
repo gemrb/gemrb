@@ -76,7 +76,7 @@ Animation::frame_t Animation::LastFrame(void)
 		return NULL;
 	}
 	if (gameAnimation) {
-		starttime = core->GetGame()->Ticks;
+		starttime = core->Time.Ticks2Ms(core->GetGame()->GameTime);
 	} else {
 		starttime = GetMilliseconds();
 	}
