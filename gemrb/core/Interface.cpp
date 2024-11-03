@@ -93,6 +93,12 @@ namespace GemRB {
 GEM_EXPORT PluginHolder<Video> VideoDriver;
 GEM_EXPORT Interface* core = nullptr;
 
+static void ThrowException(std::string msg)
+{
+	FlushLogs();
+	throw CIE(msg);
+}
+
 struct AbilityTables {
 	using AbilityTable = std::vector<ieWordSigned>;
 
@@ -237,7 +243,7 @@ Interface::Interface(CoreSettings&& cfg)
 	const char* iconvCode = GetIconvNameForCodepage(codepage);
 
 	if (nullptr == iconvCode) {
-		throw CIE(fmt::format("Mapping of codepage {} unknown to iconv.", codepage));
+		ThrowException(fmt::format("Mapping of codepage {} unknown to iconv.", codepage));
 	}
 	config.SystemEncoding = iconvCode;
 #elif defined(HAVE_LANGINFO_H)
@@ -248,11 +254,11 @@ Interface::Interface(CoreSettings&& cfg)
 	sgiterator = new SaveGameIterator();
 
 	if (!MakeDirectories(config.CachePath)) {
-		throw CIE(fmt::format("Unable to create cache directory '{}'", config.CachePath));
+		ThrowException(fmt::format("Unable to create cache directory '{}'", config.CachePath));
 	}
 
 	if (StupidityDetector(config.CachePath)) {
-		throw CIE(fmt::format("Cache path {} doesn't exist, not a folder or contains alien files!", config.CachePath));
+		ThrowException(fmt::format("Cache path {} doesn't exist, not a folder or contains alien files!", config.CachePath));
 	}
 	if (!config.KeepCache) DelTree(config.CachePath, false);
 
@@ -262,7 +268,6 @@ Interface::Interface(CoreSettings&& cfg)
 	vars.Set("GUIEnhancements", config.GUIEnhancements);
 
 	LoadPlugins();
-	FlushLogs();
 	InitVideo();
 
 	// ask the driver if a touch device is in use
@@ -273,12 +278,12 @@ Interface::Interface(CoreSettings&& cfg)
 
 	Log(MESSAGE, "Core", "Initializing search path...");
 	if (!IsAvailable(PLUGIN_RESOURCE_DIRECTORY)) {
-		throw CIE("no DirectoryImporter!");
+		ThrowException("no DirectoryImporter!");
 	}
 
 	path_t path = config.CachePath;
 	if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
-		throw CIE("The cache path couldn't be registered, please check!");
+		ThrowException("The cache path couldn't be registered, please check!");
 	}
 
 	for (const auto& modPath : config.ModPath) {
@@ -340,7 +345,7 @@ Interface::Interface(CoreSettings&& cfg)
 - you passed a bad game path to GemRB on the command line,\n\
 - you are not running GemRB from within a game dir,\n\
 - or the game is running (Windows only).");
-		throw CIE("The path must point to a game directory with a readable chitin.key file.");
+		ThrowException("The path must point to a game directory with a readable chitin.key file.");
 	}
 
 	// most of the old gemrb override files can be found here,
@@ -361,10 +366,10 @@ Interface::Interface(CoreSettings&& cfg)
 		SetNextScript("Start"); // Start is the first script executed
 		guiscript = MakePluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
 		if (guiscript == nullptr) {
-			throw CIE("Missing GUI Script Engine.");
+			ThrowException("Missing GUI Script Engine.");
 		}
 		if (!guiscript->Init()) {
-			throw CIE("Failed to initialize GUI Script.");
+			ThrowException("Failed to initialize GUI Script.");
 		}
 	}
 
@@ -416,7 +421,7 @@ Interface::Interface(CoreSettings&& cfg)
 				config.CapFPS == 0);
 
 		if (createDisplayResult == GEM_ERROR) {
-			throw CIE("Cannot initialize shaders.");
+			ThrowException("Cannot initialize shaders.");
 		}
 		VideoDriver->SetGamma(brightness, contrast);
 
@@ -464,7 +469,7 @@ Interface::Interface(CoreSettings&& cfg)
 		fs = FileStream::OpenFile(strpath);
 
 		if (!fs) {
-			throw CIE("Cannot find Dialog.tlk.");
+			ThrowException("Cannot find Dialog.tlk.");
 		}
 	}
 	strings->Open(fs);
@@ -497,7 +502,7 @@ Interface::Interface(CoreSettings&& cfg)
 
 	Log(MESSAGE, "Core", "Initializing stock sounds...");
 	if (!gamedata->ReadResRefTable(ResRef("defsound"), gamedata->defaultSounds)) {
-		throw CIE("Cannot find defsound.2da.");
+		ThrowException("Cannot find defsound.2da.");
 	}
 
 	if (!config.UseAsLibrary) {
@@ -511,7 +516,7 @@ Interface::Interface(CoreSettings&& cfg)
 
 	auto guifact = GetImporter<GUIFactory>(IE_CHU_CLASS_ID);
 	if (!guifact) {
-		throw CIE("Failed to load Window Manager.");
+		ThrowException("Failed to load Window Manager.");
 	}
 
 	if (!config.UseAsLibrary) {
@@ -574,7 +579,7 @@ Interface::Interface(CoreSettings&& cfg)
 	Log(MESSAGE, "Core", "Reading game time table...");
 	ret = ReadGameTimeTable();
 	if (!ret) {
-		throw CIE("Failed to read game time table...");
+		ThrowException("Failed to read game time table...");
 	}
 
 	ret = ReadDamageTypeTable();
@@ -1042,10 +1047,10 @@ void Interface::InitVideo() const
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
 	VideoDriver = std::static_pointer_cast<Video>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName));
 	if (!VideoDriver) {
-		throw CIE("No Video Driver Available.");
+		ThrowException("No Video Driver Available.");
 	}
 	if (VideoDriver->Init() == GEM_ERROR) {
-		throw CIE("Cannot Initialize Video Driver.");
+		ThrowException("Cannot Initialize Video Driver.");
 	}
 }
 
@@ -1054,16 +1059,16 @@ void Interface::InitAudio()
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
 	AudioDriver = std::static_pointer_cast<Audio>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName));
 	if (AudioDriver == nullptr) {
-		throw CIE("Failed to load sound driver.");
+		ThrowException("Failed to load sound driver.");
 	}
 	if (!AudioDriver->Init()) {
-		throw CIE("Failed to initialize sound driver.");
+		ThrowException("Failed to initialize sound driver.");
 	}
 
 	Log(MESSAGE, "Core", "Initializing Music Manager...");
 	music = MakePluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
 	if (!music) {
-		throw CIE("Failed to load Music Manager.");
+		ThrowException("Failed to load Music Manager.");
 	}
 
 	Log(MESSAGE, "Core", "Loading music list...");
@@ -1130,13 +1135,13 @@ void Interface::LoadPlugins() const
 	if (plugin && plugin->GetPluginCount()) {
 		Log(MESSAGE, "Core", "Plugin Loading Complete...");
 	} else {
-		throw CIE("Plugin Loading Failed, check path...");
+		ThrowException("Plugin Loading Failed, check path...");
 	}
 	plugin->RunInitializers(config);
 
 	for (const auto& type : { IE_2DA_CLASS_ID, IE_INI_CLASS_ID, IE_TLK_CLASS_ID, IE_BAM_CLASS_ID }) {
 		if (!IsAvailable(type)) {
-			throw CIE("Missing required plugin for " + TypeExt(type));
+			ThrowException("Missing required plugin for " + TypeExt(type));
 		}
 	}
 }
@@ -1168,7 +1173,7 @@ void Interface::LoadSprites()
 
 	// this is the last existing cursor type
 	if (CursorCount < IE_CURSOR_WAY) {
-		throw CIE(fmt::format("Failed to load enough cursors ({} < {}).", CursorCount, IE_CURSOR_WAY));
+		ThrowException(fmt::format("Failed to load enough cursors ({} < {}).", CursorCount, IE_CURSOR_WAY));
 	}
 	WindowManager::CursorMouseUp = Cursors[0];
 	WindowManager::CursorMouseDown = Cursors[1];
@@ -1180,7 +1185,7 @@ void Interface::LoadSprites()
 			anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
-				throw CIE("Failed Loading Ground circle bitmaps...");
+				ThrowException("Failed Loading Ground circle bitmaps...");
 			}
 
 			for (int i = 0; i < 6; i++) {
@@ -1199,7 +1204,7 @@ void Interface::LoadFonts()
 	Log(MESSAGE, "Core", "Loading Fonts...");
 	AutoTable tab = gamedata->LoadTable("fonts");
 	if (!tab) {
-		throw CIE("Cannot find fonts.2da.");
+		ThrowException("Cannot find fonts.2da.");
 	}
 
 	// FIXME: we used to try and share like fonts
@@ -1413,7 +1418,7 @@ void Interface::LoadGemRBINI()
 {
 	DataStream* inifile = gamedata->GetResourceStream("gemrb", IE_INI_CLASS_ID);
 	if (!inifile) {
-		throw CIE("could not open gemrb.ini");
+		ThrowException("could not open gemrb.ini");
 	}
 
 	Log(MESSAGE, "Core", "Loading game type-specific GemRB setup '{}'",
@@ -2580,7 +2585,7 @@ void Interface::InitItemTypes()
 {
 	AutoTable it = gamedata->LoadTable("itemtype");
 	if (!it) {
-		throw CIE("Could not open itemtype table.");
+		ThrowException("Could not open itemtype table.");
 	}
 	ItemTypes = it->GetRowCount(); //number of itemtypes
 
@@ -2634,7 +2639,7 @@ void Interface::InitItemTypes()
 	Inventory::Init();
 	AutoTable st = gamedata->LoadTable("slottype");
 	if (!st) {
-		throw CIE("Could not open slottype table.");
+		ThrowException("Could not open slottype table.");
 	}
 
 	SlotTypes = st->GetRowCount();
