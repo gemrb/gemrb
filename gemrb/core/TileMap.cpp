@@ -69,7 +69,7 @@ TileObject* TileMap::AddTile(const ResRef& ID, const ieVariable& Name, unsigned 
 TileObject* TileMap::GetTile(unsigned int idx)
 {
 	if (idx >= tiles.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return tiles[idx];
 }
@@ -91,7 +91,7 @@ Door* TileMap::AddDoor(const ResRef& ID, const ieVariable& Name, unsigned int Fl
 Door* TileMap::GetDoor(size_t idx) const
 {
 	if (idx >= doors.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return doors[idx];
 }
@@ -101,7 +101,7 @@ Door* TileMap::GetDoor(const Point& p) const
 	for (Door* door : doors) {
 		if (door->HitTest(p)) return door;
 	}
-	return NULL;
+	return nullptr;
 }
 
 Door* TileMap::GetDoorByPosition(const Point& p) const
@@ -114,7 +114,7 @@ Door* TileMap::GetDoorByPosition(const Point& p) const
 			return door;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Door* TileMap::GetDoor(const ieVariable& Name) const
@@ -123,7 +123,7 @@ Door* TileMap::GetDoor(const ieVariable& Name) const
 		if (door->GetScriptName() == Name)
 			return door;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void TileMap::UpdateDoors()
@@ -178,7 +178,7 @@ void TileMap::AddContainer(Container* c)
 Container* TileMap::GetContainer(size_t idx) const
 {
 	if (idx >= containers.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return containers[idx];
 }
@@ -190,7 +190,7 @@ Container* TileMap::GetContainer(const ieVariable& Name) const
 			return container;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 //look for a container at position
@@ -217,7 +217,7 @@ Container* TileMap::GetContainer(const Point& position, int type) const
 			return container;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Container* TileMap::GetContainerByPosition(const Point& position, int type) const
@@ -242,7 +242,7 @@ Container* TileMap::GetContainerByPosition(const Point& position, int type) cons
 		}
 		return container;
 	}
-	return NULL;
+	return nullptr;
 }
 
 int TileMap::CleanupContainer(Container* container)
@@ -327,7 +327,7 @@ InfoPoint* TileMap::GetInfoPoint(const Point& p, bool skipSilent) const
 			return infoPoint;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 InfoPoint* TileMap::GetInfoPoint(const ieVariable& Name) const
@@ -337,13 +337,13 @@ InfoPoint* TileMap::GetInfoPoint(const ieVariable& Name) const
 			return infoPoint;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 InfoPoint* TileMap::GetInfoPoint(size_t idx) const
 {
 	if (idx >= infoPoints.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return infoPoints[idx];
 }
@@ -357,7 +357,7 @@ InfoPoint* TileMap::GetTravelTo(const ResRef& Destination) const
 			return infoPoint;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 InfoPoint* TileMap::AdjustNearestTravel(Point& p) const
