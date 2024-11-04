@@ -1016,7 +1016,7 @@ void ChangeAnimationCore(Actor* src, const ResRef& replacement, bool effect)
 // check for searchmap travel regions, which should be identical to accessible map borders in practice
 static bool NearEdge(const Scriptable* escapee)
 {
-	return bool(escapee->GetCurrentArea()->GetBlocked(escapee->Pos) & PathMapFlags::TRAVEL);
+	return bool(escapee->GetCurrentArea()->GetBlockedTile(escapee->SMPos) & PathMapFlags::TRAVEL);
 }
 
 void EscapeAreaCore(Scriptable* Sender, const Point& p, const ResRef& area, const Point& enter, EscapeArea flags, int wait)
