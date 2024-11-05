@@ -113,7 +113,6 @@ FIND_PACKAGE(Threads REQUIRED)
 
 # Tests (need init'd before subdirectories)
 IF (USE_TESTS)
-	LIST(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".a") # readd, perhaps was removed above
 	FIND_PACKAGE(GTest REQUIRED)
 	INCLUDE(CTest)
 	ENABLE_TESTING()
