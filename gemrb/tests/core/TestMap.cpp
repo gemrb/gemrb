@@ -17,9 +17,6 @@
 *
 */
 
-// FIXME: remove once fixed, this is excluding non-linux build bots
-#if defined(USE_OPENGL_BACKEND) || (!defined(__APPLE__) && !defined(WIN32))
-
 #include "../../core/GameData.h"
 #include "../../core/Interface.h"
 #include "../../core/InterfaceConfig.h"
@@ -31,6 +28,8 @@
 
 namespace GemRB {
 
+// FIXME: remove once fixed, this is excluding non-linux build bots
+#if defined(USE_OPENGL_BACKEND) || (!defined(__APPLE__) && !defined(WIN32))
 class MapTest : public testing::Test {
 public:
 	static const Interface* gemrb;
@@ -117,5 +116,5 @@ TEST_F(MapTest, GetBlockedInLineTestDouble)
 			<< "i: " << i << std::endl;
 	}
 }
-}
 #endif
+}
