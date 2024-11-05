@@ -520,7 +520,6 @@ public:
 	PathMapFlags GetBlockedInRadius(const NavmapPoint&, unsigned int size, bool stopOnImpassable = true) const;
 	PathMapFlags GetBlocked(const NavmapPoint&) const;
 	PathMapFlags GetBlocked(const NavmapPoint&, int size) const;
-	PathMapFlags GetBlockedTile(const SearchmapPoint&) const;
 	Scriptable* GetScriptableByGlobalID(ieDword objectID);
 	Door* GetDoorByGlobalID(ieDword objectID) const;
 	Container* GetContainerByGlobalID(ieDword objectID) const;
@@ -721,6 +720,7 @@ private:
 	void AddProjectile(Projectile* pro);
 
 	// same as GetBlocked, but in TileCoords
+	PathMapFlags GetBlockedTile(const SearchmapPoint&) const;
 	PathMapFlags GetBlockedTile(const SearchmapPoint&, int size) const;
 	PathMapFlags GetBlockedInRadiusTile(const SearchmapPoint&, uint16_t size, bool stopOnImpassable = true) const;
 };
