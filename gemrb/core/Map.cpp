@@ -719,7 +719,7 @@ void Map::UpdateScripts()
 	Game* game = core->GetGame();
 	bool timestop = game->IsTimestopActive();
 	if (!timestop) {
-		game->SetTimestopOwner(nullptr);
+		game->SetTimestopOwner(NULL);
 	}
 
 	ieDword time = game->Ticks; // make sure everything moves at the same time
@@ -1064,7 +1064,7 @@ AreaAnimation* Map::GetNextAreaAnimation(aniIterator& iter, ieDword gametime) co
 Particles* Map::GetNextSpark(const spaIterator& iter) const
 {
 	if (iter == particles.end()) {
-		return nullptr;
+		return NULL;
 	}
 	return *iter;
 }
@@ -1073,7 +1073,7 @@ Particles* Map::GetNextSpark(const spaIterator& iter) const
 Projectile* Map::GetNextProjectile(const proIterator& iter) const
 {
 	if (iter == projectiles.end()) {
-		return nullptr;
+		return NULL;
 	}
 	return *iter;
 }
@@ -1118,7 +1118,7 @@ int Map::GetTrapCount(proIterator& iter) const
 VEFObject* Map::GetNextScriptedAnimation(const scaIterator& iter) const
 {
 	if (iter == vvcCells.end()) {
-		return nullptr;
+		return NULL;
 	}
 	return *iter;
 }
@@ -1346,7 +1346,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		}
 	}
 
-	VideoDriver->SetStencilBuffer(nullptr);
+	VideoDriver->SetStencilBuffer(NULL);
 
 	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
 	game->DrawWeather(update_scripts);
@@ -1973,7 +1973,7 @@ void Map::DeleteActor(size_t idx)
 		//this frees up the spot under the feet circle
 		ClearSearchMapFor(actor);
 		//remove the area reference from the actor
-		actor->SetMap(nullptr);
+		actor->SetMap(NULL);
 		actor->AreaName.Reset();
 		objectStencils.erase(actor);
 		//don't destroy the object in case it is a persistent object
@@ -1988,7 +1988,7 @@ void Map::DeleteActor(size_t idx)
 
 Scriptable* Map::GetScriptableByGlobalID(ieDword objectID)
 {
-	if (!objectID) return nullptr;
+	if (!objectID) return NULL;
 
 	Scriptable* scr = GetActorByGlobalID(objectID);
 	if (scr)
@@ -2014,7 +2014,7 @@ Scriptable* Map::GetScriptableByGlobalID(ieDword objectID)
 
 Door* Map::GetDoorByGlobalID(ieDword objectID) const
 {
-	if (!objectID) return nullptr;
+	if (!objectID) return NULL;
 
 	for (const auto& door : area->TMap->GetDoors()) {
 		if (door->GetGlobalID() == objectID) {
@@ -2026,7 +2026,7 @@ Door* Map::GetDoorByGlobalID(ieDword objectID) const
 
 Container* Map::GetContainerByGlobalID(ieDword objectID) const
 {
-	if (!objectID) return nullptr;
+	if (!objectID) return NULL;
 
 	for (const auto& container : area->TMap->GetContainers()) {
 		if (container->GetGlobalID() == objectID) {
@@ -2038,7 +2038,7 @@ Container* Map::GetContainerByGlobalID(ieDword objectID) const
 
 InfoPoint* Map::GetInfoPointByGlobalID(ieDword objectID) const
 {
-	if (!objectID) return nullptr;
+	if (!objectID) return NULL;
 
 	for (const auto& ip : TMap->GetInfoPoints()) {
 		if (ip->GetGlobalID() == objectID) {
@@ -2121,7 +2121,7 @@ Actor* Map::GetActor(const Point& p, int flags, const Movable* checker) const
 		}
 		return actor;
 	}
-	return nullptr;
+	return NULL;
 }
 
 Actor* Map::GetActorInRadius(const Point& p, int flags, unsigned int radius, const Scriptable* checker) const
@@ -2134,7 +2134,7 @@ Actor* Map::GetActorInRadius(const Point& p, int flags, unsigned int radius, con
 		}
 		return actor;
 	}
-	return nullptr;
+	return NULL;
 }
 
 std::vector<Actor*> Map::GetAllActorsInRadius(const Point& p, int flags, unsigned int radius, const Scriptable* see) const
@@ -2169,7 +2169,7 @@ Actor* Map::GetActor(const ieVariable& Name, int flags) const
 			return actor;
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 int Map::GetActorCount(bool any) const
@@ -2219,7 +2219,7 @@ void Map::PurgeArea(bool items)
 	while (i--) {
 		Actor* ac = actors[i];
 		//we're going to drop the map from memory so clear the reference
-		ac->SetMap(nullptr);
+		ac->SetMap(NULL);
 
 		if (ac->Modified[IE_STATE_ID] & STATE_NOSAVE) {
 			if (ac->Modified[IE_MC_FLAGS] & MC_KEEP_CORPSE) {
@@ -2283,7 +2283,7 @@ Actor* Map::GetActor(int index, bool any) const
 			}
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 Scriptable* Map::GetScriptableByDialog(const ResRef& resref) const
@@ -2297,7 +2297,7 @@ Scriptable* Map::GetScriptableByDialog(const ResRef& resref) const
 	}
 
 	if (!core->HasFeature(GFFlags::INFOPOINT_DIALOGS)) {
-		return nullptr;
+		return NULL;
 	}
 
 	// pst has plenty of talking infopoints, eg. in ar0508 (Lothar's cabinet)
@@ -2313,7 +2313,7 @@ Scriptable* Map::GetScriptableByDialog(const ResRef& resref) const
 			return door;
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 // NOTE: this function is not as general as it sounds
@@ -2326,7 +2326,7 @@ Actor* Map::GetItemByDialog(const ResRef& resref) const
 	// choose the owner of the dialog via passed dialog ref
 	if (resref != ResRef("dmhead")) {
 		Log(WARNING, "Map", "Encountered new candidate item for GetItemByDialog? {}", resref);
-		return nullptr;
+		return NULL;
 	}
 	ResRef itemref = "mertwyn";
 
@@ -2365,7 +2365,7 @@ Actor* Map::GetActorByResource(const ResRef& resref) const
 			return actor;
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 Actor* Map::GetActorByScriptName(const ieVariable& name) const
@@ -2660,7 +2660,7 @@ void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 
 	stencilViewport = vp;
 
-	if (wallStencil == nullptr) {
+	if (wallStencil == NULL) {
 		// FIXME: this should be forced 8bit*4 color format
 		// but currently that is forcing some performance killing conversion issues on some platforms
 		// for now things will break if we use 16 bit color settings
@@ -2890,7 +2890,7 @@ Entrance* Map::GetEntrance(const ieVariable& Name) const
 			return entrance;
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 bool Map::HasActor(const Actor* actor) const
@@ -2911,7 +2911,7 @@ void Map::RemoveActor(Actor* actor)
 			//path is invalid outside this area, but actions may be valid
 			actor->ClearPath(true);
 			ClearSearchMapFor(actor);
-			actor->SetMap(nullptr);
+			actor->SetMap(NULL);
 			actor->AreaName.Reset();
 			actors.erase(actors.begin() + i);
 			return;
@@ -3195,7 +3195,7 @@ const MapNote* Map::MapNoteAtPoint(const Point& point, unsigned int radius) cons
 			return &mapnotes[i];
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 //--------spawning------------------
@@ -3511,7 +3511,7 @@ Spawn* Map::GetSpawnRadius(const Point& point, unsigned int radius) const
 			return spawn;
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 int Map::ConsolidateContainers()
