@@ -93,8 +93,7 @@ namespace GemRB {
 GEM_EXPORT PluginHolder<Video> VideoDriver;
 GEM_EXPORT Interface* core = nullptr;
 
-[[noreturn]]
-static void ThrowException(const std::string& msg)
+static void ThrowException(std::string msg)
 {
 	FlushLogs();
 	throw CIE(msg);
