@@ -75,7 +75,7 @@ Animation::frame_t Animation::LastFrame(void)
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive1!");
 		return NULL;
 	}
-	if (gameAnimation && core->IsFreezed()) {
+	if (gameAnimation) {
 		starttime = core->Time.Ticks2Ms(core->GetGame()->GameTime);
 	} else {
 		starttime = GetMilliseconds();
@@ -97,7 +97,7 @@ Animation::frame_t Animation::NextFrame(void)
 
 	tick_t time;
 	tick_t delta = 1000 / fps; // duration per frame in ms
-	if (gameAnimation && core->IsFreezed()) {
+	if (gameAnimation) {
 		time = core->Time.Ticks2Ms(core->GetGame()->GameTime);
 	} else {
 		time = GetMilliseconds();
