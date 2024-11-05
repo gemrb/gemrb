@@ -28,8 +28,6 @@
 
 namespace GemRB {
 
-// FIXME: remove once fixed, this is excluding non-linux build bots
-#if defined(USE_OPENGL_BACKEND) || (!defined(__APPLE__) && !defined(WIN32))
 class MapTest : public testing::Test {
 public:
 	static const Interface* gemrb;
@@ -39,7 +37,7 @@ public:
 	static void SetUpTestSuite()
 	{
 #if defined(WIN32) || defined(__APPLE__)
-		const char* argv[] = { "tester", "-c", "../demo/tester.cfg" };
+		const char* argv[] = { "tester", "-c", "demo/tester.cfg" };
 #else
 		const char* argv[] = { "tester", "-c", "../../../demo/tester.cfg" };
 #endif
@@ -116,5 +114,4 @@ TEST_F(MapTest, GetBlockedInLineTestDouble)
 			<< "i: " << i << std::endl;
 	}
 }
-#endif
 }
