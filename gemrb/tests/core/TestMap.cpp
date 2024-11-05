@@ -23,7 +23,6 @@
 #include "../../core/GameData.h"
 #include "../../core/Interface.h"
 #include "../../core/InterfaceConfig.h"
-#include "../../core/Logging/Loggers/Stdio.h"
 #include "../../core/Map.h"
 #include "../../core/PluginMgr.h"
 #include "../../core/SaveGameMgr.h"
@@ -46,8 +45,6 @@ public:
 		const char* argv[] = { "tester", "-c", "../../../demo/tester.cfg" };
 #endif
 		auto cfg = LoadFromArgs(3, const_cast<char**>(argv));
-		ToggleLogging(true);
-		AddLogWriter(createStdioLogWriter());
 		gemrb = new Interface(std::move(cfg));
 
 		auto gamStream = gamedata->GetResourceStream("gem-demo", IE_GAM_CLASS_ID);
