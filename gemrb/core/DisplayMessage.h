@@ -69,7 +69,6 @@ enum class GUIColors : uint8_t {
 	TA_LB_OPTIONS, // textarea listbox options
 	TA_LB_HOVER,
 	TA_LB_SELECTED,
-	EMPTYCONTAINER,
 
 	count
 };

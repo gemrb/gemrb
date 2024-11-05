@@ -974,11 +974,7 @@ void Map::DrawHighlightables(const Region& viewport) const
 		if (c->Highlight) {
 			c->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_CONTAINERS) {
-			if (c->inventory.GetSlotCount()) {
-				c->outlineColor = displaymsg->GetColor(GUIColors::ALTCONTAINER);
-			} else if (core->config.GUIEnhancements & 1) {
-				c->outlineColor = displaymsg->GetColor(GUIColors::EMPTYCONTAINER);
-			}
+			c->outlineColor = displaymsg->GetColor(GUIColors::ALTCONTAINER);
 			c->DrawOutline(viewport.origin);
 		}
 	}

@@ -27,7 +27,6 @@ MSG_PARTY		0x9cc7d6ff
 TA_LB_OPTIONS		0xd7d7d7ff
 TA_LB_HOVER		0xffb400ff
 TA_LB_SELECTED		0x376400ff
-EMPTYCONTAINER		0xd7d7beff
 
 # To add a new color apart of adding it here you must add also the following changes:
 # On the file DisplayMessage.h put the name of the color at the end of the enum.
