@@ -307,11 +307,10 @@ void CharAnimations::MaybeUpdateMainPalette(const Animation& anim)
 {
 	if (previousStanceID != stanceID && GetAnimType() != IE_ANI_TWO_PIECE) {
 		// Test if the palette in question is actually different to the one loaded.
-		Holder<Palette> palette = anim.GetFrame(0)->GetPalette();
-		if (!PartPalettes[PAL_MAIN] || *PartPalettes[PAL_MAIN] != *palette) {
+		if (!PartPalettes[PAL_MAIN] || *PartPalettes[PAL_MAIN] != *anim.GetFrame(0)->GetPalette()) {
 			PaletteResRef[PAL_MAIN].Reset();
 
-			if (palette) PartPalettes[PAL_MAIN] = MakeHolder<Palette>(*palette);
+			PartPalettes[PAL_MAIN] = MakeHolder<Palette>(*anim.GetFrame(0)->GetPalette());
 			SetupColors(PAL_MAIN);
 		}
 	}
@@ -1038,8 +1037,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			if (!PartPalettes[ptype]) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
-				Holder<Palette> palette = newanim->GetFrame(0)->GetPalette();
-				if (palette) PartPalettes[ptype] = MakeHolder<Palette>(*palette);
+				PartPalettes[ptype] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
 				// ...and setup the colours properly
 				SetupColors(ptype);
 			} else if (ptype == PAL_MAIN) {
