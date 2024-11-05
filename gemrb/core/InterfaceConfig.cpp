@@ -368,7 +368,6 @@ InterfaceConfig LoadFromCFG(const path_t& file)
 {
 	FileStream cfgStream;
 	if (!cfgStream.Open(file)) {
-		FlushLogs();
 		throw CIE(std::string("File not found: ") + file);
 	}
 
