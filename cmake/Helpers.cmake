@@ -421,10 +421,6 @@ FUNCTION(ADD_GEMRB_PLUGIN plugin_name)
 		LIST(REMOVE_ITEM PLUGIN_BUILD_FILES "COCOA")
 		#this is an Apple thing
 		IF(APPLE)
-			SET_SOURCE_FILES_PROPERTIES(
-				CocoaWrapper.m
-				PROPERTIES LANGUAGE C
-			)
 			message(STATUS "Will link ${plugin_name} plugin to: ${BUNDLE_LOADER}")
 			SET (PLUGIN_BUILD_FILES ${PLUGIN_BUILD_FILES} CocoaWrapper.m)
 		ENDIF(APPLE)
