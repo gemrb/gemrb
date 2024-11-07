@@ -1130,7 +1130,7 @@ String GameControl::TooltipText() const
 	}
 
 	const Actor* actor = area->GetActor(gameMousePos, GA_NO_DEAD | GA_NO_UNSCHEDULED);
-	if (!actor || actor->GetStat(IE_MC_FLAGS) & MC_NO_TOOLTIPS) {
+	if (!actor || actor->GetStat(IE_MC_FLAGS) & MC_NO_TOOLTIPS || (!actor->InParty && actor->IsInvisibleTo(nullptr))) {
 		return View::TooltipText();
 	}
 
@@ -1291,6 +1291,14 @@ void GameControl::UpdateCursor()
 	if (nextCursor == IE_CURSOR_INVALID) {
 		lastCursor = IE_CURSOR_BLOCKED;
 		return;
+	} else if (nextCursor == IE_CURSOR_BLOCKED) {
+		// don't leak that an enemy is invisible and treat its space as passable
+		// it's not necessarily lastActor, so we have to search again
+		const Actor* actor = area->GetActor(gameMousePos, GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_ALLY);
+		if (actor && actor->IsInvisibleTo(nullptr)) {
+			lastCursor = IE_CURSOR_WALK;
+			return;
+		}
 	}
 
 	Door* overDoor = Scriptable::As<Door>(overMe);
