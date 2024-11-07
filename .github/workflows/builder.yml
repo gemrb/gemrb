@@ -134,7 +134,7 @@ jobs:
     - name: Test Suite
       run: |
         cd build
-        make test
+        xvfb-run make test
 
     - name: Test Run
       run: |
