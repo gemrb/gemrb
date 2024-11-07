@@ -121,5 +121,32 @@ TEST_F(MapTest, GetBlockedInLineTestDouble)
 			<< "i: " << i << std::endl;
 	}
 }
+
+TEST_F(MapTest, FindPathTest)
+{
+	// straight path
+	constexpr int circleSize = 2;
+	auto path = map->FindPath(goodPaths[0], goodPaths[1], circleSize);
+	EXPECT_TRUE(path);
+	EXPECT_EQ(path.Size(), 1);
+
+	// curvy path
+	path = map->FindPath(badPaths[0], badPaths[1], circleSize);
+	EXPECT_TRUE(path);
+	EXPECT_EQ(path.Size(), 3);
+
+	// ... is exactly what we expect
+	EXPECT_EQ(path.GetStep(0).point, Point(1222, 700));
+	EXPECT_EQ(path.GetStep(1).point, Point(1110, 712));
+	EXPECT_EQ(path.GetStep(2).point, Point(1062, 700)); // not exactly badPaths[1]!
+
+	// basic determinism
+	auto path2 = map->FindPath(badPaths[0], badPaths[1], circleSize);
+	EXPECT_TRUE(path2);
+	EXPECT_EQ(path2.Size(), 3);
+	for (int i = 0; i < 3; i++) {
+		EXPECT_EQ(path.GetStep(i).point, path2.GetStep(i).point);
+	}
+}
 }
 #endif
