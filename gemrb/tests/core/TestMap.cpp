@@ -40,6 +40,7 @@ public:
 	// set up core and the first map from the demo
 	static void SetUpTestSuite()
 	{
+		setlocale(LC_ALL, "");
 #if defined(WIN32) || defined(__APPLE__)
 		const char* argv[] = { "tester", "-c", "../demo/tester.cfg" };
 #else
