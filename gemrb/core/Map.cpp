@@ -1769,9 +1769,8 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 		block.h = 6;
 		while (i < path.Size()) {
 			const PathNode& step = path.GetStep(i);
-			block.x = (step.point.x + 64) - vp.x;
-			block.y = (step.point.y + 6) - vp.y;
-			Log(DEBUG, "Map", "Waypoint {} at {}", i, step.point);
+			block.x = step.point.x - vp.x;
+			block.y = step.point.y - vp.y;
 			VideoDriver->DrawRect(block, waypoint);
 			i++;
 		}
