@@ -270,7 +270,7 @@ void GameControl::ClearMouseState()
 	isSelectionRect = false;
 	isFormationRotation = false;
 
-	SetCursor(NULL);
+	SetCursor(nullptr);
 }
 
 // generate an action to do the actual movement
@@ -445,7 +445,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 			numScrollCursor = (numScrollCursor + 1) % 15;
 		}
 	} else if (!window->IsDisabled()) {
-		window->SetCursor(NULL);
+		window->SetCursor(nullptr);
 	}
 
 	const Map* area = CurrentArea();
@@ -761,7 +761,7 @@ void GameControl::SelectActor(int whom, int type)
 {
 	Game* game = core->GetGame();
 	if (whom == -1) {
-		game->SelectActor(NULL, true, SELECT_NORMAL);
+		game->SelectActor(nullptr, true, SELECT_NORMAL);
 		return;
 	}
 
@@ -1120,7 +1120,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 String GameControl::TooltipText() const
 {
 	const Map* area = CurrentArea();
-	if (area == NULL) {
+	if (!area) {
 		return View::TooltipText();
 	}
 
@@ -1215,7 +1215,7 @@ Holder<Sprite2D> GameControl::GetTargetActionCursor(TargetMode mode)
 Holder<Sprite2D> GameControl::Cursor() const
 {
 	Holder<Sprite2D> cursor = View::Cursor();
-	if (cursor == NULL && lastCursor != IE_CURSOR_INVALID) {
+	if (!cursor && lastCursor != IE_CURSOR_INVALID) {
 		int idx = lastCursor & ~IE_CURSOR_GRAY;
 		if (EventMgr::MouseDown()) {
 			++idx;
@@ -1229,7 +1229,7 @@ Holder<Sprite2D> GameControl::Cursor() const
 bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 {
 	const Map* area = CurrentArea();
-	if (area == NULL) {
+	if (!area) {
 		return false;
 	}
 
@@ -1259,7 +1259,7 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	lastActor = area->GetActor(gameMousePos, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 	if (lastActor && lastActor->Modified[IE_EA] >= EA_CONTROLLED) {
 		if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos)) {
-			lastActor = NULL;
+			lastActor = nullptr;
 		}
 	}
 
@@ -1280,7 +1280,7 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 void GameControl::UpdateCursor()
 {
 	const Map* area = CurrentArea();
-	if (area == NULL) {
+	if (!area) {
 		lastCursor = IE_CURSOR_BLOCKED;
 		return;
 	}
@@ -1645,7 +1645,7 @@ void GameControl::MoveViewportUnlockedTo(Point p, bool center)
 bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 {
 	const Map* area = CurrentArea();
-	bool canMove = area != NULL;
+	bool canMove = area != nullptr;
 
 	if (updateVPTimer && speed) {
 		updateVPTimer = false;
@@ -2524,7 +2524,7 @@ void GameControl::MakeSelection(bool extend)
 	Game* game = core->GetGame();
 
 	if (!extend && !highlighted.empty()) {
-		game->SelectActor(NULL, false, SELECT_NORMAL);
+		game->SelectActor(nullptr, false, SELECT_NORMAL);
 	}
 
 	std::vector<Actor*>::iterator it = highlighted.begin();
@@ -2634,7 +2634,7 @@ Map* GameControl::CurrentArea() const
 	if (game) {
 		return game->GetCurrentArea();
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* GameControl::GetLastActor() const
@@ -2651,7 +2651,7 @@ void GameControl::SetLastActor(Actor* lastActor)
 {
 	if (lastActorID) {
 		const Map* area = CurrentArea();
-		if (area == NULL) {
+		if (!area) {
 			return;
 		}
 
