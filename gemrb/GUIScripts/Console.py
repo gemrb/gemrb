@@ -96,7 +96,7 @@ def Exec(cmd):
 
 		locals = {} # we dont want to expose our locals
 		modend = cmd.find('.')
-		if modend > -1:
+		if modend > -1 and modend < len("ex('ActionOverride(Pla"): # Point arguments use a dot
 			import importlib
 			importlib.invalidate_caches()
 			modname = cmd[0:modend]
