@@ -1,3 +1,5 @@
+1 ActionOverride(O:Actor*,A:Action*)
+2 AddWayPoint(P:WayPoint*)
 23 MoveToPoint(P:Point*)
 30 SetGlobal(S:Name*,S:Area*,I:Value*)
 49 MoveViewPoint(P:Target*,I:ScrollSpeed*Scroll)
