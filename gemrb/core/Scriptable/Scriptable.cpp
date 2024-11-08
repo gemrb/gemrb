@@ -2233,6 +2233,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	SetOrientation(step.orient, false);
 	timeStartStep = time;
 	if (Pos == nmptStep) {
+		path.nodes[path.currentStep].waypoint = false;
 		++path.currentStep;
 		if (path.currentStep >= path.Size()) {
 			ClearPath(true);
@@ -2250,9 +2251,10 @@ void Movable::AddWayPoint(const Point& Des)
 	}
 	Destination = Des;
 
-	Point p = path.GetStep(path.Size() - 1).point;
+	size_t steps = path.Size();
+	PathNode& lastStep = path.nodes[steps - 1];
 	area->ClearSearchMapFor(this);
-	Path path2 = area->FindPath(p, Des, circleSize);
+	Path path2 = area->FindPath(lastStep.point, Des, circleSize);
 	// if the waypoint is too close to the current position, no path is generated
 	if (!path2) {
 		if (BlocksSearchMap()) {
@@ -2260,6 +2262,7 @@ void Movable::AddWayPoint(const Point& Des)
 		}
 		return;
 	}
+	lastStep.waypoint = true;
 	path.AppendPath(path2);
 }
 

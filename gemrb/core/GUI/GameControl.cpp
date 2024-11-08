@@ -635,13 +635,22 @@ void GameControl::DrawTargetReticles() const
 	if (isFormationRotation) {
 		float_t angle = AngleFromPoints(gameMousePos, gameClickPoint);
 		DrawFormation(game->selected, gameClickPoint, angle);
-	} else {
-		for (const auto& selectee : game->selected) {
-			assert(selectee);
-			if (selectee->ShouldDrawReticle()) {
-				DrawTargetReticle(selectee, selectee->Destination - vpOrigin);
-			}
+		return;
+	}
+
+	for (const auto& selectee : game->selected) {
+		assert(selectee);
+		if (!selectee->ShouldDrawReticle()) continue;
+
+		// any waypoints to draw?
+		const Path& path = selectee->GetPath();
+		for (size_t i = 0; i < path.Size(); i++) {
+			const PathNode& step = path.GetStep(i);
+			if (!step.waypoint) continue;
+			Point wp = step.point - vpOrigin;
+			DrawTargetReticle(selectee, wp);
 		}
+		DrawTargetReticle(selectee, selectee->Destination - vpOrigin); // always draw last step
 	}
 }
 

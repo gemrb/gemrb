@@ -56,6 +56,7 @@ using NavmapPoint = Point;
 struct PathNode {
 	Point point;
 	orient_t orient;
+	bool waypoint = false;
 };
 
 struct Path {
