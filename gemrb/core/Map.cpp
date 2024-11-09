@@ -1693,7 +1693,7 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 					buffer[i] = ColorGray;
 				}
 			}
-			searchMapPal->CopyColors(0, buffer.cbegin(), buffer.cbegin() + 16);
+			searchMapPal->CopyColors(0, buffer.cbegin(), buffer.cend());
 
 			materialMapPal = MakeHolder<Palette>();
 			buffer[0] = ColorBlack; // impassable, light blocking
