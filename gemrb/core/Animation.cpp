@@ -73,7 +73,7 @@ Animation::frame_t Animation::LastFrame(void)
 {
 	if (!(flags & Flags::Active)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive1!");
-		return NULL;
+		return nullptr;
 	}
 	if (gameAnimation && core->IsFreezed()) {
 		starttime = core->Time.Ticks2Ms(core->GetGame()->GameTime);
@@ -87,7 +87,7 @@ Animation::frame_t Animation::NextFrame(void)
 {
 	if (!(flags & Flags::Active)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive2!");
-		return NULL;
+		return nullptr;
 	}
 
 	Holder<Sprite2D> ret = frames[GetCurrentFrameIndex()];
@@ -132,7 +132,7 @@ Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 {
 	if (!(flags & Flags::Active)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive!");
-		return NULL;
+		return nullptr;
 	}
 	Holder<Sprite2D> ret = frames[GetCurrentFrameIndex()];
 	starttime = master->starttime;
@@ -148,7 +148,7 @@ Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 Animation::frame_t Animation::GetFrame(index_t i) const
 {
 	if (i >= GetFrameCount()) {
-		return NULL;
+		return nullptr;
 	}
 	return frames[i];
 }

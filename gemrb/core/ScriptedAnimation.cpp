@@ -190,7 +190,7 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 		//if there is no hold anim, move the onset anim there
 		if (!anims[p_hold]) {
 			anims[p_hold] = anims[p_onset];
-			anims[p_onset] = NULL;
+			anims[p_onset] = nullptr;
 		}
 		//onset and release phases are to be played only once
 		if (anims[p_onset])
@@ -748,14 +748,14 @@ void ScriptedAnimation::AlterPalette(const RGBModifier& mod)
 ScriptedAnimation* ScriptedAnimation::DetachTwin()
 {
 	if (!twin) {
-		return NULL;
+		return nullptr;
 	}
 	ScriptedAnimation* ret = twin;
 	//ret->Frame.y+=ret->ZPos+1;
 	if (ret->ZOffset >= 0) {
 		ret->ZOffset = -1;
 	}
-	twin = NULL;
+	twin = nullptr;
 	return ret;
 }
 

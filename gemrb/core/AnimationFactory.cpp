@@ -73,7 +73,7 @@ Holder<Sprite2D> AnimationFactory::GetFrame(index_t index, index_t cycle) const
 Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(index_t index) const
 {
 	if (index >= frames.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return frames[index];
 }
