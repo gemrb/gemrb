@@ -208,7 +208,8 @@ void Scriptable::Update()
 void Scriptable::TickScripting()
 {
 	// Stagger script updates.
-	if (Ticks % 16 != globalID % 16) {
+	// but not for just loaded area scripts, ensuring they run first
+	if (Ticks % 16 != globalID % 16 && (Type != ST_AREA || Ticks > 1)) {
 		return;
 	}
 
