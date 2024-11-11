@@ -90,7 +90,7 @@ SpriteAnimation::SpriteAnimation(std::shared_ptr<Animation> a)
 
 Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t)
 {
-	auto frame = anim->NextFrame();
+	const auto& frame = anim->NextFrame();
 	return frame ? frame : current;
 }
 
