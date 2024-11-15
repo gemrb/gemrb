@@ -1665,6 +1665,7 @@ def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
 		else:
 			Price = 1 if Inventory else GetRealPrice(pc, "buy", Item, Slot)
 
+			Button.EnableBorder (2, False)
 			if Item['Function'] & ITM_F_CONTAINER and not Bag and not Inventory:
 				# containers are always clickable
 				state = IE_GUI_BUTTON_ENABLED
