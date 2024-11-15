@@ -4856,7 +4856,7 @@ std::string Actor::dump() const
 		AppendFormat(buffer, " {}", poi);
 	}
 	buffer.append("\n");
-	AppendFormat(buffer, "Area:       {} {}\n", AreaName, Pos);
+	AppendFormat(buffer, "Area:       {} {} Dest: {}\n", AreaName, Pos, Destination);
 	AppendFormat(buffer, "Dialog:     {}    TalkCount:  {}\n", Dialog, TalkCount);
 	AppendFormat(buffer, "Global ID:  {}   PartySlot: {}\n", GetGlobalID(), InParty);
 	AppendFormat(buffer, "Script name:{:<32}    Current action: {}    Total: {}\n", scriptName, CurrentAction ? CurrentAction->actionID : -1, actionQueue.size());
