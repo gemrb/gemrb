@@ -26,7 +26,7 @@ import GUICommon
 import CommonWindow
 
 def OnLoad ():
-	movies = ["T1DEATH","T1ABSORB","FINALE"]
+	movies = ["", "T1DEATH", "T1ABSORB", "FINALE"]
 
 	CommonWindow.SetGameGUIHidden(True)
 	which = GemRB.GetVar ("QuitGame1")
