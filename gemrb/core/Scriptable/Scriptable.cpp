@@ -2179,8 +2179,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	// We can't use GetActorInRadius because we want to only check directly along the way
 	// and not be blocked by actors who are on the sides
 	int collisionLookaheadRadius = ((circleSize < 3 ? 3 : circleSize) - 1) * 3;
-	int r = collisionLookaheadRadius;
-	for (; r > 0 && !actorInTheWay; r--) {
+	for (int r = collisionLookaheadRadius; r > 0 && !actorInTheWay; r--) {
 		auto xCollision = Pos.x + dx * r;
 		auto yCollision = Pos.y + dy * r; // NormalizeDeltas already adjusted dy for perspective
 		Point nmptCollision(xCollision, yCollision);
@@ -2202,9 +2201,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		}
 		if (actor && actor->ValidTarget(GA_CAN_BUMP) && actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
 			actorInTheWay->BumpAway();
-		} else if (r == 1 || actorInTheWay->GetPath()) {
-			// only back off if the immediate step is blocked or if the blocker is moving
-			// it's better to make a single step if possible, to avoid backoff loops
+		} else {
 			Backoff();
 			return;
 		}
