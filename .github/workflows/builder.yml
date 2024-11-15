@@ -59,7 +59,7 @@ jobs:
 
   macos:
     name: MacOS build
-    runs-on: macos-latest
+    runs-on: macos-latest-large
 
     steps:
     - name: Checkout
