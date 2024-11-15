@@ -492,7 +492,15 @@ Actor* DialogHandler::GetLocalActorByGlobalID(ieDword ID) const
 
 Scriptable* DialogHandler::GetTarget() const
 {
-	return GetLocalActorByGlobalID(targetID);
+	if (!targetID) return nullptr;
+
+	const Game* game = core->GetGame();
+	if (!game) return nullptr;
+
+	Map* area = game->GetCurrentArea();
+	if (!area) return nullptr;
+
+	return area->GetScriptableByGlobalID(targetID);
 }
 
 Actor* DialogHandler::GetSpeaker() const
