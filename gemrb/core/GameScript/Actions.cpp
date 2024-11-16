@@ -6784,9 +6784,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	}
 	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters);
 	const Actor* target = Scriptable::As<const Actor>(tar);
-	if (!tar ||
-	    (tar->GetInternalFlag() & (IF_ACTIVE | IF_VISIBLE)) != (IF_ACTIVE | IF_VISIBLE) ||
-	    (target && target->GetStat(IE_AVATARREMOVAL))) {
+	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -6838,6 +6836,26 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		core->Autopause(AUTOPAUSE::NOTARGET, Sender);
 		gamedata->FreeItem(itm, itemres, false);
 		return;
+	}
+	const ITMExtHeader* hh = itm->GetExtHeader(header);
+	if (!hh) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	bool inactive = (tar->GetInternalFlag() & (IF_ACTIVE | IF_VISIBLE)) != (IF_ACTIVE | IF_VISIBLE);
+	bool removed = target && target->GetStat(IE_AVATARREMOVAL);
+	if (hh->Target == TARGET_DEAD) {
+		if (!target || target->ValidTarget(GA_NO_DEAD) ||
+		    (target->InParty == 0 && (inactive || removed)) ||
+		    (target->InParty && removed)) {
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+	} else {
+		if ((target && target->GetStat(IE_AVATARREMOVAL)) || inactive) {
+			Sender->ReleaseCurrentAction();
+			return;
+		}
 	}
 	gamedata->FreeItem(itm, itemres, false);
 
