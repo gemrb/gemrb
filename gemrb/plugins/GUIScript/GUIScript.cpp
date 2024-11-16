@@ -11313,7 +11313,7 @@ static PyObject* GemRB_SpellCast(PyObject* /*self*/, PyObject* args)
 			core->ApplySpell(spelldata.spellName, actor, actor, 0);
 			break;
 		case TARGET_AREA:
-			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT | GA_NO_DEAD, spelldata.TargetNumber);
 			break;
 		case TARGET_CREA:
 			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
@@ -11462,7 +11462,7 @@ static PyObject* GemRB_UseItem(PyObject* /*self*/, PyObject* args)
 			actor->UseItem(itemdata.slot, static_cast<int>(itemdata.headerindex), nullptr, flags);
 			break;
 		case TARGET_AREA:
-			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_POINT, itemdata.TargetNumber);
+			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_POINT | GA_NO_DEAD, itemdata.TargetNumber);
 			break;
 		case TARGET_CREA:
 			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_NO_DEAD, itemdata.TargetNumber);
