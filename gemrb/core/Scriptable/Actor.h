@@ -347,6 +347,7 @@ struct TimerData {
 	tick_t lastFatigueCheck = 0;
 	tick_t remainingTalkSoundTime = 0;
 	tick_t lastTalkTimeCheckAt = 0;
+	tick_t lastPosTicks = 0;
 	// delay all maxhp checks until we completely load all effects
 	// set after modifying maxhp, adjusts hp next tick
 	int checkHP = 2;
@@ -904,6 +905,7 @@ public:
 	int GetElevation() const;
 	bool ShouldDrawReticle() const;
 	void DoStep(unsigned int newWalkScale, ieDword time = 0) override;
+	void UpdatePosCounter(bool increase);
 	void Draw(const Region& screen, Color baseTint, Color tint, BlitFlags flags) const;
 
 	/* add mobile vvc (spell effects) to actor's list */

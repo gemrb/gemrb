@@ -11553,6 +11553,15 @@ const std::string& Actor::GetRaceName() const
 	}
 }
 
+void Actor::UpdatePosCounter(bool increase)
+{
+	if (increase) {
+		Timers.lastPosTicks++;
+	} else {
+		Timers.lastPosTicks = 0;
+	}
+}
+
 bool Actor::TouchAttack(const Projectile* pro) const
 {
 	if (!(pro->ExtFlags & PEF_TOUCH)) {
