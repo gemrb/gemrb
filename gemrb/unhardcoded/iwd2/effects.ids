@@ -308,6 +308,7 @@ IDS
 0x132	CriticalHitModifier
 0x133	TurnLevelModifier
 0x141	RemoveEffectsByResource
+0x142	NPCBump
 395	CastSpellOnCondition
 396	ChangeBardSong
 397	SpellResistance

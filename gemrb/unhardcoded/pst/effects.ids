@@ -213,4 +213,5 @@ IDS
 0x141	RemoveEffectsByResource
 0x144	Protection:Spell3
 0x146	ApplyEffectsList
+0x147	NPCBump
 425	ControlUndead2
