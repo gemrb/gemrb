@@ -272,17 +272,18 @@ void DialogHandler::DialogChooseInitial(Scriptable* target, Actor* tgta) const
 	// needs to end before final actions are executed due to
 	// actions making new dialogs!
 	// should we just queue dialog actions in front instead?
-	// for now clear only if the state potentially has actions at all
+	// for now clear only if any state potentially has actions at all
 	// ar6100 61izbela.bcs needs it to reenable the area exit
+	// a shallow check is not enough as demonstrated by the rowing fire elementals not starting their play
 	bool payload = true;
 	if (core->HasFeature(GFFlags::RULES_3ED)) {
-		auto ds = dlg->GetState(initialState);
-		if (!ds) return;
 		payload = false;
-		for (const auto& transition : ds->transitions) {
-			if (!transition->actions.empty()) {
-				payload = true;
-				break;
+		for (const auto& ds : dlg->initialStates) {
+			for (const auto& transition : ds->transitions) {
+				if (!transition->actions.empty()) {
+					payload = true;
+					break;
+				}
 			}
 		}
 	}
