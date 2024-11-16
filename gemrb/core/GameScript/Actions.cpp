@@ -4864,7 +4864,7 @@ void GameScript::ExpansionEndCredits(Scriptable* Sender, Action* parameters)
 	core->PlayMovie("ecredit");
 
 	// end the game for HoW-only runs, but teleport back to Kuldahar for full iwd runs
-	bool howOnly = CheckVariable(Sender, "EXPANSION_DOOR", "GLOBAL") == 1; // 1 how only, 0/2 for full run
+	bool howOnly = CheckVariable(Sender, "JOIN_POSSE", "GLOBAL") == 0; // 0 how only, >0 for full run
 	if (howOnly) {
 		QuitGame(Sender, parameters);
 	} else {
