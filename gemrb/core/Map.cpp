@@ -780,7 +780,10 @@ void Map::UpdateScripts()
 		} else if (actor->InMove() && actor->GetSpeed()) {
 			// Make actors pathfind if there are others nearby
 			// in order to avoid bumping when possible
-			const Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF, actor->GetAnims()->GetCircleSize(), actor);
+			// do it more often out of combat, so they're less likely to get stuck
+			unsigned int radius = actor->GetAnims()->GetCircleSize();
+			if (!actor->ValidTarget(GA_CAN_BUMP)) radius = actor->CircleSize2Radius() * 4;
+			const Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF, radius, actor);
 			if (nearActor) {
 				actor->NewPath();
 			}
