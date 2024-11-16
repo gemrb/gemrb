@@ -4183,6 +4183,9 @@ static void ChunkActor(Actor* actor)
 		fx->Duration = core->GetGame()->GameTime + core->Time.round_size / 2 + RAND(-30, 30);
 		copy->fxqueue.AddEffect(fx, true);
 	}
+	for (uint8_t i = 0; i < MAX_SCRIPTS; ++i) {
+		actor->SetScript(ResRef {}, i, false);
+	}
 }
 
 //returns actual damage
