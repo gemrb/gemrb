@@ -1757,13 +1757,11 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 		}
 	}
 
-	if (dFlags & DEBUG_SHOW_SEARCHMAP) {
-		// draw also pathfinding waypoints
-		const Actor* act = core->GetFirstSelectedActor();
+	auto DrawWaypoints = [&block, &vp](const Actor* act) {
 		if (!act) return;
 		const Path& path = act->GetPath();
 		if (!path) return;
-		Color waypoint(0, 64, 128, 128); // darker blue-ish
+		Color waypoint(0, 64 * (act->GetGlobalID() % 4), 128, 128); // darker blue-ish
 		size_t i = 0;
 		block.w = 8;
 		block.h = 6;
@@ -1773,6 +1771,19 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 			block.y = step.point.y - vp.y;
 			VideoDriver->DrawRect(block, waypoint);
 			i++;
+		}
+	};
+	if (dFlags & DEBUG_SHOW_SEARCHMAP) {
+		// draw also pathfinding waypoints
+		const Game* game = core->GetGame();
+		if (game->selected.size() == static_cast<size_t>(game->GetPartySize(true))) {
+			// do it for all
+			for (const auto& actor : actors) {
+				DrawWaypoints(actor);
+			}
+		} else {
+			const Actor* act = core->GetFirstSelectedActor();
+			DrawWaypoints(act);
 		}
 	}
 }
