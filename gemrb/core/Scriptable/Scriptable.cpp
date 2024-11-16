@@ -1049,7 +1049,7 @@ void Scriptable::CastSpellEnd(int level, bool keepStance)
 	}
 
 	//if the projectile doesn't need to follow the target, then use the target position
-	CreateProjectile(SpellResRef, objects.LastSpellTarget, level, GetSpellDistance(SpellResRef, this) == 0xffffffff);
+	CreateProjectile(SpellResRef, objects.LastSpellTarget, level, GetSpellDistance(SpellResRef, this) == 0x7fffffff);
 
 	// the original engine saves lasttrigger only in case of SpellCast, so we have to differentiate
 	ieDword oldLastTrigger = objects.LastTrigger;

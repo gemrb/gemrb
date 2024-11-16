@@ -351,7 +351,7 @@ unsigned int Spell::GetCastingDistance(Scriptable* Sender) const
 	}
 
 	if (seh->Target == TARGET_DEAD) {
-		return 0xffffffff;
+		return 0x7fffffff;
 	}
 	return std::min((unsigned int) seh->Range, limit);
 }

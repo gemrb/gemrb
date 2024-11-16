@@ -2031,10 +2031,10 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const 
 	dist = spl->GetCastingDistance(Sender);
 	gamedata->FreeSpell(spl, spellRes, false);
 
-	//make possible special return values (like 0xffffffff means the spell doesn't need distance)
-	//this is used with special targeting mode (3)
+	// make possible special return values (like 0x7fffffff means the spell doesn't need distance)
+	// this is used with special targeting mode (3)
 	if (dist > 0xff000000) {
-		return 0xffffffff;
+		return 0x7fffffff;
 	}
 
 	if (!target.IsZero()) {
@@ -2060,10 +2060,10 @@ unsigned int GetItemDistance(const ResRef& itemres, int header, float_t angle)
 	unsigned int dist = itm->GetCastingDistance(header);
 	gamedata->FreeItem(itm, itemres, false);
 
-	//make possible special return values (like 0xffffffff means the item doesn't need distance)
-	//this is used with special targeting mode (3)
+	// make possible special return values (like 0x7fffffff means the item doesn't need distance)
+	// this is used with special targeting mode (3)
 	if (dist > 0xff000000) {
-		return 0xffffffff;
+		return 0x7fffffff;
 	}
 
 	return Feet2Pixels(dist, angle);
@@ -2289,7 +2289,7 @@ void SpellCore(Scriptable* Sender, Action* parameters, int flags)
 	//parse target
 	int seeflag = 0;
 	unsigned int dist = GetSpellDistance(spellResRef, Sender);
-	if ((flags & SC_NO_DEAD) && dist != 0xffffffff) {
+	if ((flags & SC_NO_DEAD) && dist != 0x7fffffff) {
 		seeflag = GA_NO_DEAD;
 	}
 
@@ -2321,7 +2321,7 @@ void SpellCore(Scriptable* Sender, Action* parameters, int flags)
 		}
 
 		//move near to target
-		if ((flags & SC_RANGE_CHECK) && dist != 0xffffffff) {
+		if ((flags & SC_RANGE_CHECK) && dist != 0x7fffffff) {
 			if (PersonalDistance(tar, Sender) > dist) {
 				MoveNearerTo(Sender, tar, dist);
 				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
