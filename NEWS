@@ -1,16 +1,17 @@
-GemRB git (79e599):
+GemRB git (aa99049):
   New features:
     - 
     - iwd2 is now fully completable!
     - iwd2 turn undead, damage types
     - option to more easily use GemRB as a library
-    - option to highlight learnable scrolls
+    - option to highlight learnable scrolls, draw empty containers gray
+    - animfps.2da to set per-animation drawing speed
 
   Improved features:
     - 
     - text encoding, drawing speed, drawing, audio, GUI internals
     - feats, animations
-    - scripting, projectiles, effects, movement speed
+    - scripting, projectiles, effects, movement speed, pathfinding
     - bugfixes
 
 GemRB v0.9.3 (2024-07-10):
