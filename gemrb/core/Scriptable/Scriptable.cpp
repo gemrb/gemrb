@@ -1126,7 +1126,7 @@ int Scriptable::CanCast(const ResRef& SpellRef, bool verbose)
 	// check for miscast magic and similar
 	ieDword roll = actor->LuckyRoll(1, 100, 0, 0);
 	bool failed = false;
-	ieDword chance = 0;
+	ieDword chance = 1000;
 	switch (spl->SpellType) {
 		case IE_SPL_PRIEST:
 			chance = actor->GetSpellFailure(false);
@@ -1136,6 +1136,8 @@ int Scriptable::CanCast(const ResRef& SpellRef, bool verbose)
 			break;
 		case IE_SPL_INNATE:
 			chance = actor->Modified[IE_SPELLFAILUREINNATE];
+			break;
+		default:
 			break;
 	}
 	if (chance >= roll) {
@@ -2179,11 +2181,12 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	// We can't use GetActorInRadius because we want to only check directly along the way
 	// and not be blocked by actors who are on the sides
 	int collisionLookaheadRadius = ((circleSize < 3 ? 3 : circleSize) - 1) * 3;
-	for (int r = collisionLookaheadRadius; r > 0 && !actorInTheWay; r--) {
+	for (int r = collisionLookaheadRadius; r > 0; r--) {
 		auto xCollision = Pos.x + dx * r;
 		auto yCollision = Pos.y + dy * r; // NormalizeDeltas already adjusted dy for perspective
 		Point nmptCollision(xCollision, yCollision);
 		actorInTheWay = area->GetActor(nmptCollision, GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF, this);
+		if (actorInTheWay) break;
 	}
 
 	const Actor* actor = Scriptable::As<Actor>(this);

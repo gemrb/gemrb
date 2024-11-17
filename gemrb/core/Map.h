@@ -273,12 +273,14 @@ public:
 	int GetHeight() const;
 };
 
-enum AnimationObjectType { AOT_AREA,
-			   AOT_SCRIPTED,
-			   AOT_ACTOR,
-			   AOT_SPARK,
-			   AOT_PROJECTILE,
-			   AOT_PILE };
+enum class AnimationObjectType {
+	AREA,
+	SCRIPTED,
+	ACTOR,
+	SPARK,
+	PROJECTILE,
+	PILE
+};
 
 //priorities when handling actors, we really ignore the third one
 enum class Priority : uint8_t {

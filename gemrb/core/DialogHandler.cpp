@@ -278,8 +278,8 @@ void DialogHandler::DialogChooseInitial(Scriptable* target, Actor* tgta) const
 	bool payload = true;
 	if (core->HasFeature(GFFlags::RULES_3ED)) {
 		payload = false;
-		for (const auto& ds : dlg->initialStates) {
-			for (const auto& transition : ds->transitions) {
+		for (const auto& dst : dlg->initialStates) {
+			for (const auto& transition : dst->transitions) {
 				if (!transition->actions.empty()) {
 					payload = true;
 					break;

@@ -371,21 +371,21 @@ static inline AnimationObjectType SelectObject(const Actor* actor, int q, const 
 
 	// piles should always be drawn last, except if there is a corpse in the way
 	if (actor && (actor->GetStat(IE_STATE_ID) & STATE_DEAD)) {
-		return AOT_ACTOR;
+		return AnimationObjectType::ACTOR;
 	}
 	if (pile) {
-		return AOT_PILE;
+		return AnimationObjectType::PILE;
 	}
 
 	// one of them is guaranteed to have a sane value, so we don't need
 	// to care that 0x7fffffff can repeat; same heights for others are
 	// dealt with the chosen specific order of comparisons
 	int lowest = std::min({ proh, spah, aah, scah, actorh });
-	if (lowest == proh) return AOT_PROJECTILE;
-	if (lowest == spah) return AOT_SPARK;
-	if (lowest == aah) return AOT_AREA;
-	if (lowest == scah) return AOT_SCRIPTED;
-	return AOT_ACTOR;
+	if (lowest == proh) return AnimationObjectType::PROJECTILE;
+	if (lowest == spah) return AnimationObjectType::SPARK;
+	if (lowest == aah) return AnimationObjectType::AREA;
+	if (lowest == scah) return AnimationObjectType::SCRIPTED;
+	return AnimationObjectType::ACTOR;
 }
 
 MapNote::MapNote(String txt, ieWord c, bool readonly)
@@ -1258,7 +1258,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 	while (actor || a || sca || spark || pro || pile) {
 		switch (SelectObject(actor, q, a, sca, spark, pro, pile)) {
-			case AOT_ACTOR:
+			case AnimationObjectType::ACTOR:
 				bool visible;
 				visible = false;
 				// always update the animations even if we arent visible
@@ -1287,7 +1287,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 				}
 				actor = GetNextActor(q, index);
 				break;
-			case AOT_PILE:
+			case AnimationObjectType::PILE:
 				// draw piles
 				if (!bgoverride) {
 					BlitFlags flags = SetDrawingStencilForScriptable(pile, viewport);
@@ -1308,10 +1308,10 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 					pile = GetNextPile(pileIdx);
 				}
 				break;
-			case AOT_AREA:
+			case AnimationObjectType::AREA:
 				a = DrawAreaAnimation(a);
 				break;
-			case AOT_SCRIPTED:
+			case AnimationObjectType::SCRIPTED:
 				bool endReached;
 				endReached = sca->UpdateDrawingState(-1);
 				if (endReached) {
@@ -1332,14 +1332,14 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 				}
 				sca = GetNextScriptedAnimation(scaidx);
 				break;
-			case AOT_PROJECTILE:
+			case AnimationObjectType::PROJECTILE:
 				{
 					BlitFlags flags = SetDrawingStencilForProjectile(pro, viewport);
 					pro->Draw(viewport, flags);
 					pro = GetNextProjectile(++proidx);
 				}
 				break;
-			case AOT_SPARK:
+			case AnimationObjectType::SPARK:
 				int drawn;
 				if (gametime > oldGameTime) {
 					drawn = spark->Update();
