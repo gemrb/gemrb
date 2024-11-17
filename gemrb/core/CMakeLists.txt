@@ -143,9 +143,9 @@ IF(WIN32)
 		../../platforms/windows/CodepageToIconvMap.cpp
 		../../platforms/windows/WindowsFile.cpp
 	)
-	INCLUDE_DIRECTORIES(${Iconv_INCLUDE_DIR})
 ENDIF()
 
+INCLUDE_DIRECTORIES(${Iconv_INCLUDE_DIR})
 ADD_DEFINITIONS("-DGEM_BUILDING_CORE")
 
 if (STATIC_LINK)
