@@ -283,7 +283,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			c.b *= 0.66;
 		}
 
-		Font::PrintColors colors { c, ColorBlack };
+		Font::PrintColors colors { c, textBGColor };
 		font->Print(r, Text, align, colors);
 	}
 
@@ -648,9 +648,13 @@ bool Button::HitTest(const Point& p) const
 }
 
 // Set palette used for drawing button label in normal state
-void Button::SetTextColor(const Color& color)
+void Button::SetTextColor(const Color& color, bool bg)
 {
-	textColor = color;
+	if (bg) {
+		textBGColor = color;
+	} else {
+		textColor = color;
+	}
 	MarkDirty();
 }
 

@@ -1227,11 +1227,11 @@ Specifics depend on control type:\n\
     * TA_COLOR_OPTIONS: color of pick-one selection options\n\
     * TA_COLOR_HOVER: color of options on hover\n\
     * TA_COLOR_SELECTED: color of the selected option\n\
-  * button: set the text color\n\
+  * button: set the text color (same as passing TA_COLOR_NORMAL)\n\
+    * TA_COLOR_BACKGROUND: text background color (only for fonts that have background enabled in fonts.2da)\n\
   * label: set the text color and enable color mode (black background by default)\n\
 \n\
 **Parameters:**\n\
-  * GTextArea - the TextArea to set a color for\n\
   * Color - Python dictionary of r,g,b,a color values\n\
   * Index - the COLOR_TYPE\n\
 \n\
@@ -1249,7 +1249,7 @@ static PyObject* GemRB_Control_SetColor(PyObject* self, PyObject* args)
 
 	if (ctrl->ControlType == IE_GUI_BUTTON) {
 		Button* button = GetView<Button>(self);
-		button->SetTextColor(color);
+		button->SetTextColor(color, colorType == TextArea::COLOR_BACKGROUND);
 	} else if (ctrl->ControlType == IE_GUI_LABEL) {
 		Label* label = GetView<Label>(self);
 		label->SetColors(color, ColorBlack);
