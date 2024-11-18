@@ -792,7 +792,7 @@ void Map::UpdateScripts()
 
 			// as a fallback, temporarily enable bumping if we're stuck
 			actor->UpdatePosCounter(lastPos == actor->Pos);
-			if (actor->Timers.lastPosTicks > 30 && core->InCutSceneMode() && !actor->ValidTarget(GA_CAN_BUMP)) {
+			if (actor->Timers.lastPosTicks > 10 && core->InCutSceneMode() && !actor->ValidTarget(GA_CAN_BUMP)) {
 				static EffectRef npcBumpRef = { "NPCBump", -1 };
 				Effect* fx = EffectQueue::CreateEffect(npcBumpRef, 1, 0, FX_DURATION_INSTANT_LIMITED);
 				if (fx) {
