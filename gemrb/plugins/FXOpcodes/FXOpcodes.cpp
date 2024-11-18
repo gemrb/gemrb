@@ -5472,7 +5472,10 @@ int fx_move_to_area(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	Game* game = core->GetGame();
 	//remove actor from current map, and set destination map
-	if (fx->FirstApply) {
+	if (fx->FirstApply && fx->Parameter6 == 0) {
+		// make sure to run only once even if the effect was saved afterwards
+		fx->Parameter6 = 1;
+
 		//if current area is different from target area
 		if (game->CurrentArea != fx->Resource) {
 			//make global
