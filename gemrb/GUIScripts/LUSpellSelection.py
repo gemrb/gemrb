@@ -108,7 +108,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		return
 
 	# load our window
-	if chargen or GameCheck.IsBG1 ():
+	if chargen:
 		SpellsWindow = GemRB.LoadWindow (7, "GUICG")
 
 		if GameCheck.IsBG2():
@@ -704,7 +704,7 @@ def RowIndex ():
 def ExtraSpellButtons ():
 	"""Determines if extra spell slots are available. """
 
-	if EnhanceGUI and not chargen and not GameCheck.IsBG1 ():
+	if EnhanceGUI and (not chargen):
 		return 1
 	else:
 		return 0

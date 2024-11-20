@@ -529,7 +529,7 @@ def DCProfsDonePress ():
 	ClericTable = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
 	DruidTable = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
 	if SpellTable != "*":
-		LUSpellSelection.OpenSpellsWindow (pc, SpellTable, 1, 1, 0, 0, False)
+		LUSpellSelection.OpenSpellsWindow (pc, SpellTable, 1, 1, 0)
 		SpellTable = GemRB.LoadTable (SpellTable)
 		GemRB.SetMemorizableSpellsCount (pc, SpellTable.GetValue (0, 0), IE_SPELL_TYPE_WIZARD, 0)
 		NewMageSpells = 1
