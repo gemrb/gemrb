@@ -327,7 +327,7 @@ def RedrawSkills():
 	global DoneButton, LevelUpWindow, HLACount
 
 	# we need to disable the HLA button if we don't have any HLAs left
-	HLACount = GemRB.GetVar ("HLACount")
+	HLACount = GemRB.GetVar ("HLACount") or 0
 	if GameCheck.IsBG2() and HLACount == 0:
 		# turn the HLA button off
 		HLAButton = LevelUpWindow.GetControl (126)
@@ -530,7 +530,7 @@ def LevelUpHLAPress ():
 	# we can turn the button off and temporarily set HLACount to 0
 	# because there is no cancel button on the HLA window; therefore,
 	# it's guaranteed to come back as 0
-	TmpCount = GemRB.GetVar ("HLACount")
+	TmpCount = GemRB.GetVar ("HLACount") or 0
 	GemRB.SetVar ("HLACount", 0)
 	RedrawSkills ()
 	GemRB.SetVar ("HLACount", TmpCount)
