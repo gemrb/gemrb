@@ -557,7 +557,7 @@ def NamelessOneClass (actor):
 def CanDualClass(actor):
 	# race restriction (human)
 	RaceName = CommonTables.Races.FindValue ("ID", GemRB.GetPlayerStat (actor, IE_RACE, 1))
-	if not RaceName:
+	if RaceName == None:
 		return 0
 	RaceName = CommonTables.Races.GetRowName (RaceName)
 	RaceDual = CommonTables.Races.GetValue (RaceName, "CANDUAL", GTV_STR)
