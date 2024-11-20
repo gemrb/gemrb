@@ -114,7 +114,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		if GameCheck.IsBG2():
 			import CharGenCommon
 			CharGenCommon.PositionCharGenWin (SpellsWindow)
-		elif GameCheck.IsIWD2():
+		elif IWD2:
 			import CharOverview
 			CharOverview.PositionCharGenWin (SpellsWindow)
 
