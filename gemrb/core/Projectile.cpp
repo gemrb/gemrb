@@ -747,7 +747,7 @@ Projectile::ProjectileState Projectile::DoStep()
 	// ... but we slow it down manually any way
 	unsigned int timePerPx = static_cast<unsigned int>(1 * core->Time.Ticks2Ms(1) / Speed);
 	static constexpr unsigned int slowDownFactor = 2; // TODO: empirical, shouldn't be needed!
-	unsigned int timePerStep = slowDownFactor * timePerPx;
+	unsigned int timePerStep = slowDownFactor * std::max(1U, timePerPx);
 	tick_t time = GetMilliseconds();
 
 	auto step = path.begin() + path.currentStep;
