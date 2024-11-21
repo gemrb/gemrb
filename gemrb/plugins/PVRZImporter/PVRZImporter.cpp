@@ -147,9 +147,9 @@ std::tuple<uint16_t, uint16_t> PVRZImporter::extractPalette(size_t offset, std::
 	uint16_t color2 = *reinterpret_cast<const uint16_t*>(&data[offset + 2]);
 
 	auto convert = [&](uint16_t color, uint8_t outOffset) {
-		colors[outOffset] = ((color << 3) & 0xF8) | ((color >> 2) & 0x7);
-		colors[outOffset + 1] = ((color >> 3) & 0xFC) | ((color >> 9) & 0x3);
-		colors[outOffset + 2] = ((color >> 8) & 0xF8) | ((color >> 13) & 0x7);
+		colors[outOffset] = (color & 0x1F) * 8; // B
+		colors[outOffset + 1] = ((color >> 5) & 0x3F) * 4; // G
+		colors[outOffset + 2] = ((color >> 11) & 0x1F) * 8; // R
 	};
 
 	convert(color1, 0);
