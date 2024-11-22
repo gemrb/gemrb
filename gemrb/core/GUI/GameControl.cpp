@@ -2690,11 +2690,10 @@ void GameControl::SetLastActor(Actor* lastActor)
 //u is the user
 //target type is a bunch of GetActor flags that alter valid targets
 //cnt is the number of different targets (usually 1)
-void GameControl::SetupItemUse(int slot, size_t header, Actor* u, int targettype, int cnt)
+void GameControl::SetupItemUse(int slot, size_t header, int targettype, int cnt)
 {
 	spellName.Reset();
 	spellOrItem = -1;
-	spellUser = u;
 	spellSlot = slot;
 	spellIndex = static_cast<int>(header);
 	//item use also uses the casting icon, this might be changed in some custom game?
@@ -2710,11 +2709,10 @@ void GameControl::SetupItemUse(int slot, size_t header, Actor* u, int targettype
 //u is the caster
 //target type is a bunch of GetActor flags that alter valid targets
 //cnt is the number of different targets (usually 1)
-void GameControl::SetupCasting(const ResRef& spellname, int type, int level, int idx, Actor* u, int targettype, int cnt)
+void GameControl::SetupCasting(const ResRef& spellname, int type, int level, int idx, int targettype, int cnt)
 {
 	spellName = spellname;
 	spellOrItem = type;
-	spellUser = u;
 	spellSlot = level;
 	spellIndex = idx;
 	SetTargetMode(TargetMode::Cast);

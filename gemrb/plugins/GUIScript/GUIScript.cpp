@@ -11303,7 +11303,7 @@ static PyObject* GemRB_SpellCast(PyObject* /*self*/, PyObject* args)
 
 	switch (spelldata.Target) {
 		case TARGET_SELF:
-			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, GA_NO_DEAD, spelldata.TargetNumber);
 			gc->TryToCast(actor, actor);
 			break;
 		case TARGET_NONE:
@@ -11313,13 +11313,13 @@ static PyObject* GemRB_SpellCast(PyObject* /*self*/, PyObject* args)
 			core->ApplySpell(spelldata.spellName, actor, actor, 0);
 			break;
 		case TARGET_AREA:
-			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT | GA_NO_DEAD, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, GA_POINT | GA_NO_DEAD, spelldata.TargetNumber);
 			break;
 		case TARGET_CREA:
-			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, GA_NO_DEAD, spelldata.TargetNumber);
 			break;
 		case TARGET_DEAD:
-			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, 0, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, 0, spelldata.TargetNumber);
 			break;
 		case TARGET_INV:
 			//bring up inventory in the end???
@@ -11454,7 +11454,7 @@ static PyObject* GemRB_UseItem(PyObject* /*self*/, PyObject* args)
 	switch (forcetarget) {
 		case TARGET_SELF:
 			if (core->HasFeature(GFFlags::TEAM_MOVEMENT)) count += 1000; // pst inventory workaround to avoid another parameter
-			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_NO_DEAD, count);
+			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, GA_NO_DEAD, count);
 			gc->TryToCast(actor, actor);
 			break;
 		case TARGET_NONE:
@@ -11462,13 +11462,13 @@ static PyObject* GemRB_UseItem(PyObject* /*self*/, PyObject* args)
 			actor->UseItem(itemdata.slot, static_cast<int>(itemdata.headerindex), nullptr, flags);
 			break;
 		case TARGET_AREA:
-			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_POINT | GA_NO_DEAD, itemdata.TargetNumber);
+			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, GA_POINT | GA_NO_DEAD, itemdata.TargetNumber);
 			break;
 		case TARGET_CREA:
-			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_NO_DEAD, itemdata.TargetNumber);
+			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, GA_NO_DEAD, itemdata.TargetNumber);
 			break;
 		case TARGET_DEAD:
-			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, 0, itemdata.TargetNumber);
+			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, 0, itemdata.TargetNumber);
 			break;
 		default:
 			Log(ERROR, "GUIScript", "Unhandled target type!");

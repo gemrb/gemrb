@@ -95,8 +95,6 @@ public:
 	ResRef spellName;
 	//using spell or item
 	int spellOrItem = 0; // -1 = item, otherwise the spell type
-	//the user of spell or item
-	Actor* spellUser = nullptr;
 	int spellSlot = 0; // or inventorySlot/itemHeader
 	int spellIndex = 0;
 	int spellCount = 0; //multiple targeting
@@ -214,9 +212,9 @@ public:
 	/** changes map to the current PC */
 	void ChangeMap(const Actor* pc, bool forced);
 	/** Sets up targeting with spells or items */
-	void SetupItemUse(int slot, size_t header, Actor* actor, int targettype, int cnt);
+	void SetupItemUse(int slot, size_t header, int targettype, int cnt);
 	/** Page is the spell type + spell level info */
-	void SetupCasting(const ResRef& spellname, int type, int level, int slot, Actor* actor, int targettype, int cnt);
+	void SetupCasting(const ResRef& spellname, int type, int level, int slot, int targettype, int cnt);
 	void ToggleAlwaysRun();
 	int GetOverheadOffset() const;
 	void TryDefaultTalk() const;
