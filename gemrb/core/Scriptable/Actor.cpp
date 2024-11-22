@@ -8478,8 +8478,15 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 		vvc->Draw(vp, baseTint, BBox.h, vvcFlags);
 	}
 
+	const Game* game = core->GetGame();
 	if (ShouldDrawCircle()) {
-		DrawCircle(vp.origin);
+		const GameControl* gc = core->GetGameControl();
+		// attacked, cast at, talked to
+		if (game->IsTargeted(GetGlobalID()) || gc->dialoghandler->GetTarget() == this) {
+			gc->DrawTargetReticle(this, Pos - vp.origin, 5);
+		} else {
+			DrawCircle(vp.origin);
+		}
 	}
 
 	if (!currentStance.anim.empty()) {
@@ -8543,7 +8550,6 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 			DrawActorSprite(drawPos, flags, currentStance.shadow, tint);
 		}
 
-		const Game* game = core->GetGame();
 		// infravision, independent of light map and global light
 		if (HasBodyHeat() &&
 		    game->PartyHasInfravision() &&

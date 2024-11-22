@@ -150,9 +150,9 @@ public:
 	// GameControl always needs to redraw unless we arent in a game (disabled)
 	bool IsAnimated() const override { return !IsDisabled(); }
 	void DrawTargetReticles() const;
-	void DrawTargetReticle(uint16_t size, const Color& color, const Point& p) const;
+	void DrawTargetReticle(uint16_t size, const Color& color, const Point& p, int offset = 0) const;
 	/** Draws the target reticle for Actor movement. */
-	void DrawTargetReticle(const Movable* target, const Point& point) const;
+	void DrawTargetReticle(const Movable* target, const Point& point, int offset = 0) const;
 	/** Sets multiple quicksaves flag*/
 	//static void MultipleQuickSaves(int arg);
 	void SetTracker(const Actor* actor, ieDword dist);

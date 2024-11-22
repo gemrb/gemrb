@@ -333,15 +333,15 @@ void GameControl::DrawArrowMarker(const Point& p, const Color& color) const
 	VideoDriver->BlitGameSprite(arrow, dp, BlitFlags::COLOR_MOD | BlitFlags::BLENDED, color);
 }
 
-void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Point& p) const
+void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Point& p, int radialOffset) const
 {
 	uint8_t offset = GlobalColorCycle.Step() >> 1;
 	BasePoint offsetH = BasePoint(offset, 0);
 	BasePoint offsetV = BasePoint(0, offset);
 
 	/* segments should not go outside selection radius */
-	uint16_t xradius = (size * 4) - 5;
-	uint16_t yradius = (size * 3) - 5;
+	uint16_t xradius = (size * 4) - 5 + radialOffset;
+	uint16_t yradius = (size * 3) - 5 + radialOffset;
 	const Size s(xradius * 2, yradius * 2);
 	const Region r(p - s.Center(), s);
 
@@ -413,13 +413,13 @@ void GameControl::DrawTargetReticle(uint16_t size, const Color& color, const Poi
 	}
 }
 
-void GameControl::DrawTargetReticle(const Movable* target, const Point& p) const
+void GameControl::DrawTargetReticle(const Movable* target, const Point& p, int offset) const
 {
 	int size = target->CircleSize2Radius();
 	const Color& green = target->selectedColor;
 	const Color& color = (target->Over) ? GlobalColorCycle.Blend(target->overColor, green) : green;
 
-	DrawTargetReticle(size, color, p);
+	DrawTargetReticle(size, color, p, offset);
 }
 
 void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)

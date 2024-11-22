@@ -430,6 +430,12 @@ Action* Scriptable::PopNextAction()
 // clear all actions, unless some are marked to be preserved
 void Scriptable::ClearActions(int skipFlags)
 {
+	// clear dialog target if it was us that wanted to talk
+	// this is here just to clear the target reticle back to a circle
+	if (CurrentAction && CurrentAction->actionID == 70) { // NIDSpecial1
+		core->GetGameControl()->dialoghandler->SetTarget(nullptr);
+	}
+
 	// pst sometimes uses clearactions in the middle of a cutscene (eg. 1203cd21)
 	// and expect it to clear only the previous actions, not the whole queue
 	bool savedCurrentAction = false;
