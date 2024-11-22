@@ -11960,6 +11960,81 @@ static PyObject* GemRB_ModifyEffect(PyObject* /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR(GemRB_GetEffects__doc,
+	     "===== GetEffects =====\n\
+\n\
+**Prototype:** GemRB.GetEffects (globalID, opcode)\n\
+\n\
+**Description:** Returns a list of effects on the target matching opcode. Used for the contingency window.\n\
+\n\
+**Parameters:**\n\
+  * globalID - the player character's index in the party\n\
+  * opcode  - the effect opcode (for values see effects.ids)\n\
+\n\
+**Return value:** tuple of dicts with these keys derived from the effect:\n\
+  * Param1: first parameter\n\
+  * Param2: second parameter\n\
+  * Resource1\n\
+  * Resource2\n\
+  * Resource3\n\
+  * Spell1Icon: icon of the first resource if it is a spell\n\
+  * Spell2Icon: icon of the second resource if it is a spell\n\
+  * Spell3Icon: icon of the third resource if it is a spell\n\
+\n\
+**See also:** [ApplyEffect](ApplyEffect.md), [CountEffects](CountEffects.md), [ModifyEffect](ModifyEffect.md)\n\
+");
+
+static PyObject* GemRB_GetEffects(PyObject* /*self*/, PyObject* args)
+{
+	int globalID;
+	const char* opcodeName;
+	PARSE_ARGS(args, "is", &globalID, &opcodeName);
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	work_ref.Name = opcodeName;
+	work_ref.opcode = -1;
+	if (EffectQueue::ResolveEffect(work_ref) < 0) {
+		return RuntimeError("Invalid effect name provided!");
+	}
+
+	size_t count = actor->fxqueue.CountEffects(work_ref, -1, -1);
+	if (!count) return PyTuple_New(0);
+
+	auto GetSpellIcon = [](const ResRef& spellRef) {
+		const Spell* spl = gamedata->GetSpell(spellRef, true);
+		if (!spl) return ResRef {};
+		ResRef icon = spl->SpellbookIcon;
+		gamedata->FreeSpell(spl, spellRef, false);
+		return icon;
+	};
+
+	PyObject* effects = PyTuple_New(count);
+	auto f = actor->fxqueue.GetFirstEffect();
+	int i = 0;
+	Effect* fx = actor->fxqueue.GetNextEffect(f);
+	while (fx) {
+		if (fx->Opcode != static_cast<ieDword>(work_ref.opcode)) {
+			fx = actor->fxqueue.GetNextEffect(f);
+			continue;
+		}
+		PyObject* dict = PyDict_New();
+		PyDict_SetItemString(dict, "Param1", PyLong_FromLong(fx->Parameter1));
+		PyDict_SetItemString(dict, "Param2", PyLong_FromLong(fx->Parameter2));
+		PyDict_SetItemString(dict, "Resource1", DecRef(PyString_FromResRef, fx->Resource));
+		PyDict_SetItemString(dict, "Resource2", DecRef(PyString_FromResRef, fx->Resource2));
+		PyDict_SetItemString(dict, "Resource3", DecRef(PyString_FromResRef, fx->Resource3));
+		PyDict_SetItemString(dict, "Spell1Icon", DecRef(PyString_FromResRef, GetSpellIcon(fx->Resource)));
+		PyDict_SetItemString(dict, "Spell2Icon", DecRef(PyString_FromResRef, GetSpellIcon(fx->Resource2)));
+		PyDict_SetItemString(dict, "Spell3Icon", DecRef(PyString_FromResRef, GetSpellIcon(fx->Resource3)));
+
+		PyTuple_SetItem(effects, i, dict);
+		fx = actor->fxqueue.GetNextEffect(f);
+		i++;
+	}
+	return effects;
+}
+
 PyDoc_STRVAR(GemRB_StealFailed__doc,
 	     "===== StealFailed =====\n\
 \n\
@@ -12854,6 +12929,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetContainerItem, METH_VARARGS),
 	METHOD(GetCurrentArea, METH_NOARGS),
 	METHOD(GetDamageReduction, METH_VARARGS),
+	METHOD(GetEffects, METH_VARARGS),
 	METHOD(GetEquippedAmmunition, METH_VARARGS),
 	METHOD(GetEquippedQuickSlot, METH_VARARGS),
 	METHOD(GetGamePreview, METH_VARARGS),
