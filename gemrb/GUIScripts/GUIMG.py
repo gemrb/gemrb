@@ -69,10 +69,17 @@ def InitMageWindow (window):
 	Button = MageWindow.GetControl (2)
 	Button.OnPress (MageNextLevelPress)
 
-	#unknown usage
+	# contingencies
 	Button = MageWindow.GetControl (55)
 	if Button:
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		Button.OnPress (OpenContingenciesWindow)
+		pc = GemRB.GameGetSelectedPCSingle ()
+		if GemRB.CountEffects (pc, "CastSpellOnCondition", -1, -1) == 0:
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			Button.SetText (None)
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetText (34586)
 
 	#setup level buttons
 	if GameCheck.IsBG2():
@@ -713,6 +720,61 @@ def LevelDecrease():
 		Level = Level-1
 	UpdateSpellList()
 	return
+
+def OpenContingenciesWindow():
+	global OtherWindow
+
+	OtherWindow = Window = GemRB.LoadWindow (7, "GUIMG")
+
+	OkButton = Window.GetControl (2)
+	OkButton.SetText (11973)
+	OkButton.OnPress (Window.Close)
+	OkButton.MakeDefault ()
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	contingencies = GemRB.GetEffects (pc, "CastSpellOnCondition")
+	targets = [ 30992, 30990, 30994, "Anyone"]
+	conditions = [ "Was hit", 30973, 30975, 30982, 30984, 30986, 30988, "Attacked", "Near 4'", "Near 10'", "Every round", "Took damage", "Killed", "Time of day", "In personal space", "State", "I died", "Someone died", "Got turned", "HP <", "HP% <", "Spell state" ]
+	for cidx in range(5):
+		rowID1 = Window.GetControl (0x10000000 + 31 + cidx)
+		rowID2 = Window.GetControl (0x10000000 + 37 + cidx)
+		rowID3 = Window.GetControl (0x10000000 + 43 + cidx)
+		spellBtn1 = Window.GetControl (25 + cidx)
+		spellBtn2 = Window.GetControl (31 + cidx)
+		spellBtn3 = Window.GetControl (37 + cidx)
+		handBtn = Window.GetControl (43 + cidx)
+		spellBtn1.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		spellBtn2.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		spellBtn3.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		spellBtn1.SetState (IE_GUI_BUTTON_LOCKED)
+		spellBtn2.SetState (IE_GUI_BUTTON_LOCKED)
+		spellBtn3.SetState (IE_GUI_BUTTON_LOCKED)
+		if cidx < len(contingencies):
+			rowID1.SetText (str(cidx + 1))
+			cont = contingencies[cidx]
+			rowID2.SetText (conditions[cont["Param2"]])
+			rowID3.SetText (targets[cont["Param1"]])
+
+			spellBtn1.SetBAM (cont["Spell1Icon"][:-1] + "b", 0, 0)
+			if cont["Resource2"] != "":
+				spellBtn2.SetBAM (cont["Spell2Icon"][:-1] + "b", 0, 0)
+			if cont["Resource3"] != "":
+				spellBtn3.SetBAM (cont["Spell3Icon"][:-1] + "b", 0, 0)
+
+			# warning: can take out too many
+			handBtn.OnPress (lambda: GemRB.DispelEffect (pc, "CastSpellOnCondition", cont["Param2"]))
+		else:
+			rowID1.SetText (None)
+			rowID2.SetText (None)
+			rowID3.SetText (None)
+			spellBtn1.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			spellBtn1.SetState (IE_GUI_BUTTON_DISABLED)
+			spellBtn2.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			spellBtn2.SetState (IE_GUI_BUTTON_DISABLED)
+			spellBtn3.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			spellBtn3.SetState (IE_GUI_BUTTON_DISABLED)
+			handBtn.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+
 
 ###################################################
 # End of file GUIMG.py
