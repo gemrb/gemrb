@@ -74,7 +74,7 @@ def InitMageWindow (window):
 	if Button:
 		Button.OnPress (OpenContingenciesWindow)
 		pc = GemRB.GameGetSelectedPCSingle ()
-		if GemRB.CountEffects (pc, "CastSpellOnCondition", -1, -1) == 0:
+		if GemRB.CountEffects (pc, "CastSpellOnCondition", -1, -1) + GemRB.CountEffects (pc, "Sequencer:Store", -1, -1) == 0:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetText (None)
 		else:
@@ -733,6 +733,7 @@ def OpenContingenciesWindow():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	contingencies = GemRB.GetEffects (pc, "CastSpellOnCondition")
+	sequencers = GemRB.GetEffects (pc, "Sequencer:Store")
 	targets = [ 30992, 30990, 30994, "Anyone"]
 	conditions = [ "Was hit", 30973, 30975, 30982, 30984, 30986, 30988, "Attacked", "Near 4'", "Near 10'", "Every round", "Took damage", "Killed", "Time of day", "In personal space", "State", "I died", "Someone died", "Got turned", "HP <", "HP% <", "Spell state" ]
 	for cidx in range(5):
@@ -754,6 +755,20 @@ def OpenContingenciesWindow():
 			cont = contingencies[cidx]
 			rowID2.SetText (conditions[cont["Param2"]])
 			rowID3.SetText (targets[cont["Param1"]])
+
+			spellBtn1.SetBAM (cont["Spell1Icon"][:-1] + "b", 0, 0)
+			if cont["Resource2"] != "":
+				spellBtn2.SetBAM (cont["Spell2Icon"][:-1] + "b", 0, 0)
+			if cont["Resource3"] != "":
+				spellBtn3.SetBAM (cont["Spell3Icon"][:-1] + "b", 0, 0)
+
+			# warning: can take out too many
+			handBtn.OnPress (lambda: GemRB.DispelEffect (pc, "CastSpellOnCondition", cont["Param2"]))
+		elif cidx < len(contingencies) + len(sequencers):
+			rowID1.SetText (str(cidx + 1))
+			cont = sequencers[cidx - len(contingencies)]
+			rowID2.SetText (25951)
+			rowID3.SetText (None)
 
 			spellBtn1.SetBAM (cont["Spell1Icon"][:-1] + "b", 0, 0)
 			if cont["Resource2"] != "":
