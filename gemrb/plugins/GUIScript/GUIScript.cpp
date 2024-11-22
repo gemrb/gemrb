@@ -11815,7 +11815,7 @@ PyDoc_STRVAR(GemRB_ApplyEffect__doc,
 **Prototype:** GemRB.ApplyEffect (globalID, opcode, param1, param2[, resref, resref2, resref3, source, timing])\n\
 \n\
 **Description:** Creates a basic effect and applies it on the actor marked \n\
-by PartyID. \n\
+by globalID. \n\
 This function cam be used to add stats that are stored in effect blocks.\n\
 \n\
 **Parameters:**\n\
