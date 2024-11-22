@@ -2523,11 +2523,13 @@ bool Game::IsTargeted(ieDword gid) const
 {
 	for (const auto& pc : PCs) {
 		if (pc->objects.LastTarget == gid) return true;
+		if (pc->objects.LastSpellTarget == gid) return true;
 	}
 	// check also familiars and summons
 	for (const auto& npc : NPCs) {
 		if (npc->GetStat(IE_EA) > EA_CONTROLLABLE) continue;
 		if (npc->objects.LastTarget == gid) return true;
+		if (npc->objects.LastSpellTarget == gid) return true;
 	}
 	return false;
 }
