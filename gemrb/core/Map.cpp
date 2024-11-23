@@ -252,6 +252,7 @@ private:
 
 struct Explore {
 	int LargeFog;
+	// NOTE: iwds supported also much higher values than 30, but there is no known need for that #1460
 	static constexpr int MaxVisibility = 30;
 	int VisibilityPerimeter = 0; // calculated from MaxVisibility
 	std::array<std::vector<SearchmapPoint>, MaxVisibility> VisibilityMasks;
