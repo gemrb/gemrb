@@ -63,11 +63,6 @@ static const unsigned int VOODOO_EXISTENCE_DELAY_DEFAULT = 300;
 static const int VOODOO_VISUAL_RANGE = 28;
 static const int VOODOO_DIALOG_RANGE = 15;
 
-// character speed was also hardcoded depending on the used animation type
-// 9 is a good default for bg2, but it's clearly wrong for bg1 and some animations
-// we now use the number of frames in each cycle of its animation (bad)
-static const int VOODOO_CHAR_SPEED = 9;
-
 }
 
 #endif

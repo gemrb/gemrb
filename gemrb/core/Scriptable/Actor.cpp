@@ -474,6 +474,7 @@ void Actor::SetAnimationID(stat_t animID)
 
 	// PST and EE 2.0+ use an ini to define animation data, including walk and run speed
 	// the rest had it hardcoded
+	SetBase(IE_MOVEMENTRATE, 9); // just a fallback
 	if (!core->HasFeature(GFFlags::RESDATA_INI)) {
 		// handle default speed and per-animation overrides
 		TableMgr::index_t row = TableMgr::npos;
@@ -6005,9 +6006,6 @@ int Actor::GetHpAdjustment(int multiplier, bool modified) const
 
 void Actor::InitStatsOnLoad()
 {
-	//default is 9 in Tob, 6 in bg1
-	SetBase(IE_MOVEMENTRATE, VOODOO_CHAR_SPEED);
-
 	stat_t animID = BaseStats[IE_ANIMATION_ID];
 	//this is required so the actor has animation already
 	SetAnimationID(animID);
