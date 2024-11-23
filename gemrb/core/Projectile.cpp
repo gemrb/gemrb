@@ -1178,6 +1178,8 @@ void Projectile::SecondaryTarget()
 		}
 
 		Projectile* pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
+		// also copy speed, so visuals match the payload for slow moving projectiles like the bg2 cone of cold
+		pro->Speed = Speed;
 		// run special targeting modes on one child only, so target-all and similar don't run payload too often
 		EffectQueue projQueue;
 		ProcessEffects(projQueue, owner, nullptr, first);
