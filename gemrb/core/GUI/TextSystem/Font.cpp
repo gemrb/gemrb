@@ -46,28 +46,29 @@ static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 	Point blitPoint = p + glyph.pos;
 	Size srcSize = glyph.size;
 	if (blitPoint.y < 0) {
-		int offset = (-blitPoint.y * glyph.size.w);
-		src += offset;
+		int offset = -blitPoint.y * glyph.size.w;
+		src += offset * glyph.bytesPerPx;
 		srcSize.h -= offset;
 		blitPoint.y = 0;
 	}
 	if (blitPoint.x < 0) {
 		int offset = -blitPoint.x;
-		src += offset;
+		src += offset * glyph.bytesPerPx;
 		srcSize.w -= offset;
 		blitPoint.x = 0;
 	}
-	ieByte* dest = canvas + (size.w * blitPoint.y) + blitPoint.x;
+	ieByte* dest = canvas + ((size.w * blitPoint.y) + blitPoint.x) * glyph.bytesPerPx;
 	assert(src >= glyph.pixels);
 	assert(dest >= canvas);
 	// copy the glyph to the canvas
 	for (int row = 0; row < srcSize.h; row++) {
-		if (dest + srcSize.w > canvas + (size.w * size.h)) {
+		if (dest + srcSize.w * glyph.bytesPerPx > canvas + (size.w * size.h * glyph.bytesPerPx)) {
 			break;
 		}
-		memcpy(dest, src, srcSize.w);
-		dest += size.w;
-		src += glyph.pitch;
+
+		memcpy(dest, src, srcSize.w * glyph.bytesPerPx);
+		dest += size.w * glyph.bytesPerPx;
+		src += glyph.pitch * glyph.bytesPerPx;
 	}
 }
 
@@ -77,7 +78,7 @@ Font::GlyphAtlasPage::GlyphAtlasPage(Size pageSize, Font* font)
 	SheetRegion.w = pageSize.w;
 	SheetRegion.h = pageSize.h;
 
-	pageData = (ieByte*) calloc(pageSize.h, pageSize.w);
+	pageData = (ieByte*) calloc(pageSize.h, pageSize.w * (font->palette ? 1 : 4));
 }
 
 bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
@@ -93,13 +94,13 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		// must grow to accommodate this glyph
 		if (Sheet) {
 			// if we already have a sheet we need to destroy it before we can add more glyphs
-			pageData = (ieByte*) calloc(SheetRegion.w, glyphH);
+			pageData = (ieByte*) calloc(SheetRegion.w, glyphH * g.bytesPerPx);
 			const ieByte* pixels = static_cast<const ieByte*>(Sheet->LockSprite());
-			std::copy(pixels, pixels + (Sheet->Frame.w * Sheet->Frame.h), pageData);
+			std::copy(pixels, pixels + (Sheet->Frame.w * Sheet->Frame.h) * g.bytesPerPx, pageData);
 			Sheet->UnlockSprite();
 			Sheet = nullptr;
 		} else {
-			pageData = (ieByte*) realloc(pageData, SheetRegion.w * glyphH);
+			pageData = (ieByte*) realloc(pageData, SheetRegion.w * glyphH * g.bytesPerPx);
 		}
 
 		assert(pageData);
@@ -115,7 +116,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 	MapSheetSegment(chr, Region(pageXPos, (g.pos.y < 0) ? 0 : g.pos.y, g.size.w, g.size.h));
 	// make the non-temporary glyph from our own data
 	const ieByte* pageLoc = pageData + pageXPos;
-	glyphs.emplace(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w));
+	glyphs.emplace(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w, g.bytesPerPx));
 
 	pageXPos = newX;
 
@@ -132,7 +133,7 @@ const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 	if (it != glyphs.end()) {
 		return it->second;
 	}
-	const static Glyph blank(Size(0, 0), Point(0, 0), NULL, 0);
+	const static Glyph blank(Size(0, 0), Point(0, 0), NULL, 0, 1);
 	return blank;
 }
 
@@ -140,10 +141,14 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 {
 	// ensure that we have a sprite!
 	if (Sheet == NULL) {
-		//Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pageData, pal, true, 0);
-		PixelFormat fmt = PixelFormat::Paletted8Bit(font->palette, true, 0);
+		PixelFormat fmt = PixelFormat::ARGB32Bit();
+		if (font->palette) {
+			fmt = PixelFormat::Paletted8Bit(font->palette, true, 0);
+		}
+
 		Sheet = VideoDriver->CreateSprite(SheetRegion, pageData, fmt);
-		if (font->background) {
+		// FIXME: allow inverting non-paletted fonts (see #2224)
+		if (font->background && font->palette) {
 			invertedSheet = Sheet->copy();
 			auto invertedPalette = MakeHolder<Palette>(*font->palette);
 
@@ -164,7 +169,7 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 		if (font->background) {
 			SpriteSheet<ieWord>::Draw(chr, dest, BlitFlags::BLENDED | BlitFlags::COLOR_MOD, colors->bg);
 			// no point in BlitFlags::ADD with black so let's optimize away some blits
-			if (colors->fg != ColorBlack) {
+			if (colors->fg != ColorBlack && font->palette) {
 				std::swap(Sheet, invertedSheet);
 				SpriteSheet<ieWord>::Draw(chr, dest, BlitFlags::ADD | BlitFlags::COLOR_MOD, colors->fg);
 				std::swap(Sheet, invertedSheet);
@@ -217,7 +222,7 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>& 
 	// FIXME: should we adjust for spr->Frame.x too?
 	Point pos(0, Baseline - spr->Frame.y);
 
-	Glyph tmp = Glyph(size, pos, (ieByte*) spr->LockSprite(), spr->Frame.w);
+	Glyph tmp = Glyph(size, pos, (ieByte*) spr->LockSprite(), spr->Frame.w, spr->GetPalette() ? 1 : 4);
 	spr->UnlockSprite(); // FIXME: this is assuming it is ok to hang onto to pixel buffer returned from LockSprite()
 	// adjust the location for the glyph
 	if (!CurrentAtlasPage || !CurrentAtlasPage->AddGlyph(chr, tmp)) {
@@ -253,7 +258,7 @@ const Glyph& Font::GetGlyph(ieWord chr) const
 			return *g;
 		}
 	}
-	const static Glyph blank(Size(0, 0), Point(0, 0), NULL, 0);
+	const static Glyph blank(Size(0, 0), Point(0, 0), NULL, 0, 1);
 	return blank;
 }
 

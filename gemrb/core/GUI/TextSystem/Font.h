@@ -68,9 +68,10 @@ struct Glyph {
 
 	const ieWord pitch;
 	const ieByte* pixels;
+	const uint8_t bytesPerPx;
 
-	Glyph(const Size& size, Point pos, const ieByte* pixels, ieWord pitch)
-		: size(size), pos(pos), pitch(pitch), pixels(pixels) {};
+	Glyph(const Size& size, Point pos, const ieByte* pixels, ieWord pitch, uint8_t bpp)
+		: size(size), pos(pos), pitch(pitch), pixels(pixels), bytesPerPx(bpp) {};
 };
 
 /**
