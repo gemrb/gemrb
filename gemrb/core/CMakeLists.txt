@@ -101,6 +101,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Scriptable/CombatInfo.cpp
 	Scriptable/Container.cpp
 	Scriptable/Door.cpp
+	Scriptable/Highlightable.cpp
 	Scriptable/InfoPoint.cpp
 	Scriptable/OverHeadText.cpp
 	Scriptable/Scriptable.cpp

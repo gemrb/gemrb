@@ -22,7 +22,7 @@
 #define INFOPOINT_H
 
 #include "GUI/GameControlDefs.h"
-#include "Scriptable/Scriptable.h"
+#include "Scriptable/Highlightable.h"
 
 namespace GemRB {
 

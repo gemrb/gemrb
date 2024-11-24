@@ -138,19 +138,6 @@ int InfoPoint::GetCursor(TargetMode targetMode) const
 	return Cursor;
 }
 
-//trap that is visible on screen (marked by red)
-//if TrapDetected is a bitflag, we could show traps selectively for
-//players, really nice for multiplayer
-bool Highlightable::VisibleTrap(int see_all) const
-{
-	if (!Trapped) return false;
-	if (!PossibleToSeeTrap()) return false;
-	if (!Scripts[0]) return false;
-	if (see_all) return true;
-	if (TrapDetected) return true;
-	return false;
-}
-
 //trap that will fire now
 bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 {

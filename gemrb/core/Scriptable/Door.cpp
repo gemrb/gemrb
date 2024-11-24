@@ -315,66 +315,6 @@ void Door::SetNewOverlay(Holder<TileOverlay> Overlay)
 	ToggleTiles(IsOpen(), false);
 }
 
-void Highlightable::SetTrapDetected(int x)
-{
-	if (x == TrapDetected)
-		return;
-	TrapDetected = x;
-	if (TrapDetected) {
-		core->PlaySound(DS_FOUNDSECRET, SFXChannel::Hits);
-		core->Autopause(AUTOPAUSE::TRAP, this);
-	}
-}
-
-void Highlightable::TryDisarm(Actor* actor)
-{
-	if (!Trapped || !TrapDetected) return;
-
-	int skill = actor->GetStat(IE_TRAPS);
-	int roll = 0;
-	int bonus = 0;
-	int trapDC = TrapRemovalDiff;
-
-	if (core->HasFeature(GFFlags::RULES_3ED)) {
-		skill = actor->GetSkill(IE_TRAPS);
-		roll = core->Roll(1, 20, 0);
-		bonus = actor->GetAbilityBonus(IE_INT);
-		trapDC = TrapRemovalDiff / 7 + 10; // oddity from the original
-		if (skill == 0) { // a trained skill
-			trapDC = 100;
-		}
-	} else {
-		roll = core->Roll(1, skill / 2, 0);
-		skill /= 2;
-	}
-
-	int check = skill + roll + bonus;
-	if (check > trapDC) {
-		AddTrigger(TriggerEntry(trigger_disarmed, actor->GetGlobalID()));
-		//trap removed
-		Trapped = 0;
-		if (core->HasFeature(GFFlags::RULES_3ED)) {
-			// ~Successful Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, GUIColors::LIGHTGREY, actor, roll, skill - bonus, bonus, trapDC);
-		}
-		displaymsg->DisplayMsgAtLocation(HCStrings::DisarmDone, FT_ANY, actor, actor);
-		int xp = gamedata->GetXPBonus(XP_DISARM, actor->GetXPLevel(1));
-		const Game* game = core->GetGame();
-		game->ShareXP(xp, SX_DIVIDE);
-		core->GetGameControl()->ResetTargetMode();
-		core->PlaySound(DS_DISARMED, SFXChannel::Hits);
-	} else {
-		AddTrigger(TriggerEntry(trigger_disarmfailed, actor->GetGlobalID()));
-		if (core->HasFeature(GFFlags::RULES_3ED)) {
-			// ~Failed Disarm Device - d20 roll %d + Disarm Device skill %d + INT mod %d >= Trap DC %d~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL6, GUIColors::LIGHTGREY, actor, roll, skill - bonus, bonus, trapDC);
-		}
-		displaymsg->DisplayMsgAtLocation(HCStrings::DisarmFail, FT_ANY, actor, actor);
-		TriggerTrap(skill, actor->GetGlobalID());
-	}
-	ImmediateEvent();
-}
-
 void Door::TryPickLock(Actor* actor)
 {
 	if (!Highlightable::TryPickLock(actor, LockDifficulty, LockedStrRef, HCStrings::DoorNotPickable)) return;

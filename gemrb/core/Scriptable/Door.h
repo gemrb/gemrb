@@ -26,7 +26,7 @@
 #include "TileOverlay.h"
 
 #include "GUI/GameControlDefs.h"
-#include "Scriptable/Scriptable.h"
+#include "Scriptable/Highlightable.h"
 
 namespace GemRB {
 

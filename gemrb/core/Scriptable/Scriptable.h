@@ -471,49 +471,6 @@ public:
 	int CircleSize2Radius() const;
 };
 
-class GEM_EXPORT Highlightable : public Scriptable {
-public:
-	using Scriptable::Scriptable;
-	virtual int TrapResets() const = 0;
-	virtual bool CanDetectTrap() const { return true; }
-	virtual bool PossibleToSeeTrap() const;
-	virtual void TryBashLock(Actor* actor) = 0;
-	virtual void TryPickLock(Actor* actor) = 0;
-	virtual bool IsLocked() const { return false; }
-
-public:
-	std::shared_ptr<Gem_Polygon> outline = nullptr;
-	Color outlineColor = ColorBlack;
-	ieDword Cursor = IE_CURSOR_NORMAL;
-	bool Highlight = false;
-	Point TrapLaunch = Point(-1, -1);
-	ieWord TrapDetectionDiff = 0;
-	ieWord TrapRemovalDiff = 0;
-	ieWord Trapped = 0;
-	ieWord TrapDetected = 0;
-	ResRef KeyResRef;
-	//play this wav file when stepping on the trap (on PST)
-	ResRef EnterWav;
-
-public:
-	bool IsOver(const Point& Place) const;
-	void DrawOutline(Point origin) const;
-	void SetCursor(unsigned char CursorIndex);
-
-	void SetTrapDetected(int x);
-	void TryDisarm(Actor* actor);
-	//detect trap, set skill to 256 if you want sure fire
-	void DetectTrap(int skill, ieDword actorID);
-	//returns true if trap is visible, only_detected must be true
-	//if you want to see discovered traps, false is for cheats
-	bool VisibleTrap(int only_detected) const;
-	//returns true if trap has been triggered, tumble skill???
-	virtual bool TriggerTrap(int skill, ieDword ID);
-	bool TryUnlock(Actor* actor, bool removekey) const;
-	bool TryBashLock(Actor* actor, ieWord lockDifficulty, HCStrings failStr);
-	bool TryPickLock(Actor* actor, ieWord lockDifficulty, ieStrRef customFailStr, HCStrings failStr);
-};
-
 class GEM_EXPORT Movable : public Selectable {
 private: //these seem to be sensitive, so get protection
 	unsigned char StanceID = 0;
