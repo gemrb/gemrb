@@ -37,8 +37,7 @@
 #include "GUI/TextSystem/Font.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
-#include "Scriptable/Door.h"
-#include "Scriptable/InfoPoint.h"
+#include "Scriptable/Highlightable.h"
 #include "Video/Video.h"
 
 #include <utility>
@@ -828,14 +827,12 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 		}
 
 		Point origin = Pos;
-		if (Type == ST_TRIGGER || Type == ST_PROXIMITY) {
+		if (Type == ST_TRIGGER || Type == ST_PROXIMITY || Type == ST_DOOR) {
 			// try and make projectiles start from the right trap position
 			// see the traps in the duergar/assassin battle in bg2 dungeon
 			// see also function below - maybe we should fix Pos instead
-			origin = ((InfoPoint*) this)->TrapLaunch;
-		} else if (Type == ST_DOOR) {
-			// iwd2 ar6050 doors need the same; the closed outline is moved to the map corner
-			origin = As<const Door>(this)->TrapLaunch;
+			// iwd2 ar6050 doors need the same (the closed outline is moved to the map corner), same for traps in ar6100
+			origin = As<const Highlightable>(this)->TrapLaunch;
 		}
 
 		if (caster) {
