@@ -47,7 +47,7 @@
 
 #include "GUI/GameControl.h"
 #include "Scriptable/Container.h"
-#include "Scriptable/Door.h"
+#include "Scriptable/Highlightable.h"
 #include "Scriptable/InfoPoint.h"
 
 #include <cstdio>
@@ -2041,7 +2041,7 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const 
 
 	if (!target.IsZero()) {
 		Point pos = Sender->Pos;
-		if (Sender->Type == ST_DOOR) pos = Scriptable::As<const Door>(Sender)->TrapLaunch;
+		if (Sender->Type == ST_DOOR) pos = Scriptable::As<const Highlightable>(Sender)->TrapLaunch;
 		float_t angle = AngleFromPoints(pos, target);
 		return Feet2Pixels(dist, angle);
 	}
