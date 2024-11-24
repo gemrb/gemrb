@@ -1710,7 +1710,8 @@ int GameScript::DisarmFailed(Scriptable* Sender, const Trigger* parameters)
 //opened for doors/containers
 int GameScript::Opened(Scriptable* Sender, const Trigger* parameters)
 {
-	return Sender->MatchTriggerWithObject(trigger_opened, parameters->objectParameter);
+	return Sender->MatchTriggerWithObject(trigger_opened, parameters->objectParameter) ||
+		Sender->MatchTriggerWithObject(trigger_disarmfailed, parameters->objectParameter);
 }
 
 int GameScript::HarmlessOpened(Scriptable* Sender, const Trigger* parameters)
