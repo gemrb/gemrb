@@ -118,28 +118,28 @@ bool Highlightable::TryUnlock(Actor* actor, bool removeKey) const
 		return false;
 	}
 
-	if (removeKey) {
-		CREItem* item = nullptr;
-		int result = haskey->inventory.RemoveItem(KeyResRef, 0, &item);
-		// check also in bags if nothing was found
-		if (result == -1) {
-			int i = haskey->inventory.GetSlotCount();
-			while (i--) {
-				// maybe we could speed this up if we mark bag items with a flags bit
-				const CREItem* itemSlot = haskey->inventory.GetSlotItem(i);
-				if (!itemSlot) continue;
-				const Item* itemStore = gamedata->GetItem(itemSlot->ItemResRef);
-				if (!itemStore) continue;
-				if (core->CheckItemType(itemStore, SLOT_BAG)) {
-					// the store is the same as the item's name
-					RemoveStoreItem(itemSlot->ItemResRef, KeyResRef);
-				}
-				gamedata->FreeItem(itemStore, itemSlot->ItemResRef);
+	if (!removeKey) return true;
+
+	CREItem* item = nullptr;
+	int result = haskey->inventory.RemoveItem(KeyResRef, 0, &item);
+	// check also in bags if nothing was found
+	if (result == -1) {
+		int i = haskey->inventory.GetSlotCount();
+		while (i--) {
+			// maybe we could speed this up if we mark bag items with a flags bit
+			const CREItem* itemSlot = haskey->inventory.GetSlotItem(i);
+			if (!itemSlot) continue;
+			const Item* itemStore = gamedata->GetItem(itemSlot->ItemResRef);
+			if (!itemStore) continue;
+			if (core->CheckItemType(itemStore, SLOT_BAG)) {
+				// the store is the same as the item's name
+				RemoveStoreItem(itemSlot->ItemResRef, KeyResRef);
 			}
+			gamedata->FreeItem(itemStore, itemSlot->ItemResRef);
 		}
-		// the item should always be existing!!!
-		delete item;
 	}
+	// the item should always be existing!!!
+	delete item;
 
 	return true;
 }
