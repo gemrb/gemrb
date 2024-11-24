@@ -120,7 +120,7 @@ def RedrawMCs():
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
-		offset = GemRB.GetVar ("TopIndex")
+		offset = GemRB.GetVar ("TopIndex") or 0
 		t = GUICommon.GetClassRowName (MCRowIndices[i - 2 + offset][0], "index")
 		t = CommonTables.Classes.GetValue(t, "NAME_REF")
 		Button.SetText(t )
