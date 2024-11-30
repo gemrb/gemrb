@@ -114,6 +114,11 @@ SearchmapPoint SearchmapPoint::operator+(const SearchmapPoint& p) const noexcept
 	return SearchmapPoint(x + p.x, y + p.y);
 }
 
+SearchmapPoint SearchmapPoint::operator*(int n) const noexcept
+{
+	return SearchmapPoint(x * n, y * n);
+}
+
 Size::Size(int w, int h) noexcept
 {
 	this->w = w;

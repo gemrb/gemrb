@@ -3087,6 +3087,52 @@ void Map::AdjustPositionNavmap(NavmapPoint& goal, const Size& radius) const
 	goal.y = smptGoal.y * 12 + 6;
 }
 
+// best adjustment attempt given an initial direction to look around
+// at the same time we don't want to look too far in the same direction, since getting close
+// to the target is more important
+void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int startingRadius) const
+{
+	const Size& mapSize = PropsSize();
+	SearchmapPoint smptGoal { goal };
+	if (smptGoal.x > mapSize.w) {
+		smptGoal.x = mapSize.w;
+	}
+	if (smptGoal.y > mapSize.h) {
+		smptGoal.y = mapSize.h;
+	}
+
+	// search at starting orientation first, then left and right of it, then repeat with higher radius
+	// a bit like a sparse cone projectile
+	std::array<orient_t, 3> orients { direction, NextOrientation(direction), PrevOrientation(direction) };
+	std::array<SearchmapPoint, 3> baseOffsets;
+	for (size_t idx = 0; idx < orients.size(); idx++) {
+		Point p = OrientedOffset(orients[idx], 1);
+		baseOffsets[idx] = SearchmapPoint(p.x, p.y);
+	}
+
+	bool found = false;
+	int radius = startingRadius - 1;
+	while (!found && radius < 2 * startingRadius) { // reduce this search radius if needed
+		for (size_t idx = 0; idx < orients.size(); idx++) {
+			SearchmapPoint candidate = smptGoal + baseOffsets[idx] * radius;
+			if (bool(GetBlockedTile(candidate, startingRadius) & PathMapFlags::PASSABLE)) {
+				smptGoal = candidate;
+				found = true;
+				break;
+			}
+		}
+		radius++;
+	}
+
+	if (!found) {
+		// fall back to regular search
+		AdjustPosition(smptGoal);
+	}
+
+	goal.x = smptGoal.x * 16 + 8;
+	goal.y = smptGoal.y * 12 + 6;
+}
+
 void Map::AdjustPosition(SearchmapPoint& goal, const Size& startingRadius, int size) const
 {
 	const Size& mapSize = PropsSize();

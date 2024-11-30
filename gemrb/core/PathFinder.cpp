@@ -240,7 +240,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		// to the nearest reachable point.
 		// Also avoid bumping a still actor out of its position,
 		// but stop just before it
-		AdjustPositionNavmap(nmptDest);
+		orient_t direction = GetOrient(nmptDest, nmptSource);
+		AdjustPositionDirected(nmptDest, direction, size);
 	}
 
 	if (nmptDest == nmptSource) return {};

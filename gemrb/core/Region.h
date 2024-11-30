@@ -97,6 +97,7 @@ public:
 	}
 
 	SearchmapPoint operator+(const SearchmapPoint& p) const noexcept;
+	SearchmapPoint operator*(int n) const noexcept;
 	Point ToNavmapPoint() const { return Point(x * 16, y * 12); };
 };
 

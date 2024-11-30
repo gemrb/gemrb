@@ -610,6 +610,7 @@ public:
 	/* Finds the nearest passable point */
 	void AdjustPosition(SearchmapPoint& goal, const Size& startingRadius = ZeroSize, int size = -1) const;
 	void AdjustPositionNavmap(Point& goal, const Size& radius = ZeroSize) const;
+	void AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int startingRadius) const;
 	/* Finds the path which leads the farthest from d */
 	Path RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const;
 	PathNode RandomWalk(const Point& s, int size, int radius, const Actor* caller) const;
