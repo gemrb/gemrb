@@ -753,7 +753,7 @@ Projectile::ProjectileState Projectile::DoStep()
 	auto step = path.begin() + path.currentStep;
 	auto start = step;
 	auto last = --path.end();
-	tick_t count = timePerStep ? (time - timeStartStep) / timePerStep : 0;
+	tick_t count = (time - timeStartStep) / timePerStep;
 	while (step != last && count > 0) {
 		++step;
 		--count;
@@ -778,9 +778,6 @@ Projectile::ProjectileState Projectile::DoStep()
 		path.Clear();
 		NewOrientation = Orientation;
 		return GetNextTravelState();
-	}
-	if (!timePerStep) {
-		return state;
 	}
 
 	if (SFlags & PSF_SPARKS) {
