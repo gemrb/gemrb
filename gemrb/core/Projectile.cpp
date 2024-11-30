@@ -42,8 +42,8 @@ namespace GemRB {
 
 constexpr uint8_t PALSIZE = 32;
 
-static const ieByte SixteenToNine[MAX_ORIENT] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1 };
-static const ieByte SixteenToFive[MAX_ORIENT] = { 0, 1, 2, 3, 4, 3, 2, 1, 0, 1, 2, 3, 4, 3, 2, 1 };
+// different conversion than in Orientation.h
+static const ieByte SixteenToFive2[MAX_ORIENT] = { 0, 1, 2, 3, 4, 3, 2, 1, 0, 1, 2, 3, 4, 3, 2, 1 };
 
 static ProjectileServer* server = NULL;
 
@@ -119,7 +119,7 @@ Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactor
 		AnimationFactory::index_t c;
 		switch (Aim) {
 			case 5:
-				c = SixteenToFive[cycle];
+				c = SixteenToFive2[cycle];
 				// orientations go counter-clockwise, starting south
 				if (cycle > 4 && cycle <= 8) {
 					// top-left quadrant

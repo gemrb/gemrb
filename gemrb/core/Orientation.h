@@ -68,6 +68,9 @@ enum orient_t : uint8_t {
 /////maximum animation orientation count (used in many places)
 #define MAX_ORIENT 0x10 // uint8_t(orient_t::MAX)
 
+static const ieByte SixteenToNine[MAX_ORIENT] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1 };
+static const ieByte SixteenToFive[MAX_ORIENT] = { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 2, 2, 1, 1 };
+
 inline orient_t RandomOrientation()
 {
 	return orient_t(RAND(0, MAX_ORIENT - 1));

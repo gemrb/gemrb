@@ -66,17 +66,6 @@ static const std::array<CycleType, 16> cTypes = {
 	CycleType::Three | CycleType::Five,
 };
 
-static const ieByte SixteenToNine[3 * MAX_ORIENT] = {
-	0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1,
-	9, 10, 11, 12, 13, 14, 15, 16, 17, 16, 15, 14, 13, 12, 11, 10,
-	18, 19, 20, 21, 22, 23, 24, 25, 26, 25, 24, 23, 22, 21, 20, 19
-};
-static const ieByte SixteenToFive[3 * MAX_ORIENT] = {
-	0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 2, 2, 1, 1,
-	5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 8, 8, 7, 7, 6, 6,
-	10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 13, 13, 12, 12, 11, 11
-};
-
 static ieDword TranslucentShadows = 0;
 
 Animation* ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, Animation::index_t cycle, Animation::index_t i, bool loop) const
@@ -86,9 +75,9 @@ Animation* ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, Anima
 	if (NumOrientations == 16 || OrientationFlags & IE_VVC_FACE_FIXED) {
 		if (af.GetCycleCount() > i) c = i;
 	} else if (NumOrientations == 5) {
-		c = SixteenToFive[i];
+		c = SixteenToFive[i % MAX_ORIENT] + 5 * i / MAX_ORIENT;
 	} else if (NumOrientations == 9) {
-		c = SixteenToNine[i];
+		c = SixteenToNine[i % MAX_ORIENT] + 9 * i / MAX_ORIENT;
 	}
 
 	Animation* anim = af.GetCycle(c);
@@ -165,10 +154,10 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 			assert(p < 3);
 			p *= MAX_ORIENT;
 		} else if (type & CycleType::Five) {
-			c = SixteenToFive[c];
+			c = SixteenToFive[c % MAX_ORIENT] + 5 * c / MAX_ORIENT;
 			if ((i & 15) >= 5) mirrorFlags = BlitFlags::MIRRORX;
 		} else if (type & CycleType::Nine) {
-			c = SixteenToNine[c];
+			c = SixteenToNine[c % MAX_ORIENT] + 9 * c / MAX_ORIENT;
 			if ((i & 15) >= 9) mirrorFlags = BlitFlags::MIRRORX;
 		} else if (!(type & CycleType::SevenEyes2)) {
 			assert(p < 3);
