@@ -390,10 +390,10 @@ def InitStoreShoppingWindow (Window):
 			Button.OnPress (SellPressed)
 
 	# inactive button (close container)
-	if GameCheck.IsBG2():
-		Button = Window.GetControl (50)
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Button = Window.GetControl (50)
+	if Button:
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
+		Button.SetText (24892)
 		Button.OnPress (lambda: CloseBag(Window))
 
 	#backpack
@@ -436,6 +436,13 @@ def UpdateStoreShoppingWindow (Window):
 
 	# right scrollbar
 	SetupScrollBar(Window.GetControlAlias('STOSBARR'), "RightTopIndex", RightCount, Window.GetControlAlias('RBTN0'), callback)
+
+	Button = Window.GetControl (50)
+	if Button:
+		if Bag:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	RedrawStoreShoppingWindow (Window)
 	return
