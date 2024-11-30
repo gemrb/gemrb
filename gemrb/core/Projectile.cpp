@@ -334,7 +334,7 @@ void Projectile::Setup()
 		flags |= GEM_SND_LOOPING;
 	}
 
-	travel_handle.sound = core->GetAudioDrv()->Play(FiringSound, SFXChannel::Missile, Pos, flags);
+	travelHandle.sound = core->GetAudioDrv()->Play(FiringSound, SFXChannel::Missile, Pos, flags);
 
 	//create more projectiles
 	if (ExtFlags & PEF_ITERATION) {
@@ -532,9 +532,9 @@ void Projectile::ApplyDefault() const
 
 void Projectile::StopSound()
 {
-	if (travel_handle) {
-		travel_handle.sound->Stop();
-		travel_handle.sound = nullptr;
+	if (travelHandle) {
+		travelHandle.sound->Stop();
+		travelHandle.sound = nullptr;
 	}
 }
 
@@ -543,13 +543,13 @@ void Projectile::UpdateSound()
 	if (!(SFlags & PSF_SOUND2)) {
 		StopSound();
 	}
-	if (!travel_handle || !travel_handle->Playing()) {
+	if (!travelHandle || !travelHandle->Playing()) {
 		unsigned int flags = GEM_SND_SPATIAL;
 		if (SFlags & PSF_LOOPING2) {
 			flags |= GEM_SND_LOOPING;
 		}
 
-		travel_handle.sound = core->GetAudioDrv()->Play(ArrivalSound, SFXChannel::Missile, Pos, flags);
+		travelHandle.sound = core->GetAudioDrv()->Play(ArrivalSound, SFXChannel::Missile, Pos, flags);
 		SFlags |= PSF_SOUND2;
 	}
 }
@@ -770,8 +770,8 @@ Projectile::ProjectileState Projectile::DoStep()
 	Pos = step->point;
 	path.currentStep = step - path.begin();
 
-	if (travel_handle) {
-		travel_handle->SetPos(Pos);
+	if (travelHandle) {
+		travelHandle->SetPos(Pos);
 	}
 
 	if (step == last) {

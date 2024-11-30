@@ -345,7 +345,7 @@ private:
 		{
 			return bool(sound);
 		}
-	} travel_handle;
+	} travelHandle;
 
 public:
 	void SetCaster(ieDword t, int level);
