@@ -268,7 +268,6 @@ static int CheckAbilities = false;
 static EffectRef fx_set_haste_state_ref = { "State:Hasted", -1 };
 static EffectRef fx_set_slow_state_ref = { "State:Slowed", -1 };
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
-static EffectRef fx_cleave_ref = { "Cleave", -1 };
 static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
 static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
 static EffectRef fx_mirrorimage_ref = { "MirrorImageModifier", -1 };
@@ -286,30 +285,16 @@ static EffectRef fx_eye_sword_ref = { "EyeOfTheSword", -1 };
 static EffectRef fx_eye_mage_ref = { "EyeOfTheMage", -1 };
 //iwd2
 static EffectRef control_undead_ref = { "ControlUndead2", -1 };
-static EffectRef fx_cure_poisoned_state_ref = { "Cure:Poison", -1 };
-static EffectRef fx_cure_hold_state_ref = { "Cure:Hold", -1 };
-static EffectRef fx_cure_stun_state_ref = { "Cure:Stun", -1 };
-static EffectRef fx_remove_portrait_icon_ref = { "Icon:Remove", -1 };
-static EffectRef fx_unpause_caster_ref = { "Cure:CasterHold", -1 };
 static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
-static EffectRef fx_puppetmarker_ref = { "PuppetMarker", -1 };
 static EffectRef fx_damage_ref = { "Damage", -1 };
-static EffectRef fx_melee_ref = { "SetMeleeEffect", -1 };
-static EffectRef fx_ranged_ref = { "SetRangedEffect", -1 };
 static EffectRef fx_cant_use_item_ref = { "CantUseItem", -1 };
 static EffectRef fx_cant_use_item_type_ref = { "CantUseItemType", -1 };
 static EffectRef fx_item_usability_ref = { "Usability:ItemUsability", -1 };
 static EffectRef fx_remove_invisible_state_ref = { "ForceVisible", -1 };
 static EffectRef fx_remove_sanctuary_ref = { "Cure:Sanctuary", -1 };
 static EffectRef fx_disable_button_ref = { "DisableButton", -1 };
-static EffectRef fx_damage_reduction_ref = { "DamageReduction", -1 };
-static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -1 };
-static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
 static EffectRef fx_attacks_per_round_modifier_ref = { "AttacksPerRoundModifier", -1 };
-static EffectRef fx_minimum_base_stats_ref = { "MinimumBaseStats", -1 };
 static EffectRef fx_animation_override_data_ref = { "AnimationOverrideData", -1 };
-static EffectRef fx_enchantment_vs_creature_type_ref = { "EnchantmentVsCreatureType", -1 };
-static EffectRef fx_enchantment_bonus_ref = { "EnchantmentBonus", -1 };
 static EffectRef fx_save_vs_school_bonus_ref = { "SaveVsSchoolModifier", -1 };
 static EffectRef fx_set_diseased_state_ref = { "State:Diseased", -1 };
 
@@ -1218,6 +1203,7 @@ static void pcf_minhitpoint(Actor* actor, ieDword /*oldValue*/, ieDword hp)
 static void pcf_stat(Actor* actor, ieDword newValue, ieDword stat)
 {
 	if ((signed) newValue <= 0) {
+		static EffectRef fx_minimum_base_stats_ref = { "MinimumBaseStats", -1 };
 		if (DeathOnZeroStat && !actor->fxqueue.HasEffectWithParam(fx_minimum_base_stats_ref, 1)) {
 			actor->Die(NULL);
 		} else {
@@ -4135,6 +4121,7 @@ bool Actor::CheckSilenced() const
 
 void Actor::CheckCleave()
 {
+	static EffectRef fx_cleave_ref = { "Cleave", -1 };
 	int cleave = GetFeat(Feat::Cleave);
 	//feat level 1 only enables one cleave per round
 	if ((cleave == 1) && fxqueue.HasEffect(fx_cleave_ref)) {
@@ -5479,18 +5466,23 @@ void Actor::Die(Scriptable* killer, bool grantXP)
 
 	// remove poison, hold, casterhold, stun and its icon
 	Effect* newfx;
+	static EffectRef fx_cure_poisoned_state_ref = { "Cure:Poison", -1 };
 	newfx = EffectQueue::CreateEffect(fx_cure_poisoned_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
 
+	static EffectRef fx_cure_hold_state_ref = { "Cure:Hold", -1 };
 	newfx = EffectQueue::CreateEffect(fx_cure_hold_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
 
+	static EffectRef fx_unpause_caster_ref = { "Cure:CasterHold", -1 };
 	newfx = EffectQueue::CreateEffect(fx_unpause_caster_ref, 0, 100, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
 
+	static EffectRef fx_cure_stun_state_ref = { "Cure:Stun", -1 };
 	newfx = EffectQueue::CreateEffect(fx_cure_stun_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
 
+	static EffectRef fx_remove_portrait_icon_ref = { "Icon:Remove", -1 };
 	newfx = EffectQueue::CreateEffect(fx_remove_portrait_icon_ref, 0, 37, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
 
@@ -7117,6 +7109,7 @@ static void ApplyCriticalEffect(Actor* actor, Actor* target, const WeaponInfo& w
 void Actor::PerformAttack(ieDword gameTime)
 {
 	static int attackRollDiceSides = gamedata->GetMiscRule("ATTACK_ROLL_DICE_SIDES");
+	static EffectRef fx_puppetmarker_ref = { "PuppetMarker", -1 };
 
 	// don't let imprisoned or otherwise missing actors continue their attack
 	if (Modified[IE_AVATARREMOVAL]) return;
@@ -7268,6 +7261,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	// iwd2 smite evil only lasts for one attack, but has an insane duration, so remove it manually
 	if (HasSpellState(SS_SMITEEVIL)) {
+		static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
 		fxqueue.RemoveAllEffects(fx_smite_evil_ref);
 	}
 
@@ -7455,6 +7449,9 @@ int Actor::WeaponDamageBonus(const WeaponInfo& wi) const
 // damage reduction (the effect and other uses) is implemented as normal resistance for physical damage, just with extra checks
 int Actor::GetDamageReduction(int resist_stat, ieDword weaponEnchantment) const
 {
+	static EffectRef fx_damage_reduction_ref = { "DamageReduction", -1 };
+	static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -1 };
+
 	// this is the total, but some of it may have to be discarded
 	int resisted = (signed) GetSafeStat(resist_stat);
 	if (!resisted) {
@@ -9311,6 +9308,8 @@ static bool WeaponSlotMatchesHand(ieDword slot, const WeaponInfo& wi, const Effe
 // check Enchantment vs. creature type and plain enchantment bonuses
 static ieDword AdjustEnchantment(const Actor* wielder, const Actor* target, const WeaponInfo& wi)
 {
+	static EffectRef fx_enchantment_vs_creature_type_ref = { "EnchantmentVsCreatureType", -1 };
+	static EffectRef fx_enchantment_bonus_ref = { "EnchantmentBonus", -1 };
 	ieDword enchantment = wi.enchantment;
 
 	const Effect* fx = wielder->fxqueue.HasEffect(fx_enchantment_vs_creature_type_ref);
@@ -9577,6 +9576,8 @@ int Actor::GetBackstabDamage(const Actor* target, const WeaponInfo& wi, int mult
 bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword flags, int damage)
 {
 	assert(target);
+	static EffectRef fx_melee_ref = { "SetMeleeEffect", -1 };
+	static EffectRef fx_ranged_ref = { "SetRangedEffect", -1 };
 	const Actor* tar = Scriptable::As<Actor>(target);
 	if (!tar) {
 		return UseItemPoint(slot, header, target->Pos, flags);
