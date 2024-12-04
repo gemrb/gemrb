@@ -21,6 +21,7 @@
 ###################################################
 
 import GemRB
+import ActionsWindow
 import GUICommon
 import CommonTables
 import Spellbook
@@ -440,13 +441,13 @@ def UpdateFloatMenuSpell (pc, i):
 
 		spell = GemRB.GetSpell (SpellResRef)
 		Button.SetTooltip (spell['SpellName'])
-		Button.OnPress (lambda: CloseOnPress (GUICommonWindows.SpellPressed))
+		Button.OnPress (lambda: CloseOnPress (ActionsWindow.SpellPressed))
 		Button.SetVarAssoc ("Spell", spell_list[i + float_menu_index]['SpellIndex'])
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	elif i < 3 and GemRB.GetPlayerStat (pc, IE_CLASS) == 9:
 		# handle thieving
 		thieving = [ ACT_SEARCH, ACT_THIEVING, ACT_STEALTH ]
-		acts = [ GUICommonWindows.ActionSearchPressed, GUICommonWindows.ActionThievingPressed, GUICommonWindows.ActionStealthPressed ]
+		acts = [ ActionsWindow.ActionSearchPressed, ActionsWindow.ActionThievingPressed, ActionsWindow.ActionStealthPressed ]
 		Button.SetActionIcon (globals(), thieving[i])
 		Button.OnPress (lambda: CloseOnPress (acts[i]))
 		Button.SetState (IE_GUI_BUTTON_ENABLED)

@@ -21,6 +21,7 @@
 ###################################################
 
 import GemRB
+import ActionsWindow as ActionsWindowModule
 import GameCheck
 import GUICommon
 import GUICommonWindows
@@ -48,7 +49,7 @@ def OnLoad():
 	sbar.SetResizeFlags(IE_GUI_VIEW_RESIZE_VERTICAL)
 
 	ActionsWindow = GemRB.LoadWindow(3, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
-	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
+	ActionsWindowModule.OpenActionsWindowControls (ActionsWindow)
 	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	ActionsWindow.AddAlias("ACTWIN")
 	ActionsWindow.AddAlias("HIDE_CUT", 1)

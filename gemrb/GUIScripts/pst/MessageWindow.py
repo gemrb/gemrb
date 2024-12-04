@@ -22,6 +22,7 @@
 ###################################################
 
 import GemRB
+import ActionsWindow as ActionsWindowModule
 import GUIClasses
 import GUICommon
 import GUICommonWindows
@@ -106,7 +107,7 @@ def SetupClockWindowControls (Window):
 	# Abort current action
 	Button = Window.GetControl (3)
 	Button.SetTooltip (41655)
-	Button.OnPress (GUICommonWindows.ActionStopPressed)
+	Button.OnPress (ActionsWindowModule.ActionStopPressed)
 
 	# Formations
 	import GUIWORLD

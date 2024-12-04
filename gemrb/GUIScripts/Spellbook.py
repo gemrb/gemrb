@@ -228,7 +228,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		memorizedSpells = SortUsableSpells(allSpells)
 
 	# start creating the controls
-	import GUICommonWindows
+	import ActionsWindow
 	# TODO: ASCOL, ROWS
 	#AsCol = CommonTables.SpellDisplay.GetValue (layout, "AS_COL")
 	#Rows = CommonTables.SpellDisplay.GetValue (layout, "ROWS")
@@ -239,7 +239,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		Button = Window.GetControl (Offset)
 		Button.SetText ("")
 		if Start:
-			GUICommonWindows.SetActionIconWorkaround (Button, ACT_LEFT, 0)
+			ActionsWindow.SetActionIconWorkaround (Button, ACT_LEFT, 0)
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -292,8 +292,8 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.EnableBorder(1, 0)
 		else:
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
-			Button.OnPress (GUICommonWindows.SpellPressed)
-			Button.OnShiftPress (GUICommonWindows.SpellShiftPressed)
+			Button.OnPress (ActionsWindow.SpellPressed)
+			Button.OnShiftPress (ActionsWindow.SpellShiftPressed)
 
 		if Spell['SpellResRef']:
 			Button.SetSprites ("guibtbut", 0, 0,1,2,3)
@@ -309,7 +309,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	# scroll right button
 	if More:
 		Button = Window.GetControl (Offset+buttonCount+1)
-		GUICommonWindows.SetActionIconWorkaround (Button, ACT_RIGHT, buttonCount)
+		ActionsWindow.SetActionIconWorkaround (Button, ACT_RIGHT, buttonCount)
 		Button.SetText ("")
 		if len(memorizedSpells) - Start > 10:
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)

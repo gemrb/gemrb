@@ -24,6 +24,7 @@
 
 import GemRB
 from GUIDefines import *
+import ActionsWindow
 import GUICommon
 import GUICommonWindows
 import MessageWindow
@@ -54,7 +55,7 @@ def DialogStarted ():
 def DialogEnded ():
 	global ContinueWindow
 
-	GUICommonWindows.UpdateActionsWindow()
+	ActionsWindow.UpdateActionsWindow ()
 
 	ContinueWindow.Close ()
 	ContinueWindow = None

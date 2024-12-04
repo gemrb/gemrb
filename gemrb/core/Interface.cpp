@@ -700,7 +700,7 @@ void Interface::HandleEvents()
 
 		const Window* win = GetWindow(0, "ACTWIN");
 		if (win) {
-			guiscript->RunFunction("GUICommonWindows", "UpdateActionsWindow");
+			guiscript->RunFunction("ActionsWindow", "UpdateActionsWindow");
 		}
 	}
 

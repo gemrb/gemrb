@@ -35,9 +35,6 @@ else:
 	leftdiv = 3
 	ground_size = 6
 
-if GameCheck.IsPST():
-	import GUICommonWindows
-
 def UpdateContainerWindow ():
 	global Container
 
@@ -88,7 +85,7 @@ def RedrawContainerWindow ():
 			Button.SetVarAssoc ("LeftIndex", None)
 			callback = None
 		if GameCheck.IsPST():
-			GUICommonWindows.SetItemButton (Window, Button, Slot, callback, None)
+			SetItemButton (Window, Button, Slot, callback, None)
 		else:
 			InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "container")
 
@@ -100,7 +97,7 @@ def RedrawContainerWindow ():
 		Button = Window.GetControl (i+10)
 
 		#pst had a redundant call here, reenable if it turns out it isn't redundant:
-		#GUICommonWindows.SetItemButton (Window, Button, Slot, None, None)
+		#SetItemButton (Window, Button, Slot, None, None)
 
 		if Slot:
 			Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
@@ -109,7 +106,7 @@ def RedrawContainerWindow ():
 			Button.SetVarAssoc ("RightIndex", None)
 			callback = None
 		if GameCheck.IsPST():
-			GUICommonWindows.SetItemButton (Window, Button, Slot, callback, None)
+			SetItemButton (Window, Button, Slot, callback, None)
 		else:
 			InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "inventory")
 
@@ -285,3 +282,31 @@ def TakeItemContainer ():
 
 	GemRB.ChangeContainerItem (0, LeftIndex, 1)
 	UpdateContainerWindow ()
+
+# pst container override (maybe recheck if UpdateInventorySlot could handle it)
+def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
+	if Slot != None:
+		Item = GemRB.GetItem (Slot['ItemResRef'])
+		identified = Slot['Flags'] & IE_INV_ITEM_IDENTIFIED
+		Button.SetItemIcon (Slot['ItemResRef'],0)
+
+		if Item['MaxStackAmount'] > 1:
+			Button.SetText (str (Slot['Usages0']))
+		else:
+			Button.SetText ('')
+
+		if not identified or Item['ItemNameIdentified'] == -1:
+			Button.SetTooltip (Item['ItemName'])
+		else:
+			Button.SetTooltip (Item['ItemNameIdentified'])
+
+		Button.OnPress (PressHandler)
+		Button.OnRightPress (RightPressHandler)
+	else:
+		Button.SetItemIcon ('')
+		Button.SetTooltip (4273) # Ground Item
+		Button.SetText ('')
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+
+		Button.OnPress (None)
+		Button.OnRightPress (None)

@@ -23,6 +23,7 @@
 
 import GemRB
 
+import ActionsWindow
 import CommonWindow
 import Container
 import GameCheck
@@ -70,7 +71,7 @@ def DialogStarted ():
 def DialogEnded ():
 	global ContinueWindow
 
-	GUICommonWindows.UpdateActionsWindow()
+	ActionsWindow.UpdateActionsWindow ()
 	if not ContinueWindow:
 		return
 
