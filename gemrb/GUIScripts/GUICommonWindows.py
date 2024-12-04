@@ -640,6 +640,7 @@ def UpdateActionsWindow ():
 		Button.SetFont ("NUMBER")
 		Button.SetText ("")
 		Button.SetTooltip("")
+		Button.SetDisabled (False)
 
 	if Selected == 0:
 		EmptyControls ()
@@ -652,11 +653,16 @@ def UpdateActionsWindow ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 
 	# all but bg2 summons all use the group actionbar!
-	if not GameCheck.IsBG2 () and GemRB.GetPlayerStat (pc, IE_EA) != 2: # EA_PC
-		GroupControls ()
-		return
-
+	# bg2 has a different common format and exceptions for illusions/clones
 	level = GemRB.GetVar ("ActionLevel")
+	if GemRB.GetPlayerStat (pc, IE_EA) != 2: # EA_PC
+		if GameCheck.IsBG2 ():
+			if level == UAW_STANDARD and GemRB.GetPlayerStat (pc, IE_SEX) != 7:
+				level = UAW_BG2SUMMONS
+		else:
+			GroupControls ()
+			return
+
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == UAW_STANDARD:
 		#this is based on class
@@ -664,7 +670,6 @@ def UpdateActionsWindow ():
 	elif level == UAW_EQUIPMENT:
 		CurrentWindow.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
 	elif level == UAW_SPELLS or level == UAW_SPELLS_DIRECT: #spells
-
 		if GameCheck.IsIWD2():
 			if level == UAW_SPELLS:
 				# set up book selection if appropriate
@@ -686,6 +691,24 @@ def UpdateActionsWindow ():
 		Spellbook.SetupSpellIcons(CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	elif level == UAW_QWEAPONS or level == UAW_QITEMS: #quick weapon or quick item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot"), level)
+	elif level == UAW_BG2SUMMONS:
+			CurrentWindow.SetupControls (globals(), pc, ActionBarControlOffset)
+			# use group attack icon and disable second weapon slot
+			Button = CurrentWindow.GetControl (1 + ActionBarControlOffset)
+			Button.SetActionIcon (globals(), 15, 2)
+			Button = CurrentWindow.GetControl (2 + ActionBarControlOffset)
+			Button.SetActionIcon (globals(), -1, 0)
+			# the games showed quick spells, but these actors don't have the data for it
+			# we just disable the slots instead
+			Button = CurrentWindow.GetControl (3 + ActionBarControlOffset)
+			Button.SetActionIcon (globals(), 3, 4)
+			Button.SetDisabled (True)
+			Button = CurrentWindow.GetControl (4 + ActionBarControlOffset)
+			Button.SetActionIcon (globals(), 4, 5)
+			Button.SetDisabled (True)
+			Button = CurrentWindow.GetControl (5 + ActionBarControlOffset)
+			Button.SetActionIcon (globals(), 5, 6)
+			Button.SetDisabled (True)
 	elif level == UAW_ALLMAGE: #all known mage spells
 		GemRB.SetVar ("Type", -1)
 		Spellbook.SetupSpellIcons(CurrentWindow, -1, TopIndex, ActionBarControlOffset)
