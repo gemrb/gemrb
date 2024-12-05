@@ -2394,7 +2394,7 @@ setting the IE_GUI_BUTTON_NO_IMAGE flag on the control.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [Button_SetFlags](Button_SetFlags.md), [Button_SetBAM](Button_SetBAM.md), [Button_SetPicture](Button_SetPicture.md)");
+**See also:** [Button_SetFlags](Button_SetFlags.md), [Button_SetPicture](Button_SetPicture.md), [Button_SetPicture](Button_SetPicture.md)");
 
 static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 {
@@ -2532,7 +2532,7 @@ PyDoc_STRVAR(GemRB_Button_EnableBorder__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [Button_SetBAM](Button_SetBAM.md), [Button_SetFlags](Button_SetFlags.md), [Button_SetBorder](Button_SetBorder.md)");
+**See also:** [Button_SetPicture](Button_SetPicture.md), [Button_SetFlags](Button_SetFlags.md), [Button_SetBorder](Button_SetBorder.md)");
 
 static PyObject* GemRB_Button_EnableBorder(PyObject* self, PyObject* args)
 {
@@ -3390,7 +3390,7 @@ PyDoc_STRVAR(GemRB_Button_SetPicture__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [Button_SetBAM](Button_SetBAM.md), [Button_SetPLT](Button_SetPLT.md), [Button_SetSprites](Button_SetSprites.md), [Button_SetPictureClipping](Button_SetPictureClipping.md), [Window_SetPicture](Window_SetPicture.md)");
+**See also:** [Button_SetPicture](Button_SetPicture.md), [Button_SetPLT](Button_SetPLT.md), [Button_SetSprites](Button_SetSprites.md), [Button_SetPictureClipping](Button_SetPictureClipping.md), [Window_SetPicture](Window_SetPicture.md)");
 
 static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 {
@@ -3441,7 +3441,7 @@ Sets up the palette based on the eight given gradient colors.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [Button_SetBAM](Button_SetBAM.md)");
+**See also:** [Button_SetPicture](Button_SetPicture.md)");
 
 static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 {
