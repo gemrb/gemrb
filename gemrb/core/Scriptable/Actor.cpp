@@ -234,11 +234,12 @@ static int damageGradients[DAMAGE_LEVELS] = {
 	-1, -1, -1
 };
 
-static ResRef hc_overlays[OVERLAY_COUNT] = { "SANCTRY", "SPENTACI", "SPMAGGLO", "SPSHIELD",
-					     "GREASED", "WEBENTD", "MINORGLB", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-					     "", "", "", "SPTURNI2", "SPTURNI", "", "", "", "", "", "" };
-static ieDword hc_locations = 0;
-static int hc_flags[OVERLAY_COUNT];
+struct HCOverlay {
+	ResRef bam;
+	int flags = 0;
+};
+static std::array<HCOverlay, OVERLAY_COUNT> hcOverlays;
+static ieDword hcLocations = 0;
 #define HC_INVISIBLE 1
 
 // thieving skill dexterity and race boni vectors
@@ -1284,7 +1285,7 @@ static void pcf_gold(Actor* actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 
 static ResRef OverrideVVC(const Actor* actor, int idx)
 {
-	ResRef overlayGfx = hc_overlays[idx];
+	ResRef overlayGfx = hcOverlays[idx].bam;
 
 	// ee allows overriding some overlay graphics directly via their effects
 	static EffectRef fx_overlay_sanctuary_ref = { "Overlay:Sanctuary", -1 };
@@ -1334,12 +1335,12 @@ static void handle_overlay(Actor* actor, ieDword idx)
 	// this is just a guess, maybe there are extra conditions
 	// IE_AVATARREMOVAL and unscheduled get handled by not drawing anything at all
 	// MC_ENABLED is not perfectly understood
-	if (!actor->InParty && actor->Modified[IE_STATE_ID] & state_invisible && !(hc_flags[idx] & HC_INVISIBLE)) {
+	if (!actor->InParty && actor->Modified[IE_STATE_ID] & state_invisible && !(hcOverlays[idx].flags & HC_INVISIBLE)) {
 		delete sca;
 		return;
 	}
 
-	ieDword flag = hc_locations & (1 << idx);
+	ieDword flag = hcLocations & (1 << idx);
 	if (flag) {
 		sca->ZOffset = -1;
 	}
@@ -1793,11 +1794,10 @@ static void InitActorTables()
 	if (tm) {
 		ieDword mask = 1;
 		for (int i = 0; i < OVERLAY_COUNT; i++) {
-			hc_overlays[i] = tm->QueryField(i, 0);
+			hcOverlays[i] = { tm->QueryField(i, 0), tm->QueryFieldSigned<int>(i, 2) };
 			if (tm->QueryFieldSigned<int>(i, 1)) {
-				hc_locations |= mask;
+				hcLocations |= mask;
 			}
-			hc_flags[i] = tm->QueryFieldSigned<int>(i, 2);
 			mask <<= 1;
 		}
 	}
