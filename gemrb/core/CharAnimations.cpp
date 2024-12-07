@@ -395,9 +395,31 @@ void CharAnimations::SetRangedType(int rt)
 	RangedType = Clamp<ieByte>(rt, 0, 2);
 }
 
+// Attack
+// 1h, 2h, 2w
+//static const char *SlashPrefix[]={"a1","a4","a7"};
+//static const char *BackPrefix[]={"a2","a5","a8"};
+//static const char *JabPrefix[]={"a3","a6","a9"};
+using prefix_t = char[3];
+static const prefix_t SlashPrefix[] = { "a1", "a2", "a7" };
+static const prefix_t BackPrefix[] = { "a3", "a4", "a8" };
+static const prefix_t JabPrefix[] = { "a5", "a6", "a9" };
+static const prefix_t RangedPrefix[] = { "sa", "sx", "ss" };
+static const prefix_t RangedPrefixOld[] = { "sa", "sx", "a1" };
+
 void CharAnimations::SetWeaponType(unsigned char wt)
 {
 	if (wt == IE_ANI_WEAPON_INVALID) return;
+
+	// add more sanity checks here
+	if (GetAnimType() == IE_ANI_TWENTYTWO) {
+		ResRef test = ResRefBase;
+		test.Append(SlashPrefix[wt]);
+		if (!gamedata->Exists(test, IE_BAM_CLASS_ID, true)) {
+			wt = 0;
+		}
+	}
+
 	if (wt != WeaponType) {
 		WeaponType = wt;
 		DropAnims();
@@ -1804,18 +1826,6 @@ void CharAnimations::AddNFSuffix(ResRef& dest, unsigned char StanceID,
 	StringToLower(prefix.begin(), prefix.end(), dest.begin());
 	Cycle = (ieByte) (Cycle + CycleOffset[StanceID]);
 }
-
-//Attack
-//h1, h2, w2
-//static const char *SlashPrefix[]={"a1","a4","a7"};
-//static const char *BackPrefix[]={"a2","a5","a8"};
-//static const char *JabPrefix[]={"a3","a6","a9"};
-using prefix_t = char[3];
-static const prefix_t SlashPrefix[] = { "a1", "a2", "a7" };
-static const prefix_t BackPrefix[] = { "a3", "a4", "a8" };
-static const prefix_t JabPrefix[] = { "a5", "a6", "a9" };
-static const prefix_t RangedPrefix[] = { "sa", "sx", "ss" };
-static const prefix_t RangedPrefixOld[] = { "sa", "sx", "a1" };
 
 void CharAnimations::AddVHRSuffix(ResRef& dest, unsigned char StanceID,
 				  unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
