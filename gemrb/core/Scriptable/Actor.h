@@ -916,7 +916,7 @@ public:
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc);
 	/* remove a vvc from the list, graceful means animated removal */
-	void RemoveVVCells(const ResRef& vvcname);
+	void RemoveVVCells(int vvcIdx);
 	/* returns true if actor already has the overlay (slow) */
 	bool HasVVCCell(const ResRef& resource) const;
 	/* returns overlay if actor already has it (slow) */

@@ -1282,11 +1282,10 @@ static void pcf_gold(Actor* actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	}
 }
 
-static void handle_overlay(Actor* actor, ieDword idx)
+static ResRef OverrideVVC(const Actor* actor, int idx)
 {
-	if (idx >= OVERLAY_COUNT || actor->FindOverlay(idx)) return;
-
 	ResRef overlayGfx = hc_overlays[idx];
+
 	// ee allows overriding some overlay graphics directly via their effects
 	static EffectRef fx_overlay_sanctuary_ref = { "Overlay:Sanctuary", -1 };
 	static EffectRef fx_overlay_entangle_ref = { "Overlay:Entangle", -1 };
@@ -1294,13 +1293,29 @@ static void handle_overlay(Actor* actor, ieDword idx)
 	static EffectRef fx_overlay_shieldglobe_ref = { "Overlay:ShieldGlobe", -1 };
 	static EffectRef fx_overlay_web_ref = { "Overlay:Web", -1 };
 	static EffectRef fx_overlay_grease_ref = { "Overlay:Grease", -1 };
-	static std::map<int, EffectRef> overlayRefs = { { OV_SANCTUARY, fx_overlay_sanctuary_ref }, { OV_ENTANGLE, fx_overlay_entangle_ref }, { OV_MINORGLOBE, fx_overlay_minorglobe_ref }, { OV_SHIELDGLOBE, fx_overlay_shieldglobe_ref }, { OV_WEB, fx_overlay_web_ref }, { OV_GREASE, fx_overlay_grease_ref } };
+	static std::map<int, EffectRef> overlayRefs = {
+		{ OV_SANCTUARY, fx_overlay_sanctuary_ref },
+		{ OV_ENTANGLE, fx_overlay_entangle_ref },
+		{ OV_MINORGLOBE, fx_overlay_minorglobe_ref },
+		{ OV_SHIELDGLOBE, fx_overlay_shieldglobe_ref },
+		{ OV_WEB, fx_overlay_web_ref },
+		{ OV_GREASE, fx_overlay_grease_ref }
+	};
 	if (idx <= OV_MINORGLOBE && idx != OV_SPELLTRAP) {
 		const Effect* fx = actor->fxqueue.HasEffectWithParam(overlayRefs[idx], 1);
 		if (fx && !fx->Resource.IsEmpty()) {
 			overlayGfx = fx->Resource;
 		}
 	}
+
+	return overlayGfx;
+}
+
+static void handle_overlay(Actor* actor, ieDword idx)
+{
+	if (idx >= OVERLAY_COUNT || actor->FindOverlay(idx)) return;
+
+	ResRef overlayGfx = OverrideVVC(actor, idx);
 	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(overlayGfx, false);
 
 	if (!sca) {
@@ -1332,7 +1347,7 @@ static void pcf_entangle(Actor* actor, ieDword oldValue, ieDword newValue)
 		handle_overlay(actor, OV_ENTANGLE);
 	}
 	if (oldValue & 1) {
-		actor->RemoveVVCells(hc_overlays[OV_ENTANGLE]);
+		actor->RemoveVVCells(OV_ENTANGLE);
 	}
 }
 
@@ -1350,7 +1365,7 @@ static void pcf_sanctuary(Actor* actor, ieDword oldValue, ieDword newValue)
 			if (newValue & mask) {
 				handle_overlay(actor, i);
 			} else if (oldValue & mask) {
-				actor->RemoveVVCells(hc_overlays[i]);
+				actor->RemoveVVCells(i);
 			}
 		}
 		mask <<= 1;
@@ -1365,7 +1380,7 @@ static void pcf_shieldglobe(Actor* actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue & 1) {
-		actor->RemoveVVCells(hc_overlays[OV_SHIELDGLOBE]);
+		actor->RemoveVVCells(OV_SHIELDGLOBE);
 	}
 }
 
@@ -1377,7 +1392,7 @@ static void pcf_minorglobe(Actor* actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue & 1) {
-		actor->RemoveVVCells(hc_overlays[OV_MINORGLOBE]);
+		actor->RemoveVVCells(OV_MINORGLOBE);
 	}
 }
 
@@ -1389,7 +1404,7 @@ static void pcf_grease(Actor* actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue & 1) {
-		actor->RemoveVVCells(hc_overlays[OV_GREASE]);
+		actor->RemoveVVCells(OV_GREASE);
 	}
 }
 
@@ -1402,7 +1417,7 @@ static void pcf_web(Actor* actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue & 1) {
-		actor->RemoveVVCells(hc_overlays[OV_WEB]);
+		actor->RemoveVVCells(OV_WEB);
 	}
 }
 
@@ -1414,7 +1429,7 @@ static void pcf_bounce(Actor* actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue) {
-		actor->RemoveVVCells(hc_overlays[OV_BOUNCE]);
+		actor->RemoveVVCells(OV_BOUNCE);
 	}
 }
 
@@ -8321,7 +8336,7 @@ bool Actor::UpdateDrawingState()
 
 		// skip two overlays if fx_disable_overlay_modifier is in effect
 		// add a flags field if this ever starts being used heavily (currently only bg2 demi-liches)
-		if (Modified[IE_DISABLEOVERLAY] && (vvc->ResName == hc_overlays[OV_BOUNCE] || vvc->ResName == hc_overlays[OV_SPELLTRAP])) {
+		if (Modified[IE_DISABLEOVERLAY] && (vvc->ResName == OverrideVVC(this, OV_BOUNCE) || vvc->ResName == OverrideVVC(this, OV_SPELLTRAP))) {
 			++it;
 			continue;
 		}
@@ -9021,8 +9036,9 @@ std::pair<vvcDict::const_iterator, vvcDict::const_iterator>
 	return vfxDict.equal_range(resource);
 }
 
-void Actor::RemoveVVCells(const ResRef& resource)
+void Actor::RemoveVVCells(int vvcIdx)
 {
+	const ResRef& resource = OverrideVVC(this, vvcIdx);
 	auto range = vfxDict.equal_range(resource);
 	if (range.first != vfxDict.end()) {
 		for (auto it = range.first; it != range.second; ++it) {
@@ -9039,7 +9055,7 @@ ScriptedAnimation* Actor::FindOverlay(int index) const
 {
 	if (index >= OVERLAY_COUNT) return NULL;
 
-	auto it = vfxDict.find(hc_overlays[index]);
+	auto it = vfxDict.find(OverrideVVC(this, index));
 	return (it != vfxDict.end()) ? it->second : nullptr;
 }
 
