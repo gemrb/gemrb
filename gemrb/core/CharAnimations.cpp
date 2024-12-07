@@ -1495,7 +1495,7 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
 
 			for (int i = flip; i < 2 + flip; ++i) {
 				dest.Format("{}{}{}", ResRefBase[0], prefixes[i % 2], ResRefBase.begin() + 1);
-				if (gamedata->Exists(dest, IE_BAM_CLASS_ID)) {
+				if (gamedata->Exists(dest, IE_BAM_CLASS_ID, true)) {
 					return;
 				}
 			}
