@@ -24,6 +24,8 @@
 
 namespace GemRB {
 
+class Gem_Polygon;
+
 class GEM_EXPORT Highlightable : public Scriptable {
 public:
 	using Scriptable::Scriptable;

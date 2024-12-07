@@ -37,8 +37,8 @@
 #include "Projectile.h"
 #include "Spellbook.h"
 
+#include "Scriptable/Movable.h"
 #include "Scriptable/PCStatStruct.h"
-#include "Scriptable/Scriptable.h"
 #include "Video/Video.h"
 
 #include <array>
@@ -108,6 +108,10 @@ enum class Modal : ieWord {
 #define DNJ_UNHINDERED 2
 #define DNJ_JUMP       4
 #define DNJ_BIRD       (DNJ_FIT | DNJ_UNHINDERED)
+
+#define MAX_PATH_TRIES      8
+#define MAX_BUMP_BACK_TRIES 16
+#define MAX_RAND_WALK       10
 
 //add_animation flags (override vvc)
 #define AA_PLAYONCE 1

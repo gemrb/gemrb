@@ -103,8 +103,10 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Scriptable/Door.cpp
 	Scriptable/Highlightable.cpp
 	Scriptable/InfoPoint.cpp
+	Scriptable/Movable.cpp
 	Scriptable/OverHeadText.cpp
 	Scriptable/Scriptable.cpp
+	Scriptable/Selectable.cpp
 	Scriptable/PCStatStruct.cpp
 	Scriptable/TileObject.cpp
 	Streams/DataStream.cpp
