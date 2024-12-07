@@ -1449,6 +1449,7 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
 {
 	const char* Prefix;
 	static const char prefixes[2][4] = { "sf2", "sf1" };
+	int flip = RandomFlip();
 
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
@@ -1492,8 +1493,8 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
 		case IE_ANI_HEAD_TURN:
 			Cycle = SixteenToFive[Orient];
 
-			for (int i = RandomFlip(); i < 2; ++i) {
-				dest.Format("{}{}{}", ResRefBase[0], prefixes[i], ResRefBase.begin() + 1);
+			for (int i = flip; i < 2 + flip; ++i) {
+				dest.Format("{}{}{}", ResRefBase[0], prefixes[i % 2], ResRefBase.begin() + 1);
 				if (gamedata->Exists(dest, IE_BAM_CLASS_ID)) {
 					return;
 				}
