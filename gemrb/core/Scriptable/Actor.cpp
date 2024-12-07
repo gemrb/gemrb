@@ -1308,6 +1308,12 @@ static ResRef OverrideVVC(const Actor* actor, int idx)
 		}
 	}
 
+	// iwds have two sizes for Otiluke's resilient sphere spwi413
+	// bg2 uses the GOI overlay number instead
+	if (idx == OV_RESILIENT && actor->circleSize > 2) {
+		overlayGfx = "ORSPHEB";
+	}
+
 	return overlayGfx;
 }
 
