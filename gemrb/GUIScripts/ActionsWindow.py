@@ -890,7 +890,7 @@ def SpellPressed ():
 	Spell = GemRB.GetVar ("Spell")
 	Type = GemRB.GetVar ("Type")
 
-	if Type == 1 << IE_IWD2_SPELL_SONG or Type == 1 << IE_SPELL_TYPE_SONG:
+	if Type == 1 << IE_IWD2_SPELL_SONG or (Type == 1 << IE_SPELL_TYPE_SONG and not GameCheck.IsIWD2()):
 		SelectBardSong (Spell)
 		ActionBardSongPressed()
 		return
