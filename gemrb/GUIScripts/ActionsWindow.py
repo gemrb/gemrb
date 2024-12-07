@@ -1034,7 +1034,9 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 			return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
 
 		# sigh, get unshifted value back
-		bookType = bin(pcStats["QuickSpellsBookType"][tmp])[::-1].index("1")
+		bookType = pcStats["QuickSpellsBookType"][tmp]
+		if bookType > 0:
+			bookType = bin(pcStats["QuickSpellsBookType"][tmp])[::-1].index("1")
 		memorizedSpells = Spellbook.GetUsableMemorizedSpells (pc, bookType)
 		memorizedCount = 0
 		for sp in memorizedSpells:
