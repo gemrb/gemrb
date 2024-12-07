@@ -1156,7 +1156,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 			state = IE_GUI_BUTTON_DISABLED
 	elif action == ACT_BARDSONG:
 		if GameCheck.IsIWD2 ():
-			spellType = 1 << IE_IWD2_SPELL_SONG
+			spellType = IE_IWD2_SPELL_SONG
 			if not GemRB.GetKnownSpellsCount (pc, spellType):
 				state = IE_GUI_BUTTON_DISABLED
 			elif modalState == MS_BATTLESONG:
