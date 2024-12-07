@@ -8484,108 +8484,110 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 		}
 	}
 
-	if (!currentStance.anim.empty()) {
-		orient_t face = GetOrientation();
-		// Drawing the actor:
-		// * mirror images:
-		//     Drawn without transparency, unless fully invisible.
-		//     Order: W, E, N, S, NW, SE, NE, SW
-		// * blurred copies (3 of them)
-		//     Drawn with transparency.
-		//     distance between copies depends on IE_MOVEMENTRATE
-		//     TODO: actually, the direction is the real movement direction,
-		//	not the (rounded) direction given Face
-		// * actor itself
-		//
-		//comments by Avenger:
-		// currently we don't have a real direction, but the orientation field
-		// could be used with higher granularity. When we need the face value
-		// it could be divided so it will become a 0-15 number.
-		//
+	if (currentStance.anim.empty()) {
+		return; // something is wrong, ignore the rest of the vvcs
+	}
 
-		if (AppearanceFlags & APP_HALFTRANS) flags |= BlitFlags::HALFTRANS;
+	orient_t face = GetOrientation();
+	// Drawing the actor:
+	// * mirror images:
+	//     Drawn without transparency, unless fully invisible.
+	//     Order: W, E, N, S, NW, SE, NE, SW
+	// * blurred copies (3 of them)
+	//     Drawn with transparency.
+	//     distance between copies depends on IE_MOVEMENTRATE
+	//     TODO: actually, the direction is the real movement direction,
+	//	not the (rounded) direction given Face
+	// * actor itself
+	//
+	//comments by Avenger:
+	// currently we don't have a real direction, but the orientation field
+	// could be used with higher granularity. When we need the face value
+	// it could be divided so it will become a 0-15 number.
+	//
 
-		Point drawPos = Pos - vp.origin;
-		drawPos.y -= GetElevation();
+	if (AppearanceFlags & APP_HALFTRANS) flags |= BlitFlags::HALFTRANS;
 
-		// mirror images behind the actor
-		for (int i = 0; i < 4; ++i) {
-			unsigned int m = MirrorImageZOrder[i];
-			if (m < Modified[IE_MIRRORIMAGES]) {
-				int dir = MirrorImageLocation[m];
-				int icx = drawPos.x + 3 * OrientdX[dir];
-				int icy = drawPos.y + 3 * OrientdY[dir];
-				Point iPos(icx, icy);
-				// FIXME: I don't know if GetBlocked() is good enough
-				// consider the possibility the mirror image is behind a wall (walls.second)
-				// GetBlocked might be false, but we still should not draw the image
-				// maybe the mirror image coordinates can never be beyond the width of a wall?
-				if ((area->GetBlocked(iPos + vp.origin) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR)) != PathMapFlags::IMPASSABLE) {
-					DrawActorSprite(iPos, flags, currentStance.anim, tint);
-				}
+	Point drawPos = Pos - vp.origin;
+	drawPos.y -= GetElevation();
+
+	// mirror images behind the actor
+	for (int i = 0; i < 4; ++i) {
+		unsigned int m = MirrorImageZOrder[i];
+		if (m < Modified[IE_MIRRORIMAGES]) {
+			int dir = MirrorImageLocation[m];
+			int iCx = drawPos.x + 3 * OrientdX[dir];
+			int iCy = drawPos.y + 3 * OrientdY[dir];
+			Point iPos(iCx, iCy);
+			// FIXME: I don't know if GetBlocked() is good enough
+			// consider the possibility the mirror image is behind a wall (walls.second)
+			// GetBlocked might be false, but we still should not draw the image
+			// maybe the mirror image coordinates can never be beyond the width of a wall?
+			if ((area->GetBlocked(iPos + vp.origin) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR)) != PathMapFlags::IMPASSABLE) {
+				DrawActorSprite(iPos, flags, currentStance.anim, tint);
 			}
 		}
+	}
 
-		// blur sprites behind the actor
-		int blurdx = (OrientdX[face] * (int) Modified[IE_MOVEMENTRATE]) / 20;
-		int blurdy = (OrientdY[face] * (int) Modified[IE_MOVEMENTRATE]) / 20;
-		Point blurPos = drawPos;
-		if (State & STATE_BLUR) {
-			if (face < 4 || face >= 12) {
-				blurPos -= Point(4 * blurdx, 4 * blurdy);
-				for (int i = 0; i < 3; ++i) {
-					blurPos += Point(blurdx, blurdy);
-					// FIXME: I don't think we ought to draw blurs that are behind a wall that the actor is in front of
-					DrawActorSprite(blurPos, flags, currentStance.anim, tint);
-				}
+	// blur sprites behind the actor
+	int blurdx = (OrientdX[face] * (int) Modified[IE_MOVEMENTRATE]) / 20;
+	int blurdy = (OrientdY[face] * (int) Modified[IE_MOVEMENTRATE]) / 20;
+	Point blurPos = drawPos;
+	if (State & STATE_BLUR) {
+		if (face < 4 || face >= 12) {
+			blurPos -= Point(4 * blurdx, 4 * blurdy);
+			for (int i = 0; i < 3; ++i) {
+				blurPos += Point(blurdx, blurdy);
+				// FIXME: I don't think we ought to draw blurs that are behind a wall that the actor is in front of
+				DrawActorSprite(blurPos, flags, currentStance.anim, tint);
 			}
 		}
+	}
 
-		if (!currentStance.shadow.empty()) {
-			DrawActorSprite(drawPos, flags, currentStance.shadow, tint);
+	if (!currentStance.shadow.empty()) {
+		DrawActorSprite(drawPos, flags, currentStance.shadow, tint);
+	}
+
+	// infravision, independent of light map and global light
+	if (HasBodyHeat() &&
+	    game->PartyHasInfravision() &&
+	    !game->IsDay() &&
+	    (area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
+		tint = Color(255, 120, 120, tint.a);
+
+		/* IWD2: infravision is white, not red. */
+		if (core->HasFeature(GFFlags::RULES_3ED)) {
+			tint = Color(255, 255, 255, tint.a);
 		}
+	}
 
-		// infravision, independent of light map and global light
-		if (HasBodyHeat() &&
-		    game->PartyHasInfravision() &&
-		    !game->IsDay() &&
-		    (area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
-			tint = Color(255, 120, 120, tint.a);
+	// actor itself
+	DrawActorSprite(drawPos, flags, currentStance.anim, tint);
 
-			/* IWD2: infravision is white, not red. */
-			if (core->HasFeature(GFFlags::RULES_3ED)) {
-				tint = Color(255, 255, 255, tint.a);
+	// blur sprites in front of the actor
+	if (State & STATE_BLUR) {
+		if (face >= 4 && face < 12) {
+			for (int i = 0; i < 3; ++i) {
+				blurPos -= Point(blurdx, blurdy);
+				DrawActorSprite(blurPos, flags, currentStance.anim, tint);
 			}
 		}
+	}
 
-		// actor itself
-		DrawActorSprite(drawPos, flags, currentStance.anim, tint);
-
-		// blur sprites in front of the actor
-		if (State & STATE_BLUR) {
-			if (face >= 4 && face < 12) {
-				for (int i = 0; i < 3; ++i) {
-					blurPos -= Point(blurdx, blurdy);
-					DrawActorSprite(blurPos, flags, currentStance.anim, tint);
-				}
-			}
-		}
-
-		// mirror images in front of the actor
-		for (int i = 4; i < 8; ++i) {
-			unsigned int m = MirrorImageZOrder[i];
-			if (m < Modified[IE_MIRRORIMAGES]) {
-				int dir = MirrorImageLocation[m];
-				int icx = drawPos.x + 3 * OrientdX[dir];
-				int icy = drawPos.y + 3 * OrientdY[dir];
-				Point iPos(icx, icy);
-				// FIXME: I don't know if GetBlocked() is good enough
-				// consider the possibility the mirror image is in front of a wall (walls.first)
-				// GetBlocked might be false, but we still should not draw the image
-				// maybe the mirror image coordinates can never be beyond the width of a wall?
-				if ((area->GetBlocked(iPos + vp.origin) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR)) != PathMapFlags::IMPASSABLE) {
-					DrawActorSprite(iPos, flags, currentStance.anim, tint);
-				}
+	// mirror images in front of the actor
+	for (int i = 4; i < 8; ++i) {
+		unsigned int m = MirrorImageZOrder[i];
+		if (m < Modified[IE_MIRRORIMAGES]) {
+			int dir = MirrorImageLocation[m];
+			int icx = drawPos.x + 3 * OrientdX[dir];
+			int icy = drawPos.y + 3 * OrientdY[dir];
+			Point iPos(icx, icy);
+			// FIXME: I don't know if GetBlocked() is good enough
+			// consider the possibility the mirror image is in front of a wall (walls.first)
+			// GetBlocked might be false, but we still should not draw the image
+			// maybe the mirror image coordinates can never be beyond the width of a wall?
+			if ((area->GetBlocked(iPos + vp.origin) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR)) != PathMapFlags::IMPASSABLE) {
+				DrawActorSprite(iPos, flags, currentStance.anim, tint);
 			}
 		}
 	}
