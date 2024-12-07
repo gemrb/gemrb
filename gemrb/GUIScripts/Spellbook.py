@@ -25,6 +25,7 @@ from ie_stats import *
 from ie_action import ACT_LEFT, ACT_RIGHT
 from ie_spells import *
 from ie_restype import RES_2DA
+from ie_modal import MS_TURNUNDEAD
 
 #################################################################
 # this is in the operator module of the standard python lib
@@ -199,11 +200,11 @@ def SortUsableSpells(memorizedSpells):
 # BookType is a spellbook type bitfield (1-mage, 2-priest, 4-innate and others in iwd2)
 # Offset is a control ID offset here for iwd2 purposes
 def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
+	import GUICommon
 	actor = GemRB.GameGetFirstSelectedActor ()
 
 	# bardsongs weren't saved in iwd1, so learn them now if needed
 	if GameCheck.IsIWD1 () and BookType == (1 << IE_SPELL_TYPE_SONG) and HasSpell (actor, IE_SPELL_TYPE_SONG, 0, "SPIN151") == -1:
-		import GUICommon
 		level = GemRB.GetPlayerStat (actor, IE_LEVEL)
 		GUICommon.AddClassAbilities (actor, "clabbard", level, level)
 
@@ -252,6 +253,8 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	# disable all spells if fx_disable_spellcasting was run with the same type
 	# but only if there are any spells of that type to disable
 	disabled_spellcasting = GemRB.GetPlayerStat(actor, IE_CASTING, 0)
+	classRowName = GUICommon.GetClassRowName (actor)
+	extraActionButton = not (GameCheck.IsIWD2() or GameCheck.IsPST()) and classRowName == "CLERIC_THIEF"
 	actionLevel = GemRB.GetVar ("ActionLevel")
 
 	# spellType will have IE_SPL_ITEM (...) not IE_SPELL_TYPE_PRIEST (...)!
@@ -264,6 +267,18 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	for i in range (buttonCount):
 		Button = Window.GetControl (i+Offset+More)
 		Button.OnRightPress (None)
+
+		# yuck, handle offloaded cleric/thief icon
+		# original did picking, we do turning, since it is used less often
+		if i + Start == 0 and extraActionButton:
+			Button.SetActionIcon (globals(), 6, 1)
+			Button.OnPress (ActionsWindow.ActionTurnPressed)
+			if GemRB.GetModalState (actor) == MS_TURNUNDEAD:
+				Button.SetState (IE_GUI_BUTTON_SELECTED)
+			else:
+				Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetText ("")
+			continue
 
 		if i+Start >= len(memorizedSpells):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)

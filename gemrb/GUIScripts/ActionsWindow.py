@@ -378,6 +378,7 @@ def UpdateActionsWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == UAW_STANDARD:
 		# this is based on class
+		# cleric/thief wants 13 icons, so we push the extra under innates (original did picking, we do turning)
 		SetupControls (CurrentWindow, pc, ActionBarControlOffset)
 	elif level == UAW_EQUIPMENT:
 		CurrentWindow.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
