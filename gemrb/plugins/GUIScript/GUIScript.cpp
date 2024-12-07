@@ -5823,7 +5823,7 @@ PyDoc_STRVAR(GemRB_GameGetFirstSelectedActor__doc,
 \n\
 **Prototype:** GemRB.GameGetFirstSelectedActor ()\n\
 \n\
-**Description:**  Returns the global ID of the first selected actor or 0 if none.\n\
+**Description:** Returns the global ID of the first selected actor, party ID if a pc or 0 if none.\n\
 \n\
 **Return value:** int\n\
 \n\
@@ -5833,7 +5833,11 @@ static PyObject* GemRB_GameGetFirstSelectedActor(PyObject* /*self*/, PyObject* /
 {
 	const Actor* actor = core->GetFirstSelectedActor();
 	if (actor) {
-		return PyLong_FromLong(actor->GetGlobalID());
+		if (actor->InParty) {
+			return PyLong_FromLong(actor->InParty);
+		} else {
+			return PyLong_FromLong(actor->GetGlobalID());
+		}
 	}
 
 	return PyLong_FromLong(0);
