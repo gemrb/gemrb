@@ -1024,14 +1024,27 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 			return IE_GUI_BUTTON_DISABLED
 
 		poi = pcStats["QuickSpells"][tmp]
-		if poi != "":
-			btn.SetSpellIcon (poi, 1, 1, i + 1)
-			memorized = Spellbook.HasSpellinfoSpell (pc, poi)
-			SetItemText (btn, memorized, True)
-			if not memorized:
-				return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
+		if poi == "":
+			return IE_GUI_BUTTON_FAKEDISABLED
+
+		btn.SetSpellIcon (poi, 1, 1, i + 1)
+		memorized = Spellbook.HasSpellinfoSpell (pc, poi)
+		if not memorized:
+			return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
+
+		# sigh, get unshifted value back
+		bookType = bin(pcStats["QuickSpellsBookType"][tmp])[::-1].index("1")
+		memorizedSpells = Spellbook.GetUsableMemorizedSpells (pc, bookType)
+		memorizedCount = 0
+		for sp in memorizedSpells:
+			if sp["SpellResRef"] == poi:
+				memorizedCount = sp["MemoCount"]
+				break
+		if memorizedCount:
+			SetItemText (btn, memorizedCount, True)
 			return IE_GUI_BUTTON_UNPRESSED
-		return IE_GUI_BUTTON_FAKEDISABLED
+		else:
+			return IE_GUI_BUTTON_FAKEDISABLED
 
 	def SetQSlotBtn (btn, pc, tmp, action):
 		btn.SetBAM ("stonitem", 0, 0)

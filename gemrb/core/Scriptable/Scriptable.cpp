@@ -1394,6 +1394,7 @@ int Scriptable::SpellCast(bool instant, Scriptable* target, int level)
 	}
 
 	gamedata->FreeSpell(spl, SpellResRef, false);
+	core->SetEventFlag(EF_ACTION); // in case it was cast from a quickspell slot, so we update the count
 	return duration;
 }
 
