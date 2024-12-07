@@ -36,6 +36,7 @@ CurrentWindow = None
 ActionBarControlOffset = 0
 if GameCheck.IsIWD2 ():
 	ActionBarControlOffset = 6 # portrait and action window were merged
+fistDrawn = True
 
 # The following four functions are currently unused in pst
 def EmptyControls ():
@@ -305,7 +306,7 @@ def SetupBookSelection ():
 skillbar = (ACT_STEALTH, ACT_SEARCH, ACT_THIEVING, ACT_WILDERNESS, ACT_TAMING, ACT_USE, ACT_CAST, 100, 100, 100, 100, 100)
 def SetupSkillSelection ():
 	pc = GemRB.GameGetFirstSelectedActor ()
-	CurrentWindow.SetupControls( globals(), pc, ActionBarControlOffset, skillbar)
+	SetupControls (CurrentWindow, pc, ActionBarControlOffset, skillbar)
 	return
 
 def UpdateActionsWindow ():
@@ -377,7 +378,7 @@ def UpdateActionsWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	if level == UAW_STANDARD:
 		# this is based on class
-		CurrentWindow.SetupControls (globals(), pc, ActionBarControlOffset)
+		SetupControls (CurrentWindow, pc, ActionBarControlOffset)
 	elif level == UAW_EQUIPMENT:
 		CurrentWindow.SetupEquipmentIcons(globals(), pc, TopIndex, ActionBarControlOffset)
 	elif level == UAW_SPELLS or level == UAW_SPELLS_DIRECT: # spells
@@ -403,7 +404,7 @@ def UpdateActionsWindow ():
 	elif level == UAW_QWEAPONS or level == UAW_QITEMS: # quick weapon or quick item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot"), level)
 	elif level == UAW_BG2SUMMONS:
-			CurrentWindow.SetupControls (globals(), pc, ActionBarControlOffset)
+			SetupControls (CurrentWindow, pc, ActionBarControlOffset)
 			# use group attack icon and disable second weapon slot
 			Button = CurrentWindow.GetControl (1 + ActionBarControlOffset)
 			Button.SetActionIcon (globals(), 15, 2)
@@ -473,7 +474,7 @@ def ActionQWeaponPressed (which):
 		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 		GemRB.SetEquippedQuickSlot (pc, which, -1)
 
-	CurrentWindow.SetupControls (globals(), pc, ActionBarControlOffset)
+	SetupControls (CurrentWindow, pc, ActionBarControlOffset)
 	UpdateActionsWindow ()
 	return
 
@@ -947,3 +948,321 @@ def ActionDefendPressed ():
 
 def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD | GA_NO_SELF | GA_NO_ENEMY | GA_NO_HIDDEN)
+
+def SetupControls (Window, pc, actionOffset, customBar = None):
+	global fistDrawn
+
+	if customBar:
+		actionRow = customBar
+	else:
+		actionRow = GemRB.GetPlayerActionRow (pc)
+
+	pcStats = GemRB.GetPCStats (pc) # will be None for summons, familiars!
+	invInfo = GemRB.GetInventoryInfo (pc)
+	fistDrawn = True
+
+	GUIBT_COUNT = 12
+	for i in range(GUIBT_COUNT):
+		btn = Window.GetControl (i + actionOffset)
+		if not btn:
+			raise RuntimeError("Missing action buttons!")
+
+		action = actionRow[i]
+		if action == ACT_NONE:
+			action = -1
+
+		btn.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
+		ret = btn.SetActionIcon (globals(), action, i + 1)
+		if ret is not None:
+			raise RuntimeError("Cannot set action button {} to {}!".format(i, action))
+
+		if action != -1:
+			# reset it to the first one, so we can handle them more easily below
+			if (action >= ACT_IWDQSPELL) and (action <= ACT_IWDQSPELL + 9):
+				action = ACT_IWDQSPELL
+			elif (action >= ACT_IWDQITEM) and (action <= ACT_IWDQITEM + 9):
+				action = ACT_IWDQITEM
+			elif (action >= ACT_IWDQSPEC) and (action <= ACT_IWDQSPEC + 9):
+				action = ACT_IWDQSPEC
+			elif (action >= ACT_IWDQSONG) and (action <= ACT_IWDQSONG + 9):
+				action = ACT_IWDQSONG
+
+		state = SetupActionButton (pc, action, btn, i, pcStats, invInfo)
+
+		disabledButton = GemRB.GetPlayerStat (pc, IE_DISABLEDBUTTON)
+		if action < 0 or (action <= ACT_SKILLS and (disabledButton & (1 << action))):
+			state = IE_GUI_BUTTON_DISABLED
+		elif action >= ACT_QSPELL1 and action <= ACT_QSPELL3 and (disabledButton & (1 << ACT_CAST)):
+			state = IE_GUI_BUTTON_DISABLED
+
+		btn.SetState (state)
+		# you have to set this overlay up
+		# this state check looks bizarre, but without it most buttons get misrendered
+		btn.EnableBorder (1, state == IE_GUI_BUTTON_DISABLED)
+
+def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
+	global fistDrawn
+
+	state = IE_GUI_BUTTON_UNPRESSED
+	magicSlot = invInfo["MagicSlot"]
+	fistSlot = invInfo["FistSlot"]
+	weaponSlot = invInfo["WeaponSlot"]
+	usedslot = invInfo["UsedSlot"]
+	modalState = GemRB.GetModalState (pc)
+
+	def SetItemText (btn, charges, oneIsNone):
+		if not btn:
+			return
+
+		if charges and (charges > 1 or not oneIsNone):
+			btn.SetText (str(charges))
+		else:
+			btn.SetText (None)
+
+	def SetQSpellBtn (btn, pc, tmp):
+		if not pcStats:
+			return IE_GUI_BUTTON_DISABLED
+
+		poi = pcStats["QuickSpells"][tmp]
+		if poi != "":
+			btn.SetSpellIcon (poi, 1, 1, i + 1)
+			memorized = Spellbook.HasSpellinfoSpell (pc, poi)
+			SetItemText (btn, memorized, True)
+			if not memorized:
+				return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
+			return IE_GUI_BUTTON_UNPRESSED
+		return IE_GUI_BUTTON_FAKEDISABLED
+
+	def SetQSlotBtn (btn, pc, tmp, action):
+		btn.SetBAM ("stonitem", 0, 0)
+		if not pcStats:
+			return IE_GUI_BUTTON_DISABLED
+		slot = pcStats["QuickItemSlots"][tmp]
+		if slot != 0xffff:
+			# no slot translation required
+			item = GemRB.GetSlotItem (pc, slot, 1)
+			if item:
+				# MISC3H (horn of blasting) is not displayed when it is out of usages
+				header = pcStats["QuickItemHeaders"][tmp]
+				usages = item["Usages" + str(header)]
+				# I don't like this feature, if the goal is full IE compatibility
+				# make the next two lines conditional on usages != 0
+				# SetItemIcon parameter needs header + 6 to display extended header icons
+				btn.SetItemIcon (item["ItemResRef"], header + 6, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1)
+				SetItemText (btn, usages, False)
+			elif action == ACT_IWDQITEM:
+				return IE_GUI_BUTTON_DISABLED
+		elif action == ACT_IWDQITEM:
+			return IE_GUI_BUTTON_DISABLED
+		return IE_GUI_BUTTON_UNPRESSED
+
+	def CanUseActionButton (pc, btnType):
+		capability = -1
+		if GameCheck.IsIWD2 ():
+			if btnType == ACT_STEALTH:
+				# iwd2 will automatically use the GetSkill checks for trained skills
+				capability = GemRB.GetPlayerStat (pc, IE_STEALTH) + GemRB.GetPlayerStat (pc, IE_HIDEINSHADOWS)
+			elif btnType == ACT_THIEVING:
+				capability = GemRB.GetPlayerStat (pc, IE_LOCKPICKING) + GemRB.GetPlayerStat (pc, IE_PICKPOCKET)
+			elif btnType == ACT_SEARCH:
+				capability = 1 # everyone can try to search
+			else:
+				print("Unknown action (button) type: ", btnType)
+		else:
+			# use levels instead, so inactive dualclasses work as expected
+			if btnType == ACT_STEALTH:
+				capability = GemRB.GetPlayerLevel (pc, ISTHIEF) + GemRB.GetPlayerLevel (pc, ISMONK) + GemRB.GetPlayerLevel (pc, ISRANGER)
+			elif btnType == ACT_THIEVING:
+				capability = GemRB.GetPlayerLevel (pc, ISTHIEF) + GemRB.GetPlayerLevel (pc, ISBARD)
+			elif btnType == ACT_SEARCH:
+				capability = GemRB.GetPlayerLevel (pc, ISTHIEF)
+			else:
+				print("Unknown action (button) type: ", btnType)
+		return capability > 0
+
+	def HasAnyActiveCasterLevel (pc):
+		sum = GemRB.GetPlayerLevel (pc, ISMAGE) + GemRB.GetPlayerLevel (pc, ISSORCERER) + GemRB.GetPlayerLevel (pc, ISBARD)
+		sum = sum + GemRB.GetPlayerLevel (pc, ISCLERIC) + GemRB.GetPlayerLevel (pc, ISDRUID)
+		# first spells at level: 9 (bg1), 6 (iwd), 4 (iwd2)
+		# lowest works here, since we also check for spell presence
+		# — either you have spells from the class or the other one provides them
+		sum = sum + int(GemRB.GetPlayerLevel (pc, ISPALADIN) >= 4)
+		# first spells at level: 8 (bg1), 6 (iwd), 4 (iwd2)
+		# we could look it up in the tables instead
+		sum = sum + int(GemRB.GetPlayerLevel(pc, ISRANGER) >= 4)
+		return sum > 0
+
+	SetItemText (btn, 0, False)
+
+	########################################################################
+	# big main switch
+	if action == ACT_INNATE:
+		if GameCheck.IsIWD2 ():
+			spellType = (1 << IE_IWD2_SPELL_INNATE) | (1 << IE_IWD2_SPELL_SHAPE)
+		else:
+			spellType = 1 << IE_SPELL_TYPE_INNATE
+
+		if len(GemRB.GetSpelldata (pc, spellType)) == 0:
+			state = IE_GUI_BUTTON_DISABLED
+	elif action == ACT_CAST:
+		# luckily the castable spells in IWD2 are all bits below INNATE, so we can do this trick
+		if GameCheck.IsIWD2 ():
+			spellType = (1 << IE_IWD2_SPELL_INNATE) - 1
+		else:
+			spellType = (1 << IE_SPELL_TYPE_INNATE) - 1
+
+		# returns true if there are ANY spells to cast
+		if len(GemRB.GetSpelldata (pc, spellType)) == 0 or not HasAnyActiveCasterLevel (pc):
+			state = IE_GUI_BUTTON_DISABLED
+	elif action in [ACT_BARD, ACT_CLERIC, ACT_DRUID, ACT_PALADIN, ACT_RANGER, ACT_SORCERER, ACT_WIZARD, ACT_DOMAIN]:
+		if GameCheck.IsIWD2 ():
+			spellType = 1 << (action - ACT_BARD)
+		else:
+			# only cleric or wizard switch exists in the bg engine
+			if action == ACT_WIZARD:
+				spellType = 1 << IE_SPELL_TYPE_WIZARD
+			else:
+				spellType = 1 << IE_SPELL_TYPE_PRIEST
+
+		# returns true if there is ANY spell
+		if len(GemRB.GetSpelldata (pc, spellType)) == 0:
+			state = IE_GUI_BUTTON_DISABLED
+	elif action == ACT_WILDSHAPE or action == ACT_SHAPE:
+		if GameCheck.IsIWD2 ():
+			spellType = 1 << IE_IWD2_SPELL_SHAPE
+		else:
+			spellType = 0 # no separate shapes in old spellbook
+
+		# returns true if there is ANY shape
+		if len(GemRB.GetSpelldata (pc, spellType)) == 0:
+			state = IE_GUI_BUTTON_DISABLED
+	elif action == ACT_USE:
+		# returns true if there is ANY equipment with a usable header
+		if not invInfo["HasEquippedAbilities"]:
+			state = IE_GUI_BUTTON_DISABLED
+	elif action == ACT_BARDSONG:
+		if GameCheck.IsIWD2 ():
+			spellType = 1 << IE_IWD2_SPELL_SONG
+			if not GemRB.GetKnownSpellsCount (pc, spellType):
+				state = IE_GUI_BUTTON_DISABLED
+			elif modalState == MS_BATTLESONG:
+				state = IE_GUI_BUTTON_SELECTED
+		elif modalState == MS_BATTLESONG:
+			state = IE_GUI_BUTTON_SELECTED
+	elif action == ACT_TURN:
+		if GemRB.GetPlayerStat (pc, IE_TURNUNDEADLEVEL) < 1:
+			state = IE_GUI_BUTTON_DISABLED
+		elif modalState == MS_TURNUNDEAD:
+			state = IE_GUI_BUTTON_SELECTED
+	elif action == ACT_STEALTH:
+		if not CanUseActionButton(pc, action):
+			state = IE_GUI_BUTTON_DISABLED
+		elif modalState == MS_STEALTH:
+			state = IE_GUI_BUTTON_SELECTED
+	elif action == ACT_SEARCH:
+		# in IWD2 everyone can try to search, in bg2 only thieves get the icon
+		if not CanUseActionButton(pc, action):
+			state = IE_GUI_BUTTON_DISABLED
+		elif modalState == MS_DETECTTRAPS:
+			state = IE_GUI_BUTTON_SELECTED
+	elif action == ACT_THIEVING:
+		if not CanUseActionButton(pc, action):
+			state = IE_GUI_BUTTON_DISABLED
+	elif action == ACT_TAMING:
+		if GemRB.GetPlayerStat (pc, IE_ANIMALS) <= 0:
+			state = IE_GUI_BUTTON_DISABLED
+	elif action in [ACT_WEAPON1, ACT_WEAPON2, ACT_WEAPON3, ACT_WEAPON4]:
+		btn.SetBAM ("stonweap", 0, 0)
+		if magicSlot == None:
+			if pcStats:
+				slot = pcStats["QuickWeaponSlots"][action - ACT_WEAPON1]
+			else:
+				slot = weaponSlot + (action - ACT_WEAPON1)
+		else:
+			slot = magicSlot
+
+		item2ResRef = ""
+		skip = False
+		if slot == 0xffff:
+			skip = True
+		if not skip:
+			item = GemRB.GetSlotItem (pc, slot, 1)
+			if item:
+				# no slot translation required
+				launcherSlot = item["LauncherSlot"]
+				if launcherSlot and launcherSlot != fistSlot:
+					# launcher/projectile in this slot
+					item2 = GemRB.GetSlotItem (pc, launcherSlot, 1)
+					item2ResRef = item2["ItemResRef"]
+			else:
+				skip = True
+		if not skip:
+			if slot == fistSlot:
+				if fistDrawn:
+					fistDrawn = False
+				else:
+					# empty weapon slot, already drawn
+					skip = True
+
+		if not skip:
+			btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1, item2ResRef)
+			if pcStats:
+				SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][action - ACT_WEAPON1])], True)
+			else:
+				SetItemText (btn, 0, True)
+			if usedslot == slot:
+				btn.EnableBorder (0, True)
+				if GemRB.GameControlGetTargetMode () == TARGET_MODE_ATTACK:
+					state = IE_GUI_BUTTON_SELECTED
+				else:
+					state = IE_GUI_BUTTON_FAKEDISABLED
+			else:
+				btn.EnableBorder (0, False)
+	elif action == ACT_IWDQSPELL:
+		btn.SetBAM ("stonspel", 0, 0)
+		if GameCheck.IsIWD2 () and i > 3:
+			tmp = i - 3
+		else:
+			tmp = 0
+		state = SetQSpellBtn (btn, pc, tmp)
+	elif action == ACT_IWDQSONG:
+		btn.SetBAM ("stonsong", 0, 0)
+		if GameCheck.IsIWD2 () and i > 3:
+			tmp = i - 3
+		else:
+			tmp = 0
+		state = SetQSpellBtn (btn, pc, tmp)
+	elif action == ACT_IWDQSPEC:
+		btn.SetBAM ("stonspec", 0, 0)
+		if GameCheck.IsIWD2 () and i > 3:
+			tmp = i - 3
+		else:
+			tmp = 0
+		state = SetQSpellBtn (btn, pc, tmp)
+	elif action in [ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3]:
+		btn.SetBAM ("stonspel", 0, 0)
+		tmp = action - ACT_QSPELL1
+		state = SetQSpellBtn (btn, pc, tmp)
+	elif action == ACT_IWDQITEM:
+		if i > 3:
+			tmp = (i + 1) % 3
+		else:
+			tmp = 0
+		state = SetQSlotBtn (btn, pc, tmp, action)
+	elif action == ACT_QSLOT1:
+		tmp = 0
+		state = SetQSlotBtn (btn, pc, tmp, action)
+	elif action == ACT_QSLOT2:
+		tmp = 1
+		state = SetQSlotBtn (btn, pc, tmp, action)
+	elif action == ACT_QSLOT3:
+		tmp = 2
+		state = SetQSlotBtn (btn, pc, tmp, action)
+	elif action == ACT_QSLOT4:
+		tmp = 3
+		state = SetQSlotBtn (btn, pc, tmp, action)
+	elif action == ACT_QSLOT5:
+		tmp = 4
+		state = SetQSlotBtn (btn, pc, tmp, action)
+
+	return state

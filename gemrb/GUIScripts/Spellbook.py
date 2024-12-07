@@ -156,6 +156,10 @@ def GetMemorizedSpells(actor, BookType, level):
 	return memoSpells
 
 # direct access to the spellinfo struct
+def HasSpellinfoSpell(pc, resRef):
+	spellResRefs = GemRB.GetSpelldata (pc)
+	return resRef in spellResRefs
+
 # SpellIndex is the index of the spell in the struct, but we add a thousandfold of the spell type for later use in SpellPressed
 def GetSpellinfoSpells(actor, BookType):
 	memorizedSpells = []
