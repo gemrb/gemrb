@@ -1451,6 +1451,7 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
 	static const char prefixes[2][4] = { "sf2", "sf1" };
 	int flip = RandomFlip();
 
+retry:
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
@@ -1500,8 +1501,9 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
 				}
 			}
 
-			Prefix = "stc";
-			break;
+			// nothing was found, try with IE_ANI_READY
+			StanceID = MaybeOverrideStance(IE_ANI_READY);
+			goto retry;
 		case IE_ANI_PST_START:
 			Cycle = 0;
 			Prefix = "ms1";
