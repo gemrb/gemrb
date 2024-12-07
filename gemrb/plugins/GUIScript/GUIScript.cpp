@@ -8206,7 +8206,7 @@ PyDoc_STRVAR(GemRB_CheckSpecialSpell__doc,
 **Description:** Checks if an actor's spell is considered special (splspec.2da).\n\
 \n\
 **Parameters:**\n\
-  * globalID - global ID of the actor to use\n\
+  * globalID - global or party ID of the actor to use\n\
   * SpellResRef - spell resource to check\n\
 \n\
 **Return value:** bitfield\n\
@@ -8222,11 +8222,7 @@ static PyObject* GemRB_CheckSpecialSpell(PyObject* /*self*/, PyObject* args)
 	PyObject* SpellResRef = nullptr;
 	PARSE_ARGS(args, "iO", &globalID, &SpellResRef);
 	GET_GAME();
-
-	const Actor* actor = game->GetActorByGlobalID(globalID);
-	if (!actor) {
-		return RuntimeError("Actor not found!\n");
-	}
+	GET_ACTOR_GLOBAL();
 
 	int ret = gamedata->CheckSpecialSpell(ResRefFromPy(SpellResRef), actor);
 	return PyLong_FromLong(ret);
