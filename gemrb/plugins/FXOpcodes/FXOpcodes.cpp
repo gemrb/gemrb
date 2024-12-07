@@ -5269,7 +5269,9 @@ int fx_damage_animation(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_add_innate(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_add_innate(%2d): Resource: %s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
-	target->LearnSpell(fx->Resource, fx->Parameter2 | LS_MEMO);
+	int bookType = 1 << IE_SPELL_TYPE_INNATE;
+	if (target->spellbook.IsIWDSpellBook()) bookType = 1 << IE_IWD2_SPELL_INNATE;
+	target->LearnSpell(fx->Resource, fx->Parameter2 | LS_MEMO, bookType);
 	//this is an instant, so it shouldn't stick
 	return FX_NOT_APPLIED;
 }
