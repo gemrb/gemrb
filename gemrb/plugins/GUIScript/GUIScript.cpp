@@ -5333,6 +5333,61 @@ static PyObject* GemRB_GetPlayerStates(PyObject* /*self*/, PyObject* args)
 	return PyByteArray_FromStringAndSize(stats.c_str(), stats.length());
 }
 
+PyDoc_STRVAR(GemRB_GetPlayerActionRow__doc,
+	     "===== GetPlayerActionRow =====\n\
+\n\
+**Prototype:** GemRB.GetPlayerActionRow (globalID)\n\
+\n\
+**Description:** Returns the actor's action bar\n\
+\n\
+**Parameters:**\n\
+  * globalID - the PC's position in the party (1 based)\n\
+\n\
+**Return value:** tuple with individual action button data\n");
+
+static PyObject* GemRB_GetPlayerActionRow(PyObject* /*self*/, PyObject* args)
+{
+	int globalID;
+
+	PARSE_ARGS(args, "i", &globalID);
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	ActionButtonRow myRow;
+	actor->GetActionButtonRow(myRow);
+
+	PyObject* bar = PyTuple_New(GUIBT_COUNT);
+	for (int i = 0; i < GUIBT_COUNT; i++) {
+		PyTuple_SetItem(bar, i, PyLong_FromLong(myRow[i]));
+	}
+	return bar;
+}
+
+PyDoc_STRVAR(GemRB_GetPlayerLevel__doc,
+	     "===== GetPlayerLevel =====\n\
+\n\
+**Prototype:** GemRB.GetPlayerLevel (globalID, class)\n\
+\n\
+**Description:** Returns the actor's level in the specified class. Takes\n\
+dual-classing into account (inactive duals).\n\
+\n\
+**Parameters:**\n\
+  * globalID - the PC's position in the party (1 based)\n\
+  * class - which level to query, see ie_stats.py\n\
+\n\
+**Return value:** number\n");
+
+static PyObject* GemRB_GetPlayerLevel(PyObject* /*self*/, PyObject* args)
+{
+	int globalID;
+	int classis;
+
+	PARSE_ARGS(args, "ii", &globalID, &classis);
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+	return PyLong_FromLong(actor->GetClassLevel(classis));
+}
+
 PyDoc_STRVAR(GemRB_GetPlayerName__doc,
 	     "===== GetPlayerName =====\n\
 \n\
@@ -5668,6 +5723,32 @@ static PyObject* GemRB_GetPCStats(PyObject* /*self*/, PyObject* args)
 	} else {
 		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyLong_FromLong, -1));
 	}
+
+	// fill it also with the quickslot info
+	PyObject* qss = PyTuple_New(MAX_QSLOTS);
+	PyObject* qsb = PyTuple_New(MAX_QSLOTS);
+	PyObject* qis = PyTuple_New(MAX_QUICKITEMSLOT);
+	PyObject* qih = PyTuple_New(MAX_QUICKITEMSLOT);
+	PyObject* qws = PyTuple_New(MAX_QUICKWEAPONSLOT);
+	PyObject* qwh = PyTuple_New(MAX_QUICKWEAPONSLOT);
+	for (int i = 0; i < MAX_QSLOTS; i++) {
+		PyTuple_SetItem(qss, i, PyString_FromResRef(ps->QuickSpells[i]));
+		PyTuple_SetItem(qsb, i, PyLong_FromLong(ps->QuickSpellBookType[i]));
+	}
+	for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
+		PyTuple_SetItem(qis, i, PyLong_FromLong(ps->QuickItemSlots[i]));
+		PyTuple_SetItem(qih, i, PyLong_FromLong(ps->QuickItemHeaders[i]));
+	}
+	for (int i = 0; i < MAX_QUICKWEAPONSLOT; i++) {
+		PyTuple_SetItem(qws, i, PyLong_FromLong(ps->QuickWeaponSlots[i]));
+		PyTuple_SetItem(qwh, i, PyLong_FromLong(ps->QuickWeaponHeaders[i]));
+	}
+	PyDict_SetItemString(dict, "QuickSpells", qss);
+	PyDict_SetItemString(dict, "QuickSpellsBookType", qsb);
+	PyDict_SetItemString(dict, "QuickItemSlots", qis);
+	PyDict_SetItemString(dict, "QuickItemHeaders", qih);
+	PyDict_SetItemString(dict, "QuickWeaponSlots", qws);
+	PyDict_SetItemString(dict, "QuickWeaponHeaders", qwh);
 
 	return dict;
 }
@@ -8566,6 +8647,49 @@ static PyObject* GemRB_UnmemorizeSpell(PyObject* /*self*/, PyObject* args)
 		return PyLong_FromLong(actor->spellbook.UnmemorizeSpell(ms));
 }
 
+PyDoc_STRVAR(GemRB_GetInventoryInfo__doc,
+	     "===== GetInventoryInfo =====\n\
+\n\
+**Prototype:** GemRB.GetInventoryInfo (globalID)\n\
+\n\
+**Description:** Returns several details about current slots in the specified actor's inventory\n\
+\n\
+**Parameters:**\n\
+  * globalID - the actor's global ID or the PC's position in the party\n\
+\n\
+**Return value:** dictionary\n\
+  * 'FistSlot'\n\
+  * 'MagicSlot' - The magic slot if a magic weapon was spawned, None othewise.\n\
+  * 'WeaponSlot' - The first melee slot.\n\
+  * 'UsedSlot' - The equipped slot, the fist slot if nothing is equipped.\n\
+  * 'HasEquippedAbilities' - Whether any inventory item is granting a usable ability\n\
+\n\
+**See also:** [GetSlotItem](GetSlotItem.md), [GetItem](GetItem.md)");
+
+static PyObject* GemRB_GetInventoryInfo(PyObject* /*self*/, PyObject* args)
+{
+	int globalID;
+	PARSE_ARGS(args, "i", &globalID);
+
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	PyObject* dict = PyDict_New();
+	int magicSlot = Inventory::GetMagicSlot();
+	if (actor->inventory.IsSlotEmpty(magicSlot)) {
+		Py_INCREF(Py_None);
+		PyDict_SetItemString(dict, "MagicSlot", Py_None);
+	} else {
+		PyDict_SetItemString(dict, "MagicSlot", PyLong_FromLong(magicSlot));
+	}
+	PyDict_SetItemString(dict, "FistSlot", PyLong_FromLong(Inventory::GetFistSlot()));
+	PyDict_SetItemString(dict, "WeaponSlot", PyLong_FromLong(Inventory::GetWeaponSlot()));
+	PyDict_SetItemString(dict, "UsedSlot", PyLong_FromLong(actor->inventory.GetEquippedSlot()));
+	std::vector<ItemExtHeader> itemData;
+	PyDict_SetItemString(dict, "HasEquippedAbilities", PyBool_FromLong(actor->inventory.GetEquipmentInfo(itemData, 0, 0)));
+	return dict;
+}
+
 PyDoc_STRVAR(GemRB_GetSlotItem__doc,
 	     "===== GetSlotItem =====\n\
 \n\
@@ -8597,6 +8721,7 @@ the slot will not be looked up again.\n\
   * 'Header'  - Item's extended header assigned to the inventory slot (the\n\
   ability to use). Only applicable to quickslots.\n\
   * 'Slot'  - The same as the slot parameter.\n\
+  * 'LauncherSlot' - The slot of the launcher, if any, 0 otherwise.\n\
 \n\
 **See also:** [GetItem](GetItem.md), [Button_SetItemIcon](Button_SetItemIcon.md), [ChangeItemFlag](ChangeItemFlag.md)");
 
@@ -8609,6 +8734,7 @@ static PyObject* GemRB_GetSlotItem(PyObject* /*self*/, PyObject* args)
 	const CREItem* si;
 	int header = -1;
 
+	int launcherSlot = 0;
 	if (globalID == 0) {
 		si = core->GetDraggedItem()->item;
 	} else {
@@ -8618,6 +8744,10 @@ static PyObject* GemRB_GetSlotItem(PyObject* /*self*/, PyObject* args)
 		auto slot = translated ? idx : core->QuerySlot(idx);
 		header = actor->PCStats->GetHeaderForSlot(slot);
 		si = actor->inventory.GetSlotItem(slot);
+		launcherSlot = actor->inventory.FindSlotRangedWeapon(slot);
+		if (launcherSlot == actor->inventory.GetFistSlot()) {
+			launcherSlot = 0;
+		}
 	}
 	if (!si) {
 		Py_RETURN_NONE;
@@ -8630,7 +8760,7 @@ static PyObject* GemRB_GetSlotItem(PyObject* /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Flags", PyLong_FromLong(si->Flags));
 	PyDict_SetItemString(dict, "Header", PyLong_FromLong(header));
 	PyDict_SetItemString(dict, "Slot", PyLong_FromLong(idx));
-
+	PyDict_SetItemString(dict, "LauncherSlot", PyLong_FromLong(launcherSlot));
 	return dict;
 }
 
@@ -11141,6 +11271,32 @@ static PyObject* GemRB_GetEquippedAmmunition(PyObject* /*self*/, PyObject* args)
 	}
 }
 
+PyDoc_STRVAR(GemRB_GetModalState__doc,
+	     "===== GetModalState =====\n\
+\n\
+**Prototype:** GemRB.GetModalState (globalID)\n\
+\n\
+**Description:** Gets an actor's modal state. The modal states are listed \n\
+in ie_modal.py.\n\
+\n\
+**Parameters:**\n\
+  * globalID - party ID or global ID of the actor to use\n\
+\n\
+**Return value:** state number\n\
+\n\
+**See also:** [SetModalState](SetModalState.md)\n\
+");
+
+static PyObject* GemRB_GetModalState(PyObject* /*self*/, PyObject* args)
+{
+	int globalID;
+	PARSE_ARGS(args, "i", &globalID);
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	return PyLong_FromLong(UnderType(actor->Modal.State));
+}
+
 PyDoc_STRVAR(GemRB_SetModalState__doc,
 	     "===== SetModalState =====\n\
 \n\
@@ -12937,6 +13093,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetGameTime, METH_NOARGS),
 	METHOD(GetGameVar, METH_VARARGS),
 	METHOD(GetGUIFlags, METH_VARARGS),
+	METHOD(GetInventoryInfo, METH_VARARGS),
 	METHOD(GetINIBeastsKey, METH_VARARGS),
 	METHOD(GetINIPartyCount, METH_NOARGS),
 	METHOD(GetINIPartyKey, METH_VARARGS),
@@ -12954,9 +13111,12 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetMemorizedSpellsCount, METH_VARARGS),
 	METHOD(GetMultiClassPenalty, METH_VARARGS),
 	METHOD(ConsoleWindowLog, METH_VARARGS),
+	METHOD(GetModalState, METH_VARARGS),
 	METHOD(GetPartySize, METH_NOARGS),
 	METHOD(GetPCStats, METH_VARARGS),
+	METHOD(GetPlayerActionRow, METH_VARARGS),
 	METHOD(GetPlayerName, METH_VARARGS),
+	METHOD(GetPlayerLevel, METH_VARARGS),
 	METHOD(GetPlayerPortrait, METH_VARARGS),
 	METHOD(GetPlayerStat, METH_VARARGS),
 	METHOD(GetPlayerStates, METH_VARARGS),

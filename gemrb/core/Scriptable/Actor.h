@@ -205,6 +205,7 @@ enum class Difficulty {
 #define PROFS_MASK 0x07
 
 //locations of classes in the isclass/levelslots arrays
+// !!! Keep these synchronized with ie_stats.py !!!
 #define ISFIGHTER   0
 #define ISMAGE      1
 #define ISTHIEF     2
@@ -579,8 +580,6 @@ private:
 	void CreateDerivedStatsBG();
 	/* Set up all the missing stats on load time, or after level up */
 	void CreateDerivedStatsIWD2();
-	/* Gets the given ISCLASS level */
-	ieDword GetClassLevel(ieDword isClass) const;
 	/* Returns true if the dual class is backwards */
 	bool IsDualSwap() const;
 	/* returns the weapon proficiency stat of the actor */
@@ -695,6 +694,8 @@ public:
 	ResRef GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */
 	ieDword GetXPLevel(int modified) const;
+	/* Gets the given ISCLASS level */
+	ieDword GetClassLevel(ieDword isClass) const;
 	/** Guesses the (base) casting level */
 	ieDword GetCasterLevel(int spelltype);
 	ieDword GetBaseCasterLevel(int spelltype, int flags = 0) const;

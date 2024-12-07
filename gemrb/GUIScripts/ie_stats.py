@@ -380,4 +380,20 @@ IE_ARTERIAL_STRIKE              = 0x1005
 IE_HAMSTRING                    = 0x1006
 IE_RAPID_SHOT                   = 0x1007
 
+# internal class indices
+# Keep these synchronized with Actor.h
+ISFIGHTER = 0
+ISMAGE = 1
+ISTHIEF = 2
+ISBARBARIAN = 3
+ISBARD = 4
+ISCLERIC = 5
+ISDRUID = 6
+ISMONK = 7
+ISPALADIN = 8
+ISRANGER = 9
+ISSORCERER = 10
+ISCLASS12 = 11
+ISCLASS13 = 12
+
 # End of file ie_stats.py
