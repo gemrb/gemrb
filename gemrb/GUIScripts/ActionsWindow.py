@@ -366,7 +366,7 @@ def UpdateActionsWindow ():
 	# all but bg2 summons all use the group actionbar!
 	# bg2 has a different common format and exceptions for illusions/clones
 	level = GemRB.GetVar ("ActionLevel")
-	if GemRB.GetPlayerStat (pc, IE_EA) != 2: # EA_PC
+	if GemRB.GetPlayerStat (pc, IE_EA) >= CONTROLLED:
 		if GameCheck.IsBG2 ():
 			if level == UAW_STANDARD and GemRB.GetPlayerStat (pc, IE_SEX) != 7:
 				level = UAW_BG2SUMMONS
