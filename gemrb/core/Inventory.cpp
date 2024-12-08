@@ -933,6 +933,7 @@ bool Inventory::EquipItem(ieDword slot)
 		case SLOT_EFFECT_FIST:
 			if (Equipped != IW_NO_EQUIPPED || EquippedHeader != 0) {
 				SetEquippedSlot(IW_NO_EQUIPPED, 0);
+				effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			} else {
 				gamedata->FreeItem(itm, item->ItemResRef, false);
 				return false;
@@ -994,6 +995,7 @@ bool Inventory::EquipItem(ieDword slot)
 
 			weaponslot -= SLOT_MELEE;
 			SetEquippedSlot((ieWordSigned) (slot - SLOT_MELEE), newHeader);
+			effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			// it is unsure if we can have multiple equipping headers for bows/arrow
 			// it is unclear which item's header index should go there
 			Owner->SetupQuickSlot(ACT_WEAPON1 + weaponslot, slot, 0);
