@@ -1781,7 +1781,6 @@ bool Inventory::EquipBestWeapon(int flags)
 	}
 
 	bool equipped = EquipItem(bestSlot);
-	UpdateWeaponAnimation();
 	return equipped;
 }
 
