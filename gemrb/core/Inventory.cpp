@@ -1858,7 +1858,11 @@ void Inventory::UpdateShieldAnimation(const Item* it)
 			WeaponType = IE_ANI_WEAPON_1H;
 		}
 	}
-	Owner->SetUsedShield(AnimationType, WeaponType);
+
+	const CharAnimations* anims = Owner->GetAnims();
+	if (AnimationType != Owner->ShieldRef || (anims && anims->WeaponType != WeaponType)) {
+		Owner->SetUsedShield(AnimationType, WeaponType);
+	}
 }
 
 void Inventory::UpdateWeaponAnimation()
