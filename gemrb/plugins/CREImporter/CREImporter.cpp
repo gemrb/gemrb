@@ -1396,8 +1396,9 @@ void CREImporter::GetIWD2Spellpage(Actor* act, ieIWD2SpellType type, int level, 
 		str->Seek(4, GEM_CURRENT_POS);
 		const ResRef& tmp = ResolveSpellIndex(spellindex, level, type, act->BaseStats[IE_KIT]);
 		if (tmp.IsEmpty()) {
-			error("CREImporter", "Unresolved spell index: {} level:{}, type: {}",
-			      spellindex, level + 1, type);
+			Log(ERROR, "CREImporter", "Unresolved spell index: {} level:{}, type: {}",
+			    spellindex, level + 1, type);
+			continue;
 		}
 
 		CREKnownSpell* known = new CREKnownSpell;
