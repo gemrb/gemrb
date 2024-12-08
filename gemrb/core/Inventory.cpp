@@ -1853,6 +1853,11 @@ void Inventory::UpdateShieldAnimation(const Item* it)
 			WeaponType = IE_ANI_WEAPON_2W;
 		}
 	}
+	if (AnimationType[0] == ' ' || AnimationType[0] == 0) {
+		if (WeaponType == IE_ANI_WEAPON_2W) {
+			WeaponType = IE_ANI_WEAPON_1H;
+		}
+	}
 	Owner->SetUsedShield(AnimationType, WeaponType);
 }
 

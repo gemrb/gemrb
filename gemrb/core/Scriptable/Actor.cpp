@@ -9851,15 +9851,8 @@ void Actor::SetUsedWeapon(AnimRef AnimationType, const std::array<ieWord, 3>& me
 void Actor::SetUsedShield(AnimRef AnimationType, unsigned char wt)
 {
 	ShieldRef = AnimationType;
-	if (AnimationType[0] == ' ' || AnimationType[0] == 0) {
-		if (wt == IE_ANI_WEAPON_2W) {
-			wt = IE_ANI_WEAPON_1H;
-		}
-	}
 
-	if (!anims)
-		return;
-
+	if (!anims) return;
 	anims->SetOffhandRef(AnimationType);
 	anims->SetWeaponType(wt);
 	ClearCurrentStanceAnims();
