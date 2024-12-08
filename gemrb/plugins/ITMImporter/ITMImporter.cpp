@@ -130,6 +130,7 @@ static void AddZZFeatures(Item* s)
 		Effect* fx = EffectQueue::CreateEffect(zzRefs[i], IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
 		fx->Parameter3 = static_cast<ieDword>(bonus);
 		fx->SourceRef = s->Name;
+		fx->SourceType = 1;
 		s->equipping_features.push_back(fx);
 	}
 }
@@ -359,6 +360,7 @@ Effect* ITMImporter::GetFeature(const Item* s)
 	eM->Open(str, false);
 	Effect* fx = eM->GetEffect();
 	fx->SourceRef = s->Name;
+	fx->SourceType = 1;
 	return fx;
 }
 

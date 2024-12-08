@@ -240,6 +240,7 @@ Effect* SPLImporter::GetFeature(const Spell* s)
 	eM->Open(str, false);
 	Effect* fx = eM->GetEffect();
 	fx->SourceRef = s->Name;
+	fx->SourceType = 2;
 	fx->PrimaryType = s->PrimaryType;
 	fx->SecondaryType = s->SecondaryType;
 	return fx;

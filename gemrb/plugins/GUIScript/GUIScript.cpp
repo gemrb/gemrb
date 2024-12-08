@@ -11578,6 +11578,7 @@ static PyObject* GemRB_ApplyEffect(PyObject* /*self*/, PyObject* args)
 	fx->Resource2 = ResRefFromPy(resref2);
 	fx->Resource3 = ResRefFromPy(resref3);
 	fx->SourceRef = ResRefFromPy(source);
+	// fx->SourceType is probably useless here, so we leave it unset
 	//This is a hack...
 	fx->Parameter3 = 1;
 
