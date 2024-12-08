@@ -7239,7 +7239,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		spdfactor = Clamp(spdfactor + LuckyRoll(1, 6, -4, LR_NEGATIVE), 0, 10);
 
 		//(round_size/attacks_per_round)*(initiative) is the first delta
-		Timers.nextAttack = core->Time.round_size * spdfactor / (attacksperround * 10) + gameTime;
+		Timers.nextAttack = core->Time.attack_round_size * spdfactor / (attacksperround * 10) + gameTime;
 
 		//we can still attack this round if we have a speed factor of 0
 		if (Timers.nextAttack > gameTime) {
