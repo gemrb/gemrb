@@ -925,32 +925,40 @@ bool Inventory::EquipItem(ieDword slot)
 		return false;
 	}
 
-	Owner->ClearCurrentStanceAnims();
-
 	int armorLevel = itm->AnimationType[0] - '1';
 	int weaponslot;
 	ieDword equip = IW_NO_EQUIPPED;
+	ieWord newHeader;
 	switch (effect) {
 		case SLOT_EFFECT_FIST:
-			SetEquippedSlot(IW_NO_EQUIPPED, 0);
+			if (Equipped != IW_NO_EQUIPPED || EquippedHeader != 0) {
+				SetEquippedSlot(IW_NO_EQUIPPED, 0);
+			} else {
+				gamedata->FreeItem(itm, item->ItemResRef, false);
+				return false;
+			}
 			break;
 		case SLOT_EFFECT_LEFT:
 			//no idea if the offhand weapon has style, or simply the right
 			//hand style is dominant
-			CacheAllWeaponInfo();
-			UpdateShieldAnimation(itm);
+			if (UpdateShieldAnimation(itm)) {
+				CacheAllWeaponInfo();
+			} else {
+				gamedata->FreeItem(itm, item->ItemResRef, false);
+				return false;
+			}
 			break;
 		case SLOT_EFFECT_MELEE:
 			//if weapon is bow, then find quarrel for it and equip that
 			weaponslot = GetWeaponQuickSlot(slot);
-			EquippedHeader = 0;
+			newHeader = 0;
 			if (Owner->PCStats) {
 				int eheader = Owner->PCStats->GetHeaderForSlot(slot);
 				if (eheader >= 0) {
-					EquippedHeader = eheader;
+					newHeader = eheader;
 				}
 			}
-			header = itm->GetExtHeader(EquippedHeader);
+			header = itm->GetExtHeader(newHeader);
 			if (!header) return false; // in case of broken saves
 			if (header->AttackType == ITEM_AT_BOW || (header->AttackType == ITEM_AT_PROJECTILE && !header->Charges)) {
 				// find the ranged projectile associated with it, this returns equipped code
@@ -963,36 +971,55 @@ bool Inventory::EquipItem(ieDword slot)
 				equip = weaponslot;
 				slot = GetWeaponSlot(weaponslot);
 			}
-			if (equip != IW_NO_EQUIPPED) {
-				Owner->SetupQuickSlot(ACT_WEAPON1 + weaponslot, slot, EquippedHeader);
+			if (ieWordSigned(equip) == Equipped && newHeader == EquippedHeader) {
+				gamedata->FreeItem(itm, item->ItemResRef, false);
+				return false;
 			}
-			SetEquippedSlot(equip, EquippedHeader);
+			if (equip != IW_NO_EQUIPPED) {
+				Owner->SetupQuickSlot(ACT_WEAPON1 + weaponslot, slot, newHeader);
+			}
+			SetEquippedSlot(equip, newHeader);
 			effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			break;
 		case SLOT_EFFECT_MISSILE:
 			//Get the ranged header of the projectile (so we theoretically allow shooting of daggers)
-			EquippedHeader = itm->GetWeaponHeaderNumber(true);
-			header = itm->GetExtHeader(EquippedHeader);
+			newHeader = itm->GetWeaponHeaderNumber(true);
+			header = itm->GetExtHeader(newHeader);
 			if (!header) return false; // in case of broken saves
 			weaponslot = FindTypedRangedWeapon(header->ProjectileQualifier);
-			if (weaponslot != SLOT_FIST) {
-				weaponslot -= SLOT_MELEE;
-				SetEquippedSlot((ieWordSigned) (slot - SLOT_MELEE), EquippedHeader);
-				// it is unsure if we can have multiple equipping headers for bows/arrow
-				// it is unclear which item's header index should go there
-				Owner->SetupQuickSlot(ACT_WEAPON1 + weaponslot, slot, 0);
+			if (weaponslot == SLOT_FIST || (Equipped == ieWordSigned(slot - SLOT_MELEE) && EquippedHeader == newHeader)) {
+				gamedata->FreeItem(itm, item->ItemResRef, false);
+				return false;
 			}
-			UpdateWeaponAnimation();
+
+			weaponslot -= SLOT_MELEE;
+			SetEquippedSlot((ieWordSigned) (slot - SLOT_MELEE), newHeader);
+			// it is unsure if we can have multiple equipping headers for bows/arrow
+			// it is unclear which item's header index should go there
+			Owner->SetupQuickSlot(ACT_WEAPON1 + weaponslot, slot, 0);
 			break;
 		case SLOT_EFFECT_HEAD:
-			Owner->SetUsedHelmet(itm->AnimationType);
+			if (itm->AnimationType == Owner->HelmetRef) {
+				gamedata->FreeItem(itm, item->ItemResRef, false);
+				return false;
+			} else {
+				Owner->SetUsedHelmet(itm->AnimationType);
+			}
 			break;
 		case SLOT_EFFECT_ITEM:
 			//adjusting armour level if needed
 			if (armorLevel >= IE_ANI_NO_ARMOR && armorLevel <= IE_ANI_HEAVY_ARMOR) {
+				if (Owner->GetBase(IE_ARMOR_TYPE) == ieDword(armorLevel)) {
+					gamedata->FreeItem(itm, item->ItemResRef, false);
+					return false;
+				}
 				Owner->SetBase(IE_ARMOR_TYPE, armorLevel);
+				Owner->ClearCurrentStanceAnims();
 			} else {
-				UpdateShieldAnimation(itm);
+				if (!UpdateShieldAnimation(itm)) {
+					gamedata->FreeItem(itm, item->ItemResRef, false);
+					return false;
+				}
 			}
 			break;
 		default: // none, SLOT_EFFECT_MAGIC (handled indirectly elsewhere) or alias
@@ -1842,7 +1869,7 @@ ieDword Inventory::GetEquipExclusion(int index) const
 	return ret;
 }
 
-void Inventory::UpdateShieldAnimation(const Item* it)
+bool Inventory::UpdateShieldAnimation(const Item* it)
 {
 	AnimRef AnimationType;
 	unsigned char WeaponType = IE_ANI_WEAPON_1H;
@@ -1862,7 +1889,9 @@ void Inventory::UpdateShieldAnimation(const Item* it)
 	const CharAnimations* anims = Owner->GetAnims();
 	if (AnimationType != Owner->ShieldRef || (anims && anims->WeaponType != WeaponType)) {
 		Owner->SetUsedShield(AnimationType, WeaponType);
+		return true;
 	}
+	return false;
 }
 
 void Inventory::UpdateWeaponAnimation()

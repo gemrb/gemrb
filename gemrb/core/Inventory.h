@@ -368,7 +368,7 @@ private:
 	void KillSlot(size_t index);
 	inline Item* GetItemPointer(ieDword slot, CREItem*& Slot) const;
 	void UpdateWeaponAnimation();
-	void UpdateShieldAnimation(const Item* it);
+	bool UpdateShieldAnimation(const Item* it);
 	void CacheWeaponInfo(bool leftOrRight) const;
 };
 
