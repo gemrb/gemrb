@@ -1098,7 +1098,7 @@ static int CheckSaves(Actor* actor, Effect* fx)
 		if (globals.iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
 			fx->Parameter1 = 0;
 			// Evades effects from <RESOURCE>~
-			if (fx->SourceRef.IsEmpty()) {
+			if (fx->SourceRef.IsEmpty() || fx->SourceType != 2) {
 				displaymsg->DisplayConstantStringName(HCStrings::Evaded2, GUIColors::WHITE, actor);
 			} else {
 				const Spell* spl = gamedata->GetSpell(fx->SourceRef, true);
