@@ -1813,27 +1813,15 @@ bool Game::CanPartyRest(RestChecks checks, ieStrRef* err) const
 	return true;
 }
 
-// checks: can anything prevent us from resting?
-// dream:
-//   -1: no dream
-//    0, 8+: dream based on area
-//    1-7: dream selected from a fixed list
-// hp: how much hp the rest will heal
-// returns true if a cutscene dream is about to be played
-bool Game::RestParty(RestChecks checks, int dream, int hp)
+// this is the internal core rest function for the party
+bool Game::RestPartyInternal(RestChecks checks, int hp, int& hours)
 {
-	if (!CanPartyRest(checks)) {
-		return false;
-	}
-
-	const Actor* leader = GetPC(0, true);
-	assert(leader);
-	// TODO: implement "rest until healed", it's an option in some games
-	int hours = 8;
 	int hoursLeft = 0;
+
 	if (checks & RestChecks::Area) {
-		//area encounters
+		// area encounters
 		// also advances gametime (so partial rest is possible)
+		const Actor* leader = GetPC(0, true);
 		Trigger parameters;
 		parameters.int0Parameter = 0; // TIMEOFDAY_DAY, with a slight preference for daytime interrupts
 		hoursLeft = area->CheckRestInterruptsAndPassTime(leader->Pos, hours, GameScript::TimeOfDay(nullptr, &parameters));
@@ -1854,23 +1842,22 @@ bool Game::RestParty(RestChecks checks, int dream, int hp)
 		AdvanceTime(hours * core->Time.hour_size);
 	}
 
+	bool needToRepeat = false;
 	int i = GetPartySize(true); // party size, only alive
-
 	while (i--) {
 		Actor* tar = GetPC(i, true);
 		tar->ClearPath();
 		tar->SetModal(Modal::None, false);
-		//if hp = 0, then healing will be complete
+		// if hp = 0, then healing will be complete
 		tar->Heal(hp);
 		// auto-cast memorized healing spells if requested and available
 		// run it only once, since it loops itself to save time
 		if (i + 1 == GetPartySize(true)) {
-			CastOnRest();
+			needToRepeat = CastOnRest();
 		}
-		//removes fatigue, recharges spells
+		// removes fatigue, recharges spells
 		tar->Rest(hours);
-		if (!hoursLeft)
-			tar->PartyRested();
+		if (!hoursLeft) tar->PartyRested();
 	}
 
 	// also let familiars rest
@@ -1887,6 +1874,42 @@ bool Game::RestParty(RestChecks checks, int dream, int hp)
 	// abort the partial rest; we got what we wanted
 	if (hoursLeft) {
 		return false;
+	}
+	return needToRepeat;
+}
+
+// checks: can anything prevent us from resting?
+// dream:
+//   -1: no dream
+//    0, 8+: dream based on area
+//    1-7: dream selected from a fixed list
+// hp: how much hp the rest will heal, 0 for full health
+// returns true if a cutscene dream is about to be played
+bool Game::RestParty(RestChecks checks, int dream, int hp)
+{
+	if (!CanPartyRest(checks)) {
+		return false;
+	}
+
+	ieDword allowRepeatedRests = core->GetDictionary().Get("Heal Party on Rest", 0);
+	bool interrupted = false;
+	int hours = 8;
+	interrupted = !RestPartyInternal(checks, hp, hours);
+	if (interrupted && hours != 8) return false; // true interrupt
+	if (hp == 0 || !allowRepeatedRests) {
+		// Healing spells cast on rest.
+		ieStrRef restedMsg = DisplayMessage::GetStringReference(HCStrings::HealingRest);
+		displaymsg->DisplayString(restedMsg, GUIColors::WHITE, STRING_FLAGS::NONE);
+	} else if (!interrupted) { // someone still needs healing
+		int hours2 = 8;
+		// skip further checks
+		while (RestPartyInternal(RestChecks::NoCheck, hp, hours2)) {
+			hours += 8;
+			hours2 = 8;
+		}
+		// Healing spells cast on rest until fully healed.
+		ieStrRef restedMsg = DisplayMessage::GetStringReference(HCStrings::HealingRestFull);
+		displaymsg->DisplayString(restedMsg, GUIColors::WHITE, STRING_FLAGS::NONE);
 	}
 
 	//movie, cutscene, and still frame dreams
@@ -1952,11 +1975,9 @@ bool Game::CastOnRest() const
 	using RestSpells = std::vector<HealingResource>;
 	using RestTargets = std::vector<Injured>;
 
-	ieDword tmp = core->GetDictionary().Get("Heal Party on Rest", 0);
-
 	const auto& special_spells = gamedata->GetSpecialSpells();
 	size_t specialCount = special_spells.size();
-	if (!tmp || !specialCount) {
+	if (!specialCount) {
 		return false;
 	}
 

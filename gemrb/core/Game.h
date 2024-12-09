@@ -520,6 +520,7 @@ public:
 
 private:
 	ResRef* GetDream(Map* area);
+	bool RestPartyInternal(RestChecks checks, int hp, int& hours);
 	bool CastOnRest() const;
 	void PlayerDream() const;
 	void TextDream();

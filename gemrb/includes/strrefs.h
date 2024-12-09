@@ -228,6 +228,8 @@ enum class HCStrings : TableMgr::index_t {
 	BackstabDouble,
 	Evaded1,
 	Evaded2,
+	HealingRest,
+	HealingRestFull,
 
 	count,
 };

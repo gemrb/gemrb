@@ -194,3 +194,5 @@ STR_TRAP_FOUND          36965               2
 STR_BACKSTAB_DOUBLE     19265     36644:36928
 EVADED1                    -1               0
 EVADED2                    -1               0
+HEALING_REST               -1               0
+HEALING_REST_FULL          -1               0
