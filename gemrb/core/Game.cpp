@@ -2027,7 +2027,7 @@ void Game::CastOnRest() const
 	while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
 		Injured& mostInjured = wholeparty.back();
 		HealingResource& mostHealing = healingspells.back();
-		mostHealing.caster->DirectlyCastSpell(mostInjured.character, mostHealing.resRef, 0, true, true);
+		core->ApplySpell(mostHealing.resRef, mostInjured.character, mostHealing.caster, mostHealing.caster->GetAnyActiveCasterLevel());
 		mostHealing.amount--;
 		mostInjured.hpneeded -= mostHealing.amounthealed;
 		std::sort(wholeparty.begin(), wholeparty.end());
