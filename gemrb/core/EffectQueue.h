@@ -270,7 +270,8 @@ public:
 	void RemoveAllNonPermanentEffects();
 	void RemoveAllDetrimentalEffects(EffectRef& effect_reference, ieDword current);
 	void RemoveAllEffectsWithParam(EffectRef& effect_reference, ieDword param2);
-	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
+	void RemoveAllEffectsWithParam1(EffectRef& effectReference, ieDword param1);
+	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param, bool param1 = false);
 	void RemoveAllEffectsWithResource(EffectRef& effect_reference, const ResRef& resource);
 	void RemoveAllEffectsWithParamAndResource(EffectRef& effect_reference, ieDword param2, const ResRef& resource);
 	void RemoveAllEffectsWithSource(EffectRef& effectReference, const ResRef& source, int mode);

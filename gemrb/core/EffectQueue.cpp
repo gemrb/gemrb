@@ -1632,12 +1632,16 @@ void EffectQueue::RemoveAllDetrimentalEffects(EffectRef& effect_reference, ieDwo
 //param2 is usually an effect's subclass (quality) while param1 is more like quantity.
 //So opcode+param2 usually pinpoints an effect better when not all effects of a given
 //opcode need to be removed (see removal of portrait icon)
-void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2)
+void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param, bool param1)
 {
 	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
-		MATCH_PARAM2()
+		if (param1) {
+			if (fx.Parameter1 != param) continue;
+		} else {
+			if (fx.Parameter2 != param) continue;
+		}
 
 		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
@@ -1648,6 +1652,12 @@ void EffectQueue::RemoveAllEffectsWithParam(EffectRef& effect_reference, ieDword
 {
 	Globals::ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithParam(effect_reference.opcode, param2);
+}
+
+void EffectQueue::RemoveAllEffectsWithParam1(EffectRef& effectReference, ieDword param1)
+{
+	Globals::ResolveEffectRef(effectReference);
+	RemoveAllEffectsWithParam(effectReference.opcode, param1, true);
 }
 
 //Removes all effects with a matching resource field
