@@ -520,7 +520,7 @@ public:
 
 private:
 	ResRef* GetDream(Map* area);
-	void CastOnRest() const;
+	bool CastOnRest() const;
 	void PlayerDream() const;
 	void TextDream();
 };

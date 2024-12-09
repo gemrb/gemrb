@@ -1947,7 +1947,7 @@ inline static int CastOnRestHealingAmount(const Actor* caster, const SpecialSpel
 }
 
 // heal on rest and similar
-void Game::CastOnRest() const
+bool Game::CastOnRest() const
 {
 	using RestSpells = std::vector<HealingResource>;
 	using RestTargets = std::vector<Injured>;
@@ -1957,7 +1957,7 @@ void Game::CastOnRest() const
 	const auto& special_spells = gamedata->GetSpecialSpells();
 	size_t specialCount = special_spells.size();
 	if (!tmp || !specialCount) {
-		return;
+		return false;
 	}
 
 	RestTargets wholeparty;
@@ -2051,6 +2051,16 @@ void Game::CastOnRest() const
 			spelltarget = 0;
 		}
 	}
+
+	bool anyoneStillHurt = false;
+	ps = ps2;
+	for (int idx = 1; idx <= ps; idx++) {
+		Actor* tar = FindPC(idx);
+		if (!tar) continue;
+		int hpNeeded = static_cast<int>(tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS));
+		if (hpNeeded) anyoneStillHurt = true;
+	}
+	return anyoneStillHurt;
 }
 
 //timestop effect
