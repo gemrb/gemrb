@@ -1891,11 +1891,14 @@ bool Game::RestParty(RestChecks checks, int dream, int hp)
 		return false;
 	}
 
+	// rest once
 	ieDword allowRepeatedRests = core->GetDictionary().Get("Heal Party on Rest", 0);
 	bool interrupted = false;
 	int hours = 8;
 	interrupted = !RestPartyInternal(checks, hp, hours);
 	if (interrupted && hours != 8) return false; // true interrupt
+
+	// rest again?
 	if (hp == 0 || !allowRepeatedRests) {
 		// Healing spells cast on rest.
 		ieStrRef restedMsg = DisplayMessage::GetStringReference(HCStrings::HealingRest);
@@ -1910,6 +1913,19 @@ bool Game::RestParty(RestChecks checks, int dream, int hp)
 		// Healing spells cast on rest until fully healed.
 		ieStrRef restedMsg = DisplayMessage::GetStringReference(HCStrings::HealingRestFull);
 		displaymsg->DisplayString(restedMsg, GUIColors::WHITE, STRING_FLAGS::NONE);
+	}
+
+	// temporarily silence "healed" messages to avoid spam from mass cure wounds
+	// the payload happens after the rest, so we need to delay further
+	static EffectRef fx_protection_from_display_string_ref = { "Protection:String", -1 };
+	int ps = GetPartySize(true);
+	for (int idx = 0; idx < ps; idx++) {
+		Actor* tar = GetPC(idx, true);
+		if (!tar) continue;
+		Effect* fx = EffectQueue::CreateEffect(fx_protection_from_display_string_ref, 14022, 0, FX_DURATION_INSTANT_LIMITED);
+		if (!fx) continue;
+		fx->Duration = core->Time.round_size + GameTime;
+		tar->fxqueue.AddEffect(fx);
 	}
 
 	//movie, cutscene, and still frame dreams
