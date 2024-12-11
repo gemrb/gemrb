@@ -756,7 +756,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Sparkle", fx_sparkle, 0, -1),
 	EffectDesc("SpellDurationModifier", fx_spell_duration_modifier, 0, -1),
 	EffectDesc("Spell:Add", fx_add_innate, 0, -1),
-	EffectDesc("Spell:Cast", fx_cast_spell, 0, -1),
+	EffectDesc("Spell:Cast", fx_cast_spell, EFFECT_NO_ACTOR, -1),
 	EffectDesc("Spell:CastPoint", fx_cast_spell_point, 0, -1),
 	EffectDesc("Spell:Learn", fx_learn_spell, 0, -1),
 	EffectDesc("Spell:Remove", fx_remove_spell, 0, -1),
@@ -4810,7 +4810,16 @@ int fx_cast_spell(Scriptable* Owner, Actor* target, Effect* fx)
 		}
 	}
 
-	if (fx->Parameter2 == 0 || target->Type == ST_CONTAINER) {
+	const Map* map = Owner->GetCurrentArea();
+	bool allowsNATarget = !target && map;
+	bool nonActor = false;
+	if (allowsNATarget) {
+		nonActor |= map->TMap->GetContainerByPosition(fx->Pos) != nullptr;
+		nonActor |= map->TMap->GetDoorByPosition(fx->Pos) != nullptr;
+		nonActor |= map->TMap->GetInfoPoint(fx->Pos, false) != nullptr;
+	}
+
+	if (fx->Parameter2 == 0 || nonActor) {
 		// no deplete, no interrupt, caster or provided level
 		std::string tmp = fmt::format("ForceSpellRES(\"{}\",[-1],{})", fx->Resource, fx->Parameter1);
 		Scriptable* target2 = Owner->GetCurrentArea()->GetScriptable(fx->Pos, 0); // refetch for non-actors
