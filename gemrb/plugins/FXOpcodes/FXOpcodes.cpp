@@ -723,7 +723,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("RemoveEffectsByResource", fx_remove_effects, 0, -1),
 	EffectDesc("RemoveImmunity", fx_remove_immunity, 0, -1),
 	EffectDesc("RemoveMapNote", fx_remove_map_note, EFFECT_NO_ACTOR, -1),
-	EffectDesc("RemoveProjectile", fx_remove_projectile, 0, -1), //removes effects from actor and area
+	EffectDesc("RemoveProjectile", fx_remove_projectile, EFFECT_NO_ACTOR, -1), //removes effects from actor and area
 	EffectDesc("RenableButton", fx_renable_button, 0, -1), //removes disable button flag
 	EffectDesc("ReplaceCreature", fx_replace_creature, 0, -1),
 	EffectDesc("ReputationModifier", fx_reputation_modifier, 0, -1),
@@ -7453,13 +7453,10 @@ int fx_apply_effect_repeat(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x111 RemoveProjectile
-int fx_remove_projectile(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_remove_projectile(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	//instant effect
-	// print("fx_remove_projectile(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
-	if (!target) return FX_NOT_APPLIED;
-	const Map* area = target->GetCurrentArea();
+	const Map* area = target ? target->GetCurrentArea() : Owner->GetCurrentArea();
 	if (!area) return FX_NOT_APPLIED;
 
 	auto HandleProjectile = [&](ieDword projectile) {
