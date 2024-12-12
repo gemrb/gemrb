@@ -1,8 +1,8 @@
-GemRB git (aa99049):
+GemRB git (d9e23c7):
   New features:
     - 
     - iwd2 is now fully completable!
-    - iwd2 turn undead, damage types
+    - iwd2 turn undead, damage types, Heal Party on Rest
     - option to more easily use GemRB as a library
     - option to highlight learnable scrolls, draw empty containers gray
     - animfps.2da to set per-animation drawing speed
