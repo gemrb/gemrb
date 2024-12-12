@@ -137,4 +137,5 @@ int OGGReader::ReadSamplesIntoChannels(char* /*channel1*/, char* /*channel2*/, i
 
 GEMRB_PLUGIN(0x18C310C3, "OGG File Importer")
 PLUGIN_RESOURCE(OGGReader, "ogg")
+PLUGIN_IE_RESOURCE(OGGReader, "wav", (ieWord) IE_WAV_CLASS_ID) // ees suck, eg. GAM_04.wav is actually an ogg file
 END_PLUGIN()
