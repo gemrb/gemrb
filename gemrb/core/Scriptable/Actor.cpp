@@ -4093,14 +4093,34 @@ bool Actor::CheckSpellDisruption(int damage) const
 	int spellLevel = spl->SpellLevel;
 	gamedata->FreeSpell(spl, SpellResRef, false);
 
+	int roll = LuckyRoll(1, 20, 0);
 	if (core->HasFeature(GFFlags::SIMPLE_DISRUPTION)) {
-		return LuckyRoll(1, 20, 0) < (damage + spellLevel);
+		return roll < (damage + spellLevel);
+	} else if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		AutoTable eeConcentration = gamedata->LoadTable("concentr", true);
+		if (!eeConcentration) return true;
+
+		int checkMode = eeConcentration->QueryFieldSigned<int>("CHECK_MODE", "VALUE");
+		int plainRoll = RAND(1, 20);
+		switch (checkMode) {
+			case 0:
+				return true;
+			case 1:
+				return (roll - 1) < (spellLevel + damage);
+			case 2:
+				return (plainRoll - 1 + int(Modified[IE_CON]) / 2 - 5) < (spellLevel + 15);
+			case 3:
+				return (roll - 1) < (spellLevel + 15);
+			case 4:
+				return (plainRoll - 1 + int(Modified[IE_CON]) / 2 - 5) < (spellLevel + damage);
+			default:
+				return true;
+		}
 	}
 	if (!third) {
 		return true;
 	}
 
-	int roll = LuckyRoll(1, 20, 0);
 	int concentration = GetSkill(IE_CONCENTRATION);
 	int bonus = 0;
 	if (HasFeat(Feat::CombatCasting)) {
