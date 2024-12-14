@@ -3476,7 +3476,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 	// 1pp deliberately breaks palettes for the bam to be used (so the original did support)
 	// ... but also not all are identical and we'd be missing half-orcs
 	// so we need to prefer PLTs to BAMs, but avoid bad ones
-	ResourceHolder<PalettedImageMgr> im = gamedata->GetResourceHolder<PalettedImageMgr>(ResRef, false, true);
+	ResourceHolder<PalettedImageMgr> im = gamedata->GetResourceHolder<PalettedImageMgr>(ResRef, true, true);
 	if (!im) {
 		// the PLT doesn't exist or is bad, so try BAM
 		Picture = GetPaperdollImage(ResRef, col[0] == 0xFFFFFFFF ? 0 : col, Picture2, (unsigned int) type);
