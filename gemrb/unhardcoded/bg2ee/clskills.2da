@@ -22,3 +22,4 @@ FIGHTER_MAGE_CLERIC *          MXSPLPRS    MXSPLWIZ   89000      *          *   
 CLERIC_RANGER       MXSPLRAN   MXSPLPRS    *          89000      *          *          *          1          1          HATERACE   PR01,RN01  -2         2500000    SKILLRNG    0          *
 SORCERER            *          *           MXSPLSRC   89000      *          *          *          0          2          *          *          -4         2500000    *           0          *
 MONK                *          *           *          89000      *          SKILLS     *          0          0          *          CLABMO01   -3         2500000    *           0          *
+SHAMAN              MXSPLSHM   *           *          89000      *          *          *          0          3          *          CLABDR01   -3         2500000    SKILLSHM    0          *

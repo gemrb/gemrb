@@ -179,6 +179,8 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		SpellLearnTable = "SPLSRCKN"
 	elif SpellLearnTable == "MXSPLBRD":
 		SpellLearnTable = "SPLBRDKN"
+	elif SpellLearnTable == "MXSPLSHM":
+		SpellLearnTable = "SPLSHMKN"
 	# ... which is also important for mages during chargen and then never again
 	elif SpellLearnTable == "MXSPLWIZ":
 		SpellLearnTable = "SPLWIZKN"

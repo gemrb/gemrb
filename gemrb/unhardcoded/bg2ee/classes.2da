@@ -22,3 +22,4 @@ FIGHTER_MAGE_CLERIC 7214       9581       1075       *          7          17   
 SORCERER            45849      45866      45856      SAVEWIZ    0          19         HPWIZ      0x40000    -1         1          1          1          0          0          0          0        0         10
 MONK                45851      45867      45858      SAVEMONK   0          20         HPMONK     0x20000000 -1         1          0          0          0          0          0          0        0         9
 BARBARIAN           45855      45869      45859      SAVEWAR    0          2          HPBARB     0          -1         1          1          1          1          1          1          1        1         9
+SHAMAN              103059     103060     103061     SAVEPRS    0          21         HPPRS      0x40000000 -1         1          1          1          1          1          1          1        1         9
