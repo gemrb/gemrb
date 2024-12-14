@@ -40,6 +40,7 @@ def InitInventoryWindow (Window):
 
 	# info label, game paused, etc
 	if GameCheck.IsBG2EE ():
+		# text area instead of label
 		Feedback = Window.GetControl (64)
 	else:
 		Feedback = Window.GetControl (0x1000003f)

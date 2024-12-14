@@ -217,7 +217,7 @@ void DisplayMessage::DisplayString(ieStrRef stridx, const Color& color, STRING_F
 
 void DisplayMessage::DisplayString(String text, const Color& color, Scriptable* target) const
 {
-	const TextArea* ta = core->GetMessageTextArea();
+	TextArea* ta = core->GetMessageTextArea();
 	if (ta) {
 		DisplayMarkupString(fmt::format(DisplayFormat, color.Packed(), text));
 	}
@@ -226,6 +226,10 @@ void DisplayMessage::DisplayString(String text, const Color& color, Scriptable* 
 	if (l) {
 		l->SetColors(color, ColorBlack);
 		l->SetText(std::move(text));
+	} else if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		// ees have a text area instead
+		ta = core->GetMessageTextArea(1);
+		if (ta) ta->SetText(fmt::format(DisplayFormat, color.Packed(), text));
 	}
 
 	if (target && l == nullptr && ta == nullptr) {

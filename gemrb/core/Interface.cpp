@@ -2936,9 +2936,9 @@ Label* Interface::GetMessageLabel() const
 	return GetControl<Label>("MsgSys", 1);
 }
 
-TextArea* Interface::GetMessageTextArea() const
+TextArea* Interface::GetMessageTextArea(int which) const
 {
-	return GetControl<TextArea>("MsgSys", 0);
+	return GetControl<TextArea>("MsgSys", which);
 }
 
 void Interface::SetFeedbackLevel(int level)

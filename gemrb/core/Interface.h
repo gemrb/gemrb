@@ -420,7 +420,7 @@ public:
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label* GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
-	TextArea* GetMessageTextArea() const;
+	TextArea* GetMessageTextArea(int which = 0) const;
 	void SetFeedbackLevel(int level);
 	/** returns true if the passed feedback type is enabled */
 	bool HasFeedback(int type) const;
