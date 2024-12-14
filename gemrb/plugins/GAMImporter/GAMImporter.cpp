@@ -271,6 +271,16 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 				str->ReadResRef(tmp);
 				newGame->SetFamiliar(tmp, i);
 			}
+		} else {
+			// guesswork for bgee table (not present in bg2ee)
+			AutoTable famTable = gamedata->LoadTable("familiar", true);
+			if (famTable) {
+				ResRef fam;
+				for (unsigned int i = 0; i < 9; i++) {
+					fam = famTable->QueryField(i, 0);
+					newGame->SetFamiliar(fam, i);
+				}
+			}
 		}
 	}
 	// Loading known creatures array (beasts)
