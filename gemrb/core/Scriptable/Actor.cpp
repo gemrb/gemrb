@@ -10812,7 +10812,7 @@ inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 
 	switch (reason) {
 		case 0:
 			// ~Failed hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
-			displaymsg->DisplayRollStringName(ieStrRef::ROLL10, GUIColors::LIGHTGREY, actor, skill - bonus, roll, bonus);
+			displaymsg->DisplayRollStringName(ieStrRef::ROLL10, GUIColors::LIGHTGREY, actor, skill, roll, bonus);
 			break;
 		case 1:
 			// ~Failed hide in shadows because you were seen by creature! Hide in Shadows check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
@@ -10901,27 +10901,32 @@ bool Actor::TryToHide()
 		HideFailed(this, 1);
 	}
 
-	if (third) {
-		skill *= 7; // FIXME: temporary increase for the lightness percentage calculation
-	}
-	// TODO: figure out how iwd2 uses the area lightness and crelight.2da
 	const Game* game = core->GetGame();
 	// check how bright our spot is
-	ieDword lightness = game->GetCurrentArea()->GetLightLevel(Pos);
+	ieDword lightness = game->GetCurrentArea()->GetLightLevel(Pos); // 0-100
 	// seems to be the color overlay at midnight; lightness of a point with rgb (200, 100, 100)
 	// TODO: but our NightTint computes to a higher value, which one is bad?
 	ieDword light_diff = int((lightness - ref_lightness) * 100 / (100 - ref_lightness)) / 2;
 	ieDword chance = (100 - light_diff) * skill / 100;
 
+	if (third) {
+		AutoTable creLight = gamedata->LoadTable("crelight", true);
+		assert(creLight);
+		int hideMod = creLight->QueryFieldSigned<int>(GetRaceName(), "LIGHTMOD"); // 0-100
+		chance = skill - (lightness * hideMod * skill) / 10000 + 10;
+		skill = chance; // improve feedback
+		roll = roll + 1;
+	}
+
 	if (roll > chance) {
-		HideFailed(this, 0, skill / 7, roll);
+		HideFailed(this, 0, skill, roll);
 		return false;
 	}
 	if (!continuation) VerbalConstant(Verbal::Hide);
 	if (!third) return true;
 
 	// ~Successful hide in shadows check! Hide in shadows check %d vs. D20 roll %d (%d Dexterity ability modifier)~
-	displaymsg->DisplayRollStringName(ieStrRef::ROLL9, GUIColors::LIGHTGREY, this, skill / 7, roll, GetAbilityBonus(IE_DEX));
+	displaymsg->DisplayRollStringName(ieStrRef::ROLL9, GUIColors::LIGHTGREY, this, skill, roll, GetAbilityBonus(IE_DEX));
 	return true;
 }
 
@@ -10942,7 +10947,7 @@ bool Actor::TryToHideIWD2()
 	// visibility check, you can try hiding while enemies are nearby
 	ieDword skill = GetSkill(IE_HIDEINSHADOWS);
 	for (const Actor* toCheck : neighbours) {
-		if (toCheck->GetStat(IE_STATE_ID) & STATE_BLIND) {
+		if (toCheck->GetStat(IE_STATE_ID) & STATE_CANTSEE) {
 			continue;
 		}
 		// we need to do an additional visual range check from the perspective of the observer
@@ -10971,7 +10976,7 @@ bool Actor::TryToHideIWD2()
 	// separate move silently check
 	skill = GetSkill(IE_STEALTH);
 	for (const Actor* toCheck : neighbours) {
-		if (toCheck->HasSpellState(SS_DEAF)) {
+		if (toCheck->HasSpellState(SS_DEAF) || toCheck->GetStat(IE_STATE_ID) & STATE_CANTLISTEN) {
 			continue;
 		}
 		// NOTE: pretending there is no hearing range, just as in the original
