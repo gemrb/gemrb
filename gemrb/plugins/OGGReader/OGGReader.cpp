@@ -129,7 +129,7 @@ int OGGReader::read_samples(short* buffer, int count)
 
 int OGGReader::ReadSamplesIntoChannels(char* /*channel1*/, char* /*channel2*/, int /*numSamples*/)
 {
-	assert(false);
+	// unimplemented
 	return 0;
 }
 
