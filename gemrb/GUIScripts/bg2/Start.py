@@ -78,7 +78,7 @@ def OnLoad():
 	# migrate mpsave saves if possible and needed
 	MigrateSaveDir ()
 
-	skip_videos = GemRB.GetVar ("SkipIntroVideos")
+	skip_videos = GemRB.GetVar ("SkipIntroVideos") or 0
 	if not skip_videos and not GemRB.GetVar ("SeenIntroVideos"):
 		if GameCheck.IsBG2EE ():
 			GemRB.PlayMovie ("logo", 1)
