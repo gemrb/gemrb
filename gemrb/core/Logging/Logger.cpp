@@ -81,6 +81,9 @@ void Logger::ProcessMessages(QueueType queue)
 		}
 		queue.pop_front();
 	}
+	for (const auto& writer : writers) {
+		writer->Flush();
+	}
 }
 
 void Logger::LogMsg(LogLevel level, const char* owner, const char* message, LOG_FMT fmt)
@@ -95,6 +98,7 @@ void Logger::LogMsg(LogMessage&& msg)
 		std::lock_guard<std::mutex> l(writerLock);
 		for (const auto& writer : writers) {
 			writer->WriteLogMessage(msg);
+			writer->Flush();
 		}
 	} else {
 		std::lock_guard<std::mutex> l(queueLock);
