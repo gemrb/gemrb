@@ -583,6 +583,20 @@ DirectoryIterator::DirectoryIterator(path_t path)
 	Rewind();
 }
 
+DirectoryIterator::DirectoryIterator(DirectoryIterator&& other) noexcept
+{
+	predicate = std::move(other.predicate);
+
+	Directory = std::move(other.Directory);
+	other.Directory = nullptr;
+
+	Entry = std::move(other.Entry);
+	other.Entry = nullptr;
+
+	Path = std::move(other.Path);
+	entrySkipFlags = std::move(other.entrySkipFlags);
+}
+
 DirectoryIterator::~DirectoryIterator()
 {
 	if (Directory)
