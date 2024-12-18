@@ -173,7 +173,10 @@ public:
 	 */
 	explicit DirectoryIterator(path_t path);
 	DirectoryIterator(const DirectoryIterator&) = delete;
-	DirectoryIterator(DirectoryIterator&&) noexcept = default;
+	// Manual move constructor needed to properly take ownership of DirectoryIterator::Directory.
+	// Without a manual implementation DirectoryIterator::Directory is improperly closed when the
+	// moving instance is destructed.
+	DirectoryIterator(DirectoryIterator&&) noexcept;
 	~DirectoryIterator();
 	DirectoryIterator& operator=(const DirectoryIterator&) = delete;
 
