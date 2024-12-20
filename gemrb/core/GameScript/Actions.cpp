@@ -4180,6 +4180,11 @@ void GameScript::CreateItem(Scriptable* Sender, Action* parameters)
 	Scriptable* tar;
 	if (parameters->objects[1]) {
 		tar = GetScriptableFromObject(Sender, parameters);
+		// originals fell back to Player1 if Player1-6 tried to match and failed
+		// one of the reasons for nodecode.ids #2233
+		if (!tar && parameters->objects[1]->objectFilters[0] >= 21 && parameters->objects[1]->objectFilters[0] < 27) {
+			tar = core->GetGame()->GetPC(0, false);
+		}
 	} else {
 		tar = Sender;
 	}
