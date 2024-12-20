@@ -328,7 +328,7 @@ Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Object* oC, int g
 	if (Sender->CurrentActionTarget) {
 		tar = core->GetGame()->GetActorByGlobalID(Sender->CurrentActionTarget);
 		target = Scriptable::As<Actor>(tar);
-		if (target && target->ValidTarget(ga_flags)) {
+		if (target && target->ValidTarget(ga_flags, Sender)) {
 			return tar;
 		}
 		return NULL; // target invalid/gone
