@@ -1270,7 +1270,7 @@ static const IDSLink idsnames[] = {
 	{ "align", GameScript::ID_Alignment },
 	{ "alignmen", GameScript::ID_Alignment },
 	{ "alignmnt", GameScript::ID_Alignment },
-	{ "class20", GameScript::ID_AVClass },
+	{ "avclass", GameScript::ID_AVClass },
 	{ "class", GameScript::ID_Class },
 	{ "classmsk", GameScript::ID_ClassMask },
 	{ "ea", GameScript::ID_Allegiance },
@@ -1302,9 +1302,8 @@ static const L* FindLink(StringView name, const L2& names)
 
 static const IDSLink* FindIdentifier(const std::string& idsname)
 {
-	int len = static_cast<int>(idsname.size());
 	for (int i = 0; idsnames[i].Name; i++) {
-		if (!strnicmp(idsnames[i].Name, idsname.c_str(), len)) {
+		if (!stricmp(idsnames[i].Name, idsname.c_str())) {
 			return idsnames + i;
 		}
 	}
@@ -1659,6 +1658,44 @@ static void SetupSavedTriggers()
 	}
 }
 
+// IWD2 parses object selectors in differing orders depending on whether it's working with .DLG resources (text) or .BCS resources (compiled)!
+//   Dialog: [EA.GENERAL.RACE.SUBRACE.CLASS.SPECIFIC.GENDER.ALIGN.AVCLASS.CLASSMSK]
+//   BCS: EA GENERAL RACE CLASS SPECIFIC GENDER ALIGNMNT SUBRACE filter1 filter2 filter3 filter4 filter5 [rect1.rect2.rect3.rect4] "scriptname" AVCLASS CLASSMSK
+static void InitializeDialogObjectIDS(AutoTable& objNameTable)
+{
+	TableMgr::index_t idsRow = objNameTable->GetRowIndex("DIALOG_IDS_COUNT");
+
+	if (idsRow != TableMgr::npos) {
+		DialogObjectIDSCount = objNameTable->QueryFieldSigned<int>(idsRow, 0);
+		DialogObjectIDSTableNames.resize(DialogObjectIDSCount);
+
+		for (int i = 0; i < DialogObjectIDSCount; i++) {
+			const std::string& idsName = objNameTable->QueryField(idsRow, i + 1);
+			DialogObjectIDSTableNames[i] = ResRef(idsName);
+		}
+	} else {
+		DialogObjectIDSCount = ObjectIDSCount;
+		DialogObjectIDSTableNames.resize(DialogObjectIDSCount);
+
+		for (int i = 0; i < DialogObjectIDSCount; i++) {
+			DialogObjectIDSTableNames[i] = ObjectIDSTableNames[i];
+		}
+	}
+
+	TableMgr::index_t orderRow = objNameTable->GetRowIndex("DIALOG_IDS_ORDER");
+	DialogObjectIDSOrder.resize(DialogObjectIDSCount);
+
+	if (orderRow != TableMgr::npos) {
+		for (int i = 0; i < DialogObjectIDSCount; i++) {
+			DialogObjectIDSOrder[i] = objNameTable->QueryFieldSigned<int>(orderRow, i + 1) - 1;
+		}
+	} else {
+		for (int i = 0; i < DialogObjectIDSCount; i++) {
+			DialogObjectIDSOrder[i] = i;
+		}
+	}
+}
+
 void InitializeIEScript()
 {
 	PluginMgr::Get()->RegisterCleanup(CleanupIEScript);
@@ -1707,6 +1744,9 @@ void InitializeIEScript()
 		}
 		ObjectIDSTableNames[i] = ResRef(idsName);
 	}
+
+	InitializeDialogObjectIDS(objNameTable);
+
 	MaxObjectNesting = objNameTable->QueryFieldSigned<int>(1, 0);
 	if (MaxObjectNesting < 0 || MaxObjectNesting > MAX_NESTING) {
 		error("GameScript", "The Object Nesting Count shouldn't be more than 5!");
