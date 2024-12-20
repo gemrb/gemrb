@@ -54,12 +54,15 @@ extern std::array<uint16_t, MAX_ACTIONS> actionflags;
 extern std::array<short, MAX_TRIGGERS> triggerflags;
 extern ResRefRCCache<Script> BcsCache; //cache for scripts
 extern int ObjectIDSCount;
+extern int DialogObjectIDSCount;
 extern int MaxObjectNesting;
 extern bool HasAdditionalRect;
 extern bool HasTriggerPoint;
 extern bool NoCreate;
 extern bool HasKaputz;
 extern std::vector<ResRef> ObjectIDSTableNames;
+extern std::vector<int> DialogObjectIDSOrder;
+extern std::vector<ResRef> DialogObjectIDSTableNames;
 extern int ObjectFieldsCount;
 extern int ExtraParametersCount;
 extern Gem_Polygon** polygons;
