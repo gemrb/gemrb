@@ -1559,6 +1559,7 @@ void AttackCore(Scriptable* Sender, Scriptable* target, int flags)
 	//will return false on any errors (eg, unusable weapon)
 	if (!header) {
 		attacker->StopAttack();
+		attacker->inventory.EquipBestWeapon(EQUIP_MELEE);
 		Sender->ReleaseCurrentAction();
 		assert(tar);
 		attacker->AddTrigger(TriggerEntry(trigger_unusable, tar->GetGlobalID()));
