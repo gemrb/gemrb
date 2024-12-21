@@ -19,13 +19,13 @@
 ###################################################
 
 import GemRB
+import GameCheck
 import GUICommon
 import MessageWindow
 from ie_restype import RES_2DA
-from GameCheck import MAX_PARTY_SIZE
 
 def EnterGame():
-	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
+	GemRB.GameSetPartySize (GameCheck.MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
 	GUICommon.SetSaveDir ()
 
@@ -38,9 +38,6 @@ def EnterGame():
 #upgrade savegame to next version
 #this is not necessary if TotSC was already installed before starting the game
 def GameExpansion():
-	if HasTOTSC():
+	if GameCheck.HasTOTSC ():
 		#reload world map if it doesn't have AR1000
 		GemRB.UpdateWorldMap("WORLDMAP", "AR1000")
-
-def HasTOTSC ():
-	return GemRB.HasResource ("toscst", RES_2DA)
