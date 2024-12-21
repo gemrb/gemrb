@@ -31,6 +31,10 @@ def EnterGame():
 
 	MessageWindow.OnLoad()
 
+	# reset gold, so a message is printed
+	if GemRB.GetGameTime () <= 2103:
+		GemRB.SetTimedEvent (lambda: GemRB.GameSetPartyGold (GemRB.GameGetPartyGold (), 1), 1)
+
 #upgrade savegame to next version
 #this is not necessary if TotSC was already installed before starting the game
 def GameExpansion():
