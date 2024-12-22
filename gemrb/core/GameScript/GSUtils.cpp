@@ -69,6 +69,7 @@ std::array<uint16_t, MAX_ACTIONS> actionflags;
 std::array<short, MAX_TRIGGERS> triggerflags;
 ResRefRCCache<Script> BcsCache; //cache for scripts
 int ObjectIDSCount = 7;
+int DialogObjectIDSCount = 7;
 int MaxObjectNesting = 5;
 bool HasAdditionalRect = false;
 bool HasTriggerPoint = false;
@@ -76,6 +77,8 @@ bool HasTriggerPoint = false;
 bool NoCreate = false;
 bool HasKaputz = false;
 std::vector<ResRef> ObjectIDSTableNames;
+std::vector<int> DialogObjectIDSOrder;
+std::vector<ResRef> DialogObjectIDSTableNames;
 int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
 int RandomNumValue;
