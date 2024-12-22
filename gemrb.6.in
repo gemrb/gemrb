@@ -521,7 +521,7 @@ directory with Python scripts providing GUI setup and interaction. The files
 are sorted into directories for specific games.
 
 .TP
-.B $XDG_CONFIG_PATH/gemrb/
+.B $XDG_CONFIG_HOME/gemrb/
 user's own configuration files.
 .PD
 
