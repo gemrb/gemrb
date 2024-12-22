@@ -209,7 +209,7 @@ int GameScript::ClassEx(Scriptable* Sender, const Trigger* parameters)
 		return 0;
 	}
 
-	return ID_AVClass(actor, parameters->int0Parameter);
+	return ID_Class(actor, parameters->int0Parameter);
 }
 
 int GameScript::Faction(Scriptable* Sender, const Trigger* parameters)
