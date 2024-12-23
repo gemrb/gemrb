@@ -25,7 +25,7 @@
 
 namespace GemRB {
 
-TEST(Orientation_Test, GetOrient)
+TEST(OrientationTest, GetOrient)
 {
 	// self
 	auto start = Point(1000, 1000);

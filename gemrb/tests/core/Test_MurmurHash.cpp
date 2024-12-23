@@ -4,7 +4,7 @@
 
 namespace GemRB {
 
-TEST(MurmurHash_Test, Feed)
+TEST(MurmurHashTest, Feed)
 {
 	auto hasher = MurmurHash3_32();
 	EXPECT_EQ(hasher.GetHash(), 0);

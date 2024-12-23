@@ -25,14 +25,14 @@ namespace GemRB {
 
 #ifdef WIN32
 
-TEST(UTF8Comparison_Test, UTF8_stricmp_Equality)
+TEST(UTF8ComparisonTest, UTF8stricmpEquality)
 {
 	GTEST_SKIP() << "Not applicable to Windows.";
 }
 
 #else
 
-TEST(UTF8Comparison_Test, UTF8_stricmp_Equality)
+TEST(UTF8ComparisonTest, UTF8stricmpEquality)
 {
 	EXPECT_TRUE(UTF8_stricmp("abc", "abc"));
 	EXPECT_FALSE(UTF8_stricmp("abc", "ab"));

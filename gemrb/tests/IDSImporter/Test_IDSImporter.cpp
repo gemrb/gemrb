@@ -27,7 +27,7 @@ namespace GemRB {
 static const path_t SAMPLE_FILE = PathJoin("tests", "resources", "IDSImporter", "sample.ids");
 static const path_t ENC_SAMPLE_FILE = PathJoin("tests", "resources", "IDSImporter", "sample_encrypted.ids");
 
-class IDSImporter_Test : public testing::TestWithParam<path_t> {
+class IDSImporterTest : public testing::TestWithParam<path_t> {
 protected:
 	IDSImporter unit;
 	const path_t path;
@@ -42,7 +42,7 @@ public:
 	}
 };
 
-TEST_P(IDSImporter_Test, GetValueByString)
+TEST_P(IDSImporterTest, GetValueByString)
 {
 	// first matches
 	EXPECT_EQ(unit.GetValue(StringView { "AXEFLM" }), 8);
@@ -52,7 +52,7 @@ TEST_P(IDSImporter_Test, GetValueByString)
 	EXPECT_EQ(unit.GetValue(StringView { "HMGRML" }), -1);
 }
 
-TEST_P(IDSImporter_Test, GetValueByInt)
+TEST_P(IDSImporterTest, GetValueByInt)
 {
 	EXPECT_EQ(unit.GetValue(8), std::string { "axeflm" });
 	EXPECT_EQ(unit.GetValue(9), std::string { "axeflm" });
@@ -62,7 +62,7 @@ TEST_P(IDSImporter_Test, GetValueByInt)
 	EXPECT_EQ(unit.GetValue(200), std::string {});
 }
 
-TEST_P(IDSImporter_Test, GetStringIndex)
+TEST_P(IDSImporterTest, GetStringIndex)
 {
 	EXPECT_EQ(unit.GetStringIndex(0), std::string { "axeflm" });
 	EXPECT_EQ(unit.GetStringIndex(10), std::string { "arghxxl" });
@@ -70,7 +70,7 @@ TEST_P(IDSImporter_Test, GetStringIndex)
 	EXPECT_EQ(unit.GetStringIndex(100), std::string {});
 }
 
-TEST_P(IDSImporter_Test, GetValueIndex)
+TEST_P(IDSImporterTest, GetValueIndex)
 {
 	EXPECT_EQ(unit.GetValueIndex(0), 8);
 	EXPECT_EQ(unit.GetValueIndex(10), 45);
@@ -82,7 +82,7 @@ TEST_P(IDSImporter_Test, GetValueIndex)
 #endif
 }
 
-TEST_P(IDSImporter_Test, FindString)
+TEST_P(IDSImporterTest, FindString)
 {
 	EXPECT_EQ(unit.FindString(StringView { "SPSMPUFF" }), 9);
 	EXPECT_EQ(unit.FindString(StringView { "axeflm" }), 1);
@@ -90,7 +90,7 @@ TEST_P(IDSImporter_Test, FindString)
 	EXPECT_EQ(unit.FindString(StringView { "HMGRML" }), -1);
 }
 
-TEST_P(IDSImporter_Test, FindValue)
+TEST_P(IDSImporterTest, FindValue)
 {
 	EXPECT_EQ(unit.FindValue(45), 11);
 	EXPECT_EQ(unit.FindValue(8), 0);
@@ -99,19 +99,19 @@ TEST_P(IDSImporter_Test, FindValue)
 	EXPECT_EQ(unit.FindValue(100), -1);
 }
 
-TEST_P(IDSImporter_Test, GetSize)
+TEST_P(IDSImporterTest, GetSize)
 {
 	EXPECT_EQ(unit.GetSize(), 12);
 }
 
-TEST_P(IDSImporter_Test, GetHighestValue)
+TEST_P(IDSImporterTest, GetHighestValue)
 {
 	EXPECT_EQ(unit.GetHighestValue(), 58);
 }
 
 INSTANTIATE_TEST_SUITE_P(
 	IDSImporterInstances,
-	IDSImporter_Test,
+	IDSImporterTest,
 	testing::Values(
 		SAMPLE_FILE,
 		ENC_SAMPLE_FILE));

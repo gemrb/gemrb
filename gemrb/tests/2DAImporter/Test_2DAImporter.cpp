@@ -28,7 +28,7 @@ static const path_t SAMPLE_FILE = PathJoin("tests", "resources", "2DAImporter", 
 static const path_t ENC_SAMPLE_FILE = PathJoin("tests", "resources", "2DAImporter", "sample_encrypted.2da");
 static const path_t SAMPLE_FILE2 = PathJoin("tests", "resources", "2DAImporter", "sample2.2da");
 
-class p2DAImporter_Test : public testing::TestWithParam<path_t> {
+class p2DAImporterTest : public testing::TestWithParam<path_t> {
 protected:
 	p2DAImporter unit;
 
@@ -42,24 +42,24 @@ public:
 	}
 };
 
-TEST_P(p2DAImporter_Test, GetRowCount)
+TEST_P(p2DAImporterTest, GetRowCount)
 {
 	EXPECT_EQ(unit.GetRowCount(), 8);
 }
 
-TEST_P(p2DAImporter_Test, GetColNamesCount)
+TEST_P(p2DAImporterTest, GetColNamesCount)
 {
 	EXPECT_EQ(unit.GetColNamesCount(), 4);
 }
 
-TEST_P(p2DAImporter_Test, GetColumnCount)
+TEST_P(p2DAImporterTest, GetColumnCount)
 {
 	EXPECT_EQ(unit.GetColumnCount(), 4);
 	EXPECT_EQ(unit.GetColumnCount(6), 3);
 	EXPECT_EQ(unit.GetColumnCount(7), 2);
 }
 
-TEST_P(p2DAImporter_Test, QueryField)
+TEST_P(p2DAImporterTest, QueryField)
 {
 	EXPECT_EQ(unit.QueryField(0, 0), std::string { "11975" });
 	EXPECT_EQ(unit.QueryField(0, 3), std::string { "STR" });
@@ -67,12 +67,12 @@ TEST_P(p2DAImporter_Test, QueryField)
 	EXPECT_EQ(unit.QueryField(6, 3), std::string { "-1" });
 }
 
-TEST_P(p2DAImporter_Test, QueryDefault)
+TEST_P(p2DAImporterTest, QueryDefault)
 {
 	EXPECT_EQ(unit.QueryDefault(), std::string { "-1" });
 }
 
-TEST_P(p2DAImporter_Test, GetRowIndex)
+TEST_P(p2DAImporterTest, GetRowIndex)
 {
 	EXPECT_EQ(unit.GetRowIndex(std::string { "STRENGTH" }), 0);
 	EXPECT_EQ(unit.GetRowIndex(std::string { "SQUEEZENESS" }), 6);
@@ -80,7 +80,7 @@ TEST_P(p2DAImporter_Test, GetRowIndex)
 	EXPECT_EQ(unit.GetRowIndex(std::string { "FLUFFINESS" }), p2DAImporter::npos);
 }
 
-TEST_P(p2DAImporter_Test, GetColumnIndex)
+TEST_P(p2DAImporterTest, GetColumnIndex)
 {
 	EXPECT_EQ(unit.GetColumnIndex(std::string { "NAME_REF" }), 0);
 	EXPECT_EQ(unit.GetColumnIndex(std::string { "STAT_ID" }), 3);
@@ -88,7 +88,7 @@ TEST_P(p2DAImporter_Test, GetColumnIndex)
 	EXPECT_EQ(unit.GetColumnIndex(std::string { "COOLNESS" }), p2DAImporter::npos);
 }
 
-TEST_P(p2DAImporter_Test, GetColumnName)
+TEST_P(p2DAImporterTest, GetColumnName)
 {
 	EXPECT_EQ(unit.GetColumnName(0), std::string { "NAME_REF" });
 	EXPECT_EQ(unit.GetColumnName(3), std::string { "STAT_ID" });
@@ -96,7 +96,7 @@ TEST_P(p2DAImporter_Test, GetColumnName)
 	EXPECT_EQ(unit.GetColumnName(4), std::string {});
 }
 
-TEST_P(p2DAImporter_Test, GetRowName)
+TEST_P(p2DAImporterTest, GetRowName)
 {
 	EXPECT_EQ(unit.GetRowName(0), std::string { "STRENGTH" });
 	EXPECT_EQ(unit.GetRowName(6), std::string { "SQUEEZENESS" });
@@ -105,7 +105,7 @@ TEST_P(p2DAImporter_Test, GetRowName)
 	EXPECT_EQ(unit.GetRowName(8), std::string {});
 }
 
-TEST_P(p2DAImporter_Test, FindTableValue)
+TEST_P(p2DAImporterTest, FindTableValue)
 {
 	EXPECT_EQ(unit.FindTableValue(3, std::string { "CON" }, 0), 1);
 	EXPECT_EQ(unit.FindTableValue(3, std::string { "CON" }, 2), 2);
@@ -114,7 +114,7 @@ TEST_P(p2DAImporter_Test, FindTableValue)
 	EXPECT_EQ(unit.FindTableValue(4, std::string { "CON" }, 0), p2DAImporter::npos);
 }
 
-TEST_P(p2DAImporter_Test, FindTableValueByLong)
+TEST_P(p2DAImporterTest, FindTableValueByLong)
 {
 	EXPECT_EQ(unit.FindTableValue(1, 9584, 0), 0);
 	EXPECT_EQ(unit.FindTableValue(1, 9584, 1), 1);
@@ -125,11 +125,11 @@ TEST_P(p2DAImporter_Test, FindTableValueByLong)
 
 INSTANTIATE_TEST_SUITE_P(
 	2DAImporterInstances,
-	p2DAImporter_Test,
+	p2DAImporterTest,
 	testing::Values(SAMPLE_FILE, ENC_SAMPLE_FILE));
 
 // single column table
-TEST(p2DAImporter_Test, GetColumnCount2)
+TEST(p2DAImporterTest, GetColumnCount2)
 {
 	p2DAImporter unit;
 	auto stream = new FileStream {};

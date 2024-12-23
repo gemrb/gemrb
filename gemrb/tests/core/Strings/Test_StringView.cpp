@@ -23,7 +23,7 @@
 
 namespace GemRB {
 
-TEST(StringView_Test, Equality)
+TEST(StringViewTest, Equality)
 {
 	EXPECT_EQ(StringView { "abc" }, StringView { "abc" });
 	EXPECT_EQ(StringView {}, StringView {});
@@ -32,7 +32,7 @@ TEST(StringView_Test, Equality)
 	EXPECT_NE(StringView { "123" }, StringView { "abc" });
 }
 
-TEST(StringView_Test, clear)
+TEST(StringViewTest, clear)
 {
 	StringView unit { "abc" };
 	unit.clear();
@@ -41,7 +41,7 @@ TEST(StringView_Test, clear)
 	EXPECT_TRUE(unit.empty());
 }
 
-TEST(StringView_Test, erase)
+TEST(StringViewTest, erase)
 {
 	StringView unit { "abcd" };
 	unit.erase(3);

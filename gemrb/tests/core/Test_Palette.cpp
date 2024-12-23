@@ -4,13 +4,13 @@
 
 namespace GemRB {
 
-TEST(Palette_Test, Constructor)
+TEST(PaletteTest, Constructor)
 {
 	Palette unit;
 	EXPECT_FALSE(unit.IsNamed());
 }
 
-TEST(Palette_Test, SetAndGetColor)
+TEST(PaletteTest, SetAndGetColor)
 {
 	Color c { 0x12, 0x34, 0x56, 0 };
 	Palette unit;
@@ -19,7 +19,7 @@ TEST(Palette_Test, SetAndGetColor)
 	EXPECT_EQ(c, unit[17]);
 }
 
-TEST(Palette_Test, CopyColors)
+TEST(PaletteTest, CopyColors)
 {
 	Palette::Colors buffer;
 	Palette unit;
@@ -38,7 +38,7 @@ TEST(Palette_Test, CopyColors)
 	}
 }
 
-TEST(Palette_Test, SetColor_Version)
+TEST(PaletteTest, SetColorVersion)
 {
 	Color c { 1, 0, 0, 255 };
 	Palette unit;
@@ -62,7 +62,7 @@ TEST(Palette_Test, SetColor_Version)
 	EXPECT_NE(v3, v4);
 }
 
-TEST(Palette_Test, CopyColors_Version)
+TEST(PaletteTest, CopyColorsVersion)
 {
 	Palette::Colors buffer;
 	Palette unit;

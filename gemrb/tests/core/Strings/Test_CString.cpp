@@ -25,7 +25,7 @@
 
 namespace GemRB {
 
-TEST(CString_Test, IsASCII)
+TEST(CStringTest, IsASCII)
 {
 	auto unit0 = FixedSizeString<0> { "" };
 	EXPECT_TRUE(unit0.IsASCII());
@@ -40,7 +40,7 @@ TEST(CString_Test, IsASCII)
 	EXPECT_FALSE(unit3.IsASCII());
 }
 
-TEST(CString_Test, Format)
+TEST(CStringTest, Format)
 {
 	auto src = FixedSizeString<8> { "spwi103" };
 	auto fu = FixedSizeString<8> { "" };

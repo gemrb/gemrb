@@ -23,14 +23,14 @@
 
 namespace GemRB {
 
-TEST(String_Test, StringFromView)
+TEST(StringTest, StringFromView)
 {
 	String input { u"abc" };
 	auto result = StringFromView<String>(StringViewT<String> { input });
 	EXPECT_EQ(result, input);
 }
 
-TEST(String_Test, FindFirstOf)
+TEST(StringTest, FindFirstOf)
 {
 	auto result = FindFirstOf(String {}, StringViewT<String> {});
 	EXPECT_EQ(result, String::npos);
@@ -48,7 +48,7 @@ TEST(String_Test, FindFirstOf)
 	EXPECT_EQ(result, String::npos);
 }
 
-TEST(String_Test, FindNotOf)
+TEST(StringTest, FindNotOf)
 {
 	String unit { u"abc" };
 
@@ -65,7 +65,7 @@ TEST(String_Test, FindNotOf)
 	EXPECT_EQ(result, unit.cbegin());
 }
 
-TEST(String_Test, FindFirstNotOf)
+TEST(StringTest, FindFirstNotOf)
 {
 	auto result = FindFirstNotOf(String {}, StringViewT<String> {});
 	EXPECT_EQ(result, String::npos);
@@ -86,7 +86,7 @@ TEST(String_Test, FindFirstNotOf)
 	EXPECT_EQ(result, 1);
 }
 
-TEST(String_Test, FindLastNotOf)
+TEST(StringTest, FindLastNotOf)
 {
 	auto result = FindLastNotOf(String {}, StringViewT<String> {});
 	EXPECT_EQ(result, String::npos);
@@ -113,7 +113,7 @@ TEST(String_Test, FindLastNotOf)
 	EXPECT_EQ(result, String::npos);
 }
 
-TEST(String_Test, FindLastNotOf_Reverse)
+TEST(StringTest, FindLastNotOfReverse)
 {
 	auto result = FindLastNotOf(String { u"abc" }, StringViewT<String> { u"def" }, String::npos, true);
 	EXPECT_EQ(result, 2);
@@ -137,7 +137,7 @@ TEST(String_Test, FindLastNotOf_Reverse)
 	EXPECT_EQ(result, String::npos);
 }
 
-TEST(String_Test, RTrim)
+TEST(StringTest, RTrim)
 {
 	String testString { u"space  " };
 	RTrim(testString);
@@ -155,7 +155,7 @@ TEST(String_Test, RTrim)
 	EXPECT_EQ(testString, u"space lt");
 }
 
-TEST(String_Test, RTrimCopy)
+TEST(StringTest, RTrimCopy)
 {
 	String testString { u"space  " };
 	EXPECT_EQ(RTrimCopy(testString), u"space");
@@ -169,7 +169,7 @@ TEST(String_Test, RTrimCopy)
 	EXPECT_EQ((RTrimCopy(testString, u"xd")), u"space lt");
 }
 
-TEST(String_Test, LTrim)
+TEST(StringTest, LTrim)
 {
 	String testString { u"  space" };
 	LTrim(testString);
@@ -187,7 +187,7 @@ TEST(String_Test, LTrim)
 	EXPECT_EQ(testString, u"td space");
 }
 
-TEST(String_Test, TrimString)
+TEST(StringTest, TrimString)
 {
 	String testString { u"  space  " };
 	TrimString(testString);
@@ -205,7 +205,7 @@ TEST(String_Test, TrimString)
 	EXPECT_EQ(testString, u"td space lt");
 }
 
-TEST(String_Test, Explode)
+TEST(StringTest, Explode)
 {
 	String a { u"a" };
 	String b { u"b" };
@@ -267,7 +267,7 @@ TEST(String_Test, Explode)
 	EXPECT_EQ(result, emptyList);
 }
 
-TEST(String_Test, SubStr)
+TEST(StringTest, SubStr)
 {
 	String unit { u"some string" };
 
@@ -281,7 +281,7 @@ TEST(String_Test, SubStr)
 	EXPECT_EQ(result, StringViewT<String> { String { u"om" } });
 }
 
-TEST(String_DeathTest, Substr)
+TEST(StringDeathTest, Substr)
 {
 	String unit { u"some string" };
 
@@ -292,7 +292,7 @@ TEST(String_DeathTest, Substr)
 #endif
 }
 
-TEST(String_Test, AppendFormat)
+TEST(StringTest, AppendFormat)
 {
 	std::string unit { "msg: " };
 	AppendFormat(unit, "{:02} {}", 2, "failures");
@@ -303,14 +303,14 @@ TEST(String_Test, AppendFormat)
 // The underlying code has no explicit references to locales, so we only check
 // for ASCII cases.
 
-TEST(String_Test, StringToLower)
+TEST(StringTest, StringToLower)
 {
 	String unit { u" StR.iNG" };
 	StringToLower(unit);
 	EXPECT_EQ(unit, u" str.ing");
 }
 
-TEST(String_Test, StringToUpper)
+TEST(StringTest, StringToUpper)
 {
 	String unit { u" StR.iNG" };
 	StringToUpper(unit);

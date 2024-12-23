@@ -26,7 +26,7 @@ namespace GemRB {
 
 static const path_t SAMPLE_FILE = PathJoin("tests", "resources", "INIImporter", "sample.ini");
 
-class INIImporter_Test : public testing::Test {
+class INIImporterTest : public testing::Test {
 protected:
 	INIImporter unit;
 
@@ -40,12 +40,12 @@ public:
 	}
 };
 
-TEST_F(INIImporter_Test, GetTagsCount)
+TEST_F(INIImporterTest, GetTagsCount)
 {
 	EXPECT_EQ(unit.GetTagsCount(), 4);
 }
 
-TEST_F(INIImporter_Test, GroupIteration)
+TEST_F(INIImporterTest, GroupIteration)
 {
 	auto it = unit.begin();
 
@@ -56,7 +56,7 @@ TEST_F(INIImporter_Test, GroupIteration)
 	EXPECT_EQ(unit.end(), it);
 }
 
-TEST_F(INIImporter_Test, Find)
+TEST_F(INIImporterTest, Find)
 {
 	auto it = unit.find("sectionC");
 	auto it2 = unit.find("Sectionc");
@@ -65,7 +65,7 @@ TEST_F(INIImporter_Test, Find)
 	EXPECT_EQ("sectionC", it->GetName());
 }
 
-TEST_F(INIImporter_Test, KeyValueIteration)
+TEST_F(INIImporterTest, KeyValueIteration)
 {
 	auto it = unit.begin();
 	std::unordered_map<std::string, std::string> values;
@@ -82,7 +82,7 @@ TEST_F(INIImporter_Test, KeyValueIteration)
 	EXPECT_EQ("FALSE", values.find("falseValue")->second);
 }
 
-TEST_F(INIImporter_Test, GetKeyAsString)
+TEST_F(INIImporterTest, GetKeyAsString)
 {
 	auto sectionA = StringView { "SectionA" };
 
@@ -100,7 +100,7 @@ TEST_F(INIImporter_Test, GetKeyAsString)
 	EXPECT_EQ(StringView {}, (unit.GetKeyAsString(StringView { "sectionC" }, StringView { "2ndKey" })));
 }
 
-TEST_F(INIImporter_Test, GetKeyAsInt)
+TEST_F(INIImporterTest, GetKeyAsInt)
 {
 	auto sectionA = StringView { "SectionA" };
 
@@ -111,7 +111,7 @@ TEST_F(INIImporter_Test, GetKeyAsInt)
 	EXPECT_EQ(2, (unit.GetKeyAsInt(sectionA, StringView { "floatValue" }, 0)));
 }
 
-TEST_F(INIImporter_Test, GetKeyAsFloat)
+TEST_F(INIImporterTest, GetKeyAsFloat)
 {
 	auto sectionA = StringView { "SectionA" };
 
@@ -123,7 +123,7 @@ TEST_F(INIImporter_Test, GetKeyAsFloat)
 	EXPECT_EQ(1.0, (unit.GetKeyAsFloat(sectionA, StringView { "intValue" }, 0.0)));
 }
 
-TEST_F(INIImporter_Test, GetKeyAsBool)
+TEST_F(INIImporterTest, GetKeyAsBool)
 {
 	auto sectionA = StringView { "SectionA" };
 
@@ -137,7 +137,7 @@ TEST_F(INIImporter_Test, GetKeyAsBool)
 	EXPECT_FALSE(unit.GetKeyAsBool(sectionA, StringView { "stringValue" }, true));
 }
 
-TEST_F(INIImporter_Test, GetAsAndGetAsXEquality)
+TEST_F(INIImporterTest, GetAsAndGetAsXEquality)
 {
 	auto sectionA = StringView { "SectionA" };
 	auto section = *unit.find(sectionA);

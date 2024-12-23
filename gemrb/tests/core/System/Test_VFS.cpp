@@ -30,7 +30,7 @@ namespace GemRB {
 
 path_t getTempPath();
 
-TEST(DirectoryIterator_Test, DirectoryIteration)
+TEST(DirectoryIteratorTest, DirectoryIteration)
 {
 	path_t scanDir = PathJoin("tests", "resources", "VFS", "encoding");
 	auto unit = DirectoryIterator { scanDir };
@@ -49,7 +49,7 @@ TEST(DirectoryIterator_Test, DirectoryIteration)
 	EXPECT_TRUE(dirList.find("directory_äöü") != dirList.cend());
 }
 
-TEST(DirectoryIterator_Test, FileIteration)
+TEST(DirectoryIteratorTest, FileIteration)
 {
 	path_t scanDir = PathJoin("tests", "resources", "VFS", "encoding");
 	auto unit = DirectoryIterator { scanDir };
@@ -67,7 +67,7 @@ TEST(DirectoryIterator_Test, FileIteration)
 	EXPECT_TRUE(fileList.find("file_äöü.txt") != fileList.cend());
 }
 
-TEST(VFS_Test, Misc)
+TEST(VFSTest, Misc)
 {
 #ifdef WIN32
 	EXPECT_EQ(SPathDelimiter[0], '\\');
@@ -76,7 +76,7 @@ TEST(VFS_Test, Misc)
 #endif
 }
 
-TEST(VFS_Test, DirExists)
+TEST(VFSTest, DirExists)
 {
 	auto baseDir = PathJoin("tests", "resources", "VFS", "encoding");
 	EXPECT_TRUE(DirExists(PathJoin(baseDir, "directory")));
@@ -85,7 +85,7 @@ TEST(VFS_Test, DirExists)
 	EXPECT_FALSE(DirExists(PathJoin(baseDir, "does_not_exist")));
 }
 
-TEST(VFS_Test, FileExists)
+TEST(VFSTest, FileExists)
 {
 	auto baseDir = PathJoin("tests", "resources", "VFS", "encoding");
 	EXPECT_TRUE(FileExists(PathJoin(baseDir, "file.txt")));
@@ -95,27 +95,27 @@ TEST(VFS_Test, FileExists)
 	EXPECT_FALSE(FileExists(PathJoin(baseDir, "na")));
 }
 
-TEST(VFS_Test, PathAppend_PlainPath)
+TEST(VFSTest, PathAppendPlainPath)
 {
 	path_t path { "dir" };
 	PathAppend(path, "subdir");
 	EXPECT_EQ(path, fmt::format("dir{0}subdir", SPathDelimiter));
 }
 
-TEST(VFS_Test, PathAppend_SuffixedPath)
+TEST(VFSTest, PathAppendSuffixedPath)
 {
 	path_t path = fmt::format("dir{0}", SPathDelimiter);
 	PathAppend(path, "subdir");
 	EXPECT_EQ(path, fmt::format("dir{0}subdir", SPathDelimiter));
 }
 
-TEST(VFS_Test, PathJoin)
+TEST(VFSTest, PathJoin)
 {
 	EXPECT_EQ(PathJoin("dir", "abc"), PathJoin<true>("dir", "abc"));
 	EXPECT_EQ(PathJoin("dir", "abc"), fmt::format("dir{0}abc", SPathDelimiter));
 }
 
-TEST(VFS_Test, PathJoin_WithActualCaseFix)
+TEST(VFSTest, PathJoinWithActualCaseFix)
 {
 	auto path = PathJoin<true>("tests", "resoUrces", "vfs", "encoding", "file_ÄÖÜ.txt");
 #if IS_CASE_INSENSITIVE
@@ -125,19 +125,19 @@ TEST(VFS_Test, PathJoin_WithActualCaseFix)
 #endif
 }
 
-TEST(VFS_Test, PathJoin_WithoutActualCaseFix)
+TEST(VFSTest, PathJoinWithoutActualCaseFix)
 {
 	auto path = PathJoin<false>("tests", "resoUrces", "vfs");
 	EXPECT_EQ(path, fmt::format("tests{0}resoUrces{0}vfs", SPathDelimiter));
 }
 
-TEST(VFS_Test, PathJoinExt)
+TEST(VFSTest, PathJoinExt)
 {
 	EXPECT_EQ(PathJoinExt("dir", "file", "ext"), PathJoinExt<true>("dir", "file", "ext"));
 	EXPECT_EQ(PathJoinExt("dir", "file", "ext"), fmt::format("dir{0}file.ext", SPathDelimiter));
 }
 
-TEST(VFS_Test, PathJoinExt_WithActualCaseFix)
+TEST(VFSTest, PathJoinExtWithActualCaseFix)
 {
 	auto basePath = PathJoin<false>("tests", "resoUrces", "vfs", "encoding");
 	auto path = PathJoinExt<true>(basePath, "file_ÄÖÜ", "TXT");
@@ -148,14 +148,14 @@ TEST(VFS_Test, PathJoinExt_WithActualCaseFix)
 #endif
 }
 
-TEST(VFS_Test, PathJoinExt_WithoutActualCaseFix)
+TEST(VFSTest, PathJoinExtWithoutActualCaseFix)
 {
 	auto basePath = PathJoin<false>("tests", "resoUrces", "vfs");
 	auto path = PathJoinExt<false>(basePath, "file_ÄÖÜ", "TXT");
 	EXPECT_EQ(path, fmt::format("tests{0}resoUrces{0}vfs{0}file_ÄÖÜ.TXT", SPathDelimiter));
 }
 
-TEST(VFS_Test, ResolveCase)
+TEST(VFSTest, ResolveCase)
 {
 	auto badPath = PathJoin<false>("tests", "resoUrces", "vfs", "encoding", "file_ÄÖÜ.txt");
 	const auto& path = ResolveCase(badPath);
@@ -166,7 +166,7 @@ TEST(VFS_Test, ResolveCase)
 #endif
 }
 
-TEST(VFS_Test, MakeDirectory)
+TEST(VFSTest, MakeDirectory)
 {
 	auto tempPath = getTempPath();
 
@@ -181,7 +181,7 @@ TEST(VFS_Test, MakeDirectory)
 	RemoveDirectory(umlautPath);
 }
 
-TEST(VFS_Test, MakeDirectories)
+TEST(VFSTest, MakeDirectories)
 {
 	auto tempPath = getTempPath();
 
@@ -198,7 +198,7 @@ TEST(VFS_Test, MakeDirectories)
 	RemoveDirectory(PathJoin(tempPath, "test_Ö"));
 }
 
-TEST(VFS_Test, RemoveDirectory)
+TEST(VFSTest, RemoveDirectory)
 {
 	auto tempPath = getTempPath();
 
@@ -215,7 +215,7 @@ TEST(VFS_Test, RemoveDirectory)
 	RemoveDirectory(PathJoin(tempPath, "test_Ö"));
 }
 
-TEST(VFS_Test, UnlinkFile)
+TEST(VFSTest, UnlinkFile)
 {
 	auto tempPath = getTempPath();
 
