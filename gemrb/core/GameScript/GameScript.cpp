@@ -1659,6 +1659,38 @@ static void SetupSavedTriggers()
 	}
 }
 
+static void InitializeObjectIDS(const AutoTable& objNameTable)
+{
+	TableMgr::index_t idsRow = objNameTable->GetRowIndex("OBJECT_IDS_COUNT");
+
+	ObjectIDSCount = objNameTable->QueryFieldSigned<int>(idsRow, 0);
+	if (ObjectIDSCount < 0 || ObjectIDSCount > MAX_OBJECT_FIELDS) {
+		error("GameScript", "The IDS Count shouldn't be more than 10!");
+	}
+
+	ObjectIDSTableNames.resize(ObjectIDSCount);
+	for (int i = 0; i < ObjectIDSCount; i++) {
+		const std::string& idsName = objNameTable->QueryField(idsRow, i + 1);
+		const IDSLink* poi = FindIdentifier(idsName.c_str());
+		if (poi == nullptr) {
+			idtargets[i] = nullptr;
+		} else {
+			idtargets[i] = poi->Function;
+		}
+		ObjectIDSTableNames[i] = ResRef(idsName);
+	}
+
+	MaxObjectNesting = objNameTable->QueryFieldSigned<int>("MAX_OBJECT_NESTING", "DATA");
+	if (MaxObjectNesting < 0 || MaxObjectNesting > MAX_NESTING) {
+		error("GameScript", "The Object Nesting Count shouldn't be more than 5!");
+	}
+
+	HasAdditionalRect = objNameTable->QueryFieldSigned<int>("ADDITIONAL_RECT", "DATA") != 0;
+	ExtraParametersCount = objNameTable->QueryFieldSigned<int>("EXTRA_PARAMETERS_COUNT", "DATA");
+	HasTriggerPoint = objNameTable->QueryFieldSigned<int>("TRIGGER_POINT", "DATA") != 0;
+	ObjectFieldsCount = ObjectIDSCount - ExtraParametersCount;
+}
+
 void InitializeIEScript()
 {
 	PluginMgr::Get()->RegisterCleanup(CleanupIEScript);
@@ -1690,31 +1722,7 @@ void InitializeIEScript()
 	}
 
 	/* Loading Script Configuration Parameters */
-
-	ObjectIDSCount = objNameTable->QueryFieldSigned<int>(0, 0);
-	if (ObjectIDSCount < 0 || ObjectIDSCount > MAX_OBJECT_FIELDS) {
-		error("GameScript", "The IDS Count shouldn't be more than 10!");
-	}
-
-	ObjectIDSTableNames.resize(ObjectIDSCount);
-	for (int i = 0; i < ObjectIDSCount; i++) {
-		const std::string& idsName = objNameTable->QueryField(0, i + 1);
-		const IDSLink* poi = FindIdentifier(idsName.c_str());
-		if (poi == nullptr) {
-			idtargets[i] = nullptr;
-		} else {
-			idtargets[i] = poi->Function;
-		}
-		ObjectIDSTableNames[i] = ResRef(idsName);
-	}
-	MaxObjectNesting = objNameTable->QueryFieldSigned<int>(1, 0);
-	if (MaxObjectNesting < 0 || MaxObjectNesting > MAX_NESTING) {
-		error("GameScript", "The Object Nesting Count shouldn't be more than 5!");
-	}
-	HasAdditionalRect = objNameTable->QueryFieldSigned<int>(2, 0) != 0;
-	ExtraParametersCount = objNameTable->QueryFieldSigned<int>(3, 0);
-	HasTriggerPoint = objNameTable->QueryFieldSigned<int>(4, 0) != 0;
-	ObjectFieldsCount = ObjectIDSCount - ExtraParametersCount;
+	InitializeObjectIDS(objNameTable);
 
 	/* Initializing the Script Engine */
 	SetupTriggers();
