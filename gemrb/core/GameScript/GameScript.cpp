@@ -1302,7 +1302,7 @@ static const L* FindLink(StringView name, const L2& names)
 
 static const IDSLink* FindIdentifier(const std::string& idsname)
 {
-	int len = static_cast<int>(idsname.size());
+	int len = static_cast<int>(idsname.size() + 1);
 	for (int i = 0; idsnames[i].Name; i++) {
 		if (!strnicmp(idsnames[i].Name, idsname.c_str(), len)) {
 			return idsnames + i;
