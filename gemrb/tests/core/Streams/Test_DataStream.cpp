@@ -55,21 +55,21 @@ public:
 	}
 };
 
-class DataStream_ReadingTest : public DataStream_Test {
+class DataStreamReadingTest : public DataStream_Test {
 	void SetUp() override
 	{
 		this->stream = GetParam()(READ_TEST_FILE);
 	}
 };
 
-class DataStream_DecryptionTest : public DataStream_Test {
+class DataStreamDecryptionTest : public DataStream_Test {
 	void SetUp() override
 	{
 		this->stream = GetParam()(DECRYPTION_TEST_FILE);
 	}
 };
 
-TEST_P(DataStream_ReadingTest, MetaData)
+TEST_P(DataStreamReadingTest, MetaData)
 {
 	EXPECT_FALSE(stream->CheckEncrypted());
 	EXPECT_EQ(stream->GetPos(), 0);
@@ -82,7 +82,7 @@ TEST_P(DataStream_ReadingTest, MetaData)
 	EXPECT_EQ(stream->GetPos(), stream->Size());
 }
 
-TEST_P(DataStream_ReadingTest, ReadScalar)
+TEST_P(DataStreamReadingTest, ReadScalar)
 {
 	uint8_t one;
 	EXPECT_EQ(stream->ReadScalar(one), 1);
@@ -98,7 +98,7 @@ TEST_P(DataStream_ReadingTest, ReadScalar)
 	EXPECT_EQ(four, 0x0201);
 }
 
-TEST_P(DataStream_ReadingTest, ReadEnum)
+TEST_P(DataStreamReadingTest, ReadEnum)
 {
 	stream->Seek(5, GEM_STREAM_START);
 	DummyEnum enumValue;
@@ -106,7 +106,7 @@ TEST_P(DataStream_ReadingTest, ReadEnum)
 	EXPECT_EQ(enumValue, DummyEnum::VALUE_11);
 }
 
-TEST_P(DataStream_ReadingTest, ReadRTrimString)
+TEST_P(DataStreamReadingTest, ReadRTrimString)
 {
 	// cannot test with ordinary strings r/n
 	FixedSizeString<10> buffer;
@@ -115,7 +115,7 @@ TEST_P(DataStream_ReadingTest, ReadRTrimString)
 	EXPECT_EQ(buffer, "Text text");
 }
 
-TEST_P(DataStream_ReadingTest, ReadPoint)
+TEST_P(DataStreamReadingTest, ReadPoint)
 {
 	Point p;
 	stream->Seek(18, GEM_STREAM_START);
@@ -126,7 +126,7 @@ TEST_P(DataStream_ReadingTest, ReadPoint)
 }
 
 // equiv. to ReadPoint in terms of reading
-TEST_P(DataStream_ReadingTest, ReadSize)
+TEST_P(DataStreamReadingTest, ReadSize)
 {
 	Size s;
 	stream->Seek(18, GEM_STREAM_START);
@@ -136,7 +136,7 @@ TEST_P(DataStream_ReadingTest, ReadSize)
 	EXPECT_EQ(s, expected);
 }
 
-TEST_P(DataStream_ReadingTest, ReadRegion)
+TEST_P(DataStreamReadingTest, ReadRegion)
 {
 	Region r;
 	stream->Seek(18, GEM_STREAM_START);
@@ -146,7 +146,7 @@ TEST_P(DataStream_ReadingTest, ReadRegion)
 	EXPECT_EQ(r, expected);
 }
 
-TEST_P(DataStream_ReadingTest, ReadRegion_AsPoints)
+TEST_P(DataStreamReadingTest, ReadRegionAsPoints)
 {
 	Region r;
 	stream->Seek(18, GEM_STREAM_START);
@@ -156,7 +156,7 @@ TEST_P(DataStream_ReadingTest, ReadRegion_AsPoints)
 	EXPECT_EQ(r, expected);
 }
 
-TEST_P(DataStream_ReadingTest, ReadLine)
+TEST_P(DataStreamReadingTest, ReadLine)
 {
 	stream->Seek(26, GEM_STREAM_START);
 	std::string buffer {};
@@ -171,7 +171,7 @@ TEST_P(DataStream_ReadingTest, ReadLine)
 	EXPECT_EQ(buffer, "Line4");
 }
 
-TEST_P(DataStream_DecryptionTest, ReadEncryptedValues)
+TEST_P(DataStreamDecryptionTest, ReadEncryptedValues)
 {
 	EXPECT_TRUE(stream->CheckEncrypted());
 
@@ -183,7 +183,7 @@ TEST_P(DataStream_DecryptionTest, ReadEncryptedValues)
 	}
 }
 
-TEST(DataStream_WritingTest, Writes)
+TEST(DataStreamWritingTest, Writes)
 {
 	void* buffer = malloc(35);
 	MemoryStream stream { "", buffer, 35 };
@@ -232,14 +232,14 @@ static DataStream* createMMapStream(const path_t& path)
 
 INSTANTIATE_TEST_SUITE_P(
 	DataStreamReadingInstances,
-	DataStream_ReadingTest,
+	DataStreamReadingTest,
 	testing::Values(
 		DataStreamFactory { createFileStream },
 		DataStreamFactory { createMMapStream }));
 
 INSTANTIATE_TEST_SUITE_P(
 	DataStreamDecryptingInstances,
-	DataStream_DecryptionTest,
+	DataStreamDecryptionTest,
 	testing::Values(
 		DataStreamFactory { createFileStream },
 		DataStreamFactory { createMMapStream }));

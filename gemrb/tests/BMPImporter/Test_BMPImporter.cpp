@@ -30,7 +30,7 @@ static const path_t SAMPLE_FILE_8B = PathJoin(resources, "sample_8bit.bmp");
 static const path_t SAMPLE_FILE_V3 = PathJoin(resources, "sample_v3.bmp");
 static const path_t SAMPLE_FILE_V5 = PathJoin(resources, "sample_v5.bmp");
 
-class BMPImporter_Test : public testing::TestWithParam<path_t> {
+class BMPImporterTest : public testing::TestWithParam<path_t> {
 protected:
 	BMPImporter unit;
 	const path_t path;
@@ -46,7 +46,7 @@ public:
 };
 
 // More like a smoke test
-TEST_P(BMPImporter_Test, GetPalette)
+TEST_P(BMPImporterTest, GetPalette)
 {
 	Palette pal;
 	EXPECT_EQ(unit.GetPalette(2, pal), -1);
@@ -54,7 +54,7 @@ TEST_P(BMPImporter_Test, GetPalette)
 
 INSTANTIATE_TEST_SUITE_P(
 	BMPImporterInstances,
-	BMPImporter_Test,
+	BMPImporterTest,
 	testing::Values(
 		SAMPLE_FILE,
 		SAMPLE_FILE_8B,
