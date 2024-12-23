@@ -1350,12 +1350,11 @@ int GameScript::ID_ClassMask(const Actor* actor, int parameter)
 	return 0;
 }
 
-// this is only present in iwd2
-// the function is identical to ID_Class, but uses the class20 IDS,
-// iwd2's class.ids is different than the rest, while class20 is identical (remnant)
-int GameScript::ID_AVClass(const Actor* actor, int parameter)
+// Defunct object selector in IWD2. AVCLASS.IDS doesn't exist, and the engine
+// doesn't do anything with the value other than read / write it to sprites.
+int GameScript::ID_AVClass(const Actor*, int)
 {
-	return idclass(actor, parameter, false);
+	return true;
 }
 
 int GameScript::ID_Race(const Actor* actor, int parameter)

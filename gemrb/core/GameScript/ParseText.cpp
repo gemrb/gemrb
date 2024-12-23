@@ -93,8 +93,9 @@ static int ParseIntParam(const char*& src, const char*& str)
 
 static void ParseIdsTarget(const char*& src, Object*& object)
 {
-	for (int i = 0; i < ObjectFieldsCount; i++) {
-		object->objectFields[i] = GetIdsValue(src, ObjectIDSTableNames[i]);
+	for (int i = 0; i < DialogObjectIDSCount; i++) {
+		int fieldIndex = DialogObjectIDSOrder[i];
+		object->objectFields[fieldIndex] = GetIdsValue(src, DialogObjectIDSTableNames[i]);
 		if (*src != '.') {
 			break;
 		}
