@@ -37,11 +37,11 @@ protected:
 
 	mutable BlitFlags appliedBlitFlags = BlitFlags::NONE;
 	mutable Color appliedTint;
-	mutable bool surfaceInvalidated = false;
+	mutable bool surfaceInvalidated = true;
 
-	mutable version_t palVersion;
+	mutable version_t palVersion = 0;
 	mutable Holder<Palette> shadedPalette;
-	mutable version_t shadedPaletteVersion;
+	mutable version_t shadedPaletteVersion = 0;
 
 	void UpdatePalette() noexcept override;
 	void UpdateColorKey() noexcept override;
