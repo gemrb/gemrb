@@ -44,12 +44,12 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const Region& rgn, void* px, const PixelF
 	assert(surface);
 	pitch = surface->pitch;
 
+	UpdateColorKey();
+	format = PixelFormatForSurface(surface, format.palette);
+
 	if (format.palette) {
 		UpdatePalette();
 	}
-	UpdateColorKey();
-
-	format = PixelFormatForSurface(surface, format.palette);
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const Region& rgn, const PixelFormat& fmt) noexcept
@@ -62,13 +62,9 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D& obj) noexcept
 	renderFlags = obj.renderFlags;
 	appliedBlitFlags = obj.appliedBlitFlags;
 	appliedTint = obj.appliedTint;
-	surfaceInvalidated = obj.surfaceInvalidated;
-	palVersion = obj.palVersion;
-	if (obj.shadedPalette) {
-		shadedPalette = MakeHolder<Palette>(*obj.shadedPalette);
-	}
-	shadedPaletteVersion = obj.shadedPaletteVersion;
 
+	// note: make sure that src & dest have the same palette applied before this
+	// everything else will end up in SDL color transformation magic
 	SDL_BlitSurface(obj.surface, nullptr, surface, nullptr);
 }
 
