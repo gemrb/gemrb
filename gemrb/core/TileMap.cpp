@@ -107,10 +107,10 @@ Door* TileMap::GetDoor(const Point& p) const
 Door* TileMap::GetDoorByPosition(const Point& p) const
 {
 	for (Door* door : doors) {
-		if (door->toOpen[0].x == p.x && door->toOpen[0].y == p.y) {
+		if (door->toOpen[0] == p) {
 			return door;
 		}
-		if (door->toOpen[1].x == p.x && door->toOpen[1].y == p.y) {
+		if (door->toOpen[1] == p) {
 			return door;
 		}
 	}
@@ -227,7 +227,7 @@ Container* TileMap::GetContainerByPosition(const Point& position, int type) cons
 			continue;
 		}
 
-		if (container->Pos.x != position.x || container->Pos.y != position.y) {
+		if (container->Pos != position) {
 			continue;
 		}
 
