@@ -991,9 +991,8 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 		state = SetupActionButton (pc, action, btn, i, pcStats, invInfo)
 
 		disabledButton = GemRB.GetPlayerStat (pc, IE_DISABLEDBUTTON)
-		if action < 0 or (action <= ACT_SKILLS and (disabledButton & (1 << action))):
-			state = IE_GUI_BUTTON_DISABLED
-		elif action >= ACT_QSPELL1 and action <= ACT_QSPELL3 and (disabledButton & (1 << ACT_CAST)):
+		disablableAction = (action <= ACT_SKILLS) or (action >= ACT_QSPELL1 and action <= ACT_QSPELL3)
+		if action < 0 or (disablableAction and disabledButton & (1 << action)):
 			state = IE_GUI_BUTTON_DISABLED
 
 		btn.SetState (state)
@@ -1097,16 +1096,16 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		return capability > 0
 
 	def HasAnyActiveCasterLevel (pc):
-		sum = GemRB.GetPlayerLevel (pc, ISMAGE) + GemRB.GetPlayerLevel (pc, ISSORCERER) + GemRB.GetPlayerLevel (pc, ISBARD)
-		sum = sum + GemRB.GetPlayerLevel (pc, ISCLERIC) + GemRB.GetPlayerLevel (pc, ISDRUID)
+		levels = GemRB.GetPlayerLevel (pc, ISMAGE) + GemRB.GetPlayerLevel (pc, ISSORCERER) + GemRB.GetPlayerLevel (pc, ISBARD)
+		levels = levels + GemRB.GetPlayerLevel (pc, ISCLERIC) + GemRB.GetPlayerLevel (pc, ISDRUID)
 		# first spells at level: 9 (bg1), 6 (iwd), 4 (iwd2)
 		# lowest works here, since we also check for spell presence
 		# — either you have spells from the class or the other one provides them
-		sum = sum + int(GemRB.GetPlayerLevel (pc, ISPALADIN) >= 4)
+		levels = levels + int(GemRB.GetPlayerLevel (pc, ISPALADIN) >= 4)
 		# first spells at level: 8 (bg1), 6 (iwd), 4 (iwd2)
 		# we could look it up in the tables instead
-		sum = sum + int(GemRB.GetPlayerLevel(pc, ISRANGER) >= 4)
-		return sum > 0
+		levels = levels + int(GemRB.GetPlayerLevel(pc, ISRANGER) >= 4)
+		return levels > 0
 
 	SetItemText (btn, 0, False)
 
