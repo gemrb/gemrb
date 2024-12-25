@@ -127,10 +127,38 @@ int OGGReader::read_samples(short* buffer, int count)
 	return samples_got;
 }
 
-int OGGReader::ReadSamplesIntoChannels(char* /*channel1*/, char* /*channel2*/, int /*numSamples*/)
+static constexpr size_t CHANNEL_SPLIT_BUFFER_SIZE = 4096;
+
+int OGGReader::ReadSamplesIntoChannels(char* channel1, char* channel2, int numSamples)
 {
-	// unimplemented
-	return 0;
+	std::vector<char> buffer;
+	buffer.resize(CHANNEL_SPLIT_BUFFER_SIZE);
+	int streamPos = 0;
+
+	uint8_t bytesPerChannel = 2;
+	uint8_t bytesPerSample = 2 * bytesPerChannel;
+	int samplesRead = ov_read(&OggStream, buffer.data(), CHANNEL_SPLIT_BUFFER_SIZE, false, 2, 1, &streamPos) / bytesPerSample;
+	auto totalSamples = samplesRead;
+
+	size_t z = 0;
+	do {
+		for (decltype(samplesRead) i = 0; i < samplesRead; ++i) {
+			auto bufferOffset = i * bytesPerSample;
+			for (uint8_t j = 0; j < bytesPerChannel; ++j) {
+				channel1[z + j] = buffer[bufferOffset + j];
+				channel2[z + j] = buffer[bufferOffset + j + 2];
+			}
+			z += bytesPerChannel;
+		}
+
+		samplesRead = ov_read(&OggStream, buffer.data(), CHANNEL_SPLIT_BUFFER_SIZE, false, 2, 1, &streamPos) / bytesPerSample;
+		if (samplesRead == OV_HOLE) {
+			continue;
+		}
+		totalSamples += samplesRead;
+	} while (samplesRead > 0 && totalSamples <= numSamples);
+
+	return totalSamples;
 }
 
 #include "plugindef.h"
