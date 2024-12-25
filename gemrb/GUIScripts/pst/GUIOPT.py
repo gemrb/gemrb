@@ -37,6 +37,7 @@ import GUICommon
 import GUICommonWindows
 import GUISAVE
 import GUIOPTControls
+from ie_sounds import *
 from GUIDefines import *
 
 ###################################################
@@ -173,7 +174,8 @@ def UpdateVolume (volume_ref):
 	helpTA = GemRB.GetView ("OPTHELP")
 	if helpTA:
 		helpTA.SetText (volume_ref)
-	GemRB.UpdateVolume ()
+	GemRB.UpdateVolume (GEM_SND_VOL_MUSIC)
+	GemRB.UpdateVolume (GEM_SND_VOL_AMBIENTS)
 
 ###################################################
 
