@@ -1049,8 +1049,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			case '5':
 				{
-					constexpr int flagCnt = 6;
-					static uint32_t wallFlags[flagCnt] {
+					static std::array<uint32_t, 6> wallFlags {
 						0,
 						DEBUG_SHOW_WALLS_ALL,
 						DEBUG_SHOW_DOORS_SECRET,
@@ -1061,7 +1060,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					static uint32_t flagIdx = 0;
 					DebugFlags &= ~DEBUG_SHOW_WALLS_ALL;
 					DebugFlags |= wallFlags[flagIdx++];
-					flagIdx = flagIdx % flagCnt;
+					flagIdx = flagIdx % wallFlags.size();
 				}
 				break;
 			case '6': //toggle between lightmap/heightmap/material/search
