@@ -182,7 +182,7 @@ bool AudioStream::ClearIfStopped(ALuint Source)
 	alGetSourcei(Source, AL_SOURCE_STATE, &state);
 	if (!checkALError("Failed to check source state", WARNING) &&
 	    state == AL_STOPPED) {
-		ClearProcessedBuffers();
+		ClearProcessedBuffers(Source);
 		alDeleteSources(1, &Source);
 		checkALError("Failed to delete source", WARNING);
 
