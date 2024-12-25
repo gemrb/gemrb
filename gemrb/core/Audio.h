@@ -145,7 +145,7 @@ public:
 	virtual bool ReleaseStream(int stream, bool HardStop = false) = 0;
 	virtual int SetupNewStream(int x, int y, int z,
 				   ieWord gain, bool point, int ambientRange) = 0;
-	virtual tick_t QueueAmbient(int stream, const ResRef& sound) = 0;
+	virtual tick_t QueueAmbient(int stream, const ResRef& sound, bool spatial) = 0;
 	virtual void SetAmbientStreamVolume(int stream, int volume) = 0;
 	virtual void SetAmbientStreamPitch(int stream, int pitch) = 0;
 	virtual void QueueBuffer(int stream, unsigned short bits,

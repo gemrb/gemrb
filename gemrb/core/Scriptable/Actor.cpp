@@ -3855,7 +3855,7 @@ void Actor::PlayExistenceSounds()
 		ieDword vol = core->GetDictionary().Get("Volume Ambients", 100);
 		int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, ieWord(vol), true, 50); // REFERENCE_DISTANCE
 		if (stream != -1) {
-			tick_t audioLength = audio->QueueAmbient(stream, sb.Sound);
+			tick_t audioLength = audio->QueueAmbient(stream, sb.Sound, true);
 			if (audioLength > 0) {
 				SetAnimatedTalking(audioLength);
 			}

@@ -314,7 +314,7 @@ tick_t AmbientMgr::AmbientSource::Enqueue() const
 {
 	if (stream < 0) return -1;
 	// print("Playing ambient %s, %d/%ld on stream %d", ambient->sounds[nextref], nextref, ambient->sounds.size(), stream);
-	return core->GetAudioDrv()->QueueAmbient(stream, ambient->sounds[nextref]);
+	return core->GetAudioDrv()->QueueAmbient(stream, ambient->sounds[nextref], !(ambient->GetFlags() & IE_AMBI_MAIN));
 }
 
 bool AmbientMgr::AmbientSource::IsHeard(const Point& listener) const

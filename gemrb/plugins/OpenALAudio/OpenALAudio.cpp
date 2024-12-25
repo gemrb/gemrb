@@ -897,7 +897,7 @@ int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 	return streamIdx;
 }
 
-tick_t OpenALAudioDriver::QueueAmbient(int streamIdx, const ResRef& sound)
+tick_t OpenALAudioDriver::QueueAmbient(int streamIdx, const ResRef& sound, bool spatial)
 {
 	auto& stream = streams[streamIdx];
 	if (stream.free || !stream.ambient)
@@ -909,7 +909,7 @@ tick_t OpenALAudioDriver::QueueAmbient(int streamIdx, const ResRef& sound)
 	stream.ClearProcessedBuffers();
 
 	tick_t time_length;
-	ALuint Buffer = loadSound(sound, time_length).first;
+	ALuint Buffer = loadSound(sound, time_length, spatial).first;
 	if (0 == Buffer) {
 		return -1;
 	}
