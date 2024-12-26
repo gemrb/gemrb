@@ -130,7 +130,7 @@ public:
 	void UpdateVolume(unsigned int flags) override;
 
 	int SetupNewStream(int x, int y, int z, ieWord gain, bool point, int ambientRange) override;
-	tick_t QueueAmbient(int stream, const ResRef& sound) override;
+	tick_t QueueAmbient(int stream, const ResRef& sound, bool spatial) override;
 	bool ReleaseStream(int stream, bool hardstop) override;
 	void SetAmbientStreamVolume(int stream, int gain) override;
 	void SetAmbientStreamPitch(int stream, int pitch) override;

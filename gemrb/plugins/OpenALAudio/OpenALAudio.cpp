@@ -182,7 +182,7 @@ bool AudioStream::ClearIfStopped(ALuint Source)
 	alGetSourcei(Source, AL_SOURCE_STATE, &state);
 	if (!checkALError("Failed to check source state", WARNING) &&
 	    state == AL_STOPPED) {
-		ClearProcessedBuffers();
+		ClearProcessedBuffers(Source);
 		alDeleteSources(1, &Source);
 		checkALError("Failed to delete source", WARNING);
 
@@ -863,18 +863,28 @@ int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 		return -1;
 	}
 
-	ALfloat position[] = { (float) x, (float) y, (float) z };
 	alSourcef(source, AL_PITCH, 1.0f);
-	alSourcefv(source, AL_POSITION, position);
 	alSourcei(source, AL_LOOPING, 0);
-	alSourcef(source, AL_GAIN, 0.01f * gain);
-	// under default sound distance model (AL_INVERSE_DISTANCE_CLAMPED) the formula is:
-	//   dist = max(dist, AL_REFERENCE_DISTANCE);
-	//   dist = min(dist, AL_MAX_DISTANCE);
-	//   gain = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE + AL_ROLLOFF_FACTOR * (dist – AL_REFERENCE_DISTANCE) );
-	// ambientRange also works as cut-off distance, so reducing the volume earlier
-	alSourcei(source, AL_REFERENCE_DISTANCE, ambientRange > 0 ? (ambientRange / 2) : REFERENCE_DISTANCE);
-	alSourcei(source, AL_ROLLOFF_FACTOR, point ? 1 : 0);
+	alSourcef(source, AL_GAIN, 0.03f * gain);
+	alSourcei(source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE);
+	alSourcei(source, AL_ROLLOFF_FACTOR, 0);
+	alSourcei(source, AL_SOURCE_RELATIVE, !point);
+
+	if (point) {
+		ALfloat position[] = { (float) x, (float) y, (float) z };
+		alSourcefv(source, AL_POSITION, position);
+
+		// under default sound distance model (AL_INVERSE_DISTANCE_CLAMPED) the formula is:
+		//   dist = max(dist, AL_REFERENCE_DISTANCE);
+		//   dist = min(dist, AL_MAX_DISTANCE);
+		//   gain = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE + AL_ROLLOFF_FACTOR * (dist – AL_REFERENCE_DISTANCE) );
+		alSourcei(source, AL_ROLLOFF_FACTOR, 4);
+		alSourcei(source, AL_MAX_DISTANCE, ambientRange);
+	} else {
+		ALfloat position[] = { 0.0f, 0.0f, 0.0f };
+		alSourcefv(source, AL_POSITION, position);
+	}
+
 	checkALError("Unable to set stream parameters", WARNING);
 
 	auto& stream = streams[streamIdx];
@@ -887,7 +897,7 @@ int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 	return streamIdx;
 }
 
-tick_t OpenALAudioDriver::QueueAmbient(int streamIdx, const ResRef& sound)
+tick_t OpenALAudioDriver::QueueAmbient(int streamIdx, const ResRef& sound, bool spatial)
 {
 	auto& stream = streams[streamIdx];
 	if (stream.free || !stream.ambient)
@@ -899,7 +909,7 @@ tick_t OpenALAudioDriver::QueueAmbient(int streamIdx, const ResRef& sound)
 	stream.ClearProcessedBuffers();
 
 	tick_t time_length;
-	ALuint Buffer = loadSound(sound, time_length).first;
+	ALuint Buffer = loadSound(sound, time_length, spatial).first;
 	if (0 == Buffer) {
 		return -1;
 	}

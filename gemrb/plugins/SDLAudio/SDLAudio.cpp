@@ -438,7 +438,7 @@ int SDLAudio::SetupNewStream(int x, int y, int z,
 	return 0;
 }
 
-tick_t SDLAudio::QueueAmbient(int stream, const ResRef& sound)
+tick_t SDLAudio::QueueAmbient(int stream, const ResRef& sound, bool spatial)
 {
 	if (stream <= 0 || stream > AMBIENT_CHANNELS) {
 		return -1;
@@ -455,7 +455,7 @@ tick_t SDLAudio::QueueAmbient(int stream, const ResRef& sound)
 		return -1;
 	}
 
-	if (ambientStreams[stream - 1].point) {
+	if (spatial && ambientStreams[stream - 1].point) {
 		SetChannelPosition(listenerPos, ambientStreams[stream - 1].streamPos, stream, AMBIENT_DISTANCE_ROLLOFF_MOD);
 	}
 	Mix_PlayChannel(stream, chunk, 0);
