@@ -348,7 +348,7 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 
 
 // wall polygons
-void Wall_Polygon::SetBaseline(const Point& a, const Point& b)
+void WallPolygon::SetBaseline(const Point& a, const Point& b)
 {
 	if ((a.x < b.x) || ((a.x == b.x) && (a.y < b.y))) {
 		base0 = a;
@@ -359,11 +359,11 @@ void Wall_Polygon::SetBaseline(const Point& a, const Point& b)
 	base1 = a;
 }
 
-bool Wall_Polygon::PointBehind(const Point& p) const
+bool WallPolygon::PointBehind(const Point& p) const
 {
-	if (wall_flag & WF_DISABLED)
+	if (wallFlag & WF_DISABLED)
 		return false;
-	if (wall_flag & WF_BASELINE) {
+	if (wallFlag & WF_BASELINE) {
 		if (base0.x > base1.x)
 			return left(base0, base1, p);
 		else
@@ -372,12 +372,12 @@ bool Wall_Polygon::PointBehind(const Point& p) const
 	return true;
 }
 
-void Wall_Polygon::SetDisabled(bool disabled)
+void WallPolygon::SetDisabled(bool disabled)
 {
 	if (disabled) {
-		wall_flag |= WF_DISABLED;
+		wallFlag |= WF_DISABLED;
 	} else {
-		wall_flag &= ~WF_DISABLED;
+		wallFlag &= ~WF_DISABLED;
 	}
 }
 

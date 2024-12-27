@@ -56,7 +56,7 @@ class Projectile;
 class ScriptedAnimation;
 class TileMap;
 class VEFObject;
-class Wall_Polygon;
+class WallPolygon;
 
 //distance of actors from spawn point
 #define SPAWN_RANGE 400

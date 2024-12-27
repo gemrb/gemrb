@@ -74,23 +74,23 @@ public:
 // door polygons are not always drawn
 #define WF_DISABLED 0x80
 
-class GEM_EXPORT Wall_Polygon : public Gem_Polygon {
+class GEM_EXPORT WallPolygon : public Gem_Polygon {
 public:
 	using Gem_Polygon::Gem_Polygon;
 	//is the point above the baseline
 	bool PointBehind(const Point& p) const;
-	ieDword GetPolygonFlag() const { return wall_flag; }
-	void SetPolygonFlag(ieDword flg) { wall_flag = flg; }
+	ieDword GetPolygonFlag() const { return wallFlag; }
+	void SetPolygonFlag(ieDword flg) { wallFlag = flg; }
 	void SetBaseline(const Point& a, const Point& b);
 
 	void SetDisabled(bool disabled);
 
 public:
-	ieDword wall_flag = 0;
+	ieDword wallFlag = 0;
 	Point base0, base1;
 };
 
-using WallPolygonGroup = std::vector<std::shared_ptr<Wall_Polygon>>;
+using WallPolygonGroup = std::vector<std::shared_ptr<WallPolygon>>;
 // the first of the pair are the walls in front, the second are the walls behind
 using WallPolygonSet = std::pair<WallPolygonGroup, WallPolygonGroup>;
 

@@ -345,7 +345,7 @@ void WEDImporter::ReadWallPolygons()
 
 		const Region& rgn = PolygonHeaders[i].rect;
 		if (!rgn.size.IsInvalid()) { // PST AR0600 is known to have a polygon with 0 height
-			polygonTable[i] = std::make_shared<Wall_Polygon>(std::move(points), &rgn);
+			polygonTable[i] = std::make_shared<WallPolygon>(std::move(points), &rgn);
 			if (flags & WF_BASELINE) {
 				polygonTable[i]->SetBaseline(base0, base1);
 			}
@@ -363,7 +363,7 @@ WallPolygonGroup WEDImporter::MakeGroupFromTableEntries(size_t idx, size_t cnt) 
 	auto begin = polygonTable.begin() + idx;
 	auto end = begin + cnt;
 	WallPolygonGroup grp;
-	std::copy_if(begin, end, std::back_inserter(grp), [](const std::shared_ptr<Wall_Polygon>& wp) {
+	std::copy_if(begin, end, std::back_inserter(grp), [](const std::shared_ptr<WallPolygon>& wp) {
 		return wp != nullptr;
 	});
 	return grp;

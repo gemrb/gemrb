@@ -1421,7 +1421,7 @@ void Map::DrawWallPolygons(const Region& viewport) const
 	for (const auto& poly : viewportWallsAll.first) {
 		const Point& origin = poly->BBox.origin - viewport.origin;
 
-		if (poly->wall_flag & WF_DISABLED) {
+		if (poly->wallFlag & WF_DISABLED) {
 			if (debugFlags & DEBUG_SHOW_DOORS_DISABLED) {
 				VideoDriver->DrawPolygon(poly.get(), origin, ColorGray, true, BlitFlags::BLENDED | BlitFlags::HALFTRANS);
 			}
@@ -1434,7 +1434,7 @@ void Map::DrawWallPolygons(const Region& viewport) const
 
 		Color c = ColorYellow;
 		if (debugFlags & DEBUG_SHOW_WALLS_ANIM_COVER) {
-			if (poly->wall_flag & WF_COVERANIMS) {
+			if (poly->wallFlag & WF_COVERANIMS) {
 				// darker yellow for walls with WF_COVERANIMS
 				c.r -= 0x80;
 				c.g -= 0x80;
@@ -1444,7 +1444,7 @@ void Map::DrawWallPolygons(const Region& viewport) const
 		}
 
 		VideoDriver->DrawPolygon(poly.get(), origin, c, true, BlitFlags::BLENDED | BlitFlags::HALFTRANS);
-		if (poly->wall_flag & WF_BASELINE) {
+		if (poly->wallFlag & WF_BASELINE) {
 			VideoDriver->DrawLine(poly->base0 - viewport.origin, poly->base1 - viewport.origin, ColorMagenta);
 		}
 	}
@@ -1484,7 +1484,7 @@ WallPolygonSet Map::WallsIntersectingRegion(Region r, bool includeDisabled, cons
 			const auto& group = wallGroups[y * pitch + x];
 
 			for (const auto& wp : group) {
-				if ((wp->wall_flag & WF_DISABLED) && includeDisabled == false) {
+				if ((wp->wallFlag & WF_DISABLED) && includeDisabled == false) {
 					continue;
 				}
 
@@ -2712,13 +2712,13 @@ void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, con
 	for (const auto& wp : walls) {
 		const Point& origin = wp->BBox.origin - vp.origin;
 
-		if (wp->wall_flag & WF_DITHER) {
+		if (wp->wallFlag & WF_DITHER) {
 			stencilcol.r = 0x80;
 		} else {
 			stencilcol.r = 0xff;
 		}
 
-		if (wp->wall_flag & WF_COVERANIMS) {
+		if (wp->wallFlag & WF_COVERANIMS) {
 			stencilcol.g = stencilcol.r;
 		} else {
 			stencilcol.g = 0;
