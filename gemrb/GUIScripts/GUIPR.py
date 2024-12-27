@@ -26,6 +26,7 @@ import GameCheck
 import GUICommon
 import GUICommonWindows
 import CommonTables
+import Spellbook
 from GUICommon import BindControlCallbackParams
 from GUIDefines import *
 from ie_stats import *
@@ -112,9 +113,14 @@ def UpdatePriestWindow (Window):
 	Label = Window.GetControl (0x10000035)
 	Label.SetText (Name)
 
+	Sorcerer = Spellbook.HasSorcererBook (pc)
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, False)
 	for i in range (12):
 		Button = Window.GetControl (3 + i)
+		Button.SetFlags (IE_GUI_VIEW_INVISIBLE | IE_GUI_VIEW_DISABLED, OP_OR if Sorcerer else OP_NAND)
+		if Sorcerer:
+			continue
+
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, spelltype, level, i)
 			Button.SetSpellIcon (ms['SpellResRef'], 0)
