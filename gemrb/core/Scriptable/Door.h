@@ -62,7 +62,7 @@ public:
 	DoorTrigger(std::shared_ptr<Gem_Polygon> openTrigger, WallPolygonGroup&& openWall,
 		    std::shared_ptr<Gem_Polygon> closedTrigger, WallPolygonGroup&& closedWall);
 
-	void SetState(bool open);
+	void SetState(bool open, Map* map);
 
 	std::shared_ptr<Gem_Polygon> StatePolygon() const;
 	std::shared_ptr<Gem_Polygon> StatePolygon(bool open) const;

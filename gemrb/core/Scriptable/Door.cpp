@@ -39,7 +39,7 @@ DoorTrigger::DoorTrigger(std::shared_ptr<Gem_Polygon> openTrigger, WallPolygonGr
 	: openWalls(std::move(openWalls)), closedWalls(std::move(closedWalls)), openTrigger(std::move(openTrigger)), closedTrigger(std::move(closedTrigger))
 {}
 
-void DoorTrigger::SetState(bool open)
+void DoorTrigger::SetState(bool open, Map* map)
 {
 	if (isOpen == open) return;
 	isOpen = open;
@@ -49,6 +49,10 @@ void DoorTrigger::SetState(bool open)
 	for (const auto& wp : closedWalls) {
 		wp->SetDisabled(isOpen);
 	}
+
+	// also force update the Map stencils
+	// without the viewport reset we would not notice there was a change
+	map->ResetStencilViewport();
 }
 
 std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon() const
@@ -76,7 +80,7 @@ void Door::ImpedeBlocks(const std::vector<SearchmapPoint>& points, PathMapFlags 
 
 void Door::UpdateDoor()
 {
-	doorTrigger.SetState(Flags & DOOR_OPEN);
+	doorTrigger.SetState(Flags & DOOR_OPEN, area);
 	outline = doorTrigger.StatePolygon();
 
 	if (outline) {

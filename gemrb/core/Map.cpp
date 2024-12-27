@@ -2675,10 +2675,6 @@ bool Map::IsWalkableTo(const SearchmapPoint& s, const SearchmapPoint& d, bool ac
 
 void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 {
-	// FIXME: how do we know if a door changed state?
-	// we need to redraw the stencil when that happens
-	// see TODO in Map::SetDrawingStencilForScriptable for another example of something that could use this
-
 	if (stencilViewport == vp) {
 		assert(wallStencil);
 		return;

@@ -502,6 +502,10 @@ public:
 	{
 		wallGroups = std::move(walls);
 	}
+	void ResetStencilViewport()
+	{
+		stencilViewport = Region();
+	}
 	bool BehindWall(const Point&, const Region&) const;
 	void Shout(const Actor* actor, int shoutID, bool global) const;
 	void ActorSpottedByPlayer(const Actor* actor) const;
