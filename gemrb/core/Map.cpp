@@ -1533,13 +1533,6 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 				DrawStencil(stencil, objectRgn, walls.first);
 				objectStencils[object] = std::make_pair(stencil, objectRgn);
 			}
-		} else {
-			// TODO: we only need to do this because a door might have changed state over us
-			// if we could detect that we could avoid doing this expensive operation
-			// we could add another wall flag to mark doors and then we only need to do this if one of the "walls" over us has that flag set
-			stencil->Clear();
-			stencil->SetOrigin(objectRgn.origin - viewPortOrigin);
-			DrawStencil(stencil, objectRgn, walls.first);
 		}
 
 		debugColor = ColorRed;
