@@ -103,7 +103,7 @@ def DualClassWindow ():
 
 	# back button (on)
 	DCMainBackButton = DCMainWindow.GetControl (5)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		DCMainBackButton.SetText (15416)
 	DCMainBackButton.OnPress (DCMainBackPress)
 	DCMainBackButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -478,7 +478,7 @@ def DCOpenProfsWindow ():
 	# load up our window and set some basic variables
 	DCProfsWindow = GemRB.LoadWindow (15, "GUIREC")
 	NewClassId = CommonTables.Classes.GetValue (ClassName, "ID", GTV_INT)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		LUProfsSelection.SetupProfsWindow (pc, \
 			LUProfsSelection.LUPROFS_TYPE_DUALCLASS, DCProfsWindow, DCProfsRedraw, classid=NewClassId)
 	else:
@@ -580,7 +580,7 @@ def OpenSkillsWindow ():
 	global DCSkillsWindow, DCSkillsDoneButton
 
 	DCSkillsWindow = GemRB.LoadWindow (7, "GUIREC")
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		LUSkillsSelection.SetupSkillsWindow (pc, \
 			LUSkillsSelection.LUSKILLS_TYPE_DUALCLASS, DCSkillsWindow, DCSkillsRedraw, classid=NewClassId)
 	else:

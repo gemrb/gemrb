@@ -32,12 +32,12 @@ NameField = ExportDoneButton = None
 ScriptsTable = None
 RevertButton = None
 
-if GameCheck.IsBG2() or GameCheck.IsBG1():
+if GameCheck.IsBG2OrEE () or GameCheck.IsBG1():
 	BioStrRefSlot = 74
 else:
 	BioStrRefSlot = 63
 
-if GameCheck.IsBG2() or GameCheck.IsIWD2():
+if GameCheck.IsBG2OrEE () or GameCheck.IsIWD2():
 	PortraitNameSuffix = "L"
 else:
 	PortraitNameSuffix = "G"
@@ -174,7 +174,7 @@ def OpenPortraitSelectWindow ():
 def PortraitDonePress ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	# eh, different sizes
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		GemRB.FillPlayerInfo (pc, Portrait.Name () + "M", Portrait.Name () + "S")
 	else:
 		GemRB.FillPlayerInfo (pc, Portrait.Name () + "L", Portrait.Name () + "S")
@@ -512,13 +512,13 @@ def OpenBiographyEditWindow ():
 		SubCustomizeWindow.DeleteControl (3)
 	else:
 		SubCustomizeWindow = GemRB.LoadWindow (23, "GUIREC")
-		if GameCheck.IsBG2 ():
+		if GameCheck.IsBG2OrEE ():
 			SubCustomizeWindow.DeleteControl (6)
 
 	SubCustomizeWindow.AddAlias("SUB_WIN", 0)
 
 	ClearButton = SubCustomizeWindow.GetControl (5)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		ClearButton.SetText (34881)
 	else:
 		ClearButton.SetText (18622)

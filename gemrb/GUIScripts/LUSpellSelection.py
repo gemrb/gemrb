@@ -97,7 +97,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	SpellsToMemoTable = GemRB.LoadTable (table)
 	if not SpellsToMemoTable.GetValue (str(level), str(1), GTV_INT):
 		if chargen:
-			if GameCheck.IsBG2():
+			if GameCheck.IsBG2OrEE ():
 				GemRB.SetNextScript("GUICG6")
 			elif GameCheck.IsBG1():
 				# HACK
@@ -111,7 +111,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	if chargen:
 		SpellsWindow = GemRB.LoadWindow (7, "GUICG")
 
-		if GameCheck.IsBG2():
+		if GameCheck.IsBG2OrEE ():
 			import CharGenCommon
 			CharGenCommon.PositionCharGenWin (SpellsWindow)
 		elif IWD2:
@@ -334,13 +334,13 @@ def SpellsDonePress ():
 			return
 
 	# close our window and update our records
-	if SpellsWindow and (not chargen or GameCheck.IsBG2() or IWD2):
+	if SpellsWindow and (not chargen or GameCheck.IsBG2OrEE () or IWD2):
 		SpellsWindow.Close ()
 		SpellsWindow = None
 
 	# move to the next script if this is chargen
 	if chargen:
-		if GameCheck.IsBG2():
+		if GameCheck.IsBG2OrEE ():
 			GemRB.SetNextScript("GUICG6")
 		elif GameCheck.IsBG1():
 			SpellsWindow.Close ()
@@ -384,7 +384,7 @@ def ShowKnownSpells ():
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetValue (i)
 		SpellButton.OnPress (MemorizePress)
-		if GameCheck.IsBG2():
+		if GameCheck.IsBG2OrEE ():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
 		else:
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
@@ -468,7 +468,7 @@ def ShowSpells ():
 		SpellButton.SetTooltip(Spell['SpellName'])
 		SpellButton.SetVarAssoc("ButtonPressed", i)
 		SpellButton.OnPress (SpellsSelectPress)
-		if GameCheck.IsBG2():
+		if GameCheck.IsBG2OrEE ():
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,2,3)
 		else:
 			SpellButton.SetSprites("GUIBTBUT",0, 0,1,24,25)
@@ -599,7 +599,7 @@ def SpellsCancelPress ():
 	# remove all learned spells
 	Spellbook.RemoveKnownSpells (pc, SpellBookType, 1, 9, 1)
 
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		# unload teh window and go back
 		if SpellsWindow:
 			SpellsWindow.Close ()

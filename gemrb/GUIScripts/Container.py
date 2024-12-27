@@ -158,7 +158,7 @@ def OpenContainerWindow ():
 	Container = GemRB.GetContainer(0)
 
 	# Gears (time) when options pane is down
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		import Clock
 		Clock.CreateClockButton(Window.GetControl (62))
 

@@ -125,7 +125,7 @@ def CheckStat20 (Actor, Stat, Diff):
 	return False
 
 def GetGUISpellButtonCount ():
-	if GameCheck.HasHOW() or GameCheck.IsBG2():
+	if GameCheck.HasHOW() or GameCheck.IsBG2OrEE ():
 		return 24
 	else:
 		return 20
@@ -791,7 +791,7 @@ def GetACStyleBonus (pc):
 	return WStyleTable.GetValue (str(stars), "AC", GTV_INT)
 
 def AddDefaultVoiceSet (VoiceList, Voices):
-	if GameCheck.IsBG1 () or GameCheck.IsBG2 ():
+	if GameCheck.IsBG1 () or GameCheck.IsBG2OrEE ():
 		Options = collections.OrderedDict(enumerate(Voices))
 		Options[-1] = "default"
 		Options = collections.OrderedDict(sorted(Options.items()))
@@ -805,7 +805,7 @@ def OverrideDefaultVoiceSet (Gender, CharSound):
 		if GameCheck.IsBG1 ():
 			Gender2Sound = [ "", "mainm", "mainf" ]
 			CharSound = Gender2Sound[Gender]
-		elif GameCheck.IsBG2 ():
+		elif GameCheck.IsBG2OrEE ():
 			Gender2Sound = [ "", "male005", "female4" ]
 			CharSound = Gender2Sound[Gender]
 	return CharSound

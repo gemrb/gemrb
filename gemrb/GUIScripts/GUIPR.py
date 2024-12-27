@@ -34,7 +34,7 @@ from ie_action import ACT_CAST
 PriestSpellWindow = None
 PriestSpellLevel = 0
 
-FlashResRef = "FLASHBR" if GameCheck.IsBG2() else "FLASH"
+FlashResRef = "FLASHBR" if GameCheck.IsBG2OrEE () else "FLASH"
 
 def InitPriestWindow (Window):
 	global PriestSpellWindow
@@ -47,7 +47,7 @@ def InitPriestWindow (Window):
 	Button.OnPress (PriestNextLevelPress)
 
 	#setup level buttons
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		for i in range (7):
 			Button = Window.GetControl (55 + i)
 			Button.OnPress (RefreshPriestLevel)
@@ -93,7 +93,7 @@ def UpdatePriestWindow (Window):
 
 	Label = Window.GetControl (0x10000032)
 	# bg2 uses a shorthand form
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		GemRB.SetToken ("SPELLLEVEL", str(level+1))
 		Label.SetText (10345)
 	else:
@@ -191,7 +191,7 @@ def OpenPriestSpellInfoWindow (spell):
 	Button.SetText (15416)
 	Button.OnPress (Window.Close)
 
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		Label = Window.GetControl (0x0fffffff)
 	else:
 		Label = Window.GetControl (0x10000000)

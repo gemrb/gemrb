@@ -46,7 +46,7 @@ def Set (PortraitName):
 	global PortraitCount
 
 	# removes the size marking character at the end
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		PortraitName = PortraitName.rstrip ("[ms]")
 	else:
 		PortraitName = PortraitName.rstrip ("[ls]")

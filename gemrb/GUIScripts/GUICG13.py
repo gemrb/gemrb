@@ -49,7 +49,7 @@ def OnLoad():
 	
 	ColorWindow=GemRB.LoadWindow(13, "GUICG")
 	ColorWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
-	if GameCheck.IsBG2 ():
+	if GameCheck.IsBG2OrEE ():
 		CharGenCommon.PositionCharGenWin (ColorWindow, -6)
 
 	ColorTable = GemRB.LoadTable("clowncol")
@@ -72,22 +72,22 @@ def OnLoad():
 	HairButton = ColorWindow.GetControl(2)
 	HairButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
 	HairButton.OnPress (HairPress)
-	HairButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, HairColor)
+	HairButton.SetBAM ("COLGRAD", GameCheck.IsBG2OrEE (), 0, HairColor)
 
 	SkinButton = ColorWindow.GetControl(3)
 	SkinButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
 	SkinButton.OnPress (SkinPress)
-	SkinButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, SkinColor)
+	SkinButton.SetBAM ("COLGRAD", GameCheck.IsBG2OrEE (), 0, SkinColor)
 
 	MajorButton = ColorWindow.GetControl(5)
 	MajorButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
 	MajorButton.OnPress (MajorPress)
-	MajorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MinorColor)
+	MajorButton.SetBAM ("COLGRAD", GameCheck.IsBG2OrEE (), 0, MinorColor)
 
 	MinorButton = ColorWindow.GetControl(4)
 	MinorButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
 	MinorButton.OnPress (MinorPress)
-	MinorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MajorColor)
+	MinorButton.SetBAM ("COLGRAD", GameCheck.IsBG2OrEE (), 0, MajorColor)
 
 	BackButton = ColorWindow.GetControl(13)
 	BackButton.SetText(15416)
@@ -118,22 +118,22 @@ def DonePress():
 	PickedColor = ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex == 0:
 		HairColor = PickedColor
-		HairButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, HairColor)
+		HairButton.SetBAM ("COLGRAD", GameCheck.IsBG2OrEE (), 0, HairColor)
 		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
 	if ColorIndex == 1:
 		SkinColor = PickedColor
-		SkinButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, SkinColor)
+		SkinButton.SetBAM ("COLGRAD", GameCheck.IsBG2OrEE (), 0, SkinColor)
 		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
 	if ColorIndex == 2:
 		MinorColor = PickedColor
-		MajorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MinorColor)
+		MajorButton.SetBAM ("COLGRAD", GameCheck.IsBG2OrEE (), 0, MinorColor)
 		BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 		return
 
 	MajorColor = PickedColor
-	MinorButton.SetBAM ("COLGRAD", GameCheck.IsBG2(), 0, MajorColor)
+	MinorButton.SetBAM ("COLGRAD", GameCheck.IsBG2OrEE (), 0, MajorColor)
 	BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 	return
 
@@ -141,12 +141,12 @@ def GetColor():
 	global ColorPicker
 
 	ColorPicker = GemRB.LoadWindow(14, "GUICG")
-	if GameCheck.IsBG2 ():
+	if GameCheck.IsBG2OrEE ():
 		CharGenCommon.PositionCharGenWin (ColorPicker, -2, -1)
 	GemRB.SetVar("Selected", None)
 	btnFlags = IE_GUI_BUTTON_PICTURE
 	btnState = IE_GUI_BUTTON_LOCKED
-	if GameCheck.IsBG2 ():
+	if GameCheck.IsBG2OrEE ():
 		btnFlags |= IE_GUI_BUTTON_RADIOBUTTON
 		btnState = IE_GUI_BUTTON_DISABLED
 	for i in range(34):

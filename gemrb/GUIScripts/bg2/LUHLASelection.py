@@ -20,6 +20,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_spells import LS_MEMO
+import GameCheck
 import GUICommon
 import Spellbook
 import CommonTables
@@ -68,7 +69,10 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	TitleLabel.SetText (63818)
 
 	# create the done button
-	HLADoneButton = HLAWindow.GetControl (28)
+	if GameCheck.IsBG2EE ():
+		HLADoneButton = HLAWindow.GetControl (42)
+	else:
+		HLADoneButton = HLAWindow.GetControl (28)
 	HLADoneButton.OnPress (HLADonePress)
 	HLADoneButton.SetText(11973)
 	HLADoneButton.MakeDefault()
@@ -78,7 +82,10 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 		HLADoneButton.SetDisabled(False)
 
 	# setup our text area
-	HLATextArea = HLAWindow.GetControl(26)
+	if GameCheck.IsBG2EE ():
+		HLATextArea = HLAWindow.GetControl (41)
+	else:
+		HLATextArea = HLAWindow.GetControl (26)
 
 	print("Number of HLAs:",len (HLAAbilities))
 

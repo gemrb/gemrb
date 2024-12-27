@@ -79,7 +79,7 @@ def InitRecordsWindow (Window):
 	Button.OnPress (GUIRECCommon.OpenExportWindow)
 
 	# kit info
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		Button = Window.GetControl (52)
 		Button.SetText (61265)
 		Button.OnPress (OpenKitInfoWindow)
@@ -124,7 +124,7 @@ def UpdateRecordsWindow (Window):
 	portrait = GemRB.GetPlayerPortrait (pc, 0)
 	pic = portrait["Sprite"] if portrait else ""
 
-	if GameCheck.IsBG2() and not GameCheck.IsBG2Demo():
+	if GameCheck.IsBG2OrEE () and not GameCheck.IsBG2Demo():
 		Button.SetPicture (pic, "NOPORTMD")
 	else:
 		Button.SetPicture (pic, "NOPORTLG")
@@ -245,7 +245,7 @@ def GetStatColor (pc, stat):
 
 # GemRB.GetPlayerStat wrapper that crosschecks skill availability
 SkillStatNames = { IE_PICKPOCKET : "PICK_POCKETS", IE_LOCKPICKING : "OPEN_LOCKS", IE_TRAPS : "FIND_TRAPS", IE_STEALTH : "STEALTH", IE_HIDEINSHADOWS : "HIDE_IN_SHADOWS", IE_DETECTILLUSIONS : "DETECT_ILLUSION", IE_SETTRAPS : "SET_TRAPS" }
-if GameCheck.IsBG2 ():
+if GameCheck.IsBG2OrEE ():
 	SkillStatNames[IE_STEALTH] = "MOVE_SILENTLY"
 def GetValidSkill (pc, className, stat):
 	val = GemRB.GetPlayerStat (pc, stat)
@@ -452,7 +452,7 @@ def GetProficiencies(pc, cdet):
 
 	# look ma, I can use both hands
 	
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		stats.append ( (61932, tohit["Base"], '0') )
 		if (GemRB.IsDualWielding(pc)):
 			stats.append ( (56911, tohit["Total"], '0') ) # main
@@ -518,7 +518,7 @@ def GetSkills(pc):
 			stats.append ( (15982, HatedRace, '') )
 
 	# these skills were new in bg2
-	if GameCheck.IsBG2() or GameCheck.IsIWD1():
+	if GameCheck.IsBG2OrEE () or GameCheck.IsIWD1():
 		stats.append ( (34120, GetValidSkill (pc, className, IE_HIDEINSHADOWS), '') )
 		stats.append ( (34121, GetValidSkill (pc, className, IE_DETECTILLUSIONS), '') )
 		stats.append ( (34122, GetValidSkill (pc, className, IE_SETTRAPS), '') )
@@ -570,7 +570,7 @@ def GetWeaponProficiencies(pc):
 	table = GemRB.LoadTable ("weapprof")
 	RowCount = table.GetRowCount ()
 	# the first 7 profs are foobared (bg1 style)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		offset = 8
 	else:
 		offset = 0
@@ -665,7 +665,7 @@ def GetResistances(pc):
 	stats = []
 	# only bg2 displayed all the resistances, but it is useful information
 	# Resistances
-	if GameCheck.IsBG2() or GameCheck.IsBG2EE():
+	if GameCheck.IsBG2OrEE ():
 		stats.append(32204)
 	elif not GameCheck.IsBG1():
 		stats.append (15544)
@@ -673,7 +673,7 @@ def GetResistances(pc):
 	# 32222 Magic Fire
 	# 32214 Normal Cold
 	# 32223 Magic Cold
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		stats.append ((32213, GS (pc, IE_RESISTFIRE), '%'))
 		stats.append ((32222, GS (pc, IE_RESISTMAGICFIRE), '%'))
 		stats.append ((32214, GS (pc, IE_RESISTCOLD), '%'))
@@ -698,7 +698,7 @@ def GetResistances(pc):
 		stats.append ((14015, GS (pc, IE_RESISTACID), '%'))
 	else:
 		stats.append ((32221, GS (pc, IE_RESISTACID), '%'))
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		# Magic (others show it higher up)
 		stats.append ((62146, GS (pc, IE_RESISTMAGIC), '%'))
 	# Magic Damage
@@ -725,7 +725,7 @@ def GetResistances(pc):
 def GetWeaponStyleBonuses(pc, cdet):
 
 	stats = []
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		# Weapon Style bonuses
 		stats.append (32131)
 		wstyle = cdet["Style"] # equipped weapon style + 1000 * proficiency level
@@ -743,7 +743,7 @@ def GetWeaponStyleBonuses(pc, cdet):
 
 def TypeSetStats(stats, pc=0):
 	# everyone but bg1 has it somewhere
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		str_None = GemRB.GetString (61560)
 	elif GameCheck.IsBG1():
 		str_None = -1

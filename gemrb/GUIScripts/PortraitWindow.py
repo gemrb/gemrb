@@ -206,7 +206,7 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 def AddStatusFlagLabel (Button, i):
 	# label for status flags (dialog, store, level up)
 	align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT | IE_FONT_SINGLE_LINE
-	if GameCheck.IsBG2 ():
+	if GameCheck.IsBG2OrEE ():
 		align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_CENTER | IE_FONT_SINGLE_LINE
 	label = Button.CreateLabel (199 + i, StatesFont, "", align) #level up icon is on the right
 	label.SetFrame (Button.GetInsetFrame (4))
@@ -336,7 +336,7 @@ def UpdatePortraitWindow ():
 		pcID = Button.Value
 		# character - 1 == bam cycle
 		talk = store = flag = blank = bytearray([32])
-		if GameCheck.IsBG2():
+		if GameCheck.IsBG2OrEE ():
 			flag = blank = bytearray([238])
 			# as far as I can tell only BG2 has icons for talk or store
 			flag = bytearray([238])
@@ -347,12 +347,12 @@ def UpdatePortraitWindow ():
 				flag = bytearray([155]) # shopping icon
 
 		if LUCommon.CanLevelUp (pcID):
-			if GameCheck.IsBG2():
+			if GameCheck.IsBG2OrEE ():
 				flag = flag + blank + bytearray([255])
 			else:
 				flag = bytearray([255])
 		else:
-			if GameCheck.IsBG2():
+			if GameCheck.IsBG2OrEE ():
 				flag = flag + blank + blank
 			else:
 				flag = ""

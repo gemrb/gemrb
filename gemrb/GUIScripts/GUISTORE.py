@@ -67,7 +67,7 @@ SellSum = 0
 
 UnusableColor = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
 
-if GameCheck.IsBG2():
+if GameCheck.IsBG2OrEE ():
 	IDColor = {'r' : 0, 'g' : 0, 'b' : 128, 'a' : 160}
 elif GameCheck.IsPST():
 	IDColor = {'r' : 128, 'g' : 0, 'b' : 0, 'a' : 100}
@@ -312,7 +312,7 @@ def InitStoreShoppingWindow (Window):
 		Label = Window.GetControl (0xfffffff)
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Label.SetText (26291)
-		elif GameCheck.IsBG2():
+		elif GameCheck.IsBG2OrEE ():
 			Label.SetText (51881)
 		else:
 			Label.SetText ("")
@@ -344,7 +344,7 @@ def InitStoreShoppingWindow (Window):
 
 		Button = Window.GetControlAlias ('RBTN' + str(i))
 		Button.SetVarAssoc ("RightIndex", i)
-		if GameCheck.IsBG2():
+		if GameCheck.IsBG2OrEE ():
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 
 		Button.SetBorder (0, IDColor, 0, 1)
@@ -365,7 +365,7 @@ def InitStoreShoppingWindow (Window):
 	if Inventory:
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetText (26287)
-		elif GameCheck.IsBG2():
+		elif GameCheck.IsBG2OrEE ():
 			Button.SetText (51882)
 		else:
 			Button.SetText ("")
@@ -379,7 +379,7 @@ def InitStoreShoppingWindow (Window):
 	if Inventory:
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetText (26288)
-		elif GameCheck.IsBG2():
+		elif GameCheck.IsBG2OrEE ():
 			Button.SetText (51883)
 		else:
 			Button.SetText ("")
@@ -811,7 +811,7 @@ def InitStoreRumourWindow (Window):
 	TextArea.SetText (strrefs["rumors"])
 
 	#tavern quality image
-	if GameCheck.IsBG1() or GameCheck.IsBG2():
+	if GameCheck.IsBG1() or GameCheck.IsBG2OrEE ():
 		BAM = "TVRNQUL%d"% ((Store['StoreFlags']>>9)&3)
 		Button = Window.GetControl (12)
 		Button.SetSprites (BAM, 0, 0, 0, 0, 0)
@@ -1238,7 +1238,7 @@ def RedrawStoreShoppingWindow (Window):
 	else:
 		RightButton.SetState (IE_GUI_BUTTON_DISABLED)
 
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		CloseBagButton = Window.GetControl (50)
 		if Bag:
 			CloseBagButton.SetText (37452)
@@ -1281,7 +1281,7 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 	wid = 16
 	if GameCheck.IsIWD2() or GameCheck.IsIWD1():
 		wid = 20
-	elif GameCheck.IsBG2():
+	elif GameCheck.IsBG2OrEE ():
 		pass
 	else:
 		return
@@ -1506,7 +1506,7 @@ def InfoWindow (Slot, Item):
 	Window = GemRB.LoadWindow (windowIDs["iteminfo"], "GUISTORE", StoreWindowPlacement)
 
 	# TODO: check if we can simplify bg2 vs non-pst games to see which label is which
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		NameLabel = Window.GetControl (0x10000000)
 		FakeLabel = Window.GetControl (0x10000007)
 	elif GameCheck.IsPST():
@@ -1526,7 +1526,7 @@ def InfoWindow (Slot, Item):
 	FakeLabel.SetText ("")
 
 	#description bam
-	if GameCheck.IsBG1() or GameCheck.IsBG2() or GameCheck.IsPST():
+	if GameCheck.IsBG1() or GameCheck.IsBG2OrEE () or GameCheck.IsPST():
 		Button = Window.GetControlAlias ("INFIMG")
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -1555,7 +1555,7 @@ def InfoWindow (Slot, Item):
 	Button.OnPress (Window.Close)
 
 	# hide the empty button
-	if GameCheck.IsBG2() or GameCheck.IsIWD2():
+	if GameCheck.IsBG2OrEE () or GameCheck.IsIWD2():
 		Window.DeleteControl (9)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -1699,7 +1699,7 @@ def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
 	if (Inventory or steal) and not GameCheck.IsPST():
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			LabelText = GemRB.GetString (24890)
-		elif GameCheck.IsBG2():
+		elif GameCheck.IsBG2OrEE ():
 			LabelText = GemRB.GetString (28337)
 		elif steal:
 			LabelText = Name

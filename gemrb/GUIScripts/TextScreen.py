@@ -87,7 +87,7 @@ def StartTextScreen ():
 		GemRB.DisplayString (Message, ColorRed)
 
 	Table = GemRB.LoadTable (TableName)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		LoadPic = Table.GetValue (-1, -1)
 		if LoadPic.startswith ("*"): # BG2 epilogues
 			ID = 63
@@ -117,7 +117,7 @@ def StartTextScreen ():
 	if GameCheck.IsBG1():
 		#these suckers couldn't use a fix row
 		FindTextRow (Table)
-	elif GameCheck.IsBG2():
+	elif GameCheck.IsBG2OrEE ():
 		FindTextRow (Table)
 		if LoadPic != "":
 			if ID == 63:

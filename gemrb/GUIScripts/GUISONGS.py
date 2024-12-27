@@ -40,7 +40,7 @@ def OnLoad():
 		MoviesTableName = "MUSIC"
 		ColOffset = 1
 		CreditsRef = "credits"
-	elif GameCheck.IsBG2():
+	elif GameCheck.IsBG2OrEE ():
 		MoviesTableName = "SONGLIST"
 		ColOffset = 0
 		CreditsRef = "endcrdit"

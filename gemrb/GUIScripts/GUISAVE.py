@@ -205,7 +205,7 @@ def OpenConfirmWindow (btn):
 		Slotname = Games[Pos].GetName()
 		save_strref = strs['overwrite']
 
-		if GameCheck.IsBG2 ():
+		if GameCheck.IsBG2OrEE ():
 			Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
 			GameDate = GemRB.GetString (str_chapter[Chapter-1]) + " " + Games[Pos].GetGameDate()
 		else:

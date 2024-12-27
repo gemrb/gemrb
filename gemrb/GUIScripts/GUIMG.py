@@ -44,13 +44,13 @@ ContTarg = None
 SpellType = None
 Level = 1
 
-FlashResRef = "FLASHBR" if GameCheck.IsBG2() else "FLASH"
+FlashResRef = "FLASHBR" if GameCheck.IsBG2OrEE () else "FLASH"
 
 def ToggleSpellWindow (btn):
 	global Sorcerer
 	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
+	Sorcerer = GameCheck.IsBG2OrEE () and Spellbook.HasSorcererBook (pc)
 	
 	ToggleSpellWindow.Args = btn
 	
@@ -71,6 +71,8 @@ def InitMageWindow (window):
 
 	# contingencies
 	Button = MageWindow.GetControl (55)
+	if GameCheck.IsBG2EE ():
+		Button = MageWindow.GetControl (59)
 	if Button:
 		Button.OnPress (OpenContingenciesWindow)
 		pc = GemRB.GameGetSelectedPCSingle ()
@@ -82,9 +84,14 @@ def InitMageWindow (window):
 			Button.SetText (34586)
 
 	#setup level buttons
-	if GameCheck.IsBG2():
+	spellLevelOffset = None
+	if GameCheck.IsBG2 ():
+		spellLevelOffset = 56
+	elif GameCheck.IsBG2EE ():
+		spellLevelOffset = 61
+	if spellLevelOffset:
 		for i in range (9):
-			Button = MageWindow.GetControl (56 + i)
+			Button = MageWindow.GetControl (spellLevelOffset + i)
 			Button.OnPress (RefreshMageLevel)
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 			Button.SetVarAssoc ("MageSpellLevel", i)
@@ -120,7 +127,7 @@ def UpdateMageWindow (MageWindow):
 	GUICommon.AdjustWindowVisibility (MageWindow, pc, CantCast)
 
 	Label = MageWindow.GetControl (0x10000032)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		GemRB.SetToken ("SPELLLEVEL", str(level + 1))
 		Label.SetText (10345)
 	else:
@@ -198,7 +205,7 @@ def MageSelectionChanged (oldwin):
 	UpdateMageWindow(oldwin)
 	
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
+	Sorcerer = GameCheck.IsBG2OrEE () and Spellbook.HasSorcererBook (pc)
 
 	if Sorcerer:
 		OpenSorcererWindow (ToggleSpellWindow.Args)
@@ -287,7 +294,7 @@ def OnMageMemorizeSpell (btn):
 	return
 
 def OpenMageSpellRemoveWindow (parentWin):
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
 		Window = GemRB.LoadWindow (5, "GUIMG")
@@ -318,7 +325,7 @@ def OpenMageSpellRemoveWindow (parentWin):
 	return
 
 def OpenMageSpellUnmemorizeWindow (btn):
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
 		Window = GemRB.LoadWindow (5, "GUIMG")

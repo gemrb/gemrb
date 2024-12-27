@@ -87,7 +87,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 	ProfsType = proftype
 	ProfsScrollBar = None
 
-	if proftype == LUPROFS_TYPE_CHARGEN and (GameCheck.IsBG1() or GameCheck.IsBG2()): #chargen
+	if proftype == LUPROFS_TYPE_CHARGEN and (GameCheck.IsBG1() or GameCheck.IsBG2OrEE ()):
 		ProfsOffsetSum = 9
 		ProfsOffsetButton1 = 11
 		ProfsOffsetStar = 27
@@ -99,10 +99,10 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 		if (scroll):
 			ProfsScrollBar = ProfsWindow.GetControl (78)
 
-		if GameCheck.IsBG2() or GameCheck.IsIWD2():
+		if GameCheck.IsBG2OrEE () or GameCheck.IsIWD2 ():
 			import CharGenCommon
 			CharGenCommon.PositionCharGenWin (ProfsWindow)
-	elif proftype == LUPROFS_TYPE_LEVELUP and GameCheck.IsBG2(): #levelup
+	elif proftype == LUPROFS_TYPE_LEVELUP and GameCheck.IsBG2OrEE ():
 		ProfsOffsetSum = 36
 		ProfsOffsetButton1 = 1
 		ProfsOffsetStar = 48
@@ -355,7 +355,7 @@ def ProfsRedraw (ProfsTopIndex):
 			Button2.SetState(IE_GUI_BUTTON_DISABLED)
 			Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 			Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-			if GameCheck.IsBG2() and (i==0 or ((i-1) in SkipProfs)):
+			if GameCheck.IsBG2OrEE () and (i == 0 or ((i - 1) in SkipProfs)):
 				SkipProfs.append (i)
 		else:
 			Button1.SetState(IE_GUI_BUTTON_ENABLED)
@@ -451,7 +451,7 @@ def ProfsSave (pc, proftype = LUPROFS_TYPE_LEVELUP):
 			ProfID = ProfID + IE_PROFICIENCYBASTARDSWORD
 		SaveProf = GemRB.GetVar ("Prof "+str(i))
 
-		if proftype == LUPROFS_TYPE_CHARGEN and GameCheck.IsBG2():
+		if proftype == LUPROFS_TYPE_CHARGEN and GameCheck.IsBG2OrEE ():
 			GemRB.DispelEffect (pc, "Proficiency", ProfID)
 		elif proftype != LUPROFS_TYPE_DUALCLASS:
 			OldProf = GemRB.GetPlayerStat (pc, ProfID) & 0x38
@@ -461,7 +461,7 @@ def ProfsSave (pc, proftype = LUPROFS_TYPE_LEVELUP):
 			SaveProf = (OldProf << 3) | SaveProf
 
 		GemRB.SetPlayerStat (pc, ProfID, SaveProf)
-		if GameCheck.IsBG2() and proftype != LUPROFS_TYPE_DUALCLASS and SaveProf:
+		if GameCheck.IsBG2OrEE () and proftype != LUPROFS_TYPE_DUALCLASS and SaveProf:
 			GemRB.ApplyEffect (pc, "Proficiency", SaveProf, ProfID)
 	return
 

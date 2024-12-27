@@ -309,14 +309,14 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptCheckbox (18023, 19, 27, 17182, 'Gore')
 	GUIOPTControls.OptCheckbox (11797, 42, 44, 11795, 'Infravision')
 	GUIOPTControls.OptCheckbox (20619, 47, 46, 20618, 'Weather')
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		GUIOPTControls.OptCheckbox (2242, 50, 48, 2241, 'Heal Party on Rest')
 	elif GameCheck.IsIWD2() or GameCheck.IsIWD1():
 		GUIOPTControls.OptCheckbox (15136, 50, 49, 17378, 'Maximum HP')
 
 	GUIOPTControls.OptButton (OpenFeedbackOptionsWindow, 5, 17163)
 	GUIOPTControls.OptButton (OpenAutopauseOptionsWindow, 6, 17166)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		GUIOPTControls.OptButton (OpenHotkeyOptionsWindow, 51, 816)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -396,7 +396,7 @@ def OpenAutopauseOptionsWindow ():
 		GUIOPTControls.OptCheckbox (24888, 33, 34, 10574, 'Auto Pause Center', None, 1)
 	elif Window.GetControl (26):
 		GUIOPTControls.OptCheckbox (23514, 26, 27, 23516, 'Auto Pause State', None, 128) # enemy sighted
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		GUIOPTControls.OptCheckbox (31872, 31, 33, 31875, 'Auto Pause State', None, 512) # spell cast
 		GUIOPTControls.OptCheckbox (58171, 34, 30, 57354, 'Auto Pause State', None, 256) # trap found
 		GUIOPTControls.OptCheckbox (10571, 37, 36, 10574, 'Auto Pause Center', None, 1)

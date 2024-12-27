@@ -113,7 +113,7 @@ def InitWorldMapWindow (Window):
 
 	Window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
 
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "floattxt", "WMDAG")
 	elif GameCheck.IsBG1():
 		cnormal = {'r' : 0, 'g' : 0, 'b' : 0, 'a' : 0xff}
@@ -139,7 +139,7 @@ def InitWorldMapWindow (Window):
 		Button.OnPress (MapS)
 		Button.SetActionInterval (200)
 
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		#northwest
 		Button = Window.GetControl (8)
 		Button.OnPress (MapNW)
@@ -196,7 +196,7 @@ def OpenTravelWindow(Travel):
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 def HasMapNotes ():
-	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
+	return GameCheck.IsBG2OrEE () or GameCheck.IsIWD2 () or GameCheck.IsPST ()
 
 def AddNoteWindow ():
 	global NoteLabel, MapWindow

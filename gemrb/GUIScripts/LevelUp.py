@@ -76,7 +76,7 @@ def OpenLevelUpWindow():
 
 	LevelUpWindow = GemRB.LoadWindow (3, "GUIREC")
 
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		InfoButton = LevelUpWindow.GetControl (125)
 		InfoButton.SetText (13707)
 		InfoButton.OnPress (LevelUpInfoPress)
@@ -261,7 +261,7 @@ def OpenLevelUpWindow():
 		# set values required by the hla level up code
 		HLACount = HLACount // HLATable.GetValue (ClassName, "RATE", GTV_INT)
 		GemRB.SetVar ("HLACount", HLACount)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		HLAButton = LevelUpWindow.GetControl (126)
 		if HLACount:
 			HLAButton.SetText (4954)
@@ -273,7 +273,7 @@ def OpenLevelUpWindow():
 	Level1 = []
 	for i in range (len (Level)):
 		Level1.append (Level[i]-LevelDiff[i])
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		LUProfsSelection.SetupProfsWindow (pc, LUProfsSelection.LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
 	else:
 		LUProfsSelection.SetupProfsWindow (pc, LUProfsSelection.LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False, 0)
@@ -282,13 +282,13 @@ def OpenLevelUpWindow():
 	#we autohide the skills and let SetupSkillsWindow show them if needbe
 	for i in range (4):
 		HideSkills (i)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		LUSkillsSelection.SetupSkillsWindow (pc, LUSkillsSelection.LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
 	else:
 		LUSkillsSelection.SetupSkillsWindow (pc, LUSkillsSelection.LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False)
 	NewSkillPoints = GemRB.GetVar ("SkillPointsLeft")
 
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		TextAreaControl = LevelUpWindow.GetControl(110)
 		TextAreaControl.SetText(GetLevelUpNews())
 	else:
@@ -328,7 +328,7 @@ def RedrawSkills():
 
 	# we need to disable the HLA button if we don't have any HLAs left
 	HLACount = GemRB.GetVar ("HLACount") or 0
-	if GameCheck.IsBG2() and HLACount == 0:
+	if GameCheck.IsBG2OrEE () and HLACount == 0:
 		# turn the HLA button off
 		HLAButton = LevelUpWindow.GetControl (126)
 		HLAButton.SetState(IE_GUI_BUTTON_DISABLED)
@@ -555,7 +555,7 @@ def ReactivateBaseClass ():
 	# reactivate all our proficiencies
 	TmpTable = GemRB.LoadTable ("weapprof")
 	ProfsTableOffset = 0
-	if GameCheck.IsBG2 ():
+	if GameCheck.IsBG2OrEE ():
 		ProfsTableOffset = 8 # skip bg1 weapprof.2da proficiencies
 	ProfCount = TmpTable.GetRowCount () - ProfsTableOffset
 	for i in range(ProfCount):
@@ -568,7 +568,7 @@ def ReactivateBaseClass ():
 		if OldProf > NewProf:
 			Value = (OldProf << 3) | OldProf
 			print("Value:", Value)
-			if GameCheck.IsBG2():
+			if GameCheck.IsBG2OrEE ():
 				GemRB.ApplyEffect (pc, "Proficiency", Value, ProfID )
 			else:
 				GemRB.SetPlayerStat (pc, ProfID, Value)

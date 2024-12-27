@@ -37,7 +37,6 @@ SkillsCallback = 0
 
 #offsets to the various parts of all 3 windows
 SkillsOffsetPress = 0
-SkillsOffsetButton1 = 0
 SkillsOffsetName = 0
 SkillsOffsetPoints = 0
 SkillsOffsetSum = 0
@@ -61,7 +60,7 @@ SkillsAssignable = 0
 #WARNING: This WILL NOT show the window, only access it. To see the return, call GemRB.GetVar ("SkillPointsLeft").
 # If nothing can be assigned, it will return 0 prior to accessing any of the window methods.
 def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0, scroll=True):
-	global SkillsWindow, SkillsCallback, SkillsOffsetPress, SkillsOffsetButton1, SkillsOffsetName
+	global SkillsWindow, SkillsCallback, SkillsOffsetPress, SkillsOffsetName
 	global SkillsOffsetPoints, SkillsOffsetSum, SkillsIndices, SkillPointsLeft
 	global SkillsTable, SkillsOldPos, SkillsClickCount, SkillsOldDirection, SkillsNumButtons
 	global SkillsTextArea, SkillsKitName, SkillsAssignable, SkillsLabelIncrement
@@ -86,7 +85,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		return
 
 	#setup the offsets
-	if skilltype == LUSKILLS_TYPE_LEVELUP and GameCheck.IsBG2():
+	if skilltype == LUSKILLS_TYPE_LEVELUP and GameCheck.IsBG2OrEE ():
 		SkillsOffsetPress = 120
 		SkillsOffsetButton1 = 17
 		SkillsOffsetSum = 37
@@ -145,6 +144,16 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 			SkillsWindow.SetEventProxy(ScrollBar)
 	else:
 		return
+
+	# yet another "what were they thinking?!"
+	if GameCheck.IsBG2EE () and skilltype == LUSKILLS_TYPE_DUALCLASS:
+		# remap 9,16,18,20 to 14,16,18,20 AND 10,17,19,21 to 15,17,19,21
+		# potentially also broken in chargen
+		SkillsWindow.AliasControls ({'PLUSBTN' + str(x[0]) : x[1] for x in enumerate([9, 16, 18, 20])})
+		SkillsWindow.AliasControls ({'MINUSBTN' + str(x[0]) : x[1] for x in enumerate([10, 17, 19, 21])})
+	else:
+		SkillsWindow.AliasControls ({'PLUSBTN' + str(x) : x * 2 + SkillsOffsetButton1 for x in range(4)})
+		SkillsWindow.AliasControls ({'MINUSBTN' + str(x) : x * 2 + SkillsOffsetButton1 + 1 for x in range(4)})
 
 	if ScrollBar:
 		ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, 0)
@@ -286,12 +295,12 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 			Button.SetVarAssoc("Skill",SkillsIndices[i])
 			Button.OnPress (SkillJustPress)
 
-		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1)
+		Button = SkillsWindow.GetControlAlias ("PLUSBTN" + str(i))
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
 		Button.OnPress (SkillLeftPress)
 		Button.SetActionInterval(20);
 
-		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1+1)
+		Button =  SkillsWindow.GetControlAlias ("MINUSBTN" + str(i))
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
 		Button.OnPress (SkillRightPress)
 		Button.SetActionInterval(20);
@@ -320,8 +329,8 @@ def SkillsRedraw (direction=0):
 		#enable/disable the button if we can(not) get the skills
 		SkillName = SkillsTable.GetRowName (Pos+2)
 		Ok = SkillsTable.GetValue (SkillName, SkillsKitName) and SkillsAssignable
-		Button1 = SkillsWindow.GetControl(i*2+SkillsOffsetButton1)
-		Button2 = SkillsWindow.GetControl(i*2+SkillsOffsetButton1+1)
+		Button1 = SkillsWindow.GetControlAlias ("PLUSBTN" + str(i))
+		Button2 = SkillsWindow.GetControlAlias ("MINUSBTN" + str(i))
 		if not Ok:
 			Button1.SetState(IE_GUI_BUTTON_DISABLED)
 			Button2.SetState(IE_GUI_BUTTON_DISABLED)
@@ -422,10 +431,10 @@ def SkillsNullify (pc = None):
 def SkillsHide (i):
 	Label = SkillsWindow.GetControl (0x10000000+SkillsOffsetName+i)
 	Label.SetText ("")
-	Button1 = SkillsWindow.GetControl(i*2+SkillsOffsetButton1)
+	Button1 = SkillsWindow.GetControlAlias ("PLUSBTN" + str(i))
 	Button1.SetState(IE_GUI_BUTTON_DISABLED)
 	Button1.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-	Button2 = SkillsWindow.GetControl(i*2+SkillsOffsetButton1+1)
+	Button2 = SkillsWindow.GetControlAlias ("MINUSBTN" + str(i))
 	Button2.SetState(IE_GUI_BUTTON_DISABLED)
 	Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 	Label = SkillsWindow.GetControl(0x10000000+SkillsOffsetPoints+i)

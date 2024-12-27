@@ -308,7 +308,7 @@ def UpdateItemDisplay(Window, slotItem, itemtype):
 
 	#textarea
 	Text = Window.GetControl (5)
-	if GameCheck.IsBG2(): # I believe only BG2 has special initials
+	if GameCheck.IsBG2OrEE (): # I believe only BG2 has special initials
 		Text.SetColor (ColorWhitish, TA_COLOR_INITIALS)
 	text = GetItemDescription (item, itemtype)
 	Text.SetText (text)
@@ -396,7 +396,7 @@ def UpdateItemDisplay(Window, slotItem, itemtype):
 			return
 		if GameCheck.IsIWD2() or GameCheck.IsHOW():
 			Button.SetText (24891) # Open Container
-		elif GameCheck.IsBG2():
+		elif GameCheck.IsBG2OrEE ():
 			Button.SetText (44002) # open container
 		else:
 			# a fallback, since the originals have nothing appropriate from not having any bags
@@ -885,7 +885,7 @@ def ReadItemWindow (item, pc):
 			strref = 72874 # your spell school does not permit you to learn
 		elif ret == LSR_LEVEL and GameCheck.HasTOB():
 			strref = 48806 # inadequate intelligence (good enough approximation)
-		elif ret == LSR_FULL and GameCheck.IsBG2():
+		elif ret == LSR_FULL and GameCheck.IsBG2OrEE ():
 			strref = 32097
 		elif ret == LSR_FULL and GameCheck.IsPST():
 			strref = 50395
@@ -1021,7 +1021,7 @@ def AbilitiesItemWindow (slot_item, pc):
 	GemRB.SetVar ("Ability", slot_item["Header"])
 	for i in range(3):
 		Button = Window.GetControl (i+1)
-		if GameCheck.IsBG2():
+		if GameCheck.IsBG2OrEE ():
 			Button.SetSprites ("GUIBTBUT",i,0,1,2,0)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetVarAssoc ("Ability",i)

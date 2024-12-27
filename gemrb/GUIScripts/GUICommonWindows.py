@@ -110,7 +110,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	"""Binds all of the basic controls and windows to the options pane."""
 
 	bg1 = GameCheck.IsBG1()
-	bg2 = GameCheck.IsBG2()
+	bg2 = GameCheck.IsBG2OrEE ()
 	iwd1 = GameCheck.IsIWD1()
 	how = GameCheck.HasHOW()
 	iwd2 = GameCheck.IsIWD2()
@@ -680,7 +680,7 @@ def RealRestPress ():
 	# only bg2 has area-based rest movies
 	# outside movies start at 2, 1 is for inns
 	# 15 means run all checks to see if resting is possible
-	info = GemRB.RestParty(15, 0 if GameCheck.IsBG2() else 2, 1)
+	info = GemRB.RestParty(15, 0 if GameCheck.IsBG2OrEE () else 2, 1)
 	if info["Error"]:
 		if GameCheck.IsPST ():
 			# open error window

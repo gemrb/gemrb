@@ -86,7 +86,7 @@ def GroupControls ():
 
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	Button = CurrentWindow.GetControl (ActionBarControlOffset)
-	if GameCheck.IsBG2():
+	if GameCheck.IsBG2OrEE ():
 		Button.SetActionIcon (globals(), 7, 1) # talk icon
 	else:
 		Button.SetActionIcon (globals(), 14, 1)# guard icon
@@ -368,7 +368,7 @@ def UpdateActionsWindow ():
 	# bg2 has a different common format and exceptions for illusions/clones
 	level = GemRB.GetVar ("ActionLevel")
 	if GemRB.GetPlayerStat (pc, IE_EA) >= CONTROLLED:
-		if GameCheck.IsBG2 ():
+		if GameCheck.IsBG2OrEE ():
 			if level == UAW_STANDARD and GemRB.GetPlayerStat (pc, IE_SEX) != 7:
 				level = UAW_BG2SUMMONS
 		else:

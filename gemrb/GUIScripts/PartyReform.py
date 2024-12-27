@@ -97,7 +97,7 @@ def RemovePlayer (select):
 
 	# confirm
 	def RemovePlayerConfirm ():
-		if GameCheck.IsBG2 ():
+		if GameCheck.IsBG2OrEE ():
 			GemRB.LeaveParty (select, 2)
 		elif GameCheck.IsBG1 ():
 			GemRB.LeaveParty (select, 1)
