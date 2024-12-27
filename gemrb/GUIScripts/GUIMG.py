@@ -211,6 +211,7 @@ def UpdateMageWindow (MageWindow):
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
 		Button.OnPress (OnMageMemorizeSpell)
 		spell = GemRB.GetSpell (ks['SpellResRef'])
+		spell['CurrentIndex'] = i # save it for later
 		Button.OnRightPress (BindControlCallbackParams(OpenMageSpellInfoWindow, spell, Button.VarName))
 		Button.SetTooltip (spell['SpellName'])
 
@@ -284,7 +285,7 @@ def OpenMageSpellInfoWindow (spell, kind):
 			Button.OnPress (None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
-			Button.OnPress (lambda: OpenMageSpellRemoveWindow(Window))
+			Button.OnPress (lambda: OpenMageSpellRemoveWindow(Window, spell['CurrentIndex']))
 			Button.SetText (63668)
 
 	Label = Window.GetControl (0x0fffffff)
@@ -321,7 +322,7 @@ def OnMageMemorizeSpell (btn):
 
 	return
 
-def OpenMageSpellRemoveWindow (parentWin):
+def OpenMageSpellRemoveWindow (parentWin, spellIndex):
 	if GameCheck.IsBG2OrEE ():
 		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
@@ -335,12 +336,12 @@ def OpenMageSpellRemoveWindow (parentWin):
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	
-	def RemoveSpell (btn):
-		OnMageRemoveSpell(btn)
+	def RemoveSpell (spellIndex):
+		OnMageRemoveSpell (spellIndex)
 		Window.Close()
 		parentWin.Close()
 	
-	Button.OnPress (RemoveSpell)
+	Button.OnPress (lambda: RemoveSpell(spellIndex))
 	Button.MakeDefault()
 
 	# Cancel
@@ -396,15 +397,13 @@ def OnMageUnmemorizeSpell (btn):
 		Button.OnAnimEnd(lambda: UpdateMageWindow (MageWindow))
 	return
 
-def OnMageRemoveSpell (btn):
+def OnMageRemoveSpell (spellIndex):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
-	index = btn.Value
-
 	#remove spell from book
-	GemRB.RemoveSpell (pc, spelltype, level, index)
+	GemRB.RemoveSpell (pc, spelltype, level, spellIndex)
 	UpdateMageWindow (MageWindow)
 	return
 
