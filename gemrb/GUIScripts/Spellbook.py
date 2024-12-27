@@ -563,8 +563,8 @@ def HasSorcererBook (pc, cls=-1):
 		ClassName = GUICommon.GetClassRowName (cls, "class")
 	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
 	if SorcererBook == "*" or ClassName == "":
-		return False
-	return IsSorcererBook (SorcererBook)
+		return 0
+	return SorcererBook if IsSorcererBook (SorcererBook) else 0
 
 def CannotLearnSlotSpell (slot_item, pc):
 	# disqualify sorcerers immediately
