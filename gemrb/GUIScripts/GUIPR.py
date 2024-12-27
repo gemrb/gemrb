@@ -66,6 +66,14 @@ def InitPriestWindow (Window):
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetVarAssoc ("Memorized", i)
 		Button.SetAnimation (None)
+		# reposition from a 4x3 grid to the bottom
+		if GameCheck.IsBG2EE ():
+			row = i // 4
+			col = i % 4
+			width = 54 + 8 # slot + padding
+			Button.SetPos (100 + row * width * 4 + col * width, 644)
+			# the bam isn't centered, so let's cheat
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
 	# Setup book spells buttons
 	for i in range (GUICommon.GetGUISpellButtonCount()):
@@ -110,7 +118,8 @@ def UpdatePriestWindow (Window):
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, spelltype, level, i)
 			Button.SetSpellIcon (ms['SpellResRef'], 0)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
+			if not GameCheck.IsBG2EE ():
+				Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 			if ms['Flags']:
 				Button.OnPress (OpenPriestSpellUnmemorizeWindow)
 			else:
@@ -136,7 +145,8 @@ def UpdatePriestWindow (Window):
 		Button = Window.GetControl (27 + i)
 		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+		if not GameCheck.IsBG2EE ():
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Button.OnPress (OnPriestMemorizeSpell)
 		spell = GemRB.GetSpell (ks['SpellResRef'])
 		Button.OnRightPress (BindControlCallbackParams(OpenPriestSpellInfoWindow, spell))
