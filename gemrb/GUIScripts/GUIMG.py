@@ -50,7 +50,7 @@ def ToggleSpellWindow (btn):
 	global Sorcerer
 	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Sorcerer = GameCheck.IsBG2OrEE () and Spellbook.HasSorcererBook (pc)
+	Sorcerer = GameCheck.IsBG2OrEE () and Spellbook.HasSorcererBook (pc) > 0
 	
 	ToggleSpellWindow.Args = btn
 	
@@ -107,6 +107,33 @@ def InitMageWindow (window):
 			Button.SetAnimation (None)
 			Button.SetVarAssoc ("Memorized", i)
 
+	# reposition from a 4x3 grid to the bottom or top
+	# for mages that's the memoed spells, for sorcerers the known
+	if GameCheck.IsBG2EE ():
+		for i in range (12):
+			Button = MageWindow.GetControl (3 + i + 24 * int(Sorcerer))
+			row = i // 4
+			col = i % 4
+			width = 54 + 8 * (1 + int(Sorcerer)) # slot + padding
+			# don't bother transposing 4x3 grid to 3x4 grid
+			if Sorcerer:
+				frame = Button.GetFrame ()
+				x = frame["x"] - (314 - 166)
+				y = frame["y"] - (536 - 234)
+			else:
+				x = 100 + row * width * 4 + col * width + 66 * int(Sorcerer)
+				y = 644
+			Button.SetPos (x, y)
+			# the bam isn't centered, so let's cheat
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+
+		# some extra slot button, sorcerer button and a label on a button
+		MageWindow.DeleteControl (51)
+		if Sorcerer:
+			MageWindow.DeleteControl (59)
+		else:
+			MageWindow.DeleteControl (0x10000000 + 51)
+
 	# Setup book spells buttons
 	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = MageWindow.GetControl (27 + i)
@@ -148,7 +175,8 @@ def UpdateMageWindow (MageWindow):
 			if i < mem_cnt:
 				ms = GemRB.GetMemorizedSpell (pc, spelltype, level, i)
 				Button.SetSpellIcon (ms['SpellResRef'], 0)
-				Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
+				if not GameCheck.IsBG2EE ():
+					Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 				if ms['Flags']:
 					Button.OnPress (OpenMageSpellUnmemorizeWindow)
 				else:
