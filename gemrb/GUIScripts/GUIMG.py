@@ -284,7 +284,7 @@ def OpenMageSpellInfoWindow (spell, kind):
 			Button.OnPress (None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
-			Button.OnPress (lambda: OpenMageSpellRemoveWindow(Window))
+			Button.OnPress (lambda: OpenMageSpellRemoveWindow(Window), spell['index'])
 			Button.SetText (63668)
 
 	Label = Window.GetControl (0x0fffffff)
@@ -321,7 +321,7 @@ def OnMageMemorizeSpell (btn):
 
 	return
 
-def OpenMageSpellRemoveWindow (parentWin):
+def OpenMageSpellRemoveWindow (parentWin,spell_index):
 	if GameCheck.IsBG2OrEE ():
 		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
@@ -336,7 +336,7 @@ def OpenMageSpellRemoveWindow (parentWin):
 	Button.SetText (17507)
 	
 	def RemoveSpell (btn):
-		OnMageRemoveSpell(btn)
+		OnMageRemoveSpell(btn, spell_index)
 		Window.Close()
 		parentWin.Close()
 	
@@ -396,15 +396,18 @@ def OnMageUnmemorizeSpell (btn):
 		Button.OnAnimEnd(lambda: UpdateMageWindow (MageWindow))
 	return
 
-def OnMageRemoveSpell (btn):
+def OnMageRemoveSpell (btn, spell_index):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
-	index = btn.Value
+	index = spell_index
 
 	#remove spell from book
-	GemRB.RemoveSpell (pc, spelltype, level, index)
+	if index is not None:
+		GemRB.RemoveSpell (pc, spelltype, level, index)
+	else:
+		print("Error: spell index is None")
 	UpdateMageWindow (MageWindow)
 	return
 
