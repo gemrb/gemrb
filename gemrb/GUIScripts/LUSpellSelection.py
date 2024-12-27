@@ -626,7 +626,11 @@ def SpellsPickPress ():
 	global SpellBook, SpellsSelectPointsLeft
 
 	# load up our table
-	AutoTable = GemRB.LoadTable ("splautop")
+	if Spellbook.HasSorcererBook (pc) & 3 == 3:
+		# priestly sorcerer like shaman
+		AutoTable = GemRB.LoadTable ("splautos")
+	else:
+		AutoTable = GemRB.LoadTable ("splautop")
 
 	for i in range (AutoTable.GetRowCount ()):
 		if SpellsSelectPointsLeft[SpellLevel] == 0:
