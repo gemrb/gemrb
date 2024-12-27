@@ -285,7 +285,8 @@ void WEDImporter::ReadWallPolygons()
 	struct wed_polygon {
 		ieDword FirstVertex;
 		ieDword CountVertex;
-		ieWord Flags; // two bytes in the original: type and height with height currently unused
+		ieByte Flags;
+		ieByte Height; // typically set to -1, unsure if used
 		Region rect;
 	};
 
@@ -297,7 +298,8 @@ void WEDImporter::ReadWallPolygons()
 	for (ieDword i = 0; i < polygonCount; i++) {
 		str->ReadDword(PolygonHeaders[i].FirstVertex);
 		str->ReadDword(PolygonHeaders[i].CountVertex);
-		str->ReadWord(PolygonHeaders[i].Flags); // two bytes: mode and height in the original bg2
+		str->Read(&PolygonHeaders[i].Flags, 1);
+		str->Read(&PolygonHeaders[i].Height, 1);
 
 		// Note: unlike the rest, the layout is minX, maxX, minY, maxY
 		auto& rect = PolygonHeaders[i].rect;
