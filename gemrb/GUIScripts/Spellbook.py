@@ -749,4 +749,8 @@ def LearnFromScroll (pc, slot):
 	# destroy the scroll, just one in case of a stack
 	GemRB.RemoveItem (pc, slot, 1)
 
+	# bg2 tutorial needs this
+	if slot_item["ItemResRef"] == "ttscrl01":
+		GemRB.SetGlobal ("TutorialLesson", "GLOBAL", 20)
+
 	return ret
