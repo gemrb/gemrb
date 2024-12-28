@@ -24,7 +24,7 @@ def OnLoad():
 	StartWindow = GemRB.LoadWindow (0, "START")
 	StartWindow.AddAlias("START2")
 	
-	if GameCheck.HasTOB() and GemRB.GetVar("oldgame")==1:
+	if GameCheck.HasTOB() and GemRB.GetVar("oldgame") == 1 and not GameCheck.IsBG2EE ():
 		StartWindow.SetBackground("STARTOLD")
 
 	SinglePlayerButton = StartWindow.GetControl (0)
@@ -33,8 +33,26 @@ def OnLoad():
 	MultiPlayerButton = StartWindow.GetControl (1)
 	MoviesButton = StartWindow.GetControl (2)
 	BackButton = StartWindow.GetControl (5)
-	Label = StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
+
+	Title = StartWindow.GetControl (6)
+	Logo = StartWindow.GetControl (7)
+	if Logo:
+		# should be 2 for bp
+		frame = 0 if GemRB.GetVar ("oldgame") else 1
+		Title.SetSprites ("title", 0, frame, frame, 0, 0)
+		Logo.SetSprites ("biglogo", 0, frame, frame, 0, 0)
+		if frame == 1: # both tob and bp logos are shorter and not centered bams
+			btnFrame = Logo.GetFrame ()
+			Logo.SetPos (btnFrame["x"], btnFrame["y"] + 70)
+
+	y = 450
+	w = 640
+	if GameCheck.IsBG2EE ():
+		y = GemRB.GetSystemVariable (SV_HEIGHT) - 100
+		w = GemRB.GetSystemVariable (SV_WIDTH)
+	Label = StartWindow.CreateLabel(0x0fff0000, 0, y, w, 30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label.SetText (GemRB.Version)
+
 	if GameCheck.HasTOB():
 		BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		BackButton.SetText (15416)
