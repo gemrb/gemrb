@@ -1317,8 +1317,8 @@ inline bool idclass(const Actor* actor, int parameter, bool iwd2)
 		// PALADIN_ALL
 		value = actor->GetPaladinLevel();
 	} else if (parameter == classes[2]) {
-		// DRUID_ALL
-		value = actor->GetDruidLevel();
+		// DRUID_ALL, shaman is a guess
+		value = actor->GetDruidLevel() + actor->GetShamanLevel();
 	} else if (parameter == classes[6]) {
 		// RANGER_ALL
 		value = actor->GetRangerLevel();

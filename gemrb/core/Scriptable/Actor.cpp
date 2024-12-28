@@ -982,7 +982,8 @@ static void pcf_level(Actor* actor, ieDword oldValue, ieDword newValue, ieDword 
 		actor->GetMonkLevel() +
 		actor->GetPaladinLevel() +
 		actor->GetRangerLevel() +
-		actor->GetSorcererLevel();
+		actor->GetSorcererLevel() +
+		actor->GetShamanLevel();
 	actor->SetBase(IE_CLASSLEVELSUM, sum);
 	actor->SetupFist();
 	if (newValue != oldValue) {
