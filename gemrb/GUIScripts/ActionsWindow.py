@@ -1090,7 +1090,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 			elif btnType == ACT_THIEVING:
 				capability = GemRB.GetPlayerLevel (pc, ISTHIEF) + GemRB.GetPlayerLevel (pc, ISBARD)
 			elif btnType == ACT_SEARCH:
-				capability = GemRB.GetPlayerLevel (pc, ISTHIEF)
+				capability = GemRB.GetPlayerLevel (pc, ISTHIEF) + GemRB.GetPlayerLevel (pc, ISSHAMAN)
 			else:
 				print("Unknown action (button) type: ", btnType)
 		return capability > 0
