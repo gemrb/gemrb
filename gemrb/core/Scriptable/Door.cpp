@@ -41,7 +41,6 @@ DoorTrigger::DoorTrigger(std::shared_ptr<Gem_Polygon> openTrigger, WallPolygonGr
 
 void DoorTrigger::SetState(bool open, Map* map)
 {
-	if (isOpen == open) return;
 	isOpen = open;
 	for (const auto& wp : openWalls) {
 		wp->SetDisabled(!isOpen);
