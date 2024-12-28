@@ -954,7 +954,6 @@ def IdentifyUseSpell (slotItem, pc):
 		GemRB.GetString (strRef, 2) # play the attached sound
 	else:
 		GemRB.PlaySound (DEF_IDENTIFY)
-	btn.Window.Close()
 	OpenItemInfoWindow(slotItem, pc)
 	return
 
