@@ -54,6 +54,17 @@ def OnLoad():
 			Button = ClassWindow.GetControl(j+7)
 		else:
 			Button = ClassWindow.GetControl(j+2)
+
+		if GameCheck.IsBG2EE (): # make room for another button for shaman; ideally we'd add another scrollbar
+			if Button:
+				btnFrame = Button.GetFrame ()
+				Button.SetPos (btnFrame["x"], btnFrame["y"] - 10)
+			else:
+				Button = ClassWindow.CreateButton (j + 7, 22, 416, 340, 32)
+				Button.SetSprites ("guichlng", 0, 0, 1, 2, 3)
+				Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
+				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		j = j+1
