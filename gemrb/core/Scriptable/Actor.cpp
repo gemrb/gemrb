@@ -5102,6 +5102,7 @@ ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 			if (!level) level = GetPaladinLevel();
 			// for cleric/rangers, we can't tell from which class a spell is, unless unique, so we ignore the distinction
 			if (!level) level = GetRangerLevel();
+			if (!level) level = GetShamanLevel();
 			break;
 		case IE_SPL_WIZARD:
 			level = GetMageLevel();
