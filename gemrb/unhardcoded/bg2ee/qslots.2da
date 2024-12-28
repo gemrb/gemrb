@@ -21,3 +21,4 @@ FIGHTER_MAGE_CLERIC 6          3          4          2          8          9    
 CLERIC_RANGER       6          0          3          2          8          9          11         12         13
 SORCERER            3          4          5          2          8          9          11         12         13
 MONK                18         14         22         0          8          9          11         12         13
+SHAMAN              27         22         5          2          8          9          11         12         13
