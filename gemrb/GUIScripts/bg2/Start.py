@@ -48,7 +48,6 @@ def RunStart2(isTOB):
 	theme = MusicTable.GetValue ("33", "RESOURCE")
 	GemRB.LoadMusicPL (theme, 1)
 
-# TODO: mimic RunStart2 and plug back into Start2 at the end
 def RunStartEE():
 	StartWindow = GemRB.LoadWindow (11, "START")
 	Label = StartWindow.CreateLabel (0x0fff0000, 0, 0, 1024, 30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
@@ -61,9 +60,10 @@ def RunStartEE():
 	GemRB.SetToken ("SaveDir", "save")
 
 	soaButton = StartWindow.GetControl (1)
+	soaButton.OnPress (lambda: RunStart2(False))
 
 	tobButton = StartWindow.GetControl (2)
-	tobButton.OnPress (LoadSingleEE)
+	tobButton.OnPress (lambda: RunStart2(True))
 
 	bp2Button = StartWindow.GetControl (3)
 
@@ -82,11 +82,6 @@ def RunStartEE():
 	ExitButton.SetText (13731)
 	ExitButton.OnPress (lambda: GemRB.Quit())
 	ExitButton.MakeEscape ()
-
-def LoadSingleEE():
-	GemRB.SetVar ("PlayMode", 2)
-	GemRB.SetMasterScript ("BALDUR25", "WORLDM25")
-	GemRB.SetNextScript ("GUILOAD")
 
 def OnLoad():
 	global skip_videos
