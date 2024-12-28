@@ -364,7 +364,7 @@ IE_LEVELMONK                    = 244
 IE_LEVELPALADIN                 = 245
 IE_LEVELRANGER                  = 246
 IE_LEVELSORCERER                = 247
-#248 IE_LEVELCLASS12
+IE_LEVELSHAMAN                  = 248
 #249 IE_LEVELCLASS13
 #the remaining stats are for our internal use now
 IE_DIALOGRANGE                  = 250 # distance for dialogue
@@ -393,7 +393,7 @@ ISMONK = 7
 ISPALADIN = 8
 ISRANGER = 9
 ISSORCERER = 10
-ISCLASS12 = 11
+ISSHAMAN = 11
 ISCLASS13 = 12
 
 # End of file ie_stats.py

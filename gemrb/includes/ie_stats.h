@@ -564,8 +564,8 @@ namespace GemRB {
 #define IE_LEVELPALADIN   245
 #define IE_LEVELRANGER    246
 #define IE_LEVELSORCERER  247
-// place for 2 more classes
-#define IE_LEVELCLASS12 248
+#define IE_LEVELSHAMAN    248
+// place for 1 more class
 #define IE_LEVELCLASS13 249
 
 //more GemRB internal stats

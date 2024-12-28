@@ -125,11 +125,11 @@ static const int mcwasflags[ISCLASSES] = {
 };
 static std::string isclassnames[ISCLASSES] = {
 	"FIGHTER", "MAGE", "THIEF", "BARBARIAN", "BARD", "CLERIC",
-	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER", "CLASS12", "CLASS13"
+	"DRUID", "MONK", "PALADIN", "RANGER", "SORCERER", "SHAMAN", "CLASS13"
 };
 static const int levelslotsiwd2[ISCLASSES] = { IE_LEVELFIGHTER, IE_LEVELMAGE, IE_LEVELTHIEF,
 					       IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, IE_LEVELMONK,
-					       IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVELSORCERER, IE_LEVELCLASS12, IE_LEVELCLASS13 };
+					       IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVELSORCERER, IE_LEVELSHAMAN, IE_LEVELCLASS13 };
 
 #define BGCLASSCNT 23
 //fighter is the default level here
@@ -137,7 +137,7 @@ static const int levelslotsiwd2[ISCLASSES] = { IE_LEVELFIGHTER, IE_LEVELMAGE, IE
 //this map could probably be auto-generated BG2 class ID -> ISCLASS
 static const int levelslotsbg[BGCLASSCNT] = { ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERIC, ISTHIEF,
 					      ISBARD, ISPALADIN, 0, 0, 0, 0, ISDRUID, ISRANGER, 0, 0, 0, 0, 0, 0, ISSORCERER, ISMONK,
-					      ISCLASS12, ISCLASS13 };
+					      ISSHAMAN, ISCLASS13 };
 // map isClass -> (IWD2) class ID
 static unsigned int classesiwd2[ISCLASSES] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -1688,7 +1688,9 @@ static void InitActorTables()
 			const auto& rowname = tm->GetRowName(i);
 
 			field = tm->QueryField(rowname, "DRUIDSPELL").c_str();
-			if (field[0] != '*') {
+			if (ResRef(field) == "MXSPLSHM") {
+				isclass[ISSHAMAN] |= bitmask;
+			} else if (field[0] != '*') {
 				isclass[ISDRUID] |= bitmask;
 			}
 			field = tm->QueryField(rowname, "CLERICSPELL").c_str();

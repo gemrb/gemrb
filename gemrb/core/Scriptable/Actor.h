@@ -221,7 +221,7 @@ enum class Difficulty {
 #define ISPALADIN   8
 #define ISRANGER    9
 #define ISSORCERER  10
-#define ISCLASS12   11
+#define ISSHAMAN    11
 #define ISCLASS13   12
 
 #define ISCLASSES 13
