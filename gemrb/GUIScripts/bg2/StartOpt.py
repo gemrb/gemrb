@@ -40,6 +40,14 @@ def OnLoad():
 	GameButton = OptionsWindow.GetControl(9)
 	GraphicButton = OptionsWindow.GetControl(7)
 	BackButton = OptionsWindow.GetControl(11)
+
+	if GameCheck.IsBG2EE ():
+		MoviesButton = OptionsWindow.GetControl (12)
+		MoviesButton.SetText (15415)
+		MoviesButton.OnPress (lambda: GemRB.SetNextScript ("GUIMOVIE"))
+
+		OptionsWindow.DeleteControl (15)
+
 	SoundButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	GameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	GraphicButton.SetStatus(IE_GUI_BUTTON_ENABLED)
@@ -47,7 +55,8 @@ def OnLoad():
 	SoundButton.SetText(17164)
 	GameButton.SetText(17165)
 	GraphicButton.SetText(17162)
-	BackButton.SetText(10308)
+	BackButton.SetText (12896)
+
 	SoundButton.OnPress (GUIOPT.OpenAudioOptionsWindow )
 	GameButton.OnPress (GUIOPT.OpenGameplayOptionsWindow)
 	GraphicButton.OnPress (GUIOPT.OpenVideoOptionsWindow)
