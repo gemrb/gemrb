@@ -261,7 +261,7 @@ void AudioStream::SetVolume(int volume) const
 
 OpenALAudioDriver::OpenALAudioDriver(void)
 {
-	music_memory = (short*) malloc(ACM_BUFFERSIZE);
+	musicBuffer.resize(ACM_BUFFERSIZE / sizeof(short));
 	memset(&reverbProperties.reverbData, 0, sizeof(reverbProperties.reverbData));
 	reverbProperties.reverbDisabled = true;
 }
@@ -454,8 +454,6 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	}
 	alutContext = NULL;
 
-	free(music_memory);
-
 	delete ambim;
 }
 
@@ -504,12 +502,13 @@ std::pair<ALuint, ALuint> OpenALAudioDriver::loadSound(StringView ResRef, tick_t
 		alBufferData(buffers[0], format, channel1.data(), actualSamples * 2, samplerate);
 		alBufferData(buffers[1], format, channel2.data(), actualSamples * 2, samplerate);
 	} else {
-		short* memory = (short*) malloc(totalBytesPerChannel);
-		//multiply always with 2 because it is in 16 bits
-		unsigned int cnt1 = acm->read_samples(memory, numSamples) * 2;
-		//it is always reading the stuff into 16 bits
-		alBufferData(buffers[0], GetFormatEnum(channels, 16), memory, cnt1, samplerate);
-		free(memory);
+		std::vector<short> memory;
+		memory.resize(totalBytesPerChannel / sizeof(short));
+
+		// multiply always with 2 because it is in 16 bits
+		unsigned int cnt1 = acm->read_samples(memory.data(), numSamples) * 2;
+		// it is always reading the stuff into 16 bits
+		alBufferData(buffers[0], GetFormatEnum(channels, 16), memory.data(), cnt1, samplerate);
 	}
 
 	// Sound length in milliseconds
@@ -865,7 +864,7 @@ int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 
 	alSourcef(source, AL_PITCH, 1.0f);
 	alSourcei(source, AL_LOOPING, 0);
-	alSourcef(source, AL_GAIN, 0.03f * gain);
+	alSourcef(source, AL_GAIN, 0.01f * gain);
 	alSourcei(source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE);
 	alSourcei(source, AL_ROLLOFF_FACTOR, 0);
 	alSourcei(source, AL_SOURCE_RELATIVE, !point);
@@ -880,6 +879,7 @@ int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 		//   gain = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE + AL_ROLLOFF_FACTOR * (dist – AL_REFERENCE_DISTANCE) );
 		alSourcei(source, AL_ROLLOFF_FACTOR, 4);
 		alSourcei(source, AL_MAX_DISTANCE, ambientRange);
+		alSourcef(source, AL_GAIN, 0.03f * gain);
 	} else {
 		ALfloat position[] = { 0.0f, 0.0f, 0.0f };
 		alSourcefv(source, AL_POSITION, position);
@@ -985,12 +985,14 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					// ensure that MusicSource has no buffers attached by passing "NULL" buffer
 					alSourcei(driver->MusicSource, AL_BUFFER, 0);
 					checkALError("Unable to detach buffers from music source.", WARNING);
+
 					for (unsigned int buffer : driver->MusicBuffer) {
-						driver->MusicReader->read_samples(driver->music_memory, ACM_BUFFERSIZE >> 1);
+						driver->MusicReader->read_samples(driver->musicBuffer.data(), ACM_BUFFERSIZE >> 1);
 						alBufferData(buffer, AL_FORMAT_STEREO16,
-							     driver->music_memory, ACM_BUFFERSIZE,
+							     driver->musicBuffer.data(), ACM_BUFFERSIZE,
 							     driver->MusicReader->get_samplerate());
 					}
+
 					checkALError("Unable to buffer data.", ERROR);
 					// FIXME: determine if we should error out if any data fails to buffer
 					alSourceQueueBuffers(driver->MusicSource, MUSICBUFFERS, driver->MusicBuffer);
@@ -1033,25 +1035,27 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					}
 					if (bFinished == AL_FALSE) {
 						int size = ACM_BUFFERSIZE;
-						int cnt = driver->MusicReader->read_samples(driver->music_memory, ACM_BUFFERSIZE >> 1);
+						int cnt = driver->MusicReader->read_samples(driver->musicBuffer.data(), ACM_BUFFERSIZE >> 1);
 						size -= (cnt * 2);
 						if (size != 0)
 							bFinished = AL_TRUE;
 						if (bFinished) {
 							Log(MESSAGE, "OpenAL", "Playing Next Music");
 							core->GetMusicMgr()->PlayNext();
+
+							auto bufferPos = driver->musicBuffer.data() + cnt;
 							if (driver->MusicPlaying) {
 								Log(MESSAGE, "OpenAL", "Queuing New Music");
-								driver->MusicReader->read_samples((driver->music_memory + cnt), size >> 1);
+								driver->MusicReader->read_samples(bufferPos, size >> 1);
 								bFinished = AL_FALSE;
 							} else {
 								Log(MESSAGE, "OpenAL", "No Other Music to play");
-								memset(driver->music_memory + cnt, 0, size);
+								std::fill(bufferPos, bufferPos + size, 0);
 								driver->MusicPlaying = false;
 								break;
 							}
 						}
-						alBufferData(BufferID, AL_FORMAT_STEREO16, driver->music_memory, ACM_BUFFERSIZE, driver->MusicReader->get_samplerate());
+						alBufferData(BufferID, AL_FORMAT_STEREO16, driver->musicBuffer.data(), ACM_BUFFERSIZE, driver->MusicReader->get_samplerate());
 						if (checkALError("Unable to buffer music data", ERROR)) {
 							driver->MusicPlaying = false;
 							return -1;
