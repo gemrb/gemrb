@@ -195,7 +195,7 @@ private:
 	int num_streams = 0;
 
 	std::atomic_bool stayAlive { true };
-	short* music_memory;
+	std::vector<short> musicBuffer;
 	std::thread musicThread;
 
 	bool hasReverbProperties = false;
