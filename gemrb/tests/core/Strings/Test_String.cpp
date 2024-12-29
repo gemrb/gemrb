@@ -315,6 +315,11 @@ TEST(StringTest, StringToUpper)
 	String unit { u" StR.iNG" };
 	StringToUpper(unit);
 	EXPECT_EQ(unit, u" STR.ING");
+
+	// cyrilic
+	String unit2 { u"Закончить" };
+	StringToUpper(unit2);
+	EXPECT_EQ(unit2, u"ЗАКОНЧИТЬ");
 }
 
 }
