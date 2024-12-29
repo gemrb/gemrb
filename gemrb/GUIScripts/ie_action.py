@@ -45,6 +45,7 @@ ACT_SHAPE=23
 ACT_TAMING=24
 ACT_SKILLS=25
 ACT_WILDERNESS=26
+ACT_DANCE = 27
 #gui navigation (scrolling button rows left or right)
 ACT_LEFT=32
 ACT_RIGHT=33

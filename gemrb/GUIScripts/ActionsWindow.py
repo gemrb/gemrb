@@ -700,6 +700,13 @@ def ActionWildernessPressed ():
 	UpdateActionsWindow ()
 	return
 
+def ActionDancePressed ():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetModalState (pc, MS_DANCE)
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	UpdateActionsWindow ()
+	return
+
 def ActionUseItemPressed ():
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", UAW_EQUIPMENT)
@@ -1183,6 +1190,9 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 	elif action == ACT_THIEVING:
 		if not CanUseActionButton(pc, action):
 			state = IE_GUI_BUTTON_DISABLED
+	elif action == ACT_DANCE:
+		if modalState == MS_DANCE:
+			state = IE_GUI_BUTTON_SELECTED
 	elif action == ACT_TAMING:
 		if GemRB.GetPlayerStat (pc, IE_ANIMALS) <= 0:
 			state = IE_GUI_BUTTON_DISABLED

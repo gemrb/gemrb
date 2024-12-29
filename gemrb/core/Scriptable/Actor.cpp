@@ -6424,6 +6424,8 @@ void Actor::SetModal(enum Modal newstate, bool force)
 			break;
 		case Modal::TurnUndead:
 			break;
+		case Modal::ShamanDance:
+			break;
 		default:
 			return;
 	}
@@ -10803,6 +10805,9 @@ bool Actor::ModalSpellSkillCheck()
 			return true;
 		case Modal::Stealth:
 			return TryToHide();
+		case Modal::ShamanDance:
+			// nothing to check
+			return true;
 		case Modal::None:
 		default:
 			return false;
