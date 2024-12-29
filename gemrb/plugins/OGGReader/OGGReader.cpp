@@ -96,7 +96,9 @@ bool OGGReader::Import(DataStream* stream)
 	info = ov_info(&OggStream, -1);
 	channels = info->channels;
 	samplerate = info->rate;
-	samples_left = (samples = ov_pcm_total(&OggStream, -1));
+	samples_left = ov_pcm_total(&OggStream, -1);
+	// align to how WAVReader counts samples (one is per channel)
+	samples = samples_left * channels;
 	return true;
 }
 
@@ -134,6 +136,7 @@ int OGGReader::ReadSamplesIntoChannels(char* channel1, char* channel2, int numSa
 	std::vector<char> buffer;
 	buffer.resize(CHANNEL_SPLIT_BUFFER_SIZE);
 	int streamPos = 0;
+	numSamples /= channels;
 
 	uint8_t bytesPerChannel = 2;
 	uint8_t bytesPerSample = 2 * bytesPerChannel;
