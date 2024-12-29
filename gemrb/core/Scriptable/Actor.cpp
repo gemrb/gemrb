@@ -6430,6 +6430,14 @@ void Actor::SetModal(enum Modal newstate, bool force)
 
 	if (Modal.State != newstate) {
 		Modal.FirstApply = true;
+
+		// potentially remove fx_modal_movement_check and its parent spell
+		static EffectRef fx_modal_movement_check_ref = { "ModalStateCheck", -1 };
+		Effect* fx = fxqueue.HasEffect(fx_modal_movement_check_ref);
+		if (fx && newstate == Modal::None) {
+			// remove this effect and any other effects applied by the same spell
+			fxqueue.RemoveAllEffects(fx->SourceRef);
+		}
 	}
 
 	if (Modal.State == Modal::BattleSong && Modal.State != newstate && HasFeat(Feat::LingeringSong)) {

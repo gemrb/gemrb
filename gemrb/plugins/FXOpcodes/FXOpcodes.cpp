@@ -447,7 +447,8 @@ int fx_alter_animation(Scriptable* Owner, Actor* target, Effect* fx); // 0x153 i
 int fx_change_backstab(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 0x154 in ees
 // generic effect x2
 int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 0x157 in ees
-
+// generic effect x6 and several unused slots
+int fx_modal_movement_check(Scriptable* /*Owner*/, Actor* target, Effect* fx); // 0x16b - 363
 
 int fx_set_concealment(Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
 int fx_uncanny_dodge(Scriptable* Owner, Actor* target, Effect* fx); // 1cb - 459
@@ -656,6 +657,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("MissilesResistanceModifier", fx_missiles_resistance_modifier, EFFECT_SPECIAL_UNDO, -1),
 	EffectDesc("MirrorImage", fx_mirror_image, 0, -1),
 	EffectDesc("MirrorImageModifier", fx_mirror_image_modifier, 0, -1),
+	EffectDesc("ModalStateCheck", fx_modal_movement_check, 0, -1),
 	EffectDesc("ModifyGlobalVariable", fx_modify_global_variable, EFFECT_NO_ACTOR, -1),
 	EffectDesc("ModifyLocalVariable", fx_modify_local_variable, 0, -1),
 	EffectDesc("MonsterSummoning", fx_monster_summoning, EFFECT_NO_ACTOR, -1),
@@ -8642,10 +8644,27 @@ int fx_swap_hp(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x169 (361) Cast spell on critical miss (identical to 0x155), implemented as a generic effect
 // 0x16a (362) Critical miss bonus, implemented as a generic effect
 
-// 0x16b (363) TODO: ee, Modal state check — for shaman dance (granted by clabsh01, set up like their bard song - uses spsh004)
+// 0x16b (363) Modal movement check — for shaman dance
+int fx_modal_movement_check(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	Modal state = Modal(fx->IsVariable);
+	if (target->Modal.State == Modal::None) return FX_NOT_APPLIED;
+
+	// in this case any real modal state is eligible
+	if (state == Modal::None) {
+		return FX_APPLIED;
+	} else if (state != target->Modal.State) {
+		return FX_NOT_APPLIED;
+	}
+
+	// other than that this works as a generic effect and is queried elsewhere
+	return FX_APPLIED;
+}
+
+
 // 0x16c (364) unused
 // 0x16d (365) TODO: ee, Make unselectable; reuse the action?
-// 0x16e (366) TODO: ee, Spell: Apply Spell On Move
+// 0x16e (366) TODO: ee, Spell: Apply Spell On Move (unused in bg2ee)
 
 // 0x16f (367) MinimumBaseStats (EE-only) is implemented as a generic effect
 

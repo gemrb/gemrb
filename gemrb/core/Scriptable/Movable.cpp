@@ -226,6 +226,13 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		return;
 	}
 
+	// trying to move should break the current modal action if a special effect is in place
+	Actor* actor = Scriptable::As<Actor>(this);
+	static EffectRef fx_modal_movement_check_ref = { "ModalStateCheck", -1 };
+	if (actor && actor->fxqueue.HasEffect(fx_modal_movement_check_ref)) {
+		actor->SetModal(Modal::None);
+	}
+
 	Actor* actorInTheWay = nullptr;
 	// We can't use GetActorInRadius because we want to only check directly along the way
 	// and not be blocked by actors who are on the sides
@@ -238,7 +245,6 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		if (actorInTheWay) break;
 	}
 
-	const Actor* actor = Scriptable::As<Actor>(this);
 	bool blocksSearch = BlocksSearchMap();
 	if (actorInTheWay && blocksSearch && actorInTheWay->BlocksSearchMap()) {
 		// Give up instead of bumping if you are close to the goal

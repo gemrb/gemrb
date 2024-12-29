@@ -324,4 +324,5 @@ IDS
 0x144 Protection:Spell3
 0x146 ApplyEffectsList
 0x14C DamageBonusModifier2
+0x16b ModalStateCheck
 0x200 Protection:Spell2
