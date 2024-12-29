@@ -485,8 +485,10 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 				BlitGlyphToCanvas(curGlyph, blitPoint, *canvas, lineRgn.size);
 			} else {
 				size_t pageIdx = AtlasIndex[currChar].pageIdx;
-				GlyphAtlasPage* page = Atlas[pageIdx];
-				page->Draw(currChar, Region(blitPoint, curGlyph.size), colors);
+				if (pageIdx < Atlas.size()) {
+					GlyphAtlasPage* page = Atlas[pageIdx];
+					page->Draw(currChar, Region(blitPoint, curGlyph.size), colors);
+				}
 			}
 			dp.x += curGlyph.size.w;
 		}
