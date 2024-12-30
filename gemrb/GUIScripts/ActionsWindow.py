@@ -999,6 +999,14 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 
 		disabledButton = GemRB.GetPlayerStat (pc, IE_DISABLEDBUTTON)
 		disablableAction = (action <= ACT_SKILLS) or (action >= ACT_QSPELL1 and action <= ACT_QSPELL3)
+		# two entries don't match between the effect param and the constants
+		# param          our values
+		# 10 bardsong    ACT_QSLOT4=10  ACT_BARDSONG=20
+		# 14 find traps  ACT_DEFEND=14  ACT_SEARCH=22
+		if disabledButton & (1 << 10) and action == 20:
+			action = 10
+		elif disabledButton & (1 << 14) and action == 22:
+			action = 14
 		if action < 0 or (disablableAction and disabledButton & (1 << action)):
 			state = IE_GUI_BUTTON_DISABLED
 
