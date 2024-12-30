@@ -42,7 +42,7 @@ static_assert(sizeof(ScriptingGroup_t) <= 16, "Please try to keep this sensibly 
 
 class GEM_EXPORT ScriptingRefBase {
 public:
-	const ScriptingId Id; // unique id for each object in a ScriptingGroup
+	const ScriptingId Id = 0; // unique id for each object in a ScriptingGroup
 
 	explicit ScriptingRefBase(ScriptingId id)
 		: Id(id) {}
@@ -58,7 +58,7 @@ public:
 template<class T>
 class ScriptingRef : public ScriptingRefBase {
 private:
-	T* ref;
+	T* ref = nullptr;
 
 public:
 	using RefType = T*;
