@@ -6281,6 +6281,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject* /*self*/, PyObject* args)
 		newstats.Happiness = oldstats.Happiness;
 		newstats.SoundFolder = oldstats.SoundFolder;
 		newstats.States = oldstats.States;
+		newstats.SoundSet = oldstats.SoundSet;
 
 		oldstats = std::move(newstats);
 	}
