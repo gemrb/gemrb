@@ -7,7 +7,7 @@ import io
 # based on https://gibberlings3.github.io/iesdp/file_formats/ie_formats/tlk_v1.htm
 
 class Tlk(Base, list):
-    SIGN = "TLK V1  "
+    SIGN = b"TLK V1  "
     def _load(self, io):
         self.language_id, num, offset = unpack("<HII", io.read(0xa))
 
@@ -19,9 +19,9 @@ class Tlk(Base, list):
             io.seek(offset+t["offset"], os.SEEK_SET)
             t["string"] = io.read(t["length"])
 
-    def _save(self, io):
+    def _save(self, io2):
         offset = len(self)*0x1a + 0x12
-        io.write(pack("<HII", self.language_id, len(self), offset))
+        io2.write(pack("<HII", self.language_id, len(self), offset))
 
         string_io = io.BytesIO()
         for t in self:
@@ -31,10 +31,10 @@ class Tlk(Base, list):
             else:
                 t["offset"] = string_io.tell()
 
-            io.write(pack("<H 8s 4I", t["flag"], t["sound_name"], t["volume"], t["pitch"], t["offset"], t["length"]))
+            io2.write(pack("<H 8s 4I", t["flag"], t["sound_name"], t["volume"], t["pitch"], t["offset"], t["length"]))
             string_io.write(t["string"])
 
-        io.write(string_io.getvalue())
+        io2.write(string_io.getvalue())
 
     def __str__(self):
         s = []

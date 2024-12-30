@@ -3,7 +3,7 @@
 import os
 
 class Base:
-    SIGN = ""
+    SIGN = b""
     def __init__(self, io=None):
         if io:
             self.load(io)
