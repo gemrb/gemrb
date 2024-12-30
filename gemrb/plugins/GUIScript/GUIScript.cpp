@@ -8722,7 +8722,7 @@ static PyObject* GemRB_GetSlotItem(PyObject* /*self*/, PyObject* args)
 		header = actor->PCStats->GetHeaderForSlot(slot);
 		si = actor->inventory.GetSlotItem(slot);
 		launcherSlot = actor->inventory.FindSlotRangedWeapon(slot);
-		if (launcherSlot == actor->inventory.GetFistSlot()) {
+		if (launcherSlot == Inventory::GetFistSlot()) {
 			launcherSlot = 0;
 		}
 	}

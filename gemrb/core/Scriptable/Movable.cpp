@@ -158,28 +158,36 @@ void Movable::BumpBack()
 	if (Type != ST_ACTOR) return;
 	const Actor* actor = (const Actor*) this;
 	area->ClearSearchMapFor(this);
+	// is the spot free again?
 	PathMapFlags oldPosBlockStatus = area->GetBlocked(oldPos);
-	if (!(oldPosBlockStatus & PathMapFlags::PASSABLE)) {
-		// Do bump back if the actor is "blocking" itself
-		if (!((oldPosBlockStatus & PathMapFlags::ACTOR) == PathMapFlags::ACTOR && area->GetActor(oldPos, GA_NO_DEAD | GA_NO_UNSCHEDULED) == actor)) {
-			area->BlockSearchMapFor(this);
-			if (actor->GetStat(IE_EA) < EA_GOODCUTOFF) {
-				bumpBackTries++;
-				if (bumpBackTries > MAX_BUMP_BACK_TRIES && SquaredDistance(Pos, oldPos) < unsigned(circleSize * 32 * circleSize * 32)) {
-					oldPos = Pos;
-					bumped = false;
-					bumpBackTries = 0;
-					if (SquaredDistance(Pos, Destination) < unsigned(circleSize * 32 * circleSize * 32)) {
-						ClearPath(true);
-					}
-				}
+	if (!!(oldPosBlockStatus & PathMapFlags::PASSABLE)) {
+		bumped = false;
+		MoveTo(oldPos);
+		bumpBackTries = 0;
+		return;
+	}
+
+	// Do bump back if the actor is "blocking" itself
+	if ((oldPosBlockStatus & PathMapFlags::ACTOR) == PathMapFlags::ACTOR && area->GetActor(oldPos, GA_NO_DEAD | GA_NO_UNSCHEDULED) == actor) {
+		bumped = false;
+		MoveTo(oldPos);
+		bumpBackTries = 0;
+		return;
+	}
+
+	// no luck, try again
+	area->BlockSearchMapFor(this);
+	if (actor->GetStat(IE_EA) < EA_GOODCUTOFF) {
+		bumpBackTries++;
+		if (bumpBackTries > MAX_BUMP_BACK_TRIES && SquaredDistance(Pos, oldPos) < unsigned(circleSize * 32 * circleSize * 32)) {
+			oldPos = Pos;
+			bumped = false;
+			bumpBackTries = 0;
+			if (SquaredDistance(Pos, Destination) < unsigned(circleSize * 32 * circleSize * 32)) {
+				ClearPath(true);
 			}
-			return;
 		}
 	}
-	bumped = false;
-	MoveTo(oldPos);
-	bumpBackTries = 0;
 }
 
 // Takes care of movement and actor bumping, i.e. gently pushing blocking actors out of the way
