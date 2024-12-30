@@ -1125,8 +1125,6 @@ void CREImporter::ReadInventory(Actor* act, size_t slotCount)
 		// some equipping effects require everything to be set up, which may not be the case on first load
 		if (core->GetGame()) act->inventory.EquipBestWeapon(EQUIP_MELEE);
 	}
-
-	indices.clear();
 }
 
 void CREImporter::ReadSpellbook(Actor* act)
