@@ -929,6 +929,7 @@ bool Inventory::EquipItem(ieDword slot)
 	int weaponslot;
 	ieDword equip = IW_NO_EQUIPPED;
 	ieWord newHeader;
+	bool ret = true;
 	switch (effect) {
 		case SLOT_EFFECT_FIST:
 			if (Equipped != IW_NO_EQUIPPED || EquippedHeader != 0) {
@@ -945,8 +946,8 @@ bool Inventory::EquipItem(ieDword slot)
 			if (UpdateShieldAnimation(itm)) {
 				CacheAllWeaponInfo();
 			} else {
-				gamedata->FreeItem(itm, item->ItemResRef, false);
-				return false;
+				ret = false;
+				goto final;
 			}
 			break;
 		case SLOT_EFFECT_MELEE:
@@ -1002,8 +1003,8 @@ bool Inventory::EquipItem(ieDword slot)
 			break;
 		case SLOT_EFFECT_HEAD:
 			if (itm->AnimationType == Owner->HelmetRef) {
-				gamedata->FreeItem(itm, item->ItemResRef, false);
-				return false;
+				ret = false;
+				goto final;
 			} else {
 				Owner->SetUsedHelmet(itm->AnimationType);
 			}
@@ -1012,26 +1013,28 @@ bool Inventory::EquipItem(ieDword slot)
 			//adjusting armour level if needed
 			if (armorLevel >= IE_ANI_NO_ARMOR && armorLevel <= IE_ANI_HEAVY_ARMOR) {
 				if (Owner->GetBase(IE_ARMOR_TYPE) == ieDword(armorLevel)) {
-					gamedata->FreeItem(itm, item->ItemResRef, false);
-					return false;
+					ret = false;
+					goto final;
 				}
 				Owner->SetBase(IE_ARMOR_TYPE, armorLevel);
 				Owner->ClearCurrentStanceAnims();
 			} else {
 				if (!UpdateShieldAnimation(itm)) {
-					gamedata->FreeItem(itm, item->ItemResRef, false);
-					return false;
+					ret = false;
+					goto final;
 				}
 			}
 			break;
 		default: // none, SLOT_EFFECT_MAGIC (handled indirectly elsewhere) or alias
 			break;
 	}
+
+final:
 	gamedata->FreeItem(itm, item->ItemResRef, false);
 	if (effect) {
 		AddSlotEffects(slot);
 	}
-	return true;
+	return ret;
 }
 
 //the removecurse flag will check if it is possible to move the item to the inventory
