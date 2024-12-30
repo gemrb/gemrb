@@ -349,7 +349,11 @@ def UpdateActionsWindow ():
 
 		color = {'r' : 50, 'g' : 30, 'b' :10, 'a' : 120}
 		Button.SetBorder (1, color, 0, 1)
-		Button.SetFont ("NUMBER")
+		if GameCheck.IsBG2EE ():
+			# for some reason NUMBER doesn't display
+			Button.SetFont ("NUMBER2")
+		else:
+			Button.SetFont ("NUMBER")
 		Button.SetText ("")
 		Button.SetTooltip("")
 		Button.SetDisabled (False)
