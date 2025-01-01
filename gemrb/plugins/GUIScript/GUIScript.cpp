@@ -3180,13 +3180,10 @@ PyDoc_STRVAR(GemRB_GameControlSetScreenFlags__doc,
 Don't confuse it with the saved screen flags set by GameSetScreenFlags.\n\
 \n\
 **Parameters:**\n\
-  * Mode - bitfield:\n\
-    * 1 - disable mouse\n\
-    * 2 - center on actor (one time)\n\
-    * 4 - center on actor (always)\n\
-    * 8 - enable gui\n\
-    * 16 - lock scroll\n\
-    * 32 - cutscene (no action queueing)\n\
+  * Mode:\n\
+    * 0 - center on actor (one time)\n\
+    * 1 - center on actor (always)\n\
+    * 2 - cutscene mode (rather use ai scripts for this)\n\
   * Operation - bit operation to use\n\
 \n\
 **Return value:** boolean denoting success\n\
