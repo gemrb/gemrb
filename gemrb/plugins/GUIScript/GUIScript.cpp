@@ -3149,7 +3149,15 @@ PyDoc_STRVAR(GemRB_GameSetScreenFlags__doc,
 status, dialog textarea size).\n\
 \n\
 **Parameters:**\n\
-  * Bits - This depends on the game. The lowest 2 bits are the message window size\n\
+  * Bits (partly game dependent due to different GUI layouts)\n\
+    * 0 - default, small message window size\n\
+    * 1 - enable party AI\n\
+    * 2 - medium message window size\n\
+    * 4 - large message window size (use with 2, as 6, GS_LARGEDIALOG)\n\
+    * 8 - in dialog mode\n\
+    * 16 - hide the whole GUI\n\
+    * 32 - hide left menu (options) window\n\
+    * 64 - hide portrait window\n\
   * Operation - The usual bit operations\n\
 \n\
 **Return value:** boolean denoting success");

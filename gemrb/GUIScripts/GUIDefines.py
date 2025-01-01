@@ -189,7 +189,6 @@ GS_DIALOG            = 8
 GS_HIDEGUI           = 16
 GS_OPTIONPANE        = 32
 GS_PORTRAITPANE      = 64
-GS_MAPNOTE           = 128
 
 # GameControl screen flags
 # !!! Keep these synchronized with GameControl.h !!!

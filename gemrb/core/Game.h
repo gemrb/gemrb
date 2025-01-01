@@ -89,7 +89,6 @@ enum ENP {
 #define CS_HIDEGUI        16 //hide all gui
 #define CS_ACTION         32 //hide action pane
 #define CS_PORTRAIT       64 //hide portrait pane
-#define CS_MAPNOTES       128 //hide mapnotes
 
 //Weather bits
 #define WB_NORMAL     0
