@@ -57,6 +57,7 @@ public:
 	float fps = ANI_DEFAULT_FRAMERATE;
 	bool playReversed = false;
 	bool gameAnimation = false; // is it affected by pausing?
+	bool paused = false;
 	Region animArea;
 	Flags flags = Flags::None;
 
@@ -88,6 +89,7 @@ public:
 private:
 	std::vector<frame_t> frames;
 	tick_t starttime = 0;
+	tick_t lastTime = 0;
 };
 
 static_assert(std::is_nothrow_move_constructible<Animation>::value, "Animation should be noexcept MoveConstructible");

@@ -21,7 +21,6 @@
 #include "Animation.h"
 
 #include "EnumFlags.h"
-#include "Game.h"
 #include "Interface.h"
 #include "RNG.h"
 #include "Sprite2D.h"
@@ -76,7 +75,9 @@ Animation::frame_t Animation::LastFrame(void)
 		return nullptr;
 	}
 	if (gameAnimation && core->IsFreezed()) {
-		starttime = core->Time.Ticks2Ms(core->GetGame()->GameTime);
+		starttime = lastTime;
+	} else if (gameAnimation) {
+		starttime = GetMilliseconds() - lastTime;
 	} else {
 		starttime = GetMilliseconds();
 	}
@@ -98,9 +99,19 @@ Animation::frame_t Animation::NextFrame(void)
 	tick_t time;
 	tick_t delta = 1000 / fps; // duration per frame in ms
 	if (gameAnimation && core->IsFreezed()) {
-		time = core->Time.Ticks2Ms(core->GetGame()->GameTime);
+		time = lastTime;
+		paused = true;
+	} else if (gameAnimation) {
+		time = GetMilliseconds();
+		if (paused) {
+			paused = false;
+			// adjust timer for the pause duration gap, so there is no frame skipping
+			starttime += time - lastTime;
+		}
+		lastTime = time;
 	} else {
 		time = GetMilliseconds();
+		lastTime = time;
 	}
 	if (starttime == 0) starttime = time;
 
@@ -137,6 +148,8 @@ Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 	Holder<Sprite2D> ret = frames[GetCurrentFrameIndex()];
 	starttime = master->starttime;
 	endReached = master->endReached;
+	lastTime = master->lastTime;
+	paused = master->paused;
 
 	//return a valid frame even if the master is longer (e.g. ankhegs)
 	frameIdx = master->frameIdx % GetFrameCount();
