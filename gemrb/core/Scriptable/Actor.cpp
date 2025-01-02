@@ -647,26 +647,11 @@ static void ApplyClab_internal(Actor* actor, const ResRef& clab, int level, bool
 #define KIT_WILDMAGE     KIT_BASECLASS + 30
 #define KIT_BARBARIAN    KIT_BASECLASS + 31
 
-static ieDword GetKitUsability(ieDword baseClass, ieDword kit)
-{
-	ieDword usability = 0;
-	int idx = 0;
-	for (const auto& aKit : class2kits[baseClass].indices) {
-		if (kit == aKit) return class2kits[baseClass].ids[idx];
-		idx++;
-	}
-
-	return usability;
-}
-
 int Actor::GetSpecialistSaveBonus(ieDword school) const
 {
 	int bonus = 0;
 	ieDword specialist = Modified[IE_KIT];
 	if (GetMageLevel() && specialist != KIT_BASECLASS) {
-		if (specialist > KIT_BASECLASS) {
-			specialist = GetKitUsability(1, specialist - KIT_BASECLASS); // send the kit index for pcs
-		}
 		if (specialist & (1 << (school + 5))) {
 			bonus = 2;
 		}
