@@ -61,6 +61,7 @@ else:
 RepModTable = None
 SpellTable = None
 PreviousPC = 0
+BestCharmer = 0
 MaxAmount = 0
 BuySum = 0
 SellSum = 0
@@ -272,6 +273,7 @@ def OpenStoreWindow ():
 
 def InitStoreShoppingWindow (Window):
 	global LeftButton, RightButton, Inventory
+	global BestCharmer
 
 	Window.AddAlias('WINSHOP')
 	PositionStoreWinRelativeTo(Window)
@@ -412,6 +414,15 @@ def InitStoreShoppingWindow (Window):
 			IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
 		BackpackButton.CreateLabel (0x10000044, "NUMBER", "0:",
 			IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
+
+	# find pc with highest charisma for pricing purposes
+	PartySize = GemRB.GetPartySize ()
+	maxCha = 0
+	for pc in range(1, PartySize + 1):
+		cha = GemRB.GetPlayerStat (pc, IE_CHR)
+		if cha > maxCha:
+			maxCha = cha
+			BestCharmer = pc
 
 	return
 
@@ -1769,7 +1780,8 @@ def GetRealPrice (pc, mode, Item, Slot):
 			mod = max(mod, 20)
 	else:
 		# charisma modifier (in percent)
-		BarteringPC = GemRB.GetVar("BARTER_PC");
+		# a QoL improvement is to grab the best pc for the task
+		BarteringPC = BestCharmer if BestCharmer else GemRB.GetVar ("BARTER_PC")
 		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
 
 		# reputation modifier (in percent, but absolute)
