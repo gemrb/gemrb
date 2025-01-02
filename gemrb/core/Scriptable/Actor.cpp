@@ -697,9 +697,8 @@ TableMgr::index_t Actor::GetKitIndex(ieDword kit, ieDword baseclass) const
 		return GetIWD2KitIndex(kit, baseclass);
 	}
 
-	if ((kit & BG2_KITMASK) == KIT_BASECLASS) {
-		kitindex = kit & 0xfff;
-		if (!kitindex && !baseclass) return 0;
+	if ((kit & BG2_KITMASK) == KIT_BASECLASS && !baseclass) {
+		return 0;
 	}
 
 	if (kitindex == 0) {
