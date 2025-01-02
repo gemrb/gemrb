@@ -34,7 +34,7 @@ def readAndGetMaxLength(f):
   maxL = i = 0
   for line in f:
     lines.append(line.rstrip())
-    if len(lines[i]) > maxL:
+    if len(lines[i]) > maxL and chr(line[0]) != "#":
       maxL = len(lines[i])
     i = i + 1
   return maxL
@@ -46,10 +46,11 @@ def appendCol(f, max):
   f.truncate()
   i = 0
   for cell in data:
-    if cell == "$":
+    if cell == "$" or lines[i] == b"" or chr(lines[i][0]) == "#":
       f.write(lines[i] + b"\n")
       i = i + 1
       continue
+
     padding = max - len(lines[i]) + 2 # 2 spaces as field separator
     f.write(lines[i] + (" "*padding + cell + "\n").encode('ascii'))
 
