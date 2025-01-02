@@ -144,7 +144,7 @@ def RedrawKits():
 			if ClassName == "MAGE":
 				KitName = SchoolList.GetValue (i+TopIndex, 0)
 				if KitIndex == 0:
-					KitName = SchoolList.GetValue (0, 0)
+					KitName = SchoolList.GetValue ("GENERALIST", "NAME_REF")
 					Button.SetState(IE_GUI_BUTTON_ENABLED)
 					if Init: #preselection of mage plain kit
 						Button.SetState(IE_GUI_BUTTON_SELECTED)
@@ -226,10 +226,11 @@ def NextPress():
 	KitIndex = GemRB.GetVar ("Class Kit")
 	MageSchool = GemRB.GetVar ("MAGESCHOOL")
 	if MageSchool and not KitIndex:
-		KitIndex = CommonTables.KitList.FindValue (6, SchoolList.GetValue (MageSchool, 3))
+		KitValue = SchoolList.GetValue (MageSchool, 3)
+	else:
+		KitValue = CommonTables.KitList.GetValue (KitIndex, 6)
 
 	#save the kit
-	KitValue = (0x4000 + KitIndex)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
 	GemRB.SetNextScript("CharGen4") #abilities

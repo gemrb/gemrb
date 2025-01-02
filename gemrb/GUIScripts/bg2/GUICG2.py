@@ -141,8 +141,7 @@ def SetClass():
 	#multiclassed gnomes 
 	if MageSchool and not KitIndex and "MAGE" in ClassName:
 		SchoolTable = GemRB.LoadTable ("magesch")
-		KitIndex = CommonTables.KitList.FindValue (6, SchoolTable.GetValue (MageSchool, 3) )
-		KitValue = (0x4000 + KitIndex)
+		KitValue = SchoolTable.GetValue (MageSchool, 3)
 		GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
 	# protect against barbarians; this stat will be overwritten later
