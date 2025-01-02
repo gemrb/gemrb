@@ -13144,6 +13144,7 @@ PyObject* GUIScript::RunPyFunction(const char* Modulename, const char* FunctionN
 
 		for (size_t i = 0; i < size; ++i) {
 			PyObject* pyParam = ParamToPython(params[i]); // a "stolen" reference for PyTuple_SetItem
+			Py_INCREF(pyParam); // could depend on Python version, see #2198
 			PyTuple_SetItem(pyParams, i, pyParam);
 		}
 		return RunPyFunction(Modulename, FunctionName, pyParams, report_error);
