@@ -137,24 +137,24 @@ def RedrawKits():
 			Button = KitWindow.GetControl(i+5)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		if not KitTable:
-			Kit = 0
+			KitIndex = 0
 			KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
 		else:
-			Kit = KitTable.GetValue (i+TopIndex,0)
+			KitIndex = KitTable.GetValue (i + TopIndex, 0)
 			if ClassName == "MAGE":
 				KitName = SchoolList.GetValue (i+TopIndex, 0)
-				if Kit == 0:
+				if KitIndex == 0:
 					KitName = SchoolList.GetValue (0, 0)
 					Button.SetState(IE_GUI_BUTTON_ENABLED)
 					if Init: #preselection of mage plain kit
 						Button.SetState(IE_GUI_BUTTON_SELECTED)
 						KitSelected = i+TopIndex
 						Init=0
-				if Kit != "*":
-					EnabledButtons.append(Kit-21)
+				if KitIndex != "*":
+					EnabledButtons.append (KitIndex - 21)
 			else:
-				if Kit and Kit != "*":
-					KitName = CommonTables.KitList.GetValue(Kit, 1)
+				if KitIndex and KitIndex != "*":
+					KitName = CommonTables.KitList.GetValue (KitIndex, 1)
 				else:
 					KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
 		Button.SetText(KitName)
@@ -164,7 +164,7 @@ def RedrawKits():
 				Button.SetState(IE_GUI_BUTTON_SELECTED)
 				KitSelected = i+TopIndex
 				Init=0
-		if Kit == "*":
+		if KitIndex == "*":
 			continue
 		if Init and i+TopIndex==0:
 			if EnabledButtons:
@@ -184,29 +184,29 @@ def KitPress():
 	ButtonPressed=GemRB.GetVar("ButtonPressed")
 	KitSelected = ButtonPressed + TopIndex
 	if not KitTable:
-		Kit = 0
+		KitIndex = 0
 	else:
-		Kit = KitTable.GetValue (ButtonPressed+TopIndex, 0)
+		KitIndex = KitTable.GetValue (ButtonPressed + TopIndex, 0)
 		if ClassName == "MAGE":
 			if ButtonPressed + TopIndex == 0:
-				Kit = 0
+				KitIndex = 0
 			else:
-				Kit = ButtonPressed + TopIndex + 21
+				KitIndex = ButtonPressed + TopIndex + 21
 
-	if ClassName == "MAGE" and Kit != 0:
-		GemRB.SetVar("MAGESCHOOL", Kit-21) # hack: -21 to make the generalist 0
+	if ClassName == "MAGE" and KitIndex != 0:
+		GemRB.SetVar ("MAGESCHOOL", KitIndex - 21) # hack: -21 to make the generalist 0
 	else:
 		GemRB.SetVar("MAGESCHOOL", 0) # so bards don't get schools
 
-	if Kit == 0:
+	if KitIndex == 0:
 		KitDescription = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
 	else:
-		KitDescription = CommonTables.KitList.GetValue(Kit, 3)
+		KitDescription = CommonTables.KitList.GetValue (KitIndex, 3)
 
 	TextAreaControl.SetText(KitDescription)
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
-	GemRB.SetVar("Class Kit", Kit)
+	GemRB.SetVar ("Class Kit", KitIndex)
 
 	return
 

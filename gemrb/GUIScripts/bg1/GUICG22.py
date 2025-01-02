@@ -60,29 +60,29 @@ def OnLoad():
 		Button = KitWindow.GetControl(i+2)
 		if not KitTable:
 			if ClassName == "MAGE":
-				Kit=GemRB.GetVar("MAGESCHOOL")
+				KitIndex = GemRB.GetVar ("MAGESCHOOL")
 				KitName = SchoolList.GetValue(i, 0)
 			else:
-				Kit = 0
+				KitIndex = 0
 				KitName = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
 
 		else:
-			Kit = KitTable.GetValue(i,0)
+			KitIndex = KitTable.GetValue (i, 0)
 			if ClassName == "MAGE":
-				if Kit:
-					Kit = Kit - 21
-				KitName = SchoolList.GetValue(Kit, 0)
+				if KitIndex:
+					KitIndex = KitIndex - 21
+				KitName = SchoolList.GetValue (KitIndex, 0)
 			else:
-				if Kit:
-					KitName = CommonTables.KitList.GetValue(Kit, 1)
+				if KitIndex:
+					KitName = CommonTables.KitList.GetValue (KitIndex, 1)
 				else:
 					KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
 
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetText(KitName)
-		Button.SetVarAssoc("Class Kit",Kit)
+		Button.SetVarAssoc ("Class Kit", KitIndex)
 		if i==0:
-			GemRB.SetVar("Class Kit",Kit)
+			GemRB.SetVar ("Class Kit", KitIndex)
 		Button.OnPress (KitPress)
 
 	BackButton = KitWindow.GetControl(12)
@@ -101,14 +101,14 @@ def OnLoad():
 	return
 
 def KitPress():
-	Kit = GemRB.GetVar("Class Kit")
-	if Kit == 0:
+	KitIndex = GemRB.GetVar ("Class Kit")
+	if KitIndex == 0:
 		KitName = CommonTables.Classes.GetValue(ClassName, "DESC_REF")
 	else:
 		if ClassName == "MAGE":
-			KitName = SchoolList.GetValue(Kit, 1)
+			KitName = SchoolList.GetValue (KitIndex, 1)
 		else:
-			KitName = CommonTables.KitList.GetValue(Kit, 3)
+			KitName = CommonTables.KitList.GetValue (KitIndex, 3)
 	TextAreaControl.SetText(KitName)
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
