@@ -46,12 +46,17 @@ def appendCol(f, max):
   f.truncate()
   i = 0
   for cell in data:
+    if i == 2:
+      colName = cell
+
     if cell == "$" or lines[i] == b"" or chr(lines[i][0]) == "#":
       f.write(lines[i] + b"\n")
       i = i + 1
       continue
 
     padding = max - len(lines[i]) + 2 # 2 spaces as field separator
+    if i > 2:
+      padding = padding  + (len(colName) - 1) # right-align
     f.write(lines[i] + (" "*padding + cell + "\n").encode('ascii'))
 
     i = i + 1
