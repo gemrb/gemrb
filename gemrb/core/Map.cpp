@@ -2432,6 +2432,13 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	// * -1 for last master area's song of the same entry,
 	// * -2 for current area's day/night song
 	// Eg. bg1 AR2607 (intro candlekeep ambush south), AR2302 (friendly arm inn 2nd floor)
+	const PluginHolder<MusicMgr>& musicMgr = core->GetMusicMgr();
+	static std::set<ResRef> silentAreas;
+	if (silentAreas.find(scriptName) != silentAreas.end()) {
+		// already gave up on this one before, avoid reloading master area every script update
+		musicMgr->End();
+		return;
+	}
 	if (SongType == 0xffff || SongList[SongType] == ieDword(-2)) {
 		// select SONG_DAY or SONG_NIGHT
 		Trigger parameters;
@@ -2442,7 +2449,6 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 
 	bool hasContinuation = core->HasFeature(GFFlags::HAS_CONTINUATION);
 	Game* game = core->GetGame();
-	const PluginHolder<MusicMgr>& musicMgr = core->GetMusicMgr();
 
 	// handle -1
 	// Test for non-zero pl in order to keep subareas quiet which disable
@@ -2454,6 +2460,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 		const Map* lastMasterArea = game->GetMap(game->LastMasterArea, false);
 		pl = lastMasterArea ? lastMasterArea->SongList[SongType] : bc1Idx;
 		poi = core->GetMusicPlaylist(pl);
+		if (IsStar(poi)) silentAreas.insert(scriptName);
 	}
 
 	if (IsStar(poi)) {
