@@ -1,17 +1,17 @@
 2DA V1.0
 NORMAL
-	RESREF		FONT_NAME	PX_SIZE		STYLE	BACKGRND
-0	NORMAL	       NORMAL		14		0		1
-1 	TOOLFONT       TOOLFONT		14		0		1
-2	NUMBER	       NUMBER		14		0		0
-3	INITIALS       INITIALS		14		0		0
-4	NUMBER2	       NUMBER2		14		0		0
-5	NUMBER3	       NUMBER3		14		0		0
-6	REALMS	       REALMS		14		0		0
-7	STONEBIG       STONEBIG		14		0		0
-8 	STONESML       STONESML		14		0		0
+    RESREF      FONT_NAME   PX_SIZE     STYLE   BACKGRND
+0   NORMAL      NORMAL      14          0       1
+1   TOOLFONT    TOOLFONT    14          0       1
+2   NUMBER      NUMBER      14          0       0
+3   INITIALS    INITIALS    14          0       0
+4   NUMBER2     NUMBER2     14          0       0
+5   NUMBER3     NUMBER3     14          0       0
+6   REALMS      REALMS      14          0       0
+7   STONEBIG    STONEBIG    14          0       0
+8   STONESML    STONESML    14          0       0
 # state "fonts" are the status icons. You probably don't want to edit these.
-9	STATES  	   STATES		14		0		0
-10	STATES2 	   STATES2		14		0		0
+9   STATES      STATES      14          0       0
+10  STATES2     STATES2     14          0       0
 
 # Customization How To: https://gemrb.org/Fonts
