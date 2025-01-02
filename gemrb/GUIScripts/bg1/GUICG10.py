@@ -97,4 +97,12 @@ def NextPress(Window):
 	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+
+	# gnomes are forced to specialize also when multiclassing
+	if "MAGE" in ClassName and GemRB.GetVar ("MAGESCHOOL"):
+		KitIndex = GemRB.GetVar ("MAGESCHOOL")
+		SchoolList = GemRB.LoadTable ("magesch", 1)
+		KitValue = SchoolList.GetValue (KitIndex, 3)
+		GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
+
 	CharGenCommon.next()
