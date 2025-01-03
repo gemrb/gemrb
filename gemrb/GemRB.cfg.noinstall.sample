@@ -201,6 +201,15 @@ CachePath=./gemrb/Cache2/
 # The path where GemRB looks for non-BAM fonts (eg. TTF)
 #CustomFontPath=
 
+###############################################################################
+#  GemRB Save Path [String]                                                   #
+#                                                                             #
+#  The path where GemRB looks for saved games. Enter the full path to the     #
+#  directory containing eg. the 'save' subdirectory if it's not in GamePath.  #
+###############################################################################
+
+#SavePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
+
 ###### HERE BE DRAGONS ########################################################
 # You shouldn't need to change anything below this point.
 
@@ -226,15 +235,6 @@ CachePath=./gemrb/Cache2/
 ###############################################################################
 
 #GameDataPath=data
-
-###############################################################################
-#  GemRB Save Path [String]                                                   #
-#                                                                             #
-#  The path where GemRB looks for saved games. Enter the full path to the     #
-#  directory containing eg. the 'save' subdirectory if it's not in GamePath.  #
-###############################################################################
-
-#SavePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
 
 ###############################################################################
 #  Game Data Override Path [String]                                           #
