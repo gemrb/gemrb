@@ -363,7 +363,7 @@ def UpdatePortraitWindow ():
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (pcID)
 
-		numCols = 4 if GameCheck.IsIWD2() else 3
+		numCols = 4 if (GameCheck.IsIWD2 () or GameCheck.IsBG2EE ()) else 3
 		numEffects = len(effects)
 
 		# calculate the partial row
