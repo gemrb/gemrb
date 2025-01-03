@@ -58,14 +58,14 @@ public:
 	DataStream* GetResourceStream(StringView resname, SClass_ID type, bool silent = false) const;
 
 	template<class T>
-	inline ResourceHolder<T> GetResourceHolder(StringView resname, bool silent = false, bool useCorrupt = false) const
+	inline ResourceHolder<T> GetResourceHolder(StringView resname, bool silent = false, bool useCorrupt = false, ieWord prefferedType = 0) const
 	{
-		return std::static_pointer_cast<T>(GetResource(resname, &T::ID, silent, useCorrupt));
+		return std::static_pointer_cast<T>(GetResource(resname, &T::ID, silent, useCorrupt, prefferedType));
 	}
 
 private:
 	/** Returns Resource object associated to given resource */
-	ResourceHolder<Resource> GetResource(StringView resname, const TypeID* type, bool silent = false, bool useCorrupt = false) const;
+	ResourceHolder<Resource> GetResource(StringView resname, const TypeID* type, bool silent = false, bool useCorrupt = false, ieWord prefferedType = 0) const;
 
 	std::vector<PluginHolder<ResourceSource>> searchPath;
 };

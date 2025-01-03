@@ -178,7 +178,7 @@ DataStream* ResourceManager::GetResourceStream(StringView ResRef, SClass_ID type
 	return NULL;
 }
 
-ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const TypeID* type, bool silent, bool useCorrupt) const
+ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const TypeID* type, bool silent, bool useCorrupt, ieWord prefferedType) const
 {
 	if (ResRef.empty())
 		return nullptr;
@@ -186,7 +186,13 @@ ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const T
 		Log(MESSAGE, "ResourceManager", "Searching for '{}'...", ResRef);
 	}
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);
-	for (const auto& type2 : types) {
+	std::vector<ResourceDesc> types2 = types;
+	if (prefferedType) {
+		// sort the preferred type to the front, so we check it first
+		std::sort(types2.begin(), types2.end(), [&prefferedType](auto& a, auto& b) { return (a.GetKeyType() == prefferedType ? true : (a.GetKeyType() < b.GetKeyType())); });
+	}
+
+	for (const auto& type2 : types2) {
 		for (const auto& path : searchPath) {
 			DataStream* str = path->GetResource(ResRef, type2);
 			if (!str && useCorrupt && core->UseCorruptedHack) {
