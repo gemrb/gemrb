@@ -4204,6 +4204,17 @@ static void ChunkActor(Actor* actor)
 	}
 }
 
+static bool CanGetChunked(const Actor* actor)
+{
+	if (actor->GetStat(IE_MINHITPOINTS)) return false;
+	if (actor->GetStat(IE_DISABLECHUNKING)) return false;
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS) && actor->GetStat(IE_MC_FLAGS) & MC_IGNORE_RETURN) return false;
+
+	if (!actor->InParty) return true;
+	if (CFGCache.gameDifficulty <= Difficulty::Normal) return false;
+	return true;
+}
+
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, int critical, int saveflags, int specialFlags)
 {
@@ -4288,7 +4299,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 
 	if (damage > 0) {
 		// instant chunky death if the actor is petrified or frozen
-		bool allowChunking = !Modified[IE_DISABLECHUNKING] && (!InParty || CFGCache.gameDifficulty > Difficulty::Normal) && !Modified[IE_MINHITPOINTS];
+		bool allowChunking = CanGetChunked(this);
 		if (Modified[IE_STATE_ID] & (STATE_FROZEN | STATE_PETRIFIED) && allowChunking) {
 			damage = 123456; // arbitrarily high for death; won't be displayed
 			LastDamageType |= DAMAGE_CHUNKING;
