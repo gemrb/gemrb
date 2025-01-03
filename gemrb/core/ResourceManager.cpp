@@ -195,16 +195,15 @@ ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const T
 	for (const auto& type2 : types2) {
 		for (const auto& path : searchPath) {
 			DataStream* str = path->GetResource(ResRef, type2);
-			if (str) {
-				auto res = type2.Create(str);
-				if (res) {
-					if (!silent) {
-						Log(MESSAGE, "ResourceManager", "Found '{}.{}' in '{}'.",
-						    ResRef, type2.GetExt(), path->GetDescription());
-					}
-					return res;
-				}
+			if (!str) continue;
+
+			auto res = type2.Create(str);
+			if (!res) continue;
+			if (!silent) {
+				Log(MESSAGE, "ResourceManager", "Found '{}.{}' in '{}'.",
+				    ResRef, type2.GetExt(), path->GetDescription());
 			}
+			return res;
 		}
 	}
 	if (!silent) {
