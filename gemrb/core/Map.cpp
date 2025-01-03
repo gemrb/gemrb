@@ -2598,9 +2598,16 @@ PathMapFlags Map::GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, b
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
-		if (sms == SearchmapPoint(p)) continue;
+		SearchmapPoint smp { p };
+		if (sms == smp) continue;
 
-		PathMapFlags blockStatus = GetBlocked(p);
+		// see note in GetBlockedInLineTile
+		PathMapFlags blockStatus;
+		if (stopOnImpassable && caller) {
+			blockStatus = GetBlockedInRadiusTile(smp, caller->circleSize);
+		} else {
+			blockStatus = GetBlockedTile(smp);
+		}
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}
@@ -2629,7 +2636,14 @@ PathMapFlags Map::GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapP
 		p.y += dy;
 		if (s == p) continue;
 
-		PathMapFlags blockStatus = GetBlockedTile(p);
+		// do a wider check for bigger actors (for the common case it's the same)
+		// should not be used for IsVisibleLOS
+		PathMapFlags blockStatus;
+		if (stopOnImpassable && caller) {
+			blockStatus = GetBlockedInRadiusTile(p, caller->circleSize);
+		} else {
+			blockStatus = GetBlockedTile(p);
+		}
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}
