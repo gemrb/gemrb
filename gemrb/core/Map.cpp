@@ -2627,7 +2627,7 @@ PathMapFlags Map::GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapP
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	SearchmapPoint p = s;
-	float_t factor = caller && caller->GetSpeed() ? float_t(gamedata->GetStepTime()) / float_t(caller->GetSpeed()) : 1;
+	float_t factor = caller && caller->GetSpeed() ? float_t(gamedata->GetStepTime()) / float_t(caller->GetSpeed()) / 16 : 1;
 	while (p != d) {
 		float_t dx = d.x - p.x;
 		float_t dy = d.y - p.y;
