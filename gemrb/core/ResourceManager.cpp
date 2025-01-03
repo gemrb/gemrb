@@ -175,7 +175,7 @@ DataStream* ResourceManager::GetResourceStream(StringView ResRef, SClass_ID type
 	if (!silent) {
 		Log(ERROR, "ResourceManager", "Couldn't find '{}.{}'.", ResRef, TypeExt(type));
 	}
-	return NULL;
+	return nullptr;
 }
 
 ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const TypeID* type, bool silent, ieWord prefferedType) const
@@ -211,7 +211,7 @@ ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const T
 		PrintPossibleFiles(buffer, ResRef, type);
 		Log(WARNING, "ResourceManager", "{}", buffer);
 	}
-	return NULL;
+	return nullptr;
 }
 
 }
