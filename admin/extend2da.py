@@ -21,8 +21,8 @@ import sys
 
 def usage(msg):
   print("Error:", msg)
-  print("Usage:", sys.argv[0], 'filename APPEND|APPEND_COL "$|value1  [$|value2] ... [$|valueN]"')
-  print("Passing $ will result in an empty cell. Use it for the first two entries when appending columns, so you don't break the 2da signature or default value")
+  print("\nUsage:", sys.argv[0], 'filename APPEND|APPEND_COL "$|value1  [$|value2] ... [$|valueN]" [-r]\n')
+  print("Passing $ will result in an empty cell. Use it for the first two entries when appending columns,\nso you don't break the 2da signature or default value. Passing -r at the end will right-align cells.")
   print()
   print("Example:")
   print("python extend2da.py gemrb/override/bg1/classes.2da APPEND 'HACKER 1 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0'")
@@ -55,8 +55,8 @@ def appendCol(f, max):
       continue
 
     padding = max - len(lines[i]) + 2 # 2 spaces as field separator
-    if i > 2:
-      padding = padding  + (len(colName) - 1) # right-align
+    if i > 2 and "-r" in flags:
+      padding = padding  + (len(colName) - len(cell)) # right-align
     f.write(lines[i] + (" "*padding + cell + "\n").encode('ascii'))
 
     i = i + 1
@@ -115,6 +115,7 @@ if len(sys.argv) < 4:
 filename = sys.argv[1]
 mode = sys.argv[2].upper() # APPEND / APPEND_COL
 data = sys.argv[3:][0].split()
+flags = sys.argv[4] if len(sys.argv) > 4 else ""
 
 if mode != "APPEND" and mode != "APPEND_COL":
   usage("invalid mode parameter")
