@@ -131,6 +131,6 @@ with open(filename, 'r+b') as f:
     appendRow(f)
 
 # tests
-# python2 extend2da.py gemrb/override/bg1/classes.2da APPEND_COL "$ $ BOGOSITY 0 0 0 00 0 0 0 0 0 0 0 0 0 0 2 3 4 7"
-# python2 extend2da.py gemrb/override/bg1/classes.2da APPEND "HACKER 1 3 0 0 0 00 0 0 0 0 0 0 0 0 0 0 "
+# python admin/extend2da.py gemrb/unhardcoded/bg1/classes.2da APPEND_COL "$ $ BOGOSITY 0 0 0 00 0 0 0 0 0 0 0 0 0 0 2 3 4 7"
+# python admin/extend2da.py gemrb/unhardcoded/bg1/classes.2da APPEND "HACKER 1 3 0 0 0 00 0 0 0 0 0 0 0 0 0 0 0 0"
 
