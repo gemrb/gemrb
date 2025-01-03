@@ -4828,6 +4828,7 @@ int fx_cast_spell(Scriptable* Owner, Actor* target, Effect* fx)
 		// no deplete, no interrupt, caster or provided level
 		std::string tmp = fmt::format("ForceSpellRES(\"{}\",[-1],{})", fx->Resource, fx->Parameter1);
 		Scriptable* target2 = Owner->GetCurrentArea()->GetScriptable(fx->Pos, 0); // refetch for non-actors
+		if (!target2) target2 = target;
 		Action* forceSpellAction = GenerateActionDirect(std::move(tmp), target2);
 		Owner->AddActionInFront(forceSpellAction);
 		Owner->ImmediateEvent();
