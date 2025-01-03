@@ -1,22 +1,22 @@
 2DA V1.0
 NORMAL
-    RESREF      FONT_NAME   PX_SIZE     STYLE   BACKGRND
-0   NORMAL      NORMAL      14          0       1
-1   INFOFONT    INFOFONT    14          0       1
-2   NUMBER      NUMBER      14          0       0
-3   INITIALS    INITIALS    14          0       0
-4   NUMBER2     NUMBER2     14          0       0
-5   NUMBER3     NUMBER3     14          0       0
-6   NUMFONT     NUMFONT     14          0       1
-7   REALMS      REALMS      14          0       0
-8   REALMS2     REALMS2     14          0       1
-9   STONEBIG    STONEBIG    14          0       0
-10  STONESM2    STONESM2    14          0       0
-11  STONESM3    STONESM3    14          0       1
-12  STONESML    STONESML    14          0       0
-13  TOOLFONT    TOOLFONT    14          0       1
+    RESREF      FONT_NAME   PX_SIZE     STYLE   BACKGRND  FLAGS
+0   NORMAL      NORMAL      14          0       1         0
+1   INFOFONT    INFOFONT    14          0       1         0
+2   NUMBER      NUMBER      14          0       0         0
+3   INITIALS    INITIALS    14          0       0         0
+4   NUMBER2     NUMBER2     14          0       0         0
+5   NUMBER3     NUMBER3     14          0       0         0
+6   NUMFONT     NUMFONT     14          0       1         0
+7   REALMS      REALMS      14          0       0         0
+8   REALMS2     REALMS2     14          0       1         0
+9   STONEBIG    STONEBIG    14          0       0         0
+10  STONESM2    STONESM2    14          0       0         0
+11  STONESM3    STONESM3    14          0       1         0
+12  STONESML    STONESML    14          0       0         0
+13  TOOLFONT    TOOLFONT    14          0       1         0
 # state "fonts" are the status icons. You probably don't want to edit these.
-14  STATES      STATES      14          0       0
-15  STATES2     STATES2     14          0       0
+14  STATES      STATES      14          0       0         0
+15  STATES2     STATES2     14          0       0         0
 
 # Customization How To: https://gemrb.org/Fonts

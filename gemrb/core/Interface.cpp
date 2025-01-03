@@ -1222,9 +1222,11 @@ void Interface::LoadFonts()
 		ieWord font_size = tab->QueryFieldUnsigned<ieWord>(rowName, "PX_SIZE"); // not available in BAM fonts.
 		FontStyle font_style = (FontStyle) tab->QueryFieldSigned<int>(rowName, "STYLE"); // not available in BAM fonts.
 		bool background = tab->QueryFieldSigned<int>(rowName, "BACKGRND") != 0;
+		bool preferBAM = tab->QueryFieldSigned<int>(rowName, "FLAGS") & 1;
 
 		Holder<Font> fnt;
-		ResourceHolder<FontManager> fntMgr = gamedata->GetResourceHolder<FontManager>(font_name);
+		ResourceHolder<FontManager> fntMgr;
+		fntMgr = gamedata->GetResourceHolder<FontManager>(font_name, false, false, preferBAM ? IE_BAM_CLASS_ID : 0);
 		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, background);
 
 		if (!fnt) {

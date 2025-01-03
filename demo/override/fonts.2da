@@ -1,12 +1,12 @@
 2DA V1.0
 NORMAL
-    RESREF      FONT_NAME   PX_SIZE     STYLE   BACKGRND
-0   NORMAL      Lato-Bold   14          0       0
-1   FLOATTXT    Lato-Bold   12          0       0
+    RESREF      FONT_NAME   PX_SIZE     STYLE   BACKGRND  FLAGS
+0   NORMAL      Lato-Bold   14          0       0         0
+1   FLOATTXT    Lato-Bold   12          0       0         0
 #these are the same font so list the larger one first and gemrb only needs to create one font
-2   INITIALS    Eadui       36          0       0
-3   NUMBER      Eadui       14          0       0
-4   INFOFONT    Lato-Bold   12          0       0
-5   TOOLFONT    Lato-Bold   12          0       0
+2   INITIALS    Eadui       36          0       0         0
+3   NUMBER      Eadui       14          0       0         0
+4   INFOFONT    Lato-Bold   12          0       0         0
+5   TOOLFONT    Lato-Bold   12          0       0         0
 
 # Customization How To: https://gemrb.org/Fonts
