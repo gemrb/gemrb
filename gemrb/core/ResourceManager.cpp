@@ -178,7 +178,7 @@ DataStream* ResourceManager::GetResourceStream(StringView ResRef, SClass_ID type
 	return NULL;
 }
 
-ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const TypeID* type, bool silent, bool useCorrupt, ieWord prefferedType) const
+ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const TypeID* type, bool silent, ieWord prefferedType) const
 {
 	if (ResRef.empty())
 		return nullptr;
@@ -195,12 +195,6 @@ ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const T
 	for (const auto& type2 : types2) {
 		for (const auto& path : searchPath) {
 			DataStream* str = path->GetResource(ResRef, type2);
-			if (!str && useCorrupt && core->UseCorruptedHack) {
-				// don't look at other paths if requested
-				core->UseCorruptedHack = false;
-				return NULL;
-			}
-			core->UseCorruptedHack = false;
 			if (str) {
 				auto res = type2.Create(str);
 				if (res) {

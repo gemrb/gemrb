@@ -692,7 +692,6 @@ public:
 
 	path_t INIConfig = "baldur.ini";
 	bool DitherSprites = true;
-	bool UseCorruptedHack = false;
 	int FeedbackLevel = 0;
 
 	/** The Main program loop */

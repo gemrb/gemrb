@@ -41,7 +41,6 @@ bool PLTImporter::Import(DataStream* str)
 
 	str->Read(Signature, 8);
 	if (strncmp(Signature, "PLT V1  ", 8) != 0) {
-		core->UseCorruptedHack = true;
 		return false;
 	}
 

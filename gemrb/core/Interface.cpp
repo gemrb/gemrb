@@ -1226,7 +1226,7 @@ void Interface::LoadFonts()
 
 		Holder<Font> fnt;
 		ResourceHolder<FontManager> fntMgr;
-		fntMgr = gamedata->GetResourceHolder<FontManager>(font_name, false, false, preferBAM ? IE_BAM_CLASS_ID : 0);
+		fntMgr = gamedata->GetResourceHolder<FontManager>(font_name, false, preferBAM ? IE_BAM_CLASS_ID : 0);
 		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, background);
 
 		if (!fnt) {
