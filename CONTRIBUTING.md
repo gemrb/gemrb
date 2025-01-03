@@ -165,8 +165,8 @@ If you're using cmake, this has been done for you.
 ## Version tracking
 
 1. Split your changes (commits) into well-rounded units of logic (`git commit -p` can help).
-2. Read the commit diff to verify you're commiting what you think. That indentation matches
-   and that no extraneous changes are included (eg. random style changes from bad IDE settings).
+2. Read the commit diff to verify you're commiting what you think and no extraneous changes
+   are included.
 3. Each commit should compile and run. You can do quick fixups with `git commit --amend -p`.
 4. Commit messages should be descriptive (why is more important than what, include
    area/creature/script names if possible).
@@ -216,8 +216,9 @@ You can check what we're working towards in the current release by reading the
 NEWS file and, as far as bugtracker backlog goes, by looking at the version's
 [milestone](https://github.com/gemrb/gemrb/milestones).
 
-The plan for 0.9.4 is to work on iwd2 completability, annoying pst oddities,
-deal with some postponed issues, and whatever piques the contributor's fancy.
+The plan for 0.9.5 is to work on polishing, annoying pst oddities, maybe getting
+bg2ee support out of experimental stage, deal with some postponed issues, and
+whatever piques the contributor's fancy.
 
 We're looking for ninjas to help with python porting, a SDL_ttf backend,
 GLESv2 support (no hw, see [#938](https://github.com/gemrb/gemrb/issues/938)) and
