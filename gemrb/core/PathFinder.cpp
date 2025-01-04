@@ -339,7 +339,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 
 			if (usePlainThetaStar) {
 				// Theta-star path if there is LOS
-				if (IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
+				if (IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
 					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 					if (newDist < oldDist) {
 						parents[smptChildIdx] = nmptParent;
@@ -368,7 +368,9 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 
 				if (distFromStart[smptChildIdx] < oldDist) {
 					// Theta-star path if there is LOS
-					if (!IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
+					// so far the searchmap grid appears too coarse to play on, see #2261
+					//if (!IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
+					if (!IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
 						// Fall back to A-star path
 						distFromStart[smptChildIdx] = std::numeric_limits<unsigned short>::max();
 						// Find already visited neighbour with shortest: path from start + path to child

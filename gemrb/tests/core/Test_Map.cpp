@@ -148,10 +148,10 @@ TEST_F(MapTest, FindPathTest)
 		EXPECT_EQ(path.GetStep(i).point, path2.GetStep(i).point);
 	}
 
-	// FIXME: close obstacle - don't try to tunnel through
-	// path = map->FindPath(Point(1217, 690), Point(1111, 715), circleSize);
-	// EXPECT_TRUE(path);
-	// EXPECT_GT(path.Size(), 1);
+	// close obstacle: don't try to tunnel through monolith
+	path = map->FindPath(Point(1217, 690), Point(1111, 715), circleSize);
+	EXPECT_TRUE(path);
+	EXPECT_GT(path.Size(), 1);
 }
 }
 #endif
