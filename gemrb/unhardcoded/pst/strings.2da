@@ -70,8 +70,8 @@ TRACKING                   -1               0
 TRACKINGFAILED             -1               0
 DOOR_NOPICK             23169               0
 CONT_NOPICK             23169               0
-CANTSAVECOMBAT          34592               0
-CANTSAVENOCTRL          34592               0
+CANTSAVECOMBAT          34597               0
+CANTSAVENOCTRL          34597               0
 LOCKPICK_DONE           36933               1
 LOCKPICK_FAILED         36941               1
 STATIC_DISSIPATE           -1               0
