@@ -1065,7 +1065,7 @@ bool Game::AddJournalEntry(ieStrRef strRef, JournalSection section, ieByte group
 	}
 	if (core->HasFeedback(FT_MISC)) {
 		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
-			core->GetGameControl()->SetDisplayText(HCStrings::JournalChange, 30);
+			core->GetGameControl()->SetDisplayText(HCStrings::JournalChange, 120);
 		} else {
 			displaymsg->DisplayMarkupString(std::move(msg));
 		}
@@ -1244,7 +1244,7 @@ void Game::ShareXP(int xp, int flags) const
 		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
 			ieStrRef complaint = DisplayMessage::GetStringReference(strIdx);
 			String text = fmt::format(u"{}: {}", core->GetString(complaint), xp);
-			core->GetGameControl()->SetDisplayText(text, core->Time.defaultTicksPerSec * 4);
+			core->GetGameControl()->SetDisplayText(text, 120);
 		} else {
 			displaymsg->DisplayConstantStringValue(strIdx, GUIColors::XPCHANGE, (ieDword) xp);
 		}

@@ -398,7 +398,7 @@ void DisplayMessage::DisplayMsgCentered(HCStrings strIdx, int type, GUIColors co
 	if (!core->HasFeedback(type)) return;
 
 	if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
-		core->GetGameControl()->SetDisplayText(strIdx, 30);
+		core->GetGameControl()->SetDisplayText(strIdx, 120);
 	} else {
 		DisplayConstantString(strIdx, color);
 	}
