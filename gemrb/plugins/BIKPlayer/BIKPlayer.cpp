@@ -269,7 +269,7 @@ int BIKPlayer::setAudioStream() const
 {
 	ieDword volume = core->GetDictionary().Get("Volume Movie", 0);
 
-	int source = core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume, false, false);
+	int source = core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume, false, 0);
 	return source;
 }
 
