@@ -1402,7 +1402,7 @@ static void SetupTriggers()
 		if (triggers[i]) {
 			if (poi && triggers[i] != poi->Function) {
 				std::string buffer = fmt::format("{} is in collision with ", name);
-				printFunction(buffer, name, i);
+				printFunction(buffer, poi->Name, i);
 				Log(WARNING, "GameScript", "{}", buffer);
 			} else if (InDebugMode(DebugMode::TRIGGERS)) {
 				std::string buffer = fmt::format("{} is a synonym of ", name);
