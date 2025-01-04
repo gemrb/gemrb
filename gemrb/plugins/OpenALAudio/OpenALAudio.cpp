@@ -864,7 +864,7 @@ int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 
 	alSourcef(source, AL_PITCH, 1.0f);
 	alSourcei(source, AL_LOOPING, 0);
-	alSourcef(source, AL_GAIN, 0.01f * gain);
+	alSourcef(source, AL_GAIN, 0.003f * gain);
 	alSourcei(source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE);
 	alSourcei(source, AL_ROLLOFF_FACTOR, 0);
 	alSourcei(source, AL_SOURCE_RELATIVE, !point);
@@ -877,9 +877,9 @@ int OpenALAudioDriver::SetupNewStream(int x, int y, int z,
 		//   dist = max(dist, AL_REFERENCE_DISTANCE);
 		//   dist = min(dist, AL_MAX_DISTANCE);
 		//   gain = AL_REFERENCE_DISTANCE / (AL_REFERENCE_DISTANCE + AL_ROLLOFF_FACTOR * (dist – AL_REFERENCE_DISTANCE) );
-		alSourcei(source, AL_ROLLOFF_FACTOR, 4);
+		alSourcei(source, AL_ROLLOFF_FACTOR, 5);
 		alSourcei(source, AL_MAX_DISTANCE, ambientRange);
-		alSourcef(source, AL_GAIN, 0.03f * gain);
+		alSourcef(source, AL_GAIN, 0.07f * gain);
 	} else {
 		ALfloat position[] = { 0.0f, 0.0f, 0.0f };
 		alSourcefv(source, AL_POSITION, position);
