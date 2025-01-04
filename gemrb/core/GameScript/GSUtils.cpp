@@ -699,7 +699,7 @@ MIC MoveItemCore(Scriptable* Sender, Scriptable* target, const ResRef& resref, i
 		if (count <= 0) count = 1;
 		if (!GetItemContainer(*item, myinv, resref, count)) {
 			delete item;
-			item = NULL;
+			item = nullptr;
 		}
 	}
 
@@ -722,7 +722,7 @@ MIC MoveItemCore(Scriptable* Sender, Scriptable* target, const ResRef& resref, i
 			myinv = &((Container*) target)->inventory;
 			break;
 		default:
-			myinv = NULL;
+			myinv = nullptr;
 			break;
 	}
 	if (lostitem && !gotitem) {
@@ -1126,7 +1126,8 @@ void GetPositionFromScriptable(const Scriptable* scr, Point& position, bool dest
 
 void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 {
-	Scriptable *tar = NULL, *scr = NULL;
+	Scriptable* tar = nullptr;
+	Scriptable* scr = nullptr;
 
 	ScriptDebugLog(DebugMode::VARIABLES, "BeginDialog core");
 
@@ -1712,7 +1713,7 @@ bool IsInObjectRect(const Point& pos, const Region& rect)
 
 static Object* ObjectCopy(const Object* object)
 {
-	if (!object) return NULL;
+	if (!object) return nullptr;
 	Object* newObject = new Object();
 	memcpy(newObject->objectFields, object->objectFields, sizeof(newObject->objectFields));
 	memcpy(newObject->objectFilters, object->objectFilters, sizeof(newObject->objectFilters));
@@ -1747,7 +1748,7 @@ Action* ParamCopyNoOverride(const Action* parameters)
 	newAction->pointParameter = parameters->pointParameter;
 	newAction->string0Parameter = parameters->string0Parameter;
 	newAction->string1Parameter = parameters->string1Parameter;
-	newAction->objects[0] = NULL;
+	newAction->objects[0] = nullptr;
 	newAction->objects[1] = ObjectCopy(parameters->objects[1]);
 	newAction->objects[2] = ObjectCopy(parameters->objects[2]);
 	return newAction;
@@ -2168,7 +2169,7 @@ Gem_Polygon* GetPolygon2DA(ieDword index)
 	ResRef resRef;
 
 	if (index >= MAX_ISLAND_POLYGONS) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (!polygons) {
@@ -2180,11 +2181,11 @@ Gem_Polygon* GetPolygon2DA(ieDword index)
 	resRef.Format("ISLAND{:02d}", index);
 	AutoTable tm = gamedata->LoadTable(resRef);
 	if (!tm) {
-		return NULL;
+		return nullptr;
 	}
 	TableMgr::index_t cnt = tm->GetRowCount();
 	if (!cnt) {
-		return NULL;
+		return nullptr;
 	}
 
 	std::vector<Point> p(cnt);
