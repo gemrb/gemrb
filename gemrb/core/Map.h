@@ -177,6 +177,8 @@ public:
 	ieWord NightChance = 0;
 	ieDword NextSpawn = 0;
 	// TODO: EE added several extra fields: Spawn frequency (another?), Countdown, Spawn weights for all Creatures
+	// only bg1ee uses or used it — it's not so common and some fields clearly have garbage,
+	// so perhaps this was abandoned
 };
 
 class SpawnGroup {
