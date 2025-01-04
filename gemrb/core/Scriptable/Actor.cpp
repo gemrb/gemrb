@@ -4208,6 +4208,7 @@ static bool CanGetChunked(const Actor* actor)
 {
 	if (actor->GetStat(IE_MINHITPOINTS)) return false;
 	if (actor->GetStat(IE_DISABLECHUNKING)) return false;
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) return false; // pst lacks the animations
 	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS) && actor->GetStat(IE_MC_FLAGS) & MC_IGNORE_RETURN) return false;
 
 	if (!actor->InParty) return true;
