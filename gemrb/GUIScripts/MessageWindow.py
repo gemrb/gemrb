@@ -51,7 +51,6 @@ def OnLoad():
 	ActionsWindow = GemRB.LoadWindow(3, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	ActionsWindowModule.OpenActionsWindowControls (ActionsWindow)
 	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
-	ActionsWindow.AddAlias("ACTWIN")
 	ActionsWindow.AddAlias("HIDE_CUT", 1)
 	ActionsWindow.AddAlias("NOT_DLG", 0)
 	

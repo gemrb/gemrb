@@ -131,6 +131,7 @@ def GroupControls ():
 
 def OpenActionsWindowControls (Window):
 	CreateClockButton(Window.GetControl (62))
+	Window.AddAlias ("ACTWIN") # needs to happen before the first update or it will be a noop
 	UpdateActionsWindow ()
 	return
 
