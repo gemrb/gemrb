@@ -1571,7 +1571,7 @@ static void SetupOverrideActions()
 			printFunction(buffer, name, i);
 			continue;
 		}
-		if (actions[i] && (actions[i] != poi->Function || actionflags[i] != poi->Flags)) {
+		if (actions[i] && (actions[i] != poi->Function || (actionflags[i] & AF_FILE_MASK) != (poi->Flags & AF_FILE_MASK))) {
 			std::string buffer = fmt::format("{} overrides existing action ", name);
 			int x = actionsTable->FindValue(i);
 			if (x >= 0) {

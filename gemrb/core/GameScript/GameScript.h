@@ -446,6 +446,7 @@ struct TriggerLink {
 #define AF_SLEEP         2048 //only awake actors can do this
 #define AF_DLG_INSTANT   4096 //instant dialog actions
 #define AF_SCR_INSTANT   8192 //instant script actions
+#define AF_FILE_MASK     (AF_SCR_INSTANT - 1) // limit of flags defined in original ids files
 #define AF_INSTANT       (AF_DLG_INSTANT | AF_SCR_INSTANT) //only iwd2 treats them separately; 12288
 #define AF_IWD2_OVERRIDE 16384 // marking actions that require special attention when clearing during ActionOverride
 #define AF_HAS_OBJECT    32768 // whether it has an object parameter
