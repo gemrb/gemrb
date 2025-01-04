@@ -177,8 +177,11 @@ def UpdateLabels():
 	global AcPoints, HpPoints
 
 	Str = Stats[0]
-	if Str<=18:
+	if (LevelUp and Str != 18) or (not LevelUp and Str <= 18):
 		StatLabels[0].SetText(str(Str))
+	elif LevelUp:
+		strEx = GemRB.GetPlayerStat(1, IE_STREXTRA, 1)
+		StatLabels[0].SetText("18/" + ("00" if strEx == 100 else str(strEx)))
 	else:
 		StatLabels[0].SetText("18/"+strings[Str-19])
 	for i in range(1, len(Stats)):
@@ -229,7 +232,7 @@ def AcceptPress():
 		GemRB.CreatePlayer ("charbase", 1)
 
 	Str = Stats[0]
-	if Str<=18:
+	if (LevelUp and Str != 18) or (not LevelUp and Str <= 18):
 		GemRB.SetPlayerStat(1, IE_STR, Str)
 		GemRB.SetPlayerStat(1, IE_STREXTRA,0)
 	else:
@@ -287,21 +290,28 @@ def CancelPress():
 def StrPress():
 	TextArea.SetText(18489)
 	s = Stats[0]
-	if s>18:
+	if LevelUp:
+		# s = GemRB.GetPlayerStat (1, IE_STR, 1)
+		e = GemRB.GetPlayerStat (1, IE_STREXTRA, 1)
+	elif s > 18:
 		e=extras[s-19]
 		s=18
 	else:
 		e=0
 
-	x = CommonTables.StrMod.GetValue(s,0) + CommonTables.StrModEx.GetValue(e,0)
-	y = CommonTables.StrMod.GetValue(s,1) + CommonTables.StrModEx.GetValue(e,1)
-	if x==0:
-		x=y
-		y=0
+	toHit = CommonTables.StrMod.GetValue(s, 0)
+	damage = CommonTables.StrMod.GetValue(s, 1)
+	# this is for the STR==16 case, which displays only one number
+	if toHit == 0:
+		toHit = damage
+		damage = 0
+	elif s == 18 and e: # the new extra strength might not be saved yet, so don't display too high bonuses
+		toHit = toHit + CommonTables.StrModEx.GetValue(e, 0)
+		damage = damage + CommonTables.StrModEx.GetValue(e, 1)
 
-	if e>60:
+	if s == 18 and e > 60:
 		s=19
-	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(s,0), STRING_FLAGS_RESOLVE_TAGS).format(x,y))
+	TextArea.Append("\n\n" + GemRB.GetString(StatTable.GetValue(s, 0), STRING_FLAGS_RESOLVE_TAGS).format(toHit, damage))
 	return
 
 def IntPress():
