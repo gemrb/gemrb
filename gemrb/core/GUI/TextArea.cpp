@@ -414,6 +414,17 @@ void TextArea::SetColor(const Color* color, COLOR_TYPE idx)
 	}
 }
 
+void TextArea::SetFont(Holder<Font> newFont, int which)
+{
+	if (which) {
+		finit = std::move(newFont);
+	} else {
+		ftext = std::move(newFont);
+	}
+	// reset it in the parser too
+	parser.ResetAttributes(ftext, { colors[COLOR_NORMAL], colors[COLOR_BACKGROUND] }, finit, { colors[COLOR_INITIALS], colors[COLOR_BACKGROUND] });
+}
+
 void TextArea::ClearHistoryTimer()
 {
 	if (historyTimer) {

@@ -262,6 +262,7 @@ class GControl(GView):
 		'SetAction': _GemRB.Control_SetAction,
 		'SetActionInterval': _GemRB.Control_SetActionInterval,
 		'SetColor': _GemRB.Control_SetColor,
+		'SetFont': _GemRB.Control_SetFont,
 		'SetStatus': _GemRB.Control_SetStatus,
 		'SetValue': _GemRB.Control_SetValue
 	}
@@ -293,9 +294,7 @@ class GControl(GView):
 		self.SetAction(handler, IE_ACT_VALUE_CHANGE)
 
 class GLabel(GControl):
-	methods = {
-		'SetFont': _GemRB.Label_SetFont,
-	}
+	pass
 
 class GTextArea(GControl, Scrollable):
 	methods = {
@@ -340,7 +339,6 @@ class GButton(GControl):
 		'SetOverlay': _GemRB.Button_SetOverlay,
 		'SetBorder': _GemRB.Button_SetBorder,
 		'EnableBorder': _GemRB.Button_EnableBorder,
-		'SetFont': _GemRB.Button_SetFont,
 		'SetHotKey': _GemRB.Button_SetHotKey,
 		'SetAnchor': _GemRB.Button_SetAnchor,
 		'SetPushOffset': _GemRB.Button_SetPushOffset,

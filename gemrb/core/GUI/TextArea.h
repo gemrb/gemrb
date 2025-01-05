@@ -147,6 +147,7 @@ public:
 	bool IsOpaque() const override { return false; }
 
 	void SetColor(const Color&, COLOR_TYPE);
+	void SetFont(Holder<Font> newFont, int which);
 
 	/** Sets the Actual Text */
 	void SetText(String text) override;
