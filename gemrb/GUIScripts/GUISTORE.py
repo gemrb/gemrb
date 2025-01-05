@@ -1299,9 +1299,9 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 
 	Window = GemRB.LoadWindow (wid, "GUISTORE")
 	if store == STORE_MAIN:
-		Index = GemRB.GetVar ("LeftIndex")
+		Index = GemRB.GetVar ("LeftIndex") + GemRB.GetVar ("LeftTopIndex")
 	else:
-		Index = GemRB.GetVar ("RightIndex")
+		Index = GemRB.GetVar ("RightIndex") + GemRB.GetVar ("RightTopIndex")
 	Slot = GemRB.GetStoreItem (Index, store)
 	Amount = Slot['Purchased']
 	if Amount == 0:
