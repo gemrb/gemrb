@@ -152,6 +152,7 @@ def GetMemorizedSpells(actor, BookType, level):
 		Spell = GemRB.GetSpell(Spell0["SpellResRef"])
 		Spell['KnownCount'] = 1
 		Spell['MemoCount'] = Spell0["Flags"]
+		Spell['SpellIndex'] = i
 		memoSpells.append (Spell)
 
 	return memoSpells

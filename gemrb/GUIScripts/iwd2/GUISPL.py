@@ -180,7 +180,7 @@ def UpdateSpellBookWindow (Window):
 				Button.OnPress (lambda btn, mc = ms['MemoCount']: OnSpellBookUnmemorizeSpell(btn, mc))
 			else:
 				# deplete and remove
-				Button.OnPress (OpenSpellBookSpellRemoveWindow)
+				Button.OnPress (lambda btn, idx = ms['SpellIndex']: OpenSpellBookSpellRemoveWindow(btn, idx))
 			Button.OnRightPress (OpenSpellBookSpellInfoWindow)
 			tmp = str(ms['MemoCount'])+"/"+str(ms['KnownCount'])
 			Label.SetText (tmp)
@@ -314,7 +314,7 @@ def OnSpellBookMemorizeSpell (btn):
 
 	return
 
-def OpenSpellBookSpellRemoveWindow (btn):
+def OpenSpellBookSpellRemoveWindow (btn, spellIdx):
 	Window = GemRB.LoadWindow (5, "GUISPL")
 
 	# "Are you sure you want to ....?"
@@ -324,7 +324,7 @@ def OpenSpellBookSpellRemoveWindow (btn):
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	Button.SetValue(btn.Value)
+	Button.SetValue (spellIdx)
 	Button.OnPress (OnSpellBookRemoveSpell)
 	Button.MakeDefault()
 
@@ -345,6 +345,7 @@ def OnSpellBookUnmemorizeSpell (btn, mem_cnt):
 	return
 
 # not like removing spells in bg2, where you could delete known spells from the spellbook!
+# it's about removing an undepleted memorization
 def OnSpellBookRemoveSpell (btn):
 	UnmemoSpell (btn)
 	btn.Window.Close()
