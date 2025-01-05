@@ -14,7 +14,9 @@ Thanks to everyone that contributed their time, including:
 git shortlog -s $PREVIOUS_VERSION_TAG.. gets just the committers, so
 https://github.com/mntnr/name-your-contributors is preferred, eg.
   export GITHUB_TOKEN=<get a token first>
-  ../node_modules/.bin/name-your-contributors -o gemrb -a 2021-06-02 | grep -B1 name
+  ../node_modules/.bin/name-your-contributors -o gemrb -a 2021-06-02 > names.json
+  jq '[.[][] | {login, name}] | unique[] | if .name then "\(.name), \(.login)"
+      else .login end' names.json | sed 's/^"//; s/"$/, /'
 and then prefer real names to nicks, clean up and dedupe the list, sort.
 
 (**Notes to packagers:**)
