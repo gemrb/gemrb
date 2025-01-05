@@ -30,6 +30,7 @@ from ie_stats import *
 from ie_action import ACT_CAST
 
 BookNames = (1083,1079,1080,1078,1077,32,1081,39722)
+CurrentPC = None
 
 def InitSpellBookWindow (Window):
 	#setup level buttons
@@ -92,6 +93,15 @@ def GetBookType(pc):
 	return ActiveSpellBooks[BookIndex]
 
 def SelectedNewPlayer (Window):
+	global CurrentPC
+
+	# we call the selection change handler much too often and it breaks scrolling
+	pc = GemRB.GameGetSelectedPCSingle ()
+	if CurrentPC == pc:
+		return
+	else:
+		CurrentPC = pc
+
 	ScrollBar = Window.GetControl (54)
 	ScrollBar.ScrollTo (0, 0)
 	UpdateSpellBookWindow (Window)
@@ -112,7 +122,6 @@ def UpdateSpellBookWindow (Window):
 	NumBooks = len(ActiveSpellBooks)
 
 	# update spellbook buttons
-	pc = GemRB.GameGetSelectedPCSingle ()
 	ActiveSpellBooks = GetActiveSpellBooks (pc)
 	for i in range(3, -1, -1):
 		Button = Window.GetControl (88 + i)
