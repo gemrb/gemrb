@@ -1553,6 +1553,8 @@ def InfoWindow (Slot, Item):
 	Button.SetItemIcon (Slot['ItemResRef'], 0)
 
 	TextArea = Window.GetControlAlias ("INFTA")
+	if GameCheck.IsIWD1 ():
+		TextArea.SetFont ("TOOLFONT", 1)
 	if Identify:
 		NameLabel.SetText (Item['ItemNameIdentified'])
 		TextArea.SetText (Item['ItemDescIdentified'])
