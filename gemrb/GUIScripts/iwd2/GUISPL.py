@@ -181,7 +181,7 @@ def UpdateSpellBookWindow (Window):
 			else:
 				# deplete and remove
 				Button.OnPress (lambda btn, idx = ms['SpellIndex']: OpenSpellBookSpellRemoveWindow(btn, idx))
-			Button.OnRightPress (OpenSpellBookSpellInfoWindow)
+			Button.OnRightPress (lambda btn, idx = ms['SpellIndex']: OpenSpellBookSpellInfoWindow(btn, idx))
 			tmp = str(ms['MemoCount'])+"/"+str(ms['KnownCount'])
 			Label.SetText (tmp)
 			Button.SetVisible(True)
@@ -254,7 +254,7 @@ def MemorizedSpellList (pc, SelectedBook, SpellBookSpellLevel):
 def KnownSpellList (pc, SelectedBook, SpellBookSpellLevel):
 	return Spellbook.GetKnownSpellsLevel (pc, SelectedBook, SpellBookSpellLevel)
 
-def OpenSpellBookSpellInfoWindow (btn):
+def OpenSpellBookSpellInfoWindow (btn, spellIdx = None):
 	Window = GemRB.LoadWindow (3, "GUISPL")
 
 	#back
@@ -268,7 +268,8 @@ def OpenSpellBookSpellInfoWindow (btn):
 	BookType = GetBookType(pc)
 
 	if btn.VarName == "Memorized":
-		ms = GemRB.GetMemorizedSpell (pc, BookType, level, btn.Value)
+		idx = spellIdx if (spellIdx is not None) else btn.Value
+		ms = GemRB.GetMemorizedSpell (pc, BookType, level, idx)
 		ResRef = ms['SpellResRef']
 	else:
 		known = KnownSpellList(pc, BookType, level)
