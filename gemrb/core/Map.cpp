@@ -1149,6 +1149,10 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	ieDword gametime = game->GameTime;
 	static ieDword oldGameTime = 0;
 	bool timestop = game->IsTimestopActive();
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS) && core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) {
+		// also grey on pause
+		timestop = true;
+	}
 
 	//area specific spawn.ini files (a PST feature)
 	if (INISpawn) {
