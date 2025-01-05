@@ -1117,7 +1117,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 
 	def HasAnyActiveCasterLevel (pc):
 		levels = GemRB.GetPlayerLevel (pc, ISMAGE) + GemRB.GetPlayerLevel (pc, ISSORCERER) + GemRB.GetPlayerLevel (pc, ISBARD)
-		levels = levels + GemRB.GetPlayerLevel (pc, ISCLERIC) + GemRB.GetPlayerLevel (pc, ISDRUID)
+		levels = levels + GemRB.GetPlayerLevel (pc, ISCLERIC) + GemRB.GetPlayerLevel (pc, ISDRUID) + GemRB.GetPlayerLevel (pc, ISSHAMAN)
 		# first spells at level: 9 (bg1), 6 (iwd), 4 (iwd2)
 		# lowest works here, since we also check for spell presence
 		# — either you have spells from the class or the other one provides them
