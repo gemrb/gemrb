@@ -10066,35 +10066,34 @@ static PyObject* GemRB_CheckFeatCondition(PyObject* /*self*/, PyObject* args)
 		return RuntimeError("Callback failed");
 	}
 
-	bool ret = true;
-	auto CheckStat = [actor](PyObject* o1, PyObject* o2, int op) {
-		int stat = static_cast<int>(PyLong_AsLong(o1));
-		int value = static_cast<int>(PyLong_AsLong(o2));
-		return DiffCore(actor->GetBase(stat), value, op);
-	};
-
-	if (p[1] || p[2]) {
-		int op = p[9] ? static_cast<int>(PyLong_AsLong(p[9])) : GREATER_OR_EQUALS;
-		ret = CheckStat(p[1], p[2], op);
+	std::array<int, 9> reqs;
+	for (size_t i = 0; i < reqs.size(); i++) {
+		reqs[i] = static_cast<int>(PyLong_AsLong(p[i]));
 	}
 
-	if (p[3] || p[4]) {
+	bool ret = true;
+	if (reqs[1] || reqs[2]) {
+		int op = p[9] ? static_cast<int>(PyLong_AsLong(p[9])) : GREATER_OR_EQUALS;
+		ret = DiffCore(actor->GetBase(reqs[1]), reqs[2], op);
+	}
+
+	if (reqs[3] || reqs[4]) {
 		int op = p[10] ? static_cast<int>(PyLong_AsLong(p[10])) : GREATER_OR_EQUALS;
-		ret |= CheckStat(p[3], p[4], op);
+		ret |= DiffCore(actor->GetBase(reqs[3]), reqs[4], op);
 	}
 
 	if (!ret)
 		goto endofquest;
 
-	if (p[5] || p[6]) {
+	if (reqs[5] || reqs[6]) {
 		// no | because the formula is (a|b) & (c|d)
 		int op = p[11] ? static_cast<int>(PyLong_AsLong(p[11])) : GREATER_OR_EQUALS;
-		ret = CheckStat(p[5], p[6], op);
+		ret = DiffCore(actor->GetBase(reqs[5]), reqs[6], op);
 	}
 
-	if (p[7] || p[8]) {
+	if (reqs[7] || reqs[8]) {
 		int op = p[12] ? static_cast<int>(PyLong_AsLong(p[12])) : GREATER_OR_EQUALS;
-		ret |= CheckStat(p[7], p[8], op);
+		ret |= DiffCore(actor->GetBase(reqs[7]), reqs[8], op);
 	}
 
 	if (PyErr_Occurred()) {
