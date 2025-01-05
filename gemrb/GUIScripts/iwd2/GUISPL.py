@@ -177,7 +177,7 @@ def UpdateSpellBookWindow (Window):
 			# since spells are stacked, we need to check first whether to unmemorize (deplete) or remove (already depleted)
 			if ms['MemoCount'] < ms['KnownCount']:
 				# already depleted, just remove
-				Button.OnPress (lambda btn, mc = ms['MemoCount']: OnSpellBookUnmemorizeSpell(btn, mc))
+				Button.OnPress (lambda btn, mc = ms['MemoCount'], idx = ms['SpellIndex']: OnSpellBookUnmemorizeSpell(btn, mc, idx))
 			else:
 				# deplete and remove
 				Button.OnPress (lambda btn, idx = ms['SpellIndex']: OpenSpellBookSpellRemoveWindow(btn, idx))
@@ -338,10 +338,10 @@ def OpenSpellBookSpellRemoveWindow (btn, spellIdx):
 	return
 
 # since we can have semidepleted stacks, first make sure we unmemorize the depleted ones, only then unmemorize
-def OnSpellBookUnmemorizeSpell (btn, mem_cnt):
+def OnSpellBookUnmemorizeSpell (btn, mem_cnt, spellIdx):
 	# remove one depleted spell without touching the still memorized
 	# we'd need a different spell index, but it's all handled in the core
-	UnmemoSpell(btn, mem_cnt != 0)
+	UnmemoSpell(btn, mem_cnt != 0, spellIdx)
 	return
 
 # not like removing spells in bg2, where you could delete known spells from the spellbook!
@@ -351,7 +351,7 @@ def OnSpellBookRemoveSpell (btn):
 	btn.Window.Close()
 	return
 
-def UnmemoSpell (btn, onlydepleted = False):
+def UnmemoSpell (btn, onlydepleted = False, spellIdx = None):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = GemRB.GetVar("SpellBookSpellLevel")
 	BookType = GetBookType(pc)
@@ -359,7 +359,8 @@ def UnmemoSpell (btn, onlydepleted = False):
 	Window = GemRB.GetView("WIN_SPL")
 	def Complete(btn):
 		# remove spell from memory
-		GemRB.UnmemorizeSpell (pc, BookType, level, btn.Value, onlydepleted)
+		idx = spellIdx if (spellIdx is not None) else btn.Value
+		GemRB.UnmemorizeSpell (pc, BookType, level, idx, onlydepleted)
 		UpdateSpellBookWindow(Window)
 
 	GemRB.PlaySound ("GAM_44")
