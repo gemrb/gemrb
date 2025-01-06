@@ -2172,7 +2172,7 @@ std::vector<Actor*> Map::GetAllActorsInRadius(const Point& p, int flags, unsigne
 		}
 		if (!(flags & GA_NO_LOS)) {
 			//line of sight visibility
-			if (!IsVisibleLOS(actor->Pos, p)) {
+			if (!IsVisibleLOS(actor->Pos, p, actor)) {
 				continue;
 			}
 		}

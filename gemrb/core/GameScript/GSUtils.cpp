@@ -596,11 +596,11 @@ int CanSee(const Scriptable* Sender, const Scriptable* target, bool range, int s
 	}
 	//}
 
+	const Actor* snd = Scriptable::As<Actor>(Sender);
 	if (range) {
 		unsigned int dist;
 		bool los = true;
-		if (Sender->Type == ST_ACTOR) {
-			const Actor* snd = static_cast<const Actor*>(Sender);
+		if (snd) {
 			dist = snd->Modified[IE_VISUALRANGE];
 			if (halveRange) dist /= 2;
 		} else {
@@ -617,7 +617,7 @@ int CanSee(const Scriptable* Sender, const Scriptable* target, bool range, int s
 		}
 	}
 
-	return map->IsVisibleLOS(target->SMPos, Sender->SMPos);
+	return map->IsVisibleLOS(target->SMPos, Sender->SMPos, snd);
 }
 
 //non actors can see too (reducing function to LOS)
@@ -1588,7 +1588,7 @@ void AttackCore(Scriptable* Sender, Scriptable* target, int flags)
 	float_t angle = AngleFromPoints(attacker->Pos, target->Pos);
 	if (attacker->GetCurrentArea() != target->GetCurrentArea() ||
 	    !WithinPersonalRange(attacker, target, weaponRange) ||
-	    !attacker->GetCurrentArea()->IsVisibleLOS(attacker->Pos, target->Pos) ||
+	    !attacker->GetCurrentArea()->IsVisibleLOS(attacker->Pos, target->Pos, attacker) ||
 	    !CanSee(attacker, target, true, 0)) {
 		MoveNearerTo(attacker, target, Feet2Pixels(weaponRange, angle));
 		return;
@@ -2334,7 +2334,7 @@ void SpellCore(Scriptable* Sender, Action* parameters, int flags)
 				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 				return;
 			}
-			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, tar->SMPos)) {
+			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, tar->SMPos, act)) {
 				if (!(spl->Flags & SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					MoveNearerTo(Sender, tar, dist, 2);
@@ -2460,7 +2460,7 @@ void SpellPointCore(Scriptable* Sender, Action* parameters, int flags)
 				MoveNearerTo(Sender, parameters->pointParameter, dist, 2);
 				return;
 			}
-			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, SearchmapPoint(parameters->pointParameter))) {
+			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, SearchmapPoint(parameters->pointParameter), act)) {
 				const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
 				if (!(spl->Flags & SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);

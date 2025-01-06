@@ -301,7 +301,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		} else if (minDistance &&
 			   parents[smptCurrentIdx] != nmptCurrent &&
 			   SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist &&
-			   (!(flags & PF_SIGHT) || IsVisibleLOS(smptCurrent, smptDest0))) { // FIXME: should probably be smptDest
+			   (!(flags & PF_SIGHT) || IsVisibleLOS(smptCurrent, smptDest0, caller))) { // FIXME: should probably be smptDest
 			smptDest = smptCurrent;
 			nmptDest = nmptCurrent;
 			foundPath = true;
