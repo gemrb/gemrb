@@ -258,20 +258,16 @@ def ItemPress(func, slotItem, *args):
 def DisplayItem (slotItem, ground = False):
 	Window = GemRB.LoadWindow (5, "GUIINV")
 
-	def Update():
-		#the ground items are only displayable
-		if slotItem["Flags"] & IE_INV_ITEM_IDENTIFIED:
-			value = 0
-		else:
-			value = 2
+	# the ground items are only displayable
+	if slotItem["Flags"] & IE_INV_ITEM_IDENTIFIED:
+		value = 0
+	else:
+		value = 2
 
-		if not ground:
-			value += 1
+	if not ground:
+		value += 1
 
-		UpdateItemDisplay(Window, slotItem, value)
-
-	Window.OnFocus(Update)
-	Update()
+	UpdateItemDisplay(Window, slotItem, value)
 
 def UpdateItemDisplay(Window, slotItem, itemtype):
 	item = GemRB.GetItem (slotItem["ItemResRef"])
