@@ -631,8 +631,8 @@ public:
 
 	bool IsVisible(const Point& p) const;
 	bool IsExplored(const Point& p) const;
-	bool IsVisibleLOS(const Point& s, const Point& d, const Actor* caller = NULL) const;
-	bool IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller = nullptr) const;
+	bool IsVisibleLOS(const Point& s, const Point& d, const Actor* caller) const;
+	bool IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller) const;
 	bool IsWalkableTo(const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller) const;
 	bool IsWalkableTo(const SearchmapPoint& s, const SearchmapPoint& d, bool actorsAreBlocking, const Actor* caller) const;
 
