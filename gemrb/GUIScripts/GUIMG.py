@@ -335,8 +335,8 @@ def OpenMageSpellRemoveWindow (parentWin):
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	
-	def RemoveSpell (btn):
-		OnMageRemoveSpell(btn)
+	def RemoveSpell (spell_index):
+		OnMageRemoveSpell(spell_index)
 		Window.Close()
 		parentWin.Close()
 	
@@ -396,12 +396,18 @@ def OnMageUnmemorizeSpell (btn):
 		Button.OnAnimEnd(lambda: UpdateMageWindow (MageWindow))
 	return
 
-def OnMageRemoveSpell (btn):
+def OnMageRemoveSpell (spell_index):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
 
-	index = btn.Value
+	if spell_index is None:
+		GemRB.Log("Error: spell index is None", level=LOG_ERROR)
+        return
+	GemRB.RemoveSpell(pc, spelltype, level, spell_index)
+   	UpdateMageWindow(MageWindow)
+    	return
+		
 
 	#remove spell from book
 	GemRB.RemoveSpell (pc, spelltype, level, index)
