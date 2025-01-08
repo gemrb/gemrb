@@ -1561,6 +1561,9 @@ int fx_death(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->Damage(0, damagetype, killer);
 	//death has damage type too
 	target->Die(killer, giveXP);
+	if (core->GetGame()->EveryoneDead()) {
+		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindowPlot", false);
+	}
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }
