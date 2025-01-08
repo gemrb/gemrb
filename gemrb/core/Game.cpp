@@ -1535,7 +1535,7 @@ bool Game::EveryoneDead() const
 	}
 	// if protagonist died
 	if (protagonist == PM_YES) {
-		if (PCs[0]->GetStat(IE_STATE_ID) & STATE_NOSAVE) {
+		if (PCs[0]->GetStat(IE_STATE_ID) & STATE_NOSAVE || PCs[0]->GetInternalFlag() & IF_JUSTDIED) {
 			return true;
 		}
 		return false;
