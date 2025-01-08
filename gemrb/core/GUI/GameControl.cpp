@@ -599,7 +599,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 
 	DrawTrackingArrows();
 
-	if (lastActorID) {
+	if (lastActorID && !(DialogueFlags & DF_FREEZE_SCRIPTS)) {
 		const Actor* actor = GetLastActor();
 		if (actor) {
 			DrawArrowMarker(actor->Pos, ColorGreen);
