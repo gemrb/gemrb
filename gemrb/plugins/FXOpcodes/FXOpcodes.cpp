@@ -4407,16 +4407,13 @@ int fx_set_petrified_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	target->SendDiedTrigger();
 
 	// end the game if everyone in the party gets petrified
-	const Game* game = core->GetGame();
-	int partySize = game->GetPartySize(true);
-	int stoned = 0;
-	for (int j = 0; j < partySize; j++) {
-		const Actor* pc = game->GetPC(j, true);
-		if (pc->GetStat(IE_STATE_ID) & STATE_PETRIFIED) stoned++;
-	}
-	if (stoned == partySize) {
+	Game* game = core->GetGame();
+	int oldPM = game->protagonist;
+	game->SetProtagonistMode(PM_TEAM);
+	if (game->EveryoneDead()) {
 		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindowPlot", false);
 	}
+	game->SetProtagonistMode(oldPM);
 
 	//always permanent effect, in fact in the original it is a death opcode (Avenger)
 	//i just would like this to be less difficult to use in mods (don't destroy petrified creatures)
