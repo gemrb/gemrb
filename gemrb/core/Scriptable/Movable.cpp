@@ -256,7 +256,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	bool blocksSearch = BlocksSearchMap();
 	if (actorInTheWay && blocksSearch && actorInTheWay->BlocksSearchMap()) {
 		// Give up instead of bumping if you are close to the goal
-		if (path.currentStep == path.Size() && PersonalDistance(nmptStep, this) < MAX_OPERATING_DISTANCE) {
+		if (path.Size() == 1 && PersonalDistance(nmptStep, this) < MAX_OPERATING_DISTANCE) {
 			ClearPath(true);
 			NewOrientation = Orientation;
 			// Do not call ReleaseCurrentAction() since other actions
