@@ -58,12 +58,6 @@ def OnLoad():
 	mFrame = MessageWindow.GetFrame()
 	MessageWindow.SetPos(mFrame['x'], mFrame['y'] - aFrame['h'])
 	
-	Button = ActionsWindow.GetControl(60)
-	if Button:
-		Button.OnPress (lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
-		Button = ActionsWindow.GetControl(61)
-		Button.OnPress (lambda: ToggleWindowMinimize(PortraitWindow, GS_PORTRAITPANE))
-
 	if GameCheck.HasHOW():
 		OptionsWindow = GemRB.LoadWindow(25, GUICommon.GetWindowPack(), WINDOW_LEFT|WINDOW_VCENTER)
 	else:
@@ -77,6 +71,12 @@ def OnLoad():
 	PortraitWin = PortraitWindow.OpenPortraitWindow(1)
 	PortraitWin.AddAlias("HIDE_CUT", 3)
 	PortraitWin.AddAlias("NOT_DLG", 2)
+
+	Button = ActionsWindow.GetControl (60)
+	if Button:
+		Button.OnPress (lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
+		Button = ActionsWindow.GetControl (61)
+		Button.OnPress (lambda: ToggleWindowMinimize(PortraitWin, GS_PORTRAITPANE))
 
 	# 1280 and higher don't have this control
 	Button = OptionsWindow.GetControl (10)
