@@ -32,7 +32,7 @@
 #include <vector>
 
 // This is changed by both cmake and AppVeyor (CmakeLists.txt and .appveyor.yml)
-#define VERSION_GEMRB "0.9.3-git"
+#define VERSION_GEMRB "0.9.4"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 #define PACKAGE      "GemRB"

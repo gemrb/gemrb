@@ -1,6 +1,5 @@
-GemRB git (8d724e9):
+GemRB v0.9.4 (2025-01-11):
   New features:
-    - 
     - iwd2 is now fully completable!
     - iwd2 turn undead, hybrid damage types, Heal Party on Rest
     - traditional bg2ee GUI is usable and the shaman class works
@@ -9,7 +8,6 @@ GemRB git (8d724e9):
     - animfps.2da to set per-animation drawing speed
 
   Improved features:
-    - 
     - text encoding, drawing speed, drawing, (stereo) audio, GUI internals
     - feats, animations
     - scripting, projectiles, effects, movement speed, pathfinding
