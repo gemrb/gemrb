@@ -526,9 +526,16 @@ for i in range(9):
 	GenerateButtonActions(i, "QShape", globals(), 1)
 	GenerateButtonActions(i, "QSong", globals(), 0)
 	GenerateButtonActions(i, "QSong", globals(), 1)
-for i in range(4):
-	GenerateButtonActions(i, "QWeapon", globals(), 0)
-	GenerateButtonActions(i, "QWeapon", globals(), 1, 10)
+
+# iwd2 weapon slots are sparser due to weapon sets
+if GameCheck.IsIWD2 ():
+	for i in range(4):
+		GenerateButtonActions(i, "QWeapon", globals(), 0, i)
+		GenerateButtonActions(i, "QWeapon", globals(), 1, 10 + i)
+else:
+	for i in range(4):
+		GenerateButtonActions(i, "QWeapon", globals(), 0)
+		GenerateButtonActions(i, "QWeapon", globals(), 1, 10)
 
 def ActionQSpecPressed (which):
 	ActionQSpellPressed (which)
