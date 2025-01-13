@@ -162,6 +162,9 @@ CONFIGURE_FILE(
   IMMEDIATE @ONLY
 )
 
+# copy config for complex tests to build dir
+CONFIGURE_FILE(../demo/tester.cfg "${CMAKE_BINARY_DIR}")
+
 INSTALL( TARGETS gemrb DESTINATION ${BIN_DIR} )
 
 # optional script to help deploy dependencies when building with windows.

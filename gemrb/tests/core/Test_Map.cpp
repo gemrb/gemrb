@@ -41,11 +41,7 @@ public:
 	static void SetUpTestSuite()
 	{
 		setlocale(LC_ALL, "");
-#if defined(WIN32) || defined(__APPLE__)
-		const char* argv[] = { "tester", "-c", "../demo/tester.cfg" };
-#else
-		const char* argv[] = { "tester", "-c", "../../../demo/tester.cfg" };
-#endif
+		const char* argv[] = { "tester", "-c", "../../tester.cfg" };
 		auto cfg = LoadFromArgs(3, const_cast<char**>(argv));
 		ToggleLogging(true);
 		AddLogWriter(createStdioLogWriter());
