@@ -568,7 +568,8 @@ bool Window::DispatchEvent(const Event& event)
 		default:
 #ifdef USE_SDL_CONTROLLER_API
 			// If controller api is not used, this maybe reached if a controller is used.
-			assert(false); // others should be handled above
+			// others should be handled above
+			Log(ERROR, "Window", "Unhandled event type generated: {}", event.type);
 #endif
 			break;
 	}
