@@ -12977,7 +12977,7 @@ bool GUIScript::Init(void)
 	/* pGUIClasses is a borrowed reference */
 
 	PyObject* pFunc = PyDict_GetItemString(pMainDic, "Init");
-	if (!PyObject_CallObject(pFunc, nullptr)) {
+	if (!CallObjectWrapper(pFunc, nullptr)) {
 		Log(ERROR, "GUIScript", "Failed to execute Init() in {}", main);
 		PyErr_Print();
 		return false;
@@ -13164,7 +13164,8 @@ PyObject* GUIScript::RunPyFunction(const char* moduleName, const char* functionN
 		Py_DECREF(pyModule);
 		return NULL;
 	}
-	PyObject* pValue = PyObject_CallObject(pFunc, pArgs);
+
+	PyObject* pValue = CallObjectWrapper(pFunc, pArgs);
 	if (!pValue) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();
