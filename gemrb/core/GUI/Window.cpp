@@ -46,6 +46,9 @@ Window::Window(const Region& frame, WindowManager& mgr)
 
 void Window::Close()
 {
+	// did we already get closed?
+	if (!GetScriptingRef()) return;
+
 	// fire the onclose handler prior to actually invalidating the window
 	if (eventHandlers[Closed]) {
 		eventHandlers[Closed](this);
