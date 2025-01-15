@@ -35,7 +35,6 @@ def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
 
 	Window.AddAlias("WIN_INV")
-	Window.OnFocus(UpdateInventoryWindow)
 	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
 
 	#ground items scrollbar
