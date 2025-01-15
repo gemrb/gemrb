@@ -20,7 +20,7 @@ def OnLoad():
 	console = consoleWin.ReplaceSubview (0, IE_GUI_CONSOLE, hist)
 	console.AddAlias ("CONSOLE_CTL", 1);
 	
-	consoleWin.SetAction(console.Focus, ACTION_WINDOW_FOCUS_GAINED)
+	consoleWin.OnFocus (console.Focus)
 	
 	consoleOut = consoleWin.GetControl(1)
 	consoleOut.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)

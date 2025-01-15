@@ -486,7 +486,7 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 	
 			if selectionHandler:
 				selectionHandler(window)
-				window.SetAction(selectionHandler, ACTION_WINDOW_FOCUS_GAINED)
+				window.OnFocus (selectionHandler)
 			
 			SetTopWindow (window, selectionHandler)
 			window.SetAction(lambda: TopWindowClosed(window), ACTION_WINDOW_CLOSED)

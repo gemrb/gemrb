@@ -107,7 +107,7 @@ def OnLoad():
 	StartWindow.Focus()
 	GemRB.LoadMusicPL("Theme.mus")
 	
-	StartWindow.SetAction(RefreshProtocol, ACTION_WINDOW_FOCUS_GAINED)
+	StartWindow.OnFocus (RefreshProtocol)
 
 	return
 
