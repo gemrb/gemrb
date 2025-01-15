@@ -159,7 +159,7 @@ ENDIF(APPLE)
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/GemRB.cfg.sample.in"
   "${CMAKE_CURRENT_BINARY_DIR}/GemRB.cfg.sample"
-  IMMEDIATE @ONLY
+  @ONLY
 )
 
 # copy config for complex tests to build dir
