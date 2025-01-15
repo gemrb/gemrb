@@ -579,7 +579,7 @@ def OpenItemAmountWindow (btn, location = "inventory"):
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (4, "GUIINV")
 	Window.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
-	Window.SetAction(ItemAmountWindowClosed, ACTION_WINDOW_CLOSED)
+	Window.OnClose (ItemAmountWindowClosed)
 
 	strings = { 'Done': 11973, "Cancel": 13727}
 	if GameCheck.IsPST():

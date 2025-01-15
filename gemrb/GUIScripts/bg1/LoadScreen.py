@@ -54,7 +54,7 @@ def EndLoadScreen ():
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetPicture ("GTRBPSK2")
 
-	LoadScreen.SetAction(lambda win: GemRB.GamePause(0, 0), ACTION_WINDOW_CLOSED)
+	LoadScreen.OnClose (lambda win: GemRB.GamePause(0, 0))
 	GemRB.SetTimer(LoadScreen.Close, 500, 0)
 
 	return

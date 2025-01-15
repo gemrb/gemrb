@@ -489,7 +489,7 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 				window.OnFocus (selectionHandler)
 			
 			SetTopWindow (window, selectionHandler)
-			window.SetAction(lambda: TopWindowClosed(window), ACTION_WINDOW_CLOSED)
+			window.OnClose (lambda: TopWindowClosed(window))
 
 			if pause:
 				CreateTopWinLoader.PauseState = GemRB.GamePause(3, 1)

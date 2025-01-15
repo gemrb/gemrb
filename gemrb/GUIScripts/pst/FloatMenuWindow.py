@@ -138,7 +138,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	Window.SetFlags (WF_DRAGGABLE|WF_ALPHA_CHANNEL, OP_OR)
 	Window.SetPos (x, y)
 	Window.SetTooltip (8199)
-	Window.SetAction (OnClose, ACTION_WINDOW_CLOSED)
+	Window.OnClose (OnClose)
 
 	# portrait button
 	Button = Window.GetControl (CID_PORTRAIT)

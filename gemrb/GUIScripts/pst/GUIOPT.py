@@ -108,7 +108,7 @@ def OpenVideoOptionsWindow ():
 
 	Window = GemRB.LoadWindow (1, "GUIOPT")
 	Window.AddAlias ("SUB_WIN", 0)
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
+	Window.OnClose (OnClose)
 
 	GUIOPTControls.OptHelpText (9, 31052)
 	GUIOPTControls.OptDone (Window.Close, 7)
@@ -148,7 +148,7 @@ def OpenAudioOptionsWindow ():
 
 		TrySavingConfiguration()
 
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
+	Window.OnClose (OnClose)
 
 	# save values, so we can restore them on cancel
 	for v in "Volume Ambients", "Volume SFX", "Volume Voices", "Volume Music", "Volume Movie", "Sound Processing", "Music Processing":
@@ -188,7 +188,7 @@ def OpenGameplayOptionsWindow ():
 	def OnClose(Window):
 		TrySavingConfiguration()
 
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
+	Window.OnClose (OnClose)
 
 	GUIOPTControls.OptHelpText (12, 31212)
 

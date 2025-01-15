@@ -208,7 +208,7 @@ def AddNoteWindow ():
 	NoteWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 	
 	Map = MapWindow.GetControl (2)
-	NoteWindow.SetAction (lambda: Map.SetVarAssoc("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES), ACTION_WINDOW_CLOSED)
+	NoteWindow.OnClose (lambda: Map.SetVarAssoc("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES))
 
 	if GameCheck.IsIWD2():
 		#convert to multiline, destroy unwanted resources
