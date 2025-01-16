@@ -217,6 +217,13 @@ def SetupPortraitButton (Button, pcID, needControls = 0):
 	if GameCheck.IsIWD1 () or GameCheck.IsIWD2 ():
 		AddHPLabel (Button, pcID)
 
+	# if you're using bigger parties, you probably don't care about the
+	# pairwise hotkeys and would prefer the individual ones — so override
+	if pcID == 10:
+		Button.SetHotKey('0', 0, True)
+	else:
+		Button.SetHotKey(chr(ord('0') + pcID), 0, True)
+
 def AddStatusFlagLabel (Button, i):
 	# label for status flags (dialog, store, level up)
 	align = IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_RIGHT | IE_FONT_SINGLE_LINE
@@ -308,9 +315,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	PortraitButtons = GetPortraitButtons (Window)
 	for Button in PortraitButtons:
 		pcID = Button.Value
-
 		SetupPortraitButton (Button, pcID, needcontrols)
-		Button.SetHotKey(chr(ord('0') + pcID), 0, True)
 
 	UpdatePortraitWindow()
 	return Window
