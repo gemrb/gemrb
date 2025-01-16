@@ -870,6 +870,10 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	str->ReadResRef(act->SmallPortrait);
 	if (act->SmallPortrait.IsEmpty()) {
 		act->SmallPortrait = "NONE";
+	} else if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		// bg2ee stores the M and L, but not S
+		// gimp it for now, since we want the small portrait to be small
+		*act->SmallPortrait.rbegin() = 'S';
 	}
 	str->ReadResRef(act->LargePortrait);
 	if (act->LargePortrait.IsEmpty()) {
@@ -1963,7 +1967,13 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 	//old effect type
 	Signature[7] = TotSCEFF;
 	stream->Write(Signature, 8);
-	stream->WriteResRef(actor->SmallPortrait);
+
+	// see the read above, this just ensures save compatibility
+	ResRef smallPortrait = actor->SmallPortrait;
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		*smallPortrait.rbegin() = 'M';
+	}
+	stream->WriteResRef(smallPortrait);
 	stream->WriteResRef(actor->LargePortrait);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_REPUTATION]);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_HIDEINSHADOWS]);
