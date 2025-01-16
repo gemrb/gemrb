@@ -176,6 +176,7 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 		button.SetVarAssoc("portrait", i + 1)
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
 		SetupButtonBorders (button)
+		AddStatusFlagLabel (button, i + 1)
 		button.SetFont (StatesFont)
 		button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 
