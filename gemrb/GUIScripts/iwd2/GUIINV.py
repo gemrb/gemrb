@@ -147,11 +147,20 @@ def UpdateInventoryWindow (Window):
 	Count = Container['ItemCount']
 	# account for two columns
 	ScrollBar.SetVarAssoc ("TopIndex", max(0, (Count - 6 + 1) // 2))
+
 	Equipped = GemRB.GetEquippedQuickSlot (pc, 1)
 	GemRB.SetVar ("Equipped", Equipped)
 	for i in range (4):
 		Button = Window.GetControl (109+i)
 		Button.SetVarAssoc("Equipped", i)
+	# eeh, radio buttons ...
+	for i in range (4):
+		Button = Window.GetControl (109 + i)
+		if i == Equipped:
+			Button.SetState (IE_GUI_BUTTON_SELECTED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+
 	RefreshInventoryWindow ()
 	# populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
