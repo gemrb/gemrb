@@ -6392,7 +6392,7 @@ static void SetItemText(Button* btn, int charges, bool oneisnone)
 PyDoc_STRVAR(GemRB_Button_SetItemIcon__doc,
 	     "===== Button_SetItemIcon =====\n\
 \n\
-**Metaclass Prototype:** SetItemIcon (ITMResRef[, Type, Tooltip, ITM2ResRef, BAM3ResRef]])\n\
+**Metaclass Prototype:** SetItemIcon (ITMResRef[, Type, Tooltip, FunctionKey, ITM2ResRef, BAM3ResRef]])\n\
 \n\
 **Description:** Sets Item icon image on a Button control.\n\
 \n\
@@ -6409,6 +6409,7 @@ PyDoc_STRVAR(GemRB_Button_SetItemIcon__doc,
     * 7 - Item ability icon for second extended header\n\
     * 8 - etc.\n\
   * Tooltip  - if set to 1 or 2 (identified), the tooltip for the item will also be set\n\
+  * FunctionKey  - F-key to map to [1-12]\n\
   * ITM2ResRef - if set, a second item to display in the icon. ITM2 is drawn first. The tooltip of ITM is used. Only valid for Type 4 and 5\n\
   * BAM3ResRef - if set, a third image will be stacked on top of the others\n\
 \n\
