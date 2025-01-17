@@ -694,6 +694,9 @@ def UpdateSlot (pc, slot):
 		# pst shows the inventory-bag icon bg behind items
 		if GameCheck.IsPST ():
 			Button.SetSprites ("IVSLOT", 0, 0, 0, 0, 0)
+		elif GameCheck.IsIWD2 () and ControlID in [15, 16, 17]:
+			# perhaps we should do it for all, but so far only the quiver was identified as problematic
+			Button.SetSprites ("STONSLOT", 3 + (ControlID - 15), 0, 1, 2, 3)
 	else:
 		if SlotType["ResRef"]=="*":
 			Button.SetBAM ("",0,0)
@@ -727,6 +730,7 @@ def UpdateSlot (pc, slot):
 	else:
 		Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 
+	# highlight equipped weapons and ammo
 	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
 		Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 
