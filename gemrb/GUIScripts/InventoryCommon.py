@@ -724,8 +724,9 @@ def UpdateSlot (pc, slot):
 		Button.OnRightPress (None)
 		Button.OnShiftPress (None)
 		Button.OnDoublePress (OpenItemAmountWindow)
-
-	if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
+	if not slot_item:
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
+	elif (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
