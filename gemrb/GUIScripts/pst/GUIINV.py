@@ -107,10 +107,6 @@ def InitInventoryWindow (Window):
 	ScrollBar = Window.GetControl (45)
 	ScrollBar.OnChange (lambda: RefreshInventoryWindow(Window))
 
-	for i in range (57, 64):
-		Label = Window.GetControl (0x10000000 + i)
-		Label.SetText (str (i))
-
 	# portrait
 	Button = Window.GetControl (44)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
