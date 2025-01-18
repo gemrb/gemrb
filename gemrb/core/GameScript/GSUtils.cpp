@@ -1447,6 +1447,12 @@ void MoveToObjectCore(Scriptable* Sender, Action* parameters, ieDword flags, boo
 		return;
 	}
 
+	// avoid repeated expensive pathfinding; eg. the fighter2 bg1 script will keep the actor close to the protagonist
+	if (target->GetCurrentArea() != Sender->GetCurrentArea()) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	Point dest = target->Pos + parameters->pointParameter; // MoveToObjectOffset adds an offset
 	if (target->Type == ST_TRIGGER && static_cast<const InfoPoint*>(target)->GetUsePoint()) {
 		dest = static_cast<const InfoPoint*>(target)->UsePoint;
