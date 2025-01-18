@@ -1862,7 +1862,7 @@ control. See more about this in 'data_exchange'.\n\
 \n\
 **Special:** If the 'DialogChoose' variable was set to -1 or 0 during a dialog session, it will terminate (-1) or pick the first available option (0) from the dialog automatically. (0 is used for 'continue', -1 is used for 'end dialogue').\n\
 \n\
-**See also:** [Button_SetFlags](Button_SetFlags.md), [SetVar](SetVar.md), [GetVar](GetVar.md)");
+**See also:** [View_SetFlags](View_SetFlags.md), [SetVar](SetVar.md), [GetVar](GetVar.md)");
 
 static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 {
@@ -2394,7 +2394,7 @@ setting the IE_GUI_BUTTON_NO_IMAGE flag on the control.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [Button_SetFlags](Button_SetFlags.md), [Button_SetPicture](Button_SetPicture.md), [Button_SetPicture](Button_SetPicture.md)");
+**See also:** [View_SetFlags](View_SetFlags.md), [Button_SetPicture](Button_SetPicture.md), [Button_SetPicture](Button_SetPicture.md)");
 
 static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 {
@@ -2532,7 +2532,7 @@ PyDoc_STRVAR(GemRB_Button_EnableBorder__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [Button_SetPicture](Button_SetPicture.md), [Button_SetFlags](Button_SetFlags.md), [Button_SetBorder](Button_SetBorder.md)");
+**See also:** [Button_SetPicture](Button_SetPicture.md), [View_SetFlags](View_SetFlags.md), [Button_SetBorder](Button_SetBorder.md)");
 
 static PyObject* GemRB_Button_EnableBorder(PyObject* self, PyObject* args)
 {
@@ -3318,7 +3318,7 @@ is a checkbox or a radio button though, their states are handled internally.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [Button_SetFlags](Button_SetFlags.md)");
+**See also:** [View_SetFlags](View_SetFlags.md)");
 
 static PyObject* GemRB_Button_SetState(PyObject* self, PyObject* args)
 {
