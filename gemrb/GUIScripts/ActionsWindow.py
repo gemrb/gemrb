@@ -472,6 +472,8 @@ def ActionQWeaponPressed (which):
 
 	pc = GemRB.GameGetFirstSelectedActor ()
 	qs = GemRB.GetEquippedQuickSlot (pc, 1)
+	if GameCheck.IsIWD2 ():
+		which = which // 2
 
 	# 38 is the magic slot
 	if ((qs==which) or (qs==38)) and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
