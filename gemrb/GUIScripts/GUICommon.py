@@ -124,6 +124,19 @@ def CheckStat20 (Actor, Stat, Diff):
 		return True
 	return False
 
+def CantUseSpellbookWindow (pc, priest = False):
+	if GameCheck.IsIWD2 ():
+		return False
+
+	ClassName = GetClassRowName (pc)
+	if priest:
+		CantCast = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL") == "*"
+		CantCast &= CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*"
+	else:
+		CantCast = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL") == "*"
+
+	return CantCast
+
 def GetGUISpellButtonCount ():
 	if GameCheck.HasHOW() or GameCheck.IsBG2OrEE ():
 		return 24

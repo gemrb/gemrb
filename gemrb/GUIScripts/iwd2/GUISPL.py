@@ -236,9 +236,7 @@ def UpdateSpellBookWindow (Window):
 		mem_cnt = GetMemorizedSpellsCount (memorized, True)
 		Label.SetText (str(max_mem_cnt-mem_cnt))
 
-	#if actor is uncontrollable, make this grayed
-	CantCast = GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
-	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+	GUICommon.AdjustWindowVisibility (Window, pc, False)
 
 	ScrollBar = Window.GetControl (54)
 	ScrollBar.SetVarAssoc ("SpellTopIndex", SpellTopIndex, 0, known_cnt - 8)

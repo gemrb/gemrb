@@ -149,9 +149,8 @@ def UpdateMageWindow (MageWindow):
 	spelltype = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, spelltype, level, 1)
-	
-	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
-	GUICommon.AdjustWindowVisibility (MageWindow, pc, CantCast)
+
+	GUICommon.AdjustWindowVisibility (MageWindow, pc, GUICommon.CantUseSpellbookWindow (pc))
 
 	Label = MageWindow.GetControl (0x10000032)
 	if GameCheck.IsBG2OrEE ():

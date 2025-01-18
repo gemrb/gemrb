@@ -57,11 +57,8 @@ def UpdatePriestWindow (Window):
 	spelltype = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, spelltype, level)
-	
-	ClassName = GUICommon.GetClassRowName (pc)
-	CantCast = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*"
-	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
-	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+
+	GUICommon.AdjustWindowVisibility (Window, pc, GUICommon.CantUseSpellbookWindow (pc, True))
 
 	Name = GemRB.GetPlayerName (pc, 1)
 	Label = Window.GetControl (0x10000027)
