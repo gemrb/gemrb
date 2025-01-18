@@ -177,12 +177,10 @@ def RefreshInventoryWindow (Window):
 	Label = Window.GetControl (0x10000039)
 	Label.SetText (GemRB.GetPlayerName (pc, 1))
 
-
 	# portrait
 	Button = Window.GetControl (44)
 	Button.SetPicture (GUICommonWindows.GetActorPortrait (pc, 'INVENTORY'))
 
-	# there's a label at 0x1000003a, but we don't need it
 	GUICommon.SetEncumbranceLabels (Window, 46, None, pc)
 
 	# armor class
