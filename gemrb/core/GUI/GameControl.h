@@ -209,6 +209,8 @@ public:
 	void DisplayString(const Point& p, const char* Text);
 	Actor* GetLastActor() const;
 	void SetLastActor(Actor* lastActor);
+	/** Gets the Scriptable currently under the cursor */
+	Scriptable* GetHoverObject() const;
 	/** changes map to the current PC */
 	void ChangeMap(const Actor* pc, bool forced);
 	/** Sets up targeting with spells or items */

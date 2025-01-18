@@ -2683,6 +2683,12 @@ void GameControl::SetLastActor(Actor* lastActor)
 	}
 }
 
+Scriptable* GameControl::GetHoverObject() const
+{
+	Scriptable* const lastActor = lastActorID != 0 ? GetLastActor() : nullptr;
+	return lastActor != nullptr ? lastActor : overMe;
+}
+
 //Set up an item use which needs targeting
 //Slot is an inventory slot
 //header is the used item extended header
