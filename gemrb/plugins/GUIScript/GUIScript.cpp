@@ -10743,12 +10743,36 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject* /*self*/, PyObject* args)
 	const CREItem* item = actor->inventory.GetUsedWeapon(false, dummy);
 	if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
 		displaymsg->DisplayConstantString(HCStrings::Cursed, GUIColors::WHITE);
-	} else {
-		HCStrings ret = actor->SetEquippedQuickSlot(slot, ability);
-		if (ret != HCStrings::count) {
-			displaymsg->DisplayConstantString(ret, GUIColors::WHITE);
+		Py_RETURN_NONE;
+	}
+
+	// for iwd2 we also need to take care of the paired slot
+	// otherwise we'll happily draw a bow and a shield in the same hand
+	bool reequip = false;
+	if (core->HasFeature(GFFlags::HAS_WEAPON_SETS) && actor->PCStats) {
+		// unequip the old one, reequip the new one, if any
+		reequip = true;
+		int shieldSlot = actor->inventory.GetShieldSlot();
+
+		if (!actor->inventory.IsSlotEmpty(shieldSlot)) {
+			if (actor->inventory.UnEquipItem(shieldSlot, false)) {
+				actor->SetUsedShield({}, IE_ANI_WEAPON_INVALID);
+			}
 		}
 	}
+
+	HCStrings ret = actor->SetEquippedQuickSlot(slot, ability);
+	if (ret == HCStrings::count) {
+		// set up the (new) offhand slot again
+		if (reequip) {
+			int shieldSlot = actor->inventory.GetShieldSlot();
+			if (shieldSlot != -1) actor->inventory.EquipItem(shieldSlot);
+		}
+	} else {
+		// error occurred
+		displaymsg->DisplayConstantString(ret, GUIColors::WHITE);
+	}
+
 	Py_RETURN_NONE;
 }
 
