@@ -4897,10 +4897,11 @@ int fx_identify(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 // (actually, in bg2 the effect targets area objects and the range is implemented
 // by the inareans projectile) - inanimate, area, no sprite
 // TODO: effects should target inanimates using different code
-// 0 - detect traps automatically
-// 1 - detect traps by skill
+// 0 - detect traps automatically (what the spell uses)
+// 1 - detect traps by skill (what our modal uses)
 // 2 - detect secret doors automatically
-// 3 - detect secret doors by luck
+// 3 - detect secret doors by luck (what our background detect.spl uses)
+// Under 1 we also detect illusions
 int fx_find_traps(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_find_traps(%2d)", fx->Opcode);
@@ -4908,6 +4909,7 @@ int fx_find_traps(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ieDword id = target->GetGlobalID();
 	ieDword range = target->GetStat(IE_VISUALRANGE) / 2;
 	ieDword skill;
+	ieDword diSkill = 9999;
 	bool detecttraps = true;
 
 	switch (fx->Parameter2) {
@@ -4915,8 +4917,10 @@ int fx_find_traps(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//find traps
 			if (core->HasFeature(GFFlags::RULES_3ED)) {
 				skill = target->GetSkill(IE_SEARCH);
+				diSkill = skill * 7;
 			} else {
 				skill = target->GetStat(IE_TRAPS);
+				diSkill = target->GetStat(IE_DETECTILLUSIONS);
 			}
 			break;
 		case 3:
@@ -4935,7 +4939,8 @@ int fx_find_traps(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 	}
 
-	const TileMap* TMap = target->GetCurrentArea()->TMap;
+	const Map* map = target->GetCurrentArea();
+	const TileMap* TMap = map->TMap;
 
 	for (const auto& door : TMap->GetDoors()) {
 		if (WithinRange(target, door->Pos, range)) {
@@ -4943,6 +4948,30 @@ int fx_find_traps(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			if (detecttraps && door->Visible()) {
 				// when was door trap noticed
 				door->DetectTrap(skill, id);
+			}
+		}
+	}
+
+	// detect illusions?
+	if (diSkill != 9999) {
+		ieDword diRange = std::min(15U, range); // in case we were blinded; value a guess
+		int flags = GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_ALLY | GA_NO_SELF;
+		auto neighbours = map->GetAllActorsInRadius(target->Pos, flags, diRange, target);
+		for (const auto& neighbour : neighbours) {
+			if (neighbour->GetSafeStat(IE_SEX) == SEX_ILLUSION) {
+				// project image etc. get destroyed
+				neighbour->DestroySelf();
+				continue;
+			}
+
+			ieDword check = neighbour->LuckyRoll(1, 100, 0, LR_NEGATIVE);
+			if (diSkill < check) continue;
+
+			// remove all illusion effects, not just invisibility
+			neighbour->CureInvisibility();
+			for (int level = 0; level < 9; level++) {
+				// won't work in bg1, since the spells don't have their school set
+				neighbour->fxqueue.RemoveLevelEffects(level, RL_MATCHSCHOOL, 5, neighbour);
 			}
 		}
 	}
