@@ -200,6 +200,14 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			Button.SetSprites ("GUILSOP", 0,8,9,24,8)
 		if iwd1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,24)
+		pc = GemRB.GameGetSelectedPCSingle ()
+		if pst:
+			# these two blocks do nothing yet
+			# the disabled frames are there, but they are identical to pressed
+			if GUICommon.CantUseSpellbookWindow (pc):
+				Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
+			else:
+				Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 		# Priest
 		Button = InitOptionButton(Window, 'Priest_Spells')
@@ -207,6 +215,12 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			Button.SetSprites ("GUILSOP", 0,10,11,25,10)
 		if iwd1:
 			Button.SetSprites ("GUILSOP", 0,10,11,25,25)
+		if pst:
+			if GUICommon.CantUseSpellbookWindow (pc, True):
+				Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
+			else:
+				Button.SetState (IE_GUI_BUTTON_ENABLED)
+
 
 	# Options
 	Button = InitOptionButton(Window, 'Options')
