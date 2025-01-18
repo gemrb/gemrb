@@ -117,7 +117,7 @@ GUIEnhancements = 23
 # Enable debug and cheat keystrokes, see docs/en/CheatKeys.txt for full listing
 #EnableCheatKeys=1
 
-# Developer debug mode toggle (see DebugModeBits enum)
+# Developer debug mode toggle (see DebugMode enum)
 #DebugMode=0
 
 ###############################################################################
