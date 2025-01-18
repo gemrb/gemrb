@@ -177,19 +177,6 @@ static int IWDSound = false;
 static ieDword TranslucentShadows = 0;
 static unsigned int SpellStatesSize = 0; //and this is for the spellStates bitfield
 
-static const char iwd2gemrb[32] = {
-	0, 0, 20, 2, 22, 25, 0, 14,
-	15, 23, 13, 0, 1, 24, 8, 21,
-	0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0
-};
-static const char gemrb2iwd[32] = {
-	11, 12, 3, 71, 72, 73, 0, 0, //0
-	14, 80, 83, 82, 81, 10, 7, 8, //8
-	0, 0, 0, 0, 2, 15, 4, 9, //16
-	13, 5, 0, 0, 0, 0, 0, 0 //24
-};
-
 //letters for char sound resolution bg1/bg2
 static EnumArray<Verbal, char> csound { '\0' };
 
@@ -8899,6 +8886,13 @@ void Actor::GetActionButtonRow(ActionButtonRow& ar)
 
 int Actor::Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const
 {
+	static const char gemrb2iwd[32] = {
+		11, 12, 3, 71, 72, 73, 0, 0, // 0
+		14, 80, 83, 82, 81, 10, 7, 8, // 8
+		0, 0, 0, 0, 2, 15, 4, 9, // 16
+		13, 5, 0, 0, 0, 0, 0, 0 // 24
+	};
+
 	if (QslotTranslation && slotindex > 2) {
 		if (actslot > ACT_IWDQSONG) { // quick songs
 			actslot = 110 + actslot % 10;
@@ -8921,6 +8915,13 @@ int Actor::Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const
 
 ieByte Actor::IWD2GemrbQslot(int slotIndex) const
 {
+	static const char iwd2gemrb[32] = {
+		0, 0, 20, 2, 22, 25, 0, 14,
+		15, 23, 13, 0, 1, 24, 8, 21,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0
+	};
+
 	ieByte qslot = PCStats->QSlots[slotIndex];
 	//the first three buttons are hardcoded in gemrb
 	//don't mess with them
