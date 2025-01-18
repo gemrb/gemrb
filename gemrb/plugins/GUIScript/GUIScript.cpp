@@ -7763,10 +7763,17 @@ PyDoc_STRVAR(GemRB_ExecuteString__doc,
 \n\
 **Prototype:** GemRB.ExecuteString (String[, Slot])\n\
 \n\
-**Description:** Executes an in-game script action in the current area \n\
-script context. This means that LOCALS will be treated as the current \n\
-area's variable. If a number was given, it will execute the action in the \n\
-numbered actor's context.\n\
+**Description:** Executes an in-game script action. If a valid Slot (greater than 0) \n\
+is specified, the actor in that Slot is used as the script context. Slot numbers \n\
+[1-1000] are treated as portrait indices, while Slot numbers greater than 1000 are \n\
+treated as global actor IDs. If no Slot is specified, the scriptable object (actor, \n\
+container, door, etc.) currently under the cursor (if available) becomes the script \n\
+context. If no valid object exists under the cursor, the current area script is used \n\
+as the script context instead.\n\
+\n\
+The script context determines which scriptable executes the action and its \n\
+associated behavior. For example, LOCALS used by the action will be those of the \n\
+object acting as the script context.\n\
 \n\
 **Parameters:**\n\
   * String - a gamescript action\n\
@@ -7791,17 +7798,28 @@ The above example will force Player2 to attack an enemy, as the example will run
 static PyObject* GemRB_ExecuteString(PyObject* /*self*/, PyObject* args)
 {
 	char* String;
-	int globalID = 0;
+	int Slot = 0;
 
-	PARSE_ARGS(args, "s|i", &String, &globalID);
-	GET_GAME();
+	PARSE_ARGS(args, "s|i", &String, &Slot);
+	GET_GAME()
+	GET_GAMECONTROL()
+	GET_MAP()
 
-	if (globalID) {
-		GET_ACTOR_GLOBAL();
-		GameScript::ExecuteString(actor, String);
+	Scriptable* scriptable = nullptr;
+
+	if (Slot != 0) {
+		scriptable = Slot > 1000 ? game->GetActorByGlobalID(Slot) : game->FindPC(Slot);
+		if (scriptable == nullptr) {
+			return RuntimeError("Actor not found!\n");
+		}
 	} else {
-		GameScript::ExecuteString(game->GetCurrentArea(), String);
+		scriptable = gc->GetHoverObject();
+		if (scriptable == nullptr) {
+			scriptable = map;
+		}
 	}
+
+	GameScript::ExecuteString(scriptable, String);
 	Py_RETURN_NONE;
 }
 
