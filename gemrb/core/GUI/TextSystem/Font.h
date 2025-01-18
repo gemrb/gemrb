@@ -115,9 +115,9 @@ private:
 	private:
 		using GlyphMap = std::map<ieWord, Glyph>;
 		GlyphMap glyphs;
-		ieByte* pageData; // current raw page being built
+		ieByte* pageData = nullptr; // current raw page being built
 		int pageXPos = 0; // current position on building page
-		Font* font;
+		Font* font = nullptr;
 		Holder<Sprite2D> invertedSheet;
 
 	public:
@@ -163,8 +163,8 @@ protected:
 	bool background = false;
 
 public:
-	const int LineHeight;
-	const int Baseline;
+	const int LineHeight = 0;
+	const int Baseline = 0;
 
 private:
 	void CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph*);
