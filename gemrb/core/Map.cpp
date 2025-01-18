@@ -3555,7 +3555,7 @@ void Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los)
 
 void Map::UpdateFog()
 {
-	TRACY(ZoneScoped);
+//	TRACY(ZoneScoped);
 	VisibleBitmap.fill(0);
 
 	std::set<Spawn*> potentialSpawns;

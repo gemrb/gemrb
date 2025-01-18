@@ -55,7 +55,7 @@ OPTION(USE_PNG "Enable LibPNG support" ON)
 OPTION(USE_TESTS "Enable building and running of tests" OFF)
 OPTION(USE_VORBIS "Enable Vorbis support" ON)
 OPTION(DISABLE_WERROR "Do not treat warnings as errors" OFF)
-OPTION(USE_TRACY "Build with Tracy support" OFF)
+OPTION(USE_TRACY "Build with Tracy support" ON)
 
 OPTION(USE_SDL_CONTROLLER_API "Enable SDL controller APIs. (disable if you plan on handling controller input in an external program like gptokeyb)" ON)
 
