@@ -53,7 +53,6 @@ def OnLoad():
 	#OptionsWindow.AddAlias("HIDE_CUT", 2)
 	OptionsWindow.AddAlias("NOT_DLG", 1)
 	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
-	GemRB.SetVar ("PortraitPosition", 1)
 
 	MWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	MWindow.SetFlags(WF_DESTROY_ON_CLOSE, OP_NAND)
