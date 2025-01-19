@@ -1272,7 +1272,11 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		if GemRB.GetPlayerStat (pc, IE_ANIMALS) <= 0:
 			state = IE_GUI_BUTTON_DISABLED
 	elif action in [ACT_WEAPON1, ACT_WEAPON2, ACT_WEAPON3, ACT_WEAPON4]:
-		state = SetWeaponButton (btn, action, pc)
+		realAction = action
+		if GameCheck.IsIWD2 () and pcStats:
+			# pick the selected weapon set instead
+			realAction = ACT_WEAPON1 + pcStats["QuickWeaponSlots"].index(usedslot)
+		state = SetWeaponButton (btn, realAction, pc)
 	elif action == ACT_OFFHAND: # only used in iwd2
 		if magicSlot == None:
 			offhandSlot = usedslot + 1
