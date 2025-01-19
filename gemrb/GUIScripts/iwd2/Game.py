@@ -22,12 +22,11 @@ import GemRB
 import GUICommon
 import MessageWindow
 from GameCheck import MAX_PARTY_SIZE
-from ie_action import ACT_DEFEND, ACT_WEAPON1, ACT_WEAPON2
 
 def EnterGame():
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(2)
-	GemRB.SetDefaultActions (1, ACT_DEFEND, ACT_WEAPON1, ACT_WEAPON2) # defend replaces talk
+
 	GUICommon.SetSaveDir ()
 
 	MessageWindow.OnLoad()

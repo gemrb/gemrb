@@ -21,6 +21,7 @@ import GemRB
 import LoadScreen
 from GUIDefines import *
 from datetime import datetime
+from ie_action import ACT_DEFEND, ACT_WEAPON1, ACT_WEAPON2
 
 QuickLoadSlot = 0
 StartWindow = None;
@@ -35,6 +36,10 @@ def OnLoad():
 		GemRB.PlayMovie ('NVIDIA', 1)
 		GemRB.PlayMovie ('INTRO', 1)
 		GemRB.SetVar ("SkipIntroVideos", 1)
+
+	# defend replaces talk
+	# this has to be set before a game is started!
+	GemRB.SetDefaultActions (1, ACT_DEFEND, ACT_WEAPON1, ACT_WEAPON2)
 
 #main window
 	StartWindow = GemRB.LoadWindow(0, "GUICONN")
