@@ -87,13 +87,13 @@ def GroupControls ():
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	Button = CurrentWindow.GetControl (ActionBarControlOffset)
 	if GameCheck.IsBG2OrEE ():
-		Button.SetActionIcon (globals(), 7, 1) # talk icon
+		Button.SetActionIcon (globals(), ACT_TALK, 1)
 	else:
-		Button.SetActionIcon (globals(), 14, 1)# guard icon
+		Button.SetActionIcon (globals(), ACT_DEFEND, 1)
 	Button = CurrentWindow.GetControl (1 + ActionBarControlOffset)
-	Button.SetActionIcon (globals(), 15, 2)
+	Button.SetActionIcon (globals(), ACT_ATTACK, 2)
 	Button = CurrentWindow.GetControl (2 + ActionBarControlOffset)
-	Button.SetActionIcon (globals(), 21, 3)
+	Button.SetActionIcon (globals(), ACT_STOP, 3)
 	Button = CurrentWindow.GetControl (3 + ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1, 4)
 	Button = CurrentWindow.GetControl (4 + ActionBarControlOffset)
@@ -300,7 +300,7 @@ def SetupBookSelection ():
 		if i >= len(usableBooks):
 			Button.SetActionIcon (globals(), -1)
 			continue
-		Button.SetActionIcon (globals(), 40 + usableBooks[i])
+		Button.SetActionIcon (globals(), ACT_BARD + usableBooks[i])
 	return
 
 # you can change this for custom skills, this is the original engine
@@ -413,19 +413,19 @@ def UpdateActionsWindow ():
 			SetupControls (CurrentWindow, pc, ActionBarControlOffset)
 			# use group attack icon and disable second weapon slot
 			Button = CurrentWindow.GetControl (1 + ActionBarControlOffset)
-			Button.SetActionIcon (globals(), 15, 2)
+			Button.SetActionIcon (globals(), ACT_ATTACK, 2)
 			Button = CurrentWindow.GetControl (2 + ActionBarControlOffset)
 			Button.SetActionIcon (globals(), -1, 0)
 			# the games showed quick spells, but these actors don't have the data for it
 			# we just disable the slots instead
 			Button = CurrentWindow.GetControl (3 + ActionBarControlOffset)
-			Button.SetActionIcon (globals(), 3, 4)
+			Button.SetActionIcon (globals(), ACT_QSPELL1, 4)
 			Button.SetDisabled (True)
 			Button = CurrentWindow.GetControl (4 + ActionBarControlOffset)
-			Button.SetActionIcon (globals(), 4, 5)
+			Button.SetActionIcon (globals(), ACT_QSPELL2, 5)
 			Button.SetDisabled (True)
 			Button = CurrentWindow.GetControl (5 + ActionBarControlOffset)
-			Button.SetActionIcon (globals(), 5, 6)
+			Button.SetActionIcon (globals(), ACT_QSPELL3, 6)
 			Button.SetDisabled (True)
 	elif level == UAW_ALLMAGE: # all known mage spells
 		GemRB.SetVar ("Type", -1)
