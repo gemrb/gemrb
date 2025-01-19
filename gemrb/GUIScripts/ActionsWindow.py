@@ -1179,6 +1179,10 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 				capability = GemRB.GetPlayerStat (pc, IE_LOCKPICKING) + GemRB.GetPlayerStat (pc, IE_PICKPOCKET)
 			elif btnType == ACT_SEARCH:
 				capability = 1 # everyone can try to search
+			elif btnType == ACT_CAST:
+				capability = HasAnyActiveCasterLevel (pc)
+			elif btnType == ACT_BARDSONG:
+				capability = GemRB.GetPlayerLevel (pc, ISBARD)
 			else:
 				print("Unknown action (button) type: ", btnType)
 		else:
