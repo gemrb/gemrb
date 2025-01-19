@@ -21,7 +21,7 @@ import GemRB
 import LoadScreen
 from GUIDefines import *
 from datetime import datetime
-from ie_action import ACT_DEFEND, ACT_WEAPON1, ACT_WEAPON2
+from ie_action import ACT_DEFEND, ACT_WEAPON1, ACT_OFFHAND
 
 QuickLoadSlot = 0
 StartWindow = None;
@@ -37,9 +37,9 @@ def OnLoad():
 		GemRB.PlayMovie ('INTRO', 1)
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
-	# defend replaces talk
+	# defend replaces talk and display the whole weapon set instead of one weapon each of 2 sets
 	# this has to be set before a game is started!
-	GemRB.SetDefaultActions (1, ACT_DEFEND, ACT_WEAPON1, ACT_WEAPON2)
+	GemRB.SetDefaultActions (1, ACT_DEFEND, ACT_WEAPON1, ACT_OFFHAND)
 
 #main window
 	StartWindow = GemRB.LoadWindow(0, "GUICONN")

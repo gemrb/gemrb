@@ -1273,6 +1273,29 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 			state = IE_GUI_BUTTON_DISABLED
 	elif action in [ACT_WEAPON1, ACT_WEAPON2, ACT_WEAPON3, ACT_WEAPON4]:
 		state = SetWeaponButton (btn, action, pc)
+	elif action == ACT_OFFHAND: # only used in iwd2
+		if magicSlot == None:
+			offhandSlot = usedslot + 1
+		else:
+			offhandSlot = magicSlot
+
+		item = GemRB.GetSlotItem (pc, offhandSlot, 1)
+		btn.SetActionIcon (globals(), ACT_WEAPON1) # for the empty frame
+		state = IE_GUI_BUTTON_LOCKED
+		if item and usedslot != fistSlot:
+			btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1)
+			if pcStats:
+				qwIdx = pcStats["QuickWeaponSlots"].index(offhandSlot)
+				SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][qwIdx])], True)
+			else:
+				SetItemText (btn, 0, True)
+			btn.EnableBorder (0, True)
+			if GemRB.GameControlGetTargetMode () == TARGET_MODE_ATTACK:
+				state = IE_GUI_BUTTON_SELECTED
+			else:
+				state = IE_GUI_BUTTON_FAKEDISABLED
+		else:
+			btn.SetBAM ("stonshil", 0, 0)
 	elif action == ACT_IWDQSPELL:
 		btn.SetBAM ("stonspel", 0, 0)
 		if GameCheck.IsIWD2 () and i > 3:
