@@ -159,7 +159,7 @@ def SelectQuiverSlot():
 
 # this doubles up as an ammo selector (not yet used in pst)
 def SetupItemAbilities(pc, slot, only):
-	slot_item = GemRB.GetSlotItem(pc, slot)
+	slot_item = GemRB.GetSlotItem(pc, slot, 1 if GameCheck.IsIWD2() else 0)
 	if not slot_item:
 		# CHIV: Could configure empty quickslots from the game screen ala spells heres
 		return
@@ -301,6 +301,65 @@ def SetupBookSelection ():
 			Button.SetActionIcon (globals(), -1)
 			continue
 		Button.SetActionIcon (globals(), ACT_BARD + usableBooks[i])
+	return
+
+def SelectWeaponSet (setIdx):
+	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	ActionQWeaponPressed (setIdx, False)
+
+def SelectWeaponSetAbility (slot, fistSlot, pc):
+	item = GemRB.GetSlotItem (pc, slot, 1)
+	if item:
+		launcherSlot = item["LauncherSlot"]
+		if launcherSlot and launcherSlot != fistSlot:
+			slot = launcherSlot
+
+	ActionQWeaponRightPressedDirect (slot)
+
+def SetupWeaponSets ():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	pcStats = GemRB.GetPCStats (pc)
+	if not pcStats:
+		return
+
+	invInfo = GemRB.GetInventoryInfo (pc)
+	magicSlot = invInfo["MagicSlot"]
+	usedSlot = invInfo["UsedSlot"]
+	fistSlot = invInfo["FistSlot"]
+	if usedSlot == magicSlot:
+		return
+
+	# display each set with 1 button as a gap
+	for setIdx in range(4):
+		ctrlOffset = setIdx * 3 + ActionBarControlOffset
+		selected = False
+
+		Button = CurrentWindow.GetControl (ctrlOffset)
+		slot1 = pcStats["QuickWeaponSlots"][setIdx]
+		Button.SetActionIcon (globals(), ACT_WEAPON1 + setIdx, ctrlOffset)
+		Button.OnPress (lambda btn, idx = setIdx: SelectWeaponSet (idx))
+		SetWeaponButton (Button, ACT_WEAPON1 + setIdx, pc, pcStats, invInfo)
+		if usedSlot == slot1:
+			Button.SetState (IE_GUI_BUTTON_SELECTED)
+			selected = True
+			Button.OnRightPress (lambda btn, idx = slot1: SelectWeaponSetAbility (idx, fistSlot, pc))
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+
+		Button = CurrentWindow.GetControl (ctrlOffset + 1)
+		# slot2 would be pcStats["QuickWeaponSlots"][setIdx + 4]
+		Button.SetActionIcon (globals(), ACT_OFFHAND, ctrlOffset + 1)
+		Button.OnPress (lambda btn, idx = setIdx: SelectWeaponSet (idx))
+		SetOffHandButton (Button, pc, pcStats, magicSlot, slot1, invInfo["FistSlot"])
+		if selected:
+			Button.SetState (IE_GUI_BUTTON_SELECTED)
+			Button.OnRightPress (lambda btn, idx = slot1: SelectWeaponSetAbility (idx, fistSlot, pc))
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+
+		Button = CurrentWindow.GetControl (ctrlOffset + 2)
+		Button.SetActionIcon (globals(), -1)
+		Button.SetDisabled (True)
 	return
 
 # you can change this for custom skills, this is the original engine
@@ -461,19 +520,22 @@ def UpdateActionsWindow ():
 			spelltype = (1 << IE_SPELL_TYPE_PRIEST) + (1 << IE_SPELL_TYPE_WIZARD)
 		GemRB.SetVar ("Type", spelltype)
 		Spellbook.SetupSpellIcons (CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
+	elif level == UAW_WEAPONSETS:
+		SetupWeaponSets ()
 	else:
 		print("Invalid action level:", level)
 		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 		UpdateActionsWindow ()
 	return
 
-def ActionQWeaponPressed (which):
+def ActionQWeaponPressed (which, reset = True):
 	"""Selects the given quickslot weapon if possible."""
 
 	pc = GemRB.GameGetFirstSelectedActor ()
 	qs = GemRB.GetEquippedQuickSlot (pc, 1)
-	if GameCheck.IsIWD2 ():
-		which = which // 2
+	if GameCheck.IsIWD2 () and reset:
+		# on the main action bar we always present the same slot
+		which = qs
 
 	# 38 is the magic slot
 	if ((qs==which) or (qs==38)) and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
@@ -486,11 +548,27 @@ def ActionQWeaponPressed (which):
 	UpdateActionsWindow ()
 	return
 
-# TODO: implement full weapon set switching instead
-def ActionQWeaponRightPressed (action):
+def ActionQWeaponRightPressed (which):
+	if GameCheck.IsIWD2 ():
+		# display weapon set choice instead
+		GemRB.SetVar ("ActionLevel", UAW_WEAPONSETS)
+		UpdateActionsWindow ()
+	else:
+		ActionQWeaponRightPressedDirect (which)
+	return
+
+def ActionQWeaponRightPressedDirect (action):
 	"""Selects the used ability of the quick weapon."""
+
 	GemRB.SetVar ("Slot", action)
 	GemRB.SetVar ("ActionLevel", UAW_QWEAPONS)
+	UpdateActionsWindow ()
+	return
+
+def ActionOffhandRightPressed (action):
+	"""Selects the used weapon set."""
+
+	GemRB.SetVar ("ActionLevel", UAW_WEAPONSETS)
 	UpdateActionsWindow ()
 	return
 
@@ -1341,9 +1419,9 @@ def SetOffHandButton (btn, pc, pcStats, magicSlot, usedSlot, fistSlot):
 
 	item = GemRB.GetSlotItem (pc, offhandSlot, 1)
 	state = IE_GUI_BUTTON_LOCKED
-	if item and usedSlot != fistSlot:
+	if item and usedSlot != fistSlot and item["LauncherSlot"] == 0:
 		btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1)
-		if pcStats:
+		if pcStats and offhandSlot in pcStats["QuickWeaponSlots"]:
 			qwIdx = pcStats["QuickWeaponSlots"].index(offhandSlot)
 			SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][qwIdx])], True)
 		else:

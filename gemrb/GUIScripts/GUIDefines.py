@@ -369,6 +369,7 @@ UAW_2DASPELLS = 11
 UAW_SPELLS_DIRECT = 12
 UAW_QITEMS = 13
 UAW_BG2SUMMONS = 14
+UAW_WEAPONSETS = 15
 
 # item extended header location field
 ITEM_LOC_WEAPON = 1  # show on quick weapon ability selection
