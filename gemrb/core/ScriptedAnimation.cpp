@@ -123,6 +123,8 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 		case 1:
 			type = CycleType::One | CycleType::Double;
 			break;
+		default:
+			break;
 	}
 
 	if (type == CycleType::Illegal) {
