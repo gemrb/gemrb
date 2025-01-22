@@ -680,6 +680,14 @@ Region ScriptedAnimation::DrawingRegion() const
 	return r;
 }
 
+void ScriptedAnimation::SetPos(const Point& pos)
+{
+	Pos = pos;
+	if (twin) {
+		twin->Pos = pos;
+	}
+}
+
 void ScriptedAnimation::SetEffectOwned(bool flag)
 {
 	effect_owned = flag;

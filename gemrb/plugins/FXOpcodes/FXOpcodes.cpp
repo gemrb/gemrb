@@ -2951,7 +2951,7 @@ int fx_unsummon_creature(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//play the vanish animation
 		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, false);
 		if (sca) {
-			sca->Pos = target->Pos;
+			sca->SetPos(target->Pos);
 			area->AddVVCell(sca);
 		}
 		//remove the creature
@@ -4691,9 +4691,9 @@ int fx_visual_spell_hit(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 		if (fx->Parameter1) {
-			sca->Pos = target->Pos;
+			sca->SetPos(target->Pos);
 		} else {
-			sca->Pos = fx->Pos;
+			sca->SetPos(fx->Pos);
 		}
 		sca->ZOffset += 45; // roughly half the target height; empirical value to match original
 		if (fx->Parameter2 < 32) {
@@ -5671,7 +5671,7 @@ static Actor* GetFamiliar(Scriptable* Owner, const Actor* target, const Effect* 
 		if (vvc) {
 			//This is the final position of the summoned creature
 			//not the original target point
-			vvc->Pos = fam->Pos;
+			vvc->SetPos(fam->Pos);
 			//force vvc to play only once
 			vvc->PlayOnce();
 			map->AddVVCell(vvc);
@@ -6205,13 +6205,13 @@ int fx_play_visual_effect(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				delete sca;
 				return FX_NOT_APPLIED;
 			}
-			sca->Pos = fx->Source;
+			sca->SetPos(fx->Source);
 		} else {
-			sca->Pos = fx->Pos;
+			sca->SetPos(fx->Pos);
 		}
 	} else {
 		// add also its offset, so drawing order is ok (eg. with stoneskin)
-		sca->Pos = target->Pos + Point(sca->XOffset, sca->YOffset);
+		sca->SetPos(target->Pos + Point(sca->XOffset, sca->YOffset));
 	}
 	sca->PlayOnce();
 	map->AddVVCell(sca);

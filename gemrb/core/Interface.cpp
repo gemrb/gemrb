@@ -1705,7 +1705,7 @@ Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		if (vvc) {
 			// This is the final position of the summoned creature
 			// not the original target point
-			vvc->Pos = ab->Pos;
+			vvc->SetPos(ab->Pos);
 			// force vvc to play only once
 			vvc->PlayOnce();
 			map->AddVVCell(vvc);

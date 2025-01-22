@@ -678,7 +678,7 @@ int Projectile::AddTrail(const ResRef& BAM, const ieByte* pal) const
 	sca->SetOrientation(Orientation);
 	sca->PlayOnce();
 	sca->SetBlend();
-	sca->Pos = Pos;
+	sca->SetPos(Pos);
 	// oddly, there's no visible difference in setting or not setting sca->ZOffset = ZPos
 	// the heights are still fine even for the large dragon offsets
 	area->AddVVCell(vef);
@@ -1439,7 +1439,7 @@ void Projectile::InitExplodingPhase1() const
 		vvc->SetOrientation(Orientation);
 	}
 
-	vvc->Pos = Pos;
+	vvc->SetPos(Pos);
 	vvc->PlayOnce();
 	vvc->SetBlend();
 	if (vef) {
@@ -1453,7 +1453,7 @@ void Projectile::InitExplodingPhase1() const
 	if (Extension->VVCRes == "SPCOMEX1") {
 		ScriptedAnimation* secondVVC = gamedata->GetScriptedAnimation("SPCOMEX2", false);
 		if (secondVVC) {
-			secondVVC->Pos = Pos;
+			secondVVC->SetPos(Pos);
 			secondVVC->PlayOnce();
 			secondVVC->SetBlend();
 			area->AddVVCell(secondVVC);

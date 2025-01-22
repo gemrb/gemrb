@@ -8365,7 +8365,7 @@ bool Actor::UpdateDrawingState()
 		}
 
 		if ((vvc->SequenceFlags & IE_VVC_STATIC) == 0) {
-			vvc->Pos = Pos;
+			vvc->SetPos(Pos);
 		}
 
 		bool endReached = vvc->UpdateDrawingState(GetOrientation());
@@ -9099,7 +9099,7 @@ ScriptedAnimation* Actor::FindOverlay(int index) const
 void Actor::AddVVCell(ScriptedAnimation* vvc)
 {
 	assert(vvc);
-	vvc->Pos = Pos;
+	vvc->SetPos(Pos);
 	vfxDict.emplace(vvc->ResName, vvc);
 	vfxQueue.insert(vvc);
 	assert(vfxDict.size() == vfxQueue.size());

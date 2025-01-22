@@ -990,7 +990,7 @@ void CreateVisualEffectCore(const Scriptable* Sender, const Point& position, con
 	} else {
 		ScriptedAnimation* vvc = GetVVCEffect(effect, iterations);
 		if (vvc) {
-			vvc->Pos = position;
+			vvc->SetPos(position);
 			area->AddVVCell(vvc);
 		}
 	}

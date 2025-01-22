@@ -660,7 +660,7 @@ void Map::DrawPortal(const InfoPoint* ip, int enable)
 			sca->SetBlend();
 			sca->PlayOnce();
 			//exact position, because HasVVCCell depends on the coordinates, PST had no coordinate offset anyway
-			sca->Pos = ip->Pos;
+			sca->SetPos(ip->Pos);
 			//this is actually ordered by time, not by height
 			sca->ZOffset = gotPortal;
 			AddVVCell(sca);

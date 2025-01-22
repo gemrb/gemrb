@@ -213,7 +213,7 @@ int fx_play_bam_blended(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter2 & 2) {
-		sca->Pos = fx->Pos;
+		sca->SetPos(fx->Pos);
 		area->AddVVCell(sca);
 	} else {
 		assert(target);
@@ -321,12 +321,12 @@ int fx_play_bam_not_blended(Scriptable* Owner, Actor* target, Effect* fx)
 			y = (tmp >> 5) & 31;
 		}
 
-		sca->Pos = fx->Pos;
+		sca->SetPos(fx->Pos);
 		sca->XOffset -= x;
 		sca->YOffset -= y;
 
 		if (twin) {
-			twin->Pos = fx->Pos;
+			twin->SetPos(fx->Pos);
 			twin->XOffset -= x;
 			twin->YOffset -= y;
 			area->AddVVCell(twin);

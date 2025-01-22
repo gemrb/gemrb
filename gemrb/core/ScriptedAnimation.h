@@ -164,6 +164,8 @@ public:
 	void SetOrientation(orient_t orientation);
 	/* transforms vvc to blended */
 	void SetBlend();
+	/* sets the position */
+	void SetPos(const Point& pos);
 	/* sets the effect owned flag */
 	void SetEffectOwned(bool flag);
 	/* sets fade effect at end of animation (pst feature) */
