@@ -10666,12 +10666,12 @@ static PyObject* GemRB_SetupQuickSpell(PyObject* /*self*/, PyObject* args)
 	return PyLong_FromLong(spelldata.Target);
 }
 
-PyDoc_STRVAR(GemRB_SetupQuickSlot__doc,
-	     "===== SetupQuickSlot =====\n\
+PyDoc_STRVAR(GemRB_SetupQuickItemSlot__doc,
+	     "===== SetupQuickItemSlot =====\n\
 \n\
-**Prototype:** GemRB.SetupQuickSlot (PartyID, QuickSlotID, InventorySlot[, AbilityIndex])\n\
+**Prototype:** GemRB.SetupQuickItemSlot (PartyID, QuickSlotID, InventorySlot[, AbilityIndex])\n\
 \n\
-**Description:** Sets up a quickslot or weapon slot to point to a particular \n\
+**Description:** Sets up a quick item or weapon slot to point to a particular \n\
 inventory slot. Also sets the used ability for that given quickslot. \n\
 If the abilityindex is omitted, it will be assumed as 0. \n\
 If the InventorySlot is -1, then it won't be assigned to the quickslot \n\
@@ -10692,7 +10692,7 @@ usually constant and taken care by the core\n\
 **See also:** [GetEquippedQuickSlot](GetEquippedQuickSlot.md), [SetEquippedQuickSlot](SetEquippedQuickSlot.md)\n\
 ");
 
-static PyObject* GemRB_SetupQuickSlot(PyObject* /*self*/, PyObject* args)
+static PyObject* GemRB_SetupQuickItemSlot(PyObject* /*self*/, PyObject* args)
 {
 	int globalID;
 	int qslotID;
@@ -10726,7 +10726,7 @@ Optionally sets the used ability.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [GetEquippedQuickSlot](GetEquippedQuickSlot.md), [SetupQuickSlot](SetupQuickSlot.md)\n\
+**See also:** [GetEquippedQuickSlot](GetEquippedQuickSlot.md), [SetupQuickItemSlot](SetupQuickItemSlot.md)\n\
 ");
 
 static PyObject* GemRB_SetEquippedQuickSlot(PyObject* /*self*/, PyObject* args)
@@ -12798,7 +12798,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetToken, METH_VARARGS),
 	METHOD(SetTooltipDelay, METH_VARARGS),
 	METHOD(SetupMaze, METH_VARARGS),
-	METHOD(SetupQuickSlot, METH_VARARGS),
+	METHOD(SetupQuickItemSlot, METH_VARARGS),
 	METHOD(SetupQuickSpell, METH_VARARGS),
 	METHOD(SetVar, METH_VARARGS),
 	METHOD(SoftEndPL, METH_NOARGS),

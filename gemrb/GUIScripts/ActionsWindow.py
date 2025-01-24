@@ -140,7 +140,7 @@ def SelectItemAbility():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	slot = GemRB.GetVar ("Slot")
 	ability = GemRB.GetVar ("Ability")
-	GemRB.SetupQuickSlot (pc, 0, slot, ability)
+	GemRB.SetupQuickItemSlot (pc, 0, slot, ability)
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	return
 

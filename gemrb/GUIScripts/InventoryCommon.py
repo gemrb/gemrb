@@ -1009,7 +1009,7 @@ def IdentifyItemWindow (slotItem, pc):
 	return
 
 def DoneAbilitiesItemWindow (slot_item, pc):
-	GemRB.SetupQuickSlot (pc, 0, slot_item["Slot"], GemRB.GetVar ("Ability"))
+	GemRB.SetupQuickItemSlot (pc, 0, slot_item["Slot"], GemRB.GetVar ("Ability"))
 	return
 
 def AbilitiesItemWindow (slot_item, pc):
