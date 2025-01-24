@@ -482,9 +482,9 @@ inline Targets* PlayerX(Targets* parameters, int ga_flags, unsigned int slot, in
 		// PlayerNFill
 		pc = core->GetGame()->FindPC(slot + 1);
 	} else if (mode == 2) {
-		// PartySlotN
-		slot = core->GetDictionary().Get("portrait", slot + 1);
-		pc = core->GetGame()->GetPC(slot - 1, false);
+		// PartySlotN, currently the same as PlayerNFill
+		++slot;
+		pc = core->GetGame()->FindPC(slot);
 	} else {
 		// PlayerN
 		pc = core->GetGame()->GetPC(slot, false);
