@@ -8922,6 +8922,9 @@ ieByte Actor::IWD2GemrbQslot(int slotIndex) const
 		0, 0, 0, 0, 0, 0, 0, 0
 	};
 
+	// can be hit in the first run via dumpQSlots
+	if (size_t(slotIndex) >= PCStats->QSlots.size()) return 0;
+
 	ieByte qslot = PCStats->QSlots[slotIndex];
 	//the first three buttons are hardcoded in gemrb
 	//don't mess with them
