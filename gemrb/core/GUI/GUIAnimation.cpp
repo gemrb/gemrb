@@ -81,11 +81,6 @@ SpriteAnimation::SpriteAnimation(std::shared_ptr<Animation> a)
 {
 	assert(anim);
 	current = anim->CurrentFrame();
-
-	// maintain the same speed at higher drawing frequencies
-	// for an uncapped FPS we just use a guess, since it will fluctuate and depend on the monitor
-	static tick_t delayFactor = (core->config.CapFPS > 0) ? core->config.CapFPS / 30 : 3;
-	anim->fps /= delayFactor;
 }
 
 Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t)
