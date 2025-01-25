@@ -2516,8 +2516,7 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 	}
 	unsigned int distance;
 	const Point* p;
-	Door* door = NULL;
-	Container* container = NULL;
+	const Door* door = nullptr;
 	ScriptableType type = tar->Type;
 
 	switch (type) {
@@ -2531,8 +2530,7 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 			p = door->GetClosestApproach(Sender, distance);
 			break;
 		case ST_CONTAINER:
-			container = static_cast<Container*>(tar);
-			p = &container->Pos;
+			p = &tar->Pos;
 			distance = Distance(*p, Sender);
 			break;
 		default:
@@ -6576,7 +6574,7 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 	const Point* pos;
 	unsigned int distance;
 	if (target->Type == ST_DOOR) {
-		Door* door = static_cast<Door*>(target);
+		const Door* door = static_cast<Door*>(target);
 		pos = door->GetClosestApproach(Sender, distance);
 	} else if (target->Type == ST_CONTAINER) {
 		pos = &target->Pos;

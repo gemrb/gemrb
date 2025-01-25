@@ -361,7 +361,7 @@ int Door::GetCursor(TargetMode targetMode, int lastCursor) const
 	return Cursor;
 }
 
-const Point* Door::GetClosestApproach(Scriptable* src, unsigned int& distance) const
+const Point* Door::GetClosestApproach(const Scriptable* src, unsigned int& distance) const
 {
 	const Point* p = &toOpen[0];
 	unsigned int dist1 = Distance(toOpen[0], src);
