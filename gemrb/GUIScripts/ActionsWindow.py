@@ -1113,7 +1113,6 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 	state = IE_GUI_BUTTON_UNPRESSED
 	magicSlot = invInfo["MagicSlot"]
 	fistSlot = invInfo["FistSlot"]
-	weaponSlot = invInfo["WeaponSlot"]
 	usedslot = invInfo["UsedSlot"]
 	modalState = GemRB.GetModalState (pc)
 
@@ -1377,42 +1376,42 @@ def SetWeaponButton (btn, action, pc, pcStats, invInfo):
 		slot = magicSlot
 
 	item2ResRef = ""
-	skip = False
 	if slot == 0xffff:
-		skip = True
-	if not skip:
-		item = GemRB.GetSlotItem (pc, slot, 1)
-		if item:
-			# no slot translation required
-			launcherSlot = item["LauncherSlot"]
-			if launcherSlot and launcherSlot != fistSlot:
-				# launcher/projectile in this slot
-				item2 = GemRB.GetSlotItem (pc, launcherSlot, 1)
-				item2ResRef = item2["ItemResRef"]
-		else:
-			skip = True
-	if not skip:
-		if slot == fistSlot:
-			if fistDrawn:
-				fistDrawn = False
-			else:
-				# empty weapon slot, already drawn
-				skip = True
+		return state
 
-	if not skip:
-		btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1, item2ResRef)
-		if pcStats:
-			SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][action - ACT_WEAPON1])], True)
+	item = GemRB.GetSlotItem (pc, slot, 1)
+	if not item:
+		return state
+
+	# no slot translation required
+	launcherSlot = item["LauncherSlot"]
+	if launcherSlot and launcherSlot != fistSlot:
+		# launcher/projectile in this slot
+		item2 = GemRB.GetSlotItem (pc, launcherSlot, 1)
+		item2ResRef = item2["ItemResRef"]
+
+	if slot == fistSlot:
+		if fistDrawn:
+			fistDrawn = False
 		else:
-			SetItemText (btn, 0, True)
-		if usedSlot == slot:
-			btn.EnableBorder (0, True)
-			if GemRB.GameControlGetTargetMode () == TARGET_MODE_ATTACK:
-				state = IE_GUI_BUTTON_SELECTED
-			else:
-				state = IE_GUI_BUTTON_FAKEDISABLED
+			# empty weapon slot, already drawn
+			return state
+
+	btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1, item2ResRef)
+	if pcStats:
+		SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][action - ACT_WEAPON1])], True)
+	else:
+		SetItemText (btn, 0, True)
+
+	if usedSlot == slot:
+		btn.EnableBorder (0, True)
+		if GemRB.GameControlGetTargetMode () == TARGET_MODE_ATTACK:
+			state = IE_GUI_BUTTON_SELECTED
 		else:
-			btn.EnableBorder (0, False)
+			state = IE_GUI_BUTTON_FAKEDISABLED
+	else:
+		btn.EnableBorder (0, False)
+
 	return state
 
 def SetOffHandButton (btn, pc, pcStats, magicSlot, usedSlot, fistSlot):
