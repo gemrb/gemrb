@@ -24,6 +24,8 @@
 #include "exports.h"
 #include "globals.h"
 
+#include "AudioBackend.h"
+#include "BufferCache.h"
 #include "Region.h"
 
 #include <atomic>
@@ -42,9 +44,11 @@ public:
 	~AmbientMgr();
 
 	void Reset();
-	void UpdateVolume(unsigned short value);
-	void SetAmbients(const std::vector<Ambient*>& a);
 	void RemoveAmbients(const std::vector<Ambient*>& oldAmbients);
+	void SetAmbients(const std::vector<Ambient*>& a);
+
+	void UpdateVolume();
+	void SetVolume(unsigned short value);
 
 	void Activate(StringView name); // hard play ;-)
 	void Activate();
@@ -67,32 +71,40 @@ private:
 
 	class AmbientSource {
 	public:
-		explicit AmbientSource(const Ambient* a) noexcept
-			: ambient(a) {};
+		explicit AmbientSource(const Ambient* a, AudioBufferCache& cache) noexcept
+			: ambient(a), bufferCache(cache) {};
 		AmbientSource(const AmbientSource&) = delete;
-		~AmbientSource();
+		AmbientSource(AmbientSource&&) = default;
 		AmbientSource& operator=(const AmbientSource&) = delete;
+		AmbientSource& operator=(AmbientSource&&) = default;
+
 		tick_t Tick(tick_t ticks, Point listener, ieDword timeslice);
 		void HardStop();
-		void SetVolume(unsigned short volume) const;
+		void SetVolume(unsigned short volume);
 		const Ambient* GetAmbient() const { return ambient; };
 
 	private:
-		int stream = -1;
 		const Ambient* ambient;
+		std::reference_wrapper<AudioBufferCache> bufferCache;
+
+		Holder<SoundSourceHandle> source;
+		BufferCacheEntry bufferCacheEntry;
 		tick_t lastticks = 0;
 		tick_t nextdelay = 0;
 		size_t nextref = 0;
-		unsigned int totalgain = 0;
+		unsigned int gain = 0;
 
+		BufferCacheEntry GetBuffer(ResRef resource, const AudioPlaybackConfig& config);
 		bool IsHeard(const Point& listener) const;
-		tick_t Enqueue() const;
+		tick_t Enqueue(const AudioPlaybackConfig& config);
 	};
-	std::vector<AmbientSource*> ambientSources;
+
+	AudioBufferCache bufferCache { 60 };
+	std::vector<AmbientSource> ambientSources;
 
 	int Play();
-	tick_t Tick(tick_t ticks) const;
-	void HardStop() const;
+	tick_t Tick(tick_t ticks);
+	void HardStop();
 };
 
 }

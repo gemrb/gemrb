@@ -20,7 +20,6 @@
 
 #include "SDL20Video.h"
 
-#include "Audio.h"
 #include "Interface.h"
 
 #ifdef USE_TRACY
@@ -925,12 +924,12 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event& event)
 					// on iOS/Android this happens when leaving the application or when play is interrupted (ex phone call)
 					// but it's annoying on desktops, so we try to detect them
 					if (TouchInputEnabled()) {
-						core->GetAudioDrv()->Pause(); //this is for ANDROID mostly
+						core->GetMusicLoop().Pause(); //this is for ANDROID mostly
 						core->SetPause(PauseState::On);
 					}
 					break;
 				case SDL_WINDOWEVENT_RESTORED: //SDL 1.3
-					core->GetAudioDrv()->Resume(); //this is for ANDROID mostly
+					core->GetMusicLoop().Resume(); //this is for ANDROID mostly
 					break;
 				// SDL_WINDOWEVENT_RESIZED and SDL_WINDOWEVENT_SIZE_CHANGED are handled automatically
 				default:

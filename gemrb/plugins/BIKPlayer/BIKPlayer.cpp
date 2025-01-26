@@ -34,7 +34,6 @@
 
 #include "ie_types.h"
 
-#include "Audio.h"
 #include "Interface.h"
 #include "binkdata.h"
 #include "rational.h"
@@ -209,7 +208,7 @@ bool BIKPlayer::Import(DataStream* str)
 			movieSize.w = header.width;
 			movieSize.h = header.height;
 			framePos = 0;
-			sound_init(core->GetAudioDrv()->CanPlay());
+			sound_init();
 			return video_init() == 0;
 		}
 	}
@@ -234,7 +233,7 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 	ieDword audframesize;
 	str->ReadDword(audframesize);
 	frame.size = str->Read(inbuff, frame.size - 4);
-	if (s_stream > -1 && DecodeAudioFrame(inbuff, audframesize)) {
+	if (audioStream && DecodeAudioFrame(inbuff, audframesize)) {
 		//buggy frame, we stop immediately
 		//return false;
 	}
@@ -251,7 +250,7 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 
 void BIKPlayer::Stop()
 {
-	if (s_stream > -1)
+	if (audioStream)
 		EndAudio();
 	EndVideo();
 	av_freep((void**) &inbuff);
@@ -265,24 +264,24 @@ strret_t BIKPlayer::fileRead(strpos_t pos, void* buf, strpos_t count)
 	return str->Read(buf, count);
 }
 
-int BIKPlayer::setAudioStream() const
+void BIKPlayer::FreeAudioStream() const
 {
-	ieDword volume = core->GetDictionary().Get("Volume Movie", 0);
-
-	int source = core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume, false, 0);
-	return source;
+	if (audioStream) {
+		audioStream->Stop();
+	}
 }
 
-void BIKPlayer::freeAudioStream(int stream) const
+void BIKPlayer::QueueBuffer(unsigned short bits, int channels, short* memory, int size, int samplerate)
 {
-	if (stream > -1)
-		core->GetAudioDrv()->ReleaseStream(stream, true);
-}
+	if (audioStream) {
+		audioStreamFormat.bits = bits;
+		audioStreamFormat.channels = channels;
+		audioStreamFormat.sampleRate = samplerate;
 
-void BIKPlayer::queueBuffer(int stream, unsigned short bits, int channels, short* memory, int size, int samplerate) const
-{
-	if (stream > -1)
-		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate);
+		if (!audioStream->Feed(audioStreamFormat, reinterpret_cast<char*>(memory), size)) {
+			Log(WARNING, "BIKPlayer", "Audio backend can't keep up.");
+		}
+	}
 }
 
 
@@ -293,21 +292,20 @@ void BIKPlayer::queueBuffer(int stream, unsigned short bits, int channels, short
  *  http://wiki.multimedia.cx/index.php?title=Bink_Audio
  */
 
-int BIKPlayer::sound_init(bool need_init)
+int BIKPlayer::sound_init()
 {
 	int sample_rate = header.samplerate;
 	int sample_rate_half;
 	int frame_len_bits;
 	int ret;
 
-	if (need_init) {
-		s_stream = setAudioStream();
+	if (!audioStream) {
+		audioStream = core->GetAudioDrv()->CreateStreamable(core->GetAudioSettings().ConfigPresetMovie());
 	} else {
-		s_stream = -1;
 		return 0;
 	}
 
-	if (s_stream < 0) {
+	if (!audioStream) {
 		return 0;
 	}
 
@@ -435,7 +433,7 @@ int BIKPlayer::video_init()
 
 int BIKPlayer::EndAudio()
 {
-	freeAudioStream(s_stream);
+	FreeAudioStream();
 	av_freep((void**) &s_bands);
 	if (header.audioflag & BINK_AUD_USEDCT)
 		ff_dct_end(&s_trans.dct);
@@ -628,7 +626,7 @@ int BIKPlayer::DecodeAudioFrame(void* data, int data_size)
 	//ret is a better value here as it provides almost perfect sound.
 	//Original ffmpeg code produces worse results with reported_size.
 	//Ideally ret == reported_size
-	queueBuffer(s_stream, 16, s_channels, samples, ret, header.samplerate);
+	QueueBuffer(16, s_channels, samples, ret, header.samplerate);
 
 	free(samples);
 	return reported_size != ret;

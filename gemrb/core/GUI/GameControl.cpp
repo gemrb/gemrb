@@ -1654,7 +1654,7 @@ void GameControl::MoveViewportUnlockedTo(Point p, bool center)
 		p -= half;
 	}
 
-	core->GetAudioDrv()->UpdateListenerPos(p + half);
+	core->GetAudioDrv()->SetListenerPosition(p + half);
 	vpOrigin = p;
 }
 

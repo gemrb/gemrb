@@ -36,7 +36,7 @@ class RawPCMReader : public SoundMgr {
 protected:
 	// one sample consists of
 	// channels * (is16bit ? 2 : 1) bytes
-	int samples_left = 0; // count of unread samples
+	size_t samplesLeft = 0; // count of unread samples
 	int is16bit; // 1 - if 16 bit file, 0 - otherwise
 
 public:
@@ -46,8 +46,8 @@ public:
 	}
 
 	bool Import(DataStream* stream) override;
-	int read_samples(short* buffer, int count) override;
-	int ReadSamplesIntoChannels(char* channel1, char* channel2, int numSamples) override;
+	size_t read_samples(short* buffer, size_t count) override;
+	size_t ReadSamplesIntoChannels(char* channel1, char* channel2, size_t numSamples) override;
 };
 
 // WAV files

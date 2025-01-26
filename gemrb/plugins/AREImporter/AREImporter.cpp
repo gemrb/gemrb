@@ -24,7 +24,6 @@
 #include "strrefs.h"
 
 #include "ActorMgr.h"
-#include "Ambient.h"
 #include "AnimationFactory.h"
 #include "DataFileMgr.h"
 #include "DisplayMessage.h"
@@ -37,6 +36,7 @@
 #include "ProjectileServer.h"
 #include "RNG.h"
 
+#include "Audio/Ambient.h"
 #include "GameScript/GameScript.h"
 #include "Plugins/TileMapMgr.h"
 #include "Scriptable/Container.h"

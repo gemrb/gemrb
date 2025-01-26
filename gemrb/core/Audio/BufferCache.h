@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2025 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,32 +15,37 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *
  */
 
-#include "NullSound.h"
+#ifndef H_AUDIO_BUFFER_CACHE
+#define H_AUDIO_BUFFER_CACHE
+
+#include "AudioBackend.h"
+#include "LRUCache.h"
 
 namespace GemRB {
 
-Holder<SoundSourceHandle> NullSound::CreatePlaybackSource(const AudioPlaybackConfig&, bool)
-{
-	return MakeHolder<NullSoundSourceHandle>();
+struct BufferCacheEntry {
+	Holder<SoundBufferHandle> handle;
+	time_t length = 0;
+
+	BufferCacheEntry() = default;
+	explicit BufferCacheEntry(Holder<SoundBufferHandle> handle, time_t length)
+		: handle(std::move(handle)), length(length)
+	{}
+
+	void evictionNotice() const { /* No need. */ }
+};
+
+struct BufferInUse {
+	bool operator()(BufferCacheEntry& entry) const
+	{
+		return entry.handle->Disposable();
+	}
+};
+
+using AudioBufferCache = LRUCache<BufferCacheEntry, BufferInUse>;
+
 }
 
-Holder<SoundStreamSourceHandle> NullSound::CreateStreamable(const AudioPlaybackConfig&)
-{
-	return MakeHolder<NullSoundStreamSourceHandle>();
-}
-
-Holder<SoundBufferHandle> NullSound::LoadSound(ResourceHolder<SoundMgr>, const AudioPlaybackConfig&)
-{
-	return MakeHolder<NullSoundBufferHandle>();
-}
-
-}
-
-#include "plugindef.h"
-
-GEMRB_PLUGIN(0x96E414D, "Null Sound Driver")
-PLUGIN_DRIVER(NullSound, "none")
-END_PLUGIN()
+#endif

@@ -27,7 +27,6 @@
 #include "strrefs.h"
 
 #include "ActorMgr.h"
-#include "AmbientMgr.h"
 #include "AnimationMgr.h"
 #include "ArchiveImporter.h"
 #include "Calendar.h"
@@ -651,6 +650,10 @@ Interface::~Interface() noexcept
 	delete displaymsg;
 	delete TooltipBG;
 
+	delete audioPlayback;
+	delete ambientManager;
+	delete musicLoop;
+
 	// delete and nullify this global data as well
 	delete gamedata;
 	gamedata = nullptr;
@@ -913,15 +916,15 @@ bool Interface::ReadDamageTypeTable()
 	return true;
 }
 
-bool Interface::ReadSoundChannelsTable() const
+bool Interface::ReadSoundChannelsTable()
 {
 	AutoTable tm = gamedata->LoadTable("sndchann");
 	if (!tm) {
 		return false;
 	}
 
+	// reverb is currently ignored
 	TableMgr::index_t ivol = tm->GetColumnIndex("VOLUME");
-	TableMgr::index_t irev = tm->GetColumnIndex("REVERB");
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
 		auto rowname = tm->GetRowName(i);
 		// translate some alternative names for the IWDs
@@ -931,11 +934,7 @@ bool Interface::ReadSoundChannelsTable() const
 			rowname = "SWINGS";
 
 		int volume = tm->QueryFieldSigned<int>(i, ivol);
-		float reverb = 0.0f;
-		if (irev != TableMgr::npos) {
-			reverb = atof(tm->QueryField(i, irev).c_str());
-		}
-		AudioDriver->UpdateChannel(rowname, volume, reverb);
+		audioSettings.UpdateChannel(rowname, volume);
 	}
 	return true;
 }
@@ -1058,7 +1057,8 @@ void Interface::InitVideo() const
 void Interface::InitAudio()
 {
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = std::static_pointer_cast<Audio>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName));
+	AudioDriver =
+		std::static_pointer_cast<AudioBackend>(PluginMgr::Get()->GetDriver(&AudioBackend::ID, config.AudioDriverName));
 	if (AudioDriver == nullptr) {
 		ThrowException("Failed to load sound driver.");
 	}
@@ -1104,7 +1104,11 @@ void Interface::InitAudio()
 		Log(WARNING, "Core", "Failed to read channel table.");
 	}
 
-	AudioDriver->SetScreenSize(Size(config.Width, config.Height));
+	audioSettings.SetScreenSize({ config.Width, config.Height });
+
+	ambientManager = new AmbientMgr {};
+	audioPlayback = new AudioPlayback { gamedata->defaultSounds };
+	musicLoop = new MusicLoop {};
 }
 
 void Interface::LoadPlugins() const
@@ -1268,9 +1272,29 @@ FogRenderer& Interface::GetFogRenderer()
 	return *fogRenderer;
 }
 
-PluginHolder<Audio> Interface::GetAudioDrv() const
+AmbientMgr& Interface::GetAmbientManager()
+{
+	return *ambientManager;
+}
+
+PluginHolder<AudioBackend> Interface::GetAudioDrv() const
 {
 	return AudioDriver;
+}
+
+const AudioSettings& Interface::GetAudioSettings() const
+{
+	return audioSettings;
+}
+
+AudioPlayback& Interface::GetAudioPlayback()
+{
+	return *audioPlayback;
+}
+
+MusicLoop& Interface::GetMusicLoop()
+{
+	return *musicLoop;
 }
 
 ieStrRef Interface::UpdateString(ieStrRef strref, const String& text) const
@@ -2039,11 +2063,12 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	//shutting down music and ambients before movie
 	if (music)
 		music->HardEnd();
-	AmbientMgr* ambim = AudioDriver->GetAmbientMgr();
-	if (ambim) ambim->Deactivate();
+	ambientManager->Deactivate();
 	if (strrefHandle) {
 		strrefHandle->Stop();
 		strrefHandle.reset();
+	} else {
+		audioPlayback->StopSpeech();
 	}
 
 	ResourceHolder<MoviePlayer> mp = gamedata->GetResourceHolder<MoviePlayer>(actualMovieRef);
@@ -2116,9 +2141,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		}
 	}
 
-	Holder<SoundHandle> sound_override;
+	Holder<PlaybackHandle> soundOverride;
 	if (!sound_resref.empty()) {
-		sound_override = AudioDriver->Play(sound_resref, SFXChannel::Narrator);
+		soundOverride = GetAudioPlayback().Play(sound_resref, audioSettings.ConfigPresetMovie());
 	}
 
 	// clear whatever is currently on screen
@@ -2140,15 +2165,14 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	if (!inCutScene) {
 		SetCutSceneMode(false);
 	}
-	if (sound_override) {
-		sound_override->Stop();
-		sound_override.reset();
+	if (soundOverride) {
+		soundOverride->Stop();
 	}
 
 	//restarting music
 	if (music)
 		music->Start();
-	if (ambim) ambim->Activate();
+	ambientManager->Activate();
 
 	//Setting the movie name to 1
 	vars.Set(movieRef, 1);
@@ -2378,9 +2402,8 @@ void Interface::QuitGame(int BackToMain)
 	}
 	// stop any ambients which are still enqueued
 	if (AudioDriver) {
-		AmbientMgr* ambim = AudioDriver->GetAmbientMgr();
-		if (ambim) ambim->Deactivate();
-		AudioDriver->Stop(); // also kill sounds
+		ambientManager->Deactivate();
+		musicLoop->Stop(); // also kill sounds
 	}
 	//delete game, worldmap
 	if (game) {
@@ -2436,7 +2459,6 @@ void Interface::LoadGame(Holder<SaveGame> sg, int ver_override)
 	// These are here because of the goto
 	PluginHolder<SaveGameMgr> gamMgr;
 	PluginHolder<WorldMapMgr> wmpMgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
-	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
 
 	if (sg == nullptr) {
 		//Load the Default Game
@@ -2504,9 +2526,7 @@ void Interface::LoadGame(Holder<SaveGame> sg, int ver_override)
 	}
 
 	// rarely caused crashes while loading, so stop the ambients
-	if (ambim) {
-		ambim->Reset();
-	}
+	ambientManager->Reset();
 
 	// Let's assume that now is everything loaded OK and swap the objects
 	delete game;
@@ -3444,20 +3464,6 @@ ieStrRef Interface::GetRumour(const ResRef& dlgref)
 	}
 	delete dlg;
 	return ret;
-}
-
-//plays stock sound listed in defsound.2da
-Holder<SoundHandle> Interface::PlaySound(size_t index, SFXChannel channel) const
-{
-	return PlaySound(index, channel, Point(), 0);
-}
-
-Holder<SoundHandle> Interface::PlaySound(size_t index, SFXChannel channel, const Point& p, unsigned int flags) const
-{
-	if (index <= gamedata->defaultSounds.size()) {
-		return AudioDriver->Play(gamedata->defaultSounds[index], channel, p, flags);
-	}
-	return nullptr;
 }
 
 Actor* Interface::GetFirstSelectedPC(bool forced)

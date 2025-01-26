@@ -27,7 +27,6 @@
 
 #include "mve_player.h"
 
-#include "Audio.h"
 #include "Interface.h"
 #include "MVEPlayer.h"
 #include "gstmvedemux.h"
@@ -61,10 +60,6 @@ MVEPlayer::MVEPlayer(class MVEPlay* file)
 	video_data = NULL;
 	video_back_buf = NULL;
 
-	audio_stream = -1;
-
-	playsound = core->GetAudioDrv()->CanPlay();
-
 	buffersize = chunk_size = chunk_offset = 0;
 	audio_num_channels = audio_sample_rate = audio_sample_size = 0;
 	truecolour = video_rendered_frame = audio_compressed = false;
@@ -80,8 +75,6 @@ MVEPlayer::~MVEPlayer()
 		free(video_data);
 	}
 	if (video_back_buf) free(video_back_buf);
-
-	if (audio_stream != -1) host->freeAudioStream(audio_stream);
 
 	if (host->video_skippedframes) {
 		Log(WARNING, "MVEPlayer", "Had to drop {} video frame(s).", host->video_skippedframes);
@@ -368,12 +361,9 @@ void MVEPlayer::segment_video_play()
 
 void MVEPlayer::segment_audio_init(unsigned char version)
 {
-	if (!playsound) return;
-
-	audio_stream = host->setAudioStream();
-	if (audio_stream == -1) {
+	audioStream = host->setAudioStream();
+	if (!audioStream) {
 		Log(ERROR, "MVEPlayer", "MVE player couldn't open audio. Will play silently.");
-		playsound = false;
 		return;
 	}
 
@@ -401,7 +391,7 @@ void MVEPlayer::segment_audio_init(unsigned char version)
 
 void MVEPlayer::segment_audio_data(bool silent)
 {
-	if (!playsound) return;
+	if (!audioStream) return;
 
 	unsigned short seq_index = GST_READ_UINT16_LE(buffer);
 	(void) seq_index; /* we don't care */
@@ -419,7 +409,7 @@ void MVEPlayer::segment_audio_data(bool silent)
 			else
 				memcpy(audio_buffer, data, audio_size);
 		}
-		host->queueBuffer(audio_stream, audio_sample_size, audio_num_channels, audio_buffer, audio_size, audio_sample_rate);
+		host->queueBuffer(audioStream, audio_sample_size, audio_num_channels, audio_buffer, audio_size, audio_sample_rate);
 	} else {
 		/* alternative audio stream, which we don't care about */
 	}

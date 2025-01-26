@@ -24,7 +24,6 @@
 #include "ScriptedAnimation.h"
 
 #include "AnimationFactory.h"
-#include "Audio.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -540,9 +539,9 @@ retry:
 
 void ScriptedAnimation::StopSound()
 {
-	if (sound_handle) {
-		sound_handle->Stop();
-		sound_handle.reset();
+	if (soundHandle) {
+		soundHandle->Stop();
+		soundHandle.reset();
 	}
 }
 
@@ -553,27 +552,29 @@ void ScriptedAnimation::UpdateSound()
 	}
 
 	Point soundpos(Pos.x + XOffset, Pos.y + YOffset);
-	if (!sound_handle || !sound_handle->Playing()) {
+	if (!soundHandle || !soundHandle->IsPlaying()) {
 		while (SoundPhase <= P_RELEASE && sounds[SoundPhase].IsEmpty()) {
 			SoundPhase++;
 		}
 
 		if (SoundPhase <= P_RELEASE) {
 			bool loop = SoundPhase == P_HOLD && (SequenceFlags & IE_VVC_LOOP);
-			unsigned int flags = GEM_SND_SPATIAL | (loop ? GEM_SND_LOOPING : 0);
-			sound_handle = core->GetAudioDrv()->Play(sounds[SoundPhase], SFXChannel::Hits, soundpos, flags);
+			auto config = core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Hits, soundpos);
+			config.loop = loop;
+
+			soundHandle = core->GetAudioPlayback().Play(sounds[SoundPhase], config);
 			SoundPhase++;
 		}
 	} else {
-		sound_handle->SetPos(soundpos);
+		soundHandle->SetPosition(soundpos);
 	}
 }
 
 void ScriptedAnimation::IncrementPhase()
 {
-	if (Phase == P_HOLD && sound_handle && (SequenceFlags & IE_VVC_LOOP)) {
+	if (Phase == P_HOLD && soundHandle && (SequenceFlags & IE_VVC_LOOP)) {
 		// kill looping sound
-		sound_handle->StopLooping();
+		soundHandle->StopLooping();
 	}
 	Phase++;
 }

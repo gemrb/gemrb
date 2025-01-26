@@ -122,12 +122,12 @@ void Door::ToggleTiles(int State, int playsound)
 	if (State) {
 		state = !closedIndex;
 		if (playsound && !OpenSound.IsEmpty()) {
-			core->GetAudioDrv()->Play(OpenSound, SFXChannel::Actions, toOpen[0], GEM_SND_SPATIAL);
+			core->GetAudioPlayback().Play(OpenSound, AudioPreset::Spatial, SFXChannel::Actions, toOpen[0]);
 		}
 	} else {
 		state = closedIndex;
 		if (playsound && !CloseSound.IsEmpty()) {
-			core->GetAudioDrv()->Play(CloseSound, SFXChannel::Actions, toOpen[0], GEM_SND_SPATIAL);
+			core->GetAudioPlayback().Play(CloseSound, AudioPreset::Spatial, SFXChannel::Actions, toOpen[0]);
 		}
 	}
 	for (const auto& tile : tiles) {
@@ -164,12 +164,12 @@ void Door::SetDoorLocked(int Locked, int playsound)
 		// only close it in pst, needed for Dead nations (see 4a3e1cb4ef)
 		if (core->HasFeature(GFFlags::REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
 		if (playsound && !LockSound.IsEmpty())
-			core->GetAudioDrv()->Play(LockSound, SFXChannel::Actions, toOpen[0], GEM_SND_SPATIAL);
+			core->GetAudioPlayback().Play(LockSound, AudioPreset::Spatial, SFXChannel::Actions, toOpen[0]);
 	} else {
 		if (!(Flags & DOOR_LOCKED)) return;
 		Flags &= ~DOOR_LOCKED;
 		if (playsound && !UnLockSound.IsEmpty())
-			core->GetAudioDrv()->Play(UnLockSound, SFXChannel::Actions, toOpen[0], GEM_SND_SPATIAL);
+			core->GetAudioPlayback().Play(UnLockSound, AudioPreset::Spatial, SFXChannel::Actions, toOpen[0]);
 	}
 }
 
@@ -298,7 +298,7 @@ void Door::TryDetectSecret(int skill, ieDword actorID)
 	if (Visible()) return;
 	if (skill > (signed) DiscoveryDiff) {
 		Flags |= DOOR_FOUND;
-		core->PlaySound(DS_FOUNDSECRET, SFXChannel::Hits);
+		core->GetAudioPlayback().PlayDefaultSound(DS_FOUNDSECRET, SFXChannel::Hits);
 		if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 			AddTrigger(TriggerEntry(trigger_secreddoordetected, GetGlobalID()));
 		} else {

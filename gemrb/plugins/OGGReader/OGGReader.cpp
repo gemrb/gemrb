@@ -95,21 +95,25 @@ bool OGGReader::Import(DataStream* stream)
 	}
 	info = ov_info(&OggStream, -1);
 	channels = info->channels;
-	samplerate = info->rate;
-	samples_left = ov_pcm_total(&OggStream, -1);
+	sampleRate = info->rate;
+	auto total = ov_pcm_total(&OggStream, -1);
+	samplesLeft = 0;
+	if (total != OV_EINVAL) {
+		samplesLeft = static_cast<size_t>(total);
+	}
 	// align to how WAVReader counts samples (one is per channel)
-	samples = samples_left * channels;
+	samples = samplesLeft * channels;
 	return true;
 }
 
-int OGGReader::read_samples(short* buffer, int count)
+size_t OGGReader::read_samples(short* buffer, size_t count)
 {
 	int whatisthis;
 
-	if (samples_left < count) {
-		count = samples_left;
+	if (samplesLeft < count) {
+		count = samplesLeft;
 	}
-	int samples_got = 0;
+	size_t samples_got = 0;
 	int samples_need = count;
 	while (samples_need) {
 		int rd = ov_read(&OggStream, (char*) buffer, samples_need << 1, false, 2, 1, &whatisthis);
@@ -124,14 +128,14 @@ int OGGReader::read_samples(short* buffer, int count)
 		samples_got += rd;
 		samples_need -= rd;
 	}
-	samples_left -= samples_got;
+	samplesLeft -= samples_got;
 
 	return samples_got;
 }
 
 static constexpr size_t CHANNEL_SPLIT_BUFFER_SIZE = 4096;
 
-int OGGReader::ReadSamplesIntoChannels(char* channel1, char* channel2, int numSamples)
+size_t OGGReader::ReadSamplesIntoChannels(char* channel1, char* channel2, size_t numSamples)
 {
 	std::vector<char> buffer;
 	buffer.resize(CHANNEL_SPLIT_BUFFER_SIZE);
@@ -140,8 +144,11 @@ int OGGReader::ReadSamplesIntoChannels(char* channel1, char* channel2, int numSa
 
 	uint8_t bytesPerChannel = 2;
 	uint8_t bytesPerSample = 2 * bytesPerChannel;
-	int samplesRead = ov_read(&OggStream, buffer.data(), CHANNEL_SPLIT_BUFFER_SIZE, false, 2, 1, &streamPos) / bytesPerSample;
-	auto totalSamples = samplesRead;
+	auto samplesRead = ov_read(&OggStream, buffer.data(), CHANNEL_SPLIT_BUFFER_SIZE, false, 2, 1, &streamPos) / bytesPerSample;
+	size_t totalSamples = 0;
+	if (samplesRead > 0) {
+		totalSamples = static_cast<size_t>(samplesRead);
+	}
 
 	size_t z = 0;
 	do {

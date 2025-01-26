@@ -21,6 +21,8 @@
 #ifndef MVE_PLAYER_H
 #define MVE_PLAYER_H
 
+#include "Audio/AudioBackend.h"
+
 struct _GstMveDemuxStream;
 
 namespace GemRB {
@@ -43,7 +45,7 @@ protected:
 	unsigned short audio_sample_rate;
 	unsigned short audio_sample_size;
 	short* audio_buffer;
-	int audio_stream;
+	Holder<SoundStreamSourceHandle> audioStream;
 
 	bool playsound;
 	bool done;

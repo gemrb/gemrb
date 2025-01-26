@@ -23,11 +23,11 @@
 #include "exports.h"
 
 #include "Animation.h"
-#include "Audio.h"
 #include "Orientation.h"
 #include "Palette.h"
 #include "Resource.h"
 
+#include "Audio/Playback.h"
 #include "Video/Video.h"
 
 namespace GemRB {
@@ -134,7 +134,7 @@ public:
 	ScriptedAnimation* twin = nullptr;
 	bool active = true;
 	bool effect_owned = false;
-	Holder<SoundHandle> sound_handle;
+	Holder<PlaybackHandle> soundHandle;
 	tick_t starttime = 0;
 
 public:

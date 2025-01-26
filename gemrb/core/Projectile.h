@@ -32,12 +32,12 @@
 #include "ie_types.h"
 
 #include "Animation.h"
-#include "Audio.h"
 #include "EffectQueue.h"
 #include "Orientation.h"
 #include "Palette.h"
 #include "PathFinder.h"
 
+#include "Audio/Playback.h"
 #include "Video/Video.h"
 
 #include <list>
@@ -299,53 +299,7 @@ private:
 	int bend = 0;
 	int drawSpark = 0;
 
-	struct LoopStop {
-		Holder<SoundHandle> sound;
-
-		~LoopStop() noexcept
-		{
-			if (sound) {
-				//allow an explosion sound to finish completely
-				sound->StopLooping();
-			}
-		}
-
-		LoopStop() noexcept = default;
-
-		LoopStop(const LoopStop& ls) noexcept
-			: sound(ls.sound) {}
-
-		LoopStop(LoopStop&& ls) noexcept
-		{
-			std::swap(sound, ls.sound);
-		}
-
-		LoopStop& operator=(const LoopStop& ls) noexcept
-		{
-			if (this != &ls) {
-				sound = ls.sound;
-			}
-			return *this;
-		}
-
-		LoopStop& operator=(LoopStop&& ls) noexcept
-		{
-			if (this != &ls) {
-				std::swap(sound, ls.sound);
-			}
-			return *this;
-		}
-
-		SoundHandle* operator->() noexcept
-		{
-			return sound.get();
-		}
-
-		explicit operator bool() const noexcept
-		{
-			return bool(sound);
-		}
-	} travelHandle;
+	Holder<PlaybackHandle> travelHandle;
 
 public:
 	void SetCaster(ieDword t, int level);

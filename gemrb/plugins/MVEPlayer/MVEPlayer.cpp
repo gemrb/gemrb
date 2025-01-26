@@ -22,7 +22,6 @@
 
 #include "ie_types.h"
 
-#include "Audio.h"
 #include "Interface.h"
 #include "Palette.h"
 
@@ -105,25 +104,25 @@ void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count) const
 	g_palette->CopyColors(start, buffer.cbegin() + start, buffer.cbegin() + start + count);
 }
 
-int MVEPlay::setAudioStream() const
+Holder<SoundStreamSourceHandle> MVEPlay::setAudioStream() const
 {
-	ieDword volume = core->GetDictionary().Get("Volume Movie", 0);
-	int source = core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume, false, 0);
-	return source;
+	return core->GetAudioDrv()->CreateStreamable(core->GetAudioSettings().ConfigPresetMovie());
 }
 
-void MVEPlay::freeAudioStream(int stream) const
-{
-	if (stream > -1)
-		core->GetAudioDrv()->ReleaseStream(stream, true);
-}
-
-void MVEPlay::queueBuffer(int stream, unsigned short bits,
+void MVEPlay::queueBuffer(Holder<SoundStreamSourceHandle> handle, unsigned short bits,
 			  int channels, short* memory,
 			  int size, int samplerate) const
 {
-	if (stream > -1)
-		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate);
+	if (handle) {
+		AudioBufferFormat format;
+		format.bits = bits;
+		format.channels = channels;
+		format.sampleRate = samplerate;
+
+		if (!handle->Feed(format, reinterpret_cast<char*>(memory), size)) {
+			Log(WARNING, "MVEPlayer", "Audio backend can't keep up.");
+		}
+	}
 }
 
 

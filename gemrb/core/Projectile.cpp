@@ -329,12 +329,12 @@ void Projectile::Setup()
 		light = CreateLight(Size(LightX, LightY), LightZ);
 	}
 
-	unsigned int flags = GEM_SND_SPATIAL;
+	auto config = core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Missile, Pos);
 	if (SFlags & PSF_LOOPING) {
-		flags |= GEM_SND_LOOPING;
+		config.loop = true;
 	}
 
-	travelHandle.sound = core->GetAudioDrv()->Play(FiringSound, SFXChannel::Missile, Pos, flags);
+	travelHandle = core->GetAudioPlayback().Play(FiringSound, config);
 
 	//create more projectiles
 	if (ExtFlags & PEF_ITERATION) {
@@ -533,8 +533,7 @@ void Projectile::ApplyDefault() const
 void Projectile::StopSound()
 {
 	if (travelHandle) {
-		travelHandle.sound->Stop();
-		travelHandle.sound = nullptr;
+		travelHandle->Stop();
 	}
 }
 
@@ -543,13 +542,13 @@ void Projectile::UpdateSound()
 	if (!(SFlags & PSF_SOUND2)) {
 		StopSound();
 	}
-	if (!travelHandle || !travelHandle->Playing()) {
-		unsigned int flags = GEM_SND_SPATIAL;
+	if (!travelHandle || !travelHandle->IsPlaying()) {
+		auto config = core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Missile, Pos);
 		if (SFlags & PSF_LOOPING2) {
-			flags |= GEM_SND_LOOPING;
+			config.loop = true;
 		}
 
-		travelHandle.sound = core->GetAudioDrv()->Play(ArrivalSound, SFXChannel::Missile, Pos, flags);
+		travelHandle = core->GetAudioPlayback().Play(ArrivalSound, config);
 		SFlags |= PSF_SOUND2;
 	}
 }
@@ -771,7 +770,7 @@ Projectile::ProjectileState Projectile::DoStep()
 	path.currentStep = step - path.begin();
 
 	if (travelHandle) {
-		travelHandle->SetPos(Pos);
+		travelHandle->SetPosition(Pos);
 	}
 
 	if (step == last) {
@@ -1404,7 +1403,7 @@ void Projectile::SpawnFragments(const Holder<ProjectileExtension>& extension) co
 
 void Projectile::InitExplodingPhase1() const
 {
-	core->GetAudioDrv()->Play(Extension->SoundRes, SFXChannel::Missile, Pos, GEM_SND_SPATIAL);
+	core->GetAudioPlayback().Play(Extension->SoundRes, AudioPreset::Spatial, SFXChannel::Missile, Pos);
 
 	// play VVC in center
 	if (!(Extension->AFlags & PAF_VVC)) {
@@ -1690,7 +1689,7 @@ Projectile::ProjectileState Projectile::GetNextExplosionState()
 		InitExplodingPhase1();
 		nextState = ProjectileState::EXPLODING_AGAIN;
 	} else {
-		core->GetAudioDrv()->Play(Extension->AreaSound, SFXChannel::Missile, Pos, GEM_SND_SPATIAL);
+		core->GetAudioPlayback().Play(Extension->AreaSound, AudioPreset::Spatial, SFXChannel::Missile, Pos);
 	}
 
 	if (Extension->Spread) {

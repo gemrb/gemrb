@@ -25,8 +25,6 @@
 #include "strrefs.h"
 #include "voodooconst.h"
 
-#include "AmbientMgr.h"
-#include "Audio.h"
 #include "CharAnimations.h"
 #include "DialogHandler.h"
 #include "DisplayMessage.h"
@@ -542,21 +540,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 	}
 
 	if (soundpath && soundpath[0] && !(flags & DS_SILENT)) {
-		ieDword soundFlags = GEM_SND_EFX;
-		Point pos;
-		if (flags & DS_SPEECH) {
-			soundFlags |= GEM_SND_SPEECH;
-		}
-
 		Actor* actor = Scriptable::As<Actor>(Sender);
-		// Spatial unless PC, cutscene or dialog
-		if (actor && !actor->InParty && !core->InCutSceneMode() && !core->GetGameControl()->InDialog()) {
-			pos = Sender->Pos;
-			soundFlags |= GEM_SND_SPATIAL;
-		}
-
-		if (flags & DS_QUEUE) soundFlags |= GEM_SND_QUEUE;
-
 		SFXChannel channel = SFXChannel::Dialog;
 		if (flags & DS_CONST && actor) {
 			if (actor->InParty > 0) {
@@ -565,13 +549,26 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 				channel = SFXChannel::Monster;
 			}
 		}
+		auto config = core->GetAudioSettings().ConfigPresetEnvVoice(channel);
 
-		tick_t len = 0;
-		core->GetAudioDrv()->Play(StringView(soundpath), channel, pos, soundFlags, &len);
-		tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
+		// Spatial unless PC, cutscene or dialog
+		if (actor && !actor->InParty && !core->InCutSceneMode() && !core->GetGameControl()->InDialog()) {
+			config = core->GetAudioSettings().ConfigPresetSpatialVoice(channel, Sender->Pos);
+		}
 
-		if (actor && len > 0 && flags & DS_CIRCLE) {
-			actor->SetAnimatedTalking(len);
+		tick_t length = 0;
+		if (flags & DS_SPEECH) {
+			length = core->GetAudioPlayback().PlaySpeech(StringView(soundpath), config, !(flags & DS_QUEUE));
+		} else {
+			auto handle = core->GetAudioPlayback().Play(StringView(soundpath), config);
+			if (handle) {
+				length = handle->GetLengthMs();
+			}
+		}
+		tick_t counter = (core->Time.defaultTicksPerSec * length) / 1000;
+
+		if (actor && length > 0 && flags & DS_CIRCLE) {
+			actor->SetAnimatedTalking(length);
 		}
 
 		if ((counter != 0) && (flags & DS_WAIT))
@@ -2151,11 +2148,11 @@ void AmbientActivateCore(const Scriptable* Sender, const Action* parameters, boo
 	}
 	if (!anim) {
 		// iwd2 expects this behaviour in ar6001 by (de)activating sound_portal
-		AmbientMgr* ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
+		AmbientMgr& ambientmgr = core->GetAmbientManager();
 		if (flag) {
-			ambientmgr->Activate(parameters->objects[1]->objectName);
+			ambientmgr.Activate(parameters->objects[1]->objectName);
 		} else {
-			ambientmgr->Deactivate(parameters->objects[1]->objectName);
+			ambientmgr.Deactivate(parameters->objects[1]->objectName);
 		}
 		return;
 	}
@@ -2561,7 +2558,7 @@ void AddXPCore(const Action* parameters, bool divide)
 		// give xp to everyone
 		core->GetGame()->ShareXP(atoi(xpvalue), 0);
 	}
-	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
+	core->GetAudioPlayback().PlayDefaultSound(DS_GOTXP, SFXChannel::Actions);
 }
 
 int NumItemsCore(Scriptable* Sender, const Trigger* parameters)
