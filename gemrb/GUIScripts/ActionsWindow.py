@@ -37,6 +37,7 @@ ActionBarControlOffset = 0
 if GameCheck.IsIWD2 ():
 	ActionBarControlOffset = 6 # portrait and action window were merged
 fistDrawn = True
+GUIBT_COUNT = 12
 
 # The following four functions are currently unused in pst
 def EmptyControls ():
@@ -51,7 +52,7 @@ def EmptyControls ():
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	if not CurrentWindow:
 		return # current case in our game demo (on right-click)
-	for i in range (12):
+	for i in range (GUIBT_COUNT):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		Button.SetVisible (False)
 	return
@@ -71,7 +72,7 @@ def SelectFormationPreset ():
 def SetupFormation ():
 	"""Opens the formation selection section."""
 
-	for i in range (12):
+	for i in range (GUIBT_COUNT):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetSprites ("GUIBTBUT", 0, 0, 1, 2, 3)
@@ -185,7 +186,7 @@ def SetupItemAbilities(pc, slot, only):
 		ammoslots = GemRB.GetSlots(pc, SLOT_QUIVER, 1)
 		currentammo = GemRB.GetEquippedAmmunition (pc)
 		currentbutton = None
-		for i in range (12):
+		for i in range (GUIBT_COUNT):
 			Button = CurrentWindow.GetControl (i + ActionBarControlOffset)
 			if i < len(ammoslots):
 				ammoslot = GemRB.GetSlotItem (pc, ammoslots[i])
@@ -233,7 +234,7 @@ def SetupItemAbilities(pc, slot, only):
 
 	if len(Tips) > 0:
 		reset = False
-		rmax = min(len(Tips), 12-ammoSlotCount)
+		rmax = min(len(Tips), GUIBT_COUNT - ammoSlotCount)
 
 		# for mixed items, only show headers if there is more than one appropriate one
 		weaps = sum([i == ITEM_LOC_WEAPON for i in Locations])
@@ -295,7 +296,7 @@ def SetupBookSelection ():
 		UpdateActionsWindow ()
 		return
 
-	for i in range (12):
+	for i in range (GUIBT_COUNT):
 		Button = CurrentWindow.GetControl (i + ActionBarControlOffset)
 		if i >= len(usableBooks):
 			Button.SetActionIcon (globals(), -1)
@@ -401,7 +402,7 @@ def UpdateActionsWindow ():
 	Selected = GemRB.GetSelectedSize()
 
 	# setting up the disabled button overlay (using the second border slot)
-	for i in range (12):
+	for i in range (GUIBT_COUNT):
 		Button = CurrentWindow.GetControl (i + ActionBarControlOffset)
 		if GameCheck.IsBG1():
 			color = {'r' : 0, 'g' : 254, 'b' :0, 'a' : 255}
@@ -1061,7 +1062,6 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 	invInfo = GemRB.GetInventoryInfo (pc)
 	fistDrawn = True
 
-	GUIBT_COUNT = 12
 	for i in range(GUIBT_COUNT):
 		btn = Window.GetControl (i + actionOffset)
 		if not btn:
