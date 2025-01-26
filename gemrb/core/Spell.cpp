@@ -24,7 +24,6 @@
 
 #include "voodooconst.h"
 
-#include "Audio.h"
 #include "Game.h"
 #include "Interface.h"
 #include "Projectile.h"
@@ -144,7 +143,7 @@ void Spell::AddCastingGlow(EffectQueue* fxqueue, ieDword duration, int gender) c
 		}
 		// only actors have fxqueue's and also the parent function checks for that
 		Actor* caster = (Actor*) fxqueue->GetOwner();
-		caster->casting_sound = core->GetAudioDrv()->Play(Resource, SFXChannel::Casting, caster->Pos, GEM_SND_SPATIAL);
+		caster->casting_sound = core->GetAudioPlayback().Play(Resource, AudioPreset::Spatial, SFXChannel::Casting, caster->Pos);
 	}
 
 	fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);

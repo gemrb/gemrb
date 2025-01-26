@@ -21,7 +21,6 @@
 #include "AmbientMgr.h"
 
 #include "Ambient.h"
-#include "Audio.h"
 #include "Game.h"
 #include "Interface.h"
 #include "RNG.h"
@@ -41,12 +40,7 @@ AmbientMgr::~AmbientMgr()
 {
 	playing = false;
 	mutex.lock();
-	for (auto ambientSource : ambientSources) {
-		delete ambientSource;
-	}
-	ambientSources.clear();
 	mutex.unlock();
-	Reset();
 
 	cond.notify_all();
 	player.join();
@@ -59,23 +53,27 @@ void AmbientMgr::Reset()
 	AmbientsSet(ambients);
 }
 
-void AmbientMgr::UpdateVolume(unsigned short volume)
+void AmbientMgr::UpdateVolume()
+{
+	SetVolume(core->GetAudioSettings().GetAmbientVolume());
+}
+
+void AmbientMgr::SetVolume(unsigned short volume)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
-	for (const auto& source : ambientSources) {
-		source->SetVolume(volume);
+	for (auto& source : ambientSources) {
+		source.SetVolume(volume);
 	}
 }
 
 void AmbientMgr::AmbientsSet(const std::vector<Ambient*>& a)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
-	for (auto ambientSource : ambientSources) {
-		delete ambientSource;
-	}
-	ambientSources.resize(0);
+	ambientSources.clear();
+	ambientSources.reserve(a.size());
+
 	for (auto& source : a) {
-		ambientSources.push_back(new AmbientSource(source));
+		ambientSources.emplace_back(source, bufferCache);
 	}
 }
 
@@ -84,11 +82,9 @@ void AmbientMgr::RemoveAmbients(const std::vector<Ambient*>& oldAmbients)
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	// manually deleting ambientSources as regenerating them causes a several second pause
 	for (auto it = ambientSources.begin(); it != ambientSources.end();) {
-		auto ambientSource = *it;
 		bool deleted = false;
 		for (const auto& ambient : oldAmbients) {
-			if (ambientSource->GetAmbient() == ambient) {
-				delete ambientSource;
+			if (it->GetAmbient() == ambient) {
 				it = ambientSources.erase(it);
 				deleted = true;
 				break;
@@ -118,14 +114,12 @@ void AmbientMgr::SetAmbients(const std::vector<Ambient*>& a)
 	ambients = a;
 	AmbientsSet(ambients);
 
-	core->GetAudioDrv()->UpdateVolume(GEM_SND_VOL_AMBIENTS);
 	Activate();
 }
 
 void AmbientMgr::Activate(StringView name)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
-	//std::lock_guard<std::mutex> l(ambientsMutex);
 	for (const auto& ambient : ambients) {
 		if (ambient->GetName() == name) {
 			ambient->SetActive();
@@ -145,7 +139,6 @@ void AmbientMgr::Activate()
 void AmbientMgr::Deactivate(StringView name)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
-	//std::lock_guard<std::mutex> l(ambientsMutex);
 	for (const auto& ambient : ambients) {
 		if (ambient->GetName() == name) {
 			ambient->SetInactive();
@@ -173,10 +166,10 @@ bool AmbientMgr::IsActive(StringView name) const
 	return false;
 }
 
-void AmbientMgr::HardStop() const
+void AmbientMgr::HardStop()
 {
-	for (auto source : ambientSources) {
-		source->HardStop();
+	for (auto& source : ambientSources) {
+		source.HardStop();
 	}
 }
 
@@ -192,7 +185,7 @@ int AmbientMgr::Play()
 	return 0;
 }
 
-tick_t AmbientMgr::Tick(tick_t ticks) const
+tick_t AmbientMgr::Tick(tick_t ticks)
 {
 	tick_t delay = 60000; // wait one minute if all sources are off
 
@@ -200,7 +193,7 @@ tick_t AmbientMgr::Tick(tick_t ticks) const
 		return delay;
 	}
 
-	Point listener = core->GetAudioDrv()->GetListenerPos();
+	auto pos = core->GetAudioDrv()->GetListenerPosition();
 
 	const Game* game = core->GetGame();
 	ieDword timeslice = 0;
@@ -209,8 +202,8 @@ tick_t AmbientMgr::Tick(tick_t ticks) const
 	}
 
 	std::lock_guard<std::recursive_mutex> l(mutex);
-	for (auto source : ambientSources) {
-		tick_t newdelay = source->Tick(ticks, listener, timeslice);
+	for (auto& source : ambientSources) {
+		tick_t newdelay = source.Tick(ticks, { pos.x, pos.y }, timeslice);
 		if (newdelay < delay) delay = newdelay;
 	}
 	return delay;
@@ -218,14 +211,6 @@ tick_t AmbientMgr::Tick(tick_t ticks) const
 
 // AmbientSource implementation
 //
-AmbientMgr::AmbientSource::~AmbientSource()
-{
-	if (stream >= 0) {
-		core->GetAudioDrv()->ReleaseStream(stream, true);
-		stream = -1;
-	}
-}
-
 tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword timeslice)
 {
 	// if we are out of sounds do nothing
@@ -236,10 +221,8 @@ tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword tim
 	if (!(ambient->GetFlags() & IE_AMBI_ENABLED) || !(ambient->GetAppearance() & timeslice)) {
 		// disabled
 
-		if (stream >= 0) {
-			// release the stream without immediately stopping it
-			core->GetAudioDrv()->ReleaseStream(stream, false);
-			stream = -1;
+		if (source && !source->HasFinishedPlaying()) {
+			source->Stop();
 		}
 		return std::numeric_limits<tick_t>::max();
 	}
@@ -274,33 +257,41 @@ tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword tim
 
 	if (!(ambient->GetFlags() & IE_AMBI_MAIN) && !IsHeard(listener)) { // we are out of range
 		// release stream if we're inactive for a while
-		core->GetAudioDrv()->ReleaseStream(stream);
-		stream = -1;
+		if (source && !source->HasFinishedPlaying()) {
+			source->Stop();
+		}
 		return nextdelay;
 	}
 
-	SFXChannel channel = ambient->GetFlags() & IE_AMBI_LOOPING ? (ambient->GetFlags() & IE_AMBI_MAIN ? SFXChannel::MainAmbient : SFXChannel::AmbientLoop) : SFXChannel::AmbientOther;
-	totalgain = ambient->GetTotalGain() * core->GetAudioDrv()->GetVolume(channel) / 100;
+	if (source && !source->HasFinishedPlaying()) {
+		return nextdelay;
+	}
 
-	unsigned int v = core->GetDictionary().Get("Volume Ambients", 100);
+	auto& settings = core->GetAudioSettings();
+	auto volume = settings.GetAmbientVolume();
+	auto loop = (ambient->GetFlags() & IE_AMBI_LOOPING) > 0;
+	auto ambientGain = ambient->GetTotalGain();
 
-	if (stream < 0) {
+	auto config =
+		ambient->GetFlags() & IE_AMBI_MAIN ? settings.ConfigPresetMainAmbient(ambientGain, loop) : settings.ConfigPresetPointAmbient(ambientGain, ambient->GetOrigin(), ambient->radius, loop);
+	gain = config.channelVolume;
+
+	if (!source) {
 		// we need to allocate a stream
-		stream = core->GetAudioDrv()->SetupNewStream(ambient->GetOrigin().x, ambient->GetOrigin().y, 0, v * totalgain / 100, !(ambient->GetFlags() & IE_AMBI_MAIN), ambient->radius);
+		source = core->GetAudioDrv()->CreatePlaybackSource(config);
 
-		if (stream == -1) {
-			// no streams available...
+		if (!source) {
 			// Try again later
 			return nextdelay;
 		}
 	} else if (ambient->gainVariance != 0) {
-		SetVolume(v);
+		SetVolume(volume);
 	}
 	if (ambient->pitchVariance != 0) {
-		core->GetAudioDrv()->SetAmbientStreamPitch(stream, ambient->GetTotalPitch());
+		source->SetPitch(ambient->GetTotalPitch());
 	}
 
-	tick_t length = Enqueue();
+	tick_t length = Enqueue(config);
 
 	if (interval == 0) { // continuous ambient
 		nextdelay = length;
@@ -309,12 +300,40 @@ tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword tim
 	return nextdelay;
 }
 
-// enqueues a random sound and returns its length
-tick_t AmbientMgr::AmbientSource::Enqueue() const
+BufferCacheEntry AmbientMgr::AmbientSource::GetBuffer(ResRef resource, const AudioPlaybackConfig& config)
 {
-	if (stream < 0) return -1;
-	// print("Playing ambient %s, %d/%ld on stream %d", ambient->sounds[nextref], nextref, ambient->sounds.size(), stream);
-	return core->GetAudioDrv()->QueueAmbient(stream, ambient->sounds[nextref], !(ambient->GetFlags() & IE_AMBI_MAIN));
+	auto entry = bufferCache.get().Lookup(resource);
+	if (entry) {
+		return *entry;
+	}
+
+	ResourceHolder<SoundMgr> acm = gamedata->GetResourceHolder<SoundMgr>(resource);
+	if (!acm) {
+		return {};
+	}
+
+	auto length = acm->GetLengthMs();
+	auto handle = core->GetAudioDrv()->LoadSound(std::move(acm), config);
+	if (!handle) {
+		return {};
+	}
+
+	bufferCache.get().SetAt(resource, std::move(handle), length);
+
+	return *bufferCache.get().Lookup(resource);
+}
+
+// enqueues a random sound and returns its length
+tick_t AmbientMgr::AmbientSource::Enqueue(const AudioPlaybackConfig& config)
+{
+	auto cacheEntry = GetBuffer(ambient->sounds[nextref], config);
+	if (!cacheEntry.handle) {
+		return -1;
+	}
+
+	source->Enqueue(cacheEntry.handle);
+
+	return cacheEntry.length;
 }
 
 bool AmbientMgr::AmbientSource::IsHeard(const Point& listener) const
@@ -324,19 +343,16 @@ bool AmbientMgr::AmbientSource::IsHeard(const Point& listener) const
 
 void AmbientMgr::AmbientSource::HardStop()
 {
-	if (stream >= 0) {
-		core->GetAudioDrv()->ReleaseStream(stream, true);
-		stream = -1;
+	if (source) {
+		source->Stop();
+		source.reset();
 	}
 }
 
-// sets the overall volume (in percent)
-// the final volume is affected by the specific ambient gain
-void AmbientMgr::AmbientSource::SetVolume(unsigned short vol) const
+void AmbientMgr::AmbientSource::SetVolume(unsigned short volume)
 {
-	if (stream >= 0) {
-		int v = vol * totalgain / 100;
-		core->GetAudioDrv()->SetAmbientStreamVolume(stream, v);
+	if (source) {
+		source->SetVolume(volume * gain / 100);
 	}
 }
 

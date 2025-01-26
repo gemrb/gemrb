@@ -23,7 +23,6 @@
 #include "defsounds.h"
 #include "ie_cursors.h"
 
-#include "Audio.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -463,7 +462,7 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 		}
 		SetState(PRESSED);
 		if (flags & IE_GUI_BUTTON_SOUND) {
-			core->PlaySound(DS_BUTTON_PRESSED, SFXChannel::GUI);
+			core->GetAudioPlayback().PlayDefaultSound(DS_BUTTON_PRESSED, SFXChannel::GUI);
 		}
 	}
 	return Control::OnMouseDown(me, mod);

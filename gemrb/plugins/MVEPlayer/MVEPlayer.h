@@ -44,9 +44,9 @@ private:
 	void showFrame(const unsigned char* buf, unsigned int bufw, unsigned int bufh);
 	void setPalette(unsigned char* p, unsigned start, unsigned count) const;
 	int pollEvents();
-	int setAudioStream() const;
-	void freeAudioStream(int stream) const;
-	void queueBuffer(int stream, unsigned short bits,
+	Holder<SoundStreamSourceHandle> setAudioStream() const;
+	void freeAudioStream(Holder<SoundStreamSourceHandle> handle) const;
+	void queueBuffer(Holder<SoundStreamSourceHandle> handle, unsigned short bits,
 			 int channels, short* memory,
 			 int size, int samplerate) const;
 

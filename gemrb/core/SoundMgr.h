@@ -44,25 +44,32 @@ public:
 	 * @param[in] cnt number of samples to read.
 	 * @returns Number of samples read.
 	 */
-	virtual int read_samples(short* memory, int cnt) = 0;
-	virtual int ReadSamplesIntoChannels(char* channel1, char* channel2, int numSamples) = 0;
-	int get_channels() const
+	virtual size_t read_samples(short* memory, size_t cnt) = 0;
+	virtual size_t ReadSamplesIntoChannels(char* channel1, char* channel2, size_t numSamples) = 0;
+	time_t GetLengthMs() const
+	{
+		if (channels == 0 || sampleRate == 0) {
+			return 0;
+		}
+		return ((samples / channels) * 1000) / sampleRate;
+	}
+	uint8_t GetChannels() const
 	{
 		return channels;
 	}
-	int get_samplerate() const
+	uint32_t GetSampleRate() const
 	{
-		return samplerate;
+		return sampleRate;
 	}
-	int get_length() const
+	size_t GetNumSamples() const
 	{
 		return samples;
-	} // returns the total samples count
+	}
 
 protected:
-	int samples = 0; // total count of sound samples
-	int channels = 0;
-	int samplerate = 0;
+	size_t samples = 0;
+	uint8_t channels = 0;
+	uint32_t sampleRate = 0;
 };
 
 }

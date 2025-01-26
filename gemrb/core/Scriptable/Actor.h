@@ -27,7 +27,6 @@
 #include "ie_types.h"
 #include "strrefs.h"
 
-#include "Audio.h"
 #include "CombatInfo.h"
 #include "EffectQueue.h"
 #include "Game.h"
@@ -37,6 +36,7 @@
 #include "Projectile.h"
 #include "Spellbook.h"
 
+#include "Audio/Playback.h"
 #include "Scriptable/Movable.h"
 #include "Scriptable/PCStatStruct.h"
 #include "Video/Video.h"
@@ -518,7 +518,7 @@ public:
 	vvcDict vfxDict;
 	vvcSet vfxQueue = vvcSet(VVCSort); // sorted so we can distinguish effects infront and behind
 	std::vector<bool> projectileImmunity; // classic bitfield
-	Holder<SoundHandle> casting_sound;
+	Holder<PlaybackHandle> casting_sound;
 	PanicMode panicMode = PanicMode::None; // runaway, berserk or randomwalk
 
 	// public combat related data

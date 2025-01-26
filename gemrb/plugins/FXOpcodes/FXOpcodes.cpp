@@ -24,7 +24,6 @@
 #include "strrefs.h"
 #include "voodooconst.h"
 
-#include "Audio.h"
 #include "DisplayMessage.h"
 #include "EffectQueue.h"
 #include "Game.h"
@@ -989,8 +988,9 @@ static inline void HandleMainStatBonus(const Actor* target, int stat, Effect* fx
 
 static inline void PlayRemoveEffect(const Actor* target, const Effect* fx, StringView defsound = StringView())
 {
-	core->GetAudioDrv()->Play(fx->Resource.IsEmpty() ? defsound : StringView(fx->Resource),
-				  SFXChannel::Actions, target->Pos, GEM_SND_SPATIAL);
+	core->GetAudioPlayback().Play(
+		fx->Resource.IsEmpty() ? defsound : StringView(fx->Resource),
+		AudioPreset::Spatial, SFXChannel::Actions, target->Pos);
 }
 
 //resurrect code used in many places
@@ -1507,7 +1507,7 @@ int fx_death(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			// Actor::CheckOnDeath handles the actual chunking
 			damagetype = DAMAGE_CRUSHING | DAMAGE_CHUNKING;
 			// bg1 & iwds have this file, bg2 & pst none
-			core->GetAudioDrv()->Play("GORE", SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+			core->GetAudioPlayback().Play("GORE", AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 			break;
 		case 16:
 			BASE_STATE_SET(STATE_PETRIFIED);
@@ -1521,12 +1521,12 @@ int fx_death(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_PETRIFIED);
 			damagetype = DAMAGE_CRUSHING | DAMAGE_CHUNKING;
 			// file only in iwds
-			core->GetAudioDrv()->Play("GORE2", SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+			core->GetAudioPlayback().Play("GORE2", AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 			break;
 		case 128:
 			if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_FROZEN);
 			damagetype = DAMAGE_COLD | DAMAGE_CHUNKING;
-			core->GetAudioDrv()->Play("GORE2", SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+			core->GetAudioPlayback().Play("GORE2", AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 			break;
 		case 256:
 			damagetype = DAMAGE_ELECTRICITY;
@@ -3821,11 +3821,11 @@ int fx_remove_item(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 		// "EFF_M02" was hardcoded in the originals, but EEs added extra options
 		if (fx->Parameter1 == 0) {
-			core->PlaySound(DS_ITEM_GONE, SFXChannel::GUI);
+			core->GetAudioPlayback().PlayDefaultSound(DS_ITEM_GONE, SFXChannel::GUI);
 		} else if (fx->Parameter1 == 1) {
-			core->GetAudioDrv()->Play("AMB_D02B", SFXChannel::GUI);
+			core->GetAudioPlayback().Play("AMB_D02B", AudioPreset::ScreenAction, SFXChannel::GUI);
 		} else if (fx->Parameter1 == 2) {
-			core->GetAudioDrv()->Play(fx->Resource2, SFXChannel::GUI);
+			core->GetAudioPlayback().Play(fx->Resource2, AudioPreset::ScreenAction, SFXChannel::GUI);
 		}
 	}
 
@@ -4599,7 +4599,7 @@ int fx_display_string(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			// mrttaunt.src has placeholder text, but valid audio, so enable just sound
 			if (fx->IsVariable) {
 				StringBlock sb = core->strings->GetStringBlock(str);
-				core->GetAudioDrv()->Play(StringView(sb.Sound), SFXChannel::Actions, target->Pos, GEM_SND_SPATIAL);
+				core->GetAudioPlayback().Play(StringView(sb.Sound), AudioPreset::Spatial, SFXChannel::Actions, target->Pos);
 			} else {
 				fx->Parameter1 = ieDword(str);
 				DisplayStringCore(target, str, DS_HEAD);
@@ -4665,7 +4665,7 @@ int fx_casting_glow(Scriptable* Owner, Actor* target, Effect* fx)
 	// Resource contains the termination sound from when used from GameScript::SpellCastEffect
 	// the channel is a guess
 	if (fx->Duration - core->GetGame()->GameTime == 1 && !fx->Resource.IsEmpty()) {
-		core->GetAudioDrv()->Play(fx->Resource, SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+		core->GetAudioPlayback().Play(fx->Resource, AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 	}
 
 	// TODO: this opcode is also affected by slow/haste
@@ -5371,9 +5371,9 @@ int fx_playsound(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//this is probably inaccurate
 	if (target) {
-		core->GetAudioDrv()->Play(fx->Resource, SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+		core->GetAudioPlayback().Play(fx->Resource, AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 	} else {
-		core->GetAudioDrv()->Play(fx->Resource, SFXChannel::Hits);
+		core->GetAudioPlayback().Play(fx->Resource, AudioPreset::ScreenAction, SFXChannel::Hits);
 	}
 	//this is an instant, it shouldn't stick
 	return FX_NOT_APPLIED;

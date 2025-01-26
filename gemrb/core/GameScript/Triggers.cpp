@@ -20,7 +20,6 @@
 
 #include "voodooconst.h"
 
-#include "AmbientMgr.h"
 #include "Calendar.h"
 #include "DialogHandler.h"
 #include "Game.h"
@@ -395,8 +394,8 @@ int GameScript::IsActive(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters);
 	if (!scr) {
-		const AmbientMgr* ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
-		if (ambientmgr->IsActive(parameters->objectParameter->objectName)) {
+		const AmbientMgr& ambientmgr = core->GetAmbientManager();
+		if (ambientmgr.IsActive(parameters->objectParameter->objectName)) {
 			return 1;
 		}
 		return 0;

@@ -1,9 +1,13 @@
 FILE(GLOB gemrb_core_LIB_SRCS
-	Ambient.cpp
-	AmbientMgr.cpp
 	Animation.cpp
 	AnimationFactory.cpp
-	Audio.cpp
+	Audio/Ambient.cpp
+	Audio/AmbientMgr.cpp
+	Audio/AudioBackend.cpp
+	Audio/AudioPlaybackConfig.cpp
+	Audio/AudioSettings.cpp
+	Audio/MusicLoop.cpp
+	Audio/Playback.cpp
 	Calendar.cpp
 	CharAnimations.cpp
 	Core.cpp

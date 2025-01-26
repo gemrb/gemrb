@@ -21,148 +21,123 @@
 #ifndef SDLAUDIO_H
 #define SDLAUDIO_H
 
-#include "Audio.h"
-#include "LRUCache.h"
+
+#include "RingBuffer.h"
+
+#include "Audio/AudioBackend.h"
 
 #include <SDL_mixer.h>
+#include <condition_variable>
 #include <mutex>
-#include <vector>
-
-#define AMBIENT_CHANNELS             8
-#define MIXER_CHANNELS               16
-#define BUFFER_CACHE_SIZE            100
-#define AUDIO_DISTANCE_ROLLOFF_MOD   1.3
-#define AMBIENT_DISTANCE_ROLLOFF_MOD 5
+#include <set>
 
 namespace GemRB {
 
-class SDLAudioSoundHandle : public SoundHandle {
+class SDLSoundBufferHandle : public SoundBufferHandle {
 public:
-	SDLAudioSoundHandle(Mix_Chunk* chunk, SFXChannel channel, bool relative)
-		: mixChunk(chunk), chunkChannel(int(channel)), sndRelative(relative) {};
-	void SetPos(const Point&) final;
-	bool Playing() final;
-	void Stop() final;
-	void StopLooping() final;
-	void Invalidate() const {}
+	SDLSoundBufferHandle(Mix_Chunk*, std::vector<char>&&);
+	~SDLSoundBufferHandle() override;
+
+	bool Disposable() override;
+
+	Mix_Chunk* GetChunk();
+	void AssignChannel(int channel);
 
 private:
-	Mix_Chunk* mixChunk;
-	int chunkChannel;
-	bool sndRelative;
-};
-
-struct BufferedData {
-	char* buf;
-	unsigned int size;
-};
-
-struct SDLAudioStream {
-	bool free = true;
-	bool point = false;
-	Point streamPos;
-};
-
-struct CacheEntry {
 	Mix_Chunk* chunk;
-	unsigned int Length;
-
-	CacheEntry(Mix_Chunk* chunk, tick_t length)
-		: chunk(chunk), Length(length) {}
-	CacheEntry(const CacheEntry&) = delete;
-	CacheEntry(CacheEntry&& other)
-		: chunk(other.chunk), Length(other.Length)
-	{
-		other.chunk = nullptr;
-	}
-	CacheEntry& operator=(const CacheEntry&) = delete;
-	CacheEntry& operator=(CacheEntry&& other)
-	{
-		this->chunk = other.chunk;
-		other.chunk = nullptr;
-		this->Length = other.Length;
-
-		return *this;
-	}
-
-	void evictionNotice() const {}
-
-	~CacheEntry()
-	{
-		if (chunk != nullptr) {
-			free(chunk->abuf);
-			free(chunk);
-		}
-	}
+	std::vector<char> chunkBuffer;
+	std::set<int> assignedChannels;
 };
 
-struct SDLAudioPlaying {
-	bool operator()(const CacheEntry& entry) const
-	{
-		int numChannels = Mix_AllocateChannels(-1);
-
-		for (int i = 0; i < numChannels; ++i) {
-			if (Mix_Playing(i) && Mix_GetChunk(i) == entry.chunk) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-};
-
-class SDLAudio : public Audio {
+class SDLSoundSourceHandle : public SoundSourceHandle {
 public:
-	SDLAudio(void);
-	~SDLAudio(void) override;
-	bool Init(void) override;
-	Holder<SoundHandle> Play(StringView ResRef, SFXChannel channel,
-				 const Point&, unsigned int flags = 0, tick_t* length = nullptr) override;
-	int CreateStream(ResourceHolder<SoundMgr>) override;
-	bool Play() override;
-	bool Stop() override;
-	bool Pause() override;
-	bool Resume() override;
-	bool CanPlay() override;
-	void ResetMusics() final;
-	void UpdateListenerPos(const Point&) override;
-	Point GetListenerPos() override;
-	void UpdateVolume(unsigned int flags) override;
+	using PositionGetter = std::function<const AudioPoint&()>;
 
-	int SetupNewStream(int x, int y, int z, ieWord gain, bool point, int ambientRange) override;
-	tick_t QueueAmbient(int stream, const ResRef& sound, bool spatial) override;
-	bool ReleaseStream(int stream, bool hardstop) override;
-	void SetAmbientStreamVolume(int stream, int gain) override;
-	void SetAmbientStreamPitch(int stream, int pitch) override;
-	void QueueBuffer(int stream, unsigned short bits, int channels,
-			 short* memory, int size, int samplerate) override;
+	SDLSoundSourceHandle(const AudioPlaybackConfig& config, PositionGetter positionGetter, int channel = -1);
+	~SDLSoundSourceHandle() override;
+
+	bool Enqueue(Holder<SoundBufferHandle>) override;
+	bool HasFinishedPlaying() const override;
+	void ConfigChannel() const;
+	void Reconfigure(const AudioPlaybackConfig& config) override;
+	void Stop() override;
+	void StopLooping() override;
+	void SetPitch(int) override { /* no known implementation yet */ };
+	void SetPosition(const AudioPoint&) override;
+	void SetVolume(int) override;
+
+	uint64_t GetID() const;
 
 private:
-	void FreeBuffers();
+	static uint64_t nextId;
 
-	static void SetAudioStreamVolume(uint8_t* stream, int len, int volume);
-	static void music_callback(void* udata, uint8_t* stream, int len);
-	static void buffer_callback(void* udata, uint8_t* stream, int len);
-	bool evictBuffer();
-	void clearBufferCache();
-	Mix_Chunk* loadSound(StringView ResRef, tick_t& time_length);
+	uint64_t id;
+	AudioPlaybackConfig config;
+	PositionGetter positionGetter;
+	int channel = -1;
+	bool reserved = false;
 
-	Point listenerPos;
-	ResourceHolder<SoundMgr> MusicReader;
-
-	bool MusicPlaying = false;
-	unsigned int curr_buffer_offset = 0;
-	std::vector<BufferedData> buffers;
-
-	int audio_rate = 0;
-	unsigned short audio_format = 0;
-	int audio_channels = 0;
-
-	std::recursive_mutex MusicMutex;
-	LRUCache<CacheEntry, SDLAudioPlaying> buffercache;
-	SDLAudioStream ambientStreams[AMBIENT_CHANNELS];
+	bool CanOperateOnChannel() const;
 };
 
+class SDLSoundStreamSourceHandle : public SoundStreamSourceHandle {
+public:
+	explicit SDLSoundStreamSourceHandle(size_t);
+	~SDLSoundStreamSourceHandle() override;
+
+	bool Feed(const AudioBufferFormat&, const char*, size_t) override;
+	bool HasProcessed() override;
+	void Pause() override;
+	void Resume() override;
+	void Reclaim() override;
+	void Stop() override;
+
+	void SetVolume(int) override;
+
+private:
+	int volume = 128;
+	static std::mutex mixMutex;
+	RingBuffer<char> ringBuffer;
+	bool fillWait = true;
+
+	static void StreamCallback(const void*, uint8_t* stream, int len);
+};
+
+class MixCallbackState {
+public:
+	static SDLSoundStreamSourceHandle* handle;
+	static std::mutex mutex;
+
+private:
+	MixCallbackState() = default;
+};
+
+class SDLAudioBackend : public AudioBackend {
+public:
+	~SDLAudioBackend() override;
+
+	bool Init() override;
+
+	Holder<SoundSourceHandle> CreatePlaybackSource(const AudioPlaybackConfig&, bool priority = false) override;
+	Holder<SoundStreamSourceHandle> CreateStreamable(const AudioPlaybackConfig&) override;
+	Holder<SoundBufferHandle> LoadSound(ResourceHolder<SoundMgr> resource, const AudioPlaybackConfig&) override;
+
+	const AudioPoint& GetListenerPosition() const override;
+	void SetListenerPosition(const AudioPoint& p) override;
+
+	StreamMode GetStreamMode() const override { return StreamMode::WAITING; }
+
+	static int audioRate;
+	static unsigned short audioFormat;
+	static int audioChannels;
+
+private:
+	AudioPoint listenerPosition;
+	size_t reservedCounter = 0;
+	std::vector<std::weak_ptr<SDLSoundSourceHandle>> issuedChannels;
+
+	void Housekeeping();
+};
 }
 
 #endif

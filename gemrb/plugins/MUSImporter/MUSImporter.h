@@ -24,6 +24,7 @@
 #include "MusicMgr.h"
 #include "ResourceManager.h"
 
+#include "Audio/MusicLoop.h"
 #include "Streams/FileStream.h"
 
 #include <cstdio>

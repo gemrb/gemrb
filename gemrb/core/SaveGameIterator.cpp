@@ -401,7 +401,7 @@ static bool DoSaveGame(const path_t& Path, bool overrideRunning)
 {
 	const Game* game = core->GetGame();
 	//saving areas to cache currently in memory
-	unsigned int mc = (unsigned int) game->GetLoadedMapCount();
+	auto mc = game->GetLoadedMapCount();
 	while (mc--) {
 		Map* map = game->GetMap(mc);
 		if (core->SwapoutArea(map)) {

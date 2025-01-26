@@ -25,9 +25,6 @@
 #include "ie_cursors.h"
 #include "strrefs.h"
 
-#include "Ambient.h"
-#include "AmbientMgr.h"
-#include "Audio.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
@@ -47,6 +44,7 @@
 #include "TileMap.h"
 #include "VEFObject.h"
 
+#include "Audio/Ambient.h"
 #include "GUI/GameControl.h"
 #include "GUI/Window.h"
 #include "GameScript/GSUtils.h"
@@ -482,8 +480,7 @@ Map::~Map(void)
 		delete particle;
 	}
 
-	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
-	ambim->RemoveAmbients(ambients);
+	core->GetAmbientManager().RemoveAmbients(ambients);
 	for (auto ambient : ambients) {
 		delete ambient;
 	}
@@ -880,7 +877,7 @@ void Map::UpdateScripts()
 
 		// Play the PST specific enter sound
 		if (wasActive & _TRAP_USEPOINT) {
-			core->GetAudioDrv()->Play(ip->EnterWav, SFXChannel::Actions, ip->TrapLaunch);
+			core->GetAudioPlayback().Play(ip->EnterWav, AudioPreset::Spatial, SFXChannel::Actions, ip->TrapLaunch);
 		}
 		ip->Update();
 	}
@@ -3223,8 +3220,7 @@ WMPDirection Map::WhichEdge(const NavmapPoint& s) const
 //--------ambients----------------
 void Map::SetAmbients(std::vector<Ambient*> ambs, MapReverb::id_t id)
 {
-	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
-	ambim->RemoveAmbients(ambients);
+	core->GetAmbientManager().RemoveAmbients(ambients);
 	for (auto ambient : ambients) {
 		delete ambient;
 	}
@@ -3240,9 +3236,9 @@ void Map::SetAmbients(std::vector<Ambient*> ambs, MapReverb::id_t id)
 
 void Map::SetupAmbients() const
 {
-	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
-	ambim->Reset();
-	ambim->SetAmbients(ambients);
+	AmbientMgr& ambim = core->GetAmbientManager();
+	ambim.Reset();
+	ambim.SetAmbients(ambients);
 }
 
 void Map::AddMapNote(const Point& point, ieWord color, String text, bool readonly)

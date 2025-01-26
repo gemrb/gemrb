@@ -20,532 +20,417 @@
 
 #include "SDLAudio.h"
 
-#include "AmbientMgr.h"
-#include "GameData.h"
-#include "Interface.h" // GetMusicMgr()
-#include "MusicMgr.h"
+#include "ChannelManager.h"
+#include "Interface.h"
 #include "SoundMgr.h"
 
 #include "Logging/Logging.h"
 
 #include <SDL.h>
-#include <SDL_mixer.h>
+#include <chrono>
 
-using namespace GemRB;
+namespace GemRB {
 
-static void SetChannelPosition(const Point& listenerPos, const Point& p, int channel, float rolloff)
+// Don't increase too much since it will make the volume slider delay
+static constexpr size_t RING_BUFFER_CHANNEL_SIZE = 16384;
+static constexpr uint8_t RESERVED_CHANNELS = 1;
+
+uint64_t SDLSoundSourceHandle::nextId = 0;
+std::mutex MixCallbackState::mutex = {};
+SDLSoundStreamSourceHandle* MixCallbackState::handle = nullptr;
+
+static void SetChannelPosition(const AudioPoint& listenerPos, const AudioPlaybackConfig& config, int channel)
 {
-	int16_t angle = AngleFromPoints(listenerPos, p) * 180 / M_PI - 90;
-	if (angle < 0) {
-		angle += 360;
-	}
+	auto p1 = static_cast<Point>(listenerPos);
+	auto p2 = static_cast<Point>(config.position);
 
-	uint8_t distance = std::min(static_cast<int32_t>(Distance(listenerPos, p) / rolloff), 255);
+	int16_t angle = static_cast<int16_t>(AngleFromPoints(p1, p2) * 180 / M_PI + 90);
+	// for unknown reasons, if the hardware reports only 2 channels, the angle needs to be shifted by 180°
+	angle += SDLAudioBackend::audioChannels > 2 ? 0 : 180;
+
+	uint8_t distance = std::min(255u * Distance(p1, p2) / config.muteDistance, 255u);
 	Mix_SetPosition(channel, angle, distance);
 }
 
-void SDLAudioSoundHandle::SetPos(const Point& p)
+SDLSoundBufferHandle::SDLSoundBufferHandle(Mix_Chunk* chunk, std::vector<char>&& buffer)
+	: chunk(chunk), chunkBuffer(std::move(buffer)) {}
+
+SDLSoundBufferHandle::~SDLSoundBufferHandle()
 {
-	if (sndRelative)
+	Mix_FreeChunk(chunk);
+}
+
+bool SDLSoundBufferHandle::Disposable()
+{
+	bool playing = false;
+	for (auto it = assignedChannels.begin(); it != assignedChannels.end();) {
+		if (Mix_Playing(*it) && Mix_GetChunk(*it) == chunk) {
+			playing = true;
+			++it;
+		} else {
+			it = assignedChannels.erase(it);
+		}
+	}
+
+	return playing;
+}
+
+void SDLSoundBufferHandle::AssignChannel(int channel)
+{
+	assignedChannels.insert(channel);
+}
+
+Mix_Chunk* SDLSoundBufferHandle::GetChunk()
+{
+	return chunk;
+}
+
+SDLSoundSourceHandle::SDLSoundSourceHandle(
+	const AudioPlaybackConfig& config,
+	PositionGetter positionGetter,
+	int channel)
+	: id(nextId++), config(config), positionGetter(positionGetter), channel(channel)
+{
+	if (channel != -1) {
+		reserved = true;
+	}
+}
+
+SDLSoundSourceHandle::~SDLSoundSourceHandle()
+{
+	SDLSoundSourceHandle::Stop();
+}
+
+uint64_t SDLSoundSourceHandle::GetID() const
+{
+	return id;
+}
+
+bool SDLSoundSourceHandle::Enqueue(Holder<SoundBufferHandle> handle)
+{
+	auto sdlHandle = std::dynamic_pointer_cast<SDLSoundBufferHandle>(handle);
+	if (!sdlHandle) {
+		return false;
+	}
+
+	auto chunk = sdlHandle->GetChunk();
+	Mix_VolumeChunk(chunk, MIX_MAX_VOLUME * config.channelVolume / 100);
+
+	if (!reserved && !Mix_Playing(channel) && CanOperateOnChannel()) {
+		channel = -1;
+	}
+
+	auto nextChannel = ChannelManager::Request(*this, channel, chunk, config.loop);
+	if (nextChannel == -1 && !reserved) {
+		Log(ERROR, "SDLAudio", "Error playing channel! {}", Mix_GetError());
+		return false;
+	} else if (!reserved) {
+		channel = nextChannel;
+	}
+
+	ConfigChannel();
+	sdlHandle->AssignChannel(channel);
+
+	return true;
+}
+
+bool SDLSoundSourceHandle::CanOperateOnChannel() const
+{
+	return reserved || (channel != -1 && ChannelManager::IsMyChannel(*this, channel));
+}
+
+bool SDLSoundSourceHandle::HasFinishedPlaying() const
+{
+	if (CanOperateOnChannel()) {
+		return Mix_Playing(channel) == 0;
+	}
+
+	return true;
+}
+
+void SDLSoundSourceHandle::Reconfigure(const AudioPlaybackConfig& newConfig)
+{
+	config = newConfig;
+	ConfigChannel();
+}
+
+void SDLSoundSourceHandle::ConfigChannel() const
+{
+	if (CanOperateOnChannel()) {
+		Mix_Volume(channel, MIX_MAX_VOLUME * config.masterVolume / 100);
+		if (config.spatial) {
+			SetChannelPosition(positionGetter(), config, channel);
+		}
+	}
+}
+
+void SDLSoundSourceHandle::Stop()
+{
+	if (CanOperateOnChannel()) {
+		Mix_HaltChannel(channel);
+	}
+}
+
+void SDLSoundSourceHandle::StopLooping()
+{
+	if (CanOperateOnChannel()) {
+		Mix_FadeOutChannel(channel, 1000);
+		if (!reserved) {
+			channel = -1;
+		}
+	}
+}
+
+void SDLSoundSourceHandle::SetPosition(const AudioPoint& position)
+{
+	config.position = position;
+	if (CanOperateOnChannel() && config.spatial) {
+		SetChannelPosition(positionGetter(), config, channel);
+	}
+}
+
+void SDLSoundSourceHandle::SetVolume(int volume)
+{
+	if (CanOperateOnChannel()) {
+		Mix_Volume(channel, MIX_MAX_VOLUME * volume / 100);
+	}
+}
+
+std::mutex SDLSoundStreamSourceHandle::mixMutex = {};
+
+SDLSoundStreamSourceHandle::SDLSoundStreamSourceHandle(size_t ringBufferSize)
+	: ringBuffer { ringBufferSize }
+{
+	SDLSoundStreamSourceHandle::Reclaim();
+}
+
+SDLSoundStreamSourceHandle::~SDLSoundStreamSourceHandle()
+{
+	SDLSoundStreamSourceHandle::Stop();
+}
+
+bool SDLSoundStreamSourceHandle::Feed(const AudioBufferFormat&, const char* memory, size_t length)
+{
+	std::vector<char> convertBuffer(length, 0);
+
+	// We can't use `Mix_VolumeMusic` since we don't use Mix to play files, and thus it internally
+	// never reaches a playing-state to care about volume calls.
+	if (volume == MIX_MAX_VOLUME) {
+		std::copy(memory, memory + length, convertBuffer.begin());
+	} else {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+		SDL_MixAudioFormat(reinterpret_cast<Uint8*>(convertBuffer.data()), reinterpret_cast<const Uint8*>(memory),
+				   MIX_DEFAULT_FORMAT, length, volume);
+#else
+		SDL_MixAudio(reinterpret_cast<Uint8*>(convertBuffer.data()), reinterpret_cast<const Uint8*>(memory), length, volume);
+#endif
+	}
+
+	SDL_AudioCVT cvt;
+	SDL_BuildAudioCVT(&cvt,
+			  AUDIO_S16SYS, 2, 22050,
+			  SDLAudioBackend::audioFormat, SDLAudioBackend::audioChannels, SDLAudioBackend::audioRate);
+
+	convertBuffer.resize(convertBuffer.size() * cvt.len_mult);
+	cvt.buf = reinterpret_cast<Uint8*>(convertBuffer.data());
+	cvt.len = length;
+	SDL_ConvertAudio(&cvt);
+	convertBuffer.resize(length * cvt.len_ratio);
+
+	size_t offset = 0;
+	do {
+		auto written = ringBuffer.Fill(convertBuffer.data() + offset, convertBuffer.size() - offset);
+		offset += written;
+
+		if (offset < convertBuffer.size()) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+	} while (offset < convertBuffer.size() && fillWait);
+
+	return fillWait;
+}
+
+bool SDLSoundStreamSourceHandle::HasProcessed()
+{
+	return true;
+}
+
+void SDLSoundStreamSourceHandle::Pause()
+{
+	Mix_PauseMusic();
+}
+
+void SDLSoundStreamSourceHandle::Resume()
+{
+	Mix_ResumeMusic();
+}
+
+void SDLSoundStreamSourceHandle::Reclaim()
+{
+	std::lock_guard<std::mutex> lock { mixMutex };
+
+	fillWait = true;
+	// The hook call isn't guarded by Mix' own locking
+	{
+		std::lock_guard<std::mutex> cbLock { MixCallbackState::mutex };
+		if (MixCallbackState::handle != this) {
+			MixCallbackState::handle = this;
+			ringBuffer.Reset();
+		}
+	}
+	Mix_HookMusic((void (*)(void*, Uint8*, int)) StreamCallback, nullptr);
+}
+
+void SDLSoundStreamSourceHandle::Stop()
+{
+	fillWait = false;
+	{
+		std::lock_guard<std::mutex> lock { MixCallbackState::mutex };
+		MixCallbackState::handle = nullptr;
+	}
+	Mix_HaltMusic();
+}
+
+void SDLSoundStreamSourceHandle::SetVolume(int value)
+{
+	volume = MIX_MAX_VOLUME * value / 100;
+}
+
+void SDLSoundStreamSourceHandle::StreamCallback(const void*, uint8_t* dest, int len)
+{
+	std::lock_guard<std::mutex> lock { MixCallbackState::mutex };
+	SDLSoundStreamSourceHandle* handle = MixCallbackState::handle;
+	if (!handle) {
 		return;
+	}
 
-	Point pos = core->GetAudioDrv()->GetListenerPos();
-	SetChannelPosition(pos, p, chunkChannel, AUDIO_DISTANCE_ROLLOFF_MOD);
+	auto length = static_cast<size_t>(len);
+	auto read = handle->ringBuffer.Consume(reinterpret_cast<char*>(dest), length);
+
+	if (read < length) {
+		std::fill(dest + read, dest + length, 0);
+	}
 }
 
-bool SDLAudioSoundHandle::Playing()
+SDLAudioBackend::~SDLAudioBackend()
 {
-	return (mixChunk && Mix_Playing(chunkChannel) && Mix_GetChunk(chunkChannel) == mixChunk);
-}
-
-void SDLAudioSoundHandle::Stop()
-{
-	// Mix_FadeOutChannel is not as aggressive sounding (especially when stopping spellcasting) as Mix_HaltChannel
-	Mix_FadeOutChannel(chunkChannel, 500);
-}
-
-void SDLAudioSoundHandle::StopLooping()
-{
-	// No way to stop looping. Fading out instead..
-	Mix_FadeOutChannel(chunkChannel, 1000);
-}
-
-SDLAudio::SDLAudio(void)
-	: buffercache(BUFFER_CACHE_SIZE)
-{
-}
-
-SDLAudio::~SDLAudio(void)
-{
-	// TODO
 	Mix_HaltChannel(-1);
-	delete ambim;
-	Mix_HookMusic(NULL, NULL);
-	FreeBuffers();
-	Mix_ChannelFinished(NULL);
+	Mix_ChannelFinished(nullptr);
+	Mix_HaltMusic();
 
+	Mix_CloseAudio();
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-bool SDLAudio::Init(void)
+int SDLAudioBackend::audioRate = 0;
+unsigned short SDLAudioBackend::audioFormat = 0;
+int SDLAudioBackend::audioChannels = 0;
+
+bool SDLAudioBackend::Init()
 {
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
 		Log(ERROR, "SDLAudio", "InitSubSystem failed: {}", SDL_GetError());
 		return false;
 	}
-	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 512) < 0) {
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024) < 0) {
 		return false;
 	}
 
-	int result = Mix_AllocateChannels(MIXER_CHANNELS + AMBIENT_CHANNELS);
-	if (result < 0) {
-		Log(ERROR, "SDLAudio", "Unable to allocate mixing channels: {}\n", SDL_GetError());
-		return false;
-	}
-
-	Mix_QuerySpec(&audio_rate, (Uint16*) &audio_format, &audio_channels);
-	Mix_ReserveChannels(AMBIENT_CHANNELS + 1); // for speech and ambients
-	ambim = new AmbientMgr();
+	ChannelManager::Init(24, RESERVED_CHANNELS);
+	Mix_QuerySpec(&audioRate, &audioFormat, &audioChannels);
 
 	return true;
 }
 
-void SDLAudio::SetAudioStreamVolume(uint8_t* stream, int len, int volume)
+Holder<SoundSourceHandle> SDLAudioBackend::CreatePlaybackSource(const AudioPlaybackConfig& config, bool priority)
 {
-	// since it's at max volume by default
-	if (volume == MIX_MAX_VOLUME)
-		return;
-	uint8_t* mixData = new uint8_t[len];
-	memcpy(mixData, stream, len * sizeof(uint8_t));
-	memset(stream, 0, len); // mix audio data against silence
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-	SDL_MixAudioFormat(stream, mixData, MIX_DEFAULT_FORMAT, len, MIX_MAX_VOLUME);
-#else
-	SDL_MixAudio(stream, mixData, len, MIX_MAX_VOLUME);
-#endif
-	delete[] mixData;
-}
+	Housekeeping();
 
-void SDLAudio::music_callback(void* udata, uint8_t* stream, int len)
-{
-	ieDword volume = core->GetDictionary().Get("Volume Music", 100);
-
-	// No point of bothering if it's off anyway
-	if (volume == 0) {
-		return;
+	if (priority && reservedCounter == RESERVED_CHANNELS) {
+		Log(ERROR, "SDLAudio", "Cannot issue any more reserved channels.");
+		return {};
 	}
 
-	uint8_t* mixerStream = stream;
-	int mixerLen = len;
+	auto channel = priority ? reservedCounter++ : -1;
+	auto handle =
+		MakeHolder<SDLSoundSourceHandle>(
+			config,
+			[this]() -> const AudioPoint& { return this->GetListenerPosition(); },
+			channel);
+	issuedChannels.emplace_back(handle);
 
-	SDLAudio* driver = (SDLAudio*) udata;
-
-	do {
-		std::lock_guard<std::recursive_mutex> l(driver->MusicMutex);
-
-		int num_samples = len / 2;
-		int cnt = driver->MusicReader->read_samples((short*) stream, num_samples);
-
-		// Done?
-		if (cnt == num_samples)
-			break;
-
-		// TODO: this shouldn't be in the callback (see also the openal thread)
-		Log(MESSAGE, "SDLAudio", "Playing Next Music");
-		core->GetMusicMgr()->PlayNext();
-
-		stream = stream + (cnt * 2);
-		len = len - (cnt * 2);
-
-		if (!driver->MusicPlaying) {
-			Log(MESSAGE, "SDLAudio", "No Other Music to play");
-			memset(stream, 0, len);
-			Mix_HookMusic(NULL, NULL);
-			break;
-		}
-	} while (true);
-
-	SetAudioStreamVolume(mixerStream, mixerLen, MIX_MAX_VOLUME * volume / 100);
+	return handle;
 }
 
-Mix_Chunk* SDLAudio::loadSound(StringView ResRef, tick_t& time_length)
+Holder<SoundStreamSourceHandle> SDLAudioBackend::CreateStreamable(const AudioPlaybackConfig&)
+{
+	return MakeHolder<SDLSoundStreamSourceHandle>(audioChannels * RING_BUFFER_CHANNEL_SIZE);
+}
+
+Holder<SoundBufferHandle> SDLAudioBackend::LoadSound(ResourceHolder<SoundMgr> resource, const AudioPlaybackConfig&)
 {
 	Mix_Chunk* chunk = nullptr;
 
-	if (ResRef.empty()) {
-		return chunk;
+	auto numSamples = resource->GetNumSamples();
+	auto riffChans = resource->GetChannels();
+	auto sampleRate = resource->GetSampleRate();
+
+	std::vector<char> buffer {};
+	buffer.resize(numSamples * 2);
+	auto actualSamples = resource->read_samples(reinterpret_cast<short*>(buffer.data()), numSamples);
+	if (actualSamples == 0) {
+		return {};
 	}
 
-	auto entry = buffercache.Lookup(ResRef);
-	if (entry != nullptr) {
-		time_length = entry->Length;
-		return entry->chunk;
-	}
-
-	ResourceHolder<SoundMgr> acm = gamedata->GetResourceHolder<SoundMgr>(ResRef);
-	if (!acm) {
-		Log(ERROR, "SDLAudio", "Failed acm load!");
-		return chunk;
-	}
-	int cnt = acm->get_length();
-	int riff_chans = acm->get_channels();
-	int samplerate = acm->get_samplerate();
-	// Use 16-bit word for memory allocation because read_samples takes a 16 bit alignment
-	short* memory = (short*) malloc(cnt * 2);
-	//multiply always with 2 because it is in 16 bits
-	int cnt1 = acm->read_samples(memory, cnt) * 2;
-	//Sound Length in milliseconds
-	time_length = ((cnt / riff_chans) * 1000) / samplerate;
-
-	// convert our buffer, if necessary
 	SDL_AudioCVT cvt;
-	SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, riff_chans, samplerate,
-			  audio_format, audio_channels, audio_rate);
-	cvt.buf = (Uint8*) malloc(cnt1 * cvt.len_mult);
-	memcpy(cvt.buf, (char*) memory, cnt1);
-	cvt.len = cnt1;
+	SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, riffChans, sampleRate, audioFormat, audioChannels, audioRate);
+
+	buffer.resize(actualSamples * 2 * cvt.len_mult);
+	cvt.buf = reinterpret_cast<Uint8*>(buffer.data());
+	cvt.len = actualSamples * 2;
 	SDL_ConvertAudio(&cvt);
 
-	// free old buffer
-	free(memory);
-
-	// make SDL_mixer chunk
-	chunk = Mix_QuickLoad_RAW(cvt.buf, cvt.len * cvt.len_ratio);
+	buffer.resize(cvt.len * cvt.len_ratio);
+	chunk = Mix_QuickLoad_RAW(reinterpret_cast<Uint8*>(buffer.data()), cvt.len * cvt.len_ratio);
 	if (!chunk) {
 		Log(ERROR, "SDLAudio", "Error loading chunk!");
-		free(cvt.buf);
-		return chunk;
+		return {};
 	}
 
-	buffercache.SetAt(ResRef, chunk, time_length);
-
-	return chunk;
+	return MakeHolder<SDLSoundBufferHandle>(chunk, std::move(buffer));
 }
 
-Holder<SoundHandle> SDLAudio::Play(StringView ResRef, SFXChannel channel,
-				   const Point& p, unsigned int flags, tick_t* length)
+const AudioPoint& SDLAudioBackend::GetListenerPosition() const
 {
-	Mix_Chunk* chunk;
-
-	if (ResRef.empty()) {
-		if (flags & GEM_SND_SPEECH) {
-			Mix_HaltChannel(0);
-		}
-		return Holder<SoundHandle>();
-	}
-
-	int chan = -1;
-	int loop = (flags & GEM_SND_LOOPING) ? -1 : 0;
-	ieDword volume = 100;
-
-	if (flags & GEM_SND_SPEECH) {
-		chan = 0;
-		loop = 0; // Speech ignores GEM_SND_LOOPING
-		volume = core->GetDictionary().Get("Volume Voices", 100);
-	} else {
-		volume = core->GetDictionary().Get("Volume SFX", 100);
-	}
-
-	if (volume == 0) {
-		return Holder<SoundHandle>();
-	}
-
-	tick_t time_length;
-	chunk = loadSound(ResRef, time_length);
-	if (chunk == nullptr) {
-		return Holder<SoundHandle>();
-	}
-
-	if (length) {
-		*length = time_length;
-	}
-
-	Mix_VolumeChunk(chunk, MIX_MAX_VOLUME * GetVolume(channel) / 100);
-
-	chan = Mix_PlayChannel(chan, chunk, loop);
-	if (chan < 0) {
-		Log(ERROR, "SDLAudio", "Error playing channel!");
-		return Holder<SoundHandle>();
-	}
-	Mix_Volume(chan, MIX_MAX_VOLUME * volume / 100);
-
-	if (flags & GEM_SND_SPATIAL) {
-		SetChannelPosition(listenerPos, p, chan, AUDIO_DISTANCE_ROLLOFF_MOD);
-	}
-
-	// TODO: we need something like static_ptr_cast
-	return Holder<SoundHandle>(new SDLAudioSoundHandle(chunk, SFXChannel(chan), flags));
+	return listenerPosition;
 }
 
-bool SDLAudio::Pause()
+void SDLAudioBackend::SetListenerPosition(const AudioPoint& p)
 {
-	((AmbientMgr*) ambim)->Deactivate();
-	return true;
-}
+	listenerPosition = p;
 
-bool SDLAudio::Resume()
-{
-	((AmbientMgr*) ambim)->Activate();
-	return true;
-}
-
-int SDLAudio::CreateStream(ResourceHolder<SoundMgr> newMusic)
-{
-	std::lock_guard<std::recursive_mutex> l(MusicMutex);
-
-	Log(MESSAGE, "SDLAudio", "SDLAudio setting new music");
-	MusicReader = std::move(newMusic);
-
-	return 0;
-}
-
-bool SDLAudio::Stop()
-{
-	MusicPlaying = false;
-	Mix_HookMusic(NULL, NULL);
-	return true;
-}
-
-bool SDLAudio::Play()
-{
-	std::lock_guard<std::recursive_mutex> l(MusicMutex);
-
-	if (!MusicReader) {
-		return false;
-	}
-	MusicPlaying = true;
-	Mix_HookMusic((void (*)(void*, Uint8*, int)) music_callback, this);
-	return true;
-}
-
-void SDLAudio::ResetMusics()
-{
-	MusicPlaying = false;
-	Mix_HookMusic(NULL, NULL);
-}
-
-void SDLAudio::UpdateVolume(unsigned int flags)
-{
-	ieDword volume = 0;
-
-	if (flags & GEM_SND_VOL_AMBIENTS) {
-		volume = core->GetDictionary().Get("Volume Ambients", 0);
-		((AmbientMgr*) ambim)->UpdateVolume(volume);
-	}
-}
-
-bool SDLAudio::CanPlay()
-{
-	return true;
-}
-
-void SDLAudio::UpdateListenerPos(const Point& p)
-{
-	listenerPos = p;
-
-	for (int i = 0; i < AMBIENT_CHANNELS; i++) {
-		if (!ambientStreams[i].free && ambientStreams[i].point) {
-			// channel i + 1, since ambient channels start at 1 (channel 0 is reserved for speech)
-			SetChannelPosition(listenerPos, ambientStreams[i].streamPos, i + 1, AMBIENT_DISTANCE_ROLLOFF_MOD);
+	for (auto channelPtr : issuedChannels) {
+		if (auto channel = channelPtr.lock()) {
+			channel->ConfigChannel();
 		}
 	}
 }
 
-Point SDLAudio::GetListenerPos()
+void SDLAudioBackend::Housekeeping()
 {
-	return listenerPos;
-}
-
-void SDLAudio::buffer_callback(void* udata, uint8_t* stream, int len)
-{
-	// Check only movie volume, since ambiens aren't supported right now
-	ieDword volume = core->GetDictionary().Get("Volume Movie", 100);
-
-	// No point of bothering if it's off anyway
-	if (volume == 0) {
-		return;
-	}
-
-	uint8_t* mixerStream = stream;
-	int mixerLen = len;
-
-	SDLAudio* driver = (SDLAudio*) udata;
-	unsigned int remaining = len;
-
-	while (remaining && !driver->buffers.empty()) {
-		std::lock_guard<std::recursive_mutex> l(driver->MusicMutex);
-
-		unsigned int avail = driver->buffers[0].size - driver->curr_buffer_offset;
-		if (avail > remaining) {
-			// more data available in this buffer than we need
-			avail = remaining;
-			memcpy(stream, driver->buffers[0].buf + driver->curr_buffer_offset, avail);
-			driver->curr_buffer_offset += avail;
+	for (auto it = issuedChannels.begin(); it != issuedChannels.end();) {
+		if (!it->lock()) {
+			it = issuedChannels.erase(it);
 		} else {
-			// exhausted this buffer, move to the next one
-			memcpy(stream, driver->buffers[0].buf + driver->curr_buffer_offset, avail);
-			driver->curr_buffer_offset = 0;
-			free(driver->buffers[0].buf);
-			// TODO: inefficient
-			driver->buffers.erase(driver->buffers.begin());
+			it++;
 		}
-		remaining -= avail;
-		stream = stream + avail;
 	}
-
-	if (remaining > 0) {
-		// underrun (out of buffers)
-		memset(stream, 0, remaining);
-	}
-	SetAudioStreamVolume(mixerStream, mixerLen, MIX_MAX_VOLUME * volume / 100);
 }
 
-int SDLAudio::SetupNewStream(int x, int y, int z,
-			     ieWord gain, bool point, int ambientRange)
-{
-	std::lock_guard<std::recursive_mutex> l(MusicMutex);
-
-	if (ambientRange) {
-		for (int i = 1; i <= AMBIENT_CHANNELS; i++) {
-			if (ambientStreams[i - 1].free) {
-				if (point) {
-					Point ambientPos(x, y);
-					SetChannelPosition(listenerPos, ambientPos, i, AMBIENT_DISTANCE_ROLLOFF_MOD);
-				} else {
-					Mix_SetPosition(i, 0, 0);
-				}
-
-				Mix_Volume(i, MIX_MAX_VOLUME * gain / 100);
-				ambientStreams[i - 1].free = false;
-				ambientStreams[i - 1].streamPos.x = x;
-				ambientStreams[i - 1].streamPos.y = y;
-				ambientStreams[i - 1].point = point;
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	// TODO: maybe don't ignore these
-	(void) z;
-
-	Log(MESSAGE, "SDLAudio", "SDLAudio allocating stream...");
-
-	// TODO: buggy
-	MusicPlaying = false;
-	curr_buffer_offset = 0;
-	Mix_HookMusic((void (*)(void*, Uint8*, int)) buffer_callback, this);
-	return 0;
-}
-
-tick_t SDLAudio::QueueAmbient(int stream, const ResRef& sound, bool spatial)
-{
-	if (stream <= 0 || stream > AMBIENT_CHANNELS) {
-		return -1;
-	}
-
-	if (Mix_Playing(stream)) {
-		Mix_HaltChannel(stream);
-	}
-
-	tick_t time_length;
-	Mix_Chunk* chunk = loadSound(sound, time_length);
-
-	if (chunk == nullptr) {
-		return -1;
-	}
-
-	if (spatial && ambientStreams[stream - 1].point) {
-		SetChannelPosition(listenerPos, ambientStreams[stream - 1].streamPos, stream, AMBIENT_DISTANCE_ROLLOFF_MOD);
-	}
-	Mix_PlayChannel(stream, chunk, 0);
-
-	return time_length;
-}
-
-bool SDLAudio::ReleaseStream(int stream, bool HardStop)
-{
-	if (stream < 0) {
-		return false;
-	}
-
-	if (stream > 0) {
-		if (ambientStreams[stream - 1].free) {
-			return false;
-		}
-		Mix_HaltChannel(stream);
-		ambientStreams[stream - 1].free = true;
-		return true;
-	}
-
-	Log(MESSAGE, "SDLAudio", "Releasing stream...");
-
-	(void) HardStop;
-	Stop();
-	FreeBuffers();
-
-	return true;
-}
-
-void SDLAudio::FreeBuffers()
-{
-	std::lock_guard<std::recursive_mutex> l(MusicMutex);
-	for (const auto& buffer : buffers) {
-		free(buffer.buf);
-	}
-	buffers.clear();
-}
-
-void SDLAudio::SetAmbientStreamVolume(int stream, int volume)
-{
-	Mix_Volume(stream, MIX_MAX_VOLUME * volume / 100);
-}
-
-void SDLAudio::SetAmbientStreamPitch(int, int)
-{
-	// TODO: ambient sounds
-}
-
-void SDLAudio::QueueBuffer(int stream, unsigned short bits,
-			   int channels, short* memory, int size, int samplerate)
-{
-	if (stream != 0) {
-		return;
-	}
-
-	assert(!MusicPlaying);
-
-	BufferedData d;
-
-	// convert our buffer, if necessary
-	if (bits != 16 || channels != audio_channels || samplerate != audio_rate) {
-		SDL_AudioCVT cvt;
-		if (SDL_BuildAudioCVT(&cvt, (bits == 8 ? AUDIO_S8 : AUDIO_S16SYS), channels, samplerate,
-				      audio_format, audio_channels, audio_rate) == 0) {
-			Log(ERROR, "SDLAudio", "Couldn't convert video stream! trying to convert {} bits, {} channels, {} rate",
-			    bits, channels, samplerate);
-			return;
-		}
-		cvt.buf = (Uint8*) malloc(size * cvt.len_mult);
-		memcpy(cvt.buf, memory, size);
-		cvt.len = size;
-		SDL_ConvertAudio(&cvt);
-
-		d.size = cvt.len * cvt.len_ratio;
-		d.buf = (char*) cvt.buf;
-	} else {
-		d.size = size;
-		d.buf = (char*) malloc(d.size);
-		memcpy(d.buf, memory, d.size);
-	}
-
-	MusicMutex.lock();
-	buffers.push_back(d);
-	MusicMutex.unlock();
 }
 
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x52C524E, "SDL Audio Driver")
-PLUGIN_DRIVER(SDLAudio, "SDLAudio")
+PLUGIN_DRIVER(SDLAudioBackend, "SDLAudio")
 END_PLUGIN()

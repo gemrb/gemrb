@@ -20,7 +20,6 @@
 
 #include "MUSImporter.h"
 
-#include "Audio.h"
 #include "GameData.h" // For ResourceHolder
 #include "Interface.h"
 #include "SoundMgr.h"
@@ -81,7 +80,7 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	if (Playing || IsCurrentPlayList(name)) {
 		return true;
 	}
-	core->GetAudioDrv()->ResetMusics();
+	core->GetMusicLoop().Stop();
 	playlist.clear();
 	PLpos = 0;
 	PLName.Reset();
@@ -172,7 +171,6 @@ void MUSImporter::Start()
 	}
 
 	PlayMusic(PLpos);
-	core->GetAudioDrv()->Play();
 	lastSound = playlist[PLpos].soundID;
 	Playing = true;
 }
@@ -192,7 +190,7 @@ void MUSImporter::End()
 
 void MUSImporter::HardEnd()
 {
-	core->GetAudioDrv()->Stop();
+	core->GetMusicLoop().Stop();
 	Playing = false;
 	PLpos = 0;
 }
@@ -252,7 +250,7 @@ void MUSImporter::PlayNext()
 		}
 	} else {
 		Playing = false;
-		core->GetAudioDrv()->Stop();
+		core->GetMusicLoop().Stop();
 		//start new music after the old faded out
 		if (PLNameNew[0]) {
 			if (OpenPlaylist(PLNameNew)) {
@@ -284,14 +282,11 @@ void MUSImporter::PlayMusic(const ieVariable& name)
 
 	ResourceHolder<SoundMgr> sound = manager.GetResourceHolder<SoundMgr>(FName, true);
 	if (sound) {
-		int soundID = core->GetAudioDrv()->CreateStream(std::move(sound));
-		if (soundID == -1) {
-			core->GetAudioDrv()->Stop();
-		}
+		core->GetMusicLoop().Load(std::move(sound));
+		Log(MESSAGE, "MUSImporter", "Playing {}...", FName);
 	} else {
-		core->GetAudioDrv()->Stop();
+		core->GetMusicLoop().Stop();
 	}
-	Log(MESSAGE, "MUSImporter", "Playing {}...", FName);
 }
 
 bool MUSImporter::IsCurrentPlayList(const ieVariable& name)

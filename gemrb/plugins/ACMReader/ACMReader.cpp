@@ -55,7 +55,7 @@ bool ACMReader::Import(DataStream* str)
 	}
 	samples_left = (samples = hdr.samples);
 	channels = hdr.channels;
-	samplerate = hdr.rate;
+	sampleRate = hdr.rate;
 	//levels = hdr.levels;
 	//subblocks = hdr.subblocks;
 
@@ -89,9 +89,9 @@ int ACMReader::make_new_samples()
 	return 1;
 }
 
-int ACMReader::read_samples(short* buffer, int count)
+size_t ACMReader::read_samples(short* buffer, size_t count)
 {
-	int res = 0;
+	size_t res = 0;
 	while (res < count) {
 		if (samples_ready == 0) {
 			if (samples_left == 0)
@@ -110,7 +110,7 @@ int ACMReader::read_samples(short* buffer, int count)
 
 static constexpr size_t CHANNEL_SPLIT_SAMPLE_SIZE = 2048;
 
-int ACMReader::ReadSamplesIntoChannels(char* channel1, char* channel2, int numSamples)
+size_t ACMReader::ReadSamplesIntoChannels(char* channel1, char* channel2, size_t numSamples)
 {
 	std::vector<char> buffer;
 	// sample: 2 channels à 2 bytes ...

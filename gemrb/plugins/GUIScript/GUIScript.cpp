@@ -20,7 +20,6 @@
 
 #include "GUIScript.h"
 
-#include "Audio.h"
 #include "CharAnimations.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h"
@@ -3691,8 +3690,10 @@ static PyObject* GemRB_VerbalConstant(PyObject* /*self*/, PyObject* args)
 
 	//get soundset based string constant
 	std::string sound = fmt::format("{}{}{}{:02d}", fmt::WideToChar { actor->PCStats->SoundFolder }, PathDelimiter, actor->PCStats->SoundSet, str);
-	SFXChannel channel = actor->InParty ? SFXChannel(ieByte(SFXChannel::Char0) + actor->InParty - 1) : SFXChannel::Dialog;
-	core->GetAudioDrv()->Play(sound, channel, Point(), GEM_SND_SPEECH | GEM_SND_EFX);
+	auto config =
+		core->GetAudioSettings().ConfigPresetDialog(
+			actor->InParty ? SFXChannel(ieByte(SFXChannel::Char0) + actor->InParty - 1) : SFXChannel::Dialog);
+	core->GetAudioPlayback().PlaySpeech(sound, config);
 	Py_RETURN_NONE;
 }
 
@@ -3722,34 +3723,42 @@ sound as if it was said by that PC (EAX).\n\
 
 static PyObject* GemRB_PlaySound(PyObject* /*self*/, PyObject* args)
 {
-	char* channel_name = NULL;
+	char* channelName = nullptr;
 	Point pos;
 	unsigned int flags = 0;
 	SFXChannel channel = SFXChannel::GUI;
 	int index;
 
-	if (PyArg_ParseTuple(args, "i|z", &index, &channel_name)) {
-		if (channel_name) {
-			channel = core->GetAudioDrv()->GetChannel(channel_name);
+	if (PyArg_ParseTuple(args, "i|z", &index, &channelName)) {
+		if (channelName) {
+			channel = AudioSettings::GetChannelByName(StringView { channelName });
 		}
-		core->PlaySound(index, channel);
+		core->GetAudioPlayback().PlayDefaultSound(index, channel);
 	} else {
 		PyErr_Clear(); //clearing the exception
 		PyObject* pyref = nullptr;
-		if (!PyArg_ParseTuple(args, "O|ziii", &pyref, &channel_name, &pos.x, &pos.y, &flags)) {
+		if (!PyArg_ParseTuple(args, "O|ziii", &pyref, &channelName, &pos.x, &pos.y, &flags)) {
 			return AttributeError(GemRB_PlaySound__doc);
 		}
 
-		if (channel_name) {
-			channel = core->GetAudioDrv()->GetChannel(channel_name);
+		if (channelName) {
+			channel = AudioSettings::GetChannelByName(StringView { channelName });
 		}
 
-		if (pyref == Py_None) {
-			core->GetAudioDrv()->Play("", channel, pos, flags);
+		auto config = core->GetAudioSettings().ConfigPresetScreenAction(channel);
+		if (!pos.IsZero()) {
+			config = core->GetAudioSettings().ConfigPresetByChannel(channel, pos);
+		}
+
+		if (pyref == Py_None && (flags & GEM_SND_SPEECH)) {
+			core->GetAudioPlayback().StopSpeech();
 		} else if (PyUnicode_Check(pyref)) {
-			core->GetAudioDrv()->PlayMB(PyString_AsStringObj(pyref), channel, pos, flags);
+			auto mbString = MBStringFromString(PyString_AsStringObj(pyref));
+			auto mbResource = StringView { mbString };
+
+			core->GetAudioPlayback().Play(mbResource, config);
 		} else {
-			core->GetAudioDrv()->Play(PyString_AsStringView(pyref), channel, pos, flags);
+			core->GetAudioPlayback().Play(PyString_AsStringView(pyref), config);
 		}
 	}
 
@@ -6909,7 +6918,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject* /*self*/, PyObject* args)
 	}
 
 	if (Sound && Sound[0]) {
-		core->GetAudioDrv()->Play(Sound, SFXChannel::GUI);
+		core->GetAudioPlayback().Play(Sound, AudioPreset::ScreenAction, SFXChannel::GUI);
 	}
 	Py_RETURN_NONE;
 }
@@ -7437,7 +7446,7 @@ static PyObject* ChangeStoreItem(Store* store, int slot, Actor* actor, StoreActi
 				OverrideSound(itemResRef, SoundItem, IS_DROP);
 				if (!SoundItem.IsEmpty()) {
 					// speech means we'll only play the last sound if multiple items were bought
-					core->GetAudioDrv()->Play(SoundItem, SFXChannel::GUI, Point(), GEM_SND_SPEECH);
+					core->GetAudioPlayback().PlaySpeech(SoundItem, core->GetAudioSettings().ConfigPresetScreenAction(SFXChannel::GUI));
 				}
 				res = ASI_SUCCESS;
 				break;
@@ -7872,8 +7881,13 @@ PyDoc_STRVAR(GemRB_UpdateVolume__doc,
 static PyObject* GemRB_UpdateVolume(PyObject* /*self*/, PyObject* args)
 {
 	int type = 3;
-	PARSE_ARGS(args, "i", &type);
-	core->GetAudioDrv()->UpdateVolume(type);
+	PARSE_ARGS(args, "|i", &type);
+	if (type & 1) {
+		core->GetMusicLoop().UpdateVolume();
+	}
+	if (type & 2) {
+		core->GetAmbientManager().UpdateVolume();
+	}
 
 	Py_RETURN_NONE;
 }
@@ -9270,7 +9284,7 @@ static PyObject* GemRB_DragItem(PyObject* /*self*/, PyObject* args)
 
 	OverrideSound(si->ItemResRef, Sound, IS_GET);
 	if (!Sound.IsEmpty()) {
-		core->GetAudioDrv()->Play(Sound, SFXChannel::GUI);
+		core->GetAudioPlayback().Play(Sound, AudioPreset::ScreenAction, SFXChannel::GUI);
 	}
 
 	//if res is positive, it is gold!
@@ -9343,7 +9357,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject* /*self*/, PyObject* args)
 		int res = cc->AddItem(si);
 		OverrideSound(si->ItemResRef, Sound, IS_DROP);
 		if (!Sound.IsEmpty()) {
-			core->GetAudioDrv()->Play(Sound, SFXChannel::GUI);
+			core->GetAudioPlayback().Play(Sound, AudioPreset::ScreenAction, SFXChannel::GUI);
 		}
 		if (res == ASI_SUCCESS) {
 			// Whole amount was placed
@@ -9474,7 +9488,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject* /*self*/, PyObject* args)
 	}
 
 	if (Sound && Sound[0]) {
-		core->GetAudioDrv()->Play(Sound, SFXChannel::GUI);
+		core->GetAudioPlayback().Play(Sound, AudioPreset::ScreenAction, SFXChannel::GUI);
 	}
 	return PyLong_FromLong(res);
 }

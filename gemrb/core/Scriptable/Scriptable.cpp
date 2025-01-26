@@ -972,7 +972,7 @@ void Scriptable::CastSpellPointEnd(int level, bool keepStance)
 
 	if (!keepStance) {
 		// yep, the original didn't use the casting channel for this!
-		core->GetAudioDrv()->Play(spl->CompletionSound, SFXChannel::Missile, Pos, GEM_SND_SPATIAL);
+		core->GetAudioPlayback().Play(spl->CompletionSound, AudioPreset::Spatial, SFXChannel::Missile, Pos);
 	}
 
 	CreateProjectile(SpellResRef, 0, level, false);
@@ -1048,7 +1048,7 @@ void Scriptable::CastSpellEnd(int level, bool keepStance)
 	}
 
 	if (!keepStance) {
-		core->GetAudioDrv()->Play(spl->CompletionSound, SFXChannel::Missile, Pos, GEM_SND_SPATIAL);
+		core->GetAudioPlayback().Play(spl->CompletionSound, AudioPreset::Spatial, SFXChannel::Missile, Pos);
 	}
 
 	//if the projectile doesn't need to follow the target, then use the target position

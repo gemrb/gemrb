@@ -20,7 +20,6 @@
 
 #include "voodooconst.h"
 
-#include "AmbientMgr.h"
 #include "CharAnimations.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h"
@@ -1922,20 +1921,25 @@ void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFXChannel::Char0, Sender->Pos, parameters->int0Parameter ? GEM_SND_SPEECH : 0);
+
+	if (parameters->int0Parameter) {
+		auto config = core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Char0, Sender->Pos);
+		core->GetAudioPlayback().PlaySpeech(parameters->string0Parameter, config);
+	} else {
+		core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::Spatial, SFXChannel::Char0, Sender->Pos);
+	}
 }
 
 void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFXChannel::Actions,
-				  parameters->pointParameter, GEM_SND_SPATIAL);
+	core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::Spatial, SFXChannel::Actions, parameters->pointParameter);
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFXChannel::Actions);
+	core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::ScreenAction, SFXChannel::Actions);
 }
 
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -2039,11 +2043,11 @@ void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
 // not in IESDP but this one should affect ambients
 void GameScript::SoundActivate(Scriptable* /*Sender*/, Action* parameters)
 {
-	AmbientMgr* ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
+	AmbientMgr& ambientmgr = core->GetAmbientManager();
 	if (parameters->int0Parameter) {
-		ambientmgr->Activate(parameters->objects[1]->objectName);
+		ambientmgr.Activate(parameters->objects[1]->objectName);
 	} else {
-		ambientmgr->Deactivate(parameters->objects[1]->objectName);
+		ambientmgr.Deactivate(parameters->objects[1]->objectName);
 	}
 }
 
@@ -2623,7 +2627,9 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* parameters)
 			door->AddTrigger(TriggerEntry(trigger_failedtoopen, actor->GetGlobalID()));
 
 			//playsound unsuccessful opening of door
-			core->PlaySound(door->IsOpen() ? DS_CLOSE_FAIL : DS_OPEN_FAIL, SFXChannel::Actions, *p, GEM_SND_SPATIAL);
+			core->GetAudioPlayback().PlayDefaultSound(
+				door->IsOpen() ? DS_CLOSE_FAIL : DS_OPEN_FAIL,
+				core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Actions, *p));
 			Sender->ReleaseCurrentAction();
 			return; //don't open door
 		}
@@ -2944,7 +2950,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 
 	//normally the second parameter is 0, but it may be handy to have control over that (See SX_* flags)
 	actor->AddExperience(xp, parameters->int1Parameter);
-	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
+	core->GetAudioPlayback().PlayDefaultSound(DS_GOTXP, SFXChannel::Actions);
 }
 
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
@@ -2966,13 +2972,13 @@ void GameScript::AddXPWorth(Scriptable* Sender, Action* parameters)
 	int xp = actor->GetStat(IE_XPVALUE); // I guess
 	if (parameters->int0Parameter) actor->SetBase(IE_XPVALUE, 0);
 	core->GetGame()->ShareXP(xp, SX_DIVIDE);
-	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
+	core->GetAudioPlayback().PlayDefaultSound(DS_GOTXP, SFXChannel::Actions);
 }
 
 void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->ShareXP(parameters->int0Parameter, SX_DIVIDE);
-	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
+	core->GetAudioPlayback().PlayDefaultSound(DS_GOTXP, SFXChannel::Actions);
 }
 
 //this needs moncrate.2da, but otherwise independent from GFFlags::CHALLENGERATING
@@ -2985,7 +2991,7 @@ void GameScript::AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters
 {
 	ieDword xp = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter);
 	core->GetGame()->ShareXP(xp, SX_DIVIDE);
-	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
+	core->GetAudioPlayback().PlayDefaultSound(DS_GOTXP, SFXChannel::Actions);
 }
 
 // these two didn't work in the original (bg2, ee) and were unused
@@ -7402,7 +7408,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	}
 
 	// voice
-	core->GetAudioDrv()->Play(parameters->string0Parameter, channel, Sender->Pos, GEM_SND_SPEECH | GEM_SND_QUEUE | GEM_SND_SPATIAL);
+	core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::SpatialVoice, channel, Sender->Pos);
 	// string1Parameter has the starting sound, played at the same time, but on SFXChannel::Casting
 	// NOTE: only a few uses have also an ending sound that plays when the effect ends (also stopping Sound1)
 	// but we don't even read all three string parameters, as Action stores just two

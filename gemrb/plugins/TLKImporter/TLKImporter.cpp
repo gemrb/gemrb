@@ -20,7 +20,6 @@
 
 #include "TLKImporter.h"
 
-#include "Audio.h"
 #include "Calendar.h"
 #include "DialogHandler.h"
 #include "Game.h"
@@ -377,12 +376,18 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		string = ResolveTags(string);
 	}
 	if ((type & 2) && bool(flags & STRING_FLAGS::SOUND) && !SoundResRef.IsEmpty()) {
-		// GEM_SND_SPEECH will stop the previous sound source
-		unsigned int flag = (uint32_t(flags) & (GEM_SND_SPEECH | GEM_SND_QUEUE));
-
 		// Narrator's error announcements (ambush, incomplete party)
 		SFXChannel channel = SoundResRef.BeginsWith("ERROR") ? SFXChannel::Narrator : SFXChannel::Dialog;
-		core->strrefHandle = core->GetAudioDrv()->Play(SoundResRef, channel, Point(), flag);
+		auto config = core->GetAudioSettings().ConfigPresetDialog(channel);
+
+		bool speech = bool(flags & STRING_FLAGS::SPEECH);
+		if (speech) {
+			bool interrupt = uint32_t(flags & STRING_FLAGS::ALLOW_ZERO) == 0;
+			core->GetAudioPlayback().PlaySpeech(SoundResRef, config, interrupt);
+			core->strrefHandle.reset();
+		} else {
+			core->strrefHandle = core->GetAudioPlayback().Play(SoundResRef, config);
+		}
 	}
 	if (bool(flags & STRING_FLAGS::STRREFON)) {
 		string = fmt::format(u"{}: {}", ieDword(strref), string);
