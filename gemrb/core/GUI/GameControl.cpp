@@ -2175,8 +2175,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 				SetTargetMode(TargetMode::None);
 			}
 			// update the action bar
-			core->GetDictionary().Set("ActionLevel", 0);
-			core->SetEventFlag(EF_ACTION);
+			core->ResetActionBar();
 			ClearMouseState();
 			return true;
 		} else {
