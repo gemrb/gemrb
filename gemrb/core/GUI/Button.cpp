@@ -490,7 +490,8 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		SetState(UNPRESSED);
 	}
 
-	if (me.button == GEM_MB_ACTION) {
+	// not sure why we limit this on checkboxes and radios - perhaps to match the originals?
+	if (me.button == GEM_MB_ACTION || !(flags & (IE_GUI_BUTTON_CHECKBOX | IE_GUI_BUTTON_RADIOBUTTON))) {
 		DoToggle();
 	}
 	return Control::OnMouseUp(me, mod);
