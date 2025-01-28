@@ -8894,15 +8894,15 @@ int Actor::Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const
 	};
 
 	if (QslotTranslation && slotindex > 2) {
-		if (actslot > ACT_IWDQSONG) { // quick songs
+		if (actslot >= ACT_IWDQSONG) { // quick songs
 			actslot = 110 + actslot % 10;
-		} else if (actslot > ACT_IWDQSPEC) { // quick abilities
+		} else if (actslot >= ACT_IWDQSPEC) { // quick abilities
 			actslot = 90 + actslot % 10;
-		} else if (actslot > ACT_IWDQITEM) { // quick items
+		} else if (actslot >= ACT_IWDQITEM) { // quick items
 			actslot = 80 + actslot % 10;
-		} else if (actslot > ACT_IWDQSPELL) { // quick spells
+		} else if (actslot >= ACT_IWDQSPELL) { // quick spells
 			actslot = 70 + actslot % 10;
-		} else if (actslot > ACT_BARD) { // spellbooks
+		} else if (actslot >= ACT_BARD) { // spellbooks
 			actslot = 50 + actslot % 10;
 		} else if (actslot >= 32) { // here be dragons
 			Log(ERROR, "Actor", "Bad slot index passed to SetActionButtonRow!");
