@@ -1076,17 +1076,6 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 		if ret is not None:
 			raise RuntimeError("Cannot set action button {} to {}!".format(i, action))
 
-		if action != -1:
-			# reset it to the first one, so we can handle them more easily below
-			if (action >= ACT_IWDQSPELL) and (action <= ACT_IWDQSPELL + 9):
-				action = ACT_IWDQSPELL
-			elif (action >= ACT_IWDQITEM) and (action <= ACT_IWDQITEM + 9):
-				action = ACT_IWDQITEM
-			elif (action >= ACT_IWDQSPEC) and (action <= ACT_IWDQSPEC + 9):
-				action = ACT_IWDQSPEC
-			elif (action >= ACT_IWDQSONG) and (action <= ACT_IWDQSONG + 9):
-				action = ACT_IWDQSONG
-
 		state = SetupActionButton (pc, action, btn, i, pcStats, invInfo)
 
 		disabledButton = GemRB.GetPlayerStat (pc, IE_DISABLEDBUTTON)
@@ -1299,36 +1288,24 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		state = SetWeaponButton (btn, realAction, pc, pcStats, invInfo)
 	elif action == ACT_OFFHAND: # only used in iwd2
 		state = SetOffHandButton (btn, pc, pcStats, magicSlot, usedslot, fistSlot)
-	elif action == ACT_IWDQSPELL:
+	elif (action >= ACT_IWDQSPELL) and (action <= ACT_IWDQSPELL + 9):
 		btn.SetBAM ("stonspel", 0, 0)
-		if GameCheck.IsIWD2 () and i > 3:
-			tmp = i - 3
-		else:
-			tmp = 0
+		tmp = action - ACT_IWDQSPELL
 		state = SetQSpellBtn (btn, pc, tmp)
-	elif action == ACT_IWDQSONG:
+	elif (action >= ACT_IWDQSONG) and (action <= ACT_IWDQSONG + 9):
 		btn.SetBAM ("stonsong", 0, 0)
-		if GameCheck.IsIWD2 () and i > 3:
-			tmp = i - 3
-		else:
-			tmp = 0
+		tmp = action - ACT_IWDQSONG
 		state = SetQSpellBtn (btn, pc, tmp)
-	elif action == ACT_IWDQSPEC:
+	elif (action >= ACT_IWDQSPEC) and (action <= ACT_IWDQSPEC + 9):
 		btn.SetBAM ("stonspec", 0, 0)
-		if GameCheck.IsIWD2 () and i > 3:
-			tmp = i - 3
-		else:
-			tmp = 0
+		tmp = action - ACT_IWDQSPEC
 		state = SetQSpellBtn (btn, pc, tmp)
 	elif action in [ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3]:
 		btn.SetBAM ("stonspel", 0, 0)
 		tmp = action - ACT_QSPELL1
 		state = SetQSpellBtn (btn, pc, tmp)
-	elif action == ACT_IWDQITEM:
-		if i > 3:
-			tmp = (i + 1) % 3
-		else:
-			tmp = 0
+	elif (action >= ACT_IWDQITEM) and (action <= ACT_IWDQITEM + 9):
+		tmp = action - ACT_IWDQITEM
 		state = SetQSlotBtn (btn, pc, tmp, action)
 	elif action == ACT_QSLOT1:
 		tmp = 0
