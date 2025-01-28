@@ -1075,10 +1075,10 @@ def OpenLevelUpWindow ():
 
 		# Hit Points Gained and Hit Points from Constitution Bonus (multiclass)
 		for i in range (NumOfPrimLevUp):
-			HPGained = HPGained + GetSingleClassHP ("FIGHTER", avatar_header['PrimLevel'])/2
+			HPGained = HPGained + GetSingleClassHP ("FIGHTER", avatar_header['PrimLevel']) // 2
 
 		for i in range (NumOfSecoLevUp):
-			HPGained = HPGained + GetSingleClassHP (Class, avatar_header['SecoLevel'])/2
+			HPGained = HPGained + GetSingleClassHP (Class, avatar_header['SecoLevel']) // 2
 		ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, NumOfSecoLevUp, 2)
 
 		# Thac0
