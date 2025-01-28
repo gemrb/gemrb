@@ -35,8 +35,8 @@ Offhand     0          1          24         25         4950       guibtbut
 31          *          *          *          *          *          *
 Left        48         49         50         51         -1         guibtact
 Right       52         53         54         55         -1         guibtact
-34          *          *          *          *          *          *
-35          *          *          *          *          *          *
+Clear       116        117        118        119        39723      guibtact
+Restore     120        121        122        123        39724      guibtact
 36          *          *          *          *          *          *
 37          *          *          *          *          *          *
 38          *          *          *          *          *          *

@@ -10406,6 +10406,13 @@ static PyObject* SetActionIcon(Button* btn, PyObject* dict, int Index, int Funct
 	}
 
 	btn->SetHotKey(GEM_FUNCTIONX(Function), 0, true);
+	// for customization we need to preserve the original button's value / place
+	ieDword customizationState = core->GetDictionary().Get("SettingButtons", 0);
+	if (customizationState == 0) {
+		btn->BindDictVariable("QuickSlotButton", Function - 1);
+	} else {
+		btn->BindDictVariable("SecondLevelActionButton", btn->GetValue());
+	}
 
 	//no incref
 	return Py_None;
@@ -10664,6 +10671,45 @@ static PyObject* GemRB_SetupQuickSpell(PyObject* /*self*/, PyObject* args)
 	actor->PCStats->QuickSpellBookType[slot] = static_cast<ieByte>(type);
 
 	return PyLong_FromLong(spelldata.Target);
+}
+
+PyDoc_STRVAR(GemRB_SetupQuickSlot__doc,
+	     "===== SetupQuickSlot =====\n\
+\n\
+**Prototype:** GemRB.SetupQuickSlot (globalID, quickSlotID, actionID)\n\
+\n\
+**Description:** Changes the action assigned to the specified action bar button.\n\
+It only changes it for the specified creature, so it does not use the class \n\
+default any more. This is only used in iwd2.\n\
+\n\
+**Parameters:**\n\
+  * globalID - the PC's position in the party (1 based) or global ID\n\
+  * quickSlotID - the quickslot (button) to set up (0-11)\n\
+  * actionID - the actionbar action id to assign to this quickslot\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [SetupQuickItemSlot](SetupQuickItemSlot.md), [SetEquippedQuickSlot](SetEquippedQuickSlot.md)\n\
+");
+
+static PyObject* GemRB_SetupQuickSlot(PyObject* /*self*/, PyObject* args)
+{
+	int globalID;
+	int qslotID;
+	int actionIdx;
+	PARSE_ARGS(args, "iii", &globalID, &qslotID, &actionIdx);
+
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	if (!actor->PCStats) {
+		RuntimeError(fmt::format("{} is not a creature with a custom action bar!", fmt::WideToChar { actor->GetName() }));
+	} else if (qslotID < 0 || qslotID > 11) {
+		RuntimeError("Quick slot ID should be between 0-11!");
+	} else {
+		actor->PCStats->QSlots[qslotID] = actor->Gemrb2IWD2Qslot(actionIdx, qslotID);
+	}
+	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR(GemRB_SetupQuickItemSlot__doc,
@@ -12799,6 +12845,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetTooltipDelay, METH_VARARGS),
 	METHOD(SetupMaze, METH_VARARGS),
 	METHOD(SetupQuickItemSlot, METH_VARARGS),
+	METHOD(SetupQuickSlot, METH_VARARGS),
 	METHOD(SetupQuickSpell, METH_VARARGS),
 	METHOD(SetVar, METH_VARARGS),
 	METHOD(SoftEndPL, METH_NOARGS),

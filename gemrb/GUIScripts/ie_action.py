@@ -50,6 +50,9 @@ ACT_OFFHAND = 28 # pair slot to ACT_WEAPON1 - ACT_WEAPON4
 #gui navigation (scrolling button rows left or right)
 ACT_LEFT=32
 ACT_RIGHT=33
+# iwd2 customization buttons
+ACT_CLEAR = 34
+ACT_RESTORE = 35
 
 ACT_NONE=100
 

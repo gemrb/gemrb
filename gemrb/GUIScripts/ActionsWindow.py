@@ -370,6 +370,27 @@ def SetupSkillSelection ():
 	SetupControls (CurrentWindow, pc, ActionBarControlOffset, skillbar)
 	return
 
+# original customization menu:
+# skills, cast, use item (abilities), quick item (opened submenu to select 1 of 3, if any), innates, song
+# at the right end: clear button, restore default buttons (restored all of them)
+# we just list out the quickslots, since although there are many more, only 3 are settable via the inventory
+customizationBar = (ACT_SKILLS, ACT_CAST, ACT_USE, ACT_IWDQITEM, ACT_IWDQITEM + 1, ACT_IWDQITEM + 2, ACT_INNATE, ACT_BARDSONG, ACT_NONE, ACT_NONE, ACT_CLEAR, ACT_RESTORE)
+def SetupButtonChoices ():
+	GemRB.SetVar ("SettingButtons", 1)
+	pc = GemRB.GameGetFirstSelectedActor ()
+	SetupControls (CurrentWindow, pc, ActionBarControlOffset, customizationBar)
+	GemRB.SetVar ("SettingButtons", 2)
+	return
+
+def SaveActionButton (actionIdx):
+	GemRB.SetVar ("SettingButtons", 0)
+	pc = GemRB.GameGetFirstSelectedActor ()
+	qslot = GemRB.GetVar ("QuickSlotButton")
+	GemRB.SetupQuickSlot (pc, qslot, actionIdx)
+
+	SetActionLevel (UAW_STANDARD)
+	UpdateActionsWindow ()
+
 def UpdateActionsWindow ():
 	"""Redraws the actions section of the window."""
 
@@ -523,6 +544,8 @@ def UpdateActionsWindow ():
 		Spellbook.SetupSpellIcons (CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	elif level == UAW_WEAPONSETS:
 		SetupWeaponSets ()
+	elif level == UAW_CONFIGUREBAR:
+		SetupButtonChoices ()
 	else:
 		print("Invalid action level:", level)
 		SetActionLevel (UAW_STANDARD)
@@ -741,6 +764,10 @@ def ActionBardSongRightPressed ():
 def ActionBardSongPressed ():
 	"""Toggles the battle song."""
 
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_BARDSONG)
+		return
+
 	# get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
@@ -801,13 +828,25 @@ def ActionDancePressed ():
 	return
 
 def ActionUseItemPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_USE)
+		return
+
 	GemRB.SetVar ("TopIndex", 0)
 	SetActionLevel (UAW_EQUIPMENT)
 	UpdateActionsWindow ()
 	return
 
+def ActionUseItemRightPressed ():
+	StartBarConfiguration ()
+	return
+
 def ActionCastPressed ():
 	"""Opens the spell choice scrollbar."""
+
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_CAST)
+		return
 
 	GemRB.SetVar ("QSpell", -1)
 	GemRB.SetVar ("TopIndex", 0)
@@ -815,8 +854,21 @@ def ActionCastPressed ():
 	UpdateActionsWindow ()
 	return
 
-def ActionQItemPressed (action):
+def StartBarConfiguration ():
+	SetActionLevel (UAW_CONFIGUREBAR)
+	UpdateActionsWindow ()
+	return
+
+def ActionCastRightPressed ():
+	StartBarConfiguration ()
+	return
+
+def ActionQItemPressed (action, idx):
 	"""Uses the given quick item."""
+
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_IWDQITEM + idx)
+		return
 
 	pc = GemRB.GameGetFirstSelectedActor ()
 	# quick slot
@@ -824,29 +876,29 @@ def ActionQItemPressed (action):
 	return
 
 def ActionQItem1Pressed ():
-	ActionQItemPressed (ACT_QSLOT1)
+	ActionQItemPressed (ACT_QSLOT1, 0)
 	return
 
 def ActionQItem2Pressed ():
-	ActionQItemPressed (ACT_QSLOT2)
+	ActionQItemPressed (ACT_QSLOT2, 1)
 	return
 
 def ActionQItem3Pressed ():
-	ActionQItemPressed (ACT_QSLOT3)
+	ActionQItemPressed (ACT_QSLOT3, 2)
 	return
 
 def ActionQItem4Pressed ():
-	ActionQItemPressed (ACT_QSLOT4)
+	ActionQItemPressed (ACT_QSLOT4, 3)
 	return
 
 def ActionQItem5Pressed ():
-	ActionQItemPressed (ACT_QSLOT5)
+	ActionQItemPressed (ACT_QSLOT5, 4)
 	return
 
-def ActionQItemRightPressed (action):
+def ActionQItemRightPressed (which):
 	"""Selects the used ability of the quick item."""
 
-	GemRB.SetVar ("Slot", action)
+	GemRB.SetVar ("Slot", which)
 	SetActionLevel (UAW_QITEMS)
 	UpdateActionsWindow ()
 	return
@@ -869,16 +921,32 @@ def ActionQItem5RightPressed ():
 def ActionInnatePressed ():
 	"""Opens the innate spell scrollbar."""
 
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_INNATE)
+		return
+
 	GemRB.SetVar ("QSpell", -1)
 	GemRB.SetVar ("TopIndex", 0)
 	SetActionLevel (UAW_INNATES)
 	UpdateActionsWindow ()
 	return
 
+def ActionInnateRightPressed ():
+	StartBarConfiguration ()
+	return
+
 def ActionSkillsPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_SKILLS)
+		return
+
 	GemRB.SetVar ("TopIndex", 0)
 	SetActionLevel (UAW_SKILLS)
 	UpdateActionsWindow ()
+	return
+
+def ActionSkillsRightPressed ():
+	StartBarConfiguration ()
 	return
 
 def TypeSpellPressed (spelltype):
@@ -1167,10 +1235,6 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 				capability = GemRB.GetPlayerStat (pc, IE_LOCKPICKING) + GemRB.GetPlayerStat (pc, IE_PICKPOCKET)
 			elif btnType == ACT_SEARCH:
 				capability = 1 # everyone can try to search
-			elif btnType == ACT_CAST:
-				capability = HasAnyActiveCasterLevel (pc)
-			elif btnType == ACT_BARDSONG:
-				capability = GemRB.GetPlayerLevel (pc, ISBARD)
 			else:
 				print("Unknown action (button) type: ", btnType)
 		else:
@@ -1247,12 +1311,8 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		if not invInfo["HasEquippedAbilities"]:
 			state = IE_GUI_BUTTON_DISABLED
 	elif action == ACT_BARDSONG:
-		if GameCheck.IsIWD2 ():
-			spellType = IE_IWD2_SPELL_SONG
-			if not GemRB.GetKnownSpellsCount (pc, spellType):
-				state = IE_GUI_BUTTON_DISABLED
-			elif modalState == MS_BATTLESONG:
-				state = IE_GUI_BUTTON_SELECTED
+		if not GemRB.GetPlayerLevel (pc, ISBARD):
+			state = IE_GUI_BUTTON_DISABLED
 		elif modalState == MS_BATTLESONG:
 			state = IE_GUI_BUTTON_SELECTED
 	elif action == ACT_TURN:
