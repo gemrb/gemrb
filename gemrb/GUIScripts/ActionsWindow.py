@@ -364,7 +364,7 @@ def SetupWeaponSets ():
 	return
 
 # you can change this for custom skills, this is the original engine
-skillbar = (ACT_STEALTH, ACT_SEARCH, ACT_THIEVING, ACT_WILDERNESS, ACT_TAMING, ACT_USE, ACT_CAST, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE)
+skillbar = (ACT_STEALTH, ACT_SEARCH, ACT_THIEVING, ACT_WILDERNESS, ACT_TAMING, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE)
 def SetupSkillSelection ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	SetupControls (CurrentWindow, pc, ActionBarControlOffset, skillbar)
