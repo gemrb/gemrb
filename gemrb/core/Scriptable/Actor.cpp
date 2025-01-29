@@ -8890,7 +8890,7 @@ int Actor::Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const
 		11, 12, 3, 71, 72, 73, 0, 0, // 0
 		14, 80, 83, 82, 81, 10, 7, 8, // 8
 		0, 0, 0, 0, 2, 15, 4, 9, // 16
-		13, 5, 0, 0, 0, 0, 0, 0 // 24
+		13, 5, 119, 0, 0, 0, 0, 0 // 24
 	};
 
 	if (QslotTranslation && slotindex > 2) {
@@ -8929,7 +8929,9 @@ ieByte Actor::IWD2GemrbQslot(int slotIndex) const
 	//the first three buttons are hardcoded in gemrb
 	//don't mess with them
 	if (QslotTranslation && slotIndex > 2) {
-		if (qslot >= 110) { //quick songs
+		if (qslot == 119) { // yep...
+			qslot = ACT_WILDERNESS;
+		} else if (qslot >= 110) { //quick songs
 			qslot = ACT_IWDQSONG + qslot % 10;
 		} else if (qslot >= 90) { // quick abilities
 			qslot = ACT_IWDQSPEC + qslot % 10;
