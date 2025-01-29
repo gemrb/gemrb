@@ -570,10 +570,21 @@ void Actor::SetCircleSize()
 	SetCircle(anims->GetCircleSize(), oscillationFactor, color, core->GroundCircles[csize][normalIdx], core->GroundCircles[csize][selectedIdx]);
 }
 
-static void ApplyClabEntry(Actor* actor, const ResRef& res, bool remove)
+static void ApplyClabEntry(Actor* actor, const ieVariable& res, bool remove)
 {
-	// what about songs and shapes??
-	int innate = core->HasFeature(GFFlags::HAS_SPELLLIST) ? IE_IWD2_SPELL_INNATE : 0; // others ignore the passed type
+	auto GetClabSpellType = [](const ResRef& spellRef) {
+		if (!core->HasFeature(GFFlags::HAS_SPELLLIST)) return -1;
+		const Spell* spl = gamedata->GetSpell(spellRef, true);
+		if (!spl) return -1;
+		// in iwd2 kits grant a bunch of regular spells as innates, so we need to force their type
+		// shapes have their own spell type, but the spells are marked as innate
+		int spellbookMask = 1 << IE_IWD2_SPELL_INNATE;
+		if (spl->SpellType == IE_SPL_SONG) {
+			spellbookMask = 1 << IE_IWD2_SPELL_SONG;
+		}
+		gamedata->FreeSpell(spl, spellRef, false);
+		return spellbookMask;
+	};
 
 	ResRef clabRef = ResRef(res.begin() + 3);
 	if (res.BeginsWith("AP_")) {
@@ -586,7 +597,7 @@ static void ApplyClabEntry(Actor* actor, const ResRef& res, bool remove)
 		if (remove) {
 			actor->spellbook.RemoveSpell(clabRef);
 		} else {
-			actor->LearnSpell(clabRef, LS_MEMO, 0, 1 << innate);
+			actor->LearnSpell(clabRef, LS_MEMO, GetClabSpellType(clabRef));
 		}
 	} else if (res.BeginsWith("FA_")) { // iwd2 only: innate name strref
 		// memorize these?
