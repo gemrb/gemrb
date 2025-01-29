@@ -1421,8 +1421,8 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 			state = IE_GUI_BUTTON_DISABLED
 	elif action in [ACT_WEAPON1, ACT_WEAPON2, ACT_WEAPON3, ACT_WEAPON4]:
 		realAction = action
-		if GameCheck.IsIWD2 () and pcStats:
-			# pick the selected weapon set instead
+		if GameCheck.IsIWD2 () and pcStats and usedslot in pcStats["QuickWeaponSlots"]:
+			# pick the selected weapon set instead, unless the magic slot is in use
 			realAction = ACT_WEAPON1 + pcStats["QuickWeaponSlots"].index(usedslot)
 		state = SetWeaponButton (btn, realAction, pc, pcStats, invInfo)
 	elif action == ACT_OFFHAND: # only used in iwd2
@@ -1490,6 +1490,7 @@ def SetWeaponButton (btn, action, pc, pcStats, invInfo):
 			slot = weaponSlot + (action - ACT_WEAPON1)
 	else:
 		slot = magicSlot
+		action = ACT_WEAPON1 # avoid oob-ing QuickWeaponHeaders
 
 	item2ResRef = ""
 	if slot == 0xffff:
