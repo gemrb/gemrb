@@ -779,6 +779,10 @@ def ActionBardSongPressed ():
 def ActionSearchPressed ():
 	"""Toggles detect traps."""
 
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_SEARCH)
+		return
+
 	# get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_DETECTTRAPS)
@@ -786,14 +790,28 @@ def ActionSearchPressed ():
 	UpdateActionsWindow ()
 	return
 
+def ActionSearchRightPressed ():
+	if GemRB.GetVar ("ActionLevel") != UAW_SKILLS:
+		StartBarConfiguration ()
+	return
+
 def ActionStealthPressed ():
 	"""Toggles stealth."""
+
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_STEALTH)
+		return
 
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_STEALTH)
 	GemRB.PlaySound ("act_07", CHAN_HITS)
 	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
+	return
+
+def ActionStealthRightPressed ():
+	if GemRB.GetVar ("ActionLevel") != UAW_SKILLS:
+		StartBarConfiguration ()
 	return
 
 def ActionTurnPressed ():
@@ -807,17 +825,35 @@ def ActionTurnPressed ():
 	return
 
 def ActionTamingPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_TAMING)
+		return
+
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SpellCast (pc, -3, 0, "spin108")
 	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
+def ActionTamingRightPressed ():
+	if GemRB.GetVar ("ActionLevel") != UAW_SKILLS:
+		StartBarConfiguration ()
+	return
+
 def ActionWildernessPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_WILDERNESS)
+		return
+
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.ApplyEffect (pc, "Reveal:Tracks", 0, 0)
 	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
+	return
+
+def ActionWildernessRightPressed ():
+	if GemRB.GetVar ("ActionLevel") != UAW_SKILLS:
+		StartBarConfiguration ()
 	return
 
 def ActionDancePressed ():
@@ -946,7 +982,11 @@ def ActionSkillsPressed ():
 	return
 
 def ActionSkillsRightPressed ():
-	StartBarConfiguration ()
+	if GemRB.GetVar ("SettingButtons"):
+		SetActionLevel (UAW_SKILLS)
+		UpdateActionsWindow ()
+	else:
+		StartBarConfiguration ()
 	return
 
 def TypeSpellPressed (spelltype):
@@ -1116,7 +1156,16 @@ def ActionDefendPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND, GA_NO_SELF | GA_NO_ENEMY | GA_NO_HIDDEN)
 
 def ActionThievingPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_THIEVING)
+		return
+
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD | GA_NO_SELF | GA_NO_ENEMY | GA_NO_HIDDEN)
+
+def ActionThievingRightPressed ():
+	if GemRB.GetVar ("ActionLevel") != UAW_SKILLS:
+		StartBarConfiguration ()
+	return
 
 def SetupControls (Window, pc, actionOffset, customBar = None):
 	global fistDrawn
