@@ -660,10 +660,14 @@ def ActionQShapeRightPressed (which):
 	UpdateActionsWindow ()
 
 def ActionQSongPressed (which):
-	SelectBardSong (which) # TODO: verify parameter once we have actionbar customisation
+	SelectBardSong (which)
 	ActionBardSongPressed ()
 
 def ActionQSongRightPressed (which):
+	if GemRB.GetVar ("ActionLevel") != UAW_QSONGS:
+		StartBarConfiguration ()
+		return
+
 	GemRB.SetVar ("QSpell", which)
 	GemRB.SetVar ("TopIndex", 0)
 	SetActionLevel (UAW_QSONGS)
@@ -745,10 +749,17 @@ def SelectBardSong (which):
 	songType = IE_IWD2_SPELL_SONG
 	if GameCheck.IsIWD1 ():
 		songType = IE_SPELL_TYPE_SONG
-	pc = GemRB.GameGetFirstSelectedActor ()
-	songs = Spellbook.GetKnownSpells (pc, songType)
+
 	# "which" is a mashup of the spell index with it's type
 	idx = which % ((1 << songType) * 100)
+	pc = GemRB.GameGetFirstSelectedActor ()
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_IWDQSONG + idx)
+		# also update PCStats->QuickSpells
+		GemRB.SetupQuickSpell (pc, idx, idx, 1 << songType)
+		return
+
+	songs = Spellbook.GetKnownSpells (pc, songType)
 	qsong = songs[idx]['SpellResRef']
 	# the effect needs to be set each tick, so we use FX_DURATION_INSTANT_PERMANENT==1 timing mode
 	# GemRB.SetModalState can also set the spell, but it wouldn't persist
@@ -756,9 +767,16 @@ def SelectBardSong (which):
 
 def ActionBardSongRightPressed ():
 	"""Selects a bardsong."""
-	SetActionLevel (UAW_QSONGS)
-	GemRB.SetVar ("TopIndex", 0)
-	UpdateActionsWindow ()
+
+	# do nothing if only 1 song is known
+	pc = GemRB.GameGetFirstSelectedActor ()
+	if GemRB.GetVar ("SettingButtons") and len(Spellbook.GetKnownSpells (pc, IE_IWD2_SPELL_SONG)) > 1:
+		SetActionLevel (UAW_QSONGS)
+		GemRB.SetVar ("TopIndex", 0)
+		UpdateActionsWindow ()
+	else:
+		StartBarConfiguration ()
+
 	return
 
 def ActionBardSongPressed ():
@@ -1232,13 +1250,19 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 
 		btn.SetSpellIcon (poi, 1, 1, i + 1)
 		memorized = Spellbook.HasSpellinfoSpell (pc, poi)
-		if not memorized:
-			return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
 
 		# sigh, get unshifted value back
 		bookType = pcStats["QuickSpellsBookType"][tmp]
 		if bookType > 0:
 			bookType = bin(pcStats["QuickSpellsBookType"][tmp])[::-1].index("1")
+
+		if bookType == IE_IWD2_SPELL_SONG and modalState == MS_BATTLESONG:
+			return IE_GUI_BUTTON_SELECTED
+		elif bookType == IE_IWD2_SPELL_SONG:
+			return IE_GUI_BUTTON_UNPRESSED
+		if not memorized:
+			return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
+
 		memorizedSpells = Spellbook.GetUsableMemorizedSpells (pc, bookType)
 		memorizedCount = 0
 		for sp in memorizedSpells:
