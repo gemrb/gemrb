@@ -1,6 +1,6 @@
 2DA V1.0
 -1
-           1          2          3          4          TOOLTIP    RESREF
+           ENABLED    PRESSED    SELECTED   DISABLED   TOOLTIP    RESREF
 Stealth    0          1          2          3          41651      SP086
 Thieving   0          1          2          3          41650      SP087
 Cast       *          *          *          *          *          *

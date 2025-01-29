@@ -1,6 +1,6 @@
 2DA V1.0
 100
-           1          2          3          4          TOOLTIP    RESREF     
+           ENABLED    PRESSED    SELECTED   DISABLED   TOOLTIP    RESREF
 Stealth    30         31         32         33         4968       guibtact   
 Thieving   26         27         28         29         4971       guibtact   
 Cast       12         13         52         53         4688       guibtact   
