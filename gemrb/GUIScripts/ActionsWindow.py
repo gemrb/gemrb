@@ -383,7 +383,6 @@ def SetupButtonChoices ():
 	return
 
 def SaveActionButton (actionIdx):
-	GemRB.SetVar ("SettingButtons", 0)
 	pc = GemRB.GameGetFirstSelectedActor ()
 	qslot = GemRB.GetVar ("QuickSlotButton")
 	GemRB.SetupQuickSlot (pc, qslot, actionIdx)
@@ -1557,3 +1556,5 @@ def SetOffHandButton (btn, pc, pcStats, magicSlot, usedSlot, fistSlot):
 
 def SetActionLevel (level):
 	GemRB.SetVar ("ActionLevel", level)
+	if level == UAW_STANDARD:
+		GemRB.SetVar ("SettingButtons", 0)
