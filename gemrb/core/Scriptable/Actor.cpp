@@ -570,12 +570,54 @@ void Actor::SetCircleSize()
 	SetCircle(anims->GetCircleSize(), oscillationFactor, color, core->GroundCircles[csize][normalIdx], core->GroundCircles[csize][selectedIdx]);
 }
 
+static void ApplyClabEntry(Actor* actor, const ResRef& res, bool remove)
+{
+	// what about songs and shapes??
+	int innate = core->HasFeature(GFFlags::HAS_SPELLLIST) ? IE_IWD2_SPELL_INNATE : 0; // others ignore the passed type
+
+	ResRef clabRef = ResRef(res.begin() + 3);
+	if (res.BeginsWith("AP_")) {
+		if (remove) {
+			actor->fxqueue.RemoveAllEffects(clabRef);
+		} else {
+			core->ApplySpell(clabRef, actor, actor, 0);
+		}
+	} else if (res.BeginsWith("GA_")) {
+		if (remove) {
+			actor->spellbook.RemoveSpell(clabRef);
+		} else {
+			actor->LearnSpell(clabRef, LS_MEMO, 0, 1 << innate);
+		}
+	} else if (res.BeginsWith("FA_")) { // iwd2 only: innate name strref
+		// memorize these?
+		// we now learn them just to get the feedback string out
+		if (remove) {
+			actor->fxqueue.RemoveAllEffects(clabRef);
+		} else {
+			actor->LearnSpell(clabRef, LS_MEMO | LS_LEARN, 1 << IE_IWD2_SPELL_INNATE);
+			actor->spellbook.RemoveSpell(clabRef);
+			core->ApplySpell(clabRef, actor, actor, 0);
+		}
+	} else if (res.BeginsWith("FS_")) { // iwd2 only: song name strref (used by unused kits)
+		// don't memorize these?
+		if (remove) {
+			actor->fxqueue.RemoveAllEffects(clabRef);
+		} else {
+			actor->LearnSpell(clabRef, LS_LEARN, 1 << IE_IWD2_SPELL_SONG);
+			actor->spellbook.RemoveSpell(clabRef);
+			core->ApplySpell(clabRef, actor, actor, 0);
+		}
+	} else if (res.BeginsWith("RA_")) { // iwd2 only
+		// remove ability
+		int ability = atoi(res.c_str() + 3);
+		actor->spellbook.RemoveSpell(ability);
+	}
+}
+
 static void ApplyClab_internal(Actor* actor, const ResRef& clab, int level, bool remove, int diff)
 {
 	AutoTable table = gamedata->LoadTable(clab);
 	if (!table) return;
-
-	int innate = core->HasFeature(GFFlags::HAS_SPELLLIST) ? IE_IWD2_SPELL_INNATE : 0; // others ignore the passed type
 
 	TableMgr::index_t row = table->GetRowCount();
 	int maxLevel = level;
@@ -587,43 +629,7 @@ static void ApplyClab_internal(Actor* actor, const ResRef& clab, int level, bool
 			const ieVariable res = table->QueryField(j, i); // not really a variable, we just need a big enough buffer
 			if (IsStar(res)) continue;
 
-			ResRef clabRef = ResRef(res.begin() + 3);
-			if (res.BeginsWith("AP_")) {
-				if (remove) {
-					actor->fxqueue.RemoveAllEffects(clabRef);
-				} else {
-					core->ApplySpell(clabRef, actor, actor, 0);
-				}
-			} else if (res.BeginsWith("GA_")) {
-				if (remove) {
-					actor->spellbook.RemoveSpell(clabRef);
-				} else {
-					actor->LearnSpell(clabRef, LS_MEMO, 0, 1 << innate);
-				}
-			} else if (res.BeginsWith("FA_")) { //iwd2 only: innate name strref
-				//memorize these?
-				// we now learn them just to get the feedback string out
-				if (remove) {
-					actor->fxqueue.RemoveAllEffects(clabRef);
-				} else {
-					actor->LearnSpell(clabRef, LS_MEMO | LS_LEARN, 1 << IE_IWD2_SPELL_INNATE);
-					actor->spellbook.RemoveSpell(clabRef);
-					core->ApplySpell(clabRef, actor, actor, 0);
-				}
-			} else if (res.BeginsWith("FS_")) { //iwd2 only: song name strref (used by unused kits)
-				//don't memorize these?
-				if (remove) {
-					actor->fxqueue.RemoveAllEffects(clabRef);
-				} else {
-					actor->LearnSpell(clabRef, LS_LEARN, 1 << IE_IWD2_SPELL_SONG);
-					actor->spellbook.RemoveSpell(clabRef);
-					core->ApplySpell(clabRef, actor, actor, 0);
-				}
-			} else if (res.BeginsWith("RA_")) { //iwd2 only
-				//remove ability
-				int x = atoi(res.c_str() + 3);
-				actor->spellbook.RemoveSpell(x);
-			}
+			ApplyClabEntry(actor, res, remove);
 		}
 	}
 }
