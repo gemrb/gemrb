@@ -1246,6 +1246,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 
 		poi = pcStats["QuickSpells"][tmp]
 		if poi == "":
+			# unset quick spell slot, just waiting to be used
 			return IE_GUI_BUTTON_FAKEDISABLED
 
 		btn.SetSpellIcon (poi, 1, 1, i + 1)
@@ -1256,9 +1257,9 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		if bookType > 0:
 			bookType = bin(pcStats["QuickSpellsBookType"][tmp])[::-1].index("1")
 
-		if bookType == IE_IWD2_SPELL_SONG and modalState == MS_BATTLESONG:
+		if bookType == 0 and modalState == MS_BATTLESONG: # 1 << IE_IWD2_SPELL_SONG is too big for QuickSpellBookType :(
 			return IE_GUI_BUTTON_SELECTED
-		elif bookType == IE_IWD2_SPELL_SONG:
+		elif bookType == 0:
 			return IE_GUI_BUTTON_UNPRESSED
 		if not memorized:
 			return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
