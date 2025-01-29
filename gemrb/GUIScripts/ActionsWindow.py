@@ -141,7 +141,7 @@ def SelectItemAbility():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	slot = GemRB.GetVar ("Slot")
 	ability = GemRB.GetVar ("Ability")
-	GemRB.SetupQuickItemSlot (pc, 0, slot, ability)
+	GemRB.SetupQuickItemSlot (pc, 0, slot, ability, 0 if GameCheck.IsIWD2 () else 1)
 	SetActionLevel (UAW_STANDARD)
 	return
 
@@ -952,9 +952,15 @@ def ActionQItem5Pressed ():
 def ActionQItemRightPressed (which):
 	"""Selects the used ability of the quick item."""
 
-	GemRB.SetVar ("Slot", which)
-	SetActionLevel (UAW_QITEMS)
-	UpdateActionsWindow ()
+	# iwd2 did not allow for ability selection, but we can be better
+	if GemRB.GetVar ("SettingButtons") or not GameCheck.IsIWD2 ():
+		if GameCheck.IsIWD2 ():
+			which = 15 + which - 19 # the 15 is from slottype.2da, the first inventory quickslot
+		GemRB.SetVar ("Slot", which)
+		SetActionLevel (UAW_QITEMS)
+		UpdateActionsWindow ()
+	else:
+		StartBarConfiguration ()
 	return
 
 def ActionQItem1RightPressed ():

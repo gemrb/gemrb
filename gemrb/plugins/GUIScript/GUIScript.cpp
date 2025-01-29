@@ -10715,7 +10715,7 @@ static PyObject* GemRB_SetupQuickSlot(PyObject* /*self*/, PyObject* args)
 PyDoc_STRVAR(GemRB_SetupQuickItemSlot__doc,
 	     "===== SetupQuickItemSlot =====\n\
 \n\
-**Prototype:** GemRB.SetupQuickItemSlot (PartyID, QuickSlotID, InventorySlot[, AbilityIndex])\n\
+**Prototype:** GemRB.SetupQuickItemSlot (PartyID, QuickSlotID, InventorySlot[, AbilityIndex=0, Translation=1])\n\
 \n\
 **Description:** Sets up a quick item or weapon slot to point to a particular \n\
 inventory slot. Also sets the used ability for that given quickslot. \n\
@@ -10732,6 +10732,7 @@ by the InventorySlot, and assign the AbilityIndex to it. \n\
   * InventorySlot - the inventory slot assigned to this quickslot, this is\n\
 usually constant and taken care by the core\n\
   * AbilityIndex  - the number of the item extended header to use with this quickslot\n\
+  * Translation   - whether the slot needs an extra lookup in slottypes.2da\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -10744,12 +10745,15 @@ static PyObject* GemRB_SetupQuickItemSlot(PyObject* /*self*/, PyObject* args)
 	int qslotID;
 	ieWord slot;
 	ieWord headerIndex = 0;
-	PARSE_ARGS(args, "iiH|H", &globalID, &qslotID, &slot, &headerIndex);
+	int translation = 1;
+	PARSE_ARGS(args, "iiH|Hi", &globalID, &qslotID, &slot, &headerIndex, &translation);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	slot = static_cast<ieWord>(core->QuerySlot(slot));
+	if (translation) {
+		slot = static_cast<ieWord>(core->QuerySlot(slot));
+	}
 	// recache info for potentially changed ammo or weapon ability
 	actor->inventory.SetEquipped(static_cast<ieWordSigned>(actor->inventory.GetEquipped()), headerIndex); // reset EquippedHeader
 	actor->SetupQuickSlot(qslotID, slot, headerIndex);
