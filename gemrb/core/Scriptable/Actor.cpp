@@ -8919,7 +8919,9 @@ int Actor::Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const
 	};
 
 	if (QslotTranslation && slotindex > 2) {
-		if (actslot >= ACT_IWDQSONG) { // quick songs
+		if (actslot == ACT_NONE) {
+			actslot = ACT_NONE; // do nothing
+		} else if (actslot >= ACT_IWDQSONG) { // quick songs
 			actslot = 110 + actslot % 10;
 		} else if (actslot >= ACT_IWDQSPEC) { // quick abilities
 			actslot = 90 + actslot % 10;
@@ -8956,6 +8958,8 @@ ieByte Actor::IWD2GemrbQslot(int slotIndex) const
 	if (QslotTranslation && slotIndex > 2) {
 		if (qslot == 119) { // yep...
 			qslot = ACT_WILDERNESS;
+		} else if (qslot == ACT_NONE) {
+			qslot = ACT_NONE;
 		} else if (qslot >= 110) { //quick songs
 			qslot = ACT_IWDQSONG + qslot % 10;
 		} else if (qslot >= 90) { // quick abilities

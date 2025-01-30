@@ -10381,6 +10381,16 @@ static PyObject* SetActionIcon(Button* btn, PyObject* dict, int Index, int Funct
 	}
 	ABORT_IF_NULL(btn);
 
+	// for customization we need to preserve the original button's value / place
+	// and we need to do this even for imageless buttons, so in iwd2 the empty
+	// action bar buttons can be properly configured
+	ieDword customizationState = core->GetDictionary().Get("SettingButtons", 0);
+	if (customizationState == 0) {
+		btn->BindDictVariable("QuickSlotButton", Function - 1);
+	} else {
+		btn->BindDictVariable("SecondLevelActionButton", btn->GetValue());
+	}
+
 	if (Index < 0) {
 		btn->SetImage(ButtonImage::None, nullptr);
 		btn->SetAction(nullptr, Control::Click, GEM_MB_ACTION, 0, 1);
@@ -10420,13 +10430,6 @@ static PyObject* SetActionIcon(Button* btn, PyObject* dict, int Index, int Funct
 	}
 
 	btn->SetHotKey(GEM_FUNCTIONX(Function), 0, true);
-	// for customization we need to preserve the original button's value / place
-	ieDword customizationState = core->GetDictionary().Get("SettingButtons", 0);
-	if (customizationState == 0) {
-		btn->BindDictVariable("QuickSlotButton", Function - 1);
-	} else {
-		btn->BindDictVariable("SecondLevelActionButton", btn->GetValue());
-	}
 
 	//no incref
 	return Py_None;

@@ -1164,6 +1164,14 @@ def EquipmentPressed ():
 	UpdateActionsWindow ()
 	return
 
+def ActionClearPressed ():
+	SaveActionButton (ACT_NONE)
+	return
+
+def EmptiedButtonRightPress ():
+	StartBarConfiguration ()
+	return
+
 def ActionStopPressed ():
 	for i in GemRB.GetSelectedActors():
 		GemRB.ClearActions (i)
@@ -1208,11 +1216,12 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 			raise RuntimeError("Missing action buttons!")
 
 		action = actionRow[i]
+		action2 = action
 		if action == ACT_NONE:
-			action = -1
+			action2 = -1
 
 		btn.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
-		ret = btn.SetActionIcon (globals(), action, i + 1)
+		ret = btn.SetActionIcon (globals(), action2, i + 1)
 		if ret is not None:
 			raise RuntimeError("Cannot set action button {} to {}!".format(i, action))
 
@@ -1385,6 +1394,9 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		# returns true if there is ANY shape
 		if len(GemRB.GetSpelldata (pc, spellType)) == 0:
 			state = IE_GUI_BUTTON_DISABLED
+	elif action == ACT_NONE:
+		btn.OnRightPress (EmptiedButtonRightPress)
+		state = IE_GUI_BUTTON_FAKEDISABLED
 	elif action == ACT_USE:
 		# returns true if there is ANY equipment with a usable header
 		if not invInfo["HasEquippedAbilities"]:
