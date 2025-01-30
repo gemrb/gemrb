@@ -1082,11 +1082,7 @@ def SpellShiftPressed ():
 		CureOrHarm = 0
 
 	# get the unshifted booktype
-	BaseType = 0
-	tmp = Type
-	while tmp > 1:
-		tmp = tmp >> 1
-		BaseType += 1
+	BaseType = UnshiftBookType (Type)
 
 	# figure out the spell's details
 	# TODO: find a simpler way
@@ -1276,7 +1272,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		# sigh, get unshifted value back
 		bookType = pcStats["QuickSpellsBookType"][tmp]
 		if bookType > 0:
-			bookType = bin(pcStats["QuickSpellsBookType"][tmp])[::-1].index("1")
+			bookType = UnshiftBookType (bookType)
 
 		if bookType == 0 and modalState == MS_BATTLESONG: # 1 << IE_IWD2_SPELL_SONG is too big for QuickSpellBookType :(
 			return IE_GUI_BUTTON_SELECTED
@@ -1578,3 +1574,6 @@ def SetActionLevel (level):
 	GemRB.SetVar ("ActionLevel", level)
 	if level == UAW_STANDARD:
 		GemRB.SetVar ("SettingButtons", 0)
+
+def UnshiftBookType (bookType):
+	return bin(bookType)[::-1].index("1")
