@@ -10701,7 +10701,7 @@ default any more. This is only used in iwd2.\n\
 \n\
 **Parameters:**\n\
   * globalID - the PC's position in the party (1 based) or global ID\n\
-  * quickSlotID - the quickslot (button) to set up (0-11)\n\
+  * quickSlotID - the quickslot (button) to set up (0-11) or -1 to revert all to class defaults\n\
   * actionID - the actionbar action id to assign to this quickslot\n\
 \n\
 **Return value:** N/A\n\
@@ -10721,6 +10721,8 @@ static PyObject* GemRB_SetupQuickSlot(PyObject* /*self*/, PyObject* args)
 
 	if (!actor->PCStats) {
 		RuntimeError(fmt::format("{} is not a creature with a custom action bar!", fmt::WideToChar { actor->GetName() }));
+	} else if (qslotID == -1) {
+		actor->InitButtons(actor->GetActiveClass(), true);
 	} else if (qslotID < 0 || qslotID > 11) {
 		RuntimeError("Quick slot ID should be between 0-11!");
 	} else {

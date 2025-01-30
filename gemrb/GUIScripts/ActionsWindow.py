@@ -1168,6 +1168,13 @@ def ActionClearPressed ():
 	SaveActionButton (ACT_NONE)
 	return
 
+def ActionRestorePressed ():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetupQuickSlot (pc, -1, 0)
+	SetActionLevel (UAW_STANDARD)
+	UpdateActionsWindow ()
+	return
+
 def EmptiedButtonRightPress ():
 	StartBarConfiguration ()
 	return
