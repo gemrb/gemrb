@@ -387,7 +387,7 @@ int Game::LeaveParty(Actor* actor, bool returnCriticalItems)
 	}
 	actor->SetBase(IE_EA, EA_NEUTRAL);
 	// bgs also gave away any IE_ITEM_CRITICAL items, but not if the actor was kicked out?!
-	if (returnCriticalItems && core->HasFeature(GFFlags::HEAL_ON_100PLUS)) { // TODO: change to !SELLABLE_CRITS_NO_CONV once that is merged
+	if (returnCriticalItems && core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
 		slot = actor->inventory.FindItem("", IE_INV_ITEM_CRITICAL);
 		while (slot != -1) {
 			const CREItem* si = actor->inventory.GetSlotItem(slot);
