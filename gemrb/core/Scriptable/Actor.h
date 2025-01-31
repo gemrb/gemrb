@@ -899,7 +899,6 @@ public:
 	/* converts the iwd2 qslot index to our internal representation */
 	ieByte IWD2GemrbQslot(int slotindex) const;
 	int Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const;
-	void dumpQSlots() const;
 
 	/* Handling automatic stance changes */
 	bool HandleActorStance();
