@@ -2297,6 +2297,7 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 			config.Height = 0.75 * config.Width;
 		}
 	}
+	Log(MESSAGE, "Core", "Using resolution {}x{}", config.Width, config.Height);
 	return true;
 }
 
