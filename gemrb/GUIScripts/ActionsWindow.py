@@ -908,6 +908,9 @@ def ActionCastPressed ():
 	return
 
 def StartBarConfiguration ():
+	if not GameCheck.IsIWD2 ():
+		return # oops
+
 	SetActionLevel (UAW_CONFIGUREBAR)
 	UpdateActionsWindow ()
 	return
