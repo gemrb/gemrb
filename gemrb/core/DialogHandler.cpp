@@ -453,10 +453,12 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		return false;
 	}
 
-	if (tgta) {
+	if (target) {
 		// displaying npc text and portrait
-		Holder<Sprite2D> portrait = tgta->CopyPortrait(1);
-		ta->SetSpeakerPicture(std::move(portrait));
+		if (tgta) {
+			Holder<Sprite2D> portrait = tgta->CopyPortrait(1);
+			ta->SetSpeakerPicture(std::move(portrait));
+		}
 		ta->AppendText(u"\n");
 		displaymsg->DisplayStringName(ds->StrRef, GUIColors::DIALOG, target, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 	}
