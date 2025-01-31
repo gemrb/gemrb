@@ -291,7 +291,8 @@ void MUSImporter::PlayMusic(const ieVariable& name)
 
 bool MUSImporter::IsCurrentPlayList(const ieVariable& name)
 {
-	return name == PLName;
+	// ignore .mus
+	return name.BeginsWith(PLName) && name.length() - 4 == PLName.length();
 }
 
 #include "plugindef.h"
