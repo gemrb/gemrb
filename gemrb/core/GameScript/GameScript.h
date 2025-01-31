@@ -487,6 +487,7 @@ extern void ScriptDebugLog(DebugMode bit, const char* message, ARGS&&... args)
 }
 extern int RandomNumValue;
 extern int NextTriggerObjectID;
+extern unsigned int MAX_OPERATING_DISTANCE;
 
 class GEM_EXPORT GameScript {
 public:

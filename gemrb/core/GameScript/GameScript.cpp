@@ -65,6 +65,11 @@ namespace GemRB {
 // 8 - action execution
 //16 - trigger evaluation
 
+// test cases: tob pp summoning spirit, pst portals, pst AR0405, AR0508, ar0500 (guards through gates)
+// it's about 3 times bigger in pst, perhaps related to the bigger sprite sizes and we modify it in Scriptable
+// The distance of operating a trigger, container, dialog buffer etc.
+unsigned int MAX_OPERATING_DISTANCE = 40; // a search square is 16x12 (diagonal of 20), so that's about two
+
 //Make this an ordered list, so we could use bsearch!
 static const TriggerLink triggernames[] = {
 	{ "actionlistempty", GameScript::ActionListEmpty, 0 },
@@ -1736,7 +1741,6 @@ void InitializeIEScript()
 	NoCreate = core->HasFeature(GFFlags::NO_NEW_VARIABLES);
 	HasKaputz = core->HasFeature(GFFlags::HAS_KAPUTZ);
 
-	// see note in voodooconst.h
 	if (core->HasFeature(GFFlags::AREA_OVERRIDE)) {
 		MAX_OPERATING_DISTANCE = 40 * 3;
 	}
