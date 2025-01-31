@@ -365,6 +365,10 @@ int Game::LeaveParty(Actor* actor, bool returnCriticalItems)
 	if (selected.empty()) {
 		SelectActor(PCs[0], true, SELECT_NORMAL);
 	}
+	// same for the screens
+	if (!GetSelectedPCSingle(false)) {
+		SelectPCSingle(1);
+	}
 
 	for (const auto& pc : PCs) {
 		if (pc->InParty > actor->InParty) {
