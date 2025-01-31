@@ -153,7 +153,7 @@ def UpdateInventoryWindow (Window):
 	Count = Container['ItemCount']
 	if Count<1:
 		Count=1
-	ScrollBar.SetVarAssoc ("TopIndex", Count)
+	ScrollBar.SetVarAssoc ("TopIndex", max(0, (Count - 10 + 1) // 2))
 	RefreshInventoryWindow (Window)
 
 	# PST uses unhardcoded/avslots.2da to decide which slots do what per character
