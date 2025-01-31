@@ -842,7 +842,7 @@ void IniSpawn::InitialSpawn()
 			Actor* pc = game->GetPC(1, false); // skip TNO
 			pc->Stop();
 			MoveBetweenAreasCore(pc, PartySpawnArea, PartySpawnPoint, -1, true);
-			game->LeaveParty(pc);
+			game->LeaveParty(pc, false);
 		}
 	}
 }
