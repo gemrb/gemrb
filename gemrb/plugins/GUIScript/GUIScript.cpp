@@ -8347,7 +8347,7 @@ PyDoc_STRVAR(GemRB_GetSpelldata__doc,
 \n\
 **Parameters:**\n\
   * globalID - global ID of the actor to use\n\
-  * type - spell(book) type (255 means any)\n\
+  * type - spell(book) type (2047 means any)\n\
 \n\
 **Return value:** tuple of spell resresfs\n\
 ");
@@ -8355,7 +8355,7 @@ PyDoc_STRVAR(GemRB_GetSpelldata__doc,
 static PyObject* GemRB_GetSpelldata(PyObject* /*self*/, PyObject* args)
 {
 	unsigned int globalID;
-	int type = 255;
+	int type = 2047;
 	PARSE_ARGS(args, "i|i", &globalID, &type);
 
 	GET_GAME();
