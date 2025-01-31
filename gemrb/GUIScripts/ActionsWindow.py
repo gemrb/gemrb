@@ -1343,6 +1343,8 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 			btn.EnableBorder(1, True)
 			return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
 
+		if GameCheck.IsIWD2 () and bookType == 0:
+			bookType = IE_IWD2_SPELL_INNATE
 		memorizedSpells = Spellbook.GetUsableMemorizedSpells (pc, bookType)
 		memorizedCount = 0
 		for sp in memorizedSpells:
