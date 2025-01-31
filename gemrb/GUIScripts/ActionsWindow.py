@@ -460,7 +460,7 @@ def UpdateActionsWindow ():
 			GroupControls ()
 			return
 
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = GemRB.GetVar ("TopIndex") or 0
 	if level == UAW_STANDARD:
 		# this is based on class
 		# cleric/thief wants 13 icons, so we push the extra under innates (original did picking, we do turning)
