@@ -1303,7 +1303,9 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 		btn.SetState (state)
 		# you have to set this overlay up
 		# this state check looks bizarre, but without it most buttons get misrendered
-		btn.EnableBorder (1, state == IE_GUI_BUTTON_DISABLED)
+		# but let various quick spells handle this themselves
+		if action < ACT_IWDQSPELL and not action in [ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3]:
+			btn.EnableBorder (1, state == IE_GUI_BUTTON_DISABLED)
 
 def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 	global fistDrawn
@@ -1331,11 +1333,14 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		if bookType > 0:
 			bookType = UnshiftBookType (bookType)
 
-		if bookType == 0 and modalState == MS_BATTLESONG: # 1 << IE_IWD2_SPELL_SONG is too big for QuickSpellBookType :(
+		# 1 << IE_IWD2_SPELL_SONG is too big for QuickSpellBookType :(
+		# unfortunately so is 1 << IE_IWD2_SPELL_INNATE, so we can't distinguish them
+		if bookType == 0 and modalState == MS_BATTLESONG:
 			return IE_GUI_BUTTON_SELECTED
-		elif bookType == 0:
-			return IE_GUI_BUTTON_UNPRESSED
-		if not memorized:
+		if memorized:
+			btn.EnableBorder(1, False)
+		else:
+			btn.EnableBorder(1, True)
 			return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
 
 		memorizedSpells = Spellbook.GetUsableMemorizedSpells (pc, bookType)
