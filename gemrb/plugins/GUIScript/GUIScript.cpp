@@ -8349,7 +8349,7 @@ PyDoc_STRVAR(GemRB_GetSpelldata__doc,
   * globalID - global ID of the actor to use\n\
   * type - spell(book) type (2047 means any)\n\
 \n\
-**Return value:** tuple of spell resresfs\n\
+**Return value:** tuple of uppercase spell resresfs\n\
 ");
 
 static PyObject* GemRB_GetSpelldata(PyObject* /*self*/, PyObject* args)
@@ -8366,6 +8366,7 @@ static PyObject* GemRB_GetSpelldata(PyObject* /*self*/, PyObject* args)
 	PyObject* spell_list = PyTuple_New(count);
 	for (int i = 0; i < count; i++) {
 		actor->spellbook.GetSpellInfo(&spelldata, type, i, 1);
+		StringToUpper(spelldata.spellName);
 		PyTuple_SetItem(spell_list, i, PyString_FromResRef(spelldata.spellName));
 	}
 	return spell_list;
