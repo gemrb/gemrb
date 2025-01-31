@@ -1318,7 +1318,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		if not pcStats:
 			return IE_GUI_BUTTON_DISABLED
 
-		poi = pcStats["QuickSpells"][tmp]
+		poi = pcStats["QuickSpells"][tmp].upper()
 		if poi == "":
 			# unset quick spell slot, just waiting to be used
 			return IE_GUI_BUTTON_FAKEDISABLED
