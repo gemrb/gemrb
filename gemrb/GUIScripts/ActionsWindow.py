@@ -379,7 +379,6 @@ def SetupButtonChoices ():
 	GemRB.SetVar ("SettingButtons", 1)
 	pc = GemRB.GameGetFirstSelectedActor ()
 	SetupControls (CurrentWindow, pc, ActionBarControlOffset, customizationBar)
-	GemRB.SetVar ("SettingButtons", 2)
 	return
 
 def SaveActionButton (actionIdx):
@@ -606,10 +605,13 @@ def ActionQSpellPressed (which):
 	return
 
 def ActionQSpellRightPressed (which):
-	GemRB.SetVar ("QSpell", which)
-	GemRB.SetVar ("TopIndex", 0)
-	SetActionLevel (UAW_QSPELLS)
-	UpdateActionsWindow ()
+	if GameCheck.IsIWD2 ():
+		StartBarConfiguration ()
+	else:
+		GemRB.SetVar ("QSpell", which)
+		GemRB.SetVar ("TopIndex", 0)
+		SetActionLevel (UAW_QSPELLS)
+		UpdateActionsWindow ()
 	return
 
 suf = ["", "Right"]
@@ -916,6 +918,11 @@ def StartBarConfiguration ():
 	return
 
 def ActionCastRightPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SetActionLevel (UAW_SPELLS)
+		UpdateActionsWindow ()
+		return
+
 	StartBarConfiguration ()
 	return
 
@@ -1015,47 +1022,48 @@ def ActionSkillsRightPressed ():
 		StartBarConfiguration ()
 	return
 
-def TypeSpellPressed (spelltype):
-	GemRB.SetVar ("Type", 1 << spelltype)
+# the iwd2 spell types work nicely as indices up to domain spells
+# e.g. IE_IWD2_SPELL_BARD = 0 -> ACT_BARD = 40 ... IE_IWD2_SPELL_DOMAIN = 7 -> ACT_DOMAIN = 47
+# BUT IE_IWD2_SPELL_INNATE = 8 -> ACT_INNATE=13
+# songs and shapes we skip; the former are configurable through bardsong, the latter are innates
+def TypeSpellPressed (spellType):
+	if GemRB.GetVar ("SettingButtons"):
+		if spellType <= IE_IWD2_SPELL_DOMAIN:
+			actionType = spellType + ACT_BARD
+		else:
+			actionType = ACT_INNATE
+		SaveActionButton (actionType)
+		return
+
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("Type", 1 << spellType)
 	SetActionLevel (UAW_BOOK)
 	UpdateActionsWindow ()
 	return
 
-def ActionBardSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_BARD)
+def TypeSpellRightPressed (spellType):
+	if GemRB.GetVar ("SettingButtons"):
+		GemRB.SetVar ("TopIndex", 0)
+		GemRB.SetVar ("Type", 1 << spellType)
+		SetActionLevel (UAW_BOOK)
+		UpdateActionsWindow ()
+	else:
+		StartBarConfiguration ()
 	return
 
-def ActionClericSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_CLERIC)
-	return
+# generate the callbacks for individual spellbook buttons
+# innates have their own button, so no need to complicate matters by adding them here
+name2BookType = { "Bard": IE_IWD2_SPELL_BARD, "Cleric": IE_IWD2_SPELL_CLERIC, "Druid": IE_IWD2_SPELL_DRUID,
+								 "Paladin": IE_IWD2_SPELL_PALADIN, "Ranger": IE_IWD2_SPELL_RANGER, "Sorcerer": IE_IWD2_SPELL_SORCERER,
+								 "Wizard": IE_IWD2_SPELL_WIZARD, "Domain": IE_IWD2_SPELL_DOMAIN, "WildShapes": IE_IWD2_SPELL_SHAPE }
+def GenerateSpellButtonActions(name, g, bookType, right = 0):
+	dec = "def Action" + name + "Spell" + suf[right] + "Pressed():\n"
+	dec += "\tTypeSpell" + suf[right] + "Pressed(" + str(bookType) + ")"
+	exec(dec, g) # pass on the same global dict, so we remain in the top scope
 
-def ActionDruidSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_DRUID)
-	return
-
-def ActionPaladinSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_PALADIN)
-	return
-
-def ActionRangerSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_RANGER)
-	return
-
-def ActionSorcererSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_SORCERER)
-	return
-
-def ActionWizardSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_WIZARD)
-	return
-
-def ActionDomainSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_DOMAIN)
-	return
-
-def ActionWildShapesPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_SHAPE)
-	return
+for name, bookType in name2BookType.items():
+	GenerateSpellButtonActions(name, globals(), bookType)
+	GenerateSpellButtonActions(name, globals(), bookType, 1)
 
 def SpellShiftPressed ():
 	Spell = GemRB.GetVar ("Spell") # spellindex from spellbook jumbled with booktype
@@ -1125,20 +1133,28 @@ def SpellPressed ():
 		ActionBardSongPressed()
 		return
 
-	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
+	Target = None
 	if Type != -1:
 		Type = Spell // 1000
 	Spell = Spell % 1000
 	slot = GemRB.GetVar ("QSpell")
+	if GemRB.GetVar ("SettingButtons"):
+		slot = GemRB.GetVar ("QuickSlotButton") - 3 # 12 buttons, 9 quickspells, first 3 buttons hardcoded
 	if slot is not None:
 		# setup quickspell slot
 		# if spell has no target, return
 		# otherwise continue with casting
 		Target = GemRB.SetupQuickSpell (pc, slot, Spell, Type)
-		# sabotage the immediate casting of self targeting spells
-		if Target == 5 or Target == 7:
-			Type = -1
-			GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
+
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_IWDQSPELL + slot)
+		return
+
+	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
+	# sabotage the immediate casting of self targeting spells
+	if Target == 5 or Target == 7:
+		Type = -1
+		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
 	if Type==-1:
 		SetActionLevel (UAW_STANDARD)
