@@ -898,7 +898,7 @@ def InitStoreRentWindow (Window):
 	# room types
 	RentIndex = -1
 	for i in range (4):
-		ok = Store['StoreRoomPrices'][i]
+		ok = Store['StoreRoomPrices'][i] or 0
 		if ok >= 0:
 			RentIndex = i
 			break
@@ -944,7 +944,7 @@ def UpdateStoreRentWindow (Window):
 	if RentIndex is not None:
 		TextArea = Window.GetControlAlias ('RENTTA')
 		TextArea.SetText (roomdesc[RentIndex])
-		price = Store['StoreRoomPrices'][RentIndex]
+		price = Store['StoreRoomPrices'][RentIndex] or 0
 		Label.SetText (str(price) )
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -1931,7 +1931,7 @@ def GulpDrink (btn):
 
 def RentConfirm (Window0):
 	RentIndex = GemRB.GetVar ("RentIndex")
-	price = Store['StoreRoomPrices'][RentIndex]
+	price = Store['StoreRoomPrices'][RentIndex] or 0
 	Gold = GemRB.GameGetPartyGold ()
 	GemRB.GameSetPartyGold (Gold-price)
 	RestTable = GemRB.LoadTable ("restheal")
@@ -1962,7 +1962,7 @@ def RentRoom ():
 	global RentConfirmWindow
 
 	RentIndex = GemRB.GetVar ("RentIndex")
-	price = Store['StoreRoomPrices'][RentIndex]
+	price = Store['StoreRoomPrices'][RentIndex] or 0
 	Gold = GemRB.GameGetPartyGold ()
 	if Gold<price:
 		ErrorWindow (strrefs['roomtoocostly'])
