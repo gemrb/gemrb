@@ -272,13 +272,16 @@ def OpenSpellBookSpellInfoWindow (btn, spellIdx = None):
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = GemRB.GetVar("SpellBookSpellLevel")
-	BookType = GetBookType(pc)
 
 	if btn.VarName == "Memorized":
 		idx = spellIdx if (spellIdx is not None) else btn.Value
+		BookType = GetBookType(pc)
 		ms = GemRB.GetMemorizedSpell (pc, BookType, level, idx)
 		ResRef = ms['SpellResRef']
+	elif btn.VarName == "ActionBar":
+		ResRef = btn.SpellRef
 	else:
+		BookType = GetBookType(pc)
 		known = KnownSpellList(pc, BookType, level)
 		ResRef = known[btn.Value]["SpellResRef"]
 	spell = GemRB.GetSpell (ResRef)

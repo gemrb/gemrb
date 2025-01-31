@@ -1149,6 +1149,34 @@ def SpellPressed ():
 	UpdateActionsWindow ()
 	return
 
+def SpellRightPressed ():
+	spell = GemRB.GetVar ("Spell")
+	bookType = GemRB.GetVar ("Type")
+	if bookType == -1:
+		return
+	bookType = UnshiftBookType (spell // 1000)
+
+	pc = GemRB.GameGetFirstSelectedActor ()
+	memorized = Spellbook.GetUsableMemorizedSpells(pc, bookType)
+	for mem in memorized:
+		if mem["SpellIndex"] == spell:
+			spellRef = mem["SpellResRef"]
+			break
+	else:
+		return
+
+	if GameCheck.IsIWD2 ():
+		# fake a button
+		btn = lambda: None
+		btn.VarName = "ActionBar"
+		btn.SpellRef = spellRef
+		import GUISPL
+		GUISPL.OpenSpellBookSpellInfoWindow (btn)
+	else:
+		import GUIMG
+		spell = GemRB.GetSpell (spellRef)
+		GUIMG.OpenMageSpellInfoWindow (spell, "Memorized")
+
 def EquipmentPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 
