@@ -640,9 +640,10 @@ def PortraitButtonOnShiftPress (btn):
 def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
 	from PortraitWindow import UpdatePortraitWindow
+	import ActionsWindow
 
 	# FIXME: hack. If defined, display single selection
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	ActionsWindow.SetActionLevel (UAW_STANDARD)
 	if (not SelectionChangeHandler):
 		import ActionsWindow
 		ActionsWindow.UpdateActionsWindow ()
