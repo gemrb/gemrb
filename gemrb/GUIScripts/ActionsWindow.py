@@ -646,10 +646,13 @@ def ActionQSpecPressed (which):
 	ActionQSpellPressed (which)
 
 def ActionQSpecRightPressed (which):
-	GemRB.SetVar ("QSpell", which)
-	GemRB.SetVar ("TopIndex", 0)
-	SetActionLevel (UAW_INNATES)
-	UpdateActionsWindow ()
+	if GameCheck.IsIWD2 ():
+		StartBarConfiguration ()
+	else:
+		GemRB.SetVar ("QSpell", which)
+		GemRB.SetVar ("TopIndex", 0)
+		SetActionLevel (UAW_INNATES)
+		UpdateActionsWindow ()
 
 def ActionQShapePressed (which):
 	ActionQSpellPressed (which)
@@ -1001,7 +1004,14 @@ def ActionInnatePressed ():
 	return
 
 def ActionInnateRightPressed ():
-	StartBarConfiguration ()
+	if GemRB.GetVar ("ActionLevel") == UAW_STANDARD:
+		StartBarConfiguration ()
+		return
+
+	GemRB.SetVar ("QSpell", -1)
+	GemRB.SetVar ("TopIndex", 0)
+	SetActionLevel (UAW_INNATES)
+	UpdateActionsWindow ()
 	return
 
 def ActionSkillsPressed ():
