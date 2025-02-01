@@ -518,6 +518,7 @@ def FloatMenuSelectWeapons ():
 
 def FloatMenuSelectItems ():
 	ResetMenuState (MENU_MODE_ITEMS)
+	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	UpdateFloatMenuWindow ()
 	return
 
