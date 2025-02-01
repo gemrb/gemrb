@@ -196,7 +196,7 @@ SF_CENTERONACTOR     = 0
 SF_ALWAYSCENTER      = 1
 
 # GameControltarget modes
-# !!! Keep these synchronized with GameControl.h !!!
+# !!! Keep these synchronized with GameControlDefs.h !!!
 TARGET_MODE_NONE    = 0
 TARGET_MODE_TALK    = 1
 TARGET_MODE_ATTACK  = 2
