@@ -255,6 +255,8 @@ def UpdateFloatMenuWindow ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 
 	Button = Window.GetControl (CID_PORTRAIT)
+	if not Button:
+		return
 	Button.SetSprites (GUICommonWindows.GetActorPortrait (pc, 'FMENU'), 0, 0, 1, 2, 3)
 	Button = Window.GetControl (CID_PREV)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
