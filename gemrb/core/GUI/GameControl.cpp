@@ -2220,18 +2220,24 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			return false;
 		}
 
+		bool alreadyActed = false;
 		if (overMe && (overMe->Type == ST_DOOR || overMe->Type == ST_CONTAINER || (overMe->Type == ST_TRAVEL && targetMode == TargetMode::None))) {
 			// move to the object before trying to interact with it
+			// except for pst worldmapping purposes, where we need Actor::UsedExit to be called sooner
 			Actor* mainActor = GetMainSelectedActor();
 			if (mainActor && overMe->Type != ST_TRAVEL) {
 				CreateMovement(mainActor, p, false, tryToRun); // let one actor handle doors, loot and containers
 			} else {
+				if (core->HasFeature(GFFlags::TEAM_MOVEMENT) && overMe && overMe->Type == ST_TRAVEL && targetMode == TargetMode::None) {
+					PerformSelectedAction(p);
+					alreadyActed = true;
+				}
 				CommandSelectedMovement(p, overMe->Type != ST_TRAVEL, false, tryToRun);
 			}
 		}
 
 		if (targetMode != TargetMode::None || (overMe && overMe->Type != ST_ACTOR)) {
-			PerformSelectedAction(p);
+			if (!alreadyActed) PerformSelectedAction(p);
 			ClearMouseState();
 			return true;
 		}
