@@ -5356,7 +5356,11 @@ int fx_poison_resistance_modifier(Scriptable* /*Owner*/, Actor* target, Effect* 
 {
 	// this is a gemrb extension, the original only supported flat setting of this resistance
 	// ... up until EE version 2.5, where it started always incrementing
-	STAT_MOD(IE_RESISTPOISON);
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		target->NewStat(IE_RESISTPOISON, fx->Parameter1, MOD_ADDITIVE);
+	} else {
+		STAT_MOD(IE_RESISTPOISON);
+	}
 	return FX_APPLIED;
 }
 
