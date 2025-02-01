@@ -5387,7 +5387,8 @@ void Actor::Resurrect(const Point& destPoint)
 	}
 
 	ResetCommentTime();
-	//clear effects?
+	// clear effects? If we get resurrected in a new area, equipping effects would get
+	// reapplied, but we dumped the inventory anyway (and TNO is handled in IniSpawn)
 }
 
 static const std::string& GetVarName(const ResRef& table, int value)
