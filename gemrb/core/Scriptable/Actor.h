@@ -554,6 +554,7 @@ private:
 	int walkScale = 0;
 	// true when command has been played after select
 	bool playedCommandSound = false;
+	ResRef deadArea;
 
 	//trap we're trying to disarm
 	ieDword disarmTrap = 0;

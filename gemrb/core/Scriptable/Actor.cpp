@@ -5348,6 +5348,7 @@ void Actor::Resurrect(const Point& destPoint)
 	BaseStats[IE_GENERAL] = GEN_HUMANOID;
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_AVATARREMOVAL, 0);
+	deadArea.Reset();
 	if (!destPoint.IsZero()) {
 		SetPosition(destPoint, true);
 	}
@@ -5788,7 +5789,7 @@ bool Actor::CheckOnDeath()
 	// FIXME: even when chunking? Consider changing and adding fx_replace_creature-like handling
 	if (Persistent()) {
 		// hide the corpse artificially
-		SetBase(IE_AVATARREMOVAL, 1);
+		deadArea = AreaName;
 		return false;
 	}
 
@@ -8485,7 +8486,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 {
 	// if an actor isn't visible, should we still draw video cells?
 	// let us assume not, for now..
-	if (!(InternalFlags & IF_VISIBLE)) {
+	if (!(InternalFlags & IF_VISIBLE) || (!deadArea.IsEmpty() && deadArea != AreaName)) {
 		return;
 	}
 
