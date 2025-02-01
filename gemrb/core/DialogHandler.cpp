@@ -272,21 +272,10 @@ void DialogHandler::DialogChooseInitial(Scriptable* target, Actor* tgta) const
 	// needs to end before final actions are executed due to
 	// actions making new dialogs!
 	// should we just queue dialog actions in front instead?
-	// for now clear only if any state potentially has actions at all
-	// ar6100 61izbela.bcs needs it to reenable the area exit
+	// iwd2 didn't clear actions at all, unlike other games (confirmed bg2, bg2ee)
+	// ar6100 61izbela.bcs needs it skipped to reenable the area exit
 	// a shallow check is not enough as demonstrated by the rowing fire elementals not starting their play
-	bool payload = true;
-	if (core->HasFeature(GFFlags::RULES_3ED)) {
-		payload = false;
-		for (const auto& dst : dlg->initialStates) {
-			for (const auto& transition : dst->transitions) {
-				if (!transition->actions.empty()) {
-					payload = true;
-					break;
-				}
-			}
-		}
-	}
+	bool payload = !core->HasFeature(GFFlags::RULES_3ED);
 	if (payload && !(target->GetInternalFlag() & IF_NOINT)) {
 		target->Stop();
 	}
