@@ -281,7 +281,6 @@ public:
 	//left hand
 	int GetShieldSlot() const;
 	void AddSlotEffects(ieDword slot);
-	//void AddAllEffects();
 	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(ieDword slot) const;
 	/** Returns the item's inventory flags */
