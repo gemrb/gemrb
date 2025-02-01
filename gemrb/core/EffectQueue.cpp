@@ -1447,7 +1447,7 @@ bool EffectQueue::RemoveEquippingEffects(size_t slotCode)
 	bool removed = false;
 	for (auto& fx : effects) {
 		if (!IsEquipped(fx.TimingMode)) continue;
-		if (fx.InventorySlot != (ieDwordSigned) slotCode) continue;
+		if (slotCode != 0xffffffff && fx.InventorySlot != (ieDwordSigned) slotCode) continue;
 
 		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 		RemoveBonusMemorizations(fx);
