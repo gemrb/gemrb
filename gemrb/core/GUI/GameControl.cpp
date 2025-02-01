@@ -867,10 +867,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				//target is the door/actor currently under the pointer
 				if (!game->selected.empty()) {
 					Actor* src = game->selected[0];
-					Scriptable* target = lastActor;
-					if (overMe) {
-						target = overMe;
-					}
+					Scriptable* target = GetHoverObject();
 					if (target) {
 						src->SetSpellResRef(TestSpell);
 						src->CastSpell(target, false);
