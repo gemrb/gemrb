@@ -458,6 +458,7 @@ void Scriptable::ClearActions(int skipFlags)
 			if (skipFlags == 3 && aC == CurrentAction && savedCurrentAction) continue;
 
 			actionQueue.pop_front();
+			i--;
 			aC->Release();
 		}
 	}
