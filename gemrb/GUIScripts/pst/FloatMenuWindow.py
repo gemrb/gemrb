@@ -488,19 +488,20 @@ def FloatMenuSelectNextPC ():
 	# NOTE: it invokes FloatMenuSelectAnotherPC() through selection change handler
 	return
 
-def FloatMenuSelectAnotherPC ():
+def ResetMenuState (mode):
 	global float_menu_mode, float_menu_index, float_menu_selected
-	float_menu_mode = MENU_MODE_SINGLE
+
+	float_menu_mode = mode
 	float_menu_index = 0
 	float_menu_selected = None
+
+def FloatMenuSelectAnotherPC ():
+	ResetMenuState (MENU_MODE_SINGLE)
 	UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectDialog ():
-	global float_menu_mode, float_menu_index, float_menu_selected
-	float_menu_mode = MENU_MODE_DIALOG
-	float_menu_index = 0
-	float_menu_selected = None
+	ResetMenuState (MENU_MODE_DIALOG)
 	GemRB.GameControlSetTargetMode (TARGET_MODE_TALK)
 	# close it immediately for touch users, since it's hard for them rightclick to close
 	if GUICommon.UsingTouchInput ():
@@ -510,42 +511,29 @@ def FloatMenuSelectDialog ():
 	return
 
 def FloatMenuSelectWeapons ():
-	global float_menu_mode, float_menu_index, float_menu_selected
-	float_menu_mode = MENU_MODE_WEAPONS
-	float_menu_index = 0
-	float_menu_selected = None
+	ResetMenuState (MENU_MODE_WEAPONS)
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ATTACK)
 	UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectItems ():
-	global float_menu_mode, float_menu_index, float_menu_selected
-	float_menu_mode = MENU_MODE_ITEMS
-	float_menu_index = 0
-	float_menu_selected = None
+	ResetMenuState (MENU_MODE_ITEMS)
 	UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectSpells ():
-	global float_menu_mode, float_menu_index, float_menu_selected
-
 	pc = GemRB.GameGetFirstSelectedPC ()
 	ClassName = GUICommon.GetClassRowName (pc)
 	BookType = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE", GTV_INT)
 	if not BookType:
 		return
 
-	float_menu_mode = MENU_MODE_SPELLS
-	float_menu_index = 0
-	float_menu_selected = None
+	ResetMenuState (MENU_MODE_SPELLS)
 	UpdateFloatMenuWindow ()
 	return
 
 def FloatMenuSelectAbilities ():
-	global float_menu_mode, float_menu_index, float_menu_selected
-	float_menu_mode = MENU_MODE_ABILITIES
-	float_menu_index = 0
-	float_menu_selected = None
+	ResetMenuState (MENU_MODE_ABILITIES)
 	UpdateFloatMenuWindow ()
 	return
 
