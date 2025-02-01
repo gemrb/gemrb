@@ -50,7 +50,7 @@ def Possible(posx, posy):
 	return pos
 
 def GetPossible (pos):
-	posx = pos/MAZE_MAX_DIM
+	posx = pos // MAZE_MAX_DIM
 	posy = pos-posx*MAZE_MAX_DIM
 	possible = []
 
@@ -101,7 +101,7 @@ def LoadMazeFrom2da(tablename):
 	GemRB.SetMazeData(MH_POS2X, -1)
 	GemRB.SetMazeData(MH_POS2Y, -1)
 	#adding foyer coordinates (middle of bottom)
-	GemRB.SetMazeData(MH_POS3X, size/2)
+	GemRB.SetMazeData(MH_POS3X, size // 2)
 	GemRB.SetMazeData(MH_POS3Y, size-1)
 	#adding engine room coordinates (bottom right)
 	GemRB.SetMazeData(MH_POS4X, size-1)
@@ -266,14 +266,14 @@ def CreateMaze ():
 				posy = 0
 				pos = 0
 			else:
-				posx = pos/MAZE_MAX_DIM
+				posx = pos // MAZE_MAX_DIM
 				posy = pos-posx*MAZE_MAX_DIM
 		GemRB.SetMazeEntry(pos, ME_TRAP, GemRB.Roll(1, 3, -1) )
 
 	entries = oldentries
 	while len(rooms)>0:
 		pos = rooms.pop(0)
-		posx = pos/MAZE_MAX_DIM
+		posx = pos // MAZE_MAX_DIM
 		posy = pos-posx*MAZE_MAX_DIM
 		possible = GetPossible(pos)
 		plen = len(possible)
@@ -407,7 +407,7 @@ def CustomizeMaze(AreaName):
 
 	GemRB.SetMazeEntry(pos, ME_VISITED, 1)
 	walls = entry['Walls']
-	y = tmp / MAZE_MAX_DIM
+	y = tmp // MAZE_MAX_DIM
 	x = tmp - y*MAZE_MAX_DIM
 	for i in range(1,5):
 		if wallbits[i]&walls:
