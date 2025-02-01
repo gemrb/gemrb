@@ -273,7 +273,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		}
 	}
 	// Stop if there's a door in the way
-	if (blocksSearch && bool(area->GetBlocked(Pos + Point(dx, dy)) & PathMapFlags::SIDEWALL)) {
+	if (blocksSearch && !core->InCutSceneMode() && bool(area->GetBlocked(Pos + Point(dx, dy)) & PathMapFlags::SIDEWALL)) {
 		Log(DEBUG, "PathFinder", "Abandoning because I'm in front of a wall");
 		ClearPath(true);
 		ReleaseCurrentAction(); // otherwise MoveToPoint and others that keep retrying will loop
