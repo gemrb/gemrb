@@ -43,10 +43,10 @@ def SetReputation ():
 	MyChar = GemRB.GetVar ("Slot")
 
 	# If Rep > 0 then MyChar is an imported character with a saved reputation,
-	# in which case the reputation shouldn't be overwritten.
+	# in which case the reputation shouldn't be overwritten (bg1, but not bg2).
 	Rep = GemRB.GetPlayerStat (MyChar, IE_REPUTATION)
 
-	if Rep <= 0:
+	if Rep <= 0 or not GameCheck.IsBG1 ():
 		# use the alignment to apply starting reputation
 		Alignment = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 		AlignmentAbbrev = CommonTables.Aligns.FindValue (3, Alignment)
