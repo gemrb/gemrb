@@ -620,7 +620,7 @@ int GAMImporter::GetStoredFileSize(const Game* game)
 		headersize += am->GetStoredFileSize(ac);
 	}
 
-	if (game->mazedata) {
+	if (game->version == GAM_VER_PST) {
 		MazeOffset = headersize;
 		//due to alignment the internal size is not the same as the external size
 		headersize += MAZE_DATA_SIZE_HARDCODED;
@@ -1136,10 +1136,15 @@ void GAMImporter::PutMazeEntry(DataStream* stream, void* memory) const
 
 int GAMImporter::PutMaze(DataStream* stream, const Game* game) const
 {
-	for (int i = 0; i < MAZE_ENTRY_COUNT; i++) {
-		PutMazeEntry(stream, game->mazedata + i * MAZE_ENTRY_SIZE);
+	if (game->mazedata) {
+		for (int i = 0; i < MAZE_ENTRY_COUNT; i++) {
+			PutMazeEntry(stream, game->mazedata + i * MAZE_ENTRY_SIZE);
+		}
+		PutMazeHeader(stream, game->mazedata + MAZE_ENTRY_COUNT * MAZE_ENTRY_SIZE);
+	} else {
+		stream->WriteFilling(MAZE_DATA_SIZE_HARDCODED);
 	}
-	PutMazeHeader(stream, game->mazedata + MAZE_ENTRY_COUNT * MAZE_ENTRY_SIZE);
+
 	return 0;
 }
 
@@ -1190,7 +1195,7 @@ int GAMImporter::PutGame(DataStream* stream, Game* game) const
 		return ret;
 	}
 
-	if (game->mazedata) {
+	if (game->version == GAM_VER_PST) {
 		ret = PutMaze(stream, game);
 		if (ret) {
 			return ret;
