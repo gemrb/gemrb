@@ -785,8 +785,10 @@ int Game::DelMap(unsigned int index, int forced)
 	}
 
 	// one last script execution, so the Vacant trigger is more likely to run (pst ar0109)
+	// we can't cause a reparse of the scripts in general, since that often causes them to run for too long,
+	// messing with scripts in the new area if they use shared variables like Current_Area #2313
 	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
-		map->ExecuteScript(MAX_SCRIPTS);
+		// map->ExecuteScript(MAX_SCRIPTS);
 		map->ProcessActions();
 	}
 
