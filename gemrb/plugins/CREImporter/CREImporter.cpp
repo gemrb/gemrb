@@ -2034,7 +2034,11 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MAGICDAMAGERESISTANCE]);
 		stream->Write(Signature, 4);
 	} else {
-		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DETECTILLUSIONS]);
+		if (actor->creVersion == CREVersion::V1_2) {
+			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_FREESLOTS]);
+		} else {
+			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DETECTILLUSIONS]);
+		}
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SETTRAPS]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LORE]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LOCKPICKING]);
