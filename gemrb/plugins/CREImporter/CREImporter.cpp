@@ -935,10 +935,10 @@ void CREImporter::GetActorPST(Actor* act)
 	ieWordSigned tmpWord;
 	str->ReadScalar(tmpWord);
 	act->AC.SetNatural(tmpWord);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACCRUSHINGMOD]);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACMISSILEMOD]);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACPIERCINGMOD]);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACSLASHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACCRUSHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACMISSILEMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACPIERCINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACSLASHINGMOD]);
 	ieByteSigned tmpByte;
 	str->Read(&tmpByte, 1);
 	act->ToHit.SetBase(tmpByte);
