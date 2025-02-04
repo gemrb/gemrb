@@ -313,9 +313,6 @@ SHOP_SELECT = 0x20000
 
 #game constants
 
-# !!! Keep this synchronized with Video.h !!!
-TOOLTIP_DELAY_FACTOR = 250
-
 #game strings
 STR_LOADMOS  = 0
 STR_AREANAME = 1

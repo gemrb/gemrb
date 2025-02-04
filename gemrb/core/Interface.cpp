@@ -435,9 +435,7 @@ Interface::Interface(CoreSettings&& cfg)
 	// the originals used double ticks for haste handling
 	Time.ticksPerSec = maxRefreshRate / 2;
 
-	// set up the tooltip delay which we store in milliseconds
-	ieDword tooltipDelay = vars.Get("Tooltips", 0);
-	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
+	ApplyTooltipDelay();
 
 	// restore the game config name if we read it from our version
 	if (!tmp.empty()) {
@@ -4135,4 +4133,22 @@ float Interface::GetAnimationFPS(const ResRef& anim) const
 	return ANI_DEFAULT_FRAMERATE;
 }
 
+void Interface::ApplyTooltipDelay() const
+{
+	ieDword tooltipDelay = vars.Get("Tooltips", 0);
+
+	// PST: [0, 119] -> [0, 2500]
+	// everything else: [0, 10] * 10 -> [0, 2500]
+	// with the highest value meaning "never"
+	int delay = 0;
+	if (HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		delay = tooltipDelay >= 119 ? std::numeric_limits<int>::max() :
+					      tooltipDelay * 21;
+	} else {
+		delay = tooltipDelay >= 100 ? std::numeric_limits<int>::max() :
+					     tooltipDelay * 25;
+	}
+
+	WindowManager::SetTooltipDelay(delay);
+}
 }

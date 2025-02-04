@@ -11329,7 +11329,7 @@ PyDoc_STRVAR(GemRB_SetMouseScrollSpeed__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [SetTooltipDelay](SetTooltipDelay.md)");
+**See also:** [UpdateTooltipDelay](UpdateTooltipDelay.md)");
 
 static PyObject* GemRB_SetMouseScrollSpeed(PyObject* /*self*/, PyObject* args)
 {
@@ -11339,24 +11339,20 @@ static PyObject* GemRB_SetMouseScrollSpeed(PyObject* /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR(GemRB_SetTooltipDelay__doc,
-	     "===== SetTooltipDelay =====\n\
+PyDoc_STRVAR(GemRB_UpdateTooltipDelay__doc,
+	     "===== UpdateTooltipDelay =====\n\
 \n\
-**Prototype:** GemRB.SetTooltipDelay (time)\n\
+**Prototype:** GemRB.UpdateTooltipDelay (time)\n\
 \n\
-**Description:** Sets the tooltip delay.\n\
+**Description:** Updates the tooltip delay as set by \"Tooltips\" in slider steps.\n\
 \n\
-**Parameters:**\n\
-  * time - delay in fifteenth of a second\n\
 \n\
 **See also:** [View_SetTooltip](View_SetTooltip.md), [SetMouseScrollSpeed](SetMouseScrollSpeed.md)\n\
 ");
 
-static PyObject* GemRB_SetTooltipDelay(PyObject* /*self*/, PyObject* args)
+static PyObject* GemRB_UpdateTooltipDelay(PyObject* /*self*/, PyObject* /*args*/)
 {
-	int tooltipDelay;
-	PARSE_ARGS(args, "i", &tooltipDelay);
-	WindowManager::SetTooltipDelay(tooltipDelay);
+	core->ApplyTooltipDelay();
 	Py_RETURN_NONE;
 }
 
@@ -12866,7 +12862,6 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetTimer, METH_VARARGS),
 	METHOD(SetTimedEvent, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),
-	METHOD(SetTooltipDelay, METH_VARARGS),
 	METHOD(SetupMaze, METH_VARARGS),
 	METHOD(SetupQuickItemSlot, METH_VARARGS),
 	METHOD(SetupQuickSlot, METH_VARARGS),
@@ -12876,6 +12871,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SpellCast, METH_VARARGS),
 	METHOD(StealFailed, METH_NOARGS),
 	METHOD(UnmemorizeSpell, METH_VARARGS),
+	METHOD(UpdateTooltipDelay, METH_VARARGS),
 	METHOD(UpdateVolume, METH_VARARGS),
 	METHOD(UpdateWorldMap, METH_VARARGS),
 	METHOD(UseItem, METH_VARARGS),
