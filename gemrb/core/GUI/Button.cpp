@@ -255,8 +255,14 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		Region r = rgn;
 		if (Picture && flags & IE_GUI_BUTTON_PICTURE) {
 			// constrain the label (status icons) to the picture bounds
+			// but not inventory icons nor quick slots
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
-			r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
+			if (align == (IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_BOTTOM)) {
+				r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
+			} else {
+				r.w -= 4;
+				r.h -= 4;
+			}
 		} else if (flags & IE_GUI_BUTTON_ANCHOR) {
 			r.x += Anchor.x;
 			r.y += Anchor.y;
