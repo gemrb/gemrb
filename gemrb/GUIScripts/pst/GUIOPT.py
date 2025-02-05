@@ -195,7 +195,7 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptDone (Window.Close, 10)
 	GUIOPTControls.OptCancel (Window.Close, 11)
 
-	GUIOPTControls.OptSlider (31232, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
+	GUIOPTControls.OptSlider (31232, 1, 13, 31481, "Tooltips", UpdateTooltips, 1)
 	GUIOPTControls.OptSlider (31230, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
 	GUIOPTControls.OptSlider (31231, 3, 15, 31480, "Keyboard Scroll Speed")
 	GUIOPTControls.OptSlider (31233, 4, 16, 31479, "Difficulty Level")
@@ -212,7 +212,7 @@ def OpenGameplayOptionsWindow ():
 
 def UpdateTooltips ():
 	GemRB.GetView ("OPTHELP").SetText (31232)
-	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") )
+	GemRB.UpdateTooltipDelay()
 
 def UpdateMouseSpeed ():
 	GemRB.GetView ("OPTHELP").SetText (31230)

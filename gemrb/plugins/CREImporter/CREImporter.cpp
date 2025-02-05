@@ -935,10 +935,10 @@ void CREImporter::GetActorPST(Actor* act)
 	ieWordSigned tmpWord;
 	str->ReadScalar(tmpWord);
 	act->AC.SetNatural(tmpWord);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACCRUSHINGMOD]);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACMISSILEMOD]);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACPIERCINGMOD]);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACSLASHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACCRUSHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACMISSILEMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACPIERCINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACSLASHINGMOD]);
 	ieByteSigned tmpByte;
 	str->Read(&tmpByte, 1);
 	act->ToHit.SetBase(tmpByte);
@@ -2034,7 +2034,11 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MAGICDAMAGERESISTANCE]);
 		stream->Write(Signature, 4);
 	} else {
-		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DETECTILLUSIONS]);
+		if (actor->creVersion == CREVersion::V1_2) {
+			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_FREESLOTS]);
+		} else {
+			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DETECTILLUSIONS]);
+		}
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SETTRAPS]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LORE]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LOCKPICKING]);

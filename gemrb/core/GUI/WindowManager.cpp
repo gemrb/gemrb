@@ -43,8 +43,7 @@ Holder<Sprite2D> WindowManager::CursorMouseDown;
 
 void WindowManager::SetTooltipDelay(int delay)
 {
-	// Max setting disables tooltips in originals, we just set it to an extremely high value for simplicity.
-	ToolTipDelay = (delay == 10 * Tooltip::DELAY_FACTOR) ? 10000000 : delay;
+	ToolTipDelay = delay;
 }
 
 WindowManager::WindowManager(PluginHolder<Video> vid, std::shared_ptr<GUIFactory> fact)

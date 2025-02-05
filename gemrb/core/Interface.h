@@ -742,6 +742,7 @@ public:
 
 	Timer& SetTimer(const EventHandler&, tick_t interval, int repeats = -1);
 	float GetAnimationFPS(const ResRef& anim) const;
+	void ApplyTooltipDelay() const;
 };
 
 extern GEM_EXPORT Interface* core;
