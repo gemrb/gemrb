@@ -650,7 +650,7 @@ static const ActionLink actionnames[] = {
 	{ "displaystringnonamedlg", GameScript::DisplayStringNoName, 0 },
 	{ "displaystringnonamehead", GameScript::DisplayStringNoNameHead, 0 },
 	{ "displaystringpoint", GameScript::FloatMessageFixed, 0 }, // can customize color, maybe a different font, otherwise the same
-	{ "displaystringpointlog", GameScript::FloatMessageFixed, 0 }, // same, but force also printing to message window?
+	{ "displaystringpointlog", GameScript::FloatMessageFixed, 0 }, // same, but force also printing to message window
 	{ "displaystringwait", GameScript::DisplayStringWait, AF_BLOCKING },
 	{ "doubleclicklbuttonobject", GameScript::DoubleClickLButtonObject, AF_BLOCKING },
 	{ "doubleclicklbuttonpoint", GameScript::DoubleClickLButtonPoint, AF_BLOCKING },

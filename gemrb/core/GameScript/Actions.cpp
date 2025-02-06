@@ -1283,6 +1283,9 @@ void GameScript::TimedMoveToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (parameters->int0Parameter <= 0) {
+		if (actor->Pos != parameters->pointParameter) {
+			actor->SetPosition(parameters->pointParameter, true);
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -7865,7 +7868,10 @@ void GameScript::MoveToCampaign(Scriptable* /*Sender*/, Action* parameters)
 }
 
 // SetNoWaitX(I:SetReset*Boolean) was a stub
-// TODO: ee, unknown ContinueGame(I:State*Boolean) unknown, called only before EndCredits, so potentially useless
+// TODO: ee, ContinueGame(I:State*Boolean)
+//       IESDP: If "State" is `FALSE` then this action clears the "Last Save" definition in `baldur.lua` for the current
+//       campaign that would otherwise enable the player to automatically load the latest save from the start menu of the game.
+//       Specifying `TRUE` does nothing.
 // TODO: ee, unclear if really useful DisableAI(O:Object*,I:Disable*Boolean) used in cutscenes
 // IESDP says: this action activates or deactivates all creature scripts of the given target depending on the second parameter.
 // ... but they're already disabled; is this used more to enable them despite cutscene logic?
