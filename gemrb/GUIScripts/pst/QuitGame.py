@@ -26,7 +26,7 @@ import GUICommon
 import CommonWindow
 
 def OnLoad ():
-	movies = ["", "T1DEATH", "T1ABSORB", "FINALE"]
+	movies = ["", "T1DEATH", "T1ABSORB", "FINALE", "CREDITS"]
 
 	CommonWindow.SetGameGUIHidden(True)
 	which = GemRB.GetVar ("QuitGame1")
@@ -39,6 +39,7 @@ def OnLoad ():
 	if which:
 		DeathWindowEnd ()
 	else:
+		GemRB.PlayMovie (movies[4], 1)
 		GemRB.QuitGame ()
 		GemRB.SetNextScript("Start")
 
