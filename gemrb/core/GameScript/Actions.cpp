@@ -7860,7 +7860,7 @@ void GameScript::MoveToCampaign(Scriptable* /*Sender*/, Action* parameters)
 	core->UpdateWorldMap(parameters->resref0Parameter);
 }
 
-// TODO: ee, unknown SetNoWaitX(I:SetReset*Boolean); prevents WaitCounter being set??
+// SetNoWaitX(I:SetReset*Boolean) was a stub
 // TODO: ee, unknown ContinueGame(I:State*Boolean) unknown, called only before EndCredits, so potentially useless
 // TODO: ee, unclear if really useful DisableAI(O:Object*,I:Disable*Boolean) used in cutscenes
 // IESDP says: this action activates or deactivates all creature scripts of the given target depending on the second parameter.
