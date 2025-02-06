@@ -780,7 +780,7 @@ static const ActionLink actionnames[] = {
 	{ "incrementproficiency", GameScript::IncrementProficiency, 0 },
 	{ "interact", GameScript::Interact, 0 },
 	{ "joinparty", GameScript::JoinParty, 0 }, //this action appears to be blocking in bg2
-	{ "joinpartyoverride", GameScript::JoinParty, 0 }, // TODO: ee, seems to be there just to enable use in ActionOverride?? Why another action?
+	{ "joinpartyoverride", GameScript::JoinParty, 0 },
 	{ "journalentrydone", GameScript::SetQuestDone, 0 },
 	{ "jumptoobject", GameScript::JumpToObject, 0 },
 	{ "jumptopoint", GameScript::JumpToPoint, 0 },

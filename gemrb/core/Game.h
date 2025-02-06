@@ -61,6 +61,7 @@ class TableMgr;
 #define JP_JOIN    1 //refresh join time
 #define JP_INITPOS 2 //init startpos
 #define JP_SELECT  4 //select the actor after joining
+#define JP_OVERRIDE 8 // replace actor, if any
 
 //protagonist mode
 #define PM_NO   0 //no death checks

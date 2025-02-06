@@ -487,6 +487,22 @@ int Game::JoinParty(Actor* actor, int join)
 		}
 		AddTrigger(TriggerEntry(trigger_joins, actor->GetGlobalID()));
 	}
+
+	if (join & JP_OVERRIDE) {
+		Actor* actor2 = nullptr;
+		// FindNPC but also checks it's not us
+		for (const auto& npc : NPCs) {
+			if (npc != actor && npc->GetScriptName() == actor->GetScriptName()) {
+				actor2 = npc;
+			}
+		}
+		if (actor2) {
+			int slot = InStore(actor2);
+			DelNPC(slot);
+			actor2->SetPersistent(-1);
+		}
+	}
+
 	slot = InStore(actor);
 	if (slot >= 0) {
 		std::vector<Actor*>::iterator m = NPCs.begin() + slot;

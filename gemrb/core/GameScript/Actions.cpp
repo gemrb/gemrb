@@ -3096,7 +3096,11 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 			act->SetDialog(resRef);
 		}
 	}
-	game->JoinParty(act, JP_JOIN);
+	int flags = JP_JOIN;
+	if (parameters->actionID > 19) { // ugly way to distinguish JoinPartyOverride
+		flags |= JP_OVERRIDE;
+	}
+	game->JoinParty(act, flags);
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
