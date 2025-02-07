@@ -77,8 +77,12 @@ def PlayPress():
 	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
 	CharSound = GUICommon.OverrideDefaultVoiceSet (Gender, CharSound)
 
+	limit = 30
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
 		NextSound()
+		limit -= 1
+		if limit == 0:
+			break
 	# play the sound like it was a speech, so any previous yells are quieted
 	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], CHAN_CHAR1, 0, 0, SND_SPEECH)
 	NextSound()
