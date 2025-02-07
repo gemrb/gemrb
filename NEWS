@@ -1,9 +1,13 @@
-GemRB git (a1a7e51):
+GemRB git (7e10995):
   New features:
     - 
+    - partial audio system rewrite for better (spatial) audio
+    - customizable iwd2 action bar, weapon set switching, spell info on right-click
+    - detect illusions
 
   Improved features:
-    - weapon sets
+    - 
+    - weapon sets, pst GUI
     - bugfixes
 
 GemRB v0.9.4 (2025-01-11):
