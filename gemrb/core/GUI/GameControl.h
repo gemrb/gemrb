@@ -99,7 +99,7 @@ public:
 	int spellIndex = 0;
 	int spellCount = 0; //multiple targeting
 	// allow targeting allies, enemies and/or neutrals (bitmask)
-	int target_types = 0;
+	int targetTypes = 0;
 
 private:
 	using FormationPoints = std::vector<Point>;

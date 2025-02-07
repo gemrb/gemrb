@@ -3225,7 +3225,7 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject* /*self*/, PyObject* ar
 	//target mode is only the low bits (which is a number)
 	gc->SetTargetMode(TargetMode(Mode & GA_ACTION));
 	//target type is all the bits
-	gc->target_types = (Mode & GA_ACTION) | Types;
+	gc->targetTypes = (Mode & GA_ACTION) | Types;
 	Py_RETURN_NONE;
 }
 

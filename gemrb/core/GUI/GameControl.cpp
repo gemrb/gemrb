@@ -1263,12 +1263,12 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	// let us target party members even if they are invisible
 	lastActor = area->GetActor(gameMousePos, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 	if (lastActor && lastActor->Modified[IE_EA] >= EA_CONTROLLED) {
-		if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos)) {
+		if (!lastActor->ValidTarget(targetTypes) || !area->IsVisible(gameMousePos)) {
 			lastActor = nullptr;
 		}
 	}
 
-	if ((target_types & GA_NO_SELF) && lastActor == core->GetFirstSelectedActor()) {
+	if ((targetTypes & GA_NO_SELF) && lastActor == core->GetFirstSelectedActor()) {
 		lastActor = nullptr;
 	}
 
@@ -1404,7 +1404,7 @@ void GameControl::UpdateCursor()
 		// knock ignores that
 		bool blocked = bool(area->GetBlocked(gameMousePos) & (PathMapFlags::PASSABLE | PathMapFlags::TRAVEL | PathMapFlags::ACTOR));
 		bool ignoreSM = gamedata->GetSpecialSpell(spellName) & SPEC_AREA;
-		if (!ignoreSM && (!blocked || (!(target_types & GA_POINT) && !lastActor))) {
+		if (!ignoreSM && (!blocked || (!(targetTypes & GA_POINT) && !lastActor))) {
 			nextCursor |= IE_CURSOR_GRAY;
 		}
 	} else if (targetMode == TargetMode::Defend) {
@@ -1770,7 +1770,7 @@ void GameControl::TryToDisarm(Actor* source, const InfoPoint* tgt) const
 //generate action code for source actor to use item/cast spell on a point
 void GameControl::TryToCast(Actor* source, const Point& tgt)
 {
-	if ((target_types & GA_POINT) == false) {
+	if ((targetTypes & GA_POINT) == false) {
 		return; // not allowed to target point
 	}
 
@@ -1918,7 +1918,7 @@ void GameControl::HandleContainer(Container* container, Actor* actor)
 
 	if ((targetMode == TargetMode::Cast) && spellCount) {
 		//we'll get the container back from the coordinates
-		target_types |= GA_POINT;
+		targetTypes |= GA_POINT;
 		TryToCast(actor, container->Pos);
 		//Do not reset target_mode, TryToCast does it for us!!
 		return;
@@ -2264,7 +2264,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 {
 	const Game* game = core->GetGame();
 	const Map* area = game->GetCurrentArea();
-	Actor* targetActor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
+	Actor* targetActor = area->GetActor(p, targetTypes & ~GA_NO_HIDDEN);
 	if (targetActor && targetActor->GetStat(IE_NOCIRCLE) == 0) {
 		PerformActionOn(targetActor);
 		return;
@@ -2278,7 +2278,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	//add a check if you don't want some random monster handle doors and such
 	if (targetMode == TargetMode::Cast && !(gamedata->GetSpecialSpell(spellName) & SPEC_AREA)) {
 		//the player is using an item or spell on the ground
-		target_types |= GA_POINT;
+		targetTypes |= GA_POINT;
 		TryToCast(selectedActor, p);
 	} else if (!overMe) {
 		return;
@@ -2439,7 +2439,7 @@ void GameControl::PerformActionOn(Actor* actor)
 		type = ACT_THIEVING;
 	}
 
-	if (type != ACT_NONE && !actor->ValidTarget(target_types)) {
+	if (type != ACT_NONE && !actor->ValidTarget(targetTypes)) {
 		return;
 	}
 
@@ -2519,7 +2519,7 @@ void GameControl::SetTargetMode(TargetMode mode)
 
 void GameControl::ResetTargetMode()
 {
-	target_types = GA_NO_DEAD | GA_NO_HIDDEN | GA_NO_UNSCHEDULED;
+	targetTypes = GA_NO_DEAD | GA_NO_HIDDEN | GA_NO_UNSCHEDULED;
 	SetTargetMode(TargetMode::None);
 }
 
@@ -2705,7 +2705,7 @@ void GameControl::SetupItemUse(int slot, size_t header, int targettype, int cnt)
 	spellIndex = static_cast<int>(header);
 	//item use also uses the casting icon, this might be changed in some custom game?
 	SetTargetMode(TargetMode::Cast);
-	target_types = targettype;
+	targetTypes = targettype;
 	spellCount = cnt;
 }
 
@@ -2723,7 +2723,7 @@ void GameControl::SetupCasting(const ResRef& spellname, int type, int level, int
 	spellSlot = level;
 	spellIndex = idx;
 	SetTargetMode(TargetMode::Cast);
-	target_types = targettype;
+	targetTypes = targettype;
 	spellCount = cnt;
 }
 
