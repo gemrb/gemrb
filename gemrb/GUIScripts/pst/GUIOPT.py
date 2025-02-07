@@ -485,7 +485,7 @@ def OnPlayMoviePress ():
 
 ###################################################
 def OnCreditsPress ():
-	GemRB.PlayMovie ("CREDITS")
+	GemRB.PlayMovie ("CREDITS", 1)
 
 ###################################################
 
