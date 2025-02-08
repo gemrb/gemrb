@@ -31,8 +31,6 @@
 
 namespace GemRB {
 
-// Don't increase too much since it will make the volume slider delay
-static constexpr size_t RING_BUFFER_CHANNEL_SIZE = 16384;
 static constexpr uint8_t RESERVED_CHANNELS = 1;
 
 uint64_t SDLSoundSourceHandle::nextId = 0;
@@ -243,7 +241,7 @@ bool SDLSoundStreamSourceHandle::Feed(const AudioBufferFormat&, const char* memo
 		offset += written;
 
 		if (offset < convertBuffer.size()) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			SDL_Delay(5);
 		}
 	} while (offset < convertBuffer.size() && fillWait);
 
@@ -362,9 +360,9 @@ Holder<SoundSourceHandle> SDLAudioBackend::CreatePlaybackSource(const AudioPlayb
 	return handle;
 }
 
-Holder<SoundStreamSourceHandle> SDLAudioBackend::CreateStreamable(const AudioPlaybackConfig&)
+Holder<SoundStreamSourceHandle> SDLAudioBackend::CreateStreamable(const AudioPlaybackConfig&, size_t minQueueSize)
 {
-	return MakeHolder<SDLSoundStreamSourceHandle>(audioChannels * RING_BUFFER_CHANNEL_SIZE);
+	return MakeHolder<SDLSoundStreamSourceHandle>(audioChannels * minQueueSize);
 }
 
 Holder<SoundBufferHandle> SDLAudioBackend::LoadSound(ResourceHolder<SoundMgr> resource, const AudioPlaybackConfig&)

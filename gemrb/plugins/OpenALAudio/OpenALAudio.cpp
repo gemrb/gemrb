@@ -506,7 +506,7 @@ Holder<SoundSourceHandle> OpenALBackend::CreatePlaybackSource(const AudioPlaybac
 	return MakeHolder<OpenALSourceHandle>(ALPair { sourcesArray[0], sourcesArray[1] }, config);
 }
 
-Holder<SoundStreamSourceHandle> OpenALBackend::CreateStreamable(const AudioPlaybackConfig& config)
+Holder<SoundStreamSourceHandle> OpenALBackend::CreateStreamable(const AudioPlaybackConfig& config, size_t)
 {
 	ALuint source = 0;
 	alGenSources(1, &source);

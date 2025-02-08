@@ -31,6 +31,9 @@
 
 namespace GemRB {
 
+// for SDL, and per channel; don't increase too much since it will make the volume slider delay
+static constexpr size_t STREAM_QUEUE_MIN_SIZE = 16384;
+
 struct GEM_EXPORT AudioBufferFormat {
 	uint8_t bits = 0;
 	uint8_t channels = 0;
@@ -91,7 +94,9 @@ public:
 	virtual bool Init() = 0;
 
 	virtual Holder<SoundSourceHandle> CreatePlaybackSource(const AudioPlaybackConfig& config, bool priority = false) = 0;
-	virtual Holder<SoundStreamSourceHandle> CreateStreamable(const AudioPlaybackConfig& config) = 0;
+	virtual Holder<SoundStreamSourceHandle> CreateStreamable(
+		const AudioPlaybackConfig& config,
+		size_t minQueueSize = STREAM_QUEUE_MIN_SIZE) = 0;
 	virtual Holder<SoundBufferHandle> LoadSound(ResourceHolder<SoundMgr> resource, const AudioPlaybackConfig& config) = 0;
 
 	virtual const AudioPoint& GetListenerPosition() const = 0;

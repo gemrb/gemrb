@@ -31,10 +31,13 @@
 namespace GemRB {
 
 static constexpr uint8_t MVE_SIGNATURE_LEN = 26;
+// This should be at least enough fit 1s at 16b/22k, as some movies have that much prebuffering
+// and be a power of 2, to avoid crackling for unknown reasons
+static constexpr size_t MIN_QUEUE_SIZE = 65536;
 
 MVEPlayer::MVEPlayer()
 {
-	audioPlayer = core->GetAudioDrv()->CreateStreamable(core->GetAudioSettings().ConfigPresetMovie());
+	audioPlayer = core->GetAudioDrv()->CreateStreamable(core->GetAudioSettings().ConfigPresetMovie(), MIN_QUEUE_SIZE);
 
 	palette.SetColor(1, ColorBlack);
 	// subtitle color
