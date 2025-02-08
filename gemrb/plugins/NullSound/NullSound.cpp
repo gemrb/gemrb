@@ -27,7 +27,7 @@ Holder<SoundSourceHandle> NullSound::CreatePlaybackSource(const AudioPlaybackCon
 	return MakeHolder<NullSoundSourceHandle>();
 }
 
-Holder<SoundStreamSourceHandle> NullSound::CreateStreamable(const AudioPlaybackConfig&)
+Holder<SoundStreamSourceHandle> NullSound::CreateStreamable(const AudioPlaybackConfig&, size_t)
 {
 	return MakeHolder<NullSoundStreamSourceHandle>();
 }

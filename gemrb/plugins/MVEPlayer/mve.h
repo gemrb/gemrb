@@ -22,9 +22,6 @@
 #ifndef __MVE_H__
 #define __MVE_H__
 
-#define MVE_PREAMBLE      "Interplay MVE File\032\000\032\000\000\001\063\021"
-#define MVE_PREAMBLE_SIZE 26
-
 #define MVE_PALETTE_COUNT 256
 
 #define MVE_DEFAULT_AUDIO_STREAM 0x01

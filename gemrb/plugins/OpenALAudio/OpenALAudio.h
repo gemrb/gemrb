@@ -105,7 +105,7 @@ public:
 	bool Init() override;
 
 	Holder<SoundSourceHandle> CreatePlaybackSource(const AudioPlaybackConfig& config, bool priority = false) override;
-	Holder<SoundStreamSourceHandle> CreateStreamable(const AudioPlaybackConfig& config) override;
+	Holder<SoundStreamSourceHandle> CreateStreamable(const AudioPlaybackConfig& config, size_t) override;
 	Holder<SoundBufferHandle> LoadSound(ResourceHolder<SoundMgr> resource, const AudioPlaybackConfig& config) override;
 
 	const AudioPoint& GetListenerPosition() const override;

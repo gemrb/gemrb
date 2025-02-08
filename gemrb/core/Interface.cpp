@@ -2074,11 +2074,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		return -1;
 	}
 
-	//one of these two should exist (they both mean the same thing)
-	ieDword subtitles = vars.Get("Dialog Movie Subtitles", 1);
-	if (!subtitles) {
-		subtitles = vars.Get("Dialog Subtitles", 0);
-	}
+	bool subtitles = vars.Get("Display Movie Subtitles", 0) == 1; // IWD(2)/BG2
+	subtitles |= vars.Get("Display Subtitles", 0) == 1; // BG2
+	subtitles |= vars.Get("Subtitles", 0) == 1; // always present
 
 	mp->EnableSubtitles(subtitles);
 
