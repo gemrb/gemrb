@@ -22,6 +22,8 @@
 
 #include "Video/Video.h"
 
+#include <mutex>
+
 using namespace GemRB;
 
 VLCPlayer::VLCPlayer(void)
@@ -39,6 +41,8 @@ VLCPlayer::~VLCPlayer(void)
 bool VLCPlayer::Import(DataStream* stream)
 {
 	DestroyPlayer();
+	movieFormat = Video::BufferFormat::DISPLAY;
+
 	if (stream) {
 		// we don't actually need anything from the stream. libVLC will open and use the file internally
 		libvlc_media_t* media = libvlc_media_new_path(libvlc, stream->originalfile.c_str());
@@ -50,8 +54,11 @@ bool VLCPlayer::Import(DataStream* stream)
 
 		bool success = libvlc_media_player_play(mediaPlayer) == 0;
 
-		// FIXME: this is technically a data race!
-		while (success && movieFormat == Video::BufferFormat::DISPLAY);
+		if (success) {
+			std::mutex mutex;
+			std::unique_lock<std::mutex> lock { mutex };
+			formatWaitVar.wait(lock, [this] { return movieFormat != Video::BufferFormat::DISPLAY; });
+		}
 
 		return success;
 	}
@@ -80,7 +87,8 @@ bool VLCPlayer::DecodeFrame(VideoBuffer& buf)
 		       planes[0], &pitches[0], // Y or RGB
 		       planes[1], &pitches[1], // U
 		       planes[2], &pitches[2]); // V
-	return true;
+
+	return libvlc_media_player_get_state(mediaPlayer) == libvlc_Playing;
 }
 
 void VLCPlayer::DestroyPlayer()
@@ -137,7 +145,7 @@ unsigned VLCPlayer::setup(void** opaque, char* chroma, unsigned* width, unsigned
 		player->planes[Y] = new char[pitches[Y] * lines[Y]];
 		player->planes[U] = new char[pitches[U] * lines[U]];
 		player->planes[V] = new char[pitches[V] * lines[V]];
-	} else { // default to 32bit
+	} else if (strcmp(chroma, "VAOP") != 0) { // default to 32bit, but ignore whatever "VAOP" is
 		player->movieFormat = Video::BufferFormat::RGBA8888;
 		memcpy(chroma, "RV32", 4);
 
@@ -146,6 +154,8 @@ unsigned VLCPlayer::setup(void** opaque, char* chroma, unsigned* width, unsigned
 
 		player->planes[0] = new char[pitches[0] * lines[0]];
 	}
+
+	player->formatWaitVar.notify_one();
 
 	return 1; // indicates the number of buffers allocated
 }
