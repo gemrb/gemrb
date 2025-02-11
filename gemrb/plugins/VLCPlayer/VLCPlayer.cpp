@@ -87,7 +87,8 @@ bool VLCPlayer::DecodeFrame(VideoBuffer& buf)
 		       planes[0], &pitches[0], // Y or RGB
 		       planes[1], &pitches[1], // U
 		       planes[2], &pitches[2]); // V
-	return true;
+
+	return libvlc_media_player_get_state(mediaPlayer) == libvlc_Playing;
 }
 
 void VLCPlayer::DestroyPlayer()
