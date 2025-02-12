@@ -1533,6 +1533,7 @@ retry:
 		default: //just in case
 			Cycle = SixteenToFive[Orient];
 			Prefix = "stc";
+			Log(DEBUG, "CharAnimation", "Unhandled pst stance: {}", StanceID);
 			break;
 	}
 	dest.Format("{}{}{}", ResRefBase[0], Prefix, ResRefBase.begin() + 1);
