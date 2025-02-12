@@ -6884,7 +6884,6 @@ int fx_puppet_master(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 		case 3:
 			puppetRef = "simulacr";
-			copy->SetBase(IE_SEX, SEX_ILLUSION);
 			// healable level drain
 			// second generation simulacri are supposedly at a different level, but that makes little sense:
 			// level = original caster - caster / 2; eg. lvl 32 -> 16 -> 24 -> 20 -> 22 -> 21

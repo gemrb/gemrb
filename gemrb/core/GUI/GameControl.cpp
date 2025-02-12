@@ -838,6 +838,7 @@ static void PrintCollection(const char* name, const CONTAIN& container)
 //Effect for the ctrl-r cheatkey (resurrect)
 static EffectRef heal_ref = { "CurrentHPModifier", -1 };
 static EffectRef damage_ref = { "Damage", -1 };
+static EffectRef puppet_ref = { "PuppetMarker", -1 };
 
 /** Key Release Event */
 bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
@@ -1897,7 +1898,9 @@ void GameControl::TryToCast(Actor* source, const Actor* tgt)
 //generate action code for source actor to use talk to target actor
 void GameControl::TryToTalk(Actor* source, const Actor* tgt) const
 {
-	if (source->GetStat(IE_SEX) == SEX_ILLUSION) return;
+	if (source->GetStat(IE_SEX) == SEX_ILLUSION || source->fxqueue.HasEffectWithParam(puppet_ref, 3)) {
+		return;
+	}
 	//Nidspecial1 is just an unused action existing in all games
 	//(non interactive demo)
 	//i found no fitting action which would emulate this kind of
@@ -1910,7 +1913,9 @@ void GameControl::TryToTalk(Actor* source, const Actor* tgt) const
 //generate action code for actor appropriate for the target mode when the target is a container
 void GameControl::HandleContainer(Container* container, Actor* actor)
 {
-	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
+	if (actor->GetStat(IE_SEX) == SEX_ILLUSION || actor->fxqueue.HasEffectWithParam(puppet_ref, 3)) {
+		return;
+	}
 	//container is disabled, it should not react
 	if (container->Flags & CONT_DISABLED) {
 		return;
@@ -1994,6 +1999,7 @@ bool GameControl::HandleActiveRegion(InfoPoint* trap, Actor* actor, const Point&
 		TryToDisarm(actor, trap);
 		return true;
 	}
+	if (actor->fxqueue.HasEffectWithParam(puppet_ref, 3)) return false;
 
 	switch (trap->Type) {
 		case ST_TRAVEL:
