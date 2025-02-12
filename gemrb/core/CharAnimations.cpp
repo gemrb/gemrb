@@ -1472,6 +1472,9 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
 	const char* Prefix;
 	static const char prefixes[2][4] = { "sf2", "sf1" };
 	int flip = RandomFlip();
+	if (StanceID == IE_ANI_RUN && !AvatarTable[AvatarsRowNum].RunScale) {
+		StanceID = IE_ANI_WALK;
+	}
 
 retry:
 	switch (StanceID) {
