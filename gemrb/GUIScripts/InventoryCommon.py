@@ -37,6 +37,10 @@ StackAmount = 0
  # A map that defines which inventory slots are used per character (PST)
 SlotMap = None
 
+# a runtime-only list of items already identified, so optionally, when you pick
+# up the same item later, it's autoidentified
+IdentifiedItems = set()
+
 def InventoryClosed(win):
 	GemRB.LeaveContainer()
 	if GemRB.IsDraggingItem () == 1:
@@ -469,16 +473,27 @@ def OpenItemInfoWindow (slotItem, pc):
 	DisplayItem (slotItem)
 	return
 
+def MarkAsIdentified(pc, slot, slotItem):
+	global IdentifiedItems
+
+	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	slotItem["Flags"] |= IE_INV_ITEM_IDENTIFIED
+	IdentifiedItems.add(slotItem["ItemResRef"].upper())
+	return
+
 # auto identify when lore is high enough
 def TryAutoIdentification(pc, item, slot, slot_item, enabled, feedback = False):
 	if not enabled or slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
 		return False
 
+	if GemRB.GetVar ("GUIEnhancements") & GE_PERSISTENT_IDENTIFICATION and slot_item["ItemResRef"].upper() in IdentifiedItems:
+		MarkAsIdentified (pc, slot, slot_item)
+		return True
+
 	if not GameCheck.IsIWD2 ():
 		# simple logic for other games
 		if item["LoreToID"] <= GemRB.GetPlayerStat (pc, IE_LORE):
-			GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-			slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+			MarkAsIdentified (pc, slot, slot_item)
 			return True
 		return False
 
@@ -493,8 +508,7 @@ def TryAutoIdentification(pc, item, slot, slot_item, enabled, feedback = False):
 	success = lore >= itemIdDC
 	msgArea = GemRB.GetView ("MsgSys")
 	if success:
-		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-		slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+		MarkAsIdentified (pc, slot, slot_item)
 	# @39263 = ~Failed identify item check! (Knowledge Arcana + Int mod) %d + %d vs. (item's lore) %d~
 	# @39264 = ~Successful identify item check! (Knowledge Arcana + Int mod) %d + %d vs. (item's lore) %d~
 	if feedback:
@@ -507,8 +521,7 @@ def TryAutoIdentification(pc, item, slot, slot_item, enabled, feedback = False):
 		alchemy = GemRB.GetPlayerStat (pc, IE_ALCHEMY)
 		success = alchemy >= itemIdDC
 		if success:
-			GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-			slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+			MarkAsIdentified (pc, slot, slot_item)
 		# @39261 = ~Successful identify potion check! (Alchemy + Int mod) %d + %d vs. (potion's lore) %d~
 		# @39262 = ~Failed identify potion check! (Alchemy + Int mod) %d + %d vs. (potion's lore) %d~
 		if feedback:
@@ -521,8 +534,7 @@ def TryAutoIdentification(pc, item, slot, slot_item, enabled, feedback = False):
 	if bardLevel > 0:
 		success = (bardLevel + intBon) >= itemIdDC
 		if success:
-			GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-			slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+			MarkAsIdentified (pc, slot, slot_item)
 		# @39259 = ~Failed identify item check! Check Bardic Lore %d vs. item's lore %d (%d Intelligence Ability Mod)~
 		# @39260 = ~Successful identify item check! Check Bardic Lore %d vs. item's lore %d (%d Intelligence Ability Mod)~
 		if feedback:
@@ -948,8 +960,7 @@ def IdentifyUseSpell (slotItem, pc):
 	"""Identifies the item with a memorized spell."""
 
 	GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 1)
-	GemRB.ChangeItemFlag (pc, slotItem["Slot"], IE_INV_ITEM_IDENTIFIED, OP_OR)
-	slotItem["Flags"] |= IE_INV_ITEM_IDENTIFIED
+	MarkAsIdentified (pc, slotItem["Slot"], slotItem)
 	if GameCheck.IsPST ():
 		strRef = GetPSTPersonalizedRef (pc, 35685)
 		GemRB.GetString (strRef, 2) # play the attached sound
@@ -962,8 +973,7 @@ def IdentifyUseScroll (slotItem, pc):
 	"""Identifies the item with a scroll or other item."""
 
 	if GemRB.HasSpecialItem (pc, 1, 1):
-		GemRB.ChangeItemFlag (pc, slotItem["Slot"], IE_INV_ITEM_IDENTIFIED, OP_OR)
-		slotItem["Flags"] |= IE_INV_ITEM_IDENTIFIED
+		MarkAsIdentified (pc, slotItem["Slot"], slotItem)
 	if GameCheck.IsPST ():
 		strRef = GetPSTPersonalizedRef (pc, 35685)
 		GemRB.GetString (strRef, 2) # play the attached sound
