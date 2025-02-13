@@ -133,28 +133,28 @@ enum PaletteType : uint8_t {
 
 struct AvatarStruct {
 	/* entries from avatars.2da */
-	unsigned int AnimID;
+	unsigned int AnimID = 0;
 	ResRef PaletteType;
 	ResRef Prefixes[4];
-	unsigned char AnimationType;
-	unsigned char CircleSize;
-	char Size;
+	unsigned char AnimationType = 0;
+	unsigned char CircleSize = 0;
+	char Size = 0;
 
 	/* comes from bloodclr.2da */
-	char BloodColor;
-	unsigned int Flags;
+	char BloodColor = 0;
+	unsigned int Flags = 0;
 
 	/* resdata.ini entries */
-	unsigned int WalkScale; /* 1000 / walkscale */
-	unsigned int RunScale; /* 1000 / runscale */
-	int Bestiary;
+	unsigned int WalkScale = 0; /* 1000 / walkscale */
+	unsigned int RunScale = 0; /* 1000 / runscale */
+	int Bestiary = -1;
 
 	/* comes from walksnd.2da */
 	ResRef WalkSound;
-	ieByte WalkSoundCount;
+	ieByte WalkSoundCount = 0;
 
 	/* comes from stances.2da */
-	unsigned char StanceOverride[MAX_ANIMS];
+	unsigned char StanceOverride[MAX_ANIMS] {};
 
 	ResRef ShadowAnimation;
 };

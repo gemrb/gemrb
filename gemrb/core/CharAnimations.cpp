@@ -95,10 +95,6 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept
 		}
 		table[i].Size = size;
 
-		table[i].WalkScale = 0;
-		table[i].RunScale = 0;
-		table[i].Bestiary = -1;
-
 		for (unsigned char j = 0; j < MAX_ANIMS; j++) {
 			table[i].StanceOverride[j] = j;
 		}
