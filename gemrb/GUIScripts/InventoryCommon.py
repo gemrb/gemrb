@@ -500,7 +500,7 @@ def TryAutoIdentification(pc, item, slot, slot_item, enabled, feedback = False):
 	if feedback:
 		msgArea.Append (GemRB.GetString(39263 + success).format(lore, intBon, itemIdDC) + "\n")
 	if success:
-		return
+		return True
 
 	# 2. try alchemy for potions
 	if item["Type"] == 9:
@@ -514,7 +514,7 @@ def TryAutoIdentification(pc, item, slot, slot_item, enabled, feedback = False):
 		if feedback:
 			msgArea.Append (GemRB.GetString(39262 - success).format(alchemy, intBon, itemIdDC) + "\n")
 		if success:
-			return
+			return True
 
 	# 3. try bardic lore
 	bardLevel = GemRB.GetPlayerStat (pc, IE_LEVELBARD)
