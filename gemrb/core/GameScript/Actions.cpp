@@ -5411,11 +5411,11 @@ void GameScript::ExploreMapChunk(Scriptable* Sender, Action* parameters)
 	Map* map = Sender->GetCurrentArea();
 	/*
 	There is a mode flag in int1Parameter, but i don't know what is it,
-	our implementation uses it for LOS=1, or no LOS=0
 	ExploreMapChunk will reveal both visibility/explored map, but the
-	visibility will fade in the next update cycle (which is quite frequent)
+	visibility will fade in the next update cycle (which is quite frequent).
+	The action is an instant, so it will only run once.
 	*/
-	map->ExploreMapChunk(SearchmapPoint(parameters->pointParameter), parameters->int0Parameter, parameters->int1Parameter);
+	map->ExploreMapChunk(SearchmapPoint(parameters->pointParameter), parameters->int1Parameter, 0);
 }
 
 void GameScript::StartStore(Scriptable* Sender, Action* parameters)
