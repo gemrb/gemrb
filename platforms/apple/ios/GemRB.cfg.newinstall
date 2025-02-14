@@ -14,9 +14,6 @@
 # coordinates and may stop being clickable).        #
 #####################################################
 
-# Enable all gui enhancements ? [Boolean]
-GUIEnhancements = 1
-
 #####################################################
 #  Debug                                            #
 #####################################################

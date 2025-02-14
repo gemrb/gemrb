@@ -50,6 +50,10 @@ def AddGemRBOptionsButton (window, frame, xOff, yOff, sprite, cycle = 0):
 	extraOpts.OnPress (OpenGemRBOptionsWindow)
 	return
 
+def CloseConfigWindow ():
+	GemRB.GetView ("SUB_WIN", 1).Close()
+	GemRB.SaveConfig ()
+
 def OpenGUIEnhancementsWindow ():
 	title = [
 		"",
@@ -98,7 +102,7 @@ def OpenGUIEnhancementsWindow ():
 	# NOTE: since the second param is not a strref, reverting to default won't work
 	GUIOPTControls.OptHelpText (controlIDs["help"], desc[0])
 
-	GUIOPTControls.OptDone (Window.Close, controlIDs["done"])
+	GUIOPTControls.OptDone (CloseConfigWindow, controlIDs["done"])
 	GUIOPTControls.OptCancel (Window.Close, controlIDs["cancel"])
 
 	GUIOPTControls.OptCheckbox (desc[1], controlIDs["1"], controlIDs["1t"], title[1], 'GUIEnhancements', None, GE_SCROLLBARS)

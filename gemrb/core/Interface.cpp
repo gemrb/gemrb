@@ -265,7 +265,6 @@ Interface::Interface(CoreSettings&& cfg)
 	vars = std::move(config.vars);
 	// for simple GUIScript access
 	vars.Set("MaxPartySize", config.MaxPartySize);
-	vars.Set("GUIEnhancements", config.GUIEnhancements);
 
 	LoadPlugins();
 	InitVideo();
@@ -2277,6 +2276,10 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 
 	if (overrides->GetKeyAsInt("Game Options", "Cheats", 1)) {
 		EnableCheatKeys(1);
+	}
+
+	if (vars.Get("GUIEnhancements", 0xffff) == 0xffff) { // populate with deprecated key if any
+		vars.Set("GUIEnhancements", config.GUIEnhancements);
 	}
 
 	// copies
