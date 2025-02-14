@@ -3552,7 +3552,10 @@ void Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los)
 void Map::UpdateFog()
 {
 	TRACY(ZoneScoped);
-	VisibleBitmap.fill(0);
+	// don't reset in cutscenes just in case the PST ExploreMapChunk action was ran
+	if (!core->InCutSceneMode()) {
+		VisibleBitmap.fill(0);
+	}
 
 	std::set<Spawn*> potentialSpawns;
 	for (const auto actor : actors) {
