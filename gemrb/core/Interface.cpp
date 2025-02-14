@@ -2124,7 +2124,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 
 	AutoTable sttable = gamedata->LoadTable(movieRef);
 	auto font = GetFont(MovieFontResRef);
-	if (sttable && font) {
+	if (sttable && font && sttable->GetColumnName(0) == "Frame") {
 		int r = sttable->QueryFieldSigned<int>("red", "frame");
 		int g = sttable->QueryFieldSigned<int>("green", "frame");
 		int b = sttable->QueryFieldSigned<int>("blue", "frame");
