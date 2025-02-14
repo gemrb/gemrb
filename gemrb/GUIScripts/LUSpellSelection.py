@@ -73,7 +73,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	global KitMask, EnhanceGUI, Memorization, SpellBookType, SpellsPickButton, ButtonCount, Class
 
 	#enhance GUI?
-	if (GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS) and not IWD2:
+	if not IWD2:
 		EnhanceGUI = 1
 
 	# save our pc

@@ -57,7 +57,7 @@ def CloseConfigWindow ():
 def OpenGUIEnhancementsWindow ():
 	title = [
 		"",
-		"Extra scrollbars as needed",
+		"New color for empty containers",
 		"Autoidentify on item transfer",
 		"Open bag contents directly",
 		"Stop scrolling on focus loss",
@@ -69,7 +69,7 @@ def OpenGUIEnhancementsWindow ():
 
 	desc = [
 		"Here you can toggle various little improvements over the originals.",
-		"Add scrollbars to various windows where mods may make it necessary, but it wasn't needed in the originals.",
+		"Chests, stashes and other containers will be drawn in grey when highlighted instead of the default color. This makes it easy to distinguish those you have already fully looted.",
 		"When moving items between pcs or containers, plus when opening an item description, try autoidentifying the item first to save a few clicks. It's still based on lore.",
 		"Skip displaying the bag/quiver/ammo belt description window and open their item list immediately instead.",
 		"When the mouse leaves the GemRB window, stop any area scrolling that was triggered near the border.",
@@ -105,7 +105,7 @@ def OpenGUIEnhancementsWindow ():
 	GUIOPTControls.OptDone (CloseConfigWindow, controlIDs["done"])
 	GUIOPTControls.OptCancel (Window.Close, controlIDs["cancel"])
 
-	GUIOPTControls.OptCheckbox (desc[1], controlIDs["1"], controlIDs["1t"], title[1], 'GUIEnhancements', None, GE_SCROLLBARS)
+	GUIOPTControls.OptCheckbox (desc[1], controlIDs["1"], controlIDs["1t"], title[1], 'GUIEnhancements', None, GE_CONTAINERS)
 	GUIOPTControls.OptCheckbox (desc[2], controlIDs["2"], controlIDs["2t"], title[2], 'GUIEnhancements', None, GE_TRY_IDENTIFY_ON_TRANSFER)
 	GUIOPTControls.OptCheckbox (desc[3], controlIDs["3"], controlIDs["3t"], title[3], 'GUIEnhancements', None, GE_ALWAYS_OPEN_CONTAINER_ITEMS)
 	GUIOPTControls.OptCheckbox (desc[4], controlIDs["4"], controlIDs["4t"], title[4], 'GUIEnhancements', None, GE_UNFOCUS_STOPS_SCROLLING)

@@ -35,7 +35,6 @@ KitTable = 0
 Init = 0
 MyChar = 0
 KitSelected = 0 #store clicked kit on redraw as number within RowCount
-EnhanceGUI = GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS #extra kit button and scroll bar toggle
 
 def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
@@ -81,23 +80,20 @@ def OnLoad():
 
 	TopIndex = 0
 	GemRB.SetVar("TopIndex", 0)
-	if EnhanceGUI:
-		tmpRowCount = RowCount
-		if RowCount>10: #create 11 kit button
-			extrakit = KitWindow.CreateButton (15, 18, 250, 271, 20)
-			extrakit.SetState(IE_GUI_BUTTON_DISABLED)
-			extrakit.SetFlags(IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_CAPS, OP_OR)
-			extrakit.SetSprites("GUICGBC",0, 0,1,2,3)
-			RowCount = 11
 
-		if tmpRowCount>11: #create scroll bar
-			ScrollBar = KitWindow.CreateScrollBar(1000, {'x' : 290, 'y' : 50, 'w' : 16, 'h' : 220}, "GUISCRCW")
-			ScrollBar.SetVarAssoc ("TopIndex", tmpRowCount-10, 0, tmpRowCount-10)
-			ScrollBar.OnChange (RedrawKits)
-			KitWindow.SetEventProxy(ScrollBar)
+	tmpRowCount = RowCount
+	if RowCount > 10: # create 11th kit button
+		extrakit = KitWindow.CreateButton (15, 18, 250, 271, 20)
+		extrakit.SetState (IE_GUI_BUTTON_DISABLED)
+		extrakit.SetFlags (IE_GUI_BUTTON_RADIOBUTTON | IE_GUI_BUTTON_CAPS, OP_OR)
+		extrakit.SetSprites ("GUICGBC", 0, 0, 1, 2, 3)
+		RowCount = 11
 
-	elif not EnhanceGUI and RowCount>10:
-		RowCount = 10
+	if tmpRowCount > 11: # create scrollbar
+		ScrollBar = KitWindow.CreateScrollBar (1000, {'x' : 290, 'y' : 50, 'w' : 16, 'h' : 220}, "GUISCRCW")
+		ScrollBar.SetVarAssoc ("TopIndex", tmpRowCount - 10, 0, tmpRowCount - 10)
+		ScrollBar.OnChange (RedrawKits)
+		KitWindow.SetEventProxy (ScrollBar)
 
 	for i in range(RowCount):
 		if i<4:
