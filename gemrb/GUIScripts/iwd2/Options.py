@@ -20,6 +20,7 @@
 
 import GemRB
 import GUIOPT
+import GUIOPTExtra
 from GUIDefines import *
 
 def OnLoad():
@@ -63,6 +64,10 @@ def OnLoad():
 		OptionsWindow.Close ()
 	ReturnButton.OnPress (CloseStartOptions)
 	ReturnButton.MakeEscape()
+
+	# GemRB extras
+	frame = KeyboardButton.GetFrame ()
+	GUIOPTExtra.AddGemRBOptionsButton (OptionsWindow, frame, 0, 60, "GBTNLRG2")
 
 	OptionsWindow.Focus()
 	GemRB.GetView ("STARTWIN").SetDisabled (True)

@@ -34,6 +34,7 @@ import GemRB
 import GUICommonWindows
 import GUISAVE
 import GUIOPTControls
+import GUIOPTExtra
 from GUIDefines import *
 from ie_sounds import GEM_SND_VOL_MUSIC, GEM_SND_VOL_AMBIENTS
 
@@ -48,7 +49,7 @@ def InitOptionsWindow (Window):
 	Container.CloseContainerWindow ()
 
 	# Return to Game
-	Button = Window.GetControl (11)
+	Button = ReturnButton = Window.GetControl (11)
 	Button.SetText (10308)
 	Button.OnPress (Window.Close)
 	Button.MakeEscape()
@@ -97,6 +98,20 @@ def InitOptionsWindow (Window):
 		MoviesButton = Window.GetControl (14)
 		MoviesButton.SetText (15415)
 		MoviesButton.OnPress (OpenMovieWindow)
+
+	# GemRB extras
+	frame = ReturnButton.GetFrame ()
+	if GameCheck.IsIWD2 ():
+		frame = MoviesButton.GetFrame ()
+		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, 110, "GBTNLRG2")
+	elif GameCheck.IsBG2 ():
+		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, -40, "GUBOTC", 1)
+	elif GameCheck.IsBG2EE ():
+		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, -50, "GUIOSTCL")
+	elif GameCheck.IsBG1 ():
+		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, 55, "BIGBUTT")
+	elif GameCheck.IsIWD1 ():
+		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, 50, "STONEOPT", 1)
 
 	return
 

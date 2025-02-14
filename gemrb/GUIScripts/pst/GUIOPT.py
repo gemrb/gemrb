@@ -37,6 +37,7 @@ import GUICommon
 import GUICommonWindows
 import GUISAVE
 import GUIOPTControls
+import GUIOPTExtra
 from ie_sounds import *
 from GUIDefines import *
 
@@ -88,6 +89,10 @@ def InitOptionsWindow (Window):
 	# game version, e.g. v1.1.0000
 	Label = Window.GetControl (0x10000007)
 	Label.SetText (GemRB.Version)
+
+	# GemRB options
+	frame = Window.GetControl (5).GetFrame ()
+	GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 115, 80, "OSSAVE")
 
 	return
 
