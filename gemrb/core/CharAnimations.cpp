@@ -1512,6 +1512,14 @@ retry:
 			Cycle = SixteenToNine[Orient];
 			Prefix = "wlk";
 			break;
+		case IE_ANI_CAST:
+			Cycle = SixteenToNine[Orient];
+			Prefix = "sp1";
+			break;
+		case IE_ANI_CONJURE:
+			Cycle = SixteenToNine[Orient];
+			Prefix = "sp2";
+			break;
 		case IE_ANI_HEAD_TURN:
 			Cycle = SixteenToFive[Orient];
 
