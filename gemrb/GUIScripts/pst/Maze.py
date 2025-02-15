@@ -388,17 +388,22 @@ def CustomizeMaze(AreaName):
 		return
 
 	difficulty = GemRB.GetGameVar("MazeDifficulty")
+	# override their shipped random item, since it's too basic
+	# it's already resolved before we change it, so you can sometime get a bonus worthless item
+	loot = "RNDTRE06"
 	if difficulty == 0:
 		name = "CLOW"
 	elif difficulty == 1:
 		name = "CMOD"
 	else:
 		name = "CHIGH"
+		loot = "RNDTRE07"
 
 	ccount = GemRB.Roll(1,3,0)
 
 	for i in range(ccount):
-		GemRB.CreateCreature(0, name, cposx[i], cposy[i])
+		gid = GemRB.CreateCreature(0, name, cposx[i], cposy[i])
+		GemRB.CreateItem (gid, loot, 30)
 
 	trapped = entry['Trapped']
 	if trapped>=0:
