@@ -61,7 +61,7 @@ public:
 		IMAGE_COUNT
 	};
 
-	int StepIncrement;
+	int StepIncrement = 1;
 
 	ScrollBar(const Region& frame, const Holder<Sprite2D>[IMAGE_COUNT]);
 	ScrollBar(const ScrollBar& sb);
@@ -88,8 +88,6 @@ private:
 	void Init(const Holder<Sprite2D> images[IMAGE_COUNT])
 	{
 		ControlType = IE_GUI_SCROLLBAR;
-		State = 0;
-		StepIncrement = 1;
 		Size s = frame.size;
 
 		for (int i = 0; i < IMAGE_COUNT; i++) {
