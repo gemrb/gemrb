@@ -103,7 +103,9 @@ void MVEPlayer::Wait(microseconds us)
 #ifdef WIN32
 	// Win is known to be limited to 14-16ms precision by default
 	// so do spin lock instead
-	LARGE_INTEGER time1, time2, freq;
+	LARGE_INTEGER time1;
+	LARGE_INTEGER time2;
+	LARGE_INTEGER freq;
 
 	QueryPerformanceCounter(&time1);
 	QueryPerformanceFrequency(&freq);
@@ -356,7 +358,7 @@ MVEPlayer::FrameResult MVEPlayer::QueueAudio(bool silence, uint16_t size)
 		return FrameResult::OK;
 	}
 
-	char* readBuffer = reinterpret_cast<char*>(audioLoadBuffer.data());
+	const char* readBuffer = reinterpret_cast<const char*>(audioLoadBuffer.data());
 	if (silence) {
 		std::fill(audioLoadBuffer.begin(), audioLoadBuffer.begin() + audioSize, 0);
 	} else {
@@ -365,7 +367,7 @@ MVEPlayer::FrameResult MVEPlayer::QueueAudio(bool silence, uint16_t size)
 				return FrameResult::ERROR;
 			}
 
-			readBuffer = reinterpret_cast<char*>(audioDecompressedBuffer.data());
+			readBuffer = reinterpret_cast<const char*>(audioDecompressedBuffer.data());
 			ipaudio_uncompress(
 				reinterpret_cast<short int*>(audioDecompressedBuffer.data()),
 				audioSize,

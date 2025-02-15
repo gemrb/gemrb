@@ -2233,11 +2233,11 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			Actor* mainActor = GetMainSelectedActor();
 			if (mainActor && overMe->Type != ST_TRAVEL) {
 				CreateMovement(mainActor, p, false, tryToRun); // let one actor handle doors, loot and containers
+			} else if (core->HasFeature(GFFlags::TEAM_MOVEMENT) && overMe->Type == ST_TRAVEL) {
+				PerformSelectedAction(p);
+				alreadyActed = true;
+				CommandSelectedMovement(p, overMe->Type != ST_TRAVEL, false, tryToRun);
 			} else {
-				if (core->HasFeature(GFFlags::TEAM_MOVEMENT) && overMe && overMe->Type == ST_TRAVEL && targetMode == TargetMode::None) {
-					PerformSelectedAction(p);
-					alreadyActed = true;
-				}
 				CommandSelectedMovement(p, overMe->Type != ST_TRAVEL, false, tryToRun);
 			}
 		}

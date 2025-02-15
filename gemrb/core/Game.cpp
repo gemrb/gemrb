@@ -497,8 +497,8 @@ int Game::JoinParty(Actor* actor, int join)
 			}
 		}
 		if (actor2) {
-			int slot = InStore(actor2);
-			DelNPC(slot);
+			int slot2 = InStore(actor2);
+			DelNPC(slot2);
 			actor2->SetPersistent(-1);
 		}
 	}
