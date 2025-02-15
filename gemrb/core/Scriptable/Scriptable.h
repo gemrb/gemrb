@@ -423,8 +423,7 @@ public:
 	bool AuraPolluted();
 	ieDword GetLocal(const ieVariable& key, ieDword fallback) const;
 	virtual std::string dump() const = 0;
-	void SetPos(const NavmapPoint& pos)
-	{
+	virtual void SetPos(const NavmapPoint& pos) {
 		Pos = pos;
 		SMPos = SearchmapPoint(pos);
 	};

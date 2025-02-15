@@ -489,6 +489,40 @@ Map::~Map(void)
 	}
 }
 
+void Map::TraversabilityUnblock(Actor *actor) {
+	ValidateTraversabilitySize();
+	const auto ActorPosition = actor->Pos;
+	const auto Idx = ActorPosition.y * PropsSize().w * 16 + ActorPosition.x;
+	Traversability[Idx].type = ETraversability::empty;
+}
+
+void Map::TraversabilityBlock(Actor *actor) const {
+	ValidateTraversabilitySize();
+	const bool bIsTraversable = actor->IsTraversable();
+	const auto ActorPosition = actor->Pos;
+	const auto Idx = ActorPosition.y * PropsSize().w * 16 + ActorPosition.x;
+	Traversability[Idx].type = bIsTraversable ? ETraversability::actor : ETraversability::actorNonTraversable;
+	Traversability[Idx].actor = actor;
+}
+
+void Map::UpdateTraversability() const {
+	ValidateTraversabilitySize();
+	for (const auto actor : actors) {
+		if (!actor) {
+			continue;
+		}
+		TraversabilityBlock(actor);
+	}
+}
+
+void Map::ValidateTraversabilitySize() const  {
+	const auto ExpectedSize = PropsSize().h * 12 * PropsSize().w * 16;
+	if (Traversability.size() != ExpectedSize) {
+		Traversability.clear();
+		Traversability.resize(ExpectedSize, { ETraversability::empty, nullptr} );
+	}
+}
+
 void Map::SetTileMapProps(TileProps props)
 {
 	tileProps = std::move(props);
@@ -671,6 +705,7 @@ void Map::DrawPortal(const InfoPoint* ip, int enable)
 
 void Map::UpdateScripts()
 {
+	UpdateTraversability();
 	bool has_pcs = false;
 	for (const auto& actor : actors) {
 		if (actor->InParty) {
@@ -1934,12 +1969,20 @@ void Map::InitActors()
 {
 	if (core->config.UseAsLibrary) return;
 
+	// Traversability.clear();
+	// Traversability.resize(PropsSize().Area(), ETraversability::empty);
+
 	// setting the map can run effects, so play on the safe side and ignore any actors that might get added
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 		actor->SetMap(this);
 		MarkVisited(actor);
+
+		// const bool bIsBlockingActor = true; // dpysx todo
+		// if (bIsBlockingActor) {
+		// 	TraversabilityBlock(actor);
+		// }
 	}
 }
 
@@ -1960,6 +2003,10 @@ void Map::AddActor(Actor* actor, bool init)
 	actor->AreaName = scriptName;
 	if (!HasActor(actor)) {
 		actors.push_back(actor);
+		const bool IsActorBlocking = !actor->IsTraversable();
+		if (IsActorBlocking) {
+			TraversabilityBlock(actor);
+		}
 	}
 	if (init) {
 		actor->SetMap(this);

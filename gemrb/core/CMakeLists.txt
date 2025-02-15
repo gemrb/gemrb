@@ -41,6 +41,8 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	PalettedImageMgr.cpp
 	Particles.cpp
 	PathFinder.cpp
+	FindPathOrig.cpp
+	FindPathImproved.cpp
 	PluginMgr.cpp
 	Polygon.cpp
 	Projectile.cpp

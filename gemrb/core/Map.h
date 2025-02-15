@@ -373,6 +373,147 @@ public:
 	void PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, PathMapFlags value) const noexcept;
 };
 
+	struct FLinearCoordsHelper
+	{
+		FLinearCoordsHelper(uint32_t InMapSize)
+			:
+			OneOverMapSize(1.0f / InMapSize),
+			MapSize(InMapSize),
+			Directions // for linear coords, the neighbours directions maps directly to a constant value of diff between two tiles
+			{
+				(int32_t)MapSize,		// North = 0,	// North: X+1	„+MAP SIZE”
+				1,					// East = 1,	// East: Y+1	„+1”
+				-(int32_t)MapSize,	// South = 2,	// South: X-1	"-MAP SIZE"
+				-1, // West = 3,	// West: Y-1	„-1”
+				0					// Undefined = 4,
+			}
+		{
+		}
+
+		const float OneOverMapSize;
+		const uint32_t MapSize;
+		const int32_t Directions[5];
+
+		int32_t GetIdx(const uint16_t X, const uint16_t Y) const
+		{
+			return X * MapSize + Y;
+		}
+
+		// FString Print(int32_t idx) const
+		// {
+		// 	return FString::Printf(TEXT("[X=%d, Y=%d, IDX=%d]"), GetIdxX(idx), GetIdxY(idx), idx);
+		// }
+
+		__always_inline int32_t GetDistance(const uint32_t IdxA, const uint32_t IdxB) const
+		{
+			return std::abs(GetIdxX(IdxB) - GetIdxX(IdxA)) + std::abs(GetIdxY(IdxB) - GetIdxY(IdxA));
+		}
+
+		// bool IsWalkable(int32_t IdxFrom, int32_t IdxTo) const
+		// {
+		// 	const FKorCoords From(GetIdxX(IdxFrom), GetIdxY(IdxFrom));
+		// 	const FKorCoords To(GetIdxX(IdxTo), GetIdxY(IdxTo));
+		// 	return FKorNavigationHelper::IsWalkable(From, To);
+		// }
+
+		int32_t GetNeighbourNIdx(const int32_t Idx) const
+		{
+			const int32_t NewIdx = Idx + MapSize;
+			return (NewIdx < (int32_t)(MapSize * MapSize)) ? NewIdx : -1;
+		}
+
+		int32_t GetNeighbourSIdx(const int32_t Idx) const
+		{
+			const int32_t NewIdx = Idx - MapSize;
+			return (Idx >= 0) ? NewIdx : -1;
+		}
+
+		int32_t GetNeighbourWIdx(const int32_t Idx) const
+		{
+			const int32_t NewIdx = Idx - 1;
+			const auto Y = GetIdxY(Idx);
+			return (Y > 0) ? NewIdx : -1;
+		}
+
+		int32_t GetNeighbourEIdx(const int32_t Idx) const
+		{
+			const int32_t NewIdx = Idx + 1;
+			const auto Y = GetIdxY(Idx) + 1;
+			return (Y < (int32_t)MapSize) ? NewIdx : -1;
+		}
+
+		uint16_t GetIdxX(const int32_t n) const
+		{
+			return n * OneOverMapSize;
+		}
+
+		uint16_t GetIdxY(const int32_t n) const
+		{
+			// tried also a "modulo by hand", but benchmarking results show slightly better for native % operator:
+			// const float floatN = n;
+			// const float Quotient = trunc((floatN * OneOverMapSize));
+			// return floatN - MapSize*Quotient;
+			return n % MapSize;
+		}
+
+		__always_inline bool AreTilesInLine(const int32_t TileA, const int32_t TileB, const int32_t TileC, const uint8_t InitialDirection) const
+		{
+			// for linear coords, the neighbours directions maps directly to a constant value of diff between
+			// two tiles, like this:
+			// North: X+1	„+MAP SIZE”
+			// East: Y+1	„+1”
+			// South: X-1	„-MAP SIZE”
+			// West: Y-1	„-1”
+
+			// hack hack: if TileB == TileC, it means we have to check if direction from A to B is in line with Initial Direction
+			const auto bIsBEqualC = TileB == TileC;
+			const auto BMinusA = TileB - TileA;
+			return ((bIsBEqualC) ? (BMinusA == Directions[InitialDirection]) : (BMinusA) == (TileC - TileB));
+		}
+
+		// uint8_t GetDirectionToNeighbour(int32_t CoordsIdxFrom, int32_t CoordsIdxTo) const
+		// {
+		// 	// for linear coords, the neighbours directions maps directly to a constant value of diff between
+		// 	// two tiles, like this:
+		// 	// North: X+1	„+MAP SIZE”
+		// 	// East: Y+1	„+1”
+		// 	// South: X-1	„-MAP SIZE”
+		// 	// West: Y-1	„-1”
+		//
+		// 	// we assume we always will get proper neighbours, so we can skip check if south and north have exactly the MAP SIZE value
+		// 	const int32_t diff = CoordsIdxTo - CoordsIdxFrom;
+		// 	const bool bAreOperandsOk = CoordsIdxTo >= 0; // here hack, only checking CoordsTo, as only here could be a null IDX passed; fixme if not ;)
+		// 	return
+		// 		(
+		// 			(!bAreOperandsOk) * static_cast<uint8>(EKorDirection::Undefined) +
+		// 			(bAreOperandsOk && diff == 1) * static_cast<uint8>(EKorDirection::East) +
+		// 			(bAreOperandsOk && diff > 1) * static_cast<uint8>(EKorDirection::North) +
+		// 			(bAreOperandsOk && diff < 1) * static_cast<uint8>(EKorDirection::South) +
+		// 			(bAreOperandsOk && diff == -1) * static_cast<uint8>(EKorDirection::West));
+		// }
+
+		// FString GetCoordsString(int32 Idx) const
+		// {
+		// 	return FString::Printf(TEXT("{%d, %d}"), GetIdxX(Idx), GetIdxY(Idx));
+		// }
+		//
+		// FKorCoords GetKorCoordsPacked(int32 Idx) const
+		// {
+		// 	return FKorCoords(GetIdxX(Idx), GetIdxY(Idx));
+		// }
+	};
+
+	enum class ETraversability: uint8_t {
+		empty,
+		actor,
+		actorNonTraversable
+	};
+
+	struct FTraversability {
+		ETraversability type;
+		Actor* actor;
+	};
+
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
@@ -422,6 +563,8 @@ private:
 
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
 
+	mutable std::vector<FTraversability> Traversability;
+
 	class MapReverb {
 	public:
 		using id_t = ieDword;
@@ -456,6 +599,15 @@ private:
 public:
 	Map(TileMap* tm, TileProps tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
+
+	void TraversabilityUnblock(Actor * actor);
+
+	void TraversabilityBlock(Actor * actor) const;
+
+	void UpdateTraversability() const;
+
+	void ValidateTraversabilitySize() const;
+
 	static void NormalizeDeltas(float_t& dx, float_t& dy, float_t factor = 1);
 
 	/** prints useful information on console */
@@ -628,6 +780,8 @@ public:
 	Path GetLinePath(const Point& start, const Point& dest, int speed, orient_t Orientation, int flags) const;
 	/* Finds the path which leads to near d */
 	Path FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr) const;
+	Path FindPathImplOriginal(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr) const;
+	Path FindPathImplOriginalImproved(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr) const;
 
 	bool IsVisible(const Point& p) const;
 	bool IsExplored(const Point& p) const;
