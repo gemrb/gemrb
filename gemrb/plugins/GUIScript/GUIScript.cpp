@@ -9870,7 +9870,7 @@ at the specified point (takes precedence if both are specified).\n\
   * CreResRef  - the creature's name (.cre resref)\n\
   * posX, posY - position to create at\n\
 \n\
-**Return value:** N/A\n\
+**Return value:** global ID of the created creature\n\
 \n\
 **See also:** [CreateItem](CreateItem.md)");
 
@@ -9885,13 +9885,14 @@ static PyObject* GemRB_CreateCreature(PyObject* /*self*/, PyObject* args)
 	GET_MAP();
 
 	ResRef CreResRef = ResRefFromPy(cstr);
+	ScriptID gid;
 	if (PosX != -1 && PosY != -1) {
-		map->SpawnCreature(Point(PosX, PosY), CreResRef);
+		gid = map->SpawnCreature(Point(PosX, PosY), CreResRef);
 	} else {
 		GET_ACTOR_GLOBAL();
-		map->SpawnCreature(actor->Pos, CreResRef, Size(10, 10));
+		gid = map->SpawnCreature(actor->Pos, CreResRef, Size(10, 10));
 	}
-	Py_RETURN_NONE;
+	return PyLong_FromLong(gid);
 }
 
 PyDoc_STRVAR(GemRB_RevealArea__doc,

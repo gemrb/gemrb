@@ -3291,9 +3291,9 @@ void Map::LoadIniSpawn()
 	}
 }
 
-bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& radius, ieWord rwdist, int* difficulty, unsigned int* creCount)
+ScriptID Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& radius, ieWord rwdist, int* difficulty, unsigned int* creCount)
 {
-	bool spawned = false;
+	ScriptID spawned = 0;
 	const SpawnGroup* sg = nullptr;
 	bool first = (creCount ? *creCount == 0 : true);
 	int level = (difficulty ? *difficulty : core->GetGame()->GetTotalPartyLevel(true));
@@ -3304,7 +3304,7 @@ bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& r
 		if (first || (level >= sg->Level())) {
 			count = sg->Count();
 		} else {
-			return false;
+			return 0;
 		}
 	}
 
@@ -3329,7 +3329,7 @@ bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& r
 			creature->RefreshEffects();
 			if (difficulty && !sg) *difficulty -= cpl;
 			if (creCount) (*creCount)++;
-			spawned = true;
+			spawned = creature->GetGlobalID();
 		}
 	}
 
