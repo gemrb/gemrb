@@ -314,12 +314,17 @@ struct avType {
 static std::vector<avType> avPrefix;
 
 void Actor::SetPos(const NavmapPoint& pos) {
-	const bool bIsActorBlocking = !IsTraversable();
-	if (bIsActorBlocking) {
-		area->TraversabilityUnblock(this);
+	bool bIsActorBlocking = false;
+	if (area) {
+		bIsActorBlocking = !IsTraversable();
+		if (bIsActorBlocking) {
+			if (area) {
+				area->TraversabilityUnblock(this);
+			}
+		}
 	}
 	Pos = pos;
-	if (bIsActorBlocking) {
+	if (area && bIsActorBlocking) {
 		area->TraversabilityBlock(this);
 	}
 	SMPos = SearchmapPoint(pos);

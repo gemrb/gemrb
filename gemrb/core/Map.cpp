@@ -493,7 +493,9 @@ void Map::TraversabilityUnblock(Actor *actor) {
 	ValidateTraversabilitySize();
 	const auto ActorPosition = actor->Pos;
 	const auto Idx = ActorPosition.y * PropsSize().w * 16 + ActorPosition.x;
-	Traversability[Idx].type = ETraversability::empty;
+	if (Idx < Traversability.size()) {
+		Traversability[Idx].type = ETraversability::empty;
+	}
 }
 
 void Map::TraversabilityBlock(Actor *actor) const {
@@ -501,8 +503,10 @@ void Map::TraversabilityBlock(Actor *actor) const {
 	const bool bIsTraversable = actor->IsTraversable();
 	const auto ActorPosition = actor->Pos;
 	const auto Idx = ActorPosition.y * PropsSize().w * 16 + ActorPosition.x;
-	Traversability[Idx].type = bIsTraversable ? ETraversability::actor : ETraversability::actorNonTraversable;
-	Traversability[Idx].actor = actor;
+	if (Idx < Traversability.size()) {
+		Traversability[Idx].type = bIsTraversable ? ETraversability::actor : ETraversability::actorNonTraversable;
+		Traversability[Idx].actor = actor;
+	}
 }
 
 void Map::UpdateTraversability() const {
@@ -519,7 +523,10 @@ void Map::ValidateTraversabilitySize() const  {
 	const auto ExpectedSize = PropsSize().h * 12 * PropsSize().w * 16;
 	if (Traversability.size() != ExpectedSize) {
 		Traversability.clear();
-		Traversability.resize(ExpectedSize, { ETraversability::empty, nullptr} );
+		Traversability.resize(ExpectedSize, FTraversability{ ETraversability::empty, nullptr} );
+		// for (int i = 0; i < ExpectedSize; ++i) {
+		// 	Traversability.push_back(FTraversability{ETraversability::empty, nullptr});
+		// }
 	}
 }
 
@@ -2003,10 +2010,6 @@ void Map::AddActor(Actor* actor, bool init)
 	actor->AreaName = scriptName;
 	if (!HasActor(actor)) {
 		actors.push_back(actor);
-		const bool IsActorBlocking = !actor->IsTraversable();
-		if (IsActorBlocking) {
-			TraversabilityBlock(actor);
-		}
 	}
 	if (init) {
 		actor->SetMap(this);
