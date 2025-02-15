@@ -246,7 +246,8 @@ TextArea::TextArea(const Region& frame, Holder<Font> text, Holder<Font> caps)
 	ClearSelectOptions();
 	ClearText();
 
-	scrollview.SetScrollIncrement(LineHeight());
+	stepIncrement = LineHeight();
+	scrollview.SetScrollIncrement(stepIncrement);
 	scrollview.SetAutoResizeFlags(ResizeAll, BitOp::SET);
 	scrollview.SetFlags(View::IgnoreEvents, (Flags() & View::IgnoreEvents) ? BitOp::OR : BitOp::NAND);
 
@@ -675,6 +676,8 @@ void TextArea::SetScrollbar(ScrollBar* sb)
 
 	Point origin = ConvertPointFromWindow(sb->Frame().origin);
 	sb->SetFrameOrigin(origin);
+	// reset increment, since the scrollbar was not attached in the ctor
+	sb->StepIncrement = stepIncrement;
 
 	scrollview.SetVScroll(sb);
 }

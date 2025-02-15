@@ -200,6 +200,7 @@ private: // Private attributes
 	TextContainer* textContainer = nullptr;
 	ScrollView scrollview;
 	Timer* historyTimer = nullptr;
+	int stepIncrement = 1;
 
 	/** Fonts */
 	Holder<Font> finit, ftext;
