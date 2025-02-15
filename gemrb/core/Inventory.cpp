@@ -798,26 +798,47 @@ int Inventory::FindItem(const ResRef& resref, unsigned int flags, unsigned int s
 
 bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map* map, const Point& loc)
 {
-	if (slot >= Slots.size()) {
-		return false;
-	}
-	//these slots will never 'drop' the item
-	if ((slot == (unsigned int) SLOT_FIST) || (slot == (unsigned int) SLOT_MAGIC)) {
-		return false;
-	}
-
-	CREItem* item = Slots[slot];
-	if (!item) {
-		return false;
-	}
-	//if you want to drop undoppable items, simply set IE_INV_UNDROPPABLE
-	//by default, it won't drop them
-	if (((flags ^ IE_INV_ITEM_UNDROPPABLE) & item->Flags) != flags) {
-		return false;
-	}
 	if (!map) {
 		return false;
 	}
+
+	auto IsSlotDroppable = [this, &flags](unsigned int aSlot) {
+		// these slots will never 'drop' the item
+		if (aSlot == (unsigned int) SLOT_FIST || aSlot == (unsigned int) SLOT_MAGIC) {
+			return false;
+		}
+
+		CREItem* item = Slots[aSlot];
+		if (!item) {
+			return false;
+		}
+		// if you want to drop undoppable items, simply set IE_INV_UNDROPPABLE
+		// by default, it won't drop them
+		if (((flags ^ IE_INV_ITEM_UNDROPPABLE) & item->Flags) != flags) {
+			return false;
+		}
+		return true;
+	};
+
+	if ((signed) slot == -1) {
+		// pick "random" slot
+		// the original just used the slots.ids order, grabbing the first available item
+		for (unsigned int idx = 0; idx < Slots.size(); idx++) {
+			if (IsSlotDroppable(idx)) {
+				slot = idx;
+				break;
+			}
+		}
+		if ((signed) slot == -1) {
+			return false;
+		}
+	} else if (slot >= Slots.size()) {
+		return false;
+	} else {
+		if (!IsSlotDroppable(slot)) return false;
+	}
+
+	CREItem* item = Slots[slot];
 	map->AddItemToLocation(loc, item);
 	KillSlot(slot);
 	return true;
