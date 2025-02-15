@@ -3036,49 +3036,43 @@ int GameScript::InCutSceneMode(Scriptable* /*Sender*/, const Trigger* /*paramete
 	return core->InCutSceneMode();
 }
 
+// ees added bg2-style proficiency matching on top of what pst supported
+// and limited it to lower bits matching probably to account for dualclassing
+// we store all of them in the same range of stats
 int GameScript::Proficiency(Scriptable* Sender, const Trigger* parameters)
 {
-	unsigned int idx = parameters->int0Parameter;
-	if (idx > 31) {
-		return 0;
-	}
+	ieByte idx = ieByte(parameters->int0Parameter);
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	const Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return 0;
 	}
 
-	return (signed) actor->GetStat(IE_PROFICIENCYBASTARDSWORD + idx) == parameters->int1Parameter;
+	return (actor->GetProficiency(idx) & 7) == parameters->int1Parameter;
 }
 
 int GameScript::ProficiencyGT(Scriptable* Sender, const Trigger* parameters)
 {
-	unsigned int idx = parameters->int0Parameter;
-	if (idx > 31) {
-		return 0;
-	}
+	ieByte idx = ieByte(parameters->int0Parameter);
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	const Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return 0;
 	}
 
-	return (signed) actor->GetStat(IE_PROFICIENCYBASTARDSWORD + idx) > parameters->int1Parameter;
+	return (actor->GetProficiency(idx) & 7) > parameters->int1Parameter;
 }
 
 int GameScript::ProficiencyLT(Scriptable* Sender, const Trigger* parameters)
 {
-	unsigned int idx = parameters->int0Parameter;
-	if (idx > 31) {
-		return 0;
-	}
+	ieByte idx = ieByte(parameters->int0Parameter);
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	const Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return 0;
 	}
 
-	return (signed) actor->GetStat(IE_PROFICIENCYBASTARDSWORD + idx) < parameters->int1Parameter;
+	return (actor->GetProficiency(idx) & 7) < parameters->int1Parameter;
 }
 
 //this is a PST specific stat, shows how many free proficiency slots we got

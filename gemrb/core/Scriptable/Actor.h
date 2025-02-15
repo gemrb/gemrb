@@ -587,8 +587,6 @@ private:
 	void CreateDerivedStatsIWD2();
 	/* Returns true if the dual class is backwards */
 	bool IsDualSwap() const;
-	/* returns the weapon proficiency stat of the actor */
-	int GetProficiency(ieByte proftype) const;
 	int GetNonProficiencyPenalty(int stars) const;
 	int GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, int& speedBonus, int& criticalBonus) const;
 	/** Re/Inits the Modified vector for PCs/NPCs */
@@ -651,6 +649,8 @@ public:
 	void RollSaves();
 	/** returns a saving throw */
 	bool GetSavingThrow(ieDword type, int modifier, const Effect* fx = nullptr);
+	/* returns the weapon proficiency stat of the actor */
+	int GetProficiency(ieByte proftype) const;
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags, const Scriptable* checker = NULL) const;
 	/** Clamps a stat value to the valid range for the respective stat */
