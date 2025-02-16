@@ -534,8 +534,8 @@ FUNCTION(CONFIGURE_UNIX_SPECIFICS)
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_RPI_SPECIFICS)
-	# check for RaspberryPi
-	FIND_FILE(RPI NAMES bcm_host.h PATHS "/opt/vc/include")
+	# check for RaspberryPi; on newer 64 bit RaspberryPi OS there is no /opt/vc/, check for raspi.list in /etc/apt/sources.list.d/
+	FIND_FILE(RPI NAMES bcm_host.h raspi.list PATHS "/opt/vc/include" "/etc/apt/sources.list.d/")
 
 	IF(RPI AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 		MESSAGE(FATAL_ERROR
