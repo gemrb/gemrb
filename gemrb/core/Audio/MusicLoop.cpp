@@ -51,6 +51,11 @@ void MusicLoop::Load(ResourceHolder<SoundMgr> music)
 {
 	std::lock_guard<std::recursive_mutex> l(mutex);
 
+	// Enqueue remaining music to avoid hard cuts
+	if (currentMusic) {
+		while (FillBuffers(1)) {}
+	}
+
 	currentFormat.bits = 16;
 	currentFormat.channels = 2; // GetChannels may report garbage
 	currentFormat.sampleRate = music->GetSampleRate();
