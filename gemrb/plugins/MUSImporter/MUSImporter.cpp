@@ -184,6 +184,7 @@ void MUSImporter::End()
 	} else {
 		HardEnd();
 	}
+	PLName = "";
 	PLnext = -1;
 }
 
@@ -191,6 +192,7 @@ void MUSImporter::HardEnd()
 {
 	core->GetMusicLoop().Stop();
 	Playing = false;
+	PLName = "";
 	PLpos = 0;
 }
 
