@@ -65,7 +65,7 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	size_t len = 0;
 	std::string line;
 
-	auto fillVar = [&i, len, &line](MUSString& var) {
+	auto fillVar = [&i, &len, &line](MUSString& var) {
 		int p = 0;
 		while (i < len) {
 			if (!isblank(line[i])) {
