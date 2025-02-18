@@ -80,7 +80,6 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	if (Playing || IsCurrentPlayList(name)) {
 		return true;
 	}
-	core->GetMusicLoop().Stop();
 	playlist.clear();
 	PLpos = 0;
 	PLName.Reset();
@@ -250,7 +249,6 @@ void MUSImporter::PlayNext()
 		}
 	} else {
 		Playing = false;
-		core->GetMusicLoop().Stop();
 		//start new music after the old faded out
 		if (PLNameNew[0]) {
 			if (OpenPlaylist(PLNameNew)) {
