@@ -65,7 +65,7 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	size_t len = 0;
 	std::string line;
 
-	auto fillVar = [&i, len, &line](MUSString& var) {
+	auto fillVar = [&i, &len, &line](MUSString& var) {
 		int p = 0;
 		while (i < len) {
 			if (!isblank(line[i])) {
@@ -80,7 +80,6 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	if (Playing || IsCurrentPlayList(name)) {
 		return true;
 	}
-	core->GetMusicLoop().Stop();
 	playlist.clear();
 	PLpos = 0;
 	PLName.Reset();
@@ -185,6 +184,7 @@ void MUSImporter::End()
 	} else {
 		HardEnd();
 	}
+	PLName = "";
 	PLnext = -1;
 }
 
@@ -192,6 +192,7 @@ void MUSImporter::HardEnd()
 {
 	core->GetMusicLoop().Stop();
 	Playing = false;
+	PLName = "";
 	PLpos = 0;
 }
 
@@ -250,7 +251,6 @@ void MUSImporter::PlayNext()
 		}
 	} else {
 		Playing = false;
-		core->GetMusicLoop().Stop();
 		//start new music after the old faded out
 		if (PLNameNew[0]) {
 			if (OpenPlaylist(PLNameNew)) {
