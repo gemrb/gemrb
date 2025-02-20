@@ -3283,7 +3283,7 @@ int GameScript::InteractingWith(Scriptable* Sender, const Trigger* parameters)
 		return 0;
 	}
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
-	if (!tar || tar->Type != ST_ACTOR) {
+	if (!tar) {
 		return 0;
 	}
 	const GameControl* gc = core->GetGameControl();
