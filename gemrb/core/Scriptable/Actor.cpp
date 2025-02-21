@@ -7134,6 +7134,21 @@ int Actor::GetDefense(int headerDamageType, ieDword wflags, const Actor* attacke
 		defense += 4;
 	}
 
+	// hardcoded pst dead truce and negative token bonuses
+	if (pstflags) {
+		stat_t general = attacker->GetStat(IE_GENERAL);
+		if (general == GEN_UNDEAD && CheckVariable(nullptr, "Dead_Truce", "GLOBAL")) {
+			defense += 4;
+		}
+		stat_t race = attacker->GetStat(IE_RACE);
+		if (race >= 53 && race <= 55) { // SHADOW_MARK_1 ... SHADOW_MARK_3
+			Trigger params;
+			params.resref0Parameter = "NTOKEN";
+			int ret = GameScript::PartyHasItem(nullptr, &params);
+			if (ret) defense += 3;
+		}
+	}
+
 	defense -= fxqueue.BonusAgainstCreature(fx_ac_vs_creature_type_ref, attacker);
 	return defense;
 }
