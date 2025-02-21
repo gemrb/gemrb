@@ -395,3 +395,296 @@ END
 
 ////////// end of alignment system
 // ****************************************************************
+
+// simplified and unhardcoded endgame hacks from LeaveAreaName
+// was triggered upon portaling to the Fortress of Regrets ("Fort_Port" in AR0202)
+
+// there are no appropriate vars much closer to the exit nor can we check the portal state
+// so reuse a var to ensure later blocks, much later in the game, run only once
+// Strong_Arm_Vaxis is only used in a dialog in the first area
+IF
+  Global("Pharod_Quest","GLOBAL",2)
+  GlobalLT("Strong_Arm_Vaxis","GLOBAL",10)
+THEN
+  RESPONSE #100
+    SetGlobal("Strong_Arm_Vaxis","GLOBAL",10)
+    Continue()
+END
+
+// block for TNO
+IF
+  Global("Current_Area","GLOBAL",202)
+  Global("Strong_Arm_Vaxis","GLOBAL",10)
+THEN
+  RESPONSE #100
+    SetGlobal("Fortress_Party_Alive","GLOBAL",1)
+    SetGlobal("Fortress_Party_Roof","GLOBAL",1)
+    SetGlobal("Fortress_Party","GLOBAL", 1)
+    SetGlobal("Fortress_Death_Counter","GLOBAL",1)
+    SetGlobal("Strong_Arm_Vaxis","GLOBAL",11)
+    Continue()
+END
+
+// transfer key items, if any, to TNO
+// and kill the pet limlim :/
+// it checked for each pc, but we can be smarter with pst-only actions
+IF
+  Global("Strong_Arm_Vaxis","GLOBAL",11)
+  Global("Current_Area","GLOBAL",202)
+  PartyHasItem("BSPHERE")
+THEN
+  RESPONSE #100
+    ActionOverride(Player1,TakePartyItem("BSPHERE")) // gives it to the active creature
+    Continue()
+END
+IF
+  Global("Strong_Arm_Vaxis","GLOBAL",11)
+  Global("Current_Area","GLOBAL",202)
+  PartyHasItem("NTOKEN")
+THEN
+  RESPONSE #100
+    ActionOverride(Player1,TakePartyItem("NTOKEN"))
+    Continue()
+END
+IF
+  Global("Strong_Arm_Vaxis","GLOBAL",11)
+  Global("Current_Area","GLOBAL",202)
+  PartyHasItem("BLADEIM")
+THEN
+  RESPONSE #100
+    ActionOverride(Player1,TakePartyItem("BLADEIM"))
+    Continue()
+END
+IF
+  Global("Strong_Arm_Vaxis","GLOBAL",11)
+  Global("Current_Area","GLOBAL",202)
+  PartyHasItem("limlim")
+THEN
+  RESPONSE #100
+    ActionOverride(Player1,TakePartyItem("d_limlim"))
+    Continue()
+END
+IF
+  Global("Strong_Arm_Vaxis","GLOBAL",11)
+  Global("Current_Area","GLOBAL",202)
+THEN
+  RESPONSE #100
+    SetGlobal("Strong_Arm_Vaxis","GLOBAL",12)
+    Continue()
+END
+
+// blocks for party members
+// using Leaves does not work in either source or target area (in this case)
+// Vhailor and Ignus skip the Fortress_Party_Roof increment
+// NOTE: add "0x40c0 OR(I:OrCount*)" to original override/trigger.ids to compile
+
+// blocks for Annah
+IF
+  Global("Fortress_Annah", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Annah")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+  !Dead("Annah")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Alive", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Death_Counter", "GLOBAL", 1)
+    Continue()
+END
+IF
+  Global("Fortress_Annah", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Annah")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Roof", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Party", "GLOBAL", 1)
+    SetGlobal("Fortress_Annah", "GLOBAL", 1)
+    Continue()
+END
+
+// blocks for Morte
+IF
+  Global("Fortress_Morte", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Morte")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+  !Dead("Morte")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Alive", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Death_Counter", "GLOBAL", 1)
+    Continue()
+END
+IF
+  Global("Fortress_Morte", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Morte")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Roof", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Party", "GLOBAL", 1)
+    SetGlobal("Fortress_Morte", "GLOBAL", 1)
+    Continue()
+END
+
+// blocks for Dak'kon
+IF
+  Global("Fortress_Dakkon", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Dakkon")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+  !Dead("Dakkon")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Alive", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Death_Counter", "GLOBAL", 1)
+    Continue()
+END
+IF
+  Global("Fortress_Dakkon", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Dakkon")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Roof", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Party", "GLOBAL", 1)
+    SetGlobal("Fortress_Dakkon", "GLOBAL", 1)
+    Continue()
+END
+
+// blocks for FFG
+IF
+  Global("Fortress_Grace", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Grace")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+  !Dead("Grace")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Alive", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Death_Counter", "GLOBAL", 1)
+    Continue()
+END
+IF
+  Global("Fortress_Grace", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Grace")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Roof", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Party", "GLOBAL", 1)
+    SetGlobal("Fortress_Grace", "GLOBAL", 1)
+    Continue()
+END
+
+// blocks for Nordom
+IF
+  Global("Fortress_Nordom", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Nordom")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+  !Dead("Nordom")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Alive", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Death_Counter", "GLOBAL", 1)
+    Continue()
+END
+IF
+  Global("Fortress_Nordom", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Nordom")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Roof", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Party", "GLOBAL", 1)
+    SetGlobal("Fortress_Nordom", "GLOBAL", 1)
+    Continue()
+END
+
+// blocks for Ignus
+IF
+  Global("Fortress_Ignus", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Ignus")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+  !Dead("Ignus")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Alive", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Death_Counter", "GLOBAL", 1)
+    Continue()
+END
+IF
+  Global("Fortress_Ignus", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Ignus")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party", "GLOBAL", 1)
+    SetGlobal("Fortress_Ignus", "GLOBAL", 1)
+    Continue()
+END
+
+// blocks for Vhailor
+IF
+  Global("Fortress_Vhailor", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Vhailor")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+  !Dead("Vhailor")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party_Alive", "GLOBAL", 1)
+    IncrementGlobal("Fortress_Death_Counter", "GLOBAL", 1)
+    Continue()
+END
+IF
+  Global("Fortress_Vhailor", "GLOBAL", 0)
+  Global("Current_Area","GLOBAL",202)
+  InParty("Vhailor")
+  OR(2)
+    PartyHasItem("SkScrap")
+    PartyHasItem("SkRegret")
+THEN
+  RESPONSE #100
+    IncrementGlobal("Fortress_Party", "GLOBAL", 1)
+    SetGlobal("Fortress_Vhailor", "GLOBAL", 1)
+    Continue()
+END
+
+////////// end of Fortress of Regrets entry foo
+// ****************************************************************
