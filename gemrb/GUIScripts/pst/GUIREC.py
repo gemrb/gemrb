@@ -450,6 +450,7 @@ def GetStatOverview (pc):
 	woff = "[/color]"
 	str_None = GemRB.GetString (41275)
 
+	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 
 	stats = []
@@ -485,13 +486,13 @@ def GetStatOverview (pc):
 	# 67049 AC Bonuses
 	stats.append (67049)
 	#   67204 AC vs. Slashing
-	stats.append ((67204, GS (IE_ACSLASHINGMOD), ''))
+	stats.append ((67204, -1 * GS (IE_ACSLASHINGMOD), 'p'))
 	#   67205 AC vs. Piercing
-	stats.append ((67205, GS (IE_ACPIERCINGMOD), ''))
+	stats.append ((67205, -1 * GS (IE_ACPIERCINGMOD), 'p'))
 	#   67206 AC vs. Crushing
-	stats.append ((67206, GS (IE_ACCRUSHINGMOD), ''))
+	stats.append ((67206, -1 * GS (IE_ACCRUSHINGMOD), 'p'))
 	#   67207 AC vs. Missile
-	stats.append ((67207, GS (IE_ACMISSILEMOD), ''))
+	stats.append ((67207, -1 * GS (IE_ACMISSILEMOD), 'p'))
 	stats.append (None)
 
 
@@ -547,34 +548,34 @@ def GetStatOverview (pc):
 	stats.append ((4214, GUIRECCommon.GetValidSkill (pc, className, IE_PICKPOCKET), '%'))
 	#   4215 Tracking
 	stats.append ((4215, GS (IE_TRACKING), ''))
-	#   4216 Reputation
-	stats.append ((4216, GS (IE_REPUTATION), ''))
-	#   4217 Turn Undead Level
-	stats.append ((4217, GS (IE_TURNUNDEADLEVEL), ''))
+	#   4216 Reputation - not shown
+	#   4217 Turn Undead Level - unused
 	#   4218 Lay on Hands Amount
 	stats.append ((4218, GS (IE_LAYONHANDSAMOUNT), ''))
 	#   4219 Backstab Damage
-	stats.append ((4219, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x'))
+	if "THIEF" in className: # for TNO display it only if he's currently a thief
+		stats.append ((4219, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x'))
 	stats.append (None)
 
 	# 4221 Saving Throws
 	stats.append (4221)
 	#   4222 Paralyze/Poison/Death
-	stats.append ((4222, GS (IE_SAVEVSDEATH), ''))
+	stats.append ((4222, IE_SAVEVSDEATH, 's'))
 	#   4223 Rod/Staff/Wand
-	stats.append ((4223, GS (IE_SAVEVSWANDS), ''))
+	stats.append ((4223, IE_SAVEVSWANDS, 's'))
 	#   4224 Petrify/Polymorph
-	stats.append ((4224, GS (IE_SAVEVSPOLY), ''))
+	stats.append ((4224, IE_SAVEVSPOLY, 's'))
 	#   4225 Breath Weapon
-	stats.append ((4225, GS (IE_SAVEVSBREATH), ''))
+	stats.append ((4225, IE_SAVEVSBREATH, 's'))
 	#   4226 Spells
-	stats.append ((4226, GS (IE_SAVEVSSPELL), ''))
+	stats.append ((4226, IE_SAVEVSSPELL, 's'))
 	stats.append (None)
 
 	# 4227 Weapon Proficiencies
 	stats.append (4227)
 	#   55011 Unused Slots
-	stats.append ((55011, GS (IE_FREESLOTS), ''))
+	if GUICommon.IsNamelessOne (pc):
+		stats.append ((55011, GS (IE_FREESLOTS), '0'))
 	#   33642 Fist
 	stats.append ((33642, GS (IE_PROFICIENCYBASTARDSWORD), '+'))
 	#   33649 Edged Weapon
@@ -597,7 +598,7 @@ def GetStatOverview (pc):
 	#   4232 Weight Allowance
 	#   4233 Armor Class Bonus
 	#   4234 Missile Adjustment
-	stats.append ((4234, GS (IE_ACMISSILEMOD), ''))
+	stats.append ((4234, -1 * GS (IE_ACMISSILEMOD), 'p'))
 	#   4236 CON HP Bonus/Level
 	#   4240 Reaction
 	stats.append (None)
@@ -624,8 +625,23 @@ def GetStatOverview (pc):
 				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
 			elif stattype == 'd': #strref is an already resolved string
 				res.append (strref)
+			elif stattype == 'p': # a plus prefix if positive
+				if val > 0:
+					res.append (GemRB.GetString (strref) + ' +' + str (val))
+				else:
+					res.append (GemRB.GetString (strref) + ' ' + str (val))
+			elif stattype == 's': # both base and (modified) stat, but only if they differ
+				base = GB (val)
+				stat = GS (val)
+				baseStr = GemRB.GetString (strref) + ': ' + str(stat)
+				if base == stat:
+					res.append (baseStr)
+				else:
+					res.append (baseStr + " (" + str(stat - base) + ")")
 			elif stattype == 'x':
 				res.append (GemRB.GetString (strref) + ': x' + str (val))
+			elif stattype == '0': # normal value
+				res.append (GemRB.GetString (strref) + ': ' + str (val))
 			else:
 				res.append (GemRB.GetString (strref) + ': ' + str (val) + stattype)
 
