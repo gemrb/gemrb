@@ -344,7 +344,7 @@ inline void PermanentStatChangeFeedback(int stat, const Actor* actor)
 		displaymsg->DisplayString(ref, GUIColors::WHITE, STRING_FLAGS::SOUND);
 		return;
 	}
-	// there's also this one, but there's no stat, perhaps used for level up, where you get the attribute increase window?
+	// there's also this one, but it is unused, nothing calls the feedback function to print it:
 	// @35621 = ~Characteristic Points increased permanently [Nameless One]~
 }
 
