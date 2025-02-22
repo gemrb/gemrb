@@ -403,7 +403,7 @@ def GetCharacterHeader (pc):
 		avatar_header['PrimLevel'] = GemRB.GetPlayerStat (pc, IE_LEVEL)
 		avatar_header['XP'] = GemRB.GetPlayerStat (pc, IE_XP)
 		if Multi:
-			avatar_header['XP'] = avatar_header['XP'] / 2
+			avatar_header['XP'] = avatar_header['XP'] // 2
 			avatar_header['SecoLevel'] = GemRB.GetPlayerStat (pc, IE_LEVEL2)
 
 			avatar_header['PrimClass'] = "FIGHTER"
