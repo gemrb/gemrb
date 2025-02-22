@@ -10,3 +10,4 @@ PALADIN        *          *          *          SAVEWAR    0          6         
 FIGHTER_MAGE   19767      *          19756      *          3          7          *          0x2000     0      9
 FIGHTER_CLERIC *          *          *          *          6          8          *          0x4000     0      9
 FIGHTER_THIEF  19766      *          19754      *          10         9          *          0x20000    0      9
+FIGHTER_MAGE_THIEF *      *          *          *          11         10         *          0          0      0
