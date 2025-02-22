@@ -1176,7 +1176,7 @@ void Scriptable::SpellcraftCheck(const Actor* caster, const ResRef& spellRef)
 	const Spell* spl = gamedata->GetSpell(spellRef);
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
-	std::vector<Actor*> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD | GA_NO_ENEMY | GA_NO_SELF | GA_NO_UNSCHEDULED, caster->GetBase(IE_VISUALRANGE), this);
+	std::vector<Actor*> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD | GA_NO_ENEMY | GA_NO_SELF | GA_NO_UNSCHEDULED, caster->GetVisualRange(), this);
 	for (const auto& detective : neighbours) {
 		// disallow neutrals from helping the party
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
@@ -1620,6 +1620,16 @@ bool Scriptable::AuraPolluted()
 
 	// sorry, you'll have to recover first
 	return true;
+}
+
+unsigned int Scriptable::GetVisualRange() const
+{
+	if (pst_flags || Type != ST_ACTOR) {
+		// everyone uses the same range
+		return VOODOO_VISUAL_RANGE;
+	}
+	const Actor* actor = static_cast<const Actor*>(this);
+	return actor->GetStat(IE_VISUALRANGE);
 }
 
 bool Scriptable::TimerActive(ieDword ID)

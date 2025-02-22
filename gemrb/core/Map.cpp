@@ -3564,7 +3564,7 @@ void Map::UpdateFog()
 		int state = actor->Modified[IE_STATE_ID];
 		if (state & STATE_CANTSEE) continue;
 
-		int vis2 = actor->Modified[IE_VISUALRANGE];
+		int vis2 = actor->GetVisualRange();
 		if ((state & STATE_BLIND) || (vis2 < 2)) vis2 = 2; //can see only themselves
 		ExploreMapChunk(actor->SMPos, vis2 + actor->GetAnims()->GetCircleSize(), 1);
 
@@ -4115,7 +4115,7 @@ Actor* Map::GetRandomEnemySeen(const Actor* origin) const
 	}
 
 	int flags = GA_NO_HIDDEN | GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF;
-	std::vector<Actor*> neighbours = GetAllActorsInRadius(origin->Pos, flags, origin->GetBase(IE_VISUALRANGE), origin);
+	std::vector<Actor*> neighbours = GetAllActorsInRadius(origin->Pos, flags, origin->GetVisualRange(), origin);
 	Actor* victim = neighbours[RAND<size_t>(0, neighbours.size() - 1)];
 
 	if (type == GroupType::PC) {

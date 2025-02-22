@@ -331,11 +331,10 @@ Projectile* Spell::GetProjectile(Scriptable* self, int header, int level, const 
 unsigned int Spell::GetCastingDistance(Scriptable* Sender) const
 {
 	int level = 0;
-	unsigned int limit = Scriptable::VOODOO_VISUAL_RANGE;
+	unsigned int limit = Sender->GetVisualRange();
 	Actor* actor = Scriptable::As<Actor>(Sender);
 	if (actor) {
 		level = actor->GetCasterLevel(SpellType);
-		limit = actor->GetStat(IE_VISUALRANGE);
 	}
 
 	if (level < 1) {

@@ -4907,7 +4907,7 @@ int fx_find_traps(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_find_traps(%2d)", fx->Opcode);
 	//reveal trapped containers, doors, triggers that are in the visible range
 	ieDword id = target->GetGlobalID();
-	ieDword range = target->GetStat(IE_VISUALRANGE) / 2;
+	ieDword range = target->GetVisualRange() / 2;
 	ieDword skill;
 	ieDword diSkill = 9999;
 	bool detecttraps = true;
@@ -6951,7 +6951,7 @@ int fx_farsee(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (!(fx->Parameter2 & 2)) {
-		fx->Parameter1 = STAT_GET(IE_VISUALRANGE);
+		fx->Parameter1 = target->GetVisualRange();
 		fx->Parameter2 |= 2;
 	}
 

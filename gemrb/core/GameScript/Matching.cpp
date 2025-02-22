@@ -127,7 +127,7 @@ static inline bool DoObjectChecks(const Map* map, const Scriptable* Sender, Acto
 		if (!IsInObjectRect(target->Pos, oC->objectRect)) {
 			return false;
 		}
-	} else if (!WithinRange(source, target->Pos, source->Modified[IE_VISUALRANGE])) {
+	} else if (!WithinRange(source, target->Pos, source->GetVisualRange())) {
 		return false;
 	}
 

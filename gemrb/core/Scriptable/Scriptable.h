@@ -422,6 +422,7 @@ public:
 	void StartTimer(ieDword ID, ieDword expiration);
 	String GetName() const;
 	bool AuraPolluted();
+	unsigned int GetVisualRange() const;
 	ieDword GetLocal(const ieVariable& key, ieDword fallback) const;
 	virtual std::string dump() const = 0;
 	void SetPos(const NavmapPoint& pos)
