@@ -608,6 +608,10 @@ void WindowManager::DrawWindows() const
 	// draw the game window now (beneath everything else); it's not part of the windows collection
 	if (gameWin->IsVisible()) {
 		gameWin->Draw();
+
+		if (FadeColor.a > 0) {
+			video->DrawRect(screen, FadeColor, true, BlitFlags::BLENDED);
+		}
 	} else {
 		// something must get drawn or else we get smearing
 		// this is kind of a hacky way to clear it, but it works
@@ -684,10 +688,6 @@ void WindowManager::DrawWindows() const
 			r.ExpandAllSides(10);
 			video->DrawRect(r, ColorWhite, false);
 		}
-	}
-
-	if (!modalWin && !drawFrame && FadeColor.a > 0) {
-		video->DrawRect(screen, FadeColor, true);
 	}
 
 	DrawMouse();
