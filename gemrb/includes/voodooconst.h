@@ -28,8 +28,6 @@
 #ifndef VOODOO_H
 #define VOODOO_H
 
-#include "exports.h"
-
 namespace GemRB {
 
 // MAX_TRAVELING_DISTANCE is our choice, only used for party travel
