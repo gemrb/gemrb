@@ -1534,6 +1534,11 @@ void Interface::LoadGemRBINI()
 		}
 	}
 
+	// see note in voodooconst.h
+	if (HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		Scriptable::VOODOO_VISUAL_RANGE = 34;
+	}
+
 	// fix the resolution default if needed
 	config.Width = std::max(config.Width, ini->GetKeyAsInt("resources", "MinWidth", 800));
 	config.Height = std::max(config.Height, ini->GetKeyAsInt("resources", "MinHeight", 600));

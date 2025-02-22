@@ -266,6 +266,11 @@ static int SetCreatureStat(Actor* actor, unsigned int StatID, int StatValue, boo
 		return 1;
 	}
 
+	// handle pst's weird visual range
+	if (StatID == IE_LEVELFIGHTER && core->HasFeature(GFFlags::PST_STATE_FLAGS) && actor->GetStat(IE_SPECIFIC) == 2) {
+		Scriptable::VOODOO_VISUAL_RANGE = (14 + StatValue) * 2;
+	}
+
 	if (pcf) {
 		actor->SetBase(StatID, StatValue);
 	} else {

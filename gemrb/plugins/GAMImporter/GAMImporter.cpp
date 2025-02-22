@@ -200,6 +200,10 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 			newGame->CurrentArea = actor->AreaName;
 			newGame->AnotherArea = newGame->CurrentArea;
 		}
+
+		if (newGame->version == GAM_VER_PST && actor->GetStat(IE_SPECIFIC) == 2) {
+			Scriptable::VOODOO_VISUAL_RANGE = (14 + actor->GetStat(IE_LEVELFIGHTER)) * 2;
+		}
 	}
 
 	//Loading NPCs
