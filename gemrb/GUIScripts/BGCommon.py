@@ -19,6 +19,7 @@
 
 import GemRB
 import CommonTables
+import GameCheck
 import GUICommon
 from ie_stats import IE_ALIGNMENT, IE_RACE, IE_REPUTATION, IE_SEX
 
