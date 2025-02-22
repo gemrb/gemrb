@@ -44,6 +44,7 @@ import CommonTables
 import LevelUp
 import LUCommon
 import GUICommonWindows
+import GUIRECCommon
 import NewLife
 import PartyReform
 from GUIDefines import *
@@ -536,13 +537,14 @@ def GetStatOverview (pc):
 	#   4210 Lore
 	stats.append ((4210, GS (IE_LORE), ''))
 	#   4211 Open Locks
-	stats.append ((4211, GS (IE_LOCKPICKING), '%'))
+	className = GUICommon.GetClassRowName (pc)
+	stats.append ((4211, GUIRECCommon.GetValidSkill (pc, className, IE_LOCKPICKING), '%'))
 	#   4212 Stealth
-	stats.append ((4212, GS (IE_STEALTH), '%'))
+	stats.append ((4212, GUIRECCommon.GetValidSkill (pc, className, IE_STEALTH), '%'))
 	#   4213 Find/Remove Traps
-	stats.append ((4213, GS (IE_TRAPS), '%'))
+	stats.append ((4213, GUIRECCommon.GetValidSkill (pc, className, IE_TRAPS), '%'))
 	#   4214 Pick Pockets
-	stats.append ((4214, GS (IE_PICKPOCKET), '%'))
+	stats.append ((4214, GUIRECCommon.GetValidSkill (pc, className, IE_PICKPOCKET), '%'))
 	#   4215 Tracking
 	stats.append ((4215, GS (IE_TRACKING), ''))
 	#   4216 Reputation

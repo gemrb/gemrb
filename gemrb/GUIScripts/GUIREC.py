@@ -41,8 +41,6 @@ ColorIndex = None
 ScriptTextArea = None
 SelectedTextArea = None
 
-SkillsTable = GemRB.LoadTable ("skills", False, True)
-
 ###################################################
 
 def InitRecordsWindow (Window):
@@ -242,27 +240,6 @@ def GetStatColor (pc, stat):
 	if a<b:
 		return {'r' : 255, 'g' : 255, 'b' : 0}
 	return {'r' : 0, 'g' : 255, 'b' : 0}
-
-# GemRB.GetPlayerStat wrapper that crosschecks skill availability
-SkillStatNames = { IE_PICKPOCKET : "PICK_POCKETS", IE_LOCKPICKING : "OPEN_LOCKS", IE_TRAPS : "FIND_TRAPS", IE_STEALTH : "STEALTH", IE_HIDEINSHADOWS : "HIDE_IN_SHADOWS", IE_DETECTILLUSIONS : "DETECT_ILLUSION", IE_SETTRAPS : "SET_TRAPS" }
-if GameCheck.IsBG2OrEE ():
-	SkillStatNames[IE_STEALTH] = "MOVE_SILENTLY"
-def GetValidSkill (pc, className, stat):
-	val = GemRB.GetPlayerStat (pc, stat)
-	if val < 0:
-		return 0
-
-	if className == "BARD":
-		if stat != IE_PICKPOCKET:
-			return 0
-	elif className == "RANGER":
-		if stat != IE_STEALTH:
-			return 0
-	else:
-		if SkillsTable.GetValue (SkillStatNames[stat], className, GTV_INT) == -1:
-			return 0
-
-	return val
 
 # shorthand wrappers for Modified/Base stat and ability bonus
 def GS (pc, stat):
@@ -505,10 +482,10 @@ def GetPartyReputation(pc):
 def GetSkills(pc):
 	stats = []
 	className = GUICommon.GetClassRowName (pc)
-	stats.append ( (9460, GetValidSkill (pc, className, IE_LOCKPICKING), '') )
-	stats.append ( (9462, GetValidSkill (pc, className, IE_TRAPS), '') )
-	stats.append ( (9463, GetValidSkill (pc, className, IE_PICKPOCKET), '') )
-	stats.append ( (9461, GetValidSkill (pc, className, IE_STEALTH), '') )
+	stats.append ( (9460, GUIRECCommon.GetValidSkill (pc, className, IE_LOCKPICKING), '') )
+	stats.append ( (9462, GUIRECCommon.GetValidSkill (pc, className, IE_TRAPS), '') )
+	stats.append ( (9463, GUIRECCommon.GetValidSkill (pc, className, IE_PICKPOCKET), '') )
+	stats.append ( (9461, GUIRECCommon.GetValidSkill (pc, className, IE_STEALTH), '') )
 	HatedRace = GS (pc, IE_HATEDRACE)
 	if HatedRace:
 		HateTable = GemRB.LoadTable ("haterace")
@@ -519,9 +496,9 @@ def GetSkills(pc):
 
 	# these skills were new in bg2
 	if GameCheck.IsBG2OrEE () or GameCheck.IsIWD1():
-		stats.append ( (34120, GetValidSkill (pc, className, IE_HIDEINSHADOWS), '') )
-		stats.append ( (34121, GetValidSkill (pc, className, IE_DETECTILLUSIONS), '') )
-		stats.append ( (34122, GetValidSkill (pc, className, IE_SETTRAPS), '') )
+		stats.append ( (34120, GUIRECCommon.GetValidSkill (pc, className, IE_HIDEINSHADOWS), '') )
+		stats.append ( (34121, GUIRECCommon.GetValidSkill (pc, className, IE_DETECTILLUSIONS), '') )
+		stats.append ( (34122, GUIRECCommon.GetValidSkill (pc, className, IE_SETTRAPS), '') )
 	stats.append ( (12128, GS (pc, IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (pc, IE_TURNUNDEADLEVEL), '') )
 

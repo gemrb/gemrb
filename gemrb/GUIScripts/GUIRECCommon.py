@@ -22,7 +22,7 @@ import GameCheck
 import GUICommon
 import Portrait
 from GUIDefines import *
-from ie_stats import IE_SEX, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
+from ie_stats import *
 from ie_restype import RES_WAV
 from ie_sounds import SND_SPEECH
 
@@ -31,6 +31,8 @@ ExportWindow = None
 NameField = ExportDoneButton = None
 ScriptsTable = None
 RevertButton = None
+
+SkillsTable = GemRB.LoadTable ("skills", False, True)
 
 if GameCheck.IsBG2OrEE () or GameCheck.IsBG1():
 	BioStrRefSlot = 74
@@ -653,3 +655,24 @@ def ExportEditChanged():
 	else:
 		ExportDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
+
+# GemRB.GetPlayerStat wrapper that crosschecks skill availability
+SkillStatNames = { IE_PICKPOCKET : "PICK_POCKETS", IE_LOCKPICKING : "OPEN_LOCKS", IE_TRAPS : "FIND_TRAPS", IE_STEALTH : "STEALTH", IE_HIDEINSHADOWS : "HIDE_IN_SHADOWS", IE_DETECTILLUSIONS : "DETECT_ILLUSION", IE_SETTRAPS : "SET_TRAPS" }
+if GameCheck.IsBG2OrEE ():
+	SkillStatNames[IE_STEALTH] = "MOVE_SILENTLY"
+def GetValidSkill (pc, className, stat):
+	val = GemRB.GetPlayerStat (pc, stat)
+	if val < 0:
+		return 0
+
+	if className == "BARD":
+		if stat != IE_PICKPOCKET:
+			return 0
+	elif className == "RANGER":
+		if stat != IE_STEALTH:
+			return 0
+	else:
+		if SkillsTable.GetValue (SkillStatNames[stat], className, GTV_INT) == -1:
+			return 0
+
+	return val
