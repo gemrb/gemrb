@@ -54,7 +54,11 @@ static const unsigned int VOODOO_EXISTENCE_DELAY_DEFAULT = 300;
 // visual range stuff
 // these two are well understood for actors, but could be different for other scriptables
 // eg. visual range is supposedly 15 (see note in DoObjectChecks)
-static const int VOODOO_VISUAL_RANGE = 28;
+// in PST it was dynamic, dependant on TNO's fighter level!?
+// horizontal range was calculated as (14 + level) * (2 * 16)
+// so at minimum 17 * 2 * 16 or the way we store it: 34 * 16
+// VOODOO_VISUAL_RANGE is now set in Interface / Scriptable.h
+// dialog range was only configurable in the iwds
 static const int VOODOO_DIALOG_RANGE = 15;
 
 }

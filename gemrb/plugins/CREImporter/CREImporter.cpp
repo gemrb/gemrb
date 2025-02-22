@@ -832,7 +832,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	}
 	poi = core->GetString(act->ShortStrRef);
 	act->SetName(std::move(poi), 2); //setting shortname (for tooltips)
-	act->BaseStats[IE_VISUALRANGE] = VOODOO_VISUAL_RANGE; // not stored anywhere
+	act->BaseStats[IE_VISUALRANGE] = Scriptable::VOODOO_VISUAL_RANGE; // not stored anywhere
 	act->BaseStats[IE_DIALOGRANGE] = VOODOO_DIALOG_RANGE;
 	str->ReadDword(act->BaseStats[IE_MC_FLAGS]);
 	str->ReadDword(act->BaseStats[IE_XPVALUE]);

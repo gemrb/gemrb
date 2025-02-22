@@ -3753,7 +3753,7 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 	int range = parameters->int0Parameter;
 	// 0 means reset back to normal
 	if (range == 0) {
-		range = VOODOO_VISUAL_RANGE;
+		range = Scriptable::VOODOO_VISUAL_RANGE;
 	}
 
 	actor->SetBase(IE_VISUALRANGE, range);

@@ -50,6 +50,7 @@ static bool startActive = false;
 static bool third = false;
 static bool pst_flags = false;
 static const unsigned short ClearActionsID = 133; // same for all games
+unsigned int Scriptable::VOODOO_VISUAL_RANGE = 28;
 
 /***********************
  *  Scriptable Class   *

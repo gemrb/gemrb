@@ -290,6 +290,7 @@ public:
 	SearchmapPoint SMPos; // Pos in searchmap space
 	Region BBox;
 	ieStrRef DialogName = ieStrRef::INVALID;
+	static unsigned int VOODOO_VISUAL_RANGE;
 
 	// State relating to the currently-running action.
 	int CurrentActionState = 0;
