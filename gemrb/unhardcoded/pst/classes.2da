@@ -1,13 +1,13 @@
 2DA V1.0
 *
                NAME_REF   DESC_REF   CAP_REF    SAVE       MULTI      ID         HP         USABILITY  HUMAN  CONBONLVL
-MAGE           19762      *          19750      SAVEWIZ    0          1          HPWIZ      0x40000    1      10
-FIGHTER        19748      *          19747      SAVEWAR    0          2          HPWAR      0x800      1      9
-CLERIC         19764      *          19752      SAVEPRS    0          3          HPPRS      0x80       0      9
-THIEF          19758      *          19749      SAVEROG    0          4          HPROG      0x400000   1      10
-BARD           *          *          *          SAVEROG    0          5          HPROG      0          0      9
-PALADIN        *          *          *          SAVEWAR    0          6          HPWAR      0          0      9
-FIGHTER_MAGE   19767      *          19756      *          3          7          *          0x2000     0      9
-FIGHTER_CLERIC *          *          *          *          6          8          *          0x4000     0      9
-FIGHTER_THIEF  19766      *          19754      *          10         9          *          0x20000    0      9
+MAGE           19762      *          19750      SAVEWIZ    0          1          HPWIZ      0x40000    1      99
+FIGHTER        19748      *          19747      SAVEWAR    0          2          HPWAR      0x800      1      99
+CLERIC         19764      *          19752      SAVEPRS    0          3          HPPRS      0x80       0      99
+THIEF          19758      *          19749      SAVEROG    0          4          HPROG      0x400000   1      99
+BARD           *          *          *          SAVEROG    0          5          HPROG      0          0      99
+PALADIN        *          *          *          SAVEWAR    0          6          HPWAR      0          0      99
+FIGHTER_MAGE   19767      *          19756      *          3          7          *          0x2000     0      99
+FIGHTER_CLERIC *          *          *          *          6          8          *          0x4000     0      99
+FIGHTER_THIEF  19766      *          19754      *          10         9          *          0x20000    0      99
 FIGHTER_MAGE_THIEF *      *          *          *          11         10         *          0          0      0
