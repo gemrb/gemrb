@@ -524,7 +524,7 @@ def GetStatOverview (pc):
 	# 4220 Proficiencies
 	stats.append (4220)
 	#   4208 THAC0
-	stats.append ((4208, GS (IE_TOHIT), ''))
+	stats.append ((4208, IE_TOHIT, 's'))
 	#   4209 Number of Attacks
 	tmp = GemRB.GetCombatDetails(pc, 0)["APR"]
 
