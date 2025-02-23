@@ -1320,7 +1320,7 @@ int fx_charisma_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_charisma_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	// ensure we don't stack in pst
-	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS) && fx->SourceType == 2) {
 		// don't be cumulative — luckily the opcode is the first on the effect list of spwi114
 		// we remove the old spell, so the player benefits from renewed duration
 		ResRef tmp = fx->SourceRef;
@@ -2856,7 +2856,7 @@ int fx_set_blur_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	// ensure we don't stack in pst
-	if (core->HasFeature(GFFlags::PST_STATE_FLAGS) && STATE_GET(STATE_BLUR)) {
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS) && STATE_GET(STATE_BLUR) && fx->SourceType == 2) {
 		// don't be cumulative — luckily the blur opcode is the first on the effect list of spwi216
 		// we remove the old spell, so the player benefits from renewed duration
 		ResRef tmp = fx->SourceRef;
