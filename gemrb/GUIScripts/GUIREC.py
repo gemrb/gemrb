@@ -269,7 +269,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	outputtext+= GetWeaponProficiencies (pc)
 	outputtext+= GetACBonuses (pc)
 	outputtext+= GUIRECCommon.GetAbilityBonuses (pc)
-	outputtext+= GetBonusSpells (pc)
+	outputtext+= GUIRECCommon.GetBonusSpells (pc)
 	outputtext+= GetResistances (pc)
 	outputtext+= GetWeaponStyleBonuses (pc, cdet)
 
@@ -579,23 +579,6 @@ def GetACBonuses(pc):
 	# 11768 AC vs. Slashing
 	stats.append ((11768, GS (pc, IE_ACSLASHINGMOD), 'p'))
 	stats.append ("\n")
-	return GUIRECCommon.TypeSetStats (stats, pc)
-
-########################################################################
-
-def GetBonusSpells(pc):
-	stats = []
-	# 10344 Bonus Priest spells
-	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, 0, 0)>0:
-		stats.append (10344)
-		for level in range (7):
-			GemRB.SetToken ("SPELLLEVEL", str (level+1) )
-			#get the bonus spell count
-			base = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level, 0)
-			if base:
-				count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
-				stats.append ( (GemRB.GetString (10345), count-base, 'r') )
-		stats.append ("\n")
 	return GUIRECCommon.TypeSetStats (stats, pc)
 
 ########################################################################

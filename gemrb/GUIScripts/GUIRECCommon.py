@@ -742,6 +742,33 @@ def GetAbilityBonuses(pc, expand = True):
 	else:
 		return stats
 
+def GetBonusSpells(pc, expand = True):
+	stats = []
+	# 10344 Bonus Priest spells
+	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, 0, 0) == 0:
+		return TypeSetStats (stats, pc) if expand else []
+
+	if not GameCheck.IsPST (): # the title is always displayed in pst
+		stats.append (10344)
+
+	for level in range (7):
+		GemRB.SetToken ("SPELLLEVEL", str (level + 1))
+		# get the bonus spell count
+		base = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level, 0)
+		count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
+		bonus = count - base
+		if bonus:
+			if GameCheck.IsPST ():
+				stats.append ((4239, bonus, 'p'))
+			else:
+				stats.append ((GemRB.GetString (10345), bonus, 'r'))
+
+	if expand:
+		stats.append ("\n")
+		return TypeSetStats (stats, pc)
+	else:
+		return stats
+
 def TypeSetStats (stats, pc, recolor = False):
 	res = []
 	lines = 0

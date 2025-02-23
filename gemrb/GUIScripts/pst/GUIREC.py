@@ -595,15 +595,11 @@ def GetStatOverview (pc):
 	stats.append (None)
 
 	# 4238 Magical Defense Adjustment
-	stats.append (4238)
-	#   4239 Bonus Priest Spells
-	stats.append ((4239, GS (IE_CASTINGLEVELBONUSCLERIC), ''))
-	stats.append (None)
-
-	# 4237 Chance to learn spell
-	#SpellLearnChance = won + GemRB.GetString (4237) + woff
-
-	# ??? 4235 Reaction Adjustment
+	if "MAGE" in className or "CLERIC" in className:
+		stats.append (4238)
+		abbon = GUIRECCommon.GetBonusSpells (pc, False)
+		stats += abbon
+		stats.append (None)
 
 	statDesc = GUIRECCommon.TypeSetStats (stats, pc, True)
 	return statDesc
