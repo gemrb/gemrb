@@ -448,7 +448,6 @@ def GetNextLevelExp (Level, Class):
 def GetStatOverview (pc):
 	won = "[color=FFFFFF]"
 	woff = "[/color]"
-	str_None = GemRB.GetString (41275)
 
 	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
@@ -614,49 +613,8 @@ def GetStatOverview (pc):
 
 	# ??? 4235 Reaction Adjustment
 
-	res = []
-	lines = 0
-	for s in stats:
-		try:
-			strref, val, stattype = s
-			if val == 0 and stattype != '0':
-				continue
-			if stattype == '+':
-				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
-			elif stattype == 'd': #strref is an already resolved string
-				res.append (strref)
-			elif stattype == 'p': # a plus prefix if positive
-				if val > 0:
-					res.append (GemRB.GetString (strref) + ' +' + str (val))
-				else:
-					res.append (GemRB.GetString (strref) + ' ' + str (val))
-			elif stattype == 's': # both base and (modified) stat, but only if they differ
-				base = GB (val)
-				stat = GS (val)
-				baseStr = GemRB.GetString (strref) + ': ' + str(stat)
-				if base == stat:
-					res.append (baseStr)
-				else:
-					res.append (baseStr + " (" + str(stat - base) + ")")
-			elif stattype == 'x':
-				res.append (GemRB.GetString (strref) + ': x' + str (val))
-			elif stattype == '0': # normal value
-				res.append (GemRB.GetString (strref) + ': ' + str (val))
-			else:
-				res.append (GemRB.GetString (strref) + ': ' + str (val) + stattype)
-
-			lines = 1
-		except:
-			if s != None:
-				res.append (won + GemRB.GetString (s) + woff)
-				lines = 0
-			else:
-				if not lines:
-					res.append (str_None)
-				res.append ("")
-				lines = 0
-
-	return "\n".join (res)
+	statDesc = GUIRECCommon.TypeSetStats (stats, pc, True)
+	return statDesc
 
 def OpenInformationWindow ():
 	global InformationWindow
