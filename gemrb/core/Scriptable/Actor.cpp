@@ -6040,6 +6040,17 @@ int Actor::GetHpAdjustment(int multiplier, bool modified) const
 
 	const stats_t& stats = modified ? Modified : BaseStats;
 
+	// TNO is a special snowflake ... but luckily always uses the fighter bonus
+	if (pstflags && BaseStats[IE_SPECIFIC] == 2) {
+		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR, stats[IE_CON]);
+		std::array<ieDword, 3> levels = {
+			GetFighterLevel(),
+			GetMageLevel(),
+			GetThiefLevel()
+		};
+		return val * *std::max_element(levels.begin(), levels.end());
+	}
+
 	// GetClassLevel/IsWarrior takes into consideration inactive dual-classes, so those would fail here
 	if (IsWarrior()) {
 		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR, stats[IE_CON]);
