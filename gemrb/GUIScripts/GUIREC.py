@@ -268,7 +268,7 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	outputtext+= GetSavingThrows (pc)
 	outputtext+= GetWeaponProficiencies (pc)
 	outputtext+= GetACBonuses (pc)
-	outputtext+= GetAbilityBonuses (pc)
+	outputtext+= GUIRECCommon.GetAbilityBonuses (pc)
 	outputtext+= GetBonusSpells (pc)
 	outputtext+= GetResistances (pc)
 	outputtext+= GetWeaponStyleBonuses (pc, cdet)
@@ -578,44 +578,6 @@ def GetACBonuses(pc):
 	stats.append ((11769, GS (pc, IE_ACPIERCINGMOD), 'p'))
 	# 11768 AC vs. Slashing
 	stats.append ((11768, GS (pc, IE_ACSLASHINGMOD), 'p'))
-	stats.append ("\n")
-	return GUIRECCommon.TypeSetStats (stats, pc)
-
-########################################################################
-
-def GetAbilityBonuses(pc):
-	stats = []
-	# 10315 Ability bonuses
-	stats.append (10315)
-	value = GemRB.GetPlayerStat (pc, IE_STR)
-	ex = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-	# 10332 to hit
-	stats.append ( (10332, GemRB.GetAbilityBonus (IE_STR,0,value,ex), 'p') )
-	# 10336 damage
-	stats.append ( (10336, GemRB.GetAbilityBonus (IE_STR,1,value,ex), 'p') )
-	# 10337 open doors (bend bars lift gates)
-	stats.append ( (10337, GemRB.GetAbilityBonus (IE_STR,2,value,ex), '0') )
-	# 10338 weight allowance
-	stats.append ( (10338, GemRB.GetAbilityBonus (IE_STR,3,value,ex), '0') )
-	# 10339 AC
-	stats.append ( (10339, GA (pc, IE_DEX, 2), '0') )
-	# 10340 Missile adjustment
-	stats.append ( (10340, GA (pc, IE_DEX, 1), 'p') )
-	# 10341 Reaction adjustment
-	stats.append ( (10341, GA (pc, IE_DEX, 0), 'p') )
-	# 10342 CON HP Bonus/Level
-	# dual-classed chars get no bonus while the primary class is inactive
-	# and the new class' bonus afterwards
-	# single- and multi-classed chars are straightforward - the highest class bonus counts
-	if GUICommon.IsWarrior (pc):
-		stats.append ( (10342, GA (pc, IE_CON, 1), 'p') )
-	else:
-		stats.append ( (10342, GA (pc, IE_CON, 0), 'p') )
-	# 10343 Chance To Learn spell
-	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
-		stats.append ( (10343, GA (pc, IE_INT, 0), '%' ) )
-	# 10347 Reaction
-	stats.append ( (10347, GA (pc, IE_REPUTATION, 0), '0') )
 	stats.append ("\n")
 	return GUIRECCommon.TypeSetStats (stats, pc)
 

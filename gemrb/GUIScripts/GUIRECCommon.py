@@ -677,6 +677,71 @@ def GetValidSkill (pc, className, stat):
 
 	return val
 
+########################################################################
+
+def GS (pc, stat):
+	return GemRB.GetPlayerStat (pc, stat)
+
+def GA (pc, stat, col):
+	return GemRB.GetAbilityBonus (stat, col, GS (pc, stat))
+
+def GetAbilityBonuses(pc, expand = True):
+	stats = []
+	names = [ 10315, 10332, 10336, 10337, 10338, 10339, 10340, 10341, 10342, 10343, 10347]
+	if GameCheck.IsPST ():
+		names = [ 4228, 4229, 4230, 4231, 4232, 4233, 4234, 4235, 4236, 4237, 4240]
+
+	# 10315 Ability bonuses
+	stats.append (names[0])
+
+	value = GemRB.GetPlayerStat (pc, IE_STR)
+	ex = GemRB.GetPlayerStat (pc, IE_STREXTRA)
+	# TODO: figure out odd pst values for tohit and damage; the tables are fine and is what we currently display
+	# original carceri save has Nordom at -1/+14 vs 0/+1, Morte at -4/+6 vs 0/+1
+	# even if it was some hardcoded bolt and teeth bonuses, why would they be displayed here?
+	# 10332 to hit
+	stats.append ((names[1], GemRB.GetAbilityBonus (IE_STR, 0, value, ex), 'p'))
+	# 10336 damage
+	stats.append ((names[2], GemRB.GetAbilityBonus (IE_STR, 1, value, ex), 'p'))
+	# 10337 open doors (bend bars lift gates)
+	stats.append ((names[3], GemRB.GetAbilityBonus (IE_STR, 2, value, ex), '0'))
+	# 10338 weight allowance
+	stats.append ((names[4], GemRB.GetAbilityBonus (IE_STR, 3, value, ex), '0'))
+	# 10339 AC
+	stats.append ((names[5], GA (pc, IE_DEX, 2), '0'))
+	# 10340 Missile adjustment
+	stats.append ((names[6], GA (pc, IE_DEX, 1), 'p'))
+	if not GameCheck.IsPST ():
+		# 10341 Reaction adjustment
+		stats.append ((names[7], GA (pc, IE_DEX, 0), 'p'))
+
+	# 10342 CON HP Bonus/Level
+	# dual-classed chars get no bonus while the primary class is inactive
+	# and the new class' bonus afterwards
+	# single- and multi-classed chars are straightforward - the highest class bonus counts
+	if GUICommon.IsWarrior (pc):
+		stats.append ((names[8], GA (pc, IE_CON, 1), 'p'))
+	else:
+		stats.append ((names[8], GA (pc, IE_CON, 0), 'p'))
+
+	if not GameCheck.IsPST ():
+		# 10343 Chance To Learn spell
+		if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
+			stats.append ((names[9], GA (pc, IE_INT, 0), '%' ))
+
+	# 10347 Reaction
+	# FIXME: is this correct? And what value did it display in pst? Reaction adjustment doesn't match either
+	if GameCheck.IsPST ():
+		stats.append ((names[10], GA (pc, IE_REPUTATION, 0), 'p'))
+	else:
+		stats.append ((names[10], GA (pc, IE_REPUTATION, 0), '0'))
+
+	if expand:
+		stats.append ("\n")
+		return TypeSetStats (stats, pc)
+	else:
+		return stats
+
 def TypeSetStats (stats, pc, recolor = False):
 	res = []
 	lines = 0
@@ -700,7 +765,7 @@ def TypeSetStats (stats, pc, recolor = False):
 	for s in stats:
 		try:
 			strref, val, stattype = s
-			if val == 0 and stattype != '0':
+			if val == 0 and (stattype != '0' and stattype != 'p'):
 				continue
 			if val == None:
 				val = str_None

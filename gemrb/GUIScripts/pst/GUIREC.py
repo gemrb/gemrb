@@ -590,16 +590,8 @@ def GetStatOverview (pc):
 	stats.append (None)
 
 	# 4228 Ability Bonuses
-	stats.append (4228)
-	#   4229 To Hit
-	#   4230 Damage
-	#   4231 Open Doors
-	#   4232 Weight Allowance
-	#   4233 Armor Class Bonus
-	#   4234 Missile Adjustment
-	stats.append ((4234, -1 * GS (IE_ACMISSILEMOD), 'p'))
-	#   4236 CON HP Bonus/Level
-	#   4240 Reaction
+	abbon = GUIRECCommon.GetAbilityBonuses (pc, False)
+	stats += abbon
 	stats.append (None)
 
 	# 4238 Magical Defense Adjustment
