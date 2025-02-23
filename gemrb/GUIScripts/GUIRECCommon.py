@@ -696,9 +696,9 @@ def GetAbilityBonuses(pc, expand = True):
 
 	value = GemRB.GetPlayerStat (pc, IE_STR)
 	ex = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-	# TODO: figure out odd pst values for tohit and damage; the tables are fine and is what we currently display
-	# original carceri save has Nordom at -1/+14 vs 0/+1, Morte at -4/+6 vs 0/+1
-	# even if it was some hardcoded bolt and teeth bonuses, why would they be displayed here?
+	# odd pst values for tohit and damage: the tables are fine and is what we currently display
+	# the original displayed the base THAC0 above and all the damage and tohit bonuses here
+	# we maintain consistency here and rather display saner values above
 	# 10332 to hit
 	stats.append ((names[1], GemRB.GetAbilityBonus (IE_STR, 0, value, ex), 'p'))
 	# 10336 damage
