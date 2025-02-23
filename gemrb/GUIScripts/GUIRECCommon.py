@@ -792,7 +792,7 @@ def TypeSetStats (stats, pc, recolor = False):
 	for s in stats:
 		try:
 			strref, val, stattype = s
-			if val == 0 and (stattype != '0' and stattype != 'p'):
+			if val == 0 and stattype != '0':
 				continue
 			if val == None:
 				val = str_None
@@ -802,14 +802,9 @@ def TypeSetStats (stats, pc, recolor = False):
 				res.append (strref)
 			elif stattype == 'p': # a plus prefix if positive
 				if val > 0:
-					res.append (GemRB.GetString (strref) + ' +' + str (val))
+					res.append (GemRB.GetString (strref) + ': +' + str (val))
 				else:
-					res.append (GemRB.GetString (strref) + ' ' + str (val))
-			elif stattype == 'r': # a plus prefix if positive, strref is an already resolved string
-				if val > 0:
-					res.append (strref + ' +' + str (val) )
-				else:
-					res.append (strref + ' ' + str (val) )
+					res.append (GemRB.GetString (strref) + ': ' + str (val))
 			elif stattype == 's': # both base and (modified) stat, but only if they differ
 				base = GB (val)
 				stat = GS (val)

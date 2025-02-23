@@ -595,7 +595,7 @@ def GetStatOverview (pc):
 	stats.append (None)
 
 	# 4238 Magical Defense Adjustment
-	if "MAGE" in className or "CLERIC" in className:
+	if "CLERIC" in className:
 		stats.append (4238)
 		abbon = GUIRECCommon.GetBonusSpells (pc, False)
 		stats += abbon
