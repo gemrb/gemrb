@@ -1013,6 +1013,8 @@ static inline int CheckMagicResistance(const Actor* actor, const Effect* fx, con
 	bool selective_mr = core->HasFeature(GFFlags::SELECTIVE_MAGIC_RES);
 	if (fx->CasterID == actor->GetGlobalID() && selective_mr) {
 		return -1;
+	} else if (IsEquipped(fx->TimingMode)) {
+		return -1;
 	}
 
 	//magic immunity
