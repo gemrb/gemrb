@@ -109,10 +109,6 @@ def RunGame(MyChar):
 		CharGenCommon.CharGenWindow.Close ()
 
 		CommonWindow.SetGameGUIHidden(True)
-		if not GameCheck.IsTOB () and not GameCheck.HasBGT () and not GameCheck.HasTutu ():
-			# fade with some number longer than it takes to get everything setup and running
-			# eventually another fade call is executed which will cancel the remaining time
-			GemRB.ExecuteString ("FadeFromColor([1000.0],0)", MyChar)
 
 		GemRB.EnterGame()
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
