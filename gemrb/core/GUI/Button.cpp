@@ -148,8 +148,9 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 				Image = buttonImages[ButtonImage::Unpressed];
 				break;
 		}
+		BlitFlags bf = flags & IE_GUI_BUTTON_SHADE_BASE ? BlitFlags::HALFTRANS : BlitFlags::NONE;
 		if (Image) {
-			VideoDriver->BlitSprite(Image, rgn.origin);
+			VideoDriver->BlitSprite(Image, rgn.origin, nullptr, bf);
 		}
 	}
 

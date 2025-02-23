@@ -201,13 +201,6 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			Button.SetSprites ("GUILSOP", 0,8,9,24,8)
 		elif iwd1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,24)
-		elif pst:
-			# these two blocks do nothing yet
-			# the disabled frames are there, but they are identical to pressed
-			if GUICommon.CantUseSpellbookWindow (pc):
-				Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
-			else:
-				Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 		# Priest
 		Button = InitOptionButton(Window, 'Priest_Spells')
@@ -215,12 +208,6 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			Button.SetSprites ("GUILSOP", 0,10,11,25,10)
 		elif iwd1:
 			Button.SetSprites ("GUILSOP", 0,10,11,25,25)
-		elif pst:
-			if GUICommon.CantUseSpellbookWindow (pc, True):
-				Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
-			else:
-				Button.SetState (IE_GUI_BUTTON_ENABLED)
-
 
 	# Options
 	Button = InitOptionButton(Window, 'Options')
@@ -267,6 +254,33 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.OnPress (RestPress)
+
+	UpdateMenuWindowControls ()
+	return
+
+# all this for just two special buttons without shaded disabled frames
+def UpdateMenuWindowControls ():
+	if not GameCheck.IsPST ():
+		return
+
+	Window = GemRB.GetView ("OPTWIN")
+	pc = GemRB.GameGetFirstSelectedPC()
+
+	Button = Window.GetControl (OptionControl[MageSpellsKey])
+	if GUICommon.CantUseSpellbookWindow (pc):
+		Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
+		Button.SetFlags (IE_GUI_BUTTON_SHADE_BASE, OP_OR)
+	else:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetFlags (IE_GUI_BUTTON_SHADE_BASE, OP_NAND)
+
+	Button = Window.GetControl (OptionControl["Priest_Spells"])
+	if GUICommon.CantUseSpellbookWindow (pc, True):
+		Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
+		Button.SetFlags (IE_GUI_BUTTON_SHADE_BASE, OP_OR)
+	else:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetFlags (IE_GUI_BUTTON_SHADE_BASE, OP_NAND)
 	return
 
 def OnLockViewPress ():
@@ -645,7 +659,6 @@ def SelectionChanged ():
 	# FIXME: hack. If defined, display single selection
 	ActionsWindow.SetActionLevel (UAW_STANDARD)
 	if (not SelectionChangeHandler):
-		import ActionsWindow
 		ActionsWindow.UpdateActionsWindow ()
 	else:
 		pc = GemRB.GameGetSelectedPCSingle();
@@ -655,6 +668,7 @@ def SelectionChanged ():
 	Container.CloseContainerWindow()
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
+	UpdateMenuWindowControls ()
 	return
 
 def OpenWaitForDiscWindow (disc_num):
