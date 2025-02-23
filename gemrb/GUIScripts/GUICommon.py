@@ -669,8 +669,12 @@ def CanDualClass(actor):
 	return 1
 
 def IsWarrior (actor):
-	IsWarrior = CommonTables.ClassSkills.GetValue (GetClassRowName(actor), "NO_PROF", GTV_INT)
+	if GameCheck.IsPST ():
+		# no column there
+		className = GetClassRowName (actor)
+		return "FIGHTER" in className
 
+	IsWarrior = CommonTables.ClassSkills.GetValue (GetClassRowName(actor), "NO_PROF", GTV_INT)
 	# warriors get only a -2 penalty for wielding weapons they are not proficient with
 	# FIXME: make the check more robust, someone may change the value!
 	IsWarrior = (IsWarrior == -2)
