@@ -32,10 +32,10 @@
 #define DF_POSTPONE_SCRIPTS   256
 
 // scroll flags for tracking arrow key scrolling
-#define SK_LEFT  1
-#define SK_RIGHT 2
-#define SK_UP    4
-#define SK_DOWN  8
+static constexpr unsigned int SK_LEFT = 1;
+static constexpr unsigned int SK_RIGHT = 2;
+static constexpr unsigned int SK_UP = 4;
+static constexpr unsigned int SK_DOWN = 8;
 
 // screen flags
 // !!! Keep these synchronized with GUIDefines.py !!!

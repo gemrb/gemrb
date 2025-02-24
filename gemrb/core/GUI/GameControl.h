@@ -76,8 +76,8 @@ private:
 	Point vpVector;
 	int numScrollCursor = 0;
 	EnumBitset<ScreenFlags> screenFlags { ScreenFlags::CenterOnActor };
-	ushort scrollKeysActive = 0;
-	ushort scrollKeysDown = 0;
+	unsigned int scrollKeysActive = 0;
+	unsigned int scrollKeysDown = 0;
 	unsigned int DialogueFlags = DF_FREEZE_SCRIPTS;
 	String DisplayText;
 	unsigned int DisplayTextTime = 0;

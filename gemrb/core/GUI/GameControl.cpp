@@ -712,7 +712,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				if (Flags() & IgnoreEvents) {
 					break;
 				}
-				ushort arrowKey = 1 << (keycode - GEM_LEFT);
+				unsigned int arrowKey = 1 << (keycode - GEM_LEFT);
 
 				// don't reprocess repeating keystrokes
 				if (scrollKeysDown & arrowKey) {
@@ -723,7 +723,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				scrollKeysActive |= arrowKey;
 
 				// If the opposite arrow key is held down, the new key press overrides it:
-				ushort oppositeKey = (arrowKey & 1) ? arrowKey << 1 : arrowKey >> 1;
+				unsigned int oppositeKey = (arrowKey & 1) ? arrowKey << 1 : arrowKey >> 1;
 				scrollKeysActive &= ~oppositeKey;
 
 				ApplyKeyScrolling();
@@ -1137,12 +1137,12 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 		case GEM_LEFT:
 		case GEM_RIGHT:
 			{
-				ushort releasedKey = 1 << (Key.keycode - GEM_LEFT);
+				unsigned int releasedKey = 1 << (Key.keycode - GEM_LEFT);
 				scrollKeysDown &= ~releasedKey;
 				scrollKeysActive &= ~releasedKey;
 
 				// If the opposite arrow key is still held down, switch to that direction:
-				ushort oppositeKey = releasedKey & 1 ? releasedKey << 1 : releasedKey >> 1;
+				unsigned int oppositeKey = releasedKey & 1 ? releasedKey << 1 : releasedKey >> 1;
 				if (scrollKeysDown & oppositeKey) {
 					scrollKeysActive |= oppositeKey;
 				}
