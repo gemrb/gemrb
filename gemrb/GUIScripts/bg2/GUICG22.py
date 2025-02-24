@@ -223,8 +223,10 @@ def NextPress():
 	MageSchool = GemRB.GetVar ("MAGESCHOOL")
 	if MageSchool and not KitIndex:
 		KitValue = SchoolList.GetValue (MageSchool, 3)
-	else:
+	elif KitIndex:
 		KitValue = CommonTables.KitList.GetValue (KitIndex, 6)
+	else:
+		KitValue = 0
 
 	#save the kit
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
