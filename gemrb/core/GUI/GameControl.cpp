@@ -714,6 +714,9 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				}
 				unsigned int arrowKey = 1 << (keycode - GEM_LEFT);
 
+				// You only get repeating OnKeyPress events for the last key pressed.
+				// More than one direction can be held down for diagonal scrolling, so we have
+				// to track which keys are pressed/released instead of relying on continuous events.
 				// don't reprocess repeating keystrokes
 				if (scrollKeysDown & arrowKey) {
 					break;
@@ -726,6 +729,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				unsigned int oppositeKey = (arrowKey & 1) ? arrowKey << 1 : arrowKey >> 1;
 				scrollKeysActive &= ~oppositeKey;
 
+				// Update the vector to start scrolling in the direction that was pressed:
 				ApplyKeyScrolling();
 			}
 			break;
@@ -1147,6 +1151,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					scrollKeysActive |= oppositeKey;
 				}
 
+				// Update the vector to stop scrolling in the direction that was released:
 				ApplyKeyScrolling();
 				break;
 			}
@@ -2427,6 +2432,8 @@ bool GameControl::OnControllerButtonDown(const ControllerEvent& ce)
 
 void GameControl::ApplyKeyScrolling()
 {
+	// Use the scrollKeysActive flags to set the vector values.
+	// This vector is then used in WillDraw to perform scrolling.
 	vpVector.reset();
 	auto keyScrollSpd = core->GetDictionary().Get("Keyboard Scroll Speed", 64);
 
