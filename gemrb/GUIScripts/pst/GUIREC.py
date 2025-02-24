@@ -225,7 +225,7 @@ def UpdateRecordsWindow (Window):
 
 	AlignmentTable = GemRB.LoadTable ("ALIGNS")
 	alignment_help = AlignmentTable.GetValue (sym, 'DESC_REF', GTV_REF)
-	frame = (3 * int (align / 16) + align % 16) - 4
+	frame = (3 * align // 16 + align % 16) - 4
 
 	Button = Window.GetControl (5)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -666,14 +666,14 @@ def OpenInformationWindow ():
 
 	Label = Window.GetControl (0x10000006)
 	if TotalPartyExp != 0:
-		PartyExp = int ((stat['KillsTotalXP'] * 100) / TotalPartyExp)
+		PartyExp = (stat['KillsTotalXP'] * 100) // TotalPartyExp
 		Label.SetText (str (PartyExp) + '%')
 	else:
 		Label.SetText ("0%")
 
 	Label = Window.GetControl (0x10000007)
 	if TotalPartyKills != 0:
-		PartyKills = int ((stat['KillsTotalCount'] * 100) / TotalPartyKills)
+		PartyKills = (stat['KillsTotalCount'] * 100) // TotalPartyKills
 		Label.SetText (str (PartyKills) + '%')
 	else:
 		Label.SetText ("0%")
@@ -1128,7 +1128,7 @@ def GetConHPBonus (pc, numPrimLevels, numSecoLevels, levelUpType):
 	if levelUpType == 1:
 		# Mage, Priest or Thief
 		return ConHPBonTable.GetValue (con, "OTHER") * numPrimLevels
-	return ConHPBonTable.GetValue (con, "WARRIOR") * numPrimLevels / 2 + ConHPBonTable.GetValue (con, "OTHER") * numSecoLevels / 2
+	return ConHPBonTable.GetValue (con, "WARRIOR") * numPrimLevels // 2 + ConHPBonTable.GetValue (con, "OTHER") * numSecoLevels // 2
 
 def GetThac0 (Class, Level):
 	Thac0Table = GemRB.LoadTable ("THAC0")
@@ -1151,7 +1151,7 @@ def GainedWeapProfs (pc, currProf, currLevel, AvatarName):
 		return maxProf - currProf
 
 	# Nameless continues gaining points forever	at a rate of 1 every 3 levels
-	elif GUICommon.IsNamelessOne(pc) and (currProf-3) <= (nextLevel / 3):
+	elif GUICommon.IsNamelessOne(pc) and (currProf - 3) <= (nextLevel // 3):
 		return 1
 
 	return 0
