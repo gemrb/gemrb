@@ -436,8 +436,14 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 		}
 	}
 
+	// Prevent key scrolling from continuing when another window opens
+	if (scrollKeysActive && !IsReceivingEvents()) {
+		scrollKeysDown = scrollKeysActive = 0;
+		vpVector.reset();
+	}
+
 	if (!vpVector.IsZero() && MoveViewportTo(vpOrigin + vpVector, false)) {
-		if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed() && !screenFlags.Test(ScreenFlags::AlwaysCenter)) {
+		if ((Flags() & IgnoreEvents) == 0 && !scrollKeysActive && core->GetMouseScrollSpeed() && !screenFlags.Test(ScreenFlags::AlwaysCenter)) {
 			orient_t orient = GetOrient(Point(), vpVector);
 			// set these cursors on game window so they are universal
 			window->SetCursor(core->GetScrollCursorSprite(orient, numScrollCursor));
@@ -703,15 +709,28 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 		case GEM_LEFT:
 		case GEM_RIGHT:
 			{
-				ieDword keyScrollSpd = core->GetDictionary().Get("Keyboard Scroll Speed", 64);
-
-				if (keycode >= GEM_UP) {
-					int v = (keycode == GEM_UP) ? -1 : 1;
-					Scroll(Point(0, keyScrollSpd * v));
-				} else {
-					int v = (keycode == GEM_LEFT) ? -1 : 1;
-					Scroll(Point(keyScrollSpd * v, 0));
+				if (Flags() & IgnoreEvents) {
+					break;
 				}
+				unsigned int arrowKey = 1 << (keycode - GEM_LEFT);
+
+				// You only get repeating OnKeyPress events for the last key pressed.
+				// More than one direction can be held down for diagonal scrolling, so we have
+				// to track which keys are pressed/released instead of relying on continuous events.
+				// don't reprocess repeating keystrokes
+				if (scrollKeysDown & arrowKey) {
+					break;
+				}
+
+				scrollKeysDown |= arrowKey;
+				scrollKeysActive |= arrowKey;
+
+				// If the opposite arrow key is held down, the new key press overrides it:
+				unsigned int oppositeKey = (arrowKey & 1) ? arrowKey << 1 : arrowKey >> 1;
+				scrollKeysActive &= ~oppositeKey;
+
+				// Update the vector to start scrolling in the direction that was pressed:
+				ApplyKeyScrolling();
 			}
 			break;
 		case GEM_TAB: // show partymember hp/maxhp as overhead text
@@ -1117,6 +1136,25 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				pc->overHead.Display(false, 0);
 			}
 			break;
+		case GEM_UP:
+		case GEM_DOWN:
+		case GEM_LEFT:
+		case GEM_RIGHT:
+			{
+				unsigned int releasedKey = 1 << (Key.keycode - GEM_LEFT);
+				scrollKeysDown &= ~releasedKey;
+				scrollKeysActive &= ~releasedKey;
+
+				// If the opposite arrow key is still held down, switch to that direction:
+				unsigned int oppositeKey = releasedKey & 1 ? releasedKey << 1 : releasedKey >> 1;
+				if (scrollKeysDown & oppositeKey) {
+					scrollKeysActive |= oppositeKey;
+				}
+
+				// Update the vector to stop scrolling in the direction that was released:
+				ApplyKeyScrolling();
+				break;
+			}
 		default:
 			return false;
 	}
@@ -1597,7 +1635,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	// we are using the window->IsDisabled on purpose
 	// to avoid bugs, we are disabling the window when we open one of the "top window"s
 	// GC->IsDisabled is for other uses
-	if (!window || window->IsDisabled() || (Flags() & IgnoreEvents)) {
+	if (!window || window->IsDisabled() || (Flags() & IgnoreEvents) || scrollKeysActive) {
 		return false;
 	}
 
@@ -2392,6 +2430,25 @@ bool GameControl::OnControllerButtonDown(const ControllerEvent& ce)
 	}
 }
 
+void GameControl::ApplyKeyScrolling()
+{
+	// Use the scrollKeysActive flags to set the vector values.
+	// This vector is then used in WillDraw to perform scrolling.
+	vpVector.reset();
+	auto keyScrollSpd = core->GetDictionary().Get("Keyboard Scroll Speed", 64);
+
+	if (scrollKeysActive & SK_LEFT) {
+		vpVector.x = -1 * keyScrollSpd;
+	} else if (scrollKeysActive & SK_RIGHT) {
+		vpVector.x = keyScrollSpd;
+	}
+	if (scrollKeysActive & SK_UP) {
+		vpVector.y = -1 * keyScrollSpd;
+	} else if (scrollKeysActive & SK_DOWN) {
+		vpVector.y = keyScrollSpd;
+	}
+}
+
 void GameControl::Scroll(const Point& amt)
 {
 	MoveViewportTo(vpOrigin + amt, false);
@@ -2635,6 +2692,7 @@ void GameControl::FlagsChanged(unsigned int /*oldflags*/)
 	if (Flags() & IgnoreEvents) {
 		ClearMouseState();
 		vpVector.reset();
+		scrollKeysDown = scrollKeysActive = 0;
 	}
 }
 

@@ -76,6 +76,8 @@ private:
 	Point vpVector;
 	int numScrollCursor = 0;
 	EnumBitset<ScreenFlags> screenFlags { ScreenFlags::CenterOnActor };
+	unsigned int scrollKeysActive = 0;
+	unsigned int scrollKeysDown = 0;
 	unsigned int DialogueFlags = DF_FREEZE_SCRIPTS;
 	String DisplayText;
 	unsigned int DisplayTextTime = 0;
@@ -113,6 +115,7 @@ private:
 	Point GetFormationPoint(const Point& origin, size_t pos, float_t angle, const FormationPoints& exclude = FormationPoints()) const;
 	FormationPoints GetFormationPoints(const Point& origin, const std::vector<Actor*>& actors, float_t angle) const;
 
+	void ApplyKeyScrolling();
 	void Scroll(const Point& amt);
 
 	void HandleContainer(Container* container, Actor* actor);
