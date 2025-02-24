@@ -21,32 +21,32 @@ import GemRB
 import GameCheck
 from GUIDefines import SV_SAVEPATH
 
-skip_videos = False
+skipVideos = False
 
 def RunStart2(isTOB):
-	global skip_videos
-	
+	global skipVideos
+
+	skipIntro = GemRB.GetVar ("SeenIntroVideos")
 	if isTOB:
-		GemRB.SetMasterScript("BALDUR25","WORLDM25")
-		GemRB.SetVar("oldgame",0)
-		if not skip_videos and not skip_videos&2:
+		GemRB.SetMasterScript("BALDUR25", "WORLDM25")
+		GemRB.SetVar("oldgame", 0)
+		if not skipVideos and skipIntro & 2 == 0:
 			GemRB.PlayMovie ("INTRO", 1)
-			skip_videos |= 2
+			skipIntro |= 2
+		GemRB.LoadMusicPL ("ThemeT.mus", 1)
 	else:
-		GemRB.SetMasterScript("BALDUR","WORLDMAP")
-		GemRB.SetVar("oldgame",1)
-		if not skip_videos and not skip_videos&4:
+		GemRB.SetMasterScript("BALDUR", "WORLDMAP")
+		GemRB.SetVar("oldgame", 1)
+		if not skipVideos and skipIntro & 4 == 0:
 			GemRB.PlayMovie ("INTRO15F", 1)
-			skip_videos |= 4
-			
+			skipIntro |= 4
+		GemRB.LoadMusicPL ("Theme.mus", 1)
+
+	GemRB.SetVar ("SeenIntroVideos", skipIntro)
 	if GameCheck.IsBG2Demo():
 		GemRB.SetFeature (GF_ALL_STRINGS_TAGGED, True)
 
 	GemRB.SetNextScript("Start2")
-	MusicTable = GemRB.LoadTable ("songlist")
-	# the table has useless rownames, so we can't search for BG2Theme
-	theme = MusicTable.GetValue ("33", "RESOURCE")
-	GemRB.LoadMusicPL (theme, 1)
 
 def RunStartEE():
 	StartWindow = GemRB.LoadWindow (11, "START")
@@ -84,13 +84,13 @@ def RunStartEE():
 	ExitButton.MakeEscape ()
 
 def OnLoad():
-	global skip_videos
+	global skipVideos
 
 	# migrate mpsave saves if possible and needed
 	MigrateSaveDir ()
 
-	skip_videos = GemRB.GetVar ("SkipIntroVideos") or 0
-	if not skip_videos and not GemRB.GetVar ("SeenIntroVideos"):
+	skipVideos = GemRB.GetVar ("SkipIntroVideos") or 0
+	if not skipVideos and not GemRB.GetVar ("SeenIntroVideos"):
 		if GameCheck.IsBG2EE ():
 			GemRB.PlayMovie ("logo", 1)
 			GemRB.PlayMovie ("intro", 1)
@@ -131,7 +131,7 @@ def OnLoad():
 	ToBButton.OnPress (lambda: RunStart2(True))
 	ExitButton.OnPress (lambda: GemRB.Quit())
 	StartWindow.Focus()
-	GemRB.LoadMusicPL("Cred.mus")
+	GemRB.LoadMusicPL("ThemeT.mus")
 	return
 
 def MigrateSaveDir():
