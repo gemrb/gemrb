@@ -3024,7 +3024,17 @@ void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
 	if (!act) {
 		return;
 	}
+
+	ieDword oldMorale = act->GetBase(IE_MORALE);
 	act->SetBase(IE_MORALE, parameters->int0Parameter);
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		ScriptEngine::FunctionParameters params {
+			ScriptEngine::Parameter(act->GetGlobalID()),
+			ScriptEngine::Parameter(act->GetBase(IE_MORALE) - oldMorale),
+			ScriptEngine::Parameter(0)
+		};
+		core->GetGUIScriptEngine()->RunFunction("Game", "CheckKarachUpgrade", params);
+	}
 }
 
 void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
@@ -3035,6 +3045,14 @@ void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	act->SetBase(IE_MORALE, act->GetBase(IE_MORALE) + parameters->int0Parameter);
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		ScriptEngine::FunctionParameters params {
+			ScriptEngine::Parameter(act->GetGlobalID()),
+			ScriptEngine::Parameter(parameters->int0Parameter),
+			ScriptEngine::Parameter(0)
+		};
+		core->GetGUIScriptEngine()->RunFunction("Game", "CheckKarachUpgrade", params);
+	}
 }
 
 void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
@@ -3045,6 +3063,14 @@ void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	act->SetBase(IE_MORALE, act->GetBase(IE_MORALE) - parameters->int0Parameter);
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		ScriptEngine::FunctionParameters params {
+			ScriptEngine::Parameter(act->GetGlobalID()),
+			ScriptEngine::Parameter(-1 * parameters->int0Parameter),
+			ScriptEngine::Parameter(0)
+		};
+		core->GetGUIScriptEngine()->RunFunction("Game", "CheckKarachUpgrade", params);
+	}
 }
 
 // ee oddity

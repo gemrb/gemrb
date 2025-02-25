@@ -39,6 +39,7 @@
 
 ###################################################
 import GemRB
+import Game
 import GUICommon
 import CommonTables
 import LevelUp
@@ -775,6 +776,7 @@ def AcceptLevelUp():
 		GemRB.SetPlayerStat (pc, LevelStats[SwitcherClass], Levels[SwitcherClass]+NumOfPrimLevUp)
 	else:
 		GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+NumOfPrimLevUp)
+		Game.CheckKarachUpgrade (pc, 0, NumOfPrimLevUp)
 		if avatar_header['SecoLevel'] != 0:
 			GemRB.SetPlayerStat (pc, IE_LEVEL2, GemRB.GetPlayerStat (pc, IE_LEVEL2)+NumOfSecoLevUp)
 	
