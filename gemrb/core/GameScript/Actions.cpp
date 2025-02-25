@@ -3829,8 +3829,7 @@ void GameScript::IncrementProficiency(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//start of the proficiency stats
-	target->SetBase(IE_PROFICIENCYBASTARDSWORD + idx,
-			target->GetBase(IE_PROFICIENCYBASTARDSWORD + idx) + parameters->int1Parameter);
+	target->NewBase(IE_PROFICIENCYBASTARDSWORD + idx, parameters->int1Parameter, MOD_ADDITIVE);
 }
 
 void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameters)
