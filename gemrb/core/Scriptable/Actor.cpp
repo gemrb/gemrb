@@ -1259,11 +1259,16 @@ static void pcf_xp(Actor* actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	ieDword pc = actor->InParty;
 	if (pc && !actor->GotLUFeedback) {
 		auto ret = core->GetGUIScriptEngine()->RunFunction("LUCommon", "CanLevelUp", pc, true);
-		if (ret.Value<bool>()) {
+		if (!ret.Value<bool>()) return;
+
+		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
+			ieStrRef ref = displaymsg->GetStringReference(HCStrings::LevelUp, actor);
+			actor->overHead.SetText(core->GetString(ref));
+		} else {
 			displaymsg->DisplayConstantStringName(HCStrings::LevelUp, GUIColors::WHITE, actor);
-			actor->GotLUFeedback = true;
 			core->SetEventFlag(EF_PORTRAIT);
 		}
+		actor->GotLUFeedback = true;
 	}
 }
 
