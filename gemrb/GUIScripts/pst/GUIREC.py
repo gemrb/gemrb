@@ -774,6 +774,7 @@ def AcceptLevelUp():
 		Levels = { "FIGHTER" : GemRB.GetPlayerStat (pc, IE_LEVEL) , "MAGE": GemRB.GetPlayerStat (pc, IE_LEVEL2), "THIEF": GemRB.GetPlayerStat (pc, IE_LEVEL3) }
 		LevelStats = { "FIGHTER" : IE_LEVEL , "MAGE": IE_LEVEL2, "THIEF": IE_LEVEL3 }
 		GemRB.SetPlayerStat (pc, LevelStats[SwitcherClass], Levels[SwitcherClass]+NumOfPrimLevUp)
+		HandleSpecializationBonuses (pc, SwitcherClass, Levels[SwitcherClass], Levels[SwitcherClass] + NumOfPrimLevUp)
 	else:
 		GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+NumOfPrimLevUp)
 		Game.CheckKarachUpgrade (pc, 0, NumOfPrimLevUp)
@@ -791,6 +792,98 @@ def AcceptLevelUp():
 
 	LevelUpWindow.Close()
 	NewLife.OpenLUStatsWindow(True, sum(LevelDiff))
+
+def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
+	# GLOBAL["Specialist"] = 1 // Fighter | was the first class to level 7
+	# GLOBAL["Specialist"] = 2 // Thief   | was the first class to level 7
+	# GLOBAL["Specialist"] = 3 // Mage    | was the first class to level 7
+	#
+	# GLOBAL["Specialist"] = 4 // Fighter | was the first class to level 7 and level 12
+	# GLOBAL["Specialist"] = 5 // Thief   | was the first class to level 7 and level 12
+	# GLOBAL["Specialist"] = 6 // Mage    | was the first class to level 7 and level 12
+	#
+	# GLOBAL["Specialist"] = 7 // Fighter | was the first class to level 12 (but not to level 7)
+	# GLOBAL["Specialist"] = 8 // Thief   | was the first class to level 12 (but not to level 7)
+	# GLOBAL["Specialist"] = 9 // Mage    | was the first class to level 12 (but not to level 7)
+	specialist = GemRB.GetGameVar ("Specialist") or 0
+	if specialist >= 4:
+		# all upgrades have been done already
+		return
+
+	def bumpStat (pc, stat, diff, delay = 0):
+		base = GemRB.GetPlayerStat (pc, stat, 1)
+		GemRB.SetPlayerStat (pc, stat, base + diff)
+
+		statMsgs = { IE_STR: 41274, IE_CON: 41273, IE_DEX: 41276, IE_INT: 39440, IE_WIS: 41271, IE_LUCK: 41272 }
+		# IE_LORE: 39439, IE_HITPOINTS: 39438 would require a full queuing approach to work
+		if stat in statMsgs:
+			action = "FloatMessage({}, {})".format(pc, statMsgs[stat] + 1000000)
+			if delay:
+				# stagger messages, so they don't overlap
+				GemRB.SetTimedEvent(lambda: GemRB.ExecuteString (action, pc), delay)
+			else:
+				GemRB.ExecuteString (action, pc)
+		return
+
+	def grantFirstBonus (pc, className, specBase = 0):
+		if className == "FIGHTER":
+			bumpStat (pc, IE_STR, 1)
+			# Unlocks Proficiency 4 for a Weapon; this is handled by trainers checking the Specialist global
+			specVal = 1
+		elif className == "THIEF":
+			bumpStat (pc, IE_DEX, 1)
+			specVal = 2
+		else:
+			bumpStat (pc, IE_INT, 1)
+			specVal = 3
+		GemRB.SetGlobal ("Specialist", "GLOBAL", specBase + specVal)
+		return
+
+	if specialist == 0:
+		if newLevel < 7:
+			return
+
+		# we just (b)reached 7 for the first time, give the first bonus
+		grantFirstBonus (pc, className)
+		return
+
+	# from here on specialist is 1, 2 or 3
+	if newLevel < 12:
+		return
+
+	# we just (b)reached 12, give the second bonus
+	if className == "FIGHTER":
+		if specialist == 1:
+			# 4: upgrade fighter specialization
+			bumpStat (pc, IE_STR, 1)
+			bumpStat (pc, IE_CON, 1, 2)
+			bumpStat (pc, IE_MAXHITPOINTS, 3)
+			bumpStat (pc, IE_HITPOINTS, 3) # we can't display it the same way, but it wasn't drawn in the original either
+			# Unlocks Proficiency 5 for a Weapon; this is handled by trainers checking the Specialist global
+			GemRB.SetGlobal ("Specialist", "GLOBAL", 4)
+		else:
+			# 7: was mage or thief, grant first fighter specialization
+			grantFirstBonus (pc, className, 6)
+	elif className == "THIEF":
+		if specialist == 2:
+			# 5: upgrade thief specialization
+			bumpStat (pc, IE_DEX, 2)
+			bumpStat (pc, IE_LUCK, 1, 2)
+			GemRB.SetGlobal ("Specialist", "GLOBAL", 5)
+		else:
+			# 8: was mage or fighter, grant first thief specialization
+			grantFirstBonus (pc, className, 6)
+	else:
+		if specialist == 3:
+			# 6: upgrade mage specialization
+			bumpStat (pc, IE_INT, 2)
+			bumpStat (pc, IE_WIS, 1, 2)
+			bumpStat (pc, IE_LORE, 5)
+			GemRB.SetGlobal ("Specialist", "GLOBAL", 6)
+		else:
+			# 9: was thief or fighter, grant first mage specialization
+			grantFirstBonus (pc, className, 6)
+	return
 
 def RedrawSkills():
 	DoneButton = LevelUpWindow.GetControl(0)
