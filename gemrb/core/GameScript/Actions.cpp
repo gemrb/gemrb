@@ -1663,7 +1663,13 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 		Log(WARNING, "Actions", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
 	}
 
-	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_HEAD | DS_SPEECH);
+	int flags = DS_HEAD | DS_SPEECH;
+	int strRef = parameters->int0Parameter;
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && strRef > 1000000) {
+		flags |= DS_APPEND; // force append, so several messages can be queued
+		strRef -= 1000000;
+	}
+	DisplayStringCore(target, ieStrRef(strRef), flags);
 }
 
 void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)

@@ -57,6 +57,7 @@ enum class EscapeArea {
 #define DS_QUEUE    256
 #define DS_CIRCLE   512
 #define DS_RESOLVED 1024
+#define DS_APPEND   2048
 
 //markspellandobject (iwd2)
 #define MSO_IGNORE_SEE     1
