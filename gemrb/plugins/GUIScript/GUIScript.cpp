@@ -8989,6 +8989,8 @@ PyDoc_STRVAR(GemRB_GetItem__doc,
   * 'Tooltips'           - the item tooltips\n\
   * 'Locations'          - the item extended header's ability locations\n\
   * 'Spell'              - the spell's strref if the item is a copyable scroll\n\
+  * 'UsabilityBitmask'   - class usability bitmask\n\
+  * 'KitUsability'       - kit usability bitmask\n\
   * 'Function'           - returns special function\n\
     * 0 - no special function\n\
     * 1 - item is a copyable scroll (2nd header's 1st feature is 'Learn spell')\n\
@@ -9033,6 +9035,8 @@ static PyObject* GemRB_GetItem(PyObject* /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "LoreToID", DecRef(PyLong_FromLong, item->LoreToID));
 	PyDict_SetItemString(dict, "Enchantment", PyLong_FromLong(item->Enchantment));
 	PyDict_SetItemString(dict, "MaxCharge", PyLong_FromLong(0));
+	PyDict_SetItemString(dict, "UsabilityBitmask", PyLong_FromLong(item->UsabilityBitmask));
+	PyDict_SetItemString(dict, "KitUsability", PyLong_FromLong(item->KitUsability));
 
 	size_t ehc = item->ext_headers.size();
 
