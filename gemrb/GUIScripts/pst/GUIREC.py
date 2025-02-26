@@ -1181,11 +1181,12 @@ def OpenLevelUpWindow ():
 	if CurrWeapProf!=-1 and WeapProfGained>0:
 		overview = overview + GemRB.GetString (38715) + '\n' + '+' + str (WeapProfGained) + '\n'
 
+	if SavThrUpdated:
+		overview = overview + GemRB.GetString (38719) + '\n'
+
 	overview = overview + str (HPGained) + " " + GemRB.GetString (38713) + '\n'
 	overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
 
-	if SavThrUpdated:
-		overview = overview + GemRB.GetString (38719) + '\n'
 	if Thac0Updated:
 		GemRB.SetPlayerStat (pc, IE_TOHIT, Thac0)
 		overview = overview + GemRB.GetString (38718) + '\n'
