@@ -1179,7 +1179,12 @@ def OpenLevelUpWindow ():
 	# Displaying level up info
 	overview = ""
 	if CurrWeapProf!=-1 and WeapProfGained>0:
-		overview = overview + GemRB.GetString (38715) + '\n' + '+' + str (WeapProfGained) + '\n'
+		# pc dependent feedback: TNO gets generic, everyone else their chosen weapon
+		profRef = 38715
+		if WeapProfType != -1:
+			WeapProfName = CommonTables.WeapProfs.GetRowName (WeapProfType)
+			profRef = CommonTables.WeapProfs.GetValue (WeapProfName, "NAME_REF", GTV_INT)
+		overview = overview + '+' + str (WeapProfGained) + " " + GemRB.GetString (profRef) + '\n'
 
 	if SavThrUpdated:
 		overview = overview + GemRB.GetString (38719) + '\n'
