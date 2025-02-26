@@ -64,7 +64,7 @@ def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 		# only TNO gets the main stat boosts
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-		if Specific != 2:
+		if Specific != 2 or LevelDiff == 0:
 			return
 	else:
 		GemRB.LoadGame(None)  #loading the base game

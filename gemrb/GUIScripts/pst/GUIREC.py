@@ -65,6 +65,8 @@ LevelDiff = 0
 Level = 0
 Classes = 0
 NumClasses = 0
+NewCharacteristicPts = 0
+LevelStats = { "FIGHTER" : IE_LEVEL , "MAGE": IE_LEVEL2, "THIEF": IE_LEVEL3 }
 
 ###################################################
 
@@ -772,9 +774,9 @@ def AcceptLevelUp():
 	if SwitcherClass:
 		# Handle saving of TNO class level in the correct CRE stat
 		Levels = { "FIGHTER" : GemRB.GetPlayerStat (pc, IE_LEVEL) , "MAGE": GemRB.GetPlayerStat (pc, IE_LEVEL2), "THIEF": GemRB.GetPlayerStat (pc, IE_LEVEL3) }
-		LevelStats = { "FIGHTER" : IE_LEVEL , "MAGE": IE_LEVEL2, "THIEF": IE_LEVEL3 }
-		GemRB.SetPlayerStat (pc, LevelStats[SwitcherClass], Levels[SwitcherClass]+NumOfPrimLevUp)
-		HandleSpecializationBonuses (pc, SwitcherClass, Levels[SwitcherClass], Levels[SwitcherClass] + NumOfPrimLevUp)
+		NewLevel = Levels[SwitcherClass] + NumOfPrimLevUp
+		GemRB.SetPlayerStat (pc, LevelStats[SwitcherClass], NewLevel)
+		HandleSpecializationBonuses (pc, SwitcherClass, Levels[SwitcherClass], NewLevel)
 	else:
 		GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+NumOfPrimLevUp)
 		Game.CheckKarachUpgrade (pc, 0, NumOfPrimLevUp)
@@ -791,7 +793,7 @@ def AcceptLevelUp():
 	LevelUp.SaveNewSpells()
 
 	LevelUpWindow.Close()
-	NewLife.OpenLUStatsWindow(True, sum(LevelDiff))
+	NewLife.OpenLUStatsWindow(True, NewCharacteristicPts)
 
 def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
 	# GLOBAL["Specialist"] = 1 // Fighter | was the first class to level 7
@@ -901,7 +903,7 @@ def OpenLevelUpWindow ():
 	global WeapProfType, CurrWeapProf, WeapProfGained
 	global NumOfPrimLevUp, NumOfSecoLevUp
 
-	global LevelDiff, Level, Classes, NumClasses
+	global LevelDiff, Level, Classes, NumClasses, NewCharacteristicPts
 
 	LevelUpWindow = Window = GemRB.LoadWindow (4, "GUIREC") # since we get called from NewLife
 
@@ -1185,6 +1187,15 @@ def OpenLevelUpWindow ():
 			WeapProfName = CommonTables.WeapProfs.GetRowName (WeapProfType)
 			profRef = CommonTables.WeapProfs.GetValue (WeapProfName, "NAME_REF", GTV_INT)
 		overview = overview + '+' + str (WeapProfGained) + " " + GemRB.GetString (profRef) + '\n'
+
+	# +x characteristic points gained
+	# but only grant extra attribute points the first time we reach a level
+	if GUICommon.IsNamelessOne (pc):
+		MaxOldLevel = max(Level1)
+		NewLevel = GemRB.GetPlayerStat (pc, LevelStats[Class]) + NumOfPrimLevUp
+		NewCharacteristicPts = 0 if NewLevel <= MaxOldLevel else NewLevel - MaxOldLevel
+	if NewCharacteristicPts:
+		overview = overview + str (NewCharacteristicPts) + " "  + GemRB.GetString (38714) + '\n'
 
 	if SavThrUpdated:
 		overview = overview + GemRB.GetString (38719) + '\n'
