@@ -3950,6 +3950,9 @@ static PyObject* GemRB_SetVar(PyObject* /*self*/, PyObject* args)
 	Control::value_t val = Control::INVALID_VALUE;
 	if (PyLong_Check(pynum)) {
 		val = Control::value_t(PyLong_AsUnsignedLongMask(pynum));
+		if (PyErr_Occurred()) { // PyLong_AsUnsignedLongMask returns -1 on error
+			PyErr_Print();
+		}
 	} else if (pynum != Py_None) {
 		return RuntimeError("Expected a numeric or None type.");
 	}
