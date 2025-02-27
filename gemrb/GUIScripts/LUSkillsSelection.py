@@ -236,7 +236,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 				SkillValue = GemRB.GetPlayerStat (pc, SkillID)
 				BaseSkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
 				GemRB.SetVar("Skill "+str(i), SkillValue)
-				GemRB.SetVar("SkillBase "+str(i), SkillValue)
+				GemRB.SetVar("SkillBase " + str(i), BaseSkillValue)
 				# display the modified stat to avoid confusion (account for dex, race and effect boni)
 				GemRB.SetVar("SkillDisplayMod "+str(i), SkillValue-BaseSkillValue)
 				TotalSkillsAssignable += LUSKILLS_MAX-SkillValue
