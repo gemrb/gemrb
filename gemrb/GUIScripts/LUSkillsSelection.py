@@ -385,7 +385,9 @@ def SkillIncreasePress (btn):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
 	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
+	Description = SkillsTable.GetValue (SkillsTable.GetRowName (Pos + 2), "DESC_REF", GTV_STR)
+	if Description != "-1":
+		SkillsTextArea.SetText (Description)
 	if SkillPointsLeft == 0:
 		return
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
