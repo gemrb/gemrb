@@ -773,8 +773,7 @@ def AcceptLevelUp():
 	SwitcherClass = GUICommon.NamelessOneClass(pc)
 	if SwitcherClass:
 		# Handle saving of TNO class level in the correct CRE stat
-		Levels = { "FIGHTER" : GemRB.GetPlayerStat (pc, IE_LEVEL) , "MAGE": GemRB.GetPlayerStat (pc, IE_LEVEL2), "THIEF": GemRB.GetPlayerStat (pc, IE_LEVEL3) }
-		NewLevel = Levels[SwitcherClass] + NumOfPrimLevUp
+		NewLevel = avatar_header['PrimLevel'] + NumOfPrimLevUp
 		GemRB.SetPlayerStat (pc, LevelStats[SwitcherClass], NewLevel)
 		HandleSpecializationBonuses (pc, SwitcherClass, Levels[SwitcherClass], NewLevel)
 	else:
@@ -1192,7 +1191,7 @@ def OpenLevelUpWindow ():
 	# but only grant extra attribute points the first time we reach a level
 	if GUICommon.IsNamelessOne (pc):
 		MaxOldLevel = max(Level1)
-		NewLevel = GemRB.GetPlayerStat (pc, LevelStats[Class]) + NumOfPrimLevUp
+		NewLevel = avatar_header['PrimLevel'] + NumOfPrimLevUp
 		NewCharacteristicPts = 0 if NewLevel <= MaxOldLevel else NewLevel - MaxOldLevel
 	if NewCharacteristicPts:
 		overview = overview + str (NewCharacteristicPts) + " "  + GemRB.GetString (38714) + '\n'
