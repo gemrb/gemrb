@@ -229,6 +229,10 @@ PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
 Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller) const
 {
+#define RUN_ORIGINAL 0
+#define RUN_IMPROVED 1
+#define RETURN_ORIGINAL 0
+#define RUN_BENCH 0
 	using namespace std::chrono_literals;
 	auto Bench = ankerl::nanobench::Bench()
 		.epochIterations(100)
@@ -238,17 +242,30 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	Path ResultOriginal;
 	Path ResultOriginalImproved;
 
+#if RUN_BENCH
 	Bench.relative(true).name("FindPathOriginal").run([&] {
+#endif
+#if RUN_ORIGINAL
 		ResultOriginal = FindPathImplOriginal(s, d, size, minDistance, flags, caller);
+#endif
+#if RUN_BENCH
 	});
 	Bench.name("FindPathOriginalImproved").run([&] {
+#endif
+#if RUN_IMPROVED
 		ResultOriginalImproved = FindPathImplOriginalImproved(s, d, size, minDistance, flags, caller);
+#endif
+#if RUN_BENCH
 	});
+#endif
 	//std::cout << std::endl;
-	std::cout << "Size: Original=" << ResultOriginal.nodes.size() << ", Improved=" << ResultOriginalImproved.nodes.size();
-	std::cout << std::endl;
-	// assert(ResultOriginal.nodes.size() == ResultOriginalImproved.nodes.size());
+	// std::cout << "Size: Original=" << ResultOriginal.nodes.size() << ", Improved=" << ResultOriginalImproved.nodes.size();
+	// std::cout << std::endl;
+#if RETURN_ORIGINAL
+	return ResultOriginal;
+#else
 	return ResultOriginalImproved;
+#endif
 }
 
 void Map::NormalizeDeltas(float_t& dx, float_t& dy, float_t factor)

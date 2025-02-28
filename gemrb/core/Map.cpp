@@ -491,27 +491,82 @@ Map::~Map(void)
 
 void Map::TraversabilityUnblock(Actor *actor) {
 	ValidateTraversabilitySize();
-	const auto ActorPosition = actor->Pos;
-	const auto Idx = ActorPosition.y * PropsSize().w * 16 + ActorPosition.x;
-	if (Idx < Traversability.size()) {
-		Traversability[Idx].type = ETraversability::empty;
-	}
+    const auto ActorPosition = actor->Pos;
+    auto baseSize = actor->CircleSize2Radius() * actor->sizeFactor;
+    const Size s(baseSize * 8, baseSize * 6);
+    const Region r(actor->Pos - s.Center(), s);
+
+    for (int x = r.x; x < r.x + r.w; ++x)
+    {
+        for (int y = r.y; y < r.y + r.h; ++y)
+        {
+            if (x < 0 || y < 0)
+            {
+                continue;
+            }
+            const auto Idx = y * PropsSize().w * 16 + x;
+            if (Idx < Traversability.size()) {
+                Traversability[Idx].type = ETraversability::empty;
+            }
+        }
+    }
 }
 
 void Map::TraversabilityBlock(Actor *actor) const {
 	ValidateTraversabilitySize();
 	const bool bIsTraversable = actor->IsTraversable();
 	const auto ActorPosition = actor->Pos;
-	const auto Idx = ActorPosition.y * PropsSize().w * 16 + ActorPosition.x;
-	if (Idx < Traversability.size()) {
-		Traversability[Idx].type = bIsTraversable ? ETraversability::actor : ETraversability::actorNonTraversable;
-		Traversability[Idx].actor = actor;
+    auto baseSize = actor->CircleSize2Radius() * actor->sizeFactor;
+    const Size s(baseSize * 8, baseSize * 6);
+    const Region r(actor->Pos - s.Center(), s);
+
+    for (int x = r.x; x < r.x + r.w; ++x)
+    {
+        for (int y = r.y; y < r.y + r.h; ++y)
+        {
+            if (x < 0 || y < 0)
+            {
+                continue;
+            }
+            const auto Idx = y * PropsSize().w * 16 + x;
+            if (Idx < Traversability.size()) {
+                Traversability[Idx].type = bIsTraversable ? ETraversability::actor : ETraversability::actorNonTraversable;
+                Traversability[Idx].actor = actor;
+            }
+        }
+    }
+}
+
+bool Map::ShouldUpdateTraversability() const {
+	if (actors.size() != CachedTraversability.size()) {
+		return true;
 	}
+	for (size_t i = 0; i < actors.size(); ++i) {
+		if (actors[i] != CachedTraversability[i].first || actors[i]->Pos != CachedTraversability[i].second) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void Map::UpdateTraversability() const {
+	if (!ShouldUpdateTraversability()) {
+		return;
+	}
+	Log(WARNING, "Map", "...Updating traversability...");
 	ValidateTraversabilitySize();
+	memset(Traversability.data(), 0, sizeof(FTraversability) * Traversability.size());
+
+	CachedTraversability.clear();
+	CachedTraversability.reserve(actors.size());
 	for (const auto actor : actors) {
+
+		Point ActorPos;
+		if (actor) {
+			ActorPos = actor->Pos;
+		}
+		CachedTraversability.emplace_back(actor, ActorPos);
+
 		if (!actor) {
 			continue;
 		}
@@ -1724,123 +1779,192 @@ BlitFlags Map::SetDrawingStencilForProjectile(const Projectile* pro, const Regio
 
 void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 {
-	const static struct DebugPalettes {
-		Palette::Colors buffer;
+//	const static struct DebugPalettes {
+//		Palette::Colors buffer;
+//
+//		Holder<Palette> searchMapPal;
+//		Holder<Palette> materialMapPal;
+//		Holder<Palette> heightMapPal;
+//		// lightmap pal is the sprite pal
+//
+//		DebugPalettes() noexcept
+//		{
+//			searchMapPal = MakeHolder<Palette>();
+//			std::fill_n(buffer.begin(), 256, Color()); // passable is transparent
+//			buffer[0] = Color(128, 64, 64, 128); // IMPASSABLE, red-ish
+//
+//			for (uint8_t i = 1; i < 255; ++i) {
+//				if (i & uint8_t(PathMapFlags::SIDEWALL)) {
+//					buffer[uint8_t(PathMapFlags::SIDEWALL)] = Color(64, 64, 128, 128); // blues-ish
+//				} else if (i & uint8_t(PathMapFlags::ACTOR)) {
+//					buffer[i] = Color(128, 64, 128, 128); // actor, purple-ish
+//				} else if ((i & uint8_t(PathMapFlags::PASSABLE)) == 0) {
+//					// anything else that isnt PASSABLE
+//					buffer[i] = ColorGray;
+//				}
+//			}
+//			searchMapPal->CopyColors(0, buffer.cbegin(), buffer.cend());
+//
+//			materialMapPal = MakeHolder<Palette>();
+//			buffer[0] = ColorBlack; // impassable, light blocking
+//			buffer[1] = Color(0xB9, 0xAB, 0x79, 128); // sand
+//			buffer[2] = Color(0x6C, 0x4D, 0x2E, 128); // wood
+//			buffer[3] = Color(0x6C, 0x4D, 0x2E, 128); // wood
+//			buffer[4] = Color(0x84, 0x86, 0x80, 128); // stone
+//			buffer[5] = Color(0, 0xFF, 0, 128); // grass
+//			buffer[6] = ColorBlue; // water
+//			buffer[7] = Color(0x84, 0x86, 0x80, 128); // stone
+//			buffer[8] = ColorWhite; // obstacle, non light blocking
+//			buffer[9] = Color(0x6C, 0x4D, 0x2E, 128); // wood
+//			buffer[10] = ColorGray; // wall, impassable
+//			buffer[11] = ColorBlue; // water
+//			buffer[12] = ColorBlueDark; // water, impassable
+//			buffer[13] = Color(0xFF, 0x00, 0xFF, 128); // roof
+//			buffer[14] = Color(128, 0, 128, 128); // exit
+//			buffer[15] = Color(0, 0xFF, 0, 128); // grass
+//			materialMapPal->CopyColors(0, buffer.cbegin(), buffer.cbegin() + 16);
+//
+//			heightMapPal = MakeHolder<Palette>();
+//			for (uint8_t i = 0; i < 255; ++i) {
+//				buffer[i] = Color(i, i, i, 128);
+//			}
+//			heightMapPal->CopyColors(0, buffer.cbegin(), buffer.cend());
+//		}
+//	} debugPalettes;
+//
+//	Region block(0, 0, 16, 12);
+//
+//	int w = vp.w / 16 + 2;
+//	int h = vp.h / 12 + 2;
+//
+//	BlitFlags flags = BlitFlags::BLENDED;
+//	if (dFlags & DEBUG_SHOW_LIGHTMAP) {
+//		flags |= BlitFlags::HALFTRANS;
+//	}
+//
+//	for (int x = 0; x < w; x++) {
+//		for (int y = 0; y < h; y++) {
+//			block.x = x * 16 - (vp.x % 16);
+//			block.y = y * 12 - (vp.y % 12);
+//
+//			SearchmapPoint p = SearchmapPoint(x, y) + SearchmapPoint(vp.origin);
+//
+//			Color col;
+//			if (dFlags & DEBUG_SHOW_SEARCHMAP) {
+//				auto val = tileProps.QueryTileProp(p, TileProps::Property::SEARCH_MAP);
+//				col = debugPalettes.searchMapPal->GetColorAt(val);
+//			} else if (dFlags & DEBUG_SHOW_MATERIALMAP) {
+//				auto val = tileProps.QueryMaterial(p);
+//				col = debugPalettes.materialMapPal->GetColorAt(val);
+//			} else if (dFlags & DEBUG_SHOW_HEIGHTMAP) {
+//				auto val = tileProps.QueryTileProp(p, TileProps::Property::ELEVATION);
+//				col = debugPalettes.heightMapPal->GetColorAt(val);
+//			} else if (dFlags & DEBUG_SHOW_LIGHTMAP) {
+//				col = tileProps.QueryLighting(p);
+//			}
+//
+//			VideoDriver->DrawRect(block, col, true, flags);
+//		}
+//	}
+//
+//	auto DrawWaypoints = [&block, &vp](const Actor* act) {
+//		if (!act) return;
+//		const Path& path = act->GetPath();
+//		if (!path) return;
+//		Color waypoint(0, 64 * (act->GetGlobalID() % 4), 128, 128); // darker blue-ish
+//		size_t i = 0;
+//		block.w = 8;
+//		block.h = 6;
+//		while (i < path.Size()) {
+//			const PathNode& step = path.GetStep(i);
+//			block.x = step.point.x - vp.x;
+//			block.y = step.point.y - vp.y;
+//			VideoDriver->DrawRect(block, waypoint);
+//			i++;
+//		}
+//	};
 
-		Holder<Palette> searchMapPal;
-		Holder<Palette> materialMapPal;
-		Holder<Palette> heightMapPal;
-		// lightmap pal is the sprite pal
+	// draw Traversability cache
+	{
+		Color TraversabilityColors[(int)ETraversability::max] {
+			Color{255, 255, 255, 50}, // none
+			Color{0, 0, 255, 255}, // actor but passable
+			Color{255, 255, 0, 255}, // blocked
+		};
 
-		DebugPalettes() noexcept
-		{
-			searchMapPal = MakeHolder<Palette>();
-			std::fill_n(buffer.begin(), 256, Color()); // passable is transparent
-			buffer[0] = Color(128, 64, 64, 128); // IMPASSABLE, red-ish
+		Region block(0, 0, 1, 1);
 
-			for (uint8_t i = 1; i < 255; ++i) {
-				if (i & uint8_t(PathMapFlags::SIDEWALL)) {
-					buffer[uint8_t(PathMapFlags::SIDEWALL)] = Color(64, 64, 128, 128); // blues-ish
-				} else if (i & uint8_t(PathMapFlags::ACTOR)) {
-					buffer[i] = Color(128, 64, 128, 128); // actor, purple-ish
-				} else if ((i & uint8_t(PathMapFlags::PASSABLE)) == 0) {
-					// anything else that isnt PASSABLE
-					buffer[i] = ColorGray;
+		int w = vp.w;// / 16 + 2;
+		int h = vp.h;// / 12 + 2;
+
+		BlitFlags flags = BlitFlags::BLENDED;
+		if (dFlags & DEBUG_SHOW_LIGHTMAP) {
+			flags |= BlitFlags::HALFTRANS;
+		}
+
+		for (int x = vp.x; x < vp.x + vp.w; ++x) {
+			for (int y = vp.y; y < vp.y + vp.h; ++y) {
+				const auto Idx = y * PropsSize().w * 16 + x;
+				const Point p{x, y};
+				if (Idx < Traversability.size()) {
+					VideoDriver->DrawPoint(p - vp.origin, TraversabilityColors[(int)Traversability[Idx].type], BLENDED);
+				}
+				else {
+					VideoDriver->DrawPoint(p - vp.origin, Color{200, 0, 200, 0}, BLENDED);
 				}
 			}
-			searchMapPal->CopyColors(0, buffer.cbegin(), buffer.cend());
-
-			materialMapPal = MakeHolder<Palette>();
-			buffer[0] = ColorBlack; // impassable, light blocking
-			buffer[1] = Color(0xB9, 0xAB, 0x79, 128); // sand
-			buffer[2] = Color(0x6C, 0x4D, 0x2E, 128); // wood
-			buffer[3] = Color(0x6C, 0x4D, 0x2E, 128); // wood
-			buffer[4] = Color(0x84, 0x86, 0x80, 128); // stone
-			buffer[5] = Color(0, 0xFF, 0, 128); // grass
-			buffer[6] = ColorBlue; // water
-			buffer[7] = Color(0x84, 0x86, 0x80, 128); // stone
-			buffer[8] = ColorWhite; // obstacle, non light blocking
-			buffer[9] = Color(0x6C, 0x4D, 0x2E, 128); // wood
-			buffer[10] = ColorGray; // wall, impassable
-			buffer[11] = ColorBlue; // water
-			buffer[12] = ColorBlueDark; // water, impassable
-			buffer[13] = Color(0xFF, 0x00, 0xFF, 128); // roof
-			buffer[14] = Color(128, 0, 128, 128); // exit
-			buffer[15] = Color(0, 0xFF, 0, 128); // grass
-			materialMapPal->CopyColors(0, buffer.cbegin(), buffer.cbegin() + 16);
-
-			heightMapPal = MakeHolder<Palette>();
-			for (uint8_t i = 0; i < 255; ++i) {
-				buffer[i] = Color(i, i, i, 128);
-			}
-			heightMapPal->CopyColors(0, buffer.cbegin(), buffer.cend());
 		}
-	} debugPalettes;
 
-	Region block(0, 0, 16, 12);
-
-	int w = vp.w / 16 + 2;
-	int h = vp.h / 12 + 2;
-
-	BlitFlags flags = BlitFlags::BLENDED;
-	if (dFlags & DEBUG_SHOW_LIGHTMAP) {
-		flags |= BlitFlags::HALFTRANS;
+		// for (int x = 0; x < w; x++) {
+		// 	for (int y = 0; y < h; y++) {
+		// 		block.x = x * 1 - (vp.x);
+		// 		block.y = y * 1 - (vp.y);
+		//
+		// 		// SearchmapPoint p = SearchmapPoint(x, y) + SearchmapPoint(vp.origin);
+		//
+		// 		const auto Idx = ActorPosition.y * PropsSize().w * 16 + ActorPosition.x;
+		//
+		// 		Color col;
+		// 		if (dFlags & DEBUG_SHOW_SEARCHMAP) {
+		// 			auto val = tileProps.QueryTileProp(p, TileProps::Property::SEARCH_MAP);
+		// 			col = debugPalettes.searchMapPal->GetColorAt(val);
+		// 		} else if (dFlags & DEBUG_SHOW_MATERIALMAP) {
+		// 			auto val = tileProps.QueryMaterial(p);
+		// 			col = debugPalettes.materialMapPal->GetColorAt(val);
+		// 		} else if (dFlags & DEBUG_SHOW_HEIGHTMAP) {
+		// 			auto val = tileProps.QueryTileProp(p, TileProps::Property::ELEVATION);
+		// 			col = debugPalettes.heightMapPal->GetColorAt(val);
+		// 		} else if (dFlags & DEBUG_SHOW_LIGHTMAP) {
+		// 			col = tileProps.QueryLighting(p);
+		// 		}
+		//
+		// 		VideoDriver->DrawRect(block, col, true, flags);
+		// 	}
+		// }
+		//
+		// for (int i = 0; i < Traversability.size(); ++i) {
+		// 	// const auto ExpectedSize = PropsSize().h * 12 * PropsSize().w * 16;
+		// 	// const auto Idx = ActorPosition.y * PropsSize().w * 16 + ActorPosition.x;
+		// 	int x = i % (12 * PropsSize().h);
+		// 	int y = i / (16 * PropsSize().w);
+		// 	const Point p{x, y};
+		// 	VideoDriver->DrawPoint(p, TraversabilityColors[Traversability[i]]);
+		// }
 	}
 
-	for (int x = 0; x < w; x++) {
-		for (int y = 0; y < h; y++) {
-			block.x = x * 16 - (vp.x % 16);
-			block.y = y * 12 - (vp.y % 12);
-
-			SearchmapPoint p = SearchmapPoint(x, y) + SearchmapPoint(vp.origin);
-
-			Color col;
-			if (dFlags & DEBUG_SHOW_SEARCHMAP) {
-				auto val = tileProps.QueryTileProp(p, TileProps::Property::SEARCH_MAP);
-				col = debugPalettes.searchMapPal->GetColorAt(val);
-			} else if (dFlags & DEBUG_SHOW_MATERIALMAP) {
-				auto val = tileProps.QueryMaterial(p);
-				col = debugPalettes.materialMapPal->GetColorAt(val);
-			} else if (dFlags & DEBUG_SHOW_HEIGHTMAP) {
-				auto val = tileProps.QueryTileProp(p, TileProps::Property::ELEVATION);
-				col = debugPalettes.heightMapPal->GetColorAt(val);
-			} else if (dFlags & DEBUG_SHOW_LIGHTMAP) {
-				col = tileProps.QueryLighting(p);
-			}
-
-			VideoDriver->DrawRect(block, col, true, flags);
-		}
-	}
-
-	auto DrawWaypoints = [&block, &vp](const Actor* act) {
-		if (!act) return;
-		const Path& path = act->GetPath();
-		if (!path) return;
-		Color waypoint(0, 64 * (act->GetGlobalID() % 4), 128, 128); // darker blue-ish
-		size_t i = 0;
-		block.w = 8;
-		block.h = 6;
-		while (i < path.Size()) {
-			const PathNode& step = path.GetStep(i);
-			block.x = step.point.x - vp.x;
-			block.y = step.point.y - vp.y;
-			VideoDriver->DrawRect(block, waypoint);
-			i++;
-		}
-	};
-	if (dFlags & DEBUG_SHOW_SEARCHMAP) {
-		// draw also pathfinding waypoints
-		const Game* game = core->GetGame();
-		if (game->selected.size() == static_cast<size_t>(game->GetPartySize(true))) {
-			// do it for all
-			for (const auto& actor : actors) {
-				DrawWaypoints(actor);
-			}
-		} else {
-			const Actor* act = core->GetFirstSelectedActor();
-			DrawWaypoints(act);
-		}
-	}
+//	if (dFlags & DEBUG_SHOW_SEARCHMAP) {
+//		// draw also pathfinding waypoints
+//		const Game* game = core->GetGame();
+//		if (game->selected.size() == static_cast<size_t>(game->GetPartySize(true))) {
+//			// do it for all
+//			for (const auto& actor : actors) {
+//				DrawWaypoints(actor);
+//			}
+//		} else {
+//			const Actor* act = core->GetFirstSelectedActor();
+//			DrawWaypoints(act);
+//		}
+//	}
 }
 
 //adding animation in order, based on its height parameter

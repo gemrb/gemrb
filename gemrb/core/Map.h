@@ -504,9 +504,11 @@ public:
 	};
 
 	enum class ETraversability: uint8_t {
-		empty,
+		empty = 0,
 		actor,
-		actorNonTraversable
+		actorNonTraversable,
+
+		max
 	};
 
 	struct FTraversability {
@@ -604,6 +606,8 @@ public:
 
 	void TraversabilityBlock(Actor * actor) const;
 
+	mutable std::vector<std::pair<Actor*, Point>> CachedTraversability;
+	bool ShouldUpdateTraversability() const;
 	void UpdateTraversability() const;
 
 	void ValidateTraversabilitySize() const;
