@@ -1035,46 +1035,7 @@ def OpenLevelUpWindow ():
 
 		# Saving Throws
 		if GUICommon.IsNamelessOne(pc):
-			# Nameless One always uses the best possible save from each class
-			FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
-			MagSavThrTable = GemRB.LoadTable ("SAVEWIZ")
-			ThiSavThrTable = GemRB.LoadTable ("SAVEROG")
-
-			FighterLevel = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
-			MageLevel = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
-			ThiefLevel = GemRB.GetPlayerStat (pc, IE_LEVEL3) - 1
-
-			# We are leveling up one of those levels. Therefore, one of them has to be updated.
-			if Class == "FIGHTER":
-				FighterLevel = NextLevel - 1
-			elif Class == "MAGE":
-				MageLevel = NextLevel - 1
-			else:
-				ThiefLevel = NextLevel - 1
-
-			# Now we need to update the saving throws with the best values from those tables.
-			# The smaller the number, the better saving throw it is.
-			# We also need to check if any of the levels are larger than 21, since
-			# after that point the table runs out, and the throws remain the
-			# same
-			if FighterLevel < 21:
-				for i in range (5):
-					Throw = FigSavThrTable.GetValue (i, FighterLevel)
-					if Throw < SavThrows[i]:
-						SavThrows[i] = Throw
-						SavThrUpdated = True
-			if MageLevel < 21:
-				for i in range (5):
-					Throw = MagSavThrTable.GetValue (i, MageLevel)
-					if Throw < SavThrows[i]:
-						SavThrows[i] = Throw
-						SavThrUpdated = True
-			if ThiefLevel < 21:
-				for i in range (5):
-					Throw = ThiSavThrTable.GetValue (i, ThiefLevel)
-					if Throw < SavThrows[i]:
-						SavThrows[i] = Throw
-						SavThrUpdated = True
+			SavThrUpdated = GetNewTNOSaves (pc, Class, SavThrows, NextLevel)
 		else:
 			SavThrTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "SAVE"))
 			# Updating the current saving throws. They are changed only if the
@@ -1088,8 +1049,6 @@ def OpenLevelUpWindow ():
 					if Throw < SavThrows[i]:
 						SavThrows[i] = Throw
 						SavThrUpdated = True
-
-
 
 	else:
 		# avatar is multi class
@@ -1213,10 +1172,61 @@ def OpenLevelUpWindow ():
 		GemRB.SetPlayerStat (pc, IE_TOHIT, Thac0)
 		overview = overview + GemRB.GetString (38718) + '\n'
 
+	# priest / spell memorization abilities have increased
+
+	# x thief skill points gained
+
+	# FFG: +5 lore gained from spec bonus!? 5/level
+	# dak'kon's weapon has changed
+
 	Text = Window.GetControl (3)
 	Text.SetText (overview)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+
+def GetNewTNOSaves (pc, Class, SavThrows, NextLevel):
+	# Nameless One always uses the best possible save from each class
+	FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
+	MagSavThrTable = GemRB.LoadTable ("SAVEWIZ")
+	ThiSavThrTable = GemRB.LoadTable ("SAVEROG")
+
+	FighterLevel = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
+	MageLevel = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
+	ThiefLevel = GemRB.GetPlayerStat (pc, IE_LEVEL3) - 1
+
+	# We are leveling up one of those levels. Therefore, one of them has to be updated.
+	if Class == "FIGHTER":
+		FighterLevel = NextLevel - 1
+	elif Class == "MAGE":
+		MageLevel = NextLevel - 1
+	else:
+		ThiefLevel = NextLevel - 1
+
+	# Now we need to update the saving throws with the best values from those tables.
+	# The smaller the number, the better saving throw it is.
+	# We also need to check if any of the levels are larger than 21, since
+	# after that point the table runs out, and the throws remain the
+	# same
+	SavThrUpdated = False
+	if FighterLevel < 21:
+		for i in range (5):
+			Throw = FigSavThrTable.GetValue (i, FighterLevel)
+			if Throw < SavThrows[i]:
+				SavThrows[i] = Throw
+				SavThrUpdated = True
+	if MageLevel < 21:
+		for i in range (5):
+			Throw = MagSavThrTable.GetValue (i, MageLevel)
+			if Throw < SavThrows[i]:
+				SavThrows[i] = Throw
+				SavThrUpdated = True
+	if ThiefLevel < 21:
+		for i in range (5):
+			Throw = ThiSavThrTable.GetValue (i, ThiefLevel)
+			if Throw < SavThrows[i]:
+				SavThrows[i] = Throw
+				SavThrUpdated = True
+	return SavThrUpdated
 
 # did TNO reach a new high?
 def IsNewMaxTNOLevel (pc, levelDiff):
