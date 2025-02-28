@@ -4093,9 +4093,9 @@ int GameScript::Unusable(Scriptable* Sender, const Trigger* parameters)
 	}
 	int ret;
 	if (actor->Unusable(item) == HCStrings::count) {
-		ret = 1;
-	} else {
 		ret = 0;
+	} else {
+		ret = 1;
 	}
 	gamedata->FreeItem(item, parameters->resref0Parameter, true);
 	return ret;
