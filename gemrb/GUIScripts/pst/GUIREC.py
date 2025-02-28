@@ -775,7 +775,6 @@ def AcceptLevelUp():
 		# Handle saving of TNO class level in the correct CRE stat
 		NewLevel = avatar_header['PrimLevel'] + NumOfPrimLevUp
 		GemRB.SetPlayerStat (pc, LevelStats[SwitcherClass], NewLevel)
-		HandleSpecializationBonuses (pc, SwitcherClass, Levels[SwitcherClass], NewLevel)
 	else:
 		GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+NumOfPrimLevUp)
 		Game.CheckKarachUpgrade (pc, 0, NumOfPrimLevUp)
@@ -795,6 +794,7 @@ def AcceptLevelUp():
 	NewLife.OpenLUStatsWindow(True, NewCharacteristicPts)
 
 def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
+	global feedbackText
 	# GLOBAL["Specialist"] = 1 // Fighter | was the first class to level 7
 	# GLOBAL["Specialist"] = 2 // Thief   | was the first class to level 7
 	# GLOBAL["Specialist"] = 3 // Mage    | was the first class to level 7
@@ -809,21 +809,29 @@ def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
 	specialist = GemRB.GetGameVar ("Specialist") or 0
 	if specialist >= 4:
 		# all upgrades have been done already
-		return
+		return ""
+
+	feedbackText = ""
 
 	def bumpStat (pc, stat, diff, delay = 0):
+		global feedbackText
+
 		base = GemRB.GetPlayerStat (pc, stat, 1)
 		GemRB.SetPlayerStat (pc, stat, base + diff)
 
-		statMsgs = { IE_STR: 41274, IE_CON: 41273, IE_DEX: 41276, IE_INT: 39440, IE_WIS: 41271, IE_LUCK: 41272 }
-		# IE_LORE: 39439, IE_HITPOINTS: 39438 would require a full queuing approach to work
+		# the original applied effects and relied on their feedback for floating messages
+		# that and PermanentStatChangeFeedback would have the same problem
+		# but it also printed all the feedback to the text area
+		statMsgs = { IE_STR: 41274, IE_CON: 41273, IE_DEX: 41276, IE_INT: 39440, IE_WIS: 41271, IE_LUCK: 41272, IE_LORE: 39439, IE_HITPOINTS: 39438 }
 		if stat in statMsgs:
-			action = "FloatMessage({}, {})".format(pc, statMsgs[stat] + 1000000)
-			if delay:
-				# stagger messages, so they don't overlap
-				GemRB.SetTimedEvent(lambda: GemRB.ExecuteString (action, pc), delay)
-			else:
-				GemRB.ExecuteString (action, pc)
+			if statMsgs[stat] >= statMsgs[IE_INT]:
+				action = "FloatMessage({}, {})".format(pc, statMsgs[stat] + 1000000)
+				if delay:
+					# stagger messages, so they don't overlap
+					GemRB.SetTimedEvent(lambda: GemRB.ExecuteString (action, pc), delay)
+				else:
+					GemRB.ExecuteString (action, pc)
+			feedbackText += GemRB.GetString (statMsgs[stat]) + " "
 		return
 
 	def grantFirstBonus (pc, className, specBase = 0):
@@ -842,15 +850,15 @@ def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
 
 	if specialist == 0:
 		if newLevel < 7:
-			return
+			return feedbackText
 
 		# we just (b)reached 7 for the first time, give the first bonus
 		grantFirstBonus (pc, className)
-		return
+		return feedbackText
 
 	# from here on specialist is 1, 2 or 3
 	if newLevel < 12:
-		return
+		return feedbackText
 
 	# we just (b)reached 12, give the second bonus
 	if className == "FIGHTER":
@@ -884,7 +892,7 @@ def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
 		else:
 			# 9: was thief or fighter, grant first mage specialization
 			grantFirstBonus (pc, className, 6)
-	return
+	return feedbackText
 
 def RedrawSkills():
 	DoneButton = LevelUpWindow.GetControl(0)
@@ -1193,8 +1201,12 @@ def OpenLevelUpWindow ():
 		MaxOldLevel = max(Level1)
 		NewLevel = avatar_header['PrimLevel'] + NumOfPrimLevUp
 		NewCharacteristicPts = 0 if NewLevel <= MaxOldLevel else NewLevel - MaxOldLevel
-	if NewCharacteristicPts:
-		overview = overview + str (NewCharacteristicPts) + " "  + GemRB.GetString (38714) + '\n'
+		if NewCharacteristicPts:
+			overview += str (NewCharacteristicPts) + " "  + GemRB.GetString (38714) + '\n'
+
+		# specialization bonuses and feedback
+		specOverview = HandleSpecializationBonuses (pc, Class, avatar_header['PrimLevel'], NewLevel)
+		overview += "" if specOverview == "" else specOverview + '\n'
 
 	if SavThrUpdated:
 		overview = overview + GemRB.GetString (38719) + '\n'
