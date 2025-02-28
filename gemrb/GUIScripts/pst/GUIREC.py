@@ -1173,10 +1173,20 @@ def OpenLevelUpWindow ():
 		overview = overview + GemRB.GetString (38718) + '\n'
 
 	# priest / spell memorization abilities have increased
+	if LevelUp.DeltaDSpells > 0:
+		overview += GemRB.GetString (38720) + '\n'
+	if LevelUp.DeltaWSpells > 0:
+		overview += GemRB.GetString (38717) + '\n'
 
 	# x thief skill points gained
+	if Class == "THIEF":
+		overview += str(GemRB.GetVar ("SkillPointsLeft")) + " " + GemRB.GetString (38716) + '\n'
 
-	# FFG: +5 lore gained from spec bonus!? 5/level
+	# FFG: +5 lore gained from spec bonus!?
+	if GemRB.GetPlayerStat (pc, IE_SPECIFIC) == 6:
+		overview += "+" + str(5 * NumOfPrimLevUp) + " " + GemRB.GetString (39439) + '\n'
+		GemRB.SetPlayerStat (pc, IE_LORE, GemRB.GetPlayerStat (pc, IE_LORE, 1) + 5 * NumOfPrimLevUp)
+
 	# dak'kon's weapon has changed
 
 	Text = Window.GetControl (3)
