@@ -32,13 +32,13 @@ def EnterGame():
 # used for Dak'kon's blade upgrades
 def CheckKarachUpgrade(pc, moraleDiff, levelDiff):
 	if GemRB.GetPlayerStat (pc, IE_SPECIFIC) != 7:
-		return
+		return False
 
 	prefix = None
 	suffix = None
 	# detect if any of the level or morale thresholds have been crossed
-	level = GemRB.GetPlayerStat (pc, IE_LEVELFIGHTER)
-	oldLevel = level - levelDiff
+	oldLevel = GemRB.GetPlayerStat (pc, IE_LEVELFIGHTER)
+	level = oldLevel + levelDiff
 	if levelDiff == 0:
 		oldLevel = 0
 	# descending order for the unlikely case that he gains enough levels at once to jump two thresholds
@@ -50,7 +50,7 @@ def CheckKarachUpgrade(pc, moraleDiff, levelDiff):
 		suffix = ""
 	else:
 		# too low level
-		return
+		return False
 
 	morale = GemRB.GetPlayerStat (pc, IE_MORALE)
 	oldMorale = morale - moraleDiff
@@ -68,7 +68,7 @@ def CheckKarachUpgrade(pc, moraleDiff, levelDiff):
 		prefix = "b"
 
 	if not prefix and not suffix:
-		return
+		return False
 
 	blade = prefix + "karach" + suffix
 	GemRB.CreateItem (pc, blade, 10) # fist slot, karach is his default weapon
@@ -77,4 +77,4 @@ def CheckKarachUpgrade(pc, moraleDiff, levelDiff):
 		GemRB.PlaySound ("dak082")
 	else:
 		GemRB.PlaySound ("dak083")
-	return
+	return True

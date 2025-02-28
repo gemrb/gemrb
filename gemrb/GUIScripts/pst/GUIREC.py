@@ -777,7 +777,6 @@ def AcceptLevelUp():
 		GemRB.SetPlayerStat (pc, LevelStats[SwitcherClass], NewLevel)
 	else:
 		GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+NumOfPrimLevUp)
-		Game.CheckKarachUpgrade (pc, 0, NumOfPrimLevUp)
 		if avatar_header['SecoLevel'] != 0:
 			GemRB.SetPlayerStat (pc, IE_LEVEL2, GemRB.GetPlayerStat (pc, IE_LEVEL2)+NumOfSecoLevUp)
 	
@@ -1188,6 +1187,8 @@ def OpenLevelUpWindow ():
 		GemRB.SetPlayerStat (pc, IE_LORE, GemRB.GetPlayerStat (pc, IE_LORE, 1) + 5 * NumOfPrimLevUp)
 
 	# dak'kon's weapon has changed
+	if Game.CheckKarachUpgrade (pc, 0, NumOfPrimLevUp):
+		overview += GemRB.GetString (39437) + '\n'
 
 	Text = Window.GetControl (3)
 	Text.SetText (overview)
