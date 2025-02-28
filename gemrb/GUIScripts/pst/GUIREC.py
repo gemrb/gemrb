@@ -1292,6 +1292,8 @@ def GetThac0 (Class, Level):
 
 # each gained level is checked for how many new prof points gained
 def GainedWeapProfs (pc, currProf, currLevel, AvatarName):
+	if AvatarName == "NAMELESS" and avatar_header['PrimClass'] != "FIGHTER":
+		return 0
 
 	# Actually looking at the next level
 	nextLevel = currLevel + 1
