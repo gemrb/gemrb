@@ -171,6 +171,11 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassName = GUICommon.GetClassRowName(Class, "class")
 
+	if GUICommon.IsNamelessOne(pc):
+		# sigh
+		level1 = [level1[2]]
+		level2 = [level2[2]]
+
 	#get the number of classes
 	if IsMulti[0]>1:
 		NumClasses = IsMulti[0]
