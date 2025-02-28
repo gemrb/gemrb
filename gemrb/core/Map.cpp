@@ -490,6 +490,7 @@ Map::~Map(void)
 }
 
 void Map::TraversabilityUnblock(Actor *actor) {
+#if PATH_RUN_IMPROVED
 	ValidateTraversabilitySize();
     const auto ActorPosition = actor->Pos;
     auto baseSize = actor->CircleSize2Radius() * actor->sizeFactor;
@@ -510,9 +511,11 @@ void Map::TraversabilityUnblock(Actor *actor) {
             }
         }
     }
+#endif
 }
 
 void Map::TraversabilityBlock(Actor *actor) const {
+#if PATH_RUN_IMPROVED
 	ValidateTraversabilitySize();
 	const bool bIsTraversable = actor->IsTraversable();
 	const auto ActorPosition = actor->Pos;
@@ -535,9 +538,11 @@ void Map::TraversabilityBlock(Actor *actor) const {
             }
         }
     }
+#endif
 }
 
 bool Map::ShouldUpdateTraversability() const {
+#if PATH_RUN_IMPROVED
 	if (actors.size() != CachedTraversability.size()) {
 		return true;
 	}
@@ -547,9 +552,11 @@ bool Map::ShouldUpdateTraversability() const {
 		}
 	}
 	return false;
+#endif
 }
 
 void Map::UpdateTraversability() const {
+#if PATH_RUN_IMPROVED
 	if (!ShouldUpdateTraversability()) {
 		return;
 	}
@@ -572,9 +579,11 @@ void Map::UpdateTraversability() const {
 		}
 		TraversabilityBlock(actor);
 	}
+#endif
 }
 
 void Map::ValidateTraversabilitySize() const  {
+#if PATH_RUN_IMPROVED
 	const auto ExpectedSize = PropsSize().h * 12 * PropsSize().w * 16;
 	if (Traversability.size() != ExpectedSize) {
 		Traversability.clear();
@@ -583,6 +592,7 @@ void Map::ValidateTraversabilitySize() const  {
 		// 	Traversability.push_back(FTraversability{ETraversability::empty, nullptr});
 		// }
 	}
+#endif
 }
 
 void Map::SetTileMapProps(TileProps props)

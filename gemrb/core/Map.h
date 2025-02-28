@@ -319,6 +319,11 @@ struct TrackingData {
 	int difficulty = 0;
 };
 
+#define PATH_RUN_ORIGINAL 1
+#define PATH_RUN_IMPROVED 0
+#define PATH_RETURN_ORIGINAL 1
+#define PATH_RUN_BENCH 0
+
 using aniIterator = std::list<AreaAnimation>::iterator;
 using scaIterator = std::list<VEFObject*>::const_iterator;
 using proIterator = std::list<Projectile*>::const_iterator;
