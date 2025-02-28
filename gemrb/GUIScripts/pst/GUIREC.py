@@ -1208,21 +1208,12 @@ def GetNewTNOSaves (pc, Class, SavThrows, NextLevel):
 	# after that point the table runs out, and the throws remain the
 	# same
 	SavThrUpdated = False
-	if FighterLevel < 21:
+	Tables = { FigSavThrTable: FighterLevel, MagSavThrTable: MageLevel, ThiSavThrTable: ThiefLevel }
+	for table, level in Tables.items():
+		if level >= 21:
+			continue
 		for i in range (5):
-			Throw = FigSavThrTable.GetValue (i, FighterLevel)
-			if Throw < SavThrows[i]:
-				SavThrows[i] = Throw
-				SavThrUpdated = True
-	if MageLevel < 21:
-		for i in range (5):
-			Throw = MagSavThrTable.GetValue (i, MageLevel)
-			if Throw < SavThrows[i]:
-				SavThrows[i] = Throw
-				SavThrUpdated = True
-	if ThiefLevel < 21:
-		for i in range (5):
-			Throw = ThiSavThrTable.GetValue (i, ThiefLevel)
+			Throw = table.GetValue (i, level)
 			if Throw < SavThrows[i]:
 				SavThrows[i] = Throw
 				SavThrUpdated = True
