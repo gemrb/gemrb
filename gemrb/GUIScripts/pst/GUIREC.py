@@ -1020,8 +1020,7 @@ def OpenLevelUpWindow ():
 			WeapProfGained += GainedWeapProfs (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i, AvatarName)
 
 		# Hit Points Gained and Hit Points from Constitution Bonus
-		for i in range (NumOfPrimLevUp):
-			HPGained = HPGained + GetSingleClassHP (Class, avatar_header['PrimLevel'])
+		HPGained += GetSingleClassHP (pc, Class, avatar_header['PrimLevel'], NumOfPrimLevUp)
 		if Class == "FIGHTER":
 			CONType = 0
 		else:
@@ -1142,11 +1141,8 @@ def OpenLevelUpWindow ():
 					SavThrUpdated = True
 
 		# Hit Points Gained and Hit Points from Constitution Bonus (multiclass)
-		for i in range (NumOfPrimLevUp):
-			HPGained = HPGained + GetSingleClassHP ("FIGHTER", avatar_header['PrimLevel']) // 2
-
-		for i in range (NumOfSecoLevUp):
-			HPGained = HPGained + GetSingleClassHP (Class, avatar_header['SecoLevel']) // 2
+		HPGained += GetSingleClassHP (pc, "FIGHTER", avatar_header['PrimLevel'], NumOfPrimLevUp) // 2
+		HPGained += GetSingleClassHP (pc, Class, avatar_header['SecoLevel'], NumOfSecoLevUp) // 2
 		ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, NumOfSecoLevUp, 2)
 
 		# Thac0
@@ -1229,23 +1225,31 @@ def IsNewMaxTNOLevel (pc, levelDiff):
 	maxLevelDiff = max(0, NewLevel - MaxOldLevel)
 	return maxLevelDiff
 
-def GetSingleClassHP (Class, Level):
+def GetSingleClassHP (pc, Class, Level, levelDiff):
+	# TNO only gains HP when leveling to a never reached before level. Otherwise 1 HP, no con bonus
+	total = 0
+	if GUICommon.IsNamelessOne (pc):
+		newHighPrimLevels = IsNewMaxTNOLevel (pc, levelDiff)
+		if newHighPrimLevels == 0:
+			return levelDiff
+		total = levelDiff - newHighPrimLevels # hp for levels before reaching new heights
+		levelDiff = newHighPrimLevels
+
 	HPTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "HP"))
 
-	# We need to check if Level is larger than 20, since after that point
-	# the table runs out, and the formula remain the same.
-	if Level > 20:
-		Level = 20
+	for i in range (levelDiff):
+		# We need to check if Level is larger than 20, since after that point
+		# the table runs out, and the formula remain the same.
+		level = Level + i
+		if level > 20:
+			level = 20
 
-	# We need the Level as a string, so that we can use the column names
-	Level = str (Level)
-
-	Sides = HPTable.GetValue (Level, "SIDES")
-	Rolls = HPTable.GetValue (Level, "ROLLS")
-	Modif = HPTable.GetValue (Level, "MODIFIER")
-
-
-	return GemRB.Roll (Rolls, Sides, Modif)
+		level = str (level)
+		Sides = HPTable.GetValue (level, "SIDES")
+		Rolls = HPTable.GetValue (level, "ROLLS")
+		Modif = HPTable.GetValue (level, "MODIFIER")
+		total += GemRB.Roll (Rolls, Sides, Modif)
+	return total
 
 def GetConHPBonus (pc, numPrimLevels, numSecoLevels, levelUpType):
 	# TNO only gains con bonus when reaching truly new levels
