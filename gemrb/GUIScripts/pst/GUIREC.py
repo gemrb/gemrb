@@ -1198,14 +1198,12 @@ def OpenLevelUpWindow ():
 	# +x characteristic points gained
 	# but only grant extra attribute points the first time we reach a level
 	if GUICommon.IsNamelessOne (pc):
-		MaxOldLevel = max(Level1)
-		NewLevel = avatar_header['PrimLevel'] + NumOfPrimLevUp
-		NewCharacteristicPts = 0 if NewLevel <= MaxOldLevel else NewLevel - MaxOldLevel
+		NewCharacteristicPts = IsNewMaxTNOLevel (pc, NumOfPrimLevUp) # actually returns the adjusted level diff
 		if NewCharacteristicPts:
 			overview += str (NewCharacteristicPts) + " "  + GemRB.GetString (38714) + '\n'
 
 		# specialization bonuses and feedback
-		specOverview = HandleSpecializationBonuses (pc, Class, avatar_header['PrimLevel'], NewLevel)
+		specOverview = HandleSpecializationBonuses (pc, Class, avatar_header['PrimLevel'], avatar_header['PrimLevel'] + NumOfPrimLevUp)
 		overview += "" if specOverview == "" else specOverview + '\n'
 
 	if SavThrUpdated:
@@ -1223,6 +1221,13 @@ def OpenLevelUpWindow ():
 	Text.SetText (overview)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+
+# did TNO reach a new high?
+def IsNewMaxTNOLevel (pc, levelDiff):
+	MaxOldLevel = max(list(map(lambda x, y: x - y, Level, LevelDiff)))
+	NewLevel = avatar_header['PrimLevel'] + levelDiff
+	maxLevelDiff = max(0, NewLevel - MaxOldLevel)
+	return maxLevelDiff
 
 def GetSingleClassHP (Class, Level):
 	HPTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "HP"))
@@ -1243,6 +1248,12 @@ def GetSingleClassHP (Class, Level):
 	return GemRB.Roll (Rolls, Sides, Modif)
 
 def GetConHPBonus (pc, numPrimLevels, numSecoLevels, levelUpType):
+	# TNO only gains con bonus when reaching truly new levels
+	if GUICommon.IsNamelessOne (pc):
+		numPrimLevels = IsNewMaxTNOLevel (pc, numPrimLevels)
+		if numPrimLevels == 0:
+			return 0
+
 	ConHPBonTable = GemRB.LoadTable ("HPCONBON")
 
 	con = str (GemRB.GetPlayerStat (pc, IE_CON))
