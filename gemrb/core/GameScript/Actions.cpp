@@ -285,6 +285,8 @@ void GameScript::SetNamelessClass(Scriptable* /*Sender*/, Action* parameters)
 	//same as Protagonist
 	Actor* actor = core->GetGame()->GetPC(0, false);
 	actor->SetBase(IE_CLASS, parameters->int0Parameter);
+	// dump newly incompatible items; perhaps this should go into pcf_class
+	actor->inventory.EnforceUsability();
 }
 
 void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)

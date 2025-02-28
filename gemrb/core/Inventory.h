@@ -358,6 +358,7 @@ public:
 	static int GetInventorySlot();
 	int InBackpack(int slot) const;
 	void CacheAllWeaponInfo() const;
+	void EnforceUsability();
 
 private:
 	void CalculateWeight(void);

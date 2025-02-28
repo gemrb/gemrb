@@ -2170,4 +2170,30 @@ int Inventory::InBackpack(int slot) const
 	return slot >= SLOT_INV && slot <= LAST_INV;
 }
 
+void Inventory::EnforceUsability()
+{
+	size_t maxSlot = Slots.size();
+	for (size_t i = 0; i < maxSlot; i++) {
+		CREItem* itm = Slots[i];
+		if (!itm) continue;
+		if (InBackpack(i)) continue;
+
+		const Item* item = gamedata->GetItem(itm->ItemResRef, true);
+		if (!item) continue;
+
+		// use CanUseItemType if this turns out to be insufficient
+		HCStrings idx = Owner->Unusable(item);
+		if (idx == HCStrings::count) continue;
+
+		// pst-only feedback: unusable item placed {in backpack, on the ground}
+		itm = RemoveItem(i);
+		if (AddSlotItem(itm, SLOT_ONLYINVENTORY) == ASI_SUCCESS) {
+			//@65514 = ~Unusable Item Placed In Backpack~
+		} else {
+			//@65515 = ~Unusable Item Dropped On Ground~
+			DropItemAtLocation(i, 0, Owner->GetCurrentArea(), Owner->Pos);
+		}
+	}
+}
+
 }
