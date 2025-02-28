@@ -1212,7 +1212,8 @@ def OpenLevelUpWindow ():
 		overview = overview + GemRB.GetString (38719) + '\n'
 
 	overview = overview + str (HPGained) + " " + GemRB.GetString (38713) + '\n'
-	overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
+	if ConHPBon:
+		overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
 
 	if Thac0Updated:
 		GemRB.SetPlayerStat (pc, IE_TOHIT, Thac0)
