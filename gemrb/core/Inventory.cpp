@@ -2188,10 +2188,12 @@ void Inventory::EnforceUsability()
 		// pst-only feedback: unusable item placed {in backpack, on the ground}
 		itm = RemoveItem(i);
 		if (AddSlotItem(itm, SLOT_ONLYINVENTORY) == ASI_SUCCESS) {
-			//@65514 = ~Unusable Item Placed In Backpack~
+			String msg = core->GetString(displaymsg->GetStringReference(HCStrings::UnusableDroppedBag));
+			Owner->overHead.SetText(std::move(msg), true, true, ColorWhite);
 		} else {
-			//@65515 = ~Unusable Item Dropped On Ground~
 			DropItemAtLocation(i, 0, Owner->GetCurrentArea(), Owner->Pos);
+			String msg = core->GetString(displaymsg->GetStringReference(HCStrings::UnusableDroppedGround));
+			Owner->overHead.SetText(std::move(msg), true, true, ColorWhite);
 		}
 	}
 }
