@@ -51,6 +51,7 @@
 #include <array>
 #include <limits>
 
+#include "PathfindingSettings.h"
 
 namespace GemRB {
 
@@ -108,7 +109,6 @@ Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned 
 	{
 		TRACY(TracyCZoneN(tCtxInit, "Init", true));
 
-#define PATHFINDER_STATIC 0
 #if PATHFINDER_STATIC
 		// Size is one more than needed, because we dump all calculations on invalid indices to the last cell, this is faster than adding ifs everywhere to check if valid
 		const int32_t TrashIdx = mapSize.AreaUpper();
@@ -225,7 +225,7 @@ Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned 
 
 				const auto TraversableVal = Traversability[nmptChild.y * mapSize.w * 16 + nmptChild.x];
 
-				const bool childIsUnbumpable = TraversableVal.actor != caller && TraversableVal.type == BlockingTraversabilityVal;
+				const bool childIsUnbumpable = TraversableVal.actor != caller && TraversableVal.type >= BlockingTraversabilityVal;
 
 				TRACY(TracyCZoneEnd(tCtxActorChecks));
 				if (childIsUnbumpable) continue;

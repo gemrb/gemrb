@@ -51,7 +51,7 @@
 
 #include <array>
 #include <limits>
-
+#include "PathfindingSettings.h"
 
 namespace GemRB {
 
@@ -231,8 +231,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 {
 	using namespace std::chrono_literals;
 	auto Bench = ankerl::nanobench::Bench()
-		.epochIterations(100)
-		.warmup(20)
+		.epochIterations(PATH_BENCHMARK_ITERS)
+		.warmup(PATH_BENCHMARK_WARMUP)
 		.timeUnit(1ms, "ms")
 		.performanceCounters(true);
 	Path ResultOriginal;
@@ -242,14 +242,20 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	Bench.relative(true).name("FindPathOriginal").run([&] {
 #endif
 #if PATH_RUN_ORIGINAL
-		ResultOriginal = FindPathImplOriginal(s, d, size, minDistance, flags, caller);
+		{
+			ScopedTimer t("}} original ");
+			ResultOriginal = FindPathImplOriginal(s, d, size, minDistance, flags, caller);
+		}
 #endif
 #if PATH_RUN_BENCH
 	});
 	Bench.name("FindPathOriginalImproved").run([&] {
 #endif
 #if PATH_RUN_IMPROVED
-		ResultOriginalImproved = FindPathImplOriginalImproved(s, d, size, minDistance, flags, caller);
+		{
+			ScopedTimer t("}} improved ");
+			ResultOriginalImproved = FindPathImplOriginalImproved(s, d, size, minDistance, flags, caller);
+		}
 #endif
 #if PATH_RUN_BENCH
 	});

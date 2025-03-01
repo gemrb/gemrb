@@ -319,11 +319,6 @@ struct TrackingData {
 	int difficulty = 0;
 };
 
-#define PATH_RUN_ORIGINAL 1
-#define PATH_RUN_IMPROVED 0
-#define PATH_RETURN_ORIGINAL 1
-#define PATH_RUN_BENCH 0
-
 using aniIterator = std::list<AreaAnimation>::iterator;
 using scaIterator = std::list<VEFObject*>::const_iterator;
 using proIterator = std::list<Projectile*>::const_iterator;
@@ -607,11 +602,19 @@ public:
 	Map(TileMap* tm, TileProps tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
 
+	Region GetTraversabilityRegion(Actor* actor) const;
+
 	void TraversabilityUnblock(Actor * actor);
 
 	void TraversabilityBlock(Actor * actor) const;
 
-	mutable std::vector<std::pair<Actor*, Point>> CachedTraversability;
+	struct FCachedActorPosState {
+		Actor* actor = nullptr;
+		Point pos;
+		int bumpable;
+		int alive;
+	};
+	mutable std::vector<FCachedActorPosState> CachedTraversability;
 	bool ShouldUpdateTraversability() const;
 	void UpdateTraversability() const;
 

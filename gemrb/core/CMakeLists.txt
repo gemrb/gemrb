@@ -43,6 +43,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	PathFinder.cpp
 	FindPathOrig.cpp
 	FindPathImproved.cpp
+	TraversabilityCache.cpp
 	PluginMgr.cpp
 	Polygon.cpp
 	Projectile.cpp
