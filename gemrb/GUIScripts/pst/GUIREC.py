@@ -812,24 +812,19 @@ def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
 
 	feedbackText = ""
 
-	def bumpStat (pc, stat, diff, delay = 0):
+	def bumpStat (pc, stat, diff):
 		global feedbackText
 
 		base = GemRB.GetPlayerStat (pc, stat, 1)
 		GemRB.SetPlayerStat (pc, stat, base + diff)
 
 		# the original applied effects and relied on their feedback for floating messages
-		# that and PermanentStatChangeFeedback would have the same problem
+		# which misses some of the upgrades
 		# but it also printed all the feedback to the text area
 		statMsgs = { IE_STR: 41274, IE_CON: 41273, IE_DEX: 41276, IE_INT: 39440, IE_WIS: 41271, IE_LUCK: 41272, IE_LORE: 39439, IE_HITPOINTS: 39438 }
 		if stat in statMsgs:
-			if statMsgs[stat] >= statMsgs[IE_INT]:
-				action = "FloatMessage({}, {})".format(pc, statMsgs[stat] + 1000000)
-				if delay:
-					# stagger messages, so they don't overlap
-					GemRB.SetTimedEvent(lambda: GemRB.ExecuteString (action, pc), delay)
-				else:
-					GemRB.ExecuteString (action, pc)
+			action = "FloatMessage({}, {})".format(pc, statMsgs[stat] + 1000000)
+			GemRB.ExecuteString (action, pc)
 			feedbackText += GemRB.GetString (statMsgs[stat]) + " "
 		return
 
@@ -864,7 +859,7 @@ def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
 		if specialist == 1:
 			# 4: upgrade fighter specialization
 			bumpStat (pc, IE_STR, 1)
-			bumpStat (pc, IE_CON, 1, 2)
+			bumpStat (pc, IE_CON, 1)
 			bumpStat (pc, IE_MAXHITPOINTS, 3)
 			bumpStat (pc, IE_HITPOINTS, 3) # we can't display it the same way, but it wasn't drawn in the original either
 			# Unlocks Proficiency 5 for a Weapon; this is handled by trainers checking the Specialist global
@@ -876,7 +871,7 @@ def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
 		if specialist == 2:
 			# 5: upgrade thief specialization
 			bumpStat (pc, IE_DEX, 2)
-			bumpStat (pc, IE_LUCK, 1, 2)
+			bumpStat (pc, IE_LUCK, 1)
 			GemRB.SetGlobal ("Specialist", "GLOBAL", 5)
 		else:
 			# 8: was mage or fighter, grant first thief specialization
@@ -885,7 +880,7 @@ def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
 		if specialist == 3:
 			# 6: upgrade mage specialization
 			bumpStat (pc, IE_INT, 2)
-			bumpStat (pc, IE_WIS, 1, 2)
+			bumpStat (pc, IE_WIS, 1)
 			bumpStat (pc, IE_LORE, 5)
 			GemRB.SetGlobal ("Specialist", "GLOBAL", 6)
 		else:
