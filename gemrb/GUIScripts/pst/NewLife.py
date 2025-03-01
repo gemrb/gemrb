@@ -36,8 +36,7 @@ HpLabel = 0
 
 StatTable = 0
 # maintain this order in all lists!
-#Stats = [ Str, Int, Wis, Dex, Con, Cha ]
-Stats = [ 0, 0, 0, 0, 0, 0 ]
+StatIDs = [ IE_STR, IE_INT, IE_WIS, IE_DEX, IE_CON, IE_CHR ]
 StatLimit = [ 23, 18, 18, 18, 18, 18 ]
 StatLabels = [ None ] * 6
 StatLowerLimit = [ 9 ] * 6
@@ -57,7 +56,7 @@ def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 	global NewLifeWindow, StatTable
 	global TotPoints, AcPoints, HpPoints
 	global TotLabel, AcLabel, HpLabel
-	global TextArea, Stats, StatLabels, StatLowerLimit, StatLimit, LevelUp
+	global TextArea, StatLabels, StatLowerLimit, StatLimit, LevelUp
 
 	LevelUp = Type
 	if LevelUp:
@@ -67,7 +66,7 @@ def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 		if Specific != 2 or LevelDiff == 0:
 			return
 	else:
-		GemRB.LoadGame(None)  #loading the base game
+		GemRB.CreatePlayer ("charbase", 1)
 
 	StatTable = GemRB.LoadTable("abcomm")
 
@@ -75,27 +74,22 @@ def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 	NewLifeWindow = GemRB.LoadWindow(0, "GUICG")
 
 	if LevelUp:
-		Str = GemRB.GetPlayerStat(1, IE_STR, 1)
-		Dex = GemRB.GetPlayerStat(1, IE_DEX, 1)
-		Con = GemRB.GetPlayerStat(1, IE_CON, 1)
-		Wis = GemRB.GetPlayerStat(1, IE_WIS, 1)
-		Int = GemRB.GetPlayerStat(1, IE_INT, 1)
-		Cha = GemRB.GetPlayerStat(1, IE_CHR, 1)
+		StatLowerLimit = []
+		for stat in StatIDs:
+			StatLowerLimit.append (GemRB.GetPlayerStat (1, stat, 1))
 		TotPoints = LevelDiff
-		Stats = [ Str, Int, Wis, Dex, Con, Cha ]
-		StatLowerLimit = list(Stats) # so we copy the values or the lower limit would increase with them
 		StatLimit = [ 25 ] * 6
 	else:
-		Str = Dex = Con = Wis = Int = Cha = 9
+		for stat in StatIDs:
+			GemRB.SetPlayerStat (1, stat, 9)
 		TotPoints = 21
-		Stats = [ Str, Int, Wis, Dex, Con, Cha ]
 
 	# stat label controls
-	for i in range(len(Stats)):
+	for i in range(6):
 		StatLabels[i] = NewLifeWindow.GetControl(0x10000018 + i)
 
 	# individual stat buttons
-	for i in range(len(Stats)):
+	for i in range(6):
 		Button = NewLifeWindow.GetControl (i+2)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.OnMouseEnter (StatPress[i])
@@ -176,7 +170,7 @@ def OpenLUStatsWindow(Type = 1, LevelDiff = 0):
 def UpdateLabels():
 	global AcPoints, HpPoints
 
-	Str = Stats[0]
+	Str = GemRB.GetPlayerStat(1, IE_STR, 1)
 	if (LevelUp and Str != 18) or (not LevelUp and Str <= 18):
 		StatLabels[0].SetText(str(Str))
 	elif LevelUp:
@@ -184,15 +178,15 @@ def UpdateLabels():
 		StatLabels[0].SetText("18/" + ("00" if strEx == 100 else str(strEx)))
 	else:
 		StatLabels[0].SetText("18/"+strings[Str-19])
-	for i in range(1, len(Stats)):
-		StatLabels[i].SetText(str(Stats[i]))
+	for i in range(1, 6):
+		StatLabels[i].SetText (str(GemRB.GetPlayerStat (1, StatIDs[i], 1)))
 
 	TotLabel.SetText(str(TotPoints))
 	if LevelUp:
 		AcPoints = GemRB.GetPlayerStat(1, IE_ARMORCLASS, 1)
 	else:
 		AcPoints = 10
-		Dex = Stats[3]
+		Dex = GemRB.GetPlayerStat(1, IE_DEX, 1)
 		if Dex > 14:
 			AcPoints = AcPoints - (Dex-14)
 
@@ -200,7 +194,7 @@ def UpdateLabels():
 		HpPoints = GemRB.GetPlayerStat(1, IE_HITPOINTS, 1)
 	else:
 		HpPoints = 20
-		Con = Stats[4]
+		Con = GemRB.GetPlayerStat(1, IE_CON, 1)
 		if Con > 14:
 			HpPoints = HpPoints + (Con-9)*2 + (Con-14)
 		else:
@@ -228,22 +222,14 @@ def AcceptPress():
 		return
 
 	#set my character up
-	if not LevelUp:
-		GemRB.CreatePlayer ("charbase", 1)
 
-	Str = Stats[0]
+	Str = GemRB.GetPlayerStat(1, IE_STR, 1)
 	if (LevelUp and Str != 18) or (not LevelUp and Str <= 18):
 		GemRB.SetPlayerStat(1, IE_STR, Str)
 		GemRB.SetPlayerStat(1, IE_STREXTRA,0)
 	else:
 		GemRB.SetPlayerStat(1, IE_STR, 18)
 		GemRB.SetPlayerStat(1, IE_STREXTRA,extras[Str-19])
-
-	GemRB.SetPlayerStat(1, IE_INT, Stats[1])
-	GemRB.SetPlayerStat(1, IE_WIS, Stats[2])
-	GemRB.SetPlayerStat(1, IE_DEX, Stats[3])
-	GemRB.SetPlayerStat(1, IE_CON, Stats[4])
-	GemRB.SetPlayerStat(1, IE_CHR, Stats[5])
 
 	if LevelUp:
 		# Return to the RecordsWindow
@@ -253,7 +239,7 @@ def AcceptPress():
 	#don't add con bonus, it will be calculated by the game
 	#interestingly enough, the game adds only one level's con bonus
 	Table = GemRB.LoadTable ("hpinit")
-	x = Table.GetValue (str(Stats[4]), "HP")
+	x = Table.GetValue (str(GemRB.GetPlayerStat (1, IE_CON, 1)), "HP")
 	
 	GemRB.SetPlayerStat(1, IE_MAXHITPOINTS, x)
 	GemRB.SetPlayerStat(1, IE_HITPOINTS, x + 100) # x + 100 ensures the player starts at max hp when con > 14
@@ -289,7 +275,7 @@ def CancelPress():
 
 def StrPress():
 	TextArea.SetText(18489)
-	s = Stats[0]
+	s = GemRB.GetPlayerStat(1, IE_STR, 1)
 	if LevelUp:
 		# s = GemRB.GetPlayerStat (1, IE_STR, 1)
 		e = GemRB.GetPlayerStat (1, IE_STREXTRA, 1)
@@ -316,31 +302,36 @@ def StrPress():
 
 def IntPress():
 	TextArea.SetText(18488)
-	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(Stats[1],1), STRING_FLAGS_RESOLVE_TAGS).format(0,0))
+	intl = GemRB.GetPlayerStat(1, IE_INT, 1)
+	TextArea.Append ("\n\n" + GemRB.GetString (StatTable.GetValue (intl, 1), STRING_FLAGS_RESOLVE_TAGS).format(0, 0))
 	return
 
 def WisPress():
 	TextArea.SetText(18490)
-	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(Stats[2],2), STRING_FLAGS_RESOLVE_TAGS).format(0,0))
+	wis = GemRB.GetPlayerStat(1, IE_WIS, 1)
+	TextArea.Append ("\n\n" + GemRB.GetString (StatTable.GetValue (wis, 2), STRING_FLAGS_RESOLVE_TAGS).format(0, 0))
 	return
 
 def DexPress():
 	Table = GemRB.LoadTable("dexmod")
-	x = -Table.GetValue (Stats[3], 2)
+	dex = GemRB.GetPlayerStat (1, IE_DEX, 1)
+	x = -Table.GetValue (dex, 2)
 	TextArea.SetText(18487)
-	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(Stats[3],3), STRING_FLAGS_RESOLVE_TAGS).format(x,0))
+	TextArea.Append ("\n\n" + GemRB.GetString (StatTable.GetValue (dex, 3), STRING_FLAGS_RESOLVE_TAGS).format(x, 0))
 	return
 
 def ConPress():
 	Table = GemRB.LoadTable("hpconbon")
-	x = Table.GetValue (Stats[4]-1, 1)
+	con = GemRB.GetPlayerStat(1, IE_CON, 1)
+	x = Table.GetValue (con - 1, 1)
 	TextArea.SetText(18491)
-	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(Stats[4],4), STRING_FLAGS_RESOLVE_TAGS).format(x,0))
+	TextArea.Append ("\n\n" + GemRB.GetString (StatTable.GetValue (con, 4), STRING_FLAGS_RESOLVE_TAGS).format(x, 0))
 	return
 
 def ChaPress():
 	TextArea.SetText(1903)
-	TextArea.Append("\n\n"+GemRB.GetString(StatTable.GetValue(Stats[5],5), STRING_FLAGS_RESOLVE_TAGS).format(0,0))
+	cha = GemRB.GetPlayerStat (1, IE_CHR, 1)
+	TextArea.Append ("\n\n" + GemRB.GetString (StatTable.GetValue (cha, 5), STRING_FLAGS_RESOLVE_TAGS).format(0, 0))
 	return
 
 StatPress = [ StrPress, IntPress, WisPress, DexPress, ConPress, ChaPress ]
@@ -359,38 +350,35 @@ def HpPress():
 
 def DecreasePress():
 	global TotPoints
-	global Sum, Stats
 
 	Pressed = GemRB.GetVar("Pressed")
-	Sum = Stats[Pressed]
+	Sum = GemRB.GetPlayerStat(1, StatIDs[Pressed], 1)
 	if Sum <= StatLowerLimit[Pressed]:
 		return
 	TotPoints = TotPoints+1
-	Sum = Sum-1
-	Stats[Pressed] = Sum
+	GemRB.SetPlayerStat (1, StatIDs[Pressed], Sum - 1)
+
 	StatPress[Pressed]()
 	UpdateLabels()
 	return
 
 def IncreasePress():
 	global TotPoints
-	global Sum, Stats
 
 	if TotPoints<=0:
 		return
 	Pressed = GemRB.GetVar("Pressed")
-	Sum = Stats[Pressed]
+	Sum = GemRB.GetPlayerStat(1, StatIDs[Pressed], 1)
 	if Sum >= StatLimit[Pressed]:
 		return
 
 	TotPoints = TotPoints-1
-	Sum = Sum+1
+	GemRB.SetPlayerStat (1, StatIDs[Pressed], Sum + 1)
 
-	Stats[Pressed] = Sum
 	StatPress[Pressed]()
 	UpdateLabels()
 	return
 
 def OverPhoto():
 	global TextArea
-	TextArea.SetText(18495)
+	TextArea.SetText (18495) # yep, the same is shown during level up

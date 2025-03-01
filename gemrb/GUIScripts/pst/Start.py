@@ -73,6 +73,7 @@ def QuitPress():
 def NewLifePress():
 	#to make difference between ingame change and new life
 	GemRB.SetVar("PlayMode",0)
+	GemRB.LoadGame(None) # loading the base game
 	GemRB.SetNextScript("NewLife")
 	return
 
