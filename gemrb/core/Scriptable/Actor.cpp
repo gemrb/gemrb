@@ -3250,7 +3250,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect* fx)
 		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
 		if (core->HasFeedback(FT_COMBAT) && success && (lastSave.prevType != type || lastSave.prevRoll != ret)) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
-			String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings(ieDword(HCStrings::SaveSpell) + type)));
+			String msg = core->GetString(HCStrings(ieDword(HCStrings::SaveSpell) + type));
 			msg += fmt::format(u" {}", ret);
 			displaymsg->DisplayStringName(std::move(msg), GUIColors::WHITE, this);
 		}
@@ -4541,7 +4541,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 			// bg1 and iwd
 			// or any traps or self-infliction (also for bg1)
 			// construct an i18n friendly "Damage Taken (damage)", since there's no token
-			String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings::Damage1), STRING_FLAGS::NONE);
+			String msg = core->GetString(HCStrings::Damage1, STRING_FLAGS::NONE);
 			String dmg = fmt::format(u" ({})", damage);
 			displaymsg->DisplayStringName(msg + dmg, GUIColors::WHITE, this);
 		} else { //bg2
@@ -7446,14 +7446,14 @@ void Actor::PerformAttack(ieDword gameTime)
 		String leftRight;
 		String hitMiss;
 		if (usedLeftHand && DisplayMessage::HasStringReference(HCStrings::AttackRollLeft)) {
-			leftRight = core->GetString(DisplayMessage::GetStringReference(HCStrings::AttackRollLeft));
+			leftRight = core->GetString(HCStrings::AttackRollLeft);
 		} else {
-			leftRight = core->GetString(DisplayMessage::GetStringReference(HCStrings::AttackRoll));
+			leftRight = core->GetString(HCStrings::AttackRoll);
 		}
 		if (success) {
-			hitMiss = core->GetString(DisplayMessage::GetStringReference(HCStrings::Hit));
+			hitMiss = core->GetString(HCStrings::Hit);
 		} else {
-			hitMiss = core->GetString(DisplayMessage::GetStringReference(HCStrings::Miss));
+			hitMiss = core->GetString(HCStrings::Miss);
 		}
 		String rollLog = fmt::format(u"{} {} {} {} = {} : {}", leftRight, roll, (rollMod >= 0) ? u"+" : u"-", std::abs(rollMod), roll + rollMod, hitMiss);
 		displaymsg->DisplayStringName(std::move(rollLog), GUIColors::WHITE, this);

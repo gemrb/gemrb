@@ -1326,6 +1326,11 @@ String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 	}
 }
 
+String Interface::GetString(HCStrings idx, STRING_FLAGS options) const
+{
+	return GetString(DisplayMessage::GetStringReference(idx), options);
+}
+
 std::string Interface::GetMBString(ieStrRef strref, STRING_FLAGS options) const
 {
 	String string = GetString(strref, options);

@@ -2799,7 +2799,7 @@ void GameControl::SetDisplayText(const String& text, unsigned int time)
 
 void GameControl::SetDisplayText(HCStrings text, unsigned int time)
 {
-	SetDisplayText(core->GetString(DisplayMessage::GetStringReference(text), STRING_FLAGS::NONE), time);
+	SetDisplayText(core->GetString(text, STRING_FLAGS::NONE), time);
 }
 
 void GameControl::ToggleAlwaysRun()

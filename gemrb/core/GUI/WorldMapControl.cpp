@@ -240,7 +240,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 		SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
 		Area = ae;
 		if (oldArea != ae) {
-			const String str = core->GetString(DisplayMessage::GetStringReference(HCStrings::TravelTime));
+			const String str = core->GetString(HCStrings::TravelTime);
 			int hours = worldmap->GetDistance(Area->AreaName);
 			if (!str.empty() && hours >= 0) {
 				SetTooltip(fmt::format(u"{}: {}", str, hours));

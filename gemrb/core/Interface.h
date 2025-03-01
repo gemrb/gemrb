@@ -404,6 +404,7 @@ public:
 	ieStrRef UpdateString(ieStrRef strref, const String& text) const;
 	/* returns a newly created string */
 	String GetString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
+	String GetString(HCStrings idx, STRING_FLAGS options = STRING_FLAGS::NONE) const;
 	std::string GetMBString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
 	/** returns a gradient set */
 	const ColorPal<16>& GetPalette16(uint8_t idx) const { return (idx >= palettes16.size()) ? palettes16[0] : palettes16[idx]; }

@@ -888,7 +888,7 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const
 			if (spl->SpellType == IE_SPL_INNATE) {
 				str = fmt::format(u"{} : {}", spell, target->GetName());
 			} else {
-				const String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings::ActionCast), STRING_FLAGS::NONE);
+				const String msg = core->GetString(HCStrings::ActionCast, STRING_FLAGS::NONE);
 				str = fmt::format(u"{} {} : {}", msg, spell, target->GetName());
 			}
 		} else {
@@ -1192,7 +1192,7 @@ void Scriptable::SpellcraftCheck(const Actor* caster, const ResRef& spellRef)
 
 		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
 			// eg. .:Casts Word of Recall:.
-			const String castmsg = core->GetString(DisplayMessage::GetStringReference(HCStrings::Casts));
+			const String castmsg = core->GetString(HCStrings::Casts);
 			const String spellname = core->GetString(spl->SpellName);
 			overHead.SetText(fmt::format(u".:{} {}:.", castmsg, spellname));
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL15, GUIColors::LIGHTGREY, detective, Spellcraft + IntMod, AdjustedSpellLevel, IntMod);
@@ -1448,7 +1448,7 @@ int Scriptable::CheckWildSurge()
 			// display feedback: Wild Surge: bla bla
 			// look up the spell in the "check" row of wildmag.2da
 			const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
-			const String s1 = core->GetString(DisplayMessage::GetStringReference(HCStrings::WildSurge), STRING_FLAGS::NONE);
+			const String s1 = core->GetString(HCStrings::WildSurge, STRING_FLAGS::NONE);
 			const String s2 = core->GetString(surgeSpell.message, STRING_FLAGS::NONE);
 			displaymsg->DisplayStringName(s1 + u" " + s2, GUIColors::WHITE, this);
 
