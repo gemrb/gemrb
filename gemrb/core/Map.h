@@ -566,6 +566,7 @@ private:
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
 
 	mutable std::vector<FTraversability> Traversability;
+	mutable std::vector<FTraversability> Traversability2;
 
 	class MapReverb {
 	public:
@@ -617,16 +618,23 @@ public:
 
 		FCachedActorPosState(Actor* InActor);
 		void ClearOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
+		void ClearOldPosition2(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
 		void ClearNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
 		void MarkNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth, bool bInUpdateSelf = false);
+		void MarkOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth);
 		void UpdateNewState();
 		static Region CalculateRegion(Actor* InActor);
 	};
 	mutable std::vector<FCachedActorPosState> CachedActorPosState;
+	mutable std::vector<FCachedActorPosState> CachedActorPosState2;
 	bool ShouldUpdateTraversability() const;
+	bool ShouldUpdateTraversability2() const;
 	void UpdateTraversability() const;
+	void UpdateTraversabilitySmort() const;
+	void UpdateTraversabilityDumb() const;
 
 	void ValidateTraversabilitySize() const;
+	void ValidateTraversabilitySize2() const;
 
 	static void NormalizeDeltas(float_t& dx, float_t& dy, float_t factor = 1);
 

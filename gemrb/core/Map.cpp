@@ -1789,6 +1789,7 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 	};
 
 	// draw Traversability cache
+	if (dFlags & DEBUG_SHOW_SEARCHMAP)
 	{
 		Color TraversabilityColors[(int)ETraversability::max] {
 			Color{255, 255, 255, 30}, // none
@@ -1818,42 +1819,36 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 				}
 			}
 		}
+	}
+	else {
+		Color TraversabilityColors[(int)ETraversability::max] {
+			Color{255, 255, 255, 30}, // none
+			Color{0, 255, 0, 180}, // actor but passable
+			Color{255, 0, 0, 180}, // blocked
+		};
 
-		// for (int x = 0; x < w; x++) {
-		// 	for (int y = 0; y < h; y++) {
-		// 		block.x = x * 1 - (vp.x);
-		// 		block.y = y * 1 - (vp.y);
-		//
-		// 		// SearchmapPoint p = SearchmapPoint(x, y) + SearchmapPoint(vp.origin);
-		//
-		// 		const auto Idx = ActorPosition.y * PropsSize().w * 16 + ActorPosition.x;
-		//
-		// 		Color col;
-		// 		if (dFlags & DEBUG_SHOW_SEARCHMAP) {
-		// 			auto val = tileProps.QueryTileProp(p, TileProps::Property::SEARCH_MAP);
-		// 			col = debugPalettes.searchMapPal->GetColorAt(val);
-		// 		} else if (dFlags & DEBUG_SHOW_MATERIALMAP) {
-		// 			auto val = tileProps.QueryMaterial(p);
-		// 			col = debugPalettes.materialMapPal->GetColorAt(val);
-		// 		} else if (dFlags & DEBUG_SHOW_HEIGHTMAP) {
-		// 			auto val = tileProps.QueryTileProp(p, TileProps::Property::ELEVATION);
-		// 			col = debugPalettes.heightMapPal->GetColorAt(val);
-		// 		} else if (dFlags & DEBUG_SHOW_LIGHTMAP) {
-		// 			col = tileProps.QueryLighting(p);
-		// 		}
-		//
-		// 		VideoDriver->DrawRect(block, col, true, flags);
-		// 	}
-		// }
-		//
-		// for (int i = 0; i < Traversability.size(); ++i) {
-		// 	// const auto ExpectedSize = PropsSize().h * 12 * PropsSize().w * 16;
-		// 	// const auto Idx = ActorPosition.y * PropsSize().w * 16 + ActorPosition.x;
-		// 	int x = i % (12 * PropsSize().h);
-		// 	int y = i / (16 * PropsSize().w);
-		// 	const Point p{x, y};
-		// 	VideoDriver->DrawPoint(p, TraversabilityColors[Traversability[i]]);
-		// }
+		Region block(0, 0, 1, 1);
+
+		int w = vp.w;// / 16 + 2;
+		int h = vp.h;// / 12 + 2;
+
+		BlitFlags flags = BlitFlags::BLENDED;
+		if (dFlags & DEBUG_SHOW_LIGHTMAP) {
+			flags |= BlitFlags::HALFTRANS;
+		}
+
+		for (int x = vp.x; x < vp.x + vp.w; ++x) {
+			for (int y = vp.y; y < vp.y + vp.h; ++y) {
+				const auto Idx = y * PropsSize().w * 16 + x;
+				const Point p{x, y};
+				if (Idx < Traversability2.size()) {
+					VideoDriver->DrawPoint(p - vp.origin, TraversabilityColors[(int)Traversability2[Idx].type], BLENDED);
+				}
+				else {
+					VideoDriver->DrawPoint(p - vp.origin, Color{200, 0, 200, 0}, BLENDED);
+				}
+			}
+		}
 	}
 
 	if (dFlags & DEBUG_SHOW_SEARCHMAP) {

@@ -223,7 +223,7 @@ Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned 
 				// If there's an actor, check it can be bumped away
 				TRACY(TracyCZoneN(tCtxActorChecks, "actorChecks", true));
 
-				const auto TraversableVal = Traversability[nmptChild.y * mapSize.w * 16 + nmptChild.x];
+				const auto TraversableVal = Traversability2[nmptChild.y * mapSize.w * 16 + nmptChild.x];
 
 				const bool childIsUnbumpable = TraversableVal.actor != caller && TraversableVal.type >= BlockingTraversabilityVal;
 

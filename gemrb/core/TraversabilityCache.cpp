@@ -37,6 +37,20 @@ void Map::FCachedActorPosState::ClearOldPosition(std::vector<FTraversability> &I
 	}
 }
 
+void Map::FCachedActorPosState::
+ClearOldPosition2(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
+	const auto& RemovedRegion = region;
+	for (int x = RemovedRegion.x; x < RemovedRegion.x + RemovedRegion.w; ++x) {
+		for (int y = RemovedRegion.y; y < RemovedRegion.y + RemovedRegion.h; ++y) {
+			if (!actor->IsOver(Point(x, y), pos)) {
+				continue;
+			}
+			const auto Idx = y * InWidth * 16 + x;
+			InOutTraversability[Idx] = FTraversability{};
+		}
+	}
+}
+
 void Map::FCachedActorPosState::ClearNewPosition(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
 	const auto RemovedRegion = CalculateRegion(actor);
 	for (int x = RemovedRegion.x; x < RemovedRegion.x + RemovedRegion.w; ++x) {
@@ -76,6 +90,31 @@ void Map::FCachedActorPosState::MarkNewPosition(std::vector<FTraversability> &In
 		this->bumpable = newState.bumpable;
 		this->pos = newState.pos;
 		this->region = newState.region;
+	}
+}
+
+void Map::FCachedActorPosState::MarkOldPosition(std::vector<FTraversability> &InOutTraversability, int InWidth) {
+	ETraversability NewTraversabilityType;
+	if (!alive) {
+		NewTraversabilityType = ETraversability::empty;
+	}
+	else if (bumpable) {
+		NewTraversabilityType = ETraversability::actor;
+	}
+	else {
+		NewTraversabilityType = ETraversability::actorNonTraversable;
+	}
+
+	const FTraversability NewTraversability{NewTraversabilityType, actor};
+	const auto& NewRegion = region;
+	for (int x = NewRegion.x; x < NewRegion.x + NewRegion.w; ++x) {
+		for (int y = NewRegion.y; y < NewRegion.y + NewRegion.h; ++y) {
+			if (!actor->IsOver(Point{x, y})) {
+				continue;
+			}
+			const auto Idx = y * InWidth * 16 + x;
+			InOutTraversability[Idx] = NewTraversability;
+		}
 	}
 }
 
@@ -202,12 +241,35 @@ bool Map::ShouldUpdateTraversability() const {
 #endif
 }
 
-	int UpdateCounter = 0;
+bool Map::ShouldUpdateTraversability2() const {
+#if PATH_RUN_IMPROVED
+	if (actors.size() != CachedActorPosState2.size()) {
+		return true;
+	}
+	for (size_t i = 0; i < actors.size(); ++i) {
+		if (actors[i] != CachedActorPosState2[i].actor ||
+			actors[i]->Pos != CachedActorPosState2[i].pos ||
+			actors[i]->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED) != CachedActorPosState2[i].alive ||
+			actors[i]->ValidTarget(GA_ONLY_BUMPABLE) != CachedActorPosState2[i].bumpable
+			)
+		{
+			return true;
+		}
+	}
+	return false;
+#endif
+}
+
 void Map::UpdateTraversability() const {
 #if PATH_RUN_IMPROVED
-	// if (!ShouldUpdateTraversability()) {
-	// 	return;
-	// }
+	UpdateTraversabilitySmort();
+	UpdateTraversabilityDumb();
+#endif
+}
+
+int UpdateCounter = 0;
+void Map::UpdateTraversabilitySmort() const {
+	ScopedTimer t("}} cacheS ");
 
 	const bool bForceRefresh = UpdateCounter == 0;
 	++UpdateCounter;
@@ -215,13 +277,12 @@ void Map::UpdateTraversability() const {
 		UpdateCounter = 0;
 	}
 
-
 	std::vector<size_t> ActorsRemoved;
 	std::vector<std::vector<FCachedActorPosState>::iterator> ActorsUpdated;
 	std::vector<FCachedActorPosState> ActorsNew;
 
 	if (bForceRefresh) {
-		Log(WARNING, "Map", "Force cache refresh");
+		// Log(WARNING, "Map", "Force cache refresh");
 		ActorsRemoved.reserve(CachedActorPosState.size());
 		ActorsNew.reserve(CachedActorPosState.size());
 		for (size_t i = 0; i < CachedActorPosState.size(); ++i) {
@@ -266,12 +327,8 @@ void Map::UpdateTraversability() const {
 		return;
 	}
 
-	ScopedTimer t("}} cache ");
-
-
 	// Log(WARNING, "Map", "...Updating traversability...");
 	ValidateTraversabilitySize();
-	// memset(Traversability.data(), 0, sizeof(FTraversability) * Traversability.size());
 
 	for (const auto RemovedIndex : ActorsRemoved) {
 		const auto RemovedRegion = CachedActorPosState[RemovedIndex].region;
@@ -325,28 +382,107 @@ void Map::UpdateTraversability() const {
 	for (auto& Added : ActorsNew) {
 		CachedActorPosState.emplace_back(std::move(Added));
 	}
+}
 
-	// // CachedTraversability.clear();
-	// CachedActorPosState.reserve(actors.size());
-	// memset(CachedActorPosState.data(), 0, sizeof(FCachedActorPosState) * actors.size());
-	// for (const auto actor : actors) {
-	//
-	// 	Point ActorPos;
-	// 	int alive = 0;
-	// 	int bumpable = 0;
-	// 	if (actor) {
-	// 		ActorPos = actor->Pos;
-	// 		alive = actor->ValidTarget(GA_NO_UNSCHEDULED | GA_NO_DEAD);
-	// 		bumpable = actor->ValidTarget(GA_ONLY_BUMPABLE);
-	// 	}
-	// 	CachedActorPosState.push_back({actor, ActorPos, bumpable, alive});
-	//
-	// 	if (!actor) {
-	// 		continue;
-	// 	}
-	// 	TraversabilityBlock(actor);
-	// }
-#endif
+void Map::UpdateTraversabilityDumb() const {
+	ScopedTimer t("}} cacheD ");
+
+	std::vector<size_t> ActorsRemoved;
+	std::vector<std::vector<FCachedActorPosState>::iterator> ActorsUpdated;
+	std::vector<FCachedActorPosState> ActorsNew;
+
+	{
+		for (size_t i = 0; i < actors.size(); ++i) {
+			auto currentActor = actors[i];
+			const auto Found = std::find_if(CachedActorPosState2.begin(), CachedActorPosState2.end(), [currentActor](const FCachedActorPosState& CachedActor) {
+				return CachedActor.actor == currentActor;
+			});
+			if (Found == CachedActorPosState2.cend()) {
+				ActorsNew.emplace_back(currentActor);
+				continue;
+			}
+
+			const FCachedActorPosState& CachedActor = *Found;
+			if (CachedActor.pos != currentActor->Pos ||
+				CachedActor.alive != currentActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED) ||
+				CachedActor.bumpable != currentActor->ValidTarget(GA_ONLY_BUMPABLE)) {
+				ActorsUpdated.push_back(Found);
+			}
+		}
+
+		for (size_t i = 0; i < CachedActorPosState2.size(); ++i) {
+			const auto& CachedActorPos = CachedActorPosState2[i];
+			const auto Found = std::find_if(actors.cbegin(), actors.cend(), [&CachedActorPos](const Actor* actor) {
+				return CachedActorPos.actor == actor;
+			});
+			if (Found == actors.cend()) {
+				ActorsRemoved.push_back(i);
+			}
+		}
+	}
+
+
+	if (ActorsNew.empty() && ActorsRemoved.empty() && ActorsUpdated.empty()) {
+		return;
+	}
+
+	// Log(WARNING, "Map", "...Updating Traversability2...");
+	ValidateTraversabilitySize2();
+
+	for (const auto RemovedIndex : ActorsRemoved) {
+		CachedActorPosState2[RemovedIndex].ClearOldPosition2(Traversability2, PropsSize().w);
+	}
+
+	for (auto IteratorUpdated : ActorsUpdated) {
+		FCachedActorPosState& Updated = *IteratorUpdated;
+		if (Updated.pos != Updated.actor->Pos) {
+			// clear old position, mark new position
+			Updated.ClearOldPosition2(Traversability2, PropsSize().w);
+			for (int i = 0; i < CachedActorPosState2.size(); ++i) {
+				if (CachedActorPosState2[i].actor == Updated.actor) {
+					continue;
+				}
+				if (CachedActorPosState2[i].region.IntersectsRegion(Updated.region)) {
+					CachedActorPosState2[i].bumpable = !static_cast<bool>(CachedActorPosState2[i].bumpable);
+				}
+			}
+			Updated.MarkNewPosition(Traversability2, PropsSize().w, true);
+			continue;
+		}
+		else {
+			// go from dead to alive
+			if (!Updated.alive && (Updated.alive != Updated.actor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED))) {
+				// no need to clear old position, just mark new position
+				Updated.MarkNewPosition(Traversability2, PropsSize().w, true);
+			}
+			// go from alive to dead
+			else if (Updated.alive && (Updated.alive != Updated.actor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED))) {
+				// just clear old position
+				Updated.ClearOldPosition2(Traversability2, PropsSize().w);
+				Updated.UpdateNewState();
+			}
+
+			// change in bumpable
+			if (Updated.bumpable != Updated.actor->ValidTarget(GA_ONLY_BUMPABLE)) {
+				// clear old, mark new
+				Updated.ClearOldPosition2(Traversability2, PropsSize().w);
+				Updated.MarkNewPosition(Traversability2, PropsSize().w, true);
+			}
+		}
+	}
+
+	for (auto & New : ActorsNew) {
+		New.MarkNewPosition(Traversability2, PropsSize().w);
+	}
+
+	for (auto RemovedIt = ActorsRemoved.crbegin(); RemovedIt != ActorsRemoved.crend(); ++RemovedIt) {
+		size_t RemovedIdx = *RemovedIt;
+		CachedActorPosState2.erase(CachedActorPosState2.begin() + RemovedIdx);
+	}
+
+	for (auto& Added : ActorsNew) {
+		CachedActorPosState2.emplace_back(std::move(Added));
+	}
 }
 
 void Map::ValidateTraversabilitySize() const  {
@@ -355,6 +491,18 @@ void Map::ValidateTraversabilitySize() const  {
 	if (Traversability.size() != ExpectedSize) {
 		Log(WARNING, "Map", "Resizing Traversability table.");
 		Traversability.resize(ExpectedSize, FTraversability{ ETraversability::empty, nullptr} );
+		memset(Traversability.data(), 0, sizeof(FTraversability) * Traversability.size());
+	}
+#endif
+}
+
+void Map::ValidateTraversabilitySize2() const {
+#if PATH_RUN_IMPROVED
+	const auto ExpectedSize = PropsSize().h * 12 * PropsSize().w * 16;
+	if (Traversability2.size() != ExpectedSize) {
+		Log(WARNING, "Map", "Resizing Traversability table.");
+		Traversability2.resize(ExpectedSize, FTraversability{ ETraversability::empty, nullptr} );
+		memset(Traversability2.data(), 0, sizeof(FTraversability) * Traversability2.size());
 	}
 #endif
 }
