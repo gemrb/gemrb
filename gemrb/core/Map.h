@@ -512,8 +512,8 @@ public:
 	};
 
 	struct FTraversability {
-		ETraversability type;
-		Actor* actor;
+		ETraversability type = ETraversability::empty;
+		Actor* actor = nullptr;
 	};
 
 class GEM_EXPORT Map : public Scriptable {
@@ -611,10 +611,18 @@ public:
 	struct FCachedActorPosState {
 		Actor* actor = nullptr;
 		Point pos;
-		int bumpable;
-		int alive;
+		Region region;
+		int bumpable = 1;
+		int alive = 0;
+
+		FCachedActorPosState(Actor* InActor);
+		void ClearOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
+		void ClearNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
+		void MarkNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth, bool bInUpdateSelf = false);
+		void UpdateNewState();
+		static Region CalculateRegion(Actor* InActor);
 	};
-	mutable std::vector<FCachedActorPosState> CachedTraversability;
+	mutable std::vector<FCachedActorPosState> CachedActorPosState;
 	bool ShouldUpdateTraversability() const;
 	void UpdateTraversability() const;
 
