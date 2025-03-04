@@ -625,13 +625,37 @@ public:
 		void UpdateNewState();
 		static Region CalculateRegion(Actor* InActor);
 	};
+
+	struct FCachedActorPosState2 {
+		int8_t flags;
+		Actor* actor = nullptr;
+		int64_t pos;
+		Region region;
+		FCachedActorPosState2(Actor* InActor, int w, int h);
+
+		static int64_t ToLinearPos(const Point& P, int32_t w, int32_t h);
+		static Point FromLinearPos(int64_t PIdx, int32_t w, int32_t h);
+		bool GetBumpable() const;
+		bool GetIsAlive() const;
+		void SetBumpable(bool b);
+		void SetIsAlive(bool b);
+
+		void ClearOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
+		void ClearOldPosition2(std::vector<FTraversability>& InOutTraversability, int InWidth, int InHeight) const;
+		void ClearNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
+		void MarkNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth, int InHeight, bool bInUpdateSelf = false);
+		void MarkOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth);
+		void UpdateNewState(int InWidth, int InHeight);
+		static Region CalculateRegion(Actor* InActor);
+	};
+
 	mutable std::vector<FCachedActorPosState> CachedActorPosState;
-	mutable std::vector<FCachedActorPosState> CachedActorPosState2;
+	mutable std::vector<FCachedActorPosState2> CachedActorPosState2;
 	bool ShouldUpdateTraversability() const;
 	bool ShouldUpdateTraversability2() const;
 	void UpdateTraversability() const;
-	void UpdateTraversabilitySmort() const;
-	void UpdateTraversabilityDumb() const;
+	void UpdateTraversabilityBase() const;
+	void UpdateTraversabilityImproved() const;
 
 	void ValidateTraversabilitySize() const;
 	void ValidateTraversabilitySize2() const;
