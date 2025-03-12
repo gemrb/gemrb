@@ -7110,7 +7110,7 @@ int fx_set_area_effect(Scriptable* Owner, Actor* target, Effect* fx)
 	const Actor* caster = Scriptable::As<const Actor>(Owner);
 	if (caster) {
 		skill = caster->GetStat(IE_SETTRAPS);
-		roll = target->LuckyRoll(1, 100, 0, LR_NEGATIVE);
+		roll = Clamp<int>(target->LuckyRoll(1, 100, 0, LR_NEGATIVE), 1, 100);
 		// assuming functioning thief, but allowing modded exceptions
 		// thieves aren't casters, so 0 for a later spell type lookup is not good enough
 		level = caster->GetThiefLevel();
