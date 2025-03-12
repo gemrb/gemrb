@@ -7111,6 +7111,10 @@ int fx_set_area_effect(Scriptable* Owner, Actor* target, Effect* fx)
 	if (caster) {
 		skill = caster->GetStat(IE_SETTRAPS);
 		roll = Clamp<int>(target->LuckyRoll(1, 100, 0, LR_NEGATIVE), 1, 100);
+		// bg2 hla traps were hardcoded to never fail
+		if (fx->Resource.BeginsWith("SPCL9")) {
+			roll = 0;
+		}
 		// assuming functioning thief, but allowing modded exceptions
 		// thieves aren't casters, so 0 for a later spell type lookup is not good enough
 		level = caster->GetThiefLevel();
