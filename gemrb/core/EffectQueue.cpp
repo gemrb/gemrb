@@ -114,12 +114,19 @@ private:
 			error("EffectQueue", "A critical scripting file is damaged!");
 		}
 
+		int maxOpcode = core->GetDictionary().Get("MaxFXOpcode", 999999);
 		for (int i = 0; i < MAX_EFFECTS; i++) {
 			const auto& effectname = effectsTable->GetValue(i);
 			if (effectname.empty()) continue; // past the table size or undefined effect
 
 			EffectDesc* poi = FindEffect(effectname);
 			assert(poi != nullptr);
+
+			// make sure the opcode is within original engine limits for save compatibility
+			if (i > maxOpcode) {
+				Log(ERROR, "EffectQueue", "Opcode {} '{}' is higher than the original max {}! Saves will be incompatible", i, effectname, maxOpcode);
+			}
+
 			Opcodes[i] = *poi;
 
 			// reverse linking opcode number
