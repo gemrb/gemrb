@@ -7541,6 +7541,11 @@ int fx_remove_projectile(Scriptable* Owner, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 	}
 
+	// ee additional way of specifying another 2da
+	if (fx->Resource) {
+		listref = fx->Resource;
+	}
+
 	//the list is now cached by Interface, no need of freeing it
 	const std::vector<ieDword>* projectilelist = core->GetListFrom2DA(listref);
 	assert(projectilelist);
