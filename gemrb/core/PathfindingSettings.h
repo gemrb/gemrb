@@ -16,10 +16,25 @@
 #define PATHFINDER_STATIC 1
 
 #include <iostream>
+#include <fstream>
+#include <chrono>
+
+struct FRemStat
+{
+    FRemStat()
+    {
+        std::ofstream os("perf.txt", std::ios_base::out | std::ios_base::trunc);
+        os << "..\n";
+    }
+};
 
 class ScopedTimer {
 	char tag[15] = "";
-	std::chrono::time_point<std::chrono::system_clock> startTime;
+#if WIN32
+	std::chrono::time_point<std::chrono::steady_clock> startTime;
+#else
+    std::chrono::time_point<std::chrono::system_clock> startTime;
+#endif
 
 public:
 	ScopedTimer(const char* InTag) {
@@ -29,7 +44,8 @@ public:
 
 	~ScopedTimer() {
 		const auto elapsed = std::chrono::high_resolution_clock::now() - startTime;
-		std::cout << tag << std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count() << "us\n";
+        std::ofstream os("perf.txt", std::ios_base::out | std::ios_base::app);
+		os << tag << std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count() << "us\n";
 	}
 };
 

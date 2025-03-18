@@ -53,6 +53,8 @@
 #include <limits>
 #include "PathfindingSettings.h"
 
+FRemStat rf;
+
 namespace GemRB {
 
 constexpr size_t DEGREES_OF_FREEDOM = 4;
