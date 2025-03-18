@@ -403,8 +403,12 @@ public:
 		// {
 		// 	return FString::Printf(TEXT("[X=%d, Y=%d, IDX=%d]"), GetIdxX(idx), GetIdxY(idx), idx);
 		// }
-
-		__always_inline int32_t GetDistance(const uint32_t IdxA, const uint32_t IdxB) const
+#if WIN32
+#define ALWAYS_INLINE __forceinline
+#else
+#define ALWAYS_INLINE __always_inline
+#endif
+        ALWAYS_INLINE int32_t GetDistance(const uint32_t IdxA, const uint32_t IdxB) const
 		{
 			return std::abs(GetIdxX(IdxB) - GetIdxX(IdxA)) + std::abs(GetIdxY(IdxB) - GetIdxY(IdxA));
 		}
@@ -456,7 +460,7 @@ public:
 			return n % MapSize;
 		}
 
-		__always_inline bool AreTilesInLine(const int32_t TileA, const int32_t TileB, const int32_t TileC, const uint8_t InitialDirection) const
+        ALWAYS_INLINE bool AreTilesInLine(const int32_t TileA, const int32_t TileB, const int32_t TileC, const uint8_t InitialDirection) const
 		{
 			// for linear coords, the neighbours directions maps directly to a constant value of diff between
 			// two tiles, like this:
