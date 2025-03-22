@@ -53,6 +53,7 @@ def OnLoad():
 		GUIOPTExtra.AddGemRBOptionsButton (OptionsWindow, frame, 0, 80, "STARTMBT", 1)
 	elif GameCheck.IsBG2 ():
 		frame = SoundButton.GetFrame ()
+		frame["w"] -= 25
 		GUIOPTExtra.AddGemRBOptionsButton (OptionsWindow, frame, 0, 50, "GMPCONNC", 2)
 
 	SoundButton.SetStatus(IE_GUI_BUTTON_ENABLED)
