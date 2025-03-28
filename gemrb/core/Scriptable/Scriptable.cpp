@@ -20,7 +20,6 @@
 #include "Scriptable/Scriptable.h"
 
 #include "strrefs.h"
-#include "voodooconst.h"
 
 #include "DialogHandler.h"
 #include "DisplayMessage.h"

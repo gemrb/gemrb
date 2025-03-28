@@ -23,8 +23,6 @@
 
 #include "Item.h"
 
-#include "voodooconst.h"
-
 #include "Interface.h"
 #include "Projectile.h"
 #include "ProjectileServer.h"

@@ -42,7 +42,6 @@
 #include "Scriptable/Actor.h"
 
 #include <map>
-#include <unordered_map>
 #include <vector>
 
 namespace GemRB {

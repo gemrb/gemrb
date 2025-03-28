@@ -35,7 +35,6 @@
 #include "Holder.h"
 #include "ImageMgr.h"
 #include "InterfaceConfig.h"
-#include "Orientation.h"
 #include "SaveGameAREExtractor.h"
 #include "StringMgr.h"
 #include "TableMgr.h"

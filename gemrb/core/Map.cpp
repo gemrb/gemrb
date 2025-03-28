@@ -46,7 +46,6 @@
 
 #include "Audio/Ambient.h"
 #include "GUI/GameControl.h"
-#include "GUI/Window.h"
 #include "GameScript/GSUtils.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
@@ -55,7 +54,6 @@
 
 #include <array>
 #include <cassert>
-#include <limits>
 #include <unordered_map>
 #include <utility>
 

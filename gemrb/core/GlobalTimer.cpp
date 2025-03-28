@@ -24,7 +24,6 @@
 #include "Interface.h"
 #include "RNG.h"
 
-#include "GUI/GUIAnimation.h"
 #include "GUI/GameControl.h"
 #include "GUI/WindowManager.h"
 

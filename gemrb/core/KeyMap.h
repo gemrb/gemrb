@@ -27,8 +27,6 @@
 #include "Strings/StringMap.h"
 #include "System/VFS.h"
 
-#include <unordered_map>
-
 namespace GemRB {
 
 class GEM_EXPORT KeyMap {

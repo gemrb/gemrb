@@ -20,7 +20,6 @@
 
 #include "Debug.h"
 #include "Interface.h"
-#include "Palette.h"
 #include "Sprite2D.h"
 
 #include "Strings/String.h"

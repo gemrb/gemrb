@@ -18,10 +18,10 @@
 
 #include "Logging/Loggers/Stdio.h"
 
-#include "plugindef.h"
+#include "Platform.h"
 
 #include "Logging/Logging.h"
-#include "Streams/FileStream.h"
+#include "Strings/CString.h"
 
 #include <cstdio>
 

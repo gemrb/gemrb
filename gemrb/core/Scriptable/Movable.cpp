@@ -19,8 +19,6 @@
 
 #include "Movable.h"
 
-#include "voodooconst.h"
-
 #include "Actor.h"
 #include "Interface.h"
 #include "Map.h"

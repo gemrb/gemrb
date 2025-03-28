@@ -39,8 +39,6 @@
 #include "GameScript/GameScript.h" // only for ID_Allegiance
 #include "Scriptable/Actor.h"
 
-#include <cstdio>
-
 namespace GemRB {
 
 static std::vector<EffectDesc> effectnames;

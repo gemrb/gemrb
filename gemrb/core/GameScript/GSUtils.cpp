@@ -23,7 +23,6 @@
 #include "defsounds.h"
 #include "ie_feats.h"
 #include "strrefs.h"
-#include "voodooconst.h"
 
 #include "CharAnimations.h"
 #include "DialogHandler.h"

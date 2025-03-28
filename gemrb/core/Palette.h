@@ -22,14 +22,11 @@
 
 #include "RGBAColor.h"
 #include "exports.h"
-#include "ie_types.h"
 
 #include "MurmurHash.h"
 
 #include <algorithm>
 #include <array>
-#include <cassert>
-#include <cstdint>
 #include <cstring>
 
 namespace GemRB {

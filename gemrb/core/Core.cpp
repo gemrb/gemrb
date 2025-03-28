@@ -24,16 +24,13 @@
  * @author The GemRB Project
  */
 
-#include "exports.h"
 #include "globals.h"
 
 #include "Interface.h"
 
 #include "Scriptable/Actor.h"
 
-#include <cctype>
 #include <cmath>
-#include <iostream>
 
 #ifdef WIN32
 

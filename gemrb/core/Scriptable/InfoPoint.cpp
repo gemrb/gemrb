@@ -21,7 +21,6 @@
 
 #include "ie_cursors.h"
 #include "strrefs.h"
-#include "voodooconst.h"
 
 #include "Game.h"
 #include "GameData.h"

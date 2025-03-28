@@ -24,10 +24,9 @@
 #include "exports.h"
 #include "ie_types.h"
 
-#include "Resource.h"
+#include "Strings/String.h"
 
 #include <array>
-#include <list>
 
 namespace GemRB {
 

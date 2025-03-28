@@ -1,8 +1,6 @@
 #ifndef MAP_REVERB_H
 #define MAP_REVERB_H
 
-#include "globals.h"
-
 #define EFX_MAX_REVERB_PROFILE_INDEX 19
 #define EFX_PROFILE_REVERB_INVALID   0xFF
 

@@ -22,7 +22,7 @@
 
 #include "Logging/Logging.h"
 
-#include <cstring>
+#include <string>
 
 namespace GemRB {
 

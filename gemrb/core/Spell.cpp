@@ -22,8 +22,6 @@
 
 #include "Spell.h"
 
-#include "voodooconst.h"
-
 #include "Game.h"
 #include "Interface.h"
 #include "Projectile.h"

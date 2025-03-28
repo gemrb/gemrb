@@ -25,6 +25,8 @@
 #include "Palette.h"
 #include "Region.h"
 
+#include <cassert>
+
 #define ERROR_UNKNOWN_BPP error("Video", "Invalid bpp.")
 
 namespace GemRB {

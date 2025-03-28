@@ -18,8 +18,6 @@
  *
  */
 
-#include "voodooconst.h"
-
 #include "CharAnimations.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h"

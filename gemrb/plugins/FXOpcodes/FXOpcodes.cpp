@@ -22,7 +22,6 @@
 #include "opcode_params.h"
 #include "overlays.h"
 #include "strrefs.h"
-#include "voodooconst.h"
 
 #include "DisplayMessage.h"
 #include "EffectQueue.h"

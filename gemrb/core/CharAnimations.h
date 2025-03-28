@@ -21,14 +21,11 @@
 #ifndef CHARANIMATIONS_H
 #define CHARANIMATIONS_H
 
-#include "RGBAColor.h"
 #include "exports.h"
 
 #include "Animation.h"
 #include "Orientation.h"
 #include "Palette.h"
-#include "Resource.h"
-#include "TableMgr.h"
 
 #include <array>
 #include <memory>
