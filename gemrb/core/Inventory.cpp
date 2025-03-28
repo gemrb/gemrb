@@ -32,13 +32,10 @@
 #include "Interface.h"
 #include "Item.h"
 #include "Map.h"
-#include "ScriptEngine.h"
 
 #include "GameScript/GSUtils.h"
 #include "Scriptable/Actor.h"
 #include "fmt/ranges.h"
-
-#include <cstdio>
 
 namespace GemRB {
 

@@ -41,8 +41,6 @@
 
 #include "GameScript/GameScript.h"
 
-#include "voodooconst.h"
-
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"

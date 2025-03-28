@@ -37,7 +37,6 @@
 #include "Plugins/ImporterPlugin.h"
 
 #include <cstring>
-#include <list>
 #include <map>
 #include <vector>
 

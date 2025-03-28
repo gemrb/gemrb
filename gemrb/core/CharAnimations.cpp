@@ -22,9 +22,7 @@
 
 #include "AnimationFactory.h"
 #include "DataFileMgr.h"
-#include "Game.h"
 #include "GameData.h"
-#include "ImageMgr.h"
 #include "Interface.h"
 #include "Palette.h"
 #include "RNG.h"

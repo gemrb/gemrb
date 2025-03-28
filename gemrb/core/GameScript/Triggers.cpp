@@ -18,8 +18,6 @@
  *
  */
 
-#include "voodooconst.h"
-
 #include "Calendar.h"
 #include "DialogHandler.h"
 #include "Game.h"

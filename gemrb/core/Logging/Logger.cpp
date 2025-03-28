@@ -18,10 +18,6 @@
 
 #include "Logging/Logger.h"
 
-#include "Logging/Logging.h"
-
-#include <cstdio>
-
 namespace GemRB {
 
 const EnumArray<LogLevel, LOG_FMT> Logger::LevelFormat {

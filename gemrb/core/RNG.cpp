@@ -20,8 +20,6 @@
 
 #include "RNG.h"
 
-#include "Logging/Logging.h"
-
 #include <ctime>
 
 namespace GemRB {

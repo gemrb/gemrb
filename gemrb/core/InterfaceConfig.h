@@ -28,7 +28,6 @@
 
 #include <stdexcept>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 // This is changed by both cmake and AppVeyor (CmakeLists.txt and .appveyor.yml)

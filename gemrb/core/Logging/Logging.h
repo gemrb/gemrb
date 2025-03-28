@@ -29,10 +29,7 @@
 #include "exports.h"
 
 #include "Logging/Logger.h"
-#include "Strings/String.h"
-#include "fmt/std.h"
-
-#include <cstdarg>
+#include "fmt/std.h" // needed for Log specialization
 
 namespace GemRB {
 

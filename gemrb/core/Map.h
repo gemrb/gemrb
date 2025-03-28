@@ -34,8 +34,6 @@
 #include "Scriptable/Scriptable.h"
 #include "Video/Video.h"
 
-#include <algorithm>
-#include <queue>
 #include <unordered_map>
 
 template<class V>

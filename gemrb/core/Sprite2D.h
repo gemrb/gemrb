@@ -36,8 +36,6 @@
 
 #include "Video/Pixels.h"
 
-#include <cstddef>
-
 namespace GemRB {
 
 // Note: not all these flags make sense together.

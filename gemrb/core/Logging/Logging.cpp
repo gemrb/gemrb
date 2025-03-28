@@ -21,11 +21,8 @@
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/TextArea.h"
 #include "Logging/Loggers/Stdio.h"
-#include "Streams/FileStream.h"
 
-#include <cstdarg>
 #include <memory>
-#include <vector>
 
 #ifndef STATIC_LINK
 	#define STATIC_LINK
