@@ -22,8 +22,6 @@
 #define ACTOR_H
 
 #include "exports.h"
-#include "ie_feats.h"
-#include "ie_stats.h" // using definitions as described in stats.ids
 #include "ie_types.h"
 #include "strrefs.h"
 
@@ -32,14 +30,11 @@
 #include "Game.h"
 #include "Inventory.h"
 #include "Palette.h"
-#include "Polygon.h"
-#include "Projectile.h"
 #include "Spellbook.h"
 
 #include "Audio/Playback.h"
 #include "Scriptable/Movable.h"
 #include "Scriptable/PCStatStruct.h"
-#include "Video/Video.h"
 
 #include <array>
 #include <map>
@@ -49,17 +44,11 @@
 namespace GemRB {
 
 class Animation;
-class ArmorClass;
-class CharAnimations;
 class DataFileMgr;
 class Map;
 class ScriptedAnimation;
-class ToHitStats;
 struct PolymorphCache;
-
-}
-
-namespace GemRB {
+enum class Feat : uint8_t;
 
 enum CREVersion {
 	GemRB,

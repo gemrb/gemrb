@@ -19,18 +19,18 @@
 
 #include "Scriptable/Container.h"
 
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "DisplayMessage.h"
-#include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Item.h"
 #include "Sprite2D.h"
 #include "TileMap.h"
 
-#include "GUI/GameControl.h"
-#include "GameScript/GSUtils.h"
+#include "GameScript/GameScript.h"
+#include "Scriptable/Actor.h"
 
 namespace GemRB {
 

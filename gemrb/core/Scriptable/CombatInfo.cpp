@@ -20,6 +20,8 @@
 
 #include "CombatInfo.h"
 
+#include "ie_stats.h"
+
 #include "Interface.h"
 
 #include "Scriptable/Actor.h"

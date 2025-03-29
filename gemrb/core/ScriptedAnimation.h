@@ -24,10 +24,8 @@
 
 #include "Animation.h"
 #include "Orientation.h"
-#include "Palette.h"
 
 #include "Audio/Playback.h"
-#include "Video/Video.h"
 
 namespace GemRB {
 

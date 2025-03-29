@@ -24,6 +24,9 @@
 
 #include "Scriptable/Actor.h"
 
+#include "defsounds.h"
+#include "ie_feats.h"
+#include "ie_stats.h" // using definitions as described in stats.ids
 #include "opcode_params.h"
 #include "overlays.h"
 #include "strrefs.h"
@@ -34,7 +37,6 @@
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
-#include "GlobalTimer.h"
 #include "ImageMgr.h"
 #include "Interface.h"
 #include "Item.h"

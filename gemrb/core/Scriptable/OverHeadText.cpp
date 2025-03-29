@@ -22,7 +22,7 @@
 
 #include "Game.h"
 #include "Interface.h"
-#include "Scriptable.h"
+#include "Selectable.h"
 
 #include "GUI/GameControl.h"
 

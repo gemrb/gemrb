@@ -23,6 +23,7 @@
 #include "Map.h"
 
 #include "ie_cursors.h"
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "DisplayMessage.h"

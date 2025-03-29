@@ -21,6 +21,7 @@
 #include "GameData.h"
 
 #include "globals.h"
+#include "ie_stats.h"
 
 #include "ActorMgr.h"
 #include "AnimationMgr.h"

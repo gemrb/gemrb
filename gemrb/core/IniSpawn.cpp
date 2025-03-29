@@ -24,6 +24,7 @@
 #include "IniSpawn.h"
 
 #include "globals.h"
+#include "ie_stats.h"
 
 #include "CharAnimations.h"
 #include "Game.h"

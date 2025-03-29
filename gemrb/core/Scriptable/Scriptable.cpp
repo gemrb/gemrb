@@ -19,6 +19,7 @@
 
 #include "Scriptable/Scriptable.h"
 
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "DialogHandler.h"
@@ -27,17 +28,12 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Projectile.h"
-#include "RNG.h"
 #include "Spell.h"
-#include "Sprite2D.h"
 
-#include "GUI/GUIAnimation.h"
 #include "GUI/GameControl.h"
-#include "GUI/TextSystem/Font.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
 #include "Scriptable/Highlightable.h"
-#include "Video/Video.h"
 
 #include <utility>
 

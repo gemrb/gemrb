@@ -20,6 +20,7 @@
 #include "GUI/GameControl.h"
 
 #include "ie_cursors.h"
+#include "ie_stats.h"
 #include "opcode_params.h"
 #include "strrefs.h"
 

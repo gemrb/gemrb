@@ -21,6 +21,8 @@
 #ifndef INFOPOINT_H
 #define INFOPOINT_H
 
+#include "strrefs.h"
+
 #include "GUI/GameControlDefs.h"
 #include "Scriptable/Highlightable.h"
 

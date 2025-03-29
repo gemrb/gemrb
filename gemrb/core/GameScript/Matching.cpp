@@ -20,9 +20,12 @@
 
 #include "GameScript/Matching.h"
 
+#include "ie_stats.h"
+
 #include "Game.h"
 #include "Interface.h"
 #include "Map.h"
+#include "SymbolMgr.h"
 #include "TileMap.h"
 
 #include "GameScript/GSUtils.h"

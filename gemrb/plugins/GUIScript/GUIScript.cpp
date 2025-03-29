@@ -20,6 +20,8 @@
 
 #include "GUIScript.h"
 
+#include "ie_stats.h"
+
 #include "CharAnimations.h"
 #include "DataFileMgr.h"
 #include "DisplayMessage.h"

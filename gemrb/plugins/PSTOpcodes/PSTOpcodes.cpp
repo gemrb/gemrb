@@ -18,6 +18,8 @@
  *
  */
 
+#include "ie_stats.h"
+
 #include "EffectQueue.h"
 #include "Game.h"
 #include "GameData.h"

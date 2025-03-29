@@ -21,6 +21,7 @@
 #include "GAMImporter.h"
 
 #include "globals.h"
+#include "ie_stats.h"
 
 #include "GameData.h"
 #include "Interface.h"
@@ -28,6 +29,7 @@
 #include "TableMgr.h"
 
 #include "Scriptable/Actor.h"
+#include "Scriptable/PCStatStruct.h"
 #include "Streams/SlicedStream.h"
 
 #include <cassert>

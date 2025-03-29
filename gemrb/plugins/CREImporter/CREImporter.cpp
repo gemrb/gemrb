@@ -30,6 +30,8 @@
 #include "RNG.h"
 #include "TableMgr.h"
 
+#include "Scriptable/Actor.h"
+
 #include <cassert>
 
 using namespace GemRB;

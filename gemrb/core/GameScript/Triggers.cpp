@@ -18,6 +18,8 @@
  *
  */
 
+#include "ie_stats.h"
+
 #include "Calendar.h"
 #include "DialogHandler.h"
 #include "Game.h"

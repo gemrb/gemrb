@@ -20,6 +20,8 @@
 
 #include "DisplayMessage.h"
 
+#include "ie_stats.h" // can be removed once IE_* stats get converted to an enum class
+
 #include "Interface.h"
 #include "TableMgr.h"
 

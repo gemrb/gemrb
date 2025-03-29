@@ -21,7 +21,6 @@
 #ifndef DOOR_H
 #define DOOR_H
 
-#include "PathFinder.h"
 #include "Polygon.h"
 #include "TileOverlay.h"
 

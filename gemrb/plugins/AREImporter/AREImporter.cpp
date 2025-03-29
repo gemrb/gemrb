@@ -21,6 +21,7 @@
 #include "AREImporter.h"
 
 #include "ie_cursors.h"
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "ActorMgr.h"

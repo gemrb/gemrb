@@ -18,6 +18,9 @@
  *
  */
 
+#include "defsounds.h"
+#include "ie_stats.h"
+
 #include "CharAnimations.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h"
@@ -48,7 +51,6 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
-#include "Video/Video.h"
 
 namespace GemRB {
 

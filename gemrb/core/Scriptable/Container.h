@@ -25,7 +25,6 @@
 
 #include "GUI/GameControlDefs.h"
 #include "Scriptable/Highlightable.h"
-#include "Video/Video.h"
 
 #include <array>
 
