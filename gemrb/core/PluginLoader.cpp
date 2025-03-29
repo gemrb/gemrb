@@ -27,7 +27,7 @@
 #include "System/FileFilters.h"
 
 #include <cstdio>
-#include <cstdlib>
+#include <memory>
 #include <set>
 
 #if defined(HAVE_DLFCN_H)
@@ -45,12 +45,6 @@ using LibHandle = HMODULE;
 #else
 using LibHandle = void*;
 #endif
-
-namespace GemRB {
-
-	class PluginMgr;
-
-}
 
 struct PluginDesc {
 	LibHandle handle;

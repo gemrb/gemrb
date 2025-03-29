@@ -27,8 +27,6 @@
 #include "Audio/MusicLoop.h"
 #include "Streams/FileStream.h"
 
-#include <cstdio>
-
 namespace GemRB {
 
 /**MUS PlayList Importer

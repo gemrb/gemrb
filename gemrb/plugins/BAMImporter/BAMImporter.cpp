@@ -26,7 +26,7 @@
 #include "Palette.h"
 #include "PluginMgr.h"
 
-#include "Streams/FileStream.h"
+#include "Streams/DataStream.h"
 #include "Video/RLE.h"
 #include "Video/Video.h"
 

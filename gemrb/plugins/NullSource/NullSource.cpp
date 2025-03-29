@@ -22,8 +22,6 @@
 
 #include "ResourceDesc.h"
 
-#include "Streams/FileStream.h"
-
 using namespace GemRB;
 
 bool NullSource::Open(const path_t&, std::string desc)

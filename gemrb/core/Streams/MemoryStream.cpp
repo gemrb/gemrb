@@ -20,8 +20,6 @@
 
 #include "MemoryStream.h"
 
-#include "errors.h"
-
 #include "Logging/Logging.h"
 
 namespace GemRB {

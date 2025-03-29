@@ -7,7 +7,6 @@
 #include <cstdio>
 #include <cstring>
 #include <fstream>
-#include <sstream>
 
 using namespace GemRB;
 
