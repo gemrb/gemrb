@@ -18,8 +18,6 @@
 
 #include "GUIScriptInterface.h"
 
-#include "Resource.h"
-
 namespace GemRB {
 
 static inline ScriptingId ModifiedCtrlIdForWin(ScriptingId id, const WindowScriptingRef* winref)

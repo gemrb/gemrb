@@ -33,7 +33,6 @@
 
 #include "DataFileMgr.h"
 #include "Region.h"
-#include "Resource.h"
 
 namespace GemRB {
 

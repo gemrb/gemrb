@@ -24,6 +24,7 @@
 #include "PluginMgr.h"
 #include "Resource.h"
 #include "ResourceDesc.h"
+#include "ResourceSource.h"
 
 #include "Logging/Logging.h"
 

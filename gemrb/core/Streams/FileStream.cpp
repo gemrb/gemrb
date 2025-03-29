@@ -21,6 +21,7 @@
 #include "FileStream.h"
 
 #include "Interface.h"
+#include "ResourceSource.h"
 
 #include "Logging/Logging.h"
 

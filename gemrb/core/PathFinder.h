@@ -23,7 +23,6 @@
 #include "EnumFlags.h"
 #include "Orientation.h"
 #include "Region.h"
-#include "Resource.h"
 
 #include "Strings/StringConversion.h"
 

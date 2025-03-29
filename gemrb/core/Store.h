@@ -32,8 +32,6 @@
 #include "globals.h"
 #include "ie_types.h"
 
-#include "Resource.h"
-
 #include <vector>
 
 namespace GemRB {

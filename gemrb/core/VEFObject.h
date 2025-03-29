@@ -27,7 +27,6 @@
 
 #include "Orientation.h"
 #include "Region.h"
-#include "Resource.h"
 
 #include "Video/Video.h"
 
