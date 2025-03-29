@@ -21,12 +21,8 @@
 #ifndef INIIMPORTER_H
 #define INIIMPORTER_H
 
-#include "globals.h"
-
 #include "DataFileMgr.h"
 
-#include <cstring>
-#include <unordered_map>
 #include <vector>
 
 namespace GemRB {

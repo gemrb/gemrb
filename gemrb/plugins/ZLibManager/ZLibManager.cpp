@@ -20,7 +20,7 @@
 
 #include "ZLibManager.h"
 
-#include "globals.h"
+#include "errors.h"
 
 #include <zlib.h>
 

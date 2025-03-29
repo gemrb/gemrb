@@ -20,8 +20,8 @@
 
 #include "MUSImporter.h"
 
-#include "GameData.h" // For ResourceHolder
 #include "Interface.h"
+#include "Resource.h"
 #include "SoundMgr.h"
 
 #include "Logging/Logging.h"

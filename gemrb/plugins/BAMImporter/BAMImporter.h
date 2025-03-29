@@ -21,9 +21,6 @@
 #ifndef BAMIMPORTER_H
 #define BAMIMPORTER_H
 
-#include "RGBAColor.h"
-#include "globals.h"
-
 #include "AnimationMgr.h"
 #include "Holder.h"
 

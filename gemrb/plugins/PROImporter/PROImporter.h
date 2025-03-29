@@ -21,8 +21,6 @@
 #ifndef PROIMPORTER_H
 #define PROIMPORTER_H
 
-#include "ie_types.h"
-
 #include "Projectile.h"
 #include "ProjectileMgr.h"
 

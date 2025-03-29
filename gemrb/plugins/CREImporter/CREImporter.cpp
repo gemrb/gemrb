@@ -30,8 +30,6 @@
 #include "RNG.h"
 #include "TableMgr.h"
 
-#include "GameScript/GameScript.h"
-
 #include <cassert>
 
 using namespace GemRB;

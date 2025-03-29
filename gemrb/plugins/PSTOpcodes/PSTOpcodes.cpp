@@ -18,8 +18,6 @@
  *
  */
 
-#include "strrefs.h"
-
 #include "EffectQueue.h"
 #include "Game.h"
 #include "GameData.h"
@@ -29,13 +27,11 @@
 #include "RNG.h"
 #include "ScriptedAnimation.h"
 #include "TableMgr.h"
-#include "TileMap.h"
 #include "VEFObject.h"
 
 #include "GUI/WindowManager.h"
 #include "GameScript/GSUtils.h"
 #include "Scriptable/Actor.h"
-#include "Video/Video.h" //for tints
 
 using namespace GemRB;
 

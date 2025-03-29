@@ -22,10 +22,8 @@
 
 #include "globals.h"
 
-#include "DataFileMgr.h"
 #include "GameData.h"
 #include "Interface.h"
-#include "MapMgr.h"
 #include "PluginMgr.h"
 #include "TableMgr.h"
 

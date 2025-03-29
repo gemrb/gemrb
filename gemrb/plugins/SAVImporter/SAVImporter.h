@@ -21,8 +21,6 @@
 #ifndef SAVIMPORTER_H
 #define SAVIMPORTER_H
 
-#include "globals.h"
-
 #include "ArchiveImporter.h"
 
 #include "Streams/DataStream.h"

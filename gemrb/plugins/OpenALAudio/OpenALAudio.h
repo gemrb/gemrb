@@ -20,7 +20,7 @@
 #ifndef H_OPENAL_AUDIO
 #define H_OPENAL_AUDIO
 
-#include "globals.h"
+#include "config.h"
 
 #include <utility>
 

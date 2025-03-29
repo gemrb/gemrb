@@ -22,7 +22,6 @@
 #define KEYIMP_H
 
 #include "PluginMgr.h"
-#include "Resource.h"
 #include "ResourceSource.h"
 
 #include "Plugins/IndexedArchive.h"
@@ -35,7 +34,6 @@
 namespace GemRB {
 
 class DataStream;
-class ResourceDesc;
 
 struct BIFEntry {
 	path_t name;

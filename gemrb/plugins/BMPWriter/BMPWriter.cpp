@@ -1,9 +1,5 @@
 #include "BMPWriter.h"
 
-#include "Video/Video.h"
-
-#include <cstring>
-
 using namespace GemRB;
 
 #define BMP_HEADER_SIZE 54 //FIXME: duplicate

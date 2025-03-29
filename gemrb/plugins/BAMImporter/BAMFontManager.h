@@ -21,10 +21,11 @@
 #ifndef GemRB_BAMFontManager_h
 #define GemRB_BAMFontManager_h
 
-#include "BAMImporter.h"
 #include "FontManager.h"
 
 namespace GemRB {
+
+class BAMImporter;
 
 class BAMFontManager : public FontManager {
 private:

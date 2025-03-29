@@ -20,8 +20,6 @@
 #ifndef MVEPLAY_H
 #define MVEPLAY_H
 
-#include "globals.h"
-
 #include "MoviePlayer.h"
 #include "gstmvedemux.h"
 

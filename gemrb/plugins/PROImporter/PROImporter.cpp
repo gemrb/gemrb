@@ -20,8 +20,6 @@
 
 #include "PROImporter.h"
 
-#include "EffectMgr.h"
-
 using namespace GemRB;
 
 PROImporter::~PROImporter(void)

@@ -21,8 +21,6 @@
 #ifndef BIFIMPORTER_H
 #define BIFIMPORTER_H
 
-#include "globals.h"
-
 #include "Plugins/IndexedArchive.h"
 #include "Streams/DataStream.h"
 

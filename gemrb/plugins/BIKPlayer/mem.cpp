@@ -26,9 +26,7 @@
 
 #include "common.h"
 
-#include <climits>
 #include <cstdlib>
-#include <cstring>
 
 /* You can redefine av_malloc and av_free in your project to use your
    memory allocator. You do not need to suppress this file because the

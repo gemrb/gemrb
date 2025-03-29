@@ -18,9 +18,7 @@
 
 #include "NullSource.h"
 
-#include "globals.h"
-
-#include "ResourceDesc.h"
+#include <utility>
 
 using namespace GemRB;
 
