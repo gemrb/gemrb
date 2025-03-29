@@ -28,11 +28,10 @@
 #ifndef DATASTREAM_H
 #define DATASTREAM_H
 
-#include "Platform.h"
-
 #include "Region.h"
 
-#include "Strings/StringConversion.h"
+#include "Strings/CString.h"
+#include "Strings/String.h"
 #include "System/VFS.h"
 #include "System/swab.h"
 

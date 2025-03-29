@@ -23,6 +23,7 @@
 #include "globals.h"
 
 #include "Logging/Logging.h"
+#include "Strings/StringConversion.h"
 #include "Video/Video.h"
 
 namespace GemRB {

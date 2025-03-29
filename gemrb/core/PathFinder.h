@@ -25,6 +25,8 @@
 #include "Region.h"
 #include "Resource.h"
 
+#include "Strings/StringConversion.h"
+
 #include <cstdint>
 #include <vector>
 
