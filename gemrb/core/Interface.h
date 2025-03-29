@@ -46,6 +46,7 @@
 #include "Audio/Playback.h"
 #include "GUI/Control.h"
 #include "GUI/Tooltip.h"
+#include "Strings/StringConversion.h"
 #include "Strings/StringMap.h"
 
 #include <string>

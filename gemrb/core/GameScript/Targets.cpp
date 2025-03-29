@@ -22,6 +22,7 @@
 #include "Targets.h"
 
 #include "GameScript/GSUtils.h"
+#include "Strings/StringConversion.h"
 
 namespace GemRB {
 

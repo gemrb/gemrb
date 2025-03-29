@@ -21,6 +21,7 @@
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/TextArea.h"
 #include "Logging/Loggers/Stdio.h"
+#include "Strings/StringConversion.h"
 
 #include <memory>
 
