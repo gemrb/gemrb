@@ -19,17 +19,17 @@
 
 #include "Scriptable/Door.h"
 
+#include "defsounds.h"
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "DisplayMessage.h"
-#include "Game.h"
-#include "GameData.h"
 #include "Interface.h"
-#include "Projectile.h"
+#include "Map.h"
 #include "TileMap.h"
 
-#include "GUI/GameControl.h"
-#include "GameScript/GSUtils.h"
+#include "GameScript/GameScript.h"
+#include "Scriptable/Actor.h"
 #include "Scriptable/InfoPoint.h"
 
 namespace GemRB {

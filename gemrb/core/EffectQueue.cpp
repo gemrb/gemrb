@@ -21,6 +21,7 @@
 #include "EffectQueue.h"
 
 #include "ie_feats.h"
+#include "ie_stats.h"
 #include "opcode_params.h"
 #include "overlays.h"
 #include "strrefs.h"

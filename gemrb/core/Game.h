@@ -33,9 +33,7 @@
 
 #include "Callback.h"
 
-#include "Scriptable/PCStatStruct.h"
 #include "Scriptable/Scriptable.h"
-#include "Video/Video.h"
 
 #include <array>
 #include <atomic>
@@ -46,7 +44,7 @@ namespace GemRB {
 class Actor;
 class Map;
 class Particles;
-class TableMgr;
+enum BlitFlags : uint32_t;
 
 //the size of the bestiary register
 #define BESTIARY_SIZE 260

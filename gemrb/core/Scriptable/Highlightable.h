@@ -20,6 +20,9 @@
 #ifndef H_HIGHLIGHTABLE
 #define H_HIGHLIGHTABLE
 
+#include "ie_cursors.h"
+#include "strrefs.h"
+
 #include "Scriptable.h"
 
 namespace GemRB {

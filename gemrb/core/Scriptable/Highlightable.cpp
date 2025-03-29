@@ -20,6 +20,7 @@
 #include "Highlightable.h"
 
 #include "defsounds.h"
+#include "ie_stats.h"
 
 #include "Interface.h"
 

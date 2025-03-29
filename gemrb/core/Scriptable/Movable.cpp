@@ -19,6 +19,8 @@
 
 #include "Movable.h"
 
+#include "ie_stats.h"
+
 #include "Actor.h"
 #include "Interface.h"
 #include "Map.h"

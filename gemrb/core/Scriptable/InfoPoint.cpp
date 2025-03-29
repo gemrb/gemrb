@@ -20,16 +20,14 @@
 #include "Scriptable/InfoPoint.h"
 
 #include "ie_cursors.h"
-#include "strrefs.h"
+#include "ie_stats.h"
 
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
-#include "TileMap.h"
 
-#include "GUI/GameControl.h"
-#include "GUI/TextSystem/TextContainer.h"
-#include "GameScript/GSUtils.h"
+#include "GameScript/GameScript.h"
+#include "Scriptable/Actor.h"
 
 namespace GemRB {
 

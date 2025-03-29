@@ -22,13 +22,13 @@
 #define MAP_H
 
 #include "exports.h"
-#include "globals.h"
 
 #include "Bitmap.h"
 #include "FogRenderer.h"
 #include "MapReverb.h"
 #include "PathFinder.h"
 #include "Polygon.h"
+#include "TableMgr.h"
 #include "WorldMap.h"
 
 #include "Scriptable/Scriptable.h"
@@ -36,25 +36,23 @@
 
 #include <unordered_map>
 
-template<class V>
-class FibonacciHeap;
-
 namespace GemRB {
 
 class Actor;
 class Ambient;
 class Animation;
-class Bitmap;
+class Container;
 class CREItem;
-class GameControl;
+class Door;
+class InfoPoint;
 class IniSpawn;
+class Movable;
 class Palette;
 class Particles;
 class Projectile;
 class ScriptedAnimation;
 class TileMap;
 class VEFObject;
-class WallPolygon;
 
 //distance of actors from spawn point
 #define SPAWN_RANGE 400

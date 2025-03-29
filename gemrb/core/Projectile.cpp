@@ -20,6 +20,8 @@
 
 #include "Projectile.h"
 
+#include "ie_stats.h"
+
 #include "AnimationFactory.h"
 #include "DisplayMessage.h"
 #include "Game.h"

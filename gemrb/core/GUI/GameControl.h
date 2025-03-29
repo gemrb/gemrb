@@ -32,6 +32,7 @@
 
 #include "Dialog.h"
 #include "Map.h"
+#include "Sprite2D.h"
 
 #include "GUI/Control.h"
 #include "GUI/GameControlDefs.h"
@@ -40,9 +41,11 @@
 
 namespace GemRB {
 
-class GameControl;
-class Window;
+class Container;
 class DialogHandler;
+class GameControl;
+class Movable;
+class Window;
 
 /**
  * @class GameControl

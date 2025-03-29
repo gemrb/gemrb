@@ -26,6 +26,8 @@
 
 namespace GemRB {
 
+enum BlitFlags : uint32_t;
+
 Dialog::~Dialog(void)
 {
 	for (auto& state : initialStates) {

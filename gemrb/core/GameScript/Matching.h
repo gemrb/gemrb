@@ -21,13 +21,18 @@
 #define MATCHING_H
 
 #include "exports.h"
-
-#include "GameScript/GameScript.h"
-#include "GameScript/Targets.h"
+#include "ie_types.h"
 
 namespace GemRB {
 
+class Action;
+class Actor;
+class Map;
+class Object;
+class Scriptable;
+class Targets;
 class TileMap;
+class Trigger;
 
 enum class GroupType {
 	Enemy,

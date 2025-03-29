@@ -23,6 +23,7 @@
 #include "Game.h"
 
 #include "defsounds.h"
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "DisplayMessage.h"

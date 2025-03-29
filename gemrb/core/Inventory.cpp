@@ -23,6 +23,7 @@
 
 #include "Inventory.h"
 
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "CharAnimations.h"

@@ -41,18 +41,18 @@
 
 #include "GameScript/GameScript.h"
 
-#include "Game.h"
+#include "ie_stats.h"
+
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
 #include "RNG.h"
+#include "SymbolMgr.h"
 #include "TableMgr.h"
 
 #include "GUI/GameControl.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
-
-#include <cstdarg>
 
 namespace GemRB {
 

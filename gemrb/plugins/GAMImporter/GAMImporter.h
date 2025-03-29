@@ -34,6 +34,8 @@ namespace GemRB {
 	#define GAM_VER_TOB   21
 	#define GAM_VER_IWD2  22
 
+class PCStatsStruct;
+
 class GAMImporter : public SaveGameMgr {
 private:
 	int version = 0;

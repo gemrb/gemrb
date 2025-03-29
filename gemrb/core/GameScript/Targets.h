@@ -27,7 +27,6 @@
 
 namespace GemRB {
 
-class Actor;
 class Object;
 
 struct targettype {

@@ -22,6 +22,8 @@
 
 #include "Spell.h"
 
+#include "ie_stats.h"
+
 #include "Game.h"
 #include "Interface.h"
 #include "Projectile.h"

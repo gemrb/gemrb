@@ -18,12 +18,13 @@
  *
  */
 
+#include "ie_stats.h"
+
 #include "DialogHandler.h"
 #include "Game.h"
 #include "Interface.h"
 
 #include "GUI/GameControl.h"
-#include "GameScript/GSUtils.h"
 #include "GameScript/GameScript.h"
 #include "GameScript/Matching.h"
 #include "GameScript/Targets.h"

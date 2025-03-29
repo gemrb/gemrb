@@ -25,6 +25,7 @@
  */
 
 #include "globals.h"
+#include "ie_stats.h"
 
 #include "Interface.h"
 

@@ -21,7 +21,7 @@
 #include "GameScript/GSUtils.h"
 
 #include "defsounds.h"
-#include "ie_feats.h"
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "CharAnimations.h"

@@ -24,7 +24,6 @@
 #include "exports.h"
 
 #include "Debug.h"
-#include "SymbolMgr.h"
 
 #include "GameScript/Targets.h"
 #include "Scriptable/Actor.h"
@@ -34,9 +33,6 @@
 #include <vector>
 
 namespace GemRB {
-
-class Action;
-class GameScript;
 
 //escapearea flags
 enum class EscapeArea {
