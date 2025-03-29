@@ -20,8 +20,6 @@
 
 #include "PVRZImporter.h"
 
-#include "RGBAColor.h"
-
 #include "Logging/Logging.h"
 #include "Video/Video.h"
 

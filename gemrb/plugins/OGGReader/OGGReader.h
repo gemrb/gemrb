@@ -21,10 +21,7 @@
 
 #include "SoundMgr.h"
 
-#include "Streams/DataStream.h"
-
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #if defined __APPLE_CC__ || defined __MINGW64__
 	#define OV_EXCLUDE_STATIC_CALLBACKS

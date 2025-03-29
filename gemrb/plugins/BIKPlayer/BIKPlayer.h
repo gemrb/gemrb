@@ -21,8 +21,6 @@
 #ifndef BIKPLAYER_H
 #define BIKPLAYER_H
 
-#include "globals.h"
-
 #include "MoviePlayer.h"
 
 #include "Audio/AudioBackend.h"

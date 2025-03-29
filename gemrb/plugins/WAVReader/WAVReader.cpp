@@ -18,7 +18,6 @@
 
 #include "WAVReader.h"
 
-#include <utility>
 #include <vector>
 
 using namespace GemRB;

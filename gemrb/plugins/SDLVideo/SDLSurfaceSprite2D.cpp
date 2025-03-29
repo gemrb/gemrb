@@ -21,7 +21,6 @@
 #include "SDLSurfaceSprite2D.h"
 
 #include "SDLPixelIterator.h"
-#include "SDLSurfaceDrawing.h"
 #include "SDLVideo.h"
 
 #include "Logging/Logging.h"

@@ -37,7 +37,6 @@
 #include "ScriptedAnimation.h"
 #include "Spell.h" //needed for fx_cast_spell feedback
 #include "TileMap.h" //needs for knock!
-#include "VEFObject.h"
 #include "damages.h"
 
 #include "GUI/GameControl.h"

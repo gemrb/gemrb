@@ -20,8 +20,6 @@
 
 #include "KEYImporter.h"
 
-#include "globals.h"
-
 #include "Interface.h"
 #include "ResourceDesc.h"
 

@@ -28,11 +28,12 @@
 #ifndef ITEMMGR_H
 #define ITEMMGR_H
 
-#include "Item.h"
 #include "Plugin.h"
 #include "TableMgr.h"
 
 namespace GemRB {
+
+class Item;
 
 /**
  * @class ItemMgr

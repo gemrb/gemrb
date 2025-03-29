@@ -21,9 +21,6 @@
 #include "PNGImporter.h"
 
 #include "RGBAColor.h"
-#include "globals.h"
-
-#include "ImageFactory.h"
 
 #include "Video/Video.h"
 

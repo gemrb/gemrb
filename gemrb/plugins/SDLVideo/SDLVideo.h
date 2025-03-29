@@ -21,8 +21,6 @@
 #ifndef SDLVIDEODRIVER_H
 #define SDLVIDEODRIVER_H
 
-#include "DPadSoftKeyboard.h"
-#include "SDLSurfaceDrawing.h"
 #include "SDLSurfaceSprite2D.h"
 
 #include "GUI/EventMgr.h"

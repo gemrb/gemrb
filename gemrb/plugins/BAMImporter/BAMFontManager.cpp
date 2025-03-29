@@ -20,7 +20,7 @@
 
 #include "BAMFontManager.h"
 
-#include "Palette.h"
+#include "BAMImporter.h"
 #include "Sprite2D.h"
 
 using namespace GemRB;

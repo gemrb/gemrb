@@ -26,8 +26,6 @@
 #include "Inventory.h"
 #include "PluginMgr.h"
 
-#include "GameScript/GameScript.h"
-
 using namespace GemRB;
 
 STOImporter::~STOImporter(void)

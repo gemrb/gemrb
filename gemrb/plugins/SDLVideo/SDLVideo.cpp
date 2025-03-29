@@ -21,7 +21,7 @@
 #include "SDLVideo.h"
 
 #include "Interface.h"
-#include "SDLPixelIterator.h"
+#include "SDLSurfaceDrawing.h"
 
 #include "Video/RLE.h"
 

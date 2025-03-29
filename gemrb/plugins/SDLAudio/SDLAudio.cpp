@@ -21,13 +21,12 @@
 #include "SDLAudio.h"
 
 #include "ChannelManager.h"
-#include "Interface.h"
+#include "Geometry.h"
 #include "SoundMgr.h"
 
 #include "Logging/Logging.h"
 
 #include <SDL.h>
-#include <chrono>
 
 namespace GemRB {
 

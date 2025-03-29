@@ -26,8 +26,6 @@
 #include "Streams/DataStream.h"
 
 #include <cstdio>
-#include <cstdlib>
-#include <cstring>
 
 namespace GemRB {
 

@@ -21,11 +21,8 @@
 #ifndef P2DAIMPORTER_H
 #define P2DAIMPORTER_H
 
-#include "globals.h"
-
 #include "TableMgr.h"
 
-#include <cstring>
 #include <vector>
 
 namespace GemRB {

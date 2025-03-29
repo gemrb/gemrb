@@ -21,9 +21,6 @@
 #ifndef STOIMPORTER_H
 #define STOIMPORTER_H
 
-#include "ie_types.h"
-
-#include "Store.h"
 #include "StoreMgr.h"
 
 namespace GemRB {
