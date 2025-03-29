@@ -21,11 +21,11 @@
 #ifndef RESOURCEMANGER_H
 #define RESOURCEMANGER_H
 
+#include "SClassID.h"
 #include "exports.h"
 
 #include "Holder.h"
 #include "Resource.h"
-#include "ResourceSource.h"
 
 #include "System/VFS.h"
 

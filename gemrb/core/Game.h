@@ -32,7 +32,6 @@
 #include "ie_types.h"
 
 #include "Callback.h"
-#include "Resource.h"
 
 #include "Scriptable/PCStatStruct.h"
 #include "Scriptable/Scriptable.h"

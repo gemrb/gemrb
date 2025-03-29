@@ -46,6 +46,7 @@
 #include "PluginMgr.h"
 #include "ProjectileServer.h"
 #include "RNG.h"
+#include "ResourceSource.h"
 #include "SaveGameIterator.h"
 #include "SaveGameMgr.h"
 #include "ScriptedAnimation.h"
