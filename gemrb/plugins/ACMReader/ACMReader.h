@@ -21,14 +21,11 @@
 
 #include "SoundMgr.h"
 #include "decoder.h"
-#include "general.h"
 #include "unpacker.h"
 
 #include "Streams/DataStream.h"
 
-#include <cstdio>
 #include <cstdlib>
-#include <cstring>
 
 namespace GemRB {
 

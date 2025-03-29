@@ -30,7 +30,6 @@
 
 #include "SClassID.h"
 #include "exports.h"
-#include "globals.h"
 
 #include "DataStream.h"
 

@@ -21,11 +21,7 @@
 #ifndef SOUNDMGR_H
 #define SOUNDMGR_H
 
-#include "ie_types.h"
-
 #include "Resource.h"
-
-#include "Streams/DataStream.h"
 
 namespace GemRB {
 

@@ -26,7 +26,7 @@
 
 #include "globals.h"
 
-#include "Streams/FileStream.h"
+#include "Streams/DataStream.h"
 #include "Strings/String.h"
 
 namespace GemRB {

@@ -25,10 +25,10 @@
 #include "Interface.h"
 
 #include "Logging/Logging.h"
+#include "Streams/FileStream.h"
 
 #include <algorithm>
 #include <cassert>
-#include <cstdio>
 
 using namespace GemRB;
 

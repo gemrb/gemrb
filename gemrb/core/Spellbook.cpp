@@ -30,8 +30,6 @@
 
 #include "Scriptable/Actor.h"
 
-#include <cstdio>
-
 namespace GemRB {
 
 static bool SBInitialized = false;
