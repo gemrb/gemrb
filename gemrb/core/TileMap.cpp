@@ -27,7 +27,6 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 #include "Scriptable/TileObject.h"
-#include "Video/Video.h"
 
 namespace GemRB {
 

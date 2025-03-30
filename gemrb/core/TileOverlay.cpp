@@ -21,7 +21,6 @@
 #include "TileOverlay.h"
 
 #include "Game.h" // for GetGlobalTint
-#include "GlobalTimer.h"
 #include "Interface.h"
 
 namespace GemRB {
