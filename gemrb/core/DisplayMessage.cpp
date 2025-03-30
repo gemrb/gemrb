@@ -28,6 +28,7 @@
 #include "GUI/GameControl.h"
 #include "GUI/Label.h"
 #include "GUI/TextArea.h"
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {

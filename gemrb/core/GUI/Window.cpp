@@ -25,6 +25,7 @@
 #include "WindowManager.h"
 
 #include "GUI/GUIScriptInterface.h"
+#include "Logging/Logging.h"
 
 #include <utility>
 

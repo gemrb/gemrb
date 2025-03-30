@@ -27,6 +27,7 @@
 #include "Projectile.h"
 #include "ProjectileServer.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {

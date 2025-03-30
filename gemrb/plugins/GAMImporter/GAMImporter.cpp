@@ -28,6 +28,7 @@
 #include "PluginMgr.h"
 #include "TableMgr.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 #include "Scriptable/PCStatStruct.h"
 #include "Streams/SlicedStream.h"

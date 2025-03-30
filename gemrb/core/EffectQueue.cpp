@@ -32,12 +32,14 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Map.h"
+#include "Region.h"
 #include "Spell.h" //needs for the source flags bitfield
 #include "SymbolMgr.h"
 #include "TableMgr.h"
 
 #include "GameScript/GSUtils.h" // for DiffCore
 #include "GameScript/GameScript.h" // only for ID_Allegiance
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {

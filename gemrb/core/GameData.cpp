@@ -43,6 +43,7 @@
 #include "StoreMgr.h"
 #include "VEFObject.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 #include "Streams/FileStream.h"
 

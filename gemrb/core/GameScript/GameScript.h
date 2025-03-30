@@ -26,6 +26,7 @@
 #include "Debug.h"
 
 #include "GameScript/Targets.h"
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 #include "Streams/DataStream.h"
 

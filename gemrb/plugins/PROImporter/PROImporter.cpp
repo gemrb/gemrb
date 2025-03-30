@@ -20,6 +20,8 @@
 
 #include "PROImporter.h"
 
+#include "Logging/Logging.h"
+
 using namespace GemRB;
 
 PROImporter::~PROImporter(void)

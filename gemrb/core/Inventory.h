@@ -32,13 +32,14 @@
 #include "ie_types.h"
 #include "strrefs.h"
 
-#include "Item.h" //needs item for itmextheader
 #include "Store.h"
 
 #include <vector>
 
 namespace GemRB {
 
+class ITMExtHeader;
+class Item;
 class Map;
 
 //AddSlotItem return values

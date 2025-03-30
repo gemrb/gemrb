@@ -30,6 +30,7 @@
 #include "TileMap.h"
 
 #include "GameScript/GameScript.h"
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {

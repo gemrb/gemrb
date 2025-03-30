@@ -22,6 +22,7 @@
 #define CONTAINER_H
 
 #include "Inventory.h"
+#include "Sprite2D.h"
 
 #include "GUI/GameControlDefs.h"
 #include "Scriptable/Highlightable.h"

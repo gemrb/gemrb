@@ -39,6 +39,7 @@
 
 #include "Audio/Ambient.h"
 #include "GameScript/GameScript.h"
+#include "Logging/Logging.h"
 #include "Plugins/TileMapMgr.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"

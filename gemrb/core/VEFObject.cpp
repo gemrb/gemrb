@@ -22,15 +22,17 @@
 
 #include "VEFObject.h"
 
+#include "RGBAColor.h"
+
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "Orientation.h"
 #include "ScriptedAnimation.h"
 #include "TableMgr.h"
 
 #include "Logging/Logging.h"
 #include "Streams/DataStream.h"
-#include "Video/Video.h"
 
 namespace GemRB {
 
