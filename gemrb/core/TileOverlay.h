@@ -25,8 +25,6 @@
 
 #include "Tile.h"
 
-#include "Video/Video.h"
-
 #include <vector>
 
 namespace GemRB {

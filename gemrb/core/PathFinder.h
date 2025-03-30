@@ -20,8 +20,7 @@
 #ifndef PATHFINDER_H
 #define PATHFINDER_H
 
-#include "EnumFlags.h"
-#include "Orientation.h"
+#include "Orientation.h" // only for orient_t, since it's not an enum class'
 #include "Region.h"
 
 #include "Strings/StringConversion.h"

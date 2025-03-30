@@ -23,9 +23,8 @@
 
 #include "exports.h"
 
+#include "Polygon.h"
 #include "TileOverlay.h"
-
-#include "Scriptable/Door.h"
 
 namespace GemRB {
 
@@ -33,6 +32,8 @@ namespace GemRB {
 #define IE_CONTAINER_PILE 4
 
 class Container;
+class Door;
+class DoorTrigger;
 class InfoPoint;
 class TileObject;
 

@@ -19,9 +19,8 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include "RGBAColor.h"
 #include "exports.h"
-#include "globals.h"
+#include "ie_types.h"
 
 #include "Region.h"
 
