@@ -32,13 +32,13 @@
 #include "globals.h"
 #include "ie_types.h"
 
+#include "CharAnimations.h"
 #include "Region.h"
 
 #include <memory>
 
 namespace GemRB {
 
-class CharAnimations;
 class Scriptable;
 
 //global phase for the while spark structure

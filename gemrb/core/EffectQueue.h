@@ -31,9 +31,6 @@
 #include "exports.h"
 
 #include "Effect.h"
-#include "Region.h"
-
-#include "Logging/Logging.h"
 
 #include <cstdlib>
 #include <list>

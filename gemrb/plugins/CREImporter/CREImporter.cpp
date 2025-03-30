@@ -30,6 +30,7 @@
 #include "RNG.h"
 #include "TableMgr.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 #include <cassert>

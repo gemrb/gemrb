@@ -20,23 +20,21 @@
 #ifndef VEFOBJECT_H
 #define VEFOBJECT_H
 
-#include "RGBAColor.h"
 #include "SClassID.h"
 #include "exports.h"
 #include "ie_types.h"
 
-#include "Orientation.h"
 #include "Region.h"
+#include "Sprite2D.h" // for BlitFlags until they become an enum class
 
-#include "Video/Video.h"
-
-#include <cstdint>
 #include <vector>
 
 namespace GemRB {
 
 class DataStream;
+class Region;
 class ScriptedAnimation;
+struct Color;
 
 enum class VEFTypes { INVALID = -1,
 		      BAM,

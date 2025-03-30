@@ -26,6 +26,8 @@
 #include "SymbolMgr.h"
 #include "TableMgr.h" //needed for autotable
 
+#include "Logging/Logging.h"
+
 #include <map>
 
 using namespace GemRB;

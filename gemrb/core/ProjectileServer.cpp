@@ -26,6 +26,8 @@
 #include "ProjectileMgr.h"
 #include "SymbolMgr.h"
 
+#include "Logging/Logging.h"
+
 namespace GemRB {
 
 //////////////////////////////////////////////////////////////////////

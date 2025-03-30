@@ -35,6 +35,7 @@
 #include "Map.h"
 
 #include "GameScript/GSUtils.h"
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 #include "fmt/ranges.h"
 

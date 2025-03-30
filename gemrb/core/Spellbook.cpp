@@ -24,10 +24,9 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
-#include "Projectile.h"
 #include "Spell.h"
-#include "TableMgr.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {

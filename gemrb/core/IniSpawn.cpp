@@ -27,6 +27,7 @@
 #include "ie_stats.h"
 
 #include "CharAnimations.h"
+#include "DataFileMgr.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -37,6 +38,7 @@
 #include "GUI/GameControl.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {

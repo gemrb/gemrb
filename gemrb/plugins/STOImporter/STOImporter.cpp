@@ -26,6 +26,8 @@
 #include "Inventory.h"
 #include "PluginMgr.h"
 
+#include "Logging/Logging.h"
+
 using namespace GemRB;
 
 STOImporter::~STOImporter(void)
