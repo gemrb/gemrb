@@ -31,10 +31,8 @@
 namespace GemRB {
 
 class Font;
-class Palette;
 class Sprite2D;
 class ContentContainer;
-class TextContainer;
 
 struct LayoutRegion {
 	Region region;
