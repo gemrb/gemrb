@@ -27,6 +27,8 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
+#include "ie_types.h"
+
 #include "Plugin.h"
 
 #include "Strings/CString.h"

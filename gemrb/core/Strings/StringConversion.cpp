@@ -18,8 +18,6 @@
 
 #include "StringConversion.h"
 
-#include "ie_types.h"
-
 #include "Iconv.h"
 #include "Interface.h"
 

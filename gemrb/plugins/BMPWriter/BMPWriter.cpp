@@ -1,5 +1,7 @@
 #include "BMPWriter.h"
 
+#include "ie_types.h"
+
 using namespace GemRB;
 
 #define BMP_HEADER_SIZE 54 //FIXME: duplicate
