@@ -33,7 +33,6 @@
 #define FONT_H
 
 #include "exports.h"
-#include "globals.h"
 
 #include "SpriteSheet.h"
 

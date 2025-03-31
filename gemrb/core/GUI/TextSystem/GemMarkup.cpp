@@ -18,6 +18,8 @@
 
 #include "GemMarkup.h"
 
+#include "TextContainer.h"
+
 #include <codecvt>
 
 namespace GemRB {
