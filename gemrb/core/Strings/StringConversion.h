@@ -19,9 +19,6 @@
 #ifndef STRING_CONV_H
 #define STRING_CONV_H
 
-#include "ie_types.h"
-
-#include "CString.h"
 #include "String.h"
 #include "StringView.h"
 

@@ -23,18 +23,14 @@
 
 #include "System/VFS.h"
 
-#include "globals.h"
-
 #include "Interface.h"
 
 #include "Logging/Logging.h"
 #include "Strings/UTF8Comparison.h"
 
-#include <cctype>
 #include <cerrno>
-#include <cstdarg>
 #include <cstring>
-#include <locale>
+#include <sys/stat.h>
 
 #ifdef WIN32
 	// that's a workaround to live with `NOUSER` in `win32def.h`
