@@ -25,6 +25,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "Polygon.h"
 
 #include "GameScript/GameScript.h"
 #include "Scriptable/Actor.h"

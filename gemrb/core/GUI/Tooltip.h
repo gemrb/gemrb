@@ -23,7 +23,6 @@
 #include "Region.h"
 
 #include "GUI/TextSystem/Font.h"
-#include "Video/Video.h"
 
 namespace GemRB {
 
