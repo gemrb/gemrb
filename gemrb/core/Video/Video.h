@@ -29,18 +29,15 @@
 
 #include "globals.h"
 
-#include "EnumFlags.h"
-#include "Pixels.h"
 #include "Plugin.h"
-#include "Polygon.h"
 #include "Sprite2D.h"
 
-#include <algorithm>
 #include <deque>
 
 namespace GemRB {
 
 class EventMgr;
+class Gem_Polygon;
 class Palette;
 
 class GEM_EXPORT VideoBuffer {

@@ -21,6 +21,7 @@
 #include "Video.h"
 
 #include "Palette.h"
+#include "Polygon.h"
 #include "Sprite2D.h"
 
 #include <cmath>

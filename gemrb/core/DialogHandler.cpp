@@ -36,7 +36,6 @@
 #include "GUI/TextArea.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/GameScript.h"
-#include "Video/Video.h"
 
 namespace GemRB {
 
