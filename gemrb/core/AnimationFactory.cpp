@@ -21,7 +21,6 @@
 #include "AnimationFactory.h"
 
 #include "Interface.h"
-#include "Sprite2D.h"
 
 namespace GemRB {
 

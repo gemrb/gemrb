@@ -54,7 +54,6 @@
 #include "ScriptedAnimation.h"
 #include "SymbolMgr.h"
 #include "TileMap.h"
-#include "Timer.h"
 #include "WorldMapMgr.h"
 
 #include "GUI/EventMgr.h"

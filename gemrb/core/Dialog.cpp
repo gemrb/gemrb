@@ -23,6 +23,7 @@
 #include "RNG.h"
 
 #include "GameScript/GameScript.h"
+#include "Scriptable/Scriptable.h"
 
 namespace GemRB {
 

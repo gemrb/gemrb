@@ -24,6 +24,7 @@
 #include "../../core/Interface.h"
 #include "../../core/InterfaceConfig.h"
 #include "../../core/Logging/Loggers/Stdio.h"
+#include "../../core/Logging/Logging.h"
 #include "../../core/Map.h"
 #include "../../core/PluginMgr.h"
 #include "../../core/SaveGameMgr.h"

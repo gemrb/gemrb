@@ -27,7 +27,6 @@
 
 #include <cassert>
 #include <chrono>
-#include <climits>
 
 namespace GemRB {
 

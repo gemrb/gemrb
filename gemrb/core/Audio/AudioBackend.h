@@ -20,13 +20,10 @@
 #ifndef H_AUDIO_BACKEND
 #define H_AUDIO_BACKEND
 
-#include "globals.h"
-
 #include "Holder.h"
 #include "MapReverb.h"
 #include "PlaybackConfig.h"
 #include "Plugin.h"
-#include "Region.h"
 #include "SoundMgr.h"
 
 namespace GemRB {
