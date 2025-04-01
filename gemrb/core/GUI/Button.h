@@ -41,9 +41,6 @@
 
 namespace GemRB {
 
-class SpriteAnimation;
-class Palette;
-
 #define IE_GUI_BUTTON_NO_IMAGE    0x00000001 // don't draw image (BAM)
 #define IE_GUI_BUTTON_PICTURE     0x00000002 // draw picture (BMP, MOS, ...)
 #define IE_GUI_BUTTON_SOUND       0x00000004

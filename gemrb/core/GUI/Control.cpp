@@ -25,13 +25,13 @@
 #include "Debug.h"
 #include "Interface.h"
 #include "Sprite2D.h"
+#include "Timer.h"
 
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/Window.h"
 #include "Logging/Logging.h"
 
 #include <cstdio>
-#include <cstring>
 
 namespace GemRB {
 

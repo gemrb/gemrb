@@ -21,8 +21,6 @@
 
 #include "ie_cursors.h"
 #include "ie_stats.h"
-#include "opcode_params.h"
-#include "strrefs.h"
 
 #include "CharAnimations.h"
 #include "DialogHandler.h"
@@ -31,9 +29,9 @@
 #include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
-#include "ImageMgr.h"
 #include "Interface.h"
 #include "KeyMap.h"
+#include "Map.h"
 #include "PathFinder.h"
 #include "RNG.h"
 #include "ScriptEngine.h"
@@ -52,7 +50,6 @@
 #include "fmt/ranges.h"
 
 #include <array>
-#include <cmath>
 
 namespace GemRB {
 

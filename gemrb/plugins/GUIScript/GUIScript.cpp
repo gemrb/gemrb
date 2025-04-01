@@ -42,6 +42,7 @@
 #include "SaveGameIterator.h"
 #include "Spell.h"
 #include "TileMap.h"
+#include "Timer.h"
 #include "WorldMap.h"
 
 #include "GUI/Button.h"

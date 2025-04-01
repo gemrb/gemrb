@@ -20,6 +20,9 @@
 
 #include "GUIFactory.h"
 
+#include "GUIScriptInterface.h"
+#include "WindowManager.h"
+
 #include "Logging/Logging.h"
 
 namespace GemRB {

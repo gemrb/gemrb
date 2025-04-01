@@ -39,13 +39,10 @@
 #define IE_GUI_VIEW        254 // gemrb extension
 #define IE_GUI_INVALID     255
 
-#include "RGBAColor.h"
 #include "exports.h"
 #include "globals.h"
 
-#include "Callback.h"
-#include "Timer.h"
-
+#include "GUI/EventMgr.h"
 #include "GUI/View.h"
 
 #include <limits>
@@ -55,6 +52,7 @@ namespace GemRB {
 
 class Control;
 class Sprite2D;
+class Timer;
 
 #define ACTION_CAST(a) \
 	static_cast<Control::Action>(a)

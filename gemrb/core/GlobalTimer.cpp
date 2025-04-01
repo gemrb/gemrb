@@ -22,6 +22,7 @@
 
 #include "Game.h"
 #include "Interface.h"
+#include "Map.h"
 #include "RNG.h"
 
 #include "GUI/GameControl.h"

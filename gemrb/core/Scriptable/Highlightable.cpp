@@ -23,6 +23,7 @@
 #include "ie_stats.h"
 
 #include "Interface.h"
+#include "Map.h"
 
 #include "GUI/GameControl.h"
 #include "GameScript/GSUtils.h"

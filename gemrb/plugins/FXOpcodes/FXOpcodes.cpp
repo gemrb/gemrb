@@ -31,6 +31,7 @@
 #include "GameData.h"
 #include "GlobalTimer.h"
 #include "Interface.h"
+#include "Map.h"
 #include "PolymorphCache.h" // fx_polymorph
 #include "Projectile.h" //needs for clearair
 #include "ProjectileServer.h"

@@ -27,7 +27,6 @@
 #ifndef LABEL_H
 #define LABEL_H
 
-#include "RGBAColor.h"
 #include "exports.h"
 
 #include "GUI/Control.h"
@@ -35,7 +34,7 @@
 
 namespace GemRB {
 
-class Palette;
+struct Color;
 
 /**
  * @class Label

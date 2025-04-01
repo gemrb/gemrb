@@ -23,6 +23,7 @@
 #include "Interface.h"
 #include "Sprite2D.h"
 
+#include "GUI/EventMgr.h"
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/TextSystem/Font.h"
 #include "Video/Video.h"

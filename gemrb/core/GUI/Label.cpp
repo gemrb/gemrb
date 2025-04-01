@@ -20,11 +20,9 @@
 
 #include "GUI/Label.h"
 
-#include "GameData.h"
-#include "Interface.h"
-#include "Sprite2D.h"
+#include "RGBAColor.h"
 
-#include "GUI/Window.h"
+#include "Interface.h"
 
 namespace GemRB {
 

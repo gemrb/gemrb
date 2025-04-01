@@ -22,11 +22,10 @@
 
 #include "globals.h"
 
+#include "Callback.h" // for ViewInterfaces.h needs
 #include "Holder.h"
 #include "Region.h"
 #include "ScriptEngine.h"
-
-#include "GUI/EventMgr.h"
 
 #include <list>
 #include <memory>
@@ -37,6 +36,12 @@ namespace GemRB {
 class Sprite2D;
 class ViewScriptingRef;
 class Window;
+struct ControllerEvent;
+struct GestureEvent;
+struct KeyboardEvent;
+struct MouseEvent;
+struct TextEvent;
+struct TouchEvent;
 
 class GEM_EXPORT View {
 public:

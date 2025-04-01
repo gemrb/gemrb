@@ -19,9 +19,6 @@
 
 #include "GUIAnimation.h"
 
-#include "Interface.h"
-#include "RNG.h"
-
 namespace GemRB {
 
 // so far everything we need uses this cycle

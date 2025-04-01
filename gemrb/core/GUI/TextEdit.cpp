@@ -26,7 +26,6 @@
 #include "Sprite2D.h"
 
 #include "GUI/EventMgr.h"
-#include "GUI/Window.h"
 
 namespace GemRB {
 

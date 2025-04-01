@@ -21,8 +21,7 @@
 #include "ScrollBar.h"
 
 #include "GUI/EventMgr.h"
-#include "GUI/TextArea.h"
-#include "GUI/Window.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 

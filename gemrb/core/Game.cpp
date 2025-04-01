@@ -30,6 +30,7 @@
 #include "GameData.h"
 #include "IniSpawn.h"
 #include "Interface.h"
+#include "Map.h"
 #include "MapMgr.h"
 #include "MusicMgr.h"
 #include "Particles.h"

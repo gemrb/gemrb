@@ -27,13 +27,14 @@
 #define GUIFACTORY_H
 
 #include "Plugin.h"
+#include "ScriptEngine.h"
 
-#include "GUI/GUIScriptInterface.h"
-#include "GUI/WindowManager.h"
+#include "GUI/Window.h"
 
 namespace GemRB {
 
 class Window;
+class WindowManager;
 
 // Abstract loader for GUI windows (and controls with them).
 class GEM_EXPORT GUIFactory : public ImporterBase {

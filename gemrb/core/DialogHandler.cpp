@@ -28,6 +28,7 @@
 #include "GlobalTimer.h"
 #include "ImageMgr.h"
 #include "Interface.h"
+#include "Map.h"
 #include "PluginMgr.h"
 #include "ScriptEngine.h"
 #include "TableMgr.h"

@@ -28,6 +28,7 @@
 #include "Window.h"
 
 #include "GUI/GUIFactory.h"
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/GameControl.h"
 
 #define WIN_IT(w) \

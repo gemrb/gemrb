@@ -29,7 +29,6 @@
 
 #include "GUI/EventMgr.h"
 #include "GUI/TextSystem/Font.h"
-#include "GUI/Window.h"
 
 namespace GemRB {
 

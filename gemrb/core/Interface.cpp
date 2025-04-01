@@ -40,6 +40,7 @@
 #include "FontManager.h"
 #include "Game.h"
 #include "KeyMap.h"
+#include "Map.h"
 #include "MapMgr.h"
 #include "MoviePlayer.h"
 #include "MusicMgr.h"
@@ -53,6 +54,7 @@
 #include "ScriptedAnimation.h"
 #include "SymbolMgr.h"
 #include "TileMap.h"
+#include "Timer.h"
 #include "WorldMapMgr.h"
 
 #include "GUI/EventMgr.h"

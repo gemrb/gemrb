@@ -36,7 +36,6 @@ namespace GemRB {
 
 class Font;
 class WMPAreaEntry;
-class WorldMapControl;
 
 /**
  * @class WorldMapControl

@@ -27,6 +27,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "Map.h"
 #include "Projectile.h"
 #include "Spell.h"
 
