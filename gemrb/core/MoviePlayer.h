@@ -28,18 +28,19 @@
 #ifndef MOVIEPLAYER_H
 #define MOVIEPLAYER_H
 
-#include "globals.h"
-
 #include "Resource.h"
 
 #include "GUI/TextSystem/Font.h"
-#include "GUI/Window.h"
+#include "GUI/View.h"
 #include "Strings/String.h"
 #include "Video/Video.h"
 
 #include <chrono>
 
 namespace GemRB {
+
+class Window;
+struct KeyboardEvent;
 
 /**
  * @class MoviePlayer
@@ -126,20 +127,7 @@ private:
 	// currently dont have any real controls
 	void DrawSelf(const Region& /*drawFrame*/, const Region& /*clip*/) override {}
 
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/) override
-	{
-		KeyboardKey keycode = Key.keycode;
-		switch (keycode) {
-			case 's':
-				player.EnableSubtitles(!player.SubtitlesEnabled());
-				break;
-			default:
-				player.Stop();
-				break;
-		}
-
-		return true;
-	}
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/) override;
 
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override
 	{

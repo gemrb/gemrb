@@ -33,8 +33,6 @@
 
 namespace GemRB {
 
-class Point;
-
 using ScriptingId = uint64_t;
 using ScriptingClassId = std::string;
 using ScriptingGroup_t = FixedSizeString<15, strnicmp>;

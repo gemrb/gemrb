@@ -24,7 +24,6 @@
 
 #include "GameData.h"
 
-#include "Logging/Logging.h"
 #include "Streams/DataStream.h"
 
 namespace GemRB {

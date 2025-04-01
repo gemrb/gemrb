@@ -19,14 +19,11 @@
 
 #include "DialogHandler.h"
 
-#include "strrefs.h"
-
+#include "Dialog.h"
 #include "DialogMgr.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
-#include "GlobalTimer.h"
-#include "ImageMgr.h"
 #include "Interface.h"
 #include "Map.h"
 #include "PluginMgr.h"
@@ -35,7 +32,6 @@
 
 #include "GUI/GameControl.h"
 #include "GUI/TextArea.h"
-#include "GameScript/GSUtils.h"
 #include "GameScript/GameScript.h"
 
 namespace GemRB {

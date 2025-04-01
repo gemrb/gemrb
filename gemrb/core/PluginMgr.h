@@ -29,7 +29,6 @@
 
 #include "SClassID.h" // For PluginID
 #include "exports.h"
-#include "globals.h"
 
 #include "Plugin.h"
 #include "ResourceDesc.h"

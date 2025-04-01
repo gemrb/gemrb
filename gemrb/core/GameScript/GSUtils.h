@@ -23,12 +23,10 @@
 #include "exports.h"
 
 #include "Cache.h"
-//#include "Polygon.h"
 #include "SymbolMgr.h"
 
 #include "GameScript/GameScript.h"
 #include "GameScript/Matching.h"
-//#include "GUI/EventMgr.h"
 
 namespace GemRB {
 

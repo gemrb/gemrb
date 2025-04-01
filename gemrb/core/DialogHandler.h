@@ -23,14 +23,15 @@
 
 #include "exports.h"
 
-#include "Dialog.h"
 #include "Game.h"
 
 #include "Scriptable/Scriptable.h"
 
 namespace GemRB {
 
-class Control;
+class Dialog;
+struct DialogState;
+struct DialogTransition;
 
 class GEM_EXPORT DialogHandler {
 public:

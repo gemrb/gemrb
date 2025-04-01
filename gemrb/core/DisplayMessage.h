@@ -32,12 +32,13 @@
 #include "strrefs.h"
 
 #include "EnumIndex.h"
-#include "StringMgr.h"
 
 #include <map>
 #include <string>
 
 namespace GemRB {
+
+enum class STRING_FLAGS : uint32_t;
 
 /** 
  * Indices for externalized GUI colors in colors.2da

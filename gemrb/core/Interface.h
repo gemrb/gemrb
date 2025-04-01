@@ -38,6 +38,7 @@
 #include "SaveGameAREExtractor.h"
 #include "StringMgr.h"
 #include "TableMgr.h"
+#include "Timer.h"
 
 #include "Audio/AmbientMgr.h"
 #include "Audio/AudioBackend.h"
@@ -56,7 +57,6 @@
 namespace GemRB {
 
 class Actor;
-class Audio;
 class CREItem;
 class Calendar;
 class Container;
@@ -64,7 +64,6 @@ class DataFileMgr;
 struct Effect;
 class EffectQueue;
 class EffectDesc;
-class Factory;
 class FogRenderer;
 class Font;
 class Game;
@@ -74,13 +73,10 @@ class KeyMap;
 class Label;
 class Map;
 class MusicMgr;
-class Palette;
 class ProjectileServer;
 class SaveGame;
 class SaveGameIterator;
 class ScriptEngine;
-class SoundHandle;
-class Spell;
 class Sprite2D;
 class Store;
 class SymbolMgr;

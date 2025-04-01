@@ -30,7 +30,6 @@
 #include "Interface.h"
 #include "Map.h"
 #include "PluginMgr.h"
-#include "SaveGameMgr.h"
 #include "Sprite2D.h"
 #include "TableMgr.h"
 
