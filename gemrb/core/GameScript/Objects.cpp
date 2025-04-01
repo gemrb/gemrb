@@ -23,6 +23,7 @@
 #include "DialogHandler.h"
 #include "Game.h"
 #include "Interface.h"
+#include "Map.h"
 
 #include "GUI/GameControl.h"
 #include "GameScript/GameScript.h"

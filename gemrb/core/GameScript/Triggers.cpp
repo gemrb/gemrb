@@ -25,6 +25,7 @@
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "Map.h"
 #include "Polygon.h"
 #include "TableMgr.h"
 

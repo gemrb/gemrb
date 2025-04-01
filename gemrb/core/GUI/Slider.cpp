@@ -22,8 +22,6 @@
 
 #include "Interface.h"
 
-#include "GUI/Window.h"
-
 namespace GemRB {
 
 Slider::Slider(const Region& frame, Point pos,

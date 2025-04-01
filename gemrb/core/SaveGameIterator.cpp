@@ -28,6 +28,7 @@
 #include "ImageMgr.h"
 #include "ImageWriter.h"
 #include "Interface.h"
+#include "Map.h"
 #include "PluginMgr.h"
 #include "SaveGameMgr.h"
 #include "Sprite2D.h"

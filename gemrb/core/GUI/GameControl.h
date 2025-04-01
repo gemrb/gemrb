@@ -30,11 +30,11 @@
 #include "exports.h"
 #include "strrefs.h"
 
-#include "Dialog.h"
-#include "Map.h"
+#include "EnumIndex.h"
 #include "Sprite2D.h"
+#include "View.h"
 
-#include "GUI/Control.h"
+#include "GUI/EventMgr.h"
 #include "GUI/GameControlDefs.h"
 
 #include <vector>
@@ -43,9 +43,10 @@ namespace GemRB {
 
 class Container;
 class DialogHandler;
-class GameControl;
+class Door;
+class InfoPoint;
+class Map;
 class Movable;
-class Window;
 
 /**
  * @class GameControl

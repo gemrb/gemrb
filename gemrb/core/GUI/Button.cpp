@@ -21,17 +21,11 @@
 #include "GUI/Button.h"
 
 #include "defsounds.h"
-#include "ie_cursors.h"
 
-#include "Game.h"
-#include "GameData.h"
 #include "Interface.h"
-#include "Palette.h"
 
 #include "GUI/EventMgr.h"
-#include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
-#include "Logging/Logging.h"
 
 #include <utility>
 

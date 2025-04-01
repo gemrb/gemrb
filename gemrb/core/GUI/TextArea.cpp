@@ -21,10 +21,10 @@
 #include "TextArea.h"
 
 #include "Interface.h"
+#include "Timer.h"
 
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
-#include "GUI/Window.h"
 #include "Logging/Logging.h"
 
 #include <utility>

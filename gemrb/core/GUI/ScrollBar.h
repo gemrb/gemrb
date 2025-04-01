@@ -36,8 +36,6 @@
 
 namespace GemRB {
 
-class Sprite2D;
-
 #define UP_PRESS          0x0001
 #define DOWN_PRESS        0x0010
 #define SLIDER_GRAB       0x0100

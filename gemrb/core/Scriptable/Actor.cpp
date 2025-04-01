@@ -40,6 +40,7 @@
 #include "ImageMgr.h"
 #include "Interface.h"
 #include "Item.h"
+#include "Map.h"
 #include "PolymorphCache.h" // stupid polymorph cache hack
 #include "Projectile.h"
 #include "ProjectileServer.h"
