@@ -2747,6 +2747,12 @@ void GameControl::SetLastActor(Actor* lastActor)
 	}
 }
 
+bool GameControl::IsOverLastActor(const Point& pos) const
+{
+	const Actor* lastActor = lastActorID != 0 ? GetLastActor() : nullptr;
+	return lastActor && lastActor->IsOver(pos + vpOrigin);
+}
+
 Scriptable* GameControl::GetHoverObject() const
 {
 	Scriptable* const lastActor = lastActorID != 0 ? GetLastActor() : nullptr;

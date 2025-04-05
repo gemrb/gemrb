@@ -477,8 +477,9 @@ void WindowManager::DrawMouse() const
 	Point tooltipPos = cursorPos;
 
 	// pst displays actor name tooltips overhead, not at the mouse position
+	// to disambiguate for portrait buttons, we unfortunately can't just check for gameWin/gc focus
 	const GameControl* gc = core->GetGameControl();
-	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && gc) {
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && gc && gc->IsOverLastActor(tooltipPos)) {
 		tooltipPos.y -= gc->GetOverheadOffset();
 	}
 

@@ -216,6 +216,7 @@ public:
 	void DisplayString(const Point& p, const char* Text);
 	Actor* GetLastActor() const;
 	void SetLastActor(Actor* lastActor);
+	bool IsOverLastActor(const Point& pos) const;
 	/** Gets the Scriptable currently under the cursor */
 	Scriptable* GetHoverObject() const;
 	/** changes map to the current PC */
