@@ -19,6 +19,8 @@
 
 #include "WindowsFile.h"
 
+#include "../../gemrb/core/Strings/StringConversion.h"
+
 namespace GemRB {
 
 WindowsFile::WindowsFile(WindowsFile&& f) noexcept
