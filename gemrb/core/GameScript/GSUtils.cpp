@@ -106,7 +106,7 @@ int GetReaction(const Actor* target, const Scriptable* Sender)
 
 	// add -4 penalty when dealing with racial enemies
 	const Actor* scr = Scriptable::As<Actor>(Sender);
-	if (scr && target->GetRangerLevel()) {
+	if (scr && core->HasFeature(GFFlags::RULES_3ED) && target->GetRangerLevel()) {
 		reaction -= target->GetRacialEnemyBonus(scr);
 	}
 
