@@ -730,7 +730,7 @@ def GetAbilityBonuses(pc, expand = True):
 			stats.append ((names[9], GA (pc, IE_INT, 0), '%' ))
 
 	# 10347 Reaction
-	# FIXME: is this correct? And what value did it display in pst? Reaction adjustment doesn't match either
+	# FIXME: What value did it display in pst - doesn't match
 	if GameCheck.IsPST ():
 		stats.append ((names[10], GA (pc, IE_REPUTATION, 0), 'p'))
 	else:
