@@ -6467,8 +6467,9 @@ int fx_dispel_secondary_type_one(Scriptable* /*Owner*/, Actor* target, Effect* f
 //0xe7 Timestop
 int fx_timestop(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_timestop(%2d)", fx->Opcode);
-	core->GetGame()->TimeStop(target, fx->Duration);
+	// halve the duration :(
+	ieDword adjDuration = (fx->Duration - core->GetGame()->GameTime) / 2 + core->GetGame()->GameTime;
+	core->GetGame()->TimeStop(target, adjDuration);
 	return FX_NOT_APPLIED;
 }
 
