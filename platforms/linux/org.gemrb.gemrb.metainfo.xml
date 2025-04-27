@@ -1,33 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>org.gemrb.gemrb</id>
-  
   <name>GemRB</name>
+  <developer id="org.gemrb.gemrb">
+    <name>GemRB Contributors</name>
+    <url>https://github.com/gemrb/gemrb/blob/master/AUTHORS</url>
+  </developer>
+  <url type="homepage">https://gemrb.org/</url>
+  <url type="vcs-browser">https://github.com/gemrb/gemrb</url>
+  <url type="bugtracker">https://github.com/gemrb/gemrb/issues</url>
+  <url type="contact">https://gemrb.org/Feedback.html</url>
+  <url type="contribute">https://github.com/gemrb/gemrb/blob/master/CONTRIBUTING.md</url>
+  <url type="faq">https://gemrb.org/Common-problems.html</url>
+  <url type="help">https://gemrb.org/Documentation.html</url>
+  <branding>
+    <color type="primary" scheme_preference="light">#e8d5b7</color>
+    <color type="primary" scheme_preference="dark">#7e764d</color>
+  </branding>
   <summary>GemRB is a portable open-source implementation of Bioware’s Infinity Engine</summary>
-  
   <metadata_license>CC-BY-SA-4.0</metadata_license>
   <project_license>GPL-2.0-or-later</project_license>
-  
   <recommends>
     <control>pointing</control>
     <control>keyboard</control>
+  </recommends>
+  <supports>
     <control>touch</control>
     <control>gamepad</control>
-  </recommends>
-  
+  </supports>
   <description>
-    <p>
-      The goal of the project is to make the Infinity Engine games available on a wide range of platforms forever, fix or avoid old bugs, add new features and provide a superb platform for mod development.
-    </p>
+    <p>The goal of the project is to make the Infinity Engine games available on a wide range of platforms
+      forever, fix or avoid old bugs, add new features and provide a superb platform for mod development.</p>
+    <p><em>PLEASE NOTE:</em> GemRB does <em>not</em> include game data for any of the supported commercial
+      titles. To play any of the commercial titles, you will need to provide the game data. Please refer to
+      the GemRB documentation for more detail on how to provide it.</p>
   </description>
-  
-  <launchable type="desktop-id">gemrb.desktop</launchable>
+  <launchable type="desktop-id">org.gemrb.gemrb.desktop</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://gemrb.org/assets/img/screenshots/iwd2_3.jpg</image>
+      <image>https://gemrb.org/assets/img/screenshots/bg24hires.jpg</image>
+      <caption>Baldur's Gate II running in high resolution</caption>
     </screenshot>
     <screenshot>
-      <image>https://gemrb.org/assets/img/screenshots/10pp6.jpg</image>
+      <image>https://gemrb.org/assets/img/screenshots/bg23.jpg</image>
+      <caption>Baldur's Gate II in French</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gemrb.org/assets/img/screenshots/fonts.png</image>
+      <caption>Custom fonts for in-game text</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gemrb.org/assets/img/screenshots/goi.jpg</image>
+      <caption>Support for complex mods, such as Glory of Istar set in Dragonlance</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gemrb.org/assets/img/screenshots/iwd2-kuldahar-gem.jpg</image>
+      <caption>Icewind Dale II: Kuldahar</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gemrb.org/assets/img/screenshots/iwd2_3.jpg</image>
+      <caption>Icewind Dale II</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gemrb.org/assets/img/screenshots/iwd2stylecombat2.jpg</image>
+      <caption>Icewind Dale II-style combat in Baldur's Gate II</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gemrb.org/assets/img/screenshots/pst.jpg</image>
+      <caption>Planescape: Torment</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://gemrb.org/assets/img/screenshots/sorcerer_monk.jpg</image>
+      <caption>Multiclass builds</caption>
     </screenshot>
   </screenshots>
+  <releases>
+    <release version="0.9.4" date="2025-01-16">
+      <url>https://gemrb.org/2025/01/11/gemrb-0-9-4-released.html</url>
+    </release>
+    <release version="0.9.3" date="2024-07-10">
+      <url>https://gemrb.org/2024/07/10/gemrb-0-9-3-released.html</url>
+    </release>
+    <release version="0.9.2" date="2023-07-08">
+      <url>https://gemrb.org/2023/07/08/gemrb-0-9-2-released.html</url>
+    </release>
+    <release version="0.9.1" date="2022-08-29">
+      <url>https://gemrb.org/2022/08/29/gemrb-0-9-1-released.html</url>
+    </release>
+    <release version="0.9.0" date="2021-06-18">
+      <url>https://gemrb.org/2021/06/18/gemrb-0-9-0-released.html</url>
+    </release>
+  </releases>
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-fantasy">intense</content_attribute>
+    <content_attribute id="violence-desecration">mild</content_attribute>
+    <content_attribute id="drugs-alcohol">mild</content_attribute>
+    <content_attribute id="sex-themes">mild</content_attribute>
+    <content_attribute id="language-humor">mild</content_attribute>
+  </content_rating>
 </component>
