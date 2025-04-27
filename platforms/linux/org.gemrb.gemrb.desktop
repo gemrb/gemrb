@@ -2,7 +2,7 @@
 Version=1.0
 Name=GemRB
 GenericName=Retro role-playing game engine
-Comment=Open-source reimplementation of BioWare's Infinity Engine used in Baldur's Gate
+Comment=Open-source reimplementation of Bioware's Infinity Engine
 Type=Application
 Icon=org.gemrb.gemrb
 Terminal=true
