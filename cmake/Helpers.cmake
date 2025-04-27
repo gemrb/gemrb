@@ -644,7 +644,7 @@ FUNCTION(MAKE_APPIMAGE_TARGET)
 		COMMAND
 			mv AppDir/usr/usr/share/gemrb ${SHARE}/ || true # not always needed
 		COMMAND
-			sed -i 's,X-AppImage-Version.*,X-AppImage-Version='`date +%F`-$ENV{GITHUB_SHA}',' ${SHARE}/applications/gemrb.desktop
+			sed -i 's,X-AppImage-Version.*,X-AppImage-Version='`date +%F`-$ENV{GITHUB_SHA}',' ${SHARE}/applications/org.gemrb.gemrb.desktop
 		# bundle core python modules
 		# AppRun defaults PYTHONPATH to this destination
 		# source is probably available in Python3_STDLIB once we switch to newer cmake
@@ -685,9 +685,9 @@ FUNCTION(INSTALL_APP_RESOURCES)
 			SET(ARTWORK_PATH ${CMAKE_SOURCE_DIR}/artwork)
 			SET(LINUX_PATH ${CMAKE_SOURCE_DIR}/platforms/linux)
 
-			INSTALL(FILES ${ARTWORK_PATH}/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME gemrb.png)
-			INSTALL(FILES ${ARTWORK_PATH}/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME gemrb.svg)
-			INSTALL(FILES ${LINUX_PATH}/gemrb.desktop DESTINATION ${MENU_DIR})
+			INSTALL(FILES ${ARTWORK_PATH}/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME org.gemrb.gemrb.png)
+			INSTALL(FILES ${ARTWORK_PATH}/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME org.gemrb.gemrb.svg)
+			INSTALL(FILES ${LINUX_PATH}/org.gemrb.gemrb.desktop DESTINATION ${MENU_DIR})
 			INSTALL(FILES ${LINUX_PATH}/org.gemrb.gemrb.metainfo.xml DESTINATION ${METAINFO_DIR})
 		ENDIF()
 		INSTALL(FILES ${CMAKE_SOURCE_DIR}/README.md INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR})
