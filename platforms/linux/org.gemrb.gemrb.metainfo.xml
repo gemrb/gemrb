@@ -17,7 +17,7 @@
     <color type="primary" scheme_preference="light">#e8d5b7</color>
     <color type="primary" scheme_preference="dark">#7e764d</color>
   </branding>
-  <summary>GemRB is a portable open-source implementation of Bioware’s Infinity Engine</summary>
+  <summary>A retro role-playing game engine</summary>
   <metadata_license>CC-BY-SA-4.0</metadata_license>
   <project_license>GPL-2.0-or-later</project_license>
   <recommends>
@@ -29,6 +29,8 @@
     <control>gamepad</control>
   </supports>
   <description>
+		<p>GemRB is a portable, open-source implementation of Bioware's Infinity Engine, used in a number of
+			classic computer role playing games such as Baldur's Gate, Icewind Dale and Planescape Torment.</p>
     <p>The goal of the project is to make the Infinity Engine games available on a wide range of platforms
       forever, fix or avoid old bugs, add new features and provide a superb platform for mod development.</p>
     <p><em>PLEASE NOTE:</em> GemRB does <em>not</em> include game data for any of the supported commercial
