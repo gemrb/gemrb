@@ -1638,12 +1638,12 @@ void Game::UpdateScripts()
 	}
 
 	//this is used only for the death delay so far
-	if (event_handler) {
-		if (!event_timer) {
-			event_handler();
-			event_handler = nullptr;
+	if (eventHandler) {
+		if (!eventTimer) {
+			eventHandler();
+			eventHandler = nullptr;
 		}
-		event_timer--;
+		eventTimer--;
 	}
 
 	if (EveryoneDead()) {
@@ -1664,8 +1664,8 @@ void Game::UpdateScripts()
 
 void Game::SetTimedEvent(EventHandler func, int count)
 {
-	event_timer = count;
-	event_handler = std::move(func);
+	eventTimer = count;
+	eventHandler = std::move(func);
 }
 
 void Game::SetProtagonistMode(int mode)

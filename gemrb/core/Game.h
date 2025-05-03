@@ -296,8 +296,8 @@ public:
 	FixedSizeString<20> RandomEncounterEntry;
 
 	Particles* weather = nullptr;
-	int event_timer = 0;
-	EventHandler event_handler = nullptr;
+	int eventTimer = 0;
+	EventHandler eventHandler = nullptr;
 	bool hasInfra = false;
 	bool familiarBlock = false;
 	bool PartyAttack = false;
