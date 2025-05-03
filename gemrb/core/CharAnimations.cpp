@@ -903,10 +903,6 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 	//setting up the sequencing of animation cycles
 	autoSwitchOnEnd = false;
 	switch (stanceID) {
-		case IE_ANI_DAMAGE:
-			nextStanceID = IE_ANI_READY;
-			autoSwitchOnEnd = true;
-			break;
 		case IE_ANI_SLEEP: //going to sleep
 		case IE_ANI_DIE: //going to die
 			nextStanceID = IE_ANI_TWITCH;
@@ -926,6 +922,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			nextStanceID = IE_ANI_AWAKE;
 			autoSwitchOnEnd = true;
 			break;
+		case IE_ANI_DAMAGE:
 		case IE_ANI_CONJURE: //ending
 		case IE_ANI_SHOOT:
 		case IE_ANI_ATTACK:

@@ -796,6 +796,9 @@ static bool InspectEdges(Point& walkableStartPoint, const Region& vp, int curren
 				isPassable = true;
 			}
 			break;
+		default:
+			Log(ERROR, "GSUtils", "Someone broke FindOffScreenPoint, file a bug!");
+			break;
 	}
 	return isPassable;
 }

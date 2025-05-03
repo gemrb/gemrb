@@ -51,7 +51,7 @@ public:
 	node<V>* getChild() { return child; }
 	node<V>* getParent() { return parent; }
 	V getValue() { return value; }
-	bool isMarked() { return marked; }
+	bool isMarked() const { return marked; }
 
 	bool hasChildren() { return child; }
 	bool hasParent() { return parent; }

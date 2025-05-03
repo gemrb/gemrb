@@ -226,7 +226,6 @@ bool EffectQueue::match_ids(const Actor* target, int table, ieDword value)
 			stat = IE_TEAM;
 			break;
 		case 2: //EA
-			stat = IE_EA;
 			return GameScript::ID_Allegiance(target, value);
 		case 3: //GENERAL
 			//this is a hack to support dead only projectiles in PST
