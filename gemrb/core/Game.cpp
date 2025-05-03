@@ -202,7 +202,7 @@ Actor* Game::FindPC(unsigned int partyID) const
 	for (const auto& pc : PCs) {
 		if (pc->InParty == partyID) return pc;
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* Game::FindPC(const ieVariable& scriptingName) const
@@ -212,7 +212,7 @@ Actor* Game::FindPC(const ieVariable& scriptingName) const
 			return pc;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* Game::FindNPC(unsigned int partyID) const
@@ -220,7 +220,7 @@ Actor* Game::FindNPC(unsigned int partyID) const
 	for (const auto& npc : NPCs) {
 		if (npc->InParty == partyID) return npc;
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* Game::FindNPC(const ieVariable& scriptingName) const
@@ -230,7 +230,7 @@ Actor* Game::FindNPC(const ieVariable& scriptingName) const
 			return npc;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* Game::GetGlobalActorByGlobalID(ieDword globalID) const
@@ -245,13 +245,13 @@ Actor* Game::GetGlobalActorByGlobalID(ieDword globalID) const
 			return npc;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* Game::GetPC(size_t slot, bool onlyAlive) const
 {
 	if (slot >= PCs.size()) {
-		return NULL;
+		return nullptr;
 	}
 	if (onlyAlive) {
 		for (const auto& pc : PCs) {
@@ -259,7 +259,7 @@ Actor* Game::GetPC(size_t slot, bool onlyAlive) const
 				return pc;
 			}
 		}
-		return NULL;
+		return nullptr;
 	}
 	return PCs[slot];
 }
@@ -569,10 +569,10 @@ int Game::GetSelectedPCSingle() const
 Actor* Game::GetSelectedPCSingle(bool onlyAlive) const
 {
 	Actor* pc = FindPC(SelectedSingle);
-	if (!pc) return NULL;
+	if (!pc) return nullptr;
 
 	if (onlyAlive && !IsAlive(pc)) {
-		return NULL;
+		return nullptr;
 	}
 	return pc;
 }
@@ -622,7 +622,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 				// already the only selected actor
 				return true;
 			}
-			SelectActor(NULL, false, SELECT_QUIET);
+			SelectActor(nullptr, false, SELECT_QUIET);
 		} else if (actor->IsSelected()) {
 			// already selected
 			return true;
@@ -689,7 +689,7 @@ int Game::FindMap(const ResRef& resRef) const
 Map* Game::GetMap(unsigned int index) const
 {
 	if (index >= Maps.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return Maps[index];
 }
@@ -986,7 +986,7 @@ int Game::AddNPC(Actor* npc)
 Actor* Game::GetNPC(unsigned int index) const
 {
 	if (index >= NPCs.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return NPCs[index];
 }
@@ -1121,13 +1121,13 @@ GAMJournalEntry* Game::FindJournalEntry(ieStrRef strRef) const
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 GAMJournalEntry* Game::GetJournalEntry(unsigned int index) const
 {
 	if (index >= Journals.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return Journals[index];
 }
@@ -1150,7 +1150,7 @@ GAMLocationEntry* Game::GetSavedLocationEntry(unsigned int i)
 	size_t current = savedpositions.size();
 	if (i >= current) {
 		if (i > PCs.size()) {
-			return NULL;
+			return nullptr;
 		}
 		savedpositions.resize(i + 1);
 		while (current <= i) {
@@ -1178,7 +1178,7 @@ GAMLocationEntry* Game::GetPlaneLocationEntry(unsigned int i)
 	size_t current = planepositions.size();
 	if (i >= current) {
 		if (i > PCs.size()) {
-			return NULL;
+			return nullptr;
 		}
 		planepositions.resize(i + 1);
 		while (current <= i) {
@@ -1373,12 +1373,12 @@ void Game::PartyMemberDied(const Actor* actor) const
 		if (HasSpecialDeathReaction(pc->GetScriptName(), actor->GetScriptName())) {
 			react = pc;
 			break;
-		} else if (react == NULL) {
+		} else if (react == nullptr) {
 			react = pc;
 		}
 	}
 
-	if (react != NULL) {
+	if (react) {
 		tick_t len = react->ReactToDeath(actor->GetScriptName());
 		tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
 		if (counter > react->GetWait()) { // don't nullify it in case we're waiting already
@@ -1641,7 +1641,7 @@ void Game::UpdateScripts()
 	if (event_handler) {
 		if (!event_timer) {
 			event_handler();
-			event_handler = NULL;
+			event_handler = nullptr;
 		}
 		event_timer--;
 	}
@@ -2184,7 +2184,7 @@ static const Color DuskTint(0xe0, 0x80, 0x80, 0x40); //dark, reddish
 const Color* Game::GetGlobalTint() const
 {
 	const Map* map = GetCurrentArea();
-	if (!map) return NULL;
+	if (!map) return nullptr;
 	if (map->AreaFlags & AF_DREAM) {
 		return &DreamTint;
 	}
@@ -2207,7 +2207,7 @@ const Color* Game::GetGlobalTint() const
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // applies the global tint, if any
