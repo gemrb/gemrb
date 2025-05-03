@@ -651,7 +651,7 @@ FUNCTION(MAKE_APPIMAGE_TARGET)
 		COMMAND
 			mkdir -p ${SHARE}/pyshared
 		COMMAND
-			cp -r /usr/lib/python3.8/* ${SHARE}/pyshared
+			cp -r /usr/lib/python3.10/* ${SHARE}/pyshared
 		COMMAND
 			rm -rf ${SHARE}/pyshared/config-*x86_64-linux-gnu
 		COMMAND
