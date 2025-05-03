@@ -2116,15 +2116,8 @@ bool Game::CastOnRest() const
 		}
 	}
 
-	bool anyoneStillHurt = false;
-	ps = ps2;
-	for (int idx = 1; idx <= ps; idx++) {
-		Actor* tar = FindPC(idx);
-		if (!tar) continue;
-		int hpNeeded = static_cast<int>(tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS));
-		if (hpNeeded) anyoneStillHurt = true;
-	}
-	return anyoneStillHurt;
+	std::sort(wholeparty.begin(), wholeparty.end());
+	return wholeparty.back().hpneeded > 0;
 }
 
 //timestop effect
