@@ -457,26 +457,15 @@ using vvcDict = std::multimap<ResRef, ScriptedAnimation*>;
 class GEM_EXPORT Actor : public Movable {
 public:
 	bool IsTraversable() const {
-#define GA_ALIVE GA_NO_DEAD
-#define GA_SCHEDULED GA_NO_UNSCHEDULED
-		if (!ValidTarget(GA_ALIVE | GA_SCHEDULED)) {
+		if (!ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED)) {
 			return true;
 		}
 		if (ValidTarget(GA_ONLY_BUMPABLE)) {
 			return true;
 		}
 		return false;
-		// const bool bNoDead = ValidTarget(GA_ALIVE);
-		// const bool bNoUnscheduled = ValidTarget(GA_SCHEDULED);
-		// const bool bNoDeadNoUncheduled =
-		// const bool bIsNotTraversable = ValidTarget(GA_ALIVE | GA_SCHEDULED) && !ValidTarget(GA_ONLY_BUMPABLE);
-		// const bool bIsTraversable = !bIsNotTraversable;
-		// Log(WARNING, "Map", "IsTraversable={}, bNoDead={}, bNoUnscheduled={}, bNoDeadUnscheduled={}",
-		// 	bIsTraversable, bNoDead, bNoUnscheduled, bNoDeadNoUncheduled);
-		// return bIsTraversable;
 	}
 
-	void SetPos(const NavmapPoint& pos) override;
 	using stat_t = ieDword;
 	using stats_t = std::array<stat_t, MAX_STATS>;
 	//CRE DATA FIELDS

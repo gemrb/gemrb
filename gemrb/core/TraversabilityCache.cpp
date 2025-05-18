@@ -76,8 +76,8 @@ void Map::FCachedActorPosState::MarkNewPosition(std::vector<FTraversability> &In
 
 	const FTraversability NewTraversability{NewTraversabilityType, actor};
 	const auto& NewRegion = newState.region;
-	for (int x = NewRegion.x; x < NewRegion.x + NewRegion.w; ++x) {
-		for (int y = NewRegion.y; y < NewRegion.y + NewRegion.h; ++y) {
+	for (int x = std::max(0, NewRegion.x); x < NewRegion.x + NewRegion.w; ++x) {
+		for (int y = std::max(0, NewRegion.y); y < NewRegion.y + NewRegion.h; ++y) {
 			if (!actor->IsOver(Point{x, y})) {
 				continue;
 			}
@@ -234,8 +234,8 @@ void Map::FCachedActorPosState2::MarkNewPosition(std::vector<FTraversability> &I
 
 	const FTraversability NewTraversability{NewTraversabilityType, actor};
 	const auto& NewRegion = newState.region;
-	for (int x = NewRegion.x; x < NewRegion.x + NewRegion.w; ++x) {
-		for (int y = NewRegion.y; y < NewRegion.y + NewRegion.h; ++y) {
+	for (int x = std::max(0, NewRegion.x); x < NewRegion.x + NewRegion.w; ++x) {
+		for (int y = std::max(0, NewRegion.y); y < NewRegion.y + NewRegion.h; ++y) {
 			if (!actor->IsOver(Point{x, y})) {
 				continue;
 			}

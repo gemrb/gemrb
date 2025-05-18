@@ -1802,7 +1802,7 @@ bool Interface::IsFreezed() const
 
 void Interface::GameLoop(void)
 {
-    TRACY(FrameMark);
+	TRACY(ZoneScoped);
 	update_scripts = false;
 	GameControl* gc = GetGameControl();
 	if (gc) {

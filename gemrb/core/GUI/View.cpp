@@ -251,7 +251,7 @@ void View::DrawBackground(const Region* rgn) const
 
 void View::Draw()
 {
-	// TRACY(ZoneScoped);
+	TRACY(ZoneScoped);
 	if (flags & Invisible) return;
 
 	const Region clip = VideoDriver->GetScreenClip();

@@ -111,7 +111,7 @@ Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned 
 
 #if PATHFINDER_STATIC
 		// Size is one more than needed, because we dump all calculations on invalid indices to the last cell, this is faster than adding ifs everywhere to check if valid
-		const int32_t TrashIdx = mapSize.AreaUpper();
+		// const int32_t TrashIdx = mapSize.AreaUpper();
 		const int32_t MapSize = mapSize.Area(); // TrashIdx + 1;
 
 		FibonacciHeap<PQNode> open;
