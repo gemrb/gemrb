@@ -1999,20 +1999,12 @@ void Map::InitActors()
 {
 	if (core->config.UseAsLibrary) return;
 
-	// Traversability.clear();
-	// Traversability.resize(PropsSize().Area(), ETraversability::empty);
-
 	// setting the map can run effects, so play on the safe side and ignore any actors that might get added
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 		actor->SetMap(this);
 		MarkVisited(actor);
-
-		// const bool bIsBlockingActor = true; // dpysx todo
-		// if (bIsBlockingActor) {
-		// 	TraversabilityBlock(actor);
-		// }
 	}
 }
 
@@ -3628,7 +3620,7 @@ void Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los)
 
 void Map::UpdateFog()
 {
-//	TRACY(ZoneScoped);
+	TRACY(ZoneScoped);
 	VisibleBitmap.fill(0);
 
 	std::set<Spawn*> potentialSpawns;
