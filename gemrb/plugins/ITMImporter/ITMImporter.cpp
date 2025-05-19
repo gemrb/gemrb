@@ -38,9 +38,9 @@ std::map<wchar_t, ieByte> zzmap;
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
-	AutoTable tm = gamedata->LoadTable("proftype");
+	AutoTable tm = gamedata->LoadTable("proftype", true);
 	if (!tm) {
-		Log(ERROR, "ITMImporter", "Cannot find proftype.2da.");
+		Log(ERROR, "ITMImporter", "Cannot find proftype.2da, proficiency data is incomplete.");
 		return;
 	}
 	TableMgr::index_t profcount = tm->GetRowCount();

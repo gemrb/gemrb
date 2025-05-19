@@ -7679,7 +7679,7 @@ static PyObject* GemRB_GetStoreDrink(PyObject* /*self*/, PyObject* args)
 
 static void ReadUsedItems()
 {
-	AutoTable table = gamedata->LoadTable("item_use");
+	AutoTable table = gamedata->LoadTable("item_use", true);
 	if (table) {
 		TableMgr::index_t UsedItemsCount = table->GetRowCount();
 		UsedItems.resize(UsedItemsCount);
