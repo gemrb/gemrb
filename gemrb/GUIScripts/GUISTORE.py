@@ -873,7 +873,7 @@ def UpdateStoreRumourWindow (Window):
 				CostLabel = Window.GetControl (0x10000000+29+i)
 				CostLabel.SetText ("")
 			elif GameCheck.IsBG1 ():
-				CostLabel = Window.GetControl (0x100000005 + i)
+				CostLabel = Window.GetControl (0x10000005 + i)
 				CostLabel.SetText ("")
 	return
 
