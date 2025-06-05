@@ -81,9 +81,11 @@ private:
 	//clears the schedule, used internally
 	void Init();
 	//load a 2DA/VEF resource into the object
-	VEFObject* CreateObject(const ResRef& res, SClass_ID id);
+	VEFObject* CreateObject(const ResRef& res, SClass_ID id) const;
+	// just a helper function
+	void CreateObjectFromEntry(ScheduleEntry& entry) const;
 	//load a BAM/VVC resource into the object
-	ScriptedAnimation* CreateCell(const ResRef& res, ieDword start, ieDword end);
+	ScriptedAnimation* CreateCell(const ResRef& res, ieDword start, ieDword end) const;
 	//load a single entry from stream
 	void ReadEntry(DataStream* stream);
 };
