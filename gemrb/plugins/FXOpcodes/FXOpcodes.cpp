@@ -2746,25 +2746,33 @@ int fx_stealth_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x3C MiscastMagicModifier
 int fx_miscast_magic_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_miscast_magic_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
 	switch (fx->Parameter2) {
 		case 3:
 			STAT_SET(IE_DEADMAGIC, 1);
 			// intentional fallthrough
 		case 0:
-			STAT_SET(IE_SPELLFAILUREMAGE, fx->Parameter1);
+			STAT_ADD(IE_SPELLFAILUREMAGE, fx->Parameter1);
 			break;
 		case 4:
 			STAT_SET(IE_DEADMAGIC, 1);
 			// intentional fallthrough
 		case 1:
-			STAT_SET(IE_SPELLFAILUREPRIEST, fx->Parameter1);
+			STAT_ADD(IE_SPELLFAILUREPRIEST, fx->Parameter1);
 			break;
 		case 5:
 			STAT_SET(IE_DEADMAGIC, 1);
 			// intentional fallthrough
 		case 2:
+			STAT_ADD(IE_SPELLFAILUREINNATE, fx->Parameter1);
+			break;
+		// gemrb extension: support setting the value
+		case 6:
+			STAT_SET(IE_SPELLFAILUREMAGE, fx->Parameter1);
+			break;
+		case 7:
+			STAT_SET(IE_SPELLFAILUREPRIEST, fx->Parameter1);
+			break;
+		case 8:
 			STAT_SET(IE_SPELLFAILUREINNATE, fx->Parameter1);
 			break;
 		default:
