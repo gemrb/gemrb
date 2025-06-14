@@ -400,7 +400,7 @@ bool Map::ShouldUpdateTraversability2() const {
 void Map::UpdateTraversability() const {
 #if PATH_RUN_IMPROVED
 	UpdateTraversabilityImproved();
-	UpdateTraversabilityBase();
+	// UpdateTraversabilityBase();
 #endif
 }
 void Map::UpdateTraversabilityBase() const {
@@ -408,7 +408,7 @@ void Map::UpdateTraversabilityBase() const {
 #define UT_ACTOR_POS_CACHE_TABLE CachedActorPosState
 #define UT_ACTOR_POS_CACHE_TYPE FCachedActorPosState
 #define UT_VALIDATE ValidateTraversabilitySize
-	ScopedTimer t("}} cacheBase ");
+	// ScopedTimer t("}} cacheBase ");
 
 	std::vector<size_t> ActorsRemoved;
 	std::vector<std::vector<UT_ACTOR_POS_CACHE_TYPE>::iterator> ActorsUpdated;
