@@ -71,6 +71,11 @@ Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned 
 {
 	TRACY(ZoneScoped);
 
+	if (!bUpdatedTraversabilityThisFrame) {
+		UpdateTraversability();
+		bUpdatedTraversabilityThisFrame = true;
+	}
+
 	if (InDebugMode(DebugMode::PATHFINDER))
 		Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}",
 		    s, d,

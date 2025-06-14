@@ -239,8 +239,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		.performanceCounters(true);
 	Path ResultOriginal;
 	Path ResultOriginalImproved;
-
 #if PATH_RUN_BENCH
+	Log(DEBUG, "Map", "--- FindPath ---");
 	Bench.relative(true).name("FindPathOriginal").run([&] {
 #endif
 #if PATH_RUN_ORIGINAL

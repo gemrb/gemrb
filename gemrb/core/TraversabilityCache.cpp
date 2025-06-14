@@ -399,20 +399,6 @@ bool Map::ShouldUpdateTraversability2() const {
 
 void Map::UpdateTraversability() const {
 #if PATH_RUN_IMPROVED
-	// warmup
-	for (size_t i = 0; i < actors.size(); ++i) {
-		auto currentActor = actors[i];
-		const auto Found1 = std::find_if(CachedActorPosState.begin(), CachedActorPosState.end(), [currentActor](const auto& CachedActor) {
-				return CachedActor.actor == currentActor;
-			});
-		const auto Found2 = std::find_if(CachedActorPosState2.begin(), CachedActorPosState2.end(), [currentActor](const auto& CachedActor) {
-				return CachedActor.actor == currentActor;
-			});
-		if (Found1 != CachedActorPosState.end() && Found2 != CachedActorPosState2.end() && Found1->actor != Found2->actor) {
-			Log(WARNING, "Map", "CACHE SEEMS INCOHERENT!!");
-		}
-	}
-	// actual update
 	UpdateTraversabilityImproved();
 	UpdateTraversabilityBase();
 #endif

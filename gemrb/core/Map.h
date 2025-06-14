@@ -544,6 +544,7 @@ public:
 
 	mutable std::vector<FCachedActorPosState> CachedActorPosState;
 	mutable std::vector<FCachedActorPosState2> CachedActorPosState2;
+	mutable bool bUpdatedTraversabilityThisFrame;
 	bool ShouldUpdateTraversability() const;
 	bool ShouldUpdateTraversability2() const;
 	void UpdateTraversability() const;

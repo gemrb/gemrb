@@ -671,7 +671,8 @@ void Map::DrawPortal(const InfoPoint* ip, int enable)
 
 void Map::UpdateScripts()
 {
-	UpdateTraversability();
+	// UpdateTraversability();
+	bUpdatedTraversabilityThisFrame = false;
 	bool has_pcs = false;
 	for (const auto& actor : actors) {
 		if (actor->InParty) {
