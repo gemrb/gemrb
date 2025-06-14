@@ -497,25 +497,48 @@ public:
 	};
 
 	struct FCachedActorPosState2 {
-		int8_t flags;
 		Actor* actor = nullptr;
-		int64_t pos;
+		Point pos;
 		Region region;
-		FCachedActorPosState2(Actor* InActor, int w, int h);
+		uint8_t flags;
+		constexpr static uint8_t BUMPABLE_FLAG = 1;
+		constexpr static uint8_t ALIVE_FLAG = 2;
 
-		static int64_t ToLinearPos(const Point& P, int32_t w, int32_t h);
-		static Point FromLinearPos(int64_t PIdx, int32_t w, int32_t h);
-		bool GetBumpable() const;
-		bool GetIsAlive() const;
-		void SetBumpable(bool b);
-		void SetIsAlive(bool b);
+		inline void SetIsBumpable() {
+			flags |= (1 << BUMPABLE_FLAG);
+		}
 
+		inline void ResetIsBumpable() {
+			flags &= ~(1 << BUMPABLE_FLAG);
+		}
+
+		inline void SetIsAlive() {
+			flags |= (1 << ALIVE_FLAG);
+		}
+
+		inline void ResetIsAlive() {
+			flags &= ~(1 << ALIVE_FLAG);
+		}
+
+		inline void FlipIsBumpable() {
+			flags ^= (1 << BUMPABLE_FLAG);
+		}
+
+		bool GetIsBumpable() const {
+			return flags & (1 << BUMPABLE_FLAG);
+		}
+
+		bool GetIsAlive() const {
+			return flags & (1 << ALIVE_FLAG);
+		}
+
+		FCachedActorPosState2(Actor* InActor);
 		void ClearOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-		void ClearOldPosition2(std::vector<FTraversability>& InOutTraversability, int InWidth, int InHeight) const;
+		void ClearOldPosition2(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
 		void ClearNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-		void MarkNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth, int InHeight, bool bInUpdateSelf = false);
+		void MarkNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth, bool bInUpdateSelf = false);
 		void MarkOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth);
-		void UpdateNewState(int InWidth, int InHeight);
+		void UpdateNewState();
 		static Region CalculateRegion(Actor* InActor);
 	};
 

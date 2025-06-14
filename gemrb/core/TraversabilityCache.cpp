@@ -132,15 +132,25 @@ void Map::FCachedActorPosState::UpdateNewState() {
 	///
 	////
 
-Map::FCachedActorPosState2::FCachedActorPosState2(Actor *InActor, int w, int h) {
+Map::FCachedActorPosState2::FCachedActorPosState2(Actor *InActor) {
 	if (!InActor) {
 		return;
 	}
 
 	actor = InActor;
-	pos = ToLinearPos(InActor->Pos, w, h);
-	SetBumpable(InActor->ValidTarget(GA_ONLY_BUMPABLE));
-	SetIsAlive(InActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED));
+	pos = InActor->Pos;
+	if (InActor->ValidTarget(GA_ONLY_BUMPABLE)) {
+		SetIsBumpable();
+	}
+	else {
+		ResetIsBumpable();
+	}
+	if (InActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED)) {
+		SetIsAlive();
+	}
+	else {
+		ResetIsAlive();
+	}
 	region = CalculateRegion(InActor);
 }
 
@@ -148,40 +158,6 @@ Region Map::FCachedActorPosState2::CalculateRegion(Actor* InActor) {
 	const auto baseSize = InActor->CircleSize2Radius() * InActor->sizeFactor;
 	const Size s(baseSize * 8, baseSize * 6);
 	return {InActor->Pos - s.Center(), s};
-}
-
-int64_t Map::FCachedActorPosState2::ToLinearPos(const Point &P, int32_t w, int32_t h) {
-	return P.y * w + P.x;
-}
-
-Point Map::FCachedActorPosState2::FromLinearPos(int64_t PIdx, int32_t w, int32_t h) {
-	return Point(PIdx % w, PIdx / w);
-}
-
-bool Map::FCachedActorPosState2::GetBumpable() const {
-	return (flags) & (1<<(0));
-}
-
-bool Map::FCachedActorPosState2::GetIsAlive() const {
-	return (flags) & (1<<(1));
-}
-
-void Map::FCachedActorPosState2::SetBumpable(bool b) {
-	if (b) {
-		flags |= 1 << 0;
-	}
-	else {
-		flags &= ~(1 << 0);
-	}
-}
-
-void Map::FCachedActorPosState2::SetIsAlive(bool b) {
-	if (b) {
-		flags |= 1 << 1;
-	}
-	else {
-		flags &= ~(1 << 1);
-	}
 }
 
 void Map::FCachedActorPosState2::ClearOldPosition(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
@@ -195,15 +171,14 @@ void Map::FCachedActorPosState2::ClearOldPosition(std::vector<FTraversability> &
 }
 
 void Map::FCachedActorPosState2::
-ClearOldPosition2(std::vector<FTraversability> &InOutTraversability, int InWidth, int InHeight) const {
+ClearOldPosition2(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
 	const auto& RemovedRegion = region;
-	const auto CenterPos = FromLinearPos(pos, InWidth, InHeight);
 	for (int x = RemovedRegion.x; x < RemovedRegion.x + RemovedRegion.w; ++x) {
 		for (int y = RemovedRegion.y; y < RemovedRegion.y + RemovedRegion.h; ++y) {
-			if (!actor->IsOver(Point(x, y), CenterPos)) {
+			if (!actor->IsOver(Point(x, y), pos)) {
 				continue;
 			}
-			const auto Idx = y * InWidth + x;
+			const auto Idx = y * InWidth * 16 + x;
 			InOutTraversability[Idx] = FTraversability{};
 		}
 	}
@@ -219,13 +194,13 @@ void Map::FCachedActorPosState2::ClearNewPosition(std::vector<FTraversability> &
 	}
 }
 
-void Map::FCachedActorPosState2::MarkNewPosition(std::vector<FTraversability> &InOutTraversability, int InWidth, int InHeight, bool bInUpdateSelf) {
-	const FCachedActorPosState2 newState{actor, InWidth, InHeight};
+void Map::FCachedActorPosState2::MarkNewPosition(std::vector<FTraversability> &InOutTraversability, int InWidth, bool bInUpdateSelf) {
+	const FCachedActorPosState2 newState{actor};
 	ETraversability NewTraversabilityType;
 	if (!newState.GetIsAlive()) {
 		NewTraversabilityType = ETraversability::empty;
 	}
-	else if (newState.GetBumpable()) {
+	else if (newState.GetIsBumpable()) {
 		NewTraversabilityType = ETraversability::actor;
 	}
 	else {
@@ -239,7 +214,7 @@ void Map::FCachedActorPosState2::MarkNewPosition(std::vector<FTraversability> &I
 			if (!actor->IsOver(Point{x, y})) {
 				continue;
 			}
-			const auto Idx = y * InWidth + x;
+			const auto Idx = y * InWidth * 16 + x;
 			InOutTraversability[Idx] = NewTraversability;
 		}
 	}
@@ -255,7 +230,7 @@ void Map::FCachedActorPosState2::MarkOldPosition(std::vector<FTraversability> &I
 	if (!GetIsAlive()) {
 		NewTraversabilityType = ETraversability::empty;
 	}
-	else if (GetBumpable()) {
+	else if (GetIsBumpable()) {
 		NewTraversabilityType = ETraversability::actor;
 	}
 	else {
@@ -275,13 +250,19 @@ void Map::FCachedActorPosState2::MarkOldPosition(std::vector<FTraversability> &I
 	}
 }
 
-void Map::FCachedActorPosState2::UpdateNewState(int InWidth, int InHeight) {
-	const FCachedActorPosState2 newState{actor, InWidth, InHeight};
+void Map::FCachedActorPosState2::UpdateNewState() {
+	const FCachedActorPosState2 newState{actor};
 	this->flags = newState.flags;
 	this->pos = newState.pos;
 	this->region = newState.region;
 }
 
+
+	///
+	/////
+	///
+	///
+	///
 
 Region Map::GetTraversabilityRegion(Actor *actor) const {
 	auto baseSize = actor->CircleSize2Radius() * actor->sizeFactor;
@@ -404,9 +385,9 @@ bool Map::ShouldUpdateTraversability2() const {
 	}
 	for (size_t i = 0; i < actors.size(); ++i) {
 		if (actors[i] != CachedActorPosState2[i].actor ||
-			actors[i]->Pos != CachedActorPosState2[i].FromLinearPos(CachedActorPosState2[i].pos, PropsSize().w * 16, PropsSize().h * 12) ||
+			actors[i]->Pos != CachedActorPosState2[i].pos ||
 			actors[i]->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED) != CachedActorPosState2[i].GetIsAlive() ||
-			actors[i]->ValidTarget(GA_ONLY_BUMPABLE) != CachedActorPosState2[i].GetBumpable()
+			actors[i]->ValidTarget(GA_ONLY_BUMPABLE) != CachedActorPosState2[i].GetIsBumpable()
 			)
 		{
 			return true;
@@ -418,7 +399,20 @@ bool Map::ShouldUpdateTraversability2() const {
 
 void Map::UpdateTraversability() const {
 #if PATH_RUN_IMPROVED
-
+	// warmup
+	for (size_t i = 0; i < actors.size(); ++i) {
+		auto currentActor = actors[i];
+		const auto Found1 = std::find_if(CachedActorPosState.begin(), CachedActorPosState.end(), [currentActor](const auto& CachedActor) {
+				return CachedActor.actor == currentActor;
+			});
+		const auto Found2 = std::find_if(CachedActorPosState2.begin(), CachedActorPosState2.end(), [currentActor](const auto& CachedActor) {
+				return CachedActor.actor == currentActor;
+			});
+		if (Found1 != CachedActorPosState.end() && Found2 != CachedActorPosState2.end() && Found1->actor != Found2->actor) {
+			Log(WARNING, "Map", "CACHE SEEMS INCOHERENT!!");
+		}
+	}
+	// actual update
 	UpdateTraversabilityImproved();
 	UpdateTraversabilityBase();
 #endif
@@ -426,17 +420,18 @@ void Map::UpdateTraversability() const {
 void Map::UpdateTraversabilityBase() const {
 #define UT_TRAVERSABILITY_TABLE Traversability
 #define UT_ACTOR_POS_CACHE_TABLE CachedActorPosState
+#define UT_ACTOR_POS_CACHE_TYPE FCachedActorPosState
 #define UT_VALIDATE ValidateTraversabilitySize
 	ScopedTimer t("}} cacheBase ");
 
 	std::vector<size_t> ActorsRemoved;
-	std::vector<std::vector<FCachedActorPosState>::iterator> ActorsUpdated;
-	std::vector<FCachedActorPosState> ActorsNew;
+	std::vector<std::vector<UT_ACTOR_POS_CACHE_TYPE>::iterator> ActorsUpdated;
+	std::vector<UT_ACTOR_POS_CACHE_TYPE> ActorsNew;
 
 	{
 		for (size_t i = 0; i < actors.size(); ++i) {
 			auto currentActor = actors[i];
-			const auto Found = std::find_if(UT_ACTOR_POS_CACHE_TABLE.begin(), UT_ACTOR_POS_CACHE_TABLE.end(), [currentActor](const FCachedActorPosState& CachedActor) {
+			const auto Found = std::find_if(UT_ACTOR_POS_CACHE_TABLE.begin(), UT_ACTOR_POS_CACHE_TABLE.end(), [currentActor](const UT_ACTOR_POS_CACHE_TYPE& CachedActor) {
 				return CachedActor.actor == currentActor;
 			});
 			if (Found == UT_ACTOR_POS_CACHE_TABLE.cend()) {
@@ -444,7 +439,7 @@ void Map::UpdateTraversabilityBase() const {
 				continue;
 			}
 
-			const FCachedActorPosState& CachedActor = *Found;
+			const UT_ACTOR_POS_CACHE_TYPE& CachedActor = *Found;
 			if (CachedActor.pos != currentActor->Pos ||
 				CachedActor.alive != currentActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED) ||
 				CachedActor.bumpable != currentActor->ValidTarget(GA_ONLY_BUMPABLE)) {
@@ -474,7 +469,7 @@ void Map::UpdateTraversabilityBase() const {
 	}
 
 	for (auto IteratorUpdated : ActorsUpdated) {
-		FCachedActorPosState& Updated = *IteratorUpdated;
+		UT_ACTOR_POS_CACHE_TYPE& Updated = *IteratorUpdated;
 		if (Updated.pos != Updated.actor->Pos) {
 			// clear old position, mark new position
 			Updated.ClearOldPosition2(UT_TRAVERSABILITY_TABLE, PropsSize().w);
@@ -528,28 +523,29 @@ void Map::UpdateTraversabilityBase() const {
 void Map::UpdateTraversabilityImproved() const {
 #define UT_TRAVERSABILITY_TABLE Traversability2
 #define UT_ACTOR_POS_CACHE_TABLE CachedActorPosState2
+#define UT_ACTOR_POS_CACHE_TYPE FCachedActorPosState2
 #define UT_VALIDATE ValidateTraversabilitySize2
 	ScopedTimer t("}} cacheImpr ");
 
-	std::vector<size_t> ActorsRemoved;
-	std::vector<std::vector<FCachedActorPosState2>::iterator> ActorsUpdated;
-	std::vector<FCachedActorPosState2> ActorsNew;
+		std::vector<size_t> ActorsRemoved;
+	std::vector<std::vector<UT_ACTOR_POS_CACHE_TYPE>::iterator> ActorsUpdated;
+	std::vector<UT_ACTOR_POS_CACHE_TYPE> ActorsNew;
 
 	{
 		for (size_t i = 0; i < actors.size(); ++i) {
 			auto currentActor = actors[i];
-			const auto Found = std::find_if(UT_ACTOR_POS_CACHE_TABLE.begin(), UT_ACTOR_POS_CACHE_TABLE.end(), [currentActor](const FCachedActorPosState2& CachedActor) {
+			const auto Found = std::find_if(UT_ACTOR_POS_CACHE_TABLE.begin(), UT_ACTOR_POS_CACHE_TABLE.end(), [currentActor](const UT_ACTOR_POS_CACHE_TYPE& CachedActor) {
 				return CachedActor.actor == currentActor;
 			});
 			if (Found == UT_ACTOR_POS_CACHE_TABLE.cend()) {
-				ActorsNew.emplace_back(currentActor, PropsSize().w * 16, PropsSize().h * 12);
+				ActorsNew.emplace_back(currentActor);
 				continue;
 			}
 
-			const FCachedActorPosState2& CachedActor = *Found;
-			if (CachedActor.pos != CachedActor.ToLinearPos(currentActor->Pos, PropsSize().w * 16, PropsSize().h * 12) ||
+			const UT_ACTOR_POS_CACHE_TYPE& CachedActor = *Found;
+			if (CachedActor.pos != currentActor->Pos ||
 				CachedActor.GetIsAlive() != currentActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED) ||
-				CachedActor.GetBumpable() != currentActor->ValidTarget(GA_ONLY_BUMPABLE)) {
+				CachedActor.GetIsBumpable() != currentActor->ValidTarget(GA_ONLY_BUMPABLE)) {
 				ActorsUpdated.push_back(Found);
 			}
 		}
@@ -572,49 +568,49 @@ void Map::UpdateTraversabilityImproved() const {
 	UT_VALIDATE();
 
 	for (const auto RemovedIndex : ActorsRemoved) {
-		UT_ACTOR_POS_CACHE_TABLE[RemovedIndex].ClearOldPosition2(UT_TRAVERSABILITY_TABLE, PropsSize().w * 16, PropsSize().h * 12);
+		UT_ACTOR_POS_CACHE_TABLE[RemovedIndex].ClearOldPosition2(UT_TRAVERSABILITY_TABLE, PropsSize().w);
 	}
 
 	for (auto IteratorUpdated : ActorsUpdated) {
-		FCachedActorPosState2& Updated = *IteratorUpdated;
-		if (Updated.pos != Updated.ToLinearPos(Updated.actor->Pos, PropsSize().w * 16, PropsSize().h * 12)) {
+		UT_ACTOR_POS_CACHE_TYPE& Updated = *IteratorUpdated;
+		if (Updated.pos != Updated.actor->Pos) {
 			// clear old position, mark new position
-			Updated.ClearOldPosition2(UT_TRAVERSABILITY_TABLE, PropsSize().w * 16, PropsSize().h * 12);
+			Updated.ClearOldPosition2(UT_TRAVERSABILITY_TABLE, PropsSize().w);
 			for (int i = 0; i < UT_ACTOR_POS_CACHE_TABLE.size(); ++i) {
 				if (UT_ACTOR_POS_CACHE_TABLE[i].actor == Updated.actor) {
 					continue;
 				}
 				if (UT_ACTOR_POS_CACHE_TABLE[i].region.IntersectsRegion(Updated.region)) {
-					UT_ACTOR_POS_CACHE_TABLE[i].SetBumpable(!static_cast<bool>(UT_ACTOR_POS_CACHE_TABLE[i].GetBumpable()));
+					UT_ACTOR_POS_CACHE_TABLE[i].FlipIsBumpable();
 				}
 			}
-			Updated.MarkNewPosition(UT_TRAVERSABILITY_TABLE, PropsSize().w * 16, PropsSize().h * 12, true);
+			Updated.MarkNewPosition(UT_TRAVERSABILITY_TABLE, PropsSize().w, true);
 			continue;
 		}
 		else {
 			// go from dead to alive
 			if (!Updated.GetIsAlive() && (Updated.GetIsAlive() != Updated.actor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED))) {
 				// no need to clear old position, just mark new position
-				Updated.MarkNewPosition(UT_TRAVERSABILITY_TABLE, PropsSize().w * 16, PropsSize().h * 12, true);
+				Updated.MarkNewPosition(UT_TRAVERSABILITY_TABLE, PropsSize().w, true);
 			}
 			// go from alive to dead
 			else if (Updated.GetIsAlive() && (Updated.GetIsAlive() != Updated.actor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED))) {
 				// just clear old position
-				Updated.ClearOldPosition2(UT_TRAVERSABILITY_TABLE, PropsSize().w * 16, PropsSize().h * 12);
-				Updated.UpdateNewState(PropsSize().w * 16, PropsSize().h * 12);
+				Updated.ClearOldPosition2(UT_TRAVERSABILITY_TABLE, PropsSize().w);
+				Updated.UpdateNewState();
 			}
 
 			// change in bumpable
-			if (Updated.GetBumpable() != Updated.actor->ValidTarget(GA_ONLY_BUMPABLE)) {
+			if (Updated.GetIsBumpable() != Updated.actor->ValidTarget(GA_ONLY_BUMPABLE)) {
 				// clear old, mark new
-				Updated.ClearOldPosition2(UT_TRAVERSABILITY_TABLE, PropsSize().w * 16, PropsSize().h * 12);
-				Updated.MarkNewPosition(UT_TRAVERSABILITY_TABLE, PropsSize().w * 16, PropsSize().h * 12, true);
+				Updated.ClearOldPosition2(UT_TRAVERSABILITY_TABLE, PropsSize().w);
+				Updated.MarkNewPosition(UT_TRAVERSABILITY_TABLE, PropsSize().w, true);
 			}
 		}
 	}
 
 	for (auto & New : ActorsNew) {
-		New.MarkNewPosition(UT_TRAVERSABILITY_TABLE, PropsSize().w * 16, PropsSize().h * 12, false);
+		New.MarkNewPosition(UT_TRAVERSABILITY_TABLE, PropsSize().w);
 	}
 
 	for (auto RemovedIt = ActorsRemoved.crbegin(); RemovedIt != ActorsRemoved.crend(); ++RemovedIt) {
