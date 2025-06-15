@@ -439,7 +439,8 @@ Map::Map(TileMap* tm, TileProps props, Holder<Sprite2D> sm)
 	  tileProps(std::move(props)),
 	  SmallMap(std::move(sm)),
 	  ExploredBitmap(FogMapSize(), uint8_t(0x00)),
-	  VisibleBitmap(FogMapSize(), uint8_t(0x00))
+	  VisibleBitmap(FogMapSize(), uint8_t(0x00)),
+	  traversabilityCache(this)
 {
 	area = this;
 	MasterArea = core->GetGame()->MasterArea(scriptName);
@@ -671,8 +672,8 @@ void Map::DrawPortal(const InfoPoint* ip, int enable)
 
 void Map::UpdateScripts()
 {
-	// UpdateTraversability();
-	bUpdatedTraversabilityThisFrame = false;
+	traversabilityCache.MarkNewFrame();
+
 	bool has_pcs = false;
 	for (const auto& actor : actors) {
 		if (actor->InParty) {
@@ -1791,7 +1792,7 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 
 	// draw Traversability cache
 	{
-		Color TraversabilityColors[(int)ETraversability::max] {
+		Color TraversabilityColors[(int)TraversabilityCache::TraversabilityCellState::max] {
 			Color{255, 255, 255, 30}, // none
 			Color{0, 255, 0, 180}, // actor but passable
 			Color{255, 0, 0, 180}, // blocked
@@ -1811,8 +1812,8 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 			for (int y = vp.y_get(); y < vp.y_get() + vp.h_get(); ++y) {
 				const auto Idx = y * PropsSize().w * 16 + x;
 				const Point p{x, y};
-				if (Idx < Traversability.size()) {
-					VideoDriver->DrawPoint(p - vp.origin, TraversabilityColors[(int)Traversability[Idx].type], BLENDED);
+				if (Idx < traversabilityCache.size()) {
+					VideoDriver->DrawPoint(p - vp.origin, TraversabilityColors[(int)traversabilityCache.GetCellState(Idx).type], BLENDED);
 				}
 				else {
 					VideoDriver->DrawPoint(p - vp.origin, Color{200, 0, 200, 0}, BLENDED);

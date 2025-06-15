@@ -1,13 +1,30 @@
-//
-// Created by draghan on 01.03.25.
-//
+/* GemRB - Infinity Engine Emulator
+* Copyright (C) 2003-2004 The GemRB Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
 
-#include <Scriptable/Actor.h>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ *
+ */
+
+
+#include "TraversabilityCache.h"
 #include "Map.h"
-#include "PathfindingSettings.h"
+#include "Scriptable/Actor.h"
 
 namespace GemRB {
-	FCachedActorPosState::FCachedActorPosState(Actor *InActor) {
+	TraversabilityCache::CachedActorState::CachedActorState(Actor *InActor) {
 		if (!InActor) {
 			return;
 		}
@@ -27,46 +44,46 @@ namespace GemRB {
 		region = CalculateRegion(InActor);
 	}
 
-	Region FCachedActorPosState::CalculateRegion(const Actor *InActor) {
+	Region TraversabilityCache::CachedActorState::CalculateRegion(const Actor *InActor) {
 		const auto baseSize = InActor->CircleSize2Radius() * InActor->sizeFactor;
 		const Size s(baseSize * 8, baseSize * 6);
 		return {InActor->Pos - s.Center(), s};
 	}
 
-	void FCachedActorPosState::
-	ClearOldPosition(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
+	void TraversabilityCache::CachedActorState::
+	ClearOldPosition(std::vector<TraversabilityCellData> &InOutTraversability, int InWidth) const {
 		for (int x = region.x_get(); x < region.x_get() + region.w_get(); ++x) {
 			for (int y = region.y_get(); y < region.y_get() + region.h_get(); ++y) {
 				if (!actor->IsOver(Point(x, y), pos)) {
 					continue;
 				}
 				const auto Idx = y * InWidth * 16 + x;
-				InOutTraversability[Idx] = FTraversability{};
+				InOutTraversability[Idx] = TraversabilityCellData{};
 			}
 		}
 	}
 
-	void FCachedActorPosState::ClearNewPosition(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
+	void TraversabilityCache::CachedActorState::ClearNewPosition(std::vector<TraversabilityCellData> &InOutTraversability, int InWidth) const {
 		const auto RemovedRegion = CalculateRegion(actor);
 		for (int x = RemovedRegion.x_get(); x < RemovedRegion.x_get() + RemovedRegion.w_get(); ++x) {
 			for (int y = RemovedRegion.y_get(); y < RemovedRegion.y_get() + RemovedRegion.h_get(); ++y) {
 				const auto Idx = y * InWidth * 16 + x;
-				InOutTraversability[Idx] = FTraversability{};
+				InOutTraversability[Idx] = TraversabilityCellData{};
 			}
 		}
 	}
 
-	void FCachedActorPosState::MarkNewPosition(std::vector<FTraversability> &InOutTraversability, int InWidth,
+	void TraversabilityCache::CachedActorState::MarkNewPosition(std::vector<TraversabilityCellData> &InOutTraversability, int InWidth,
 	                                           bool bInUpdateSelf) {
-		const FCachedActorPosState newState{actor};
+		const CachedActorState newState{actor};
 
-		ETraversability NewTraversabilityType{ETraversability::actorNonTraversable};
+		TraversabilityCellState NewTraversabilityType{TraversabilityCellState::actorNonTraversable};
 		if (!newState.GetIsAlive()) {
-			NewTraversabilityType = ETraversability::empty;
+			NewTraversabilityType = TraversabilityCellState::empty;
 		} else if (newState.GetIsBumpable()) {
-			NewTraversabilityType = ETraversability::actor;
+			NewTraversabilityType = TraversabilityCellState::actor;
 		}
-		const FTraversability NewTraversability{NewTraversabilityType, actor};
+		const TraversabilityCellData NewTraversability{NewTraversabilityType, actor};
 
 		const auto &NewRegion = newState.region;
 		for (int x = std::max(0, NewRegion.x_get()); x < NewRegion.x_get() + NewRegion.w_get(); ++x) {
@@ -85,46 +102,31 @@ namespace GemRB {
 		}
 	}
 
-	void FCachedActorPosState::MarkOldPosition(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
-		ETraversability NewTraversabilityType{ ETraversability::actorNonTraversable };
-		if (!GetIsAlive()) {
-			NewTraversabilityType = ETraversability::empty;
-		} else if (GetIsBumpable()) {
-			NewTraversabilityType = ETraversability::actor;
-		}
-		const FTraversability NewTraversability{NewTraversabilityType, actor};
-
-		for (int x = region.x_get(); x < region.x_get() + region.w_get(); ++x) {
-			for (int y = region.y_get(); y < region.y_get() + region.h_get(); ++y) {
-				if (!actor->IsOver(Point{x, y})) {
-					continue;
-				}
-				const auto Idx = y * InWidth * 16 + x;
-				InOutTraversability[Idx] = NewTraversability;
-			}
-		}
-	}
-
-	void FCachedActorPosState::UpdateNewState() {
-		const FCachedActorPosState newState{actor};
+	void TraversabilityCache::CachedActorState::UpdateNewState() {
+		const CachedActorState newState{actor};
 		this->flags = newState.flags;
 		this->pos = newState.pos;
 		this->region = newState.region;
 	}
 
-	void Map::UpdateTraversabilityCache() {
+	void TraversabilityCache::UpdateTraversabilityCache() {
+		// this cache is updated once per frame and only if any path was requested
+		if (bUpdatedTraversabilityThisFrame) {
+			return;
+		}
+		bUpdatedTraversabilityThisFrame = true;
 
 		// determine all changes in actors' state regarding their alive status, bumpable status and position, also check for new and removed actors
 		std::vector<size_t> ActorsRemoved;
-		std::vector<std::vector<FCachedActorPosState>::iterator> ActorsUpdated;
-		std::vector<FCachedActorPosState> ActorsNew;
+		std::vector<std::vector<TraversabilityCache::CachedActorState>::iterator> ActorsUpdated;
+		std::vector<TraversabilityCache::CachedActorState> ActorsNew;
 
 		// for all actors in the map...
-		for (auto currentActor: actors) {
+		for (auto currentActor: map->actors) {
 
 			// find this actor in cache
 			const auto Found = std::find_if(CachedActorPosState.begin(), CachedActorPosState.end(),
-			                                [currentActor](const FCachedActorPosState &CachedActor) {
+			                                [currentActor](const TraversabilityCache::CachedActorState &CachedActor) {
 				                                return CachedActor.actor == currentActor;
 			                                });
 
@@ -135,7 +137,7 @@ namespace GemRB {
 			}
 
 			// if found, check if the position, bumpable status and alive status have been updated since last cache update
-			const FCachedActorPosState &CachedActor = *Found;
+			const TraversabilityCache::CachedActorState &CachedActor = *Found;
 			if (CachedActor.pos != currentActor->Pos ||
 			    CachedActor.GetIsAlive() != currentActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED) ||
 			    CachedActor.GetIsBumpable() != currentActor->ValidTarget(GA_ONLY_BUMPABLE)) {
@@ -146,10 +148,10 @@ namespace GemRB {
 		// find all actors from cache which are not among the map actors and store their index to remove them later
 		for (size_t i = 0; i < CachedActorPosState.size(); ++i) {
 			const auto &CachedActorPos = CachedActorPosState[i];
-			const auto Found = std::find_if(actors.cbegin(), actors.cend(), [&CachedActorPos](const Actor *actor) {
+			const auto Found = std::find_if(map->actors.cbegin(), map->actors.cend(), [&CachedActorPos](const Actor *actor) {
 				return CachedActorPos.actor == actor;
 			});
-			if (Found == actors.cend()) {
+			if (Found == map->actors.cend()) {
 				ActorsRemoved.push_back(i);
 			}
 		}
@@ -165,17 +167,17 @@ namespace GemRB {
 
 		// for all removed actors: clear in cache all the cells they were part of
 		for (const auto RemovedIndex: ActorsRemoved) {
-			CachedActorPosState[RemovedIndex].ClearOldPosition(Traversability, PropsSize().w);
+			CachedActorPosState[RemovedIndex].ClearOldPosition(Traversability, map->PropsSize().w);
 		}
 
 		// for all updated actors: make necessary changes based on the status change
 		for (auto IteratorUpdated: ActorsUpdated) {
-			FCachedActorPosState &Updated = *IteratorUpdated;
+			TraversabilityCache::CachedActorState &Updated = *IteratorUpdated;
 
 			// if the position of the actor changed...
 			if (Updated.pos != Updated.actor->Pos) {
 				// clear old position of this actor
-				Updated.ClearOldPosition(Traversability, PropsSize().w);
+				Updated.ClearOldPosition(Traversability, map->PropsSize().w);
 
 				// check whether any other actor didn't share the same position, if so - change the bumpable state of this cell (I can't remember why did I change the bumpable flag here??)
 				for (auto & cachedActorState : CachedActorPosState) {
@@ -187,7 +189,7 @@ namespace GemRB {
 					}
 				}
 				// mark new position of this actor
-				Updated.MarkNewPosition(Traversability, PropsSize().w, true);
+				Updated.MarkNewPosition(Traversability, map->PropsSize().w, true);
 				continue;
 			}
 
@@ -195,27 +197,27 @@ namespace GemRB {
 			if (!Updated.GetIsAlive() && (Updated.GetIsAlive() != Updated.actor->ValidTarget(
 				                              GA_NO_DEAD | GA_NO_UNSCHEDULED))) {
 				// no need to clear old position, just mark new position
-				Updated.MarkNewPosition(Traversability, PropsSize().w, true);
+				Updated.MarkNewPosition(Traversability, map->PropsSize().w, true);
 			}
 			// if our actor did go from alive to dead...
 			else if (Updated.GetIsAlive() && (Updated.GetIsAlive() != Updated.actor->ValidTarget(
 				                                  GA_NO_DEAD | GA_NO_UNSCHEDULED))) {
 				// just clear old position
-				Updated.ClearOldPosition(Traversability, PropsSize().w);
+				Updated.ClearOldPosition(Traversability, map->PropsSize().w);
 				Updated.UpdateNewState();
 			}
 
 			// if our actor did change its bumpable state
 			if (Updated.GetIsBumpable() != Updated.actor->ValidTarget(GA_ONLY_BUMPABLE)) {
 				// clear old cells and mark new cells
-				Updated.ClearOldPosition(Traversability, PropsSize().w);
-				Updated.MarkNewPosition(Traversability, PropsSize().w, true);
+				Updated.ClearOldPosition(Traversability, map->PropsSize().w);
+				Updated.MarkNewPosition(Traversability, map->PropsSize().w, true);
 			}
 		}
 
 		// for any new actors, just mark their new position
 		for (auto &New: ActorsNew) {
-			New.MarkNewPosition(Traversability, PropsSize().w);
+			New.MarkNewPosition(Traversability, map->PropsSize().w);
 		}
 
 		// remove from cache all the actors deteced as removed from the map since last cache update
@@ -230,12 +232,12 @@ namespace GemRB {
 		}
 	}
 
-	void Map::ValidateTraversabilityCacheSize() {
-		const auto ExpectedSize = PropsSize().h * 12 * PropsSize().w * 16;
+	void TraversabilityCache::ValidateTraversabilityCacheSize() {
+		const auto ExpectedSize = map->PropsSize().h * 12 * map->PropsSize().w * 16;
 		if (Traversability.size() != ExpectedSize) {
 			Log(WARNING, "Map", "Resizing Traversability table.");
-			Traversability.resize(ExpectedSize, FTraversability{ETraversability::empty, nullptr});
-			memset(Traversability.data(), 0, sizeof(FTraversability) * Traversability.size());
+			Traversability.resize(ExpectedSize, TraversabilityCache::TraversabilityCellData{TraversabilityCache::TraversabilityCellState::empty, nullptr});
+			memset(Traversability.data(), 0, sizeof(TraversabilityCache::TraversabilityCellData) * Traversability.size());
 		}
 	}
 }

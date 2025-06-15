@@ -30,6 +30,7 @@
 #include "PathFinder.h"
 #include "Polygon.h"
 #include "WorldMap.h"
+#include "TraversabilityCache.h"
 
 #include "Scriptable/Scriptable.h"
 #include "Video/Video.h"
@@ -373,64 +374,6 @@ public:
 	void PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, PathMapFlags value) const noexcept;
 };
 
-enum class ETraversability: uint8_t {
-	empty = 0,
-	actor,
-	actorNonTraversable,
-
-	max
-};
-
-struct FTraversability {
-	ETraversability type = ETraversability::empty;
-	Actor* actor = nullptr;
-};
-
-struct FCachedActorPosState {
-	Region region;
-	Actor* actor = nullptr;
-	Point pos;
-	uint8_t flags{};
-	constexpr static uint8_t BUMPABLE_FLAG = 1;
-	constexpr static uint8_t ALIVE_FLAG = 2;
-
-	inline void SetIsBumpable() {
-		flags |= (1 << BUMPABLE_FLAG);
-	}
-
-	inline void ResetIsBumpable() {
-		flags &= ~(1 << BUMPABLE_FLAG);
-	}
-
-	inline void SetIsAlive() {
-		flags |= (1 << ALIVE_FLAG);
-	}
-
-	inline void ResetIsAlive() {
-		flags &= ~(1 << ALIVE_FLAG);
-	}
-
-	inline void FlipIsBumpable() {
-		flags ^= (1 << BUMPABLE_FLAG);
-	}
-
-	bool GetIsBumpable() const {
-		return flags & (1 << BUMPABLE_FLAG);
-	}
-
-	bool GetIsAlive() const {
-		return flags & (1 << ALIVE_FLAG);
-	}
-
-	explicit FCachedActorPosState(Actor* InActor);
-	void ClearOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-	void ClearNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-	void MarkNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth, bool bInUpdateSelf = false);
-	void MarkOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-	void UpdateNewState();
-	static Region CalculateRegion(const Actor* InActor);
-};
-
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
@@ -475,12 +418,13 @@ private:
 	EnumArray<Priority, unsigned int> lastActorCount;
 	bool hostilesVisible = false;
 
+	friend class TraversabilityCache;
+	TraversabilityCache traversabilityCache;
+
 	VideoBufferPtr wallStencil = nullptr;
 	Region stencilViewport;
 
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
-
-	std::vector<FTraversability> Traversability;
 
 	class MapReverb {
 	public:
@@ -516,12 +460,6 @@ private:
 public:
 	Map(TileMap* tm, TileProps tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
-
-	std::vector<FCachedActorPosState> CachedActorPosState;
-	bool bUpdatedTraversabilityThisFrame;
-	void UpdateTraversabilityCache();
-	void ValidateTraversabilityCacheSize();
-
 	static void NormalizeDeltas(float_t& dx, float_t& dy, float_t factor = 1);
 
 	/** prints useful information on console */

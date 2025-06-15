@@ -71,10 +71,7 @@ Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned 
 {
 	TRACY(ZoneScoped);
 
-	if (!bUpdatedTraversabilityThisFrame) {
-		UpdateTraversabilityCache();
-		bUpdatedTraversabilityThisFrame = true;
-	}
+	traversabilityCache.UpdateTraversabilityCache();
 
 	if (InDebugMode(DebugMode::PATHFINDER))
 		Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}",
@@ -82,7 +79,7 @@ Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned 
 		    fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" },
 		    minDistance, size);
 	const bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
-	const auto BlockingTraversabilityVal = actorsAreBlocking ? ETraversability::actor : ETraversability::actorNonTraversable;
+	const auto BlockingTraversabilityVal = actorsAreBlocking ? TraversabilityCache::TraversabilityCellState::actor : TraversabilityCache::TraversabilityCellState::actorNonTraversable;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	SearchmapPoint smptDest0 { d };
@@ -228,7 +225,7 @@ Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned 
 				// If there's an actor, check it can be bumped away
 				TRACY(TracyCZoneN(tCtxActorChecks, "actorChecks", true));
 
-				const auto TraversableVal = Traversability[nmptChild.y * mapSize.w * 16 + nmptChild.x];
+				const auto TraversableVal = traversabilityCache.GetCellState(nmptChild.y * mapSize.w * 16 + nmptChild.x);
 
 				const bool childIsUnbumpable = TraversableVal.actor != caller && TraversableVal.type >= BlockingTraversabilityVal;
 

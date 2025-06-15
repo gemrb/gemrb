@@ -242,7 +242,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	Path ResultOriginalImproved;
 #if PATH_RUN_BENCH
 	Log(DEBUG, "Map", "--- FindPath ---");
-	if (!bUpdatedTraversabilityThisFrame) {
+	if (!traversabilityCache.HasUpdatedTraversabilityThisFrame()) {
 		Log(DEBUG, "Map", "(improved implementation will recalculate cache)");
 	}
 	FlushLogs();
