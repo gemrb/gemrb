@@ -66,20 +66,16 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383,
 // Sines
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand { { 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924 } };
 
-Path Map::FindPathImproved(const Point &s, const Point &d, unsigned int size, unsigned int minDistance,
-	int flags, const Actor *caller)
+
+Path Map::FindPathOriginal(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller) const
 {
 	TRACY(ZoneScoped);
-
-	traversabilityCache.UpdateTraversabilityCache();
-
 	if (InDebugMode(DebugMode::PATHFINDER))
 		Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}",
 		    s, d,
 		    fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" },
 		    minDistance, size);
-	const bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
-	const auto BlockingTraversabilityVal = actorsAreBlocking ? TraversabilityCache::TraversabilityCellState::actor : TraversabilityCache::TraversabilityCellState::actorNonTraversable;
+	bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	SearchmapPoint smptDest0 { d };
@@ -108,36 +104,15 @@ Path Map::FindPathImproved(const Point &s, const Point &d, unsigned int size, un
 	if (!mapSize.PointInside(smptSource)) return {};
 
 	// Initialize data structures
-	const int32_t MapSize = mapSize.Area();
-
-	FibonacciHeap<PQNode> open; // todo: remove this data structure or rewrite its implementation - too much allocations there!
-	// make most data storage for this algorithm static, to avoid memory allocations;
-	// each run we just clear the storage, which is keeping the underlying allocated memory at hand
-	static std::vector<bool> isClosed(mapSize.Area(), false);
-	static std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
-	static std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
-
-	// resize if needed (in case of a map change)
-	if (isClosed.size() != MapSize)
-	{
-		isClosed.resize(MapSize);
-		parents.resize(MapSize);
-		distFromStart.resize(MapSize);
-	}
-
-	// cleanup
-	isClosed.clear();
-	isClosed.resize(MapSize, false);
-	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
-	// amount of elements (the opposite also holds true)
-	memset(parents.data(), 0, sizeof(Point) * MapSize);
-	memset(distFromStart.data(), std::numeric_limits<unsigned short>::max(), sizeof(unsigned short) * MapSize);
-
-	// begin algo init
+	FibonacciHeap<PQNode> open;
+	std::vector<bool> isClosed(mapSize.Area(), false);
+	std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
+	std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
 	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
 	open.emplace(PQNode(nmptSource, 0));
 	bool foundPath = false;
+	static bool usePlainThetaStar = gamedata->GetMiscRule("LAZY_THETA_STAR") == 0;
 	unsigned int squaredMinDist = minDistance * minDistance;
 
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
@@ -199,8 +174,8 @@ Path Map::FindPathImproved(const Point &s, const Point &d, unsigned int size, un
 			if (childBlocked) continue;
 
 			// If there's an actor, check it can be bumped away
-			const auto TraversableVal = traversabilityCache.GetCellState(nmptChild.y * mapSize.w * 16 + nmptChild.x);
-			const bool childIsUnbumpable = TraversableVal.actor != caller && TraversableVal.type >= BlockingTraversabilityVal;
+			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
+			bool childIsUnbumpable = childActor && childActor != caller && (actorsAreBlocking || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
 
 			SearchmapPoint smptCurrent2 { nmptCurrent };
@@ -208,7 +183,28 @@ Path Map::FindPathImproved(const Point &s, const Point &d, unsigned int size, un
 			SearchmapPoint smptParent { nmptParent };
 			unsigned short oldDist = distFromStart[smptChildIdx];
 
-			{
+			if (usePlainThetaStar) {
+				// Theta-star path if there is LOS
+				if (IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
+					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
+					if (newDist < oldDist) {
+						parents[smptChildIdx] = nmptParent;
+						distFromStart[smptChildIdx] = newDist;
+					}
+					// Fall back to A-star path
+				} else {
+					unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
+					if (newDist < oldDist) {
+						parents[smptChildIdx] = nmptCurrent;
+						distFromStart[smptChildIdx] = newDist;
+					}
+				}
+
+				if (distFromStart[smptChildIdx] < oldDist) {
+					PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
+					open.emplace(newNode);
+				}
+			} else {
 				// Lazy Theta star*
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
