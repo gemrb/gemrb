@@ -232,10 +232,11 @@ PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
 Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller) const
 {
 	using namespace std::chrono_literals;
+	const char units[] = "us";
 	auto Bench = ankerl::nanobench::Bench()
 		.epochIterations(PATH_BENCHMARK_ITERS)
 		.warmup(PATH_BENCHMARK_WARMUP)
-		.timeUnit(1us, "us")
+		.timeUnit(1us, units)
 		.performanceCounters(true);
 	Path ResultOriginal;
 	Path ResultOriginalImproved;
@@ -244,6 +245,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	if (!bUpdatedTraversabilityThisFrame) {
 		Log(DEBUG, "Map", "(improved implementation will recalculate cache)");
 	}
+	FlushLogs();
 	Bench.relative(true).name("FindPathOriginal").run([&] {
 #endif
 #if PATH_RUN_ORIGINAL
@@ -264,6 +266,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 #endif
 #if PATH_RUN_BENCH
 	});
+	std::cout << "|---------:|--------------------:|--------------------:|--------:|----------:|:----------" << "\n| relative |               " << units << "/op |                op/s |    err% |     total | benchmark" << std::endl;
 #endif
 	//std::cout << std::endl;
 	// std::cout << "Size: Original=" << ResultOriginal.nodes.size() << ", Improved=" << ResultOriginalImproved.nodes.size();
