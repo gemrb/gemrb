@@ -1800,9 +1800,6 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 
 		Region block(0, 0, 1, 1);
 
-		int w = vp.w;// / 16 + 2;
-		int h = vp.h;// / 12 + 2;
-
 		BlitFlags flags = BlitFlags::BLENDED;
 		if (dFlags & DEBUG_SHOW_LIGHTMAP) {
 			flags |= BlitFlags::HALFTRANS;

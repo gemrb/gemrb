@@ -228,7 +228,7 @@ void TraversabilityCache::Update()
 
 void TraversabilityCache::ValidateTraversabilityCacheSize()
 {
-	const auto expectedSize = map->PropsSize().h * 12 * map->PropsSize().w * 16;
+	const size_t expectedSize = map->PropsSize().h * 12 * map->PropsSize().w * 16;
 	if (traversabilityData.size() != expectedSize) {
 		Log(DEBUG, "Map", "Resizing traversabilityData cache.");
 		traversabilityData.resize(expectedSize, TraversabilityCellData { TraversabilityCellState::EMPTY, nullptr });

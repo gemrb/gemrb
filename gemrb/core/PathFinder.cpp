@@ -267,7 +267,7 @@ Path Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned i
 	if (!mapSize.PointInside(smptSource)) return {};
 
 	// Initialize data structures
-	const int32_t MapSize = mapSize.Area();
+	const size_t MapSize = mapSize.Area();
 
 	FibonacciHeap<PQNode> open; // todo: remove this data structure or rewrite its implementation - too much allocations there!
 	// make most data storage for this algorithm static, to avoid memory allocations;
@@ -289,8 +289,8 @@ Path Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned i
 	isClosed.resize(MapSize, false);
 	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
 	// amount of elements (the opposite also holds true)
-	memset(parents.data(), 0, sizeof(Point) * MapSize);
-	memset(distFromStart.data(), std::numeric_limits<unsigned short>::max(), sizeof(unsigned short) * MapSize);
+	memset(static_cast<void*>(parents.data()), 0, sizeof(Point) * MapSize);
+	memset(static_cast<void*>(distFromStart.data()), std::numeric_limits<unsigned short>::max(), sizeof(unsigned short) * MapSize);
 
 	// begin algo init
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
