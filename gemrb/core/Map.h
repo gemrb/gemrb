@@ -497,9 +497,9 @@ public:
 	};
 
 	struct FCachedActorPosState2 {
+		Region region;
 		Actor* actor = nullptr;
 		Point pos;
-		Region region;
 		uint8_t flags;
 		constexpr static uint8_t BUMPABLE_FLAG = 1;
 		constexpr static uint8_t ALIVE_FLAG = 2;
