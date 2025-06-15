@@ -266,7 +266,6 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	if (!mapSize.PointInside(smptSource)) return {};
 
 	// Initialize data structures
-
 	FibonacciHeap<PQNode> open;
 	std::vector<bool> isClosed(mapSize.Area(), false);
 	std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
@@ -299,8 +298,6 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		open.pop();
 		SearchmapPoint smptCurrent { nmptCurrent };
 		int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
-
-		TRACY(ZoneScopedN("firstChecks"));
 		if (parents[smptCurrentIdx].IsZero()) {
 			continue;
 		}
@@ -312,8 +309,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		} else if (minDistance &&
 			   parents[smptCurrentIdx] != nmptCurrent &&
 			   SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist &&
-			   (!(flags & PF_SIGHT) ||
-			    IsVisibleLOS(smptCurrent, smptDest0, caller))) { // FIXME: should probably be smptDest
+			   (!(flags & PF_SIGHT) || IsVisibleLOS(smptCurrent, smptDest0, caller))) { // FIXME: should probably be smptDest
 			smptDest = smptCurrent;
 			nmptDest = nmptCurrent;
 			foundPath = true;
@@ -325,8 +321,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
 			SearchmapPoint smptChild { nmptChild };
 			// Outside map
-			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h)
-				continue;
+			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
 			if (isClosed[smptChildIdx]) continue;
@@ -342,8 +337,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 
 			// If there's an actor, check it can be bumped away
 			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
-			bool childIsUnbumpable = childActor && childActor != caller &&
-				(actorsAreBlocking || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
+			bool childIsUnbumpable = childActor && childActor != caller && (actorsAreBlocking || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
 
 			SearchmapPoint smptCurrent2 { nmptCurrent };
@@ -354,16 +348,14 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			if (usePlainThetaStar) {
 				// Theta-star path if there is LOS
 				if (IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
-					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] +
-						Distance(smptParent, smptChild);
+					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 					if (newDist < oldDist) {
 						parents[smptChildIdx] = nmptParent;
 						distFromStart[smptChildIdx] = newDist;
 					}
 					// Fall back to A-star path
 				} else {
-					unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] +
-						Distance(smptCurrent2, smptChild);
+					unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
 					if (newDist < oldDist) {
 						parents[smptChildIdx] = nmptCurrent;
 						distFromStart[smptChildIdx] = newDist;
@@ -371,15 +363,12 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 				}
 
 				if (distFromStart[smptChildIdx] < oldDist) {
-					{
-						PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
-						open.emplace(newNode);
-					}
+					PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
+					open.emplace(newNode);
 				}
 			} else {
 				// Lazy Theta star*
-				unsigned short newDist =
-					distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
+				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
 					parents[smptChildIdx] = nmptParent;
 					distFromStart[smptChildIdx] = newDist;
@@ -397,15 +386,12 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 							NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
 							SearchmapPoint smptVis { nmptVis };
 							// Outside map
-							if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w ||
-							    smptVis.y >= mapSize.h)
-								continue;
+							if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
 							// Only consider already visited
 							if (!isClosed[smptVis.y * mapSize.w + smptVis.x]) continue;
 
 							unsigned short oldVisDist = distFromStart[smptChildIdx];
-							newDist =
-								distFromStart[smptVis.y * mapSize.w + smptVis.x] + Distance(smptVis, smptChild);
+							newDist = distFromStart[smptVis.y * mapSize.w + smptVis.x] + Distance(smptVis, smptChild);
 							if (newDist < oldVisDist) {
 								parents[smptChildIdx] = nmptVis;
 								distFromStart[smptChildIdx] = newDist;
@@ -434,8 +420,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			// that the distance isn't too far away
 			// we approximate that with a relaxed collinearity check and intentionally
 			// skip the first step, otherwise it doesn't help with iwd beetles in ar1015
-			if (flags & PF_BACKAWAY && resultPath &&
-			    std::abs(area2(nmptCurrent, resultPath.GetStep(0).point, nmptParent)) < 300) {
+			if (flags & PF_BACKAWAY && resultPath && std::abs(area2(nmptCurrent, resultPath.GetStep(0).point, nmptParent)) < 300) {
 				newStep.orient = GetOrient(nmptCurrent, nmptParent);
 			} else {
 				newStep.orient = GetOrient(nmptParent, nmptCurrent);
@@ -453,9 +438,9 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		} else {
 			Log(DEBUG, "FindPath", "Pathing failed");
 		}
-    }
+	}
 
-    return {};
+	return {};
 
 }
 
