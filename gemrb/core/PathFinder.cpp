@@ -235,7 +235,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	auto Bench = ankerl::nanobench::Bench()
 		.epochIterations(PATH_BENCHMARK_ITERS)
 		.warmup(PATH_BENCHMARK_WARMUP)
-		.timeUnit(1ms, "ms")
+		.timeUnit(1us, "us")
 		.performanceCounters(true);
 	Path ResultOriginal;
 	Path ResultOriginalImproved;
