@@ -241,6 +241,9 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	Path ResultOriginalImproved;
 #if PATH_RUN_BENCH
 	Log(DEBUG, "Map", "--- FindPath ---");
+	if (!bUpdatedTraversabilityThisFrame) {
+		Log(DEBUG, "Map", "(improved implementation will recalculate cache)");
+	}
 	Bench.relative(true).name("FindPathOriginal").run([&] {
 #endif
 #if PATH_RUN_ORIGINAL
