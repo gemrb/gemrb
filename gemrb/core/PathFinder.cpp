@@ -46,14 +46,10 @@
 #if USE_TRACY
 #include "tracy/TracyC.h"
 #endif
-#define ANKERL_NANOBENCH_IMPLEMENT
-#include "nanobench.h"
 
 #include <array>
 #include <limits>
 #include "PathfindingSettings.h"
-
-FRemStat rf;
 
 namespace GemRB {
 

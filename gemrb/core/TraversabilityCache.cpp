@@ -24,6 +24,7 @@
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
+
 	TraversabilityCache::CachedActorState::CachedActorState(Actor *InActor) {
 		if (!InActor) {
 			return;
