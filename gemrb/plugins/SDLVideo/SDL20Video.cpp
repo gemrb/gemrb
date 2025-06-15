@@ -296,7 +296,7 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 	if (format == SDL_PIXELFORMAT_UNKNOWN)
 		return nullptr;
 
-	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w, r.h);
+	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w_get(), r.h_get());
 	if (tex == nullptr) {
 		Log(ERROR, "SDL 2", "{}", SDL_GetError());
 		return nullptr;
@@ -460,7 +460,7 @@ void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 	const Region& r = buf->Rect();
 	Point origin = r.origin + p;
 
-	const Region& srect = { 0, 0, r.w, r.h };
+	const Region& srect = { 0, 0, r.w_get(), r.h_get() };
 	const Region& drect = { origin, r.size };
 	BlitSpriteNativeClipped(tex, srect, drect, flags, reinterpret_cast<const SDL_Color*>(&tint));
 }
@@ -738,8 +738,8 @@ Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr&
 {
 	SDL_Rect rect = RectFromRegion(r);
 
-	unsigned int Width = r.w ? r.w : screenSize.w;
-	unsigned int Height = r.h ? r.h : screenSize.h;
+	unsigned int Width = r.w_get() ? r.w_get() : screenSize.w;
+	unsigned int Height = r.h_get() ? r.h_get() : screenSize.h;
 
 	static const PixelFormat fmt(3, 0x00ff0000, 0x0000ff00, 0x000000ff, 0);
 	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0, 0, Width, Height), fmt);

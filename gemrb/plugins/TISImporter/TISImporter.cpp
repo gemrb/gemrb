@@ -145,12 +145,12 @@ void TISImporter::Blit(const TISPVRBlock& dataBlock, uint8_t* frameData)
 
 	const uint8_t* spritePixels = static_cast<uint8_t*>(sprite->LockSprite());
 	for (ieDword h = 0; h < TileSize; ++h) {
-		size_t offset = h * sprite->Frame.w * 4;
+		size_t offset = h * sprite->Frame.w_get() * 4;
 		size_t destOffset = 4 * (TileSize * h);
 
 		std::copy(
 			spritePixels + offset,
-			spritePixels + offset + sprite->Frame.w * 4,
+			spritePixels + offset + sprite->Frame.w_get() * 4,
 			frameData + destOffset);
 	}
 

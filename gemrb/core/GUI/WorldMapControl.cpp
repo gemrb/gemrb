@@ -117,10 +117,10 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			// but bg2 ar1700 has bad data (ar1800), causing two indicators to be displayed, so defer
 			if (areaIndicator && (m->AreaResRef == current || m->AreaName == current)) {
 				Point indicatorPos = offset - icon->Frame.origin;
-				indicatorPos.x += areaIndicator->Frame.x + icon->Frame.w / 2 - areaIndicator->Frame.w / 2;
+				indicatorPos.x += areaIndicator->Frame.x_get() + icon->Frame.w_get() / 2 - areaIndicator->Frame.w_get() / 2;
 				// bg2 centered also vertically, while the rest didn't
 				if (core->HasFeature(GFFlags::JOURNAL_HAS_SECTIONS)) {
-					indicatorPos.y += areaIndicator->Frame.y + icon->Frame.h / 2 - areaIndicator->Frame.h / 2;
+					indicatorPos.y += areaIndicator->Frame.y_get() + icon->Frame.h_get() / 2 - areaIndicator->Frame.h_get() / 2;
 				}
 				potentialIndicators.push_back(indicatorPos);
 			}
@@ -163,7 +163,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 		Size ts = ftext->StringSize(caption);
 		ts.w += 10;
-		ftext->Print(Region(Point(r2.x + (r2.w - ts.w) / 2, r2.y + r2.h), ts),
+		ftext->Print(Region(Point(r2.x_get() + (r2.w_get() - ts.w) / 2, r2.y_get() + r2.h_get()), ts),
 			     caption, 0, colors);
 	}
 }
@@ -183,13 +183,13 @@ void WorldMapControl::ScrollTo(const Point& pos)
 		// center worldmap on current area
 		const WMPAreaEntry* areaEntry = worldmap->GetArea(currentArea);
 		if (areaEntry) {
-			Pos.x = areaEntry->pos.x - frame.w / 2;
-			Pos.y = areaEntry->pos.y - frame.h / 2;
+			Pos.x = areaEntry->pos.x - frame.w_get() / 2;
+			Pos.y = areaEntry->pos.y - frame.h_get() / 2;
 		}
 	}
 
-	int maxx = MapMOS->Frame.w - frame.w;
-	int maxy = MapMOS->Frame.h - frame.h;
+	int maxx = MapMOS->Frame.w_get() - frame.w_get();
+	int maxy = MapMOS->Frame.h_get() - frame.h_get();
 	Pos.x = Clamp<int>(Pos.x, 0, maxx);
 	Pos.y = Clamp<int>(Pos.y, 0, maxy);
 
@@ -222,18 +222,18 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 		const Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam.get());
 		Region rgn(ae->pos, Size());
 		if (icon) {
-			rgn.x -= icon->Frame.x;
-			rgn.y -= icon->Frame.y;
-			rgn.w = icon->Frame.w;
-			rgn.h = icon->Frame.h;
+			rgn.x_get() -= icon->Frame.x_get();
+			rgn.y_get() -= icon->Frame.y_get();
+			rgn.w_get() = icon->Frame.w_get();
+			rgn.h_get() = icon->Frame.h_get();
 		}
 		if (ftext) {
 			Size ts = ftext->StringSize(ae->GetCaption());
 			ts.w += 10;
-			if (rgn.h < ts.h)
-				rgn.h = ts.h;
-			if (rgn.w < ts.w)
-				rgn.w = ts.w;
+			if (rgn.h_get() < ts.h)
+				rgn.h_get() = ts.h;
+			if (rgn.w_get() < ts.w)
+				rgn.w_get() = ts.w;
 		}
 		if (!rgn.PointInside(mapOff)) continue;
 

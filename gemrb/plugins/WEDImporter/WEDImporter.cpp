@@ -303,13 +303,13 @@ void WEDImporter::ReadWallPolygons()
 
 		// Note: unlike the rest, the layout is minX, maxX, minY, maxY
 		auto& rect = PolygonHeaders[i].rect;
-		str->ReadScalar<int, ieWord>(rect.x);
-		str->ReadScalar<int, ieWord>(rect.w);
-		str->ReadScalar<int, ieWord>(rect.y);
-		str->ReadScalar<int, ieWord>(rect.h);
+		str->ReadScalar<int, ieWord>(rect.x_get());
+		str->ReadScalar<int, ieWord>(rect.w_get());
+		str->ReadScalar<int, ieWord>(rect.y_get());
+		str->ReadScalar<int, ieWord>(rect.h_get());
 
-		rect.w -= rect.x;
-		rect.h -= rect.y;
+		rect.w_get() -= rect.x_get();
+		rect.h_get() -= rect.y_get();
 	}
 
 	for (ieDword i = 0; i < polygonCount; i++) {

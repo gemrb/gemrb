@@ -32,7 +32,7 @@
 namespace GemRB {
 
 TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const String*>& opts, bool numbered, Margin m)
-	: ContentContainer(Region(0, 0, ta.Frame().w, 0)), ta(ta)
+	: ContentContainer(Region(0, 0, ta.Frame().w_get(), 0)), ta(ta)
 {
 	SetFlags(RESIZE_WIDTH, BitOp::NAND);
 
@@ -45,8 +45,8 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	Size numFrame(numWidth, ta.ftext->LineHeight); // size for the numerical prefix so they stay aligned
 	Point origin(margin.left, margin.top);
 	Region r(origin, Dimensions());
-	r.w = std::max(r.w - margin.left - margin.right, 0);
-	r.h = std::max(r.h - margin.top - margin.bottom, 0);
+	r.w_get() = std::max(r.w_get() - margin.left - margin.right, 0);
+	r.h_get() = std::max(r.h_get() - margin.top - margin.bottom, 0);
 
 	Font::PrintColors optionColors { ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND] };
 	Font::PrintColors selectedCol { ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND] };
@@ -67,12 +67,12 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 
 		if (EventMgr::TouchInputEnabled) {
 			// keeping the options spaced out (for touch screens)
-			r.y += ta.LineHeight();
+			r.y_get() += ta.LineHeight();
 		}
-		r.y += selOption->Dimensions().h;
+		r.y_get() += selOption->Dimensions().h;
 	}
 
-	SetFrameSize(Size(r.w, r.y)); // r.y is not a typo, its the location where the next option would have been
+	SetFrameSize(Size(r.w_get(), r.y_get())); // r.y is not a typo, its the location where the next option would have been
 
 	if (numbered) {
 		// in a sane world we would simply focus the window and this View
@@ -96,9 +96,9 @@ void TextArea::SpanSelector::SizeChanged(const Size&)
 	// NOTE: this wouldnt be needed if we used TextSpans (layout) for the options, but then we would have to
 	// write more complex code for the hover effects and selection
 	Point origin(margin.left, margin.top);
-	Region r(origin, Size(frame.w, 0));
-	r.w = std::max(r.w - margin.left - margin.right, 0);
-	r.h = std::max(r.h - margin.top - margin.bottom, 0);
+	Region r(origin, Size(frame.w_get(), 0));
+	r.w_get() = std::max(r.w_get() - margin.left - margin.right, 0);
+	r.h_get() = std::max(r.h_get() - margin.top - margin.bottom, 0);
 
 	for (auto it = subViews.rbegin(); it != subViews.rend(); ++it) {
 		View* selOption = *it;
@@ -107,12 +107,12 @@ void TextArea::SpanSelector::SizeChanged(const Size&)
 
 		if (EventMgr::TouchInputEnabled) {
 			// keeping the options spaced out (for touch screens)
-			r.y += ta.LineHeight();
+			r.y_get() += ta.LineHeight();
 		}
-		r.y += selOption->Dimensions().h;
+		r.y_get() += selOption->Dimensions().h;
 	}
 
-	frame.h = std::max(frame.h, r.y + margin.bottom);
+	frame.h_get() = std::max(frame.h_get(), r.y_get() + margin.bottom);
 }
 
 bool TextArea::SpanSelector::KeyEvent(const Event& event)
@@ -306,22 +306,22 @@ Region TextArea::UpdateTextFrame()
 	const Region& cr = scrollview.ContentRegion();
 	if (textContainer) {
 		Region r = textContainer->Frame();
-		r.w = cr.w + cr.x;
-		r.h = 0; // auto grow
+		r.w_get() = cr.w_get() + cr.x_get();
+		r.h_get() = 0; // auto grow
 
 		if (speakerPic) {
 			// shrink and shift the container to accommodate the image
-			r.x = speakerPic->Frame.w + 5;
-			r.w -= r.x;
+			r.x_get() = speakerPic->Frame.w_get() + 5;
+			r.w_get() -= r.x_get();
 		} else {
-			r.x = 0;
+			r.x_get() = 0;
 		}
 
 		textContainer->SetFrame(r);
 		scrollview.Update();
 		return textContainer->Frame();
 	}
-	return Region(Point(0, 0), Size(cr.w + cr.x, 0));
+	return Region(Point(0, 0), Size(cr.w_get() + cr.x_get(), 0));
 }
 
 void TextArea::UpdateScrollview()
@@ -330,8 +330,8 @@ void TextArea::UpdateScrollview()
 		assert(textContainer && selectOptions);
 
 		Region textFrame = UpdateTextFrame();
-		textFrame.y = textFrame.h;
-		textFrame.h = selectOptions->Frame().h;
+		textFrame.y_get() = textFrame.h_get();
+		textFrame.h_get() = selectOptions->Frame().h_get();
 		selectOptions->SetFrame(textFrame);
 
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
@@ -343,15 +343,15 @@ void TextArea::UpdateScrollview()
 			anim = 500;
 			y = 9999999; // FIXME: properly calculate the "bottom"?
 		} else {
-			int blankH = frame.h - LineHeight() - nodeBounds.h - optH;
+			int blankH = frame.h_get() - LineHeight() - nodeBounds.h_get() - optH;
 			if (blankH > 0) {
 				optH += blankH;
-				int width = selectOptions->Frame().w;
+				int width = selectOptions->Frame().w_get();
 				selectOptions->SetFrameSize(Size(width, optH));
 			}
 
 			// now scroll dialogBeginNode to the top less a blank line
-			y = nodeBounds.y - LineHeight();
+			y = nodeBounds.y_get() - LineHeight();
 		}
 
 		// FIXME: must update before the scroll, but this should be automatically done as a reaction to changing sizes/origins of subviews
@@ -363,8 +363,8 @@ void TextArea::UpdateScrollview()
 
 	Region textFrame = UpdateTextFrame();
 	if (selectOptions) {
-		textFrame.y = textFrame.h;
-		textFrame.h = selectOptions->Frame().h;
+		textFrame.y_get() = textFrame.h_get();
+		textFrame.h_get() = selectOptions->Frame().h_get();
 		selectOptions->SetFrame(textFrame);
 	}
 }
@@ -444,8 +444,8 @@ void TextArea::TrimHistory(size_t lines)
 	}
 
 	int height = int(LineHeight() * lines);
-	Region exclusion(Point(), Size(frame.w, height));
-	scrollview.ScrollDelta(Point(0, exclusion.h));
+	Region exclusion(Point(), Size(frame.w_get(), height));
+	scrollview.ScrollDelta(Point(0, exclusion.h_get()));
 	textContainer->DeleteContentsInRect(exclusion);
 	scrollview.Update();
 
@@ -511,7 +511,7 @@ void TextArea::AppendText(String text)
 
 	if (flags & AutoScroll && !selectOptions) {
 		// scroll to the bottom
-		int bottom = ContentHeight() - frame.h;
+		int bottom = ContentHeight() - frame.h_get();
 		if (bottom > 0)
 			ScrollToY(-bottom, 500);
 	}
@@ -661,10 +661,10 @@ void TextArea::SetScrollbar(ScrollBar* sb)
 	ContentContainer::Margin margins = GetMargins();
 
 	Region combined = Region::RegionEnclosingRegions(sbr, tar);
-	margins.top += tar.y - combined.y;
-	margins.left += tar.x - combined.x;
-	margins.right += (combined.x + combined.w) - (tar.x + tar.w);
-	margins.bottom += (combined.y + combined.h) - (tar.y + tar.h);
+	margins.top += tar.y_get() - combined.y_get();
+	margins.left += tar.x_get() - combined.x_get();
+	margins.right += (combined.x_get() + combined.w_get()) - (tar.x_get() + tar.w_get());
+	margins.bottom += (combined.y_get() + combined.h_get()) - (tar.y_get() + tar.h_get());
 
 	constexpr uint8_t MINIMUM_H_MARGIN = 3;
 	margins.right = std::max(margins.right, MINIMUM_H_MARGIN);

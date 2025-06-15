@@ -137,10 +137,14 @@ public:
 	Size size;
 
 	// unfortunately anonymous structs are an extension in C++...
-	int& x = origin.x;
-	int& y = origin.y;
-	int& w = size.w;
-	int& h = size.h;
+	int& x_get() { return origin.x; };
+	int& y_get() { return origin.y; };
+	int& w_get() { return size.w; };
+	int& h_get() { return  size.h; };
+	const int& x_get() const { return origin.x; };
+	const int& y_get() const { return origin.y; };
+	const int& w_get() const { return size.w; };
+	const int& h_get() const { return  size.h; };
 
 	Region() noexcept = default;
 	Region(int x, int y, int w, int h) noexcept;
@@ -158,8 +162,8 @@ public:
 	bool IntersectsRegion(const Region& rgn) const noexcept;
 	Region Intersect(const Region& rgn) const noexcept;
 
-	Point Center() const noexcept { return Point(x + w / 2, y + h / 2); }
-	Point Maximum() const noexcept { return Point(x + w, y + h); }
+	Point Center() const noexcept { return Point(x_get() + w_get() / 2, y_get() + h_get() / 2); }
+	Point Maximum() const noexcept { return Point(x_get() + w_get(), y_get() + h_get()); }
 	// returns the point of intersection between Region and the line (extending to infinity) from the Center to p
 	Point Intercept(const Point& p) const noexcept;
 
@@ -172,10 +176,10 @@ public:
 		Point min;
 		Point max;
 
-		min.x = std::min(r1.x, r2.x);
-		min.y = std::min(r1.y, r2.y);
-		max.x = std::max(r1.x + r1.w, r2.x + r2.w);
-		max.y = std::max(r1.y + r1.h, r2.y + r2.h);
+		min.x = std::min(r1.x_get(), r2.x_get());
+		min.y = std::min(r1.y_get(), r2.y_get());
+		max.x = std::max(r1.x_get() + r1.w_get(), r2.x_get() + r2.w_get());
+		max.y = std::max(r1.y_get() + r1.h_get(), r2.y_get() + r2.h_get());
 
 		return RegionFromPoints(min, max);
 	}

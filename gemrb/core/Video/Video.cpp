@@ -77,8 +77,8 @@ Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 	}
 	// the clip must be "safe". no negative values or crashy crashy
 	if (r.size.IsInvalid()) { // logically equivalent to no intersection
-		r.h = 0;
-		r.w = 0;
+		r.h_get() = 0;
+		r.w_get() = 0;
 	}
 	return r;
 }
@@ -196,19 +196,19 @@ void Video::BlitSprite(const Holder<Sprite2D>& spr, Point p, const Region* clip,
 		return; // already know blit fails
 	}
 
-	Region src(0, 0, spr->Frame.w, spr->Frame.h);
+	Region src(0, 0, spr->Frame.w_get(), spr->Frame.h_get());
 	// adjust the src region to account for the clipping
-	src.x += fClip.x - dst.x; // the left edge
-	src.w -= dst.w - fClip.w; // the right edge
-	src.y += fClip.y - dst.y; // the top edge
-	src.h -= dst.h - fClip.h; // the bottom edge
+	src.x_get() += fClip.x_get() - dst.x_get(); // the left edge
+	src.w_get() -= dst.w_get() - fClip.w_get(); // the right edge
+	src.y_get() += fClip.y_get() - dst.y_get(); // the top edge
+	src.h_get() -= dst.h_get() - fClip.h_get(); // the bottom edge
 
-	assert(src.w == fClip.w && src.h == fClip.h);
+	assert(src.w_get() == fClip.w_get() && src.h_get() == fClip.h_get());
 
 	// just pass fclip as dst
 	// since the next stage is also public, we must readd the Pos because it will again be removed
-	fClip.x += spr->Frame.x;
-	fClip.y += spr->Frame.y;
+	fClip.x_get() += spr->Frame.x_get();
+	fClip.y_get() += spr->Frame.y_get();
 	BlitSprite(spr, src, fClip, flags | BlitFlags::BLENDED);
 }
 
@@ -228,14 +228,14 @@ void Video::BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const Holder<
 Holder<Sprite2D> Video::SpriteScaleDown(const Holder<Sprite2D>& sprite, unsigned int ratio)
 {
 	Region scaledFrame = sprite->Frame;
-	scaledFrame.w /= ratio;
-	scaledFrame.h /= ratio;
+	scaledFrame.w_get() /= ratio;
+	scaledFrame.h_get() /= ratio;
 
-	unsigned int* pixels = (unsigned int*) malloc(scaledFrame.w * scaledFrame.h * 4);
+	unsigned int* pixels = (unsigned int*) malloc(scaledFrame.w_get() * scaledFrame.h_get() * 4);
 	int i = 0;
 
-	for (int y = 0; y < scaledFrame.h; y++) {
-		for (int x = 0; x < scaledFrame.w; x++) {
+	for (int y = 0; y < scaledFrame.h_get(); y++) {
+		for (int x = 0; x < scaledFrame.w_get(); x++) {
 			Color c = SpriteGetPixelSum(sprite, x, y, ratio);
 
 			*(pixels + i++) = c.r + (c.g << 8) + (c.b << 16) + (c.a << 24);
@@ -245,8 +245,8 @@ Holder<Sprite2D> Video::SpriteScaleDown(const Holder<Sprite2D>& sprite, unsigned
 	static const PixelFormat fmt(4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 	Holder<Sprite2D> small = CreateSprite(scaledFrame, pixels, fmt);
 
-	small->Frame.x = sprite->Frame.x / ratio;
-	small->Frame.y = sprite->Frame.y / ratio;
+	small->Frame.x_get() = sprite->Frame.x_get() / ratio;
+	small->Frame.y_get() = sprite->Frame.y_get() / ratio;
 
 	return small;
 }

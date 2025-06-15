@@ -71,8 +71,8 @@ void FogRenderer::DrawFog(const FogMapData& mapData)
 	this->end = Clamp(FogPoint(vp.Maximum()) + FogPoint(2 + largeFog, 2 + largeFog), FogPoint(), fogSizePoint);
 
 	this->p0 = {
-		(start.x * CELL_SIZE - vp.x) - (largeFog * CELL_SIZE / 2),
-		(start.y * CELL_SIZE - vp.y) - (largeFog * CELL_SIZE / 2)
+		(start.x * CELL_SIZE - vp.x_get()) - (largeFog * CELL_SIZE / 2),
+		(start.y * CELL_SIZE - vp.y_get()) - (largeFog * CELL_SIZE / 2)
 	};
 
 	DrawVPBorders();
@@ -360,43 +360,43 @@ void FogRenderer::DrawVPBorders()
 	// the amount of fuzzing to apply to map edges when the viewport overscans
 	constexpr int FUZZ_AMT = 8;
 
-	if (vp.y < 0) { // north border
-		Region r(0, 0, vp.w, -vp.y);
+	if (vp.y_get() < 0) { // north border
+		Region r(0, 0, vp.w_get(), -vp.y_get());
 		VideoDriver->DrawRect(r, ColorBlack, true);
-		r.y += r.h;
-		r.h = FUZZ_AMT;
-		for (int x = r.x + p0.x; x < r.w; x += CELL_SIZE) {
-			DrawVPBorder(Point(x, r.y), Direction::N, r, BAM_FLAGS[Direction::N]);
+		r.y_get() += r.h_get();
+		r.h_get() = FUZZ_AMT;
+		for (int x = r.x_get() + p0.x; x < r.w_get(); x += CELL_SIZE) {
+			DrawVPBorder(Point(x, r.y_get()), Direction::N, r, BAM_FLAGS[Direction::N]);
 		}
 	}
 
-	if (vp.y + vp.h > mapSize.h) { // south border
-		Region r(0, mapSize.h - vp.y, vp.w, vp.y + vp.h - mapSize.h);
+	if (vp.y_get() + vp.h_get() > mapSize.h) { // south border
+		Region r(0, mapSize.h - vp.y_get(), vp.w_get(), vp.y_get() + vp.h_get() - mapSize.h);
 		VideoDriver->DrawRect(r, ColorBlack, true);
-		r.y -= FUZZ_AMT;
-		r.h = FUZZ_AMT;
-		for (int x = r.x + p0.x; x < r.w; x += CELL_SIZE) {
-			DrawVPBorder(Point(x, r.y), Direction::S, r, BAM_FLAGS[Direction::S]);
+		r.y_get() -= FUZZ_AMT;
+		r.h_get() = FUZZ_AMT;
+		for (int x = r.x_get() + p0.x; x < r.w_get(); x += CELL_SIZE) {
+			DrawVPBorder(Point(x, r.y_get()), Direction::S, r, BAM_FLAGS[Direction::S]);
 		}
 	}
 
-	if (vp.x < 0) { // west border
-		Region r(0, std::max(0, -vp.y), -vp.x, mapSize.h);
+	if (vp.x_get() < 0) { // west border
+		Region r(0, std::max(0, -vp.y_get()), -vp.x_get(), mapSize.h);
 		VideoDriver->DrawRect(r, ColorBlack, true);
-		r.x += r.w;
-		r.w = FUZZ_AMT;
-		for (int y = r.y + p0.y; y < r.h; y += CELL_SIZE) {
-			DrawVPBorder(Point(r.x, y), Direction::W, r, BAM_FLAGS[Direction::W]);
+		r.x_get() += r.w_get();
+		r.w_get() = FUZZ_AMT;
+		for (int y = r.y_get() + p0.y; y < r.h_get(); y += CELL_SIZE) {
+			DrawVPBorder(Point(r.x_get(), y), Direction::W, r, BAM_FLAGS[Direction::W]);
 		}
 	}
 
-	if (vp.x + vp.w > mapSize.w) { // east border
-		Region r(mapSize.w - vp.x, std::max(0, -vp.y), vp.x + vp.w - mapSize.w, mapSize.h);
+	if (vp.x_get() + vp.w_get() > mapSize.w) { // east border
+		Region r(mapSize.w - vp.x_get(), std::max(0, -vp.y_get()), vp.x_get() + vp.w_get() - mapSize.w, mapSize.h);
 		VideoDriver->DrawRect(r, ColorBlack, true);
-		r.x -= FUZZ_AMT;
-		r.w = FUZZ_AMT;
-		for (int y = r.y + p0.y; y < r.h; y += CELL_SIZE) {
-			DrawVPBorder(Point(r.x, y), Direction::E, r, BAM_FLAGS[Direction::E]);
+		r.x_get() -= FUZZ_AMT;
+		r.w_get() = FUZZ_AMT;
+		for (int y = r.y_get() + p0.y; y < r.h_get(); y += CELL_SIZE) {
+			DrawVPBorder(Point(r.x_get(), y), Direction::E, r, BAM_FLAGS[Direction::E]);
 		}
 	}
 }

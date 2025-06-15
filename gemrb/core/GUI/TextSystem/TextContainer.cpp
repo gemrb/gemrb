@@ -81,24 +81,24 @@ inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) 
 	if (maxSize.w <= 0) {
 		if (maxSize.w == -1) {
 			// take remainder of parent width
-			drawRegion.w = rgn.w - p.x;
-			maxSize.w = drawRegion.w;
-			assert(drawRegion.w);
+			drawRegion.w_get() = rgn.w_get() - p.x;
+			maxSize.w = drawRegion.w_get();
+			assert(drawRegion.w_get());
 		} else {
 			Font::StringSizeMetrics metrics = { maxSize, 0, 0, true };
-			drawRegion.w = layoutFont->StringSize(text, &metrics).w;
-			assert(drawRegion.w);
+			drawRegion.w_get() = layoutFont->StringSize(text, &metrics).w;
+			assert(drawRegion.w_get());
 		}
 	}
 	if (maxSize.h <= 0) {
 		if (maxSize.h == -1) {
 			// take remainder of parent height
-			drawRegion.h = rgn.w - p.y;
-			assert(drawRegion.h);
+			drawRegion.h_get() = rgn.w_get() - p.y;
+			assert(drawRegion.h_get());
 		} else {
 			Font::StringSizeMetrics metrics = { maxSize, 0, 0, true };
-			drawRegion.h = layoutFont->StringSize(text, &metrics).h;
-			assert(drawRegion.h);
+			drawRegion.h_get() = layoutFont->StringSize(text, &metrics).h;
+			assert(drawRegion.h_get());
 		}
 	}
 	return drawRegion;
@@ -116,21 +116,21 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 		// calculate each line and print line by line
 		int lineheight = layoutFont->LineHeight;
 		Regions lineExclusions;
-		Region lineRgn(layoutPoint + drawOrigin, Size(rgn.w, lineheight));
-		lineRgn.y -= lineheight;
+		Region lineRgn(layoutPoint + drawOrigin, Size(rgn.w_get(), lineheight));
+		lineRgn.y_get() -= lineheight;
 		Region lineSegment;
 
-#define LINE_REMAINDER (lineRgn.w - lineSegment.x)
+#define LINE_REMAINDER (lineRgn.w_get() - lineSegment.x_get())
 		const Region* excluded = NULL;
 		size_t numPrinted = 0;
 		bool newline = true;
 		do {
-			if (newline || lineSegment.x + lineSegment.w >= lineRgn.x + lineRgn.w) {
+			if (newline || lineSegment.x_get() + lineSegment.w_get() >= lineRgn.x_get() + lineRgn.w_get()) {
 				// start next line
 				newline = false;
-				lineRgn.x = drawOrigin.x;
-				lineRgn.y += lineheight;
-				lineRgn.w = rgn.w;
+				lineRgn.x_get() = drawOrigin.x;
+				lineRgn.y_get() += lineheight;
+				lineRgn.w_get() = rgn.w_get();
 				layoutPoint = lineRgn.origin;
 
 				lineSegment = lineRgn;
@@ -153,19 +153,19 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 				} // no else!
 				if (excluded) {
 					Region intersect = excluded->Intersect(lineSegment);
-					if (intersect.x > lineSegment.x) { // to the right, simply shrink the width
-						lineSegment.w = intersect.x - lineSegment.x;
+					if (intersect.x_get() > lineSegment.x_get()) { // to the right, simply shrink the width
+						lineSegment.w_get() = intersect.x_get() - lineSegment.x_get();
 					} else { // overlaps our start point, jump to the right of intersect
-						int x = lineSegment.x;
-						lineSegment.x = intersect.x + intersect.w;
+						int x = lineSegment.x_get();
+						lineSegment.x_get() = intersect.x_get() + intersect.w_get();
 						// must shrink to compensate for moving x
-						lineSegment.w -= lineSegment.x - x;
+						lineSegment.w_get() -= lineSegment.x_get() - x;
 					}
 
 					// its possible that the resulting segment is 0 in width
-					if (lineSegment.w <= 0) {
-						lineSegment.x = intersect.x + intersect.w;
-						lineSegment.w = LINE_REMAINDER;
+					if (lineSegment.w_get() <= 0) {
+						lineSegment.x_get() = intersect.x_get() + intersect.w_get();
+						lineSegment.w_get() = LINE_REMAINDER;
 						lineExclusions.push_back(lineSegment);
 						newline = true;
 						goto newline;
@@ -174,14 +174,14 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 			} while (excluded);
 
 			{ // protected scope for goto
-				assert(lineSegment.h == lineheight);
+				assert(lineSegment.h_get() == lineheight);
 				size_t numOnLine = 0;
 				// must limit our operation to this single line.
 				size_t nextLine = text.find_first_of(u'\n', numPrinted);
 				if (nextLine == numPrinted) {
 					// this is a new line, we dont have to actually size that
 					// simply occupy the entire area and advance.
-					lineSegment.w = LINE_REMAINDER;
+					lineSegment.w_get() = LINE_REMAINDER;
 					numOnLine = 1;
 					newline = true;
 				} else {
@@ -190,7 +190,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 						subLen = nextLine - numPrinted + 1; // +1 for the \n
 					}
 					const String& substr = text.substr(numPrinted, subLen);
-					Font::StringSizeMetrics metrics = { lineSegment.size, 0, 0, lineSegment.w == lineRgn.w };
+					Font::StringSizeMetrics metrics = { lineSegment.size, 0, 0, lineSegment.w_get() == lineRgn.w_get() };
 					Size printSize = layoutFont->StringSize(substr, &metrics);
 					numOnLine = metrics.numChars;
 					assert(numOnLine || !metrics.forceBreak);
@@ -199,17 +199,17 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 					end = begin + numOnLine;
 
 					bool noFit = !metrics.forceBreak && numOnLine == 0;
-					bool lineFilled = lineSegment.x + lineSegment.w == lineRgn.w;
+					bool lineFilled = lineSegment.x_get() + lineSegment.w_get() == lineRgn.w_get();
 					bool moreChars = numPrinted + numOnLine < text.length();
 					if (subLen != String::npos || noFit || (lineFilled && moreChars)) {
 						// optimization for when the segment is the entire line (and we have more text)
 						// saves looping again for the known to be useless segment
 						newline = true;
-						lineSegment.w = LINE_REMAINDER;
+						lineSegment.w_get() = LINE_REMAINDER;
 						end--;
 					} else {
 						assert(printSize.w);
-						lineSegment.w = printSize.w;
+						lineSegment.w_get() = printSize.w;
 					}
 				}
 				numPrinted += numOnLine;
@@ -222,7 +222,7 @@ newline:
 				// must claim the lineExclusions as part of the layout
 				// just because we didnt fit doesn't mean something else won't...
 				Region lineLayout = Region::RegionEnclosingRegions(lineExclusions);
-				assert(lineLayout.h % lineheight == 0);
+				assert(lineLayout.h_get() % lineheight == 0);
 				layoutRegions.emplace_back(std::make_shared<TextLayoutRegion>(lineLayout, begin, end));
 				lineExclusions.clear();
 			}
@@ -249,8 +249,8 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 	size_t charsPrinted = 0;
 	for (const auto& lrgn : rgns) {
 		Region drawRect = lrgn->region;
-		drawRect.x += offset.x;
-		drawRect.y += offset.y;
+		drawRect.x_get() += offset.x;
+		drawRect.y_get() += offset.y;
 		auto printFont = LayoutFont();
 		const Font::PrintColors* pc = colors;
 		const TextContainer* container = static_cast<const TextContainer*>(parent);
@@ -289,8 +289,8 @@ void ImageSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& of
 {
 	// we only care about the first region... (should only be 1 anyway)
 	Region r = rgns.front()->region;
-	r.x += offset.x;
-	r.y += offset.y;
+	r.x_get() += offset.x;
+	r.y_get() += offset.y;
 	VideoDriver->BlitSprite(image, r.origin, &r);
 }
 
@@ -323,20 +323,20 @@ void ContentContainer::WillDraw(const Region& drawFrame, const Region& clip)
 {
 	Region sc = clip;
 
-	int diff = clip.x - drawFrame.x;
+	int diff = clip.x_get() - drawFrame.x_get();
 	if (diff < margin.left) {
-		sc.x += margin.left - diff;
-		sc.w -= margin.left - diff;
+		sc.x_get() += margin.left - diff;
+		sc.w_get() -= margin.left - diff;
 	}
 
-	diff = (drawFrame.x + drawFrame.w) - (clip.x + clip.w);
+	diff = (drawFrame.x_get() + drawFrame.w_get()) - (clip.x_get() + clip.w_get());
 	if (diff < margin.right) {
-		sc.w += margin.right - diff;
+		sc.w_get() += margin.right - diff;
 	}
 
 	// TODO: if we ever support horizontal scrollbars these will need to be fixed
-	sc.y += margin.top;
-	sc.h -= margin.top + margin.bottom;
+	sc.y_get() += margin.top;
+	sc.h_get() -= margin.top + margin.bottom;
 
 	VideoDriver->SetScreenClip(&sc);
 }
@@ -352,10 +352,10 @@ void ContentContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 		Region r = clip;
 		VideoDriver->DrawRect(r, ColorYellow, true);
 
-		r.x += margin.left;
-		r.y += margin.top;
-		r.w -= margin.left + margin.right;
-		r.h -= margin.bottom + margin.top;
+		r.x_get() += margin.left;
+		r.y_get() += margin.top;
+		r.w_get() -= margin.left + margin.right;
+		r.h_get() -= margin.bottom + margin.top;
 
 		VideoDriver->DrawRect(r, ColorGreen, true);
 	}
@@ -402,10 +402,10 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 
 void ContentContainer::SizeChanged(const Size& /*oldSize*/)
 {
-	if (frame.w <= 0) {
+	if (frame.w_get() <= 0) {
 		SetFlags(RESIZE_WIDTH, BitOp::OR);
 	}
-	if (frame.h <= 0) {
+	if (frame.h_get() <= 0) {
 		SetFlags(RESIZE_HEIGHT, BitOp::OR);
 	}
 	LayoutContentsFrom(contents.begin());
@@ -417,8 +417,8 @@ void ContentContainer::SubviewAdded(View* view, View* parent)
 		// ContentContainer should grow to the size of its (immediate) subviews automatically
 		const Region& subViewFrame = view->Frame();
 		Size s;
-		s.h = std::max(subViewFrame.y + subViewFrame.h, frame.h);
-		s.w = std::max(subViewFrame.x + subViewFrame.w, frame.w);
+		s.h = std::max(subViewFrame.y_get() + subViewFrame.h_get(), frame.h_get());
+		s.w = std::max(subViewFrame.x_get() + subViewFrame.w_get(), frame.w_get());
 		SetFrameSize(s);
 	}
 }
@@ -587,14 +587,14 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	Size contentBounds = Dimensions();
 	Region layoutFrame = Region(Point(), contentBounds);
 	if (Flags() & RESIZE_WIDTH) {
-		layoutFrame.w = SHRT_MAX;
+		layoutFrame.w_get() = SHRT_MAX;
 	} else {
-		layoutFrame.w -= margin.left + margin.right;
+		layoutFrame.w_get() -= margin.left + margin.right;
 	}
 	if (Flags() & RESIZE_HEIGHT) {
-		layoutFrame.h = SHRT_MAX;
+		layoutFrame.h_get() = SHRT_MAX;
 	} else {
-		layoutFrame.h -= margin.top + margin.bottom;
+		layoutFrame.h_get() -= margin.top + margin.bottom;
 	}
 
 	assert(!layoutFrame.size.IsInvalid());
@@ -611,11 +611,11 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			}
 			if (excluded) {
 				// we know that we have to move at least to the right
-				layoutPoint.x = excluded->x + excluded->w;
-				if (frame.w > 0 && layoutPoint.x >= layoutFrame.w) {
+				layoutPoint.x = excluded->x_get() + excluded->w_get();
+				if (frame.w_get() > 0 && layoutPoint.x >= layoutFrame.w_get()) {
 					layoutPoint.x = 0;
-					assert(excluded->y + excluded->h >= layoutPoint.y);
-					layoutPoint.y = excluded->y + excluded->h;
+					assert(excluded->y_get() + excluded->h_get() >= layoutPoint.y);
+					layoutPoint.y = excluded->y_get() + excluded->h_get();
 				}
 			}
 			exContent = ContentAtPoint(layoutPoint);
@@ -629,43 +629,43 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		ieDword flags = Flags();
 		if (flags & (RESIZE_HEIGHT | RESIZE_WIDTH)) {
 			Region bounds = BoundingBoxForLayout(rgns);
-			bounds.w += margin.left + margin.right;
-			bounds.h += margin.top + margin.bottom;
+			bounds.w_get() += margin.left + margin.right;
+			bounds.h_get() += margin.top + margin.bottom;
 
 			if (flags & RESIZE_HEIGHT)
-				contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;
+				contentBounds.h = (bounds.y_get() + bounds.h_get() > contentBounds.h) ? bounds.y_get() + bounds.h_get() : contentBounds.h;
 			if (flags & RESIZE_WIDTH)
-				contentBounds.w = (bounds.x + bounds.w > contentBounds.w) ? bounds.x + bounds.w : contentBounds.w;
+				contentBounds.w = (bounds.x_get() + bounds.w_get() > contentBounds.w) ? bounds.x_get() + bounds.w_get() : contentBounds.w;
 		}
 	}
 
 	// avoid infinite layout recursion when calling SetFrameSize...
 	Size oldSize = Dimensions();
-	frame.w = contentBounds.w;
-	frame.h = contentBounds.h;
+	frame.w_get() = contentBounds.w;
+	frame.h_get() = contentBounds.h;
 	ResizeSubviews(oldSize);
 }
 
 void ContentContainer::DeleteContentsInRect(const Region& exclusion)
 {
-	int top = exclusion.y;
+	int top = exclusion.y_get();
 	int bottom = top;
 	const Content* content;
 	while (const Region* rgn = ContentRegionForRect(exclusion)) {
 		content = ContentAtPoint(rgn->origin);
 		assert(content);
 
-		top = (rgn->y < top) ? rgn->y : top;
-		bottom = (rgn->y + rgn->h > bottom) ? rgn->y + rgn->h : bottom;
+		top = (rgn->y_get() < top) ? rgn->y_get() : top;
+		bottom = (rgn->y_get() + rgn->h_get() > bottom) ? rgn->y_get() + rgn->h_get() : bottom;
 		// must delete content last!
 		delete RemoveContent(content, false);
 	}
 
 	if (Flags() & RESIZE_HEIGHT) {
-		frame.h = 0;
+		frame.h_get() = 0;
 	}
 	if (Flags() & RESIZE_WIDTH) {
-		frame.w = 0;
+		frame.w_get() = 0;
 	}
 	// TODO: we could optimize this to only layout content after exclusion.y
 	LayoutContentsFrom(contents.begin());
@@ -754,7 +754,7 @@ void TextContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 
 	if (layout.empty() && Editable()) {
 		Holder<Sprite2D> cursor = core->GetCursorSprite();
-		Point p(drawFrame.x + margin.left, drawFrame.y + margin.top + cursor->Frame.y);
+		Point p(drawFrame.x_get() + margin.left, drawFrame.y_get() + margin.top + cursor->Frame.y_get());
 		VideoDriver->BlitSprite(cursor, p);
 	}
 }
@@ -795,7 +795,7 @@ void TextContainer::DrawContents(const Layout& layout, Point dp)
 		}
 
 		Holder<Sprite2D> cursor = core->GetCursorSprite();
-		dp.y += cursor->Frame.y;
+		dp.y += cursor->Frame.y_get();
 		VideoDriver->BlitSprite(cursor, cursorPoint + dp);
 	}
 	printPos += textLength;
@@ -804,9 +804,9 @@ void TextContainer::DrawContents(const Layout& layout, Point dp)
 void TextContainer::SizeChanged(const Size& oldSize)
 {
 	ContentContainer::SizeChanged(oldSize);
-	if (Editable() && frame.h == 0) {
+	if (Editable() && frame.h_get() == 0) {
 		// we need at least one line of height to draw the cursor
-		frame.h = font->LineHeight;
+		frame.h_get() = font->LineHeight;
 	}
 }
 
@@ -829,9 +829,9 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 
 			if (rect.PointInside(p)) {
 				// find where inside
-				int lines = (p.y - rect.y) / printFont->LineHeight;
+				int lines = (p.y - rect.y_get()) / printFont->LineHeight;
 				if (lines) {
-					metrics.size.w = rect.w;
+					metrics.size.w = rect.w_get();
 					metrics.size.h = lines * printFont->LineHeight;
 					printFont->StringSize(text.substr(numChars), &metrics);
 					numChars += metrics.numChars;

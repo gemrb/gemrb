@@ -770,33 +770,33 @@ static bool InspectEdges(Point& walkableStartPoint, const Region& vp, int curren
 	switch (currentStep) {
 		// Top-edge with random x offset
 		case 0:
-			if (offset < vp.w) {
-				walkableStartPoint.x = vp.x + offset;
-				walkableStartPoint.y = vp.y;
+			if (offset < vp.w_get()) {
+				walkableStartPoint.x = vp.x_get() + offset;
+				walkableStartPoint.y = vp.y_get();
 				isPassable = true;
 			}
 			break;
 		// Bottom-edge with random x offset
 		case 1:
-			if (offset < vp.w) {
-				walkableStartPoint.x = vp.x + offset;
-				walkableStartPoint.y = vp.y + vp.h;
+			if (offset < vp.w_get()) {
+				walkableStartPoint.x = vp.x_get() + offset;
+				walkableStartPoint.y = vp.y_get() + vp.h_get();
 				isPassable = true;
 			}
 			break;
 		// Left-edge with random y offset
 		case 2:
-			if (offset < vp.h) {
-				walkableStartPoint.x = vp.x;
-				walkableStartPoint.y = vp.y + offset;
+			if (offset < vp.h_get()) {
+				walkableStartPoint.x = vp.x_get();
+				walkableStartPoint.y = vp.y_get() + offset;
 				isPassable = true;
 			}
 			break;
 		// Right-edge with random y offset
 		case 3:
-			if (offset < vp.h) {
-				walkableStartPoint.x = vp.x + vp.w;
-				walkableStartPoint.y = vp.y + offset;
+			if (offset < vp.h_get()) {
+				walkableStartPoint.x = vp.x_get() + vp.w_get();
+				walkableStartPoint.y = vp.y_get() + offset;
 				isPassable = true;
 			}
 			break;
@@ -809,9 +809,9 @@ static Point FindOffScreenPoint(const Scriptable* Sender, int flags, int phase)
 {
 	Region vp0 = core->GetGameControl()->Viewport();
 	// go for 640x480, so large viewports are less likely to interfere with scripting
-	Region vp(vp0.x + (vp0.w - 640) / 2, vp0.y + (vp0.h - 480) / 2, 640, 480);
+	Region vp(vp0.x_get() + (vp0.w_get() - 640) / 2, vp0.y_get() + (vp0.h_get() - 480) / 2, 640, 480);
 	Point vpCenter = vp.Center();
-	int maxRandExclusive = std::max(vp.w, vp.h);
+	int maxRandExclusive = std::max(vp.w_get(), vp.h_get());
 	int firstRandStep = RAND(0, maxRandExclusive);
 	int currentStep = RAND(0, 3);
 	int slowlyIncrements = 0;
@@ -1694,8 +1694,8 @@ int MoveNearerTo(Scriptable* Sender, const Point& p, int distance, int flags)
 bool IsInObjectRect(const Point& pos, const Region& rect)
 {
 	if (!HasAdditionalRect) return true;
-	if (rect.x < 0 || rect.y < 0) return true;
-	if (rect.w <= 0) return true;
+	if (rect.x_get() < 0 || rect.y_get() < 0) return true;
+	if (rect.w_get() <= 0) return true;
 
 	// iwd2: testing shows the first point must be 0.0 for matching to work
 	if (core->HasFeature(GFFlags::RULES_3ED) && !rect.origin.IsZero()) {
@@ -1703,8 +1703,8 @@ bool IsInObjectRect(const Point& pos, const Region& rect)
 	}
 
 	// point or rect?
-	if (rect.h <= 0) {
-		unsigned int range = rect.w;
+	if (rect.h_get() <= 0) {
+		unsigned int range = rect.w_get();
 		return SquaredDistance(pos, rect.origin) <= range * range;
 	} else {
 		return rect.PointInside(pos);

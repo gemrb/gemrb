@@ -77,13 +77,13 @@ void MOSImporter::Blit(const MOSV2DataBlock& dataBlock, uint8_t* frameData)
 
 	const uint8_t* spritePixels = static_cast<uint8_t*>(sprite->LockSprite());
 	for (int h = 0; h < dataBlock.size.h; ++h) {
-		size_t offset = h * sprite->Frame.w * 4;
+		size_t offset = h * sprite->Frame.w_get() * 4;
 		size_t destOffset =
 			4 * (size.w * (dataBlock.destination.y + h) + dataBlock.destination.x);
 
 		std::copy(
 			spritePixels + offset,
-			spritePixels + offset + sprite->Frame.w * 4,
+			spritePixels + offset + sprite->Frame.w_get() * 4,
 			frameData + destOffset);
 	}
 

@@ -156,26 +156,26 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 	if (ButtonState == PRESSED) {
 		//shift the writing/border a bit
-		rgn.x += PushOffset.x;
-		rgn.y += PushOffset.y;
+		// rgn.x_get() += PushOffset.x;
+		// rgn.y_get() += PushOffset.y;
 	}
 
 	// Button picture
 	Point picPos;
 	if (Picture && (flags & IE_GUI_BUTTON_PICTURE)) {
 		// Picture is drawn centered
-		picPos.x = (rgn.w / 2) - (Picture->Frame.w / 2) + rgn.x;
-		picPos.y = (rgn.h / 2) - (Picture->Frame.h / 2) + rgn.y;
+		picPos.x = (rgn.w_get() / 2) - (Picture->Frame.w_get() / 2) + rgn.x_get();
+		picPos.y = (rgn.h_get() / 2) - (Picture->Frame.h_get() / 2) + rgn.y_get();
 		if (flags & IE_GUI_BUTTON_HORIZONTAL) {
 			picPos += Picture->Frame.origin;
 
 			// Clipping: 0 = overlay over full button, 1 = no overlay
-			int overlayHeight = Picture->Frame.h * (1.0 - Clipping);
+			int overlayHeight = Picture->Frame.h_get() * (1.0 - Clipping);
 			if (overlayHeight < 0)
 				overlayHeight = 0;
-			if (overlayHeight >= Picture->Frame.h)
-				overlayHeight = Picture->Frame.h;
-			int buttonHeight = Picture->Frame.h - overlayHeight;
+			if (overlayHeight >= Picture->Frame.h_get())
+				overlayHeight = Picture->Frame.h_get();
+			int buttonHeight = Picture->Frame.h_get() - overlayHeight;
 
 			if (overlayHeight) {
 				// TODO: Add an option to add BlitFlags::GREY to the flags
@@ -183,10 +183,10 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 				VideoDriver->BlitGameSprite(Picture, picPos, BlitFlags::COLOR_MOD, col);
 			}
 
-			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w, buttonHeight);
+			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w_get(), buttonHeight);
 			VideoDriver->BlitSprite(Picture, rb.origin, &rb);
 		} else {
-			Region r(picPos.x, picPos.y, (Picture->Frame.w * Clipping), Picture->Frame.h);
+			Region r(picPos.x, picPos.y, (Picture->Frame.w_get() * Clipping), Picture->Frame.h_get());
 			BlitFlags bf = IsDisabled() ? BlitFlags::SEPIA : BlitFlags::NONE;
 			VideoDriver->BlitSprite(Picture, Picture->Frame.origin + r.origin, &r, bf);
 		}
@@ -195,9 +195,9 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	// Button animation
 	if (animation) {
 		auto AnimPicture = animation->Current();
-		int xOffs = (frame.w / 2) - (AnimPicture->Frame.w / 2);
-		int yOffs = (frame.h / 2) - (AnimPicture->Frame.h / 2);
-		Region r(rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h);
+		int xOffs = (frame.w_get() / 2) - (AnimPicture->Frame.w_get() / 2);
+		int yOffs = (frame.h_get() / 2) - (AnimPicture->Frame.h_get() / 2);
+		Region r(rgn.x_get() + xOffs, rgn.y_get() + yOffs, int(AnimPicture->Frame.w_get() * Clipping), AnimPicture->Frame.h_get());
 
 		BlitFlags bf = bool(animation->flags & Animation::Flags::BlendBlack) ? BlitFlags::ONE_MINUS_DST : BlitFlags::BLENDED;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
@@ -213,14 +213,14 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		Point offset;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
 			// Center the hotspots of all pictures
-			offset.x = frame.w / 2;
-			offset.y = frame.h / 2;
+			offset.x = frame.w_get() / 2;
+			offset.y = frame.h_get() / 2;
 		} else if (flags & IE_GUI_BUTTON_BG1_PAPERDOLL) {
 			// Display as-is
 		} else {
 			// Center the first picture, and align the rest to that
-			offset.x = frame.w / 2 - (*iter)->Frame.w / 2 + (*iter)->Frame.x;
-			offset.y = frame.h / 2 - (*iter)->Frame.h / 2 + (*iter)->Frame.y;
+			offset.x = frame.w_get() / 2 - (*iter)->Frame.w_get() / 2 + (*iter)->Frame.x_get();
+			offset.y = frame.h_get() / 2 - (*iter)->Frame.h_get() / 2 + (*iter)->Frame.y_get();
 		}
 
 		BlitFlags blitFlags = BlitFlags::NONE;
@@ -257,12 +257,12 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		if (Picture && flags & IE_GUI_BUTTON_PICTURE) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
-			r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
+			r = Region(picPos.x, picPos.y, Picture->Frame.w_get() + 1, Picture->Frame.h_get());
 		} else if (flags & IE_GUI_BUTTON_ANCHOR) {
-			r.x += Anchor.x;
-			r.y += Anchor.y;
-			r.w -= Anchor.x;
-			r.h -= Anchor.y;
+			r.x_get() += Anchor.x;
+			r.y_get() += Anchor.y;
+			r.w_get() -= Anchor.x;
+			r.h_get() -= Anchor.y;
 		} else {
 			Font::StringSizeMetrics metrics { r.size, 0, 0, false };
 			font->StringSize(Text, &metrics);
@@ -592,7 +592,7 @@ void Button::SetPicture(Holder<Sprite2D> newpic)
 	Picture = std::move(newpic);
 	if (Picture) {
 		// try fitting to width if rescaling is possible, otherwise we automatically crop
-		unsigned int ratio = CeilDiv(Picture->Frame.w, frame.w);
+		unsigned int ratio = CeilDiv(Picture->Frame.w_get(), frame.w_get());
 		if (ratio > 1) {
 			Holder<Sprite2D> img = VideoDriver->SpriteScaleDown(Picture, ratio);
 			Picture = std::move(img);

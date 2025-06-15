@@ -643,10 +643,10 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 			// we approximate a bounding box equivalent to a small radius
 			// we copied this from the Container code that seems to indicate
 			// this is how the originals behave. It is probably "good enough"
-			bbox.x = pos.x - 7;
-			bbox.y = pos.y - 5;
-			bbox.w = 16;
-			bbox.h = 12;
+			bbox.x_get() = pos.x - 7;
+			bbox.y_get() = pos.y - 5;
+			bbox.w_get() = 16;
+			bbox.h_get() = 12;
 		}
 
 		ip = map->TMap->AddInfoPoint(ipName, ipType, nullptr);
@@ -718,9 +718,9 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 
 	if (ip->Type != ST_TRAVEL || !ip->outline) return;
 	// mark the searchmap under travel regions as passable (not travel)
-	for (int i = 0; i < ip->BBox.w; i += 8) {
-		for (int j = 0; j < ip->BBox.h; j += 6) {
-			NavmapPoint sample(ip->BBox.x + i, ip->BBox.y + j);
+	for (int i = 0; i < ip->BBox.w_get(); i += 8) {
+		for (int j = 0; j < ip->BBox.h_get(); j += 6) {
+			NavmapPoint sample(ip->BBox.x_get() + i, ip->BBox.y_get() + j);
 			if (!ip->outline->PointIn(sample)) continue;
 			SearchmapPoint below { sample };
 			PathMapFlags tmp = map->tileProps.QuerySearchMap(below);
@@ -787,10 +787,10 @@ void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
 		// but bg2 gives them this bounding box at first load,
 		// should we specifically check for Type == IE_CONTAINER_PILE?
 		if (bbox.size.IsInvalid()) {
-			bbox.x = pos.x - 7;
-			bbox.y = pos.y - 5;
-			bbox.w = 16;
-			bbox.h = 12;
+			bbox.x_get() = pos.x - 7;
+			bbox.y_get() = pos.y - 5;
+			bbox.w_get() = 16;
+			bbox.h_get() = 12;
 		}
 		c = map->AddContainer(containerName, containerType, nullptr);
 		c->BBox = bbox;
@@ -1323,8 +1323,8 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 			// our MapControl wants them in large map space so we must convert
 			// its what other games use and its what our custom map note code uses
 			const Size mapsize = map->GetSize();
-			point.x = static_cast<int>(px * double(mapsize.w) / map->SmallMap->Frame.w);
-			point.y = static_cast<int>(py * double(mapsize.h) / map->SmallMap->Frame.h);
+			point.x = static_cast<int>(px * double(mapsize.w) / map->SmallMap->Frame.w_get());
+			point.y = static_cast<int>(py * double(mapsize.h) / map->SmallMap->Frame.h_get());
 
 			char bytes[501]; // 500 + null
 			str->Read(bytes, 500);
@@ -1922,15 +1922,15 @@ int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword& VertIndex
 		stream->WriteDword(VertIndex);
 		VertIndex += tmpWord;
 		//open bounding box
-		stream->WriteWord(d->OpenBBox.x);
-		stream->WriteWord(d->OpenBBox.y);
-		stream->WriteWord(d->OpenBBox.x + d->OpenBBox.w);
-		stream->WriteWord(d->OpenBBox.y + d->OpenBBox.h);
+		stream->WriteWord(d->OpenBBox.x_get());
+		stream->WriteWord(d->OpenBBox.y_get());
+		stream->WriteWord(d->OpenBBox.x_get() + d->OpenBBox.w_get());
+		stream->WriteWord(d->OpenBBox.y_get() + d->OpenBBox.h_get());
 		//closed bounding box
-		stream->WriteWord(d->ClosedBBox.x);
-		stream->WriteWord(d->ClosedBBox.y);
-		stream->WriteWord(d->ClosedBBox.x + d->ClosedBBox.w);
-		stream->WriteWord(d->ClosedBBox.y + d->ClosedBBox.h);
+		stream->WriteWord(d->ClosedBBox.x_get());
+		stream->WriteWord(d->ClosedBBox.y_get());
+		stream->WriteWord(d->ClosedBBox.x_get() + d->ClosedBBox.w_get());
+		stream->WriteWord(d->ClosedBBox.y_get() + d->ClosedBBox.h_get());
 		//open and closed impeded blocks
 		stream->WriteDword(VertIndex);
 		tmpWord = (ieWord) d->open_ib.size();
@@ -2066,10 +2066,10 @@ int AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword& Vert
 		stream->WriteWord(c->TrapDetected);
 		stream->WritePoint(c->TrapLaunch);
 		//outline bounding box
-		stream->WriteWord(c->BBox.x);
-		stream->WriteWord(c->BBox.y);
-		stream->WriteWord(c->BBox.x + c->BBox.w);
-		stream->WriteWord(c->BBox.y + c->BBox.h);
+		stream->WriteWord(c->BBox.x_get());
+		stream->WriteWord(c->BBox.y_get());
+		stream->WriteWord(c->BBox.x_get() + c->BBox.w_get());
+		stream->WriteWord(c->BBox.y_get() + c->BBox.h_get());
 		//item index and offset
 		ieDword tmpDword = c->inventory.GetSlotCount();
 		stream->WriteDword(ItemIndex);
@@ -2109,10 +2109,10 @@ int AREImporter::PutRegions(DataStream* stream, const Map* map, ieDword& VertInd
 		//translates to trap = 0, info = 1, travel = 2
 		stream->WriteWord(((ieWord) ip->Type) - 1);
 		//outline bounding box
-		stream->WriteWord(ip->BBox.x);
-		stream->WriteWord(ip->BBox.y);
-		stream->WriteWord(ip->BBox.x + ip->BBox.w);
-		stream->WriteWord(ip->BBox.y + ip->BBox.h);
+		stream->WriteWord(ip->BBox.x_get());
+		stream->WriteWord(ip->BBox.y_get());
+		stream->WriteWord(ip->BBox.x_get() + ip->BBox.w_get());
+		stream->WriteWord(ip->BBox.y_get() + ip->BBox.h_get());
 		ieWord tmpWord = static_cast<ieWord>(ip->outline ? ip->outline->Count() : 1);
 		stream->WriteWord(tmpWord);
 		stream->WriteDword(VertIndex);
@@ -2354,8 +2354,8 @@ int AREImporter::PutMapnotes(DataStream* stream, const Map* map) const
 		if (pst) {
 			// in PST the coordinates are stored in small map space
 			const Size& mapsize = map->GetSize();
-			stream->WriteDword(static_cast<ieDword>(mn.Pos.x * double(map->SmallMap->Frame.w) / mapsize.w));
-			stream->WriteDword(static_cast<ieDword>(mn.Pos.y * double(map->SmallMap->Frame.h) / mapsize.h));
+			stream->WriteDword(static_cast<ieDword>(mn.Pos.x * double(map->SmallMap->Frame.w_get()) / mapsize.w));
+			stream->WriteDword(static_cast<ieDword>(mn.Pos.y * double(map->SmallMap->Frame.h_get()) / mapsize.h));
 
 			size_t len = 0;
 			// limited to 500 *bytes* of text, convert to a multibyte encoding.

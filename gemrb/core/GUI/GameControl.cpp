@@ -432,7 +432,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	if (screenFlags.Test(ScreenFlags::AlwaysCenter) && update_scripts) {
 		const Actor* star = core->GetFirstSelectedActor();
 		if (star) {
-			vpVector = star->Pos - vpOrigin - Point(frame.w / 2, frame.h / 2);
+			vpVector = star->Pos - vpOrigin - Point(frame.w_get() / 2, frame.h_get() / 2);
 		}
 	}
 
@@ -609,8 +609,8 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 	// Draw selection rect
 	if (isSelectionRect) {
 		Region r = SelectionRect();
-		r.x -= vpOrigin.x;
-		r.y -= vpOrigin.y;
+		r.x_get() -= vpOrigin.x;
+		r.y_get() -= vpOrigin.y;
 		VideoDriver->DrawRect(r, ColorGreen, false);
 	}
 
@@ -1611,27 +1611,27 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 
 #define SCROLL_AREA_WIDTH 5
 	Region mask = frame;
-	mask.x += SCROLL_AREA_WIDTH;
-	mask.y += SCROLL_AREA_WIDTH;
-	mask.w -= SCROLL_AREA_WIDTH * 2;
-	mask.h -= SCROLL_AREA_WIDTH * 2;
+	mask.x_get() += SCROLL_AREA_WIDTH;
+	mask.y_get() += SCROLL_AREA_WIDTH;
+	mask.w_get() -= SCROLL_AREA_WIDTH * 2;
+	mask.h_get() -= SCROLL_AREA_WIDTH * 2;
 #undef SCROLL_AREA_WIDTH
 
 	screenMousePos = e.mouse.Pos();
 	Point mp = ConvertPointFromScreen(screenMousePos);
 	int mousescrollspd = core->GetMouseScrollSpeed();
 
-	if (mp.x < mask.x) {
+	if (mp.x < mask.x_get()) {
 		vpVector.x = -mousescrollspd;
-	} else if (mp.x > mask.x + mask.w) {
+	} else if (mp.x > mask.x_get() + mask.w_get()) {
 		vpVector.x = mousescrollspd;
 	} else {
 		vpVector.x = 0;
 	}
 
-	if (mp.y < mask.y) {
+	if (mp.y < mask.y_get()) {
 		vpVector.y = -mousescrollspd;
-	} else if (mp.y > mask.y + mask.h) {
+	} else if (mp.y > mask.y_get() + mask.h_get()) {
 		vpVector.y = mousescrollspd;
 	} else {
 		vpVector.y = 0;
@@ -1649,7 +1649,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 
 void GameControl::MoveViewportUnlockedTo(Point p, bool center)
 {
-	Point half(frame.w / 2, frame.h / 2);
+	Point half(frame.w_get() / 2, frame.h_get() / 2);
 	if (center) {
 		p -= half;
 	}
@@ -1672,16 +1672,16 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		Size mapsize = area->GetSize();
 
 		if (center) {
-			p.x -= frame.w / 2;
-			p.y -= frame.h / 2;
+			p.x -= frame.w_get() / 2;
+			p.y -= frame.h_get() / 2;
 		}
 
 		// TODO: make the overflow more dynamic
-		if (frame.w >= mapsize.w + 64) {
-			p.x = (mapsize.w - frame.w) / 2;
+		if (frame.w_get() >= mapsize.w + 64) {
+			p.x = (mapsize.w - frame.w_get()) / 2;
 			canMove = false;
-		} else if (p.x + frame.w >= mapsize.w + 64) {
-			p.x = mapsize.w - frame.w + 64;
+		} else if (p.x + frame.w_get() >= mapsize.w + 64) {
+			p.x = mapsize.w - frame.w_get() + 64;
 			canMove = false;
 		} else if (p.x < -64) {
 			p.x = -64;
@@ -1691,15 +1691,15 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		int mwinh = 0;
 		const TextArea* mta = core->GetMessageTextArea();
 		if (mta) {
-			mwinh = mta->GetWindow()->Frame().h;
+			mwinh = mta->GetWindow()->Frame().h_get();
 		}
 
 		constexpr int padding = 50;
-		if (frame.h >= mapsize.h + mwinh + padding) {
-			p.y = (mapsize.h - frame.h) / 2 + padding;
+		if (frame.h_get() >= mapsize.h + mwinh + padding) {
+			p.y = (mapsize.h - frame.h_get()) / 2 + padding;
 			canMove = false;
-		} else if (p.y + frame.h >= mapsize.h + mwinh + padding) {
-			p.y = mapsize.h - frame.h + mwinh + padding;
+		} else if (p.y + frame.h_get() >= mapsize.h + mwinh + padding) {
+			p.y = mapsize.h - frame.h_get() + mwinh + padding;
 			canMove = false;
 		} else if (p.y < 0) {
 			p.y = 0;

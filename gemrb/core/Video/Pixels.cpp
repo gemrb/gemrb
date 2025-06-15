@@ -33,35 +33,35 @@ IPixelIterator* PixelFormatIterator::InitImp(void* pixel, int pitch) const noexc
 			Point p;
 
 			if (ydir == Reverse)
-				p.y = clip.h - 1;
+				p.y = clip.h_get() - 1;
 			if (xdir == Reverse)
-				p.x = clip.w - 1;
+				p.x = clip.w_get() - 1;
 
 			return FindRLEPos(rledata, pitch, p, format.ColorKey);
 		}(static_cast<uint8_t*>(pixel));
-		return new RLEIterator(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), format.ColorKey);
+		return new RLEIterator(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w_get(), clip.h_get()), format.ColorKey);
 	} else {
 		pixel = [this, pitch](uint8_t* pixels) {
 			if (xdir == Reverse) {
-				pixels += format.Bpp * (clip.w - 1);
+				pixels += format.Bpp * (clip.w_get() - 1);
 			}
 			if (ydir == Reverse) {
-				pixels += pitch * (clip.h - 1);
+				pixels += pitch * (clip.h_get() - 1);
 			}
 
-			pixels += (clip.y * pitch) + (clip.x * format.Bpp);
+			pixels += (clip.y_get() * pitch) + (clip.x_get() * format.Bpp);
 			return pixels;
 		}(static_cast<uint8_t*>(pixel));
 
 		switch (format.Bpp) {
 			case 4:
-				return new PixelIterator<uint32_t>(static_cast<uint32_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
+				return new PixelIterator<uint32_t>(static_cast<uint32_t*>(pixel), xdir, ydir, Size(clip.w_get(), clip.h_get()), pitch);
 			case 3:
-				return new PixelIterator<Pixel24Bit>(static_cast<Pixel24Bit*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
+				return new PixelIterator<Pixel24Bit>(static_cast<Pixel24Bit*>(pixel), xdir, ydir, Size(clip.w_get(), clip.h_get()), pitch);
 			case 2:
-				return new PixelIterator<uint16_t>(static_cast<uint16_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
+				return new PixelIterator<uint16_t>(static_cast<uint16_t*>(pixel), xdir, ydir, Size(clip.w_get(), clip.h_get()), pitch);
 			case 1:
-				return new PixelIterator<uint8_t>(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
+				return new PixelIterator<uint8_t>(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w_get(), clip.h_get()), pitch);
 			default:
 				ERROR_UNKNOWN_BPP;
 		}
@@ -92,7 +92,7 @@ PixelFormatIterator::~PixelFormatIterator() noexcept
 
 PixelFormatIterator PixelFormatIterator::end(const PixelFormatIterator& beg) noexcept
 {
-	if (beg.clip.w == 0 || beg.clip.h == 0) {
+	if (beg.clip.w_get() == 0 || beg.clip.h_get() == 0) {
 		// already at the end
 		return PixelFormatIterator(beg);
 	}

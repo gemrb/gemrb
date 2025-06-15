@@ -643,7 +643,7 @@ void ScriptedAnimation::Draw(const Region& vp, Color tint, int height, BlitFlags
 		ShaderTint(Tint, tint); // this tint is expected to already have the global tint applied
 	}
 
-	Point p(Pos.x - vp.x + XOffset, Pos.y - vp.y - ZOffset + YOffset);
+	Point p(Pos.x - vp.x_get() + XOffset, Pos.y - vp.y_get() - ZOffset + YOffset);
 	if (SequenceFlags & IE_VVC_HEIGHT) p.y -= height;
 	if (SequenceFlags & IE_VVC_NOCOVER || Transparency & IE_VVC_NOCOVER_2) {
 		flags &= ~BlitFlags::STENCIL_MASK;
@@ -665,15 +665,15 @@ Region ScriptedAnimation::DrawingRegion() const
 	const Animation* anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim) {
 		Region animArea = anim->animArea;
-		animArea.x += XOffset + Pos.x;
-		animArea.y += (YOffset - ZOffset) + Pos.y;
+		animArea.x_get() += XOffset + Pos.x;
+		animArea.y_get() += (YOffset - ZOffset) + Pos.y;
 		r.ExpandToRegion(animArea);
 	}
 
 	if (light) {
 		Region lightArea = light->Frame;
-		lightArea.x = XOffset - light->Frame.x + Pos.x;
-		lightArea.y = YOffset - ZOffset - light->Frame.y + Pos.y;
+		lightArea.x_get() = XOffset - light->Frame.x_get() + Pos.x;
+		lightArea.y_get() = YOffset - ZOffset - light->Frame.y_get() + Pos.y;
 		r.ExpandToRegion(lightArea);
 	}
 

@@ -1290,7 +1290,7 @@ Region Projectile::DrawingRegion(const Region& viewPort) const
 		pos += viewPort.origin;
 	}
 	Region r(pos, Size());
-	r.y -= ZPos;
+	r.y_get() -= ZPos;
 
 	for (const auto& child : children) {
 		r.ExpandToRegion(child.DrawingRegion(viewPort));
@@ -1310,7 +1310,7 @@ Region Projectile::DrawingRegion(const Region& viewPort) const
 	if (shadow) {
 		Region r2 = shadow.animArea;
 		r2.origin += Pos;
-		r2.y += ZPos; // always on the ground
+		r2.y_get() += ZPos; // always on the ground
 		r.ExpandToRegion(r2);
 	}
 	// we can ignore BAMRes1, BAMRes2, Extension->Spread: used only to create the above two
@@ -1319,7 +1319,7 @@ Region Projectile::DrawingRegion(const Region& viewPort) const
 	if (light) {
 		Region lightArea = light->Frame;
 		lightArea.origin += Pos;
-		lightArea.y += ZPos; // always on the ground
+		lightArea.y_get() += ZPos; // always on the ground
 		r.ExpandToRegion(lightArea);
 	}
 
@@ -1911,7 +1911,7 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 			if (travelAnim[i]) {
 				Holder<Sprite2D> frame = travelAnim[i].NextFrame();
 				Draw(frame, pos, flags, tint2);
-				pos.y -= frame->Frame.y;
+				pos.y -= frame->Frame.y_get();
 			}
 		}
 	} else if (travelAnim[face]) {

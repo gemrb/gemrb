@@ -130,10 +130,10 @@ void Slider::SetImage(unsigned char type, const Holder<Sprite2D>& img)
 bool Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	MarkDirty();
-	int mx = (KnobPos.x + (Pos * KnobStep) - Knob->Frame.x);
-	int my = (KnobPos.y - Knob->Frame.y);
-	int Mx = (mx + Knob->Frame.w);
-	int My = (my + Knob->Frame.h);
+	int mx = (KnobPos.x + (Pos * KnobStep) - Knob->Frame.x_get());
+	int my = (KnobPos.y - Knob->Frame.y_get());
+	int Mx = (mx + Knob->Frame.w_get());
+	int My = (my + Knob->Frame.h_get());
 
 	Point p = ConvertPointFromScreen(me.Pos());
 

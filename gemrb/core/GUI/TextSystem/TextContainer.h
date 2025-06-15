@@ -173,7 +173,7 @@ protected:
 		bool operator<(const Point& p) const
 		{
 			const Region& r = regions.back()->region;
-			return r.y < p.y || (r.x < p.x && r.y == p.y);
+			return r.y_get() < p.y || (r.x_get() < p.x && r.y_get() == p.y);
 		}
 
 		bool PointInside(const Point& p) const

@@ -69,10 +69,10 @@ void Label::SetColors(const Color& col, const Color& bg)
 
 void Label::SetAlignment(unsigned char newAlignment)
 {
-	if (!font || frame.h <= font->LineHeight) {
+	if (!font || frame.h_get() <= font->LineHeight) {
 		// FIXME: is this a poor way of determinine if we are single line?
 		newAlignment |= IE_FONT_SINGLE_LINE;
-	} else if (frame.h < font->LineHeight * 2) {
+	} else if (frame.h_get() < font->LineHeight * 2) {
 		newAlignment |= IE_FONT_NO_CALC;
 	}
 	Alignment = newAlignment;

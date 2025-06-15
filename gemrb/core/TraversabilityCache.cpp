@@ -29,8 +29,8 @@ Region Map::FCachedActorPosState::CalculateRegion(Actor* InActor) {
 
 void Map::FCachedActorPosState::ClearOldPosition(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
 	const auto& RemovedRegion = region;
-	for (int x = RemovedRegion.x; x < RemovedRegion.x + RemovedRegion.w; ++x) {
-		for (int y = RemovedRegion.y; y < RemovedRegion.y + RemovedRegion.h; ++y) {
+	for (int x = RemovedRegion.x_get(); x < RemovedRegion.x_get() + RemovedRegion.w_get(); ++x) {
+		for (int y = RemovedRegion.y_get(); y < RemovedRegion.y_get() + RemovedRegion.h_get(); ++y) {
 			const auto Idx = y * InWidth * 16 + x;
 			InOutTraversability[Idx] = FTraversability{};
 		}
@@ -40,8 +40,8 @@ void Map::FCachedActorPosState::ClearOldPosition(std::vector<FTraversability> &I
 void Map::FCachedActorPosState::
 ClearOldPosition2(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
 	const auto& RemovedRegion = region;
-	for (int x = RemovedRegion.x; x < RemovedRegion.x + RemovedRegion.w; ++x) {
-		for (int y = RemovedRegion.y; y < RemovedRegion.y + RemovedRegion.h; ++y) {
+	for (int x = RemovedRegion.x_get(); x < RemovedRegion.x_get() + RemovedRegion.w_get(); ++x) {
+		for (int y = RemovedRegion.y_get(); y < RemovedRegion.y_get() + RemovedRegion.h_get(); ++y) {
 			if (!actor->IsOver(Point(x, y), pos)) {
 				continue;
 			}
@@ -53,8 +53,8 @@ ClearOldPosition2(std::vector<FTraversability> &InOutTraversability, int InWidth
 
 void Map::FCachedActorPosState::ClearNewPosition(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
 	const auto RemovedRegion = CalculateRegion(actor);
-	for (int x = RemovedRegion.x; x < RemovedRegion.x + RemovedRegion.w; ++x) {
-		for (int y = RemovedRegion.y; y < RemovedRegion.y + RemovedRegion.h; ++y) {
+	for (int x = RemovedRegion.x_get(); x < RemovedRegion.x_get() + RemovedRegion.w_get(); ++x) {
+		for (int y = RemovedRegion.y_get(); y < RemovedRegion.y_get() + RemovedRegion.h_get(); ++y) {
 			const auto Idx = y * InWidth * 16 + x;
 			InOutTraversability[Idx] = FTraversability{};
 		}
@@ -76,8 +76,8 @@ void Map::FCachedActorPosState::MarkNewPosition(std::vector<FTraversability> &In
 
 	const FTraversability NewTraversability{NewTraversabilityType, actor};
 	const auto& NewRegion = newState.region;
-	for (int x = std::max(0, NewRegion.x); x < NewRegion.x + NewRegion.w; ++x) {
-		for (int y = std::max(0, NewRegion.y); y < NewRegion.y + NewRegion.h; ++y) {
+	for (int x = std::max(0, NewRegion.x_get()); x < NewRegion.x_get() + NewRegion.w_get(); ++x) {
+		for (int y = std::max(0, NewRegion.y_get()); y < NewRegion.y_get() + NewRegion.h_get(); ++y) {
 			if (!actor->IsOver(Point{x, y})) {
 				continue;
 			}
@@ -107,8 +107,8 @@ void Map::FCachedActorPosState::MarkOldPosition(std::vector<FTraversability> &In
 
 	const FTraversability NewTraversability{NewTraversabilityType, actor};
 	const auto& NewRegion = region;
-	for (int x = NewRegion.x; x < NewRegion.x + NewRegion.w; ++x) {
-		for (int y = NewRegion.y; y < NewRegion.y + NewRegion.h; ++y) {
+	for (int x = NewRegion.x_get(); x < NewRegion.x_get() + NewRegion.w_get(); ++x) {
+		for (int y = NewRegion.y_get(); y < NewRegion.y_get() + NewRegion.h_get(); ++y) {
 			if (!actor->IsOver(Point{x, y})) {
 				continue;
 			}
@@ -162,8 +162,8 @@ Region Map::FCachedActorPosState2::CalculateRegion(Actor* InActor) {
 
 void Map::FCachedActorPosState2::ClearOldPosition(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
 	const auto& RemovedRegion = region;
-	for (int x = RemovedRegion.x; x < RemovedRegion.x + RemovedRegion.w; ++x) {
-		for (int y = RemovedRegion.y; y < RemovedRegion.y + RemovedRegion.h; ++y) {
+	for (int x = RemovedRegion.x_get(); x < RemovedRegion.x_get() + RemovedRegion.w_get(); ++x) {
+		for (int y = RemovedRegion.y_get(); y < RemovedRegion.y_get() + RemovedRegion.h_get(); ++y) {
 			const auto Idx = y * InWidth * 16 + x;
 			InOutTraversability[Idx] = FTraversability{};
 		}
@@ -173,8 +173,8 @@ void Map::FCachedActorPosState2::ClearOldPosition(std::vector<FTraversability> &
 void Map::FCachedActorPosState2::
 ClearOldPosition2(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
 	const auto& RemovedRegion = region;
-	for (int x = RemovedRegion.x; x < RemovedRegion.x + RemovedRegion.w; ++x) {
-		for (int y = RemovedRegion.y; y < RemovedRegion.y + RemovedRegion.h; ++y) {
+	for (int x = RemovedRegion.x_get(); x < RemovedRegion.x_get() + RemovedRegion.w_get(); ++x) {
+		for (int y = RemovedRegion.y_get(); y < RemovedRegion.y_get() + RemovedRegion.h_get(); ++y) {
 			if (!actor->IsOver(Point(x, y), pos)) {
 				continue;
 			}
@@ -186,8 +186,8 @@ ClearOldPosition2(std::vector<FTraversability> &InOutTraversability, int InWidth
 
 void Map::FCachedActorPosState2::ClearNewPosition(std::vector<FTraversability> &InOutTraversability, int InWidth) const {
 	const auto RemovedRegion = CalculateRegion(actor);
-	for (int x = RemovedRegion.x; x < RemovedRegion.x + RemovedRegion.w; ++x) {
-		for (int y = RemovedRegion.y; y < RemovedRegion.y + RemovedRegion.h; ++y) {
+	for (int x = RemovedRegion.x_get(); x < RemovedRegion.x_get() + RemovedRegion.w_get(); ++x) {
+		for (int y = RemovedRegion.y_get(); y < RemovedRegion.y_get() + RemovedRegion.h_get(); ++y) {
 			const auto Idx = y * InWidth * 16 + x;
 			InOutTraversability[Idx] = FTraversability{};
 		}
@@ -209,8 +209,8 @@ void Map::FCachedActorPosState2::MarkNewPosition(std::vector<FTraversability> &I
 
 	const FTraversability NewTraversability{NewTraversabilityType, actor};
 	const auto& NewRegion = newState.region;
-	for (int x = std::max(0, NewRegion.x); x < NewRegion.x + NewRegion.w; ++x) {
-		for (int y = std::max(0, NewRegion.y); y < NewRegion.y + NewRegion.h; ++y) {
+	for (int x = std::max(0, NewRegion.x_get()); x < NewRegion.x_get() + NewRegion.w_get(); ++x) {
+		for (int y = std::max(0, NewRegion.y_get()); y < NewRegion.y_get() + NewRegion.h_get(); ++y) {
 			if (!actor->IsOver(Point{x, y})) {
 				continue;
 			}
@@ -239,8 +239,8 @@ void Map::FCachedActorPosState2::MarkOldPosition(std::vector<FTraversability> &I
 
 	const FTraversability NewTraversability{NewTraversabilityType, actor};
 	const auto& NewRegion = region;
-	for (int x = NewRegion.x; x < NewRegion.x + NewRegion.w; ++x) {
-		for (int y = NewRegion.y; y < NewRegion.y + NewRegion.h; ++y) {
+	for (int x = NewRegion.x_get(); x < NewRegion.x_get() + NewRegion.w_get(); ++x) {
+		for (int y = NewRegion.y_get(); y < NewRegion.y_get() + NewRegion.h_get(); ++y) {
 			if (!actor->IsOver(Point{x, y})) {
 				continue;
 			}
@@ -332,9 +332,9 @@ void Map::TraversabilityBlock(Actor *actor) const {
 		if (!actor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED)) {
 			return;
 		}
-		for (int x = r.x; x < r.x + r.w; ++x)
+		for (int x = r.x_get(); x < r.x_get() + r.w_get(); ++x)
 		{
-			for (int y = r.y; y < r.y + r.h; ++y)
+			for (int y = r.y_get(); y < r.y_get() + r.h_get(); ++y)
 			{
 				// ++allPoints;
 				if (x < 0 || y < 0)

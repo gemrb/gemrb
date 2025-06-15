@@ -75,8 +75,8 @@ static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 Font::GlyphAtlasPage::GlyphAtlasPage(Size pageSize, Font* font)
 	: SpriteSheet<ieWord>(), font(font)
 {
-	SheetRegion.w = pageSize.w;
-	SheetRegion.h = pageSize.h;
+	SheetRegion.w_get() = pageSize.w;
+	SheetRegion.h_get() = pageSize.h;
 
 	pageData = (ieByte*) calloc(pageSize.h, pageSize.w * (font->palette ? 1 : 4));
 }
@@ -85,26 +85,26 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 {
 	assert(glyphs.find(chr) == glyphs.end());
 	int newX = pageXPos + g.size.w;
-	if (newX > SheetRegion.w) {
+	if (newX > SheetRegion.w_get()) {
 		return false;
 	}
 
 	int glyphH = g.size.h + std::abs(g.pos.y);
-	if (glyphH > SheetRegion.h) {
+	if (glyphH > SheetRegion.h_get()) {
 		// must grow to accommodate this glyph
 		if (Sheet) {
 			// if we already have a sheet we need to destroy it before we can add more glyphs
-			pageData = (ieByte*) calloc(SheetRegion.w, glyphH * g.bytesPerPx);
+			pageData = (ieByte*) calloc(SheetRegion.w_get(), glyphH * g.bytesPerPx);
 			const ieByte* pixels = static_cast<const ieByte*>(Sheet->LockSprite());
-			std::copy(pixels, pixels + (Sheet->Frame.w * Sheet->Frame.h) * g.bytesPerPx, pageData);
+			std::copy(pixels, pixels + (Sheet->Frame.w_get() * Sheet->Frame.h_get()) * g.bytesPerPx, pageData);
 			Sheet->UnlockSprite();
 			Sheet = nullptr;
 		} else {
-			pageData = (ieByte*) realloc(pageData, SheetRegion.w * glyphH * g.bytesPerPx);
+			pageData = (ieByte*) realloc(pageData, SheetRegion.w_get() * glyphH * g.bytesPerPx);
 		}
 
 		assert(pageData);
-		SheetRegion.h = glyphH;
+		SheetRegion.h_get() = glyphH;
 	} else if (Sheet) {
 		// we need to lock/unlock the sprite because we are updating its pixels
 		const void* pixels = Sheet->LockSprite();
@@ -116,7 +116,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 	MapSheetSegment(chr, Region(pageXPos, (g.pos.y < 0) ? 0 : g.pos.y, g.size.w, g.size.h));
 	// make the non-temporary glyph from our own data
 	const ieByte* pageLoc = pageData + pageXPos;
-	glyphs.emplace(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w, g.bytesPerPx));
+	glyphs.emplace(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w_get(), g.bytesPerPx));
 
 	pageXPos = newX;
 
@@ -185,7 +185,7 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 void Font::GlyphAtlasPage::DumpToScreen(const Region& r) const
 {
 	VideoDriver->SetScreenClip(NULL);
-	Region drawRgn = Region(0, 0, 1024, Sheet->Frame.h);
+	Region drawRgn = Region(0, 0, 1024, Sheet->Frame.h_get());
 	VideoDriver->DrawRect(drawRgn, ColorBlack, true);
 	VideoDriver->DrawRect(Sheet->Frame.Intersect(r), ColorWhite, false);
 	VideoDriver->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn, BlitFlags::BLENDED);
@@ -218,11 +218,11 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>& 
 	assert(AtlasIndex.size() <= chr || AtlasIndex[chr].pageIdx == static_cast<ieWord>(-1));
 	assert(spr);
 
-	Size size(spr->Frame.w, spr->Frame.h);
+	Size size(spr->Frame.w_get(), spr->Frame.h_get());
 	// FIXME: should we adjust for spr->Frame.x too?
-	Point pos(0, Baseline - spr->Frame.y);
+	Point pos(0, Baseline - spr->Frame.y_get());
 
-	Glyph tmp = Glyph(size, pos, (ieByte*) spr->LockSprite(), spr->Frame.w, spr->GetPalette() ? 1 : 4);
+	Glyph tmp = Glyph(size, pos, (ieByte*) spr->LockSprite(), spr->Frame.w_get(), spr->GetPalette() ? 1 : 4);
 	spr->UnlockSprite(); // FIXME: this is assuming it is ok to hang onto to pixel buffer returned from LockSprite()
 	// adjust the location for the glyph
 	if (!CurrentAtlasPage || !CurrentAtlasPage->AddGlyph(chr, tmp)) {
@@ -291,34 +291,34 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 		}
 
 		// check if we need to extend the canvas
-		if (canvas && grow && rgn.h < dp.y) {
+		if (canvas && grow && rgn.h_get() < dp.y) {
 			size_t pos = (stringPos < string.length()) ? stringPos : string.length() - 1;
 			pos -= line.length();
 			Size textSize = StringSize(string.substr(pos));
 			ieWord numNewPixels = textSize.Area();
-			ieWord lineArea = rgn.w * LineHeight;
+			ieWord lineArea = rgn.w_get() * LineHeight;
 			// round up
 			ieWord numLines = 1 + ((numNewPixels - 1) / lineArea);
 			// extend the region and canvas both
-			size_t curpos = rgn.h * rgn.w;
+			size_t curpos = rgn.h_get() * rgn.w_get();
 			int vGrow = (numLines * LineHeight);
-			rgn.h += vGrow;
+			rgn.h_get() += vGrow;
 
 			if (InDebugMode(DebugMode::FONTS)) {
 				Log(MESSAGE, "Font", "Resizing canvas from {}x{} to {}x{}",
-				    rgn.w, rgn.h - vGrow, rgn.w, rgn.h);
+				    rgn.w_get(), rgn.h_get() - vGrow, rgn.w_get(), rgn.h_get());
 			}
 
-			*canvas = (ieByte*) realloc(*canvas, rgn.w * rgn.h);
+			*canvas = (ieByte*) realloc(*canvas, rgn.w_get() * rgn.h_get());
 			assert(canvas);
 			// fill the buffer with the color key, or the new area or we will get garbage in the areas we dont blit to
-			memset(*canvas + curpos, 0, vGrow * rgn.w);
+			memset(*canvas + curpos, 0, vGrow * rgn.w_get());
 		}
 
 		dp.x = 0;
 		size_t lineLen = line.length();
 		if (lineLen) {
-			const Region lineRgn(dp + rgn.origin, Size(rgn.w, LineHeight));
+			const Region lineRgn(dp + rgn.origin, Size(rgn.w_get(), LineHeight));
 			StringSizeMetrics metrics = { lineRgn.size, 0, 0, true };
 			const Size lineSize = StringSize(line, &metrics);
 			size_t linePos = metrics.numChars;
@@ -334,7 +334,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 			} else {
 				// on screen
 				if (alignment & (IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_RIGHT)) {
-					linePoint.x += (rgn.w - lineSize.w); // this is right aligned, but we can adjust for center later on
+					linePoint.x += (rgn.w_get() - lineSize.w); // this is right aligned, but we can adjust for center later on
 					if (linePoint.x < 0) {
 						linePos = String::npos;
 						size_t prevPos = linePos;
@@ -390,7 +390,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 		}
 		dp.y += LineHeight;
 
-		if (singleLine || dp.y >= rgn.h) {
+		if (singleLine || dp.y >= rgn.h_get()) {
 			break;
 		}
 	}
@@ -398,11 +398,11 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 	// free the unused canvas area (if any)
 	if (canvas) {
 		int usedh = dp.y;
-		if (usedh < rgn.h) {
+		if (usedh < rgn.h_get()) {
 			// this is more than just saving memory
 			// vertical alignment will be off if we have extra space
-			*canvas = (ieByte*) realloc(*canvas, rgn.w * usedh);
-			rgn.h = usedh;
+			*canvas = (ieByte*) realloc(*canvas, rgn.w_get() * usedh);
+			rgn.h_get() = usedh;
 		}
 	}
 
@@ -421,7 +421,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			Point& dp, const PrintColors* colors, ieByte** canvas) const
 {
-	assert(lineRgn.h == LineHeight);
+	assert(lineRgn.h_get() == LineHeight);
 
 	// NOTE: alignment is not handled here.
 	// it should have been calculated previously and passed in via the "point" parameter
@@ -450,8 +450,8 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 		if (dp.x == 0 && metrics.forceBreak) {
 			done = true;
 			word.resize(metrics.numChars);
-			assert(metrics.size.w <= lineRgn.w);
-		} else if (dp.x + wordW > lineRgn.w) {
+			assert(metrics.size.w <= lineRgn.w_get());
+		} else if (dp.x + wordW > lineRgn.w_get()) {
 			// overflow with no wrap allowed; abort.
 			break;
 		}
@@ -526,16 +526,16 @@ size_t Font::Print(Region rgn, const String& string, ieByte alignment, const Pri
 			stringSize = StringSize(string, &metrics);
 			if (alignment & IE_FONT_NO_CALC && metrics.numChars < string.length()) {
 				// PST GUISTORE, not sure what else
-				stringSize.h = rgn.h;
+				stringSize.h = rgn.h_get();
 			}
 		}
 
 		// important: we must do this adjustment even if it leads to -p.y!
 		// some labels depend on this behavior (BG2 GUIINV) :/
 		if (alignment & IE_FONT_ALIGN_MIDDLE) {
-			p.y += (rgn.h - stringSize.h) / 2;
+			p.y += (rgn.h_get() - stringSize.h) / 2;
 		} else { // bottom alignment
-			p.y += rgn.h - stringSize.h;
+			p.y += rgn.h_get() - stringSize.h;
 		}
 	}
 

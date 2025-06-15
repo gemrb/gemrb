@@ -438,8 +438,8 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 	// insert enough newlines to push the text offscreen
 	auto margins = ta->GetMargins();
 	int rowHeight = ta->LineHeight();
-	int h = ta->Frame().h - (margins.top + margins.bottom);
-	int w = ta->Frame().w - (margins.left + margins.right);
+	int h = ta->Frame().h_get() - (margins.top + margins.bottom);
+	int w = ta->Frame().w_get() - (margins.left + margins.right);
 	int newlines = CeilDiv(h, rowHeight);
 	ta->AppendText(String(newlines - 1, L'\n'));
 	ta->AppendText(PyString_AsStringObj(text));
@@ -2191,7 +2191,7 @@ static PyObject* GemRB_View_GetFrame(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(view);
 
 	const Region& frame = view->Frame();
-	return Py_BuildValue("{s:i,s:i,s:i,s:i}", "x", frame.x, "y", frame.y, "w", frame.w, "h", frame.h);
+	return Py_BuildValue("{s:i,s:i,s:i,s:i}", "x", frame.x_get(), "y", frame.y_get(), "w", frame.w_get(), "h", frame.h_get());
 }
 
 PyDoc_STRVAR(GemRB_View_SetFrame__doc,
@@ -13075,7 +13075,7 @@ static PyObject* ParamToPython(const GUIScript::Parameter& p)
 		return Py_BuildValue("{s:i,s:i}", "x", point.x, "y", point.y);
 	} else if (type == typeid(Region)) {
 		const Region& rgn = p.Value<Region>();
-		return Py_BuildValue("{s:i,s:i,s:i,s:i}", "x", rgn.x, "y", rgn.y, "w", rgn.w, "h", rgn.h);
+		return Py_BuildValue("{s:i,s:i,s:i,s:i}", "x", rgn.x_get(), "y", rgn.y_get(), "w", rgn.w_get(), "h", rgn.h_get());
 	} else if (type == typeid(View*)) {
 		const View* view = p.Value<View*>();
 		return gs->ConstructObjectForScriptable(view->GetScriptingRef());

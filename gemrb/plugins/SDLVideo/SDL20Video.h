@@ -96,7 +96,7 @@ public:
 		SDL_QueryTexture(texture, &nativeFormat, &access, NULL, NULL);
 
 		if (inputFormat != nativeFormat || access == SDL_TEXTUREACCESS_STREAMING) {
-			conversionBuffer = SDL_CreateRGBSurfaceWithFormat(0, rect.w, rect.h, SDL_BITSPERPIXEL(nativeFormat), nativeFormat);
+			conversionBuffer = SDL_CreateRGBSurfaceWithFormat(0, rect.w_get(), rect.h_get(), SDL_BITSPERPIXEL(nativeFormat), nativeFormat);
 		}
 
 		Clear();
@@ -150,7 +150,7 @@ public:
 
 	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) override
 	{
-		int sdlpitch = bufDest.w * SDL_BYTESPERPIXEL(nativeFormat);
+		int sdlpitch = bufDest.w_get() * SDL_BYTESPERPIXEL(nativeFormat);
 		SDL_Rect dest = RectFromRegion(bufDest);
 
 		if (nativeFormat == SDL_PIXELFORMAT_YV12) {
@@ -186,7 +186,7 @@ public:
 			bool hasalpha = SDL_ISPIXELFORMAT_ALPHA(nativeFormat);
 
 			const Uint8* src = static_cast<const Uint8*>(pixelBuf);
-			for (int xy = 0; xy < bufDest.w * bufDest.h; ++xy) {
+			for (int xy = 0; xy < bufDest.w_get() * bufDest.h_get(); ++xy) {
 				const Color& c = pal->GetColorAt(*src++);
 				*dst++ = (c.r << pxfmt->Rshift) | (c.g << pxfmt->Gshift) | (c.b << pxfmt->Bshift) | (c.a << pxfmt->Ashift);
 				if (hasalpha == false) {
@@ -201,7 +201,7 @@ public:
 				Log(ERROR, "SDL20Video", "{}", SDL_GetError());
 			}
 		} else {
-			int ret = SDL_ConvertPixels(bufDest.w, bufDest.h, inputFormat, pixelBuf, pitch ? *pitch : sdlpitch, nativeFormat, conversionBuffer->pixels, sdlpitch);
+			int ret = SDL_ConvertPixels(bufDest.w_get(), bufDest.h_get(), inputFormat, pixelBuf, pitch ? *pitch : sdlpitch, nativeFormat, conversionBuffer->pixels, sdlpitch);
 			if (ret == 0) {
 				ret = SDL_UpdateTexture(texture, &dest, conversionBuffer->pixels, sdlpitch);
 			}

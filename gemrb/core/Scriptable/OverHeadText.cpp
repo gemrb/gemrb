@@ -166,7 +166,7 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType
 	// NOTE: in case we just printed a message, should we reduce the offset, so we can draw immediately without interference?
 	Region rgn(p - Point(100, heightOffset) - vp.origin, Size(200, 400));
 	if (delay != maxDelay) {
-		rgn.y -= maxScrollOffset - scrollOffset.y;
+		rgn.y_get() -= maxScrollOffset - scrollOffset.y;
 		// rgn.h will be adjusted automatically, we don't need to worry about accidentally hiding other msgs
 		scrollOffset.y -= 2;
 	}
@@ -182,7 +182,7 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType
 		rgnBG.size = stringSize;
 		rgnBG.ExpandAllSides(3);
 		// recenter if we shrunk
-		rgnBG.x += (200 - rgnBG.w) / 2 + 3;
+		rgnBG.x_get() += (200 - rgnBG.w_get()) / 2 + 3;
 		static constexpr Color TranslucentBlack { 0x00, 0x00, 0x00, 0x9f };
 		VideoDriver->DrawRect(rgnBG, TranslucentBlack, true, BlitFlags::BLENDED);
 	}

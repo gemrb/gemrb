@@ -122,12 +122,12 @@ Holder<Sprite2D> PVRZImporter::GetSprite2D()
 
 Holder<Sprite2D> PVRZImporter::GetSprite2D(Region&& region)
 {
-	if (region.x < 0 || (region.x + region.w) > size.w || region.y < 0 || (region.y + region.h) > size.h) {
+	if (region.x_get() < 0 || (region.x_get() + region.w_get()) > size.w || region.y_get() < 0 || (region.y_get() + region.h_get()) > size.h) {
 		Log(ERROR, "PVRZImporter", "Out-of-bounds access");
 		return {};
 	}
 
-	if (region.w == 0 || region.h == 0) {
+	if (region.w_get() == 0 || region.h_get() == 0) {
 		return {};
 	}
 
@@ -173,8 +173,8 @@ uint16_t PVRZImporter::GetBlockPixelMask(const Region& region, const Region& gri
 	uint16_t pixelMask = 0xFFFF;
 
 	// Top margin
-	if (y == grid.y) {
-		int yOverlap = region.y % 4;
+	if (y == grid.y_get()) {
+		int yOverlap = region.y_get() % 4;
 		if (yOverlap != 0) {
 			for (int by = 0; by < yOverlap; ++by) {
 				pixelMask &= ~(0xF << (4 * by));
@@ -183,8 +183,8 @@ uint16_t PVRZImporter::GetBlockPixelMask(const Region& region, const Region& gri
 	}
 
 	// Bottom margin
-	if (y == grid.h - 1) {
-		int yOverlap = (region.y + region.h) % 4;
+	if (y == grid.h_get() - 1) {
+		int yOverlap = (region.y_get() + region.h_get()) % 4;
 		if (yOverlap != 0) {
 			for (int by = 4; by > yOverlap; --by) {
 				pixelMask &= ~(0xF << (4 * (by - 1)));
@@ -193,8 +193,8 @@ uint16_t PVRZImporter::GetBlockPixelMask(const Region& region, const Region& gri
 	}
 
 	// Left margin
-	if (x == grid.x) {
-		int xOverlap = region.x % 4;
+	if (x == grid.x_get()) {
+		int xOverlap = region.x_get() % 4;
 		if (xOverlap != 0) {
 			uint8_t rowMask = 0;
 
@@ -208,8 +208,8 @@ uint16_t PVRZImporter::GetBlockPixelMask(const Region& region, const Region& gri
 	}
 
 	// Right margin
-	if (x == grid.w - 1) {
-		int xOverlap = (region.x + region.w) % 4;
+	if (x == grid.w_get() - 1) {
+		int xOverlap = (region.x_get() + region.w_get()) % 4;
 		if (xOverlap != 0) {
 			uint8_t rowMask = 0;
 			uint16_t matrix = 0;
@@ -238,18 +238,18 @@ Holder<Sprite2D> PVRZImporter::getSprite2DDXT1(Region&& region) const
 	std::fill(uncompressedData, uncompressedData + region.size.Area(), 0);
 
 	std::array<uint8_t, 6> colors;
-	Point blockOrigin { region.x % 4, region.y % 4 };
+	Point blockOrigin { region.x_get() % 4, region.y_get() % 4 };
 
-	Region grid { region.x / 4, region.y / 4, (region.x + region.w) / 4, (region.y + region.h) / 4 };
-	if ((region.x + region.w) % 4 != 0) {
-		grid.w += 1;
+	Region grid { region.x_get() / 4, region.y_get() / 4, (region.x_get() + region.w_get()) / 4, (region.y_get() + region.h_get()) / 4 };
+	if ((region.x_get() + region.w_get()) % 4 != 0) {
+		grid.w_get() += 1;
 	}
-	if ((region.y + region.h) % 4 != 0) {
-		grid.h += 1;
+	if ((region.y_get() + region.h_get()) % 4 != 0) {
+		grid.h_get() += 1;
 	}
 
-	for (int y = grid.y; y < grid.h; ++y) {
-		for (int x = grid.x; x < grid.w; ++x) {
+	for (int y = grid.y_get(); y < grid.h_get(); ++y) {
+		for (int x = grid.x_get(); x < grid.w_get(); ++x) {
 			size_t srcDataOffset = (y * (size.w / 4) + x) * 8; // Block size is 64bit
 
 			auto color1n2 = extractPalette(srcDataOffset, colors);
@@ -291,16 +291,16 @@ Holder<Sprite2D> PVRZImporter::getSprite2DDXT1(Region&& region) const
 
 				uint8_t row = i / 4;
 				uint8_t column = i % 4;
-				uint32_t destX = (x - grid.x) * 4 + column - blockOrigin.x;
-				uint32_t destY = (y - grid.y) * 4 + row - blockOrigin.y;
+				uint32_t destX = (x - grid.x_get()) * 4 + column - blockOrigin.x;
+				uint32_t destY = (y - grid.y_get()) * 4 + row - blockOrigin.y;
 
-				size_t destDataOffset = region.w * destY + destX;
+				size_t destDataOffset = region.w_get() * destY + destX;
 				uncompressedData[destDataOffset] = fullColor;
 			}
 		}
 	}
 
-	auto spr = VideoDriver->CreateSprite(Region { 0, 0, region.w, region.h }, uncompressedData, fmt);
+	auto spr = VideoDriver->CreateSprite(Region { 0, 0, region.w_get(), region.h_get() }, uncompressedData, fmt);
 	return { spr };
 }
 
@@ -311,18 +311,18 @@ Holder<Sprite2D> PVRZImporter::getSprite2DDXT5(Region&& region) const
 	std::fill(uncompressedData, uncompressedData + region.size.Area(), 0);
 
 	std::array<uint8_t, 6> colors;
-	Point blockOrigin { region.x % 4, region.y % 4 };
-	Region grid { region.x / 4, region.y / 4, (region.x + region.w) / 4, (region.y + region.h) / 4 };
+	Point blockOrigin { region.x_get() % 4, region.y_get() % 4 };
+	Region grid { region.x_get() / 4, region.y_get() / 4, (region.x_get() + region.w_get()) / 4, (region.y_get() + region.h_get()) / 4 };
 
-	if ((region.x + region.w) % 4 != 0) {
-		grid.w += 1;
+	if ((region.x_get() + region.w_get()) % 4 != 0) {
+		grid.w_get() += 1;
 	}
-	if ((region.y + region.h) % 4 != 0) {
-		grid.h += 1;
+	if ((region.y_get() + region.h_get()) % 4 != 0) {
+		grid.h_get() += 1;
 	}
 
-	for (int y = grid.y; y < grid.h; ++y) {
-		for (int x = grid.x; x < grid.w; ++x) {
+	for (int y = grid.y_get(); y < grid.h_get(); ++y) {
+		for (int x = grid.x_get(); x < grid.w_get(); ++x) {
 			size_t srcDataOffset = (y * (size.w / 4) + x) * 16; // Block size is 128bit
 
 			std::array<uint8_t, 8> alpha;
@@ -378,16 +378,16 @@ Holder<Sprite2D> PVRZImporter::getSprite2DDXT5(Region&& region) const
 
 				uint8_t row = i / 4;
 				uint8_t column = i % 4;
-				uint32_t destX = (x - grid.x) * 4 + column - blockOrigin.x;
-				uint32_t destY = (y - grid.y) * 4 + row - blockOrigin.y;
+				uint32_t destX = (x - grid.x_get()) * 4 + column - blockOrigin.x;
+				uint32_t destY = (y - grid.y_get()) * 4 + row - blockOrigin.y;
 
-				size_t destDataOffset = region.w * destY + destX;
+				size_t destDataOffset = region.w_get() * destY + destX;
 				uncompressedData[destDataOffset] = fullColor;
 			}
 		}
 	}
 
-	auto spr = VideoDriver->CreateSprite(Region { 0, 0, region.w, region.h }, uncompressedData, fmt);
+	auto spr = VideoDriver->CreateSprite(Region { 0, 0, region.w_get(), region.h_get() }, uncompressedData, fmt);
 	return { spr };
 }
 

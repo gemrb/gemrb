@@ -273,8 +273,8 @@ Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, c
 void SDLVideoDriver::BlitSprite(const Holder<Sprite2D>& spr, const Region& src, Region dst,
 				BlitFlags flags, Color tint)
 {
-	dst.x -= spr->Frame.x;
-	dst.y -= spr->Frame.y;
+	dst.x_get() -= spr->Frame.x_get();
+	dst.y_get() -= spr->Frame.y_get();
 	BlitSpriteClipped(spr, src, dst, flags, &tint);
 }
 
@@ -323,18 +323,18 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 #endif
 	// FIXME?: srect isn't verified
 	Region dclipped = ClippedDrawingRect(dst);
-	int trim = dst.h - dclipped.h;
+	int trim = dst.h_get() - dclipped.h_get();
 	if (trim) {
-		src.h -= trim;
-		if (dclipped.y > dst.y) { // top clipped
-			src.y += trim;
+		src.h_get() -= trim;
+		if (dclipped.y_get() > dst.y_get()) { // top clipped
+			src.y_get() += trim;
 		} // already have appropriate y for bottom clip
 	}
-	trim = dst.w - dclipped.w;
+	trim = dst.w_get() - dclipped.w_get();
 	if (trim) {
-		src.w -= trim;
-		if (dclipped.x > dst.x) { // left clipped
-			src.x += trim;
+		src.w_get() -= trim;
+		if (dclipped.x_get() > dst.x_get()) { // left clipped
+			src.x_get() += trim;
 		}
 	} // already have appropriate y for right clip
 
@@ -342,7 +342,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 		return;
 	}
 
-	assert(dclipped.w == src.w && dclipped.h == src.h);
+	assert(dclipped.w_get() == src.w_get() && dclipped.h_get() == src.h_get());
 
 #if SDL_VERSION_ATLEAST(1, 3, 0)
 	dclipped = dst;
