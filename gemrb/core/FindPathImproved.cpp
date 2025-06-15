@@ -67,12 +67,12 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383,
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand { { 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924 } };
 
 Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned int size, unsigned int minDistance,
-	int flags, const Actor *caller) const
+	int flags, const Actor *caller)
 {
 	TRACY(ZoneScoped);
 
 	if (!bUpdatedTraversabilityThisFrame) {
-		UpdateTraversability();
+		UpdateTraversabilityCache();
 		bUpdatedTraversabilityThisFrame = true;
 	}
 
@@ -228,7 +228,7 @@ Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned 
 				// If there's an actor, check it can be bumped away
 				TRACY(TracyCZoneN(tCtxActorChecks, "actorChecks", true));
 
-				const auto TraversableVal = Traversability2[nmptChild.y * mapSize.w * 16 + nmptChild.x];
+				const auto TraversableVal = Traversability[nmptChild.y * mapSize.w * 16 + nmptChild.x];
 
 				const bool childIsUnbumpable = TraversableVal.actor != caller && TraversableVal.type >= BlockingTraversabilityVal;
 

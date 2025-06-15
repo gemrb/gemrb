@@ -69,7 +69,7 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383,
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand { { 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924 } };
 
 // Find the best path of limited length that brings us the farthest from d
-Path Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const
+Path Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller)
 {
 	if (!caller || !caller->GetSpeed()) return {};
 	Point p = s;
@@ -229,7 +229,7 @@ PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
-Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller) const
+Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
 {
 	using namespace std::chrono_literals;
 	const char units[] = "us";

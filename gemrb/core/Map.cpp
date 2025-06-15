@@ -1790,38 +1790,7 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 	};
 
 	// draw Traversability cache
-	if (dFlags & DEBUG_SHOW_SEARCHMAP)
 	{
-		Color TraversabilityColors[(int)ETraversability::max] {
-			Color{255, 255, 255, 30}, // none
-			Color{0, 0, 255, 180}, // actor but passable
-			Color{255, 255, 0, 180}, // blocked
-		};
-
-		Region block(0, 0, 1, 1);
-
-		int w = vp.w_get();// / 16 + 2;
-		int h = vp.h_get();// / 12 + 2;
-
-		BlitFlags flags = BlitFlags::BLENDED;
-		if (dFlags & DEBUG_SHOW_LIGHTMAP) {
-			flags |= BlitFlags::HALFTRANS;
-		}
-
-		for (int x = vp.x_get(); x < vp.x_get() + vp.w_get(); ++x) {
-			for (int y = vp.y_get(); y < vp.y_get() + vp.h_get(); ++y) {
-				const auto Idx = y * PropsSize().w * 16 + x;
-				const Point p{x, y};
-				if (Idx < Traversability.size()) {
-					VideoDriver->DrawPoint(p - vp.origin, TraversabilityColors[(int)Traversability[Idx].type], BLENDED);
-				}
-				else {
-					VideoDriver->DrawPoint(p - vp.origin, Color{200, 0, 200, 0}, BLENDED);
-				}
-			}
-		}
-	}
-	else {
 		Color TraversabilityColors[(int)ETraversability::max] {
 			Color{255, 255, 255, 30}, // none
 			Color{0, 255, 0, 180}, // actor but passable
@@ -1842,8 +1811,8 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 			for (int y = vp.y_get(); y < vp.y_get() + vp.h_get(); ++y) {
 				const auto Idx = y * PropsSize().w * 16 + x;
 				const Point p{x, y};
-				if (Idx < Traversability2.size()) {
-					VideoDriver->DrawPoint(p - vp.origin, TraversabilityColors[(int)Traversability2[Idx].type], BLENDED);
+				if (Idx < Traversability.size()) {
+					VideoDriver->DrawPoint(p - vp.origin, TraversabilityColors[(int)Traversability[Idx].type], BLENDED);
 				}
 				else {
 					VideoDriver->DrawPoint(p - vp.origin, Color{200, 0, 200, 0}, BLENDED);

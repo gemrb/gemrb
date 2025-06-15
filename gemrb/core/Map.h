@@ -373,18 +373,63 @@ public:
 	void PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, PathMapFlags value) const noexcept;
 };
 
-	enum class ETraversability: uint8_t {
-		empty = 0,
-		actor,
-		actorNonTraversable,
+enum class ETraversability: uint8_t {
+	empty = 0,
+	actor,
+	actorNonTraversable,
 
-		max
-	};
+	max
+};
 
-	struct FTraversability {
-		ETraversability type = ETraversability::empty;
-		Actor* actor = nullptr;
-	};
+struct FTraversability {
+	ETraversability type = ETraversability::empty;
+	Actor* actor = nullptr;
+};
+
+struct FCachedActorPosState {
+	Region region;
+	Actor* actor = nullptr;
+	Point pos;
+	uint8_t flags{};
+	constexpr static uint8_t BUMPABLE_FLAG = 1;
+	constexpr static uint8_t ALIVE_FLAG = 2;
+
+	inline void SetIsBumpable() {
+		flags |= (1 << BUMPABLE_FLAG);
+	}
+
+	inline void ResetIsBumpable() {
+		flags &= ~(1 << BUMPABLE_FLAG);
+	}
+
+	inline void SetIsAlive() {
+		flags |= (1 << ALIVE_FLAG);
+	}
+
+	inline void ResetIsAlive() {
+		flags &= ~(1 << ALIVE_FLAG);
+	}
+
+	inline void FlipIsBumpable() {
+		flags ^= (1 << BUMPABLE_FLAG);
+	}
+
+	bool GetIsBumpable() const {
+		return flags & (1 << BUMPABLE_FLAG);
+	}
+
+	bool GetIsAlive() const {
+		return flags & (1 << ALIVE_FLAG);
+	}
+
+	explicit FCachedActorPosState(Actor* InActor);
+	void ClearOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
+	void ClearNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
+	void MarkNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth, bool bInUpdateSelf = false);
+	void MarkOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
+	void UpdateNewState();
+	static Region CalculateRegion(const Actor* InActor);
+};
 
 class GEM_EXPORT Map : public Scriptable {
 public:
@@ -435,8 +480,7 @@ private:
 
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
 
-	mutable std::vector<FTraversability> Traversability;
-	mutable std::vector<FTraversability> Traversability2;
+	std::vector<FTraversability> Traversability;
 
 	class MapReverb {
 	public:
@@ -473,86 +517,10 @@ public:
 	Map(TileMap* tm, TileProps tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
 
-	Region GetTraversabilityRegion(Actor* actor) const;
-
-	void TraversabilityUnblock(Actor * actor);
-
-	void TraversabilityBlock(Actor * actor) const;
-
-	struct FCachedActorPosState {
-		Actor* actor = nullptr;
-		Point pos;
-		Region region;
-		int bumpable = 1;
-		int alive = 0;
-
-		FCachedActorPosState(Actor* InActor);
-		void ClearOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-		void ClearOldPosition2(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-		void ClearNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-		void MarkNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth, bool bInUpdateSelf = false);
-		void MarkOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth);
-		void UpdateNewState();
-		static Region CalculateRegion(Actor* InActor);
-	};
-
-	struct FCachedActorPosState2 {
-		Region region;
-		Actor* actor = nullptr;
-		Point pos;
-		uint8_t flags;
-		constexpr static uint8_t BUMPABLE_FLAG = 1;
-		constexpr static uint8_t ALIVE_FLAG = 2;
-
-		inline void SetIsBumpable() {
-			flags |= (1 << BUMPABLE_FLAG);
-		}
-
-		inline void ResetIsBumpable() {
-			flags &= ~(1 << BUMPABLE_FLAG);
-		}
-
-		inline void SetIsAlive() {
-			flags |= (1 << ALIVE_FLAG);
-		}
-
-		inline void ResetIsAlive() {
-			flags &= ~(1 << ALIVE_FLAG);
-		}
-
-		inline void FlipIsBumpable() {
-			flags ^= (1 << BUMPABLE_FLAG);
-		}
-
-		bool GetIsBumpable() const {
-			return flags & (1 << BUMPABLE_FLAG);
-		}
-
-		bool GetIsAlive() const {
-			return flags & (1 << ALIVE_FLAG);
-		}
-
-		FCachedActorPosState2(Actor* InActor);
-		void ClearOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-		void ClearOldPosition2(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-		void ClearNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth) const;
-		void MarkNewPosition(std::vector<FTraversability>& InOutTraversability, int InWidth, bool bInUpdateSelf = false);
-		void MarkOldPosition(std::vector<FTraversability>& InOutTraversability, int InWidth);
-		void UpdateNewState();
-		static Region CalculateRegion(Actor* InActor);
-	};
-
-	mutable std::vector<FCachedActorPosState> CachedActorPosState;
-	mutable std::vector<FCachedActorPosState2> CachedActorPosState2;
-	mutable bool bUpdatedTraversabilityThisFrame;
-	bool ShouldUpdateTraversability() const;
-	bool ShouldUpdateTraversability2() const;
-	void UpdateTraversability() const;
-	void UpdateTraversabilityBase() const;
-	void UpdateTraversabilityImproved() const;
-
-	void ValidateTraversabilitySize() const;
-	void ValidateTraversabilitySize2() const;
+	std::vector<FCachedActorPosState> CachedActorPosState;
+	bool bUpdatedTraversabilityThisFrame;
+	void UpdateTraversabilityCache();
+	void ValidateTraversabilityCacheSize();
 
 	static void NormalizeDeltas(float_t& dx, float_t& dy, float_t factor = 1);
 
@@ -716,7 +684,7 @@ public:
 	void AdjustPositionNavmap(Point& goal, const Size& radius = ZeroSize) const;
 	void AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int startingRadius) const;
 	/* Finds the path which leads the farthest from d */
-	Path RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const;
+	Path RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller);
 	PathNode RandomWalk(const Point& s, int size, int radius, const Actor* caller) const;
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy() const;
@@ -725,9 +693,9 @@ public:
 	Path GetLinePath(const Point& start, int Steps, orient_t Orientation, int flags) const;
 	Path GetLinePath(const Point& start, const Point& dest, int speed, orient_t Orientation, int flags) const;
 	/* Finds the path which leads to near d */
-	Path FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr) const;
+	Path FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr);
 	Path FindPathImplOriginal(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr) const;
-	Path FindPathImplOriginalImproved(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr) const;
+	Path FindPathImplOriginalImproved(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr);
 
 	bool IsVisible(const Point& p) const;
 	bool IsExplored(const Point& p) const;
