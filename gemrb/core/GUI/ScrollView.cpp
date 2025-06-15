@@ -34,8 +34,8 @@ void ScrollView::ContentView::SizeChanged(const Size& oldsize)
 	ScrollView* sv = static_cast<ScrollView*>(superView);
 
 	// keep the same position
-	int dx = frame.w_get() - oldsize.w;
-	int dy = frame.h_get() - oldsize.h;
+	int dx = frame.w - oldsize.w;
+	int dy = frame.h - oldsize.h;
 
 	ResizeToSubviews();
 	sv->ScrollDelta(Point(dx, dy));
@@ -66,15 +66,15 @@ void ScrollView::ContentView::ResizeToSubviews()
 			bounds.ExpandToRegion(r);
 		}
 
-		newSize.w = std::max(newSize.w, bounds.w_get());
-		newSize.h = std::max(newSize.h, bounds.h_get());
+		newSize.w = std::max(newSize.w, bounds.w);
+		newSize.h = std::max(newSize.h, bounds.h);
 	}
-	assert(newSize.w >= superView->Frame().w_get() && newSize.h >= superView->Frame().h_get());
+	assert(newSize.w >= superView->Frame().w && newSize.h >= superView->Frame().h);
 
 	// set frame size directly to avoid infinite recursion
 	// subviews were already resized, so no need to run the autoresize
-	frame.w_get() = newSize.w;
-	frame.h_get() = newSize.h;
+	frame.w = newSize.w;
+	frame.h = newSize.h;
 
 	ScrollView* sv = static_cast<ScrollView*>(superView);
 	if (!sv->animation) {
@@ -88,8 +88,8 @@ void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region
 
 	Region clipArea = parent->ContentRegion();
 	Point origin = parent->ConvertPointToWindow(clipArea.origin);
-	clipArea.x_get() = origin.x;
-	clipArea.y_get() = origin.y;
+	clipArea.x = origin.x;
+	clipArea.y = origin.y;
 
 	const Region intersect = clip.Intersect(clipArea);
 	if (intersect.size.IsInvalid()) return; // outside the window/screen
@@ -135,13 +135,13 @@ void ScrollView::SetVScroll(ScrollBar* sbar)
 			sbar = new ScrollBar(*sbar);
 
 			Region sbFrame = sbar->Frame();
-			sbFrame.x_get() = frame.w_get() - sbFrame.w_get();
-			sbFrame.y_get() = 0;
-			sbFrame.h_get() = frame.h_get();
+			sbFrame.x = frame.w - sbFrame.w;
+			sbFrame.y = 0;
+			sbFrame.h = frame.h;
 
 			sbar->SetFrame(sbFrame);
 			sbar->SetAutoResizeFlags(ResizeRight | ResizeTop | ResizeBottom, BitOp::SET);
-			savedSBSize.w = sbFrame.w_get();
+			savedSBSize.w = sbFrame.w;
 		}
 	}
 
@@ -196,7 +196,7 @@ void ScrollView::UpdateScrollbars()
 	const Size& mySize = ContentRegion().size;
 	const Region& contentFrame = contentView.Frame();
 
-	if (hscroll && contentFrame.w_get() > mySize.w) {
+	if (hscroll && contentFrame.w > mySize.w) {
 		// assert(hscroll);
 		// TODO: add horizontal scrollbars
 		// this is a limitation in the Scrollbar class
@@ -204,10 +204,10 @@ void ScrollView::UpdateScrollbars()
 	}
 	if (vscroll) {
 		bool show = false;
-		if (contentFrame.h_get() > mySize.h) {
+		if (contentFrame.h > mySize.h) {
 			show = !(Flags() & View::IgnoreEvents);
 
-			int maxVal = contentFrame.h_get() - mySize.h;
+			int maxVal = contentFrame.h - mySize.h;
 			Control::ValueRange range(0, maxVal);
 			vscroll->SetValueRange(range);
 		}
@@ -251,18 +251,18 @@ Region ScrollView::ContentRegion() const
 {
 	Region cr = Region(Point(0, 0), Dimensions());
 	if (hscroll && hscroll->IsVisible()) {
-		cr.h_get() -= hscroll->Frame().h_get();
+		cr.h -= hscroll->Frame().h;
 	}
 	if (vscroll && vscroll->IsVisible()) {
 		const Region& sframe = vscroll->Frame();
 
-		if (sframe.x_get() == 0) {
+		if (sframe.x == 0) {
 			// scrollbar is the leftmost view
-			cr.x_get() += sframe.w_get();
-			cr.w_get() -= sframe.w_get();
-		} else if (sframe.x_get() == cr.w_get() - sframe.w_get()) {
+			cr.x += sframe.w;
+			cr.w -= sframe.w;
+		} else if (sframe.x == cr.w - sframe.w) {
 			// scrollbar is the rightmost view
-			cr.w_get() -= sframe.w_get();
+			cr.w -= sframe.w;
 		} else {
 			// if we have custom scrollbars in the middle of the content view
 			// its perfectly valid to just draw beneath them
@@ -345,8 +345,8 @@ void ScrollView::ScrollTo(const Point& p)
 
 void ScrollView::ScrollTo(Point newP, ieDword duration)
 {
-	int maxx = frame.w_get() - contentView.Dimensions().w;
-	int maxy = frame.h_get() - contentView.Dimensions().h;
+	int maxx = frame.w - contentView.Dimensions().w;
+	int maxy = frame.h - contentView.Dimensions().h;
 	assert(maxx <= 0 && maxy <= 0);
 
 	// clamp values so we dont scroll beyond the content

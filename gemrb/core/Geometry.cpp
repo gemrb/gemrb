@@ -221,8 +221,8 @@ std::vector<BasePoint> PlotEllipse(const Region& rect) noexcept
 		return {};
 	}
 
-	if (rect.w_get() == rect.h_get()) {
-		return PlotCircle(rect.Center(), (rect.w_get() / 2) - 1);
+	if (rect.w == rect.h) {
+		return PlotCircle(rect.Center(), (rect.w / 2) - 1);
 	}
 
 	BasePoint p1 = rect.origin;

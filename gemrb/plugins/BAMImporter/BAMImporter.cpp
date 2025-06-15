@@ -156,7 +156,7 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 
 	if (RLESprite) {
 		PixelFormat fmt = PixelFormat::RLE8Bit(palette, CompressedColorIndex);
-		const uint8_t* dataEnd = FindRLEPos(dataBegin, rgn.w_get(), Point(rgn.w_get(), rgn.h_get() - 1), CompressedColorIndex);
+		const uint8_t* dataEnd = FindRLEPos(dataBegin, rgn.w, Point(rgn.w, rgn.h - 1), CompressedColorIndex);
 		ptrdiff_t dataLen = dataEnd - dataBegin;
 		if (dataLen == 0) return nullptr;
 		void* pixels = malloc(dataLen);
@@ -167,8 +167,8 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 		if (frameInfo.RLE) {
 			pixels = DecodeRLEData(dataBegin, rgn.size, CompressedColorIndex);
 		} else {
-			pixels = malloc(rgn.w_get() * rgn.h_get());
-			memcpy(pixels, dataBegin, rgn.w_get() * rgn.h_get());
+			pixels = malloc(rgn.w * rgn.h);
+			memcpy(pixels, dataBegin, rgn.w * rgn.h);
 		}
 		PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, CompressedColorIndex);
 		spr = VideoDriver->CreateSprite(rgn, pixels, fmt);
@@ -220,13 +220,13 @@ void BAMImporter::Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock,
 
 	const uint8_t* spritePixels = static_cast<uint8_t*>(sprite->LockSprite());
 	for (int h = 0; h < dataBlock.size.h; ++h) {
-		size_t offset = h * sprite->Frame.w_get() * 4;
+		size_t offset = h * sprite->Frame.w * 4;
 		size_t destOffset =
-			4 * (frame.bounds.w_get() * (dataBlock.destination.y + h) + dataBlock.destination.x);
+			4 * (frame.bounds.w * (dataBlock.destination.y + h) + dataBlock.destination.x);
 
 		std::copy(
 			spritePixels + offset,
-			spritePixels + offset + sprite->Frame.w_get() * 4,
+			spritePixels + offset + sprite->Frame.w * 4,
 			frameData + destOffset);
 	}
 

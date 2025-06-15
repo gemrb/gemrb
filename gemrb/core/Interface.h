@@ -643,7 +643,7 @@ private:
 		ResourceHolder<ImageMgr> palim = gamedata->GetResourceHolder<ImageMgr>(resref);
 		if (palim) {
 			auto image = palim->GetSprite2D();
-			int height = image->Frame.h_get();
+			int height = image->Frame.h;
 			palettes.resize(height);
 			Region clip(0, 0, SIZE, height);
 			auto it = image->GetIterator(IPixelIterator::Direction::Forward, IPixelIterator::Direction::Forward, clip);

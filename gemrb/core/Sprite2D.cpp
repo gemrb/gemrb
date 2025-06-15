@@ -57,7 +57,7 @@ Sprite2D::Sprite2D(const Region& rgn, void* pixels, const PixelFormat& fmt, uint
 {}
 
 Sprite2D::Sprite2D(const Region& frame, void* pixels, const PixelFormat& fmt) noexcept
-	: Sprite2D(frame, pixels, fmt, frame.w_get())
+	: Sprite2D(frame, pixels, fmt, frame.w)
 {}
 
 Sprite2D::Sprite2D(const Sprite2D& obj) noexcept
@@ -82,9 +82,9 @@ Sprite2D::~Sprite2D() noexcept
 
 Color Sprite2D::GetPixel(const Point& p) const noexcept
 {
-	if (Region(0, 0, Frame.w_get(), Frame.h_get()).PointInside(p)) {
+	if (Region(0, 0, Frame.w, Frame.h).PointInside(p)) {
 		Iterator it = GetIterator();
-		it.Advance(p.y * Frame.w_get() + p.x);
+		it.Advance(p.y * Frame.w + p.x);
 		return it.ReadRGBA();
 	}
 	return Color();

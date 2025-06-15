@@ -38,10 +38,10 @@ void TileOverlay::AddTile(Tile&& tile)
 void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlayPtr>& overlays, BlitFlags flags) const
 {
 	// determine which tiles are visible
-	int sx = std::max(viewport.x_get() / 64, 0);
-	int sy = std::max(viewport.y_get() / 64, 0);
-	int dx = (std::max(viewport.x_get(), 0) + viewport.w_get() + 63) / 64;
-	int dy = (std::max(viewport.y_get(), 0) + viewport.h_get() + 63) / 64;
+	int sx = std::max(viewport.x / 64, 0);
+	int sy = std::max(viewport.y / 64, 0);
+	int dx = (std::max(viewport.x, 0) + viewport.w + 63) / 64;
+	int dy = (std::max(viewport.y, 0) + viewport.h + 63) / 64;
 
 	const Game* game = core->GetGame();
 	assert(game);

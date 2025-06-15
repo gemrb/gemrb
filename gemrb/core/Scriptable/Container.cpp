@@ -47,8 +47,8 @@ Region Container::DrawingRegion() const
 	for (const auto& icon : groundicons) {
 		if (icon) {
 			Region frame = icon->Frame;
-			frame.x_get() = Pos.x - frame.x_get();
-			frame.y_get() = Pos.y - frame.y_get();
+			frame.x = Pos.x - frame.x;
+			frame.y = Pos.y - frame.y;
 			r.ExpandToRegion(frame);
 		}
 	}

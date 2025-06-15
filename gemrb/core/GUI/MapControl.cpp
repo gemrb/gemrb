@@ -64,13 +64,13 @@ void MapControl::DrawFog(const Region& rgn) const
 	Point gameP = p;
 
 	std::vector<BasePoint> points;
-	points.reserve(rgn.w_get() * rgn.h_get());
+	points.reserve(rgn.w * rgn.h);
 
-	for (; p.y < rgn.h_get(); ++p.y) {
-		gameP.y = int(p.y * double(mapsize.h) / mosRgn.h_get());
+	for (; p.y < rgn.h; ++p.y) {
+		gameP.y = int(p.y * double(mapsize.h) / mosRgn.h);
 
-		for (p.x = 0; p.x < rgn.w_get(); ++p.x) {
-			gameP.x = int(p.x * double(mapsize.w) / mosRgn.w_get());
+		for (p.x = 0; p.x < rgn.w; ++p.x) {
+			gameP.x = int(p.x * double(mapsize.w) / mosRgn.w);
 
 			bool visible = MyMap->IsExplored(gameP);
 			if (!visible) {
@@ -90,8 +90,8 @@ Point MapControl::ConvertPointToGame(Point p) const
 	// mos is in win coordinates (to make things easy elsewhere)
 	p = ConvertPointToSuper(p) - mosRgn.origin;
 
-	p.x = int(p.x * double(mapsize.w) / mosRgn.w_get());
-	p.y = int(p.y * double(mapsize.h) / mosRgn.h_get());
+	p.x = int(p.x * double(mapsize.w) / mosRgn.w);
+	p.y = int(p.y * double(mapsize.h) / mosRgn.h);
 
 	return p;
 }
@@ -100,8 +100,8 @@ Point MapControl::ConvertPointFromGame(Point p) const
 {
 	const Size mapsize = MyMap->GetSize();
 
-	p.x = int(p.x * double(mosRgn.w_get()) / mapsize.w);
-	p.y = int(p.y * double(mosRgn.h_get()) / mapsize.h);
+	p.x = int(p.x * double(mosRgn.w) / mapsize.w);
+	p.y = int(p.y * double(mosRgn.h) / mapsize.h);
 
 	// mos is centered... convert p from mos coordinates
 	return p + mosRgn.origin;
@@ -127,7 +127,7 @@ void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 
 	if (MapMOS) {
 		const Size& mosSize = MapMOS->Frame.size;
-		const Point center(frame.w_get() / 2 - mosSize.w / 2, frame.h_get() / 2 - mosSize.h / 2);
+		const Point center(frame.w / 2 - mosSize.w / 2, frame.h / 2 - mosSize.h / 2);
 		mosRgn = Region(Origin() + center, mosSize);
 	} else {
 		mosRgn = Region(Point(), Dimensions());
@@ -140,13 +140,13 @@ Region MapControl::GetViewport() const
 	Region vp = gc->Viewport();
 	const Size& mapsize = MyMap->GetSize();
 
-	vp.x_get() = int(vp.x_get() * double(mosRgn.w_get()) / mapsize.w);
-	vp.y_get() = int(vp.y_get() * double(mosRgn.h_get()) / mapsize.h);
-	vp.w_get() = int(vp.w_get() * double(mosRgn.w_get()) / mapsize.w);
-	vp.h_get() = int(vp.h_get() * double(mosRgn.h_get()) / mapsize.h);
+	vp.x = int(vp.x * double(mosRgn.w) / mapsize.w);
+	vp.y = int(vp.y * double(mosRgn.h) / mapsize.h);
+	vp.w = int(vp.w * double(mosRgn.w) / mapsize.w);
+	vp.h = int(vp.h * double(mosRgn.h) / mapsize.h);
 
-	vp.x_get() += mosRgn.x_get();
-	vp.y_get() += mosRgn.y_get();
+	vp.x += mosRgn.x;
+	vp.y += mosRgn.y;
 	return vp;
 }
 
@@ -200,7 +200,7 @@ void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 
 			Holder<Sprite2D> anim = mapFlags ? mapFlags->GetFrame(0, mn.color) : nullptr;
 			if (anim) {
-				Point p(anim->Frame.w_get() / 2, anim->Frame.h_get() / 2);
+				Point p(anim->Frame.w / 2, anim->Frame.h / 2);
 				VideoDriver->BlitSprite(anim, pos - p);
 			} else {
 				const Size s(12, 10);
@@ -225,8 +225,8 @@ void MapControl::ClickHandle(const MouseEvent&) const
 void MapControl::UpdateViewport(Point vp)
 {
 	Region vp2 = GetViewport();
-	vp.x -= vp2.w_get() / 2;
-	vp.y -= vp2.h_get() / 2;
+	vp.x -= vp2.w / 2;
+	vp.y -= vp2.h / 2;
 	vp = ConvertPointToGame(vp);
 
 	// clear any previously scheduled moves and then do it asap, so it works while paused
@@ -257,8 +257,8 @@ const MapNote* MapControl::MapNoteAtPoint(const Point& p) const
 	Point gamePoint = ConvertPointToGame(p);
 	Size mapsize = MyMap->GetSize();
 
-	float scalar = float(mapsize.w) / float(mosRgn.w_get());
-	unsigned int radius = (unsigned int) ((mapFlags ? mapFlags->GetFrame(0)->Frame.w_get() / 2 : 5) * scalar);
+	float scalar = float(mapsize.w) / float(mosRgn.w);
+	unsigned int radius = (unsigned int) ((mapFlags ? mapFlags->GetFrame(0)->Frame.w / 2 : 5) * scalar);
 
 	return MyMap->MapNoteAtPoint(gamePoint, radius);
 }

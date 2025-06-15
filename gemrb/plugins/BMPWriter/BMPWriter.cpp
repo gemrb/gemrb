@@ -13,8 +13,8 @@ using namespace GemRB;
 void BMPWriter::PutImage(DataStream* output, Holder<Sprite2D> spr)
 {
 	// FIXME
-	ieDword Width = spr->Frame.w_get();
-	ieDword Height = spr->Frame.h_get();
+	ieDword Width = spr->Frame.w;
+	ieDword Height = spr->Frame.h;
 	char filling[3] = { 'B', 'M' };
 	ieDword PaddedRowLength = GET_SCANLINE_LENGTH(Width, 24);
 	int stuff = (4 - (PaddedRowLength & 3)) & 3; // rounding it up to 4 bytes boundary

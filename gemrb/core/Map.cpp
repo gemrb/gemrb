@@ -1465,22 +1465,22 @@ WallPolygonSet Map::WallsIntersectingRegion(Region r, bool includeDisabled, cons
 	constexpr uint32_t groupHeight = 480;
 	constexpr uint32_t groupWidth = 640;
 
-	if (r.x_get() < 0) {
-		r.w_get() += r.x_get();
-		r.x_get() = 0;
+	if (r.x < 0) {
+		r.w += r.x;
+		r.x = 0;
 	}
 
-	if (r.y_get() < 0) {
-		r.h_get() += r.y_get();
-		r.y_get() = 0;
+	if (r.y < 0) {
+		r.h += r.y;
+		r.y = 0;
 	}
 
 	uint32_t pitch = CeilDiv<uint32_t>(TMap->XCellCount * 64, groupWidth);
-	uint32_t ymin = r.y_get() / groupHeight;
+	uint32_t ymin = r.y / groupHeight;
 	uint32_t maxHeight = CeilDiv<uint32_t>(TMap->YCellCount * 64, groupHeight);
-	uint32_t ymax = std::min(maxHeight, CeilDiv<uint32_t>(r.y_get() + r.h_get(), groupHeight));
-	uint32_t xmin = r.x_get() / groupWidth;
-	uint32_t xmax = std::min(pitch, CeilDiv<uint32_t>(r.x_get() + r.w_get(), groupWidth));
+	uint32_t ymax = std::min(maxHeight, CeilDiv<uint32_t>(r.y + r.h, groupHeight));
+	uint32_t xmin = r.x / groupWidth;
+	uint32_t xmax = std::min(pitch, CeilDiv<uint32_t>(r.x + r.w, groupWidth));
 
 	WallPolygonSet set;
 	WallPolygonGroup& infront = set.first;
@@ -1740,8 +1740,8 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 
 	Region block(0, 0, 16, 12);
 
-	int w = vp.w_get() / 16 + 2;
-	int h = vp.h_get() / 12 + 2;
+	int w = vp.w / 16 + 2;
+	int h = vp.h / 12 + 2;
 
 	BlitFlags flags = BlitFlags::BLENDED;
 	if (dFlags & DEBUG_SHOW_LIGHTMAP) {
@@ -1750,8 +1750,8 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 
 	for (int x = 0; x < w; x++) {
 		for (int y = 0; y < h; y++) {
-			block.x_get() = x * 16 - (vp.x_get() % 16);
-			block.y_get() = y * 12 - (vp.y_get() % 12);
+			block.x = x * 16 - (vp.x % 16);
+			block.y = y * 12 - (vp.y % 12);
 
 			SearchmapPoint p = SearchmapPoint(x, y) + SearchmapPoint(vp.origin);
 
@@ -1779,12 +1779,12 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 		if (!path) return;
 		Color waypoint(0, 64 * (act->GetGlobalID() % 4), 128, 128); // darker blue-ish
 		size_t i = 0;
-		block.w_get() = 8;
-		block.h_get() = 6;
+		block.w = 8;
+		block.h = 6;
 		while (i < path.Size()) {
 			const PathNode& step = path.GetStep(i);
-			block.x_get() = step.point.x - vp.x_get();
-			block.y_get() = step.point.y - vp.y_get();
+			block.x = step.point.x - vp.x;
+			block.y = step.point.y - vp.y;
 			VideoDriver->DrawRect(block, waypoint);
 			i++;
 		}
@@ -1800,16 +1800,16 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 
 		Region block(0, 0, 1, 1);
 
-		int w = vp.w_get();// / 16 + 2;
-		int h = vp.h_get();// / 12 + 2;
+		int w = vp.w;// / 16 + 2;
+		int h = vp.h;// / 12 + 2;
 
 		BlitFlags flags = BlitFlags::BLENDED;
 		if (dFlags & DEBUG_SHOW_LIGHTMAP) {
 			flags |= BlitFlags::HALFTRANS;
 		}
 
-		for (int x = vp.x_get(); x < vp.x_get() + vp.w_get(); ++x) {
-			for (int y = vp.y_get(); y < vp.y_get() + vp.h_get(); ++y) {
+		for (int x = vp.x; x < vp.x + vp.w; ++x) {
+			for (int y = vp.y; y < vp.y + vp.h; ++y) {
 				const auto Idx = y * PropsSize().w * 16 + x;
 				const Point p{x, y};
 				if (Idx < traversabilityCache.size()) {
@@ -2153,8 +2153,8 @@ std::vector<Scriptable*> Map::GetScriptablesInRect(const Point& p, unsigned int 
 	Region rect(p, Size());
 	radius = Feet2Pixels(radius, 0);
 	rect.ExpandAllSides(radius);
-	rect.y_get() += radius / 4;
-	rect.h_get() -= radius / 2;
+	rect.y += radius / 4;
+	rect.h -= radius / 2;
 
 	for (const auto& door : TMap->GetDoors()) {
 		if (door->BBox.IntersectsRegion(rect)) neighbours.emplace_back(door);
@@ -4064,8 +4064,8 @@ Region AreaAnimation::DrawingRegion() const
 	while (ac--) {
 		const Animation& anim = animation[ac];
 		Region animRgn = anim.animArea;
-		animRgn.x_get() += Pos.x;
-		animRgn.y_get() += Pos.y;
+		animRgn.x += Pos.x;
+		animRgn.y += Pos.y;
 
 		r.ExpandToRegion(animRgn);
 	}

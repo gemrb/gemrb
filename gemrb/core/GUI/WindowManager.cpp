@@ -552,8 +552,8 @@ void WindowManager::DrawTooltip(Point pos) const
 		// clamp pos so that the TT is all visible (TT draws centered at pos)
 		int halfW = tooltip.tt.TextSize().w / 2 + 16;
 		int halfH = tooltip.tt.TextSize().h / 2 + 11;
-		pos.x = Clamp<int>(pos.x, halfW, screen.w_get() - halfW);
-		pos.y = Clamp<int>(pos.y, halfW, screen.h_get() - halfH);
+		pos.x = Clamp<int>(pos.x, halfW, screen.w - halfW);
+		pos.y = Clamp<int>(pos.y, halfW, screen.h - halfH);
 
 		tooltip.tt.Draw(pos);
 	} else {
@@ -578,17 +578,17 @@ void WindowManager::DrawWindowFrame(BlitFlags flags) const
 		Holder<Sprite2D> top_edge = WinFrameEdge(2);
 		Holder<Sprite2D> bot_edge = WinFrameEdge(3);
 
-		int left_w = left_edge->Frame.w_get();
-		int right_w = right_edge->Frame.w_get();
-		int v_margin = (screen.h_get() - left_edge->Frame.h_get()) / 2;
+		int left_w = left_edge->Frame.w;
+		int right_w = right_edge->Frame.w;
+		int v_margin = (screen.h - left_edge->Frame.h) / 2;
 		// Also assume top and bottom are the same width.
-		int h_margin = (screen.w_get() - left_w - right_w - top_edge->Frame.w_get()) / 2;
+		int h_margin = (screen.w - left_w - right_w - top_edge->Frame.w) / 2;
 
 		const static Color dummy;
 		video->BlitGameSprite(left_edge, Point(h_margin, v_margin), flags, dummy);
-		video->BlitGameSprite(right_edge, Point(screen.w_get() - right_w - h_margin, v_margin), flags, dummy);
+		video->BlitGameSprite(right_edge, Point(screen.w - right_w - h_margin, v_margin), flags, dummy);
 		video->BlitGameSprite(top_edge, Point(h_margin + left_w, v_margin), flags, dummy);
-		video->BlitGameSprite(bot_edge, Point(h_margin + left_w, screen.h_get() - bot_edge->Frame.h_get() - v_margin), flags, dummy);
+		video->BlitGameSprite(bot_edge, Point(h_margin + left_w, screen.h - bot_edge->Frame.h - v_margin), flags, dummy);
 	}
 }
 
@@ -646,7 +646,7 @@ void WindowManager::DrawWindows() const
 			}
 		}
 
-		if (!drawFrame && !(win->Flags() & Window::Borderless) && (frame.w_get() < screen.w_get() || frame.h_get() < screen.h_get())) {
+		if (!drawFrame && !(win->Flags() & Window::Borderless) && (frame.w < screen.w || frame.h < screen.h)) {
 			// the window requires us to draw the frame border (happens later, on the cursor buffer)
 			drawFrame = true;
 		}
@@ -724,9 +724,9 @@ Holder<Sprite2D> WindowManager::WinFrameEdge(int edge) const
 	// we probably need a HasResource("CSTON" + width + height) call
 	// to check for a custom resource
 
-	if (screen.w_get() >= 800 && screen.w_get() < 1024)
+	if (screen.w >= 800 && screen.w < 1024)
 		refstr.Append("08");
-	else if (screen.w_get() >= 1024)
+	else if (screen.w >= 1024)
 		refstr.Append("10");
 
 	switch (edge) {

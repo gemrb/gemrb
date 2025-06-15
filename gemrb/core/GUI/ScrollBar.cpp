@@ -53,12 +53,12 @@ ScrollBar& ScrollBar::operator=(const ScrollBar& sb)
 
 int ScrollBar::SliderPxRange() const
 {
-	return frame.h_get() - GetFrameHeight(IMAGE_SLIDER) - GetFrameHeight(IMAGE_DOWN_UNPRESSED) - GetFrameHeight(IMAGE_UP_UNPRESSED);
+	return frame.h - GetFrameHeight(IMAGE_SLIDER) - GetFrameHeight(IMAGE_DOWN_UNPRESSED) - GetFrameHeight(IMAGE_UP_UNPRESSED);
 }
 
 int ScrollBar::GetFrameHeight(int frame) const
 {
-	return Frames[frame]->Frame.h_get();
+	return Frames[frame]->Frame.h;
 }
 
 void ScrollBar::ScrollDelta(const Point& delta)
@@ -132,7 +132,7 @@ void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 {
 	int upMy = GetFrameHeight(IMAGE_UP_UNPRESSED);
 	int doMy = GetFrameHeight(IMAGE_DOWN_UNPRESSED);
-	unsigned int domy = (frame.h_get() - doMy);
+	unsigned int domy = (frame.h - doMy);
 
 	//draw the up button
 	if ((State & UP_PRESS) != 0) {
@@ -140,24 +140,24 @@ void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 	} else {
 		VideoDriver->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.origin);
 	}
-	int maxy = drawFrame.y_get() + drawFrame.h_get() - GetFrameHeight(IMAGE_DOWN_UNPRESSED);
+	int maxy = drawFrame.y + drawFrame.h - GetFrameHeight(IMAGE_DOWN_UNPRESSED);
 	int stepy = GetFrameHeight(IMAGE_TROUGH);
 	// some "scrollbars" are sized to just show the up and down buttons
 	// we must skip the trough (and slider) in those cases
 	if (maxy > upMy + doMy) {
 		// draw the trough
 		if (stepy) {
-			Region rgn(drawFrame.x_get(), drawFrame.y_get() + upMy, drawFrame.w_get(), domy - upMy);
-			for (int dy = drawFrame.y_get() + upMy; dy < maxy; dy += stepy) {
+			Region rgn(drawFrame.x, drawFrame.y + upMy, drawFrame.w, domy - upMy);
+			for (int dy = drawFrame.y + upMy; dy < maxy; dy += stepy) {
 				//TROUGH surely exists if it has a nonzero height
 				Point p = Frames[IMAGE_TROUGH]->Frame.origin;
-				p.x += ((frame.w_get() - Frames[IMAGE_TROUGH]->Frame.w_get() - 1) / 2) + drawFrame.x_get();
+				p.x += ((frame.w - Frames[IMAGE_TROUGH]->Frame.w - 1) / 2) + drawFrame.x;
 				p.y += dy;
 				VideoDriver->BlitSprite(Frames[IMAGE_TROUGH], p, &rgn);
 			}
 		}
 		// draw the slider
-		int slx = ((frame.w_get() - Frames[IMAGE_SLIDER]->Frame.w_get() - 1) / 2);
+		int slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2);
 		// FIXME: doesn't respect SLIDER_HORIZONTAL
 		int sly = AxisPosFromValue().y;
 		Point p = drawFrame.origin + Frames[IMAGE_SLIDER]->Frame.origin;
@@ -167,9 +167,9 @@ void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 	}
 	//draw the down button
 	if ((State & DOWN_PRESS) != 0) {
-		VideoDriver->BlitSprite(Frames[IMAGE_DOWN_PRESSED], Point(drawFrame.x_get(), maxy));
+		VideoDriver->BlitSprite(Frames[IMAGE_DOWN_PRESSED], Point(drawFrame.x, maxy));
 	} else {
-		VideoDriver->BlitSprite(Frames[IMAGE_DOWN_UNPRESSED], Point(drawFrame.x_get(), maxy));
+		VideoDriver->BlitSprite(Frames[IMAGE_DOWN_UNPRESSED], Point(drawFrame.x, maxy));
 	}
 }
 
@@ -178,7 +178,7 @@ bool ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	// FIXME: this doesn't respect SLIDER_HORIZONTAL
 	Point p = ConvertPointFromScreen(me.Pos());
-	if (p.x < 0 || p.x > frame.w_get()) {
+	if (p.x < 0 || p.x > frame.w) {
 		// don't allow the scrollbar to engage when the mouse is outside
 		// this happens when a scrollbar is used as an event proxy for a windows
 		return false;
@@ -188,7 +188,7 @@ bool ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 		ScrollUp();
 		return true;
 	}
-	if (p.y >= frame.h_get() - GetFrameHeight(IMAGE_DOWN_UNPRESSED)) {
+	if (p.y >= frame.h - GetFrameHeight(IMAGE_DOWN_UNPRESSED)) {
 		State |= DOWN_PRESS;
 		ScrollDown();
 		return true;
@@ -200,7 +200,7 @@ bool ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	if (p.y >= sliderPos && p.y <= sliderPos + GetFrameHeight(IMAGE_SLIDER)) {
 		// FIXME: hack. we shouldnt mess with the sprite position should we?
 		// scrollbars may share images, so no, we shouldn't do this. need to fix or odd behavior will occur when 2 scrollbars are visible.
-		Frames[IMAGE_SLIDER]->Frame.y_get() = p.y - sliderPos - GetFrameHeight(IMAGE_SLIDER) / 2;
+		Frames[IMAGE_SLIDER]->Frame.y = p.y - sliderPos - GetFrameHeight(IMAGE_SLIDER) / 2;
 		return true;
 	}
 	// FIXME: assumes IMAGE_UP_UNPRESSED.h == IMAGE_DOWN_UNPRESSED.h
@@ -220,7 +220,7 @@ bool ScrollBar::OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/)
 {
 	MarkDirty();
 	State = 0;
-	Frames[IMAGE_SLIDER]->Frame.y_get() = 0; //this is to clear any offset incurred by grabbing the slider
+	Frames[IMAGE_SLIDER]->Frame.y = 0; //this is to clear any offset incurred by grabbing the slider
 	return true;
 }
 
@@ -242,7 +242,7 @@ bool ScrollBar::OnMouseDrag(const MouseEvent& me)
 {
 	if (State & SLIDER_GRAB) {
 		Point p = ConvertPointFromScreen(me.Pos());
-		Point slideroffset(Frames[IMAGE_SLIDER]->Frame.x_get(), Frames[IMAGE_SLIDER]->Frame.y_get());
+		Point slideroffset(Frames[IMAGE_SLIDER]->Frame.x, Frames[IMAGE_SLIDER]->Frame.y);
 		// FIXME: assumes IMAGE_UP_UNPRESSED.h == IMAGE_DOWN_UNPRESSED.h
 		int offset = GetFrameHeight(IMAGE_UP_UNPRESSED) + GetFrameHeight(IMAGE_SLIDER) / 2;
 		if (State & SLIDER_HORIZONTAL) {

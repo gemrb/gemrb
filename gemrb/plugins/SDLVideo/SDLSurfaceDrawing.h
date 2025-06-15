@@ -174,11 +174,11 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 template<SHADER SHADE = SHADER::NONE>
 void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, const Color& color)
 {
-	assert(clip.x_get() >= 0 && clip.w_get() <= dst->w);
-	assert(clip.y_get() >= 0 && clip.h_get() <= dst->h);
+	assert(clip.x >= 0 && clip.w <= dst->w);
+	assert(clip.y >= 0 && clip.h <= dst->h);
 	assert(dst->format->BitsPerPixel == 32); // we could easily support others if we have to, but this is optimized for our needs
 
-	if (p.y < clip.y_get() || p.y >= clip.y_get() + clip.h_get()) {
+	if (p.y < clip.y || p.y >= clip.y + clip.h) {
 		return;
 	}
 
@@ -186,11 +186,11 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, con
 		std::swap(x2, p.x);
 	}
 
-	if (p.x >= clip.x_get() + clip.w_get()) return;
-	if (x2 < clip.x_get()) return;
+	if (p.x >= clip.x + clip.w) return;
+	if (x2 < clip.x) return;
 
-	if (p.x < clip.x_get()) p.x = clip.x_get();
-	x2 = Clamp<int>(x2, p.x, clip.x_get() + clip.w_get());
+	if (p.x < clip.x) p.x = clip.x;
+	x2 = Clamp<int>(x2, p.x, clip.x + clip.w);
 
 	if (p.x == x2)
 		return DrawPointSurface<SHADE>(dst, p, clip, color);
@@ -203,7 +203,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, con
 
 	if (SHADE != SHADER::NONE) {
 		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
-		r.h_get() = 1;
+		r.h = 1;
 		auto dstit = MakeSDLPixelIterator(dst, r.Intersect(clip));
 		auto dstend = SDLPixelIterator::end(dstit);
 
@@ -226,10 +226,10 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, con
 template<SHADER SHADE = SHADER::NONE>
 inline void DrawVLineSurface(SDL_Surface* dst, Point p, int y2, const Region& clip, const Color& color)
 {
-	assert(clip.x_get() >= 0 && clip.w_get() <= dst->w);
-	assert(clip.y_get() >= 0 && clip.h_get() <= dst->h);
+	assert(clip.x >= 0 && clip.w <= dst->w);
+	assert(clip.y >= 0 && clip.h <= dst->h);
 
-	if (p.x < clip.x_get() || p.x >= clip.x_get() + clip.w_get()) {
+	if (p.x < clip.x || p.x >= clip.x + clip.w) {
 		return;
 	}
 
@@ -237,17 +237,17 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, int y2, const Region& cl
 		std::swap(y2, p.y);
 	}
 
-	if (p.y >= clip.y_get() + clip.h_get()) return;
-	if (y2 < clip.y_get()) return;
+	if (p.y >= clip.y + clip.h) return;
+	if (y2 < clip.y) return;
 
-	if (p.y < clip.y_get()) p.y = clip.y_get();
-	y2 = Clamp<int>(y2, p.y, clip.y_get() + clip.h_get());
+	if (p.y < clip.y) p.y = clip.y;
+	y2 = Clamp<int>(y2, p.y, clip.y + clip.h);
 
 	if (p.y == y2)
 		return DrawPointSurface<SHADE>(dst, p, clip, color);
 
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
-	r.w_get() = 1;
+	r.w = 1;
 	auto dstit = MakeSDLPixelIterator(dst, r.Intersect(clip));
 	auto dstend = SDLPixelIterator::end(dstit);
 
@@ -269,8 +269,8 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 	if (start.y == end.y) return DrawHLineSurface<SHADE>(surface, start, end.x, clip, color);
 	if (start.x == end.x) return DrawVLineSurface<SHADE>(surface, start, end.y, clip, color);
 
-	assert(clip.x_get() >= 0 && clip.w_get() <= surface->w);
-	assert(clip.y_get() >= 0 && clip.h_get() <= surface->h);
+	assert(clip.x >= 0 && clip.w <= surface->w);
+	assert(clip.y >= 0 && clip.h <= surface->h);
 
 	Point p1 = start;
 	Point p2 = end;

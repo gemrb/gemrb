@@ -52,8 +52,8 @@ namespace GemRB {
 
 	void TraversabilityCache::CachedActorState::
 	ClearOldPosition(std::vector<TraversabilityCellData> &InOutTraversability, int InWidth) const {
-		for (int x = region.x_get(); x < region.x_get() + region.w_get(); ++x) {
-			for (int y = region.y_get(); y < region.y_get() + region.h_get(); ++y) {
+		for (int x = region.x; x < region.x + region.w; ++x) {
+			for (int y = region.y; y < region.y + region.h; ++y) {
 				if (!actor->IsOver(Point(x, y), pos)) {
 					continue;
 				}
@@ -65,8 +65,8 @@ namespace GemRB {
 
 	void TraversabilityCache::CachedActorState::ClearNewPosition(std::vector<TraversabilityCellData> &InOutTraversability, int InWidth) const {
 		const auto RemovedRegion = CalculateRegion(actor);
-		for (int x = RemovedRegion.x_get(); x < RemovedRegion.x_get() + RemovedRegion.w_get(); ++x) {
-			for (int y = RemovedRegion.y_get(); y < RemovedRegion.y_get() + RemovedRegion.h_get(); ++y) {
+		for (int x = RemovedRegion.x; x < RemovedRegion.x + RemovedRegion.w; ++x) {
+			for (int y = RemovedRegion.y; y < RemovedRegion.y + RemovedRegion.h; ++y) {
 				const auto Idx = y * InWidth * 16 + x;
 				InOutTraversability[Idx] = TraversabilityCellData{};
 			}
@@ -86,8 +86,8 @@ namespace GemRB {
 		const TraversabilityCellData NewTraversability{NewTraversabilityType, actor};
 
 		const auto &NewRegion = newState.region;
-		for (int x = std::max(0, NewRegion.x_get()); x < NewRegion.x_get() + NewRegion.w_get(); ++x) {
-			for (int y = std::max(0, NewRegion.y_get()); y < NewRegion.y_get() + NewRegion.h_get(); ++y) {
+		for (int x = std::max(0, NewRegion.x); x < NewRegion.x + NewRegion.w; ++x) {
+			for (int y = std::max(0, NewRegion.y); y < NewRegion.y + NewRegion.h; ++y) {
 				if (!actor->IsOver(Point{x, y})) {
 					continue;
 				}

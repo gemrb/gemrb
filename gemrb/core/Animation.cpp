@@ -41,8 +41,8 @@ Animation::Animation(std::vector<frame_t> fr, float customFPS) noexcept
 	for (const frame_t& frame : frames) {
 		if (!frame) continue;
 		Region r = frame->Frame;
-		r.x_get() = -r.x_get();
-		r.y_get() = -r.y_get();
+		r.x = -r.x;
+		r.y = -r.y;
 		animArea.ExpandToRegion(r);
 	}
 }
@@ -178,22 +178,22 @@ void Animation::MirrorAnimation(BlitFlags bf)
 
 		if (bf & BlitFlags::MIRRORX) {
 			sprite->renderFlags ^= BlitFlags::MIRRORX;
-			sprite->Frame.x_get() = sprite->Frame.w_get() - sprite->Frame.x_get();
+			sprite->Frame.x = sprite->Frame.w - sprite->Frame.x;
 		}
 		if (bf & BlitFlags::MIRRORY) {
 			sprite->renderFlags ^= BlitFlags::MIRRORY;
-			sprite->Frame.y_get() = sprite->Frame.h_get() - sprite->Frame.y_get();
+			sprite->Frame.y = sprite->Frame.h - sprite->Frame.y;
 		}
 	}
 
 	if (bf & BlitFlags::MIRRORX) {
 		// flip animArea horizontally as well
-		animArea.x_get() = -animArea.w_get() - animArea.x_get();
+		animArea.x = -animArea.w - animArea.x;
 	}
 
 	if (bf & BlitFlags::MIRRORY) {
 		// flip animArea vertically as well
-		animArea.y_get() = -animArea.h_get() - animArea.y_get();
+		animArea.y = -animArea.h - animArea.y;
 	}
 }
 

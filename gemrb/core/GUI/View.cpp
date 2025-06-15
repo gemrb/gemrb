@@ -243,7 +243,7 @@ void View::DrawBackground(const Region* rgn) const
 			Region toClip(screenPt, intersect.size);
 			VideoDriver->BlitSprite(background, intersect, toClip, BlitFlags::BLENDED);
 		} else {
-			Point dp = ConvertPointToWindow(Point(background->Frame.x_get(), background->Frame.y_get()));
+			Point dp = ConvertPointToWindow(Point(background->Frame.x, background->Frame.y));
 			VideoDriver->BlitSprite(background, dp);
 		}
 	}
@@ -306,11 +306,11 @@ void View::Draw()
 				const String& string = StringFromASCII(formatted);
 
 				Region r = drawFrame;
-				r.w_get() = win ? win->Frame().w_get() - r.x_get() : Frame().w_get() - r.x_get();
+				r.w = win ? win->Frame().w - r.x : Frame().w - r.x;
 				Font::StringSizeMetrics metrics = { r.size, 0, 0, true };
 				fnt->StringSize(string, &metrics);
-				r.h_get() = metrics.size.h;
-				r.w_get() = metrics.size.w;
+				r.h = metrics.size.h;
+				r.w = metrics.size.w;
 				VideoDriver->SetScreenClip(nullptr);
 				VideoDriver->DrawRect(r, ColorBlack, true);
 				fnt->Print(r, string, IE_FONT_ALIGN_TOP | IE_FONT_ALIGN_LEFT, { ColorWhite, ColorBlack });
@@ -588,27 +588,27 @@ void View::ResizeSubviews(const Size& oldSize)
 			continue;
 
 		Region newSubFrame = subView->Frame();
-		int delta = frame.w_get() - oldSize.w;
+		int delta = frame.w - oldSize.w;
 
 		if (arFlags & ResizeRight) {
 			if (arFlags & ResizeLeft) {
-				newSubFrame.w_get() += delta;
+				newSubFrame.w += delta;
 			} else {
-				newSubFrame.x_get() += delta;
+				newSubFrame.x += delta;
 			}
 		} else if (arFlags & ResizeLeft) {
-			newSubFrame.x_get() += delta;
+			newSubFrame.x += delta;
 		}
 
-		delta = frame.h_get() - oldSize.h;
+		delta = frame.h - oldSize.h;
 		if (arFlags & ResizeBottom) {
 			if (arFlags & ResizeTop) {
-				newSubFrame.h_get() += delta;
+				newSubFrame.h += delta;
 			} else {
-				newSubFrame.y_get() += delta;
+				newSubFrame.y += delta;
 			}
 		} else if (arFlags & ResizeTop) {
-			newSubFrame.y_get() += delta;
+			newSubFrame.y += delta;
 		}
 
 		subView->SetFrame(newSubFrame);
@@ -638,8 +638,8 @@ void View::SetFrameSize(const Size& s)
 	const Size oldSize = frame.size;
 	if (oldSize == s) return;
 
-	frame.w_get() = std::max(0, s.w);
-	frame.h_get() = std::max(0, s.h);
+	frame.w = std::max(0, s.w);
+	frame.h = std::max(0, s.h);
 
 	ResizeSubviews(oldSize);
 

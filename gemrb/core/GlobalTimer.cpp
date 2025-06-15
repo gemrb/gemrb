@@ -62,8 +62,8 @@ void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
 	currentVP = gc->Viewport();
 
 	if (center) {
-		p.x -= currentVP.w_get() / 2;
-		p.y -= currentVP.h_get() / 2;
+		p.x -= currentVP.w / 2;
+		p.y -= currentVP.h / 2;
 	}
 	if (goal == p) return;
 	goal = p;

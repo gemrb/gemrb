@@ -70,13 +70,13 @@ Region RectFromPy(PyObject* obj)
 	if (PyDict_Check(obj)) {
 		Region r;
 		PyObject* pyVal = PyDict_GetItemString(obj, "x");
-		r.x_get() = int(PyLong_AsLong(pyVal));
+		r.x = int(PyLong_AsLong(pyVal));
 		pyVal = PyDict_GetItemString(obj, "y");
-		r.y_get() = int(PyLong_AsLong(pyVal));
+		r.y = int(PyLong_AsLong(pyVal));
 		pyVal = PyDict_GetItemString(obj, "w");
-		r.w_get() = int(PyLong_AsLong(pyVal));
+		r.w = int(PyLong_AsLong(pyVal));
 		pyVal = PyDict_GetItemString(obj, "h");
-		r.h_get() = int(PyLong_AsLong(pyVal));
+		r.h = int(PyLong_AsLong(pyVal));
 		return r;
 	}
 	return Region();

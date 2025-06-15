@@ -85,8 +85,8 @@ Holder<Sprite2D> PLTImporter::GetSprite2D(unsigned int type, ieDword paletteInde
 	fmt.ColorKey = green_mask;
 
 	Holder<Sprite2D> spr = VideoDriver->CreateSprite(Region(0, 0, Width, Height), p, fmt);
-	spr->Frame.x_get() = 0;
-	spr->Frame.y_get() = 0;
+	spr->Frame.x = 0;
+	spr->Frame.y = 0;
 	return spr;
 }
 

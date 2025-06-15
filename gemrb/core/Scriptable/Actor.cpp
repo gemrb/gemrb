@@ -8414,8 +8414,8 @@ void Actor::UpdateDrawingRegion()
 			Holder<Sprite2D> animframe = anim->CurrentFrame();
 			if (!animframe) continue;
 			Region partBBox = animframe->Frame;
-			partBBox.x_get() = Pos.x - partBBox.x_get();
-			partBBox.y_get() = Pos.y - partBBox.y_get();
+			partBBox.x = Pos.x - partBBox.x;
+			partBBox.y = Pos.y - partBBox.y;
 			box.ExpandToRegion(partBBox);
 			assert(box.RectInside(partBBox));
 		}
@@ -8424,7 +8424,7 @@ void Actor::UpdateDrawingRegion()
 	ExpandBoxForAnimationParts(currentStance.anim);
 	ExpandBoxForAnimationParts(currentStance.shadow);
 
-	box.y_get() -= GetElevation();
+	box.y -= GetElevation();
 
 	// BBox is the the box containing the actor and all its equipment, but nothing else
 	SetBBox(box);
@@ -8434,8 +8434,8 @@ void Actor::UpdateDrawingRegion()
 		int dir = MirrorImageLocation[i];
 
 		Region mirrorBox = BBox;
-		mirrorBox.x_get() += 3 * OrientdX[dir];
-		mirrorBox.y_get() += 3 * OrientdY[dir];
+		mirrorBox.x += 3 * OrientdX[dir];
+		mirrorBox.y += 3 * OrientdY[dir];
 
 		box.ExpandToRegion(mirrorBox);
 	}
@@ -8446,17 +8446,17 @@ void Actor::UpdateDrawingRegion()
 		int blury = (OrientdY[face] * (int) Modified[IE_MOVEMENTRATE]) / 20;
 
 		Region blurBox = BBox;
-		blurBox.x_get() -= blurx * 3;
-		blurBox.y_get() -= blury * 3;
+		blurBox.x -= blurx * 3;
+		blurBox.y -= blury * 3;
 
 		box.ExpandToRegion(blurBox);
 	}
 
 	for (const auto& vvc : vfxQueue) {
 		Region r = vvc->DrawingRegion();
-		if (vvc->SequenceFlags & IE_VVC_HEIGHT) r.y_get() -= BBox.h_get();
+		if (vvc->SequenceFlags & IE_VVC_HEIGHT) r.y -= BBox.h;
 		box.ExpandToRegion(r);
-		assert(r.w_get() <= box.w_get() && r.h_get() <= box.h_get());
+		assert(r.w <= box.w && r.h <= box.h);
 	}
 
 	// drawingRegion is the the box containing all gfx attached to the actor
@@ -8521,7 +8521,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 		if (vvc->YOffset >= 0) {
 			break;
 		}
-		vvc->Draw(vp, baseTint, BBox.h_get(), vvcFlags);
+		vvc->Draw(vp, baseTint, BBox.h, vvcFlags);
 	}
 
 	const Game* game = core->GetGame();
@@ -8646,7 +8646,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	//draw videocells over the actor
 	for (; it != vfxQueue.cend(); ++it) {
 		const ScriptedAnimation* vvc = *it;
-		vvc->Draw(vp, baseTint, BBox.h_get(), vvcFlags);
+		vvc->Draw(vp, baseTint, BBox.h, vvcFlags);
 	}
 }
 

@@ -44,15 +44,15 @@ Gem_Polygon::Gem_Polygon(std::vector<Point>&& points, const Region* bbox)
 
 void Gem_Polygon::Rasterize()
 {
-	assert(BBox.h_get() >= 1);
-	rasterData.resize(BBox.h_get() - 1);
+	assert(BBox.h >= 1);
+	rasterData.resize(BBox.h - 1);
 
 	for (const auto& trap : ComputeTrapezoids()) {
-		int y_top = trap.y1 - BBox.y_get(); // inclusive
-		int y_bot = trap.y2 - BBox.y_get(); // exclusive
+		int y_top = trap.y1 - BBox.y; // inclusive
+		int y_bot = trap.y2 - BBox.y; // exclusive
 
 		if (y_top < 0) y_top = 0;
-		if (y_bot >= BBox.h_get()) y_bot = BBox.h_get() - 1;
+		if (y_bot >= BBox.h) y_bot = BBox.h - 1;
 		if (y_top >= y_bot) continue; // clipped
 
 		int ledge = trap.left_edge;
@@ -63,16 +63,16 @@ void Gem_Polygon::Rasterize()
 		const Point& d = vertices[(redge + 1) % (Count())];
 
 		for (int y = y_top; y < y_bot; ++y) {
-			int py = y + BBox.y_get();
+			int py = y + BBox.y;
 
 			int lt = (b.x * (py - a.y) + a.x * (b.y - py)) / (b.y - a.y);
 			int rt = (d.x * (py - c.y) + c.x * (d.y - py)) / (d.y - c.y) + 1;
 
-			lt -= BBox.x_get();
-			rt -= BBox.x_get();
+			lt -= BBox.x;
+			rt -= BBox.x;
 
 			if (lt < 0) lt = 0;
-			if (rt >= BBox.w_get()) rt = BBox.w_get() - 1;
+			if (rt >= BBox.w) rt = BBox.w - 1;
 			if (lt >= rt) {
 				continue;
 			} // clipped
@@ -109,26 +109,26 @@ void Gem_Polygon::Rasterize()
 
 void Gem_Polygon::RecalcBBox()
 {
-	BBox.x_get() = vertices[0].x;
-	BBox.y_get() = vertices[0].y;
-	BBox.w_get() = vertices[0].x;
-	BBox.h_get() = vertices[0].y;
+	BBox.x = vertices[0].x;
+	BBox.y = vertices[0].y;
+	BBox.w = vertices[0].x;
+	BBox.h = vertices[0].y;
 	for (size_t i = 1; i < vertices.size(); i++) {
-		if (vertices[i].x < BBox.x_get()) {
-			BBox.x_get() = vertices[i].x;
+		if (vertices[i].x < BBox.x) {
+			BBox.x = vertices[i].x;
 		}
-		if (vertices[i].x > BBox.w_get()) {
-			BBox.w_get() = vertices[i].x;
+		if (vertices[i].x > BBox.w) {
+			BBox.w = vertices[i].x;
 		}
-		if (vertices[i].y < BBox.y_get()) {
-			BBox.y_get() = vertices[i].y;
+		if (vertices[i].y < BBox.y) {
+			BBox.y = vertices[i].y;
 		}
-		if (vertices[i].y > BBox.h_get()) {
-			BBox.h_get() = vertices[i].y;
+		if (vertices[i].y > BBox.h) {
+			BBox.h = vertices[i].y;
 		}
 	}
-	BBox.w_get() -= BBox.x_get();
-	BBox.h_get() -= BBox.y_get();
+	BBox.w -= BBox.x;
+	BBox.h -= BBox.y;
 }
 
 bool Gem_Polygon::PointIn(const Point& p) const
@@ -160,20 +160,20 @@ bool Gem_Polygon::IntersectsRect(const Region& rect) const
 	// and we can avoid a more expensive search
 
 	if (PointIn(rect.origin) ||
-	    PointIn(rect.x_get() + rect.w_get(), rect.y_get()) ||
-	    PointIn(rect.x_get(), rect.y_get() + rect.h_get()) ||
+	    PointIn(rect.x + rect.w, rect.y) ||
+	    PointIn(rect.x, rect.y + rect.h) ||
 	    PointIn(rect.Maximum())) {
 		return true;
 	}
 
 	Point relative = rect.origin - BBox.origin;
-	if (relative.y < 0 || relative.y + rect.h_get() >= int(rasterData.size())) {
+	if (relative.y < 0 || relative.y + rect.h >= int(rasterData.size())) {
 		return false;
 	}
 
-	for (int y = relative.y; y < relative.y + rect.h_get(); ++y) {
+	for (int y = relative.y; y < relative.y + rect.h; ++y) {
 		int xmin = relative.x;
-		int xmax = relative.x + rect.w_get();
+		int xmax = relative.x + rect.w;
 
 		for (const auto& seg : rasterData[y]) {
 			if (xmax >= seg.first.x && xmin <= seg.second.x) {

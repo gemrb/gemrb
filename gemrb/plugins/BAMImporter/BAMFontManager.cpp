@@ -67,8 +67,8 @@ Holder<Font> BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*styl
 		static const ieWord topIconCycles[] = { 254 /* level up icon */, 153 /* dialog icon */, 154 /* store icon */, 37 /* separator glyph (like '-')*/ };
 		for (size_t i = 0; i < 3; i++) {
 			Holder<Sprite2D> spr = af->GetFrame(0, topIconCycles[i]);
-			if (spr->Frame.x_get() > 0) // not all datasets are messed up here
-				spr->Frame.y_get() = spr->Frame.x_get();
+			if (spr->Frame.x > 0) // not all datasets are messed up here
+				spr->Frame.y = spr->Frame.x;
 		}
 	}
 
@@ -82,10 +82,10 @@ Holder<Font> BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*styl
 	ieWord lineHeight = 0;
 	if (isNumeric) {
 		baseLine = 0;
-		lineHeight = af->GetFrame(0)->Frame.h_get();
+		lineHeight = af->GetFrame(0)->Frame.h;
 	} else {
-		baseLine = af->GetFrame(0, 0)->Frame.h_get();
-		lineHeight = af->GetFrame(0, 1)->Frame.h_get();
+		baseLine = af->GetFrame(0, 0)->Frame.h;
+		lineHeight = af->GetFrame(0, 1)->Frame.h;
 	}
 
 	auto pal = af->GetFrameWithoutCycle(0)->GetPalette();

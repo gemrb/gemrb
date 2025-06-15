@@ -141,7 +141,7 @@ void Targets::dump() const
 void Targets::FilterObjectRect(const Object* oC)
 {
 	// can't match anything if the second pair of coordinates (or all of them) are unset
-	if (oC->objectRect.w_get() <= 0 || oC->objectRect.h_get() <= 0) return;
+	if (oC->objectRect.w <= 0 || oC->objectRect.h <= 0) return;
 
 	for (auto m = objects.begin(); m != objects.end();) {
 		if (!IsInObjectRect((*m).actor->Pos, oC->objectRect)) {

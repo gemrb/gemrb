@@ -84,8 +84,8 @@ void Door::UpdateDoor()
 
 	if (outline) {
 		// update the Scriptable position
-		Pos.x = outline->BBox.x_get() + outline->BBox.w_get() / 2;
-		Pos.y = outline->BBox.y_get() + outline->BBox.h_get() / 2;
+		Pos.x = outline->BBox.x + outline->BBox.w / 2;
+		Pos.y = outline->BBox.y + outline->BBox.h / 2;
 		SetPos(Pos);
 	}
 
@@ -218,8 +218,8 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 
 	//getting all impeded actors flagged for jump
 	Region rgn;
-	rgn.w_get() = 16;
-	rgn.h_get() = 12;
+	rgn.w = 16;
+	rgn.h = 12;
 	for (const SearchmapPoint& p : *points) {
 		rgn.origin = p.ToNavmapPoint();
 		PathMapFlags tmp = area->tileProps.QuerySearchMap(p) & PathMapFlags::ACTOR;

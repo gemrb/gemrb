@@ -67,7 +67,7 @@ void MoviePlayer::Play(Window* win)
 	// center over win
 	const Region& winFrame = win->Frame();
 	const Size& size = Dimensions();
-	Point center(winFrame.w_get() / 2 - size.w / 2, winFrame.h_get() / 2 - size.h / 2);
+	Point center(winFrame.w / 2 - size.w / 2, winFrame.h / 2 - size.h / 2);
 	center = center + winFrame.origin;
 	VideoBufferPtr subBuf = nullptr;
 	VideoBufferPtr vb = VideoDriver->CreateBuffer(Region(center, size), movieFormat);
@@ -75,8 +75,8 @@ void MoviePlayer::Play(Window* win)
 	if (subtitles) {
 		// FIXME: arbitrary frame of my choosing, not sure there is a better method
 		// this should probably at least be sized according to line height
-		int y = std::min<int>(winFrame.h_get() - center.y, winFrame.h_get() - 50.0);
-		Region subFrame(0, y, winFrame.w_get(), 50.0);
+		int y = std::min<int>(winFrame.h - center.y, winFrame.h - 50.0);
+		Region subFrame(0, y, winFrame.w, 50.0);
 		subBuf = VideoDriver->CreateBuffer(subFrame, Video::BufferFormat::DISPLAY_ALPHA);
 	}
 

@@ -197,9 +197,9 @@ TTFFont::TTFFont(Holder<Palette> pal, FT_Face face, int lineheight, int baseline
 	// blank for returning when there is an error
 	// TODO: ttf fonts have a "box" glyph they use for this
 	CreateGlyphForCharSprite(0, blank);
-	blank->Frame.w_get() = core->TLKEncoding.zerospace ? 1 : (LineHeight * 0.25);
+	blank->Frame.w = core->TLKEncoding.zerospace ? 1 : (LineHeight * 0.25);
 	CreateGlyphForCharSprite(' ', blank);
-	blank->Frame.w_get() *= 4;
+	blank->Frame.w *= 4;
 	CreateGlyphForCharSprite('\t', blank);
 }
 

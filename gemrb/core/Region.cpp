@@ -137,7 +137,7 @@ bool Size::operator!=(const Size& size) const noexcept
 
 bool Region::operator==(const Region& rgn) const noexcept
 {
-	return (x_get() == rgn.x_get()) && (y_get() == rgn.y_get()) && (w_get() == rgn.w_get()) && (h_get() == rgn.h_get());
+	return (x == rgn.x) && (y == rgn.y) && (w == rgn.w) && (h == rgn.h);
 }
 
 bool Region::operator!=(const Region& rgn) const noexcept
@@ -147,10 +147,10 @@ bool Region::operator!=(const Region& rgn) const noexcept
 
 Region::Region(int x, int y, int w, int h) noexcept
 {
-	this->x_get() = x;
-	this->y_get() = y;
-	this->w_get() = w;
-	this->h_get() = h;
+	this->x = x;
+	this->y = y;
+	this->w = w;
+	this->h = h;
 }
 
 Region::Region(const Point& p, const Size& s) noexcept
@@ -174,10 +174,10 @@ Region& Region::operator=(const Region& rhs) noexcept
 
 bool Region::PointInside(const Point& p) const noexcept
 {
-	if ((p.x < x_get()) || (p.x >= (x_get() + w_get()))) {
+	if ((p.x < x) || (p.x >= (x + w))) {
 		return false;
 	}
-	if ((p.y < y_get()) || (p.y >= (y_get() + h_get()))) {
+	if ((p.y < y) || (p.y >= (y + h))) {
 		return false;
 	}
 	return true;
@@ -186,26 +186,26 @@ bool Region::PointInside(const Point& p) const noexcept
 bool Region::RectInside(const Region& r) const noexcept
 {
 	// top-left not covered
-	if (r.x_get() < x_get() || r.y_get() < y_get()) return false;
+	if (r.x < x || r.y < y) return false;
 
 	// bottom-right not covered
-	if (r.x_get() + r.w_get() > x_get() + w_get() || r.y_get() + r.h_get() > y_get() + h_get()) return false;
+	if (r.x + r.w > x + w || r.y + r.h > y + h) return false;
 
 	return true;
 }
 
 bool Region::IntersectsRegion(const Region& rgn) const noexcept
 {
-	if (x_get() >= (rgn.x_get() + rgn.w_get())) {
+	if (x >= (rgn.x + rgn.w)) {
 		return false; // entirely to the right of rgn
 	}
-	if ((x_get() + w_get()) <= rgn.x_get()) {
+	if ((x + w) <= rgn.x) {
 		return false; // entirely to the left of rgn
 	}
-	if (y_get() >= (rgn.y_get() + rgn.h_get())) {
+	if (y >= (rgn.y + rgn.h)) {
 		return false; // entirely below rgn
 	}
-	if ((y_get() + h_get()) <= rgn.y_get()) {
+	if ((y + h) <= rgn.y) {
 		return false; // entirely above rgn
 	}
 	return true;
@@ -213,10 +213,10 @@ bool Region::IntersectsRegion(const Region& rgn) const noexcept
 
 Region Region::Intersect(const Region& rgn) const noexcept
 {
-	int ix1 = (x_get() >= rgn.x_get()) ? x_get() : rgn.x_get();
-	int ix2 = (x_get() + w_get() <= rgn.x_get() + rgn.w_get()) ? x_get() + w_get() : rgn.x_get() + rgn.w_get();
-	int iy1 = (y_get() >= rgn.y_get()) ? y_get() : rgn.y_get();
-	int iy2 = (y_get() + h_get() <= rgn.y_get() + rgn.h_get()) ? y_get() + h_get() : rgn.y_get() + rgn.h_get();
+	int ix1 = (x >= rgn.x) ? x : rgn.x;
+	int ix2 = (x + w <= rgn.x + rgn.w) ? x + w : rgn.x + rgn.w;
+	int iy1 = (y >= rgn.y) ? y : rgn.y;
+	int iy2 = (y + h <= rgn.y + rgn.h) ? y + h : rgn.y + rgn.h;
 
 	return Region(ix1, iy1, ix2 - ix1, iy2 - iy1);
 }
@@ -258,35 +258,35 @@ Point Region::Intercept(const Point& p) const noexcept
 
 void Region::ExpandToPoint(const Point& p) noexcept
 {
-	if (p.x < x_get()) {
-		w_get() += x_get() - p.x;
-		x_get() = p.x;
-	} else if (p.x > x_get() + w_get()) {
-		w_get() = p.x - x_get();
+	if (p.x < x) {
+		w += x - p.x;
+		x = p.x;
+	} else if (p.x > x + w) {
+		w = p.x - x;
 	}
 
-	if (p.y < y_get()) {
-		h_get() += y_get() - p.y;
-		y_get() = p.y;
-	} else if (p.y > y_get() + h_get()) {
-		h_get() = p.y - y_get();
+	if (p.y < y) {
+		h += y - p.y;
+		y = p.y;
+	} else if (p.y > y + h) {
+		h = p.y - y;
 	}
 }
 
 void Region::ExpandToRegion(const Region& r) noexcept
 {
 	ExpandToPoint(r.origin);
-	ExpandToPoint(r.origin + Point(r.w_get(), 0));
+	ExpandToPoint(r.origin + Point(r.w, 0));
 	ExpandToPoint(r.Maximum());
-	ExpandToPoint(r.Maximum() - Point(r.w_get(), 0));
+	ExpandToPoint(r.Maximum() - Point(r.w, 0));
 }
 
 void Region::ExpandAllSides(int amt) noexcept
 {
-	x_get() -= amt;
-	w_get() += amt * 2;
-	y_get() -= amt;
-	h_get() += amt * 2;
+	x -= amt;
+	w += amt * 2;
+	y -= amt;
+	h += amt * 2;
 }
 
 }

@@ -72,7 +72,7 @@ void Progressbar::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		VideoDriver->BlitSprite(BackGround2, r.origin, &r);
 
 		Point p = rgn.origin + CapPos;
-		p.x += Count - PBarCap->Frame.w_get();
+		p.x += Count - PBarCap->Frame.w;
 		VideoDriver->BlitSprite(PBarCap, p);
 		return;
 	}

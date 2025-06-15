@@ -3057,7 +3057,7 @@ Holder<Sprite2D> GetPaperdollImage(const ResRef& resref, const ieDword* colors, 
 	}
 	assert(first && second);
 	picture2 = second->copy();
-	picture2->Frame.y_get() -= 80;
+	picture2->Frame.y -= 80;
 
 	Holder<Sprite2D> spr = first->copy();
 

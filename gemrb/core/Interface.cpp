@@ -980,8 +980,8 @@ void Interface::Main()
 	Region fpsRgn(0, config.Height - 30, 80, 30);
 	String fpsstring = u"???.??? fps";
 	// set for printing
-	fpsRgn.x_get() = 5;
-	fpsRgn.y_get() = 0;
+	fpsRgn.x = 5;
+	fpsRgn.y = 0;
 
 	tick_t frame = 0;
 	tick_t time = GetMilliseconds();

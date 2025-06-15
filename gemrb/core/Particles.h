@@ -98,7 +98,7 @@ public:
 	void SetBitmap(unsigned int FragAnimID);
 	void SetPhase(ieByte ph) { phase = ph; }
 	int GetPhase() const { return phase; }
-	bool MatchPos(const Point& p) const { return pos.x_get() == p.x && pos.y_get() == p.y; }
+	bool MatchPos(const Point& p) const { return pos.x == p.x && pos.y == p.y; }
 	void SetType(ieByte t, ieByte p = SP_PATH_FALL, ieByte st = SP_SPAWN_NONE)
 	{
 		type = t;
@@ -107,10 +107,10 @@ public:
 	}
 	void SetRegion(int x, int y, int w, int h)
 	{
-		pos.x_get() = x;
-		pos.y_get() = y;
-		pos.w_get() = w;
-		pos.h_get() = h;
+		pos.x = x;
+		pos.y = y;
+		pos.w = w;
+		pos.h = h;
 	}
 	void SetTimeToLive(int ttl) { timetolive = ttl; }
 	void SetColorIndex(ieByte c);
@@ -122,7 +122,7 @@ public:
 	void AddParticles(int count);
 	/* returns true if it could be destroyed (didn't draw anything) */
 	int Update();
-	int GetHeight() const { return pos.y_get() + pos.h_get(); }
+	int GetHeight() const { return pos.y + pos.h; }
 
 private:
 	std::vector<Element> points;

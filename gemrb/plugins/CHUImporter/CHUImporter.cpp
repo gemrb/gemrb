@@ -452,7 +452,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 		str->Read(&tmp, 1); // in bg2 ControlType was a word
 		switch (controlType) {
 			case IE_GUI_BUTTON:
-				GetButton(str, ctrl, ctrlFrame, !rgn.w_get());
+				GetButton(str, ctrl, ctrlFrame, !rgn.w);
 				break;
 			case IE_GUI_PROGRESSBAR:
 				GetProgressbar(str, ctrl, ctrlFrame);

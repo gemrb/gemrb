@@ -264,16 +264,16 @@ void Window::SetPosition(WindowPosition pos)
 
 	// adjust horizontal
 	if ((pos & PosHmid) == PosHmid) {
-		newFrame.x_get() = (screen.w / 2) - (newFrame.w_get()) / 2;
+		newFrame.x = (screen.w / 2) - (newFrame.w) / 2;
 	} else if (pos & PosRight) {
-		newFrame.x_get() = screen.w - newFrame.w_get();
+		newFrame.x = screen.w - newFrame.w;
 	}
 
 	// adjust vertical
 	if ((pos & PosVmid) == PosVmid) {
-		newFrame.y_get() = (screen.h / 2) - (newFrame.h_get()) / 2;
+		newFrame.y = (screen.h / 2) - (newFrame.h) / 2;
 	} else if (pos & PosBottom) {
-		newFrame.y_get() = screen.h - newFrame.h_get();
+		newFrame.y = screen.h - newFrame.h;
 	}
 	SetFrame(newFrame);
 }

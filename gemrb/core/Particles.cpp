@@ -126,18 +126,18 @@ bool Particles::AddNew(const Point& point)
 
 	switch (path) {
 		case SP_PATH_EXPL:
-			st = pos.h_get() + last_insert % 15;
+			st = pos.h + last_insert % 15;
 			break;
 		case SP_PATH_RAIN:
 		case SP_PATH_FLIT:
 			st = core->Roll(3, 5, MAX_SPARK_PHASE) << 4;
 			break;
 		case SP_PATH_FOUNT:
-			st = (MAX_SPARK_PHASE + 2 * pos.h_get());
+			st = (MAX_SPARK_PHASE + 2 * pos.h);
 			break;
 		case SP_PATH_FALL:
 		default:
-			st = (MAX_SPARK_PHASE + pos.h_get()) << 4;
+			st = (MAX_SPARK_PHASE + pos.h) << 4;
 			break;
 	}
 	int i = last_insert;
@@ -251,22 +251,22 @@ void Particles::AddParticles(int count)
 
 		switch (path) {
 			case SP_PATH_EXPL:
-				p.x = pos.w_get() / 2 + core->Roll(1, pos.w_get() / 2, pos.w_get() / 4);
-				p.y = pos.h_get() / 2 + (last_insert & 7);
+				p.x = pos.w / 2 + core->Roll(1, pos.w / 2, pos.w / 4);
+				p.y = pos.h / 2 + (last_insert & 7);
 				break;
 			case SP_PATH_FALL:
 			default:
-				p.x = core->Roll(1, pos.w_get(), 0);
-				p.y = core->Roll(1, pos.h_get() / 2, 0);
+				p.x = core->Roll(1, pos.w, 0);
+				p.y = core->Roll(1, pos.h / 2, 0);
 				break;
 			case SP_PATH_RAIN:
 			case SP_PATH_FLIT:
-				p.x = core->Roll(1, pos.w_get(), 0);
-				p.y = core->Roll(1, pos.h_get(), 0);
+				p.x = core->Roll(1, pos.w, 0);
+				p.y = core->Roll(1, pos.h, 0);
 				break;
 			case SP_PATH_FOUNT:
-				p.x = core->Roll(1, pos.w_get() / 2, pos.w_get() / 4);
-				p.y = core->Roll(1, pos.h_get() / 2, 0);
+				p.x = core->Roll(1, pos.w / 2, pos.w / 4);
+				p.y = core->Roll(1, pos.h / 2, 0);
 				break;
 		}
 		if (AddNew(p)) {
@@ -321,20 +321,20 @@ int Particles::Update()
 		switch (path) {
 			case SP_PATH_FALL:
 				points[i].pos.y += 3 + ((i >> 2) & 3);
-				points[i].pos.y %= pos.h_get();
+				points[i].pos.y %= pos.h;
 				break;
 			case SP_PATH_RAIN:
-				points[i].pos.x += pos.w_get() + (i & 1);
-				points[i].pos.x %= pos.w_get();
+				points[i].pos.x += pos.w + (i & 1);
+				points[i].pos.x %= pos.w;
 				points[i].pos.y += 3 + ((i >> 2) & 3);
-				points[i].pos.y %= pos.h_get();
+				points[i].pos.y %= pos.h;
 				break;
 			case SP_PATH_FLIT:
 				if (points[i].state <= MAX_SPARK_PHASE << 4) {
 					break;
 				}
-				points[i].pos.x += core->Roll(1, 3, pos.w_get() - 2);
-				points[i].pos.x %= pos.w_get();
+				points[i].pos.x += core->Roll(1, 3, pos.w - 2);
+				points[i].pos.x %= pos.w;
 				points[i].pos.y += (i & 3) + 1;
 				break;
 			case SP_PATH_EXPL:
@@ -344,7 +344,7 @@ int Particles::Update()
 				if (points[i].state <= MAX_SPARK_PHASE) {
 					break;
 				}
-				if (points[i].state < (MAX_SPARK_PHASE + pos.h_get())) {
+				if (points[i].state < (MAX_SPARK_PHASE + pos.h)) {
 					if ((points[i].state & 7) == 7) {
 						points[i].pos.x += (i & 3) - 1;
 					}
