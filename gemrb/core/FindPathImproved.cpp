@@ -66,7 +66,7 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383,
 // Sines
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand { { 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924 } };
 
-Path Map::FindPathImplOriginalImproved(const Point &s, const Point &d, unsigned int size, unsigned int minDistance,
+Path Map::FindPathImproved(const Point &s, const Point &d, unsigned int size, unsigned int minDistance,
 	int flags, const Actor *caller)
 {
 	TRACY(ZoneScoped);
