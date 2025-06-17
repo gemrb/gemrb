@@ -46,16 +46,14 @@ public:
 	 * Struct holding data describing traversability of a navmap point: its state and potential actor data.
 	 */
 	struct TraversabilityCellData {
-		TraversabilityCellState state = TraversabilityCellState::EMPTY;
 		Actor* occupyingActor = nullptr;
+		TraversabilityCellState state = TraversabilityCellState::EMPTY;
 	};
 
 	explicit TraversabilityCache(Map* inMap)
 		: map { inMap }
 	{
 	}
-
-	void Update();
 
 	TraversabilityCellData GetCellData(const std::size_t inIndex) const
 	{
@@ -76,6 +74,8 @@ public:
 	{
 		return traversabilityData.size();
 	}
+
+	void Update();
 
 private:
 	/**

@@ -79,7 +79,7 @@ void TraversabilityCache::CachedActorState::MarkNewPosition(std::vector<Traversa
 	} else if (newActorState.GetIsBumpable()) {
 		newCellState = TraversabilityCellState::ACTOR;
 	}
-	const TraversabilityCellData newCellData { newCellState, actor };
+	const TraversabilityCellData newCellData { actor, newCellState };
 
 	for (int x = std::max(0, newActorState.region.x); x < newActorState.region.x + newActorState.region.w; ++x) {
 		for (int y = std::max(0, newActorState.region.y); y < newActorState.region.y + newActorState.region.h; ++y) {
@@ -132,7 +132,7 @@ void TraversabilityCache::Update()
 			continue;
 		}
 
-		// if found, check if the position, bumpable status and alive status have been updated since last cache update
+		// if found, check whether the position, bumpable status and alive status has been updated since last cache update
 		const CachedActorState& cachedActor = *foundCachedActor;
 		if (cachedActor.pos != currentActor->Pos ||
 		    cachedActor.GetIsAlive() != currentActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED) ||
@@ -157,8 +157,8 @@ void TraversabilityCache::Update()
 		return;
 	}
 
-	// make sure the cache is of proper size
 	// todo: this probably could be done once, when the map is loaded
+	// make sure the cache is of proper size
 	ValidateTraversabilityCacheSize();
 
 	// for all removed actors: clear in cache all the cells they were part of
@@ -230,8 +230,8 @@ void TraversabilityCache::ValidateTraversabilityCacheSize()
 {
 	const size_t expectedSize = map->PropsSize().h * 12 * map->PropsSize().w * 16;
 	if (traversabilityData.size() != expectedSize) {
-		Log(DEBUG, "Map", "Resizing traversabilityData cache.");
-		traversabilityData.resize(expectedSize, TraversabilityCellData { TraversabilityCellState::EMPTY, nullptr });
+		Log(DEBUG, "TraversabilityCache", "Resizing traversabilityData cache.");
+		traversabilityData.resize(expectedSize, TraversabilityCellData { nullptr, TraversabilityCellState::EMPTY });
 		memset(static_cast<void*>(traversabilityData.data()), 0, sizeof(TraversabilityCellData) * traversabilityData.size());
 	}
 }
