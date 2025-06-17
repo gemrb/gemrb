@@ -18,14 +18,14 @@
  *
  */
 
-#include "voodooconst.h"
+#include "ie_stats.h"
 
-#include "AmbientMgr.h"
 #include "Calendar.h"
 #include "DialogHandler.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "Map.h"
 #include "Polygon.h"
 #include "TableMgr.h"
 
@@ -37,7 +37,6 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
-#include "Video/Video.h"
 
 #include <cmath>
 
@@ -395,8 +394,8 @@ int GameScript::IsActive(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters);
 	if (!scr) {
-		const AmbientMgr* ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
-		if (ambientmgr->IsActive(parameters->objectParameter->objectName)) {
+		const AmbientMgr& ambientmgr = core->GetAmbientManager();
+		if (ambientmgr.IsActive(parameters->objectParameter->objectName)) {
 			return 1;
 		}
 		return 0;
@@ -3037,49 +3036,43 @@ int GameScript::InCutSceneMode(Scriptable* /*Sender*/, const Trigger* /*paramete
 	return core->InCutSceneMode();
 }
 
+// ees added bg2-style proficiency matching on top of what pst supported
+// and limited it to lower bits matching probably to account for dualclassing
+// we store all of them in the same range of stats
 int GameScript::Proficiency(Scriptable* Sender, const Trigger* parameters)
 {
-	unsigned int idx = parameters->int0Parameter;
-	if (idx > 31) {
-		return 0;
-	}
+	ieByte idx = ieByte(parameters->int0Parameter);
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	const Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return 0;
 	}
 
-	return (signed) actor->GetStat(IE_PROFICIENCYBASTARDSWORD + idx) == parameters->int1Parameter;
+	return (actor->GetProficiency(idx) & 7) == parameters->int1Parameter;
 }
 
 int GameScript::ProficiencyGT(Scriptable* Sender, const Trigger* parameters)
 {
-	unsigned int idx = parameters->int0Parameter;
-	if (idx > 31) {
-		return 0;
-	}
+	ieByte idx = ieByte(parameters->int0Parameter);
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	const Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return 0;
 	}
 
-	return (signed) actor->GetStat(IE_PROFICIENCYBASTARDSWORD + idx) > parameters->int1Parameter;
+	return (actor->GetProficiency(idx) & 7) > parameters->int1Parameter;
 }
 
 int GameScript::ProficiencyLT(Scriptable* Sender, const Trigger* parameters)
 {
-	unsigned int idx = parameters->int0Parameter;
-	if (idx > 31) {
-		return 0;
-	}
+	ieByte idx = ieByte(parameters->int0Parameter);
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	const Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return 0;
 	}
 
-	return (signed) actor->GetStat(IE_PROFICIENCYBASTARDSWORD + idx) < parameters->int1Parameter;
+	return (actor->GetProficiency(idx) & 7) < parameters->int1Parameter;
 }
 
 //this is a PST specific stat, shows how many free proficiency slots we got
@@ -3290,7 +3283,7 @@ int GameScript::InteractingWith(Scriptable* Sender, const Trigger* parameters)
 		return 0;
 	}
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
-	if (!tar || tar->Type != ST_ACTOR) {
+	if (!tar) {
 		return 0;
 	}
 	const GameControl* gc = core->GetGameControl();
@@ -4100,9 +4093,9 @@ int GameScript::Unusable(Scriptable* Sender, const Trigger* parameters)
 	}
 	int ret;
 	if (actor->Unusable(item) == HCStrings::count) {
-		ret = 1;
-	} else {
 		ret = 0;
+	} else {
+		ret = 1;
 	}
 	gamedata->FreeItem(item, parameters->resref0Parameter, true);
 	return ret;

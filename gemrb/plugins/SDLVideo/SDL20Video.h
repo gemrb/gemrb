@@ -21,7 +21,8 @@
 #ifndef SDL20VideoDRIVER_H
 #define SDL20VideoDRIVER_H
 
-#include "SDLSurfaceSprite2D.h"
+
+#include "SDLSurfaceDrawing.h"
 #include "SDLVideo.h"
 
 #if USE_OPENGL_BACKEND

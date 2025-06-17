@@ -20,103 +20,24 @@
 
 #include "NullSound.h"
 
-#include "AmbientMgr.h"
-#include "SoundMgr.h"
+namespace GemRB {
 
-using namespace GemRB;
-
-NullSound::NullSound(void)
+Holder<SoundSourceHandle> NullSound::CreatePlaybackSource(const AudioPlaybackConfig&, bool)
 {
-	ambim = new AmbientMgr();
+	return MakeHolder<NullSoundSourceHandle>();
 }
 
-NullSound::~NullSound(void)
+Holder<SoundStreamSourceHandle> NullSound::CreateStreamable(const AudioPlaybackConfig&, size_t)
 {
-	delete ambim;
+	return MakeHolder<NullSoundStreamSourceHandle>();
 }
 
-bool NullSound::Init(void)
+Holder<SoundBufferHandle> NullSound::LoadSound(ResourceHolder<SoundMgr>, const AudioPlaybackConfig&)
 {
-	return true;
+	return MakeHolder<NullSoundBufferHandle>();
 }
 
-Holder<SoundHandle> NullSound::Play(StringView, SFXChannel, const Point&, unsigned int, tick_t* len)
-{
-	if (len) *len = 1000; //Returning 1 Second Length
-	return Holder<SoundHandle>();
 }
-
-int NullSound::CreateStream(ResourceHolder<SoundMgr>)
-{
-	return 0;
-}
-
-bool NullSound::Stop()
-{
-	return true;
-}
-
-bool NullSound::Play()
-{
-	return true;
-}
-
-bool NullSound::Pause()
-{
-	return true;
-}
-
-bool NullSound::Resume()
-{
-	return true;
-}
-
-void NullSound::ResetMusics()
-{
-}
-
-bool NullSound::CanPlay()
-{
-	return false;
-}
-
-void NullSound::UpdateListenerPos(const Point& p)
-{
-	pos = p;
-}
-
-Point NullSound::GetListenerPos()
-{
-	return pos;
-}
-
-int NullSound::SetupNewStream(int, int, int, ieWord, bool, int)
-{
-	return -1;
-}
-
-tick_t NullSound::QueueAmbient(int, const ResRef&, bool)
-{
-	return -1;
-}
-
-bool NullSound::ReleaseStream(int, bool)
-{
-	return true;
-}
-
-void NullSound::SetAmbientStreamVolume(int, int)
-{
-}
-
-void NullSound::SetAmbientStreamPitch(int, int)
-{
-}
-
-void NullSound::QueueBuffer(int, unsigned short, int, short*, int, int)
-{
-}
-
 
 #include "plugindef.h"
 

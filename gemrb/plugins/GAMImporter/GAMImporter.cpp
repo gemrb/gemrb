@@ -21,15 +21,16 @@
 #include "GAMImporter.h"
 
 #include "globals.h"
+#include "ie_stats.h"
 
-#include "DataFileMgr.h"
 #include "GameData.h"
 #include "Interface.h"
-#include "MapMgr.h"
 #include "PluginMgr.h"
 #include "TableMgr.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
+#include "Scriptable/PCStatStruct.h"
 #include "Streams/SlicedStream.h"
 
 #include <cassert>
@@ -199,6 +200,10 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 		if (newGame->version != GAM_VER_PST && static_cast<ieWord>(actor->InParty - 1) == newGame->NPCAreaViewed) {
 			newGame->CurrentArea = actor->AreaName;
 			newGame->AnotherArea = newGame->CurrentArea;
+		}
+
+		if (newGame->version == GAM_VER_PST && actor->GetStat(IE_SPECIFIC) == 2) {
+			Scriptable::VOODOO_VISUAL_RANGE = (14 + actor->GetStat(IE_LEVELFIGHTER)) * 2;
 		}
 	}
 
@@ -620,7 +625,7 @@ int GAMImporter::GetStoredFileSize(const Game* game)
 		headersize += am->GetStoredFileSize(ac);
 	}
 
-	if (game->mazedata) {
+	if (game->version == GAM_VER_PST) {
 		MazeOffset = headersize;
 		//due to alignment the internal size is not the same as the external size
 		headersize += MAZE_DATA_SIZE_HARDCODED;
@@ -1136,10 +1141,15 @@ void GAMImporter::PutMazeEntry(DataStream* stream, void* memory) const
 
 int GAMImporter::PutMaze(DataStream* stream, const Game* game) const
 {
-	for (int i = 0; i < MAZE_ENTRY_COUNT; i++) {
-		PutMazeEntry(stream, game->mazedata + i * MAZE_ENTRY_SIZE);
+	if (game->mazedata) {
+		for (int i = 0; i < MAZE_ENTRY_COUNT; i++) {
+			PutMazeEntry(stream, game->mazedata + i * MAZE_ENTRY_SIZE);
+		}
+		PutMazeHeader(stream, game->mazedata + MAZE_ENTRY_COUNT * MAZE_ENTRY_SIZE);
+	} else {
+		stream->WriteFilling(MAZE_DATA_SIZE_HARDCODED);
 	}
-	PutMazeHeader(stream, game->mazedata + MAZE_ENTRY_COUNT * MAZE_ENTRY_SIZE);
+
 	return 0;
 }
 
@@ -1190,7 +1200,7 @@ int GAMImporter::PutGame(DataStream* stream, Game* game) const
 		return ret;
 	}
 
-	if (game->mazedata) {
+	if (game->version == GAM_VER_PST) {
 		ret = PutMaze(stream, game);
 		if (ret) {
 			return ret;

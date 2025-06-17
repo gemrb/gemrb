@@ -153,6 +153,13 @@ def OptHelpText (text_id, text_strref):
 def OptBuddyLabel (nameID, strRef = None, focusedText = None, defaultText = None):
 	window = GetWindow ()
 	button = window.GetControl (nameID)
+
+	if GameCheck.IsPST ():
+		# change button pictures to cover more space, since we only process mouse
+		# events over parts that would have drawn something
+		# otherwise only a short part of the title text triggers the description
+		button.SetBAM ("GPERBU10", 0, 0)
+
 	button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	button.SetState (IE_GUI_BUTTON_LOCKED)
 	if strRef and GameCheck.IsPST ():

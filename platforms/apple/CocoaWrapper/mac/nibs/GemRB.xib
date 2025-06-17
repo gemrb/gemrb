@@ -379,13 +379,6 @@
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="839">
                                     <rect key="frame" x="15" y="94" width="122" height="18"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <buttonCell key="cell" type="check" title="GUI Enhancements" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="840">
-                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <binding destination="882" name="value" keyPath="values.GUIEnhancements" id="883"/>
-                                    </connections>
                                 </button>
                                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="844">
                                     <rect key="frame" x="15" y="76" width="79" height="18"/>

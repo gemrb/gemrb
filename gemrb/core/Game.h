@@ -32,11 +32,8 @@
 #include "ie_types.h"
 
 #include "Callback.h"
-#include "Resource.h"
 
-#include "Scriptable/PCStatStruct.h"
 #include "Scriptable/Scriptable.h"
-#include "Video/Video.h"
 
 #include <array>
 #include <atomic>
@@ -47,7 +44,7 @@ namespace GemRB {
 class Actor;
 class Map;
 class Particles;
-class TableMgr;
+enum BlitFlags : uint32_t;
 
 //the size of the bestiary register
 #define BESTIARY_SIZE 260
@@ -61,6 +58,7 @@ class TableMgr;
 #define JP_JOIN    1 //refresh join time
 #define JP_INITPOS 2 //init startpos
 #define JP_SELECT  4 //select the actor after joining
+#define JP_OVERRIDE 8 // replace actor, if any
 
 //protagonist mode
 #define PM_NO   0 //no death checks
@@ -298,8 +296,8 @@ public:
 	FixedSizeString<20> RandomEncounterEntry;
 
 	Particles* weather = nullptr;
-	int event_timer = 0;
-	EventHandler event_handler = nullptr;
+	int eventTimer = 0;
+	EventHandler eventHandler = nullptr;
 	bool hasInfra = false;
 	bool familiarBlock = false;
 	bool PartyAttack = false;

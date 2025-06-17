@@ -22,7 +22,7 @@
 
 #include "Interface.h"
 
-#include "GUI/Label.h"
+#include "GUI/Window.h"
 #include "GUI/WindowManager.h"
 
 #include <chrono>
@@ -141,6 +141,21 @@ void MoviePlayer::timer_wait(microseconds frameWait)
 	std::this_thread::sleep_for(to_sleep);
 
 	timer_start();
+}
+
+bool MoviePlayerControls::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
+{
+	KeyboardKey keycode = Key.keycode;
+	switch (keycode) {
+		case 's':
+			player.EnableSubtitles(!player.SubtitlesEnabled());
+			break;
+		default:
+			player.Stop();
+			break;
+	}
+
+	return true;
 }
 
 }

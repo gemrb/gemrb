@@ -36,7 +36,6 @@ def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
 
 	Window.AddAlias("WIN_INV")
-	Window.OnFocus(UpdateInventoryWindow)
 
 	# info label, game paused, etc
 	if GameCheck.IsBG2EE ():
@@ -118,9 +117,12 @@ def UpdateInventoryWindow (Window):
 
 	Window.OnClose(InventoryCommon.InventoryClosed)
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Container = GemRB.GetContainer (pc, 1)
+	if GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD:
+		Count = 0
+	else:
+		Container = GemRB.GetContainer (pc, 1)
+		Count = max (0, Container['ItemCount'] - 4)
 	ScrollBar = Window.GetControl (66)
-	Count = max (0, Container['ItemCount'] - 4)
 	ScrollBar.SetVarAssoc ("TopIndex", Count, 0, Count)
 	RefreshInventoryWindow (Window)
 	#populate inventory slot controls
@@ -232,16 +234,22 @@ def RefreshInventoryWindow (Window):
 	Button.SetBAM ("COLGRAD", 0, 0, Color)
 
 	# update ground inventory slots
+	if GemRB.GetPlayerStat (pc, IE_STATE_ID) & STATE_DEAD:
+		GUICommon.AdjustWindowVisibility (Window, pc, False)
+		return
+
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (5):
 		Button = Window.GetControl (i+68)
+		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 		if GemRB.IsDraggingItem ()==1:
 			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
+		elif not Slot:
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		
 		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
-		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 
 		if Slot == None:
 			Button.OnPress (None)

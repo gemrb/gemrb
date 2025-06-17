@@ -22,24 +22,19 @@
 #define ACTOR_H
 
 #include "exports.h"
-#include "ie_feats.h"
-#include "ie_stats.h" // using definitions as described in stats.ids
 #include "ie_types.h"
 #include "strrefs.h"
 
-#include "Audio.h"
 #include "CombatInfo.h"
 #include "EffectQueue.h"
 #include "Game.h"
 #include "Inventory.h"
 #include "Palette.h"
-#include "Polygon.h"
-#include "Projectile.h"
 #include "Spellbook.h"
 
+#include "Audio/Playback.h"
 #include "Scriptable/Movable.h"
 #include "Scriptable/PCStatStruct.h"
-#include "Video/Video.h"
 
 #include <array>
 #include <map>
@@ -49,17 +44,11 @@
 namespace GemRB {
 
 class Animation;
-class ArmorClass;
-class CharAnimations;
 class DataFileMgr;
 class Map;
 class ScriptedAnimation;
-class ToHitStats;
 struct PolymorphCache;
-
-}
-
-namespace GemRB {
+enum class Feat : uint8_t;
 
 enum CREVersion {
 	GemRB,
@@ -528,7 +517,7 @@ public:
 	vvcDict vfxDict;
 	vvcSet vfxQueue = vvcSet(VVCSort); // sorted so we can distinguish effects infront and behind
 	std::vector<bool> projectileImmunity; // classic bitfield
-	Holder<SoundHandle> casting_sound;
+	Holder<PlaybackHandle> casting_sound;
 	PanicMode panicMode = PanicMode::None; // runaway, berserk or randomwalk
 
 	// public combat related data
@@ -564,6 +553,7 @@ private:
 	int walkScale = 0;
 	// true when command has been played after select
 	bool playedCommandSound = false;
+	ResRef deadArea;
 
 	//trap we're trying to disarm
 	ieDword disarmTrap = 0;
@@ -596,8 +586,6 @@ private:
 	void CreateDerivedStatsIWD2();
 	/* Returns true if the dual class is backwards */
 	bool IsDualSwap() const;
-	/* returns the weapon proficiency stat of the actor */
-	int GetProficiency(ieByte proftype) const;
 	int GetNonProficiencyPenalty(int stars) const;
 	int GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, int& speedBonus, int& criticalBonus) const;
 	/** Re/Inits the Modified vector for PCs/NPCs */
@@ -660,6 +648,8 @@ public:
 	void RollSaves();
 	/** returns a saving throw */
 	bool GetSavingThrow(ieDword type, int modifier, const Effect* fx = nullptr);
+	/* returns the weapon proficiency stat of the actor */
+	int GetProficiency(ieByte proftype) const;
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags, const Scriptable* checker = NULL) const;
 	/** Clamps a stat value to the valid range for the respective stat */
@@ -909,7 +899,6 @@ public:
 	/* converts the iwd2 qslot index to our internal representation */
 	ieByte IWD2GemrbQslot(int slotindex) const;
 	int Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const;
-	void dumpQSlots() const;
 
 	/* Handling automatic stance changes */
 	bool HandleActorStance();

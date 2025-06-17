@@ -33,9 +33,15 @@ UsedSlot = None
 ItemAmountWindow = None
 ColorPicker = None
 StackAmount = 0
+ClassKitUsability = None
+AlignmentStancesTable = None
 
- # A map that defines which inventory slots are used per character (PST)
+# A map that defines which inventory slots are used per character (PST)
 SlotMap = None
+
+# a runtime-only list of items already identified, so optionally, when you pick
+# up the same item later, it's autoidentified
+IdentifiedItems = set()
 
 def InventoryClosed(win):
 	GemRB.LeaveContainer()
@@ -238,6 +244,22 @@ def GetItemDescription (item, itemtype):
 	if (itemtype & 2):
 		text = item["ItemDesc"]
 
+	if GameCheck.IsIWD2():
+		usabilityMask = item["UsabilityBitmask"]
+
+		# restrictions apply, so we list them
+		if usabilityMask > 0:
+			text = GemRB.GetString(text) + "\n\n"
+			text += "[color=ffff00ff]" + GemRB.GetString(31530) + "[/color]\n  "
+
+			if usabilityMask & 0x3F000: # alignment/stances
+				text += GetIWD2RestrictedAlignmentsAndStances(usabilityMask)
+			if usabilityMask & 0x3F800000: # race
+				text += GetIWD2RestrictedRaces(usabilityMask)
+			if usabilityMask & 0xFFF: # classes (incl. unknown)
+				kitMask = item["KitUsability"]
+				text += GetIWD2RestrictedClassesAndKits(usabilityMask, kitMask)
+
 	if not GameCheck.IsPST ():
 		return text
 
@@ -247,6 +269,93 @@ def GetItemDescription (item, itemtype):
 	searchRE = re.compile(r'^([A-Z][A-Z][A-Z][A-Z]+[: ]..[a-z"].*?($|\r?\n(\r?\n)?))', re.MULTILINE | re.DOTALL)
 	replacement = r"[color=ffffff]\1[/color]"
 	text = searchRE.sub(replacement, text)
+	return text
+
+def GetIWD2RestrictedAlignmentsAndStances(mask):
+	global AlignmentStancesTable
+	if not AlignmentStancesTable:
+		AlignmentStancesTable = GemRB.LoadTable("aligstan")
+
+	text = ""
+	n = AlignmentStancesTable.GetRowCount()
+
+	for i in range(n):
+		rowName = AlignmentStancesTable.GetRowName(i)
+		useMask = AlignmentStancesTable.GetValue(rowName, "USABILITY")
+		nameRef = AlignmentStancesTable.GetValue(rowName, "NAME_REF")
+
+		if useMask & mask:
+			text += GemRB.GetString(nameRef) + "\n  "
+
+	return text
+
+def GetIWD2RestrictedRaces(mask):
+	text = ""
+	n = CommonTables.Races.GetRowCount()
+
+	for i in range(n):
+		rowName = CommonTables.Races.GetRowName(i)
+		raceMask = CommonTables.Races.GetValue(rowName, "USABILITY")
+		nameRef = CommonTables.Races.GetValue(rowName, "NAME_REF")
+
+		if raceMask == 0x7FFFFFFF: # GetValue gives as signed value
+			raceMask = 0x80000000
+
+		if mask & raceMask:
+			text += GemRB.GetString(nameRef) + "\n  "
+
+	return text
+
+def PrepareClassKitUsabilityMasks():
+	global ClassKitUsability
+	ClassKitUsability = {}
+	n = CommonTables.Classes.GetRowCount()
+
+	for i in range(n):
+		rowName = CommonTables.Classes.GetRowName(i)
+		parentClass = CommonTables.Classes.GetValue(rowName, "CLASS")
+		if parentClass == 0:
+			continue
+
+		mask = ClassKitUsability.get(parentClass, 0)
+		mask |= CommonTables.Classes.GetValue(rowName, "USABILITY")
+		ClassKitUsability[parentClass] = mask
+
+
+def GetIWD2RestrictedClassesAndKits(classesMask, kitsMask):
+	global ClassKitUsability
+	if not ClassKitUsability:
+		PrepareClassKitUsabilityMasks()
+
+	text = ""
+	n = CommonTables.Classes.GetRowCount()
+	for i in range(n):
+		rowName = CommonTables.Classes.GetRowName(i)
+		parentClass = CommonTables.Classes.GetValue(rowName, "CLASS")
+		mask = CommonTables.Classes.GetValue(rowName, "USABILITY")
+		nameRef = CommonTables.Classes.GetValue(rowName, "NAME_REF")
+		kitMask = ClassKitUsability.get(i + 1, 0)
+
+		if parentClass != 0:
+			continue
+
+		if classesMask & mask or (kitMask and kitsMask & kitMask):
+			# there are exceptions for individual kits, so list them
+			if kitMask and kitsMask & kitMask != kitMask:
+				for j in range(n):
+					kitName = CommonTables.Classes.GetRowName(j)
+					parentClass = CommonTables.Classes.GetValue(kitName, "CLASS")
+					mask = CommonTables.Classes.GetValue(kitName, "USABILITY")
+					nameRef = CommonTables.Classes.GetValue(kitName, "NAME_REF")
+
+					if parentClass != i + 1:
+						continue
+
+					if kitsMask & mask:
+						text += GemRB.GetString(nameRef) + "\n  "
+			else:
+				text += GemRB.GetString(nameRef) + "\n  "
+
 	return text
 
 def ItemPress(func, slotItem, *args):
@@ -469,16 +578,27 @@ def OpenItemInfoWindow (slotItem, pc):
 	DisplayItem (slotItem)
 	return
 
+def MarkAsIdentified(pc, slot, slotItem):
+	global IdentifiedItems
+
+	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	slotItem["Flags"] |= IE_INV_ITEM_IDENTIFIED
+	IdentifiedItems.add(slotItem["ItemResRef"].upper())
+	return
+
 # auto identify when lore is high enough
 def TryAutoIdentification(pc, item, slot, slot_item, enabled, feedback = False):
 	if not enabled or slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
 		return False
 
+	if GemRB.GetVar ("GUIEnhancements") & GE_PERSISTENT_IDENTIFICATION and slot_item["ItemResRef"].upper() in IdentifiedItems:
+		MarkAsIdentified (pc, slot, slot_item)
+		return True
+
 	if not GameCheck.IsIWD2 ():
 		# simple logic for other games
 		if item["LoreToID"] <= GemRB.GetPlayerStat (pc, IE_LORE):
-			GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-			slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+			MarkAsIdentified (pc, slot, slot_item)
 			return True
 		return False
 
@@ -493,36 +613,33 @@ def TryAutoIdentification(pc, item, slot, slot_item, enabled, feedback = False):
 	success = lore >= itemIdDC
 	msgArea = GemRB.GetView ("MsgSys")
 	if success:
-		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-		slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+		MarkAsIdentified (pc, slot, slot_item)
 	# @39263 = ~Failed identify item check! (Knowledge Arcana + Int mod) %d + %d vs. (item's lore) %d~
 	# @39264 = ~Successful identify item check! (Knowledge Arcana + Int mod) %d + %d vs. (item's lore) %d~
 	if feedback:
 		msgArea.Append (GemRB.GetString(39263 + success).format(lore, intBon, itemIdDC) + "\n")
 	if success:
-		return
+		return True
 
 	# 2. try alchemy for potions
 	if item["Type"] == 9:
 		alchemy = GemRB.GetPlayerStat (pc, IE_ALCHEMY)
 		success = alchemy >= itemIdDC
 		if success:
-			GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-			slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+			MarkAsIdentified (pc, slot, slot_item)
 		# @39261 = ~Successful identify potion check! (Alchemy + Int mod) %d + %d vs. (potion's lore) %d~
 		# @39262 = ~Failed identify potion check! (Alchemy + Int mod) %d + %d vs. (potion's lore) %d~
 		if feedback:
 			msgArea.Append (GemRB.GetString(39262 - success).format(alchemy, intBon, itemIdDC) + "\n")
 		if success:
-			return
+			return True
 
 	# 3. try bardic lore
 	bardLevel = GemRB.GetPlayerStat (pc, IE_LEVELBARD)
 	if bardLevel > 0:
 		success = (bardLevel + intBon) >= itemIdDC
 		if success:
-			GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
-			slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+			MarkAsIdentified (pc, slot, slot_item)
 		# @39259 = ~Failed identify item check! Check Bardic Lore %d vs. item's lore %d (%d Intelligence Ability Mod)~
 		# @39260 = ~Successful identify item check! Check Bardic Lore %d vs. item's lore %d (%d Intelligence Ability Mod)~
 		if feedback:
@@ -579,7 +696,7 @@ def OpenItemAmountWindow (btn, location = "inventory"):
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (4, "GUIINV")
 	Window.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
-	Window.SetAction(ItemAmountWindowClosed, ACTION_WINDOW_CLOSED)
+	Window.OnClose (ItemAmountWindowClosed)
 
 	strings = { 'Done': 11973, "Cancel": 13727}
 	if GameCheck.IsPST():
@@ -694,6 +811,9 @@ def UpdateSlot (pc, slot):
 		# pst shows the inventory-bag icon bg behind items
 		if GameCheck.IsPST ():
 			Button.SetSprites ("IVSLOT", 0, 0, 0, 0, 0)
+		elif GameCheck.IsIWD2 () and ControlID in [15, 16, 17]:
+			# perhaps we should do it for all, but so far only the quiver was identified as problematic
+			Button.SetSprites ("STONSLOT", 3 + (ControlID - 15), 0, 1, 2, 3)
 	else:
 		if SlotType["ResRef"]=="*":
 			Button.SetBAM ("",0,0)
@@ -721,12 +841,14 @@ def UpdateSlot (pc, slot):
 		Button.OnRightPress (None)
 		Button.OnShiftPress (None)
 		Button.OnDoublePress (OpenItemAmountWindow)
-
-	if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
+	if not slot_item:
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
+	elif (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
 		Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 
+	# highlight equipped weapons and ammo
 	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
 		Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 
@@ -943,8 +1065,7 @@ def IdentifyUseSpell (slotItem, pc):
 	"""Identifies the item with a memorized spell."""
 
 	GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 1)
-	GemRB.ChangeItemFlag (pc, slotItem["Slot"], IE_INV_ITEM_IDENTIFIED, OP_OR)
-	slotItem["Flags"] |= IE_INV_ITEM_IDENTIFIED
+	MarkAsIdentified (pc, slotItem["Slot"], slotItem)
 	if GameCheck.IsPST ():
 		strRef = GetPSTPersonalizedRef (pc, 35685)
 		GemRB.GetString (strRef, 2) # play the attached sound
@@ -957,8 +1078,7 @@ def IdentifyUseScroll (slotItem, pc):
 	"""Identifies the item with a scroll or other item."""
 
 	if GemRB.HasSpecialItem (pc, 1, 1):
-		GemRB.ChangeItemFlag (pc, slotItem["Slot"], IE_INV_ITEM_IDENTIFIED, OP_OR)
-		slotItem["Flags"] |= IE_INV_ITEM_IDENTIFIED
+		MarkAsIdentified (pc, slotItem["Slot"], slotItem)
 	if GameCheck.IsPST ():
 		strRef = GetPSTPersonalizedRef (pc, 35685)
 		GemRB.GetString (strRef, 2) # play the attached sound
@@ -1004,7 +1124,7 @@ def IdentifyItemWindow (slotItem, pc):
 	return
 
 def DoneAbilitiesItemWindow (slot_item, pc):
-	GemRB.SetupQuickSlot (pc, 0, slot_item["Slot"], GemRB.GetVar ("Ability"))
+	GemRB.SetupQuickItemSlot (pc, 0, slot_item["Slot"], GemRB.GetVar ("Ability"))
 	return
 
 def AbilitiesItemWindow (slot_item, pc):

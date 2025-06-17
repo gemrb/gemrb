@@ -21,6 +21,7 @@
 #include "EffectQueue.h"
 
 #include "ie_feats.h"
+#include "ie_stats.h"
 #include "opcode_params.h"
 #include "overlays.h"
 #include "strrefs.h"
@@ -31,15 +32,15 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Map.h"
+#include "Region.h"
 #include "Spell.h" //needs for the source flags bitfield
 #include "SymbolMgr.h"
 #include "TableMgr.h"
 
 #include "GameScript/GSUtils.h" // for DiffCore
 #include "GameScript/GameScript.h" // only for ID_Allegiance
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
-
-#include <cstdio>
 
 namespace GemRB {
 
@@ -114,12 +115,19 @@ private:
 			error("EffectQueue", "A critical scripting file is damaged!");
 		}
 
+		int maxOpcode = core->GetDictionary().Get("MaxFXOpcode", 999999);
 		for (int i = 0; i < MAX_EFFECTS; i++) {
 			const auto& effectname = effectsTable->GetValue(i);
 			if (effectname.empty()) continue; // past the table size or undefined effect
 
 			EffectDesc* poi = FindEffect(effectname);
 			assert(poi != nullptr);
+
+			// make sure the opcode is within original engine limits for save compatibility
+			if (i > maxOpcode) {
+				Log(ERROR, "EffectQueue", "Opcode {} '{}' is higher than the original max {}! Saves will be incompatible", i, effectname, maxOpcode);
+			}
+
 			Opcodes[i] = *poi;
 
 			// reverse linking opcode number
@@ -218,7 +226,6 @@ bool EffectQueue::match_ids(const Actor* target, int table, ieDword value)
 			stat = IE_TEAM;
 			break;
 		case 2: //EA
-			stat = IE_EA;
 			return GameScript::ID_Allegiance(target, value);
 		case 3: //GENERAL
 			//this is a hack to support dead only projectiles in PST
@@ -1013,6 +1020,8 @@ static inline int CheckMagicResistance(const Actor* actor, const Effect* fx, con
 	bool selective_mr = core->HasFeature(GFFlags::SELECTIVE_MAGIC_RES);
 	if (fx->CasterID == actor->GetGlobalID() && selective_mr) {
 		return -1;
+	} else if (IsEquipped(fx->TimingMode)) {
+		return -1;
 	}
 
 	//magic immunity
@@ -1447,7 +1456,7 @@ bool EffectQueue::RemoveEquippingEffects(size_t slotCode)
 	bool removed = false;
 	for (auto& fx : effects) {
 		if (!IsEquipped(fx.TimingMode)) continue;
-		if (fx.InventorySlot != (ieDwordSigned) slotCode) continue;
+		if (slotCode != 0xffffffff && fx.InventorySlot != (ieDwordSigned) slotCode) continue;
 
 		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 		RemoveBonusMemorizations(fx);

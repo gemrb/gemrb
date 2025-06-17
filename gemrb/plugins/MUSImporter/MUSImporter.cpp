@@ -20,9 +20,8 @@
 
 #include "MUSImporter.h"
 
-#include "Audio.h"
-#include "GameData.h" // For ResourceHolder
 #include "Interface.h"
+#include "Resource.h"
 #include "SoundMgr.h"
 
 #include "Logging/Logging.h"
@@ -66,7 +65,7 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	size_t len = 0;
 	std::string line;
 
-	auto fillVar = [&i, len, &line](MUSString& var) {
+	auto fillVar = [&i, &len, &line](MUSString& var) {
 		int p = 0;
 		while (i < len) {
 			if (!isblank(line[i])) {
@@ -81,7 +80,6 @@ bool MUSImporter::OpenPlaylist(const ieVariable& name)
 	if (Playing || IsCurrentPlayList(name)) {
 		return true;
 	}
-	core->GetAudioDrv()->ResetMusics();
 	playlist.clear();
 	PLpos = 0;
 	PLName.Reset();
@@ -172,7 +170,6 @@ void MUSImporter::Start()
 	}
 
 	PlayMusic(PLpos);
-	core->GetAudioDrv()->Play();
 	lastSound = playlist[PLpos].soundID;
 	Playing = true;
 }
@@ -187,13 +184,15 @@ void MUSImporter::End()
 	} else {
 		HardEnd();
 	}
+	PLName = "";
 	PLnext = -1;
 }
 
 void MUSImporter::HardEnd()
 {
-	core->GetAudioDrv()->Stop();
+	core->GetMusicLoop().Stop();
 	Playing = false;
+	PLName = "";
 	PLpos = 0;
 }
 
@@ -252,7 +251,6 @@ void MUSImporter::PlayNext()
 		}
 	} else {
 		Playing = false;
-		core->GetAudioDrv()->Stop();
 		//start new music after the old faded out
 		if (PLNameNew[0]) {
 			if (OpenPlaylist(PLNameNew)) {
@@ -284,19 +282,17 @@ void MUSImporter::PlayMusic(const ieVariable& name)
 
 	ResourceHolder<SoundMgr> sound = manager.GetResourceHolder<SoundMgr>(FName, true);
 	if (sound) {
-		int soundID = core->GetAudioDrv()->CreateStream(std::move(sound));
-		if (soundID == -1) {
-			core->GetAudioDrv()->Stop();
-		}
+		core->GetMusicLoop().Load(std::move(sound));
+		Log(MESSAGE, "MUSImporter", "Playing {}...", FName);
 	} else {
-		core->GetAudioDrv()->Stop();
+		core->GetMusicLoop().Stop();
 	}
-	Log(MESSAGE, "MUSImporter", "Playing {}...", FName);
 }
 
 bool MUSImporter::IsCurrentPlayList(const ieVariable& name)
 {
-	return name == PLName;
+	// ignore .mus
+	return name.BeginsWith(PLName) && name.length() - 4 == PLName.length();
 }
 
 #include "plugindef.h"

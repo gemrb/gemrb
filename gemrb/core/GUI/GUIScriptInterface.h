@@ -49,7 +49,7 @@ public:
 		return new ViewScriptingRef(this->GetObject(), id, scriptingGroup);
 	}
 
-	// TODO: perhapps in the future the GUI script implementation for view methods should be moved here
+	// TODO: perhaps in the future the GUI script implementation for view methods should be moved here
 };
 
 class WindowScriptingRef : public ViewScriptingRef {

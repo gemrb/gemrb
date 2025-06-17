@@ -20,8 +20,10 @@
 #include "Highlightable.h"
 
 #include "defsounds.h"
+#include "ie_stats.h"
 
 #include "Interface.h"
+#include "Map.h"
 
 #include "GUI/GameControl.h"
 #include "GameScript/GSUtils.h"
@@ -206,13 +208,13 @@ bool Highlightable::TryPickLock(Actor* actor, ieWord lockDifficulty, ieStrRef cu
 	if (stat < (int) lockDifficulty) {
 		displaymsg->DisplayMsgAtLocation(HCStrings::LockpickFailed, FT_ANY, actor, actor, GUIColors::XPCHANGE);
 		AddTrigger(TriggerEntry(trigger_picklockfailed, actor->GetGlobalID()));
-		core->PlaySound(DS_PICKFAIL, SFXChannel::Hits);
+		core->GetAudioPlayback().PlayDefaultSound(DS_PICKFAIL, SFXChannel::Hits);
 		return false;
 	}
 
 	core->GetGameControl()->ResetTargetMode();
 	displaymsg->DisplayMsgAtLocation(HCStrings::LockpickDone, FT_ANY, actor, actor);
-	core->PlaySound(DS_PICKLOCK, SFXChannel::Hits);
+	core->GetAudioPlayback().PlayDefaultSound(DS_PICKLOCK, SFXChannel::Hits);
 	AddTrigger(TriggerEntry(trigger_unlocked, actor->GetGlobalID()));
 	ImmediateEvent();
 
@@ -275,7 +277,7 @@ void Highlightable::SetTrapDetected(int detected)
 		return;
 	TrapDetected = detected;
 	if (TrapDetected) {
-		core->PlaySound(DS_FOUNDSECRET, SFXChannel::Hits);
+		core->GetAudioPlayback().PlayDefaultSound(DS_FOUNDSECRET, SFXChannel::Hits);
 		core->Autopause(AUTOPAUSE::TRAP, this);
 	}
 }
@@ -316,7 +318,7 @@ void Highlightable::TryDisarm(Actor* actor)
 		const Game* game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
 		core->GetGameControl()->ResetTargetMode();
-		core->PlaySound(DS_DISARMED, SFXChannel::Hits);
+		core->GetAudioPlayback().PlayDefaultSound(DS_DISARMED, SFXChannel::Hits);
 	} else {
 		AddTrigger(TriggerEntry(trigger_disarmfailed, actor->GetGlobalID()));
 		if (core->HasFeature(GFFlags::RULES_3ED)) {

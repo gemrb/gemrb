@@ -33,7 +33,6 @@
 
 #include "CharAnimations.h"
 #include "EffectQueue.h"
-#include "Resource.h"
 
 #include <vector>
 

@@ -89,16 +89,8 @@ def UpdatePriestWindow (Window):
 	spelltype = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, spelltype, level)
-	
-	ClassName = GUICommon.GetClassRowName (pc)
-	DivineCaster = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
-	if DivineCaster == "*":
-		# also check the DRUIDSPELL column
-		DivineCaster = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
-	CantCast = DivineCaster == "*"
-	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
 
-	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+	GUICommon.AdjustWindowVisibility (Window, pc, GUICommon.CantUseSpellbookWindow (pc, True))
 
 	Label = Window.GetControl (0x10000032)
 	# bg2 uses a shorthand form

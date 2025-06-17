@@ -24,9 +24,9 @@
 #ifndef TLKOVERRIDE_H
 #define TLKOVERRIDE_H
 
-#include "globals.h"
+#include "strrefs.h"
 
-#include "Streams/FileStream.h"
+#include "Streams/DataStream.h"
 #include "Strings/String.h"
 
 namespace GemRB {

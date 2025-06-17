@@ -214,6 +214,18 @@ std::string& AppendFormat(std::string& str, const std::string& fmt, ARGS&&... ar
 	return str += formatted;
 }
 
+template<typename STR>
+GEM_EXPORT_T size_t Count(const STR& str, typename STR::value_type delim = ',')
+{
+	size_t count = 0;
+	for (auto cur = str.begin(); cur != str.end(); ++cur) {
+		if (*cur == delim) {
+			count++;
+		}
+	}
+	return count;
+}
+
 }
 
 #endif

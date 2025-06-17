@@ -20,7 +20,6 @@
 
 #include "Debug.h"
 #include "Interface.h"
-#include "Palette.h"
 #include "Sprite2D.h"
 
 #include "Strings/String.h"
@@ -123,6 +122,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 #define LINE_REMAINDER (lineRgn.w - lineSegment.x)
 		const Region* excluded = NULL;
 		size_t numPrinted = 0;
+		char emptyPrints = 0;
 		bool newline = true;
 		do {
 			if (newline || lineSegment.x + lineSegment.w >= lineRgn.x + lineRgn.w) {
@@ -226,10 +226,13 @@ newline:
 				layoutRegions.emplace_back(std::make_shared<TextLayoutRegion>(lineLayout, begin, end));
 				lineExclusions.clear();
 			}
-			// FIXME: infinite loop possibility.
+			if (numPrinted == 0) {
+				emptyPrints++;
+				if (emptyPrints == 2) break;
+			}
 		} while (numPrinted < text.length());
 #undef LINE_REMAINDER
-		assert(numPrinted == text.length());
+		if (emptyPrints != 2) assert(numPrinted == text.length());
 	} else {
 		// we are limited to drawing within our frame :(
 

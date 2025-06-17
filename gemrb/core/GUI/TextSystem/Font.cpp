@@ -21,10 +21,10 @@
 #include "Font.h"
 
 #include "Debug.h"
-#include "GameData.h"
 #include "Palette.h"
 
 #include "Logging/Logging.h"
+#include "Strings/StringConversion.h"
 #include "Video/Video.h"
 
 #include <cwctype>

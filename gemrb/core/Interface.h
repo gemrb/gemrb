@@ -29,20 +29,25 @@
 #include "exports.h"
 #include "globals.h"
 
-#include "Audio.h"
 #include "EnumIndex.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
 #include "Holder.h"
 #include "ImageMgr.h"
 #include "InterfaceConfig.h"
-#include "Orientation.h"
 #include "SaveGameAREExtractor.h"
 #include "StringMgr.h"
 #include "TableMgr.h"
+#include "Timer.h"
 
+#include "Audio/AmbientMgr.h"
+#include "Audio/AudioBackend.h"
+#include "Audio/AudioSettings.h"
+#include "Audio/MusicLoop.h"
+#include "Audio/Playback.h"
 #include "GUI/Control.h"
 #include "GUI/Tooltip.h"
+#include "Strings/StringConversion.h"
 #include "Strings/StringMap.h"
 
 #include <string>
@@ -52,7 +57,6 @@
 namespace GemRB {
 
 class Actor;
-class Audio;
 class CREItem;
 class Calendar;
 class Container;
@@ -60,7 +64,6 @@ class DataFileMgr;
 struct Effect;
 class EffectQueue;
 class EffectDesc;
-class Factory;
 class FogRenderer;
 class Font;
 class Game;
@@ -70,13 +73,10 @@ class KeyMap;
 class Label;
 class Map;
 class MusicMgr;
-class Palette;
 class ProjectileServer;
 class SaveGame;
 class SaveGameIterator;
 class ScriptEngine;
-class SoundHandle;
-class Spell;
 class Sprite2D;
 class Store;
 class SymbolMgr;
@@ -289,7 +289,7 @@ public:
 private:
 	// drivers must be deallocated last (keep them at the top)
 	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
-	PluginHolder<Audio> AudioDriver;
+	PluginHolder<AudioBackend> AudioDriver;
 
 	ProjectileServer* projserv = nullptr;
 
@@ -356,6 +356,12 @@ private:
 
 	int MaximumAbility = 0;
 
+	AudioSettings audioSettings;
+	// require audio driver, settings
+	AmbientMgr* ambientManager = nullptr;
+	AudioPlayback* audioPlayback = nullptr;
+	MusicLoop* musicLoop = nullptr;
+
 public:
 	EncodingStruct TLKEncoding;
 	PluginHolder<StringMgr> strings;
@@ -369,7 +375,7 @@ public:
 	size_t SlotTypes = 0; // this is the same as the inventory size
 	ResRef GlobalScript = "BALDUR";
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };
-	Holder<SoundHandle> strrefHandle = nullptr;
+	Holder<PlaybackHandle> strrefHandle = nullptr;
 
 	std::vector<Holder<Sprite2D>> Cursors;
 	std::array<std::array<Holder<Sprite2D>, 6>, MAX_CIRCLE_SIZE> GroundCircles;
@@ -394,6 +400,7 @@ public:
 	ieStrRef UpdateString(ieStrRef strref, const String& text) const;
 	/* returns a newly created string */
 	String GetString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
+	String GetString(HCStrings idx, STRING_FLAGS options = STRING_FLAGS::NONE) const;
 	std::string GetMBString(ieStrRef strref, STRING_FLAGS options = STRING_FLAGS::NONE) const;
 	/** returns a gradient set */
 	const ColorPal<16>& GetPalette16(uint8_t idx) const { return (idx >= palettes16.size()) ? palettes16[0] : palettes16[idx]; }
@@ -549,9 +556,6 @@ public:
 	void SetMouseScrollSpeed(int speed);
 	int GetMouseScrollSpeed() const;
 
-	/** plays stock gui sound referenced by index */
-	Holder<SoundHandle> PlaySound(size_t idx, SFXChannel channel) const;
-	Holder<SoundHandle> PlaySound(size_t idx, SFXChannel channel, const Point& p, unsigned int flags = 0) const;
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor* GetFirstSelectedPC(bool forced);
@@ -664,7 +668,7 @@ private:
 	bool ReadMusicTable(const ResRef& name, int col);
 	bool ReadDamageTypeTable();
 	bool ReadGameTimeTable();
-	bool ReadSoundChannelsTable() const;
+	bool ReadSoundChannelsTable();
 
 	/*returns true if the file should never be deleted accidentally */
 	bool ProtectedExtension(const path_t& filename) const;
@@ -727,10 +731,15 @@ public:
 	/** Set Next Script */
 	void SetNextScript(const path_t& script);
 
-	PluginHolder<Audio> GetAudioDrv(void) const;
+	AmbientMgr& GetAmbientManager();
+	PluginHolder<AudioBackend> GetAudioDrv(void) const;
+	const AudioSettings& GetAudioSettings() const;
+	AudioPlayback& GetAudioPlayback();
+	MusicLoop& GetMusicLoop();
 
 	Timer& SetTimer(const EventHandler&, tick_t interval, int repeats = -1);
 	float GetAnimationFPS(const ResRef& anim) const;
+	void ApplyTooltipDelay() const;
 };
 
 extern GEM_EXPORT Interface* core;

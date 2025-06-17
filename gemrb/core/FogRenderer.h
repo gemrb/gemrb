@@ -22,9 +22,7 @@
 #define FOG_RENDERER_H
 
 #include "exports.h"
-#include "globals.h"
 
-#include "Bitmap.h"
 #include "EnumIndex.h"
 #include "Region.h"
 #include "Sprite2D.h"
@@ -32,6 +30,8 @@
 #include <vector>
 
 namespace GemRB {
+
+class Bitmap;
 
 struct FogMapData {
 	FogMapData(

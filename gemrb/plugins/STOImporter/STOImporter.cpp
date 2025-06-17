@@ -26,7 +26,7 @@
 #include "Inventory.h"
 #include "PluginMgr.h"
 
-#include "GameScript/GameScript.h"
+#include "Logging/Logging.h"
 
 using namespace GemRB;
 

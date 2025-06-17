@@ -30,7 +30,8 @@
 #include "RNG.h"
 #include "TableMgr.h"
 
-#include "GameScript/GameScript.h"
+#include "Logging/Logging.h"
+#include "Scriptable/Actor.h"
 
 #include <cassert>
 
@@ -832,7 +833,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	}
 	poi = core->GetString(act->ShortStrRef);
 	act->SetName(std::move(poi), 2); //setting shortname (for tooltips)
-	act->BaseStats[IE_VISUALRANGE] = VOODOO_VISUAL_RANGE; // not stored anywhere
+	act->BaseStats[IE_VISUALRANGE] = Scriptable::VOODOO_VISUAL_RANGE; // not stored anywhere
 	act->BaseStats[IE_DIALOGRANGE] = VOODOO_DIALOG_RANGE;
 	str->ReadDword(act->BaseStats[IE_MC_FLAGS]);
 	str->ReadDword(act->BaseStats[IE_XPVALUE]);
@@ -870,6 +871,10 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	str->ReadResRef(act->SmallPortrait);
 	if (act->SmallPortrait.IsEmpty()) {
 		act->SmallPortrait = "NONE";
+	} else if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		// bg2ee stores the M and L, but not S
+		// gimp it for now, since we want the small portrait to be small
+		*act->SmallPortrait.rbegin() = 'S';
 	}
 	str->ReadResRef(act->LargePortrait);
 	if (act->LargePortrait.IsEmpty()) {
@@ -931,10 +936,10 @@ void CREImporter::GetActorPST(Actor* act)
 	ieWordSigned tmpWord;
 	str->ReadScalar(tmpWord);
 	act->AC.SetNatural(tmpWord);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACCRUSHINGMOD]);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACMISSILEMOD]);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACPIERCINGMOD]);
-	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_ACSLASHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACCRUSHINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACMISSILEMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACPIERCINGMOD]);
+	str->ReadScalar<Actor::stat_t, ieWordSigned>(act->BaseStats[IE_ACSLASHINGMOD]);
 	ieByteSigned tmpByte;
 	str->Read(&tmpByte, 1);
 	act->ToHit.SetBase(tmpByte);
@@ -1963,7 +1968,13 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 	//old effect type
 	Signature[7] = TotSCEFF;
 	stream->Write(Signature, 8);
-	stream->WriteResRef(actor->SmallPortrait);
+
+	// see the read above, this just ensures save compatibility
+	ResRef smallPortrait = actor->SmallPortrait;
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		*smallPortrait.rbegin() = 'M';
+	}
+	stream->WriteResRef(smallPortrait);
 	stream->WriteResRef(actor->LargePortrait);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_REPUTATION]);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_HIDEINSHADOWS]);
@@ -2024,7 +2035,11 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MAGICDAMAGERESISTANCE]);
 		stream->Write(Signature, 4);
 	} else {
-		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DETECTILLUSIONS]);
+		if (actor->creVersion == CREVersion::V1_2) {
+			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_FREESLOTS]);
+		} else {
+			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DETECTILLUSIONS]);
+		}
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SETTRAPS]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LORE]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LOCKPICKING]);

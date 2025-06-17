@@ -37,6 +37,7 @@ ActionBarControlOffset = 0
 if GameCheck.IsIWD2 ():
 	ActionBarControlOffset = 6 # portrait and action window were merged
 fistDrawn = True
+GUIBT_COUNT = 12
 
 # The following four functions are currently unused in pst
 def EmptyControls ():
@@ -48,10 +49,10 @@ def EmptyControls ():
 		# init spell list
 		GemRB.SpellCast (pc, -1, 0)
 
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	if not CurrentWindow:
 		return # current case in our game demo (on right-click)
-	for i in range (12):
+	for i in range (GUIBT_COUNT):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		Button.SetVisible (False)
 	return
@@ -71,7 +72,7 @@ def SelectFormationPreset ():
 def SetupFormation ():
 	"""Opens the formation selection section."""
 
-	for i in range (12):
+	for i in range (GUIBT_COUNT):
 		Button = CurrentWindow.GetControl (i+ActionBarControlOffset)
 		Button.SetFlags (IE_GUI_BUTTON_NORMAL, OP_SET)
 		Button.SetSprites ("GUIBTBUT", 0, 0, 1, 2, 3)
@@ -84,16 +85,16 @@ def SetupFormation ():
 def GroupControls ():
 	"""Sections that control group actions."""
 
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	Button = CurrentWindow.GetControl (ActionBarControlOffset)
 	if GameCheck.IsBG2OrEE ():
-		Button.SetActionIcon (globals(), 7, 1) # talk icon
+		Button.SetActionIcon (globals(), ACT_TALK, 1)
 	else:
-		Button.SetActionIcon (globals(), 14, 1)# guard icon
+		Button.SetActionIcon (globals(), ACT_DEFEND, 1)
 	Button = CurrentWindow.GetControl (1 + ActionBarControlOffset)
-	Button.SetActionIcon (globals(), 15, 2)
+	Button.SetActionIcon (globals(), ACT_ATTACK, 2)
 	Button = CurrentWindow.GetControl (2 + ActionBarControlOffset)
-	Button.SetActionIcon (globals(), 21, 3)
+	Button.SetActionIcon (globals(), ACT_STOP, 3)
 	Button = CurrentWindow.GetControl (3 + ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1, 4)
 	Button = CurrentWindow.GetControl (4 + ActionBarControlOffset)
@@ -140,8 +141,8 @@ def SelectItemAbility():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	slot = GemRB.GetVar ("Slot")
 	ability = GemRB.GetVar ("Ability")
-	GemRB.SetupQuickSlot (pc, 0, slot, ability)
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	GemRB.SetupQuickItemSlot (pc, 0, slot, ability, 0 if GameCheck.IsIWD2 () else 1)
+	SetActionLevel (UAW_STANDARD)
 	return
 
 # in pst only nordom has bolts and they show on the same floatmenu as quickweapons, so needs work here
@@ -154,12 +155,12 @@ def SelectQuiverSlot():
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"]) #, 0, 0)
 		GemRB.DropDraggedItem (pc, slot)
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	return
 
 # this doubles up as an ammo selector (not yet used in pst)
 def SetupItemAbilities(pc, slot, only):
-	slot_item = GemRB.GetSlotItem(pc, slot)
+	slot_item = GemRB.GetSlotItem(pc, slot, 1 if GameCheck.IsIWD2() else 0)
 	if not slot_item:
 		# CHIV: Could configure empty quickslots from the game screen ala spells heres
 		return
@@ -185,7 +186,7 @@ def SetupItemAbilities(pc, slot, only):
 		ammoslots = GemRB.GetSlots(pc, SLOT_QUIVER, 1)
 		currentammo = GemRB.GetEquippedAmmunition (pc)
 		currentbutton = None
-		for i in range (12):
+		for i in range (GUIBT_COUNT):
 			Button = CurrentWindow.GetControl (i + ActionBarControlOffset)
 			if i < len(ammoslots):
 				ammoslot = GemRB.GetSlotItem (pc, ammoslots[i])
@@ -233,7 +234,7 @@ def SetupItemAbilities(pc, slot, only):
 
 	if len(Tips) > 0:
 		reset = False
-		rmax = min(len(Tips), 12-ammoSlotCount)
+		rmax = min(len(Tips), GUIBT_COUNT - ammoSlotCount)
 
 		# for mixed items, only show headers if there is more than one appropriate one
 		weaps = sum([i == ITEM_LOC_WEAPON for i in Locations])
@@ -265,7 +266,7 @@ def SetupItemAbilities(pc, slot, only):
 				Button.SetTooltip ("F%d - %s" %(i, GemRB.GetString (Tips[i])))
 
 	if reset:
-		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+		SetActionLevel (UAW_STANDARD)
 		UpdateActionsWindow ()
 	return
 
@@ -291,24 +292,102 @@ def SetupBookSelection ():
 	# if we have only one or only cleric+domain, skip to the spells
 	bookCount = len(usableBooks)
 	if bookCount == 1 or (bookCount == 2 and IE_IWD2_SPELL_CLERIC in usableBooks):
-		GemRB.SetVar ("ActionLevel", UAW_SPELLS_DIRECT)
+		SetActionLevel (UAW_SPELLS_DIRECT)
 		UpdateActionsWindow ()
 		return
 
-	for i in range (12):
+	for i in range (GUIBT_COUNT):
 		Button = CurrentWindow.GetControl (i + ActionBarControlOffset)
 		if i >= len(usableBooks):
 			Button.SetActionIcon (globals(), -1)
 			continue
-		Button.SetActionIcon (globals(), 40 + usableBooks[i])
+		Button.SetActionIcon (globals(), ACT_BARD + usableBooks[i])
+	return
+
+def SelectWeaponSet (setIdx):
+	SetActionLevel (UAW_STANDARD)
+	ActionQWeaponPressed (setIdx, False)
+
+def SelectWeaponSetAbility (slot, fistSlot, pc):
+	item = GemRB.GetSlotItem (pc, slot, 1)
+	if item:
+		launcherSlot = item["LauncherSlot"]
+		if launcherSlot and launcherSlot != fistSlot:
+			slot = launcherSlot
+
+	ActionQWeaponRightPressedDirect (slot)
+
+def SetupWeaponSets ():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	pcStats = GemRB.GetPCStats (pc)
+	if not pcStats:
+		return
+
+	invInfo = GemRB.GetInventoryInfo (pc)
+	magicSlot = invInfo["MagicSlot"]
+	usedSlot = invInfo["UsedSlot"]
+	fistSlot = invInfo["FistSlot"]
+	if usedSlot == magicSlot:
+		return
+
+	# display each set with 1 button as a gap
+	for setIdx in range(4):
+		ctrlOffset = setIdx * 3 + ActionBarControlOffset
+		selected = False
+
+		Button = CurrentWindow.GetControl (ctrlOffset)
+		slot1 = pcStats["QuickWeaponSlots"][setIdx]
+		Button.SetActionIcon (globals(), ACT_WEAPON1 + setIdx, ctrlOffset)
+		Button.OnPress (lambda btn, idx = setIdx: SelectWeaponSet (idx))
+		SetWeaponButton (Button, ACT_WEAPON1 + setIdx, pc, pcStats, invInfo)
+		if usedSlot == slot1:
+			Button.SetState (IE_GUI_BUTTON_SELECTED)
+			selected = True
+			Button.OnRightPress (lambda btn, idx = slot1: SelectWeaponSetAbility (idx, fistSlot, pc))
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+
+		Button = CurrentWindow.GetControl (ctrlOffset + 1)
+		# slot2 would be pcStats["QuickWeaponSlots"][setIdx + 4]
+		Button.SetActionIcon (globals(), ACT_OFFHAND, ctrlOffset + 1)
+		Button.OnPress (lambda btn, idx = setIdx: SelectWeaponSet (idx))
+		SetOffHandButton (Button, pc, pcStats, magicSlot, slot1, invInfo["FistSlot"])
+		if selected:
+			Button.SetState (IE_GUI_BUTTON_SELECTED)
+			Button.OnRightPress (lambda btn, idx = slot1: SelectWeaponSetAbility (idx, fistSlot, pc))
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+
+		Button = CurrentWindow.GetControl (ctrlOffset + 2)
+		Button.SetActionIcon (globals(), -1)
+		Button.SetDisabled (True)
 	return
 
 # you can change this for custom skills, this is the original engine
-skillbar = (ACT_STEALTH, ACT_SEARCH, ACT_THIEVING, ACT_WILDERNESS, ACT_TAMING, ACT_USE, ACT_CAST, 100, 100, 100, 100, 100)
+skillbar = (ACT_STEALTH, ACT_SEARCH, ACT_THIEVING, ACT_WILDERNESS, ACT_TAMING, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE)
 def SetupSkillSelection ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	SetupControls (CurrentWindow, pc, ActionBarControlOffset, skillbar)
 	return
+
+# original customization menu:
+# skills, cast, use item (abilities), quick item (opened submenu to select 1 of 3, if any), innates, song
+# at the right end: clear button, restore default buttons (restored all of them)
+# we just list out the quickslots, since although there are many more, only 3 are settable via the inventory
+customizationBar = (ACT_SKILLS, ACT_CAST, ACT_USE, ACT_IWDQITEM, ACT_IWDQITEM + 1, ACT_IWDQITEM + 2, ACT_INNATE, ACT_BARDSONG, ACT_NONE, ACT_NONE, ACT_CLEAR, ACT_RESTORE)
+def SetupButtonChoices ():
+	GemRB.SetVar ("SettingButtons", 1)
+	pc = GemRB.GameGetFirstSelectedActor ()
+	SetupControls (CurrentWindow, pc, ActionBarControlOffset, customizationBar)
+	return
+
+def SaveActionButton (actionIdx):
+	pc = GemRB.GameGetFirstSelectedActor ()
+	qslot = GemRB.GetVar ("QuickSlotButton")
+	GemRB.SetupQuickSlot (pc, qslot, actionIdx)
+
+	SetActionLevel (UAW_STANDARD)
+	UpdateActionsWindow ()
 
 def UpdateActionsWindow ():
 	"""Redraws the actions section of the window."""
@@ -342,7 +421,7 @@ def UpdateActionsWindow ():
 	Selected = GemRB.GetSelectedSize()
 
 	# setting up the disabled button overlay (using the second border slot)
-	for i in range (12):
+	for i in range (GUIBT_COUNT):
 		Button = CurrentWindow.GetControl (i + ActionBarControlOffset)
 		if GameCheck.IsBG1():
 			color = {'r' : 0, 'g' : 254, 'b' :0, 'a' : 255}
@@ -371,7 +450,7 @@ def UpdateActionsWindow ():
 
 	# all but bg2 summons all use the group actionbar!
 	# bg2 has a different common format and exceptions for illusions/clones
-	level = GemRB.GetVar ("ActionLevel")
+	level = GemRB.GetVar ("ActionLevel") or UAW_STANDARD
 	if GemRB.GetPlayerStat (pc, IE_EA) >= CONTROLLED:
 		if GameCheck.IsBG2OrEE ():
 			if level == UAW_STANDARD and GemRB.GetPlayerStat (pc, IE_SEX) != 7:
@@ -380,7 +459,7 @@ def UpdateActionsWindow ():
 			GroupControls ()
 			return
 
-	TopIndex = GemRB.GetVar ("TopIndex")
+	TopIndex = GemRB.GetVar ("TopIndex") or 0
 	if level == UAW_STANDARD:
 		# this is based on class
 		# cleric/thief wants 13 icons, so we push the extra under innates (original did picking, we do turning)
@@ -413,19 +492,19 @@ def UpdateActionsWindow ():
 			SetupControls (CurrentWindow, pc, ActionBarControlOffset)
 			# use group attack icon and disable second weapon slot
 			Button = CurrentWindow.GetControl (1 + ActionBarControlOffset)
-			Button.SetActionIcon (globals(), 15, 2)
+			Button.SetActionIcon (globals(), ACT_ATTACK, 2)
 			Button = CurrentWindow.GetControl (2 + ActionBarControlOffset)
 			Button.SetActionIcon (globals(), -1, 0)
 			# the games showed quick spells, but these actors don't have the data for it
 			# we just disable the slots instead
 			Button = CurrentWindow.GetControl (3 + ActionBarControlOffset)
-			Button.SetActionIcon (globals(), 3, 4)
+			Button.SetActionIcon (globals(), ACT_QSPELL1, 4)
 			Button.SetDisabled (True)
 			Button = CurrentWindow.GetControl (4 + ActionBarControlOffset)
-			Button.SetActionIcon (globals(), 4, 5)
+			Button.SetActionIcon (globals(), ACT_QSPELL2, 5)
 			Button.SetDisabled (True)
 			Button = CurrentWindow.GetControl (5 + ActionBarControlOffset)
-			Button.SetActionIcon (globals(), 5, 6)
+			Button.SetActionIcon (globals(), ACT_QSPELL3, 6)
 			Button.SetDisabled (True)
 	elif level == UAW_ALLMAGE: # all known mage spells
 		GemRB.SetVar ("Type", -1)
@@ -461,17 +540,24 @@ def UpdateActionsWindow ():
 			spelltype = (1 << IE_SPELL_TYPE_PRIEST) + (1 << IE_SPELL_TYPE_WIZARD)
 		GemRB.SetVar ("Type", spelltype)
 		Spellbook.SetupSpellIcons (CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
+	elif level == UAW_WEAPONSETS:
+		SetupWeaponSets ()
+	elif level == UAW_CONFIGUREBAR:
+		SetupButtonChoices ()
 	else:
 		print("Invalid action level:", level)
-		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+		SetActionLevel (UAW_STANDARD)
 		UpdateActionsWindow ()
 	return
 
-def ActionQWeaponPressed (which):
+def ActionQWeaponPressed (which, reset = True):
 	"""Selects the given quickslot weapon if possible."""
 
 	pc = GemRB.GameGetFirstSelectedActor ()
 	qs = GemRB.GetEquippedQuickSlot (pc, 1)
+	if GameCheck.IsIWD2 () and reset:
+		# on the main action bar we always present the same slot
+		which = qs
 
 	# 38 is the magic slot
 	if ((qs==which) or (qs==38)) and GemRB.GameControlGetTargetMode() != TARGET_MODE_ATTACK:
@@ -484,11 +570,27 @@ def ActionQWeaponPressed (which):
 	UpdateActionsWindow ()
 	return
 
-# TODO: implement full weapon set switching instead
-def ActionQWeaponRightPressed (action):
+def ActionQWeaponRightPressed (which):
+	if GameCheck.IsIWD2 ():
+		# display weapon set choice instead
+		SetActionLevel (UAW_WEAPONSETS)
+		UpdateActionsWindow ()
+	else:
+		ActionQWeaponRightPressedDirect (which)
+	return
+
+def ActionQWeaponRightPressedDirect (action):
 	"""Selects the used ability of the quick weapon."""
+
 	GemRB.SetVar ("Slot", action)
-	GemRB.SetVar ("ActionLevel", UAW_QWEAPONS)
+	SetActionLevel (UAW_QWEAPONS)
+	UpdateActionsWindow ()
+	return
+
+def ActionOffhandRightPressed (action):
+	"""Selects the used weapon set."""
+
+	SetActionLevel (UAW_WEAPONSETS)
 	UpdateActionsWindow ()
 	return
 
@@ -503,10 +605,13 @@ def ActionQSpellPressed (which):
 	return
 
 def ActionQSpellRightPressed (which):
-	GemRB.SetVar ("QSpell", which)
-	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", UAW_QSPELLS)
-	UpdateActionsWindow ()
+	if GameCheck.IsIWD2 ():
+		StartBarConfiguration ()
+	else:
+		GemRB.SetVar ("QSpell", which)
+		GemRB.SetVar ("TopIndex", 0)
+		SetActionLevel (UAW_QSPELLS)
+		UpdateActionsWindow ()
 	return
 
 suf = ["", "Right"]
@@ -541,10 +646,13 @@ def ActionQSpecPressed (which):
 	ActionQSpellPressed (which)
 
 def ActionQSpecRightPressed (which):
-	GemRB.SetVar ("QSpell", which)
-	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", UAW_INNATES)
-	UpdateActionsWindow ()
+	if GameCheck.IsIWD2 ():
+		StartBarConfiguration ()
+	else:
+		GemRB.SetVar ("QSpell", which)
+		GemRB.SetVar ("TopIndex", 0)
+		SetActionLevel (UAW_INNATES)
+		UpdateActionsWindow ()
 
 def ActionQShapePressed (which):
 	ActionQSpellPressed (which)
@@ -552,17 +660,21 @@ def ActionQShapePressed (which):
 def ActionQShapeRightPressed (which):
 	GemRB.SetVar ("QSpell", which)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", UAW_QSHAPES)
+	SetActionLevel (UAW_QSHAPES)
 	UpdateActionsWindow ()
 
 def ActionQSongPressed (which):
-	SelectBardSong (which) # TODO: verify parameter once we have actionbar customisation
+	SelectBardSong (which)
 	ActionBardSongPressed ()
 
 def ActionQSongRightPressed (which):
+	if GemRB.GetVar ("ActionLevel") != UAW_QSONGS:
+		StartBarConfiguration ()
+		return
+
 	GemRB.SetVar ("QSpell", which)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", UAW_QSONGS)
+	SetActionLevel (UAW_QSONGS)
 	UpdateActionsWindow ()
 
 # can't pass the globals dictionary from another module
@@ -632,7 +744,7 @@ def ActionRangePressed ():
 	return
 
 def ActionShapeChangePressed ():
-	GemRB.SetVar ("ActionLevel", UAW_QSHAPES)
+	SetActionLevel (UAW_QSHAPES)
 	GemRB.SetVar ("TopIndex", 0)
 	UpdateActionsWindow ()
 	return
@@ -641,10 +753,17 @@ def SelectBardSong (which):
 	songType = IE_IWD2_SPELL_SONG
 	if GameCheck.IsIWD1 ():
 		songType = IE_SPELL_TYPE_SONG
-	pc = GemRB.GameGetFirstSelectedActor ()
-	songs = Spellbook.GetKnownSpells (pc, songType)
+
 	# "which" is a mashup of the spell index with it's type
 	idx = which % ((1 << songType) * 100)
+	pc = GemRB.GameGetFirstSelectedActor ()
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_IWDQSONG + idx)
+		# also update PCStats->QuickSpells
+		GemRB.SetupQuickSpell (pc, idx, idx, 1 << songType)
+		return
+
+	songs = Spellbook.GetKnownSpells (pc, songType)
 	qsong = songs[idx]['SpellResRef']
 	# the effect needs to be set each tick, so we use FX_DURATION_INSTANT_PERMANENT==1 timing mode
 	# GemRB.SetModalState can also set the spell, but it wouldn't persist
@@ -652,40 +771,69 @@ def SelectBardSong (which):
 
 def ActionBardSongRightPressed ():
 	"""Selects a bardsong."""
-	GemRB.SetVar ("ActionLevel", UAW_QSONGS)
-	GemRB.SetVar ("TopIndex", 0)
-	UpdateActionsWindow ()
+
+	# do nothing if only 1 song is known
+	pc = GemRB.GameGetFirstSelectedActor ()
+	if GemRB.GetVar ("SettingButtons") and len(Spellbook.GetKnownSpells (pc, IE_IWD2_SPELL_SONG)) > 1:
+		SetActionLevel (UAW_QSONGS)
+		GemRB.SetVar ("TopIndex", 0)
+		UpdateActionsWindow ()
+	else:
+		StartBarConfiguration ()
+
 	return
 
 def ActionBardSongPressed ():
 	"""Toggles the battle song."""
 
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_BARDSONG)
+		return
+
 	# get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
 	GemRB.PlaySound ("act_01")
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
 def ActionSearchPressed ():
 	"""Toggles detect traps."""
 
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_SEARCH)
+		return
+
 	# get the global ID
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_DETECTTRAPS)
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
+	return
+
+def ActionSearchRightPressed ():
+	if GemRB.GetVar ("ActionLevel") != UAW_SKILLS:
+		StartBarConfiguration ()
 	return
 
 def ActionStealthPressed ():
 	"""Toggles stealth."""
 
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_STEALTH)
+		return
+
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_STEALTH)
 	GemRB.PlaySound ("act_07", CHAN_HITS)
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
+	return
+
+def ActionStealthRightPressed ():
+	if GemRB.GetVar ("ActionLevel") != UAW_SKILLS:
+		StartBarConfiguration ()
 	return
 
 def ActionTurnPressed ():
@@ -694,48 +842,99 @@ def ActionTurnPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	GemRB.PlaySound ("act_06")
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
 def ActionTamingPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_TAMING)
+		return
+
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SpellCast (pc, -3, 0, "spin108")
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
+def ActionTamingRightPressed ():
+	if GemRB.GetVar ("ActionLevel") != UAW_SKILLS:
+		StartBarConfiguration ()
+	return
+
 def ActionWildernessPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_WILDERNESS)
+		return
+
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.ApplyEffect (pc, "Reveal:Tracks", 0, 0)
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
+	return
+
+def ActionWildernessRightPressed ():
+	if GemRB.GetVar ("ActionLevel") != UAW_SKILLS:
+		StartBarConfiguration ()
 	return
 
 def ActionDancePressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetModalState (pc, MS_DANCE)
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
 	return
 
 def ActionUseItemPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_USE)
+		return
+
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", UAW_EQUIPMENT)
+	SetActionLevel (UAW_EQUIPMENT)
 	UpdateActionsWindow ()
+	return
+
+def ActionUseItemRightPressed ():
+	StartBarConfiguration ()
 	return
 
 def ActionCastPressed ():
 	"""Opens the spell choice scrollbar."""
 
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_CAST)
+		return
+
 	GemRB.SetVar ("QSpell", -1)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", UAW_SPELLS)
+	SetActionLevel (UAW_SPELLS)
 	UpdateActionsWindow ()
 	return
 
-def ActionQItemPressed (action):
+def StartBarConfiguration ():
+	if not GameCheck.IsIWD2 ():
+		return # oops
+
+	SetActionLevel (UAW_CONFIGUREBAR)
+	UpdateActionsWindow ()
+	return
+
+def ActionCastRightPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SetActionLevel (UAW_SPELLS)
+		UpdateActionsWindow ()
+		return
+
+	StartBarConfiguration ()
+	return
+
+def ActionQItemPressed (action, idx):
 	"""Uses the given quick item."""
+
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_IWDQITEM + idx)
+		return
 
 	pc = GemRB.GameGetFirstSelectedActor ()
 	# quick slot
@@ -743,31 +942,37 @@ def ActionQItemPressed (action):
 	return
 
 def ActionQItem1Pressed ():
-	ActionQItemPressed (ACT_QSLOT1)
+	ActionQItemPressed (ACT_QSLOT1, 0)
 	return
 
 def ActionQItem2Pressed ():
-	ActionQItemPressed (ACT_QSLOT2)
+	ActionQItemPressed (ACT_QSLOT2, 1)
 	return
 
 def ActionQItem3Pressed ():
-	ActionQItemPressed (ACT_QSLOT3)
+	ActionQItemPressed (ACT_QSLOT3, 2)
 	return
 
 def ActionQItem4Pressed ():
-	ActionQItemPressed (ACT_QSLOT4)
+	ActionQItemPressed (ACT_QSLOT4, 3)
 	return
 
 def ActionQItem5Pressed ():
-	ActionQItemPressed (ACT_QSLOT5)
+	ActionQItemPressed (ACT_QSLOT5, 4)
 	return
 
-def ActionQItemRightPressed (action):
+def ActionQItemRightPressed (which):
 	"""Selects the used ability of the quick item."""
 
-	GemRB.SetVar ("Slot", action)
-	GemRB.SetVar ("ActionLevel", UAW_QITEMS)
-	UpdateActionsWindow ()
+	# iwd2 did not allow for ability selection, but we can be better
+	if GemRB.GetVar ("SettingButtons") or not GameCheck.IsIWD2 ():
+		if GameCheck.IsIWD2 ():
+			which = 15 + which - 19 # the 15 is from slottype.2da, the first inventory quickslot
+		GemRB.SetVar ("Slot", which)
+		SetActionLevel (UAW_QITEMS)
+		UpdateActionsWindow ()
+	else:
+		StartBarConfiguration ()
 	return
 
 def ActionQItem1RightPressed ():
@@ -788,59 +993,87 @@ def ActionQItem5RightPressed ():
 def ActionInnatePressed ():
 	"""Opens the innate spell scrollbar."""
 
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_INNATE)
+		return
+
 	GemRB.SetVar ("QSpell", -1)
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", UAW_INNATES)
+	SetActionLevel (UAW_INNATES)
+	UpdateActionsWindow ()
+	return
+
+def ActionInnateRightPressed ():
+	if GemRB.GetVar ("ActionLevel") == UAW_STANDARD:
+		StartBarConfiguration ()
+		return
+
+	GemRB.SetVar ("QSpell", -1)
+	GemRB.SetVar ("TopIndex", 0)
+	SetActionLevel (UAW_INNATES)
 	UpdateActionsWindow ()
 	return
 
 def ActionSkillsPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_SKILLS)
+		return
+
 	GemRB.SetVar ("TopIndex", 0)
-	GemRB.SetVar ("ActionLevel", UAW_SKILLS)
+	SetActionLevel (UAW_SKILLS)
 	UpdateActionsWindow ()
 	return
 
-def TypeSpellPressed (spelltype):
-	GemRB.SetVar ("Type", 1 << spelltype)
-	GemRB.SetVar ("ActionLevel", UAW_BOOK)
+def ActionSkillsRightPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SetActionLevel (UAW_SKILLS)
+		UpdateActionsWindow ()
+	else:
+		StartBarConfiguration ()
+	return
+
+# the iwd2 spell types work nicely as indices up to domain spells
+# e.g. IE_IWD2_SPELL_BARD = 0 -> ACT_BARD = 40 ... IE_IWD2_SPELL_DOMAIN = 7 -> ACT_DOMAIN = 47
+# BUT IE_IWD2_SPELL_INNATE = 8 -> ACT_INNATE=13
+# songs and shapes we skip; the former are configurable through bardsong, the latter are innates
+def TypeSpellPressed (spellType):
+	if GemRB.GetVar ("SettingButtons"):
+		if spellType <= IE_IWD2_SPELL_DOMAIN:
+			actionType = spellType + ACT_BARD
+		else:
+			actionType = ACT_INNATE
+		SaveActionButton (actionType)
+		return
+
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("Type", 1 << spellType)
+	SetActionLevel (UAW_BOOK)
 	UpdateActionsWindow ()
 	return
 
-def ActionBardSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_BARD)
+def TypeSpellRightPressed (spellType):
+	if GemRB.GetVar ("SettingButtons"):
+		GemRB.SetVar ("TopIndex", 0)
+		GemRB.SetVar ("Type", 1 << spellType)
+		SetActionLevel (UAW_BOOK)
+		UpdateActionsWindow ()
+	else:
+		StartBarConfiguration ()
 	return
 
-def ActionClericSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_CLERIC)
-	return
+# generate the callbacks for individual spellbook buttons
+# innates have their own button, so no need to complicate matters by adding them here
+name2BookType = { "Bard": IE_IWD2_SPELL_BARD, "Cleric": IE_IWD2_SPELL_CLERIC, "Druid": IE_IWD2_SPELL_DRUID,
+								 "Paladin": IE_IWD2_SPELL_PALADIN, "Ranger": IE_IWD2_SPELL_RANGER, "Sorcerer": IE_IWD2_SPELL_SORCERER,
+								 "Wizard": IE_IWD2_SPELL_WIZARD, "Domain": IE_IWD2_SPELL_DOMAIN, "WildShapes": IE_IWD2_SPELL_SHAPE }
+def GenerateSpellButtonActions(name, g, bookType, right = 0):
+	dec = "def Action" + name + "Spell" + suf[right] + "Pressed():\n"
+	dec += "\tTypeSpell" + suf[right] + "Pressed(" + str(bookType) + ")"
+	exec(dec, g) # pass on the same global dict, so we remain in the top scope
 
-def ActionDruidSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_DRUID)
-	return
-
-def ActionPaladinSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_PALADIN)
-	return
-
-def ActionRangerSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_RANGER)
-	return
-
-def ActionSorcererSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_SORCERER)
-	return
-
-def ActionWizardSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_WIZARD)
-	return
-
-def ActionDomainSpellPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_DOMAIN)
-	return
-
-def ActionWildShapesPressed ():
-	TypeSpellPressed(IE_IWD2_SPELL_SHAPE)
-	return
+for name, bookType in name2BookType.items():
+	GenerateSpellButtonActions(name, globals(), bookType)
+	GenerateSpellButtonActions(name, globals(), bookType, 1)
 
 def SpellShiftPressed ():
 	Spell = GemRB.GetVar ("Spell") # spellindex from spellbook jumbled with booktype
@@ -870,11 +1103,7 @@ def SpellShiftPressed ():
 		CureOrHarm = 0
 
 	# get the unshifted booktype
-	BaseType = 0
-	tmp = Type
-	while tmp > 1:
-		tmp = tmp >> 1
-		BaseType += 1
+	BaseType = UnshiftBookType (Type)
 
 	# figure out the spell's details
 	# TODO: find a simpler way
@@ -914,32 +1143,68 @@ def SpellPressed ():
 		ActionBardSongPressed()
 		return
 
-	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
+	Target = None
 	if Type != -1:
 		Type = Spell // 1000
 	Spell = Spell % 1000
 	slot = GemRB.GetVar ("QSpell")
+	if GemRB.GetVar ("SettingButtons"):
+		slot = GemRB.GetVar ("QuickSlotButton") - 3 # 12 buttons, 9 quickspells, first 3 buttons hardcoded
 	if slot is not None:
 		# setup quickspell slot
 		# if spell has no target, return
 		# otherwise continue with casting
 		Target = GemRB.SetupQuickSpell (pc, slot, Spell, Type)
-		# sabotage the immediate casting of self targeting spells
-		if Target == 5 or Target == 7:
-			Type = -1
-			GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
+
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_IWDQSPELL + slot)
+		return
+
+	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
+	# sabotage the immediate casting of self targeting spells
+	if Target == 5 or Target == 7:
+		Type = -1
+		GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
 	if Type==-1:
-		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+		SetActionLevel (UAW_STANDARD)
 		GemRB.SetVar("Type", 0)
 	GemRB.SpellCast (pc, Type, Spell)
 	if GemRB.GetVar ("Type") is not None:
-		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+		SetActionLevel (UAW_STANDARD)
 		# init spell list
 		GemRB.SpellCast (pc, -1, 0)
 	GemRB.SetVar ("TopIndex", 0)
 	UpdateActionsWindow ()
 	return
+
+def SpellRightPressed ():
+	spell = GemRB.GetVar ("Spell")
+	bookType = GemRB.GetVar ("Type")
+	if bookType == -1:
+		return
+	bookType = UnshiftBookType (spell // 1000)
+
+	pc = GemRB.GameGetFirstSelectedActor ()
+	memorized = Spellbook.GetUsableMemorizedSpells(pc, bookType)
+	for mem in memorized:
+		if mem["SpellIndex"] == spell:
+			spellRef = mem["SpellResRef"]
+			break
+	else:
+		return
+
+	if GameCheck.IsIWD2 ():
+		# fake a button
+		btn = lambda: None
+		btn.VarName = "ActionBar"
+		btn.SpellRef = spellRef
+		import GUISPL
+		GUISPL.OpenSpellBookSpellInfoWindow (btn)
+	else:
+		import GUIMG
+		spell = GemRB.GetSpell (spellRef)
+		GUIMG.OpenMageSpellInfoWindow (spell, "Memorized")
 
 def EquipmentPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
@@ -948,8 +1213,23 @@ def EquipmentPressed ():
 	Item = GemRB.GetVar ("Equipment")
 	# equipment index
 	GemRB.UseItem (pc, -1, Item, -1)
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	SetActionLevel (UAW_STANDARD)
 	UpdateActionsWindow ()
+	return
+
+def ActionClearPressed ():
+	SaveActionButton (ACT_NONE)
+	return
+
+def ActionRestorePressed ():
+	pc = GemRB.GameGetFirstSelectedActor ()
+	GemRB.SetupQuickSlot (pc, -1, 0)
+	SetActionLevel (UAW_STANDARD)
+	UpdateActionsWindow ()
+	return
+
+def EmptiedButtonRightPress ():
+	StartBarConfiguration ()
 	return
 
 def ActionStopPressed ():
@@ -967,7 +1247,16 @@ def ActionDefendPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_DEFEND, GA_NO_SELF | GA_NO_ENEMY | GA_NO_HIDDEN)
 
 def ActionThievingPressed ():
+	if GemRB.GetVar ("SettingButtons"):
+		SaveActionButton (ACT_THIEVING)
+		return
+
 	GemRB.GameControlSetTargetMode (TARGET_MODE_PICK, GA_NO_DEAD | GA_NO_SELF | GA_NO_ENEMY | GA_NO_HIDDEN)
+
+def ActionThievingRightPressed ():
+	if GemRB.GetVar ("ActionLevel") != UAW_SKILLS:
+		StartBarConfiguration ()
+	return
 
 def SetupControls (Window, pc, actionOffset, customBar = None):
 	global fistDrawn
@@ -981,31 +1270,20 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 	invInfo = GemRB.GetInventoryInfo (pc)
 	fistDrawn = True
 
-	GUIBT_COUNT = 12
 	for i in range(GUIBT_COUNT):
 		btn = Window.GetControl (i + actionOffset)
 		if not btn:
 			raise RuntimeError("Missing action buttons!")
 
 		action = actionRow[i]
+		action2 = action
 		if action == ACT_NONE:
-			action = -1
+			action2 = -1
 
 		btn.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
-		ret = btn.SetActionIcon (globals(), action, i + 1)
+		ret = btn.SetActionIcon (globals(), action2, i + 1)
 		if ret is not None:
 			raise RuntimeError("Cannot set action button {} to {}!".format(i, action))
-
-		if action != -1:
-			# reset it to the first one, so we can handle them more easily below
-			if (action >= ACT_IWDQSPELL) and (action <= ACT_IWDQSPELL + 9):
-				action = ACT_IWDQSPELL
-			elif (action >= ACT_IWDQITEM) and (action <= ACT_IWDQITEM + 9):
-				action = ACT_IWDQITEM
-			elif (action >= ACT_IWDQSPEC) and (action <= ACT_IWDQSPEC + 9):
-				action = ACT_IWDQSPEC
-			elif (action >= ACT_IWDQSONG) and (action <= ACT_IWDQSONG + 9):
-				action = ACT_IWDQSONG
 
 		state = SetupActionButton (pc, action, btn, i, pcStats, invInfo)
 
@@ -1025,7 +1303,9 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 		btn.SetState (state)
 		# you have to set this overlay up
 		# this state check looks bizarre, but without it most buttons get misrendered
-		btn.EnableBorder (1, state == IE_GUI_BUTTON_DISABLED)
+		# but let various quick spells handle this themselves
+		if action < ACT_IWDQSPELL and not action in [ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3]:
+			btn.EnableBorder (1, state == IE_GUI_BUTTON_DISABLED)
 
 def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 	global fistDrawn
@@ -1033,18 +1313,8 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 	state = IE_GUI_BUTTON_UNPRESSED
 	magicSlot = invInfo["MagicSlot"]
 	fistSlot = invInfo["FistSlot"]
-	weaponSlot = invInfo["WeaponSlot"]
 	usedslot = invInfo["UsedSlot"]
 	modalState = GemRB.GetModalState (pc)
-
-	def SetItemText (btn, charges, oneIsNone):
-		if not btn:
-			return
-
-		if charges and (charges > 1 or not oneIsNone):
-			btn.SetText (str(charges))
-		else:
-			btn.SetText (None)
 
 	def SetQSpellBtn (btn, pc, tmp):
 		if not pcStats:
@@ -1052,17 +1322,29 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 
 		poi = pcStats["QuickSpells"][tmp]
 		if poi == "":
+			# unset quick spell slot, just waiting to be used
 			return IE_GUI_BUTTON_FAKEDISABLED
 
 		btn.SetSpellIcon (poi, 1, 1, i + 1)
 		memorized = Spellbook.HasSpellinfoSpell (pc, poi)
-		if not memorized:
-			return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
 
 		# sigh, get unshifted value back
 		bookType = pcStats["QuickSpellsBookType"][tmp]
 		if bookType > 0:
-			bookType = bin(pcStats["QuickSpellsBookType"][tmp])[::-1].index("1")
+			bookType = UnshiftBookType (bookType)
+
+		# 1 << IE_IWD2_SPELL_SONG is too big for QuickSpellBookType :(
+		# unfortunately so is 1 << IE_IWD2_SPELL_INNATE, so we can't distinguish them
+		if bookType == 0 and modalState == MS_BATTLESONG:
+			return IE_GUI_BUTTON_SELECTED
+		if memorized:
+			btn.EnableBorder(1, False)
+		else:
+			btn.EnableBorder(1, True)
+			return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
+
+		if GameCheck.IsIWD2 () and bookType == 0:
+			bookType = IE_IWD2_SPELL_INNATE
 		memorizedSpells = Spellbook.GetUsableMemorizedSpells (pc, bookType)
 		memorizedCount = 0
 		for sp in memorizedSpells:
@@ -1134,6 +1416,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		levels = levels + int(GemRB.GetPlayerLevel(pc, ISRANGER) >= 4)
 		return levels > 0
 
+	########################################################################
 	SetItemText (btn, 0, False)
 
 	########################################################################
@@ -1178,17 +1461,16 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		# returns true if there is ANY shape
 		if len(GemRB.GetSpelldata (pc, spellType)) == 0:
 			state = IE_GUI_BUTTON_DISABLED
+	elif action == ACT_NONE:
+		btn.OnRightPress (EmptiedButtonRightPress)
+		state = IE_GUI_BUTTON_FAKEDISABLED
 	elif action == ACT_USE:
 		# returns true if there is ANY equipment with a usable header
 		if not invInfo["HasEquippedAbilities"]:
 			state = IE_GUI_BUTTON_DISABLED
 	elif action == ACT_BARDSONG:
-		if GameCheck.IsIWD2 ():
-			spellType = IE_IWD2_SPELL_SONG
-			if not GemRB.GetKnownSpellsCount (pc, spellType):
-				state = IE_GUI_BUTTON_DISABLED
-			elif modalState == MS_BATTLESONG:
-				state = IE_GUI_BUTTON_SELECTED
+		if not GemRB.GetPlayerLevel (pc, ISBARD):
+			state = IE_GUI_BUTTON_DISABLED
 		elif modalState == MS_BATTLESONG:
 			state = IE_GUI_BUTTON_SELECTED
 	elif action == ACT_TURN:
@@ -1217,82 +1499,31 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		if GemRB.GetPlayerStat (pc, IE_ANIMALS) <= 0:
 			state = IE_GUI_BUTTON_DISABLED
 	elif action in [ACT_WEAPON1, ACT_WEAPON2, ACT_WEAPON3, ACT_WEAPON4]:
-		btn.SetBAM ("stonweap", 0, 0)
-		if magicSlot == None:
-			if pcStats:
-				slot = pcStats["QuickWeaponSlots"][action - ACT_WEAPON1]
-			else:
-				slot = weaponSlot + (action - ACT_WEAPON1)
-		else:
-			slot = magicSlot
-
-		item2ResRef = ""
-		skip = False
-		if slot == 0xffff:
-			skip = True
-		if not skip:
-			item = GemRB.GetSlotItem (pc, slot, 1)
-			if item:
-				# no slot translation required
-				launcherSlot = item["LauncherSlot"]
-				if launcherSlot and launcherSlot != fistSlot:
-					# launcher/projectile in this slot
-					item2 = GemRB.GetSlotItem (pc, launcherSlot, 1)
-					item2ResRef = item2["ItemResRef"]
-			else:
-				skip = True
-		if not skip:
-			if slot == fistSlot:
-				if fistDrawn:
-					fistDrawn = False
-				else:
-					# empty weapon slot, already drawn
-					skip = True
-
-		if not skip:
-			btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1, item2ResRef)
-			if pcStats:
-				SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][action - ACT_WEAPON1])], True)
-			else:
-				SetItemText (btn, 0, True)
-			if usedslot == slot:
-				btn.EnableBorder (0, True)
-				if GemRB.GameControlGetTargetMode () == TARGET_MODE_ATTACK:
-					state = IE_GUI_BUTTON_SELECTED
-				else:
-					state = IE_GUI_BUTTON_FAKEDISABLED
-			else:
-				btn.EnableBorder (0, False)
-	elif action == ACT_IWDQSPELL:
+		realAction = action
+		if GameCheck.IsIWD2 () and pcStats and usedslot in pcStats["QuickWeaponSlots"]:
+			# pick the selected weapon set instead, unless the magic slot is in use
+			realAction = ACT_WEAPON1 + pcStats["QuickWeaponSlots"].index(usedslot)
+		state = SetWeaponButton (btn, realAction, pc, pcStats, invInfo)
+	elif action == ACT_OFFHAND: # only used in iwd2
+		state = SetOffHandButton (btn, pc, pcStats, magicSlot, usedslot, fistSlot)
+	elif (action >= ACT_IWDQSPELL) and (action <= ACT_IWDQSPELL + 9):
 		btn.SetBAM ("stonspel", 0, 0)
-		if GameCheck.IsIWD2 () and i > 3:
-			tmp = i - 3
-		else:
-			tmp = 0
+		tmp = action - ACT_IWDQSPELL
 		state = SetQSpellBtn (btn, pc, tmp)
-	elif action == ACT_IWDQSONG:
+	elif (action >= ACT_IWDQSONG) and (action <= ACT_IWDQSONG + 9):
 		btn.SetBAM ("stonsong", 0, 0)
-		if GameCheck.IsIWD2 () and i > 3:
-			tmp = i - 3
-		else:
-			tmp = 0
+		tmp = action - ACT_IWDQSONG
 		state = SetQSpellBtn (btn, pc, tmp)
-	elif action == ACT_IWDQSPEC:
+	elif (action >= ACT_IWDQSPEC) and (action <= ACT_IWDQSPEC + 9):
 		btn.SetBAM ("stonspec", 0, 0)
-		if GameCheck.IsIWD2 () and i > 3:
-			tmp = i - 3
-		else:
-			tmp = 0
+		tmp = action - ACT_IWDQSPEC
 		state = SetQSpellBtn (btn, pc, tmp)
 	elif action in [ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3]:
 		btn.SetBAM ("stonspel", 0, 0)
 		tmp = action - ACT_QSPELL1
 		state = SetQSpellBtn (btn, pc, tmp)
-	elif action == ACT_IWDQITEM:
-		if i > 3:
-			tmp = (i + 1) % 3
-		else:
-			tmp = 0
+	elif (action >= ACT_IWDQITEM) and (action <= ACT_IWDQITEM + 9):
+		tmp = action - ACT_IWDQITEM
 		state = SetQSlotBtn (btn, pc, tmp, action)
 	elif action == ACT_QSLOT1:
 		tmp = 0
@@ -1311,3 +1542,102 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		state = SetQSlotBtn (btn, pc, tmp, action)
 
 	return state
+
+def SetItemText (btn, charges, oneIsNone):
+	if not btn:
+		return
+
+	if charges and (charges > 1 or not oneIsNone):
+		btn.SetText (str(charges))
+	else:
+		btn.SetText (None)
+
+def SetWeaponButton (btn, action, pc, pcStats, invInfo):
+	global fistDrawn
+
+	magicSlot = invInfo["MagicSlot"]
+	fistSlot = invInfo["FistSlot"]
+	weaponSlot = invInfo["WeaponSlot"]
+	usedSlot = invInfo["UsedSlot"]
+
+	btn.SetBAM ("stonweap", 0, 0)
+	state = IE_GUI_BUTTON_UNPRESSED
+	if magicSlot == None:
+		if pcStats:
+			slot = pcStats["QuickWeaponSlots"][action - ACT_WEAPON1]
+		else:
+			slot = weaponSlot + (action - ACT_WEAPON1)
+	else:
+		slot = magicSlot
+		action = ACT_WEAPON1 # avoid oob-ing QuickWeaponHeaders
+
+	item2ResRef = ""
+	if slot == 0xffff:
+		return state
+
+	item = GemRB.GetSlotItem (pc, slot, 1)
+	if not item:
+		return state
+
+	# no slot translation required
+	launcherSlot = item["LauncherSlot"]
+	if launcherSlot and launcherSlot != fistSlot:
+		# launcher/projectile in this slot
+		item2 = GemRB.GetSlotItem (pc, launcherSlot, 1)
+		item2ResRef = item2["ItemResRef"]
+
+	if slot == fistSlot:
+		if fistDrawn:
+			fistDrawn = False
+		else:
+			# empty weapon slot, already drawn
+			return state
+
+	btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1, item2ResRef)
+	if pcStats:
+		SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][action - ACT_WEAPON1])], True)
+	else:
+		SetItemText (btn, 0, True)
+
+	if usedSlot == slot:
+		btn.EnableBorder (0, True)
+		if GemRB.GameControlGetTargetMode () == TARGET_MODE_ATTACK:
+			state = IE_GUI_BUTTON_SELECTED
+		else:
+			state = IE_GUI_BUTTON_FAKEDISABLED
+	else:
+		btn.EnableBorder (0, False)
+
+	return state
+
+def SetOffHandButton (btn, pc, pcStats, magicSlot, usedSlot, fistSlot):
+	if magicSlot == None:
+		offhandSlot = usedSlot + 1
+	else:
+		offhandSlot = magicSlot
+
+	item = GemRB.GetSlotItem (pc, offhandSlot, 1)
+	state = IE_GUI_BUTTON_LOCKED
+	if item and usedSlot != fistSlot and item["LauncherSlot"] == 0:
+		btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1)
+		if pcStats and offhandSlot in pcStats["QuickWeaponSlots"]:
+			qwIdx = pcStats["QuickWeaponSlots"].index(offhandSlot)
+			SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][qwIdx])], True)
+		else:
+			SetItemText (btn, 0, True)
+		btn.EnableBorder (0, True)
+		if GemRB.GameControlGetTargetMode () == TARGET_MODE_ATTACK:
+			state = IE_GUI_BUTTON_SELECTED
+		else:
+			state = IE_GUI_BUTTON_FAKEDISABLED
+	else:
+		btn.SetBAM ("stonshil", 0, 0)
+	return state
+
+def SetActionLevel (level):
+	GemRB.SetVar ("ActionLevel", level)
+	if level == UAW_STANDARD:
+		GemRB.SetVar ("SettingButtons", 0)
+
+def UnshiftBookType (bookType):
+	return bin(bookType)[::-1].index("1")

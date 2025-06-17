@@ -1,6 +1,6 @@
 2DA V1.0
 guibtact
-            1          2          3          4          TOOLTIP    RESREF
+            ENABLED    PRESSED    SELECTED   DISABLED   TOOLTIP    RESREF
 Stealth     28         29         30         31         4968       guibtact
 Thieving    24         25         26         27         4971       guibtact
 Cast        8          9          10         11         4688       guibtact
@@ -29,14 +29,14 @@ Taming      124        125        126        127        4974       guibtact
 Skills      96         97         98         99         4933       guibtact
 Wilderness  92         93         94         95         32186      guibtact
 27          *          *          *          *          *          *
-28          *          *          *          *          *          *
+Offhand     0          1          24         25         4950       guibtbut
 29          *          *          *          *          *          *
 30          *          *          *          *          *          *
 31          *          *          *          *          *          *
 Left        48         49         50         51         -1         guibtact
 Right       52         53         54         55         -1         guibtact
-34          *          *          *          *          *          *
-35          *          *          *          *          *          *
+Clear       116        117        118        119        39723      guibtact
+Restore     120        121        122        123        39724      guibtact
 36          *          *          *          *          *          *
 37          *          *          *          *          *          *
 38          *          *          *          *          *          *
@@ -81,13 +81,13 @@ QSpec7      0          1          2          0          37435      guibtbut
 QSpec8      0          1          2          0          37435      guibtbut
 QSpec9      0          1          2          0          37435      guibtbut
 79          *          *          *          *          *          *
-QSong1      0          1          2          0          37436      guibtbut
-QSong2      0          1          2          0          37436      guibtbut
-QSong3      0          1          2          0          37436      guibtbut
-QSong4      0          1          2          0          37436      guibtbut
-QSong5      0          1          2          0          37436      guibtbut
-QSong6      0          1          2          0          37436      guibtbut
-QSong7      0          1          2          0          37436      guibtbut
-QSong8      0          1          2          0          37436      guibtbut
-QSong9      0          1          2          0          37436      guibtbut
+QSong1      20         21         22         23         37436      guibtact
+QSong2      20         21         22         23         37436      guibtact
+QSong3      20         21         22         23         37436      guibtact
+QSong4      20         21         22         23         37436      guibtact
+QSong5      20         21         22         23         37436      guibtact
+QSong6      20         21         22         23         37436      guibtact
+QSong7      20         21         22         23         37436      guibtact
+QSong8      20         21         22         23         37436      guibtact
+QSong9      20         21         22         23         37436      guibtact
 89

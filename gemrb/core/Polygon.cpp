@@ -22,7 +22,7 @@
 #include "Geometry.h"
 
 #include <algorithm>
-#include <cstring>
+#include <cassert>
 #include <vector>
 
 namespace GemRB {

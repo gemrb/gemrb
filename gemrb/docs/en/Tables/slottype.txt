@@ -9,6 +9,7 @@ Columns:
        FLAGS  - fine tuning of slot mechanics:
          - 0: normal
          - 1: this slot cannot be stolen from (used for eg. the fists slot)
+         - 2: use SetPicture instead of SetBAM (supports more file formats)
 
 Rows: each row represents a creature item slot, even unused or invisible slots must be represented.
 

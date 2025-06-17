@@ -26,6 +26,8 @@
 #include <SDL.h>
 // clang-format on
 
+#include "globals.h"
+
 #include "Polygon.h"
 #include "SDLPixelIterator.h"
 

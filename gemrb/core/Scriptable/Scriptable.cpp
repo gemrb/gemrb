@@ -19,26 +19,22 @@
 
 #include "Scriptable/Scriptable.h"
 
+#include "ie_stats.h"
 #include "strrefs.h"
-#include "voodooconst.h"
 
 #include "DialogHandler.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "Map.h"
 #include "Projectile.h"
-#include "RNG.h"
 #include "Spell.h"
-#include "Sprite2D.h"
 
-#include "GUI/GUIAnimation.h"
 #include "GUI/GameControl.h"
-#include "GUI/TextSystem/Font.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
 #include "Scriptable/Highlightable.h"
-#include "Video/Video.h"
 
 #include <utility>
 
@@ -50,6 +46,7 @@ static bool startActive = false;
 static bool third = false;
 static bool pst_flags = false;
 static const unsigned short ClearActionsID = 133; // same for all games
+unsigned int Scriptable::VOODOO_VISUAL_RANGE = 28;
 
 /***********************
  *  Scriptable Class   *
@@ -458,6 +455,7 @@ void Scriptable::ClearActions(int skipFlags)
 			if (skipFlags == 3 && aC == CurrentAction && savedCurrentAction) continue;
 
 			actionQueue.pop_front();
+			i--;
 			aC->Release();
 		}
 	}
@@ -886,7 +884,7 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const
 			if (spl->SpellType == IE_SPL_INNATE) {
 				str = fmt::format(u"{} : {}", spell, target->GetName());
 			} else {
-				const String msg = core->GetString(DisplayMessage::GetStringReference(HCStrings::ActionCast), STRING_FLAGS::NONE);
+				const String msg = core->GetString(HCStrings::ActionCast, STRING_FLAGS::NONE);
 				str = fmt::format(u"{} {} : {}", msg, spell, target->GetName());
 			}
 		} else {
@@ -972,7 +970,7 @@ void Scriptable::CastSpellPointEnd(int level, bool keepStance)
 
 	if (!keepStance) {
 		// yep, the original didn't use the casting channel for this!
-		core->GetAudioDrv()->Play(spl->CompletionSound, SFXChannel::Missile, Pos, GEM_SND_SPATIAL);
+		core->GetAudioPlayback().Play(spl->CompletionSound, AudioPreset::Spatial, SFXChannel::Missile, Pos);
 	}
 
 	CreateProjectile(SpellResRef, 0, level, false);
@@ -1048,7 +1046,7 @@ void Scriptable::CastSpellEnd(int level, bool keepStance)
 	}
 
 	if (!keepStance) {
-		core->GetAudioDrv()->Play(spl->CompletionSound, SFXChannel::Missile, Pos, GEM_SND_SPATIAL);
+		core->GetAudioPlayback().Play(spl->CompletionSound, AudioPreset::Spatial, SFXChannel::Missile, Pos);
 	}
 
 	//if the projectile doesn't need to follow the target, then use the target position
@@ -1174,7 +1172,7 @@ void Scriptable::SpellcraftCheck(const Actor* caster, const ResRef& spellRef)
 	const Spell* spl = gamedata->GetSpell(spellRef);
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
-	std::vector<Actor*> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD | GA_NO_ENEMY | GA_NO_SELF | GA_NO_UNSCHEDULED, caster->GetBase(IE_VISUALRANGE), this);
+	std::vector<Actor*> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD | GA_NO_ENEMY | GA_NO_SELF | GA_NO_UNSCHEDULED, caster->GetVisualRange(), this);
 	for (const auto& detective : neighbours) {
 		// disallow neutrals from helping the party
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
@@ -1190,7 +1188,7 @@ void Scriptable::SpellcraftCheck(const Actor* caster, const ResRef& spellRef)
 
 		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
 			// eg. .:Casts Word of Recall:.
-			const String castmsg = core->GetString(DisplayMessage::GetStringReference(HCStrings::Casts));
+			const String castmsg = core->GetString(HCStrings::Casts);
 			const String spellname = core->GetString(spl->SpellName);
 			overHead.SetText(fmt::format(u".:{} {}:.", castmsg, spellname));
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL15, GUIColors::LIGHTGREY, detective, Spellcraft + IntMod, AdjustedSpellLevel, IntMod);
@@ -1446,7 +1444,7 @@ int Scriptable::CheckWildSurge()
 			// display feedback: Wild Surge: bla bla
 			// look up the spell in the "check" row of wildmag.2da
 			const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
-			const String s1 = core->GetString(DisplayMessage::GetStringReference(HCStrings::WildSurge), STRING_FLAGS::NONE);
+			const String s1 = core->GetString(HCStrings::WildSurge, STRING_FLAGS::NONE);
 			const String s2 = core->GetString(surgeSpell.message, STRING_FLAGS::NONE);
 			displaymsg->DisplayStringName(s1 + u" " + s2, GUIColors::WHITE, this);
 
@@ -1618,6 +1616,16 @@ bool Scriptable::AuraPolluted()
 
 	// sorry, you'll have to recover first
 	return true;
+}
+
+unsigned int Scriptable::GetVisualRange() const
+{
+	if (pst_flags || Type != ST_ACTOR) {
+		// everyone uses the same range
+		return VOODOO_VISUAL_RANGE;
+	}
+	const Actor* actor = static_cast<const Actor*>(this);
+	return actor->GetStat(IE_VISUALRANGE);
 }
 
 bool Scriptable::TimerActive(ieDword ID)

@@ -25,6 +25,8 @@
 #include "PluginMgr.h"
 #include "TableMgr.h" //needed for autotable
 
+#include "Logging/Logging.h"
+
 using namespace GemRB;
 
 //cannot call this at the time of initialization because the tablemanager isn't alive yet

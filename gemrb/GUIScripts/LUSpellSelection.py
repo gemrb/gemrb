@@ -73,7 +73,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	global KitMask, EnhanceGUI, Memorization, SpellBookType, SpellsPickButton, ButtonCount, Class
 
 	#enhance GUI?
-	if (GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS) and not IWD2:
+	if not IWD2:
 		EnhanceGUI = 1
 
 	# save our pc
@@ -119,7 +119,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			CharOverview.PositionCharGenWin (SpellsWindow)
 
 		DoneButton = SpellsWindow.GetControl (0)
-		SpellsTextArea = SpellsWindow.GetControl (27)
+		SpellsTextArea = SpellsWindow.GetControl (41 if GameCheck.IsBG2EE() else 27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
 		if (EnhanceGUI):
 			sb = SpellsWindow.CreateScrollBar (NewScrollBarID, {'x' : 325, 'y' : 42, 'w' : 16, 'h' : 252})
@@ -128,14 +128,15 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 
 		# cancel button only applicable for chargen
 		SpellsCancelButton = SpellsWindow.GetControl(29)
-		SpellsCancelButton.SetState(IE_GUI_BUTTON_ENABLED)
-		SpellsCancelButton.OnPress (SpellsCancelPress)
-		SpellsCancelButton.SetText(13727)
-		SpellsCancelButton.MakeEscape()
+		if SpellsCancelButton:
+			SpellsCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
+			SpellsCancelButton.OnPress (SpellsCancelPress)
+			SpellsCancelButton.SetText (13727)
+			SpellsCancelButton.MakeEscape ()
 
 		if (recommend):
 			# recommended spell picks
-			SpellsPickButton = SpellsWindow.GetControl(30)
+			SpellsPickButton = SpellsWindow.GetControl (43 if GameCheck.IsBG2EE() else 30)
 			SpellsPickButton.SetState(IE_GUI_BUTTON_ENABLED)
 			SpellsPickButton.OnPress (SpellsPickPress)
 			SpellsPickButton.SetText(34210)

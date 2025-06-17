@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2025 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,40 +21,57 @@
 #ifndef NULLSOUND_H
 #define NULLSOUND_H
 
-#include "Audio.h"
+#include "Audio/AudioBackend.h"
 
 namespace GemRB {
 
-class NullSound : public Audio {
+class NullSoundBufferHandle : public SoundBufferHandle {
 public:
-	NullSound(void);
-	~NullSound(void) override;
-	bool Init(void) override;
-	Holder<SoundHandle> Play(StringView ResRef, SFXChannel channel,
-				 const Point&, unsigned int flags = 0, tick_t* length = nullptr) override;
-	int CreateStream(ResourceHolder<SoundMgr>) override;
-	bool Play() override;
-	bool Stop() override;
-	bool Pause() override;
-	bool Resume() override;
-	bool CanPlay() override;
-	void ResetMusics() final;
-	void UpdateListenerPos(const Point&) override;
-	Point GetListenerPos() override;
-	void UpdateVolume(unsigned int) override {}
-
-	int SetupNewStream(int x, int y, int z, ieWord gain, bool point, int ambientRange) override;
-	tick_t QueueAmbient(int stream, const ResRef& sound, bool ambient) override;
-	bool ReleaseStream(int stream, bool hardstop) override;
-	void SetAmbientStreamVolume(int stream, int gain) override;
-	void SetAmbientStreamPitch(int stream, int pitch) override;
-	void QueueBuffer(int stream, unsigned short bits, int channels,
-			 short* memory, int size, int samplerate) override;
-
-private:
-	Point pos;
+	bool Disposable() override { return true; }
 };
 
+class NullSoundSourceHandle : public SoundSourceHandle {
+public:
+	bool Enqueue(Holder<SoundBufferHandle>) override { return true; }
+	bool HasFinishedPlaying() const override { return true; }
+	void Reconfigure(const AudioPlaybackConfig&) override { /* null */ }
+	void Stop() override { /* null */ }
+	void StopLooping() override { /* null */ }
+	void SetPitch(int) override { /* null */ }
+	void SetPosition(const AudioPoint&) override { /* null */ }
+	void SetVolume(int) override { /* null */ }
+};
+
+class NullSoundStreamSourceHandle : public SoundStreamSourceHandle {
+public:
+	bool Feed(const AudioBufferFormat&, const char*, size_t) override
+	{
+		return true;
+	}
+	bool HasProcessed() override { return true; }
+	void Pause() override { /* null */ }
+	void Resume() override { /* null */ }
+	void Stop() override { /* null */ }
+
+	void SetVolume(int) override { /* null */ }
+};
+
+class NullSound : public AudioBackend {
+public:
+	bool Init() override { return true; };
+
+	Holder<SoundSourceHandle> CreatePlaybackSource(const AudioPlaybackConfig&, bool priority = false) override;
+	Holder<SoundStreamSourceHandle> CreateStreamable(const AudioPlaybackConfig&, size_t) override;
+	Holder<SoundBufferHandle> LoadSound(ResourceHolder<SoundMgr> resource, const AudioPlaybackConfig&) override;
+
+	const AudioPoint& GetListenerPosition() const override { return point; }
+	void SetListenerPosition(const AudioPoint& p) override { point = p; }
+
+	StreamMode GetStreamMode() const override { return StreamMode::POLLING; }
+
+private:
+	AudioPoint point;
+};
 }
 
 #endif

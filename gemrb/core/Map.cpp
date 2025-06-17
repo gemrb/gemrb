@@ -23,11 +23,9 @@
 #include "Map.h"
 
 #include "ie_cursors.h"
+#include "ie_stats.h"
 #include "strrefs.h"
 
-#include "Ambient.h"
-#include "AmbientMgr.h"
-#include "Audio.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
@@ -47,8 +45,8 @@
 #include "TileMap.h"
 #include "VEFObject.h"
 
+#include "Audio/Ambient.h"
 #include "GUI/GameControl.h"
-#include "GUI/Window.h"
 #include "GameScript/GSUtils.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
@@ -57,7 +55,6 @@
 
 #include <array>
 #include <cassert>
-#include <limits>
 #include <unordered_map>
 #include <utility>
 
@@ -483,8 +480,7 @@ Map::~Map(void)
 		delete particle;
 	}
 
-	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
-	ambim->RemoveAmbients(ambients);
+	core->GetAmbientManager().RemoveAmbients(ambients);
 	for (auto ambient : ambients) {
 		delete ambient;
 	}
@@ -661,7 +657,7 @@ void Map::DrawPortal(const InfoPoint* ip, int enable)
 			sca->SetBlend();
 			sca->PlayOnce();
 			//exact position, because HasVVCCell depends on the coordinates, PST had no coordinate offset anyway
-			sca->Pos = ip->Pos;
+			sca->SetPos(ip->Pos);
 			//this is actually ordered by time, not by height
 			sca->ZOffset = gotPortal;
 			AddVVCell(sca);
@@ -883,7 +879,7 @@ void Map::UpdateScripts()
 
 		// Play the PST specific enter sound
 		if (wasActive & _TRAP_USEPOINT) {
-			core->GetAudioDrv()->Play(ip->EnterWav, SFXChannel::Actions, ip->TrapLaunch);
+			core->GetAudioPlayback().Play(ip->EnterWav, AudioPreset::Spatial, SFXChannel::Actions, ip->TrapLaunch);
 		}
 		ip->Update();
 	}
@@ -3256,8 +3252,7 @@ WMPDirection Map::WhichEdge(const NavmapPoint& s) const
 //--------ambients----------------
 void Map::SetAmbients(std::vector<Ambient*> ambs, MapReverb::id_t id)
 {
-	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
-	ambim->RemoveAmbients(ambients);
+	core->GetAmbientManager().RemoveAmbients(ambients);
 	for (auto ambient : ambients) {
 		delete ambient;
 	}
@@ -3273,9 +3268,9 @@ void Map::SetAmbients(std::vector<Ambient*> ambs, MapReverb::id_t id)
 
 void Map::SetupAmbients() const
 {
-	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
-	ambim->Reset();
-	ambim->SetAmbients(ambients);
+	AmbientMgr& ambim = core->GetAmbientManager();
+	ambim.Reset();
+	ambim.SetAmbients(ambients);
 }
 
 void Map::AddMapNote(const Point& point, ieWord color, String text, bool readonly)
@@ -3328,9 +3323,9 @@ void Map::LoadIniSpawn()
 	}
 }
 
-bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& radius, ieWord rwdist, int* difficulty, unsigned int* creCount)
+ScriptID Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& radius, ieWord rwdist, int* difficulty, unsigned int* creCount)
 {
-	bool spawned = false;
+	ScriptID spawned = 0;
 	const SpawnGroup* sg = nullptr;
 	bool first = (creCount ? *creCount == 0 : true);
 	int level = (difficulty ? *difficulty : core->GetGame()->GetTotalPartyLevel(true));
@@ -3341,7 +3336,7 @@ bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& r
 		if (first || (level >= sg->Level())) {
 			count = sg->Count();
 		} else {
-			return false;
+			return 0;
 		}
 	}
 
@@ -3366,7 +3361,7 @@ bool Map::SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& r
 			creature->RefreshEffects();
 			if (difficulty && !sg) *difficulty -= cpl;
 			if (creCount) (*creCount)++;
-			spawned = true;
+			spawned = creature->GetGlobalID();
 		}
 	}
 
@@ -3589,7 +3584,10 @@ void Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los)
 void Map::UpdateFog()
 {
 	TRACY(ZoneScoped);
-	VisibleBitmap.fill(0);
+	// don't reset in cutscenes just in case the PST ExploreMapChunk action was ran
+	if (!core->InCutSceneMode()) {
+		VisibleBitmap.fill(0);
+	}
 
 	std::set<Spawn*> potentialSpawns;
 	for (const auto actor : actors) {
@@ -3598,7 +3596,7 @@ void Map::UpdateFog()
 		int state = actor->Modified[IE_STATE_ID];
 		if (state & STATE_CANTSEE) continue;
 
-		int vis2 = actor->Modified[IE_VISUALRANGE];
+		int vis2 = actor->GetVisualRange();
 		if ((state & STATE_BLIND) || (vis2 < 2)) vis2 = 2; //can see only themselves
 		ExploreMapChunk(actor->SMPos, vis2 + actor->GetAnims()->GetCircleSize(), 1);
 
@@ -4149,7 +4147,7 @@ Actor* Map::GetRandomEnemySeen(const Actor* origin) const
 	}
 
 	int flags = GA_NO_HIDDEN | GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF;
-	std::vector<Actor*> neighbours = GetAllActorsInRadius(origin->Pos, flags, origin->GetBase(IE_VISUALRANGE), origin);
+	std::vector<Actor*> neighbours = GetAllActorsInRadius(origin->Pos, flags, origin->GetVisualRange(), origin);
 	Actor* victim = neighbours[RAND<size_t>(0, neighbours.size() - 1)];
 
 	if (type == GroupType::PC) {

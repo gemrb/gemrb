@@ -21,18 +21,11 @@
 #include "GUI/Button.h"
 
 #include "defsounds.h"
-#include "ie_cursors.h"
 
-#include "Audio.h"
-#include "Game.h"
-#include "GameData.h"
 #include "Interface.h"
-#include "Palette.h"
 
 #include "GUI/EventMgr.h"
-#include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
-#include "Logging/Logging.h"
 
 #include <utility>
 
@@ -149,8 +142,9 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 				Image = buttonImages[ButtonImage::Unpressed];
 				break;
 		}
+		BlitFlags bf = flags & IE_GUI_BUTTON_SHADE_BASE ? BlitFlags::HALFTRANS : BlitFlags::NONE;
 		if (Image) {
-			VideoDriver->BlitSprite(Image, rgn.origin);
+			VideoDriver->BlitSprite(Image, rgn.origin, nullptr, bf);
 		}
 	}
 
@@ -256,8 +250,14 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		Region r = rgn;
 		if (Picture && flags & IE_GUI_BUTTON_PICTURE) {
 			// constrain the label (status icons) to the picture bounds
+			// but not inventory icons nor quick slots
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
-			r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
+			if (align == (IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_BOTTOM)) {
+				r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
+			} else {
+				r.w -= 4;
+				r.h -= 4;
+			}
 		} else if (flags & IE_GUI_BUTTON_ANCHOR) {
 			r.x += Anchor.x;
 			r.y += Anchor.y;
@@ -463,7 +463,7 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 		}
 		SetState(PRESSED);
 		if (flags & IE_GUI_BUTTON_SOUND) {
-			core->PlaySound(DS_BUTTON_PRESSED, SFXChannel::GUI);
+			core->GetAudioPlayback().PlayDefaultSound(DS_BUTTON_PRESSED, SFXChannel::GUI);
 		}
 	}
 	return Control::OnMouseDown(me, mod);
@@ -490,7 +490,8 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		SetState(UNPRESSED);
 	}
 
-	if (me.button == GEM_MB_ACTION) {
+	// not sure why we limit this on checkboxes and radios - perhaps to match the originals?
+	if (me.button == GEM_MB_ACTION || !(flags & (IE_GUI_BUTTON_CHECKBOX | IE_GUI_BUTTON_RADIOBUTTON))) {
 		DoToggle();
 	}
 	return Control::OnMouseUp(me, mod);

@@ -28,12 +28,13 @@
 
 #include "exports.h"
 
-#include "Animation.h"
 #include "Sprite2D.h"
 
 #include "GUI/Control.h"
 
 namespace GemRB {
+
+class Animation;
 
 /**
  * @class Progressbar

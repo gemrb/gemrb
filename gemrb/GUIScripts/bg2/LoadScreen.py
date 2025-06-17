@@ -73,7 +73,7 @@ def StartLoadScreen ():
 			Middle = LoadScreen.GetControl (3)
 			Middle.SetBAM ("COADCNTR", 1, 0)
 	
-		LoadScreen.SetAction(lambda win: GemRB.GamePause(0, 0), ACTION_WINDOW_CLOSED)
+		LoadScreen.OnClose (lambda win: GemRB.GamePause(0, 0))
 		GemRB.SetTimer(LoadScreen.Close, 500, 0)
 		return
 

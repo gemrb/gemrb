@@ -21,10 +21,10 @@
 #include "TextArea.h"
 
 #include "Interface.h"
+#include "Timer.h"
 
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
-#include "GUI/Window.h"
 #include "Logging/Logging.h"
 
 #include <utility>
@@ -675,6 +675,8 @@ void TextArea::SetScrollbar(ScrollBar* sb)
 
 	Point origin = ConvertPointFromWindow(sb->Frame().origin);
 	sb->SetFrameOrigin(origin);
+	// reset increment, since the scrollbar was not attached in the ctor
+	sb->StepIncrement = LineHeight();
 
 	scrollview.SetVScroll(sb);
 }

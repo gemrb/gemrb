@@ -41,12 +41,8 @@
 #include <climits>
 #include <cstdint>
 #include <map>
-#include <vector>
 
 namespace GemRB {
-
-class Control;
-class Window;
 
 #define GEM_LEFT   0x81
 #define GEM_RIGHT  0x82

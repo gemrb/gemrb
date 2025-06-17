@@ -42,6 +42,7 @@
 #include "Map.h"
 #include "RNG.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 #if USE_TRACY
 	#include "tracy/TracyC.h"

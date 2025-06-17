@@ -23,8 +23,11 @@
 #include "RNG.h"
 
 #include "GameScript/GameScript.h"
+#include "Scriptable/Scriptable.h"
 
 namespace GemRB {
+
+enum BlitFlags : uint32_t;
 
 Dialog::~Dialog(void)
 {

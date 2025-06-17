@@ -20,12 +20,16 @@
 
 #include "DisplayMessage.h"
 
+#include "ie_stats.h" // can be removed once IE_* stats get converted to an enum class
+
 #include "Interface.h"
+#include "StringMgr.h"
 #include "TableMgr.h"
 
 #include "GUI/GameControl.h"
 #include "GUI/Label.h"
 #include "GUI/TextArea.h"
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {

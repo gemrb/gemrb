@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003-2004 The GemRB Project
+ * Copyright (C) 2025 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,24 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- *
  */
 
-#ifndef OPENALAUDIO_H_INCLUDED
-#define OPENALAUDIO_H_INCLUDED
+#ifndef H_OPENAL_AUDIO
+#define H_OPENAL_AUDIO
 
-#include "ie_types.h"
+#include "config.h"
 
-#include "AmbientMgr.h"
-#include "Audio.h"
-#include "LRUCache.h"
-#include "MusicMgr.h"
-#include "SoundMgr.h"
-
-#include "Streams/FileStream.h"
-
-#include <mutex>
-#include <thread>
 #include <utility>
 
 #if __APPLE__
@@ -45,177 +34,93 @@
 	#endif
 #endif
 
-#define RETRY              5
-#define BUFFER_CACHE_SIZE  100
-#define MAX_STREAMS        30
-#define MUSICBUFFERS       10
-#define REFERENCE_DISTANCE 50
-#define ACM_BUFFERSIZE     8192
-
-#define LISTENER_HEIGHT 200.0f
+#include "Audio/AudioBackend.h"
 
 namespace GemRB {
 
-class OpenALSoundHandle : public SoundHandle {
-protected:
-	struct AudioStream* parent;
+using ALPair = std::pair<ALuint, ALuint>;
 
+class OpenALBufferHandle : public SoundBufferHandle {
 public:
-	explicit OpenALSoundHandle(AudioStream* p)
-		: parent(p) {}
-	void SetPos(const Point&) override;
-	bool Playing() override;
+	explicit OpenALBufferHandle(ALPair buffers);
+	OpenALBufferHandle(const OpenALBufferHandle& other) = delete;
+	OpenALBufferHandle(OpenALBufferHandle&& other) noexcept;
+	~OpenALBufferHandle() override;
+
+	bool Disposable() override;
+	ALPair GetBuffers() const;
+	AudioBufferFormat GetFormat() const;
+
+private:
+	ALPair buffers;
+};
+
+class OpenALSourceHandle : public SoundSourceHandle {
+public:
+	OpenALSourceHandle(ALPair sources, const AudioPlaybackConfig&);
+	OpenALSourceHandle(const OpenALSourceHandle& other) = delete;
+	OpenALSourceHandle(OpenALSourceHandle&& other) noexcept;
+	~OpenALSourceHandle() override;
+
+	bool Enqueue(Holder<SoundBufferHandle> handle) override;
+	bool HasFinishedPlaying() const override;
+	void Reconfigure(const AudioPlaybackConfig& config) override;
 	void Stop() override;
 	void StopLooping() override;
-	void Invalidate() { parent = 0; }
+	void SetPosition(const AudioPoint&) override;
+	void SetPitch(int pitch) override;
+	void SetVolume(int volume) override;
+
+private:
+	AudioBufferFormat lastFormat;
+	ALPair sources;
+	int channelVolume;
 };
 
-using OpenALuintPair = std::pair<ALuint, ALuint>;
-
-struct AudioStream {
-	// Spatial stereo is laid out as two sources and buffers,
-	// for every other case, just the first value is relevant.
-	OpenALuintPair buffers = { 0, 0 };
-	OpenALuintPair sources = { 0, 0 };
-	int Duration = 0;
-	bool free = true;
-	bool ambient = false;
-	bool locked = false;
-	bool delete_buffers = false;
-
-	void ClearIfStopped();
-	bool ClearIfStopped(ALuint source);
-	void ClearProcessedBuffers() const;
-	void ClearProcessedBuffers(ALuint source) const;
-	void ForceClear();
-	void SetPitch(int pitch) const;
-	void SetPos(const Point&) const;
-	void SetVolume(int volume) const;
-	void StopLooping() const;
-	void Stop() const;
-	void Stop(ALuint source) const;
-
-	Holder<OpenALSoundHandle> handle;
-};
-
-struct CacheEntry {
-	OpenALuintPair Buffer;
-	tick_t Length;
-
-	CacheEntry(OpenALuintPair buffer, tick_t length)
-		: Buffer(buffer), Length(length) {}
-	CacheEntry(const CacheEntry&) = delete;
-	CacheEntry(CacheEntry&& other) noexcept
-		: Buffer(other.Buffer), Length(other.Length)
-	{
-		other.Buffer = { 0, 0 };
-	}
-	CacheEntry& operator=(const CacheEntry&) = delete;
-	CacheEntry& operator=(CacheEntry&& other) noexcept
-	{
-		this->Buffer = other.Buffer;
-		other.Buffer = { 0, 0 };
-		this->Length = other.Length;
-
-		return *this;
-	}
-
-	void evictionNotice()
-	{
-		Buffer = { 0, 0 };
-	}
-
-	~CacheEntry()
-	{
-		alDeleteBuffers(1, &Buffer.first);
-		if (Buffer.second != 0) {
-			alDeleteBuffers(1, &Buffer.second);
-		}
-	}
-};
-
-struct OpenALPlaying {
-	bool operator()(const CacheEntry& entry) const
-	{
-		alDeleteBuffers(1, &entry.Buffer.first);
-		bool success = alGetError() == AL_NO_ERROR;
-
-		if (success && entry.Buffer.second) {
-			alDeleteBuffers(1, &entry.Buffer.second);
-		}
-
-		return success;
-	}
-};
-
-class OpenALAudioDriver : public Audio {
+class OpenALSoundStreamHandle : public SoundStreamSourceHandle {
 public:
-	OpenALAudioDriver(void);
-	~OpenALAudioDriver(void) override;
-	void PrintDeviceList() const;
-	bool Init(void) override;
-	Holder<SoundHandle> Play(StringView ResRef, SFXChannel channel,
-				 const Point&, unsigned int flags = 0,
-				 tick_t* length = nullptr) override;
-	void UpdateVolume(unsigned int flags) override;
-	bool CanPlay() override;
-	void ResetMusics() final;
-	bool Play() override;
-	bool Stop() override;
-	bool Pause() override;
-	bool Resume() override;
-	int CreateStream(ResourceHolder<SoundMgr>) override;
-	void UpdateListenerPos(const Point&) override;
-	Point GetListenerPos() override;
-	bool ReleaseStream(int stream, bool HardStop) override;
-	int SetupNewStream(int x, int y, int z,
-			   ieWord gain, bool point, int ambientRange) override;
-	tick_t QueueAmbient(int stream, const ResRef& sound, bool spatial) override;
-	void SetAmbientStreamVolume(int stream, int volume) override;
-	void SetAmbientStreamPitch(int stream, int pitch) override;
-	void QueueBuffer(int stream, unsigned short bits,
-			 int channels, short* memory,
-			 int size, int samplerate) override;
-	void UpdateMapAmbient(const MapReverbProperties&) override;
+	OpenALSoundStreamHandle(ALint source, int channelVolume);
+	OpenALSoundStreamHandle(const OpenALSoundStreamHandle& other) = delete;
+	OpenALSoundStreamHandle(OpenALSoundStreamHandle&& other) noexcept;
+	~OpenALSoundStreamHandle() override;
+
+	bool Feed(const AudioBufferFormat& format, const char* memory, size_t size) override;
+	bool HasProcessed() override;
+	void Pause() override;
+	void Resume() override;
+	void Stop() override;
+
+	void SetVolume(int volume) override;
 
 private:
-	int QueueALBuffers(OpenALuintPair source, OpenALuintPair buffer) const;
-	int QueueALBuffer(ALuint source, ALuint buffer) const;
-
-private:
-	ALCcontext* alutContext = nullptr;
-	ALuint MusicSource = 0;
-	bool MusicPlaying = false;
-	std::recursive_mutex musicMutex;
-	ALuint MusicBuffer[MUSICBUFFERS] {};
-	ResourceHolder<SoundMgr> MusicReader;
-	LRUCache<CacheEntry, OpenALPlaying> buffercache { BUFFER_CACHE_SIZE };
-	AudioStream speech;
-	AudioStream streams[MAX_STREAMS];
-	int num_streams = 0;
-
-	std::atomic_bool stayAlive { true };
-	std::vector<short> musicBuffer;
-	std::thread musicThread;
-
-	bool hasReverbProperties = false;
-	bool hasEFX = false;
-	ALuint efxEffectSlot = 0;
-	ALuint efxEffect = 0;
-	MapReverbProperties reverbProperties;
-
-	OpenALuintPair loadSound(StringView ResRef, tick_t& time_length, bool spatial = false);
-	int CountAvailableSources(int limit);
-	bool evictBuffer();
-	void clearBufferCache(bool force);
-	ALenum GetFormatEnum(int channels, int bits) const;
-	static int MusicManager(void* args);
-
-	bool InitEFX(void);
-	ALuint CreateAndConfigSource(ALuint source, ieDword volume, ALint loop, unsigned int flags, const Point& p, SFXChannel channel) const;
-	void ConfigSource(ALuint source, ieDword volume, ALint loop, unsigned int flags, const Point& p, SFXChannel channel) const;
+	ALuint source;
+	int channelVolume;
+	void UnloadFinishedSourceBuffers() const;
 };
 
+class OpenALBackend : public AudioBackend {
+public:
+	~OpenALBackend() override;
+
+	bool Init() override;
+
+	Holder<SoundSourceHandle> CreatePlaybackSource(const AudioPlaybackConfig& config, bool priority = false) override;
+	Holder<SoundStreamSourceHandle> CreateStreamable(const AudioPlaybackConfig& config, size_t) override;
+	Holder<SoundBufferHandle> LoadSound(ResourceHolder<SoundMgr> resource, const AudioPlaybackConfig& config) override;
+
+	const AudioPoint& GetListenerPosition() const override;
+	void SetListenerPosition(const AudioPoint& p) override;
+	void SetReverbProperties(const MapReverbProperties& props) override;
+
+	StreamMode GetStreamMode() const override { return StreamMode::POLLING; }
+
+private:
+	ALCcontext* alContext = nullptr;
+	AudioPoint listenerPosition;
+
+	void InitEFX();
+	ALPair GetBuffers(ResourceHolder<SoundMgr> resource, bool spatial) const;
+};
 }
 
-#endif // OPENALAUDIO_H_INCLUDED
+#endif

@@ -30,7 +30,6 @@
 #include "ie_types.h"
 
 #include "Region.h"
-#include "Resource.h"
 
 namespace GemRB {
 

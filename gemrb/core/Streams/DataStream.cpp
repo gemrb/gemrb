@@ -20,11 +20,7 @@
 
 #include "DataStream.h"
 
-#include "errors.h"
-
-#include "Resource.h"
-
-#include <cctype>
+#include "ie_types.h"
 
 namespace GemRB {
 

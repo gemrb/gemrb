@@ -32,13 +32,14 @@
 #include "ie_types.h"
 #include "strrefs.h"
 
-#include "Item.h" //needs item for itmextheader
 #include "Store.h"
 
 #include <vector>
 
 namespace GemRB {
 
+class ITMExtHeader;
+class Item;
 class Map;
 
 //AddSlotItem return values
@@ -281,7 +282,6 @@ public:
 	//left hand
 	int GetShieldSlot() const;
 	void AddSlotEffects(ieDword slot);
-	//void AddAllEffects();
 	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(ieDword slot) const;
 	/** Returns the item's inventory flags */
@@ -359,6 +359,7 @@ public:
 	static int GetInventorySlot();
 	int InBackpack(int slot) const;
 	void CacheAllWeaponInfo() const;
+	void EnforceUsability();
 
 private:
 	void CalculateWeight(void);

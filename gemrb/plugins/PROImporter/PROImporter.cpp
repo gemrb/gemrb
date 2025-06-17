@@ -20,7 +20,7 @@
 
 #include "PROImporter.h"
 
-#include "EffectMgr.h"
+#include "Logging/Logging.h"
 
 using namespace GemRB;
 

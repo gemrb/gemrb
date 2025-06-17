@@ -28,7 +28,6 @@
 
 #include <stdexcept>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 // This is changed by both cmake and AppVeyor (CmakeLists.txt and .appveyor.yml)
@@ -99,7 +98,7 @@ struct CoreSettings {
 	uint32_t debugMode = 0;
 	bool Logging = true;
 	int LogColor = -1; // -1 is to automatically determine
-	bool CheatFlag = false; /** Cheats enabled? */
+	bool CheatFlag = true; /** Cheats enabled? */
 	int MaxPartySize = 6;
 	int GUIEnhancements = 23;
 

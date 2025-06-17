@@ -18,7 +18,6 @@
 
 #include "WAVReader.h"
 
-#include <utility>
 #include <vector>
 
 using namespace GemRB;
@@ -63,16 +62,16 @@ bool RawPCMReader::Import(DataStream* str)
 	if (is16bit) {
 		samples >>= 1; // each sample has 16 bit
 	}
-	samples_left = samples;
+	samplesLeft = samples;
 	return true;
 }
 
-int RawPCMReader::read_samples(short* buffer, int count)
+size_t RawPCMReader::read_samples(short* buffer, size_t count)
 {
-	if (count > samples_left) {
-		count = samples_left;
+	if (count > samplesLeft) {
+		count = samplesLeft;
 	}
-	strret_t res = 0;
+	size_t res = 0;
 	if (count) {
 		res = str->Read(buffer, count * (is16bit ? 2 : 1));
 	}
@@ -87,13 +86,13 @@ int RawPCMReader::read_samples(short* buffer, int count)
 	if (is16bit) {
 		res >>= 1;
 	}
-	samples_left -= res;
+	samplesLeft -= res;
 	return res;
 }
 
 static constexpr size_t CHANNEL_SPLIT_BUFFER_SIZE = 4096;
 
-int RawPCMReader::ReadSamplesIntoChannels(char* channel1, char* channel2, int numSamples)
+size_t RawPCMReader::ReadSamplesIntoChannels(char* channel1, char* channel2, size_t numSamples)
 {
 	std::vector<char> buffer;
 	buffer.resize(CHANNEL_SPLIT_BUFFER_SIZE);
@@ -101,7 +100,10 @@ int RawPCMReader::ReadSamplesIntoChannels(char* channel1, char* channel2, int nu
 	uint8_t bytesPerChannel = is16bit ? 2 : 1;
 	uint8_t bytesPerSample = 2 * bytesPerChannel;
 	auto samplesRead = str->Read(buffer.data(), CHANNEL_SPLIT_BUFFER_SIZE) / bytesPerSample;
-	auto totalSamples = samplesRead;
+	size_t totalSamples = 0;
+	if (samplesRead > 0) {
+		totalSamples = static_cast<size_t>(samplesRead);
+	}
 
 	size_t z = 0;
 	do {
@@ -183,9 +185,9 @@ bool WavPCMReader::Import(DataStream* stream)
 	if (is16bit) {
 		samples >>= 1;
 	}
-	samples_left = samples;
+	samplesLeft = samples;
 	channels = fmt.nChannels;
-	samplerate = fmt.nSamplesPerSec;
+	sampleRate = fmt.nSamplesPerSec;
 	return true;
 }
 

@@ -21,9 +21,6 @@
 #ifndef EFFIMPORTER_H
 #define EFFIMPORTER_H
 
-#include "ie_types.h"
-
-#include "Effect.h"
 #include "EffectMgr.h"
 
 namespace GemRB {

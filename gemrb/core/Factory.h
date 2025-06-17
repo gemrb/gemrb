@@ -22,9 +22,7 @@
 #define FACTORY_H
 
 #include "exports.h"
-#include "globals.h"
 
-#include "AnimationFactory.h"
 #include "FactoryObject.h"
 
 #include <memory>

@@ -160,7 +160,7 @@ def GetMemorizedSpells(actor, BookType, level):
 # direct access to the spellinfo struct
 def HasSpellinfoSpell(pc, resRef):
 	spellResRefs = GemRB.GetSpelldata (pc)
-	return resRef in spellResRefs
+	return resRef.upper() in spellResRefs
 
 # SpellIndex is the index of the spell in the struct, but we add a thousandfold of the spell type for later use in SpellPressed
 def GetSpellinfoSpells(actor, BookType):
@@ -313,6 +313,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		else:
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 			Button.OnPress (ActionsWindow.SpellPressed)
+			Button.OnRightPress (ActionsWindow.SpellRightPressed)
 			Button.OnShiftPress (ActionsWindow.SpellShiftPressed)
 
 		if Spell['SpellResRef']:

@@ -2,12 +2,8 @@
 
 #include "System/VFS.h" // for PathDelimiter
 
-#include <algorithm>
-#include <cctype>
 #include <cstdio>
-#include <cstring>
 #include <fstream>
-#include <sstream>
 
 using namespace GemRB;
 

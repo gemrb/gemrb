@@ -18,19 +18,20 @@
  *
  */
 
+#include "defsounds.h"
 #include "ie_feats.h" //cannot avoid declaring these
+#include "ie_stats.h"
 #include "opcode_params.h"
 #include "overlays.h"
 #include "strrefs.h"
-#include "voodooconst.h"
 
-#include "Audio.h"
 #include "DisplayMessage.h"
 #include "EffectQueue.h"
 #include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
 #include "Interface.h"
+#include "Map.h"
 #include "PolymorphCache.h" // fx_polymorph
 #include "Projectile.h" //needs for clearair
 #include "ProjectileServer.h"
@@ -39,7 +40,6 @@
 #include "ScriptedAnimation.h"
 #include "Spell.h" //needed for fx_cast_spell feedback
 #include "TileMap.h" //needs for knock!
-#include "VEFObject.h"
 #include "damages.h"
 
 #include "GUI/GameControl.h"
@@ -989,8 +989,9 @@ static inline void HandleMainStatBonus(const Actor* target, int stat, Effect* fx
 
 static inline void PlayRemoveEffect(const Actor* target, const Effect* fx, StringView defsound = StringView())
 {
-	core->GetAudioDrv()->Play(fx->Resource.IsEmpty() ? defsound : StringView(fx->Resource),
-				  SFXChannel::Actions, target->Pos, GEM_SND_SPATIAL);
+	core->GetAudioPlayback().Play(
+		fx->Resource.IsEmpty() ? defsound : StringView(fx->Resource),
+		AudioPreset::Spatial, SFXChannel::Actions, target->Pos);
 }
 
 //resurrect code used in many places
@@ -1320,7 +1321,7 @@ int fx_charisma_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_charisma_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	// ensure we don't stack in pst
-	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS) && fx->SourceType == 2) {
 		// don't be cumulative — luckily the opcode is the first on the effect list of spwi114
 		// we remove the old spell, so the player benefits from renewed duration
 		ResRef tmp = fx->SourceRef;
@@ -1507,7 +1508,7 @@ int fx_death(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			// Actor::CheckOnDeath handles the actual chunking
 			damagetype = DAMAGE_CRUSHING | DAMAGE_CHUNKING;
 			// bg1 & iwds have this file, bg2 & pst none
-			core->GetAudioDrv()->Play("GORE", SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+			core->GetAudioPlayback().Play("GORE", AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 			break;
 		case 16:
 			BASE_STATE_SET(STATE_PETRIFIED);
@@ -1521,12 +1522,12 @@ int fx_death(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_PETRIFIED);
 			damagetype = DAMAGE_CRUSHING | DAMAGE_CHUNKING;
 			// file only in iwds
-			core->GetAudioDrv()->Play("GORE2", SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+			core->GetAudioPlayback().Play("GORE2", AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 			break;
 		case 128:
 			if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_FROZEN);
 			damagetype = DAMAGE_COLD | DAMAGE_CHUNKING;
-			core->GetAudioDrv()->Play("GORE2", SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+			core->GetAudioPlayback().Play("GORE2", AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 			break;
 		case 256:
 			damagetype = DAMAGE_ELECTRICITY;
@@ -2856,7 +2857,7 @@ int fx_set_blur_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	// ensure we don't stack in pst
-	if (core->HasFeature(GFFlags::PST_STATE_FLAGS) && STATE_GET(STATE_BLUR)) {
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS) && STATE_GET(STATE_BLUR) && fx->SourceType == 2) {
 		// don't be cumulative — luckily the blur opcode is the first on the effect list of spwi216
 		// we remove the old spell, so the player benefits from renewed duration
 		ResRef tmp = fx->SourceRef;
@@ -2951,7 +2952,7 @@ int fx_unsummon_creature(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//play the vanish animation
 		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, false);
 		if (sca) {
-			sca->Pos = target->Pos;
+			sca->SetPos(target->Pos);
 			area->AddVVCell(sca);
 		}
 		//remove the creature
@@ -3821,11 +3822,11 @@ int fx_remove_item(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 		// "EFF_M02" was hardcoded in the originals, but EEs added extra options
 		if (fx->Parameter1 == 0) {
-			core->PlaySound(DS_ITEM_GONE, SFXChannel::GUI);
+			core->GetAudioPlayback().PlayDefaultSound(DS_ITEM_GONE, SFXChannel::GUI);
 		} else if (fx->Parameter1 == 1) {
-			core->GetAudioDrv()->Play("AMB_D02B", SFXChannel::GUI);
+			core->GetAudioPlayback().Play("AMB_D02B", AudioPreset::ScreenAction, SFXChannel::GUI);
 		} else if (fx->Parameter1 == 2) {
-			core->GetAudioDrv()->Play(fx->Resource2, SFXChannel::GUI);
+			core->GetAudioPlayback().Play(fx->Resource2, AudioPreset::ScreenAction, SFXChannel::GUI);
 		}
 	}
 
@@ -4599,7 +4600,7 @@ int fx_display_string(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			// mrttaunt.src has placeholder text, but valid audio, so enable just sound
 			if (fx->IsVariable) {
 				StringBlock sb = core->strings->GetStringBlock(str);
-				core->GetAudioDrv()->Play(StringView(sb.Sound), SFXChannel::Actions, target->Pos, GEM_SND_SPATIAL);
+				core->GetAudioPlayback().Play(StringView(sb.Sound), AudioPreset::Spatial, SFXChannel::Actions, target->Pos);
 			} else {
 				fx->Parameter1 = ieDword(str);
 				DisplayStringCore(target, str, DS_HEAD);
@@ -4665,7 +4666,7 @@ int fx_casting_glow(Scriptable* Owner, Actor* target, Effect* fx)
 	// Resource contains the termination sound from when used from GameScript::SpellCastEffect
 	// the channel is a guess
 	if (fx->Duration - core->GetGame()->GameTime == 1 && !fx->Resource.IsEmpty()) {
-		core->GetAudioDrv()->Play(fx->Resource, SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+		core->GetAudioPlayback().Play(fx->Resource, AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 	}
 
 	// TODO: this opcode is also affected by slow/haste
@@ -4691,9 +4692,9 @@ int fx_visual_spell_hit(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 		if (fx->Parameter1) {
-			sca->Pos = target->Pos;
+			sca->SetPos(target->Pos);
 		} else {
-			sca->Pos = fx->Pos;
+			sca->SetPos(fx->Pos);
 		}
 		sca->ZOffset += 45; // roughly half the target height; empirical value to match original
 		if (fx->Parameter2 < 32) {
@@ -4897,17 +4898,19 @@ int fx_identify(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 // (actually, in bg2 the effect targets area objects and the range is implemented
 // by the inareans projectile) - inanimate, area, no sprite
 // TODO: effects should target inanimates using different code
-// 0 - detect traps automatically
-// 1 - detect traps by skill
+// 0 - detect traps automatically (what the spell uses)
+// 1 - detect traps by skill (what our modal uses)
 // 2 - detect secret doors automatically
-// 3 - detect secret doors by luck
+// 3 - detect secret doors by luck (what our background detect.spl uses)
+// Under 1 we also detect illusions
 int fx_find_traps(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_find_traps(%2d)", fx->Opcode);
 	//reveal trapped containers, doors, triggers that are in the visible range
 	ieDword id = target->GetGlobalID();
-	ieDword range = target->GetStat(IE_VISUALRANGE) / 2;
+	ieDword range = target->GetVisualRange() / 2;
 	ieDword skill;
+	ieDword diSkill = 9999;
 	bool detecttraps = true;
 
 	switch (fx->Parameter2) {
@@ -4915,8 +4918,10 @@ int fx_find_traps(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//find traps
 			if (core->HasFeature(GFFlags::RULES_3ED)) {
 				skill = target->GetSkill(IE_SEARCH);
+				diSkill = skill * 7;
 			} else {
 				skill = target->GetStat(IE_TRAPS);
+				diSkill = target->GetStat(IE_DETECTILLUSIONS);
 			}
 			break;
 		case 3:
@@ -4935,7 +4940,8 @@ int fx_find_traps(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 	}
 
-	const TileMap* TMap = target->GetCurrentArea()->TMap;
+	const Map* map = target->GetCurrentArea();
+	const TileMap* TMap = map->TMap;
 
 	for (const auto& door : TMap->GetDoors()) {
 		if (WithinRange(target, door->Pos, range)) {
@@ -4943,6 +4949,30 @@ int fx_find_traps(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			if (detecttraps && door->Visible()) {
 				// when was door trap noticed
 				door->DetectTrap(skill, id);
+			}
+		}
+	}
+
+	// detect illusions?
+	if (diSkill != 9999) {
+		ieDword diRange = std::min(15U, range); // in case we were blinded; value a guess
+		int flags = GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_ALLY | GA_NO_SELF;
+		auto neighbours = map->GetAllActorsInRadius(target->Pos, flags, diRange, target);
+		for (const auto& neighbour : neighbours) {
+			if (neighbour->GetSafeStat(IE_SEX) == SEX_ILLUSION) {
+				// project image etc. get destroyed
+				neighbour->DestroySelf();
+				continue;
+			}
+
+			ieDword check = neighbour->LuckyRoll(1, 100, 0, LR_NEGATIVE);
+			if (diSkill < check) continue;
+
+			// remove all illusion effects, not just invisibility
+			neighbour->CureInvisibility();
+			for (int level = 0; level < 9; level++) {
+				// won't work in bg1, since the spells don't have their school set
+				neighbour->fxqueue.RemoveLevelEffects(level, RL_MATCHSCHOOL, 5, neighbour);
 			}
 		}
 	}
@@ -5327,7 +5357,11 @@ int fx_poison_resistance_modifier(Scriptable* /*Owner*/, Actor* target, Effect* 
 {
 	// this is a gemrb extension, the original only supported flat setting of this resistance
 	// ... up until EE version 2.5, where it started always incrementing
-	STAT_MOD(IE_RESISTPOISON);
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		target->NewStat(IE_RESISTPOISON, fx->Parameter1, MOD_ADDITIVE);
+	} else {
+		STAT_MOD(IE_RESISTPOISON);
+	}
 	return FX_APPLIED;
 }
 
@@ -5342,9 +5376,9 @@ int fx_playsound(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//this is probably inaccurate
 	if (target) {
-		core->GetAudioDrv()->Play(fx->Resource, SFXChannel::Hits, target->Pos, GEM_SND_SPATIAL);
+		core->GetAudioPlayback().Play(fx->Resource, AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 	} else {
-		core->GetAudioDrv()->Play(fx->Resource, SFXChannel::Hits);
+		core->GetAudioPlayback().Play(fx->Resource, AudioPreset::ScreenAction, SFXChannel::Hits);
 	}
 	//this is an instant, it shouldn't stick
 	return FX_NOT_APPLIED;
@@ -5642,7 +5676,7 @@ static Actor* GetFamiliar(Scriptable* Owner, const Actor* target, const Effect* 
 		if (vvc) {
 			//This is the final position of the summoned creature
 			//not the original target point
-			vvc->Pos = fam->Pos;
+			vvc->SetPos(fam->Pos);
 			//force vvc to play only once
 			vvc->PlayOnce();
 			map->AddVVCell(vvc);
@@ -6176,13 +6210,13 @@ int fx_play_visual_effect(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				delete sca;
 				return FX_NOT_APPLIED;
 			}
-			sca->Pos = fx->Source;
+			sca->SetPos(fx->Source);
 		} else {
-			sca->Pos = fx->Pos;
+			sca->SetPos(fx->Pos);
 		}
 	} else {
 		// add also its offset, so drawing order is ok (eg. with stoneskin)
-		sca->Pos = target->Pos + Point(sca->XOffset, sca->YOffset);
+		sca->SetPos(target->Pos + Point(sca->XOffset, sca->YOffset));
 	}
 	sca->PlayOnce();
 	map->AddVVCell(sca);
@@ -6433,8 +6467,9 @@ int fx_dispel_secondary_type_one(Scriptable* /*Owner*/, Actor* target, Effect* f
 //0xe7 Timestop
 int fx_timestop(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_timestop(%2d)", fx->Opcode);
-	core->GetGame()->TimeStop(target, fx->Duration);
+	// halve the duration :(
+	ieDword adjDuration = (fx->Duration - core->GetGame()->GameTime) / 2 + core->GetGame()->GameTime;
+	core->GetGame()->TimeStop(target, adjDuration);
 	return FX_NOT_APPLIED;
 }
 
@@ -6851,7 +6886,6 @@ int fx_puppet_master(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 		case 3:
 			puppetRef = "simulacr";
-			copy->SetBase(IE_SEX, SEX_ILLUSION);
 			// healable level drain
 			// second generation simulacri are supposedly at a different level, but that makes little sense:
 			// level = original caster - caster / 2; eg. lvl 32 -> 16 -> 24 -> 20 -> 22 -> 21
@@ -6919,7 +6953,7 @@ int fx_farsee(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (!(fx->Parameter2 & 2)) {
-		fx->Parameter1 = STAT_GET(IE_VISUALRANGE);
+		fx->Parameter1 = target->GetVisualRange();
 		fx->Parameter2 |= 2;
 	}
 
@@ -7078,7 +7112,11 @@ int fx_set_area_effect(Scriptable* Owner, Actor* target, Effect* fx)
 	const Actor* caster = Scriptable::As<const Actor>(Owner);
 	if (caster) {
 		skill = caster->GetStat(IE_SETTRAPS);
-		roll = target->LuckyRoll(1, 100, 0, LR_NEGATIVE);
+		roll = Clamp<int>(target->LuckyRoll(1, 100, 0, LR_NEGATIVE), 1, 100);
+		// bg2 hla traps were hardcoded to never fail
+		if (fx->Resource.BeginsWith("SPCL9")) {
+			roll = 0;
+		}
 		// assuming functioning thief, but allowing modded exceptions
 		// thieves aren't casters, so 0 for a later spell type lookup is not good enough
 		level = caster->GetThiefLevel();
@@ -7503,6 +7541,11 @@ int fx_remove_projectile(Scriptable* Owner, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		default:
 			return FX_NOT_APPLIED;
+	}
+
+	// ee additional way of specifying another 2da
+	if (fx->Resource) {
+		listref = fx->Resource;
 	}
 
 	//the list is now cached by Interface, no need of freeing it

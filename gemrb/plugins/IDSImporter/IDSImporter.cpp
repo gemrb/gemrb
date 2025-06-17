@@ -22,8 +22,6 @@
 
 #include "globals.h"
 
-#include <cstring>
-
 using namespace GemRB;
 
 const std::string blank;

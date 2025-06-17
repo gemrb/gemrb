@@ -21,6 +21,8 @@
 #ifndef MUSICMGR_H
 #define MUSICMGR_H
 
+#include "ie_types.h"
+
 #include "Plugin.h"
 
 namespace GemRB {

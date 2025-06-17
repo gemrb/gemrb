@@ -22,10 +22,10 @@
 #define ANIMATIONFACTORY_H
 
 #include "exports.h"
-#include "globals.h"
 
 #include "Animation.h"
 #include "FactoryObject.h"
+#include "Sprite2D.h"
 
 namespace GemRB {
 

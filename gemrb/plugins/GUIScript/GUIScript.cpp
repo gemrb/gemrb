@@ -20,15 +20,14 @@
 
 #include "GUIScript.h"
 
-#include "Audio.h"
+#include "ie_stats.h"
+
 #include "CharAnimations.h"
 #include "DataFileMgr.h"
-#include "DialogHandler.h"
 #include "DisplayMessage.h"
 #include "EffectQueue.h"
 #include "Game.h"
 #include "GameData.h"
-#include "ImageFactory.h"
 #include "Interface.h"
 #include "Item.h"
 #include "KeyMap.h"
@@ -40,10 +39,10 @@
 #include "PythonConversions.h"
 #include "PythonErrors.h"
 #include "RNG.h"
-#include "ResourceDesc.h"
 #include "SaveGameIterator.h"
 #include "Spell.h"
 #include "TileMap.h"
+#include "Timer.h"
 #include "WorldMap.h"
 
 #include "GUI/Button.h"
@@ -265,6 +264,11 @@ static int SetCreatureStat(Actor* actor, unsigned int StatID, int StatValue, boo
 		ps->ExtraSettings[StatID] = StatValue;
 		actor->ApplyExtraSettings();
 		return 1;
+	}
+
+	// handle pst's weird visual range
+	if (StatID == IE_LEVELFIGHTER && core->HasFeature(GFFlags::PST_STATE_FLAGS) && actor->GetStat(IE_SPECIFIC) == 2) {
+		Scriptable::VOODOO_VISUAL_RANGE = (14 + StatValue) * 2;
 	}
 
 	if (pcf) {
@@ -1862,7 +1866,7 @@ control. See more about this in 'data_exchange'.\n\
 \n\
 **Special:** If the 'DialogChoose' variable was set to -1 or 0 during a dialog session, it will terminate (-1) or pick the first available option (0) from the dialog automatically. (0 is used for 'continue', -1 is used for 'end dialogue').\n\
 \n\
-**See also:** [Button_SetFlags](Button_SetFlags.md), [SetVar](SetVar.md), [GetVar](GetVar.md)");
+**See also:** [View_SetFlags](View_SetFlags.md), [SetVar](SetVar.md), [GetVar](GetVar.md)");
 
 static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 {
@@ -2394,7 +2398,7 @@ setting the IE_GUI_BUTTON_NO_IMAGE flag on the control.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [Button_SetFlags](Button_SetFlags.md), [Button_SetPicture](Button_SetPicture.md), [Button_SetPicture](Button_SetPicture.md)");
+**See also:** [View_SetFlags](View_SetFlags.md), [Button_SetPicture](Button_SetPicture.md), [Button_SetPicture](Button_SetPicture.md)");
 
 static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 {
@@ -2532,7 +2536,7 @@ PyDoc_STRVAR(GemRB_Button_EnableBorder__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [Button_SetPicture](Button_SetPicture.md), [Button_SetFlags](Button_SetFlags.md), [Button_SetBorder](Button_SetBorder.md)");
+**See also:** [Button_SetPicture](Button_SetPicture.md), [View_SetFlags](View_SetFlags.md), [Button_SetBorder](Button_SetBorder.md)");
 
 static PyObject* GemRB_Button_EnableBorder(PyObject* self, PyObject* args)
 {
@@ -3198,9 +3202,9 @@ all by default). Changes the cursor.\n\
     * 0 TARGET_MODE_NONE\n\
     * 1 TARGET_MODE_TALK\n\
     * 2 TARGET_MODE_ATTACK (also for bashing)\n\
-    * 4 TARGET_MODE_CAST\n\
-    * 8 TARGET_MODE_DEFEND\n\
-    * 16 TARGET_MODE_PICK\n\
+    * 3 TARGET_MODE_CAST\n\
+    * 4 TARGET_MODE_DEFEND\n\
+    * 5 TARGET_MODE_PICK\n\
   * (target) Types - bitfield:\n\
     * GA_SELECT (selectable actor)\n\
     * GA_NO_DEAD\n\
@@ -3226,7 +3230,7 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject* /*self*/, PyObject* ar
 	//target mode is only the low bits (which is a number)
 	gc->SetTargetMode(TargetMode(Mode & GA_ACTION));
 	//target type is all the bits
-	gc->target_types = (Mode & GA_ACTION) | Types;
+	gc->targetTypes = (Mode & GA_ACTION) | Types;
 	Py_RETURN_NONE;
 }
 
@@ -3318,7 +3322,7 @@ is a checkbox or a radio button though, their states are handled internally.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [Button_SetFlags](Button_SetFlags.md)");
+**See also:** [View_SetFlags](View_SetFlags.md)");
 
 static PyObject* GemRB_Button_SetState(PyObject* self, PyObject* args)
 {
@@ -3691,8 +3695,10 @@ static PyObject* GemRB_VerbalConstant(PyObject* /*self*/, PyObject* args)
 
 	//get soundset based string constant
 	std::string sound = fmt::format("{}{}{}{:02d}", fmt::WideToChar { actor->PCStats->SoundFolder }, PathDelimiter, actor->PCStats->SoundSet, str);
-	SFXChannel channel = actor->InParty ? SFXChannel(ieByte(SFXChannel::Char0) + actor->InParty - 1) : SFXChannel::Dialog;
-	core->GetAudioDrv()->Play(sound, channel, Point(), GEM_SND_SPEECH | GEM_SND_EFX);
+	auto config =
+		core->GetAudioSettings().ConfigPresetDialog(
+			actor->InParty ? SFXChannel(ieByte(SFXChannel::Char0) + actor->InParty - 1) : SFXChannel::Dialog);
+	core->GetAudioPlayback().PlaySpeech(sound, config);
 	Py_RETURN_NONE;
 }
 
@@ -3722,34 +3728,42 @@ sound as if it was said by that PC (EAX).\n\
 
 static PyObject* GemRB_PlaySound(PyObject* /*self*/, PyObject* args)
 {
-	char* channel_name = NULL;
+	char* channelName = nullptr;
 	Point pos;
 	unsigned int flags = 0;
 	SFXChannel channel = SFXChannel::GUI;
 	int index;
 
-	if (PyArg_ParseTuple(args, "i|z", &index, &channel_name)) {
-		if (channel_name) {
-			channel = core->GetAudioDrv()->GetChannel(channel_name);
+	if (PyArg_ParseTuple(args, "i|z", &index, &channelName)) {
+		if (channelName) {
+			channel = AudioSettings::GetChannelByName(StringView { channelName });
 		}
-		core->PlaySound(index, channel);
+		core->GetAudioPlayback().PlayDefaultSound(index, channel);
 	} else {
 		PyErr_Clear(); //clearing the exception
 		PyObject* pyref = nullptr;
-		if (!PyArg_ParseTuple(args, "O|ziii", &pyref, &channel_name, &pos.x, &pos.y, &flags)) {
+		if (!PyArg_ParseTuple(args, "O|ziii", &pyref, &channelName, &pos.x, &pos.y, &flags)) {
 			return AttributeError(GemRB_PlaySound__doc);
 		}
 
-		if (channel_name) {
-			channel = core->GetAudioDrv()->GetChannel(channel_name);
+		if (channelName) {
+			channel = AudioSettings::GetChannelByName(StringView { channelName });
 		}
 
-		if (pyref == Py_None) {
-			core->GetAudioDrv()->Play("", channel, pos, flags);
+		auto config = core->GetAudioSettings().ConfigPresetScreenAction(channel);
+		if (!pos.IsZero()) {
+			config = core->GetAudioSettings().ConfigPresetByChannel(channel, pos);
+		}
+
+		if (pyref == Py_None && (flags & GEM_SND_SPEECH)) {
+			core->GetAudioPlayback().StopSpeech();
 		} else if (PyUnicode_Check(pyref)) {
-			core->GetAudioDrv()->PlayMB(PyString_AsStringObj(pyref), channel, pos, flags);
+			auto mbString = MBStringFromString(PyString_AsStringObj(pyref));
+			auto mbResource = StringView { mbString };
+
+			core->GetAudioPlayback().Play(mbResource, config);
 		} else {
-			core->GetAudioDrv()->Play(PyString_AsStringView(pyref), channel, pos, flags);
+			core->GetAudioPlayback().Play(PyString_AsStringView(pyref), config);
 		}
 	}
 
@@ -3936,6 +3950,9 @@ static PyObject* GemRB_SetVar(PyObject* /*self*/, PyObject* args)
 	Control::value_t val = Control::INVALID_VALUE;
 	if (PyLong_Check(pynum)) {
 		val = Control::value_t(PyLong_AsUnsignedLongMask(pynum));
+		if (PyErr_Occurred()) { // PyLong_AsUnsignedLongMask returns -1 on error
+			PyErr_Print();
+		}
 	} else if (pynum != Py_None) {
 		return RuntimeError("Expected a numeric or None type.");
 	}
@@ -6392,7 +6409,7 @@ static void SetItemText(Button* btn, int charges, bool oneisnone)
 PyDoc_STRVAR(GemRB_Button_SetItemIcon__doc,
 	     "===== Button_SetItemIcon =====\n\
 \n\
-**Metaclass Prototype:** SetItemIcon (ITMResRef[, Type, Tooltip, ITM2ResRef, BAM3ResRef]])\n\
+**Metaclass Prototype:** SetItemIcon (ITMResRef[, Type, Tooltip, FunctionKey, ITM2ResRef, BAM3ResRef]])\n\
 \n\
 **Description:** Sets Item icon image on a Button control.\n\
 \n\
@@ -6409,6 +6426,7 @@ PyDoc_STRVAR(GemRB_Button_SetItemIcon__doc,
     * 7 - Item ability icon for second extended header\n\
     * 8 - etc.\n\
   * Tooltip  - if set to 1 or 2 (identified), the tooltip for the item will also be set\n\
+  * FunctionKey  - F-key to map to [1-12]\n\
   * ITM2ResRef - if set, a second item to display in the icon. ITM2 is drawn first. The tooltip of ITM is used. Only valid for Type 4 and 5\n\
   * BAM3ResRef - if set, a third image will be stacked on top of the others\n\
 \n\
@@ -6908,7 +6926,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject* /*self*/, PyObject* args)
 	}
 
 	if (Sound && Sound[0]) {
-		core->GetAudioDrv()->Play(Sound, SFXChannel::GUI);
+		core->GetAudioPlayback().Play(Sound, AudioPreset::ScreenAction, SFXChannel::GUI);
 	}
 	Py_RETURN_NONE;
 }
@@ -7436,7 +7454,7 @@ static PyObject* ChangeStoreItem(Store* store, int slot, Actor* actor, StoreActi
 				OverrideSound(itemResRef, SoundItem, IS_DROP);
 				if (!SoundItem.IsEmpty()) {
 					// speech means we'll only play the last sound if multiple items were bought
-					core->GetAudioDrv()->Play(SoundItem, SFXChannel::GUI, Point(), GEM_SND_SPEECH);
+					core->GetAudioPlayback().PlaySpeech(SoundItem, core->GetAudioSettings().ConfigPresetScreenAction(SFXChannel::GUI));
 				}
 				res = ASI_SUCCESS;
 				break;
@@ -7661,7 +7679,7 @@ static PyObject* GemRB_GetStoreDrink(PyObject* /*self*/, PyObject* args)
 
 static void ReadUsedItems()
 {
-	AutoTable table = gamedata->LoadTable("item_use");
+	AutoTable table = gamedata->LoadTable("item_use", true);
 	if (table) {
 		TableMgr::index_t UsedItemsCount = table->GetRowCount();
 		UsedItems.resize(UsedItemsCount);
@@ -7762,10 +7780,17 @@ PyDoc_STRVAR(GemRB_ExecuteString__doc,
 \n\
 **Prototype:** GemRB.ExecuteString (String[, Slot])\n\
 \n\
-**Description:** Executes an in-game script action in the current area \n\
-script context. This means that LOCALS will be treated as the current \n\
-area's variable. If a number was given, it will execute the action in the \n\
-numbered actor's context.\n\
+**Description:** Executes an in-game script action. If a valid Slot (greater than 0) \n\
+is specified, the actor in that Slot is used as the script context. Slot numbers \n\
+[1-1000] are treated as portrait indices, while Slot numbers greater than 1000 are \n\
+treated as global actor IDs. If no Slot is specified, the scriptable object (actor, \n\
+container, door, etc.) currently under the cursor (if available) becomes the script \n\
+context. If no valid object exists under the cursor, the current area script is used \n\
+as the script context instead.\n\
+\n\
+The script context determines which scriptable executes the action and its \n\
+associated behavior. For example, LOCALS used by the action will be those of the \n\
+object acting as the script context.\n\
 \n\
 **Parameters:**\n\
   * String - a gamescript action\n\
@@ -7790,17 +7815,28 @@ The above example will force Player2 to attack an enemy, as the example will run
 static PyObject* GemRB_ExecuteString(PyObject* /*self*/, PyObject* args)
 {
 	char* String;
-	int globalID = 0;
+	int Slot = 0;
 
-	PARSE_ARGS(args, "s|i", &String, &globalID);
-	GET_GAME();
+	PARSE_ARGS(args, "s|i", &String, &Slot);
+	GET_GAME()
+	GET_GAMECONTROL()
+	GET_MAP()
 
-	if (globalID) {
-		GET_ACTOR_GLOBAL();
-		GameScript::ExecuteString(actor, String);
+	Scriptable* scriptable = nullptr;
+
+	if (Slot != 0) {
+		scriptable = Slot > 1000 ? game->GetActorByGlobalID(Slot) : game->FindPC(Slot);
+		if (scriptable == nullptr) {
+			return RuntimeError("Actor not found!\n");
+		}
 	} else {
-		GameScript::ExecuteString(game->GetCurrentArea(), String);
+		scriptable = gc->GetHoverObject();
+		if (scriptable == nullptr) {
+			scriptable = map;
+		}
 	}
+
+	GameScript::ExecuteString(scriptable, String);
 	Py_RETURN_NONE;
 }
 
@@ -7853,8 +7889,13 @@ PyDoc_STRVAR(GemRB_UpdateVolume__doc,
 static PyObject* GemRB_UpdateVolume(PyObject* /*self*/, PyObject* args)
 {
 	int type = 3;
-	PARSE_ARGS(args, "i", &type);
-	core->GetAudioDrv()->UpdateVolume(type);
+	PARSE_ARGS(args, "|i", &type);
+	if (type & 1) {
+		core->GetMusicLoop().UpdateVolume();
+	}
+	if (type & 2) {
+		core->GetAmbientManager().UpdateVolume();
+	}
 
 	Py_RETURN_NONE;
 }
@@ -8314,15 +8355,15 @@ PyDoc_STRVAR(GemRB_GetSpelldata__doc,
 \n\
 **Parameters:**\n\
   * globalID - global ID of the actor to use\n\
-  * type - spell(book) type (255 means any)\n\
+  * type - spell(book) type (2047 means any)\n\
 \n\
-**Return value:** tuple of spell resresfs\n\
+**Return value:** tuple of uppercase spell resresfs\n\
 ");
 
 static PyObject* GemRB_GetSpelldata(PyObject* /*self*/, PyObject* args)
 {
 	unsigned int globalID;
-	int type = 255;
+	int type = 2047;
 	PARSE_ARGS(args, "i|i", &globalID, &type);
 
 	GET_GAME();
@@ -8333,6 +8374,7 @@ static PyObject* GemRB_GetSpelldata(PyObject* /*self*/, PyObject* args)
 	PyObject* spell_list = PyTuple_New(count);
 	for (int i = 0; i < count; i++) {
 		actor->spellbook.GetSpellInfo(&spelldata, type, i, 1);
+		StringToUpper(spelldata.spellName);
 		PyTuple_SetItem(spell_list, i, PyString_FromResRef(spelldata.spellName));
 	}
 	return spell_list;
@@ -8950,6 +8992,8 @@ PyDoc_STRVAR(GemRB_GetItem__doc,
   * 'Tooltips'           - the item tooltips\n\
   * 'Locations'          - the item extended header's ability locations\n\
   * 'Spell'              - the spell's strref if the item is a copyable scroll\n\
+  * 'UsabilityBitmask'   - class usability bitmask\n\
+  * 'KitUsability'       - kit usability bitmask\n\
   * 'Function'           - returns special function\n\
     * 0 - no special function\n\
     * 1 - item is a copyable scroll (2nd header's 1st feature is 'Learn spell')\n\
@@ -8994,6 +9038,8 @@ static PyObject* GemRB_GetItem(PyObject* /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "LoreToID", DecRef(PyLong_FromLong, item->LoreToID));
 	PyDict_SetItemString(dict, "Enchantment", PyLong_FromLong(item->Enchantment));
 	PyDict_SetItemString(dict, "MaxCharge", PyLong_FromLong(0));
+	PyDict_SetItemString(dict, "UsabilityBitmask", PyLong_FromLong(item->UsabilityBitmask));
+	PyDict_SetItemString(dict, "KitUsability", PyLong_FromLong(item->KitUsability));
 
 	size_t ehc = item->ext_headers.size();
 
@@ -9251,7 +9297,7 @@ static PyObject* GemRB_DragItem(PyObject* /*self*/, PyObject* args)
 
 	OverrideSound(si->ItemResRef, Sound, IS_GET);
 	if (!Sound.IsEmpty()) {
-		core->GetAudioDrv()->Play(Sound, SFXChannel::GUI);
+		core->GetAudioPlayback().Play(Sound, AudioPreset::ScreenAction, SFXChannel::GUI);
 	}
 
 	//if res is positive, it is gold!
@@ -9324,7 +9370,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject* /*self*/, PyObject* args)
 		int res = cc->AddItem(si);
 		OverrideSound(si->ItemResRef, Sound, IS_DROP);
 		if (!Sound.IsEmpty()) {
-			core->GetAudioDrv()->Play(Sound, SFXChannel::GUI);
+			core->GetAudioPlayback().Play(Sound, AudioPreset::ScreenAction, SFXChannel::GUI);
 		}
 		if (res == ASI_SUCCESS) {
 			// Whole amount was placed
@@ -9455,7 +9501,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject* /*self*/, PyObject* args)
 	}
 
 	if (Sound && Sound[0]) {
-		core->GetAudioDrv()->Play(Sound, SFXChannel::GUI);
+		core->GetAudioPlayback().Play(Sound, AudioPreset::ScreenAction, SFXChannel::GUI);
 	}
 	return PyLong_FromLong(res);
 }
@@ -9836,7 +9882,7 @@ at the specified point (takes precedence if both are specified).\n\
   * CreResRef  - the creature's name (.cre resref)\n\
   * posX, posY - position to create at\n\
 \n\
-**Return value:** N/A\n\
+**Return value:** global ID of the created creature\n\
 \n\
 **See also:** [CreateItem](CreateItem.md)");
 
@@ -9851,13 +9897,14 @@ static PyObject* GemRB_CreateCreature(PyObject* /*self*/, PyObject* args)
 	GET_MAP();
 
 	ResRef CreResRef = ResRefFromPy(cstr);
+	ScriptID gid;
 	if (PosX != -1 && PosY != -1) {
-		map->SpawnCreature(Point(PosX, PosY), CreResRef);
+		gid = map->SpawnCreature(Point(PosX, PosY), CreResRef);
 	} else {
 		GET_ACTOR_GLOBAL();
-		map->SpawnCreature(actor->Pos, CreResRef, Size(10, 10));
+		gid = map->SpawnCreature(actor->Pos, CreResRef, Size(10, 10));
 	}
-	Py_RETURN_NONE;
+	return PyLong_FromLong(gid);
 }
 
 PyDoc_STRVAR(GemRB_RevealArea__doc,
@@ -10348,6 +10395,16 @@ static PyObject* SetActionIcon(Button* btn, PyObject* dict, int Index, int Funct
 	}
 	ABORT_IF_NULL(btn);
 
+	// for customization we need to preserve the original button's value / place
+	// and we need to do this even for imageless buttons, so in iwd2 the empty
+	// action bar buttons can be properly configured
+	ieDword customizationState = core->GetDictionary().Get("SettingButtons", 0);
+	if (customizationState == 0) {
+		btn->BindDictVariable("QuickSlotButton", Function - 1);
+	} else {
+		btn->BindDictVariable("SecondLevelActionButton", btn->GetValue());
+	}
+
 	if (Index < 0) {
 		btn->SetImage(ButtonImage::None, nullptr);
 		btn->SetAction(nullptr, Control::Click, GEM_MB_ACTION, 0, 1);
@@ -10650,9 +10707,50 @@ static PyObject* GemRB_SetupQuickSpell(PyObject* /*self*/, PyObject* args)
 PyDoc_STRVAR(GemRB_SetupQuickSlot__doc,
 	     "===== SetupQuickSlot =====\n\
 \n\
-**Prototype:** GemRB.SetupQuickSlot (PartyID, QuickSlotID, InventorySlot[, AbilityIndex])\n\
+**Prototype:** GemRB.SetupQuickSlot (globalID, quickSlotID, actionID)\n\
 \n\
-**Description:** Sets up a quickslot or weapon slot to point to a particular \n\
+**Description:** Changes the action assigned to the specified action bar button.\n\
+It only changes it for the specified creature, so it does not use the class \n\
+default any more. This is only used in iwd2.\n\
+\n\
+**Parameters:**\n\
+  * globalID - the PC's position in the party (1 based) or global ID\n\
+  * quickSlotID - the quickslot (button) to set up (0-11) or -1 to revert all to class defaults\n\
+  * actionID - the actionbar action id to assign to this quickslot\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [SetupQuickItemSlot](SetupQuickItemSlot.md), [SetEquippedQuickSlot](SetEquippedQuickSlot.md)\n\
+");
+
+static PyObject* GemRB_SetupQuickSlot(PyObject* /*self*/, PyObject* args)
+{
+	int globalID;
+	int qslotID;
+	int actionIdx;
+	PARSE_ARGS(args, "iii", &globalID, &qslotID, &actionIdx);
+
+	GET_GAME();
+	GET_ACTOR_GLOBAL();
+
+	if (!actor->PCStats) {
+		RuntimeError(fmt::format("{} is not a creature with a custom action bar!", fmt::WideToChar { actor->GetName() }));
+	} else if (qslotID == -1) {
+		actor->InitButtons(actor->GetActiveClass(), true);
+	} else if (qslotID < 0 || qslotID > 11) {
+		RuntimeError("Quick slot ID should be between 0-11!");
+	} else {
+		actor->PCStats->QSlots[qslotID] = actor->Gemrb2IWD2Qslot(actionIdx, qslotID);
+	}
+	Py_RETURN_NONE;
+}
+
+PyDoc_STRVAR(GemRB_SetupQuickItemSlot__doc,
+	     "===== SetupQuickItemSlot =====\n\
+\n\
+**Prototype:** GemRB.SetupQuickItemSlot (PartyID, QuickSlotID, InventorySlot[, AbilityIndex=0, Translation=1])\n\
+\n\
+**Description:** Sets up a quick item or weapon slot to point to a particular \n\
 inventory slot. Also sets the used ability for that given quickslot. \n\
 If the abilityindex is omitted, it will be assumed as 0. \n\
 If the InventorySlot is -1, then it won't be assigned to the quickslot \n\
@@ -10667,24 +10765,28 @@ by the InventorySlot, and assign the AbilityIndex to it. \n\
   * InventorySlot - the inventory slot assigned to this quickslot, this is\n\
 usually constant and taken care by the core\n\
   * AbilityIndex  - the number of the item extended header to use with this quickslot\n\
+  * Translation   - whether the slot needs an extra lookup in slottypes.2da\n\
 \n\
 **Return value:** N/A\n\
 \n\
 **See also:** [GetEquippedQuickSlot](GetEquippedQuickSlot.md), [SetEquippedQuickSlot](SetEquippedQuickSlot.md)\n\
 ");
 
-static PyObject* GemRB_SetupQuickSlot(PyObject* /*self*/, PyObject* args)
+static PyObject* GemRB_SetupQuickItemSlot(PyObject* /*self*/, PyObject* args)
 {
 	int globalID;
 	int qslotID;
 	ieWord slot;
 	ieWord headerIndex = 0;
-	PARSE_ARGS(args, "iiH|H", &globalID, &qslotID, &slot, &headerIndex);
+	int translation = 1;
+	PARSE_ARGS(args, "iiH|Hi", &globalID, &qslotID, &slot, &headerIndex, &translation);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	slot = static_cast<ieWord>(core->QuerySlot(slot));
+	if (translation) {
+		slot = static_cast<ieWord>(core->QuerySlot(slot));
+	}
 	// recache info for potentially changed ammo or weapon ability
 	actor->inventory.SetEquipped(static_cast<ieWordSigned>(actor->inventory.GetEquipped()), headerIndex); // reset EquippedHeader
 	actor->SetupQuickSlot(qslotID, slot, headerIndex);
@@ -10707,7 +10809,7 @@ Optionally sets the used ability.\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [GetEquippedQuickSlot](GetEquippedQuickSlot.md), [SetupQuickSlot](SetupQuickSlot.md)\n\
+**See also:** [GetEquippedQuickSlot](GetEquippedQuickSlot.md), [SetupQuickItemSlot](SetupQuickItemSlot.md)\n\
 ");
 
 static PyObject* GemRB_SetEquippedQuickSlot(PyObject* /*self*/, PyObject* args)
@@ -10724,12 +10826,36 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject* /*self*/, PyObject* args)
 	const CREItem* item = actor->inventory.GetUsedWeapon(false, dummy);
 	if (item && (item->Flags & IE_INV_ITEM_CURSED)) {
 		displaymsg->DisplayConstantString(HCStrings::Cursed, GUIColors::WHITE);
-	} else {
-		HCStrings ret = actor->SetEquippedQuickSlot(slot, ability);
-		if (ret != HCStrings::count) {
-			displaymsg->DisplayConstantString(ret, GUIColors::WHITE);
+		Py_RETURN_NONE;
+	}
+
+	// for iwd2 we also need to take care of the paired slot
+	// otherwise we'll happily draw a bow and a shield in the same hand
+	bool reequip = false;
+	if (core->HasFeature(GFFlags::HAS_WEAPON_SETS) && actor->PCStats) {
+		// unequip the old one, reequip the new one, if any
+		reequip = true;
+		int shieldSlot = actor->inventory.GetShieldSlot();
+
+		if (!actor->inventory.IsSlotEmpty(shieldSlot)) {
+			if (actor->inventory.UnEquipItem(shieldSlot, false)) {
+				actor->SetUsedShield({}, IE_ANI_WEAPON_INVALID);
+			}
 		}
 	}
+
+	HCStrings ret = actor->SetEquippedQuickSlot(slot, ability);
+	if (ret == HCStrings::count) {
+		// set up the (new) offhand slot again
+		if (reequip) {
+			int shieldSlot = actor->inventory.GetShieldSlot();
+			if (shieldSlot != -1) actor->inventory.EquipItem(shieldSlot);
+		}
+	} else {
+		// error occurred
+		displaymsg->DisplayConstantString(ret, GUIColors::WHITE);
+	}
+
 	Py_RETURN_NONE;
 }
 
@@ -11216,7 +11342,7 @@ PyDoc_STRVAR(GemRB_SetMouseScrollSpeed__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [SetTooltipDelay](SetTooltipDelay.md)");
+**See also:** [UpdateTooltipDelay](UpdateTooltipDelay.md)");
 
 static PyObject* GemRB_SetMouseScrollSpeed(PyObject* /*self*/, PyObject* args)
 {
@@ -11226,24 +11352,20 @@ static PyObject* GemRB_SetMouseScrollSpeed(PyObject* /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR(GemRB_SetTooltipDelay__doc,
-	     "===== SetTooltipDelay =====\n\
+PyDoc_STRVAR(GemRB_UpdateTooltipDelay__doc,
+	     "===== UpdateTooltipDelay =====\n\
 \n\
-**Prototype:** GemRB.SetTooltipDelay (time)\n\
+**Prototype:** GemRB.UpdateTooltipDelay (time)\n\
 \n\
-**Description:** Sets the tooltip delay.\n\
+**Description:** Updates the tooltip delay as set by \"Tooltips\" in slider steps.\n\
 \n\
-**Parameters:**\n\
-  * time - delay in fifteenth of a second\n\
 \n\
 **See also:** [View_SetTooltip](View_SetTooltip.md), [SetMouseScrollSpeed](SetMouseScrollSpeed.md)\n\
 ");
 
-static PyObject* GemRB_SetTooltipDelay(PyObject* /*self*/, PyObject* args)
+static PyObject* GemRB_UpdateTooltipDelay(PyObject* /*self*/, PyObject* /*args*/)
 {
-	int tooltipDelay;
-	PARSE_ARGS(args, "i", &tooltipDelay);
-	WindowManager::SetTooltipDelay(tooltipDelay);
+	core->ApplyTooltipDelay();
 	Py_RETURN_NONE;
 }
 
@@ -12753,8 +12875,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetTimer, METH_VARARGS),
 	METHOD(SetTimedEvent, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),
-	METHOD(SetTooltipDelay, METH_VARARGS),
 	METHOD(SetupMaze, METH_VARARGS),
+	METHOD(SetupQuickItemSlot, METH_VARARGS),
 	METHOD(SetupQuickSlot, METH_VARARGS),
 	METHOD(SetupQuickSpell, METH_VARARGS),
 	METHOD(SetVar, METH_VARARGS),
@@ -12762,6 +12884,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SpellCast, METH_VARARGS),
 	METHOD(StealFailed, METH_NOARGS),
 	METHOD(UnmemorizeSpell, METH_VARARGS),
+	METHOD(UpdateTooltipDelay, METH_VARARGS),
 	METHOD(UpdateVolume, METH_VARARGS),
 	METHOD(UpdateWorldMap, METH_VARARGS),
 	METHOD(UseItem, METH_VARARGS),
@@ -12977,7 +13100,7 @@ bool GUIScript::Init(void)
 	/* pGUIClasses is a borrowed reference */
 
 	PyObject* pFunc = PyDict_GetItemString(pMainDic, "Init");
-	if (!PyObject_CallObject(pFunc, nullptr)) {
+	if (!CallObjectWrapper(pFunc, nullptr)) {
 		Log(ERROR, "GUIScript", "Failed to execute Init() in {}", main);
 		PyErr_Print();
 		return false;
@@ -13164,7 +13287,8 @@ PyObject* GUIScript::RunPyFunction(const char* moduleName, const char* functionN
 		Py_DECREF(pyModule);
 		return NULL;
 	}
-	PyObject* pValue = PyObject_CallObject(pFunc, pArgs);
+
+	PyObject* pValue = CallObjectWrapper(pFunc, pArgs);
 	if (!pValue) {
 		if (PyErr_Occurred()) {
 			PyErr_Print();

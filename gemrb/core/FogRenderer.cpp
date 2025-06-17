@@ -21,6 +21,7 @@
 #include "FogRenderer.h"
 
 #include "AnimationFactory.h"
+#include "Bitmap.h"
 #include "GameData.h"
 
 #include "Video/Video.h"

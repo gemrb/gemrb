@@ -25,10 +25,6 @@
 #include "globals.h"
 #include "ie_types.h"
 
-#include "Resource.h"
-
-#include <bitset>
-#include <string>
 #include <vector>
 
 namespace GemRB {

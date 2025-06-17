@@ -171,6 +171,11 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassName = GUICommon.GetClassRowName(Class, "class")
 
+	if GUICommon.IsNamelessOne(pc):
+		# sigh
+		level1 = [level1[2]]
+		level2 = [level2[2]]
+
 	#get the number of classes
 	if IsMulti[0]>1:
 		NumClasses = IsMulti[0]
@@ -236,7 +241,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 				SkillValue = GemRB.GetPlayerStat (pc, SkillID)
 				BaseSkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
 				GemRB.SetVar("Skill "+str(i), SkillValue)
-				GemRB.SetVar("SkillBase "+str(i), SkillValue)
+				GemRB.SetVar("SkillBase " + str(i), BaseSkillValue)
 				# display the modified stat to avoid confusion (account for dex, race and effect boni)
 				GemRB.SetVar("SkillDisplayMod "+str(i), SkillValue-BaseSkillValue)
 				TotalSkillsAssignable += LUSKILLS_MAX-SkillValue
@@ -344,7 +349,8 @@ def SkillsRedraw (direction=0):
 	
 		#show how many points are allocated to this skill		
 		Label = SkillsWindow.GetControl(0x10000000+SkillsOffsetPoints+(i*SkillsLabelIncrement))
-		ActPoint = GemRB.GetVar("Skill "+str(Pos) )
+		SkillValue = GemRB.GetVar("Skill " + str(Pos))
+		ActPoint = -1 if SkillValue == None else SkillValue
 		Label.SetText(str(ActPoint))
 
 	#setup doublespeed
@@ -366,7 +372,8 @@ def SkillDecreasePress (btn):
 
 	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
-	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
+	SkillValue = GemRB.GetVar("Skill " + str(Pos))
+	ActPoint = -1 if SkillValue == None else SkillValue
 	BasePoint = GemRB.GetVar("SkillBase "+str(Pos) )
 	if ActPoint <= 0 or ActPoint <= BasePoint:
 		return
@@ -385,10 +392,13 @@ def SkillIncreasePress (btn):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
 	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
+	Description = SkillsTable.GetValue (SkillsTable.GetRowName (Pos + 2), "DESC_REF", GTV_STR)
+	if Description != "-1":
+		SkillsTextArea.SetText (Description)
 	if SkillPointsLeft == 0:
 		return
-	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
+	SkillValue = GemRB.GetVar("Skill " + str(Pos))
+	ActPoint = -1 if SkillValue == None else SkillValue
 	if ActPoint >= LUSKILLS_MAX:
 		return
 	GemRB.SetVar("Skill "+str(Pos), ActPoint+1)

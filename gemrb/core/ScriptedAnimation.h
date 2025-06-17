@@ -23,12 +23,9 @@
 #include "exports.h"
 
 #include "Animation.h"
-#include "Audio.h"
 #include "Orientation.h"
-#include "Palette.h"
-#include "Resource.h"
 
-#include "Video/Video.h"
+#include "Audio/Playback.h"
 
 namespace GemRB {
 
@@ -134,7 +131,7 @@ public:
 	ScriptedAnimation* twin = nullptr;
 	bool active = true;
 	bool effect_owned = false;
-	Holder<SoundHandle> sound_handle;
+	Holder<PlaybackHandle> soundHandle;
 	tick_t starttime = 0;
 
 public:
@@ -164,6 +161,8 @@ public:
 	void SetOrientation(orient_t orientation);
 	/* transforms vvc to blended */
 	void SetBlend();
+	/* sets the position */
+	void SetPos(const Point& pos);
 	/* sets the effect owned flag */
 	void SetEffectOwned(bool flag);
 	/* sets fade effect at end of animation (pst feature) */

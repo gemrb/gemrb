@@ -27,16 +27,14 @@
 #ifndef VFS_H
 #define VFS_H
 
-#include "Platform.h"
 #include "Predicates.h"
 #include "exports.h"
-#include "ie_types.h"
 
 #include "config.h"
 
-#include <memory>
+#include "fmt/format.h"
+
 #include <string>
-#include <sys/stat.h>
 
 #ifdef WIN32
 	#include "win32def.h"

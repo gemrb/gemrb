@@ -22,8 +22,8 @@
 
 #include "RGBAColor.h"
 
-#include "Region.h"
 #include "Scriptable.h"
+#include "Sprite2D.h"
 
 namespace GemRB {
 

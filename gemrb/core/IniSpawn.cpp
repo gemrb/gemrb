@@ -24,8 +24,10 @@
 #include "IniSpawn.h"
 
 #include "globals.h"
+#include "ie_stats.h"
 
 #include "CharAnimations.h"
+#include "DataFileMgr.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -36,6 +38,7 @@
 #include "GUI/GameControl.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
@@ -609,9 +612,6 @@ void IniSpawn::RespawnNameless()
 	}
 
 	nameless->Resurrect(NamelessSpawnPoint);
-	// resurrect leaves you at 1hp for raise dead, so manually bump it back to max
-	nameless->RefreshEffects();
-	nameless->SetBase(IE_HITPOINTS, 9999);
 
 	// reselect nameless, since he didn't really 'die'
 	// this matches the unconditional reselect behavior of the original
@@ -622,7 +622,16 @@ void IniSpawn::RespawnNameless()
 		nameless->SetStance(IE_ANI_PST_START);
 	}
 
+	// resurrect leaves you at 1hp for raise dead, so manually bump it back to max
+	// however, if TNO gets transported to another map, equipping effects will be reapplied in Actor::SetMap
+	// until the game is reloaded one could accummulate modifiers that way
+	if (NamelessSpawnArea != nameless->AreaName) {
+		nameless->fxqueue.RemoveEquippingEffects(0xffffffff);
+	}
+
 	game->MovePCs(NamelessSpawnArea, NamelessSpawnPoint, -1);
+	// the move might have reapplied the effects, so set hp last in case a max hp effect is in play
+	nameless->Heal(0);
 
 	//certain variables are set when nameless dies
 	for (const auto& var : NamelessVar) {
@@ -842,7 +851,7 @@ void IniSpawn::InitialSpawn()
 			Actor* pc = game->GetPC(1, false); // skip TNO
 			pc->Stop();
 			MoveBetweenAreasCore(pc, PartySpawnArea, PartySpawnPoint, -1, true);
-			game->LeaveParty(pc);
+			game->LeaveParty(pc, false);
 		}
 	}
 }

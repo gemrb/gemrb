@@ -18,11 +18,7 @@
 
 #include "NullSource.h"
 
-#include "globals.h"
-
-#include "ResourceDesc.h"
-
-#include "Streams/FileStream.h"
+#include <utility>
 
 using namespace GemRB;
 

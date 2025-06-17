@@ -18,9 +18,9 @@
  *
  */
 
-#include "voodooconst.h"
+#include "defsounds.h"
+#include "ie_stats.h"
 
-#include "AmbientMgr.h"
 #include "CharAnimations.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h"
@@ -51,7 +51,6 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
-#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -286,6 +285,8 @@ void GameScript::SetNamelessClass(Scriptable* /*Sender*/, Action* parameters)
 	//same as Protagonist
 	Actor* actor = core->GetGame()->GetPC(0, false);
 	actor->SetBase(IE_CLASS, parameters->int0Parameter);
+	// dump newly incompatible items; perhaps this should go into pcf_class
+	actor->inventory.EnforceUsability();
 }
 
 void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)
@@ -345,7 +346,7 @@ inline void PermanentStatChangeFeedback(int stat, const Actor* actor)
 		displaymsg->DisplayString(ref, GUIColors::WHITE, STRING_FLAGS::SOUND);
 		return;
 	}
-	// there's also this one, but there's no stat, perhaps used for level up, where you get the attribute increase window?
+	// there's also this one, but it is unused, nothing calls the feedback function to print it:
 	// @35621 = ~Characteristic Points increased permanently [Nameless One]~
 }
 
@@ -1284,6 +1285,9 @@ void GameScript::TimedMoveToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (parameters->int0Parameter <= 0) {
+		if (actor->Pos != parameters->pointParameter) {
+			actor->SetPosition(parameters->pointParameter, true);
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1661,7 +1665,13 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 		Log(WARNING, "Actions", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
 	}
 
-	DisplayStringCore(target, ieStrRef(parameters->int0Parameter), DS_HEAD | DS_SPEECH);
+	int flags = DS_HEAD | DS_SPEECH;
+	int strRef = parameters->int0Parameter;
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && strRef > 1000000) {
+		flags |= DS_APPEND; // force append, so several messages can be queued
+		strRef -= 1000000;
+	}
+	DisplayStringCore(target, ieStrRef(strRef), flags);
 }
 
 void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
@@ -1922,20 +1932,25 @@ void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFXChannel::Char0, Sender->Pos, parameters->int0Parameter ? GEM_SND_SPEECH : 0);
+
+	if (parameters->int0Parameter) {
+		auto config = core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Char0, Sender->Pos);
+		core->GetAudioPlayback().PlaySpeech(parameters->string0Parameter, config);
+	} else {
+		core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::Spatial, SFXChannel::Char0, Sender->Pos);
+	}
 }
 
 void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFXChannel::Actions,
-				  parameters->pointParameter, GEM_SND_SPATIAL);
+	core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::Spatial, SFXChannel::Actions, parameters->pointParameter);
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFXChannel::Actions);
+	core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::ScreenAction, SFXChannel::Actions);
 }
 
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -2039,11 +2054,11 @@ void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
 // not in IESDP but this one should affect ambients
 void GameScript::SoundActivate(Scriptable* /*Sender*/, Action* parameters)
 {
-	AmbientMgr* ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
+	AmbientMgr& ambientmgr = core->GetAmbientManager();
 	if (parameters->int0Parameter) {
-		ambientmgr->Activate(parameters->objects[1]->objectName);
+		ambientmgr.Activate(parameters->objects[1]->objectName);
 	} else {
-		ambientmgr->Deactivate(parameters->objects[1]->objectName);
+		ambientmgr.Deactivate(parameters->objects[1]->objectName);
 	}
 }
 
@@ -2516,8 +2531,7 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 	}
 	unsigned int distance;
 	const Point* p;
-	Door* door = NULL;
-	Container* container = NULL;
+	const Door* door = nullptr;
 	ScriptableType type = tar->Type;
 
 	switch (type) {
@@ -2531,8 +2545,7 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 			p = door->GetClosestApproach(Sender, distance);
 			break;
 		case ST_CONTAINER:
-			container = static_cast<Container*>(tar);
-			p = &container->Pos;
+			p = &tar->Pos;
 			distance = Distance(*p, Sender);
 			break;
 		default:
@@ -2625,7 +2638,9 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* parameters)
 			door->AddTrigger(TriggerEntry(trigger_failedtoopen, actor->GetGlobalID()));
 
 			//playsound unsuccessful opening of door
-			core->PlaySound(door->IsOpen() ? DS_CLOSE_FAIL : DS_OPEN_FAIL, SFXChannel::Actions, *p, GEM_SND_SPATIAL);
+			core->GetAudioPlayback().PlayDefaultSound(
+				door->IsOpen() ? DS_CLOSE_FAIL : DS_OPEN_FAIL,
+				core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Actions, *p));
 			Sender->ReleaseCurrentAction();
 			return; //don't open door
 		}
@@ -2946,7 +2961,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 
 	//normally the second parameter is 0, but it may be handy to have control over that (See SX_* flags)
 	actor->AddExperience(xp, parameters->int1Parameter);
-	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
+	core->GetAudioPlayback().PlayDefaultSound(DS_GOTXP, SFXChannel::Actions);
 }
 
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
@@ -2968,13 +2983,13 @@ void GameScript::AddXPWorth(Scriptable* Sender, Action* parameters)
 	int xp = actor->GetStat(IE_XPVALUE); // I guess
 	if (parameters->int0Parameter) actor->SetBase(IE_XPVALUE, 0);
 	core->GetGame()->ShareXP(xp, SX_DIVIDE);
-	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
+	core->GetAudioPlayback().PlayDefaultSound(DS_GOTXP, SFXChannel::Actions);
 }
 
 void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->ShareXP(parameters->int0Parameter, SX_DIVIDE);
-	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
+	core->GetAudioPlayback().PlayDefaultSound(DS_GOTXP, SFXChannel::Actions);
 }
 
 //this needs moncrate.2da, but otherwise independent from GFFlags::CHALLENGERATING
@@ -2987,7 +3002,7 @@ void GameScript::AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters
 {
 	ieDword xp = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter);
 	core->GetGame()->ShareXP(xp, SX_DIVIDE);
-	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
+	core->GetAudioPlayback().PlayDefaultSound(DS_GOTXP, SFXChannel::Actions);
 }
 
 // these two didn't work in the original (bg2, ee) and were unused
@@ -3017,7 +3032,17 @@ void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
 	if (!act) {
 		return;
 	}
+
+	ieDword oldMorale = act->GetBase(IE_MORALE);
 	act->SetBase(IE_MORALE, parameters->int0Parameter);
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		ScriptEngine::FunctionParameters params {
+			ScriptEngine::Parameter(act->GetGlobalID()),
+			ScriptEngine::Parameter(act->GetBase(IE_MORALE) - oldMorale),
+			ScriptEngine::Parameter(0)
+		};
+		core->GetGUIScriptEngine()->RunFunction("Game", "CheckKarachUpgrade", params);
+	}
 }
 
 void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
@@ -3028,6 +3053,14 @@ void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	act->SetBase(IE_MORALE, act->GetBase(IE_MORALE) + parameters->int0Parameter);
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		ScriptEngine::FunctionParameters params {
+			ScriptEngine::Parameter(act->GetGlobalID()),
+			ScriptEngine::Parameter(parameters->int0Parameter),
+			ScriptEngine::Parameter(0)
+		};
+		core->GetGUIScriptEngine()->RunFunction("Game", "CheckKarachUpgrade", params);
+	}
 }
 
 void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
@@ -3038,6 +3071,14 @@ void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	act->SetBase(IE_MORALE, act->GetBase(IE_MORALE) - parameters->int0Parameter);
+	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		ScriptEngine::FunctionParameters params {
+			ScriptEngine::Parameter(act->GetGlobalID()),
+			ScriptEngine::Parameter(-1 * parameters->int0Parameter),
+			ScriptEngine::Parameter(0)
+		};
+		core->GetGUIScriptEngine()->RunFunction("Game", "CheckKarachUpgrade", params);
+	}
 }
 
 // ee oddity
@@ -3092,7 +3133,11 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 			act->SetDialog(resRef);
 		}
 	}
-	game->JoinParty(act, JP_JOIN);
+	int flags = JP_JOIN;
+	if (parameters->actionID > 19) { // ugly way to distinguish JoinPartyOverride
+		flags |= JP_OVERRIDE;
+	}
+	game->JoinParty(act, flags);
 }
 
 void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
@@ -3742,7 +3787,7 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 	int range = parameters->int0Parameter;
 	// 0 means reset back to normal
 	if (range == 0) {
-		range = VOODOO_VISUAL_RANGE;
+		range = Scriptable::VOODOO_VISUAL_RANGE;
 	}
 
 	actor->SetBase(IE_VISUALRANGE, range);
@@ -3792,8 +3837,7 @@ void GameScript::IncrementProficiency(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//start of the proficiency stats
-	target->SetBase(IE_PROFICIENCYBASTARDSWORD + idx,
-			target->GetBase(IE_PROFICIENCYBASTARDSWORD + idx) + parameters->int1Parameter);
+	target->NewBase(IE_PROFICIENCYBASTARDSWORD + idx, parameters->int1Parameter, MOD_ADDITIVE);
 }
 
 void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameters)
@@ -5400,11 +5444,11 @@ void GameScript::ExploreMapChunk(Scriptable* Sender, Action* parameters)
 	Map* map = Sender->GetCurrentArea();
 	/*
 	There is a mode flag in int1Parameter, but i don't know what is it,
-	our implementation uses it for LOS=1, or no LOS=0
 	ExploreMapChunk will reveal both visibility/explored map, but the
-	visibility will fade in the next update cycle (which is quite frequent)
+	visibility will fade in the next update cycle (which is quite frequent).
+	The action is an instant, so it will only run once.
 	*/
-	map->ExploreMapChunk(SearchmapPoint(parameters->pointParameter), parameters->int0Parameter, parameters->int1Parameter);
+	map->ExploreMapChunk(SearchmapPoint(parameters->pointParameter), parameters->int1Parameter, 0);
 }
 
 void GameScript::StartStore(Scriptable* Sender, Action* parameters)
@@ -6576,7 +6620,7 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 	const Point* pos;
 	unsigned int distance;
 	if (target->Type == ST_DOOR) {
-		Door* door = static_cast<Door*>(target);
+		const Door* door = static_cast<Door*>(target);
 		pos = door->GetClosestApproach(Sender, distance);
 	} else if (target->Type == ST_CONTAINER) {
 		pos = &target->Pos;
@@ -7404,7 +7448,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	}
 
 	// voice
-	core->GetAudioDrv()->Play(parameters->string0Parameter, channel, Sender->Pos, GEM_SND_SPEECH | GEM_SND_QUEUE | GEM_SND_SPATIAL);
+	core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::SpatialVoice, channel, Sender->Pos);
 	// string1Parameter has the starting sound, played at the same time, but on SFXChannel::Casting
 	// NOTE: only a few uses have also an ending sound that plays when the effect ends (also stopping Sound1)
 	// but we don't even read all three string parameters, as Action stores just two
@@ -7856,8 +7900,11 @@ void GameScript::MoveToCampaign(Scriptable* /*Sender*/, Action* parameters)
 	core->UpdateWorldMap(parameters->resref0Parameter);
 }
 
-// TODO: ee, unknown SetNoWaitX(I:SetReset*Boolean); prevents WaitCounter being set??
-// TODO: ee, unknown ContinueGame(I:State*Boolean) unknown, called only before EndCredits, so potentially useless
+// SetNoWaitX(I:SetReset*Boolean) was a stub
+// TODO: ee, ContinueGame(I:State*Boolean)
+//       IESDP: If "State" is `FALSE` then this action clears the "Last Save" definition in `baldur.lua` for the current
+//       campaign that would otherwise enable the player to automatically load the latest save from the start menu of the game.
+//       Specifying `TRUE` does nothing.
 // TODO: ee, unclear if really useful DisableAI(O:Object*,I:Disable*Boolean) used in cutscenes
 // IESDP says: this action activates or deactivates all creature scripts of the given target depending on the second parameter.
 // ... but they're already disabled; is this used more to enable them despite cutscene logic?

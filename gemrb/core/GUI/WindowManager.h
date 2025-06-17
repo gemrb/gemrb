@@ -19,12 +19,12 @@
 #ifndef __GemRB__WindowManager__
 #define __GemRB__WindowManager__
 
-#include "Audio.h"
 #include "EventMgr.h"
 #include "Resource.h"
 #include "Sprite2D.h"
 #include "Tooltip.h"
 
+#include "Audio/Playback.h"
 #include "GUI/Window.h"
 #include "Video/Video.h"
 
@@ -40,7 +40,7 @@ using WindowList = std::deque<Window*>;
 struct ToolTipData {
 	Tooltip tt;
 	tick_t time = 0;
-	Holder<SoundHandle> tooltip_sound;
+	Holder<PlaybackHandle> tooltip_sound;
 	bool reset = false;
 
 	explicit ToolTipData(Tooltip tt)

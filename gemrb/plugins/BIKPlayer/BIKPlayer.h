@@ -21,9 +21,9 @@
 #ifndef BIKPLAYER_H
 #define BIKPLAYER_H
 
-#include "globals.h"
-
 #include "MoviePlayer.h"
+
+#include "Audio/AudioBackend.h"
 
 // FIXME: This has to be included last, since it defines int*_t, which causes
 // mingw g++ 4.5.0 to choke.
@@ -206,7 +206,8 @@ private:
 	unsigned int s_num_bands = 0;
 	int s_first = 0;
 	bool s_audio = false;
-	int s_stream = 0; // openal stream handle
+	Holder<SoundStreamSourceHandle> audioStream;
+	AudioBufferFormat audioStreamFormat;
 
 #pragma pack(push, 16)
 	FFTSample s_coeffs[BINK_BLOCK_MAX_SIZE];
@@ -244,11 +245,9 @@ private:
 	void segment_video_play();
 	strret_t fileRead(strpos_t pos, void* buf, strpos_t count);
 
-	int setAudioStream() const;
-	void freeAudioStream(int stream) const;
-	void queueBuffer(int stream, unsigned short bits,
-			 int channels, short* memory, int size, int samplerate) const;
-	int sound_init(bool need_init);
+	void FreeAudioStream() const;
+	void QueueBuffer(unsigned short bits, int channels, short* memory, int size, int samplerate);
+	int sound_init();
 	void ff_init_scantable(ScanTable* st, const uint8_t* src_scantable) const;
 	int video_init();
 	void av_set_pts_info(AVRational& time_base, unsigned int pts_num, unsigned int pts_den) const;

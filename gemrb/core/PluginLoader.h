@@ -24,9 +24,6 @@
 #include "Strings/StringMap.h"
 #include "System/VFS.h"
 
-#include <string>
-#include <unordered_map>
-
 namespace GemRB {
 
 enum class PluginFlagsType {

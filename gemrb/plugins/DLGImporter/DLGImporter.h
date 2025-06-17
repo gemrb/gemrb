@@ -21,8 +21,6 @@
 #ifndef DLGIMPORTER_H
 #define DLGIMPORTER_H
 
-#include "globals.h"
-
 #include "DialogMgr.h"
 
 namespace GemRB {

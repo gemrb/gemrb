@@ -28,16 +28,10 @@
 #ifndef VOODOO_H
 #define VOODOO_H
 
-#include "exports.h"
-
 namespace GemRB {
 
 // MAX_TRAVELING_DISTANCE is our choice, only used for party travel
-// MAX_OPERATING_DISTANCE is a guess
-// test cases: tob pp summoning spirit, pst portals, pst AR0405, AR0508, ar0500 (guards through gates)
-// it's about 3 times bigger in pst, perhaps related to the bigger sprite sizes and we modify it in Scriptable
-// The distance of operating a trigger, container, dialog buffer etc.
-static unsigned int MAX_OPERATING_DISTANCE IGNORE_UNUSED = 40; //a search square is 16x12 (diagonal of 20), so that's about two
+// MAX_OPERATING_DISTANCE is a guess, see comment in GameScript
 
 // existence delay is a stat used to delay various char quips, but it's sometimes set to 0,
 // while it should clearly always be delayed at least a bit. The engine uses randomization.
@@ -60,7 +54,11 @@ static const unsigned int VOODOO_EXISTENCE_DELAY_DEFAULT = 300;
 // visual range stuff
 // these two are well understood for actors, but could be different for other scriptables
 // eg. visual range is supposedly 15 (see note in DoObjectChecks)
-static const int VOODOO_VISUAL_RANGE = 28;
+// in PST it was dynamic, dependant on TNO's fighter level!?
+// horizontal range was calculated as (14 + level) * (2 * 16)
+// so at minimum 17 * 2 * 16 or the way we store it: 34 * 16
+// VOODOO_VISUAL_RANGE is now set in Interface / Scriptable.h
+// dialog range was only configurable in the iwds
 static const int VOODOO_DIALOG_RANGE = 15;
 
 }

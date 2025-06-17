@@ -19,10 +19,10 @@
  */
 
 #include "ie_feats.h" //cannot avoid declaring these
+#include "ie_stats.h"
 #include "opcode_params.h"
 #include "overlays.h"
 
-#include "Audio.h" //needs for a playsound call
 #include "DisplayMessage.h"
 #include "EffectQueue.h"
 #include "Game.h"
@@ -1633,7 +1633,7 @@ static int fx_animal_rage(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 static int fx_turn_undead2(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (fx->FirstApply) {
-		core->GetAudioDrv()->Play("ACT_06", SFXChannel::Monster, target->Pos, GEM_SND_SPATIAL);
+		core->GetAudioPlayback().Play("ACT_06", AudioPreset::Spatial, SFXChannel::Monster, target->Pos);
 	}
 	target->SetSpellState(SS_TURNED);
 
@@ -1731,7 +1731,7 @@ static int fx_turn_undead3(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	}
 
 	int flags = GA_NO_SELF | GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED;
-	const auto& targets = area->GetAllActorsInRadius(target->Pos, flags, turner->GetBase(IE_VISUALRANGE) / 2, turner);
+	const auto& targets = area->GetAllActorsInRadius(target->Pos, flags, turner->GetVisualRange() / 2, turner);
 	int turnUndeadStat = turner->GetStat(IE_TURNUNDEADLEVEL);
 	for (auto subTarget : targets) {
 		// turn only once, possible with multiple clerics, paladins
@@ -1958,7 +1958,7 @@ static int fx_harpy_wail(Scriptable* Owner, Actor* target, Effect* fx)
 	if (STATE_GET(STATE_DEAD | STATE_PETRIFIED | STATE_FROZEN)) {
 		return FX_NOT_APPLIED;
 	}
-	core->GetAudioDrv()->Play(fx->Resource2, SFXChannel::Monster, target->Pos, GEM_SND_SPATIAL);
+	core->GetAudioPlayback().Play(fx->Resource2, AudioPreset::Spatial, SFXChannel::Monster, target->Pos);
 
 	const Map* area = target->GetCurrentArea();
 	if (!area) return FX_NOT_APPLIED;

@@ -24,6 +24,7 @@
 #include "../../core/Interface.h"
 #include "../../core/InterfaceConfig.h"
 #include "../../core/Logging/Loggers/Stdio.h"
+#include "../../core/Logging/Logging.h"
 #include "../../core/Map.h"
 #include "../../core/PluginMgr.h"
 #include "../../core/SaveGameMgr.h"
@@ -41,11 +42,7 @@ public:
 	static void SetUpTestSuite()
 	{
 		setlocale(LC_ALL, "");
-#if defined(WIN32) || defined(__APPLE__)
-		const char* argv[] = { "tester", "-c", "../demo/tester.cfg" };
-#else
-		const char* argv[] = { "tester", "-c", "../../../demo/tester.cfg" };
-#endif
+		const char* argv[] = { "tester", "-c", "../../tester.cfg" };
 		auto cfg = LoadFromArgs(3, const_cast<char**>(argv));
 		ToggleLogging(true);
 		AddLogWriter(createStdioLogWriter());

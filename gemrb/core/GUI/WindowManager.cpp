@@ -28,6 +28,7 @@
 #include "Window.h"
 
 #include "GUI/GUIFactory.h"
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/GameControl.h"
 
 #define WIN_IT(w) \
@@ -43,8 +44,7 @@ Holder<Sprite2D> WindowManager::CursorMouseDown;
 
 void WindowManager::SetTooltipDelay(int delay)
 {
-	// Max setting disables tooltips in originals, we just set it to an extremely high value for simplicity.
-	ToolTipDelay = (delay == 10 * Tooltip::DELAY_FACTOR) ? 10000000 : delay;
+	ToolTipDelay = delay;
 }
 
 WindowManager::WindowManager(PluginHolder<Video> vid, std::shared_ptr<GUIFactory> fact)
@@ -116,8 +116,9 @@ Window* WindowManager::LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& 
 
 Window* WindowManager::CreateWindow(ScriptingId WindowID, const Region& frame)
 {
-	// FIXME: this will create a window under the current "window pack"
+	// NOTE: this will create a window under the current "window pack"
 	// obviously its possible the id can conflict with an existing window
+	// in that case nullptr will be returned and GUIFactory will print an error
 	return guifact->CreateWindow(WindowID, frame);
 }
 
@@ -158,7 +159,7 @@ bool WindowManager::PresentModalWindow(Window* win)
 	win->SetFlags(Window::Modal, BitOp::OR);
 
 	if (win->Flags() & Window::Borderless && !(win->Flags() & Window::NoSounds)) {
-		core->PlaySound(DS_WINDOW_OPEN, SFXChannel::GUI);
+		core->GetAudioPlayback().PlayDefaultSound(DS_WINDOW_OPEN, SFXChannel::GUI);
 	}
 
 	return true;
@@ -208,7 +209,7 @@ bool WindowManager::OrderBack(Window* win)
 
 bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 {
-	if (win == NULL || win == win2) {
+	if (win == nullptr || win == win2) {
 		return false;
 	}
 	// FIXME: this should probably account for modal windows
@@ -281,18 +282,18 @@ void WindowManager::CloseWindow(Window* win)
 
 	if (win == ModalWindow()) {
 		if (win->Flags() & Window::Borderless && !(win->Flags() & Window::NoSounds)) {
-			core->PlaySound(DS_WINDOW_CLOSE, SFXChannel::GUI);
+			core->GetAudioPlayback().PlayDefaultSound(DS_WINDOW_CLOSE, SFXChannel::GUI);
 		}
 
 		win->SetFlags(Window::Modal, BitOp::NAND);
 	}
 
 	if (win == hoverWin) {
-		hoverWin = NULL;
+		hoverWin = nullptr;
 	}
 
 	if (win == trackingWin) {
-		trackingWin = NULL;
+		trackingWin = nullptr;
 	}
 
 	bool isFront = it == windows.begin();
@@ -368,7 +369,7 @@ Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_ite
 {
 	if (current == windows.end()) {
 		// we already went through them all and returned gameWin or modalWin once. There is no target window after gameWin
-		return NULL;
+		return nullptr;
 	}
 
 	if (Window* mwin = ModalWindow()) {
@@ -420,7 +421,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 		}
 
 		if (event.type != Event::TouchGesture) {
-			trackingWin = NULL;
+			trackingWin = nullptr;
 		}
 	} else if (event.isScreen && trackingWin) {
 		if (trackingWin->IsDisabled() == false) {
@@ -436,8 +437,8 @@ bool WindowManager::DispatchEvent(const Event& event)
 
 		// handle when mouse leaves the window
 		if (hoverWin && HIT_TEST(event, hoverWin) == false) {
-			hoverWin->MouseLeave(event.mouse, NULL);
-			hoverWin = NULL;
+			hoverWin->MouseLeave(event.mouse, nullptr);
+			hoverWin = nullptr;
 		}
 		// handled here instead of as a hotkey, so also gamecontrol can do its thing
 	} else if (event.type == Event::KeyDown && event.keyboard.keycode == GEM_TAB) {
@@ -477,8 +478,9 @@ void WindowManager::DrawMouse() const
 	Point tooltipPos = cursorPos;
 
 	// pst displays actor name tooltips overhead, not at the mouse position
+	// to disambiguate for portrait buttons, we unfortunately can't just check for gameWin/gc focus
 	const GameControl* gc = core->GetGameControl();
-	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && gc) {
+	if (core->HasFeature(GFFlags::ONSCREEN_TEXT) && gc && gc->IsOverLastActor(tooltipPos)) {
 		tooltipPos.y -= gc->GetOverheadOffset();
 	}
 
@@ -544,7 +546,7 @@ void WindowManager::DrawTooltip(Point pos) const
 				tooltip.tooltip_sound.reset();
 			}
 			if (text.length()) {
-				tooltip.tooltip_sound = core->PlaySound(DS_TOOLTIP, SFXChannel::GUI);
+				tooltip.tooltip_sound = core->GetAudioPlayback().PlayDefaultSound(DS_TOOLTIP, SFXChannel::GUI);
 			}
 			tooltip.reset = false;
 		}
@@ -569,7 +571,7 @@ void WindowManager::DrawWindowFrame(BlitFlags flags) const
 	// ... I'm not 100% certain this works for all use cases.
 	// if it doesn't... i think it might be better to just forget about the window frames once the game is loaded
 
-	video->SetScreenClip(NULL);
+	video->SetScreenClip(nullptr);
 
 	Holder<Sprite2D> left_edge = WinFrameEdge(0);
 	if (left_edge) {
@@ -609,6 +611,10 @@ void WindowManager::DrawWindows() const
 	// draw the game window now (beneath everything else); it's not part of the windows collection
 	if (gameWin->IsVisible()) {
 		gameWin->Draw();
+
+		if (FadeColor.a > 0) {
+			video->DrawRect(screen, FadeColor, true, BlitFlags::BLENDED);
+		}
 	} else {
 		// something must get drawn or else we get smearing
 		// this is kind of a hacky way to clear it, but it works
@@ -687,14 +693,10 @@ void WindowManager::DrawWindows() const
 		}
 	}
 
-	if (!modalWin && !drawFrame && FadeColor.a > 0) {
-		video->DrawRect(screen, FadeColor, true);
-	}
-
 	DrawMouse();
 
 	// Be sure to reset this to nothing, else some renderer backends (metal at least) complain when we clear (swapbuffers)
-	video->SetScreenClip(NULL);
+	video->SetScreenClip(nullptr);
 }
 
 //copies a screenshot into a sprite

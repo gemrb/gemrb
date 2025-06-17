@@ -124,8 +124,12 @@ def RollPress():
 				Label.SetText(str(v) )
 
 	# add a counter to the title
+	Sum = str(Total)
 	SumLabel = AbilityWindow.GetControl (0x10000000)
-	SumLabel.SetText(GemRB.GetString(11976) + ": " + str(Total))
+	SumLabel.SetText (GemRB.GetString(11976) + ": " + Sum)
+	SumLabel2 = AbilityWindow.GetControl (0x10000000 + 40)
+	if SumLabel2:
+		SumLabel2.SetText (Sum)
 	AllPoints18 = 0
 	return
 

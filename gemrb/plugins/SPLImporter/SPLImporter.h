@@ -21,9 +21,6 @@
 #ifndef SPLIMPORTER_H
 #define SPLIMPORTER_H
 
-#include "ie_types.h"
-
-#include "Spell.h"
 #include "SpellMgr.h"
 
 namespace GemRB {

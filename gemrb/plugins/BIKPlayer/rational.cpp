@@ -32,7 +32,6 @@
 // clang-format on
 
 #include <cassert>
-#include <climits>
 
 static inline int64_t av_gcd(int64_t a, int64_t b)
 {

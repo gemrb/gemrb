@@ -20,19 +20,19 @@
 #ifndef GSUTILS_H
 #define GSUTILS_H
 
-#include "defsounds.h"
 #include "exports.h"
-#include "strrefs.h"
 
 #include "Cache.h"
-#include "SrcMgr.h"
+#include "SymbolMgr.h"
 
-#include "GUI/EventMgr.h"
 #include "GameScript/GameScript.h"
 #include "GameScript/Matching.h"
-#include "GameScript/Targets.h"
 
 namespace GemRB {
+
+class Gem_Polygon;
+class SrcVector;
+struct MouseEvent;
 
 using VarContext = ResRef;
 

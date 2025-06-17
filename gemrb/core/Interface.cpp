@@ -24,11 +24,10 @@
 #include "exports.h"
 #include "globals.h"
 #include "ie_cursors.h"
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "ActorMgr.h"
-#include "AmbientMgr.h"
-#include "AnimationMgr.h"
 #include "ArchiveImporter.h"
 #include "Calendar.h"
 #include "DataFileMgr.h"
@@ -36,43 +35,34 @@
 #include "DialogHandler.h"
 #include "DialogMgr.h"
 #include "DisplayMessage.h"
-#include "EffectMgr.h"
 #include "EffectQueue.h"
 #include "Factory.h"
 #include "FontManager.h"
 #include "Game.h"
-#include "ItemMgr.h"
 #include "KeyMap.h"
+#include "Map.h"
 #include "MapMgr.h"
 #include "MoviePlayer.h"
 #include "MusicMgr.h"
-#include "Palette.h"
 #include "PluginLoader.h"
 #include "PluginMgr.h"
 #include "ProjectileServer.h"
 #include "RNG.h"
+#include "ResourceSource.h"
 #include "SaveGameIterator.h"
 #include "SaveGameMgr.h"
 #include "ScriptedAnimation.h"
-#include "SoundMgr.h"
-#include "SpellMgr.h"
-#include "StoreMgr.h"
 #include "SymbolMgr.h"
 #include "TileMap.h"
-#include "VEFObject.h"
 #include "WorldMapMgr.h"
 
-#include "GUI/Button.h"
-#include "GUI/Console.h"
 #include "GUI/EventMgr.h"
 #include "GUI/GUIFactory.h"
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/GameControl.h"
 #include "GUI/Label.h"
-#include "GUI/MapControl.h"
 #include "GUI/TextArea.h"
 #include "GUI/WindowManager.h"
-#include "GUI/WorldMapControl.h"
 #include "GameScript/GameScript.h"
 #include "Scriptable/Container.h"
 #include "Streams/FileStream.h"
@@ -266,7 +256,6 @@ Interface::Interface(CoreSettings&& cfg)
 	vars = std::move(config.vars);
 	// for simple GUIScript access
 	vars.Set("MaxPartySize", config.MaxPartySize);
-	vars.Set("GUIEnhancements", config.GUIEnhancements);
 
 	LoadPlugins();
 	InitVideo();
@@ -436,9 +425,7 @@ Interface::Interface(CoreSettings&& cfg)
 	// the originals used double ticks for haste handling
 	Time.ticksPerSec = maxRefreshRate / 2;
 
-	// set up the tooltip delay which we store in milliseconds
-	ieDword tooltipDelay = vars.Get("Tooltips", 0);
-	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
+	ApplyTooltipDelay();
 
 	// restore the game config name if we read it from our version
 	if (!tmp.empty()) {
@@ -650,6 +637,10 @@ Interface::~Interface() noexcept
 	delete projserv;
 	delete displaymsg;
 	delete TooltipBG;
+
+	delete audioPlayback;
+	delete ambientManager;
+	delete musicLoop;
 
 	// delete and nullify this global data as well
 	delete gamedata;
@@ -913,15 +904,15 @@ bool Interface::ReadDamageTypeTable()
 	return true;
 }
 
-bool Interface::ReadSoundChannelsTable() const
+bool Interface::ReadSoundChannelsTable()
 {
 	AutoTable tm = gamedata->LoadTable("sndchann");
 	if (!tm) {
 		return false;
 	}
 
+	// reverb is currently ignored
 	TableMgr::index_t ivol = tm->GetColumnIndex("VOLUME");
-	TableMgr::index_t irev = tm->GetColumnIndex("REVERB");
 	for (TableMgr::index_t i = 0; i < tm->GetRowCount(); i++) {
 		auto rowname = tm->GetRowName(i);
 		// translate some alternative names for the IWDs
@@ -931,11 +922,7 @@ bool Interface::ReadSoundChannelsTable() const
 			rowname = "SWINGS";
 
 		int volume = tm->QueryFieldSigned<int>(i, ivol);
-		float reverb = 0.0f;
-		if (irev != TableMgr::npos) {
-			reverb = atof(tm->QueryField(i, irev).c_str());
-		}
-		AudioDriver->UpdateChannel(rowname, volume, reverb);
+		audioSettings.UpdateChannel(rowname, volume);
 	}
 	return true;
 }
@@ -1058,7 +1045,8 @@ void Interface::InitVideo() const
 void Interface::InitAudio()
 {
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = std::static_pointer_cast<Audio>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName));
+	AudioDriver =
+		std::static_pointer_cast<AudioBackend>(PluginMgr::Get()->GetDriver(&AudioBackend::ID, config.AudioDriverName));
 	if (AudioDriver == nullptr) {
 		ThrowException("Failed to load sound driver.");
 	}
@@ -1104,7 +1092,11 @@ void Interface::InitAudio()
 		Log(WARNING, "Core", "Failed to read channel table.");
 	}
 
-	AudioDriver->SetScreenSize(Size(config.Width, config.Height));
+	audioSettings.SetScreenSize({ config.Width, config.Height });
+
+	ambientManager = new AmbientMgr {};
+	audioPlayback = new AudioPlayback { gamedata->defaultSounds };
+	musicLoop = new MusicLoop {};
 }
 
 void Interface::LoadPlugins() const
@@ -1268,9 +1260,29 @@ FogRenderer& Interface::GetFogRenderer()
 	return *fogRenderer;
 }
 
-PluginHolder<Audio> Interface::GetAudioDrv() const
+AmbientMgr& Interface::GetAmbientManager()
+{
+	return *ambientManager;
+}
+
+PluginHolder<AudioBackend> Interface::GetAudioDrv() const
 {
 	return AudioDriver;
+}
+
+const AudioSettings& Interface::GetAudioSettings() const
+{
+	return audioSettings;
+}
+
+AudioPlayback& Interface::GetAudioPlayback()
+{
+	return *audioPlayback;
+}
+
+MusicLoop& Interface::GetMusicLoop()
+{
+	return *musicLoop;
 }
 
 ieStrRef Interface::UpdateString(ieStrRef strref, const String& text) const
@@ -1303,6 +1315,11 @@ String Interface::GetString(ieStrRef strref, STRING_FLAGS options) const
 	} else {
 		return strings->GetString(strref, flags | options);
 	}
+}
+
+String Interface::GetString(HCStrings idx, STRING_FLAGS options) const
+{
+	return GetString(DisplayMessage::GetStringReference(idx), options);
 }
 
 std::string Interface::GetMBString(ieStrRef strref, STRING_FLAGS options) const
@@ -1513,6 +1530,14 @@ void Interface::LoadGemRBINI()
 		}
 	}
 
+	// see note in voodooconst.h
+	if (HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		Scriptable::VOODOO_VISUAL_RANGE = 34;
+	}
+
+	int maxOpcode = ini->GetKeyAsInt("resources", "MaxFXOpcode", 999999);
+	vars.Set("MaxFXOpcode", maxOpcode);
+
 	// fix the resolution default if needed
 	config.Width = std::max(config.Width, ini->GetKeyAsInt("resources", "MinWidth", 800));
 	config.Height = std::max(config.Height, ini->GetKeyAsInt("resources", "MinHeight", 600));
@@ -1705,7 +1730,7 @@ Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		if (vvc) {
 			// This is the final position of the summoned creature
 			// not the original target point
-			vvc->Pos = ab->Pos;
+			vvc->SetPos(ab->Pos);
 			// force vvc to play only once
 			vvc->PlayOnce();
 			map->AddVVCell(vvc);
@@ -2039,11 +2064,12 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	//shutting down music and ambients before movie
 	if (music)
 		music->HardEnd();
-	AmbientMgr* ambim = AudioDriver->GetAmbientMgr();
-	if (ambim) ambim->Deactivate();
+	ambientManager->Deactivate();
 	if (strrefHandle) {
 		strrefHandle->Stop();
 		strrefHandle.reset();
+	} else {
+		audioPlayback->StopSpeech();
 	}
 
 	ResourceHolder<MoviePlayer> mp = gamedata->GetResourceHolder<MoviePlayer>(actualMovieRef);
@@ -2051,11 +2077,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		return -1;
 	}
 
-	//one of these two should exist (they both mean the same thing)
-	ieDword subtitles = vars.Get("Dialog Movie Subtitles", 1);
-	if (!subtitles) {
-		subtitles = vars.Get("Dialog Subtitles", 0);
-	}
+	bool subtitles = vars.Get("Display Movie Subtitles", 0) == 1; // IWD(2)/BG2
+	subtitles |= vars.Get("Display Subtitles", 0) == 1; // BG2
+	subtitles |= vars.Get("Subtitles", 0) == 1; // always present
 
 	mp->EnableSubtitles(subtitles);
 
@@ -2104,7 +2128,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 
 	AutoTable sttable = gamedata->LoadTable(movieRef);
 	auto font = GetFont(MovieFontResRef);
-	if (sttable && font) {
+	if (sttable && font && sttable->GetColumnName(0) == "Frame") {
 		int r = sttable->QueryFieldSigned<int>("red", "frame");
 		int g = sttable->QueryFieldSigned<int>("green", "frame");
 		int b = sttable->QueryFieldSigned<int>("blue", "frame");
@@ -2116,9 +2140,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		}
 	}
 
-	Holder<SoundHandle> sound_override;
+	Holder<PlaybackHandle> soundOverride;
 	if (!sound_resref.empty()) {
-		sound_override = AudioDriver->Play(sound_resref, SFXChannel::Narrator);
+		soundOverride = GetAudioPlayback().Play(sound_resref, audioSettings.ConfigPresetMovie());
 	}
 
 	// clear whatever is currently on screen
@@ -2140,18 +2164,18 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	if (!inCutScene) {
 		SetCutSceneMode(false);
 	}
-	if (sound_override) {
-		sound_override->Stop();
-		sound_override.reset();
+	if (soundOverride) {
+		soundOverride->Stop();
 	}
 
 	//restarting music
 	if (music)
 		music->Start();
-	if (ambim) ambim->Activate();
+	ambientManager->Activate();
 
-	//Setting the movie name to 1
+	// make the movie available in the movies list immediately
 	vars.Set(movieRef, 1);
+	SaveConfig();
 	return 0;
 }
 
@@ -2259,6 +2283,10 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 		EnableCheatKeys(1);
 	}
 
+	if (vars.Get("GUIEnhancements", 0xffff) == 0xffff) { // populate with deprecated key if any
+		vars.Set("GUIEnhancements", config.GUIEnhancements);
+	}
+
 	// copies
 	if (!overrides->GetKeyAsInt("Game Options", "Darkvision", 1)) {
 		vars.Set("Infravision", 0);
@@ -2273,6 +2301,7 @@ bool Interface::InitializeVarsWithINI(const path_t& iniFileName)
 			config.Height = 0.75 * config.Width;
 		}
 	}
+	Log(MESSAGE, "Core", "Using resolution {}x{}", config.Width, config.Height);
 	return true;
 }
 
@@ -2378,9 +2407,8 @@ void Interface::QuitGame(int BackToMain)
 	}
 	// stop any ambients which are still enqueued
 	if (AudioDriver) {
-		AmbientMgr* ambim = AudioDriver->GetAmbientMgr();
-		if (ambim) ambim->Deactivate();
-		AudioDriver->Stop(); // also kill sounds
+		ambientManager->Deactivate();
+		musicLoop->Stop(); // also kill sounds
 	}
 	//delete game, worldmap
 	if (game) {
@@ -2436,7 +2464,6 @@ void Interface::LoadGame(Holder<SaveGame> sg, int ver_override)
 	// These are here because of the goto
 	PluginHolder<SaveGameMgr> gamMgr;
 	PluginHolder<WorldMapMgr> wmpMgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
-	AmbientMgr* ambim = core->GetAudioDrv()->GetAmbientMgr();
 
 	if (sg == nullptr) {
 		//Load the Default Game
@@ -2504,9 +2531,7 @@ void Interface::LoadGame(Holder<SaveGame> sg, int ver_override)
 	}
 
 	// rarely caused crashes while loading, so stop the ambients
-	if (ambim) {
-		ambim->Reset();
-	}
+	ambientManager->Reset();
 
 	// Let's assume that now is everything loaded OK and swap the objects
 	delete game;
@@ -3446,20 +3471,6 @@ ieStrRef Interface::GetRumour(const ResRef& dlgref)
 	return ret;
 }
 
-//plays stock sound listed in defsound.2da
-Holder<SoundHandle> Interface::PlaySound(size_t index, SFXChannel channel) const
-{
-	return PlaySound(index, channel, Point(), 0);
-}
-
-Holder<SoundHandle> Interface::PlaySound(size_t index, SFXChannel channel, const Point& p, unsigned int flags) const
-{
-	if (index <= gamedata->defaultSounds.size()) {
-		return AudioDriver->Play(gamedata->defaultSounds[index], channel, p, flags);
-	}
-	return nullptr;
-}
-
 Actor* Interface::GetFirstSelectedPC(bool forced)
 {
 	Actor* ret = nullptr;
@@ -4128,4 +4139,22 @@ float Interface::GetAnimationFPS(const ResRef& anim) const
 	return ANI_DEFAULT_FRAMERATE;
 }
 
+void Interface::ApplyTooltipDelay() const
+{
+	ieDword tooltipDelay = vars.Get("Tooltips", 0);
+
+	// PST: [0, 119] -> [0, 2500]
+	// everything else: [0, 10] * 10 -> [0, 2500]
+	// with the highest value meaning "never"
+	int delay = 0;
+	if (HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		delay = tooltipDelay >= 119 ? std::numeric_limits<int>::max() :
+					      tooltipDelay * 21;
+	} else {
+		delay = tooltipDelay >= 100 ? std::numeric_limits<int>::max() :
+					     tooltipDelay * 25;
+	}
+
+	WindowManager::SetTooltipDelay(delay);
+}
 }

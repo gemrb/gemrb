@@ -37,6 +37,7 @@ import GUICommon
 import GUICommonWindows
 import GUISAVE
 import GUIOPTControls
+import GUIOPTExtra
 from ie_sounds import *
 from GUIDefines import *
 
@@ -89,6 +90,10 @@ def InitOptionsWindow (Window):
 	Label = Window.GetControl (0x10000007)
 	Label.SetText (GemRB.Version)
 
+	# GemRB options
+	frame = Window.GetControl (5).GetFrame ()
+	GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 115, 80, "OSSAVE")
+
 	return
 
 ToggleOptionsWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIOPT", GUICommonWindows.ToggleWindow, InitOptionsWindow)
@@ -108,7 +113,7 @@ def OpenVideoOptionsWindow ():
 
 	Window = GemRB.LoadWindow (1, "GUIOPT")
 	Window.AddAlias ("SUB_WIN", 0)
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
+	Window.OnClose (OnClose)
 
 	GUIOPTControls.OptHelpText (9, 31052)
 	GUIOPTControls.OptDone (Window.Close, 7)
@@ -148,7 +153,7 @@ def OpenAudioOptionsWindow ():
 
 		TrySavingConfiguration()
 
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
+	Window.OnClose (OnClose)
 
 	# save values, so we can restore them on cancel
 	for v in "Volume Ambients", "Volume SFX", "Volume Voices", "Volume Music", "Volume Movie", "Sound Processing", "Music Processing":
@@ -188,14 +193,14 @@ def OpenGameplayOptionsWindow ():
 	def OnClose(Window):
 		TrySavingConfiguration()
 
-	Window.SetAction(OnClose, ACTION_WINDOW_CLOSED)
+	Window.OnClose (OnClose)
 
 	GUIOPTControls.OptHelpText (12, 31212)
 
 	GUIOPTControls.OptDone (Window.Close, 10)
 	GUIOPTControls.OptCancel (Window.Close, 11)
 
-	GUIOPTControls.OptSlider (31232, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
+	GUIOPTControls.OptSlider (31232, 1, 13, 31481, "Tooltips", UpdateTooltips, 1)
 	GUIOPTControls.OptSlider (31230, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
 	GUIOPTControls.OptSlider (31231, 3, 15, 31480, "Keyboard Scroll Speed")
 	GUIOPTControls.OptSlider (31233, 4, 16, 31479, "Difficulty Level")
@@ -212,7 +217,7 @@ def OpenGameplayOptionsWindow ():
 
 def UpdateTooltips ():
 	GemRB.GetView ("OPTHELP").SetText (31232)
-	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") )
+	GemRB.UpdateTooltipDelay()
 
 def UpdateMouseSpeed ():
 	GemRB.GetView ("OPTHELP").SetText (31230)
@@ -485,7 +490,7 @@ def OnPlayMoviePress ():
 
 ###################################################
 def OnCreditsPress ():
-	GemRB.PlayMovie ("CREDITS")
+	GemRB.PlayMovie ("CREDITS", 1)
 
 ###################################################
 

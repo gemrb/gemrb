@@ -151,7 +151,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		if bg1:
 			# enabled BAM isn't present in .chu, defining it here
 			Button.SetSprites ("GUILSOP", 0,16,17,28,16)
-		if iwd1:
+		elif iwd1:
 			# disabled/selected frame isn't present in .chu, defining it here
 			Button.SetSprites ("GUILSOP", 0,16,17,16,16)
 
@@ -169,50 +169,51 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	Button = InitOptionButton(Window, 'Map')
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,0,1,20,0)
-	if iwd1:
+	elif iwd1:
 		Button.SetSprites ("GUILSOP", 0,0,1,20,20)
 
 	# Journal
 	Button = InitOptionButton(Window, 'Journal')
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,4,5,22,4)
-	if iwd1:
+	elif iwd1:
 		Button.SetSprites ("GUILSOP", 0,4,5,22,22)
 
 	# Inventory
 	Button = InitOptionButton(Window, 'Inventory')
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,2,3,21,2)
-	if iwd1:
+	elif iwd1:
 		Button.SetSprites ("GUILSOP", 0,2,3,21,21)
 
 	# Records
 	Button = InitOptionButton(Window, CharacterStatsKey)
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,6,7,23,6)
-	if iwd1:
+	elif iwd1:
 		Button.SetSprites ("GUILSOP", 0,6,7,23,23)
 
 	if not iwd2: # All Other Games Have Fancy Distinct Spell Pages
 		# Mage
 		Button = InitOptionButton(Window, MageSpellsKey)
+		pc = GemRB.GameGetSelectedPCSingle ()
 		if bg1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,8)
-		if iwd1:
+		elif iwd1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,24)
 
 		# Priest
 		Button = InitOptionButton(Window, 'Priest_Spells')
 		if bg1:
 			Button.SetSprites ("GUILSOP", 0,10,11,25,10)
-		if iwd1:
+		elif iwd1:
 			Button.SetSprites ("GUILSOP", 0,10,11,25,25)
 
 	# Options
 	Button = InitOptionButton(Window, 'Options')
 	if bg1:
 		Button.SetSprites ("GUILSOP", 0,12,13,26,12)
-	if iwd1:
+	elif iwd1:
 		Button.SetSprites ("GUILSOP", 0,12,13,26,26)
 	ButtonOptionFrame = Button.GetFrame()
 
@@ -253,6 +254,33 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.OnPress (RestPress)
+
+	UpdateMenuWindowControls ()
+	return
+
+# all this for just two special buttons without shaded disabled frames
+def UpdateMenuWindowControls ():
+	if not GameCheck.IsPST ():
+		return
+
+	Window = GemRB.GetView ("OPTWIN")
+	pc = GemRB.GameGetFirstSelectedPC()
+
+	Button = Window.GetControl (OptionControl[MageSpellsKey])
+	if GUICommon.CantUseSpellbookWindow (pc):
+		Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
+		Button.SetFlags (IE_GUI_BUTTON_SHADE_BASE, OP_OR)
+	else:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetFlags (IE_GUI_BUTTON_SHADE_BASE, OP_NAND)
+
+	Button = Window.GetControl (OptionControl["Priest_Spells"])
+	if GUICommon.CantUseSpellbookWindow (pc, True):
+		Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
+		Button.SetFlags (IE_GUI_BUTTON_SHADE_BASE, OP_OR)
+	else:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetFlags (IE_GUI_BUTTON_SHADE_BASE, OP_NAND)
 	return
 
 def OnLockViewPress ():
@@ -486,10 +514,10 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 	
 			if selectionHandler:
 				selectionHandler(window)
-				window.SetAction(selectionHandler, ACTION_WINDOW_FOCUS_GAINED)
+				window.OnFocus (selectionHandler)
 			
 			SetTopWindow (window, selectionHandler)
-			window.SetAction(lambda: TopWindowClosed(window), ACTION_WINDOW_CLOSED)
+			window.OnClose (lambda: TopWindowClosed(window))
 
 			if pause:
 				CreateTopWinLoader.PauseState = GemRB.GamePause(3, 1)
@@ -626,11 +654,11 @@ def PortraitButtonOnShiftPress (btn):
 def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
 	from PortraitWindow import UpdatePortraitWindow
+	import ActionsWindow
 
 	# FIXME: hack. If defined, display single selection
-	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
+	ActionsWindow.SetActionLevel (UAW_STANDARD)
 	if (not SelectionChangeHandler):
-		import ActionsWindow
 		ActionsWindow.UpdateActionsWindow ()
 	else:
 		pc = GemRB.GameGetSelectedPCSingle();
@@ -640,6 +668,7 @@ def SelectionChanged ():
 	Container.CloseContainerWindow()
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
+	UpdateMenuWindowControls ()
 	return
 
 def OpenWaitForDiscWindow (disc_num):

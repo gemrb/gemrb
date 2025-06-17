@@ -20,6 +20,8 @@
 
 #include "Region.h"
 
+#include <cassert>
+
 namespace GemRB {
 
 bool BasePoint::operator==(const BasePoint& pnt) const noexcept

@@ -20,8 +20,11 @@
 
 #include "CombatInfo.h"
 
+#include "ie_stats.h"
+
 #include "Interface.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {

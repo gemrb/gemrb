@@ -20,6 +20,7 @@
 #ifndef MOVABLE_H
 #define MOVABLE_H
 
+#include "CharAnimations.h"
 #include "Region.h"
 #include "Selectable.h"
 

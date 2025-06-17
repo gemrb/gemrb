@@ -26,8 +26,6 @@
 #include "Resource.h"
 #include "Sprite2D.h"
 
-#include "Streams/DataStream.h"
-
 namespace GemRB {
 
 class ImageFactory;

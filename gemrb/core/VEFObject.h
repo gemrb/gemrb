@@ -20,24 +20,21 @@
 #ifndef VEFOBJECT_H
 #define VEFOBJECT_H
 
-#include "RGBAColor.h"
 #include "SClassID.h"
 #include "exports.h"
 #include "ie_types.h"
 
-#include "Orientation.h"
 #include "Region.h"
-#include "Resource.h"
+#include "Sprite2D.h" // for BlitFlags until they become an enum class
 
-#include "Video/Video.h"
-
-#include <cstdint>
 #include <vector>
 
 namespace GemRB {
 
 class DataStream;
+class Region;
 class ScriptedAnimation;
+struct Color;
 
 enum class VEFTypes { INVALID = -1,
 		      BAM,
@@ -84,9 +81,11 @@ private:
 	//clears the schedule, used internally
 	void Init();
 	//load a 2DA/VEF resource into the object
-	VEFObject* CreateObject(const ResRef& res, SClass_ID id);
+	VEFObject* CreateObject(const ResRef& res, SClass_ID id) const;
+	// just a helper function
+	void CreateObjectFromEntry(ScheduleEntry& entry) const;
 	//load a BAM/VVC resource into the object
-	ScriptedAnimation* CreateCell(const ResRef& res, ieDword start, ieDword end);
+	ScriptedAnimation* CreateCell(const ResRef& res, ieDword start, ieDword end) const;
 	//load a single entry from stream
 	void ReadEntry(DataStream* stream);
 };

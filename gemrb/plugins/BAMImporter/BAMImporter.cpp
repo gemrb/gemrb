@@ -21,12 +21,13 @@
 
 #include "BAMImporter.h"
 
+#include "plugindef.h"
+
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Palette.h"
-#include "PluginMgr.h"
 
-#include "Streams/FileStream.h"
+#include "Streams/DataStream.h"
 #include "Video/RLE.h"
 #include "Video/Video.h"
 

@@ -21,12 +21,9 @@
 #include "GameScript/GSUtils.h"
 
 #include "defsounds.h"
-#include "ie_feats.h"
+#include "ie_stats.h"
 #include "strrefs.h"
-#include "voodooconst.h"
 
-#include "AmbientMgr.h"
-#include "Audio.h"
 #include "CharAnimations.h"
 #include "DialogHandler.h"
 #include "DisplayMessage.h"
@@ -109,7 +106,7 @@ int GetReaction(const Actor* target, const Scriptable* Sender)
 
 	// add -4 penalty when dealing with racial enemies
 	const Actor* scr = Scriptable::As<Actor>(Sender);
-	if (scr && target->GetRangerLevel()) {
+	if (scr && core->HasFeature(GFFlags::RULES_3ED) && target->GetRangerLevel()) {
 		reaction -= target->GetRacialEnemyBonus(scr);
 	}
 
@@ -533,7 +530,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 				}
 			}
 			if (flags & (DS_HEAD | DS_AREA)) {
-				Sender->overHead.SetText(sb.text, true, false);
+				Sender->overHead.SetText(sb.text, true, flags & DS_APPEND);
 				if (flags & DS_AREA) {
 					Sender->overHead.FixPos(Sender->Pos);
 				}
@@ -542,21 +539,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 	}
 
 	if (soundpath && soundpath[0] && !(flags & DS_SILENT)) {
-		ieDword soundFlags = GEM_SND_EFX;
-		Point pos;
-		if (flags & DS_SPEECH) {
-			soundFlags |= GEM_SND_SPEECH;
-		}
-
 		Actor* actor = Scriptable::As<Actor>(Sender);
-		// Spatial unless PC, cutscene or dialog
-		if (actor && !actor->InParty && !core->InCutSceneMode() && !core->GetGameControl()->InDialog()) {
-			pos = Sender->Pos;
-			soundFlags |= GEM_SND_SPATIAL;
-		}
-
-		if (flags & DS_QUEUE) soundFlags |= GEM_SND_QUEUE;
-
 		SFXChannel channel = SFXChannel::Dialog;
 		if (flags & DS_CONST && actor) {
 			if (actor->InParty > 0) {
@@ -565,13 +548,26 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 				channel = SFXChannel::Monster;
 			}
 		}
+		auto config = core->GetAudioSettings().ConfigPresetEnvVoice(channel);
 
-		tick_t len = 0;
-		core->GetAudioDrv()->Play(StringView(soundpath), channel, pos, soundFlags, &len);
-		tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
+		// Spatial unless PC, cutscene or dialog
+		if (actor && !actor->InParty && !core->InCutSceneMode() && !core->GetGameControl()->InDialog()) {
+			config = core->GetAudioSettings().ConfigPresetSpatialVoice(channel, Sender->Pos);
+		}
 
-		if (actor && len > 0 && flags & DS_CIRCLE) {
-			actor->SetAnimatedTalking(len);
+		tick_t length = 0;
+		if (flags & DS_SPEECH) {
+			length = core->GetAudioPlayback().PlaySpeech(StringView(soundpath), config, !(flags & DS_QUEUE));
+		} else {
+			auto handle = core->GetAudioPlayback().Play(StringView(soundpath), config);
+			if (handle) {
+				length = handle->GetLengthMs();
+			}
+		}
+		tick_t counter = (core->Time.defaultTicksPerSec * length) / 1000;
+
+		if (actor && length > 0 && flags & DS_CIRCLE) {
+			actor->SetAnimatedTalking(length);
 		}
 
 		if ((counter != 0) && (flags & DS_WAIT))
@@ -601,10 +597,10 @@ int CanSee(const Scriptable* Sender, const Scriptable* target, bool range, int s
 		unsigned int dist;
 		bool los = true;
 		if (snd) {
-			dist = snd->Modified[IE_VISUALRANGE];
+			dist = snd->GetVisualRange();
 			if (halveRange) dist /= 2;
 		} else {
-			dist = VOODOO_VISUAL_RANGE; // NOTE: perhaps we should use the parameter from LOS if that was used
+			dist = Scriptable::VOODOO_VISUAL_RANGE; // NOTE: perhaps we should use the parameter from LOS if that was used
 			// iwd2 ar6102 SeeDeadMandal would detect you over a thick side wall otherwise
 			los = core->HasFeature(GFFlags::RULES_3ED);
 		}
@@ -800,6 +796,9 @@ static bool InspectEdges(Point& walkableStartPoint, const Region& vp, int curren
 				isPassable = true;
 			}
 			break;
+		default:
+			Log(ERROR, "GSUtils", "Someone broke FindOffScreenPoint, file a bug!");
+			break;
 	}
 	return isPassable;
 }
@@ -990,7 +989,7 @@ void CreateVisualEffectCore(const Scriptable* Sender, const Point& position, con
 	} else {
 		ScriptedAnimation* vvc = GetVVCEffect(effect, iterations);
 		if (vvc) {
-			vvc->Pos = position;
+			vvc->SetPos(position);
 			area->AddVVCell(vvc);
 		}
 	}
@@ -1188,6 +1187,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		if (Flags & BD_CHECKDIST) {
 			//DialogueRange is set in IWD
 			ieDword range = MAX_OPERATING_DISTANCE + speaker->GetBase(IE_DIALOGRANGE);
+			if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) range += 160; // approx value to make the FFG range in 1201csg3 match
 			if (scr->GetCurrentArea() != target->GetCurrentArea() ||
 			    PersonalDistance(scr, target) > range) {
 				MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
@@ -1443,6 +1443,12 @@ void MoveToObjectCore(Scriptable* Sender, Action* parameters, ieDword flags, boo
 	}
 	const Scriptable* target = GetStoredActorFromObject(Sender, parameters);
 	if (!target) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	// avoid repeated expensive pathfinding; eg. the fighter2 bg1 script will keep the actor close to the protagonist
+	if (target->GetCurrentArea() != Sender->GetCurrentArea()) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2145,11 +2151,11 @@ void AmbientActivateCore(const Scriptable* Sender, const Action* parameters, boo
 	}
 	if (!anim) {
 		// iwd2 expects this behaviour in ar6001 by (de)activating sound_portal
-		AmbientMgr* ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
+		AmbientMgr& ambientmgr = core->GetAmbientManager();
 		if (flag) {
-			ambientmgr->Activate(parameters->objects[1]->objectName);
+			ambientmgr.Activate(parameters->objects[1]->objectName);
 		} else {
-			ambientmgr->Deactivate(parameters->objects[1]->objectName);
+			ambientmgr.Deactivate(parameters->objects[1]->objectName);
 		}
 		return;
 	}
@@ -2555,7 +2561,7 @@ void AddXPCore(const Action* parameters, bool divide)
 		// give xp to everyone
 		core->GetGame()->ShareXP(atoi(xpvalue), 0);
 	}
-	core->PlaySound(DS_GOTXP, SFXChannel::Actions);
+	core->GetAudioPlayback().PlayDefaultSound(DS_GOTXP, SFXChannel::Actions);
 }
 
 int NumItemsCore(Scriptable* Sender, const Trigger* parameters)

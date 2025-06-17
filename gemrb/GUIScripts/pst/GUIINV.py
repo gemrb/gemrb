@@ -63,7 +63,6 @@ def InitInventoryWindow (Window):
 	global AvSlotsTable
 
 	Window.AddAlias("WIN_INV")
-	Window.OnFocus(UpdateInventoryWindow)
 
 	AvSlotsTable = GemRB.LoadTable ('avslots')
 	Window.GetControl(0x1000003d).AddAlias("MsgSys", 1)
@@ -107,10 +106,6 @@ def InitInventoryWindow (Window):
 
 	ScrollBar = Window.GetControl (45)
 	ScrollBar.OnChange (lambda: RefreshInventoryWindow(Window))
-
-	for i in range (57, 64):
-		Label = Window.GetControl (0x10000000 + i)
-		Label.SetText (str (i))
 
 	# portrait
 	Button = Window.GetControl (44)
@@ -158,7 +153,7 @@ def UpdateInventoryWindow (Window):
 	Count = Container['ItemCount']
 	if Count<1:
 		Count=1
-	ScrollBar.SetVarAssoc ("TopIndex", Count)
+	ScrollBar.SetVarAssoc ("TopIndex", max(0, (Count - 10 + 1) // 2))
 	RefreshInventoryWindow (Window)
 
 	# PST uses unhardcoded/avslots.2da to decide which slots do what per character
@@ -182,12 +177,10 @@ def RefreshInventoryWindow (Window):
 	Label = Window.GetControl (0x10000039)
 	Label.SetText (GemRB.GetPlayerName (pc, 1))
 
-
 	# portrait
 	Button = Window.GetControl (44)
 	Button.SetPicture (GUICommonWindows.GetActorPortrait (pc, 'INVENTORY'))
 
-	# there's a label at 0x1000003a, but we don't need it
 	GUICommon.SetEncumbranceLabels (Window, 46, None, pc)
 
 	# armor class
@@ -221,12 +214,15 @@ def RefreshInventoryWindow (Window):
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (10):
 		Button = Window.GetControl (i+47)
+		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 		if GemRB.IsDraggingItem ():
 			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
+		elif not Slot:
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
-		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
+
 		if Slot != None:
 			item = GemRB.GetItem (Slot['ItemResRef'])
 			identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED

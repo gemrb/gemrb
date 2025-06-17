@@ -20,7 +20,7 @@ def OnLoad():
 	console = consoleWin.ReplaceSubview (0, IE_GUI_CONSOLE, hist)
 	console.AddAlias ("CONSOLE_CTL", 1);
 	
-	consoleWin.SetAction(console.Focus, ACTION_WINDOW_FOCUS_GAINED)
+	consoleWin.OnFocus (console.Focus)
 	
 	consoleOut = consoleWin.GetControl(1)
 	consoleOut.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
@@ -96,7 +96,8 @@ def Exec(cmd):
 
 		locals = {} # we dont want to expose our locals
 		modend = cmd.find('.')
-		if modend > -1 and modend < len("ex('ActionOverride(Pla"): # Point arguments use a dot
+		paren = cmd.find('(')
+		if modend > -1 and (paren == -1 or modend < paren):
 			import importlib
 			importlib.invalidate_caches()
 			modname = cmd[0:modend]

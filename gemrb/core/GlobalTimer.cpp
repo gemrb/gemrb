@@ -22,9 +22,9 @@
 
 #include "Game.h"
 #include "Interface.h"
+#include "Map.h"
 #include "RNG.h"
 
-#include "GUI/GUIAnimation.h"
 #include "GUI/GameControl.h"
 #include "GUI/WindowManager.h"
 

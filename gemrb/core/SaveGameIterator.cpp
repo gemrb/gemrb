@@ -20,6 +20,7 @@
 
 #include "SaveGameIterator.h"
 
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "DisplayMessage.h"
@@ -27,8 +28,8 @@
 #include "ImageMgr.h"
 #include "ImageWriter.h"
 #include "Interface.h"
+#include "Map.h"
 #include "PluginMgr.h"
-#include "SaveGameMgr.h"
 #include "Sprite2D.h"
 #include "TableMgr.h"
 
@@ -43,6 +44,7 @@
 #include <cassert>
 #include <ctime>
 #include <set>
+#include <sys/stat.h>
 
 #ifdef VITA
 	#include <dirent.h>
@@ -401,7 +403,7 @@ static bool DoSaveGame(const path_t& Path, bool overrideRunning)
 {
 	const Game* game = core->GetGame();
 	//saving areas to cache currently in memory
-	unsigned int mc = (unsigned int) game->GetLoadedMapCount();
+	auto mc = game->GetLoadedMapCount();
 	while (mc--) {
 		Map* map = game->GetMap(mc);
 		if (core->SwapoutArea(map)) {

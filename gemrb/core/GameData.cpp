@@ -21,10 +21,10 @@
 #include "GameData.h"
 
 #include "globals.h"
+#include "ie_stats.h"
 
 #include "ActorMgr.h"
 #include "AnimationMgr.h"
-#include "Cache.h"
 #include "CharAnimations.h"
 #include "Effect.h"
 #include "EffectMgr.h"
@@ -36,17 +36,16 @@
 #include "Item.h"
 #include "ItemMgr.h"
 #include "PluginMgr.h"
-#include "ResourceDesc.h"
+#include "ResourceSource.h"
 #include "ScriptedAnimation.h"
 #include "Spell.h"
 #include "SpellMgr.h"
 #include "StoreMgr.h"
 #include "VEFObject.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 #include "Streams/FileStream.h"
-
-#include <cstdio>
 
 namespace GemRB {
 

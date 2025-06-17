@@ -124,6 +124,19 @@ def CheckStat20 (Actor, Stat, Diff):
 		return True
 	return False
 
+def CantUseSpellbookWindow (pc, priest = False):
+	if GameCheck.IsIWD2 ():
+		return False
+
+	ClassName = GetClassRowName (pc)
+	if priest:
+		CantCast = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL") == "*"
+		CantCast &= CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*"
+	else:
+		CantCast = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL") == "*"
+
+	return CantCast
+
 def GetGUISpellButtonCount ():
 	if GameCheck.HasHOW() or GameCheck.IsBG2OrEE ():
 		return 24
@@ -656,8 +669,12 @@ def CanDualClass(actor):
 	return 1
 
 def IsWarrior (actor):
-	IsWarrior = CommonTables.ClassSkills.GetValue (GetClassRowName(actor), "NO_PROF", GTV_INT)
+	if GameCheck.IsPST ():
+		# no column there
+		className = GetClassRowName (actor)
+		return "FIGHTER" in className
 
+	IsWarrior = CommonTables.ClassSkills.GetValue (GetClassRowName(actor), "NO_PROF", GTV_INT)
 	# warriors get only a -2 penalty for wielding weapons they are not proficient with
 	# FIXME: make the check more robust, someone may change the value!
 	IsWarrior = (IsWarrior == -2)

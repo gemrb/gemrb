@@ -37,7 +37,6 @@
 
 namespace GemRB {
 
-class Sprite2D;
 class WindowManager;
 
 /**

@@ -31,12 +31,11 @@
 #include "exports.h"
 #include "ie_types.h"
 
-#include "DataFileMgr.h"
 #include "Region.h"
-#include "Resource.h"
 
 namespace GemRB {
 
+class DataFileMgr;
 class Map;
 
 /**

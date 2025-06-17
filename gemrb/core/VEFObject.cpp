@@ -22,23 +22,24 @@
 
 #include "VEFObject.h"
 
+#include "RGBAColor.h"
+
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
+#include "Orientation.h"
 #include "ScriptedAnimation.h"
 #include "TableMgr.h"
 
 #include "Logging/Logging.h"
 #include "Streams/DataStream.h"
-#include "Video/Video.h"
 
 namespace GemRB {
 
 VEFObject::VEFObject(ScriptedAnimation* sca)
+	: Pos(sca->Pos), SingleObject(true)
 {
-	Pos = sca->Pos;
 	ResName = sca->ResName;
-	SingleObject = true;
 	ScheduleEntry entry;
 	entry.start = core->GetGame()->GameTime;
 	if (sca->Duration == 0xffffffff)
@@ -85,11 +86,11 @@ void VEFObject::AddEntry(const ResRef& res, ieDword st, ieDword len, Point pos, 
 	entry.length = len;
 	entry.offset = pos;
 	entry.type = type;
-	entry.ptr = NULL;
+	entry.ptr = nullptr;
 	entries.push_back(entry);
 }
 
-ScriptedAnimation* VEFObject::CreateCell(const ResRef& res, ieDword start, ieDword end)
+ScriptedAnimation* VEFObject::CreateCell(const ResRef& res, ieDword start, ieDword end) const
 {
 	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(res, false);
 	if (sca && end != 0xffffffff) {
@@ -98,7 +99,7 @@ ScriptedAnimation* VEFObject::CreateCell(const ResRef& res, ieDword start, ieDwo
 	return sca;
 }
 
-VEFObject* VEFObject::CreateObject(const ResRef& res, SClass_ID id)
+VEFObject* VEFObject::CreateObject(const ResRef& res, SClass_ID id) const
 {
 	if (gamedata->Exists(res, id, true)) {
 		VEFObject* obj = new VEFObject();
@@ -112,7 +113,32 @@ VEFObject* VEFObject::CreateObject(const ResRef& res, SClass_ID id)
 		}
 		return obj;
 	}
-	return NULL;
+	return nullptr;
+}
+
+void VEFObject::CreateObjectFromEntry(ScheduleEntry& entry) const
+{
+	switch (entry.type) {
+		case VEFTypes::_2DA: // original gemrb implementation of composite video effects
+			entry.ptr = CreateObject(entry.resourceName, IE_2DA_CLASS_ID);
+			if (entry.ptr) {
+				break;
+			}
+			// fall back to VEF
+			// intentional fallthrough
+		case VEFTypes::VEF: // vanilla engine implementation of composite video effects
+			entry.ptr = CreateObject(entry.resourceName, IE_VEF_CLASS_ID);
+			if (entry.ptr) {
+				break;
+			}
+			// fall back to BAM or VVC
+			// intentional fallthrough
+		case VEFTypes::BAM: // just a BAM
+		case VEFTypes::VVC: // videocell (can contain a BAM)
+			entry.ptr = CreateCell(entry.resourceName, entry.length, entry.start);
+			break;
+		default:;
+	}
 }
 
 bool VEFObject::UpdateDrawingState(int orientation)
@@ -125,27 +151,7 @@ bool VEFObject::UpdateDrawingState(int orientation)
 		if (entry.length < GameTime) continue;
 
 		if (!entry.ptr) {
-			switch (entry.type) {
-				case VEFTypes::_2DA: // original gemrb implementation of composite video effects
-					entry.ptr = CreateObject(entry.resourceName, IE_2DA_CLASS_ID);
-					if (entry.ptr) {
-						break;
-					}
-					// fall back to VEF
-					// intentional fallthrough
-				case VEFTypes::VEF: // vanilla engine implementation of composite video effects
-					entry.ptr = CreateObject(entry.resourceName, IE_VEF_CLASS_ID);
-					if (entry.ptr) {
-						break;
-					}
-					// fall back to BAM or VVC
-					// intentional fallthrough
-				case VEFTypes::BAM: // just a BAM
-				case VEFTypes::VVC: // videocell (can contain a BAM)
-					entry.ptr = CreateCell(entry.resourceName, entry.length, entry.start);
-					break;
-				default:;
-			}
+			CreateObjectFromEntry(entry);
 		}
 
 		if (!entry.ptr) entry.type = VEFTypes::INVALID;
@@ -280,7 +286,7 @@ void VEFObject::LoadVEF(DataStream* stream)
 
 ScriptedAnimation* VEFObject::GetSingleObject() const
 {
-	ScriptedAnimation* sca = NULL;
+	ScriptedAnimation* sca = nullptr;
 
 	if (SingleObject) {
 		if (!entries.empty()) {

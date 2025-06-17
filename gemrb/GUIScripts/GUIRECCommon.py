@@ -22,7 +22,7 @@ import GameCheck
 import GUICommon
 import Portrait
 from GUIDefines import *
-from ie_stats import IE_SEX, IE_RACE, IE_MC_FLAGS, MC_EXPORTABLE
+from ie_stats import *
 from ie_restype import RES_WAV
 from ie_sounds import SND_SPEECH
 
@@ -31,6 +31,8 @@ ExportWindow = None
 NameField = ExportDoneButton = None
 ScriptsTable = None
 RevertButton = None
+
+SkillsTable = GemRB.LoadTable ("skills", False, True)
 
 if GameCheck.IsBG2OrEE () or GameCheck.IsBG1():
 	BioStrRefSlot = 74
@@ -653,3 +655,202 @@ def ExportEditChanged():
 	else:
 		ExportDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
+
+# GemRB.GetPlayerStat wrapper that crosschecks skill availability
+SkillStatNames = { IE_PICKPOCKET : "PICK_POCKETS", IE_LOCKPICKING : "OPEN_LOCKS", IE_TRAPS : "FIND_TRAPS", IE_STEALTH : "STEALTH", IE_HIDEINSHADOWS : "HIDE_IN_SHADOWS", IE_DETECTILLUSIONS : "DETECT_ILLUSION", IE_SETTRAPS : "SET_TRAPS" }
+if GameCheck.IsBG2OrEE ():
+	SkillStatNames[IE_STEALTH] = "MOVE_SILENTLY"
+def GetValidSkill (pc, className, stat):
+	val = GemRB.GetPlayerStat (pc, stat)
+	if val < 0:
+		return 0
+
+	if className == "BARD":
+		if stat != IE_PICKPOCKET:
+			return 0
+	elif className == "RANGER":
+		if stat != IE_STEALTH:
+			return 0
+	else:
+		if SkillsTable.GetValue (SkillStatNames[stat], className, GTV_INT) == -1:
+			return 0
+
+	return val
+
+########################################################################
+
+def GS (pc, stat):
+	return GemRB.GetPlayerStat (pc, stat)
+
+def GA (pc, stat, col):
+	return GemRB.GetAbilityBonus (stat, col, GS (pc, stat))
+
+def GetAbilityBonuses(pc, expand = True):
+	stats = []
+	names = [ 10315, 10332, 10336, 10337, 10338, 10339, 10340, 10341, 10342, 10343, 10347]
+	if GameCheck.IsPST ():
+		names = [ 4228, 4229, 4230, 4231, 4232, 4233, 4234, 4235, 4236, 4237, 4240]
+
+	# 10315 Ability bonuses
+	stats.append (names[0])
+
+	value = GemRB.GetPlayerStat (pc, IE_STR)
+	ex = GemRB.GetPlayerStat (pc, IE_STREXTRA)
+	# odd pst values for tohit and damage: the tables are fine and is what we currently display
+	# the original displayed the base THAC0 above and all the damage and tohit bonuses here
+	# we maintain consistency here and rather display saner values above
+	# 10332 to hit
+	stats.append ((names[1], GemRB.GetAbilityBonus (IE_STR, 0, value, ex), 'p'))
+	# 10336 damage
+	stats.append ((names[2], GemRB.GetAbilityBonus (IE_STR, 1, value, ex), 'p'))
+	# 10337 open doors (bend bars lift gates)
+	stats.append ((names[3], GemRB.GetAbilityBonus (IE_STR, 2, value, ex), '0'))
+	# 10338 weight allowance
+	stats.append ((names[4], GemRB.GetAbilityBonus (IE_STR, 3, value, ex), '0'))
+	# 10339 AC
+	stats.append ((names[5], GA (pc, IE_DEX, 2), '0'))
+	# 10340 Missile adjustment
+	stats.append ((names[6], GA (pc, IE_DEX, 1), 'p'))
+	if not GameCheck.IsPST ():
+		# 10341 Reaction adjustment
+		stats.append ((names[7], GA (pc, IE_DEX, 0), 'p'))
+
+	# 10342 CON HP Bonus/Level
+	# dual-classed chars get no bonus while the primary class is inactive
+	# and the new class' bonus afterwards
+	# single- and multi-classed chars are straightforward - the highest class bonus counts
+	if GUICommon.IsWarrior (pc):
+		stats.append ((names[8], GA (pc, IE_CON, 1), 'p'))
+	else:
+		stats.append ((names[8], GA (pc, IE_CON, 0), 'p'))
+
+	if not GameCheck.IsPST ():
+		# 10343 Chance To Learn spell
+		if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
+			stats.append ((names[9], GA (pc, IE_INT, 0), '%' ))
+
+	# 10347 Reaction
+	# FIXME: What value did it display in pst - doesn't match
+	if GameCheck.IsPST ():
+		stats.append ((names[10], GA (pc, IE_REPUTATION, 0), 'p'))
+	else:
+		stats.append ((names[10], GA (pc, IE_REPUTATION, 0), '0'))
+
+	if expand:
+		stats.append ("\n")
+		return TypeSetStats (stats, pc)
+	else:
+		return stats
+
+def GetBonusSpells(pc, expand = True):
+	stats = []
+	# 10344 Bonus Priest spells
+	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, 0, 0) == 0:
+		return TypeSetStats (stats, pc) if expand else []
+
+	if not GameCheck.IsPST (): # the title is always displayed in pst
+		stats.append (10344)
+
+	for level in range (7):
+		GemRB.SetToken ("SPELLLEVEL", str (level + 1))
+		# get the bonus spell count
+		base = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level, 0)
+		count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
+		bonus = count - base
+		if bonus:
+			if GameCheck.IsPST ():
+				stats.append ((4239, bonus, 'p'))
+			else:
+				stats.append ((GemRB.GetString (10345), bonus, 'r'))
+
+	if expand:
+		stats.append ("\n")
+		return TypeSetStats (stats, pc)
+	else:
+		return stats
+
+def TypeSetStats (stats, pc, recolor = False):
+	res = []
+	lines = 0
+	noP = False
+	won = "[color=FFFFFF]"
+	woff = "[/color]"
+
+	# everyone but bg1 has it somewhere
+	if GameCheck.IsBG2OrEE ():
+		str_None = GemRB.GetString (61560)
+	elif GameCheck.IsBG1():
+		str_None = -1
+	elif GameCheck.IsPST():
+		str_None = GemRB.GetString (41275)
+	else:
+		str_None = GemRB.GetString (17093)
+
+	GB = lambda s, pc = pc: GemRB.GetPlayerStat (pc, s, 1)
+	GS = lambda s, pc = pc: GemRB.GetPlayerStat (pc, s)
+
+	for s in stats:
+		try:
+			strref, val, stattype = s
+			if val == 0 and stattype != '0':
+				continue
+			if val == None:
+				val = str_None
+			if stattype == '+': # pluses
+				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
+			elif stattype == 'd': # strref is an already resolved string
+				res.append (strref)
+			elif stattype == 'p': # a plus prefix if positive
+				if val > 0:
+					res.append (GemRB.GetString (strref) + ': +' + str (val))
+				else:
+					res.append (GemRB.GetString (strref) + ': ' + str (val))
+			elif stattype == 's': # both base and (modified) stat, but only if they differ
+				base = GB (val)
+				stat = GS (val)
+				baseStr = GemRB.GetString (strref) + ': ' + str(stat)
+				if base == stat:
+					res.append (baseStr)
+				else:
+					res.append (baseStr + " (" + str(stat - base) + ")")
+			elif stattype == 'x': # x character before value
+				res.append (GemRB.GetString (strref) + ': x' + str (val))
+			elif stattype == 'a': # value (portrait icon) + string
+				# '%' is the separator glyph in the states font
+				res.append ("[cap][int=" + str(val) + "]%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
+				noP = True
+			elif stattype == 'b': # strref is an already resolved string
+				res.append (strref+": "+str (val))
+			elif stattype == 'c': # normal string
+				res.append (GemRB.GetString (strref))
+			elif stattype == '0': # normal value
+				res.append (GemRB.GetString (strref) + ': ' + str (val))
+			else: # normal value + type character, for example percent sign
+				res.append (GemRB.GetString (strref) + ': ' + str (val) + stattype)
+
+			lines = 1
+		except: # TODO: simplify
+			if s == None:
+				if not lines:
+					res.append (str_None)
+				res.append ("") # eh?
+			elif isinstance(s, str):
+				if s == len(s) * "\n": # check if the string is all newlines
+					# avoid "double" newlines (we use join later so we would get one more newline than is in s!)
+					if res:
+						res[-1] += s
+				else:
+					res.append (s);
+			elif recolor:
+				res.append (won + GemRB.GetString (s) + woff)
+			else:
+				res.append (GemRB.GetString (s))
+			lines = 0
+
+	# effects only need a bump at the end, but pst doesn't show the icons
+	if GameCheck.IsPST():
+		noP = True
+	if noP:
+		return "\n".join (res) + "[p] [/p]"
+	else:
+		return "[p]" + "\n".join (res) + "[/p]"

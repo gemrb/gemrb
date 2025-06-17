@@ -22,42 +22,38 @@
 #define MAP_H
 
 #include "exports.h"
-#include "globals.h"
 
 #include "Bitmap.h"
 #include "FogRenderer.h"
 #include "MapReverb.h"
 #include "PathFinder.h"
 #include "Polygon.h"
+#include "TableMgr.h"
 #include "WorldMap.h"
 #include "TraversabilityCache.h"
 
 #include "Scriptable/Scriptable.h"
 #include "Video/Video.h"
 
-#include <algorithm>
-#include <queue>
 #include <unordered_map>
-
-template<class V>
-class FibonacciHeap;
 
 namespace GemRB {
 
 class Actor;
 class Ambient;
 class Animation;
-class Bitmap;
+class Container;
 class CREItem;
-class GameControl;
+class Door;
+class InfoPoint;
 class IniSpawn;
+class Movable;
 class Palette;
 class Particles;
 class Projectile;
 class ScriptedAnimation;
 class TileMap;
 class VEFObject;
-class WallPolygon;
 
 //distance of actors from spawn point
 #define SPAWN_RANGE 400
@@ -663,7 +659,7 @@ public:
 	/* May spawn creature(s), returns the remaining number of (unrested) hours for interrupted rest */
 	int CheckRestInterruptsAndPassTime(const Point& pos, int hours, int day);
 	/* Spawns creature(s) in radius of position */
-	bool SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& radius = Size(), ieWord rwdist = 0, int* difficulty = nullptr, unsigned int* creCount = nullptr);
+	ScriptID SpawnCreature(const Point& pos, const ResRef& creResRef, const Size& radius = Size(), ieWord rwdist = 0, int* difficulty = nullptr, unsigned int* creCount = nullptr);
 
 	//spawns
 	void LoadIniSpawn();

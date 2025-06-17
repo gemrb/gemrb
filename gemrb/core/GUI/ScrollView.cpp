@@ -395,7 +395,12 @@ bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 
 bool ScrollView::OnMouseWheelScroll(const Point& delta)
 {
-	ScrollDelta(delta);
+	if (vscroll && delta.x == 0) {
+		// scale up vertical scrolling
+		ScrollDelta({ 0, delta.y > 0 ? vscroll->StepIncrement : -1 * vscroll->StepIncrement });
+	} else {
+		ScrollDelta(delta);
+	}
 	return true;
 }
 

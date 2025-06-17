@@ -24,16 +24,14 @@
  * @author The GemRB Project
  */
 
-#include "exports.h"
 #include "globals.h"
+#include "ie_stats.h"
 
 #include "Interface.h"
 
 #include "Scriptable/Actor.h"
 
-#include <cctype>
 #include <cmath>
-#include <iostream>
 
 #ifdef WIN32
 
@@ -207,7 +205,7 @@ float_t Feet2Pixels(int feet, float_t angle)
  range in several places, so we will use '3 * visual_range / 2' */
 bool WithinAudibleRange(const Actor* actor, const Point& dest)
 {
-	int distance = (3 * actor->GetStat(IE_VISUALRANGE)) / 2;
+	int distance = (3 * actor->GetVisualRange()) / 2;
 	return WithinRange(actor, dest, distance);
 }
 

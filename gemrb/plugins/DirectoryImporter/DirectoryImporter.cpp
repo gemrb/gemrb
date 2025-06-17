@@ -18,12 +18,11 @@
 
 #include "DirectoryImporter.h"
 
-#include "globals.h"
-
 #include "ResourceDesc.h"
 
 #include "Logging/Logging.h"
 #include "Streams/FileStream.h"
+#include "System/VFS.h"
 
 using namespace GemRB;
 

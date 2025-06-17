@@ -126,6 +126,7 @@ FUNCTION(CONFIGURE_COMPILER)
 	IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 		# this subtly breaks things, HoW crashes on first area entry
 		#STRING(APPEND CMAKE_CXX_FLAGS " /fp:fast")
+		ADD_COMPILE_OPTIONS(/MP2) # manually enable some file-level parallelism
 	ENDIF()
 
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
@@ -534,8 +535,8 @@ FUNCTION(CONFIGURE_UNIX_SPECIFICS)
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_RPI_SPECIFICS)
-	# check for RaspberryPi
-	FIND_FILE(RPI NAMES bcm_host.h PATHS "/opt/vc/include")
+	# check for RaspberryPi; on newer 64 bit RaspberryPi OS there is no /opt/vc/, check for raspi.list in /etc/apt/sources.list.d/
+	FIND_FILE(RPI NAMES bcm_host.h raspi.list PATHS "/opt/vc/include" "/etc/apt/sources.list.d/")
 
 	IF(RPI AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 		MESSAGE(FATAL_ERROR
@@ -604,7 +605,7 @@ FUNCTION(MAKE_UNINSTALL_TARGET)
 	CONFIGURE_FILE(
 		"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
 		"${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-		IMMEDIATE @ONLY
+		@ONLY
 	)
 	ADD_CUSTOM_TARGET(
 		uninstall "${CMAKE_COMMAND}"
@@ -643,14 +644,14 @@ FUNCTION(MAKE_APPIMAGE_TARGET)
 		COMMAND
 			mv AppDir/usr/usr/share/gemrb ${SHARE}/ || true # not always needed
 		COMMAND
-			sed -i 's,X-AppImage-Version.*,X-AppImage-Version='`date +%F`-$ENV{GITHUB_SHA}',' ${SHARE}/applications/gemrb.desktop
+			sed -i 's,X-AppImage-Version.*,X-AppImage-Version='`date +%F`-$ENV{GITHUB_SHA}',' ${SHARE}/applications/org.gemrb.gemrb.desktop
 		# bundle core python modules
 		# AppRun defaults PYTHONPATH to this destination
 		# source is probably available in Python3_STDLIB once we switch to newer cmake
 		COMMAND
 			mkdir -p ${SHARE}/pyshared
 		COMMAND
-			cp -r /usr/lib/python3.8/* ${SHARE}/pyshared
+			cp -r /usr/lib/python3.10/* ${SHARE}/pyshared
 		COMMAND
 			rm -rf ${SHARE}/pyshared/config-*x86_64-linux-gnu
 		COMMAND
@@ -674,7 +675,7 @@ FUNCTION(INSTALL_APP_RESOURCES)
 	CONFIGURE_FILE(
 		"${CMAKE_CURRENT_SOURCE_DIR}/gemrb.6.in"
 		"${CMAKE_CURRENT_BINARY_DIR}/gemrb.6"
-		IMMEDIATE @ONLY
+		@ONLY
 	)
 
 	IF (NOT APPLE)
@@ -684,9 +685,9 @@ FUNCTION(INSTALL_APP_RESOURCES)
 			SET(ARTWORK_PATH ${CMAKE_SOURCE_DIR}/artwork)
 			SET(LINUX_PATH ${CMAKE_SOURCE_DIR}/platforms/linux)
 
-			INSTALL(FILES ${ARTWORK_PATH}/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME gemrb.png)
-			INSTALL(FILES ${ARTWORK_PATH}/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME gemrb.svg)
-			INSTALL(FILES ${LINUX_PATH}/gemrb.desktop DESTINATION ${MENU_DIR})
+			INSTALL(FILES ${ARTWORK_PATH}/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME org.gemrb.gemrb.png)
+			INSTALL(FILES ${ARTWORK_PATH}/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME org.gemrb.gemrb.svg)
+			INSTALL(FILES ${LINUX_PATH}/org.gemrb.gemrb.desktop DESTINATION ${MENU_DIR})
 			INSTALL(FILES ${LINUX_PATH}/org.gemrb.gemrb.metainfo.xml DESTINATION ${METAINFO_DIR})
 		ENDIF()
 		INSTALL(FILES ${CMAKE_SOURCE_DIR}/README.md INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR})

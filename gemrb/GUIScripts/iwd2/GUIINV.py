@@ -44,7 +44,6 @@ def InitInventoryWindow (Window):
 	global InventoryWindow
 
 	Window.AddAlias("WIN_INV")
-	Window.OnFocus(UpdateInventoryWindow)
 	InventoryWindow = Window
 
 	#ground items scrollbar
@@ -148,11 +147,20 @@ def UpdateInventoryWindow (Window):
 	Count = Container['ItemCount']
 	# account for two columns
 	ScrollBar.SetVarAssoc ("TopIndex", max(0, (Count - 6 + 1) // 2))
+
 	Equipped = GemRB.GetEquippedQuickSlot (pc, 1)
 	GemRB.SetVar ("Equipped", Equipped)
 	for i in range (4):
 		Button = Window.GetControl (109+i)
 		Button.SetVarAssoc("Equipped", i)
+	# eeh, radio buttons ...
+	for i in range (4):
+		Button = Window.GetControl (109 + i)
+		if i == Equipped:
+			Button.SetState (IE_GUI_BUTTON_SELECTED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+
 	RefreshInventoryWindow ()
 	# populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
@@ -229,14 +237,16 @@ def RefreshInventoryWindow ():
 		# use a different item, so the order is LTR
 		i = min(5, HorizontalSlots[cid] - 68)
 		slotID = i + TopIndex
+		Slot = GemRB.GetContainerItem (pc, slotID)
 
 		if GemRB.IsDraggingItem ()==1:
 			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
+		elif not Slot:
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
 
-		Slot = GemRB.GetContainerItem (pc, slotID)
 		if Slot == None:
 			Button.OnPress (None)
 			Button.OnRightPress (None)

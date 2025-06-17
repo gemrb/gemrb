@@ -20,8 +20,7 @@
 #include "GUI/GameControl.h"
 
 #include "ie_cursors.h"
-#include "opcode_params.h"
-#include "strrefs.h"
+#include "ie_stats.h"
 
 #include "CharAnimations.h"
 #include "DialogHandler.h"
@@ -30,9 +29,9 @@
 #include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
-#include "ImageMgr.h"
 #include "Interface.h"
 #include "KeyMap.h"
+#include "Map.h"
 #include "PathFinder.h"
 #include "RNG.h"
 #include "ScriptEngine.h"
@@ -51,7 +50,6 @@
 #include "fmt/ranges.h"
 
 #include <array>
-#include <cmath>
 
 namespace GemRB {
 
@@ -436,8 +434,14 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 		}
 	}
 
+	// Prevent key scrolling from continuing when another window opens
+	if (scrollKeysActive && !IsReceivingEvents()) {
+		scrollKeysDown = scrollKeysActive = 0;
+		vpVector.reset();
+	}
+
 	if (!vpVector.IsZero() && MoveViewportTo(vpOrigin + vpVector, false)) {
-		if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed() && !screenFlags.Test(ScreenFlags::AlwaysCenter)) {
+		if ((Flags() & IgnoreEvents) == 0 && !scrollKeysActive && core->GetMouseScrollSpeed() && !screenFlags.Test(ScreenFlags::AlwaysCenter)) {
 			orient_t orient = GetOrient(Point(), vpVector);
 			// set these cursors on game window so they are universal
 			window->SetCursor(core->GetScrollCursorSprite(orient, numScrollCursor));
@@ -703,15 +707,28 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 		case GEM_LEFT:
 		case GEM_RIGHT:
 			{
-				ieDword keyScrollSpd = core->GetDictionary().Get("Keyboard Scroll Speed", 64);
-
-				if (keycode >= GEM_UP) {
-					int v = (keycode == GEM_UP) ? -1 : 1;
-					Scroll(Point(0, keyScrollSpd * v));
-				} else {
-					int v = (keycode == GEM_LEFT) ? -1 : 1;
-					Scroll(Point(keyScrollSpd * v, 0));
+				if (Flags() & IgnoreEvents) {
+					break;
 				}
+				unsigned int arrowKey = 1 << (keycode - GEM_LEFT);
+
+				// You only get repeating OnKeyPress events for the last key pressed.
+				// More than one direction can be held down for diagonal scrolling, so we have
+				// to track which keys are pressed/released instead of relying on continuous events.
+				// don't reprocess repeating keystrokes
+				if (scrollKeysDown & arrowKey) {
+					break;
+				}
+
+				scrollKeysDown |= arrowKey;
+				scrollKeysActive |= arrowKey;
+
+				// If the opposite arrow key is held down, the new key press overrides it:
+				unsigned int oppositeKey = (arrowKey & 1) ? arrowKey << 1 : arrowKey >> 1;
+				scrollKeysActive &= ~oppositeKey;
+
+				// Update the vector to start scrolling in the direction that was pressed:
+				ApplyKeyScrolling();
 			}
 			break;
 		case GEM_TAB: // show partymember hp/maxhp as overhead text
@@ -838,6 +855,7 @@ static void PrintCollection(const char* name, const CONTAIN& container)
 //Effect for the ctrl-r cheatkey (resurrect)
 static EffectRef heal_ref = { "CurrentHPModifier", -1 };
 static EffectRef damage_ref = { "Damage", -1 };
+static EffectRef puppet_ref = { "PuppetMarker", -1 };
 
 /** Key Release Event */
 bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
@@ -867,10 +885,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				//target is the door/actor currently under the pointer
 				if (!game->selected.empty()) {
 					Actor* src = game->selected[0];
-					Scriptable* target = lastActor;
-					if (overMe) {
-						target = overMe;
-					}
+					Scriptable* target = GetHoverObject();
 					if (target) {
 						src->SetSpellResRef(TestSpell);
 						src->CastSpell(target, false);
@@ -1119,6 +1134,25 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				pc->overHead.Display(false, 0);
 			}
 			break;
+		case GEM_UP:
+		case GEM_DOWN:
+		case GEM_LEFT:
+		case GEM_RIGHT:
+			{
+				unsigned int releasedKey = 1 << (Key.keycode - GEM_LEFT);
+				scrollKeysDown &= ~releasedKey;
+				scrollKeysActive &= ~releasedKey;
+
+				// If the opposite arrow key is still held down, switch to that direction:
+				unsigned int oppositeKey = releasedKey & 1 ? releasedKey << 1 : releasedKey >> 1;
+				if (scrollKeysDown & oppositeKey) {
+					scrollKeysActive |= oppositeKey;
+				}
+
+				// Update the vector to stop scrolling in the direction that was released:
+				ApplyKeyScrolling();
+				break;
+			}
 		default:
 			return false;
 	}
@@ -1266,12 +1300,12 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	// let us target party members even if they are invisible
 	lastActor = area->GetActor(gameMousePos, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 	if (lastActor && lastActor->Modified[IE_EA] >= EA_CONTROLLED) {
-		if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos)) {
+		if (!lastActor->ValidTarget(targetTypes) || !area->IsVisible(gameMousePos)) {
 			lastActor = nullptr;
 		}
 	}
 
-	if ((target_types & GA_NO_SELF) && lastActor == core->GetFirstSelectedActor()) {
+	if ((targetTypes & GA_NO_SELF) && lastActor == core->GetFirstSelectedActor()) {
 		lastActor = nullptr;
 	}
 
@@ -1407,7 +1441,7 @@ void GameControl::UpdateCursor()
 		// knock ignores that
 		bool blocked = bool(area->GetBlocked(gameMousePos) & (PathMapFlags::PASSABLE | PathMapFlags::TRAVEL | PathMapFlags::ACTOR));
 		bool ignoreSM = gamedata->GetSpecialSpell(spellName) & SPEC_AREA;
-		if (!ignoreSM && (!blocked || (!(target_types & GA_POINT) && !lastActor))) {
+		if (!ignoreSM && (!blocked || (!(targetTypes & GA_POINT) && !lastActor))) {
 			nextCursor |= IE_CURSOR_GRAY;
 		}
 	} else if (targetMode == TargetMode::Defend) {
@@ -1599,7 +1633,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	// we are using the window->IsDisabled on purpose
 	// to avoid bugs, we are disabling the window when we open one of the "top window"s
 	// GC->IsDisabled is for other uses
-	if (!window || window->IsDisabled() || (Flags() & IgnoreEvents)) {
+	if (!window || window->IsDisabled() || (Flags() & IgnoreEvents) || scrollKeysActive) {
 		return false;
 	}
 
@@ -1654,7 +1688,7 @@ void GameControl::MoveViewportUnlockedTo(Point p, bool center)
 		p -= half;
 	}
 
-	core->GetAudioDrv()->UpdateListenerPos(p + half);
+	core->GetAudioDrv()->SetListenerPosition(p + half);
 	vpOrigin = p;
 }
 
@@ -1773,7 +1807,7 @@ void GameControl::TryToDisarm(Actor* source, const InfoPoint* tgt) const
 //generate action code for source actor to use item/cast spell on a point
 void GameControl::TryToCast(Actor* source, const Point& tgt)
 {
-	if ((target_types & GA_POINT) == false) {
+	if ((targetTypes & GA_POINT) == false) {
 		return; // not allowed to target point
 	}
 
@@ -1900,7 +1934,9 @@ void GameControl::TryToCast(Actor* source, const Actor* tgt)
 //generate action code for source actor to use talk to target actor
 void GameControl::TryToTalk(Actor* source, const Actor* tgt) const
 {
-	if (source->GetStat(IE_SEX) == SEX_ILLUSION) return;
+	if (source->GetStat(IE_SEX) == SEX_ILLUSION || source->fxqueue.HasEffectWithParam(puppet_ref, 3)) {
+		return;
+	}
 	//Nidspecial1 is just an unused action existing in all games
 	//(non interactive demo)
 	//i found no fitting action which would emulate this kind of
@@ -1913,7 +1949,9 @@ void GameControl::TryToTalk(Actor* source, const Actor* tgt) const
 //generate action code for actor appropriate for the target mode when the target is a container
 void GameControl::HandleContainer(Container* container, Actor* actor)
 {
-	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
+	if (actor->GetStat(IE_SEX) == SEX_ILLUSION || actor->fxqueue.HasEffectWithParam(puppet_ref, 3)) {
+		return;
+	}
 	//container is disabled, it should not react
 	if (container->Flags & CONT_DISABLED) {
 		return;
@@ -1921,7 +1959,7 @@ void GameControl::HandleContainer(Container* container, Actor* actor)
 
 	if ((targetMode == TargetMode::Cast) && spellCount) {
 		//we'll get the container back from the coordinates
-		target_types |= GA_POINT;
+		targetTypes |= GA_POINT;
 		TryToCast(actor, container->Pos);
 		//Do not reset target_mode, TryToCast does it for us!!
 		return;
@@ -1997,6 +2035,7 @@ bool GameControl::HandleActiveRegion(InfoPoint* trap, Actor* actor, const Point&
 		TryToDisarm(actor, trap);
 		return true;
 	}
+	if (actor->fxqueue.HasEffectWithParam(puppet_ref, 3)) return false;
 
 	switch (trap->Type) {
 		case ST_TRAVEL:
@@ -2175,8 +2214,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 				SetTargetMode(TargetMode::None);
 			}
 			// update the action bar
-			core->GetDictionary().Set("ActionLevel", 0);
-			core->SetEventFlag(EF_ACTION);
+			core->ResetActionBar();
 			ClearMouseState();
 			return true;
 		} else {
@@ -2224,18 +2262,24 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			return false;
 		}
 
+		bool alreadyActed = false;
 		if (overMe && (overMe->Type == ST_DOOR || overMe->Type == ST_CONTAINER || (overMe->Type == ST_TRAVEL && targetMode == TargetMode::None))) {
 			// move to the object before trying to interact with it
+			// except for pst worldmapping purposes, where we need Actor::UsedExit to be called sooner
 			Actor* mainActor = GetMainSelectedActor();
 			if (mainActor && overMe->Type != ST_TRAVEL) {
 				CreateMovement(mainActor, p, false, tryToRun); // let one actor handle doors, loot and containers
+			} else if (core->HasFeature(GFFlags::TEAM_MOVEMENT) && overMe->Type == ST_TRAVEL) {
+				PerformSelectedAction(p);
+				alreadyActed = true;
+				CommandSelectedMovement(p, overMe->Type != ST_TRAVEL, false, tryToRun);
 			} else {
 				CommandSelectedMovement(p, overMe->Type != ST_TRAVEL, false, tryToRun);
 			}
 		}
 
 		if (targetMode != TargetMode::None || (overMe && overMe->Type != ST_ACTOR)) {
-			PerformSelectedAction(p);
+			if (!alreadyActed) PerformSelectedAction(p);
 			ClearMouseState();
 			return true;
 		}
@@ -2262,7 +2306,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 {
 	const Game* game = core->GetGame();
 	const Map* area = game->GetCurrentArea();
-	Actor* targetActor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
+	Actor* targetActor = area->GetActor(p, targetTypes & ~GA_NO_HIDDEN);
 	if (targetActor && targetActor->GetStat(IE_NOCIRCLE) == 0) {
 		PerformActionOn(targetActor);
 		return;
@@ -2276,7 +2320,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	//add a check if you don't want some random monster handle doors and such
 	if (targetMode == TargetMode::Cast && !(gamedata->GetSpecialSpell(spellName) & SPEC_AREA)) {
 		//the player is using an item or spell on the ground
-		target_types |= GA_POINT;
+		targetTypes |= GA_POINT;
 		TryToCast(selectedActor, p);
 	} else if (!overMe) {
 		return;
@@ -2384,6 +2428,25 @@ bool GameControl::OnControllerButtonDown(const ControllerEvent& ce)
 	}
 }
 
+void GameControl::ApplyKeyScrolling()
+{
+	// Use the scrollKeysActive flags to set the vector values.
+	// This vector is then used in WillDraw to perform scrolling.
+	vpVector.reset();
+	auto keyScrollSpd = core->GetDictionary().Get("Keyboard Scroll Speed", 64);
+
+	if (scrollKeysActive & SK_LEFT) {
+		vpVector.x = -1 * keyScrollSpd;
+	} else if (scrollKeysActive & SK_RIGHT) {
+		vpVector.x = keyScrollSpd;
+	}
+	if (scrollKeysActive & SK_UP) {
+		vpVector.y = -1 * keyScrollSpd;
+	} else if (scrollKeysActive & SK_DOWN) {
+		vpVector.y = keyScrollSpd;
+	}
+}
+
 void GameControl::Scroll(const Point& amt)
 {
 	MoveViewportTo(vpOrigin + amt, false);
@@ -2437,7 +2500,7 @@ void GameControl::PerformActionOn(Actor* actor)
 		type = ACT_THIEVING;
 	}
 
-	if (type != ACT_NONE && !actor->ValidTarget(target_types)) {
+	if (type != ACT_NONE && !actor->ValidTarget(targetTypes)) {
 		return;
 	}
 
@@ -2517,7 +2580,7 @@ void GameControl::SetTargetMode(TargetMode mode)
 
 void GameControl::ResetTargetMode()
 {
-	target_types = GA_NO_DEAD | GA_NO_HIDDEN | GA_NO_UNSCHEDULED;
+	targetTypes = GA_NO_DEAD | GA_NO_HIDDEN | GA_NO_UNSCHEDULED;
 	SetTargetMode(TargetMode::None);
 }
 
@@ -2627,6 +2690,7 @@ void GameControl::FlagsChanged(unsigned int /*oldflags*/)
 	if (Flags() & IgnoreEvents) {
 		ClearMouseState();
 		vpVector.reset();
+		scrollKeysDown = scrollKeysActive = 0;
 	}
 }
 
@@ -2683,6 +2747,18 @@ void GameControl::SetLastActor(Actor* lastActor)
 	}
 }
 
+bool GameControl::IsOverLastActor(const Point& pos) const
+{
+	const Actor* lastActor = lastActorID != 0 ? GetLastActor() : nullptr;
+	return lastActor && lastActor->IsOver(pos + vpOrigin);
+}
+
+Scriptable* GameControl::GetHoverObject() const
+{
+	Scriptable* const lastActor = lastActorID != 0 ? GetLastActor() : nullptr;
+	return lastActor != nullptr ? lastActor : overMe;
+}
+
 //Set up an item use which needs targeting
 //Slot is an inventory slot
 //header is the used item extended header
@@ -2697,7 +2773,7 @@ void GameControl::SetupItemUse(int slot, size_t header, int targettype, int cnt)
 	spellIndex = static_cast<int>(header);
 	//item use also uses the casting icon, this might be changed in some custom game?
 	SetTargetMode(TargetMode::Cast);
-	target_types = targettype;
+	targetTypes = targettype;
 	spellCount = cnt;
 }
 
@@ -2715,7 +2791,7 @@ void GameControl::SetupCasting(const ResRef& spellname, int type, int level, int
 	spellSlot = level;
 	spellIndex = idx;
 	SetTargetMode(TargetMode::Cast);
-	target_types = targettype;
+	targetTypes = targettype;
 	spellCount = cnt;
 }
 
@@ -2727,7 +2803,7 @@ void GameControl::SetDisplayText(const String& text, unsigned int time)
 
 void GameControl::SetDisplayText(HCStrings text, unsigned int time)
 {
-	SetDisplayText(core->GetString(DisplayMessage::GetStringReference(text), STRING_FLAGS::NONE), time);
+	SetDisplayText(core->GetString(text, STRING_FLAGS::NONE), time);
 }
 
 void GameControl::ToggleAlwaysRun()

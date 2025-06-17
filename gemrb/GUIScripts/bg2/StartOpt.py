@@ -18,6 +18,7 @@
 #
 import GemRB
 import GUIOPT
+import GUIOPTExtra
 import GameCheck
 
 OptionsWindow = 0
@@ -47,6 +48,13 @@ def OnLoad():
 		MoviesButton.OnPress (lambda: GemRB.SetNextScript ("GUIMOVIE"))
 
 		OptionsWindow.DeleteControl (15)
+
+		frame = SoundButton.GetFrame ()
+		GUIOPTExtra.AddGemRBOptionsButton (OptionsWindow, frame, 0, 80, "STARTMBT", 1)
+	elif GameCheck.IsBG2 ():
+		frame = SoundButton.GetFrame ()
+		frame["w"] -= 25
+		GUIOPTExtra.AddGemRBOptionsButton (OptionsWindow, frame, 0, 50, "GMPCONNC", 2)
 
 	SoundButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	GameButton.SetStatus(IE_GUI_BUTTON_ENABLED)

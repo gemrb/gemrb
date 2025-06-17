@@ -23,7 +23,6 @@
 #include "Region.h"
 
 #include "GUI/TextSystem/Font.h"
-#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -63,10 +62,6 @@ public:
 	Size TextSize() const;
 
 	void Draw(const Point& p) const;
-
-	// !!! Keep this synchronized with GUIDefines.py !!!
-	// used for calculating the tooltip delay limit and the real tooltip delay
-	static constexpr int DELAY_FACTOR = 250;
 };
 
 }

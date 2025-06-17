@@ -19,6 +19,8 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
+#include "globals.h"
+
 #include "Region.h"
 
 namespace GemRB {

@@ -22,9 +22,7 @@
 
 #include "AnimationFactory.h"
 #include "DataFileMgr.h"
-#include "Game.h"
 #include "GameData.h"
-#include "ImageMgr.h"
 #include "Interface.h"
 #include "Palette.h"
 #include "RNG.h"
@@ -94,10 +92,6 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept
 			size = 0;
 		}
 		table[i].Size = size;
-
-		table[i].WalkScale = 0;
-		table[i].RunScale = 0;
-		table[i].Bestiary = -1;
 
 		for (unsigned char j = 0; j < MAX_ANIMS; j++) {
 			table[i].StanceOverride[j] = j;
@@ -909,10 +903,6 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 	//setting up the sequencing of animation cycles
 	autoSwitchOnEnd = false;
 	switch (stanceID) {
-		case IE_ANI_DAMAGE:
-			nextStanceID = IE_ANI_READY;
-			autoSwitchOnEnd = true;
-			break;
 		case IE_ANI_SLEEP: //going to sleep
 		case IE_ANI_DIE: //going to die
 			nextStanceID = IE_ANI_TWITCH;
@@ -932,6 +922,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			nextStanceID = IE_ANI_AWAKE;
 			autoSwitchOnEnd = true;
 			break;
+		case IE_ANI_DAMAGE:
 		case IE_ANI_CONJURE: //ending
 		case IE_ANI_SHOOT:
 		case IE_ANI_ATTACK:
@@ -1472,6 +1463,9 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
 	const char* Prefix;
 	static const char prefixes[2][4] = { "sf2", "sf1" };
 	int flip = RandomFlip();
+	if (StanceID == IE_ANI_RUN && !AvatarTable[AvatarsRowNum].RunScale) {
+		StanceID = IE_ANI_WALK;
+	}
 
 retry:
 	switch (StanceID) {
@@ -1513,6 +1507,14 @@ retry:
 			Cycle = SixteenToNine[Orient];
 			Prefix = "wlk";
 			break;
+		case IE_ANI_CAST:
+			Cycle = SixteenToNine[Orient];
+			Prefix = "sp1";
+			break;
+		case IE_ANI_CONJURE:
+			Cycle = SixteenToNine[Orient];
+			Prefix = "sp2";
+			break;
 		case IE_ANI_HEAD_TURN:
 			Cycle = SixteenToFive[Orient];
 
@@ -1533,6 +1535,7 @@ retry:
 		default: //just in case
 			Cycle = SixteenToFive[Orient];
 			Prefix = "stc";
+			Log(DEBUG, "CharAnimation", "Unhandled pst stance: {}", StanceID);
 			break;
 	}
 	dest.Format("{}{}{}", ResRefBase[0], Prefix, ResRefBase.begin() + 1);

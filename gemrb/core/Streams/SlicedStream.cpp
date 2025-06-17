@@ -20,8 +20,6 @@
 
 #include "SlicedStream.h"
 
-#include "errors.h"
-
 #include "MemoryStream.h"
 
 #include "Logging/Logging.h"

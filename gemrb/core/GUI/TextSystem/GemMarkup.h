@@ -19,14 +19,16 @@
 #ifndef GEMMARKUP_H
 #define GEMMARKUP_H
 
-#include "TextContainer.h"
+#include "Font.h"
 
 #include "Strings/String.h"
 
-#include <map>
 #include <stack>
 
 namespace GemRB {
+
+class TextContainer;
+class TextSpan;
 
 class GemMarkupParser {
 public:

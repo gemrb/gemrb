@@ -22,9 +22,7 @@
 #define DIALOG_H
 
 #include "exports.h"
-#include "globals.h"
-
-#include "Resource.h"
+#include "ie_types.h"
 
 #include <vector>
 
@@ -45,8 +43,9 @@ namespace GemRB {
 
 #define IE_DLG_QUEST_GROUP 0x4000 // this is a GemRB extension
 
-class Condition;
 class Action;
+class Condition;
+class Scriptable;
 
 struct DialogTransition {
 	ieDword Flags;

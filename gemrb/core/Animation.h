@@ -21,7 +21,6 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include "RGBAColor.h"
 #include "exports.h"
 #include "globals.h"
 

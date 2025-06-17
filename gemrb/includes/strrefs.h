@@ -230,6 +230,8 @@ enum class HCStrings : TableMgr::index_t {
 	Evaded2,
 	HealingRest,
 	HealingRestFull,
+	UnusableDroppedBag,
+	UnusableDroppedGround,
 
 	count,
 };

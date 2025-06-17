@@ -21,10 +21,10 @@
 #include "AREImporter.h"
 
 #include "ie_cursors.h"
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "ActorMgr.h"
-#include "Ambient.h"
 #include "AnimationFactory.h"
 #include "DataFileMgr.h"
 #include "DisplayMessage.h"
@@ -37,7 +37,9 @@
 #include "ProjectileServer.h"
 #include "RNG.h"
 
+#include "Audio/Ambient.h"
 #include "GameScript/GameScript.h"
+#include "Logging/Logging.h"
 #include "Plugins/TileMapMgr.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"

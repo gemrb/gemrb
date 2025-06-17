@@ -24,9 +24,9 @@
 #include "exports.h"
 
 #include "Debug.h"
-#include "SymbolMgr.h"
 
 #include "GameScript/Targets.h"
+#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 #include "Streams/DataStream.h"
 
@@ -34,9 +34,6 @@
 #include <vector>
 
 namespace GemRB {
-
-class Action;
-class GameScript;
 
 //escapearea flags
 enum class EscapeArea {
@@ -57,6 +54,7 @@ enum class EscapeArea {
 #define DS_QUEUE    256
 #define DS_CIRCLE   512
 #define DS_RESOLVED 1024
+#define DS_APPEND   2048
 
 //markspellandobject (iwd2)
 #define MSO_IGNORE_SEE     1
@@ -487,6 +485,7 @@ extern void ScriptDebugLog(DebugMode bit, const char* message, ARGS&&... args)
 }
 extern int RandomNumValue;
 extern int NextTriggerObjectID;
+extern unsigned int MAX_OPERATING_DISTANCE;
 
 class GEM_EXPORT GameScript {
 public:

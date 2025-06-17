@@ -29,7 +29,8 @@
 #define REGION_H
 
 #include "exports.h"
-#include "ie_types.h"
+
+#include "fmt/format.h"
 
 #include <algorithm>
 #include <vector>

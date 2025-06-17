@@ -22,34 +22,22 @@
 #define SCRIPTABLE_H
 
 #include "exports.h"
-#include "ie_cursors.h"
 #include "ie_types.h"
-#include "strrefs.h"
 
-#include "CharAnimations.h"
 #include "OverHeadText.h"
 #include "PathFinder.h"
 
 #include <list>
 #include <map>
-#include <memory>
 
 namespace GemRB {
 
 class Action;
 class Actor;
-class Container;
-class Door;
 class GameScript;
-class Highlightable;
-class InfoPoint;
 class Map;
-class Movable;
 class Object;
-struct PathNode;
 class Projectile;
-class Scriptable;
-class Selectable;
 class Spell;
 
 #define MAX_GROUND_ICON_DRAWN 3
@@ -290,6 +278,7 @@ public:
 	SearchmapPoint SMPos; // Pos in searchmap space
 	Region BBox;
 	ieStrRef DialogName = ieStrRef::INVALID;
+	static unsigned int VOODOO_VISUAL_RANGE;
 
 	// State relating to the currently-running action.
 	int CurrentActionState = 0;
@@ -421,6 +410,7 @@ public:
 	void StartTimer(ieDword ID, ieDword expiration);
 	String GetName() const;
 	bool AuraPolluted();
+	unsigned int GetVisualRange() const;
 	ieDword GetLocal(const ieVariable& key, ieDword fallback) const;
 	virtual std::string dump() const = 0;
 	void SetPos(const NavmapPoint& pos)

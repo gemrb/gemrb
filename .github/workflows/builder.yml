@@ -10,7 +10,7 @@ on:
 jobs:
   tester:
     name: Test runner linux build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev python3-dev zstd g++-7 gdb libgtest-dev
+        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev python3-dev zstd g++-9 gdb libgtest-dev
 
         SCCACHE_VERSION="v0.2.15"
         SCCACHE_LINUX_PACKAGE="sccache-${SCCACHE_VERSION}-x86_64-unknown-linux-musl"
@@ -28,8 +28,8 @@ jobs:
 
     - name: Set up build
       env:
-        CXX: g++-7
-        CC: gcc-7
+        CXX: g++-9
+        CC: gcc-9
       run: |
         mkdir build && cd build
         cmake --version
@@ -130,7 +130,7 @@ jobs:
 
   linux:
     name: Linux AppImage build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
@@ -139,7 +139,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev python3-dev zstd g++-7 gdb libgtest-dev
+        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev python3-dev zstd g++-9 gdb libgtest-dev
 
         SCCACHE_VERSION="v0.2.15"
         SCCACHE_LINUX_PACKAGE="sccache-${SCCACHE_VERSION}-x86_64-unknown-linux-musl"
@@ -148,8 +148,8 @@ jobs:
 
     - name: Set up build
       env:
-        CXX: g++-7
-        CC: gcc-7
+        CXX: g++-9
+        CC: gcc-9
       run: |
         mkdir build && cd build
         cmake --version

@@ -21,7 +21,6 @@
 #ifndef DOOR_H
 #define DOOR_H
 
-#include "PathFinder.h"
 #include "Polygon.h"
 #include "TileOverlay.h"
 
@@ -125,7 +124,7 @@ public:
 	int TrapResets() const override { return Flags & DOOR_RESET; }
 	bool CantAutoClose() const { return Flags & (DOOR_CANTCLOSE | DOOR_LOCKED); }
 	void SetNewOverlay(Holder<TileOverlay> Overlay);
-	const Point* GetClosestApproach(Scriptable* src, unsigned int& distance) const;
+	const Point* GetClosestApproach(const Scriptable* src, unsigned int& distance) const;
 
 	std::shared_ptr<Gem_Polygon> OpenTriggerArea() const;
 	std::shared_ptr<Gem_Polygon> ClosedTriggerArea() const;

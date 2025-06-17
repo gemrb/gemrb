@@ -23,13 +23,10 @@
 
 #include "Map.h"
 #include "MapMgr.h"
-#include "PluginMgr.h"
 
 namespace GemRB {
 
 class ActorMgr;
-class Animation;
-class AnimationFactory;
 class EffectQueue;
 class TileMapMgr;
 

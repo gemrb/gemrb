@@ -29,7 +29,6 @@
 
 #include "SClassID.h" // For PluginID
 #include "exports.h"
-#include "globals.h"
 
 #include "Plugin.h"
 #include "ResourceDesc.h"
@@ -37,7 +36,6 @@
 #include "Plugins/ImporterPlugin.h"
 
 #include <cstring>
-#include <list>
 #include <map>
 #include <vector>
 

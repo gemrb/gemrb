@@ -45,6 +45,7 @@ IE_GUI_BUTTON_SOUND      = 0x00000004
 IE_GUI_BUTTON_CAPS       = 0x00000008   #capitalize all the text
 IE_GUI_BUTTON_CHECKBOX   = 0x00000010   #or radio button
 IE_GUI_BUTTON_RADIOBUTTON= 0x00000020   #sticks in a state
+IE_GUI_BUTTON_SHADE_BASE = 0x00000040
 
 #these bits are hardcoded in the .chu structure, don't move them
 IE_GUI_BUTTON_ALIGN_LEFT = 0x00000100
@@ -196,7 +197,7 @@ SF_CENTERONACTOR     = 0
 SF_ALWAYSCENTER      = 1
 
 # GameControltarget modes
-# !!! Keep these synchronized with GameControl.h !!!
+# !!! Keep these synchronized with GameControlDefs.h !!!
 TARGET_MODE_NONE    = 0
 TARGET_MODE_TALK    = 1
 TARGET_MODE_ATTACK  = 2
@@ -313,9 +314,6 @@ SHOP_SELECT = 0x20000
 
 #game constants
 
-# !!! Keep this synchronized with Video.h !!!
-TOOLTIP_DELAY_FACTOR = 250
-
 #game strings
 STR_LOADMOS  = 0
 STR_AREANAME = 1
@@ -330,11 +328,12 @@ SV_TOUCH = 4
 SV_SAVEPATH = 5
 
 # GUIEnhancements bits
-GE_SCROLLBARS = 1
+GE_CONTAINERS = 1
 GE_TRY_IDENTIFY_ON_TRANSFER = 2
 GE_ALWAYS_OPEN_CONTAINER_ITEMS = 4
 GE_UNFOCUS_STOPS_SCROLLING = 8
 GE_MARK_SCROLLS = 16
+GE_PERSISTENT_IDENTIFICATION = 32
 
 # Log Levels
 # !!! Keep this synchronized with Logging/Logging.h !!!
@@ -369,6 +368,8 @@ UAW_2DASPELLS = 11
 UAW_SPELLS_DIRECT = 12
 UAW_QITEMS = 13
 UAW_BG2SUMMONS = 14
+UAW_WEAPONSETS = 15
+UAW_CONFIGUREBAR = 16
 
 # item extended header location field
 ITEM_LOC_WEAPON = 1  # show on quick weapon ability selection

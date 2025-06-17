@@ -23,12 +23,14 @@
 #include "Game.h"
 
 #include "defsounds.h"
+#include "ie_stats.h"
 #include "strrefs.h"
 
 #include "DisplayMessage.h"
 #include "GameData.h"
 #include "IniSpawn.h"
 #include "Interface.h"
+#include "Map.h"
 #include "MapMgr.h"
 #include "MusicMgr.h"
 #include "Particles.h"
@@ -200,7 +202,7 @@ Actor* Game::FindPC(unsigned int partyID) const
 	for (const auto& pc : PCs) {
 		if (pc->InParty == partyID) return pc;
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* Game::FindPC(const ieVariable& scriptingName) const
@@ -210,7 +212,7 @@ Actor* Game::FindPC(const ieVariable& scriptingName) const
 			return pc;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* Game::FindNPC(unsigned int partyID) const
@@ -218,7 +220,7 @@ Actor* Game::FindNPC(unsigned int partyID) const
 	for (const auto& npc : NPCs) {
 		if (npc->InParty == partyID) return npc;
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* Game::FindNPC(const ieVariable& scriptingName) const
@@ -228,7 +230,7 @@ Actor* Game::FindNPC(const ieVariable& scriptingName) const
 			return npc;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* Game::GetGlobalActorByGlobalID(ieDword globalID) const
@@ -243,21 +245,22 @@ Actor* Game::GetGlobalActorByGlobalID(ieDword globalID) const
 			return npc;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Actor* Game::GetPC(size_t slot, bool onlyAlive) const
 {
 	if (slot >= PCs.size()) {
-		return NULL;
+		return nullptr;
 	}
 	if (onlyAlive) {
 		for (const auto& pc : PCs) {
-			if (IsAlive(pc) && !slot--) {
+			if (IsAlive(pc) && !slot) {
 				return pc;
 			}
+			--slot;
 		}
-		return NULL;
+		return nullptr;
 	}
 	return PCs[slot];
 }
@@ -365,6 +368,10 @@ int Game::LeaveParty(Actor* actor, bool returnCriticalItems)
 	if (selected.empty()) {
 		SelectActor(PCs[0], true, SELECT_NORMAL);
 	}
+	// same for the screens
+	if (!GetSelectedPCSingle(false)) {
+		SelectPCSingle(1);
+	}
 
 	for (const auto& pc : PCs) {
 		if (pc->InParty > actor->InParty) {
@@ -387,7 +394,7 @@ int Game::LeaveParty(Actor* actor, bool returnCriticalItems)
 	}
 	actor->SetBase(IE_EA, EA_NEUTRAL);
 	// bgs also gave away any IE_ITEM_CRITICAL items, but not if the actor was kicked out?!
-	if (returnCriticalItems && core->HasFeature(GFFlags::HEAL_ON_100PLUS)) { // TODO: change to !SELLABLE_CRITS_NO_CONV once that is merged
+	if (returnCriticalItems && core->HasFeature(GFFlags::SELLABLE_CRITS_NO_CONV)) {
 		slot = actor->inventory.FindItem("", IE_INV_ITEM_CRITICAL);
 		while (slot != -1) {
 			const CREItem* si = actor->inventory.GetSlotItem(slot);
@@ -483,6 +490,22 @@ int Game::JoinParty(Actor* actor, int join)
 		}
 		AddTrigger(TriggerEntry(trigger_joins, actor->GetGlobalID()));
 	}
+
+	if (join & JP_OVERRIDE) {
+		Actor* actor2 = nullptr;
+		// FindNPC but also checks it's not us
+		for (const auto& npc : NPCs) {
+			if (npc != actor && npc->GetScriptName() == actor->GetScriptName()) {
+				actor2 = npc;
+			}
+		}
+		if (actor2) {
+			int slot2 = InStore(actor2);
+			DelNPC(slot2);
+			actor2->SetPersistent(-1);
+		}
+	}
+
 	slot = InStore(actor);
 	if (slot >= 0) {
 		std::vector<Actor*>::iterator m = NPCs.begin() + slot;
@@ -547,10 +570,10 @@ int Game::GetSelectedPCSingle() const
 Actor* Game::GetSelectedPCSingle(bool onlyAlive) const
 {
 	Actor* pc = FindPC(SelectedSingle);
-	if (!pc) return NULL;
+	if (!pc) return nullptr;
 
 	if (onlyAlive && !IsAlive(pc)) {
-		return NULL;
+		return nullptr;
 	}
 	return pc;
 }
@@ -600,7 +623,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 				// already the only selected actor
 				return true;
 			}
-			SelectActor(NULL, false, SELECT_QUIET);
+			SelectActor(nullptr, false, SELECT_QUIET);
 		} else if (actor->IsSelected()) {
 			// already selected
 			return true;
@@ -667,7 +690,7 @@ int Game::FindMap(const ResRef& resRef) const
 Map* Game::GetMap(unsigned int index) const
 {
 	if (index >= Maps.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return Maps[index];
 }
@@ -781,8 +804,10 @@ int Game::DelMap(unsigned int index, int forced)
 	}
 
 	// one last script execution, so the Vacant trigger is more likely to run (pst ar0109)
+	// we can't cause a reparse of the scripts in general, since that often causes them to run for too long,
+	// messing with scripts in the new area if they use shared variables like Current_Area #2313
 	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
-		map->ExecuteScript(MAX_SCRIPTS);
+		// map->ExecuteScript(MAX_SCRIPTS);
 		map->ProcessActions();
 	}
 
@@ -881,7 +906,7 @@ int Game::LoadMap(const ResRef& resRef, bool loadscreen)
 		newMap->LoadIniSpawn();
 	}
 
-	core->GetAudioDrv()->UpdateMapAmbient(newMap->GetReverbProperties());
+	core->GetAudioDrv()->SetReverbProperties(newMap->GetReverbProperties());
 
 	core->LoadProgress(100);
 	return ret;
@@ -962,7 +987,7 @@ int Game::AddNPC(Actor* npc)
 Actor* Game::GetNPC(unsigned int index) const
 {
 	if (index >= NPCs.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return NPCs[index];
 }
@@ -1073,7 +1098,8 @@ bool Game::AddJournalEntry(ieStrRef strRef, JournalSection section, ieByte group
 	// pst/bg2 also has a sound attached to the base string, so play it manually
 	StringBlock sb = core->strings->GetStringBlock(strJournalChange);
 	if (sb.Sound.IsEmpty()) return true;
-	core->GetAudioDrv()->Play(StringView(sb.Sound), SFXChannel::Dialog);
+
+	core->GetAudioPlayback().Play(StringView(sb.Sound), AudioPreset::Dialog, SFXChannel::Dialog);
 
 	return true;
 }
@@ -1096,13 +1122,13 @@ GAMJournalEntry* Game::FindJournalEntry(ieStrRef strRef) const
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 GAMJournalEntry* Game::GetJournalEntry(unsigned int index) const
 {
 	if (index >= Journals.size()) {
-		return NULL;
+		return nullptr;
 	}
 	return Journals[index];
 }
@@ -1125,7 +1151,7 @@ GAMLocationEntry* Game::GetSavedLocationEntry(unsigned int i)
 	size_t current = savedpositions.size();
 	if (i >= current) {
 		if (i > PCs.size()) {
-			return NULL;
+			return nullptr;
 		}
 		savedpositions.resize(i + 1);
 		while (current <= i) {
@@ -1153,7 +1179,7 @@ GAMLocationEntry* Game::GetPlaneLocationEntry(unsigned int i)
 	size_t current = planepositions.size();
 	if (i >= current) {
 		if (i > PCs.size()) {
-			return NULL;
+			return nullptr;
 		}
 		planepositions.resize(i + 1);
 		while (current <= i) {
@@ -1348,12 +1374,12 @@ void Game::PartyMemberDied(const Actor* actor) const
 		if (HasSpecialDeathReaction(pc->GetScriptName(), actor->GetScriptName())) {
 			react = pc;
 			break;
-		} else if (react == NULL) {
+		} else if (react == nullptr) {
 			react = pc;
 		}
 	}
 
-	if (react != NULL) {
+	if (react) {
 		tick_t len = react->ReactToDeath(actor->GetScriptName());
 		tick_t counter = (core->Time.defaultTicksPerSec * len) / 1000;
 		if (counter > react->GetWait()) { // don't nullify it in case we're waiting already
@@ -1613,12 +1639,12 @@ void Game::UpdateScripts()
 	}
 
 	//this is used only for the death delay so far
-	if (event_handler) {
-		if (!event_timer) {
-			event_handler();
-			event_handler = NULL;
+	if (eventHandler) {
+		if (!eventTimer) {
+			eventHandler();
+			eventHandler = nullptr;
 		}
-		event_timer--;
+		eventTimer--;
 	}
 
 	if (EveryoneDead()) {
@@ -1639,8 +1665,8 @@ void Game::UpdateScripts()
 
 void Game::SetTimedEvent(EventHandler func, int count)
 {
-	event_timer = count;
-	event_handler = std::move(func);
+	eventTimer = count;
+	eventHandler = std::move(func);
 }
 
 void Game::SetProtagonistMode(int mode)
@@ -2091,15 +2117,8 @@ bool Game::CastOnRest() const
 		}
 	}
 
-	bool anyoneStillHurt = false;
-	ps = ps2;
-	for (int idx = 1; idx <= ps; idx++) {
-		Actor* tar = FindPC(idx);
-		if (!tar) continue;
-		int hpNeeded = static_cast<int>(tar->GetStat(IE_MAXHITPOINTS) - tar->GetStat(IE_HITPOINTS));
-		if (hpNeeded) anyoneStillHurt = true;
-	}
-	return anyoneStillHurt;
+	std::sort(wholeparty.begin(), wholeparty.end());
+	return wholeparty.back().hpneeded > 0;
 }
 
 //timestop effect
@@ -2166,7 +2185,7 @@ static const Color DuskTint(0xe0, 0x80, 0x80, 0x40); //dark, reddish
 const Color* Game::GetGlobalTint() const
 {
 	const Map* map = GetCurrentArea();
-	if (!map) return NULL;
+	if (!map) return nullptr;
 	if (map->AreaFlags & AF_DREAM) {
 		return &DreamTint;
 	}
@@ -2189,7 +2208,7 @@ const Color* Game::GetGlobalTint() const
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // applies the global tint, if any
@@ -2282,30 +2301,32 @@ void Game::StartRainOrSnow(bool conditional, ieWord w)
 		if (WeatherBits & (WB_RAIN | WB_SNOW))
 			return;
 	}
+
+	auto& playback = core->GetAudioPlayback();
 	// whatever was responsible for calling this, we now have some set weather
 	WeatherBits = w | WB_HASWEATHER;
 	if (w & WB_LIGHTNINGMASK) {
 		if (WeatherBits & WB_INCREASESTORM) {
 			//already raining
 			if (GameTime & 1) {
-				core->PlaySound(DS_LIGHTNING1, SFXChannel::MainAmbient);
+				playback.PlayDefaultSound(DS_LIGHTNING1, SFXChannel::MainAmbient);
 			} else {
-				core->PlaySound(DS_LIGHTNING2, SFXChannel::MainAmbient);
+				playback.PlayDefaultSound(DS_LIGHTNING2, SFXChannel::MainAmbient);
 			}
 		} else {
 			//start raining (far)
-			core->PlaySound(DS_LIGHTNING3, SFXChannel::MainAmbient);
+			playback.PlayDefaultSound(DS_LIGHTNING3, SFXChannel::MainAmbient);
 		}
 	}
 	if (w & WB_SNOW) {
-		core->PlaySound(DS_SNOW, SFXChannel::MainAmbient);
+		playback.PlayDefaultSound(DS_SNOW, SFXChannel::MainAmbient);
 		weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
 		weather->SetColorIndex(SPARK_COLOR_WHITE);
 		return;
 	}
 	if (w & WB_RAIN) {
-		core->PlaySound(DS_RAIN, SFXChannel::MainAmbient);
+		playback.PlayDefaultSound(DS_RAIN, SFXChannel::MainAmbient);
 		weather->SetType(SP_TYPE_LINE, SP_PATH_RAIN, SP_SPAWN_SOME);
 		weather->SetPhase(P_GROW);
 		// colors re-d from iwd2

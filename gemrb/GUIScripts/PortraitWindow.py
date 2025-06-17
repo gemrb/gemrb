@@ -173,18 +173,8 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 			# vertical
 			button = Window.CreateButton (nextID, xOffset, i*buttonHeight+yOffset+i*2*scale, buttonWidth, buttonHeight)
 
-		button.SetVarAssoc("portrait", i + 1)
+		SetupPortraitButton (button, i + 1)
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
-		SetupButtonBorders (button)
-		button.SetFont (StatesFont)
-		button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-
-		button.OnRightPress (GUICommonWindows.OpenInventoryWindowClick)
-		button.OnPress (GUICommonWindows.PortraitButtonOnPress)
-		button.OnShiftPress (GUICommonWindows.PortraitButtonOnShiftPress)
-		button.SetAction (GUICommonWindows.PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
-		button.SetAction (GUICommonWindows.ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
-		button.SetAction (GUICommonWindows.ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
 		list.append(button)
 		limit -= limitStep
@@ -202,6 +192,37 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 			button.SetPos (x, y-portraitGap*i)
 
 	return list
+
+def SetupPortraitButton (Button, pcID, needControls = 0):
+	Button.SetVarAssoc ("portrait", pcID)
+	Button.SetFont (StatesFont)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_SET)
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
+
+	if needControls or GameCheck.IsIWD2 ():
+		Button.OnRightPress (GUICommonWindows.OpenInventoryWindowClick)
+	else:
+		Button.OnRightPress (GUICommonWindows.PortraitButtonOnPress)
+
+	Button.OnPress (GUICommonWindows.PortraitButtonOnPress)
+	Button.OnShiftPress (GUICommonWindows.PortraitButtonOnShiftPress)
+	Button.SetAction (GUICommonWindows.PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
+	Button.SetAction (GUICommonWindows.ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
+	Button.SetAction (GUICommonWindows.ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
+	Button.SetAction (lambda btn: GemRB.GameControlLocateActor(btn.Value), IE_ACT_MOUSE_ENTER);
+	Button.SetAction (lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE)
+
+	AddStatusFlagLabel (Button, pcID)
+	SetupButtonBorders (Button)
+	if GameCheck.IsIWD1 () or GameCheck.IsIWD2 ():
+		AddHPLabel (Button, pcID)
+
+	# if you're using bigger parties, you probably don't care about the
+	# pairwise hotkeys and would prefer the individual ones — so override
+	if pcID == 10:
+		Button.SetHotKey('0', 0, True)
+	else:
+		Button.SetHotKey(chr(ord('0') + pcID), 0, True)
 
 def AddStatusFlagLabel (Button, i):
 	# label for status flags (dialog, store, level up)
@@ -294,31 +315,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	PortraitButtons = GetPortraitButtons (Window)
 	for Button in PortraitButtons:
 		pcID = Button.Value
-
-		Button.SetVarAssoc("portrait", pcID)
-		Button.SetHotKey(chr(ord('0') + pcID), 0, True)
-		Button.SetFont (StatesFont)
-		AddStatusFlagLabel (Button, pcID)
-
-		if needcontrols or GameCheck.IsIWD2():
-			Button.OnRightPress (GUICommonWindows.OpenInventoryWindowClick)
-		else:
-			Button.OnRightPress (GUICommonWindows.PortraitButtonOnPress)
-
-		Button.OnPress (GUICommonWindows.PortraitButtonOnPress)
-		Button.OnShiftPress (GUICommonWindows.PortraitButtonOnShiftPress)
-		Button.SetAction (GUICommonWindows.PortraitButtonOnShiftPress, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, GEM_MOD_CTRL, 1)
-		Button.SetAction (GUICommonWindows.ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
-		Button.SetAction (GUICommonWindows.ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
-		Button.SetAction(lambda btn: GemRB.GameControlLocateActor(btn.Value), IE_ACT_MOUSE_ENTER);
-		Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE);
-
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_SET)
-		Button.SetState (IE_GUI_BUTTON_LOCKED)
-
-		SetupButtonBorders (Button)
-		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
-			AddHPLabel (Button, pcID)
+		SetupPortraitButton (Button, pcID, needcontrols)
 
 	UpdatePortraitWindow()
 	return Window

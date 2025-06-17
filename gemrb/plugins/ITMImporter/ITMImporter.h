@@ -21,8 +21,6 @@
 #ifndef ITMIMPORTER_H
 #define ITMIMPORTER_H
 
-#include "ie_types.h"
-
 #include "Item.h"
 #include "ItemMgr.h"
 

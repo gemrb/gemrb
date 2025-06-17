@@ -39,11 +39,13 @@
 
 ###################################################
 import GemRB
+import Game
 import GUICommon
 import CommonTables
 import LevelUp
 import LUCommon
 import GUICommonWindows
+import GUIRECCommon
 import NewLife
 import PartyReform
 from GUIDefines import *
@@ -63,6 +65,8 @@ LevelDiff = 0
 Level = 0
 Classes = 0
 NumClasses = 0
+NewCharacteristicPts = 0
+LevelStats = { "FIGHTER" : IE_LEVEL , "MAGE": IE_LEVEL2, "THIEF": IE_LEVEL3 }
 
 ###################################################
 
@@ -224,7 +228,7 @@ def UpdateRecordsWindow (Window):
 
 	AlignmentTable = GemRB.LoadTable ("ALIGNS")
 	alignment_help = AlignmentTable.GetValue (sym, 'DESC_REF', GTV_REF)
-	frame = (3 * int (align / 16) + align % 16) - 4
+	frame = (3 * align // 16 + align % 16) - 4
 
 	Button = Window.GetControl (5)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -402,7 +406,7 @@ def GetCharacterHeader (pc):
 		avatar_header['PrimLevel'] = GemRB.GetPlayerStat (pc, IE_LEVEL)
 		avatar_header['XP'] = GemRB.GetPlayerStat (pc, IE_XP)
 		if Multi:
-			avatar_header['XP'] = avatar_header['XP'] / 2
+			avatar_header['XP'] = avatar_header['XP'] // 2
 			avatar_header['SecoLevel'] = GemRB.GetPlayerStat (pc, IE_LEVEL2)
 
 			avatar_header['PrimClass'] = "FIGHTER"
@@ -447,8 +451,8 @@ def GetNextLevelExp (Level, Class):
 def GetStatOverview (pc):
 	won = "[color=FFFFFF]"
 	woff = "[/color]"
-	str_None = GemRB.GetString (41275)
 
+	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 
 	stats = []
@@ -484,13 +488,13 @@ def GetStatOverview (pc):
 	# 67049 AC Bonuses
 	stats.append (67049)
 	#   67204 AC vs. Slashing
-	stats.append ((67204, GS (IE_ACSLASHINGMOD), ''))
+	stats.append ((67204, -1 * GS (IE_ACSLASHINGMOD), 'p'))
 	#   67205 AC vs. Piercing
-	stats.append ((67205, GS (IE_ACPIERCINGMOD), ''))
+	stats.append ((67205, -1 * GS (IE_ACPIERCINGMOD), 'p'))
 	#   67206 AC vs. Crushing
-	stats.append ((67206, GS (IE_ACCRUSHINGMOD), ''))
+	stats.append ((67206, -1 * GS (IE_ACCRUSHINGMOD), 'p'))
 	#   67207 AC vs. Missile
-	stats.append ((67207, GS (IE_ACMISSILEMOD), ''))
+	stats.append ((67207, -1 * GS (IE_ACMISSILEMOD), 'p'))
 	stats.append (None)
 
 
@@ -523,7 +527,7 @@ def GetStatOverview (pc):
 	# 4220 Proficiencies
 	stats.append (4220)
 	#   4208 THAC0
-	stats.append ((4208, GS (IE_TOHIT), ''))
+	stats.append ((4208, IE_TOHIT, 's'))
 	#   4209 Number of Attacks
 	tmp = GemRB.GetCombatDetails(pc, 0)["APR"]
 
@@ -536,43 +540,44 @@ def GetStatOverview (pc):
 	#   4210 Lore
 	stats.append ((4210, GS (IE_LORE), ''))
 	#   4211 Open Locks
-	stats.append ((4211, GS (IE_LOCKPICKING), '%'))
+	className = GUICommon.GetClassRowName (pc)
+	stats.append ((4211, GUIRECCommon.GetValidSkill (pc, className, IE_LOCKPICKING), '%'))
 	#   4212 Stealth
-	stats.append ((4212, GS (IE_STEALTH), '%'))
+	stats.append ((4212, GUIRECCommon.GetValidSkill (pc, className, IE_STEALTH), '%'))
 	#   4213 Find/Remove Traps
-	stats.append ((4213, GS (IE_TRAPS), '%'))
+	stats.append ((4213, GUIRECCommon.GetValidSkill (pc, className, IE_TRAPS), '%'))
 	#   4214 Pick Pockets
-	stats.append ((4214, GS (IE_PICKPOCKET), '%'))
+	stats.append ((4214, GUIRECCommon.GetValidSkill (pc, className, IE_PICKPOCKET), '%'))
 	#   4215 Tracking
 	stats.append ((4215, GS (IE_TRACKING), ''))
-	#   4216 Reputation
-	stats.append ((4216, GS (IE_REPUTATION), ''))
-	#   4217 Turn Undead Level
-	stats.append ((4217, GS (IE_TURNUNDEADLEVEL), ''))
+	#   4216 Reputation - not shown
+	#   4217 Turn Undead Level - unused
 	#   4218 Lay on Hands Amount
 	stats.append ((4218, GS (IE_LAYONHANDSAMOUNT), ''))
 	#   4219 Backstab Damage
-	stats.append ((4219, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x'))
+	if "THIEF" in className: # for TNO display it only if he's currently a thief
+		stats.append ((4219, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x'))
 	stats.append (None)
 
 	# 4221 Saving Throws
 	stats.append (4221)
 	#   4222 Paralyze/Poison/Death
-	stats.append ((4222, GS (IE_SAVEVSDEATH), ''))
+	stats.append ((4222, IE_SAVEVSDEATH, 's'))
 	#   4223 Rod/Staff/Wand
-	stats.append ((4223, GS (IE_SAVEVSWANDS), ''))
+	stats.append ((4223, IE_SAVEVSWANDS, 's'))
 	#   4224 Petrify/Polymorph
-	stats.append ((4224, GS (IE_SAVEVSPOLY), ''))
+	stats.append ((4224, IE_SAVEVSPOLY, 's'))
 	#   4225 Breath Weapon
-	stats.append ((4225, GS (IE_SAVEVSBREATH), ''))
+	stats.append ((4225, IE_SAVEVSBREATH, 's'))
 	#   4226 Spells
-	stats.append ((4226, GS (IE_SAVEVSSPELL), ''))
+	stats.append ((4226, IE_SAVEVSSPELL, 's'))
 	stats.append (None)
 
 	# 4227 Weapon Proficiencies
 	stats.append (4227)
 	#   55011 Unused Slots
-	stats.append ((55011, GS (IE_FREESLOTS), ''))
+	if GUICommon.IsNamelessOne (pc):
+		stats.append ((55011, GS (IE_FREESLOTS), '0'))
 	#   33642 Fist
 	stats.append ((33642, GS (IE_PROFICIENCYBASTARDSWORD), '+'))
 	#   33649 Edged Weapon
@@ -588,57 +593,19 @@ def GetStatOverview (pc):
 	stats.append (None)
 
 	# 4228 Ability Bonuses
-	stats.append (4228)
-	#   4229 To Hit
-	#   4230 Damage
-	#   4231 Open Doors
-	#   4232 Weight Allowance
-	#   4233 Armor Class Bonus
-	#   4234 Missile Adjustment
-	stats.append ((4234, GS (IE_ACMISSILEMOD), ''))
-	#   4236 CON HP Bonus/Level
-	#   4240 Reaction
+	abbon = GUIRECCommon.GetAbilityBonuses (pc, False)
+	stats += abbon
 	stats.append (None)
 
 	# 4238 Magical Defense Adjustment
-	stats.append (4238)
-	#   4239 Bonus Priest Spells
-	stats.append ((4239, GS (IE_CASTINGLEVELBONUSCLERIC), ''))
-	stats.append (None)
+	if "CLERIC" in className:
+		stats.append (4238)
+		abbon = GUIRECCommon.GetBonusSpells (pc, False)
+		stats += abbon
+		stats.append (None)
 
-	# 4237 Chance to learn spell
-	#SpellLearnChance = won + GemRB.GetString (4237) + woff
-
-	# ??? 4235 Reaction Adjustment
-
-	res = []
-	lines = 0
-	for s in stats:
-		try:
-			strref, val, stattype = s
-			if val == 0 and stattype != '0':
-				continue
-			if stattype == '+':
-				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
-			elif stattype == 'd': #strref is an already resolved string
-				res.append (strref)
-			elif stattype == 'x':
-				res.append (GemRB.GetString (strref) + ': x' + str (val))
-			else:
-				res.append (GemRB.GetString (strref) + ': ' + str (val) + stattype)
-
-			lines = 1
-		except:
-			if s != None:
-				res.append (won + GemRB.GetString (s) + woff)
-				lines = 0
-			else:
-				if not lines:
-					res.append (str_None)
-				res.append ("")
-				lines = 0
-
-	return "\n".join (res)
+	statDesc = GUIRECCommon.TypeSetStats (stats, pc, True)
+	return statDesc
 
 def OpenInformationWindow ():
 	global InformationWindow
@@ -702,14 +669,14 @@ def OpenInformationWindow ():
 
 	Label = Window.GetControl (0x10000006)
 	if TotalPartyExp != 0:
-		PartyExp = int ((stat['KillsTotalXP'] * 100) / TotalPartyExp)
+		PartyExp = (stat['KillsTotalXP'] * 100) // TotalPartyExp
 		Label.SetText (str (PartyExp) + '%')
 	else:
 		Label.SetText ("0%")
 
 	Label = Window.GetControl (0x10000007)
 	if TotalPartyKills != 0:
-		PartyKills = int ((stat['KillsTotalCount'] * 100) / TotalPartyKills)
+		PartyKills = (stat['KillsTotalCount'] * 100) // TotalPartyKills
 		Label.SetText (str (PartyKills) + '%')
 	else:
 		Label.SetText ("0%")
@@ -806,9 +773,8 @@ def AcceptLevelUp():
 	SwitcherClass = GUICommon.NamelessOneClass(pc)
 	if SwitcherClass:
 		# Handle saving of TNO class level in the correct CRE stat
-		Levels = { "FIGHTER" : GemRB.GetPlayerStat (pc, IE_LEVEL) , "MAGE": GemRB.GetPlayerStat (pc, IE_LEVEL2), "THIEF": GemRB.GetPlayerStat (pc, IE_LEVEL3) }
-		LevelStats = { "FIGHTER" : IE_LEVEL , "MAGE": IE_LEVEL2, "THIEF": IE_LEVEL3 }
-		GemRB.SetPlayerStat (pc, LevelStats[SwitcherClass], Levels[SwitcherClass]+NumOfPrimLevUp)
+		NewLevel = avatar_header['PrimLevel'] + NumOfPrimLevUp
+		GemRB.SetPlayerStat (pc, LevelStats[SwitcherClass], NewLevel)
 	else:
 		GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+NumOfPrimLevUp)
 		if avatar_header['SecoLevel'] != 0:
@@ -824,7 +790,103 @@ def AcceptLevelUp():
 	LevelUp.SaveNewSpells()
 
 	LevelUpWindow.Close()
-	NewLife.OpenLUStatsWindow(True, sum(LevelDiff))
+	NewLife.OpenLUStatsWindow(True, NewCharacteristicPts)
+
+def HandleSpecializationBonuses (pc, className, oldLevel, newLevel):
+	global feedbackText
+	# GLOBAL["Specialist"] = 1 // Fighter | was the first class to level 7
+	# GLOBAL["Specialist"] = 2 // Thief   | was the first class to level 7
+	# GLOBAL["Specialist"] = 3 // Mage    | was the first class to level 7
+	#
+	# GLOBAL["Specialist"] = 4 // Fighter | was the first class to level 7 and level 12
+	# GLOBAL["Specialist"] = 5 // Thief   | was the first class to level 7 and level 12
+	# GLOBAL["Specialist"] = 6 // Mage    | was the first class to level 7 and level 12
+	#
+	# GLOBAL["Specialist"] = 7 // Fighter | was the first class to level 12 (but not to level 7)
+	# GLOBAL["Specialist"] = 8 // Thief   | was the first class to level 12 (but not to level 7)
+	# GLOBAL["Specialist"] = 9 // Mage    | was the first class to level 12 (but not to level 7)
+	specialist = GemRB.GetGameVar ("Specialist") or 0
+	if specialist >= 4:
+		# all upgrades have been done already
+		return ""
+
+	feedbackText = ""
+
+	def bumpStat (pc, stat, diff):
+		global feedbackText
+
+		base = GemRB.GetPlayerStat (pc, stat, 1)
+		GemRB.SetPlayerStat (pc, stat, base + diff)
+
+		# the original applied effects and relied on their feedback for floating messages
+		# which misses some of the upgrades
+		# but it also printed all the feedback to the text area
+		statMsgs = { IE_STR: 41274, IE_CON: 41273, IE_DEX: 41276, IE_INT: 39440, IE_WIS: 41271, IE_LUCK: 41272, IE_LORE: 39439, IE_HITPOINTS: 39438 }
+		if stat in statMsgs:
+			action = "FloatMessage({}, {})".format(pc, statMsgs[stat] + 1000000)
+			GemRB.ExecuteString (action, pc)
+			feedbackText += GemRB.GetString (statMsgs[stat]) + " "
+		return
+
+	def grantFirstBonus (pc, className, specBase = 0):
+		if className == "FIGHTER":
+			bumpStat (pc, IE_STR, 1)
+			# Unlocks Proficiency 4 for a Weapon; this is handled by trainers checking the Specialist global
+			specVal = 1
+		elif className == "THIEF":
+			bumpStat (pc, IE_DEX, 1)
+			specVal = 2
+		else:
+			bumpStat (pc, IE_INT, 1)
+			specVal = 3
+		GemRB.SetGlobal ("Specialist", "GLOBAL", specBase + specVal)
+		return
+
+	if specialist == 0:
+		if newLevel < 7:
+			return feedbackText
+
+		# we just (b)reached 7 for the first time, give the first bonus
+		grantFirstBonus (pc, className)
+		return feedbackText
+
+	# from here on specialist is 1, 2 or 3
+	if newLevel < 12:
+		return feedbackText
+
+	# we just (b)reached 12, give the second bonus
+	if className == "FIGHTER":
+		if specialist == 1:
+			# 4: upgrade fighter specialization
+			bumpStat (pc, IE_STR, 1)
+			bumpStat (pc, IE_CON, 1)
+			bumpStat (pc, IE_MAXHITPOINTS, 3)
+			bumpStat (pc, IE_HITPOINTS, 3) # we can't display it the same way, but it wasn't drawn in the original either
+			# Unlocks Proficiency 5 for a Weapon; this is handled by trainers checking the Specialist global
+			GemRB.SetGlobal ("Specialist", "GLOBAL", 4)
+		else:
+			# 7: was mage or thief, grant first fighter specialization
+			grantFirstBonus (pc, className, 6)
+	elif className == "THIEF":
+		if specialist == 2:
+			# 5: upgrade thief specialization
+			bumpStat (pc, IE_DEX, 2)
+			bumpStat (pc, IE_LUCK, 1)
+			GemRB.SetGlobal ("Specialist", "GLOBAL", 5)
+		else:
+			# 8: was mage or fighter, grant first thief specialization
+			grantFirstBonus (pc, className, 6)
+	else:
+		if specialist == 3:
+			# 6: upgrade mage specialization
+			bumpStat (pc, IE_INT, 2)
+			bumpStat (pc, IE_WIS, 1)
+			bumpStat (pc, IE_LORE, 5)
+			GemRB.SetGlobal ("Specialist", "GLOBAL", 6)
+		else:
+			# 9: was thief or fighter, grant first mage specialization
+			grantFirstBonus (pc, className, 6)
+	return feedbackText
 
 def RedrawSkills():
 	DoneButton = LevelUpWindow.GetControl(0)
@@ -842,7 +904,7 @@ def OpenLevelUpWindow ():
 	global WeapProfType, CurrWeapProf, WeapProfGained
 	global NumOfPrimLevUp, NumOfSecoLevUp
 
-	global LevelDiff, Level, Classes, NumClasses
+	global LevelDiff, Level, Classes, NumClasses, NewCharacteristicPts
 
 	LevelUpWindow = Window = GemRB.LoadWindow (4, "GUIREC") # since we get called from NewLife
 
@@ -952,8 +1014,7 @@ def OpenLevelUpWindow ():
 			WeapProfGained += GainedWeapProfs (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i, AvatarName)
 
 		# Hit Points Gained and Hit Points from Constitution Bonus
-		for i in range (NumOfPrimLevUp):
-			HPGained = HPGained + GetSingleClassHP (Class, avatar_header['PrimLevel'])
+		HPGained += GetSingleClassHP (pc, Class, avatar_header['PrimLevel'], NumOfPrimLevUp)
 		if Class == "FIGHTER":
 			CONType = 0
 		else:
@@ -968,46 +1029,7 @@ def OpenLevelUpWindow ():
 
 		# Saving Throws
 		if GUICommon.IsNamelessOne(pc):
-			# Nameless One always uses the best possible save from each class
-			FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
-			MagSavThrTable = GemRB.LoadTable ("SAVEWIZ")
-			ThiSavThrTable = GemRB.LoadTable ("SAVEROG")
-
-			FighterLevel = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
-			MageLevel = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
-			ThiefLevel = GemRB.GetPlayerStat (pc, IE_LEVEL3) - 1
-
-			# We are leveling up one of those levels. Therefore, one of them has to be updated.
-			if Class == "FIGHTER":
-				FighterLevel = NextLevel - 1
-			elif Class == "MAGE":
-				MageLevel = NextLevel - 1
-			else:
-				ThiefLevel = NextLevel - 1
-
-			# Now we need to update the saving throws with the best values from those tables.
-			# The smaller the number, the better saving throw it is.
-			# We also need to check if any of the levels are larger than 21, since
-			# after that point the table runs out, and the throws remain the
-			# same
-			if FighterLevel < 21:
-				for i in range (5):
-					Throw = FigSavThrTable.GetValue (i, FighterLevel)
-					if Throw < SavThrows[i]:
-						SavThrows[i] = Throw
-						SavThrUpdated = True
-			if MageLevel < 21:
-				for i in range (5):
-					Throw = MagSavThrTable.GetValue (i, MageLevel)
-					if Throw < SavThrows[i]:
-						SavThrows[i] = Throw
-						SavThrUpdated = True
-			if ThiefLevel < 21:
-				for i in range (5):
-					Throw = ThiSavThrTable.GetValue (i, ThiefLevel)
-					if Throw < SavThrows[i]:
-						SavThrows[i] = Throw
-						SavThrUpdated = True
+			SavThrUpdated = GetNewTNOSaves (pc, Class, SavThrows, NextLevel)
 		else:
 			SavThrTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "SAVE"))
 			# Updating the current saving throws. They are changed only if the
@@ -1021,8 +1043,6 @@ def OpenLevelUpWindow ():
 					if Throw < SavThrows[i]:
 						SavThrows[i] = Throw
 						SavThrUpdated = True
-
-
 
 	else:
 		# avatar is multi class
@@ -1074,11 +1094,8 @@ def OpenLevelUpWindow ():
 					SavThrUpdated = True
 
 		# Hit Points Gained and Hit Points from Constitution Bonus (multiclass)
-		for i in range (NumOfPrimLevUp):
-			HPGained = HPGained + GetSingleClassHP ("FIGHTER", avatar_header['PrimLevel'])/2
-
-		for i in range (NumOfSecoLevUp):
-			HPGained = HPGained + GetSingleClassHP (Class, avatar_header['SecoLevel'])/2
+		HPGained += GetSingleClassHP (pc, "FIGHTER", avatar_header['PrimLevel'], NumOfPrimLevUp) // 2
+		HPGained += GetSingleClassHP (pc, Class, avatar_header['SecoLevel'], NumOfSecoLevUp) // 2
 		ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, NumOfSecoLevUp, 2)
 
 		# Thac0
@@ -1120,41 +1137,134 @@ def OpenLevelUpWindow ():
 	# Displaying level up info
 	overview = ""
 	if CurrWeapProf!=-1 and WeapProfGained>0:
-		overview = overview + GemRB.GetString (38715) + '\n' + '+' + str (WeapProfGained) + '\n'
+		# pc dependent feedback: TNO gets generic, everyone else their chosen weapon
+		profRef = 38715
+		if WeapProfType != -1:
+			WeapProfName = CommonTables.WeapProfs.GetRowName (WeapProfType)
+			profRef = CommonTables.WeapProfs.GetValue (WeapProfName, "NAME_REF", GTV_INT)
+		overview = overview + '+' + str (WeapProfGained) + " " + GemRB.GetString (profRef) + '\n'
 
-	overview = overview + str (HPGained) + " " + GemRB.GetString (38713) + '\n'
-	overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
+	# +x characteristic points gained
+	# but only grant extra attribute points the first time we reach a level
+	if GUICommon.IsNamelessOne (pc):
+		NewCharacteristicPts = IsNewMaxTNOLevel (pc, NumOfPrimLevUp) # actually returns the adjusted level diff
+		if NewCharacteristicPts:
+			overview += str (NewCharacteristicPts) + " "  + GemRB.GetString (38714) + '\n'
+
+		# specialization bonuses and feedback
+		specOverview = HandleSpecializationBonuses (pc, Class, avatar_header['PrimLevel'], avatar_header['PrimLevel'] + NumOfPrimLevUp)
+		overview += "" if specOverview == "" else specOverview + '\n'
 
 	if SavThrUpdated:
 		overview = overview + GemRB.GetString (38719) + '\n'
+
+	overview = overview + str (HPGained) + " " + GemRB.GetString (38713) + '\n'
+	if ConHPBon:
+		overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
+
 	if Thac0Updated:
 		GemRB.SetPlayerStat (pc, IE_TOHIT, Thac0)
 		overview = overview + GemRB.GetString (38718) + '\n'
+
+	# priest / spell memorization abilities have increased
+	if LevelUp.DeltaDSpells > 0:
+		overview += GemRB.GetString (38720) + '\n'
+	if LevelUp.DeltaWSpells > 0:
+		overview += GemRB.GetString (38717) + '\n'
+
+	# x thief skill points gained
+	if Class == "THIEF":
+		overview += str(GemRB.GetVar ("SkillPointsLeft")) + " " + GemRB.GetString (38716) + '\n'
+
+	# FFG: +5 lore gained from spec bonus!?
+	if GemRB.GetPlayerStat (pc, IE_SPECIFIC) == 6:
+		overview += "+" + str(5 * NumOfPrimLevUp) + " " + GemRB.GetString (39439) + '\n'
+		GemRB.SetPlayerStat (pc, IE_LORE, GemRB.GetPlayerStat (pc, IE_LORE, 1) + 5 * NumOfPrimLevUp)
+
+	# dak'kon's weapon has changed
+	if Game.CheckKarachUpgrade (pc, 0, NumOfPrimLevUp):
+		overview += GemRB.GetString (39437) + '\n'
 
 	Text = Window.GetControl (3)
 	Text.SetText (overview)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
-def GetSingleClassHP (Class, Level):
+def GetNewTNOSaves (pc, Class, SavThrows, NextLevel):
+	# Nameless One always uses the best possible save from each class
+	FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
+	MagSavThrTable = GemRB.LoadTable ("SAVEWIZ")
+	ThiSavThrTable = GemRB.LoadTable ("SAVEROG")
+
+	FighterLevel = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
+	MageLevel = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
+	ThiefLevel = GemRB.GetPlayerStat (pc, IE_LEVEL3) - 1
+
+	# We are leveling up one of those levels. Therefore, one of them has to be updated.
+	if Class == "FIGHTER":
+		FighterLevel = NextLevel - 1
+	elif Class == "MAGE":
+		MageLevel = NextLevel - 1
+	else:
+		ThiefLevel = NextLevel - 1
+
+	# Now we need to update the saving throws with the best values from those tables.
+	# The smaller the number, the better saving throw it is.
+	# We also need to check if any of the levels are larger than 21, since
+	# after that point the table runs out, and the throws remain the
+	# same
+	SavThrUpdated = False
+	Tables = { FigSavThrTable: FighterLevel, MagSavThrTable: MageLevel, ThiSavThrTable: ThiefLevel }
+	for table, level in Tables.items():
+		if level >= 21:
+			continue
+		for i in range (5):
+			Throw = table.GetValue (i, level)
+			if Throw < SavThrows[i]:
+				SavThrows[i] = Throw
+				SavThrUpdated = True
+	return SavThrUpdated
+
+# did TNO reach a new high?
+def IsNewMaxTNOLevel (pc, levelDiff):
+	MaxOldLevel = max(list(map(lambda x, y: x - y, Level, LevelDiff)))
+	NewLevel = avatar_header['PrimLevel'] + levelDiff
+	maxLevelDiff = max(0, NewLevel - MaxOldLevel)
+	return maxLevelDiff
+
+def GetSingleClassHP (pc, Class, Level, levelDiff):
+	# TNO only gains HP when leveling to a never reached before level. Otherwise 1 HP, no con bonus
+	total = 0
+	if GUICommon.IsNamelessOne (pc):
+		newHighPrimLevels = IsNewMaxTNOLevel (pc, levelDiff)
+		if newHighPrimLevels == 0:
+			return levelDiff
+		total = levelDiff - newHighPrimLevels # hp for levels before reaching new heights
+		levelDiff = newHighPrimLevels
+
 	HPTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "HP"))
 
-	# We need to check if Level is larger than 20, since after that point
-	# the table runs out, and the formula remain the same.
-	if Level > 20:
-		Level = 20
+	for i in range (levelDiff):
+		# We need to check if Level is larger than 20, since after that point
+		# the table runs out, and the formula remain the same.
+		level = Level + i
+		if level > 20:
+			level = 20
 
-	# We need the Level as a string, so that we can use the column names
-	Level = str (Level)
-
-	Sides = HPTable.GetValue (Level, "SIDES")
-	Rolls = HPTable.GetValue (Level, "ROLLS")
-	Modif = HPTable.GetValue (Level, "MODIFIER")
-
-
-	return GemRB.Roll (Rolls, Sides, Modif)
+		level = str (level)
+		Sides = HPTable.GetValue (level, "SIDES")
+		Rolls = HPTable.GetValue (level, "ROLLS")
+		Modif = HPTable.GetValue (level, "MODIFIER")
+		total += GemRB.Roll (Rolls, Sides, Modif)
+	return total
 
 def GetConHPBonus (pc, numPrimLevels, numSecoLevels, levelUpType):
+	# TNO only gains con bonus when reaching truly new levels
+	if GUICommon.IsNamelessOne (pc):
+		numPrimLevels = IsNewMaxTNOLevel (pc, numPrimLevels)
+		if numPrimLevels == 0:
+			return 0
+
 	ConHPBonTable = GemRB.LoadTable ("HPCONBON")
 
 	con = str (GemRB.GetPlayerStat (pc, IE_CON))
@@ -1164,7 +1274,7 @@ def GetConHPBonus (pc, numPrimLevels, numSecoLevels, levelUpType):
 	if levelUpType == 1:
 		# Mage, Priest or Thief
 		return ConHPBonTable.GetValue (con, "OTHER") * numPrimLevels
-	return ConHPBonTable.GetValue (con, "WARRIOR") * numPrimLevels / 2 + ConHPBonTable.GetValue (con, "OTHER") * numSecoLevels / 2
+	return ConHPBonTable.GetValue (con, "WARRIOR") * numPrimLevels // 2 + ConHPBonTable.GetValue (con, "OTHER") * numSecoLevels // 2
 
 def GetThac0 (Class, Level):
 	Thac0Table = GemRB.LoadTable ("THAC0")
@@ -1177,6 +1287,8 @@ def GetThac0 (Class, Level):
 
 # each gained level is checked for how many new prof points gained
 def GainedWeapProfs (pc, currProf, currLevel, AvatarName):
+	if AvatarName == "NAMELESS" and avatar_header['PrimClass'] != "FIGHTER":
+		return 0
 
 	# Actually looking at the next level
 	nextLevel = currLevel + 1
@@ -1187,7 +1299,7 @@ def GainedWeapProfs (pc, currProf, currLevel, AvatarName):
 		return maxProf - currProf
 
 	# Nameless continues gaining points forever	at a rate of 1 every 3 levels
-	elif GUICommon.IsNamelessOne(pc) and (currProf-3) <= (nextLevel / 3):
+	elif GUICommon.IsNamelessOne(pc) and (currProf - 3) <= (nextLevel // 3):
 		return 1
 
 	return 0

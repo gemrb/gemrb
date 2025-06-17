@@ -81,9 +81,6 @@ Bpp=32
 #                                                                             #
 ###############################################################################
 
-# Enable all gui enhancements ? [Integer]
-GUIEnhancements = 23
-
 # Enable bigger parties (up to 10) or force smaller ones [Integer]
 # NOTE: You need to choose a big enough resolution, so
 #   there will be enough room for all the party portraits.
@@ -117,7 +114,7 @@ GUIEnhancements = 23
 # Enable debug and cheat keystrokes, see docs/en/CheatKeys.txt for full listing
 #EnableCheatKeys=1
 
-# Developer debug mode toggle (see DebugModeBits enum)
+# Developer debug mode toggle (see DebugMode enum)
 #DebugMode=0
 
 ###############################################################################

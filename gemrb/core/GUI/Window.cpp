@@ -22,10 +22,10 @@
 
 #include "Debug.h"
 #include "Interface.h"
-#include "ScrollBar.h"
 #include "WindowManager.h"
 
 #include "GUI/GUIScriptInterface.h"
+#include "Logging/Logging.h"
 
 #include <utility>
 
@@ -46,9 +46,12 @@ Window::Window(const Region& frame, WindowManager& mgr)
 
 void Window::Close()
 {
-	// fire the onclose handler prior to actually invalidating the window
-	if (eventHandlers[Closed]) {
-		eventHandlers[Closed](this);
+	// did we already get closed?
+	if (GetScriptingRef()) {
+		// fire the onclose handler prior to actually invalidating the window
+		if (eventHandlers[Closed]) {
+			eventHandlers[Closed](this);
+		}
 	}
 
 	if (flags & DestroyOnClose) {

@@ -23,6 +23,7 @@
 
 #include "MoviePlayer.h"
 
+#include <condition_variable>
 #include <vlc/vlc.h>
 
 namespace GemRB {
@@ -60,6 +61,8 @@ private:
 
 	bool DecodeFrame(VideoBuffer&) override;
 	void DestroyPlayer();
+
+	std::condition_variable formatWaitVar;
 
 public:
 	VLCPlayer();

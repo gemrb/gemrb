@@ -20,6 +20,8 @@
 
 #include "Palette.h"
 
+#include <cmath>
+
 namespace GemRB {
 
 Palette::Palette(bool named) noexcept

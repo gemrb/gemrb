@@ -22,11 +22,11 @@
 
 #include "Interface.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 #include "Scriptable/TileObject.h"
-#include "Video/Video.h"
 
 namespace GemRB {
 

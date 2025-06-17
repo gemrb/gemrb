@@ -39,10 +39,7 @@
 #include "SrcMgr.h"
 #include "TableMgr.h"
 
-#include "Scriptable/Actor.h"
-
 #include <map>
-#include <unordered_map>
 #include <vector>
 
 namespace GemRB {
@@ -54,6 +51,7 @@ class ScriptedAnimation;
 class Sprite2D;
 class Store;
 class VEFObject;
+enum class Difficulty;
 
 struct IWDIDSEntry {
 	ieDword value;

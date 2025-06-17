@@ -34,6 +34,7 @@ import GemRB
 import GUICommonWindows
 import GUISAVE
 import GUIOPTControls
+import GUIOPTExtra
 from GUIDefines import *
 from ie_sounds import GEM_SND_VOL_MUSIC, GEM_SND_VOL_AMBIENTS
 
@@ -48,7 +49,7 @@ def InitOptionsWindow (Window):
 	Container.CloseContainerWindow ()
 
 	# Return to Game
-	Button = Window.GetControl (11)
+	Button = ReturnButton = Window.GetControl (11)
 	Button.SetText (10308)
 	Button.OnPress (Window.Close)
 	Button.MakeEscape()
@@ -98,6 +99,20 @@ def InitOptionsWindow (Window):
 		MoviesButton.SetText (15415)
 		MoviesButton.OnPress (OpenMovieWindow)
 
+	# GemRB extras
+	frame = ReturnButton.GetFrame ()
+	if GameCheck.IsIWD2 ():
+		frame = MoviesButton.GetFrame ()
+		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, 110, "GBTNLRG2")
+	elif GameCheck.IsBG2 ():
+		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, -40, "GUBOTC", 1)
+	elif GameCheck.IsBG2EE ():
+		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, -50, "GUIOSTCL")
+	elif GameCheck.IsBG1 ():
+		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, 55, "BIGBUTT")
+	elif GameCheck.IsIWD1 ():
+		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, 50, "STONEOPT", 1)
+
 	return
 
 ToggleOptionsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIOPT", GUICommonWindows.ToggleWindow, InitOptionsWindow, None, True)
@@ -139,25 +154,28 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptDone (CloseVideoOptionsWindow, 21)
 	GUIOPTControls.OptCancel (CloseVideoOptionsWindow, 32)
 
-	GUIOPTControls.OptSlider (17203, 3, 35, 17129, 'Brightness Correction', DisplayHelpBrightness, 4)
-	GUIOPTControls.OptSlider (17204, 22, 36, 17128, 'Gamma Correction', DisplayHelpContrast)
+	if not GameCheck.IsBG2EE ():
+		GUIOPTControls.OptSlider (17203, 3, 35, 17129, 'Brightness Correction', DisplayHelpBrightness, 4)
+		GUIOPTControls.OptSlider (17204, 22, 36, 17128, 'Gamma Correction', DisplayHelpContrast)
 
 	# Radiobuttons need special care...
 	Variable = 'BitsPerPixel'
 	Value = GemRB.GetVar(Variable)
 	ButtonIds = [5, 6, 7]
 
-	GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[0], 37, Variable, 16, None, 17205, 18038)
-	GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[1], 37, Variable, 24, None, 17205, 18038)
-	GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[2], 37, Variable, 32, None, 17205, 18038)
-	PreselectRadioGroup (Variable, Value, ButtonIds, Window)
+	if not GameCheck.IsBG2EE ():
+		GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[0], 37, Variable, 16, None, 17205, 18038)
+		GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[1], 37, Variable, 24, None, 17205, 18038)
+		GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[2], 37, Variable, 32, None, 17205, 18038)
+		PreselectRadioGroup (Variable, Value, ButtonIds, Window)
 
-	GUIOPTControls.OptCheckbox (18000, 9, 38, 17131, 'Full Screen', DisplayHelpFullScreen)
+	GUIOPTControls.OptCheckbox (18000, 9, 15 if GameCheck.IsBG2EE () else 38, 17131, 'Full Screen', DisplayHelpFullScreen)
 
-	GUIOPTControls.OptCheckbox (20620, 51, 50, 20617, 'Translucent Shadows')
-	GUIOPTControls.OptCheckbox (15135, 40, 44, 17134, 'SoftMirrorBlt')
-	GUIOPTControls.OptCheckbox (18006, 41, 46, 17136, 'SoftSrcKeyBlt') # software standard blit
-	GUIOPTControls.OptCheckbox (18007, 42, 48, 17135, 'SoftBltFast') # software transparent blit
+	if not GameCheck.IsBG2EE ():
+		GUIOPTControls.OptCheckbox (20620, 51, 50, 20617, 'Translucent Shadows')
+		GUIOPTControls.OptCheckbox (15135, 40, 44, 17134, 'SoftMirrorBlt')
+		GUIOPTControls.OptCheckbox (18006, 41, 46, 17136, 'SoftSrcKeyBlt') # software standard blit
+		GUIOPTControls.OptCheckbox (18007, 42, 48, 17135, 'SoftBltFast') # software transparent blit
 
 	# maybe not present in original iwd, but definitely in how
 	if GameCheck.IsIWD1 () or GameCheck.IsIWD2 ():
@@ -217,7 +235,8 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptSlider (18011, 4, 19, 16511, 'Volume Music', DisplayHelpMusicVolume, 10)
 	GUIOPTControls.OptSlider (18012, 22, 20, 16546, 'Volume Movie', None, 10)
 
-	GUIOPTControls.OptCheckbox (18022, 26, 28, 20689, 'Environmental Audio')
+	if not GameCheck.IsBG2EE ():
+		GUIOPTControls.OptCheckbox (18022, 26, 28, 20689, 'Environmental Audio')
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -324,7 +343,7 @@ def OpenGameplayOptionsWindow ():
 
 def DisplayHelpTooltipDelay ():
 	GemRB.GetView ("OPTHELP").SetText (18017)
-	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") * TOOLTIP_DELAY_FACTOR//10)
+	GemRB.UpdateTooltipDelay()
 
 def DisplayHelpMouseScrollingSpeed ():
 	GemRB.GetView ("OPTHELP").SetText (18018)

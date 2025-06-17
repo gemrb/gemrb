@@ -35,6 +35,18 @@ R noop(PyObject*)
 	return R();
 }
 
+inline PyObject* CallObjectWrapper(PyObject* function, PyObject* args = nullptr)
+{
+	// PyObject_CallObject can assert if an error was triggered
+	// ignore it instead of bailing out
+	if (PyErr_Occurred()) {
+		PyErr_Print();
+		PyErr_Clear();
+	}
+
+	return PyObject_CallObject(function, args);
+}
+
 template<typename R, R (*F)(PyObject*)>
 bool CallPython(PyObject* function, PyObject* args = NULL, R* retVal = NULL)
 {
@@ -42,7 +54,7 @@ bool CallPython(PyObject* function, PyObject* args = NULL, R* retVal = NULL)
 		return false;
 	}
 
-	PyObject* ret = PyObject_CallObject(function, args);
+	PyObject* ret = CallObjectWrapper(function, args);
 	Py_XDECREF(args);
 	if (ret == NULL) {
 		if (PyErr_Occurred()) {

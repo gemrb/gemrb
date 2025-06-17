@@ -345,6 +345,8 @@ static void GetLabel(DataStream* str, Control*& ctrl, const Region& ctrlFrame)
 	} else {
 		align |= IE_FONT_ALIGN_MIDDLE;
 	}
+	// 0x2 true color in NI
+	// 0x100 word wrap in NI
 	lab->SetAlignment(align);
 }
 

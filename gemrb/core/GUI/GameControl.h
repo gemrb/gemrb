@@ -30,19 +30,23 @@
 #include "exports.h"
 #include "strrefs.h"
 
-#include "Dialog.h"
-#include "Map.h"
+#include "EnumIndex.h"
+#include "Sprite2D.h"
+#include "View.h"
 
-#include "GUI/Control.h"
+#include "GUI/EventMgr.h"
 #include "GUI/GameControlDefs.h"
 
 #include <vector>
 
 namespace GemRB {
 
-class GameControl;
-class Window;
+class Container;
 class DialogHandler;
+class Door;
+class InfoPoint;
+class Map;
+class Movable;
 
 /**
  * @class GameControl
@@ -76,6 +80,8 @@ private:
 	Point vpVector;
 	int numScrollCursor = 0;
 	EnumBitset<ScreenFlags> screenFlags { ScreenFlags::CenterOnActor };
+	unsigned int scrollKeysActive = 0;
+	unsigned int scrollKeysDown = 0;
 	unsigned int DialogueFlags = DF_FREEZE_SCRIPTS;
 	String DisplayText;
 	unsigned int DisplayTextTime = 0;
@@ -99,7 +105,7 @@ public:
 	int spellIndex = 0;
 	int spellCount = 0; //multiple targeting
 	// allow targeting allies, enemies and/or neutrals (bitmask)
-	int target_types = 0;
+	int targetTypes = 0;
 
 private:
 	using FormationPoints = std::vector<Point>;
@@ -113,6 +119,7 @@ private:
 	Point GetFormationPoint(const Point& origin, size_t pos, float_t angle, const FormationPoints& exclude = FormationPoints()) const;
 	FormationPoints GetFormationPoints(const Point& origin, const std::vector<Actor*>& actors, float_t angle) const;
 
+	void ApplyKeyScrolling();
 	void Scroll(const Point& amt);
 
 	void HandleContainer(Container* container, Actor* actor);
@@ -209,6 +216,9 @@ public:
 	void DisplayString(const Point& p, const char* Text);
 	Actor* GetLastActor() const;
 	void SetLastActor(Actor* lastActor);
+	bool IsOverLastActor(const Point& pos) const;
+	/** Gets the Scriptable currently under the cursor */
+	Scriptable* GetHoverObject() const;
 	/** changes map to the current PC */
 	void ChangeMap(const Actor* pc, bool forced);
 	/** Sets up targeting with spells or items */

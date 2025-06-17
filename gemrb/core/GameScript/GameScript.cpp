@@ -41,20 +41,18 @@
 
 #include "GameScript/GameScript.h"
 
-#include "voodooconst.h"
+#include "ie_stats.h"
 
-#include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
 #include "RNG.h"
+#include "SymbolMgr.h"
 #include "TableMgr.h"
 
 #include "GUI/GameControl.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
-
-#include <cstdarg>
 
 namespace GemRB {
 
@@ -64,6 +62,11 @@ namespace GemRB {
 // 4 - globals
 // 8 - action execution
 //16 - trigger evaluation
+
+// test cases: tob pp summoning spirit, pst portals, pst AR0405, AR0508, ar0500 (guards through gates)
+// it's about 3 times bigger in pst, perhaps related to the bigger sprite sizes and we modify it in Scriptable
+// The distance of operating a trigger, container, dialog buffer etc.
+unsigned int MAX_OPERATING_DISTANCE = 40; // a search square is 16x12 (diagonal of 20), so that's about two
 
 //Make this an ordered list, so we could use bsearch!
 static const TriggerLink triggernames[] = {
@@ -645,7 +648,7 @@ static const ActionLink actionnames[] = {
 	{ "displaystringnonamedlg", GameScript::DisplayStringNoName, 0 },
 	{ "displaystringnonamehead", GameScript::DisplayStringNoNameHead, 0 },
 	{ "displaystringpoint", GameScript::FloatMessageFixed, 0 }, // can customize color, maybe a different font, otherwise the same
-	{ "displaystringpointlog", GameScript::FloatMessageFixed, 0 }, // same, but force also printing to message window?
+	{ "displaystringpointlog", GameScript::FloatMessageFixed, 0 }, // same, but force also printing to message window
 	{ "displaystringwait", GameScript::DisplayStringWait, AF_BLOCKING },
 	{ "doubleclicklbuttonobject", GameScript::DoubleClickLButtonObject, AF_BLOCKING },
 	{ "doubleclicklbuttonpoint", GameScript::DoubleClickLButtonPoint, AF_BLOCKING },
@@ -775,7 +778,7 @@ static const ActionLink actionnames[] = {
 	{ "incrementproficiency", GameScript::IncrementProficiency, 0 },
 	{ "interact", GameScript::Interact, 0 },
 	{ "joinparty", GameScript::JoinParty, 0 }, //this action appears to be blocking in bg2
-	{ "joinpartyoverride", GameScript::JoinParty, 0 }, // TODO: ee, seems to be there just to enable use in ActionOverride?? Why another action?
+	{ "joinpartyoverride", GameScript::JoinParty, 0 },
 	{ "journalentrydone", GameScript::SetQuestDone, 0 },
 	{ "jumptoobject", GameScript::JumpToObject, 0 },
 	{ "jumptopoint", GameScript::JumpToPoint, 0 },
@@ -1736,7 +1739,6 @@ void InitializeIEScript()
 	NoCreate = core->HasFeature(GFFlags::NO_NEW_VARIABLES);
 	HasKaputz = core->HasFeature(GFFlags::HAS_KAPUTZ);
 
-	// see note in voodooconst.h
 	if (core->HasFeature(GFFlags::AREA_OVERRIDE)) {
 		MAX_OPERATING_DISTANCE = 40 * 3;
 	}

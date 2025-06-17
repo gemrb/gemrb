@@ -1,8 +1,6 @@
 #include "BMPWriter.h"
 
-#include "Video/Video.h"
-
-#include <cstring>
+#include "ie_types.h"
 
 using namespace GemRB;
 
