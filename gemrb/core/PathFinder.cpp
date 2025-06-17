@@ -44,12 +44,13 @@
 
 #include "Scriptable/Actor.h"
 #if USE_TRACY
-#include "tracy/TracyC.h"
+	#include "tracy/TracyC.h"
 #endif
+
+#include "PathfindingSettings.h"
 
 #include <array>
 #include <limits>
-#include "PathfindingSettings.h"
 
 namespace GemRB {
 
@@ -225,8 +226,7 @@ PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
-Path Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance,
-	int flags, const Actor *caller)
+Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
 {
 	TRACY(ZoneScoped);
 
@@ -238,7 +238,7 @@ Path Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned i
 		    fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" },
 		    minDistance, size);
 	const bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
-	const auto BlockingTraversabilityVal = actorsAreBlocking ? TraversabilityCache::TraversabilityCellState::ACTOR : TraversabilityCache::TraversabilityCellState::ACTOR_NON_TRAVERSABLE;
+	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellState::ACTOR : TraversabilityCache::TraversabilityCellState::ACTOR_NON_TRAVERSABLE;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	SearchmapPoint smptDest0 { d };
@@ -267,7 +267,7 @@ Path Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned i
 	if (!mapSize.PointInside(smptSource)) return {};
 
 	// Initialize data structures
-	const size_t MapSize = mapSize.Area();
+	const size_t mapCellsCount = mapSize.Area();
 
 	FibonacciHeap<PQNode> open; // todo: remove this data structure or rewrite its implementation - too much allocations there!
 	// make most data storage for this algorithm static, to avoid memory allocations;
@@ -276,21 +276,20 @@ Path Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned i
 	static std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
 	static std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
 
-	// resize if needed (in case of a map change)
-	if (isClosed.size() != MapSize)
-	{
-		isClosed.resize(MapSize);
-		parents.resize(MapSize);
-		distFromStart.resize(MapSize);
+	// resize if needed (in case of a map change; probably can be done once, when new map is loaded)
+	if (isClosed.size() != mapCellsCount) {
+		isClosed.resize(mapCellsCount);
+		parents.resize(mapCellsCount);
+		distFromStart.resize(mapCellsCount);
 	}
 
 	// cleanup
 	isClosed.clear();
-	isClosed.resize(MapSize, false);
+	isClosed.resize(mapCellsCount, false);
 	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
-	// amount of elements (the opposite also holds true)
-	memset(static_cast<void*>(parents.data()), 0, sizeof(Point) * MapSize);
-	memset(static_cast<void*>(distFromStart.data()), std::numeric_limits<unsigned short>::max(), sizeof(unsigned short) * MapSize);
+	// number of elements, while memset performs better for large vectors
+	memset(static_cast<void*>(parents.data()), 0, sizeof(Point) * mapCellsCount);
+	memset(static_cast<void*>(distFromStart.data()), std::numeric_limits<unsigned short>::max(), sizeof(unsigned short) * mapCellsCount);
 
 	// begin algo init
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
@@ -358,8 +357,8 @@ Path Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned i
 			if (childBlocked) continue;
 
 			// If there's an actor, check it can be bumped away
-			const auto TraversableVal = traversabilityCache.GetCellData(nmptChild.y * mapSize.w * 16 + nmptChild.x);
-			const bool childIsUnbumpable = TraversableVal.occupyingActor != caller && TraversableVal.state >= BlockingTraversabilityVal;
+			const auto navmapCellTraversability = traversabilityCache.GetCellData(nmptChild.y * mapSize.w * 16 + nmptChild.x);
+			const bool childIsUnbumpable = navmapCellTraversability.occupyingActor != caller && navmapCellTraversability.state >= blockingTraversabilityValue;
 			if (childIsUnbumpable) continue;
 
 			SearchmapPoint smptCurrent2 { nmptCurrent };
@@ -442,7 +441,6 @@ Path Map::FindPath(const Point &s, const Point &d, unsigned int size, unsigned i
 	}
 
 	return {};
-
 }
 
 Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
@@ -450,10 +448,10 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 	using namespace std::chrono_literals;
 	const char units[] = "us";
 	auto Bench = ankerl::nanobench::Bench()
-		.epochIterations(PATH_BENCHMARK_ITERS)
-		.warmup(PATH_BENCHMARK_WARMUP)
-		.timeUnit(1us, units)
-		.performanceCounters(true);
+			     .epochIterations(PATH_BENCHMARK_ITERS)
+			     .warmup(PATH_BENCHMARK_WARMUP)
+			     .timeUnit(1us, units)
+			     .performanceCounters(true);
 	Path ResultOriginal;
 	Path ResultOriginalImproved;
 #if PATH_RUN_BENCH
@@ -484,9 +482,6 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 	});
 	std::cout << "|---------:|--------------------:|--------------------:|--------:|----------:|:----------" << "\n| relative |               " << units << "/op |                op/s |    err% |     total | benchmark" << std::endl;
 #endif
-	//std::cout << std::endl;
-	// std::cout << "Size: Original=" << ResultOriginal.nodes.size() << ", Improved=" << ResultOriginalImproved.nodes.size();
-	// std::cout << std::endl;
 #if PATH_RETURN_ORIGINAL
 	return ResultOriginal;
 #else
