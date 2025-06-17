@@ -49,6 +49,8 @@
 #endif
 
 #include "PathfindingSettings.h"
+#define ANKERL_NANOBENCH_IMPLEMENT
+#include "nanobench.h"
 
 #include <array>
 #include <limits>
