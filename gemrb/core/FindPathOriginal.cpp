@@ -34,24 +34,24 @@
 // Moving to each node in the path thus becomes an automatic regulation problem
 // which is solved with a P regulator, see Scriptable.cpp
 
-#include "PathFinder.h"
-
 #include "Debug.h"
 #include "FibonacciHeap.h"
 #include "GameData.h"
 #include "Map.h"
+#include "PathFinder.h"
 #include "RNG.h"
 
 #include "Scriptable/Actor.h"
 #if USE_TRACY
-#include "tracy/TracyC.h"
+	#include "tracy/TracyC.h"
 #endif
+#include "PathfindingSettings.h"
 #include "nanobench.h"
+
+#include "Logging/Logging.h"
 
 #include <array>
 #include <limits>
-
-#include "PathfindingSettings.h"
 
 namespace GemRB {
 
@@ -279,7 +279,6 @@ Path Map::FindPathOriginal(const Point& s, const Point& d, unsigned int size, un
 	}
 
 	return {};
-
 }
 
 }
