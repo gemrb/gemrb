@@ -5444,13 +5444,18 @@ int fx_hold_creature(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xb1 ApplyEffect
 int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print( "fx_apply_effect (%2d) %s", fx->Opcode, fx->Resource );
-
 	//this effect executes a file effect in place of this effect
 	//the file effect inherits the target and the timingmode, but gets
 	//a new chance to roll percents
 	if (target && !EffectQueue::match_ids(target, fx->Parameter2, fx->Parameter1)) {
 		return FX_NOT_APPLIED;
+	}
+
+	// Bypass probability / immunities / saving throws; for use with external EFF files
+	// on by default in bg1, iwd1
+	bool bypass = fx->Parameter3; // bg2
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		bypass = fx->Parameter5; // moved in the ees
 	}
 
 	//apply effect, if the effect is a goner, then kill
@@ -5465,22 +5470,41 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 	myfx->Duration = fx->Duration;
 	myfx->CasterID = fx->CasterID;
 	myfx->Source = fx->Source;
+	myfx->Parameter6 = fx->Parameter6; // gametime
+
+	// some opcodes copy need more data on subsequent runs
+	if (!fx->FirstApply && core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		static std::list<ieDword> ops = { 3, 36, 127, 213, 323, 5, 37, 129, 218, 325, 15, 39, 135, 233, 330, 33, 44, 145, 236, 331, 34, 53, 210, 241, 335, 35, 71, 211, 246, 342 };
+		auto it = std::find(ops.begin(), ops.end(), myfx->Opcode);
+		if (it != ops.end()) {
+			myfx->Parameter3 = fx->Parameter3;
+			myfx->Parameter4 = fx->Parameter4;
+			myfx->IsVariable = fx->IsVariable;
+		}
+	}
 
 	int ret;
 	if (target) {
 		if (fx->FirstApply && (fx->IsVariable || fx->TimingMode == FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES)) {
-			// FIXME: should this happen for all effects?
+			// FIXME: should this happen for all effects? No, this should be reworked at minimum for the TimingMode case (see commit that added it)
+			// IESDP: The engine specially handles cases where effects are removed by opcode, ensuring it also matches the opcode in the EFF file of op177 instances.
 			//hack to entirely replace this effect with the applied effect, this is required for some generic effects
 			//that must be put directly in the effect queue to have any impact (to be counted by BonusAgainstCreature, etc)
-			myfx->Source = fx->Source; // more?
 			target->fxqueue.AddEffect(myfx);
 			return FX_NOT_APPLIED;
 		}
-		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);
+		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !bypass);
 	} else {
 		EffectQueue fxqueue;
 		fxqueue.SetOwner(Owner);
-		ret = fxqueue.ApplyEffect(NULL, myfx, fx->FirstApply, !fx->Parameter3);
+		ret = fxqueue.ApplyEffect(nullptr, myfx, fx->FirstApply, !bypass);
+	}
+
+	// modify parent effect
+	if (!fx->FirstApply && core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		fx->Parameter3 = myfx->Parameter3;
+		fx->Parameter4 = myfx->Parameter4;
+		fx->IsVariable = myfx->IsVariable;
 	}
 
 	fx->Parameter3 = 1;
