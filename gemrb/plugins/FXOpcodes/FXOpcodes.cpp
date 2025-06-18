@@ -5464,6 +5464,7 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 	myfx->TimingMode = fx->TimingMode;
 	myfx->Duration = fx->Duration;
 	myfx->CasterID = fx->CasterID;
+	myfx->Source = fx->Source;
 
 	int ret;
 	if (target) {
