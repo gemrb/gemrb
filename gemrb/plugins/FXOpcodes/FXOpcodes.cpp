@@ -5452,10 +5452,11 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	// Bypass probability / immunities / saving throws; for use with external EFF files
-	// on by default in bg1, iwd1
-	bool bypass = fx->Parameter3; // bg2
+	bool bypass = true; // on by default in bg1, iwd1
 	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 		bypass = fx->Parameter5; // moved in the ees
+	} else if (core->HasFeature(GFFlags::FIXED_MORALE_OPCODE)) {
+		bypass = fx->Parameter3; // bg2
 	}
 
 	//apply effect, if the effect is a goner, then kill
