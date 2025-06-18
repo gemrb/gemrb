@@ -449,7 +449,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
 {
 	using namespace std::chrono_literals;
-	const char units[] = "us";
+	constexpr char units[] = "us";
 	auto Bench = ankerl::nanobench::Bench()
 			     .epochIterations(PATH_BENCHMARK_ITERS)
 			     .warmup(PATH_BENCHMARK_WARMUP)
@@ -459,6 +459,8 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 	Path ResultOriginalImproved;
 #if PATH_RUN_BENCH
 	Log(DEBUG, "Map", "--- FindPath ---");
+	constexpr const char* ImprovedBenchmarkName[] = {"FindPathOriginalImproved", "FindPathOriginalImproved*"};
+	const size_t ImprovedBenchmarkNameIdx = !traversabilityCache.HasUpdatedTraversabilityThisFrame(); // 0 for updated, 1 for not updated
 	if (!traversabilityCache.HasUpdatedTraversabilityThisFrame()) {
 		Log(DEBUG, "Map", "(improved implementation will recalculate cache)");
 	}
@@ -473,7 +475,7 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 #endif
 #if PATH_RUN_BENCH
 	});
-	Bench.name("FindPathOriginalImproved").run([&] {
+	Bench.name(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx]).run([&] {
 #endif
 #if PATH_RUN_IMPROVED
 		{
