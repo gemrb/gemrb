@@ -5455,7 +5455,7 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 
 	//apply effect, if the effect is a goner, then kill
 	//this effect too
-	Effect* myfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
+	Effect* myfx = core->GetEffect(fx->Resource, -1, fx->Pos);
 	if (!myfx)
 		return FX_NOT_APPLIED;
 
