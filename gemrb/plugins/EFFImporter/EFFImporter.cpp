@@ -144,7 +144,7 @@ Effect* EFFImporter::GetEffectV20()
 	str->ReadDword(fx->Parameter3);
 	str->ReadDword(fx->Parameter4);
 	str->ReadDword(fx->Parameter5);
-	str->ReadDword(fx->Parameter6);
+	str->ReadDword(fx->Parameter6); // IESDP: gametime in ticks (at first application time)
 	str->ReadResRef(fx->Resource2);
 	str->ReadResRef(fx->Resource3);
 	str->ReadDword(tmp);

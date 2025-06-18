@@ -8286,7 +8286,7 @@ int fx_remove_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x142 (322) unused in ees
+// 0x142 (322) unused in ees, see "Evade Area of Effect" on IESDP
 
 // 0x133 TurnLevel (gemrb extension for iwd2)
 // 0x143 (323) Stat: Turn Undead Level
