@@ -3623,10 +3623,12 @@ Effect* Interface::GetEffect(const ResRef& resname, int level, const Point& p)
 	if (!effect) {
 		return nullptr;
 	}
-	if (!level) {
-		level = 1;
+	if (level != -1) {
+		if (!level) {
+			level = 1;
+		}
+		effect->Power = level;
 	}
-	effect->Power = level;
 	effect->Pos = p;
 	return effect;
 }
