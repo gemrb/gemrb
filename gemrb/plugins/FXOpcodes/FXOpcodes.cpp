@@ -5452,6 +5452,7 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	// Bypass probability / immunities / saving throws; for use with external EFF files
+	// otherwise set internally as a marker, so any repeated applications only ran the checks once
 	bool bypass = true; // on by default in bg1, iwd1
 	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 		bypass = fx->Parameter5; // moved in the ees
@@ -5508,7 +5509,13 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 		fx->IsVariable = myfx->IsVariable;
 	}
 
-	fx->Parameter3 = 1;
+	// only check resistances once
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		fx->Parameter5 = 1;
+	} else if (core->HasFeature(GFFlags::FIXED_MORALE_OPCODE)) {
+		fx->Parameter3 = 1;
+	}
+
 	delete myfx;
 	return ret;
 }
