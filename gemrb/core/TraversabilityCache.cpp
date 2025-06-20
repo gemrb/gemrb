@@ -182,13 +182,13 @@ void TraversabilityCache::Update()
 			// clear old position of this actor
 			cachedActorsState.ClearOldPosition(updatedCachedIdx, traversabilityData, map->PropsSize().w);
 
-			// check whether any other actor didn't share the same position, if so - change the bumpable state of this cell (I can't remember why did I change the bumpable flag here??)
+			// check whether any other actor didn't share the same position - if so, re-draw their position on the cache
 			for (size_t cachedActorIdx = 0; cachedActorIdx < cachedActorsState.actor.size(); ++cachedActorIdx) {
 				if (cachedActorsState.actor[cachedActorIdx] == cachedActorsState.actor[updatedCachedIdx]) {
 					continue;
 				}
 				if (cachedActorsState.region[cachedActorIdx].IntersectsRegion(cachedActorsState.region[updatedCachedIdx])) {
-					cachedActorsState.FlipIsBumpable(cachedActorIdx);
+					cachedActorsState.MarkNewPosition(cachedActorIdx, traversabilityData, map->PropsSize().w, false);
 				}
 			}
 			// mark new position of this actor
