@@ -21,7 +21,6 @@
 #ifndef TRAVERSABILITY_CACHE_H
 #define TRAVERSABILITY_CACHE_H
 
-//#include "Map.h"
 #include "Scriptable/Actor.h"
 
 
@@ -51,8 +50,9 @@ public:
 		TraversabilityCellState state = TraversabilityCellState::EMPTY;
 	};
 
-	explicit TraversabilityCache(class Map* inMap)
-		: map{inMap}, cachedActorsState(0) {
+	explicit TraversabilityCache(Map* inMap)
+		: map { inMap }
+	{
 	}
 
 	TraversabilityCellData GetCellData(const std::size_t inIndex) const
@@ -82,75 +82,65 @@ private:
 	 * Struct for storing cached state of actors on the map: position, occupied region on the navmap,
 	 * bumpable state and alive state.
 	 */
-	struct CachedActorsState {
+	struct CachedActorState {
 		constexpr static uint8_t FLAG_BUMPABLE = 1;
 		constexpr static uint8_t FLAG_ALIVE = 2;
 
-		std::vector<Region> region;
-		std::vector<Actor*> actor;
-		std::vector<Point> pos;
-		std::vector<uint8_t> flags;
+		Region region;
+		Actor* actor = nullptr;
+		Point pos;
+		uint8_t flags {};
 
-		explicit CachedActorsState(size_t reserve);
+		explicit CachedActorState(Actor* inActor);
 
-		void reserve(size_t reserve);
+		void ClearOldPosition(std::vector<TraversabilityCellData>& inOutTraversabilityData, int inWidth) const;
 
-		void reset();
+		void MarkNewPosition(std::vector<TraversabilityCellData>& inOutTraversabilityData, int inWidth, bool inShouldUpdateSelf = false);
 
-		void erase(size_t idx);
-
-		size_t AddCachedActorState(Actor* inActor);
-
-		void ClearOldPosition(size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, int inWidth) const;
-
-		void MarkNewPosition(size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, int inWidth, bool inShouldUpdateSelf = false);
-
-		void UpdateNewState(size_t i);
-
-		void emplace_back(CachedActorsState && another);
+		void UpdateNewState();
 
 		static Region CalculateRegion(const Actor* inActor);
 
 		// flags manipulation should be inlined
-		void SetIsBumpable(const size_t i)
+		void SetIsBumpable()
 		{
-			flags[i] |= (1 << FLAG_BUMPABLE);
+			flags |= (1 << FLAG_BUMPABLE);
 		}
 
-		void ResetIsBumpable(const size_t i)
+		void ResetIsBumpable()
 		{
-			flags[i] &= ~(1 << FLAG_BUMPABLE);
+			flags &= ~(1 << FLAG_BUMPABLE);
 		}
 
-		void SetIsAlive(const size_t i)
+		void SetIsAlive()
 		{
-			flags[i] |= (1 << FLAG_ALIVE);
+			flags |= (1 << FLAG_ALIVE);
 		}
 
-		void ResetIsAlive(const size_t i)
+		void ResetIsAlive()
 		{
-			flags[i] &= ~(1 << FLAG_ALIVE);
+			flags &= ~(1 << FLAG_ALIVE);
 		}
 
-		void FlipIsBumpable(const size_t i)
+		void FlipIsBumpable()
 		{
-			flags[i] ^= (1 << FLAG_BUMPABLE);
+			flags ^= (1 << FLAG_BUMPABLE);
 		}
 
-		bool GetIsBumpable(const size_t i) const
+		bool GetIsBumpable() const
 		{
-			return flags[i] & (1 << FLAG_BUMPABLE);
+			return flags & (1 << FLAG_BUMPABLE);
 		}
 
-		bool GetIsAlive(const size_t i) const
+		bool GetIsAlive() const
 		{
-			return flags[i] & (1 << FLAG_ALIVE);
+			return flags & (1 << FLAG_ALIVE);
 		}
 	};
 
 	Map* map;
 	std::vector<TraversabilityCellData> traversabilityData;
-	CachedActorsState cachedActorsState;
+	std::vector<CachedActorState> cachedActorsState;
 	bool hasBeenUpdatedThisFrame { false };
 
 	void ValidateTraversabilityCacheSize();
