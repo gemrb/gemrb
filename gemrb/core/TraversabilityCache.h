@@ -95,7 +95,7 @@ private:
 
 		void reserve(size_t reserve);
 
-		void reset();
+		void clear();
 
 		void erase(size_t idx);
 

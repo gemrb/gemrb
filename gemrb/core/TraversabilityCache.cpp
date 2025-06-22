@@ -104,7 +104,7 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 
 void TraversabilityCache::CachedActorsState::UpdateNewState(const size_t i)
 {
-	const size_t newActorStateIdx =  AddCachedActorState(actor[i]);
+	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
 	flags[i] = flags[newActorStateIdx];
 	pos[i] = pos[newActorStateIdx];
 	region[i] = region[newActorStateIdx];
@@ -120,9 +120,19 @@ void TraversabilityCache::Update()
 	hasBeenUpdatedThisFrame = true;
 
 	// determine all changes in actors' state regarding their alive status, bumpable status and position, also check for new and removed actors
-	std::vector<size_t> actorsRemoved;
-	std::vector<size_t> actorsUpdated;
-	CachedActorsState actorsNew(0);
+	static std::vector<size_t> actorsRemoved;
+	static std::vector<size_t> actorsUpdated;
+	static CachedActorsState actorsNew(0);
+
+	const size_t numberOfActorsOnMap = map->actors.size();
+	if (actorsRemoved.capacity() < numberOfActorsOnMap) {
+		actorsRemoved.reserve(numberOfActorsOnMap);
+		actorsUpdated.reserve(numberOfActorsOnMap);
+		actorsNew.reserve(numberOfActorsOnMap);
+	}
+	actorsRemoved.clear();
+	actorsUpdated.clear();
+	actorsNew.clear();
 
 	// for all actors in the map...
 	for (auto currentActor : map->actors) {
@@ -140,7 +150,7 @@ void TraversabilityCache::Update()
 
 		// if found, check whether the position, bumpable status and alive status has been updated since last cache update
 		// const CachedActorsState& cachedActor = *foundCachedActor;
-		const size_t cachedActorIdx = foundCachedActor - cachedActorsState.actor.begin() ;
+		const size_t cachedActorIdx = foundCachedActor - cachedActorsState.actor.begin();
 		if (cachedActorsState.pos[cachedActorIdx] != currentActor->Pos ||
 		    cachedActorsState.GetIsAlive(cachedActorIdx) != currentActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED) ||
 		    cachedActorsState.GetIsBumpable(cachedActorIdx) != currentActor->ValidTarget(GA_ONLY_BUMPABLE)) {
@@ -150,7 +160,7 @@ void TraversabilityCache::Update()
 
 	// find all actors from cache which are not among the map actors and store their index to remove them later
 	for (size_t i = 0; i < cachedActorsState.actor.size(); ++i) {
-		const Actor *const cachedActor = cachedActorsState.actor[i];
+		const Actor* const cachedActor = cachedActorsState.actor[i];
 		const auto foundActor = std::find_if(map->actors.cbegin(), map->actors.cend(), [&cachedActor](const Actor* actor) {
 			return cachedActor == actor;
 		});
@@ -231,34 +241,39 @@ void TraversabilityCache::Update()
 	cachedActorsState.emplace_back(std::move(actorsNew));
 }
 
-TraversabilityCache::CachedActorsState::CachedActorsState(const size_t reserve) {
+TraversabilityCache::CachedActorsState::CachedActorsState(const size_t reserve)
+{
 	if (reserve != 0) {
 		this->reserve(reserve);
 	}
 }
 
-void TraversabilityCache::CachedActorsState::reserve(const size_t reserve) {
+void TraversabilityCache::CachedActorsState::reserve(const size_t reserve)
+{
 	region.reserve(reserve);
 	actor.reserve(reserve);
 	pos.reserve(reserve);
 	flags.reserve(reserve);
 }
 
-void TraversabilityCache::CachedActorsState::reset() {
+void TraversabilityCache::CachedActorsState::clear()
+{
 	region.clear();
 	actor.clear();
 	pos.clear();
 	flags.clear();
 }
 
-void TraversabilityCache::CachedActorsState::erase(const size_t idx) {
+void TraversabilityCache::CachedActorsState::erase(const size_t idx)
+{
 	region.erase(region.begin() + idx);
 	actor.erase(actor.begin() + idx);
 	pos.erase(pos.begin() + idx);
 	flags.erase(flags.begin() + idx);
 }
 
-void TraversabilityCache::CachedActorsState::emplace_back(CachedActorsState &&another) {
+void TraversabilityCache::CachedActorsState::emplace_back(CachedActorsState&& another)
+{
 	reserve(region.size() + another.region.size());
 	region.insert(region.end(), another.region.begin(), another.region.end());
 	actor.insert(actor.end(), another.actor.begin(), another.actor.end());
