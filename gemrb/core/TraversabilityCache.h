@@ -27,6 +27,66 @@
 
 namespace GemRB {
 
+
+struct FitRegion {
+	Point origin;
+	Size size;
+
+	FitRegion(const Region& r) noexcept
+		: origin(r.origin), size(r.size)
+	{}
+
+	FitRegion() noexcept = default;
+
+	FitRegion(const FitRegion& other)
+		: origin(other.origin),
+		  size(other.size)
+	{
+	}
+
+	FitRegion(FitRegion&& other) noexcept
+		: origin(std::move(other.origin)),
+		  size(std::move(other.size))
+	{
+	}
+
+	FitRegion& operator=(const FitRegion& other)
+	{
+		if (this == &other)
+			return *this;
+		origin = other.origin;
+		size = other.size;
+		return *this;
+	}
+
+	FitRegion& operator=(FitRegion&& other) noexcept
+	{
+		if (this == &other)
+			return *this;
+		origin = std::move(other.origin);
+		size = std::move(other.size);
+		return *this;
+	}
+
+	bool IntersectsRegion(const FitRegion& rgn) const noexcept
+	{
+		if (origin.x >= (rgn.origin.x + rgn.size.w)) {
+			return false; // entirely to the right of rgn
+		}
+		if ((origin.x + size.w) <= rgn.origin.x) {
+			return false; // entirely to the left of rgn
+		}
+		if (origin.y >= (rgn.origin.y + rgn.size.h)) {
+			return false; // entirely below rgn
+		}
+		if ((origin.y + size.h) <= rgn.origin.y) {
+			return false; // entirely above rgn
+		}
+		return true;
+	}
+};
+
+
 /**
  * This class manages the cached data of actors on a navmap, to be used for speed up the FindPath implementation.
  */
@@ -52,7 +112,8 @@ public:
 	};
 
 	explicit TraversabilityCache(class Map* inMap)
-		: map{inMap}, cachedActorsState(0) {
+		: map { inMap }, cachedActorsState(0)
+	{
 	}
 
 	TraversabilityCellData GetCellData(const std::size_t inIndex) const
@@ -86,7 +147,7 @@ private:
 		constexpr static uint8_t FLAG_BUMPABLE = 1;
 		constexpr static uint8_t FLAG_ALIVE = 2;
 
-		std::vector<Region> region;
+		std::vector<FitRegion> region;
 		std::vector<Actor*> actor;
 		std::vector<Point> pos;
 		std::vector<uint8_t> flags;
@@ -107,7 +168,7 @@ private:
 
 		void UpdateNewState(size_t i);
 
-		void emplace_back(CachedActorsState && another);
+		void emplace_back(CachedActorsState&& another);
 
 		static Region CalculateRegion(const Actor* inActor);
 

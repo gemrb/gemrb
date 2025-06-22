@@ -62,8 +62,8 @@ Region TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* inAc
 
 void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, const int inWidth) const
 {
-	for (int x = region[i].x; x < region[i].x + region[i].w; ++x) {
-		for (int y = region[i].y; y < region[i].y + region[i].h; ++y) {
+	for (int x = region[i].origin.x; x < region[i].origin.x + region[i].size.w; ++x) {
+		for (int y = region[i].origin.y; y < region[i].origin.y + region[i].size.h; ++y) {
 			if (!actor[i]->IsOver(Point(x, y), pos[i])) {
 				continue;
 			}
@@ -85,8 +85,8 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 	}
 	const TraversabilityCellData newCellData { actor[i], newCellState };
 
-	for (int x = std::max(0, region[newActorStateIdx].x); x < region[newActorStateIdx].x + region[newActorStateIdx].w; ++x) {
-		for (int y = std::max(0, region[newActorStateIdx].y); y < region[newActorStateIdx].y + region[newActorStateIdx].h; ++y) {
+	for (int x = std::max(0, region[newActorStateIdx].origin.x); x < region[newActorStateIdx].origin.x + region[newActorStateIdx].size.w; ++x) {
+		for (int y = std::max(0, region[newActorStateIdx].origin.y); y < region[newActorStateIdx].origin.y + region[newActorStateIdx].size.h; ++y) {
 			if (!actor[i]->IsOver(Point { x, y })) {
 				continue;
 			}
