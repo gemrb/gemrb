@@ -44,6 +44,7 @@ public:
 	void SetBBox(const Region& newBBox);
 	void DrawCircle(const Point& p) const;
 	bool IsOver(const Point& Pos) const;
+	bool IsOver(const Point& Pos, const Point& CenterPos) const;
 	void SetOver(bool over);
 	bool IsSelected() const;
 	void Select(int Value);

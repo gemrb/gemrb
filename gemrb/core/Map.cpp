@@ -436,7 +436,8 @@ Map::Map(TileMap* tm, TileProps props, Holder<Sprite2D> sm)
 	  tileProps(std::move(props)),
 	  SmallMap(std::move(sm)),
 	  ExploredBitmap(FogMapSize(), uint8_t(0x00)),
-	  VisibleBitmap(FogMapSize(), uint8_t(0x00))
+	  VisibleBitmap(FogMapSize(), uint8_t(0x00)),
+	  traversabilityCache(this)
 {
 	area = this;
 	MasterArea = core->GetGame()->MasterArea(scriptName);
@@ -667,6 +668,8 @@ void Map::DrawPortal(const InfoPoint* ip, int enable)
 
 void Map::UpdateScripts()
 {
+	traversabilityCache.MarkNewFrame();
+
 	bool has_pcs = false;
 	for (const auto& actor : actors) {
 		if (actor->InParty) {

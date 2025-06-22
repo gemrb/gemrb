@@ -72,15 +72,20 @@ void Selectable::DrawCircle(const Point& p) const
 // Check if P is over our ground circle
 bool Selectable::IsOver(const Point& P) const
 {
+	return IsOver(P, Pos);
+}
+
+bool Selectable::IsOver(const Point& P, const Point& CenterPos) const
+{
 	int csize = circleSize;
 	if (csize < 2) {
-		Point d = P - Pos;
+		Point d = P - CenterPos;
 		if (d.x < -16 || d.x > 16) return false;
 		if (d.y < -12 || d.y > 12) return false;
 		return true;
 	}
 	// TODO: make sure to match the actual blocking shape; use GetEllipseSize/GetEllipseOffset instead?
-	return P.IsWithinEllipse(csize - 1, Pos);
+	return P.IsWithinEllipse(csize - 1, CenterPos);
 }
 
 bool Selectable::IsSelected() const

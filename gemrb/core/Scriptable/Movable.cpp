@@ -320,7 +320,7 @@ void Movable::AddWayPoint(const Point& Des)
 	size_t steps = path.Size();
 	PathNode& lastStep = path.nodes[steps - 1];
 	area->ClearSearchMapFor(this);
-	Path path2 = area->FindPath(lastStep.point, Des, circleSize);
+	Path path2 = area->RunFindPath(lastStep.point, Des, circleSize);
 	// if the waypoint is too close to the current position, no path is generated
 	if (!path2) {
 		if (BlocksSearchMap()) {
@@ -358,10 +358,10 @@ void Movable::WalkTo(const Point& Des, int distance)
 	}
 
 	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
-	Path newPath = area->FindPath(Pos, Des, circleSize, distance, PF_SIGHT | PF_ACTORS_ARE_BLOCKING, actor);
+	Path newPath = area->RunFindPath(Pos, Des, circleSize, distance, PF_SIGHT | PF_ACTORS_ARE_BLOCKING, actor);
 	if (!newPath && actor && actor->ValidTarget(GA_CAN_BUMP)) {
 		Log(DEBUG, "WalkTo", "{} re-pathing ignoring actors", fmt::WideToChar { actor->GetShortName() });
-		newPath = area->FindPath(Pos, Des, circleSize, distance, PF_SIGHT, actor);
+		newPath = area->RunFindPath(Pos, Des, circleSize, distance, PF_SIGHT, actor);
 	}
 
 	if (newPath) {

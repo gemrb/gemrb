@@ -34,23 +34,21 @@
 // Moving to each node in the path thus becomes an automatic regulation problem
 // which is solved with a P regulator, see Scriptable.cpp
 
-#include "PathFinder.h"
-
 #include "Debug.h"
 #include "FibonacciHeap.h"
 #include "GameData.h"
 #include "Map.h"
+#include "PathFinder.h"
 #include "RNG.h"
 
-#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 #if USE_TRACY
 	#include "tracy/TracyC.h"
 #endif
-
 #include "PathfindingSettings.h"
-#define ANKERL_NANOBENCH_IMPLEMENT
 #include "nanobench.h"
+
+#include "Logging/Logging.h"
 
 #include <array>
 #include <limits>
@@ -68,180 +66,16 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383,
 // Sines
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand { { 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924 } };
 
-// Find the best path of limited length that brings us the farthest from d
-Path Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller)
-{
-	if (!caller || !caller->GetSpeed()) return {};
-	Point p = s;
-	float_t dx = s.x - d.x;
-	float_t dy = s.y - d.y;
-	char xSign = 1, ySign = 1;
-	size_t tries = 0;
-	NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / caller->GetSpeed());
-	if (std::abs(dx) <= 0.333 && std::abs(dy) <= 0.333) return {};
-	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
-		Point rad(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy));
-		if (!(GetBlockedInRadius(rad, caller->circleSize) & PathMapFlags::PASSABLE)) {
-			tries++;
-			// Give up and call the pathfinder if backed into a corner
-			// should we return nullptr instead, so we don't accidentally get closer to d?
-			// it matches more closely the iwd beetles in ar1015, but is too restrictive — then they can't move at all
-			if (tries > RAND_DEGREES_OF_FREEDOM) break;
-			// Random rotation
-			xSign = RandomFlip() ? -1 : 1;
-			ySign = RandomFlip() ? -1 : 1;
-			continue;
-		}
-		p = rad;
-	}
-	int flags = PF_SIGHT;
-	if (backAway) flags |= PF_BACKAWAY;
-	return RunFindPath(s, p, caller->circleSize, caller->circleSize, flags, caller);
-}
 
-PathNode Map::RandomWalk(const Point& s, int size, int radius, const Actor* caller) const
-{
-	if (!caller || !caller->GetSpeed()) return {};
-	NavmapPoint p = s;
-	size_t i = RAND<size_t>(0, RAND_DEGREES_OF_FREEDOM - 1);
-	float_t dx = 3 * dxRand[i];
-	float_t dy = 3 * dyRand[i];
-
-	NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / caller->GetSpeed());
-	size_t tries = 0;
-	while (SquaredDistance(p, s) < unsigned(radius * radius * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
-		if (!(GetBlockedInRadius(p + Point(dx, dy), size) & PathMapFlags::PASSABLE)) {
-			tries++;
-			// Give up if backed into a corner
-			if (tries > RAND_DEGREES_OF_FREEDOM) {
-				return {};
-			}
-			// Random rotation
-			i = RAND<size_t>(0, RAND_DEGREES_OF_FREEDOM - 1);
-			dx = 3 * dxRand[i];
-			dy = 3 * dyRand[i];
-			NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / caller->GetSpeed());
-			p = s;
-		} else {
-			p.x += dx;
-			p.y += dy;
-		}
-	}
-	while (!(GetBlockedInRadius(p + Point(dx, dy), size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
-		p.x -= dx;
-		p.y -= dy;
-	}
-	PathNode randomStep;
-	const Size& mapSize = PropsSize();
-	randomStep.point = Clamp(p, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
-	randomStep.orient = GetOrient(s, p);
-	return randomStep;
-}
-
-Path Map::GetLinePath(const Point& start, int Steps, orient_t Orientation, int flags) const
-{
-	Point dest = start;
-
-	float_t xoff, yoff, mult;
-	if (Orientation <= 4) {
-		xoff = -Orientation / 4.0;
-	} else if (Orientation <= 12) {
-		xoff = -1.0 + (Orientation - 4) / 4.0;
-	} else {
-		xoff = 1.0 - (Orientation - 12) / 4.0;
-	}
-
-	if (Orientation <= 8) {
-		yoff = 1.0 - Orientation / 4.0;
-	} else {
-		yoff = -1.0 + (Orientation - 8) / 4.0;
-	}
-
-	mult = 1.0 / std::max(std::fabs(xoff), std::fabs(yoff));
-
-	dest.x += Steps * mult * xoff + 0.5;
-	dest.y += Steps * mult * yoff + 0.5;
-
-	return GetLinePath(start, dest, 2, Orientation, flags);
-}
-
-Path Map::GetLinePath(const Point& start, const Point& dest, int Speed, orient_t Orientation, int flags) const
-{
-	int Count = 0;
-	int Max = Distance(start, dest);
-	Point diff = dest - start;
-	Path path;
-	path.nodes.reserve(Max);
-	path.AppendStep(PathNode { start, Orientation });
-	auto StartNode = path.begin();
-	for (int Steps = 0; Steps < Max; Steps++) {
-		Point p;
-		p.x = start.x + (diff.x * Steps / Max);
-		p.y = start.y + (diff.y * Steps / Max);
-
-		//the path ends here as it would go off the screen, causing problems
-		//maybe there is a better way, but i needed a quick hack to fix
-		//the crash in projectiles
-		if (p.x < 0 || p.y < 0) {
-			return path;
-		}
-
-		const Size& mapSize = PropsSize();
-		if (p.x > mapSize.w * 16 || p.y > mapSize.h * 12) {
-			return path;
-		}
-
-		if (!Count) {
-			StartNode = path.AppendStep({ p, Orientation });
-			Count = Speed;
-		} else {
-			Count--;
-			StartNode->point = p;
-			StartNode->orient = Orientation;
-		}
-
-		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
-		if (wall) switch (flags) {
-				case GL_REBOUND:
-					Orientation = ReflectOrientation(Orientation);
-					// TODO: recalculate dest (mirror it)
-					break;
-				case GL_PASS:
-					break;
-				default: //premature end
-					return path;
-			}
-	}
-
-	return path;
-}
-
-PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
-{
-	PathNode lineEnd;
-	lineEnd.point.x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
-	lineEnd.point.y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
-	const Size& mapSize = PropsSize();
-	lineEnd.point = Clamp(lineEnd.point, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
-	lineEnd.orient = GetOrient(p, lineEnd.point);
-	return lineEnd;
-}
-
-// Find a path from start to goal, ending at the specified distance from the
-// target (the goal must be in sight of the end, if PF_SIGHT is specified)
-Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
+Path Map::FindPathOriginal(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller) const
 {
 	TRACY(ZoneScoped);
-
-	traversabilityCache.Update();
-
 	if (InDebugMode(DebugMode::PATHFINDER))
 		Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}",
 		    s, d,
 		    fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" },
 		    minDistance, size);
-	const bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
-	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellState::ACTOR : TraversabilityCache::TraversabilityCellState::ACTOR_NON_TRAVERSABLE;
+	bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	SearchmapPoint smptDest0 { d };
@@ -270,35 +104,15 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	if (!mapSize.PointInside(smptSource)) return {};
 
 	// Initialize data structures
-	const size_t mapCellsCount = mapSize.Area();
-
-	FibonacciHeap<PQNode> open; // todo: remove this data structure or rewrite its implementation - too much allocations there!
-	// make most data storage for this algorithm static, to avoid memory allocations;
-	// each run we just clear the storage, which is keeping the underlying allocated memory at hand
-	static std::vector<bool> isClosed(mapSize.Area(), false);
-	static std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
-	static std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
-
-	// resize if needed (in case of a map change; probably can be done once, when new map is loaded)
-	if (isClosed.size() != mapCellsCount) {
-		isClosed.resize(mapCellsCount);
-		parents.resize(mapCellsCount);
-		distFromStart.resize(mapCellsCount);
-	}
-
-	// cleanup
-	isClosed.clear();
-	isClosed.resize(mapCellsCount, false);
-	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
-	// number of elements, while memset performs better for large vectors
-	memset(static_cast<void*>(parents.data()), 0, sizeof(Point) * mapCellsCount);
-	memset(static_cast<void*>(distFromStart.data()), std::numeric_limits<unsigned short>::max(), sizeof(unsigned short) * mapCellsCount);
-
-	// begin algo init
+	FibonacciHeap<PQNode> open;
+	std::vector<bool> isClosed(mapSize.Area(), false);
+	std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
+	std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
 	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
 	open.emplace(PQNode(nmptSource, 0));
 	bool foundPath = false;
+	static bool usePlainThetaStar = gamedata->GetMiscRule("LAZY_THETA_STAR") == 0;
 	unsigned int squaredMinDist = minDistance * minDistance;
 
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
@@ -342,8 +156,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		isClosed[smptCurrentIdx] = true;
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
-			const NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
-			const SearchmapPoint smptChild { nmptChild };
+			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
+			SearchmapPoint smptChild { nmptChild };
 			// Outside map
 			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
@@ -360,8 +174,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			if (childBlocked) continue;
 
 			// If there's an actor, check it can be bumped away
-			const auto navmapCellTraversability = traversabilityCache.GetCellData(nmptChild.y * mapSize.w * 16 + nmptChild.x);
-			const bool childIsUnbumpable = navmapCellTraversability.occupyingActor != caller && navmapCellTraversability.state >= blockingTraversabilityValue;
+			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
+			bool childIsUnbumpable = childActor && childActor != caller && (actorsAreBlocking || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
 
 			SearchmapPoint smptCurrent2 { nmptCurrent };
@@ -369,7 +183,28 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			SearchmapPoint smptParent { nmptParent };
 			unsigned short oldDist = distFromStart[smptChildIdx];
 
-			{
+			if (usePlainThetaStar) {
+				// Theta-star path if there is LOS
+				if (IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
+					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
+					if (newDist < oldDist) {
+						parents[smptChildIdx] = nmptParent;
+						distFromStart[smptChildIdx] = newDist;
+					}
+					// Fall back to A-star path
+				} else {
+					unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
+					if (newDist < oldDist) {
+						parents[smptChildIdx] = nmptCurrent;
+						distFromStart[smptChildIdx] = newDist;
+					}
+				}
+
+				if (distFromStart[smptChildIdx] < oldDist) {
+					PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
+					open.emplace(newNode);
+				}
+			} else {
 				// Lazy Theta star*
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
@@ -444,79 +279,6 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	}
 
 	return {};
-}
-
-Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
-{
-	using namespace std::chrono_literals;
-	constexpr char units[] = "us";
-	auto Bench = ankerl::nanobench::Bench()
-			     .epochIterations(PATH_BENCHMARK_ITERS)
-			     .warmup(PATH_BENCHMARK_WARMUP)
-			     .timeUnit(1us, units)
-			     .performanceCounters(true);
-	Path ResultOriginal;
-	Path ResultOriginalImproved;
-#if PATH_RUN_BENCH
-	Log(DEBUG, "Map", "--- FindPath ---");
-	constexpr const char* ImprovedBenchmarkName[] = { "FindPathOriginalImproved", "FindPathOriginalImproved*" };
-	const size_t ImprovedBenchmarkNameIdx = !traversabilityCache.HasUpdatedTraversabilityThisFrame(); // 0 for updated, 1 for not updated
-	if (!traversabilityCache.HasUpdatedTraversabilityThisFrame()) {
-		Log(DEBUG, "Map", "(improved implementation will recalculate cache)");
-	}
-	FlushLogs();
-	Bench.relative(true).name("FindPathOriginal").run([&] {
-#endif
-#if PATH_RUN_ORIGINAL
-		{
-			// ScopedTimer t("}} original ");
-			ResultOriginal = FindPathOriginal(s, d, size, minDistance, flags, caller);
-		}
-#endif
-#if PATH_RUN_BENCH
-	});
-	Bench.name(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx]).run([&] {
-#endif
-#if PATH_RUN_IMPROVED
-		{
-			// ScopedTimer t("}} improved ");
-			ResultOriginalImproved = FindPath(s, d, size, minDistance, flags, caller);
-		}
-#endif
-#if PATH_RUN_BENCH
-	});
-	std::cout << "|---------:|--------------------:|--------------------:|--------:|----------:|:----------" << "\n| relative |               " << units << "/op |                op/s |    err% |     total | benchmark" << std::endl;
-#endif
-#if PATH_RETURN_ORIGINAL
-	return ResultOriginal;
-#else
-	return ResultOriginalImproved;
-#endif
-}
-
-void Map::NormalizeDeltas(float_t& dx, float_t& dy, float_t factor)
-{
-	constexpr float_t STEP_RADIUS = 2.0;
-
-	float_t ySign = std::copysign(1.0f, dy);
-	float_t xSign = std::copysign(1.0f, dx);
-	dx = std::fabs(dx);
-	dy = std::fabs(dy);
-	float_t dxOrig = dx;
-	float_t dyOrig = dy;
-	if (dx == 0.0) {
-		dy = STEP_RADIUS * 0.75f;
-	} else if (dy == 0.0) {
-		dx = STEP_RADIUS;
-	} else {
-		float_t q = STEP_RADIUS / std::hypot(dx, dy);
-		dx = dx * q;
-		dy = dy * q * 0.75f;
-	}
-	dx = std::min(dx * factor, dxOrig);
-	dy = std::min(dy * factor, dyOrig);
-	dx = std::ceil(dx) * xSign;
-	dy = std::ceil(dy) * ySign;
 }
 
 }

@@ -29,6 +29,7 @@
 #include "PathFinder.h"
 #include "Polygon.h"
 #include "TableMgr.h"
+#include "TraversabilityCache.h"
 #include "WorldMap.h"
 
 #include "Scriptable/Scriptable.h"
@@ -413,6 +414,9 @@ private:
 	EnumArray<Priority, unsigned int> lastActorCount;
 	bool hostilesVisible = false;
 
+	friend class TraversabilityCache;
+	TraversabilityCache traversabilityCache;
+
 	VideoBufferPtr wallStencil = nullptr;
 	Region stencilViewport;
 
@@ -614,7 +618,7 @@ public:
 	void AdjustPositionNavmap(Point& goal, const Size& radius = ZeroSize) const;
 	void AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int startingRadius) const;
 	/* Finds the path which leads the farthest from d */
-	Path RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const;
+	Path RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller);
 	PathNode RandomWalk(const Point& s, int size, int radius, const Actor* caller) const;
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy() const;
@@ -623,7 +627,9 @@ public:
 	Path GetLinePath(const Point& start, int Steps, orient_t Orientation, int flags) const;
 	Path GetLinePath(const Point& start, const Point& dest, int speed, orient_t Orientation, int flags) const;
 	/* Finds the path which leads to near d */
-	Path FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr) const;
+	Path RunFindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr);
+	Path FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr);
+	Path FindPathOriginal(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr) const;
 
 	bool IsVisible(const Point& p) const;
 	bool IsExplored(const Point& p) const;
