@@ -32,9 +32,15 @@ struct FitRegion {
 	Point origin;
 	Size size;
 
+	FitRegion(const Point& InOrigin, const Size& InSize)
+		: origin(InOrigin), size(InSize)
+	{
+	}
+
 	FitRegion(const Region& r) noexcept
 		: origin(r.origin), size(r.size)
-	{}
+	{
+	}
 
 	FitRegion() noexcept = default;
 
@@ -170,7 +176,7 @@ private:
 
 		void emplace_back(CachedActorsState&& another);
 
-		static Region CalculateRegion(const Actor* inActor);
+		static FitRegion CalculateRegion(const Actor* inActor);
 
 		// flags manipulation should be inlined
 		void SetIsBumpable(const size_t i)

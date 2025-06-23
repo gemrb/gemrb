@@ -445,17 +445,6 @@ using vvcDict = std::multimap<ResRef, ScriptedAnimation*>;
 
 class GEM_EXPORT Actor : public Movable {
 public:
-	bool IsTraversable() const
-	{
-		if (!ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED)) {
-			return true;
-		}
-		if (ValidTarget(GA_ONLY_BUMPABLE)) {
-			return true;
-		}
-		return false;
-	}
-
 	using stat_t = ieDword;
 	using stats_t = std::array<stat_t, MAX_STATS>;
 	//CRE DATA FIELDS
