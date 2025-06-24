@@ -8709,7 +8709,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 bool Actor::HandleActorStance()
 {
 	CharAnimations* ca = GetAnims();
-	int StanceID = GetStance();
+	int stanceID = GetStance();
 
 	if (ca->autoSwitchOnEnd) {
 		SetStance(ca->nextStanceID);
@@ -8717,18 +8717,18 @@ bool Actor::HandleActorStance()
 		return true;
 	}
 	int x = RAND(0, 24);
-	if ((StanceID == IE_ANI_AWAKE) && !x) {
+	if ((stanceID == IE_ANI_AWAKE) && !x) {
 		SetStance(IE_ANI_HEAD_TURN);
 		return true;
 	}
 	// added CurrentAction as part of blocking action fixes
-	if ((StanceID == IE_ANI_READY) && !CurrentAction && !GetNextAction()) {
+	if ((stanceID == IE_ANI_READY) && !CurrentAction && !GetNextAction()) {
 		SetStance(IE_ANI_AWAKE);
 		return true;
 	}
-	if (StanceID == IE_ANI_ATTACK || StanceID == IE_ANI_ATTACK_JAB ||
-	    StanceID == IE_ANI_ATTACK_SLASH || StanceID == IE_ANI_ATTACK_BACKSLASH ||
-	    StanceID == IE_ANI_SHOOT) {
+	if (stanceID == IE_ANI_ATTACK || stanceID == IE_ANI_ATTACK_JAB ||
+	    stanceID == IE_ANI_ATTACK_SLASH || stanceID == IE_ANI_ATTACK_BACKSLASH ||
+	    stanceID == IE_ANI_SHOOT) {
 		SetStance(AttackStance);
 		return true;
 	}

@@ -1295,25 +1295,25 @@ const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char
 
 static const int one_file[MAX_ANIMS] = { 2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4 };
 
-void CharAnimations::GetAnimResRef(unsigned char StanceID,
+void CharAnimations::GetAnimResRef(unsigned char stanceID,
 				   orient_t Orient, ResRef& NewResRef, unsigned char& Cycle,
 				   int Part, EquipResRefData& EquipData) const
 {
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FRAMES:
-			AddFFSuffix(NewResRef, StanceID, Cycle, Orient, Part);
+			AddFFSuffix(NewResRef, stanceID, Cycle, Orient, Part);
 			break;
 
 		case IE_ANI_FOUR_FRAMES_2:
-			AddFF2Suffix(NewResRef, StanceID, Cycle, Orient, Part);
+			AddFF2Suffix(NewResRef, stanceID, Cycle, Orient, Part);
 			break;
 
 		case IE_ANI_NINE_FRAMES:
-			AddNFSuffix(NewResRef, StanceID, Cycle, Orient, Part);
+			AddNFSuffix(NewResRef, stanceID, Cycle, Orient, Part);
 			break;
 
 		case IE_ANI_CODE_MIRROR:
-			AddVHRSuffix(NewResRef, StanceID, Cycle, Orient, EquipData);
+			AddVHRSuffix(NewResRef, stanceID, Cycle, Orient, EquipData);
 			break;
 
 		case IE_ANI_BIRD:
@@ -1332,31 +1332,31 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_ONE_FILE:
-			Cycle = (ieByte) (one_file[StanceID] * 16 + Orient);
+			Cycle = (ieByte) (one_file[stanceID] * 16 + Orient);
 			break;
 
 		case IE_ANI_SIX_FILES:
-			AddSixSuffix(NewResRef, StanceID, Cycle, Orient);
+			AddSixSuffix(NewResRef, stanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_TWENTYTWO: //5+3 animations
-			AddMHRSuffix(NewResRef, StanceID, Cycle, Orient, EquipData);
+			AddMHRSuffix(NewResRef, stanceID, Cycle, Orient, EquipData);
 			break;
 
 		case IE_ANI_TWO_FILES_2: //4+4 animations
-			AddLR2Suffix(NewResRef, StanceID, Cycle, Orient);
+			AddLR2Suffix(NewResRef, stanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_TWO_FILES_3: //IWD style anims
-			AddMMRSuffix(NewResRef, StanceID, Cycle, Orient, false);
+			AddMMRSuffix(NewResRef, stanceID, Cycle, Orient, false);
 			break;
 
 		case IE_ANI_TWO_FILES_3B: //IWD style anims
-			AddMMR2Suffix(NewResRef, StanceID, Cycle, Orient);
+			AddMMR2Suffix(NewResRef, stanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_TWO_FILES_3C: //IWD style anims
-			AddMMRSuffix(NewResRef, StanceID, Cycle, Orient, true);
+			AddMMRSuffix(NewResRef, stanceID, Cycle, Orient, true);
 			break;
 
 		case IE_ANI_TWO_FILES_4:
@@ -1365,45 +1365,45 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_TWO_FILES_5:
-			AddTwoFiles5Suffix(NewResRef, StanceID, Cycle, Orient);
+			AddTwoFiles5Suffix(NewResRef, stanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_TWO_FILES:
-			AddTwoFileSuffix(NewResRef, StanceID, Cycle, Orient);
+			AddTwoFileSuffix(NewResRef, stanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_FOUR_FILES:
-			AddLRSuffix(NewResRef, StanceID, Cycle, Orient, EquipData);
+			AddLRSuffix(NewResRef, stanceID, Cycle, Orient, EquipData);
 			break;
 
 		case IE_ANI_FOUR_FILES_2:
-			AddLRSuffix2(NewResRef, StanceID, Cycle, Orient, EquipData);
+			AddLRSuffix2(NewResRef, stanceID, Cycle, Orient, EquipData);
 			break;
 
 		case IE_ANI_FOUR_FILES_3:
-			AddHLSuffix(NewResRef, StanceID, Cycle, Orient);
+			AddHLSuffix(NewResRef, stanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_SIX_FILES_2: //MOGR (variant of FOUR_FILES)
-			AddLR3Suffix(NewResRef, StanceID, Cycle, Orient);
+			AddLR3Suffix(NewResRef, stanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_TWO_PIECE: //MAKH
-			AddTwoPieceSuffix(NewResRef, StanceID, Cycle, Orient, Part);
+			AddTwoPieceSuffix(NewResRef, stanceID, Cycle, Orient, Part);
 			break;
 
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
-			AddVHR2Suffix(NewResRef, StanceID, Cycle, Orient);
+			AddVHR2Suffix(NewResRef, stanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_CODE_MIRROR_3: // like IE_ANI_CODE_MIRROR_2 but with fewer cycles in g26
-			AddVHR3Suffix(NewResRef, StanceID, Cycle, Orient);
+			AddVHR3Suffix(NewResRef, stanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_PST_ANIMATION_1:
 		case IE_ANI_PST_ANIMATION_2:
 		case IE_ANI_PST_ANIMATION_3:
-			AddPSTSuffix(NewResRef, StanceID, Cycle, Orient);
+			AddPSTSuffix(NewResRef, stanceID, Cycle, Orient);
 			break;
 
 		case IE_ANI_PST_STAND:
@@ -1457,18 +1457,18 @@ const int* CharAnimations::GetZOrder(unsigned char Orient) const
 }
 
 
-void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char stanceID,
 				  unsigned char& Cycle, orient_t Orient) const
 {
 	const char* Prefix;
 	static const char prefixes[2][4] = { "sf2", "sf1" };
 	int flip = RandomFlip();
-	if (StanceID == IE_ANI_RUN && !AvatarTable[AvatarsRowNum].RunScale) {
-		StanceID = IE_ANI_WALK;
+	if (stanceID == IE_ANI_RUN && !AvatarTable[AvatarsRowNum].RunScale) {
+		stanceID = IE_ANI_WALK;
 	}
 
 retry:
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_ATTACK_JAB:
@@ -1526,7 +1526,7 @@ retry:
 			}
 
 			// nothing was found, try with IE_ANI_READY
-			StanceID = MaybeOverrideStance(IE_ANI_READY);
+			stanceID = MaybeOverrideStance(IE_ANI_READY);
 			goto retry;
 		case IE_ANI_PST_START:
 			Cycle = 0;
@@ -1535,18 +1535,18 @@ retry:
 		default: //just in case
 			Cycle = SixteenToFive[Orient];
 			Prefix = "stc";
-			Log(DEBUG, "CharAnimation", "Unhandled pst stance: {}", StanceID);
+			Log(DEBUG, "CharAnimation", "Unhandled pst stance: {}", stanceID);
 			break;
 	}
 	dest.Format("{}{}{}", ResRefBase[0], Prefix, ResRefBase.begin() + 1);
 }
 
-void CharAnimations::AddVHR2Suffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddVHR2Suffix(ResRef& dest, unsigned char stanceID,
 				   unsigned char& Cycle, orient_t Orient) const
 {
 	Cycle = SixteenToNine[Orient];
 
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_ATTACK: //temporarily
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest.Append("g21");
@@ -1615,16 +1615,16 @@ void CharAnimations::AddVHR2Suffix(ResRef& dest, unsigned char StanceID,
 			dest.Append("g22");
 			break;
 		default:
-			error("CharAnimation", "VHR2 Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "VHR2 Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 }
 
-void CharAnimations::AddVHR3Suffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddVHR3Suffix(ResRef& dest, unsigned char stanceID,
 				   unsigned char& Cycle, orient_t Orient) const
 {
 	Cycle = SixteenToNine[Orient];
 
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_ATTACK: //temporarily
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest.Append("g21");
@@ -1686,16 +1686,16 @@ void CharAnimations::AddVHR3Suffix(ResRef& dest, unsigned char StanceID,
 			dest.Append("g11");
 			break;
 		default:
-			error("CharAnimation", "VHR3 Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "VHR3 Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 }
 
 // Note: almost like SixSuffix
-void CharAnimations::AddFFSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddFFSuffix(ResRef& dest, unsigned char stanceID,
 				 unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	Cycle = SixteenToNine[Orient];
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_WALK:
 			dest.Append("g1");
 			break;
@@ -1749,17 +1749,17 @@ void CharAnimations::AddFFSuffix(ResRef& dest, unsigned char StanceID,
 			break;
 
 		default:
-			error("CharAnimation", "Four frames Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "Four frames Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	dest[dest.length()] = static_cast<char>(Part + '1');
 }
 
 // demigorgon's 4-part animation
-void CharAnimations::AddFF2Suffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddFF2Suffix(ResRef& dest, unsigned char stanceID,
 				  unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	Cycle = SixteenToNine[Orient];
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_HEAD_TURN:
 			dest.Append("g101");
 			break;
@@ -1810,31 +1810,31 @@ void CharAnimations::AddFF2Suffix(ResRef& dest, unsigned char StanceID,
 			break;
 
 		default:
-			error("CharAnimation", "Four frames 2 Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "Four frames 2 Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 
 	// change the placeholder 0 to a part number
 	dest[dest.length() - 2] = static_cast<char>(Part + '1');
 }
 
-void CharAnimations::AddNFSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddNFSuffix(ResRef& dest, unsigned char stanceID,
 				 unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	Cycle = SixteenToNine[Orient];
 
-	std::string prefix = fmt::format("{}{}{}{}{}", dest, StancePrefix[StanceID], (Part + 1) % 100, CyclePrefix[StanceID], Cycle);
+	std::string prefix = fmt::format("{}{}{}{}{}", dest, StancePrefix[stanceID], (Part + 1) % 100, CyclePrefix[stanceID], Cycle);
 	if (prefix.length() > 8) {
 		prefix.resize(8);
 	}
 	StringToLower(prefix.begin(), prefix.end(), dest.begin());
-	Cycle = (ieByte) (Cycle + CycleOffset[StanceID]);
+	Cycle = (ieByte) (Cycle + CycleOffset[stanceID]);
 }
 
-void CharAnimations::AddVHRSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddVHRSuffix(ResRef& dest, unsigned char stanceID,
 				  unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
 	Cycle = SixteenToNine[Orient];
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			dest.Append(SlashPrefix[WeaponType]);
@@ -1933,7 +1933,7 @@ void CharAnimations::AddVHRSuffix(ResRef& dest, unsigned char StanceID,
 			break;
 
 		default:
-			error("CharAnimation", "VHR Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "VHR Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	EquipData.Cycle = Cycle;
 }
@@ -1951,10 +1951,10 @@ void CharAnimations::GetVHREquipmentRef(ResRef& dest, unsigned char& Cycle,
 	dest.Append(equip.Suffix);
 }
 
-void CharAnimations::AddSixSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddSixSuffix(ResRef& dest, unsigned char stanceID,
 				  unsigned char& Cycle, orient_t Orient) const
 {
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_WALK:
 			dest.Append("g1");
 			Cycle = Orient;
@@ -2010,19 +2010,19 @@ void CharAnimations::AddSixSuffix(ResRef& dest, unsigned char StanceID,
 			break;
 
 		default:
-			error("CharAnimation", "Six Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "Six Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	if (Orient > 9) {
 		dest.Append("e");
 	}
 }
 
-void CharAnimations::AddLR2Suffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddLR2Suffix(ResRef& dest, unsigned char stanceID,
 				  unsigned char& Cycle, orient_t Orient) const
 {
 	Orient = orient_t(Orient / 2);
 
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_READY:
 		case IE_ANI_CAST: //looping
 		case IE_ANI_CONJURE: //ending
@@ -2057,7 +2057,7 @@ void CharAnimations::AddLR2Suffix(ResRef& dest, unsigned char StanceID,
 			Cycle = 32 + Orient;
 			break;
 		default:
-			error("CharAnimation", "LR2 Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "LR2 Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	if (Orient >= 4) {
 		dest.Append("g1e");
@@ -2066,12 +2066,12 @@ void CharAnimations::AddLR2Suffix(ResRef& dest, unsigned char StanceID,
 	}
 }
 
-void CharAnimations::AddMHRSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddMHRSuffix(ResRef& dest, unsigned char stanceID,
 				  unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
 	Orient = orient_t(Orient / 2);
 
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			dest.Append(SlashPrefix[WeaponType]);
@@ -2168,7 +2168,7 @@ void CharAnimations::AddMHRSuffix(ResRef& dest, unsigned char StanceID,
 			Cycle = Orient;
 			break;
 		default:
-			error("CharAnimation", "MHR Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "MHR Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	if (Orient >= 5) {
 		dest.Append("e");
@@ -2194,10 +2194,10 @@ void CharAnimations::GetMHREquipmentRef(ResRef& dest, unsigned char& Cycle,
 	}
 }
 
-void CharAnimations::AddTwoFileSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddTwoFileSuffix(ResRef& dest, unsigned char stanceID,
 				      unsigned char& Cycle, orient_t Orient) const
 {
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_HEAD_TURN:
 			Cycle = 16 + Orient / 2;
 			break;
@@ -2227,12 +2227,12 @@ void CharAnimations::AddTwoFileSuffix(ResRef& dest, unsigned char StanceID,
 	}
 }
 
-void CharAnimations::AddTwoFiles5Suffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddTwoFiles5Suffix(ResRef& dest, unsigned char stanceID,
 					unsigned char& Cycle, orient_t Orient) const
 {
 	Cycle = SixteenToNine[Orient];
 
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_WALK:
 			dest.Append("g1");
 			break;
@@ -2300,10 +2300,10 @@ void CharAnimations::AddTwoFiles5Suffix(ResRef& dest, unsigned char StanceID,
 	}
 }
 
-void CharAnimations::AddLRSuffix2(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddLRSuffix2(ResRef& dest, unsigned char stanceID,
 				  unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
 		case IE_ANI_ATTACK_SLASH:
@@ -2356,7 +2356,7 @@ void CharAnimations::AddLRSuffix2(ResRef& dest, unsigned char StanceID,
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
-			error("CharAnimation", "LRSuffix2 Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "LRSuffix2 Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	if (Orient > 9) {
 		dest.Append("e");
@@ -2365,14 +2365,14 @@ void CharAnimations::AddLRSuffix2(ResRef& dest, unsigned char StanceID,
 	EquipData.Cycle = Cycle;
 }
 
-void CharAnimations::AddTwoPieceSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddTwoPieceSuffix(ResRef& dest, unsigned char stanceID,
 				       unsigned char& Cycle, orient_t Orient, int Part) const
 {
 	if (Part == 1) {
 		dest.Append("d");
 	}
 
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_DIE:
 			dest.Append("g1");
 			Cycle = 8 + Orient / 2;
@@ -2416,17 +2416,17 @@ void CharAnimations::AddTwoPieceSuffix(ResRef& dest, unsigned char StanceID,
 			Cycle = 8 + Orient / 2;
 			break;
 		default:
-			error("CharAnimation", "Two-piece Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "Two-piece Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	if (Orient > 9) {
 		dest.Append("e");
 	}
 }
 
-void CharAnimations::AddLRSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddLRSuffix(ResRef& dest, unsigned char stanceID,
 				 unsigned char& Cycle, orient_t Orient, EquipResRefData& EquipData) const
 {
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest.Append("g2");
@@ -2483,7 +2483,7 @@ void CharAnimations::AddLRSuffix(ResRef& dest, unsigned char StanceID,
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
-			error("CharAnimation", "LR Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "LR Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	if (Orient > 9) {
 		dest.Append("e");
@@ -2501,10 +2501,10 @@ void CharAnimations::GetLREquipmentRef(ResRef& dest, unsigned char& Cycle,
 }
 
 //Only for the ogre animation (MOGR)
-void CharAnimations::AddLR3Suffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddLR3Suffix(ResRef& dest, unsigned char stanceID,
 				  unsigned char& Cycle, orient_t Orient) const
 {
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
 			dest.Append("g2");
@@ -2552,17 +2552,17 @@ void CharAnimations::AddLR3Suffix(ResRef& dest, unsigned char StanceID,
 			Cycle = 24 + Orient / 2;
 			break;
 		default:
-			error("CharAnimation", "LR3 Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "LR3 Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	if (Orient > 9) {
 		dest.Append("e");
 	}
 }
 
-void CharAnimations::AddMMR2Suffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddMMR2Suffix(ResRef& dest, unsigned char stanceID,
 				   unsigned char& Cycle, orient_t Orient) const
 {
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_ATTACK_BACKSLASH:
@@ -2625,14 +2625,14 @@ void CharAnimations::AddMMR2Suffix(ResRef& dest, unsigned char StanceID,
 			Cycle = (Orient / 2);
 			break;
 		default:
-			error("CharAnimation", "MMR Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "MMR Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	if (Orient > 9) {
 		dest.Append("e");
 	}
 }
 
-void CharAnimations::AddMMRSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddMMRSuffix(ResRef& dest, unsigned char stanceID,
 				  unsigned char& Cycle, orient_t Orient, bool mirror) const
 {
 	if (mirror) {
@@ -2640,7 +2640,7 @@ void CharAnimations::AddMMRSuffix(ResRef& dest, unsigned char StanceID,
 	} else {
 		Cycle = Orient / 2;
 	}
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_ATTACK_BACKSLASH:
@@ -2702,14 +2702,14 @@ void CharAnimations::AddMMRSuffix(ResRef& dest, unsigned char StanceID,
 			dest.Append("wk");
 			break;
 		default:
-			error("CharAnimation", "MMR Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "MMR Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	if (!mirror && Orient > 9) {
 		dest.Append("e");
 	}
 }
 
-void CharAnimations::AddHLSuffix(ResRef& dest, unsigned char StanceID,
+void CharAnimations::AddHLSuffix(ResRef& dest, unsigned char stanceID,
 				 unsigned char& Cycle, orient_t Orient) const
 {
 	//even orientations in 'h', odd in 'l', and since the WALK animation
@@ -2717,7 +2717,7 @@ void CharAnimations::AddHLSuffix(ResRef& dest, unsigned char StanceID,
 	//file need to be offset by those cycles
 	unsigned char offset = ((Orient % 2) ^ 1) * 8;
 
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_WALK:
 			//only available in 8 orientations instead of the usual 16
 			Cycle = 0 + Orient / 2;
@@ -2758,7 +2758,7 @@ void CharAnimations::AddHLSuffix(ResRef& dest, unsigned char StanceID,
 			break;
 
 		default:
-			error("CharAnimation", "HL Animation: unhandled stance: {} {}", dest, StanceID);
+			error("CharAnimation", "HL Animation: unhandled stance: {} {}", dest, stanceID);
 	}
 	if (offset) {
 		dest.Append("hg1");
