@@ -6207,7 +6207,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable* checker) const
 		if (GetStat(IE_EA) >= EA_EVILCUTOFF) return false; // handled in pcf_ea
 		// Skip sitting patrons
 		if (GetStat(IE_ANIMATION_ID) >= 0x4000 && GetStat(IE_ANIMATION_ID) <= 0x4112) return false; // ignored
-		if (IsMoving()) return false; // handled in Movable::SetStanceDirect
+		if (IsInMovingStance()) return false; // handled in Movable::SetStanceDirect
 	}
 	if (ga_flags & GA_CAN_BUMP) {
 		if (core->GetGame()->CombatCounter) return false;

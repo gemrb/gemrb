@@ -82,7 +82,7 @@ public:
 	inline void IncrementPathTries() { pathTries++; }
 	inline void ResetPathTries() { pathTries = 0; }
 	// inliners to protect data consistency
-	inline bool IsMoving() const
+	inline bool IsInMovingStance() const
 	{
 		return (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN);
 	}
