@@ -287,10 +287,8 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	if (InternalFlags & IF_RUNNING) {
 		StanceID = IE_ANI_RUN;
 	}
-	Pos.x += dx;
-	Pos.y += dy;
+	SetPos(NavmapPoint(Pos.x + dx, Pos.y + dy));
 	oldPos = Pos;
-	SMPos = SearchmapPoint(Pos);
 	if (actor && blocksSearch) {
 		auto flag = actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
 		area->tileProps.PaintSearchMap(SMPos, circleSize, flag);
