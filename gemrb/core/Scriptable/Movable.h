@@ -100,6 +100,7 @@ public:
 	}
 
 	void SetStance(unsigned int arg);
+	void SetStanceDirect(unsigned int arg);
 	void SetOrientation(orient_t value, bool slow);
 	void SetOrientation(const Point& from, const Point& to, bool slow);
 	void SetAttackMoveChances(const std::array<ieWord, 3>& amc);
