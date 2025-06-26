@@ -468,7 +468,7 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 #endif
 #if PATH_RUN_ORIGINAL
 		{
-			// ScopedTimer t("}} original ");
+			ScopedTimer t("}} original ");
 			ResultOriginal = FindPathOriginal(s, d, size, minDistance, flags, caller);
 		}
 #endif
@@ -478,7 +478,7 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 #endif
 #if PATH_RUN_IMPROVED
 		{
-			// ScopedTimer t("}} improved ");
+			ScopedTimer t("}} improved ");
 			ResultOriginalImproved = FindPath(s, d, size, minDistance, flags, caller);
 		}
 #endif
