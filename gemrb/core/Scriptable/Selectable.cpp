@@ -75,7 +75,8 @@ bool Selectable::IsOver(const Point& P) const
 	return IsOver(P, Pos);
 }
 
-bool Selectable::IsOver(const Point &P, const Point &CenterPos) const {
+bool Selectable::IsOver(const Point& P, const Point& CenterPos) const
+{
 	int csize = circleSize;
 	if (csize < 2) {
 		Point d = P - CenterPos;

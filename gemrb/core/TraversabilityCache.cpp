@@ -52,7 +52,7 @@ size_t TraversabilityCache::CachedActorsState::AddCachedActorState(Actor* inActo
 	return new_idx;
 }
 
-Region TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* inActor)
+FitRegion TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* inActor)
 {
 	// code from Selectable::DrawCircle, will it be always correct for all NPCs?
 	const auto baseSize = inActor->CircleSize2Radius() * inActor->sizeFactor;

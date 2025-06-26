@@ -29,6 +29,7 @@
 #include "PathFinder.h"
 #include "Polygon.h"
 #include "TableMgr.h"
+#include "TraversabilityCache.h"
 #include "WorldMap.h"
 #include "TraversabilityCache.h"
 

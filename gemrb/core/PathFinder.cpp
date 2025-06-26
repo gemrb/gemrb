@@ -281,7 +281,6 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 
 	// resize if needed (in case of a map change; probably can be done once, when new map is loaded)
 	if (isClosed.size() != mapCellsCount) {
-		isClosed.resize(mapCellsCount);
 		parents.resize(mapCellsCount);
 		distFromStart.resize(mapCellsCount);
 	}
@@ -291,8 +290,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	isClosed.resize(mapCellsCount, false);
 	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
 	// number of elements, while memset performs better for large vectors
-	memset(static_cast<void*>(parents.data()), 0, sizeof(Point) * mapCellsCount);
-	memset(static_cast<void*>(distFromStart.data()), std::numeric_limits<unsigned short>::max(), sizeof(unsigned short) * mapCellsCount);
+	memset(static_cast<void*>(parents.data()), 0, sizeof(decltype(parents)::value_type) * mapCellsCount);
+	memset(static_cast<void*>(distFromStart.data()), std::numeric_limits<unsigned short>::max(), sizeof(decltype(distFromStart)::value_type) * mapCellsCount);
 
 	// begin algo init
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
@@ -459,7 +458,7 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 	Path ResultOriginalImproved;
 #if PATH_RUN_BENCH
 	Log(DEBUG, "Map", "--- FindPath ---");
-	constexpr const char* ImprovedBenchmarkName[] = {"FindPathOriginalImproved", "FindPathOriginalImproved*"};
+	constexpr const char* ImprovedBenchmarkName[] = { "FindPathOriginalImproved", "FindPathOriginalImproved*" };
 	const size_t ImprovedBenchmarkNameIdx = !traversabilityCache.HasUpdatedTraversabilityThisFrame(); // 0 for updated, 1 for not updated
 	if (!traversabilityCache.HasUpdatedTraversabilityThisFrame()) {
 		Log(DEBUG, "Map", "(improved implementation will recalculate cache)");
@@ -469,7 +468,7 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 #endif
 #if PATH_RUN_ORIGINAL
 		{
-			// ScopedTimer t("}} original ");
+			ScopedTimer t("}} original ");
 			ResultOriginal = FindPathOriginal(s, d, size, minDistance, flags, caller);
 		}
 #endif
@@ -479,7 +478,7 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 #endif
 #if PATH_RUN_IMPROVED
 		{
-			// ScopedTimer t("}} improved ");
+			ScopedTimer t("}} improved ");
 			ResultOriginalImproved = FindPath(s, d, size, minDistance, flags, caller);
 		}
 #endif
