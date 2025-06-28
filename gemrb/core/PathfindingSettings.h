@@ -25,14 +25,16 @@ class ScopedTimer {
 private:
 	std::string tag;
 	long* resultStorage;
+	std::string* tagStorage;
 	std::chrono::high_resolution_clock::time_point start_time;
 
 public:
 	static std::vector<long> extraTimeTracked;
+	static std::vector<std::string> extraTagsTracked;
 	const static std::vector<long> noExtraTime;
 	static bool bIsExtraTimeTrackedInitialized;
-	explicit ScopedTimer(const std::string& tag, long* outResultStorage = nullptr)
-		: tag(tag), resultStorage(outResultStorage), start_time(std::chrono::high_resolution_clock::now()) {}
+	explicit ScopedTimer(const std::string& tag, long* outResultStorage = nullptr, std::string* outTagStorage = nullptr)
+		: tag(tag), resultStorage(outResultStorage), tagStorage(outTagStorage), start_time(std::chrono::high_resolution_clock::now()) {}
 
 	// Disable copy constructor and assignment operator
 	ScopedTimer(const ScopedTimer&) = delete;
@@ -59,7 +61,11 @@ public:
 			*resultStorage = microseconds.count();
 		}
 
-		std::cout << '\n' << tag << microseconds.count() << " us" << '\n';
+		// std::cout << '\n' << tag << microseconds.count() << " us" << '\n';
+
+		if (tagStorage) {
+			*tagStorage = std::move(tag);
+		}
 	}
 };
 

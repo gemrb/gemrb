@@ -121,7 +121,9 @@ void TraversabilityCache::Update()
 	hasBeenUpdatedThisFrame = true;
 
 	ScopedTimer::extraTimeTracked.push_back(0);
-	ScopedTimer s("}} CacheUpdate ", &ScopedTimer::extraTimeTracked[ScopedTimer::extraTimeTracked.size() - 1]);
+	ScopedTimer::extraTagsTracked.push_back(std::string{});
+	const size_t extraTrackedIdx =  ScopedTimer::extraTimeTracked.size() - 1;
+	ScopedTimer s("$", &ScopedTimer::extraTimeTracked[extraTrackedIdx], &ScopedTimer::extraTagsTracked[extraTrackedIdx]);
 	// determine all changes in actors' state regarding their alive status, bumpable status and position, also check for new and removed actors
 	static std::vector<size_t> actorsRemoved;
 	static std::vector<size_t> actorsUpdated;

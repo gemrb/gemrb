@@ -59,6 +59,7 @@
 
 bool ScopedTimer::bIsExtraTimeTrackedInitialized = false;
 std::vector<long> ScopedTimer::extraTimeTracked;
+std::vector<std::string> ScopedTimer::extraTagsTracked;
 const std::vector<long> ScopedTimer::noExtraTime;
 
 namespace GemRB {
@@ -455,6 +456,7 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 {
 	if (!ScopedTimer::bIsExtraTimeTrackedInitialized) {
 		ScopedTimer::extraTimeTracked.reserve(100000);
+		ScopedTimer::extraTagsTracked.reserve(100000);
 		ScopedTimer::bIsExtraTimeTrackedInitialized = true;
 	}
 	using namespace std::chrono_literals;
@@ -509,7 +511,7 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 			const float improvementWithExtraOpsPerSecond = microsecondsFactor / (improvementWithExtraTotal);
 			const float improvementWithExtraPercent = (baselineMeasurement / float(improvementWithExtraTotal)) * 100;
 
-			std::string line = fmt::v10::format("| {:>7.1f}% | {:>15}.00  | {:>19.2f} |    0.0% |      0.00 | `{}`", improvementWithExtraPercent, improvementWithExtraTotal, improvementWithExtraOpsPerSecond, benchmarkName);
+			std::string line = fmt::format("| {:>7.1f}% | {:>15}.00  | {:>19.2f} |    0.0% |      0.00 | `{}`", improvementWithExtraPercent, improvementWithExtraTotal, improvementWithExtraOpsPerSecond, benchmarkName);
 
 			if (!extraTimeMeasurements.empty()) {
 				const long improvementWithoutExtraTotal = improvementWithExtraTotal - extraMicroseconds;
@@ -517,12 +519,12 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 				const float improvementWithoutExtraPercent = (baselineMeasurement / float(improvementWithoutExtraTotal)) * 100;
 
 
-				std::string extraTimeString = fmt::v10::format(" Extra time: {}us, {}ops (", extraMicroseconds, extraTimeMeasurements.size());
-				for (const auto e : extraTimeMeasurements) {
-					extraTimeString += std::to_string(e) + ", ";
+				std::string extraTimeString = fmt::format(" Extra time: {}us, {}ops (", extraMicroseconds, extraTimeMeasurements.size());
+				for (size_t i = 0; i < extraTimeMeasurements.size(); ++i) {
+					extraTimeString += ScopedTimer::extraTagsTracked[i] + " " + std::to_string(extraTimeMeasurements[i]) + ", ";
 				}
 				extraTimeString += ")";
-				const std::string improvementWithoutExtraString = fmt::v10::format(" =without extra: {:.1f}% rel, {}us/op, {:.2f}op/s= ", improvementWithoutExtraPercent, improvementWithoutExtraTotal, improvementWithoutExtraOpsPerSecond);
+				const std::string improvementWithoutExtraString = fmt::format(" =without extra: {:.1f}% rel, {}us/op, {:.2f}op/s= ", improvementWithoutExtraPercent, improvementWithoutExtraTotal, improvementWithoutExtraOpsPerSecond);
 
 				line += extraTimeString + improvementWithoutExtraString;
 			}
@@ -542,10 +544,11 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 			const std::string lineImprovedExtra = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx] + std::string("+"), improvedMicroseconds, ScopedTimer::extraTimeTracked, originalMicroseconds, bIsExtraTimeAlreadyIncludedInImprovedMeasurement);
 			tableToPrint += lineImprovedExtra;
 			ScopedTimer::extraTimeTracked.clear();
+			ScopedTimer::extraTagsTracked.clear();
 		}
 
 		tableToPrint += line + headings;
-		std::cout << tableToPrint;
+		Log(DEBUG, "FindPath", "--RunFindPath--\n{}", tableToPrint);
 #endif
 
 #if PATH_RETURN_ORIGINAL
