@@ -22,6 +22,7 @@
 #include "TraversabilityCache.h"
 
 #include "Map.h"
+#include "PathfindingSettings.h"
 
 #include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
@@ -119,6 +120,8 @@ void TraversabilityCache::Update()
 	}
 	hasBeenUpdatedThisFrame = true;
 
+	ScopedTimer::extraTimeTracked.push_back(0);
+	ScopedTimer s("}} CacheUpdate ", &ScopedTimer::extraTimeTracked[ScopedTimer::extraTimeTracked.size() - 1]);
 	// determine all changes in actors' state regarding their alive status, bumpable status and position, also check for new and removed actors
 	static std::vector<size_t> actorsRemoved;
 	static std::vector<size_t> actorsUpdated;
