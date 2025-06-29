@@ -502,8 +502,16 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 	});
 	std::cout << "|---------:|--------------------:|--------------------:|--------:|----------:|:----------" << "\n| relative |               " << units << "/op |                op/s |    err% |     total | benchmark" << std::endl;
 #else
-		auto prepareBenchmarkTableRow = [](const std::string& benchmarkName, const long measurementMicroseconds,  const std::vector<long>& extraTimeMeasurements, const long baselineMeasurement, bool bIsExtraTimeAlreadyIncludedInMeasurement) {
+		auto prepareBenchmarkTableRow = [](const std::string& benchmarkName, long measurementMicroseconds,  const std::vector<long>& extraTimeMeasurements, long baselineMeasurement, bool bIsExtraTimeAlreadyIncludedInMeasurement) {
 			constexpr double microsecondsFactor = 1'000'000.0;
+
+			// don't allow infinities or nans in the table
+			if (measurementMicroseconds == 0) {
+				measurementMicroseconds = 1;
+			}
+			if (baselineMeasurement == 0) {
+				baselineMeasurement = 1;
+			}
 
 			const long extraMicroseconds = std::accumulate(extraTimeMeasurements.cbegin(), extraTimeMeasurements.cend(), 0l);
 
@@ -514,7 +522,10 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 			std::string line = fmt::format("| {:>7.1f}% | {:>15}.00  | {:>19.2f} |    0.0% |      0.00 | `{}`", improvementWithExtraPercent, improvementWithExtraTotal, improvementWithExtraOpsPerSecond, benchmarkName);
 
 			if (!extraTimeMeasurements.empty()) {
-				const long improvementWithoutExtraTotal = improvementWithExtraTotal - extraMicroseconds;
+				long improvementWithoutExtraTotal = improvementWithExtraTotal - extraMicroseconds;
+				if (improvementWithoutExtraTotal == 0) {
+					improvementWithoutExtraTotal = 1;
+				}
 				const float improvementWithoutExtraOpsPerSecond = microsecondsFactor / improvementWithoutExtraTotal;
 				const float improvementWithoutExtraPercent = (baselineMeasurement / float(improvementWithoutExtraTotal)) * 100;
 
