@@ -35,7 +35,7 @@
 // which is solved with a P regulator, see Scriptable.cpp
 
 #include "PathFinder.h"
-#include <format>
+#include "fmt/format.h"
 
 #include "Debug.h"
 #include "FibonacciHeap.h"
