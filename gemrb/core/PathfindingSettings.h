@@ -9,7 +9,7 @@
 #define PATH_RUN_IMPROVED    1
 #define PATH_RETURN_ORIGINAL (PATH_RUN_ORIGINAL && !PATH_RUN_IMPROVED)
 
-#define PATH_RUN_BENCH        1
+#define PATH_RUN_BENCH        0
 #define PATH_BENCHMARK_WARMUP 0
 #define PATH_BENCHMARK_ITERS  1
 
@@ -24,11 +24,17 @@
 class ScopedTimer {
 private:
 	std::string tag;
+	long* resultStorage;
+	std::string* tagStorage;
 	std::chrono::high_resolution_clock::time_point start_time;
 
 public:
-	explicit ScopedTimer(const std::string& tag)
-		: tag(tag), start_time(std::chrono::high_resolution_clock::now()) {}
+	static std::vector<long> extraTimeTracked;
+	static std::vector<std::string> extraTagsTracked;
+	const static std::vector<long> noExtraTime;
+	static bool bIsExtraTimeTrackedInitialized;
+	explicit ScopedTimer(const std::string& tag, long* outResultStorage = nullptr, std::string* outTagStorage = nullptr)
+		: tag(tag), resultStorage(outResultStorage), tagStorage(outTagStorage), start_time(std::chrono::high_resolution_clock::now()) {}
 
 	// Disable copy constructor and assignment operator
 	ScopedTimer(const ScopedTimer&) = delete;
@@ -50,7 +56,16 @@ public:
 		auto end_time = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time);
 		auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration);
-		std::cout << '\n' << tag << microseconds.count() << " us" << '\n';
+
+		if (resultStorage) {
+			*resultStorage = microseconds.count();
+		}
+
+		// std::cout << '\n' << tag << microseconds.count() << " us" << '\n';
+
+		if (tagStorage) {
+			*tagStorage = std::move(tag);
+		}
 	}
 };
 

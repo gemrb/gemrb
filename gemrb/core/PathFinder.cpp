@@ -35,6 +35,7 @@
 // which is solved with a P regulator, see Scriptable.cpp
 
 #include "PathFinder.h"
+#include "fmt/format.h"
 
 #include "Debug.h"
 #include "FibonacciHeap.h"
@@ -54,6 +55,12 @@
 
 #include <array>
 #include <limits>
+
+
+bool ScopedTimer::bIsExtraTimeTrackedInitialized = false;
+std::vector<long> ScopedTimer::extraTimeTracked;
+std::vector<std::string> ScopedTimer::extraTagsTracked;
+const std::vector<long> ScopedTimer::noExtraTime;
 
 namespace GemRB {
 
@@ -447,6 +454,11 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 
 Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
 {
+	if (!ScopedTimer::bIsExtraTimeTrackedInitialized) {
+		ScopedTimer::extraTimeTracked.reserve(100000);
+		ScopedTimer::extraTagsTracked.reserve(100000);
+		ScopedTimer::bIsExtraTimeTrackedInitialized = true;
+	}
 	using namespace std::chrono_literals;
 	constexpr char units[] = "us";
 	auto Bench = ankerl::nanobench::Bench()
@@ -456,19 +468,23 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 			     .performanceCounters(true);
 	Path ResultOriginal;
 	Path ResultOriginalImproved;
-#if PATH_RUN_BENCH
-	Log(DEBUG, "Map", "--- FindPath ---");
+	long originalMicroseconds;
+	long improvedMicroseconds;
 	constexpr const char* ImprovedBenchmarkName[] = { "FindPathOriginalImproved", "FindPathOriginalImproved*" };
 	const size_t ImprovedBenchmarkNameIdx = !traversabilityCache.HasUpdatedTraversabilityThisFrame(); // 0 for updated, 1 for not updated
 	if (!traversabilityCache.HasUpdatedTraversabilityThisFrame()) {
 		Log(DEBUG, "Map", "(improved implementation will recalculate cache)");
 	}
+#if PATH_RUN_BENCH
+	Log(DEBUG, "Map", "--- FindPath ---");
+	constexpr const char* ImprovedBenchmarkName[] = { "FindPathOriginalImproved", "FindPathOriginalImproved*" };
+	const size_t ImprovedBenchmarkNameIdx = !traversabilityCache.HasUpdatedTraversabilityThisFrame(); // 0 for updated, 1 for not updated
 	FlushLogs();
 	Bench.relative(true).name("FindPathOriginal").run([&] {
 #endif
 #if PATH_RUN_ORIGINAL
 		{
-			ScopedTimer t("}} original ");
+			ScopedTimer t("}} original ", &originalMicroseconds);
 			ResultOriginal = FindPathOriginal(s, d, size, minDistance, flags, caller);
 		}
 #endif
@@ -478,14 +494,74 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 #endif
 #if PATH_RUN_IMPROVED
 		{
-			ScopedTimer t("}} improved ");
+			ScopedTimer t("}} improved ", &improvedMicroseconds);
 			ResultOriginalImproved = FindPath(s, d, size, minDistance, flags, caller);
 		}
 #endif
 #if PATH_RUN_BENCH
 	});
 	std::cout << "|---------:|--------------------:|--------------------:|--------:|----------:|:----------" << "\n| relative |               " << units << "/op |                op/s |    err% |     total | benchmark" << std::endl;
+#else
+		auto prepareBenchmarkTableRow = [](const std::string& benchmarkName, long measurementMicroseconds,  const std::vector<long>& extraTimeMeasurements, long baselineMeasurement, bool bIsExtraTimeAlreadyIncludedInMeasurement) {
+			constexpr double microsecondsFactor = 1'000'000.0;
+
+			// don't allow infinities or nans in the table
+			if (measurementMicroseconds == 0) {
+				measurementMicroseconds = 1;
+			}
+			if (baselineMeasurement == 0) {
+				baselineMeasurement = 1;
+			}
+
+			const long extraMicroseconds = std::accumulate(extraTimeMeasurements.cbegin(), extraTimeMeasurements.cend(), 0l);
+
+			const long improvementWithExtraTotal = measurementMicroseconds + (!bIsExtraTimeAlreadyIncludedInMeasurement ? extraMicroseconds : 0l);
+			const float improvementWithExtraOpsPerSecond = microsecondsFactor / (improvementWithExtraTotal);
+			const float improvementWithExtraPercent = (baselineMeasurement / float(improvementWithExtraTotal)) * 100;
+
+			std::string line = fmt::format("| {:>7.1f}% | {:>15}.00  | {:>19.2f} |    0.0% |      0.00 | `{}`", improvementWithExtraPercent, improvementWithExtraTotal, improvementWithExtraOpsPerSecond, benchmarkName);
+
+			if (!extraTimeMeasurements.empty()) {
+				long improvementWithoutExtraTotal = improvementWithExtraTotal - extraMicroseconds;
+				if (improvementWithoutExtraTotal == 0) {
+					improvementWithoutExtraTotal = 1;
+				}
+				const float improvementWithoutExtraOpsPerSecond = microsecondsFactor / improvementWithoutExtraTotal;
+				const float improvementWithoutExtraPercent = (baselineMeasurement / float(improvementWithoutExtraTotal)) * 100;
+
+
+				std::string extraTimeString = fmt::format(" Extra time: {}us, {}ops (", extraMicroseconds, extraTimeMeasurements.size());
+				for (size_t i = 0; i < extraTimeMeasurements.size(); ++i) {
+					extraTimeString += ScopedTimer::extraTagsTracked[i] + " " + std::to_string(extraTimeMeasurements[i]) + ", ";
+				}
+				extraTimeString += ")";
+				const std::string improvementWithoutExtraString = fmt::format(" =without extra: {:.1f}% rel, {}us/op, {:.2f}op/s= ", improvementWithoutExtraPercent, improvementWithoutExtraTotal, improvementWithoutExtraOpsPerSecond);
+
+				line += extraTimeString + improvementWithoutExtraString;
+			}
+			line += "\n";
+			return line;
+		};
+
+		const std::string lineOriginal = prepareBenchmarkTableRow("FindPathOriginal", originalMicroseconds, ScopedTimer::noExtraTime, originalMicroseconds, false);
+		const std::string lineImproved = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx], improvedMicroseconds, ScopedTimer::noExtraTime, originalMicroseconds, false);
+
+		const std::string line = "|---------:|--------------------:|--------------------:|--------:|----------:|:----------\n";
+		const std::string headings = "| relative |               us/op |                op/s |    err% |     total | benchmark\n";
+		std::string tableToPrint = headings + line + lineOriginal + lineImproved;
+
+		if (!ScopedTimer::extraTimeTracked.empty()) {
+			constexpr bool bIsExtraTimeAlreadyIncludedInImprovedMeasurement = true;
+			const std::string lineImprovedExtra = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx] + std::string("+"), improvedMicroseconds, ScopedTimer::extraTimeTracked, originalMicroseconds, bIsExtraTimeAlreadyIncludedInImprovedMeasurement);
+			tableToPrint += lineImprovedExtra;
+			ScopedTimer::extraTimeTracked.clear();
+			ScopedTimer::extraTagsTracked.clear();
+		}
+
+		tableToPrint += line + headings;
+		Log(DEBUG, "FindPath", "--RunFindPath--\n{}", tableToPrint);
 #endif
+
 #if PATH_RETURN_ORIGINAL
 	return ResultOriginal;
 #else
