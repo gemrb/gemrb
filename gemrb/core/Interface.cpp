@@ -1431,6 +1431,7 @@ static const EnumArray<GFFlags, StringView> game_flags {
 	"IWDRestSpawns", // GFFlags::IWD_REST_SPAWNS
 	"HasContinuation", // GFFlags::HAS_CONTINUATION
 	"SellableCritsNoConv", // GFFlags::SELLABLE_CRITS_NO_CONV
+	"BetterOfHearing", // GFFlags::BETTER_OF_HEARING
 };
 
 /** Loads gemrb.ini */

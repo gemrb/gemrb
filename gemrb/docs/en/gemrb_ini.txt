@@ -180,6 +180,11 @@ AutoSearchHidden = <bool>
 Toggles whether character automatically search for hidden doors.
 
 
+BetterOfHearing
+- - - - - - - - - - - -
+Toggles whether hearing range is larger than the visual one.
+
+
 BiographyIsRes = <bool>
 - - - - - - - - - - - -
 Toggles whether to expect the biography extension as "res" or "bio".
