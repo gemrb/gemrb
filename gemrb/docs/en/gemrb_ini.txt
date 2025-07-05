@@ -544,6 +544,12 @@ Determines whether the magic resistance applies to all effects, even the
 beneficial ones.
 
 
+SellableCritsNoConv = <bool>
+- - - - - - - - - - - -
+Determines whether critical items are sellable or not (some games use it for
+a conversable bit instead).
+
+
 SimplifiedDisruption = <bool>
 - - - - - - - - - - - - - - -
 Use the ToBEx simplified "concentration" checks, ie. damage only disrupts
