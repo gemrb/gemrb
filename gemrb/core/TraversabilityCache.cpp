@@ -65,6 +65,11 @@ void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, st
 {
 	const auto CellState = GetCellStateFromFlags(i);
 	const std::vector<uint8_t>& BlockingShape = actor[i]->GetBlockingShape();
+
+	if (BlockingShape.empty()) {
+		return;
+	}
+
 	const auto BlockingShapeRegionW = actor[i]->GetBlockingShapeRegionW();
 
 	for (int x = 0; x < region[i].size.w; ++x) {
@@ -88,6 +93,11 @@ void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, st
 
 void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, int inWidth, bool inShouldUpdateSelf)
 {
+	const std::vector<uint8_t>& BlockingShape = actor[i]->GetBlockingShape();
+	if (BlockingShape.empty()) {
+		return;
+	}
+
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
 
 	// auto newCellState = GetCellStateFromFlags(newActorStateIdx);
@@ -103,10 +113,8 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 	// 	}
 	// }
 
-
 	const auto CellState = GetCellStateFromFlags(newActorStateIdx);
-	const std::vector<uint8_t>& BlockingShape = actor[newActorStateIdx]->GetBlockingShape();
-	const auto BlockingShapeRegionW = actor[newActorStateIdx]->GetBlockingShapeRegionW();
+	const auto BlockingShapeRegionW = actor[i]->GetBlockingShapeRegionW();
 
 	for (int x = 0; x < region[newActorStateIdx].size.w; ++x) {
 		for (int y = 0; y < region[newActorStateIdx].size.h; ++y) {
@@ -122,7 +130,7 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 			CurrentTraversabilityData.state += CellStateOfThisActor;
 
 			if (CellStateOfThisActor > TraversabilityCellValueEmpty) {
-				CurrentTraversabilityData.occupyingActor = actor[newActorStateIdx];
+				CurrentTraversabilityData.occupyingActor = actor[i];
 			}
 		}
 	}
