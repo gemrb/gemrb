@@ -63,12 +63,12 @@ FitRegion TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* i
 
 void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, const int inWidth) const
 {
-	const auto CellState = GetCellStateFromFlags(i);
 	const std::vector<uint8_t>& BlockingShape = actor[i]->GetBlockingShape();
-
 	if (BlockingShape.empty()) {
 		return;
 	}
+
+	const auto CellState = GetCellStateFromFlags(i);
 
 	const auto BlockingShapeRegionW = actor[i]->GetBlockingShapeRegionW();
 
@@ -100,19 +100,6 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
 
-	// auto newCellState = GetCellStateFromFlags(newActorStateIdx);
-	// const TraversabilityCellData newCellData { actor[i], newCellState };
-	//
-	// for (int x = std::max(0, region[newActorStateIdx].origin.x); x < region[newActorStateIdx].origin.x + region[newActorStateIdx].size.w; ++x) {
-	// 	for (int y = std::max(0, region[newActorStateIdx].origin.y); y < region[newActorStateIdx].origin.y + region[newActorStateIdx].size.h; ++y) {
-	// 		if (!actor[i]->IsOver(Point { x, y })) {
-	// 			continue;
-	// 		}
-	// 		const auto Idx = y * inWidth * 16 + x;
-	// 		inOutTraversabilityData[Idx] = newCellData;
-	// 	}
-	// }
-
 	const auto CellState = GetCellStateFromFlags(newActorStateIdx);
 	const auto BlockingShapeRegionW = actor[i]->GetBlockingShapeRegionW();
 
@@ -134,7 +121,6 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 			}
 		}
 	}
-
 
 	if (inShouldUpdateSelf) {
 		flags[i] = flags[newActorStateIdx];

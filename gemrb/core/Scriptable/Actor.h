@@ -455,24 +455,26 @@ public:
 		return false;
 	}
 
-	struct BlockingSize {
+	struct BlockingSizeCategory {
 		int size;
 		float sizeFactor;
-		bool operator==(const BlockingSize& other) const {
+		bool operator==(const BlockingSizeCategory& other) const {
 			return size == other.size && sizeFactor == other.sizeFactor;
 		}
 	};
-	struct BlockingSizeHash {
-		std::size_t operator()(const BlockingSize& s) const {
+	struct BlockingSizeCategoryHash {
+		std::size_t operator()(const BlockingSizeCategory& s) const {
 			std::size_t h1 = std::hash<int>{}(s.size);
 			std::size_t h2 = std::hash<float>{}(s.sizeFactor);
 			return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
 		}
 	};
-    static std::unordered_map<BlockingSize, std::vector<uint8_t>, BlockingSizeHash> SizeToBlockingShapeMap;
-    const std::vector<uint8_t>& GetBlockingShape();
-	const uint16_t GetBlockingShapeRegionW() const;
-	const uint16_t GetBlockingShapeRegionH() const;
+    static std::unordered_map<BlockingSizeCategory, std::vector<uint8_t>, BlockingSizeCategoryHash> SizeCategoryToBlockingShape;
+    const std::vector<uint8_t>& GetBlockingShape() const;
+
+	uint16_t GetBlockingShapeRegionW() const;
+
+	uint16_t GetBlockingShapeRegionH() const;
 
 	using stat_t = ieDword;
 	using stats_t = std::array<stat_t, MAX_STATS>;

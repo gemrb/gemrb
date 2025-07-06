@@ -11711,51 +11711,40 @@ bool Actor::TouchAttack(const Projectile* pro) const
 	return !fail;
 }
 
-std::unordered_map<Actor::BlockingSize, std::vector<uint8_t>, Actor::BlockingSizeHash> Actor::SizeToBlockingShapeMap;
+std::unordered_map<Actor::BlockingSizeCategory, std::vector<uint8_t>, Actor::BlockingSizeCategoryHash> Actor::SizeCategoryToBlockingShape;
 
-const std::vector<uint8_t>& Actor::GetBlockingShape() {
-    auto foundShape = SizeToBlockingShapeMap.find({circleSize, sizeFactor});
-    if (foundShape == SizeToBlockingShapeMap.end())
+const std::vector<uint8_t>& Actor::GetBlockingShape() const {
+    auto foundShape = SizeCategoryToBlockingShape.find({circleSize, sizeFactor});
+    if (foundShape == SizeCategoryToBlockingShape.end())
     {
-        // calculate region
-        const GemRB::Size BlockingShapeSize(GetBlockingShapeRegionW(), GetBlockingShapeRegionH());
+        std::vector<uint8_t> blockingShape;
+        if (sizeFactor != 0) {
+			const Size blockingShapeRegionSize(GetBlockingShapeRegionW(), GetBlockingShapeRegionH());
+	        constexpr uint8_t MaskNoBlocking = 0;
+	        blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, MaskNoBlocking);
 
-
-
-    	constexpr uint8_t MaskNoBlocking = 0;
-        std::vector<uint8_t> BlockingShape;
-
-    	if (sizeFactor != 0) {
-    		BlockingShape.resize(BlockingShapeSize.w * BlockingShapeSize.h * 16, MaskNoBlocking);
-
-    		FitRegion CurrentBlockingRegion = { this->Pos - BlockingShapeSize.Center(), BlockingShapeSize };
-    		// std::string S;
-    		for (int x = 0; x < BlockingShapeSize.w; ++x) {
-    			for (int y = 0; y < BlockingShapeSize.h; ++y) {
-
-    				const uint8_t ShapeMask = this->IsOver({x + CurrentBlockingRegion.origin.x, y + CurrentBlockingRegion.origin.y} );
-    				// 	S += std::to_string((int)ShapeMask);
-    				const auto Idx = y * BlockingShapeSize.w * 16 + x;
-    				// if (Idx > BlockingShape.size()) {
-    				// 	S += "AAAAAAA";
-    				// }
-    				BlockingShape[Idx] = ShapeMask;
+    		const FitRegion CurrentBlockingRegion = { Pos - blockingShapeRegionSize.Center(), blockingShapeRegionSize };
+    		for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
+    			for (int y = 0; y < blockingShapeRegionSize.h; ++y) {
+    				const uint8_t ShapeMask = IsOver({x + CurrentBlockingRegion.origin.x, y + CurrentBlockingRegion.origin.y} );
+    				const auto Idx = y * blockingShapeRegionSize.w * 16 + x;
+    				blockingShape[Idx] = ShapeMask;
     			}
-    			// S += "\n";
     		}
     	}
-    	const auto emplaceRetVal = SizeToBlockingShapeMap.emplace(std::move(BlockingSize{circleSize, sizeFactor}), std::move(BlockingShape));
-    	foundShape = emplaceRetVal.first;
+    	const auto emplacedIteratorAndStatusPair = SizeCategoryToBlockingShape.emplace(BlockingSizeCategory{circleSize, sizeFactor}, std::move(blockingShape));
+    	foundShape = emplacedIteratorAndStatusPair.first;
     }
 	return foundShape->second;
 }
 
-const uint16_t Actor::GetBlockingShapeRegionW() const {
-	const auto baseSize = this->CircleSize2Radius() * this->sizeFactor;
+uint16_t Actor::GetBlockingShapeRegionW() const {
+	const auto baseSize = sizeFactor * CircleSize2Radius();
 	return baseSize * 8;
 }
-const uint16_t Actor::GetBlockingShapeRegionH() const {
-	const auto baseSize = this->CircleSize2Radius() * this->sizeFactor;
+
+uint16_t Actor::GetBlockingShapeRegionH() const {
+	const auto baseSize = sizeFactor * CircleSize2Radius();
 	return baseSize * 6;
 }
 }
