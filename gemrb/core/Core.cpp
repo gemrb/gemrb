@@ -196,16 +196,21 @@ float_t Feet2Pixels(int feet, float_t angle)
 	return r * feet;
 }
 
-/* Audible range was confirmed to be 3x visual range in EEs, accounting for isometric scaling
- and more than 1x visual range in others;
- in EE, the '48' (3*16) default can be set by the 'Audible Range' option in baldur.lua
- It can also be seen in iwd2 RE.
-
- This is a bit tricky, it has been show to not be very consistent. The game used a double value of visual
- range in several places, so we will use '3 * visual_range / 2' */
+// Audible range differed between games:
+// - bg1: fixed 28 foot radius
+// - bg2, iwds: 1.5 * visual range (by default 42 feet)
+// - ee: same, but configurable factor "Audible Range" in baldur.lua (48 / 32 == 1.5)
+// - pst/ee: visual range (by default 30 feet).
 bool WithinAudibleRange(const Actor* actor, const Point& dest)
 {
-	int distance = (3 * actor->GetVisualRange()) / 2;
+	int distance;
+	if (core->HasFeature(GFFlags::BETTER_OF_HEARING)) {
+		distance = (3 * actor->GetVisualRange()) / 2;
+	} else if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
+		distance = actor->GetVisualRange();
+	} else {
+		distance = 28;
+	}
 	return WithinRange(actor, dest, distance);
 }
 

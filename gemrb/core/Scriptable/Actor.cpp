@@ -6202,11 +6202,12 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable* checker) const
 		}
 	}
 	if (ga_flags & GA_ONLY_BUMPABLE) {
-		if (core->GetGame()->CombatCounter) return false;
-		if (GetStat(IE_EA) >= EA_EVILCUTOFF) return false;
+		// NOTE: if you add new conditions, make sure TraversabilityCache gets updated accordingly
+		if (core->GetGame()->CombatCounter) return false; // handled when TraversabilityCache is used (e.g. FindPath)
+		if (GetStat(IE_EA) >= EA_EVILCUTOFF) return false; // handled in pcf_ea
 		// Skip sitting patrons
-		if (GetStat(IE_ANIMATION_ID) >= 0x4000 && GetStat(IE_ANIMATION_ID) <= 0x4112) return false;
-		if (IsMoving()) return false;
+		if (GetStat(IE_ANIMATION_ID) >= 0x4000 && GetStat(IE_ANIMATION_ID) <= 0x4112) return false; // ignored
+		if (IsInMovingStance()) return false; // handled in Movable::SetStanceDirect
 	}
 	if (ga_flags & GA_CAN_BUMP) {
 		if (core->GetGame()->CombatCounter) return false;
@@ -8708,7 +8709,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 bool Actor::HandleActorStance()
 {
 	CharAnimations* ca = GetAnims();
-	int StanceID = GetStance();
+	int stanceID = GetStance();
 
 	if (ca->autoSwitchOnEnd) {
 		SetStance(ca->nextStanceID);
@@ -8716,18 +8717,18 @@ bool Actor::HandleActorStance()
 		return true;
 	}
 	int x = RAND(0, 24);
-	if ((StanceID == IE_ANI_AWAKE) && !x) {
+	if ((stanceID == IE_ANI_AWAKE) && !x) {
 		SetStance(IE_ANI_HEAD_TURN);
 		return true;
 	}
 	// added CurrentAction as part of blocking action fixes
-	if ((StanceID == IE_ANI_READY) && !CurrentAction && !GetNextAction()) {
+	if ((stanceID == IE_ANI_READY) && !CurrentAction && !GetNextAction()) {
 		SetStance(IE_ANI_AWAKE);
 		return true;
 	}
-	if (StanceID == IE_ANI_ATTACK || StanceID == IE_ANI_ATTACK_JAB ||
-	    StanceID == IE_ANI_ATTACK_SLASH || StanceID == IE_ANI_ATTACK_BACKSLASH ||
-	    StanceID == IE_ANI_SHOOT) {
+	if (stanceID == IE_ANI_ATTACK || stanceID == IE_ANI_ATTACK_JAB ||
+	    stanceID == IE_ANI_ATTACK_SLASH || stanceID == IE_ANI_ATTACK_BACKSLASH ||
+	    stanceID == IE_ANI_SHOOT) {
 		SetStance(AttackStance);
 		return true;
 	}

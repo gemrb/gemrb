@@ -180,6 +180,11 @@ AutoSearchHidden = <bool>
 Toggles whether character automatically search for hidden doors.
 
 
+BetterOfHearing
+- - - - - - - - - - - -
+Toggles whether hearing range is larger than the visual one.
+
+
 BiographyIsRes = <bool>
 - - - - - - - - - - - -
 Toggles whether to expect the biography extension as "res" or "bio".
@@ -542,6 +547,12 @@ SelectiveMagicRes = <bool>
 - - - - - - - - - - - -
 Determines whether the magic resistance applies to all effects, even the
 beneficial ones.
+
+
+SellableCritsNoConv = <bool>
+- - - - - - - - - - - -
+Determines whether critical items are sellable or not (some games use it for
+a conversable bit instead).
 
 
 SimplifiedDisruption = <bool>
