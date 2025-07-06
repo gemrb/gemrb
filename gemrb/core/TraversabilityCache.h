@@ -98,23 +98,20 @@ struct FitRegion {
  */
 class TraversabilityCache {
 public:
+    using TraversabilityCellState = uint16_t;
 	/**
 	 * Enum describing traversability state of a single navmap point in terms of occupying them actors.
 	 */
-	enum class TraversabilityCellState : std::uint8_t {
-		EMPTY = 0, // cell is empty, meaning no actor is standing there, so is traversable; default value
-		ACTOR, // there is an actor occupying this cell, but the actor is bumpable
-		ACTOR_NON_TRAVERSABLE, // there is an actor occupying this cell, and the actor is not bumpable
-
-		MAX
-	};
+	static constexpr TraversabilityCellState TraversabilityCellValueEmpty = 0;
+	static constexpr TraversabilityCellState TraversabilityCellValueActor = 1;
+	static constexpr TraversabilityCellState TraversabilityCellValueActorNonTraversable = 100;
 
 	/**
 	 * Struct holding data describing traversability of a navmap point: its state and potential actor data.
 	 */
 	struct TraversabilityCellData {
 		Actor* occupyingActor = nullptr;
-		TraversabilityCellState state = TraversabilityCellState::EMPTY;
+        TraversabilityCellState state = TraversabilityCellValueEmpty;
 	};
 
 	explicit TraversabilityCache(class Map* inMap)
@@ -213,6 +210,7 @@ private:
 		{
 			return flags[i] & (1 << FLAG_ALIVE);
 		}
+		TraversabilityCellState GetCellStateFromFlags(const size_t i) const;
 	};
 
 	Map* map;

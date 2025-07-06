@@ -455,6 +455,25 @@ public:
 		return false;
 	}
 
+	struct BlockingSize {
+		int size;
+		float sizeFactor;
+		bool operator==(const BlockingSize& other) const {
+			return size == other.size && sizeFactor == other.sizeFactor;
+		}
+	};
+	struct BlockingSizeHash {
+		std::size_t operator()(const BlockingSize& s) const {
+			std::size_t h1 = std::hash<int>{}(s.size);
+			std::size_t h2 = std::hash<float>{}(s.sizeFactor);
+			return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+		}
+	};
+    static std::unordered_map<BlockingSize, std::vector<uint8_t>, BlockingSizeHash> SizeToBlockingShapeMap;
+    const std::vector<uint8_t>& GetBlockingShape();
+	const uint16_t GetBlockingShapeRegionW() const;
+	const uint16_t GetBlockingShapeRegionH() const;
+
 	using stat_t = ieDword;
 	using stats_t = std::array<stat_t, MAX_STATS>;
 	//CRE DATA FIELDS

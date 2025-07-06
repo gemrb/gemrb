@@ -63,13 +63,25 @@ FitRegion TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* i
 
 void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, const int inWidth) const
 {
-	for (int x = region[i].origin.x; x < region[i].origin.x + region[i].size.w; ++x) {
-		for (int y = region[i].origin.y; y < region[i].origin.y + region[i].size.h; ++y) {
-			if (!actor[i]->IsOver(Point(x, y), pos[i])) {
-				continue;
+	const auto CellState = GetCellStateFromFlags(i);
+	const std::vector<uint8_t>& BlockingShape = actor[i]->GetBlockingShape();
+	const auto BlockingShapeRegionW = actor[i]->GetBlockingShapeRegionW();
+
+	for (int x = 0; x < region[i].size.w; ++x) {
+		for (int y = 0; y < region[i].size.h; ++y) {
+
+			const int targetX = region[i].origin.x + x;
+			const int targetY = region[i].origin.y + y;
+
+			const auto Idx = targetY * inWidth * 16 + targetX;
+			TraversabilityCellData& CurrentTraversabilityData = inOutTraversabilityData[Idx];
+
+			const auto BlockingShapeIdx = y * BlockingShapeRegionW * 16 + x;
+			CurrentTraversabilityData.state -= (BlockingShape[BlockingShapeIdx] * CellState);
+
+			if (CurrentTraversabilityData.occupyingActor == actor[i]) {
+				CurrentTraversabilityData.occupyingActor = nullptr;
 			}
-			const auto Idx = y * inWidth * 16 + x;
-			inOutTraversabilityData[Idx] = TraversabilityCellData {};
 		}
 	}
 }
@@ -78,23 +90,44 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 {
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
 
-	TraversabilityCellState newCellState { TraversabilityCellState::ACTOR_NON_TRAVERSABLE };
-	if (!GetIsAlive(newActorStateIdx)) {
-		newCellState = TraversabilityCellState::EMPTY;
-	} else if (GetIsBumpable(newActorStateIdx)) {
-		newCellState = TraversabilityCellState::ACTOR;
-	}
-	const TraversabilityCellData newCellData { actor[i], newCellState };
+	// auto newCellState = GetCellStateFromFlags(newActorStateIdx);
+	// const TraversabilityCellData newCellData { actor[i], newCellState };
+	//
+	// for (int x = std::max(0, region[newActorStateIdx].origin.x); x < region[newActorStateIdx].origin.x + region[newActorStateIdx].size.w; ++x) {
+	// 	for (int y = std::max(0, region[newActorStateIdx].origin.y); y < region[newActorStateIdx].origin.y + region[newActorStateIdx].size.h; ++y) {
+	// 		if (!actor[i]->IsOver(Point { x, y })) {
+	// 			continue;
+	// 		}
+	// 		const auto Idx = y * inWidth * 16 + x;
+	// 		inOutTraversabilityData[Idx] = newCellData;
+	// 	}
+	// }
 
-	for (int x = std::max(0, region[newActorStateIdx].origin.x); x < region[newActorStateIdx].origin.x + region[newActorStateIdx].size.w; ++x) {
-		for (int y = std::max(0, region[newActorStateIdx].origin.y); y < region[newActorStateIdx].origin.y + region[newActorStateIdx].size.h; ++y) {
-			if (!actor[i]->IsOver(Point { x, y })) {
-				continue;
+
+	const auto CellState = GetCellStateFromFlags(newActorStateIdx);
+	const std::vector<uint8_t>& BlockingShape = actor[newActorStateIdx]->GetBlockingShape();
+	const auto BlockingShapeRegionW = actor[newActorStateIdx]->GetBlockingShapeRegionW();
+
+	for (int x = 0; x < region[newActorStateIdx].size.w; ++x) {
+		for (int y = 0; y < region[newActorStateIdx].size.h; ++y) {
+
+			const int targetX = region[newActorStateIdx].origin.x + x;
+			const int targetY = region[newActorStateIdx].origin.y + y;
+
+			const auto Idx = targetY * inWidth * 16 + targetX;
+			TraversabilityCellData& CurrentTraversabilityData = inOutTraversabilityData[Idx];
+
+			const auto BlockingShapeIdx = y * BlockingShapeRegionW * 16 + x;
+			const uint16_t CellStateOfThisActor = BlockingShape[BlockingShapeIdx] * CellState;
+			CurrentTraversabilityData.state += CellStateOfThisActor;
+
+			if (CellStateOfThisActor > TraversabilityCellValueEmpty) {
+				CurrentTraversabilityData.occupyingActor = actor[newActorStateIdx];
 			}
-			const auto Idx = y * inWidth * 16 + x;
-			inOutTraversabilityData[Idx] = newCellData;
 		}
 	}
+
+
 	if (inShouldUpdateSelf) {
 		flags[i] = flags[newActorStateIdx];
 		pos[i] = pos[newActorStateIdx];
@@ -197,15 +230,15 @@ void TraversabilityCache::Update()
 			// clear old position of this actor
 			cachedActorsState.ClearOldPosition(updatedCachedIdx, traversabilityData, map->PropsSize().w);
 
-			// check whether any other actor didn't share the same position - if so, re-draw their position on the cache
-			for (size_t cachedActorIdx = 0; cachedActorIdx < cachedActorsState.actor.size(); ++cachedActorIdx) {
-				if (cachedActorsState.actor[cachedActorIdx] == cachedActorsState.actor[updatedCachedIdx]) {
-					continue;
-				}
-				if (cachedActorsState.region[cachedActorIdx].IntersectsRegion(cachedActorsState.region[updatedCachedIdx])) {
-					cachedActorsState.MarkNewPosition(cachedActorIdx, traversabilityData, map->PropsSize().w, false);
-				}
-			}
+			// // check whether any other actor didn't share the same position - if so, re-draw their position on the cache
+			// for (size_t cachedActorIdx = 0; cachedActorIdx < cachedActorsState.actor.size(); ++cachedActorIdx) {
+			// 	if (cachedActorsState.actor[cachedActorIdx] == cachedActorsState.actor[updatedCachedIdx]) {
+			// 		continue;
+			// 	}
+			// 	if (cachedActorsState.region[cachedActorIdx].IntersectsRegion(cachedActorsState.region[updatedCachedIdx])) {
+			// 		cachedActorsState.MarkNewPosition(cachedActorIdx, traversabilityData, map->PropsSize().w, false);
+			// 	}
+			// }
 			// mark new position of this actor
 			cachedActorsState.MarkNewPosition(updatedCachedIdx, traversabilityData, map->PropsSize().w, true);
 			continue;
@@ -286,12 +319,22 @@ void TraversabilityCache::CachedActorsState::emplace_back(CachedActorsState&& an
 	flags.insert(flags.end(), another.flags.begin(), another.flags.end());
 }
 
+TraversabilityCache::TraversabilityCellState TraversabilityCache::CachedActorsState::GetCellStateFromFlags(const size_t i) const {
+	TraversabilityCellState newCellState { TraversabilityCellValueActorNonTraversable };
+	if (!GetIsAlive(i)) {
+		newCellState = TraversabilityCellValueEmpty;
+	} else if (GetIsBumpable(i)) {
+		newCellState = TraversabilityCellValueActor;
+	}
+	return newCellState;
+}
+
 void TraversabilityCache::ValidateTraversabilityCacheSize()
 {
 	const size_t expectedSize = map->PropsSize().h * 12 * map->PropsSize().w * 16;
 	if (traversabilityData.size() != expectedSize) {
 		Log(DEBUG, "TraversabilityCache", "Resizing traversabilityData cache.");
-		traversabilityData.resize(expectedSize, TraversabilityCellData { nullptr, TraversabilityCellState::EMPTY });
+		traversabilityData.resize(expectedSize, TraversabilityCellData { nullptr, TraversabilityCellValueEmpty });
 		memset(static_cast<void*>(traversabilityData.data()), 0, sizeof(TraversabilityCellData) * traversabilityData.size());
 	}
 }

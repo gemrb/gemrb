@@ -248,7 +248,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		    fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" },
 		    minDistance, size);
 	const bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
-	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellState::ACTOR : TraversabilityCache::TraversabilityCellState::ACTOR_NON_TRAVERSABLE;
+	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellValueActor: TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	SearchmapPoint smptDest0 { d };

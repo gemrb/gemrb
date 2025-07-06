@@ -1788,7 +1788,7 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 
 	// draw Traversability cache
 	{
-		Color TraversabilityColors[(int)TraversabilityCache::TraversabilityCellState::MAX] {
+		Color TraversabilityColors[] {
 			Color{255, 255, 255, 30}, // none
 			Color{0, 255, 0, 180}, // actor but passable
 			Color{255, 0, 0, 180}, // blocked
@@ -1806,7 +1806,14 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 				const size_t Idx = y * PropsSize().w * 16 + x;
 				const Point p{x, y};
 				if (Idx < traversabilityCache.Size()) {
-					VideoDriver->DrawPoint(p - vp.origin, TraversabilityColors[(int)traversabilityCache.GetCellData(Idx).state], BLENDED);
+					size_t colorIdx = 0;
+					if (traversabilityCache.GetCellData(Idx).state >= TraversabilityCache::TraversabilityCellValueActor) {
+						colorIdx = 1;
+					}
+					if (traversabilityCache.GetCellData(Idx).state >= TraversabilityCache::TraversabilityCellValueActorNonTraversable) {
+						colorIdx = 2;
+					}
+					VideoDriver->DrawPoint(p - vp.origin, TraversabilityColors[colorIdx], BLENDED);
 				}
 				else {
 					VideoDriver->DrawPoint(p - vp.origin, Color{200, 0, 200, 0}, BLENDED);
