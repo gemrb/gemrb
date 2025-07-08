@@ -30,13 +30,17 @@ void Selectable::SetBBox(const Region& newBBox)
 }
 
 // NOTE: still need to multiply by 4 or 3 to get full pixel radii
-int Selectable::CircleSize2Radius() const
+int Selectable::CircleSize2Radius(int circleSize)
 {
 	// for size >= 2, radii are (size-1)*16, (size-1)*12
 	// for size == 1, radii are 12, 9
 	int adjustedSize = (circleSize - 1) * 4;
 	if (adjustedSize < 4) adjustedSize = 3;
 	return adjustedSize;
+}
+
+int Selectable::CircleSize2Radius() const {
+	return CircleSize2Radius(this->circleSize);
 }
 
 void Selectable::DrawCircle(const Point& p) const
@@ -62,7 +66,7 @@ void Selectable::DrawCircle(const Point& p) const
 	if (sprite) {
 		VideoDriver->BlitSprite(sprite, Pos - p);
 	} else {
-		auto baseSize = CircleSize2Radius() * sizeFactor;
+		auto baseSize = CircleSize2Radius(circleSize) * sizeFactor;
 		const Size s(baseSize * 8, baseSize * 6);
 		const Region r(Pos - p - s.Center(), s);
 		VideoDriver->DrawEllipse(r, *col);
@@ -119,5 +123,4 @@ void Selectable::SetCircle(int circlesize, float_t factor, const Color& color, H
 	circleBitmap[0] = std::move(normal_circle);
 	circleBitmap[1] = std::move(selected_circle);
 }
-
 }

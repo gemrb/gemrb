@@ -50,6 +50,7 @@ public:
 	void Select(int Value);
 	void SetCircle(int size, float_t, const Color& color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle);
 	int CircleSize2Radius() const;
+	static int CircleSize2Radius(int circleSize);
 };
 
 }
