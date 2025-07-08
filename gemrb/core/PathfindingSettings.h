@@ -32,6 +32,7 @@ public:
 	static std::vector<long> extraTimeTracked;
 	static std::vector<std::string> extraTagsTracked;
 	const static std::vector<long> noExtraTime;
+	const static std::vector<std::string> noTags;
 	static bool bIsExtraTimeTrackedInitialized;
 	explicit ScopedTimer(const std::string& tag, long* outResultStorage = nullptr, std::string* outTagStorage = nullptr)
 		: tag(tag), resultStorage(outResultStorage), tagStorage(outTagStorage), start_time(std::chrono::high_resolution_clock::now()) {}
