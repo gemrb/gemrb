@@ -11721,8 +11721,8 @@ const std::vector<uint8_t>& Actor::GetBlockingShape(const Actor* actor, const Bl
         std::vector<uint8_t> blockingShape;
         if (category.sizeFactor != 0) {
 			const Size blockingShapeRegionSize(GetBlockingShapeRegionW(category), GetBlockingShapeRegionH(category));
-	        constexpr uint8_t MaskNoBlocking = 0;
-	        blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, MaskNoBlocking);
+	        constexpr uint8_t NotBlockingValue = 0;
+	        blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, NotBlockingValue);
 
     		const FitRegion CurrentBlockingRegion = { actor->Pos - blockingShapeRegionSize.Center(), blockingShapeRegionSize };
     		for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
@@ -11733,8 +11733,8 @@ const std::vector<uint8_t>& Actor::GetBlockingShape(const Actor* actor, const Bl
     			}
     		}
     	}
-    	const auto emplacedIteratorAndStatusPair = SizeCategoryToBlockingShape.emplace(category, std::move(blockingShape));
-    	foundShape = emplacedIteratorAndStatusPair.first;
+    	const auto& [emplacedShape, _] = SizeCategoryToBlockingShape.emplace(category, std::move(blockingShape));
+    	foundShape = emplacedShape;
     }
 	return foundShape->second;
 }

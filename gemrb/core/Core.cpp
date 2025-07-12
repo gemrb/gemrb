@@ -63,7 +63,7 @@ unsigned int PersonalDistance(const Point& p, const Scriptable* b)
 	long y = p.y - b->Pos.y;
 	auto ret = std::hypot(x, y);
 	if (b->Type == ST_ACTOR) {
-		ret -= Selectable::CircleSize2Radius(static_cast<const Actor*>(b)->circleSize) * DistanceFactor;
+		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * DistanceFactor;
 	}
 	if (ret < 0) return (unsigned int) 0;
 	return (unsigned int) ret;
@@ -76,7 +76,7 @@ unsigned int SquaredPersonalDistance(const Point& p, const Scriptable* b)
 	long y = p.y - b->Pos.y;
 	int ret = static_cast<int>(x * x + y * y);
 	if (b->Type == ST_ACTOR) {
-		ret -= Selectable::CircleSize2Radius(static_cast<const Actor*>(b)->circleSize) * SquaredDistanceFactor;
+		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * SquaredDistanceFactor;
 	}
 	if (ret < 0) return (unsigned int) 0;
 	return (unsigned int) ret;
@@ -103,10 +103,10 @@ unsigned int PersonalDistance(const Scriptable* a, const Scriptable* b)
 	long y = a->Pos.y - b->Pos.y;
 	auto ret = std::hypot(x, y);
 	if (a->Type == ST_ACTOR) {
-		ret -= Selectable::CircleSize2Radius(static_cast<const Actor*>(a)->circleSize) * DistanceFactor;
+		ret -= static_cast<const Actor*>(a)->CircleSize2Radius() * DistanceFactor;
 	}
 	if (b->Type == ST_ACTOR) {
-		ret -= Selectable::CircleSize2Radius(static_cast<const Actor*>(b)->circleSize) * DistanceFactor;
+		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * DistanceFactor;
 	}
 	if (ret < 0) return (unsigned int) 0;
 	return (unsigned int) ret;
@@ -118,10 +118,10 @@ unsigned int SquaredPersonalDistance(const Scriptable* a, const Scriptable* b)
 	long y = a->Pos.y - b->Pos.y;
 	int ret = static_cast<int>(x * x + y * y);
 	if (a->Type == ST_ACTOR) {
-		ret -= Selectable::CircleSize2Radius(static_cast<const Actor*>(a)->circleSize) * SquaredDistanceFactor;
+		ret -= static_cast<const Actor*>(a)->CircleSize2Radius() * SquaredDistanceFactor;
 	}
 	if (b->Type == ST_ACTOR) {
-		ret -= Selectable::CircleSize2Radius(static_cast<const Actor*>(b)->circleSize) * SquaredDistanceFactor;
+		ret -= static_cast<const Actor*>(b)->CircleSize2Radius() * SquaredDistanceFactor;
 	}
 	if (ret < 0) return (unsigned int) 0;
 	return (unsigned int) ret;

@@ -66,7 +66,7 @@ void Selectable::DrawCircle(const Point& p) const
 	if (sprite) {
 		VideoDriver->BlitSprite(sprite, Pos - p);
 	} else {
-		auto baseSize = CircleSize2Radius(circleSize) * sizeFactor;
+		auto baseSize = CircleSize2Radius() * sizeFactor;
 		const Size s(baseSize * 8, baseSize * 6);
 		const Region r(Pos - p - s.Center(), s);
 		VideoDriver->DrawEllipse(r, *col);
@@ -123,4 +123,5 @@ void Selectable::SetCircle(int circlesize, float_t factor, const Color& color, H
 	circleBitmap[0] = std::move(normal_circle);
 	circleBitmap[1] = std::move(selected_circle);
 }
+
 }
