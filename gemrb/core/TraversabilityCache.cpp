@@ -72,8 +72,8 @@ void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, st
 	const auto CachedCellState = GetCellStateFromFlags(i);
 	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(sizeCategory[i]);
 
-	for (int x = 0; x < region[i].size.w; ++x) {
-		for (int y = 0; y < region[i].size.h; ++y) {
+	for (int y = 0; y < region[i].size.h; ++y) {
+		for (int x = 0; x < region[i].size.w; ++x) {
 
 			const int targetX = region[i].origin.x + x;
 			const int targetY = region[i].origin.y + y;
@@ -108,8 +108,8 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 	const auto CurrentCellState = GetCellStateFromFlags(newActorStateIdx);
 	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(CurrentSizeCategory);
 
-	for (int x = 0; x < region[newActorStateIdx].size.w; ++x) {
-		for (int y = 0; y < region[newActorStateIdx].size.h; ++y) {
+	for (int y = 0; y < region[newActorStateIdx].size.h; ++y) {
+		for (int x = 0; x < region[newActorStateIdx].size.w; ++x) {
 
 			const int targetX = region[newActorStateIdx].origin.x + x;
 			const int targetY = region[newActorStateIdx].origin.y + y;

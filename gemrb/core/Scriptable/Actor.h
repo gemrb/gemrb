@@ -469,9 +469,7 @@ public:
 	};
 	struct BlockingSizeCategoryHash {
 		std::size_t operator()(const BlockingSizeCategory& s) const {
-			std::size_t h1 = std::hash<int>{}(s.circleSize);
-			std::size_t h2 = std::hash<float>{}(s.sizeFactor);
-			return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+			return std::hash<int>{}(s.circleSize) + std::hash<float>{}(s.sizeFactor);
 		}
 	};
     static std::unordered_map<BlockingSizeCategory, std::vector<uint8_t>, BlockingSizeCategoryHash> SizeCategoryToBlockingShape;

@@ -11725,8 +11725,8 @@ const std::vector<uint8_t>& Actor::GetBlockingShape(const Actor* actor, const Bl
 	        blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, NotBlockingValue);
 
     		const FitRegion CurrentBlockingRegion = { actor->Pos - blockingShapeRegionSize.Center(), blockingShapeRegionSize };
-    		for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
-    			for (int y = 0; y < blockingShapeRegionSize.h; ++y) {
+        	for (int y = 0; y < blockingShapeRegionSize.h; ++y) {
+    			for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
     				const uint8_t ShapeMask = actor->IsOver({x + CurrentBlockingRegion.origin.x, y + CurrentBlockingRegion.origin.y} );
     				const auto Idx = y * blockingShapeRegionSize.w * 16 + x;
     				blockingShape[Idx] = ShapeMask;
