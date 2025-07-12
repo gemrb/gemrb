@@ -11712,15 +11712,16 @@ bool Actor::TouchAttack(const Projectile* pro) const
 	return !fail;
 }
 
-std::unordered_map<Actor::BlockingSizeCategory, std::vector<bool>, Actor::BlockingSizeCategoryHash> Actor::SizeCategoryToBlockingShape;
+std::unordered_map<Actor::BlockingSizeCategory, std::vector<bool>> Actor::SizeCategoryToBlockingShape;
 
-const std::vector<bool>& Actor::GetBlockingShape(const Actor* actor, const BlockingSizeCategory& category) {
-    auto foundShape = SizeCategoryToBlockingShape.find(category);
+const std::vector<bool>& Actor::GetBlockingShape(const Actor* actor, const BlockingSizeCategory& blockingSizeCategory) {
+    auto foundShape = SizeCategoryToBlockingShape.find(blockingSizeCategory);
     if (foundShape == SizeCategoryToBlockingShape.end())
     {
         std::vector<bool> blockingShape;
-        if (category.sizeFactor != 0) {
-			const Size blockingShapeRegionSize(GetBlockingShapeRegionW(category), GetBlockingShapeRegionH(category));
+    	const float_t sizeFactor = actor->sizeFactor;
+        if (sizeFactor != 0) {
+			const Size blockingShapeRegionSize(GetBlockingShapeRegionW(blockingSizeCategory, sizeFactor), GetBlockingShapeRegionH(blockingSizeCategory, sizeFactor));
 	        constexpr bool NotBlockingValue = false;
 	        blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, NotBlockingValue);
 
@@ -11733,23 +11734,23 @@ const std::vector<bool>& Actor::GetBlockingShape(const Actor* actor, const Block
     			}
     		}
     	}
-    	const auto& [emplacedShape, _] = SizeCategoryToBlockingShape.emplace(category, std::move(blockingShape));
-    	foundShape = emplacedShape;
+    	const auto emplacedShape = SizeCategoryToBlockingShape.emplace(blockingSizeCategory, std::move(blockingShape));
+    	foundShape = emplacedShape.first;
     }
 	return foundShape->second;
 }
 
 Actor::BlockingSizeCategory Actor::getSizeCategory() const {
-	return {this->circleSize, this->sizeFactor};
+	return {this->circleSize};
 }
 
-uint16_t Actor::GetBlockingShapeRegionW(const BlockingSizeCategory& category) {
-	const auto baseSize = category.sizeFactor * CircleSize2Radius(category.circleSize);
+uint16_t Actor::GetBlockingShapeRegionW(const BlockingSizeCategory& blockingSizeCategory, float sizeFactor) {
+	const auto baseSize = sizeFactor * CircleSize2Radius(blockingSizeCategory);
 	return baseSize * 8;
 }
 
-uint16_t Actor::GetBlockingShapeRegionH(const BlockingSizeCategory& category) {
-	const auto baseSize = category.sizeFactor * CircleSize2Radius(category.circleSize);
+uint16_t Actor::GetBlockingShapeRegionH(const BlockingSizeCategory& blockingSizeCategory, float sizeFactor) {
+	const auto baseSize = sizeFactor * CircleSize2Radius(blockingSizeCategory);
 	return baseSize * 6;
 }
 }

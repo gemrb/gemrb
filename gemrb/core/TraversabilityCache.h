@@ -154,7 +154,7 @@ private:
 		std::vector<Actor*> actor;
 		std::vector<Point> pos;
 		std::vector<uint8_t> flags;
-		std::vector<Actor::BlockingSizeCategory> sizeCategory;
+		std::vector<Actor::BlockingSizeCategory> blockingSizeCategory;
 
 		explicit CachedActorsState(size_t reserve);
 

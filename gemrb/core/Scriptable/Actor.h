@@ -455,30 +455,30 @@ public:
 		return false;
 	}
 
-
-	struct BlockingSizeCategory {
-		int circleSize;
-		float sizeFactor;
-		bool operator==(const BlockingSizeCategory& other) const {
-			return sizeFactor == other.sizeFactor && circleSize == other.circleSize;
-		}
-
-		bool operator!=(const BlockingSizeCategory& other) const {
-			return sizeFactor != other.sizeFactor || circleSize != other.circleSize;
-		}
-	};
-	struct BlockingSizeCategoryHash {
-		std::size_t operator()(const BlockingSizeCategory& s) const {
-			return std::hash<int>{}(s.circleSize) + std::hash<float>{}(s.sizeFactor);
-		}
-	};
-    static std::unordered_map<BlockingSizeCategory, std::vector<bool>, BlockingSizeCategoryHash> SizeCategoryToBlockingShape;
-    static const std::vector<bool>& GetBlockingShape(const Actor* actor, const BlockingSizeCategory& category);
+	typedef int BlockingSizeCategory;
+	// struct BlockingSizeCategory {
+	// 	int circleSize;
+	// 	float sizeFactor;
+	// 	bool operator==(const BlockingSizeCategory& other) const {
+	// 		return sizeFactor == other.sizeFactor && circleSize == other.circleSize;
+	// 	}
+	//
+	// 	bool operator!=(const BlockingSizeCategory& other) const {
+	// 		return sizeFactor != other.sizeFactor || circleSize != other.circleSize;
+	// 	}
+	// };
+	// struct BlockingSizeCategoryHash {
+	// 	std::size_t operator()(const BlockingSizeCategory& s) const {
+	// 		return std::hash<int>{}(s.circleSize) + std::hash<float>{}(s.sizeFactor);
+	// 	}
+	// };
+    static std::unordered_map<BlockingSizeCategory, std::vector<bool>> SizeCategoryToBlockingShape;
+    static const std::vector<bool>& GetBlockingShape(const Actor* actor, const BlockingSizeCategory& blockingSizeCategory);
 	BlockingSizeCategory getSizeCategory() const;
 
-	static uint16_t GetBlockingShapeRegionW(const BlockingSizeCategory& category);
+	static uint16_t GetBlockingShapeRegionW(const BlockingSizeCategory& blockingSizeCategory, float sizeFactor);
 
-	static uint16_t GetBlockingShapeRegionH(const BlockingSizeCategory& category);
+	static uint16_t GetBlockingShapeRegionH(const BlockingSizeCategory& blockingSizeCategory, float sizeFactor);
 
 	using stat_t = ieDword;
 	using stats_t = std::array<stat_t, MAX_STATS>;

@@ -39,7 +39,7 @@ size_t TraversabilityCache::CachedActorsState::AddCachedActorState(Actor* inActo
 	actor.push_back(inActor);
 	pos.push_back(inActor->Pos);
 	flags.push_back(0);
-	sizeCategory.push_back(inActor->getSizeCategory());
+	blockingSizeCategory.push_back(inActor->getSizeCategory());
 	if (inActor->ValidTarget(GA_ONLY_BUMPABLE)) {
 		SetIsBumpable(new_idx);
 	} else {
@@ -64,13 +64,13 @@ FitRegion TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* i
 
 void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, const int inWidth) const
 {
-	const std::vector<bool>& CachedBlockingShape = Actor::GetBlockingShape(actor[i], sizeCategory[i]);
+	const std::vector<bool>& CachedBlockingShape = Actor::GetBlockingShape(actor[i], blockingSizeCategory[i]);
 	if (CachedBlockingShape.empty()) {
 		return;
 	}
 
 	const auto CachedCellState = GetCellStateFromFlags(i);
-	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(sizeCategory[i]);
+	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(blockingSizeCategory[i], actor[i]->sizeFactor);
 	const size_t TrashIdx = inOutTraversabilityData.size() - 1;
 
 	for (int y = 0; y < region[i].size.h; ++y) {
@@ -103,7 +103,7 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
 
 	const auto CurrentCellState = GetCellStateFromFlags(newActorStateIdx);
-	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(CurrentSizeCategory);
+	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(CurrentSizeCategory, actor[i]->sizeFactor);
 	const size_t TrashIdx = inOutTraversabilityData.size() - 1;
 
 	for (int y = 0; y < region[newActorStateIdx].size.h; ++y) {
@@ -128,7 +128,7 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 		flags[i] = flags[newActorStateIdx];
 		pos[i] = pos[newActorStateIdx];
 		region[i] = region[newActorStateIdx];
-		sizeCategory[i] = sizeCategory[newActorStateIdx];
+		blockingSizeCategory[i] = blockingSizeCategory[newActorStateIdx];
 	}
 
 	erase(newActorStateIdx);
@@ -140,7 +140,7 @@ void TraversabilityCache::CachedActorsState::UpdateNewState(const size_t i)
 	flags[i] = flags[newActorStateIdx];
 	pos[i] = pos[newActorStateIdx];
 	region[i] = region[newActorStateIdx];
-	sizeCategory[i] = sizeCategory[newActorStateIdx];
+	blockingSizeCategory[i] = blockingSizeCategory[newActorStateIdx];
 	erase(newActorStateIdx);
 }
 
@@ -192,7 +192,7 @@ void TraversabilityCache::Update()
 		if (cachedActorsState.pos[cachedActorIdx] != currentActor->Pos ||
 		    cachedActorsState.GetIsAlive(cachedActorIdx) != currentActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED) ||
 		    cachedActorsState.GetIsBumpable(cachedActorIdx) != currentActor->ValidTarget(GA_ONLY_BUMPABLE) ||
-		    cachedActorsState.sizeCategory[cachedActorIdx] != currentActor->getSizeCategory()) {
+		    cachedActorsState.blockingSizeCategory[cachedActorIdx] != currentActor->getSizeCategory()) {
 			actorsUpdated.push_back(cachedActorIdx);
 		}
 	}
@@ -228,7 +228,7 @@ void TraversabilityCache::Update()
 
 		// if the position or the size category of the actor changed...
 		if (cachedActorsState.pos[updatedCachedIdx] != cachedActorsState.actor[updatedCachedIdx]->Pos ||
-			cachedActorsState.sizeCategory[updatedCachedIdx] != cachedActorsState.actor[updatedCachedIdx]->getSizeCategory()) {
+			cachedActorsState.blockingSizeCategory[updatedCachedIdx] != cachedActorsState.actor[updatedCachedIdx]->getSizeCategory()) {
 
 			// clear old position of this actor
 			cachedActorsState.ClearOldPosition(updatedCachedIdx, traversabilityData, map->PropsSize().w);
@@ -295,7 +295,7 @@ void TraversabilityCache::CachedActorsState::reserve(const size_t reserve)
 	actor.reserve(reserve);
 	pos.reserve(reserve);
 	flags.reserve(reserve);
-	sizeCategory.reserve(reserve);
+	blockingSizeCategory.reserve(reserve);
 }
 
 void TraversabilityCache::CachedActorsState::clear()
@@ -304,7 +304,7 @@ void TraversabilityCache::CachedActorsState::clear()
 	actor.clear();
 	pos.clear();
 	flags.clear();
-	sizeCategory.clear();
+	blockingSizeCategory.clear();
 }
 
 void TraversabilityCache::CachedActorsState::erase(const size_t idx)
@@ -313,7 +313,7 @@ void TraversabilityCache::CachedActorsState::erase(const size_t idx)
 	actor.erase(actor.begin() + idx);
 	pos.erase(pos.begin() + idx);
 	flags.erase(flags.begin() + idx);
-	sizeCategory.erase(sizeCategory.begin() + idx);
+	blockingSizeCategory.erase(blockingSizeCategory.begin() + idx);
 }
 
 void TraversabilityCache::CachedActorsState::emplace_back(CachedActorsState&& another)
@@ -323,7 +323,7 @@ void TraversabilityCache::CachedActorsState::emplace_back(CachedActorsState&& an
 	actor.insert(actor.end(), another.actor.begin(), another.actor.end());
 	pos.insert(pos.end(), another.pos.begin(), another.pos.end());
 	flags.insert(flags.end(), another.flags.begin(), another.flags.end());
-	sizeCategory.insert(sizeCategory.end(), another.sizeCategory.begin(), another.sizeCategory.end());
+	blockingSizeCategory.insert(blockingSizeCategory.end(), another.blockingSizeCategory.begin(), another.blockingSizeCategory.end());
 }
 
 TraversabilityCache::TraversabilityCellState TraversabilityCache::CachedActorsState::GetCellStateFromFlags(const size_t i) const {
