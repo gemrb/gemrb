@@ -161,16 +161,24 @@ void TraversabilityCache::Update()
 	static std::vector<size_t> actorsRemoved;
 	static std::vector<size_t> actorsUpdated;
 	static CachedActorsState actorsNew(0);
+	static std::vector<bool> bumpableChanged;
+	static std::vector<bool> aliveChanged;
 
 	const size_t numberOfActorsOnMap = map->actors.size();
 	if (actorsRemoved.capacity() < numberOfActorsOnMap) {
 		actorsRemoved.reserve(numberOfActorsOnMap);
 		actorsUpdated.reserve(numberOfActorsOnMap);
 		actorsNew.reserve(numberOfActorsOnMap);
+		bumpableChanged.reserve(numberOfActorsOnMap);
+		aliveChanged.reserve(numberOfActorsOnMap);
 	}
 	actorsRemoved.clear();
 	actorsUpdated.clear();
 	actorsNew.clear();
+	bumpableChanged.clear();
+	aliveChanged.clear();
+	bumpableChanged.resize(numberOfActorsOnMap, false);
+	aliveChanged.resize(numberOfActorsOnMap, false);
 
 	// for all actors in the map...
 	for (auto currentActor : map->actors) {
@@ -187,11 +195,13 @@ void TraversabilityCache::Update()
 		}
 
 		// if found, check whether the position, bumpable status and alive status has been updated since last cache update
-		// const CachedActorsState& cachedActor = *foundCachedActor;
 		const size_t cachedActorIdx = foundCachedActor - cachedActorsState.actor.begin();
+		aliveChanged[cachedActorIdx] = cachedActorsState.GetIsAlive(cachedActorIdx) != currentActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED);
+		bumpableChanged[cachedActorIdx] = cachedActorsState.GetIsBumpable(cachedActorIdx) != currentActor->ValidTarget(GA_ONLY_BUMPABLE);
+
 		if (cachedActorsState.pos[cachedActorIdx] != currentActor->Pos ||
-		    cachedActorsState.GetIsAlive(cachedActorIdx) != currentActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED) ||
-		    cachedActorsState.GetIsBumpable(cachedActorIdx) != currentActor->ValidTarget(GA_ONLY_BUMPABLE) ||
+		    aliveChanged[cachedActorIdx] ||
+		    bumpableChanged[cachedActorIdx] ||
 		    cachedActorsState.sizeCategory[cachedActorIdx] != currentActor->getSizeCategory()) {
 			actorsUpdated.push_back(cachedActorIdx);
 		}
@@ -248,19 +258,19 @@ void TraversabilityCache::Update()
 		}
 
 		// if our actor did go from dead to alive...
-		if (!cachedActorsState.GetIsAlive(updatedCachedIdx) && (cachedActorsState.GetIsAlive(updatedCachedIdx) != cachedActorsState.actor[updatedCachedIdx]->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED))) {
+		if (!cachedActorsState.GetIsAlive(updatedCachedIdx) && aliveChanged[updatedCachedIdx]) {
 			// no need to clear old position, just mark new position
 			cachedActorsState.MarkNewPosition(updatedCachedIdx, traversabilityData, map->PropsSize().w, true);
 		}
 		// if our actor did go from alive to dead...
-		else if (cachedActorsState.GetIsAlive(updatedCachedIdx) && (cachedActorsState.GetIsAlive(updatedCachedIdx) != cachedActorsState.actor[updatedCachedIdx]->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED))) {
+		else if (cachedActorsState.GetIsAlive(updatedCachedIdx) && aliveChanged[updatedCachedIdx]) {
 			// just clear old position
 			cachedActorsState.ClearOldPosition(updatedCachedIdx, traversabilityData, map->PropsSize().w);
 			cachedActorsState.UpdateNewState(updatedCachedIdx);
 		}
 
 		// if our actor did change its bumpable state
-		if (cachedActorsState.GetIsBumpable(updatedCachedIdx) != cachedActorsState.actor[updatedCachedIdx]->ValidTarget(GA_ONLY_BUMPABLE)) {
+		if (bumpableChanged[updatedCachedIdx]) {
 			// clear old cells and mark new cells
 			cachedActorsState.ClearOldPosition(updatedCachedIdx, traversabilityData, map->PropsSize().w);
 			cachedActorsState.MarkNewPosition(updatedCachedIdx, traversabilityData, map->PropsSize().w, true);
