@@ -36,12 +36,12 @@ namespace GemRB {
 
 GEM_EXPORT DisplayMessage* displaymsg = nullptr;
 
-static const auto DisplayFormatName = FMT_STRING(u"[color={:08X}]{} - [/color][p][color={:08X}]{}[/color][/p]");
-static const auto DisplayFormatAction = FMT_STRING(u"[color={:08X}]{} - [/color][p][color={:08X}]{} {}[/color][/p]");
-static const auto DisplayFormat = FMT_STRING(u"[p][color={:08X}]{}[/color][/p]");
-static const auto DisplayFormatValue = FMT_STRING(u"[p][color={:08X}]{}: {}[/color][/p]");
-static const auto DisplayFormatNameString = FMT_STRING(u"[color={:08X}]{} - [/color][p][color={:08X}]{}: {}[/color][/p]");
-static const auto DisplayFormatSimple = FMT_STRING(u"[p]{}[/p]");
+static const auto DisplayFormatName = u"[color={:08X}]{} - [/color][p][color={:08X}]{}[/color][/p]";
+static const auto DisplayFormatAction = u"[color={:08X}]{} - [/color][p][color={:08X}]{} {}[/color][/p]";
+static const auto DisplayFormat = u"[p][color={:08X}]{}[/color][/p]";
+static const auto DisplayFormatValue = u"[p][color={:08X}]{}: {}[/color][/p]";
+static const auto DisplayFormatNameString = u"[color={:08X}]{} - [/color][p][color={:08X}]{}: {}[/color][/p]";
+static const auto DisplayFormatSimple = u"[p]{}[/p]";
 
 DisplayMessage::StrRefs DisplayMessage::SRefs;
 

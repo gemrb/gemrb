@@ -135,12 +135,14 @@ SaveGame::SaveGame(path_t path, const path_t& name, const ResRef& prefix, std::s
 	struct stat my_stat;
 	path_t nPath = PathJoinExt(Path, Prefix, "bmp");
 	memset(&my_stat, 0, sizeof(my_stat));
+	std::tm* time;
 	if (stat(nPath.c_str(), &my_stat)) {
 		Log(ERROR, "SaveGameIterator", "Stat call failed, using dummy time!");
-		Date = fmt::format(DATE_FMT, fmt::localtime(0));
+		time = std::localtime(nullptr);
 	} else {
-		Date = fmt::format(DATE_FMT, fmt::localtime(my_stat.st_mtime));
+		time = std::localtime(&my_stat.st_mtime);
 	}
+	Date = fmt::format(DATE_FMT, *time);
 	manager.AddSource(Path, name, PLUGIN_RESOURCE_DIRECTORY);
 	Name = StringFromUtf8(name);
 }

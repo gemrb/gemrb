@@ -24,6 +24,7 @@
 #include "StringView.h"
 
 #include "fmt/format.h"
+#include "fmt/ranges.h"
 
 #include <algorithm>
 #include <cassert>
@@ -306,5 +307,14 @@ auto format_as(const GemRB::FixedSizeString<LEN, CMP>& str)
 }
 
 }
+
+// disable conflicting range formatter
+namespace fmt {
+
+template<size_t LEN, int (*CMP)(const char*, const char*, size_t)>
+struct is_range<GemRB::FixedSizeString<LEN, CMP>, char> : std::false_type {};
+
+}
+
 
 #endif
