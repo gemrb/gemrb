@@ -64,7 +64,7 @@ FitRegion TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* i
 
 void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, const int inWidth) const
 {
-	const std::vector<uint8_t>& CachedBlockingShape = Actor::GetBlockingShape(actor[i], sizeCategory[i]);
+	const std::vector<bool>& CachedBlockingShape = Actor::GetBlockingShape(actor[i], sizeCategory[i]);
 	if (CachedBlockingShape.empty()) {
 		return;
 	}
@@ -98,7 +98,7 @@ void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, st
 void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, int inWidth, bool inShouldUpdateSelf)
 {
 	const auto CurrentSizeCategory = actor[i]->getSizeCategory();
-	const std::vector<uint8_t>& CurrentBlockingShape = Actor::GetBlockingShape(actor[i], CurrentSizeCategory);
+	const std::vector<bool>& CurrentBlockingShape = Actor::GetBlockingShape(actor[i], CurrentSizeCategory);
 	if (CurrentBlockingShape.empty()) {
 		return;
 	}

@@ -11712,22 +11712,22 @@ bool Actor::TouchAttack(const Projectile* pro) const
 	return !fail;
 }
 
-std::unordered_map<Actor::BlockingSizeCategory, std::vector<uint8_t>, Actor::BlockingSizeCategoryHash> Actor::SizeCategoryToBlockingShape;
+std::unordered_map<Actor::BlockingSizeCategory, std::vector<bool>, Actor::BlockingSizeCategoryHash> Actor::SizeCategoryToBlockingShape;
 
-const std::vector<uint8_t>& Actor::GetBlockingShape(const Actor* actor, const BlockingSizeCategory& category) {
+const std::vector<bool>& Actor::GetBlockingShape(const Actor* actor, const BlockingSizeCategory& category) {
     auto foundShape = SizeCategoryToBlockingShape.find(category);
     if (foundShape == SizeCategoryToBlockingShape.end())
     {
-        std::vector<uint8_t> blockingShape;
+        std::vector<bool> blockingShape;
         if (category.sizeFactor != 0) {
 			const Size blockingShapeRegionSize(GetBlockingShapeRegionW(category), GetBlockingShapeRegionH(category));
-	        constexpr uint8_t NotBlockingValue = 0;
+	        constexpr bool NotBlockingValue = false;
 	        blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, NotBlockingValue);
 
     		const FitRegion CurrentBlockingRegion = { actor->Pos - blockingShapeRegionSize.Center(), blockingShapeRegionSize };
         	for (int y = 0; y < blockingShapeRegionSize.h; ++y) {
     			for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
-    				const uint8_t ShapeMask = actor->IsOver({x + CurrentBlockingRegion.origin.x, y + CurrentBlockingRegion.origin.y} );
+    				const bool ShapeMask = actor->IsOver({x + CurrentBlockingRegion.origin.x, y + CurrentBlockingRegion.origin.y} );
     				const auto Idx = y * blockingShapeRegionSize.w * 16 + x;
     				blockingShape[Idx] = ShapeMask;
     			}

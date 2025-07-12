@@ -472,8 +472,8 @@ public:
 			return std::hash<int>{}(s.circleSize) + std::hash<float>{}(s.sizeFactor);
 		}
 	};
-    static std::unordered_map<BlockingSizeCategory, std::vector<uint8_t>, BlockingSizeCategoryHash> SizeCategoryToBlockingShape;
-    static const std::vector<uint8_t>& GetBlockingShape(const Actor* actor, const BlockingSizeCategory& category);
+    static std::unordered_map<BlockingSizeCategory, std::vector<bool>, BlockingSizeCategoryHash> SizeCategoryToBlockingShape;
+    static const std::vector<bool>& GetBlockingShape(const Actor* actor, const BlockingSizeCategory& category);
 	BlockingSizeCategory getSizeCategory() const;
 
 	static uint16_t GetBlockingShapeRegionW(const BlockingSizeCategory& category);
