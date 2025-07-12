@@ -56,7 +56,7 @@ struct formatter<WideToChar> {
 	static constexpr auto parse(const format_parse_context& ctx) -> decltype(ctx.begin()) { return ctx.begin(); }
 
 	template<typename FormatContext>
-	auto format(const WideToChar& wstr, FormatContext& ctx) -> decltype(ctx.out())
+	auto format(const WideToChar& wstr, FormatContext& ctx) const -> decltype(ctx.out())
 	{
 		const auto mbstr = GemRB::MBStringFromString(wstr.string);
 		return format_to(ctx.out(), "{}", mbstr);
