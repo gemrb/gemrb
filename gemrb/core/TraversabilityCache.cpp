@@ -71,26 +71,23 @@ void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, st
 
 	const auto CachedCellState = GetCellStateFromFlags(i);
 	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(sizeCategory[i]);
+	const size_t TrashIdx = inOutTraversabilityData.size() - 1;
 
 	for (int y = 0; y < region[i].size.h; ++y) {
 		for (int x = 0; x < region[i].size.w; ++x) {
 
 			const int targetX = region[i].origin.x + x;
 			const int targetY = region[i].origin.y + y;
-
-			if (targetX < 0 || targetY < 0) {
-				continue;
-			}
-
-			const auto Idx = targetY * inWidth * 16 + targetX;
+			const size_t IdxIn = targetY * inWidth * 16 + targetX;
+			const size_t Idx = IdxIn < TrashIdx ? IdxIn : TrashIdx;
 			TraversabilityCellData& CurrentTraversabilityData = inOutTraversabilityData[Idx];
 
 			const auto BlockingShapeIdx = y * BlockingShapeRegionW * 16 + x;
 			CurrentTraversabilityData.state -= (CachedBlockingShape[BlockingShapeIdx] * CachedCellState);
-
-			if (CurrentTraversabilityData.occupyingActor == actor[i]) {
-				CurrentTraversabilityData.occupyingActor = nullptr;
-			}
+			// if (CurrentTraversabilityData.occupyingActor == actor[i]) {
+			// 	CurrentTraversabilityData.occupyingActor = nullptr;
+			// }
+			CurrentTraversabilityData.occupyingActor = reinterpret_cast<Actor*>((reinterpret_cast<size_t>(CurrentTraversabilityData.occupyingActor) * (CurrentTraversabilityData.occupyingActor != actor[i])));
 		}
 	}
 }
@@ -107,6 +104,7 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 
 	const auto CurrentCellState = GetCellStateFromFlags(newActorStateIdx);
 	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(CurrentSizeCategory);
+	const size_t TrashIdx = inOutTraversabilityData.size() - 1;
 
 	for (int y = 0; y < region[newActorStateIdx].size.h; ++y) {
 		for (int x = 0; x < region[newActorStateIdx].size.w; ++x) {
@@ -114,20 +112,15 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 			const int targetX = region[newActorStateIdx].origin.x + x;
 			const int targetY = region[newActorStateIdx].origin.y + y;
 
-			if (targetX < 0 || targetY < 0) {
-				continue;
-			}
-
-			const auto Idx = targetY * inWidth * 16 + targetX;
+			const size_t IdxIn = targetY * inWidth * 16 + targetX;
+			const size_t Idx = IdxIn < TrashIdx ? IdxIn : TrashIdx;
 			TraversabilityCellData& CurrentTraversabilityData = inOutTraversabilityData[Idx];
 
 			const auto BlockingShapeIdx = y * BlockingShapeRegionW * 16 + x;
 			const uint16_t CellStateOfThisActor = CurrentBlockingShape[BlockingShapeIdx] * CurrentCellState;
 			CurrentTraversabilityData.state += CellStateOfThisActor;
 
-			if (CellStateOfThisActor > TraversabilityCellValueEmpty) {
-				CurrentTraversabilityData.occupyingActor = actor[i];
-			}
+			CurrentTraversabilityData.occupyingActor = CellStateOfThisActor > TraversabilityCellValueEmpty ? actor[i] : CurrentTraversabilityData.occupyingActor;
 		}
 	}
 
@@ -345,7 +338,7 @@ TraversabilityCache::TraversabilityCellState TraversabilityCache::CachedActorsSt
 
 void TraversabilityCache::ValidateTraversabilityCacheSize()
 {
-	const size_t expectedSize = map->PropsSize().h * 12 * map->PropsSize().w * 16;
+	const size_t expectedSize = map->PropsSize().h * 12 * map->PropsSize().w * 16 + 1; // +1 is for spare cell
 	if (traversabilityData.size() != expectedSize) {
 		Log(DEBUG, "TraversabilityCache", "Resizing traversabilityData cache.");
 		traversabilityData.resize(expectedSize, TraversabilityCellData { nullptr, TraversabilityCellValueEmpty });
