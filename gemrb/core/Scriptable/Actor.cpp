@@ -61,6 +61,7 @@
 
 #include <cmath>
 #include <string>
+#include <iostream>
 
 namespace GemRB {
 
@@ -11735,6 +11736,8 @@ const std::vector<bool>& Actor::GetBlockingShape(const Actor* actor, const Block
 
     	const auto emplacedShape = SizeCategoryToBlockingShape.emplace(blockingSizeCategory, std::move(blockingShape));
     	foundShape = emplacedShape.first;
+    	std::string s = "dpysx: Blocking regionW=" + std::to_string(blockingShapeRegionSize.w) + ", regionH=" + std::to_string(blockingShapeRegionSize.h) + "\n";
+    	std::cout << s;
     }
 	return foundShape->second;
 }
@@ -11744,10 +11747,12 @@ Actor::BlockingSizeCategory Actor::getSizeCategory() const {
 }
 
 uint16_t Actor::GetBlockingShapeRegionW(int circleSize) {
-	return circleSize < 2 ? 16 : 2*circleSize;
+	const uint16_t multiplier = circleSize < 2 ? 1 : 2 * circleSize;
+	return 16 * multiplier;
 }
 
 uint16_t Actor::GetBlockingShapeRegionH(int circleSize) {
-	return  circleSize < 2 ? 12 : 2*circleSize;
+	const uint16_t multiplier = circleSize < 2 ? 1 : 2 * circleSize;
+	return 12 * multiplier;
 }
 }
