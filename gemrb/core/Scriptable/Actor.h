@@ -476,9 +476,9 @@ public:
     static const std::vector<bool>& GetBlockingShape(const Actor* actor, const BlockingSizeCategory& blockingSizeCategory);
 	BlockingSizeCategory getSizeCategory() const;
 
-	static uint16_t GetBlockingShapeRegionW(int circleSize);
+	static uint16_t GetBlockingShapeRegionW(const BlockingSizeCategory& blockingSizeCategory, float sizeFactor);
 
-	static uint16_t GetBlockingShapeRegionH(int circleSize);
+	static uint16_t GetBlockingShapeRegionH(const BlockingSizeCategory& blockingSizeCategory, float sizeFactor);
 
 	using stat_t = ieDword;
 	using stats_t = std::array<stat_t, MAX_STATS>;

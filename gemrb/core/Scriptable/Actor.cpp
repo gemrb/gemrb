@@ -11719,20 +11719,21 @@ const std::vector<bool>& Actor::GetBlockingShape(const Actor* actor, const Block
     if (foundShape == SizeCategoryToBlockingShape.end())
     {
         std::vector<bool> blockingShape;
+    	const float_t sizeFactor = actor->sizeFactor;
+        if (sizeFactor != 0) {
+			const Size blockingShapeRegionSize(GetBlockingShapeRegionW(blockingSizeCategory, sizeFactor), GetBlockingShapeRegionH(blockingSizeCategory, sizeFactor));
+	        constexpr bool NotBlockingValue = false;
+	        blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, NotBlockingValue);
 
-		const Size blockingShapeRegionSize(GetBlockingShapeRegionW(blockingSizeCategory), GetBlockingShapeRegionH(blockingSizeCategory));
-        constexpr bool NotBlockingValue = false;
-        blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, NotBlockingValue);
-
-    	const FitRegion CurrentBlockingRegion = { actor->Pos - blockingShapeRegionSize.Center(), blockingShapeRegionSize };
-        for (int y = 0; y < blockingShapeRegionSize.h; ++y) {
-    		for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
-    			const bool ShapeMask = actor->IsOver({x + CurrentBlockingRegion.origin.x, y + CurrentBlockingRegion.origin.y} );
-    			const auto Idx = y * blockingShapeRegionSize.w * 16 + x;
-    			blockingShape[Idx] = ShapeMask;
+    		const FitRegion CurrentBlockingRegion = { actor->Pos - blockingShapeRegionSize.Center(), blockingShapeRegionSize };
+        	for (int y = 0; y < blockingShapeRegionSize.h; ++y) {
+    			for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
+    				const bool ShapeMask = actor->IsOver({x + CurrentBlockingRegion.origin.x, y + CurrentBlockingRegion.origin.y} );
+    				const auto Idx = y * blockingShapeRegionSize.w * 16 + x;
+    				blockingShape[Idx] = ShapeMask;
+    			}
     		}
     	}
-
     	const auto emplacedShape = SizeCategoryToBlockingShape.emplace(blockingSizeCategory, std::move(blockingShape));
     	foundShape = emplacedShape.first;
     }
@@ -11743,11 +11744,13 @@ Actor::BlockingSizeCategory Actor::getSizeCategory() const {
 	return {this->circleSize};
 }
 
-uint16_t Actor::GetBlockingShapeRegionW(int circleSize) {
-	return circleSize < 2 ? 16 : 2*circleSize;
+uint16_t Actor::GetBlockingShapeRegionW(const BlockingSizeCategory& blockingSizeCategory, float sizeFactor) {
+	const auto baseSize = sizeFactor * CircleSize2Radius(blockingSizeCategory);
+	return baseSize * 8;
 }
 
-uint16_t Actor::GetBlockingShapeRegionH(int circleSize) {
-	return  circleSize < 2 ? 12 : 2*circleSize;
+uint16_t Actor::GetBlockingShapeRegionH(const BlockingSizeCategory& blockingSizeCategory, float sizeFactor) {
+	const auto baseSize = sizeFactor * CircleSize2Radius(blockingSizeCategory);
+	return baseSize * 6;
 }
 }

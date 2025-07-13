@@ -54,17 +54,12 @@ size_t TraversabilityCache::CachedActorsState::AddCachedActorState(Actor* inActo
 	return new_idx;
 }
 
-FitRegion CalculateRegionForBlockingSize(int circleSize, const Point& Pos) {
-	const auto baseWidth = Actor::GetBlockingShapeRegionW(circleSize);
-	const auto baseHeight = Actor::GetBlockingShapeRegionH(circleSize);
-	const GemRB::Size s(baseWidth, baseHeight);
-	return { Pos - s.Center(), s };
-}
-
 FitRegion TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* inActor)
 {
 	// code from Selectable::DrawCircle, will it be always correct for all NPCs?
-	return CalculateRegionForBlockingSize(inActor->circleSize, inActor->Pos);
+	const auto baseSize = Selectable::CircleSize2Radius(inActor->circleSize) * inActor->sizeFactor;
+	const GemRB::Size s(baseSize * 8, baseSize * 6);
+	return { inActor->Pos - s.Center(), s };
 }
 
 void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, const int inWidth) const
@@ -75,7 +70,7 @@ void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, st
 	}
 
 	const auto CachedCellState = GetCellStateFromFlags(i);
-	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(blockingSizeCategory[i]);
+	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(blockingSizeCategory[i], actor[i]->sizeFactor);
 	const size_t TrashIdx = inOutTraversabilityData.size() - 1;
 
 	for (int y = 0; y < region[i].size.h; ++y) {
@@ -108,7 +103,7 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
 
 	const auto CurrentCellState = GetCellStateFromFlags(newActorStateIdx);
-	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(CurrentSizeCategory);
+	const auto BlockingShapeRegionW = Actor::GetBlockingShapeRegionW(CurrentSizeCategory, actor[i]->sizeFactor);
 	const size_t TrashIdx = inOutTraversabilityData.size() - 1;
 
 	for (int y = 0; y < region[newActorStateIdx].size.h; ++y) {
