@@ -1431,6 +1431,7 @@ static const EnumArray<GFFlags, StringView> game_flags {
 	"IWDRestSpawns", // GFFlags::IWD_REST_SPAWNS
 	"HasContinuation", // GFFlags::HAS_CONTINUATION
 	"SellableCritsNoConv", // GFFlags::SELLABLE_CRITS_NO_CONV
+	"BetterOfHearing", // GFFlags::BETTER_OF_HEARING
 };
 
 /** Loads gemrb.ini */
@@ -3623,10 +3624,12 @@ Effect* Interface::GetEffect(const ResRef& resname, int level, const Point& p)
 	if (!effect) {
 		return nullptr;
 	}
-	if (!level) {
-		level = 1;
+	if (level != -1) {
+		if (!level) {
+			level = 1;
+		}
+		effect->Power = level;
 	}
-	effect->Power = level;
 	effect->Pos = p;
 	return effect;
 }

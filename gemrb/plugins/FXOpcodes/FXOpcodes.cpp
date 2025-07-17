@@ -2746,25 +2746,33 @@ int fx_stealth_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x3C MiscastMagicModifier
 int fx_miscast_magic_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_miscast_magic_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
 	switch (fx->Parameter2) {
 		case 3:
 			STAT_SET(IE_DEADMAGIC, 1);
 			// intentional fallthrough
 		case 0:
-			STAT_SET(IE_SPELLFAILUREMAGE, fx->Parameter1);
+			STAT_ADD(IE_SPELLFAILUREMAGE, fx->Parameter1);
 			break;
 		case 4:
 			STAT_SET(IE_DEADMAGIC, 1);
 			// intentional fallthrough
 		case 1:
-			STAT_SET(IE_SPELLFAILUREPRIEST, fx->Parameter1);
+			STAT_ADD(IE_SPELLFAILUREPRIEST, fx->Parameter1);
 			break;
 		case 5:
 			STAT_SET(IE_DEADMAGIC, 1);
 			// intentional fallthrough
 		case 2:
+			STAT_ADD(IE_SPELLFAILUREINNATE, fx->Parameter1);
+			break;
+		// gemrb extension: support setting the value
+		case 6:
+			STAT_SET(IE_SPELLFAILUREMAGE, fx->Parameter1);
+			break;
+		case 7:
+			STAT_SET(IE_SPELLFAILUREPRIEST, fx->Parameter1);
+			break;
+		case 8:
 			STAT_SET(IE_SPELLFAILUREINNATE, fx->Parameter1);
 			break;
 		default:
@@ -5436,8 +5444,6 @@ int fx_hold_creature(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xb1 ApplyEffect
 int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 {
-	// print( "fx_apply_effect (%2d) %s", fx->Opcode, fx->Resource );
-
 	//this effect executes a file effect in place of this effect
 	//the file effect inherits the target and the timingmode, but gets
 	//a new chance to roll percents
@@ -5445,9 +5451,18 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
+	// Bypass probability / immunities / saving throws; for use with external EFF files
+	// otherwise set internally as a marker, so any repeated applications only ran the checks once
+	bool bypass = true; // on by default in bg1, iwd1
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		bypass = fx->Parameter5; // moved in the ees
+	} else if (core->HasFeature(GFFlags::FIXED_MORALE_OPCODE)) {
+		bypass = fx->Parameter3; // bg2
+	}
+
 	//apply effect, if the effect is a goner, then kill
 	//this effect too
-	Effect* myfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
+	Effect* myfx = core->GetEffect(fx->Resource, -1, fx->Pos);
 	if (!myfx)
 		return FX_NOT_APPLIED;
 
@@ -5456,25 +5471,51 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 	myfx->TimingMode = fx->TimingMode;
 	myfx->Duration = fx->Duration;
 	myfx->CasterID = fx->CasterID;
+	myfx->Source = fx->Source;
+	myfx->Parameter6 = fx->Parameter6; // gametime
+
+	// some opcodes copy need more data on subsequent runs
+	if (!fx->FirstApply && core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		static std::list<ieDword> ops = { 3, 36, 127, 213, 323, 5, 37, 129, 218, 325, 15, 39, 135, 233, 330, 33, 44, 145, 236, 331, 34, 53, 210, 241, 335, 35, 71, 211, 246, 342 };
+		auto it = std::find(ops.begin(), ops.end(), myfx->Opcode);
+		if (it != ops.end()) {
+			myfx->Parameter3 = fx->Parameter3;
+			myfx->Parameter4 = fx->Parameter4;
+			myfx->IsVariable = fx->IsVariable;
+		}
+	}
 
 	int ret;
 	if (target) {
 		if (fx->FirstApply && (fx->IsVariable || fx->TimingMode == FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES)) {
-			// FIXME: should this happen for all effects?
+			// FIXME: should this happen for all effects? No, this should be reworked at minimum for the TimingMode case (see commit that added it)
+			// IESDP: The engine specially handles cases where effects are removed by opcode, ensuring it also matches the opcode in the EFF file of op177 instances.
 			//hack to entirely replace this effect with the applied effect, this is required for some generic effects
 			//that must be put directly in the effect queue to have any impact (to be counted by BonusAgainstCreature, etc)
-			myfx->Source = fx->Source; // more?
 			target->fxqueue.AddEffect(myfx);
 			return FX_NOT_APPLIED;
 		}
-		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);
+		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !bypass);
 	} else {
 		EffectQueue fxqueue;
 		fxqueue.SetOwner(Owner);
-		ret = fxqueue.ApplyEffect(NULL, myfx, fx->FirstApply, !fx->Parameter3);
+		ret = fxqueue.ApplyEffect(nullptr, myfx, fx->FirstApply, !bypass);
 	}
 
-	fx->Parameter3 = 1;
+	// modify parent effect
+	if (!fx->FirstApply && core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		fx->Parameter3 = myfx->Parameter3;
+		fx->Parameter4 = myfx->Parameter4;
+		fx->IsVariable = myfx->IsVariable;
+	}
+
+	// only check resistances once
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		fx->Parameter5 = 1;
+	} else if (core->HasFeature(GFFlags::FIXED_MORALE_OPCODE)) {
+		fx->Parameter3 = 1;
+	}
+
 	delete myfx;
 	return ret;
 }
@@ -8253,7 +8294,7 @@ int fx_remove_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x142 (322) unused in ees
+// 0x142 (322) unused in ees, see "Evade Area of Effect" on IESDP
 
 // 0x133 TurnLevel (gemrb extension for iwd2)
 // 0x143 (323) Stat: Turn Undead Level

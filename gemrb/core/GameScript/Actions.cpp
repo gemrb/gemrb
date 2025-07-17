@@ -5161,14 +5161,11 @@ void GameScript::SendTrigger(Scriptable* Sender, Action* parameters)
 void GameScript::Shout(Scriptable* Sender, Action* parameters)
 {
 	const Actor* actor = Scriptable::As<Actor>(Sender);
-	if (!actor) {
+	// skip dead ones or the paladin ogres turn Garren hostile
+	if (!actor || actor->GetStat(IE_STATE_ID) & STATE_DEAD) {
 		return;
 	}
-	//according to IESDP silenced creatures cannot use shout
-	// neither do dead ones or the paladin ogres turn Garren hostile
-	if (actor->GetStat(IE_STATE_ID) & STATE_DEAD || actor->CheckSilenced()) {
-		return;
-	}
+
 	const Map* map = Sender->GetCurrentArea();
 	map->Shout(actor, parameters->int0Parameter, false);
 }
@@ -5176,13 +5173,10 @@ void GameScript::Shout(Scriptable* Sender, Action* parameters)
 void GameScript::GlobalShout(Scriptable* Sender, Action* parameters)
 {
 	const Actor* actor = Scriptable::As<Actor>(Sender);
-	if (!actor) {
+	if (!actor || actor->GetStat(IE_STATE_ID) & STATE_DEAD) {
 		return;
 	}
-	//according to IESDP silenced creatures cannot use shout
-	if (actor->GetStat(IE_STATE_ID) & STATE_DEAD || actor->CheckSilenced()) {
-		return;
-	}
+
 	const Map* map = Sender->GetCurrentArea();
 	// true means global, unlimited, shout distance
 	map->Shout(actor, parameters->int0Parameter, true);
@@ -5194,7 +5188,7 @@ void GameScript::Help(Scriptable* Sender, Action* /*parameters*/)
 	if (!actor) {
 		return;
 	}
-	//TODO: add state limiting like in Shout?
+
 	const Map* map = Sender->GetCurrentArea();
 	map->Shout(actor, 0, false);
 }

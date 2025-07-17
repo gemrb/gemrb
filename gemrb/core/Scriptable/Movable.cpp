@@ -47,6 +47,11 @@ Point Movable::GetMostLikelyPosition() const
 	return Destination;
 }
 
+void Movable::SetStanceDirect(unsigned int arg)
+{
+	StanceID = static_cast<unsigned char>(arg);
+}
+
 void Movable::SetStance(unsigned int arg)
 {
 	// don't modify stance from dead back to anything if the actor is dead
@@ -58,7 +63,7 @@ void Movable::SetStance(unsigned int arg)
 	}
 
 	if (arg >= MAX_ANIMS) {
-		StanceID = IE_ANI_AWAKE;
+		SetStanceDirect(IE_ANI_AWAKE);
 		Log(ERROR, "Movable", "Tried to set invalid stance id({})", arg);
 		return;
 	}
@@ -71,17 +76,17 @@ void Movable::SetStance(unsigned int arg)
 		}
 	}
 
-	StanceID = (unsigned char) arg;
+	SetStanceDirect(arg);
 
 	if (StanceID == IE_ANI_ATTACK) {
 		// Set stance to a random attack animation
 		int random = RAND(0, 99);
 		if (random < AttackMovements[0]) {
-			StanceID = IE_ANI_ATTACK_BACKSLASH;
+			SetStanceDirect(IE_ANI_ATTACK_BACKSLASH);
 		} else if (random < AttackMovements[0] + AttackMovements[1]) {
-			StanceID = IE_ANI_ATTACK_SLASH;
+			SetStanceDirect(IE_ANI_ATTACK_SLASH);
 		} else {
-			StanceID = IE_ANI_ATTACK_JAB;
+			SetStanceDirect(IE_ANI_ATTACK_JAB);
 		}
 	}
 
@@ -136,7 +141,7 @@ orient_t Movable::GetNextFace() const
 
 void Movable::Backoff()
 {
-	StanceID = IE_ANI_READY;
+	SetStanceDirect(IE_ANI_READY);
 	if (InternalFlags & IF_RUNNING) {
 		randomBackoff = RAND(MAX_PATH_TRIES * 2 / 3, MAX_PATH_TRIES * 4 / 3);
 	} else {
@@ -211,7 +216,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	if (!time) time = core->GetGame()->Ticks;
 	if (!walkScale) {
 		// zero speed: no movement
-		StanceID = IE_ANI_READY;
+		SetStanceDirect(IE_ANI_READY);
 		timeStartStep = time;
 		return;
 	}
@@ -283,14 +288,12 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	if (blocksSearch) {
 		area->ClearSearchMapFor(this);
 	}
-	StanceID = IE_ANI_WALK;
+	SetStanceDirect(IE_ANI_WALK);
 	if (InternalFlags & IF_RUNNING) {
-		StanceID = IE_ANI_RUN;
+		SetStanceDirect(IE_ANI_RUN);
 	}
-	Pos.x += dx;
-	Pos.y += dy;
+	SetPos(NavmapPoint(Pos.x + dx, Pos.y + dy));
 	oldPos = Pos;
-	SMPos = SearchmapPoint(Pos);
 	if (actor && blocksSearch) {
 		auto flag = actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
 		area->tileProps.PaintSearchMap(SMPos, circleSize, flag);
@@ -484,7 +487,7 @@ void Movable::ClearPath(bool resetDestination)
 		Destination = Pos;
 
 		if (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN) {
-			StanceID = IE_ANI_AWAKE;
+			SetStanceDirect(IE_ANI_AWAKE);
 		}
 		HandleAnkhegStance(true);
 		InternalFlags &= ~IF_NORETICLE;

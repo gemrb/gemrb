@@ -82,7 +82,7 @@ public:
 	inline void IncrementPathTries() { pathTries++; }
 	inline void ResetPathTries() { pathTries = 0; }
 	// inliners to protect data consistency
-	inline bool IsMoving() const
+	inline bool IsInMovingStance() const
 	{
 		return (StanceID == IE_ANI_WALK || StanceID == IE_ANI_RUN);
 	}
@@ -100,6 +100,7 @@ public:
 	}
 
 	void SetStance(unsigned int arg);
+	void SetStanceDirect(unsigned int arg);
 	void SetOrientation(orient_t value, bool slow);
 	void SetOrientation(const Point& from, const Point& to, bool slow);
 	void SetAttackMoveChances(const std::array<ieWord, 3>& amc);
