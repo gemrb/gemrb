@@ -61,6 +61,7 @@ bool ScopedTimer::bIsExtraTimeTrackedInitialized = false;
 std::vector<long> ScopedTimer::extraTimeTracked;
 std::vector<std::string> ScopedTimer::extraTagsTracked;
 const std::vector<long> ScopedTimer::noExtraTime;
+const std::vector<std::string> ScopedTimer::noTags;
 
 namespace GemRB {
 
@@ -248,7 +249,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		    fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" },
 		    minDistance, size);
 	const bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
-	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellState::ACTOR : TraversabilityCache::TraversabilityCellState::ACTOR_NON_TRAVERSABLE;
+	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellValueActor: TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	SearchmapPoint smptDest0 { d };
@@ -502,7 +503,7 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 	});
 	std::cout << "|---------:|--------------------:|--------------------:|--------:|----------:|:----------" << "\n| relative |               " << units << "/op |                op/s |    err% |     total | benchmark" << std::endl;
 #else
-		auto prepareBenchmarkTableRow = [](const std::string& benchmarkName, long measurementMicroseconds,  const std::vector<long>& extraTimeMeasurements, long baselineMeasurement, bool bIsExtraTimeAlreadyIncludedInMeasurement) {
+		auto prepareBenchmarkTableRow = [](const std::string& benchmarkName, long measurementMicroseconds,  const std::vector<long>& extraTimeMeasurements, const std::vector<std::string>& extraTags, long baselineMeasurement) {
 			constexpr double microsecondsFactor = 1'000'000.0;
 
 			// don't allow infinities or nans in the table
@@ -513,9 +514,27 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 				baselineMeasurement = 1;
 			}
 
-			const long extraMicroseconds = std::accumulate(extraTimeMeasurements.cbegin(), extraTimeMeasurements.cend(), 0l);
+			const std::vector<std::string> ExtraTagsAlreadyIncludedInImprovedMeasurement {
+				"$"
+			};
 
-			const long improvementWithExtraTotal = measurementMicroseconds + (!bIsExtraTimeAlreadyIncludedInMeasurement ? extraMicroseconds : 0l);
+			long extraMicrosecondsIncluded = 0;
+			long extraMicrosecondsExcluded = 0;
+			for (size_t i = 0; i < extraTimeMeasurements.size(); ++i) {
+				const auto foundOnIncluded = std::find(ExtraTagsAlreadyIncludedInImprovedMeasurement.cbegin(), ExtraTagsAlreadyIncludedInImprovedMeasurement.cend(), extraTags[i]);
+				if (foundOnIncluded == ExtraTagsAlreadyIncludedInImprovedMeasurement.cend()) {
+					extraMicrosecondsExcluded += extraTimeMeasurements[i];
+				}
+				else {
+					extraMicrosecondsIncluded += extraTimeMeasurements[i];
+				}
+			}
+			long extraMicroseconds = extraMicrosecondsExcluded + extraMicrosecondsIncluded;
+			if (extraMicroseconds == 0) {
+				extraMicroseconds = 1;
+			}
+
+			const long improvementWithExtraTotal = measurementMicroseconds + extraMicrosecondsExcluded;
 			const float improvementWithExtraOpsPerSecond = microsecondsFactor / (improvementWithExtraTotal);
 			const float improvementWithExtraPercent = (baselineMeasurement / float(improvementWithExtraTotal)) * 100;
 
@@ -543,16 +562,15 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 			return line;
 		};
 
-		const std::string lineOriginal = prepareBenchmarkTableRow("FindPathOriginal", originalMicroseconds, ScopedTimer::noExtraTime, originalMicroseconds, false);
-		const std::string lineImproved = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx], improvedMicroseconds, ScopedTimer::noExtraTime, originalMicroseconds, false);
+		const std::string lineOriginal = prepareBenchmarkTableRow("FindPathOriginal", originalMicroseconds, ScopedTimer::noExtraTime, ScopedTimer::noTags, originalMicroseconds);
+		const std::string lineImproved = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx], improvedMicroseconds, ScopedTimer::noExtraTime, ScopedTimer::noTags, originalMicroseconds);
 
 		const std::string line = "|---------:|--------------------:|--------------------:|--------:|----------:|:----------\n";
 		const std::string headings = "| relative |               us/op |                op/s |    err% |     total | benchmark\n";
 		std::string tableToPrint = headings + line + lineOriginal + lineImproved;
 
 		if (!ScopedTimer::extraTimeTracked.empty()) {
-			constexpr bool bIsExtraTimeAlreadyIncludedInImprovedMeasurement = true;
-			const std::string lineImprovedExtra = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx] + std::string("+"), improvedMicroseconds, ScopedTimer::extraTimeTracked, originalMicroseconds, bIsExtraTimeAlreadyIncludedInImprovedMeasurement);
+			const std::string lineImprovedExtra = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx] + std::string("+"), improvedMicroseconds, ScopedTimer::extraTimeTracked, ScopedTimer::extraTagsTracked, originalMicroseconds);
 			tableToPrint += lineImprovedExtra;
 			ScopedTimer::extraTimeTracked.clear();
 			ScopedTimer::extraTagsTracked.clear();

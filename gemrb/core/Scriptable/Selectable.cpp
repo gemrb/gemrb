@@ -30,13 +30,17 @@ void Selectable::SetBBox(const Region& newBBox)
 }
 
 // NOTE: still need to multiply by 4 or 3 to get full pixel radii
-int Selectable::CircleSize2Radius() const
+int Selectable::CircleSize2Radius(int circleSize)
 {
 	// for size >= 2, radii are (size-1)*16, (size-1)*12
 	// for size == 1, radii are 12, 9
 	int adjustedSize = (circleSize - 1) * 4;
 	if (adjustedSize < 4) adjustedSize = 3;
 	return adjustedSize;
+}
+
+int Selectable::CircleSize2Radius() const {
+	return CircleSize2Radius(this->circleSize);
 }
 
 void Selectable::DrawCircle(const Point& p) const
