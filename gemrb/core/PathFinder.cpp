@@ -520,7 +520,7 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 
 			long extraMicrosecondsIncluded = 0;
 			long extraMicrosecondsExcluded = 0;
-			for (int i = 0; i < extraTimeMeasurements.size(); ++i) {
+			for (size_t i = 0; i < extraTimeMeasurements.size(); ++i) {
 				const auto foundOnIncluded = std::find(ExtraTagsAlreadyIncludedInImprovedMeasurement.cbegin(), ExtraTagsAlreadyIncludedInImprovedMeasurement.cend(), extraTags[i]);
 				if (foundOnIncluded == ExtraTagsAlreadyIncludedInImprovedMeasurement.cend()) {
 					extraMicrosecondsExcluded += extraTimeMeasurements[i];

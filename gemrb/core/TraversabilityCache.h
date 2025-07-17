@@ -98,13 +98,10 @@ struct FitRegion {
  */
 class TraversabilityCache {
 public:
-    using TraversabilityCellState = uint16_t;
-	/**
-	 * Enum describing traversability state of a single navmap point in terms of occupying them actors.
-	 */
+    using TraversabilityCellState = uint8_t;
 	static constexpr TraversabilityCellState TraversabilityCellValueEmpty = 0;
 	static constexpr TraversabilityCellState TraversabilityCellValueActor = 1;
-	static constexpr TraversabilityCellState TraversabilityCellValueActorNonTraversable = 100;
+	static constexpr TraversabilityCellState TraversabilityCellValueActorNonTraversable = 15;
 
 	/**
 	 * Struct holding data describing traversability of a navmap point: its state and potential actor data.
