@@ -11712,12 +11712,13 @@ bool Actor::TouchAttack(const Projectile* pro) const
 	return !fail;
 }
 
-std::unordered_map<Actor::BlockingSizeCategory, std::vector<bool>> Actor::SizeCategoryToBlockingShape;
+std::vector<std::vector<bool>> Actor::SizeCategoryToBlockingShape;
 
 const std::vector<bool>& Actor::GetBlockingShape(const Actor* actor, const BlockingSizeCategory& blockingSizeCategory) {
-    auto foundShape = SizeCategoryToBlockingShape.find(blockingSizeCategory);
-    if (foundShape == SizeCategoryToBlockingShape.end())
-    {
+	if (SizeCategoryToBlockingShape.size() <= blockingSizeCategory) {
+		SizeCategoryToBlockingShape.resize(blockingSizeCategory+1);
+	}
+	if (SizeCategoryToBlockingShape[blockingSizeCategory].empty()) {
         std::vector<bool> blockingShape;
     	const float_t sizeFactor = actor->sizeFactor;
         if (sizeFactor != 0) {
@@ -11734,10 +11735,9 @@ const std::vector<bool>& Actor::GetBlockingShape(const Actor* actor, const Block
     			}
     		}
     	}
-    	const auto emplacedShape = SizeCategoryToBlockingShape.emplace(blockingSizeCategory, std::move(blockingShape));
-    	foundShape = emplacedShape.first;
+		SizeCategoryToBlockingShape[blockingSizeCategory] = std::move(blockingShape);
     }
-	return foundShape->second;
+	return SizeCategoryToBlockingShape[blockingSizeCategory];
 }
 
 Actor::BlockingSizeCategory Actor::getSizeCategory() const {
