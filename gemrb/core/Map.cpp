@@ -1786,42 +1786,6 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 		}
 	};
 
-	// draw Traversability cache
-	{
-		Color TraversabilityColors[] {
-			Color{255, 255, 255, 30}, // none
-			Color{0, 255, 0, 180}, // actor but passable
-			Color{255, 0, 0, 180}, // blocked
-		};
-
-		Region block(0, 0, 1, 1);
-
-		BlitFlags flags = BlitFlags::BLENDED;
-		if (dFlags & DEBUG_SHOW_LIGHTMAP) {
-			flags |= BlitFlags::HALFTRANS;
-		}
-
-		for (int x = vp.x; x < vp.x + vp.w; ++x) {
-			for (int y = vp.y; y < vp.y + vp.h; ++y) {
-				const size_t Idx = y * PropsSize().w * 16 + x;
-				const Point p{x, y};
-				if (Idx < traversabilityCache.Size()) {
-					size_t colorIdx = 0;
-					if (traversabilityCache.GetCellData(Idx).state >= TraversabilityCache::TraversabilityCellValueActor) {
-						colorIdx = 1;
-					}
-					if (traversabilityCache.GetCellData(Idx).state >= TraversabilityCache::TraversabilityCellValueActorNonTraversable) {
-						colorIdx = 2;
-					}
-					VideoDriver->DrawPoint(p - vp.origin, TraversabilityColors[colorIdx], BLENDED);
-				}
-				else {
-					VideoDriver->DrawPoint(p - vp.origin, Color{200, 0, 200, 0}, BLENDED);
-				}
-			}
-		}
-	}
-
 	if (dFlags & DEBUG_SHOW_SEARCHMAP) {
 		// draw also pathfinding waypoints
 		const Game* game = core->GetGame();

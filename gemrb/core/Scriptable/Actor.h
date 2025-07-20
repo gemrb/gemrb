@@ -620,6 +620,8 @@ public:
 	std::string dump() const override;
 	/** fixes the feet circle */
 	void SetCircleSize();
+	/** get the size category for this actor; it's used to determine and track region needed for tracing blocking shape
+	 * of this actor in the traversability cache */
 	BlockingSizeCategory getSizeCategory() const;
 	/** places the actor on the map */
 	void SetMap(Map* map);

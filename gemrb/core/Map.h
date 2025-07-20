@@ -31,7 +31,6 @@
 #include "TableMgr.h"
 #include "TraversabilityCache.h"
 #include "WorldMap.h"
-#include "TraversabilityCache.h"
 
 #include "Scriptable/Scriptable.h"
 #include "Video/Video.h"

@@ -315,7 +315,7 @@ TraversabilityCache::TraversabilityCellState TraversabilityCache::CachedActorsSt
 		TraversabilityCellValueActor
 	};
 
-	// if it's not alive, we should mark cell as Empty
+	// if it's not alive, we should mark cell as empty
 	// if it's alive, we check the bumpable to determine the cell state
 
 	// This equation produces the following values, which directly maps onto
@@ -370,13 +370,13 @@ const std::vector<bool>& TraversabilityCache::GetBlockingShape(const Actor* acto
 	return BlockingShapeCache[blockingSizeCategory];
 }
 
-uint16_t TraversabilityCache::GetBlockingShapeRegionW(const Actor::BlockingSizeCategory& blockingSizeCategory, float sizeFactor)
+uint16_t TraversabilityCache::GetBlockingShapeRegionW(const Actor::BlockingSizeCategory blockingSizeCategory, const float sizeFactor)
 {
 	const auto baseSize = sizeFactor * Actor::CircleSize2Radius(blockingSizeCategory);
 	return baseSize * 8;
 }
 
-uint16_t TraversabilityCache::GetBlockingShapeRegionH(const Actor::BlockingSizeCategory& blockingSizeCategory, float sizeFactor)
+uint16_t TraversabilityCache::GetBlockingShapeRegionH(const Actor::BlockingSizeCategory blockingSizeCategory, const float sizeFactor)
 {
 	const auto baseSize = sizeFactor * Actor::CircleSize2Radius(blockingSizeCategory);
 	return baseSize * 6;

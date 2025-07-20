@@ -98,6 +98,27 @@ struct FitRegion {
  */
 class TraversabilityCache {
 public:
+	// There can be more than one actor occupying a navmap cell, the cache must be able
+	// to represent more than one traversability value per cell at a time.
+	//
+	// We will use a token strategy:
+	// Upon entering a cell, each actor will put its token to the cell - increase the cell's
+	// numerical value by (1) if being bumpable and (15) if not being bumpable.
+	// The same value is subtracted when leaving a cell (token removal).
+	//
+	// If a cell has value of 0, it means no actor is occupying it.
+	// If a cell has value between 1 and 14, it means there are only bumpable
+	// actors.
+	// If a cell crosses the threshold of 15, it means there is at least one
+	// non-bumpable actor.
+	//
+	// This gives us ability to properly store 14 bumpable actors and 16
+	// non-bumpable actors in one uint8_t cell - more than plenty enough.
+	//
+	// Treating it as tokens also removes the need of re-drawing neighbouring
+	// actors on clearing previous position, as now we don't blindly erase the cells' state,
+	// but maintaining it in a more meaningful fashion.
+
 	using TraversabilityCellState = uint8_t;
 	static constexpr TraversabilityCellState TraversabilityCellValueEmpty = 0;
 	static constexpr TraversabilityCellState TraversabilityCellValueActor = 1;
@@ -141,7 +162,7 @@ public:
 private:
 	/**
 	 * Struct for storing cached state of actors on the map: position, occupied region on the navmap,
-	 * bumpable state and alive state.
+	 * bumpable and alive states and their size category.
 	 */
 	struct CachedActorsState {
 		constexpr static uint8_t FLAG_BUMPABLE = 1;
@@ -204,16 +225,16 @@ private:
 
 	void ValidateTraversabilityCacheSize();
 
-	// this could have been a map of (actor's size category)->(blocking shape),
+	// BlockingShapeCache could have been a map of (actor's size category)->(blocking shape),
 	// but it's deliberately not a map; actors' size categories usually range from 0-3 (large creatures, e.g. dragons, having it at 7),
 	// direct vector access via idx will be faster on slow HW than going through std::unordered_map buckets
 	static std::vector<std::vector<bool>> BlockingShapeCache;
 
 	static const std::vector<bool>& GetBlockingShape(const Actor* actor, Actor::BlockingSizeCategory blockingSizeCategory);
 
-	static uint16_t GetBlockingShapeRegionW(const Actor::BlockingSizeCategory& blockingSizeCategory, float sizeFactor);
+	static uint16_t GetBlockingShapeRegionW(Actor::BlockingSizeCategory blockingSizeCategory, float sizeFactor);
 
-	static uint16_t GetBlockingShapeRegionH(const Actor::BlockingSizeCategory& blockingSizeCategory, float sizeFactor);
+	static uint16_t GetBlockingShapeRegionH(Actor::BlockingSizeCategory blockingSizeCategory, float sizeFactor);
 };
 }
 
