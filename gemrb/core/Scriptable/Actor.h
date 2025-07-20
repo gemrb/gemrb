@@ -445,41 +445,6 @@ using vvcDict = std::multimap<ResRef, ScriptedAnimation*>;
 
 class GEM_EXPORT Actor : public Movable {
 public:
-	bool IsTraversable() const {
-		if (!ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED)) {
-			return true;
-		}
-		if (ValidTarget(GA_ONLY_BUMPABLE)) {
-			return true;
-		}
-		return false;
-	}
-
-	typedef int BlockingSizeCategory;
-	// struct BlockingSizeCategory {
-	// 	int circleSize;
-	// 	float sizeFactor;
-	// 	bool operator==(const BlockingSizeCategory& other) const {
-	// 		return sizeFactor == other.sizeFactor && circleSize == other.circleSize;
-	// 	}
-	//
-	// 	bool operator!=(const BlockingSizeCategory& other) const {
-	// 		return sizeFactor != other.sizeFactor || circleSize != other.circleSize;
-	// 	}
-	// };
-	// struct BlockingSizeCategoryHash {
-	// 	std::size_t operator()(const BlockingSizeCategory& s) const {
-	// 		return std::hash<int>{}(s.circleSize) + std::hash<float>{}(s.sizeFactor);
-	// 	}
-	// };
-    static std::vector<std::vector<bool>> SizeCategoryToBlockingShape;
-    static const std::vector<bool>& GetBlockingShape(const Actor* actor, const BlockingSizeCategory& blockingSizeCategory);
-	BlockingSizeCategory getSizeCategory() const;
-
-	static uint16_t GetBlockingShapeRegionW(const BlockingSizeCategory& blockingSizeCategory, float sizeFactor);
-
-	static uint16_t GetBlockingShapeRegionH(const BlockingSizeCategory& blockingSizeCategory, float sizeFactor);
-
 	using stat_t = ieDword;
 	using stats_t = std::array<stat_t, MAX_STATS>;
 	//CRE DATA FIELDS
@@ -642,6 +607,7 @@ private:
 	void RefreshEffects(bool init, const stats_t& prev);
 
 public:
+	using BlockingSizeCategory = uint8_t;
 	Actor(void);
 	Actor(const Actor&) = delete;
 	~Actor() override;
@@ -654,6 +620,7 @@ public:
 	std::string dump() const override;
 	/** fixes the feet circle */
 	void SetCircleSize();
+	BlockingSizeCategory getSizeCategory() const;
 	/** places the actor on the map */
 	void SetMap(Map* map);
 	/** sets the actor's position, calculating with the nojump flag*/

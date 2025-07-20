@@ -98,7 +98,7 @@ struct FitRegion {
  */
 class TraversabilityCache {
 public:
-    using TraversabilityCellState = uint8_t;
+	using TraversabilityCellState = uint8_t;
 	static constexpr TraversabilityCellState TraversabilityCellValueEmpty = 0;
 	static constexpr TraversabilityCellState TraversabilityCellValueActor = 1;
 	static constexpr TraversabilityCellState TraversabilityCellValueActorNonTraversable = 15;
@@ -108,7 +108,7 @@ public:
 	 */
 	struct TraversabilityCellData {
 		Actor* occupyingActor = nullptr;
-        TraversabilityCellState state = TraversabilityCellValueEmpty;
+		TraversabilityCellState state = TraversabilityCellValueEmpty;
 	};
 
 	explicit TraversabilityCache(class Map* inMap)
@@ -151,7 +151,7 @@ private:
 		std::vector<Actor*> actor;
 		std::vector<Point> pos;
 		std::vector<uint8_t> flags;
-		std::vector<Actor::BlockingSizeCategory> blockingSizeCategory;
+		std::vector<Actor::BlockingSizeCategory> sizeCategory;
 
 		explicit CachedActorsState(size_t reserve);
 
@@ -174,29 +174,14 @@ private:
 		static FitRegion CalculateRegion(const Actor* inActor);
 
 		// flags manipulation should be inlined
-		void SetIsBumpable(const size_t i)
+		void SetIsBumpable(const size_t i, const bool isBumpable)
 		{
-			flags[i] |= (1 << FLAG_BUMPABLE);
+			flags[i] = (flags[i] & ~(1 << FLAG_BUMPABLE)) | (isBumpable << FLAG_BUMPABLE);
 		}
 
-		void ResetIsBumpable(const size_t i)
+		void SetIsAlive(const size_t i, const bool isAlive)
 		{
-			flags[i] &= ~(1 << FLAG_BUMPABLE);
-		}
-
-		void SetIsAlive(const size_t i)
-		{
-			flags[i] |= (1 << FLAG_ALIVE);
-		}
-
-		void ResetIsAlive(const size_t i)
-		{
-			flags[i] &= ~(1 << FLAG_ALIVE);
-		}
-
-		void FlipIsBumpable(const size_t i)
-		{
-			flags[i] ^= (1 << FLAG_BUMPABLE);
+			flags[i] = (flags[i] & ~(1 << FLAG_ALIVE)) | (isAlive << FLAG_ALIVE);
 		}
 
 		bool GetIsBumpable(const size_t i) const
@@ -208,7 +193,8 @@ private:
 		{
 			return flags[i] & (1 << FLAG_ALIVE);
 		}
-		TraversabilityCellState GetCellStateFromFlags(const size_t i) const;
+
+		TraversabilityCellState GetCellStateFromFlags(size_t i) const;
 	};
 
 	Map* map;
@@ -217,6 +203,17 @@ private:
 	bool hasBeenUpdatedThisFrame { false };
 
 	void ValidateTraversabilityCacheSize();
+
+	// this could have been a map of (actor's size category)->(blocking shape),
+	// but it's deliberately not a map; actors' size categories usually range from 0-3 (large creatures, e.g. dragons, having it at 7),
+	// direct vector access via idx will be faster on slow HW than going through std::unordered_map buckets
+	static std::vector<std::vector<bool>> BlockingShapeCache;
+
+	static const std::vector<bool>& GetBlockingShape(const Actor* actor, Actor::BlockingSizeCategory blockingSizeCategory);
+
+	static uint16_t GetBlockingShapeRegionW(const Actor::BlockingSizeCategory& blockingSizeCategory, float sizeFactor);
+
+	static uint16_t GetBlockingShapeRegionH(const Actor::BlockingSizeCategory& blockingSizeCategory, float sizeFactor);
 };
 }
 

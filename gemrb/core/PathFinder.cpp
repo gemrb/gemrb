@@ -35,7 +35,6 @@
 // which is solved with a P regulator, see Scriptable.cpp
 
 #include "PathFinder.h"
-#include "fmt/format.h"
 
 #include "Debug.h"
 #include "FibonacciHeap.h"
@@ -45,6 +44,7 @@
 
 #include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
+#include "fmt/format.h"
 #if USE_TRACY
 	#include "tracy/TracyC.h"
 #endif
@@ -249,7 +249,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		    fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" },
 		    minDistance, size);
 	const bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
-	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellValueActor: TraversabilityCache::TraversabilityCellValueActorNonTraversable;
+	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellValueActor : TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	SearchmapPoint smptDest0 { d };
@@ -503,81 +503,80 @@ Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigne
 	});
 	std::cout << "|---------:|--------------------:|--------------------:|--------:|----------:|:----------" << "\n| relative |               " << units << "/op |                op/s |    err% |     total | benchmark" << std::endl;
 #else
-		auto prepareBenchmarkTableRow = [](const std::string& benchmarkName, long measurementMicroseconds,  const std::vector<long>& extraTimeMeasurements, const std::vector<std::string>& extraTags, long baselineMeasurement) {
-			constexpr double microsecondsFactor = 1'000'000.0;
+	auto prepareBenchmarkTableRow = [](const std::string& benchmarkName, long measurementMicroseconds, const std::vector<long>& extraTimeMeasurements, const std::vector<std::string>& extraTags, long baselineMeasurement) {
+		constexpr double microsecondsFactor = 1'000'000.0;
 
-			// don't allow infinities or nans in the table
-			if (measurementMicroseconds == 0) {
-				measurementMicroseconds = 1;
-			}
-			if (baselineMeasurement == 0) {
-				baselineMeasurement = 1;
-			}
-
-			const std::vector<std::string> ExtraTagsAlreadyIncludedInImprovedMeasurement {
-				"$"
-			};
-
-			long extraMicrosecondsIncluded = 0;
-			long extraMicrosecondsExcluded = 0;
-			for (size_t i = 0; i < extraTimeMeasurements.size(); ++i) {
-				const auto foundOnIncluded = std::find(ExtraTagsAlreadyIncludedInImprovedMeasurement.cbegin(), ExtraTagsAlreadyIncludedInImprovedMeasurement.cend(), extraTags[i]);
-				if (foundOnIncluded == ExtraTagsAlreadyIncludedInImprovedMeasurement.cend()) {
-					extraMicrosecondsExcluded += extraTimeMeasurements[i];
-				}
-				else {
-					extraMicrosecondsIncluded += extraTimeMeasurements[i];
-				}
-			}
-			long extraMicroseconds = extraMicrosecondsExcluded + extraMicrosecondsIncluded;
-			if (extraMicroseconds == 0) {
-				extraMicroseconds = 1;
-			}
-
-			const long improvementWithExtraTotal = measurementMicroseconds + extraMicrosecondsExcluded;
-			const float improvementWithExtraOpsPerSecond = microsecondsFactor / (improvementWithExtraTotal);
-			const float improvementWithExtraPercent = (baselineMeasurement / float(improvementWithExtraTotal)) * 100;
-
-			std::string line = fmt::format("| {:>7.1f}% | {:>15}.00  | {:>19.2f} |    0.0% |      0.00 | `{}`", improvementWithExtraPercent, improvementWithExtraTotal, improvementWithExtraOpsPerSecond, benchmarkName);
-
-			if (!extraTimeMeasurements.empty()) {
-				long improvementWithoutExtraTotal = improvementWithExtraTotal - extraMicroseconds;
-				if (improvementWithoutExtraTotal == 0) {
-					improvementWithoutExtraTotal = 1;
-				}
-				const float improvementWithoutExtraOpsPerSecond = microsecondsFactor / improvementWithoutExtraTotal;
-				const float improvementWithoutExtraPercent = (baselineMeasurement / float(improvementWithoutExtraTotal)) * 100;
-
-
-				std::string extraTimeString = fmt::format(" Extra time: {}us, {}ops (", extraMicroseconds, extraTimeMeasurements.size());
-				for (size_t i = 0; i < extraTimeMeasurements.size(); ++i) {
-					extraTimeString += ScopedTimer::extraTagsTracked[i] + " " + std::to_string(extraTimeMeasurements[i]) + ", ";
-				}
-				extraTimeString += ")";
-				const std::string improvementWithoutExtraString = fmt::format(" =without extra: {:.1f}% rel, {}us/op, {:.2f}op/s= ", improvementWithoutExtraPercent, improvementWithoutExtraTotal, improvementWithoutExtraOpsPerSecond);
-
-				line += extraTimeString + improvementWithoutExtraString;
-			}
-			line += "\n";
-			return line;
-		};
-
-		const std::string lineOriginal = prepareBenchmarkTableRow("FindPathOriginal", originalMicroseconds, ScopedTimer::noExtraTime, ScopedTimer::noTags, originalMicroseconds);
-		const std::string lineImproved = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx], improvedMicroseconds, ScopedTimer::noExtraTime, ScopedTimer::noTags, originalMicroseconds);
-
-		const std::string line = "|---------:|--------------------:|--------------------:|--------:|----------:|:----------\n";
-		const std::string headings = "| relative |               us/op |                op/s |    err% |     total | benchmark\n";
-		std::string tableToPrint = headings + line + lineOriginal + lineImproved;
-
-		if (!ScopedTimer::extraTimeTracked.empty()) {
-			const std::string lineImprovedExtra = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx] + std::string("+"), improvedMicroseconds, ScopedTimer::extraTimeTracked, ScopedTimer::extraTagsTracked, originalMicroseconds);
-			tableToPrint += lineImprovedExtra;
-			ScopedTimer::extraTimeTracked.clear();
-			ScopedTimer::extraTagsTracked.clear();
+		// don't allow infinities or nans in the table
+		if (measurementMicroseconds == 0) {
+			measurementMicroseconds = 1;
+		}
+		if (baselineMeasurement == 0) {
+			baselineMeasurement = 1;
 		}
 
-		tableToPrint += line + headings;
-		Log(DEBUG, "FindPath", "--RunFindPath--\n{}", tableToPrint);
+		const std::vector<std::string> ExtraTagsAlreadyIncludedInImprovedMeasurement {
+			"$"
+		};
+
+		long extraMicrosecondsIncluded = 0;
+		long extraMicrosecondsExcluded = 0;
+		for (size_t i = 0; i < extraTimeMeasurements.size(); ++i) {
+			const auto foundOnIncluded = std::find(ExtraTagsAlreadyIncludedInImprovedMeasurement.cbegin(), ExtraTagsAlreadyIncludedInImprovedMeasurement.cend(), extraTags[i]);
+			if (foundOnIncluded == ExtraTagsAlreadyIncludedInImprovedMeasurement.cend()) {
+				extraMicrosecondsExcluded += extraTimeMeasurements[i];
+			} else {
+				extraMicrosecondsIncluded += extraTimeMeasurements[i];
+			}
+		}
+		long extraMicroseconds = extraMicrosecondsExcluded + extraMicrosecondsIncluded;
+		if (extraMicroseconds == 0) {
+			extraMicroseconds = 1;
+		}
+
+		const long improvementWithExtraTotal = measurementMicroseconds + extraMicrosecondsExcluded;
+		const float improvementWithExtraOpsPerSecond = microsecondsFactor / (improvementWithExtraTotal);
+		const float improvementWithExtraPercent = (baselineMeasurement / float(improvementWithExtraTotal)) * 100;
+
+		std::string line = fmt::format("| {:>7.1f}% | {:>15}.00  | {:>19.2f} |    0.0% |      0.00 | `{}`", improvementWithExtraPercent, improvementWithExtraTotal, improvementWithExtraOpsPerSecond, benchmarkName);
+
+		if (!extraTimeMeasurements.empty()) {
+			long improvementWithoutExtraTotal = improvementWithExtraTotal - extraMicroseconds;
+			if (improvementWithoutExtraTotal == 0) {
+				improvementWithoutExtraTotal = 1;
+			}
+			const float improvementWithoutExtraOpsPerSecond = microsecondsFactor / improvementWithoutExtraTotal;
+			const float improvementWithoutExtraPercent = (baselineMeasurement / float(improvementWithoutExtraTotal)) * 100;
+
+
+			std::string extraTimeString = fmt::format(" Extra time: {}us, {}ops (", extraMicroseconds, extraTimeMeasurements.size());
+			for (size_t i = 0; i < extraTimeMeasurements.size(); ++i) {
+				extraTimeString += ScopedTimer::extraTagsTracked[i] + " " + std::to_string(extraTimeMeasurements[i]) + ", ";
+			}
+			extraTimeString += ")";
+			const std::string improvementWithoutExtraString = fmt::format(" =without extra: {:.1f}% rel, {}us/op, {:.2f}op/s= ", improvementWithoutExtraPercent, improvementWithoutExtraTotal, improvementWithoutExtraOpsPerSecond);
+
+			line += extraTimeString + improvementWithoutExtraString;
+		}
+		line += "\n";
+		return line;
+	};
+
+	const std::string lineOriginal = prepareBenchmarkTableRow("FindPathOriginal", originalMicroseconds, ScopedTimer::noExtraTime, ScopedTimer::noTags, originalMicroseconds);
+	const std::string lineImproved = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx], improvedMicroseconds, ScopedTimer::noExtraTime, ScopedTimer::noTags, originalMicroseconds);
+
+	const std::string line = "|---------:|--------------------:|--------------------:|--------:|----------:|:----------\n";
+	const std::string headings = "| relative |               us/op |                op/s |    err% |     total | benchmark\n";
+	std::string tableToPrint = headings + line + lineOriginal + lineImproved;
+
+	if (!ScopedTimer::extraTimeTracked.empty()) {
+		const std::string lineImprovedExtra = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx] + std::string("+"), improvedMicroseconds, ScopedTimer::extraTimeTracked, ScopedTimer::extraTagsTracked, originalMicroseconds);
+		tableToPrint += lineImprovedExtra;
+		ScopedTimer::extraTimeTracked.clear();
+		ScopedTimer::extraTagsTracked.clear();
+	}
+
+	tableToPrint += line + headings;
+	Log(DEBUG, "FindPath", "--RunFindPath--\n{}", tableToPrint);
 #endif
 
 #if PATH_RETURN_ORIGINAL
