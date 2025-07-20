@@ -23,7 +23,7 @@
 #include "Interface.h"
 
 #ifdef USE_TRACY
-	// #include <tracy/TracyOpenGL.hpp>
+	#include <tracy/TracyOpenGL.hpp>
 #endif
 
 // don't move this up
@@ -326,14 +326,14 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	}
 
 	{
-		// TRACY(ZoneScopedN("SDL_RenderPresent"));
+		TRACY(ZoneScopedN("SDL_RenderPresent"));
 		SDL_RenderPresent(renderer);
 	}
 #if USE_OPENGL_BACKEND
 	TRACY(TracyGpuCollect);
 #endif
 
-//	TRACY(FrameMark);
+	TRACY(FrameMark);
 }
 
 SDLVideoDriver::vid_buf_t* SDL20VideoDriver::ScratchBuffer() const
@@ -399,7 +399,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Region& srgn, const Region& drgn, BlitFlags flags, const SDL_Color* tint)
 {
-	//TRACY(ZoneScoped);
+	TRACY(ZoneScoped);
 	SDL_Rect srect = RectFromRegion(srgn);
 	SDL_Rect drect = RectFromRegion(drgn);
 
