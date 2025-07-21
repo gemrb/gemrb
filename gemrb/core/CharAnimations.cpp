@@ -1467,7 +1467,6 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char stanceID,
 		stanceID = IE_ANI_WALK;
 	}
 
-retry:
 	switch (stanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
@@ -1527,7 +1526,8 @@ retry:
 
 			// nothing was found, try with IE_ANI_READY
 			stanceID = MaybeOverrideStance(IE_ANI_READY);
-			goto retry;
+			AddPSTSuffix(dest, stanceID, Cycle, Orient);
+			return;
 		case IE_ANI_PST_START:
 			Cycle = 0;
 			Prefix = "ms1";
