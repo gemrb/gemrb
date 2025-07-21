@@ -126,7 +126,8 @@ FUNCTION(CONFIGURE_COMPILER)
 	IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 		# this subtly breaks things, HoW crashes on first area entry
 		#STRING(APPEND CMAKE_CXX_FLAGS " /fp:fast")
-		ADD_COMPILE_OPTIONS(/MP2) # manually enable some file-level parallelism
+		# manually enable some file-level parallelism + unicode for fmt
+		ADD_COMPILE_OPTIONS(/MP2 /utf-8)
 	ENDIF()
 
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
