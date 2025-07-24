@@ -761,7 +761,7 @@ def GetBonusSpells(pc, expand = True):
 			if GameCheck.IsPST ():
 				stats.append ((4239, bonus, 'p'))
 			else:
-				stats.append ((GemRB.GetString (10345), bonus, 'r'))
+				stats.append ((GemRB.GetString (10345), bonus, 'p'))
 
 	if expand:
 		stats.append ("\n")
@@ -801,10 +801,14 @@ def TypeSetStats (stats, pc, recolor = False):
 			elif stattype == 'd': # strref is an already resolved string
 				res.append (strref)
 			elif stattype == 'p': # a plus prefix if positive
+				# special handling to cover bonus priest spells where string is resolved earlier
+				resolvedString = strref
+				if isinstance (strref, int):
+					resolvedString = GemRB.GetString (strref)
 				if val > 0:
-					res.append (GemRB.GetString (strref) + ': +' + str (val))
+					res.append (resolvedString + ': +' + str (val))
 				else:
-					res.append (GemRB.GetString (strref) + ': ' + str (val))
+					res.append (resolvedString + ': ' + str (val))
 			elif stattype == 's': # both base and (modified) stat, but only if they differ
 				base = GB (val)
 				stat = GS (val)
@@ -840,7 +844,7 @@ def TypeSetStats (stats, pc, recolor = False):
 					if res:
 						res[-1] += s
 				else:
-					res.append (s);
+					res.append (s)
 			elif recolor:
 				res.append (won + GemRB.GetString (s) + woff)
 			else:
