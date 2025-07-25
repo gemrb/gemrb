@@ -44,9 +44,24 @@
 
 #include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
+#include "fmt/format.h"
+#if USE_TRACY
+	#include "tracy/TracyC.h"
+#endif
+
+#include "PathfindingSettings.h"
+#define ANKERL_NANOBENCH_IMPLEMENT
+#include "nanobench.h"
 
 #include <array>
 #include <limits>
+
+
+bool ScopedTimer::bIsExtraTimeTrackedInitialized = false;
+std::vector<long> ScopedTimer::extraTimeTracked;
+std::vector<std::string> ScopedTimer::extraTagsTracked;
+const std::vector<long> ScopedTimer::noExtraTime;
+const std::vector<std::string> ScopedTimer::noTags;
 
 namespace GemRB {
 
@@ -62,7 +77,7 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383,
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand { { 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924 } };
 
 // Find the best path of limited length that brings us the farthest from d
-Path Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const
+Path Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller)
 {
 	if (!caller || !caller->GetSpeed()) return {};
 	Point p = s;
@@ -89,7 +104,7 @@ Path Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAw
 	}
 	int flags = PF_SIGHT;
 	if (backAway) flags |= PF_BACKAWAY;
-	return FindPath(s, p, caller->circleSize, caller->circleSize, flags, caller);
+	return RunFindPath(s, p, caller->circleSize, caller->circleSize, flags, caller);
 }
 
 PathNode Map::RandomWalk(const Point& s, int size, int radius, const Actor* caller) const
@@ -222,15 +237,19 @@ PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
-Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller) const
+Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
 {
 	TRACY(ZoneScoped);
+
+	traversabilityCache.Update();
+
 	if (InDebugMode(DebugMode::PATHFINDER))
 		Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}",
 		    s, d,
 		    fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" },
 		    minDistance, size);
-	bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
+	const bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
+	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellValueActor : TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	SearchmapPoint smptDest0 { d };
@@ -259,15 +278,34 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	if (!mapSize.PointInside(smptSource)) return {};
 
 	// Initialize data structures
-	FibonacciHeap<PQNode> open;
-	std::vector<bool> isClosed(mapSize.Area(), false);
-	std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
-	std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
+	const size_t mapCellsCount = mapSize.Area();
+
+	FibonacciHeap<PQNode> open; // todo: remove this data structure or rewrite its implementation - too much allocations there!
+	// make most data storage for this algorithm static, to avoid memory allocations;
+	// each run we just clear the storage, which is keeping the underlying allocated memory at hand
+	static std::vector<bool> isClosed(mapSize.Area(), false);
+	static std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
+	static std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
+
+	// resize if needed (in case of a map change; probably can be done once, when new map is loaded)
+	if (isClosed.size() != mapCellsCount) {
+		parents.resize(mapCellsCount);
+		distFromStart.resize(mapCellsCount);
+	}
+
+	// cleanup
+	isClosed.clear();
+	isClosed.resize(mapCellsCount, false);
+	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
+	// number of elements, while memset performs better for large vectors
+	memset(static_cast<void*>(parents.data()), 0, sizeof(decltype(parents)::value_type) * mapCellsCount);
+	memset(static_cast<void*>(distFromStart.data()), std::numeric_limits<unsigned short>::max(), sizeof(decltype(distFromStart)::value_type) * mapCellsCount);
+
+	// begin algo init
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
 	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
 	open.emplace(PQNode(nmptSource, 0));
 	bool foundPath = false;
-	static bool usePlainThetaStar = gamedata->GetMiscRule("LAZY_THETA_STAR") == 0;
 	unsigned int squaredMinDist = minDistance * minDistance;
 
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
@@ -311,8 +349,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		isClosed[smptCurrentIdx] = true;
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
-			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
-			SearchmapPoint smptChild { nmptChild };
+			const NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
+			const SearchmapPoint smptChild { nmptChild };
 			// Outside map
 			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
@@ -329,8 +367,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			if (childBlocked) continue;
 
 			// If there's an actor, check it can be bumped away
-			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
-			bool childIsUnbumpable = childActor && childActor != caller && (actorsAreBlocking || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
+			const auto navmapCellTraversability = traversabilityCache.GetCellData(nmptChild.y * mapSize.w * 16 + nmptChild.x);
+			const bool childIsUnbumpable = navmapCellTraversability.occupyingActor != caller && navmapCellTraversability.state >= blockingTraversabilityValue;
 			if (childIsUnbumpable) continue;
 
 			SearchmapPoint smptCurrent2 { nmptCurrent };
@@ -338,28 +376,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			SearchmapPoint smptParent { nmptParent };
 			unsigned short oldDist = distFromStart[smptChildIdx];
 
-			if (usePlainThetaStar) {
-				// Theta-star path if there is LOS
-				if (IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
-					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
-					if (newDist < oldDist) {
-						parents[smptChildIdx] = nmptParent;
-						distFromStart[smptChildIdx] = newDist;
-					}
-					// Fall back to A-star path
-				} else {
-					unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
-					if (newDist < oldDist) {
-						parents[smptChildIdx] = nmptCurrent;
-						distFromStart[smptChildIdx] = newDist;
-					}
-				}
-
-				if (distFromStart[smptChildIdx] < oldDist) {
-					PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
-					open.emplace(newNode);
-				}
-			} else {
+			{
 				// Lazy Theta star*
 				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
 				if (newDist < oldDist) {
@@ -436,12 +453,145 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	return {};
 }
 
+Path Map::RunFindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
+{
+	if (!ScopedTimer::bIsExtraTimeTrackedInitialized) {
+		ScopedTimer::extraTimeTracked.reserve(100000);
+		ScopedTimer::extraTagsTracked.reserve(100000);
+		ScopedTimer::bIsExtraTimeTrackedInitialized = true;
+	}
+	using namespace std::chrono_literals;
+	constexpr char units[] = "us";
+	auto Bench = ankerl::nanobench::Bench()
+			     .epochIterations(PATH_BENCHMARK_ITERS)
+			     .warmup(PATH_BENCHMARK_WARMUP)
+			     .timeUnit(1us, units)
+			     .performanceCounters(true);
+	Path ResultOriginal;
+	Path ResultOriginalImproved;
+	long originalMicroseconds;
+	long improvedMicroseconds;
+	constexpr const char* ImprovedBenchmarkName[] = { "FindPathOriginalImproved", "FindPathOriginalImproved*" };
+	const size_t ImprovedBenchmarkNameIdx = !traversabilityCache.HasUpdatedTraversabilityThisFrame(); // 0 for updated, 1 for not updated
+	if (!traversabilityCache.HasUpdatedTraversabilityThisFrame()) {
+		Log(DEBUG, "Map", "(improved implementation will recalculate cache)");
+	}
+#if PATH_RUN_BENCH
+	Log(DEBUG, "Map", "--- FindPath ---");
+	constexpr const char* ImprovedBenchmarkName[] = { "FindPathOriginalImproved", "FindPathOriginalImproved*" };
+	const size_t ImprovedBenchmarkNameIdx = !traversabilityCache.HasUpdatedTraversabilityThisFrame(); // 0 for updated, 1 for not updated
+	FlushLogs();
+	Bench.relative(true).name("FindPathOriginal").run([&] {
+#endif
+#if PATH_RUN_ORIGINAL
+		{
+			ScopedTimer t("}} original ", &originalMicroseconds);
+			ResultOriginal = FindPathOriginal(s, d, size, minDistance, flags, caller);
+		}
+#endif
+#if PATH_RUN_BENCH
+	});
+	Bench.name(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx]).run([&] {
+#endif
+#if PATH_RUN_IMPROVED
+		{
+			ScopedTimer t("}} improved ", &improvedMicroseconds);
+			ResultOriginalImproved = FindPath(s, d, size, minDistance, flags, caller);
+		}
+#endif
+#if PATH_RUN_BENCH
+	});
+	std::cout << "|---------:|--------------------:|--------------------:|--------:|----------:|:----------" << "\n| relative |               " << units << "/op |                op/s |    err% |     total | benchmark" << std::endl;
+#else
+	auto prepareBenchmarkTableRow = [](const std::string& benchmarkName, long measurementMicroseconds, const std::vector<long>& extraTimeMeasurements, const std::vector<std::string>& extraTags, long baselineMeasurement) {
+		constexpr double microsecondsFactor = 1'000'000.0;
+
+		// don't allow infinities or nans in the table
+		if (measurementMicroseconds == 0) {
+			measurementMicroseconds = 1;
+		}
+		if (baselineMeasurement == 0) {
+			baselineMeasurement = 1;
+		}
+
+		const std::vector<std::string> ExtraTagsAlreadyIncludedInImprovedMeasurement {
+			"$"
+		};
+
+		long extraMicrosecondsIncluded = 0;
+		long extraMicrosecondsExcluded = 0;
+		for (size_t i = 0; i < extraTimeMeasurements.size(); ++i) {
+			const auto foundOnIncluded = std::find(ExtraTagsAlreadyIncludedInImprovedMeasurement.cbegin(), ExtraTagsAlreadyIncludedInImprovedMeasurement.cend(), extraTags[i]);
+			if (foundOnIncluded == ExtraTagsAlreadyIncludedInImprovedMeasurement.cend()) {
+				extraMicrosecondsExcluded += extraTimeMeasurements[i];
+			} else {
+				extraMicrosecondsIncluded += extraTimeMeasurements[i];
+			}
+		}
+		long extraMicroseconds = extraMicrosecondsExcluded + extraMicrosecondsIncluded;
+		if (extraMicroseconds == 0) {
+			extraMicroseconds = 1;
+		}
+
+		const long improvementWithExtraTotal = measurementMicroseconds + extraMicrosecondsExcluded;
+		const float improvementWithExtraOpsPerSecond = microsecondsFactor / (improvementWithExtraTotal);
+		const float improvementWithExtraPercent = (baselineMeasurement / float(improvementWithExtraTotal)) * 100;
+
+		std::string line = fmt::format("| {:>7.1f}% | {:>15}.00  | {:>19.2f} |    0.0% |      0.00 | `{}`", improvementWithExtraPercent, improvementWithExtraTotal, improvementWithExtraOpsPerSecond, benchmarkName);
+
+		if (!extraTimeMeasurements.empty()) {
+			long improvementWithoutExtraTotal = improvementWithExtraTotal - extraMicroseconds;
+			if (improvementWithoutExtraTotal == 0) {
+				improvementWithoutExtraTotal = 1;
+			}
+			const float improvementWithoutExtraOpsPerSecond = microsecondsFactor / improvementWithoutExtraTotal;
+			const float improvementWithoutExtraPercent = (baselineMeasurement / float(improvementWithoutExtraTotal)) * 100;
+
+
+			std::string extraTimeString = fmt::format(" Extra time: {}us, {}ops (", extraMicroseconds, extraTimeMeasurements.size());
+			for (size_t i = 0; i < extraTimeMeasurements.size(); ++i) {
+				extraTimeString += ScopedTimer::extraTagsTracked[i] + " " + std::to_string(extraTimeMeasurements[i]) + ", ";
+			}
+			extraTimeString += ")";
+			const std::string improvementWithoutExtraString = fmt::format(" =without extra: {:.1f}% rel, {}us/op, {:.2f}op/s= ", improvementWithoutExtraPercent, improvementWithoutExtraTotal, improvementWithoutExtraOpsPerSecond);
+
+			line += extraTimeString + improvementWithoutExtraString;
+		}
+		line += "\n";
+		return line;
+	};
+
+	const std::string lineOriginal = prepareBenchmarkTableRow("FindPathOriginal", originalMicroseconds, ScopedTimer::noExtraTime, ScopedTimer::noTags, originalMicroseconds);
+	const std::string lineImproved = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx], improvedMicroseconds, ScopedTimer::noExtraTime, ScopedTimer::noTags, originalMicroseconds);
+
+	const std::string line = "|---------:|--------------------:|--------------------:|--------:|----------:|:----------\n";
+	const std::string headings = "| relative |               us/op |                op/s |    err% |     total | benchmark\n";
+	std::string tableToPrint = headings + line + lineOriginal + lineImproved;
+
+	if (!ScopedTimer::extraTimeTracked.empty()) {
+		const std::string lineImprovedExtra = prepareBenchmarkTableRow(ImprovedBenchmarkName[ImprovedBenchmarkNameIdx] + std::string("+"), improvedMicroseconds, ScopedTimer::extraTimeTracked, ScopedTimer::extraTagsTracked, originalMicroseconds);
+		tableToPrint += lineImprovedExtra;
+		ScopedTimer::extraTimeTracked.clear();
+		ScopedTimer::extraTagsTracked.clear();
+	}
+
+	tableToPrint += line + headings;
+	Log(DEBUG, "FindPath", "--RunFindPath--\n{}", tableToPrint);
+#endif
+
+#if PATH_RETURN_ORIGINAL
+	return ResultOriginal;
+#else
+	return ResultOriginalImproved;
+#endif
+}
+
 void Map::NormalizeDeltas(float_t& dx, float_t& dy, float_t factor)
 {
 	constexpr float_t STEP_RADIUS = 2.0;
 
-	float_t ySign = std::copysign(1.0, dy);
-	float_t xSign = std::copysign(1.0, dx);
+	float_t ySign = std::copysign(1.0f, dy);
+	float_t xSign = std::copysign(1.0f, dx);
 	dx = std::fabs(dx);
 	dy = std::fabs(dy);
 	float_t dxOrig = dx;

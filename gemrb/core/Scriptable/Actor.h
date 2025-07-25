@@ -607,6 +607,7 @@ private:
 	void RefreshEffects(bool init, const stats_t& prev);
 
 public:
+	using BlockingSizeCategory = uint8_t;
 	Actor(void);
 	Actor(const Actor&) = delete;
 	~Actor() override;
@@ -619,6 +620,9 @@ public:
 	std::string dump() const override;
 	/** fixes the feet circle */
 	void SetCircleSize();
+	/** get the size category for this actor; it's used to determine and track region needed for tracing blocking shape
+	 * of this actor in the traversability cache */
+	BlockingSizeCategory getSizeCategory() const;
 	/** places the actor on the map */
 	void SetMap(Map* map);
 	/** sets the actor's position, calculating with the nojump flag*/
