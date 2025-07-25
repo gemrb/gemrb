@@ -7944,11 +7944,9 @@ int fx_can_use_any_item_modifier(Scriptable* /*Owner*/, Actor* target, Effect* f
 }
 
 // 0x12f AlwaysBackstab
-// the two extra TobEx bits are handled in the user
+// the two extra ToBEx/EE bits are handled in the user
 int fx_always_backstab_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_always_backstab_modifier(%2d): Value: %d", fx->Opcode, fx->Parameter2);
-
 	STAT_SET(IE_ALWAYSBACKSTAB, fx->Parameter2);
 	return FX_APPLIED;
 }
