@@ -156,7 +156,6 @@ static void SetRGBMod(ieDword color, ScriptedAnimation* sca)
 	RGBModifier rgb;
 
 	rgb.speed = -1;
-	rgb.phase = 0;
 	rgb.rgb = Color::FromABGR(color);
 	rgb.type = RGBModifier::TINT;
 	sca->AlterPalette(rgb);

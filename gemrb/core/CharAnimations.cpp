@@ -660,18 +660,10 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	}
 
 	for (size_t i = 0; i < PAL_MAX * 8; ++i) {
-		ColorMods[i].type = RGBModifier::NONE;
-		ColorMods[i].speed = 0;
 		// make initial phase depend on location to make the pulse appear
 		// less even
 		ColorMods[i].phase = 5 * i;
-		ColorMods[i].locked = false;
 	}
-	GlobalColorMod.type = RGBModifier::NONE;
-	GlobalColorMod.speed = 0;
-	GlobalColorMod.phase = 0;
-	GlobalColorMod.locked = false;
-	GlobalColorMod.rgb = Color();
 
 	AvatarsRowNum = GetAvatarsCount();
 	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
