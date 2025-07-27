@@ -7981,11 +7981,10 @@ void Actor::SetColorMod(ieDword location, RGBModifier::Type type, int speed,
 		ca->GlobalColorMod.type = type;
 		ca->GlobalColorMod.speed = speed;
 		ca->GlobalColorMod.rgb = color;
-		if (phase >= 0)
+		if (phase >= 0) {
 			ca->GlobalColorMod.phase = phase;
-		else {
-			if (ca->GlobalColorMod.phase > 2 * speed)
-				ca->GlobalColorMod.phase = 0;
+		} else if (ca->GlobalColorMod.phase > 2 * speed) {
+			ca->GlobalColorMod.phase = 0;
 		}
 		return;
 	}
