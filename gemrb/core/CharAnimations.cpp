@@ -2559,6 +2559,13 @@ void CharAnimations::AddLR3Suffix(ResRef& dest, unsigned char stanceID,
 	}
 }
 
+// TODO: merge with IE_ANI_TWO_FILES_3 / AddMMRSuffix after verifying this covers all current users
+// it turns out the last byte of the anim id codes for which animations are available
+// 0 - a1
+// 1 - sp / ca - spellcasting
+// 2 - a4 - ranged
+// 4 - a3
+// 8 - a2
 void CharAnimations::AddMMR2Suffix(ResRef& dest, unsigned char stanceID,
 				   unsigned char& Cycle, orient_t Orient) const
 {
