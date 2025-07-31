@@ -22,6 +22,7 @@
 #include "CString.h"
 #include "StringView.h"
 
+#include <memory>
 #include <unordered_map>
 
 namespace GemRB {

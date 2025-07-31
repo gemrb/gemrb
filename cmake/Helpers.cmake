@@ -126,7 +126,8 @@ FUNCTION(CONFIGURE_COMPILER)
 	IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 		# this subtly breaks things, HoW crashes on first area entry
 		#STRING(APPEND CMAKE_CXX_FLAGS " /fp:fast")
-		ADD_COMPILE_OPTIONS(/MP2) # manually enable some file-level parallelism
+		# manually enable some file-level parallelism + unicode for fmt
+		ADD_COMPILE_OPTIONS(/MP2 /utf-8)
 	ENDIF()
 
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
@@ -598,7 +599,7 @@ FUNCTION(CONFIGURE_FMT_INCLUDES)
 	# supress static analysis of fmt
 	INCLUDE_DIRECTORIES(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/includes/fmt)
 	# ensure fmt gets included properly
-	ADD_DEFINITIONS("-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0")
+	ADD_DEFINITIONS("-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0 -DFMT_UNICODE=1")
 ENDFUNCTION()
 
 FUNCTION(MAKE_UNINSTALL_TARGET)

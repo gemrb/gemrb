@@ -20,6 +20,7 @@
 #define STRINGVIEW_H
 
 #include "fmt/format.h"
+#include "fmt/ranges.h"
 
 #include <cstring>
 #include <iterator>
@@ -168,5 +169,14 @@ auto format_as(const StringViewImp<CHAR>& str)
 }
 
 }
+
+// disable conflicting range formatter
+namespace fmt {
+
+template<typename CHAR>
+struct is_range<GemRB::StringViewImp<CHAR>, char> : std::false_type {};
+
+}
+
 
 #endif /* STRINGVIEW_H */

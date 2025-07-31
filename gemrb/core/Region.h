@@ -240,7 +240,7 @@ struct formatter<GemRB::Point> {
 	}
 
 	template<typename FormatContext>
-	auto format(const GemRB::Point& p, FormatContext& ctx) -> decltype(ctx.out())
+	auto format(const GemRB::Point& p, FormatContext& ctx) const -> decltype(ctx.out())
 	{
 		return format_to(ctx.out(), "({:d}, {:d})", p.x, p.y);
 	}

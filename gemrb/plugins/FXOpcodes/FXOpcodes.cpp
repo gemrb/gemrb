@@ -5635,9 +5635,11 @@ int fx_castingspeed_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xbe PhysicalSpeedModifier
+// this is not a saved stat, so permanent timing modes won't behave as expected
+// in the games this effect is not cumulative, but we let it be, since it does not conflict with uses
+// we also allow for the standard effect modes to be used (additive, percentile, absolute)
 int fx_attackspeed_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_attackspeed_modifier(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	STAT_MOD(IE_PHYSICALSPEED);
 	return FX_APPLIED;
 }
@@ -7944,11 +7946,9 @@ int fx_can_use_any_item_modifier(Scriptable* /*Owner*/, Actor* target, Effect* f
 }
 
 // 0x12f AlwaysBackstab
-// the two extra TobEx bits are handled in the user
+// the two extra ToBEx/EE bits are handled in the user
 int fx_always_backstab_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_always_backstab_modifier(%2d): Value: %d", fx->Opcode, fx->Parameter2);
-
 	STAT_SET(IE_ALWAYSBACKSTAB, fx->Parameter2);
 	return FX_APPLIED;
 }
