@@ -144,6 +144,13 @@ def CloseStoreWindow ():
 
 	GemRB.LeaveStore ()
 
+	OptionsWindow = GemRB.GetView ("OPTWIN")
+	if OptionsWindow:
+		OptionsWindow.SetDisabled (False)
+	PortraitWindow = GemRB.GetView ("PORTWIN")
+	if PortraitWindow:
+		PortraitWindow.SetDisabled (False)
+
 	CureTable = None
 
 	if Inventory:
@@ -193,6 +200,10 @@ def OpenStoreWindow ():
 		top = GemRB.GetView("WIN_TOP")
 		if top:
 			top.Focus()
+
+		PortraitWindow = GemRB.GetView ("PORTWIN")
+		if PortraitWindow:
+			PortraitWindow.SetDisabled (False)
 		return func()
 	
 	store_funcs = (lambda: ChangeStoreView(OpenStoreShoppingWindow),
@@ -233,6 +244,10 @@ def OpenStoreWindow ():
 	Window.AddAlias("WIN_STORE")
 
 	PositionStoreWinRelativeTo(topwin)
+
+	OptionsWindow = GemRB.GetView ("OPTWIN")
+	if OptionsWindow:
+		OptionsWindow.SetDisabled (True)
 
 	# Done
 	Button = Window.GetControl (0)
@@ -937,6 +952,10 @@ def InitStoreRentWindow (Window):
 	return
 
 def UpdateStoreRentWindow (Window):
+	PortraitWindow = GemRB.GetView ("PORTWIN")
+	if PortraitWindow:
+		PortraitWindow.SetDisabled (True)
+
 	UpdateStoreCommon (Window, "STOTITLE", None, "STOGOLD")
 	RentIndex = GemRB.GetVar ("RentIndex")
 	Button = Window.GetControlAlias ('RENTBTN')

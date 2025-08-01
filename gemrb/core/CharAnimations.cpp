@@ -660,18 +660,10 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	}
 
 	for (size_t i = 0; i < PAL_MAX * 8; ++i) {
-		ColorMods[i].type = RGBModifier::NONE;
-		ColorMods[i].speed = 0;
 		// make initial phase depend on location to make the pulse appear
 		// less even
 		ColorMods[i].phase = 5 * i;
-		ColorMods[i].locked = false;
 	}
-	GlobalColorMod.type = RGBModifier::NONE;
-	GlobalColorMod.speed = 0;
-	GlobalColorMod.phase = 0;
-	GlobalColorMod.locked = false;
-	GlobalColorMod.rgb = Color();
 
 	AvatarsRowNum = GetAvatarsCount();
 	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
@@ -1467,7 +1459,6 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char stanceID,
 		stanceID = IE_ANI_WALK;
 	}
 
-retry:
 	switch (stanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
@@ -1527,7 +1518,8 @@ retry:
 
 			// nothing was found, try with IE_ANI_READY
 			stanceID = MaybeOverrideStance(IE_ANI_READY);
-			goto retry;
+			AddPSTSuffix(dest, stanceID, Cycle, Orient);
+			return;
 		case IE_ANI_PST_START:
 			Cycle = 0;
 			Prefix = "ms1";
@@ -2559,6 +2551,13 @@ void CharAnimations::AddLR3Suffix(ResRef& dest, unsigned char stanceID,
 	}
 }
 
+// TODO: merge with IE_ANI_TWO_FILES_3 / AddMMRSuffix after verifying this covers all current users
+// it turns out the last byte of the anim id codes for which animations are available
+// 0 - a1
+// 1 - sp / ca - spellcasting
+// 2 - a4 - ranged
+// 4 - a3
+// 8 - a2
 void CharAnimations::AddMMR2Suffix(ResRef& dest, unsigned char stanceID,
 				   unsigned char& Cycle, orient_t Orient) const
 {

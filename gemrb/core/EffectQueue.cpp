@@ -524,7 +524,13 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		}
 	}
 
-	switch (fx->Target) {
+	ieDword targetType = fx->Target;
+	if ((targetType == FX_TARGET_OWN_SIDE && (!st || st->InParty)) ||
+	    (targetType == FX_TARGET_OTHER_SIDE && (!pretarget || pretarget->InParty))) {
+		targetType = FX_TARGET_PARTY;
+	}
+
+	switch (targetType) {
 		case FX_TARGET_ORIGINAL:
 			assert(self != nullptr);
 			fx->SetPosition(self->Pos);
@@ -572,9 +578,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			break;
 
 		case FX_TARGET_OWN_SIDE:
-			if (!st || st->InParty) {
-				goto all_party;
-			}
 			map = self->GetCurrentArea();
 			spec = st->GetStat(IE_SPECIFIC);
 
@@ -599,9 +602,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			flg = FX_APPLIED;
 			break;
 		case FX_TARGET_OTHER_SIDE:
-			if (!pretarget || pretarget->InParty) {
-				goto all_party;
-			}
 			assert(self != nullptr);
 			map = self->GetCurrentArea();
 			spec = pretarget->GetStat(IE_SPECIFIC);
@@ -641,7 +641,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			break;
 
 		case FX_TARGET_PARTY:
-all_party:
 			game = core->GetGame();
 			i = game->GetPartySize(false);
 			while (i--) {
@@ -705,7 +704,7 @@ all_party:
 
 		case FX_TARGET_UNKNOWN:
 		default:
-			Log(MESSAGE, "EffectQueue", "Unknown FX target type: {}", fx->Target);
+			Log(MESSAGE, "EffectQueue", "Unknown FX target type: {} ({})", targetType, fx->Target);
 			flg = FX_ABORT;
 			delete fx;
 			break;

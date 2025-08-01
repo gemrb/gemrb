@@ -33,15 +33,15 @@ namespace GemRB {
 
 struct RGBModifier {
 	Color rgb;
-	int speed;
-	int phase;
+	int speed = 0;
+	int phase = 0;
 	enum Type {
 		NONE,
 		ADD,
 		TINT,
 		BRIGHTEN
-	} type;
-	bool locked;
+	} type = NONE;
+	bool locked = false;
 };
 
 class GEM_EXPORT Palette {

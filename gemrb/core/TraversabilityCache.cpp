@@ -24,7 +24,6 @@
 #include "Map.h"
 #include "PathfindingSettings.h"
 
-#include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
@@ -50,9 +49,9 @@ size_t TraversabilityCache::CachedActorsState::AddCachedActorState(Actor* inActo
 	return newIdx;
 }
 
-FitRegion TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* inActor)
+TraversabilityCache::FitRegion TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* inActor)
 {
-	const auto baseSize = inActor->CircleSize2Radius() * inActor->sizeFactor;
+	const auto baseSize = inActor->CircleSize2Radius();
 	const GemRB::Size s(baseSize * 8, baseSize * 6);
 	return { inActor->Pos - s.Center(), s };
 }
@@ -65,12 +64,12 @@ void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, st
 	}
 
 	const auto cachedCellState = GetCellStateFromFlags(i);
-	const auto blockingShapeRegionW = GetBlockingShapeRegionW(sizeCategory[i], actor[i]->sizeFactor);
+	const auto blockingShapeRegionW = GetBlockingShapeRegionW(sizeCategory[i]);
 	const size_t trashIdx = inOutTraversabilityData.size() - 1;
-	for (int y = 0; y < region[i].size.h; ++y) {
-		for (int x = 0; x < region[i].size.w; ++x) {
-			const int targetX = region[i].origin.x + x;
-			const int targetY = region[i].origin.y + y;
+	for (int y = 0; y < region[i].h; ++y) {
+		for (int x = 0; x < region[i].w; ++x) {
+			const int targetX = region[i].x + x;
+			const int targetY = region[i].y + y;
 			const size_t targetIdx = targetY * inWidth * 16 + targetX;
 
 			// use spare cell index for invalid data: it's faster than paying fee for validating branch each iteration:
@@ -99,12 +98,12 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
 
 	const auto currentCellState = GetCellStateFromFlags(newActorStateIdx);
-	const auto blockingShapeRegionW = GetBlockingShapeRegionW(currentSizeCategory, actor[i]->sizeFactor);
+	const auto blockingShapeRegionW = GetBlockingShapeRegionW(currentSizeCategory);
 	const size_t trashIdx = inOutTraversabilityData.size() - 1;
-	for (int y = 0; y < region[newActorStateIdx].size.h; ++y) {
-		for (int x = 0; x < region[newActorStateIdx].size.w; ++x) {
-			const int targetX = region[newActorStateIdx].origin.x + x;
-			const int targetY = region[newActorStateIdx].origin.y + y;
+	for (int y = 0; y < region[newActorStateIdx].h; ++y) {
+		for (int x = 0; x < region[newActorStateIdx].w; ++x) {
+			const int targetX = region[newActorStateIdx].x + x;
+			const int targetY = region[newActorStateIdx].y + y;
 			const size_t targetIdx = targetY * inWidth * 16 + targetX;
 
 			// use spare cell index for invalid data: it's faster than paying fee for validating branch each iteration:
@@ -351,34 +350,34 @@ const std::vector<bool>& TraversabilityCache::GetBlockingShape(const Actor* acto
 	// if we don't have the proper data yet, calculate it
 	if (BlockingShapeCache[blockingSizeCategory].empty()) {
 		std::vector<bool> blockingShape;
-		if (actor->sizeFactor != 0) {
-			const ::GemRB::Size blockingShapeRegionSize(GetBlockingShapeRegionW(blockingSizeCategory, actor->sizeFactor), GetBlockingShapeRegionH(blockingSizeCategory, actor->sizeFactor));
-			constexpr bool NotBlockingValue = false;
-			blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, NotBlockingValue);
 
-			const FitRegion CurrentBlockingRegion = { actor->Pos - blockingShapeRegionSize.Center(), blockingShapeRegionSize };
-			for (int y = 0; y < blockingShapeRegionSize.h; ++y) {
-				for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
-					const bool ShapeMask = actor->IsOver({ x + CurrentBlockingRegion.origin.x, y + CurrentBlockingRegion.origin.y });
-					const auto Idx = y * blockingShapeRegionSize.w * 16 + x;
-					blockingShape[Idx] = ShapeMask;
-				}
+		const ::GemRB::Size blockingShapeRegionSize(GetBlockingShapeRegionW(blockingSizeCategory), GetBlockingShapeRegionH(blockingSizeCategory));
+		constexpr bool NotBlockingValue = false;
+		blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, NotBlockingValue);
+
+		const FitRegion CurrentBlockingRegion = { actor->Pos - blockingShapeRegionSize.Center(), blockingShapeRegionSize };
+		for (int y = 0; y < blockingShapeRegionSize.h; ++y) {
+			for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
+				const bool ShapeMask = actor->IsOver({ x + CurrentBlockingRegion.x, y + CurrentBlockingRegion.y });
+				const auto Idx = y * blockingShapeRegionSize.w * 16 + x;
+				blockingShape[Idx] = ShapeMask;
 			}
 		}
+
 		BlockingShapeCache[blockingSizeCategory] = std::move(blockingShape);
 	}
 	return BlockingShapeCache[blockingSizeCategory];
 }
 
-uint16_t TraversabilityCache::GetBlockingShapeRegionW(const Actor::BlockingSizeCategory blockingSizeCategory, const float sizeFactor)
+uint16_t TraversabilityCache::GetBlockingShapeRegionW(const Actor::BlockingSizeCategory blockingSizeCategory)
 {
-	const auto baseSize = sizeFactor * Actor::CircleSize2Radius(blockingSizeCategory);
+	const auto baseSize = Actor::CircleSize2Radius(blockingSizeCategory);
 	return baseSize * 8;
 }
 
-uint16_t TraversabilityCache::GetBlockingShapeRegionH(const Actor::BlockingSizeCategory blockingSizeCategory, const float sizeFactor)
+uint16_t TraversabilityCache::GetBlockingShapeRegionH(const Actor::BlockingSizeCategory blockingSizeCategory)
 {
-	const auto baseSize = sizeFactor * Actor::CircleSize2Radius(blockingSizeCategory);
+	const auto baseSize = Actor::CircleSize2Radius(blockingSizeCategory);
 	return baseSize * 6;
 }
 }

@@ -3694,11 +3694,13 @@ int GameScript::IsPlayerNumber(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	const Actor* actor = Scriptable::As<Actor>(tar);
-	if (!actor) {
+	// PlayerN - make sure this always matches what PlayerX() does for object matching
+	const Actor* player = core->GetGame()->GetPC(parameters->int0Parameter - 1, false);
+	if (!actor || !player) {
 		return 0;
 	}
 
-	if (actor->InParty == parameters->int0Parameter) {
+	if (actor->InParty == player->InParty) {
 		return 1;
 	}
 	return 0;
