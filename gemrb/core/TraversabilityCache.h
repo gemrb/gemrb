@@ -28,71 +28,6 @@
 namespace GemRB {
 
 
-struct FitRegion {
-	Point origin;
-	Size size;
-
-	FitRegion(const Point& InOrigin, const Size& InSize)
-		: origin(InOrigin), size(InSize)
-	{
-	}
-
-	FitRegion(const Region& r) noexcept
-		: origin(r.origin), size(r.size)
-	{
-	}
-
-	FitRegion() noexcept = default;
-
-	FitRegion(const FitRegion& other)
-		: origin(other.origin),
-		  size(other.size)
-	{
-	}
-
-	FitRegion(FitRegion&& other) noexcept
-		: origin(std::move(other.origin)),
-		  size(std::move(other.size))
-	{
-	}
-
-	FitRegion& operator=(const FitRegion& other)
-	{
-		if (this == &other)
-			return *this;
-		origin = other.origin;
-		size = other.size;
-		return *this;
-	}
-
-	FitRegion& operator=(FitRegion&& other) noexcept
-	{
-		if (this == &other)
-			return *this;
-		origin = std::move(other.origin);
-		size = std::move(other.size);
-		return *this;
-	}
-
-	bool IntersectsRegion(const FitRegion& rgn) const noexcept
-	{
-		if (origin.x >= (rgn.origin.x + rgn.size.w)) {
-			return false; // entirely to the right of rgn
-		}
-		if ((origin.x + size.w) <= rgn.origin.x) {
-			return false; // entirely to the left of rgn
-		}
-		if (origin.y >= (rgn.origin.y + rgn.size.h)) {
-			return false; // entirely below rgn
-		}
-		if ((origin.y + size.h) <= rgn.origin.y) {
-			return false; // entirely above rgn
-		}
-		return true;
-	}
-};
-
-
 /**
  * This class manages the cached data of actors on a navmap, to be used for speed up the FindPath implementation.
  */
@@ -123,6 +58,25 @@ public:
 	static constexpr TraversabilityCellState TraversabilityCellValueEmpty = 0;
 	static constexpr TraversabilityCellState TraversabilityCellValueActor = 1;
 	static constexpr TraversabilityCellState TraversabilityCellValueActorNonTraversable = 15;
+
+	/**
+	 * Struct representing Region, but with reduced data size.
+	 * We don't use the regular GemRG::Region class because of its footprint:
+	 * currently it weights 48 bytes, while we can work totally fine with 6 bytes.
+	 * In TraversabilityCache, we don't pay as much attention to memory size, but
+	 * this reduces CPU data cache pressure by a factor of 8 per single loaded region.
+	 */
+	struct FitRegion {
+		uint16_t x;
+		uint16_t y;
+		uint8_t w;
+		uint8_t h;
+
+		FitRegion(const Point& InOrigin, const Size& InSize)
+			: x(InOrigin.x), y(InOrigin.y), w(InSize.w), h(InSize.h)
+		{
+		}
+	};
 
 	/**
 	 * Struct holding data describing traversability of a navmap point: its state and potential actor data.
@@ -232,9 +186,9 @@ private:
 
 	static const std::vector<bool>& GetBlockingShape(const Actor* actor, Actor::BlockingSizeCategory blockingSizeCategory);
 
-	static uint16_t GetBlockingShapeRegionW(Actor::BlockingSizeCategory blockingSizeCategory, float sizeFactor);
+	static uint16_t GetBlockingShapeRegionW(Actor::BlockingSizeCategory blockingSizeCategory);
 
-	static uint16_t GetBlockingShapeRegionH(Actor::BlockingSizeCategory blockingSizeCategory, float sizeFactor);
+	static uint16_t GetBlockingShapeRegionH(Actor::BlockingSizeCategory blockingSizeCategory);
 };
 }
 
