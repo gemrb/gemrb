@@ -316,7 +316,7 @@ TraversabilityCache::TraversabilityCellState TraversabilityCache::CachedActorsSt
 	// 0 - for not alive,
 	// 1 - for alive and non bumpable,
 	// 2 - for alive and bumpable
-	const uint8_t idx = static_cast<uint8_t>(GetIsAlive(i)) * static_cast<uint8_t>(GetIsBumpable(i) + 1);
+	const uint8_t idx = static_cast<uint8_t>(GetIsAlive(i)) * (static_cast<uint8_t>(GetIsBumpable(i)) + 1);
 	return flagsToCellStateMapping[idx];
 }
 

@@ -86,7 +86,7 @@ public:
 	};
 
 	explicit TraversabilityCache(class Map* inMap)
-		: map { inMap }, cachedActorsState { 0 }
+		: map { inMap }
 	{
 	}
 
@@ -173,7 +173,7 @@ private:
 
 	Map* map;
 	std::vector<TraversabilityCellData> traversabilityData;
-	CachedActorsState cachedActorsState;
+	CachedActorsState cachedActorsState { 0 };
 	bool hasBeenUpdatedThisFrame { false };
 
 	void ValidateTraversabilityCacheSize();
