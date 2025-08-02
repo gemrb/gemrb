@@ -39,7 +39,8 @@ int Selectable::CircleSize2Radius(int circleSize)
 	return adjustedSize;
 }
 
-int Selectable::CircleSize2Radius() const {
+int Selectable::CircleSize2Radius() const
+{
 	return CircleSize2Radius(this->circleSize);
 }
 
