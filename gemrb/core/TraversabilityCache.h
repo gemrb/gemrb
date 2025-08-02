@@ -21,7 +21,6 @@
 #ifndef TRAVERSABILITY_CACHE_H
 #define TRAVERSABILITY_CACHE_H
 
-//#include "Map.h"
 #include "Scriptable/Actor.h"
 
 
@@ -87,7 +86,7 @@ public:
 	};
 
 	explicit TraversabilityCache(class Map* inMap)
-		: map { inMap }, cachedActorsState(0)
+		: map { inMap }, cachedActorsState { 0 }
 	{
 	}
 
@@ -151,12 +150,12 @@ private:
 		// flags manipulation should be inlined
 		void SetIsBumpable(const size_t i, const bool isBumpable)
 		{
-			flags[i] = (flags[i] & ~(1 << FLAG_BUMPABLE)) | (isBumpable << FLAG_BUMPABLE);
+			flags[i] = (flags[i] & ~(1 << FLAG_BUMPABLE)) | (static_cast<uint8_t>(isBumpable) << FLAG_BUMPABLE);
 		}
 
 		void SetIsAlive(const size_t i, const bool isAlive)
 		{
-			flags[i] = (flags[i] & ~(1 << FLAG_ALIVE)) | (isAlive << FLAG_ALIVE);
+			flags[i] = (flags[i] & ~(1 << FLAG_ALIVE)) | (static_cast<uint8_t>(isAlive) << FLAG_ALIVE);
 		}
 
 		bool GetIsBumpable(const size_t i) const

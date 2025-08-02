@@ -76,11 +76,11 @@ void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, st
 			TraversabilityCellData& currentTraversabilityData = inOutTraversabilityData[idx];
 
 			const auto blockingShapeIdx = y * blockingShapeRegionW * 16 + x;
-			currentTraversabilityData.state -= (cachedBlockingShape[blockingShapeIdx] * cachedCellState);
+			currentTraversabilityData.state -= static_cast<uint8_t>(cachedBlockingShape[blockingShapeIdx]) * cachedCellState;
 
 			// the following is a branchless version of zeroing `CurrentTraversabilityData.occupyingActor` if it's equal to actor[i]
 			currentTraversabilityData.occupyingActor = reinterpret_cast<Actor*>(
-				(currentTraversabilityData.occupyingActor != actor[i]) *
+				static_cast<size_t>(currentTraversabilityData.occupyingActor != actor[i]) *
 				reinterpret_cast<size_t>(currentTraversabilityData.occupyingActor));
 		}
 	}
@@ -110,7 +110,7 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, std
 			TraversabilityCellData& currentTraversabilityData = inOutTraversabilityData[idx];
 
 			const auto blockingShapeIdx = y * blockingShapeRegionW * 16 + x;
-			const uint16_t cellStateOfThisActor = currentBlockingShape[blockingShapeIdx] * currentCellState;
+			const uint16_t cellStateOfThisActor = static_cast<uint8_t>(currentBlockingShape[blockingShapeIdx]) * currentCellState;
 			currentTraversabilityData.state += cellStateOfThisActor;
 
 			currentTraversabilityData.occupyingActor = cellStateOfThisActor > TraversabilityCellValueEmpty ? actor[i] : currentTraversabilityData.occupyingActor;
@@ -316,7 +316,7 @@ TraversabilityCache::TraversabilityCellState TraversabilityCache::CachedActorsSt
 	// 0 - for not alive,
 	// 1 - for alive and non bumpable,
 	// 2 - for alive and bumpable
-	const uint8_t idx = GetIsAlive(i) * (GetIsBumpable(i) + 1);
+	const uint8_t idx = static_cast<uint8_t>(GetIsAlive(i)) * static_cast<uint8_t>(GetIsBumpable(i) + 1);
 	return flagsToCellStateMapping[idx];
 }
 
