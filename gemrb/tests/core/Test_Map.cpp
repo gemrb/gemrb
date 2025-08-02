@@ -36,7 +36,7 @@ namespace GemRB {
 class MapTest : public testing::Test {
 public:
 	static const Interface* gemrb;
-	static const Map* map;
+	static Map* map;
 
 	// set up core and the first map from the demo
 	static void SetUpTestSuite()
@@ -67,7 +67,7 @@ public:
 	}
 };
 
-const Map* MapTest::map = nullptr;
+Map* MapTest::map = nullptr;
 const Interface* MapTest::gemrb = nullptr;
 
 static Point badPaths[] = { Point(1270, 640), Point(1071, 699), Point(1170, 967), Point(1126, 601) };

@@ -45,9 +45,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	PalettedImageMgr.cpp
 	Particles.cpp
 	PathFinder.cpp
-		FindPathOriginal.cpp
-	FindPathImproved.cpp
-	TraversabilityCache.cpp
 	PluginMgr.cpp
 	Polygon.cpp
 	Projectile.cpp
@@ -68,6 +65,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Store.cpp
 	TileMap.cpp
 	TileOverlay.cpp
+	TraversabilityCache.cpp
 	VEFObject.cpp
 	WorldMap.cpp
 	GameScript/Actions.cpp
