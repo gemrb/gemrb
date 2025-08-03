@@ -11712,4 +11712,8 @@ bool Actor::TouchAttack(const Projectile* pro) const
 	return !fail;
 }
 
+Actor::BlockingSizeCategory Actor::getSizeCategory() const
+{
+	return this->circleSize;
+}
 }

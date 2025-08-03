@@ -62,7 +62,7 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383,
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand { { 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924 } };
 
 // Find the best path of limited length that brings us the farthest from d
-Path Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller) const
+Path Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller)
 {
 	if (!caller || !caller->GetSpeed()) return {};
 	Point p = s;
@@ -222,15 +222,19 @@ PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
-Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller) const
+Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
 {
 	TRACY(ZoneScoped);
+
+	traversabilityCache.Update();
+
 	if (InDebugMode(DebugMode::PATHFINDER))
 		Log(DEBUG, "FindPath", "s = {}, d = {}, caller = {}, dist = {}, size = {}",
 		    s, d,
 		    fmt::WideToChar { caller ? caller->GetShortName() : u"nullptr" },
 		    minDistance, size);
-	bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
+	const bool actorsAreBlocking = flags & PF_ACTORS_ARE_BLOCKING;
+	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellValueActor : TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
 	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
 	SearchmapPoint smptDest0 { d };
@@ -259,15 +263,34 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	if (!mapSize.PointInside(smptSource)) return {};
 
 	// Initialize data structures
-	FibonacciHeap<PQNode> open;
-	std::vector<bool> isClosed(mapSize.Area(), false);
-	std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
-	std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
+	const size_t mapCellsCount = mapSize.Area();
+
+	FibonacciHeap<PQNode> open; // todo: remove this data structure or rewrite its implementation - too much allocations there!
+	// make most data storage for this algorithm static, to avoid memory allocations;
+	// each run we just clear the storage, which is keeping the underlying allocated memory at hand
+	static std::vector<bool> isClosed(mapSize.Area(), false);
+	static std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
+	static std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
+
+	// resize if needed (in case of a map change; probably can be done once, when new map is loaded)
+	if (isClosed.size() != mapCellsCount) {
+		parents.resize(mapCellsCount);
+		distFromStart.resize(mapCellsCount);
+	}
+
+	// cleanup
+	isClosed.clear();
+	isClosed.resize(mapCellsCount, false);
+	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
+	// number of elements, while memset performs better for large vectors
+	memset(static_cast<void*>(parents.data()), 0, sizeof(decltype(parents)::value_type) * mapCellsCount);
+	memset(static_cast<void*>(distFromStart.data()), std::numeric_limits<unsigned short>::max(), sizeof(decltype(distFromStart)::value_type) * mapCellsCount);
+
+	// begin algo init
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
 	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
 	open.emplace(PQNode(nmptSource, 0));
 	bool foundPath = false;
-	static bool usePlainThetaStar = gamedata->GetMiscRule("LAZY_THETA_STAR") == 0;
 	unsigned int squaredMinDist = minDistance * minDistance;
 
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
@@ -311,8 +334,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 		isClosed[smptCurrentIdx] = true;
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
-			NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
-			SearchmapPoint smptChild { nmptChild };
+			const NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
+			const SearchmapPoint smptChild { nmptChild };
 			// Outside map
 			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
@@ -329,8 +352,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			if (childBlocked) continue;
 
 			// If there's an actor, check it can be bumped away
-			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
-			bool childIsUnbumpable = childActor && childActor != caller && (actorsAreBlocking || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
+			const auto navmapCellTraversability = traversabilityCache.GetCellData(nmptChild.y * mapSize.w * 16 + nmptChild.x);
+			const bool childIsUnbumpable = navmapCellTraversability.occupyingActor != caller && navmapCellTraversability.state >= blockingTraversabilityValue;
 			if (childIsUnbumpable) continue;
 
 			SearchmapPoint smptCurrent2 { nmptCurrent };
@@ -338,64 +361,41 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			SearchmapPoint smptParent { nmptParent };
 			unsigned short oldDist = distFromStart[smptChildIdx];
 
-			if (usePlainThetaStar) {
+			// Lazy Theta star*
+			unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
+			if (newDist < oldDist) {
+				parents[smptChildIdx] = nmptParent;
+				distFromStart[smptChildIdx] = newDist;
+			}
+
+			if (distFromStart[smptChildIdx] < oldDist) {
 				// Theta-star path if there is LOS
-				if (IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
-					unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
-					if (newDist < oldDist) {
-						parents[smptChildIdx] = nmptParent;
-						distFromStart[smptChildIdx] = newDist;
-					}
+				// so far the searchmap grid appears too coarse to play on, see #2261
+				//if (!IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
+				if (!IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
 					// Fall back to A-star path
-				} else {
-					unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
-					if (newDist < oldDist) {
-						parents[smptChildIdx] = nmptCurrent;
-						distFromStart[smptChildIdx] = newDist;
-					}
-				}
+					distFromStart[smptChildIdx] = std::numeric_limits<unsigned short>::max();
+					// Find already visited neighbour with shortest: path from start + path to child
+					for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
+						NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
+						SearchmapPoint smptVis { nmptVis };
+						// Outside map
+						if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
+						// Only consider already visited
+						if (!isClosed[smptVis.y * mapSize.w + smptVis.x]) continue;
 
-				if (distFromStart[smptChildIdx] < oldDist) {
-					PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
-					open.emplace(newNode);
-				}
-			} else {
-				// Lazy Theta star*
-				unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
-				if (newDist < oldDist) {
-					parents[smptChildIdx] = nmptParent;
-					distFromStart[smptChildIdx] = newDist;
-				}
-
-				if (distFromStart[smptChildIdx] < oldDist) {
-					// Theta-star path if there is LOS
-					// so far the searchmap grid appears too coarse to play on, see #2261
-					//if (!IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
-					if (!IsWalkableTo(nmptParent, nmptChild, actorsAreBlocking, caller)) {
-						// Fall back to A-star path
-						distFromStart[smptChildIdx] = std::numeric_limits<unsigned short>::max();
-						// Find already visited neighbour with shortest: path from start + path to child
-						for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
-							NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
-							SearchmapPoint smptVis { nmptVis };
-							// Outside map
-							if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
-							// Only consider already visited
-							if (!isClosed[smptVis.y * mapSize.w + smptVis.x]) continue;
-
-							unsigned short oldVisDist = distFromStart[smptChildIdx];
-							newDist = distFromStart[smptVis.y * mapSize.w + smptVis.x] + Distance(smptVis, smptChild);
-							if (newDist < oldVisDist) {
-								parents[smptChildIdx] = nmptVis;
-								distFromStart[smptChildIdx] = newDist;
-							}
+						unsigned short oldVisDist = distFromStart[smptChildIdx];
+						newDist = distFromStart[smptVis.y * mapSize.w + smptVis.x] + Distance(smptVis, smptChild);
+						if (newDist < oldVisDist) {
+							parents[smptChildIdx] = nmptVis;
+							distFromStart[smptChildIdx] = newDist;
 						}
-						if (distFromStart[smptChildIdx] >= oldDist) continue;
 					}
-
-					PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
-					open.emplace(newNode);
+					if (distFromStart[smptChildIdx] >= oldDist) continue;
 				}
+
+				PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
+				open.emplace(newNode);
 			}
 		}
 	}
@@ -440,8 +440,8 @@ void Map::NormalizeDeltas(float_t& dx, float_t& dy, float_t factor)
 {
 	constexpr float_t STEP_RADIUS = 2.0;
 
-	float_t ySign = std::copysign(1.0, dy);
-	float_t xSign = std::copysign(1.0, dx);
+	float_t ySign = std::copysign(1.0f, dy);
+	float_t xSign = std::copysign(1.0f, dx);
 	dx = std::fabs(dx);
 	dy = std::fabs(dy);
 	float_t dxOrig = dx;

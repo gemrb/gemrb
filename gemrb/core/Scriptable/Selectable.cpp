@@ -30,13 +30,18 @@ void Selectable::SetBBox(const Region& newBBox)
 }
 
 // NOTE: still need to multiply by 4 or 3 to get full pixel radii
-int Selectable::CircleSize2Radius() const
+int Selectable::CircleSize2Radius(int circleSize)
 {
 	// for size >= 2, radii are (size-1)*16, (size-1)*12
 	// for size == 1, radii are 12, 9
 	int adjustedSize = (circleSize - 1) * 4;
 	if (adjustedSize < 4) adjustedSize = 3;
 	return adjustedSize;
+}
+
+int Selectable::CircleSize2Radius() const
+{
+	return CircleSize2Radius(this->circleSize);
 }
 
 void Selectable::DrawCircle(const Point& p) const
@@ -72,15 +77,20 @@ void Selectable::DrawCircle(const Point& p) const
 // Check if P is over our ground circle
 bool Selectable::IsOver(const Point& P) const
 {
+	return IsOver(P, Pos);
+}
+
+bool Selectable::IsOver(const Point& P, const Point& CenterPos) const
+{
 	int csize = circleSize;
 	if (csize < 2) {
-		Point d = P - Pos;
+		Point d = P - CenterPos;
 		if (d.x < -16 || d.x > 16) return false;
 		if (d.y < -12 || d.y > 12) return false;
 		return true;
 	}
 	// TODO: make sure to match the actual blocking shape; use GetEllipseSize/GetEllipseOffset instead?
-	return P.IsWithinEllipse(csize - 1, Pos);
+	return P.IsWithinEllipse(csize - 1, CenterPos);
 }
 
 bool Selectable::IsSelected() const

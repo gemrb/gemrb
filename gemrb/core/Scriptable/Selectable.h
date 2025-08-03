@@ -44,11 +44,13 @@ public:
 	void SetBBox(const Region& newBBox);
 	void DrawCircle(const Point& p) const;
 	bool IsOver(const Point& Pos) const;
+	bool IsOver(const Point& Pos, const Point& CenterPos) const;
 	void SetOver(bool over);
 	bool IsSelected() const;
 	void Select(int Value);
 	void SetCircle(int size, float_t, const Color& color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle);
 	int CircleSize2Radius() const;
+	static int CircleSize2Radius(int circleSize);
 };
 
 }
