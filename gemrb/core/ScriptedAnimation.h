@@ -42,8 +42,8 @@ class Sprite2D;
 #define IE_VVC_TRANSPARENT 0x00000002
 // translucent shadow 4
 #define IE_VVC_BLENDED 0x00000008
-#define IE_VVC_MIRRORX 0x00000010 // TODO: implement
-#define IE_VVC_MIRRORY 0x00000020 // TODO: implement
+#define IE_VVC_MIRRORX 0x00000010 // mirrors if facing eastward
+#define IE_VVC_MIRRORY 0x00000020 // mirrors if facing northward
 #define IE_VVC_CLIPPED 0x00000040
 // IE_VVC_COPYFROMBACK  	0x00000080
 // IE_VVC_CLEARFILL  	0x00000100
