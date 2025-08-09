@@ -36,44 +36,51 @@ class Sprite2D;
 //scripted animation flags
 #define S_ANI_PLAYONCE Animation::Flags::Once
 
+// originals: bg2 is the only one with VVC files and they use only IE_VVC_BLENDED, IE_VVC_MIRRORX, IE_VVC_MIRRORY
+// bg(2)ee: also IE_VVC_3D_BLEND, IE_VVC_TRANSPARENT, IE_VVC_NOCOVER_2
 // transparent 1, translucent 2
 #define IE_VVC_TRANSPARENT 0x00000002
 // translucent shadow 4
 #define IE_VVC_BLENDED 0x00000008
-#define IE_VVC_MIRRORX 0x00000010
-#define IE_VVC_MIRRORY 0x00000020
+#define IE_VVC_MIRRORX 0x00000010 // TODO: implement
+#define IE_VVC_MIRRORY 0x00000020 // TODO: implement
 #define IE_VVC_CLIPPED 0x00000040
 // IE_VVC_COPYFROMBACK  	0x00000080
 // IE_VVC_CLEARFILL  	0x00000100
-#define IE_VVC_3D_BLEND    0x00000200 // CVEFVIDCELL_BLT_GLOW in the original
+#define IE_VVC_3D_BLEND    0x00000200 // CVEFVIDCELL_BLT_GLOW in the original TODO: implement
 #define IE_VVC_NOCOVER_2   0x00000400
 #define IE_VVC_NO_TIMESTOP 0x00000800 //ignore timestop palette
 #define IE_VVC_NO_SEPIA    0x00001000 //ignore dream palette
 #define IE_VVC_2D_BLEND    0x00002000
 // 0x4000, 0x8000 unused
+
 // start of Colour flags on iesdp (though same field in original bg2)
-// 0x10000 Not light source
-// 0x20000 Light source
+// originals: IE_VVC_GREYSCALE, IE_VVC_GLOWING, IE_VVC_SEPIA
+// bg(2)ee: also IE_VVC_NOT_LIGHT_SOURCE, IE_VVC_LIGHT_SOURCE, IE_VVC_INT_BRIGHTNESS, IE_VVC_FULL_PALETTE
+// IE_VVC_NOT_LIGHT_SOURCE 0x00010000 // Not light source TODO: implement
+// IE_VVC_LIGHT_SOURCE 0x00020000 // Light source TODO: implement
 #define IE_VVC_TINT 0x00030000 //2 bits need to be set for tint (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)
-// 0x40000 Internal brightness
+// IE_VVC_INT_BRIGHTNESS 0x00040000 // Internal brightness TODO: implement
 #define IE_VVC_GREYSCALE 0x00080000 //timestopped palette
-#define IE_VVC_DARKEN    0x00100000 // unused
-#define IE_VVC_GLOWING   0x00200000 //internal gamma
+//#define IE_VVC_DARKEN    0x00100000 // unused
+#define IE_VVC_GLOWING 0x00200000 // internal gamma TODO: implement
 // 0x00400000 Non-reserved palette
-// 0x00800000 Full palette
+// IE_VVC_FULL_PALETTE 0x00800000 // Full palette TODO: implement
 // 0x01000000 Unused
 #define IE_VVC_SEPIA 0x02000000 //dream palette
 
+// sequence flags
+// originals, bg(2)ee used: IE_VVC_LOOP - IE_VVC_BAM, IE_VVC_NOCOVER - IE_VVC_HIGH_BRIGHTEN
 #define IE_VVC_LOOP      0x00000001
 #define IE_VVC_LIGHTSPOT 0x00000002 //draw lightspot; CVEFVIDCELL_GLOW
 #define IE_VVC_HEIGHT    0x00000004
 #define IE_VVC_BAM       0x00000008
-#define IE_VVC_OWN_PAL   0x00000010
+// #define IE_VVC_OWN_PAL   0x00000010 // unused
 // original: CVEFVIDCELL_DELETED  	0x00000020 //Used by linked effect
 //#define IE_VVC_PURGEABLE	0x00000020 // purge on next ai update; uses unknown
 #define IE_VVC_NOCOVER       0x00000040 // CVEFVIDCELL_DONOTCLIP
-#define IE_VVC_MID_BRIGHTEN  0x00000080 // CVEFVIDCELL_BRIGHTEN3DONLYOFF
-#define IE_VVC_HIGH_BRIGHTEN 0x00000100 // CVEFVIDCELL_BRIGHTENIFFAST
+#define IE_VVC_MID_BRIGHTEN  0x00000080 // CVEFVIDCELL_BRIGHTEN3DONLYOFF TODO: implement
+#define IE_VVC_HIGH_BRIGHTEN 0x00000100 // CVEFVIDCELL_BRIGHTENIFFAST TODO: implement
 
 
 //#define IE_VVC_UNUSED           0xe0000000U
