@@ -1643,13 +1643,8 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 		return false;
 	}
 
-#define SCROLL_AREA_WIDTH 5
 	Region mask = frame;
-	mask.x += SCROLL_AREA_WIDTH;
-	mask.y += SCROLL_AREA_WIDTH;
-	mask.w -= SCROLL_AREA_WIDTH * 2;
-	mask.h -= SCROLL_AREA_WIDTH * 2;
-#undef SCROLL_AREA_WIDTH
+	mask.ExpandAllSides(-5); // scroll area width
 
 	screenMousePos = e.mouse.Pos();
 	Point mp = ConvertPointFromScreen(screenMousePos);
