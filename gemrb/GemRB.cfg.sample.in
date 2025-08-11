@@ -124,9 +124,6 @@ Bpp=32
 # Whether or not to use software keyboard on devices that support one
 #UseSoftKeyboard=1
 
-# Adds a gutter around the screen for scrolling
-#TouchScrollAreas=1
-
 ###############################################################################
 #  MouseFeedback                                                              #
 #  Bitfield with reserved bits for disabling the mouse.                       #
