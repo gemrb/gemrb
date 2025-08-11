@@ -1696,9 +1696,22 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 {
 	const Map* area = CurrentArea();
 	bool canMove = area != nullptr;
+	int mwinh = 0;
+
+	if (center || (!(updateVPTimer && speed) && canMove && p != vpOrigin)) {
+		const TextArea* mta = core->GetMessageTextArea();
+		if (mta) {
+			mwinh = mta->GetWindow()->Frame().h;
+		}
+	}
 
 	if (updateVPTimer && speed) {
 		updateVPTimer = false;
+		if (center) {
+			// also account for message window height, since it can cover the center of the window at lowest resolutions
+			// GlobalTimer does its own centering, so we only offset
+			p.y += mwinh;
+		}
 		core->timer.SetMoveViewPort(p, speed, center);
 	} else if (canMove && p != vpOrigin) {
 		updateVPTimer = true;
@@ -1706,6 +1719,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		Size mapsize = area->GetSize();
 
 		if (center) {
+			// should we account for the message window height here too?
 			p.x -= frame.w / 2;
 			p.y -= frame.h / 2;
 		}
@@ -1720,12 +1734,6 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		} else if (p.x < -64) {
 			p.x = -64;
 			canMove = false;
-		}
-
-		int mwinh = 0;
-		const TextArea* mta = core->GetMessageTextArea();
-		if (mta) {
-			mwinh = mta->GetWindow()->Frame().h;
 		}
 
 		constexpr int padding = 50;
