@@ -124,6 +124,9 @@ Bpp=32
 # Whether or not to use software keyboard on devices that support one
 #UseSoftKeyboard=1
 
+# How close from the window edge should we start to scroll, offset in pixels
+#EdgeScrollOffset=5
+
 ###############################################################################
 #  MouseFeedback                                                              #
 #  Bitfield with reserved bits for disabling the mouse.                       #

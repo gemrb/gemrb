@@ -1644,7 +1644,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	}
 
 	Region mask = frame;
-	mask.ExpandAllSides(-5); // scroll area width
+	mask.ExpandAllSides(-1 * core->config.EdgeScrollOffset);
 
 	screenMousePos = e.mouse.Pos();
 	Point mp = ConvertPointFromScreen(screenMousePos);

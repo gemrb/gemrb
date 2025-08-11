@@ -376,6 +376,11 @@ Bitfield with reserved bits for disabling the mouse.
   Hide mouse+tooltips = 3
 
 .TP
+.BR EdgeScrollOffset =INT
+An offset in pixels that is used to determine when to trigger area scrolling when the cursor
+is close to the window edge. The default is 5.
+
+.TP
 .BR TouchInput =(0-1)
 Override setting for when autodetection does not have satisfactory results.
   Autodetect         = -1 (default)
