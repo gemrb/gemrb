@@ -37,7 +37,6 @@
 #include "PathFinder.h"
 
 #include "Debug.h"
-#include "FibonacciHeap.h"
 #include "GameData.h"
 #include "Map.h"
 #include "RNG.h"
@@ -222,7 +221,7 @@ PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
-Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
+Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsigned int minDistance, int flags, const Actor* caller)
 {
 	TRACY(ZoneScoped);
 
@@ -262,23 +261,30 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	const Size& mapSize = PropsSize();
 	if (!mapSize.PointInside(smptSource)) return {};
 
+	const auto getChildBlockedStatusFn = size > 2 ? &Map::GetChildBlockedStatusForBigSize : &Map::GetChildBlockedStatusForSmallSize;
+
 	// Initialize data structures
 	const size_t mapCellsCount = mapSize.Area();
 
-	FibonacciHeap<PQNode> open; // todo: remove this data structure or rewrite its implementation - too much allocations there!
 	// make most data storage for this algorithm static, to avoid memory allocations;
 	// each run we just clear the storage, which is keeping the underlying allocated memory at hand
-	static std::vector<bool> isClosed(mapSize.Area(), false);
-	static std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
-	static std::vector<unsigned short> distFromStart(mapSize.Area(), std::numeric_limits<unsigned short>::max());
+	static std::vector<Point> openPoint;
+	static std::vector<float> openCost;
+	static std::vector<bool> isClosed;
+	static std::vector<NavmapPoint> parents;
+	static std::vector<unsigned short> distFromStart;
 
 	// resize if needed (in case of a map change; probably can be done once, when new map is loaded)
 	if (isClosed.size() != mapCellsCount) {
 		parents.resize(mapCellsCount);
 		distFromStart.resize(mapCellsCount);
+		openPoint.reserve(mapCellsCount);
+		openCost.reserve(mapCellsCount);
 	}
 
 	// cleanup
+	openPoint.clear();
+	openCost.clear();
 	isClosed.clear();
 	isClosed.resize(mapCellsCount, false);
 	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
@@ -289,31 +295,36 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	// begin algo init
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
 	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
-	open.emplace(PQNode(nmptSource, 0));
+
+	openCost.push_back(0);
+	openPoint.emplace_back(nmptSource);
+
 	bool foundPath = false;
 	unsigned int squaredMinDist = minDistance * minDistance;
 
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 	constexpr float_t HEURISTIC_WEIGHT = 1.5;
-	auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) {
+	const auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) {
 		// Calculate heuristic
-		int xDist = smptChild.x - smptDest.x;
-		int yDist = smptChild.y - smptDest.y;
+		const int xDist = smptChild.x - smptDest.x;
+		const int yDist = smptChild.y - smptDest.y;
 		// Tie-breaking used to smooth out the path
-		int dxCross = smptDest.x - smptSource.x;
-		int dyCross = smptDest.y - smptSource.y;
-		int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
-		double distance = std::hypot(xDist, yDist);
-		double heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
-		double estDist = distFromStart[smptChildIdx] + heuristic;
+		const int dxCross = smptDest.x - smptSource.x;
+		const int dyCross = smptDest.y - smptSource.y;
+		const int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
+		const float distance = std::hypot(xDist, yDist);
+		const float heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
+		const float estDist = distFromStart[smptChildIdx] + heuristic;
 		return estDist;
 	};
 
-	while (!open.empty()) {
-		NavmapPoint nmptCurrent = open.top().point;
-		open.pop();
-		SearchmapPoint smptCurrent { nmptCurrent };
-		int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
+	while (!openPoint.empty()) {
+		const NavmapPoint nmptCurrent = openPoint.back();
+		openPoint.pop_back();
+		openCost.pop_back();
+
+		const SearchmapPoint smptCurrent { nmptCurrent };
+		const int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
 		if (parents[smptCurrentIdx].IsZero()) {
 			continue;
 		}
@@ -322,15 +333,18 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			nmptDest = nmptCurrent;
 			foundPath = true;
 			break;
-		} else if (minDistance &&
-			   parents[smptCurrentIdx] != nmptCurrent &&
-			   SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist &&
-			   (!(flags & PF_SIGHT) || IsVisibleLOS(smptCurrent, smptDest0, caller))) { // FIXME: should probably be smptDest
+		}
+
+		if (minDistance &&
+		    parents[smptCurrentIdx] != nmptCurrent &&
+		    SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist &&
+		    (!(flags & PF_SIGHT) || IsVisibleLOS(smptCurrent, smptDest0, caller))) { // FIXME: should probably be smptDest
 			smptDest = smptCurrent;
 			nmptDest = nmptCurrent;
 			foundPath = true;
 			break;
 		}
+
 		isClosed[smptCurrentIdx] = true;
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
@@ -342,12 +356,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
 			if (isClosed[smptChildIdx]) continue;
 
-			PathMapFlags childBlockStatus;
-			if (size > 2) {
-				childBlockStatus = GetBlockedInRadiusTile(smptChild, size);
-			} else {
-				childBlockStatus = GetBlockedTile(smptChild);
-			}
+			const PathMapFlags childBlockStatus = (this->*getChildBlockedStatusFn)(smptChild, size);
 			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR));
 			if (childBlocked) continue;
 
@@ -394,8 +403,27 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 					if (distFromStart[smptChildIdx] >= oldDist) continue;
 				}
 
-				PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
-				open.emplace(newNode);
+				// use binary search to find the right slot and insert there the new cost & point;
+				// for small open sets (let's say below 50, depending on HW), the linear search was faster, but it
+				// was losing to binary search for bigger sets of open nodes.
+				// Combined approach with both versions dynamically chosen depending on open nodes' set size was actually
+				// performing worse for both cases.
+				const float newCost = getHeuristic(smptChild, smptChildIdx);
+				int32_t lowerBound = 0;
+				int32_t upperBound = static_cast<int32_t>(openPoint.size()) - 1;
+				while (lowerBound < upperBound) {
+					const int currentIdx = lowerBound + (upperBound - lowerBound) / 2;
+					const bool isNewCostCheaper = openCost[currentIdx] >= newCost;
+
+					// branchless version of:
+					// if (isNewCostCheaper) { lowerBound = currentIdx + 1; }
+					// else { upperBound = currentIdx; }
+					lowerBound = (isNewCostCheaper) * (currentIdx + 1) + (!isNewCostCheaper) * lowerBound;
+					upperBound = (isNewCostCheaper) *upperBound + (!isNewCostCheaper) * currentIdx;
+				}
+				const uint32_t newPos = lowerBound + (static_cast<size_t>(lowerBound) < openCost.size() && openCost[lowerBound] >= newCost);
+				openCost.insert(openCost.cbegin() + newPos, newCost);
+				openPoint.insert(openPoint.cbegin() + newPos, nmptChild);
 			}
 		}
 	}
