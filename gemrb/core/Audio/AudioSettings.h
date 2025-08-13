@@ -21,6 +21,7 @@
 #define H_AUDIO_SETTINGS
 
 #include "EnumIndex.h"
+#include "Orientation.h"
 #include "PlaybackConfig.h"
 
 namespace GemRB {
@@ -67,6 +68,7 @@ class GEM_EXPORT AudioSettings {
 public:
 	AudioPlaybackConfig ConfigPresetByChannel(SFXChannel channel, const Point& point) const;
 	AudioPlaybackConfig ConfigPresetDialog(SFXChannel channel = SFXChannel::Dialog) const;
+	AudioPlaybackConfig ConfigPresetDirectional(SFXChannel channel, const Point& point, orient_t orientation) const;
 	AudioPlaybackConfig ConfigPresetMusic() const;
 	AudioPlaybackConfig ConfigPresetMovie() const;
 	AudioPlaybackConfig ConfigPresetPointAmbient(int gain, const Point& point, uint16_t range, bool loop) const;
