@@ -244,6 +244,60 @@ bool FileExists(const path_t& path)
 	return true;
 }
 
+std::tm* FileModificationTime(const path_t& path)
+{
+#ifdef WIN32
+	static std::tm timestamp;
+
+	auto buffer = StringFromUtf8(path.c_str());
+	auto wideChars = reinterpret_cast<const wchar_t*>(buffer.c_str());
+
+	auto file =
+		CreateFile(
+			wideChars,
+			GENERIC_READ,
+			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+			nullptr,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			nullptr);
+
+	if (file == INVALID_HANDLE_VALUE) {
+		return nullptr;
+	}
+
+	FILETIME moditicationTime;
+	auto result = GetFileTime(file, nullptr, nullptr, &moditicationTime);
+	CloseHandle(file);
+	if (result == 0) {
+		return nullptr;
+	}
+
+	SYSTEMTIME systemTime, localTime;
+	FileTimeToSystemTime(&moditicationTime, &systemTime);
+	SystemTimeToTzSpecificLocalTime(nullptr, &systemTime, &localTime);
+
+	timestamp.tm_sec = localTime.wSecond;
+	timestamp.tm_min = localTime.wMinute;
+	timestamp.tm_hour = localTime.wHour;
+	timestamp.tm_wday = localTime.wDayOfWeek;
+	timestamp.tm_mday = localTime.wDay;
+	timestamp.tm_mon = localTime.wMonth - 1;
+	timestamp.tm_year = localTime.wYear - 1900;
+
+	return &timestamp;
+#else
+	struct stat statStruct;
+	memset(&statStruct, 0, sizeof(statStruct));
+
+	if (stat(path.c_str(), &statStruct)) {
+		return nullptr;
+	} else {
+		return std::localtime(&statStruct.st_mtime);
+	}
+#endif
+}
+
 void PathAppend(path_t& target, const path_t& name)
 {
 	if (name.empty()) {
