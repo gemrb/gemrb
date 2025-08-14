@@ -74,7 +74,7 @@ struct dirent {
 
 	dirent& operator=(std::string&& entryName)
 	{
-		auto cutOff = entryName.length();
+		auto cutOff = std::min(entryName.length(), static_cast<size_t>(_MAX_PATH - 1));
 		buffer = std::move(entryName);
 		buffer.resize(_MAX_PATH);
 		buffer[cutOff] = 0;
