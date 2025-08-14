@@ -18,6 +18,7 @@
  */
 
 #include "Strings/String.h"
+#include "Strings/StringConversion.h"
 
 #include <gtest/gtest.h>
 
@@ -323,6 +324,14 @@ TEST(StringTest, StringToUpper)
 	StringToUpper(unit2);
 	EXPECT_EQ(unit2, u"ЗАКОНЧИТЬ");
 #endif
+}
+
+TEST(StringTest, RecodedStringFromWideStringBytes)
+{
+	std::u16string original { u"abc" };
+	auto utf8 = RecodedStringFromWideStringBytes(reinterpret_cast<const char16_t*>(original.c_str()), 6, "UTF-8");
+	EXPECT_EQ(3, utf8.length());
+	EXPECT_EQ("abc", utf8);
 }
 
 }
