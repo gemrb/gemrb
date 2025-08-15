@@ -58,7 +58,7 @@ void error(const char* owner, const char* format, ARGS&&... args)
 }
 
 // poison printf
-extern "C" [[deprecated("GemRB doesn't use printf; use Log instead.")]]
+[[deprecated("GemRB doesn't use printf; use Log instead.")]]
 int printf(const char* message, ...);
 
 #endif
