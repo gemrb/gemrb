@@ -62,12 +62,6 @@
 	#define GEM_EXPORT_DLL extern "C"
 #endif
 
-/// Semantic Warning Macros
-#ifdef HAVE_ATTRIBUTE_WARN_UNUSED_RESULT
-	#define WARN_UNUSED __attribute__((warn_unused_result))
-#else
-	#define WARN_UNUSED
-#endif
 
 /// Make sure we don't link to static libraries
 /// This causes hard to debug errors due to multiple heaps.
@@ -75,11 +69,5 @@
 	#error GemRB must be dynamically linked with runtime libraries on win32.
 #endif
 
-/// Silence some persistent unused warnings (supported since gcc 2.4)
-#ifdef HAVE_ATTRIBUTE_UNUSED
-	#define IGNORE_UNUSED __attribute__((unused))
-#else
-	#define IGNORE_UNUSED
-#endif
 
 #endif

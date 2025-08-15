@@ -28,6 +28,7 @@
 #define VFS_H
 
 #include "Predicates.h"
+#include "attributes.h"
 #include "exports.h"
 
 #include "config.h"
