@@ -69,27 +69,6 @@
 	#define WARN_UNUSED
 #endif
 
-/// Disable silly MSVC warnings
-#if _MSC_VER >= 1000
-	//  4138 disables the warning for */ found outside of comment, mostly in GameScript.h
-	#pragma warning(disable : 4138)
-	//  4267 disables the warnings related to conversion between size_t and other types
-	#pragma warning(disable : 4267)
-	//	4251 disables the annoying warning about missing dll interface in templates
-	#pragma warning(disable : 4251 521)
-	#pragma warning(disable : 4275)
-	// _CRT_SECURE_NO_WARNINGS on use of various strcpy/printf variants
-	#pragma warning(disable : 4996)
-	//  coercion to bool
-	#pragma warning(disable : 4800)
-	//  conversion from 'GemRB::ieWord' to 'GemRB::ieByte', possible loss of data
-	#pragma warning(disable : 4244)
-	//  new behavior: elements of array will be default initialized
-	#pragma warning(disable : 4351)
-	//	disables warnings about posix functions
-	#define _CRT_NONSTDC_NO_DEPRECATE 1
-#endif
-
 /// Make sure we don't link to static libraries
 /// This causes hard to debug errors due to multiple heaps.
 #if defined(_MSC_VER) && !defined(_DLL)

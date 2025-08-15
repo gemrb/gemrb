@@ -148,6 +148,12 @@ FUNCTION(CONFIGURE_COMPILER)
 		#STRING(APPEND CMAKE_CXX_FLAGS " /fp:fast")
 		# manually enable some file-level parallelism + unicode for fmt
 		ADD_COMPILE_OPTIONS(/MP2 /utf-8)
+		# disable a bunch of warnings
+		# 4267 disables the warnings related to conversion between size_t and other types
+		# 4996 _CRT_SECURE_NO_WARNINGS on use of various strcpy/printf variants
+		ADD_COMPILE_OPTIONS(/wd4267 /wd4996)
+		# disables warnings about posix functions
+		ADD_COMPILE_DEFINITIONS(_CRT_NONSTDC_NO_DEPRECATE=1)
 	ENDIF()
 
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
