@@ -51,12 +51,12 @@ void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 	size_t oldc = effectnames.size();
 	effectnames.resize(effectnames.size() + count);
 
-	std::copy(opcodes, opcodes + count, &effectnames[0] + oldc);
+	std::copy(opcodes, opcodes + count, effectnames.begin() + oldc);
 
 	//if we merge two effect lists, then we need to sort their effect tables
 	//actually, we might always want to sort this list, so there is no
 	//need to do it manually (sorted table is needed if we use bsearch)
-	qsort(&effectnames[0], effectnames.size(), sizeof(EffectDesc), [](const void* a, const void* b) {
+	qsort(effectnames.data(), effectnames.size(), sizeof(EffectDesc), [](const void* a, const void* b) {
 		return stricmp(((const EffectDesc*) a)->Name, ((const EffectDesc*) b)->Name);
 	});
 }

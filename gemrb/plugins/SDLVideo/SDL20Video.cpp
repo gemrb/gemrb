@@ -682,6 +682,9 @@ void SDL20VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Colo
 
 void SDL20VideoDriver::DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags)
 {
+	if (points.empty()) {
+		return;
+	}
 	UpdateRenderTarget(reinterpret_cast<const Color*>(&color), flags);
 	SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
 }

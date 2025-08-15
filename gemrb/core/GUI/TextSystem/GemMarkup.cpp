@@ -237,8 +237,8 @@ GemMarkupParser::ParseState
 				if (*it == u']') {
 					std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> conv;
 					std::wstring wToken = conv.from_bytes(
-						reinterpret_cast<const char*>(&token[0]),
-						reinterpret_cast<const char*>(&token[0] + token.size()));
+						reinterpret_cast<const char*>(token.data()),
+						reinterpret_cast<const char*>(token.data() + token.size()));
 					// state icons, invalid as unicode, so we cant translate in Python
 					wchar_t chr = (wchar_t) wcstoul(wToken.c_str(), nullptr, 0);
 					token.clear();
