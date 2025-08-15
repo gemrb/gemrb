@@ -78,6 +78,7 @@ GEM_EXPORT path_t& ResolveFilePath(path_t& FilePath);
 
 GEM_EXPORT bool DirExists(const path_t& path);
 GEM_EXPORT bool FileExists(const path_t& path);
+GEM_EXPORT std::tm* FileModificationTime(const path_t& path);
 
 // when case sensitivity is enabled dir will be transformed to fit the case of the actual items composing the path
 GEM_EXPORT path_t& ResolveCase(path_t& dir);
