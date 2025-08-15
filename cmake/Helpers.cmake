@@ -25,6 +25,26 @@ FUNCTION(ADD_FLAG_IF_SUPPORTED)
 	ENDIF ()
 ENDFUNCTION()
 
+FUNCTION(IS_ATTRIBUTE_SUPPORTED ATTRIBUTE)
+	# cmake vars are case sensitive and we pass a lower case attribute
+	STRING(TOUPPER ${ATTRIBUTE} ATTR_UPPER)
+	CHECK_CXX_SOURCE_COMPILES("
+		#ifdef __has_attribute
+		#  if __has_attribute(${ATTRIBUTE})
+		#    define ATTR __attribute__((${ATTRIBUTE}))
+		#  endif
+		#endif
+		#ifndef ATTR
+		#  define ATTR definitely-not-an-attribute
+		#endif
+
+		int test() ATTR;
+		int main(int, char**) {
+			return 0;
+		}" HAVE_ATTRIBUTE_${ATTR_UPPER}
+	)
+ENDFUNCTION()
+
 FUNCTION(USE_SCCACHE_IF_AVAILABLE)
 	FIND_PROGRAM(SCCACHE_PROGRAM "sccache")
 	IF(SCCACHE_PROGRAM)

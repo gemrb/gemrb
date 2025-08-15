@@ -21,6 +21,8 @@
 #ifndef EXPORTS_H
 #define EXPORTS_H
 
+#include "config.h"
+
 /**
  * @file exports.h
  * This file contains global compiler configuration.
@@ -61,7 +63,7 @@
 #endif
 
 /// Semantic Warning Macros
-#ifdef __GNUC__
+#ifdef HAVE_ATTRIBUTE_WARN_UNUSED_RESULT
 	#define WARN_UNUSED __attribute__((warn_unused_result))
 #else
 	#define WARN_UNUSED
@@ -95,7 +97,7 @@
 #endif
 
 /// Silence some persistent unused warnings (supported since gcc 2.4)
-#if defined(__GNUC__) || defined(__clang__)
+#ifdef HAVE_ATTRIBUTE_UNUSED
 	#define IGNORE_UNUSED __attribute__((unused))
 #else
 	#define IGNORE_UNUSED
