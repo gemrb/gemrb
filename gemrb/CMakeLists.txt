@@ -4,7 +4,10 @@ ENDIF()
 ADD_SUBDIRECTORY( core )
 
 # GUIScripts and override go directly in the bundle
-SET(RESOURCE_LIST "GUIScripts" "override" "unhardcoded" "../demo")
+SET(RESOURCE_LIST "GUIScripts" "override" "unhardcoded")
+IF (NOT SKIP_DEMO_DATA)
+	LIST(APPEND RESOURCE_LIST "../demo")
+ENDIF()
 IF (NOT OPENGL_BACKEND STREQUAL "None")
 	LIST(APPEND RESOURCE_LIST "plugins/SDLVideo/Shaders")
 ENDIF()
