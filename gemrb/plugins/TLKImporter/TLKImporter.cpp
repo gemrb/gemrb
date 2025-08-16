@@ -364,6 +364,10 @@ String TLKImporter::GetString(ieStrRef strref, STRING_FLAGS flags)
 		str->ReadDword(StrOffset);
 		str->ReadDword(l);
 
+		if (l == 0) {
+			return u"";
+		}
+
 		if (type & 1) {
 			if (str->Seek(StrOffset + Offset, GEM_STREAM_START) == GEM_ERROR) {
 				return u"";

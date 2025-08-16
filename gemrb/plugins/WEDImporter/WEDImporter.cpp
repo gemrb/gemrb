@@ -135,7 +135,7 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 			}
 			str->Seek(newOverlays->TILOffset + startindex * 2, GEM_STREAM_START);
 			std::vector<ieWord> indices(count);
-			str->Read(&indices[0], count * sizeof(ieWord));
+			str->Read(indices.data(), count * sizeof(ieWord));
 
 			Tile* tile;
 			if (secondary == 0xffff) {
