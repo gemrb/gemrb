@@ -86,11 +86,6 @@ FUNCTION(CONFIGURE_COMPILER)
 		STRING(APPEND CMAKE_CXX_FLAGS " -pedantic")
 		# mark chars explicitly signed (ARM defaults to unsigned)
 		ADD_FLAG_IF_SUPPORTED(FLAG "-fsigned-char")
-		# only export symbols explicitly marked to be exported.
-		# BSDs crash with it #2074
-		IF (NOT (BSD AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
-			ADD_FLAG_IF_SUPPORTED(FLAG "-fvisibility=hidden")
-		ENDIF ()
 		# Fast math helps us covering some things that need a little more rework soon
 		ADD_FLAG_IF_SUPPORTED(FLAG "-ffast-math")
 		ADD_FLAG_IF_SUPPORTED(FLAG "-frounding-math")
