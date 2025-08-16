@@ -160,6 +160,19 @@ FUNCTION(CONFIGURE_COMPILER)
 	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" PARENT_SCOPE)
 	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}" PARENT_SCOPE)
 	USE_SCCACHE_IF_AVAILABLE()
+	SET(EXTENDED_EXPORTS "
+// msvc requires dllexport for templated functions
+// GEM_EXPORT_T is also useful anywhere else we want to force default visibility
+#ifdef WIN32
+	#define GEM_EXPORT_T __declspec(dllexport)
+#else
+	#define GEM_EXPORT_T GEM_EXPORT
+#endif
+// Make sure we don't link to static libraries
+// This causes hard to debug errors due to multiple heaps.
+#if defined(_MSC_VER) && !defined(_DLL)
+  #error GemRB must be dynamically linked with runtime libraries on win32.
+#endif" PARENT_SCOPE)
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_PYTHON)

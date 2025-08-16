@@ -31,8 +31,6 @@
 #include "attributes.h"
 #include "exports.h"
 
-#include "config.h"
-
 #include "fmt/format.h"
 
 #include <string>
