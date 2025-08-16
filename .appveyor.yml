@@ -84,6 +84,7 @@ before_build:
       $env:gl = "OpenGL"
     }
     cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOPENGL_BACKEND="$env:gl" -DINSOURCEBUILD=1 -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET="x64-windows" -A x64 -DPYTHON_VERSION="3.10...<3.11" -DUSE_TESTS=ON .
+    Get-Content gemrb/includes/gem-core-export.h
 
     # set version to tag or version + commits since tag + commit hash
     $git_version = (git describe --always) | Out-String

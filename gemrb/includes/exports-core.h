@@ -33,8 +33,7 @@
 		#include "gem-core-export.h"
 		// TODO: move to the header if these simplifactions work
 		// TODO: if it works out, just inline the extern and use GEM_EXPORT instead; has to always be dllexport here
-		#define GEM_EXPORT_DLL extern "C" GEM_EXPORT
-		#define GEM_EXPORT_T   GEM_EXPORT // TODO: verify this define is still needed at all (added for templates on windows)
+		#define GEM_EXPORT_DLL extern "C" GEM_EXPORT_T
 	#else
 		// if the file wasn't found, fallback to manual implementation
 		// left here for the included xcode project until #1865
@@ -42,7 +41,7 @@
 		#if !defined(GEM_NO_EXPORT) && defined(__GNUC__)
 			#define GEM_EXPORT     __attribute__((visibility("default")))
 			#define GEM_EXPORT_T   GEM_EXPORT
-			#define GEM_EXPORT_DLL extern "C" __attribute__((visibility("default")))
+			#define GEM_EXPORT_DLL extern "C" GEM_EXPORT
 		#endif
 	#endif
 #endif
