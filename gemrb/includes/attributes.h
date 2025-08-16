@@ -21,7 +21,9 @@
 #ifndef ATTRIBUTES_H
 #define ATTRIBUTES_H
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+	#include "config.h"
+#endif
 
 // Semantic warning macros
 #ifdef HAVE_ATTRIBUTE_WARN_UNUSED_RESULT
