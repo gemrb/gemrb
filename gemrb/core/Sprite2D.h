@@ -28,7 +28,7 @@
 #define SPRITE2D_H
 
 #include "RGBAColor.h"
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Palette.h"
 #include "Region.h"

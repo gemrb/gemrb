@@ -20,7 +20,7 @@
 #ifndef UTF8_COMPARISON_H
 #define UTF8_COMPARISON_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 namespace GemRB {
 

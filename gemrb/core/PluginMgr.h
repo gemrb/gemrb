@@ -28,7 +28,7 @@
 #define PLUGINMGR_H
 
 #include "SClassID.h" // For PluginID
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Plugin.h"
 #include "ResourceDesc.h"

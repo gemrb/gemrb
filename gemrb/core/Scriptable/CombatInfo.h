@@ -23,7 +23,7 @@
 #ifndef COMBATINFO_H
 #define COMBATINFO_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include <string>
 

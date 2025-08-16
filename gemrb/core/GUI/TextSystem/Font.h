@@ -32,7 +32,7 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "SpriteSheet.h"
 

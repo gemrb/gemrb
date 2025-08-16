@@ -21,7 +21,7 @@
 #include "Interface.h"
 
 #include "Predicates.h"
-#include "exports.h"
+#include "exports-core.h"
 #include "globals.h"
 #include "ie_cursors.h"
 #include "ie_stats.h"

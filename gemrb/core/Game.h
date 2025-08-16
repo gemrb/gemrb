@@ -28,7 +28,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include "Callback.h"

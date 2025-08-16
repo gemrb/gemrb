@@ -21,7 +21,7 @@
 #ifndef AMBIENT_H
 #define AMBIENT_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "globals.h"
 #include "ie_types.h"
 

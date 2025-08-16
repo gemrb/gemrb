@@ -21,7 +21,7 @@
 #ifndef GAMESCRIPT_H
 #define GAMESCRIPT_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Debug.h"
 

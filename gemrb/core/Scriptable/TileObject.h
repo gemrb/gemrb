@@ -20,7 +20,7 @@
 #ifndef TILEOBJECT_H
 #define TILEOBJECT_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 namespace GemRB {

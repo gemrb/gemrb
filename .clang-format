@@ -70,7 +70,7 @@ FixNamespaceComments: false
 IncludeBlocks: Regroup
 IncludeCategories:
 - Priority: 2
-  Regex: '^"(attributes|CircularBuffer|defsounds|errors|exports|globals|ie_.*|opcode_params|overlays|Platform|plugindef|Predicates|RGBAColor|SClassID|strrefs|voodooconst|win32def)\.h"'
+  Regex: '^"(attributes|CircularBuffer|defsounds|errors|exports-core|globals|ie_.*|opcode_params|overlays|Platform|plugindef|Predicates|RGBAColor|SClassID|strrefs|voodooconst|win32def)\.h"'
   SortPriority: 0
 - Priority: 3
   Regex: '^"[^/]+"'

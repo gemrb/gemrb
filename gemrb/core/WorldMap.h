@@ -28,7 +28,7 @@
 #ifndef WORLDMAP_H
 #define WORLDMAP_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include "AnimationFactory.h"

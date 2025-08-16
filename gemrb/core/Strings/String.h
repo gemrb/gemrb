@@ -19,7 +19,7 @@
 #ifndef STRING_H
 #define STRING_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "StringView.h"
 

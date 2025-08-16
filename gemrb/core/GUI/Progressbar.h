@@ -26,7 +26,7 @@
 #ifndef PROGRESSBAR_H
 #define PROGRESSBAR_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Sprite2D.h"
 

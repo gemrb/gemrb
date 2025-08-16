@@ -21,7 +21,7 @@
 #ifndef SAVEGAMEITERATOR_H
 #define SAVEGAMEITERATOR_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "SaveGame.h"
 

@@ -19,7 +19,7 @@
 #ifndef SAVE_GAME_ARE_EXTRACTOR_H
 #define SAVE_GAME_ARE_EXTRACTOR_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Resource.h"
 #include "SaveGame.h"

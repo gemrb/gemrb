@@ -21,7 +21,7 @@
 #ifndef TARGETS_H
 #define TARGETS_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Scriptable/Scriptable.h"
 

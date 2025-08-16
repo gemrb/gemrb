@@ -21,7 +21,7 @@
 #ifndef FOG_RENDERER_H
 #define FOG_RENDERER_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "EnumIndex.h"
 #include "Region.h"

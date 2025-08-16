@@ -18,7 +18,7 @@
 #ifndef IE_SWAB_H
 #define IE_SWAB_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #if defined(__cplusplus)
 extern "C"

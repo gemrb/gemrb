@@ -26,7 +26,7 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Logging/Logger.h"
 #include "fmt/std.h" // needed for Log specialization

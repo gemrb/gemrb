@@ -21,7 +21,7 @@
 #ifndef PCSTATSTRUCT_H
 #define PCSTATSTRUCT_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include "Strings/String.h"

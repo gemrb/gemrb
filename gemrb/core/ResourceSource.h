@@ -22,7 +22,7 @@
 #define RESOURCESOURCE_H
 
 #include "SClassID.h"
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Plugin.h"
 

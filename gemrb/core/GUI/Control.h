@@ -39,7 +39,7 @@
 #define IE_GUI_VIEW        254 // gemrb extension
 #define IE_GUI_INVALID     255
 
-#include "exports.h"
+#include "exports-core.h"
 #include "globals.h"
 
 #include "GUI/EventMgr.h"

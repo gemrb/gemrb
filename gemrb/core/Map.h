@@ -21,7 +21,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Bitmap.h"
 #include "FogRenderer.h"

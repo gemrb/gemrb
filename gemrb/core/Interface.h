@@ -26,7 +26,7 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "globals.h"
 
 #include "EnumIndex.h"

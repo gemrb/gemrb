@@ -28,7 +28,7 @@
 #define DISPLAYMESSAGE_H
 
 #include "RGBAColor.h"
-#include "exports.h"
+#include "exports-core.h"
 #include "strrefs.h"
 
 #include "EnumIndex.h"

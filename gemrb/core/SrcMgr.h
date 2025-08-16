@@ -21,7 +21,7 @@
 #ifndef SRCMGR_H
 #define SRCMGR_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include "Resource.h"

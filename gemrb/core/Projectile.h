@@ -28,7 +28,7 @@
 #ifndef PROJECTILE_H
 #define PROJECTILE_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include "Animation.h"

@@ -21,7 +21,7 @@
 #ifndef IMAGEMGR_H
 #define IMAGEMGR_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Resource.h"
 #include "Sprite2D.h"

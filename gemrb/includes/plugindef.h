@@ -103,7 +103,7 @@
 
 #include "Platform.h"
 #include "attributes.h"
-#include "exports.h"
+#include "exports-core.h"
 
 #include "InterfaceConfig.h"
 #include "PluginMgr.h"

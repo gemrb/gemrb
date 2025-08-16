@@ -27,7 +27,7 @@
 #ifndef GAMECONTROL_H
 #define GAMECONTROL_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "strrefs.h"
 
 #include "EnumIndex.h"

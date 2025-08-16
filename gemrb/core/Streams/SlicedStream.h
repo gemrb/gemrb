@@ -21,7 +21,7 @@
 #ifndef SLICEDSTREAM_H
 #define SLICEDSTREAM_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "DataStream.h"
 

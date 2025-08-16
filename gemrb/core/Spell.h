@@ -28,7 +28,7 @@
 #ifndef SPELL_H
 #define SPELL_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include "EffectQueue.h"

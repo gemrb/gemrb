@@ -21,7 +21,7 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "globals.h"
 
 #include "Holder.h"

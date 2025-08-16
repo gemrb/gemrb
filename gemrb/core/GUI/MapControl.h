@@ -26,7 +26,7 @@
 #ifndef MAPCONTROL_H
 #define MAPCONTROL_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "AnimationFactory.h"
 

@@ -21,7 +21,7 @@
 #define PALETTE_H
 
 #include "RGBAColor.h"
-#include "exports.h"
+#include "exports-core.h"
 
 #include "MurmurHash.h"
 

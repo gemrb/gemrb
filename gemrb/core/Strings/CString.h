@@ -19,7 +19,7 @@
 #ifndef CSTRING_H
 #define CSTRING_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "StringView.h"
 

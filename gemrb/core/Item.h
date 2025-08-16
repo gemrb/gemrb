@@ -28,7 +28,7 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include "CharAnimations.h"

@@ -21,7 +21,7 @@
 #ifndef CALENDAR_H
 #define CALENDAR_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include <vector>

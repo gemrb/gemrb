@@ -22,7 +22,7 @@
 #define TEXTAREA_H
 
 #include "RGBAColor.h"
-#include "exports.h"
+#include "exports-core.h"
 
 #include "GUI/Control.h"
 #include "GUI/ScrollView.h"

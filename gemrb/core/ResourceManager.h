@@ -22,7 +22,7 @@
 #define RESOURCEMANGER_H
 
 #include "SClassID.h"
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Holder.h"
 #include "Resource.h"

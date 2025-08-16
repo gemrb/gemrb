@@ -21,7 +21,7 @@
 #ifndef OVERHEADTEXT_H
 #define OVERHEADTEXT_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "globals.h"
 
 #include <vector>

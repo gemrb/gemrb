@@ -21,7 +21,7 @@
 #ifndef ANIMATIONFACTORY_H
 #define ANIMATIONFACTORY_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Animation.h"
 #include "FactoryObject.h"

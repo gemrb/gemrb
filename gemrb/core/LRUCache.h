@@ -21,7 +21,7 @@
 #ifndef LRUCACHE_H
 #define LRUCACHE_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Strings/StringView.h"
 

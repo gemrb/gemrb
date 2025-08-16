@@ -21,7 +21,7 @@
 #ifndef DIALOGHANDLER_H
 #define DIALOGHANDLER_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Game.h"
 

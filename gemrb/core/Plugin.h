@@ -27,7 +27,7 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "TypeID.h"
 

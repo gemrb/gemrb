@@ -22,7 +22,7 @@
 #define TILE_H
 
 #include "RGBAColor.h"
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Animation.h"
 

@@ -20,7 +20,7 @@
 #ifndef H_GEMRB_MURMUR_HASH
 #define H_GEMRB_MURMUR_HASH
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include <cstdint>
 

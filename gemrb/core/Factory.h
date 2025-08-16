@@ -21,7 +21,7 @@
 #ifndef FACTORY_H
 #define FACTORY_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "FactoryObject.h"
 

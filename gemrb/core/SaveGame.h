@@ -21,7 +21,7 @@
 #ifndef SAVEGAME_H
 #define SAVEGAME_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "ResourceManager.h"
 

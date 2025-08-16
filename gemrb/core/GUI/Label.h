@@ -27,7 +27,7 @@
 #ifndef LABEL_H
 #define LABEL_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "GUI/Control.h"
 #include "GUI/TextSystem/Font.h"

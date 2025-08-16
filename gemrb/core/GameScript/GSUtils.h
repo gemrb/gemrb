@@ -20,7 +20,7 @@
 #ifndef GSUTILS_H
 #define GSUTILS_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Cache.h"
 #include "SymbolMgr.h"

@@ -20,7 +20,7 @@
 #ifndef MATCHING_H
 #define MATCHING_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 namespace GemRB {

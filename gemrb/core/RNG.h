@@ -21,7 +21,7 @@
 #ifndef RNG_H
 #define RNG_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Region.h"
 

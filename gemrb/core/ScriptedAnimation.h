@@ -20,7 +20,7 @@
 #ifndef SCRIPTEDANIMATION_H
 #define SCRIPTEDANIMATION_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Animation.h"
 #include "Orientation.h"

@@ -21,7 +21,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Region.h"
 

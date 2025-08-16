@@ -21,7 +21,7 @@
 #define VEFOBJECT_H
 
 #include "SClassID.h"
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include "Region.h"

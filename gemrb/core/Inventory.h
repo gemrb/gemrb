@@ -28,7 +28,7 @@
 #ifndef INVENTORY_H
 #define INVENTORY_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 #include "strrefs.h"
 

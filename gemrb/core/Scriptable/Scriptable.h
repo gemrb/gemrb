@@ -21,7 +21,7 @@
 #ifndef SCRIPTABLE_H
 #define SCRIPTABLE_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include "OverHeadText.h"

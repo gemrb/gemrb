@@ -27,7 +27,7 @@
 #ifndef WORLDMAPCONTROL_H
 #define WORLDMAPCONTROL_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "GUI/Control.h"
 #include "GUI/GUIAnimation.h"

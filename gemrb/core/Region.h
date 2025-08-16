@@ -28,7 +28,7 @@
 #ifndef REGION_H
 #define REGION_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "fmt/format.h"
 

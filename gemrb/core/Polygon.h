@@ -19,7 +19,7 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "ie_types.h"
 
 #include "Region.h"

@@ -28,7 +28,7 @@
 #ifndef SCROLLBAR_H
 #define SCROLLBAR_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Sprite2D.h"
 

@@ -28,7 +28,7 @@
 #ifndef EFFECTQUEUE_H
 #define EFFECTQUEUE_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Effect.h"
 

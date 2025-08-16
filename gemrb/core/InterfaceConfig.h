@@ -21,7 +21,7 @@
 #ifndef __GemRB__InterfaceConfig__
 #define __GemRB__InterfaceConfig__
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Strings/StringMap.h"
 #include "System/VFS.h"

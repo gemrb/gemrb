@@ -25,7 +25,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "EnumIndex.h"
 

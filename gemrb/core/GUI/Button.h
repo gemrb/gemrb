@@ -28,7 +28,7 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "EnumIndex.h"
 #include "Sprite2D.h"

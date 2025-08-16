@@ -21,7 +21,7 @@
 #ifndef TILEOVERLAY_H
 #define TILEOVERLAY_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Tile.h"
 

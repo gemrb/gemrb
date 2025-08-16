@@ -18,38 +18,30 @@
  *
  */
 
-#ifndef EXPORTS_H
-#define EXPORTS_H
+#ifndef EXPORTS_CORE_H
+#define EXPORTS_CORE_H
 
-#ifdef HAVE_CONFIG_H
-	#include "config.h"
-#endif
+#include "config.h"
 
 /**
- * @file exports.h
- * This file contains global compiler configuration.
- *
- * It should not contain any declarations or includes,
- * only compiler dependent macros and pragmas.
+ * @file exports-core.h
+ * This file contains global compiler configuration related to symbol visibility.
  */
 
-/// Symbol visibility macros
-#ifndef STATIC_LINK
-	#ifdef WIN32
-		#ifdef GEM_BUILDING_CORE
-			#define GEM_EXPORT   __declspec(dllexport)
-			#define GEM_EXPORT_T GEM_EXPORT
-		#else
-			#define GEM_EXPORT __declspec(dllimport)
-			#define GEM_EXPORT_T
-		#endif
-		#define GEM_EXPORT_DLL extern "C" __declspec(dllexport)
+#if defined(__has_include) && !defined(STATIC_LINK)
+	#if __has_include("gem-core-export.h")
+		#include "gem-core-export.h"
+		// TODO: move to the header if these simplifactions work
+		// TODO: if it works out, just inline the extern and use GEM_EXPORT instead; has to always be dllexport here
+		#define GEM_EXPORT_DLL extern "C" GEM_EXPORT
+		#define GEM_EXPORT_T   GEM_EXPORT // TODO: verify this define is still needed at all (added for templates on windows)
 	#else
-		#ifdef __GNUC__
-			#ifdef GEM_BUILDING_CORE
-				#define GEM_EXPORT   __attribute__((visibility("default")))
-				#define GEM_EXPORT_T GEM_EXPORT
-			#endif
+		// if the file wasn't found, fallback to manual implementation
+		// left here for the included xcode project until #1865
+		// afterwards we can simplify to the gem-core-export.h include and the last two fallbacks for static builds
+		#if !defined(GEM_NO_EXPORT) && defined(__GNUC__)
+			#define GEM_EXPORT     __attribute__((visibility("default")))
+			#define GEM_EXPORT_T   GEM_EXPORT
 			#define GEM_EXPORT_DLL extern "C" __attribute__((visibility("default")))
 		#endif
 	#endif
@@ -57,19 +49,12 @@
 
 #ifndef GEM_EXPORT
 	#define GEM_EXPORT
+#endif
+#ifndef GEM_EXPORT_T
 	#define GEM_EXPORT_T
 #endif
-
 #ifndef GEM_EXPORT_DLL
 	#define GEM_EXPORT_DLL extern "C"
 #endif
-
-
-/// Make sure we don't link to static libraries
-/// This causes hard to debug errors due to multiple heaps.
-#if defined(_MSC_VER) && !defined(_DLL)
-	#error GemRB must be dynamically linked with runtime libraries on win32.
-#endif
-
 
 #endif

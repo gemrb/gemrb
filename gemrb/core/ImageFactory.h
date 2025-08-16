@@ -21,7 +21,7 @@
 #ifndef IMAGEFACTORY_H
 #define IMAGEFACTORY_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "FactoryObject.h"
 #include "Sprite2D.h"

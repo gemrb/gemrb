@@ -21,7 +21,7 @@
 #ifndef MEMORYSTREAM_H
 #define MEMORYSTREAM_H
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "DataStream.h"
 

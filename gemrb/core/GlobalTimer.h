@@ -20,7 +20,7 @@
 #ifndef GLOBALTIMER_H
 #define GLOBALTIMER_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "globals.h"
 
 #include "Region.h"

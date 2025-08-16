@@ -21,7 +21,7 @@
 #ifndef AMBIENTMGR_H
 #define AMBIENTMGR_H
 
-#include "exports.h"
+#include "exports-core.h"
 #include "globals.h"
 
 #include "AudioBackend.h"

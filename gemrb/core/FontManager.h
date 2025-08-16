@@ -21,7 +21,7 @@
 #ifndef GemRB_FontManager_h
 #define GemRB_FontManager_h
 
-#include "exports.h"
+#include "exports-core.h"
 
 #include "Resource.h"
 #include "TypeID.h"

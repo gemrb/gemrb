@@ -29,9 +29,7 @@
 
 #include "Predicates.h"
 #include "attributes.h"
-#include "exports.h"
-
-#include "config.h"
+#include "exports-core.h"
 
 #include "fmt/format.h"
 
