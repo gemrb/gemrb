@@ -21,15 +21,16 @@
 #ifndef TILESETMGR_H
 #define TILESETMGR_H
 
+#include "exports-core.h"
+
 #include "Plugin.h"
 #include "Tile.h"
 
-#include "Plugins/export.h"
 #include "Streams/DataStream.h"
 
 namespace GemRB {
 
-class GEM_PLUGIN_EXPORT TileSetMgr : public Plugin {
+class GEM_EXPORT_T TileSetMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Tile* GetTile(const std::vector<ieWord>& indexes,
