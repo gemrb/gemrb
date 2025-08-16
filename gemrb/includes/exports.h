@@ -21,7 +21,9 @@
 #ifndef EXPORTS_H
 #define EXPORTS_H
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+	#include "config.h"
+#endif
 
 /**
  * @file exports.h
