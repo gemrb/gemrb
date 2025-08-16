@@ -1499,11 +1499,11 @@ void CharAnimations::AddPSTSuffix(ResRef& dest, unsigned char stanceID,
 			Prefix = "wlk";
 			break;
 		case IE_ANI_CAST:
-			Cycle = SixteenToNine[Orient];
+			Cycle = SixteenToFive[Orient];
 			Prefix = "sp1";
 			break;
 		case IE_ANI_CONJURE:
-			Cycle = SixteenToNine[Orient];
+			Cycle = SixteenToFive[Orient];
 			Prefix = "sp2";
 			break;
 		case IE_ANI_HEAD_TURN:
