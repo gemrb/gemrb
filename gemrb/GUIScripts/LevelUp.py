@@ -729,9 +729,9 @@ def SaveNewSpells():
 			IsCleric = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
 			if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
 				continue
-			elif IsCleric == "*": # druid spells
-				ClassFlag = 0x8000
-			else: # cleric spells
-				ClassFlag = 0x4000
+			if IsCleric == "*":
+				ClassFlag = Spellbook.GetClassFlag (IsDruid)
+			else:
+				ClassFlag = Spellbook.GetClassFlag (IsCleric)
 
 			Spellbook.LearnPriestSpells (pc, i + 1, ClassFlag)
