@@ -328,7 +328,7 @@ def LearnSpells(MyChar, which):
 	if TableName == "*":
 		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR)
 	if TableName != "*" and which == "priest":
-		ClassFlag = GetClassFlag (TableName)
+		ClassFlag = Spellbook.GetClassFlag (TableName)
 		TableName = Spellbook.GetPriestSpellTable (TableName)
 
 		Spellbook.SetupSpellLevels (MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
@@ -549,14 +549,6 @@ def SetCharacterDescription():
 					j = j + 1
 				TextArea.Append ("\n")
 	return
-
-def GetClassFlag(TableName):
-	if TableName in ("MXSPLPRS", "MXSPLPAL"):
-		return 0x4000
-	elif TableName in ("MXSPLDRU", "MXSPLRAN"):
-		return 0x8000
-	else:
-		return 0
 
 # Gender Selection
 def GenderPress():
@@ -1534,7 +1526,7 @@ def SkillsPress():
 			SkillsState = 4
 
 	if SkillsState == 4:
-		ClassFlag = GetClassFlag (PriestSpell)
+		ClassFlag = Spellbook.GetClassFlag (PriestSpell)
 		if PriestSpell == "MXSPLPRS":
 			PriestSpellsMemorize(PriestSpell, Level, SpellLevel)
 		elif DruidSpell == "MXSPLDRU":

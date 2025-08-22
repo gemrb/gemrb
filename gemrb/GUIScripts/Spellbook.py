@@ -756,3 +756,11 @@ def LearnFromScroll (pc, slot):
 		GemRB.SetGlobal ("TutorialLesson", "GLOBAL", 20)
 
 	return ret
+
+def GetClassFlag(tableName):
+	if tableName in ("MXSPLPRS", "MXSPLPAL"):
+		return 0x4000
+	elif tableName in ("MXSPLDRU", "MXSPLRAN"):
+		return 0x8000
+	else:
+		return 0
