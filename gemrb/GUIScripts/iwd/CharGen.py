@@ -411,7 +411,7 @@ def AcceptPress():
 	return
 
 def SetCharacterDescription():
-	global CharGenWindow, TextArea, CharGenState, ClassFlag
+	global CharGenWindow, TextArea, CharGenState
 	global MyChar
 
 	TextArea.Clear()
@@ -1534,13 +1534,12 @@ def SkillsPress():
 			SkillsState = 4
 
 	if SkillsState == 4:
+		ClassFlag = GetClassFlag (PriestSpell)
 		if PriestSpell == "MXSPLPRS":
-			ClassFlag = 0x4000
 			PriestSpellsMemorize(PriestSpell, Level, SpellLevel)
 		elif DruidSpell == "MXSPLDRU":
 			# no separate spell progression by default
 			DruidSpell = Spellbook.GetPriestSpellTable (DruidSpell)
-			ClassFlag = 0x8000
 			PriestSpellsMemorize(DruidSpell, Level, SpellLevel)
 		else:
 			SkillsState = 5
