@@ -534,8 +534,7 @@ def DCProfsDonePress ():
 		GemRB.SetMemorizableSpellsCount (pc, SpellTable.GetValue (0, 0), IE_SPELL_TYPE_WIZARD, 0)
 		NewMageSpells = 1
 	if ClericTable != "*":
-		if not GemRB.HasResource(ClericTable, RES_2DA, 1):
-			ClericTable = "MXSPLPRS" # iwd1 doesn't have a DRUIDSPELL column in the table
+		ClericTable = Spellbook.GetPriestSpellTable (ClericTable) # iwd1 does not have MXSPLDRU
 		# make sure we can cast spells at this level (paladins)
 		ClericTable = GemRB.LoadTable (ClericTable)
 		if ClericTable.GetRowName (0) == "1":
