@@ -601,13 +601,11 @@ def ReactivateBaseClass ():
 	elif SpellTables[1] != "*" or SpellTables[0] != "*": # casts priest spells
 		# get the correct table and mask
 		if SpellTables[1] != "*": # clerical spells
-			SpellTable = GemRB.LoadTable (SpellTables[1])
-			ClassMask = 0x4000
-		else: # druidic spells
-			if not GemRB.HasResource(SpellTables[0], RES_2DA):
-				SpellTables[0] = "MXSPLPRS"
-			SpellTable = GemRB.LoadTable (SpellTables[0])
-			ClassMask = 0x8000
+			ClassMask = Spellbook.GetClassFlag (SpellTables[1])
+		else:
+			ClassMask = Spellbook.GetClassFlag (SpellTables[0])
+			SpellTables[1] = Spellbook.GetPriestSpellTable (SpellTables[0])
+		SpellTable = GemRB.LoadTable (SpellTables[1])
 
 		# loop through each spell level
 		for i in range (7):
