@@ -666,12 +666,15 @@ def RemoveKnownSpells (pc, spelltype, level1=1, level2=1, noslots=0, kit=0):
 
 			# this is is specifically for dual-classes and will not work to remove only one
 			# spell type from a ranger/cleric multi-class
-			if CommonTables.ClassSkills.GetValue (originalkit, "DRUIDSPELL", GTV_STR) != "*": # knows druid spells
-				originalkit = 0x8000
-			elif CommonTables.ClassSkills.GetValue (originalkit, "CLERICSPELL", GTV_STR) != "*": # knows cleric spells
-				originalkit = 0x4000
-			else: # don't know any other spells
+			druidTable = CommonTables.ClassSkills.GetValue (originalkit, "DRUIDSPELL", GTV_STR)
+			clericTable = CommonTables.ClassSkills.GetValue (originalkit, "CLERICSPELL", GTV_STR)
+			if druidTable != "*":
+				originalkit = GetClassFlag (druidTable)
+			elif clericTable != "*":
+				originalkit = GetClassFlag (clericTable)
+			else:
 				originalkit = 0
+			# originalkit now holds the druid/cleric spell class mask
 
 			# don't know how this would happen, but better to be safe
 			if originalkit == kit:
