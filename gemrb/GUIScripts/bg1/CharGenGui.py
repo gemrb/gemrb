@@ -278,12 +278,13 @@ def setDivineSpells():
 	
 	DruidTable = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
 	ClericTable = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
-	
-	if ClericTable != "*":
-		learnDivine (MyChar, 0x4000, ClericTable)
-	if DruidTable != "*":
-		learnDivine (MyChar, 0x8000, DruidTable)
-		
+
+	for tableName in (ClericTable, DruidTable):
+		if tableName == "*":
+			continue
+		classFlag = Spellbook.GetClassFlag (tableName)
+		learnDivine (MyChar, classFlag, tableName)
+
 	return False
 
 def learnDivine(MyChar, ClassFlag, TableName):
