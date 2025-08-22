@@ -533,17 +533,19 @@ def DCProfsDonePress ():
 		SpellTable = GemRB.LoadTable (SpellTable)
 		GemRB.SetMemorizableSpellsCount (pc, SpellTable.GetValue (0, 0), IE_SPELL_TYPE_WIZARD, 0)
 		NewMageSpells = 1
-	if ClericTable != "*":
-		ClericTable = Spellbook.GetPriestSpellTable (ClericTable) # iwd1 does not have MXSPLDRU
-		# make sure we can cast spells at this level (paladins)
-		ClericTable = GemRB.LoadTable (ClericTable)
-		if ClericTable.GetRowName (0) == "1":
-			NewPriestMask = 0x4000
-	elif DruidTable != "*":
-		# make sure we can cast spells at this level (rangers)
-		DruidTable = GemRB.LoadTable (DruidTable)
-		if DruidTable.GetRowName (0) == "1":
-			NewPriestMask = 0x8000
+
+	for tableName in (ClericTable, DruidTable):
+		if tableName == "*":
+			continue
+
+		flag = Spellbook.GetClassFlag (tableName)
+		if tableName == DruidTable:
+			tableName = Spellbook.GetPriestSpellTable (tableName)
+		table = GemRB.LoadTable (tableName)
+		# make sure we can cast spells at this level (paladins, rangers)
+		if table.GetRowName (0) == "1":
+			NewPriestMask = flag
+		break
 
 	# open the thieves selection window
 	OpenSkillsWindow ()
