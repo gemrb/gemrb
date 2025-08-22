@@ -541,11 +541,8 @@ def DCProfsDonePress ():
 			NewPriestMask = 0x4000
 	elif DruidTable != "*":
 		# make sure we can cast spells at this level (rangers)
-		if GameCheck.HasTOB ():
-			DruidTable = GemRB.LoadTable (DruidTable)
-			if DruidTable.GetRowName (0) == "1":
-				NewPriestMask = 0x8000
-		else:
+		DruidTable = GemRB.LoadTable (DruidTable)
+		if DruidTable.GetRowName (0) == "1":
 			NewPriestMask = 0x8000
 
 	# open the thieves selection window
