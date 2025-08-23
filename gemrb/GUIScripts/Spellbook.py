@@ -563,9 +563,13 @@ def IsSorcererBook (bookmode):
 def HasSorcererBook (pc, cls=-1):
 	import GUICommon
 
-	ClassName = GUICommon.GetClassRowName (pc)
-	if cls != -1:
+	if isinstance(cls, str):
+		ClassName = cls
+	elif cls != -1:
 		ClassName = GUICommon.GetClassRowName (cls, "class")
+	else:
+		ClassName = GUICommon.GetClassRowName (pc)
+
 	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
 	if SorcererBook == "*" or ClassName == "":
 		return 0
