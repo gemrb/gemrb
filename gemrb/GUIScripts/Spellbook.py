@@ -505,15 +505,17 @@ def GetPriestSpellTable(tablename):
 		return "MXSPLPRS"
 	return tablename
 
+# sets up spell slots for all spell levels available to passed character level
+# returns total count of slots set
 def SetupSpellLevels (pc, TableName, Type, Level):
 	#don't die on a missing reference
 	tmp = GetPriestSpellTable(TableName)
 	if tmp != TableName:
-		SetupSpellLevels (pc, tmp, Type, Level)
-		return
+		return SetupSpellLevels (pc, tmp, Type, Level)
 
 	Table = GemRB.LoadTable (TableName)
 	kit = GemRB.GetPlayerStat (pc, IE_KIT)
+	count = 0
 	for i in range(Table.GetColumnCount ()):
 		# do a string lookup since some tables don't have entries for all levels
 		value = Table.GetValue (str(Level), str(i+1), GTV_INT)
@@ -528,7 +530,8 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 			if value > 0:
 				value = 1 # since we're reusing the main cleric table
 		GemRB.SetMemorizableSpellsCount (pc, value, Type, i)
-	return
+		count += value
+	return count
 
 def UnsetupSpellLevels (pc, TableName, Type, Level):
 	#don't die on a missing reference

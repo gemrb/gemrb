@@ -279,17 +279,29 @@ def setDivineSpells():
 	DruidTable = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
 	ClericTable = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
 
+	# we need to use the maximum of both, if there are two classes
+	# cleric/rangers otherwise don't get any slots
+	# luckily it's level 1 only, so we don't need to compare several spell levels
+	maxSlots = (0, "")
+	for tableName in (ClericTable, DruidTable):
+		if tableName == "*":
+			continue
+		slots = Spellbook.SetupSpellLevels (MyChar, tableName, IE_SPELL_TYPE_PRIEST, 1)
+		if slots > maxSlots[0]:
+			maxSlots = (slots, tableName)
+
+	if maxSlots[0] == 0: # rangers and paladins don't get spells right away
+		return False
+
 	for tableName in (ClericTable, DruidTable):
 		if tableName == "*":
 			continue
 		classFlag = Spellbook.GetClassFlag (tableName)
-		learnDivine (MyChar, classFlag, tableName)
+
+		Spellbook.SetupSpellLevels (MyChar, maxSlots[1], IE_SPELL_TYPE_PRIEST, 1)
+		Spellbook.LearnPriestSpells (MyChar, 1, classFlag)
 
 	return False
-
-def learnDivine(MyChar, ClassFlag, TableName):
-	Spellbook.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-	Spellbook.LearnPriestSpells (MyChar, 1, ClassFlag)
 
 def unsetDivineSpells():
 	print("unsetDivineSpells")
