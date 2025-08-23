@@ -674,8 +674,6 @@ def GetNewSpells(actor, Classes, Level, LevelDiff, Kit=0):
 			DeltaWSpells = sum(NewWSpells)-sum(OldWSpells)
 		elif ClericTable != "*":
 			# check for cleric spells
-			if not GemRB.HasResource(ClericTable, RES_2DA, 1):
-				ClericTable = "MXSPLPRS" # iwd1 doesn't have a DRUIDSPELL column in the table
 			ClericTable = GemRB.LoadTable (ClericTable)
 			HaveCleric = 1
 			# same as above
@@ -686,11 +684,8 @@ def GetNewSpells(actor, Classes, Level, LevelDiff, Kit=0):
 		elif DruidTable != "*":
 			# clerics have precedence in multis (ranger/cleric)
 			if HaveCleric == 0:
-				#use MXSPLPRS if we can't find the resource (SoA fix)
-				if not GemRB.HasResource (DruidTable, RES_2DA):
-					DruidTable = "MXSPLPRS"
-
 				# check druid spells
+				DruidTable = Spellbook.GetPriestSpellTable (DruidTable)
 				DruidTable = GemRB.LoadTable (DruidTable)
 				# same as above
 				for j in range (DruidTable.GetColumnCount ()):
