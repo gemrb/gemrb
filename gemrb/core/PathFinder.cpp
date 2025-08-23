@@ -36,6 +36,7 @@
 
 #include "PathFinder.h"
 
+#include "BucketPriorityQueue.h"
 #include "Debug.h"
 #include "GameData.h"
 #include "Map.h"
@@ -268,8 +269,7 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 
 	// make most data storage for this algorithm static, to avoid memory allocations;
 	// each run we just clear the storage, which is keeping the underlying allocated memory at hand
-	static std::vector<Point> openPoint;
-	static std::vector<float> openCost;
+	static BucketPriorityQueue open;
 	static std::vector<bool> isClosed;
 	static std::vector<NavmapPoint> parents;
 	static std::vector<unsigned short> distFromStart;
@@ -278,13 +278,10 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 	if (isClosed.size() != mapCellsCount) {
 		parents.resize(mapCellsCount);
 		distFromStart.resize(mapCellsCount);
-		openPoint.reserve(mapCellsCount);
-		openCost.reserve(mapCellsCount);
 	}
 
 	// cleanup
-	openPoint.clear();
-	openCost.clear();
+	open.Clear();
 	isClosed.clear();
 	isClosed.resize(mapCellsCount, false);
 	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
@@ -296,8 +293,7 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
 	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
 
-	openCost.push_back(0);
-	openPoint.emplace_back(nmptSource);
+	open.Push(nmptSource, 0);
 
 	bool foundPath = false;
 	unsigned int squaredMinDist = minDistance * minDistance;
@@ -318,10 +314,8 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 		return estDist;
 	};
 
-	while (!openPoint.empty()) {
-		const NavmapPoint nmptCurrent = openPoint.back();
-		openPoint.pop_back();
-		openCost.pop_back();
+	while (!open.IsEmpty()) {
+		const NavmapPoint nmptCurrent = open.Pop();
 
 		const SearchmapPoint smptCurrent { nmptCurrent };
 		const int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
@@ -403,27 +397,8 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 					if (distFromStart[smptChildIdx] >= oldDist) continue;
 				}
 
-				// use binary search to find the right slot and insert there the new cost & point;
-				// for small open sets (let's say below 50, depending on HW), the linear search was faster, but it
-				// was losing to binary search for bigger sets of open nodes.
-				// Combined approach with both versions dynamically chosen depending on open nodes' set size was actually
-				// performing worse for both cases.
 				const float newCost = getHeuristic(smptChild, smptChildIdx);
-				int32_t lowerBound = 0;
-				int32_t upperBound = static_cast<int32_t>(openPoint.size()) - 1;
-				while (lowerBound < upperBound) {
-					const int currentIdx = lowerBound + (upperBound - lowerBound) / 2;
-					const bool isNewCostCheaper = openCost[currentIdx] >= newCost;
-
-					// branchless version of:
-					// if (isNewCostCheaper) { lowerBound = currentIdx + 1; }
-					// else { upperBound = currentIdx; }
-					lowerBound = (isNewCostCheaper) * (currentIdx + 1) + (!isNewCostCheaper) * lowerBound;
-					upperBound = (isNewCostCheaper) *upperBound + (!isNewCostCheaper) * currentIdx;
-				}
-				const uint32_t newPos = lowerBound + (static_cast<size_t>(lowerBound) < openCost.size() && openCost[lowerBound] >= newCost);
-				openCost.insert(openCost.cbegin() + newPos, newCost);
-				openPoint.insert(openPoint.cbegin() + newPos, nmptChild);
+				open.Push(nmptChild, newCost);
 			}
 		}
 	}
