@@ -660,7 +660,7 @@ def GetNewSpells(actor, Classes, Level, LevelDiff, Kit=0):
 				Specialist = 1
 
 			if Spellbook.HasSorcererBook (actor, Classes[i]):
-				MageTable = "SPLSRCKN"
+				MageTable = Spellbook.GetSpellLearningTable (MageTable)
 
 			MageTable = GemRB.LoadTable (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)

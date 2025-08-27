@@ -774,3 +774,20 @@ def GetClassFlag(tableName):
 		return 0x8000
 	else:
 		return 0
+
+def GetSpellLearningTable (tableName):
+	# bg2 had splsrckn, iwd2 also splbrdkn, ees added splshmkn, but all the others lacked the tables
+	# we provide a shared splwizkn.2da and splbrdkn.2da
+	# TODO: move to clskills
+	if tableName == "MXSPLSOR" or tableName == "MXSPLSRC":
+		tableName = "SPLSRCKN"
+	elif tableName == "MXSPLBRD":
+		tableName = "SPLBRDKN"
+	elif tableName == "MXSPLSHM":
+		tableName = "SPLSHMKN"
+	# ... which is also important for mages during chargen and then never again
+	elif tableName == "MXSPLWIZ":
+		tableName = "SPLWIZKN"
+	else:
+		print("GetSpellLearningTable: unhandled spell learning type encountered, falling back to memo table:", tableName)
+	return tableName

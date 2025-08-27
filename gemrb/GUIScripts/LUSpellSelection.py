@@ -93,7 +93,6 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			ButtonCount = 30
 
 	# make sure there is an entry at the given level (bard)
-	SpellLearnTable = table
 	SpellsToMemoTable = GemRB.LoadTable (table)
 	if not SpellsToMemoTable.GetValue (str(level), str(1), GTV_INT):
 		if chargen:
@@ -175,18 +174,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	DoneButton.MakeDefault()
 
 	# adjust the table for the amount of spells available for learning for free
-	# bg2 had SPLSRCKN, iwd2 also SPLBRDKN, but all the others lacked the tables
-	if SpellLearnTable == "MXSPLSOR" or SpellLearnTable == "MXSPLSRC":
-		SpellLearnTable = "SPLSRCKN"
-	elif SpellLearnTable == "MXSPLBRD":
-		SpellLearnTable = "SPLBRDKN"
-	elif SpellLearnTable == "MXSPLSHM":
-		SpellLearnTable = "SPLSHMKN"
-	# ... which is also important for mages during chargen and then never again
-	elif SpellLearnTable == "MXSPLWIZ":
-		SpellLearnTable = "SPLWIZKN"
-	else:
-		print("OpenSpellsWindow: unhandled spell learning type encountered, falling back to memo table:", table)
+	SpellLearnTable = Spellbook.GetSpellLearningTable (table)
 	SpellLearnTable = GemRB.LoadTable (SpellLearnTable)
 
 	CastingStatValue = 0
