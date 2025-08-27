@@ -1527,9 +1527,9 @@ def SkillsPress():
 
 	if SkillsState == 4:
 		ClassFlag = Spellbook.GetClassFlag (PriestSpell)
-		if PriestSpell == "MXSPLPRS":
+		if PriestSpell != "*":
 			PriestSpellsMemorize(PriestSpell, Level, SpellLevel)
-		elif DruidSpell == "MXSPLDRU":
+		elif DruidSpell != "*":
 			# no separate spell progression by default
 			DruidSpell = Spellbook.GetPriestSpellTable (DruidSpell)
 			PriestSpellsMemorize(DruidSpell, Level, SpellLevel)
