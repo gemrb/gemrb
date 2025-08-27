@@ -408,9 +408,16 @@ def GetMageSpells (Kit, Alignment, Level, baseClass = -1):
 		return GetIWD2Spells (Kit, Usability, Level, baseClass)
 
 	SpellsTable = GemRB.LoadTable ("spells")
+	# bg2 didn't use spells.2da for this, even missing 8th and 9th level columns
+	# and then bgee added a table to unhardcode it instead of just fixing the data
+	HideSpellTable = GemRB.LoadTable ("hidespl", True, True)
 	SpellCount = SpellsTable.GetValue ("MAGE", str(Level), GTV_INT)
+	if HideSpellTable:
+		SpellCount = 99 # max for a two-char string
 	for i in range(SpellCount):
 		SpellName = "SPWI%d%02d"%(Level,i+1)
+		if HideSpellTable and HideSpellTable.GetValue (SpellName, "IS_HIDDEN", GTV_INT):
+			continue
 		ms = GemRB.GetSpell (SpellName, 1)
 		if ms == None:
 			continue
@@ -482,8 +489,14 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 		return spells
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue ("PRIEST", str (Level), GTV_INT)):
+	HideSpellTable = GemRB.LoadTable ("hidespl", True, True) # see comment in GetMageSpells
+	SpellCount = SpellsTable.GetValue ("PRIEST", str (Level), GTV_INT)
+	if HideSpellTable:
+		SpellCount = 99 # max for a two-char string
+	for i in range(SpellCount):
 		SpellName = "SPPR%d%02d"%(Level,i+1)
+		if HideSpellTable and HideSpellTable.GetValue (SpellName, "IS_HIDDEN", GTV_INT):
+			continue
 		ms = GemRB.GetSpell(SpellName, 1)
 		if ms == None:
 			continue
