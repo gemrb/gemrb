@@ -629,7 +629,7 @@ def ReactivateBaseClass ():
 					GemRB.LearnSpell(pc, Learnable[k])
 
 def GetNewSpells(actor, Classes, Level, LevelDiff, Kit=0):
-	'''Scan each class for new spells. Values are stored in the global variables'''
+	'''Scan each class for new memorizable spells. Values are stored in the global variables'''
 
 	global DeltaDSpells, DeltaWSpells, NewDSpells, NewWSpells, OldDSpells, OldWSpells
 
@@ -660,9 +660,6 @@ def GetNewSpells(actor, Classes, Level, LevelDiff, Kit=0):
 			Specialist = 0
 			if CommonTables.KitList.GetValue (Kit, 7) == 1: # see if we're a kitted mage
 				Specialist = 1
-
-			if Spellbook.HasSorcererBook (actor, Classes[i]):
-				MageTable = Spellbook.GetSpellLearningTable (MageTable)
 
 			MageTable = GemRB.LoadTable (MageTable)
 			# loop through each spell level and save the amount possible to cast (current)
