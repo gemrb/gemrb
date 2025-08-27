@@ -4044,11 +4044,12 @@ static PyObject* GemRB_GetVar(PyObject* /*self*/, PyObject* args)
 	PyObject* Variable;
 	PARSE_ARGS(args, "O", &Variable);
 
-	int32_t value = core->GetDictionary().Get(PyString_AsStringView(Variable), -1);
-	if (value == -1) {
+	auto varName = PyString_AsStringView(Variable);
+	if (!core->GetDictionary().Contains(varName)) {
 		Py_RETURN_NONE;
 	}
 
+	int32_t value = core->GetDictionary().Get(varName, -1);
 	return PyLong_FromLong(value);
 }
 
