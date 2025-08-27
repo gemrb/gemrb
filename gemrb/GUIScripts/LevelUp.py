@@ -301,7 +301,9 @@ def OpenLevelUpWindow():
 	# if we have a sorcerer who can learn spells, we need to do spell selection
 	for c in range(NumClasses):
 		if Spellbook.HasSorcererBook (pc, Classes[c]) and DeltaWSpells > 0:
-			LUSpellSelection.OpenSpellsWindow (pc, "SPLSRCKN", Level[c], LevelDiff[c])
+			ClassName = GUICommon.GetClassRowName (Classes[c], "class")
+			MageTable = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
+			LUSpellSelection.OpenSpellsWindow (pc, MageTable, Level[c], LevelDiff[c])
 
 def HideSkills(i):
 	"""Hides the given skill label from view."""
