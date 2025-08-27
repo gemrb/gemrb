@@ -521,8 +521,8 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 		value = Table.GetValue (str(Level), str(i+1), GTV_INT)
 		# specialist mages get an extra spell if they already know that level
 		# FIXME: get a general routine to find specialists
-		school = GemRB.GetVar("MAGESCHOOL")
-		if (Type == IE_SPELL_TYPE_WIZARD and school is not None) or \
+		school = GemRB.GetVar ("MAGESCHOOL") or 0
+		if (Type == IE_SPELL_TYPE_WIZARD and school != 0) or \
 			(GameCheck.IsIWD2() and Type == IE_IWD2_SPELL_WIZARD and not (kit&0x4000)):
 			if value > 0:
 				value += 1
