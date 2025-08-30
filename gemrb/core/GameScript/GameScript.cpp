@@ -1578,7 +1578,7 @@ static void SetupOverrideActions()
 			std::string buffer = fmt::format("{} overrides existing action ", name);
 			int x = actionsTable->FindValue(i);
 			if (x >= 0) {
-				printFunction(buffer, actionsTable, actionsTable->FindValue(i));
+				printFunction(buffer, actionsTable, x);
 			} else {
 				printFunction(buffer, name, i);
 			}
