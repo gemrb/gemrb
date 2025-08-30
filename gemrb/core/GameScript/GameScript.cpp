@@ -1596,6 +1596,7 @@ static void SetupOverrideTriggers()
 	size_t max = overrideTriggersTable->GetSize();
 	for (size_t j = 0; j < max; j++) {
 		int i = overrideTriggersTable->GetValueIndex(j);
+		int triggerID = i;
 		bool wasCondition = (i & 0x4000);
 		i &= 0x3fff;
 		const auto& trName = overrideTriggersTable->GetStringIndex(j);
@@ -1617,12 +1618,12 @@ static void SetupOverrideTriggers()
 		if (triggers[i] && (triggers[i] != poi->Function || triggerflags[i] != tf)) {
 			std::string buffer = fmt::format("{} overrides existing trigger ", trName);
 			int x = triggersTable->FindValue(i);
-			if (x < 0) x = triggersTable->FindValue(i | 0x4000);
+			if (x < 0) x = triggersTable->FindValue(triggerID);
 			if (x >= 0) {
 				printFunction(buffer, triggersTable, x);
 			} else {
 				x = overrideTriggersTable->FindValue(i);
-				if (x < 0 || size_t(x) >= j) x = overrideTriggersTable->FindValue(i | 0x4000);
+				if (x < 0 || size_t(x) >= j) x = overrideTriggersTable->FindValue(triggerID);
 				printFunction(buffer, overrideTriggersTable, x);
 			}
 			Log(MESSAGE, "GameScript", "{}", buffer);
