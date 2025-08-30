@@ -4602,26 +4602,32 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	dirit.SetFlags(itflags, true);
 
 	std::vector<String> strings;
-	if (dirit) {
-		do {
-			const path_t& name = dirit.GetName();
-			if (name[0] == '.' || dirit.IsDirectory() != dirs)
-				continue;
-
-			String string = StringFromUtf8(name.c_str());
-
-			if (dirs == false) {
-				size_t pos = string.find_last_of(u'.');
-				if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
-					continue;
-				}
-				string.resize(pos);
-			}
-			strings.emplace_back(std::move(string));
-		} while (++dirit);
+	std::vector<SelectOption> TAOptions;
+	if (!dirit) {
+		ta->SetSelectOptions(TAOptions, false);
+		return MakePyList<const String&, PyString_FromStringObj>(strings);
 	}
 
-	std::vector<SelectOption> TAOptions;
+	do {
+		const path_t& name = dirit.GetName();
+		if (name[0] == '.' || dirit.IsDirectory() != dirs) {
+			continue;
+		}
+
+		String string = StringFromUtf8(name.c_str());
+		if (dirs) {
+			strings.emplace_back(std::move(string));
+			continue;
+		}
+
+		size_t pos = string.find_last_of(u'.');
+		if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
+			continue;
+		}
+		string.resize(pos);
+		strings.emplace_back(std::move(string));
+	} while (++dirit);
+
 	std::sort(strings.begin(), strings.end());
 	for (size_t i = 0; i < strings.size(); i++) {
 		TAOptions.emplace_back(i, strings[i]);
