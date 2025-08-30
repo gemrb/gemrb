@@ -1267,7 +1267,7 @@ int Scriptable::CastSpellPoint(const Point& target, bool deplete, bool instant, 
 
 	objects.LastTargetPos = target;
 
-	if (!CheckWildSurge()) {
+	if (CheckWildSurge()) {
 		return -1;
 	}
 
@@ -1310,7 +1310,7 @@ int Scriptable::CastSpell(Scriptable* target, bool deplete, bool instant, bool n
 		objects.LastSpellTarget = target->GetGlobalID();
 	}
 
-	if (!CheckWildSurge()) {
+	if (CheckWildSurge()) {
 		return -1;
 	}
 
@@ -1404,21 +1404,22 @@ int Scriptable::SpellCast(bool instant, Scriptable* target, int level)
 // 2.1. this can loop, since some surges cause rerolls
 static EffectRef fx_chaosshield_ref = { "ChaosShieldModifier", -1 };
 
+// returns 1 if wild surge substitution failed, 0 otherwise (surged or not)
 int Scriptable::CheckWildSurge()
 {
 	//no need to check for 3rd ed rules, because surgemod or forcesurge need to be nonzero to get a surge
 	if (Type != ST_ACTOR) {
-		return 1;
+		return 0;
 	}
 	if (core->InCutSceneMode()) {
-		return 1;
+		return 0;
 	}
 
 	Actor* caster = (Actor*) this;
 
 	int roll = core->Roll(1, 100, 0);
 	if (!((roll <= 5 && caster->Modified[IE_SURGEMOD]) || caster->Modified[IE_FORCESURGE])) {
-		return 1;
+		return 0;
 	}
 
 	ResRef oldSpellResRef;
@@ -1427,12 +1428,12 @@ int Scriptable::CheckWildSurge()
 	// ignore non-magic "spells"
 	if (spl->Flags & (SF_HLA | SF_TRIGGER)) {
 		gamedata->FreeSpell(spl, oldSpellResRef, false);
-		return 1;
+		return 0;
 	}
 
 	// some effects, if present, disable wild surges for the whole spell
 	if (spl->ContainsTamingOpcode()) {
-		return 1;
+		return 0;
 	}
 
 	int check = roll + caster->Modified[IE_SURGEMOD];
@@ -1461,7 +1462,7 @@ int Scriptable::CheckWildSurge()
 			if (!HandleHardcodedSurge(surgeSpell.spell, spl, caster)) {
 				// free the spell handle because we need to return
 				gamedata->FreeSpell(spl, oldSpellResRef, false);
-				return 0;
+				return 1;
 			}
 		} else {
 			// finally change the spell
@@ -1471,7 +1472,7 @@ int Scriptable::CheckWildSurge()
 	}
 
 	gamedata->FreeSpell(spl, oldSpellResRef, false);
-	return 1;
+	return 0;
 }
 
 bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell* spl, Actor* caster)
