@@ -22,11 +22,11 @@ Map::MapReverb::MapReverb(MapEnv env, id_t reverbID)
 		/* If still nothing, fallback to something Ok. */
 		if (EFX_PROFILE_REVERB_INVALID == reverbProfile) {
 			if (env & (AT_OUTDOOR | AT_CITY | AT_FOREST)) {
-				reverbProfile = loadProperties(reverbs, EFX_PROFILE_OUTSIDE);
+				loadProperties(reverbs, EFX_PROFILE_OUTSIDE);
 			} else if (env & AT_DUNGEON) {
-				reverbProfile = loadProperties(reverbs, EFX_PROFILE_DUNGEON);
+				loadProperties(reverbs, EFX_PROFILE_DUNGEON);
 			} else {
-				reverbProfile = loadProperties(reverbs, EFX_PROFILE_DEFAULT);
+				loadProperties(reverbs, EFX_PROFILE_DEFAULT);
 			}
 		}
 	}
