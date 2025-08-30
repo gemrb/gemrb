@@ -2475,7 +2475,7 @@ bool EffectQueue::CheckIWDTargeting(const Scriptable* Owner, Actor* target, ieDw
 				return timeofday >= val && timeofday <= rel;
 			}
 		case STI_AREATYPE:
-			Map* area;
+			const Map* area;
 			area = target->GetCurrentArea();
 			return area && DiffCore((ieDword) area->AreaType, val, rel);
 		case STI_MORAL_ALIGNMENT:

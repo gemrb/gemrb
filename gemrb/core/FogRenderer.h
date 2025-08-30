@@ -135,7 +135,7 @@ private:
 	void DrawVisibleCell(FogPoint cellPoint, const Bitmap* mask);
 	void DrawVPBorder(Point p, Direction direction, const Region& r, BlitFlags flags);
 	void DrawVPBorders();
-	void FillFog(Point p, int numRowItems, BlitFlags flags);
+	void FillFog(Point p, int numRowItems, BlitFlags flags) const;
 	static bool IsUncovered(FogPoint cellPoint, const Bitmap* mask);
 	void SetFogVerticesByOrigin(Point p);
 };

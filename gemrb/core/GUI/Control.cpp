@@ -206,8 +206,8 @@ void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange val
 		// SET implies the dictionary value should always mirror Value
 		UpdateDictValue();
 	} else {
-		auto& vars = core->GetDictionary();
-		auto lookup = vars.Get(VarName);
+		const auto& vars = core->GetDictionary();
+		const auto lookup = vars.Get(VarName);
 		if (lookup != nullptr) {
 			UpdateState(VarName, *lookup);
 		}

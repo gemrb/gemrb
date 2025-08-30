@@ -569,7 +569,7 @@ void GameControl::DrawTrackingArrows()
 	if (!trackerID) return;
 
 	const Game* game = core->GetGame();
-	Map* area = game->GetCurrentArea();
+	const Map* area = game->GetCurrentArea();
 	const Actor* actor = area->GetActorByGlobalID(trackerID);
 	if (actor) {
 		std::vector<Actor*> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED, distance);

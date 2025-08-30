@@ -881,7 +881,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	stream->WriteEnum(ac->Modal.State);
 	stream->WriteWord(ac->PCStats->Happiness);
 	//interact counters
-	for (unsigned int& interact : ac->PCStats->Interact) {
+	for (const unsigned int& interact : ac->PCStats->Interact) {
 		stream->WriteDword(interact);
 	}
 
@@ -938,10 +938,10 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	switch (GAMVersion) {
 		case GAM_VER_PST:
 		case GAM_VER_GEMRB:
-			for (unsigned short& quickItemSlot : ac->PCStats->QuickItemSlots) {
+			for (const unsigned short& quickItemSlot : ac->PCStats->QuickItemSlots) {
 				stream->WriteWord(quickItemSlot);
 			}
-			for (unsigned short& quickItemHeader : ac->PCStats->QuickItemHeaders) {
+			for (const unsigned short& quickItemHeader : ac->PCStats->QuickItemHeaders) {
 				stream->WriteWord(quickItemHeader);
 			}
 			break;
@@ -1014,7 +1014,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
 		//I don't know how many fields are actually used in IWD2 saved game
 		//but we got at least 8 (and only 5 of those are actually used)
-		for (unsigned int& extraSetting : ac->PCStats->ExtraSettings) {
+		for (const unsigned int& extraSetting : ac->PCStats->ExtraSettings) {
 			stream->WriteDword(extraSetting);
 		}
 		stream->WriteFilling(130);

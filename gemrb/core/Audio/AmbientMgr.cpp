@@ -299,7 +299,7 @@ tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword tim
 	return nextdelay;
 }
 
-BufferCacheEntry AmbientMgr::AmbientSource::GetBuffer(ResRef resource, const AudioPlaybackConfig& config)
+BufferCacheEntry AmbientMgr::AmbientSource::GetBuffer(ResRef resource, const AudioPlaybackConfig& config) const
 {
 	auto entry = bufferCache.get().Lookup(resource);
 	if (entry) {

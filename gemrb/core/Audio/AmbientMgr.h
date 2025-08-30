@@ -94,7 +94,7 @@ private:
 		size_t nextref = 0;
 		unsigned int gain = 0;
 
-		BufferCacheEntry GetBuffer(ResRef resource, const AudioPlaybackConfig& config);
+		BufferCacheEntry GetBuffer(ResRef resource, const AudioPlaybackConfig& config) const;
 		bool IsHeard(const Point& listener) const;
 		tick_t Enqueue(const AudioPlaybackConfig& config);
 	};

@@ -4188,7 +4188,7 @@ void Actor::CheckCleave()
 // NOTE: only does the visual part of chunking
 static void ChunkActor(Actor* actor)
 {
-	Map* map = actor->GetCurrentArea();
+	const Map* map = actor->GetCurrentArea();
 	if (!map->IsVisible(actor->Pos)) return; // protect against ctrl-shift-y
 
 	// TODO: play chunky animation / particles #128
