@@ -1704,7 +1704,7 @@ static void InitializeObjectIDS(const AutoTable& objNameTable)
 // IWD2 parses object selectors in differing orders depending on whether it's working with .DLG resources (text) or .BCS resources (compiled)!
 //   Dialog: [EA.GENERAL.RACE.SUBRACE.CLASS.SPECIFIC.GENDER.ALIGN.AVCLASS.CLASSMSK]
 //   BCS: EA GENERAL RACE CLASS SPECIFIC GENDER ALIGNMNT SUBRACE filter1 filter2 filter3 filter4 filter5 [rect1.rect2.rect3.rect4] "scriptname" AVCLASS CLASSMSK
-static void InitializeDialogObjectIDS(AutoTable& objNameTable)
+static void InitializeDialogObjectIDS(const AutoTable& objNameTable)
 {
 	TableMgr::index_t idsRow = objNameTable->GetRowIndex("DIALOG_IDS_COUNT");
 
