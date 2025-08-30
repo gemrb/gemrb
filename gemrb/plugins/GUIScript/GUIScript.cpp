@@ -7844,7 +7844,7 @@ static PyObject* GemRB_ExecuteString(PyObject* /*self*/, PyObject* args)
 PyDoc_STRVAR(GemRB_EvaluateString__doc,
 	     "===== EvaluateString =====\n\
 \n\
-**Prototype:** GemRB.EvaluateString (String)\n\
+**Prototype:** GemRB.EvaluateString (String[, quiet=False])\n\
 \n\
 **Description:** Evaluates an ingame script trigger in the current area \n\
 script context. It prints the result. The command is more useful from the \n\
@@ -7852,8 +7852,13 @@ ingame debug console than from scripts.\n\
 \n\
 **Parameters:**\n\
   * String - a gamescript trigger\n\
+  * quiet - set to True to skip printing the result\n\
 \n\
-**Return value:** N/A (the trigger's return value is printed)\n\
+**Return value:** the trigger's return value\n\
+\n\
+**Examples:**\n\
+\n\
+GemRB.EvaluateString('HPPercentLT(Player1, 20)', True)\n\
 \n\
 **See also:** [ExecuteString](ExecuteString.md)\n\
 ");
@@ -7861,15 +7866,17 @@ ingame debug console than from scripts.\n\
 static PyObject* GemRB_EvaluateString(PyObject* /*self*/, PyObject* args)
 {
 	const char* String;
-	PARSE_ARGS(args, "s", &String);
+	int quiet = 0;
+	PARSE_ARGS(args, "s|p", &String, &quiet);
 	GET_GAME();
 
 	if (GameScript::EvaluateString(game->GetCurrentArea(), String)) {
-		Log(DEBUG, "GUIScript", "{} returned True", String);
+		if (!quiet) Log(DEBUG, "GUIScript", "{} returned True", String);
+		Py_RETURN_TRUE;
 	} else {
-		Log(DEBUG, "GUIScript", "{} returned False", String);
+		if (!quiet) Log(DEBUG, "GUIScript", "{} returned False", String);
+		Py_RETURN_FALSE;
 	}
-	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR(GemRB_UpdateVolume__doc,
