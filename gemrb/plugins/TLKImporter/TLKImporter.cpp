@@ -276,9 +276,10 @@ String TLKImporter::ResolveTags(const String& source)
 	auto mystrncpy = [&source, &strLen](ieVariable& tok, size_t idx, wchar_t delim) {
 		char* dest = tok.begin();
 		auto maxlength = std::min(sizeof(ieVariable) - 1, strLen);
-		while (idx < source.length() && (source[idx] != delim) && maxlength--) {
+		while (idx < source.length() && (source[idx] != delim) && maxlength) {
 			char chr = source[idx++];
 			if (chr != u' ') *dest++ = chr;
+			--maxlength;
 		}
 		*dest = '\0';
 		return idx;

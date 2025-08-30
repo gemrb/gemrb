@@ -74,7 +74,7 @@ def OnLoad():
 	elif DruidTable != "*" and TableName != "*": # cleric and druid spells
 		ClassFlag = 0
 	else: # only cleric spells
-		ClassFlag = Spellbook.GetClassFlag (TableName)
+		pass
 
 	if TableName != "*":
 		#figure out which class casts spells and use the level of the class

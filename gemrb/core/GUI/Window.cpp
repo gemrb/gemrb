@@ -108,6 +108,7 @@ void Window::SubviewAdded(View* view, View* /*parent*/)
 
 void Window::SubviewRemoved(View* subview, View* parent)
 {
+	assert(subview);
 	Control* ctrl = dynamic_cast<Control*>(subview);
 	if (ctrl) {
 		Controls.erase(ctrl);

@@ -2232,10 +2232,6 @@ void CharAnimations::AddTwoFiles5Suffix(ResRef& dest, unsigned char stanceID,
 			Cycle += 9;
 			dest.Append("g1");
 			break;
-		case IE_ANI_HEAD_TURN:
-			Cycle += 18;
-			dest.Append("g1");
-			break;
 		case IE_ANI_DAMAGE:
 			Cycle += 27;
 			dest.Append("g1");
@@ -2286,6 +2282,7 @@ void CharAnimations::AddTwoFiles5Suffix(ResRef& dest, unsigned char stanceID,
 			Cycle += 54;
 			dest.Append("g2");
 			break;
+		case IE_ANI_HEAD_TURN:
 		default:
 			Cycle += 18;
 			dest.Append("g1");

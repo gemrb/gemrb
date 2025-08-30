@@ -6512,7 +6512,7 @@ void Actor::SetModalSpell(enum Modal state, const ResRef& spell)
 	if (spell) {
 		Modal.Spell = spell;
 	} else {
-		if (size_t(state) >= ModalStates.size) {
+		if (size_t(state) >= decltype(ModalStates)::size) {
 			Modal.Spell.Reset();
 		} else {
 			if (state == Modal::BattleSong && !BardSong.IsEmpty()) {

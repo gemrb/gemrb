@@ -1180,7 +1180,7 @@ static int fx_summon_pomab(Scriptable* Owner, Actor* target, Effect* fx)
 	for (TableMgr::index_t i = 0; i < cnt; ++i) {
 		Point p(tab->QueryFieldSigned<int>(i + 1, 0), tab->QueryFieldSigned<int>(i + 1, 1));
 		core->SummonCreature(resrefs[real != i], fx->Resource2, Owner,
-				     target, p, EAM_DEFAULT, 0, NULL, false);
+				     target, p, EAM_DEFAULT, 0, nullptr, false);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2532,7 +2532,7 @@ static int fx_area_effect(Scriptable* Owner, Actor* target, Effect* fx)
 	EffectQueue fxqueue = spell->GetEffectBlock(Owner, fx->Pos, 0, fx->CasterLevel);
 	fxqueue.SetOwner(Owner);
 	//bit 2 original target is excluded or not excluded
-	fxqueue.AffectAllInRange(map, fx->Pos, 0, 0, fx->Parameter1, fx->Parameter2 & AE_TARGETEXCL ? target : NULL);
+	fxqueue.AffectAllInRange(map, fx->Pos, 0, 0, fx->Parameter1, fx->Parameter2 & AE_TARGETEXCL ? target : nullptr);
 
 	//bit 1 repeat or only once
 	if (fx->Parameter2 & AE_REPEAT) {
