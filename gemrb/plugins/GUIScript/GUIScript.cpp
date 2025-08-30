@@ -4621,8 +4621,15 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 		}
 
 		size_t pos = string.find_last_of(u'.');
-		if (pos == String::npos || (type == DIRECTORY_CHR_SOUNDS && pos-- == 0)) {
+		if (pos == String::npos) {
 			continue;
+		}
+		if (type == DIRECTORY_CHR_SOUNDS) {
+			if (pos == 0) {
+				continue;
+			} else {
+				--pos;
+			}
 		}
 		string.resize(pos);
 		strings.emplace_back(std::move(string));
