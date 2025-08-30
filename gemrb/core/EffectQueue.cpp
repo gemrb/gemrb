@@ -2417,6 +2417,12 @@ bool EffectQueue::HasHostileEffects() const
 	return hostile;
 }
 
+bool EffectQueue::IsTamingOpcode(ieDword opcode)
+{
+	const auto& opcodes = Globals::Get().Opcodes;
+	return opcodes[opcode].Flags & EFFECT_TAMING;
+}
+
 // iwd got a weird targeting system
 // the opcode parameters are:
 //   * param1 - optional value used only rarely

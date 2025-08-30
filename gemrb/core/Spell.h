@@ -175,6 +175,7 @@ public:
 	Projectile* GetProjectile(Scriptable* self, int headerindex, int level, const Point& pos);
 	unsigned int GetCastingDistance(Scriptable* Sender) const;
 	bool ContainsDamageOpcode() const;
+	bool ContainsTamingOpcode() const;
 };
 
 }

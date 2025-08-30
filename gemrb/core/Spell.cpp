@@ -371,4 +371,17 @@ bool Spell::ContainsDamageOpcode() const
 	return false;
 }
 
+// ignoring casting_features
+bool Spell::ContainsTamingOpcode() const
+{
+	for (const SPLExtHeader& header : ext_headers) {
+		for (const Effect& fx : header.features) {
+			if (EffectQueue::IsTamingOpcode(fx.Opcode)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 }

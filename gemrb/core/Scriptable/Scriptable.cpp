@@ -1430,6 +1430,11 @@ int Scriptable::CheckWildSurge()
 		return 1;
 	}
 
+	// some effects, if present, disable wild surges for the whole spell
+	if (spl->ContainsTamingOpcode()) {
+		return 1;
+	}
+
 	int check = roll + caster->Modified[IE_SURGEMOD];
 	if (caster->Modified[IE_FORCESURGE] != 7) {
 		// skip the caster level bonus if we're already in a complicated surge
