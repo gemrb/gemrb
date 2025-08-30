@@ -296,7 +296,7 @@ Projectile* Spell::GetProjectile(Scriptable* self, int header, int level, const 
 	if (!seh) {
 		Log(ERROR, "Spell", "Cannot retrieve spell header!!! required header: {}, maximum: {}",
 		    header, ext_headers.size());
-		return NULL;
+		return nullptr;
 	}
 	Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->features.size()) {
