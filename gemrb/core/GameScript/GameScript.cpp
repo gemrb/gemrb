@@ -1583,6 +1583,9 @@ static void SetupOverrideActions()
 				printFunction(buffer, name, i);
 			}
 			Log(MESSAGE, "GameScript", "{}", buffer);
+		} else if (!actions[i]) {
+			// add it to the main symbol table, so also lookups in actionsTable can find it
+			actionsTable->AddSymbol(name, i);
 		}
 		actions[i] = poi->Function;
 		actionflags[i] = poi->Flags;
@@ -1627,6 +1630,9 @@ static void SetupOverrideTriggers()
 				printFunction(buffer, overrideTriggersTable, x);
 			}
 			Log(MESSAGE, "GameScript", "{}", buffer);
+		} else if (!triggers[i]) {
+			// add it to the main symbol table, so also lookups in triggersTable can find it
+			triggersTable->AddSymbol(trName, triggerID);
 		}
 		triggers[i] = poi->Function;
 		triggerflags[i] = tf;
