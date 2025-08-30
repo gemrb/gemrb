@@ -101,6 +101,20 @@ def OnDragItem (btn):
 	slot = btn.Value
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot_item = GemRB.GetSlotItem (pc, slot)
+	SlotType = GemRB.GetSlotType (slot, pc)
+
+	# bg2: no armor switching during combat
+	if SlotType["Type"] == SLOT_ARMOUR and GemRB.EvaluateString ("ActuallyInCombat()", True):
+		errorRef = -1
+		if GameCheck.IsBG2OrEE ():
+			errorRef = 62024
+		elif GameCheck.IsBGEE ():
+			errorRef = 24169
+		elif GameCheck.IsPSTEE ():
+			errorRef = 68554
+		if errorRef != -1:
+			GemRB.DisplayString (errorRef, ColorWhite)
+			return
 
 	GemRB.GetView ("MsgSys").SetText ("")
 
@@ -110,7 +124,6 @@ def OnDragItem (btn):
 		if slot == 2: # reset disguise
 			GemRB.SetGlobal ("APPEARANCE", "GLOBAL", 0)
 	else:
-		SlotType = GemRB.GetSlotType (slot, pc)
 		#special monk check
 		if GemRB.GetPlayerStat (pc, IE_CLASS) == 20 and SlotType["Effects"] == TYPE_OFFHAND:
 			SlotType["ResRef"] = ""
