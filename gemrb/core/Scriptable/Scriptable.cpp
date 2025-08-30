@@ -1417,55 +1417,55 @@ int Scriptable::CheckWildSurge()
 	Actor* caster = (Actor*) this;
 
 	int roll = core->Roll(1, 100, 0);
-	if ((roll <= 5 && caster->Modified[IE_SURGEMOD]) || caster->Modified[IE_FORCESURGE]) {
-		ResRef oldSpellResRef;
-		oldSpellResRef = SpellResRef;
-		const Spell* spl = gamedata->GetSpell(oldSpellResRef); // this was checked before we got here
-		// ignore non-magic "spells"
-		if (spl->Flags & (SF_HLA | SF_TRIGGER)) {
-			gamedata->FreeSpell(spl, oldSpellResRef, false);
-			return 1;
-		}
-
-		int check = roll + caster->Modified[IE_SURGEMOD];
-		if (caster->Modified[IE_FORCESURGE] != 7) {
-			// skip the caster level bonus if we're already in a complicated surge
-			check += caster->GetCasterLevel(spl->SpellType);
-		}
-		if (caster->Modified[IE_CHAOSSHIELD]) {
-			//avert the surge and decrease the chaos shield counter
-			check = 0;
-			caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref, 1);
-			displaymsg->DisplayConstantStringName(HCStrings::ChaosShield, GUIColors::LIGHTGREY, caster);
-		}
-
-		// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
-		if ((check > 0) && (check < 100)) {
-			// display feedback: Wild Surge: bla bla
-			// look up the spell in the "check" row of wildmag.2da
-			const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
-			const String s1 = core->GetString(HCStrings::WildSurge, STRING_FLAGS::NONE);
-			const String s2 = core->GetString(surgeSpell.message, STRING_FLAGS::NONE);
-			displaymsg->DisplayStringName(s1 + u" " + s2, GUIColors::WHITE, this);
-
-			if (!gamedata->Exists(surgeSpell.spell, IE_SPL_CLASS_ID)) {
-				// handle the hardcoded cases - they'll also fail here
-				if (!HandleHardcodedSurge(surgeSpell.spell, spl, caster)) {
-					//free the spell handle because we need to return
-					gamedata->FreeSpell(spl, oldSpellResRef, false);
-					return 0;
-				}
-			} else {
-				// finally change the spell
-				// the hardcoded bunch does it on its own when needed
-				SpellResRef = surgeSpell.spell;
-			}
-		}
-
-		//free the spell handle
-		gamedata->FreeSpell(spl, oldSpellResRef, false);
+	if (!((roll <= 5 && caster->Modified[IE_SURGEMOD]) || caster->Modified[IE_FORCESURGE])) {
+		return 1;
 	}
 
+	ResRef oldSpellResRef;
+	oldSpellResRef = SpellResRef;
+	const Spell* spl = gamedata->GetSpell(oldSpellResRef); // this was checked before we got here
+	// ignore non-magic "spells"
+	if (spl->Flags & (SF_HLA | SF_TRIGGER)) {
+		gamedata->FreeSpell(spl, oldSpellResRef, false);
+		return 1;
+	}
+
+	int check = roll + caster->Modified[IE_SURGEMOD];
+	if (caster->Modified[IE_FORCESURGE] != 7) {
+		// skip the caster level bonus if we're already in a complicated surge
+		check += caster->GetCasterLevel(spl->SpellType);
+	}
+	if (caster->Modified[IE_CHAOSSHIELD]) {
+		// avert the surge and decrease the chaos shield counter
+		check = 0;
+		caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref, 1);
+		displaymsg->DisplayConstantStringName(HCStrings::ChaosShield, GUIColors::LIGHTGREY, caster);
+	}
+
+	// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
+	if ((check > 0) && (check < 100)) {
+		// display feedback: Wild Surge: bla bla
+		// look up the spell in the "check" row of wildmag.2da
+		const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
+		const String s1 = core->GetString(HCStrings::WildSurge, STRING_FLAGS::NONE);
+		const String s2 = core->GetString(surgeSpell.message, STRING_FLAGS::NONE);
+		displaymsg->DisplayStringName(s1 + u" " + s2, GUIColors::WHITE, this);
+
+		if (!gamedata->Exists(surgeSpell.spell, IE_SPL_CLASS_ID)) {
+			// handle the hardcoded cases - they'll also fail here
+			if (!HandleHardcodedSurge(surgeSpell.spell, spl, caster)) {
+				// free the spell handle because we need to return
+				gamedata->FreeSpell(spl, oldSpellResRef, false);
+				return 0;
+			}
+		} else {
+			// finally change the spell
+			// the hardcoded bunch does it on its own when needed
+			SpellResRef = surgeSpell.spell;
+		}
+	}
+
+	gamedata->FreeSpell(spl, oldSpellResRef, false);
 	return 1;
 }
 
