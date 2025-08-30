@@ -391,9 +391,6 @@ public:
 	virtual Region DrawingRegion() const;
 	/* check if casting is allowed at all */
 	int CanCast(const ResRef& SpellRef, bool verbose = true);
-	/* check for and trigger a wild surge */
-	int CheckWildSurge();
-	void SpellcraftCheck(const Actor* caster, const ResRef& spellRef);
 	/* internal spellcasting shortcuts */
 	void DirectlyCastSpellPoint(const Point& target, const ResRef& spellRef, int level, bool keepStance, bool deplete);
 	void DirectlyCastSpell(Scriptable* target, const ResRef& spellRef, int level, bool keepStance, bool deplete);
@@ -429,6 +426,9 @@ private:
 	void ModifyProjectile(Projectile*& pro, Spell* spl, ieDword tgt, int level);
 	void ResetCastingState(Actor* caster);
 	void DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const;
+	/* check for and trigger a wild surge */
+	int CheckWildSurge();
+	void SpellcraftCheck(const Actor* caster, const ResRef& spellRef);
 };
 }
 
