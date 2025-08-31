@@ -349,8 +349,7 @@ def SkillsRedraw (direction=0):
 	
 		#show how many points are allocated to this skill		
 		Label = SkillsWindow.GetControl(0x10000000+SkillsOffsetPoints+(i*SkillsLabelIncrement))
-		SkillValue = GemRB.GetVar("Skill " + str(Pos))
-		ActPoint = -1 if SkillValue == None else SkillValue
+		ActPoint = GemRB.GetVar("Skill " + str(Pos))
 		Label.SetText(str(ActPoint))
 
 	#setup doublespeed
@@ -364,16 +363,15 @@ def SkillsRedraw (direction=0):
 
 def SkillJustPress (btn):
 	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
+	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos + 2), "DESC_REF", GTV_INT))
 	return
 
 def SkillDecreasePress (btn):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
 	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
-	SkillValue = GemRB.GetVar("Skill " + str(Pos))
-	ActPoint = -1 if SkillValue == None else SkillValue
+	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos + 2), "DESC_REF", GTV_INT))
+	ActPoint = GemRB.GetVar("Skill " + str(Pos))
 	BasePoint = GemRB.GetVar("SkillBase "+str(Pos) )
 	if ActPoint <= 0 or ActPoint <= BasePoint:
 		return
@@ -392,13 +390,12 @@ def SkillIncreasePress (btn):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
 	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
-	Description = SkillsTable.GetValue (SkillsTable.GetRowName (Pos + 2), "DESC_REF", GTV_STR)
+	Description = SkillsTable.GetValue (SkillsTable.GetRowName (Pos + 2), "DESC_REF", GTV_INT)
 	if Description != "-1":
 		SkillsTextArea.SetText (Description)
 	if SkillPointsLeft == 0:
 		return
-	SkillValue = GemRB.GetVar("Skill " + str(Pos))
-	ActPoint = -1 if SkillValue == None else SkillValue
+	ActPoint = GemRB.GetVar("Skill " + str(Pos))
 	if ActPoint >= LUSKILLS_MAX:
 		return
 	GemRB.SetVar("Skill "+str(Pos), ActPoint+1)

@@ -87,6 +87,7 @@ struct CoreSettings {
 	unsigned short NumFingKboard = 3;
 	unsigned short NumFingInfo = 2;
 	int MouseFeedback = 0;
+	int8_t EdgeScrollOffset = 5;
 
 	int Width = 640;
 	int Height = 480;

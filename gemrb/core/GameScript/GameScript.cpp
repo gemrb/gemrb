@@ -1578,11 +1578,14 @@ static void SetupOverrideActions()
 			std::string buffer = fmt::format("{} overrides existing action ", name);
 			int x = actionsTable->FindValue(i);
 			if (x >= 0) {
-				printFunction(buffer, actionsTable, actionsTable->FindValue(i));
+				printFunction(buffer, actionsTable, x);
 			} else {
 				printFunction(buffer, name, i);
 			}
 			Log(MESSAGE, "GameScript", "{}", buffer);
+		} else if (!actions[i]) {
+			// add it to the main symbol table, so also lookups in actionsTable can find it
+			actionsTable->AddSymbol(name, i);
 		}
 		actions[i] = poi->Function;
 		actionflags[i] = poi->Flags;
@@ -1596,6 +1599,7 @@ static void SetupOverrideTriggers()
 	size_t max = overrideTriggersTable->GetSize();
 	for (size_t j = 0; j < max; j++) {
 		int i = overrideTriggersTable->GetValueIndex(j);
+		int triggerID = i;
 		bool wasCondition = (i & 0x4000);
 		i &= 0x3fff;
 		const auto& trName = overrideTriggersTable->GetStringIndex(j);
@@ -1617,15 +1621,18 @@ static void SetupOverrideTriggers()
 		if (triggers[i] && (triggers[i] != poi->Function || triggerflags[i] != tf)) {
 			std::string buffer = fmt::format("{} overrides existing trigger ", trName);
 			int x = triggersTable->FindValue(i);
-			if (x < 0) x = triggersTable->FindValue(i | 0x4000);
+			if (x < 0) x = triggersTable->FindValue(triggerID);
 			if (x >= 0) {
 				printFunction(buffer, triggersTable, x);
 			} else {
 				x = overrideTriggersTable->FindValue(i);
-				if (x < 0 || size_t(x) >= j) x = overrideTriggersTable->FindValue(i | 0x4000);
+				if (x < 0 || size_t(x) >= j) x = overrideTriggersTable->FindValue(triggerID);
 				printFunction(buffer, overrideTriggersTable, x);
 			}
 			Log(MESSAGE, "GameScript", "{}", buffer);
+		} else if (!triggers[i]) {
+			// add it to the main symbol table, so also lookups in triggersTable can find it
+			triggersTable->AddSymbol(trName, triggerID);
 		}
 		triggers[i] = poi->Function;
 		triggerflags[i] = tf;
@@ -1697,7 +1704,7 @@ static void InitializeObjectIDS(const AutoTable& objNameTable)
 // IWD2 parses object selectors in differing orders depending on whether it's working with .DLG resources (text) or .BCS resources (compiled)!
 //   Dialog: [EA.GENERAL.RACE.SUBRACE.CLASS.SPECIFIC.GENDER.ALIGN.AVCLASS.CLASSMSK]
 //   BCS: EA GENERAL RACE CLASS SPECIFIC GENDER ALIGNMNT SUBRACE filter1 filter2 filter3 filter4 filter5 [rect1.rect2.rect3.rect4] "scriptname" AVCLASS CLASSMSK
-static void InitializeDialogObjectIDS(AutoTable& objNameTable)
+static void InitializeDialogObjectIDS(const AutoTable& objNameTable)
 {
 	TableMgr::index_t idsRow = objNameTable->GetRowIndex("DIALOG_IDS_COUNT");
 

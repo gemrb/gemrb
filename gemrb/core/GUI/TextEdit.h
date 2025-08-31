@@ -97,6 +97,7 @@ public:
 	/** Sets the alignment */
 	void SetAlignment(unsigned char Alignment);
 	/** Sets one of the background images */
+	using View::SetBackground;
 	void SetBackground(const ResRef& bg, TextEditBG type);
 	void SetBackground(TextEditBG type);
 

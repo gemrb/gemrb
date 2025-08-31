@@ -48,6 +48,7 @@ public:
 	virtual int GetValueIndex(size_t Index) const = 0;
 	virtual int FindValue(int val) const = 0;
 	virtual int FindString(StringView str) const = 0;
+	virtual void AddSymbol(StringView str, int val) = 0;
 	virtual size_t GetSize() const = 0;
 	virtual int GetHighestValue() const = 0;
 };

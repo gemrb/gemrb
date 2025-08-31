@@ -408,9 +408,16 @@ def GetMageSpells (Kit, Alignment, Level, baseClass = -1):
 		return GetIWD2Spells (Kit, Usability, Level, baseClass)
 
 	SpellsTable = GemRB.LoadTable ("spells")
+	# bg2 didn't use spells.2da for this, even missing 8th and 9th level columns
+	# and then bgee added a table to unhardcode it instead of just fixing the data
+	HideSpellTable = GemRB.LoadTable ("hidespl", True, True)
 	SpellCount = SpellsTable.GetValue ("MAGE", str(Level), GTV_INT)
+	if HideSpellTable:
+		SpellCount = 99 # max for a two-char string
 	for i in range(SpellCount):
 		SpellName = "SPWI%d%02d"%(Level,i+1)
+		if HideSpellTable and HideSpellTable.GetValue (SpellName, "IS_HIDDEN", GTV_INT):
+			continue
 		ms = GemRB.GetSpell (SpellName, 1)
 		if ms == None:
 			continue
@@ -482,8 +489,14 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 		return spells
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue ("PRIEST", str (Level), GTV_INT)):
+	HideSpellTable = GemRB.LoadTable ("hidespl", True, True) # see comment in GetMageSpells
+	SpellCount = SpellsTable.GetValue ("PRIEST", str (Level), GTV_INT)
+	if HideSpellTable:
+		SpellCount = 99 # max for a two-char string
+	for i in range(SpellCount):
 		SpellName = "SPPR%d%02d"%(Level,i+1)
+		if HideSpellTable and HideSpellTable.GetValue (SpellName, "IS_HIDDEN", GTV_INT):
+			continue
 		ms = GemRB.GetSpell(SpellName, 1)
 		if ms == None:
 			continue
@@ -505,22 +518,24 @@ def GetPriestSpellTable(tablename):
 		return "MXSPLPRS"
 	return tablename
 
+# sets up spell slots for all spell levels available to passed character level
+# returns total count of slots set
 def SetupSpellLevels (pc, TableName, Type, Level):
 	#don't die on a missing reference
 	tmp = GetPriestSpellTable(TableName)
 	if tmp != TableName:
-		SetupSpellLevels (pc, tmp, Type, Level)
-		return
+		return SetupSpellLevels (pc, tmp, Type, Level)
 
 	Table = GemRB.LoadTable (TableName)
 	kit = GemRB.GetPlayerStat (pc, IE_KIT)
+	count = 0
 	for i in range(Table.GetColumnCount ()):
 		# do a string lookup since some tables don't have entries for all levels
 		value = Table.GetValue (str(Level), str(i+1), GTV_INT)
 		# specialist mages get an extra spell if they already know that level
 		# FIXME: get a general routine to find specialists
-		school = GemRB.GetVar("MAGESCHOOL")
-		if (Type == IE_SPELL_TYPE_WIZARD and school is not None) or \
+		school = GemRB.GetVar ("MAGESCHOOL") or 0
+		if (Type == IE_SPELL_TYPE_WIZARD and school != 0) or \
 			(GameCheck.IsIWD2() and Type == IE_IWD2_SPELL_WIZARD and not (kit&0x4000)):
 			if value > 0:
 				value += 1
@@ -528,7 +543,8 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 			if value > 0:
 				value = 1 # since we're reusing the main cleric table
 		GemRB.SetMemorizableSpellsCount (pc, value, Type, i)
-	return
+		count += value
+	return count
 
 def UnsetupSpellLevels (pc, TableName, Type, Level):
 	#don't die on a missing reference
@@ -560,9 +576,13 @@ def IsSorcererBook (bookmode):
 def HasSorcererBook (pc, cls=-1):
 	import GUICommon
 
-	ClassName = GUICommon.GetClassRowName (pc)
-	if cls != -1:
+	if isinstance(cls, str):
+		ClassName = cls
+	elif cls != -1:
 		ClassName = GUICommon.GetClassRowName (cls, "class")
+	else:
+		ClassName = GUICommon.GetClassRowName (pc)
+
 	SorcererBook = CommonTables.ClassSkills.GetValue (ClassName, "BOOKTYPE")
 	if SorcererBook == "*" or ClassName == "":
 		return 0
@@ -666,12 +686,15 @@ def RemoveKnownSpells (pc, spelltype, level1=1, level2=1, noslots=0, kit=0):
 
 			# this is is specifically for dual-classes and will not work to remove only one
 			# spell type from a ranger/cleric multi-class
-			if CommonTables.ClassSkills.GetValue (originalkit, "DRUIDSPELL", GTV_STR) != "*": # knows druid spells
-				originalkit = 0x8000
-			elif CommonTables.ClassSkills.GetValue (originalkit, "CLERICSPELL", GTV_STR) != "*": # knows cleric spells
-				originalkit = 0x4000
-			else: # don't know any other spells
+			druidTable = CommonTables.ClassSkills.GetValue (originalkit, "DRUIDSPELL", GTV_STR)
+			clericTable = CommonTables.ClassSkills.GetValue (originalkit, "CLERICSPELL", GTV_STR)
+			if druidTable != "*":
+				originalkit = GetClassFlag (druidTable)
+			elif clericTable != "*":
+				originalkit = GetClassFlag (clericTable)
+			else:
 				originalkit = 0
+			# originalkit now holds the druid/cleric spell class mask
 
 			# don't know how this would happen, but better to be safe
 			if originalkit == kit:
@@ -756,3 +779,28 @@ def LearnFromScroll (pc, slot):
 		GemRB.SetGlobal ("TutorialLesson", "GLOBAL", 20)
 
 	return ret
+
+def GetClassFlag(tableName):
+	if tableName in ("MXSPLPRS", "MXSPLPAL"):
+		return 0x4000
+	elif tableName in ("MXSPLDRU", "MXSPLRAN", "MXSPLSHM"):
+		return 0x8000
+	else:
+		return 0
+
+def GetSpellLearningTable (tableName):
+	# bg2 had splsrckn, iwd2 also splbrdkn, ees added splshmkn, but all the others lacked the tables
+	# we provide a shared splwizkn.2da and splbrdkn.2da
+	# TODO: move to clskills
+	if tableName == "MXSPLSOR" or tableName == "MXSPLSRC":
+		tableName = "SPLSRCKN"
+	elif tableName == "MXSPLBRD":
+		tableName = "SPLBRDKN"
+	elif tableName == "MXSPLSHM":
+		tableName = "SPLSHMKN"
+	# ... which is also important for mages during chargen and then never again
+	elif tableName == "MXSPLWIZ":
+		tableName = "SPLWIZKN"
+	else:
+		print("GetSpellLearningTable: unhandled spell learning type encountered, falling back to memo table:", tableName)
+	return tableName

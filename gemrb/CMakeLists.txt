@@ -1,10 +1,18 @@
+SET(CMAKE_CXX_VISIBILITY_PRESET "hidden")
+SET(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
+INCLUDE(GenerateExportHeader)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}/includes)
+
 IF(USE_TRACY)
   ADD_SUBDIRECTORY(plugins/Tracy)
 ENDIF()
 ADD_SUBDIRECTORY( core )
 
 # GUIScripts and override go directly in the bundle
-SET(RESOURCE_LIST "GUIScripts" "override" "unhardcoded" "../demo")
+SET(RESOURCE_LIST "GUIScripts" "override" "unhardcoded")
+IF (NOT SKIP_DEMO_DATA)
+	LIST(APPEND RESOURCE_LIST "../demo")
+ENDIF()
 IF (NOT OPENGL_BACKEND STREQUAL "None")
 	LIST(APPEND RESOURCE_LIST "plugins/SDLVideo/Shaders")
 ENDIF()

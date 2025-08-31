@@ -652,6 +652,13 @@ void ScriptedAnimation::Draw(const Region& vp, Color tint, int height, BlitFlags
 		flags &= ~BlitFlags::STENCIL_MASK;
 	}
 
+	if (Transparency & IE_VVC_MIRRORX && Orientation >= N) {
+		flags |= BlitFlags::MIRRORX;
+	}
+	if (Transparency & IE_VVC_MIRRORY && Orientation >= WNW && Orientation < E) {
+		flags |= BlitFlags::MIRRORY;
+	}
+
 	const Animation* anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim)
 		VideoDriver->BlitGameSpriteWithPalette(anim->CurrentFrame(), palette, p, flags | BlitFlags::BLENDED, tint);

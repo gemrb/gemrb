@@ -25,8 +25,6 @@
 	#include <config.h>
 #endif
 
-#include "exports.h"
-
 #ifdef WIN32
 	#include "win32def.h"
 #elif defined(HAVE_UNISTD_H)

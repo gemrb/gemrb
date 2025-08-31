@@ -23,13 +23,7 @@
 
 #include <type_traits>
 
-#ifdef __has_attribute
-	#define HAS_ATTRIBUTE(x) __has_attribute(x)
-#else
-	#define HAS_ATTRIBUTE(x) 0
-#endif
-
-#if HAS_ATTRIBUTE(flag_enum)
+#ifdef HAVE_ATTRIBUTE_FLAG_ENUM
 	#define FLAG_ENUM enum class __attribute__((flag_enum))
 #else
 	#define FLAG_ENUM enum class

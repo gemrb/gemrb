@@ -102,6 +102,7 @@
 #define PLUGINDEF_H
 
 #include "Platform.h"
+#include "attributes.h"
 #include "exports.h"
 
 #include "InterfaceConfig.h"

@@ -161,7 +161,7 @@ public:
 		}
 
 		if (ext_headers.size() <= which) {
-			return NULL;
+			return nullptr;
 		}
 		return &ext_headers[which];
 	}
@@ -175,6 +175,7 @@ public:
 	Projectile* GetProjectile(Scriptable* self, int headerindex, int level, const Point& pos);
 	unsigned int GetCastingDistance(Scriptable* Sender) const;
 	bool ContainsDamageOpcode() const;
+	bool ContainsTamingOpcode() const;
 };
 
 }

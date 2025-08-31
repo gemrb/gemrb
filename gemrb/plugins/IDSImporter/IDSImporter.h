@@ -46,6 +46,7 @@ public:
 	int GetValueIndex(size_t Index) const override;
 	int FindString(StringView str) const override;
 	int FindValue(int val) const override;
+	void AddSymbol(StringView str, int val) override;
 	size_t GetSize() const override { return pairs.size(); }
 	int GetHighestValue() const override;
 };

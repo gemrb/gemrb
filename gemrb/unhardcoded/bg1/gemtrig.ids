@@ -7,3 +7,4 @@ IDS
 0x407B NumItemsPartyGT(S:ResRef*,I:Num*)
 0x407C NumItemsPartyLT(S:ResRef*,I:Num*)
 0x407D IsOverMe(O:Object*)
+0x4120 ActuallyInCombat()

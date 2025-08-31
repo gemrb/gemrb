@@ -21,14 +21,14 @@
 #ifndef H_IMPORTER_PLUGIN
 #define H_IMPORTER_PLUGIN
 
-#include "Plugin.h"
+#include "exports.h"
 
-#include "Plugins/export.h"
+#include "Plugin.h"
 
 namespace GemRB {
 
 template<class IMPORTER>
-class GEM_PLUGIN_EXPORT ImporterPlugin final : public Plugin {
+class GEM_EXPORT_T ImporterPlugin final : public Plugin {
 	std::shared_ptr<IMPORTER> importer = MakeImporter<IMPORTER>();
 
 public:

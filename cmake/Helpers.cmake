@@ -25,6 +25,26 @@ FUNCTION(ADD_FLAG_IF_SUPPORTED)
 	ENDIF ()
 ENDFUNCTION()
 
+FUNCTION(IS_ATTRIBUTE_SUPPORTED ATTRIBUTE)
+	# cmake vars are case sensitive and we pass a lower case attribute
+	STRING(TOUPPER ${ATTRIBUTE} ATTR_UPPER)
+	CHECK_CXX_SOURCE_COMPILES("
+		#ifdef __has_attribute
+		#  if __has_attribute(${ATTRIBUTE})
+		#    define ATTR __attribute__((${ATTRIBUTE}))
+		#  endif
+		#endif
+		#ifndef ATTR
+		#  define ATTR definitely-not-an-attribute
+		#endif
+
+		int test() ATTR;
+		int main(int, char**) {
+			return 0;
+		}" HAVE_ATTRIBUTE_${ATTR_UPPER}
+	)
+ENDFUNCTION()
+
 FUNCTION(USE_SCCACHE_IF_AVAILABLE)
 	FIND_PROGRAM(SCCACHE_PROGRAM "sccache")
 	IF(SCCACHE_PROGRAM)
@@ -66,11 +86,6 @@ FUNCTION(CONFIGURE_COMPILER)
 		STRING(APPEND CMAKE_CXX_FLAGS " -pedantic")
 		# mark chars explicitly signed (ARM defaults to unsigned)
 		ADD_FLAG_IF_SUPPORTED(FLAG "-fsigned-char")
-		# only export symbols explicitly marked to be exported.
-		# BSDs crash with it #2074
-		IF (NOT (BSD AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
-			ADD_FLAG_IF_SUPPORTED(FLAG "-fvisibility=hidden")
-		ENDIF ()
 		# Fast math helps us covering some things that need a little more rework soon
 		ADD_FLAG_IF_SUPPORTED(FLAG "-ffast-math")
 		ADD_FLAG_IF_SUPPORTED(FLAG "-frounding-math")
@@ -128,12 +143,31 @@ FUNCTION(CONFIGURE_COMPILER)
 		#STRING(APPEND CMAKE_CXX_FLAGS " /fp:fast")
 		# manually enable some file-level parallelism + unicode for fmt
 		ADD_COMPILE_OPTIONS(/MP2 /utf-8)
+		# disable a bunch of warnings
+		# 4267 disables the warnings related to conversion between size_t and other types
+		# 4996 _CRT_SECURE_NO_WARNINGS on use of various strcpy/printf variants
+		ADD_COMPILE_OPTIONS(/wd4267 /wd4996)
+		# disables warnings about posix functions
+		ADD_COMPILE_DEFINITIONS(_CRT_NONSTDC_NO_DEPRECATE=1)
 	ENDIF()
 
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" PARENT_SCOPE)
 	SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}" PARENT_SCOPE)
 	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}" PARENT_SCOPE)
 	USE_SCCACHE_IF_AVAILABLE()
+	SET(EXTENDED_EXPORTS "
+// msvc requires dllexport for templated functions
+// GEM_EXPORT_T is also useful anywhere else we want to force default visibility
+#ifdef WIN32
+	#define GEM_EXPORT_T __declspec(dllexport)
+#else
+	#define GEM_EXPORT_T GEM_EXPORT
+#endif
+// Make sure we don't link to static libraries
+// This causes hard to debug errors due to multiple heaps.
+#if defined(_MSC_VER) && !defined(_DLL)
+  #error GemRB must be dynamically linked with runtime libraries on win32.
+#endif" PARENT_SCOPE)
 ENDFUNCTION()
 
 FUNCTION(CONFIGURE_PYTHON)

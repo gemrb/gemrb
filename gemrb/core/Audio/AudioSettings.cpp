@@ -143,6 +143,24 @@ AudioPlaybackConfig AudioSettings::ConfigPresetDialog(SFXChannel channel) const
 	return config;
 }
 
+// Directional (casting voices)
+AudioPlaybackConfig AudioSettings::ConfigPresetDirectional(SFXChannel channel, const Point& p, orient_t orientation) const
+{
+	auto config = ConfigPresetSpatialVoice(channel, p);
+	config.directional = true;
+	config.cone = 120;
+
+	using t = std::underlying_type_t<orient_t>;
+	// 0 is south, and 90 deg turn is west
+	float rot = (static_cast<t>(orientation) / (1.0f * static_cast<t>(orient_t::MAX)) * 360.0f) * (M_PI / 180.0f);
+	rot = rot * -1.0f - M_PI * 0.5f;
+	float x = std::cos(rot);
+	float y = std::sin(rot);
+	config.direction = { x, y, 0.0f };
+
+	return config;
+}
+
 // Ambient with a location and range by IE data
 AudioPlaybackConfig AudioSettings::ConfigPresetPointAmbient(int gain, const Point& p, uint16_t range, bool loop) const
 {

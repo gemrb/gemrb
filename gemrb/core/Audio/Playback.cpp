@@ -96,6 +96,11 @@ Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, AudioPreset pres
 	return Play(resource, config);
 }
 
+Holder<PlaybackHandle> AudioPlayback::PlayDirectional(StringView resource, SFXChannel channel, const Point& point, orient_t orientation)
+{
+	return Play(resource, core->GetAudioSettings().ConfigPresetDirectional(channel, point, orientation));
+}
+
 Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, const AudioPlaybackConfig& config)
 {
 	Housekeeping();
