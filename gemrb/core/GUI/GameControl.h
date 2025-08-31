@@ -132,6 +132,7 @@ private:
 	void CommandSelectedMovement(const Point& p, bool formation = true, bool append = false, bool tryToRun = false) const;
 
 	bool OnGlobalMouseMove(const Event&);
+	bool OnCheatKeyRelease(const KeyboardEvent& key, unsigned short mod);
 
 	/** Draws the Control on the Output Display */
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
