@@ -930,7 +930,7 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 			break;
 		// f
 		case 'g': // shows loaded areas and other game information
-			fmt::println("{}", game->dump());
+			Log(DEBUG, "Game", "{}", game->dump());
 			break;
 		// h
 		case 'i': // interact trigger (from the original game)
