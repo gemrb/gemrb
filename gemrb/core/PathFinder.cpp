@@ -262,6 +262,8 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 	const Size& mapSize = PropsSize();
 	if (!mapSize.PointInside(smptSource)) return {};
 
+	const auto getChildBlockedStatusFn = size > 2 ? &Map::GetChildBlockedStatusForBigSize : &Map::GetChildBlockedStatusForSmallSize;
+
 	// Initialize data structures
 	const size_t mapCellsCount = mapSize.Area();
 
@@ -342,12 +344,7 @@ Path Map::FindPath(const Point& s, const Point& d, unsigned int size, unsigned i
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
 			if (isClosed[smptChildIdx]) continue;
 
-			PathMapFlags childBlockStatus;
-			if (size > 2) {
-				childBlockStatus = GetBlockedInRadiusTile(smptChild, size);
-			} else {
-				childBlockStatus = GetBlockedTile(smptChild);
-			}
+			const PathMapFlags childBlockStatus = (this->*getChildBlockedStatusFn)(smptChild, size);
 			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR));
 			if (childBlocked) continue;
 
