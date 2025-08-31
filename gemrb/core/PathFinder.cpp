@@ -303,7 +303,7 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 		const int dxCross = smptDest.x - smptSource.x;
 		const int dyCross = smptDest.y - smptSource.y;
 		const int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
-		const float distance = std::hypot(xDist, yDist);
+		const float distance = std::hypotf(xDist, yDist);
 		const float heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
 		const float estDist = distFromStart[smptChildIdx] + heuristic;
 		return estDist;
@@ -455,7 +455,7 @@ void Map::NormalizeDeltas(float_t& dx, float_t& dy, const float_t factor)
 	} else if (dy == 0.0) {
 		dx = STEP_RADIUS;
 	} else {
-		const float_t q = STEP_RADIUS / std::hypot(dx, dy);
+		const float_t q = STEP_RADIUS / std::hypotf(dx, dy);
 		dx = dx * q;
 		dy = dy * q * 0.75f;
 	}
