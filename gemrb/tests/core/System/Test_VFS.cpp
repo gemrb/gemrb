@@ -236,6 +236,14 @@ TEST(VFSTest, UnlinkFile)
 	EXPECT_FALSE(FileExists(umlautFilePath));
 }
 
+TEST(VFSTest, FileModificationTime)
+{
+	auto baseDir = PathJoin("tests", "resources", "VFS", "encoding");
+	EXPECT_NE(nullptr, FileModificationTime(PathJoin(baseDir, "file.txt")));
+	EXPECT_NE(nullptr, FileModificationTime(PathJoin(baseDir, "file_äöü.txt")));
+	EXPECT_EQ(nullptr, FileModificationTime("na"));
+}
+
 path_t getTempPath()
 {
 #ifdef WIN32

@@ -133,6 +133,8 @@ std::string RecodedStringFromWideStringBytes(const char16_t* bytes, size_t bytes
 		return "";
 	}
 
+	buffer.resize(buffer.length() - outLenLeft);
+
 	return buffer;
 }
 

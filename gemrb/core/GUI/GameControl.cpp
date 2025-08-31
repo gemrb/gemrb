@@ -569,7 +569,7 @@ void GameControl::DrawTrackingArrows()
 	if (!trackerID) return;
 
 	const Game* game = core->GetGame();
-	Map* area = game->GetCurrentArea();
+	const Map* area = game->GetCurrentArea();
 	const Actor* actor = area->GetActorByGlobalID(trackerID);
 	if (actor) {
 		std::vector<Actor*> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED, distance);
@@ -1643,13 +1643,8 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 		return false;
 	}
 
-#define SCROLL_AREA_WIDTH 5
 	Region mask = frame;
-	mask.x += SCROLL_AREA_WIDTH;
-	mask.y += SCROLL_AREA_WIDTH;
-	mask.w -= SCROLL_AREA_WIDTH * 2;
-	mask.h -= SCROLL_AREA_WIDTH * 2;
-#undef SCROLL_AREA_WIDTH
+	mask.ExpandAllSides(-1 * core->config.EdgeScrollOffset);
 
 	screenMousePos = e.mouse.Pos();
 	Point mp = ConvertPointFromScreen(screenMousePos);
@@ -1696,9 +1691,22 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 {
 	const Map* area = CurrentArea();
 	bool canMove = area != nullptr;
+	int mwinh = 0;
+
+	if (center || (!(updateVPTimer && speed) && canMove && p != vpOrigin)) {
+		const TextArea* mta = core->GetMessageTextArea();
+		if (mta) {
+			mwinh = mta->GetWindow()->Frame().h;
+		}
+	}
 
 	if (updateVPTimer && speed) {
 		updateVPTimer = false;
+		if (center) {
+			// also account for message window height, since it can cover the center of the window at lowest resolutions
+			// GlobalTimer does its own centering, so we only offset
+			p.y += mwinh;
+		}
 		core->timer.SetMoveViewPort(p, speed, center);
 	} else if (canMove && p != vpOrigin) {
 		updateVPTimer = true;
@@ -1706,6 +1714,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		Size mapsize = area->GetSize();
 
 		if (center) {
+			// should we account for the message window height here too?
 			p.x -= frame.w / 2;
 			p.y -= frame.h / 2;
 		}
@@ -1720,12 +1729,6 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		} else if (p.x < -64) {
 			p.x = -64;
 			canMove = false;
-		}
-
-		int mwinh = 0;
-		const TextArea* mta = core->GetMessageTextArea();
-		if (mta) {
-			mwinh = mta->GetWindow()->Frame().h;
 		}
 
 		constexpr int padding = 50;

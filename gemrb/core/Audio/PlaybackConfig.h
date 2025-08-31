@@ -24,6 +24,8 @@
 
 #include "Region.h"
 
+#include <array>
+
 namespace GemRB {
 
 struct AudioPoint {
@@ -52,6 +54,11 @@ struct GEM_EXPORT AudioPlaybackConfig {
 	AudioPoint position;
 
 	uint16_t muteDistance;
+
+	bool directional = false;
+	std::array<float, 3> direction = { 0.0f, 0.0f, 0.0f };
+	// 0 to 360
+	int32_t cone = 0;
 };
 
 }

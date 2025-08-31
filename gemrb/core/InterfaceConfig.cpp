@@ -181,6 +181,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	CONFIG_INT("TouchInput", config.TouchInput);
 	CONFIG_INT("Width", config.Width);
 	CONFIG_INT("UseSoftKeyboard", config.UseSoftKeyboard);
+	CONFIG_INT("EdgeScrollOffset", config.EdgeScrollOffset);
 	CONFIG_INT("NumFingScroll", config.NumFingScroll);
 	CONFIG_INT("NumFingKboard", config.NumFingKboard);
 	CONFIG_INT("NumFingInfo", config.NumFingInfo);

@@ -21,15 +21,14 @@
 #ifndef INDEXEDARCHIVE_H
 #define INDEXEDARCHIVE_H
 
+#include "exports.h"
 #include "globals.h"
 
 #include "Plugin.h"
 
-#include "Plugins/export.h"
-
 namespace GemRB {
 
-class GEM_PLUGIN_EXPORT IndexedArchive : public Plugin {
+class GEM_EXPORT_T IndexedArchive : public Plugin {
 public:
 	virtual int OpenArchive(const path_t& filename) = 0;
 	virtual DataStream* GetStream(unsigned long Resource, unsigned long Type) = 0;

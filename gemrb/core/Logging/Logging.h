@@ -58,8 +58,7 @@ void error(const char* owner, const char* format, ARGS&&... args)
 }
 
 // poison printf
-#if !defined(__MINGW32__) && defined(__GNUC__)
-extern "C" int printf(const char* message, ...) __attribute__((deprecated("GemRB doesn't use printf; use Log instead.")));
-#endif
+[[deprecated("GemRB doesn't use printf; use Log instead.")]]
+int printf(const char* message, ...);
 
 #endif

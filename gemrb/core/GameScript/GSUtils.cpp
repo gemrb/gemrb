@@ -357,7 +357,7 @@ void PlaySequenceCore(Scriptable* Sender, const Action* parameters, Animation::i
 	// interestingly 16==our sleep crashes; seq.ids has sleep at our IE_ANI_GET_UP though
 	CharAnimations* ca = actor->GetAnims();
 	orient_t face = actor->GetOrientation();
-	Animation* stanceAnim = ca->GetAnimation(value, face)->at(0).get();
+	const Animation* stanceAnim = ca->GetAnimation(value, face)->at(0).get();
 
 	int duration = stanceAnim->GetFrameCount() * core->Time.defaultTicksPerSec / stanceAnim->fps;
 	// 0x7F06 djinnis don't have any twitch frames, but it doesn't matter for the (only?) use in 61cefsum

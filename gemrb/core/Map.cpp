@@ -2596,6 +2596,9 @@ PathMapFlags Map::GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, b
 	NavmapPoint p = s;
 	SearchmapPoint sms { s };
 	float_t factor = caller && caller->GetSpeed() ? float_t(gamedata->GetStepTime()) / float_t(caller->GetSpeed()) : 1;
+
+	const int circleSize = caller ? caller->circleSize : 0;
+	const auto getBlockedStatusFn = (stopOnImpassable && caller) ? &Map::GetChildBlockedStatusForBigSize : &Map::GetChildBlockedStatusForSmallSize;
 	while (p != d) {
 		float_t dx = d.x - p.x;
 		float_t dy = d.y - p.y;
@@ -2606,12 +2609,7 @@ PathMapFlags Map::GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, b
 		if (sms == smp) continue;
 
 		// see note in GetBlockedInLineTile
-		PathMapFlags blockStatus;
-		if (stopOnImpassable && caller) {
-			blockStatus = GetBlockedInRadiusTile(smp, caller->circleSize);
-		} else {
-			blockStatus = GetBlockedTile(smp);
-		}
+		const PathMapFlags blockStatus = (this->*getBlockedStatusFn)(smp, circleSize);
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}
@@ -2632,6 +2630,9 @@ PathMapFlags Map::GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapP
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	SearchmapPoint p = s;
 	float_t factor = caller && caller->GetSpeed() ? float_t(gamedata->GetStepTime()) / float_t(caller->GetSpeed()) / 16 : 1;
+
+	const int circleSize = caller ? caller->circleSize : 0;
+	const auto getBlockedStatusFn = (stopOnImpassable && caller) ? &Map::GetChildBlockedStatusForBigSize : &Map::GetChildBlockedStatusForSmallSize;
 	while (p != d) {
 		float_t dx = d.x - p.x;
 		float_t dy = d.y - p.y;
@@ -2642,12 +2643,7 @@ PathMapFlags Map::GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapP
 
 		// do a wider check for bigger actors (for the common case it's the same)
 		// should not be used for IsVisibleLOS
-		PathMapFlags blockStatus;
-		if (stopOnImpassable && caller) {
-			blockStatus = GetBlockedInRadiusTile(p, caller->circleSize);
-		} else {
-			blockStatus = GetBlockedTile(p);
-		}
+		const PathMapFlags blockStatus = (this->*getBlockedStatusFn)(p, circleSize);
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}

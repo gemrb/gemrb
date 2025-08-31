@@ -402,7 +402,7 @@ void FogRenderer::DrawVPBorders()
 	}
 }
 
-void FogRenderer::FillFog(Point p, int numRowItems, BlitFlags flags)
+void FogRenderer::FillFog(Point p, int numRowItems, BlitFlags flags) const
 {
 	Region r(p, Size(CELL_SIZE * numRowItems, CELL_SIZE));
 	VideoDriver->DrawRect(r, ColorBlack, true, flags);

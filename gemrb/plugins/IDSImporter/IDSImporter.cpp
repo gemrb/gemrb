@@ -108,6 +108,11 @@ int IDSImporter::FindValue(int val) const
 	return -1;
 }
 
+void IDSImporter::AddSymbol(StringView str, int val)
+{
+	pairs.emplace_back(val, str.c_str());
+}
+
 int IDSImporter::GetHighestValue() const
 {
 	int i = static_cast<int>(pairs.size());

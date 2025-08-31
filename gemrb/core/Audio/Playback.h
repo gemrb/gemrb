@@ -56,6 +56,7 @@ public:
 	Holder<PlaybackHandle> Play(StringView resource, AudioPreset preset, SFXChannel channel, const Point& point);
 	Holder<PlaybackHandle> Play(StringView resource, AudioPreset preset, SFXChannel channel);
 	Holder<PlaybackHandle> Play(StringView resource, const AudioPlaybackConfig& config);
+	Holder<PlaybackHandle> PlayDirectional(StringView resource, SFXChannel channel, const Point& point, orient_t orientation);
 	Holder<PlaybackHandle> PlayDefaultSound(size_t index, SFXChannel channel);
 	Holder<PlaybackHandle> PlayDefaultSound(size_t index, const AudioPlaybackConfig& config);
 	time_t PlaySpeech(StringView resource, const AudioPlaybackConfig& config, bool interrupt = true);

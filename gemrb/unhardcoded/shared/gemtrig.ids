@@ -32,3 +32,4 @@ IDS
 0x411C E(I:Num1*,I:Num2*)
 0x411D GT(I:Num1*,I:Num2*)
 0x411E LT(I:Num1*,I:Num2*)
+0x4120 ActuallyInCombat()

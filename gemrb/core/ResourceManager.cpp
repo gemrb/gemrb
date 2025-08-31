@@ -141,7 +141,7 @@ bool ResourceManager::Exists(StringView ResRef, SClass_ID type, bool silent) con
 
 bool ResourceManager::Exists(StringView ResRef, const TypeID* type, bool silent) const
 {
-	if (ResRef[0] == '\0')
+	if (ResRef.empty())
 		return false;
 	// TODO: check various caches
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);

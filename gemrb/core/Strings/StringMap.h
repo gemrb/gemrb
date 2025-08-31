@@ -19,6 +19,8 @@
 #ifndef STRING_MAP_H
 #define STRING_MAP_H
 
+#include "attributes.h"
+
 #include "CString.h"
 #include "StringView.h"
 

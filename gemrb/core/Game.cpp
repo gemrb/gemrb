@@ -2540,6 +2540,7 @@ void Game::CheckAreaComment()
 	size_t offset = RAND<size_t>(1, PCs.size());
 	const Actor* pc = PCs[offset - 1];
 	static const Actor* prevPC = nullptr;
+	if (!pc) return; // defensive check if we ever switch to sparse storage
 	if (pc == prevPC && RAND(1, 10) != 1) return;
 
 	prevPC = pc;

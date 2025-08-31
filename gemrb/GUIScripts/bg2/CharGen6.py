@@ -61,14 +61,20 @@ def OnLoad():
 
 	# learn divine spells if appropriate
 	TableName = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL", GTV_STR) # cleric spells
+	DruidTable = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR)
 
-	if TableName == "*": # only druid spells or no spells at all
-		TableName = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR)
-		ClassFlag = 0x8000
-	elif CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL", GTV_STR) != "*": # cleric and druid spells
+	if TableName == "*" and DruidTable == "*":
+		CharGenCommon.DisplayOverview (6)
+		return
+
+	ClassFlag = Spellbook.GetClassFlag (TableName)
+	if DruidTable != "*" and TableName == "*": # only druid spells
+		ClassFlag = Spellbook.GetClassFlag (DruidTable)
+		TableName = Spellbook.GetPriestSpellTable (DruidTable)
+	elif DruidTable != "*" and TableName != "*": # cleric and druid spells
 		ClassFlag = 0
 	else: # only cleric spells
-		ClassFlag = 0x4000
+		pass
 
 	if TableName != "*":
 		#figure out which class casts spells and use the level of the class

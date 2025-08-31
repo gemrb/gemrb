@@ -144,7 +144,7 @@ void Spell::AddCastingGlow(EffectQueue* fxqueue, ieDword duration, int gender) c
 		}
 		// only actors have fxqueue's and also the parent function checks for that
 		Actor* caster = (Actor*) fxqueue->GetOwner();
-		caster->casting_sound = core->GetAudioPlayback().Play(Resource, AudioPreset::Spatial, SFXChannel::Casting, caster->Pos);
+		caster->casting_sound = core->GetAudioPlayback().PlayDirectional(Resource, SFXChannel::Casting, caster->Pos, caster->GetOrientation());
 	}
 
 	fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
@@ -296,7 +296,7 @@ Projectile* Spell::GetProjectile(Scriptable* self, int header, int level, const 
 	if (!seh) {
 		Log(ERROR, "Spell", "Cannot retrieve spell header!!! required header: {}, maximum: {}",
 		    header, ext_headers.size());
-		return NULL;
+		return nullptr;
 	}
 	Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->features.size()) {
@@ -366,6 +366,19 @@ bool Spell::ContainsDamageOpcode() const
 		}
 		if (Flags & SF_SIMPLIFIED_DURATION) { // iwd2 has only one header
 			break;
+		}
+	}
+	return false;
+}
+
+// ignoring casting_features
+bool Spell::ContainsTamingOpcode() const
+{
+	for (const SPLExtHeader& header : ext_headers) {
+		for (const Effect& fx : header.features) {
+			if (EffectQueue::IsTamingOpcode(fx.Opcode)) {
+				return true;
+			}
 		}
 	}
 	return false;

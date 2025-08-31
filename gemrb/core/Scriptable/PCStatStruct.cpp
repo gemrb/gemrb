@@ -213,12 +213,14 @@ static void RegisterFavorite(PCStatsStruct::FavoriteList& favorites, const ResRe
 	for (auto& pair : favorites) {
 		if (fav == pair.first) {
 			//found an old favourite, just increase its usage count and done
-			if (pair.second < std::numeric_limits<ieWord>::max()) {
-				++pair.second;
-				if (pair.second > mincnt) {
-					// we beat the record, update the order too
-					std::swap(pair, *minpos);
-				}
+			if (pair.second == std::numeric_limits<ieWord>::max()) {
+				return;
+			}
+
+			++pair.second;
+			if (pair.second > mincnt) {
+				// we beat the record, update the order too
+				std::swap(pair, *minpos);
 			}
 			return;
 		}

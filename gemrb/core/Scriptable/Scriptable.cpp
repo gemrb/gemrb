@@ -1267,7 +1267,7 @@ int Scriptable::CastSpellPoint(const Point& target, bool deplete, bool instant, 
 
 	objects.LastTargetPos = target;
 
-	if (!CheckWildSurge()) {
+	if (CheckWildSurge()) {
 		return -1;
 	}
 
@@ -1310,7 +1310,7 @@ int Scriptable::CastSpell(Scriptable* target, bool deplete, bool instant, bool n
 		objects.LastSpellTarget = target->GetGlobalID();
 	}
 
-	if (!CheckWildSurge()) {
+	if (CheckWildSurge()) {
 		return -1;
 	}
 
@@ -1404,69 +1404,75 @@ int Scriptable::SpellCast(bool instant, Scriptable* target, int level)
 // 2.1. this can loop, since some surges cause rerolls
 static EffectRef fx_chaosshield_ref = { "ChaosShieldModifier", -1 };
 
+// returns 1 if wild surge substitution failed, 0 otherwise (surged or not)
 int Scriptable::CheckWildSurge()
 {
 	//no need to check for 3rd ed rules, because surgemod or forcesurge need to be nonzero to get a surge
 	if (Type != ST_ACTOR) {
-		return 1;
+		return 0;
 	}
 	if (core->InCutSceneMode()) {
-		return 1;
+		return 0;
 	}
 
 	Actor* caster = (Actor*) this;
 
 	int roll = core->Roll(1, 100, 0);
-	if ((roll <= 5 && caster->Modified[IE_SURGEMOD]) || caster->Modified[IE_FORCESURGE]) {
-		ResRef oldSpellResRef;
-		oldSpellResRef = SpellResRef;
-		const Spell* spl = gamedata->GetSpell(oldSpellResRef); // this was checked before we got here
-		// ignore non-magic "spells"
-		if (spl->Flags & (SF_HLA | SF_TRIGGER)) {
-			gamedata->FreeSpell(spl, oldSpellResRef, false);
-			return 1;
-		}
-
-		int check = roll + caster->Modified[IE_SURGEMOD];
-		if (caster->Modified[IE_FORCESURGE] != 7) {
-			// skip the caster level bonus if we're already in a complicated surge
-			check += caster->GetCasterLevel(spl->SpellType);
-		}
-		if (caster->Modified[IE_CHAOSSHIELD]) {
-			//avert the surge and decrease the chaos shield counter
-			check = 0;
-			caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref, 1);
-			displaymsg->DisplayConstantStringName(HCStrings::ChaosShield, GUIColors::LIGHTGREY, caster);
-		}
-
-		// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
-		if ((check > 0) && (check < 100)) {
-			// display feedback: Wild Surge: bla bla
-			// look up the spell in the "check" row of wildmag.2da
-			const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
-			const String s1 = core->GetString(HCStrings::WildSurge, STRING_FLAGS::NONE);
-			const String s2 = core->GetString(surgeSpell.message, STRING_FLAGS::NONE);
-			displaymsg->DisplayStringName(s1 + u" " + s2, GUIColors::WHITE, this);
-
-			if (!gamedata->Exists(surgeSpell.spell, IE_SPL_CLASS_ID)) {
-				// handle the hardcoded cases - they'll also fail here
-				if (!HandleHardcodedSurge(surgeSpell.spell, spl, caster)) {
-					//free the spell handle because we need to return
-					gamedata->FreeSpell(spl, oldSpellResRef, false);
-					return 0;
-				}
-			} else {
-				// finally change the spell
-				// the hardcoded bunch does it on its own when needed
-				SpellResRef = surgeSpell.spell;
-			}
-		}
-
-		//free the spell handle
-		gamedata->FreeSpell(spl, oldSpellResRef, false);
+	if (!((roll <= 5 && caster->Modified[IE_SURGEMOD]) || caster->Modified[IE_FORCESURGE])) {
+		return 0;
 	}
 
-	return 1;
+	ResRef oldSpellResRef;
+	oldSpellResRef = SpellResRef;
+	const Spell* spl = gamedata->GetSpell(oldSpellResRef); // this was checked before we got here
+	// ignore non-magic "spells"
+	if (spl->Flags & (SF_HLA | SF_TRIGGER)) {
+		gamedata->FreeSpell(spl, oldSpellResRef, false);
+		return 0;
+	}
+
+	// some effects, if present, disable wild surges for the whole spell
+	if (spl->ContainsTamingOpcode()) {
+		return 0;
+	}
+
+	int check = roll + caster->Modified[IE_SURGEMOD];
+	if (caster->Modified[IE_FORCESURGE] != 7) {
+		// skip the caster level bonus if we're already in a complicated surge
+		check += caster->GetCasterLevel(spl->SpellType);
+	}
+	if (caster->Modified[IE_CHAOSSHIELD]) {
+		// avert the surge and decrease the chaos shield counter
+		check = 0;
+		caster->fxqueue.DecreaseParam1OfEffect(fx_chaosshield_ref, 1);
+		displaymsg->DisplayConstantStringName(HCStrings::ChaosShield, GUIColors::LIGHTGREY, caster);
+	}
+
+	// hundred or more means a normal cast; same for negative values (for absurd antisurge modifiers)
+	if ((check > 0) && (check < 100)) {
+		// display feedback: Wild Surge: bla bla
+		// look up the spell in the "check" row of wildmag.2da
+		const SurgeSpell& surgeSpell = gamedata->GetSurgeSpell(check - 1);
+		const String s1 = core->GetString(HCStrings::WildSurge, STRING_FLAGS::NONE);
+		const String s2 = core->GetString(surgeSpell.message, STRING_FLAGS::NONE);
+		displaymsg->DisplayStringName(s1 + u" " + s2, GUIColors::WHITE, this);
+
+		if (!gamedata->Exists(surgeSpell.spell, IE_SPL_CLASS_ID)) {
+			// handle the hardcoded cases - they'll also fail here
+			if (!HandleHardcodedSurge(surgeSpell.spell, spl, caster)) {
+				// free the spell handle because we need to return
+				gamedata->FreeSpell(spl, oldSpellResRef, false);
+				return 1;
+			}
+		} else {
+			// finally change the spell
+			// the hardcoded bunch does it on its own when needed
+			SpellResRef = surgeSpell.spell;
+		}
+	}
+
+	gamedata->FreeSpell(spl, oldSpellResRef, false);
+	return 0;
 }
 
 bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell* spl, Actor* caster)

@@ -126,7 +126,7 @@ inline bool IsStar(const STR& str)
 inline ieVariable MakeVariable(const StringView& sv)
 {
 	ieVariable var;
-	uint8_t count = var.Size - 1;
+	uint8_t count = ieVariable::Size - 1;
 	auto dest = var.begin();
 	auto source = sv.begin();
 	while (count-- && source != sv.end()) {

@@ -163,7 +163,8 @@ enum EffectFlags {
 	EFFECT_NO_ACTOR = 4,
 	EFFECT_REINIT_ON_LOAD = 8,
 	EFFECT_PRESET_TARGET = 16,
-	EFFECT_SPECIAL_UNDO = 32
+	EFFECT_SPECIAL_UNDO = 32,
+	EFFECT_TAMING = 64,
 };
 
 // unusual SpellProt types which need hacking (fake stats)
@@ -339,6 +340,7 @@ public:
 	/** just checks if it is a particularly stupid effect that needs its target reset */
 	static bool OverrideTarget(const Effect* fx);
 	bool HasHostileEffects() const;
+	static bool IsTamingOpcode(ieDword opcode);
 	static bool CheckIWDTargeting(const Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect* fx = nullptr);
 
 private:

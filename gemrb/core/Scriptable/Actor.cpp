@@ -4188,7 +4188,7 @@ void Actor::CheckCleave()
 // NOTE: only does the visual part of chunking
 static void ChunkActor(Actor* actor)
 {
-	Map* map = actor->GetCurrentArea();
+	const Map* map = actor->GetCurrentArea();
 	if (!map->IsVisible(actor->Pos)) return; // protect against ctrl-shift-y
 
 	// TODO: play chunky animation / particles #128
@@ -6512,7 +6512,7 @@ void Actor::SetModalSpell(enum Modal state, const ResRef& spell)
 	if (spell) {
 		Modal.Spell = spell;
 	} else {
-		if (size_t(state) >= ModalStates.size) {
+		if (size_t(state) >= decltype(ModalStates)::size) {
 			Modal.Spell.Reset();
 		} else {
 			if (state == Modal::BattleSong && !BardSong.IsEmpty()) {

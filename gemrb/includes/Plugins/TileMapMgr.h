@@ -21,15 +21,16 @@
 #ifndef TILEMAPMGR_H
 #define TILEMAPMGR_H
 
+#include "exports.h"
+
 #include "Plugin.h"
 #include "TileMap.h"
 
-#include "Plugins/export.h"
 #include "Streams/DataStream.h"
 
 namespace GemRB {
 
-class GEM_PLUGIN_EXPORT TileMapMgr : public Plugin {
+class GEM_EXPORT_T TileMapMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
 	virtual TileMap* GetTileMap(TileMap* tm) const = 0;

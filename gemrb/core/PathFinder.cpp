@@ -439,22 +439,22 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 	return {};
 }
 
-void Map::NormalizeDeltas(float_t& dx, float_t& dy, float_t factor)
+void Map::NormalizeDeltas(float_t& dx, float_t& dy, const float_t factor)
 {
 	constexpr float_t STEP_RADIUS = 2.0;
 
-	float_t ySign = std::copysign(1.0f, dy);
-	float_t xSign = std::copysign(1.0f, dx);
+	const float_t ySign = std::copysign(1.0f, dy);
+	const float_t xSign = std::copysign(1.0f, dx);
 	dx = std::fabs(dx);
 	dy = std::fabs(dy);
-	float_t dxOrig = dx;
-	float_t dyOrig = dy;
+	const float_t dxOrig = dx;
+	const float_t dyOrig = dy;
 	if (dx == 0.0) {
 		dy = STEP_RADIUS * 0.75f;
 	} else if (dy == 0.0) {
 		dx = STEP_RADIUS;
 	} else {
-		float_t q = STEP_RADIUS / std::hypot(dx, dy);
+		const float_t q = STEP_RADIUS / std::hypotf(dx, dy);
 		dx = dx * q;
 		dy = dy * q * 0.75f;
 	}

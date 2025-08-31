@@ -152,7 +152,7 @@ static std::vector<SpellEntry*> splList;
 static std::vector<SpellEntry*> domList;
 static std::vector<SpellEntry*> magList;
 
-static int IsDomain(const ResRef& name, unsigned short& level, unsigned int kit)
+static int IsDomain(const ResRef& name, unsigned short level, unsigned int kit)
 {
 	size_t splCount = splList.size();
 	for (size_t i = 0; i < splCount; i++) {

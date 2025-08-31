@@ -25,9 +25,13 @@ IF(HAVE_MMAP OR WIN32)
 	SET(SUPPORTS_MEMSTREAM 1)
 ENDIF()
 
+INCLUDE(CheckCXXSourceCompiles)
+IS_ATTRIBUTE_SUPPORTED(unused)
+IS_ATTRIBUTE_SUPPORTED(warn_unused_result)
+IS_ATTRIBUTE_SUPPORTED(flag_enum)
+
 #Unneeded on windows
 IF(NOT WIN32)
-	INCLUDE (CheckCXXSourceCompiles)
 	CHECK_CXX_SOURCE_COMPILES("typedef void *(* voidvoid)(void);
 
 		void *object = 0;
