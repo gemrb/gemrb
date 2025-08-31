@@ -458,7 +458,7 @@ public:
 	/** Enables/Disables the CutScene Mode */
 	void SetCutSceneMode(bool active);
 	/** returns true if in cutscene mode */
-	bool InCutSceneMode() const;
+	bool InCutSceneMode(bool checkDialog = true) const;
 	/** Updates the Game Script Engine State */
 	bool GSUpdate(bool update);
 	/** Get the Party INI Interpreter */

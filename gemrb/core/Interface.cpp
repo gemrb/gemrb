@@ -2377,11 +2377,14 @@ void Interface::SetCutSceneMode(bool active)
 }
 
 /** returns true if in dialogue or cutscene */
-bool Interface::InCutSceneMode() const
+bool Interface::InCutSceneMode(bool checkDialog) const
 {
 	const GameControl* gc = GetGameControl();
 	if (!gc) return false;
-	if (gc->InDialog() || gc->GetScreenFlags().Test(ScreenFlags::Cutscene)) {
+	if (gc->GetScreenFlags().Test(ScreenFlags::Cutscene)) {
+		return true;
+	}
+	if (checkDialog && gc->InDialog()) {
 		return true;
 	}
 	return false;
