@@ -865,6 +865,31 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 	Map* area = game->GetCurrentArea();
 	if (!area) return false;
 
+	static std::array<uint32_t, 4> fogFlags {
+		0,
+		DEBUG_SHOW_FOG_ALL,
+		DEBUG_SHOW_FOG_INVISIBLE,
+		DEBUG_SHOW_FOG_UNEXPLORED
+	};
+	static uint32_t fogFlagIdx = 0;
+	static std::array<uint32_t, 6> wallFlags {
+		0,
+		DEBUG_SHOW_WALLS_ALL,
+		DEBUG_SHOW_DOORS_SECRET,
+		DEBUG_SHOW_DOORS_DISABLED,
+		DEBUG_SHOW_WALLS,
+		DEBUG_SHOW_WALLS_ANIM_COVER
+	};
+	static uint32_t wallFlagIdx = 0;
+	static std::array<uint32_t, 5> flags {
+		0,
+		DEBUG_SHOW_SEARCHMAP,
+		DEBUG_SHOW_MATERIALMAP,
+		DEBUG_SHOW_HEIGHTMAP,
+		DEBUG_SHOW_LIGHTMAP,
+	};
+	static uint32_t flagIdx = 0;
+
 	Point gameMousePos = GameMousePos();
 	Highlightable* over = Scriptable::As<Highlightable>(overMe);
 	Actor* lastActor = area->GetActorByGlobalID(lastActorID);
@@ -879,17 +904,16 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 		case 'c': // force cast a hardcoded spell
 			// caster is the last selected actor
 			// target is the door/actor currently under the pointer
-			if (!game->selected.empty()) {
+			if (game->selected.empty()) break;
+
+			if (GetHoverObject()) {
 				Actor* src = game->selected[0];
-				Scriptable* target = GetHoverObject();
-				if (target) {
-					src->SetSpellResRef(TestSpell);
-					src->CastSpell(target, false);
-					if (src->objects.LastSpellTarget) {
-						src->CastSpellEnd(0, false);
-					} else {
-						src->CastSpellPointEnd(0, false);
-					}
+				src->SetSpellResRef(TestSpell);
+				src->CastSpell(GetHoverObject(), false);
+				if (src->objects.LastSpellTarget) {
+					src->CastSpellEnd(0, false);
+				} else {
+					src->CastSpellPointEnd(0, false);
 				}
 			}
 			break;
@@ -1012,14 +1036,13 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 			break;
 		case 'Y': // damages all enemies by 300 (resistances apply)
 			// mwahaha!
-			{
-				int i = area->GetActorCount(false);
-				while (i--) {
-					Actor* victim = area->GetActor(i, false);
-					if (victim->Modified[IE_EA] == EA_ENEMY) {
-						Effect* newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC << 16, FX_DURATION_INSTANT_PERMANENT);
-						core->ApplyEffect(newfx, victim, victim);
-					}
+			int i;
+			i = area->GetActorCount(false);
+			while (i--) {
+				Actor* victim = area->GetActor(i, false);
+				if (victim->Modified[IE_EA] == EA_ENEMY) {
+					Effect* newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC << 16, FX_DURATION_INSTANT_PERMANENT);
+					core->ApplyEffect(newfx, victim, victim);
 				}
 			}
 			// fallthrough
@@ -1060,63 +1083,28 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 			Log(MESSAGE, "GameControl", "Show traps and infopoints {}", DebugFlags & DEBUG_SHOW_INFOPOINTS ? "ON" : "OFF");
 			break;
 		case '5':
-			{
-				static std::array<uint32_t, 6> wallFlags {
-					0,
-					DEBUG_SHOW_WALLS_ALL,
-					DEBUG_SHOW_DOORS_SECRET,
-					DEBUG_SHOW_DOORS_DISABLED,
-					DEBUG_SHOW_WALLS,
-					DEBUG_SHOW_WALLS_ANIM_COVER
-				};
-				static uint32_t flagIdx = 0;
-				DebugFlags &= ~DEBUG_SHOW_WALLS_ALL;
-				DebugFlags |= wallFlags[flagIdx++];
-				flagIdx = flagIdx % wallFlags.size();
-			}
+			DebugFlags &= ~DEBUG_SHOW_WALLS_ALL;
+			DebugFlags |= wallFlags[wallFlagIdx++];
+			wallFlagIdx = wallFlagIdx % wallFlags.size();
 			break;
 		case '6': // toggle between lightmap/heightmap/material/search
-			{
-				constexpr int flagCnt = 5;
-				static uint32_t flags[flagCnt] {
-					0,
-					DEBUG_SHOW_SEARCHMAP,
-					DEBUG_SHOW_MATERIALMAP,
-					DEBUG_SHOW_HEIGHTMAP,
-					DEBUG_SHOW_LIGHTMAP,
-				};
-				constexpr uint32_t mask = (DEBUG_SHOW_LIGHTMAP | DEBUG_SHOW_HEIGHTMAP | DEBUG_SHOW_MATERIALMAP | DEBUG_SHOW_SEARCHMAP);
+			DebugFlags &= ~DEBUG_SHOW_MAPS_ALL;
+			DebugFlags |= flags[flagIdx++];
+			flagIdx = flagIdx % flags.size();
 
-				static uint32_t flagIdx = 0;
-				DebugFlags &= ~mask;
-				DebugFlags |= flags[flagIdx++];
-				flagIdx = flagIdx % flagCnt;
-
-				if (DebugFlags & mask) {
-					// fog interferese with debugging the map
-					// you can manually reenable with ctrl+7
-					DebugFlags |= DEBUG_SHOW_FOG_ALL;
-				} else {
-					DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
-					DebugPropVal = 0;
-				}
+			if (DebugFlags & DEBUG_SHOW_MAPS_ALL) {
+				// fog interferese with debugging the map
+				// you can manually reenable with ctrl+7
+				DebugFlags |= DEBUG_SHOW_FOG_ALL;
+			} else {
+				DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
+				DebugPropVal = 0;
 			}
 			break;
 		case '7': // toggles fog of war
-			{
-				constexpr int flagCnt = 4;
-				static uint32_t fogFlags[flagCnt] {
-					0,
-					DEBUG_SHOW_FOG_ALL,
-					DEBUG_SHOW_FOG_INVISIBLE,
-					DEBUG_SHOW_FOG_UNEXPLORED
-				};
-				static uint32_t flagIdx = 0;
-
-				DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
-				DebugFlags |= fogFlags[flagIdx++];
-				flagIdx = flagIdx % flagCnt;
-			}
+			DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
+			DebugFlags |= fogFlags[fogFlagIdx++];
+			fogFlagIdx = fogFlagIdx % fogFlags.size();
 			break;
 		default:
 			break;
@@ -1146,21 +1134,21 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& key, unsigned short mod)
 		case GEM_DOWN:
 		case GEM_LEFT:
 		case GEM_RIGHT:
-			{
-				unsigned int releasedKey = 1 << (key.keycode - GEM_LEFT);
-				scrollKeysDown &= ~releasedKey;
-				scrollKeysActive &= ~releasedKey;
+			unsigned int releasedKey;
+			releasedKey = 1 << (key.keycode - GEM_LEFT);
+			scrollKeysDown &= ~releasedKey;
+			scrollKeysActive &= ~releasedKey;
 
-				// If the opposite arrow key is still held down, switch to that direction:
-				unsigned int oppositeKey = releasedKey & 1 ? releasedKey << 1 : releasedKey >> 1;
-				if (scrollKeysDown & oppositeKey) {
-					scrollKeysActive |= oppositeKey;
-				}
-
-				// Update the vector to stop scrolling in the direction that was released:
-				ApplyKeyScrolling();
-				break;
+			// If the opposite arrow key is still held down, switch to that direction:
+			unsigned int oppositeKey;
+			oppositeKey = releasedKey & 1 ? releasedKey << 1 : releasedKey >> 1;
+			if (scrollKeysDown & oppositeKey) {
+				scrollKeysActive |= oppositeKey;
 			}
+
+			// Update the vector to stop scrolling in the direction that was released:
+			ApplyKeyScrolling();
+			break;
 		default:
 			return false;
 	}
