@@ -2373,9 +2373,9 @@ std::string Game::dump() const
 	std::string buffer("Currently loaded areas:\n");
 
 	for (const auto& map : Maps) {
-		Log(DEBUG, "Game", "{}", map->GetScriptName());
+		AppendFormat(buffer, "{}\n", map->GetScriptName());
 	}
-	AppendFormat(buffer, "Current area: {}   Previous area: {}\n", CurrentArea, PreviousArea);
+	AppendFormat(buffer, "Current area: {}   Previous area: {}\n\n", CurrentArea, PreviousArea);
 	if (Scripts[0]) {
 		AppendFormat(buffer, "Global script: {}\n", Scripts[0]->GetName());
 	}
