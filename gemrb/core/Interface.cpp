@@ -3526,7 +3526,7 @@ Holder<Sprite2D> Interface::GetScrollCursorSprite(orient_t orient, int spriteNum
 
 void Interface::DisableGameControl(bool disable) const
 {
-	if (!gamectrl) return;
+	if (!gamectrl || InCutSceneMode()) return;
 	gamectrl->SetFlags(View::IgnoreEvents, disable ? BitOp::OR : BitOp::NAND);
 }
 
