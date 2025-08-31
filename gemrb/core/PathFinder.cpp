@@ -36,8 +36,8 @@
 
 #include "PathFinder.h"
 
-#include "BucketPriorityQueue.h"
 #include "Debug.h"
+#include "FibonacciHeap.h"
 #include "GameData.h"
 #include "Map.h"
 #include "RNG.h"
@@ -262,14 +262,12 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 	const Size& mapSize = PropsSize();
 	if (!mapSize.PointInside(smptSource)) return {};
 
-	const auto getChildBlockedStatusFn = size > 2 ? &Map::GetChildBlockedStatusForBigSize : &Map::GetChildBlockedStatusForSmallSize;
-
 	// Initialize data structures
 	const size_t mapCellsCount = mapSize.Area();
 
+	FibonacciHeap<PQNode> open; // todo: remove this data structure or rewrite its implementation - too much allocations there!
 	// make most data storage for this algorithm static, to avoid memory allocations;
 	// each run we just clear the storage, which is keeping the underlying allocated memory at hand
-	static BucketPriorityQueue open;
 	static std::vector<bool> isClosed;
 	static std::vector<NavmapPoint> parents;
 	static std::vector<unsigned short> distFromStart;
@@ -281,7 +279,6 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 	}
 
 	// cleanup
-	open.Clear();
 	isClosed.clear();
 	isClosed.resize(mapCellsCount, false);
 	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
@@ -292,9 +289,7 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 	// begin algo init
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
 	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
-
-	open.Push(nmptSource, 0);
-
+	open.emplace(PQNode(nmptSource, 0));
 	bool foundPath = false;
 	unsigned int squaredMinDist = minDistance * minDistance;
 
@@ -308,14 +303,15 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 		const int dxCross = smptDest.x - smptSource.x;
 		const int dyCross = smptDest.y - smptSource.y;
 		const int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
-		const float distance = std::hypotf(xDist, yDist);
+		const float distance = std::hypot(xDist, yDist);
 		const float heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
 		const float estDist = distFromStart[smptChildIdx] + heuristic;
 		return estDist;
 	};
 
-	while (!open.IsEmpty()) {
-		const NavmapPoint nmptCurrent = open.Pop();
+	while (!open.empty()) {
+		const NavmapPoint nmptCurrent = open.top().point;
+		open.pop();
 
 		const SearchmapPoint smptCurrent { nmptCurrent };
 		const int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
@@ -350,7 +346,12 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
 			if (isClosed[smptChildIdx]) continue;
 
-			const PathMapFlags childBlockStatus = (this->*getChildBlockedStatusFn)(smptChild, size);
+			PathMapFlags childBlockStatus;
+			if (size > 2) {
+				childBlockStatus = GetBlockedInRadiusTile(smptChild, size);
+			} else {
+				childBlockStatus = GetBlockedTile(smptChild);
+			}
 			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR));
 			if (childBlocked) continue;
 
@@ -397,8 +398,8 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 					if (distFromStart[smptChildIdx] >= oldDist) continue;
 				}
 
-				const float newCost = getHeuristic(smptChild, smptChildIdx);
-				open.Push(nmptChild, newCost);
+				PQNode newNode(nmptChild, getHeuristic(smptChild, smptChildIdx));
+				open.emplace(newNode);
 			}
 		}
 	}
@@ -439,22 +440,22 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 	return {};
 }
 
-void Map::NormalizeDeltas(float_t& dx, float_t& dy, float_t factor)
+void Map::NormalizeDeltas(float_t& dx, float_t& dy, const float_t factor)
 {
 	constexpr float_t STEP_RADIUS = 2.0;
 
-	float_t ySign = std::copysign(1.0f, dy);
-	float_t xSign = std::copysign(1.0f, dx);
+	const float_t ySign = std::copysign(1.0f, dy);
+	const float_t xSign = std::copysign(1.0f, dx);
 	dx = std::fabs(dx);
 	dy = std::fabs(dy);
-	float_t dxOrig = dx;
-	float_t dyOrig = dy;
+	const float_t dxOrig = dx;
+	const float_t dyOrig = dy;
 	if (dx == 0.0) {
 		dy = STEP_RADIUS * 0.75f;
 	} else if (dy == 0.0) {
 		dx = STEP_RADIUS;
 	} else {
-		float_t q = STEP_RADIUS / std::hypot(dx, dy);
+		const float_t q = STEP_RADIUS / std::hypot(dx, dy);
 		dx = dx * q;
 		dy = dy * q * 0.75f;
 	}

@@ -529,17 +529,6 @@ public:
 	PathMapFlags GetBlocked(const NavmapPoint&) const;
 	PathMapFlags GetBlocked(const NavmapPoint&, int size) const;
 	PathMapFlags GetBlockedTile(const SearchmapPoint&) const;
-
-	// helper function used when the size > 2
-	PathMapFlags GetChildBlockedStatusForBigSize(const SearchmapPoint& smptChild, const unsigned int size) const
-	{
-		return GetBlockedInRadiusTile(smptChild, size);
-	}
-	// helper function used when the size <= 2
-	PathMapFlags GetChildBlockedStatusForSmallSize(const SearchmapPoint& smptChild, const unsigned int /* size */) const
-	{
-		return GetBlockedTile(smptChild);
-	}
 	Scriptable* GetScriptableByGlobalID(ieDword objectID);
 	Door* GetDoorByGlobalID(ieDword objectID) const;
 	Container* GetContainerByGlobalID(ieDword objectID) const;
