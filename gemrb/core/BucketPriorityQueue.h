@@ -32,7 +32,7 @@ namespace GemRB {
  * Specialized class for choosing the cheapest Point from the pathfinder's set of 'open' nodes.
  * It's tailor-made to our pathfinder characteristics: buckets' count is selected to fit our Cost values,
  * size of the individual bucket is chosen to fit (with a reasonable big safety margin) all Points with similar cost,
- * yet to retain relatively local in terms of memory, the method for selecting the next item to Pop is also made with
+ * yet to remain relatively local in terms of memory, the method for selecting the next item to Pop is also made with
  * our needs in mind (keeping track of the bucket with the lowest used index, use of the linear search within the
  * bucket).
  */
@@ -45,7 +45,7 @@ public:
 		// speeds up the search for the cheapest point
 		const int bucketIdx = std::min(static_cast<int>(cost), CostPointBuckets::BUCKETS_COUNT - 1);
 		minBucket = std::min(minBucket, bucketIdx);
-		buckets.PushItem(bucketIdx, point, cost);
+		buckets.PushPoint(bucketIdx, point, cost);
 	}
 
 	Point Pop()
@@ -103,7 +103,7 @@ private:
 
 		bool IsEmpty(const int32_t bucketIdx) const
 		{
-			return bucketSize[bucketIdx] <= 0;
+			return bucketSize[bucketIdx] == 0;
 		}
 
 		int Size(const int32_t bucketIdx) const
@@ -130,7 +130,7 @@ private:
 			std::memset(bucketSize.data(), 0, BUCKETS_COUNT * sizeof(bucketSize[0]));
 		}
 
-		void PushItem(const int32_t bucketIdx, const Point& point, const float cost)
+		void PushPoint(const int32_t bucketIdx, const Point& point, const float cost)
 		{
 			const auto storageNewLastUsedIdx = GetBucketBeginIdx(bucketIdx) + bucketSize[bucketIdx];
 			storageCosts[storageNewLastUsedIdx] = cost;
@@ -157,7 +157,7 @@ private:
 		std::array<float, BUCKET_SIZE * BUCKETS_COUNT> storageCosts;
 
 		// bucketSize tells how many items are currently stored in each bucket
-		std::array<int8_t, BUCKETS_COUNT> bucketSize;
+		std::array<uint8_t, BUCKETS_COUNT> bucketSize;
 	};
 
 	CostPointBuckets buckets;
