@@ -627,6 +627,8 @@ public:
 	static const char* GetDeathVarFormat();
 	/** Saves config variables to a file */
 	bool SaveConfig();
+	/** Checks if the cheat console is open */
+	bool IsConsoleWindowOpen() const;
 
 private:
 	void LoadPlugins() const;

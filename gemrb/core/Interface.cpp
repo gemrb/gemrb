@@ -4164,4 +4164,12 @@ void Interface::ApplyTooltipDelay() const
 
 	WindowManager::SetTooltipDelay(delay);
 }
+
+bool Interface::IsConsoleWindowOpen() const
+{
+	Window* consoleWin = GetWindow(0, "WIN_CON");
+	if (!consoleWin) return false;
+	return consoleWin->HasFocus();
+}
+
 }
