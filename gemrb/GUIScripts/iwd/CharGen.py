@@ -1246,12 +1246,14 @@ def AbilitiesPress():
 		AbilitiesPlusButton = AbilitiesWindow.GetControl (16 + i * 2)
 		AbilitiesPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
 		AbilitiesPlusButton.OnPress (AbilitiesPlusPress)
+		AbilitiesPlusButton.SetValue(i)
 		AbilitiesPlusButton.SetVarAssoc ("AbilityIndex", i + 1)
 		AbilitiesPlusButton.SetActionInterval (200)
 
 		AbilitiesMinusButton = AbilitiesWindow.GetControl (17 + i * 2)
 		AbilitiesMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
 		AbilitiesMinusButton.OnPress (AbilitiesMinusPress)
+		AbilitiesMinusButton.SetValue(i)
 		AbilitiesMinusButton.SetVarAssoc ("AbilityIndex", i + 1)
 		AbilitiesMinusButton.SetActionInterval (200)
 
@@ -1321,11 +1323,11 @@ def AbilitiesLabelPress():
 	AbilitiesTextArea.SetText (AbilitiesTable.GetValue (AbilityIndex, 1) )
 	return
 
-def AbilitiesPlusPress():
+def AbilitiesPlusPress(btn):
 	global AbilitiesWindow, AbilitiesTextArea
 	global AbilitiesMinimum, AbilitiesMaximum
 
-	Abidx = GemRB.GetVar ("AbilityIndex") - 1
+	Abidx = btn.Value - 1
 	AbilitiesCalcLimits(Abidx)
 	GemRB.SetToken ("MINIMUM", str(AbilitiesMinimum) )
 	GemRB.SetToken ("MAXIMUM", str(AbilitiesMaximum) )
@@ -1350,11 +1352,11 @@ def AbilitiesPlusPress():
 			AbilitiesDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
-def AbilitiesMinusPress():
+def AbilitiesMinusPress(btn):
 	global AbilitiesWindow, AbilitiesTextArea
 	global AbilitiesMinimum, AbilitiesMaximum
 
-	Abidx = GemRB.GetVar ("AbilityIndex") - 1
+	Abidx = btn.Value - 1
 	AbilitiesCalcLimits(Abidx)
 	GemRB.SetToken ("MINIMUM", str(AbilitiesMinimum) )
 	GemRB.SetToken ("MAXIMUM", str(AbilitiesMaximum) )
