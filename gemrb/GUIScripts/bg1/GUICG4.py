@@ -172,12 +172,12 @@ def OnLoad():
 
 		Button = AbilityWindow.GetControl(i*2+16)
 		Button.OnPress (LeftPress)
-		Button.SetVarAssoc("Ability", i )
+		Button.SetValue(i)
 		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
 		Button.OnPress (RightPress)
-		Button.SetVarAssoc("Ability", i )
+		Button.SetValue(i)
 		Button.SetActionInterval (200)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
@@ -191,10 +191,10 @@ def OnLoad():
 	AbilityWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
 
-def RightPress():
+def RightPress(Button):
 	global PointsLeft
 
-	Abidx = GemRB.GetVar("Ability")
+	Abidx = Button.Value
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
@@ -223,10 +223,10 @@ def JustPress():
 	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
 	return
 
-def LeftPress():
+def LeftPress(Button):
 	global PointsLeft
 
-	Abidx = GemRB.GetVar("Ability")
+	Abidx = Button.Value
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
