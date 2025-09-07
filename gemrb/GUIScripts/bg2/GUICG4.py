@@ -105,16 +105,16 @@ def RollPress():
 		Total = 0
 		for i in range(6):
 			dice = 3
-			size = 5
+			size = 6
 			CalcLimits(i)
-			v = GemRB.Roll(dice, size, Add+3)
-			if v<Minimum:
-				v = Minimum
-			if v>Maximum:
-				v = Maximum
+
+			v = 0
+			while v < Minimum or v > Maximum:
+				v = GemRB.Roll(dice, size, Add)
+
 			if AllPoints18:
 				v = 18
-			GemRB.SetVar("Ability "+str(i), v )
+			GemRB.SetVar("Ability "+str(i), v)
 			Total += v
 
 			Label = AbilityWindow.GetControl(0x10000003+i)

@@ -1415,7 +1415,7 @@ def AbilitiesRerollPress():
 	PointsLeftLabel = AbilitiesWindow.GetControl (0x10000002)
 	PointsLeftLabel.SetText ("0")
 	Dices = 3
-	Sides = 5
+	Sides = 6
 
 	#roll strextra even when the current stat is not 18
 	if HasStrExtra:
@@ -1423,20 +1423,29 @@ def AbilitiesRerollPress():
 	else:
 		e = 0
 	GemRB.SetVar("StrExtra", e)
-	for i in range (6):
-		AbilitiesCalcLimits(i)
-		Value = GemRB.Roll (Dices, Sides, AbilitiesModifier+3)
-		if Value < AbilitiesMinimum:
-			Value = AbilitiesMinimum
-		if Value > AbilitiesMaximum:
-			Value = AbilitiesMaximum
-		GemRB.SetVar ("Ability" + str(i + 1), Value)
-		Label = AbilitiesWindow.GetControl (0x10000003 + i)
 
-		if i==0 and HasStrExtra and Value==18:
-			Label.SetText("18/"+str(e) )
-		else:
-			Label.SetText(str(Value) )
+	# roll until total score is at least 75
+	total = 0
+	while total < 75:
+		total = 0
+
+		for i in range (6):
+			AbilitiesCalcLimits(i)
+
+			# roll each stat until it lies within the correct range
+			Value = 0
+			while Value < AbilitiesMinimum or Value > AbilitiesMaximum:
+				Value = GemRB.Roll (Dices, Sides, AbilitiesModifier)
+
+			total += Value
+
+			GemRB.SetVar ("Ability" + str(i + 1), Value)
+			Label = AbilitiesWindow.GetControl (0x10000003 + i)
+
+			if i==0 and HasStrExtra and Value==18:
+				Label.SetText("18/"+str(e) )
+			else:
+				Label.SetText(str(Value) )
 
 	AbilitiesDoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
