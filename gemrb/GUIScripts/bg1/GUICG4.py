@@ -22,6 +22,7 @@ from GUIDefines import *
 from ie_stats import *
 import CharGenCommon
 import GUICommon
+import GUICommonWindows
 import CommonTables
 
 AbilityWindow = 0
@@ -87,21 +88,37 @@ def RollPress():
 	else:
 		e = 0
 	GemRB.SetVar("StrExtra", e)
-	for i in range(6):
-		dice = 3
-		size = 5
-		CalcLimits(i)
-		v = GemRB.Roll(dice, size, Add+3)
-		if v<Minimum:
-			v = Minimum
-		if v>Maximum:
-			v = Maximum
-		GemRB.SetVar("Ability "+str(i), v )
-		Label = AbilityWindow.GetControl(0x10000003+i)
-		if i==0 and v==18 and HasStrExtra:
-			Label.SetText("18/"+str(e) )
-		else:
-			Label.SetText(str(v) )
+
+	dice = 3
+	size = 6
+
+	total = 0
+	totMax = 108 # ensure the loop will complete
+	# roll stats until total points are 75 or above
+	while total < 75 and totMax >= 75:
+		total = 0
+		totMax = 0
+
+		for i in range(6):
+			CalcLimits(i)
+
+			totMax += Maximum
+
+			v = 0
+			if Maximum <= Minimum:
+				v = Maximum
+			else:
+				# roll until the result falls in the allowed range
+				while v < Minimum or v > Maximum:
+					v = GemRB.Roll(dice, size, Add)
+
+			GemRB.SetVar("Ability " + str(i), v)
+			total += v
+
+			Label = AbilityWindow.GetControl(0x10000003+i)
+
+			GUICommonWindows.SetAbilityScoreLabel(Label, i, v, e)
+
 	return
 
 def OnLoad():
