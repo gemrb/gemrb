@@ -19,6 +19,7 @@
 #character generation, ability (GUICG4)
 import GemRB
 import GUICommon
+import GUICommonWindows
 import CommonTables
 from ie_stats import *
 from GUIDefines import *
@@ -101,27 +102,33 @@ def RollPress():
 	GemRB.SetVar("StrExtra", e)
 
 	Total = 0
-	while (Total < 75):
+	TotMax = 108 # ensure the loop will complete
+	while Total < 75 and TotMax >= 75:
 		Total = 0
+		TotMax = 0
 		for i in range(6):
 			dice = 3
-			size = 5
+			size = 6
 			CalcLimits(i)
-			v = GemRB.Roll(dice, size, Add+3)
-			if v<Minimum:
-				v = Minimum
-			if v>Maximum:
-				v = Maximum
+
+			TotMax += Maximum
+
+			v = 0
 			if AllPoints18:
 				v = 18
-			GemRB.SetVar("Ability "+str(i), v )
+			elif Maximum <= Minimum:
+				# this is what the code used to do in this degenerate situation
+				v = Maximum
+			else:
+				while v < Minimum or v > Maximum:
+					v = GemRB.Roll(dice, size, Add)
+
+			GemRB.SetVar("Ability "+str(i), v)
 			Total += v
 
 			Label = AbilityWindow.GetControl(0x10000003+i)
-			if i==0 and v==18 and HasStrExtra:
-				Label.SetText("18/"+str(e) )
-			else:
-				Label.SetText(str(v) )
+
+			GUICommonWindows.SetAbilityScoreLabel(Label, i, v, e)
 
 	# add a counter to the title
 	Sum = str(Total)
