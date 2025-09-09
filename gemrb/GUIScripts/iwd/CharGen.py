@@ -26,6 +26,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_spells import LS_MEMO
 import GUICommon
+import GUICommonWindows
 import Spellbook
 import CommonTables
 import LUSkillsSelection
@@ -1247,14 +1248,12 @@ def AbilitiesPress():
 		AbilitiesPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
 		AbilitiesPlusButton.OnPress (AbilitiesPlusPress)
 		AbilitiesPlusButton.SetValue(i)
-		AbilitiesPlusButton.SetVarAssoc ("AbilityIndex", i + 1)
 		AbilitiesPlusButton.SetActionInterval (200)
 
 		AbilitiesMinusButton = AbilitiesWindow.GetControl (17 + i * 2)
 		AbilitiesMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
 		AbilitiesMinusButton.OnPress (AbilitiesMinusPress)
 		AbilitiesMinusButton.SetValue(i)
-		AbilitiesMinusButton.SetVarAssoc ("AbilityIndex", i + 1)
 		AbilitiesMinusButton.SetActionInterval (200)
 
 	AbilitiesStoreButton = AbilitiesWindow.GetControl (37)
@@ -1327,7 +1326,7 @@ def AbilitiesPlusPress(btn):
 	global AbilitiesWindow, AbilitiesTextArea
 	global AbilitiesMinimum, AbilitiesMaximum
 
-	Abidx = btn.Value - 1
+	Abidx = btn.Value
 	AbilitiesCalcLimits(Abidx)
 	GemRB.SetToken ("MINIMUM", str(AbilitiesMinimum) )
 	GemRB.SetToken ("MAXIMUM", str(AbilitiesMaximum) )
@@ -1356,7 +1355,7 @@ def AbilitiesMinusPress(btn):
 	global AbilitiesWindow, AbilitiesTextArea
 	global AbilitiesMinimum, AbilitiesMaximum
 
-	Abidx = btn.Value - 1
+	Abidx = btn.Value
 	AbilitiesCalcLimits(Abidx)
 	GemRB.SetToken ("MINIMUM", str(AbilitiesMinimum) )
 	GemRB.SetToken ("MAXIMUM", str(AbilitiesMaximum) )
@@ -1428,26 +1427,31 @@ def AbilitiesRerollPress():
 
 	# roll until total score is at least 75
 	total = 0
-	while total < 75:
+	totMax = 108 # ensure the loop will complete
+	while total < 75 and totMax >= 75:
 		total = 0
+		totMax = 0
 
 		for i in range (6):
 			AbilitiesCalcLimits(i)
 
-			# roll each stat until it lies within the correct range
+			totMax += AbilitiesMaximum
+
 			Value = 0
-			while Value < AbilitiesMinimum or Value > AbilitiesMaximum:
-				Value = GemRB.Roll (Dices, Sides, AbilitiesModifier)
+			if AbilitiesMaximum <= AbilitiesMinimum:
+				# this is what the code would previously do in this degenerate situation
+				Value = AbilitiesMaximum
+			else:
+				# roll each stat until it lies within the correct range
+				while Value < AbilitiesMinimum or Value > AbilitiesMaximum:
+					Value = GemRB.Roll (Dices, Sides, AbilitiesModifier)
 
 			total += Value
 
 			GemRB.SetVar ("Ability" + str(i + 1), Value)
 			Label = AbilitiesWindow.GetControl (0x10000003 + i)
 
-			if i==0 and HasStrExtra and Value==18:
-				Label.SetText("18/"+str(e) )
-			else:
-				Label.SetText(str(Value) )
+			GUICommonWindows.SetAbilityScoreLabel(Label, i, Value, e)
 
 	AbilitiesDoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return

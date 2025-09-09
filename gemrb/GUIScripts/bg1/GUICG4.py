@@ -22,6 +22,7 @@ from GUIDefines import *
 from ie_stats import *
 import CharGenCommon
 import GUICommon
+import GUICommonWindows
 import CommonTables
 
 AbilityWindow = 0
@@ -92,27 +93,31 @@ def RollPress():
 	size = 6
 
 	total = 0
+	totMax = 108 # ensure the loop will complete
 	# roll stats until total points are 75 or above
-	while total < 75:
+	while total < 75 and totMax >= 75:
 		total = 0
+		totMax = 0
 
 		for i in range(6):
 			CalcLimits(i)
 
+			totMax += Maximum
+
 			v = 0
-			# roll until the result falls in the allowed range
-			while v < Minimum or v > Maximum:
-				v = GemRB.Roll(dice, size, Add)
+			if Maximum <= Minimum:
+				v = Maximum
+			else:
+				# roll until the result falls in the allowed range
+				while v < Minimum or v > Maximum:
+					v = GemRB.Roll(dice, size, Add)
 
 			GemRB.SetVar("Ability " + str(i), v)
 			total += v
 
 			Label = AbilityWindow.GetControl(0x10000003+i)
 
-			if i == 0 and v == 18 and HasStrExtra:
-				Label.SetText("18/" + str(e))
-			else:
-				Label.SetText(str(v))
+			GUICommonWindows.SetAbilityScoreLabel(Label, i, v, e)
 
 	return
 
@@ -168,13 +173,11 @@ def OnLoad():
 		Button = AbilityWindow.GetControl(i*2+16)
 		Button.OnPress (LeftPress)
 		Button.SetValue(i)
-		Button.SetVarAssoc("Ability", i )
 		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
 		Button.OnPress (RightPress)
 		Button.SetValue(i)
-		Button.SetVarAssoc("Ability", i )
 		Button.SetActionInterval (200)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
