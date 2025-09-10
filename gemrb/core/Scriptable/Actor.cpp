@@ -4326,8 +4326,9 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 			damage = 123456; // arbitrarily high for death; won't be displayed
 			LastDamageType |= DAMAGE_CHUNKING;
 		}
-		// chunky death when you're reduced below -10 hp
-		if ((ieDword) damage >= Modified[IE_HITPOINTS] + 10 && allowChunking) {
+		// chunky death when you're reduced below -19 hp (pc) or -8 (everyone else)
+		ieDword chunkyLimit = (BaseStats[IE_EA] == EA_PC) ? 20 : 9;
+		if ((ieDword) damage >= Modified[IE_HITPOINTS] + chunkyLimit && allowChunking) {
 			LastDamageType |= DAMAGE_CHUNKING;
 		}
 		// mark LastHitter for repeating damage effects (eg. to get xp from melfing trolls)
