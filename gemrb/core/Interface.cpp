@@ -3350,16 +3350,16 @@ bool Interface::ResolveRandomItem(CREItem* itm) const
 		auto parts = Explode<ResRef, ResRef>(pickedItem, '*', 1);
 		ieWord diceSides;
 		bool isGold = false;
+		bool stacked = false;
 		if (parts.size() > 1) {
 			// create a stack
+			stacked = true;
 			diceSides = strtounsigned<ieWord>(parts[1].c_str(), nullptr, 10);
 		} else {
 			// gold or regular item (can have leading digits)
 			char* endptr;
 			diceSides = strtounsigned<ieWord>(parts[0].c_str(), &endptr, 10);
-			if (*endptr) {
-				diceSides = 1;
-			} else {
+			if (!*endptr) {
 				isGold = true;
 			}
 		}
@@ -3367,12 +3367,13 @@ bool Interface::ResolveRandomItem(CREItem* itm) const
 		if (isGold) {
 			itm->ItemResRef = GoldResRef;
 			itm->Usages[0] = diceSides;
+		} else if (parts[0] == "no_drop") {
+			return false;
 		} else {
 			itm->ItemResRef = parts[0];
-			if (itm->ItemResRef == "no_drop") {
-				return false;
+			if (stacked) { // at minimum iwd2 needs us to not overwrite the charges set in the creitem
+				itm->Usages[0] = RAND<ieWord>(1, diceSides);
 			}
-			itm->Usages[0] = RAND<ieWord>(1, diceSides);
 		}
 	}
 	Log(ERROR, "Interface", "Loop detected while generating random item: {}", itm->ItemResRef);
