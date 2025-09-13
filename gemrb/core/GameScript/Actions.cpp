@@ -6757,10 +6757,10 @@ void GameScript::SetBestWeapon(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	if (PersonalDistance(actor, target) > (unsigned int) parameters->int0Parameter) {
-		actor->inventory.EquipBestWeapon(EQUIP_RANGED);
-	} else {
+	if (WithinPersonalRange(actor, target, parameters->int0Parameter)) {
 		actor->inventory.EquipBestWeapon(EQUIP_MELEE);
+	} else {
+		actor->inventory.EquipBestWeapon(EQUIP_RANGED);
 	}
 }
 
