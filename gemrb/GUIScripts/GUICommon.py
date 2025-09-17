@@ -48,14 +48,13 @@ def GetWindowPack():
 	# 3. not all games have all the window packs
 	# ... but the widescreen mod only modifies guiw08 or guiw10, not touching others
 	# luckily internally its guiw08 is in the end produced as a copy of guiw10
+	# guiw12, 16 and 20 are cut off, have bg1 graphics in places, so we skip them
 	if GameCheck.HasWideScreenMod ():
 		if GameCheck.IsBG1 () or GameCheck.IsPST ():
 			return default
 		return "GUIW10"
 	else:
-		if height >= 960 and GemRB.HasResource ("GUIW12", RES_CHU, 1):
-			return "GUIW12"
-		elif height >= 768 and GemRB.HasResource ("GUIW10", RES_CHU, 1):
+		if height >= 768 and GemRB.HasResource ("GUIW10", RES_CHU, 1):
 			return "GUIW10"
 		elif height >= 600 and GemRB.HasResource ("GUIW08", RES_CHU, 1):
 			return "GUIW08"
