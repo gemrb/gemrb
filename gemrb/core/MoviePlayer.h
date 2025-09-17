@@ -98,9 +98,6 @@ protected:
 	unsigned int video_skippedframes = 0;
 
 protected:
-	void DisplaySubtitle(const String& sub);
-	void PresentMovie(const Region&, Video::BufferFormat fmt);
-
 	microseconds get_current_time() const;
 	void timer_start();
 	void timer_wait(microseconds frameWait);
