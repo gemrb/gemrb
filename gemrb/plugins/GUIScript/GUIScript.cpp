@@ -10721,6 +10721,7 @@ static PyObject* GemRB_SetupQuickSpell(PyObject* /*self*/, PyObject* args)
 		return RuntimeError("Invalid parameter! Spell not found!\n");
 	}
 
+	assert(slot >= 0);
 	actor->PCStats->QuickSpells[slot] = spelldata.spellName;
 	actor->PCStats->QuickSpellBookType[slot] = static_cast<ieByte>(type);
 
