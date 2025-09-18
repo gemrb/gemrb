@@ -95,7 +95,7 @@ TEST_P(DataStreamReadingTest, ReadScalar)
 	uint32_t four;
 	auto numBytes = stream->ReadScalar<uint32_t, uint16_t>(four);
 	EXPECT_EQ(numBytes, 2);
-	EXPECT_EQ(four, 0x0201);
+	EXPECT_EQ(four, uint32_t(0x0201));
 }
 
 TEST_P(DataStreamReadingTest, ReadEnum)
