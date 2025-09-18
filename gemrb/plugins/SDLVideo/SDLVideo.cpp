@@ -145,7 +145,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 
 	// in cutscenes: disable everything but cursor moves, cheats and console interaction
 	// mouse moves are exempted only to prevent unexpected warping
-	if (event.type != SDL_MOUSEMOTION && modstate == 0 && core->InCutSceneMode(false) && !core->IsConsoleWindowOpen()) {
+	if (event.type != SDL_MOUSEMOTION && modstate == 0 && core->InCutSceneMode(false) && !core->IsConsoleWindowOpen() && !core->PlayingMovie()) {
 		return GEM_OK;
 	}
 

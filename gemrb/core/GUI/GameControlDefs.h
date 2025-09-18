@@ -43,8 +43,9 @@ enum class ScreenFlags : unsigned int {
 	CenterOnActor = 0,
 	AlwaysCenter = 1,
 	Cutscene = 2, // don't push new actions onto the action queue
+	PlayingMovie = 3,
 
-	count = 3
+	count = 4
 };
 
 // target modes and types

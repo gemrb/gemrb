@@ -2147,8 +2147,12 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	}
 
 	// clear whatever is currently on screen
-	const GameControl* gc = GetGameControl();
-	bool inCutScene = gc && gc->GetScreenFlags().Test(ScreenFlags::Cutscene);
+	GameControl* gc = GetGameControl();
+	bool inCutScene = false;
+	if (gc) {
+		inCutScene = gc->GetScreenFlags().Test(ScreenFlags::Cutscene);
+		gc->SetScreenFlags(ScreenFlags::PlayingMovie, BitOp::OR);
+	}
 	SetCutSceneMode(true);
 
 	Region screen(0, 0, config.Width, config.Height);
@@ -2160,6 +2164,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 
 	mp->Play(win);
 	win->Close();
+	if (gc) {
+		gc->SetScreenFlags(ScreenFlags::PlayingMovie, BitOp::NAND);
+	}
 	winmgr->SetCursorFeedback(cur);
 	// only reset if it wasn't active before we started or if there's no game yet
 	if (!inCutScene) {
@@ -4164,6 +4171,13 @@ void Interface::ApplyTooltipDelay() const
 	}
 
 	WindowManager::SetTooltipDelay(delay);
+}
+
+bool Interface::PlayingMovie() const
+{
+	const GameControl* gc = GetGameControl();
+	if (!gc) return false;
+	return gc->GetScreenFlags().Test(ScreenFlags::PlayingMovie);
 }
 
 bool Interface::IsConsoleWindowOpen() const

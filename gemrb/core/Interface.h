@@ -629,6 +629,8 @@ public:
 	bool SaveConfig();
 	/** Checks if the cheat console is open */
 	bool IsConsoleWindowOpen() const;
+	/** Checks if we're in the middle of playing a movie */
+	bool PlayingMovie() const;
 
 private:
 	void LoadPlugins() const;
