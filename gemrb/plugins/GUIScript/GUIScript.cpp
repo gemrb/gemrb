@@ -3912,6 +3912,8 @@ static PyObject* GemRB_SetToken(PyObject* /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+constexpr int32_t Py_NoneAsInt = -12345; // unlikely magic number
+
 PyDoc_STRVAR(GemRB_SetVar__doc,
 	     "===== SetVar =====\n\
 \n\
@@ -3947,9 +3949,9 @@ static PyObject* GemRB_SetVar(PyObject* /*self*/, PyObject* args)
 	PyObject* pynum = nullptr;
 	PARSE_ARGS(args, "OO", &Variable, &pynum);
 
-	Control::value_t val = Control::INVALID_VALUE;
+	int32_t val = Py_NoneAsInt; // matching type contained by variables_t
 	if (PyLong_Check(pynum)) {
-		val = Control::value_t(PyLong_AsUnsignedLongMask(pynum));
+		val = static_cast<int32_t>(PyLong_AsUnsignedLongMask(pynum));
 		if (PyErr_Occurred()) { // PyLong_AsUnsignedLongMask returns -1 on error
 			PyErr_Print();
 		}
@@ -4045,11 +4047,11 @@ static PyObject* GemRB_GetVar(PyObject* /*self*/, PyObject* args)
 	PARSE_ARGS(args, "O", &Variable);
 
 	auto varName = PyString_AsStringView(Variable);
-	if (!core->GetDictionary().Contains(varName)) {
+	// we return None for both missing keys and for None itself
+	int32_t value = core->GetDictionary().Get(varName, Py_NoneAsInt);
+	if (value == Py_NoneAsInt) {
 		Py_RETURN_NONE;
 	}
-
-	int32_t value = core->GetDictionary().Get(varName, -1);
 	return PyLong_FromLong(value);
 }
 
