@@ -357,7 +357,7 @@ def RefreshSpellList(pc, innate):
 			spell_list += Spellbook.GetUsableMemorizedSpells (pc, i)
 
 	GemRB.SetVar ("Type", spelltype)
-	GemRB.SetVar ("QSpell", -1)
+	GemRB.SetVar ("QSpell", None)
 	return
 
 def UpdateFloatMenuItem (pc, i, weapons):

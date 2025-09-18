@@ -906,7 +906,7 @@ def ActionCastPressed ():
 		SaveActionButton (ACT_CAST)
 		return
 
-	GemRB.SetVar ("QSpell", -1)
+	GemRB.SetVar ("QSpell", None)
 	GemRB.SetVar ("TopIndex", 0)
 	SetActionLevel (UAW_SPELLS)
 	UpdateActionsWindow ()
@@ -997,7 +997,7 @@ def ActionInnatePressed ():
 		SaveActionButton (ACT_INNATE)
 		return
 
-	GemRB.SetVar ("QSpell", -1)
+	GemRB.SetVar ("QSpell", None)
 	GemRB.SetVar ("TopIndex", 0)
 	SetActionLevel (UAW_INNATES)
 	UpdateActionsWindow ()
@@ -1008,7 +1008,7 @@ def ActionInnateRightPressed ():
 		StartBarConfiguration ()
 		return
 
-	GemRB.SetVar ("QSpell", -1)
+	GemRB.SetVar ("QSpell", None)
 	GemRB.SetVar ("TopIndex", 0)
 	SetActionLevel (UAW_INNATES)
 	UpdateActionsWindow ()
