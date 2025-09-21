@@ -936,17 +936,20 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 		case 'i': // interact trigger (from the original game)
 			if (!lastActor) {
 				lastActor = area->GetActor(gameMousePos, GA_DEFAULT);
+				if (!lastActor) break;
 			}
-			if (lastActor && !(lastActor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
-				int size = game->GetPartySize(true);
-				if (size < 2 || lastActor->GetCurrentArea() != area) break;
-				for (int i = core->Roll(1, size, 0); i < 2 * size; i++) {
-					const Actor* target = game->GetPC(i % size, true);
-					if (target == lastActor) continue;
-					if (target->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE) continue; // user generated pc
-					lastActor->HandleInteractV1(target);
-					break;
-				}
+			if (lastActor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE || lastActor->GetCurrentArea() != area) {
+				break;
+			}
+			int size;
+			size = game->GetPartySize(true);
+			if (size < 2) break;
+			for (int i = core->Roll(1, size, 0); i < 2 * size; i++) {
+				const Actor* target = game->GetPC(i % size, true);
+				if (target == lastActor) continue;
+				if (target->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE) continue; // user generated pc
+				lastActor->HandleInteractV1(target);
+				break;
 			}
 			break;
 		case 'j': // teleports the selected actors
@@ -1084,13 +1087,13 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 			break;
 		case '5':
 			DebugFlags &= ~DEBUG_SHOW_WALLS_ALL;
-			DebugFlags |= wallFlags[wallFlagIdx++];
-			wallFlagIdx = wallFlagIdx % wallFlags.size();
+			DebugFlags |= wallFlags[wallFlagIdx];
+			wallFlagIdx = (wallFlagIdx + 1) % wallFlags.size();
 			break;
 		case '6': // toggle between lightmap/heightmap/material/search
 			DebugFlags &= ~DEBUG_SHOW_MAPS_ALL;
-			DebugFlags |= flags[flagIdx++];
-			flagIdx = flagIdx % flags.size();
+			DebugFlags |= flags[flagIdx];
+			flagIdx = (flagIdx + 1) % flags.size();
 
 			if (DebugFlags & DEBUG_SHOW_MAPS_ALL) {
 				// fog interferese with debugging the map
@@ -1103,8 +1106,8 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 			break;
 		case '7': // toggles fog of war
 			DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
-			DebugFlags |= fogFlags[fogFlagIdx++];
-			fogFlagIdx = fogFlagIdx % fogFlags.size();
+			DebugFlags |= fogFlags[fogFlagIdx];
+			fogFlagIdx = (fogFlagIdx + 1) % fogFlags.size();
 			break;
 		default:
 			break;

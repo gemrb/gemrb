@@ -4182,7 +4182,7 @@ bool Interface::PlayingMovie() const
 
 bool Interface::IsConsoleWindowOpen() const
 {
-	Window* consoleWin = GetWindow(0, "WIN_CON");
+	const Window* consoleWin = GetWindow(0, "WIN_CON");
 	if (!consoleWin) return false;
 	return consoleWin->HasFocus();
 }
