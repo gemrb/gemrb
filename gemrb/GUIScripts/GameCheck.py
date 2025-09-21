@@ -59,6 +59,9 @@ def IsBGEE ():
 def IsPSTEE ():
 	return GemRB.GameType == "pstee"
 
+def IsAnyEE ():
+	return IsBG2EE () or IsBGEE () or IsPSTEE ()
+
 def IsBG2Demo ():
 	return ('BG2Demo' in GemRB.__dict__) and (GemRB.BG2Demo == True)
 

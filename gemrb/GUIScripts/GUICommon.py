@@ -33,6 +33,7 @@ CommonTables.Load ()
 
 def GetWindowPack():
 	height = GemRB.GetSystemVariable (SV_HEIGHT)
+	width = GemRB.GetSystemVariable (SV_WIDTH)
 
 	if GameCheck.IsPST ():
 		default = "GUIWORLD"
@@ -54,6 +55,27 @@ def GetWindowPack():
 			return default
 		return "GUIW10"
 	else:
+		if GameCheck.IsAnyEE ():
+			if height >= 1500 and GemRB.HasResource ("GUIW20", RES_CHU, 1):
+				return "GUIW20"
+			elif height >= 768 and width >= 1920 and GemRB.HasResource ("GUIW19", RES_CHU, 1):
+				return "GUIW19" # kinda works
+			# 800x600 again, but spaced in a larger screen and broken
+			# elif height >= 768 and width >= 1536 and GemRB.HasResource ("GUIW16", RES_CHU, 1):
+			# 	return "GUIW16"
+			elif height >= 768 and width > 1200 and GemRB.HasResource ("GUIW13", RES_CHU, 1):
+				return "GUIW13"
+			# elif height >= 768 and width > 1024 and GemRB.HasResource ("GUIW12", RES_CHU, 1):
+			# 	return "GUIW12" # misaligned message window
+			else:
+				return "GUIW10"
+			# very incomplete
+			# elif height >= 640 and GemRB.HasResource ("GUIW09", RES_CHU, 1):
+			# 	return "GUIW09"
+			# elif height >= 600 and GemRB.HasResource ("GUIW08", RES_CHU, 1):
+			# 	return "GUIW08"
+			# else:
+			# 	return default
 		if height >= 768 and GemRB.HasResource ("GUIW10", RES_CHU, 1):
 			return "GUIW10"
 		elif height >= 600 and GemRB.HasResource ("GUIW08", RES_CHU, 1):
