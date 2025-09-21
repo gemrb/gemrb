@@ -370,7 +370,7 @@ void Movable::WalkTo(const Point& Des, int distance)
 		area->BlockSearchMapFor(this);
 	}
 
-	if (newPath) {
+	if (newPath && newPath != path) {
 		ClearPath(false);
 		path = std::move(newPath);
 		HandleAnkhegStance(false);

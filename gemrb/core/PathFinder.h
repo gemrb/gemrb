@@ -57,6 +57,10 @@ struct PathNode {
 	Point point;
 	orient_t orient;
 	bool waypoint = false;
+	bool operator==(const PathNode& other) const noexcept
+	{
+		return point == other.point && orient == other.orient;
+	}
 };
 
 struct Path {
@@ -65,6 +69,14 @@ struct Path {
 	using iterator = std::vector<PathNode>::iterator;
 	using const_iterator = std::vector<PathNode>::const_iterator;
 
+	bool operator==(const Path& other) const noexcept
+	{
+		return nodes == other.nodes && currentStep == other.currentStep;
+	}
+	bool operator!=(const Path& other) const noexcept
+	{
+		return !operator==(other);
+	}
 	explicit operator bool() const noexcept
 	{
 		return !nodes.empty();
