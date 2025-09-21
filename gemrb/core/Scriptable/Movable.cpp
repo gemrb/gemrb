@@ -366,6 +366,9 @@ void Movable::WalkTo(const Point& Des, int distance)
 		Log(DEBUG, "WalkTo", "{} re-pathing ignoring actors", fmt::WideToChar { actor->GetShortName() });
 		newPath = area->FindPath(Pos, Des, circleSize, distance, PF_SIGHT, actor);
 	}
+	if (BlocksSearchMap()) {
+		area->BlockSearchMapFor(this);
+	}
 
 	if (newPath) {
 		ClearPath(false);
@@ -373,9 +376,6 @@ void Movable::WalkTo(const Point& Des, int distance)
 		HandleAnkhegStance(false);
 	} else {
 		pathfindingDistance = std::max(circleSize, distance);
-		if (BlocksSearchMap()) {
-			area->BlockSearchMapFor(this);
-		}
 	}
 }
 
