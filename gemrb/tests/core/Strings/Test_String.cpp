@@ -40,7 +40,7 @@ TEST(StringTest, FindFirstOf)
 	EXPECT_EQ(result, String::npos);
 
 	result = FindFirstOf(String { u"abc" }, StringViewT<String> { u"cd" });
-	EXPECT_EQ(result, 2);
+	EXPECT_EQ(result, size_t(2));
 
 	result = FindFirstOf(String { u"abcd" }, StringViewT<String> { u"c" }, 3);
 	EXPECT_EQ(result, String::npos);
@@ -330,7 +330,7 @@ TEST(StringTest, RecodedStringFromWideStringBytes)
 {
 	std::u16string original { u"abc" };
 	auto utf8 = RecodedStringFromWideStringBytes(reinterpret_cast<const char16_t*>(original.c_str()), 6, "UTF-8");
-	EXPECT_EQ(3, utf8.length());
+	EXPECT_EQ(size_t(3), utf8.length());
 	EXPECT_EQ("abc", utf8);
 }
 

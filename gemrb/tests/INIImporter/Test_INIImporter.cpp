@@ -74,7 +74,7 @@ TEST_F(INIImporterTest, KeyValueIteration)
 		values[static_cast<StringView>(p.first).MakeString()] = p.second;
 	}
 
-	EXPECT_EQ(5, values.size());
+	EXPECT_EQ(size_t(5), values.size());
 	EXPECT_EQ("abc", values.find("stringValue")->second);
 	EXPECT_EQ("1", values.find("intValue")->second);
 	EXPECT_EQ("2.5", values.find("floatValue")->second);

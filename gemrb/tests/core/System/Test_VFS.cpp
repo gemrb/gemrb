@@ -44,7 +44,7 @@ TEST(DirectoryIteratorTest, DirectoryIteration)
 		++unit;
 	}
 
-	EXPECT_EQ(dirList.size(), 2);
+	EXPECT_EQ(dirList.size(), size_t(2));
 	EXPECT_TRUE(dirList.find("directory") != dirList.cend());
 	EXPECT_TRUE(dirList.find("directory_äöü") != dirList.cend());
 }
@@ -62,7 +62,7 @@ TEST(DirectoryIteratorTest, FileIteration)
 		++unit;
 	}
 
-	EXPECT_EQ(fileList.size(), 2);
+	EXPECT_EQ(fileList.size(), size_t(2));
 	EXPECT_TRUE(fileList.find("file.txt") != fileList.cend());
 	EXPECT_TRUE(fileList.find("file_äöü.txt") != fileList.cend());
 }

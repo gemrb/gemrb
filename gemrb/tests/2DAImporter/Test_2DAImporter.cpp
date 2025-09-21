@@ -44,19 +44,19 @@ public:
 
 TEST_P(p2DAImporterTest, GetRowCount)
 {
-	EXPECT_EQ(unit.GetRowCount(), 8);
+	EXPECT_EQ(unit.GetRowCount(), TableMgr::index_t(8));
 }
 
 TEST_P(p2DAImporterTest, GetColNamesCount)
 {
-	EXPECT_EQ(unit.GetColNamesCount(), 4);
+	EXPECT_EQ(unit.GetColNamesCount(), TableMgr::index_t(4));
 }
 
 TEST_P(p2DAImporterTest, GetColumnCount)
 {
-	EXPECT_EQ(unit.GetColumnCount(), 4);
-	EXPECT_EQ(unit.GetColumnCount(6), 3);
-	EXPECT_EQ(unit.GetColumnCount(7), 2);
+	EXPECT_EQ(unit.GetColumnCount(), TableMgr::index_t(4));
+	EXPECT_EQ(unit.GetColumnCount(6), TableMgr::index_t(3));
+	EXPECT_EQ(unit.GetColumnCount(7), TableMgr::index_t(2));
 }
 
 TEST_P(p2DAImporterTest, QueryField)
@@ -74,16 +74,16 @@ TEST_P(p2DAImporterTest, QueryDefault)
 
 TEST_P(p2DAImporterTest, GetRowIndex)
 {
-	EXPECT_EQ(unit.GetRowIndex(std::string { "STRENGTH" }), 0);
-	EXPECT_EQ(unit.GetRowIndex(std::string { "SQUEEZENESS" }), 6);
+	EXPECT_EQ(unit.GetRowIndex(std::string { "STRENGTH" }), TableMgr::index_t(0));
+	EXPECT_EQ(unit.GetRowIndex(std::string { "SQUEEZENESS" }), TableMgr::index_t(6));
 
 	EXPECT_EQ(unit.GetRowIndex(std::string { "FLUFFINESS" }), p2DAImporter::npos);
 }
 
 TEST_P(p2DAImporterTest, GetColumnIndex)
 {
-	EXPECT_EQ(unit.GetColumnIndex(std::string { "NAME_REF" }), 0);
-	EXPECT_EQ(unit.GetColumnIndex(std::string { "STAT_ID" }), 3);
+	EXPECT_EQ(unit.GetColumnIndex(std::string { "NAME_REF" }), TableMgr::index_t(0));
+	EXPECT_EQ(unit.GetColumnIndex(std::string { "STAT_ID" }), TableMgr::index_t(3));
 
 	EXPECT_EQ(unit.GetColumnIndex(std::string { "COOLNESS" }), p2DAImporter::npos);
 }
@@ -107,8 +107,8 @@ TEST_P(p2DAImporterTest, GetRowName)
 
 TEST_P(p2DAImporterTest, FindTableValue)
 {
-	EXPECT_EQ(unit.FindTableValue(3, std::string { "CON" }, 0), 1);
-	EXPECT_EQ(unit.FindTableValue(3, std::string { "CON" }, 2), 2);
+	EXPECT_EQ(unit.FindTableValue(3, std::string { "CON" }, 0), TableMgr::index_t(1));
+	EXPECT_EQ(unit.FindTableValue(3, std::string { "CON" }, 2), TableMgr::index_t(2));
 
 	EXPECT_EQ(unit.FindTableValue(3, std::string { "NIX" }, 0), p2DAImporter::npos);
 	EXPECT_EQ(unit.FindTableValue(4, std::string { "CON" }, 0), p2DAImporter::npos);
@@ -116,8 +116,8 @@ TEST_P(p2DAImporterTest, FindTableValue)
 
 TEST_P(p2DAImporterTest, FindTableValueByLong)
 {
-	EXPECT_EQ(unit.FindTableValue(1, 9584, 0), 0);
-	EXPECT_EQ(unit.FindTableValue(1, 9584, 1), 1);
+	EXPECT_EQ(unit.FindTableValue(1, 9584, 0), TableMgr::index_t(0));
+	EXPECT_EQ(unit.FindTableValue(1, 9584, 1), TableMgr::index_t(1));
 
 	EXPECT_EQ(unit.FindTableValue(1, 17, 0), p2DAImporter::npos);
 	EXPECT_EQ(unit.FindTableValue(4, 17, 0), p2DAImporter::npos);
@@ -135,8 +135,8 @@ TEST(p2DAImporterTest, GetColumnCount2)
 	auto stream = new FileStream {};
 	stream->Open(SAMPLE_FILE2);
 	unit.Open(std::unique_ptr<DataStream> { stream });
-	EXPECT_EQ(unit.GetColumnCount(), 1);
-	EXPECT_EQ(unit.GetColumnCount(0), 1);
+	EXPECT_EQ(unit.GetColumnCount(), TableMgr::index_t(1));
+	EXPECT_EQ(unit.GetColumnCount(0), TableMgr::index_t(1));
 }
 
 }

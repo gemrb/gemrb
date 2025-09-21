@@ -37,7 +37,7 @@ TEST(StringViewTest, clear)
 	StringView unit { "abc" };
 	unit.clear();
 
-	EXPECT_EQ(unit.length(), 0);
+	EXPECT_EQ(unit.length(), size_t(0));
 	EXPECT_TRUE(unit.empty());
 }
 
@@ -46,7 +46,7 @@ TEST(StringViewTest, erase)
 	StringView unit { "abcd" };
 	unit.erase(3);
 
-	EXPECT_EQ(unit.length(), 3);
+	EXPECT_EQ(unit.length(), size_t(3));
 	EXPECT_EQ(unit, StringView { "abc" });
 }
 

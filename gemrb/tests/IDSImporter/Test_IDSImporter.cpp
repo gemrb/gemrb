@@ -101,7 +101,7 @@ TEST_P(IDSImporterTest, FindValue)
 
 TEST_P(IDSImporterTest, GetSize)
 {
-	EXPECT_EQ(unit.GetSize(), 12);
+	EXPECT_EQ(unit.GetSize(), size_t(12));
 }
 
 TEST_P(IDSImporterTest, GetHighestValue)
