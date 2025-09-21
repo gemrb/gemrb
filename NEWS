@@ -1,4 +1,4 @@
-GemRB git (1810e35):
+GemRB git (df5e9f49):
   New features:
     - 
     - partial audio system rewrite for better (spatial) audio and music
@@ -9,9 +9,9 @@ GemRB git (1810e35):
 
   Improved features:
     - 
-    - pathfinder speedup
+    - pathfinder speedups
     - video players, animations
-    - iwd2 weapon sets, pst GUI, pst level up
+    - iwd2 weapon sets, pst GUI, pst level up, ee compatibility
     - scripting, effects
     - bugfixes
 
