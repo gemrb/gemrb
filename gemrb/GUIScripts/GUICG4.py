@@ -81,6 +81,15 @@ def CalcLimits(Abidx):
 
 	return
 
+# add a counter to the title label
+def UpdatePointsLabel (points):
+	points = str(points)
+	sumLabel = AbilityWindow.GetControl (0x10000000)
+	sumLabel.SetText (GemRB.GetString (11976) + ": " + points)
+	sumLabel2 = AbilityWindow.GetControl (0x10000000 + 40)
+	if sumLabel2:
+		sumLabel2.SetText (points)
+
 def RollPress():
 	global Minimum, Maximum, Add, HasStrExtra
 	global AllPoints18
@@ -132,13 +141,8 @@ def RollPress():
 
 			GUICommonWindows.SetAbilityScoreLabel (Label, i, v, e)
 
-	# add a counter to the title
-	Sum = str(total)
-	SumLabel = AbilityWindow.GetControl (0x10000000)
-	SumLabel.SetText (GemRB.GetString (11976) + ": " + Sum)
-	SumLabel2 = AbilityWindow.GetControl (0x10000000 + 40)
-	if SumLabel2:
-		SumLabel2.SetText (Sum)
+	UpdatePointsLabel (total)
+
 	AllPoints18 = 0
 	return
 
@@ -322,9 +326,7 @@ def RecallPress():
 		else:
 			Label.SetText (str(v))
 
-	# add a counter to the title
-	SumLabel = AbilityWindow.GetControl (0x10000000)
-	SumLabel.SetText (GemRB.GetString (11976) + ": " + str(Total))
+	UpdatePointsLabel (Total)
 	return
 
 def BackPress():
