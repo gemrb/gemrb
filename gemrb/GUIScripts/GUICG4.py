@@ -91,6 +91,16 @@ def UpdatePointsLabel (points):
 	if sumLabel2:
 		sumLabel2.SetText (points)
 
+# TODO: now we don't handle extra strength in steps — shouldn't it be the case (0/33/66/99/100)?
+# in pst we go to great lengths to make it work
+def SetAbilityScoreLabel (index, score, strExtra, mod = 0):
+	label = AbilityWindow.GetControl (0x10000003 + index)
+	if index == 0 and HasStrExtra == 1 and score == 18 - mod and (True if mod == 1 else strExtra > 0):
+		# display 2 digits of exceptional strength, with 00 for 100
+		label.SetText ("18/%02d" % (strExtra % 100))
+	else:
+		label.SetText (str(score + mod))
+
 def RollPress():
 	global Minimum, Maximum, Add, HasStrExtra
 	global AllPoints18
@@ -137,10 +147,7 @@ def RollPress():
 
 			GemRB.SetVar ("Ability " + str(i), v)
 			total += v
-
-			Label = AbilityWindow.GetControl (0x10000003 + i)
-
-			GUICommonWindows.SetAbilityScoreLabel (Label, i, v, e)
+			SetAbilityScoreLabel (i, v, e)
 
 	UpdatePointsLabel (total)
 
@@ -254,12 +261,7 @@ def RightPress(Button):
 	GemRB.SetVar ("Ability -1", PointsLeft)
 	SumLabel = AbilityWindow.GetControl (0x10000002)
 	SumLabel.SetText (str(PointsLeft))
-	Label = AbilityWindow.GetControl (0x10000003 + Abidx)
-	StrExtra = GemRB.GetVar ("StrExtra")
-	if Abidx == 0 and Ability == 19 and StrExtra:
-		Label.SetText ("18/" + str(StrExtra))
-	else:
-		Label.SetText (str(Ability - 1))
+	SetAbilityScoreLabel (Abidx, Ability, GemRB.GetVar ("StrExtra"), -1)
 	return
 
 def JustPress(Button):
@@ -286,12 +288,7 @@ def LeftPress(Button):
 	GemRB.SetVar ("Ability -1", PointsLeft)
 	SumLabel = AbilityWindow.GetControl (0x10000002)
 	SumLabel.SetText (str(PointsLeft))
-	Label = AbilityWindow.GetControl (0x10000003 + Abidx)
-	StrExtra = GemRB.GetVar ("StrExtra")
-	if Abidx == 0 and Ability == 17 and HasStrExtra == 1:
-		Label.SetText ("18/%02d" % (StrExtra))
-	else:
-		Label.SetText (str(Ability + 1))
+	SetAbilityScoreLabel (Abidx, Ability, GemRB.GetVar ("StrExtra"), 1)
 	return
 
 def EmptyPress():
@@ -313,11 +310,7 @@ def RecallPress():
 		v = GemRB.GetVar ("Stored " + str(i))
 		Total += v
 		GemRB.SetVar ("Ability " + str(i), v)
-		Label = AbilityWindow.GetControl (0x10000003 + i)
-		if i == 0 and v == 18 and HasStrExtra == 1:
-			Label.SetText ("18/" + str(e))
-		else:
-			Label.SetText (str(v))
+		SetAbilityScoreLabel (i, v, e)
 
 	UpdatePointsLabel (Total)
 	return
