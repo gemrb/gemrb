@@ -42,7 +42,7 @@ public:
 
 TEST_F(INIImporterTest, GetTagsCount)
 {
-	EXPECT_EQ(unit.GetTagsCount(), 4);
+	EXPECT_EQ(unit.GetTagsCount(), size_t(4));
 }
 
 TEST_F(INIImporterTest, GroupIteration)
@@ -115,12 +115,12 @@ TEST_F(INIImporterTest, GetKeyAsFloat)
 {
 	auto sectionA = StringView { "SectionA" };
 
-	EXPECT_EQ(2.5, (unit.GetKeyAsFloat(sectionA, StringView { "floatValue" }, 1.0)));
-	EXPECT_EQ(2.5, (unit.GetKeyAsFloat(sectionA, StringView { "Floatvalue" }, 1.0)));
-	EXPECT_EQ(1.5, (unit.GetKeyAsFloat(sectionA, StringView { "floatValueX" }, 1.5)));
+	EXPECT_EQ(2.5F, (unit.GetKeyAsFloat(sectionA, StringView { "floatValue" }, 1.0)));
+	EXPECT_EQ(2.5F, (unit.GetKeyAsFloat(sectionA, StringView { "Floatvalue" }, 1.0)));
+	EXPECT_EQ(1.5F, (unit.GetKeyAsFloat(sectionA, StringView { "floatValueX" }, 1.5F)));
 
-	EXPECT_EQ(0.0, (unit.GetKeyAsFloat(sectionA, StringView { "stringValue" }, 2.0)));
-	EXPECT_EQ(1.0, (unit.GetKeyAsFloat(sectionA, StringView { "intValue" }, 0.0)));
+	EXPECT_EQ(0.0F, (unit.GetKeyAsFloat(sectionA, StringView { "stringValue" }, 2.0)));
+	EXPECT_EQ(1.0F, (unit.GetKeyAsFloat(sectionA, StringView { "intValue" }, 0.0)));
 }
 
 TEST_F(INIImporterTest, GetKeyAsBool)
