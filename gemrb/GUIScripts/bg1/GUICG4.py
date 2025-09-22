@@ -18,12 +18,14 @@
 #
 #character generation, ability (GUICG4)
 import GemRB
-from GUIDefines import *
-from ie_stats import *
 import CharGenCommon
 import GUICommon
 import GUICommonWindows
 import CommonTables
+import GameCheck
+from ie_stats import *
+from GUIDefines import *
+from ie_restype import RES_2DA
 
 AbilityWindow = 0
 TextAreaControl = 0
@@ -50,10 +52,6 @@ def CalcLimits(Abidx):
 	Minimum = 3
 	Maximum = 18
 
-	tmp = Abclasrq.GetValue(KitIndex, Abidx)
-	if tmp > Minimum:
-		Minimum = tmp
-
 	Race = Abracerq.GetRowIndex(RaceName)
 	tmp = Abracerq.GetValue(Race, Abidx*2)
 	if tmp > Minimum:
@@ -63,19 +61,30 @@ def CalcLimits(Abidx):
 	if tmp > Maximum:
 		Maximum = tmp
 
+	tmp = Abclasrq.GetValue(KitIndex, Abidx)
+	if tmp > Minimum:
+		Minimum = tmp
+
 	Race = Abracead.GetRowIndex(RaceName)
-	Add = Abracead.GetValue(Race, Abidx)# + Abclsmod.GetValue(KitIndex, Abidx)
-	Maximum = Maximum + Add
-	Minimum = Minimum + Add
-	if Minimum<1:
-		Minimum=1
-	if Maximum>25:
-		Maximum=25
+	Add = Abracead.GetValue(Race, Abidx)
+	Minimum += Add
+	Maximum += Add
+
+	if Abclsmod:
+		tmp = Abclsmod.GetValue(KitIndex, Abidx)
+		Maximum += tmp
+		Add += tmp
+
+	if Minimum < 1:
+		Minimum = 1
+	if Maximum > 25:
+		Maximum = 25
 
 	return
 
 def RollPress():
 	global Minimum, Maximum, Add, HasStrExtra, PointsLeft
+	global AllPoints18
 
 	GemRB.SetVar("Ability",0)
 	GemRB.SetVar("Ability -1",0)
@@ -84,7 +93,10 @@ def RollPress():
 	SumLabel.SetText("0")
 
 	if HasStrExtra:
-		e = GemRB.Roll(1,100,0)
+		if AllPoints18:
+			e = 100
+		else:
+			e = GemRB.Roll(1,100,0)
 	else:
 		e = 0
 	GemRB.SetVar("StrExtra", e)
@@ -105,7 +117,10 @@ def RollPress():
 			totMax += Maximum
 
 			v = 0
-			if Maximum <= Minimum:
+			if AllPoints18:
+				v = 18
+			elif Maximum <= Minimum:
+				# this is what the code used to do in this degenerate situation
 				v = Maximum
 			else:
 				# roll until the result falls in the allowed range
@@ -119,15 +134,34 @@ def RollPress():
 
 			GUICommonWindows.SetAbilityScoreLabel(Label, i, v, e)
 
+	# add a counter to the title
+	Sum = str(total)
+	SumLabel = AbilityWindow.GetControl (0x10000000)
+	SumLabel.SetText (GemRB.GetString(11976) + ": " + Sum)
+	SumLabel2 = AbilityWindow.GetControl (0x10000000 + 40)
+	if SumLabel2:
+		SumLabel2.SetText (Sum)
+	AllPoints18 = 0
 	return
+
+def GiveAll18():
+	global AllPoints18
+
+	AllPoints18 = 1
+	RollPress()
 
 def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
 	global PointsLeft, HasStrExtra
 	global AbilityTable, Abclasrq, Abclsmod, Abracerq, Abracead
 	global KitIndex, Minimum, Maximum, MyChar
+	global AllPoints18
+
+	AllPoints18 = 0
 
 	Abracead = GemRB.LoadTable("ABRACEAD")
+	if GemRB.HasResource ("ABCLSMOD", RES_2DA):
+		Abclsmod = GemRB.LoadTable ("ABCLSMOD")
 	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	Abracerq = GemRB.LoadTable("ABRACERQ")
 
@@ -144,9 +178,17 @@ def OnLoad():
 	HasStrExtra = CommonTables.Classes.GetValue(ClassName, "STREXTRA", GTV_INT)
 
 	KitIndex = Abclasrq.GetRowIndex(KitName)
+	if KitIndex == None:
+		KitIndex = 9999999 # for broken mods / installs; both tables have 0 defaults which work fine
 
 	AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindow(4, "GUICG")
+	if GameCheck.IsBG2 ():
+		CharGenCommon.PositionCharGenWin (AbilityWindow)
+
+	Button = AbilityWindow.CreateButton (2000, 0, 0, 0, 0)
+	Button.OnPress (GiveAll18)
+	Button.SetHotKey ("8", GEM_MOD_CTRL, True)
 
 	RerollButton = AbilityWindow.GetControl(2)
 	RerollButton.SetText(11982)
@@ -168,16 +210,24 @@ def OnLoad():
 	for i in range(6):
 		Button = AbilityWindow.GetControl(i+30)
 		Button.OnPress (JustPress)
-		Button.SetVarAssoc("Ability", i)
+		if GameCheck.IsBG2 ():
+			Button.OnMouseLeave (EmptyPress)
+		Button.SetValue (i)
+		# delete the labels and use the buttons instead
+		if GameCheck.IsBG2 ():
+			AbilityWindow.DeleteControl (i+0x10000009)
+			Button.SetText (AbilityTable.GetValue (i, 0))
+			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT, OP_OR)
+			Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 		Button = AbilityWindow.GetControl(i*2+16)
 		Button.OnPress (LeftPress)
-		Button.SetValue(i)
+		Button.SetValue (i)
 		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
 		Button.OnPress (RightPress)
-		Button.SetValue(i)
+		Button.SetValue (i)
 		Button.SetActionInterval (200)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
@@ -187,8 +237,12 @@ def OnLoad():
 	RecallButton.OnPress (RecallPress)
 	RerollButton.OnPress (RollPress)
 	DoneButton.OnPress (NextPress)
-	BackButton.OnPress (lambda: CharGenCommon.back(AbilityWindow))
-	AbilityWindow.ShowModal(MODAL_SHADOW_GRAY)
+	if GameCheck.IsBG1 ():
+		BackButton.OnPress (lambda: CharGenCommon.back(AbilityWindow))
+		AbilityWindow.ShowModal (MODAL_SHADOW_GRAY)
+	else:
+		BackButton.OnPress (BackPress)
+		AbilityWindow.Focus ()
 	return
 
 def RightPress(Button):
@@ -215,8 +269,8 @@ def RightPress(Button):
 		Label.SetText(str(Ability-1) )
 	return
 
-def JustPress():
-	Abidx = GemRB.GetVar("Ability")
+def JustPress(Button):
+	Abidx = Button.Value
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
@@ -265,8 +319,10 @@ def RecallPress():
 
 	e=GemRB.GetVar("StoredStrExtra")
 	GemRB.SetVar("StrExtra",e)
+	Total = 0
 	for i in range(-1,6):
 		v = GemRB.GetVar("Stored "+str(i) )
+		Total += v
 		GemRB.SetVar("Ability "+str(i), v)
 		Label = AbilityWindow.GetControl(0x10000003+i)
 		if i==0 and v==18 and HasStrExtra==1:
@@ -275,10 +331,24 @@ def RecallPress():
 			Label.SetText(str(v) )
 
 	PointsLeft = GemRB.GetVar("Ability -1")
+
+	# add a counter to the title
+	SumLabel = AbilityWindow.GetControl (0x10000000)
+	SumLabel.SetText(GemRB.GetString(11976) + ": " + str(Total))
+	return
+
+def BackPress():
+	if AbilityWindow:
+		AbilityWindow.Close ()
+	GemRB.SetNextScript("CharGen5")
+	GemRB.SetVar("StrExtra",0)
+	for i in range(-1,6):
+		GemRB.SetVar("Ability "+str(i),0)  #scrapping the abilities
 	return
 
 def NextPress():
-	AbilityWindow.Close()
+	if AbilityWindow:
+		AbilityWindow.Close ()
 	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 
@@ -289,5 +359,8 @@ def NextPress():
 
 	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
 
-	CharGenCommon.next()
-
+	if GameCheck.IsBG1 ():
+		CharGenCommon.next()
+	else:
+		GemRB.SetNextScript ("CharGen6")
+	return
