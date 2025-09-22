@@ -742,3 +742,10 @@ def OpenPSTDeathWindow ():
 	Button.SetText (1403)
 	Button.OnPress (ShowCredits)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
+
+def SetAbilityScoreLabel (label, index, score, strExtra):
+	if index == 0 and score == 18 and strExtra > 0:
+		# display 2 digits of exceptional strength, with 00 for 100
+		label.SetText("18/%02d" % (strExtra % 100))
+	else:
+		label.SetText(str(score))
