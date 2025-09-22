@@ -30,17 +30,18 @@ from ie_restype import RES_2DA
 AbilityWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-AbilityTable = 0
-Abclasrq = 0
-Abclsmod = 0
-Abclasrq = 0
-Abracerq = 0
 Minimum = 0
 Maximum = 0
 Add = 0
 KitIndex = 0
 HasStrExtra = 0
 MyChar = 0
+
+AbilityTable = GemRB.LoadTable ("ability")
+Abracead = GemRB.LoadTable ("ABRACEAD")
+Abclsmod = GemRB.LoadTable ("ABCLSMOD", True)
+Abclasrq = GemRB.LoadTable ("ABCLASRQ")
+Abracerq = GemRB.LoadTable ("ABRACERQ")
 
 def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
@@ -155,17 +156,10 @@ def GiveAll18():
 def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
 	global HasStrExtra
-	global AbilityTable, Abclasrq, Abclsmod, Abracerq, Abracead
 	global KitIndex, Minimum, Maximum, MyChar
 	global AllPoints18
 
 	AllPoints18 = 0
-
-	Abracead = GemRB.LoadTable ("ABRACEAD")
-	if GemRB.HasResource ("ABCLSMOD", RES_2DA):
-		Abclsmod = GemRB.LoadTable ("ABCLSMOD")
-	Abclasrq = GemRB.LoadTable ("ABCLASRQ")
-	Abracerq = GemRB.LoadTable ("ABRACERQ")
 
 	MyChar = GemRB.GetVar ("Slot")
 	Kit = GUICommon.GetKitIndex (MyChar)
@@ -183,7 +177,6 @@ def OnLoad():
 	if KitIndex == None:
 		KitIndex = 9999999 # for broken mods / installs; both tables have 0 defaults which work fine
 
-	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityWindow = GemRB.LoadWindow (4, "GUICG")
 	if GameCheck.IsBG2 ():
 		CharGenCommon.PositionCharGenWin (AbilityWindow)
@@ -341,9 +334,8 @@ def BackPress():
 def NextPress():
 	if AbilityWindow:
 		AbilityWindow.Close ()
-	AbilityTable = GemRB.LoadTable ("ability")
-	AbilityCount = AbilityTable.GetRowCount ()
 
+	AbilityCount = AbilityTable.GetRowCount ()
 	for i in range (AbilityCount):
 		StatID = AbilityTable.GetValue (i, 3)
 		StatValue = GemRB.GetVar ("Ability " + str(i))
