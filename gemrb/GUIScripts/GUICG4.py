@@ -35,7 +35,6 @@ Abclasrq = 0
 Abclsmod = 0
 Abclasrq = 0
 Abracerq = 0
-PointsLeft = 0
 Minimum = 0
 Maximum = 0
 Add = 0
@@ -83,12 +82,11 @@ def CalcLimits(Abidx):
 	return
 
 def RollPress():
-	global Minimum, Maximum, Add, HasStrExtra, PointsLeft
+	global Minimum, Maximum, Add, HasStrExtra
 	global AllPoints18
 
 	GemRB.SetVar ("Ability", 0)
-	GemRB.SetVar ("Ability -1", 0)
-	PointsLeft = 0
+	GemRB.SetVar ("Ability -1", 0) # holds the points available to distribute
 	SumLabel = AbilityWindow.GetControl (0x10000002)
 	SumLabel.SetText ("0")
 
@@ -152,7 +150,7 @@ def GiveAll18():
 
 def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
-	global PointsLeft, HasStrExtra
+	global HasStrExtra
 	global AbilityTable, Abclasrq, Abclsmod, Abracerq, Abracead
 	global KitIndex, Minimum, Maximum, MyChar
 	global AllPoints18
@@ -246,8 +244,6 @@ def OnLoad():
 	return
 
 def RightPress(Button):
-	global PointsLeft
-
 	Abidx = Button.Value
 	Ability = GemRB.GetVar ("Ability " + str(Abidx))
 	CalcLimits (Abidx)
@@ -257,7 +253,7 @@ def RightPress(Button):
 	if Ability <= Minimum:
 		return
 	GemRB.SetVar ("Ability " + str(Abidx), Ability - 1)
-	PointsLeft = PointsLeft + 1
+	PointsLeft = GemRB.GetVar ("Ability -1") + 1
 	GemRB.SetVar ("Ability -1", PointsLeft)
 	SumLabel = AbilityWindow.GetControl (0x10000002)
 	SumLabel.SetText (str(PointsLeft))
@@ -278,20 +274,18 @@ def JustPress(Button):
 	return
 
 def LeftPress(Button):
-	global PointsLeft
-
 	Abidx = Button.Value
 	Ability = GemRB.GetVar ("Ability " + str(Abidx))
 	CalcLimits (Abidx)
 	GemRB.SetToken ("MINIMUM", str(Minimum))
 	GemRB.SetToken ("MAXIMUM", str(Maximum))
 	TextAreaControl.SetText (AbilityTable.GetValue (Abidx, 1))
-	if PointsLeft == 0:
+	PointsLeft = GemRB.GetVar ("Ability -1") - 1
+	if PointsLeft == -1:
 		return
 	if Ability >= Maximum:
 		return
 	GemRB.SetVar ("Ability " + str(Abidx), Ability + 1)
-	PointsLeft = PointsLeft - 1
 	GemRB.SetVar ("Ability -1", PointsLeft)
 	SumLabel = AbilityWindow.GetControl (0x10000002)
 	SumLabel.SetText (str(PointsLeft))
@@ -315,8 +309,6 @@ def StorePress():
 	return
 
 def RecallPress():
-	global PointsLeft
-
 	e = GemRB.GetVar ("StoredStrExtra")
 	GemRB.SetVar ("StrExtra", e)
 	Total = 0
@@ -329,8 +321,6 @@ def RecallPress():
 			Label.SetText ("18/" + str(e))
 		else:
 			Label.SetText (str(v))
-
-	PointsLeft = GemRB.GetVar ("Ability -1")
 
 	# add a counter to the title
 	SumLabel = AbilityWindow.GetControl (0x10000000)
