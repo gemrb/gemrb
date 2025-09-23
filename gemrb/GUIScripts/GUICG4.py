@@ -332,9 +332,6 @@ def BackPress():
 	if AbilityWindow:
 		AbilityWindow.Close ()
 	GemRB.SetNextScript ("CharGen5")
-	GemRB.SetVar ("StrExtra",0)
-	for i in range(-1, 6):
-		GemRB.SetVar ("Ability " + str(i), 0) #scrapping the abilities
 	return
 
 def NextPress():
