@@ -198,6 +198,7 @@ def OnLoad():
 	StoreButton.SetText (17373)
 	RecallButton = AbilityWindow.GetControl (38)
 	RecallButton.SetText (17374)
+	RecallButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	BackButton = AbilityWindow.GetControl (36)
 	BackButton.SetText (15416)
@@ -208,7 +209,6 @@ def OnLoad():
 	DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 
 	RollPress()
-	StorePress()
 	for i in range(6):
 		Button = AbilityWindow.GetControl (i + 30)
 		Button.OnPress (JustPress)
@@ -300,6 +300,8 @@ def StorePress():
 	GemRB.SetVar ("StoredStrExtra", GemRB.GetVar ("StrExtra"))
 	for i in range(-1, 6):
 		GemRB.SetVar ("Stored " + str(i), GemRB.GetVar ("Ability " + str(i)))
+	# enable recall
+	AbilityWindow.GetControl (38).SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
 def RecallPress():
