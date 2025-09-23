@@ -101,6 +101,12 @@ def SetAbilityScoreLabel (index, score, strExtra, mod = 0):
 	else:
 		label.SetText (str(score + mod))
 
+	# reusing logic here since both +, -, rolling and recalling needs it
+	if GemRB.GetVar("Ability -1") == 0:
+		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+	else:
+		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+
 def RollPress():
 	global Minimum, Maximum, Add, HasStrExtra
 	global AllPoints18
@@ -206,7 +212,6 @@ def OnLoad():
 	DoneButton = AbilityWindow.GetControl (0)
 	DoneButton.SetText (11973)
 	DoneButton.MakeDefault()
-	DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 
 	RollPress()
 	for i in range(6):
