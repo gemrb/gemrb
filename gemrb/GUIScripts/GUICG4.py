@@ -223,12 +223,12 @@ def OnLoad():
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 		Button = AbilityWindow.GetControl (i * 2 + 16)
-		Button.OnPress (LeftPress)
+		Button.OnPress (PlusPress)
 		Button.SetValue (i)
 		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl (i * 2 + 17)
-		Button.OnPress (RightPress)
+		Button.OnPress (MinusPress)
 		Button.SetValue (i)
 		Button.SetActionInterval (200)
 
@@ -247,7 +247,7 @@ def OnLoad():
 		AbilityWindow.Focus ()
 	return
 
-def RightPress(Button):
+def MinusPress(Button):
 	Abidx = Button.Value
 	Ability = GemRB.GetVar ("Ability " + str(Abidx))
 	CalcLimits (Abidx)
@@ -272,7 +272,7 @@ def JustPress(Button):
 	TextAreaControl.SetText (AbilityTable.GetValue (Abidx, 1))
 	return
 
-def LeftPress(Button):
+def PlusPress(Button):
 	Abidx = Button.Value
 	Ability = GemRB.GetVar ("Ability " + str(Abidx))
 	CalcLimits (Abidx)
