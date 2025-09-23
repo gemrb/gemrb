@@ -163,7 +163,7 @@ def GiveAll18():
 def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
 	global HasStrExtra
-	global KitIndex, Minimum, Maximum, MyChar
+	global KitIndex, MyChar
 	global AllPoints18
 
 	AllPoints18 = 0
