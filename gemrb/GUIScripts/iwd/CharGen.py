@@ -25,6 +25,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_spells import LS_MEMO
+import GUICG4
 import GUICommon
 import GUICommonWindows
 import Spellbook
@@ -72,17 +73,7 @@ AlignmentTextArea = 0
 AlignmentDoneButton = 0
 
 AbilitiesButton = 0
-AbilitiesWindow = 0
 AbilitiesTable = 0
-AbilitiesRaceAddTable = 0
-AbilitiesRaceReqTable = 0
-AbilitiesClassReqTable = 0
-AbilitiesMinimum = 0
-AbilitiesMaximum = 0
-AbilitiesModifier = 0
-AbilitiesTextArea = 0
-AbilitiesRecallButton = 0
-AbilitiesDoneButton = 0
 
 SkillsButton = 0
 SkillsWindow = 0
@@ -194,7 +185,7 @@ def OnLoad():
 
 	AbilitiesButton = CharGenWindow.GetControl (4)
 	AbilitiesButton.SetState (IE_GUI_BUTTON_DISABLED)
-	AbilitiesButton.OnPress (AbilitiesPress)
+	AbilitiesButton.OnPress (GUICG4.OnLoad)
 	AbilitiesButton.SetText (11960)
 
 	SkillsButton = CharGenWindow.GetControl (5)
@@ -1222,273 +1213,7 @@ def AlignmentCancelPress():
 		AlignmentWindow.Close ()
 	return
 
-# Abilities Selection
-
-def AbilitiesPress():
-	global CharGenWindow, AbilitiesWindow
-	global AbilitiesTextArea, AbilitiesRecallButton, AbilitiesDoneButton
-	global AbilitiesRaceAddTable, AbilitiesRaceReqTable, AbilitiesClassReqTable
-	global HasStrExtra
-
-	AbilitiesWindow = GemRB.LoadWindow (4, "GUICG")
-	AbilitiesRaceAddTable = GemRB.LoadTable ("ABRACEAD")
-	AbilitiesRaceReqTable = GemRB.LoadTable ("ABRACERQ")
-	AbilitiesClassReqTable = GemRB.LoadTable ("ABCLASRQ")
-
-	ClassName = GUICommon.GetClassRowName (MyChar)
-	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "STREXTRA", GTV_INT)
-
-	for i in range (6):
-		AbilitiesLabelButton = AbilitiesWindow.GetControl (30 + i)
-		AbilitiesLabelButton.SetState (IE_GUI_BUTTON_ENABLED)
-		AbilitiesLabelButton.OnPress (AbilitiesLabelPress)
-		AbilitiesLabelButton.SetVarAssoc ("AbilityIndex", i + 1)
-
-		AbilitiesPlusButton = AbilitiesWindow.GetControl (16 + i * 2)
-		AbilitiesPlusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		AbilitiesPlusButton.OnPress (AbilitiesPlusPress)
-		AbilitiesPlusButton.SetValue(i)
-		AbilitiesPlusButton.SetActionInterval (200)
-
-		AbilitiesMinusButton = AbilitiesWindow.GetControl (17 + i * 2)
-		AbilitiesMinusButton.SetState (IE_GUI_BUTTON_ENABLED)
-		AbilitiesMinusButton.OnPress (AbilitiesMinusPress)
-		AbilitiesMinusButton.SetValue(i)
-		AbilitiesMinusButton.SetActionInterval (200)
-
-	AbilitiesStoreButton = AbilitiesWindow.GetControl (37)
-	AbilitiesStoreButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AbilitiesStoreButton.OnPress (AbilitiesStorePress)
-	AbilitiesStoreButton.SetText (17373)
-
-	AbilitiesRecallButton = AbilitiesWindow.GetControl (38)
-	AbilitiesRecallButton.SetState (IE_GUI_BUTTON_DISABLED)
-	AbilitiesRecallButton.OnPress (AbilitiesRecallPress)
-	AbilitiesRecallButton.SetText (17374)
-
-	AbilitiesRerollButton = AbilitiesWindow.GetControl (2)
-	AbilitiesRerollButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AbilitiesRerollButton.OnPress (AbilitiesRerollPress)
-	AbilitiesRerollButton.SetText (11982)
-
-	AbilitiesTextArea = AbilitiesWindow.GetControl (29)
-	AbilitiesTextArea.SetText (17247)
-
-	AbilitiesDoneButton = AbilitiesWindow.GetControl (0)
-	AbilitiesDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AbilitiesDoneButton.OnPress (AbilitiesDonePress)
-	AbilitiesDoneButton.SetText (11973)
-	AbilitiesDoneButton.MakeDefault()
-
-	AbilitiesCancelButton = AbilitiesWindow.GetControl (36)
-	AbilitiesCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	AbilitiesCancelButton.OnPress (AbilitiesCancelPress)
-	AbilitiesCancelButton.SetText (13727)
-	AbilitiesCancelButton.MakeEscape()
-
-	AbilitiesRerollPress()
-
-	AbilitiesWindow.ShowModal(MODAL_SHADOW_NONE)
-	return
-
-def AbilitiesCalcLimits(Index):
-	global AbilitiesRaceReqTable, AbilitiesRaceAddTable, AbilitiesClassReqTable
-	global AbilitiesMinimum, AbilitiesMaximum, AbilitiesModifier
-
-	Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE))
-	RaceName = CommonTables.Races.GetRowName (Race)
-	Race = AbilitiesRaceReqTable.GetRowIndex (RaceName)
-	AbilitiesMinimum = AbilitiesRaceReqTable.GetValue (Race, Index * 2)
-	AbilitiesMaximum = AbilitiesRaceReqTable.GetValue (Race, Index * 2 + 1)
-	AbilitiesModifier = AbilitiesRaceAddTable.GetValue (Race, Index)
-
-	ClassName = GUICommon.GetClassRowName (MyChar)
-	ClassIndex = AbilitiesClassReqTable.GetRowIndex (ClassName)
-	Min = AbilitiesClassReqTable.GetValue (ClassIndex, Index)
-	if Min > 0 and AbilitiesMinimum < Min:
-		AbilitiesMinimum = Min
-
-	AbilitiesMinimum = AbilitiesMinimum + AbilitiesModifier
-	AbilitiesMaximum = AbilitiesMaximum + AbilitiesModifier
-	return
-
-def AbilitiesLabelPress():
-	global AbilitiesWindow, AbilitiesTextArea
-
-	AbilityIndex = GemRB.GetVar ("AbilityIndex") - 1
-	AbilitiesCalcLimits(AbilityIndex)
-	GemRB.SetToken ("MINIMUM", str(AbilitiesMinimum) )
-	GemRB.SetToken ("MAXIMUM", str(AbilitiesMaximum) )
-	AbilitiesTextArea.SetText (AbilitiesTable.GetValue (AbilityIndex, 1) )
-	return
-
-def AbilitiesPlusPress(btn):
-	global AbilitiesWindow, AbilitiesTextArea
-	global AbilitiesMinimum, AbilitiesMaximum
-
-	Abidx = btn.Value
-	AbilitiesCalcLimits(Abidx)
-	GemRB.SetToken ("MINIMUM", str(AbilitiesMinimum) )
-	GemRB.SetToken ("MAXIMUM", str(AbilitiesMaximum) )
-	AbilitiesTextArea.SetText (AbilitiesTable.GetValue (Abidx, 1) )
-	PointsLeft = GemRB.GetVar ("Ability0")
-	Ability = GemRB.GetVar ("Ability" + str(Abidx + 1) )
-	if PointsLeft > 0 and Ability < AbilitiesMaximum:
-		PointsLeft = PointsLeft - 1
-		GemRB.SetVar ("Ability0", PointsLeft)
-		PointsLeftLabel = AbilitiesWindow.GetControl (0x10000002)
-		PointsLeftLabel.SetText (str(PointsLeft) )
-		Ability = Ability + 1
-		GemRB.SetVar ("Ability" + str(Abidx + 1), Ability)
-		Label = AbilitiesWindow.GetControl (0x10000003 + Abidx)
-		StrExtra = GemRB.GetVar("StrExtra")
-		if Abidx==0 and Ability==18 and HasStrExtra:
-			Label.SetText("18/"+str(StrExtra) )
-		else:
-			Label.SetText(str(Ability) )
-
-		if PointsLeft == 0:
-			AbilitiesDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-	return
-
-def AbilitiesMinusPress(btn):
-	global AbilitiesWindow, AbilitiesTextArea
-	global AbilitiesMinimum, AbilitiesMaximum
-
-	Abidx = btn.Value
-	AbilitiesCalcLimits(Abidx)
-	GemRB.SetToken ("MINIMUM", str(AbilitiesMinimum) )
-	GemRB.SetToken ("MAXIMUM", str(AbilitiesMaximum) )
-	AbilitiesTextArea.SetText (AbilitiesTable.GetValue (Abidx, 1) )
-	PointsLeft = GemRB.GetVar ("Ability0")
-	Ability = GemRB.GetVar ("Ability" + str(Abidx + 1) )
-	if Ability > AbilitiesMinimum:
-		Ability = Ability - 1
-		GemRB.SetVar ("Ability" + str(Abidx + 1), Ability)
-		Label = AbilitiesWindow.GetControl (0x10000003 + Abidx)
-		StrExtra = GemRB.GetVar("StrExtra")
-		if Abidx==0 and Ability==18 and HasStrExtra:
-			Label.SetText("18/"+str(StrExtra) )
-		else:
-			Label.SetText(str(Ability) )
-
-		PointsLeft = PointsLeft + 1
-		GemRB.SetVar ("Ability0", PointsLeft)
-		PointsLeftLabel = AbilitiesWindow.GetControl (0x10000002)
-		PointsLeftLabel.SetText (str(PointsLeft) )
-		AbilitiesDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	return
-
-def AbilitiesStorePress():
-	global AbilitiesWindow, AbilitiesRecallButton
-
-	GemRB.SetVar("StoredStrExtra", GemRB.GetVar ("StrExtra") )
-	for i in range (7):
-		GemRB.SetVar ("Stored" + str(i), GemRB.GetVar ("Ability" + str(i)))
-	AbilitiesRecallButton.SetState (IE_GUI_BUTTON_ENABLED)
-	return
-
-def AbilitiesRecallPress():
-	global AbilitiesWindow
-
-	e=GemRB.GetVar("StoredStrExtra")
-	GemRB.SetVar("StrExtra",e)
-	for i in range (7):
-		v =  GemRB.GetVar ("Stored" + str(i))
-		GemRB.SetVar ("Ability" + str(i), v)
-		Label = AbilitiesWindow.GetControl (0x10000002 + i)
-		if i==0 and v==18 and HasStrExtra==1:
-			Label.SetText("18/"+str(e) )
-		else:
-			Label.SetText(str(v) )
-
-	PointsLeft = GemRB.GetVar("Ability0")
-	if PointsLeft == 0:
-		AbilitiesDoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	else:
-		AbilitiesDoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	return
-
-def AbilitiesRerollPress():
-	global AbilitiesWindow, AbilitiesMinimum, AbilitiesMaximum, AbilitiesModifier
-
-	GemRB.SetVar ("Ability0", 0)
-	PointsLeftLabel = AbilitiesWindow.GetControl (0x10000002)
-	PointsLeftLabel.SetText ("0")
-	Dices = 3
-	Sides = 6
-
-	#roll strextra even when the current stat is not 18
-	if HasStrExtra:
-		e = GemRB.Roll (1,100,0)
-	else:
-		e = 0
-	GemRB.SetVar("StrExtra", e)
-
-	# roll until total score is at least 75
-	total = 0
-	totMax = 108 # ensure the loop will complete
-	while total < 75 and totMax >= 75:
-		total = 0
-		totMax = 0
-
-		for i in range (6):
-			AbilitiesCalcLimits(i)
-
-			totMax += AbilitiesMaximum
-
-			Value = 0
-			if AbilitiesMaximum <= AbilitiesMinimum:
-				# this is what the code would previously do in this degenerate situation
-				Value = AbilitiesMaximum
-			else:
-				# roll each stat until it lies within the correct range
-				while Value < AbilitiesMinimum or Value > AbilitiesMaximum:
-					Value = GemRB.Roll (Dices, Sides, AbilitiesModifier)
-
-			total += Value
-
-			GemRB.SetVar ("Ability" + str(i + 1), Value)
-			Label = AbilitiesWindow.GetControl (0x10000003 + i)
-
-			GUICommonWindows.SetAbilityScoreLabel(Label, i, Value, e)
-
-	AbilitiesDoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	return
-
-def AbilitiesDonePress():
-	global CharGenWindow, CharGenState, AbilitiesWindow, AbilitiesButton, SkillsButton, SkillsState
-
-	if AbilitiesWindow:
-		AbilitiesWindow.Close ()
-	AbilitiesButton.SetState (IE_GUI_BUTTON_DISABLED)
-	SkillsButton.SetState (IE_GUI_BUTTON_ENABLED)
-	SkillsButton.MakeDefault()
-
-	Str = GemRB.GetVar ("Ability1")
-	GemRB.SetPlayerStat (MyChar, IE_STR, Str)
-	if Str == 18:
-		GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
-	else:
-		GemRB.SetPlayerStat (MyChar, IE_STREXTRA, 0)
-
-	GemRB.SetPlayerStat (MyChar, IE_DEX, GemRB.GetVar ("Ability2"))
-	GemRB.SetPlayerStat (MyChar, IE_CON, GemRB.GetVar ("Ability3"))
-	GemRB.SetPlayerStat (MyChar, IE_INT, GemRB.GetVar ("Ability4"))
-	GemRB.SetPlayerStat (MyChar, IE_WIS, GemRB.GetVar ("Ability5"))
-	GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability6"))
-
-	CharGenState = 5
-	SkillsState = 0
-	SetCharacterDescription()
-	return
-
-def AbilitiesCancelPress():
-	global CharGenWindow, AbilitiesWindow
-
-	if AbilitiesWindow:
-		AbilitiesWindow.Close ()
-	return
+# Abilities selection is handled by the shared GUICG4
 
 # Skills Selection
 

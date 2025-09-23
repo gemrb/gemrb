@@ -18,7 +18,10 @@
 #
 #character generation, ability (GUICG4)
 import GemRB
-import CharGenCommon
+try:
+	import CharGenCommon # only bgs have it
+except ImportError:
+	pass
 import GUICommon
 import GUICommonWindows
 import CommonTables
@@ -247,6 +250,9 @@ def OnLoad():
 	if GameCheck.IsBG1 ():
 		BackButton.OnPress (lambda: CharGenCommon.back(AbilityWindow))
 		AbilityWindow.ShowModal (MODAL_SHADOW_GRAY)
+	elif GameCheck.IsIWD1 ():
+		BackButton.OnPress (AbilityWindow.Close)
+		AbilityWindow.ShowModal (MODAL_SHADOW_NONE)
 	else:
 		BackButton.OnPress (BackPress)
 		AbilityWindow.Focus ()
@@ -345,6 +351,17 @@ def NextPress():
 
 	if GameCheck.IsBG1 ():
 		CharGenCommon.next()
+	elif GameCheck.IsIWD1 ():
+		import CharGen
+		AbilitiesButton = CharGen.CharGenWindow.GetControl (4)
+		AbilitiesButton.SetState (IE_GUI_BUTTON_DISABLED)
+		SkillsButton = CharGen.CharGenWindow.GetControl (5)
+		SkillsButton.SetState (IE_GUI_BUTTON_ENABLED)
+		SkillsButton.MakeDefault()
+
+		CharGen.CharGenState = 5
+		CharGen.SkillsState = 0
+		CharGen.SetCharacterDescription()
 	else:
 		GemRB.SetNextScript ("CharGen6")
 	return
