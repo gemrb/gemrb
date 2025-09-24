@@ -134,9 +134,11 @@ static SDL_Keycode TranslateKeycode(SDLKey sym)
 // and make sure textscreens still work, since they're started by scripts
 // mouse moves are exempted only to prevent unexpected warping
 // in movies: allow everything, so they can be skipped, subtitles toggled
+// also allow to always force quit the engine
 static bool BlocksEvents(const SDL_Event& event, int modState)
 {
-	if (event.type == SDL_MOUSEMOTION || modState != 0) return false;
+	if (event.type == SDL_MOUSEMOTION || event.type == SDL_QUIT || modState != 0) return false;
+	if (core->GetDictionary().Get("AskAndExit", 1)) return false; // asking to quit
 	if (!core->InCutSceneMode(false)) return false;
 	if (core->IsConsoleWindowOpen() || core->PlayingMovie()) return false;
 	// paused during a cutscene, as needed for CI exit textscreen to work
