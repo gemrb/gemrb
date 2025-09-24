@@ -130,6 +130,22 @@ static SDL_Keycode TranslateKeycode(SDLKey sym)
 	return sym;
 }
 
+// in cutscenes: disable everything but cursor moves, cheats and console interaction
+// and make sure textscreens still work, since they're started by scripts
+// mouse moves are exempted only to prevent unexpected warping
+// in movies: allow everything, so they can be skipped, subtitles toggled
+static bool BlocksEvents(const SDL_Event& event, int modState)
+{
+	if (event.type == SDL_MOUSEMOTION || modState != 0) return false;
+	if (!core->InCutSceneMode(false)) return false;
+	if (core->IsConsoleWindowOpen() || core->PlayingMovie()) return false;
+	// paused during a cutscene, as needed for CI exit textscreen to work
+	if (core->IsFreezed()) {
+		return false;
+	}
+	return true;
+}
+
 int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 {
 	if (!EvntManager)
@@ -143,9 +159,8 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 	SDL_Keycode key;
 	Event e;
 
-	// in cutscenes: disable everything but cursor moves, cheats and console interaction
-	// mouse moves are exempted only to prevent unexpected warping
-	if (event.type != SDL_MOUSEMOTION && modstate == 0 && core->InCutSceneMode(false) && !core->IsConsoleWindowOpen() && !core->PlayingMovie()) {
+	// eat up events in special circumstances
+	if (BlocksEvents(event, modstate)) {
 		return GEM_OK;
 	}
 
