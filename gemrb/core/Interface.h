@@ -35,6 +35,7 @@
 #include "Holder.h"
 #include "ImageMgr.h"
 #include "InterfaceConfig.h"
+#include "MoviePlayer.h"
 #include "SaveGameAREExtractor.h"
 #include "StringMgr.h"
 #include "TableMgr.h"
@@ -361,6 +362,7 @@ private:
 	AmbientMgr* ambientManager = nullptr;
 	AudioPlayback* audioPlayback = nullptr;
 	MusicLoop* musicLoop = nullptr;
+	ResourceHolder<MoviePlayer> moviePlayer;
 
 public:
 	EncodingStruct TLKEncoding;

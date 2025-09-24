@@ -42,7 +42,6 @@
 #include "KeyMap.h"
 #include "Map.h"
 #include "MapMgr.h"
-#include "MoviePlayer.h"
 #include "MusicMgr.h"
 #include "PluginLoader.h"
 #include "PluginMgr.h"
@@ -2073,8 +2072,8 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		audioPlayback->StopSpeech();
 	}
 
-	ResourceHolder<MoviePlayer> mp = gamedata->GetResourceHolder<MoviePlayer>(actualMovieRef);
-	if (!mp) {
+	moviePlayer = gamedata->GetResourceHolder<MoviePlayer>(actualMovieRef);
+	if (!moviePlayer) {
 		return -1;
 	}
 
@@ -2082,7 +2081,7 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	subtitles |= vars.Get("Display Subtitles", 0) == 1; // BG2
 	subtitles |= vars.Get("Subtitles", 0) == 1; // always present
 
-	mp->EnableSubtitles(subtitles);
+	moviePlayer->EnableSubtitles(subtitles);
 
 	class IESubtitles : public MoviePlayer::SubtitleSet {
 		using FrameMap = std::map<size_t, ieStrRef>;
@@ -2135,9 +2134,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		int b = sttable->QueryFieldSigned<int>("blue", "frame");
 
 		if (r || g || b) {
-			mp->SetSubtitles(new IESubtitles(std::move(font), sttable, Color(r, g, b, 0xff)));
+			moviePlayer->SetSubtitles(new IESubtitles(std::move(font), sttable, Color(r, g, b, 0xff)));
 		} else {
-			mp->SetSubtitles(new IESubtitles(std::move(font), sttable));
+			moviePlayer->SetSubtitles(new IESubtitles(std::move(font), sttable));
 		}
 	}
 
@@ -2151,7 +2150,6 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	bool inCutScene = false;
 	if (gc) {
 		inCutScene = gc->GetScreenFlags().Test(ScreenFlags::Cutscene);
-		gc->SetScreenFlags(ScreenFlags::PlayingMovie, BitOp::OR);
 	}
 	SetCutSceneMode(true);
 
@@ -2162,11 +2160,8 @@ int Interface::PlayMovie(const ResRef& movieRef)
 	WindowManager::CursorFeedback cur = winmgr->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	winmgr->DrawWindows();
 
-	mp->Play(win);
+	moviePlayer->Play(win);
 	win->Close();
-	if (gc) {
-		gc->SetScreenFlags(ScreenFlags::PlayingMovie, BitOp::NAND);
-	}
 	winmgr->SetCursorFeedback(cur);
 	// only reset if it wasn't active before we started or if there's no game yet
 	if (!inCutScene) {
@@ -4175,9 +4170,8 @@ void Interface::ApplyTooltipDelay() const
 
 bool Interface::PlayingMovie() const
 {
-	const GameControl* gc = GetGameControl();
-	if (!gc) return false;
-	return gc->GetScreenFlags().Test(ScreenFlags::PlayingMovie);
+	if (!moviePlayer) return false;
+	return moviePlayer->IsPlaying();
 }
 
 bool Interface::IsConsoleWindowOpen() const

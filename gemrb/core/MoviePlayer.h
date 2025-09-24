@@ -115,6 +115,7 @@ public:
 	void SetSubtitles(SubtitleSet* subs);
 	void EnableSubtitles(bool set);
 	bool SubtitlesEnabled() const;
+	bool IsPlaying() const;
 };
 
 class MoviePlayerControls : public View {

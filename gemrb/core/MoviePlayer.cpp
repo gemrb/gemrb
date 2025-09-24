@@ -56,6 +56,11 @@ bool MoviePlayer::SubtitlesEnabled() const
 	return showSubtitles && subtitles;
 }
 
+bool MoviePlayer::IsPlaying() const
+{
+	return isPlaying;
+}
+
 void MoviePlayer::Play(Window* win)
 {
 	assert(win);
