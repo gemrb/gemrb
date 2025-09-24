@@ -1930,6 +1930,11 @@ void Interface::AskAndExit()
 	// if askExit is 1 then we are trying to quit a second time and should instantly do so
 	ieDword askExit = vars.Get("AskAndExit", 0);
 
+	// stop any movies, since they eat up events
+	if (PlayingMovie()) {
+		moviePlayer->Stop();
+	}
+
 	if (game && !askExit) {
 		SetPause(PauseState::On);
 		vars.Set("AskAndExit", 1);
