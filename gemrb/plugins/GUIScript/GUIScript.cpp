@@ -88,9 +88,6 @@ GUIScript* GemRB::gs = NULL;
 //bit used in SetCreatureStat to access some fields
 #define EXTRASETTINGS 0x1000
 
-//maximum distance for passing items between two characters
-#define MAX_DISTANCE 500
-
 struct UsedItemType {
 	ResRef itemname;
 	ieVariable username; //death variable
@@ -9421,10 +9418,11 @@ static PyObject* GemRB_DropDraggedItem(PyObject* /*self*/, PyObject* args)
 	}
 
 	// too far away?
+	constexpr unsigned int maxPassingDistance = 500; // verified in game
 	const Actor* current = game->FindPC(game->GetSelectedPCSingle());
 	if (current && current != actor &&
 	    (actor->GetCurrentArea() != current->GetCurrentArea() ||
-	     SquaredPersonalDistance(actor, current) > MAX_DISTANCE * MAX_DISTANCE)) {
+	     SquaredPersonalDistance(actor, current) > maxPassingDistance * maxPassingDistance)) {
 		displaymsg->DisplayConstantString(HCStrings::TooFarAway, GUIColors::WHITE);
 		return PyLong_FromLong(ASI_FAILED);
 	}
