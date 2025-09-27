@@ -6212,7 +6212,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable* checker) const
 	}
 	if (ga_flags & GA_CAN_BUMP) {
 		if (core->GetGame()->CombatCounter) return false;
-		if (!((IsPartyMember() && GetStat(IE_EA) < EA_GOODCUTOFF) || GetStat(IE_NPCBUMP))) return false;
+		if (!(GetStat(IE_EA) <= EA_CONTROLLABLE || GetStat(IE_NPCBUMP))) return false;
 	}
 	if (ga_flags & GA_BIGBAD) {
 		ieDword animID = Modified[IE_ANIMATION_ID];
