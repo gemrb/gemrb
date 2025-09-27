@@ -286,6 +286,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetText ("")
 			continue
+
 		Spell = memorizedSpells[i+Start]
 		spellType = Spell['SpellType']
 		if spellType > 4:
@@ -321,6 +322,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.SetSpellIcon (Spell['SpellResRef'], 1)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
 			Button.SetTooltip (Spell['SpellName'])
+			GUICommon.SetButtonAnchor (Button)
 
 			if Spell['MemoCount'] > 0 and BookType != -1:
 				Button.SetText (str(Spell['MemoCount']))

@@ -198,6 +198,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 		Button.SetVarAssoc ("ItemButton", i)
 		Button.SetFont ('NUMBER')
 		Button.SetPushOffset (0, 0)
+		GUICommon.SetButtonAnchor (Button)
 
 	num = 0
 	for i in range (GemRB.GetPartySize ()):
@@ -400,13 +401,14 @@ def SelectItem (btn):
 def UpdateFloatMenuSpell (pc, i):
 	Window = FloatMenuWindow
 
-	Button = Window.GetControl (15 + i)
+	Button = Window.GetControl (CID_SLOTS + i)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+	# reset bam back to normal, since spell and item icons work differently
 	if i == float_menu_selected:
 		Button.SetBAM ('AMHILITE', 0, 0)
 	else:
 		Button.SetPicture(None)
-		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR) # make relative anchors work
 
 	def CloseOnPress (callback):
 		if GUICommon.UsingTouchInput ():
@@ -416,7 +418,7 @@ def UpdateFloatMenuSpell (pc, i):
 	if i + float_menu_index < len (spell_list):
 		SpellResRef = spell_list[i + float_menu_index]["SpellResRef"]
 		Button.SetSpellIcon (SpellResRef)
-		Button.SetText ("%d" % spell_list[i + float_menu_index]["MemoCount"])
+		Button.SetText (str(spell_list[i + float_menu_index]["MemoCount"]))
 
 		spell = GemRB.GetSpell (SpellResRef)
 		Button.SetTooltip (spell['SpellName'])

@@ -1189,6 +1189,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	colorGreen =  {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 64}
 
 	Button.SetText ("")
+	GUICommon.SetButtonAnchor (Button)
 	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	if Slot == None:

@@ -845,5 +845,12 @@ def OverrideDefaultVoiceSet (Gender, CharSound):
 			CharSound = Gender2Sound[Gender]
 	return CharSound
 
+# sets up a relative anchor for buttons with pictures/images
+def SetButtonAnchor (button, x = 4, y = 4):
+	button.SetFlags (IE_GUI_BUTTON_ALIGN_ANCHOR, OP_OR)
+	if GameCheck.IsPST ():
+		y = 1 # inventory
+	button.SetAnchor (x, y)
+
 def BindControlCallbackParams(fn, *args):
 	return lambda ctl: fn(*args)
