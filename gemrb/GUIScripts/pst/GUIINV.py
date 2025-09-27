@@ -116,7 +116,7 @@ def InitInventoryWindow (Window):
 	# encumbrance
 	Button = Window.GetControl (46)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_SET)
 	Button.SetFont ('NUMBER')
 
 	# armor class
