@@ -261,7 +261,10 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	bool blocksSearch = BlocksSearchMap();
 	if (actorInTheWay && blocksSearch && actorInTheWay->BlocksSearchMap()) {
 		// Give up instead of bumping if you are close to the goal
-		if (path.Size() == 1 && PersonalDistance(nmptStep, this) < MAX_OPERATING_DISTANCE) {
+		// the cut-off should be max 1 foot, so attacking with close-ranged weapons is unlikely to stop approaching too soon
+		// attacking actions already take weapon range into account when
+		// triggering movement, so this here does not mean we go needlessly close
+		if (path.Size() == 1 && WithinPersonalRange(this, nmptStep, 1)) {
 			ClearPath(true);
 			NewOrientation = Orientation;
 			// Do not call ReleaseCurrentAction() since other actions
