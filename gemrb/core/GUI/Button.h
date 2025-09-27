@@ -214,6 +214,7 @@ private: // Private attributes
 	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	/** Draws the Control on the Output Display */
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
+	void DrawLabel(const Region& rgn) const;
 
 	BitOp GetDictOp() const noexcept override;
 	void SetState(State state, bool setval);

@@ -227,72 +227,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	}
 
 	// Button label
-	if (hasText) {
-		// FIXME: hopefully there's no button which sinks when selected
-		//   AND has text label
-		//else if (State == IE_GUI_BUTTON_PRESSED || State == IE_GUI_BUTTON_SELECTED) {
-
-		ieByte align = 0;
-		if (flags & IE_GUI_BUTTON_ALIGN_LEFT)
-			align |= IE_FONT_ALIGN_LEFT;
-		else if (flags & IE_GUI_BUTTON_ALIGN_RIGHT)
-			align |= IE_FONT_ALIGN_RIGHT;
-		else
-			align |= IE_FONT_ALIGN_CENTER;
-
-		if (flags & IE_GUI_BUTTON_ALIGN_TOP)
-			align |= IE_FONT_ALIGN_TOP;
-		else if (flags & IE_GUI_BUTTON_ALIGN_BOTTOM)
-			align |= IE_FONT_ALIGN_BOTTOM;
-		else
-			align |= IE_FONT_ALIGN_MIDDLE;
-
-		Region r = rgn;
-		if ((flags & (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANCHOR)) == (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANCHOR)) {
-			// reuse mostly unused Anchor system to finetune label placement per-game via python
-			// unlike the original anchors, these are used as offsets from the aligned-to side (relative anchors)
-			// values are set only in an unused file and bg2 journal, where it is not used with a picture
-			// nobody sets the anchor flags bit, so it doesn't come into play
-			if (flags & IE_GUI_BUTTON_ALIGN_LEFT) {
-				r.x += Anchor.x;
-				r.w -= Anchor.x;
-			} else if (align & IE_FONT_ALIGN_RIGHT) {
-				r.w -= Anchor.x;
-			}
-			if (align & IE_FONT_ALIGN_TOP) {
-				r.y += Anchor.y;
-				r.h -= Anchor.y;
-			} else if (align & IE_FONT_ALIGN_BOTTOM) {
-				r.h -= Anchor.y;
-			}
-		} else if (flags & IE_GUI_BUTTON_ANCHOR) {
-			r.x += Anchor.x;
-			r.y += Anchor.y;
-			r.w -= Anchor.x;
-			r.h -= Anchor.y;
-		} else {
-			Font::StringSizeMetrics metrics { r.size, 0, 0, false };
-			font->StringSize(Text, &metrics);
-
-			if (metrics.numLines == 1 && (IE_GUI_BUTTON_ALIGNMENT_FLAGS & flags)) {
-				// FIXME: I'm unsure when exactly this adjustment applies...
-				// we do know that if a button is multiline it should not have margins
-				// I'm actually wondering if we need this at all anymore
-				// I suspect its origins predate the fixing of font baseline alignment
-				r.ExpandAllSides(-5);
-			}
-		}
-
-		Color c = textColor;
-		if (ButtonState == DISABLED || IsDisabled()) {
-			c.r *= 0.66;
-			c.g *= 0.66;
-			c.b *= 0.66;
-		}
-
-		Font::PrintColors colors { c, textBGColor };
-		font->Print(r, Text, align, colors);
-	}
+	DrawLabel(rgn);
 
 	if (!(flags & IE_GUI_BUTTON_NO_IMAGE)) {
 		for (const ButtonBorder& border : borders) {
@@ -308,6 +243,77 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			}
 		}
 	}
+}
+
+void Button::DrawLabel(const Region& rgn) const
+{
+	if (!hasText) {
+		return;
+	}
+
+	// luckily there's no button which sinks when selected AND has a text label
+	ieByte align = 0;
+	if (flags & IE_GUI_BUTTON_ALIGN_LEFT) {
+		align |= IE_FONT_ALIGN_LEFT;
+	} else if (flags & IE_GUI_BUTTON_ALIGN_RIGHT) {
+		align |= IE_FONT_ALIGN_RIGHT;
+	} else {
+		align |= IE_FONT_ALIGN_CENTER;
+	}
+
+	if (flags & IE_GUI_BUTTON_ALIGN_TOP) {
+		align |= IE_FONT_ALIGN_TOP;
+	} else if (flags & IE_GUI_BUTTON_ALIGN_BOTTOM) {
+		align |= IE_FONT_ALIGN_BOTTOM;
+	} else {
+		align |= IE_FONT_ALIGN_MIDDLE;
+	}
+
+	Region r = rgn;
+	if ((flags & (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANCHOR)) == (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANCHOR)) {
+		// reuse mostly unused Anchor system to finetune label placement per-game via python
+		// unlike the original anchors, these are used as offsets from the aligned-to side (relative anchors)
+		// values are set only in an unused file and bg2 journal, where it is not used with a picture
+		// nobody sets the anchor flags bit, so it doesn't come into play
+		if (flags & IE_GUI_BUTTON_ALIGN_LEFT) {
+			r.x += Anchor.x;
+			r.w -= Anchor.x;
+		} else if (align & IE_FONT_ALIGN_RIGHT) {
+			r.w -= Anchor.x;
+		}
+		if (align & IE_FONT_ALIGN_TOP) {
+			r.y += Anchor.y;
+			r.h -= Anchor.y;
+		} else if (align & IE_FONT_ALIGN_BOTTOM) {
+			r.h -= Anchor.y;
+		}
+	} else if (flags & IE_GUI_BUTTON_ANCHOR) {
+		r.x += Anchor.x;
+		r.y += Anchor.y;
+		r.w -= Anchor.x;
+		r.h -= Anchor.y;
+	} else {
+		Font::StringSizeMetrics metrics { r.size, 0, 0, false };
+		font->StringSize(Text, &metrics);
+
+		if (metrics.numLines == 1 && (IE_GUI_BUTTON_ALIGNMENT_FLAGS & flags)) {
+			// FIXME: I'm unsure when exactly this adjustment applies...
+			// we do know that if a button is multiline it should not have margins
+			// I'm actually wondering if we need this at all anymore
+			// I suspect its origins predate the fixing of font baseline alignment
+			r.ExpandAllSides(-5);
+		}
+	}
+
+	Color c = textColor;
+	if (ButtonState == DISABLED || IsDisabled()) {
+		c.r *= 0.66;
+		c.g *= 0.66;
+		c.b *= 0.66;
+	}
+
+	Font::PrintColors colors { c, textBGColor };
+	font->Print(r, Text, align, colors);
 }
 
 /** Sets the Button State */
