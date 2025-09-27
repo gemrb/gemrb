@@ -198,6 +198,12 @@ def SetupPortraitButton (Button, pcID, needControls = 0):
 	Button.SetFont (StatesFont)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	xAnchor, yAnchor = 7, 7
+	if GameCheck.IsIWD1 ():
+		xAnchor, yAnchor = 5, 5
+	elif GameCheck.IsIWD2 ():
+		xAnchor, yAnchor = 2, 2
+	GUICommon.SetButtonAnchor (Button, xAnchor, yAnchor)
 
 	if needControls or GameCheck.IsIWD2 ():
 		Button.OnRightPress (GUICommonWindows.OpenInventoryWindowClick)

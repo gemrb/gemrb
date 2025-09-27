@@ -248,30 +248,22 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			align |= IE_FONT_ALIGN_MIDDLE;
 
 		Region r = rgn;
-		if (flags & IE_GUI_BUTTON_PICTURE) {
+		if ((flags & (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANCHOR)) == (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANCHOR)) {
 			// reuse mostly unused Anchor system to finetune label placement per-game via python
 			// unlike the original anchors, these are used as offsets from the aligned-to side (relative anchors)
 			// values are set only in an unused file and bg2 journal, where it is not used with a picture
 			// nobody sets the anchor flags bit, so it doesn't come into play
-			if (flags & IE_GUI_BUTTON_ANCHOR) {
-				if (flags & IE_GUI_BUTTON_ALIGN_LEFT) {
-					r.x += Anchor.x;
-					r.w -= Anchor.x;
-				} else if (align & IE_FONT_ALIGN_RIGHT) {
-					r.w -= Anchor.x;
-				}
-				if (align & IE_FONT_ALIGN_TOP) {
-					r.y += Anchor.y;
-					r.h -= Anchor.y;
-				} else if (align & IE_FONT_ALIGN_BOTTOM) {
-					r.h -= Anchor.y;
-				}
+			if (flags & IE_GUI_BUTTON_ALIGN_LEFT) {
+				r.x += Anchor.x;
+				r.w -= Anchor.x;
+			} else if (align & IE_FONT_ALIGN_RIGHT) {
+				r.w -= Anchor.x;
 			}
-			// constrain the label (status icons) to the picture bounds
-			// but not inventory icons nor quick slots
-			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
-			if (Picture && align == (IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_BOTTOM)) {
-				r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
+			if (align & IE_FONT_ALIGN_TOP) {
+				r.y += Anchor.y;
+				r.h -= Anchor.y;
+			} else if (align & IE_FONT_ALIGN_BOTTOM) {
+				r.h -= Anchor.y;
 			}
 		} else if (flags & IE_GUI_BUTTON_ANCHOR) {
 			r.x += Anchor.x;
