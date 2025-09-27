@@ -199,29 +199,6 @@ def OpenFloatMenuWindow (x=0, y=0):
 		Button.SetFont ('NUMBER')
 		Button.SetPushOffset (0, 0)
 
-	# BAMs:
-	# AMALLSTP - 41655
-	# AMATTCK - 41654
-	#AMGENB1
-	#AMGENS
-	#AMGUARD - 31657, 32431, 41652, 48887
-	#AMHILITE - highlight frame
-	#AMINVNT - 41601, 41709
-	#AMJRNL - 41623, 41714
-	#AMMAP - 41625, 41710
-	#AMSPLL - 4709
-	#AMSTAT - 4707
-	#AMTLK - 41653
-
-	#AMPANN
-	#AMPDKK
-	#AMPFFG
-	#AMPIGY
-	#AMPMRT
-	#AMPNDM
-	#AMPNM1
-	#AMPVHA
-
 	num = 0
 	for i in range (GemRB.GetPartySize ()):
 		if GemRB.GameIsPCSelected (i + 1):
