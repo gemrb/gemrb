@@ -256,7 +256,8 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 				r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
 			} else {
 				r.w -= 4;
-				r.h -= 4;
+				// pst needs a smaller offset
+				r.h -= rgn.h > 40 ? 4 : 1;
 			}
 		} else if (flags & IE_GUI_BUTTON_ANCHOR) {
 			r.x += Anchor.x;
