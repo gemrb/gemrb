@@ -6204,12 +6204,11 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable* checker) const
 		}
 	}
 	if (ga_flags & GA_ONLY_BUMPABLE) {
-		// NOTE: if you add new conditions, make sure TraversabilityCache gets updated accordingly
-		if (core->GetGame()->CombatCounter) return false; // handled when TraversabilityCache is used (e.g. FindPath)
-		if (GetStat(IE_EA) >= EA_EVILCUTOFF) return false; // handled in pcf_ea
+		if (core->GetGame()->CombatCounter) return false;
+		if (GetStat(IE_EA) >= EA_EVILCUTOFF) return false;
 		// Skip sitting patrons
-		if (GetStat(IE_ANIMATION_ID) >= 0x4000 && GetStat(IE_ANIMATION_ID) <= 0x4112) return false; // ignored
-		if (IsInMovingStance()) return false; // handled in Movable::SetStanceDirect
+		if (GetStat(IE_ANIMATION_ID) >= 0x4000 && GetStat(IE_ANIMATION_ID) <= 0x4112) return false;
+		if (IsInMovingStance()) return false;
 	}
 	if (ga_flags & GA_CAN_BUMP) {
 		if (core->GetGame()->CombatCounter) return false;
