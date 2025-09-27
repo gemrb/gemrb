@@ -6339,7 +6339,7 @@ static PyObject* SetSpellIcon(Button* btn, const ResRef& SpellResRef, int type, 
 	ABORT_IF_NULL(btn);
 
 	if (SpellResRef.IsEmpty()) {
-		btn->SetPicture(NULL);
+		btn->SetPicture(nullptr);
 		//no incref here!
 		return Py_None;
 	}
@@ -6362,14 +6362,16 @@ static PyObject* SetSpellIcon(Button* btn, const ResRef& SpellResRef, int type, 
 	if (!af) {
 		return RuntimeError(fmt::format("{} BAM not found", iconResRef));
 	}
-	//small difference between pst and others
-	if (af->GetCycleSize(0) != 4) { //non-pst
-		btn->SetPicture(af->GetFrame(0, 0));
-	} else { //pst
+	// small difference: pst has a other frames in cycle 0, no cycle 1
+	// others (mostly?) only have the same frame in cycle 0 and 1
+	// so we overlay a picture for others and replace the button bam for pst
+	if (af->GetCycleSize(0) == 4) { // pst
 		btn->SetImage(ButtonImage::Unpressed, af->GetFrame(0, 0));
 		btn->SetImage(ButtonImage::Pressed, af->GetFrame(1, 0));
 		btn->SetImage(ButtonImage::Selected, af->GetFrame(2, 0));
 		btn->SetImage(ButtonImage::Disabled, af->GetFrame(3, 0));
+	} else {
+		btn->SetPicture(af->GetFrame(0, 0));
 	}
 	if (tooltip) {
 		SetViewTooltipFromRef(btn, spell->SpellName);
