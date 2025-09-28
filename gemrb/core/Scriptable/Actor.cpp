@@ -4841,34 +4841,34 @@ void Actor::PlaySwingSound(const WeaponInfo& wi) const
 	// TobExAL and Infinity Sounds prefer both to be played, so we match that, giving more choice to modders
 	// they override any values in the 2da, which is something GetVerbalConstantSound handles for us
 	int stance = GetStance();
-	EnumIterator<Verbal> vb(Verbal::count);
+	Verbal vb = Verbal::count;
 	switch (stance) {
 		case IE_ANI_ATTACK_SLASH:
-			vb = EnumIterator<Verbal>(Verbal::Attack1);
+			vb = Verbal::Attack1;
 			break;
 		case IE_ANI_ATTACK_BACKSLASH:
-			vb = EnumIterator<Verbal>(Verbal::Attack2);
+			vb = Verbal::Attack2;
 			break;
 		case IE_ANI_ATTACK_JAB:
-			vb = EnumIterator<Verbal>(Verbal::Attack3);
+			vb = Verbal::Attack3;
 			break;
 		case IE_ANI_SHOOT:
-			vb = EnumIterator<Verbal>(Verbal::Attack4);
+			vb = Verbal::Attack4;
 			break;
 		default:
 			Log(WARNING, "Actor", "Unknown attack stance detected ({}) for {}, not playing creature swing sound!", stance, fmt::WideToChar { LongName });
 			break;
 	}
-	if (vb != vb.end()) {
+	if (vb != Verbal::count) {
 		bool found = false;
 		// limit to once per round so high APR actors don't spam
 		if (!InParty || attackcount == attacksperround) {
-			VerbalConstant(*vb);
+			VerbalConstant(vb);
 		}
 		// retry with 2da for soundsets, since they only checked one thing
 		if (!found) {
 			ResRef sound2;
-			GetSoundFromFile(sound2, *vb);
+			GetSoundFromFile(sound2, vb);
 			if (sound != sound2) {
 				core->GetAudioPlayback().Play(sound2, AudioPreset::Spatial, SFXChannel::Swings, Pos);
 			}
