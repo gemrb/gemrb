@@ -66,14 +66,17 @@ int ZLibManager::Decompress(DataStream* dest, DataStream* source, unsigned int s
 				size_guess = std::max<unsigned int>(0, size_guess - stream.avail_in);
 			}
 			if (source->Read(bufferin, stream.avail_in) != (int) stream.avail_in) {
+				inflateEnd(&stream);
 				return GEM_ERROR;
 			}
 		}
 		result = inflate(&stream, Z_NO_FLUSH);
 		if (result != Z_OK && result != Z_STREAM_END) {
+			inflateEnd(&stream);
 			return GEM_ERROR;
 		}
 		if (dest->Write(bufferout, OUTPUTSIZE - stream.avail_out) == GEM_ERROR) {
+			inflateEnd(&stream);
 			return GEM_ERROR;
 		}
 		if (result == Z_STREAM_END) {
@@ -111,6 +114,7 @@ int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 			unsigned long remains = std::min<unsigned long>(source->Remains(), std::numeric_limits<uInt>::max());
 			stream.avail_in = std::min<uInt>(static_cast<uInt>(remains), INPUTSIZE);
 			if (source->Read(bufferin, stream.avail_in) != (int) stream.avail_in) {
+				deflateEnd(&stream);
 				return GEM_ERROR;
 			}
 		}
@@ -120,9 +124,11 @@ int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 			result = deflate(&stream, Z_NO_FLUSH);
 		}
 		if (result != Z_OK && result != Z_STREAM_END) {
+			deflateEnd(&stream);
 			return GEM_ERROR;
 		}
 		if (dest->Write(bufferout, OUTPUTSIZE - stream.avail_out) == GEM_ERROR) {
+			deflateEnd(&stream);
 			return GEM_ERROR;
 		}
 		if (result == Z_STREAM_END) {
