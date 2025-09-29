@@ -316,7 +316,7 @@ std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(const ITMExtHeader* hea
 			damage.DiceSides = fx->DiceSides;
 			damage.DiceBonus = fx->Parameter1;
 			damage.Chance = fx->ProbabilityRangeMax - fx->ProbabilityRangeMin;
-			damage_opcodes.push_back(damage);
+			damage_opcodes.push_back(std::move(damage));
 		}
 	}
 	return damage_opcodes;

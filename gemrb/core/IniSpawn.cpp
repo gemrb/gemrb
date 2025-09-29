@@ -569,7 +569,7 @@ void IniSpawn::ReadSpawnEntry(const DataFileMgr* inifile, StringView entryname, 
 		CritterEntry critter = ReadCreature(inifile, critters[crittercount]);
 		// don't add disabled or defective entries
 		if (!critter.CreFile.empty()) {
-			entry.critters.push_back(critter);
+			entry.critters.push_back(std::move(critter));
 		}
 	}
 	entry.critters.shrink_to_fit();

@@ -54,7 +54,7 @@ private:
 	microseconds duration = microseconds { 0 };
 
 	std::vector<unsigned char> videoLoadBuffer;
-	GstMveDemuxStream gstData;
+	GstMveDemuxStream gstData {};
 	std::vector<char> codeMap;
 	std::vector<char> videoBackBuffer;
 

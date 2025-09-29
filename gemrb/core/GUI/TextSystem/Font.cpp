@@ -66,7 +66,7 @@ static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 			break;
 		}
 
-		memcpy(dest, src, srcSize.w * glyph.bytesPerPx);
+		memcpy(dest, src, size_t(srcSize.w) * glyph.bytesPerPx);
 		dest += size.w * glyph.bytesPerPx;
 		src += glyph.pitch * glyph.bytesPerPx;
 	}
@@ -94,13 +94,13 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		// must grow to accommodate this glyph
 		if (Sheet) {
 			// if we already have a sheet we need to destroy it before we can add more glyphs
-			pageData = (ieByte*) calloc(SheetRegion.w, glyphH * g.bytesPerPx);
+			pageData = (ieByte*) calloc(SheetRegion.w, size_t(glyphH) * g.bytesPerPx);
 			const ieByte* pixels = static_cast<const ieByte*>(Sheet->LockSprite());
 			std::copy(pixels, pixels + (Sheet->Frame.w * Sheet->Frame.h) * g.bytesPerPx, pageData);
 			Sheet->UnlockSprite();
 			Sheet = nullptr;
 		} else {
-			pageData = (ieByte*) realloc(pageData, SheetRegion.w * glyphH * g.bytesPerPx);
+			pageData = (ieByte*) realloc(pageData, size_t(SheetRegion.w * glyphH) * g.bytesPerPx);
 		}
 
 		assert(pageData);

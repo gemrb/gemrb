@@ -2003,10 +2003,10 @@ int Interface::LoadSymbol(const ResRef& ref)
 		}
 	}
 	if (ind != -1) {
-		symbols[ind] = s;
+		symbols[ind] = std::move(s);
 		return ind;
 	}
-	symbols.push_back(s);
+	symbols.push_back(std::move(s));
 	return (int) symbols.size() - 1;
 }
 /** Gets the index of a loaded Symbol Table, returns -1 on error */

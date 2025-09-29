@@ -76,7 +76,7 @@ public:
 private:
 	AudioBufferFormat lastFormat;
 	ALPair sources;
-	int channelVolume;
+	int channelVolume = 0;
 };
 
 class OpenALSoundStreamHandle : public SoundStreamSourceHandle {

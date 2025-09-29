@@ -287,7 +287,7 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
 	// number of elements, while memset performs better for large vectors
 	memset(static_cast<void*>(parents.data()), 0, sizeof(decltype(parents)::value_type) * mapCellsCount);
-	memset(static_cast<void*>(distFromStart.data()), std::numeric_limits<unsigned short>::max(), sizeof(decltype(distFromStart)::value_type) * mapCellsCount);
+	memset(static_cast<void*>(distFromStart.data()), 255, sizeof(decltype(distFromStart)::value_type) * mapCellsCount);
 
 	// begin algo init
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
@@ -422,7 +422,7 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 				newStep.orient = GetOrient(nmptParent, nmptCurrent);
 			}
 
-			resultPath.PrependStep(newStep);
+			resultPath.PrependStep(std::move(newStep));
 			nmptCurrent = nmptParent;
 
 			smptCurrent = SearchmapPoint(nmptCurrent);

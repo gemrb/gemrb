@@ -156,7 +156,7 @@ bool KEYImporter::Open(const path_t& resfile, std::string desc)
 				be.name[p] = PathDelimiter;
 		}
 		FindBIF(&be);
-		biffiles.push_back(be);
+		biffiles.push_back(std::move(be));
 	}
 	f->Seek(ResOffset, GEM_STREAM_START);
 

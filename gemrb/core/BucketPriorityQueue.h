@@ -52,7 +52,7 @@ public:
 	{
 		--count;
 		// find the first non-empty bucket with minimum index - under this index we will find bucket with the cheapest Point
-		while (minBucket < CostPointBuckets::BUCKETS_COUNT && buckets.IsEmpty(minBucket)) {
+		while (minBucket < CostPointBuckets::BUCKETS_COUNT - 1 && buckets.IsEmpty(minBucket)) {
 			++minBucket;
 		}
 

@@ -86,7 +86,7 @@ SDLSoundSourceHandle::SDLSoundSourceHandle(
 	const AudioPlaybackConfig& config,
 	PositionGetter positionGetter,
 	int channel)
-	: id(nextId++), config(config), positionGetter(positionGetter), channel(channel)
+	: id(nextId++), config(config), positionGetter(std::move(positionGetter)), channel(channel)
 {
 	if (channel != -1) {
 		reserved = true;

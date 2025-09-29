@@ -53,7 +53,7 @@ struct GEM_EXPORT AudioPlaybackConfig {
 	bool spatial = false;
 	AudioPoint position;
 
-	uint16_t muteDistance;
+	uint16_t muteDistance = 1;
 
 	bool directional = false;
 	std::array<float, 3> direction = { 0.0f, 0.0f, 0.0f };

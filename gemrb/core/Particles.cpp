@@ -62,13 +62,7 @@ static void InitSparks()
 	}
 	while (i--) {
 		for (int j = 0; j < MAX_SPARK_PHASE; j++) {
-			TableMgr::index_t idx;
-
-			if (i < MAX_SPARK_COLOR) {
-				idx = spark_color_indices[i];
-			} else {
-				idx = i;
-			}
+			TableMgr::index_t idx = spark_color_indices[i];
 			const char* value = tab->QueryField(idx, j).c_str();
 			TranslateColor(value, sparkcolors[i][j]);
 		}

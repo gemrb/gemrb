@@ -305,7 +305,7 @@ bool SaveGameIterator::RescanSaveGames()
 	for (const auto& slot : slots) {
 		auto saveGame = BuildSaveGame(slot);
 		if (saveGame) {
-			save_slots.push_back(saveGame);
+			save_slots.push_back(std::move(saveGame));
 		}
 	}
 

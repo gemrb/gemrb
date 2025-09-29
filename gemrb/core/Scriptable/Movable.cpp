@@ -454,7 +454,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	}
 	if (!randomStep.point.IsZero()) {
 		Destination = randomStep.point;
-		path.PrependStep(randomStep); // start or end doesn't matter, since the path is currently empty
+		path.PrependStep(std::move(randomStep)); // start or end doesn't matter, since the path is currently empty
 	} else {
 		randomWalkCounter = 0;
 		WalkTo(HomeLocation);

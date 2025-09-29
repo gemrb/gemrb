@@ -116,9 +116,9 @@ struct Path {
 		nodes.push_back(std::move(step));
 		return nodes.end() - 1;
 	}
-	void PrependStep(PathNode& step)
+	void PrependStep(PathNode&& step)
 	{
-		nodes.insert(nodes.begin(), std::move(step));
+		nodes.insert(nodes.begin(), step);
 	}
 	void AppendPath(const Path& path2)
 	{

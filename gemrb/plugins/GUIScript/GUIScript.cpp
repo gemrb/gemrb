@@ -2734,7 +2734,7 @@ static PyObject* GemRB_AddNewArea(PyObject* /*self*/, PyObject* args)
 
 			size_t areaIndex;
 			const WMPAreaEntry* oarea = wmap->GetArea(larea, areaIndex);
-			if (!oarea) {
+			if (!oarea || linktodir == WMPDirection::count) {
 				//blabla
 				return RuntimeError("cannot establish area link!");
 			}

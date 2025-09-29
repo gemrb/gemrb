@@ -535,7 +535,7 @@ Holder<SoundBufferHandle> OpenALBackend::LoadSound(
 	ResourceHolder<SoundMgr> resource,
 	const AudioPlaybackConfig& config)
 {
-	auto buffers = GetBuffers(resource, config.spatial);
+	auto buffers = GetBuffers(std::move(resource), config.spatial);
 	if (buffers.first == 0) {
 		return Holder<SoundBufferHandle>();
 	}

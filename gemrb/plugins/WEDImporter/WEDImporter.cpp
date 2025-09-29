@@ -408,7 +408,7 @@ std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
 			ieWord polyIndex = PLT[j];
 			auto wp = polygonTable[polyIndex];
 			if (wp) {
-				group.push_back(wp);
+				group.push_back(std::move(wp));
 			}
 		}
 	}
