@@ -5048,15 +5048,14 @@ int fx_replace_creature(Scriptable* Owner, Actor* target, Effect* fx)
 // 0x98 PlayMovie
 int fx_play_movie(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	// print("fx_play_movie(%2d): Resource: %s", fx->Opcode, fx->Resource);
 	core->PlayMovie(fx->Resource);
 	return FX_NOT_APPLIED;
 }
 // 0x99 Overlay:Sanctuary
 // iwd and bg are a bit different, but we solve the whole stuff in a single opcode
+// ees added external resource support to overlay opcodes, which we handle in Actor (OverrideVVC)
 int fx_set_sanctuary_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_set_sanctuary_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	static const ieDword fullwhite[7] = { ICE_GRADIENT, ICE_GRADIENT, ICE_GRADIENT, ICE_GRADIENT, ICE_GRADIENT, ICE_GRADIENT, ICE_GRADIENT };
 
 	// don't set the state twice
@@ -5079,8 +5078,6 @@ int fx_set_sanctuary_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x9a Overlay:Entangle
 int fx_set_entangle_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_set_entangle_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
 	//iwd2 effects that disable entangle
 	if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
 	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
@@ -5095,7 +5092,6 @@ int fx_set_entangle_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x9b Overlay:MinorGlobe
 int fx_set_minorglobe_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
-	// print("fx_set_minorglobe_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	//the globe vanishes on death
 	if (STATE_GET(STATE_DEAD)) {
 		return FX_NOT_APPLIED;
@@ -5109,7 +5105,6 @@ int fx_set_minorglobe_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 // 0x9c Overlay:ShieldGlobe
 int fx_set_shieldglobe_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
-	// print("fx_set_shieldglobe_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	//the shield vanishes on dead
 	if (STATE_GET(STATE_DEAD)) {
 		return FX_NOT_APPLIED;
@@ -5121,8 +5116,6 @@ int fx_set_shieldglobe_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*
 // 0x9d Overlay:Web
 int fx_set_web_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
-	// print("fx_set_web_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
 	//iwd2 effects that disable web
 	if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
 	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
@@ -5138,8 +5131,6 @@ int fx_set_web_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 // 0x9e Overlay:Grease
 int fx_set_grease_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
-	// print("fx_set_grease_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
 	//iwd2 effects that disable grease
 	if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
 	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
