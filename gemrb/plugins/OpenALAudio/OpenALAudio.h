@@ -95,8 +95,8 @@ public:
 	void SetVolume(int volume) override;
 
 private:
-	ALuint source;
-	int channelVolume;
+	ALuint source = 0;
+	int channelVolume = 0;
 	void UnloadFinishedSourceBuffers() const;
 };
 
