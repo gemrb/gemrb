@@ -72,6 +72,12 @@ void AreaAnimation::InitAnimation()
 		return;
 	}
 
+	index_t animCount = af->GetCycleCount();
+	if (!animCount) {
+		Log(ERROR, "Map", "Will not load empty animation: {}", BAM);
+		return;
+	}
+
 	auto GetAnimationPiece = [af, this](index_t animCycle) {
 		Animation ret;
 		Animation* anim = af->GetCycle(animCycle);
@@ -95,7 +101,6 @@ void AreaAnimation::InitAnimation()
 		return ret;
 	};
 
-	index_t animCount = af->GetCycleCount();
 	animation.reserve(animCount);
 	index_t existingcount = std::min<index_t>(animation.size(), animCount);
 
