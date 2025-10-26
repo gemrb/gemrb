@@ -1,6 +1,7 @@
 FILE(GLOB gemrb_core_LIB_SRCS
 	Animation.cpp
 	AnimationFactory.cpp
+	AreaAnimation.cpp
 	Audio/Ambient.cpp
 	Audio/AmbientMgr.cpp
 	Audio/AudioBackend.cpp
