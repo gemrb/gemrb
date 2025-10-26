@@ -9729,6 +9729,7 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 	}
 
 	pro->SetCaster(GetGlobalID(), gamedata->GetMiscRule("ITEM_CASTERLEVEL"));
+	pro->SFlags &= ~PSF_FLYING;
 	if (flags & UI_FAKE) {
 		delete pro;
 	} else if (header < 0 && !(flags & UI_MISS)) { // using a weapon
@@ -9756,7 +9757,6 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 			pro->TFlags |= PTF_TIMELESS;
 		}
 		attackProjectile = pro;
-		attackProjectile->SFlags &= ~PSF_FLYING;
 		// check if critical hit needs a screenshake
 		bool pm = InParty || (target->Type == ST_ACTOR && Scriptable::As<Actor>(target)->InParty);
 		if (flags & UI_CRITICAL && CFGCache.critHitShake && pm) {
