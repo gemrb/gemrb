@@ -12,3 +12,5 @@ IDS
 148 BashDoor(O:Object)
 112 UseContainer()
 93 LeaveAreaName(O:Target*)
+113 ForceSpellRES(S:RES*,O:Target,I:CastingLevel)
+114 ForceSpellPointRES(S:RES*,P:Target,I:CastingLevel)

@@ -15,4 +15,6 @@ IDS
 93 LeaveAreaName(O:Target*)
 354 RunAwayFromNoInterruptNoLeaveArea(O:Creature,I:Time)
 113 ForceSpellRES(S:RES*,O:Target)
+113 ForceSpellRES(S:RES*,O:Target,I:CastingLevel)
 114 ForceSpellPointRES(S:RES*,P:Target)
+114 ForceSpellPointRES(S:RES*,P:Target,I:CastingLevel)
