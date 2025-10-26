@@ -4056,8 +4056,17 @@ void AreaAnimation::Draw(const Region& viewport, Color tint, BlitFlags bf) const
 
 void AreaAnimation::Update()
 {
-	for (auto& anim : animation) {
-		anim.NextFrame();
+	if (animation.empty()) return;
+
+	Animation& firstAnim = animation[0];
+	firstAnim.NextFrame();
+	for (size_t idx = 1; idx < animation.size(); ++idx) {
+		Animation& anim = animation[idx];
+		if (bool(anim.flags & Animation::Flags::Sync)) {
+			anim.GetSyncedNextFrame(&firstAnim);
+		} else {
+			anim.NextFrame();
+		}
 	}
 }
 
