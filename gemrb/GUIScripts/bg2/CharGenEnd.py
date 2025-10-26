@@ -111,7 +111,7 @@ def RunGame(MyChar):
 		CommonWindow.SetGameGUIHidden(True)
 
 		GemRB.EnterGame()
-		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
+		GemRB.SetTimedEvent (lambda: GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar), 1)
 		if GameCheck.IsTOB ():
 			# delay for sorcerers, since their class pcf needs to run first to set up their spellbook properly
 			GemRB.SetTimedEvent (lambda: GemRB.ChargeSpells (MyChar), 1)
