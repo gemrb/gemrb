@@ -119,6 +119,8 @@ def StartTextScreen ():
 		FindTextRow (Table)
 	elif GameCheck.IsBG2OrEE ():
 		FindTextRow (Table)
+		if LoadPic == "NONE": # (at least) tutu tries to load a nonexisting image
+			LoadPic = None
 		if LoadPic != "":
 			if ID == 63:
 				#only for BG2 epilogue windows
