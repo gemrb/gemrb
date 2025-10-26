@@ -1165,7 +1165,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	// 4. set the video stencil buffer to animWallStencil
 	// 5. Draw background animations (BlitFlags::STENCIL_GREEN)
 	// 6. set the video stencil buffer to wallStencil
-	// 7. draw scriptables (depending on scriptable->ForceDither() return value)
+	// 7. draw scriptables (order depending on their effective height)
 	// 8. draw fog (BlitFlags::BLENDED)
 	// 9. draw text (BlitFlags::BLENDED)
 
