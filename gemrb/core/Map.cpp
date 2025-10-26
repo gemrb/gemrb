@@ -1208,6 +1208,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
+	AreaAnimation* masterAreaAnimation = nullptr; // save one for syncing purposes
 
 	auto DrawAreaAnimation = [&, this](AreaAnimation* a) {
 		BlitFlags flags = SetDrawingStencilForAreaAnimation(a, viewport);
@@ -1225,7 +1226,10 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		game->ApplyGlobalTint(tint, flags);
 
 		a->Draw(viewport, tint, flags);
-		a->Update();
+		a->Update(masterAreaAnimation);
+		if (!masterAreaAnimation && bool(a->flags & AreaAnimation::Flags::Sync)) {
+			masterAreaAnimation = a;
+		}
 		return GetNextAreaAnimation(aniidx, gametime);
 	};
 

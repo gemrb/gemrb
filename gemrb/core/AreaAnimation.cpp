@@ -173,12 +173,17 @@ void AreaAnimation::Draw(const Region& viewport, Color tint, BlitFlags bf) const
 	}
 }
 
-void AreaAnimation::Update()
+void AreaAnimation::Update(const AreaAnimation* master)
 {
 	if (animation.empty()) return;
 
 	Animation& firstAnim = animation[0];
-	firstAnim.NextFrame();
+	if (master && bool(firstAnim.flags & Animation::Flags::Sync)) {
+		firstAnim.GetSyncedNextFrame(&master->animation[0]);
+	} else {
+		firstAnim.NextFrame();
+	}
+
 	for (size_t idx = 1; idx < animation.size(); ++idx) {
 		Animation& anim = animation[idx];
 		if (bool(anim.flags & Animation::Flags::Sync)) {
