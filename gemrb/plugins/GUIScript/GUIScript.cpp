@@ -3498,7 +3498,7 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 PyDoc_STRVAR(GemRB_GetSprite__doc,
 	     "===== GetSprite =====\n\
 \n\
-**Prototype:** GemRB.GetSprite (resref[, grad, cycle, frame])\n\
+**Prototype:** GemRB.GetSprite (resref[, grad, cycle, frame, size])\n\
 \n\
 **Description:** Return a Sprite2D for a given resref. If \n\
 the supplied color gradient value is the default -1, then no palette change, \n\
@@ -3509,6 +3509,7 @@ uses 12 colors palette, it has issues in PST.\n\
   * resref - the name of the BAM animation (a .bam resref)\n\
   * grad - the gradient number, (-1 is no gradient)\n\
   * cycle, frame - the cycle and frame index of the picture in the bam\n\
+  * size - get the sprite dimensions instead\n\
 \n\
 **Return value:** N/A\n");
 
@@ -3517,8 +3518,9 @@ static PyObject* GemRB_GetSprite(PyObject* /*self*/, PyObject* args)
 	int cycle = 0;
 	int frame = 0;
 	int palidx = -1;
+	int size = 0;
 	PyObject* pyObj;
-	PARSE_ARGS(args, "O|iii", &pyObj, &palidx, &cycle, &frame);
+	PARSE_ARGS(args, "O|iiii", &pyObj, &palidx, &cycle, &frame, &size);
 
 	Holder<Sprite2D> spr;
 	if (PyUnicode_Check(pyObj)) {
@@ -3530,7 +3532,14 @@ static PyObject* GemRB_GetSprite(PyObject* /*self*/, PyObject* args)
 	}
 
 	if (spr == nullptr) {
-		spr = SpriteFromPy(pyObj);
+		Size dims;
+		spr = SpriteFromPy(pyObj, &dims);
+		if (size) {
+			PyObject* dict = PyDict_New();
+			PyDict_SetItemString(dict, "w", DecRef(PyLong_FromLong, dims.w));
+			PyDict_SetItemString(dict, "h", DecRef(PyLong_FromLong, dims.h));
+			return dict;
+		}
 	}
 
 	if (spr == nullptr) {

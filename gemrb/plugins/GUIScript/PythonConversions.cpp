@@ -105,13 +105,14 @@ PluginHolder<SymbolMgr> GetSymbols(PyObject* obj)
 	return sm;
 }
 
-Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
+Holder<Sprite2D> SpriteFromPy(PyObject* pypic, Size* size)
 {
 	Holder<Sprite2D> pic;
 	if (PyObject_TypeCheck(pypic, &PyUnicode_Type)) {
 		ResourceHolder<ImageMgr> im = gamedata->GetResourceHolder<ImageMgr>(PyString_AsStringView(pypic));
 		if (im) {
 			pic = im->GetSprite2D();
+			if (size) *size = im->GetSize();
 		}
 	} else if (pypic != Py_None) {
 		pic = CObject<Sprite2D>(pypic);

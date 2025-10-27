@@ -232,7 +232,7 @@ ieStrRef StrRefFromPy(PyObject* obj);
 
 std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj);
 
-Holder<Sprite2D> SpriteFromPy(PyObject* obj);
+Holder<Sprite2D> SpriteFromPy(PyObject* obj, Size* size = nullptr);
 
 /*
  Conversions to PyObject
