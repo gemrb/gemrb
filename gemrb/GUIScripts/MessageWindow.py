@@ -27,6 +27,7 @@ import GUICommon
 import GUICommonWindows
 import PortraitWindow
 
+from ie_restype import RES_MOS
 from GUIDefines import *
 
 def OnLoad():
@@ -93,38 +94,40 @@ WinSizes = {GS_SMALLDIALOG : 45,
 			GS_MEDIUMDIALOG : 109,
 			GS_LARGEDIALOG : 237}
 
-def MWinBG(size, width=None):
-	if width is None:
-		width = GemRB.GetSystemVariable (SV_WIDTH)
+tries = 0
+def MWinBG(size, pack = None):
+	global tries
+
+	if pack is None:
+		pack = GUICommon.GetWindowPack ()
 
 	bg = None
-	if size == GS_SMALLDIALOG:
-		if width == 640:
-			bg = "guiwbtp2"
-		else:
-			bg = "guwbtp2"
-	elif size == GS_MEDIUMDIALOG:
-		bg = "guiwdmb"
-	elif size == GS_LARGEDIALOG:
-		if width == 640:
-			bg = "guiwbtp3"
-		else:
-			bg = "guwbtp3"
+	if pack == "GUIW":
+		bgs = { GS_SMALLDIALOG: "guiwbtp2", GS_MEDIUMDIALOG: "guiwdmb", GS_LARGEDIALOG: "guiwbtp3" }
+		bg = bgs[size]
 	else:
-		raise ValueError('Invalid size for MWinBG')
+		bgs = { GS_SMALLDIALOG: "guwbtp2", GS_MEDIUMDIALOG: "guiwdmb", GS_LARGEDIALOG: "guwbtp3" }
+		bg = bgs[size]
 
-	if width >= 800 and width < 1024:
-		bg = bg + "8"
-	elif width >= 1024:
-		bg = bg + "0"
-
-	# FIXME: infinite recursion possible
-	from ie_restype import RES_MOS
-	if not GemRB.HasResource(bg, RES_MOS):
-		if GameCheck.IsBG2OrEE () or GameCheck.IsIWD2():
-			return MWinBG(size, 800)
+		if pack == "GUIW08":
+			bg = bg + "8"
+		elif pack == "GUIW10":
+			bg = bg + "0"
+		elif GameCheck.IsAnyEE (): # "GUIW13" ... "GUIW20"
+			bg = bg + "9" # 1160px wide
 		else:
-			return MWinBG(size, 640)
+			raise ValueError("Unexpected window pack: " + pack)
+
+	if GemRB.HasResource (bg, RES_MOS):
+		tries = 0
+	else:
+		tries += 1
+		if tries > 1:
+			raise RuntimeError("Cannot find message window background for " + pack)
+		if GameCheck.IsBG2OrEE ():
+			return MWinBG(size, "GUIW08")
+		else:
+			return MWinBG(size, "GUIW")
 
 	return bg
 
