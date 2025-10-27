@@ -97,9 +97,6 @@ def RunGame(MyChar):
 	if GameCheck.IsTOB():
 		# will also add the starting inventory for tob
 		GemRB.GameSetExpansion (4)
-		# no torture, let's refresh all the spells, at least for sorcerers
-		# TODO: add mage memorisation step like in bg1, but to one of the earlier scripts
-		GemRB.ChargeSpells (MyChar)
 
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode is not None:
@@ -111,10 +108,11 @@ def RunGame(MyChar):
 		CommonWindow.SetGameGUIHidden(True)
 
 		GemRB.EnterGame()
-		GemRB.SetTimedEvent (lambda: GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar), 1)
-		if GameCheck.IsTOB ():
+		if GameCheck.IsTOB () and Spellbook.HasSorcererBook (MyChar):
 			# delay for sorcerers, since their class pcf needs to run first to set up their spellbook properly
 			GemRB.SetTimedEvent (lambda: GemRB.ChargeSpells (MyChar), 1)
+		else:
+			GemRB.SetTimedEvent (lambda: GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar), 1)
 	else:
 		#when export is done, go to start
 		if GameCheck.HasTOB():
