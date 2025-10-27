@@ -30,6 +30,9 @@ import PortraitWindow
 from ie_restype import RES_MOS
 from GUIDefines import *
 
+WinSizes = { GS_SMALLDIALOG : 0, GS_MEDIUMDIALOG : 0, GS_LARGEDIALOG : 0 }
+ContractButton = ExpandButton = None
+
 def OnLoad():
 	# just load the medium window always. we can shrink/expand it, but it is the one with both controls
 	# this saves us from having to bend over backwards to load the new window and move the text to it (its also shorter code)
@@ -88,19 +91,9 @@ def OnLoad():
 
 	UpdateControlStatus(True)
 
-# or if we are going to do this a lot maybe add a view flag for automatically resizing to the assigned background
-# TODO: add a GUIScript function to return a dict with a CObject<Sprite2D> + dimensions for a given resref
-WinSizes = {GS_SMALLDIALOG : 45,
-			GS_MEDIUMDIALOG : 109,
-			GS_LARGEDIALOG : 237}
-if GameCheck.IsAnyEE ():
-	WinSizes = {GS_SMALLDIALOG : 50,
-			GS_MEDIUMDIALOG : 141,
-			GS_LARGEDIALOG : 300}
-
 tries = 0
 def MWinBG(size, pack = None):
-	global tries
+	global tries, WinSizes
 
 	if pack is None:
 		pack = GUICommon.GetWindowPack ()
@@ -132,6 +125,10 @@ def MWinBG(size, pack = None):
 			return MWinBG(size, "GUIW08")
 		else:
 			return MWinBG(size, "GUIW")
+
+	if WinSizes[size] == 0:
+		WinSizes[size] = GemRB.GetSprite (bg, -1, 0, 0, 1)["h"]
+		SetMWSize (size, GemRB.GetGUIFlags () & ~GS_DIALOGMASK)
 
 	return bg
 
@@ -165,8 +162,29 @@ def ToggleActionbarClock(show):
 	if clock:
 		clock.SetVisible(show)
 
+def SetMWSize(size, GSFlags):
+	if size not in WinSizes:
+		return
+
+	frame = ContractButton.GetFrame()
+	if size != GS_SMALLDIALOG:
+		frame['y'] -= (frame['h'] + 6)
+	ExpandButton.SetFrame (frame)
+
+	MessageWindow = GemRB.GetView ("MSGWIN")
+	frame = MessageWindow.GetFrame()
+	diff = frame['h'] - WinSizes[size]
+	frame['y'] += diff
+	frame['h'] = WinSizes[size]
+	MessageWindow.SetFrame (frame)
+	MessageWindow.SetBackground (MWinBG(size))
+
+	GemRB.GameSetScreenFlags (size + GSFlags, OP_SET)
+
 MTARestoreSize = None
 def UpdateControlStatus(init = False):
+	global ContractButton, ExpandButton
+
 	MessageWindow = GemRB.GetView("MSGWIN")
 
 	if not MessageWindow:
@@ -188,24 +206,6 @@ def UpdateControlStatus(init = False):
 		Expand = GSFlags&GS_DIALOGMASK
 		GSFlags = GSFlags-Expand
 		return (GSFlags, Expand)
-
-	def SetMWSize(size, GSFlags):
-		if size not in WinSizes:
-			return
-		
-		frame = ContractButton.GetFrame()
-		if size != GS_SMALLDIALOG:
-			frame['y'] -= (frame['h'] + 6)
-		ExpandButton.SetFrame(frame)
-
-		frame = MessageWindow.GetFrame()
-		diff = frame['h'] - WinSizes[size]
-		frame['y'] += diff
-		frame['h'] = WinSizes[size]
-		MessageWindow.SetFrame(frame)
-		MessageWindow.SetBackground(MWinBG(size))
-
-		GemRB.GameSetScreenFlags(size + GSFlags, OP_SET)
 
 	def OnIncreaseSize():
 		GSFlags, Expand = GetGSFlags()
