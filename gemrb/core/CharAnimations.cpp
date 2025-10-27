@@ -528,7 +528,6 @@ void CharAnimations::SetupColors(PaletteType type)
 		if (type != PAL_MAIN) {
 			return;
 		}
-		// TODO: handle equipment colour glows
 
 		// Colors[6] is the COLORCOUNT stat in PST.
 		// It tells how many customisable color slots we have.
@@ -541,32 +540,11 @@ void CharAnimations::SetupColors(PaletteType type)
 		//the color count shouldn't be more than 6!
 		if (colorcount > 6) colorcount = 6;
 		int dest = 256 - colorcount * size;
-		bool needmod = false;
-		if (GlobalColorMod.type != RGBModifier::NONE) {
-			needmod = true;
-		}
-		//don't drop the palette, it disables rgb pulse effects
-		//also don't bail out, we need to free the modified palette later
-		//so this entire block is needless
-		/*
-		if ((colorcount == 0) && (needmod==false) ) {
-		  gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef);
-			PaletteResRef[0]=0;
-			return;
-		}
-		*/
+
 		for (int i = 0; i < colorcount; i++) {
 			const auto& pal32 = core->GetPalette32(static_cast<uint8_t>(Colors[i]));
 			PartPalettes[PAL_MAIN]->CopyColors(dest, pal32.cbegin(), pal32.cend());
 			dest += size;
-		}
-
-		if (needmod) {
-			if (!ModPartPalettes[PAL_MAIN])
-				ModPartPalettes[PAL_MAIN] = MakeHolder<Palette>();
-			*ModPartPalettes[PAL_MAIN] = SetupGlobalRGBModification(PartPalettes[PAL_MAIN], GlobalColorMod);
-		} else {
-			ModPartPalettes[PAL_MAIN] = nullptr;
 		}
 	} else if (type <= PAL_MAIN_5 && paletteType != "0" && !paletteType.IsEmpty()) {
 		//handling special palettes like MBER_BL (black bear)
@@ -585,41 +563,38 @@ void CharAnimations::SetupColors(PaletteType type)
 				PaletteResRef[type].Reset();
 			}
 		}
-		bool needmod = GlobalColorMod.type != RGBModifier::NONE;
-		if (needmod) {
-			if (!ModPartPalettes[type])
-				ModPartPalettes[type] = MakeHolder<Palette>();
-			*ModPartPalettes[type] = SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
-		} else {
-			ModPartPalettes[type] = nullptr;
-		}
 	} else {
 		*pal = SetupPaperdollColours(Colors, type);
 		if (lockPalette) {
 			return;
 		}
+	}
 
-		bool needmod = false;
+	// handle color mods
+	bool needMod = false;
+	if (GlobalColorMod.type != RGBModifier::NONE) {
+		needMod = true;
+	} else {
+		for (size_t i = 0; i < PAL_MAX; ++i) {
+			if (ColorMods[i + 8 * type].type != RGBModifier::NONE) {
+				needMod = true;
+				break;
+			}
+		}
+	}
+
+	if (needMod) {
+		if (!ModPartPalettes[type]) {
+			ModPartPalettes[type] = MakeHolder<Palette>();
+		}
+
 		if (GlobalColorMod.type != RGBModifier::NONE) {
-			needmod = true;
+			*ModPartPalettes[type] = SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
 		} else {
-			for (size_t i = 0; i < PAL_MAX; ++i) {
-				if (ColorMods[i + 8 * type].type != RGBModifier::NONE) needmod = true;
-			}
+			*ModPartPalettes[type] = SetupRGBModification(PartPalettes[type], ColorMods, type);
 		}
-
-		if (needmod) {
-			if (!ModPartPalettes[type])
-				ModPartPalettes[type] = MakeHolder<Palette>();
-
-			if (GlobalColorMod.type != RGBModifier::NONE) {
-				*ModPartPalettes[type] = SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
-			} else {
-				*ModPartPalettes[type] = SetupRGBModification(PartPalettes[type], ColorMods, type);
-			}
-		} else {
-			ModPartPalettes[type] = nullptr;
-		}
+	} else {
+		ModPartPalettes[type] = nullptr;
 	}
 }
 
