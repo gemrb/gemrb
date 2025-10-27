@@ -1068,9 +1068,25 @@ AreaAnimation* Map::GetNextAreaAnimation(aniIterator& iter, ieDword gametime) co
 		if (!a.Schedule(gametime)) {
 			continue;
 		}
-		if (bool(a.flags & AreaAnimation::Flags::NotInFog) ? !IsVisible(a.Pos) : !IsExplored(a.Pos)) {
-			continue;
+		// the animations can be big, so to avoid sudden appearances, check drawing region vertices
+		// for biggest ones also check midpoints, since exploration happens with circles, so e.g. a horizontal
+		// approach would show the midpoint a few tiles before any vertex
+		bool visible = false;
+		Region bbox = a.DrawingRegion();
+		std::vector<Point> verts { bbox.origin, bbox.Maximum(), Point(bbox.x + bbox.w, bbox.y), Point(bbox.x, bbox.y + bbox.h) };
+		if (bbox.w > 150 || bbox.h > 150) {
+			verts.push_back(Point(bbox.x, bbox.y + bbox.h / 2));
+			verts.push_back(Point(bbox.x + bbox.w, bbox.y + bbox.h / 2));
+			verts.push_back(Point(bbox.x + bbox.w / 2, bbox.y));
+			verts.push_back(Point(bbox.x + bbox.w / 2, bbox.y + bbox.h));
 		}
+		for (const auto& point : verts) {
+			if (bool(a.flags & AreaAnimation::Flags::NotInFog) ? IsVisible(point) : IsExplored(point)) {
+				visible = true;
+				break;
+			}
+		}
+		if (!visible) continue;
 
 		return &a;
 	}
