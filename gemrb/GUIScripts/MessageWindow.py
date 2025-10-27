@@ -93,6 +93,10 @@ def OnLoad():
 WinSizes = {GS_SMALLDIALOG : 45,
 			GS_MEDIUMDIALOG : 109,
 			GS_LARGEDIALOG : 237}
+if GameCheck.IsAnyEE ():
+	WinSizes = {GS_SMALLDIALOG : 50,
+			GS_MEDIUMDIALOG : 141,
+			GS_LARGEDIALOG : 300}
 
 tries = 0
 def MWinBG(size, pack = None):
