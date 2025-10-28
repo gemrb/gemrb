@@ -4,7 +4,7 @@ BUILDING GEMRB WITH CMAKE
 Tools you will need to build GemRB:
   - cmake
   - make
-  - a C++11 compatible compiler (g++, clang, MSVC and mingw are known to work)
+  - a C++14 compatible compiler (g++, clang, MSVC and mingw are known to work)
 
 Required dependencies:
   - ZLib
