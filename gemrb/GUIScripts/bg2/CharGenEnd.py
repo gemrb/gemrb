@@ -108,7 +108,7 @@ def RunGame(MyChar):
 		# avoid briefly showing the GUI before the bg2 intro cutscene starts
 		# however BGT and TUTU users can start bg1 through the same code and
 		# that definitely should not hide the GUI
-		if not (GameCheck.HasBGT () or GameCheck.HasTutu ()) or playmode == 1:
+		if not GameCheck.IsBGT ("bg1"):
 			CommonWindow.SetGameGUIHidden (True)
 
 		GemRB.EnterGame()

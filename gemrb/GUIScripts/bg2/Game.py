@@ -153,13 +153,9 @@ def GameExpansion():
 	if not GameCheck.HasTOB():
 		return
 
-	# bgt reuses the tutorial for its soa mode (playmode==0 is bg1)
-	bgtSOA = False
-	if GemRB.GetVar ("PlayMode") == 1 and (GameCheck.HasBGT() or GameCheck.HasTutu()):
-		bgtSOA = True
-
 	# old singleplayer soa or bgt soa/tutorial hybrid
-	if version < 5 and (GemRB.GetVar ("PlayMode") == 0 or bgtSOA) and GemRB.GetVar ("oldgame"):
+	# bgt reuses the tutorial for its soa mode (playmode==0 is bg1)
+	if version < 5 and (GemRB.GetVar ("PlayMode") == 0 or GameCheck.IsBGT ("soa")) and GemRB.GetVar ("oldgame"):
 		#upgrade SoA to ToB/SoA
 		if GemRB.GameSetExpansion(4):
 			GemRB.AddNewArea("xnewarea")

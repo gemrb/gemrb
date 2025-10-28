@@ -68,6 +68,10 @@ def IsBG2Demo ():
 def IsGemRBDemo ():
 	return GemRB.GameType == "demo"
 
+def IsBGT (mode):
+	modes = { "bg1" : 0, "soa" : 1, "tob" : 2 }
+	return (HasBGT () or HasTutu ()) and GemRB.GetVar ("PlayMode") == modes[mode]
+
 def IsTOB ():
 	return GemRB.HasResource ("worldm25", RES_WMP) and GemRB.GetVar("oldgame") == 0
 
