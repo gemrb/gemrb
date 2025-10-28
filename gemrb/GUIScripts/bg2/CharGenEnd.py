@@ -105,7 +105,11 @@ def RunGame(MyChar):
 		import CharGenCommon, CommonWindow
 		CharGenCommon.CharGenWindow.Close ()
 
-		CommonWindow.SetGameGUIHidden(True)
+		# avoid briefly showing the GUI before the bg2 intro cutscene starts
+		# however BGT and TUTU users can start bg1 through the same code and
+		# that definitely should not hide the GUI
+		if not (GameCheck.HasBGT () or GameCheck.HasTutu ()) or playmode == 1:
+			CommonWindow.SetGameGUIHidden (True)
 
 		GemRB.EnterGame()
 		if GameCheck.IsTOB () and Spellbook.HasSorcererBook (MyChar):
