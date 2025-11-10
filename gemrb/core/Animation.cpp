@@ -202,4 +202,9 @@ void Animation::AddAnimArea(const Animation* slave)
 	animArea.ExpandToRegion(slave->animArea);
 }
 
+bool Animation::IsActive() const
+{
+	return !paused;
+}
+
 }

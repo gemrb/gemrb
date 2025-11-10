@@ -146,6 +146,7 @@ public:
 	explicit SpriteAnimation(std::shared_ptr<Animation> anim);
 
 	bool HasEnded() const override;
+	bool IsActive() const;
 
 	Animation::Flags& flags;
 	bool& gameAnimation;
