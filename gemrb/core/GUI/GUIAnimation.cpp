@@ -91,4 +91,9 @@ bool SpriteAnimation::HasEnded() const
 	return anim->endReached;
 }
 
+bool SpriteAnimation::IsActive() const
+{
+	return anim && anim->IsActive();
+}
+
 }

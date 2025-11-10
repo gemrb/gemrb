@@ -342,7 +342,7 @@ void Button::SetState(State state)
 
 bool Button::IsAnimated() const
 {
-	if (animation) {
+	if (animation && animation->IsActive()) {
 		return true;
 	}
 

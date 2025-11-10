@@ -84,6 +84,7 @@ public:
 	index_t GetCurrentFrameIndex() const;
 	/** add other animation's animarea to self */
 	void AddAnimArea(const Animation* slave);
+	bool IsActive() const;
 
 private:
 	std::vector<frame_t> frames;
