@@ -60,7 +60,12 @@ void MusicLoop::Load(ResourceHolder<SoundMgr> music)
 	currentFormat.channels = 2; // GetChannels may report garbage
 	currentFormat.sampleRate = music->GetSampleRate();
 
-	loadBuffer.resize(currentFormat.GetNumBytesForMs(CHUNK_BUFFER_SIZE_MS) / 2);
+	auto loadBufferSize = currentFormat.GetNumBytesForMs(CHUNK_BUFFER_SIZE_MS) / 2;
+	// OGGReader does not like odd buffer sizes
+	if (loadBufferSize % 2 == 1) {
+		loadBufferSize -= 1;
+	}
+	loadBuffer.resize(loadBufferSize);
 
 	currentMusic = std::move(music);
 	rampUp = true;
