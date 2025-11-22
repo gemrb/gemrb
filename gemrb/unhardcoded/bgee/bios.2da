@@ -1,0 +1,24 @@
+2DA V1.0
+15889
+                    BIO
+*                   *
+MAGE                15882
+FIGHTER             15881
+CLERIC              15884
+THIEF               15883
+BARD                15886
+PALADIN             15887
+FIGHTER_MAGE        15889
+FIGHTER_CLERIC      15889
+FIGHTER_THIEF       15889
+FIGHTER_MAGE_THIEF  15889
+DRUID               15885
+RANGER              15888
+MAGE_THIEF          15889
+CLERIC_MAGE         15889
+CLERIC_THIEF        15889
+FIGHTER_DRUID       15889
+FIGHTER_MAGE_CLERIC 15889
+CLERIC_RANGER       15889
+SORCERER            *
+MONK                *

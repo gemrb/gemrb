@@ -1,0 +1,6 @@
+2DA V1.0
+*
+           XPOS                YPOS                AREA                ROT        
+NORMAL     START_XPOS          START_YPOS          START_AREA          *          
+TUTORIAL   START_XPOS_TUTORIAL START_YPOS_TUTORIAL START_AREA_TUTORIAL *          
+EXPANSION  START_XPOS_MP       START_YPOS_MP       START_AREA_MP       *          

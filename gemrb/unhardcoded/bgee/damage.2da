@@ -1,0 +1,16 @@
+2DA V1.0
+*
+        MAIN      SPARKS    GRADIENT  BLEND
+CRIT    BLOODCR   *         47        0
+SMALL   BLOODS    *         47        0
+MEDIUM  BLOODM    *         47        0
+LARGE   BLOODL    *         47        0
+FIRES   SPFIRIMP  SPBURN    19        1
+FIREM   SPFIRIMP  SPBURN    19        1
+FIREL   SPFIRIMP  SPBURN    19        1
+SPARKS  SPSHKIMP  SPSPARKS  -1        1
+SPARKM  SPSHKIMP  SPSPARKS  -1        1
+SPARKL  SPSHKIMP  SPSPARKS  -1        1
+ICES    SPFIRIMP  *         71        1
+ICEM    SPFIRIMP  *         71        1
+ICEL    SPFIRIMP  *         71        1

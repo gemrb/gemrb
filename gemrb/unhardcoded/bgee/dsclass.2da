@@ -1,0 +1,24 @@
+2DA V1.0
+0
+	   CLASS BONUS
+MAGE    1     5
+FIGHTER 2     10
+CLERIC  3     10
+THIEF   4     15
+BARD    5     15
+PALADIN 6     10
+FM      7     10
+FC      8     10
+FT      9     15
+FMT     10    15
+DRUID   11    10
+RANGER  12    10
+MT      13    15
+CM      14    10
+CT      15    15
+FD      16    10
+FMC     17    10
+CR      18    10
+SORC    19    5
+MONK    20    15
+
