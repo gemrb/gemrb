@@ -13116,7 +13116,7 @@ bool GUIScript::Init(void)
 	path_t path2;
 	if (core->config.GameType == "how") {
 		path2 = PathJoin(path, "iwd");
-	} else if (core->config.GameType == "bg2ee") {
+	} else if (core->config.GameType == "bg2ee" || core->config.GameType == "bgee") {
 		path2 = PathJoin(path, "bg2");
 	} else {
 		path2 = PathJoin(path, core->config.GameType);
