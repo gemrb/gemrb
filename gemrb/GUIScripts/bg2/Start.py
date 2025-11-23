@@ -34,6 +34,13 @@ def RunStart2(isTOB):
 			GemRB.PlayMovie ("INTRO", 1)
 			skipIntro |= 2
 		GemRB.LoadMusicPL ("ThemeT.mus", 1)
+	elif GameCheck.IsBGEE():
+		GemRB.SetMasterScript("BALDUR", "WORLDMAP")
+		GemRB.SetVar("oldgame", 1)
+		if not skipVideos and skipIntro & 2 == 0:
+			GemRB.PlayMovie ("INTRO", 1)
+			skipIntro |= 2
+		GemRB.LoadMusicPL ("oldthm.mus")
 	else:
 		GemRB.SetMasterScript("BALDUR", "WORLDMAP")
 		GemRB.SetVar("oldgame", 1)
@@ -83,6 +90,43 @@ def RunStartEE():
 	ExitButton.OnPress (lambda: GemRB.Quit())
 	ExitButton.MakeEscape ()
 
+def RunStartBG1EE():
+	StartWindow = GemRB.LoadWindow(7, "START")
+
+	Label = StartWindow.CreateLabel(0x0fff0000, 640, 35, 100, 25, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
+	Label.SetText(GemRB.Version)
+
+	# not implemented yet (tutorial, pit, credits, DLCs)
+	for btnId in [3, 6, 9, 11]:
+		Button = StartWindow.GetControl(btnId)
+		Button.SetState(IE_GUI_BUTTON_LOCKED)
+
+	TutorialButton = StartWindow.GetControl(6)
+	TutorialButton.SetText(24338)
+	CreditsButton = StartWindow.GetControl(3)
+	CreditsButton.SetText(24410)
+
+	ExitButton = StartWindow.GetControl(4)
+	ExitButton.SetText(13731)
+	ExitButton.OnPress(lambda: GemRB.Quit())
+	ExitButton.MakeEscape ()
+
+	MainMenuButton = StartWindow.GetControl(2)
+	MainMenuButton.SetText(16509)
+	MainMenuButton.OnPress(lambda: RunStart2(False))
+
+	Help1 = StartWindow.GetControl(5)
+	Help1.SetText(24630)
+	Help2 = StartWindow.GetControl(1)
+	Help2.SetText(24347)
+	Help3 = StartWindow.GetControl(0)
+	Help3.SetText(24346)
+
+	DLC = StartWindow.GetControl(9)
+	DLC.SetPicture("DLCDN")
+
+	GemRB.LoadMusicPL("oldthm.mus")
+
 def OnLoad():
 	global skipVideos
 
@@ -91,15 +135,20 @@ def OnLoad():
 
 	skipVideos = GemRB.GetVar ("SkipIntroVideos") or 0
 	if not skipVideos and not GemRB.GetVar ("SeenIntroVideos"):
-		if GameCheck.IsBG2EE ():
+		# There may be differences between OS-native versions
+		if GameCheck.IsAnyEE ():
 			GemRB.PlayMovie ("logo", 1)
-			GemRB.PlayMovie ("intro", 1)
 		else:
 			GemRB.PlayMovie ("BISLOGO", 1)
 			GemRB.PlayMovie ("BWDRAGON", 1)
 			GemRB.PlayMovie ("WOTC", 1)
 		# don't replay the intros on subsequent reentries
 		GemRB.SetVar ("SeenIntroVideos", 1)
+
+	# EE BG1 menu
+	if GameCheck.IsBGEE ():
+		RunStartBG1EE()
+		return
 
 	# if not detected ToB, we go right to the main SoA menu
 	if not GameCheck.HasTOB():
