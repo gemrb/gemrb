@@ -1,0 +1,11 @@
+2DA V1.0
+0
+           ID         NAME_REF   DESC_REF
+LARGE_SWORD 0          8668       9589
+SMALL_SWORD 1          8732       9590
+BOW     2          8733       9591
+SPEAR   3          8734       9592
+BLUNT   4          9400       9593
+SPIKED  5          9401       9594
+AXE     6          9402       9595
+MISSILE 7          9403       9596

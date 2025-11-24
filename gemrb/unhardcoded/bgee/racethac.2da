@@ -1,0 +1,30 @@
+2DA V1.0
+0
+    PROFICIENCY              HUMAN     DWARF     ELF       GNOME     HALF_ELF  HALFLING  HALFORC
+89  BASTARDSWORD             0         0         0         0         0         0         0
+90  LONGSWORD                0         0         1         0         0         0         0
+91  SHORTSWORD               0         0         1         0         0         0         0
+92  AXE                      0         0         0         0         0         0         0
+93  TWOHANDEDSWORD           0         0         0         0         0         0         0
+94  KATANA                   0         0         0         0         0         0         0
+95  SCIMITARWAKISASHININJATO 0         0         0         0         0         0         0
+96  DAGGER                   0         0         0         0         0         0         0
+97  WARHAMMER                0         0         0         0         0         0         0
+98  SPEAR                    0         0         0         0         0         0         0
+99  HALBERD                  0         0         0         0         0         0         0
+100 FLAILMORNINGSTAR         0         0         0         0         0         0         0
+101 MACE                     0         0         0         0         0         0         0
+102 QUARTERSTAFF             0         0         0         0         0         0         0
+103 CROSSBOW                 0         0         0         0         0         0         0
+104 LONGBOW                  0         0         1         0         0         0         0
+105 SHORTBOW                 0         0         1         0         0         0         0
+106 DART                     0         0         0         0         0         0         0
+107 SLING                    0         0         0         0         0         1         0
+108 BLACKJACK                0         0         0         0         0         0         0
+109 GUN                      0         0         0         0         0         0         0 
+110 MARTIALARTS              0         0         0         0         0         0         0
+111 2HANDED                  0         0         0         0         0         0         0
+112 SWORDANDSHIELD           0         0         0         0         0         0         0
+113 SINGLEWEAPON             0         0         0         0         0         0         0
+114 2WEAPON                  0         0         0         0         0         0         0
+115 CLUB                     0         0         0         0         0         0         0

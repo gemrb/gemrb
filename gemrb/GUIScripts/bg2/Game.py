@@ -145,9 +145,11 @@ def FixInnates(pc):
 
 #upgrade savegame to next version
 def GameExpansion():
+	if GameCheck.IsBGEE():
+		return
 
 	version = GemRB.GameGetExpansion()
-	if version<3:
+	if version < 3:
 		GemRB.GameSetReputation(100)
 
 	if not GameCheck.HasTOB():

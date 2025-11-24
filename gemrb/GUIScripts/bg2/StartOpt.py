@@ -34,6 +34,9 @@ def OnLoad():
 	if GameCheck.IsBG2EE ():
 		y = GemRB.GetSystemVariable (SV_HEIGHT) - 100
 		w = GemRB.GetSystemVariable (SV_WIDTH)
+	elif GameCheck.IsBGEE ():
+		y = GemRB.GetSystemVariable (SV_HEIGHT) - 55
+		w = GemRB.GetSystemVariable (SV_WIDTH)
 	Label = OptionsWindow.CreateLabel(0x0fff0000, 0, y, w, 30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label.SetText (GemRB.Version)
 
@@ -42,12 +45,13 @@ def OnLoad():
 	GraphicButton = OptionsWindow.GetControl(7)
 	BackButton = OptionsWindow.GetControl(11)
 
-	if GameCheck.IsBG2EE ():
+	if GameCheck.IsAnyEE ():
 		MoviesButton = OptionsWindow.GetControl (12)
 		MoviesButton.SetText (15415)
 		MoviesButton.OnPress (lambda: GemRB.SetNextScript ("GUIMOVIE"))
 
-		OptionsWindow.DeleteControl (15)
+		if GameCheck.IsBG2EE ():
+			OptionsWindow.DeleteControl (15)
 
 		frame = SoundButton.GetFrame ()
 		GUIOPTExtra.AddGemRBOptionsButton (OptionsWindow, frame, 0, 80, "STARTMBT", 1)

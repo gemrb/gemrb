@@ -1,0 +1,8 @@
+2DA V1.0
+0
+                DURATION
+ROUND_SECONDS   6
+TURN_SECONDS    60
+ATTACK_ROUND    100
+FADE_RESET      150  # known by RE, 300 in the original double ticks
+FADE_DEFAULT    20
