@@ -382,6 +382,7 @@ def GetKitIndex (actor):
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	KitIndex = 0
 
+	# make sure original saves get translated properly
 	if Kit & 0xc000 == 0x4000:
 		KitIndex = Kit & 0xfff
 
