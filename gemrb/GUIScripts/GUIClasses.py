@@ -27,6 +27,7 @@ from GemRB import GetView, CreateView, RemoveView, RemoveScriptingRef
 DefaultScrollbars = {
 	"bg1": "GUIWSBR",
 	"bg2": "GUISCRCW",
+	"bgee": "GUISCRCW",
 	"bg2ee": "GUISCRCW",
 	"iwd": "GUISBR",
 	"how": "GUISBR",
