@@ -34,7 +34,7 @@ namespace GemRB {
 using SClass_ID = unsigned long;
 
 #define IE_2DA_CLASS_ID  0x000003F4
-#define IE_ACM_CLASS_ID  0x00010000
+#define IE_ACM_CLASS_ID  0x00000FFF
 #define IE_ARE_CLASS_ID  0x000003F2
 #define IE_BAM_CLASS_ID  0x000003E8
 #define IE_BCS_CLASS_ID  0x000003EF
@@ -58,7 +58,7 @@ using SClass_ID = unsigned long;
 #define IE_LUA_CLASS_ID  0x00000409
 #define IE_MENU_CLASS_ID 0x00000408 // gap of 3
 #define IE_MOS_CLASS_ID  0x000003EC
-#define IE_MUS_CLASS_ID  0x00040000
+#define IE_MUS_CLASS_ID        0x00000FFE
 #define IE_MVE_CLASS_ID  0x00000002
 #define IE_BIK_CLASS_ID  0x00FFFFFF
 #define IE_OGG_CLASS_ID  0x00000007 // gemrb extension

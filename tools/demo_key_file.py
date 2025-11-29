@@ -22,6 +22,7 @@ SCAN_DIRECTORIES = ['override']
 # only what fits into 2 bytes
 FILE_EXT_MAPPING = {
 	'2da':  0x3F4,
+	'acm':  0xFFF,
 	'are':  0x3F2,
 	'bam':  0x3E8,
 	'bcs':  0x3EF,
@@ -40,6 +41,7 @@ FILE_EXT_MAPPING = {
 	'ini':  0x802,
 	'itm':  0x3ED,
 	'mos':  0x3EC,
+	'mus':  0xFFE,
 	'mve':    0x2,
 	'ogg':    0x7,
 	'plt':    0x6,
