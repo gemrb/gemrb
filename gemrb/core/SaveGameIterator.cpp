@@ -625,7 +625,7 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 		return GEM_ERROR;
 	}
 
-	if (!DoSaveGame(Path.c_str(), overrideRunning)) {
+	if (!DoSaveGame(Path, overrideRunning)) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}
@@ -704,7 +704,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, StringView slotname,
 		return GEM_ERROR;
 	}
 
-	if (!DoSaveGame(Path.c_str(), overrideRunning)) {
+	if (!DoSaveGame(Path, overrideRunning)) {
 		displaymsg->DisplayMsgCentered(HCStrings::CantSave, FT_ANY, GUIColors::XPCHANGE);
 		return GEM_ERROR;
 	}

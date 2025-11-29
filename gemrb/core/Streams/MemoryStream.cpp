@@ -41,7 +41,7 @@ DataStream* MemoryStream::Clone() const noexcept
 {
 	void* copy = malloc(size);
 	memcpy(copy, data, size);
-	return new MemoryStream(originalfile.c_str(), copy, size);
+	return new MemoryStream(originalfile, copy, size);
 }
 
 strret_t MemoryStream::Read(void* dest, strpos_t length)

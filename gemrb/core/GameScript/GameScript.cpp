@@ -1681,7 +1681,7 @@ static void InitializeObjectIDS(const AutoTable& objNameTable)
 	ObjectIDSTableNames.resize(ObjectIDSCount);
 	for (int i = 0; i < ObjectIDSCount; i++) {
 		const std::string& idsName = objNameTable->QueryField(idsRow, i + 1);
-		const IDSLink* poi = FindIdentifier(idsName.c_str());
+		const IDSLink* poi = FindIdentifier(idsName);
 		if (poi == nullptr) {
 			idtargets[i] = nullptr;
 		} else {

@@ -108,7 +108,7 @@ DataStream* SliceStream(DataStream* str, strpos_t startpos, strpos_t size, bool 
 		if (preservepos)
 			str->Seek(oldpos, GEM_STREAM_START);
 
-		DataStream* mem = new MemoryStream(str->originalfile.c_str(), data, size);
+		DataStream* mem = new MemoryStream(str->originalfile, data, size);
 		return mem;
 	} else
 		return new SlicedStream(str, startpos, size);

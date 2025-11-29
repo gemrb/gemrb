@@ -29,7 +29,7 @@
 namespace GemRB {
 
 MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)
-	: MemoryStream(fileName.c_str(), nullptr, 0),
+	: MemoryStream(fileName, nullptr, 0),
 	  fileHandle(nullptr),
 	  fileOpened(false),
 	  fileMapped(false)

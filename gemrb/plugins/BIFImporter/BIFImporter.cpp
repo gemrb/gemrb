@@ -100,7 +100,7 @@ int BIFImporter::OpenArchive(const path_t& path)
 	path_t cachePath = PathJoin(core->config.CachePath, ExtractFileFromPath(path));
 	char Signature[8];
 #if defined(SUPPORTS_MEMSTREAM)
-	auto cacheStream = new MappedFileMemoryStream { cachePath.c_str() };
+	auto cacheStream = new MappedFileMemoryStream { cachePath };
 
 	if (!cacheStream->isOk()) {
 		delete cacheStream;
@@ -123,10 +123,10 @@ int BIFImporter::OpenArchive(const path_t& path)
 		}
 
 		if (strncmp(Signature, "BIF V1.0", 8) == 0) {
-			stream = DecompressBIF(file, cachePath.c_str());
+			stream = DecompressBIF(file, cachePath);
 			delete file;
 		} else if (strncmp(Signature, "BIFCV1.0", 8) == 0) {
-			stream = DecompressBIFC(file, cachePath.c_str());
+			stream = DecompressBIFC(file, cachePath);
 			delete file;
 		} else if (strncmp(Signature, "BIFFV1  ", 8) == 0) {
 			file->Seek(0, GEM_STREAM_START);
