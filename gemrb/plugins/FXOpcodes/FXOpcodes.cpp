@@ -1378,7 +1378,6 @@ int fx_set_color_rgb_global(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 09 Color:PulseRGB
 int fx_set_color_pulse_rgb(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_set_color_pulse_rgb(%2d): RGB: %x, Location: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	EffectQueue::HackColorEffects(target, fx);
 	ieDword location = fx->Parameter2 & 0xff;
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
@@ -1390,8 +1389,6 @@ int fx_set_color_pulse_rgb(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 09 Color:PulseRGBGlobal (pst variant)
 int fx_set_color_pulse_rgb_global(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_set_color_pulse_rgb_global(%2d): RGB: %x, Location: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
 	target->SetColorMod(0xff, RGBModifier::ADD, speed, Color::FromBGRA(fx->Parameter1));
 
