@@ -114,8 +114,8 @@ def StartTextScreen ():
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(True)
 
-	if GameCheck.IsBG1():
-		#these suckers couldn't use a fix row
+	if GameCheck.IsBG1OrEE ():
+		# these suckers couldn't use a fixed row
 		FindTextRow (Table)
 	elif GameCheck.IsBG2OrEE ():
 		FindTextRow (Table)

@@ -87,7 +87,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 	ProfsType = proftype
 	ProfsScrollBar = None
 
-	if proftype == LUPROFS_TYPE_CHARGEN and (GameCheck.IsBG1() or GameCheck.IsBG2OrEE ()):
+	if proftype == LUPROFS_TYPE_CHARGEN and (GameCheck.IsBG1OrEE () or GameCheck.IsBG2OrEE ()):
 		ProfsOffsetSum = 9
 		ProfsOffsetButton1 = 11
 		ProfsOffsetStar = 27
@@ -99,7 +99,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 		if (scroll):
 			ProfsScrollBar = ProfsWindow.GetControl (78)
 
-		if GameCheck.IsBG2OrEE () or GameCheck.IsIWD2 ():
+		if GameCheck.IsBG2OrEE () or GameCheck.IsIWD2 () or GameCheck.IsBGEE ():
 			import CharGenCommon
 			CharGenCommon.PositionCharGenWin (ProfsWindow)
 	elif proftype == LUPROFS_TYPE_LEVELUP and GameCheck.IsBG2OrEE ():

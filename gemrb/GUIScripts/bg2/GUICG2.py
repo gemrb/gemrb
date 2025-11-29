@@ -46,10 +46,11 @@ def OnLoad():
 
 	j = 0
 	#radiobutton groups must be set up before doing anything else to them
-	for i in range(1,ClassCount):
+	for i in range(1, min(ClassCount, 12)):
 		ClassName = CommonTables.Classes.GetRowName (i-1)
 		if CommonTables.Classes.GetValue (ClassName, "MULTI"):
 			continue
+		# bgee ids 2-9, 15-18, bg2ee is missing 18
 		if j>7:
 			Button = ClassWindow.GetControl(j+7)
 		else:
@@ -72,7 +73,7 @@ def OnLoad():
 	j = 0
 	GemRB.SetVar("MAGESCHOOL",0) 
 	HasMulti = 0
-	for i in range(1,ClassCount):
+	for i in range(1, min(ClassCount, 12)):
 		ClassName = CommonTables.Classes.GetRowName(i-1)
 		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
 		if CommonTables.Classes.GetValue (ClassName, "MULTI"):

@@ -44,6 +44,9 @@ def IsIWD2 ():
 def IsBG1 ():
 	return GemRB.GameType == "bg1"
 
+def IsBG1OrEE ():
+	return GemRB.GameType in ["bg1", "bgee"]
+
 def IsBG2 ():
 	return GemRB.GameType == "bg2"
 
