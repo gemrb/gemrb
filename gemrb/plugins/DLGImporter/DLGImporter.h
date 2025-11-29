@@ -44,14 +44,14 @@ public:
 	DLGImporter() noexcept = default;
 
 	Holder<Dialog> GetDialog() const override;
-	Condition* GetCondition(const char* string) const override;
+	Holder<Condition> GetCondition(const char* string) const override;
 
 private:
 	bool Import(DataStream* stream) override;
 	DialogState* GetDialogState(Dialog* d, unsigned int index) const;
 	DialogTransition* GetTransition(unsigned int index) const;
-	Condition* GetStateTrigger(unsigned int index) const;
-	Condition* GetTransitionTrigger(unsigned int index) const;
+	Holder<Condition> GetStateTrigger(unsigned int index) const;
+	Holder<Condition> GetTransitionTrigger(unsigned int index) const;
 	std::vector<Action*> GetAction(unsigned int index) const;
 	std::vector<DialogTransition*> GetTransitions(unsigned int firstIndex,
 						      unsigned int count) const;

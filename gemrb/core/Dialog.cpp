@@ -53,21 +53,18 @@ void Dialog::FreeDialogState(DialogState* ds)
 		for (auto& action : trans->actions) {
 			action->Release();
 		}
-		if (trans->condition)
-			delete trans->condition;
+		trans->condition.reset();
 		delete trans;
 	}
 
-	if (ds->condition) {
-		delete ds->condition;
-	}
+	ds->condition.reset();
 	delete ds;
 }
 
 int Dialog::FindFirstState(Scriptable* target) const
 {
 	for (unsigned int i = 0; i < TopLevelCount; i++) {
-		const Condition* cond = GetState(Order[i])->condition;
+		const Holder<Condition> cond = GetState(Order[i])->condition;
 		if (cond && cond->Evaluate(target)) {
 			return Order[i];
 		}
@@ -81,13 +78,13 @@ int Dialog::FindRandomState(Scriptable* target) const
 	if (!max) return -1;
 	unsigned int pick = RAND(0u, max - 1);
 	for (unsigned int i = pick; i < max; i++) {
-		const Condition* cond = GetState(i)->condition;
+		const Holder<Condition> cond = GetState(i)->condition;
 		if (cond && cond->Evaluate(target)) {
 			return i;
 		}
 	}
 	for (unsigned int i = 0; i < pick; i++) {
-		const Condition* cond = GetState(i)->condition;
+		const Holder<Condition> cond = GetState(i)->condition;
 		if (cond && cond->Evaluate(target)) {
 			return i;
 		}

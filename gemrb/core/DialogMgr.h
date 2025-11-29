@@ -30,7 +30,7 @@ namespace GemRB {
 class GEM_EXPORT DialogMgr : public ImporterBase {
 public:
 	virtual Holder<Dialog> GetDialog() const = 0;
-	virtual Condition* GetCondition(const char* string) const = 0;
+	virtual Holder<Condition> GetCondition(const char* string) const = 0;
 };
 
 }

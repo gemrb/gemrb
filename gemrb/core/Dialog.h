@@ -24,6 +24,8 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include "Holder.h"
+
 #include <vector>
 
 namespace GemRB {
@@ -51,7 +53,7 @@ struct DialogTransition {
 	ieDword Flags;
 	ieStrRef textStrRef;
 	ieStrRef journalStrRef;
-	Condition* condition;
+	Holder<Condition> condition;
 	std::vector<Action*> actions;
 	ResRef Dialog;
 	ieDword stateIndex;
@@ -61,7 +63,7 @@ struct DialogState {
 	ieStrRef StrRef;
 	std::vector<DialogTransition*> transitions;
 	unsigned int transitionsCount;
-	Condition* condition;
+	Holder<Condition> condition;
 	unsigned int weight;
 };
 

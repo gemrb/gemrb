@@ -32,6 +32,8 @@
 #include "globals.h"
 #include "ie_types.h"
 
+#include "Holder.h"
+
 #include <vector>
 
 namespace GemRB {
@@ -95,14 +97,13 @@ struct GEM_EXPORT STOItem {
 	ieDword AmountInStock = 0;
 	ieDwordSigned InfiniteSupply = 0;
 	// V1.1
-	Condition* triggers = nullptr;
+	Holder<Condition> triggers = nullptr;
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
 
 	STOItem() noexcept = default;
 	explicit STOItem(const CREItem* item);
 	STOItem(const STOItem&) = delete;
-	~STOItem();
 	STOItem& operator=(const STOItem&) = delete;
 	void CopyCREItem(const CREItem* item);
 };

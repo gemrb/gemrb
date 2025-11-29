@@ -134,7 +134,7 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 	if (dt->Flags & IE_DLG_TR_TRIGGER) {
 		dt->condition = GetTransitionTrigger(TriggerIndex);
 	} else {
-		dt->condition = NULL;
+		dt->condition = nullptr;
 	}
 	if (dt->Flags & IE_DLG_TR_ACTION) {
 		dt->actions = GetAction(ActionIndex);
@@ -144,25 +144,25 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 
 static char** GetStrings(const char* string, unsigned int& count);
 
-Condition* DLGImporter::GetCondition(const char* string) const
+Holder<Condition> DLGImporter::GetCondition(const char* string) const
 {
 	unsigned int count;
 	char** lines = GetStrings(string, count);
-	Condition* condition = new Condition();
+	Condition condition;
 	for (size_t i = 0; i < count; ++i) {
 		Trigger* trigger = GenerateTrigger(lines[i]);
 		if (!trigger) {
 			Log(WARNING, "DLGImporter", "Can't compile trigger: {}", lines[i]);
 		} else {
-			condition->triggers.push_back(trigger);
+			condition.triggers.push_back(trigger);
 		}
 		free(lines[i]);
 	}
 	free(lines);
-	return condition;
+	return MakeHolder<Condition>(std::move(condition));
 }
 
-Condition* DLGImporter::GetStateTrigger(unsigned int index) const
+Holder<Condition> DLGImporter::GetStateTrigger(unsigned int index) const
 {
 	if ((signed) index == -1) index = 0;
 	if (index >= StateTriggersCount) {
@@ -183,12 +183,12 @@ Condition* DLGImporter::GetStateTrigger(unsigned int index) const
 	char* string = (char*) malloc(Length + 1);
 	str->Read(string, Length);
 	string[Length] = 0;
-	Condition* condition = GetCondition(string);
+	auto condition = GetCondition(string);
 	free(string);
 	return condition;
 }
 
-Condition* DLGImporter::GetTransitionTrigger(unsigned int index) const
+Holder<Condition> DLGImporter::GetTransitionTrigger(unsigned int index) const
 {
 	if (index >= TransitionTriggersCount) {
 		return NULL;
@@ -201,7 +201,7 @@ Condition* DLGImporter::GetTransitionTrigger(unsigned int index) const
 	char* string = (char*) malloc(Length + 1);
 	str->Read(string, Length);
 	string[Length] = 0;
-	Condition* condition = GetCondition(string);
+	auto condition = GetCondition(string);
 	free(string);
 	return condition;
 }

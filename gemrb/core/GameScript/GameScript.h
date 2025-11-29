@@ -115,6 +115,7 @@ protected:
 		canary = (unsigned long) 0xdeadbeef;
 	}
 	Canary(const Canary&) = delete;
+	Canary(Canary&&) noexcept = default;
 	Canary& operator=(const Canary&) = delete;
 	virtual ~Canary() noexcept // protected destructor
 	{
@@ -200,6 +201,8 @@ public:
 
 class GEM_EXPORT Condition final : protected Canary {
 public:
+	Condition() noexcept = default;
+	Condition(Condition&&) noexcept = default;
 	~Condition() noexcept override
 	{
 		for (auto& trigger : triggers) {
@@ -343,10 +346,7 @@ public:
 	ResponseBlock() noexcept = default;
 	~ResponseBlock() noexcept override
 	{
-		if (condition) {
-			condition->Release();
-			condition = nullptr;
-		}
+		condition = nullptr;
 		if (responseSet) {
 			responseSet->Release();
 			responseSet = nullptr;
@@ -357,7 +357,7 @@ public:
 		delete this;
 	}
 
-	Condition* condition = nullptr;
+	Holder<Condition> condition = nullptr;
 	ResponseSet* responseSet = nullptr;
 };
 

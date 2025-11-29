@@ -50,11 +50,6 @@ void STOItem::CopyCREItem(const CREItem* item)
 	triggers = nullptr;
 }
 
-STOItem::~STOItem(void)
-{
-	if (triggers) triggers->Release();
-}
-
 Store::~Store(void)
 {
 	for (auto item : items) {
@@ -74,7 +69,7 @@ bool Store::IsItemAvailable(const STOItem* item) const
 	//0     - not infinite, not conditional
 	//-1    - infinite
 	//other - pst trigger ref
-	const Condition* triggers = item->triggers;
+	const Holder<Condition> triggers = item->triggers;
 	if (triggers) {
 		const Game* game = core->GetGame();
 		Scriptable* shopper = game->GetSelectedPCSingle(false);

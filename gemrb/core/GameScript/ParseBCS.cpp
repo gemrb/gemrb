@@ -155,7 +155,7 @@ static Trigger* ReadTrigger(DataStream* stream)
 	return tR;
 }
 
-static Condition* ReadCondition(DataStream* stream)
+static Holder<Condition> ReadCondition(DataStream* stream)
 {
 	std::string line;
 	stream->ReadLine(line, 10);
@@ -163,7 +163,7 @@ static Condition* ReadCondition(DataStream* stream)
 		return nullptr;
 	}
 
-	Condition* cO = new Condition();
+	Condition cO;
 	Object* triggerer = nullptr;
 	while (true) {
 		Trigger* tR = ReadTrigger(stream);
@@ -189,9 +189,9 @@ static Condition* ReadCondition(DataStream* stream)
 			continue;
 		}
 
-		cO->triggers.push_back(tR);
+		cO.triggers.push_back(tR);
 	}
-	return cO;
+	return MakeHolder<Condition>(std::move(cO));
 }
 
 ResponseBlock* GameScript::ReadResponseBlock(DataStream* stream)
