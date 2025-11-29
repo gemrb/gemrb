@@ -3465,7 +3465,7 @@ int Interface::GetMouseScrollSpeed() const
 ieStrRef Interface::GetRumour(const ResRef& dlgref)
 {
 	PluginHolder<DialogMgr> dm = GetImporter<DialogMgr>(IE_DLG_CLASS_ID, gamedata->GetResourceStream(dlgref, IE_DLG_CLASS_ID));
-	Dialog* dlg = dm->GetDialog();
+	Holder<Dialog> dlg = dm->GetDialog();
 
 	if (!dlg) {
 		Log(ERROR, "Interface", "Cannot load dialog: {}", dlgref);
@@ -3481,7 +3481,6 @@ ieStrRef Interface::GetRumour(const ResRef& dlgref)
 	if (i >= 0) {
 		ret = dlg->GetState(i)->StrRef;
 	}
-	delete dlg;
 	return ret;
 }
 

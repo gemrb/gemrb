@@ -22,13 +22,14 @@
 #define DIALOGMGR_H
 
 #include "Dialog.h"
+#include "Holder.h"
 #include "Plugin.h"
 
 namespace GemRB {
 
 class GEM_EXPORT DialogMgr : public ImporterBase {
 public:
-	virtual Dialog* GetDialog() const = 0;
+	virtual Holder<Dialog> GetDialog() const = 0;
 	virtual Condition* GetCondition(const char* string) const = 0;
 };
 

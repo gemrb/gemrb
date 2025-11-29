@@ -47,11 +47,6 @@ DialogHandler::DialogHandler(void)
 	}
 }
 
-DialogHandler::~DialogHandler(void)
-{
-	delete dlg;
-}
-
 void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 {
 	if (!tr || !(tr->Flags & IE_DLG_TR_JOURNAL)) return;
@@ -70,7 +65,6 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
 //Try to start dialogue between two actors (one of them could be inanimate)
 bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& dialogRef, ieDword si)
 {
-	delete dlg;
 	dlg = nullptr;
 
 	if (dialogRef.IsEmpty() || IsStar(dialogRef)) {
@@ -181,7 +175,6 @@ void DialogHandler::EndDialog(bool try_to_break)
 		target->SetCircleSize();
 	}
 	ds = nullptr;
-	delete dlg;
 	dlg = nullptr;
 
 	core->ToggleViewsEnabled(true, "NOT_DLG");

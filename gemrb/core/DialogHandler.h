@@ -24,6 +24,7 @@
 #include "exports.h"
 
 #include "Game.h"
+#include "Holder.h"
 
 #include "Scriptable/Scriptable.h"
 
@@ -37,7 +38,6 @@ class GEM_EXPORT DialogHandler {
 public:
 	DialogHandler();
 	DialogHandler(const DialogHandler&) = delete;
-	~DialogHandler();
 	DialogHandler& operator=(const DialogHandler&) = delete;
 
 	Scriptable* GetTarget() const;
@@ -60,7 +60,7 @@ private:
 	int DialogChooseTransition(unsigned int choose, Scriptable*& target, Actor*& tgta, Actor* speaker);
 
 	DialogState* ds = nullptr;
-	Dialog* dlg = nullptr;
+	Holder<Dialog> dlg = nullptr;
 
 	ScriptID speakerID = 0;
 	ScriptID targetID = 0;

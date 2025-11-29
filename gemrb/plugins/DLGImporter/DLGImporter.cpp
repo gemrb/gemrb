@@ -64,21 +64,21 @@ bool DLGImporter::Import(DataStream* str)
 	return true;
 }
 
-Dialog* DLGImporter::GetDialog() const
+Holder<Dialog> DLGImporter::GetDialog() const
 {
 	if (!Version) {
-		return NULL;
+		return nullptr;
 	}
-	Dialog* d = new Dialog();
-	d->Flags = Flags;
-	d->TopLevelCount = StatesCount;
-	d->Order.resize(StatesCount);
-	d->initialStates.resize(StatesCount);
+	Dialog d;
+	d.Flags = Flags;
+	d.TopLevelCount = StatesCount;
+	d.Order.resize(StatesCount);
+	d.initialStates.resize(StatesCount);
 	for (unsigned int i = 0; i < StatesCount; i++) {
-		DialogState* ds = GetDialogState(d, i);
-		d->initialStates[i] = ds;
+		DialogState* ds = GetDialogState(&d, i);
+		d.initialStates[i] = ds;
 	}
-	return d;
+	return MakeHolder<Dialog>(std::move(d));
 }
 
 DialogState* DLGImporter::GetDialogState(Dialog* d, unsigned int index) const

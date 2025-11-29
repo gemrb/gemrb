@@ -43,7 +43,7 @@ private:
 public:
 	DLGImporter() noexcept = default;
 
-	Dialog* GetDialog() const override;
+	Holder<Dialog> GetDialog() const override;
 	Condition* GetCondition(const char* string) const override;
 
 private:

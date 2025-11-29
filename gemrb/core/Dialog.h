@@ -69,6 +69,7 @@ class GEM_EXPORT Dialog {
 public:
 	Dialog() noexcept = default;
 	Dialog(const Dialog&) = delete;
+	Dialog(Dialog&&) noexcept = default;
 	~Dialog();
 	Dialog& operator=(const Dialog&) = delete;
 
