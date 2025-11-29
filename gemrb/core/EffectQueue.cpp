@@ -20,6 +20,7 @@
 
 #include "EffectQueue.h"
 
+#include "damages.h"
 #include "ie_feats.h"
 #include "ie_stats.h"
 #include "opcode_params.h"
@@ -1083,6 +1084,12 @@ static int CheckSaves(Actor* actor, Effect* fx)
 	if (fx_damage_ref.opcode < 0) {
 		Globals::ResolveEffectRef(fx_damage_ref);
 	}
+	bool isDamageFx = (int) fx->Opcode == fx_damage_ref.opcode;
+
+	// iwd druids and fighter/druids get a +2 bonus vs damage effects that are electricity or fire
+	if (core->HasFeature(GFFlags::IWD_REST_SPAWNS) && isDamageFx && fx->Parameter2 & ((DAMAGE_ELECTRICITY | DAMAGE_FIRE) << 16) && actor->GetDruidLevel()) {
+		bonus += 2;
+	}
 
 	bool saved = false;
 	for (int i = 0; i < 5; i++) {
@@ -1099,7 +1106,7 @@ static int CheckSaves(Actor* actor, Effect* fx)
 		}
 	}
 
-	bool saveForHalf = fx->IsSaveForHalfDamage || ((int) fx->Opcode == fx_damage_ref.opcode && fx->IsVariable & DamageFlags::SaveForHalf);
+	bool saveForHalf = fx->IsSaveForHalfDamage || (isDamageFx && fx->IsVariable & DamageFlags::SaveForHalf);
 	if (saved && saveForHalf) {
 		// if we have evasion, we take no damage
 		// sadly there's no feat or stat for it
