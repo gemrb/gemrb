@@ -23,10 +23,12 @@
 
 #include "Region.h"
 
+#include <vector>
+
 namespace GemRB {
 
 class GEM_EXPORT Bitmap final {
-	uint8_t* data = nullptr;
+	std::vector<uint8_t> storage;
 	Size size;
 	int bytes;
 
@@ -53,7 +55,7 @@ public:
 		: size(size)
 	{
 		bytes = CeilDiv<int>(size.w * size.h, 8);
-		data = new uint8_t[bytes];
+		storage.resize(bytes);
 	}
 
 	Bitmap(const Size& s, uint8_t pattern) noexcept
@@ -62,33 +64,28 @@ public:
 		fill(pattern);
 	}
 
-	explicit Bitmap(const Size& size, const uint8_t* in) noexcept
+	explicit Bitmap(const Size& size, const std::vector<uint8_t>& in) noexcept
 		: Bitmap(size)
 	{
-		std::copy(in, in + bytes, data);
-	}
-
-	~Bitmap() noexcept
-	{
-		delete[] data;
+		storage = in;
 	}
 
 	Bitmap(const Bitmap& bm) noexcept
-		: Bitmap(bm.size, bm.data) {}
+		: Bitmap(bm.size, bm.storage) {}
 
 	Bitmap& operator=(const Bitmap& bm) noexcept
 	{
 		if (&bm != this) {
 			size = bm.size;
 			bytes = bm.bytes;
-			std::copy(bm.data, bm.data + bm.bytes, data);
+			storage = bm.storage;
 		}
 		return *this;
 	}
 
 	Bitmap(Bitmap&& other) noexcept
 	{
-		std::swap(data, other.data);
+		std::swap(storage, other.storage);
 		size = other.size;
 		bytes = other.bytes;
 	}
@@ -96,7 +93,7 @@ public:
 	Bitmap& operator=(Bitmap&& other) noexcept
 	{
 		if (&other != this) {
-			std::swap(data, other.data);
+			std::swap(storage, other.storage);
 			size = other.size;
 			bytes = other.bytes;
 		}
@@ -106,13 +103,13 @@ public:
 	BitProxy operator[](int i) noexcept
 	{
 		div_t res = std::div(i, 8);
-		return BitProxy(data[res.quot], res.rem);
+		return BitProxy(storage[res.quot], res.rem);
 	}
 
 	bool operator[](int i) const noexcept
 	{
 		div_t res = std::div(i, 8);
-		return data[res.quot] & (1 << res.rem);
+		return storage[res.quot] & (1 << res.rem);
 	}
 
 	BitProxy operator[](const BasePoint& p) noexcept
@@ -133,24 +130,34 @@ public:
 		return operator[](p.y * size.w + p.x);
 	}
 
-	uint8_t* begin() noexcept
+	auto begin() noexcept
 	{
-		return data;
+		return storage.begin();
 	}
 
-	uint8_t* end() noexcept
+	auto end() noexcept
 	{
-		return data + bytes;
+		return storage.end();
 	}
 
-	const uint8_t* begin() const noexcept
+	auto begin() const noexcept
 	{
-		return data;
+		return storage.cbegin();
 	}
 
-	const uint8_t* end() const noexcept
+	auto end() const noexcept
 	{
-		return data + bytes;
+		return storage.cend();
+	}
+
+	auto data() noexcept
+	{
+		return storage.data();
+	}
+
+	const auto data() const noexcept
+	{
+		return storage.data();
 	}
 
 	Size GetSize() const noexcept

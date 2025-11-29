@@ -1626,7 +1626,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	ieDword mapSize = ieDword(map->ExploredBitmap.Bytes());
 	mapSize = std::min(mapSize, ExploredBitmapSize);
 	str->Seek(ExploredBitmapOffset, GEM_STREAM_START);
-	str->Read(map->ExploredBitmap.begin(), mapSize);
+	str->Read(map->ExploredBitmap.data(), mapSize);
 
 	Log(DEBUG, "AREImporter", "Loading wallgroups");
 	map->SetWallGroups(tmm->GetWallGroups());
@@ -2462,7 +2462,7 @@ int AREImporter::PutTraps(DataStream* stream, const Map* map) const
 
 int AREImporter::PutExplored(DataStream* stream, const Map* map) const
 {
-	stream->Write(map->ExploredBitmap.begin(), ExploredBitmapSize);
+	stream->Write(map->ExploredBitmap.data(), ExploredBitmapSize);
 	return 0;
 }
 
