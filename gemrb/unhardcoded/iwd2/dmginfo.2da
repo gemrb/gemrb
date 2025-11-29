@@ -1,19 +1,19 @@
 2DA V1.0
 -1
-                       LOWER      RESIST_STAT           VALUE      IWDMOD  REDUCTION
-DAMAGE_CRUSHING        121        RESISTCRUSHING        0          9       1
-DAMAGE_ACID            125        RESISTACID            1          4       0
-DAMAGE_COLD            124        RESISTCOLD            2          2       0
-DAMAGE_ELECTRICITY     123        RESISTELECTRICITY     4          3       0
-DAMAGE_FIRE            122        RESISTFIRE            8          1       0
-DAMAGE_PIERCING        120        RESISTPIERCING        0x10       8       1
-DAMAGE_POISON          116        RESISTPOISON          0x20       6       0
-DAMAGE_MAGIC           117        MAGICDAMAGERESISTANCE 0x40       5       0
-DAMAGE_MISSILE         118        RESISTMISSILE         0x80       10      1
-DAMAGE_SLASHING        119        RESISTSLASHING        0x100      7       1
-DAMAGE_PIERCINGMISSILE 120        RESISTMISSILE         0x200      10      1
-DAMAGE_CRUSHINGMISSILE 121        RESISTMISSILE         0x400      10      1
-DAMAGE_STUNNING        121        0                     0x800      13      0
-DAMAGE_SOULEATER       117        0                     0x1000     -1      0
-DAMAGE_DISEASE         126        0                     0x4000     -1      0
-DAMAGE_CHUNKING        126        0                     0x8000     -1      0
+                       LOWER      RESIST_STAT           VALUE      IWDMOD  REDUCTION  CHUNKING
+DAMAGE_CRUSHING        121        RESISTCRUSHING        0          9       1          8
+DAMAGE_ACID            125        RESISTACID            1          4       0          5
+DAMAGE_COLD            124        RESISTCOLD            2          2       0          5
+DAMAGE_ELECTRICITY     123        RESISTELECTRICITY     4          3       0          5
+DAMAGE_FIRE            122        RESISTFIRE            8          1       0          5
+DAMAGE_PIERCING        120        RESISTPIERCING        0x10       8       1          8
+DAMAGE_POISON          116        RESISTPOISON          0x20       6       0          0
+DAMAGE_MAGIC           117        MAGICDAMAGERESISTANCE 0x40       5       0          0
+DAMAGE_MISSILE         118        RESISTMISSILE         0x80       10      1          0
+DAMAGE_SLASHING        119        RESISTSLASHING        0x100      7       1          8
+DAMAGE_PIERCINGMISSILE 120        RESISTMISSILE         0x200      10      1          5
+DAMAGE_CRUSHINGMISSILE 121        RESISTMISSILE         0x400      10      1          5
+DAMAGE_STUNNING        121        0                     0x800      13      0          0
+DAMAGE_SOULEATER       117        0                     0x1000     -1      0          0
+DAMAGE_DISEASE         126        0                     0x4000     -1      0          0
+DAMAGE_CHUNKING        126        0                     0x8000     -1      0          1

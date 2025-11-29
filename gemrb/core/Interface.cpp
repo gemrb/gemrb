@@ -897,6 +897,7 @@ bool Interface::ReadDamageTypeTable()
 		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2).c_str(), nullptr, 16);
 		di.iwd_mod_type = tm->QueryFieldSigned<int>(i, 3);
 		di.reduction = tm->QueryFieldSigned<int>(i, 4);
+		di.chunking = tm->QueryFieldSigned<int>(i, 5);
 		DamageInfoMap.emplace(di.value, di);
 	}
 

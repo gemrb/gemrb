@@ -4231,6 +4231,7 @@ static bool CanGetChunked(const Actor* actor)
 	if (actor->GetStat(IE_DISABLECHUNKING)) return false;
 	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) return false; // pst lacks the animations
 	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS) && actor->GetStat(IE_MC_FLAGS) & MC_IGNORE_RETURN) return false;
+	// ees also checked if the color_chunks animation ini key is 255, which disables
 
 	if (!actor->InParty) return true;
 	if (CFGCache.gameDifficulty <= Difficulty::Normal) return false;
@@ -4361,11 +4362,19 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 			damage = 123456; // arbitrarily high for death; won't be displayed
 			LastDamageType |= DAMAGE_CHUNKING;
 		}
-		// chunky death when you're reduced below -19 hp (pc) or -8 (everyone else)
-		ieDword chunkyLimit = (BaseStats[IE_EA] == EA_PC) ? 20 : 9;
+
+		// chunky death when you're reduced below -19 hp (pc) or a type dependent threshold (everyone else)
+		ieDword chunkyLimit = 1;
+		auto it = core->DamageInfoMap.find(damagetype);
+		if (it != core->DamageInfoMap.end()) {
+			chunkyLimit = it->second.chunking + 1;
+		}
+		if (chunkyLimit == 1) allowChunking = false;
+		chunkyLimit = (BaseStats[IE_EA] == EA_PC) ? 20 : chunkyLimit;
 		if ((ieDword) damage >= Modified[IE_HITPOINTS] + chunkyLimit && allowChunking) {
 			LastDamageType |= DAMAGE_CHUNKING;
 		}
+
 		// mark LastHitter for repeating damage effects (eg. to get xp from melfing trolls)
 		if (act && objects.LastHitter == 0) {
 			objects.LastHitter = act->GetGlobalID();

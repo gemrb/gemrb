@@ -107,6 +107,7 @@ struct DamageInfoStruct {
 	unsigned int value;
 	int iwd_mod_type;
 	int reduction;
+	int chunking;
 	// maybe also add the ac bonus and/or the DL_ constants
 };
 
