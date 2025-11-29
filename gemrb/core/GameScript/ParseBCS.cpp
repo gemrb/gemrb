@@ -127,12 +127,12 @@ static Trigger* ReadTrigger(DataStream* stream)
 	Trigger* tR = new Trigger();
 	// this exists only in PST?
 	if (HasTriggerPoint) {
-		sscanf(line.data(), "%hu %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf(line.data(), R"(%hu %d %d %d %d [%d,%d] "%[^"]" "%[^"]" OB)",
 		       &tR->triggerID, &tR->int0Parameter, &tR->flags,
 		       &tR->int1Parameter, &tR->int2Parameter, &tR->pointParameter.x,
 		       &tR->pointParameter.y, tR->string0Parameter.begin(), tR->string1Parameter.begin());
 	} else {
-		sscanf(line.data(), "%hu %d %d %d %d \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf(line.data(), R"(%hu %d %d %d %d "%[^"]" "%[^"]" OB)",
 		       &tR->triggerID, &tR->int0Parameter, &tR->flags,
 		       &tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter.begin(),
 		       tR->string1Parameter.begin());
@@ -259,7 +259,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		}
 
 		stream->ReadLine(line);
-		sscanf(line.data(), "%d %d %d %d %d\"%[^\"]\" \"%[^\"]\" AC",
+		sscanf(line.data(), R"(%d %d %d %d %d"%[^"]" "%[^"]" AC)",
 		       &aC->int0Parameter, &aC->pointParameter.x, &aC->pointParameter.y,
 		       &aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter.begin(),
 		       aC->string1Parameter.begin());
