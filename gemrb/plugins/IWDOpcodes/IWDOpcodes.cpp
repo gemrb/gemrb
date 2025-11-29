@@ -2784,7 +2784,6 @@ static int fx_energy_drain(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //432 TortoiseShell
 static int fx_tortoise_shell(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_tortoise_shell(%2d) Hits: %d", fx->Opcode, fx->Parameter1);
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
@@ -2794,8 +2793,12 @@ static int fx_tortoise_shell(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_TORTOISE);
 		target->SetOverlay(OV_TORTOISE);
 	}
-	target->SetSpellState(SS_HELD);
-	STATE_SET(STATE_HELPLESS);
+
+	// gemrb extension: potentially avoid the immobility
+	if (!fx->Parameter2) {
+		target->SetSpellState(SS_HELD);
+		STATE_SET(STATE_HELPLESS);
+	}
 	return FX_APPLIED;
 }
 
