@@ -382,6 +382,9 @@ def GetKitIndex (actor):
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	KitIndex = 0
 
+	if Kit & 0xc000 == 0x4000:
+		KitIndex = Kit & 0xfff
+
 	# carefully looking for kit by the usability flag
 	# since the barbarian kit id clashes with the no-kit value
 	if KitIndex == 0 and Kit != 0x4000:
