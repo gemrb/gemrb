@@ -4310,6 +4310,41 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		}
 	}
 
+	if (HasSpellState(SS_TORTOISE) && damage > 0) {
+		// reduce the shell's pool
+		static EffectRef fx_tortoise_ref = { "TortoiseShell", -1 };
+		Effect* fx = fxqueue.HasEffect(fx_tortoise_ref);
+		assert(fx);
+		int shell = fx->Parameter1;
+		if (shell >= damage) {
+			SetTokenAsString("AMOUNT", damage);
+			fx->Parameter1 -= damage;
+		} else {
+			SetTokenAsString("AMOUNT", shell);
+			fx->Parameter1 = 0;
+			damage -= shell;
+		}
+		String feedback;
+		if (hitter) {
+			// Tortoise Shell absorbs <AMOUNT> damage from <DAMAGER>
+			SetTokenAsString("DAMAGER", hitter->GetName());
+			feedback = core->GetString(ieStrRef::SHELL1);
+		} else {
+			// Tortoise Shell absorbs <AMOUNT> damage
+			feedback = core->GetString(ieStrRef::SHELL2);
+		}
+		displaymsg->DisplayStringName(feedback, GUIColors::WHITE, this);
+
+		if (fx->Parameter1 == 0) {
+			// Tortoise Shell breaks
+			feedback = core->GetString(ieStrRef::SHELLB);
+			displaymsg->DisplayStringName(feedback, GUIColors::WHITE, this);
+			// the effect will clean up itself and we continue processing any remaining damage
+		} else {
+			return 0;
+		}
+	}
+
 	int resisted = 0;
 	if (damage) {
 		ModifyDamage(hitter, damage, resisted, damagetype);
@@ -4509,7 +4544,7 @@ void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damaget
 
 		if (detailed) {
 			// 3 choices depending on resistance and boni
-			// iwd2 also has two Tortoise Shell (spell) absorption strings
+			// iwd2 also has two Tortoise Shell absorption strings handled in Damage()
 			tokens["TYPE"] = std::move(type_name);
 			SetTokenAsString("AMOUNT", damage);
 

@@ -84,6 +84,9 @@ enum class ieStrRef : ieDword {
 	REBUKED = 20827,
 	TURNED = 20828,
 	COMMANDED = 41023,
+	SHELL1 = 17067,
+	SHELL2 = 17075,
+	SHELLB = 17096,
 
 	// params to DisplayRollStringName
 	ROLL0 = 112,
