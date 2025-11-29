@@ -1265,7 +1265,7 @@ static void pcf_xp(Actor* actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 		if (!ret.Value<bool>()) return;
 
 		if (core->HasFeature(GFFlags::ONSCREEN_TEXT)) {
-			ieStrRef ref = displaymsg->GetStringReference(HCStrings::LevelUp, actor);
+			ieStrRef ref = DisplayMessage::GetStringReference(HCStrings::LevelUp, actor);
 			actor->overHead.SetText(core->GetString(ref));
 		} else {
 			displaymsg->DisplayConstantStringName(HCStrings::LevelUp, GUIColors::WHITE, actor);

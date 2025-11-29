@@ -197,7 +197,7 @@ Control ItemDragOp::dragDummy = Control(Region());
 ItemDragOp::ItemDragOp(CREItem* item)
 	: ControlDragOp(&dragDummy), item(item)
 {
-	Item* i = gamedata->GetItem(item->ItemResRef);
+	const Item* i = gamedata->GetItem(item->ItemResRef);
 	assert(i);
 	Holder<Sprite2D> pic = gamedata->GetAnySprite(i->ItemIcon, -1, 1);
 	if (pic == nullptr) {

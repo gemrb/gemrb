@@ -29,7 +29,7 @@ namespace GemRB {
 struct GEM_EXPORT MurmurHash {
 	uint32_t value = 0;
 
-	MurmurHash() {};
+	MurmurHash() = default;
 	MurmurHash(uint32_t value);
 	bool operator==(const MurmurHash& other) const;
 	bool operator!=(const MurmurHash& other) const;
@@ -38,7 +38,7 @@ struct GEM_EXPORT MurmurHash {
 
 class GEM_EXPORT MurmurHash3_32 {
 public:
-	MurmurHash3_32() {};
+	MurmurHash3_32() = default;
 
 	void Feed(uint32_t value);
 	MurmurHash GetHash() const;

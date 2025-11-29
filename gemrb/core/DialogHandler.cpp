@@ -509,7 +509,7 @@ static ScriptID SetVar(const StringView& var, ScriptID& id, const Scriptable* sc
 		id = 0;
 	}
 
-	const Actor* actor = scr->As<const Actor>(scr);
+	const Actor* actor = Scriptable::As<const Actor>(scr);
 	if (actor) {
 		core->GetDictionary().Set(var, actor->InParty);
 	} else {

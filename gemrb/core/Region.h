@@ -220,7 +220,7 @@ template<>
 struct formatter<GemRB::Point> {
 	char presentation = 'd';
 
-	auto parse(const format_parse_context& ctx) -> decltype(ctx.begin())
+	auto parse(const format_parse_context& ctx) const -> decltype(ctx.begin())
 	{
 		// [ctx.begin(), ctx.end()) is a character range that contains a part of
 		// the format string starting from the format specifications to be parsed,

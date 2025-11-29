@@ -125,11 +125,11 @@ static void AddZZFeatures(Item* s)
 		bonus -= 4;
 	}
 
-	static EffectRef zzRefs[] = { { "ToHitVsCreature", -1 }, { "DamageVsCreature", -1 } };
+	static std::array<EffectRef, 2> zzRefs = { { { "ToHitVsCreature", -1 }, { "DamageVsCreature", -1 } } };
 
 	// append the new equipping effects (tohit+damage)
-	for (unsigned int i = 0; i < sizeof(zzRefs) / sizeof(*zzRefs); i++) {
-		Effect* fx = EffectQueue::CreateEffect(zzRefs[i], IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
+	for (auto& zzRef : zzRefs) {
+		Effect* fx = EffectQueue::CreateEffect(zzRef, IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
 		fx->Parameter3 = static_cast<ieDword>(bonus);
 		fx->SourceRef = s->Name;
 		fx->SourceType = 1;

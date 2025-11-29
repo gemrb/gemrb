@@ -86,7 +86,7 @@ struct SRTinter_Flags {
 // Don't tint, but conditionally handle grey, sepia
 template<bool PALALPHA>
 struct SRTinter_FlagsNoTint {
-	SRTinter_FlagsNoTint() {}
+	SRTinter_FlagsNoTint() = default;
 
 	void operator()(Uint8& r, Uint8& g, Uint8& b, Uint8& a, unsigned int flags) const
 	{

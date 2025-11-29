@@ -40,7 +40,7 @@ class GEM_EXPORT Targets {
 	targetlist objects;
 
 public:
-	Targets() noexcept {};
+	Targets() noexcept = default;
 
 	size_t Count() const;
 	void Pop() { objects.pop_front(); };

@@ -1224,7 +1224,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
-	AreaAnimation* masterAreaAnimation = nullptr; // save one for syncing purposes
+	const AreaAnimation* masterAreaAnimation = nullptr; // save one for syncing purposes
 
 	auto DrawAreaAnimation = [&, this](AreaAnimation* a) {
 		BlitFlags flags = SetDrawingStencilForAreaAnimation(a, viewport);

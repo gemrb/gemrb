@@ -64,7 +64,7 @@ static inline voidvoid my_dlsym(void* handle, const char* symbol)
 {
 	void* value = dlsym(handle, symbol);
 	voidvoid ret;
-	assert(sizeof(ret) == sizeof(value));
+	static_assert(sizeof(ret) == sizeof(value), "dlsym type mismatch!");
 	memcpy(&ret, &value, sizeof(ret));
 	return ret;
 }

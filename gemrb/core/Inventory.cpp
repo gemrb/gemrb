@@ -807,7 +807,7 @@ bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map* m
 			return false;
 		}
 
-		CREItem* item = Slots[aSlot];
+		const CREItem* item = Slots[aSlot];
 		if (!item) {
 			return false;
 		}
