@@ -45,7 +45,7 @@ FILE_EXT_MAPPING = {
 	'plt':    0x6,
 	'pro':  0x3FD,
 	'pvrz': 0x404,
-	'png':    0x3,
+	'png':  0x40B,
 	'res':  0x3FE,
 	'spl':  0x3EE,
 	'sto':  0x3F6,

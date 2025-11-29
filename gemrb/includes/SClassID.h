@@ -42,7 +42,7 @@ using SClass_ID = unsigned long;
 #define IE_BIF_CLASS_ID  0x00020000
 #define IE_BIO_CLASS_ID  0x000003FE //also .res
 #define IE_BMP_CLASS_ID  0x00000001
-#define IE_PNG_CLASS_ID  0x00000003
+// TGA was at 0x3, but never used (noted as unconfirmed 0x3B8 in NI)
 #define IE_CHR_CLASS_ID  0x000003FA
 #define IE_CHU_CLASS_ID  0x000003EA
 #define IE_CRE_CLASS_ID  0x000003F1
@@ -63,6 +63,7 @@ using SClass_ID = unsigned long;
 #define IE_BIK_CLASS_ID  0x00FFFFFF
 #define IE_OGG_CLASS_ID  0x00000007 // gemrb extension
 #define IE_PLT_CLASS_ID  0x00000006
+#define IE_PNG_CLASS_ID        0x0000040B
 #define IE_PRO_CLASS_ID  0x000003FD
 #define IE_PVRZ_CLASS_ID 0x00000404
 #define IE_SAV_CLASS_ID  0x00050000
@@ -70,7 +71,6 @@ using SClass_ID = unsigned long;
 #define IE_SQL_CLASS_ID  0x00000403 // yep, no 0x402
 #define IE_SRC_CLASS_ID  0x00000803
 #define IE_STO_CLASS_ID  0x000003F6
-// TGA was at 0x3, but never used
 #define IE_TIS_CLASS_ID        0x000003EB
 #define IE_TLK_CLASS_ID        0x00060000
 #define IE_TOH_CLASS_ID        0x00070000 // 0x407 in ee, merged with tot as toh v2
