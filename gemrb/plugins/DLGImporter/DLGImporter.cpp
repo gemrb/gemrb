@@ -75,13 +75,13 @@ Holder<Dialog> DLGImporter::GetDialog() const
 	d.Order.resize(StatesCount);
 	d.initialStates.resize(StatesCount);
 	for (unsigned int i = 0; i < StatesCount; i++) {
-		Holder<DialogState> ds = GetDialogState(&d, i);
+		Holder<DialogState> ds = GetDialogState(d, i);
 		d.initialStates[i] = ds;
 	}
 	return MakeHolder<Dialog>(std::move(d));
 }
 
-Holder<DialogState> DLGImporter::GetDialogState(Dialog* d, unsigned int index) const
+Holder<DialogState> DLGImporter::GetDialogState(Dialog& dlg, unsigned int index) const
 {
 	DialogState ds;
 	//16 = sizeof(State)
@@ -95,7 +95,7 @@ Holder<DialogState> DLGImporter::GetDialogState(Dialog* d, unsigned int index) c
 	ds.condition = GetStateTrigger(TriggerIndex);
 	ds.transitions = GetTransitions(FirstTransitionIndex, ds.transitionsCount);
 	if (TriggerIndex < StatesCount)
-		d->Order[TriggerIndex] = index;
+		dlg.Order[TriggerIndex] = index;
 	return MakeHolder<DialogState>(std::move(ds));
 }
 
