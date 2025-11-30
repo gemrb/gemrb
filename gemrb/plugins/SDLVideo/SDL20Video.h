@@ -260,6 +260,8 @@ public:
 
 	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
 			     Color tint = Color()) override;
+	void BlitVideoBufferFully(const VideoBufferPtr& buf, BlitFlags flags,
+				  Color tint = Color()) override;
 
 	void DrawRawGeometry(const std::vector<float>& vertices, const std::vector<Color>& colors, BlitFlags blitFlags) override;
 
