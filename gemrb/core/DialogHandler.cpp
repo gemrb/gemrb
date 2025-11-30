@@ -206,7 +206,7 @@ static Actor* FindBanter(const Scriptable* target, const ResRef& dialog)
 	return target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
 }
 
-static int GetDialogOptions(const DialogState* ds, std::vector<SelectOption>& options, Scriptable* target)
+static int GetDialogOptions(const Holder<DialogState> ds, std::vector<SelectOption>& options, Scriptable* target)
 {
 	int idx = 0;
 	// first looking for a 'continue' opportunity, the order is descending (a la IE)

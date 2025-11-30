@@ -75,28 +75,28 @@ Holder<Dialog> DLGImporter::GetDialog() const
 	d.Order.resize(StatesCount);
 	d.initialStates.resize(StatesCount);
 	for (unsigned int i = 0; i < StatesCount; i++) {
-		DialogState* ds = GetDialogState(&d, i);
+		Holder<DialogState> ds = GetDialogState(&d, i);
 		d.initialStates[i] = ds;
 	}
 	return MakeHolder<Dialog>(std::move(d));
 }
 
-DialogState* DLGImporter::GetDialogState(Dialog* d, unsigned int index) const
+Holder<DialogState> DLGImporter::GetDialogState(Dialog* d, unsigned int index) const
 {
-	DialogState* ds = new DialogState();
+	DialogState ds;
 	//16 = sizeof(State)
 	str->Seek(StatesOffset + (index * 16), GEM_STREAM_START);
 	ieDword FirstTransitionIndex;
 	ieDword TriggerIndex;
-	str->ReadStrRef(ds->StrRef);
+	str->ReadStrRef(ds.StrRef);
 	str->ReadDword(FirstTransitionIndex);
-	str->ReadDword(ds->transitionsCount);
+	str->ReadDword(ds.transitionsCount);
 	str->ReadDword(TriggerIndex);
-	ds->condition = GetStateTrigger(TriggerIndex);
-	ds->transitions = GetTransitions(FirstTransitionIndex, ds->transitionsCount);
+	ds.condition = GetStateTrigger(TriggerIndex);
+	ds.transitions = GetTransitions(FirstTransitionIndex, ds.transitionsCount);
 	if (TriggerIndex < StatesCount)
 		d->Order[TriggerIndex] = index;
-	return ds;
+	return MakeHolder<DialogState>(std::move(ds));
 }
 
 std::vector<DialogTransition*> DLGImporter::GetTransitions(unsigned int firstIndex, unsigned int count) const

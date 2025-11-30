@@ -76,11 +76,10 @@ public:
 	Dialog& operator=(const Dialog&) = delete;
 
 private:
-	void FreeDialogState(DialogState* ds);
+	void FreeDialogState(Holder<DialogState> ds);
 
 public:
-	void AddState(DialogState* ds);
-	DialogState* GetState(unsigned int index) const;
+	Holder<DialogState> GetState(unsigned int index) const;
 	int FindFirstState(Scriptable* target) const;
 	int FindRandomState(Scriptable* target) const;
 
@@ -89,7 +88,7 @@ public:
 	ieDword Flags = 0; // freeze flags (bg2)
 	unsigned int TopLevelCount = 0;
 	std::vector<unsigned int> Order;
-	std::vector<DialogState*> initialStates;
+	std::vector<Holder<DialogState>> initialStates;
 };
 
 }

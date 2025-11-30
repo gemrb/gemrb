@@ -38,15 +38,15 @@ Dialog::~Dialog(void)
 	}
 }
 
-DialogState* Dialog::GetState(unsigned int index) const
+Holder<DialogState> Dialog::GetState(unsigned int index) const
 {
 	if (index >= TopLevelCount) {
-		return NULL;
+		return nullptr;
 	}
 	return initialStates[index];
 }
 
-void Dialog::FreeDialogState(DialogState* ds)
+void Dialog::FreeDialogState(Holder<DialogState> ds)
 {
 	for (unsigned int i = 0; i < ds->transitionsCount; i++) {
 		DialogTransition* trans = ds->transitions[i];
@@ -56,9 +56,6 @@ void Dialog::FreeDialogState(DialogState* ds)
 		trans->condition.reset();
 		delete trans;
 	}
-
-	ds->condition.reset();
-	delete ds;
 }
 
 int Dialog::FindFirstState(Scriptable* target) const

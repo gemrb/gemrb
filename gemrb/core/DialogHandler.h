@@ -59,7 +59,7 @@ private:
 	void DialogChooseInitial(Scriptable* target, Actor* tgta) const;
 	int DialogChooseTransition(unsigned int choose, Scriptable*& target, Actor*& tgta, Actor* speaker);
 
-	DialogState* ds = nullptr;
+	Holder<DialogState> ds = nullptr;
 	Holder<Dialog> dlg = nullptr;
 
 	ScriptID speakerID = 0;
