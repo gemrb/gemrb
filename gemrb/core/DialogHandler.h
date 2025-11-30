@@ -55,7 +55,7 @@ public:
 private:
 	/** this function safely retrieves an Actor by ID */
 	Actor* GetLocalActorByGlobalID(ieDword ID) const;
-	void UpdateJournalForTransition(const DialogTransition* tr) const;
+	void UpdateJournalForTransition(const Holder<DialogTransition> tr) const;
 	void DialogChooseInitial(Scriptable* target, Actor* tgta) const;
 	int DialogChooseTransition(unsigned int choose, Scriptable*& target, Actor*& tgta, Actor* speaker);
 

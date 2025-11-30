@@ -47,7 +47,7 @@ DialogHandler::DialogHandler(void)
 	}
 }
 
-void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr) const
+void DialogHandler::UpdateJournalForTransition(const Holder<DialogTransition> tr) const
 {
 	if (!tr || !(tr->Flags & IE_DLG_TR_JOURNAL)) return;
 
@@ -272,7 +272,7 @@ void DialogHandler::DialogChooseInitial(Scriptable* target, Actor* tgta) const
 
 int DialogHandler::DialogChooseTransition(unsigned int choose, Scriptable*& target, Actor*& tgta, Actor* speaker)
 {
-	DialogTransition* tr = ds->transitions[choose];
+	Holder<DialogTransition> tr = ds->transitions[choose];
 	UpdateJournalForTransition(tr);
 
 	TextArea* ta = core->GetMessageTextArea();

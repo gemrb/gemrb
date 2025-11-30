@@ -49,12 +49,12 @@ public:
 private:
 	bool Import(DataStream* stream) override;
 	Holder<DialogState> GetDialogState(Dialog& dlg, unsigned int index) const;
-	DialogTransition* GetTransition(unsigned int index) const;
+	Holder<DialogTransition> GetTransition(unsigned int index) const;
 	Holder<Condition> GetStateTrigger(unsigned int index) const;
 	Holder<Condition> GetTransitionTrigger(unsigned int index) const;
 	std::vector<Action*> GetAction(unsigned int index) const;
-	std::vector<DialogTransition*> GetTransitions(unsigned int firstIndex,
-						      unsigned int count) const;
+	std::vector<Holder<DialogTransition>> GetTransitions(unsigned int firstIndex,
+							     unsigned int count) const;
 };
 
 }

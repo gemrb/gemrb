@@ -61,7 +61,7 @@ struct DialogTransition {
 
 struct DialogState {
 	ieStrRef StrRef;
-	std::vector<DialogTransition*> transitions;
+	std::vector<Holder<DialogTransition>> transitions;
 	unsigned int transitionsCount;
 	Holder<Condition> condition;
 	unsigned int weight;

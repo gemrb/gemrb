@@ -99,47 +99,47 @@ Holder<DialogState> DLGImporter::GetDialogState(Dialog& dlg, unsigned int index)
 	return MakeHolder<DialogState>(std::move(ds));
 }
 
-std::vector<DialogTransition*> DLGImporter::GetTransitions(unsigned int firstIndex, unsigned int count) const
+std::vector<Holder<DialogTransition>> DLGImporter::GetTransitions(unsigned int firstIndex, unsigned int count) const
 {
-	std::vector<DialogTransition*> trans(count);
+	std::vector<Holder<DialogTransition>> trans(count);
 	for (unsigned int i = 0; i < count; i++) {
 		trans[i] = GetTransition(firstIndex + i);
 	}
 	return trans;
 }
 
-DialogTransition* DLGImporter::GetTransition(unsigned int index) const
+Holder<DialogTransition> DLGImporter::GetTransition(unsigned int index) const
 {
 	if (index >= TransitionsCount) {
-		return NULL;
+		return nullptr;
 	}
 	//32 = sizeof(Transition)
 	str->Seek(TransitionsOffset + (index * 32), GEM_STREAM_START);
-	DialogTransition* dt = new DialogTransition();
-	str->ReadDword(dt->Flags);
-	str->ReadStrRef(dt->textStrRef);
-	if (!(dt->Flags & IE_DLG_TR_TEXT)) {
-		dt->textStrRef = ieStrRef::INVALID;
+	DialogTransition dt;
+	str->ReadDword(dt.Flags);
+	str->ReadStrRef(dt.textStrRef);
+	if (!(dt.Flags & IE_DLG_TR_TEXT)) {
+		dt.textStrRef = ieStrRef::INVALID;
 	}
-	str->ReadStrRef(dt->journalStrRef);
-	if (!(dt->Flags & IE_DLG_TR_JOURNAL)) {
-		dt->journalStrRef = ieStrRef::INVALID;
+	str->ReadStrRef(dt.journalStrRef);
+	if (!(dt.Flags & IE_DLG_TR_JOURNAL)) {
+		dt.journalStrRef = ieStrRef::INVALID;
 	}
 	ieDword TriggerIndex;
 	ieDword ActionIndex;
 	str->ReadDword(TriggerIndex);
 	str->ReadDword(ActionIndex);
-	str->ReadResRef(dt->Dialog);
-	str->ReadDword(dt->stateIndex);
-	if (dt->Flags & IE_DLG_TR_TRIGGER) {
-		dt->condition = GetTransitionTrigger(TriggerIndex);
+	str->ReadResRef(dt.Dialog);
+	str->ReadDword(dt.stateIndex);
+	if (dt.Flags & IE_DLG_TR_TRIGGER) {
+		dt.condition = GetTransitionTrigger(TriggerIndex);
 	} else {
-		dt->condition = nullptr;
+		dt.condition = nullptr;
 	}
-	if (dt->Flags & IE_DLG_TR_ACTION) {
-		dt->actions = GetAction(ActionIndex);
+	if (dt.Flags & IE_DLG_TR_ACTION) {
+		dt.actions = GetAction(ActionIndex);
 	}
-	return dt;
+	return MakeHolder<DialogTransition>(std::move(dt));
 }
 
 static char** GetStrings(const char* string, unsigned int& count);

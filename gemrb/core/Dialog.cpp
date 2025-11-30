@@ -49,12 +49,11 @@ Holder<DialogState> Dialog::GetState(unsigned int index) const
 void Dialog::FreeDialogState(Holder<DialogState> ds)
 {
 	for (unsigned int i = 0; i < ds->transitionsCount; i++) {
-		DialogTransition* trans = ds->transitions[i];
+		Holder<DialogTransition> trans = ds->transitions[i];
 		for (auto& action : trans->actions) {
 			action->Release();
 		}
-		trans->condition.reset();
-		delete trans;
+		trans = nullptr;
 	}
 }
 
