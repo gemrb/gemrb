@@ -91,15 +91,14 @@ void DrawPointSurface(SDL_Surface* dst, BasePoint p, const Region& clip, const C
 }
 
 template<SHADER SHADE = SHADER::NONE>
-void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, const Region& clip, const Color& srcc)
+void DrawPointsSurface(SDL_Surface* surface, const std::vector<BasePoint>& points, const Region& clip, const Color& srcc)
 {
 	const SDL_PixelFormat* fmt = surface->format;
 	SDL_LockSurface(surface);
 
-	std::vector<Point>::const_iterator it;
-	it = points.begin();
-	for (; it != points.end(); ++it) {
-		Point p = *it;
+	auto it = points.cbegin();
+	for (; it != points.cend(); ++it) {
+		auto p = *it;
 		if (!clip.PointInside(p) || PointClipped(surface, p)) continue;
 
 		unsigned char* start = static_cast<unsigned char*>(surface->pixels);
@@ -266,16 +265,16 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, int y2, const Region& cl
 }
 
 template<SHADER SHADE = SHADER::NONE>
-void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end, const Region& clip, const Color& color)
+void DrawLineSurface(SDL_Surface* surface, const BasePoint& start, const BasePoint& end, const Region& clip, const Color& color)
 {
-	if (start.y == end.y) return DrawHLineSurface<SHADE>(surface, start, end.x, clip, color);
-	if (start.x == end.x) return DrawVLineSurface<SHADE>(surface, start, end.y, clip, color);
+	if (start.y == end.y) return DrawHLineSurface<SHADE>(surface, { start.x, start.y }, end.x, clip, color);
+	if (start.x == end.x) return DrawVLineSurface<SHADE>(surface, { start.x, start.y }, end.y, clip, color);
 
 	assert(clip.x >= 0 && clip.w <= surface->w);
 	assert(clip.y >= 0 && clip.h <= surface->h);
 
-	Point p1 = start;
-	Point p2 = end;
+	auto p1 = start;
+	auto p2 = end;
 
 	bool yLonger = false;
 	int shortLen = p2.y - p1.y;
@@ -301,7 +300,7 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 	// while drawing. Yes, its permanently used memory, but we do
 	// enough drawing that this is not a problem (its a tiny amount anyway)
 	// Point is trivial and clear() should be constant
-	static std::vector<Point> s_points;
+	static std::vector<BasePoint> s_points;
 	s_points.clear();
 	s_points.reserve(std::abs(longLen) + std::abs(shortLen));
 	Point newp;

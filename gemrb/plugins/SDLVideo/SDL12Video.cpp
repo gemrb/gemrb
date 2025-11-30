@@ -23,9 +23,10 @@
 #include "Game.h"
 #include "Interface.h"
 #include "SDL12GamepadMappings.h"
-#include "SDLPixelIterator.h"
 #include "SDLSpriteRendererRLE.h"
 #include "SDLSurfaceSprite2D.h"
+
+#include "Logging/Logging.h"
 
 using namespace GemRB;
 
@@ -255,9 +256,9 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const Region
 	if (spr->Format().Bpp == 1) {
 		if (flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)) {
 			c.a = (flags & BlitFlags::ALPHA_MOD) ? c.a : SDL_ALPHA_OPAQUE;
-			flags &= ~spr->RenderWithFlags(flags, &c);
+			flags &= ~spr->PrepareForRendering(flags, &c);
 		} else {
-			flags &= ~spr->RenderWithFlags(flags);
+			flags &= ~spr->PrepareForRendering(flags);
 		}
 	}
 
@@ -435,12 +436,13 @@ void SDL12VideoDriver::DrawPointsImp(const std::vector<BasePoint>& points, const
 
 void SDL12VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags)
 {
+	auto& basePoints = reinterpret_cast<const std::vector<BasePoint>&>(points);
 	if (flags & BlitFlags::BLENDED && color.unused < 0xff) {
-		DrawPointsSurface<SHADER::BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<SHADER::BLEND>(CurrentRenderBuffer(), basePoints, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	} else if (flags & BlitFlags::MOD) {
-		DrawPointsSurface<SHADER::TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<SHADER::TINT>(CurrentRenderBuffer(), basePoints, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	} else {
-		DrawPointsSurface<SHADER::NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<SHADER::NONE>(CurrentRenderBuffer(), basePoints, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	}
 }
 

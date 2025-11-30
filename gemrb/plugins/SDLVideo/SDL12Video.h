@@ -21,6 +21,9 @@
 #ifndef SDL12VIDEODRIVER_H
 #define SDL12VIDEODRIVER_H
 
+#include "DPadSoftKeyboard.h"
+#include "SDLPixelIterator.h"
+#include "SDLSurfaceDrawing.h"
 #include "SDLVideo.h"
 
 namespace GemRB {
@@ -150,7 +153,7 @@ public:
 			va_list args;
 			va_start(args, pitch);
 			Palette* pal = va_arg(args, Palette*);
-			memcpy(sprite->format->palette->colors, pal->col, sprite->format->palette->ncolors * 4);
+			memcpy(sprite->format->palette->colors, pal->ColorData(), sprite->format->palette->ncolors * 4);
 			va_end(args);
 		}
 
