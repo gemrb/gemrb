@@ -1387,8 +1387,8 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 
 	VideoDriver->SetStencilBuffer(nullptr);
 
-	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
-	game->DrawWeather(update_scripts);
+	bool updateScripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
+	game->DrawWeather(viewport, updateScripts);
 
 	if (dFlags & (DEBUG_SHOW_LIGHTMAP | DEBUG_SHOW_HEIGHTMAP | DEBUG_SHOW_MATERIALMAP | DEBUG_SHOW_SEARCHMAP)) {
 		DrawDebugOverlay(viewport, dFlags);

@@ -2262,7 +2262,7 @@ void Game::ChangeSong(bool always, bool force) const
 
 // this method redraws weather. If update is false,
 // then the weather particles won't change (game paused)
-void Game::DrawWeather(bool update)
+void Game::DrawWeather(const Region& viewport, bool update)
 {
 	if (!weather) {
 		return;
@@ -2271,6 +2271,7 @@ void Game::DrawWeather(bool update)
 		return;
 	}
 
+	weather->SetRegion(0, 0, viewport.w, viewport.h);
 	// weather just needs to occur on screen. it doesn't actually require coordinates like a spell effect would.
 	weather->Draw(Point());
 	if (!update) {

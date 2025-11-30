@@ -484,7 +484,7 @@ public:
 	/** returns true if party has infravision */
 	bool PartyHasInfravision() const { return hasInfra; }
 	/** draw weather */
-	void DrawWeather(bool update);
+	void DrawWeather(const Region&, bool update);
 	/** updates current area music */
 	void ChangeSong(bool always = true, bool force = true) const;
 	/** sets expansion mode */
