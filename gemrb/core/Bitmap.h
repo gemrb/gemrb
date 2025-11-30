@@ -155,7 +155,7 @@ public:
 		return storage.data();
 	}
 
-	const auto data() const noexcept
+	auto data() const noexcept
 	{
 		return storage.data();
 	}
