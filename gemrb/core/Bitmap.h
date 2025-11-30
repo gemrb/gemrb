@@ -73,33 +73,6 @@ public:
 	Bitmap(const Bitmap& bm) noexcept
 		: Bitmap(bm.size, bm.storage) {}
 
-	Bitmap& operator=(const Bitmap& bm) noexcept
-	{
-		if (&bm != this) {
-			size = bm.size;
-			bytes = bm.bytes;
-			storage = bm.storage;
-		}
-		return *this;
-	}
-
-	Bitmap(Bitmap&& other) noexcept
-	{
-		std::swap(storage, other.storage);
-		size = other.size;
-		bytes = other.bytes;
-	}
-
-	Bitmap& operator=(Bitmap&& other) noexcept
-	{
-		if (&other != this) {
-			std::swap(storage, other.storage);
-			size = other.size;
-			bytes = other.bytes;
-		}
-		return *this;
-	}
-
 	BitProxy operator[](int i) noexcept
 	{
 		div_t res = std::div(i, 8);
