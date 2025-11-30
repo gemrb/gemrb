@@ -221,7 +221,7 @@ public:
 	Point ConvertPointToWindow(const Point&) const;
 	Point ConvertPointFromWindow(const Point&) const;
 	Point ConvertPointToScreen(const Point&) const;
-	Point ConvertPointFromScreen(const Point&) const;
+	virtual Point ConvertPointFromScreen(const Point&) const;
 
 	Region ConvertRegionToSuper(Region) const;
 	Region ConvertRegionFromSuper(Region) const;

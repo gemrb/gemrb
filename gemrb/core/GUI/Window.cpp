@@ -157,6 +157,7 @@ void Window::RecreateBuffer()
 	Video::BufferFormat fmt = (flags & AlphaChannel) ? Video::BufferFormat::DISPLAY_ALPHA : Video::BufferFormat::DISPLAY;
 	backBuffer = VideoDriver->CreateBuffer(frame, fmt);
 
+	UseScaleBuffer(scale, true);
 	// the entire window must be invalidated, because the new buffer is blank
 	// TODO: we *could* optimize this to instead blit the old buffer to the new one
 	MarkDirty();
@@ -182,31 +183,41 @@ void Window::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	backBuffer->SetOrigin(frame.origin);
 	VideoDriver->PushDrawingBuffer(backBuffer);
+
+	if (scaleBuffer) {
+		scaleBuffer->SetOrigin(frame.origin);
+		VideoDriver->PushDrawingBuffer(scaleBuffer);
+	}
 }
 
 void Window::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
-	if (!InDebugMode(DebugMode::WINDOWS)) return;
+	if (InDebugMode(DebugMode::WINDOWS)) {
+		VideoDriver->SetScreenClip(nullptr);
 
-	VideoDriver->SetScreenClip(nullptr);
+		auto lock = manager.DrawHUD();
 
-	auto lock = manager.DrawHUD();
+		if (focusView) {
+			Region r = focusView->ConvertRegionToScreen(Region(Point(), focusView->Dimensions()));
+			VideoDriver->DrawRect(r, ColorWhite, false);
+		}
 
-	if (focusView) {
-		Region r = focusView->ConvertRegionToScreen(Region(Point(), focusView->Dimensions()));
-		VideoDriver->DrawRect(r, ColorWhite, false);
+		if (hoverView) {
+			Region r = hoverView->ConvertRegionToScreen(Region(Point(), hoverView->Dimensions()));
+			r.ExpandAllSides(-5);
+			VideoDriver->DrawRect(r, ColorBlue, false);
+		}
+
+		if (trackingView) {
+			Region r = trackingView->ConvertRegionToScreen(Region(Point(), trackingView->Dimensions()));
+			r.ExpandAllSides(-10);
+			VideoDriver->DrawRect(r, ColorRed, false);
+		}
 	}
 
-	if (hoverView) {
-		Region r = hoverView->ConvertRegionToScreen(Region(Point(), hoverView->Dimensions()));
-		r.ExpandAllSides(-5);
-		VideoDriver->DrawRect(r, ColorBlue, false);
-	}
-
-	if (trackingView) {
-		Region r = trackingView->ConvertRegionToScreen(Region(Point(), trackingView->Dimensions()));
-		r.ExpandAllSides(-10);
-		VideoDriver->DrawRect(r, ColorRed, false);
+	if (scaleBuffer) {
+		VideoDriver->PopDrawingBuffer();
+		VideoDriver->BlitVideoBufferFully(scaleBuffer, BlitFlags::NONE);
 	}
 }
 
@@ -674,6 +685,31 @@ bool Window::OnControllerButtonDown(const ControllerEvent& ce)
 ViewScriptingRef* Window::CreateScriptingRef(ScriptingId id, ScriptingGroup_t group)
 {
 	return new WindowScriptingRef(this, id, group);
+}
+
+void Window::DropScaleBuffer()
+{
+	scale = 100;
+	scaleBuffer = nullptr;
+}
+
+void Window::UseScaleBuffer(unsigned int percent, bool force)
+{
+	if (!((force && percent != 100) || scale != percent)) {
+		return;
+	}
+
+	DropScaleBuffer();
+	scale = percent;
+	if (percent == 100) {
+		return;
+	}
+
+	auto r = backBuffer->Rect();
+	r.Scale(percent);
+
+	Video::BufferFormat fmt = (flags & AlphaChannel) ? Video::BufferFormat::DISPLAY_ALPHA : Video::BufferFormat::DISPLAY;
+	scaleBuffer = VideoDriver->CreateBuffer(r, fmt);
 }
 
 }
