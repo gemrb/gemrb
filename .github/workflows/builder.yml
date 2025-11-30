@@ -106,7 +106,7 @@ jobs:
         sccache -s
 
     - name: Set up SSH
-      uses: kielabokkie/ssh-key-and-known-hosts-action@v1
+      uses: kielabokkie/ssh-key-and-known-hosts-action@5b675129e6aa73a496c939eb1f4a9fe4502fc324
       if: github.event_name == 'push'
       with:
         ssh-private-key: ${{ secrets.SSH_SF_PRIVATE_KEY }}
@@ -215,7 +215,7 @@ jobs:
         sccache -s
 
     - name: Set up SSH
-      uses: kielabokkie/ssh-key-and-known-hosts-action@v1
+      uses: kielabokkie/ssh-key-and-known-hosts-action@5b675129e6aa73a496c939eb1f4a9fe4502fc324
       if: github.event_name == 'push'
       with:
         ssh-private-key: ${{ secrets.SSH_SF_PRIVATE_KEY }}
