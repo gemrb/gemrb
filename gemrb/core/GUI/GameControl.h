@@ -69,7 +69,7 @@ private:
 	// mouse coordinates represented in game coordinates
 	Point gameClickPoint;
 	Point screenMousePos;
-	Point vpOrigin;
+	Region viewport;
 	bool updateVPTimer = true;
 	float_t formationBaseAngle = 0.0;
 
@@ -87,6 +87,7 @@ private:
 	unsigned int DisplayTextTime = 0;
 	bool AlwaysRun = false;
 	Actor* user = nullptr; //the user of item or spell
+	unsigned int zoomLevel = 16; // 100%
 
 	Scriptable* overMe = nullptr;
 
@@ -141,6 +142,7 @@ private:
 	void OutlineDoors() const;
 	void OutlineContainers() const;
 	void DrawTrackingArrows();
+	void ScaleViewport(unsigned int);
 
 	bool CanLockFocus() const override { return true; };
 	void FlagsChanged(unsigned int /*oldflags*/) override;
@@ -180,6 +182,7 @@ public:
 	void ClearMouseState();
 	Point GameMousePos() const;
 
+	Point ConvertPointFromScreen(const Point&) const override;
 	void MoveViewportUnlockedTo(Point, bool center);
 	bool MoveViewportTo(Point, bool center, int speed = 0);
 	Region Viewport() const;
@@ -229,6 +232,8 @@ public:
 	void ToggleAlwaysRun();
 	int GetOverheadOffset() const;
 	void TryDefaultTalk() const;
+	unsigned int GetZoomLevel() const;
+	unsigned int GetScalePercent() const;
 
 protected:
 	//Events

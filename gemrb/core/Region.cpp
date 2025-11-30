@@ -291,4 +291,25 @@ void Region::ExpandAllSides(int amt) noexcept
 	h += amt * 2;
 }
 
+void Region::Scale(unsigned int percent) noexcept
+{
+	int newW = (w * percent) / 100;
+	int newH = (h * percent) / 100;
+	x += (w - newW) / 2;
+	y += (h - newH) / 2;
+	w = newW;
+	h = newH;
+}
+
+// inverse of above
+void Region::Unscale(unsigned int percent) noexcept
+{
+	int newW = (w * 100) / percent;
+	int newH = (h * 100) / percent;
+	x += (w - newW) / 2;
+	y += (h - newH) / 2;
+	w = newW;
+	h = newH;
+}
+
 }

@@ -167,6 +167,8 @@ public:
 	void ExpandToPoint(const Point& p) noexcept;
 	void ExpandToRegion(const Region& r) noexcept;
 	void ExpandAllSides(int amt) noexcept;
+	void Scale(unsigned int percent) noexcept;
+	void Unscale(unsigned int percent) noexcept;
 
 	static Region RegionEnclosingRegions(const Region& r1, const Region& r2)
 	{

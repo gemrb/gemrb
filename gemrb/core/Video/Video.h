@@ -206,9 +206,10 @@ public:
 	void SetEventMgr(EventMgr* evnt);
 
 	/** Sets Clip Rectangle */
-	void SetScreenClip(const Region* clip);
+	void SetScreenClip(const Region* clip, bool toScreen = true);
 	/** Gets Clip Rectangle */
 	const Region& GetScreenClip() const { return screenClip; }
+
 	virtual void SetGamma(int brightness, int contrast) = 0;
 
 	/** Scales down a sprite by a ratio */
