@@ -174,7 +174,7 @@ Region& Region::operator=(const Region& rhs) noexcept
 	return *this;
 }
 
-bool Region::PointInside(const Point& p) const noexcept
+bool Region::PointInside(const BasePoint& p) const noexcept
 {
 	if ((p.x < x) || (p.x >= (x + w))) {
 		return false;

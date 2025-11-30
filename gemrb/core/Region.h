@@ -153,7 +153,7 @@ public:
 	bool operator==(const Region& rgn) const noexcept;
 	bool operator!=(const Region& rgn) const noexcept;
 
-	bool PointInside(const Point& p) const noexcept;
+	bool PointInside(const BasePoint& p) const noexcept;
 	bool RectInside(const Region& r) const noexcept;
 
 	bool IntersectsRegion(const Region& rgn) const noexcept;
