@@ -31,7 +31,7 @@ enum BlitFlags : uint32_t;
 
 Dialog::~Dialog(void)
 {
-	for (auto& state : initialStates) {
+	for (const auto& state : initialStates) {
 		if (state) {
 			FreeDialogState(state);
 		}
@@ -46,7 +46,7 @@ Holder<DialogState> Dialog::GetState(unsigned int index) const
 	return initialStates[index];
 }
 
-void Dialog::FreeDialogState(Holder<DialogState> ds)
+void Dialog::FreeDialogState(Holder<DialogState> ds) const
 {
 	for (auto& trans : ds->transitions) {
 		for (auto& action : trans->actions) {

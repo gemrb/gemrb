@@ -76,7 +76,7 @@ public:
 	Dialog& operator=(const Dialog&) = delete;
 
 private:
-	void FreeDialogState(Holder<DialogState> ds);
+	void FreeDialogState(Holder<DialogState> ds) const;
 
 public:
 	Holder<DialogState> GetState(unsigned int index) const;
