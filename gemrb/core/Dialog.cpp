@@ -48,8 +48,7 @@ Holder<DialogState> Dialog::GetState(unsigned int index) const
 
 void Dialog::FreeDialogState(Holder<DialogState> ds)
 {
-	for (unsigned int i = 0; i < ds->transitionsCount; i++) {
-		Holder<DialogTransition> trans = ds->transitions[i];
+	for (auto& trans : ds->transitions) {
 		for (auto& action : trans->actions) {
 			action->Release();
 		}
