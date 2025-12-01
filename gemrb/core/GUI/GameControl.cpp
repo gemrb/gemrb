@@ -2863,9 +2863,12 @@ int GameControl::GetOverheadOffset() const
 	return 0;
 }
 
-unsigned int GameControl::GetZoomLevel() const
+void GameControl::SetScalePercent(unsigned int level)
 {
-	return zoomLevel;
+	auto value = Clamp(level, 25u, 160u);
+	zoomLevel = (value - 20) / 5;
+
+	ScaleViewport(100);
 }
 
 unsigned int GameControl::GetScalePercent() const
