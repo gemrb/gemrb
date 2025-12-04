@@ -378,9 +378,9 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 			{
 				SRBlender<Uint32, Blender> blend(dstit.format);
 				if (partial) {
-					BlitSpriteRLE_Partial<Uint32>(rledata, spr->Frame.w, srect, palette->col, ck, dstit, *cover, flags, tint, blend);
+					BlitSpriteRLE_Partial<Uint32>(rledata, spr->Frame.w, srect, palette->ColorData(), ck, dstit, *cover, flags, tint, blend);
 				} else {
-					BlitSpriteRLE_Total<Uint32>(rledata, palette->col, ck, dstit, *cover, flags, tint, blend);
+					BlitSpriteRLE_Total<Uint32>(rledata, palette->ColorData(), ck, dstit, *cover, flags, tint, blend);
 				}
 				break;
 			}
@@ -388,9 +388,9 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 			{
 				SRBlender<Uint16, Blender> blend(dstit.format);
 				if (partial) {
-					BlitSpriteRLE_Partial<Uint16>(rledata, spr->Frame.w, srect, palette->col, ck, dstit, *cover, flags, tint, blend);
+					BlitSpriteRLE_Partial<Uint16>(rledata, spr->Frame.w, srect, palette->ColorData(), ck, dstit, *cover, flags, tint, blend);
 				} else {
-					BlitSpriteRLE_Total<Uint16>(rledata, palette->col, ck, dstit, *cover, flags, tint, blend);
+					BlitSpriteRLE_Total<Uint16>(rledata, palette->ColorData(), ck, dstit, *cover, flags, tint, blend);
 				}
 				break;
 			}

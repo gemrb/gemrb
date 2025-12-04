@@ -160,6 +160,9 @@ public:
 	bool PerformAction(const ActionKey& action) override;
 	bool SupportsAction(const ActionKey& action) override;
 
+	void DropScaleBuffer();
+	void UseScaleBuffer(unsigned int percent, bool force = false);
+
 private: // Private attributes
 	using KeyMap = std::map<KeyboardKey, EventMgr::EventCallback>;
 
@@ -175,6 +178,8 @@ private: // Private attributes
 	tick_t lastMouseMoveTime;
 
 	VideoBufferPtr backBuffer = nullptr;
+	VideoBufferPtr scaleBuffer = nullptr;
+	unsigned int scale = 100;
 	WindowManager& manager;
 
 	WindowEventHandler eventHandlers[3];

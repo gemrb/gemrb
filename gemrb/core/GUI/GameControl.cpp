@@ -19,6 +19,7 @@
 
 #include "GUI/GameControl.h"
 
+#include "damages.h"
 #include "ie_cursors.h"
 #include "ie_stats.h"
 
@@ -36,7 +37,6 @@
 #include "RNG.h"
 #include "ScriptEngine.h"
 #include "TileMap.h"
-#include "damages.h"
 
 #include "GUI/Button.h"
 #include "GUI/EventMgr.h"
@@ -113,7 +113,7 @@ void GameControl::SetTracker(const Actor* actor, ieDword dist)
 }
 
 GameControl::GameControl(const Region& frame)
-	: View(frame)
+	: View(frame), viewport(Point { 0, 0 }, frame.size)
 {
 	this->AlwaysRun = core->GetDictionary().Get("Always Run", 0);
 
@@ -259,7 +259,7 @@ void GameControl::DrawFormation(const std::vector<Actor*>& actors, const Point& 
 {
 	std::vector<Point> formationPoints = GetFormationPoints(formationPoint, actors, angle);
 	for (size_t i = 0; i < actors.size(); ++i) {
-		DrawTargetReticle(actors[i], formationPoints[i] - vpOrigin);
+		DrawTargetReticle(actors[i], formationPoints[i] - viewport.origin);
 	}
 }
 
@@ -422,6 +422,15 @@ void GameControl::DrawTargetReticle(const Movable* target, const Point& p, int o
 
 void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
+	auto scale = GetScalePercent();
+	if (scale != 100) {
+		auto screenSize = VideoDriver->GetScreenSize();
+		screenSize.w = (screenSize.w * scale) / 100;
+		screenSize.h = (screenSize.h * scale) / 100;
+		Region r(Point {}, screenSize);
+		VideoDriver->SetScreenClip(&r, false);
+	}
+
 	UpdateCursor();
 
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
@@ -430,7 +439,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	if (screenFlags.Test(ScreenFlags::AlwaysCenter) && update_scripts) {
 		const Actor* star = core->GetFirstSelectedActor();
 		if (star) {
-			vpVector = star->Pos - vpOrigin - Point(frame.w / 2, frame.h / 2);
+			vpVector = star->Pos - viewport.origin - Point(frame.w / 2, frame.h / 2);
 		}
 	}
 
@@ -440,7 +449,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 		vpVector.reset();
 	}
 
-	if (!vpVector.IsZero() && MoveViewportTo(vpOrigin + vpVector, false)) {
+	if (!vpVector.IsZero() && MoveViewportTo(viewport.origin + vpVector, false)) {
 		if ((Flags() & IgnoreEvents) == 0 && !scrollKeysActive && core->GetMouseScrollSpeed() && !screenFlags.Test(ScreenFlags::AlwaysCenter)) {
 			orient_t orient = GetOrient(Point(), vpVector);
 			// set these cursors on game window so they are universal
@@ -599,7 +608,7 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 		tmpflags |= DEBUG_SHOW_CONTAINERS | DEBUG_SHOW_DOORS;
 	}
 	//drawmap should be here so it updates fog of war
-	area->DrawMap(Viewport(), core->GetFogRenderer(), tmpflags);
+	area->DrawMap(viewport, core->GetFogRenderer(), tmpflags);
 
 	DrawTrackingArrows();
 
@@ -613,8 +622,8 @@ void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 	// Draw selection rect
 	if (isSelectionRect) {
 		Region r = SelectionRect();
-		r.x -= vpOrigin.x;
-		r.y -= vpOrigin.y;
+		r.x -= viewport.origin.x;
+		r.y -= viewport.origin.y;
 		VideoDriver->DrawRect(r, ColorGreen, false);
 	}
 
@@ -651,10 +660,10 @@ void GameControl::DrawTargetReticles() const
 		for (size_t i = 0; i < path.Size(); i++) {
 			const PathNode& step = path.GetStep(i);
 			if (!step.waypoint) continue;
-			Point wp = step.point - vpOrigin;
+			Point wp = step.point - viewport.origin;
 			DrawTargetReticle(selectee, wp);
 		}
-		DrawTargetReticle(selectee, selectee->Destination - vpOrigin); // always draw last step
+		DrawTargetReticle(selectee, selectee->Destination - viewport.origin); // always draw last step
 	}
 }
 
@@ -1496,12 +1505,21 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 {
 	if (EventMgr::ModState(GEM_MOD_CTRL)) {
 		Point p = ConvertPointFromScreen(me.Pos());
-		DebugPaint(p + vpOrigin, false);
+		DebugPaint(p + viewport.origin, false);
 		return true;
 	}
 
+	auto furtherAwayFromZero = [this](int a) {
+		// at closer zoom, mouse and move speed may not be colinear due to hitting almost 0 here
+		int b = a * static_cast<int>(GetScalePercent()) / 100;
+		return std::abs(a) > std::abs(b) ? a : b;
+	};
+
 	if (me.ButtonState(GEM_MB_MIDDLE)) {
-		Scroll(me.Delta());
+		auto delta = me.Delta();
+		delta.x = furtherAwayFromZero(delta.x);
+		delta.y = furtherAwayFromZero(delta.y);
+		Scroll(delta);
 		return true;
 	}
 
@@ -1584,7 +1602,7 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 				InitFormation(screenMousePos, true);
 			}
 		} else { // scroll viewport
-			MoveViewportTo(vpOrigin - gesture.Delta(), false);
+			MoveViewportTo(viewport.origin - gesture.Delta(), false);
 		}
 	} else if (gesture.numFingers == 3) { // keyboard/console
 		enum class SWIPE { DOWN = -1,
@@ -1624,7 +1642,7 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 
 Point GameControl::GameMousePos() const
 {
-	return vpOrigin + ConvertPointFromScreen(screenMousePos);
+	return viewport.origin + ConvertPointFromScreen(screenMousePos);
 }
 
 bool GameControl::OnGlobalMouseMove(const Event& e)
@@ -1646,8 +1664,9 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	mask.ExpandAllSides(-1 * core->config.EdgeScrollOffset);
 
 	screenMousePos = e.mouse.Pos();
-	Point mp = ConvertPointFromScreen(screenMousePos);
+	Point mp = View::ConvertPointFromScreen(e.mouse.Pos());
 	int mousescrollspd = core->GetMouseScrollSpeed();
+	mousescrollspd = (mousescrollspd * GetScalePercent()) / 100;
 
 	if (mp.x < mask.x) {
 		vpVector.x = -mousescrollspd;
@@ -1669,7 +1688,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 		// cancel any scripted moves
 		// we are not in dialog or cutscene mode anymore
 		// and the user is attempting to move the viewport
-		core->timer.SetMoveViewPort(vpOrigin, 0, false);
+		core->timer.SetMoveViewPort(viewport.origin, 0, false);
 	}
 
 	return true;
@@ -1677,13 +1696,13 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 
 void GameControl::MoveViewportUnlockedTo(Point p, bool center)
 {
-	Point half(frame.w / 2, frame.h / 2);
+	Point half(viewport.w / 2, viewport.h / 2);
 	if (center) {
 		p -= half;
 	}
 
 	core->GetAudioDrv()->SetListenerPosition(p + half);
-	vpOrigin = p;
+	viewport.origin = p;
 }
 
 bool GameControl::MoveViewportTo(Point p, bool center, int speed)
@@ -1692,10 +1711,10 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 	bool canMove = area != nullptr;
 	int mwinh = 0;
 
-	if (center || (!(updateVPTimer && speed) && canMove && p != vpOrigin)) {
+	if (center || (!(updateVPTimer && speed) && canMove && p != viewport.origin)) {
 		const TextArea* mta = core->GetMessageTextArea();
 		if (mta) {
-			mwinh = mta->GetWindow()->Frame().h;
+			mwinh = (mta->GetWindow()->Frame().h * GetScalePercent()) / 100;
 		}
 	}
 
@@ -1707,23 +1726,23 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 			p.y += mwinh;
 		}
 		core->timer.SetMoveViewPort(p, speed, center);
-	} else if (canMove && p != vpOrigin) {
+	} else if (canMove && p != viewport.origin) {
 		updateVPTimer = true;
 
 		Size mapsize = area->GetSize();
 
 		if (center) {
 			// should we account for the message window height here too?
-			p.x -= frame.w / 2;
-			p.y -= frame.h / 2;
+			p.x -= viewport.w / 2;
+			p.y -= viewport.h / 2;
 		}
 
 		// TODO: make the overflow more dynamic
-		if (frame.w >= mapsize.w + 64) {
-			p.x = (mapsize.w - frame.w) / 2;
+		if (viewport.w >= mapsize.w + 64) {
+			p.x = (mapsize.w - viewport.w) / 2;
 			canMove = false;
-		} else if (p.x + frame.w >= mapsize.w + 64) {
-			p.x = mapsize.w - frame.w + 64;
+		} else if (p.x + viewport.w >= mapsize.w + 64) {
+			p.x = mapsize.w - viewport.w + 64;
 			canMove = false;
 		} else if (p.x < -64) {
 			p.x = -64;
@@ -1731,11 +1750,11 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		}
 
 		constexpr int padding = 50;
-		if (frame.h >= mapsize.h + mwinh + padding) {
-			p.y = (mapsize.h - frame.h) / 2 + padding;
+		if (viewport.h >= mapsize.h + mwinh + padding) {
+			p.y = (mapsize.h - viewport.h) / 2 + padding;
 			canMove = false;
-		} else if (p.y + frame.h >= mapsize.h + mwinh + padding) {
-			p.y = mapsize.h - frame.h + mwinh + padding;
+		} else if (p.y + viewport.h >= mapsize.h + mwinh + padding) {
+			p.y = mapsize.h - viewport.h + mwinh + padding;
 			canMove = false;
 		} else if (p.y < 0) {
 			p.y = 0;
@@ -1745,7 +1764,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		MoveViewportUnlockedTo(p, false); // we already handled centering
 	} else {
 		updateVPTimer = true;
-		canMove = (p != vpOrigin);
+		canMove = (p != viewport.origin);
 	}
 
 	return canMove;
@@ -1753,7 +1772,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 
 Region GameControl::Viewport() const
 {
-	return Region(vpOrigin, frame.size);
+	return viewport;
 }
 
 //generate action code for source actor to try to attack a target
@@ -2127,7 +2146,7 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 	}
 
 	Point p = ConvertPointFromScreen(me.Pos());
-	gameClickPoint = p + vpOrigin;
+	gameClickPoint = p + viewport.origin;
 
 	switch (me.button) {
 		case GEM_MB_MENU: //right click.
@@ -2193,14 +2212,14 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
 	if (Mod & GEM_MOD_CTRL) {
 		Point p = ConvertPointFromScreen(me.Pos());
-		DebugPaint(p + vpOrigin, me.button == GEM_MB_MENU);
+		DebugPaint(p + viewport.origin, me.button == GEM_MB_MENU);
 		return true;
 	}
 
 	//heh, i found no better place
 	core->CloseCurrentContainer();
 
-	Point p = ConvertPointFromScreen(me.Pos()) + vpOrigin;
+	Point p = ConvertPointFromScreen(me.Pos()) + viewport.origin;
 	bool isDoubleClick = me.repeats == 2;
 	bool tryToRun = isDoubleClick;
 	if (core->HasFeature(GFFlags::HAS_FLOAT_MENU)) {
@@ -2405,14 +2424,35 @@ void GameControl::CommandSelectedMovement(const Point& p, bool formation, bool a
 		party[0]->AddAction("NIDSpecial2()");
 	}
 }
+
 bool GameControl::OnMouseWheelScroll(const Point& delta)
 {
-	// Game coordinates start at the top left to the bottom right
-	// so we need to invert the 'y' axis
-	Point d = delta;
-	d.y *= -1;
-	Scroll(d);
+	auto lastScale = GetScalePercent();
+	// EEs have 27 zoom steps
+	if (delta.y > 0 && zoomLevel > 1) {
+		zoomLevel--;
+	} else if (delta.y < 0 && zoomLevel < 27) {
+		zoomLevel++;
+	}
+
+	ScaleViewport(lastScale);
+
 	return true;
+}
+
+void GameControl::ScaleViewport(unsigned int lastScale)
+{
+	// reset to 100% first
+	if (lastScale != 100) {
+		viewport.Unscale(lastScale);
+	}
+
+	auto scale = GetScalePercent();
+	if (scale == 100) {
+		return;
+	}
+
+	viewport.Scale(scale);
 }
 
 bool GameControl::OnControllerButtonDown(const ControllerEvent& ce)
@@ -2451,7 +2491,7 @@ void GameControl::ApplyKeyScrolling()
 
 void GameControl::Scroll(const Point& amt)
 {
-	MoveViewportTo(vpOrigin + amt, false);
+	MoveViewportTo(viewport.origin + amt, false);
 }
 
 // only party members and familiars can start conversations from the GUI
@@ -2752,7 +2792,7 @@ void GameControl::SetLastActor(Actor* lastActor)
 bool GameControl::IsOverLastActor(const Point& pos) const
 {
 	const Actor* lastActor = lastActorID != 0 ? GetLastActor() : nullptr;
-	return lastActor && lastActor->IsOver(pos + vpOrigin);
+	return lastActor && lastActor->IsOver(pos + viewport.origin);
 }
 
 Scriptable* GameControl::GetHoverObject() const
@@ -2821,6 +2861,33 @@ int GameControl::GetOverheadOffset() const
 		return actor->overHead.GetHeightOffset();
 	}
 	return 0;
+}
+
+void GameControl::SetScalePercent(unsigned int level)
+{
+	auto value = Clamp(level, 25u, 160u);
+	zoomLevel = (value - 20) / 5;
+
+	ScaleViewport(100);
+}
+
+unsigned int GameControl::GetScalePercent() const
+{
+	return 20 + zoomLevel * 5;
+}
+
+Point GameControl::ConvertPointFromScreen(const Point& p) const
+{
+	auto scale = GetScalePercent();
+	if (scale == 100) {
+		return View::ConvertPointFromScreen(p);
+	}
+
+	auto offset = p;
+	offset.x = (offset.x * scale) / 100;
+	offset.y = (offset.y * scale) / 100;
+
+	return offset;
 }
 
 }

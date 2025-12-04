@@ -824,6 +824,7 @@ void Interface::HandleFlags() noexcept
 			if (actor) {
 				gc->ChangeMap(actor, true);
 			}
+			gc->SetScalePercent(GetGame()->zoomLevel);
 
 			Window* gamewin = winmgr->GetGameWindow();
 			gamewin->AddSubviewInFrontOfView(gc);

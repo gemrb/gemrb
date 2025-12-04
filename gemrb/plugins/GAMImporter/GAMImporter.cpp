@@ -25,6 +25,7 @@
 
 #include "GameData.h"
 #include "Interface.h"
+#include "GUI/GameControl.h"
 #include "PluginMgr.h"
 #include "TableMgr.h"
 
@@ -846,7 +847,9 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 	stream->WriteDword(game->RealTime); //this isn't correct, this field is the realtime
 	stream->WriteDword(PPLocOffset);
 	stream->WriteDword(PPLocCount);
-	stream->WriteDword(game->zoomLevel);
+
+	auto gc = core->GetGameControl();
+	stream->WriteDword(gc->GetScalePercent());
 	stream->WriteFilling(48); //unknown
 
 	//save failed, but it is not our fault, returning now before the asserts kill us

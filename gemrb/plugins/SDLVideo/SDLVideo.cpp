@@ -29,7 +29,11 @@ using namespace GemRB;
 
 SDLVideoDriver::~SDLVideoDriver(void)
 {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
 	SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER | SDL_INIT_JOYSTICK | SDL_INIT_VIDEO);
+#else
+	SDL_QuitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_VIDEO);
+#endif
 }
 
 int SDLVideoDriver::Init(void)

@@ -176,6 +176,8 @@ public:
 
 	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
 				     Color tint = Color()) = 0;
+	virtual void BlitVideoBufferFully(const VideoBufferPtr& buf, BlitFlags flags,
+					  Color tint = Color()) = 0;
 
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
@@ -204,9 +206,10 @@ public:
 	void SetEventMgr(EventMgr* evnt);
 
 	/** Sets Clip Rectangle */
-	void SetScreenClip(const Region* clip);
+	void SetScreenClip(const Region* clip, bool toScreen = true);
 	/** Gets Clip Rectangle */
 	const Region& GetScreenClip() const { return screenClip; }
+
 	virtual void SetGamma(int brightness, int contrast) = 0;
 
 	/** Scales down a sprite by a ratio */

@@ -21,6 +21,9 @@
 #ifndef SDL12VIDEODRIVER_H
 #define SDL12VIDEODRIVER_H
 
+#include "DPadSoftKeyboard.h"
+#include "SDLPixelIterator.h"
+#include "SDLSurfaceDrawing.h"
 #include "SDLVideo.h"
 
 namespace GemRB {
@@ -81,6 +84,7 @@ private:
 	void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst, BlitFlags flags, Color tint);
 	void BlitSpriteNativeClipped(SDL_Surface* surf, SDL_Rect* src, SDL_Rect* dst, BlitFlags flags, Color tint);
 	void BlitWithPipeline(SDLPixelIterator& src, SDLPixelIterator& dst, IAlphaIterator* maskit, BlitFlags flags, Color tint);
+	void BlitVideoBufferFully(const VideoBufferPtr& buf, BlitFlags flags, Color tint = Color());
 
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags) override;
 
@@ -150,7 +154,7 @@ public:
 			va_list args;
 			va_start(args, pitch);
 			Palette* pal = va_arg(args, Palette*);
-			memcpy(sprite->format->palette->colors, pal->col, sprite->format->palette->ncolors * 4);
+			memcpy(sprite->format->palette->colors, pal->ColorData(), sprite->format->palette->ncolors * 4);
 			va_end(args);
 		}
 

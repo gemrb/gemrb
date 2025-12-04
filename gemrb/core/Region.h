@@ -153,7 +153,7 @@ public:
 	bool operator==(const Region& rgn) const noexcept;
 	bool operator!=(const Region& rgn) const noexcept;
 
-	bool PointInside(const Point& p) const noexcept;
+	bool PointInside(const BasePoint& p) const noexcept;
 	bool RectInside(const Region& r) const noexcept;
 
 	bool IntersectsRegion(const Region& rgn) const noexcept;
@@ -167,6 +167,8 @@ public:
 	void ExpandToPoint(const Point& p) noexcept;
 	void ExpandToRegion(const Region& r) noexcept;
 	void ExpandAllSides(int amt) noexcept;
+	void Scale(unsigned int percent) noexcept;
+	void Unscale(unsigned int percent) noexcept;
 
 	static Region RegionEnclosingRegions(const Region& r1, const Region& r2)
 	{

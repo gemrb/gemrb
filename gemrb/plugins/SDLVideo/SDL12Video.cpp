@@ -23,9 +23,10 @@
 #include "Game.h"
 #include "Interface.h"
 #include "SDL12GamepadMappings.h"
-#include "SDLPixelIterator.h"
 #include "SDLSpriteRendererRLE.h"
 #include "SDLSurfaceSprite2D.h"
+
+#include "Logging/Logging.h"
 
 using namespace GemRB;
 
@@ -255,9 +256,9 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const Region
 	if (spr->Format().Bpp == 1) {
 		if (flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)) {
 			c.a = (flags & BlitFlags::ALPHA_MOD) ? c.a : SDL_ALPHA_OPAQUE;
-			flags &= ~spr->RenderWithFlags(flags, &c);
+			flags &= ~spr->PrepareForRendering(flags, &c);
 		} else {
-			flags &= ~spr->RenderWithFlags(flags);
+			flags &= ~spr->PrepareForRendering(flags);
 		}
 	}
 
@@ -411,6 +412,29 @@ void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 	}
 }
 
+void SDL12VideoDriver::BlitVideoBufferFully(const VideoBufferPtr& buf, BlitFlags flags, Color tint)
+{
+	auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();
+	bool nativeBlit = (flags & ~(BlitFlags::HALFTRANS | BlitFlags::ALPHA_MOD | BlitFlags::BLENDED)) == 0 && ((surface->flags & SDL_SRCCOLORKEY) != 0 || (flags & BlitFlags::BLENDED) == 0);
+
+	auto sRect = buf->Rect();
+	auto dRect = drawingBuffer->Rect();
+	SDL_Rect sRegion = { 0, 0, static_cast<uint16_t>(sRect.w), static_cast<uint16_t>(sRect.h) };
+	SDL_Rect dRegion = { 0, 0, static_cast<uint16_t>(dRect.w), static_cast<uint16_t>(dRect.h) };
+
+	if (nativeBlit) {
+		BlitSpriteNativeClipped(surface, &sRegion, &dRegion, flags, tint);
+	} else {
+		SDLPixelIterator::Direction xdir = (flags & BlitFlags::MIRRORX) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
+		SDLPixelIterator::Direction ydir = (flags & BlitFlags::MIRRORY) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
+
+		auto src = MakeSDLPixelIterator(surface, xdir, ydir, sRect);
+		auto dst = MakeSDLPixelIterator(CurrentRenderBuffer(), SDLPixelIterator::Forward, SDLPixelIterator::Forward, dRect);
+
+		BlitWithPipeline(src, dst, nullptr, flags, tint);
+	}
+}
+
 void SDL12VideoDriver::DrawPointImp(const BasePoint& p, const Color& color, BlitFlags flags)
 {
 	if (flags & BlitFlags::BLENDED && color.a < 0xff) {
@@ -435,12 +459,13 @@ void SDL12VideoDriver::DrawPointsImp(const std::vector<BasePoint>& points, const
 
 void SDL12VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags)
 {
+	auto& basePoints = reinterpret_cast<const std::vector<BasePoint>&>(points);
 	if (flags & BlitFlags::BLENDED && color.unused < 0xff) {
-		DrawPointsSurface<SHADER::BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<SHADER::BLEND>(CurrentRenderBuffer(), basePoints, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	} else if (flags & BlitFlags::MOD) {
-		DrawPointsSurface<SHADER::TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<SHADER::TINT>(CurrentRenderBuffer(), basePoints, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	} else {
-		DrawPointsSurface<SHADER::NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<SHADER::NONE>(CurrentRenderBuffer(), basePoints, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	}
 }
 

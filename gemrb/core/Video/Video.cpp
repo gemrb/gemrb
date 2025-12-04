@@ -161,11 +161,15 @@ int Video::SwapBuffers(int fpscap)
 	return PollEvents();
 }
 
-void Video::SetScreenClip(const Region* clip)
+void Video::SetScreenClip(const Region* clip, bool toScreen)
 {
 	screenClip = Region(Point(), screenSize);
 	if (clip) {
-		screenClip = screenClip.Intersect(*clip);
+		if (toScreen) {
+			screenClip = screenClip.Intersect(*clip);
+		} else {
+			screenClip = *clip;
+		}
 	}
 }
 
