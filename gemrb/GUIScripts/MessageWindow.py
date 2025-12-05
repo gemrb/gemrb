@@ -128,7 +128,6 @@ def MWinBG(size, pack = None):
 
 	if WinSizes[size] == 0:
 		WinSizes[size] = GemRB.GetSprite (bg, -1, 0, 0, 1)["h"]
-		SetMWSize (size, GemRB.GetGUIFlags () & ~GS_DIALOGMASK)
 
 	return bg
 
@@ -165,6 +164,9 @@ def ToggleActionbarClock(show):
 def SetMWSize(size, GSFlags):
 	if size not in WinSizes:
 		return
+
+	if WinSizes[size] == 0:
+		MWinBG (size)
 
 	frame = ContractButton.GetFrame()
 	if size != GS_SMALLDIALOG:
