@@ -4339,7 +4339,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 		if (fx->Parameter1 == 0) {
 			// Tortoise Shell breaks
 			feedback = core->GetString(ieStrRef::SHELLB);
-			displaymsg->DisplayStringName(feedback, GUIColors::WHITE, this);
+			displaymsg->DisplayStringName(std::move(feedback), GUIColors::WHITE, this);
 			// the effect will clean up itself and we continue processing any remaining damage
 		} else {
 			return 0;

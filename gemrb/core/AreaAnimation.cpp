@@ -78,7 +78,7 @@ void AreaAnimation::InitAnimation()
 		return;
 	}
 
-	auto GetAnimationPiece = [af, this](index_t animCycle) {
+	auto GetAnimationPiece = [&af, this](index_t animCycle) {
 		Animation ret;
 		Animation* anim = af->GetCycle(animCycle);
 		if (!anim)

@@ -76,7 +76,7 @@ Holder<Dialog> DLGImporter::GetDialog() const
 	d.initialStates.resize(StatesCount);
 	for (unsigned int i = 0; i < StatesCount; i++) {
 		Holder<DialogState> ds = GetDialogState(d, i);
-		d.initialStates[i] = ds;
+		d.initialStates[i] = std::move(ds);
 	}
 	return MakeHolder<Dialog>(std::move(d));
 }
