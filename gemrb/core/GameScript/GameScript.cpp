@@ -915,6 +915,7 @@ static const ActionLink actionnames[] = {
 	{ "rest", GameScript::Rest, AF_ALIVE },
 	{ "restnospells", GameScript::RestNoSpells, 0 },
 	{ "restorepartylocations", GameScript::RestorePartyLocation, 0 },
+	{ "restorezoomlevel", GameScript::RestoreZoomLevel, 0 },
 	{ "restparty", GameScript::RestParty, 0 },
 	{ "restuntilhealed", GameScript::RestUntilHealed, 0 },
 	//this is in iwd2, same as movetosavedlocation, but with stats
@@ -1021,6 +1022,7 @@ static const ActionLink actionnames[] = {
 	{ "setupwishobject", GameScript::SetupWishObject, 0 },
 	{ "setvisualrange", GameScript::SetVisualRange, 0 },
 	{ "setworldmap", GameScript::SetWorldmap, 0 },
+	{ "setzoomviewport", GameScript::SetZoomViewport, 0 },
 	{ "sg", GameScript::SG, 0 },
 	{ "shout", GameScript::Shout, 0 },
 	{ "sinisterpoof", GameScript::CreateVisualEffect, 0 },
@@ -1073,6 +1075,7 @@ static const ActionLink actionnames[] = {
 	{ "stickysinisterpoof", GameScript::CreateVisualEffectObjectSticky, 0 },
 	{ "stopmoving", GameScript::StopMoving, 0 },
 	{ "storepartylocations", GameScript::StorePartyLocation, 0 },
+	{ "storezoomlevel", GameScript::StoreZoomLevel, 0 },
 	{ "swing", GameScript::Swing, AF_ALIVE },
 	{ "swingonce", GameScript::SwingOnce, AF_ALIVE },
 	{ "takecreatureitems", GameScript::TakeCreatureItems, 0 },
@@ -1122,6 +1125,7 @@ static const ActionLink actionnames[] = {
 	{ "waitrandom", GameScript::WaitRandom, AF_BLOCKING | AF_ALIVE },
 	{ "weather", GameScript::Weather, 0 },
 	{ "xequipitem", GameScript::XEquipItem, 0 },
+	{ "zoomlock", GameScript::ZoomLock, 0 },
 	{ NULL, NULL, 0 }
 };
 

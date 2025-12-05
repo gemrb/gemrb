@@ -1255,6 +1255,7 @@ public: //Script Functions
 	static void RestorePartyLocation(Scriptable* Sender, Action* parameters);
 	static void Rest(Scriptable* Sender, Action* parameters);
 	static void RestNoSpells(Scriptable* Sender, Action* parameters);
+	static void RestoreZoomLevel(Scriptable* Sender, Action* parameters);
 	static void RestParty(Scriptable* Sender, Action* parameters);
 	static void RestUntilHealed(Scriptable* Sender, Action* parameters);
 	static void ReturnToSavedLocation(Scriptable* Sender, Action* parameters);
@@ -1348,6 +1349,7 @@ public: //Script Functions
 	static void SetupWishObject(Scriptable* Sender, Action* parameters);
 	static void SetVisualRange(Scriptable* Sender, Action* parameters);
 	static void SetWorldmap(Scriptable* /*Sender*/, Action* parameters);
+	static void SetZoomViewport(Scriptable* Sender, Action* parameters);
 	static void SG(Scriptable* Sender, Action* parameters);
 	static void Shout(Scriptable* Sender, Action* parameters);
 	static void SmallWait(Scriptable* Sender, Action* parameters);
@@ -1389,6 +1391,7 @@ public: //Script Functions
 	static void StaticStop(Scriptable* Sender, Action* parameters);
 	static void StopMoving(Scriptable* Sender, Action* parameters);
 	static void StorePartyLocation(Scriptable* Sender, Action* parameters);
+	static void StoreZoomLevel(Scriptable* Sender, Action* parameters);
 	static void Swing(Scriptable* Sender, Action* parameters);
 	static void SwingOnce(Scriptable* Sender, Action* parameters);
 	static void TakeCreatureItems(Scriptable* Sender, Action* parameters);
@@ -1430,6 +1433,7 @@ public: //Script Functions
 	static void WaitRandom(Scriptable* Sender, Action* parameters);
 	static void Weather(Scriptable* Sender, Action* parameters);
 	static void XEquipItem(Scriptable* Sender, Action* parameters);
+	static void ZoomLock(Scriptable* Sender, Action* parameters);
 
 	//Objects
 	static Targets* BestAC(const Scriptable* Sender, Targets* parameters, int ga_flags);

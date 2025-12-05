@@ -7903,18 +7903,60 @@ void GameScript::MoveToCampaign(Scriptable* /*Sender*/, Action* parameters)
 // IESDP says: this action activates or deactivates all creature scripts of the given target depending on the second parameter.
 // ... but they're already disabled; is this used more to enable them despite cutscene logic?
 
-// TODO: ee, zoom actions
 // 412 ZoomLock(I:Lock*Boolean)
-// 	This action can be used to set zoom to 100%. When set to TRUE zoom factor is locked at 100% and can not be changed by user input. Setting it to FALSE restores the original zoom factor. The zoom lock state is not saved.
-//
+// 	This action can be used to set zoom to 100%. When set to TRUE zoom factor is locked at 100% and can not be changed by user input. Setting it to FALSE restores the original zoom factor.
+void GameScript::ZoomLock(Scriptable* /*Sender*/, Action* parameters)
+{
+	GameControl* gc = core->GetGameControl();
+	assert(gc);
+	gc->SetScalePercent(100);
+	core->GetDictionary().Set("Zoom Lock", parameters->int0Parameter);
+}
+
 // 463 SetZoomViewport(P:Point*)
 // 	Changes the current zoom level to match the viewport size specified by the point parameter. The action has no effect if Zoom Lock has been enabled in the game options.
-//
+void GameScript::SetZoomViewport(Scriptable* /*Sender*/, Action* parameters)
+{
+	if (core->GetDictionary().Get("Zoom Lock", 0) == 1) return;
+
+	GameControl* gc = core->GetGameControl();
+	assert(gc);
+	WindowManager* wm = core->GetWindowManager();
+	int gcWidth = wm->GetGameWindow()->Frame().w;
+	int newWidth = parameters->pointParameter.x;
+	int bestScale = -1;
+	int minDiff = gcWidth * 150 / 100 - newWidth;
+	for (int i = 0; i < 27; i++) {
+		int scale = 20 + i * 5; // mimicking GameControl::GetScalePercent()
+		if (gcWidth * scale / 100 - newWidth < minDiff) {
+			minDiff = gcWidth * scale / 100 - newWidth;
+			bestScale = scale;
+		}
+	}
+	if (bestScale != -1) {
+		gc->SetScalePercent(bestScale);
+	}
+}
+
 // 464 StoreZoomLevel()
 // 	Stores the current zoom level internally. It can be restored with RestoreZoomLevel(). The stored zoom level is not saved.
-//
+void GameScript::StoreZoomLevel(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	GameControl* gc = core->GetGameControl();
+	assert(gc);
+	core->GetDictionary().Set("Zoom Save", gc->GetScalePercent());
+}
+
 // 465 RestoreZoomLevel()
 // 	Restores the zoom level stored by a previous call of StoreZoomLevel(). The action has no effect if Zoom Lock has been enabled in the game options.
+void GameScript::RestoreZoomLevel(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	if (core->GetDictionary().Get("Zoom Lock", 0) == 1) return;
+
+	GameControl* gc = core->GetGameControl();
+	assert(gc);
+	gc->SetScalePercent(core->GetDictionary().Get("Zoom Save", gc->GetScalePercent()));
+}
 
 // TODO: ee, voice channels actions
 // 470 WaitForVoiceChannel()
