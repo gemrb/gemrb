@@ -106,7 +106,7 @@ def InitOptionsWindow (Window):
 		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, 110, "GBTNLRG2")
 	elif GameCheck.IsBG2 ():
 		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, -40, "GUBOTC", 1)
-	elif GameCheck.IsBG2EE ():
+	elif GameCheck.IsAnyEE ():
 		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, -50, "GUIOSTCL")
 	elif GameCheck.IsBG1 ():
 		GUIOPTExtra.AddGemRBOptionsButton (Window, frame, 0, 55, "BIGBUTT")
@@ -154,7 +154,7 @@ def OpenVideoOptionsWindow ():
 	GUIOPTControls.OptDone (CloseVideoOptionsWindow, 21)
 	GUIOPTControls.OptCancel (CloseVideoOptionsWindow, 32)
 
-	if not GameCheck.IsBG2EE ():
+	if not GameCheck.IsAnyEE ():
 		GUIOPTControls.OptSlider (17203, 3, 35, 17129, 'Brightness Correction', DisplayHelpBrightness, 4)
 		GUIOPTControls.OptSlider (17204, 22, 36, 17128, 'Gamma Correction', DisplayHelpContrast)
 
@@ -163,15 +163,15 @@ def OpenVideoOptionsWindow ():
 	Value = GemRB.GetVar(Variable)
 	ButtonIds = [5, 6, 7]
 
-	if not GameCheck.IsBG2EE ():
+	if not GameCheck.IsAnyEE ():
 		GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[0], 37, Variable, 16, None, 17205, 18038)
 		GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[1], 37, Variable, 24, None, 17205, 18038)
 		GUIOPTControls.OptRadio (DisplayHelpBPP, ButtonIds[2], 37, Variable, 32, None, 17205, 18038)
 		PreselectRadioGroup (Variable, Value, ButtonIds, Window)
 
-	GUIOPTControls.OptCheckbox (18000, 9, 15 if GameCheck.IsBG2EE () else 38, 17131, 'Full Screen', DisplayHelpFullScreen)
+	GUIOPTControls.OptCheckbox (18000, 9, 15 if GameCheck.IsAnyEE () else 38, 17131, 'Full Screen', DisplayHelpFullScreen)
 
-	if not GameCheck.IsBG2EE ():
+	if not GameCheck.IsAnyEE ():
 		GUIOPTControls.OptCheckbox (20620, 51, 50, 20617, 'Translucent Shadows')
 		GUIOPTControls.OptCheckbox (15135, 40, 44, 17134, 'SoftMirrorBlt')
 		GUIOPTControls.OptCheckbox (18006, 41, 46, 17136, 'SoftSrcKeyBlt') # software standard blit
@@ -181,6 +181,8 @@ def OpenVideoOptionsWindow ():
 	if GameCheck.IsIWD1 () or GameCheck.IsIWD2 ():
 		GUIOPTControls.OptCheckbox (15141, 56, 52, 14447, 'TranslucentBlt')
 		GUIOPTControls.OptCheckbox (18004, 57, 54, 14578, 'StaticAnims')
+
+	# TODO: ee, handle Zoom Lock and others
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -235,7 +237,7 @@ def OpenAudioOptionsWindow ():
 	GUIOPTControls.OptSlider (18011, 4, 19, 16511, 'Volume Music', DisplayHelpMusicVolume, 10)
 	GUIOPTControls.OptSlider (18012, 22, 20, 16546, 'Volume Movie', None, 10)
 
-	if not GameCheck.IsBG2EE ():
+	if not GameCheck.IsAnyEE ():
 		GUIOPTControls.OptCheckbox (18022, 26, 28, 20689, 'Environmental Audio')
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -328,14 +330,14 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptCheckbox (18023, 19, 27, 17182, 'Gore')
 	GUIOPTControls.OptCheckbox (11797, 42, 44, 11795, 'Infravision')
 	GUIOPTControls.OptCheckbox (20619, 47, 46, 20618, 'Weather')
-	if GameCheck.IsBG2OrEE ():
+	if GameCheck.IsBG2 () or GameCheck.IsAnyEE ():
 		GUIOPTControls.OptCheckbox (2242, 50, 48, 2241, 'Heal Party on Rest')
 	elif GameCheck.IsIWD2() or GameCheck.IsIWD1():
 		GUIOPTControls.OptCheckbox (15136, 50, 49, 17378, 'Maximum HP')
 
 	GUIOPTControls.OptButton (OpenFeedbackOptionsWindow, 5, 17163)
 	GUIOPTControls.OptButton (OpenAutopauseOptionsWindow, 6, 17166)
-	if GameCheck.IsBG2OrEE ():
+	if GameCheck.IsBG2 () or GameCheck.IsAnyEE ():
 		GUIOPTControls.OptButton (OpenHotkeyOptionsWindow, 51, 816)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
@@ -415,7 +417,7 @@ def OpenAutopauseOptionsWindow ():
 		GUIOPTControls.OptCheckbox (24888, 33, 34, 10574, 'Auto Pause Center', None, 1)
 	elif Window.GetControl (26):
 		GUIOPTControls.OptCheckbox (23514, 26, 27, 23516, 'Auto Pause State', None, 128) # enemy sighted
-	if GameCheck.IsBG2OrEE ():
+	if GameCheck.IsBG2 () or GameCheck.IsAnyEE ():
 		GUIOPTControls.OptCheckbox (31872, 31, 33, 31875, 'Auto Pause State', None, 512) # spell cast
 		GUIOPTControls.OptCheckbox (58171, 34, 30, 57354, 'Auto Pause State', None, 256) # trap found
 		GUIOPTControls.OptCheckbox (10571, 37, 36, 10574, 'Auto Pause Center', None, 1)
