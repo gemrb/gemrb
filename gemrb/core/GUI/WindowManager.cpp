@@ -611,10 +611,13 @@ void WindowManager::DrawWindows() const
 	// draw the game window now (beneath everything else); it's not part of the windows collection
 	if (gameWin->IsVisible()) {
 		auto gameControl = core->GetGameControl();
-		if (gameControl->GetScalePercent() != 100) {
-			gameWin->UseScaleBuffer(gameControl->GetScalePercent());
-		} else {
-			gameWin->DropScaleBuffer();
+		if (gameControl) {
+			auto scale = gameControl->GetScalePercent();
+			if (scale != 100) {
+				gameWin->UseScaleBuffer(scale);
+			} else {
+				gameWin->DropScaleBuffer();
+			}
 		}
 
 		gameWin->Draw();
