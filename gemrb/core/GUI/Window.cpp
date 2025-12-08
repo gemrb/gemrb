@@ -175,6 +175,10 @@ void Window::DrawAfterSubviews(const Region& /*drawFrame*/, const Region& /*clip
 {
 	if (IsDisabled()) {
 		Region winrgn(Point(), Dimensions());
+		if (scaleBuffer) {
+			winrgn.size = scaleBuffer->Rect().size;
+		}
+
 		VideoDriver->DrawRect(winrgn, ColorBlack, true, BlitFlags::HALFTRANS | BlitFlags::BLENDED);
 	}
 }
