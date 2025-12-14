@@ -94,7 +94,7 @@ private:
 		// we should have buckets count directly related to the maximum available Cost value.
 		// The highest value I've seen was around 3k on a big map, so I set it to over 5k to have a safe margin.
 		// Keep in mind to change this constant, if you will change the cost calculating formula.
-		constexpr static int32_t BUCKETS_COUNT = 1024 * 5;
+		constexpr static int32_t BUCKETS_COUNT = 1024 * 6;
 
 		CostPointBuckets()
 		{
@@ -145,6 +145,7 @@ private:
 
 	private:
 		constexpr static int32_t BUCKET_SIZE = 100;
+		constexpr static int32_t LAST_BUCKET_OVERFLOW_SIZE = 500;
 
 		static int32_t GetBucketBeginIdx(const int32_t bucketIdx)
 		{
@@ -152,9 +153,11 @@ private:
 		}
 
 		// used 2 separate arrays for storing Points and Costs, as the linear search performs better if there are
-		// only the Costs prefetched, without cache pressure from unnecessarily loading paired Points
-		std::array<Point, BUCKET_SIZE * BUCKETS_COUNT> storagePoints;
-		std::array<float, BUCKET_SIZE * BUCKETS_COUNT> storageCosts;
+		// only the Costs prefetched, without cache pressure from unnecessarily loading paired Points.
+		// Added some extra cells at the end (LAST_BUCKET_OVERFLOW_SIZE) - last bucket has potential to get more items
+		// than the rest, as it gathers all points with cost >= BUCKETS_COUNT.
+		std::array<Point, BUCKET_SIZE * BUCKETS_COUNT + LAST_BUCKET_OVERFLOW_SIZE> storagePoints;
+		std::array<float, BUCKET_SIZE * BUCKETS_COUNT + LAST_BUCKET_OVERFLOW_SIZE> storageCosts;
 
 		// bucketSize tells how many items are currently stored in each bucket
 		std::array<uint8_t, BUCKETS_COUNT> bucketSize;
