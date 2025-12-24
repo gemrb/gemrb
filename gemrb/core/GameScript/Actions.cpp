@@ -3900,19 +3900,19 @@ void GameScript::IncInternal(Scriptable* Sender, Action* parameters)
 			target->GetBase(IE_INTERNAL_0 + idx) + parameters->int1Parameter);
 }
 
+static Inventory* GetInventory(Scriptable* owner)
+{
+	if (owner->Type == ST_ACTOR) {
+		return &(static_cast<Actor*>(owner)->inventory);
+	} else if (owner->Type == ST_CONTAINER) {
+		return &(static_cast<Container*>(owner)->inventory);
+	}
+	return nullptr;
+}
+
 void GameScript::DestroyAllEquipment(Scriptable* Sender, Action* /*parameters*/)
 {
-	Inventory* inv = NULL;
-
-	switch (Sender->Type) {
-		case ST_ACTOR:
-			inv = &(static_cast<Actor*>(Sender)->inventory);
-			break;
-		case ST_CONTAINER:
-			inv = &(static_cast<Container*>(Sender)->inventory);
-			break;
-		default:;
-	}
+	Inventory* inv = GetInventory(Sender);
 	if (inv) {
 		inv->DestroyItem("", 0, (ieDword) ~0); //destroy any and all
 	}
@@ -3920,19 +3920,24 @@ void GameScript::DestroyAllEquipment(Scriptable* Sender, Action* /*parameters*/)
 
 void GameScript::DestroyItem(Scriptable* Sender, Action* parameters)
 {
-	Inventory* inv = NULL;
-
-	switch (Sender->Type) {
-		case ST_ACTOR:
-			inv = &(static_cast<Actor*>(Sender)->inventory);
-			break;
-		case ST_CONTAINER:
-			inv = &(static_cast<Container*>(Sender)->inventory);
-			break;
-		default:;
-	}
+	Inventory* inv = GetInventory(Sender);
 	if (inv) {
 		inv->DestroyItem(parameters->resref0Parameter, 0, 1); //destroy one (even indestructible?)
+	}
+}
+
+// DestroyAllFragileEquipment just adds an item type filter parameter
+void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* parameters)
+{
+	Inventory* inv = GetInventory(Sender);
+
+	// bits are from itemflag.ids and are identical to our Item flags, not CREItem
+	// handling the only known user for now
+	ieDword flags = parameters->int0Parameter | IE_INV_ITEM_DESTRUCTIBLE;
+	if (flags & IE_ITEM_ADAMANTINE) flags = (flags | IE_INV_ITEM_ADAMANTINE) & ~IE_ITEM_ADAMANTINE;
+
+	if (inv) {
+		inv->DestroyItem("", flags, (ieDword) ~0);
 	}
 }
 
@@ -3982,30 +3987,6 @@ void GameScript::DestroyPartyItemNum(Scriptable* /*Sender*/, Action* parameters)
 		if (!count) {
 			break;
 		}
-	}
-}
-
-// DestroyAllFragileEquipment just adds an item type filter parameter
-void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* parameters)
-{
-	Inventory* inv = nullptr;
-
-	// bits are from itemflag.ids and are identical to our Item flags, not CREItem
-	// handling the only known user for now
-	ieDword flags = parameters->int0Parameter | IE_INV_ITEM_DESTRUCTIBLE;
-	if (flags & IE_ITEM_ADAMANTINE) flags = (flags | IE_INV_ITEM_ADAMANTINE) & ~IE_ITEM_ADAMANTINE;
-
-	switch (Sender->Type) {
-		case ST_ACTOR:
-			inv = &(static_cast<Actor*>(Sender)->inventory);
-			break;
-		case ST_CONTAINER:
-			inv = &(static_cast<Container*>(Sender)->inventory);
-			break;
-		default:;
-	}
-	if (inv) {
-		inv->DestroyItem("", flags, (ieDword) ~0);
 	}
 }
 
@@ -4577,16 +4558,7 @@ void GameScript::DropInventoryEX(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	Inventory* inv = NULL;
-	switch (tar->Type) {
-		case ST_ACTOR:
-			inv = &(static_cast<Actor*>(tar)->inventory);
-			break;
-		case ST_CONTAINER:
-			inv = &(static_cast<Container*>(tar)->inventory);
-			break;
-		default:;
-	}
+	Inventory* inv = GetInventory(tar);
 	if (!inv) return;
 
 	int x = inv->GetSlotCount();
