@@ -1022,7 +1022,6 @@ public: //Script Functions
 	static void DestroyAllDestructableEquipment(Scriptable* Sender,
 						    Action* parameters);
 	static void DestroyAllEquipment(Scriptable* Sender, Action* parameters);
-	static void DestroyAllFragileEquipment(Scriptable* Sender, Action* parameters);
 	static void DestroyGold(Scriptable* Sender, Action* parameters);
 	static void DestroyGroundPiles(Scriptable* Sender, Action* /*parameters*/);
 	static void DestroyItem(Scriptable* Sender, Action* parameters);

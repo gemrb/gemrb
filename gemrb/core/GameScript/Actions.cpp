@@ -3985,9 +3985,15 @@ void GameScript::DestroyPartyItemNum(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
-void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* /*parameters*/)
+// DestroyAllFragileEquipment just adds an item type filter parameter
+void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* parameters)
 {
-	Inventory* inv = NULL;
+	Inventory* inv = nullptr;
+
+	// bits are from itemflag.ids and are identical to our Item flags, not CREItem
+	// handling the only known user for now
+	ieDword flags = parameters->int0Parameter | IE_INV_ITEM_DESTRUCTIBLE;
+	if (flags & IE_ITEM_ADAMANTINE) flags = (flags | IE_INV_ITEM_ADAMANTINE) & ~IE_ITEM_ADAMANTINE;
 
 	switch (Sender->Type) {
 		case ST_ACTOR:
@@ -3999,7 +4005,7 @@ void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* /*p
 		default:;
 	}
 	if (inv) {
-		inv->DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
+		inv->DestroyItem("", flags, (ieDword) ~0);
 	}
 }
 
@@ -7745,21 +7751,6 @@ void GameScript::ChunkCreature(Scriptable* Sender, Action* parameters)
 void GameScript::MultiPlayerSync(Scriptable* Sender, Action* /*parameters*/)
 {
 	Sender->SetWait(2);
-}
-
-void GameScript::DestroyAllFragileEquipment(Scriptable* Sender, Action* parameters)
-{
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
-	Actor* actor = Scriptable::As<Actor>(tar);
-	if (!actor) {
-		return;
-	}
-
-	// bits are from itemflag.ids and are identical to our Item flags, not CREItem
-	// handling the only known user for now
-	ieDword flags = parameters->int0Parameter;
-	if (flags & IE_ITEM_ADAMANTINE) flags = (flags | IE_INV_ITEM_ADAMANTINE) & ~IE_ITEM_ADAMANTINE;
-	actor->inventory.DestroyItem("", flags, ~0);
 }
 
 void GameScript::SetOriginalClass(Scriptable* Sender, Action* parameters)
