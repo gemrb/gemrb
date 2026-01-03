@@ -56,7 +56,7 @@
 0x5101     CEMF1      CEMF2      CEMF3      CHMF4      6          2          0          M
 0x5102     CDMF1      CDMF2      CDMF3      CDMF4      6          2          0          S
 0x5103     CIMF1      CIMF2      CIMF3      CIMF4      6          2          0          S
-0x5110     CHFF1      CHFF2      CHFF3      CHFF4      6          2          0          M
+0x5110     CHFF1      CHFF2      CHFF3      CHFF4      6          2          0          L
 0x5111     CEFF1      CEFF2      CEFF3      CEFF4      6          2          0          M
 0x5112     CDMF1      CDMF2      CDMF3      CDMF4      6          2          0          S
 0x5113     CIFF1      CIFF2      CIFF3      CIFF4      6          2          0          S
@@ -94,7 +94,7 @@
 0x6103     CIMF1      CIMF2      CIMF3      CIMF4      6          2          0          S
 0x6104     CDMF1      CDMF2      CDMF3      CDMF4      6          2          0          S
 0x6105     CHMF1      CHMF2      CHMF3      CHMF4      6          2          0          L
-0x6110     CHFF1      CHFF2      CHFF3      CHFF4      6          2          0          M
+0x6110     CHFF1      CHFF2      CHFF3      CHFF4      6          2          0          L
 0x6111     CEFF1      CEFF2      CEFF3      CEFF4      6          2          0          M
 0x6112     CDMF1      CDMF2      CDMF3      CDMF4      6          2          0          S
 0x6113     CIFF1      CIFF2      CIFF3      CIFF4      6          2          0          S
