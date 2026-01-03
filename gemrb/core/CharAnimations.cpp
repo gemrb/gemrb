@@ -3038,6 +3038,9 @@ Holder<Sprite2D> GetPaperdollImage(const ResRef& resref, const ieDword* colors, 
 	if (colors) {
 		Holder<Palette> pal = MakeHolder<Palette>(*spr->GetPalette());
 		*pal = SetupPaperdollColours(colors, type);
+		auto shadowColor = pal->GetColorAt(1);
+		shadowColor.a = core->GetDictionary().Get("Translucent Shadows", 0) ? 128 : 255;
+		pal->SetColor(1, shadowColor);
 		spr->SetPalette(pal);
 		picture2->SetPalette(pal);
 	}
