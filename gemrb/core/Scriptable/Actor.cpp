@@ -8237,9 +8237,7 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
 			if (palette) {
-				auto shadowColor = palette->GetColorAt(1);
-				shadowColor.a = TranslucentShadows ? 128 : 255;
-				palette->SetColor(1, shadowColor);
+				palette->TranslucentShadowColor(TranslucentShadows);
 				VideoDriver->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
 			} else {
 				VideoDriver->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);

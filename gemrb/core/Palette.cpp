@@ -85,6 +85,13 @@ Palette::Colors::const_reference Palette::GetColorAt(size_t pos) const
 	return colors[pos];
 }
 
+void Palette::TranslucentShadowColor(bool enable)
+{
+	auto shadowColor = colors[1];
+	shadowColor.a = enable ? 128 : 255;
+	SetColor(1, shadowColor);
+}
+
 Hash Palette::GetVersion() const
 {
 	return version;

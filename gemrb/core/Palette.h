@@ -80,6 +80,7 @@ public:
 	Hash GetVersion() const;
 	bool IsNamed() const;
 	void SetColor(size_t index, const Color& c);
+	void TranslucentShadowColor(bool enable);
 
 private:
 	Colors colors;

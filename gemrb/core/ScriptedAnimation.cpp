@@ -734,9 +734,7 @@ void ScriptedAnimation::GetPaletteCopy()
 		if (!spr) continue;
 
 		palette = MakeHolder<Palette>(*spr->GetPalette());
-		auto shadowColor = palette->GetColorAt(1);
-		shadowColor.a = TranslucentShadows ? 128 : 255;
-		palette->SetColor(1, shadowColor);
+		palette->TranslucentShadowColor(TranslucentShadows);
 		break;
 	}
 }
