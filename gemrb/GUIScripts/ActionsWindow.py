@@ -1303,6 +1303,15 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 			action = 14
 		if action < 0 or (disablableAction and disabledButton & (1 << action)):
 			state = IE_GUI_BUTTON_DISABLED
+		# also check for when just spellcasting is disabled, without buttons
+		disabledCasting = GemRB.GetPlayerStat (pc, IE_CASTING)
+		if action >= ACT_QSPELL1 and action <= ACT_QSPELL3 and pcStats and disabledCasting & 4: # mage spells
+			# look up what type of a quick spell this is
+			bookType = pcStats["QuickSpellsBookType"][action - ACT_QSPELL1]
+			if bookType > 0:
+				bookType = UnshiftBookType (bookType)
+			if bookType == IE_SPELL_TYPE_WIZARD:
+				state = IE_GUI_BUTTON_DISABLED
 
 		btn.SetState (state)
 		# you have to set this overlay up
