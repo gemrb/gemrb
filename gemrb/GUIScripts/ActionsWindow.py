@@ -91,10 +91,13 @@ def GroupControls ():
 		Button.SetActionIcon (globals(), ACT_TALK, 1)
 	else:
 		Button.SetActionIcon (globals(), ACT_DEFEND, 1)
+	Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 	Button = CurrentWindow.GetControl (1 + ActionBarControlOffset)
 	Button.SetActionIcon (globals(), ACT_ATTACK, 2)
+	Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 	Button = CurrentWindow.GetControl (2 + ActionBarControlOffset)
 	Button.SetActionIcon (globals(), ACT_STOP, 3)
+	Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 	Button = CurrentWindow.GetControl (3 + ActionBarControlOffset)
 	Button.SetActionIcon (globals(), -1, 4)
 	Button = CurrentWindow.GetControl (4 + ActionBarControlOffset)
