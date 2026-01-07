@@ -1313,7 +1313,14 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 			if bookType == IE_SPELL_TYPE_WIZARD:
 				state = IE_GUI_BUTTON_DISABLED
 
-		btn.SetState (state)
+		if GameCheck.IsBG1 () and state == IE_GUI_BUTTON_DISABLED:
+			# sigh, the disabled frames in guibtbut are all pressed and fully saturated
+			btn.SetState (IE_GUI_BUTTON_UNPRESSED)
+			btn.SetDisabled (True)
+		else:
+			btn.SetState (state)
+			btn.SetDisabled (False)
+
 		# you have to set this overlay up
 		# this state check looks bizarre, but without it most buttons get misrendered
 		# but let various quick spells handle this themselves

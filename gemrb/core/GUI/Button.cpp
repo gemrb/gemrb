@@ -122,6 +122,17 @@ void Button::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 /** Draws the Control on the Output Display */
 void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
+	// base blit flags
+	BlitFlags bf = BlitFlags::NONE;
+	bool sepiaPic = false;
+	if (IsDisabled()) {
+		if (core->HasFeature(GFFlags::GREY_DISABLED_CONTROLS)) {
+			bf |= BlitFlags::GREY;
+		} else {
+			sepiaPic = true;
+		}
+	}
+
 	// Button image
 	if (!(flags & IE_GUI_BUTTON_NO_IMAGE)) {
 		Holder<Sprite2D> Image;
@@ -142,9 +153,9 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 				Image = buttonImages[ButtonImage::Unpressed];
 				break;
 		}
-		BlitFlags bf = flags & IE_GUI_BUTTON_SHADE_BASE ? BlitFlags::HALFTRANS : BlitFlags::NONE;
+		BlitFlags bf2 = flags & IE_GUI_BUTTON_SHADE_BASE ? BlitFlags::HALFTRANS : BlitFlags::NONE;
 		if (Image) {
-			VideoDriver->BlitSprite(Image, rgn.origin, nullptr, bf);
+			VideoDriver->BlitSprite(Image, rgn.origin, nullptr, bf | bf2);
 		}
 	}
 
@@ -178,10 +189,10 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 			}
 
 			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w, buttonHeight);
-			VideoDriver->BlitSprite(Picture, rb.origin, &rb);
+			VideoDriver->BlitSprite(Picture, rb.origin, &rb, bf);
 		} else {
 			Region r(picPos.x, picPos.y, (Picture->Frame.w * Clipping), Picture->Frame.h);
-			BlitFlags bf = IsDisabled() ? BlitFlags::SEPIA : BlitFlags::NONE;
+			if (sepiaPic) bf |= BlitFlags::SEPIA;
 			VideoDriver->BlitSprite(Picture, Picture->Frame.origin + r.origin, &r, bf);
 		}
 	}

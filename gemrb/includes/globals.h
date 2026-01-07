@@ -140,6 +140,7 @@ enum class GFFlags : uint32_t {
 	HAS_CONTINUATION, // all but iwds
 	SELLABLE_CRITS_NO_CONV, // bg1, iwd1
 	BETTER_OF_HEARING, // all but bg1 and psts
+	GREY_DISABLED_CONTROLS, // bg1
 
 	count // must be last
 };

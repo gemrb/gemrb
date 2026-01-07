@@ -1433,6 +1433,7 @@ static const EnumArray<GFFlags, StringView> game_flags {
 	"HasContinuation", // GFFlags::HAS_CONTINUATION
 	"SellableCritsNoConv", // GFFlags::SELLABLE_CRITS_NO_CONV
 	"BetterOfHearing", // GFFlags::BETTER_OF_HEARING
+	"GreyDisabledControls", // GFFlags::GREY_DISABLED_CONTROLS
 };
 
 /** Loads gemrb.ini */

@@ -262,6 +262,11 @@ FlexibleWorldmap = <bool>
 Toggles whether the game supports worldmap extensions.
 
 
+GreyDisabledControls = <bool>
+- - - - - - - - - - - - -
+Toggles whether the game greyscales disabled control states.
+
+
 Happiness = <bool>
 - - - - - - - - - - -
 Whether the game supports NPC happiness. All come with happy.2da, even though
