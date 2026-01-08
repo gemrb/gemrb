@@ -428,11 +428,13 @@ def UpdateActionsWindow ():
 	for i in range (GUIBT_COUNT):
 		Button = CurrentWindow.GetControl (i + ActionBarControlOffset)
 		if GameCheck.IsBG1():
+			# no need for a disabled overlay, but a selection one is needed
 			color = {'r' : 0, 'g' : 254, 'b' :0, 'a' : 255}
 			Button.SetBorder (0, color, 0, 0, Button.GetInsetFrame(6, 6, 4, 4))
+		else:
+			color = {'r' : 50, 'g' : 30, 'b' :10, 'a' : 120}
+			Button.SetBorder (1, color, 0, 1)
 
-		color = {'r' : 50, 'g' : 30, 'b' :10, 'a' : 120}
-		Button.SetBorder (1, color, 0, 1)
 		if GameCheck.IsBG2EE ():
 			# for some reason NUMBER doesn't display
 			Button.SetFont ("NUMBER2")
