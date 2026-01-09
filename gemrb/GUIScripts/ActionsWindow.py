@@ -1345,7 +1345,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		poi = pcStats["QuickSpells"][tmp]
 		if poi == "":
 			# unset quick spell slot, just waiting to be used
-			return IE_GUI_BUTTON_FAKEDISABLED
+			return IE_GUI_BUTTON_LOCKED
 
 		btn.SetSpellIcon (poi, 1, 1, i + 1)
 		memorized = Spellbook.HasSpellinfoSpell (pc, poi)
@@ -1363,7 +1363,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 			btn.EnableBorder(1, False)
 		else:
 			btn.EnableBorder(1, True)
-			return IE_GUI_BUTTON_FAKEDISABLED # so right-click can still be invoked to change the binding
+			return IE_GUI_BUTTON_LOCKED # so right-click can still be invoked to change the binding
 
 		if GameCheck.IsIWD2 () and bookType == 0:
 			bookType = IE_IWD2_SPELL_INNATE
@@ -1377,7 +1377,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 			SetItemText (btn, memorizedCount, True)
 			return IE_GUI_BUTTON_UNPRESSED
 		else:
-			return IE_GUI_BUTTON_FAKEDISABLED
+			return IE_GUI_BUTTON_LOCKED
 
 	def SetQSlotBtn (btn, pc, tmp, action):
 		btn.SetBAM ("stonitem", 0, 0)
