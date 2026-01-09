@@ -62,6 +62,7 @@ def GetUsableMemorizedSpells(actor, BookType):
 			if not Spell:
 				continue
 			Spell['BookType'] = BookType # just another sorting key
+			Spell['SpellResRef'] = resref # unify to lowercased key
 			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"], 1<<BookType) # crucial!
 			if Spell['SpellIndex'] == -1:
 				GemRB.Log (LOG_ERROR, "GetUsableMemorizedSpells", "Memorized spell not found! " + Spell["SpellResRef"] + " of type " + str(1<<BookType))
