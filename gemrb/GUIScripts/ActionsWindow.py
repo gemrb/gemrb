@@ -1357,7 +1357,8 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 
 		# 1 << IE_IWD2_SPELL_SONG is too big for QuickSpellBookType :(
 		# unfortunately so is 1 << IE_IWD2_SPELL_INNATE, so we can't distinguish them
-		if bookType == 0 and modalState == MS_BATTLESONG:
+		# we could check more properly if we loaded the spell sooner: sp["SpellType"] == 5: # IE_SPL_SONG
+		if bookType == 0 and modalState == MS_BATTLESONG and poi in ["spin151", "spin144", "spin145", "spin146", "spin147", "spin148"]:
 			return IE_GUI_BUTTON_SELECTED
 
 		if memorized:
