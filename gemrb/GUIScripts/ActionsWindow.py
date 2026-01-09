@@ -1342,7 +1342,7 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		if not pcStats:
 			return IE_GUI_BUTTON_DISABLED
 
-		poi = pcStats["QuickSpells"][tmp]
+		poi = pcStats["QuickSpells"][tmp].lower()
 		if poi == "":
 			# unset quick spell slot, just waiting to be used
 			return IE_GUI_BUTTON_LOCKED
@@ -1359,10 +1359,12 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		# unfortunately so is 1 << IE_IWD2_SPELL_INNATE, so we can't distinguish them
 		if bookType == 0 and modalState == MS_BATTLESONG:
 			return IE_GUI_BUTTON_SELECTED
+
 		if memorized:
 			btn.EnableBorder(1, False)
 		else:
 			btn.EnableBorder(1, True)
+			SetItemText (btn, 0, -1)
 			return IE_GUI_BUTTON_LOCKED # so right-click can still be invoked to change the binding
 
 		if GameCheck.IsIWD2 () and bookType == 0:
@@ -1373,8 +1375,10 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 			if sp["SpellResRef"] == poi:
 				memorizedCount = sp["MemoCount"]
 				break
+		# always display memo count like in ees
+		# bg1 discarded depleted qspells instead, clearing the slot, which is not very user friendly
+		SetItemText (btn, memorizedCount, -1)
 		if memorizedCount:
-			SetItemText (btn, memorizedCount, True)
 			return IE_GUI_BUTTON_UNPRESSED
 		else:
 			return IE_GUI_BUTTON_LOCKED
@@ -1570,7 +1574,9 @@ def SetItemText (btn, charges, oneIsNone):
 		return
 
 	GUICommon.SetButtonAnchor (btn)
-	if charges and (charges > 1 or not oneIsNone):
+	if oneIsNone == -1:
+		btn.SetText (str(charges))
+	elif charges and (charges > 1 or not oneIsNone):
 		btn.SetText (str(charges))
 	else:
 		btn.SetText (None)
