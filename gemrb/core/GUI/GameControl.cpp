@@ -2243,6 +2243,10 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		}
 	} else if (me.button == GEM_MB_MIDDLE) {
 		// do nothing, so middle button panning doesn't trigger a move
+		// except reset zoom if there's no panning
+		if (me.Pos() == screenMousePos) {
+			SetScalePercent(100, true);
+		}
 		return true;
 	} else {
 		// any other button behaves as left click (scrollwhell buttons are mouse wheel events now)
