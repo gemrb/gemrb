@@ -165,7 +165,8 @@ def SelectQuiverSlot():
 def SetupItemAbilities(pc, slot, only):
 	slot_item = GemRB.GetSlotItem(pc, slot, 1 if GameCheck.IsIWD2() else 0)
 	if not slot_item:
-		# CHIV: Could configure empty quickslots from the game screen ala spells heres
+		SetActionLevel (UAW_STANDARD)
+		UpdateActionsWindow ()
 		return
 
 	item = GemRB.GetItem (slot_item["ItemResRef"])
