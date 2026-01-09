@@ -11131,6 +11131,10 @@ static PyObject* GemRB_SpellCast(PyObject* /*self*/, PyObject* args)
 			Py_RETURN_NONE;
 		}
 		actor->spellbook.FindSpellInfo(&spelldata, actor->PCStats->QuickSpells[spell], actor->PCStats->QuickSpellBookType[spell]);
+		if (spelldata.Target == TARGET_INVALID) {
+			// empty quickspell slot, don't complain
+			Py_RETURN_NONE;
+		}
 	} else {
 		ieDword ActionLevel = core->GetDictionary().Get("ActionLevel", 0);
 		if (ActionLevel == 5) {
