@@ -7872,7 +7872,7 @@ void GameScript::ZoomLock(Scriptable* /*Sender*/, Action* parameters)
 {
 	GameControl* gc = core->GetGameControl();
 	assert(gc);
-	gc->SetScalePercent(100);
+	gc->SetScalePercent(100, true);
 	core->GetDictionary().Set("Zoom Lock", parameters->int0Parameter);
 }
 
@@ -7897,7 +7897,7 @@ void GameScript::SetZoomViewport(Scriptable* /*Sender*/, Action* parameters)
 		}
 	}
 	if (bestScale != -1) {
-		gc->SetScalePercent(bestScale);
+		gc->SetScalePercent(bestScale, true);
 	}
 }
 

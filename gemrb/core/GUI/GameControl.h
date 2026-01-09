@@ -232,7 +232,7 @@ public:
 	void ToggleAlwaysRun();
 	int GetOverheadOffset() const;
 	void TryDefaultTalk() const;
-	void SetScalePercent(unsigned int);
+	void SetScalePercent(unsigned int zoomLevel, bool force = false);
 	unsigned int GetScalePercent() const;
 
 protected:
