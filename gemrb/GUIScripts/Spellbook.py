@@ -225,7 +225,11 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 				if BookType & (1<<i):
 					allSpells += GetUsableMemorizedSpells (actor, i)
 			if not len(allSpells):
-				raise AttributeError ("Error, unknown BookType passed to SetupSpellIcons: %d! Bailing out!" %(BookType))
+				print("No usable spells or unknown BookType passed to SetupSpellIcons: %d! Bailing out!" %(BookType))
+				import ActionsWindow
+				ActionsWindow.SetActionLevel (UAW_STANDARD)
+				ActionsWindow.UpdateActionsWindow ()
+				return
 
 	if BookType == -1:
 		memorizedSpells = allSpells
