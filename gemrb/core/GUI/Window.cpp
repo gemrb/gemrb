@@ -308,6 +308,8 @@ void Window::RedrawControls(const Control::varname_t& VarName) const
 
 View* Window::TrySetFocus(View* target)
 {
+	if (target == focusView) return focusView;
+
 	View* newFocus = focusView;
 	if (target && !target->CanLockFocus()) {
 		// target won't accept focus so dont bother unfocusing current
