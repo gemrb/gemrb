@@ -243,13 +243,14 @@ def generate_rank():
 		print_y(0, i)
 	print()
 
+# A dull-pointed V - starting with two characters at the tip
 def generate_v():
 	print("V", end=' ')
 	for i in range(num_coords):
 		if i % 2 == 0:
 			xpos = (i // 2) * -15
 		else:
-			xpos = 64 + (i // 2) * -15
+			xpos = 32 + (i // 2) * 15
 		ypos = (i // 2) * 48
 		print(xpos, end=' ')
 		print_y(ypos, i)
