@@ -4585,6 +4585,8 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 
 	DirectoryIterator dirit = core->GetResourceDirectory(type);
 	bool dirs = false;
+	bool savedirchars = false;
+	path_t savecharpath;
 	auto suffix = "S";
 	switch (type) {
 		case DIRECTORY_CHR_PORTRAITS:
@@ -4600,6 +4602,11 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 			}
 			break;
 		case DIRECTORY_CHR_EXPORTS:
+			if (core->config.GamePath != core->config.SavePath) {
+				savecharpath = PathJoin(core->config.SavePath, core->config.GameCharactersPath);
+				savedirchars = DirExists(savecharpath);
+			}
+			break;
 		case DIRECTORY_CHR_SCRIPTS:
 		default:
 			break;
@@ -4642,6 +4649,31 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 		string.resize(pos);
 		strings.emplace_back(std::move(string));
 	} while (++dirit);
+	
+	if (savedirchars) {
+		DirectoryIterator dirIt(savecharpath);
+		DirectoryIterator::FileFilterPredicate filter = std::make_shared<ExtFilter>("CHR");
+		dirIt.SetFilterPredicate(std::move(filter));
+		do {
+			const path_t& name = dirIt.GetName();
+			if (name[0] == '.' || dirIt.IsDirectory() != dirs) {
+				continue;
+			}
+
+			String string = StringFromUtf8(name.c_str());
+			if (dirs) {
+				strings.emplace_back(std::move(string));
+				continue;
+			}
+
+			size_t pos = string.find_last_of(u'.');
+			if (pos == String::npos) {
+				continue;
+			}
+			string.resize(pos);
+			strings.emplace_back(std::move(string));
+		} while (++dirIt);
+	}
 
 	std::sort(strings.begin(), strings.end());
 	for (size_t i = 0; i < strings.size(); i++) {

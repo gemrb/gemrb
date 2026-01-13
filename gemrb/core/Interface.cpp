@@ -3703,8 +3703,22 @@ int Interface::WriteCharacter(StringView name, const Actor* actor) const
 
 	FileStream str;
 	if (!str.Create(Path, name.c_str(), IE_CHR_CLASS_ID) || gm->PutActor(&str, actor, true) < 0) {
-		Log(WARNING, "Core", "Character cannot be saved: {}", name);
-		return -1;
+		if (config.GamePath != config.SavePath) {
+			//If GamePath is not writable, try SavePath
+			Path = PathJoin(config.SavePath, config.GameCharactersPath);
+			if (!DirExists(Path)) {
+				if (MakeDirectory(Path)) {
+					Log(WARNING, "Core", "Making new characters folder at: {}", Path);
+				}
+			}
+			if (!str.Create(Path, name.c_str(), IE_CHR_CLASS_ID) || gm->PutActor(&str, actor, true) < 0) {
+				Log(WARNING, "Core", "Character cannot be saved: {}", name);
+				return -1;
+			}
+		} else {
+			Log(WARNING, "Core", "Character cannot be saved: {}", name);
+			return -1;
+		}
 	}
 
 	//write the BIO string
