@@ -114,7 +114,8 @@ def GroupControls ():
 		idx = GemRB.GameGetFormation (i)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON | IE_GUI_BUTTON_NORMAL, OP_SET)
 		# kill the previous sprites or they show through
-		Button.SetSprites ("GUIBTBUT", 0, 0, 1, 2, 3)
+		offsetSelected = GameCheck.IsBG1 () or GameCheck.IsIWD1 () or GameCheck.IsIWD2 ()
+		Button.SetSprites ("GUIBTBUT", 0, 0, 1, 24 if offsetSelected else 2, 3)
 		Button.SetBAM ("FORM%x" % idx, 0, 0, -1)
 		Button.SetVarAssoc ("Formation", i)
 		Button.OnPress (SelectFormation)
