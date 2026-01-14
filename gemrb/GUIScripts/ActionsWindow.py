@@ -61,15 +61,15 @@ def SelectFormation (btn):
 	GemRB.GameSetFormation (btn.Value)
 	return
 
-def SelectFormationPreset ():
+def SelectFormationPreset (origBtnIdx):
 	"""Choose the default formation."""
 
-	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation")) # save
-	GemRB.GameSetFormation (GemRB.GetVar ("Formation")) # set
+	GemRB.GameSetFormation (GemRB.GetVar ("Value"), origBtnIdx) # save
+	GemRB.GameSetFormation (origBtnIdx) # set
 	GroupControls ()
 	return
 
-def SetupFormation ():
+def SetupFormation (btn):
 	"""Opens the formation selection section."""
 
 	for i in range (GUIBT_COUNT):
@@ -78,7 +78,7 @@ def SetupFormation ():
 		Button.SetSprites ("GUIBTBUT", 0, 0, 1, 2, 3)
 		Button.SetBAM ("FORM%x"%i, 0, 0, -1)
 		Button.SetVarAssoc ("Value", i)
-		Button.OnPress (SelectFormationPreset)
+		Button.OnPress (lambda: SelectFormationPreset (btn.Value))
 		Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 	return
 
