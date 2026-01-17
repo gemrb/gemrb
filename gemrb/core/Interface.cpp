@@ -241,24 +241,29 @@ static void AddGameOverrides(bool home, CoreSettings& config)
 		if (!FileExists(engineLuaPath)) return; // not an ee game
 
 		FileStream* fs = FileStream::OpenFile(engineLuaPath);
-		path_t basePath2 = basePath;
 		std::string line;
+		std::string profile;
 		if (!fs) goto fallback;
 
 		// perhaps replace this section once we have a lua parser
 		while (fs->ReadLine(line) != DataStream::Error) {
 			if (line.find("engine_name") == std::string::npos) continue;
 			auto quote = line.find_first_of('"', 11);
-			line = line.substr(quote + 1, line.size() - quote - 2);
-			PathAppend(basePath, line);
+			profile = line.substr(quote + 1, line.size() - quote - 2);
 			break;
 		}
 		delete fs;
-		if (basePath == basePath2) {
+
+		if (profile.empty()) {
 fallback:
-			PathAppend(basePath, "Infinity Engine - Enhanced Edition");
+			profile = "Infinity Engine - Enhanced Edition";
+			PathAppend(basePath, profile);
+			if (!MakeDirectory(basePath)) return;
+		} else {
+			PathAppend(basePath, profile);
 		}
 		if (!DirExists(basePath)) return;
+		config.GameProfile = profile;
 	}
 
 	if (!home) {

@@ -78,6 +78,7 @@ struct CoreSettings {
 #endif
 
 	std::string GameName = GEMRB_STRING;
+	std::string GameProfile;
 	std::string GameType = "auto";
 	std::string Encoding = "default";
 
