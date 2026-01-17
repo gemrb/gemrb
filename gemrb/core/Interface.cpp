@@ -289,22 +289,26 @@ Interface::Interface(CoreSettings&& cfg)
 	path = PathJoin(config.GemRBOverridePath, "override", "shared");
 	gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	path = PathJoin(config.GamePath, config.GameOverridePath);
-	gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	// start of game-bundled (or created) override dirs
+
+	path = PathJoin(config.GamePath, config.GameMoviesPath);
+	gamedata->AddSource(path, "Movies", PLUGIN_RESOURCE_DIRECTORY);
+
+	// in the original GameCharactersPath also served as an override folder, but nobody is abusing that
+
+	path = PathJoin(config.GamePath, config.GamePortraitsPath);
+	gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	// GAME sounds are intentionally not cached, in IWD there are directory structures,
 	// that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
 	path = PathJoin(config.GamePath, config.GameSoundsPath);
 	gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
 
-	path = PathJoin(config.GamePath, config.GameMoviesPath);
-	gamedata->AddSource(path, "Movies", PLUGIN_RESOURCE_DIRECTORY);
-
 	path = PathJoin(config.GamePath, config.GameScriptsPath);
 	gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	path = PathJoin(config.GamePath, config.GamePortraitsPath);
-	gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	path = PathJoin(config.GamePath, config.GameOverridePath);
+	gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 	path = PathJoin(config.GamePath, config.GameDataPath);
 	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
