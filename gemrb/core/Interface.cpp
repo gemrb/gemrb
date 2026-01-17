@@ -3754,7 +3754,6 @@ int Interface::SwapoutArea(Map* map) const
 
 int Interface::WriteCharacter(StringView name, const Actor* actor) const
 {
-	path_t Path = PathJoin(config.GamePath, config.GameCharactersPath);
 	if (!actor) {
 		return -1;
 	}
@@ -3763,15 +3762,30 @@ int Interface::WriteCharacter(StringView name, const Actor* actor) const
 		return -1;
 	}
 
+	path_t path = PathJoin(config.GamePath, config.GameCharactersPath);
+	path_t profilePath = PathJoin(UserProfilePath(), config.GameProfile, config.GameCharactersPath);
+	std::array<path_t, 2> chrPaths { path, profilePath };
+	if (HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		chrPaths[0] = "";
+	}
+	bool saved = false;
 	FileStream str;
-	if (!str.Create(Path, name.c_str(), IE_CHR_CLASS_ID) || gm->PutActor(&str, actor, true) < 0) {
+	for (auto& chrPath : chrPaths) {
+		if (chrPath.empty()) continue;
+		if (!str.Create(chrPath, name.c_str(), IE_CHR_CLASS_ID)) continue;
+		if (gm->PutActor(&str, actor, true) < 0) continue;
+		saved = true;
+		path = chrPath;
+		break;
+	}
+	if (!saved) {
 		Log(WARNING, "Core", "Character cannot be saved: {}", name);
 		return -1;
 	}
 
 	//write the BIO string
 	if (!HasFeature(GFFlags::NO_BIOGRAPHY)) {
-		str.Create(Path, name.c_str(), IE_BIO_CLASS_ID);
+		str.Create(path, name.c_str(), IE_BIO_CLASS_ID);
 		//never write the string reference into this string
 		std::string mbstr = GetMBString(actor->GetVerbalConstant(Verbal::Bio), STRING_FLAGS::STRREFOFF);
 		str.Write(mbstr.data(), mbstr.length());
