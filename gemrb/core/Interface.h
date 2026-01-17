@@ -697,7 +697,7 @@ private:
 
 public:
 	CoreSettings config;
-	ResRef GameNameResRef;
+	ResRef GameNameResRef; // baldur / icewind / torment base name for GAM/SAV/BMP files in saves
 	ResRef GoldResRef; //MISC07.itm
 	ResRefMap<ItemList> RtRows;
 
