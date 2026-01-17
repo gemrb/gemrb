@@ -536,6 +536,45 @@ GEM_EXPORT path_t HomePath()
 	return "";
 }
 
+path_t UserProfilePath()
+{
+	path_t outPath = HomePath();
+	if (outPath.empty()) {
+		return "";
+	}
+
+#ifdef WIN32
+	PathAppend(outPath, "Documents");
+#elif __APPLE__
+	// same path as windows unless it was installed via the app store
+	path_t appStorePath;
+	std::array<path_t, 4> appList { "com.beamdog.baldursgateenhancededition", "com.beamdog.baldursgateIIenhancededition", "com.overhaulgames.iwdee-macos", "com.beamdog.planescapetormentenhancededition" };
+	for (path_t& app : appList) {
+		appStorePath = PathJoin(outPath, "Library", "Containers", app, "Data", "Documents");
+		if (DirExists(appStorePath)) {
+			outPath = appStorePath;
+			break;
+		}
+		appStorePath = "";
+	}
+
+	if (appStorePath == "") {
+		PathAppend(outPath, "Documents");
+	}
+#elif ANDROID
+	outPath = ""; // fix this if the port ever gets updated
+#else
+	// try XDG_DATA_HOME, with the standard fallback of ~/.local/share/gemrb
+	const char* home = getenv("XDG_DATA_HOME");
+	if (home) {
+		outPath = home;
+	} else {
+		outPath = PathJoin(outPath, ".local", "share");
+	}
+#endif
+	return outPath;
+}
+
 path_t GemDataPath()
 {
 	// check env var; used by the Android wrapper
