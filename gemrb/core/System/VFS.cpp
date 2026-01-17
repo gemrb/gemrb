@@ -151,7 +151,7 @@ namespace GemRB {
 path_t BundlePath(BundleDirectory dir)
 {
 	CFBundleRef mainBundle = CFBundleGetMainBundle();
-	CFURLRef bundleDirURL = NULL;
+	CFURLRef bundleDirURL = nullptr;
 	switch (dir) {
 		case RESOURCES:
 			bundleDirURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
@@ -725,8 +725,8 @@ void DirectoryIterator::Rewind()
 	if (Directory)
 		closedir(static_cast<DIR*>(Directory));
 	Directory = opendir(Path.c_str());
-	if (Directory == NULL) {
-		Entry = NULL;
+	if (Directory == nullptr) {
+		Entry = nullptr;
 		//Log(WARNING, "DirectoryIterator", "Cannot open directory: {}\nError: {}", Path, strerror(errno));
 	} else {
 		this->operator++();
