@@ -219,6 +219,76 @@ ItemDragOp::~ItemDragOp()
 	}
 }
 
+// first add home paths if relevant; they are analogues of the main paths under GamePath
+// full list here: https://gibberlings3.github.io/iesdp/appendices/override.htm
+static void AddGameOverrides(bool home, CoreSettings& config)
+{
+	// it's too early in init to have GameType or gemrb.ini data, but we skip empty dirs anyway,
+	// so adding paths that don't exist or are empty will not have any impact on non-EE
+	// games beyond the few extra lookups here
+
+	path_t basePath = config.GamePath;
+	path_t path;
+	int flags = 0;
+	if (home) {
+		flags = RM_SILENT;
+		// the game profile folder name is defined by the entry "engine_name" in  engine.lua
+		basePath = UserProfilePath();
+		if (basePath == "") return;
+
+		// look up game name properly, since mods could change it
+		path_t engineLuaPath = PathJoin(config.GamePath, "engine.lua");
+		if (!FileExists(engineLuaPath)) return; // not an ee game
+
+		FileStream* fs = FileStream::OpenFile(engineLuaPath);
+		path_t basePath2 = basePath;
+		std::string line;
+		if (!fs) goto fallback;
+
+		// perhaps replace this section once we have a lua parser
+		while (fs->ReadLine(line) != DataStream::Error) {
+			if (line.find("engine_name") == std::string::npos) continue;
+			auto quote = line.find_first_of('"', 11);
+			line = line.substr(quote + 1, line.size() - quote - 2);
+			PathAppend(basePath, line);
+			break;
+		}
+		delete fs;
+		if (basePath == basePath2) {
+fallback:
+			PathAppend(basePath, "Infinity Engine - Enhanced Edition");
+		}
+		if (!DirExists(basePath)) return;
+	}
+
+	if (!home) {
+		path = PathJoin(basePath, config.GameLanguagePath, config.GameMoviesPath);
+		gamedata->AddSource(path, "Movies i18n", PLUGIN_RESOURCE_DIRECTORY);
+	}
+	path = PathJoin(basePath, config.GameMoviesPath);
+	gamedata->AddSource(path, "Movies", PLUGIN_RESOURCE_DIRECTORY, flags);
+
+	// in the original GameCharactersPath also served as an override folder, but nobody is abusing that
+
+	path = PathJoin(basePath, config.GamePortraitsPath);
+	gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY, flags);
+
+	// GAME sounds are intentionally not cached, in IWD there are directory structures,
+	// that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
+	if (!home) {
+		path = PathJoin(basePath, config.GameLanguagePath, config.GameSoundsPath);
+		gamedata->AddSource(path, "Sounds i18n", PLUGIN_RESOURCE_DIRECTORY);
+	}
+	path = PathJoin(basePath, config.GameSoundsPath);
+	gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY, flags);
+
+	path = PathJoin(basePath, config.GameScriptsPath);
+	gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY, flags);
+
+	path = PathJoin(basePath, config.GameOverridePath);
+	gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, flags);
+}
+
 Interface::Interface(CoreSettings&& cfg)
 	: config(std::move(cfg))
 {
@@ -289,26 +359,9 @@ Interface::Interface(CoreSettings&& cfg)
 	path = PathJoin(config.GemRBOverridePath, "override", "shared");
 	gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-	// start of game-bundled (or created) override dirs
-
-	path = PathJoin(config.GamePath, config.GameMoviesPath);
-	gamedata->AddSource(path, "Movies", PLUGIN_RESOURCE_DIRECTORY);
-
-	// in the original GameCharactersPath also served as an override folder, but nobody is abusing that
-
-	path = PathJoin(config.GamePath, config.GamePortraitsPath);
-	gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-	// GAME sounds are intentionally not cached, in IWD there are directory structures,
-	// that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
-	path = PathJoin(config.GamePath, config.GameSoundsPath);
-	gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
-
-	path = PathJoin(config.GamePath, config.GameScriptsPath);
-	gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
-
-	path = PathJoin(config.GamePath, config.GameOverridePath);
-	gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+	// game-bundled (or user created) override dirs
+	AddGameOverrides(true, config);
+	AddGameOverrides(false, config);
 
 	path = PathJoin(config.GamePath, config.GameDataPath);
 	gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
