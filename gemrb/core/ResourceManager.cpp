@@ -89,7 +89,7 @@ bool ResourceManager::AddSource(const path_t& path, const std::string& descripti
 {
 	PluginHolder<ResourceSource> source = MakePluginHolder<ResourceSource>(type);
 	if (!source->Open(path, description)) {
-		Log(WARNING, "ResourceManager", "Invalid path given: {} ({})", path, description);
+		if (!(flags & RM_SILENT)) Log(WARNING, "ResourceManager", "Invalid path given: {} ({})", path, description);
 		return false;
 	}
 
@@ -97,7 +97,7 @@ bool ResourceManager::AddSource(const path_t& path, const std::string& descripti
 	if (type == PLUGIN_RESOURCE_DIRECTORY && !(flags & RM_USE_EMPTY_SOURCE)) {
 		DirectoryIterator it(path);
 		if (!++it) {
-			Log(WARNING, "ResourceManager", "Empty directory given: {} ({})", path, description);
+			if (!(flags & RM_SILENT)) Log(WARNING, "ResourceManager", "Empty directory given: {} ({})", path, description);
 			return false;
 		}
 	}

@@ -36,6 +36,7 @@ namespace GemRB {
 
 constexpr int RM_REPLACE_SAME_SOURCE = 1;
 constexpr int RM_USE_EMPTY_SOURCE = 2;
+constexpr int RM_SILENT = 4;
 
 class ResourceSource;
 class TypeID;
