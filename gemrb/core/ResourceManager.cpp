@@ -93,6 +93,15 @@ bool ResourceManager::AddSource(const path_t& path, const std::string& descripti
 		return false;
 	}
 
+	// skip empty folders?
+	if (type == PLUGIN_RESOURCE_DIRECTORY && !(flags & RM_USE_EMPTY_SOURCE)) {
+		DirectoryIterator it(path);
+		if (!++it) {
+			Log(WARNING, "ResourceManager", "Empty directory given: {} ({})", path, description);
+			return false;
+		}
+	}
+
 	if (flags & RM_REPLACE_SAME_SOURCE) {
 		for (auto& path2 : searchPath) {
 			if (description == path2->GetDescription()) {

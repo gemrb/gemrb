@@ -271,7 +271,7 @@ Interface::Interface(CoreSettings&& cfg)
 	}
 
 	path_t path = config.CachePath;
-	if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
+	if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY, RM_USE_EMPTY_SOURCE)) {
 		ThrowException("The cache path couldn't be registered, please check!");
 	}
 
