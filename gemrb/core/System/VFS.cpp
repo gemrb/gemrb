@@ -759,6 +759,19 @@ DirectoryIterator& DirectoryIterator::operator++()
 	return *this;
 }
 
+DirectoryIterator& DirectoryIterator::operator=(DirectoryIterator&& other) noexcept
+{
+	if (this == &other) return *this;
+
+	predicate = std::exchange(other.predicate, nullptr);
+	Directory = std::exchange(other.Directory, nullptr);
+	Entry = std::exchange(other.Entry, nullptr);
+	Path = std::exchange(other.Path, "");
+	entrySkipFlags = std::exchange(other.entrySkipFlags, Files);
+
+	return *this;
+}
+
 void DirectoryIterator::Rewind()
 {
 	if (Directory)

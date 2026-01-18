@@ -178,6 +178,7 @@ public:
 	DirectoryIterator(DirectoryIterator&&) noexcept;
 	~DirectoryIterator();
 	DirectoryIterator& operator=(const DirectoryIterator&) = delete;
+	DirectoryIterator& operator=(DirectoryIterator&&) noexcept;
 
 	void SetFilterPredicate(FileFilterPredicate p, bool chain = false);
 	bool IsDirectory();

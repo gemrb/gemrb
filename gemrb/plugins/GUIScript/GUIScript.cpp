@@ -4564,6 +4564,8 @@ static PyObject* GemRB_Roll(PyObject* /*self*/, PyObject* args)
 // appends matching paths in dirIt to the first argument
 static void ExtractPaths(std::vector<String>& strings, DirectoryIterator& dirIt, RESOURCE_DIRECTORY type, bool dirs)
 {
+	if (!dirIt) return;
+
 	do {
 		const path_t& name = dirIt.GetName();
 		if (name[0] == '.' || dirIt.IsDirectory() != dirs) {
@@ -4642,13 +4644,26 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 
 	std::vector<String> strings;
 	std::vector<SelectOption> TAOptions;
+	bool searchedProfile = false;
 	if (!dirit) {
+profile:
+		DirectoryIterator dirit2 = core->GetResourceDirectory(type, true);
+		dirit2.SetFlags(itflags, true);
+		dirit = std::move(dirit2);
+		searchedProfile = true;
+	}
+
+	if (!dirit && strings.empty()) {
 		ta->SetSelectOptions(TAOptions, false);
 		return MakePyList<const String&, PyString_FromStringObj>(strings);
 	}
 
 	ExtractPaths(strings, dirit, type, dirs);
 
+	// if we haven't already, look also into user paths
+	if (!searchedProfile) {
+		goto profile;
+	}
 
 	std::sort(strings.begin(), strings.end());
 	for (size_t i = 0; i < strings.size(); i++) {
