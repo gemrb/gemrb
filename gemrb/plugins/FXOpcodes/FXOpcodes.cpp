@@ -4191,7 +4191,13 @@ int fx_movement_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	ieDword value = target->GetStat(IE_MOVEMENTRATE);
-	STAT_MOD(IE_MOVEMENTRATE);
+	// ees added a new mode: Multiplicative Stacking Percentage Modifier: Movement = (Movement * fx->Parameter1) / 100
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS) && fx->Parameter2 == 5) {
+		// not using MOD_MULTIPLICATIVE or base stats to make it stackable
+		target->NewStat(IE_MOVEMENTRATE, fx->Parameter1 * target->GetStat(IE_MOVEMENTRATE), MOD_ABSOLUTE);
+	} else {
+		STAT_MOD(IE_MOVEMENTRATE);
+	}
 	if (value < target->GetStat(IE_MOVEMENTRATE)) {
 		target->AddPortraitIcon(PI_HASTED);
 	}
