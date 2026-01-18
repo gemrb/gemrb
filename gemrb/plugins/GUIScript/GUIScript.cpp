@@ -4561,6 +4561,37 @@ static PyObject* GemRB_Roll(PyObject* /*self*/, PyObject* args)
 	return PyLong_FromLong(core->Roll(Dice, Size, Add));
 }
 
+// appends matching paths in dirIt to the first argument
+static void ExtractPaths(std::vector<String>& strings, DirectoryIterator& dirIt, RESOURCE_DIRECTORY type, bool dirs)
+{
+	do {
+		const path_t& name = dirIt.GetName();
+		if (name[0] == '.' || dirIt.IsDirectory() != dirs) {
+			continue;
+		}
+
+		String string = StringFromUtf8(name.c_str());
+		if (dirs) {
+			strings.emplace_back(std::move(string));
+			continue;
+		}
+
+		size_t pos = string.find_last_of(u'.');
+		if (pos == String::npos) {
+			continue;
+		}
+		if (type == DIRECTORY_CHR_SOUNDS) {
+			if (pos == 0) {
+				continue;
+			} else {
+				--pos;
+			}
+		}
+		string.resize(pos);
+		strings.emplace_back(std::move(string));
+	} while (++dirIt);
+}
+
 PyDoc_STRVAR(GemRB_TextArea_ListResources__doc,
 	     "===== TextArea_ListResources =====\n\
 \n\
@@ -4616,32 +4647,8 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 		return MakePyList<const String&, PyString_FromStringObj>(strings);
 	}
 
-	do {
-		const path_t& name = dirit.GetName();
-		if (name[0] == '.' || dirit.IsDirectory() != dirs) {
-			continue;
-		}
+	ExtractPaths(strings, dirit, type, dirs);
 
-		String string = StringFromUtf8(name.c_str());
-		if (dirs) {
-			strings.emplace_back(std::move(string));
-			continue;
-		}
-
-		size_t pos = string.find_last_of(u'.');
-		if (pos == String::npos) {
-			continue;
-		}
-		if (type == DIRECTORY_CHR_SOUNDS) {
-			if (pos == 0) {
-				continue;
-			} else {
-				--pos;
-			}
-		}
-		string.resize(pos);
-		strings.emplace_back(std::move(string));
-	} while (++dirit);
 
 	std::sort(strings.begin(), strings.end());
 	for (size_t i = 0; i < strings.size(); i++) {
