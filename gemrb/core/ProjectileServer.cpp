@@ -200,7 +200,9 @@ Projectile* ProjectileServer::GetProjectile(size_t idx)
 		}
 
 		//fill the explosion/spread animation flags
-		pro->Extension->APFlags = explosions[Type].flags;
+		if (Type < static_cast<int>(explosions.size())) {
+			pro->Extension->APFlags = explosions[Type].flags;
+		}
 	}
 
 	projectiles[idx].projectile = std::make_unique<Projectile>(*pro);
