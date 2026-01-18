@@ -2269,10 +2269,15 @@ int Interface::Roll(int dice, int size, int add) const
 	return add;
 }
 
-DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
+DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir, bool profile) const
 {
 	path_t resourcePath;
+	path_t basePath = config.GamePath;
 	DirectoryIterator::FileFilterPredicate filter;
+	if (profile) {
+		basePath = PathJoin(UserProfilePath(), config.GameProfile);
+	}
+
 	switch (dir) {
 		case DIRECTORY_CHR_PORTRAITS:
 			resourcePath = config.GamePortraitsPath;
@@ -2300,7 +2305,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 			error("Interface", "Unknown resource directory type: {}!", dir);
 	}
 
-	DirectoryIterator dirIt(PathJoin(config.GamePath, resourcePath));
+	DirectoryIterator dirIt(PathJoin(basePath, resourcePath));
 	dirIt.SetFilterPredicate(std::move(filter));
 	return dirIt;
 }

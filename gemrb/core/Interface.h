@@ -515,7 +515,7 @@ public:
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
 
-	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY) const;
+	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY, bool profile = false) const;
 
 	size_t GetInventorySize() const { return SlotTypes - 1; }
 	ieDword FindSlot(unsigned int idx) const;
