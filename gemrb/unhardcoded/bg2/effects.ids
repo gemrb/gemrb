@@ -323,6 +323,7 @@ IDS
 #these-are-not-supported-in-the-originals
 0x13e Stat:SetStat
 0x13f Usability:ItemUsability
+#ChangeWeather-we-do-use-internally-but-it-is-instant
 0x140 ChangeWeather
 0x141 RemoveEffectsByResource
 0x144 Protection:Spell3

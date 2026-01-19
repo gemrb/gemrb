@@ -193,7 +193,7 @@ IDS
 0xbf	CastingLevelModifier
 0xc0	FindFamiliar
 0xc1	InvisibleDetection
-0xc2	IgnoreDialogPause
+0xc2	AlterAnimation
 0xc3	FamiliarBond
 0xc4	FamiliarMarker
 0xc5	Bounce:Projectile
@@ -224,7 +224,7 @@ IDS
 0xde	RandomTeleport
 0xdf	Protection:SchoolDec
 0xe0	Cure:LevelDrain
-0xe1	Reveal:Magic
+0xe1	ChangeBardSong
 0xe2	Protection:SecondaryTypeDec
 0xe3	Bounce:SchoolDec
 0xe4	Bounce:SecondaryTypeDec
@@ -303,5 +303,3 @@ IDS
 0x141	RemoveEffectsByResource
 0x146	ApplyEffectsList
 0x147	NPCBump
-396     ChangeBardSong
-399     AlterAnimation
