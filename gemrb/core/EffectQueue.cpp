@@ -126,7 +126,9 @@ private:
 
 			// make sure the opcode is within original engine limits for save compatibility
 			if (i > maxOpcode) {
-				Log(ERROR, "EffectQueue", "Opcode {} '{}' is higher than the original max {}! Saves will be incompatible", i, effectname, maxOpcode);
+				// this is fine for effects that don't linger
+				// but we don't have a good way of detecting that
+				//Log(DEBUG, "EffectQueue", "Opcode {} '{}' is higher than the original max {}! Saves will be incompatible", i, effectname, maxOpcode);
 			}
 
 			Opcodes[i] = *poi;
