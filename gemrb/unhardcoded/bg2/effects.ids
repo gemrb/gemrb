@@ -297,6 +297,8 @@ IDS
 0x127 DisableChunk
 0x128 Protection:Animation
 0x129 Protection:Turn
+
+#these-are-not-supported-in-the-original-soa
 0x12a CutScene2
 0x12b ChaosShieldModifier
 0x12c NPCBump
@@ -317,6 +319,8 @@ IDS
 0x13b AvatarRemovalModifier
 0x13c MagicalRest
 0x13d State:Haste2
+
+#these-are-not-supported-in-the-originals
 0x13e Stat:SetStat
 0x13f Usability:ItemUsability
 0x140 ChangeWeather
@@ -324,4 +328,5 @@ IDS
 0x144 Protection:Spell3
 0x146 ApplyEffectsList
 0x14C DamageBonusModifier2
+
 0x200 Protection:Spell2

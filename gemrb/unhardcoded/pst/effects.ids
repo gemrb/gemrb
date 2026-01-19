@@ -210,6 +210,8 @@ IDS
 0xd2	DetectEvil
 0xd3	JumbleCurse
 0xd4	SpeakWithDead
+
+#these-are-not-supported-in-the-originals
 0x141	RemoveEffectsByResource
 0x144	Protection:Spell3
 0x146	ApplyEffectsList

@@ -296,6 +296,8 @@ IDS
 0x126	HarpyWail
 0x127	JackalWereGaze
 0x128	ModifyGlobalVariable
+
+#these-are-not-supported-in-the-original
 0x129	HideInShadowsModifier
 0x12a	UseMagicDeviceModifier
 0x141	RemoveEffectsByResource

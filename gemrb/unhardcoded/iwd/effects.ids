@@ -265,6 +265,8 @@ IDS
 0x107	ControlCreature
 0x108	StaticCharge
 0x109	CloakOfFear
+
+#these-are-not-supported-in-the-original
 0x10a	MovementRateModifier3
 0x10b	Cure:Confusion
 0x10c	EyeOfTheMind

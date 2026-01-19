@@ -191,6 +191,8 @@ IDS
 0xbd	CastingSpeedModifier
 0xbe	AttackSpeedModifier
 0xbf	CastingLevelModifier
+
+#these-are-not-supported-in-the-original
 0xc0	FindFamiliar
 0xc1	InvisibleDetection
 0xc2	IgnoreDialogPause

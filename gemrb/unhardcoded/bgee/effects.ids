@@ -345,6 +345,10 @@ IDS
 0x158 EnchantmentVsCreatureType
 0x159 EnchantmentBonus
 0x15A SaveVsSchoolModifier
+
+#gemrb-extension
+0x15B Protection:Spell2
+
 0x168 IgnoreReputationBreakingPoint
 0x169 CastSpellOnCriticalMiss
 0x16A CriticalMissModifier
@@ -352,4 +356,3 @@ IDS
 0x16D MakeUnselectable
 0x16E Spell:ApplySpellOnMove
 0x16F MinimumBaseStats
-0x200 Protection:Spell2
