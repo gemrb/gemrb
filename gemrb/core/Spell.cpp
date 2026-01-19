@@ -242,6 +242,13 @@ EffectQueue Spell::GetEffectBlock(Scriptable* self, const Point& pos, int block_
 				fx.Duration = (fx.Duration * caster->Modified[IE_SPELLDURATIONMODMAGE]) / 100;
 			} else if (caster->Modified[IE_SPELLDURATIONMODPRIEST] && SpellType == IE_SPL_PRIEST) {
 				fx.Duration = (fx.Duration * caster->Modified[IE_SPELLDURATIONMODPRIEST]) / 100;
+			} else if (SpellType == IE_SPELL_TYPE_SONG) {
+				static EffectRef durationRef = { "SpellDurationModifier", -1 };
+				EffectQueue::ResolveEffect(durationRef);
+				const Effect* durFx = caster->fxqueue.HasEffectWithParam(durationRef, 2);
+				if (durFx) {
+					fx.Duration = (fx.Duration * durFx->Parameter1) / 100;
+				}
 			}
 
 			//evaluate spell focus feats

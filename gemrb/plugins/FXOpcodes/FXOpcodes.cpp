@@ -3611,14 +3611,15 @@ int fx_set_regenerating_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x63 SpellDurationModifier
 int fx_spell_duration_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_spell_duration_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
 	switch (fx->Parameter2) {
 		case 0:
 			STAT_SET(IE_SPELLDURATIONMODMAGE, fx->Parameter1);
 			break;
 		case 1:
 			STAT_SET(IE_SPELLDURATIONMODPRIEST, fx->Parameter1);
+			break;
+		case 2:
+			// bard song (EE only), handled when resolving durations
 			break;
 		default:
 			return FX_NOT_APPLIED;
