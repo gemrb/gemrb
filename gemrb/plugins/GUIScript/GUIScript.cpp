@@ -2039,7 +2039,7 @@ static PyObject* GemRB_CreateView(PyObject* /*self*/, PyObject* args)
 				PARSE_ARGS(constructArgs, "OO", &pyRef, &pyImgList);
 				ResRef resRef = ResRefFromPy(pyRef);
 
-				auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(resRef, IE_BAM_CLASS_ID);
+				auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(resRef, IE_BAM_CLASS_ID, true);
 				if (!af) {
 					return RuntimeError(fmt::format("{} BAM not found!", resRef));
 				}

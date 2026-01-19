@@ -72,7 +72,7 @@ ProjectileServer::ProjectileServer() noexcept
 		core->DelSymbol(gemresource);
 	}
 
-	AutoTable explist = gamedata->LoadTable("areapro");
+	AutoTable explist = gamedata->LoadTable("areapro", true);
 	if (explist) {
 		TableMgr::index_t rows = explist->GetRowCount();
 		//cannot handle 0xff and it is easier to set up the fields

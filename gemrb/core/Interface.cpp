@@ -1537,7 +1537,7 @@ void Interface::LoadGemRBINI()
 	int ttMargin = ini->GetKeyAsInt("resources", "TooltipMargin", 10);
 
 	if (!tooltipBG.IsEmpty() && !config.UseAsLibrary) {
-		auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(tooltipBG, IE_BAM_CLASS_ID);
+		auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(tooltipBG, IE_BAM_CLASS_ID, true);
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (anim) {
 			TooltipBG = new TooltipBackground(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2));

@@ -32,7 +32,7 @@ constexpr EnumArray<FogRenderer::Direction, BlitFlags> FogRenderer::BAM_FLAGS;
 
 EnumArray<FogRenderer::Direction, Holder<Sprite2D>> FogRenderer::LoadFogSprites()
 {
-	auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>("fogowar", IE_BAM_CLASS_ID);
+	auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>("fogowar", IE_BAM_CLASS_ID, true);
 	if (!anim) {
 		return {};
 	}
