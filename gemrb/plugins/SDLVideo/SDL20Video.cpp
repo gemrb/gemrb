@@ -814,10 +814,12 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event& event)
 			break;
 		case SDL_CONTROLLERAXISMOTION:
 			{
+				gamepadControl.HandleAxisEvent(event.caxis.axis, event.caxis.value);
 				float pct = event.caxis.value / float(sizeof(Sint16));
 				bool xaxis = event.caxis.axis % 2;
-				// FIXME: I'm sure this delta needs to be scaled
 				int delta = xaxis ? pct * screenSize.w : pct * screenSize.h;
+				gamepadControl.SetPointerSpeed(delta);
+				delta = gamepadControl.GetPointerSpeed();
 				InputAxis axis = InputAxis(event.caxis.axis);
 				e = EventMgr::CreateControllerAxisEvent(axis, delta, pct);
 				EvntManager->DispatchEvent(std::move(e));

@@ -21,6 +21,7 @@
 #ifndef SDLVIDEODRIVER_H
 #define SDLVIDEODRIVER_H
 
+#include "GamepadControl.h"
 #include "SDLSurfaceSprite2D.h"
 
 #include "GUI/EventMgr.h"
@@ -85,6 +86,7 @@ protected:
 #endif
 	VideoBufferPtr scratchBuffer; // a buffer that the driver can do with as it pleases for intermediate work
 	int refreshRate = 30;
+	GamepadControl gamepadControl;
 
 	int CreateDriverDisplay(const char* title, bool vsync) override;
 
@@ -108,6 +110,8 @@ private:
 
 	void DrawEllipseImp(const Region& rect, const Color& color, BlitFlags flags) override;
 	void DrawCircleImp(const Point& origin, uint16_t r, const Color& color, BlitFlags flags) override;
+	void SetPointerSpeed(int pointerSpeed) override;
+	void ProcessAxisMotion();
 
 public:
 	// static functions for manipulating surfaces
