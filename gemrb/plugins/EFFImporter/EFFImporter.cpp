@@ -173,6 +173,14 @@ Effect* EFFImporter::GetEffectV20()
 	str->ReadDword(fx->SecondaryType);
 	str->Seek(60, GEM_CURRENT_POS); // padding
 
+	// fix some too high opcode numbers present in versions before 0.9.5
+	// we could inspect MaxFXOpcode, but it'd be silly to bring in core for that
+	if (fx->Opcode >= 458) {
+		if (fx->Opcode == 458) fx->Opcode = 394;
+		if (fx->Opcode == 459) fx->Opcode = 392;
+		if (fx->Opcode == 511) fx->Opcode = 393;
+	}
+
 	return fx;
 }
 
