@@ -320,6 +320,4 @@ IDS
 0x13c	MagicalRest
 0x13d	State:Haste2
 0x141	RemoveEffectsByResource
-0x144	Protection:Spell3
 0x146	ApplyEffectsList
-0x200	Protection:Spell2

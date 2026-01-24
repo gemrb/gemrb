@@ -326,8 +326,5 @@ IDS
 #ChangeWeather-we-do-use-internally-but-it-is-instant
 0x140 ChangeWeather
 0x141 RemoveEffectsByResource
-0x144 Protection:Spell3
 0x146 ApplyEffectsList
 0x14C DamageBonusModifier2
-
-0x200 Protection:Spell2
