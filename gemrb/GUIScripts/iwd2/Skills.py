@@ -41,7 +41,7 @@ def RedrawSkills():
 	global CostTable, TopIndex
 
 	SumLabel = SkillWindow.GetControl(0x1000000c)
-	if PointsLeft == 0 or (not CharGen and PointsLeft == 1):
+	if PointsLeft == 0 or not CharGen:
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 		SumLabel.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 	else:
