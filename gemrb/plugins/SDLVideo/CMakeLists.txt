@@ -1,6 +1,6 @@
 INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} $<$<BOOL:${WIN32}>:${GLEW_INCLUDE_DIRS}>)
 
-SET(COMMON_FILES COCOA SDLVideo.cpp SDLSurfaceSprite2D.cpp DPadSoftKeyboard.cpp)
+SET(COMMON_FILES COCOA SDLVideo.cpp SDLSurfaceSprite2D.cpp DPadSoftKeyboard.cpp GamepadControl.cpp)
 
 IF(SDL_BACKEND STREQUAL "SDL2")
 	# With v2.24, we get libSDL2main, and that wants main() be linked here.

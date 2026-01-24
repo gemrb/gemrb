@@ -59,6 +59,11 @@ int SDLVideoDriver::PollEvents()
 	int ret = GEM_OK;
 	SDL_Event currentEvent;
 
+	// FIXME: move, refactor?
+	if (SDL_NumJoysticks() > 0) {
+		ProcessAxisMotion();
+	}
+
 	while (ret != GEM_ERROR && SDL_PollEvent(&currentEvent)) {
 		ret = ProcessEvent(currentEvent);
 	}
@@ -234,6 +239,9 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 			EvntManager->DispatchEvent(std::move(e));
 			break;
 		case SDL_MOUSEMOTION:
+			if (SDL_NumJoysticks() > 0) { // XXX
+				gamepadControl.SetGamepadPosition(event.motion.x, event.motion.y);
+			}
 			e = EventMgr::CreateMouseMotionEvent(Point(event.motion.x, event.motion.y), modstate);
 			EvntManager->DispatchEvent(std::move(e));
 			break;
@@ -255,10 +263,12 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 #ifdef USE_SDL_CONTROLLER_API
 		case SDL_JOYAXISMOTION:
 			{
+				gamepadControl.HandleAxisEvent(event.jaxis.axis, event.jaxis.value);
 				float pct = event.jaxis.value / float(sizeof(Sint16));
 				bool xaxis = event.jaxis.axis % 2;
-				// FIXME: I'm sure this delta needs to be scaled
 				int delta = xaxis ? pct * screenSize.w : pct * screenSize.h;
+				gamepadControl.SetPointerSpeed(delta); // XXX
+				delta = gamepadControl.GetPointerSpeed();
 				InputAxis axis = InputAxis(event.jaxis.axis);
 				e = EventMgr::CreateControllerAxisEvent(axis, delta, pct);
 				EvntManager->DispatchEvent(std::move(e));
@@ -278,6 +288,60 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 			break;
 	}
 	return GEM_OK;
+}
+
+void SDLVideoDriver::ProcessAxisMotion() // FIXME: verify
+{
+	uint32_t currentTime = GetMilliseconds();
+	uint32_t deltaTime = currentTime - gamepadControl.lastAxisMovementTime;
+	gamepadControl.lastAxisMovementTime = currentTime;
+
+	// cursor movement
+	if (gamepadControl.xAxisLValue != 0 || gamepadControl.yAxisLValue != 0) {
+		int16_t xSign = (gamepadControl.xAxisLValue > 0) - (gamepadControl.xAxisLValue < 0);
+		int16_t ySign = (gamepadControl.yAxisLValue > 0) - (gamepadControl.yAxisLValue < 0);
+
+		gamepadControl.xAxisFloatPos += ((pow(abs(gamepadControl.xAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * xSign * deltaTime)) * gamepadControl.GetPointerSpeed();
+		gamepadControl.yAxisFloatPos += ((pow(abs(gamepadControl.yAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * ySign * deltaTime)) * gamepadControl.GetPointerSpeed();
+
+		gamepadControl.xAxisFloatPos = Clamp(gamepadControl.xAxisFloatPos, 0.0F, static_cast<float>(GetScreenSize().w));
+		gamepadControl.yAxisFloatPos = Clamp(gamepadControl.yAxisFloatPos, 0.0F, static_cast<float>(GetScreenSize().h));
+
+		Event e = EvntManager->CreateMouseMotionEvent(Point(static_cast<int>(gamepadControl.xAxisFloatPos), static_cast<int>(gamepadControl.yAxisFloatPos)));
+		EvntManager->DispatchEvent(std::move(e));
+	}
+
+	// map scroll
+	if (gamepadControl.xAxisRValue != 0 || gamepadControl.yAxisRValue != 0) {
+		gamepadControl.gamepadScrollTimer += deltaTime;
+
+		if (gamepadControl.gamepadScrollTimer > gamepadControl.GAMEPAD_SCROLL_DELAY) {
+			gamepadControl.gamepadScrollTimer -= gamepadControl.GAMEPAD_SCROLL_DELAY;
+
+			if (gamepadControl.xAxisRValue > GamepadControl::JOY_R_DEADZONE) {
+				Event e = EventMgr::CreateKeyEvent(GEM_RIGHT, false, 0);
+				EvntManager->DispatchEvent(std::move(e));
+			} else if (gamepadControl.xAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
+				Event e = EventMgr::CreateKeyEvent(GEM_LEFT, false, 0);
+				EvntManager->DispatchEvent(std::move(e));
+			}
+
+			if (gamepadControl.yAxisRValue > GamepadControl::JOY_R_DEADZONE) {
+				Event e = EventMgr::CreateKeyEvent(GEM_DOWN, false, 0);
+				EvntManager->DispatchEvent(std::move(e));
+			} else if (gamepadControl.yAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
+				Event e = EventMgr::CreateKeyEvent(GEM_UP, false, 0);
+				EvntManager->DispatchEvent(std::move(e));
+			}
+		}
+	} else {
+		gamepadControl.gamepadScrollTimer = 0;
+	}
+}
+
+void SDLVideoDriver::SetPointerSpeed(int pointerSpeed)
+{
+	gamepadControl.SetPointerSpeed(pointerSpeed);
 }
 
 Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, const PixelFormat& fmt)
