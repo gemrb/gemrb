@@ -35,8 +35,8 @@ IDS
 0x21	SaveVsDeathModifier
 0x22	SaveVsWandsModifier
 0x23	SaveVsPolyModifier
-0x24	SaveVsBreathModifier
-0x25	SaveVsSpellsModifier
+#0x24	SaveVsBreathModifier
+#0x25	SaveVsSpellsModifier
 0x26	State:Silenced
 0x27	State:Helpless
 0x28	State:Slowed
@@ -121,10 +121,10 @@ IDS
 0x73	DetectAlignment
 0x74	Cure:Invisible2
 0x75	Reveal:Area
-0x76	Reveal:Creatures
+#0x76	Reveal:Creatures
 0x77	MirrorImage
 0x78	Protection:Weapons
-0x79	VisualAnimationEffect
+#0x79	VisualAnimationEffect
 0x7a	Item:CreateInventory
 0x7b	Item:RemoveInventory
 0x7c	DimensionDoor
@@ -199,7 +199,7 @@ IDS
 0xbd	CastingSpeedModifier
 0xbe	AttackSpeedModifier
 0xbf	CastingLevelModifier
-0xc0	FindFamiliar
+#0xc0	FindFamiliar
 0xc1	InvisibleDetection
 # effect not supported in original - just contains an assert
 0xc2	IgnoreDialogPause
