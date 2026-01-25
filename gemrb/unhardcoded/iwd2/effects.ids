@@ -83,6 +83,7 @@ IDS
 0x51	Cure:Deafness
 0x52	SetAIScript
 0x53	Protection:Projectile
+# 2 effects not supported in original - just contain an assert:
 0x54	MagicalFireResistanceModifier
 0x55	MagicalColdResistanceModifier
 0x56	SlashingResistanceModifier
@@ -99,6 +100,7 @@ IDS
 0x61	StrengthBonusModifier
 0x62	State:Regenerating
 0x63	SpellDurationModifier
+# effect not supported in original - just contains an assert
 0x64	Protection:Creature
 0x65	Protection:Opcode
 0x66	Protection:SpellLevel
@@ -109,11 +111,13 @@ IDS
 0x6b	PortraitChange
 0x6c	ReputationModifier
 0x6d	State:Hold3
+# effect not supported in original - just contains an assert
 0x6e	RetreatFrom
 0x6f	Item:CreateMagic
 0x70	Item:Remove
 0x71	Item:Equip
 0x72	Dither
+# effect not supported in original - just contains an assert
 0x73	DetectAlignment
 0x74	Cure:Invisible2
 0x75	Reveal:Area
@@ -126,6 +130,7 @@ IDS
 0x7c	DimensionDoor
 0x7d	Unlock
 0x7e	MovementRateModifier
+# effect not supported in original - just contains an assert
 0x7f	MonsterSummoning
 0x80	State:Confused
 0x81	AidNonCumulative
@@ -136,6 +141,7 @@ IDS
 0x86	State:Petrification
 0x87	Polymorph
 0x88	ForceVisible
+# effect not supported in original - just contains an assert
 0x89	ChantBadNonCumulative
 0x8a	AnimationStateChange
 0x8b	DisplayString
@@ -154,6 +160,7 @@ IDS
 0x98	PlayMovie
 0x99	Overlay:Sanctuary
 0x9a	Overlay:Entangle
+# 2 effects not supported in original - just contain an assert:
 0x9b	Overlay:MinorGlobe
 0x9c	Overlay:ShieldGlobe
 0x9d	Overlay:Web
@@ -184,6 +191,7 @@ IDS
 0xb6	ApplyEffectItem
 0xb7	ApplyEffectItemType
 0xb8	DontJumpModifier
+# effect not supported in original - just contains an assert
 0xb9	State:Hold2
 0xba	MoveToArea
 0xbb	Variable:StoreLocalVariable
@@ -193,6 +201,7 @@ IDS
 0xbf	CastingLevelModifier
 0xc0	FindFamiliar
 0xc1	InvisibleDetection
+# effect not supported in original - just contains an assert
 0xc2	IgnoreDialogPause
 0xc3	FamiliarBond
 0xc4	FamiliarMarker
@@ -200,14 +209,17 @@ IDS
 0xc6	Bounce:Opcode
 0xc7	Bounce:SpellLevel
 0xc8	Bounce:SpellLevelDec
+# effect not supported in original - just contains an assert
 0xc9	Protection:SpellLevelDec
 0xca	Bounce:School
 0xcb	Bounce:SecondaryType
+# 2 effects not supported in original - just contain an assert:
 0xcc	Protection:School
 0xcd	Protection:SecondaryType
 0xce	Protection:Spell2
 0xcf	Bounce:Spell
 0xd0	MinimumHPModifier
+# 5 effects not supported in original - just contain an assert:
 0xd1	PowerWordKill
 0xd2	PowerWordStun
 0xd3	State:Imprisonment
@@ -216,14 +228,18 @@ IDS
 0xd6	CastFromList
 0xd7	PlayVisualEffect
 0xd8	LevelDrainModifier
+# effect not supported in original - just contains an assert
 0xd9	PowerWordSleep
 0xda	IronSkins
+# effect not supported in original - just contains an assert
 0xdb	ACVsCreatureType
 0xdc	DispelSchool
 0xdd	DispelSecondaryType
 0xde	RandomTeleport
+# effect not supported in original - just contains an assert
 0xdf	Protection:SchoolDec
 0xe0	Cure:LevelDrain
+# 7 effects not supported in original - just contain an assert:
 0xe1	Reveal:Magic
 0xe2	Protection:SecondaryTypeDec
 0xe3	Bounce:SchoolDec
@@ -233,22 +249,29 @@ IDS
 0xe7	TimeStop
 0xe8	Color:FadeRGB
 0xe9	IWDVisualSpellHit
+# effect not supported in original - just contains an assert
 0xea	ColdDamage
 0xeb	CastingGlow2
 0xec	ChillTouchPanic
+# effect not supported in original - just contains an assert
 0xed	CrushingDamage
 0xee	SaveBonus
 0xef	SlowPoison
+# effect not supported in original - just contains an assert
 0xf0	IWDMonsterSummoning
 0xf1	VampiricTouch
+# 2 effects not supported in original - just contain an assert
 0xf2	Overlay
 0xf3	AnimateDead
 0xf4	Prayer2
+# 2 effects not supported in original - just contain an assert
 0xf5	Curse2
 0xf6	SummonMonster2
 0xf7	BurningBlood
+# effect not supported in original - just contains an assert
 0xf8	SummonShadowMonster
 0xf9	Recitation
+# 4 effects not supported in original - just contain an assert
 0xfa	RecitationBad
 0xfb	State:HoldNoIcon2
 0xfc	BlindingOrb
@@ -256,11 +279,14 @@ IDS
 0xfe	RemoveEffects
 0xff	SalamanderAura
 0x100	UmberHulkGaze
+# effect not supported in original - just contains an assert
 0x101	ZombieLordAura
 0x102	Protection:Spell
+# effect not supported in original - just contains an assert
 0x103	SummonCreature2
 0x104	AvatarRemoval
 0x105	Protection:Opcode2
+# effect not supported in original - just contains an assert
 0x106	SummonPomab
 0x107	ControlUndead
 0x108	StaticCharge
@@ -276,6 +302,7 @@ IDS
 0x112	EyeOfStone
 0x113	RemoveSevenEyes
 0x114	RemoveEffect
+# effect not supported in original - just contains an assert
 0x115	SoulEater
 0x116	ShroudOfFlame2
 0x117	AnimalRage
@@ -288,6 +315,7 @@ IDS
 0x11e	Reveal:Tracks
 0x11f	Protection:Backstab
 0x120	State:Set
+# effect not supported in original - just contains an assert
 0x121	Cutscene
 0x122	Protection:Spell3
 0x123	RodOfSmithing
@@ -298,27 +326,10 @@ IDS
 0x128	ModifyGlobalVariable
 0x129	HideInShadowsModifier
 0x12a	UseMagicDeviceModifier
-0x12b	AnimalEmpathyModifier
-0x12c	BluffModifier
-0x12d	ConcentrationModifier
-0x12e	DiplomacyModifier
-0x12f	IntimidateModifier
-0x130	SearchModifier
-0x131	SpellcraftModifier
-0x132	CriticalHitModifier
-0x133	TurnLevelModifier
-0x141	RemoveEffectsByResource
-0x142	NPCBump
-#324-
-#use-this-gap-for-any-new-iwd2-specific-opcodes
-392	UncannyDodge
-393	TurnUndead3
-394	SetConcealment
-395	CastSpellOnCondition
-396	ChangeBardSong
-397	SpellResistance
-398	SpellFocus
-399	AlterAnimation
+
+# 299-399
+# this gap is not reusable in the original, an assert will trigger
+
 400	Hopelessness
 401	ProtectionFromEvil
 402	ApplyEffectsList
@@ -377,3 +388,31 @@ IDS
 455	ArterialStrike
 456	Hamstring
 457	RapidShot
+# this is the end of the original list of effects
+
+### these are defined in the original, so we can reuse their values
+# old saving throw effects
+0x24	UncannyDodge
+0x25	TurnUndead3
+# find familiar: broken, unused
+0xC0	CastSpellOnCondition
+# effects with no implementation
+0x76	ChangeBardSong
+0x79	SpellFocus
+#0xD6
+
+# gemrb extensions break the original if present in saves
+# effects that never stick around are therefore fine
+0x12b	AnimalEmpathyModifier
+0x12c	BluffModifier
+0x12d	ConcentrationModifier
+0x12e	DiplomacyModifier
+0x12f	IntimidateModifier
+0x130	SearchModifier
+0x131	SpellcraftModifier
+0x132	CriticalHitModifier
+0x133	TurnLevelModifier
+0x141	RemoveEffectsByResource
+0x142	NPCBump
+458	SetConcealment
+459	SpellResistance
