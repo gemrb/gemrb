@@ -297,7 +297,7 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 		}
 	}
 
-	if (SavedLocCount && SavedLocOffset) {
+	if (SavedLocCount && SavedLocOffset && (version == GAM_VER_BG2 || version == GAM_VER_TOB)) {
 		str->Seek(SavedLocOffset, GEM_STREAM_START);
 		for (unsigned int i = 0; i < SavedLocCount; i++) {
 			GAMLocationEntry* gle = newGame->GetSavedLocationEntry(i);
