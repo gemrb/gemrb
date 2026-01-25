@@ -174,11 +174,12 @@ Effect* EFFImporter::GetEffectV20()
 	str->Seek(60, GEM_CURRENT_POS); // padding
 
 	// fix some too high opcode numbers present in versions before 0.9.5
-	// we could inspect MaxFXOpcode, but it'd be silly to bring in core for that
-	if (fx->Opcode >= 458) {
-		if (fx->Opcode == 458) fx->Opcode = 394;
-		if (fx->Opcode == 459) fx->Opcode = 392;
-		if (fx->Opcode == 511) fx->Opcode = 393;
+	if (fx->Opcode >= 396) {
+		if (fx->Opcode == 458) fx->Opcode = 0x24;
+		if (fx->Opcode == 459) fx->Opcode = 0x25;
+		if (fx->Opcode == 511) fx->Opcode = 0xc0;
+		if (fx->Opcode == 396) fx->Opcode = 0x76;
+		if (fx->Opcode == 398) fx->Opcode = 0x79;
 	}
 
 	return fx;
