@@ -35,7 +35,7 @@ bool IDSImporter::Open(std::unique_ptr<DataStream> str)
 		str->Rewind();
 	}
 	while (str->ReadLine(line) != DataStream::Error) {
-		if (line.length() == 0) {
+		if (line.length() == 0 || line[0] == '#') {
 			continue;
 		}
 
