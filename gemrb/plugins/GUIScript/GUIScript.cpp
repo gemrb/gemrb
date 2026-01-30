@@ -97,6 +97,7 @@ struct UsedItemType {
 };
 
 using EventNameType = FixedSizeString<16>;
+using stat_t = Actor::stat_t;
 #define IS_DROP        0
 #define IS_GET         1
 #define IS_SWINGOFFSET 2 // offset to the swing sound columns
@@ -241,7 +242,7 @@ static int GetCreatureStat(const Actor* actor, unsigned int StatID, int Mod)
 	return actor->GetBase(StatID);
 }
 
-static int SetCreatureStat(Actor* actor, unsigned int StatID, int StatValue, bool pcf)
+static int SetCreatureStat(Actor* actor, unsigned int StatID, stat_t StatValue, bool pcf)
 {
 	// special AC handling
 	if (StatID == IE_ARMORCLASS) {
@@ -6142,9 +6143,10 @@ The above example sets the player's color just picked via the color customisatio
 
 static PyObject* GemRB_SetPlayerStat(PyObject* /*self*/, PyObject* args)
 {
-	int globalID, StatID, StatValue;
+	int globalID, StatID;
+	stat_t StatValue;
 	int pcf = 1;
-	PARSE_ARGS(args, "iii|i", &globalID, &StatID, &StatValue, &pcf);
+	PARSE_ARGS(args, "iil|i", &globalID, &StatID, &StatValue, &pcf);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
