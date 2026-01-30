@@ -216,7 +216,7 @@ static bool StatIsASkill(unsigned int StatID)
 	return false;
 }
 
-static int GetCreatureStat(const Actor* actor, unsigned int StatID, int Mod)
+static int64_t GetCreatureStat(const Actor* actor, unsigned int StatID, int Mod)
 {
 	//this is a hack, if more PCStats fields are needed, improve it
 	if (StatID & EXTRASETTINGS) {
@@ -6098,18 +6098,18 @@ listed in ie_stats.py. For IWD2 skills, it takes all bonuses into account.\n\
 
 static PyObject* GemRB_GetPlayerStat(PyObject* /*self*/, PyObject* args)
 {
-	int globalID, StatID, StatValue, BaseStat;
-
-	BaseStat = 0;
+	int globalID;
+	int StatID;
+	int BaseStat = 0;
 	PARSE_ARGS(args, "ii|i", &globalID, &StatID, &BaseStat);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
 	//returning the modified stat if BaseStat was 0 (default)
-	StatValue = GetCreatureStat(actor, StatID, !BaseStat);
+	int64_t StatValue = GetCreatureStat(actor, StatID, !BaseStat);
 
 	// special handling for the hidden hp
-	if ((unsigned) StatValue == 0xdadadada) {
+	if (StatValue == 0xdadadada) {
 		return PyString_FromString("?");
 	} else {
 		return PyLong_FromLong(StatValue);
