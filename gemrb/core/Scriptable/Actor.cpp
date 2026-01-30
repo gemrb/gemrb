@@ -2493,13 +2493,9 @@ Actor::stat_t Actor::ClampStat(unsigned int StatIndex, stat_t Value) const
 		return Value;
 	}
 
-	if ((signed) Value < -100) {
-		Value = (stat_t) -100;
-	} else {
-		if (maximum_values[StatIndex] > 0) {
-			if ((signed) Value > 0 && Value > maximum_values[StatIndex]) {
-				Value = maximum_values[StatIndex];
-			}
+	if (maximum_values[StatIndex] > 0) {
+		if ((signed) Value > 0 && Value > maximum_values[StatIndex]) {
+			Value = maximum_values[StatIndex];
 		}
 	}
 	return Value;
