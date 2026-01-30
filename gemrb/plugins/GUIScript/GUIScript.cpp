@@ -222,8 +222,7 @@ static int64_t GetCreatureStat(const Actor* actor, unsigned int StatID, int Mod)
 	if (StatID & EXTRASETTINGS) {
 		const auto& ps = actor->PCStats;
 		if (!ps) {
-			//the official invalid value in GetStat
-			return 0xdadadada;
+			RuntimeError("Creature does not have the PCStats struct!");
 		}
 		StatID &= 15;
 		return ps->ExtraSettings[StatID];
@@ -232,11 +231,7 @@ static int64_t GetCreatureStat(const Actor* actor, unsigned int StatID, int Mod)
 		if (core->HasFeature(GFFlags::RULES_3ED) && StatIsASkill(StatID)) {
 			return actor->GetSkill(StatID);
 		} else {
-			if (StatID != IE_HITPOINTS || actor->HasVisibleHP()) {
-				return actor->GetStat(StatID);
-			} else {
-				return 0xdadadada;
-			}
+			return actor->GetStat(StatID);
 		}
 	}
 	return actor->GetBase(StatID);
@@ -6109,7 +6104,7 @@ static PyObject* GemRB_GetPlayerStat(PyObject* /*self*/, PyObject* args)
 	int64_t StatValue = GetCreatureStat(actor, StatID, !BaseStat);
 
 	// special handling for the hidden hp
-	if (StatValue == 0xdadadada) {
+	if (StatID == IE_HITPOINTS && !actor->HasVisibleHP()) {
 		return PyString_FromString("?");
 	} else {
 		return PyLong_FromLong(StatValue);
