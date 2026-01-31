@@ -38,10 +38,6 @@
 
 namespace GemRB {
 
-#define FAMILIAR_FILL_SIZE 324
-// if your compiler chokes on this, use -1 or 0xff whichever works for you
-#define UNINITIALIZED_CHAR '\xff'
-
 bool GAMImporter::Import(DataStream* str)
 {
 	char Signature[8];
@@ -130,51 +126,48 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 	str->ReadDword(newGame->CurrentLink); //in ToB this is named 'currentLink'
 	str->ReadDword(JournalCount);
 	str->ReadDword(JournalOffset);
-	switch (version) {
-		default:
-			MazeOffset = 0;
-			str->ReadDword(newGame->Reputation);
-			str->ReadResRef(newGame->CurrentArea);
-			newGame->AnotherArea = newGame->CurrentArea;
-			str->ReadDword(newGame->ControlStatus);
-			str->ReadDword(newGame->Expansion);
-			str->ReadDword(FamiliarsOffset);
-			str->ReadDword(SavedLocOffset);
-			str->ReadDword(SavedLocCount);
 
-			// iwd2 HoF mode was stored at the bg2 location of SavedLocOffset
-			if (version == GAM_VER_IWD2) {
-				newGame->HOFMode = SavedLocOffset == 1;
-			}
+	if (version == GAM_VER_PST) {
+		str->ReadDword(MazeOffset);
+		str->ReadDword(newGame->Reputation);
+		str->ReadResRef(newGame->AnotherArea);
+		str->ReadDword(KillVarsOffset);
+		str->ReadDword(KillVarsCount);
+		str->ReadDword(FamiliarsOffset); //bestiary
+		str->ReadResRef(newGame->AnotherArea); //yet another area
+		SavedLocOffset = 0;
+		SavedLocCount = 0;
+		PPLocOffset = 0;
+		PPLocCount = 0;
+		str->Seek(64, GEM_CURRENT_POS);
+	} else {
+		MazeOffset = 0;
+		str->ReadDword(newGame->Reputation);
+		str->ReadResRef(newGame->CurrentArea);
+		newGame->AnotherArea = newGame->CurrentArea;
+		str->ReadDword(newGame->ControlStatus);
+		str->ReadDword(newGame->Expansion);
+		str->ReadDword(FamiliarsOffset);
+		str->ReadDword(SavedLocOffset);
+		str->ReadDword(SavedLocCount);
 
-			str->ReadDword(newGame->RealTime);
-			str->ReadDword(PPLocOffset);
-			str->ReadDword(PPLocCount);
-			// EE-only from here on
-			if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
-				str->ReadDword(newGame->zoomLevel);
-				str->ReadResRef(newGame->RandomEncounterArea);
-				str->ReadResRef(newGame->CurrentWorldMap);
-				str->ReadResRef(newGame->CurrentCampaign);
-				str->ReadDword(newGame->FamiliarOwner);
-				str->ReadRTrimString(newGame->RandomEncounterEntry, 20); // ran out of space for a proper ieVariable
-			}
-			break;
+		// iwd2 HoF mode was stored at the bg2 location of SavedLocOffset
+		if (version == GAM_VER_IWD2) {
+			newGame->HOFMode = SavedLocOffset == 1;
+		}
 
-		case GAM_VER_PST:
-			str->ReadDword(MazeOffset);
-			str->ReadDword(newGame->Reputation);
-			str->ReadResRef(newGame->AnotherArea);
-			str->ReadDword(KillVarsOffset);
-			str->ReadDword(KillVarsCount);
-			str->ReadDword(FamiliarsOffset); //bestiary
-			str->ReadResRef(newGame->AnotherArea); //yet another area
-			SavedLocOffset = 0;
-			SavedLocCount = 0;
-			PPLocOffset = 0;
-			PPLocCount = 0;
-			str->Seek(64, GEM_CURRENT_POS);
-			break;
+		str->ReadDword(newGame->RealTime);
+		str->ReadDword(PPLocOffset);
+		str->ReadDword(PPLocCount);
+		// EE-only from here on
+		if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+			str->ReadDword(newGame->zoomLevel);
+			str->ReadResRef(newGame->RandomEncounterArea);
+			str->ReadResRef(newGame->CurrentWorldMap);
+			str->ReadResRef(newGame->CurrentCampaign);
+			str->ReadDword(newGame->FamiliarOwner);
+			str->ReadRTrimString(newGame->RandomEncounterEntry, 20); // ran out of space for a proper ieVariable
+		}
 	}
 
 	if (newGame->CurrentArea.IsEmpty()) {
@@ -290,7 +283,7 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 		}
 	}
 	// Loading known creatures array (beasts)
-	if (core->GetBeastsINI() != NULL) {
+	if (core->GetBeastsINI()) {
 		int beasts_count = BESTIARY_SIZE;
 		if (FamiliarsOffset) {
 			str->Read(newGame->beasts.data(), beasts_count);
@@ -467,7 +460,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 
 	size_t pos = str->GetPos();
 
-	Actor* actor = NULL;
+	Actor* actor = nullptr;
 	int slot = is_in_party ? (pcInfo.PartyOrder + 1) : 0;
 
 	if (pcInfo.OffsetToCRE) {
@@ -1176,6 +1169,7 @@ int GAMImporter::PutFamiliars(DataStream* stream, const Game* game) const
 	if (len) {
 		stream->Write(game->beasts.data(), len);
 	}
+	constexpr int FAMILIAR_FILL_SIZE = 324;
 	stream->WriteFilling(FAMILIAR_FILL_SIZE - len);
 	return 0;
 }
