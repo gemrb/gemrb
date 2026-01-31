@@ -31,8 +31,8 @@
 
 using namespace GemRB;
 
-//the net sizeof(wed_polygon) is 0x12 but not all compilers know that
-#define WED_POLYGON_SIZE 0x12
+// the stored sizeof(wed_polygon) is 0x12, but padding/alignment increases it
+constexpr int WED_POLYGON_SIZE = 0x12;
 
 WEDImporter::~WEDImporter(void)
 {
@@ -122,8 +122,11 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 		for (int x = 0; x < newOverlays->size.w; x++) {
 			str->Seek(newOverlays->TilemapOffset + (y * newOverlays->size.w + x) * 10, GEM_STREAM_START);
 
-			ieWord startindex, count, secondary;
-			ieByte overlaymask, animspeed;
+			ieWord startindex;
+			ieWord count;
+			ieWord secondary;
+			ieByte overlaymask;
+			ieByte animspeed;
 			str->ReadWord(startindex);
 			str->ReadWord(count);
 			str->ReadWord(secondary);
@@ -231,18 +234,19 @@ WallPolygonGroup WEDImporter::OpenDoorPolygons() const
 
 std::vector<ieWord> WEDImporter::GetDoorIndices(const ResRef& resref, bool& BaseClosed)
 {
-	ieWord DoorClosed, DoorTileStart, DoorTileCount;
+	ieWord DoorClosed;
+	ieWord DoorTileStart;
+	ieWord DoorTileCount;
 	ResRef Name;
-	unsigned int i;
 
-	for (i = 0; i < DoorsCount; i++) {
+	for (unsigned int i = 0; i < DoorsCount; i++) {
 		str->Seek(DoorsOffset + (i * 0x1A), GEM_STREAM_START);
 		str->ReadResRef(Name);
 		if (Name == resref)
 			break;
 	}
 	//The door has no representation in the WED file
-	if (i == DoorsCount) {
+	if (Name != resref) {
 		Log(ERROR, "WEDImporter", "Found door without WED entry!");
 		return {};
 	}
@@ -321,7 +325,8 @@ void WEDImporter::ReadWallPolygons()
 			continue;
 		}
 		ieDword flags = PolygonHeaders[i].Flags & ~(WF_BASELINE | WF_HOVER);
-		Point base0, base1;
+		Point base0;
+		Point base1;
 		if (PolygonHeaders[i].Flags & WF_HOVER) {
 			count -= 2;
 			str->ReadPoint(base0);
@@ -397,7 +402,8 @@ std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
 
 	str->Seek(WallGroupsOffset, GEM_STREAM_START);
 	for (size_t i = 0; i < groupSize; ++i) {
-		ieWord index, count;
+		ieWord index;
+		ieWord count;
 		str->ReadWord(index);
 		str->ReadWord(count);
 
