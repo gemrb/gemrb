@@ -633,7 +633,8 @@ void CREImporter::ReadChrHeader(Actor* act)
 {
 	ieVariable name;
 	char Signature[8];
-	ieDword offset, size;
+	ieDword offset;
+	ieDword size;
 
 	act->CreateStats();
 	str->Rewind();
@@ -750,7 +751,10 @@ void CREImporter::ReadScript(Actor* act, int ScriptLevel)
 
 CRESpellMemorization* CREImporter::GetSpellMemorization(Actor* act)
 {
-	ieWord Level, Type, Number, Number2;
+	ieWord Level;
+	ieWord Type;
+	ieWord Number;
+	ieWord Number2;
 
 	str->ReadWord(Level);
 	str->ReadWord(Number);
@@ -1103,9 +1107,8 @@ void CREImporter::ReadInventory(Actor* act, size_t slotCount)
 
 	//read the item entries based on the previously read indices
 	//an item entry may be read multiple times if the indices are repeating
-	for (size_t i = 0; i < slotCount;) {
-		//the index was intentionally increased here, the fist slot isn't saved
-		ieWord index = indices[i++];
+	for (size_t i = 0; i < slotCount; ++i) {
+		ieWord index = indices[i];
 		if (index != 0xffff) {
 			if (index >= ItemsCount) {
 				Log(ERROR, "CREImporter", "Invalid item index ({}) in creature!", index);
@@ -1115,7 +1118,7 @@ void CREImporter::ReadInventory(Actor* act, size_t slotCount)
 			str->Seek(ItemsOffset + index * 20 + CREOffset, GEM_STREAM_START);
 			//the core allocates this item data
 			CREItem* item = core->ReadItem(str);
-			int Slot = core->QuerySlot((unsigned int) i);
+			int Slot = core->QuerySlot((unsigned int) i + 1); // the fist slot isn't saved
 			if (item) {
 				act->inventory.SetSlotItem(item, Slot);
 			} else {
@@ -1626,9 +1629,12 @@ void CREImporter::GetActorIWD2(Actor* act)
 		str->ReadDword(ClassSpellCounts[i]);
 	}
 
-	ieDword InnateOffset, InnateCount;
-	ieDword SongOffset, SongCount;
-	ieDword ShapeOffset, ShapeCount;
+	ieDword InnateOffset;
+	ieDword InnateCount;
+	ieDword SongOffset;
+	ieDword SongCount;
+	ieDword ShapeOffset;
+	ieDword ShapeCount;
 	str->ReadDword(InnateOffset);
 	str->ReadDword(InnateCount);
 	str->ReadDword(SongOffset);
@@ -2462,7 +2468,8 @@ ieDword CREImporter::GetIWD2SpellpageSize(const Actor* actor, ieIWD2SpellType ty
 
 int CREImporter::PutIWD2Spellpage(DataStream* stream, const Actor* actor, ieIWD2SpellType type, int level) const
 {
-	ieDword max, known;
+	ieDword max;
+	ieDword known;
 
 	int knownCount = actor->spellbook.GetKnownSpellsCount(type, level);
 	for (int i = 0; i < knownCount; i++) {
@@ -2541,32 +2548,31 @@ int CREImporter::PutActor(DataStream* stream, const Actor* actor, bool chr)
 
 	//writing offsets and counts
 	if (actor->creVersion == CREVersion::V2_2) {
-		int type, level;
 		ieDword tmpDword = 0;
 		//class spells
-		for (type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++)
-			for (level = 0; level < 9; level++) {
+		for (int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++)
+			for (int level = 0; level < 9; level++) {
 				tmpDword = GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, level);
 				stream->WriteDword(KnownSpellsOffset);
 				KnownSpellsOffset += tmpDword * 16 + 8;
 			}
-		for (type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++)
-			for (level = 0; level < 9; level++) {
+		for (int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++)
+			for (int level = 0; level < 9; level++) {
 				tmpDword = GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, level);
 				stream->WriteDword(tmpDword);
 			}
 		//domain spells
-		for (level = 0; level < 9; level++) {
+		for (int level = 0; level < 9; level++) {
 			tmpDword = GetIWD2SpellpageSize(actor, IE_IWD2_SPELL_DOMAIN, level);
 			stream->WriteDword(KnownSpellsOffset);
 			KnownSpellsOffset += tmpDword * 16 + 8;
 		}
-		for (level = 0; level < 9; level++) {
+		for (int level = 0; level < 9; level++) {
 			tmpDword = GetIWD2SpellpageSize(actor, IE_IWD2_SPELL_DOMAIN, level);
 			stream->WriteDword(tmpDword);
 		}
 		//innates, shapes, songs
-		for (type = IE_IWD2_SPELL_INNATE; type < NUM_IWD2_SPELLTYPES; type++) {
+		for (int type = IE_IWD2_SPELL_INNATE; type < NUM_IWD2_SPELLTYPES; type++) {
 			tmpDword = GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, 0);
 			stream->WriteDword(KnownSpellsOffset);
 			KnownSpellsOffset += tmpDword * 16 + 8;
@@ -2589,22 +2595,20 @@ int CREImporter::PutActor(DataStream* stream, const Actor* actor, bool chr)
 	//spells, spellbook etc
 
 	if (actor->creVersion == CREVersion::V2_2) {
-		int type, level;
-
 		//writing out spell page headers
-		for (type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
-			for (level = 0; level < 9; level++) {
+		for (int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
+			for (int level = 0; level < 9; level++) {
 				PutIWD2Spellpage(stream, actor, (ieIWD2SpellType) type, level);
 			}
 		}
 
 		//writing out domain page headers
-		for (level = 0; level < 9; level++) {
+		for (int level = 0; level < 9; level++) {
 			PutIWD2Spellpage(stream, actor, IE_IWD2_SPELL_DOMAIN, level);
 		}
 
 		//innates, shapes, songs
-		for (type = IE_IWD2_SPELL_INNATE; type < NUM_IWD2_SPELLTYPES; type++) {
+		for (int type = IE_IWD2_SPELL_INNATE; type < NUM_IWD2_SPELLTYPES; type++) {
 			PutIWD2Spellpage(stream, actor, (ieIWD2SpellType) type, 0);
 		}
 	} else {
