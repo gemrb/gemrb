@@ -247,7 +247,7 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 
 	std::vector<index_t> FLT(count);
 	str->Seek(FLTOffset, GEM_STREAM_START);
-	str->Read(&FLT[0], count * sizeof(ieWord));
+	str->ReadArray(FLT);
 	return FLT;
 }
 

@@ -135,7 +135,7 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 			}
 			str->Seek(newOverlays->TILOffset + startindex * 2, GEM_STREAM_START);
 			std::vector<ieWord> indices(count);
-			str->Read(indices.data(), count * sizeof(ieWord));
+			str->ReadArray(indices);
 
 			Tile* tile;
 			if (secondary == 0xffff) {
@@ -258,7 +258,7 @@ std::vector<ieWord> WEDImporter::GetDoorIndices(const ResRef& resref, bool& Base
 	//Reading Door Tile Cells
 	str->Seek(DoorTilesOffset + (DoorTileStart * 2), GEM_STREAM_START);
 	auto DoorTiles = std::vector<ieWord>(DoorTileCount);
-	str->Read(DoorTiles.data(), DoorTileCount * sizeof(ieWord));
+	str->ReadArray(DoorTiles);
 
 	BaseClosed = DoorClosed != 0;
 	return DoorTiles;

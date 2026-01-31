@@ -51,6 +51,7 @@ namespace GemRB {
 #define ReadStrRef           ReadEnum<ieStrRef>
 #define ReadResRef(str)      ReadRTrimString(str, str.Size)
 #define ReadVariable(str)    ReadRTrimString(str, str.Size)
+#define ReadArray(arr)       Read(arr.data(), arr.size() * sizeof(decltype(arr)::value_type))
 #define WriteWord            WriteScalar<ieWord>
 #define WriteDword           WriteScalar<ieDword>
 #define WriteStrRef          WriteEnum<ieStrRef>

@@ -655,7 +655,7 @@ void CREImporter::ReadChrHeader(Actor* act)
 		str->ReadResRef(act->PCStats->QuickSpells[i]);
 	}
 	if (QSPCount == 9) {
-		str->Read(act->PCStats->QuickSpellBookType.data(), 9);
+		str->ReadArray(act->PCStats->QuickSpellBookType);
 		str->Seek(1, GEM_CURRENT_POS); // null terminator
 	}
 	for (int i = 0; i < QITCount; i++) {
@@ -848,9 +848,10 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	}
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_MAXHITPOINTS]);
 	str->ReadDword(act->BaseStats[IE_ANIMATION_ID]); //animID is a dword
-	ieByte tmp2[7];
-	str->Read(tmp2, 7);
-	for (int i = 0; i < 7; i++) {
+
+	std::array<ieByte, 7> tmp2;
+	str->ReadArray(tmp2);
+	for (size_t i = 0; i < tmp2.size(); i++) {
 		ieDword t = tmp2[i];
 		// apply RANDCOLR.2DA transformation
 		SetupColor(t);
