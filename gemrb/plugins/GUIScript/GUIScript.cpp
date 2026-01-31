@@ -5316,7 +5316,7 @@ static PyObject* GemRB_CreatePlayer(PyObject* /*self*/, PyObject* args)
 
 	ResRef CreResRef = ResRefFromPy(pystr);
 	if (!CreResRef.IsEmpty()) {
-		PlayerSlot = gamedata->LoadCreature(CreResRef, Slot, (bool) Import, VersionOverride);
+		PlayerSlot = gamedata->LoadCreature(CreResRef, Slot, (bool) Import, static_cast<CREVersion>(VersionOverride));
 	} else {
 		//just destroyed the previous actor, not going to create one
 		PlayerSlot = 0;

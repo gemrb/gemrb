@@ -24,6 +24,7 @@
 #include "exports.h"
 #include "ie_types.h"
 #include "strrefs.h"
+#include "versions.h"
 
 #include "CombatInfo.h"
 #include "EffectQueue.h"
@@ -49,15 +50,6 @@ class Map;
 class ScriptedAnimation;
 struct PolymorphCache;
 enum class Feat : uint8_t;
-
-enum CREVersion {
-	GemRB,
-	V1_0 = 10, // bg1
-	V1_1 = 11, // bg2 (still V1.0)
-	V1_2 = 12, // pst
-	V2_2 = 22, // iwd2
-	V9_0 = 90 // iwd
-};
 
 #define MAX_STATS 256
 #define MAX_LEVEL 128
@@ -478,7 +470,7 @@ public:
 	Inventory inventory;
 	Spellbook spellbook;
 	//savefile version (creatures embedded in area)
-	int creVersion = 0;
+	CREVersion creVersion = CREVersion::GemRB;
 	//in game or area actor header
 	ieDword TalkCount = 0;
 	//FIXME: this is definitely not the same in bg2, in bg2 there are joinable npcs

@@ -24,6 +24,7 @@
 #include "SClassID.h"
 #include "exports.h"
 #include "ie_types.h"
+#include "versions.h"
 
 #include "Cache.h"
 #include "CharAnimations.h"
@@ -99,7 +100,7 @@ public:
 	/** Returns actor */
 	Actor* GetCreature(const ResRef& creature, unsigned int PartySlot = 0);
 	/** Returns a PC index, by loading a creature */
-	int LoadCreature(const ResRef& creature, unsigned int PartySlot, bool character = false, int VersionOverride = -1);
+	int LoadCreature(const ResRef& creature, unsigned int PartySlot, bool character = false, CREVersion versionOverride = CREVersion::GemRB);
 
 
 	// 2DA table functions.

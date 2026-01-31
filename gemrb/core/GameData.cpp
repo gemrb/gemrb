@@ -73,7 +73,7 @@ Actor* GameData::GetCreature(const ResRef& creature, unsigned int PartySlot)
 	return actor;
 }
 
-int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool character, int VersionOverride)
+int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool character, CREVersion versionOverride)
 {
 	DataStream* stream;
 
@@ -101,8 +101,8 @@ int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool 
 		return -1;
 	}
 
-	if (VersionOverride != -1) {
-		actor->creVersion = VersionOverride;
+	if (versionOverride != CREVersion::GemRB) {
+		actor->creVersion = versionOverride;
 	}
 
 	actor->AreaName = core->GetGame()->CurrentArea;

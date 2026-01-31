@@ -21,6 +21,8 @@
 #ifndef CREIMPORTER_H
 #define CREIMPORTER_H
 
+#include "versions.h"
+
 #include "ActorMgr.h"
 #include "Spellbook.h"
 
@@ -31,7 +33,7 @@ struct Effect;
 
 class CREImporter : public ActorMgr {
 private:
-	unsigned char CREVersion = 0xff;
+	CREVersion version = CREVersion::GemRB;
 	ieDword KnownSpellsOffset = 0;
 	ieDword KnownSpellsCount = 0;
 	ieDword SpellMemorizationOffset = 0;

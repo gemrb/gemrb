@@ -31,4 +31,13 @@ enum class GAMVersion {
 	IWD2 = 22
 };
 
+enum class CREVersion {
+	GemRB = 0,
+	V1_0 = 10, // bg1
+	V1_1 = 11, // bg2 (still V1.0)
+	V1_2 = 12, // pst
+	V2_2 = 22, // iwd2
+	V9_0 = 90 // iwd
+};
+
 #endif

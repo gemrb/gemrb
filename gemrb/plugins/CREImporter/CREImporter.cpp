@@ -463,23 +463,23 @@ bool CREImporter::Import(DataStream* str)
 		CREOffset = 0;
 	}
 	if (strncmp(Signature, "CRE V1.0", 8) == 0) {
-		CREVersion = CREVersion::V1_0;
+		version = CREVersion::V1_0;
 		return true;
 	}
 	if (strncmp(Signature, "CRE V1.2", 8) == 0) {
-		CREVersion = CREVersion::V1_2;
+		version = CREVersion::V1_2;
 		return true;
 	}
 	if (strncmp(Signature, "CRE V2.2", 8) == 0) {
-		CREVersion = CREVersion::V2_2;
+		version = CREVersion::V2_2;
 		return true;
 	}
 	if (strncmp(Signature, "CRE V9.0", 8) == 0) {
-		CREVersion = CREVersion::V9_0;
+		version = CREVersion::V9_0;
 		return true;
 	}
 	if (strncmp(Signature, "CRE V0.0", 8) == 0) {
-		CREVersion = CREVersion::GemRB;
+		version = CREVersion::GemRB;
 		return true;
 	}
 
@@ -489,7 +489,7 @@ bool CREImporter::Import(DataStream* str)
 
 void CREImporter::SetupSlotCounts()
 {
-	switch (CREVersion) {
+	switch (version) {
 		case CREVersion::V1_2: // pst
 			QWPCount = 4;
 			QSPCount = 3;
@@ -520,7 +520,7 @@ void CREImporter::WriteChrHeader(DataStream* stream, const Actor* act)
 	ieDword hdrSize = 0;
 
 	CRESize = GetStoredFileSize(act);
-	switch (CREVersion) {
+	switch (version) {
 		case CREVersion::V9_0: // iwd/HoW
 			memcpy(Signature, "CHR V1.0", 8);
 			hdrSize = 0x64; //headersize
@@ -590,7 +590,7 @@ void CREImporter::WriteChrHeader(DataStream* stream, const Actor* act)
 	for (int i = 0; i < QITCount; i++) {
 		stream->WriteWord(act->PCStats->QuickItemHeaders[i]);
 	}
-	switch (CREVersion) {
+	switch (version) {
 		case CREVersion::V2_2:
 			//gemrb format doesn't save these redundantly
 			for (int i = 0; i < QSPCount; i++) {
@@ -667,7 +667,7 @@ void CREImporter::ReadChrHeader(Actor* act)
 
 	ResRef spell;
 	//here comes the version specific read
-	switch (CREVersion) {
+	switch (version) {
 		case CREVersion::V2_2:
 			//gemrb format doesn't save these redundantly
 			// quick innates and quick songs
@@ -860,13 +860,13 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	}
 
 	str->Read(&TotSCEFF, 1);
-	if (CREVersion == CREVersion::V1_0 && TotSCEFF) {
-		CREVersion = CREVersion::V1_1;
+	if (version == CREVersion::V1_0 && TotSCEFF) {
+		version = CREVersion::V1_1;
 	}
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
 	if (core->config.SaveAsOriginal) {
-		act->creVersion = CREVersion;
+		act->creVersion = version;
 	}
 	str->ReadResRef(act->SmallPortrait);
 	if (act->SmallPortrait.IsEmpty()) {
@@ -882,7 +882,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	}
 
 	size_t inventorySize;
-	switch (CREVersion) {
+	switch (version) {
 		case CREVersion::GemRB:
 			inventorySize = GetActorGemRB(act);
 			break;
@@ -904,7 +904,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 			GetActorIWD1(act);
 			break;
 		default:
-			Log(ERROR, "CREImporter", "Unknown creature signature: {}\n", CREVersion);
+			Log(ERROR, "CREImporter", "Unknown creature signature: {}\n", static_cast<int>(version));
 			delete act;
 			return NULL;
 	}
@@ -1795,8 +1795,8 @@ int CREImporter::GetStoredFileSize(const Actor* actor)
 	int headersize;
 	unsigned int Inventory_Size;
 
-	CREVersion = static_cast<unsigned char>(actor->creVersion);
-	switch (CREVersion) {
+	version = actor->creVersion;
+	switch (version) {
 		case CREVersion::GemRB:
 			headersize = 0x2d4;
 			//minus fist
@@ -1943,9 +1943,9 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 	char Signature[8];
 
 	memcpy(Signature, "CRE V0.0", 8);
-	Signature[5] += CREVersion / 10;
+	Signature[5] += static_cast<int>(version) / 10;
 	if (actor->creVersion != CREVersion::V1_1) {
-		Signature[7] += CREVersion % 10;
+		Signature[7] += static_cast<int>(version) % 10;
 	}
 	stream->Write(Signature, 8);
 	stream->WriteStrRef(actor->LongStrRef);
@@ -2508,7 +2508,7 @@ int CREImporter::PutActor(DataStream* stream, const Actor* actor, bool chr)
 	//here comes the fuzzy part
 	ieDword Inventory_Size;
 
-	switch (CREVersion) {
+	switch (version) {
 		case CREVersion::GemRB:
 			//don't add fist
 			Inventory_Size = (ieDword) actor->inventory.GetSlotCount() - 1;
