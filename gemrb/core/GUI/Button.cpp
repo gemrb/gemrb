@@ -204,11 +204,11 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		int yOffs = (frame.h / 2) - (AnimPicture->Frame.h / 2);
 		Region r(rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h);
 
-		BlitFlags bf = bool(animation->flags & Animation::Flags::BlendBlack) ? BlitFlags::ONE_MINUS_DST : BlitFlags::BLENDED;
+		BlitFlags bf2 = bool(animation->flags & Animation::Flags::BlendBlack) ? BlitFlags::ONE_MINUS_DST : BlitFlags::BLENDED;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			VideoDriver->BlitSprite(AnimPicture, r.origin + AnimPicture->Frame.origin, &r, bf);
+			VideoDriver->BlitSprite(AnimPicture, r.origin + AnimPicture->Frame.origin, &r, bf2);
 		} else {
-			VideoDriver->BlitSprite(AnimPicture, r.origin, &r, bf);
+			VideoDriver->BlitSprite(AnimPicture, r.origin, &r, bf2);
 		}
 	}
 

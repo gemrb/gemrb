@@ -4641,24 +4641,27 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	std::vector<String> strings;
 	std::vector<SelectOption> TAOptions;
 	bool searchedProfile = false;
-	if (!dirit) {
-profile:
-		DirectoryIterator dirit2 = core->GetResourceDirectory(type, true);
-		dirit2.SetFlags(itflags, true);
-		dirit = std::move(dirit2);
-		searchedProfile = true;
-	}
+	// construct the list with entries from both game and user paths
+	// both or neither could be empty
+	for (int i = 0; i < 2; i++) {
+		if (!dirit || i == 1) {
+			DirectoryIterator dirit2 = core->GetResourceDirectory(type, true);
+			dirit2.SetFlags(itflags, true);
+			dirit = std::move(dirit2);
+			searchedProfile = true;
+		}
 
-	if (!dirit && strings.empty()) {
-		ta->SetSelectOptions(TAOptions, false);
-		return MakePyList<const String&, PyString_FromStringObj>(strings);
-	}
+		if (!dirit && strings.empty()) {
+			ta->SetSelectOptions(TAOptions, false);
+			return MakePyList<const String&, PyString_FromStringObj>(strings);
+		}
 
-	ExtractPaths(strings, dirit, type, dirs);
+		ExtractPaths(strings, dirit, type, dirs);
 
-	// if we haven't already, look also into user paths
-	if (!searchedProfile) {
-		goto profile;
+		// if we haven't already, look also into user paths, otherwise we're fine
+		if (searchedProfile) {
+			break;
+		}
 	}
 
 	std::sort(strings.begin(), strings.end());
@@ -6138,10 +6141,11 @@ The above example sets the player's color just picked via the color customisatio
 
 static PyObject* GemRB_SetPlayerStat(PyObject* /*self*/, PyObject* args)
 {
-	int globalID, StatID;
+	int globalID;
+	unsigned int StatID;
 	stat_t StatValue;
 	int pcf = 1;
-	PARSE_ARGS(args, "iil|i", &globalID, &StatID, &StatValue, &pcf);
+	PARSE_ARGS(args, "iIl|i", &globalID, &StatID, &StatValue, &pcf);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 

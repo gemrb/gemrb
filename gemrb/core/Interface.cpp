@@ -254,8 +254,8 @@ static void AddGameOverrides(bool home, CoreSettings& config)
 		}
 		delete fs;
 
-		if (profile.empty()) {
 fallback:
+		if (profile.empty()) {
 			profile = "Infinity Engine - Enhanced Edition";
 			PathAppend(basePath, profile);
 			if (!MakeDirectory(basePath)) return;
