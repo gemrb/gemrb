@@ -1,15 +1,15 @@
-GemRB git (38cc7ffd2):
+GemRB git (6804c3ed):
   New features:
     - 
     - partial audio system rewrite for better (spatial) audio and music
     - iwd2: customizable action bar, weapon set switching, item usability info
     - detect illusions, spell info on right-click, various hardcoded pst bonuses
-    - smooth keyboard scrolling
+    - smooth keyboard scrolling, zoom
     - GUI enhancements are now configurable from within the game
 
   Improved features:
     - 
-    - pathfinder speedups
+    - pathfinder and drawing speedups
     - video players, animations
     - iwd2 weapon sets, pst GUI, pst level up, ee compatibility
     - scripting, effects
