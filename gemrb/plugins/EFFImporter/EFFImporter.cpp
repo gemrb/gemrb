@@ -31,7 +31,7 @@ EFFImporter::~EFFImporter(void)
 
 bool EFFImporter::Open(DataStream* stream, bool autoFree)
 {
-	if (stream == NULL) {
+	if (stream == nullptr) {
 		return false;
 	}
 	if (this->autoFree) {
@@ -187,8 +187,6 @@ Effect* EFFImporter::GetEffectV20()
 
 void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 {
-	ieDword tmpDword1, tmpDword2;
-
 	stream->WriteFilling(8); //signature
 	stream->WriteDword(fx->Opcode);
 	stream->WriteDword(fx->Target);
@@ -224,8 +222,8 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 		stream->WriteResRef(fx->Resource2);
 		stream->WriteResRef(fx->Resource3);
 	}
-	tmpDword1 = fx->Source.x;
-	tmpDword2 = fx->Source.y;
+	ieDword tmpDword1 = fx->Source.x;
+	ieDword tmpDword2 = fx->Source.y;
 	stream->WriteDword(tmpDword1);
 	stream->WriteDword(tmpDword2);
 	tmpDword1 = fx->Pos.x;

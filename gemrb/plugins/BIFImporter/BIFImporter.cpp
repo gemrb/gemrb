@@ -62,7 +62,8 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const path_t& pa
 	size_t finalsize = 0;
 	int laststep = 0;
 	while (finalsize < unCompBifSize) {
-		ieDword complen, declen;
+		ieDword complen;
+		ieDword declen;
 		compressed->ReadDword(declen);
 		compressed->ReadDword(complen);
 		if (comp->Decompress(&out, compressed, complen) != GEM_OK) {
@@ -83,7 +84,9 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const path_t& pa
 
 DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const path_t& /*path*/)
 {
-	ieDword fnlen, complen, declen;
+	ieDword fnlen;
+	ieDword complen;
+	ieDword declen;
 	compressed->ReadDword(fnlen);
 	compressed->Seek(fnlen, GEM_CURRENT_POS);
 	compressed->ReadDword(declen);
