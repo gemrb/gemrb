@@ -166,18 +166,19 @@ Holder<Condition> DLGImporter::GetStateTrigger(unsigned int index) const
 {
 	if ((signed) index == -1) index = 0;
 	if (index >= StateTriggersCount) {
-		return NULL;
+		return nullptr;
 	}
 	//8 = sizeof(VarOffset)
 	str->Seek(StateTriggersOffset + (index * 8), GEM_STREAM_START);
-	ieDword Offset, Length;
+	ieDword Offset;
+	ieDword Length;
 	str->ReadDword(Offset);
 	str->ReadDword(Length);
 	//a zero length trigger counts as no trigger
 	//a // comment counts as true(), so we simply ignore zero
 	//length trigger text like it isn't there
 	if (!Length) {
-		return NULL;
+		return nullptr;
 	}
 	str->Seek(Offset, GEM_STREAM_START);
 	char* string = (char*) malloc(Length + 1);
@@ -191,10 +192,11 @@ Holder<Condition> DLGImporter::GetStateTrigger(unsigned int index) const
 Holder<Condition> DLGImporter::GetTransitionTrigger(unsigned int index) const
 {
 	if (index >= TransitionTriggersCount) {
-		return NULL;
+		return nullptr;
 	}
 	str->Seek(TransitionTriggersOffset + (index * 8), GEM_STREAM_START);
-	ieDword Offset, Length;
+	ieDword Offset;
+	ieDword Length;
 	str->ReadDword(Offset);
 	str->ReadDword(Length);
 	str->Seek(Offset, GEM_STREAM_START);
@@ -212,7 +214,8 @@ std::vector<Action*> DLGImporter::GetAction(unsigned int index) const
 		return std::vector<Action*>();
 	}
 	str->Seek(ActionsOffset + (index * 8), GEM_STREAM_START);
-	ieDword Offset, Length;
+	ieDword Offset;
+	ieDword Length;
 	str->ReadDword(Offset);
 	str->ReadDword(Length);
 	str->Seek(Offset, GEM_STREAM_START);
@@ -332,10 +335,10 @@ static char** GetStrings(const char* string, unsigned int& count)
 		}
 	}
 	if (!count) {
-		return NULL;
+		return nullptr;
 	}
 	char** strings = (char**) calloc(count, sizeof(char*));
-	if (strings == NULL) {
+	if (strings == nullptr) {
 		count = 0;
 		return strings;
 	}
