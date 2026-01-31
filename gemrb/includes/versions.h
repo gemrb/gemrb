@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2026 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,22 +17,18 @@
  *
  *
  */
-#ifndef SAVEGAMEMGR_H
-#define SAVEGAMEMGR_H
 
-#include "Game.h"
-#include "Plugin.h"
+#ifndef VERSIONS_H
+#define VERSIONS_H
 
-namespace GemRB {
-
-class GEM_EXPORT SaveGameMgr : public ImporterBase {
-public:
-	virtual Game* LoadGame(Game* newGame, GAMVersion override = GAMVersion::GemRB) = 0;
-
-	virtual int GetStoredFileSize(const Game* game) = 0;
-	virtual int PutGame(DataStream* stream, Game* game) const = 0;
+enum class GAMVersion {
+	GemRB = 0,
+	BG = 10,
+	IWD = 11,
+	PST = 12,
+	BG2 = 20, // SoA
+	TOB = 21,
+	IWD2 = 22
 };
-
-}
 
 #endif

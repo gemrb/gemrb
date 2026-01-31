@@ -3515,9 +3515,9 @@ int GameScript::NightmareModeOn(Scriptable* /*Sender*/, const Trigger* /*paramet
 	ieDword diff = 0;
 	const Game* game = core->GetGame();
 
-	if (game->version == 11) { // GAM_VER_IWD
+	if (game->version == GAMVersion::IWD) {
 		diff = core->GetDictionary().Get("Nightmare Mode", 0);
-	} else if (game->version == 22) { // GAM_VER_IWD2
+	} else if (game->version == GAMVersion::IWD2) {
 		diff = game->HOFMode;
 	}
 

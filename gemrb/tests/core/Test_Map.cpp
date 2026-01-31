@@ -50,7 +50,7 @@ public:
 
 		auto gamStream = gamedata->GetResourceStream("gem-demo", IE_GAM_CLASS_ID);
 		auto gamMgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gamStream);
-		Game* game = gamMgr->LoadGame(new Game(), 0);
+		Game* game = gamMgr->LoadGame(new Game(), GAMVersion::GemRB);
 		core->SetGame(game);
 
 		ResRef mapRef { "ar0100" };

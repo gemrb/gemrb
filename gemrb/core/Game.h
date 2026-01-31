@@ -30,6 +30,7 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "versions.h"
 
 #include "Callback.h"
 
@@ -250,7 +251,7 @@ private:
 
 public:
 	std::vector<Actor*> selected;
-	int version = 0;
+	GAMVersion version = GAMVersion::GemRB;
 	kaputz_t kaputz;
 	std::array<ieByte, BESTIARY_SIZE> beasts;
 	ieByte* mazedata = nullptr; //only in PST

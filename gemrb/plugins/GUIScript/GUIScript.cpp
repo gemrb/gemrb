@@ -344,7 +344,7 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 	int VersionOverride = 0;
 	if (PyArg_ParseTuple(args, "O|i", &obj, &VersionOverride)) {
 		CObject<SaveGame> save(obj);
-		core->SetupLoadGame(save, VersionOverride);
+		core->SetupLoadGame(save, static_cast<GAMVersion>(VersionOverride));
 		Py_RETURN_NONE;
 	}
 	return nullptr;
@@ -4333,7 +4333,7 @@ static PyObject* GemRB_SaveGame(PyObject* /*self*/, PyObject* args)
 	}
 
 	if (Version > 0) {
-		game->version = Version;
+		game->version = static_cast<GAMVersion>(Version);
 	}
 	if (slot == -1) {
 		CObject<SaveGame> save(obj);

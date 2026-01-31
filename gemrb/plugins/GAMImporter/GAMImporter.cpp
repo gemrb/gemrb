@@ -43,37 +43,37 @@ bool GAMImporter::Import(DataStream* str)
 	char Signature[8];
 	str->Read(Signature, 8);
 	if (strncmp(Signature, "GAMEV0.0", 8) == 0) {
-		version = GAM_VER_GEMRB;
+		version = GAMVersion::GemRB;
 		PCSize = 0x160;
 	} else if (strncmp(Signature, "GAMEV2.0", 8) == 0) {
 		//soa (soa part of tob)
-		version = GAM_VER_BG2;
+		version = GAMVersion::BG2;
 		PCSize = 0x160;
 	} else if (strncmp(Signature, "GAMEV2.1", 8) == 0) {
 		//tob
-		version = GAM_VER_TOB;
+		version = GAMVersion::TOB;
 		PCSize = 0x160;
 	} else if (strncmp(Signature, "GAMEV1.0", 8) == 0) {
 		//bg1?
-		version = GAM_VER_BG;
+		version = GAMVersion::BG;
 		PCSize = 0x160;
 	} else if (strncmp(Signature, "GAMEV2.2", 8) == 0) {
 		//iwd2
-		version = GAM_VER_IWD2;
+		version = GAMVersion::IWD2;
 		PCSize = 0x340;
 	} else if (strncmp(Signature, "GAMEV1.1", 8) == 0) {
 		//iwd, torment, totsc
 		if (core->HasFeature(GFFlags::HAS_KAPUTZ)) { //pst
 			PCSize = 0x168;
-			version = GAM_VER_PST;
+			version = GAMVersion::PST;
 			//sound folder name takes up this space,
 			//so it is handy to make this check
 		} else if (core->HasFeature(GFFlags::SOUNDFOLDERS)) {
 			PCSize = 0x180;
-			version = GAM_VER_IWD;
+			version = GAMVersion::IWD;
 		} else {
 			PCSize = 0x160;
-			version = GAM_VER_BG;
+			version = GAMVersion::BG;
 		}
 	} else {
 		Log(ERROR, "GAMImporter", "This file is not a valid GAM File! Actual signature: {}", Signature);
@@ -83,14 +83,14 @@ bool GAMImporter::Import(DataStream* str)
 	return true;
 }
 
-Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
+Game* GAMImporter::LoadGame(Game* newGame, GAMVersion override)
 {
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
 	if (core->config.SaveAsOriginal) {
 		// HACK: default icewind2.gam is 2.0! handled by script
-		if (ver_override) {
-			newGame->version = ver_override;
+		if (override != GAMVersion::GemRB) {
+			newGame->version = override;
 		} else {
 			newGame->version = version;
 		}
@@ -105,7 +105,7 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 		str->ReadWord(formation);
 	}
 	//hack for PST
-	if (version == GAM_VER_PST) {
+	if (version == GAMVersion::PST) {
 		newGame->Formations[0] = newGame->WhichFormation;
 		newGame->WhichFormation = 0;
 	}
@@ -127,7 +127,7 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 	str->ReadDword(JournalCount);
 	str->ReadDword(JournalOffset);
 
-	if (version == GAM_VER_PST) {
+	if (version == GAMVersion::PST) {
 		str->ReadDword(MazeOffset);
 		str->ReadDword(newGame->Reputation);
 		str->ReadResRef(newGame->AnotherArea);
@@ -152,7 +152,7 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 		str->ReadDword(SavedLocCount);
 
 		// iwd2 HoF mode was stored at the bg2 location of SavedLocOffset
-		if (version == GAM_VER_IWD2) {
+		if (version == GAMVersion::IWD2) {
 			newGame->HOFMode = SavedLocOffset == 1;
 		}
 
@@ -191,12 +191,12 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 		Actor* actor = GetActor(aM, true);
 		newGame->JoinParty(actor, actor->Selected ? JP_SELECT : 0);
 		// potentially override the current area, now that the pcs are loaded
-		if (newGame->version != GAM_VER_PST && static_cast<ieWord>(actor->InParty - 1) == newGame->NPCAreaViewed) {
+		if (newGame->version != GAMVersion::PST && static_cast<ieWord>(actor->InParty - 1) == newGame->NPCAreaViewed) {
 			newGame->CurrentArea = actor->AreaName;
 			newGame->AnotherArea = newGame->CurrentArea;
 		}
 
-		if (newGame->version == GAM_VER_PST && actor->GetStat(IE_SPECIFIC) == 2) {
+		if (newGame->version == GAMVersion::PST && actor->GetStat(IE_SPECIFIC) == 2) {
 			Scriptable::VOODOO_VISUAL_RANGE = (14 + actor->GetStat(IE_LEVELFIGHTER)) * 2;
 		}
 	}
@@ -250,7 +250,7 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 		newGame->AddJournalEntry(je);
 	}
 
-	if (version == GAM_VER_PST) {
+	if (version == GAMVersion::PST) {
 		//loading maze
 		if (MazeOffset) {
 			//Don't allocate memory in plugins (MSVC chokes on this)
@@ -290,7 +290,7 @@ Game* GAMImporter::LoadGame(Game* newGame, int ver_override)
 		}
 	}
 
-	if (SavedLocCount && SavedLocOffset && (version == GAM_VER_BG2 || version == GAM_VER_TOB)) {
+	if (SavedLocCount && SavedLocOffset && (version == GAMVersion::BG2 || version == GAMVersion::TOB)) {
 		str->Seek(SavedLocOffset, GEM_STREAM_START);
 		for (unsigned int i = 0; i < SavedLocCount; i++) {
 			GAMLocationEntry* gle = newGame->GetSavedLocationEntry(i);
@@ -359,7 +359,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 		str->ReadDword(interact); //interact counters
 	}
 
-	bool extended = version == GAM_VER_GEMRB || version == GAM_VER_IWD2;
+	bool extended = version == GAMVersion::GemRB || version == GAMVersion::IWD2;
 	if (extended) {
 		for (unsigned int i = 0; i < 4; i++) {
 			str->ReadWord(ps.QuickWeaponSlots[i]);
@@ -386,7 +386,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 		}
 		ps.QuickItemHeaders[3] = 0xffff;
 		ps.QuickItemHeaders[4] = 0xffff;
-		if (version == GAM_VER_IWD2) {
+		if (version == GAMVersion::IWD2) {
 			//quick innates
 			//we spare some memory and time by storing them in the same place
 			//this may be slightly buggy because IWD2 doesn't clear the
@@ -434,7 +434,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 		for (unsigned int i = 0; i < 3; i++) {
 			str->ReadResRef(ps.QuickSpells[i]);
 		}
-		if (version == GAM_VER_PST) { //Torment
+		if (version == GAMVersion::PST) { //Torment
 			for (unsigned short& slot : ps.QuickItemSlots) {
 				str->ReadWord(slot);
 			}
@@ -579,22 +579,22 @@ int GAMImporter::GetStoredFileSize(const Game* game)
 		KillVarsCount = 0;
 	}
 	switch (game->version) {
-		case GAM_VER_IWD:
+		case GAMVersion::IWD:
 			headersize = 0xb4;
 			PCSize = 0x180;
 			break;
-		case GAM_VER_BG:
-		case GAM_VER_BG2:
-		case GAM_VER_TOB:
-		case GAM_VER_GEMRB:
+		case GAMVersion::BG:
+		case GAMVersion::BG2:
+		case GAMVersion::TOB:
+		case GAMVersion::GemRB:
 			headersize = 0xb4;
 			PCSize = 0x160;
 			break;
-		case GAM_VER_IWD2:
+		case GAMVersion::IWD2:
 			headersize = 0xb4;
 			PCSize = 0x340;
 			break;
-		case GAM_VER_PST:
+		case GAMVersion::PST:
 			headersize = 0xb8;
 			PCSize = 0x168;
 			break;
@@ -619,7 +619,7 @@ int GAMImporter::GetStoredFileSize(const Game* game)
 		headersize += am->GetStoredFileSize(ac);
 	}
 
-	if (game->version == GAM_VER_PST) {
+	if (game->version == GAMVersion::PST) {
 		MazeOffset = headersize;
 		//due to alignment the internal size is not the same as the external size
 		headersize += MAZE_DATA_SIZE_HARDCODED;
@@ -641,19 +641,19 @@ int GAMImporter::GetStoredFileSize(const Game* game)
 		headersize += KillVarsCount * 84;
 	}
 
-	if (game->version == GAM_VER_BG) {
+	if (game->version == GAMVersion::BG) {
 		FamiliarsOffset = 0;
 	} else {
 		FamiliarsOffset = headersize;
 		if (core->GetBeastsINI()) {
 			headersize += BESTIARY_SIZE;
 		}
-		if (game->version != GAM_VER_PST) {
+		if (game->version != GAMVersion::PST) {
 			headersize += 9 * 8 + 82 * 4;
 		}
 	}
 
-	if (game->version == GAM_VER_IWD2) {
+	if (game->version == GAMVersion::IWD2) {
 		SavedLocOffset = game->HOFMode;
 		SavedLocCount = 0;
 		// there is an unknown dword at the end of iwd2 savegames (see PutSavedLocations)
@@ -693,7 +693,7 @@ int GAMImporter::PutSavedLocations(DataStream* stream, Game* game) const
 	//iwd2 has a single 0 dword here (at the end of the file)
 	//it could be a hacked out saved location list (inherited from SoA)
 	//if the field is missing, original engine cannot load this saved game
-	if (game->version == GAM_VER_IWD2) {
+	if (game->version == GAMVersion::IWD2) {
 		stream->WriteDword(0);
 		return 0;
 	}
@@ -760,18 +760,18 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 	ResRef signature = "GAMEV0.0";
 	ieDword tmpDword;
 
-	signature[5] += game->version / 10;
-	if (game->version == GAM_VER_PST || game->version == GAM_VER_BG) { //pst/bg1 saved version
+	signature[5] += static_cast<int>(game->version) / 10;
+	if (game->version == GAMVersion::PST || game->version == GAMVersion::BG) { //pst/bg1 saved version
 		signature[7] += 1;
 	} else {
-		signature[7] += game->version % 10;
+		signature[7] += static_cast<int>(game->version) % 10;
 	}
 	stream->WriteResRef(signature);
 
 	tmpDword = game->GameTime / core->Time.defaultTicksPerSec;
 	stream->WriteDword(tmpDword);
 	//pst has a single preset of formations
-	if (game->version == GAM_VER_PST) {
+	if (game->version == GAMVersion::PST) {
 		stream->WriteWord(game->Formations[0]);
 		stream->WriteFilling(10);
 	} else {
@@ -813,12 +813,12 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 	stream->WriteDword(JournalOffset);
 
 	switch (game->version) {
-		case GAM_VER_GEMRB:
-		case GAM_VER_BG:
-		case GAM_VER_IWD:
-		case GAM_VER_BG2:
-		case GAM_VER_TOB:
-		case GAM_VER_IWD2:
+		case GAMVersion::GemRB:
+		case GAMVersion::BG:
+		case GAMVersion::IWD:
+		case GAMVersion::BG2:
+		case GAMVersion::TOB:
+		case GAMVersion::IWD2:
 			stream->WriteDword(game->Reputation);
 			stream->WriteResRefUC(masterArea); // current area, but usually overridden via NPCAreaViewed
 			stream->WriteDword(game->ControlStatus);
@@ -827,7 +827,7 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 			stream->WriteDword(SavedLocOffset);
 			stream->WriteDword(SavedLocCount);
 			break;
-		case GAM_VER_PST:
+		case GAMVersion::PST:
 			stream->WriteDword(MazeOffset);
 			stream->WriteDword(game->Reputation);
 			stream->WriteResRefLC(game->CurrentArea);
@@ -852,7 +852,7 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 	return 0;
 }
 
-int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, ieDword CREOffset, ieDword GAMVersion) const
+int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, ieDword CREOffset, GAMVersion newVersion) const
 {
 	if (ac->Selected) {
 		stream->WriteWord(1);
@@ -882,7 +882,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 
 	//quickweapons
-	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
+	if (newVersion == GAMVersion::IWD2 || newVersion == GAMVersion::GemRB) {
 		for (int i = 0; i < 4; i++) {
 			stream->WriteWord(ac->PCStats->QuickWeaponSlots[i]);
 			stream->WriteWord(ac->PCStats->QuickWeaponSlots[4 + i]);
@@ -901,7 +901,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 
 	//quickspells
-	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
+	if (newVersion == GAMVersion::IWD2 || newVersion == GAMVersion::GemRB) {
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if (ac->PCStats->QuickSpellBookType[i] >= 0xfe) {
 				stream->WriteFilling(8);
@@ -910,7 +910,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 			}
 		}
 
-		if (GAMVersion == GAM_VER_IWD2) {
+		if (newVersion == GAMVersion::IWD2) {
 			//quick spell classes, clear the field for iwd2 if it is
 			//a bard song/innate slot (0xfe or 0xff)
 			for (ieByte qbyte : ac->PCStats->QuickSpellBookType) {
@@ -931,9 +931,9 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 
 	//quick items
-	switch (GAMVersion) {
-		case GAM_VER_PST:
-		case GAM_VER_GEMRB:
+	switch (newVersion) {
+		case GAMVersion::PST:
+		case GAMVersion::GemRB:
 			for (const unsigned short& quickItemSlot : ac->PCStats->QuickItemSlots) {
 				stream->WriteWord(quickItemSlot);
 			}
@@ -952,7 +952,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	}
 
 	//innates, bard songs and quick slots are saved only in iwd2
-	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
+	if (newVersion == GAMVersion::IWD2 || newVersion == GAMVersion::GemRB) {
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if (ac->PCStats->QuickSpellBookType[i] == 0xff) {
 				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
@@ -1007,7 +1007,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 		soundFolder.resize(ieVariable::Size);
 		stream->WriteStringLC(std::move(soundFolder), ieVariable::Size);
 	}
-	if (GAMVersion == GAM_VER_IWD2 || GAMVersion == GAM_VER_GEMRB) {
+	if (newVersion == GAMVersion::IWD2 || newVersion == GAMVersion::GemRB) {
 		//I don't know how many fields are actually used in IWD2 saved game
 		//but we got at least 8 (and only 5 of those are actually used)
 		for (const unsigned int& extraSetting : ac->PCStats->ExtraSettings) {
@@ -1154,7 +1154,7 @@ int GAMImporter::PutFamiliars(DataStream* stream, const Game* game) const
 	int len = 0;
 	if (core->GetBeastsINI()) {
 		len = BESTIARY_SIZE;
-		if (game->version == GAM_VER_PST) {
+		if (game->version == GAMVersion::PST) {
 			//only GemRB version can have all features, return when it is PST
 			//gemrb version will have the beasts after the familiars
 			stream->Write(game->beasts.data(), len);
@@ -1197,7 +1197,7 @@ int GAMImporter::PutGame(DataStream* stream, Game* game) const
 		return ret;
 	}
 
-	if (game->version == GAM_VER_PST) {
+	if (game->version == GAMVersion::PST) {
 		ret = PutMaze(stream, game);
 		if (ret) {
 			return ret;
@@ -1226,7 +1226,7 @@ int GAMImporter::PutGame(DataStream* stream, Game* game) const
 			return ret;
 		}
 	}
-	if (SavedLocOffset || game->version == GAM_VER_IWD2) {
+	if (SavedLocOffset || game->version == GAMVersion::IWD2) {
 		ret = PutSavedLocations(stream, game);
 		if (ret) {
 			return ret;

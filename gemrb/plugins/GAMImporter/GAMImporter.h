@@ -21,24 +21,18 @@
 #ifndef GAMIMPORTER_H
 	#define GAMIMPORTER_H
 
+	#include "versions.h"
+
 	#include "ActorMgr.h"
 	#include "SaveGameMgr.h"
 
 namespace GemRB {
 
-	#define GAM_VER_GEMRB 0
-	#define GAM_VER_BG    10
-	#define GAM_VER_IWD   11
-	#define GAM_VER_PST   12
-	#define GAM_VER_BG2   20
-	#define GAM_VER_TOB   21
-	#define GAM_VER_IWD2  22
-
 class PCStatsStruct;
 
 class GAMImporter : public SaveGameMgr {
 private:
-	int version = 0;
+	GAMVersion version = GAMVersion::GemRB;
 	unsigned int PCSize = 0;
 	ieDword PCOffset = 0;
 	ieDword PCCount = 0;
@@ -60,7 +54,7 @@ private:
 public:
 	GAMImporter() noexcept = default;
 
-	Game* LoadGame(Game* newGame, int ver_override = 0) override;
+	Game* LoadGame(Game* newGame, GAMVersion override = GAMVersion::GemRB) override;
 
 	int GetStoredFileSize(const Game* game) override;
 	/* stores a gane in the savegame folder */
@@ -74,7 +68,7 @@ private:
 	GAMJournalEntry* GetJournalEntry();
 
 	int PutHeader(DataStream* stream, const Game* game) const;
-	int PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, ieDword CREOffset, ieDword GAMVersion) const;
+	int PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, ieDword CREOffset, GAMVersion newVersion) const;
 	int PutPCs(DataStream* stream, const Game* game) const;
 	int PutNPCs(DataStream* stream, const Game* game) const;
 	int PutJournals(DataStream* stream, const Game* game) const;
