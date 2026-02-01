@@ -1048,6 +1048,10 @@ int GAMImporter::PutPCs(DataStream* stream, const Game* game) const
 
 int GAMImporter::PutNPCs(DataStream* stream, const Game* game) const
 {
+	if (core->HasFeature(GFFlags::RULES_3ED) && core->config.SaveAsOriginal) {
+		return 0; // the original iwd2 can't cope with this section in saves
+	}
+
 	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	ieDword CREOffset = NPCOffset + NPCCount * PCSize;
 

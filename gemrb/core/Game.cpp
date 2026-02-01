@@ -972,6 +972,11 @@ int Game::AddNPC(Actor* npc)
 	if (slot != -1) {
 		return -1;
 	} //can't add as npc already in party
+
+	if (core->HasFeature(GFFlags::RULES_3ED) && core->config.SaveAsOriginal) {
+		// iwd2 gimped all this code
+		return -1;
+	}
 	npc->SetPersistent(0);
 	NPCs.push_back(npc);
 

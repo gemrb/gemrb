@@ -1383,6 +1383,11 @@ bool CreateMovementEffect(Actor* actor, const ResRef& area, const Point& positio
 {
 	if (actor->AreaName == area) return false; // no need of this for intra area movement
 
+	if (core->HasFeature(GFFlags::RULES_3ED) && core->config.SaveAsOriginal && !actor->InParty) {
+		// iwd2 disabled following through areas, so fake success
+		return true;
+	}
+
 	Effect* fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
 	if (!fx) return false;
 	fx->SetPosition(position);
