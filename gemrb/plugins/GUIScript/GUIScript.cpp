@@ -5290,7 +5290,7 @@ static PyObject* GemRB_CreatePlayer(PyObject* /*self*/, PyObject* args)
 	PyObject* pystr = nullptr;
 	int PlayerSlot, Slot;
 	int Import = 0;
-	int VersionOverride = -1;
+	int VersionOverride = 0;
 	PARSE_ARGS(args, "Oi|ii", &pystr, &PlayerSlot, &Import, &VersionOverride);
 	//PlayerSlot is zero based
 	Slot = (PlayerSlot & 0x7fff);
