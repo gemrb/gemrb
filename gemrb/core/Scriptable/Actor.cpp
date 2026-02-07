@@ -488,7 +488,8 @@ CharAnimations* Actor::GetAnims() const
 Actor::stat_t Actor::GetStat(unsigned int StatIndex) const
 {
 	if (StatIndex >= MAX_STATS) {
-		return 0xdadadada;
+		Log(ERROR, "Actor", "Invalid creature stat queried ({}), using 0!");
+		return 0;
 	}
 	return Modified[StatIndex];
 }
@@ -497,7 +498,8 @@ Actor::stat_t Actor::GetStat(unsigned int StatIndex) const
 Actor::stat_t Actor::GetSafeStat(unsigned int StatIndex) const
 {
 	if (StatIndex >= MAX_STATS) {
-		return 0xdadadada;
+		Log(ERROR, "Actor", "Invalid creature stat queried ({}), using 0 instead!");
+		return 0;
 	}
 	if (PrevStats) return PrevStats[StatIndex];
 	return Modified[StatIndex];
