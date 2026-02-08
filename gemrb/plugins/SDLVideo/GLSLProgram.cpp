@@ -35,6 +35,15 @@ bool GLSLProgram::TryPath(std::ifstream& fileStream, const std::string& shaderPa
 	PathAppend(outPath, shaderPath);
 	ResolveFilePath(outPath);
 	fileStream.open(outPath);
+
+	// also look in the current binary's dir in case people use relative paths for GemRBPath
+	// ... which is the default for windows packages, making them harder to run from outside the dir
+	outPath = BinaryPath();
+	if (!fileStream.is_open() && !outPath.empty()) {
+		PathAppend(outPath, shaderPath);
+		ResolveFilePath(outPath);
+		fileStream.open(outPath);
+	}
 	if (!fileStream.is_open()) {
 		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + shaderPath;
 		return false;
