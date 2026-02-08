@@ -24,22 +24,17 @@ GLSLProgram* GLSLProgram::Create(const std::string& vertexSource, const std::str
 	return program;
 }
 
-bool GLSLProgram::TryPath(std::ifstream& fileStream, std::string& shaderPath)
+bool GLSLProgram::TryPath(std::ifstream& fileStream, const std::string& shaderPath)
 {
-#if __APPLE__
-	if (!fileStream.is_open()) {
-		path_t bundleShaderPath = BundlePath(RESOURCES);
-		PathAppend(bundleShaderPath, shaderPath);
-		ResolveFilePath(bundleShaderPath);
-		fileStream.open(bundleShaderPath);
+	// perhaps the passed path is already fine
+	if (fileStream.is_open()) {
+		return true;
 	}
-#elif defined DATA_DIR
-	if (!fileStream.is_open()) {
-		shaderPath.insert(0, 1, PathDelimiter);
-		shaderPath.insert(0, DATA_DIR);
-		fileStream.open(shaderPath);
-	}
-#endif
+
+	path_t outPath = GemDataPath();
+	PathAppend(outPath, shaderPath);
+	ResolveFilePath(outPath);
+	fileStream.open(outPath);
 	if (!fileStream.is_open()) {
 		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + shaderPath;
 		return false;

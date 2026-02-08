@@ -37,7 +37,7 @@ private:
 	GLuint buildShader(GLenum type, std::string source) const;
 	GLint getUniformLocation(const std::string& uniformName) const;
 	bool storeUniformLocation(const std::string& uniformName);
-	static bool TryPath(std::ifstream& fileStream, std::string& shaderPath);
+	static bool TryPath(std::ifstream& fileStream, const std::string& shaderPath);
 };
 }
 
