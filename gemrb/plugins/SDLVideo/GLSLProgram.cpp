@@ -24,6 +24,29 @@ GLSLProgram* GLSLProgram::Create(const std::string& vertexSource, const std::str
 	return program;
 }
 
+bool GLSLProgram::TryPath(std::ifstream& fileStream, std::string& shaderPath)
+{
+#if __APPLE__
+	if (!fileStream.is_open()) {
+		path_t bundleShaderPath = BundlePath(RESOURCES);
+		PathAppend(bundleShaderPath, shaderPath);
+		ResolveFilePath(bundleShaderPath);
+		fileStream.open(bundleShaderPath);
+	}
+#elif defined DATA_DIR
+	if (!fileStream.is_open()) {
+		shaderPath.insert(0, 1, PathDelimiter);
+		shaderPath.insert(0, DATA_DIR);
+		fileStream.open(shaderPath);
+	}
+#endif
+	if (!fileStream.is_open()) {
+		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + shaderPath;
+		return false;
+	}
+	return true;
+}
+
 GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std::string fragmentSourceFileName,
 					  GLuint programID)
 {
@@ -32,23 +55,8 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 
 	// first check the build dir then fallback to DATA_DIR
 	std::ifstream fileStream(vertexSourceFileName);
-#if __APPLE__
-	if (!fileStream.is_open()) {
-		path_t bundleShaderPath = BundlePath(RESOURCES);
-		PathAppend(bundleShaderPath, vertexSourceFileName);
-		ResolveFilePath(bundleShaderPath);
-		fileStream.open(bundleShaderPath);
-	}
-#elif defined DATA_DIR
-	if (!fileStream.is_open()) {
-		vertexSourceFileName.insert(0, 1, PathDelimiter);
-		vertexSourceFileName.insert(0, DATA_DIR);
-		fileStream.open(vertexSourceFileName);
-	}
-#endif
-	if (!fileStream.is_open()) {
-		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + vertexSourceFileName;
-		return NULL;
+	if (!TryPath(fileStream, vertexSourceFileName)) {
+		return nullptr;
 	}
 	std::string line = "";
 	while (!fileStream.eof()) {
@@ -63,23 +71,8 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	fileStream.close();
 
 	std::ifstream fileStream2(fragmentSourceFileName);
-#if __APPLE__
-	if (!fileStream2.is_open()) {
-		path_t bundleShaderPath = BundlePath(RESOURCES);
-		PathAppend(bundleShaderPath, fragmentSourceFileName);
-		ResolveFilePath(bundleShaderPath);
-		fileStream2.open(bundleShaderPath);
-	}
-#elif defined DATA_DIR
-	if (!fileStream2.is_open()) {
-		fragmentSourceFileName.insert(0, 1, PathDelimiter);
-		fragmentSourceFileName.insert(0, DATA_DIR);
-		fileStream2.open(fragmentSourceFileName);
-	}
-#endif
-	if (!fileStream2.is_open()) {
-		GLSLProgram::errMessage = "GLSLProgram error: Can't open file: " + fragmentSourceFileName;
-		return NULL;
+	if (!TryPath(fileStream2, fragmentSourceFileName)) {
+		return nullptr;
 	}
 	while (!fileStream2.eof()) {
 		std::getline(fileStream2, line);
