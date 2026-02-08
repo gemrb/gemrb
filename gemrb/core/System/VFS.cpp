@@ -603,6 +603,11 @@ path_t GemDataPath()
 	return outPath;
 }
 
+path_t BinaryPath()
+{
+	return core->config.AbsoluteGemRBPath;
+}
+
 #ifdef WIN32
 
 void* readonly_mmap(void* fd)

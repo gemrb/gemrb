@@ -330,8 +330,22 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 CoreSettings LoadFromArgs(int argc, char* argv[])
 {
 	InterfaceConfig settings;
+	// store the base and dirname of this program for use with config finding and
+	// when not ran from the CWD respectively
+	char* argv0 = argv[0];
+	char* lastSlash = strrchr(argv0, PathDelimiter);
+	const char* appName = lastSlash;
+	if (lastSlash) {
+		appName++;
+		*lastSlash = 0;
+		path_t dirName = argv0;
+		settings.Set("AbsoluteGemRBPath", dirName);
+	} else {
+		appName = argv[0];
+	}
+
 	bool loadedCFG = false;
-	// skip arg0 (it is just gemrb)
+	// skip arg0 (already handled)
 	for (int i = 1; i < argc; i++) {
 		if (stricmp(argv[i], "-c") == 0) {
 			// settings passed on the CLI override anything in the file
@@ -351,14 +365,6 @@ CoreSettings LoadFromArgs(int argc, char* argv[])
 	}
 
 	if (loadedCFG == false) {
-		// Find basename of this program. It does the same as basename (3),
-		// but that's probably missing on some archs
-		const char* appName = strrchr(argv[0], PathDelimiter);
-		if (appName) {
-			appName++;
-		} else {
-			appName = argv[0];
-		}
 		// settings passed on the CLI override anything in the file
 		settings.Merge(LoadDefaultCFG(appName));
 	}

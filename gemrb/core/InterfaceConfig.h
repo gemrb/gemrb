@@ -67,6 +67,7 @@ struct CoreSettings {
 	path_t CustomFontPath = "/usr/share/fonts/TTF";
 
 	path_t GemRBPath = GemDataPath();
+	path_t AbsoluteGemRBPath;
 	path_t GemRBOverridePath;
 	path_t GemRBUnhardcodedPath;
 	path_t PluginsPath;

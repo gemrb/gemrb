@@ -140,6 +140,7 @@ GEM_EXPORT void DelTree(const path_t& path, bool onlySave);
 
 GEM_EXPORT path_t HomePath();
 GEM_EXPORT path_t UserProfilePath();
+GEM_EXPORT path_t BinaryPath(); // realtime path
 
 // default directory housing GUIScripts/Override/Unhardcoded
 GEM_EXPORT path_t GemDataPath();
