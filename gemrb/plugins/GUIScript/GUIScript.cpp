@@ -10601,6 +10601,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		return RuntimeError("guibtbut BAM not found");
 	}
 
+	bool foundAny = false;
 	for (i = 0; i < GUIBT_COUNT - (more ? 1 : 0); i++) {
 		Button* btn = GetControl<Button>(i + Offset + (Start ? 1 : 0), win);
 		if (!btn || btn->ControlType != IE_GUI_BUTTON) {
@@ -10627,6 +10628,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BitOp::SET);
 			btn->SetTooltip(u"");
 		} else {
+			foundAny = true;
 			SetButtonCycle(bam, btn, 0, ButtonImage::Unpressed);
 			SetButtonCycle(bam, btn, 1, ButtonImage::Pressed);
 			SetButtonCycle(bam, btn, 2, ButtonImage::Selected);
@@ -10655,6 +10657,8 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			return nullptr;
 		}
 	}
+
+	if (!foundAny) core->ResetActionBar();
 
 	Py_RETURN_NONE;
 }
