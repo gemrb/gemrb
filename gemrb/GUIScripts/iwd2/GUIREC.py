@@ -1446,6 +1446,13 @@ def FinishLevelUp():
 	Levels[LUClass] += LevelDiff
 	LUCommon.SetupHP (pc, Levels, LevelDiffs)
 
+	# racial spell resistance increases were hardcoded
+	raceFlagTable = GemRB.LoadTable ("raceflag")
+	raceName = CommonTables.Races.GetRowName (IDLUCommon.GetRace (pc))
+	orig = GemRB.GetPlayerStat (pc, IE_RESISTMAGIC, 1)
+	perLevel = raceFlagTable.GetValue (raceName, "MAGICRES")
+	GemRB.SetPlayerStat (pc, IE_RESISTMAGIC, orig + LevelDiff * perLevel)
+
 	# add class/kit resistances iff we chose a new class
 	levelStat = IDLUCommon.Levels[LUClass]
 	oldLevel = GemRB.GetPlayerStat(pc, levelStat, 1)
