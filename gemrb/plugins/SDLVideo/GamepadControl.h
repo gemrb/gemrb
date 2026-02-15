@@ -30,30 +30,27 @@
 #endif
 
 class GamepadControl {
-private:
-	const float JOY_SPEED_MOD = 2000000.0F;
-
 public:
-	enum {
-		JOY_L_DEADZONE = 1000,
-		JOY_R_DEADZONE = 25000,
-	};
-
+	// todo: it would be nice to make all these constants configurable, preferably during game's runtime
 	const float JOY_AXIS_SPEEDUP = 1.03F;
-	const uint32_t GAMEPAD_SCROLL_DELAY = 50;
+	const int16_t JOY_L_DEADZONE = 5000;
+	const int16_t JOY_R_DEADZONE = 5000;
 
-	float joyPointerSpeed;
+	float pointerSpeed = 0.03f;
+
+	float xAxisFloatPos = 0;
+	float yAxisFloatPos = 0;
+	uint32_t lastAxisMovementTime = 0;
 	int16_t xAxisLValue = 0;
 	int16_t yAxisLValue = 0;
 	int16_t xAxisRValue = 0;
 	int16_t yAxisRValue = 0;
-	float xAxisFloatPos = 0;
-	float yAxisFloatPos = 0;
-	uint32_t lastAxisMovementTime = 0;
-	uint32_t gamepadScrollTimer = 0;
 
-	void SetPointerSpeed(int pointerSpeed);
-	float GetPointerSpeed();
+	bool gamepadScrollRightKeyPressed = false;
+	bool gamepadScrollLeftKeyPressed = false;
+	bool gamepadScrollUpKeyPressed = false;
+	bool gamepadScrollDownKeyPressed = false;
+
 	void SetGamepadPosition(int x, int y);
 	void HandleAxisEvent(uint8_t axis, int16_t value);
 };

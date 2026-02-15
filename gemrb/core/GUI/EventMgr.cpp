@@ -18,6 +18,41 @@
  *
  */
 
+/**
+   How the events' cascading works here??
+    1) SDLVideoDriver::PollEvents() -> ProcessAxisMotion();
+                                        \
+                                         |-> set gamepadControl.lastAxisMovementTime
+                                         |-> if (gamepadControl.x/yAxisLValue)
+                                         |      \
+                                         |       |-> set gamepadControl.x/yAxisFloatPos
+                                         |       |-> EvntManager->CreateMouseMotionEvent(gamepadControl.x/yAxisFloatPos)
+                                         |       +-> EvntManager->DispatchEvent( ^ )
+                                         |           \
+                                         |            | //I guess for this type of event Event::MouseMove, only this bit is relevant:
+                                         |            +-> mousePos = e.mouse.Pos();
+                                         |-> if (gamepadControl.x/yAxisRValue)
+                                                \
+                                                 +-> TBD, not relevant for cursor
+
+
+    2) SDLVideoDriver::PollEvents() -> SDL20VideoDriver::ProcessEvent() -> SDLVideoDriver::ProcessEvent()
+                                        \                                                              \
+                                         \->case SDL_CONTROLLERAXISMOTION:                              |-> case SDL_MOUSEMOTION:
+                                            \                                                           |    \
+                                             |-> gamepadControl.HandleAxisEvent()                       |     |-> gamepadControl.SetGamepadPosition
+                                             |        \                                                   |     |-> EventMgr::CreateMouseMotionEvent()
+                                             |         |-> set x/yAxisLValue                              |     +-> EvntManager->DispatchEvent(^)
+                                             |         +-> set x/yAxisRValue                              +-> case SDL_JOYAXISMOTION:
+                                             |-> gamepadControl.SetPointerSpeed                              \  // (disabled for now)
+                                             |-> EventMgr::CreateControllerAxisEvent(axis, delta, pct)        |-> was duplicating SDL_CONTROLLERAXISMOTION from SDL20VideoDriver::ProcessEvent()
+                                             |-> EvntManager->DispatchEvent(^)
+                                                    \
+                                                     |-> // right now empty, it was setting mousePos
+
+ */
+
+
 #include "GUI/EventMgr.h"
 
 #include "globals.h"
@@ -181,13 +216,6 @@ void EventMgr::DispatchEvent(Event&& e) const
 			if (it->second(e)) {
 				return;
 			}
-		}
-	} else if (Event::EventMaskFromType(e.type) & Event::ControllerAxisMask) {
-		// only the left stick moves the cursor
-		if (e.controller.axis == AXIS_LEFT_X) {
-			mousePos.x += e.controller.axisDelta;
-		} else if (e.controller.axis == AXIS_LEFT_Y) {
-			mousePos.y += e.controller.axisDelta;
 		}
 	} else if (Event::EventMaskFromType(e.type) & (Event::ControllerButtonUpMask | Event::ControllerButtonDownMask)) {
 		controllerButtonStates = e.controller.buttonStates;

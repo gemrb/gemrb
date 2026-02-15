@@ -20,15 +20,6 @@
 
 #include "GamepadControl.h"
 
-void GamepadControl::SetPointerSpeed(int pointerSpeed)
-{
-	joyPointerSpeed = pointerSpeed / JOY_SPEED_MOD;
-}
-
-float GamepadControl::GetPointerSpeed()
-{
-	return joyPointerSpeed;
-}
 
 void GamepadControl::SetGamepadPosition(int x, int y)
 {

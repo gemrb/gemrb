@@ -264,14 +264,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 		case SDL_JOYAXISMOTION:
 			{
 				gamepadControl.HandleAxisEvent(event.jaxis.axis, event.jaxis.value);
-				float pct = event.jaxis.value / float(sizeof(Sint16));
-				bool xaxis = event.jaxis.axis % 2;
-				int delta = xaxis ? pct * screenSize.w : pct * screenSize.h;
-				gamepadControl.SetPointerSpeed(delta); // XXX
-				delta = gamepadControl.GetPointerSpeed();
-				InputAxis axis = InputAxis(event.jaxis.axis);
-				e = EventMgr::CreateControllerAxisEvent(axis, delta, pct);
-				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 		case SDL_JOYBUTTONDOWN:
@@ -296,13 +288,15 @@ void SDLVideoDriver::ProcessAxisMotion() // FIXME: verify
 	uint32_t deltaTime = currentTime - gamepadControl.lastAxisMovementTime;
 	gamepadControl.lastAxisMovementTime = currentTime;
 
-	// cursor movement
-	if (gamepadControl.xAxisLValue != 0 || gamepadControl.yAxisLValue != 0) {
-		int16_t xSign = (gamepadControl.xAxisLValue > 0) - (gamepadControl.xAxisLValue < 0);
-		int16_t ySign = (gamepadControl.yAxisLValue > 0) - (gamepadControl.yAxisLValue < 0);
-
-		gamepadControl.xAxisFloatPos += ((pow(abs(gamepadControl.xAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * xSign * deltaTime)) * gamepadControl.GetPointerSpeed();
-		gamepadControl.yAxisFloatPos += ((pow(abs(gamepadControl.yAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * ySign * deltaTime)) * gamepadControl.GetPointerSpeed();
+	// 1) cursor movement
+	const int16_t xAxisLSign = (gamepadControl.xAxisLValue > gamepadControl.JOY_L_DEADZONE) - (gamepadControl.xAxisLValue < gamepadControl.JOY_L_DEADZONE);
+	const int16_t yAxisLSign = (gamepadControl.yAxisLValue > gamepadControl.JOY_L_DEADZONE) - (gamepadControl.yAxisLValue < gamepadControl.JOY_L_DEADZONE);
+	if (xAxisLSign != 0 || yAxisLSign != 0) {
+		const float dtSeconds = deltaTime / 1000.f;
+		const auto xDelta = pow(abs(gamepadControl.xAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * xAxisLSign * dtSeconds * gamepadControl.pointerSpeed;
+		const auto yDelta = pow(abs(gamepadControl.yAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * yAxisLSign * dtSeconds * gamepadControl.pointerSpeed;
+		gamepadControl.xAxisFloatPos += xDelta;
+		gamepadControl.yAxisFloatPos += yDelta;
 
 		gamepadControl.xAxisFloatPos = Clamp(gamepadControl.xAxisFloatPos, 0.0F, static_cast<float>(GetScreenSize().w));
 		gamepadControl.yAxisFloatPos = Clamp(gamepadControl.yAxisFloatPos, 0.0F, static_cast<float>(GetScreenSize().h));
@@ -311,37 +305,56 @@ void SDLVideoDriver::ProcessAxisMotion() // FIXME: verify
 		EvntManager->DispatchEvent(std::move(e));
 	}
 
-	// map scroll
+	// 2) map scroll
+	// 2.1) first send key up for every scroll key we set as down last frame
+	if (gamepadControl.gamepadScrollDownKeyPressed) {
+		gamepadControl.gamepadScrollDownKeyPressed = false;
+		auto e = EventMgr::CreateKeyEvent(GEM_DOWN, false, 0);
+		EvntManager->DispatchEvent(std::move(e));
+	}
+	if (gamepadControl.gamepadScrollUpKeyPressed) {
+		gamepadControl.gamepadScrollUpKeyPressed = false;
+		auto e = EventMgr::CreateKeyEvent(GEM_UP, false, 0);
+		EvntManager->DispatchEvent(std::move(e));
+	}
+	if (gamepadControl.gamepadScrollRightKeyPressed) {
+		gamepadControl.gamepadScrollRightKeyPressed = false;
+		auto e = EventMgr::CreateKeyEvent(GEM_RIGHT, false, 0);
+		EvntManager->DispatchEvent(std::move(e));
+	}
+	if (gamepadControl.gamepadScrollLeftKeyPressed) {
+		gamepadControl.gamepadScrollLeftKeyPressed = false;
+		auto e = EventMgr::CreateKeyEvent(GEM_LEFT, false, 0);
+		EvntManager->DispatchEvent(std::move(e));
+	}
+
+	// 2.2) if user moves the axis, treat it as a discrete input and send proper scroll-related keys
 	if (gamepadControl.xAxisRValue != 0 || gamepadControl.yAxisRValue != 0) {
-		gamepadControl.gamepadScrollTimer += deltaTime;
-
-		if (gamepadControl.gamepadScrollTimer > gamepadControl.GAMEPAD_SCROLL_DELAY) {
-			gamepadControl.gamepadScrollTimer -= gamepadControl.GAMEPAD_SCROLL_DELAY;
-
-			if (gamepadControl.xAxisRValue > GamepadControl::JOY_R_DEADZONE) {
-				Event e = EventMgr::CreateKeyEvent(GEM_RIGHT, false, 0);
-				EvntManager->DispatchEvent(std::move(e));
-			} else if (gamepadControl.xAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
-				Event e = EventMgr::CreateKeyEvent(GEM_LEFT, false, 0);
-				EvntManager->DispatchEvent(std::move(e));
-			}
-
-			if (gamepadControl.yAxisRValue > GamepadControl::JOY_R_DEADZONE) {
-				Event e = EventMgr::CreateKeyEvent(GEM_DOWN, false, 0);
-				EvntManager->DispatchEvent(std::move(e));
-			} else if (gamepadControl.yAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
-				Event e = EventMgr::CreateKeyEvent(GEM_UP, false, 0);
-				EvntManager->DispatchEvent(std::move(e));
-			}
+		if (gamepadControl.xAxisRValue > gamepadControl.JOY_R_DEADZONE) {
+			Event e = EventMgr::CreateKeyEvent(GEM_RIGHT, true, 0);
+			EvntManager->DispatchEvent(std::move(e));
+			gamepadControl.gamepadScrollRightKeyPressed = true;
+		} else if (gamepadControl.xAxisRValue < -gamepadControl.JOY_R_DEADZONE) {
+			Event e = EventMgr::CreateKeyEvent(GEM_LEFT, true, 0);
+			EvntManager->DispatchEvent(std::move(e));
+			gamepadControl.gamepadScrollLeftKeyPressed = true;
 		}
-	} else {
-		gamepadControl.gamepadScrollTimer = 0;
+
+		if (gamepadControl.yAxisRValue > gamepadControl.JOY_R_DEADZONE) {
+			Event e = EventMgr::CreateKeyEvent(GEM_DOWN, true, 0);
+			EvntManager->DispatchEvent(std::move(e));
+			gamepadControl.gamepadScrollDownKeyPressed = true;
+		} else if (gamepadControl.yAxisRValue < -gamepadControl.JOY_R_DEADZONE) {
+			Event e = EventMgr::CreateKeyEvent(GEM_UP, true, 0);
+			EvntManager->DispatchEvent(std::move(e));
+			gamepadControl.gamepadScrollUpKeyPressed = true;
+		}
 	}
 }
 
-void SDLVideoDriver::SetPointerSpeed(int pointerSpeed)
+void SDLVideoDriver::SetPointerSpeed(float pointerSpeed)
 {
-	gamepadControl.SetPointerSpeed(pointerSpeed);
+	gamepadControl.pointerSpeed = pointerSpeed;
 }
 
 Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, const PixelFormat& fmt)
