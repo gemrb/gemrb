@@ -82,9 +82,9 @@ int GameData::LoadCreature(const ResRef& creature, unsigned int PartySlot, bool 
 		path_t file = fmt::format("{}.chr", creature);
 		path_t gamePath = PathJoin(core->config.GamePath, core->config.GameCharactersPath, file);
 		path_t profilePath = PathJoin(UserProfilePath(), core->config.GameProfile, core->config.GameCharactersPath, file);
-		path_t nPath = profilePath;
+		path_t nPath = std::move(profilePath);
 		if (!FileExists(nPath)) {
-			nPath = gamePath;
+			nPath = std::move(gamePath);
 		}
 
 		stream = FileStream::OpenFile(nPath);

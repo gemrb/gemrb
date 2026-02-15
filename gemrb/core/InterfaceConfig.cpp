@@ -339,7 +339,7 @@ CoreSettings LoadFromArgs(int argc, char* argv[])
 		appName++;
 		*lastSlash = 0;
 		path_t dirName = argv0;
-		settings.Set("AbsoluteGemRBPath", dirName);
+		settings.Set("AbsoluteGemRBPath", std::move(dirName));
 	} else {
 		appName = argv[0];
 	}

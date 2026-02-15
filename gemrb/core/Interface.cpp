@@ -263,7 +263,7 @@ fallback:
 			PathAppend(basePath, profile);
 		}
 		if (!DirExists(basePath)) return;
-		config.GameProfile = profile;
+		config.GameProfile = std::move(profile);
 	}
 
 	if (!home) {
@@ -3769,7 +3769,7 @@ int Interface::WriteCharacter(StringView name, const Actor* actor) const
 
 	path_t path = PathJoin(config.GamePath, config.GameCharactersPath);
 	path_t profilePath = PathJoin(UserProfilePath(), config.GameProfile, config.GameCharactersPath);
-	std::array<path_t, 2> chrPaths { path, profilePath };
+	std::array<path_t, 2> chrPaths { path, std::move(profilePath) };
 	if (HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 		chrPaths[0] = "";
 	}
