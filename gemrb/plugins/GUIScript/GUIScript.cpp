@@ -223,6 +223,7 @@ static int64_t GetCreatureStat(const Actor* actor, unsigned int StatID, int Mod)
 		const auto& ps = actor->PCStats;
 		if (!ps) {
 			RuntimeError("Creature does not have the PCStats struct!");
+			return 0;
 		}
 		StatID &= 15;
 		return ps->ExtraSettings[StatID];
