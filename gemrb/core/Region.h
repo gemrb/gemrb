@@ -122,7 +122,7 @@ public:
 	bool IsZero() const noexcept { return w == 0 && h == 0; }
 	bool IsInvalid() const noexcept { return w <= 0 || h <= 0; }
 
-	bool PointInside(const BasePoint& p) const noexcept { return p.x >= 0 && p.x < w && p.y >= 0 && p.y < h; }
+	bool PointInside(const BasePoint& p) const noexcept { return p.x < w && p.y < h && p.x >= 0 && p.y >= 0; }
 };
 
 /**
