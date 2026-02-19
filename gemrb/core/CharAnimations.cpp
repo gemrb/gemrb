@@ -2968,6 +2968,8 @@ Palette SetupPaperdollColours(const ieDword* colors, unsigned int type) noexcept
 
 	for (uint8_t idx = METAL; idx < END; ++idx) {
 		const auto& pal16 = core->GetPalette16(colors[idx] >> s);
+		// FIXME: is this 0x04 an error? sizeof Color is 4, so that only skips the transparency color
+		// the shadow color we manually reset below, but doesn't this offset all the palettes by 1 slot?
 		std::copy(&pal16[0], &pal16[numCols], buffer.begin() + 0x04 + (idx * 12));
 	}
 
