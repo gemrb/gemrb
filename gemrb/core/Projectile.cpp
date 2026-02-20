@@ -1440,7 +1440,12 @@ void Projectile::InitExplodingPhase1() const
 	}
 
 	vvc->SetPos(Pos);
-	vvc->PlayOnce();
+	if (ExtFlags & PEF_WALL) {
+		vvc->SetDefaultDuration(core->Time.round_size * 5); // hardcoded, since it's not stored in the originating spells
+	} else {
+		vvc->PlayOnce();
+	}
+
 	vvc->SetBlend();
 	if (vef) {
 		area->AddVVCell(vef);
