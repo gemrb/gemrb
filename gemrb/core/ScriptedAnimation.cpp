@@ -74,9 +74,9 @@ Animation* ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, Anima
 	if (NumOrientations == 16 || OrientationFlags & IE_VVC_FACE_FIXED) {
 		if (af.GetCycleCount() > i) c = i;
 	} else if (NumOrientations == 5) {
-		c = SixteenToFive[i % MAX_ORIENT] + 5 * i / MAX_ORIENT;
+		c = SixteenToFive[i % MAX_ORIENT] + 5 * (i / MAX_ORIENT);
 	} else if (NumOrientations == 9) {
-		c = SixteenToNine[i % MAX_ORIENT] + 9 * i / MAX_ORIENT;
+		c = SixteenToNine[i % MAX_ORIENT] + 9 * (i / MAX_ORIENT);
 	}
 
 	Animation* anim = af.GetCycle(c);
@@ -155,10 +155,10 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 			assert(p < 3);
 			p *= MAX_ORIENT;
 		} else if (type & CycleType::Five) {
-			c = SixteenToFive[c % MAX_ORIENT] + 5 * c / MAX_ORIENT;
+			c = SixteenToFive[c % MAX_ORIENT] + 5 * (c / MAX_ORIENT);
 			if ((i & 15) >= 5) mirrorFlags = BlitFlags::MIRRORX;
 		} else if (type & CycleType::Nine) {
-			c = SixteenToNine[c % MAX_ORIENT] + 9 * c / MAX_ORIENT;
+			c = SixteenToNine[c % MAX_ORIENT] + 9 * (c / MAX_ORIENT);
 			if ((i & 15) >= 9) mirrorFlags = BlitFlags::MIRRORX;
 		} else if (!(type & CycleType::SevenEyes2)) {
 			assert(p < 3);
