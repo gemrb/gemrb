@@ -256,7 +256,12 @@ void Projectile::Setup()
 	}
 
 	if (ExtFlags & PEF_WALL) {
-		SetupWall();
+		if (act) {
+			Orientation = act->GetOrientation();
+		} else {
+			Orientation = GetOrient(Pos, Destination);
+		}
+		NewOrientation = Orientation;
 	}
 
 	//cone area of effect always disables the travel flag
@@ -1751,15 +1756,6 @@ void Projectile::SetFrames(orient_t face, int frame1, int frame2)
 	if (shadowAnim[face]) {
 		shadowAnim[face].SetFrame(frame2);
 	}
-}
-
-//recalculate target and source points (perpendicular bisector)
-void Projectile::SetupWall()
-{
-	Point p1 = (Pos + Destination) / 2;
-	Point p2 = p1 + (Pos - Destination);
-	Pos = p1;
-	SetTarget(p2);
 }
 
 void Projectile::DrawLine(const Region& vp, orient_t face, BlitFlags flag)

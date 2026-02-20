@@ -416,8 +416,6 @@ private:
 	void LineTarget(Path::const_iterator beg, Path::const_iterator end);
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	ProjectileState CheckTrigger(unsigned int radius);
-	//calculate target and destination points for a firewall
-	void SetupWall();
 	void BendPosition(Point& pos) const;
 	void DrawPopping(orient_t face, const Point& pos, BlitFlags flags, const Color& popTint);
 	void DrawLine(const Region& screen, orient_t face, BlitFlags flag);
