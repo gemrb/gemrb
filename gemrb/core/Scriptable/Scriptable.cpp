@@ -809,7 +809,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 	}
 
 	while (projectileCount--) {
-		Projectile* pro = NULL;
+		Projectile* pro = nullptr;
 		// jump through hoops to skip applying selftargeting spells to the caster
 		// if we'll be changing the target
 		int tct = 0;
@@ -835,6 +835,11 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 
 		if (caster) {
 			ModifyProjectile(pro, spl, tgt, level);
+		}
+		// only one wall of the same type can be up at the same time
+		if (pro->ExtFlags & PEF_WALL && !area->IsProjectileUnique(pro->GetType())) {
+			// the games silently discarded the spell
+			continue;
 		}
 
 		if (tgt) {

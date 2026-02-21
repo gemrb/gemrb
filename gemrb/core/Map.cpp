@@ -1109,6 +1109,18 @@ Projectile* Map::GetNextProjectile(const proIterator& iter) const
 	return *iter;
 }
 
+bool Map::IsProjectileUnique(ieWord proType) const
+{
+	bool unique = true;
+	for (const auto& pro : projectiles) {
+		if (pro->GetType() == proType) {
+			unique = false;
+			break;
+		}
+	}
+	return unique;
+}
+
 const Projectile* Map::GetNextTrap(proIterator& iter, int flags) const
 {
 	const Projectile* pro;

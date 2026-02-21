@@ -510,6 +510,8 @@ public:
 	size_t GetProjectileCount(proIterator& iter) const;
 	//get the next projectile
 	Projectile* GetNextProjectile(const proIterator& iter) const;
+	// checks whether a projectile is already present in the area
+	bool IsProjectileUnique(ieWord proType) const;
 	//count of unexploded projectiles that are saved
 	int GetTrapCount(proIterator& iter) const;
 	//get the next saved projectile
