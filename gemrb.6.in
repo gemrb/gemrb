@@ -476,6 +476,18 @@ if you want to keep the cache after exiting GemRB. It is disabled by default.
 Pointer movement speed with gamepads. The default is 10.
 
 .TP
+.BR GamepadPointerAccel =INT
+Pointer movement acceleration factor. The default is 103, while 100 means no acceleration.
+
+.TP
+.BR GamepadLDeadZone =INT
+Gamepad left stick threshold value for registering movement. The default is 5000.
+
+.TP
+.BR GamepadRDeadZone =INT
+Gamepad right stick threshold value for registering movement. The default is 5000.
+
+.TP
 .BR VitaKeepAspectRatio =(0|1)
 If set to
 .IR 1 ,

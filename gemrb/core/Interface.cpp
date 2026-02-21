@@ -339,7 +339,7 @@ Interface::Interface(CoreSettings&& cfg)
 	EventMgr::DCDelay = config.DoubleClickDelay;
 	Control::ActionRepeatDelay = config.ActionRepeatDelay;
 	GameControl::DebugFlags = config.DebugFlags;
-	VideoDriver->SetPointerSpeed(config.GamepadPointerSpeed);
+	VideoDriver->ConfigurePointer(config.GamepadPointerSpeed, config.GamepadPointerAccel, config.GamepadLDeadZone, config.GamepadRDeadZone);
 
 	Log(MESSAGE, "Core", "Initializing search path...");
 	if (!IsAvailable(PLUGIN_RESOURCE_DIRECTORY)) {

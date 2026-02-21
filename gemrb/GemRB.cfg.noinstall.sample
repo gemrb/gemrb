@@ -153,8 +153,12 @@ Bpp=32
 
 #NumFingInfo=2
 
-# Pointer speed with thumbstick
+# Pointer speed and acceleration factor with thumbstick
 #GamepadPointerSpeed=10
+#GamepadPointerAccel=103
+# Threshold values for axis / stick movement
+#GamepadLDeadZone=5000
+#GamepadRDeadZone=5000
 
 # Vita specific options
 VitaKeepAspectRatio=1

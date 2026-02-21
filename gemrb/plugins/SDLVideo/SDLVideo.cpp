@@ -292,12 +292,12 @@ void SDLVideoDriver::ProcessAxisMotion()
 	gamepadControl.lastAxisMovementTime = currentTime;
 
 	// 1) cursor movement
-	const int16_t xAxisLSign = (gamepadControl.xAxisLValue > gamepadControl.JOY_L_DEADZONE) - (gamepadControl.xAxisLValue < gamepadControl.JOY_L_DEADZONE);
-	const int16_t yAxisLSign = (gamepadControl.yAxisLValue > gamepadControl.JOY_L_DEADZONE) - (gamepadControl.yAxisLValue < gamepadControl.JOY_L_DEADZONE);
+	const int16_t xAxisLSign = (gamepadControl.xAxisLValue > gamepadControl.deadZoneL) - (gamepadControl.xAxisLValue < gamepadControl.deadZoneL);
+	const int16_t yAxisLSign = (gamepadControl.yAxisLValue > gamepadControl.deadZoneL) - (gamepadControl.yAxisLValue < gamepadControl.deadZoneL);
 	if (xAxisLSign != 0 || yAxisLSign != 0) {
 		const float dtSeconds = deltaTime / 1000.f;
-		const auto xDelta = pow(abs(gamepadControl.xAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * xAxisLSign * dtSeconds * gamepadControl.GetPointerSpeed();
-		const auto yDelta = pow(abs(gamepadControl.yAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * yAxisLSign * dtSeconds * gamepadControl.GetPointerSpeed();
+		const auto xDelta = pow(abs(gamepadControl.xAxisLValue), gamepadControl.joyPointerAccel) * xAxisLSign * dtSeconds * gamepadControl.GetPointerSpeed();
+		const auto yDelta = pow(abs(gamepadControl.yAxisLValue), gamepadControl.joyPointerAccel) * yAxisLSign * dtSeconds * gamepadControl.GetPointerSpeed();
 		gamepadControl.xAxisFloatPos += xDelta;
 		gamepadControl.yAxisFloatPos += yDelta;
 
@@ -357,9 +357,9 @@ void SDLVideoDriver::ProcessAxisMotion()
 	}
 }
 
-void SDLVideoDriver::SetPointerSpeed(int pointerSpeed)
+void SDLVideoDriver::ConfigurePointer(int pointerSpeed, int pointerAccel, int deadZoneL, int deadZoneR)
 {
-	gamepadControl.SetPointerSpeed(pointerSpeed);
+	gamepadControl.ConfigurePointer(pointerSpeed, pointerAccel, deadZoneL, deadZoneR);
 }
 
 Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, const PixelFormat& fmt)

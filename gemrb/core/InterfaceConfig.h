@@ -84,6 +84,9 @@ struct CoreSettings {
 	std::string Encoding = "default";
 
 	int GamepadPointerSpeed = 10;
+	int GamepadPointerAccel = 103;
+	int GamepadLDeadZone = 5000;
+	int GamepadRDeadZone = 5000;
 	unsigned short NumFingScroll = 2;
 	unsigned short NumFingKboard = 3;
 	unsigned short NumFingInfo = 2;

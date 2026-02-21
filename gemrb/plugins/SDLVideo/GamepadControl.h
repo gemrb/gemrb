@@ -34,12 +34,11 @@ private:
 	const float JOY_SPEED_MOD = 500.0f;
 
 public:
-	// todo: it would be nice to make all these constants configurable, preferably during game's runtime
-	const float JOY_AXIS_SPEEDUP = 1.03F;
-	const int16_t JOY_L_DEADZONE = 5000;
-	const int16_t JOY_R_DEADZONE = 5000;
+	int16_t deadZoneL = 5000;
+	int16_t deadZoneR = 5000;
 
 	float joyPointerSpeed = 0;
+	float joyPointerAccel = 1.03F;
 
 	float xAxisFloatPos = 0;
 	float yAxisFloatPos = 0;
@@ -54,7 +53,7 @@ public:
 	bool gamepadScrollUpKeyPressed = false;
 	bool gamepadScrollDownKeyPressed = false;
 
-	void SetPointerSpeed(int pointerSpeed);
+	void ConfigurePointer(int pointerSpeed, int pointerAccel, int deadZoneL, int deadZoneR);
 	float GetPointerSpeed();
 	void SetGamepadPosition(int x, int y);
 	void HandleAxisEvent(uint8_t axis, int16_t value);
