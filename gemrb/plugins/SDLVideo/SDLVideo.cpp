@@ -59,7 +59,6 @@ int SDLVideoDriver::PollEvents()
 	int ret = GEM_OK;
 	SDL_Event currentEvent;
 
-	// FIXME: move, refactor?
 	if (SDL_NumJoysticks() > 0) {
 		ProcessAxisMotion();
 	}
@@ -239,7 +238,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 			EvntManager->DispatchEvent(std::move(e));
 			break;
 		case SDL_MOUSEMOTION:
-			if (SDL_NumJoysticks() > 0) { // XXX
+			if (SDL_NumJoysticks() > 0) {
 				gamepadControl.SetGamepadPosition(event.motion.x, event.motion.y);
 			}
 			e = EventMgr::CreateMouseMotionEvent(Point(event.motion.x, event.motion.y), modstate);
@@ -286,7 +285,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 	return GEM_OK;
 }
 
-void SDLVideoDriver::ProcessAxisMotion() // FIXME: verify
+void SDLVideoDriver::ProcessAxisMotion()
 {
 	uint32_t currentTime = GetMilliseconds();
 	uint32_t deltaTime = currentTime - gamepadControl.lastAxisMovementTime;
