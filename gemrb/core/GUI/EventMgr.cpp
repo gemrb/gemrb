@@ -119,7 +119,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 
 	me.buttonStates = down ? btn : 0;
 	me.button = btn;
-	me.repeats = 1;
+	me.repeats = ce.repeats ? ce.repeats : 1;
 
 	return me;
 }
@@ -217,6 +217,23 @@ void EventMgr::DispatchEvent(Event&& e) const
 		}
 	} else if (Event::EventMaskFromType(e.type) & (Event::ControllerButtonUpMask | Event::ControllerButtonDownMask)) {
 		controllerButtonStates = e.controller.buttonStates;
+
+		// track repeat count for double-click support, mirroring mouse repeat logic
+		static tick_t lastButtonDown = 0;
+		static unsigned char repeatCount = 0;
+		static EventButton repeatButton = 0;
+
+		if (e.type == Event::ControllerButtonDown) {
+			if (e.controller.button == repeatButton && e.time <= lastButtonDown + DCDelay) {
+				repeatCount++;
+			} else {
+				repeatCount = 1;
+			}
+			repeatButton = e.controller.button;
+			lastButtonDown = GetMilliseconds();
+		}
+
+		e.controller.repeats = repeatCount;
 	} else if (e.isScreen) {
 		if (Event::EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask | Event::TouchUpMask | Event::TouchDownMask)) {
 			// WARNING: these are shared between mouse and touch
