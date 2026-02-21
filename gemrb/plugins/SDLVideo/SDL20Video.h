@@ -22,6 +22,7 @@
 #define SDL20VideoDRIVER_H
 
 
+#include "DPadSoftKeyboard.h"
 #include "SDLSurfaceDrawing.h"
 #include "SDLVideo.h"
 
@@ -231,6 +232,7 @@ private:
 	SDL_BlendMode srcBlender;
 
 	SDL_GameController* gameController = nullptr;
+	DPadSoftKeyboard dPadSoftKeyboard;
 
 	GLSLProgram* blitRGBAShader = nullptr;
 	float brightness = 1.0;

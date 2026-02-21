@@ -820,10 +820,48 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event& event)
 		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_CONTROLLERBUTTONUP:
 			{
-				bool down = (event.type == SDL_CONTROLLERBUTTONDOWN) ? true : false;
-				EventButton btn = EventButton(event.cbutton.button);
-				e = EventMgr::CreateControllerButtonEvent(btn, down);
-				EvntManager->DispatchEvent(std::move(e));
+				bool handled = false;
+				if (InTextInput() && event.type == SDL_CONTROLLERBUTTONDOWN) {
+					Event bsp = EventMgr::CreateKeyEvent(GEM_BACKSP, true);
+					handled = true;
+
+					switch (event.cbutton.button) {
+						case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+							dPadSoftKeyboard.RemoveCharacter();
+							EvntManager->DispatchEvent(std::move(bsp));
+							break;
+						case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+							dPadSoftKeyboard.AddCharacter();
+							EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+							break;
+						case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+							dPadSoftKeyboard.NextCharacter();
+							EvntManager->DispatchEvent(std::move(bsp));
+							EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+							break;
+						case SDL_CONTROLLER_BUTTON_DPAD_UP:
+							dPadSoftKeyboard.PreviousCharacter();
+							EvntManager->DispatchEvent(std::move(bsp));
+							EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+							break;
+						case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+						case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+							dPadSoftKeyboard.ToggleUppercase();
+							EvntManager->DispatchEvent(std::move(bsp));
+							EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+							break;
+						default:
+							handled = false;
+							break;
+					}
+				}
+
+				if (!handled) {
+					bool down = (event.type == SDL_CONTROLLERBUTTONDOWN);
+					EventButton btn = EventButton(event.cbutton.button);
+					e = EventMgr::CreateControllerButtonEvent(btn, down);
+					EvntManager->DispatchEvent(std::move(e));
+				}
 			}
 			break;
 #endif
@@ -993,11 +1031,15 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event& event)
 
 void SDL20VideoDriver::StopTextInput()
 {
+	dPadSoftKeyboard.StopInput();
 	SDL_StopTextInput();
 }
 
 void SDL20VideoDriver::StartTextInput()
 {
+	if (!dPadSoftKeyboard.IsInputActive()) {
+		dPadSoftKeyboard.StartInput();
+	}
 	// FIXME: we probably dont need this ANDROID code
 	// UseSoftKeyboard probably has no effect since SDL delegates SDL_StartTextInput to the OS
 	// on iOS this is going to be a user preference and depends on a physical keyboard presence
