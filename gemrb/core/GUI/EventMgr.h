@@ -313,6 +313,7 @@ public:
 	void DispatchEvent(Event&& e) const;
 
 	static bool ModState(unsigned short mod);
+	static void SetModState(unsigned short mod, bool set);
 
 	static bool MouseButtonState(EventButton btn);
 	static bool MouseDown();

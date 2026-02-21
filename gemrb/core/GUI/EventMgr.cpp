@@ -155,6 +155,15 @@ bool EventMgr::ModState(unsigned short mod)
 	return (modKeys & buttonbits(mod)).any();
 }
 
+void EventMgr::SetModState(unsigned short mod, bool set)
+{
+	if (set) {
+		modKeys |= buttonbits(mod);
+	} else {
+		modKeys &= ~buttonbits(mod);
+	}
+}
+
 bool EventMgr::MouseButtonState(EventButton btn)
 {
 	return (mouseButtonFlags & buttonbits(btn)).any();

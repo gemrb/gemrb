@@ -876,6 +876,12 @@ bool View::OnControllerButtonDown(const ControllerEvent& ce)
 		return true;
 	}
 
+	// Right thumbstick press toggles ALT modifier (highlights interactable objects)
+	if (ce.button == CONTROLLER_BUTTON_RIGHTSTICK) {
+		EventMgr::SetModState(GEM_MOD_ALT, true);
+		return true;
+	}
+
 	// TODO: we might want to add modifiers for "trigger" buttons
 	KeyboardEvent ke = KeyEventFromController(ce);
 	return OnKeyPress(ke, 0);
@@ -887,6 +893,12 @@ bool View::OnControllerButtonUp(const ControllerEvent& ce)
 		MouseEvent me = MouseEventFromController(ce, false);
 		// TODO: we might want to add modifiers for "trigger" buttons
 		return OnMouseUp(me, 0);
+	}
+
+	// Right thumbstick release clears ALT modifier
+	if (ce.button == CONTROLLER_BUTTON_RIGHTSTICK) {
+		EventMgr::SetModState(GEM_MOD_ALT, false);
+		return true;
 	}
 
 	// TODO: we might want to add modifiers for "trigger" buttons
