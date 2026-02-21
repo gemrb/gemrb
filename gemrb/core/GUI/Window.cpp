@@ -541,6 +541,7 @@ bool Window::DispatchEvent(const Event& event)
 			TrySetFocus(target);
 			target->ControllerButtonDown(event.controller);
 			trackingView = target;
+			dragOrigin = screenPos;
 		} else {
 			if (trackingView) {
 				trackingView->ControllerButtonUp(event.controller);
