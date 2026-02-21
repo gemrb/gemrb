@@ -36,7 +36,7 @@ public:
 	const int16_t JOY_L_DEADZONE = 5000;
 	const int16_t JOY_R_DEADZONE = 5000;
 
-	float pointerSpeed = 0.03f;
+	float pointerSpeed = 0;
 
 	float xAxisFloatPos = 0;
 	float yAxisFloatPos = 0;
@@ -51,6 +51,8 @@ public:
 	bool gamepadScrollUpKeyPressed = false;
 	bool gamepadScrollDownKeyPressed = false;
 
+	void SetPointerSpeed(int pointerSpeed);
+	float GetPointerSpeed();
 	void SetGamepadPosition(int x, int y);
 	void HandleAxisEvent(uint8_t axis, int16_t value);
 };

@@ -159,7 +159,7 @@ public:
 
 	virtual bool TouchInputEnabled() = 0;
 	virtual bool CanDrawRawGeometry() const { return false; }
-	virtual void SetPointerSpeed(float pointerSpeed) = 0;
+	virtual void SetPointerSpeed(int pointerSpeed) = 0;
 
 	virtual Holder<Sprite2D> CreateSprite(const Region&, void* pixels, const PixelFormat&) = 0;
 

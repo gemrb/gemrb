@@ -110,7 +110,7 @@ private:
 
 	void DrawEllipseImp(const Region& rect, const Color& color, BlitFlags flags) override;
 	void DrawCircleImp(const Point& origin, uint16_t r, const Color& color, BlitFlags flags) override;
-	void SetPointerSpeed(float pointerSpeed) override;
+	void SetPointerSpeed(int pointerSpeed) override;
 	void ProcessAxisMotion();
 
 public:
