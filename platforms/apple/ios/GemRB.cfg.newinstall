@@ -35,9 +35,6 @@
 #  Input Parameters                                 #
 #####################################################
 
-#whether or not to use software keyboard on devices that support one
-UseSoftKeyboard=1
-
 #####################################################
 #  MouseFeedback		                    #
 #  Bitfield with reserved bits for disabling        #

@@ -157,7 +157,6 @@ function prepare_config {
 
   cp -f "$template" "$out" &&
   # change/enable/override some defaults
-  sed -i 's,^#UseSoftKeyboard,UseSoftKeyboard,' "$out" &&
   sed -i 's,^Bpp=.*,Bpp=16,' "$out" &&
   sed -i 's,^#\?AudioDriver.*,AudioDriver = openal,' "$out" &&
   sed -i 's,^Bpp=.*,Bpp=16,' "$out" &&

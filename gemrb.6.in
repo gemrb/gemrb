@@ -349,11 +349,6 @@ Millisecond threshold for detecting a double click. The default is 250.
 Millisecond threshold for detecting a repeated key press. The default is 250.
 
 .TP
-.BR UseSoftKeyboard =(0|1)
-Toggles use of software keyboard on devices that support one. It pops up when
-text input is required. Disabled by default.
-
-.TP
 .BR NumFingScroll =(2|3|4)
 Number of fingers for multitouch to trigger scrolling. The default is 2.
 

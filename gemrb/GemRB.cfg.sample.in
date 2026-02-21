@@ -122,9 +122,6 @@ Bpp=32
 #  Input Parameters                                                           #
 ###############################################################################
 
-# Whether or not to use software keyboard on devices that support one
-#UseSoftKeyboard=1
-
 # How close from the window edge should we start to scroll, offset in pixels
 #EdgeScrollOffset=5
 

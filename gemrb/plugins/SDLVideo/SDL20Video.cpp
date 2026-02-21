@@ -1040,19 +1040,7 @@ void SDL20VideoDriver::StartTextInput()
 	if (!dPadSoftKeyboard.IsInputActive()) {
 		dPadSoftKeyboard.StartInput();
 	}
-	// FIXME: we probably dont need this ANDROID code
-	// UseSoftKeyboard probably has no effect since SDL delegates SDL_StartTextInput to the OS
-	// on iOS this is going to be a user preference and depends on a physical keyboard presence
-#if ANDROID
-	if (core->UseSoftKeyboard) {
-		SDL_StartTextInput();
-	} else {
-		Event e = EvntManager->CreateTextEvent(L"");
-		EvntManager->DispatchEvent(e);
-	}
-#else
 	SDL_StartTextInput();
-#endif
 }
 
 bool SDL20VideoDriver::InTextInput()
