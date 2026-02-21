@@ -42,8 +42,16 @@ void GamepadControl::HandleAxisEvent(uint8_t axis, int16_t value)
 			yAxisLValue = 0;
 		}
 	} else if (axis == SDL_CONTROLLER_AXIS_RIGHTX) {
-		xAxisRValue = value;
+		if (std::abs(value) > JOY_R_DEADZONE) {
+			xAxisRValue = value;
+		} else {
+			xAxisRValue = 0;
+		}
 	} else if (axis == SDL_CONTROLLER_AXIS_RIGHTY) {
-		yAxisRValue = value;
+		if (std::abs(value) > JOY_R_DEADZONE) {
+			yAxisRValue = value;
+		} else {
+			yAxisRValue = 0;
+		}
 	}
 }

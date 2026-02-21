@@ -80,6 +80,12 @@ private:
 	Point vpVector;
 	int numScrollCursor = 0;
 	EnumBitset<ScreenFlags> screenFlags { ScreenFlags::CenterOnActor };
+	// Scroll direction bits: LEFT=1, RIGHT=2, UP=4, DOWN=8
+	// Pairs: LEFT<->RIGHT (bits 0,1) and UP<->DOWN (bits 2,3)
+	static constexpr unsigned int SCROLL_LEFT  = 1 << 0;
+	static constexpr unsigned int SCROLL_RIGHT = 1 << 1;
+	static constexpr unsigned int SCROLL_UP    = 1 << 2;
+	static constexpr unsigned int SCROLL_DOWN  = 1 << 3;
 	unsigned int scrollKeysActive = 0;
 	unsigned int scrollKeysDown = 0;
 	unsigned int DialogueFlags = DF_FREEZE_SCRIPTS;
