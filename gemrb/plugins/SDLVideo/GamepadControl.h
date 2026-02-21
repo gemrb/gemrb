@@ -36,7 +36,7 @@ public:
 	const int16_t JOY_L_DEADZONE = 5000;
 	const int16_t JOY_R_DEADZONE = 5000;
 
-	float pointerSpeed = 0;
+	float joyPointerSpeed = 0;
 
 	float xAxisFloatPos = 0;
 	float yAxisFloatPos = 0;
