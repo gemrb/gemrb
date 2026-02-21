@@ -88,6 +88,21 @@ MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down)
 	return me;
 }
 
+// Map a single controller button to the corresponding mouse button
+static EventButton ControllerBtnToMouseBtn(EventButton controllerBtn)
+{
+	switch (controllerBtn) {
+		case CONTROLLER_BUTTON_A:
+			return GEM_MB_ACTION;
+		case CONTROLLER_BUTTON_B:
+			return GEM_MB_MENU;
+		case CONTROLLER_BUTTON_LEFTSTICK:
+			return GEM_MB_MIDDLE;
+		default:
+			return 0;
+	}
+}
+
 MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 {
 	Point p = EventMgr::MousePos();
@@ -104,18 +119,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 		me.deltaY = ce.axisDelta;
 	}
 
-	EventButton btn = 0;
-	switch (ce.button) {
-		case CONTROLLER_BUTTON_A:
-			btn = GEM_MB_ACTION;
-			break;
-		case CONTROLLER_BUTTON_B:
-			btn = GEM_MB_MENU;
-			break;
-		case CONTROLLER_BUTTON_LEFTSTICK:
-			btn = GEM_MB_MIDDLE;
-			break;
-	}
+	EventButton btn = ControllerBtnToMouseBtn(ce.button);
 
 	me.buttonStates = down ? btn : 0;
 	me.button = btn;
@@ -226,6 +230,19 @@ void EventMgr::DispatchEvent(Event&& e) const
 		}
 	} else if (Event::EventMaskFromType(e.type) & (Event::ControllerButtonUpMask | Event::ControllerButtonDownMask)) {
 		controllerButtonStates = e.controller.buttonStates;
+
+		// Mirror controller buttons that map to mouse buttons into mouseButtonFlags,
+		// so that mouse motion events (e.g. from stick cursor movement) carry the
+		// correct button states for drag operations (formation rotation, selection
+		// rectangle, map panning).
+		EventButton mouseBtn = ControllerBtnToMouseBtn(e.controller.button);
+		if (mouseBtn) {
+			if (e.type == Event::ControllerButtonDown) {
+				mouseButtonFlags |= buttonbits(mouseBtn);
+			} else {
+				mouseButtonFlags &= ~buttonbits(mouseBtn);
+			}
+		}
 
 		// track repeat count for double-click support, mirroring mouse repeat logic
 		static tick_t lastButtonDown = 0;
