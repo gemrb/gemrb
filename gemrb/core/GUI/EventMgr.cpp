@@ -19,37 +19,34 @@
  */
 
 /**
-   How the events' cascading works here??
-    1) SDLVideoDriver::PollEvents() -> ProcessAxisMotion();
-                                        \
-                                         |-> set gamepadControl.lastAxisMovementTime
-                                         |-> if (gamepadControl.x/yAxisLValue)
-                                         |      \
-                                         |       |-> set gamepadControl.x/yAxisFloatPos
-                                         |       |-> EvntManager->CreateMouseMotionEvent(gamepadControl.x/yAxisFloatPos)
-                                         |       +-> EvntManager->DispatchEvent( ^ )
-                                         |           \
-                                         |            | //I guess for this type of event Event::MouseMove, only this bit is relevant:
-                                         |            +-> mousePos = e.mouse.Pos();
-                                         |-> if (gamepadControl.x/yAxisRValue)
-                                                \
-                                                 +-> TBD, not relevant for cursor
+   Gamepad event flow:
 
+   Axis (thumbstick) events:
+    1) SDLVideoDriver::PollEvents() -> ProcessAxisMotion()
+       - Left stick: moves the cursor by generating MouseMotion events via EvntManager->DispatchEvent()
+       - Right stick: scrolls the map by generating key press/release events (GEM_UP/DOWN/LEFT/RIGHT)
 
-    2) SDLVideoDriver::PollEvents() -> SDL20VideoDriver::ProcessEvent() -> SDLVideoDriver::ProcessEvent()
-                                        \                                                              \
-                                         \->case SDL_CONTROLLERAXISMOTION:                              |-> case SDL_MOUSEMOTION:
-                                            \                                                           |    \
-                                             |-> gamepadControl.HandleAxisEvent()                       |     |-> gamepadControl.SetGamepadPosition
-                                             |        \                                                   |     |-> EventMgr::CreateMouseMotionEvent()
-                                             |         |-> set x/yAxisLValue                              |     +-> EvntManager->DispatchEvent(^)
-                                             |         +-> set x/yAxisRValue                              +-> case SDL_JOYAXISMOTION:
-                                             |-> gamepadControl.SetPointerSpeed                              \  // (disabled for now)
-                                             |-> EventMgr::CreateControllerAxisEvent(axis, delta, pct)        |-> was duplicating SDL_CONTROLLERAXISMOTION from SDL20VideoDriver::ProcessEvent()
-                                             |-> EvntManager->DispatchEvent(^)
-                                                    \
-                                                     |-> // right now empty, it was setting mousePos
+    2) SDL20VideoDriver::ProcessEvent()
+       - SDL_CONTROLLERAXISMOTION: stores raw axis values in gamepadControl via HandleAxisEvent()
+         (ProcessAxisMotion() in the next frame converts those to cursor/scroll events)
 
+   Button events:
+    SDL20VideoDriver::ProcessEvent()
+     -> SDL_CONTROLLERBUTTONDOWN / SDL_CONTROLLERBUTTONUP
+     -> EventMgr::CreateControllerButtonEvent(btn, down) [isScreen = true]
+     -> EventMgr::DispatchEvent()
+        -> updates controllerButtonStates
+        -> event taps -> WindowManager::DispatchEvent()
+           -> NextEventWindow() uses EventMgr::MousePos() for hit-testing
+           -> Window::DispatchEvent()
+              -> target View found at cursor position
+              -> View::ControllerButtonDown/Up(ce)
+                 -> OnControllerButtonDown/Up(ce) converts:
+                    - A/B/LEFTSTICK -> mouse down/up events
+                    - DPad -> key press/release events
+                    - START -> pause toggle
+                    - GUIDE -> text input
+                    - Y/X -> inventory/map (in GameControl)
  */
 
 
@@ -122,6 +119,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 
 	me.buttonStates = down ? btn : 0;
 	me.button = btn;
+	me.repeats = 1;
 
 	return me;
 }
@@ -495,6 +493,7 @@ Event EventMgr::CreateControllerButtonEvent(EventButton btn, bool down)
 		e.controller.buttonStates &= ~btn;
 	}
 	e.controller.button = btn;
+	e.isScreen = true; // controller buttons act on screen position (the cursor)
 
 	return e;
 }

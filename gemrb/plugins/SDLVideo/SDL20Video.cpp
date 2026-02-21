@@ -820,7 +820,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event& event)
 		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_CONTROLLERBUTTONUP:
 			{
-				bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
+				bool down = (event.type == SDL_CONTROLLERBUTTONDOWN) ? true : false;
 				EventButton btn = EventButton(event.cbutton.button);
 				e = EventMgr::CreateControllerButtonEvent(btn, down);
 				EvntManager->DispatchEvent(std::move(e));
