@@ -30,6 +30,9 @@
 #endif
 
 class GamepadControl {
+private:
+	const float JOY_SPEED_MOD = 500.0f;
+
 public:
 	// todo: it would be nice to make all these constants configurable, preferably during game's runtime
 	const float JOY_AXIS_SPEEDUP = 1.03F;
