@@ -22,7 +22,7 @@
 
 void GamepadControl::SetPointerSpeed(int pointerSpeed)
 {
-	joyPointerSpeed = 1.0f / static_cast<float>(pointerSpeed);
+	joyPointerSpeed = pointerSpeed / JOY_SPEED_MOD;
 }
 
 float GamepadControl::GetPointerSpeed()

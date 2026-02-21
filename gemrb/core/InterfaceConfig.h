@@ -83,7 +83,7 @@ struct CoreSettings {
 	std::string GameType = "auto";
 	std::string Encoding = "default";
 
-	int GamepadPointerSpeed = 50;
+	int GamepadPointerSpeed = 10;
 	bool UseSoftKeyboard = false; // TODO: reevaluate the need for this, see comments in StartTextInput
 	unsigned short NumFingScroll = 2;
 	unsigned short NumFingKboard = 3;
