@@ -260,7 +260,11 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 				}
 			}
 			break;
-#ifdef USE_SDL_CONTROLLER_API
+#if defined(USE_SDL_CONTROLLER_API) && !SDL_VERSION_ATLEAST(1, 3, 0)
+		// SDL 1.x only: handle joystick events directly.
+		// In SDL2, the Game Controller API events (SDL_CONTROLLERBUTTON*, SDL_CONTROLLERAXISMOTION)
+		// are handled by SDL20VideoDriver::ProcessEvent, and SDL also generates duplicate
+		// SDL_JOY* events that must be ignored to avoid double-dispatch.
 		case SDL_JOYAXISMOTION:
 			{
 				gamepadControl.HandleAxisEvent(event.jaxis.axis, event.jaxis.value);

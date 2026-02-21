@@ -362,8 +362,17 @@ Window* WindowManager::GetFocusWindow() const
 	return gameWin;
 }
 
+static inline Point ScreenPosFromEvent(const Event& e) {
+	if (Event::EventMaskFromType(e.type) & Event::AllControllerMask) {
+		// controller events use ControllerEvent in the union, not MouseEvent
+		// the cursor position is tracked separately via EventMgr::MousePos()
+		return EventMgr::MousePos();
+	}
+	return e.mouse.Pos();
+}
+
 #define HIT_TEST(e, w) \
-	((w)->HitTest((w)->ConvertPointFromScreen(e.mouse.Pos())))
+	((w)->HitTest((w)->ConvertPointFromScreen(ScreenPosFromEvent(e))))
 
 Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_iterator& current)
 {
@@ -408,7 +417,9 @@ bool WindowManager::DispatchEvent(const Event& event)
 		return true;
 	}
 
-	if (EventMgr::MouseDown() == false && EventMgr::FingerDown() == false) {
+	bool isControllerButton = Event::EventMaskFromType(event.type) & (Event::ControllerButtonUpMask | Event::ControllerButtonDownMask);
+
+	if (EventMgr::MouseDown() == false && EventMgr::FingerDown() == false && !isControllerButton) {
 		if (event.type == Event::MouseUp || event.type == Event::TouchUp) {
 			// we don't deliver mouse up events if there isn't a corresponding mouse down (no trackingWin).
 			if (!trackingWin) return false;
@@ -423,10 +434,19 @@ bool WindowManager::DispatchEvent(const Event& event)
 		if (event.type != Event::TouchGesture) {
 			trackingWin = nullptr;
 		}
-	} else if (event.isScreen && trackingWin) {
+	} else if (event.isScreen && trackingWin && !isControllerButton) {
 		if (trackingWin->IsDisabled() == false) {
 			trackingWin->DispatchEvent(event);
 		}
+		return true;
+	}
+
+	// controller button UP: deliver to trackingWin if set, then clear it
+	if (event.type == Event::ControllerButtonUp && trackingWin) {
+		if (!trackingWin->IsDisabled() && trackingWin->IsVisible()) {
+			trackingWin->DispatchEvent(event);
+		}
+		trackingWin = nullptr;
 		return true;
 	}
 
@@ -453,7 +473,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 		if (target->IsDisabled() || target->DispatchEvent(event)) {
 			if (event.isScreen && target->IsVisible()) {
 				hoverWin = target;
-				if (event.type == Event::MouseDown || event.type == Event::TouchDown) {
+				if (event.type == Event::MouseDown || event.type == Event::TouchDown || event.type == Event::ControllerButtonDown) {
 					trackingWin = target;
 				}
 			} else if ((target->Flags() & (View::IgnoreEvents | View::Disabled)) == View::Disabled && event.type == Event::KeyDown && event.keyboard.keycode == GEM_ESCAPE) {

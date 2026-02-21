@@ -507,13 +507,47 @@ bool Window::DispatchEvent(const Event& event)
 		return true;
 	}
 
-	if (!event.isScreen) { // key events
+	bool isControllerButton = event.type == Event::ControllerButtonDown || event.type == Event::ControllerButtonUp;
+
+	if (!event.isScreen && !isControllerButton) { // key events
 		return DispatchKey(focusView, event);
 	}
 
 	if (event.type == Event::TouchGesture) {
 		if (trackingView) {
 			DispatchTouchGesture(trackingView, event.gesture);
+		}
+		return true;
+	}
+
+	// Controller button events: dispatch through the View's controller handlers
+	// which already convert to mouse/key events as appropriate
+	if (isControllerButton) {
+		Point screenPos = EventMgr::MousePos();
+		if (!frame.PointInside(screenPos) && trackingView == nullptr) {
+			return true;
+		}
+
+		target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
+		assert(target == nullptr || target->IsVisible());
+
+		if (target == nullptr) {
+			target = this;
+		} else if (target->IsDisabled()) {
+			return true; // absorb the event
+		}
+
+		if (event.type == Event::ControllerButtonDown) {
+			TrySetFocus(target);
+			target->ControllerButtonDown(event.controller);
+			trackingView = target;
+		} else {
+			if (trackingView) {
+				trackingView->ControllerButtonUp(event.controller);
+			} else if (target) {
+				target->ControllerButtonUp(event.controller);
+			}
+			trackingView = NULL;
 		}
 		return true;
 	}
@@ -587,7 +621,7 @@ bool Window::DispatchEvent(const Event& event)
 			DispatchTouchUp(target, event.touch, event.mod);
 			break;
 		default:
-#ifdef USE_SDL_CONTROLLER_API
+#ifndef USE_SDL_CONTROLLER_API
 			// If controller api is not used, this maybe reached if a controller is used.
 			// others should be handled above
 			Log(ERROR, "Window", "Unhandled event type generated: {}", event.type);
