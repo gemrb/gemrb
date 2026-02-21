@@ -733,7 +733,8 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				scrollKeysActive |= arrowKey;
 
 				// If the opposite arrow key is held down, the new key press overrides it:
-				unsigned int oppositeKey = (arrowKey & 1) ? arrowKey << 1 : arrowKey >> 1;
+				// Each pair shares adjacent bits: LEFT|RIGHT = bits 0,1 and UP|DOWN = bits 2,3
+				unsigned int oppositeKey = (arrowKey & (SCROLL_LEFT | SCROLL_UP)) ? arrowKey << 1 : arrowKey >> 1;
 				scrollKeysActive &= ~oppositeKey;
 
 				// Update the vector to start scrolling in the direction that was pressed:
@@ -1153,7 +1154,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& key, unsigned short mod)
 
 			// If the opposite arrow key is still held down, switch to that direction:
 			unsigned int oppositeKey;
-			oppositeKey = releasedKey & 1 ? releasedKey << 1 : releasedKey >> 1;
+			oppositeKey = (releasedKey & (SCROLL_LEFT | SCROLL_UP)) ? releasedKey << 1 : releasedKey >> 1;
 			if (scrollKeysDown & oppositeKey) {
 				scrollKeysActive |= oppositeKey;
 			}

@@ -309,50 +309,52 @@ void SDLVideoDriver::ProcessAxisMotion() // FIXME: verify
 		EvntManager->DispatchEvent(std::move(e));
 	}
 
-	// 2) map scroll
-	// 2.1) first send key up for every scroll key we set as down last frame
-	if (gamepadControl.gamepadScrollDownKeyPressed) {
-		gamepadControl.gamepadScrollDownKeyPressed = false;
-		auto e = EventMgr::CreateKeyEvent(GEM_DOWN, false, 0);
-		EvntManager->DispatchEvent(std::move(e));
-	}
-	if (gamepadControl.gamepadScrollUpKeyPressed) {
-		gamepadControl.gamepadScrollUpKeyPressed = false;
-		auto e = EventMgr::CreateKeyEvent(GEM_UP, false, 0);
-		EvntManager->DispatchEvent(std::move(e));
-	}
-	if (gamepadControl.gamepadScrollRightKeyPressed) {
+	// 2) map scroll - send key down/up events for scroll keys on axis value transitions
+	const bool wantRight = gamepadControl.xAxisRValue > 0;
+	const bool wantLeft = gamepadControl.xAxisRValue < 0;
+	const bool wantDown = gamepadControl.yAxisRValue > 0;
+	const bool wantUp = gamepadControl.yAxisRValue < 0;
+
+	if (gamepadControl.gamepadScrollRightKeyPressed && !wantRight) {
 		gamepadControl.gamepadScrollRightKeyPressed = false;
 		auto e = EventMgr::CreateKeyEvent(GEM_RIGHT, false, 0);
 		EvntManager->DispatchEvent(std::move(e));
 	}
-	if (gamepadControl.gamepadScrollLeftKeyPressed) {
+	if (gamepadControl.gamepadScrollLeftKeyPressed && !wantLeft) {
 		gamepadControl.gamepadScrollLeftKeyPressed = false;
 		auto e = EventMgr::CreateKeyEvent(GEM_LEFT, false, 0);
 		EvntManager->DispatchEvent(std::move(e));
 	}
+	if (gamepadControl.gamepadScrollDownKeyPressed && !wantDown) {
+		gamepadControl.gamepadScrollDownKeyPressed = false;
+		auto e = EventMgr::CreateKeyEvent(GEM_DOWN, false, 0);
+		EvntManager->DispatchEvent(std::move(e));
+	}
+	if (gamepadControl.gamepadScrollUpKeyPressed && !wantUp) {
+		gamepadControl.gamepadScrollUpKeyPressed = false;
+		auto e = EventMgr::CreateKeyEvent(GEM_UP, false, 0);
+		EvntManager->DispatchEvent(std::move(e));
+	}
 
-	// 2.2) if user moves the axis, treat it as a discrete input and send proper scroll-related keys
-	if (gamepadControl.xAxisRValue != 0 || gamepadControl.yAxisRValue != 0) {
-		if (gamepadControl.xAxisRValue > gamepadControl.JOY_R_DEADZONE) {
-			Event e = EventMgr::CreateKeyEvent(GEM_RIGHT, true, 0);
-			EvntManager->DispatchEvent(std::move(e));
-			gamepadControl.gamepadScrollRightKeyPressed = true;
-		} else if (gamepadControl.xAxisRValue < -gamepadControl.JOY_R_DEADZONE) {
-			Event e = EventMgr::CreateKeyEvent(GEM_LEFT, true, 0);
-			EvntManager->DispatchEvent(std::move(e));
-			gamepadControl.gamepadScrollLeftKeyPressed = true;
-		}
-
-		if (gamepadControl.yAxisRValue > gamepadControl.JOY_R_DEADZONE) {
-			Event e = EventMgr::CreateKeyEvent(GEM_DOWN, true, 0);
-			EvntManager->DispatchEvent(std::move(e));
-			gamepadControl.gamepadScrollDownKeyPressed = true;
-		} else if (gamepadControl.yAxisRValue < -gamepadControl.JOY_R_DEADZONE) {
-			Event e = EventMgr::CreateKeyEvent(GEM_UP, true, 0);
-			EvntManager->DispatchEvent(std::move(e));
-			gamepadControl.gamepadScrollUpKeyPressed = true;
-		}
+	if (wantRight && !gamepadControl.gamepadScrollRightKeyPressed) {
+		gamepadControl.gamepadScrollRightKeyPressed = true;
+		auto e = EventMgr::CreateKeyEvent(GEM_RIGHT, true, 0);
+		EvntManager->DispatchEvent(std::move(e));
+	}
+	if (wantLeft && !gamepadControl.gamepadScrollLeftKeyPressed) {
+		gamepadControl.gamepadScrollLeftKeyPressed = true;
+		auto e = EventMgr::CreateKeyEvent(GEM_LEFT, true, 0);
+		EvntManager->DispatchEvent(std::move(e));
+	}
+	if (wantDown && !gamepadControl.gamepadScrollDownKeyPressed) {
+		gamepadControl.gamepadScrollDownKeyPressed = true;
+		auto e = EventMgr::CreateKeyEvent(GEM_DOWN, true, 0);
+		EvntManager->DispatchEvent(std::move(e));
+	}
+	if (wantUp && !gamepadControl.gamepadScrollUpKeyPressed) {
+		gamepadControl.gamepadScrollUpKeyPressed = true;
+		auto e = EventMgr::CreateKeyEvent(GEM_UP, true, 0);
+		EvntManager->DispatchEvent(std::move(e));
 	}
 }
 
