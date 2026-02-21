@@ -1637,7 +1637,7 @@ Projectile::ProjectileState Projectile::GetNextExplosionState()
 	StopSound();
 	UpdateChildren();
 
-	//Delay explosion, it could even be revoked with PAF_SYNC (see skull trap)
+	// delay explosion, it could even be revoked with PAF_DELAYED (see skull trap)
 	if (extensionDelay) {
 		extensionDelay--;
 		// proper scorchers hit at the start then have a delayed hit at the end
