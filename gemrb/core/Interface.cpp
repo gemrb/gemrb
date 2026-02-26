@@ -4157,10 +4157,9 @@ ieDword Interface::TranslateStat(const std::string& statName)
 // Optionally an override stat value can be specified (needed for use in pcfs).
 int Interface::ResolveStatBonus(const Actor* actor, const ResRef& tableName, ieDword flags, int value)
 {
-	AutoTable mtm = gamedata->LoadTable(tableName);
+	AutoTable mtm = gamedata->LoadTable(tableName, true);
 	if (!mtm) {
-		Log(ERROR, "Core", "Cannot resolve stat bonus.");
-		return -1;
+		return 0;
 	}
 	TableMgr::index_t count = mtm->GetRowCount();
 	if (count < 1) {
