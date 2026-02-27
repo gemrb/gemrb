@@ -107,6 +107,7 @@ def StartTextScreen ():
 		GemRB.LoadMusicPL (MusicName + ".mus")
 
 	TextScreen = GemRB.LoadWindow (ID, "GUICHAP")
+	TextScreen.OnClose (ReactivateGame)
 	TextArea = TextScreen.GetControl (2)
 	TextArea.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	TextArea.SetColor (ColorWhitish, TA_COLOR_INITIALS)
@@ -185,7 +186,9 @@ def EndTextScreen ():
 		TextScreen.Close ()
 		GemRB.HardEndPL ()
 		GemRB.PlaySound(None, CHAN_GUI, 0, 0, SND_SPEECH)
+	ReactivateGame ()
 
+def ReactivateGame():
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(False)
 	ToggleAmbients (1)
