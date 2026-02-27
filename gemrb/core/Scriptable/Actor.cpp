@@ -178,7 +178,7 @@ static int QslotTranslation = false;
 static int DeathOnZeroStat = true;
 static int IWDSound = false;
 static ieDword TranslucentShadows = 0;
-static unsigned int SpellStatesSize = 0; //and this is for the spellStates bitfield
+static ieDword SpellStatesSize = 0; // the spellStates bitfield was stored as a sequence of ints
 
 //letters for char sound resolution bg1/bg2
 static EnumArray<Verbal, char> csound { '\0' };
@@ -10194,22 +10194,22 @@ void Actor::SetOverlay(unsigned int overlay)
 }
 
 //returns true if spell state is already set or illegal
-bool Actor::SetSpellState(unsigned int spellstate) const
+bool Actor::SetSpellState(ieDword spellstate) const
 {
 	if (spellstate >= SpellStatesSize << 5) return true;
-	unsigned int pos = spellstate >> 5;
-	unsigned int bit = 1 << (spellstate & 31);
+	ieDword pos = spellstate >> 5;
+	ieDword bit = 1 << (spellstate & 31);
 	if (spellStates[pos] & bit) return true;
 	spellStates[pos] |= bit;
 	return false;
 }
 
 //returns true if spell state is already set
-bool Actor::HasSpellState(unsigned int spellstate) const
+bool Actor::HasSpellState(ieDword spellstate) const
 {
 	if (spellstate >= SpellStatesSize << 5) return false;
-	unsigned int pos = spellstate >> 5;
-	unsigned int bit = 1 << (spellstate & 31);
+	ieDword pos = spellstate >> 5;
+	ieDword bit = 1 << (spellstate & 31);
 	if (spellStates[pos] & bit) return true;
 	return false;
 }

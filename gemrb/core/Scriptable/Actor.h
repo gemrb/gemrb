@@ -973,9 +973,9 @@ public:
 	/* Enables an overlay */
 	void SetOverlay(unsigned int overlay);
 	/* Checks and sets a spellstate if it wasn't set yet */
-	bool SetSpellState(unsigned int spellstate) const;
+	bool SetSpellState(ieDword spellstate) const;
 	/* Checks a spellstate */
-	bool HasSpellState(unsigned int spellstate) const;
+	bool HasSpellState(ieDword spellstate) const;
 	/* Checks a feat */
 	bool HasFeat(Feat feat) const;
 	/* Reports projectile immunity, nonzero if immune */
