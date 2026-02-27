@@ -44,6 +44,7 @@ def InitJournalWindow (JournalWindow):
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 	
 	TextArea = JournalWindow.GetControl (1)
+	JournalWindow.SetEventProxy (TextArea)
 
 	Button = JournalWindow.GetControl (3)
 	Button = JournalWindow.ReparentSubview (Button, TextArea)

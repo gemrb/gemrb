@@ -141,6 +141,7 @@ def OpenQuestsWindow ():
 	List.OnSelect (OnJournalQuestSelect)
 
 	QuestDesc = QuestsWindow.GetControl (3)
+	QuestsWindow.SetEventProxy (QuestsList)
 
 	EvaluateAllQuests ()
 	PopulateQuestsList ()
@@ -260,6 +261,7 @@ def OpenBeastsWindow ():
 	Button.OnPress (lambda: CloseAll(BeastsWindow))
 
 	BeastsList = List = BeastsWindow.GetControl (0)
+	BeastsWindow.SetEventProxy (BeastsList)
 	List.SetVarAssoc ('SelectedBeast', None)
 	List.OnSelect (OnJournalBeastSelect)
 
@@ -341,6 +343,7 @@ def OpenLogWindow ():
 
 	# text area
 	Text = LogWindow.GetControl (2)
+	LogWindow.SetEventProxy (Text)
 
 	# limit the log to the last entries (original did something similar)
 	js = GemRB.GetJournalSize (0)

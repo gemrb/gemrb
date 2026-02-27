@@ -42,6 +42,9 @@ def InitJournalWindow (JournalWindow):
 	#StartYear is the year of the lowest ingame date to be printed
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 
+	TextArea = JournalWindow.GetControl (1)
+	JournalWindow.SetEventProxy (TextArea)
+
 	Button = JournalWindow.GetControl (3)
 	Button.OnPress (JournalPrevSectionPress)
 

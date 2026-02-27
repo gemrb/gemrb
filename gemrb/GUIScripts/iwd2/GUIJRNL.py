@@ -43,7 +43,10 @@ def InitJournalWindow (Window):
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 		
 	JournalWindow = Window
-	
+
+	TextArea = JournalWindow.GetControl (1)
+	JournalWindow.SetEventProxy (TextArea)
+
 	Button = Window.GetControl (3)
 	Button.OnPress (JournalPrevSectionPress)
 

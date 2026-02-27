@@ -204,6 +204,7 @@ def UpdateLogWindow (JournalWindow):
 	print ("Chapter", Chapter, "Section", Section)
 
 	Text = JournalWindow.GetControl (1)
+	JournalWindow.SetEventProxy (Text)
 	Text.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
 
 	Text.Clear ()
