@@ -6144,14 +6144,14 @@ static PyObject* GemRB_SetPlayerStat(PyObject* /*self*/, PyObject* args)
 {
 	int globalID;
 	unsigned int StatID;
-	stat_t StatValue;
+	long StatValue;
 	int pcf = 1;
 	PARSE_ARGS(args, "iIl|i", &globalID, &StatID, &StatValue, &pcf);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
 	//Setting the creature's base stat
-	SetCreatureStat(actor, StatID, StatValue, pcf);
+	SetCreatureStat(actor, StatID, static_cast<stat_t>(StatValue), pcf);
 	Py_RETURN_NONE;
 }
 
