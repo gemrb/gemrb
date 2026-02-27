@@ -673,7 +673,6 @@ bool Window::UnRegisterHotKeyCallback(const EventMgr::EventCallback& cb, Keyboar
 
 bool Window::OnMouseDrag(const MouseEvent& me)
 {
-	assert(me.buttonStates);
 	// dragging the window to a new position. only happens with left mouse.
 	if (IsDraggable()) {
 		Point newOrigin = frame.origin - me.Delta();
