@@ -136,7 +136,7 @@ bool BAMImporter::Import(DataStream* str)
 		// BAM v2 (EEs) supports alpha, but for backwards compatibility an alpha of 0 is still 255
 		color.a = a ? a : 255;
 	}
-	palette->CopyColors(0, buffer.cbegin(), buffer.cend());
+	palette->CopyColors(buffer);
 
 	return true;
 }

@@ -194,7 +194,7 @@ void SDLSurfaceSprite2D::ShadePalette(BlitFlags renderflags, const Color* tint) 
 		}
 	}
 
-	shadedPalette->CopyColors(0, buffer.cbegin(), buffer.cend());
+	shadedPalette->CopyColors(buffer);
 }
 
 bool SDLSurfaceSprite2D::NeedToUpdatePalette() const noexcept

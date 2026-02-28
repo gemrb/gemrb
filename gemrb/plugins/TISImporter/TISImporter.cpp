@@ -202,7 +202,7 @@ Holder<Sprite2D> TISImporter::GetTilePaletted(int index)
 		}
 	}
 
-	pal->CopyColors(0, buffer.cbegin(), buffer.cend());
+	pal->CopyColors(buffer);
 
 	fmt.ColorKey = ck;
 	fmt.HasColorKey = pal->GetColorAt(ck) == ColorGreen;

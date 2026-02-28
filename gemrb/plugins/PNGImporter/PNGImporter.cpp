@@ -207,7 +207,7 @@ int PNGImporter::GetPalette(int colors, Palette& pal)
 		}
 	}
 
-	pal.CopyColors(0, buffer.cbegin(), buffer.cend());
+	pal.CopyColors(buffer);
 
 	return (num_alpha == 1) ? 0 : -1;
 }
