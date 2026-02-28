@@ -716,6 +716,13 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 		case GEM_LEFT:
 		case GEM_RIGHT:
 			{
+				if (InDialog()) {
+					// work around the fact that the MessageWindow is ignoring events
+					TextArea* ta = core->GetMessageTextArea();
+					int delta = ta->LineHeight() * (keycode == GEM_UP ? 1 : -1);
+					ta->ScrollDelta(Point(0, delta));
+					break;
+				}
 				if (Flags() & IgnoreEvents) {
 					break;
 				}
