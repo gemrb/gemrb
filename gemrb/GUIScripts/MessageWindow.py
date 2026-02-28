@@ -196,12 +196,12 @@ def UpdateControlStatus(init = False):
 	ExpandButton = MessageWindow.GetControl(0)
 	ExpandButton.SetDisabled(False)
 	ExpandButton.SetResizeFlags(IE_GUI_VIEW_RESIZE_TOP)
-	ExpandButton.SetHotKey(chr(0x8d), 0, True) # GEM_PGUP
+	ExpandButton.SetHotKey(GEM_PGUP, 0, True)
 
 	ContractButton = MessageWindow.GetControl(3)
 	ContractButton.SetFlags(IE_GUI_VIEW_INVISIBLE|IE_GUI_VIEW_DISABLED, OP_NAND)
 	ContractButton.SetResizeFlags(IE_GUI_VIEW_RESIZE_BOTTOM)
-	ContractButton.SetHotKey(chr(0x8e), 0, True) # GEM_PGDOWN
+	ContractButton.SetHotKey(GEM_PGDOWN, 0, True)
 	
 	def GetGSFlags():
 		GSFlags = GemRB.GetGUIFlags()

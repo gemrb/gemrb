@@ -109,6 +109,10 @@ GEM_MB_ACTION               = 1
 GEM_MB_MENU                 = 4
 GEM_LEFT = chr(0x81)
 GEM_RIGHT = chr(0x82)
+GEM_RETURN = chr(0x86)
+GEM_ESCAPE = chr(0x8c)
+GEM_PGUP = chr(0x8d)
+GEM_PGDOWN = chr(0x8e)
 
 IE_ACT_MOUSE_PRESS   = 0
 IE_ACT_MOUSE_DRAG    = 1

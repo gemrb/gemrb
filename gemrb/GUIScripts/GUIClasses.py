@@ -357,12 +357,10 @@ class GButton(GControl):
 		return self.SetPicture(GemRB.GetSprite(resref, pal, cycle, frame))
 
 	def MakeDefault(self, glob=False):
-		# return key
-		return self.SetHotKey(chr(0x86), 0, glob)
+		return self.SetHotKey(GEM_RETURN, 0, glob)
 
 	def MakeEscape(self, glob=False):
-		# escape key
-		return self.SetHotKey(chr(0x8c), 0, glob)
+		return self.SetHotKey(GEM_ESCAPE, 0, glob)
 
 	def CreateLabel(self, labelid, *args):
 		frame = self.GetFrame()
