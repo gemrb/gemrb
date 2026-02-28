@@ -90,6 +90,7 @@ def NextDialogState ():
 
 	ContinueWindow.GetControl(0).SetVisible(False)
 	ContinueWindow.GetControl(0).SetDisabled(True)
+	GemRB.GetView ("MSGWIN").Focus ()
 
 def OpenEndMessageWindow ():
 	Button = ContinueWindow.GetControl (0)
@@ -104,10 +105,11 @@ def OpenEndMessageWindow ():
 	Button.MakeDefault(True)
 
 def OpenContinueMessageWindow ():
-	#continue
+	# continue button
 	Button = ContinueWindow.GetControl (0)
 	Button.SetVisible(True)
 	Button.SetDisabled(False)
+	ContinueWindow.Focus ()
 	ContinueStrref = 9372
 	if GameCheck.IsGemRBDemo ():
 		ContinueStrref = 66
