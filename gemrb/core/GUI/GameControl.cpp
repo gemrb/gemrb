@@ -2566,6 +2566,7 @@ void GameControl::PerformActionOn(Actor* actor)
 		ResetTargetMode();
 	}
 
+	Actor* source = nullptr;
 	switch (type) {
 		case ACT_NONE: //none
 			if (!actor->ValidTarget(GA_SELECT)) {
@@ -2587,7 +2588,7 @@ void GameControl::PerformActionOn(Actor* actor)
 
 			// talk (first selected talks)
 			if (!game->selected.empty()) {
-				Actor* source = GetTalkInitiator();
+				source = GetTalkInitiator();
 				if (source) {
 					TryToTalk(source, actor);
 				}
@@ -2614,7 +2615,7 @@ void GameControl::PerformActionOn(Actor* actor)
 			break;
 		case ACT_THIEVING:
 			if (game->selected.size() == 1) {
-				Actor* source = core->GetFirstSelectedActor();
+				source = core->GetFirstSelectedActor();
 				if (source) {
 					TryToPick(source, actor);
 				}
