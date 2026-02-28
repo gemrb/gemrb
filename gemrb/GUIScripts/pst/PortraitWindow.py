@@ -148,6 +148,8 @@ def UpdatePortraitButton(Button):
 	if not portrait:
 		Button.SetVisible(False)
 		Button.SetAnimation(None)
+		ButtonHP = Button.Window.GetControl (6 + Button.ControlID)
+		ButtonHP.SetVisible (False)
 		return
 
 	Button.SetVisible (True)
@@ -165,7 +167,7 @@ def UpdatePortraitButton(Button):
 	g = int (255 * ratio)
 
 	ButtonHP = Button.Window.GetControl(6 + Button.ControlID)
-
+	ButtonHP.SetVisible (True)
 	ButtonHP.SetColor ({'r' : r, 'g' : g, 'b' : 0})
 	ButtonHP.SetPictureClipping (ratio)
 
