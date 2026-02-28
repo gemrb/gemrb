@@ -124,6 +124,9 @@ def OpenFloatMenuWindow (x=0, y=0):
 			UseSpell()
 		elif float_menu_mode == MENU_MODE_ABILITIES:
 			UseSpell()
+
+		# pst reselected the original selection if it changed, however we
+		# don't save it, so we wouldn't know what to restore it to
 		return
 
 	if not GemRB.GameGetFirstSelectedPC ():

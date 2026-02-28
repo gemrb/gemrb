@@ -346,7 +346,7 @@ def AIPress (toggle=1):
 # NOTE: the following two features are only used in pst
 # which=INVENTORY|STATS|FMENU
 def GetActorPortrait (actor, which):
-	#return GemRB.GetPlayerPortrait( actor, which)
+	# GemRB.GetPlayerPortrait just returns the stored portrait
 
 	# only the lowest byte is meaningful here (OneByteAnimID)
 	anim_id = GemRB.GetPlayerStat (actor, IE_ANIMATION_ID) & 255

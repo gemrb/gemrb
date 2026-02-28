@@ -108,7 +108,6 @@ def SelectFormation ():
 	Window = FormationWindow
 	
 	formation = GemRB.GetVar ("SelectedFormation")
-	print("FORMATION:", formation)
 	if last_formation != None and last_formation != formation:
 		Button = Window.GetControl (last_formation)
 		Button.SetState (IE_GUI_BUTTON_UNPRESSED)

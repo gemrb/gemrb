@@ -99,9 +99,6 @@ def UpdateMageWindow (Window=None):
 			Icon.SetTooltip ('')
 			Icon.EnableBorder (0, 0)
 
-	#--------------------------test-----------------------------#
-	print("max_mem_cnt is: ", max_mem_cnt)
-	print("mem_cnt is:     ", mem_cnt)
 	known_cnt = GemRB.GetKnownSpellsCount (pc, spelltype, level)
 	btncount = 20
 	i = 0
