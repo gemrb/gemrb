@@ -453,6 +453,7 @@ def FloatMenuSelectPreviousPC ():
 		previous = 1
 	elif previous == 0:
 		previous = GemRB.GetPartySize ()
+	GemRB.GameSelectPCSingle (previous)
 	GemRB.GameSelectPC (previous, 1, SELECT_REPLACE)
 	# NOTE: it invokes FloatMenuSelectAnotherPC() through selection change handler
 	return
@@ -463,7 +464,9 @@ def FloatMenuSelectNextPC ():
 		OpenFloatMenuWindow ()
 		return
 
-	GemRB.GameSelectPC (sel % GemRB.GetPartySize () + 1, 1, SELECT_REPLACE)
+	nextPC = sel % GemRB.GetPartySize () + 1
+	GemRB.GameSelectPCSingle (nextPC)
+	GemRB.GameSelectPC (nextPC, 1, SELECT_REPLACE)
 	# NOTE: it invokes FloatMenuSelectAnotherPC() through selection change handler
 	return
 
@@ -497,7 +500,6 @@ def FloatMenuSelectWeapons ():
 
 def FloatMenuSelectItems ():
 	ResetMenuState (MENU_MODE_ITEMS)
-	GemRB.GameControlSetTargetMode (TARGET_MODE_CAST)
 	UpdateFloatMenuWindow ()
 	return
 
