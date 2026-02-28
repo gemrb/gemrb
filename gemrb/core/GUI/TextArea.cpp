@@ -533,7 +533,7 @@ int TextArea::LineHeight() const
 
 void TextArea::ScrollDelta(const Point& p)
 {
-	scrollview.ScrollTo(p);
+	scrollview.ScrollDelta(p);
 }
 
 void TextArea::ScrollTo(const Point& p)
