@@ -701,6 +701,10 @@ def OpenItemAmountWindow (btn, location = "inventory"):
 	else:
 		slot_item = GemRB.GetContainerItem (pc, UsedSlot)
 
+	item = GemRB.GetItem (slot_item['ItemResRef'])
+	if item['MaxStackAmount'] <= 1: # is it stackable at all?
+		return
+
 	if slot_item:
 		StackAmount = slot_item["Usages0"]
 	else:
