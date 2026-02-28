@@ -32,6 +32,7 @@ def OnLoad():
 	
 	PartySelectWindow = GemRB.LoadWindow(10, "GUISP")
 	TextArea = PartySelectWindow.GetControl(6)
+	PartySelectWindow.SetEventProxy (TextArea)
 	
 	ModifyButton = PartySelectWindow.GetControl(12)
 	ModifyButton.OnPress (ModifyPress)

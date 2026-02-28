@@ -66,8 +66,10 @@ def InitSpellBookWindow (Window):
 	# book left / right
 	Button = Window.GetControl (92)
 	Button.OnPress (SpellBookCycle)
+	Button.SetHotKey (GEM_LEFT, 0, True)
 	Button = Window.GetControl (93)
 	Button.OnPress (SpellBookCycle)
+	Button.SetHotKey (GEM_RIGHT, 0, True)
 
 	# scrollbar for known spells
 	ScrollBar = Window.GetControl (54)
@@ -111,6 +113,8 @@ ToggleSpellBookWindow = GUICommonWindows.CreateTopWinLoader(2, "GUISPL", GUIComm
 OpenSpellBookWindow = GUICommonWindows.CreateTopWinLoader(2, "GUISPL", GUICommonWindows.OpenWindowOnce, NewSpellBookWindow, SelectedNewPlayer, True)
 
 def SpellBookCycle (btn):
+	if not btn.Value: # can be triggered via keyboard if there's no spellbook
+		return
 	Button = btn.Window.GetControl (88 + btn.Value)
 	Button.SetState (IE_GUI_BUTTON_SELECTED)
 	UpdateSpellBookWindow (btn.Window)

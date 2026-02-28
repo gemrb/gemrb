@@ -66,6 +66,7 @@ def OnLoad():
 
 	DoneButton = ClassWindow.GetControl (0)
 	TextAreaControl = ClassWindow.GetControl (16)
+	ClassWindow.SetEventProxy (TextAreaControl)
 	BackButton = ClassWindow.GetControl (17)
 
 	SetupClassList ()

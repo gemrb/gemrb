@@ -49,9 +49,11 @@ def InitJournalWindow (Window):
 
 	Button = Window.GetControl (3)
 	Button.OnPress (JournalPrevSectionPress)
+	Button.SetHotKey (GEM_LEFT, 0, True)
 
 	Button = Window.GetControl (4)
 	Button.OnPress (JournalNextSectionPress)
+	Button.SetHotKey (GEM_RIGHT, 0, True)
 
 	Chapter = GemRB.GetGameVar("chapter")
 	UpdateJournalWindow (JournalWindow)

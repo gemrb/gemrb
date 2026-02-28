@@ -38,9 +38,11 @@ def InitMageWindow (Window):
 
 	Button = Window.GetControl (0)
 	Button.OnPress (MagePrevLevelPress)
+	Button.SetHotKey (GEM_LEFT, 0, True)
 
 	Button = Window.GetControl (1)
 	Button.OnPress (MageNextLevelPress)
+	Button.SetHotKey (GEM_RIGHT, 0, True)
 
 	# Setup memorized spells buttons
 	for i in range (12):
@@ -155,6 +157,7 @@ def OpenMageSpellInfoWindow (spell):
 
 	Text = Window.GetControl (2)
 	Text.SetText (spell['SpellDesc'])
+	Window.SetEventProxy (Text)
 
 	IconResRef = 'SPL' + spell['SpellbookIcon'][2:]
 

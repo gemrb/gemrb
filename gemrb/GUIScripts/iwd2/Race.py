@@ -59,6 +59,7 @@ def OnLoad():
 
 	TextAreaControl = RaceWindow.GetControl (9)
 	TextAreaControl.SetText (17237)
+	RaceWindow.SetEventProxy (TextAreaControl)
 
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (BackPress)

@@ -58,6 +58,7 @@ def OnLoad():
 
 	TextAreaControl = AlignmentWindow.GetControl(11)
 	TextAreaControl.SetText(9602)
+	AlignmentWindow.SetEventProxy (TextAreaControl)
 
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (BackPress)

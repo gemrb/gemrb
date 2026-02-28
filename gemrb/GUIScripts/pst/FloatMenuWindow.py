@@ -183,11 +183,13 @@ def OpenFloatMenuWindow (x=0, y=0):
 	Button = Window.GetControl (CID_PREV)
 	Button.SetTooltip (8197)
 	Button.OnPress (FloatMenuPreviousItem)
+	Button.SetHotKey (GEM_LEFT, 0, True)
 
 	# Rotate Items right (to end)
 	Button = Window.GetControl (CID_NEXT)
 	Button.SetTooltip (8198)
 	Button.OnPress (FloatMenuNextItem)
+	Button.SetHotKey (GEM_RIGHT, 0, True)
 
 	# 6 - 10 - items/spells/other
 	for i in range (CID_ABILITIES + 1, CID_HANDLE1):

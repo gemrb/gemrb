@@ -82,6 +82,7 @@ def OnLoad():
 
 	TextAreaControl = RaceWindow.GetControl(6)
 	TextAreaControl.SetText(CommonTables.Races.GetValue(RaceName, "DESC_REF"))
+	RaceWindow.SetEventProxy (TextAreaControl)
 
 	DoneButton.OnPress (NextPress)
 	BackButton.OnPress (BackPress)

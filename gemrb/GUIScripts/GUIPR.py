@@ -43,9 +43,11 @@ def InitPriestWindow (Window):
 	
 	Button = Window.GetControl (1)
 	Button.OnPress (PriestPrevLevelPress)
+	Button.SetHotKey (GEM_LEFT, 0, True)
 
 	Button = Window.GetControl (2)
 	Button.OnPress (PriestNextLevelPress)
+	Button.SetHotKey (GEM_RIGHT, 0, True)
 
 	#setup level buttons
 	if GameCheck.IsBG2OrEE ():
@@ -210,6 +212,7 @@ def OpenPriestSpellInfoWindow (spell):
 
 	Text = Window.GetControl (3)
 	Text.SetText (spell['SpellDesc'])
+	Window.SetEventProxy (Text)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

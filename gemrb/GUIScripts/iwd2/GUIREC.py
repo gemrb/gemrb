@@ -1002,6 +1002,7 @@ def UpdateRecordsWindow (Window):
 	RecordsTextArea = Window.GetControl (45)
 	RecordsTextArea.SetText ("")
 	RecordsTextArea.SetColor (ColorWhitish, TA_COLOR_INITIALS)
+	Window.SetEventProxy (RecordsTextArea)
 
 	DisplayCommon (pc)
 
@@ -1101,6 +1102,7 @@ def UpdateHelpWindow ():
 	ScrollBar = Window.GetControl (4)
 	ScrollBar.SetVarAssoc ("TopIndex", i)
 	ScrollBar.OnChange (RefreshHelpWindow)
+	Window.SetEventProxy (ScrollBar)
 
 	RefreshHelpWindow ()
 	return
@@ -1214,6 +1216,7 @@ def OpenLevelUpWindow ():
 	# description
 	TextArea = Window.GetControl (13)
 	TextArea.SetText (17242)
+	Window.SetEventProxy (TextArea)
 
 	# 14 scrollbar
 	# 14 static Level label
@@ -1240,6 +1243,7 @@ def LUClassPress ():
 	ClassDesc = CommonTables.Classes.GetRowName (i)
 	ClassDesc = CommonTables.Classes.GetValue (ClassDesc, "DESC_REF", GTV_REF)
 	TextArea.SetText (ClassDesc)
+	Window.SetEventProxy (TextArea)
 
 	# increase/decrease level label by LevelDiff (usually 1)
 	if OldLevelLabel != i:
@@ -1353,6 +1357,7 @@ def OpenLUKitWindow ():
 	# description
 	TextArea = Window.GetControl (13)
 	TextArea.SetText ("")
+	Window.SetEventProxy (TextArea)
 
     # skip to the first kit of this class
 	kitOffset = hasKits

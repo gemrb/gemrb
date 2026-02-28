@@ -65,9 +65,11 @@ def InitMageWindow (window):
 
 	Button = MageWindow.GetControl (1)
 	Button.OnPress (MagePrevLevelPress)
+	Button.SetHotKey (GEM_LEFT, 0, True)
 
 	Button = MageWindow.GetControl (2)
 	Button.OnPress (MageNextLevelPress)
+	Button.SetHotKey (GEM_RIGHT, 0, True)
 
 	# contingencies
 	Button = MageWindow.GetControl (55)
@@ -295,6 +297,7 @@ def OpenMageSpellInfoWindow (spell, kind):
 
 	Text = Window.GetControl (3)
 	Text.SetText (spell['SpellDesc'])
+	Window.SetEventProxy (Text)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

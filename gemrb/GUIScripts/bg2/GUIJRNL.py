@@ -47,11 +47,13 @@ def InitJournalWindow (JournalWindow):
 	# prev. chapter
 	Button = JournalWindow.GetControl (3)
 	Button.OnPress (PrevChapterPress)
+	Button.SetHotKey (GEM_LEFT, 0, True)
 
 	# next chapter
 	Button = JournalWindow.GetControl (4)
 	Button.OnPress (NextChapterPress)
-	
+	Button.SetHotKey (GEM_RIGHT, 0, True)
+
 	def Update():
 		UpdateLogWindow(JournalWindow)
 

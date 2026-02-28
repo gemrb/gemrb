@@ -81,6 +81,7 @@ def OpenSaveWindow ():
 
 	ScrollBar = Window.GetControl (13)
 	ScrollBar.OnChange (ScrollBarPress)
+	Window.SetEventProxy (ScrollBar)
 	Games = GemRB.GetSaveGames()
 	TopIndex = max (0, len(Games) - 4 + 1) #one more for the 'new game'
 

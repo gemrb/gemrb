@@ -552,10 +552,12 @@ def UpdateItemDisplay(Window, slotItem, itemtype):
 		#left scroll
 		Button = Window.GetControl (13)
 		Button.OnPress (lambda: CycleDisplayItem(slotItem["Slot"], pc, -1))
+		Button.SetHotKey (GEM_LEFT, 0, True)
 
 		#right scroll
 		Button = Window.GetControl (14)
 		Button.OnPress (lambda: CycleDisplayItem(slotItem["Slot"], pc, 1))
+		Button.SetHotKey (GEM_RIGHT, 0, True)
 
 	Window.ShowModal(MODAL_SHADOW_GRAY)
 	return

@@ -174,6 +174,7 @@ def OpenAbilitiesWindow(chargen, points):
 
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)
+	AbilityWindow.SetEventProxy (TextAreaControl)
 
 	if not chargen:
 		AbilityWindow.ShowModal (MODAL_SHADOW_GRAY)

@@ -49,10 +49,12 @@ def InitJournalWindow (JournalWindow):
 	Button = JournalWindow.GetControl (3)
 	Button = JournalWindow.ReparentSubview (Button, TextArea)
 	Button.OnPress (JournalPrevSectionPress)
+	Button.SetHotKey (GEM_LEFT, 0, True)
 
 	Button = JournalWindow.GetControl (4)
 	Button = JournalWindow.ReparentSubview (Button, TextArea)
 	Button.OnPress (JournalNextSectionPress)
+	Button.SetHotKey (GEM_RIGHT, 0, True)
 
 	Chapter = GemRB.GetGameVar("chapter")
 	return

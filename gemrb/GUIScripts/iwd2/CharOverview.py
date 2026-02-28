@@ -135,6 +135,8 @@ def UpdateOverview(CurrentStep):
 	
 	# Handle character overview information
 	TextAreaControl = CharGenWindow.GetControl(9)
+	CharGenWindow.SetEventProxy (TextAreaControl)
+
 	Tables = []
 	for tbl in ['races', 'classes', 'aligns', 'ability', 'skillsta', 'skills', 'featreq', 'feats']:
 		Tables.append(GemRB.LoadTable(tbl))
