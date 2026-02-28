@@ -3042,6 +3042,7 @@ std::string Map::dump(bool show_actors) const
 	AppendFormat(buffer, "Weather: {}\n", YesNo(AreaType & AT_WEATHER));
 	AppendFormat(buffer, "Area Type: {}\n", AreaType & (AT_CITY | AT_FOREST | AT_DUNGEON));
 	AppendFormat(buffer, "Can rest: {}\n", YesNo(core->GetGame()->CanPartyRest(RestChecks::Area)));
+	AppendFormat(buffer, "Projectile count: {}\n", projectiles.size());
 
 	if (show_actors) {
 		buffer.append("\n");
