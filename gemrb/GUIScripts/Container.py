@@ -133,7 +133,7 @@ def OpenContainerWindow ():
 		# must use a timed event because SetGameGUIHidden(False) sets a flag to unhide the gui next frame
 		# AFIK not needed, commented out in case it turns out there are conditions we will need it
 		# GemRB.SetTimedEvent (lambda: GemRB.GetView ("MSGWIN").SetVisible(False), 1)
-	else:
+	elif not GameCheck.IsPST ():
 		GemRB.GetView ("MSGWIN").SetVisible (False)
 		ActWin = GemRB.GetView ("ACTWIN")
 		if ActWin:
@@ -241,9 +241,10 @@ def CloseContainerWindow ():
 
 	ContainerWindow.Close ()
 	ContainerWindow = None
-	GemRB.GetView ("MSGWIN").SetVisible (True)
-	if GemRB.GetView ("ACTWIN"):
-		GemRB.GetView ("ACTWIN").SetVisible (True)
+	if not GameCheck.IsPST ():
+		GemRB.GetView ("MSGWIN").SetVisible (True)
+		if GemRB.GetView ("ACTWIN"):
+			GemRB.GetView ("ACTWIN").SetVisible (True)
 	SetGameGUIHidden(HideOnClose)
 
 	Table = GemRB.LoadTable ("containr")
