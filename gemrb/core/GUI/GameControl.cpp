@@ -2602,10 +2602,12 @@ void GameControl::PerformActionOn(Actor* actor)
 			break;
 		case ACT_CAST: //cast on target or use item on target
 			if (game->selected.size() == 1) {
-				Actor* source = core->GetFirstSelectedActor();
-				if (source) {
-					TryToCast(source, actor);
-				}
+				source = core->GetFirstSelectedActor();
+			} else {
+				source = game->GetSelectedPCSingle(true);
+			}
+			if (source) {
+				TryToCast(source, actor);
 			}
 			break;
 		case ACT_DEFEND:
@@ -2616,9 +2618,11 @@ void GameControl::PerformActionOn(Actor* actor)
 		case ACT_THIEVING:
 			if (game->selected.size() == 1) {
 				source = core->GetFirstSelectedActor();
-				if (source) {
-					TryToPick(source, actor);
-				}
+			} else {
+				source = game->GetSelectedPCSingle(true);
+			}
+			if (source) {
+				TryToPick(source, actor);
 			}
 			break;
 	}
