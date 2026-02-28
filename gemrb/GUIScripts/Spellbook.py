@@ -252,6 +252,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		if Start:
 			ActionsWindow.SetActionIconWorkaround (Button, ACT_LEFT, 0)
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
+			Button.SetHotKey (GEM_LEFT, 0, True)
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
@@ -339,6 +340,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		Button = Window.GetControl (Offset+buttonCount+1)
 		ActionsWindow.SetActionIconWorkaround (Button, ACT_RIGHT, buttonCount)
 		Button.SetText ("")
+		Button.SetHotKey (GEM_RIGHT, 0, True)
 		if len(memorizedSpells) - Start > 10:
 			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 		else:
