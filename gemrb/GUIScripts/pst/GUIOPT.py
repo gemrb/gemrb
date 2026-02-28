@@ -499,10 +499,15 @@ def PSTOptButton (ctlname, button_id, label_id, label_strref, action):
 
 	window = GemRB.GetView ("SUB_WIN")
 	button = window.GetControl (button_id)
-	button.OnPress (action)
 	help_ta = GemRB.GetView ("OPTHELP")
 	button.OnMouseEnter (lambda: help_ta.SetText (ctlname))
 	button.OnMouseLeave (lambda: help_ta.SetText (help_ta.Value))
+
+	# gamepad users don't generate mouseover events, so do it manually
+	def PressWithHelp ():
+		help_ta.SetText (ctlname)
+		action ()
+	button.OnPress (PressWithHelp)
 
 	GUIOPTControls.OptBuddyLabel (label_id, label_strref, ctlname, help_ta.Value)
 
