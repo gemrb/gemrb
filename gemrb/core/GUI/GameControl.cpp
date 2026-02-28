@@ -1729,9 +1729,10 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 	if (updateVPTimer && speed) {
 		updateVPTimer = false;
 		if (center) {
-			// also account for message window height, since it can cover the center of the window at lowest resolutions
+			// also account for message window height, since it can cover the center of the
+			// window at lowest resolutions and we want to center in the visible map space
 			// GlobalTimer does its own centering, so we only offset
-			p.y += mwinh;
+			p.y += mwinh / 2;
 		}
 		core->timer.SetMoveViewPort(p, speed, center);
 	} else if (canMove && p != viewport.origin) {
