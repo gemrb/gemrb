@@ -140,8 +140,8 @@ def UpdateSpellBookWindow (Window):
 	if len(ActiveSpellBooks) == 0:
 		GemRB.SetVar ("SelectedBook", None)
 	else:
-		Button = Window.GetControl (88)
-		Button.SetState (IE_GUI_BUTTON_SELECTED)
+		Button = Window.GetControl (88 + (GemRB.GetVar ("SelectedBook") or 0))
+		Button.SetState (IE_GUI_BUTTON_SELECTED) # will reset "SelectedBook"
 
 	BookIndex = GemRB.GetVar ("SelectedBook")
 	if BookIndex is not None:
