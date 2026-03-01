@@ -4195,7 +4195,7 @@ int fx_movement_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// ees added a new mode: Multiplicative Stacking Percentage Modifier: Movement = (Movement * fx->Parameter1) / 100
 	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS) && fx->Parameter2 == 5) {
 		// not using MOD_MULTIPLICATIVE or base stats to make it stackable
-		target->NewStat(IE_MOVEMENTRATE, fx->Parameter1 * target->GetStat(IE_MOVEMENTRATE), MOD_ABSOLUTE);
+		target->NewStat(IE_MOVEMENTRATE, fx->Parameter1 * target->GetStat(IE_MOVEMENTRATE) / 100, MOD_ABSOLUTE);
 	} else {
 		STAT_MOD(IE_MOVEMENTRATE);
 	}
