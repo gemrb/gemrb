@@ -384,6 +384,7 @@ IDS V1.0
 383 TRAP
 384 TRAP
 385 FBREATH
+# technically too high of an id for the original, but unlikely to be saved
 500 inarea5
 0x1001 INVTRAV
 0x1002 ABJURH

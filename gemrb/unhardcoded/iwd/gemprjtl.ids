@@ -354,6 +354,7 @@ IDS V1.0
 353 CCDAMAH
 354 RNG450
 355 RNG450
+# technically too high of an id for the original, but unlikely to be saved
 500 inarea5
 0x1001 INVTRAV
 0x1002 ABJURH
