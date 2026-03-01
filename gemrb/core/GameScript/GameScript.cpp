@@ -1532,7 +1532,7 @@ static void SetupObjects()
 				std::string buffer = fmt::format("{} is in collision with ", name);
 				printFunction(buffer, name, i);
 				Log(WARNING, "GameScript", "{}", buffer);
-			} else {
+			} else if (InDebugMode(DebugMode::ACTIONS)) {
 				std::string buffer = fmt::format("{} is a synonym of ", name);
 				printFunction(buffer, name, i);
 				Log(DEBUG, "GameScript", "{}", buffer);
