@@ -226,7 +226,7 @@ public:
 	bool HasItemType(ieDword type) const;
 	/** Looks for a particular item in the inventory.
 	 * flags: see ieCREItemFlagBits */
-	bool HasItem(const ResRef& resref, ieDword flags) const;
+	bool HasItem(const ResRef& resref, ieDword creFlags, ieDword flags = 0, int negate = 0) const;
 
 	void SetInventoryType(ieInventoryType arg);
 	void SetOwner(Actor* act) { Owner = act; }

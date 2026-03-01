@@ -311,7 +311,7 @@ int Inventory::CountItems(const ResRef& resRef, bool stacks, bool checkBags) con
 /** this function can look for stolen, equipped, identified, destructible
 		etc, items. You just have to specify the flags in the bitmask
 		specifying 1 in a bit signifies a requirement */
-bool Inventory::HasItem(const ResRef& resref, ieDword flags) const
+bool Inventory::HasItem(const ResRef& resref, ieDword creFlags, ieDword flags, int negate) const
 {
 	size_t slot = Slots.size();
 	while (slot--) {
@@ -319,11 +319,23 @@ bool Inventory::HasItem(const ResRef& resref, ieDword flags) const
 		if (!item) {
 			continue;
 		}
-		if ((flags & item->Flags) != flags) {
+		bool match = (creFlags & item->Flags) != creFlags;
+		match = negate & 1 ? !match : match;
+		if (match) {
 			continue;
 		}
-		if (item->ItemResRef != resref) {
+		if (!resref.IsEmpty() && item->ItemResRef != resref) {
 			continue;
+		}
+		if (flags) { // also check IE_ITEM_* bits
+			const Item* item2 = gamedata->GetItem(item->ItemResRef);
+			if (!item2) continue;
+			match = (flags & item2->Flags) != flags;
+			match = negate & 2 ? !match : match;
+			gamedata->FreeItem(item2, item->ItemResRef);
+			if (match) {
+				continue;
+			}
 		}
 		return true;
 	}
