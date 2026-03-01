@@ -405,6 +405,7 @@ void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 	actor->SetBase(parameters->int0Parameter, value);
 }
 
+// gemrb extension
 void GameScript::ChangeStatGlobal(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* scr = Sender;
@@ -1613,6 +1614,7 @@ void GameScript::RunAwayFromNoInterruptNoLeaveArea(Scriptable* Sender, Action* p
 	RunAwayFromCore(Sender, parameters, RunAwayFlags::NoInterrupt);
 }
 
+// gemrb extension
 void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 {
 	RunAwayFromCore(Sender, parameters, RunAwayFlags::LeaveArea | RunAwayFlags::UsePoint);
@@ -1960,7 +1962,7 @@ void GameScript::CreateVisualEffectObject(Scriptable* Sender, Action* parameters
 	CreateVisualEffectCore(tar, tar->Pos, parameters->resref0Parameter, parameters->int0Parameter);
 }
 
-// creates sticky vvc on actor or normal animation on object
+// gemrb extension: creates sticky vvc on actor or normal animation on object
 void GameScript::CreateVisualEffectObjectSticky(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
@@ -2840,6 +2842,7 @@ void GameScript::MakeGlobalOverride(Scriptable* Sender, Action* /*parameters*/)
 	game->AddNPC(act);
 }
 
+// gemrb extension
 void GameScript::UnMakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 {
 	Actor* act = Scriptable::As<Actor>(Sender);
@@ -3856,6 +3859,7 @@ void GameScript::SetQuestDone(Scriptable* /*Sender*/, Action* parameters)
 	game->AddJournalEntry(ieStrRef(parameters->int0Parameter), JournalSection::Solved, (ieByte) parameters->int2Parameter);
 }
 
+// gemrb extension
 void GameScript::RemoveJournalEntry(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->DeleteJournalEntry(ieStrRef(parameters->int0Parameter));
@@ -4003,7 +4007,7 @@ void GameScript::SetRegularName(Scriptable* Sender, Action* parameters)
 	target->SetName(ieStrRef(parameters->int0Parameter), 2);
 }
 
-/** this is a gemrb extension */
+// gemrb extension
 void GameScript::UnloadArea(Scriptable* /*Sender*/, Action* parameters)
 {
 	int map = core->GetGame()->FindMap(parameters->resref0Parameter);
@@ -4781,6 +4785,7 @@ void GameScript::PickPockets(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction();
 }
 
+// gemrb extension
 void GameScript::TakeItemList(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
@@ -4901,6 +4906,7 @@ void GameScript::ExpansionEndCredits(Scriptable* Sender, Action* parameters)
 //this covers:
 //QuitGame (play two of 3 movies in PST, display death screen with strref; names also in movval.ids)
 //EndGame (display death screen with strref)
+// LoseGame() from tobex
 void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 {
 	auto& vars = core->GetDictionary();
@@ -6299,6 +6305,7 @@ void GameScript::EscapeAreaObject(Scriptable* Sender, Action* parameters)
 	//EscapeAreaCore will do its ReleaseCurrentAction
 }
 
+// gemrb extension
 //This one doesn't require the object to be seen?
 //We don't have that feature yet, so this is the same as EscapeAreaObject
 void GameScript::EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters)
@@ -6476,6 +6483,7 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 	}
 }
 
+// gemrb extension
 void GameScript::ApplySpellPoint(Scriptable* Sender, Action* parameters)
 {
 	ResRef spellRes;
@@ -6486,8 +6494,7 @@ void GameScript::ApplySpellPoint(Scriptable* Sender, Action* parameters)
 	core->ApplySpellPoint(spellRes, Sender->GetCurrentArea(), parameters->pointParameter, Sender, parameters->int1Parameter);
 }
 
-//this is a gemrb extension
-//sets a variable to the stat value
+// gemrb extension: sets a variable to the stat value
 void GameScript::GetStat(Scriptable* Sender, Action* parameters)
 {
 	ieDword value = 0;
@@ -6656,7 +6663,7 @@ void GameScript::EnablePortalTravel(Scriptable* Sender, Action* parameters)
 	}
 }
 
-//unhardcoded iwd action (for the forge entrance change)
+// gemrb extension: unhardcoded iwd action (for the forge entrance change)
 void GameScript::ChangeDestination(Scriptable* Sender, Action* parameters)
 {
 	InfoPoint* ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectNameVar);
@@ -7023,6 +7030,7 @@ void GameScript::AddSuperKit(Scriptable* Sender, Action* parameters)
 	scr->ApplyKit(false);
 }
 
+// gemrb extension
 void GameScript::SetSelection(Scriptable* /*Sender*/, Action* parameters)
 {
 	GameControl* gc = core->GetGameControl();
@@ -7631,7 +7639,7 @@ void GameScript::SetupWishObject(Scriptable* Sender, Action* parameters)
 	SetupWishCore(Sender, target->GetStat(IE_WIS), parameters->int0Parameter);
 }
 
-//GemRB specific action
+// gemrb extension
 //Sets up multiple tokens randomly (one per 2da row)
 //the row label column sets the token names
 void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
@@ -7652,7 +7660,7 @@ void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
-//this is a gemrb extension for scriptable tracks
+// gemrb extension for scriptable tracks
 void GameScript::SetTrackString(Scriptable* Sender, Action* parameters)
 {
 	Map* map = Sender->GetCurrentArea();
@@ -7718,6 +7726,7 @@ void GameScript::MultiPlayerSync(Scriptable* Sender, Action* /*parameters*/)
 	Sender->SetWait(2);
 }
 
+// gemrb extension
 void GameScript::SetOriginalClass(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
@@ -7735,6 +7744,7 @@ void GameScript::SetOriginalClass(Scriptable* Sender, Action* parameters)
 	actor->SetMCFlag(classBit, BitOp(parameters->int1Parameter));
 }
 
+// gemrb extension
 void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);

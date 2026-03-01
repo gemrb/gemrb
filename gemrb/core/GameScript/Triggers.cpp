@@ -1048,6 +1048,7 @@ int GameScript::Contains(Scriptable* Sender, const Trigger* parameters)
 	return 0;
 }
 
+// gemrb extension
 int GameScript::StoreHasItem(Scriptable* /*Sender*/, const Trigger* parameters)
 {
 	return StoreHasItemCore(parameters->resref0Parameter, parameters->resref1Parameter);
@@ -1133,7 +1134,7 @@ int GameScript::HasItemSlot(Scriptable* Sender, const Trigger* parameters)
 	return 0;
 }
 
-//this is a GemRB extension
+// gemrb extension
 //HasItemTypeSlot(Object, SLOT, ItemType)
 //returns true if the item in SLOT is of ItemType
 int GameScript::HasItemTypeSlot(Scriptable* Sender, const Trigger* parameters)
@@ -1338,6 +1339,7 @@ int GameScript::HaveSpellParty(Scriptable* /*Sender*/, const Trigger* parameters
 	return 0;
 }
 
+// gemrb extension
 int GameScript::KnowSpell(Scriptable* Sender, const Trigger* parameters)
 {
 	const Actor* actor = Scriptable::As<Actor>(Sender);
@@ -1452,7 +1454,7 @@ int GameScript::NumTimesInteractedLT(Scriptable* Sender, const Trigger* paramete
 	return actor->PCStats->Interact[npcid] < (ieDword) parameters->int1Parameter ? 1 : 0;
 }
 
-//GemRB specific
+// gemrb extension
 //interacting npc counts were restricted to 24
 //gemrb will increase a local variable in the interacting npc, with the scriptname of the
 //target npc
@@ -1471,6 +1473,7 @@ int GameScript::NumTimesInteractedObject(Scriptable* Sender, const Trigger* para
 	return CheckVariable(Sender, tar->GetScriptName(), "LOCALS") == (ieDword) parameters->int0Parameter ? 1 : 0;
 }
 
+// gemrb extension
 int GameScript::NumTimesInteractedObjectGT(Scriptable* Sender, const Trigger* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -1486,6 +1489,7 @@ int GameScript::NumTimesInteractedObjectGT(Scriptable* Sender, const Trigger* pa
 	return CheckVariable(Sender, tar->GetScriptName(), "LOCALS") > (ieDword) parameters->int0Parameter ? 1 : 0;
 }
 
+// gemrb extension
 int GameScript::NumTimesInteractedObjectLT(Scriptable* Sender, const Trigger* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -1603,7 +1607,7 @@ int GameScript::InLine(Scriptable* Sender, const Trigger* parameters)
 	return 0;
 }
 
-//PST
+// gemrb extension
 int GameScript::AtLocation(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
@@ -2940,6 +2944,7 @@ int GameScript::IsExtendedNight(Scriptable* Sender, const Trigger* /*parameters*
 	return 0;
 }
 
+// gemrb extension
 int GameScript::AreaFlag(Scriptable* Sender, const Trigger* parameters)
 {
 	const Map* map = Sender->GetCurrentArea();
@@ -3657,6 +3662,7 @@ int GameScript::OutOfAmmo(Scriptable* Sender, const Trigger* parameters)
 	return 0;
 }
 
+// gemrb extension
 //returns true if a weapon is equipped and target is in range
 //if a bow is equipped without projectile, it is useless (but it will be a fist)!
 int GameScript::HaveUsableWeaponEquipped(Scriptable* Sender, const Trigger* /*parameters*/)
@@ -3927,6 +3933,7 @@ int GameScript::IsCreatureHiddenInShadows(Scriptable* Sender, const Trigger* /*p
 	return 0;
 }
 
+// gemrb extension
 int GameScript::IsWeather(Scriptable* /*Sender*/, const Trigger* parameters)
 {
 	const Game* game = core->GetGame();
@@ -4062,6 +4069,7 @@ int GameScript::TimerActive(Scriptable* Sender, const Trigger* parameters)
 	return 0;
 }
 
+// gemrb extension
 int GameScript::ActuallyInCombat(Scriptable* /*Sender*/, const Trigger* /*parameters*/)
 {
 	const Game* game = core->GetGame();
@@ -4171,6 +4179,7 @@ int GameScript::HasImmunityEffects(Scriptable* Sender, const Trigger* parameters
 #define SYSV_REPUTATION    2
 #define SYSV_PARTYGOLD     3
 
+// gemrb extension
 int GameScript::SystemVariable_Trigger(Scriptable* Sender, const Trigger* parameters)
 {
 	ieDword value;
@@ -4216,6 +4225,7 @@ int GameScript::SpellCastOnMe(Scriptable* Sender, const Trigger* parameters)
 	return Sender->MatchTriggerWithObject(trigger_spellcastonme, parameters->objectParameter, parameters->int0Parameter);
 }
 
+// gemrb extension
 int GameScript::CalendarDay(Scriptable* /*Sender*/, const Trigger* parameters)
 {
 	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime / core->Time.day_size);
@@ -4225,6 +4235,7 @@ int GameScript::CalendarDay(Scriptable* /*Sender*/, const Trigger* parameters)
 	return 0;
 }
 
+// gemrb extension
 int GameScript::CalendarDayGT(Scriptable* /*Sender*/, const Trigger* parameters)
 {
 	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime / core->Time.day_size);
@@ -4234,6 +4245,7 @@ int GameScript::CalendarDayGT(Scriptable* /*Sender*/, const Trigger* parameters)
 	return 0;
 }
 
+// gemrb extension
 int GameScript::CalendarDayLT(Scriptable* /*Sender*/, const Trigger* parameters)
 {
 	int day = core->GetCalendar()->GetCalendarDay(core->GetGame()->GameTime / core->Time.day_size);
@@ -4249,6 +4261,7 @@ int GameScript::TurnedBy(Scriptable* Sender, const Trigger* parameters)
 	return Sender->MatchTriggerWithObject(trigger_turnedby, parameters->objectParameter);
 }
 
+// gemrb extension
 //This is used for pst portals
 //usage: UsedExit(Protagonist, "sigil")
 //where sigil.2da contains all the exits that should trigger the teleport
@@ -4442,6 +4455,7 @@ int GameScript::NumBouncingSpellLevelLT(Scriptable* Sender, const Trigger* param
  */
 static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
 static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
+// was added to EEs
 int GameScript::ImmuneToSpellLevel(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
@@ -4559,6 +4573,7 @@ int GameScript::NumTrappingSpellLevelLT(Scriptable* Sender, const Trigger* param
 
 // Returns true if the target creature specified by Object is dual-classed and
 // the original class matches Class.
+// was added to EEs
 int GameScript::OriginalClass(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
@@ -4596,7 +4611,7 @@ int GameScript::OriginalClass(Scriptable* Sender, const Trigger* parameters)
  */
 int GameScript::Assign(Scriptable* /*Sender*/, const Trigger* /*parameters*/)
 {
-	// TODO: implement
+	// TODO: implement; it also has an action variant
 	return 0;
 }
 

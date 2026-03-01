@@ -18,3 +18,18 @@ IDS
 113 ForceSpellRES(S:RES*,O:Target,I:CastingLevel)
 114 ForceSpellPointRES(S:RES*,P:Target)
 114 ForceSpellPointRES(S:RES*,P:Target,I:CastingLevel)
+# LoseGame from tobex is just mapped to QuitGame
+#
+# gemrb extensions / gemrb-only actions (assign a non-conflicting id as needed):
+# ChangeStatGlobal
+# CreateVisualEffectObjectSticky
+# EscapeAreaObjectNoSee
+# GetStat
+# RemoveJournalEntry
+# RunAwayFromPoint
+# SetFavouritesTokens
+# SetOriginalClass
+# SetSelection
+# TakeItemList
+# UnloadArea
+# ... plus the ones at the start of the file with ids just below 400
