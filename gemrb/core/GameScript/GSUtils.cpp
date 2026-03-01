@@ -383,10 +383,9 @@ void TransformItemCore(Actor* actor, const Action* parameters, bool onlyone)
 }
 
 //check if an inventory (container or actor) has item (could be recursive ?)
-bool HasItemCore(const Inventory* inventory, const ResRef& itemname, ieDword flags)
+bool HasItemCore(const Inventory* inventory, const ResRef& itemname, ieDword flags, ieDword itemFlags, int negate)
 {
-	if (itemname.IsEmpty()) return false;
-	if (inventory->HasItem(itemname, flags)) {
+	if (inventory->HasItem(itemname, flags, itemFlags, negate)) {
 		return true;
 	}
 	int i = inventory->GetSlotCount();

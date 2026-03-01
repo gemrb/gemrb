@@ -81,7 +81,7 @@ int GetHPPercent(const Scriptable* Sender);
 unsigned int StoreCountItems(const ResRef& storeName, const ResRef& itemName);
 bool StoreHasItemCore(const ResRef& storename, const ResRef& itemname);
 bool RemoveStoreItem(const ResRef& storeName, const ResRef& itemName, ieDword count = 0);
-bool HasItemCore(const Inventory* inventory, const ResRef& itemname, ieDword flags);
+bool HasItemCore(const Inventory* inventory, const ResRef& itemname, ieDword flags, ieDword itemFlags = 0, int negate = 0);
 void ClickCore(Scriptable* Sender, const MouseEvent& me, int speed);
 void PlaySequenceCore(Scriptable* Sender, const Action* parameters, Animation::index_t value);
 void TransformItemCore(Actor* actor, const Action* parameters, bool onlyone);

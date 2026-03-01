@@ -663,6 +663,7 @@ public: //Script Functions
 	static int HasItemEquipped(Scriptable* Sender, const Trigger* parameters);
 	static int HasItemEquippedReal(Scriptable* Sender, const Trigger* parameters);
 	static int HasItemSlot(Scriptable* Sender, const Trigger* parameters);
+	static int HasItemType(Scriptable* Sender, const Trigger* parameters);
 	static int HasItemTypeSlot(Scriptable* Sender, const Trigger* parameters);
 	static int HasWeaponEquipped(Scriptable* Sender, const Trigger* parameters);
 	static int HaveAnySpells(Scriptable* Sender, const Trigger* parameters);

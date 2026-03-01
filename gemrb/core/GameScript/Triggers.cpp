@@ -1054,12 +1054,31 @@ int GameScript::StoreHasItem(Scriptable* /*Sender*/, const Trigger* parameters)
 }
 
 //the int0 parameter is an addition, normally it is 0
+// also as a variant: HasItemType(object, flags, ignoreDestructible)
+// returns true if there's any matching item
+// HasItemType can't look into bags due to flags type, while HasItem does
 int GameScript::HasItem(Scriptable* Sender, const Trigger* parameters)
 {
 	const Scriptable* scr = GetScriptableFromObject(Sender, parameters);
 	if (!scr) {
 		return 0;
 	}
+
+	if (parameters->resref0Parameter.IsEmpty()) { // HasItemType
+		const Actor* actor = Scriptable::As<Actor>(scr);
+		if (!actor) {
+			return 0;
+		}
+		// it's using itemflag.ids like DestroyAllFragileEquipment, so the bits
+		// are IE_ITEM_* not IE_INV_ITEM_* that we need for StoreHasItemCore
+		ieDword flags = parameters->int0Parameter;
+		ieDword creFlags = parameters->int1Parameter ? static_cast<ieDword>(IE_INV_ITEM_DESTRUCTIBLE) : 0;
+		if (HasItemCore(&actor->inventory, "", creFlags, flags, 1)) {
+			return 1;
+		}
+		return 0;
+	}
+
 	const Inventory* inventory = nullptr;
 	switch (scr->Type) {
 		case ST_ACTOR:

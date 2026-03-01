@@ -208,6 +208,7 @@ static const TriggerLink triggernames[] = {
 	{ "hasitemequippedreal", GameScript::HasItemEquippedReal, 0 },
 	{ "hasiteminslot", GameScript::HasItemSlot, 0 },
 	{ "hasitemslot", GameScript::HasItemSlot, 0 },
+	{ "hasitemtype", GameScript::HasItem, 0 },
 	{ "hasitemtypeslot", GameScript::HasItemTypeSlot, 0 }, //gemrb extension
 	{ "hasweaponequiped", GameScript::HasWeaponEquipped, 0 }, //a typo again
 	{ "hasweaponequipped", GameScript::HasWeaponEquipped, 0 },
