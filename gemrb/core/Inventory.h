@@ -84,7 +84,7 @@ enum class ieInventoryType {
 };
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-using ieCREItemFlagBits = enum ieCREItemFlagBits : uint32_t {
+enum ieCREItemFlagBits : uint32_t {
 	IE_INV_ITEM_IDENTIFIED = 1,
 	IE_INV_ITEM_UNSTEALABLE = 2,
 	IE_INV_ITEM_STOLEN = 4, // denotes steel items in pst
