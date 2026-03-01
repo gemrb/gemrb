@@ -26,7 +26,7 @@ namespace GemRB {
 
 enum class DebugMode : uint32_t {
 	NONE = 0,
-	REFERENCE = 1,
+	REFERENCE = 1, // unused
 	CUTSCENE = 2,
 	VARIABLES = 4,
 	ACTIONS = 8,
