@@ -75,6 +75,7 @@ static const TriggerLink triggernames[] = {
 	{ "acquired", GameScript::Acquired, 0 },
 	{ "alignment", GameScript::Alignment, 0 },
 	{ "allegiance", GameScript::Allegiance, 0 },
+	{ "amiinwatcherskeeppleaseignorethelackofapostophe", GameScript::AreaStartsWith, 0 },
 	{ "animstate", GameScript::AnimState, 0 },
 	{ "anypconmap", GameScript::AnyPCOnMap, 0 },
 	{ "anypcseesenemy", GameScript::AnyPCSeesEnemy, 0 },
@@ -218,6 +219,7 @@ static const TriggerLink triggernames[] = {
 	{ "havespell", GameScript::HaveSpell, 0 }, //these must be the same
 	{ "havespellparty", GameScript::HaveSpellParty, 0 },
 	{ "havespellres", GameScript::HaveSpell, 0 }, //they share the same ID
+	{ "haveusableweapon", GameScript::OutOfAmmo, 0 }, // BG(2)EE-only synonym or IESDP error
 	{ "haveusableweaponequipped", GameScript::HaveUsableWeaponEquipped, 0 },
 	{ "heard", GameScript::Heard, 0 },
 	{ "help", GameScript::Help_Trigger, 0 },
@@ -321,6 +323,7 @@ static const TriggerLink triggernames[] = {
 	{ "notstatecheck", GameScript::NotStateCheck, 0 },
 	{ "nulldialog", GameScript::NullDialog, 0 },
 	{ "nulldialogue", GameScript::NullDialog, 0 },
+	{ "numberoftimestalkedto", GameScript::NumTimesTalkedTo, 0 },
 	{ "numbouncingspelllevel", GameScript::NumBouncingSpellLevel, 0 },
 	{ "numbouncingspelllevelgt", GameScript::NumBouncingSpellLevelGT, 0 },
 	{ "numbouncingspelllevellt", GameScript::NumBouncingSpellLevelLT, 0 },
@@ -997,6 +1000,7 @@ static const ActionLink actionnames[] = {
 	{ "setnamelessdeathparty", GameScript::SetNamelessDeathParty, 0 },
 	{ "setnamelessdisguise", GameScript::SetNamelessDisguise, 0 },
 	{ "setnooneontrigger", GameScript::SetNoOneOnTrigger, 0 },
+	{ "setnowaitx", GameScript::NoAction, 0 }, // a stub in ees too
 	{ "setnumtimestalkedto", GameScript::SetNumTimesTalkedTo, 0 },
 	{ "setoriginalclass", GameScript::SetOriginalClass, 0 },
 	{ "setplayersound", GameScript::SetPlayerSound, 0 },
@@ -1043,7 +1047,7 @@ static const ActionLink actionnames[] = {
 	{ "spellwait", GameScript::Spell, AF_BLOCKING | AF_ALIVE | AF_IWD2_OVERRIDE },
 	{ "startcombatcounter", GameScript::StartCombatCounter, 0 },
 	{ "startcutscene", GameScript::StartCutScene, 0 },
-	{ "startcutsceneex", GameScript::StartCutSceneEx, 0 }, //pst (unknown), EE perhaps as of PST:EE
+	{ "startcutsceneex", GameScript::StartCutScene, 0 }, // including pst+EE StartCutSceneEx
 	{ "startcutscenemode", GameScript::StartCutSceneMode, 0 },
 	{ "startdialog", GameScript::StartDialogue, AF_BLOCKING | AF_DIALOG },
 	{ "startdialoginterrupt", GameScript::StartDialogueInterrupt, AF_BLOCKING | AF_DIALOG },
