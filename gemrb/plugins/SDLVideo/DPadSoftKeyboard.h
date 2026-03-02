@@ -34,7 +34,7 @@ private:
 	bool inputActive = false;
 	bool emptyInput = false;
 	bool currentUpper = false;
-	int32_t currentCharIndex;
+	int32_t currentCharIndex = 0;
 	std::vector<int32_t> inputIndexes;
 
 	char dpadKeys[TOTAL_CHARACTERS_DPAD] = {
