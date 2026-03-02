@@ -839,6 +839,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 		// only one wall of the same type can be up at the same time
 		if (pro->ExtFlags & PEF_WALL && !area->IsProjectileUnique(pro->GetType())) {
 			// the games silently discarded the spell
+			delete pro;
 			continue;
 		}
 
