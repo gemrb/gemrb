@@ -2209,4 +2209,16 @@ void Inventory::EnforceUsability()
 	}
 }
 
+void Inventory::CheckExpiry(ieDword hour)
+{
+	size_t maxSlot = Slots.size();
+	for (size_t i = 0; i < maxSlot; i++) {
+		CREItem* itm = Slots[i];
+		if (!itm) continue;
+		if (itm->Expired == 0 || itm->Expired > hour) continue;
+		// time's up
+		BreakItemSlot(i);
+	}
+}
+
 }

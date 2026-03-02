@@ -1452,19 +1452,25 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 {
 	static EffectRef fx_set_regenerating_state_ref = { "State:Regenerating", -1 };
 
-	ieDword h = GameTime / core->Time.hour_size;
+	ieDword hours = GameTime / core->Time.hour_size;
 	GameTime += add;
-	if (h != GameTime / core->Time.hour_size) {
+	ieDword hours2 = GameTime / core->Time.hour_size;
+	Map* map = GetCurrentArea();
+	if (hours != hours2) {
 		//asking for a new weather when the hour changes
 		WeatherBits &= ~WB_HASWEATHER;
 		//update clock display
 		core->GetGUIScriptEngine()->RunFunction("Clock", "UpdateClock");
+		// also check if any item expired and should get removed
+		auto actors = map->GetAllActors();
+		for (auto& actor : actors) {
+			actor->inventory.CheckExpiry(hours2);
+		}
 	}
 
 	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)
 	// and delay most idle actions
 	// but only if we skip for at least an hour
-	Map* map = GetCurrentArea();
 	if (add >= core->Time.hour_size) {
 		for (const auto& pc : PCs) {
 			pc->ResetCommentTime();

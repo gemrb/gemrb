@@ -3250,6 +3250,11 @@ CREItem* Interface::ReadItem(DataStream* str, CREItem* itm) const
 {
 	str->ReadResRef(itm->ItemResRef);
 	str->ReadWord(itm->Expired);
+	if (itm->Expired != 0 && itm->Expired <= 255) {
+		// convert to absolute time, including forcing a 255 delay
+		itm->Expired = (GetGame()->GameTime / Time.hour_size) + itm->Expired * 24 + 255;
+	}
+
 	str->ReadWord(itm->Usages[0]);
 	str->ReadWord(itm->Usages[1]);
 	str->ReadWord(itm->Usages[2]);
