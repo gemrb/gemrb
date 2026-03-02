@@ -25,6 +25,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import InventoryCommon
+import PaperDoll
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -32,6 +33,7 @@ from ie_spells import *
 from ie_restype import RES_BAM
 
 InventoryWindow = None
+PaperDoll.StanceAnim = "WK"
 
 # ground slots are transposed with one outlier, so map them to something normal
 # 68 71 -> 68 69
@@ -57,6 +59,11 @@ def InitInventoryWindow (Window):
 		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
 		Button.SetFont ("NUMBER")
 
+	def SelectColor (stat):
+		pc = GemRB.GameGetSelectedPCSingle ()
+		Picker = PaperDoll.SelectColorForPC (stat, pc, "GUIINV")
+		Picker.SetAction (lambda: GemRB.SetPlayerStat (pc, stat, GemRB.GetVar ("PickedColor")), ACTION_WINDOW_CLOSED)
+
 	Button = Window.GetControl (81)
 	Button.SetTooltip (83)
 	Button.SetVarAssoc ("ItemButton", 6 + 81)
@@ -66,23 +73,23 @@ def InitInventoryWindow (Window):
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MajorPress)
+	Button.OnPress (lambda: SelectColor (IE_MAJOR_COLOR))
 	Button.SetTooltip ("Major color")
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MinorPress)
+	Button.OnPress (lambda: SelectColor (IE_MINOR_COLOR))
 	Button.SetTooltip ("Minor color")
 
 	#hair & skin color
 	Button = Window.GetControl (82)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.HairPress)
+	Button.OnPress (lambda: SelectColor (IE_HAIR_COLOR))
 	Button.SetTooltip ("Hair color")
 
 	Button = Window.GetControl (83)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.SkinPress)
+	Button.OnPress (lambda: SelectColor (IE_SKIN_COLOR))
 	Button.SetTooltip ("Skin color")
 
 	# paperdoll
@@ -180,7 +187,7 @@ def RefreshInventoryWindow ():
 	Button = Window.GetControl (50)
 
 	Button.SetFlags (IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
-	pdoll = GUICommonWindows.GetActorPaperDoll (pc)+"WK"
+	pdoll = PaperDoll.GetActorPaperDoll (pc)
 	# FIXME: animation bleeds through top window
 	# NOTE: regenerate invenwin.png with a transparent hole if we
 	# can ever keep drawing the gamecontrol underneath ...
