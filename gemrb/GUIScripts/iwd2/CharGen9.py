@@ -206,14 +206,6 @@ def NextPress():
 	t = GemRB.Roll(a,b,c)*d+e
 	GemRB.SetPlayerStat (MyChar, IE_GOLD, t)
 	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") or 0)
-
-	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("Color1") )
-	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("Color2") )
-	GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("Color4") )
-	GUICommon.SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("Color3") )
-	GUICommon.SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
-	GUICommon.SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
-	GUICommon.SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 

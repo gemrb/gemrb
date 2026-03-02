@@ -25,6 +25,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import InventoryCommon
+import PaperDoll
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -32,6 +33,7 @@ from ie_spells import *
 from ie_restype import RES_BAM
 
 InventoryWindow = None
+PaperDoll.StanceAnim = "G11"
 
 # ground slots are transposed with one outlier, so map them to something normal
 # 68 71 -> 68 69
@@ -56,26 +58,31 @@ def InitInventoryWindow (Window):
 		Button.OnMouseEnter (InventoryCommon.MouseEnterGround)
 		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
 
+	def SelectColor (stat):
+		pc = GemRB.GameGetSelectedPCSingle ()
+		Picker = PaperDoll.SelectColorForPC (stat, pc, "GUIINV")
+		Picker.SetAction (lambda: GemRB.SetPlayerStat (pc, stat, GemRB.GetVar ("PickedColor")), ACTION_WINDOW_CLOSED)
+
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MajorPress)
+	Button.OnPress (lambda: SelectColor (IE_MAJOR_COLOR))
 	Button.SetTooltip (12007)
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MinorPress)
+	Button.OnPress (lambda: SelectColor (IE_MINOR_COLOR))
 	Button.SetTooltip (12008)
 
 	#hair & skin color
 	Button = Window.GetControl (82)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.HairPress)
+	Button.OnPress (lambda: SelectColor (IE_HAIR_COLOR))
 	Button.SetTooltip (37560)
 
 	Button = Window.GetControl (83)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.SkinPress)
+	Button.OnPress (lambda: SelectColor (IE_SKIN_COLOR))
 	Button.SetTooltip (37559)
 
 	# paperdoll
@@ -183,7 +190,7 @@ def RefreshInventoryWindow ():
 	# paperdoll
 	Button = Window.GetControl (50)
 	Button.SetFlags (IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
-	pdoll = GUICommonWindows.GetActorPaperDoll (pc)+"G11"
+	pdoll = PaperDoll.GetActorPaperDoll (pc)
 	if GemRB.HasResource (pdoll, RES_BAM):
 		pal = [GemRB.GetPlayerStat (pc, c) for c in range(IE_METAL_COLOR, IE_HAIR_COLOR + 1)]
 		Button.SetAnimation (pdoll, 1, A_ANI_ACTIVE, pal)
