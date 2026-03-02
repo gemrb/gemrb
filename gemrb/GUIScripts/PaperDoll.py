@@ -264,11 +264,10 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 		RaceName = CommonTables.Races.GetRowName (Race)
 		HairTable = GemRB.LoadTable (CommonTables.Races.GetValue (RaceName, "HAIR"))
 		SkinTable = GemRB.LoadTable (CommonTables.Races.GetValue (RaceName, "SKIN"))
-		btnIDs = range(33)
 		if row == 0:
 			btnIDs = range(HairTable.GetRowCount ())
 			table = HairTable
-		if row == 1:
+		elif row == 1:
 			btnIDs = range(SkinTable.GetRowCount ())
 			table = SkinTable
 
