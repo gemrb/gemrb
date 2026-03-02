@@ -35,6 +35,12 @@ static constexpr uint8_t MVE_SIGNATURE_LEN = 26;
 // and be a power of 2, to avoid crackling for unknown reasons
 static constexpr size_t MIN_QUEUE_SIZE = 65536;
 
+// tainted alloc size limits (~10x what was seen in data)
+constexpr size_t MAX_BACKBUFSIZE = 12'300'000;
+constexpr strret_t MAX_PALETTENUMBYTES = 8000;
+constexpr uint32_t MAX_AUDIOBUFFERSIZE = 900'000;
+constexpr uint16_t MAX_SEGMENTSIZE = 65'000;
+
 MVEPlayer::MVEPlayer()
 {
 	audioPlayer = core->GetAudioDrv()->CreateStreamable(core->GetAudioSettings().ConfigPresetMovie(), MIN_QUEUE_SIZE);
@@ -141,6 +147,9 @@ MVEPlayer::FrameResult MVEPlayer::InitializeAudio(uint8_t version)
 	audioCompressed = ((version > 0) && (flags & MVE_AUDIO_COMPRESSED));
 	/* the docs say min_buffer_len is 16-bit for version 0, all other code just assumes 32-bit.. */
 	auto audioBufferSize = GST_READ_UINT32_LE(buffer.data() + 4);
+	if (audioBufferSize > MAX_AUDIOBUFFERSIZE) {
+		return FrameResult::ERROR;
+	}
 
 	if (audioBufferSize > audioLoadBuffer.size()) {
 		audioLoadBuffer.resize(audioBufferSize);
@@ -167,6 +176,9 @@ MVEPlayer::FrameResult MVEPlayer::InitializeVideo(uint8_t version)
 	gstData.height = GST_READ_UINT16_LE(buffer.data() + 2) << 3;
 
 	size_t backBufSize = 2 * gstData.width * gstData.height * (format > 0 ? 2 : 1);
+	if (backBufSize > MAX_BACKBUFSIZE) {
+		return FrameResult::ERROR;
+	}
 	if (videoBackBuffer.size() < backBufSize) {
 		videoBackBuffer.resize(backBufSize);
 	}
@@ -222,6 +234,9 @@ MVEPlayer::FrameResult MVEPlayer::ProcessChunk()
 		uint16_t segmentSize = GST_READ_UINT16_LE(buffer.data());
 		uint8_t segmentType = buffer[2];
 		uint8_t segmentVersion = buffer[3];
+		if (segmentSize > MAX_SEGMENTSIZE) {
+			return FrameResult::ERROR;
+		}
 
 		lastResult = ProcessSegment(segmentSize, segmentType, segmentVersion);
 		if (lastResult != FrameResult::OK) {
@@ -316,6 +331,9 @@ MVEPlayer::FrameResult MVEPlayer::UpdatePalette()
 	uint16_t startIdx = GST_READ_UINT16_LE(buffer.data());
 	uint16_t numEntries = GST_READ_UINT16_LE(buffer.data() + 2);
 	strret_t paletteNumBytes = numEntries * 3;
+	if (paletteNumBytes > MAX_PALETTENUMBYTES) {
+		return FrameResult::ERROR;
+	}
 
 	std::vector<unsigned char> paletteData;
 	paletteData.resize(paletteNumBytes);
