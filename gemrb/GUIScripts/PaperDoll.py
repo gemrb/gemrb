@@ -67,8 +67,9 @@ def GetActorPaperDoll (pc):
 	if GameCheck.IsIWD2 ():
 		return GetActorPaperDollIWD2 (pc)
 	elif GameCheck.IsGemRBDemo ():
-		import GUICommonWindows
-		return GUICommonWindows.GetActorPaperDoll (pc) + StanceAnim
+		# sometimes we need a different table and animations
+		level = GemRB.GetPlayerStat (pc, IE_ARMOR_TYPE)
+		return GemRB.GetAvatarsValue (pc, level) + StanceAnim
 	return GetActorPaperDoll0 (pc)
 
 def GetActorPaperDollIWD2 (pc):
@@ -134,17 +135,19 @@ def OpenPaperDollWindow(pc, pack, stats):
 	if pack == "GUICG":
 		winID = 13
 		controlIDs = {"DOLL" : 1, "HAIR" : 2, "SKIN" : 3, "MAJOR" : 4, "MINOR" : 5, "DONE" : 0, "CANCEL" : 13}
+		pDollFlags = IE_GUI_BUTTON_CENTER_PICTURES
 	else:
 		# only GUIREC remains valid so treat everything else as GUIREC
 		pack = "GUIREC"
 		winID = 21
 		controlIDs = {"DOLL" : 0, "HAIR" : 3, "SKIN" : 4, "MAJOR" : 5, "MINOR" : 6, "DONE" : 12, "CANCEL" : 13}
+		pDollFlags = 0
 
 	ColorWindow = GemRB.LoadWindow (winID, pack)
 	ColorWindow.AliasControls (controlIDs)
 
 	PDollButton = ColorWindow.GetControlAlias ("DOLL")
-	PDollButton.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES, OP_OR) # add/OP_SET IE_GUI_BUTTON_NO_IMAGE?
+	PDollButton.SetFlags (IE_GUI_BUTTON_PICTURE | pDollFlags, OP_OR) # add/OP_SET IE_GUI_BUTTON_NO_IMAGE?
 	PDollButton.SetState (IE_GUI_BUTTON_LOCKED)
 
 	HairButton = ColorWindow.GetControlAlias ("HAIR")
@@ -164,7 +167,11 @@ def OpenPaperDollWindow(pc, pack, stats):
 			PDollButton.SetAnimation (pdoll, 1, A_ANI_ACTIVE, pal) # add A_ANI_PLAYONCE?
 			PDollButton.SetBAM ("", 0, 0, 0) # just hide or there is a tiny artifact
 		else:
-			PDollButton.SetPLT (pdoll, stats, 0)
+			# reorder to expected layout, luckily it's in stat order, so we can just sort
+			# TODO: if nothing else relies on it, fix the order in ColorStatsFrom* directly
+			stats2 = { k: stats[k] for k in sorted(stats) }
+			PDollButton.SetPLT (pdoll, *stats2.values(), 0)
+
 		cycle = int(GameCheck.IsIWD2 ())
 		MinorButton.SetBAM ("COLGRAD", cycle, 0, stats[IE_MINOR_COLOR])
 		MajorButton.SetBAM ("COLGRAD", cycle, 0, stats[IE_MAJOR_COLOR])
@@ -196,7 +203,7 @@ def OpenPaperDollWindow(pc, pack, stats):
 	DoneButton.MakeDefault ()
 	if not GameCheck.IsIWD2 ():
 		DoneButton.OnPress (SaveDoll)
-		BackButton.OnPress (Window.Close)
+		BackButton.OnPress (ColorWindow.Close)
 
 	UpdatePaperDoll ()
 
@@ -255,7 +262,7 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 
 	for i in btnIDs:
 		Button = ColorPicker.GetControl (i)
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
 	table = ColorTable
