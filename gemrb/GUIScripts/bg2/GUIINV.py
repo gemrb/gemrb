@@ -27,10 +27,13 @@ import GUICommon
 import GUICommonWindows
 import CommonTables
 import InventoryCommon
+import PaperDoll
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
 from ie_spells import *
+
+PaperDoll.StanceAnim = "G11"
 
 def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
@@ -61,13 +64,13 @@ def InitInventoryWindow (Window):
 	Button = Window.GetControl (62)
 	Button.SetSprites ("INVBUT",0,0,1,0,0)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MajorPress)
+	Button.OnPress (lambda: PaperDoll.SelectPickerColor (IE_MAJOR_COLOR))
 	Button.SetTooltip (12007)
 
 	Button = Window.GetControl (63)
 	Button.SetSprites ("INVBUT",0,0,1,0,0)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MinorPress)
+	Button.OnPress (lambda: PaperDoll.SelectPickerColor (IE_MINOR_COLOR))
 	Button.SetTooltip (12008)
 
 	#portrait
@@ -163,7 +166,7 @@ def RefreshInventoryWindow (Window):
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
 	if (anim_id < 0x5000 or anim_id >= 0x7000 or anim_id == 0x6404) and (anim_id != 0x8000 and anim_id != 0x9000):
 		Color1 = -1
-	Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
+	Button.SetPLT (PaperDoll.GetActorPaperDoll (pc),
 		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
 	# disable equipment for flinds and ogres and Sarevok (Recovery Mod)
 	if anim_id == 0x8000 or anim_id == 0x9000 or anim_id == 0x6404:

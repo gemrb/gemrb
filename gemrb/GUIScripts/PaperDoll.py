@@ -313,3 +313,9 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 		CancelButton.MakeEscape ()
 
 	return ColorPicker
+
+def SelectPickerColor (stat):
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Picker = SelectColorForPC (stat, pc, "GUIINV")
+	Picker.SetAction (lambda: GemRB.SetPlayerStat (pc, stat, GemRB.GetVar ("PickedColor")), ACTION_WINDOW_CLOSED)
+	return

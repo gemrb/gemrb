@@ -58,31 +58,26 @@ def InitInventoryWindow (Window):
 		Button.OnMouseEnter (InventoryCommon.MouseEnterGround)
 		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
 
-	def SelectColor (stat):
-		pc = GemRB.GameGetSelectedPCSingle ()
-		Picker = PaperDoll.SelectColorForPC (stat, pc, "GUIINV")
-		Picker.SetAction (lambda: GemRB.SetPlayerStat (pc, stat, GemRB.GetVar ("PickedColor")), ACTION_WINDOW_CLOSED)
-
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (lambda: SelectColor (IE_MAJOR_COLOR))
+	Button.OnPress (lambda: PaperDoll.SelectPickerColor (IE_MAJOR_COLOR))
 	Button.SetTooltip (12007)
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (lambda: SelectColor (IE_MINOR_COLOR))
+	Button.OnPress (lambda: PaperDoll.SelectPickerColor (IE_MINOR_COLOR))
 	Button.SetTooltip (12008)
 
 	#hair & skin color
 	Button = Window.GetControl (82)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (lambda: SelectColor (IE_HAIR_COLOR))
+	Button.OnPress (lambda: PaperDoll.SelectPickerColor (IE_HAIR_COLOR))
 	Button.SetTooltip (37560)
 
 	Button = Window.GetControl (83)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (lambda: SelectColor (IE_SKIN_COLOR))
+	Button.OnPress (lambda: PaperDoll.SelectPickerColor (IE_SKIN_COLOR))
 	Button.SetTooltip (37559)
 
 	# paperdoll

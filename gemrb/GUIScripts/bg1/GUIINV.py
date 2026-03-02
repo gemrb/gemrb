@@ -26,9 +26,12 @@ import GUICommon
 import GUICommonWindows
 import CommonTables
 import InventoryCommon
+import PaperDoll
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
+
+PaperDoll.StanceAnim = "G11"
 
 def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
@@ -61,12 +64,12 @@ def InitInventoryWindow (Window):
 	#major & minor clothing color
 	Button = Window.GetControl (62)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MajorPress)
+	Button.OnPress (lambda: PaperDoll.SelectPickerColor (IE_MAJOR_COLOR))
 	Button.SetTooltip (12007)
 
 	Button = Window.GetControl (63)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE,OP_OR)
-	Button.OnPress (InventoryCommon.MinorPress)
+	Button.OnPress (lambda: PaperDoll.SelectPickerColor (IE_MINOR_COLOR))
 	Button.SetTooltip (12008)
 
 	#portrait
@@ -162,7 +165,7 @@ def RefreshInventoryWindow (Window):
 	size = CommonTables.Pdolls.GetValue (row, "SIZE")
 
 	if size == "*":
-		Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
+		Button.SetPLT (PaperDoll.GetActorPaperDoll (pc),
 			-1, 0, 0, 0, 0, 0, 0, 0, 0)
 	else:
 		Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
@@ -172,7 +175,7 @@ def RefreshInventoryWindow (Window):
 		Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
 		Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 		Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-		Button.SetPLT (GUICommon.GetActorPaperDoll (pc),
+		Button.SetPLT (PaperDoll.GetActorPaperDoll (pc),
 			Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
 
 		# Weapon
