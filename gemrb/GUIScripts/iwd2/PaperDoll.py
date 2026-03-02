@@ -20,17 +20,25 @@
 import GemRB
 
 import CommonTables
+import GameCheck
 import GUICommon
-import IDLUCommon
 
-from ie_stats import *
+if GameCheck.IsIWD2 ():
+	import IDLUCommon
+
 from GUIDefines import *
+from ie_restype import *
+from ie_stats import *
 
 ColorTable = GemRB.LoadTable ("clowncol")
 StanceAnim = "" # set before use
 
 def ColorStatsFromPortrait (PortraitName):
-	PortraitTable = GemRB.LoadTable ("pictures")
+	if GameCheck.IsIWD1 ():
+		PortraitTable = GemRB.LoadTable ("PORTCOLR")
+		PortraitName = PortraitTable.GetRowName (PortraitName) + "L"
+	else:
+		PortraitTable = GemRB.LoadTable ("pictures")
 
 	return {
 		IE_MINOR_COLOR : PortraitTable.GetValue (PortraitName, "MINOR", GTV_INT),
@@ -56,6 +64,14 @@ def ColorStatsFromPC (pc):
 	}
 
 def GetActorPaperDoll (pc):
+	if GameCheck.IsIWD2 ():
+		return GetActorPaperDollIWD2 (pc)
+	elif GameCheck.IsGemRBDemo ():
+		import GUICommonWindows
+		return GUICommonWindows.GetActorPaperDoll (pc) + StanceAnim
+	return GetActorPaperDoll0 (pc)
+
+def GetActorPaperDollIWD2 (pc):
 	# calculate the paperdoll animation id from the race, class and gender
 	PDollTable = GemRB.LoadTable ("avatars")
 	table = GemRB.LoadTable ("avprefr")
@@ -88,28 +104,72 @@ def GetActorPaperDoll (pc):
 
 	return PDollResRef
 
-def OpenPaperDollWindow(pc, pack, stats):
-	ColorWindow = GemRB.LoadWindow (13, "GUICG")
+def GetActorPaperDoll0 (pc):
+	# calculate the paperdoll animation id from the race, class and gender
+	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
+	if anim_id == 0x2000: # still in chargen
+		anim_id = 0x6000
+		table = GemRB.LoadTable ("avprefr")
+		Race = GemRB.GetPlayerStat (pc, IE_RACE)
+		anim_id = anim_id + table.GetValue (Race, 0)
+		table = GemRB.LoadTable ("avprefc")
+		ClassName = GUICommon.GetClassRowName (pc)
+		anim_id = anim_id + table.GetValue (ClassName, "CLASS")
+		table = GemRB.LoadTable ("avprefg")
+		Gender = GemRB.GetPlayerStat (pc, IE_SEX)
+		anim_id = anim_id + table.GetValue (Gender, 0)
 
-	PDollButton = ColorWindow.GetControl (1)
-	PDollButton.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
+	level = GemRB.GetPlayerStat (pc, IE_ARMOR_TYPE) or 0
+	which = "LEVEL%d" % (level + 1)
+	anim_id = hex(anim_id)
+	doll = CommonTables.Pdolls.GetValue (anim_id, which)
+	if doll == "*":
+		# guess a name
+		doll = GemRB.GetAvatarsValue (pc, level) + "INV"
+		if not GemRB.HasResource (doll, RES_BAM):
+			print("GetActorPaperDoll: Missing paper doll for animation {} and {}".format(anim_id, which))
+	return doll
+
+def OpenPaperDollWindow(pc, pack, stats):
+	if pack == "GUICG":
+		winID = 13
+		controlIDs = {"DOLL" : 1, "HAIR" : 2, "SKIN" : 3, "MAJOR" : 4, "MINOR" : 5, "DONE" : 0, "CANCEL" : 13}
+	else:
+		# only GUIREC remains valid so treat everything else as GUIREC
+		pack = "GUIREC"
+		winID = 21
+		controlIDs = {"DOLL" : 0, "HAIR" : 3, "SKIN" : 4, "MAJOR" : 5, "MINOR" : 6, "DONE" : 12, "CANCEL" : 13}
+
+	ColorWindow = GemRB.LoadWindow (winID, pack)
+	ColorWindow.AliasControls (controlIDs)
+
+	PDollButton = ColorWindow.GetControlAlias ("DOLL")
+	PDollButton.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES, OP_OR) # add/OP_SET IE_GUI_BUTTON_NO_IMAGE?
 	PDollButton.SetState (IE_GUI_BUTTON_LOCKED)
 
-	HairButton = ColorWindow.GetControl (2)
-	SkinButton = ColorWindow.GetControl (3)
-	MinorButton = ColorWindow.GetControl (4)
-	MajorButton = ColorWindow.GetControl (5)
+	HairButton = ColorWindow.GetControlAlias ("HAIR")
+	SkinButton = ColorWindow.GetControlAlias ("SKIN")
+	MajorButton = ColorWindow.GetControlAlias ("MAJOR")
+	MinorButton = ColorWindow.GetControlAlias ("MINOR")
+
+	def SaveDoll ():
+		SaveStats (stats, pc)
+		ColorWindow.Close ()
 
 	def UpdatePaperDoll ():
 		pdoll = GetActorPaperDoll (pc)
-		pal = [0, stats[IE_MINOR_COLOR], stats[IE_MAJOR_COLOR], stats[IE_SKIN_COLOR], 0, 0, stats[IE_HAIR_COLOR], 0]
-		PDollButton.SetAnimation (None) # force reset
-		PDollButton.SetAnimation (pdoll, 1, A_ANI_ACTIVE, pal) # add A_ANI_PLAYONCE?
-		PDollButton.SetBAM ("", 0, 0, 0) # just hide or there is a tiny artifact
-		MinorButton.SetBAM ("COLGRAD", 1, 0, stats[IE_MINOR_COLOR])
-		MajorButton.SetBAM ("COLGRAD", 1, 0, stats[IE_MAJOR_COLOR])
-		SkinButton.SetBAM ("COLGRAD", 1, 0, stats[IE_SKIN_COLOR])
-		HairButton.SetBAM ("COLGRAD", 1, 0, stats[IE_HAIR_COLOR])
+		if GameCheck.IsIWD2 ():
+			pal = [0, stats[IE_MINOR_COLOR], stats[IE_MAJOR_COLOR], stats[IE_SKIN_COLOR], 0, 0, stats[IE_HAIR_COLOR], 0]
+			PDollButton.SetAnimation (None) # force reset
+			PDollButton.SetAnimation (pdoll, 1, A_ANI_ACTIVE, pal) # add A_ANI_PLAYONCE?
+			PDollButton.SetBAM ("", 0, 0, 0) # just hide or there is a tiny artifact
+		else:
+			PDollButton.SetPLT (pdoll, stats, 0)
+		cycle = int(GameCheck.IsIWD2 ())
+		MinorButton.SetBAM ("COLGRAD", cycle, 0, stats[IE_MINOR_COLOR])
+		MajorButton.SetBAM ("COLGRAD", cycle, 0, stats[IE_MAJOR_COLOR])
+		SkinButton.SetBAM ("COLGRAD", cycle, 0, stats[IE_SKIN_COLOR])
+		HairButton.SetBAM ("COLGRAD", cycle, 0, stats[IE_HAIR_COLOR])
 
 		return
 
@@ -127,13 +187,21 @@ def OpenPaperDollWindow(pc, pack, stats):
 	MajorButton.OnPress (lambda: SelectColor (IE_MAJOR_COLOR))
 	MinorButton.OnPress (lambda: SelectColor (IE_MINOR_COLOR))
 
-	BackButton = ColorWindow.GetControl (13)
-	BackButton.SetText (15416)
-	DoneButton = ColorWindow.GetControl (0)
-	DoneButton.SetText (11973)
+	BackButton = ColorWindow.GetControlAlias ("CANCEL")
+	BackButton.SetText (15416 if GameCheck.IsIWD2 () else 13727)
+	BackButton.MakeEscape ()
+
+	DoneButton = ColorWindow.GetControlAlias ("DONE")
+	DoneButton.SetText (11973 if GameCheck.IsIWD2 () else 11973)
 	DoneButton.MakeDefault ()
+	if not GameCheck.IsIWD2 ():
+		DoneButton.OnPress (SaveDoll)
+		BackButton.OnPress (Window.Close)
 
 	UpdatePaperDoll ()
+
+	if not GameCheck.IsBG2 ():
+		ColorWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return ColorWindow
 
 def SaveStats (stats, pc):
@@ -152,40 +220,60 @@ def SelectColorForPC (stat, pc, pack = "GUICG"):
 		row = 3
 
 	Picker = OpenColorPicker (row, pc, stats[stat], pack)
-	Picker.ShowModal (MODAL_SHADOW_GRAY)
+	if not GameCheck.IsBG2():
+		Picker.ShowModal (MODAL_SHADOW_GRAY)
 
 	return Picker
 
+def GetMyColor (row, i, offset, table):
+	if not GameCheck.IsIWD2 ():
+		return ColorTable.GetValue (row, i - offset)
+
+	if row < 2:
+		return table.GetValue (i, 0)
+	else:
+		return ColorTable.GetValue (row - 2, i)
+
 def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 	if pack == "GUICG":
-		ColorPicker = GemRB.LoadWindow (14, pack)
+		winID = 14
+		btnIDs = range(0, 33 if GameCheck.IsIWD2 () else 34)
+		offset = 0
+	elif pack == "GUIINV":
+		winID = 3
+		btnIDs = range(0, 33 if GameCheck.IsIWD2 () else 34)
+		offset = 0
 	else:
-		ColorPicker = GemRB.LoadWindow (3, pack)
+		# only GUIREC remains valid so treat everything else as GUIREC
+		pack = "GUIREC"
+		winID = 22
+		btnIDs = range(1, 35)
+		offset = 1
 
+	ColorPicker = GemRB.LoadWindow (winID, pack)
 	GemRB.SetVar ("PickedColor", PickedColor)
 
-	for i in range(33):
+	for i in btnIDs:
 		Button = ColorPicker.GetControl (i)
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
-	Race = IDLUCommon.GetRace (pc)
-	RaceName = CommonTables.Races.GetRowName (Race)
-	HairTable = GemRB.LoadTable (CommonTables.Races.GetValue(RaceName, "HAIR"))
-	SkinTable = GemRB.LoadTable (CommonTables.Races.GetValue(RaceName, "SKIN"))
+	table = ColorTable
+	if GameCheck.IsIWD2 ():
+		Race = IDLUCommon.GetRace (pc)
+		RaceName = CommonTables.Races.GetRowName (Race)
+		HairTable = GemRB.LoadTable (CommonTables.Races.GetValue (RaceName, "HAIR"))
+		SkinTable = GemRB.LoadTable (CommonTables.Races.GetValue (RaceName, "SKIN"))
+		btnIDs = range(33)
+		if row == 0:
+			btnIDs = range(HairTable.GetRowCount ())
+			table = HairTable
+		if row == 1:
+			btnIDs = range(SkinTable.GetRowCount ())
+			table = SkinTable
 
-	m = 33
-	if row == 0:
-		m = HairTable.GetRowCount ()
-		t = HairTable
-	if row == 1:
-		m = SkinTable.GetRowCount ()
-		t = SkinTable
-	for i in range(m):
-		if row < 2:
-			MyColor = t.GetValue (i, 0)
-		else:
-			MyColor = ColorTable.GetValue (row - 2, i)
+	for i in btnIDs:
+		MyColor = GetMyColor (row, i, offset, table)
 		if MyColor == "*":
 			break
 		Button = ColorPicker.GetControl (i)
@@ -194,6 +282,13 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("PickedColor", MyColor)
 		Button.OnPress (ColorPicker.Close)
+
+	# restore value after SetVarAssoc
+	GemRB.SetVar ("PickedColor", PickedColor)
+
+	if pack == "GUICG" and GameCheck.IsBG2 ():
+		import CharGenCommon
+		CharGenCommon.PositionCharGenWin (ColorPicker, -2)
 
 	def RandomSelect():
 		color = "*"
@@ -207,13 +302,14 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 		GemRB.SetVar ("PickedColor", color)
 		ColorPicker.Close ()
 
-	Button = ColorPicker.GetControl (33)
-	Button.OnPress (RandomSelect)
-	Button.SetText ("RND")
+	if GameCheck.IsIWD2 ():
+		Button = ColorPicker.GetControl (33)
+		Button.OnPress (RandomSelect)
+		Button.SetText ("RND")
 
-	CancelButton = ColorPicker.GetControl (35)
-	CancelButton.SetText (13727)
-	CancelButton.OnPress (ColorPicker.Close)
-	CancelButton.MakeEscape ()
+		CancelButton = ColorPicker.GetControl (35)
+		CancelButton.SetText (13727)
+		CancelButton.OnPress (ColorPicker.Close)
+		CancelButton.MakeEscape ()
 
 	return ColorPicker

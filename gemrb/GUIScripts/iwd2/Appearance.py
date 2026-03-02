@@ -27,6 +27,7 @@ from ie_stats import IE_SEX
 
 ColorWindow = None
 stats = None
+PaperDoll.StanceAnim = "G11"
 
 def OnLoad():
 	global ColorWindow, stats
