@@ -215,10 +215,10 @@ You can check what we're working towards in the current release by reading the
 NEWS file and, as far as bugtracker backlog goes, by looking at the version's
 [milestone](https://github.com/gemrb/gemrb/milestones).
 
-The plan for 0.9.5 is to work on polishing, annoying pst oddities, maybe getting
+The plan for 0.9.6 is to work on polishing, annoying pst oddities, maybe getting
 bg2ee support out of experimental stage, deal with some postponed issues, and
 whatever piques the contributor's fancy.
 
-We're looking for ninjas to help with python porting, a SDL_ttf backend,
+We're looking for ninjas to help with replacing FreeType (with SDL_ttf) and libvlc,
 GLESv2 support (no hw, see [#938](https://github.com/gemrb/gemrb/issues/938)) and
 a full-fledged installer for windows [#612](https://github.com/gemrb/gemrb/issues/612).
