@@ -1304,7 +1304,6 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 		return;
 	}
 
-	// Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
 	auto flag = gamedata->GetFactoryResourceAs<AnimationFactory>("FLAG1", IE_BAM_CLASS_ID);
 	if (flag == nullptr) {
 		ResourceHolder<ImageMgr> roImg = gamedata->GetResourceHolder<ImageMgr>("RONOTE");
@@ -1314,6 +1313,8 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 		gamedata->AddFactoryResource<AnimationFactory>(std::move(af));
 	}
 
+	// Load user-added notes, but skip readonly ones — added from autonote.ini later
+	const Size mapsize = map->GetSize();
 	if (NoteCount) {
 		for (ieDword i = 0; i < NoteCount; i++) {
 			ieDword px;
@@ -1324,7 +1325,6 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 			// in PST the coordinates are stored in small map space
 			// our MapControl wants them in large map space so we must convert
 			// its what other games use and its what our custom map note code uses
-			const Size mapsize = map->GetSize();
 			point.x = static_cast<int>(px * double(mapsize.w) / map->SmallMap->Frame.w);
 			point.y = static_cast<int>(py * double(mapsize.h) / map->SmallMap->Frame.h);
 
@@ -1333,32 +1333,38 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 			bytes[500] = '\0';
 			ieDword readonly;
 			str->ReadDword(readonly); // readonly == 1
-			map->AddMapNote(point, 0, StringFromTLK(StringView(bytes)), readonly);
 			str->Seek(20, GEM_CURRENT_POS);
+			if (readonly) {
+				continue;
+			}
+			map->AddMapNote(point, 0, StringFromTLK(StringView(bytes)), false);
 		}
-	} else {
-		if (!INInote) {
-			ReadAutonoteINI();
-		}
-		if (!INInote) return;
+	}
 
-		// add autonote.ini entries
-		const ieVariable& scriptName = map->GetScriptName();
-		int count = INInote->GetKeyAsInt(scriptName, "count", 0);
-		while (count) {
-			ieVariable key;
-			int value;
-			key.Format("xPos{}", count);
-			value = INInote->GetKeyAsInt(scriptName, key, 0);
-			point.x = value;
-			key.Format("yPos{}", count);
-			value = INInote->GetKeyAsInt(scriptName, key, 0);
-			point.y = value;
-			key.Format("text{}", count);
-			value = INInote->GetKeyAsInt(scriptName, key, 0);
-			map->AddMapNote(point, 0, ieStrRef(value), true);
-			count--;
-		}
+	// Always load (readonly) notes from autonote.ini with correct coordinate conversion
+	if (!INInote) {
+		ReadAutonoteINI();
+	}
+	if (!INInote) return;
+
+	// add autonote.ini entries
+	const ieVariable& scriptName = map->GetScriptName();
+	int count = INInote->GetKeyAsInt(scriptName, "count", 0);
+	while (count) {
+		ieVariable key;
+		key.Format("xPos{}", count);
+		int smallX = INInote->GetKeyAsInt(scriptName, key, 0);
+		key.Format("yPos{}", count);
+		int smallY = INInote->GetKeyAsInt(scriptName, key, 0);
+
+		// autonote.ini coordinates are in small map space too, so convert to game world space
+		point.x = static_cast<int>(smallX * double(mapsize.w) / map->SmallMap->Frame.w);
+		point.y = static_cast<int>(smallY * double(mapsize.h) / map->SmallMap->Frame.h);
+
+		key.Format("text{}", count);
+		int value = INInote->GetKeyAsInt(scriptName, key, 0);
+		map->AddMapNote(point, 0, ieStrRef(value), true);
+		count--;
 	}
 }
 
