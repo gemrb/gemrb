@@ -110,13 +110,6 @@ def GetAbilityBonus (Actor, Stat):
 	Ability = GemRB.GetPlayerStat (Actor, Stat)
 	return Ability//2-5
 
-def SetColorStat (Actor, Stat, Value):
-	t = Value & 0xFF
-	t |= t << 8
-	t |= t << 16
-	GemRB.SetPlayerStat (Actor, Stat, t)
-	return
-
 def CheckStat100 (Actor, Stat, Diff):
 	mystat = GemRB.GetPlayerStat (Actor, Stat)
 	goal = GemRB.Roll (1,100, Diff)

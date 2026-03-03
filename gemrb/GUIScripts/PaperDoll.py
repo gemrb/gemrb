@@ -36,9 +36,15 @@ StanceAnim = "" # set before use
 def ColorStatsFromPortrait (PortraitName):
 	if GameCheck.IsIWD1 ():
 		PortraitTable = GemRB.LoadTable ("PORTCOLR")
-		PortraitName = PortraitTable.GetRowName (PortraitName) + "L"
+		PortraitName = PortraitTable.GetRowName (PortraitName)
 	else:
 		PortraitTable = GemRB.LoadTable ("pictures")
+
+	def GetColorForStat (color):
+		rgb = color & 0xFF
+		rgb |= rgb << 8
+		rgb |= rgb << 16
+		return rgb
 
 	return {
 		IE_MINOR_COLOR : PortraitTable.GetValue (PortraitName, "MINOR", GTV_INT),
@@ -46,9 +52,9 @@ def ColorStatsFromPortrait (PortraitName):
 		IE_SKIN_COLOR : PortraitTable.GetValue (PortraitName, "SKIN", GTV_INT),
 		IE_HAIR_COLOR : PortraitTable.GetValue (PortraitName, "HAIR", GTV_INT),
 		# not editable in GUI, but part of the SetPLT payload
-		IE_LEATHER_COLOR : 0x1B,
-		IE_ARMOR_COLOR : 0x16,
-		IE_METAL_COLOR : 0x17
+		IE_LEATHER_COLOR : GetColorForStat (0x1B),
+		IE_ARMOR_COLOR : GetColorForStat (0x16),
+		IE_METAL_COLOR : GetColorForStat (0x17)
 	}
 
 def ColorStatsFromPC (pc):
@@ -135,18 +141,17 @@ def OpenPaperDollWindow(pc, pack, stats):
 	if pack == "GUICG":
 		winID = 13
 		controlIDs = {"DOLL" : 1, "HAIR" : 2, "SKIN" : 3, "MAJOR" : 4, "MINOR" : 5, "DONE" : 0, "CANCEL" : 13}
-		pDollFlags = IE_GUI_BUTTON_CENTER_PICTURES
 	else:
 		# only GUIREC remains valid so treat everything else as GUIREC
 		pack = "GUIREC"
 		winID = 21
 		controlIDs = {"DOLL" : 0, "HAIR" : 3, "SKIN" : 4, "MAJOR" : 5, "MINOR" : 6, "DONE" : 12, "CANCEL" : 13}
-		pDollFlags = 0
 
 	ColorWindow = GemRB.LoadWindow (winID, pack)
 	ColorWindow.AliasControls (controlIDs)
 
 	PDollButton = ColorWindow.GetControlAlias ("DOLL")
+	pDollFlags = IE_GUI_BUTTON_CENTER_PICTURES if GameCheck.IsIWD2 () else 0
 	PDollButton.SetFlags (IE_GUI_BUTTON_PICTURE | pDollFlags, OP_OR) # add/OP_SET IE_GUI_BUTTON_NO_IMAGE?
 	PDollButton.SetState (IE_GUI_BUTTON_LOCKED)
 
@@ -214,6 +219,14 @@ def OpenPaperDollWindow(pc, pack, stats):
 def SaveStats (stats, pc):
 	for stat, color in stats.items():
 		GemRB.SetPlayerStat (pc, stat, color)
+
+def ResetStats (pc):
+	nullStats = {
+		IE_MINOR_COLOR : 0, IE_MAJOR_COLOR : 0, IE_SKIN_COLOR : 0,
+		IE_HAIR_COLOR : 0, IE_LEATHER_COLOR : 0, IE_ARMOR_COLOR : 0, IE_METAL_COLOR : 0
+	}
+	SaveStats (nullStats, pc)
+	return
 
 def SelectColorForPC (stat, pc, pack = "GUICG"):
 	stats = ColorStatsFromPC (pc)

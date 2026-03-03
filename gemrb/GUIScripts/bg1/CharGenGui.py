@@ -8,6 +8,7 @@ import Spellbook
 import CommonTables
 import LUCommon
 import LUProfsSelection
+import PaperDoll
 
 def Imprt():
 	GemRB.SetToken("NextScript","CharGen")
@@ -249,10 +250,7 @@ def getProfi(TextAreaControl):
 #Appearance
 def unsetColors():
 	MyChar = GemRB.GetVar ("Slot")
-	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, 0 )
-	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, 0 )
-	GUICommon.SetColorStat (MyChar, IE_MAJOR_COLOR, 0 )
-	GUICommon.SetColorStat (MyChar, IE_MINOR_COLOR, 0 )
+	PaperDoll.ResetStats (MyChar)
 
 def unsetSounds():
 	MyChar = GemRB.GetVar ("Slot")
@@ -353,11 +351,6 @@ def setAccept():
 
 	#set the base number of attacks; effects will add the proficiency bonus
 	GemRB.SetPlayerStat (MyChar, IE_NUMBEROFATTACKS, 2)
-
-	#colors
-	GUICommon.SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
-	GUICommon.SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
-	GUICommon.SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 
 	CustomizeChar (MyChar)
 

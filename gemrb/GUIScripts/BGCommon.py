@@ -20,25 +20,7 @@
 import GemRB
 import CommonTables
 import GameCheck
-import GUICommon
 from ie_stats import IE_ALIGNMENT, IE_RACE, IE_REPUTATION, IE_SEX
-
-def RefreshPDoll(button, MinorColor, MajorColor, SkinColor, HairColor):
-	MyChar = GemRB.GetVar ("Slot")
-	AnimID = 0x6000
-	table = GemRB.LoadTable ("avprefr")
-	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
-	AnimID = AnimID + table.GetValue(Race, 0)
-	table = GemRB.LoadTable ("avprefc")
-	ClassName = GUICommon.GetClassRowName (MyChar)
-	AnimID = AnimID + table.GetValue (ClassName, "CLASS")
-	table = GemRB.LoadTable ("avprefg")
-	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
-	AnimID = AnimID + table.GetValue (Gender, 0)
-	ResRef = CommonTables.Pdolls.GetValue (hex(AnimID), "LEVEL1")
-
-	button.SetPLT (ResRef, 0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
-	return
 
 def SetReputation ():
 	MyChar = GemRB.GetVar ("Slot")
