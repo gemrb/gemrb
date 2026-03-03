@@ -360,6 +360,10 @@ def SetupEquipment (pc, button, size, stats):
 	# Helmet
 	slotItem = GemRB.GetSlotItem (pc, 1)
 	if slotItem:
+		# halflings use gnome helmet files
+		# only weapons exist with H, so this is fine for everyone
+		if size == "H":
+			size = "S"
 		item = GemRB.GetItem (slotItem["ItemResRef"])
 		if item['AnimationType'] != '':
 			button.SetPLT ("WP" + size + item['AnimationType'] + "INV", stats, 3)
