@@ -47,26 +47,24 @@ def ColorStatsFromPortrait (PortraitName):
 		return rgb
 
 	return {
+		IE_METAL_COLOR : GetColorForStat (0x17), # not editable in GUI, but part of the SetPLT payload
 		IE_MINOR_COLOR : PortraitTable.GetValue (PortraitName, "MINOR", GTV_INT),
 		IE_MAJOR_COLOR : PortraitTable.GetValue (PortraitName, "MAJOR", GTV_INT),
 		IE_SKIN_COLOR : PortraitTable.GetValue (PortraitName, "SKIN", GTV_INT),
-		IE_HAIR_COLOR : PortraitTable.GetValue (PortraitName, "HAIR", GTV_INT),
-		# not editable in GUI, but part of the SetPLT payload
 		IE_LEATHER_COLOR : GetColorForStat (0x1B),
 		IE_ARMOR_COLOR : GetColorForStat (0x16),
-		IE_METAL_COLOR : GetColorForStat (0x17)
+		IE_HAIR_COLOR : PortraitTable.GetValue (PortraitName, "HAIR", GTV_INT)
 	}
 
 def ColorStatsFromPC (pc):
 	return {
+		IE_METAL_COLOR : GemRB.GetPlayerStat (pc, IE_METAL_COLOR), # not editable in GUI, but part of the SetPLT payload
 		IE_MINOR_COLOR : GemRB.GetPlayerStat (pc, IE_MINOR_COLOR),
 		IE_MAJOR_COLOR : GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR),
 		IE_SKIN_COLOR : GemRB.GetPlayerStat (pc, IE_SKIN_COLOR),
-		IE_HAIR_COLOR : GemRB.GetPlayerStat (pc, IE_HAIR_COLOR),
-		# not editable in GUI, but part of the SetPLT payload
 		IE_LEATHER_COLOR : GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR),
 		IE_ARMOR_COLOR : GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR),
-		IE_METAL_COLOR : GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
+		IE_HAIR_COLOR : GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 	}
 
 def GetActorPaperDoll (pc):
@@ -172,10 +170,7 @@ def OpenPaperDollWindow(pc, pack, stats):
 			PDollButton.SetAnimation (pdoll, 1, A_ANI_ACTIVE, pal) # add A_ANI_PLAYONCE?
 			PDollButton.SetBAM ("", 0, 0, 0) # just hide or there is a tiny artifact
 		else:
-			# reorder to expected layout, luckily it's in stat order, so we can just sort
-			# TODO: if nothing else relies on it, fix the order in ColorStatsFrom* directly
-			stats2 = { k: stats[k] for k in sorted(stats) }
-			PDollButton.SetPLT (pdoll, *stats2.values(), 0)
+			PDollButton.SetPLT (pdoll, *stats.values(), 0)
 
 		cycle = int(GameCheck.IsIWD2 ())
 		MinorButton.SetBAM ("COLGRAD", cycle, 0, stats[IE_MINOR_COLOR])
