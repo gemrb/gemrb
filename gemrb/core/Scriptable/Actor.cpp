@@ -7833,6 +7833,13 @@ void Actor::UpdateActorState()
 	}
 
 	if (anim.empty()) {
+		// try auto-switching to a valid stance or a fall back instead of staying invisible
+		const CharAnimations* ca = GetAnims();
+		if (ca && ca->autoSwitchOnEnd) {
+			HandleActorStance();
+		} else {
+			SetStance(IE_ANI_AWAKE);
+		}
 		UpdateModalState(game->GameTime);
 		return;
 	}
