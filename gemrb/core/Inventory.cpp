@@ -2215,7 +2215,8 @@ void Inventory::CheckExpiry(ieDword hour)
 	for (size_t i = 0; i < maxSlot; i++) {
 		CREItem* itm = Slots[i];
 		if (!itm) continue;
-		if (itm->Expired == 0 || itm->Expired > hour) continue;
+		// the 255 is added when loading the item; it discriminates between relative day and absolute hour (useless) durations
+		if (itm->Expired == 0 || itm->Expired > hour + 255) continue;
 		// time's up
 		BreakItemSlot(i);
 	}

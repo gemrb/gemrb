@@ -163,7 +163,7 @@ public:
 	ResRef ItemResRef;
 	//recent research showed that this field is used by the create item
 	//for days effect. This field shows the expiration in gametime hours
-	// users pass in the duration in days and there is a 10 day delay added on top
+	// users pass in the duration in days or hours
 	ieWord Expired = 0;
 	std::array<ieWord, CHARGE_COUNTERS> Usages;
 	uint32_t Flags = 0;
