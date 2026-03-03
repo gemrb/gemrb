@@ -1600,8 +1600,9 @@ def StealPressed (btn):
 	#if difficulty = 0 and skill=100, automatic success
 	#if difficulty = 0 and skill=50, 50% success
 	#if difficulty = 50 and skill=50, 0% success
-	#if skill>random(100)+difficulty - success
-	if GUICommon.CheckStat100 (pc, IE_PICKPOCKET, Store['StealFailure']):
+	skill = GemRB.GetPlayerStat (pc, IE_PICKPOCKET)
+	difficulty = GemRB.Roll (1, 100, Store['StealFailure'])
+	if skill > difficulty:
 		GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_STEAL)
 		GemRB.PlaySound(DEF_STOLEN)
 		UpdateStoreStealWindow (btn.Window)

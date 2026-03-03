@@ -110,20 +110,6 @@ def GetAbilityBonus (Actor, Stat):
 	Ability = GemRB.GetPlayerStat (Actor, Stat)
 	return Ability//2-5
 
-def CheckStat100 (Actor, Stat, Diff):
-	mystat = GemRB.GetPlayerStat (Actor, Stat)
-	goal = GemRB.Roll (1,100, Diff)
-	if mystat>=goal:
-		return True
-	return False
-
-def CheckStat20 (Actor, Stat, Diff):
-	mystat = GemRB.GetPlayerStat (Actor, Stat)
-	goal = GemRB.Roll (1,20, Diff)
-	if mystat>=goal:
-		return True
-	return False
-
 def CantUseSpellbookWindow (pc, priest = False):
 	if GameCheck.IsIWD2 ():
 		return False
