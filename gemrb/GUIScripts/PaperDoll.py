@@ -170,7 +170,7 @@ def OpenPaperDollWindow(pc, pack, stats):
 			PDollButton.SetAnimation (pdoll, 1, A_ANI_ACTIVE, pal) # add A_ANI_PLAYONCE?
 			PDollButton.SetBAM ("", 0, 0, 0) # just hide or there is a tiny artifact
 		else:
-			PDollButton.SetPLT (pdoll, *stats.values(), 0)
+			PDollButton.SetPLT (pdoll, stats, 0)
 
 		cycle = int(GameCheck.IsIWD2 ())
 		MinorButton.SetBAM ("COLGRAD", cycle, 0, stats[IE_MINOR_COLOR])

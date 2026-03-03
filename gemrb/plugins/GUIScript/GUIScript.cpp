@@ -3412,19 +3412,27 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 PyDoc_STRVAR(GemRB_Button_SetPLT__doc,
 	     "===== Button_SetPLT =====\n\
 \n\
-**Metaclass Prototype:** SetPLT (PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8[, type])\n\
+**Metaclass Prototype:** SetPLT (PLTResRef, ColorDict[, type])\n\
 \n\
 **Description:** Sets the Picture of a Button Control from a PLT file. \n\
-Sets up the palette based on the eight given gradient colors.\n\
+Sets up the palette based on the colors contained in ColorDict, where \n\
+the key is the stat coresponding to the color.\n\
 \n\
 **Parameters:**\n\
   * PLTResRef - the name of the picture (a .plt resref)\n\
-  * col1-8 - color gradients\n\
+  * ColorDict - dictionary of up to 8 color stats mapped to indices in the global palette\n\
   * type - the byte to use from the gradients:\n\
     * 0 Body (robe or armour)\n\
     * 1 Weapon\
     * 2 Shield\n\
     * 3 Helmet\n\
+\n\
+**Example:**\n\
+\n\
+    import PaperDoll\n\
+    pc = GemRB.GameGetSelectedPCSingle ()\n\
+    stats = PaperDoll.ColorStatsFromPC (pc)\n\
+    Button.SetPLT (PaperDoll.GetActorPaperDoll (pc), stats)\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -3432,16 +3440,11 @@ Sets up the palette based on the eight given gradient colors.\n\
 
 static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 {
-	ieDword col[8];
 	int type = 0;
+	PyObject* colors;
 	PyObject* pyref;
 
-	memset(col, -1, sizeof(col));
-	if (!PyArg_ParseTuple(args, "OOiiiiiiii|i", &self,
-			      &pyref, &(col[0]), &(col[1]), &(col[2]), &(col[3]),
-			      &(col[4]), &(col[5]), &(col[6]), &(col[7]), &type)) {
-		return nullptr;
-	}
+	PARSE_ARGS(args, "OOO|i", &self, &pyref, &colors, &type);
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
@@ -3452,6 +3455,16 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 	if (ResRef.IsEmpty() || IsStar(ResRef)) {
 		btn->SetPicture(nullptr);
 		Py_RETURN_NONE;
+	}
+
+	// the 8th doesn't have a stat, so it will always be 0 (not -1 just to maintain parity with previous code)
+	ieDword col[8] { ieDword(-1), ieDword(-1), ieDword(-1), ieDword(-1), ieDword(-1), ieDword(-1), ieDword(-1), 0 };
+	Actor::stat_t keys[8] { IE_METAL_COLOR, IE_MINOR_COLOR, IE_MAJOR_COLOR, IE_SKIN_COLOR, IE_LEATHER_COLOR, IE_ARMOR_COLOR, IE_HAIR_COLOR };
+	for (int i = 0; i < 8; ++i) {
+		PyObject* obj = PyDict_GetItem(colors, PyLong_FromLong(keys[i]));
+		if (obj) {
+			col[i] = ieDword(PyLong_AsLong(obj));
+		}
 	}
 
 	Holder<Sprite2D> Picture;

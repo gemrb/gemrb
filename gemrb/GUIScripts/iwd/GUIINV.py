@@ -138,15 +138,8 @@ def RefreshInventoryWindow (Window):
 
 	# portrait
 	Button = Window.GetControl (50)
-	Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
-	Color2 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
-	Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
-	Color4 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
-	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
-	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
-	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-	Button.SetPLT (PaperDoll.GetActorPaperDoll (pc),
-		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
+	stats = PaperDoll.ColorStatsFromPC (pc)
+	Button.SetPLT (PaperDoll.GetActorPaperDoll (pc), stats, 0)
 
 	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
 	row = "0x%04X" %anim_id
@@ -157,7 +150,7 @@ def RefreshInventoryWindow (Window):
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
-			Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
+			Button.SetPLT("WP" + size + item['AnimationType'] + "INV", stats, 1)
 
 	# Shield
 	slot_item = GemRB.GetSlotItem (pc, 3)
@@ -167,17 +160,17 @@ def RefreshInventoryWindow (Window):
 		if (item['AnimationType'] != ''):
 			if (GemRB.CanUseItemType (SLOT_WEAPON, itemname)):
 				#off-hand weapon
-				Button.SetPLT("WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
+				Button.SetPLT("WP" + size + item['AnimationType'] + "OIN", stats, 2)
 			else:
 				#shield
-				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
+				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", stats, 2)
 
 	# Helmet
 	slot_item = GemRB.GetSlotItem (pc, 1)
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
-			Button.SetPLT("WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
+			Button.SetPLT("WP" + size + item['AnimationType'] + "INV", stats, 3)
 
 	# encumbrance
 	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
