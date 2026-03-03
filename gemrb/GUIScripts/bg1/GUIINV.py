@@ -170,33 +170,7 @@ def RefreshInventoryWindow (Window):
 	else:
 		stats = PaperDoll.ColorStatsFromPC (pc)
 		Button.SetPLT (PaperDoll.GetActorPaperDoll (pc), stats, 0)
-
-		# Weapon
-		slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc) )
-		if slot_item:
-			item = GemRB.GetItem (slot_item["ItemResRef"])
-			if (item['AnimationType'] != ''):
-				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", stats, 1)
-
-		# Shield
-		slot_item = GemRB.GetSlotItem (pc, 3)
-		if slot_item:
-			itemname = slot_item["ItemResRef"]
-			item = GemRB.GetItem (itemname)
-			if (item['AnimationType'] != ''):
-				if (GemRB.CanUseItemType (SLOT_WEAPON, itemname)):
-					#off-hand weapon
-					Button.SetPLT("WP" + size + item['AnimationType'] + "OIN", stats, 2)
-				else:
-					#shield
-					Button.SetPLT("WP" + size + item['AnimationType'] + "INV", stats, 2)
-
-		# Helmet
-		slot_item = GemRB.GetSlotItem (pc, 1)
-		if slot_item:
-			item = GemRB.GetItem (slot_item["ItemResRef"])
-			if (item['AnimationType'] != ''):
-				Button.SetPLT("WP" + size + item['AnimationType'] + "INV", stats, 3)
+		PaperDoll.SetupEquipment (pc, Button, size, stats)
 
 	# encumbrance
 	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)

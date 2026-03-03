@@ -333,3 +333,33 @@ def SelectPickerColor (stat):
 	Picker = SelectColorForPC (stat, pc, "GUIINV")
 	Picker.SetAction (lambda: GemRB.SetPlayerStat (pc, stat, GemRB.GetVar ("PickedColor")), ACTION_WINDOW_CLOSED)
 	return
+
+# overlay more images for weapons, shields and helmets
+# body armor already dictates the base paperdoll
+def SetupEquipment (pc, button, size, stats):
+	# Weapon
+	slotItem = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot (pc))
+	if slotItem:
+		item = GemRB.GetItem (slotItem["ItemResRef"])
+		if item['AnimationType'] != '':
+			button.SetPLT ("WP" + size + item['AnimationType'] + "INV", stats, 1)
+
+	# Shield
+	slotItem = GemRB.GetSlotItem (pc, 3)
+	if slotItem:
+		itemname = slotItem["ItemResRef"]
+		item = GemRB.GetItem (itemname)
+		if item['AnimationType'] != '':
+			if (GemRB.CanUseItemType (SLOT_WEAPON, itemname)):
+				# off-hand weapon
+				button.SetPLT ("WP" + size + item['AnimationType'] + "OIN", stats, 2)
+			else:
+				# shield
+				button.SetPLT ("WP" + size + item['AnimationType'] + "INV", stats, 2)
+
+	# Helmet
+	slotItem = GemRB.GetSlotItem (pc, 1)
+	if slotItem:
+		item = GemRB.GetItem (slotItem["ItemResRef"])
+		if item['AnimationType'] != '':
+			button.SetPLT ("WP" + size + item['AnimationType'] + "INV", stats, 3)
