@@ -1498,7 +1498,7 @@ void MoveToObjectCore(Scriptable* Sender, Action* parameters, ieDword flags, boo
 	}
 }
 
-bool CreateItemCore(CREItem* item, const ResRef& resref, int a, int b, int c)
+bool CreateItemCore(CREItem* item, const ResRef& resref, int a, int b, int c, ieWord expiry)
 {
 	item->ItemResRef = resref;
 	if (!core->ResolveRandomItem(item))
@@ -1519,7 +1519,7 @@ bool CreateItemCore(CREItem* item, const ResRef& resref, int a, int b, int c)
 		item->Usages[2] = (ieWord) c;
 	}
 	item->Flags = 0;
-	item->Expired = 0;
+	item->Expired = expiry;
 	core->SanitizeItem(item);
 	return true;
 }

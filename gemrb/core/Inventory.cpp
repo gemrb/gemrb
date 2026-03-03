@@ -1633,10 +1633,10 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const ResRef& 
 	return -1;
 }
 
-void Inventory::AddSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
+void Inventory::AddSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2, ieWord expiry)
 {
 	CREItem* TmpItem = new CREItem();
-	if (CreateItemCore(TmpItem, ItemResRef, Charge0, Charge1, Charge2)) {
+	if (CreateItemCore(TmpItem, ItemResRef, Charge0, Charge1, Charge2, expiry)) {
 		int ret = AddSlotItem(TmpItem, SlotID);
 		if (ret != ASI_SUCCESS) {
 			// put the remainder on the ground

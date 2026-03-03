@@ -94,7 +94,7 @@ void PolymorphCopyCore(const Actor* src, Actor* tar);
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
 MIC MoveItemCore(Scriptable* Sender, Scriptable* target, const ResRef& resref, int flags, int setflag, int count = 0);
 void MoveToObjectCore(Scriptable* Sender, Action* parameters, ieDword flags, bool untilsee);
-GEM_EXPORT bool CreateItemCore(CREItem* item, const ResRef& resref, int a, int b, int c);
+GEM_EXPORT bool CreateItemCore(CREItem* item, const ResRef& resref, int a, int b, int c, ieWord expiry = 0);
 void AttackCore(Scriptable* Sender, Scriptable* target, int flags);
 void HandleBitMod(ieDword& value1, ieDword value2, BitOp opcode);
 bool ResolveSpellName(ResRef& spellRes, const Action* parameter);
