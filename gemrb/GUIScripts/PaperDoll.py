@@ -315,7 +315,7 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 	def RandomSelect():
 		color = "*"
 		while color == "*":
-			roll = GemRB.Roll (1, m, 0)
+			roll = GemRB.Roll (1, btnIDs[-1], 0)
 			if row < 2:
 				color = t.GetValue (roll, 0)
 			else:
