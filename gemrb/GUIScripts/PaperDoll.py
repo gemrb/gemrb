@@ -29,6 +29,7 @@ if GameCheck.IsIWD2 ():
 from GUIDefines import *
 from ie_restype import *
 from ie_stats import *
+from ie_slots import SLOT_WEAPON
 
 ColorTable = GemRB.LoadTable ("clowncol")
 StanceAnim = "" # set before use
