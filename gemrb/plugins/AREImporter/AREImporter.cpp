@@ -1337,7 +1337,7 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 			if (readonly) {
 				continue;
 			}
-			map->AddMapNote(point, 0, StringFromTLK(StringView(bytes)), false);
+			map->AddMapNote(point, 1, StringFromTLK(StringView(bytes)), false);
 		}
 	}
 
