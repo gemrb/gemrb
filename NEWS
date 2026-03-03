@@ -1,4 +1,4 @@
-GemRB git (6804c3ed):
+GemRB git (506af36):
   New features:
     - 
     - partial audio system rewrite for better (spatial) audio and music
@@ -10,9 +10,9 @@ GemRB git (6804c3ed):
   Improved features:
     - 
     - pathfinder and drawing speedups
-    - video players, animations
+    - video players, animations, controller input
     - iwd2 weapon sets, pst GUI, pst level up, ee compatibility
-    - scripting, effects
+    - scripting, effects, projectiles
     - bugfixes
 
 GemRB v0.9.4 (2025-01-11):
