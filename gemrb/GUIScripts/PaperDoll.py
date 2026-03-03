@@ -266,6 +266,9 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 		offset = 1
 
 	ColorPicker = GemRB.LoadWindow (winID, pack)
+	# reset to single color (band) to match table values
+	# needed for when the value comes from a saved stat
+	PickedColor = PickedColor & 0xFF
 	GemRB.SetVar ("PickedColor", PickedColor)
 
 	for i in btnIDs:
@@ -286,6 +289,7 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 			btnIDs = range(SkinTable.GetRowCount ())
 			table = SkinTable
 
+	selectedBtn = None # radiobutton hack
 	for i in btnIDs:
 		MyColor = GetMyColor (row, i, offset, table)
 		if MyColor == "*":
@@ -295,10 +299,14 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("PickedColor", MyColor)
+		if PickedColor == MyColor:
+			selectedBtn = Button
 		Button.OnPress (ColorPicker.Close)
 
 	# restore value after SetVarAssoc
 	GemRB.SetVar ("PickedColor", PickedColor)
+	if selectedBtn:
+		selectedBtn.SetState (IE_GUI_BUTTON_SELECTED)
 
 	if pack == "GUICG" and GameCheck.IsBG2 ():
 		import CharGenCommon
