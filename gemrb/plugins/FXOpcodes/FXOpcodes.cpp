@@ -4071,7 +4071,6 @@ int fx_visual_animation_effect(Scriptable* /*Owner*/, Actor* /*target*/, Effect*
 // 0x7a Item:CreateInventory
 int fx_create_inventory_item(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_create_inventory_item(%2d)", fx->Opcode);
 	// EEs added randomness that can't hurt elsewhere
 	ResRef* refs[] = { &fx->Resource, &fx->Resource2, &fx->Resource3 };
 	char count = 1;
@@ -4084,6 +4083,7 @@ int fx_create_inventory_item(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		receiver = core->GetGame()->FindPC(1);
 	}
 	receiver->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
+	// it also set CREItem::Expired, but that appears to be useless, since fx_remove_inventory_item_ref is queued as well
 
 	int ret = MaybeTransformTo(fx_remove_inventory_item_ref, fx);
 	if (ret == FX_APPLIED) fx->Resource = *refs[choice];
@@ -7210,13 +7210,10 @@ int fx_create_item_days(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->GetBase(IE_EA) == EA_FAMILIAR) {
 		receiver = core->GetGame()->FindPC(1);
 	}
-	receiver->inventory.AddSlotItemRes(fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
-
-	int ret = MaybeTransformTo(fx_remove_inventory_item_ref, fx);
-	// duration needs recalculating for days
-	// no idea if this multiplier is ok
-	if (ret == FX_APPLIED) fx->Duration += (fx->Duration - core->GetGame()->GameTime) * core->Time.day_sec / 3;
-	return ret;
+	// duration needs recalculating into days
+	ieWord expiry = fx->Duration - core->GetGame()->GameTime;
+	receiver->inventory.AddSlotItemRes(fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4, expiry);
+	return FX_NOT_APPLIED;
 }
 
 // 0x100 Sequencer:Store
