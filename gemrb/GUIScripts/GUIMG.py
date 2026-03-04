@@ -43,6 +43,7 @@ ContCond = None
 ContTarg = None
 SpellType = None
 Level = 1
+spellLevelOffset = None
 
 FlashResRef = "FLASHBR" if GameCheck.IsBG2OrEE () else "FLASH"
 
@@ -60,7 +61,7 @@ def ToggleSpellWindow (btn):
 		ToggleMageWindow (btn)
 
 def InitMageWindow (window):
-	global MageWindow
+	global MageWindow, spellLevelOffset
 	MageWindow = window
 
 	Button = MageWindow.GetControl (1)
@@ -91,10 +92,9 @@ def InitMageWindow (window):
 				Button.SetVisible (True)
 
 	#setup level buttons
-	spellLevelOffset = None
 	if GameCheck.IsBG2 ():
 		spellLevelOffset = 56
-	elif GameCheck.IsBG2EE ():
+	elif GameCheck.IsAnyEE ():
 		spellLevelOffset = 61
 	if spellLevelOffset:
 		for i in range (9):
@@ -261,7 +261,8 @@ def MagePrevLevelPress ():
 
 	if MageSpellLevel > 0:
 		MageSpellLevel = MageSpellLevel - 1
-		UpdateMageWindow (MageWindow)
+		GemRB.SetVar ("MageSpellLevel", MageSpellLevel)
+		RefreshMageLevel ()
 	return
 
 def MageNextLevelPress ():
@@ -269,13 +270,17 @@ def MageNextLevelPress ():
 
 	if MageSpellLevel < 8:
 		MageSpellLevel = MageSpellLevel + 1
-		UpdateMageWindow (MageWindow)
+		GemRB.SetVar ("MageSpellLevel", MageSpellLevel)
+		RefreshMageLevel ()
 	return
 
 def RefreshMageLevel ():
 	global MageSpellLevel
 
 	MageSpellLevel = GemRB.GetVar ("MageSpellLevel")
+	if spellLevelOffset:
+		Button = MageWindow.GetControl (spellLevelOffset + MageSpellLevel)
+		Button.SetState (IE_GUI_BUTTON_SELECTED)
 	UpdateMageWindow (MageWindow)
 	return
 

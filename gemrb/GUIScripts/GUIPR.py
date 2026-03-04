@@ -178,7 +178,8 @@ def PriestPrevLevelPress ():
 
 	if PriestSpellLevel > 0:
 		PriestSpellLevel = PriestSpellLevel - 1
-		UpdatePriestWindow (PriestSpellWindow)
+		GemRB.SetVar ("PriestSpellLevel", PriestSpellLevel)
+		RefreshPriestLevel ()
 	return
 
 def PriestNextLevelPress ():
@@ -186,13 +187,16 @@ def PriestNextLevelPress ():
 
 	if PriestSpellLevel < 6:
 		PriestSpellLevel = PriestSpellLevel + 1
-		UpdatePriestWindow (PriestSpellWindow)
+		GemRB.SetVar ("PriestSpellLevel", PriestSpellLevel)
+		RefreshPriestLevel ()
 	return
 
 def RefreshPriestLevel ():
 	global PriestSpellLevel
 
 	PriestSpellLevel = GemRB.GetVar ("PriestSpellLevel")
+	Button = PriestSpellWindow.GetControl (55 + PriestSpellLevel)
+	Button.SetState (IE_GUI_BUTTON_SELECTED)
 	UpdatePriestWindow (PriestSpellWindow)
 	return
 
