@@ -2527,7 +2527,7 @@ void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion override)
 	strings->CloseAux();
 	tokens.clear(); //clearing the token dictionary
 
-	if (calendar) delete calendar;
+	delete calendar;
 	calendar = new Calendar;
 
 	DataStream* gamStr = nullptr;

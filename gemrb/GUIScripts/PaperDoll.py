@@ -200,7 +200,7 @@ def OpenPaperDollWindow(pc, pack, stats):
 	BackButton.MakeEscape ()
 
 	DoneButton = ColorWindow.GetControlAlias ("DONE")
-	DoneButton.SetText (11973 if GameCheck.IsIWD2 () else 11973)
+	DoneButton.SetText (11973)
 	DoneButton.MakeDefault ()
 	if not GameCheck.IsIWD2 ():
 		DoneButton.OnPress (SaveDoll)

@@ -304,7 +304,7 @@ void SDLVideoDriver::ProcessAxisMotion()
 		gamepadControl.xAxisFloatPos = Clamp(gamepadControl.xAxisFloatPos, 0.0F, static_cast<float>(GetScreenSize().w));
 		gamepadControl.yAxisFloatPos = Clamp(gamepadControl.yAxisFloatPos, 0.0F, static_cast<float>(GetScreenSize().h));
 
-		Event e = EvntManager->CreateMouseMotionEvent(Point(static_cast<int>(gamepadControl.xAxisFloatPos), static_cast<int>(gamepadControl.yAxisFloatPos)));
+		Event e = EventMgr::CreateMouseMotionEvent(Point(static_cast<int>(gamepadControl.xAxisFloatPos), static_cast<int>(gamepadControl.yAxisFloatPos)));
 		EvntManager->DispatchEvent(std::move(e));
 	}
 

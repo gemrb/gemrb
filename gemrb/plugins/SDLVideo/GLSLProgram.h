@@ -10,7 +10,7 @@ namespace GemRB {
 class GLSLProgram {
 public:
 	static GLSLProgram* Create(const std::string& vertexSource, const std::string& fragmentSource, GLuint programID = 0);
-	static GLSLProgram* CreateFromFiles(std::string vertexSourceFileName, std::string fragmentSourceFileName, GLuint programID = 0);
+	static GLSLProgram* CreateFromFiles(const std::string& vertexSourceFileName, const std::string& fragmentSourceFileName, GLuint programID = 0);
 
 	static std::string GetLastError();
 

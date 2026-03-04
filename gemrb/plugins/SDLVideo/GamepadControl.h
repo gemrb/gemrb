@@ -54,7 +54,7 @@ public:
 	bool gamepadScrollDownKeyPressed = false;
 
 	void ConfigurePointer(int pointerSpeed, int pointerAccel, int deadZoneL, int deadZoneR);
-	float GetPointerSpeed();
+	float GetPointerSpeed() const;
 	void SetGamepadPosition(int x, int y);
 	void HandleAxisEvent(uint8_t axis, int16_t value);
 };

@@ -1462,7 +1462,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		//update clock display
 		core->GetGUIScriptEngine()->RunFunction("Clock", "UpdateClock");
 		// also check if any item expired and should get removed
-		auto actors = map->GetAllActors();
+		const auto& actors = map->GetAllActors();
 		for (auto& actor : actors) {
 			actor->inventory.CheckExpiry(hours2);
 		}

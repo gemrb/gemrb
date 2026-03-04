@@ -51,7 +51,7 @@ bool GLSLProgram::TryPath(std::ifstream& fileStream, const std::string& shaderPa
 	return true;
 }
 
-GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std::string fragmentSourceFileName,
+GLSLProgram* GLSLProgram::CreateFromFiles(const std::string& vertexSourceFileName, const std::string& fragmentSourceFileName,
 					  GLuint programID)
 {
 	std::string vertexContent;

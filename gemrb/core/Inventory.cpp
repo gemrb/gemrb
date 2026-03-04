@@ -2213,7 +2213,7 @@ void Inventory::CheckExpiry(ieDword hour)
 {
 	size_t maxSlot = Slots.size();
 	for (size_t i = 0; i < maxSlot; i++) {
-		CREItem* itm = Slots[i];
+		const CREItem* itm = Slots[i];
 		if (!itm) continue;
 		// the 255 is added when loading the item; it discriminates between relative day and absolute hour (useless) durations
 		if (itm->Expired == 0 || itm->Expired > hour + 255) continue;

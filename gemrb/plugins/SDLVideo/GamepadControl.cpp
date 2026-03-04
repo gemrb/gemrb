@@ -28,7 +28,7 @@ void GamepadControl::ConfigurePointer(int pointerSpeed, int pointerAccel, int de
 	deadZoneR = deadR;
 }
 
-float GamepadControl::GetPointerSpeed()
+float GamepadControl::GetPointerSpeed() const
 {
 	return joyPointerSpeed;
 }
