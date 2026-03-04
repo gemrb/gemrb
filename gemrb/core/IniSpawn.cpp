@@ -135,24 +135,18 @@ IniSpawn::IniSpawn(Map* owner, const ResRef& defaultArea)
 	InitialSpawn();
 }
 
-// possible values implemented in DiffMode, but not needed here
-// BINARY_LESS_OR_EQUALS 6 //(left has only bits in right)
-// BINARY_MORE_OR_EQUALS 7 //(left has equal or more bits than right)
-// BINARY_INTERSECT 8      //(left and right has at least one common bit)
-// BINARY_NOT_INTERSECT 9  //(no common bits)
-// BINARY_MORE 10          //left has more bits than right
-// BINARY_LESS 11          //left has less bits than right
-int IniSpawn::GetDiffMode(const ieVariable& keyword) const
+// the other possible values in DiffMode are not needed here
+DiffMode IniSpawn::GetDiffMode(const ieVariable& keyword) const
 {
-	if (!keyword) return NO_OPERATION; //-1
-	if (keyword[0] == 0) return NO_OPERATION; //-1
-	if (keyword == "less_or_equal_to") return LESS_OR_EQUALS; //0 (gemrb ext)
-	if (keyword == "equal_to") return EQUALS; // 1
-	if (keyword == "less_than") return LESS_THAN; // 2
-	if (keyword == "greater_than") return GREATER_THAN; //3
-	if (keyword == "greater_or_equal_to") return GREATER_OR_EQUALS; //4 (gemrb ext)
-	if (keyword == "not_equal_to") return NOT_EQUALS; //5
-	return NO_OPERATION;
+	if (!keyword) return DiffMode::NO_OPERATION;
+	if (keyword[0] == 0) return DiffMode::NO_OPERATION;
+	if (keyword == "less_or_equal_to") return DiffMode::LESS_OR_EQUALS; // gemrb extension
+	if (keyword == "equal_to") return DiffMode::EQUALS;
+	if (keyword == "less_than") return DiffMode::LESS_THAN;
+	if (keyword == "greater_than") return DiffMode::GREATER_THAN;
+	if (keyword == "greater_or_equal_to") return DiffMode::GREATER_OR_EQUALS; // gemrb extension
+	if (keyword == "not_equal_to") return DiffMode::NOT_EQUALS;
+	return DiffMode::NO_OPERATION;
 }
 
 inline bool VarHasContext(StringView str)
@@ -656,7 +650,7 @@ void IniSpawn::SpawnCreature(const CritterEntry& critter) const
 	ieDword specvar = CheckVariable(map, critter.SpecVar, critter.SpecContext);
 
 	if (critter.SpecVar[0]) {
-		if (critter.SpecVarOperator >= 0) {
+		if (critter.SpecVarOperator != DiffMode::NO_OPERATION) {
 			// dunno if this should be negated
 			if (!DiffCore(specvar, critter.SpecVarValue, critter.SpecVarOperator)) {
 				return;

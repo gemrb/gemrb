@@ -10189,12 +10189,12 @@ static PyObject* GemRB_CheckFeatCondition(PyObject* /*self*/, PyObject* args)
 
 	bool ret = true;
 	if (reqs[1] || reqs[2]) {
-		int op = p[9] ? static_cast<int>(PyLong_AsLong(p[9])) : GREATER_OR_EQUALS;
+		DiffMode op = p[9] ? static_cast<DiffMode>(PyLong_AsLong(p[9])) : DiffMode::GREATER_OR_EQUALS;
 		ret = DiffCore(actor->GetBase(reqs[1]), reqs[2], op);
 	}
 
 	if (reqs[3] || reqs[4]) {
-		int op = p[10] ? static_cast<int>(PyLong_AsLong(p[10])) : GREATER_OR_EQUALS;
+		DiffMode op = p[10] ? static_cast<DiffMode>(PyLong_AsLong(p[10])) : DiffMode::GREATER_OR_EQUALS;
 		ret |= DiffCore(actor->GetBase(reqs[3]), reqs[4], op);
 	}
 
@@ -10203,12 +10203,12 @@ static PyObject* GemRB_CheckFeatCondition(PyObject* /*self*/, PyObject* args)
 
 	if (reqs[5] || reqs[6]) {
 		// no | because the formula is (a|b) & (c|d)
-		int op = p[11] ? static_cast<int>(PyLong_AsLong(p[11])) : GREATER_OR_EQUALS;
+		DiffMode op = p[11] ? static_cast<DiffMode>(PyLong_AsLong(p[11])) : DiffMode::GREATER_OR_EQUALS;
 		ret = DiffCore(actor->GetBase(reqs[5]), reqs[6], op);
 	}
 
 	if (reqs[7] || reqs[8]) {
-		int op = p[12] ? static_cast<int>(PyLong_AsLong(p[12])) : GREATER_OR_EQUALS;
+		DiffMode op = p[12] ? static_cast<DiffMode>(PyLong_AsLong(p[12])) : DiffMode::GREATER_OR_EQUALS;
 		ret |= DiffCore(actor->GetBase(reqs[7]), reqs[8], op);
 	}
 

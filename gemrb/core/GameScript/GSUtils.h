@@ -106,21 +106,6 @@ void GoNear(Scriptable* Sender, const Point& p);
 void MoveNearerTo(Scriptable* Sender, const Scriptable* target, int distance, int flags = 0);
 int MoveNearerTo(Scriptable* Sender, const Point& p, int distance, int flags);
 
-#define NO_OPERATION   -1
-#define LESS_OR_EQUALS 0
-//iwd2 diffmode with gemrb enhancements
-#define EQUALS                1
-#define LESS_THAN             2
-#define GREATER_THAN          3
-#define GREATER_OR_EQUALS     4
-#define NOT_EQUALS            5
-#define BINARY_LESS_OR_EQUALS 6 //(left has only bits in right)
-#define BINARY_MORE_OR_EQUALS 7 //(left has equal or more bits than right)
-#define BINARY_INTERSECT      8 //(left and right has at least one common bit)
-#define BINARY_NOT_INTERSECT  9 //(no common bits)
-#define BINARY_MORE           10 //left has more bits than right
-#define BINARY_LESS           11 //left has less bits than right
-
 GEM_EXPORT GroupType GetGroup(const Actor* actor);
 GEM_EXPORT Actor* GetNearestOf(const Map* map, const Actor* origin, int whoseeswho);
 GEM_EXPORT Actor* GetNearestEnemyOf(const Map* map, const Actor* origin, int whoseeswho);
@@ -135,7 +120,7 @@ Point GetEntryPoint(const ResRef& areaname, const ResRef& entryname);
 //these are used from other plugins
 GEM_EXPORT int CanSee(const Scriptable* Sender, const Scriptable* target, bool range, int nodead, bool halveRange = false);
 GEM_EXPORT int SeeCore(Scriptable* Sender, const Trigger* parameters, int extraFlags);
-GEM_EXPORT bool DiffCore(ieDword a, ieDword b, int diffMode);
+GEM_EXPORT bool DiffCore(ieDword a, ieDword b, DiffMode diffMode);
 GEM_EXPORT void DisplayStringCoreVC(Scriptable* Sender, Verbal vc, int flags);
 GEM_EXPORT void DisplayStringCore(Scriptable* Sender, ieStrRef str, int flags, const char* sound = nullptr);
 bool CreateMovementEffect(Actor* actor, const ResRef& area, const Point& position, int face);

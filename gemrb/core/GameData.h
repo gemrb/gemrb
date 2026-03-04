@@ -57,7 +57,7 @@ enum class Difficulty;
 struct IWDIDSEntry {
 	ieDword value;
 	ieWord stat = USHRT_MAX;
-	ieWord relation;
+	DiffMode relation;
 };
 
 struct SpecialSpellType {

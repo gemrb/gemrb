@@ -87,7 +87,7 @@ struct CritterEntry {
 	Point SpawnPoint; //spawn point
 	std::string SpawnPointsDef; // the unparsed available spawn points
 	char SpawnMode = '\0'; // the spawn point selection mode
-	int SpecVarOperator = 0; // operation performed on spec var
+	DiffMode SpecVarOperator = DiffMode::LESS_OR_EQUALS; // operation performed on spec var
 	int SpecVarValue = 0; // using this value with the operation
 	int SpecVarInc = 0; // add this to spec var at each spawn
 	int Orientation = 0; // spawn orientation
@@ -148,7 +148,7 @@ private:
 	void SpawnCreature(const CritterEntry& critter) const;
 	void SpawnGroup(SpawnEntry& event) const;
 	//gets the spec var operation code from a keyword
-	int GetDiffMode(const ieVariable& keyword) const;
+	DiffMode GetDiffMode(const ieVariable& keyword) const;
 	void PrepareSpawnPoints(const DataFileMgr* iniFile, StringView critterName, CritterEntry& critter) const;
 	void SelectSpawnPoint(CritterEntry& critter) const;
 

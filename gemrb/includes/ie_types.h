@@ -143,6 +143,23 @@ inline ieVariable MakeVariable(const StringView& sv)
 	return var;
 }
 
+enum class DiffMode {
+	NO_OPERATION = -1,
+	LESS_OR_EQUALS,
+	//iwd2 diffmode with gemrb enhancements
+	EQUALS,
+	LESS_THAN,
+	GREATER_THAN,
+	GREATER_OR_EQUALS,
+	NOT_EQUALS,
+	BINARY_LESS_OR_EQUALS, // (left has only bits in right)
+	BINARY_MORE_OR_EQUALS, // (left has equal or more bits than right)
+	BINARY_INTERSECT, // (left and right has at least one common bit)
+	BINARY_NOT_INTERSECT, // (no common bits)
+	BINARY_MORE, // left has more bits than right
+	BINARY_LESS // left has less bits than right
+};
+
 }
 
 // NOTE: these specializations are only required due to something in fmt/ranges.h being preferred

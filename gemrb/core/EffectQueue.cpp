@@ -2456,7 +2456,7 @@ bool EffectQueue::CheckIWDTargeting(const Scriptable* Owner, Actor* target, ieDw
 	const IWDIDSEntry& entry = gamedata->GetSpellProt(type);
 	ieDword idx = entry.stat;
 	ieDword val = entry.value;
-	ieDword rel = entry.relation;
+	DiffMode rel = entry.relation;
 	const Actor* OwnerActor;
 	if (idx == STI_INVALID) {
 		// bad entry, don't match
@@ -2476,12 +2476,14 @@ bool EffectQueue::CheckIWDTargeting(const Scriptable* Owner, Actor* target, ieDw
 			return DiffCore(EARelation(Owner, target), EAR_HOSTILE, rel);
 		case STI_DAYTIME:
 			ieDword timeofday;
+			ieDword limit;
 			timeofday = core->Time.GetHour(core->GetGame()->GameTime);
+			limit = static_cast<ieDword>(rel);
 			// handle the clock jumping at midnight
-			if (val > rel) {
-				return timeofday >= val || timeofday <= rel;
+			if (val > limit) {
+				return timeofday >= val || timeofday <= limit;
 			} else {
-				return timeofday >= val && timeofday <= rel;
+				return timeofday >= val && timeofday <= limit;
 			}
 		case STI_AREATYPE:
 			const Map* area;
@@ -2496,11 +2498,11 @@ bool EffectQueue::CheckIWDTargeting(const Scriptable* Owner, Actor* target, ieDw
 			}
 		case STI_TWO_ROWS:
 			//used in checks where any of two matches are ok (golem or undead etc)
-			return CheckIWDTargeting(Owner, target, value, rel, fx) ||
+			return CheckIWDTargeting(Owner, target, value, static_cast<ieDword>(rel), fx) ||
 				CheckIWDTargeting(Owner, target, value, val, fx);
 		case STI_NOT_TWO_ROWS:
 			//this should be the opposite as above
-			return !(CheckIWDTargeting(Owner, target, value, rel, fx) ||
+			return !(CheckIWDTargeting(Owner, target, value, static_cast<ieDword>(rel), fx) ||
 				 CheckIWDTargeting(Owner, target, value, val, fx));
 		case STI_SOURCE_TARGET:
 			return Owner == target;
@@ -2510,7 +2512,7 @@ bool EffectQueue::CheckIWDTargeting(const Scriptable* Owner, Actor* target, ieDw
 			return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, rel);
 		case STI_SPELLSTATE:
 			// only used with 1 and 5, so we don't need another accessor
-			if (rel == EQUALS) {
+			if (rel == DiffMode::EQUALS) {
 				return target->HasSpellState(val);
 			} else {
 				return !target->HasSpellState(val);
@@ -2543,7 +2545,7 @@ bool EffectQueue::CheckIWDTargeting(const Scriptable* Owner, Actor* target, ieDw
 		case STI_WATERY:
 			// NOTE: this got reused in EEs for alignment matching, while the originals were about water.
 			// Luckily the relation is unset in the later and the default 0 doesn't make sense for alignment
-			if (rel == 0) {
+			if (rel == DiffMode::LESS_OR_EQUALS) {
 				// hardcoded via animation id, so we can't use STI_TWO_ROWS
 				// sahuagin x2, water elementals x2 (and water weirds)
 				ieDword animID = target->GetSafeStat(IE_ANIMATION_ID);

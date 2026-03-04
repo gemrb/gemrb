@@ -1565,7 +1565,7 @@ int GameScript::Range(Scriptable* Sender, const Trigger* parameters)
 	}
 	SearchmapPoint targetPos { scr->Pos };
 	int distance = SquaredDistance(senderPos, targetPos);
-	bool matched = DiffCore(distance, (parameters->int0Parameter + 1) * (parameters->int0Parameter + 1), parameters->int1Parameter);
+	bool matched = DiffCore(distance, (parameters->int0Parameter + 1) * (parameters->int0Parameter + 1), static_cast<DiffMode>(parameters->int1Parameter));
 	if (matched) {
 		Sender->SetLastTrigger(trigger_range, scr->GetGlobalID());
 	}
@@ -3571,10 +3571,10 @@ int GameScript::CheckAreaDiffLevel(Scriptable* /*Sender*/, const Trigger* parame
 int GameScript::Difficulty(Scriptable* /*Sender*/, const Trigger* parameters)
 {
 	ieDword diff = core->GetDictionary().Get("Difficulty Level", 0);
-	int mode = parameters->int1Parameter;
+	DiffMode mode = static_cast<DiffMode>(parameters->int1Parameter);
 	//hack for compatibility
 	if (!mode) {
-		mode = EQUALS;
+		mode = DiffMode::EQUALS;
 	}
 	return DiffCore(diff + 1, (ieDword) parameters->int0Parameter, mode);
 }
@@ -3804,16 +3804,16 @@ int GameScript::ChargeCount(Scriptable* Sender, const Trigger* parameters)
 		return 0;
 	}
 	int charge = item->Usages[parameters->int0Parameter];
-	switch (parameters->int2Parameter) {
-		case EQUALS:
+	switch (static_cast<DiffMode>(parameters->int2Parameter)) {
+		case DiffMode::EQUALS:
 			if (charge == parameters->int1Parameter)
 				return 1;
 			break;
-		case LESS_THAN:
+		case DiffMode::LESS_THAN:
 			if (charge < parameters->int1Parameter)
 				return 1;
 			break;
-		case GREATER_THAN:
+		case DiffMode::GREATER_THAN:
 			if (charge > parameters->int1Parameter)
 				return 1;
 			break;
@@ -3842,18 +3842,18 @@ int GameScript::CheckPartyAverageLevel(Scriptable* /*Sender*/, const Trigger* pa
 
 	if (count) level /= count;
 
-	switch (parameters->int1Parameter) {
-		case EQUALS:
+	switch (static_cast<DiffMode>(parameters->int1Parameter)) {
+		case DiffMode::EQUALS:
 			if (level == parameters->int0Parameter) {
 				return 1;
 			}
 			break;
-		case LESS_THAN:
+		case DiffMode::LESS_THAN:
 			if (level < parameters->int0Parameter) {
 				return 1;
 			}
 			break;
-		case GREATER_THAN:
+		case DiffMode::GREATER_THAN:
 			if (level > parameters->int0Parameter) {
 				return 1;
 			}

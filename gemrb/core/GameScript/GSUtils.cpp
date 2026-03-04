@@ -1907,30 +1907,30 @@ bool VariableExists(const Scriptable* Sender, const StringParam& VarName, const 
 	return false;
 }
 
-bool DiffCore(ieDword a, ieDword b, int diffMode)
+bool DiffCore(ieDword a, ieDword b, DiffMode diffMode)
 {
 	switch (diffMode) {
-		case LESS_THAN:
+		case DiffMode::LESS_THAN:
 			return a < b;
-		case EQUALS:
+		case DiffMode::EQUALS:
 			return a == b;
-		case GREATER_THAN:
+		case DiffMode::GREATER_THAN:
 			return a > b;
-		case GREATER_OR_EQUALS:
+		case DiffMode::GREATER_OR_EQUALS:
 			return a >= b;
-		case NOT_EQUALS:
+		case DiffMode::NOT_EQUALS:
 			return a != b;
-		case BINARY_LESS_OR_EQUALS:
+		case DiffMode::BINARY_LESS_OR_EQUALS:
 			return (a & b) == a;
-		case BINARY_MORE:
+		case DiffMode::BINARY_MORE:
 			return (a & b) != a;
-		case BINARY_MORE_OR_EQUALS:
+		case DiffMode::BINARY_MORE_OR_EQUALS:
 			return (a & b) == b;
-		case BINARY_LESS:
+		case DiffMode::BINARY_LESS:
 			return (a & b) != b;
-		case BINARY_INTERSECT:
+		case DiffMode::BINARY_INTERSECT:
 			return static_cast<bool>(a & b);
-		case BINARY_NOT_INTERSECT:
+		case DiffMode::BINARY_NOT_INTERSECT:
 			return !(a & b);
 		default: //less or equals
 			return a <= b;

@@ -676,7 +676,7 @@ void GameData::ReadSpellProtTable()
 		ieDword stat = core->TranslateStat(tab->QueryField(i, 0));
 		spellProt[i].stat = (ieWord) stat;
 		spellProt[i].value = tab->QueryFieldUnsigned<ieDword>(i, 1);
-		spellProt[i].relation = tab->QueryFieldUnsigned<ieWord>(i, 2);
+		spellProt[i].relation = static_cast<DiffMode>(tab->QueryFieldUnsigned<ieWord>(i, 2));
 	}
 }
 
