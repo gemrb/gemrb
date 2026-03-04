@@ -1096,34 +1096,64 @@ void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end)
 	} while (iter != end);
 }
 
+void ConeShape::SetupCone(ieWord width, orient_t orientation)
+{
+	// see Orientation.h for a nice visualization of the orientation directions
+	// they start at 270° and go anticlockwise, so we have to rotate (reflect over y=-x) to match what math functions expect
+	// TODO: check if we can ignore this and use the angle between caster pos and target pos (are they still available here?)
+	orient_t saneOrientation = PrevOrientation(E, orientation);
+	// for cone angles (widths) bigger than 22.5 we will always have a range of values greater than 360
+	// to normalize into [0,360] we use an orientation dependent factor that is then accounted for in later calculations
+	minDeg = (saneOrientation * (720 / MAX_ORIENT) - width) / 2;
+	if (minDeg < 0) {
+		degOffset = -minDeg;
+	} else if (minDeg + width > 360) {
+		degOffset = -(minDeg - 360 + width);
+	}
+	minDeg += degOffset;
+	maxDeg = minDeg + width;
+}
+
+bool Projectile::InCone(const Actor* actor, const ConeShape& cone) const
+{
+	// cone never affects the caster
+	if (Caster == actor->GetGlobalID()) {
+		return false;
+	}
+	float_t xDiff = actor->Pos.x - Pos.x;
+	float_t yDiff = Pos.y - actor->Pos.y;
+	int deg;
+
+	// a dragon will definitely be easier to hit than a mouse
+	// but nothing checks the personal space of possible targets in the original either #384
+	if (yDiff) {
+		// ensure [0,360] range: transform [-180,180] from atan2, but also take orientation correction factor into account
+		deg = int(std::atan2(yDiff, xDiff) * 180 / M_PI);
+		deg = ((deg % 360) + 360 + cone.degOffset) % 360;
+	} else if (xDiff < 0) {
+		deg = 180;
+	} else {
+		deg = 0;
+	}
+
+	// not in the right sector of circle
+	if (cone.minDeg > deg || cone.maxDeg < deg) {
+		return false;
+	}
+	return true;
+}
+
 //secondary projectiles target all in the explosion radius
 void Projectile::SecondaryTarget()
 {
 	//fail will become true if the projectile utterly failed to find a target
 	//if the spell was already applied on explosion, ignore this
 	bool fail = !!(Extension->APFlags & APF_SPELLFAIL) && !(ExtFlags & PEF_DEFSPELL);
-	int mindeg = 0;
-	int maxdeg = 0;
-	int degOffset = 0;
 
-	//the AOE (area of effect) is cone shaped
+	// the AOE (area of effect) is cone shaped
+	ConeShape cone;
 	if (Extension->AFlags & PAF_CONE) {
-		// see Orientation.h for a nice visualization of the orientation directions
-		// they start at 270° and go anticlockwise, so we have to rotate (reflect over y=-x) to match what math functions expect
-		// TODO: check if we can ignore this and use the angle between caster pos and target pos (are they still available here?)
-		orient_t saneOrientation = PrevOrientation(E, Orientation);
-
-		// for cone angles (widths) bigger than 22.5 we will always have a range of values greater than 360
-		// to normalize into [0,360] we use an orientation dependent factor that is then accounted for in later calculations
-		mindeg = (saneOrientation * (720 / MAX_ORIENT) - Extension->ConeWidth) / 2;
-		if (mindeg < 0) {
-			degOffset = -mindeg;
-			//mindeg = 0;
-		} else if (mindeg + Extension->ConeWidth > 360) {
-			degOffset = -(mindeg - 360 + Extension->ConeWidth);
-		}
-		mindeg += degOffset;
-		maxdeg = mindeg + Extension->ConeWidth;
+		cone.SetupCone(Extension->ConeWidth, Orientation);
 	}
 
 	if (Extension->DiceCount) {
@@ -1152,31 +1182,8 @@ void Projectile::SecondaryTarget()
 			continue;
 		}
 
-		if (Extension->AFlags & PAF_CONE) {
-			//cone never affects the caster
-			if (Caster == targetID) {
-				continue;
-			}
-			float_t xdiff = actor->Pos.x - Pos.x;
-			float_t ydiff = Pos.y - actor->Pos.y;
-			int deg;
-
-			// a dragon will definitely be easier to hit than a mouse
-			// but nothing checks the personal space of possible targets in the original either #384
-			if (ydiff) {
-				// ensure [0,360] range: transform [-180,180] from atan2, but also take orientation correction factor into account
-				deg = int(std::atan2(ydiff, xdiff) * 180 / M_PI);
-				deg = ((deg % 360) + 360 + degOffset) % 360;
-			} else if (xdiff < 0) {
-				deg = 180;
-			} else {
-				deg = 0;
-			}
-
-			//not in the right sector of circle
-			if (mindeg > deg || maxdeg < deg) {
-				continue;
-			}
+		if (Extension->AFlags & PAF_CONE && !InCone(actor, cone)) {
+			continue;
 		}
 
 		Projectile* pro = server->GetProjectileByIndex(Extension->ExplProjIdx);

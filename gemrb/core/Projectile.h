@@ -163,6 +163,13 @@ enum class ProHeights {
 #define APF_TILED    4096
 #define APF_PLAYONCE 8192
 
+struct ConeShape {
+	int minDeg = 0;
+	int maxDeg = 0;
+	int degOffset = 0;
+	void SetupCone(ieWord width, orient_t orientation); // deliberately not providing as a ctor
+};
+
 struct ProjectileExtension {
 	ieDword AFlags;
 	ieWord TriggerRadius;
@@ -415,6 +422,7 @@ private:
 	void LineTarget(); // line projectiles (walls, scorchers)
 	void LineTarget(Path::const_iterator beg, Path::const_iterator end);
 	void SecondaryTarget(); //area projectiles (circles, cones)
+	bool InCone(const Actor* actor, const ConeShape& cone) const;
 	ProjectileState CheckTrigger(unsigned int radius);
 	void BendPosition(Point& pos) const;
 	void DrawPopping(orient_t face, const Point& pos, BlitFlags flags, const Color& popTint);
