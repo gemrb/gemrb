@@ -73,17 +73,22 @@ def InitMageWindow (window):
 
 	# contingencies
 	Button = MageWindow.GetControl (55)
-	if GameCheck.IsBG2EE ():
+	if GameCheck.IsAnyEE ():
 		Button = MageWindow.GetControl (59)
 	if Button:
 		Button.OnPress (OpenContingenciesWindow)
 		pc = GemRB.GameGetSelectedPCSingle ()
 		if GemRB.CountEffects (pc, "CastSpellOnCondition", -1, -1) + GemRB.CountEffects (pc, "Sequencer:Store", -1, -1) == 0:
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
-			Button.SetText (None)
+			if GameCheck.IsAnyEE ():
+				Button.SetVisible (False)
+			else:
+				Button.SetState (IE_GUI_BUTTON_DISABLED)
+				Button.SetText (None)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 			Button.SetText (34586)
+			if GameCheck.IsAnyEE ():
+				Button.SetVisible (True)
 
 	#setup level buttons
 	spellLevelOffset = None
