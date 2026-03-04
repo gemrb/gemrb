@@ -179,6 +179,9 @@ public:
 	ContentContainer::Margin GetMargins() const;
 	void SetMargins(ContentContainer::Margin m);
 
+	void MarkDialogStart();
+	void ClearDialogStart() { dialogScrollTarget = -1; }
+
 	/** Returns the selected text */
 	String QueryText() const override;
 	/** Marks textarea for redraw with a new value */
@@ -192,6 +195,7 @@ private: // Private attributes
 	// dialog and listbox handling
 	std::vector<value_t> values;
 	const Content* dialogBeginNode;
+	int dialogScrollTarget = -1;
 	Holder<Sprite2D> speakerPic;
 	// dialog options container
 	SpanSelector* selectOptions = nullptr;

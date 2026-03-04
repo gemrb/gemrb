@@ -341,7 +341,11 @@ void TextArea::UpdateScrollview()
 
 		if (core->HasFeature(GFFlags::DIALOGUE_SCROLLS)) {
 			anim = 500;
-			y = 9999999; // FIXME: properly calculate the "bottom"?
+			if (dialogScrollTarget >= 0) {
+				y = dialogScrollTarget;
+			} else {
+				y = nodeBounds.y - LineHeight();
+			}
 		} else {
 			int blankH = frame.h - LineHeight() - nodeBounds.h - optH;
 			if (blankH > 0) {
@@ -610,6 +614,11 @@ void TextArea::AddSubviewInFrontOfView(View* front, const View* back)
 	View::AddSubviewInFrontOfView(front, target);
 }
 
+void TextArea::MarkDialogStart()
+{
+	dialogScrollTarget = textContainer ? textContainer->Dimensions().h : 0;
+}
+
 int TextArea::TextHeight() const
 {
 	return textContainer ? textContainer->Dimensions().h : 0;
@@ -732,6 +741,7 @@ void TextArea::TextChanged(const TextContainer& /*tc*/)
 
 void TextArea::ClearText()
 {
+	dialogScrollTarget = -1;
 	delete scrollview.RemoveSubview(textContainer);
 
 	parser.Reset(); // reset in case any tags were left open from before

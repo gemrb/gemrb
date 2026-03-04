@@ -159,6 +159,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 		// reset the TA
 		ta->SetSpeakerPicture(nullptr);
 		ta->ClearSelectOptions();
+		ta->ClearDialogStart();
 	}
 
 	Actor* tmp = GetSpeaker();
@@ -430,6 +431,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		EndDialog();
 		return false;
 	}
+
+	ta->MarkDialogStart();
 
 	if (target) {
 		// displaying npc text and portrait
