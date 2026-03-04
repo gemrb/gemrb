@@ -11001,7 +11001,9 @@ bool Actor::TryToHide()
 		skill = GetStat(IE_STEALTH);
 	}
 
-	if (seen) {
+	// hide in plain sight: a shadowdancer may hide in shadows even while being observed
+	bool shadow = GetThiefLevel() && (BaseStats[IE_KIT] & 0xFFFFBFFF) == 0x21;
+	if (seen && !shadow) {
 		HideFailed(this, 1);
 	}
 
