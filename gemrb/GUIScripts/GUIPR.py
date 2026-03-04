@@ -60,6 +60,9 @@ def InitPriestWindow (Window):
 			Button = Window.GetControl (55 + i)
 			Button.SetVarAssoc ("PriestSpellLevel", i)
 
+		Button = Window.GetControl (55 + PriestSpellLevel)
+		Button.SetState (IE_GUI_BUTTON_SELECTED)
+
 	# Setup memorized spells buttons
 	for i in range (12):
 		Button = Window.GetControl (3 + i)

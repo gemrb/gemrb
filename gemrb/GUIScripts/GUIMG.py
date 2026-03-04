@@ -103,6 +103,9 @@ def InitMageWindow (window):
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 			Button.SetVarAssoc ("MageSpellLevel", i)
 
+		Button = MageWindow.GetControl (spellLevelOffset + MageSpellLevel)
+		Button.SetState (IE_GUI_BUTTON_SELECTED)
+
 	# Setup memorized spells buttons
 	if not Sorcerer:
 		for i in range (12):
