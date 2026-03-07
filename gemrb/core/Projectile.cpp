@@ -30,6 +30,7 @@
 #include "Interface.h"
 #include "Light.h"
 #include "Map.h"
+#include "Polygon.h"
 #include "ProjectileServer.h"
 #include "RNG.h"
 #include "ScriptedAnimation.h"
@@ -1142,6 +1143,41 @@ bool Projectile::InCone(const Actor* actor, const ConeShape& cone) const
 	return true;
 }
 
+// walls have oriented rectangular targeting, centered around the casting point
+// area effect: Trap Size (TriggerRadius) = Parallel Length, Explosion Size (ExplosionRadius) = Perpendicular Length
+// NOTE: does not take the isometric perspective into account - unclear if it should
+void Projectile::SetupWall(Gem_Polygon& wall) const
+{
+	// find the vertices
+	std::vector<Point> verts;
+	float_t h = Extension->ExplosionRadius / 2;
+	float_t w = Extension->TriggerRadius / 2;
+	int baseAngle = GetMathyOrientation(Orientation) * M_PI / 180;
+	float_t cosinus = std::cos(baseAngle);
+	float_t sinus = std::sin(baseAngle);
+
+	// A
+	int xOffset = static_cast<int>(w * cosinus + h * sinus);
+	int yOffset = static_cast<int>(w * sinus - h * cosinus);
+	verts.emplace_back(Pos.x + xOffset, Pos.y + yOffset);
+	// B
+	xOffset = static_cast<int>(w * cosinus - h * sinus);
+	yOffset = static_cast<int>(w * sinus + h * cosinus);
+	verts.emplace_back(Pos.x + xOffset, Pos.y + yOffset);
+	// C
+	xOffset = static_cast<int>(-w * cosinus - h * sinus);
+	yOffset = static_cast<int>(-w * sinus + h * cosinus);
+	verts.emplace_back(Pos.x + xOffset, Pos.y + yOffset);
+	// D
+	xOffset = static_cast<int>(-w * cosinus + h * sinus);
+	yOffset = static_cast<int>(-w * sinus - h * cosinus);
+	verts.emplace_back(Pos.x + xOffset, Pos.y + yOffset);
+
+	// construct the polygon for hit-testing
+	Gem_Polygon newWall { std::move(verts) };
+	wall = std::move(newWall);
+}
+
 //secondary projectiles target all in the explosion radius
 void Projectile::SecondaryTarget()
 {
@@ -1153,6 +1189,12 @@ void Projectile::SecondaryTarget()
 	ConeShape cone;
 	if (Extension->AFlags & PAF_CONE) {
 		cone.SetupCone(Extension->ConeWidth, Orientation);
+	}
+
+	// the wall area of effect is not circular
+	Gem_Polygon wall;
+	if (ExtFlags & PEF_WALL) {
+		SetupWall(wall);
 	}
 
 	if (Extension->DiceCount) {
@@ -1182,6 +1224,10 @@ void Projectile::SecondaryTarget()
 		}
 
 		if (Extension->AFlags & PAF_CONE && !InCone(actor, cone)) {
+			continue;
+		}
+
+		if (ExtFlags & PEF_WALL && !wall.PointIn(actor->Pos)) {
 			continue;
 		}
 

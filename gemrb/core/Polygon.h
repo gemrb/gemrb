@@ -43,6 +43,7 @@ class GEM_EXPORT Gem_Polygon {
 public:
 	using LineSegment = std::pair<Point, Point>;
 
+	Gem_Polygon() = default; // beware on use
 	Gem_Polygon(std::vector<Point>&&, const Region* bbox = nullptr);
 
 	Region BBox;
