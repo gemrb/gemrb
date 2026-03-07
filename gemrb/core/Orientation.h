@@ -162,6 +162,13 @@ inline orient_t GetNextFace(orient_t old, orient_t next)
 	return old;
 }
 
+// orientations start at 270° with S and go clockwise, while
+// math functions expect counterclockwise starting from E
+inline orient_t GetMathyOrientation(orient_t face)
+{
+	return PrevOrientation(E, face);
+}
+
 } // namespace GemRB
 
 #endif

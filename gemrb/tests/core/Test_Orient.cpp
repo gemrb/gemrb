@@ -41,7 +41,7 @@ TEST(OrientationTest, GetOrient)
 		int dy = std::sin(angle) * distance;
 		auto target = Point(start.x + dx, start.y - dy);
 		dir = GetOrient(start, target);
-		int expectedDir = PrevOrientation(E, i);
+		int expectedDir = GetMathyOrientation(static_cast<orient_t>(i));
 		EXPECT_EQ(dir, expectedDir) << "i: " << i << " target: " << target.x << " " << target.y << std::endl;
 	}
 }

@@ -1099,9 +1099,8 @@ void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end)
 void ConeShape::SetupCone(ieWord width, orient_t orientation)
 {
 	// see Orientation.h for a nice visualization of the orientation directions
-	// they start at 270° and go anticlockwise, so we have to rotate (reflect over y=-x) to match what math functions expect
 	// TODO: check if we can ignore this and use the angle between caster pos and target pos (are they still available here?)
-	orient_t saneOrientation = PrevOrientation(E, orientation);
+	orient_t saneOrientation = GetMathyOrientation(orientation);
 	// for cone angles (widths) bigger than 22.5 we will always have a range of values greater than 360
 	// to normalize into [0,360] we use an orientation dependent factor that is then accounted for in later calculations
 	minDeg = (saneOrientation * (720 / MAX_ORIENT) - width) / 2;
