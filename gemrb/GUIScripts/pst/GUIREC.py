@@ -912,6 +912,7 @@ def OpenLevelUpWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (4192)
 	Button.OnPress (AcceptLevelUp)
+	Button.MakeDefault ()
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
