@@ -5921,7 +5921,10 @@ void Actor::GetItemSlotInfo(ItemExtHeader* item, int which, int header) const
 	}
 	const ITMExtHeader* ext_header = itm->GetExtHeader(headerindex);
 	//item has no extended header, or header index is wrong
-	if (!ext_header) return;
+	if (!ext_header) {
+		gamedata->FreeItem(itm, slot->ItemResRef, false);
+		return;
+	}
 	item->CopyITMExtHeader(*ext_header);
 	item->itemName = slot->ItemResRef;
 	item->slot = idx;
@@ -11622,9 +11625,9 @@ char Actor::GetArmorCode() const
 	const Item* item = gamedata->GetItem(itm->ItemResRef, true);
 	if (!item) return '1';
 	bool wearingRobes = item->AnimationType[1] == 'W';
-
-	if (mageAnimation ^ wearingRobes) return '1';
-	return item->AnimationType[0];
+	char code = (mageAnimation ^ wearingRobes) ? '1' : item->AnimationType[0];
+	gamedata->FreeItem(item, itm->ItemResRef, false);
+	return code;
 }
 
 ResRef Actor::GetArmorSound() const

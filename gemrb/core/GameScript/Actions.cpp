@@ -6860,6 +6860,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	}
 	const ITMExtHeader* hh = itm->GetExtHeader(header);
 	if (!hh) {
+		gamedata->FreeItem(itm, itemres, false);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -6869,11 +6870,13 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		if (!target || target->ValidTarget(GA_NO_DEAD) ||
 		    (target->InParty == 0 && (inactive || removed)) ||
 		    (target->InParty && removed)) {
+			gamedata->FreeItem(itm, itemres, false);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
 	} else {
 		if ((target && target->GetStat(IE_AVATARREMOVAL)) || inactive) {
+			gamedata->FreeItem(itm, itemres, false);
 			Sender->ReleaseCurrentAction();
 			return;
 		}

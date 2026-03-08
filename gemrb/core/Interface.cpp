@@ -204,6 +204,7 @@ ItemDragOp::ItemDragOp(CREItem* item)
 		// use any / the smaller icon if the dragging one is unavailable
 		pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
 	}
+	gamedata->FreeItem(i, item->ItemResRef, false);
 
 	cursor = std::move(pic);
 

@@ -2394,7 +2394,11 @@ Actor* Map::GetItemByDialog(const ResRef& resref) const
 		if (!citem) continue;
 		const Item* item = gamedata->GetItem(citem->ItemResRef);
 		if (!item) continue;
-		if (item->Dialog != resref) continue;
+		if (item->Dialog != resref) {
+			gamedata->FreeItem(item, citem->ItemResRef, false);
+			continue;
+		}
+		gamedata->FreeItem(item, citem->ItemResRef, false);
 
 		// finally, spawn (dmhead.cre) from our override as a substitute talker
 		// the cre file is set up to be invisible, invincible and immune to several things

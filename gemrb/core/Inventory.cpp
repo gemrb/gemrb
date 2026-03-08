@@ -993,7 +993,10 @@ bool Inventory::EquipItem(ieDword slot)
 				}
 			}
 			header = itm->GetExtHeader(newHeader);
-			if (!header) return false; // in case of broken saves
+			if (!header) { // in case of broken saves
+				gamedata->FreeItem(itm, item->ItemResRef, false);
+				return false;
+			}
 			if (header->AttackType == ITEM_AT_BOW || (header->AttackType == ITEM_AT_PROJECTILE && !header->Charges)) {
 				// find the ranged projectile associated with it, this returns equipped code
 				equip = FindRangedProjectile(header->ProjectileQualifier);
@@ -1019,7 +1022,10 @@ bool Inventory::EquipItem(ieDword slot)
 			//Get the ranged header of the projectile (so we theoretically allow shooting of daggers)
 			newHeader = itm->GetWeaponHeaderNumber(true);
 			header = itm->GetExtHeader(newHeader);
-			if (!header) return false; // in case of broken saves
+			if (!header) { // in case of broken saves
+				gamedata->FreeItem(itm, item->ItemResRef, false);
+				return false;
+			}
 			weaponslot = FindTypedRangedWeapon(header->ProjectileQualifier);
 			if (weaponslot == SLOT_FIST || (Equipped == ieWordSigned(slot - SLOT_MELEE) && EquippedHeader == newHeader)) {
 				gamedata->FreeItem(itm, item->ItemResRef, false);
@@ -1394,7 +1400,9 @@ const ITMExtHeader* Inventory::GetEquippedExtHeader(int header) const
 	if (!itm) return NULL;
 	const Item* item = gamedata->GetItem(itm->ItemResRef, true);
 	if (!item) return NULL;
-	return item->GetExtHeader(header);
+	const ITMExtHeader* ext = item->GetExtHeader(header);
+	gamedata->FreeItem(item, itm->ItemResRef, false);
+	return ext;
 }
 
 void Inventory::SetEquipped(ieWordSigned slot, ieWord header)
@@ -1463,7 +1471,10 @@ void Inventory::CacheWeaponInfo(bool leftOrRight) const
 	}
 	hittingHeader = item->GetExtHeader(headerIdx);
 
-	if (!hittingHeader) return; // ar2808 elf has the misc3b moonblade equipped ... and it has no headers
+	if (!hittingHeader) { // ar2808 elf has the misc3b moonblade equipped ... and it has no headers
+		gamedata->FreeItem(item, weapon->ItemResRef, false);
+		return;
+	}
 	if (hittingHeader->AttackType == ITEM_AT_PROJECTILE) ranged = true; // throwing weapon
 
 	if (ranged) {
@@ -2194,6 +2205,7 @@ void Inventory::EnforceUsability()
 
 		// use CanUseItemType if this turns out to be insufficient
 		HCStrings idx = Owner->Unusable(item);
+		gamedata->FreeItem(item, itm->ItemResRef, false);
 		if (idx == HCStrings::count) continue;
 
 		// pst-only feedback: unusable item placed {in backpack, on the ground}

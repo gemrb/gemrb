@@ -9496,6 +9496,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject* /*self*/, PyObject* args)
 		const CREItem* weapon = actor->inventory.GetUsedWeapon(false, Effect);
 		if (weapon && (weapon->Flags & IE_INV_ITEM_CURSED)) {
 			displaymsg->DisplayConstantString(HCStrings::Cursed, GUIColors::WHITE);
+			gamedata->FreeItem(item, slotitem->ItemResRef, false);
 			return PyLong_FromLong(ASI_FAILED);
 		}
 	}
@@ -9513,6 +9514,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject* /*self*/, PyObject* args)
 	//it is always possible to put these items into the inventory
 	if (!(Slottype & SLOT_INVENTORY)) {
 		if (CheckRemoveItem(actor, slotitem, CRI_EQUIP)) {
+			gamedata->FreeItem(item, slotitem->ItemResRef, false);
 			return PyLong_FromLong(ASI_FAILED);
 		}
 	}

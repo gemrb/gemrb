@@ -127,8 +127,12 @@ Store* STOImporter::GetStore(Store* s)
 		const Item* itm = gamedata->GetItem(item->ItemResRef, true);
 		// some iwd2 stores like 60sheemi contain crap
 		if (itm && signed(itm->ItemNameIdentified) == -1) {
+			gamedata->FreeItem(itm, item->ItemResRef, false);
 			toDelete.push_back(item);
 			continue;
+		}
+		if (itm) {
+			gamedata->FreeItem(itm, item->ItemResRef, false);
 		}
 		//it is important to handle this field as signed
 		if (item->InfiniteSupply > 0) {
