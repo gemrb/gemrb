@@ -7644,6 +7644,7 @@ void Actor::ModifyDamage(Scriptable* hitter, int& damage, int& resisted, int dam
 	static EffectRef fx_aegis_ref = { "Aegis", -1 };
 	static EffectRef fx_cloak_ref = { "Overlay", -1 };
 	static EffectRef fx_ironskins_ref = { "IronSkins", -1 }; // iwd2 stone- and ironskin
+	static EffectRef fx_armor_ref = { "ACVsDamageTypeModifier", -1 };
 	Actor* attacker = Scriptable::As<Actor>(hitter);
 
 	//guardian mantle for PST
@@ -7651,6 +7652,17 @@ void Actor::ModifyDamage(Scriptable* hitter, int& damage, int& resisted, int dam
 		//if the hitter doesn't make the spell save, the mantle works and the damage is 0
 		if (!attacker->GetSavingThrow(0, -4)) {
 			damage = 0;
+			return;
+		}
+	}
+
+	// the pst armor spell has a pseudo damage soaking effect
+	// all effects in the spell need to be removed when enough damage has been
+	// taken, the armor not acting like a stoneskin (as cloak of warding does)
+	if (pstflags && fxqueue.HasEffectWithSource(fx_armor_ref, "spwi102")) {
+		if (fxqueue.DecreaseParam3OfEffect(fx_armor_ref, damage, -1)) {
+			// the damage was higher, kill the spell
+			fxqueue.RemoveAllEffects("spwi102");
 			return;
 		}
 	}

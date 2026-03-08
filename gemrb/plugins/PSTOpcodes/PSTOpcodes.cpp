@@ -817,7 +817,15 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 				break;
 			case 7: //armor
 				target->ApplyEffectCopy(fx, fx_colorchange_ref, Owner, 0x825A2800, -1);
-				target->ApplyEffectCopy(fx, fx_armor_ref, Owner, 6, 16);
+				// since the timing mode is permanent, we need to manually fix the AC effect
+				newfx = EffectQueue::CreateEffectCopy(fx, fx_armor_ref, 6, 16);
+				if (newfx) {
+					newfx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+					newfx->Duration = 0xffff; // just something big to mimic permanence
+					newfx->Resistance = FX_NO_RESIST_CAN_DISPEL;
+					newfx->Parameter3 = 8 + fx->CasterLevel;
+					core->ApplyEffect(newfx, target, Owner);
+				}
 				break;
 			case 8: //antimagic shell
 				{
