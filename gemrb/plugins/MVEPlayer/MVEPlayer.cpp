@@ -334,6 +334,9 @@ MVEPlayer::FrameResult MVEPlayer::UpdatePalette()
 	if (paletteNumBytes > MAX_PALETTENUMBYTES) {
 		return FrameResult::ERROR;
 	}
+	if (startIdx + numEntries > 255) {
+		return FrameResult::ERROR;
+	}
 
 	std::vector<unsigned char> paletteData;
 	paletteData.resize(paletteNumBytes);

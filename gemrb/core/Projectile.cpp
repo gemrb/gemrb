@@ -1150,8 +1150,8 @@ void Projectile::SetupWall(Gem_Polygon& wall) const
 {
 	// find the vertices
 	std::vector<Point> verts;
-	float_t h = Extension->ExplosionRadius / 2;
-	float_t w = Extension->TriggerRadius / 2;
+	float_t h = Extension->ExplosionRadius / 2.0;
+	float_t w = Extension->TriggerRadius / 2.0;
 	int baseAngle = GetMathyOrientation(Orientation) * M_PI / 180;
 	float_t cosinus = std::cos(baseAngle);
 	float_t sinus = std::sin(baseAngle);
