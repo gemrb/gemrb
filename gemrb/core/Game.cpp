@@ -1933,7 +1933,7 @@ bool Game::RestParty(RestChecks checks, int dream, int hp)
 	}
 
 	// rest once
-	ieDword allowRepeatedRests = core->GetDictionary().Get("Heal Party on Rest", 0);
+	ieDword allowRepeatedRests = core->GetDictionary().Get("Heal Party on Rest", 0) && !(checks & RestChecks::NoRepeats);
 	bool interrupted = false;
 	int hours = 8;
 	interrupted = !RestPartyInternal(checks, hp, hours);

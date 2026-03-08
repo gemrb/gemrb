@@ -117,7 +117,8 @@ enum RestChecks {
 	Area = 1, // is it allowed at all?
 	Scattered = 2, // is the party together?
 	InControl = 4, // are pcs controllable?
-	Enemies = 8
+	Enemies = 8,
+	NoRepeats = 16 // disable Rest until healed
 };
 
 // Song types, index in ARE song section (hardcoded and in musics.ids for scripts (iwd))

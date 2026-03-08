@@ -1957,7 +1957,8 @@ def RentConfirm (Window0):
 	RestTable = GemRB.LoadTable ("restheal")
 	healFor = RestTable.GetValue (RentIndex, 0, GTV_INT)
 	# TODO: run GemRB.RunRestScripts ()
-	info = GemRB.RestParty (2, 1, healFor) # 2 = REST_SCATTER, check that everyone is close by
+	# 18 = check that everyone is close by + don't repeat rests
+	info = GemRB.RestParty (18, 1, healFor)
 	cutscene = info["Cutscene"]
 
 	if RentConfirmWindow:

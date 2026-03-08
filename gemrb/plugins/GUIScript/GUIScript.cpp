@@ -11589,7 +11589,8 @@ static PyObject* GemRB_RestParty(PyObject* /*self*/, PyObject* args)
 	} else {
 		PyDict_SetItemString(dict, "ErrorMsg", DecRef(PyLong_FromLong, -1));
 		// all is well, so do the actual resting
-		PyDict_SetItemString(dict, "Cutscene", DecRef(PyBool_FromLong, game->RestParty((RestChecks) flags & RestChecks::Area, dream, hp)));
+		RestChecks remainingFlags = static_cast<RestChecks>(flags & (RestChecks::Area | RestChecks::NoRepeats));
+		PyDict_SetItemString(dict, "Cutscene", DecRef(PyBool_FromLong, game->RestParty(remainingFlags, dream, hp)));
 	}
 
 	return dict;
