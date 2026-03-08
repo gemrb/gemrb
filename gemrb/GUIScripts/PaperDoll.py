@@ -31,7 +31,7 @@ from ie_restype import *
 from ie_stats import *
 from ie_slots import SLOT_WEAPON
 
-ColorTable = GemRB.LoadTable ("clowncol")
+ColorTable = GemRB.LoadTable ("clowncol", True, True)
 StanceAnim = "" # set before use
 
 def ColorStatsFromPortrait (PortraitName):
