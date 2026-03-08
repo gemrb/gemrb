@@ -377,7 +377,7 @@ public:
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index) const;
 	void SwapPCs(unsigned int pc1, unsigned int pc2) const;
-	bool IsDay() const;
+	bool IsDay(int hour = -1) const;
 	/** checks if the actor should be replaced via npclevel.2da and then does it */
 	bool CheckForReplacementActor(size_t i);
 

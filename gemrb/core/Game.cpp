@@ -2236,9 +2236,9 @@ void Game::ApplyGlobalTint(Color& tint, BlitFlags& flags) const
 	}
 }
 
-bool Game::IsDay() const
+bool Game::IsDay(int hour) const
 {
-	ieDword daynight = core->Time.GetHour(GameTime);
+	int daynight = hour == -1 ? core->Time.GetHour(GameTime) : (hour % 24);
 	// matches GameScript::TimeOfDay and splprot.2da by including dawn
 	if (daynight < 6 || daynight > 20) {
 		return false;
