@@ -1466,6 +1466,11 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		for (auto& actor : actors) {
 			actor->inventory.CheckExpiry(hours2);
 		}
+
+		// check for day/night transitions
+		if (IsDay(hours) ^ IsDay(hours2)) {
+			ChangeSong(false, true);
+		}
 	}
 
 	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)
