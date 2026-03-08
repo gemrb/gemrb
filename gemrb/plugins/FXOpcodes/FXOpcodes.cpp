@@ -4084,6 +4084,7 @@ int fx_create_inventory_item(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	receiver->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
 	// it also set CREItem::Expired, but that appears to be useless, since fx_remove_inventory_item_ref is queued as well
+	// with the same effective timing
 
 	int ret = MaybeTransformTo(fx_remove_inventory_item_ref, fx);
 	if (ret == FX_APPLIED) fx->Resource = *refs[choice];

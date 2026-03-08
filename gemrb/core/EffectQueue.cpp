@@ -1580,7 +1580,7 @@ void EffectQueue::RemoveAllEffectsWithResource(EffectRef& effectReference, const
 	RemoveAllEffectsWithResource(effectReference.opcode, resource);
 }
 
-//Removes all effects with a matching resource field
+// removes all effects with a matching source field
 void EffectQueue::RemoveAllEffectsWithSource(ieDword opcode, const ResRef& source, int mode)
 {
 	for (auto& fx : effects) {
@@ -1588,7 +1588,7 @@ void EffectQueue::RemoveAllEffectsWithSource(ieDword opcode, const ResRef& sourc
 		if (fx.SourceRef != source) continue;
 
 		// equipping effects only
-		// IsEquipped excludes to many to match ee's opcode 321
+		// IsEquipped excludes too many to match ee's opcode 321
 		if (mode == 1 && fx.TimingMode != FX_DURATION_INSTANT_WHILE_EQUIPPED) {
 			continue;
 		}
