@@ -66,6 +66,7 @@ def GetUsableMemorizedSpells(actor, BookType):
 			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"], 1<<BookType) # crucial!
 			if Spell['SpellIndex'] == -1:
 				GemRB.Log (LOG_ERROR, "GetUsableMemorizedSpells", "Memorized spell not found! " + Spell["SpellResRef"] + " of type " + str(1<<BookType))
+				continue
 			Spell['SpellIndex'] += 1000 * 1<<BookType
 			memorizedSpells.append (Spell)
 
