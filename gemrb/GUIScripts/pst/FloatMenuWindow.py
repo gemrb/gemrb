@@ -71,8 +71,7 @@ spelltype = None
 def UseSpell ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 	slot = float_menu_selected+float_menu_index
-	print("spell", spelltype, slot)
-	GemRB.SpellCast (pc, 1<<type, slot)
+	GemRB.SpellCast (pc, 1 << spelltype, slot)
 	return
 
 def UseItem ():
@@ -322,7 +321,7 @@ def UpdateFloatMenuGroupAction (i):
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 def RefreshSpellList(pc, innate):
-	global spell_list, type
+	global spell_list, spelltype
 
 	if innate:
 		spelltype = IE_SPELL_TYPE_INNATE
