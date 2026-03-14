@@ -1808,6 +1808,11 @@ void GameScript::Face(Scriptable* Sender, Action* parameters)
 	} else {
 		actor->SetOrientation(ClampToOrientation(parameters->int0Parameter), false);
 	}
+	if (core->InCutSceneMode() && actor->GetCurrentArea()) {
+		// hack for soego cutscene visibility if hargrimm is told about his betrayal (1500cs14)
+		// it's not correct, since he's only supposed to explore maybe 10 feet around him, while hargrimm none
+		actor->GetCurrentArea()->ExploreMapChunk(actor->SMPos, 10, 1);
+	}
 	actor->SetWait(1);
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
