@@ -933,11 +933,13 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 					target->fxqueue.RemoveAllEffectsWithProjectile(tmp);
 					fx->Projectile = tmp;
 				}
-				ConvertTiming(fx, duration);
+				fx->Duration = duration;
+				fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 
-				// improved strength also has a pulse we need to adjust
+				// the spells also have a pulse effect we need to adjust
 				Effect* efx = const_cast<Effect*>(target->fxqueue.HasEffectWithSource(fx_colorpulse_ref, fx->SourceRef)); // FIXME: const_cast
 				if (efx) {
+					efx->TimingMode = FX_DURATION_ABSOLUTE;
 					ConvertTiming(efx, duration);
 				}
 
