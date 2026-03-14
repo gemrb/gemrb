@@ -2215,7 +2215,11 @@ std::vector<Actor*> Map::GetAllActorsInRadius(const Point& p, int flags, unsigne
 
 Actor* Map::GetActor(const ieVariable& Name, int flags) const
 {
-	for (auto actor : actors) {
+	// if there is more than one match, return the most recently created actor
+	// since they always get added at the end, we can just reverse the search order
+	// fixes pst ar1500 1500cs6 cutscene not displaying text properly
+	for (auto iter = actors.rbegin(); iter != actors.rend(); ++iter) {
+		Actor* actor = *iter;
 		if (actor->GetScriptName() == Name) {
 			// there can be more with the same scripting name, see bg2/ar0014.baf
 			if (!actor->ValidTarget(flags)) {
