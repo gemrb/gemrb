@@ -928,9 +928,11 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 					target->fxqueue.RemoveAllEffectsWithProjectile(286);
 				}
 				tmp = fx->Projectile;
-				fx->Projectile = 0;
-				target->fxqueue.RemoveAllEffectsWithProjectile(tmp);
-				fx->Projectile = tmp;
+				if (tmp) {
+					fx->Projectile = 0;
+					target->fxqueue.RemoveAllEffectsWithProjectile(tmp);
+					fx->Projectile = tmp;
+				}
 				ConvertTiming(fx, duration);
 
 				// improved strength also has a pulse we need to adjust
