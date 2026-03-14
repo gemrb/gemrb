@@ -146,7 +146,7 @@ static SDL_Keycode TranslateKeycode(SDLKey sym)
 static bool BlocksEvents(const SDL_Event& event, int modState)
 {
 	if (event.type == SDL_MOUSEMOTION || event.type == SDL_QUIT || modState != 0) return false;
-	if (core->GetDictionary().Get("AskAndExit", 1)) return false; // asking to quit
+	if (core->GetDictionary().Get("AskAndExit", 2) == 1) return false; // asking to quit
 	if (!core->InCutSceneMode(false)) return false;
 	if (core->IsConsoleWindowOpen() || core->PlayingMovie()) return false;
 	// paused during a cutscene, as needed for CI exit textscreen to work
