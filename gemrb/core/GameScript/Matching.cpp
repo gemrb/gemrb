@@ -38,7 +38,7 @@ namespace GemRB {
 /* return a Targets object with a single scriptable inside */
 static inline Targets* ReturnScriptableAsTarget(Scriptable* sc)
 {
-	if (!sc) return NULL;
+	if (!sc) return nullptr;
 	Targets* tgts = new Targets();
 	tgts->AddTarget(sc, 0, 0);
 	return tgts;
@@ -101,7 +101,7 @@ static inline Targets* DoObjectFiltering(const Scriptable* Sender, Targets* tgts
 		tgts = func(Sender, tgts, ga_flags);
 		if (!tgts->Count()) {
 			delete tgts;
-			return NULL;
+			return nullptr;
 		}
 	}
 	return tgts;
@@ -161,7 +161,7 @@ static Targets* EvaluateObject(const Map* map, const Scriptable* Sender, const O
 	// if you ActionOverride a global actor, they might not have a map :(
 	// TODO: don't allow this to happen?
 	if (!map) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (oC->objectName[0]) {
@@ -181,7 +181,7 @@ static Targets* EvaluateObject(const Map* map, const Scriptable* Sender, const O
 		Actor* aC = map->GetActorByGlobalID((ieDword) oC->objectFields[1]);
 		if (aC) {
 			if (!aC->ValidTarget(ga_flags)) {
-				return NULL;
+				return nullptr;
 			}
 			return ReturnScriptableAsTarget(aC);
 		}
@@ -196,7 +196,7 @@ static Targets* EvaluateObject(const Map* map, const Scriptable* Sender, const O
 		}
 	}
 
-	Targets* tgts = NULL;
+	Targets* tgts = nullptr;
 
 	//we need to get a subset of actors from the large array
 	//if this gets slow, we will need some index tables
@@ -259,7 +259,7 @@ Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Object* oC, int
 	//if we couldn't find an endpoint by name or object qualifiers
 	//it is not an Actor, but could still be a Door or Container (scriptable)
 	if (!tgts && oC->objectName[0]) {
-		return NULL;
+		return nullptr;
 	}
 	//now lets do the object filter stuff, we create Targets because
 	//it is possible to start from blank sheets using endpoint filters
@@ -325,7 +325,7 @@ Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Action* parameter
 
 Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Object* oC, int ga_flags, bool anyone)
 {
-	Scriptable* tar = NULL;
+	Scriptable* tar = nullptr;
 	const Actor* target;
 	// retrieve an existing target if it still exists and is valid
 	if (Sender->CurrentActionTarget) {
@@ -334,7 +334,7 @@ Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Object* oC, int g
 		if (target && target->ValidTarget(ga_flags, Sender)) {
 			return tar;
 		}
-		return NULL; // target invalid/gone
+		return nullptr; // target invalid/gone
 	}
 	tar = GetScriptableFromObject(Sender, oC, ga_flags, anyone);
 	target = Scriptable::As<Actor>(tar);
@@ -380,7 +380,7 @@ Scriptable* GetScriptableFromObject(Scriptable* Sender, const Object* oC, int ga
 	}
 
 	if (!oC) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (oC->objectName[0]) {
@@ -403,7 +403,7 @@ Scriptable* GetScriptableFromObject(Scriptable* Sender, const Object* oC, int ga
 			return aC;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 bool MatchActor(const Scriptable* Sender, ieDword actorID, const Object* oC)
