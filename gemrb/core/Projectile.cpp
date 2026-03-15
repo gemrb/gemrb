@@ -1149,32 +1149,35 @@ bool Projectile::InCone(const Actor* actor, const ConeShape& cone) const
 
 // walls have oriented rectangular targeting, centered around the casting point
 // area effect: Trap Size (TriggerRadius) = Parallel Length, Explosion Size (ExplosionRadius) = Perpendicular Length
-// NOTE: does not take the isometric perspective into account - unclear if it should
 void Projectile::SetupWall() const
 {
 	// find the vertices
 	std::vector<Point> verts;
 	float_t h = Extension->ExplosionRadius / 2.0;
 	float_t w = Extension->TriggerRadius / 2.0;
-	int baseAngle = GetMathyOrientation(Orientation) * M_PI / 180;
+	// the -1 factor compensates for the inverted y axis
+	float_t baseAngle = GetMathyOrientation(Orientation) * -22.5 * M_PI / 180.0;
 	float_t cosinus = std::cos(baseAngle);
 	float_t sinus = std::sin(baseAngle);
+	constexpr float_t isoFactor = 0.75;
+	// empirical factor for better match between bam and aoe
+	float_t yCorrection = projectileName == "wofire" ? -20.0 * std::abs(cosinus) : 0;
 
 	// A
 	int xOffset = static_cast<int>(w * cosinus + h * sinus);
-	int yOffset = static_cast<int>(w * sinus - h * cosinus);
+	int yOffset = static_cast<int>((w * sinus - h * cosinus) * isoFactor + yCorrection);
 	verts.emplace_back(Pos.x + xOffset, Pos.y + yOffset);
 	// B
 	xOffset = static_cast<int>(w * cosinus - h * sinus);
-	yOffset = static_cast<int>(w * sinus + h * cosinus);
+	yOffset = static_cast<int>((w * sinus + h * cosinus) * isoFactor + yCorrection);
 	verts.emplace_back(Pos.x + xOffset, Pos.y + yOffset);
 	// C
 	xOffset = static_cast<int>(-w * cosinus - h * sinus);
-	yOffset = static_cast<int>(-w * sinus + h * cosinus);
+	yOffset = static_cast<int>((-w * sinus + h * cosinus) * isoFactor + yCorrection);
 	verts.emplace_back(Pos.x + xOffset, Pos.y + yOffset);
 	// D
 	xOffset = static_cast<int>(-w * cosinus + h * sinus);
-	yOffset = static_cast<int>(-w * sinus - h * cosinus);
+	yOffset = static_cast<int>((-w * sinus - h * cosinus) * isoFactor + yCorrection);
 	verts.emplace_back(Pos.x + xOffset, Pos.y + yOffset);
 
 	// construct the polygon for hit-testing
