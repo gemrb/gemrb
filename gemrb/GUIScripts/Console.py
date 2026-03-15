@@ -52,6 +52,8 @@ def debug(level):
 	
 def cast(spellRes):
 	GemRB.SpellCast (GemRB.GameGetFirstSelectedPC (), -3, 0, spellRes)
+	# reinit just in case; wall of moonlight needs it
+	GemRB.SpellCast (GemRB.GameGetFirstSelectedPC (), -1, 0)
 
 def cc(cre, px=-1, py=-1):
 	GemRB.CreateCreature(GemRB.GameGetFirstSelectedPC(), cre, px, py)
