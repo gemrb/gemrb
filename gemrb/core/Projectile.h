@@ -36,6 +36,7 @@
 #include "Orientation.h"
 #include "Palette.h"
 #include "PathFinder.h"
+#include "Polygon.h"
 
 #include "Audio/Playback.h"
 
@@ -45,7 +46,6 @@
 namespace GemRB {
 
 class AnimationFactory;
-class Gem_Polygon;
 
 // various special heights/Zs hardcoded in the originals
 enum class ProHeights {
@@ -194,6 +194,7 @@ struct ProjectileExtension {
 	ieWord DiceCount;
 	ieWord DiceSize;
 	Point tileCoord;
+	Gem_Polygon wall;
 };
 
 class GEM_EXPORT Projectile {
@@ -424,7 +425,7 @@ private:
 	void LineTarget(Path::const_iterator beg, Path::const_iterator end);
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	bool InCone(const Actor* actor, const ConeShape& cone) const;
-	void SetupWall(Gem_Polygon& wall) const;
+	void SetupWall() const;
 	ProjectileState CheckTrigger(unsigned int radius);
 	void BendPosition(Point& pos) const;
 	void DrawPopping(orient_t face, const Point& pos, BlitFlags flags, const Color& popTint);

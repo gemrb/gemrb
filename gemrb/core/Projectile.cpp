@@ -30,7 +30,6 @@
 #include "Interface.h"
 #include "Light.h"
 #include "Map.h"
-#include "Polygon.h"
 #include "ProjectileServer.h"
 #include "RNG.h"
 #include "ScriptedAnimation.h"
@@ -263,6 +262,8 @@ void Projectile::Setup()
 			Orientation = GetOrient(Pos, Destination);
 		}
 		NewOrientation = Orientation;
+		// the wall area of effect is not circular
+		SetupWall();
 	}
 
 	//cone area of effect always disables the travel flag
@@ -1146,7 +1147,7 @@ bool Projectile::InCone(const Actor* actor, const ConeShape& cone) const
 // walls have oriented rectangular targeting, centered around the casting point
 // area effect: Trap Size (TriggerRadius) = Parallel Length, Explosion Size (ExplosionRadius) = Perpendicular Length
 // NOTE: does not take the isometric perspective into account - unclear if it should
-void Projectile::SetupWall(Gem_Polygon& wall) const
+void Projectile::SetupWall() const
 {
 	// find the vertices
 	std::vector<Point> verts;
@@ -1175,7 +1176,7 @@ void Projectile::SetupWall(Gem_Polygon& wall) const
 
 	// construct the polygon for hit-testing
 	Gem_Polygon newWall { std::move(verts) };
-	wall = std::move(newWall);
+	Extension->wall = std::move(newWall);
 }
 
 //secondary projectiles target all in the explosion radius
@@ -1189,12 +1190,6 @@ void Projectile::SecondaryTarget()
 	ConeShape cone;
 	if (Extension->AFlags & PAF_CONE) {
 		cone.SetupCone(Extension->ConeWidth, Orientation);
-	}
-
-	// the wall area of effect is not circular
-	Gem_Polygon wall;
-	if (ExtFlags & PEF_WALL) {
-		SetupWall(wall);
 	}
 
 	if (Extension->DiceCount) {
@@ -1227,7 +1222,7 @@ void Projectile::SecondaryTarget()
 			continue;
 		}
 
-		if (ExtFlags & PEF_WALL && !wall.PointIn(actor->Pos)) {
+		if (ExtFlags & PEF_WALL && !Extension->wall.PointIn(actor->Pos)) {
 			continue;
 		}
 
