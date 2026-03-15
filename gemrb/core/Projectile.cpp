@@ -996,7 +996,21 @@ Projectile::ProjectileState Projectile::CheckTrigger(unsigned int radius)
 			}
 		}
 	}
-	if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
+
+	// we can use the normal radius for all, since walls effectively use only half of it
+	std::vector<Actor*> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
+	bool overlap = false;
+	if (ExtFlags & PEF_WALL) {
+		for (const Actor* actor : actors) {
+			if (Extension->wall.PointIn(actor->Pos)) {
+				overlap = true;
+				break;
+			}
+		}
+	} else {
+		overlap = actors.empty();
+	}
+	if (overlap) {
 		if (state == ProjectileState::AWAITING_TRIGGER) {
 			extensionDelay = (ExtFlags & PEF_WALL) ? 5 : Extension->Delay;
 			return ProjectileState::EXPLODING;
@@ -1211,6 +1225,8 @@ void Projectile::SecondaryTarget()
 
 	Scriptable* owner = area->GetScriptableByGlobalID(Caster);
 	int radius = Extension->ExplosionRadius / 16;
+	// with 8 we capture more candidates to avoid potentially big rounding errors with small values
+	if (ExtFlags & PEF_WALL) radius = std::max(Extension->ExplosionRadius, Extension->TriggerRadius) / 8;
 	std::vector<Actor*> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	bool first = true;
 	uint32_t time = core->GetGame()->GameTime;
