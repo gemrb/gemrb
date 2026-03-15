@@ -308,6 +308,8 @@ private:
 	int drawSpark = 0;
 
 	Holder<PlaybackHandle> travelHandle;
+	// time-based duration for walls, instead of tracking ExplosionCount
+	uint32_t duration = 0;
 
 public:
 	void SetCaster(ieDword t, int level);

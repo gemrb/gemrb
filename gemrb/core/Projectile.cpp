@@ -264,6 +264,7 @@ void Projectile::Setup()
 		}
 		NewOrientation = Orientation;
 		Pos = Destination;
+		duration = core->GetGame()->GameTime + Extension->Delay * Extension->ExplosionCount;
 		InitExplodingPhase1(); // draw immediately
 		// the wall area of effect is not circular
 		SetupWall();
@@ -997,7 +998,7 @@ Projectile::ProjectileState Projectile::CheckTrigger(unsigned int radius)
 	}
 	if (area->GetActorInRadius(Pos, CalculateTargetFlag(), radius)) {
 		if (state == ProjectileState::AWAITING_TRIGGER) {
-			extensionDelay = Extension->Delay;
+			extensionDelay = (ExtFlags & PEF_WALL) ? 5 : Extension->Delay;
 			return ProjectileState::EXPLODING;
 		}
 	} else if (state == ProjectileState::EXPLODING && Extension->AFlags & PAF_DELAYED) {
@@ -1018,7 +1019,7 @@ void Projectile::SetEffectsCopy(const EffectQueue& eq, const Point& source)
 bool Projectile::HasBeenHitRecently(ieDword targetID, uint32_t time) const
 {
 	// not relevant
-	if (!(ExtFlags & PEF_LINE)) return false;
+	if (!(ExtFlags & (PEF_LINE | PEF_WALL))) return false;
 
 	auto targeted = lineTargets.find(targetID);
 	if (targeted == lineTargets.end()) {
@@ -1026,7 +1027,9 @@ bool Projectile::HasBeenHitRecently(ieDword targetID, uint32_t time) const
 		return false;
 	}
 	// hit recently?
-	return targeted->second + Extension->Delay / 2 > time;
+	uint32_t threshold = targeted->second + Extension->Delay;
+	if (ExtFlags & PEF_LINE) threshold /= 2;
+	return threshold > time;
 }
 
 void Projectile::LineTarget()
@@ -1210,6 +1213,7 @@ void Projectile::SecondaryTarget()
 	int radius = Extension->ExplosionRadius / 16;
 	std::vector<Actor*> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	bool first = true;
+	uint32_t time = core->GetGame()->GameTime;
 	for (const Actor* actor : actors) {
 		ieDword targetID = actor->GetGlobalID();
 
@@ -1228,8 +1232,27 @@ void Projectile::SecondaryTarget()
 			continue;
 		}
 
-		if (ExtFlags & PEF_WALL && !Extension->wall.PointIn(actor->Pos)) {
-			continue;
+		if (ExtFlags & PEF_WALL) {
+			// extensionExplosionCount was perhaps used as a limiter in a per-actor fashion
+			// for walls it helps define the duration, so there's no need for that
+			// however since we do check more often, keep it above 0, so the projectile doesn't expire prematurely
+			extensionExplosionCount++;
+
+			if (!Extension->wall.PointIn(actor->Pos)) { // perhaps should use IntersectsRect for big actors
+				continue;
+			}
+
+			if (HasBeenHitRecently(targetID, time)) {
+				continue;
+			}
+
+			// now we know it's a hit
+			auto targeted = lineTargets.find(targetID);
+			if (targeted != lineTargets.end()) {
+				targeted->second = time;
+			} else {
+				lineTargets.emplace(targetID, time);
+			}
 		}
 
 		Projectile* pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
@@ -1505,7 +1528,7 @@ void Projectile::InitExplodingPhase1() const
 	vvc->SetPos(Pos);
 	// iwdee provides some womoon.vvc; if it doesn't work, perhaps limit the following modifications to only bam vefs
 	if (ExtFlags & PEF_WALL) {
-		vvc->SetDefaultDuration(core->Time.round_size * 5); // hardcoded, since it's not stored in the originating spells
+		vvc->SetDefaultDuration(duration - core->GetGame()->GameTime);
 		vvc->SetSound(P_HOLD, Extension->AreaSound);
 	} else {
 		vvc->PlayOnce();
@@ -1767,7 +1790,12 @@ Projectile::ProjectileState Projectile::GetNextExplosionState()
 		SpawnChildren();
 	}
 
-	if (extensionExplosionCount) {
+	if (ExtFlags & PEF_WALL) {
+		extensionDelay = 5; // check more often, the limiting is done per-actor
+		if (duration < core->GetGame()->GameTime) {
+			nextState = ProjectileState::BURNING_DOWN;
+		}
+	} else if (extensionExplosionCount) {
 		extensionDelay = Extension->Delay;
 	} else {
 		nextState = ProjectileState::BURNING_DOWN;
