@@ -35,7 +35,8 @@ enum class DebugMode : uint32_t {
 	WINDOWS = 64,
 	FONTS = 128,
 	TEXT = 256,
-	PATHFINDER = 512
+	PATHFINDER = 512,
+	PROJECTILES = 1024,
 };
 
 bool InDebugMode(DebugMode modes) noexcept;

@@ -436,6 +436,9 @@ This parameter is meant for developers. It is a combination of bit values
 .IR 512
 - enable pathfinding debug mode.
 
+.IR 1024
+- enable projectiles debug mode.
+
 The default is
 .IR 0 .
 

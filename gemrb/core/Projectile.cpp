@@ -23,6 +23,7 @@
 #include "ie_stats.h"
 
 #include "AnimationFactory.h"
+#include "Debug.h"
 #include "DisplayMessage.h"
 #include "Game.h"
 #include "GameData.h"
@@ -1380,6 +1381,11 @@ Region Projectile::DrawingRegion(const Region& viewPort) const
 
 void Projectile::Draw(const Region& viewport, BlitFlags flags)
 {
+	// reuse this when implementing aoe preview ('Game Options' 'Show AOE')
+	if (ExtFlags & PEF_WALL && InDebugMode(DebugMode::PROJECTILES)) {
+		Point origin = Extension->wall.BBox.origin - viewport.origin;
+		VideoDriver->DrawPolygon(&Extension->wall, origin, ColorRed, false);
+	}
 	switch (state) {
 		case ProjectileState::AWAITING_TRIGGER:
 		case ProjectileState::EXPLODING:
