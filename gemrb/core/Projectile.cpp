@@ -263,6 +263,8 @@ void Projectile::Setup()
 			Orientation = GetOrient(Pos, Destination);
 		}
 		NewOrientation = Orientation;
+		Pos = Destination;
+		InitExplodingPhase1(); // draw immediately
 		// the wall area of effect is not circular
 		SetupWall();
 	}
@@ -1750,7 +1752,7 @@ Projectile::ProjectileState Projectile::GetNextExplosionState()
 	auto nextState = state;
 
 	if (state == ProjectileState::EXPLODING) {
-		InitExplodingPhase1();
+		if (!(ExtFlags & PEF_WALL)) InitExplodingPhase1(); // wall projectiles init it immediately
 		nextState = ProjectileState::EXPLODING_AGAIN;
 	} else {
 		core->GetAudioPlayback().Play(Extension->AreaSound, AudioPreset::Spatial, SFXChannel::Missile, Pos);
