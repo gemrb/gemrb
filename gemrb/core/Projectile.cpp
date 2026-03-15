@@ -1503,8 +1503,10 @@ void Projectile::InitExplodingPhase1() const
 	}
 
 	vvc->SetPos(Pos);
+	// iwdee provides some womoon.vvc; if it doesn't work, perhaps limit the following modifications to only bam vefs
 	if (ExtFlags & PEF_WALL) {
 		vvc->SetDefaultDuration(core->Time.round_size * 5); // hardcoded, since it's not stored in the originating spells
+		vvc->SetSound(P_HOLD, Extension->AreaSound);
 	} else {
 		vvc->PlayOnce();
 	}
