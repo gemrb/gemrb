@@ -57,8 +57,6 @@ OPTION(USE_VORBIS "Enable Vorbis support" ON)
 OPTION(DISABLE_WERROR "Do not treat warnings as errors" OFF)
 OPTION(USE_TRACY "Build with Tracy support" OFF)
 
-OPTION(USE_SDL_CONTROLLER_API "Enable SDL controller APIs. (disable if you plan on handling controller input in an external program like gptokeyb)" ON)
-
 #VCPKG dll deployment is circumvented because it doesn't currently work for gemrb
 IF(WIN32 AND _VCPKG_INSTALLED_DIR)
 	OPTION(VCPKG_AUTO_DEPLOY "Fix VCPKG dependency DLL locations" ON)
@@ -166,7 +164,6 @@ PRINT_OPTION(STATIC_LINK)
 PRINT_OPTION(INSOURCEBUILD)
 PRINT_OPTION(DISABLE_WERROR)
 PRINT_OPTION(SDL_BACKEND)
-PRINT_OPTION(USE_SDL_CONTROLLER_API)
 PRINT_OPTION(PYTHON_VERSION)
 PRINT_OPTION(OPENGL_BACKEND)
 PRINT_OPTION(SANITIZE)

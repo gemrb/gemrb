@@ -622,11 +622,9 @@ bool Window::DispatchEvent(const Event& event)
 			DispatchTouchUp(target, event.touch, event.mod);
 			break;
 		default:
-#ifndef USE_SDL_CONTROLLER_API
 			// If controller api is not used, this maybe reached if a controller is used.
 			// others should be handled above
-			Log(ERROR, "Window", "Unhandled event type generated: {}", event.type);
-#endif
+			if (!core->config.GamepadSupport) Log(ERROR, "Window", "Unhandled event type generated: {}", event.type);
 			break;
 	}
 	// absorb other screen events i guess

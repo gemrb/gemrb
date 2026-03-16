@@ -105,7 +105,6 @@ int SDL20VideoDriver::Init()
 {
 	int ret = SDLVideoDriver::Init();
 
-#ifdef USE_SDL_CONTROLLER_API
 	if (!core->config.GamepadSupport) {
 		Log(MESSAGE, "SDL2", "Gamepad support disabled via config (GamepadSupport=0)");
 	} else {
@@ -123,7 +122,6 @@ int SDL20VideoDriver::Init()
 			}
 		}
 	}
-#endif
 
 	return ret;
 }
@@ -794,13 +792,11 @@ int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger (&fingers)[FINGER_MAX],
 	return numf;
 }
 
-int SDL20VideoDriver::ProcessEvent(const SDL_Event& event)
+bool SDL20VideoDriver::ProcessControllerEvent(const SDL_Event& event)
 {
-	int modstate = GetModState(SDL_GetModState());
-	Event e;
+	bool processed = true;
 
 	switch (event.type) {
-#ifdef USE_SDL_CONTROLLER_API
 		case SDL_CONTROLLERDEVICEREMOVED:
 			if (gameController != nullptr) {
 				const SDL_GameController* removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
@@ -817,58 +813,78 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event& event)
 			}
 			break;
 		case SDL_CONTROLLERAXISMOTION:
-			{
-				gamepadControl.HandleAxisEvent(event.caxis.axis, event.caxis.value);
-			}
+			gamepadControl.HandleAxisEvent(event.caxis.axis, event.caxis.value);
 			break;
 		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_CONTROLLERBUTTONUP:
-			{
-				bool handled = false;
-				if (InTextInput() && event.type == SDL_CONTROLLERBUTTONDOWN) {
-					Event bsp = EventMgr::CreateKeyEvent(GEM_BACKSP, true);
-					handled = true;
+			if (InTextInput() && event.type == SDL_CONTROLLERBUTTONDOWN) {
+				Event bsp = EventMgr::CreateKeyEvent(GEM_BACKSP, true);
 
-					switch (event.cbutton.button) {
-						case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-							dPadSoftKeyboard.RemoveCharacter();
-							EvntManager->DispatchEvent(std::move(bsp));
-							break;
-						case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-							dPadSoftKeyboard.AddCharacter();
-							EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
-							break;
-						case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-							dPadSoftKeyboard.NextCharacter();
-							EvntManager->DispatchEvent(std::move(bsp));
-							EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
-							break;
-						case SDL_CONTROLLER_BUTTON_DPAD_UP:
-							dPadSoftKeyboard.PreviousCharacter();
-							EvntManager->DispatchEvent(std::move(bsp));
-							EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
-							break;
-						case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-						case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-							dPadSoftKeyboard.ToggleUppercase();
-							EvntManager->DispatchEvent(std::move(bsp));
-							EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
-							break;
-						default:
-							handled = false;
-							break;
-					}
+				switch (event.cbutton.button) {
+					case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+						dPadSoftKeyboard.RemoveCharacter();
+						EvntManager->DispatchEvent(std::move(bsp));
+						break;
+					case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+						dPadSoftKeyboard.AddCharacter();
+						EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+						break;
+					case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+						dPadSoftKeyboard.NextCharacter();
+						EvntManager->DispatchEvent(std::move(bsp));
+						EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+						break;
+					case SDL_CONTROLLER_BUTTON_DPAD_UP:
+						dPadSoftKeyboard.PreviousCharacter();
+						EvntManager->DispatchEvent(std::move(bsp));
+						EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+						break;
+					case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+					case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+						dPadSoftKeyboard.ToggleUppercase();
+						EvntManager->DispatchEvent(std::move(bsp));
+						EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+						break;
+					default:
+						processed = false;
+						break;
 				}
-
-				if (!handled) {
-					bool down = (event.type == SDL_CONTROLLERBUTTONDOWN);
-					EventButton btn = EventButton(event.cbutton.button);
-					e = EventMgr::CreateControllerButtonEvent(btn, down);
-					EvntManager->DispatchEvent(std::move(e));
-				}
+			} else {
+				processed = false;
 			}
+
+			if (!processed) {
+				bool down = (event.type == SDL_CONTROLLERBUTTONDOWN);
+				EventButton btn = EventButton(event.cbutton.button);
+				Event e = EventMgr::CreateControllerButtonEvent(btn, down);
+				EvntManager->DispatchEvent(std::move(e));
+			}
+			processed = true;
 			break;
-#endif
+		default:
+			processed = false;
+			break;
+	}
+	return processed;
+}
+
+int SDL20VideoDriver::ProcessEvent(const SDL_Event& event)
+{
+	int modstate = GetModState(SDL_GetModState());
+	Event e;
+
+	if (core->config.GamepadSupport && ProcessControllerEvent(event)) {
+		return GEM_OK;
+	}
+
+	switch (event.type) {
+		case SDL_CONTROLLERDEVICEREMOVED:
+		case SDL_CONTROLLERDEVICEADDED:
+		case SDL_CONTROLLERAXISMOTION:
+		case SDL_CONTROLLERBUTTONDOWN:
+		case SDL_CONTROLLERBUTTONUP:
+			// ignore, handled in ProcessControllerEvent when needed
+			break;
 		case SDL_FINGERDOWN: // fallthrough
 		case SDL_FINGERUP:
 			{

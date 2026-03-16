@@ -271,6 +271,7 @@ private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat) override;
 
 	int ProcessEvent(const SDL_Event& event) override;
+	bool ProcessControllerEvent(const SDL_Event& event);
 
 	int CreateSDLDisplay(const char* title, bool vsync) override;
 	void SwapBuffers(VideoBuffers& buffers) override;

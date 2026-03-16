@@ -154,6 +154,7 @@ Bpp=32
 #NumFingInfo=2
 
 # Set this to 0 to disable gamepad/joystick support entirely.
+# This is useful if you handle such input separately and in case of bugs:
 # On some Windows systems, SDL's joystick subsystem initialization can hang
 # for 30+ seconds due to device enumeration issues (e.g. WMI timeouts).
 # If the game takes abnormally long to start, try disabling this.

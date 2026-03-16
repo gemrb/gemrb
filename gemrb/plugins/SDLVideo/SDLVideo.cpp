@@ -259,29 +259,35 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 				}
 			}
 			break;
-#if defined(USE_SDL_CONTROLLER_API) && !SDL_VERSION_ATLEAST(1, 3, 0)
+		default:
+			break;
+	}
+
+#if !SDL_VERSION_ATLEAST(1, 3, 0)
+	if (core->config.GamepadSupport) {
 		// SDL 1.x only: handle joystick events directly.
 		// In SDL2, the Game Controller API events (SDL_CONTROLLERBUTTON*, SDL_CONTROLLERAXISMOTION)
 		// are handled by SDL20VideoDriver::ProcessEvent, and SDL also generates duplicate
 		// SDL_JOY* events that must be ignored to avoid double-dispatch.
-		case SDL_JOYAXISMOTION:
-			{
+		switch (event.type) {
+			case SDL_JOYAXISMOTION:
 				gamepadControl.HandleAxisEvent(event.jaxis.axis, event.jaxis.value);
-			}
-			break;
-		case SDL_JOYBUTTONDOWN:
-		case SDL_JOYBUTTONUP:
-			{
-				bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
-				EventButton btn = EventButton(event.jbutton.button);
-				e = EventMgr::CreateControllerButtonEvent(btn, down);
-				EvntManager->DispatchEvent(std::move(e));
-			}
-			break;
-#endif
-		default:
-			break;
+				break;
+			case SDL_JOYBUTTONDOWN:
+			case SDL_JOYBUTTONUP:
+				{
+					bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
+					EventButton btn = EventButton(event.jbutton.button);
+					e = EventMgr::CreateControllerButtonEvent(btn, down);
+					EvntManager->DispatchEvent(std::move(e));
+				}
+				break;
+			default:
+				break;
+		}
 	}
+#endif
+
 	return GEM_OK;
 }
 
