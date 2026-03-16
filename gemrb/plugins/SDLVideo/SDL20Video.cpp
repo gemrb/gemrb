@@ -106,16 +106,20 @@ int SDL20VideoDriver::Init()
 	int ret = SDLVideoDriver::Init();
 
 #ifdef USE_SDL_CONTROLLER_API
-	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1) {
-		Log(ERROR, "SDL2", "InitSubSystem failed: {}", SDL_GetError());
-		return ret;
-	}
+	if (!core->config.GamepadSupport) {
+		Log(MESSAGE, "SDL2", "Gamepad support disabled via config (GamepadSupport=0)");
+	} else {
+		if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1) {
+			Log(ERROR, "SDL2", "InitSubSystem failed: {}", SDL_GetError());
+			return ret;
+		}
 
-	for (int i = 0; i < SDL_NumJoysticks(); ++i) {
-		if (SDL_IsGameController(i)) {
-			gameController = SDL_GameControllerOpen(i);
-			if (gameController != nullptr) {
-				break;
+		for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+			if (SDL_IsGameController(i)) {
+				gameController = SDL_GameControllerOpen(i);
+				if (gameController != nullptr) {
+					break;
+				}
 			}
 		}
 	}
