@@ -168,6 +168,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 	SDLKey sym = event.key.keysym.sym;
 	SDL_Keycode key;
 	Event e;
+	EventButton btn;
 
 	// eat up events in special circumstances
 	if (BlocksEvents(event, modstate)) {
@@ -246,17 +247,15 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
-			{
-				EventButton btn = SDL_BUTTON(event.button.button);
-				if (btn) {
-					// it has been observed that multibutton mice can
-					// result in 0 for some of their extra buttons
-					// on at least some platforms
-					bool down = (event.type == SDL_MOUSEBUTTONDOWN) ? true : false;
-					Point p(event.button.x, event.button.y);
-					e = EventMgr::CreateMouseBtnEvent(p, btn, down, modstate);
-					EvntManager->DispatchEvent(std::move(e));
-				}
+			btn = SDL_BUTTON(event.button.button);
+			if (btn) {
+				// it has been observed that multibutton mice can
+				// result in 0 for some of their extra buttons
+				// on at least some platforms
+				bool down = (event.type == SDL_MOUSEBUTTONDOWN) ? true : false;
+				Point p(event.button.x, event.button.y);
+				e = EventMgr::CreateMouseBtnEvent(p, btn, down, modstate);
+				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 		default:
@@ -275,12 +274,9 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event& event)
 				break;
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP:
-				{
-					bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
-					EventButton btn = EventButton(event.jbutton.button);
-					e = EventMgr::CreateControllerButtonEvent(btn, down);
-					EvntManager->DispatchEvent(std::move(e));
-				}
+				btn = EventButton(event.jbutton.button);
+				e = EventMgr::CreateControllerButtonEvent(btn, event.type == SDL_JOYBUTTONDOWN);
+				EvntManager->DispatchEvent(std::move(e));
 				break;
 			default:
 				break;
