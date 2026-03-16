@@ -6567,7 +6567,7 @@ static PyObject* SetItemIcon(Button* btn, const ResRef& ItemResRef, int Which, i
 		default:
 			const ITMExtHeader* eh = item->GetExtHeader(Which - 6);
 			if (eh) {
-				Picture = gamedata->GetAnySprite(eh->UseIcon, -1, 0);
+				Picture = gamedata->GetAnySprite(eh->UseIcon, -1, 0); // TODO: ee, scrolls need frame 1; improve and replicate UpdateInventorySlot logic
 			}
 	}
 

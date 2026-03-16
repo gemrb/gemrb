@@ -1157,5 +1157,6 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 		Button.SetItemIcon (Slot['ItemResRef'], 0, 0, 0, "", "STORTIN3")
 	else:
 		Button.SetFlags (IE_GUI_BUTTON_HORIZONTAL, OP_NAND)
-		Button.SetItemIcon (Slot['ItemResRef'], 0)
+		# this check does not catch scrolls that are not learnable (e.g. priest scrolls)
+		Button.SetItemIcon (Slot['ItemResRef'], 1 if GameCheck.IsAnyEE () and scroll else 0)
 	return
