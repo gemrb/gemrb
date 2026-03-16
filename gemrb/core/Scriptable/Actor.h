@@ -356,17 +356,17 @@ struct IgnoredFields {
 };
 
 enum DamageFlags {
-	DrainFromTarget = 0,
-	DrainFromSource = 1,
-	FistOnly = 2,
-	DrainFromTargetNC = 4,
-	DrainFromSourceNC = 8,
-	NoFeedback = 0x10,
-	CapToTarget = 0x20,
-	CapToSource = 0x40,
-	SaveForHalf = 0x80,
-	FailForHalf = 0x100,
-	NoAwake = 0x200
+	DrainFromTarget = 1,
+	DrainFromSource = 2,
+	FistOnly = 4,
+	DrainFromTargetNC = 8,
+	DrainFromSourceNC = 0x10,
+	NoFeedback = 0x20,
+	CapToTarget = 0x40,
+	CapToSource = 0x80,
+	SaveForHalf = 0x100,
+	FailForHalf = 0x200,
+	NoAwake = 0x400
 };
 
 // verbal constant (bg2 soundoff.ids / sndslot.ids), we have a lookup table (vcremap) for other games
