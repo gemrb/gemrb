@@ -6129,6 +6129,10 @@ static PyObject* GemRB_GetPlayerStat(PyObject* /*self*/, PyObject* args)
 
 	//returning the modified stat if BaseStat was 0 (default)
 	int64_t StatValue = GetCreatureStat(actor, StatID, !BaseStat);
+	if (StatValue > 0x8000'0000) { // just above INT32_MAX, e.g. wild mages
+		// it's a regular negative number
+		return PyLong_FromLong(static_cast<int32_t>(StatValue));
+	}
 
 	// special handling for the hidden hp
 	if (StatID == IE_HITPOINTS && !actor->HasVisibleHP()) {
