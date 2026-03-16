@@ -896,7 +896,6 @@ static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 static EffectRef fx_eye_venom_ref = { "EyeOfVenom", -1 };
 static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 static EffectRef fx_eye_fortitude_ref = { "EyeOfFortitude", -1 };
-static EffectRef fx_remove_effects_ref = { "RemoveEffectsByResource", -1 };
 static EffectRef fx_wound_ref = { "BleedingWounds", -1 }; // 416
 
 static EffectRef fx_str_ref = { "StrengthModifier", -1 };
@@ -8284,8 +8283,8 @@ int fx_item_usability(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // parameter2 dictates whether to work on all effects, equipping or non-equipping
 int fx_remove_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	target->fxqueue.RemoveAllEffectsWithSource(fx_remove_effects_ref, fx->Resource, fx->Parameter2);
-	return FX_APPLIED;
+	target->fxqueue.RemoveAllEffects(fx->Resource, MAX_TIMING_MODE + fx->Parameter2);
+	return FX_NOT_APPLIED;
 }
 
 // 0x142 (322) unused in ees, see "Evade Area of Effect" on IESDP

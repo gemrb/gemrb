@@ -1376,10 +1376,6 @@ static inline bool IsLive(ieByte timingmode)
 	if (fx.Parameter2 != param2) { \
 		continue; \
 	}
-#define MATCH_TIMING() \
-	if (fx.TimingMode != timing) { \
-		continue; \
-	}
 
 //call this from an applied effect, after it returns, these effects
 //will be killed along with it
@@ -1540,11 +1536,28 @@ void EffectQueue::RemoveAllEffects(const ResRef& removed)
 void EffectQueue::RemoveAllEffects(const ResRef& removed, ieByte timing)
 {
 	for (auto& fx : effects) {
-		MATCH_TIMING()
+		// if a sane timing mode is passed, use it as-is
+		if (timing < MAX_TIMING_MODE) {
+			if (fx.TimingMode != timing) continue;
+		} else {
+			// use timing as a mode parameter
+			int mode = timing - MAX_TIMING_MODE;
+			// equipping effects only
+			// IsEquipped excludes too many to match ee's opcode 321
+			if (mode == 1 && fx.TimingMode != FX_DURATION_INSTANT_WHILE_EQUIPPED) {
+				continue;
+			}
+
+			// "timed" effects only
+			if (mode == 2 && (fx.TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED || fx.TimingMode == FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES)) {
+				continue;
+			}
+			// mode 0 or anything else means remove all effects that match
+		}
+
 		if (removed != fx.SourceRef) {
 			continue;
 		}
-
 		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
 }
@@ -1578,36 +1591,6 @@ void EffectQueue::RemoveAllEffectsWithResource(EffectRef& effectReference, const
 {
 	Globals::ResolveEffectRef(effectReference);
 	RemoveAllEffectsWithResource(effectReference.opcode, resource);
-}
-
-// removes all effects with a matching source field
-void EffectQueue::RemoveAllEffectsWithSource(ieDword opcode, const ResRef& source, int mode)
-{
-	for (auto& fx : effects) {
-		MATCH_OPCODE()
-		if (fx.SourceRef != source) continue;
-
-		// equipping effects only
-		// IsEquipped excludes too many to match ee's opcode 321
-		if (mode == 1 && fx.TimingMode != FX_DURATION_INSTANT_WHILE_EQUIPPED) {
-			continue;
-		}
-
-		// "timed" effects only
-		if (mode == 2 && (fx.TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED || fx.TimingMode == FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES)) {
-			continue;
-		}
-
-		// mode 0 or anything else means remove all effects that match
-
-		fx.TimingMode = FX_DURATION_JUST_EXPIRED;
-	}
-}
-
-void EffectQueue::RemoveAllEffectsWithSource(EffectRef& effectReference, const ResRef& source, int mode)
-{
-	Globals::ResolveEffectRef(effectReference);
-	RemoveAllEffectsWithSource(effectReference.opcode, source, mode);
 }
 
 //This method could be used to remove stat modifiers that would lower a stat

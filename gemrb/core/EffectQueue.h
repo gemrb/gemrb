@@ -251,9 +251,6 @@ public:
 	/* removes any effects (delayed or not) which were using projectile */
 	void RemoveAllEffectsWithProjectile(ieDword projectile);
 
-	// removes any effects with matching source and chosen mode
-	void RemoveAllEffectsWithSource(ieDword opcode, const ResRef& source, int mode);
-
 	/* removes equipping effects with specified inventory slot code */
 	bool RemoveEquippingEffects(size_t slotCode);
 
@@ -272,7 +269,6 @@ public:
 	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param, bool param1 = false);
 	void RemoveAllEffectsWithResource(EffectRef& effectReference, const ResRef& resource);
 	void RemoveAllEffectsWithParamAndResource(EffectRef& effectReference, ieDword param2, const ResRef& resource);
-	void RemoveAllEffectsWithSource(EffectRef& effectReference, const ResRef& source, int mode);
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match, const Scriptable* target);
 	static bool RollDispelChance(ieDword casterLevel, ieDword level);
 	void DispelEffects(const Effect* dispeller, ieDword level);
