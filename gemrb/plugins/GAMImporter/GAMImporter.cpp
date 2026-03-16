@@ -162,6 +162,8 @@ Game* GAMImporter::LoadGame(Game* newGame, GAMVersion override)
 		// EE-only from here on
 		if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 			str->ReadDword(newGame->zoomLevel);
+			// reset to default if needed
+			if (newGame->zoomLevel == 0) newGame->zoomLevel = 100;
 			str->ReadResRef(newGame->RandomEncounterArea);
 			str->ReadResRef(newGame->CurrentWorldMap);
 			str->ReadResRef(newGame->CurrentCampaign);
