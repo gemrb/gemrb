@@ -184,6 +184,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	CONFIG_INT("NumFingScroll", config.NumFingScroll);
 	CONFIG_INT("NumFingKboard", config.NumFingKboard);
 	CONFIG_INT("NumFingInfo", config.NumFingInfo);
+	CONFIG_INT("GamepadSupport", config.GamepadSupport);
 	CONFIG_INT("GamepadPointerSpeed", config.GamepadPointerSpeed);
 	CONFIG_INT("GamepadPointerAccel", config.GamepadPointerAccel);
 	CONFIG_INT("GamepadLDeadZone", config.GamepadLDeadZone);

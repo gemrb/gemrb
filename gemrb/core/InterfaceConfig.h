@@ -83,6 +83,7 @@ struct CoreSettings {
 	std::string GameType = "auto";
 	std::string Encoding = "default";
 
+	int GamepadSupport = 1;
 	int GamepadPointerSpeed = 10;
 	int GamepadPointerAccel = 103;
 	int GamepadLDeadZone = 5000;
