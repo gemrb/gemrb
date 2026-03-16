@@ -54,7 +54,7 @@ def InitInventoryWindow (Window):
 	ScrollBar.OnChange (lambda: RefreshInventoryWindow(Window))
 
 	#Ground Item
-	for i in range (5):
+	for i in range (5 + GameCheck.IsAnyEE () * 3):
 		Button = Window.GetControl (i+68)
 		Button.OnMouseEnter (InventoryCommon.MouseEnterGround)
 		Button.OnMouseLeave (InventoryCommon.MouseLeaveGround)
@@ -207,7 +207,7 @@ def RefreshInventoryWindow (Window):
 		return
 
 	TopIndex = GemRB.GetVar ("TopIndex")
-	for i in range (5):
+	for i in range (5 + GameCheck.IsAnyEE () * 3):
 		Button = Window.GetControl (i+68)
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 		if GemRB.IsDraggingItem ()==1:

@@ -54,7 +54,7 @@ Bag = None
 inventory_slots = ()
 total_price = 0
 total_income = 0
-if GameCheck.IsIWD2():
+if GameCheck.IsIWD2 () or GameCheck.IsAnyEE ():
 	ItemButtonCount = 6
 else:
 	ItemButtonCount = 4
