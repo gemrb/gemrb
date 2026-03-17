@@ -5790,6 +5790,7 @@ bool Actor::CheckOnDeath()
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
 
 	// death variables are updated at the moment of death in the original
+	// if we move that again, change also fx_replace_creature
 	if (core->HasFeature(GFFlags::HAS_KAPUTZ)) {
 		const char* format = AppearanceFlags & APP_ADDKILL ? "KILL_{}" : "{}";
 

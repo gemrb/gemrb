@@ -591,7 +591,6 @@ private:
 
 	int CalculateSpeedFromRate(bool feedback) const;
 	int CalculateSpeedFromINI(bool feedback) const;
-	void IncrementDeathVariable(Game::kaputz_t& vars, const char* format, StringView name) const;
 	/* give kill xp if appropriate */
 	bool ProcessKillXP(const Actor* killerActor, bool grantXP);
 
@@ -745,6 +744,7 @@ public:
 	/* inlined dialogue response */
 	void Response(int type) const;
 	tick_t ReactToDeath(const ieVariable& deadname) const;
+	void IncrementDeathVariable(Game::kaputz_t& vars, const char* format, StringView name) const;
 	/* sends trigger_died to everyone in visual range */
 	void SendDiedTrigger() const;
 	/* called when someone talks to Actor */

@@ -5025,6 +5025,14 @@ int fx_replace_creature(Scriptable* Owner, Actor* target, Effect* fx)
 	//remove old creature
 	switch (fx->Parameter2) {
 		case 0: //remove silently
+			// make sure death vars get set if this was triggered on death (mimicking Actor::CheckOnDeath)
+			bool halfDead;
+			halfDead = target->GetInternalFlag() & IF_REALLYDIED && !(target->GetBase(IE_STATE_ID) & STATE_DEAD);
+			if (halfDead && !target->GetScriptName().IsEmpty()) {
+				auto& vars = core->GetGame()->locals;
+				vars[target->KillVar] = 1;
+				target->IncrementDeathVariable(vars, Interface::GetDeathVarFormat(), target->GetScriptName());
+			}
 			target->DestroySelf();
 			break;
 		case 1: //chunky death
