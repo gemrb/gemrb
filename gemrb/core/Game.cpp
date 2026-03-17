@@ -1454,9 +1454,12 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 
 	ieDword hours = GameTime / core->Time.hour_size;
 	GameTime += add;
+	// if rest until healed is in action, skip most of this function
+	bool healOnly = core->GetDictionary().Get("Heal Party on Rest", 0) == 99;
+
 	ieDword hours2 = GameTime / core->Time.hour_size;
 	Map* map = GetCurrentArea();
-	if (hours != hours2) {
+	if (hours != hours2 && !healOnly) {
 		//asking for a new weather when the hour changes
 		WeatherBits &= ~WB_HASWEATHER;
 		//update clock display
@@ -1492,6 +1495,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 				pc->Heal(add / conHealRate);
 			}
 		}
+		if (healOnly) return;
 
 		// bg1 also closed doors
 		map->AutoLockDoors();
@@ -1933,7 +1937,8 @@ bool Game::RestParty(RestChecks checks, int dream, int hp)
 	}
 
 	// rest once
-	ieDword allowRepeatedRests = core->GetDictionary().Get("Heal Party on Rest", 0) && !(checks & RestChecks::NoRepeats);
+	ieDword restUntilHealed = core->GetDictionary().Get("Heal Party on Rest", 0);
+	ieDword allowRepeatedRests = restUntilHealed && !(checks & RestChecks::NoRepeats);
 	bool interrupted = false;
 	int hours = 8;
 	interrupted = !RestPartyInternal(checks, hp, hours);
@@ -1946,11 +1951,16 @@ bool Game::RestParty(RestChecks checks, int dream, int hp)
 		displaymsg->DisplayString(restedMsg, GUIColors::WHITE, STRING_FLAGS::NONE);
 	} else if (!interrupted) { // someone still needs healing
 		int hours2 = 8;
-		// skip further checks
+		// skip further checks and avoid repeated movie play in areas with day/night movies
+		core->GetDictionary().Set("Heal Party on Rest", 99);
 		while (RestPartyInternal(RestChecks::NoCheck, hp, hours2)) {
 			hours += 8;
 			hours2 = 8;
 		}
+		core->GetDictionary().Set("Heal Party on Rest", restUntilHealed);
+		// fake a proper time transition to trigger any day/night changes without wasting more time
+		GameTime -= 8 * core->Time.hour_size;
+		AdvanceTime(8 * core->Time.hour_size);
 		// Healing spells cast on rest until fully healed.
 		ieStrRef restedMsg = DisplayMessage::GetStringReference(HCStrings::HealingRestFull);
 		displaymsg->DisplayString(restedMsg, GUIColors::WHITE, STRING_FLAGS::NONE);
