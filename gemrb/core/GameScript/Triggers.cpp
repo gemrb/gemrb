@@ -2913,6 +2913,7 @@ int GameScript::InActiveArea(Scriptable* Sender, const Trigger* parameters)
 
 int GameScript::InMyArea(Scriptable* Sender, const Trigger* parameters)
 {
+	if (!Sender->GetCurrentArea()) return 0;
 	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	if (!tar) {
 		return 0;
