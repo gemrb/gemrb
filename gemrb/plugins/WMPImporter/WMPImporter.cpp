@@ -118,7 +118,7 @@ void WMPImporter::GetWorldMap(DataStream* str, WorldMap* m, unsigned int index) 
 	str->ReadDword(AreaLinksOffset);
 	str->ReadDword(AreaLinksCount);
 	str->ReadResRef(m->MapIconResRef);
-	str->ReadDword(m->Flags); // TODO: use; only present in EE, so make sure to ignore in other games, since it's not guaranteed to be 0
+	str->ReadDword(m->Flags);
 
 	// Load map bitmap
 	ResourceHolder<ImageMgr> mos = gamedata->GetResourceHolder<ImageMgr>(m->MapResRef);

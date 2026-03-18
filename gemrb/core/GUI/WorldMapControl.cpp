@@ -103,7 +103,15 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		Point offset = MapToScreen(m->pos);
 		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam.get());
 		if (icon) {
-			BlitFlags flags = core->HasFeature(GFFlags::AUTOMAP_INI) ? BlitFlags::BLENDED : (BlitFlags::BLENDED | BlitFlags::COLOR_MOD);
+			BlitFlags flags = BlitFlags::BLENDED;
+			if (worldmap->Flags == 0) {
+				flags |= core->HasFeature(GFFlags::AUTOMAP_INI) ? BlitFlags::NONE : BlitFlags::COLOR_MOD;
+			} else {
+				// only present in EE (SoD): bit 0 for colored icons, 1 for ignoring their palette - both set
+				// currently a guess
+				if (!(worldmap->Flags & 1)) flags ^= BlitFlags::COLOR_MOD;
+				if (worldmap->Flags == 2) flags |= BlitFlags::GREY;
+			}
 			if (m == Area && m->HighlightSelected()) {
 				VideoDriver->BlitGameSprite(icon, offset, flags, hoverAnim.Current());
 			} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
