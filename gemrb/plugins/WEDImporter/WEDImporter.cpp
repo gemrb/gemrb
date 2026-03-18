@@ -41,7 +41,7 @@ WEDImporter::~WEDImporter(void)
 
 bool WEDImporter::Open(DataStream* stream)
 {
-	if (stream == NULL) {
+	if (stream == nullptr) {
 		return false;
 	}
 	delete str;
@@ -170,7 +170,7 @@ TileMap* WEDImporter::GetTileMap(TileMap* tm) const
 	bool freenew = false;
 
 	if (overlays.empty()) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (!tm) {
@@ -183,18 +183,18 @@ TileMap* WEDImporter::GetTileMap(TileMap* tm) const
 		if (freenew) {
 			delete tm;
 		}
-		return NULL;
+		return nullptr;
 	}
 	// rain_overlays[0] is never used
-	tm->AddRainOverlay(NULL);
+	tm->AddRainOverlay(nullptr);
 
 	//reading additional overlays
 	int mask = 2;
 	for (ieDword i = 1; i < OverlaysCount; i++) {
 		//skipping unused overlays
 		if (!(mask & usedoverlays)) {
-			tm->AddOverlay(NULL);
-			tm->AddRainOverlay(NULL);
+			tm->AddOverlay(nullptr);
+			tm->AddRainOverlay(nullptr);
 		} else {
 			// FIXME: should fix AddOverlay not to load an overlay twice if there's no rain version!!
 			AddOverlay(tm, &overlays.at(i), false);

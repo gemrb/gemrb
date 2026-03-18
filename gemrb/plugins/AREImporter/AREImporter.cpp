@@ -1457,7 +1457,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	tmm->Open(wedfile);
 
 	//there was no tilemap set yet, so lets just send a NULL
-	TileMap* tm = tmm->GetTileMap(NULL);
+	TileMap* tm = tmm->GetTileMap(nullptr);
 	if (!tm) {
 		Log(ERROR, "AREImporter", "No tile map available.");
 		return nullptr;
@@ -2409,7 +2409,7 @@ int AREImporter::PutEffects(DataStream* stream, const EffectQueue& fxqueue) cons
 	for (unsigned int i = 0; i < EffectsCount; i++) {
 		const Effect* fx = fxqueue.GetNextSavedEffect(f);
 
-		assert(fx != NULL);
+		assert(fx != nullptr);
 
 		eM->PutEffectV2(stream, fx);
 	}

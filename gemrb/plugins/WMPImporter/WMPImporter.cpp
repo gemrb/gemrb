@@ -35,7 +35,7 @@ WMPImporter::~WMPImporter(void)
 
 bool WMPImporter::Open(DataStream* stream1, DataStream* stream2)
 {
-	if ((stream1 == NULL) && (stream2 == NULL)) {
+	if (stream1 == nullptr && stream2 == nullptr) {
 		return false;
 	}
 	delete str1;

@@ -273,7 +273,7 @@ bool WorldMapControl::OnMouseDrag(const MouseEvent& me)
 /** Mouse Leave Event */
 void WorldMapControl::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 {
-	Area = NULL;
+	Area = nullptr;
 	Control::OnMouseLeave(me, op);
 }
 
