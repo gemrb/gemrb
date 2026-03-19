@@ -1650,12 +1650,10 @@ void MoveNearerTo(Scriptable* Sender, const Scriptable* target, int distance, in
 	GetPositionFromScriptable(target, p, false);
 
 	// account for PersonalDistance (which caller uses, but pathfinder doesn't)
-	if (!(flags & 2)) {
-		if (distance) {
-			distance += mover->CircleSize2Radius() * 4; // DistanceFactor
-		}
-		if (distance && target->Type == ST_ACTOR) {
-			distance += static_cast<const Actor*>(target)->CircleSize2Radius() * 4;
+	if (!(flags & 2) && distance) {
+		distance += mover->CircleSize2Radius() * 3; // lower DistanceFactor
+		if (target->Type == ST_ACTOR) {
+			distance += static_cast<const Actor*>(target)->CircleSize2Radius() * 3;
 		}
 	}
 
