@@ -179,7 +179,7 @@ def guardSkills():
 	MyChar = GemRB.GetVar ("Slot")
 	Kit = GUICommon.GetKitIndex(MyChar)
 
-	if Kit != 0: # luckily the first row is a dummy
+	if Kit != 0 and not GUICommon.IsMultiClassed (MyChar, 0): # luckily the first row is a dummy
 		KitName = CommonTables.KitList.GetValue(Kit, 0) #rowname is just a number
 	else:
 		KitName = GUICommon.GetClassRowName (MyChar)
