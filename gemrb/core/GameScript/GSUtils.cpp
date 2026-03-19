@@ -1679,9 +1679,9 @@ int MoveNearerTo(Scriptable* Sender, const Point& p, int distance, int flags)
 	//Sender->CurrentActionInterruptible = false;
 
 	if (!actor->InMove() || actor->Destination != p) {
-		ieDword flags = core->GetGameControl()->ShouldRun(actor) ? IF_RUNNING : 0;
-		flags |= IF_NORETICLE;
-		actor->WalkTo(p, flags, distance);
+		ieDword flags2 = core->GetGameControl()->ShouldRun(actor) ? IF_RUNNING : 0;
+		flags2 |= IF_NORETICLE;
+		actor->WalkTo(p, flags2, distance);
 	}
 
 	if (!actor->InMove()) {
