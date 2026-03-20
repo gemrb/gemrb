@@ -625,6 +625,9 @@ void Map::UseExit(Actor* actor, InfoPoint* ip)
 		case CT_WHOLE:
 		case CT_MOVE_SELECTED:
 			break;
+		default:
+			Log(ERROR, "Map", "Unknown EveryOne value: {}", EveryOne);
+			break;
 	}
 
 	if (!ip->Destination.IsEmpty()) {
@@ -1873,10 +1876,8 @@ void Map::Shout(const Actor* actor, int shoutID, bool global) const
 			continue;
 		}
 
-		if (!global) {
-			if (!WithinAudibleRange(actor, listener->Pos)) {
-				continue;
-			}
+		if (!global && !WithinAudibleRange(actor, listener->Pos)) {
+			continue;
 		}
 		if (shoutID) {
 			listener->AddTrigger(TriggerEntry(trigger_heard, actor->GetGlobalID(), shoutID));
@@ -3186,7 +3187,7 @@ void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int star
 		// the map is reverse-sorted already
 		bool found = false;
 		unsigned int minDist2 = minDistance * minDistance;
-		for (auto& candidate : candidates) {
+		for (const auto& candidate : candidates) {
 			if (candidate.first > minDist2) continue;
 			smptGoal = candidate.second;
 			found = true;
@@ -3318,8 +3319,7 @@ void Map::AddMapNote(const Point& point, MapNote note)
 
 void Map::RemoveMapNote(const Point& point)
 {
-	std::vector<MapNote>::iterator it = mapnotes.begin();
-	for (; it != mapnotes.end(); ++it) {
+	for (auto it = mapnotes.begin(); it != mapnotes.end(); ++it) {
 		if (!it->readonly && it->Pos == point) {
 			mapnotes.erase(it);
 			break;
@@ -3849,12 +3849,15 @@ void Map::FadeSparkle(const Point& pos, bool forced) const
 
 void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point& pos, unsigned int FragAnimID, int Zpos)
 {
-	int style, path, grow, size, width, ttl;
-
 	if (!Zpos) {
 		Zpos = 30;
 	}
 
+	int path = SP_PATH_FLIT;
+	int grow = SP_SPAWN_SOME;
+	int size = 100;
+	int width = 40;
+	int ttl = duration;
 	//the high word is ignored in the original engine (compatibility hack)
 	switch (type & 0xffff) {
 		case SPARKLE_SHOWER: //simple falling sparks
@@ -3879,11 +3882,6 @@ void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point& po
 			ttl = core->GetGame()->GameTime + Zpos;
 			break;
 		default:
-			path = SP_PATH_FLIT;
-			grow = SP_SPAWN_SOME;
-			size = 100;
-			width = 40;
-			ttl = duration;
 			break;
 	}
 	Particles* sparkles = new Particles(size);
@@ -3891,11 +3889,10 @@ void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point& po
 	sparkles->SetRegion(pos.x - width / 2, pos.y - Zpos, width, Zpos);
 	sparkles->SetTimeToLive(ttl);
 
+	int style = SP_TYPE_POINT;
 	if (FragAnimID) {
 		style = SP_TYPE_BITMAP;
 		sparkles->SetBitmap(FragAnimID);
-	} else {
-		style = SP_TYPE_POINT;
 	}
 	sparkles->SetType(style, path, grow);
 	sparkles->SetColorIndex(color);
