@@ -246,7 +246,7 @@ Path Map::FindPath(const Point& s, const Point& d, const unsigned int size, unsi
 		// Also avoid bumping a still actor out of its position,
 		// but stop just before it
 		orient_t direction = GetOrient(nmptDest, nmptSource);
-		AdjustPositionDirected(nmptDest, direction, size);
+		AdjustPositionDirected(nmptDest, direction, size, minDistance);
 	}
 
 	if (nmptDest == nmptSource) return {};

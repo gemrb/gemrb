@@ -3141,7 +3141,7 @@ void Map::AdjustPositionNavmap(NavmapPoint& goal, const Size& radius) const
 // best adjustment attempt given an initial direction to look around
 // at the same time we don't want to look too far in the same direction, since getting close
 // to the target is more important
-void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int startingRadius) const
+void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int startingRadius, unsigned int minDistance) const
 {
 	const Size& mapSize = PropsSize();
 	SearchmapPoint smptGoal { goal };
@@ -3164,7 +3164,7 @@ void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int star
 		baseOffsets.emplace(p.x, p.y);
 	}
 
-	std::map<unsigned int, SearchmapPoint> candidates;
+	std::map<unsigned int, SearchmapPoint, std::greater<>> candidates;
 	NavmapPoint adjGoal = goal - NavmapPoint(8, 6);
 	int radius = startingRadius - 1;
 	while (radius < 2 * startingRadius) { // reduce this search radius if needed
@@ -3182,9 +3182,20 @@ void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int star
 		// fall back to regular search
 		AdjustPosition(smptGoal);
 	} else {
-		// pick the closest candidate
-		// implicitly sorted already
-		smptGoal = candidates.begin()->second;
+		// pick the closest candidate, taking the needed range into account
+		// the map is reverse-sorted already
+		bool found = false;
+		unsigned int minDist2 = minDistance * minDistance;
+		for (auto& candidate : candidates) {
+			if (candidate.first > minDist2) continue;
+			smptGoal = candidate.second;
+			found = true;
+			break;
+		}
+		if (!found) {
+			// if all are further than what we want, go as close as possible
+			smptGoal = candidates.crbegin()->second;
+		}
 	}
 
 	goal.x = smptGoal.x * 16 + 8;
