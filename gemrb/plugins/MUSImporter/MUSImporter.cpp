@@ -281,7 +281,7 @@ void MUSImporter::PlayMusic(const ieVariable& name)
 	}
 
 	ResourceHolder<SoundMgr> sound = manager.GetResourceHolder<SoundMgr>(FName, true);
-	if (sound) {
+	if (sound && core->config.AudioDriverName != "none") {
 		core->GetMusicLoop().Load(std::move(sound));
 		Log(MESSAGE, "MUSImporter", "Playing {}...", FName);
 	} else {
