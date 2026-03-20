@@ -52,6 +52,7 @@ public:
 
 	bool operator==(const BasePoint& pnt) const noexcept;
 	bool operator!=(const BasePoint& pnt) const noexcept;
+	bool operator<(const BasePoint& pnt) const noexcept;
 
 	bool IsZero() const noexcept; // (0, 0)
 	bool IsInvalid() const noexcept; // (-1, -1)

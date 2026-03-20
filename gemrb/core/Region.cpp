@@ -34,6 +34,11 @@ bool BasePoint::operator!=(const BasePoint& pnt) const noexcept
 	return !(*this == pnt);
 }
 
+bool BasePoint::operator<(const BasePoint& pnt) const noexcept
+{
+	return x <= pnt.x && y <= pnt.y;
+}
+
 BasePoint BasePoint::operator-(const BasePoint& p) const noexcept
 {
 	return BasePoint(x - p.x, y - p.y);
