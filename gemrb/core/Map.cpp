@@ -505,17 +505,17 @@ void Map::AutoLockDoors() const
 	GetTileMap()->AutoLockDoors();
 }
 
-void Map::MoveToNewArea(const ResRef& area, const ieVariable& entrance, unsigned int direction, int EveryOne, Actor* actor) const
+void Map::MoveToNewArea(const ResRef& newArea, const ieVariable& entrance, unsigned int direction, int EveryOne, Actor* actor) const
 {
 	//change loader MOS image here
 	//check worldmap entry, if that doesn't contain anything,
 	//make a random pick
 
 	Game* game = core->GetGame();
-	const Map* map = game->GetMap(area, false); // add a GUIEnhancement bit for this if anyone ever complains we only show the first loadscreen
+	const Map* map = game->GetMap(newArea, false); // add a GUIEnhancement bit for this if anyone ever complains we only show the first loadscreen
 	if (EveryOne & CT_GO_CLOSER) {
 		//copy the area name if it exists on the worldmap
-		const WMPAreaEntry* entry = core->GetWorldMap()->FindNearestEntry(area);
+		const WMPAreaEntry* entry = core->GetWorldMap()->FindNearestEntry(newArea);
 		if (entry) {
 			game->PreviousArea = entry->AreaName;
 		}
@@ -526,14 +526,14 @@ void Map::MoveToNewArea(const ResRef& area, const ieVariable& entrance, unsigned
 		}
 	}
 	if (!map) {
-		Log(ERROR, "Map", "Invalid map: {}", area);
+		Log(ERROR, "Map", "Invalid map: {}", newArea);
 		return;
 	}
 	const Entrance* ent = nullptr;
 	if (!entrance.IsEmpty()) {
 		ent = map->GetEntrance(entrance);
 		if (!ent) {
-			Log(ERROR, "Map", "Invalid entrance '{}' for area {}", entrance, area);
+			Log(ERROR, "Map", "Invalid entrance '{}' for area {}", entrance, newArea);
 		}
 	}
 	int X, Y, face;
@@ -578,7 +578,7 @@ void Map::MoveToNewArea(const ResRef& area, const ieVariable& entrance, unsigned
 		}
 	}
 	//LeaveArea is the same in ALL engine versions
-	std::string command = fmt::format("LeaveArea(\"{}\",[{}.{}],{})", area, X, Y, face);
+	std::string command = fmt::format("LeaveArea(\"{}\",[{}.{}],{})", newArea, X, Y, face);
 
 	if (EveryOne & (CT_GO_CLOSER | CT_SELECTED)) {
 		int i = game->GetPartySize(false);
@@ -849,7 +849,6 @@ void Map::UpdateScripts()
 			continue;
 		}
 
-		const auto& runQueue = queue[int(Priority::RunScripts)];
 		q = runQueue.size();
 		ieDword exitID = ip->GetGlobalID();
 		while (q--) {
@@ -3707,11 +3706,10 @@ static void MergePiles(Container* donorPile, Container* pile)
 	}
 }
 
-void Map::MoveVisibleGroundPiles(const Point& Pos)
+void Map::MoveVisibleGroundPiles(const Point& pos)
 {
 	//creating the container at the given position
-	Container* othercontainer;
-	othercontainer = GetPile(Pos);
+	Container* othercontainer = GetPile(pos);
 
 	size_t containerCount = TMap->GetContainerCount();
 	while (containerCount--) {
@@ -3775,12 +3773,12 @@ void Map::AddItemToLocation(const Point& position, CREItem* item)
 	container->AddItem(item);
 }
 
-Container* Map::AddContainer(const ieVariable& Name, unsigned short Type,
+Container* Map::AddContainer(const ieVariable& Name, unsigned short cType,
 			     const std::shared_ptr<Gem_Polygon>& outline)
 {
 	Container* c = new Container();
 	c->SetScriptName(Name);
-	c->containerType = Type;
+	c->containerType = cType;
 	c->outline = outline;
 	c->SetMap(this);
 	if (outline) {
