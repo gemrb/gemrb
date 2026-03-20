@@ -3164,23 +3164,27 @@ void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int star
 		baseOffsets.emplace(p.x, p.y);
 	}
 
-	bool found = false;
+	std::map<unsigned int, SearchmapPoint> candidates;
+	NavmapPoint adjGoal = goal - NavmapPoint(8, 6);
 	int radius = startingRadius - 1;
-	while (!found && radius < 2 * startingRadius) { // reduce this search radius if needed
+	while (radius < 2 * startingRadius) { // reduce this search radius if needed
 		for (auto& offset : baseOffsets) {
 			SearchmapPoint candidate = smptGoal + offset * radius;
 			if (bool(GetBlockedTile(candidate, startingRadius) & PathMapFlags::PASSABLE)) {
-				smptGoal = candidate;
-				found = true;
-				break;
+				unsigned int range = SquaredDistance(candidate.ToNavmapPoint(), adjGoal);
+				candidates[range] = candidate;
 			}
 		}
 		radius++;
 	}
 
-	if (!found) {
+	if (candidates.empty()) {
 		// fall back to regular search
 		AdjustPosition(smptGoal);
+	} else {
+		// pick the closest candidate
+		// implicitly sorted already
+		smptGoal = candidates.begin()->second;
 	}
 
 	goal.x = smptGoal.x * 16 + 8;
