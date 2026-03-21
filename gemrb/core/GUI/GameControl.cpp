@@ -2464,6 +2464,8 @@ void GameControl::CommandSelectedMovement(const Point& p, bool formation, bool a
 
 bool GameControl::OnMouseWheelScroll(const Point& delta)
 {
+	if (core->GetDictionary().Get("Zoom Lock", 0) == 1) return false;
+
 	auto lastScale = GetScalePercent();
 	// EEs have 27 zoom steps
 	if (delta.y > 0 && zoomLevel > 1) {
