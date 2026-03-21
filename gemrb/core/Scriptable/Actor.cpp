@@ -11446,11 +11446,15 @@ bool Actor::HasVisibleHP() const
 }
 
 // shows hp/maxhp as overhead text
-void Actor::DisplayHeadHPRatio()
+void Actor::DisplayHeadHPRatio(bool showName)
 {
 	if (!HasVisibleHP()) return;
 
-	overHead.SetText(fmt::format(u"{}/{}", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]), true, false);
+	if (showName) {
+		overHead.SetText(fmt::format(u"{}\n{}/{}", GetName(), Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]), true, false);
+	} else {
+		overHead.SetText(fmt::format(u"{}/{}", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]), true, false);
+	}
 }
 
 void Actor::ReleaseCurrentAction()

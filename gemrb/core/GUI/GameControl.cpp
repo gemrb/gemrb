@@ -667,6 +667,40 @@ void GameControl::DrawTargetReticles() const
 	}
 }
 
+// show partymember hp/maxhp as overhead text
+// the ees do that plus show the names of every visible actor
+static void DisplayHeadHPNames(bool enable, const Region& vp)
+{
+	const Game* game = core->GetGame();
+	const Map* area = game->GetCurrentArea();
+	if (!area) return;
+
+	if (!enable) {
+		auto actors = area->GetActorsInRect(vp, GA_NO_DEAD | GA_NO_UNSCHEDULED);
+		for (Actor* actor : actors) {
+			actor->overHead.Display(false, 0);
+		}
+		return;
+	}
+
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		auto actors = area->GetActorsInRect(vp, GA_NO_DEAD | GA_NO_UNSCHEDULED);
+		for (Actor* actor : actors) {
+			if (actor->InParty) {
+				actor->DisplayHeadHPRatio(true);
+			} else {
+				actor->overHead.SetText(fmt::format(u"{}", actor->GetName()), true, false);
+			}
+		}
+	} else {
+		for (int pm = 0; pm < game->GetPartySize(false); pm++) {
+			Actor* pc = game->GetPC(pm, true);
+			if (!pc) continue;
+			pc->DisplayHeadHPRatio();
+		}
+	}
+}
+
 // this existly only so tab can be handled
 // it's used both for tooltips everywhere and hp display on game control
 bool GameControl::DispatchEvent(const Event& event) const
@@ -676,13 +710,7 @@ bool GameControl::DispatchEvent(const Event& event) const
 	}
 
 	if (event.keyboard.keycode == GEM_TAB) {
-		const Game* game = core->GetGame();
-		// show partymember hp/maxhp as overhead text
-		for (int pm = 0; pm < game->GetPartySize(false); pm++) {
-			Actor* pc = game->GetPC(pm, true);
-			if (!pc) continue;
-			pc->DisplayHeadHPRatio();
-		}
+		DisplayHeadHPNames(true, viewport);
 		return true;
 	} else if (event.keyboard.keycode == GEM_ESCAPE) {
 		core->ResetActionBar();
@@ -1143,12 +1171,8 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& key, unsigned short mod)
 
 	switch (key.keycode) {
 			//FIXME: move these to guiscript
-		case GEM_TAB: // remove overhead partymember hp/maxhp
-			for (int pm = 0; pm < core->GetGame()->GetPartySize(false); pm++) {
-				Actor* pc = core->GetGame()->GetPC(pm, true);
-				if (!pc) continue;
-				pc->overHead.Display(false, 0);
-			}
+		case GEM_TAB: // remove overhead partymember hp/maxhp / names
+			DisplayHeadHPNames(false, viewport);
 			break;
 		case GEM_UP:
 		case GEM_DOWN:

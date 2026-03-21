@@ -1077,7 +1077,7 @@ public:
 	void MovementCommand(std::string command);
 	/* shows hp/maxhp as overhead text */
 	bool HasVisibleHP() const;
-	void DisplayHeadHPRatio();
+	void DisplayHeadHPRatio(bool showName = false);
 	/* if Lasttarget is gone, call this */
 	void StopAttack();
 	int SetBaseAPRandAB(bool CheckRapidShot);
