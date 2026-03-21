@@ -2506,10 +2506,9 @@ void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
 			}
 		} else {
 			//no trap here
-			//displaymsg->DisplayString(HCStrings::NotTrapped);
 		}
 	} else {
-		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE, 0);
+		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE, MNT::None);
 		return;
 	}
 	Sender->SetWait(1);
@@ -2559,12 +2558,9 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		if (locked) {
 			lockMount->TryPickLock(actor);
-		} else {
-			//notlocked
-			//displaymsg->DisplayString(HCStrings::NotLocked);
 		}
 	} else {
-		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE, 0);
+		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE, MNT::None);
 		return;
 	}
 	Sender->SetWait(1);
@@ -2648,7 +2644,7 @@ void GameScript::ToggleDoor(Scriptable* Sender, Action* parameters)
 		//trap scripts are triggered by SetDoorOpen
 		door->SetDoorOpen(!door->IsOpen(), true, actor->GetGlobalID());
 	} else {
-		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE, 0);
+		MoveNearerTo(Sender, *p, MAX_OPERATING_DISTANCE, MNT::None);
 		return;
 	}
 	Sender->SetWait(1);
@@ -4525,7 +4521,7 @@ void GameScript::DropItem(Scriptable* Sender, Action* parameters)
 	}
 
 	if (Distance(parameters->pointParameter, Sender) > 10) {
-		MoveNearerTo(Sender, parameters->pointParameter, 10, 0);
+		MoveNearerTo(Sender, parameters->pointParameter, 10, MNT::None);
 		return;
 	}
 	Map* map = Sender->GetCurrentArea();
@@ -4619,7 +4615,7 @@ void GameScript::Plunder(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (PersonalDistance(Sender, tar) > MAX_OPERATING_DISTANCE) {
-		MoveNearerTo(Sender, tar->Pos, MAX_OPERATING_DISTANCE, 0);
+		MoveNearerTo(Sender, tar->Pos, MAX_OPERATING_DISTANCE, MNT::None);
 		return;
 	}
 	//move all movable item from the target to the Sender
@@ -5847,7 +5843,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	MoveNearerTo(Sender, container, needed, 1);
+	MoveNearerTo(Sender, container, needed, MNT::NoRelease);
 }
 
 //call the usecontainer action in target (not used)
@@ -6608,7 +6604,7 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 	}
 
 	if (distance > MAX_OPERATING_DISTANCE) {
-		MoveNearerTo(Sender, *pos, MAX_OPERATING_DISTANCE, 0);
+		MoveNearerTo(Sender, *pos, MAX_OPERATING_DISTANCE, MNT::None);
 		return;
 	}
 
@@ -6941,7 +6937,7 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 	float_t angle = AngleFromPoints(Sender->Pos, parameters->pointParameter);
 	unsigned int dist = GetItemDistance(itemres, header, angle);
 	if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
-		MoveNearerTo(Sender, parameters->pointParameter, dist, 0);
+		MoveNearerTo(Sender, parameters->pointParameter, dist, MNT::None);
 		return;
 	}
 

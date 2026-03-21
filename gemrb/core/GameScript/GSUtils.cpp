@@ -1026,7 +1026,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point& p, const ResRef& area, cons
 		if (!p.IsInvalid() && PersonalDistance(p, Sender) > MAX_OPERATING_DISTANCE) {
 			//MoveNearerTo will return 0, if the actor is in move
 			//it will return 1 (the fourth parameter) if the target is unreachable
-			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE, 1) && !NearEdge(Sender)) {
+			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE, MNT::NoRelease) && !NearEdge(Sender)) {
 				if (!Sender->InMove()) Log(WARNING, "GSUtils", "At least it said so...");
 				// ensure the action doesn't get interrupted
 				// fixes Nalia starting a second dialog in the Coronet, if she gets a chance #253
@@ -1189,7 +1189,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) range += 160; // approx value to make the FFG range in 1201csg3 match
 			if (scr->GetCurrentArea() != target->GetCurrentArea() ||
 			    PersonalDistance(scr, target) > range) {
-				MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE, 2);
+				MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE, MNT::FinalDistance);
 				return;
 			}
 		}
@@ -1206,7 +1206,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			GetTalkPositionFromScriptable(scr, TalkPos);
 			if (PersonalDistance(TalkPos, target) > MAX_OPERATING_DISTANCE) {
 				//try to force the target to come closer???
-				if (!MoveNearerTo(target, TalkPos, MAX_OPERATING_DISTANCE, 1))
+				if (!MoveNearerTo(target, TalkPos, MAX_OPERATING_DISTANCE, MNT::NoRelease))
 					return;
 			}
 		}
@@ -1619,7 +1619,7 @@ void AttackCore(Scriptable* Sender, Scriptable* target, int flags)
 	attacker->PerformAttack(core->GetGame()->GameTime);
 }
 
-void MoveNearerTo(Scriptable* Sender, const Scriptable* target, int distance, int flags)
+void MoveNearerTo(Scriptable* Sender, const Scriptable* target, int distance, MNT flags)
 {
 	Point p;
 
@@ -1650,7 +1650,7 @@ void MoveNearerTo(Scriptable* Sender, const Scriptable* target, int distance, in
 	GetPositionFromScriptable(target, p, false);
 
 	// account for PersonalDistance (which caller uses, but pathfinder doesn't)
-	if (!(flags & 2) && distance) {
+	if (!(flags & MNT::FinalDistance) && distance) {
 		distance += mover->CircleSize2Radius() * 3; // lower DistanceFactor
 		if (target->Type == ST_ACTOR) {
 			distance += static_cast<const Actor*>(target)->CircleSize2Radius() * 3;
@@ -1663,13 +1663,13 @@ void MoveNearerTo(Scriptable* Sender, const Scriptable* target, int distance, in
 //It is not always good to release the current action if target is unreachable
 //we should also raise the trigger TargetUnreachable (if this is an Attack, at least)
 //i hacked only this low level function, didn't need the higher ones so far
-int MoveNearerTo(Scriptable* Sender, const Point& p, int distance, int flags)
+MNT MoveNearerTo(Scriptable* Sender, const Point& p, int distance, MNT flags)
 {
 	Actor* actor = Scriptable::As<Actor>(Sender);
 	if (!actor) {
 		Log(ERROR, "GameScript", "MoveNearerTo only works with actors");
 		Sender->ReleaseCurrentAction();
-		return 0;
+		return MNT::None;
 	}
 
 	// chasing is not unbreakable
@@ -1684,13 +1684,13 @@ int MoveNearerTo(Scriptable* Sender, const Point& p, int distance, int flags)
 
 	if (!actor->InMove()) {
 		//didn't release
-		if (flags & 1) {
+		if (bool(flags & MNT::NoRelease)) {
 			return flags;
 		}
 		// we can't walk any nearer to destination, give up
 		Sender->ReleaseCurrentAction();
 	}
-	return 0;
+	return MNT::None;
 }
 
 // checks the odd HasAdditionalRect / ADDITIONAL_RECT matching
@@ -2338,14 +2338,14 @@ void SpellCore(Scriptable* Sender, Action* parameters, int flags)
 		//move near to target
 		if ((flags & SC_RANGE_CHECK) && dist != 0x7fffffff) {
 			if (PersonalDistance(tar, Sender) > dist) {
-				MoveNearerTo(Sender, tar, dist, 2);
+				MoveNearerTo(Sender, tar, dist, MNT::FinalDistance);
 				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 				return;
 			}
 			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, tar->SMPos, act)) {
 				if (!(spl->Flags & SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
-					MoveNearerTo(Sender, tar, dist, 2);
+					MoveNearerTo(Sender, tar, dist, MNT::FinalDistance);
 					return;
 				}
 			}
@@ -2465,14 +2465,14 @@ void SpellPointCore(Scriptable* Sender, Action* parameters, int flags)
 		if (flags & SC_RANGE_CHECK) {
 			unsigned int dist = GetSpellDistance(spellResRef, Sender, parameters->pointParameter);
 			if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
-				MoveNearerTo(Sender, parameters->pointParameter, dist, 2);
+				MoveNearerTo(Sender, parameters->pointParameter, dist, MNT::FinalDistance);
 				return;
 			}
 			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, SearchmapPoint(parameters->pointParameter), act)) {
 				const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
 				if (!(spl->Flags & SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
-					MoveNearerTo(Sender, parameters->pointParameter, dist, 2);
+					MoveNearerTo(Sender, parameters->pointParameter, dist, MNT::FinalDistance);
 					return;
 				}
 				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
