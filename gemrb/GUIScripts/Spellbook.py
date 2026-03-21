@@ -262,8 +262,8 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	# but only if there are any spells of that type to disable
 	disabled_spellcasting = GemRB.GetPlayerStat(actor, IE_CASTING, 0)
 	classRowName = GUICommon.GetClassRowName (actor)
-	extraActionButton = not (GameCheck.IsIWD2() or GameCheck.IsPST()) and classRowName == "CLERIC_THIEF"
 	actionLevel = GemRB.GetVar ("ActionLevel")
+	extraActionButton = not (GameCheck.IsIWD2() or GameCheck.IsPST()) and classRowName == "CLERIC_THIEF" and actionLevel == UAW_INNATES
 
 	# spellType will have IE_SPL_ITEM (...) not IE_SPELL_TYPE_PRIEST (...)!
 	# IE_CASTING order is: item, cleric, mage, innate, class, song
