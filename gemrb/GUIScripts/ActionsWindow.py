@@ -1178,7 +1178,7 @@ def SpellPressed ():
 		SetActionLevel (UAW_STANDARD)
 		GemRB.SetVar("Type", 0)
 	GemRB.SpellCast (pc, Type, Spell)
-	if GemRB.GetVar ("Type") is not None:
+	if GemRB.GetVar ("Type") is not -1:
 		SetActionLevel (UAW_STANDARD)
 		# init spell list
 		GemRB.SpellCast (pc, -1, 0)
