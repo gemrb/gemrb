@@ -9956,7 +9956,7 @@ void Actor::SetUsedWeapon(AnimRef AnimationType, const std::array<ieWord, 3>& me
 
 	anims->SetWeaponRef(AnimationType);
 	anims->SetWeaponType(wt);
-	ClearCurrentStanceAnims();
+	AdvanceAnimations(); // clear and recreate stance anims (the latter is needed for TNO to start on the table)
 	SetAttackMoveChances(meleeAnimation);
 	if (InParty) {
 		//update the paperdoll weapon animation
@@ -11420,7 +11420,7 @@ int Actor::UpdateAnimationID(bool derived)
 	}
 	if (!derived) {
 		SetAnimationID(newAnimID);
-		//setting PST's starting stance to 18
+		// setting PST's starting stance to 18 (IE_ANI_PST_START)
 		if (avStance != -1) {
 			SetStance(avStance);
 		}
