@@ -1367,7 +1367,7 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 		UpdateStoreShoppingWindow(ShopWin)
 
 	def Confirm():
-		ConfirmItemAmount(Text.QueryInteger(), store)
+		ConfirmItemAmount(Text.QueryInteger(), store, Index)
 		CloseAmountWindow()
 
 	# Done
@@ -1384,17 +1384,13 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def ConfirmItemAmount (Number, store = STORE_MAIN):
+def ConfirmItemAmount (Number, store, Index):
 	global MaxAmount
 
 	if Number > MaxAmount:
 		Number = MaxAmount
 	elif Number < 0:
 		Number = 0
-	if store == STORE_MAIN:
-		Index = GemRB.GetVar ("LeftIndex")
-	else:
-		Index = GemRB.GetVar ("RightIndex")
 	GemRB.SetPurchasedAmount (Index, Number, store)
 
 	return
