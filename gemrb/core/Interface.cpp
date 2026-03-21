@@ -1498,6 +1498,7 @@ static const EnumArray<GFFlags, StringView> game_flags {
 	"SellableCritsNoConv", // GFFlags::SELLABLE_CRITS_NO_CONV
 	"BetterOfHearing", // GFFlags::BETTER_OF_HEARING
 	"GreyDisabledControls", // GFFlags::GREY_DISABLED_CONTROLS
+	"NameEveryoneOnTab", // GFFlags::NAME_EVERYONE_ON_TAB
 };
 
 /** Loads gemrb.ini */

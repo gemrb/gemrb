@@ -141,6 +141,7 @@ enum class GFFlags : uint32_t {
 	SELLABLE_CRITS_NO_CONV, // bg1, iwd1
 	BETTER_OF_HEARING, // all but bg1 and psts
 	GREY_DISABLED_CONTROLS, // bg1
+	NAME_EVERYONE_ON_TAB, // ees
 
 	count // must be last
 };

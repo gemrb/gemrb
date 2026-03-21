@@ -20,7 +20,7 @@ their own files. User specific configuration is in other file (GemRB.cfg).
 
 Options that do not deal strictly with data availability and diversity
 may be freely changed. Some that may be interesting to users include:
-AutoSearchHidden, BreakableWeapons, DeathOnZeroStat,
+AutoSearchHidden, BreakableWeapons, DeathOnZeroStat, NameEveryoneOnTab,
 HasSpecificDamageBonus (mod required), SimplifiedDisruption,
 HealOn100Plus, KnowWorld, ProperBackstab, SelectiveMagicRes,
 ShopsRechargeItems, StealIsAttack and TeamMovement.
@@ -475,6 +475,12 @@ MeleeHeaderUsesProjectile = <bool>
 - - - - - - - - -
 Toggles whether melee hitting headers should use their set projectile or not.
 Disabled by default everywhere.
+
+
+NameEveryoneOnTab = <bool>
+- - - - - - - - -
+Toggles whether holding TAB shows only the HP of party members in overhead text
+or also the names of every visible actor.
 
 
 NoDropCanMove = <bool>

@@ -683,7 +683,7 @@ static void DisplayHeadHPNames(bool enable, const Region& vp)
 		return;
 	}
 
-	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+	if (core->HasFeature(GFFlags::NAME_EVERYONE_ON_TAB)) {
 		auto actors = area->GetActorsInRect(vp, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 		for (Actor* actor : actors) {
 			if (actor->InParty) {
