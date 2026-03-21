@@ -610,7 +610,7 @@ def PortraitSelect():
 	Portrait = 0
 
 	PortraitPortraitButton = PortraitWindow.GetControl (1)
-	PortraitPortraitButton.SetState (IE_GUI_BUTTON_DISABLED)
+	PortraitPortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
 	PortraitPortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
 	PortraitLeftButton = PortraitWindow.GetControl (2)
