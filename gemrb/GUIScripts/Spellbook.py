@@ -211,6 +211,10 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		level = GemRB.GetPlayerStat (actor, IE_LEVEL)
 		GUICommon.AddClassAbilities (actor, "clabbard", level, level)
 
+	classRowName = GUICommon.GetClassRowName (actor)
+	actionLevel = GemRB.GetVar ("ActionLevel")
+	extraActionButton = not (GameCheck.IsIWD2() or GameCheck.IsPST()) and classRowName == "CLERIC_THIEF" and actionLevel == UAW_INNATES
+
 	# check if we're dealing with a temporary spellbook
 	if GemRB.GetVar("ActionLevel") == UAW_2DASPELLS:
 		allSpells = GetSpellinfoSpells (actor, BookType)
@@ -225,7 +229,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			for i in range(16):
 				if BookType & (1<<i):
 					allSpells += GetUsableMemorizedSpells (actor, i)
-			if not len(allSpells):
+			if not len(allSpells) and not extraActionButton:
 				print("No usable spells or unknown BookType passed to SetupSpellIcons: %d! Bailing out!" %(BookType))
 				import ActionsWindow
 				ActionsWindow.SetActionLevel (UAW_STANDARD)
@@ -261,9 +265,6 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	# disable all spells if fx_disable_spellcasting was run with the same type
 	# but only if there are any spells of that type to disable
 	disabled_spellcasting = GemRB.GetPlayerStat(actor, IE_CASTING, 0)
-	classRowName = GUICommon.GetClassRowName (actor)
-	actionLevel = GemRB.GetVar ("ActionLevel")
-	extraActionButton = not (GameCheck.IsIWD2() or GameCheck.IsPST()) and classRowName == "CLERIC_THIEF" and actionLevel == UAW_INNATES
 
 	# spellType will have IE_SPL_ITEM (...) not IE_SPELL_TYPE_PRIEST (...)!
 	# IE_CASTING order is: item, cleric, mage, innate, class, song
