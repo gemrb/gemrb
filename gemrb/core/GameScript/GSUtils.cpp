@@ -1189,7 +1189,7 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 			if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) range += 160; // approx value to make the FFG range in 1201csg3 match
 			if (scr->GetCurrentArea() != target->GetCurrentArea() ||
 			    PersonalDistance(scr, target) > range) {
-				MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
+				MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE, 2);
 				return;
 			}
 		}
