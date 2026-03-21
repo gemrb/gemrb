@@ -267,7 +267,7 @@ def OnAutoEquip (btn):
 	ret = GemRB.DropDraggedItem (pc, -1)
 	#this is exactly the same hack as the blackisle guys did it
 	#quite lame, but we should copy their efforts the best
-	if ret == 2 and item and (item['ItemResRef'] == "dustrobe"):
+	if ret == 2 and item and (item['ItemResRef'] == "DUSTROBE"):
 		GemRB.SetGlobal("APPEARANCE","GLOBAL",2)
 
 	UpdateInventoryWindow (btn.Window)

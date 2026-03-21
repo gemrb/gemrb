@@ -158,7 +158,7 @@ def OnDragItem (btn):
 			GemRB.DropDraggedItem (pc, slot)
 
 			# handle pst disguises
-			if slot == 2 and item['ItemResRef'] == 'dustrobe':
+			if slot == 2 and item['ItemResRef'] == 'DUSTROBE':
 				GemRB.SetGlobal ("APPEARANCE", "GLOBAL", 2)
 			elif slot < 21 and itemData['AnimationType'] != '':
 				GemRB.SetGlobal ("APPEARANCE", "GLOBAL", 0)
