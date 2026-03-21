@@ -192,7 +192,7 @@ bool OverHeadMsg::Draw(int heightOffset, const Point& fallbackPos, int ownerType
 		scrollOffset.y -= 2;
 	}
 
-	if (core->HasFeature(GFFlags::RULES_3ED)) {
+	if (core->HasFeature(GFFlags::RULES_3ED) || core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 		// first draw a background layer for better contrast
 		Region rgnBG(rgn);
 
