@@ -11197,7 +11197,7 @@ static PyObject* GemRB_SpellCast(PyObject* /*self*/, PyObject* args)
 		}
 	} else {
 		ieDword ActionLevel = core->GetDictionary().Get("ActionLevel", 0);
-		if (ActionLevel == 5) {
+		if (ActionLevel == 5) { // UAW_ALLMAGE
 			// get the right spell, since the lookup below only checks the memorized list
 			actor->spellbook.SetCustomSpellInfo(data, ResRef(), type);
 		}

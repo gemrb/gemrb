@@ -6173,7 +6173,7 @@ int fx_select_spell(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2) {
 		//all known spells, no need to memorize
 		// the details are all handled by the Spellbook guiscript
-		vars.Set("ActionLevel", 5);
+		vars.Set("ActionLevel", 5); // UAW_ALLMAGE
 	} else {
 		//all spells listed in 2da
 		// (ees) differentiate between 1 and 2 with some minor extra filtering, but we do that elsewhere
@@ -6181,7 +6181,7 @@ int fx_select_spell(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		gamedata->ReadResRefTable(fx->Resource, data);
 		sb->SetCustomSpellInfo(data, fx->SourceRef, 0);
 
-		vars.Set("ActionLevel", 11);
+		vars.Set("ActionLevel", 11); // UAW_2DASPELLS
 	}
 	// force a redraw of the action bar
 	//this is required, because not all of these opcodes are firing right at casting
