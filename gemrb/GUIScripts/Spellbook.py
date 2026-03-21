@@ -279,6 +279,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 
 		# yuck, handle offloaded cleric/thief icon
 		# original did picking, we do turning, since it is used less often
+		extraOffset = 0
 		if i + Start == 0 and extraActionButton:
 			Button.SetActionIcon (globals(), 6, 1)
 			Button.OnPress (ActionsWindow.ActionTurnPressed)
@@ -288,21 +289,25 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 				Button.SetState (IE_GUI_BUTTON_ENABLED)
 			Button.SetText ("")
 			continue
+		elif extraActionButton:
+			# don't skip the first spell
+			extraOffset = -1
 
-		if i+Start >= len(memorizedSpells):
+		spellIdx = i + Start + extraOffset
+		if spellIdx >= len(memorizedSpells):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetText ("")
 			continue
 
-		Spell = memorizedSpells[i+Start]
+		Spell = memorizedSpells[spellIdx]
 		spellType = Spell['SpellType']
 		if spellType > 4:
 			spellType = 1
 		else:
 			spellType = spellSections[spellType]
 		if BookType == -1:
-			Button.SetVarAssoc ("Spell", Spell['SpellIndex']+i+Start)
+			Button.SetVarAssoc ("Spell", Spell['SpellIndex'] + spellIdx)
 		else:
 			Button.SetVarAssoc ("Spell", Spell['SpellIndex'])
 
