@@ -1456,7 +1456,8 @@ def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 		else:
 			spellType = 1 << IE_SPELL_TYPE_INNATE
 
-		if len(GemRB.GetSpelldata (pc, spellType)) == 0:
+		extraTurning = not (GameCheck.IsIWD2() or GameCheck.IsPST()) and GUICommon.GetClassRowName (pc) == "CLERIC_THIEF"
+		if len(GemRB.GetSpelldata (pc, spellType)) == 0 and not extraTurning:
 			state = IE_GUI_BUTTON_DISABLED
 	elif action == ACT_CAST:
 		# luckily the castable spells in IWD2 are all bits below INNATE, so we can do this trick
