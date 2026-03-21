@@ -564,12 +564,14 @@ def InitStoreStealWindow (Window):
 		Window.AliasControls ({'SWRLBL' + str(x) : x+0x10000011 for x in range(ItemButtonCount)} )
 		Window.AliasControls ({'SWLLBL' + str(x) : x+0x10000008 for x in range(ItemButtonCount)} )
 	else:
-		Window.AliasControls ({ 'STEAL' : 1, 'SWLSBAR' : 9, 'SWRSBAR' : 10,
+		offset = 1 if GameCheck.IsAnyEE () else 0 # sigh, random id changes
+
+		Window.AliasControls ({ 'STEAL' : 1, 'SWLSBAR' : 9 + offset, 'SWRSBAR' : 10 + offset,
 								'STONAME' : 0x10000027, 'STOTITLE' : 0x10000002, 'STOGOLD' : 0x10000023
 							  } )
 
 		Window.AliasControls ({'SWLBTN' + str(x) : x+4 for x in range(ItemButtonCount)} )
-		Window.AliasControls ({'SWRBTN' + str(x) : x+11 for x in range(ItemButtonCount)} )
+		Window.AliasControls ({'SWRBTN' + str(x) : x + 11 + offset for x in range(ItemButtonCount)})
 		Window.AliasControls ({'SWRLBL' + str(x) : x+0x10000019 for x in range(ItemButtonCount)} )
 		Window.AliasControls ({'SWLLBL' + str(x) : x+0x1000000f for x in range(ItemButtonCount)} )
 
@@ -598,6 +600,7 @@ def InitStoreStealWindow (Window):
 	Button.SetText (strrefs["steal"])
 	Button.OnPress (StealPressed)
 
+	# bag icon
 	Button = Window.GetControl (37)
 	if Button:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
