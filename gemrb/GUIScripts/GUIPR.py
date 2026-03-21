@@ -196,7 +196,8 @@ def RefreshPriestLevel ():
 
 	PriestSpellLevel = GemRB.GetVar ("PriestSpellLevel")
 	Button = PriestSpellWindow.GetControl (55 + PriestSpellLevel)
-	Button.SetState (IE_GUI_BUTTON_SELECTED)
+	if Button:
+		Button.SetState (IE_GUI_BUTTON_SELECTED)
 	UpdatePriestWindow (PriestSpellWindow)
 	return
 
