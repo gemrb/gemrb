@@ -66,15 +66,6 @@ MaxAmount = 0
 BuySum = 0
 SellSum = 0
 
-UnusableColor = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
-
-if GameCheck.IsBG2OrEE ():
-	IDColor = {'r' : 0, 'g' : 0, 'b' : 128, 'a' : 160}
-elif GameCheck.IsPST():
-	IDColor = {'r' : 128, 'g' : 0, 'b' : 0, 'a' : 100}
-else:
-	IDColor = {'r' : 32, 'g' : 32, 'b' : 192, 'a' : 128}
-
 # 0 - Store
 # 1 - Tavern
 # 2 - Inn
@@ -286,6 +277,21 @@ def OpenStoreWindow ():
 
 	return
 
+def SetupBorders (btn):
+		UnusableColor = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
+		DisabledColor = {'r': 61, 'g': 47, 'b': 24, 'a': 100}
+
+		if GameCheck.IsBG2OrEE ():
+			IDColor = {'r' : 0, 'g' : 0, 'b' : 128, 'a' : 160}
+		elif GameCheck.IsPST():
+			IDColor = {'r' : 128, 'g' : 0, 'b' : 0, 'a' : 100}
+		else:
+			IDColor = {'r' : 32, 'g' : 32, 'b' : 192, 'a' : 128}
+
+		btn.SetBorder (0, IDColor, 0, 1)
+		btn.SetBorder (1, UnusableColor, 0, 1)
+		btn.SetBorder (2, DisabledColor, 0, 1)
+
 def InitStoreShoppingWindow (Window):
 	global LeftButton, RightButton, Inventory
 	global BestCharmer
@@ -350,9 +356,8 @@ def InitStoreShoppingWindow (Window):
 
 	for i in range (ItemButtonCount):
 		Button = Window.GetControlAlias ('LBTN' + str(i))
-		Button.SetBorder (0, IDColor, 0, 1)
-		Button.SetBorder (1, UnusableColor, 0, 1)
 		Button.SetVarAssoc ("LeftIndex", i)
+		SetupBorders (Button)
 		Button.OnPress (SelectBuy)
 		Button.OnDoublePress (lambda: OpenItemAmountWindow(Window))
 		Button.OnRightPress (InfoLeftWindow)
@@ -364,8 +369,7 @@ def InitStoreShoppingWindow (Window):
 		if GameCheck.IsBG2OrEE ():
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 
-		Button.SetBorder (0, IDColor, 0, 1)
-		Button.SetBorder (1, UnusableColor, 0, 1)
+		SetupBorders (Button)
 		if Store['StoreType'] != 3: # can't sell to temples
 			Button.OnPress (SelectSell)
 			Button.OnDoublePress (lambda: OpenBag(Window))
@@ -516,7 +520,7 @@ def InitStoreIdentifyWindow (Window):
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			Button.SetSprites ("GUISTMSC", 0, 1,2,0,3)
 
-		Button.SetBorder (0, IDColor, 0, 1)
+		SetupBorders (Button)
 		Button.OnPress (SelectID)
 		Button.OnRightPress (InfoIdentifyWindow)
 		Button.SetFont ("NUMBER")
@@ -572,8 +576,7 @@ def InitStoreStealWindow (Window):
 	for i in range (ItemButtonCount):
 		Button = Window.GetControlAlias ('SWLBTN' + str(i))
 		Button.SetVarAssoc ("LeftIndex", i)
-		Button.SetBorder (0, IDColor, 0, 1)
-		Button.SetBorder (1, UnusableColor, 0, 1)
+		SetupBorders (Button)
 		Button.OnRightPress (InfoLeftWindow)
 		Button.OnPress (SelectSteal)
 		Button.SetFont ("NUMBER")
@@ -581,8 +584,7 @@ def InitStoreStealWindow (Window):
 
 		Button = Window.GetControlAlias ('SWRBTN' + str(i))
 		Button.SetVarAssoc ("RightIndex", i)
-		Button.SetBorder (0, IDColor, 0, 1)
-		Button.SetBorder (1, UnusableColor, 0, 1)
+		SetupBorders (Button)
 		Button.OnRightPress (InfoRightWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
@@ -1654,13 +1656,16 @@ def RedrawStoreStealWindow (Window):
 	return
 
 def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
+	Button.EnableBorder (0, False)
+	Button.EnableBorder (1, False)
+	Button.EnableBorder (2, False)
+
 	if Slot == None:
 		# BG1 doesnt have empty slots on the window bg
 		# instead of GameChecking, just clear data for all instead of setting visibility
 		Button.SetPicture(None)
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button.SetText("")
-		Button.EnableBorder (1, False)
 		Label.SetVisible(False)
 		return
 
@@ -1675,9 +1680,7 @@ def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
 	state = IE_GUI_BUTTON_DISABLED
 	Price = None
 	
-	if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
-		Button.EnableBorder (1, False)
-	else:
+	if not GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
 		Button.EnableBorder (1, True)
 
 	if storetype == ITEM_STORE:
@@ -1700,12 +1703,9 @@ def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
 			index = inventory_slots[index]
 
 		Flags = GemRB.IsValidStoreItem (pc, index, storetype)
-		if steal:
-			Button.EnableBorder (1, False)
-		else:
+		if not steal:
 			Price = 1 if Inventory else GetRealPrice(pc, "buy", Item, Slot)
 
-			Button.EnableBorder (2, False)
 			if Item['Function'] & ITM_F_CONTAINER and not Bag and not Inventory:
 				# containers are always clickable
 				state = IE_GUI_BUTTON_ENABLED
@@ -1714,8 +1714,7 @@ def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
 			elif Flags & SHOP_SELL and Price > 0:
 				state = IE_GUI_BUTTON_ENABLED
 			else:
-				color = {'r': 61, 'g': 47, 'b': 24, 'a': 100}
-				Button.SetBorder (2, color, 1,1)
+				Button.EnableBorder (2, True)
 				state = IE_GUI_BUTTON_DISABLED
 
 	Button.SetState(state)
@@ -1724,7 +1723,6 @@ def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
 		Button.EnableBorder (0, True)
 	else:
 		Name = GemRB.GetString (Item['ItemNameIdentified'])
-		Button.EnableBorder (0, False)
 
 	GemRB.SetToken ("ITEMNAME", Name)
 	GemRB.SetToken ("ITEMCOST", str(Price))
