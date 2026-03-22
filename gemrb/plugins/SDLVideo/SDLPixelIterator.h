@@ -43,7 +43,7 @@ inline PixelFormat PixelFormatForSurface(SDL_Surface* surf, Holder<Palette> pal 
 		fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask,
 		fmt->BytesPerPixel, fmt->BitsPerPixel,
 #if SDL_VERSION_ATLEAST(1, 3, 0)
-		[surf]() { Uint32 ck; SDL_GetColorKey(surf, &ck); return ck; }(),
+		[surf]() { Uint32 ck = 0; SDL_GetColorKey(surf, &ck); return ck; }(),
 		bool(SDL_HasColorKey(surf)),
 #else
 		fmt->colorkey,
