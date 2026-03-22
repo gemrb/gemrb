@@ -160,6 +160,9 @@ def OnDragItem (btn):
 			# handle pst disguises
 			if slot == 2 and item['ItemResRef'] == 'DUSTROBE':
 				GemRB.SetGlobal ("APPEARANCE", "GLOBAL", 2)
+				# call UpdateInventoryWindow, so the paperdoll updates immediately
+				import GUICommonWindows
+				GUICommonWindows.SelectionChangeHandler  ()
 			elif slot < 21 and itemData['AnimationType'] != '':
 				GemRB.SetGlobal ("APPEARANCE", "GLOBAL", 0)
 
