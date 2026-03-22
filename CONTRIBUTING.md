@@ -184,9 +184,9 @@ as a template to track progress in a dedicated issue.
 3. Releases are usually made when larger pieces of work land or many smaller
 fixes have accrued.
 4. Versioning is semantic, but also ad-hoc. We want 1.0 to be the classic
-polished release (feature complete or not), so we won't reach it until we
-implement full iwd2 playability (you can finish the game). Until then, we'll
-be bumping the patchlevel version number.
+polished release (feature complete or not), so we won't reach it until an
+undecided milestone of stability. Until then, we'll be bumping the patchlevel
+version number.
 
 
 ## Development priorities
@@ -215,10 +215,11 @@ You can check what we're working towards in the current release by reading the
 NEWS file and, as far as bugtracker backlog goes, by looking at the version's
 [milestone](https://github.com/gemrb/gemrb/milestones).
 
-The plan for 0.9.6 is to work on polishing, annoying pst oddities, maybe getting
+The plan for 0.9.6 is to work on polishing, improving moddability, maybe getting
 bg2ee support out of experimental stage, deal with some postponed issues, and
 whatever piques the contributor's fancy.
 
 We're looking for ninjas to help with replacing FreeType (with SDL_ttf) and libvlc,
-GLESv2 support (no hw, see [#938](https://github.com/gemrb/gemrb/issues/938)) and
-a full-fledged installer for windows [#612](https://github.com/gemrb/gemrb/issues/612).
+[GLESv2 support](https://github.com/gemrb/gemrb/issues/938)), general Enhanced Edition
+[compatibility](https://github.com/gemrb/gemrb/labels/game%3A%20ees) and several
+problems unique to [apple devices](https://github.com/gemrb/gemrb/labels/portability).
