@@ -47,7 +47,7 @@ def OnLoad():
 	j = 0
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1, ClassCount):
-		if j == 11: # reached the last control
+		if j == 11 + int(GameCheck.IsAnyEE ()): # reached the last control
 			break
 		ClassName = CommonTables.Classes.GetRowName (i-1)
 		if CommonTables.Classes.GetValue (ClassName, "MULTI"):
@@ -58,7 +58,7 @@ def OnLoad():
 		else:
 			Button = ClassWindow.GetControl(j+2)
 
-		if GameCheck.IsBG2EE (): # make room for another button for shaman; ideally we'd add another scrollbar
+		if GameCheck.IsAnyEE (): # make room for another button for shaman; ideally we'd add another scrollbar
 			if Button:
 				btnFrame = Button.GetFrame ()
 				Button.SetPos (btnFrame["x"], btnFrame["y"] - 10)
@@ -76,7 +76,7 @@ def OnLoad():
 	GemRB.SetVar("MAGESCHOOL",0) 
 	HasMulti = 0
 	for i in range(1, ClassCount):
-		if j == 11: # reached the last control
+		if j == 11 + int(GameCheck.IsAnyEE ()): # reached the last control
 			break
 		ClassName = CommonTables.Classes.GetRowName(i-1)
 		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
