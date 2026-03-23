@@ -7999,6 +7999,31 @@ static PyObject* GemRB_ConsoleWindowLog(PyObject* /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR(GemRB_ConsolidateLoot__doc,
+	     "===== ConsolidateLoot =====\n\
+\n\
+**Prototype:** GemRB.ConsolidateLoot ()\n\
+\n\
+**Description:** Moves all visible loot piles under the selected actor, merges \n\
+and sorts the items, then opens up the container window.\n\
+\n\
+**Return value:** N/A\n\
+");
+
+static PyObject* GemRB_ConsolidateLoot(PyObject* /*self*/, PyObject* /*args*/)
+{
+	GET_GAME();
+	GET_MAP();
+	Actor* pc = core->GetFirstSelectedPC(true);
+	if (pc) {
+		map->MoveVisibleGroundPiles(pc->Pos);
+		Container* pile = map->GetPile(pc->Pos);
+		core->SetCurrentContainer(pc, pile);
+		pc->CommandActor(GenerateAction("UseContainer()"));
+	}
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR(GemRB_GetCurrentArea__doc,
 	     "===== GetCurrentArea =====\n\
 \n\
@@ -12790,6 +12815,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ClearActions, METH_VARARGS),
 	METHOD(CloseRighthandStore, METH_NOARGS),
 	METHOD(ConsoleWindowLog, METH_VARARGS),
+	METHOD(ConsolidateLoot, METH_VARARGS),
 	METHOD(CountEffects, METH_VARARGS),
 	METHOD(CountSpells, METH_VARARGS),
 	METHOD(CreateCreature, METH_VARARGS),

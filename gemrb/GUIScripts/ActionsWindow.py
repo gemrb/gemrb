@@ -1331,6 +1331,11 @@ def SetupControls (Window, pc, actionOffset, customBar = None):
 		if action < ACT_IWDQSPELL and not action in [ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3]:
 			btn.EnableBorder (1, state == IE_GUI_BUTTON_DISABLED)
 
+	# EE loot row toggle button
+	Button = CurrentWindow.GetControl (63)
+	if Button:
+		Button.OnPress (lambda: GemRB.ConsolidateLoot ())
+
 def SetupActionButton (pc, action, btn, i, pcStats, invInfo):
 	global fistDrawn
 
