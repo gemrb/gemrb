@@ -539,7 +539,7 @@ def UpdateStoreIdentifyWindow (Window):
 	callback = lambda: RedrawStoreIdentifyWindow(Window)
 	Count = len(inventory_slots) - ItemButtonCount
 	ScrollBar = Window.GetControlAlias('IDSBAR')
-	SetupScrollBar(Window.GetControlAlias('IDSBAR'), "TopIndex", Count, Window.GetControlAlias('IDBTN0'), callback)
+	SetupScrollBar (ScrollBar, "TopIndex", Count, Window.GetControlAlias('IDBTN0'), callback)
 
 	RedrawStoreIdentifyWindow (Window)
 	return
@@ -1616,7 +1616,6 @@ def RedrawStoreStealWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	LeftCount = Store['StoreItemCount']
 	pc = GemRB.GameGetSelectedPCSingle ()
 	RightCount = len(inventory_slots)
 	for i in range (ItemButtonCount):

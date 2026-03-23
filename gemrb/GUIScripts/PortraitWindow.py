@@ -338,12 +338,11 @@ def UpdatePortraitWindow ():
 	def SetIcons(Button):
 		pcID = Button.Value
 		# character - 1 == bam cycle
-		talk = store = flag = blank = bytearray([32])
+		flag = blank = bytearray([32])
 		if GameCheck.IsBG2OrEE ():
 			flag = blank = bytearray([238])
-			# as far as I can tell only BG2 has icons for talk or store
-			flag = bytearray([238])
 
+			# as far as I can tell only BG2 has icons for talk or store
 			if pcID == GemRB.GetVar("DLG_SPEAKER"):
 				flag = bytearray([154]) # dialog icon
 			elif pcID == GemRB.GetVar("BARTER_PC") and not GemRB.GetView("WIN_INV"): # don't show in bags

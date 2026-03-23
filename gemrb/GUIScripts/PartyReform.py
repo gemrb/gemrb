@@ -82,8 +82,6 @@ def UpdateReformWindow (Window, select):
 	return
 
 def RemovePlayer (select):
-	hideFlag = CommonWindow.IsGameGUIHidden ()
-
 	winID = 25
 	if GameCheck.IsHOW ():
 		winID = 0 # at least in guiw08, this is the correct window

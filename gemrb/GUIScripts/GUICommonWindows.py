@@ -196,7 +196,6 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	if not iwd2: # All Other Games Have Fancy Distinct Spell Pages
 		# Mage
 		Button = InitOptionButton(Window, MageSpellsKey)
-		pc = GemRB.GameGetSelectedPCSingle ()
 		if bg1:
 			Button.SetSprites ("GUILSOP", 0,8,9,24,8)
 		elif iwd1:
