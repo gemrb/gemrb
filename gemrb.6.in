@@ -341,26 +341,12 @@ It is not set by default.
 .SH Input Parameters:
 
 .TP
-.BR DoubleClickDelay =INT
-Millisecond threshold for detecting a double click. The default is 250.
-
-.TP
 .BR RepeatKeyDelay =INT
 Millisecond threshold for detecting a repeated key press. The default is 250.
 
 .TP
-.BR NumFingScroll =(2|3|4)
-Number of fingers for multitouch to trigger scrolling. The default is 2.
-
-.TP
-.BR NumFingKboard =(2|3|4)
-Number of fingers for multitouch to open up the software keyboard. The default is 3.
-The value should not be equal to
-.IR NumFingScroll " above."
-
-.TP
-.BR NumFingInfo =(2|3|4)
-Number of fingers for multitouch to emulate a special keypress (alt, tab). The default is 2.
+.BR DoubleClickDelay =INT
+Millisecond threshold for detecting a double click. The default is 250.
 
 .TP
 .BR MouseFeedback =(0-3)
@@ -381,6 +367,44 @@ Override setting for when autodetection does not have satisfactory results.
   Autodetect         = -1 (default)
   Force disable      = 0
   Enable             = 1
+
+.TP
+.BR NumFingScroll =(2|3|4)
+Number of fingers for multitouch to trigger scrolling. The default is 2.
+
+.TP
+.BR NumFingKboard =(2|3|4)
+Number of fingers for multitouch to open up the software keyboard. The default is 3.
+The value should not be equal to
+.IR NumFingScroll " above."
+
+.TP
+.BR NumFingInfo =(2|3|4)
+Number of fingers for multitouch to emulate a special keypress (alt, tab). The default is 2.
+
+.TP
+.BR GamepadSupport =(0|1)
+Set this to 0 to disable gamepad/joystick support entirely.
+This is useful if you handle such input separately and in case of bugs:
+On some Windows systems, SDL's joystick subsystem initialization can hang
+for 30+ seconds due to device enumeration issues (e.g. WMI timeouts).
+If the game takes abnormally long to start, try disabling this. The default is 1.
+
+.TP
+.BR GamepadPointerSpeed =INT
+Pointer movement speed with gamepads. The default is 10.
+
+.TP
+.BR GamepadPointerAccel =INT
+Pointer movement acceleration factor. The default is 103, while 100 means no acceleration.
+
+.TP
+.BR GamepadLDeadZone =INT
+Gamepad left stick threshold value for registering movement. The default is 5000.
+
+.TP
+.BR GamepadRDeadZone =INT
+Gamepad right stick threshold value for registering movement. The default is 5000.
 
 .\"###################################################
 .SH Development parameters:
@@ -473,22 +497,6 @@ if you want to keep the save game compatible with the original engine. It is ena
 Set this parameter to
 .IR 1 ,
 if you want to keep the cache after exiting GemRB. It is disabled by default.
-
-.TP
-.BR GamepadPointerSpeed =INT
-Pointer movement speed with gamepads. The default is 10.
-
-.TP
-.BR GamepadPointerAccel =INT
-Pointer movement acceleration factor. The default is 103, while 100 means no acceleration.
-
-.TP
-.BR GamepadLDeadZone =INT
-Gamepad left stick threshold value for registering movement. The default is 5000.
-
-.TP
-.BR GamepadRDeadZone =INT
-Gamepad right stick threshold value for registering movement. The default is 5000.
 
 .TP
 .BR VitaKeepAspectRatio =(0|1)
