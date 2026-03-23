@@ -12,10 +12,9 @@ Copyright: 2011, Aranthor
            2021, Jaka Kranjc
 License: public-domain
 
-Files: demo/data/ZHMW1*.bam
-Copyright: 2010, deepinthewoods
-           2021, m7600
-License: GPL-2+
+Files: demo/data/CHMB1*.bam
+Copyright: 2026, exhuman
+License: CC-BY-SA-4
 
 Files: demo/data/Eadui.ttf
 Copyright: 2010, Peter S. Baker
