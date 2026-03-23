@@ -22,7 +22,7 @@ Beta testing:
 
 Release:
 - [ ] Finalise choice of version number, eg. v1.2.3
-- [ ] Amend Roadmap in contributing.md
+- [ ] Amend Roadmap in CONTRIBUTING.md
 - [ ] Final `NEWS` update
 - [ ] Update version number in `gemrb/core/InterfaceConfig.h` and `.github/ISSUE_TEMPLATE/bug_report.md`
 - [ ] Add a git tag and push it (make sure to push together with something else, so the build won't be skipped)
@@ -62,7 +62,7 @@ cp -v $(find Linux/ -name "*$version*" | tail -n1) ../Releases/$version/gemrb-li
   - [ ] Test downloads
 - [ ] Runtime tests of release packages
 - [ ] Announce on
-  - [ ] homepage: _config (bump version), index, news, potentially features/status, install (recheck the new links)
+  - [ ] homepage: _config (bump version), index, potentially features/status
   - Gibberlings3 forums
     - [ ] GemRB forum
     - [ ] modding news
