@@ -77,6 +77,9 @@
     </screenshot>
   </screenshots>
   <releases>
+    <release version="0.9.5" date="2026-03-23">
+      <url>https://gemrb.org/2026/03/23/gemrb-0-9-5-released.html</url>
+    </release>
     <release version="0.9.4" date="2025-01-16">
       <url>https://gemrb.org/2025/01/11/gemrb-0-9-4-released.html</url>
     </release>
