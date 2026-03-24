@@ -2692,7 +2692,7 @@ int fx_alignment_change(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x3a DispelEffects
 int fx_dispel_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// ees added an upper word to tweak targeting of weapons in SLOT_MAGIC
+	// TobEx and EEs added an upper word to tweak targeting of weapons in SLOT_MAGIC
 	int slot = Inventory::GetMagicSlot();
 	ieDword itemLevel;
 	if (fx->Parameter2 > 2 && !target->inventory.IsSlotEmpty(slot)) {
@@ -5488,6 +5488,9 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 			myfx->IsVariable = fx->IsVariable;
 		}
 	}
+	// TobEx also always restored Parameter1 and Parameter2 on subsequent runs, but we skip that,
+	// since it was deemed unnecessary by EE devs, who only dealt with the above
+	// TobEx did it for its own changes to effects and a fix to fx_polymorph (which we don't need)
 
 	int ret;
 	if (target) {
