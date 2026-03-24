@@ -283,8 +283,8 @@ String TLKImporter::ExternalToken(const ieVariable& token) const
 
 		// set to non-zero for protagonist (Player1) tokens, set to zero for current talker tokens
 		int protagonist = tokenTable->QueryFieldSigned<int>(idx, 1);
-		int64_t stat = tokenTable->QueryFieldSigned<int64_t>(idx, 2);
-		int64_t value = tokenTable->QueryFieldSigned<int64_t>(idx, 3);
+		int32_t stat = tokenTable->QueryFieldSigned<int64_t>(idx, 2);
+		int32_t value = tokenTable->QueryFieldSigned<int64_t>(idx, 3);
 		int cmp = tokenTable->QueryFieldSigned<int>(idx, 4);
 		String trueStr = StringFromUtf8(tokenTable->QueryField(idx, 5));
 		String falseStr = StringFromUtf8(tokenTable->QueryField(idx, 6));
