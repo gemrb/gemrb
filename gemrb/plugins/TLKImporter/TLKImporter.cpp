@@ -72,16 +72,13 @@ TLKImporter::~TLKImporter(void)
 
 void TLKImporter::CloseAux()
 {
-	if (OverrideTLK) {
-		delete OverrideTLK;
-	}
 	OverrideTLK = nullptr;
 }
 
 void TLKImporter::OpenAux()
 {
 	CloseAux();
-	OverrideTLK = new CTlkOverride();
+	OverrideTLK = std::make_unique<CTlkOverride>();
 	if (OverrideTLK && !OverrideTLK->Init()) {
 		CloseAux();
 		Log(ERROR, "TlkImporter", "Cannot open tlk override!");

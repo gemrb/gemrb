@@ -50,15 +50,15 @@ struct EntryType {
 
 class CTlkOverride {
 private:
-	DataStream* tot_str = nullptr;
-	DataStream* toh_str = nullptr;
+	std::unique_ptr<DataStream> tot_str;
+	std::unique_ptr<DataStream> toh_str;
 	ieDword AuxCount = 0;
 	strpos_t FreeOffset = DataStream::InvalidPos;
 	strpos_t NextStrRef = DataStream::InvalidPos;
 
 	void CloseResources();
-	DataStream* GetAuxHdr(bool create);
-	DataStream* GetAuxTlk(bool create);
+	std::unique_ptr<DataStream> GetAuxHdr(bool create);
+	std::unique_ptr<DataStream> GetAuxTlk(bool create);
 	ieStrRef GetNewStrRef(ieStrRef strref);
 	strpos_t LocateString(ieStrRef strref);
 	strpos_t ClaimFreeSegment();
@@ -69,7 +69,6 @@ private:
 public:
 	CTlkOverride() noexcept = default;
 	CTlkOverride(const CTlkOverride&) = delete;
-	virtual ~CTlkOverride();
 	CTlkOverride& operator=(const CTlkOverride&) = delete;
 
 	bool Init();

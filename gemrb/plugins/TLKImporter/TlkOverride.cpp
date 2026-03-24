@@ -32,11 +32,6 @@
 
 using namespace GemRB;
 
-CTlkOverride::~CTlkOverride()
-{
-	CloseResources();
-}
-
 bool CTlkOverride::Init()
 {
 	CloseResources();
@@ -70,14 +65,8 @@ bool CTlkOverride::Init()
 
 void CTlkOverride::CloseResources()
 {
-	if (toh_str) {
-		delete toh_str;
-		toh_str = nullptr;
-	}
-	if (tot_str) {
-		delete tot_str;
-		tot_str = nullptr;
-	}
+	toh_str = nullptr;
+	tot_str = nullptr;
 }
 
 //gets the length of a stored string which might span more than one segment
@@ -311,12 +300,12 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t& Length)
 	return string;
 }
 
-DataStream* CTlkOverride::GetAuxHdr(bool create)
+std::unique_ptr<DataStream> CTlkOverride::GetAuxHdr(bool create)
 {
 	char Signature[] = "TLK ";
 
 	path_t nPath = PathJoin(core->config.CachePath, "default.toh");
-	FileStream* fs = new FileStream();
+	auto fs = std::make_unique<FileStream>();
 
 	while (true) {
 		if (fs->Modify(nPath)) {
@@ -329,15 +318,15 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 			create = false;
 			continue;
 		}
-		delete fs;
+		fs.reset();
 		return nullptr;
 	}
 }
 
-DataStream* CTlkOverride::GetAuxTlk(bool create)
+std::unique_ptr<DataStream> CTlkOverride::GetAuxTlk(bool create)
 {
 	path_t nPath = PathJoin(core->config.CachePath, "default.tot");
-	FileStream* fs = new FileStream();
+	auto fs = std::make_unique<FileStream>();
 
 	while (true) {
 		if (fs->Modify(nPath)) {
@@ -359,7 +348,7 @@ DataStream* CTlkOverride::GetAuxTlk(bool create)
 			create = false;
 			continue;
 		}
-		delete fs;
+		fs.reset();
 		return nullptr;
 	}
 }

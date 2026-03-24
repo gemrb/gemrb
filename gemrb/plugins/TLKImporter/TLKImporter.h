@@ -42,7 +42,7 @@ private:
 	ieWord Language = 0;
 	ieDword StrRefCount = 0;
 	ieDword Offset = 0;
-	CTlkOverride* OverrideTLK = nullptr;
+	std::unique_ptr<CTlkOverride> OverrideTLK;
 	ResRefMap<gt_type> gtmap;
 	int charname = 0;
 	bool hasEndingNewline = false;
