@@ -68,6 +68,7 @@ private:
 	void GetMonthName(int dayandmonth);
 	String ResolveTags(const String& source);
 	String BuiltinToken(const ieVariable& Token);
+	String ExternalToken(const ieVariable& token) const;
 	ieStrRef ClassStrRef(int slot) const;
 	ieStrRef RaceStrRef(int slot) const;
 	ieStrRef GenderStrRef(int slot, ieStrRef malestrref, ieStrRef femalestrref) const;

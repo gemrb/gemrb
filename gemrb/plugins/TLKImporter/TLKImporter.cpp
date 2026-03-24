@@ -270,6 +270,38 @@ String TLKImporter::BuiltinToken(const ieVariable& Token)
 	return u"";
 }
 
+// check if there's a user-defined token in tokentxt.2da
+String TLKImporter::ExternalToken(const ieVariable& token) const
+{
+	static AutoTable tokenTable = gamedata->LoadTable("tokentxt", false);
+	if (!tokenTable) return u"";
+
+	int tokenCount = static_cast<int>(tokenTable->GetRowCount());
+	for (int idx = 0; idx < tokenCount; ++idx) {
+		auto name = tokenTable->QueryField(idx, 0);
+		if (token != name) continue;
+
+		// set to non-zero for protagonist (Player1) tokens, set to zero for current talker tokens
+		int protagonist = tokenTable->QueryFieldSigned<int>(idx, 1);
+		int64_t stat = tokenTable->QueryFieldSigned<int64_t>(idx, 2);
+		int64_t value = tokenTable->QueryFieldSigned<int64_t>(idx, 3);
+		int cmp = tokenTable->QueryFieldSigned<int>(idx, 4);
+		String trueStr = StringFromUtf8(tokenTable->QueryField(idx, 5));
+		String falseStr = StringFromUtf8(tokenTable->QueryField(idx, 6));
+
+		const Actor* speaker = core->GetGameControl()->dialoghandler->GetSpeaker();
+		if (protagonist != 0) speaker = core->GetGame()->GetPC(0, false);
+		if (!speaker) continue;
+		stat = speaker->GetStat(stat);
+		if (cmp) {
+			return stat < value ? trueStr : falseStr;
+		} else {
+			return stat == value ? trueStr : falseStr;
+		}
+	}
+	return u"";
+}
+
 String TLKImporter::ResolveTags(const String& source)
 {
 	const size_t strLen = source.length();
@@ -292,6 +324,9 @@ String TLKImporter::ResolveTags(const String& source)
 		if (srcch == u'<') {
 			i = mystrncpy(Token, i + 1, u'>');
 			String resolvedToken = BuiltinToken(Token);
+			if (resolvedToken.empty()) {
+				resolvedToken = ExternalToken(Token);
+			}
 			if (resolvedToken.empty()) {
 				auto& tokens = core->GetTokenDictionary();
 				auto lookup = tokens.find(Token);
