@@ -75,7 +75,7 @@ void TLKImporter::CloseAux()
 	if (OverrideTLK) {
 		delete OverrideTLK;
 	}
-	OverrideTLK = NULL;
+	OverrideTLK = nullptr;
 }
 
 void TLKImporter::OpenAux()
@@ -90,7 +90,7 @@ void TLKImporter::OpenAux()
 
 bool TLKImporter::Open(DataStream* stream)
 {
-	if (stream == NULL) {
+	if (stream == nullptr) {
 		return false;
 	}
 	delete str;
@@ -132,7 +132,7 @@ static inline const Actor* GetActorFromSlot(int slot)
 	}
 	const Game* game = core->GetGame();
 	if (!game) {
-		return NULL;
+		return nullptr;
 	}
 	if (slot == 0) {
 		return game->GetPC(0, false); //protagonist
@@ -306,7 +306,7 @@ String TLKImporter::ResolveTags(const String& source)
 {
 	const size_t strLen = source.length();
 	auto mystrncpy = [&source, &strLen](ieVariable& tok, size_t idx, wchar_t delim) {
-		char* dest = tok.begin();
+		auto dest = tok.begin();
 		auto maxlength = std::min(sizeof(ieVariable) - 1, strLen);
 		while (idx < source.length() && (source[idx] != delim) && maxlength) {
 			char chr = source[idx++];

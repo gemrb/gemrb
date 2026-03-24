@@ -300,7 +300,7 @@ char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t& Length)
 	if (offset != DataStream::InvalidPos) {
 		string = GetString(offset);
 	}
-	if (string != NULL) {
+	if (string != nullptr) {
 		Length = strlen(string);
 	} else {
 		Length = 0;
