@@ -168,15 +168,14 @@ Store* STOImporter::GetStore(Store* s)
 
 void STOImporter::GetItem(STOItem* it, const Store* s)
 {
-	CREItem* tmpCREItem = new CREItem();
-	core->ReadItem(str, tmpCREItem);
+	auto tmpCREItem = std::make_unique<CREItem>();
+	core->ReadItem(str, tmpCREItem.get());
 
 	//fix item properties if necessary
-	s->IdentifyItem(tmpCREItem);
-	s->RechargeItem(tmpCREItem);
+	s->IdentifyItem(tmpCREItem.get());
+	s->RechargeItem(tmpCREItem.get());
+	it->CopyCREItem(tmpCREItem.get());
 
-	it->CopyCREItem(tmpCREItem);
-	delete tmpCREItem;
 	str->ReadDword(it->AmountInStock);
 	//if there was no item on stock, how this could be 0
 	//we hack-fix this here so it won't cause trouble
