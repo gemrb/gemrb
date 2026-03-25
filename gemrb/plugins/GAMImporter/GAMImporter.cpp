@@ -38,10 +38,10 @@
 
 namespace GemRB {
 
-bool GAMImporter::Import(DataStream* str)
+bool GAMImporter::Import(DataStream* stream)
 {
 	char Signature[8];
-	str->Read(Signature, 8);
+	stream->Read(Signature, 8);
 	if (strncmp(Signature, "GAMEV0.0", 8) == 0) {
 		version = GAMVersion::GemRB;
 		PCSize = 0x160;
@@ -83,14 +83,14 @@ bool GAMImporter::Import(DataStream* str)
 	return true;
 }
 
-Game* GAMImporter::LoadGame(Game* newGame, GAMVersion override)
+Game* GAMImporter::LoadGame(Game* newGame, GAMVersion forceVersion)
 {
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
 	if (core->config.SaveAsOriginal) {
 		// HACK: default icewind2.gam is 2.0! handled by script
-		if (override != GAMVersion::GemRB) {
-			newGame->version = override;
+		if (forceVersion != GAMVersion::GemRB) {
+			newGame->version = forceVersion;
 		} else {
 			newGame->version = version;
 		}

@@ -32,7 +32,7 @@ using namespace GemRB;
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
-	AutoTable tm = gamedata->LoadTable("cgtable");
+	AutoTable tm = gamedata->LoadTable("cgtable", false);
 	if (!tm) {
 		Log(ERROR, "SPLImporter", "Cannot find cgtable.2da.");
 		return;
@@ -84,7 +84,7 @@ SPLImporter::~SPLImporter(void)
 
 bool SPLImporter::Open(DataStream* stream)
 {
-	if (stream == NULL) {
+	if (stream == nullptr) {
 		return false;
 	}
 	delete str;

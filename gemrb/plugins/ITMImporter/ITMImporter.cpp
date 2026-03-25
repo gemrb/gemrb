@@ -142,7 +142,7 @@ Item* ITMImporter::GetItem(Item* s)
 	ieByte k1, k2, k3, k4;
 
 	if (!s) {
-		return NULL;
+		return nullptr;
 	}
 	str->ReadStrRef(s->ItemName);
 	str->ReadStrRef(s->ItemNameIdentified);
