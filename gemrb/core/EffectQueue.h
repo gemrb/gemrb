@@ -354,7 +354,7 @@ private:
 	const Effect* HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;
 	const Effect* HasOpcodeWithResource(ieDword opcode, const ResRef& resource) const;
 	const Effect* HasOpcodeWithPower(ieDword opcode, ieDword power) const;
-	const Effect* HasOpcodeWithSource(ieDword opcode, const ResRef& source) const;
+	const Effect* HasOpcodeWithSource(ieDword opcode, const ResRef& source, const Effect* sourceFx = nullptr) const;
 	bool DecreaseParam1OfEffect(ieDword opcode, ieDword amount);
 	int DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword param2);
 	int BonusForParam2(ieDword opcode, ieDword param2) const;

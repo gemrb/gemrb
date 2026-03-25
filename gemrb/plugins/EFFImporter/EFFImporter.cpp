@@ -20,6 +20,8 @@
 
 #include "EFFImporter.h"
 
+#include "Interface.h"
+
 using namespace GemRB;
 
 EFFImporter::~EFFImporter(void)
@@ -64,6 +66,19 @@ static inline void fixAffectedLevels(Effect* fx)
 	}
 }
 
+// tobex and ees use the same bit differently. Resolve the conflict here, so later use can be cleaner
+static ieDword FixSaveFlags(const Effect* fx, bool fix = true)
+{
+	if (!(fx->SavingThrowType & (SF_IGNORE_DIFFICULTY | SF_LIMIT_EFFECT_STACKING))) return 0;
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) return 0;
+
+	if (fix) {
+		return (fx->SavingThrowType & ~SF_IGNORE_DIFFICULTY) | SF_LIMIT_EFFECT_STACKING;
+	} else {
+		return (fx->SavingThrowType & ~SF_LIMIT_EFFECT_STACKING) | SF_IGNORE_DIFFICULTY;
+	}
+}
+
 Effect* EFFImporter::GetEffect()
 {
 	if (version == 1) {
@@ -103,6 +118,8 @@ Effect* EFFImporter::GetEffectV1()
 	str->ReadDword(fx->DiceThrown);
 	str->ReadDword(fx->DiceSides);
 	str->ReadDword(fx->SavingThrowType);
+	ieDword flags = FixSaveFlags(fx);
+	if (flags) fx->SavingThrowType = flags;
 	str->ReadDword(fx->SavingThrowBonus);
 	str->ReadWord(fx->IsVariable);
 	str->ReadWord(fx->IsSaveForHalfDamage);
@@ -133,6 +150,8 @@ Effect* EFFImporter::GetEffectV20()
 	str->ReadDword(fx->DiceThrown);
 	str->ReadDword(fx->DiceSides);
 	str->ReadDword(fx->SavingThrowType);
+	ieDword flags = FixSaveFlags(fx);
+	if (flags) fx->SavingThrowType = flags;
 	str->ReadDword(fx->SavingThrowBonus);
 	str->ReadWord(fx->IsVariable); //if this field was set to 1, this is a variable
 	str->ReadWord(fx->IsSaveForHalfDamage); //if this field was set to 1, save for half damage; part of Special dword with the preceding field
@@ -205,7 +224,9 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	}
 	stream->WriteDword(fx->DiceThrown);
 	stream->WriteDword(fx->DiceSides);
-	stream->WriteDword(fx->SavingThrowType);
+	ieDword flags = FixSaveFlags(fx, false);
+	if (flags == 0) flags = fx->SavingThrowType;
+	stream->WriteDword(flags);
 	stream->WriteDword(fx->SavingThrowBonus);
 	stream->WriteWord(fx->IsVariable);
 	stream->WriteFilling(2); // SaveForHalfDamage

@@ -1311,8 +1311,14 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		}
 	}
 
-	res = ed(Owner, target, fx);
-	fx->FirstApply = 0;
+	// tobex
+	if (fx->SavingThrowType & SF_LIMIT_EFFECT_STACKING && target->fxqueue.HasOpcodeWithSource(fx->Opcode, fx->SourceRef, fx)) {
+		// skip execution, but keept it around
+		res = FX_APPLIED;
+	} else {
+		res = ed(Owner, target, fx);
+		fx->FirstApply = 0;
+	}
 
 	switch (res) {
 		case FX_APPLIED:
@@ -2182,12 +2188,15 @@ const Effect* EffectQueue::HasSource(const ResRef& removed) const
 }
 
 //used in contingency/sequencer code (cannot have the same contingency twice)
-const Effect* EffectQueue::HasOpcodeWithSource(ieDword opcode, const ResRef& removed) const
+const Effect* EffectQueue::HasOpcodeWithSource(ieDword opcode, const ResRef& removed, const Effect* sourceFx) const
 {
 	for (auto& fx : effects) {
 		MATCH_OPCODE()
 		MATCH_LIVE_FX()
 		if (removed != fx.SourceRef) {
+			continue;
+		}
+		if (sourceFx && sourceFx == &fx) {
 			continue;
 		}
 
