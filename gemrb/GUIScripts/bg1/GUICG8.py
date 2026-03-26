@@ -44,7 +44,8 @@ def OnLoad():
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 	for i in range(2, RaceCount+2):
 		Button = RaceWindow.GetControl(i)
-		Button.SetText(CommonTables.Races.GetValue(i-2,0) )
+		RaceName = CommonTables.Races.GetRowName (i - 2)
+		Button.SetText (CommonTables.Races.GetValue (RaceName, "NAME_REF"))
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.OnPress (RacePress)
 		Button.SetVarAssoc("Race",i-1)
@@ -66,13 +67,15 @@ def OnLoad():
 
 def RacePress():
 	Race = GemRB.GetVar("Race")-1
-	TextAreaControl.SetText(CommonTables.Races.GetValue(Race,1) )
+	RaceName = CommonTables.Races.GetRowName (Race)
+	TextAreaControl.SetText (CommonTables.Races.GetValue (RaceName, "DESC_REF"))
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def NextPress():
 	RaceWindow.Close()
 	Race = GemRB.GetVar ("Race") - 1
+	RaceName = CommonTables.Races.GetRowName (Race)
 	MyChar = GemRB.GetVar ("Slot")
-	GemRB.SetPlayerStat (MyChar, IE_RACE, CommonTables.Races.GetValue (Race, 3))
+	GemRB.SetPlayerStat (MyChar, IE_RACE, CommonTables.Races.GetValue (RaceName, "ID"))
 	CharGenCommon.next()

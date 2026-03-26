@@ -21,6 +21,7 @@ import GemRB
 from GUIDefines import *
 import CharOverview
 import CommonTables
+import GUICommon
 from ie_stats import IE_STR, IE_DEX, IE_CON, IE_INT, IE_WIS, IE_CHR
 
 AbilityWindow = 0
@@ -44,11 +45,6 @@ def CalcLimits(Abidx):
 		Maximum = 25
 		return
 
-	Abracead = GemRB.LoadTable("ABRACEAD")
-	RaceID = GemRB.GetVar("Race")
-	RowIndex = CommonTables.Races.FindValue(3, RaceID)
-	RaceName = CommonTables.Races.GetRowName(RowIndex)
-
 	Minimum = 3
 	Maximum = 18
 
@@ -57,18 +53,21 @@ def CalcLimits(Abidx):
 	if tmp > Minimum:
 		Minimum = tmp
 
+	MyChar = GemRB.GetVar ("Slot")
+	RaceName = GUICommon.GetRaceRowName (MyChar, GemRB.GetVar ("Race"))
 	Abracerq = GemRB.LoadTable("ABRACERQ")
-	Race = Abracerq.GetRowIndex(RaceName)
-	tmp = Abracerq.GetValue(Race, Abidx*2)
+	Race = Abracerq.GetRowIndex (RaceName)
+	tmp = Abracerq.GetValue (Race, Abidx * 2)
 	if tmp > Minimum:
 		Minimum = tmp
 
-	tmp = Abracerq.GetValue(Race, Abidx*2+1)
+	tmp = Abracerq.GetValue (Race, Abidx * 2 + 1)
 	if tmp > Maximum:
 		Maximum = tmp
 
-	Race = Abracead.GetRowIndex(RaceName)
-	Add = Abracead.GetValue(Race, Abidx)
+	Abracead = GemRB.LoadTable ("ABRACEAD")
+	Race = Abracead.GetRowIndex (RaceName)
+	Add = Abracead.GetValue (Race, Abidx)
 	Maximum = Maximum + Add
 	Minimum = Minimum + Add
 	if Minimum<1:

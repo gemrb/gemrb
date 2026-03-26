@@ -72,8 +72,7 @@ def OnLoad():
 	SetupClassList ()
 
 def SetupClassList():
-	rid = CommonTables.Races.FindValue(3, GemRB.GetVar('BaseRace'))
-	RaceName = CommonTables.Races.GetRowName(rid)
+	RaceName = GUICommon.GetRaceRowName (GemRB.GetVar ("Slot"), GemRB.GetVar ("BaseRace"))
 
 	#radiobutton groups must be set up before doing anything else to them
 	j = 0

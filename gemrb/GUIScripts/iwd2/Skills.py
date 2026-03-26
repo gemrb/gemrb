@@ -21,7 +21,7 @@ import GemRB
 from GUIDefines import *
 import CharOverview
 import CommonTables
-import IDLUCommon
+import GUICommon
 from ie_stats import IE_INT, IE_UNUSED_SKILLPTS, IE_CLASSLEVELSUM
 
 SkillWindow = 0
@@ -147,7 +147,7 @@ def OpenSkillsWindow(chargen, level=0):
 
 	# Humans receive +2 skill points at level 1 and +1 skill points each level thereafter
 	RaceBonusTable = GemRB.LoadTable ("racskill")
-	RaceName = CommonTables.Races.GetRowName (IDLUCommon.GetRace (pc))
+	RaceName = GUICommon.GetRaceRowName (pc)
 	PointsLeft += RaceBonusTable.GetValue (RaceName, "BONUS") * LevelDiff
 	if Level < 2:
 		PointsLeft += RaceBonusTable.GetValue (RaceName, "LEVEL1_BONUS")
@@ -284,8 +284,7 @@ def NextPress():
 		MyChar = GemRB.GetVar("Slot")
 
 		# deal with racial boni too (skillrac.2da is ignored)
-		RaceIndex = IDLUCommon.GetRace (MyChar)
-		RaceName = CommonTables.Races.GetRowName (RaceIndex)
+		RaceName = GUICommon.GetRaceRowName (MyChar)
 		# the column holds the index into feats.2da, which has one less intro column
 		RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN") + 1
 	else:

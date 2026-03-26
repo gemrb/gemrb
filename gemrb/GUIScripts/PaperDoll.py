@@ -82,8 +82,7 @@ def GetActorPaperDollIWD2 (pc):
 	PDollTable = GemRB.LoadTable ("avatars")
 	table = GemRB.LoadTable ("avprefr")
 
-	Race = IDLUCommon.GetRace (pc)
-	RaceName = CommonTables.Races.GetRowName (Race)
+	RaceName = GUICommon.GetRaceRowName (pc)
 	RaceID = CommonTables.Races.GetValue (RaceName, "ID", GTV_INT)
 	# look up base race if needed
 	if RaceID > 1000:
@@ -279,8 +278,7 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 
 	table = ColorTable
 	if GameCheck.IsIWD2 ():
-		Race = IDLUCommon.GetRace (pc)
-		RaceName = CommonTables.Races.GetRowName (Race)
+		RaceName = GUICommon.GetRaceRowName (pc)
 		HairTable = GemRB.LoadTable (CommonTables.Races.GetValue (RaceName, "HAIR"))
 		SkinTable = GemRB.LoadTable (CommonTables.Races.GetValue (RaceName, "SKIN"))
 		if row == 0:

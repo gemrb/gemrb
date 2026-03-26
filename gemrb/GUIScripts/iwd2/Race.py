@@ -43,10 +43,11 @@ def OnLoad():
 		
 	for i in range(7):
 		Button = RaceWindow.GetControl (i+2)
-		Button.SetText (CommonTables.Races.GetValue (i,0) )
+		RaceName = CommonTables.Races.GetRowName (i)
+		Button.SetText (CommonTables.Races.GetValue (RaceName, "NAME_REF"))
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.OnPress (RacePress)
-		Button.SetVarAssoc ("BaseRace", CommonTables.Races.GetValue (i, 3) )
+		Button.SetVarAssoc ("BaseRace", CommonTables.Races.GetValue (RaceName, "ID", GTV_INT))
 
 	BackButton = RaceWindow.GetControl (11) 
 	BackButton.SetText (15416)
@@ -70,7 +71,7 @@ def RacePress():
 	global RaceWindow, SubRacesTable
 	Race = GemRB.GetVar ("BaseRace")
 	GemRB.SetVar ("Race", Race)
-	RaceID = CommonTables.Races.GetRowName (CommonTables.Races.FindValue (3, Race) )
+	RaceID = GUICommon.GetRaceRowName (GemRB.GetVar ("Slot"), Race)
 	HasSubRaces = SubRacesTable.GetValue (RaceID, "PURE_RACE")
 	if HasSubRaces == 0:
 		TextAreaControl.SetText (CommonTables.Races.GetValue (RaceID,"DESC_REF") )

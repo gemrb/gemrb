@@ -159,7 +159,7 @@ def UpdateOverview(CurrentStep):
 		strref = 1049 + GemRB.GetPlayerStat (MyChar, IE_SEX)
 		AddText(strref, 1)
 
-	RaceName = CommonTables.Races.GetRowName (IDLUCommon.GetRace (MyChar))
+	RaceName = GUICommon.GetRaceRowName (MyChar)
 	if CurrentStep > 2:
 		AddText(1048)
 		AddText(': ')

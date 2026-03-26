@@ -49,27 +49,26 @@ Abracerq = GemRB.LoadTable ("ABRACERQ")
 def CalcLimits(Abidx):
 	global Minimum, Maximum, Add
 
-	Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE))
-	RaceName = CommonTables.Races.GetRowName (Race)
-
 	Minimum = 3
 	Maximum = 18
 
+	RaceName = GUICommon.GetRaceRowName (MyChar)
 	Race = Abracerq.GetRowIndex (RaceName)
-	tmp = Abracerq.GetValue (Race, Abidx * 2)
+	tmp = Abracerq.GetValue (Race, Abidx * 2, GTV_INT)
 	if tmp > Minimum:
 		Minimum = tmp
 
-	tmp = Abracerq.GetValue (Race, Abidx * 2 + 1)
+	tmp = Abracerq.GetValue (Race, Abidx * 2 + 1, GTV_INT)
 	if tmp > Maximum:
 		Maximum = tmp
 
+	Race = Abclasrq.GetRowIndex (RaceName)
 	tmp = Abclasrq.GetValue (KitIndex, Abidx)
 	if tmp > Minimum:
 		Minimum = tmp
 
 	Race = Abracead.GetRowIndex (RaceName)
-	Add = Abracead.GetValue (Race, Abidx)
+	Add = Abracead.GetValue (Race, Abidx, GTV_INT)
 	Minimum += Add
 	Maximum += Add
 

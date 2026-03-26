@@ -419,9 +419,8 @@ def SetCharacterDescription():
 	if CharGenState > 1:
 		TextArea.Append (1048)
 		TextArea.Append (": ")
-		Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
-		Race = CommonTables.Races.FindValue (3, Race)
-		TextArea.Append (CommonTables.Races.GetValue (Race, 2) )
+		RaceName = GUICommon.GetRaceRowName (MyChar)
+		TextArea.Append (CommonTables.Races.GetValue (RaceName, "CAP_REF"))
 		TextArea.Append ("\n")
 	if CharGenState > 3:
 		TextArea.Append (1049)
@@ -823,7 +822,8 @@ def RacePress():
 		RaceSelectButton = RaceWindow.GetControl (i)
 		RaceSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 		RaceSelectButton.OnPress (RaceSelectPress)
-		RaceSelectButton.SetText (CommonTables.Races.GetValue (i - 2, 0))
+		RaceName = CommonTables.Races.GetRowName (i - 2)
+		RaceSelectButton.SetText (CommonTables.Races.GetValue (RaceName, "NAME_REF"))
 		RaceSelectButton.SetVarAssoc ("Race", i - 1)
 
 	RaceTextArea = RaceWindow.GetControl (8)
@@ -847,8 +847,8 @@ def RacePress():
 def RaceSelectPress():
 	global RaceWindow, RaceDoneButton, RaceTextArea
 
-	Race = GemRB.GetVar ("Race") - 1
-	RaceTextArea.SetText (CommonTables.Races.GetValue (Race, 1) )
+	RaceName = GUICommon.GetRaceRowName (MyChar, GemRB.GetVar ("Race"))
+	RaceTextArea.SetText (CommonTables.Races.GetValue (RaceName, "DESC_REF"))
 	RaceDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -862,8 +862,8 @@ def RaceDonePress():
 	ClassButton.MakeDefault()
 	CharGenState = 2
 
-	Race = GemRB.GetVar ("Race")-1
-	Race = CommonTables.Races.GetValue (Race, 3)
+	RaceName = GUICommon.GetRaceRowName (MyChar, GemRB.GetVar ("Race"))
+	Race = CommonTables.Races.GetValue (RaceName, "ID")
 	GemRB.SetPlayerStat (MyChar, IE_RACE, Race)
 	SetCharacterDescription()
 	return
@@ -882,8 +882,7 @@ def ClassPress():
 
 	ClassWindow = GemRB.LoadWindow (2, "GUICG")
 	ClassCount = CommonTables.Classes.GetRowCount ()
-	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
-	RaceName = CommonTables.Races.GetRowName (RaceRow)
+	RaceName = GUICommon.GetRaceRowName (MyChar)
 	GemRB.SetVar ("Class", 0)
 	GemRB.SetVar ("Class Kit", 0)
 	GemRB.SetVar ("MAGESCHOOL", 0)
@@ -961,8 +960,7 @@ def ClassMultiPress():
 	ClassWindow.SetVisible(False)
 	ClassMultiWindow = GemRB.LoadWindow (10, "GUICG")
 	ClassCount = CommonTables.Classes.GetRowCount ()
-	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
-	RaceName = CommonTables.Races.GetRowName (RaceRow)
+	RaceName = GUICommon.GetRaceRowName (MyChar)
 
 	for i in range (2, 10):
 		ClassMultiSelectButton = ClassMultiWindow.GetControl (i)
@@ -1036,8 +1034,7 @@ def KitPress():
 	GemRB.SetVar ("MAGESCHOOL",0)
 
 	# potentially exclude kits, eg. gnomes can only be illusionists
-	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE))
-	RaceName = CommonTables.Races.GetRowName (RaceRow)
+	RaceName = GUICommon.GetRaceRowName (MyChar)
 	Allowed = CommonTables.Classes.GetValue ("MAGE", RaceName)
 
 	for i in range (8):

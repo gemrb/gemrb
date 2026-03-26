@@ -118,11 +118,6 @@ def OpenLevelUpWindow():
 	print("Kit: " + str(Kit) + "\tActor Kit: " + str(actor.KitIndex()))
 	print("ClassName: " + ClassName + "\tActor ClassNames: " + str(actor.ClassNames()))
 
-	# need this for checking gnomes
-	RaceName = GemRB.GetPlayerStat (pc, IE_RACE, 1)
-	RaceName = CommonTables.Races.FindValue (3, RaceName)
-	RaceName = CommonTables.Races.GetRowName (RaceName)
-
 	# figure our our proficiency table and index
 	if Kit == 0:
 		KitName = ClassName

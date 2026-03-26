@@ -390,9 +390,8 @@ def UpdateAnimation ():
 
 # NOTE: the following 4 functions are only used in iwd2
 def GetActorRaceTitle (actor):
-	import IDLUCommon
-	RaceIndex = IDLUCommon.GetRace (actor)
-	RaceTitle = CommonTables.Races.GetValue (RaceIndex, 2)
+	RaceName = GUICommon.GetRaceRowName (actor)
+	RaceTitle = CommonTables.Races.GetValue (RaceName, "CAP_REF", GTV_REF)
 	return RaceTitle
 
 # NOTE: this function is called with the primary classes

@@ -190,7 +190,7 @@ def UpdateRecordsWindow (Window):
 	Label.SetText (ClassTitle)
 
 	# race
-	text = CommonTables.Races.GetValue (CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (pc, IE_RACE)) , 0)
+	text = CommonTables.Races.GetValue (GUICommon.GetRaceRowName (pc) , "NAME_REF")
 
 	Label = Window.GetControl (0x1000000f)
 	Label.SetText (text)

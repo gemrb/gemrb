@@ -218,12 +218,9 @@ def SetupSavingThrows (pc, Level=None):
 	if NumClasses > len(Levels):
 		return
 
-	#get some basic values
-	Race = GemRB.GetPlayerStat (pc, IE_RACE)
-
 	#see if we can add racial bonuses to saves
-	Race = CommonTables.Races.GetRowName (CommonTables.Races.FindValue (3, Race) )
-	RaceSaveTableName = CommonTables.Races.GetValue (Race, "SAVE", GTV_STR)
+	RaceName = GUICommon.GetRaceRowName (pc)
+	RaceSaveTableName = CommonTables.Races.GetValue (RaceName, "SAVE", GTV_STR)
 	RaceSaveTable = None
 	if RaceSaveTableName != "-1" and RaceSaveTableName != "*":
 		Con = GemRB.GetPlayerStat (pc, IE_CON, 1)-1

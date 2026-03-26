@@ -57,7 +57,7 @@ def GetRace (pc):
 	Subrace = GemRB.GetPlayerStat (pc, IE_SUBRACE)
 	if Subrace:
 		Race = Race<<16 | Subrace
-	return CommonTables.Races.FindValue (3, Race)
+	return CommonTables.Races.FindValue ("ID", Race)
 
 def SetupSavingThrows (pc, Class, Chargen=False):
 	"""Updates an actors saving throws based upon level.

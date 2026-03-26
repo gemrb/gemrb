@@ -50,7 +50,8 @@ def OnLoad():
 	GemRB.SetVar ("Race", None)
 	for i in range(2, RaceCount+2):
 		Button = RaceWindow.GetControl(i)
-		Button.SetText(CommonTables.Races.GetValue(i-2,0) )
+		RaceName = CommonTables.Races.GetRowName (i - 2)
+		Button.SetText (CommonTables.Races.GetValue (RaceName, "NAME_REF"))
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.OnPress (RacePress)
 		Button.SetVarAssoc("Race", i-2 )
@@ -73,7 +74,8 @@ def OnLoad():
 
 def RacePress():
 	Race = GemRB.GetVar("Race")
-	TextAreaControl.SetText(CommonTables.Races.GetValue(Race,1) )
+	RaceName = CommonTables.Races.GetRowName (Race)
+	TextAreaControl.SetText (CommonTables.Races.GetValue (RaceName, "DESC_REF"))
 	DoneButton.SetDisabled(False)
 	return
 
@@ -89,7 +91,8 @@ def NextPress():
 		RaceWindow.Close ()
 
 	Race = GemRB.GetVar ("Race")
-	GemRB.SetPlayerStat (MyChar, IE_RACE, CommonTables.Races.GetValue(Race,3) )
+	RaceName = CommonTables.Races.GetRowName (Race)
+	GemRB.SetPlayerStat (MyChar, IE_RACE, CommonTables.Races.GetValue (RaceName, "ID"))
 
 	GemRB.SetNextScript("CharGen3") #class
 	return

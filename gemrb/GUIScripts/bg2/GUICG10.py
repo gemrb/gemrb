@@ -40,8 +40,7 @@ def OnLoad():
 
 	MyChar = GemRB.GetVar ("Slot")
 	ClassCount = CommonTables.Classes.GetRowCount()+1
-	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
-	RaceName = CommonTables.Races.GetRowName(CommonTables.Races.FindValue (3, Race) )
+	RaceName = GUICommon.GetRaceRowName (MyChar)
 
 	MCRowIndices = []
 	for i in range(1,ClassCount):

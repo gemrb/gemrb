@@ -39,11 +39,8 @@ def OnLoad():
 	CharGenCommon.PositionCharGenWin(ClassWindow)
 
 	MyChar = GemRB.GetVar ("Slot")
-	Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
-	RaceName = CommonTables.Races.GetRowName(Race)
 
 	ClassCount = CommonTables.Classes.GetRowCount()+1
-
 	j = 0
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1, ClassCount):
@@ -75,6 +72,7 @@ def OnLoad():
 	j = 0
 	GemRB.SetVar("MAGESCHOOL",0) 
 	HasMulti = 0
+	RaceName = GUICommon.GetRaceRowName (MyChar)
 	for i in range(1, ClassCount):
 		if j == 11 + int(GameCheck.IsAnyEE ()): # reached the last control
 			break

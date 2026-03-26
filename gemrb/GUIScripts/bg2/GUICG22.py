@@ -19,6 +19,7 @@
 
 import GemRB
 import CommonTables
+import GUICommon
 from ie_stats import *
 from GUIDefines import *
 
@@ -42,8 +43,7 @@ def OnLoad():
 	global RowCount, TopIndex, KitTable, Init, MyChar
 
 	MyChar = GemRB.GetVar ("Slot")
-	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
-	RaceName = CommonTables.Races.GetRowName(CommonTables.Races.FindValue (3, Race) )
+	RaceName = GUICommon.GetRaceRowName (MyChar)
 
 	ClassName = CommonTables.Classes.GetRowName (GemRB.GetPlayerStat (MyChar, IE_HITPOINTS)) # barbarian hack
 

@@ -227,10 +227,9 @@ def GetFavoredClass (pc, code):
 
 # returns the effective character level modifier
 def GetECL (pc):
-	RaceIndex = IDLUCommon.GetRace (pc)
-	if RaceIndex == None:
+	RaceRowName = GUICommon.GetRaceRowName (pc)
+	if RaceRowName is None:
 		return 0
-	RaceRowName = CommonTables.Races.GetRowName (RaceIndex)
 	return CommonTables.Races.GetValue (RaceRowName, "ECL")
 
 #class is ignored
@@ -309,16 +308,12 @@ def DisplayGeneral (pc, targetTextArea):
 		RecordsTextArea.Append (DelimitedText (40311, levelsum+adj, 0))
 
 	#favoured class
-	#get the subrace value
-	RaceIndex = IDLUCommon.GetRace (pc)
-	Race = CommonTables.Races.GetValue (RaceIndex, 2)
-	tmp = CommonTables.Races.GetValue (RaceIndex, 8)
-
+	RaceName = GUICommon.GetRaceRowName (pc)
+	tmp = CommonTables.Races.GetValue (RaceName, "FAVORED_CLASS")
 	if tmp == -1:
 		tmp = highest
 	else:
 		tmp = GetFavoredClass(pc, tmp)
-
 	tmp = CommonTables.Classes.GetValue (CommonTables.Classes.GetRowName(tmp), "NAME_REF")
 	RecordsTextArea.Append (DelimitedStrRefs (40310, tmp, 0))
 
@@ -347,8 +342,9 @@ def DisplayGeneral (pc, targetTextArea):
 	# TODO: Active Feats (eg. Power attack 4)
 
 	#race
+	RaceCap = CommonTables.Races.GetValue (RaceName, "CAP_REF", GTV_REF)
 	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(1048) + "[/color]\n")
-	RecordsTextArea.Append ("[p]" + GemRB.GetString(Race) + "[/p]")
+	RecordsTextArea.Append ("[p]" + RaceCap + "[/p]")
 
 	#alignment
 	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(1049) + "[/color]\n")
@@ -1453,7 +1449,7 @@ def FinishLevelUp():
 
 	# racial spell resistance increases were hardcoded
 	raceFlagTable = GemRB.LoadTable ("raceflag")
-	raceName = CommonTables.Races.GetRowName (IDLUCommon.GetRace (pc))
+	raceName = GUICommon.GetRaceRowName (pc)
 	orig = GemRB.GetPlayerStat (pc, IE_RESISTMAGIC, 1)
 	perLevel = raceFlagTable.GetValue (raceName, "MAGICRES")
 	GemRB.SetPlayerStat (pc, IE_RESISTMAGIC, orig + LevelDiff * perLevel)

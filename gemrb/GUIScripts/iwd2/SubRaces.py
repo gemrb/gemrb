@@ -21,6 +21,7 @@ import GemRB
 from GUIDefines import *
 import CharOverview
 import CommonTables
+import GUICommon
 
 RaceWindow = 0
 TextAreaControl = 0
@@ -39,10 +40,8 @@ def OnLoad():
 	for i in range(1, 5):
 		Button = RaceWindow.GetControl(i)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-		
-	Race = GemRB.GetVar("BaseRace")
-	RaceName = CommonTables.Races.GetRowName(CommonTables.Races.FindValue(3, Race) )
 
+	RaceName = GUICommon.GetRaceRowName (GemRB.GetVar ("Slot"), GemRB.GetVar("BaseRace"))
 	PureRace = SubRacesTable.GetValue(RaceName , "PURE_RACE")
 	Button = RaceWindow.GetControl(1)
 	RaceStrRef = CommonTables.Races.GetValue(PureRace, "CAP_REF")
@@ -91,8 +90,8 @@ def OnLoad():
 
 def SubRacePress():
 	global RaceWindow, TextAreaControl
-	Race = CommonTables.Races.FindValue(3, GemRB.GetVar("Race") )
-	TextAreaControl.SetText(CommonTables.Races.GetValue(Race, 1))
+	RaceName = GUICommon.GetRaceRowName (GemRB.GetVar ("Slot"), GemRB.GetVar("Race"))
+	TextAreaControl.SetText (CommonTables.Races.GetValue (RaceName, "DESC_REF"))
 	return
 
 def BackPress():

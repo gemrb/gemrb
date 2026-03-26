@@ -298,6 +298,20 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
 
 	return
 
+def GetRaceRowName (actor, race = -1):
+	if race != -1:
+		raceIndex = CommonTables.Races.FindValue ("ID", race)
+	elif GameCheck.IsIWD2 ():
+		import IDLUCommon
+		raceIndex = IDLUCommon.GetRace (actor)
+	else:
+		race = GemRB.GetPlayerStat (actor, IE_RACE, 1)
+		raceIndex = CommonTables.Races.FindValue ("ID", race)
+	if raceIndex is None:
+		return None
+	raceName = CommonTables.Races.GetRowName (raceIndex)
+	return raceName
+
 def GetActorClassTitle (actor):
 	"""Returns the string representation of the actors class."""
 
@@ -556,10 +570,9 @@ def NamelessOneClass (actor):
 
 def CanDualClass(actor):
 	# race restriction (human)
-	RaceName = CommonTables.Races.FindValue ("ID", GemRB.GetPlayerStat (actor, IE_RACE, 1))
-	if RaceName == None:
+	RaceName = GetRaceRowName (actor)
+	if RaceName is None:
 		return 0
-	RaceName = CommonTables.Races.GetRowName (RaceName)
 	RaceDual = CommonTables.Races.GetValue (RaceName, "CANDUAL", GTV_STR)
 	if RaceDual != "1":
 		return 0

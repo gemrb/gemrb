@@ -170,7 +170,7 @@ def NextPress():
 		clssname = CommonTables.Classes.GetRowName (kitrow)
 	IDLUCommon.AddResistances (MyChar, clssname, "clssrsmd")
 
-	racename = CommonTables.Races.GetRowName (IDLUCommon.GetRace (MyChar))
+	racename = GUICommon.GetRaceRowName (MyChar)
 	IDLUCommon.AddResistances (MyChar, racename, "racersmd")
 	SetRaceBonuses(MyChar, racename)
 	SetRaceAbilities (MyChar, racename)

@@ -51,9 +51,8 @@ def unsetRace():
 
 def getRace(area):
 	MyChar = GemRB.GetVar ("Slot")
-	RaceID = GemRB.GetPlayerStat (MyChar, IE_RACE)
-	RaceIndex = CommonTables.Races.FindValue(3,RaceID)
-	RaceCap = CommonTables.Races.GetValue(RaceIndex,2)
+	RaceName = GUICommon.GetRaceRowName (MyChar)
+	RaceCap = CommonTables.Races.GetValue (RaceName, "CAP_REF", GTV_INT)
 	area.Append("\n")
 	area.Append(1048)
 	area.Append(": ")
