@@ -136,6 +136,12 @@ def SetGamedaysAndHourToken ():
 	GemRB.SetToken ('GAMEDAY', str (days))
 	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
+	# ee extras
+	GemRB.SetToken ('DAY', str (days))
+	mins = (currentTime // 60) % 60
+	GemRB.SetToken ('MINUTE', str (mins))
+	GemRB.SetToken ('DURATION', SetFullDateTokens (days, hours, True))
+	GemRB.SetToken ('DURATIONNOAND', SetFullDateTokens (days, hours, False))
 
 def Gain(infostr, ability):
 	GemRB.SetToken ('SPECIALABILITYNAME', GemRB.GetString(int(ability) ) )
@@ -721,12 +727,18 @@ def SetCurrentDateTokens (stat, plural=False):
 	if plural:
 		return
 
-	# construct <GAMEDAYS> days ~and~ ~<HOUR> hours~
+	return SetFullDateTokens (days, hours, True)
+
+# construct ~<GAMEDAYS> days~ (~ and ~) ~<HOUR> hours~
+def SetFullDateTokens (days, hours, anded):
 	if days == 1:
 		time = GemRB.GetString (10698)
 	else:
 		time = GemRB.GetString (10697)
-	time += " " + GemRB.GetString (10699) + " "
+	time += " "
+
+	if anded: time += GemRB.GetString (10699) + " "
+
 	if days == 0:
 		# only display hours
 		time = ""
