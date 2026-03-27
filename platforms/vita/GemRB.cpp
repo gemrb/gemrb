@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 
 		if (VideoDriver->GetFullscreenMode()) {
 			const char* optstr = config->GetValueForKey("VitaKeepAspectRatio");
-			if (optstr && atoi(optstr) > 0) {
+			if (!optstr || atoi(optstr) > 0) {
 				if ((static_cast<float>(VITA_FULLSCREEN_WIDTH) / VITA_FULLSCREEN_HEIGHT) >= (static_cast<float>(width) / height)) {
 					float scale = static_cast<float>(VITA_FULLSCREEN_HEIGHT) / height;
 					vitaDestRect.w = width * scale;

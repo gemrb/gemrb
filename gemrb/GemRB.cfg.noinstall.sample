@@ -168,7 +168,7 @@ Bpp=32
 #GamepadRDeadZone=5000
 
 # Vita specific options
-VitaKeepAspectRatio=1
+#VitaKeepAspectRatio=1
 
 ###############################################################################
 #  Paths                                                                      #
