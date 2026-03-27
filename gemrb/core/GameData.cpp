@@ -506,10 +506,10 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const std::string& raceNa
 
 bool GameData::HasInfravision(const std::string& raceName)
 {
-	AutoTable racialInfravision = LoadTable("racefeat", true);
+	AutoTable racialInfravision = LoadTable("racedata", true);
 
 	if (!racialInfravision) return false;
-	return racialInfravision->QueryFieldSigned<int>(raceName, "VALUE") & 1;
+	return racialInfravision->QueryFieldSigned<int>(raceName, "HASINFRA") & 1;
 }
 
 int GameData::GetSpellAbilityDie(const Actor* target, int which)
