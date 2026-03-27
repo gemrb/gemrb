@@ -38,6 +38,8 @@ def ColorStatsFromPortrait (PortraitName):
 	if GameCheck.IsIWD1 ():
 		PortraitTable = GemRB.LoadTable ("PORTCOLR")
 		PortraitName = PortraitTable.GetRowName (PortraitName)
+	elif GameCheck.IsAnyEE ():
+		return ColorStatsFromEETables ()
 	else:
 		PortraitTable = GemRB.LoadTable ("pictures")
 
@@ -55,6 +57,30 @@ def ColorStatsFromPortrait (PortraitName):
 		IE_LEATHER_COLOR : GetColorForStat (0x1B),
 		IE_ARMOR_COLOR : GetColorForStat (0x16),
 		IE_HAIR_COLOR : PortraitTable.GetValue (PortraitName, "HAIR", GTV_INT)
+	}
+
+def ColorStatsFromEETables ():
+	RaceColorTable = GemRB.LoadTable ("racecolr")
+	ClassColorTable = GemRB.LoadTable ("clascolr")
+	pc = GemRB.GetVar ("Slot")
+	RaceName = GUICommon.GetRaceRowName (pc)
+	# why be consistent?
+	if RaceName == "HALF_ORC":
+		RaceName = "HALFORC"
+	# class or kit name
+	ClassName = GUICommon.GetClassRowName (pc)
+	KitIndex = GUICommon.GetKitIndex (pc)
+	if KitIndex != 0:
+		ClassName = CommonTables.KitList.GetValue (KitIndex, 0, GTV_STR)
+
+	return {
+		IE_METAL_COLOR : ClassColorTable.GetValue ("METAL", ClassName, GTV_INT),
+		IE_MINOR_COLOR : ClassColorTable.GetValue ("MINOR_CLOTH", ClassName, GTV_INT),
+		IE_MAJOR_COLOR : ClassColorTable.GetValue ("MAIN_CLOTH", ClassName, GTV_INT),
+		IE_SKIN_COLOR : RaceColorTable.GetValue ("SKIN", RaceName, GTV_INT),
+		IE_LEATHER_COLOR : ClassColorTable.GetValue ("LEATHER", ClassName, GTV_INT),
+		IE_ARMOR_COLOR : ClassColorTable.GetValue ("ARMOR", ClassName, GTV_INT),
+		IE_HAIR_COLOR : RaceColorTable.GetValue ("HAIR", RaceName, GTV_INT)
 	}
 
 def ColorStatsFromPC (pc):
