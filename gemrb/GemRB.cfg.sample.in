@@ -52,8 +52,8 @@ Width=640
 # Screen height
 Height=480
 
-# Bits per pixel [Integer:16,32]
-Bpp=32
+# Bits per pixel [Integer:16,32], defaults to 32
+#Bpp=32
 
 # Choices: best (default), linear, nearest
 #ScaleQuality = best
@@ -113,6 +113,7 @@ Bpp=32
 #GCDebug=1536
 
 # Enable debug and cheat keystrokes, see docs/en/CheatKeys.txt for full listing
+# Enabled by default
 #EnableCheatKeys=1
 
 # Developer debug mode toggle (see DebugMode enum)
