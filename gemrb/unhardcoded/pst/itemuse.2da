@@ -1,7 +1,7 @@
 2DA V1.0
 *
-           STAT       FILE       MCOL       VCOL       WHICH
-0	ALIGNMENT     aligns     3          5          0
-1	FACTION       factions   -1         2          0
-2	CLASS         classes    5          7          0
-3	SPECIFIC      avslots    -1         0          0
+    STAT        FILE        MCOL    VCOL    WHICH
+0   ALIGNMENT   aligns      3       5       0
+1   FACTION     factions    -1      2       0
+2   CLASS       classes     5       7       0
+3   SPECIFIC    avslots     -1      0       0
