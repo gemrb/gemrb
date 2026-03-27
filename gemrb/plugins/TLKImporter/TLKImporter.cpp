@@ -183,7 +183,7 @@ ieStrRef TLKImporter::RaceStrRef(int slot) const
 		race = act->GetStat(IE_RACE);
 	}
 
-	AutoTable tab = gamedata->LoadTable("races");
+	AutoTable tab = gamedata->LoadTable("racetext");
 	if (!tab) {
 		return ieStrRef::INVALID;
 	}

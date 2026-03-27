@@ -40,11 +40,11 @@ def Load():
 
 	Classes = GemRB.LoadTable ("classes", False, True)
 	ClassSkills = GemRB.LoadTable ("clskills", False, True)
-	Races = GemRB.LoadTable ("races", False, True)
+	Races = GemRB.LoadTable ("racetext", False, True)
 	if GameCheck.IsIWD2 ():
-		RaceData = GemRB.LoadTable ("races", False, True)
+		RaceData = GemRB.LoadTable ("racetext", False, True)
 	else:
-		RaceData = GemRB.LoadTable ("races", False, True)
+		RaceData = GemRB.LoadTable ("racedata", False, True)
 	NextLevel = GemRB.LoadTable ("xplevel", False, True)
 	StrMod = GemRB.LoadTable ("strmod", False, True)
 	StrModEx = GemRB.LoadTable ("strmodex", False, True)

@@ -17,3 +17,4 @@ DWARF_GRAY              0x40002     5382        5416        5382        0x000000
 HALFLING_STRONGHEART    0x50001     5383        5660        5383        0x00000000  HAIRNORM    SKINNORM    33              0x909           0           0
 HALFLING_GHOSTWISE      0x50002     5384        5661        5384        0x00000000  HAIRNORM    SKINNORM    34              0x101           0           0
 GNOME_DEEP              0x60001     5385        5662        5385        0x00000000  HAIRNORM    SKINNORM    36              0xb0b           0           3
+# iwd2 with merged racetext.2da and racedata.2da, so we don't have to load both in core

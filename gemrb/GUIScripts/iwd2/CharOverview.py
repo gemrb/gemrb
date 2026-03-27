@@ -138,7 +138,7 @@ def UpdateOverview(CurrentStep):
 	CharGenWindow.SetEventProxy (TextAreaControl)
 
 	Tables = []
-	for tbl in ['races', 'classes', 'aligns', 'ability', 'skillsta', 'skills', 'featreq', 'feats']:
+	for tbl in ['racetext', 'classes', 'aligns', 'ability', 'skillsta', 'skills', 'featreq', 'feats']:
 		Tables.append(GemRB.LoadTable(tbl))
 	
 	MyChar = GemRB.GetVar ("Slot")

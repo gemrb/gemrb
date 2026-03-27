@@ -1,0 +1,9 @@
+2DA V1.0
+-1
+            ID  NAME        DESCSTR     UPPERCASE
+HUMAN       1   7193        9550        1096
+ELF         2   7194        9552        1097
+HALF_ELF    3   7197        9555        1098
+GNOME       6   7196        9553        1099
+HALFLING    5   7195        9554        1101
+DWARF       4   7182        9551        1100

@@ -1,0 +1,13 @@
+2DA V1.0
+-1
+            USABILITY   SAVE        CANDUAL
+HUMAN       0x08000000  *           1
+ELF         0x00800000  *           0
+HALF_ELF    0x02000000  *           0
+GNOME       0x10000000  SAVECNG     0
+HALFLING    0x04000000  SAVECNDH    0
+DWARF       0x01000000  SAVECNDH    0
+HALFORC     0x80000000  *           0
+TIEFLING    0           *           0
+ILLITHID    0           *           0
+# extra racial data not stored in racetext.2da

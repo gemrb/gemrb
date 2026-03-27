@@ -2257,7 +2257,7 @@ static void InitActorTables()
 	}
 
 	// races table
-	tm = gamedata->LoadTable("races");
+	tm = gamedata->LoadTable("racetext");
 	if (tm && !pstflags) {
 		TableMgr::index_t racesNRows = tm->GetRowCount();
 
