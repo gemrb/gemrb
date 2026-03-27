@@ -19,6 +19,7 @@
 
 import GemRB
 import CommonTables
+import GameCheck
 import GUICommon
 from ie_stats import *
 from GUIDefines import *
@@ -224,7 +225,13 @@ def NextPress():
 	if MageSchool and not KitIndex:
 		KitValue = SchoolList.GetValue (MageSchool, 3)
 	elif KitIndex:
-		KitValue = CommonTables.KitList.GetValue (KitIndex, 6)
+		# ees added another column, simplifying the mage mess
+		# all new kits rely on it
+		KitRowName = CommonTables.KitList.GetRowName (KitIndex)
+		if GameCheck.IsAnyEE ():
+			KitValue = CommonTables.KitList.GetValue (KitRowName, "KITIDS")
+		else:
+			KitValue = CommonTables.KitList.GetValue (KitRowName, "UNUSABLE")
 	else:
 		KitValue = 0
 
