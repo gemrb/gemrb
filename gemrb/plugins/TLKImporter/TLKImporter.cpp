@@ -188,7 +188,8 @@ ieStrRef TLKImporter::RaceStrRef(int slot) const
 		return ieStrRef::INVALID;
 	}
 	TableMgr::index_t row = tab->FindTableValue("ID", race, 0);
-	return tab->QueryFieldAsStrRef(row, 0);
+	const auto& raceName = tab->GetRowName(row);
+	return tab->QueryFieldAsStrRef(raceName, "NAME");
 }
 
 ieStrRef TLKImporter::GenderStrRef(int slot, ieStrRef malestrref, ieStrRef femalestrref) const

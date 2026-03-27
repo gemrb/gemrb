@@ -3,5 +3,5 @@
     STAT        FILE        MCOL    VCOL    WHICH
 0   KIT         kitlist     6       6       1
 1   ALIGNMENT   aligns      3       5       0
-2   RACE        races       3       4       0
+2   RACE        races       0       4       0
 3   CLASS       classes     5       7       0
