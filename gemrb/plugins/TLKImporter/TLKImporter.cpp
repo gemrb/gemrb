@@ -187,7 +187,7 @@ ieStrRef TLKImporter::RaceStrRef(int slot) const
 	if (!tab) {
 		return ieStrRef::INVALID;
 	}
-	TableMgr::index_t row = tab->FindTableValue(3, race, 0);
+	TableMgr::index_t row = tab->FindTableValue("ID", race, 0);
 	return tab->QueryFieldAsStrRef(row, 0);
 }
 

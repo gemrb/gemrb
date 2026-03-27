@@ -2262,9 +2262,9 @@ static void InitActorTables()
 		TableMgr::index_t racesNRows = tm->GetRowCount();
 
 		for (TableMgr::index_t i = 0; i < racesNRows; i++) {
-			int raceID = tm->QueryFieldSigned<int>(i, 3);
-			int favClass = tm->QueryFieldSigned<int>(i, 8);
 			const auto& raceName = tm->GetRowName(i);
+			int raceID = tm->QueryFieldSigned<int>(raceName, "ID");
+			int favClass = tm->QueryFieldSigned<int>(raceName, "FAVORED_CLASS");
 			favoredMap.emplace(raceID, favClass);
 			raceID2Name.emplace(raceID, raceName);
 		}
