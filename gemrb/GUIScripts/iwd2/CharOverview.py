@@ -137,8 +137,8 @@ def UpdateOverview(CurrentStep):
 	TextAreaControl = CharGenWindow.GetControl(9)
 	CharGenWindow.SetEventProxy (TextAreaControl)
 
-	Tables = []
-	for tbl in ['racetext', 'classes', 'aligns', 'ability', 'skillsta', 'skills', 'featreq', 'feats']:
+	Tables = [None, None, None]
+	for tbl in ['ability', 'skillsta', 'skills', 'featreq', 'feats']:
 		Tables.append(GemRB.LoadTable(tbl))
 	
 	MyChar = GemRB.GetVar ("Slot")
@@ -163,24 +163,24 @@ def UpdateOverview(CurrentStep):
 	if CurrentStep > 2:
 		AddText(1048)
 		AddText(': ')
-		AddText(Tables[0].GetValue(RaceName, "UPPERCASE", GTV_INT), 1)
+		AddText(CommonTables.Races.GetValue (RaceName, "UPPERCASE", GTV_INT), 1)
 
 	kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	ClassRowName = ""
 	# won't work for multikits, but it's just a cosmetic problem
 	if kit:
-		ClassRowName = Tables[1].GetRowName (Tables[1].FindValue ("ID", kit, 10))
+		ClassRowName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue ("ID", kit, 10))
 	if ClassRowName == "" and CurrentStep > 3:
 		ClassRowName = GUICommon.GetClassRowName (GemRB.GetPlayerStat (MyChar, IE_CLASS) - 1, "index")
-	ClassName = Tables[1].GetValue (ClassRowName, "NAME_REF", GTV_STR)
+	ClassName = CommonTables.Classes.GetValue (ClassRowName, "NAME_REF", GTV_STR)
 	if ClassName != "*":
 		AddText(11959)
 		AddText(': ')
 		AddText(int(ClassName), 1)
 
-	AlignName = Tables[2].FindValue ("VALUE", GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
+	AlignName = CommonTables.Aligns.FindValue ("VALUE", GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
 	if AlignName:
-		AlignName = Tables[2].GetValue (Tables[2].GetRowName (AlignName), "NAME_REF", GTV_INT)
+		AlignName = CommonTables.Aligns.GetValue (CommonTables.Aligns.GetRowName (AlignName), "NAME_REF", GTV_INT)
 		AddText(11958)
 		AddText(': ')
 		AddText(AlignName, 1)
@@ -198,7 +198,7 @@ def UpdateOverview(CurrentStep):
 	if CurrentStep > 6:
 		AddText('\n[color=FFFF00]' + GemRB.GetString(11983) + '[/color]', 1)
 		
-		ClassColumn = Tables[1].GetValue (ClassRowName, "CLASS", GTV_INT) # Finds base class row id
+		ClassColumn = CommonTables.Classes.GetValue (ClassRowName, "CLASS", GTV_INT) # Finds base class row id
 		if ClassColumn < 1: ClassColumn = GemRB.GetPlayerStat (MyChar, IE_CLASS) - 1 # If 0 then already a base class so need actual row
 		else: ClassColumn -= 1 # 'CLASS' column in classes.2da is out by 1 for some reason
 		ClassColumn += 4 # There are 4 columns before the classes in skills.2da
@@ -208,10 +208,10 @@ def UpdateOverview(CurrentStep):
 		# as rows and skills as columns. Something like SKILCLAS.2DA
 		### Cleric kit hack:
 		if ClassRowName[:7] == "CLERIC_":
-			ClericKitOffset = Tables[1].GetRowIndex (ClassRowName) - Tables[1].GetRowIndex ("CLERIC_ILMATER")
+			ClericKitOffset = CommonTables.Classes.GetRowIndex (ClassRowName) - CommonTables.Classes.GetRowIndex ("CLERIC_ILMATER")
 			ClassColumn = 15 + ClericKitOffset
 
-		SkillColumn = Tables[0].GetValue(RaceName, 'SKILL_COLUMN', GTV_INT) + 1
+		SkillColumn = CommonTables.RaceData.GetValue (RaceName, 'SKILL_COLUMN', GTV_INT) + 1
 		for i in range(Tables[4].GetRowCount()):
 			skill = Tables[4].GetValue (i, 0, GTV_STAT)
 			ability = Tables[4].GetValue (i, 1, GTV_STAT)
