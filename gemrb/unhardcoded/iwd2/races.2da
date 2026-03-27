@@ -1,6 +1,6 @@
 2DA V1.0
 -1
-                        ID          NAME_REF    DESC_REF    CAP_REF     USABILITY   HAIR        SKIN        SKILL_COLUMN    FAVORED_CLASS   FEATBONUS   ECL
+                        ID          NAME        DESCSTR     UPPERCASE   USABILITY   HAIR        SKIN        SKILL_COLUMN    FAVORED_CLASS   FEATBONUS   ECL
 HUMAN                   1           7193        9550        1096        0x08000000  HAIRNORM    SKINNORM    23              -1              1           0
 DWARF                   4           7182        9551        1100        0x01000000  HAIRNORM    SKINNORM    29              0x505           0           0
 ELF                     2           7194        9552        1097        0x00800000  HAIRNORM    SKINNORM    26              0xb0b           0           0

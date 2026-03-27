@@ -51,7 +51,7 @@ def OnLoad():
 	for i in range(2, RaceCount+2):
 		Button = RaceWindow.GetControl(i)
 		RaceName = CommonTables.Races.GetRowName (i - 2)
-		Button.SetText (CommonTables.Races.GetValue (RaceName, "NAME_REF"))
+		Button.SetText (CommonTables.Races.GetValue (RaceName, "NAME"))
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.OnPress (RacePress)
 		Button.SetVarAssoc("Race", i-2 )
@@ -75,7 +75,7 @@ def OnLoad():
 def RacePress():
 	Race = GemRB.GetVar("Race")
 	RaceName = CommonTables.Races.GetRowName (Race)
-	TextAreaControl.SetText (CommonTables.Races.GetValue (RaceName, "DESC_REF"))
+	TextAreaControl.SetText (CommonTables.Races.GetValue (RaceName, "DESCSTR"))
 	DoneButton.SetDisabled(False)
 	return
 

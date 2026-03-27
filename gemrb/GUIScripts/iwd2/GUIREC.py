@@ -342,7 +342,7 @@ def DisplayGeneral (pc, targetTextArea):
 	# TODO: Active Feats (eg. Power attack 4)
 
 	#race
-	RaceCap = CommonTables.Races.GetValue (RaceName, "CAP_REF", GTV_REF)
+	RaceCap = CommonTables.Races.GetValue (RaceName, "UPPERCASE", GTV_REF)
 	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(1048) + "[/color]\n")
 	RecordsTextArea.Append ("[p]" + RaceCap + "[/p]")
 

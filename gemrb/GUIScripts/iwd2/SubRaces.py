@@ -44,7 +44,7 @@ def OnLoad():
 	RaceName = GUICommon.GetRaceRowName (GemRB.GetVar ("Slot"), GemRB.GetVar("BaseRace"))
 	PureRace = SubRacesTable.GetValue(RaceName , "PURE_RACE")
 	Button = RaceWindow.GetControl(1)
-	RaceStrRef = CommonTables.Races.GetValue(PureRace, "CAP_REF")
+	RaceStrRef = CommonTables.Races.GetValue (PureRace, "UPPERCASE")
 	Button.SetText(RaceStrRef )
 	Button.SetState(IE_GUI_BUTTON_ENABLED)
 	Button.OnPress (SubRacePress)
@@ -63,7 +63,7 @@ def OnLoad():
 			Button.SetText("")
 		else:
 			HasSubRace = PureRace+"_"+HasSubRace
-			RaceStrRef = CommonTables.Races.GetValue(HasSubRace, "CAP_REF")
+			RaceStrRef = CommonTables.Races.GetValue (HasSubRace, "UPPERCASE")
 			Button.SetText(RaceStrRef )
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 			Button.OnPress (SubRacePress)
@@ -80,7 +80,7 @@ def OnLoad():
 	DoneButton.MakeDefault()
 
 	TextAreaControl = RaceWindow.GetControl(6)
-	TextAreaControl.SetText(CommonTables.Races.GetValue(RaceName, "DESC_REF"))
+	TextAreaControl.SetText(CommonTables.Races.GetValue(RaceName, "DESCSTR"))
 	RaceWindow.SetEventProxy (TextAreaControl)
 
 	DoneButton.OnPress (NextPress)
@@ -91,7 +91,7 @@ def OnLoad():
 def SubRacePress():
 	global RaceWindow, TextAreaControl
 	RaceName = GUICommon.GetRaceRowName (GemRB.GetVar ("Slot"), GemRB.GetVar("Race"))
-	TextAreaControl.SetText (CommonTables.Races.GetValue (RaceName, "DESC_REF"))
+	TextAreaControl.SetText (CommonTables.Races.GetValue (RaceName, "DESCSTR"))
 	return
 
 def BackPress():

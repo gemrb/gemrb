@@ -159,7 +159,7 @@ def DisplayOverview(step):
 			TextAreaControl.Append (GemRB.GetString(12135) + ": " + gender + "\n")
 		elif part == 3:
 			RaceName = GUICommon.GetRaceRowName (MyChar)
-			TextAreaControl.Append (GemRB.GetString (1048) + ": " + CommonTables.Races.GetValue (RaceName, "CAP_REF", GTV_REF) + "\n")
+			TextAreaControl.Append (GemRB.GetString (1048) + ": " + CommonTables.Races.GetValue (RaceName, "UPPERCASE", GTV_REF) + "\n")
 		elif part == 4:
 			ClassTitle = GUICommon.GetActorClassTitle (MyChar)
 			TextAreaControl.Append (GemRB.GetString(12136) + ": " + ClassTitle + "\n")

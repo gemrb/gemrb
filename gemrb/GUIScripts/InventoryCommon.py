@@ -312,13 +312,13 @@ def GetIWD2RestrictedRaces(mask):
 	for i in range(n):
 		rowName = CommonTables.Races.GetRowName(i)
 		raceMask = CommonTables.Races.GetValue(rowName, "USABILITY")
-		nameRef = CommonTables.Races.GetValue(rowName, "NAME_REF")
+		nameRef = CommonTables.Races.GetValue (rowName, "NAME", GTV_REF)
 
 		if raceMask == 0x7FFFFFFF: # GetValue gives as signed value
 			raceMask = 0x80000000
 
 		if mask & raceMask:
-			text += GemRB.GetString(nameRef) + "\n  "
+			text += nameRef + "\n  "
 
 	return text
 

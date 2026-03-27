@@ -163,7 +163,7 @@ def UpdateOverview(CurrentStep):
 	if CurrentStep > 2:
 		AddText(1048)
 		AddText(': ')
-		AddText(Tables[0].GetValue(RaceName, "CAP_REF", GTV_INT), 1)
+		AddText(Tables[0].GetValue(RaceName, "UPPERCASE", GTV_INT), 1)
 
 	kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 	ClassRowName = ""

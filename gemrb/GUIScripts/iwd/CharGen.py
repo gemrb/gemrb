@@ -420,7 +420,7 @@ def SetCharacterDescription():
 		TextArea.Append (1048)
 		TextArea.Append (": ")
 		RaceName = GUICommon.GetRaceRowName (MyChar)
-		TextArea.Append (CommonTables.Races.GetValue (RaceName, "CAP_REF"))
+		TextArea.Append (CommonTables.Races.GetValue (RaceName, "UPPERCASE"))
 		TextArea.Append ("\n")
 	if CharGenState > 3:
 		TextArea.Append (1049)
@@ -823,7 +823,7 @@ def RacePress():
 		RaceSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 		RaceSelectButton.OnPress (RaceSelectPress)
 		RaceName = CommonTables.Races.GetRowName (i - 2)
-		RaceSelectButton.SetText (CommonTables.Races.GetValue (RaceName, "NAME_REF"))
+		RaceSelectButton.SetText (CommonTables.Races.GetValue (RaceName, "NAME"))
 		RaceSelectButton.SetVarAssoc ("Race", i - 1)
 
 	RaceTextArea = RaceWindow.GetControl (8)
@@ -848,7 +848,7 @@ def RaceSelectPress():
 	global RaceWindow, RaceDoneButton, RaceTextArea
 
 	RaceName = GUICommon.GetRaceRowName (MyChar, GemRB.GetVar ("Race"))
-	RaceTextArea.SetText (CommonTables.Races.GetValue (RaceName, "DESC_REF"))
+	RaceTextArea.SetText (CommonTables.Races.GetValue (RaceName, "DESCSTR"))
 	RaceDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 

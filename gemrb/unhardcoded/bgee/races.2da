@@ -1,6 +1,6 @@
 2DA V1.0
 -1
-            ID      NAME_REF    DESC_REF    CAP_REF     USABILITY   SAVE        CANDUAL
+            ID      NAME        DESCSTR     UPPERCASE   USABILITY   SAVE        CANDUAL
 HUMAN       1       7193        9550        1096        0x08000000  *           1
 ELF         2       7194        9552        1097        0x00800000  *           0
 HALF_ELF    3       7197        9555        1098        0x02000000  *           0
