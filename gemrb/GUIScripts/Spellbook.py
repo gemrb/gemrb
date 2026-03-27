@@ -549,8 +549,9 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 		# do a string lookup since some tables don't have entries for all levels
 		value = Table.GetValue (str(Level), str(i+1), GTV_INT)
 		# specialist mages get an extra spell if they already know that level
+		# same for sorcerer kits in the ees
 		# FIXME: get a general routine to find specialists
-		school = GemRB.GetVar ("MAGESCHOOL") or 0
+		school = GemRB.GetVar ("MAGESCHOOL") or int(IsSorcererKit (pc))
 		if (Type == IE_SPELL_TYPE_WIZARD and school != 0) or \
 			(GameCheck.IsIWD2() and Type == IE_IWD2_SPELL_WIZARD and not (kit&0x4000)):
 			if value > 0:
@@ -820,3 +821,10 @@ def GetSpellLearningTable (tableName):
 	else:
 		print("GetSpellLearningTable: unhandled spell learning type encountered, falling back to memo table:", tableName)
 	return tableName
+
+def IsSorcererKit (pc):
+	if not GameCheck.IsAnyEE ():
+		return False
+	import GUICommon
+	ClassName = GUICommon.GetClassRowName (pc)
+	return ClassName == "SORCERER" and GUICommon.GetKitIndex (pc)

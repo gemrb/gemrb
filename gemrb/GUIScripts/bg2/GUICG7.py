@@ -18,9 +18,11 @@
 # character generation, mage spells (GUICG7)
 
 import GemRB
+import GameCheck
 import GUICommon
 import CommonTables
 import LUSpellSelection
+import Spellbook
 from GUIDefines import *
 from ie_stats import *
 
@@ -39,13 +41,23 @@ def OnLoad():
 	KitTable = GemRB.LoadTable ("magesch")
 	KitIndex = GUICommon.GetKitIndex (Slot)
 	if KitIndex:
-		KitValue = KitTable.GetValue(KitIndex - 21, 3)
+		if GameCheck.IsAnyEE ():
+			KitRowName = CommonTables.KitList.GetRowName (KitIndex)
+			KitValue = CommonTables.KitList.GetValue (KitRowName, "KITIDS")
+		else:
+			KitValue = KitTable.GetValue (KitIndex - 21, 3)
 
 		# bards have kits too
 		if KitValue == -1:
 			KitValue = 0x4000 # we only need it for the spells, so this is ok
 	else:
 		KitValue = 0x4000
+
+	# dragon disciples have their own table for the -1 spells per level penalty
+	# howevere as kits they're treated as specialists, so get +1, therefore the table has -2
+	# currently all such kits get treated the same way, since the table is not in kitlist.2da
+	if Spellbook.IsSorcererKit (Slot):
+		TableName = "MXSPLDD"
 
 	# open up the spell selection window
 	# remember, it is pc, table, level, diff, kit, chargen

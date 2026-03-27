@@ -48,6 +48,8 @@ def OnLoad():
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 		GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
 	TableName = CommonTables.ClassSkills.GetValue (ClassName, "MAGESPELL", GTV_STR)
+	if Spellbook.IsSorcererKit (MyChar):
+		TableName = "MXSPLDD"
 	if TableName != "*":
 		levelIdx = 0
 		if IsMulti[0] > 1:
