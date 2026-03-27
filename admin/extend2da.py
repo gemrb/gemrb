@@ -21,7 +21,8 @@ import sys
 
 def usage(msg):
   print("Error:", msg)
-  print("\nUsage:", sys.argv[0], 'filename APPEND|APPEND_COL "$|value1  [$|value2] ... [$|valueN]" [-r]\n')
+  print("\nUsage:", sys.argv[0], 'filename APPEND|APPEND_COL "$|value1  [$|value2] ... [$|valueN]" [-r]\n"')
+  print("\nUsage:", sys.argv[0], 'filename SWITCH "colName1 colName2"')
   print("Passing $ will result in an empty cell. Use it for the first two entries when appending columns,\nso you don't break the 2da signature or default value. Passing -r at the end will right-align cells.")
   print()
   print("Example:")
@@ -107,6 +108,46 @@ def appendRow(f):
   f.truncate()
   f.write(b"\n")
 
+def switchCols(f):
+  global lines, data
+
+  f.seek(0)
+  f.truncate()
+  i = 0
+  colIdx1 = 0
+  colIdx2 = 0
+  for line in lines:
+    if i < 2 or line == b"" or chr(line[0]) == "#":
+      f.write(line + b"\n")
+      i = i + 1
+      continue
+
+    if i == 2:
+      colNames = line.split()
+      col1, col2 = [bytes(datum, "ascii") for datum in data]
+      colIdx1 = colNames.index(col1)
+      colIdx2 = colNames.index(col2)
+    elif i == 3:
+      colIdx1 += 1 # skip row names from now on
+      colIdx2 += 1
+
+    # lazy approach instead of using spans or format
+    lineFields = line.split()
+    col1 = lineFields[colIdx1]
+    col2 = lineFields[colIdx2]
+    lineFields.insert(colIdx1, col2)
+    lineFields.pop(colIdx2 + 1)
+    lineFields.insert(colIdx2 + 1, col1)
+    lineFields.pop(colIdx1 + 1)
+    line = b"   ".join(lineFields)
+    if i == 2:
+      introPad = " " * (len(lines[2]) - len(lines[2].lstrip()))
+      f.write((introPad + line.decode() + "\n").encode('ascii'))
+    else:
+      f.write((line.decode() + "\n").encode('ascii'))
+
+    i = i + 1
+
 ################# MAIN ####################################
 if len(sys.argv) < 4:
   usage("missing parameters")
@@ -117,7 +158,7 @@ mode = sys.argv[2].upper() # APPEND / APPEND_COL
 data = sys.argv[3:][0].split()
 flags = sys.argv[4] if len(sys.argv) > 4 else ""
 
-if mode != "APPEND" and mode != "APPEND_COL":
+if mode not in ["APPEND", "APPEND_COL", "SWITCH"]:
   usage("invalid mode parameter")
   sys.exit(12)
 
@@ -130,8 +171,10 @@ with open(filename, 'r+b') as f:
     appendCol(f, max)
   elif mode == "APPEND":
     appendRow(f)
+  elif mode == "SWITCH":
+    switchCols(f)
 
 # tests
 # python admin/extend2da.py gemrb/unhardcoded/bg1/classes.2da APPEND_COL "$ $ BOGOSITY 0 0 0 00 0 0 0 0 0 0 0 0 0 0 2 3 4 7"
 # python admin/extend2da.py gemrb/unhardcoded/bg1/classes.2da APPEND "HACKER 1 3 0 0 0 00 0 0 0 0 0 0 0 0 0 0 0 0"
-
+# python admin/extend2da.py gemrb/unhardcoded/bg1/pdolls.2da SWITCH "LEVEL2 SIZE"
