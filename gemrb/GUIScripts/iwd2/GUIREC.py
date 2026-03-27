@@ -230,7 +230,7 @@ def GetECL (pc):
 	RaceRowName = GUICommon.GetRaceRowName (pc)
 	if RaceRowName is None:
 		return 0
-	return CommonTables.Races.GetValue (RaceRowName, "ECL")
+	return CommonTables.RaceData.GetValue (RaceRowName, "ECL")
 
 #class is ignored
 def GetNextLevelExp (Level, Adjustment, string=0):
@@ -309,7 +309,7 @@ def DisplayGeneral (pc, targetTextArea):
 
 	#favoured class
 	RaceName = GUICommon.GetRaceRowName (pc)
-	tmp = CommonTables.Races.GetValue (RaceName, "FAVORED_CLASS")
+	tmp = CommonTables.RaceData.GetValue (RaceName, "FAVORED_CLASS")
 	if tmp == -1:
 		tmp = highest
 	else:

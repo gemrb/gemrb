@@ -286,7 +286,7 @@ def NextPress():
 		# deal with racial boni too (skillrac.2da is ignored)
 		RaceName = GUICommon.GetRaceRowName (MyChar)
 		# the column holds the index into feats.2da, which has one less intro column
-		RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN") + 1
+		RaceColumn = CommonTables.RaceData.GetValue (RaceName, "SKILL_COLUMN") + 1
 	else:
 		MyChar = GemRB.GameGetSelectedPCSingle ()
 		RacialBonus = 0

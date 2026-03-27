@@ -241,7 +241,7 @@ def OpenFeatsWindow(chargen=0):
 				GemRB.SetFeat (pc, FEAT_IMPROVED_EVASION, 1)
 
 	# could use column ID as well, but they tend to change :)
-	RaceColumn = CommonTables.Races.GetValue(RaceName, "SKILL_COLUMN")
+	RaceColumn = CommonTables.RaceData.GetValue (RaceName, "SKILL_COLUMN")
 
 	ClassName = KitName = GUICommon.GetClassRowName (ClassIndex, "index")
 	# classcolumn is base class or 0 if it is not a kit
@@ -286,7 +286,7 @@ def OpenFeatsWindow(chargen=0):
 	#racial abilities which seem to be hardcoded in the IWD2 engine
 	#are implemented in races.2da
 	if chargen:
-		PointsLeft += CommonTables.Races.GetValue(RaceName,'FEATBONUS')
+		PointsLeft += CommonTables.RaceData.GetValue (RaceName, 'FEATBONUS')
 	###
 
 	if PointsLeft == 0:

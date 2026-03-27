@@ -573,7 +573,7 @@ def CanDualClass(actor):
 	RaceName = GetRaceRowName (actor)
 	if RaceName is None:
 		return 0
-	RaceDual = CommonTables.Races.GetValue (RaceName, "CANDUAL", GTV_STR)
+	RaceDual = CommonTables.RaceData.GetValue (RaceName, "CANDUAL", GTV_STR)
 	if RaceDual != "1":
 		return 0
 

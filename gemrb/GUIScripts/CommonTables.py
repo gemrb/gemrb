@@ -18,20 +18,21 @@
 # the place for preloading the most commonly used tables
 # helps with code deduplication, reduced log spam and tiny lookup savings
 import GemRB
+import GameCheck
 from ie_restype import RES_2DA
 
 # these two are only used in SetEncumbranceLabels, but that is called very often
 StrMod = StrModEx = None
 Classes = KitList = ClassSkills = Races = NextLevel = None
 Pdolls = SpellDisplay = Aligns = ItemType = None
-WeapProfs = CharProfs = None
+WeapProfs = CharProfs = RaceData = None
 
 Loaded = False
 
 def Load():
 	global Classes, KitList, ClassSkills, Races, NextLevel
 	global Pdolls, StrModEx, StrMod, SpellDisplay, Aligns
-	global ItemType, WeapProfs, CharProfs
+	global ItemType, WeapProfs, CharProfs, RaceData
 	global Loaded
 
 	if Loaded:
@@ -40,6 +41,10 @@ def Load():
 	Classes = GemRB.LoadTable ("classes", False, True)
 	ClassSkills = GemRB.LoadTable ("clskills", False, True)
 	Races = GemRB.LoadTable ("races", False, True)
+	if GameCheck.IsIWD2 ():
+		RaceData = GemRB.LoadTable ("races", False, True)
+	else:
+		RaceData = GemRB.LoadTable ("races", False, True)
 	NextLevel = GemRB.LoadTable ("xplevel", False, True)
 	StrMod = GemRB.LoadTable ("strmod", False, True)
 	StrModEx = GemRB.LoadTable ("strmodex", False, True)
