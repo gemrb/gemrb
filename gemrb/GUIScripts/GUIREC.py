@@ -481,11 +481,10 @@ def GetPartyReputation(pc):
 
 def GetSkills(pc):
 	stats = []
-	className = GUICommon.GetClassRowName (pc)
-	stats.append ( (9460, GUIRECCommon.GetValidSkill (pc, className, IE_LOCKPICKING), '') )
-	stats.append ( (9462, GUIRECCommon.GetValidSkill (pc, className, IE_TRAPS), '') )
-	stats.append ( (9463, GUIRECCommon.GetValidSkill (pc, className, IE_PICKPOCKET), '') )
-	stats.append ( (9461, GUIRECCommon.GetValidSkill (pc, className, IE_STEALTH), '') )
+	stats.append ( (9460, GUIRECCommon.GetValidSkill (pc, IE_LOCKPICKING), '') )
+	stats.append ( (9462, GUIRECCommon.GetValidSkill (pc, IE_TRAPS), '') )
+	stats.append ( (9463, GUIRECCommon.GetValidSkill (pc, IE_PICKPOCKET), '') )
+	stats.append ( (9461, GUIRECCommon.GetValidSkill (pc, IE_STEALTH), '') )
 	HatedRace = GS (pc, IE_HATEDRACE)
 	if HatedRace:
 		HateTable = GemRB.LoadTable ("haterace")
@@ -496,9 +495,9 @@ def GetSkills(pc):
 
 	# these skills were new in bg2
 	if GameCheck.IsBG2OrEE () or GameCheck.IsIWD1():
-		stats.append ( (34120, GUIRECCommon.GetValidSkill (pc, className, IE_HIDEINSHADOWS), '') )
-		stats.append ( (34121, GUIRECCommon.GetValidSkill (pc, className, IE_DETECTILLUSIONS), '') )
-		stats.append ( (34122, GUIRECCommon.GetValidSkill (pc, className, IE_SETTRAPS), '') )
+		stats.append ( (34120, GUIRECCommon.GetValidSkill (pc, IE_HIDEINSHADOWS), '') )
+		stats.append ( (34121, GUIRECCommon.GetValidSkill (pc, IE_DETECTILLUSIONS), '') )
+		stats.append ( (34122, GUIRECCommon.GetValidSkill (pc, IE_SETTRAPS), '') )
 	stats.append ( (12128, GS (pc, IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (pc, IE_TURNUNDEADLEVEL), '') )
 

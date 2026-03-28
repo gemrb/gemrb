@@ -33,7 +33,7 @@ NameField = ExportDoneButton = None
 ScriptsTable = None
 RevertButton = None
 
-SkillsTable = GemRB.LoadTable ("skills", False, True)
+SkillsTable = GemRB.LoadTable ("thiefscl", True, True)
 
 if GameCheck.IsBG2OrEE () or GameCheck.IsBG1():
 	BioStrRefSlot = 74
@@ -660,20 +660,19 @@ def ExportEditChanged():
 SkillStatNames = { IE_PICKPOCKET : "PICK_POCKETS", IE_LOCKPICKING : "OPEN_LOCKS", IE_TRAPS : "FIND_TRAPS", IE_STEALTH : "STEALTH", IE_HIDEINSHADOWS : "HIDE_IN_SHADOWS", IE_DETECTILLUSIONS : "DETECT_ILLUSION", IE_SETTRAPS : "SET_TRAPS" }
 if GameCheck.IsBG2OrEE ():
 	SkillStatNames[IE_STEALTH] = "MOVE_SILENTLY"
-def GetValidSkill (pc, className, stat):
+def GetValidSkill (pc, stat):
 	val = GemRB.GetPlayerStat (pc, stat)
 	if val < 0:
 		return 0
 
-	if className == "BARD":
-		if stat != IE_PICKPOCKET:
-			return 0
-	elif className == "RANGER":
-		if stat != IE_STEALTH:
-			return 0
-	else:
-		if SkillsTable.GetValue (SkillStatNames[stat], className, GTV_INT) == -1:
-			return 0
+	# some kits like dark moon monks enable more skills than the base class
+	# but kits may also be missing from the table, so check the class too
+	className = GUICommon.GetClassRowName (pc)
+	kitName = GUICommon.GetKitRowName (pc)
+	classSkill = SkillsTable.GetValue (SkillStatNames[stat], className, GTV_INT)
+	kitSkill = SkillsTable.GetValue (SkillStatNames[stat], kitName, GTV_INT)
+	if kitSkill + classSkill == 0:
+		return 0
 
 	return val
 

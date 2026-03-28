@@ -1,0 +1,10 @@
+2DA V1.0
+0
+                 THIEF   MAGE_THIEF  FIGHTER_THIEF   CLERIC_THIEF    FIGHTER_MAGE_THIEF  MONK   RANGER   BARD
+PICK_POCKETS     1       1           1               1               1                   0      0        1
+OPEN_LOCKS       1       1           1               1               1                   0      0        0
+FIND_TRAPS       1       1           1               1               1                   1      0        0
+MOVE_SILENTLY    1       1           1               1               1                   1      1        0
+HIDE_IN_SHADOWS  1       1           1               1               1                   1      0        0
+DETECT_ILLUSION  1       1           1               1               1                   0      0        0
+SET_TRAPS        1       1           1               1               1                   0      0        0

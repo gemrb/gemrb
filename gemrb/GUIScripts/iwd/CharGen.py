@@ -447,18 +447,7 @@ def SetCharacterDescription():
 		IsBard = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
 		IsThief = CommonTables.ClassSkills.GetValue (ClassName, "THIEFSKILL")
 
-		if IsThief!="*":
-			TextArea.Append ("\n")
-			TextArea.Append (8442)
-			TextArea.Append ("\n")
-			for i in range (4):
-				SkillRow = SkillTable.GetRowName (i)
-				TextArea.Append (SkillsTable.GetValue (SkillRow, "CAP_REF"))
-				StatID = SkillsTable.GetValue (SkillRow, "ID")
-				TextArea.Append (": " )
-				TextArea.Append (str(GemRB.GetPlayerStat (MyChar, StatID)) )
-				TextArea.Append ("%\n")
-		elif DruidSpell!="*":
+		if IsThief != "*" or DruidSpell != "*" or IsBard != "*":
 			PositiveStats = []
 			for i in range (4):
 				SkillRow = SkillTable.GetRowName (i)
@@ -477,6 +466,7 @@ def SetCharacterDescription():
 					TextArea.Append (str(Stat) )
 					TextArea.Append ("%\n")
 
+		if DruidSpell != "*":
 			RacialEnemy = GemRB.GetVar ("RacialEnemyIndex") + GemRB.GetVar ("RacialEnemy") - 1
 			if RacialEnemy != -1:
 				TextArea.Append ("\n")
@@ -484,19 +474,6 @@ def SetCharacterDescription():
 				TextArea.Append (": " )
 				TextArea.Append (RacialEnemyTable.GetValue (RacialEnemy, 3))
 				TextArea.Append ("\n")
-		elif IsBard!="*":
-			TextArea.Append ("\n")
-			TextArea.Append (8442)
-			TextArea.Append ("\n")
-			for i in range (4):
-				SkillRow = SkillTable.GetRowName (i)
-				StatID = SkillsTable.GetValue (SkillRow, "ID")
-				Stat = GemRB.GetPlayerStat (MyChar, StatID)
-				if Stat>0:
-					TextArea.Append (SkillsTable.GetValue (SkillRow, "CAP_REF"))
-					TextArea.Append (": " )
-					TextArea.Append (str(Stat) )
-					TextArea.Append ("%\n")
 
 		if MageSpell != "*":
 			info = Spellbook.GetKnownSpellsDescription (MyChar, IE_SPELL_TYPE_WIZARD)

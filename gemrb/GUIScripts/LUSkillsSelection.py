@@ -50,6 +50,7 @@ SkillsLabelIncrement = 1
 SkillsIndices = []
 SkillPointsLeft = 0
 SkillsTable = GemRB.LoadTable ("skills", True, True)
+SkillMapTable = GemRB.LoadTable ("thiefscl", True, True)
 SkillsOldPos = 0
 SkillsClickCount = 0
 SkillsOldDirection = 0
@@ -195,9 +196,13 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	else:
 		SkillsKitName = GUICommon.GetKitRowName (pc, True, Kit)
 
-	# also treat most mod-introduced kits as kitless for skills.2da
-	# lookups - unless they add the required columns
-	if SkillsTable.GetValue ("OPEN_LOCKS", SkillsKitName) == -1:
+	# if a kit isn't listed (to reduce duplication or a mod doesn't care), look up the class value
+	# unfortunately the default value is the same as the disabling one
+	Cols = []
+	ColCount = SkillMapTable.GetColumnCount ()
+	for i in range(ColCount):
+		Cols.append(SkillMapTable.GetColumnName (i))
+	if Kit and not SkillsKitName in Cols:
 		SkillsKitName = ClassName
 
 	#figure out the correct skills table
@@ -219,7 +224,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		SkillsAssignable = 1
 		for i in range(SkillsTable.GetRowCount()):
 			SkillName = SkillsTable.GetRowName (i)
-			if SkillsTable.GetValue (SkillName, SkillsKitName) != -1:
+			if SkillMapTable.GetValue (SkillName, SkillsKitName) != 0:
 				SkillsIndices.append(i)
 
 		LevelDiff = []

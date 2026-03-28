@@ -541,14 +541,13 @@ def GetStatOverview (pc):
 	#   4210 Lore
 	stats.append ((4210, GS (IE_LORE), ''))
 	#   4211 Open Locks
-	className = GUICommon.GetClassRowName (pc)
-	stats.append ((4211, GUIRECCommon.GetValidSkill (pc, className, IE_LOCKPICKING), '%'))
+	stats.append ((4211, GUIRECCommon.GetValidSkill (pc, IE_LOCKPICKING), '%'))
 	#   4212 Stealth
-	stats.append ((4212, GUIRECCommon.GetValidSkill (pc, className, IE_STEALTH), '%'))
+	stats.append ((4212, GUIRECCommon.GetValidSkill (pc, IE_STEALTH), '%'))
 	#   4213 Find/Remove Traps
-	stats.append ((4213, GUIRECCommon.GetValidSkill (pc, className, IE_TRAPS), '%'))
+	stats.append ((4213, GUIRECCommon.GetValidSkill (pc, IE_TRAPS), '%'))
 	#   4214 Pick Pockets
-	stats.append ((4214, GUIRECCommon.GetValidSkill (pc, className, IE_PICKPOCKET), '%'))
+	stats.append ((4214, GUIRECCommon.GetValidSkill (pc, IE_PICKPOCKET), '%'))
 	#   4215 Tracking
 	stats.append ((4215, GS (IE_TRACKING), ''))
 	#   4216 Reputation - not shown
@@ -556,6 +555,7 @@ def GetStatOverview (pc):
 	#   4218 Lay on Hands Amount
 	stats.append ((4218, GS (IE_LAYONHANDSAMOUNT), ''))
 	#   4219 Backstab Damage
+	className = GUICommon.GetClassRowName (pc)
 	if "THIEF" in className: # for TNO display it only if he's currently a thief
 		stats.append ((4219, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x'))
 	stats.append (None)
