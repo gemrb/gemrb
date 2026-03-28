@@ -68,6 +68,7 @@ static void ReadAutonoteINI()
 	INInote = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	path_t tINInote = PathJoin(core->config.GamePath, "autonote.ini");
 	FileStream* fs = FileStream::OpenFile(tINInote);
+	if (!fs) return;
 	INInote->Open(std::unique_ptr<DataStream> { fs });
 }
 

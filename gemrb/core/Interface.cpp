@@ -587,7 +587,7 @@ Interface::Interface(CoreSettings&& cfg)
 		path_t tINIparty = PathJoin(config.GamePath, "Party.ini");
 		fs = FileStream::OpenFile(tINIparty);
 
-		if (!INIparty->Open(std::unique_ptr<DataStream> { fs })) {
+		if (!fs || !INIparty->Open(std::unique_ptr<DataStream> { fs })) {
 			Log(WARNING, "Core", "Failed to load precreated teams.");
 		}
 	}
@@ -602,7 +602,7 @@ Interface::Interface(CoreSettings&& cfg)
 		path_t tINIbeasts = PathJoin(config.GamePath, "beast.ini");
 		fs = FileStream::OpenFile(tINIbeasts);
 
-		if (!INIbeasts->Open(std::unique_ptr<DataStream> { fs })) {
+		if (!fs || !INIbeasts->Open(std::unique_ptr<DataStream> { fs })) {
 			Log(WARNING, "Core", "Failed to load beast definitions.");
 		}
 
@@ -611,7 +611,7 @@ Interface::Interface(CoreSettings&& cfg)
 		path_t tINIquests = PathJoin(config.GamePath, "quests.ini");
 		FileStream* fs2 = FileStream::OpenFile(tINIquests);
 
-		if (!INIquests->Open(std::unique_ptr<DataStream> { fs2 })) {
+		if (!fs2 || !INIquests->Open(std::unique_ptr<DataStream> { fs2 })) {
 			Log(WARNING, "Core", "Failed to load quest definitions.");
 		}
 	}
@@ -1146,7 +1146,7 @@ void Interface::InitAudio()
 		StringView sv(resdata ? "resdata" : "sounds");
 		DataStream* ds = gamedata->GetResourceStream(sv, IE_INI_CLASS_ID);
 
-		if (!INIresdata->Open(std::unique_ptr<DataStream> { ds })) {
+		if (!ds || !INIresdata->Open(std::unique_ptr<DataStream> { ds })) {
 			Log(WARNING, "Core", "Failed to load resource data.");
 		}
 	}
