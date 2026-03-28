@@ -183,11 +183,12 @@ def DisplayOverview(step):
 			# thieving and other skills
 			info = ""
 			SkillTable = GemRB.LoadTable ("skills")
+			SkillPtsTable = GemRB.LoadTable ("thiefskl")
 			RangerSkills = CommonTables.ClassSkills.GetValue (ClassName, "RANGERSKILL")
 			BardSkills = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
 			KitName = GUICommon.GetKitRowName (MyChar)
 
-			if SkillTable.GetValue ("RATE", KitName) != -1:
+			if SkillPtsTable.GetValue (KitName, "LEVEL_POINTS", GTV_INT) != 0:
 				for skill in range(SkillTable.GetRowCount ()):
 					name = SkillTable.GetValue (skill, 1, GTV_REF)
 					available = SkillTable.GetValue (SkillTable.GetRowName (skill), KitName)

@@ -194,12 +194,13 @@ def getSkills(TextAreaControl):
 	# thieving and other skills
 	info = ""
 	SkillTable = GemRB.LoadTable ("skills")
+	SkillPtsTable = GemRB.LoadTable ("thiefskl")
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	RangerSkills = CommonTables.ClassSkills.GetValue (ClassName, "RANGERSKILL")
 	BardSkills = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
 	KitName = GUICommon.GetKitRowName (MyChar)
 
-	if SkillTable.GetValue ("RATE", KitName) != -1 or BardSkills != "*" or RangerSkills != "*":
+	if SkillPtsTable.GetValue (KitName, "LEVEL_POINTS") != 0 or BardSkills != "*" or RangerSkills != "*":
 		for skill in range(SkillTable.GetRowCount ()):
 			name = SkillTable.GetValue (skill, 1, GTV_REF)
 			stat = SkillTable.GetValue (skill, 2)
