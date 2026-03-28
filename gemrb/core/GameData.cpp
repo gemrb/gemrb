@@ -820,7 +820,13 @@ ResRef GameData::GetFist(int cls, int level)
 		return defaultFist;
 	}
 
-	AutoTable fistWeap = LoadTable("fistweap");
+	AutoTable fistWeap = LoadTable("fistweap", true);
+	// ees added their own table that is transposed and only for monks
+	if (!fistWeap && core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		if (cls != 20) return defaultFist;
+		fistWeap = LoadTable("monkfist", true);
+		return fistWeap->QueryField(fmt::to_string(level), "RESREF");
+	}
 	if (!fistWeap) {
 		ignore = true;
 		return defaultFist;
