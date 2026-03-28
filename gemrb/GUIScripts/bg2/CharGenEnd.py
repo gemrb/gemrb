@@ -127,7 +127,7 @@ def RunGame(MyChar):
 
 def GiveEquipment(MyChar, ClassName, KitIndex):
 		# get the kit (or use class if no kit) to load the start table
-		EquipmentColName = GUICommon.GetKitRowName (pc, True, KitIndex)
+		EquipmentColName = GUICommon.GetKitRowName (MyChar, True, KitIndex)
 		# sorcerers are missing from the table, use the mage equipment instead
 		if EquipmentColName == "SORCERER":
 			EquipmentColName = "MAGE"
