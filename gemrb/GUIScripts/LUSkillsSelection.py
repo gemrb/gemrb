@@ -133,10 +133,10 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	elif skilltype == LUSKILLS_TYPE_CHARGEN:
 		SkillsOffsetPress = 21
 		SkillsOffsetButton1 = 11
-		SkillsOffsetSum = 5
-		SkillsOffsetName = 6
+		SkillsOffsetSum = 7 if GameCheck.IsAnyEE () else 5
+		SkillsOffsetName = 8 if GameCheck.IsAnyEE () else 6
 		SkillsOffsetPoints = 1
-		SkillsNumButtons = 4
+		SkillsNumButtons = 6 if GameCheck.IsAnyEE () else 4
 		SkillsTextArea = SkillsWindow.GetControl (19)
 		SkillsTextArea.SetText(17248)
 		if (scroll):
@@ -145,12 +145,16 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	else:
 		return
 
-	# yet another "what were they thinking?!"
-	if GameCheck.IsBG2EE () and skilltype == LUSKILLS_TYPE_DUALCLASS:
-		# remap 9,16,18,20 to 14,16,18,20 AND 10,17,19,21 to 15,17,19,21
-		# potentially also broken in chargen
-		SkillsWindow.AliasControls ({'PLUSBTN' + str(x[0]) : x[1] for x in enumerate([9, 16, 18, 20])})
-		SkillsWindow.AliasControls ({'MINUSBTN' + str(x[0]) : x[1] for x in enumerate([10, 17, 19, 21])})
+	if GameCheck.IsAnyEE () and skilltype != LUSKILLS_TYPE_LEVELUP:
+		# yet another "what were they thinking?!"
+		if skilltype == LUSKILLS_TYPE_DUALCLASS:
+			# remap 9,16,18,20 to 14,16,18,20 AND 10,17,19,21 to 15,17,19,21
+			SkillsWindow.AliasControls ({'PLUSBTN' + str(x[0]) : x[1] for x in enumerate([9, 16, 18, 20])})
+			SkillsWindow.AliasControls ({'MINUSBTN' + str(x[0]) : x[1] for x in enumerate([10, 17, 19, 21])})
+		elif skilltype == LUSKILLS_TYPE_CHARGEN:
+			# 11-12 - 17-18 + 27-30
+			SkillsWindow.AliasControls ({'PLUSBTN' + str(x[0]) : x[1] for x in enumerate([11, 13, 15, 17, 27, 29])})
+			SkillsWindow.AliasControls ({'MINUSBTN' + str(x[0]) : x[1] for x in enumerate([12, 14, 16, 18, 28, 30])})
 	else:
 		SkillsWindow.AliasControls ({'PLUSBTN' + str(x) : x * 2 + SkillsOffsetButton1 for x in range(4)})
 		SkillsWindow.AliasControls ({'MINUSBTN' + str(x) : x * 2 + SkillsOffsetButton1 + 1 for x in range(4)})

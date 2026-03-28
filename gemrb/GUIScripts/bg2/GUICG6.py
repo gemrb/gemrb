@@ -58,7 +58,7 @@ def OnLoad():
 		GemRB.SetNextScript("GUICG9")
 		return
 	
-	BackButton = SkillWindow.GetControl(25)
+	BackButton = SkillWindow.GetControl(31 if GameCheck.IsBG2OrEE () else 25)
 	BackButton.SetText(15416)
 	BackButton.MakeEscape()
 	BackButton.OnPress (BackPress)
