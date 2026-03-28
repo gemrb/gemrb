@@ -68,10 +68,7 @@ def ColorStatsFromEETables ():
 	if RaceName == "HALF_ORC":
 		RaceName = "HALFORC"
 	# class or kit name
-	ClassName = GUICommon.GetClassRowName (pc)
-	KitIndex = GUICommon.GetKitIndex (pc)
-	if KitIndex != 0:
-		ClassName = CommonTables.KitList.GetValue (KitIndex, 0, GTV_STR)
+	ClassName = GUICommon.GetKitRowName (pc)
 
 	return {
 		IE_METAL_COLOR : ClassColorTable.GetValue ("METAL", ClassName, GTV_INT),

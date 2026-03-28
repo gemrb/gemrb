@@ -127,13 +127,10 @@ def RunGame(MyChar):
 
 def GiveEquipment(MyChar, ClassName, KitIndex):
 		# get the kit (or use class if no kit) to load the start table
-		if KitIndex == 0:
-			EquipmentColName = ClassName
-			# sorcerers are missing from the table, use the mage equipment instead
-			if EquipmentColName == "SORCERER":
-				EquipmentColName = "MAGE"
-		else:
-			EquipmentColName = CommonTables.KitList.GetValue (KitIndex, 0)
+		EquipmentColName = GUICommon.GetKitRowName (pc, True, KitIndex)
+		# sorcerers are missing from the table, use the mage equipment instead
+		if EquipmentColName == "SORCERER":
+			EquipmentColName = "MAGE"
 
 		EquipmentTable = GemRB.LoadTable ("25stweap")
 

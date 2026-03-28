@@ -389,7 +389,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	Kit = GUICommon.GetKitIndex (pc)
 	ClassName = None
 	if Kit and not Dual[0] and Multi[0]<2:
-		KitName = CommonTables.KitList.GetValue (Kit, 0, GTV_STR)
+		KitName = GUICommon.GetKitRowName (pc, True, Kit)
 		if CommonTables.Classes.GetRowIndex (KitName) != None:
 			ClassName = KitName
 

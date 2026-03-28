@@ -190,7 +190,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	if not Kit or skilltype == LUSKILLS_TYPE_DUALCLASS or IsDual[0] in [1, 2] or IsMulti[0]>1:
 		SkillsKitName = ClassName
 	else:
-		SkillsKitName = CommonTables.KitList.GetValue (Kit, 0, GTV_STR)
+		SkillsKitName = GUICommon.GetKitRowName (pc, True, Kit)
 
 	# also treat most mod-introduced kits as kitless for skills.2da
 	# lookups - unless they add the required columns

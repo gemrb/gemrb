@@ -176,13 +176,7 @@ def guardSkills():
 	RowCount = SkillTable.GetRowCount()-2
 
 	MyChar = GemRB.GetVar ("Slot")
-	Kit = GUICommon.GetKitIndex(MyChar)
-
-	if Kit != 0 and not GUICommon.IsMultiClassed (MyChar, 0): # luckily the first row is a dummy
-		KitName = CommonTables.KitList.GetValue(Kit, 0) #rowname is just a number
-	else:
-		KitName = GUICommon.GetClassRowName (MyChar)
-
+	KitName = GUICommon.GetKitRowName (MyChar, not GUICommon.IsMultiClassed (MyChar, 0))
 	for i in range(RowCount):
 		SkillName = SkillTable.GetRowName(i+2)
 		if SkillTable.GetValue(SkillName, KitName)==1:
@@ -203,12 +197,8 @@ def getSkills(TextAreaControl):
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	RangerSkills = CommonTables.ClassSkills.GetValue (ClassName, "RANGERSKILL")
 	BardSkills = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
-	KitName = GUICommon.GetKitIndex (MyChar)
-	if KitName == 0:
-		KitName = ClassName
-	else:
-		KitName = CommonTables.KitList.GetValue (KitName, 0)
-		
+	KitName = GUICommon.GetKitRowName (MyChar)
+
 	if SkillTable.GetValue ("RATE", KitName) != -1 or BardSkills != "*" or RangerSkills != "*":
 		for skill in range(SkillTable.GetRowCount () - 2):
 			name = SkillTable.GetValue (skill+2, 1, GTV_REF)

@@ -119,11 +119,7 @@ def OpenLevelUpWindow():
 	print("ClassName: " + ClassName + "\tActor ClassNames: " + str(actor.ClassNames()))
 
 	# figure our our proficiency table and index
-	if Kit == 0:
-		KitName = ClassName
-	else:
-		#rowname is just a number, the kitname is the first data column
-		KitName = CommonTables.KitList.GetValue(Kit, 0)
+	KitName = GUICommon.GetKitRowName (pc, True, Kit)
 
 	# our multiclass variables
 	IsMulti = GUICommon.IsMultiClassed (pc, 1)

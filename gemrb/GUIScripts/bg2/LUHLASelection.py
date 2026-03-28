@@ -311,15 +311,13 @@ def GetHLAs ():
 
 	# get all the HLAs for each class
 	for i in range (NumClasses):
-		ClassName = GUICommon.GetClassRowName (Classes[i], "class")
 		CurrentLevel = Level[i]
+		ClassName = GUICommon.GetClassRowName (Classes[i], "class")
+		KitName = GUICommon.GetKitRowName (pc, NumClasses == 1 and not IsDual, Kit)
 
-		if Kit != 0 and NumClasses == 1 and not IsDual: # kitted single-class
-			KitName = CommonTables.KitList.GetValue (Kit, 0)
-			HLAClassTable = "lu" + HLAAbbrTable.GetValue (KitName, "ABBREV")
+		if KitName != ClassName: # kitted single-class
 			ClassName = KitName
-		else: # everyone else
-			HLAClassTable = "lu" + HLAAbbrTable.GetValue (ClassName, "ABBREV")
+		HLAClassTable = "lu" + HLAAbbrTable.GetValue (ClassName, "ABBREV")
 
 		# actually load the table
 		HLAClassTable = GemRB.LoadTable (HLAClassTable)

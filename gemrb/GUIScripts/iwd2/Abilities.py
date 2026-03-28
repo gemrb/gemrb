@@ -122,11 +122,7 @@ def OpenAbilitiesWindow(chargen, points):
 	if chargen:
 		Kit = GemRB.GetVar("Class Kit")
 		Class = GemRB.GetVar("Class")-1
-		if Kit == 0:
-			KitName = CommonTables.Classes.GetRowName(Class)
-		else:
-			#rowname is just a number, first value row what we need here
-			KitName = CommonTables.KitList.GetValue(Kit, 0)
+		KitName = GUICommon.GetKitRowName (GemRB.GetVar ("Slot"), True, Kit)
 
 		Abclasrq = GemRB.LoadTable("ABCLASRQ")
 		KitIndex = Abclasrq.GetRowIndex(KitName)

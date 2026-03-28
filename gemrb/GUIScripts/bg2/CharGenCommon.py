@@ -185,11 +185,7 @@ def DisplayOverview(step):
 			SkillTable = GemRB.LoadTable ("skills")
 			RangerSkills = CommonTables.ClassSkills.GetValue (ClassName, "RANGERSKILL")
 			BardSkills = CommonTables.ClassSkills.GetValue (ClassName, "BARDSKILL")
-			KitName = GUICommon.GetKitIndex (MyChar)
-			if KitName == 0:
-				KitName = ClassName
-			else:
-				KitName = CommonTables.KitList.GetValue (KitName, 0)
+			KitName = GUICommon.GetKitRowName (MyChar)
 
 			if SkillTable.GetValue ("RATE", KitName) != -1:
 				for skill in range(SkillTable.GetRowCount () - 2):

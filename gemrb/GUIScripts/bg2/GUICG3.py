@@ -35,13 +35,7 @@ def OnLoad():
 	global MyChar
 	
 	MyChar = GemRB.GetVar ("Slot")
-	Kit = GUICommon.GetKitIndex (MyChar)
-	if Kit == 0:
-		KitName = GUICommon.GetClassRowName (MyChar)
-	else:
-		#rowname is just a number, first value row what we need here
-		KitName = CommonTables.KitList.GetValue(Kit, 0)
-
+	KitName = GUICommon.GetKitRowName (MyChar)
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
 	AlignmentWindow = GemRB.LoadWindow(3, "GUICG")

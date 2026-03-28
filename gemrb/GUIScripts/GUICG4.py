@@ -177,13 +177,8 @@ def OnLoad():
 	AllPoints18 = 0
 
 	MyChar = GemRB.GetVar ("Slot")
-	Kit = GUICommon.GetKitIndex (MyChar)
 	ClassName = GUICommon.GetClassRowName (MyChar)
-	if Kit == 0:
-		KitName = ClassName
-	else:
-		#rowname is just a number, first value row what we need here
-		KitName = CommonTables.KitList.GetValue (Kit, 0)
+	KitName = GUICommon.GetKitRowName (MyChar)
 
 	#if the class uses the warrior table for saves, then it may have the extra strength
 	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "STREXTRA", GTV_INT)

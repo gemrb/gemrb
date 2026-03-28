@@ -380,6 +380,21 @@ def GetKitIndex (actor):
 
 	return KitIndex
 
+# returns the plaintext kit name, which is in the first column
+# returns the class name for unkitted actors
+def GetKitRowName (pc, extraCheck = True, idx = -1):
+	if idx == -1:
+		KitIndex = GetKitIndex (pc)
+	else:
+		KitIndex = idx
+
+	if KitIndex and extraCheck:
+		KitRow = CommonTables.KitList.GetRowName (KitIndex)
+		KitName = CommonTables.KitList.GetValue (KitRow, "ROWNAME", GTV_STR)
+	else:
+		KitName = GetClassRowName (pc)
+	return KitName
+
 # fetches the rowname of the passed actor's (base) class from classes.2da
 # NOTE: only the "index" method is iwd2-ready, since you can have multiple classes and kits
 def GetClassRowName(value, which=-1):
@@ -591,10 +606,7 @@ def CanDualClass(actor):
 	DualClassTable = GemRB.LoadTable ("dualclas")
 	ClassName = GetClassRowName(actor)
 	KitIndex = GetKitIndex (actor)
-	if KitIndex == 0:
-		ClassTitle = ClassName
-	else:
-		ClassTitle = CommonTables.KitList.GetValue (KitIndex, 0, GTV_STR)
+	ClassTitle = GetKitRowName (actor, True, KitIndex)
 	Row = DualClassTable.GetRowIndex (ClassTitle)
 	if Row == None and KitIndex > 0:
 		# retry with the baseclass in case the kit/school is missing (eg. wildmages)
@@ -704,10 +716,11 @@ def IsWarrior (actor):
 # set MAGESCHOOL to mage school (kit) index
 def UpdateMageSchool(pc):
 	GemRB.SetVar ("MAGESCHOOL", 0)
-	Kit = GetKitIndex (pc)
-	if Kit and CommonTables.KitList.GetValue (Kit, 7) == 1:
-		MageTable = GemRB.LoadTable ("magesch")
-		GemRB.SetVar ("MAGESCHOOL", MageTable.GetRowIndex (CommonTables.KitList.GetValue (Kit, 0, GTV_STR)))
+	KitIndex = GetKitIndex (pc)
+	KitName = GetKitRowName (pc, True, KitIndex)
+	if KitIndex and GemRB.GetPlayerStat (pc, IE_CLASS) == 1:
+		MageTable = GemRB.LoadTable ("magesch", False, True)
+		GemRB.SetVar ("MAGESCHOOL", MageTable.GetRowIndex (KitName))
 
 def SetCurrentDateTokens (stat, plural=False):
 	# NOTE: currentTime is in seconds, joinTime is in seconds * 15

@@ -123,12 +123,8 @@ def DualClassWindow ():
 	DCLabel.SetText (GemRB.GetPlayerName (pc, 0))
 
 	# class name
-	Kit = GUICommon.GetKitIndex (pc)
 	OldClassName = GUICommon.GetClassRowName (pc)
-	if Kit:
-		OldKitName = CommonTables.KitList.GetValue (Kit, 0, GTV_STR)
-	else:
-		OldKitName = OldClassName
+	OldKitName = GUICommon.GetKitRowName (pc)
 	DCLabel = DCMainWindow.GetControl (0x10000009)
 	DCLabel.SetText (GUICommon.GetActorClassTitle (pc))
 
