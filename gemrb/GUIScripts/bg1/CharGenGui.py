@@ -202,9 +202,10 @@ def getSkills(TextAreaControl):
 
 	if SkillPtsTable.GetValue (KitName, "LEVEL_POINTS") != 0 or BardSkills != "*" or RangerSkills != "*":
 		for skill in range(SkillTable.GetRowCount ()):
-			name = SkillTable.GetValue (skill, 1, GTV_REF)
-			stat = SkillTable.GetValue (skill, 2)
-			available = SkillTable.GetValue (SkillTable.GetRowName (skill), KitName)
+			skillRow = SkillTable.GetRowName (skill)
+			name = SkillTable.GetValue (skillRow, "CAP_REF", GTV_REF)
+			available = SkillTable.GetValue (skillRow, KitName, GTV_INT)
+			statID = SkillTable.GetValue (skillRow, "ID", GTV_INT)
 			value = GemRB.GetPlayerStat (MyChar, stat)
 			if value >= 0 and available != -1:
 				info += name + ": " + str(value) + "\n"

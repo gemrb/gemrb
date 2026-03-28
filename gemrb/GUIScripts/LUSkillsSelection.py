@@ -329,13 +329,13 @@ def SkillsRedraw (direction=0):
 
 		#show the current skills name
 		Pos = SkillsIndices[GemRB.GetVar ("SkillsTopIndex") + i]
-		SkillName = SkillsTable.GetValue (SkillsTable.GetRowName (Pos), "CAP_REF")
+		SkillRowName = SkillsTable.GetRowName (Pos)
+		SkillName = SkillsTable.GetValue (SkillRowName, "CAP_REF")
 		Label = SkillsWindow.GetControl (0x10000000+SkillsOffsetName+(i*SkillsLabelIncrement))
 		Label.SetText (SkillName)
 
 		#enable/disable the button if we can(not) get the skills
-		SkillName = SkillsTable.GetRowName (Pos)
-		Ok = SkillsTable.GetValue (SkillName, SkillsKitName) and SkillsAssignable
+		Ok = SkillsTable.GetValue (SkillRowName, SkillsKitName) and SkillsAssignable
 		Button1 = SkillsWindow.GetControlAlias ("PLUSBTN" + str(i))
 		Button2 = SkillsWindow.GetControlAlias ("MINUSBTN" + str(i))
 		if not Ok:

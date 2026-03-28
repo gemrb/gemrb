@@ -452,15 +452,17 @@ def SetCharacterDescription():
 			TextArea.Append (8442)
 			TextArea.Append ("\n")
 			for i in range (4):
-				TextArea.Append (SkillsTable.GetValue (i, 2))
-				StatID = SkillsTable.GetValue (i, 3)
+				SkillRow = SkillTable.GetRowName (i)
+				TextArea.Append (SkillsTable.GetValue (SkillRow, "CAP_REF"))
+				StatID = SkillsTable.GetValue (SkillRow, "ID")
 				TextArea.Append (": " )
 				TextArea.Append (str(GemRB.GetPlayerStat (MyChar, StatID)) )
 				TextArea.Append ("%\n")
 		elif DruidSpell!="*":
 			PositiveStats = []
 			for i in range (4):
-				StatID = SkillsTable.GetValue (i, 3)
+				SkillRow = SkillTable.GetRowName (i)
+				StatID = SkillsTable.GetValue (SkillRow, "ID")
 				Stat = GemRB.GetPlayerStat (MyChar, StatID)
 				if Stat>0:
 					PositiveStats.append ((i, Stat))
@@ -469,7 +471,8 @@ def SetCharacterDescription():
 				TextArea.Append (8442)
 				TextArea.Append ("\n")
 				for i, Stat in PositiveStats:
-					TextArea.Append (SkillsTable.GetValue (i, 2))
+					SkillRow = SkillTable.GetRowName (i)
+					TextArea.Append (SkillsTable.GetValue (SkillRow, "CAP_REF"))
 					TextArea.Append (": " )
 					TextArea.Append (str(Stat) )
 					TextArea.Append ("%\n")
@@ -486,10 +489,11 @@ def SetCharacterDescription():
 			TextArea.Append (8442)
 			TextArea.Append ("\n")
 			for i in range (4):
-				StatID = SkillsTable.GetValue (i, 3)
+				SkillRow = SkillTable.GetRowName (i)
+				StatID = SkillsTable.GetValue (SkillRow, "ID")
 				Stat = GemRB.GetPlayerStat (MyChar, StatID)
 				if Stat>0:
-					TextArea.Append (SkillsTable.GetValue (i, 2))
+					TextArea.Append (SkillsTable.GetValue (SkillRow, "CAP_REF"))
 					TextArea.Append (": " )
 					TextArea.Append (str(Stat) )
 					TextArea.Append ("%\n")
