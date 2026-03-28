@@ -1,0 +1,21 @@
+2DA V1.0
+0
+                 DAMAGE_RIGHT     DAMAGE_LEFT      THAC0_RIGHT      THAC0_LEFT       AC_BASE          AC_MISSILE       SPEED            CRITICALROLL
+TWOHANDED-0      0                0                0                0                0                0                0                0
+SINGLEWEAPON-0   0                0                0                0                0                0                0                0
+SWORDANDSHIELD-0 0                0                0                0                0                0                0                0
+TWOWEAPON-0      0                0                4                8                0                0                0                0
+TWOHANDED-1      1                0                0                0                0                0                -2               1
+SINGLEWEAPON-1   0                0                0                0                -1               0                0                1
+SWORDANDSHIELD-1 0                0                0                0                0                -2               0                0
+TWOWEAPON-1      0                0                2                6                0                0                0                0
+TWOHANDED-2      1                0                0                0                0                0                -4               1
+SINGLEWEAPON-2   0                0                0                0                -2               0                0                1
+SWORDANDSHIELD-2 0                0                0                0                0                -4               0                0
+TWOWEAPON-2      0                0                0                4                0                0                0                0
+TWOWEAPON-3      0                0                0                2                0                0                0                0
+
+# Description: This table lists the benefits for points in weapon proficiencies. (BG2-specific)
+#
+# Columns - bonuses to stats
+# Rows - proficiencies and their levels

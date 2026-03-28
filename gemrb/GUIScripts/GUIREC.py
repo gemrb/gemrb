@@ -653,12 +653,13 @@ def GetWeaponStyleBonuses(pc, cdet):
 		wstyle = cdet["Style"] # equipped weapon style + 1000 * proficiency level
 		profcount = wstyle // 1000
 		if profcount:
-			wstyletables = { IE_PROFICIENCY2WEAPON:"wstwowpn", IE_PROFICIENCY2HANDED:"wstwohnd", IE_PROFICIENCYSINGLEWEAPON:"wssingle", IE_PROFICIENCYSWORDANDSHIELD:"wsshield" }
-			bonusrefs = { "THAC0BONUSRIGHT":56911, "THAC0BONUSLEFT":56910, "DAMAGEBONUS":10336, "CRITICALHITBONUS":32140, "PHYSICALSPEED":32141, "AC":10339, "ACVSMISSLE":10340 }
-			WStyleTable = GemRB.LoadTable (wstyletables[wstyle % 1000])
+			wStyles = { IE_PROFICIENCY2WEAPON:"TWOWEAPON", IE_PROFICIENCY2HANDED:"TWOHANDED", IE_PROFICIENCYSINGLEWEAPON:"SINGLEWEAPON", IE_PROFICIENCYSWORDANDSHIELD:"SWORDANDSHIELD" }
+			bonusrefs = { "THAC0_RIGHT":56911, "THAC0_LEFT":56910, "DAMAGE_RIGHT":10336, "DAMAGE_LEFT":10336, "CRITICALROLL":32140, "SPEED":32141, "AC_BASE":10339, "AC_MISSILE":10340 }
+			WStyleTable = GemRB.LoadTable ("stylbonu", False, True)
 			for col in range(WStyleTable.GetColumnCount()):
 				colName = WStyleTable.GetColumnName (col);
-				value = WStyleTable.GetValue (str(profcount), colName, GTV_INT)
+				stat = cdet["Style"] % 1000
+				value = WStyleTable.GetValue ("%s-%s" % (wStyles[stat], profcount), colName, GTV_INT)
 				stats.append ((bonusrefs[colName], value, ''))
 		stats.append ("\n")
 	return GUIRECCommon.TypeSetStats (stats, pc)

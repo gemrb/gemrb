@@ -864,34 +864,23 @@ int GameData::GetMonkBonus(int bonusType, int level)
 	return monkBon->QueryFieldSigned<int>(bonusType, level - 1);
 }
 
-// AC  CRITICALHITBONUS   DAMAGEBONUS   THAC0BONUSRIGHT   THAC0BONUSLEFT   PHYSICALSPEED   ACVSMISSLE
-int GameData::GetWeaponStyleBonus(int style, int stars, int bonusType)
+int GameData::GetWeaponStyleBonus(WS style, int stars, WSB bonusType)
 {
-	if (stars == 0) return 0;
-
-	static std::array<ResRef, 4> weaponStyles = { "wstwowpn", "wstwohnd", "wsshield", "wssingle" };
-	static std::array<short, 4> ignore = { 0 };
-	if (ignore[style] == 1) {
+	static uint8_t ignore = 0;
+	if (ignore == 1 || style == WS::None) {
 		return 0;
 	}
 
-	if (ignore[style] == 0) {
-		AutoTable styleTable = LoadTable(weaponStyles[style]);
-		if (!styleTable) {
-			ignore[style] = 1;
-			return 0;
-		}
-
-		TableMgr::index_t cols = styleTable->GetColumnCount();
-		for (int star = 0; star <= STYLE_STAR_MAX; star++) {
-			for (TableMgr::index_t bonus = 0; bonus < cols; bonus++) {
-				weaponStyleBoni[style][star][bonus] = styleTable->QueryFieldSigned<int>(star, bonus);
-			}
-		}
-		ignore[style] = 2;
+	static AutoTable styleTable = LoadTable("stylbonu", true);
+	if (!styleTable) {
+		ignore = 1;
+		return 0;
 	}
 
-	return weaponStyleBoni[style][stars][bonusType];
+	EnumArray<WS, std::string> styleNames { "", "TWOHANDED", "SINGLEWEAPON", "SWORDANDSHIELD", "TWOWEAPON" };
+	EnumArray<WSB, std::string> bonusNames { "DAMAGE_RIGHT", "DAMAGE_LEFT", "THAC0_RIGHT", "THAC0_LEFT", "AC_BASE", "AC_MISSILE", "SPEED", "CRITICALROLL" };
+	std::string rowName = fmt::format("{}-{}", styleNames[style], stars);
+	return styleTable->QueryFieldSigned<int>(rowName, bonusNames[bonusType]);
 }
 
 int GameData::GetWSpecialBonus(int bonusType, int stars)

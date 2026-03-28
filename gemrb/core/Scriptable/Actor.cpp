@@ -6876,19 +6876,20 @@ int Actor::GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, i
 		return prof;
 	}
 
-	int styleIdx = -1;
+	WS styleIdx = WS::None;
 	int stars = 0;
 	if (dualWielding) {
 		// add dual wielding penalty
 		stars = GetStars(IE_PROFICIENCY2WEAPON);
 		style = 1000 * stars + IE_PROFICIENCY2WEAPON;
-		styleIdx = 0;
-		prof += gamedata->GetWeaponStyleBonus(0, stars, leftOrRight ? 4 : 3);
+		styleIdx = WS::TwoWeapons;
+		prof += gamedata->GetWeaponStyleBonus(styleIdx, stars, leftOrRight ? WSB::THAC0Left : WSB::THAC0Right);
+		damageBonus += gamedata->GetWeaponStyleBonus(styleIdx, stars, leftOrRight ? WSB::DamageLeft : WSB::DamageRight);
 	} else if (wi.itemflags & IE_INV_ITEM_TWOHANDED && wi.wflags & WEAPON_MELEE) {
 		// add two handed profs bonus
 		stars = GetStars(IE_PROFICIENCY2HANDED);
 		style = 1000 * stars + IE_PROFICIENCY2HANDED;
-		styleIdx = 1;
+		styleIdx = WS::TwoHanded;
 	} else if (wi.wflags & WEAPON_MELEE) {
 		int slot;
 		const CREItem* weapon = inventory.GetUsedWeapon(true, slot);
@@ -6896,24 +6897,25 @@ int Actor::GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, i
 			// no weapon means no shield slot
 			stars = GetStars(IE_PROFICIENCYSINGLEWEAPON);
 			style = 1000 * stars + IE_PROFICIENCYSINGLEWEAPON;
-			styleIdx = 3;
+			styleIdx = WS::SingleWeapon;
 		} else {
 			// sword and shield
 			stars = GetStars(IE_PROFICIENCYSWORDANDSHIELD);
 			style = 1000 * stars + IE_PROFICIENCYSWORDANDSHIELD;
-			styleIdx = 2;
+			styleIdx = WS::SwordAndShield;
 		}
 	} else {
 		// ranged - no bonus
 	}
 
-	if (styleIdx != -1) {
-		damageBonus += gamedata->GetWeaponStyleBonus(styleIdx, stars, 2);
-		speedBonus += gamedata->GetWeaponStyleBonus(styleIdx, stars, 5);
-		criticalBonus = gamedata->GetWeaponStyleBonus(styleIdx, stars, 1);
-		if (styleIdx != 0) {
+	if (styleIdx != WS::None) {
+		damageBonus += gamedata->GetWeaponStyleBonus(styleIdx, stars, WSB::DamageLeft);
+		speedBonus += gamedata->GetWeaponStyleBonus(styleIdx, stars, WSB::Speed);
+		criticalBonus = gamedata->GetWeaponStyleBonus(styleIdx, stars, WSB::CriticalRoll);
+		if (styleIdx != WS::TwoWeapons) {
 			// right hand bonus; dualwielding was already considered above
-			prof += gamedata->GetWeaponStyleBonus(styleIdx, stars, 3);
+			prof += gamedata->GetWeaponStyleBonus(styleIdx, stars, WSB::THAC0Right);
+			damageBonus += gamedata->GetWeaponStyleBonus(styleIdx, stars, WSB::DamageRight);
 		}
 	}
 
@@ -6988,7 +6990,7 @@ bool Actor::GetCombatDetails(int& toHit, bool leftOrRight, int& damageBonus,
 
 	//pst increased critical hits
 	if (pstflags && (Modified[IE_STATE_ID] & STATE_CRIT_ENH)) {
-		criticalBonus--;
+		criticalBonus++;
 	}
 	return true;
 }
@@ -7163,11 +7165,11 @@ int Actor::GetDefense(int headerDamageType, ieDword wflags, const Actor* attacke
 			if (inventory.GetUsedWeapon(true, slot) == NULL) {
 				//single-weapon style applies to all ac
 				stars = GetStars(IE_PROFICIENCYSINGLEWEAPON);
-				defense += gamedata->GetWeaponStyleBonus(3, stars, 0);
+				defense += gamedata->GetWeaponStyleBonus(WS::SingleWeapon, stars, WSB::ACBase);
 			} else if (ConvertDamageType(headerDamageType) == DAMAGE_MISSILE) {
 				//sword-shield style applies only to missile ac
 				stars = GetStars(IE_PROFICIENCYSWORDANDSHIELD);
-				defense += gamedata->GetWeaponStyleBonus(2, stars, 6);
+				defense += gamedata->GetWeaponStyleBonus(WS::SwordAndShield, stars, WSB::ACMissile);
 			}
 		}
 	}
@@ -7435,13 +7437,13 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	// iwd2 rerolls to check for criticals (cf. manual page 45) - the second roll just needs to hit; on miss, it degrades to a normal hit
-	// CriticalBonus is negative, it is added to the minimum roll needed for a critical hit
+	// CriticalBonus is positive, it is added to the minimum roll needed for a critical hit
 	// IE_CRITICALHITBONUS is positive, it is subtracted
 	int roll = LuckyRoll(1, attackRollDiceSides, 0, LR_CRITICAL);
-	int criticalroll = roll + (int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus;
+	int criticalroll = roll + (int) GetStat(IE_CRITICALHITBONUS) + CriticalBonus;
 	if (third) {
 		int ThreatRangeMin = wi.critrange;
-		ThreatRangeMin -= ((int) GetStat(IE_CRITICALHITBONUS) - CriticalBonus);
+		ThreatRangeMin -= ((int) GetStat(IE_CRITICALHITBONUS));
 		criticalroll = LuckyRoll(1, attackRollDiceSides, 0, LR_CRITICAL);
 		if (criticalroll < ThreatRangeMin || GetStat(IE_SPECFLAGS) & SPECF_CRITIMMUNITY) {
 			// make it an ordinary hit

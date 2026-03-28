@@ -79,6 +79,29 @@ struct SurgeSpell {
 	ieStrRef message;
 };
 
+// weapon styles and bonuses
+enum class WS : uint16_t {
+	None,
+	TwoHanded,
+	SingleWeapon,
+	SwordAndShield,
+	TwoWeapons,
+
+	count
+};
+enum class WSB : uint16_t {
+	DamageRight,
+	DamageLeft,
+	THAC0Left,
+	THAC0Right,
+	ACBase,
+	ACMissile,
+	Speed,
+	CriticalRoll,
+
+	count
+};
+
 // item usability array
 struct ItemUseType {
 	ResRef table; // which table contains the stat usability flags
@@ -180,7 +203,7 @@ public:
 	const IWDIDSEntry& GetSpellProt(index_t idx);
 	ResRef GetFist(int cls, int level);
 	int GetMonkBonus(int bonusType, int level);
-	int GetWeaponStyleBonus(int style, int stars, int bonusType);
+	int GetWeaponStyleBonus(WS style, int stars, WSB bonusType);
 	int GetWSpecialBonus(int bonusType, int stars);
 	const std::vector<int>& GetBonusSpells(int ability);
 	ieByte GetItemAnimation(const ResRef& itemRef);
@@ -219,8 +242,6 @@ private:
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax {};
-	// 4 styles and 4 star levels, 7 bonus types
-	std::array<std::array<std::array<int, 7>, 4>, 4> weaponStyleBoni {};
 	ResRefMap<ieByte> itemAnims;
 	std::vector<ItemUseType> itemUse;
 

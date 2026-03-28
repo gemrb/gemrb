@@ -819,18 +819,16 @@ def DisplayAC (pc, window, labelID):
 	Label.SetTooltip (17183)
 
 def GetACStyleBonus (pc):
-	stars = GemRB.GetPlayerStat(pc, IE_PROFICIENCYSINGLEWEAPON) & 0x7
-	if not stars:
-		return 0
-
-	WStyleTable = GemRB.LoadTable ("wssingle", 1)
+	WStyleTable = GemRB.LoadTable ("stylbonu", True, True)
 	if not WStyleTable:
 		return 0
-	# are we actually single-wielding?
+	wStyles = { IE_PROFICIENCY2WEAPON:"TWOWEAPON", IE_PROFICIENCY2HANDED:"TWOHANDED", IE_PROFICIENCYSINGLEWEAPON:"SINGLEWEAPON", IE_PROFICIENCYSWORDANDSHIELD:"SWORDANDSHIELD" }
 	cdet = GemRB.GetCombatDetails (pc, 0)
-	if cdet["Style"] % 1000 != IE_PROFICIENCYSINGLEWEAPON:
+	stat = cdet["Style"] % 1000
+	stars = cdet["Style"] // 1000
+	if stat == 0:
 		return 0
-	return WStyleTable.GetValue (str(stars), "AC", GTV_INT)
+	return WStyleTable.GetValue ("%s-%s" % (wStyles[stat], stars), "AC", GTV_INT)
 
 def AddDefaultVoiceSet (VoiceList, Voices):
 	if GameCheck.IsBG1 () or GameCheck.IsBG2OrEE ():
