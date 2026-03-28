@@ -49,7 +49,7 @@ SkillsLabelIncrement = 1
 #internal variables
 SkillsIndices = []
 SkillPointsLeft = 0
-SkillsTable = 0
+SkillsTable = GemRB.LoadTable ("skills", True, True)
 SkillsOldPos = 0
 SkillsClickCount = 0
 SkillsOldDirection = 0
@@ -62,7 +62,7 @@ SkillsAssignable = 0
 def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0, scroll=True):
 	global SkillsWindow, SkillsCallback, SkillsOffsetPress, SkillsOffsetName
 	global SkillsOffsetPoints, SkillsOffsetSum, SkillsIndices, SkillPointsLeft
-	global SkillsTable, SkillsOldPos, SkillsClickCount, SkillsOldDirection, SkillsNumButtons
+	global SkillsOldPos, SkillsClickCount, SkillsOldDirection, SkillsNumButtons
 	global SkillsTextArea, SkillsKitName, SkillsAssignable, SkillsLabelIncrement
 
 	#reset some basic values
@@ -74,7 +74,6 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	SkillsClickCount = 0
 	SkillsOldDirection = 0
 	SkillsAssignable = 0
-	SkillsTable = GemRB.LoadTable ("skills")
 	SkillPointsLeft = 0
 	GemRB.SetVar ("SkillPointsLeft", 0)
 	SkillsNullify ()
@@ -414,10 +413,6 @@ def SkillIncreasePress (btn):
 
 # saves all the skills
 def SkillsSave (pc):
-	global SkillsTable
-	if not SkillsTable:
-		SkillsTable = GemRB.LoadTable ("skills")
-
 	for i in range(SkillsTable.GetRowCount ()):
 		SkillName = SkillsTable.GetRowName (i)
 		SkillID = SkillsTable.GetValue (SkillName, "ID")
@@ -426,10 +421,6 @@ def SkillsSave (pc):
 			GemRB.SetPlayerStat (pc, SkillID, SkillValue)
 
 def SkillsNullify (pc = None):
-	global SkillsTable
-	if not SkillsTable:
-		SkillsTable = GemRB.LoadTable ("skills")
-
 	for i in range(SkillsTable.GetRowCount()):
 		GemRB.SetVar ("Skill "+str(i), 0)
 		GemRB.SetVar ("SkillBase "+str(i), 0)

@@ -78,7 +78,7 @@ AbilitiesTable = 0
 
 SkillsButton = 0
 SkillsWindow = 0
-SkillsTable = 0
+SkillsTable = GemRB.LoadTable ("skills", False, True)
 SkillsTextArea = 0
 SkillsDoneButton = 0
 SkillsPointsLeft = 0
@@ -138,14 +138,13 @@ def OnLoad():
 	global GenderButton, RaceButton, ClassButton, AlignmentButton
 	global AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
 	global KitTable, ProficienciesTable, RacialEnemyTable
-	global AbilitiesTable, SkillsTable, PortraitsTable
+	global AbilitiesTable, PortraitsTable
 	global MyChar, ImportedChar
 
 	KitTable = GemRB.LoadTable ("magesch")
 	ProficienciesTable = GemRB.LoadTable ("weapprof")
 	RacialEnemyTable = GemRB.LoadTable ("haterace")
 	AbilitiesTable = GemRB.LoadTable ("ability")
-	SkillsTable = GemRB.LoadTable ("skills")
 	PortraitsTable = GemRB.LoadTable ("pictures")
 	CharGenWindow = GemRB.LoadWindow (0, "GUICG")
 	CharGenState = 0
