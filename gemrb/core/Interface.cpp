@@ -588,7 +588,8 @@ Interface::Interface(CoreSettings&& cfg)
 		fs = FileStream::OpenFile(tINIparty);
 
 		if (!fs || !INIparty->Open(std::unique_ptr<DataStream> { fs })) {
-			Log(WARNING, "Core", "Failed to load precreated teams.");
+			Log(ERROR, "Core", "Failed to load precreated teams.");
+			Log(ERROR, "Core", "It seems you did not install iwd2 fully, expect problems!");
 		}
 	}
 
