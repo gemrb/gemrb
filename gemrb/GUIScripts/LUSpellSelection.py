@@ -73,7 +73,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	global KitMask, EnhanceGUI, Memorization, SpellBookType, SpellsPickButton, ButtonCount, Class
 
 	#enhance GUI?
-	if not IWD2:
+	if not IWD2 and not GameCheck.IsAnyEE ():
 		EnhanceGUI = 1
 
 	# save our pc
@@ -118,7 +118,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			CharOverview.PositionCharGenWin (SpellsWindow)
 
 		DoneButton = SpellsWindow.GetControl (0)
-		SpellsTextArea = SpellsWindow.GetControl (41 if GameCheck.IsBG2EE() else 27)
+		SpellsTextArea = SpellsWindow.GetControl (41 if GameCheck.IsAnyEE() else 27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
 		if (EnhanceGUI):
 			sb = SpellsWindow.CreateScrollBar (NewScrollBarID, {'x' : 325, 'y' : 42, 'w' : 16, 'h' : 252})
@@ -145,6 +145,11 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			DoneButton = SpellsWindow.GetControl (33)
 			SpellsTextArea = SpellsWindow.GetControl(30)
 			SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000022)
+		elif GameCheck.IsAnyEE ():
+			NewScrollBarID = 40
+			DoneButton = SpellsWindow.GetControl (42)
+			SpellsTextArea = SpellsWindow.GetControl(41)
+			SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
 		else:
 			DoneButton = SpellsWindow.GetControl (28)
 			SpellsTextArea = SpellsWindow.GetControl(26)
@@ -693,7 +698,7 @@ def RowIndex ():
 		return ( SpellTopIndex + 1 ) * 6 - 6
 	elif IWD2: # 30 during level-up
 		return ( SpellTopIndex + 1 ) * 6 - 6
-	elif EnhanceGUI:
+	elif EnhanceGUI or GameCheck.IsAnyEE ():
 		return ( SpellTopIndex + 1 ) * 5 - 5
 	else:
 		return SpellTopIndex
@@ -701,7 +706,7 @@ def RowIndex ():
 def ExtraSpellButtons ():
 	"""Determines if extra spell slots are available. """
 
-	if EnhanceGUI and (not chargen):
+	if (EnhanceGUI or GameCheck.IsAnyEE ()) and not chargen:
 		return 1
 	else:
 		return 0
