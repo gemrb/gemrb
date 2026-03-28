@@ -218,9 +218,8 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		#SkillsKitName should be fine as all multis are in classes.2da
 		#also allows for thief kits
 		SkillsAssignable = 1
-		for i in range(SkillsTable.GetRowCount()-2):
-			# -2/+2 to compensate for the special first_level and rate rows
-			SkillName = SkillsTable.GetRowName (i+2)
+		for i in range(SkillsTable.GetRowCount()):
+			SkillName = SkillsTable.GetRowName (i)
 			if SkillsTable.GetValue (SkillName, SkillsKitName) is not None:
 				SkillsIndices.append(i)
 
@@ -239,9 +238,8 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 			SkillPointsLeft = 0
 		else:
 			#get the skill values
-			for i in range(SkillsTable.GetRowCount()-2):
-				# -2/+2 to compensate for the special first_level and rate rows
-				SkillName = SkillsTable.GetRowName (i+2)
+			for i in range(SkillsTable.GetRowCount()):
+				SkillName = SkillsTable.GetRowName (i)
 				SkillID = SkillsTable.GetValue (SkillName, "ID")
 				SkillValue = GemRB.GetPlayerStat (pc, SkillID)
 				BaseSkillValue = GemRB.GetPlayerStat (pc, SkillID, 1)
@@ -274,7 +272,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 			for skill in range(SpecialSkillsTable.GetColumnCount ()):
 				skillname = SpecialSkillsTable.GetColumnName (skill)
 				value = SpecialSkillsTable.GetValue (str(level2[skills[1]]), skillname)
-				skillindex = SkillsTable.GetRowIndex (skillname) - 2
+				skillindex = SkillsTable.GetRowIndex (skillname)
 				GemRB.SetVar ("Skill " + str(skillindex), value)
 				SkillsIndices.append(skillindex)
 
@@ -288,8 +286,8 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	#skills scrollbar
 	if len(SkillsIndices) > SkillsNumButtons:
 		ScrollBar.OnChange (lambda: SkillsRedraw())
-		#decrease it with the number of controls on screen (list size) and two unrelated rows
-		maxvalue = SkillsTable.GetRowCount() - SkillsNumButtons - 2
+		#decrease it with the number of controls on screen (list size)
+		maxvalue = SkillsTable.GetRowCount() - SkillsNumButtons
 		ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, maxvalue)
 		Button = SkillsWindow.GetControl(SkillsOffsetPress)
 		AddScrollbarProxy(SkillsWindow, ScrollBar, Button)
@@ -332,12 +330,12 @@ def SkillsRedraw (direction=0):
 
 		#show the current skills name
 		Pos = SkillsIndices[GemRB.GetVar ("SkillsTopIndex") + i]
-		SkillName = SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "CAP_REF")
+		SkillName = SkillsTable.GetValue (SkillsTable.GetRowName (Pos), "CAP_REF")
 		Label = SkillsWindow.GetControl (0x10000000+SkillsOffsetName+(i*SkillsLabelIncrement))
 		Label.SetText (SkillName)
 
 		#enable/disable the button if we can(not) get the skills
-		SkillName = SkillsTable.GetRowName (Pos+2)
+		SkillName = SkillsTable.GetRowName (Pos)
 		Ok = SkillsTable.GetValue (SkillName, SkillsKitName) and SkillsAssignable
 		Button1 = SkillsWindow.GetControlAlias ("PLUSBTN" + str(i))
 		Button2 = SkillsWindow.GetControlAlias ("MINUSBTN" + str(i))
@@ -368,14 +366,14 @@ def SkillsRedraw (direction=0):
 
 def SkillJustPress (btn):
 	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos + 2), "DESC_REF", GTV_INT))
+	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos), "DESC_REF", GTV_INT))
 	return
 
 def SkillDecreasePress (btn):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
 	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
-	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos + 2), "DESC_REF", GTV_INT))
+	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos), "DESC_REF", GTV_INT))
 	ActPoint = GemRB.GetVar("Skill " + str(Pos))
 	BasePoint = GemRB.GetVar("SkillBase "+str(Pos) )
 	if ActPoint <= 0 or ActPoint <= BasePoint:
@@ -395,7 +393,7 @@ def SkillIncreasePress (btn):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
 	Pos = btn.Value + GemRB.GetVar ("SkillsTopIndex")
-	Description = SkillsTable.GetValue (SkillsTable.GetRowName (Pos + 2), "DESC_REF", GTV_INT)
+	Description = SkillsTable.GetValue (SkillsTable.GetRowName (Pos), "DESC_REF", GTV_INT)
 	if Description != "-1":
 		SkillsTextArea.SetText (Description)
 	if SkillPointsLeft == 0:
@@ -420,8 +418,8 @@ def SkillsSave (pc):
 	if not SkillsTable:
 		SkillsTable = GemRB.LoadTable ("skills")
 
-	for i in range(SkillsTable.GetRowCount() - 2):
-		SkillName = SkillsTable.GetRowName (i+2)
+	for i in range(SkillsTable.GetRowCount ()):
+		SkillName = SkillsTable.GetRowName (i)
 		SkillID = SkillsTable.GetValue (SkillName, "ID")
 		SkillValue = (GemRB.GetVar ("Skill " + str(i)) or 0) - (GemRB.GetVar("SkillDisplayMod " + str(i)) or 0)
 		if SkillValue > 0:
@@ -432,11 +430,11 @@ def SkillsNullify (pc = None):
 	if not SkillsTable:
 		SkillsTable = GemRB.LoadTable ("skills")
 
-	for i in range(SkillsTable.GetRowCount()-2):
+	for i in range(SkillsTable.GetRowCount()):
 		GemRB.SetVar ("Skill "+str(i), 0)
 		GemRB.SetVar ("SkillBase "+str(i), 0)
 		if pc:
-			SkillName = SkillsTable.GetRowName (i+2)
+			SkillName = SkillsTable.GetRowName (i)
 			SkillID = SkillsTable.GetValue (SkillName, "ID")
 			GemRB.SetPlayerStat (pc, SkillID, 0)
 

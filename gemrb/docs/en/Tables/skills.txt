@@ -1,5 +1,5 @@
 Description: This table is used by the character generator (and when leveling up).
-It lists the thieving skills. The first two rows contain the distributable points per level.
+It lists the thieving skills.
 
 Columns - rogue classes or kits
 

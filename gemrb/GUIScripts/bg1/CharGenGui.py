@@ -173,12 +173,12 @@ def getMageSpells(TextAreaControl):
 
 def guardSkills():
 	SkillTable = GemRB.LoadTable("skills")
-	RowCount = SkillTable.GetRowCount()-2
+	RowCount = SkillTable.GetRowCount()
 
 	MyChar = GemRB.GetVar ("Slot")
 	KitName = GUICommon.GetKitRowName (MyChar, not GUICommon.IsMultiClassed (MyChar, 0))
 	for i in range(RowCount):
-		SkillName = SkillTable.GetRowName(i+2)
+		SkillName = SkillTable.GetRowName(i)
 		if SkillTable.GetValue(SkillName, KitName)==1:
 			return True
 
@@ -200,10 +200,10 @@ def getSkills(TextAreaControl):
 	KitName = GUICommon.GetKitRowName (MyChar)
 
 	if SkillTable.GetValue ("RATE", KitName) != -1 or BardSkills != "*" or RangerSkills != "*":
-		for skill in range(SkillTable.GetRowCount () - 2):
-			name = SkillTable.GetValue (skill+2, 1, GTV_REF)
-			stat = SkillTable.GetValue (skill + 2, 2)
-			available = SkillTable.GetValue (SkillTable.GetRowName (skill+2), KitName)
+		for skill in range(SkillTable.GetRowCount ()):
+			name = SkillTable.GetValue (skill, 1, GTV_REF)
+			stat = SkillTable.GetValue (skill, 2)
+			available = SkillTable.GetValue (SkillTable.GetRowName (skill), KitName)
 			value = GemRB.GetPlayerStat (MyChar, stat)
 			if value >= 0 and available != -1:
 				info += name + ": " + str(value) + "\n"

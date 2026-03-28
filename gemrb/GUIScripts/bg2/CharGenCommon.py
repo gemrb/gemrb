@@ -188,17 +188,17 @@ def DisplayOverview(step):
 			KitName = GUICommon.GetKitRowName (MyChar)
 
 			if SkillTable.GetValue ("RATE", KitName) != -1:
-				for skill in range(SkillTable.GetRowCount () - 2):
-					name = SkillTable.GetValue (skill+2, 1, GTV_REF)
-					available = SkillTable.GetValue (SkillTable.GetRowName (skill+2), KitName)
-					statID = SkillTable.GetValue (skill+2, 2)
+				for skill in range(SkillTable.GetRowCount ()):
+					name = SkillTable.GetValue (skill, 1, GTV_REF)
+					available = SkillTable.GetValue (SkillTable.GetRowName (skill), KitName)
+					statID = SkillTable.GetValue (skill, 2)
 					value = GemRB.GetPlayerStat (MyChar, statID, 1)
 					if value >= 0 and available != -1:
 						info += name + ": " + str(value) + "\n"
 			elif BardSkills != "*" or RangerSkills != "*":
-				for skill in range(SkillTable.GetRowCount () - 2):
-					name = SkillTable.GetValue (skill+2, 1, GTV_REF)
-					StatID = SkillTable.GetValue (skill+2, 2)
+				for skill in range(SkillTable.GetRowCount ()):
+					name = SkillTable.GetValue (skill, 1, GTV_REF)
+					StatID = SkillTable.GetValue (skill, 2)
 					value = GemRB.GetPlayerStat (MyChar, StatID, 1)
 					if value > 0:
 						info += name + ": " + str(value) + "\n"
