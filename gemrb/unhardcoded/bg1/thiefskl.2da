@@ -1,0 +1,10 @@
+2DA V1.0
+0
+                    START_POINTS  LEVEL_POINTS
+THIEF               30            20
+FIGHTER_THIEF       30            20
+MAGE_THIEF          30            20
+CLERIC_THIEF        30            20
+FIGHTER_MAGE_THIEF  30            20
+
+# thieving skill learning rates

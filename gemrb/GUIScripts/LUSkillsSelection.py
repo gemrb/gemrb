@@ -227,10 +227,11 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		LevelDiff = []
 		for i in range (NumClasses):
 			LevelDiff.append (level2[i]-level1[i])
+		SkillPtsTable = GemRB.LoadTable ("thiefskl", False, True)
 		if level1[SkillIndex] == 0:
-			SkillPointsLeft = SkillsTable.GetValue ("FIRST_LEVEL", SkillsKitName, GTV_INT)
+			SkillPointsLeft = SkillPtsTable.GetValue (SkillsKitName, "START_POINTS", GTV_INT)
 			LevelDiff[SkillIndex] -= 1
-		SkillPointsLeft += LevelDiff[SkillIndex] * SkillsTable.GetValue("RATE", SkillsKitName, GTV_INT)
+		SkillPointsLeft += LevelDiff[SkillIndex] * SkillPtsTable.GetValue(SkillsKitName, "LEVEL_POINTS", GTV_INT)
 		TotalSkillsAssignable = 0
 
 		if SkillPointsLeft < 0:

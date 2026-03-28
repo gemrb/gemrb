@@ -1,0 +1,14 @@
+2DA V1.0
+0
+                    START_POINTS  LEVEL_POINTS
+THIEF               40            25
+ASSASIN             40            15
+BOUNTY_HUNTER       40            20
+SWASHBUCKLER        40            25
+MONK                0             10
+FIGHTER_THIEF       40            25
+MAGE_THIEF          40            25
+CLERIC_THIEF        40            25
+FIGHTER_MAGE_THIEF  40            25
+
+# thieving skill learning rates
