@@ -3076,7 +3076,7 @@ void Actor::RefreshPCStats()
 
 	// adjust thieving skills with dex and race
 	// table header is in this order:
-	// PICK_POCKETS  OPEN_LOCKS  FIND_TRAPS  MOVE_SILENTLY  HIDE_IN_SHADOWS  DETECT_ILLUSION  SET_TRAPS
+	// (name) PICK_POCKETS  OPEN_LOCKS  FIND_TRAPS  MOVE_SILENTLY  HIDE_IN_SHADOWS  DETECT_ILLUSION  SET_TRAPS
 	Modified[IE_PICKPOCKET] += GetSkillBonus(1);
 	if (Modified[IE_RACE] == 153 && !third) { // sigh, tieflings had hardcoded bonuses instead of a table entry
 		Modified[IE_PICKPOCKET] += 20;

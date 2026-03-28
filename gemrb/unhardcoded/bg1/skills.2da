@@ -1,9 +1,9 @@
 2DA V1.0
 -1
-                DESC_REF   CAP_REF  ID   THIEF	MAGE_THIEF	FIGHTER_THIEF	CLERIC_THIEF	FIGHTER_MAGE_THIEF
-FIRST_LEVEL	*	   *	    *    40     40              40              40              40
-RATE		*	   *	    *    40	40		40		40		40
-PICK_POCKETS    9597       9463     29   1	1		1		1		1
-OPEN_LOCKS      9598       9460     26   1	1		1		1		1
-FIND_TRAPS      9599       9462     28   1	1		1		1		1
-STEALTH         9600       9461     27   1	1		1		1		1
+                DESC_REF    CAP_REF     ID  THIEF   MAGE_THIEF  FIGHTER_THIEF   CLERIC_THIEF    FIGHTER_MAGE_THIEF
+FIRST_LEVEL     *           *           *   40      40          40              40              40
+RATE            *           *           *   40      40          40              40              40
+PICK_POCKETS    9597        9463        29  1       1           1               1               1
+OPEN_LOCKS      9598        9460        26  1       1           1               1               1
+FIND_TRAPS      9599        9462        28  1       1           1               1               1
+STEALTH         9600        9461        27  1       1           1               1               1
