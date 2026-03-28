@@ -530,7 +530,11 @@ def GetStatOverview (pc):
 	#   4208 THAC0
 	stats.append ((4208, IE_TOHIT, 's'))
 	#   4209 Number of Attacks
-	tmp = GemRB.GetCombatDetails(pc, 0)["APR"]
+	tmp = GemRB.GetCombatDetails(pc, 0)
+	if tmp:
+		tmp = tmp["APR"]
+	else:
+		tmp = 2
 
 	if (tmp&1):
 		tmp2 = str(tmp // 2) + chr(189)

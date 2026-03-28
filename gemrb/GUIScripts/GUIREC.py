@@ -259,7 +259,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 
 	outputtext = GetClassTitles (pc,LevelDiff)
 	outputtext+= GetEffectIcons (pc,LevelDiff)
-	outputtext+= GetProficiencies (pc, cdet)
+	if cdet:
+		outputtext += GetProficiencies (pc, cdet)
 	outputtext+= GetLore (pc)
 	outputtext+= GetMagicResistance (pc)
 	outputtext+= GetPartyReputation (pc)
@@ -271,7 +272,8 @@ def GetStatOverview (pc, LevelDiff=[0,0,0]):
 	outputtext+= GUIRECCommon.GetAbilityBonuses (pc)
 	outputtext+= GUIRECCommon.GetBonusSpells (pc)
 	outputtext+= GetResistances (pc)
-	outputtext+= GetWeaponStyleBonuses (pc, cdet)
+	if cdet:
+		outputtext += GetWeaponStyleBonuses (pc, cdet)
 
 	return outputtext
 

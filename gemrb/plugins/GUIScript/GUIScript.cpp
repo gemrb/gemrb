@@ -12100,9 +12100,13 @@ static PyObject* GemRB_GetCombatDetails(PyObject* /*self*/, PyObject* args)
 	int style = 0;
 
 	PyObject* dict = PyDict_New();
+	if (actor->GetStat(IE_STATE_ID) & STATE_DEAD) {
+		// equipment was dropped, just simplify and not report fists
+		return dict;
+	}
 	if (!actor->GetCombatDetails(tohit, leftorright, DamageBonus, speed, CriticalBonus, style, nullptr)) {
-		Py_DecRef(dict);
-		return RuntimeError("Serious problem in GetCombatDetails: could not find the hitting header!");
+		Log(ERROR, "GUIScript", "Serious problem in GetCombatDetails: could not find the hitting header!");
+		return dict;
 	}
 	PyDict_SetItemString(dict, "Slot", DecRef(PyLong_FromLong, wi.slot));
 	PyDict_SetItemString(dict, "Flags", DecRef(PyLong_FromLong, wi.wflags));

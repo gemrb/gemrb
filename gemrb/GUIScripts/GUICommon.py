@@ -824,6 +824,8 @@ def GetACStyleBonus (pc):
 		return 0
 	wStyles = { IE_PROFICIENCY2WEAPON:"TWOWEAPON", IE_PROFICIENCY2HANDED:"TWOHANDED", IE_PROFICIENCYSINGLEWEAPON:"SINGLEWEAPON", IE_PROFICIENCYSWORDANDSHIELD:"SWORDANDSHIELD" }
 	cdet = GemRB.GetCombatDetails (pc, 0)
+	if not cdet:
+		return 0
 	stat = cdet["Style"] % 1000
 	stars = cdet["Style"] // 1000
 	if stat == 0:

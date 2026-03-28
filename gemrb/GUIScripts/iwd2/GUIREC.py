@@ -371,11 +371,13 @@ def DisplayGeneral (pc, targetTextArea):
 			RecordsTextArea.Append (DelimitedText (12127, tmp, 0))
 		MonkLevel = GemRB.GetPlayerStat (pc, IE_LEVELMONK)
 		if MonkLevel:
-			AC = GemRB.GetCombatDetails(pc, 0)["AC"]
-			GemRB.SetToken ("number", PlusMinusStat (AC["Wisdom"]))
-			RecordsTextArea.Append (DelimitedText (39431, "", 0, ""))
-			# wholeness of body
-			RecordsTextArea.Append (DelimitedText (39749, MonkLevel*2, 0))
+			AC = GemRB.GetCombatDetails(pc, 0)
+			if AC:
+				AC = AC["AC"]
+				GemRB.SetToken ("number", PlusMinusStat (AC["Wisdom"]))
+				RecordsTextArea.Append (DelimitedText (39431, "", 0, ""))
+				# wholeness of body
+				RecordsTextArea.Append (DelimitedText (39749, MonkLevel*2, 0))
 
 	# favoured enemies; eg Goblins: +2 & Harpies: +1
 	RangerLevel = GemRB.GetPlayerStat (pc, IE_LEVELRANGER)
@@ -661,26 +663,26 @@ def DisplayWeapons (pc):
 
 	combatdet = GemRB.GetCombatDetails(pc, 0)
 	combatdet2 = combatdet # placeholder for the potential offhand numbers
-	ac = combatdet["AC"]
 	dualwielding = GemRB.IsDualWielding(pc)
-	if dualwielding:
-		combatdet2 = GemRB.GetCombatDetails(pc, 1)
+	if combatdet:
+		ac = combatdet["AC"]
+		if dualwielding:
+			combatdet2 = GemRB.GetCombatDetails(pc, 1)
 
-	# Main Hand
-	ToHitOfHand (combatdet, dualwielding)
+		# Main Hand
+		ToHitOfHand (combatdet, dualwielding)
 
-	# Off Hand
-	if dualwielding:
-		ToHitOfHand (combatdet2, dualwielding, 1)
+		# Off Hand
+		if dualwielding:
+			ToHitOfHand (combatdet2, dualwielding, 1)
 
-
-	###################
-	# Number of Attacks
-	if dualwielding:
-		# only one extra offhand attack and it is displayed as eg. 2+1
-		RecordsTextArea.Append (DelimitedText (9458, str (combatdet["APR"]//2-1)+"+1"))
-	else:
-		RecordsTextArea.Append (DelimitedText (9458, str (combatdet["APR"]//2)))
+		###################
+		# Number of Attacks
+		if dualwielding:
+			# only one extra offhand attack and it is displayed as eg. 2+1
+			RecordsTextArea.Append (DelimitedText (9458, str (combatdet["APR"]//2-1)+"+1"))
+		else:
+			RecordsTextArea.Append (DelimitedText (9458, str (combatdet["APR"]//2)))
 
 	###################
 	# Armor Class
@@ -688,33 +690,34 @@ def DisplayWeapons (pc):
 	RecordsTextArea.Append (DelimitedText (33553, str (GS(IE_ARMORCLASS)), 0)) # same as ac["Total"]
 
 	# Base
-	AddIndent()
-	RecordsTextArea.Append (DelimitedText (31353, str (ac["Natural"]), 0))
-	# Armor
-	if ac["Armor"]:
+	if combatdet:
 		AddIndent()
-		RecordsTextArea.Append (DelimitedText (11997, PlusMinusStat (ac["Armor"]), 0))
-	# Shield
-	if ac["Shield"]:
-		AddIndent()
-		RecordsTextArea.Append (DelimitedText (6347, PlusMinusStat (ac["Shield"]), 0))
-	# Deflection
-	if ac["Deflection"]:
-		AddIndent()
-		RecordsTextArea.Append (DelimitedText (33551, PlusMinusStat (ac["Deflection"]), 0))
-	# Generic
-	if ac["Generic"]:
-		AddIndent()
-		RecordsTextArea.Append (DelimitedText (33552, PlusMinusStat (ac["Generic"]), 0))
-	# Dexterity
-	if ac["Dexterity"]:
-		AddIndent()
-		RecordsTextArea.Append (DelimitedText (1151, PlusMinusStat (ac["Dexterity"]), 0))
-	# Monk Wisdom Bonus: <number> to AC
-	if ac["Wisdom"]:
-		GemRB.SetToken ("number", PlusMinusStat (ac["Wisdom"]))
-		AddIndent()
-		RecordsTextArea.Append (DelimitedText (39431, "", 0, ""))
+		RecordsTextArea.Append (DelimitedText (31353, str (ac["Natural"]), 0))
+		# Armor
+		if ac["Armor"]:
+			AddIndent()
+			RecordsTextArea.Append (DelimitedText (11997, PlusMinusStat (ac["Armor"]), 0))
+		# Shield
+		if ac["Shield"]:
+			AddIndent()
+			RecordsTextArea.Append (DelimitedText (6347, PlusMinusStat (ac["Shield"]), 0))
+		# Deflection
+		if ac["Deflection"]:
+			AddIndent()
+			RecordsTextArea.Append (DelimitedText (33551, PlusMinusStat (ac["Deflection"]), 0))
+		# Generic
+		if ac["Generic"]:
+			AddIndent()
+			RecordsTextArea.Append (DelimitedText (33552, PlusMinusStat (ac["Generic"]), 0))
+		# Dexterity
+		if ac["Dexterity"]:
+			AddIndent()
+			RecordsTextArea.Append (DelimitedText (1151, PlusMinusStat (ac["Dexterity"]), 0))
+		# Monk Wisdom Bonus: <number> to AC
+		if ac["Wisdom"]:
+			GemRB.SetToken ("number", PlusMinusStat (ac["Wisdom"]))
+			AddIndent()
+			RecordsTextArea.Append (DelimitedText (39431, "", 0, ""))
 
 	###################
 	# Armor Class Modifiers
@@ -779,12 +782,13 @@ def DisplayWeapons (pc):
 	# Weapon Statistics
 	RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(41119) + "[/color]\n")
 
-	# Main hand
-	WeaponOfHand(pc, combatdet, dualwielding)
+	if combatdet:
+		# Main hand
+		WeaponOfHand(pc, combatdet, dualwielding)
 
-	# Off-hand (if any)
-	if dualwielding:
-		WeaponOfHand(pc, combatdet2, dualwielding, 1)
+		# Off-hand (if any)
+		if dualwielding:
+			WeaponOfHand(pc, combatdet2, dualwielding, 1)
 
 	DisplaySavingThrows (pc, RecordsTextArea)
 
