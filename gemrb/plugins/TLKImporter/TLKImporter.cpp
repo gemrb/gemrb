@@ -172,7 +172,8 @@ ieStrRef TLKImporter::ClassStrRef(int slot) const
 		return ieStrRef::INVALID;
 	}
 	TableMgr::index_t row = tab->FindTableValue("ID", clss, 0);
-	return tab->QueryFieldAsStrRef(row, 0);
+	const auto& rowName = tab->GetRowName(row);
+	return tab->QueryFieldAsStrRef(rowName, "NAME_REF");
 }
 
 ieStrRef TLKImporter::RaceStrRef(int slot) const
