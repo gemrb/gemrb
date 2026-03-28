@@ -1248,7 +1248,8 @@ def GetSingleClassHP (pc, Class, Level, levelDiff):
 		total = levelDiff - newHighPrimLevels # hp for levels before reaching new heights
 		levelDiff = newHighPrimLevels
 
-	HPTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "HP"))
+	HPClassTable = GemRB.LoadTable ("hpclass", False, True)
+	HPTable = GemRB.LoadTable (HPClassTable.GetValue (Class, "TABLE"))
 
 	for i in range (levelDiff):
 		# We need to check if Level is larger than 20, since after that point

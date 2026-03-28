@@ -387,9 +387,9 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 
 	#get the correct hp for barbarians
 	Kit = GUICommon.GetKitIndex (pc)
+	KitName = GUICommon.GetKitRowName (pc, True, Kit)
 	ClassName = None
 	if Kit and not Dual[0] and Multi[0]<2:
-		KitName = GUICommon.GetKitRowName (pc, True, Kit)
 		if CommonTables.Classes.GetRowIndex (KitName) != None:
 			ClassName = KitName
 
@@ -405,14 +405,23 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		# hack around so we can reuse more of the main loop
 		NumClasses = len(Levels)
 		Divisor = 1.0
+
 	for i in range (NumClasses):
 		if GameCheck.IsIWD2() and not Class[i]:
 			continue
 
 		#check this classes hp table for any gain
+		# ees actually provide separate mc and kit tables
+		# the mc ones are unused and the same per-class method is used as before
+		# so we only need check additionally for kits
+		# ... and make sure the kit is for the currently inspected class
+		HPClassTable = GemRB.LoadTable ("hpclass", False, True)
+		if GameCheck.IsAnyEE () and Kit and CommonTables.KitList.GetValue (KitName, "CLASS", GTV_INT) == Class[i]:
+			# hpclass has a useless default, so we can't check if a row was found easily
+			ClassName = KitName
 		if not ClassName or NumClasses > 1:
 			ClassName = GUICommon.GetClassRowName (Class[i], "class")
-		HPTable = CommonTables.Classes.GetValue (ClassName, "HP")
+		HPTable = HPClassTable.GetValue (ClassName, "TABLE")
 		HPTable = GemRB.LoadTable (HPTable)
 
 		#make sure we are within table ranges
