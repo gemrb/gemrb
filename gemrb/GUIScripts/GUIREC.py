@@ -40,11 +40,14 @@ ColorTable = None
 ColorIndex = None
 ScriptTextArea = None
 SelectedTextArea = None
+LastPC = None
 
 ###################################################
 
 def InitRecordsWindow (Window):
 	"""Open Records Window"""
+
+	global LastPC
 
 	# dual class
 	Button = Window.GetControl (0)
@@ -80,6 +83,7 @@ def InitRecordsWindow (Window):
 	Text = Window.GetControl (45)
 	Text.SetColor (ColorWhitish, TA_COLOR_INITIALS)
 	UpdateActorDescription (Window)
+	LastPC = GemRB.GameGetSelectedPCSingle ()
 
 	# kit info
 	if GameCheck.IsBG2OrEE ():
@@ -96,7 +100,7 @@ def UpdateActorDescription (Window):
 	Text.SetText (GetStatOverview (pc))
 
 def UpdateRecordsWindow (Window):
-	global alignment_help
+	global alignment_help, LastPC
 
 	# exportable
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -216,6 +220,10 @@ def UpdateRecordsWindow (Window):
 		Label.SetText (7198)
 	else:
 		Label.SetText (7199)
+
+	if LastPC != pc:
+		LastPC = pc
+		UpdateActorDescription (Window)
 
 	#TODO: making window visible/shaded depending on the pc's state
 
