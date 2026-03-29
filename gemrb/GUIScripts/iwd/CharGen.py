@@ -805,7 +805,7 @@ def RacePress():
 		RaceSelectButton.OnPress (RaceSelectPress)
 		RaceName = CommonTables.Races.GetRowName (i - 2)
 		RaceSelectButton.SetText (CommonTables.Races.GetValue (RaceName, "NAME"))
-		RaceSelectButton.SetVarAssoc ("Race", i - 1)
+		RaceSelectButton.SetVarAssoc ("Race", CommonTables.Races.GetValue (RaceName, "ID", GTV_INT))
 
 	RaceTextArea = RaceWindow.GetControl (8)
 	RaceTextArea.SetText (17237)
