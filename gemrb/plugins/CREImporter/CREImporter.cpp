@@ -2001,8 +2001,9 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 	ieByte tmpByte = static_cast<ieByte>(actor->BaseStats[IE_NUMBEROFATTACKS]);
 	if (actor->creVersion != CREVersion::V2_2 && actor->InParty && actor->HasPlayerClass()) {
 		// not setting to 2 just in case they got a permanent APR change applied
-		ieDword wl;
-		tmpByte -= 2 * actor->IsDualWielding() + actor->GetStyleExtraAPR(wl);
+		bool eligible;
+		int extra = actor->GetStyleExtraAPR(eligible);
+		tmpByte -= 2 * actor->IsDualWielding() + extra;
 		if (tmpByte != 2) {
 			Log(DEBUG, "CREImporter", "Detected creature '{}' with uncommon APR: {}", fmt::WideToChar { actor->GetName() }, tmpByte / 2);
 		}

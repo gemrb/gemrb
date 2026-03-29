@@ -839,7 +839,7 @@ public:
 	int GetDefense(int headerDamageType, ieDword wflags, const Actor* attacker) const;
 	/* returns the number of allocated proficiency points (stars) */
 	int GetStars(stat_t proficiency) const;
-	int GetStyleExtraAPR(ieDword& warriorLevel) const;
+	int GetStyleExtraAPR(bool& isEligible) const;
 	static bool IsCriticalEffectEligible(const WeaponInfo& wi, const Effect* fx);
 	/* get the current hit bonus */
 	bool GetCombatDetails(int& tohit, bool leftorright,
@@ -1013,8 +1013,8 @@ public:
 	ieDword GetRangerLevel() const { return GetClassLevel(ISRANGER); }
 	ieDword GetSorcererLevel() const { return GetClassLevel(ISSORCERER); }
 	ieDword GetShamanLevel() const { return GetClassLevel(ISSHAMAN); }
-	/* Returns true if the character is a warrior */
-	ieDword GetWarriorLevel() const;
+	/* Returns highest of the actor levels */
+	ieDword GetHighestLevel() const;
 	bool IsWarrior() const { return (GetFighterLevel() || GetBarbarianLevel() || GetRangerLevel() || GetPaladinLevel()); }
 	/* Returns true if the old class is inactive */
 	bool IsDualInactive() const;

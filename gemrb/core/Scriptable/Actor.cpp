@@ -2973,7 +2973,7 @@ void Actor::RefreshHP()
 	Timers.lastConBonus = bonus;
 }
 
-int Actor::GetStyleExtraAPR(ieDword& warriorLevel) const
+int Actor::GetStyleExtraAPR(bool& isEligible) const
 {
 	if (third) return 0;
 
@@ -2982,9 +2982,16 @@ int Actor::GetStyleExtraAPR(ieDword& warriorLevel) const
 	if (!stars && HasSpellState(SS_TENSER)) stars = 1;
 	if (!stars) return 0;
 
-	warriorLevel = GetWarriorLevel();
-	if (warriorLevel) {
-		return gamedata->GetWeaponStyleAPRBonus(stars, warriorLevel - 1);
+	AutoTable weaponMisc = gamedata->LoadTable("clswpbon", true);
+	// if a kit is not present in the table, check its class
+	// unfortunately it has a non-distinct default value, so it's hard to be smart about it
+	// we support kits enabling the bonus for classes that don't have it, but not disabling for those that do
+	const std::string& className = GetClassName(GetActiveClass());
+	const std::string& kitName = GetKitName(BaseStats[IE_KIT]);
+	isEligible = weaponMisc->QueryFieldSigned<int>(className, "GETS_PROF_APR") != 0;
+	isEligible = isEligible || weaponMisc->QueryFieldSigned<int>(kitName, "GETS_PROF_APR") != 0;
+	if (isEligible) {
+		return gamedata->GetWeaponStyleAPRBonus(stars, GetHighestLevel() - 1);
 	} else {
 		return gamedata->GetWeaponStyleAPRBonus(stars, 0);
 	}
@@ -3027,8 +3034,8 @@ void Actor::RefreshPCStats()
 	if (header) {
 		// haste and monk bonuses are added on top, later
 		int defaultattacks = 2 + 2 * IsDualWielding();
-		ieDword warriorLevel = 0;
-		int bonus = GetStyleExtraAPR(warriorLevel);
+		bool eligibleForFullBonus = false;
+		int bonus = GetStyleExtraAPR(eligibleForFullBonus);
 		if (bonus) {
 			// In bg2 the proficiency and warrior level bonus is added after effects, so also ranged weapons are affected,
 			// since their rate of fire (apr) is set using an effect with a flat modifier.
@@ -3038,7 +3045,7 @@ void Actor::RefreshPCStats()
 			// instead of 4+[0-3] = 4-7
 			// For a master ranger at level 14, the difference ends up as 2 (1 apr).
 			defaultattacks += bonus;
-			if (warriorLevel) {
+			if (eligibleForFullBonus) {
 				int mod = Modified[IE_NUMBEROFATTACKS] - BaseStats[IE_NUMBEROFATTACKS];
 				BaseStats[IE_NUMBEROFATTACKS] = defaultattacks;
 				if (fxqueue.HasEffectWithParam(fx_attacks_per_round_modifier_ref, 1)) { // launcher sets base APR
@@ -10669,13 +10676,12 @@ bool Actor::IsDualSwap() const
 	return (ieDword) dualSwap[tmpclass] == (Modified[IE_MC_FLAGS] & MC_WAS_ANY);
 }
 
-ieDword Actor::GetWarriorLevel() const
+ieDword Actor::GetHighestLevel() const
 {
-	std::array<ieDword, 4> warriorlevels = {
-		GetBarbarianLevel(),
-		GetFighterLevel(),
-		GetPaladinLevel(),
-		GetRangerLevel()
+	std::array<ieDword, 3> warriorlevels = {
+		BaseStats[IE_LEVEL],
+		BaseStats[IE_LEVEL2],
+		BaseStats[IE_LEVEL3],
 	};
 
 	ieDword highest = *std::max_element(warriorlevels.begin(), warriorlevels.end());

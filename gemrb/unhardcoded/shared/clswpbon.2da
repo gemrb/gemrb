@@ -1,0 +1,31 @@
+2DA V1.0
+0
+                        GETS_PROF_APR     UNARMED_DIVISOR   ZERO_SKILL_THAC0
+MAGE                    0                 0                 5
+FIGHTER                 1                 0                 2
+CLERIC                  0                 0                 3
+THIEF                   0                 0                 3
+BARD                    0                 0                 3
+PALADIN                 1                 0                 2
+DRUID                   0                 0                 3
+RANGER                  1                 0                 2
+FIGHTER_MAGE            1                 0                 2
+FIGHTER_CLERIC          1                 0                 2
+FIGHTER_THIEF           1                 0                 2
+FIGHTER_MAGE_THIEF      1                 0                 2
+MAGE_THIEF              0                 0                 5
+CLERIC_MAGE             0                 0                 3
+CLERIC_THIEF            0                 0                 3
+FIGHTER_DRUID           1                 0                 2
+FIGHTER_MAGE_CLERIC     1                 0                 2
+CLERIC_RANGER           1                 0                 2
+BARBARIAN               1                 0                 2
+SORCERER                0                 0                 5
+MONK                    1                 3                 2
+
+# table listing bonuses:
+# - who gets full wspatck.2da APR bonuses
+# - fist APR progression
+# - non-proficiency penalty
+#
+# kits can be listed as well; if not present, their class will be used
