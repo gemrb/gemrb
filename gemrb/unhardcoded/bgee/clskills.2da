@@ -1,25 +1,25 @@
 2DA V1.0
 *
-                    DRUIDSPELL CLERICSPELL MAGESPELL  STARTXP    BARDSKILL  THIEFSKILL LAYHANDS   TURNLEVEL  BOOKTYPE   HATERACE   ABILITIES  NO_PROF    STARTXP2   RANGERSKILL SAVEBONUS  SPONCAST
-UNUSED              *          *           *          *          *          *          *          0          0          *          *          *          *          *           *          *
-MAGE                *          *           MXSPLWIZ   0          *          *          *          0          1          *          CLABMA01   -4         *          *           0          *
-FIGHTER             *          *           *          0          *          *          *          0          0          *          CLABFI01   -2         *          *           0          *
-CLERIC              *          MXSPLPRS    *          0          *          *          *          1          1          *          CLABPR01   -3         *          *           0          *
-THIEF               *          *           *          0          *          SKILLS     *          0          0          *          CLABTH01   -3         *          *           0          *
-BARD                *          *           MXSPLBRD   0          SKILLBRD   *          *          0          1          *          CLABBA01   -3         *          *           0          *
-PALADIN             *          MXSPLPAL    *          0          *          *          LAYHANDS   5          1          *          CLABPA01   -2         *          *           2          *
-FIGHTER_MAGE        *          *           MXSPLWIZ   0          *          *          *          0          1          *          CLABFI01   -2         *          *           0          *
-FIGHTER_CLERIC      *          MXSPLPRS    *          0          *          *          *          1          1          *          FI01,PR01  -2         *          *           0          *
-FIGHTER_THIEF       *          *           *          0          *          SKILLS     *          0          0          *          FI01,TH01  -2         *          *           0          *
-FIGHTER_MAGE_THIEF  *          *           MXSPLWIZ   0          *          SKILLS     *          0          1          *          FI01,TH01  -2         *          *           0          *
-DRUID               MXSPLDRU   *           *          0          *          *          *          0          1          *          CLABDR01   -3         *          *           0          *
-RANGER              MXSPLRAN   *           *          0          *          *          *          0          1          HATERACE   CLABRN01   -2         *          SKILLRNG    0          *
-MAGE_THIEF          *          *           MXSPLWIZ   0          *          SKILLS     *          0          1          *          CLABTH01   -3         *          *           0          *
-CLERIC_MAGE         *          MXSPLPRS    MXSPLWIZ   0          *          *          *          1          1          *          CLABPR01   -3         *          *           0          *
-CLERIC_THIEF        *          MXSPLPRS    *          0          *          SKILLS     *          1          1          *          PR01,TH01  -3         *          *           0          *
-FIGHTER_DRUID       MXSPLDRU   *           *          0          *          *          *          0          1          *          FI01,DR01  -2         *          *           0          *
-FIGHTER_MAGE_CLERIC *          MXSPLPRS    MXSPLWIZ   0          *          *          *          1          1          *          FI01,PR01  -2         *          *           0          *
-CLERIC_RANGER       MXSPLRAN   MXSPLPRS    *          0          *          *          *          1          1          HATERACE   PR01,RN01  -2         *          SKILLRNG    0          *
-SORCERER            *          *           MXSPLSRC   0          *          *          *          0          2          *          *          -4         *          *           0          *
-MONK                *          *           *          0          *          SKILLS     *          0          0          *          CLABMO01   -3         *          *           0          *
-SHAMAN              MXSPLSHM   *           *          0          *          *          *          0          3          *          CLABSH01   -3         *          SKILLSHM    0          *
+                    DRUIDSPELL CLERICSPELL MAGESPELL  STARTXP    BARDSKILL  THIEFSKILL LAYHANDS   TURNLEVEL  BOOKTYPE   HATERACE   ABILITIES  STARTXP2   RANGERSKILL SAVEBONUS  SPONCAST
+UNUSED              *          *           *          *          *          *          *          0          0          *          *          *          *           *          *
+MAGE                *          *           MXSPLWIZ   0          *          *          *          0          1          *          CLABMA01   *          *           0          *
+FIGHTER             *          *           *          0          *          *          *          0          0          *          CLABFI01   *          *           0          *
+CLERIC              *          MXSPLPRS    *          0          *          *          *          1          1          *          CLABPR01   *          *           0          *
+THIEF               *          *           *          0          *          SKILLS     *          0          0          *          CLABTH01   *          *           0          *
+BARD                *          *           MXSPLBRD   0          SKILLBRD   *          *          0          1          *          CLABBA01   *          *           0          *
+PALADIN             *          MXSPLPAL    *          0          *          *          LAYHANDS   5          1          *          CLABPA01   *          *           2          *
+FIGHTER_MAGE        *          *           MXSPLWIZ   0          *          *          *          0          1          *          CLABFI01   *          *           0          *
+FIGHTER_CLERIC      *          MXSPLPRS    *          0          *          *          *          1          1          *          FI01,PR01  *          *           0          *
+FIGHTER_THIEF       *          *           *          0          *          SKILLS     *          0          0          *          FI01,TH01  *          *           0          *
+FIGHTER_MAGE_THIEF  *          *           MXSPLWIZ   0          *          SKILLS     *          0          1          *          FI01,TH01  *          *           0          *
+DRUID               MXSPLDRU   *           *          0          *          *          *          0          1          *          CLABDR01   *          *           0          *
+RANGER              MXSPLRAN   *           *          0          *          *          *          0          1          HATERACE   CLABRN01   *          SKILLRNG    0          *
+MAGE_THIEF          *          *           MXSPLWIZ   0          *          SKILLS     *          0          1          *          CLABTH01   *          *           0          *
+CLERIC_MAGE         *          MXSPLPRS    MXSPLWIZ   0          *          *          *          1          1          *          CLABPR01   *          *           0          *
+CLERIC_THIEF        *          MXSPLPRS    *          0          *          SKILLS     *          1          1          *          PR01,TH01  *          *           0          *
+FIGHTER_DRUID       MXSPLDRU   *           *          0          *          *          *          0          1          *          FI01,DR01  *          *           0          *
+FIGHTER_MAGE_CLERIC *          MXSPLPRS    MXSPLWIZ   0          *          *          *          1          1          *          FI01,PR01  *          *           0          *
+CLERIC_RANGER       MXSPLRAN   MXSPLPRS    *          0          *          *          *          1          1          HATERACE   PR01,RN01  *          SKILLRNG    0          *
+SORCERER            *          *           MXSPLSRC   0          *          *          *          0          2          *          *          *          *           0          *
+MONK                *          *           *          0          *          SKILLS     *          0          0          *          CLABMO01   *          *           0          *
+SHAMAN              MXSPLSHM   *           *          0          *          *          *          0          3          *          CLABSH01   *          SKILLSHM    0          *

@@ -1678,6 +1678,7 @@ static void InitActorTables()
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
 	AutoTable tm = gamedata->LoadTable("clskills");
+	AutoTable weaponMisc = gamedata->LoadTable("clswpbon", true);
 	if (tm) {
 		classcount = tm->GetRowCount();
 		noProfPenalty.resize(classcount);
@@ -1756,7 +1757,8 @@ static void InitActorTables()
 			class2kits[i].clab = ResRef(field);
 			class2kits[i].className = rowname;
 
-			noProfPenalty[i] = tm->QueryFieldSigned<int>(rowname, "NO_PROF");
+			// ignoring kits, since nobody cares about this
+			noProfPenalty[i] = -1 * weaponMisc->QueryFieldSigned<int>(rowname, "ZERO_SKILL_THAC0");
 
 			bitmask <<= 1;
 		}
