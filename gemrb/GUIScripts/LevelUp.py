@@ -519,6 +519,7 @@ def LevelUpDonePress():
 	if LevelUpWindow:
 		LevelUpWindow.Close()
 	PortraitWindow.UpdatePortraitWindow()
+	GUIREC.UpdateActorDescription (GemRB.GetView ("WIN_TOP"))
 	return
 
 def LevelUpHLAPress ():

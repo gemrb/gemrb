@@ -76,6 +76,11 @@ def InitRecordsWindow (Window):
 	Button.SetText (13956)
 	Button.OnPress (GUIRECCommon.OpenExportWindow)
 
+	# help, info textarea
+	Text = Window.GetControl (45)
+	Text.SetColor (ColorWhitish, TA_COLOR_INITIALS)
+	UpdateActorDescription (Window)
+
 	# kit info
 	if GameCheck.IsBG2OrEE ():
 		Button = Window.GetControl (52)
@@ -84,13 +89,17 @@ def InitRecordsWindow (Window):
 
 	return
 
+def UpdateActorDescription (Window):
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GUICommon.UpdateMageSchool (pc)
+	Text = Window.GetControl (45)
+	Text.SetText (GetStatOverview (pc))
+
 def UpdateRecordsWindow (Window):
 	global alignment_help
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	GUICommon.UpdateMageSchool (pc)
-
 	# exportable
+	pc = GemRB.GameGetSelectedPCSingle ()
 	Button = Window.GetControl (36)
 	if Exportable (pc):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -208,10 +217,6 @@ def UpdateRecordsWindow (Window):
 	else:
 		Label.SetText (7199)
 
-	# help, info textarea
-	Text = Window.GetControl (45)
-	Text.SetColor (ColorWhitish, TA_COLOR_INITIALS)
-	Text.SetText (GetStatOverview (pc))
 	#TODO: making window visible/shaded depending on the pc's state
 
 	return
