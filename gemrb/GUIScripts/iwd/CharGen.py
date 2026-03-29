@@ -369,6 +369,9 @@ def AcceptPress():
 	GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
 	
 	LUCommon.SetupSavingThrows (MyChar)
+	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
+	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
+	LUCommon.SetupHP (MyChar)
 
 	#does all the rest
 	LargePortrait = GemRB.GetToken ("LargePortrait")
