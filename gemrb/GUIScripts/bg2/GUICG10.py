@@ -43,9 +43,10 @@ def OnLoad():
 	RaceName = GUICommon.GetRaceRowName (MyChar)
 
 	MCRowIndices = []
+	ClassRaceTable = GemRB.LoadTable ("clsrcreq")
 	for i in range(1,ClassCount):
 		ClassName = CommonTables.Classes.GetRowName(i-1)
-		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
+		Allowed = ClassRaceTable.GetValue (ClassName, RaceName, GTV_INT)
 		if CommonTables.Classes.GetValue (ClassName, "MULTI") == 0:
 			# not a multiclass
 			continue

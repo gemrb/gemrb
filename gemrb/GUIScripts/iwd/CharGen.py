@@ -58,6 +58,7 @@ ClassButton = 0
 ClassWindow = 0
 ClassTextArea = 0
 ClassDoneButton = 0
+ClassRaceTable = GemRB.LoadTable ("clsrcreq")
 
 ClassMultiWindow = 0
 ClassMultiTextArea = 0
@@ -875,7 +876,7 @@ def ClassPress():
 	j = 2
 	for i in range (ClassCount):
 		ClassRowName = CommonTables.Classes.GetRowName (i)
-		Allowed = CommonTables.Classes.GetValue (ClassRowName, RaceName)
+		Allowed = ClassRaceTable.GetValue (ClassRowName, RaceName, GTV_INT)
 		if CommonTables.Classes.GetValue (ClassRowName, "MULTI"):
 			if Allowed != 0:
 				HasMulti = 1
@@ -900,7 +901,7 @@ def ClassPress():
 
 	KitButton = ClassWindow.GetControl (11)
 	#only the mage class has schools
-	Allowed = CommonTables.Classes.GetValue ("MAGE", RaceName)
+	Allowed = ClassRaceTable.GetValue ("MAGE", RaceName, GTV_INT)
 	if Allowed:
 		KitButton.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
@@ -952,7 +953,7 @@ def ClassMultiPress():
 		if CommonTables.Classes.GetValue (ClassName, "MULTI") > 0:
 			ClassMultiSelectButton = ClassMultiWindow.GetControl (j)
 			j = j + 1
-			if CommonTables.Classes.GetValue (ClassName, RaceName) > 0:
+			if ClassRaceTable.GetValue (ClassName, RaceName, GTV_INT) > 0:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1015,7 +1016,7 @@ def KitPress():
 
 	# potentially exclude kits, eg. gnomes can only be illusionists
 	RaceName = GUICommon.GetRaceRowName (MyChar)
-	Allowed = CommonTables.Classes.GetValue ("MAGE", RaceName)
+	Allowed = ClassRaceTable.GetValue ("MAGE", RaceName, GTV_INT)
 
 	for i in range (8):
 		Button = KitWindow.GetControl (i+2)

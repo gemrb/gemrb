@@ -1,0 +1,21 @@
+2DA V1.0
+0
+                     HUMAN      ELF        HALF_ELF   DWARF      HALFLING   GNOME
+FIGHTER              1          1          1          1          1          1     
+RANGER               1          1          1          0          0          0     
+PALADIN              1          0          0          0          0          0     
+CLERIC               1          1          1          1          1          1     
+DRUID                1          1          1          0          0          0     
+MAGE                 1          1          1          0          0          2     
+THIEF                1          1          1          1          1          1     
+BARD                 1          0          1          0          0          0     
+FIGHTER_THIEF        0          1          1          1          1          1     
+FIGHTER_CLERIC       0          0          1          1          0          1     
+FIGHTER_MAGE         0          1          1          0          0          2     
+MAGE_THIEF           0          1          1          0          0          2     
+CLERIC_MAGE          0          0          1          0          0          2     
+CLERIC_THIEF         0          0          0          0          0          1     
+FIGHTER_DRUID        0          0          1          0          0          0     
+CLERIC_RANGER        0          0          1          0          0          0     
+FIGHTER_MAGE_THIEF   0          1          1          0          0          0     
+FIGHTER_MAGE_CLERIC  0          0          1          0          0          0

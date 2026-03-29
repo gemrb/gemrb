@@ -55,9 +55,10 @@ def OnLoad():
 	GemRB.SetVar("MAGESCHOOL",0) 
 	HasMulti = 0
 	RaceName = GUICommon.GetRaceRowName (MyChar)
+	ClassRaceTable = GemRB.LoadTable ("clsrcreq")
 	for i in range(1,ClassCount):
 		ClassName = CommonTables.Classes.GetRowName(i-1)
-		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
+		Allowed = ClassRaceTable.GetValue (ClassName, RaceName, GTV_INT)
 		if CommonTables.Classes.GetValue (ClassName, "MULTI"):
 			if Allowed!=0:
 				HasMulti = 1
@@ -81,7 +82,7 @@ def OnLoad():
 	if HasMulti == 0:
 		MultiClassButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	Allowed = CommonTables.Classes.GetValue ("MAGE", RaceName)
+	Allowed = ClassRaceTable.GetValue ("MAGE", RaceName, GTV_INT)
 	SpecialistButton = ClassWindow.GetControl(11)
 	SpecialistButton.SetText(11994)
 	if Allowed == 0:

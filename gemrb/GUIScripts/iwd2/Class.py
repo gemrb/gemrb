@@ -87,13 +87,14 @@ def SetupClassList():
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 
 	j = 0
+	ClassRaceTable = GemRB.LoadTable ("clsrcreq")
 	for i in range(1,ClassCount):
 		ClassName = CommonTables.Classes.GetRowName(i-1)
 		#determining if this is a kit or class
 		Allowed = CommonTables.Classes.GetValue(ClassName, "CLASS")
 		if Allowed > 0:
 			continue
-		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
+		Allowed = ClassRaceTable.GetValue (ClassName, RaceName, GTV_INT)
 		Button = ClassWindow.GetControl(j+2)
 		j = j+1
 		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")

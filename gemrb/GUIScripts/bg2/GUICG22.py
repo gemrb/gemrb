@@ -31,16 +31,18 @@ TextAreaControl = 0
 DoneButton = 0
 SchoolList = 0
 ClassName = 0
+RaceName = 0
 TopIndex = 0
 RowCount = 10
 KitTable = 0
 Init = 0
 MyChar = 0
 KitSelected = 0 #store clicked kit on redraw as number within RowCount
+ClassRaceTable = GemRB.LoadTable ("clsrcreq", False, True)
 
 def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
-	global SchoolList, ClassName
+	global SchoolList, ClassName, RaceName
 	global RowCount, TopIndex, KitTable, Init, MyChar
 
 	MyChar = GemRB.GetVar ("Slot")
@@ -122,6 +124,14 @@ def OnLoad():
 	KitWindow.Focus()
 	return
 
+def RaceAllowsKit (KitName):
+	CRKindex = ClassRaceTable.GetRowIndex (KitName)
+	if CRKindex is None: # no kit entry, look at class
+		CRKitName = ClassName
+	else:
+		CRKitName = KitName
+	return ClassRaceTable.GetValue (CRKitName, RaceName, GTV_INT)
+
 def RedrawKits():
 	global TopIndex, Init, KitSelected
 
@@ -135,27 +145,27 @@ def RedrawKits():
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		if not KitTable:
 			KitIndex = 0
-			KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
+			KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF", GTV_REF)
 		else:
 			KitIndex = KitTable.GetValue (i + TopIndex, 0)
 			if ClassName == "MAGE":
-				KitName = SchoolList.GetValue (i+TopIndex, 0)
+				KitName = SchoolList.GetValue (i + TopIndex, 0, GTV_REF)
 				if KitIndex == 0:
-					KitName = SchoolList.GetValue ("GENERALIST", "NAME_REF")
+					KitName = SchoolList.GetValue ("GENERALIST", "NAME_REF", GTV_REF)
 					Button.SetState(IE_GUI_BUTTON_ENABLED)
 					if Init: #preselection of mage plain kit
 						Button.SetState(IE_GUI_BUTTON_SELECTED)
 						KitSelected = i+TopIndex
 						Init=0
-				if KitIndex != "*":
+				if KitIndex != "*" and RaceAllowsKit (KitName):
 					EnabledButtons.append (KitIndex - 21)
 			else:
 				if KitIndex and KitIndex != "*":
-					KitName = CommonTables.KitList.GetValue (KitIndex, 1)
+					KitName = CommonTables.KitList.GetValue (KitIndex, 1, GTV_REF)
 				else:
-					KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
+					KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF", GTV_REF)
 		Button.SetText(KitName)
-		if not EnabledButtons or i+TopIndex in EnabledButtons:
+		if (not EnabledButtons and RaceAllowsKit (KitName)) or i+TopIndex in EnabledButtons:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
 			if Init and i+TopIndex>0:
 				Button.SetState(IE_GUI_BUTTON_SELECTED)

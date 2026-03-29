@@ -73,11 +73,12 @@ def OnLoad():
 	GemRB.SetVar("MAGESCHOOL",0) 
 	HasMulti = 0
 	RaceName = GUICommon.GetRaceRowName (MyChar)
+	ClassRaceTable = GemRB.LoadTable ("clsrcreq")
 	for i in range(1, ClassCount):
 		if j == 11 + int(GameCheck.IsAnyEE ()): # reached the last control
 			break
 		ClassName = CommonTables.Classes.GetRowName(i-1)
-		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
+		Allowed = ClassRaceTable.GetValue (ClassName, RaceName, GTV_INT)
 		if CommonTables.Classes.GetValue (ClassName, "MULTI"):
 			if Allowed!=0:
 				HasMulti = 1

@@ -50,10 +50,11 @@ def OnLoad():
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		j = j + 1
 
+	ClassRaceTable = GemRB.LoadTable ("clsrcreq")
 	j=0
 	for i in range(1,ClassCount):
 		ClassName = CommonTables.Classes.GetRowName (i-1)
-		Allowed = CommonTables.Classes.GetValue(ClassName, RaceName)
+		Allowed = ClassRaceTable.GetValue (ClassName, RaceName, GTV_INT)
 		if CommonTables.Classes.GetValue (ClassName, "MULTI") == 0:
 			continue
 		if j>11:
