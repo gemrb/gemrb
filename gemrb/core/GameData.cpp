@@ -841,7 +841,7 @@ ResRef GameData::GetFist(int cls, int level)
 }
 
 // read from our unhardcoded monk bonus table
-int GameData::GetMonkBonus(int bonusType, int level)
+int GameData::GetMonkBonus(int bonusType, int level, const Actor* actor)
 {
 	// not a monk?
 	if (level == 0) return 0;
@@ -851,17 +851,31 @@ int GameData::GetMonkBonus(int bonusType, int level)
 		return 0;
 	}
 
-	AutoTable monkBon = LoadTable("monkbon");
+	AutoTable monkBon = LoadTable("monkbon", true); // our table
 	if (!monkBon) {
 		ignore = true;
 		return 0;
 	}
 
-	// extend the last level value to infinity
-	static int cols = monkBon->GetColumnCount();
-	if (level >= cols) level = cols;
+	// ees externalized just APR and in a linear manner, where bonus = class levels/value (rounded down)
+	if (bonusType == 0) {
+		AutoTable weaponMisc = LoadTable("clswpbon", true);
+		const std::string& className = actor->GetClassName(actor->GetActiveClass());
+		const std::string& kitName = actor->GetKitName(actor->GetBase(IE_KIT));
+		// make this more generic if there's ever a need, now there's no partial
+		// disabling, plus it's being called with monk levels only
+		int bonus = weaponMisc->QueryFieldSigned<int>(className, "UNARMED_DIVISOR");
+		int bonus2 = weaponMisc->QueryFieldSigned<int>(kitName, "UNARMED_DIVISOR");
+		bonus += bonus2;
+		if (bonus == 0) return 0;
+		return std::min(6, level / bonus);
+	} else {
+		// extend the last level value to infinity
+		static int cols = monkBon->GetColumnCount();
+		if (level >= cols) level = cols;
 
-	return monkBon->QueryFieldSigned<int>(bonusType, level - 1);
+		return monkBon->QueryFieldSigned<int>(bonusType, level - 1);
+	}
 }
 
 int GameData::GetWeaponStyleBonus(WS style, int stars, WSB bonusType)

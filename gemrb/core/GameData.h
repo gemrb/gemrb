@@ -202,7 +202,7 @@ public:
 	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data);
 	const IWDIDSEntry& GetSpellProt(index_t idx);
 	ResRef GetFist(int cls, int level);
-	int GetMonkBonus(int bonusType, int level);
+	int GetMonkBonus(int bonusType, int level, const Actor* actor = nullptr);
 	int GetWeaponStyleBonus(WS style, int stars, WSB bonusType);
 	int GetWSpecialBonus(int bonusType, int stars);
 	const std::vector<int>& GetBonusSpells(int ability);

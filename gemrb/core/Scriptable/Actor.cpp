@@ -2981,6 +2981,8 @@ int Actor::GetStyleExtraAPR(bool& isEligible) const
 	// tenser's transformation ensures the actor is at least proficient with any weapon
 	if (!stars && HasSpellState(SS_TENSER)) stars = 1;
 	if (!stars) return 0;
+	// ... except monks are marked as receiving the warrior apr bonus, but don't actually get it
+	if (weaponInfo[0].prof == 254) return 0;
 
 	AutoTable weaponMisc = gamedata->LoadTable("clswpbon", true);
 	// if a kit is not present in the table, check its class
@@ -6656,7 +6658,7 @@ ieDword Actor::GetNumberOfAttacks()
 	} else {
 		base = GetStat(IE_NUMBEROFATTACKS);
 		if (inventory.FistsEquipped()) {
-			bonus = gamedata->GetMonkBonus(0, GetMonkLevel());
+			bonus = gamedata->GetMonkBonus(0, GetMonkLevel(), this);
 		}
 	}
 	return base + bonus;
