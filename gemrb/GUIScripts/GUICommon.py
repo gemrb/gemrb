@@ -690,24 +690,30 @@ def CanDualClass(actor):
 	return 1
 
 def IsWarrior (actor):
+	className = GetClassRowName (actor)
 	if GameCheck.IsPST ():
 		# no column there
-		className = GetClassRowName (actor)
 		return "FIGHTER" in className
 
-	IsWarrior = CommonTables.ClassSkills.GetValue (GetClassRowName(actor), "NO_PROF", GTV_INT)
-	# warriors get only a -2 penalty for wielding weapons they are not proficient with
-	# FIXME: make the check more robust, someone may change the value!
-	IsWarrior = (IsWarrior == -2)
+	# better than checking clswpbon GETS_PROF_APR / ZERO_SKILL_THAC0
+	# since those values could get changed, but new class additions are rare
+	# brand new types of warriors would probably require engine changes
+	def HasWarriorName (className):
+		candidates = ["FIGHTER", "PALADIN", "RANGER", "MONK", "BARBARIAN"]
+		for name in candidates:
+			if name in className:
+				return True
+		return False
+
+	IsWarrior = HasWarriorName (className)
 
 	Dual = IsDualClassed (actor, 0)
 	if Dual[0] > 0:
 		DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 		FirstClassIndex = CommonTables.Classes.FindValue ("MC_WAS_ID", DualedFrom)
 		FirstClassName = CommonTables.Classes.GetRowName (FirstClassIndex)
-		OldIsWarrior = CommonTables.ClassSkills.GetValue (FirstClassName, "NO_PROF", GTV_INT)
 		# there are no warrior to warrior dualclasses, so if the previous class was one, the current one certainly isn't
-		if OldIsWarrior == -2:
+		if HasWarriorName (FirstClassName):
 			return 0
 		# but there are also non-warrior to non-warrior dualclasses, so just use the new class check
 
