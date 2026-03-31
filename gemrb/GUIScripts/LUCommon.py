@@ -148,10 +148,10 @@ def CanLevelUp(actor):
 	elif Dual[0] > 0: # dual classed
 		# get the class we can level
 		if Dual[0] == 3:
-			ClassID = CommonTables.KitList.GetValue (Dual[2], 7, GTV_INT)
+			ClassID = CommonTables.KitList.GetValue (Dual[2], "CLASS", GTV_INT)
 			Class = GUICommon.GetClassRowName (ClassID, "class")
 		else:
-			Class = GUICommon.GetClassRowName(Dual[2], "index")
+			Class = Dual[2]
 		if GUICommon.IsDualSwap(actor):
 			Levels = [Levels[1], Levels[0], Levels[2]]
 
@@ -196,10 +196,9 @@ def _SetupLevels (pc, Level, offset=0, noclass=0):
 		Class = [Multi[1], Multi[2], Multi[3]]
 	elif Dual[0]: #only worry about the newer class
 		if Dual[0] == 3:
-			Class = [CommonTables.KitList.GetValue (Dual[2], 7, GTV_INT)]
+			Class = [CommonTables.KitList.GetValue (Dual[2], "CLASS", GTV_INT)]
 		else:
-			ClassRow = GUICommon.GetClassRowName(Dual[2], "index")
-			Class = [CommonTables.ClassText.GetValue (ClassRow, "CLASSID", GTV_INT)]
+			Class = [CommonTables.ClassText.GetValue (Dual[2], "CLASSID", GTV_INT)]
 		#assume Level is correct if passed
 		if GUICommon.IsDualSwap(pc) and not Level:
 			Levels = [Levels[1], Levels[0], Levels[2]]
@@ -373,10 +372,9 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		if (Levels[0]<=Levels[1]):
 			return
 		if Dual[0] == 3:
-			Class = [CommonTables.KitList.GetValue (Dual[2], 7, GTV_INT)]
+			Class = [CommonTables.KitList.GetValue (Dual[2], "CLASS", GTV_INT)]
 		else:
-			ClassRow = GUICommon.GetClassRowName(Dual[2], "index")
-			Class = [CommonTables.ClassText.GetValue (ClassRow, "CLASSID", GTV_INT)]
+			Class = [CommonTables.ClassText.GetValue (Dual[2], "CLASSID", GTV_INT)]
 		#if Level and LevelDiff are passed, we assume it is correct
 		if GUICommon.IsDualSwap(pc) and not Level and not LevelDiff:
 			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]

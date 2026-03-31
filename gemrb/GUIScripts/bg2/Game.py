@@ -81,15 +81,13 @@ def FixProtagonist( idx):
 		if GUICommon.IsDualSwap (idx):
 			OldLevel = GemRB.GetPlayerStat (idx, IE_LEVEL2)
 
-		OldClassIndex = Dual[1]
+		OldClassName = Dual[1]
 		if Dual[0] == 1:
 			# was not a class before
-			KittedClass = CommonTables.KitList.GetValue (Dual[1], 7)
+			KittedClass = CommonTables.KitList.GetValue (Dual[1], "CLASS")
 			OldClassIndex = CommonTables.ClassText.FindValue ("CLASSID", KittedClass)
-			ClassName = CommonTables.ClassText.GetRowName (OldClassIndex)
-		else:
-			ClassName = GUICommon.GetClassRowName (OldClassIndex, "index")
-		OldXP = LUCommon.GetNextLevelExp (OldLevel, ClassName)
+			OldClassName = CommonTables.ClassText.GetRowName (OldClassIndex)
+		OldXP = LUCommon.GetNextLevelExp (OldLevel, OldClassName)
 		XP += OldXP
 
 	# only give a few items for transitions from soa or if we're upgrading an imported character
