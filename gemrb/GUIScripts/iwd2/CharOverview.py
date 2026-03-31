@@ -171,7 +171,7 @@ def UpdateOverview(CurrentStep):
 	if kit:
 		ClassRowName = CommonTables.ClassText.GetRowName (CommonTables.ClassText.FindValue ("CLASSID", kit, 10))
 	if ClassRowName == "" and CurrentStep > 3:
-		ClassRowName = GUICommon.GetClassRowName (GemRB.GetPlayerStat (MyChar, IE_CLASS) - 1, "index")
+		ClassRowName = GUICommon.GetClassRowName (MyChar)
 	ClassName = CommonTables.ClassText.GetValue (ClassRowName, "LOWER", GTV_STR)
 	if ClassName != "*":
 		AddText(11959)
