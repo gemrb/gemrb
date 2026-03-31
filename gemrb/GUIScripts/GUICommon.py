@@ -399,8 +399,7 @@ def GetKitRowName (pc, extraCheck = True, idx = -1):
 # NOTE: only the "index" method is iwd2-ready, since you can have multiple classes and kits
 def GetClassRowName(value, which=-1):
 	if which == "index":
-		ClassIndex = value
-		# if barbarians cause problems, repeat the lookup again here
+		return CommonTables.Classes.GetRowName (value)
 	else:
 		if which == -1:
 			Class = GemRB.GetPlayerStat (value, IE_CLASS)
