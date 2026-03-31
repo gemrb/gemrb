@@ -92,7 +92,7 @@ private:
 	PluginHolder<Video> video;
 	VideoBufferPtr HUDBuf = nullptr; // heads up display layer. Contains cursors/tooltips/borders and whatever gets drawn via DrawHUD()
 
-	// these are mutable instead of statice because Sprite2Ds must be released before the video driver is unloaded
+	// these are mutable instead of static because Sprite2Ds must be released before the video driver is unloaded
 	mutable ToolTipData tooltip;
 	mutable ResRefMap<Holder<Sprite2D>> winframes;
 
