@@ -1,0 +1,31 @@
+2DA V1.0
+*
+                  CLASSID   KITID       LOWER       DESCSTR     MIXED
+FIGHTER                 2   *           7201        9556        1076   
+RANGER                  12  *           7200        9557        1077   
+PALADIN                 6   *           7217        9558        1078   
+CLERIC                  3   *           7204        9559        1079   
+DRUID                   11  *           7210        9560        1080   
+MAGE                    1   *           7203        9563        1081   
+THIEF                   4   *           7202        9561        1082   
+BARD                    5   *           7206        9562        1083   
+FIGHTER_THIEF           9   *           7205        9572        1052   
+FIGHTER_CLERIC          8   *           7211        9573        1053   
+FIGHTER_MAGE            7   *           7213        9574        1056   
+MAGE_THIEF              13  *           7216        9575        1057   
+CLERIC_MAGE             14  *           7207        9577        1058   
+CLERIC_THIEF            15  *           7209        9578        1065   
+FIGHTER_DRUID           16  *           7212        9579        1066   
+CLERIC_RANGER           18  *           7208        9580        1073   
+FIGHTER_MAGE_THIEF      10  *           7215        9576        1074   
+FIGHTER_MAGE_CLERIC     17  *           7214        9581        1075   
+SORCERER                19  *           45849       45866       45856  
+MONK                    20  *           45851       45867       45858  
+BARBARIAN               2   *           45855       45869       45859  
+
+# class identifier number and string references
+#
+# the original from ees also include kits, but their info is still in
+# kitlist.2da, so we zero it out instead just to maintain the same layout;
+# this is mostly useful for reusing weidu patching functions across games
+# in mods - we try to do named lookups everywhere

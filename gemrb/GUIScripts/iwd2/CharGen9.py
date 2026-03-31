@@ -162,7 +162,8 @@ def NextPress():
 	BaseClassName = CommonTables.Classes.GetRowName (Class-1)
 	#kit
 	kitrow = GemRB.GetVar ("Class")-1
-	if (CommonTables.Classes.GetValue(kitrow, 3) == 0):
+	kitName = CommonTables.Classes.GetRowName (kitrow)
+	if CommonTables.Classes.GetValue (kitName, "CLASS") == 0:
 		#baseclass
 		clssname = BaseClassName
 	else:

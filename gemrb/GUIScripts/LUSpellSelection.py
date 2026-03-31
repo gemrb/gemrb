@@ -71,6 +71,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	global SpellsWindow, DoneButton, SpellsSelectPointsLeft, Spells, chargen, SpellPointsLeftLabel
 	global SpellsTextArea, SpellTopIndex, SpellBook, SpellLevel, pc, SpellStart, BonusPoints
 	global KitMask, EnhanceGUI, Memorization, SpellBookType, SpellsPickButton, ButtonCount, Class
+	global NewScrollBarID
 
 	#enhance GUI?
 	if not IWD2 and not GameCheck.IsAnyEE ():
@@ -168,8 +169,8 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	if IWD2 and not chargen:
 		LUClass = GemRB.GetVar ("LUClass") or 0
-		LUClassName = CommonTables.Classes.GetRowName (LUClass)
-		LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
+		LUClassName = CommonTables.ClassText.GetRowName (LUClass)
+		LUClassID = CommonTables.ClassText.GetValue (LUClassName, "CLASSID")
 		Class = LUClassID
 
 	# the done button also doubles as a next button

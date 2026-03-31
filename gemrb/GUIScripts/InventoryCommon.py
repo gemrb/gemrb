@@ -349,7 +349,7 @@ def GetIWD2RestrictedClassesAndKits(classesMask, kitsMask):
 		rowName = CommonTables.Classes.GetRowName(i)
 		parentClass = CommonTables.Classes.GetValue(rowName, "CLASS")
 		mask = CommonTables.Classes.GetValue(rowName, "USABILITY")
-		nameRef = CommonTables.Classes.GetValue(rowName, "NAME_REF")
+		nameRef = CommonTables.ClassText.GetValue (rowName, "LOWER")
 		kitMask = ClassKitUsability.get(i + 1, 0)
 
 		if parentClass != 0:
@@ -362,7 +362,7 @@ def GetIWD2RestrictedClassesAndKits(classesMask, kitsMask):
 					kitName = CommonTables.Classes.GetRowName(j)
 					parentClass = CommonTables.Classes.GetValue(kitName, "CLASS")
 					mask = CommonTables.Classes.GetValue(kitName, "USABILITY")
-					nameRef = CommonTables.Classes.GetValue(kitName, "NAME_REF")
+					nameRef = CommonTables.ClassText.GetValue (kitName, "LOWER")
 
 					if parentClass != i + 1:
 						continue

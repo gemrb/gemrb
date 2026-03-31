@@ -170,7 +170,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		Class = CommonTables.KitList.GetValue (IsDual[2], 7)
 	elif IsDual[0]: #only care about the current class
 		Class = GUICommon.GetClassRowName(IsDual[2], "index")
-		Class = CommonTables.Classes.GetValue (Class, "ID")
+		Class = CommonTables.ClassText.GetValue (Class, "CLASSID")
 	else:
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassName = GUICommon.GetClassRowName(Class, "class")

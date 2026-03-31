@@ -66,7 +66,7 @@ def OnLoad():
 			
 		Button = ClassWindow.GetControl(i+1)
 		
-		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
+		t = CommonTables.ClassText.GetValue (ClassName, "LOWER")
 		Button.SetText(t )
 
 		if Allowed==2:
@@ -101,7 +101,7 @@ def OnLoad():
 		TextAreaControl.SetText(17242)
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
-		TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
+		TextAreaControl.SetText (CommonTables.ClassText.GetValue (ClassName, "DESCSTR"))
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	MultiClassButton.OnPress (MultiClassPress)
@@ -126,7 +126,7 @@ def SpecialistPress():
 	
 def ClassPress():
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF") )
+	TextAreaControl.SetText (CommonTables.ClassText.GetValue (ClassName, "DESCSTR"))
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -134,7 +134,7 @@ def NextPress():
 	ClassWindow.Close()
 	# find the class from the class table
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	Class = CommonTables.Classes.GetValue (ClassName, "ID")
+	Class = CommonTables.ClassText.GetValue (ClassName, "CLASSID")
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	CharGenCommon.next()

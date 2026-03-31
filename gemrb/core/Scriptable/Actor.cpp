@@ -1896,6 +1896,7 @@ static void InitActorTables()
 	if (!tm) {
 		error("Actor", "Missing classes.2da!");
 	}
+
 	if (iwd2class) {
 		// we need to set up much less here due to a saner class/level system in 3ed
 		Log(MESSAGE, "Actor", "Examining IWD2-style classes.2da");
@@ -1903,12 +1904,12 @@ static void InitActorTables()
 		for (int i = 0; i < (int) tm->GetRowCount(); i++) {
 			const auto& classname = tm->GetRowName(i);
 			int classis = IsClassFromName(classname);
-			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
+			ieDword classID = tm->QueryFieldUnsigned<ieDword>(classname, "CLASSID");
 			ieDword classcol = tm->QueryFieldUnsigned<ieDword>(classname, "CLASS"); // only real classes have this column at 0
 			ResRef clab = tm->QueryField(classname, "CLAB");
 			if (classcol) {
 				// kit ids are in hex
-				classID = strtounsigned<ieDword>(tm->QueryField(classname, "ID").c_str(), nullptr, 16);
+				classID = strtounsigned<ieDword>(tm->QueryField(classname, "CLASSID").c_str(), nullptr, 16);
 				class2kits[classcol].indices.push_back(i);
 				class2kits[classcol].ids.push_back(classID);
 				class2kits[classcol].clabs.emplace_back(clab);
@@ -1917,7 +1918,7 @@ static void InitActorTables()
 			} else if (i < classcount) {
 				// populate classesiwd2
 				// we need the id of the isclass name, not the current one
-				ieDword cid = tm->QueryFieldUnsigned<ieDword>(isclassnames[i], "ID");
+				ieDword cid = tm->QueryFieldUnsigned<ieDword>(isclassnames[i], "CLASSID");
 				classesiwd2[i] = cid;
 
 				class2kits[classID].clab = clab;
@@ -1964,6 +1965,7 @@ static void InitActorTables()
 		}
 	} else {
 		AutoTable hptm;
+		AutoTable clasText = gamedata->LoadTable("clastext", true);
 
 		Log(MESSAGE, "Actor", "Examining classes.2da");
 		// iwd2 just uses levelslotsiwd2 instead
@@ -1976,7 +1978,7 @@ static void InitActorTables()
 			const std::string& classname = tm->GetRowName(i);
 			//make sure we have a valid classid, then decrement
 			//it to get the correct array index
-			tmpindex = tm->QueryFieldUnsigned<ieDword>(classname, "ID");
+			tmpindex = clasText->QueryFieldUnsigned<ieDword>(classname, "CLASSID");
 			if (!tmpindex)
 				continue;
 			className2ID[classname] = tmpindex;
@@ -2036,7 +2038,7 @@ static void InitActorTables()
 					break;
 				if ((1 << j) & tmpclass) {
 					//save the IE_LEVEL information
-					const std::string& currentname = tm->GetRowName(tm->FindTableValue("ID", j + 1));
+					const std::string& currentname = clasText->GetRowName(clasText->FindTableValue("CLASSID", j + 1));
 					classis = IsClassFromName(currentname);
 					if (classis >= 0) {
 						//search for the current class in the split of the names to get it's

@@ -36,8 +36,8 @@ def AdjustTextArea():
 	global HasSubClass, ClassID
 
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
-	ClassID = CommonTables.Classes.GetValue(ClassName, "ID")
+	TextAreaControl.SetText (CommonTables.ClassText.GetValue (ClassName, "DESCSTR"))
+	ClassID = CommonTables.ClassText.GetValue (ClassName, "CLASSID")
 	#determining if this class has any subclasses
 	HasSubClass = 0
 	for i in range(1, ClassCount):
@@ -97,7 +97,7 @@ def SetupClassList():
 		Allowed = ClassRaceTable.GetValue (ClassName, RaceName, GTV_INT)
 		Button = ClassWindow.GetControl(j+2)
 		j = j+1
-		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
+		t = CommonTables.ClassText.GetValue (ClassName, "LOWER")
 		Button.SetText(t )
 
 		if Allowed==0:
@@ -153,7 +153,7 @@ def ClassPress():
 			continue
 		Button = ClassWindow.GetControl(j+2)
 		j = j+1
-		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
+		t = CommonTables.ClassText.GetValue (ClassName, "LOWER")
 		Button.SetText(t )
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.OnPress (ClassPress2)
@@ -164,7 +164,7 @@ def ClassPress():
 
 def ClassPress2():
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
+	TextAreaControl.SetText (CommonTables.ClassText.GetValue (ClassName, "DESCSTR"))
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 

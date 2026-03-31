@@ -87,7 +87,7 @@ def OnLoad():
 def ClassPress():
 	GUICG2.SetClass()
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
+	TextAreaControl.SetText (CommonTables.ClassText.GetValue (ClassName, "DESCSTR"))
 	DoneButton.SetDisabled(False)
 	return
 
@@ -105,7 +105,7 @@ def NextPress():
 
 	# find the class from the class table
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	Class = CommonTables.Classes.GetValue (ClassName, "ID")
+	Class = CommonTables.ClassText.GetValue (ClassName, "CLASSID")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 
 	GemRB.SetNextScript("CharGen4") #alignment
@@ -122,7 +122,7 @@ def RedrawMCs():
 
 		offset = GemRB.GetVar ("TopIndex") or 0
 		t = GUICommon.GetClassRowName (MCRowIndices[i - 2 + offset][0], "index")
-		t = CommonTables.Classes.GetValue(t, "NAME_REF")
+		t = CommonTables.ClassText.GetValue (t, "LOWER")
 		Button.SetText(t )
 		if not MCRowIndices[i - 2 + offset][1]:
 			Button.SetState(IE_GUI_BUTTON_DISABLED)

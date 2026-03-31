@@ -85,7 +85,7 @@ def FixProtagonist( idx):
 		if Dual[0] == 1:
 			# was not a class before
 			KittedClass = CommonTables.KitList.GetValue (Dual[1], 7)
-			OldClassIndex = CommonTables.Classes.FindValue ("ID", KittedClass)
+			OldClassIndex = CommonTables.ClassText.FindValue ("CLASSID", KittedClass)
 		ClassName = GUICommon.GetClassRowName (OldClassIndex, "index")
 		OldXP = LUCommon.GetNextLevelExp (OldLevel, ClassName)
 		XP += OldXP

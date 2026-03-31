@@ -413,7 +413,7 @@ def SetCharacterDescription():
 		Kit = GemRB.GetPlayerStat (MyChar, IE_KIT)
 		KitIndex = KitTable.FindValue (3, Kit)
 		if KitIndex <= 0:
-			ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF")
+			ClassTitle = CommonTables.ClassText.GetValue (ClassName, "MIXED")
 		else:
 			ClassTitle = KitTable.GetValue (KitIndex, 2)
 		TextArea.Append (ClassTitle)
@@ -891,7 +891,7 @@ def ClassPress():
 			else:
 				ClassSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 			ClassSelectButton.OnPress (ClassSelectPress)
-			ClassSelectButton.SetText (CommonTables.Classes.GetValue (ClassRowName, "NAME_REF"))
+			ClassSelectButton.SetText (CommonTables.ClassText.GetValue (ClassRowName, "LOWER"))
 			ClassSelectButton.SetVarAssoc ("Class", i + 1)
 
 	ClassMultiButton = ClassWindow.GetControl (10)
@@ -934,7 +934,7 @@ def ClassSelectPress():
 	global ClassWindow, ClassTextArea, ClassDoneButton
 
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	ClassTextArea.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
+	ClassTextArea.SetText (CommonTables.ClassText.GetValue (ClassName, "DESCSTR"))
 	ClassDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -961,7 +961,7 @@ def ClassMultiPress():
 			else:
 				ClassMultiSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
 			ClassMultiSelectButton.OnPress (ClassMultiSelectPress)
-			ClassMultiSelectButton.SetText (CommonTables.Classes.GetValue (ClassName, "NAME_REF"))
+			ClassMultiSelectButton.SetText (CommonTables.ClassText.GetValue (ClassName, "LOWER"))
 			ClassMultiSelectButton.SetVarAssoc ("Class", i + 1)
 
 	ClassMultiTextArea = ClassMultiWindow.GetControl (12)
@@ -986,7 +986,7 @@ def ClassMultiSelectPress():
 	global ClassMultiWindow, ClassMultiTextArea, ClassMultiDoneButton
 
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	ClassMultiTextArea.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
+	ClassMultiTextArea.SetText (CommonTables.ClassText.GetValue (ClassName, "DESCSTR"))
 	ClassMultiDoneButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -1085,7 +1085,7 @@ def ClassDonePress():
 	AlignmentButton.MakeDefault()
 
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	Class = CommonTables.Classes.GetValue (ClassName, "ID")
+	Class = CommonTables.ClassText.GetValue (ClassName, "CLASSID")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 
 	Kit = KitTable.GetValue (GemRB.GetVar ("MAGESCHOOL"), 3 )

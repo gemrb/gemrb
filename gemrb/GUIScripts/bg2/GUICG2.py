@@ -88,7 +88,7 @@ def OnLoad():
 		else:
 			Button = ClassWindow.GetControl(j+2)
 		j = j+1
-		t = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
+		t = CommonTables.ClassText.GetValue (ClassName, "LOWER")
 		Button.SetText(t )
 
 		if Allowed==0:
@@ -118,7 +118,7 @@ def OnLoad():
 		TextAreaControl.SetText(17242)
 		DoneButton.SetDisabled(True)
 	else:
-		TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
+		TextAreaControl.SetText (CommonTables.ClassText.GetValue (ClassName, "DESCSTR"))
 		DoneButton.SetDisabled(False)
 
 	MultiClassButton.OnPress (MultiClassPress)
@@ -138,7 +138,7 @@ def SetClass():
 	# find the class from the class table
 	ClassIndex = GemRB.GetVar ("Class") - 1
 	ClassName = GUICommon.GetClassRowName (ClassIndex, "index")
-	Class = CommonTables.Classes.GetValue (ClassName, "ID")
+	Class = CommonTables.ClassText.GetValue (ClassName, "CLASSID")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
 	MageSchool = GemRB.GetVar ("MAGESCHOOL")

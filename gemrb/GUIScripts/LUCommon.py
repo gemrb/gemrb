@@ -199,7 +199,7 @@ def _SetupLevels (pc, Level, offset=0, noclass=0):
 			Class = [CommonTables.KitList.GetValue (Dual[2], 7, GTV_INT)]
 		else:
 			ClassRow = GUICommon.GetClassRowName(Dual[2], "index")
-			Class = [CommonTables.Classes.GetValue (ClassRow, "ID", GTV_INT)]
+			Class = [CommonTables.ClassText.GetValue (ClassRow, "CLASSID", GTV_INT)]
 		#assume Level is correct if passed
 		if GUICommon.IsDualSwap(pc) and not Level:
 			Levels = [Levels[1], Levels[0], Levels[2]]
@@ -376,7 +376,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 			Class = [CommonTables.KitList.GetValue (Dual[2], 7, GTV_INT)]
 		else:
 			ClassRow = GUICommon.GetClassRowName(Dual[2], "index")
-			Class = [CommonTables.Classes.GetValue (ClassRow, "ID", GTV_INT)]
+			Class = [CommonTables.ClassText.GetValue (ClassRow, "CLASSID", GTV_INT)]
 		#if Level and LevelDiff are passed, we assume it is correct
 		if GUICommon.IsDualSwap(pc) and not Level and not LevelDiff:
 			LevelDiffs = [LevelDiffs[1], LevelDiffs[0], LevelDiffs[2]]

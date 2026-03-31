@@ -25,7 +25,7 @@ from ie_restype import RES_2DA
 StrMod = StrModEx = None
 Classes = KitList = ClassSkills = Races = NextLevel = None
 Pdolls = SpellDisplay = Aligns = ItemType = None
-WeapProfs = CharProfs = RaceData = None
+WeapProfs = CharProfs = RaceData = ClassText = None
 
 Loaded = False
 
@@ -33,7 +33,7 @@ def Load():
 	global Classes, KitList, ClassSkills, Races, NextLevel
 	global Pdolls, StrModEx, StrMod, SpellDisplay, Aligns
 	global ItemType, WeapProfs, CharProfs, RaceData
-	global Loaded
+	global Loaded, ClassText
 
 	if Loaded:
 		return
@@ -62,5 +62,9 @@ def Load():
 		WeapProfs = GemRB.LoadTable ("weapprof", False, True)
 	if GemRB.HasResource ("charprof", RES_2DA):
 		CharProfs = GemRB.LoadTable ("charprof", False, True)
+	if GameCheck.IsIWD2 ():
+		ClassText = Classes
+	elif GemRB.HasResource ("clastext", RES_2DA):
+		ClassText = GemRB.LoadTable ("clastext", False, True)
 
 	Loaded = True

@@ -217,7 +217,7 @@ def UpdateRecordsWindow (Window):
 
 
 	# class
-	text = CommonTables.Classes.GetValue (GUICommon.GetClassRowName (pc), "NAME_REF")
+	text = CommonTables.ClassText.GetValue (GUICommon.GetClassRowName (pc), "LOWER")
 
 	Label = Window.GetControl (0x10000016)
 	Label.SetText (text)
@@ -423,7 +423,7 @@ def GetCharacterHeader (pc):
 			avatar_header['SecoNextLevXP'] = GetNextLevelExp (avatar_header['SecoLevel'], avatar_header['SecoClass'])
 
 			# Converting to the displayable format
-			avatar_header['SecoClass'] = CommonTables.Classes.GetValue (avatar_header['SecoClass'], "NAME_REF", GTV_REF)
+			avatar_header['SecoClass'] = CommonTables.ClassText.GetValue (avatar_header['SecoClass'], "LOWER", GTV_REF)
 		else:
 			avatar_header['SecoLevel'] = 0
 			avatar_header['PrimClass'] = CommonTables.Classes.GetRowName (Class)
@@ -432,7 +432,7 @@ def GetCharacterHeader (pc):
 			avatar_header['SecoNextLevXP'] = 0
 
 	# Converting to the displayable format
-	avatar_header['PrimClass'] = CommonTables.Classes.GetValue (avatar_header['PrimClass'], "NAME_REF", GTV_REF)
+	avatar_header['PrimClass'] = CommonTables.ClassText.GetValue (avatar_header['PrimClass'], "LOWER", GTV_REF)
 
 
 
@@ -970,7 +970,7 @@ def OpenLevelUpWindow ():
 
 	# class
 	Label = Window.GetControl (0x10000001)
-	Label.SetText (CommonTables.Classes.GetValue (Class, "NAME_REF"))
+	Label.SetText (CommonTables.ClassText.GetValue (Class, "LOWER"))
 
 	# Armor Class
 	Label = Window.GetControl (0x10000023)

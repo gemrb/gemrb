@@ -399,15 +399,15 @@ def GetKitIndex (actor, ClassIndex):
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 
 	KitIndex = -1
-	ClassName = CommonTables.Classes.GetRowName (ClassIndex)
-	ClassID = CommonTables.Classes.GetValue (ClassName, "ID")
+	ClassName = CommonTables.ClassText.GetRowName (ClassIndex)
+	ClassID = CommonTables.ClassText.GetValue (ClassName, "CLASSID")
 	# skip the primary classes
 	# start at the first original kit - in iwd2 both classes and kits are in the same table
 	KitOffset = CommonTables.Classes.FindValue ("CLASS", 7)
 	for ci in range (KitOffset, CommonTables.Classes.GetRowCount ()):
 		RowName = CommonTables.Classes.GetRowName (ci)
 		BaseClass = CommonTables.Classes.GetValue (RowName, "CLASS")
-		if BaseClass == ClassID and Kit & CommonTables.Classes.GetValue (RowName, "ID", GTV_INT):
+		if BaseClass == ClassID and Kit & CommonTables.ClassText.GetValue (RowName, "CLASSID", GTV_INT):
 			#FIXME: this will return the last kit only, check if proper multikit return values are needed
 			KitIndex = ci
 
@@ -426,7 +426,7 @@ def GetActorClassTitle (actor, ClassIndex):
 		ClassName = CommonTables.Classes.GetRowName (ClassIndex)
 	else:
 		ClassName = CommonTables.Classes.GetRowName (KitIndex)
-	ClassTitle = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
+	ClassTitle = CommonTables.ClassText.GetValue (ClassName, "LOWER")
 
 	if ClassTitle == "*":
 		return 0

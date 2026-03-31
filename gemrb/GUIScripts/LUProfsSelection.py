@@ -193,7 +193,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 		Class = CommonTables.KitList.GetValue (IsDual[2], 7, GTV_INT)
 	elif IsDual[0]:
 		Class = GUICommon.GetClassRowName(IsDual[2], "index")
-		Class = CommonTables.Classes.GetValue (Class, "ID", GTV_INT)
+		Class = CommonTables.ClassText.GetValue (Class, "CLASSID", GTV_INT)
 	else:
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassName = GUICommon.GetClassRowName (Class, "class")

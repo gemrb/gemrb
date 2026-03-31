@@ -326,7 +326,7 @@ def GetClassTitles (pc,LevelDiff):
 			if Kit and KitClass == Multi[i+1]:
 				ClassTitle = CommonTables.KitList.GetValue (str(Kit), "MIXED", GTV_REF)
 			else:
-				ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
+				ClassTitle = CommonTables.ClassText.GetValue (Class, "MIXED", GTV_REF)
 			GemRB.SetToken ("CLASS", ClassTitle)
 			GemRB.SetToken ("LEVEL", str (Levels[i] + LevelDiff[i] - LevelDrain // Multi[0]))
 			GemRB.SetToken ("EXPERIENCE", str (XP // Multi[0]) )
@@ -358,7 +358,7 @@ def GetClassTitles (pc,LevelDiff):
 			ClassTitle = CommonTables.KitList.GetValue (Dual[2], 2, GTV_REF)
 		else:
 			Class = GUICommon.GetClassRowName (Dual[2], "index")
-			ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
+			ClassTitle = CommonTables.ClassText.GetValue (Class, "MIXED", GTV_REF)
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[0]-LevelDrain))
 		XP2 = GemRB.GetPlayerStat (pc, IE_XP)
@@ -376,7 +376,7 @@ def GetClassTitles (pc,LevelDiff):
 			ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2, GTV_REF)
 		else:
 			Class = GUICommon.GetClassRowName (Dual[1], "index")
-			ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
+			ClassTitle = CommonTables.ClassText.GetValue (Class, "MIXED", GTV_REF)
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[1]) )
 
@@ -809,7 +809,7 @@ def OpenKitInfoWindow ():
 	Dual = GUICommon.IsDualClassed (pc, 1)
 	text = ""
 	if Multi and Dual[0] == 0: # true multi class
-		text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
+		text = CommonTables.ClassText.GetValue (ClassName, "DESCSTR")
 	else:
 		KitIndex = GUICommon.GetKitIndex (pc)
 
@@ -818,19 +818,19 @@ def OpenKitInfoWindow ():
 			if Dual[0] == 1:
 				text = CommonTables.KitList.GetValue (Dual[1], 3, GTV_REF)
 			else:
-				text = CommonTables.Classes.GetValue (GUICommon.GetClassRowName(Dual[1], "index"), "DESC_REF", GTV_REF)
+				text = CommonTables.ClassText.GetValue (GUICommon.GetClassRowName(Dual[1], "index"), "DESCSTR", GTV_REF)
 	
 			text += "\n\n"
 			if Dual[0] == 3:
 				text += CommonTables.KitList.GetValue (Dual[2], 3, GTV_REF)
 			else:
-				text += CommonTables.Classes.GetValue (GUICommon.GetClassRowName(Dual[2], "index"), "DESC_REF", GTV_REF)
+				text += CommonTables.ClassText.GetValue (GUICommon.GetClassRowName(Dual[2], "index"), "DESCSTR", GTV_REF)
 	
 		else: # ordinary class or kit
 			if KitIndex:
 				text = CommonTables.KitList.GetValue (KitIndex, 3)
 			else:
-				text = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
+				text = CommonTables.ClassText.GetValue (ClassName, "DESCSTR")
 
 	TextArea.SetText (text)
 

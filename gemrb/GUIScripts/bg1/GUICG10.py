@@ -62,7 +62,7 @@ def OnLoad():
 		else:
 			Button = ClassWindow.GetControl(j+2)
 
-		t = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
+		t = CommonTables.ClassText.GetValue (ClassName, "LOWER")
 		Button.SetText(t )
 		j=j+1
 		if Allowed ==0:
@@ -87,7 +87,7 @@ def OnLoad():
 
 def ClassPress():
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
+	TextAreaControl.SetText (CommonTables.ClassText.GetValue (ClassName, "DESCSTR"))
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -95,7 +95,7 @@ def NextPress(Window):
 	Window.Close()
 	#class	
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
-	Class = CommonTables.Classes.GetValue (ClassName, "ID")
+	Class = CommonTables.ClassText.GetValue (ClassName, "CLASSID")
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 

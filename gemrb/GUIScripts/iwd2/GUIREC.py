@@ -314,7 +314,7 @@ def DisplayGeneral (pc, targetTextArea):
 		tmp = highest
 	else:
 		tmp = GetFavoredClass(pc, tmp)
-	tmp = CommonTables.Classes.GetValue (CommonTables.Classes.GetRowName(tmp), "NAME_REF")
+	tmp = CommonTables.ClassText.GetValue (CommonTables.ClassText.GetRowName(tmp), "LOWER")
 	RecordsTextArea.Append (DelimitedStrRefs (40310, tmp, 0))
 
 	#experience
@@ -1195,7 +1195,7 @@ def OpenLevelUpWindow ():
 		Label = Window.GetControl (0x10000000 + i+13)
 
 		ClassTitle = CommonTables.Classes.GetRowName (i-2)
-		ClassTitle = CommonTables.Classes.GetValue (ClassTitle, "NAME_REF", GTV_REF)
+		ClassTitle = CommonTables.ClassText.GetValue (ClassTitle, "LOWER", GTV_REF)
 		Button.SetText (ClassTitle)
 		level = GemRB.GetPlayerStat (pc, Classes[i-2])
 		if level > 0:
@@ -1241,7 +1241,7 @@ def LUClassPress ():
 	TextArea = Window.GetControl (13)
 	i = GemRB.GetVar ("LUClass") or 0
 	ClassDesc = CommonTables.Classes.GetRowName (i)
-	ClassDesc = CommonTables.Classes.GetValue (ClassDesc, "DESC_REF", GTV_REF)
+	ClassDesc = CommonTables.ClassText.GetValue (ClassDesc, "DESCSTR", GTV_REF)
 	TextArea.SetText (ClassDesc)
 	Window.SetEventProxy (TextArea)
 
@@ -1325,12 +1325,12 @@ def OpenLUKitWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	LUClass = GemRB.GetVar ("LUClass") # index, not ID
 	LUClassName = CommonTables.Classes.GetRowName (LUClass)
-	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
+	LUClassID = CommonTables.ClassText.GetValue (LUClassName, "CLASSID")
 	hasKits = CommonTables.Classes.FindValue ("CLASS", LUClassID)
 	kitIndex = GUICommonWindows.GetKitIndex (pc, LUClass)
 	if hasKits is None or kitIndex > 0:
 		kitName = CommonTables.Classes.GetRowName (kitIndex)
-		kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
+		kitID = CommonTables.ClassText.GetValue (kitName, "CLASSID", GTV_INT)
 		if hasKits is None:
 			kitID = 0
 		HandleSpecFlagExclusion(pc, LUClassID, kitID)
@@ -1373,7 +1373,7 @@ def OpenLUKitWindow ():
 			continue
 
 		kitTitle = CommonTables.Classes.GetRowName (kitOffset+i)
-		kitTitle = CommonTables.Classes.GetValue (kitTitle, "NAME_REF", GTV_REF)
+		kitTitle = CommonTables.ClassText.GetValue (kitTitle, "LOWER", GTV_REF)
 		Button.SetText (kitTitle)
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc ("LUKit", i)
@@ -1392,14 +1392,14 @@ def LUKitPress ():
 	i = GemRB.GetVar ("LUKit") or 0
 	LUClass = GemRB.GetVar ("LUClass") or 0
 	LUClassName = CommonTables.Classes.GetRowName (LUClass)
-	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
+	LUClassID = CommonTables.ClassText.GetValue (LUClassName, "CLASSID")
 	kitOffset = CommonTables.Classes.FindValue ("CLASS", LUClassID)
 	kitName = CommonTables.Classes.GetRowName (i+kitOffset)
-	kitDesc = CommonTables.Classes.GetValue (kitName, "DESC_REF", GTV_REF)
+	kitDesc = CommonTables.ClassText.GetValue (kitName, "DESCSTR", GTV_REF)
 	TextArea.SetText (kitDesc)
 
 	# set it to the kit value, so we don't need these gimnastics later
-	kitID = CommonTables.Classes.GetValue (kitName, "ID", GTV_INT)
+	kitID = CommonTables.ClassText.GetValue (kitName, "CLASSID", GTV_INT)
 	GemRB.SetVar ("LUKit", kitID)
 	GemRB.SetVar ("LUKitJustSet", LUClassID)
 
@@ -1439,7 +1439,7 @@ def FinishLevelUp():
 	# saving throws
 	LUClass = GemRB.GetVar ("LUClass") or 0 # index, not ID
 	LUClassName = CommonTables.Classes.GetRowName (LUClass)
-	LUClassID = CommonTables.Classes.GetValue (LUClassName, "ID")
+	LUClassID = CommonTables.ClassText.GetValue (LUClassName, "CLASSID")
 	IDLUCommon.SetupSavingThrows (pc, LUClassID)
 
 	# hit points
@@ -1464,7 +1464,7 @@ def FinishLevelUp():
 	# use the kit name if it is available
 	LUKitName = LUClassName
 	if LUKit != 0:
-		kitIndex = CommonTables.Classes.FindValue ("ID", LUKit)
+		kitIndex = CommonTables.ClassText.FindValue ("CLASSID", LUKit)
 		LUKitName = CommonTables.Classes.GetRowName (kitIndex)
 	if oldLevel == 0:
 		IDLUCommon.AddResistances (pc, LUKitName, "clssrsmd")

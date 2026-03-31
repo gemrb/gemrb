@@ -499,7 +499,7 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 	if GameCheck.IsIWD2():
 		row = CommonTables.ClassSkills.FindValue ("SPLTYPE", booktype)
 		rowName = CommonTables.ClassSkills.GetRowName (row)
-		Class = CommonTables.Classes.GetValue (rowName, "ID", GTV_INT)
+		Class = CommonTables.ClassText.GetValue (rowName, "CLASSID", GTV_INT)
 		spells = GetIWD2Spells (0, Usability, Level, Class)
 		spells = [e[0] for e in filter(lambda s: s[1], spells)] # skip disallowed spells
 		return spells

@@ -203,7 +203,7 @@ def RefreshInventoryWindow (Window):
 	Label.SetText (str (GemRB.GameGetPartyGold ()))
 
 	# class
-	text = CommonTables.Classes.GetValue (GUICommon.GetClassRowName (pc), "NAME_REF")
+	text = CommonTables.ClassText.GetValue (GUICommon.GetClassRowName (pc), "LOWER")
 
 	Label = Window.GetControl (0x1000003f)
 	Label.SetText (text)

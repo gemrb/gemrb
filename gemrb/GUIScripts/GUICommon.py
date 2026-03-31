@@ -333,7 +333,7 @@ def GetActorClassTitle (actor):
 	MCFlags = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
 
 	if Multi and Dual[0] == 0: # true multi class
-		ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF", GTV_REF)
+		ClassTitle = CommonTables.ClassText.GetValue (ClassName, "MIXED", GTV_REF)
 		return ClassTitle
 
 	if Dual[0]: # dual class
@@ -341,12 +341,12 @@ def GetActorClassTitle (actor):
 		if Dual[0] == 1:
 			ClassTitle = CommonTables.KitList.GetValue (Dual[1], 2, GTV_REF)
 		else:
-			ClassTitle = CommonTables.Classes.GetValue (GetClassRowName(Dual[1], "index"), "CAP_REF", GTV_REF)
+			ClassTitle = CommonTables.ClassText.GetValue (GetClassRowName(Dual[1], "index"), "MIXED", GTV_REF)
 		ClassTitle += " / "
 		if Dual[0] == 3:
 			ClassTitle += CommonTables.KitList.GetValue (Dual[2], 2, GTV_REF)
 		else:
-			ClassTitle += CommonTables.Classes.GetValue (GetClassRowName(Dual[2], "index"), "CAP_REF", GTV_REF)
+			ClassTitle += CommonTables.ClassText.GetValue (GetClassRowName(Dual[2], "index"), "MIXED", GTV_REF)
 	elif MCFlags & (MC_FALLEN_PALADIN | MC_FALLEN_RANGER): # fallen
 		ClassTitle = 10369
 		if MCFlags & MC_FALLEN_PALADIN:
@@ -355,7 +355,7 @@ def GetActorClassTitle (actor):
 	elif KitIndex: # ordinary kit
 		ClassTitle = CommonTables.KitList.GetValue (KitIndex, 2, GTV_REF)
 	else: # ordinary class
-		ClassTitle = CommonTables.Classes.GetValue (ClassName, "CAP_REF", GTV_REF)
+		ClassTitle = CommonTables.ClassText.GetValue (ClassName, "MIXED", GTV_REF)
 
 	return ClassTitle
 
@@ -408,10 +408,10 @@ def GetClassRowName(value, which=-1):
 			Class = value
 		else:
 			raise RuntimeError("Bad type parameter for GetClassRowName: " + str(which))
-		ClassIndex = CommonTables.Classes.FindValue ("ID", Class)
+		ClassIndex = CommonTables.ClassText.FindValue ("CLASSID", Class)
 	if ClassIndex is None:
 		return ""
-	ClassRowName = CommonTables.Classes.GetRowName (ClassIndex)
+	ClassRowName = CommonTables.ClassText.GetRowName (ClassIndex)
 	return ClassRowName
 
 # checks the classes.2da table if the class is multiclass/dualclass capable (bits define the class combination)
@@ -446,7 +446,7 @@ def IsDualClassed(actor, verbose):
 	KitIndex = GetKitIndex (actor)
 	if KitIndex:
 		KittedClass = CommonTables.KitList.GetValue (KitIndex, 7)
-		KittedClassIndex = CommonTables.Classes.FindValue ("ID", KittedClass)
+		KittedClassIndex = CommonTables.ClassText.FindValue ("CLASSID", KittedClass)
 	else:
 		KittedClassIndex = 0
 
@@ -457,7 +457,7 @@ def IsDualClassed(actor, verbose):
 	for i in range (1,16):
 		Mask = 1 << (i - 1)
 		if Multi & Mask:
-			ClassIndex = CommonTables.Classes.FindValue ("ID", i)
+			ClassIndex = CommonTables.ClassText.FindValue ("CLASSID", i)
 			if ClassIndex == FirstClassIndex:
 				continue
 			SecondClassIndex = ClassIndex
@@ -485,8 +485,8 @@ def IsDualSwap (actor, override=None):
 
 	Dual = IsDualClassed (actor, 1)
 	if override:
-		CI1 = CommonTables.Classes.FindValue ("ID", override["old"])
-		CI2 = CommonTables.Classes.FindValue ("ID", override["new"])
+		CI1 = CommonTables.ClassText.FindValue ("CLASSID", override["old"])
+		CI2 = CommonTables.ClassText.FindValue ("CLASSID", override["new"])
 		Dual = (2, CI1, CI2) # TODO: support IsDualClassed mode 3 once a gui for it is added
 
 	# not dual classed

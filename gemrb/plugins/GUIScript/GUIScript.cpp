@@ -3905,7 +3905,7 @@ be avoided. The hardcoded token list:\n\
 \n\
 **Examples:**\n\
 \n\
-    ClassTitle = CommonTables.Classes.GetValue (Class, 'CAP_REF', GTV_REF)\n\
+    ClassTitle = CommonTables.ClassText.GetValue (Class, 'MIXED', GTV_REF)\n\
     GemRB.SetToken ('CLASS', ClassTitle)\n\
     # force an update of the string by refetching it\n\
     TextArea.SetText (GemRB.GetString (16480))\n\

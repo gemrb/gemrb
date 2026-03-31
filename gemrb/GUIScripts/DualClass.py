@@ -213,7 +213,7 @@ def DCMainDonePress ():
 	MultClassId = (1 << (NewClassId-1)) | (1 << (OldClassId-1))
 	MultClassId = CommonTables.Classes.FindValue ("MULTI", MultClassId)
 	MultClassId = CommonTables.Classes.GetRowName (MultClassId)
-	MultClassId = CommonTables.Classes.GetValue (MultClassId, "ID")
+	MultClassId = CommonTables.ClassText.GetValue (MultClassId, "CLASSID")
 
 	# fake update our levels (no PCF), so the PCF can be ran later on correct values
 	# core only looks at the level difference when determining dc class order
@@ -314,7 +314,7 @@ def DCMainClassPress ():
 	# string refs for the given classes
 	DCClassStrings = []
 	for classname in DCClasses:
-		DCClassStrings.append(CommonTables.Classes.GetValue (classname, "NAME_REF", GTV_INT))
+		DCClassStrings.append (CommonTables.ClassText.GetValue (classname, "LOWER", GTV_INT))
 
 	# setup the class buttons
 	for i in range (6):
@@ -380,7 +380,7 @@ def DCClassSelect ():
 	# all the possible strrefs for the different classes
 	DCClassStrings = []
 	for classname in DCClasses:
-		DCClassStrings.append (CommonTables.Classes.GetValue (classname, "DESC_REF", GTV_INT))
+		DCClassStrings.append (CommonTables.ClassText.GetValue (classname, "DESCSTR", GTV_INT))
 
 	# update the text are with the new string
 	DCClassTextArea = DCClassWindow.GetControl (9)
@@ -404,7 +404,7 @@ def DCClassDonePress ():
 
 	# save the class
 	ClassName = DCClasses[DCClass]
-	NewClassId = CommonTables.Classes.GetValue (ClassName, "ID", GTV_INT)
+	NewClassId = CommonTables.ClassText.GetValue (ClassName, "CLASSID", GTV_INT)
 
 	# set our step to 2 so that the back button knows where we are
 	DCMainStep = 2
@@ -473,7 +473,7 @@ def DCOpenProfsWindow ():
 
 	# load up our window and set some basic variables
 	DCProfsWindow = GemRB.LoadWindow (15, "GUIREC")
-	NewClassId = CommonTables.Classes.GetValue (ClassName, "ID", GTV_INT)
+	NewClassId = CommonTables.ClassText.GetValue (ClassName, "CLASSID", GTV_INT)
 	if GameCheck.IsBG2OrEE ():
 		LUProfsSelection.SetupProfsWindow (pc, \
 			LUProfsSelection.LUPROFS_TYPE_DUALCLASS, DCProfsWindow, DCProfsRedraw, classid=NewClassId)

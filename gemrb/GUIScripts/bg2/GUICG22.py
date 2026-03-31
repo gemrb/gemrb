@@ -145,7 +145,7 @@ def RedrawKits():
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		if not KitTable:
 			KitIndex = 0
-			KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF", GTV_REF)
+			KitName = CommonTables.ClassText.GetValue (ClassName, "LOWER", GTV_REF)
 		else:
 			KitIndex = KitTable.GetValue (i + TopIndex, 0)
 			if ClassName == "MAGE":
@@ -163,7 +163,7 @@ def RedrawKits():
 				if KitIndex and KitIndex != "*":
 					KitName = CommonTables.KitList.GetValue (KitIndex, 1, GTV_REF)
 				else:
-					KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF", GTV_REF)
+					KitName = CommonTables.ClassText.GetValue (ClassName, "LOWER", GTV_REF)
 		Button.SetText(KitName)
 		if (not EnabledButtons and RaceAllowsKit (KitName)) or i+TopIndex in EnabledButtons:
 			Button.SetState(IE_GUI_BUTTON_ENABLED)
@@ -206,7 +206,7 @@ def KitPress():
 		GemRB.SetVar("MAGESCHOOL", 0) # so bards don't get schools
 
 	if KitIndex == 0:
-		KitDescription = CommonTables.Classes.GetValue (ClassName, "DESC_REF")
+		KitDescription = CommonTables.ClassText.GetValue (ClassName, "DESCSTR")
 	else:
 		KitDescription = CommonTables.KitList.GetValue (KitIndex, 3)
 

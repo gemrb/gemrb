@@ -169,10 +169,10 @@ def UpdateOverview(CurrentStep):
 	ClassRowName = ""
 	# won't work for multikits, but it's just a cosmetic problem
 	if kit:
-		ClassRowName = CommonTables.Classes.GetRowName (CommonTables.Classes.FindValue ("ID", kit, 10))
+		ClassRowName = CommonTables.ClassText.GetRowName (CommonTables.ClassText.FindValue ("CLASSID", kit, 10))
 	if ClassRowName == "" and CurrentStep > 3:
 		ClassRowName = GUICommon.GetClassRowName (GemRB.GetPlayerStat (MyChar, IE_CLASS) - 1, "index")
-	ClassName = CommonTables.Classes.GetValue (ClassRowName, "NAME_REF", GTV_STR)
+	ClassName = CommonTables.ClassText.GetValue (ClassRowName, "LOWER", GTV_STR)
 	if ClassName != "*":
 		AddText(11959)
 		AddText(': ')

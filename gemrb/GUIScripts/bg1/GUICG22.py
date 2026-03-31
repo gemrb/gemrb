@@ -64,7 +64,7 @@ def OnLoad():
 				KitName = SchoolList.GetValue(i, 0)
 			else:
 				KitIndex = 0
-				KitName = CommonTables.Classes.GetValue(ClassName, "NAME_REF")
+				KitName = CommonTables.ClassText.GetValue (ClassName, "LOWER")
 
 		else:
 			KitIndex = KitTable.GetValue (i, 0)
@@ -76,7 +76,7 @@ def OnLoad():
 				if KitIndex:
 					KitName = CommonTables.KitList.GetValue (KitIndex, 1)
 				else:
-					KitName = CommonTables.Classes.GetValue (ClassName, "NAME_REF")
+					KitName = CommonTables.ClassText.GetValue (ClassName, "LOWER")
 
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetText(KitName)
@@ -103,7 +103,7 @@ def OnLoad():
 def KitPress():
 	KitIndex = GemRB.GetVar ("Class Kit")
 	if KitIndex == 0:
-		KitName = CommonTables.Classes.GetValue(ClassName, "DESC_REF")
+		KitName = CommonTables.ClassText.GetValue (ClassName, "DESCSTR")
 	else:
 		if ClassName == "MAGE":
 			KitName = SchoolList.GetValue (KitIndex, 1)
@@ -116,7 +116,7 @@ def KitPress():
 def NextPress():
 	KitWindow.Close ()
 	#class	
-	Class = CommonTables.Classes.GetValue (ClassName, "ID")
+	Class = CommonTables.ClassText.GetValue (ClassName, "CLASSID")
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")

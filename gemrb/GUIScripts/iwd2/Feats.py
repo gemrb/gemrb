@@ -228,7 +228,7 @@ def OpenFeatsWindow(chargen=0):
 		# for faking having leveled up already, so the level checks work
 		LUStat = IDLUCommon.Levels[ClassIndex]
 		if KitID != 0:
-			KitIndex = CommonTables.Classes.FindValue ("ID", KitID)
+			KitIndex = CommonTables.ClassText.FindValue ("CLASSID", KitID)
 			ClassIndex = KitIndex
 		Level = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM) + 1
 		LevelDiff = GemRB.GetVar ("LevelDiff") or 0
@@ -249,7 +249,7 @@ def OpenFeatsWindow(chargen=0):
 	if ClassColumn < 0:  #it was already a base class
 		ClassColumn = ClassIndex
 		# feats.2da is transposed, but has the same ordering
-		FeatsClassColumn = ClassIndex + 3 # CommonTables.Classes.GetValue (ClassName, "ID") + 2
+		FeatsClassColumn = ClassIndex + 3 # CommonTables.ClassText.GetValue (ClassName, "CLASSID") + 2
 	else:
 		FeatsClassColumn = ClassColumn + 3
 
@@ -273,7 +273,7 @@ def OpenFeatsWindow(chargen=0):
 	#this one exists only for clerics
 	# Although it should be made extendable to all kits
 	# A FEAT_COLUMN is needed in classes.2da or better yet, a whole new 2da
-	if CommonTables.Classes.GetValue (ClassName, "CLASS") == CommonTables.Classes.GetValue ("CLERIC", "ID"):
+	if CommonTables.Classes.GetValue (ClassName, "CLASS") == CommonTables.ClassText.GetValue ("CLERIC", "CLASSID"):
 		if KitColumn:
 			# 3 to get to the class columns (feats.2da) and 11 to get to these cleric kit columns
 			KitColumn = 3 + KitColumn + 11
