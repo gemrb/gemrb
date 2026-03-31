@@ -75,7 +75,7 @@ def FixProtagonist( idx):
 	# but don't let dualclassed characters get more xp than the rest
 	XP = GemRB.GetPlayerStat (idx, IE_XP)
 	XP2 = CommonTables.ClassSkills.GetValue (ClassName, "STARTXP2", GTV_INT)
-	Dual = GUICommon.IsDualClassed (idx, True)
+	Dual = GUICommon.IsDualClassedDetailed (idx)
 	if Dual[0] > 0:
 		OldLevel = GemRB.GetPlayerStat (idx, IE_LEVEL)
 		if GUICommon.IsDualSwap (idx):

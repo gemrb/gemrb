@@ -162,7 +162,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	if ScrollBar:
 		ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, 0)
 	#get our class id and name
-	IsDual = GUICommon.IsDualClassed (pc, 1)
+	IsDual = GUICommon.IsDualClassedDetailed (pc)
 	IsMulti = GUICommon.IsMultiClassed (pc, 1)
 	if classid: #used when dual-classing
 		Class = classid

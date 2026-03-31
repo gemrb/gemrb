@@ -298,8 +298,7 @@ def GetHLAs ():
 
 	# get some needed values
 	Kit = GUICommon.GetKitIndex (pc)
-	IsDual = GUICommon.IsDualClassed (pc, 0)
-	IsDual = IsDual[0] > 0
+	IsDual = GUICommon.IsDualClassed (pc)
 	MaxHLACount = 0
 
 	# reset the abilities

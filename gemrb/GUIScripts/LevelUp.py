@@ -132,7 +132,7 @@ def OpenLevelUpWindow():
 	# not multi, check dual
 	if not IsMulti:
 		# check if we're dual classed
-		IsDual = GUICommon.IsDualClassed (pc, 1)
+		IsDual = GUICommon.IsDualClassedDetailed (pc)
 		Classes = []
 
 		# either dual or single only care about 1 class

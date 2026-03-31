@@ -48,7 +48,7 @@ def GetNextLevels (actor, Classes):
 
 	# Dual class character only care about the first class
 	# However the inactive class is needed to handle reactivation
-	if GUICommon.IsDualClassed (actor, False)[0]:
+	if GUICommon.IsDualClassed (actor):
 		NumClasses = 1
 		if GUICommon.IsDualSwap(actor):
 			Level[1] = GemRB.GetPlayerStat (actor, IE_LEVEL)
@@ -100,7 +100,7 @@ def CanLevelUp(actor):
 	# get our class and placements for Multi'd and Dual'd characters
 	Class = GUICommon.GetClassRowName (actor)
 	Multi = GUICommon.IsMultiClassed (actor, 1)
-	Dual = GUICommon.IsDualClassed (actor, 1)
+	Dual = GUICommon.IsDualClassedDetailed (actor)
 
 	if Class == "":
 		return 0
@@ -189,7 +189,7 @@ def _SetupLevels (pc, Level, offset=0, noclass=0):
 	# adjust the class for multi/dual chars
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
 	Multi = GUICommon.IsMultiClassed (pc, 1)
-	Dual = GUICommon.IsDualClassed (pc, 1)
+	Dual = GUICommon.IsDualClassedDetailed (pc)
 	NumClasses = 1
 	if Multi[0]>1: #get each of the multi-classes
 		NumClasses = Multi[0]
@@ -363,7 +363,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 	#adjust the class for multi/dual chars
 	Class = [GemRB.GetPlayerStat (pc, IE_CLASS)]
 	Multi = GUICommon.IsMultiClassed (pc, 1)
-	Dual = GUICommon.IsDualClassed (pc, 1)
+	Dual = GUICommon.IsDualClassedDetailed (pc)
 	NumClasses = 1
 	if Multi[0]>1: #get each of the multi-classes
 		NumClasses = Multi[0]

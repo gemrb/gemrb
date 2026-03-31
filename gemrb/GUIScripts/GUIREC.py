@@ -304,7 +304,7 @@ def GetClassTitles (pc,LevelDiff):
 	ClassTitle = GUICommon.GetActorClassTitle (pc)
 	GemRB.SetToken ("CLASS", ClassTitle)
 	Class = GUICommon.GetClassRowName (pc)
-	Dual = GUICommon.IsDualClassed (pc, 1)
+	Dual = GUICommon.IsDualClassedDetailed (pc)
 	Multi = GUICommon.IsMultiClassed (pc, 1)
 	XP = GemRB.GetPlayerStat (pc, IE_XP)
 	LevelDrain = GS (pc, IE_LEVELDRAIN)
@@ -806,7 +806,7 @@ def OpenKitInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ClassName = GUICommon.GetClassRowName (pc)
 	Multi = GUICommon.HasMultiClassBits (pc)
-	Dual = GUICommon.IsDualClassed (pc, 1)
+	Dual = GUICommon.IsDualClassedDetailed (pc)
 	text = ""
 	if Multi and Dual[0] == 0: # true multi class
 		text = CommonTables.ClassText.GetValue (ClassName, "DESCSTR")

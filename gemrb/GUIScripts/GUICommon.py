@@ -329,7 +329,7 @@ def GetActorClassTitle (actor):
 	ClassName = GetClassRowName (actor)
 	KitIndex = GetKitIndex (actor)
 	Multi = HasMultiClassBits (actor)
-	Dual = IsDualClassed (actor, 1)
+	Dual = IsDualClassedDetailed (actor)
 	MCFlags = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
 
 	if Multi and Dual[0] == 0: # true multi class
@@ -423,7 +423,10 @@ def HasMultiClassBits(actor):
 
 	return int(MultiBits)
 
-def IsDualClassed(actor, verbose):
+def IsDualClassed (actor):
+	return IsDualClassedDetailed (actor, False)[0] > 0
+
+def IsDualClassedDetailed (actor, verbose = True):
 	"""Returns an array containing the dual class information.
 
 	Return[0] is 0 if not dualclassed, 1 if the old class is a kit, 3 if the new class is a kit, 2 otherwise.
@@ -482,7 +485,7 @@ def IsDualSwap (actor, override=None):
 	respectively; however, if one duals from a fighter to a mage in the above
 	example, the levels would actually be in reverse of expectation."""
 
-	Dual = IsDualClassed (actor, 1)
+	Dual = IsDualClassedDetailed (actor)
 	if override:
 		CI1 = CommonTables.ClassText.FindValue ("CLASSID", override["old"])
 		CI2 = CommonTables.ClassText.FindValue ("CLASSID", override["new"])
@@ -527,10 +530,10 @@ def IsMultiClassed (actor, verbose):
 
 	# get our base class
 	IsMulti = HasMultiClassBits (actor)
-	IsDual = IsDualClassed (actor, 0)
+	IsDual = IsDualClassed (actor)
 
 	# dual-class char's look like multi-class chars
-	if (IsMulti == 0) or (IsDual[0] > 0):
+	if IsMulti == 0 or IsDual:
 		return (0,-1,-1,-1)
 	elif verbose == 0:
 		return (IsMulti,-1,-1,-1)
@@ -598,8 +601,7 @@ def CanDualClass(actor):
 		return 0
 
 	# already dualclassed
-	Dual = IsDualClassed (actor,0)
-	if Dual[0] > 0:
+	if IsDualClassed (actor):
 		return 0
 
 	DualClassTable = GemRB.LoadTable ("dualclas")
@@ -706,8 +708,7 @@ def IsWarrior (actor):
 
 	IsWarrior = HasWarriorName (className)
 
-	Dual = IsDualClassed (actor, 0)
-	if Dual[0] > 0:
+	if IsDualClassed (actor):
 		DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 		FirstClassIndex = CommonTables.Classes.FindValue ("MC_WAS_ID", DualedFrom)
 		FirstClassName = CommonTables.Classes.GetRowName (FirstClassIndex)

@@ -186,7 +186,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 		ClassWeaponsTable = None
 
 	#get the class name
-	IsDual = GUICommon.IsDualClassed (pc, 1)
+	IsDual = GUICommon.IsDualClassedDetailed (pc)
 	if classid: #for dual classes when we can't get the class dualing to
 		Class = classid
 	elif IsDual[0] == 3:
