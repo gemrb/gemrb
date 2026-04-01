@@ -921,7 +921,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 
 	PartAnim& anims = Anims[stanceID][Orient];
 	if (!anims.empty()) {
-		const SharedAnim& anim = anims[0];
+		const auto& anim = anims[0];
 		MaybeUpdateMainPalette(*anim);
 		previousStanceID = stanceID;
 
@@ -989,7 +989,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char Stanc
 			}
 		}
 
-		SharedAnim newanim(af->GetCycle(Cycle));
+		auto newanim = af->GetCycle(Cycle);
 
 		if (!newanim) {
 			if (part < actorPartCount) {
@@ -1221,7 +1221,7 @@ const CharAnimations::PartAnim* CharAnimations::GetShadowAnimation(unsigned char
 		return nullptr;
 	}
 
-	SharedAnim animation(af->GetCycle(cycle));
+	auto animation = af->GetCycle(cycle);
 	if (!animation) {
 		return nullptr;
 	}

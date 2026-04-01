@@ -71,7 +71,7 @@ public:
 	frame_t CurrentFrame() const;
 	frame_t LastFrame();
 	frame_t NextFrame();
-	frame_t GetSyncedNextFrame(const Animation* master);
+	frame_t GetSyncedNextFrame(const Animation& master);
 	/** Gets the i-th frame */
 	frame_t GetFrame(index_t i) const;
 

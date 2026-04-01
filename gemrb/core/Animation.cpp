@@ -139,20 +139,20 @@ Animation::frame_t Animation::NextFrame(void)
 	return ret;
 }
 
-Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
+Animation::frame_t Animation::GetSyncedNextFrame(const Animation& master)
 {
 	if (!(flags & Flags::Active)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive!");
 		return nullptr;
 	}
 	Holder<Sprite2D> ret = frames[GetCurrentFrameIndex()];
-	starttime = master->starttime;
-	endReached = master->endReached;
-	lastTime = master->lastTime;
-	paused = master->paused;
+	starttime = master.starttime;
+	endReached = master.endReached;
+	lastTime = master.lastTime;
+	paused = master.paused;
 
 	//return a valid frame even if the master is longer (e.g. ankhegs)
-	frameIdx = master->frameIdx % GetFrameCount();
+	frameIdx = master.frameIdx % GetFrameCount();
 
 	return ret;
 }

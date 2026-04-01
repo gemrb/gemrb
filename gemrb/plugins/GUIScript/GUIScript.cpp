@@ -3615,7 +3615,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 		const ResRef& ref = ResRefFromPy(pyAnim);
 		auto af = gamedata->GetFactoryResourceAs<AnimationFactory>(ref, IE_BAM_CLASS_ID);
 		ABORT_IF_NULL(af);
-		anim.reset(af->GetCycle(cycle));
+		anim = af->GetCycle(cycle);
 	} else if (PyList_Check(pyAnim)) {
 		std::vector<Holder<Sprite2D>> frames;
 		for (Py_ssize_t i = 0; i < PyList_Size(pyAnim); ++i) {

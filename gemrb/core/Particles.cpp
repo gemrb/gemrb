@@ -92,26 +92,7 @@ void Particles::SetColorIndex(ieByte c)
 
 void Particles::SetBitmap(unsigned int FragAnimID)
 {
-	//int i;
-
 	fragments = std::make_unique<CharAnimations>(FragAnimID, 0);
-	/*
-	for (i=0;i<MAX_SPARK_PHASE;i++) {
-		delete( bitmap[i] );
-	}
-
-	AnimationFactory* af = ( AnimationFactory* )
-		gamedata->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
-
-	if (af == NULL) {
-		return;
-	}
-
-	for (i=0;i<MAX_SPARK_PHASE; i++) {
-		bitmap[i] = af->GetCycle( i );
-	}
-
-*/
 }
 
 bool Particles::AddNew(const Point& point)

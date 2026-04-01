@@ -93,7 +93,7 @@ Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactor
 	AnimArray anims(MAX_ORIENT);
 	for (ieByte cycle = 0; cycle < Aim; cycle++) {
 		AnimationFactory::index_t c = cycle + seq;
-		Animation* a = af.GetCycle(c);
+		auto a = af.GetCycle(c);
 		if (!a) continue;
 
 		//animations are started at a random frame position
@@ -105,7 +105,6 @@ Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactor
 		a->gameAnimation = true;
 
 		anims[cycle] = std::move(*a);
-		delete a;
 	}
 	return anims;
 }
@@ -145,7 +144,7 @@ Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactor
 				c = seq;
 				break;
 		}
-		Animation* a = af.GetCycle(c);
+		auto a = af.GetCycle(c);
 		if (!a) continue;
 
 		//animations are started at a random frame position
@@ -158,7 +157,6 @@ Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactor
 		a->gameAnimation = true;
 
 		anims[cycle] = std::move(*a);
-		delete a;
 	}
 	return anims;
 }

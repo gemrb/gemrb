@@ -54,14 +54,13 @@ public:
 
 	Progressbar(const Region& frame, unsigned short KnobStepsCount);
 	Progressbar(const Progressbar&) = delete;
-	~Progressbar() override;
 	Progressbar& operator=(const Progressbar&) = delete;
 
 	bool IsOpaque() const override;
 
 	void SetImages(Holder<Sprite2D> bg, Holder<Sprite2D> cap);
 	/** Sets a bam resource for progressbar */
-	void SetAnimation(Animation* arg);
+	void SetAnimation(Holder<Animation> arg);
 	/** Sets the mos coordinates for the progressbar filler mos/cap */
 	void SetSliderPos(const Point& knob, const Point& cap);
 	/** Refreshes a progressbar which is associated with VariableName */
@@ -77,7 +76,7 @@ private: // Private attributes
 	/** The mos for the progressbar cap (linear progressbar) */
 	Holder<Sprite2D> PBarCap;
 	/** The bam cycle whose frames work as a progressbar (animated progressbar) */
-	Animation* PBarAnim = nullptr;
+	Holder<Animation> PBarAnim;
 };
 
 }

@@ -7876,7 +7876,7 @@ void Actor::UpdateActorState()
 		return;
 	}
 
-	Animation* first = anim[0].first;
+	auto first = anim[0].first;
 
 	if (first->endReached) {
 		// possible stance change
@@ -7885,7 +7885,7 @@ void Actor::UpdateActorState()
 			first->endReached = false;
 			first->SetFrame(0);
 
-			Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
+			auto firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
 			if (firstShadow) {
 				firstShadow->endReached = false;
 				firstShadow->SetFrame(0);
@@ -8268,8 +8268,8 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 	}
 
 	for (const auto& part : animParts) {
-		const Animation* anim = part.first;
-		Holder<Palette> palette = part.second;
+		const auto& anim = part.first;
+		auto& palette = part.second;
 
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
@@ -8358,21 +8358,21 @@ bool Actor::AdvanceAnimations()
 	for (int part = 0; part < count; ++part) {
 		int partnum = part;
 		if (zOrder) partnum = zOrder[part];
-		Animation* anim = stanceAnim->at(partnum).get();
+		auto anim = stanceAnim->at(partnum);
 		if (anim) {
 			currentStance.anim.emplace_back(anim, anims->GetPartPalette(partnum));
 		}
 
 		if (shadows) {
-			Animation* shadowAnim = shadows->at(partnum).get();
+			auto shadowAnim = shadows->at(partnum);
 			if (shadowAnim) {
 				currentStance.shadow.emplace_back(shadowAnim, anims->GetShadowPalette());
 			}
 		}
 	}
 
-	Animation* first = currentStance.anim[0].first;
-	Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
+	auto& first = currentStance.anim[0].first;
+	auto firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
 
 	// advance first (main) animation by one frame (in sync)
 	if (Immobile()) {
@@ -8392,13 +8392,13 @@ bool Actor::AdvanceAnimations()
 	// update all other animation parts, in sync with the first part
 	auto it = currentStance.anim.begin() + 1;
 	for (; it != currentStance.anim.end(); ++it) {
-		it->first->GetSyncedNextFrame(first);
+		it->first->GetSyncedNextFrame(*first);
 	}
 
 	it = currentStance.shadow.begin();
 	if (it != currentStance.shadow.end()) {
 		for (++it; it != currentStance.shadow.end(); ++it) {
-			it->first->GetSyncedNextFrame(firstShadow);
+			it->first->GetSyncedNextFrame(*firstShadow);
 		}
 	}
 
@@ -8544,7 +8544,7 @@ void Actor::UpdateDrawingRegion()
 
 	auto ExpandBoxForAnimationParts = [&box, this](const std::vector<AnimationPart>& parts) {
 		for (const auto& part : parts) {
-			const Animation* anim = part.first;
+			const auto anim = part.first;
 			Holder<Sprite2D> animframe = anim->CurrentFrame();
 			if (!animframe) continue;
 			Region partBBox = animframe->Frame;
