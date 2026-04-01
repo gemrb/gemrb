@@ -121,7 +121,6 @@ def OpenAbilitiesWindow(chargen, points):
 	AbilityTable = GemRB.LoadTable ("ability")
 	if chargen:
 		Kit = GemRB.GetVar("Class Kit")
-		Class = GemRB.GetVar("Class")-1
 		KitName = GUICommon.GetKitRowName (GemRB.GetVar ("Slot"), True, Kit)
 
 		Abclasrq = GemRB.LoadTable("ABCLASRQ")

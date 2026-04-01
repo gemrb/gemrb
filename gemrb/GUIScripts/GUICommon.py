@@ -466,13 +466,15 @@ def IsDualClassedDetailed (actor, verbose = True):
 	# use the first class of the multiclass bunch that isn't the same as the first class
 	for i in range (1,16):
 		Mask = 1 << (i - 1)
-		if Multi & Mask:
-			ClassIndex = CommonTables.ClassText.FindValue ("CLASSID", i)
-			ClassName = CommonTables.ClassText.GetRowName (ClassIndex)
-			if ClassName == FirstClassName:
-				continue
-			SecondClassName = CommonTables.ClassText.GetRowName (ClassIndex)
-			break
+		if Multi & Mask == 0:
+			continue
+
+		ClassIndex = CommonTables.ClassText.FindValue ("CLASSID", i)
+		ClassName = CommonTables.ClassText.GetRowName (ClassIndex)
+		if ClassName == FirstClassName:
+			continue
+		SecondClassName = CommonTables.ClassText.GetRowName (ClassIndex)
+		break
 	else:
 		GemRB.Log (LOG_WARNING, "IsDualClassed", "Invalid dualclass combination, treating as a single class!")
 		print(DualedFrom, Multi, KitIndex, FirstClassIndex, KittedClassName, FirstClassName, KitName)

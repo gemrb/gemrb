@@ -1471,7 +1471,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		}
 
 		// check for day/night transitions
-		if (IsDay(hours) ^ IsDay(hours2)) {
+		if (int(IsDay(hours)) + int(IsDay(hours2)) == 1) {
 			ChangeSong(false, true);
 		}
 	}

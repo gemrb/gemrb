@@ -62,7 +62,6 @@ def CalcLimits(Abidx):
 	if tmp > Maximum:
 		Maximum = tmp
 
-	Race = Abclasrq.GetRowIndex (RaceName)
 	tmp = Abclasrq.GetValue (KitIndex, Abidx)
 	if tmp > Minimum:
 		Minimum = tmp

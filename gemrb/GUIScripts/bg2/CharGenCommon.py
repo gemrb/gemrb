@@ -169,7 +169,6 @@ def DisplayOverview(step):
 			TextAreaControl.Append (GemRB.GetString(1049) + ": " + CommonTables.Aligns.GetValue (v, 2, GTV_REF) + "\n")
 		elif part == 6:
 			TextAreaControl.Append ("\n")
-			ClassName = GUICommon.GetClassRowName (MyChar)
 			strextra = GemRB.GetPlayerStat (MyChar, IE_STREXTRA)
 			for i in range(6):
 				v = AbilityTable.GetValue (i, 2, GTV_REF)
