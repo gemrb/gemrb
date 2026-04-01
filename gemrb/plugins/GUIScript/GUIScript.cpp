@@ -7704,8 +7704,7 @@ static PyObject* GemRB_GetStoreItem(PyObject* /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyLong_FromStrRef, item->GetItemDesc(identified)));
 
 	int price = item->Price * store->SellMarkup / 100;
-	//calculate depreciation too
-	//store->DepreciationRate, mount
+	// depreciation is handled on the GUISTORE side
 
 	price *= si->Usages[0];
 
