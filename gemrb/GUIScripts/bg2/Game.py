@@ -84,7 +84,8 @@ def FixProtagonist( idx):
 		OldClassName = Dual[1]
 		if Dual[0] == 1:
 			# was not a class before
-			KittedClass = CommonTables.KitList.GetValue (Dual[1], "CLASS")
+			KitRow = CommonTables.KitList.GetRowName (Dual[1])
+			KittedClass = CommonTables.KitList.GetValue (str(KitRow), "CLASS")
 			OldClassIndex = CommonTables.ClassText.FindValue ("CLASSID", KittedClass)
 			OldClassName = CommonTables.ClassText.GetRowName (OldClassIndex)
 		OldXP = LUCommon.GetNextLevelExp (OldLevel, OldClassName)

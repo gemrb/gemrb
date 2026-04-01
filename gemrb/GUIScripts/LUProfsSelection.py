@@ -190,7 +190,8 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 	if classid: #for dual classes when we can't get the class dualing to
 		Class = classid
 	elif IsDual[0] == 3:
-		Class = CommonTables.KitList.GetValue (IsDual[2], "CLASS", GTV_INT)
+		KitRow = CommonTables.KitList.FindValue ("ROWNAME", IsDual[2])
+		Class = CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_INT)
 	elif IsDual[0]:
 		Class = CommonTables.ClassText.GetValue (IsDual[2], "CLASSID", GTV_INT)
 	else:

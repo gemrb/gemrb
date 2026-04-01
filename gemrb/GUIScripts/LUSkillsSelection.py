@@ -167,7 +167,8 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	if classid: #used when dual-classing
 		Class = classid
 	elif IsDual[0] == 3:
-		Class = CommonTables.KitList.GetValue (IsDual[2], "CLASS")
+		KitRow = CommonTables.KitList.FindValue ("ROWNAME", IsDual[2])
+		Class = CommonTables.KitList.GetValue (str(KitRow), "CLASS")
 	elif IsDual[0]: #only care about the current class
 		Class = CommonTables.ClassText.GetValue (IsDual[2], "CLASSID")
 	else:

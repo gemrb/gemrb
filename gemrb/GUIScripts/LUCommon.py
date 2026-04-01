@@ -148,7 +148,8 @@ def CanLevelUp(actor):
 	elif Dual[0] > 0: # dual classed
 		# get the class we can level
 		if Dual[0] == 3:
-			ClassID = CommonTables.KitList.GetValue (Dual[2], "CLASS", GTV_INT)
+			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[2])
+			ClassID = CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_INT)
 			Class = GUICommon.GetClassRowName (ClassID, "class")
 		else:
 			Class = Dual[2]
@@ -196,7 +197,8 @@ def _SetupLevels (pc, Level, offset=0, noclass=0):
 		Class = [Multi[1], Multi[2], Multi[3]]
 	elif Dual[0]: #only worry about the newer class
 		if Dual[0] == 3:
-			Class = [CommonTables.KitList.GetValue (Dual[2], "CLASS", GTV_INT)]
+			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[2])
+			Class = [CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_INT)]
 		else:
 			Class = [CommonTables.ClassText.GetValue (Dual[2], "CLASSID", GTV_INT)]
 		#assume Level is correct if passed
@@ -372,7 +374,8 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		if (Levels[0]<=Levels[1]):
 			return
 		if Dual[0] == 3:
-			Class = [CommonTables.KitList.GetValue (Dual[2], "CLASS", GTV_INT)]
+			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[2])
+			Class = [CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_INT)]
 		else:
 			Class = [CommonTables.ClassText.GetValue (Dual[2], "CLASSID", GTV_INT)]
 		#if Level and LevelDiff are passed, we assume it is correct
@@ -414,7 +417,8 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		# so we only need check additionally for kits
 		# ... and make sure the kit is for the currently inspected class
 		HPClassTable = GemRB.LoadTable ("hpclass", False, True)
-		if GameCheck.IsAnyEE () and Kit and CommonTables.KitList.GetValue (KitName, "CLASS", GTV_INT) == Class[i]:
+		KitRow = CommonTables.KitList.FindValue ("ROWNAME", KitName)
+		if GameCheck.IsAnyEE () and Kit and CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_INT) == Class[i]:
 			# hpclass has a useless default, so we can't check if a row was found easily
 			ClassName = KitName
 		if not ClassName or NumClasses > 1:
