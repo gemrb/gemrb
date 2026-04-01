@@ -203,6 +203,12 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	if Kit and not SkillsKitName in Cols:
 		SkillsKitName = ClassName
 
+	# ees added this table of starting skills
+	# it duplicates the level 1 table entries for SpecialSkillsTable, but we overwrite it later
+	# it's not used for thieves either
+	# in effect, the only difference is that it allows per-kit granularity
+	# disabled until proven useful: GemRB.LoadTable ("clasiskl", True, True)
+
 	#figure out the correct skills table
 	SkillIndex = -1
 	for i in range (NumClasses):
