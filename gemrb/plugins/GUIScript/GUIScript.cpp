@@ -13254,15 +13254,8 @@ bool GUIScript::Autodetect(void)
 	iter.SetFlags(DirectoryIterator::Directories);
 	do {
 		const path_t& dirent = iter.GetName();
-
-		// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
-		// Method1:
 		path_t moduleName = PathJoin(core->config.GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py");
 		ExecFile(moduleName.c_str());
-		// Method2:
-		//strcpy( module, dirent );
-		//strcat( module, ".Autodetect");
-		//LoadScript(module);
 	} while (++iter);
 
 	if (!gameTypeHint.empty()) {
