@@ -1,9 +1,11 @@
-GemRB git (b4775174b):
+GemRB git (6aae7538):
   New features:
     - 
+    - moddable GUI code, TobEx Limit effect stacking
 
   Improved features:
     - 
+    - ee compatibility
     - bugfixes
 
 GemRB v0.9.5 (2026-03-23):
