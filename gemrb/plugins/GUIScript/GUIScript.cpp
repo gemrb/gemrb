@@ -13226,6 +13226,10 @@ bool GUIScript::Init(void)
 	// GameType-specific import path must have a higher priority than
 	// the generic one, so insert it before it
 	PyList_Insert(sysPath, -1, PyString_FromStringObj(path2));
+	// also add python/ as a game path subdir for mod provided python overrides
+	path2 = PathJoin(core->config.GamePath, "python");
+	PyList_Insert(sysPath, -2, PyString_FromStringObj(path2));
+
 	PyModule_AddStringConstant(pGemRB, "GameType", core->config.GameType.c_str());
 
 	PyObject* pClassesMod = PyImport_AddModule("GUIClasses");
