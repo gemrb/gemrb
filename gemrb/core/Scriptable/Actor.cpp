@@ -10182,7 +10182,18 @@ HCStrings Actor::Unusable(const Item* item) const
 		}
 	}
 
-	// iesdp says this is always checked?
+	// iesdp says the level is always checked?
+	// iwd2 has a table that determines it for level and all 6 main stats
+	// but they forgot to add a header row, so the first item is erroneusly ignored
+	if (third && item->Name != "00ax2h94") {
+		static AutoTable table = gamedata->LoadTable("itemabil", true);
+		// look up by index, so any fixpacks addressing the bug won't break this
+		auto row = table->GetRowIndex(item->Name);
+		if (row == TableMgr::npos || table->QueryFieldSigned<int>(row, 0) == 0) {
+			return HCStrings::count;
+		}
+	}
+
 	if (item->MinLevel > GetXPLevel(true)) {
 		return HCStrings::CantUseItem;
 	}
