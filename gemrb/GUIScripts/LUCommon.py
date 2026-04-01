@@ -192,8 +192,7 @@ def _SetupLevels (pc, Level, offset=0, noclass=0):
 		Class = [Multi[1], Multi[2], Multi[3]]
 	elif Dual[0]: #only worry about the newer class
 		if Dual[0] == 3:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[2])
-			Class = [CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_INT)]
+			Class = [CommonTables.KitList.GetValue (Dual[5], "CLASS", GTV_INT)]
 		else:
 			Class = [CommonTables.ClassText.GetValue (Dual[2], "CLASSID", GTV_INT)]
 		#assume Level is correct if passed
@@ -369,8 +368,7 @@ def SetupHP (pc, Level=None, LevelDiff=None):
 		if (Levels[0]<=Levels[1]):
 			return
 		if Dual[0] == 3:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[2])
-			Class = [CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_INT)]
+			Class = [CommonTables.KitList.GetValue (Dual[5], "CLASS", GTV_INT)]
 		else:
 			Class = [CommonTables.ClassText.GetValue (Dual[2], "CLASSID", GTV_INT)]
 		#if Level and LevelDiff are passed, we assume it is correct

@@ -354,8 +354,7 @@ def GetClassTitles (pc,LevelDiff):
 
 		Class = Dual[2]
 		if Dual[0] == 3:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[3])
-			ClassTitle = CommonTables.KitList.GetValue (str(KitRow), "MIXED", GTV_REF)
+			ClassTitle = CommonTables.KitList.GetValue (Dual[5], "MIXED", GTV_REF)
 		else:
 			ClassTitle = CommonTables.ClassText.GetValue (Class, "MIXED", GTV_REF)
 		GemRB.SetToken ("CLASS", ClassTitle)
@@ -372,8 +371,7 @@ def GetClassTitles (pc,LevelDiff):
 
 		# the first class (shown second)
 		if Dual[0] == 1:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[3])
-			ClassTitle = CommonTables.KitList.GetValue (str(KitRow), "MIXED", GTV_REF)
+			ClassTitle = CommonTables.KitList.GetValue (Dual[5], "MIXED", GTV_REF)
 		else:
 			Class = Dual[1]
 			ClassTitle = CommonTables.ClassText.GetValue (Class, "MIXED", GTV_REF)
@@ -810,15 +808,13 @@ def OpenKitInfoWindow ():
 		if Dual[0]: # dual class
 			# first (previous) kit or class of the dual class
 			if Dual[0] == 1:
-				KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[1])
-				text = CommonTables.KitList.GetValue (str(KitRow), "HELP", GTV_REF)
+				text = CommonTables.KitList.GetValue (Dual[5], "HELP", GTV_REF)
 			else:
 				text = CommonTables.ClassText.GetValue (Dual[1], "DESCSTR", GTV_REF)
 	
 			text += "\n\n"
 			if Dual[0] == 3:
-				KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[2])
-				text += CommonTables.KitList.GetValue (str(KitRow), "HELP", GTV_REF)
+				text += CommonTables.KitList.GetValue (Dual[5], "HELP", GTV_REF)
 			else:
 				text += CommonTables.ClassText.GetValue (Dual[2], "DESCSTR", GTV_REF)
 	

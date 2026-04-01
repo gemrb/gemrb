@@ -339,14 +339,12 @@ def GetActorClassTitle (actor):
 	if Dual[0]: # dual class
 		# first (previous) kit or class of the dual class
 		if Dual[0] == 1:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[3])
-			ClassTitle = CommonTables.KitList.GetValue (str(KitRow), "MIXED", GTV_REF)
+			ClassTitle = CommonTables.KitList.GetValue (Dual[5], "MIXED", GTV_REF)
 		else:
 			ClassTitle = CommonTables.ClassText.GetValue (Dual[1], "MIXED", GTV_REF)
 		ClassTitle += " / "
 		if Dual[0] == 3:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[3])
-			ClassTitle += CommonTables.KitList.GetValue (str(KitRow), "MIXED", GTV_REF)
+			ClassTitle += CommonTables.KitList.GetValue (Dual[5], "MIXED", GTV_REF)
 		else:
 			ClassTitle += CommonTables.ClassText.GetValue (Dual[2], "MIXED", GTV_REF)
 	elif MCFlags & (MC_FALLEN_PALADIN | MC_FALLEN_RANGER): # fallen
@@ -436,18 +434,19 @@ def IsDualClassedDetailed (actor, verbose = True):
 	Return[2] contains the class name of the new class.
 	Return[3] contains the kit name of the kit in 1 or 2 or an empty string
 	Return[4] contains None, a placeholder for the potential second kit
+	Return[5] contains the kitlist.2da row name of the first kit
 	If verbose is false, only Return[0] contains useable data."""
 
 	Multi = HasMultiClassBits (actor)
 	if Multi == 0: # also catches iwd2
-		return (0, -1, -1, -1, -1)
+		return (0, -1, -1, -1, -1, -1)
 
 	DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 	if DualedFrom == 0:
-		return (0, -1, -1, -1, -1)
+		return (0, -1, -1, -1, -1, -1)
 
 	if not verbose:
-		return (1, -1, -1, -1, -1)
+		return (1, -1, -1, -1, -1, -1)
 
 	KitIndex = GetKitIndex (actor)
 	if KitIndex:
@@ -478,14 +477,15 @@ def IsDualClassedDetailed (actor, verbose = True):
 	else:
 		GemRB.Log (LOG_WARNING, "IsDualClassed", "Invalid dualclass combination, treating as a single class!")
 		print(DualedFrom, Multi, KitIndex, FirstClassIndex, KittedClassName, FirstClassName, KitName)
-		return (0, -1, -1, -1, -1)
+		return (0, -1, -1, -1, -1, -1)
 
 	if KittedClassName == FirstClassName and KitIndex:
-		return (1, FirstClassName, SecondClassName, KitName, None)
+		status = 1
 	elif KittedClassName == SecondClassName:
-		return (3, FirstClassName, SecondClassName, KitName, None)
+		status = 3
 	else:
-		return (2, FirstClassName, SecondClassName, "", None)
+		status = 2
+	return (status, FirstClassName, SecondClassName, KitName, None, str(KitIndex))
 
 def IsDualSwap (actor, override=None):
 	"""Returns true if the dualed classes are reverse of expectation.
