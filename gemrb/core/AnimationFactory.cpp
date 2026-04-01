@@ -39,7 +39,7 @@ AnimationFactory::AnimationFactory(const ResRef& resref,
 	fps = core->GetAnimationFPS(resRef);
 }
 
-Animation* AnimationFactory::GetCycle(index_t cycle) const noexcept
+Holder<Animation> AnimationFactory::GetCycle(index_t cycle) const noexcept
 {
 	if (cycle >= cycles.size() || cycles[cycle].FramesCount == 0) {
 		return nullptr;
@@ -52,7 +52,8 @@ Animation* AnimationFactory::GetCycle(index_t cycle) const noexcept
 		animframes.push_back(frames[FLTable[i]]);
 	}
 	assert(cycles[cycle].FramesCount == animframes.size());
-	return new Animation(std::move(animframes), fps);
+
+	return MakeHolder<Animation>(std::move(animframes), fps);
 }
 
 /* returns the required frame of the named cycle, cycle defaults to 0 */

@@ -80,13 +80,12 @@ void AreaAnimation::InitAnimation()
 
 	auto GetAnimationPiece = [&af, this](index_t animCycle) {
 		Animation ret;
-		Animation* anim = af->GetCycle(animCycle);
+		auto anim = af->GetCycle(animCycle);
 		if (!anim)
 			anim = af->GetCycle(0);
 
 		assert(anim);
 		ret = std::move(*anim);
-		delete anim;
 
 		// this will make the animation stop when the game is stopped
 		// a possible gemrb feature to have this flag settable in .are
@@ -182,17 +181,17 @@ void AreaAnimation::Update(const AreaAnimation* master)
 {
 	if (animation.empty()) return;
 
-	Animation& firstAnim = animation[0];
+	auto& firstAnim = animation[0];
 	if (master && bool(firstAnim.flags & Animation::Flags::Sync)) {
-		firstAnim.GetSyncedNextFrame(&master->animation[0]);
+		firstAnim.GetSyncedNextFrame(master->animation[0]);
 	} else {
 		firstAnim.NextFrame();
 	}
 
 	for (size_t idx = 1; idx < animation.size(); ++idx) {
-		Animation& anim = animation[idx];
+		auto& anim = animation[idx];
 		if (bool(anim.flags & Animation::Flags::Sync)) {
-			anim.GetSyncedNextFrame(&firstAnim);
+			anim.GetSyncedNextFrame(firstAnim);
 		} else {
 			anim.NextFrame();
 		}

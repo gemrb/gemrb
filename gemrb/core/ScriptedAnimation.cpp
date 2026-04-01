@@ -67,7 +67,7 @@ static const std::array<CycleType, 16> cTypes = {
 
 static ieDword TranslucentShadows = 0;
 
-Animation* ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, Animation::index_t cycle, Animation::index_t i, bool loop) const
+Holder<Animation> ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, Animation::index_t cycle, Animation::index_t i, bool loop) const
 {
 	Animation::index_t c = cycle;
 
@@ -79,7 +79,7 @@ Animation* ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, Anima
 		c = SixteenToNine[i % MAX_ORIENT] + 9 * (i / MAX_ORIENT);
 	}
 
-	Animation* anim = af.GetCycle(c);
+	auto anim = af.GetCycle(c);
 	if (anim) {
 		anim->MirrorAnimation(BlitFlags(Transparency) & (BlitFlags::MIRRORX | BlitFlags::MIRRORY));
 		//creature anims may start at random position, vvcs always start on 0
@@ -91,6 +91,7 @@ Animation* ScriptedAnimation::PrepareAnimation(const AnimationFactory& af, Anima
 		}
 		anim->fps = FrameRate;
 	}
+
 	return anim;
 }
 
@@ -323,10 +324,6 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 
 ScriptedAnimation::~ScriptedAnimation(void)
 {
-	for (Animation* anim : anims) {
-		delete anim;
-	}
-
 	if (twin) {
 		delete twin;
 	}
@@ -358,7 +355,7 @@ void ScriptedAnimation::SetSound(int arg, const ResRef& sound)
 void ScriptedAnimation::PlayOnce()
 {
 	SequenceFlags &= ~IE_VVC_LOOP;
-	for (Animation* anim : anims) {
+	for (auto& anim : anims) {
 		if (anim) {
 			anim->flags |= S_ANI_PLAYONCE;
 		}
@@ -406,7 +403,7 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 
 Animation::index_t ScriptedAnimation::GetCurrentFrame() const
 {
-	const Animation* anim = anims[P_HOLD * MAX_ORIENT];
+	const auto& anim = anims[P_HOLD * MAX_ORIENT];
 	if (anim) {
 		return anim->GetCurrentFrameIndex();
 	}
@@ -416,7 +413,7 @@ Animation::index_t ScriptedAnimation::GetCurrentFrame() const
 ieDword ScriptedAnimation::GetSequenceDuration(ieDword multiplier) const
 {
 	//P_HOLD * MAX_ORIENT == MAX_ORIENT
-	const Animation* anim = anims[P_HOLD * MAX_ORIENT];
+	const auto& anim = anims[P_HOLD * MAX_ORIENT];
 	if (anim) {
 		return anim->GetFrameCount() * multiplier / FrameRate;
 	}
@@ -500,7 +497,7 @@ retry:
 		return true;
 	}
 
-	Animation* anim = anims[Phase * MAX_ORIENT + Orientation];
+	auto& anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (!anim) {
 		IncrementPhase();
 		goto retry;
@@ -659,7 +656,7 @@ void ScriptedAnimation::Draw(const Region& vp, Color tint, int height, BlitFlags
 		flags |= BlitFlags::MIRRORY;
 	}
 
-	const Animation* anim = anims[Phase * MAX_ORIENT + Orientation];
+	const auto& anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim)
 		VideoDriver->BlitGameSpriteWithPalette(anim->CurrentFrame(), palette, p, flags | BlitFlags::BLENDED, tint);
 
@@ -672,7 +669,7 @@ Region ScriptedAnimation::DrawingRegion() const
 {
 	Region r = twin ? twin->DrawingRegion() : Region(Pos, Size());
 
-	const Animation* anim = anims[Phase * MAX_ORIENT + Orientation];
+	const auto& anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim) {
 		Region animArea = anim->animArea;
 		animArea.x += XOffset + Pos.x;
@@ -727,7 +724,7 @@ void ScriptedAnimation::GetPaletteCopy()
 		return;
 	//it is not sure that the first position will have a resource in it
 	//therefore the cycle
-	for (const Animation* anim : anims) {
+	for (const auto& anim : anims) {
 		if (!anim) continue;
 
 		Holder<Sprite2D> spr = anim->GetFrame(0);

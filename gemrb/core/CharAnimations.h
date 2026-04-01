@@ -163,8 +163,7 @@ using AnimRef = FixedSizeString<2>;
 class GEM_EXPORT CharAnimations {
 public:
 	// using shared_ptr<Animation> because several orientations can share the same animation
-	using SharedAnim = std::shared_ptr<Animation>;
-	using PartAnim = std::vector<SharedAnim>;
+	using PartAnim = std::vector<Holder<Animation>>;
 	using OrientAnim = std::array<PartAnim, MAX_ORIENT>;
 	using StanceAnim = std::array<OrientAnim, MAX_ANIMS>;
 

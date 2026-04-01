@@ -112,7 +112,7 @@ public:
 	//it will usually cycle in the 2. phase
 	//the anims could also be used 'orientation based' if NumOrientations is
 	//set to 5, 9, 16
-	Animation* anims[3 * MAX_ORIENT] {};
+	std::array<Holder<Animation>, 3 * MAX_ORIENT> anims;
 	//there is only one palette
 	Holder<Palette> palette;
 	ResRef sounds[3];
@@ -180,7 +180,7 @@ public:
 	ScriptedAnimation* DetachTwin();
 
 private:
-	Animation* PrepareAnimation(const AnimationFactory& af, Animation::index_t cycle, Animation::index_t i, bool loop = false) const;
+	Holder<Animation> PrepareAnimation(const AnimationFactory& af, Animation::index_t cycle, Animation::index_t i, bool loop = false) const;
 	bool UpdatePhase();
 	void GetPaletteCopy();
 	void IncrementPhase();

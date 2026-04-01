@@ -36,11 +36,6 @@ Progressbar::Progressbar(const Region& frame, unsigned short KnobStepsCount)
 	SetValueRange(0, 100);
 }
 
-Progressbar::~Progressbar()
-{
-	delete PBarAnim;
-}
-
 bool Progressbar::IsOpaque() const
 {
 	bool isOpaque = Control::IsOpaque();
@@ -102,9 +97,8 @@ void Progressbar::SetImages(Holder<Sprite2D> bg, Holder<Sprite2D> cap)
 	MarkDirty();
 }
 
-void Progressbar::SetAnimation(Animation* arg)
+void Progressbar::SetAnimation(Holder<Animation> arg)
 {
-	delete PBarAnim;
 	PBarAnim = arg;
 }
 
