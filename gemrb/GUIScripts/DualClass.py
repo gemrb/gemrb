@@ -251,6 +251,8 @@ def DCMainDonePress ():
 	# dump any equipped items that are now unusable
 	DumpUnusableItems (pc)
 
+	GUIREC.UpdateActorDescription (GemRB.GetView ("WIN_TOP"))
+
 	# close our window
 	if DCMainWindow:
 		DCMainWindow.Close ()
