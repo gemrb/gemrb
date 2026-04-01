@@ -352,13 +352,11 @@ def GetClassTitles (pc,LevelDiff):
 
 		Levels[0] += LevelDiff[0]
 
+		Class = Dual[2]
 		if Dual[0] == 3:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[2])
-			ClassID = CommonTables.KitList.GetValue (str(KitRow), "CLASS")
-			Class = GUICommon.GetClassRowName (ClassID, "class")
+			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[3])
 			ClassTitle = CommonTables.KitList.GetValue (str(KitRow), "MIXED", GTV_REF)
 		else:
-			Class = Dual[2]
 			ClassTitle = CommonTables.ClassText.GetValue (Class, "MIXED", GTV_REF)
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[0]-LevelDrain))
@@ -374,7 +372,7 @@ def GetClassTitles (pc,LevelDiff):
 
 		# the first class (shown second)
 		if Dual[0] == 1:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[1])
+			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[3])
 			ClassTitle = CommonTables.KitList.GetValue (str(KitRow), "MIXED", GTV_REF)
 		else:
 			Class = Dual[1]
@@ -382,17 +380,11 @@ def GetClassTitles (pc,LevelDiff):
 		GemRB.SetToken ("CLASS", ClassTitle)
 		GemRB.SetToken ("LEVEL", str (Levels[1]) )
 
-		# the xp table contains only classes, so we have to determine the base class for kits
-		if Dual[0] > 1:
-			BaseClass = Dual[1]
-		else:
-			BaseClass = GUICommon.GetKitIndex (pc)
-			BaseClass = CommonTables.KitList.GetValue (BaseClass, 7)
-			BaseClass = GUICommon.GetClassRowName (BaseClass, "class")
+		# the xp table contains only classes, so we have to use the base class for kits
 		# the first class' XP is discarded and set to the minimum level
 		# requirement, so if you don't dual class right after a levelup,
 		# the game would eat some of your XP
-		XP1 = CommonTables.NextLevel.GetValue (BaseClass, str (Levels[1]))
+		XP1 = CommonTables.NextLevel.GetValue (Dual[1], str (Levels[1]))
 		GemRB.SetToken ("EXPERIENCE", str (XP1) )
 
 		# inactive until the new class SURPASSES the former

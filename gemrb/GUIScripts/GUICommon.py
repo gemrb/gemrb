@@ -339,13 +339,13 @@ def GetActorClassTitle (actor):
 	if Dual[0]: # dual class
 		# first (previous) kit or class of the dual class
 		if Dual[0] == 1:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[1])
+			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[3])
 			ClassTitle = CommonTables.KitList.GetValue (str(KitRow), "MIXED", GTV_REF)
 		else:
 			ClassTitle = CommonTables.ClassText.GetValue (Dual[1], "MIXED", GTV_REF)
 		ClassTitle += " / "
 		if Dual[0] == 3:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[2])
+			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[3])
 			ClassTitle += CommonTables.KitList.GetValue (str(KitRow), "MIXED", GTV_REF)
 		else:
 			ClassTitle += CommonTables.ClassText.GetValue (Dual[2], "MIXED", GTV_REF)
@@ -432,20 +432,22 @@ def IsDualClassedDetailed (actor, verbose = True):
 	"""Returns an array containing the dual class information.
 
 	Return[0] is 0 if not dualclassed, 1 if the old class is a kit, 3 if the new class is a kit, 2 otherwise.
-	Return[1] contains either the kit or class name of the old class.
-	Return[2] contains either the kit or class name of the new class.
+	Return[1] contains the class name of the old class.
+	Return[2] contains the class name of the new class.
+	Return[3] contains the kit name of the kit in 1 or 2 or an empty string
+	Return[4] contains None, a placeholder for the potential second kit
 	If verbose is false, only Return[0] contains useable data."""
 
 	Multi = HasMultiClassBits (actor)
 	if Multi == 0: # also catches iwd2
-		return (0, -1, -1)
+		return (0, -1, -1, -1, -1)
 
 	DualedFrom = GemRB.GetPlayerStat (actor, IE_MC_FLAGS) & MC_WAS_ANY_CLASS
 	if DualedFrom == 0:
-		return (0, -1, -1)
+		return (0, -1, -1, -1, -1)
 
 	if not verbose:
-		return (1, -1, -1)
+		return (1, -1, -1, -1, -1)
 
 	KitIndex = GetKitIndex (actor)
 	if KitIndex:
@@ -473,15 +475,15 @@ def IsDualClassedDetailed (actor, verbose = True):
 			break
 	else:
 		GemRB.Log (LOG_WARNING, "IsDualClassed", "Invalid dualclass combination, treating as a single class!")
-		print(DualedFrom, Multi, KitIndex, FirstClassIndex, KitName, FirstClassName)
-		return (0, -1, -1)
+		print(DualedFrom, Multi, KitIndex, FirstClassIndex, KittedClassName, FirstClassName, KitName)
+		return (0, -1, -1, -1, -1)
 
 	if KittedClassName == FirstClassName and KitIndex:
-		return (1, KitName, SecondClassName)
+		return (1, FirstClassName, SecondClassName, KitName, None)
 	elif KittedClassName == SecondClassName:
-		return (3, FirstClassName, KitName)
+		return (3, FirstClassName, SecondClassName, KitName, None)
 	else:
-		return (2, FirstClassName, SecondClassName)
+		return (2, FirstClassName, SecondClassName, "", None)
 
 def IsDualSwap (actor, override=None):
 	"""Returns true if the dualed classes are reverse of expectation.
@@ -511,15 +513,10 @@ def IsDualSwap (actor, override=None):
 		Class = GetClassRowName(override["mc"], "class").split("_")
 
 	# get our old class name
-	if Dual[0] > 1:
-		BaseClass = Dual[1]
-	else:
-		KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[1])
-		BaseClass = CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_STR)
-		if BaseClass == "*":
-			# mod boilerplate
-			return 0
-		BaseClass = GetClassRowName(int(BaseClass), "class")
+	BaseClass = Dual[1]
+	if BaseClass == "*":
+		# mod boilerplate
+		return 0
 
 	# if our old class is the first class, we need to swap
 	if Class[0] == BaseClass:

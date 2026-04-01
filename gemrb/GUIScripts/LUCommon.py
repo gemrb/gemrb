@@ -147,12 +147,7 @@ def CanLevelUp(actor):
 		return False
 	elif Dual[0] > 0: # dual classed
 		# get the class we can level
-		if Dual[0] == 3:
-			KitRow = CommonTables.KitList.FindValue ("ROWNAME", Dual[2])
-			ClassID = CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_INT)
-			Class = GUICommon.GetClassRowName (ClassID, "class")
-		else:
-			Class = Dual[2]
+		Class = Dual[2]
 		if GUICommon.IsDualSwap(actor):
 			Levels = [Levels[1], Levels[0], Levels[2]]
 

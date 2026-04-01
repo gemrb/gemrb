@@ -82,12 +82,6 @@ def FixProtagonist( idx):
 			OldLevel = GemRB.GetPlayerStat (idx, IE_LEVEL2)
 
 		OldClassName = Dual[1]
-		if Dual[0] == 1:
-			# was not a class before
-			KitRow = CommonTables.KitList.GetRowName (Dual[1])
-			KittedClass = CommonTables.KitList.GetValue (str(KitRow), "CLASS")
-			OldClassIndex = CommonTables.ClassText.FindValue ("CLASSID", KittedClass)
-			OldClassName = CommonTables.ClassText.GetRowName (OldClassIndex)
 		OldXP = LUCommon.GetNextLevelExp (OldLevel, OldClassName)
 		XP += OldXP
 

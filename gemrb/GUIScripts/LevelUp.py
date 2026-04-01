@@ -142,16 +142,8 @@ def OpenLevelUpWindow():
 		if IsDual[0] == 0:
 			Classes = [Class]
 		else: # resolve kits to classes (new class goes first)
-			if IsDual[0] == 3: # 1st kit
-				KitRow = CommonTables.KitList.FindValue ("ROWNAME", IsDual[2])
-				Classes.append (CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_INT))
-			else: # 1st class
-				Classes.append (CommonTables.ClassText.GetValue (IsDual[2], "CLASSID", GTV_INT))
-			if IsDual[0] == 1: # 2nd kit
-				KitRow = CommonTables.KitList.FindValue ("ROWNAME", IsDual[1])
-				Classes.append (CommonTables.KitList.GetValue (str(KitRow), "CLASS", GTV_INT))
-			else: # 2nd class
-				Classes.append (CommonTables.ClassText.GetValue (IsDual[1], "CLASSID", GTV_INT))
+			Classes.append (CommonTables.ClassText.GetValue (IsDual[2], "CLASSID", GTV_INT))
+			Classes.append (CommonTables.ClassText.GetValue (IsDual[1], "CLASSID", GTV_INT))
 
 		# store a boolean for IsDual
 		IsDual = IsDual[0] > 0
