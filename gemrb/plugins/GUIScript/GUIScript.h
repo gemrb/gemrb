@@ -36,7 +36,8 @@ enum {
 	SV_HEIGHT,
 	SV_GAMEPATH,
 	SV_TOUCH,
-	SV_SAVEPATH
+	SV_SAVEPATH,
+	SV_INICONF,
 };
 
 class GUIScript : public ScriptEngine {
