@@ -376,7 +376,7 @@ def GetKitIndex (actor):
 	# carefully looking for kit by the usability flag
 	# since the barbarian kit id clashes with the no-kit value
 	if KitIndex == 0 and Kit != 0x4000:
-		KitIndex = CommonTables.KitList.FindValue (6, Kit)
+		KitIndex = CommonTables.KitList.FindValue ("UNUSABLE", Kit)
 		if KitIndex is None:
 			KitIndex = 0
 

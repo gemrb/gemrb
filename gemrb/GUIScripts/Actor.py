@@ -133,7 +133,7 @@ class Actor:
 		# carefully looking for kit by the usability flag
 		# since the barbarian kit id clashes with the no-kit value
 		if self.__kitindex == 0 and Kit != 0x4000:
-			self.__kitindex = CommonTables.KitList.FindValue (6, Kit)
+			self.__kitindex = CommonTables.KitList.FindValue ("UNUSABLE", Kit)
 			if self.__kitindex is None:
 				self.__kitindex = 0
 
