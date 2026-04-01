@@ -37,7 +37,7 @@ def OnLoad():
 	if Kit == Class:
 		Kit = 0
 	else:
-		kitName = CommonTables.Classes.GetRowName (Kit - 1)
+		KitName = CommonTables.Classes.GetRowName (Kit - 1)
 		Kit = CommonTables.Classes.GetValue (KitName, "CLASSID")
 	GemRB.SetPlayerStat (MyChar, IE_KIT, Kit)
 

@@ -209,7 +209,7 @@ def getSkills(TextAreaControl):
 			available = SkillMapTable.GetValue (skillRow, KitName, GTV_INT)
 			available += SkillMapTable.GetValue (skillRow, ClassName, GTV_INT)
 			statID = SkillTable.GetValue (skillRow, "ID", GTV_INT)
-			value = GemRB.GetPlayerStat (MyChar, stat)
+			value = GemRB.GetPlayerStat (MyChar, statID)
 			if value >= 0 and available != 0:
 				info += name + ": " + str(value) + "\n"
 				
