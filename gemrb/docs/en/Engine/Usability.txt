@@ -1,5 +1,0 @@
-Usability hacks in the original IE engine
-
-(0x00040000) Assasin      - 15 skill points (skills.2da)
-(0x00080000) Bountyhunter - 20 skill points (skills.2da)
-(0x00100000) Swashbuckler - no backstab multiplier (TODO)
