@@ -10042,20 +10042,29 @@ static ieDword ResolveTableValue(const ResRef& resref, ieDword stat, ieDword mco
 {
 	//don't close this table, it can mess with the guiscripts
 	auto tm = gamedata->LoadTable(resref);
-	if (tm) {
-		TableMgr::index_t row;
-		if (mcol == 0xff) {
-			row = stat;
+	if (!tm) return 0;
+
+	TableMgr::index_t row;
+	if (mcol == 0xff) {
+		row = stat;
+	} else {
+		// fix lookup, since now the values are split across two tables
+		if (resref == "classes") {
+			static AutoTable table = gamedata->LoadTable("clastext", true);
+			row = table->FindTableValue(mcol, stat);
+		} else if (resref == "racetext") {
+			static AutoTable table = gamedata->LoadTable("racedata", true);
+			row = table->FindTableValue(mcol, stat);
 		} else {
 			row = tm->FindTableValue(mcol, stat);
-			if (row == 0xffffffff) {
-				return 0;
-			}
 		}
-		ieDword ret;
-		if (valid_unsignednumber(tm->QueryField(row, vcol).c_str(), ret)) {
-			return ret;
+		if (row == 0xffffffff) {
+			return 0;
 		}
+	}
+	ieDword ret;
+	if (valid_unsignednumber(tm->QueryField(row, vcol).c_str(), ret)) {
+		return ret;
 	}
 
 	return 0;
