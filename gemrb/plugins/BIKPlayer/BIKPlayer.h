@@ -280,7 +280,7 @@ public:
 	BIKPlayer& operator=(const BIKPlayer&) = delete;
 	bool Import(DataStream* stream) override;
 
-	void Stop();
+	void Stop() override;
 };
 
 }

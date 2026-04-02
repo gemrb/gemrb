@@ -160,6 +160,12 @@ unsigned VLCPlayer::setup(void** opaque, char* chroma, unsigned* width, unsigned
 	return 1; // indicates the number of buffers allocated
 }
 
+void VLCPlayer::Stop()
+{
+	MoviePlayer::Stop();
+	libvlc_media_player_stop(mediaPlayer);
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x218963DD, "VLC Video Player")

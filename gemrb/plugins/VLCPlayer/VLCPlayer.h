@@ -69,6 +69,7 @@ public:
 	~VLCPlayer() override;
 
 	bool Import(DataStream* stream) override;
+	void Stop() override;
 };
 
 }
