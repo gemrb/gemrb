@@ -110,7 +110,7 @@ public:
 
 	Size Dimensions() const { return movieSize; }
 	void Play(Window* win);
-	void Stop();
+	virtual void Stop();
 
 	void SetSubtitles(SubtitleSet* subs);
 	void EnableSubtitles(bool set);
