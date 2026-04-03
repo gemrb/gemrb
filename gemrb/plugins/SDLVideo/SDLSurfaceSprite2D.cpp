@@ -61,6 +61,12 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D& obj) noexcept
 	renderFlags = obj.renderFlags;
 	appliedBlitFlags = obj.appliedBlitFlags;
 	appliedTint = obj.appliedTint;
+	surfaceInvalidated = obj.surfaceInvalidated;
+
+	if (obj.shadedPalette) {
+		shadedPalette = MakeHolder<Palette>(*obj.shadedPalette);
+	}
+	UpdatePalettesState(true);
 
 	// note: make sure that src & dest have the same palette applied before this
 	// everything else will end up in SDL color transformation magic
