@@ -188,7 +188,7 @@ DataStream* ResourceManager::GetResourceStream(StringView ResRef, SClass_ID type
 	return nullptr;
 }
 
-ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const TypeID* type, bool silent, ieWord prefferedType) const
+ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const TypeID* type, bool silent, ieWord preferredType) const
 {
 	if (ResRef.empty())
 		return nullptr;
@@ -197,9 +197,9 @@ ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const T
 	}
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);
 	std::vector<ResourceDesc> types2 = types;
-	if (prefferedType) {
+	if (preferredType) {
 		// sort the preferred type to the front, so we check it first
-		std::sort(types2.begin(), types2.end(), [&prefferedType](auto& a, auto& b) { return (a.GetKeyType() == prefferedType ? true : (a.GetKeyType() < b.GetKeyType())); });
+		std::sort(types2.begin(), types2.end(), [&preferredType](auto& a, auto& b) { return (a.GetKeyType() == preferredType ? true : (a.GetKeyType() < b.GetKeyType())); });
 	}
 
 	for (const auto& type2 : types2) {
