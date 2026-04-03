@@ -1,0 +1,33 @@
+2DA V1.0
+textedit
+                                   CONTROL
+Maximum_Frame_Rate                 textedit
+Zoom_Lock                          checkbox
+Cheats                             checkbox
+Spacer                             none
+
+Suppress_Extra_Difficulty_Damage   checkbox
+Maximum_HP                         checkbox
+Heal_Party_on_Rest                 checkbox
+Infravision                        checkbox
+3E_Thief_Sneak_Attack              checkbox
+Spacer                             none
+
+Display_Movie_Subtitles            checkbox
+Display_Subtitles                  checkbox
+Duplicate_Floating_Text            checkbox
+Subtitles                          checkbox
+Bored_Timeout                      textedit
+Hotkeys_On_Tooltips                checkbox
+HP_Over_Head                       checkbox
+EnableRollFeedback                 checkbox
+Strref_On                          checkbox
+Spacer                             none
+
+DefaultCharGenPointsPool           textedit
+Spacer                             none
+All_other_keys_are_less_important: none
+
+# row names contain interesting defaults.ini keys
+# column CONTROL defines how it can be configured
+# CONTROL type none "Spacer" is rendered without text
