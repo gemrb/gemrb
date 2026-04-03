@@ -96,7 +96,8 @@ bool Control::PerformAction(const ActionKey& key)
 
 	const auto& it = actions.find(key);
 	if (it != actions.end()) {
-		if (!window) {
+		// if a ScrollBar is created by a Window's ScrollView, it won't have `window` set, something we rely on elsewhere
+		if (!window && ControlType != IE_GUI_SCROLLBAR) {
 			Log(WARNING, "Control", "Executing event handler for a control with no window. This most likely indicates a programming or scripting error.");
 		}
 
