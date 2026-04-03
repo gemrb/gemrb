@@ -628,7 +628,14 @@ of the same type, unless Type is specified and different.\n\
     * GTV_STAT 2 - stat symbol (translated to numeric - value of stat)\n\
     * GTV_REF 3 - string reference (expanded to string)\n\
 \n\
-**Return value:** numeric or string, based on the indices or type\n\
+**Return value:** numeric or string, based on the indices or Type. If\n\
+both the row and column parameters are None, the default table value.\n\
+\n\
+**Examples:**\n\
+\n\
+RumourTable = GemRB.LoadTable ('donarumr')\n\
+RumourFactor = RumourTable.GetValue ('RUMORRATE', 'VALUE', GTV_INT)\n\
+RumourDefault = RumourTable.GetValue (None, None)\n\
 \n\
 **See also:** [GetSymbolValue](GetSymbolValue.md), [Table_FindValue](Table_FindValue.md), [LoadTable](LoadTable.md)");
 
