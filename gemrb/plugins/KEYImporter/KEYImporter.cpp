@@ -193,7 +193,7 @@ bool KEYImporter::HasResource(StringView resname, const ResourceDesc& type)
 DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 {
 	if (type == 0)
-		return NULL;
+		return nullptr;
 
 	const auto lookup = resources.find({ resname, type });
 	if (lookup == resources.cend())
@@ -210,13 +210,13 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 	if (!biffiles[bifnum].found) {
 		Log(ERROR, "KEYImporter", "Cannot find {}... Resource unavailable.",
 		    biffiles[bifnum].name);
-		return NULL;
+		return nullptr;
 	}
 
 	PluginHolder<IndexedArchive> ai = MakePluginHolder<IndexedArchive>(IE_BIF_CLASS_ID);
 	if (ai->OpenArchive(biffiles[bifnum].path) == GEM_ERROR) {
 		Log(ERROR, "KEYImporter", "Cannot open archive {}", biffiles[bifnum].path);
-		return NULL;
+		return nullptr;
 	}
 
 	DataStream* ret = ai->GetStream(ResLocator, type);
@@ -226,7 +226,7 @@ DataStream* KEYImporter::GetStream(const ResRef& resname, ieWord type)
 		return ret;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 DataStream* KEYImporter::GetResource(StringView resname, SClass_ID type)
