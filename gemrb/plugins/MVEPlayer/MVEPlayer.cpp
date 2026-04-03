@@ -64,7 +64,7 @@ bool MVEPlayer::Import(DataStream* str)
 	endAfterNextFrame = false;
 
 	// Assumed to cover A/V setup
-	return ProcessChunk() == FrameResult::OK && ProcessChunk() == FrameResult::OK;
+	return ProcessChunk() == FrameResult::OK && ProcessChunk() != FrameResult::ERROR;
 }
 
 bool MVEPlayer::DecodeFrame(VideoBuffer& videoBuffer)
