@@ -399,6 +399,9 @@ void TextArea::SetText(String text)
 {
 	ClearText();
 	AppendText(std::move(text));
+	if (flags & Editable) {
+		textContainer->CursorEnd();
+	}
 }
 
 void TextArea::SetColor(const Color& color, COLOR_TYPE idx)
