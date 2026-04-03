@@ -89,10 +89,14 @@ def OptCheckbox (ctlhelp, button_id, nameID, nameStrRef, variable, handler = Non
 	if variable:
 		button.SetVarAssoc (variable, value)
 
-	if GameCheck.IsIWD2():
+	if GameCheck.IsBG2OrEE (): # checked only in bg2 and bg2ee
+		button.SetSprites ("ROUNDBUT", 0, 0, 1, 2, 3)
+	elif GameCheck.IsIWD2 ():
 		button.SetSprites("GBTNOPT4", 0, 0, 1, 2, 3)
 	elif GameCheck.IsIWD1() or GameCheck.IsBG1():
 		button.SetSprites ("GMPPARBC", 3, 1, 2, 3, 5)
+	elif GameCheck.IsPST ():
+		button.SetSprites ("GPERBUT4", 0, 0, 1, 2, 3)
 
 	def callback():
 		GemRB.GetView ("OPTHELP").SetText (ctlhelp)
