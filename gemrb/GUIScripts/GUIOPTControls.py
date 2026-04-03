@@ -155,6 +155,8 @@ def OptHelpText (text_id, text_strref):
 	return text
 
 def OptBuddyLabel (nameID, strRef = None, focusedText = None, defaultText = None):
+	if nameID == None:
+		return
 	window = GetWindow ()
 	button = window.GetControl (nameID)
 
