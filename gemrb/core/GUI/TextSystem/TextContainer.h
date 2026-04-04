@@ -253,6 +253,7 @@ private:
 	size_t textLen = 0;
 	size_t cursorPos = 0;
 	size_t printPos = 0;
+	bool focused = false;
 	Point cursorPoint;
 
 private:

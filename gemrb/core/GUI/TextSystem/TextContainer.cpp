@@ -755,7 +755,7 @@ void TextContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 	printPos = 0;
 	ContentContainer::DrawSelf(drawFrame, clip);
 
-	if (layout.empty() && Editable()) {
+	if (layout.empty() && Editable() && focused) {
 		Holder<Sprite2D> cursor = core->GetCursorSprite();
 		Point p(drawFrame.x + margin.left, drawFrame.y + margin.top + cursor->Frame.y);
 		VideoDriver->BlitSprite(cursor, p);
@@ -784,7 +784,7 @@ void TextContainer::DrawContents(const Layout& layout, Point dp)
 	const String& text = ts->Text();
 	size_t textLength = ts->Text().length();
 
-	if (Editable() && printPos <= cursorPos && printPos + textLength >= cursorPos) {
+	if (Editable() && printPos <= cursorPos && printPos + textLength >= cursorPos && focused) {
 		auto printFont = ts->LayoutFont();
 
 		auto it = FindCursorRegion(layout);
@@ -861,11 +861,13 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 void TextContainer::DidFocus()
 {
 	VideoDriver->StartTextInput();
+	focused = true;
 }
 
 void TextContainer::DidUnFocus()
 {
 	VideoDriver->StopTextInput();
+	focused = false;
 }
 
 bool TextContainer::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
