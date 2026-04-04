@@ -120,7 +120,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 		Region lineSegment;
 
 #define LINE_REMAINDER (lineRgn.w - lineSegment.x)
-		const Region* excluded = NULL;
+		const Region* excluded = nullptr;
 		size_t numPrinted = 0;
 		char emptyPrints = 0;
 		bool newline = true;
@@ -282,12 +282,6 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 	}
 }
 
-ImageSpan::ImageSpan(const Holder<Sprite2D>& im)
-	: Content(im->Frame.size)
-{
-	image = im;
-}
-
 void ImageSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& offset) const
 {
 	// we only care about the first region... (should only be 1 anyway)
@@ -384,7 +378,7 @@ void ContentContainer::DrawContents(const Layout& contentLayout, Point point)
 void ContentContainer::AppendContent(Content* content)
 {
 	if (contents.empty())
-		InsertContentAfter(content, NULL);
+		InsertContentAfter(content, nullptr);
 	else
 		InsertContentAfter(content, *(--contents.end()));
 }
@@ -438,7 +432,7 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 	if (it != contents.end()) {
 		Content* content = *it;
 		it = contents.erase(it);
-		content->parent = NULL;
+		content->parent = nullptr;
 		layout.erase(std::find(layout.begin(), layout.end(), content));
 
 		layoutPoint.reset(); // reset cached layoutPoint
@@ -449,14 +443,14 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 		ContentRemoved(content);
 		return content;
 	}
-	return NULL;
+	return nullptr;
 }
 
 ContentContainer::ContentList::iterator
 	ContentContainer::EraseContent(ContentList::iterator it)
 {
 	Content* content = *it;
-	content->parent = NULL;
+	content->parent = nullptr;
 	layout.erase(std::find(layout.begin(), layout.end(), content));
 	layoutPoint.reset(); // reset cached layoutPoint
 	ContentRemoved(content);
@@ -482,7 +476,7 @@ Content* ContentContainer::ContentAtPoint(const Point& p) const
 		// we could return std::find(contents.begin(), contents.end(), *it) instead, but whats the point?
 		return (Content*) (contentLayout->content);
 	}
-	return NULL;
+	return nullptr;
 }
 
 const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) const
@@ -510,7 +504,7 @@ const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) 
 			count = step;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Region ContentContainer::BoundingBoxForContent(const Content* c) const
@@ -552,7 +546,7 @@ const Region* ContentContainer::ContentRegionForRect(const Region& r) const
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void ContentContainer::LayoutContentsFrom(const Content* c)
@@ -566,8 +560,8 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		return; // must bail or things will get screwed up!
 	}
 
-	const Content* exContent = NULL;
-	const Region* excluded = NULL;
+	const Content* exContent = nullptr;
+	const Region* excluded = nullptr;
 
 	if (it != contents.begin()) {
 		// relaying content some place in the middle of the container

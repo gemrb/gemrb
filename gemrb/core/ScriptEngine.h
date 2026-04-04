@@ -228,7 +228,7 @@ public:
 		return RunFunction(ModuleName, FunctionName, params, report_error);
 	}
 	/** Exec a single String */
-	virtual bool ExecString(const std::string& string, bool feedback) = 0;
+	virtual bool ExecString(const std::string& string, bool feedback = false) = 0;
 };
 
 }

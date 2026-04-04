@@ -274,7 +274,7 @@ struct ItemDragOp : public Control::ControlDragOp {
 	CREItem* item;
 
 	explicit ItemDragOp(CREItem* item);
-	~ItemDragOp();
+	~ItemDragOp() override;
 
 private:
 	static Control dragDummy;

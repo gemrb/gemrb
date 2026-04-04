@@ -198,7 +198,6 @@ def GuessControlType (keyData):
 def AddKeyControls (window, keyData, position, offset, introText):
 	# return
 	key, controlType, value, desc = keyData
-	oldct = controlType
 	controlType = GuessControlType (keyData)
 	firstID = offset["c"] * 1000 + offset["r"]
 	secondID = offset["c"] * 10000 + offset["r"]
