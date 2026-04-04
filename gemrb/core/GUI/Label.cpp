@@ -80,7 +80,6 @@ void Label::SetAlignment(unsigned char newAlignment)
 	MarkDirty();
 }
 
-/** Simply returns the pointer to the text, don't modify it! */
 String Label::QueryText() const
 {
 	return Text;
