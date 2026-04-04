@@ -173,7 +173,6 @@ public:
 	//static void MultipleQuickSaves(int arg);
 	void SetTracker(const Actor* actor, ieDword dist);
 
-	void DrawTooltip(const Point& p) const;
 	String TooltipText() const override;
 
 	void SetTargetMode(TargetMode mode);
