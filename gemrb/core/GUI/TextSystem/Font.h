@@ -98,6 +98,9 @@ public:
 	struct PrintColors {
 		Color fg;
 		Color bg;
+		PrintColors() = default;
+		PrintColors(const Color& fg, const Color& bg)
+			: fg(fg), bg(bg) {};
 	};
 
 	struct StringSizeMetrics {

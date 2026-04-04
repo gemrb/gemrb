@@ -75,7 +75,7 @@ class TextSpan final : public Content {
 private:
 	String text;
 	const Holder<Font> font;
-	Font::PrintColors* colors = nullptr;
+	std::unique_ptr<Font::PrintColors> colors;
 
 	struct TextLayoutRegion : LayoutRegion {
 		size_t beginCharIdx;
@@ -91,10 +91,8 @@ public:
 	TextSpan(String string, const Holder<Font> font, const Size* = nullptr);
 	TextSpan(String string, const Holder<Font> font, Font::PrintColors cols, const Size* = nullptr);
 	TextSpan(const TextSpan&) = delete;
-	~TextSpan() final;
 	TextSpan& operator=(const TextSpan&) = delete;
 
-	void ClearColors();
 	void SetColors(const Color& fg, const Color& bg);
 
 	const String& Text() const { return text; };
@@ -248,7 +246,7 @@ private:
 	using TextLayout = TextSpan::TextLayoutRegion;
 	// default font/palette for adding plain text
 	Holder<Font> font;
-	Font::PrintColors* colors = nullptr;
+	std::unique_ptr<Font::PrintColors> colors;
 	unsigned char alignment = IE_FONT_ALIGN_LEFT;
 
 	size_t textLen = 0;
@@ -277,7 +275,6 @@ private:
 public:
 	TextContainer(const Region& frame, Holder<Font> font);
 	TextContainer(const TextContainer&) = delete;
-	~TextContainer() override;
 	TextContainer& operator=(const TextContainer&) = delete;
 
 	// relative to cursor pos
@@ -292,9 +289,8 @@ public:
 	void DidFocus() override;
 	void DidUnFocus() override;
 
-	void ClearColors();
 	void SetColors(const Color& fg, const Color& bg);
-	const Font::PrintColors* TextColors() const { return colors; }
+	const std::unique_ptr<Font::PrintColors>& TextColors() const { return colors; }
 	void SetFont(Holder<Font> fnt) { font = std::move(fnt); }
 	Holder<const Font> TextFont() const { return font; }
 	void SetAlignment(unsigned char align) { alignment = align; }

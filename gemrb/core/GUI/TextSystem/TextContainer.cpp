@@ -41,24 +41,13 @@ TextSpan::TextSpan(String string, const Holder<Font> fnt, const Size* frame)
 }
 
 TextSpan::TextSpan(String string, const Holder<Font> fnt, Font::PrintColors cols, const Size* frame)
-	: Content(frame ? *frame : Size()), text(std::move(string)), font(fnt), colors(new Font::PrintColors(cols))
+	: Content(frame ? *frame : Size()), text(std::move(string)), font(fnt), colors(std::make_unique<Font::PrintColors>(cols))
 {
-}
-
-TextSpan::~TextSpan()
-{
-	delete colors;
-}
-
-void TextSpan::ClearColors()
-{
-	delete colors;
 }
 
 void TextSpan::SetColors(const Color& fg, const Color& bg)
 {
-	ClearColors();
-	colors = new Font::PrintColors { fg, bg };
+	colors = std::make_unique<Font::PrintColors>(fg, bg);
 }
 
 inline Holder<const Font> TextSpan::LayoutFont() const
@@ -255,10 +244,10 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 		drawRect.x += offset.x;
 		drawRect.y += offset.y;
 		auto printFont = LayoutFont();
-		const Font::PrintColors* pc = colors;
+		const Font::PrintColors* pc = colors.get();
 		const TextContainer* container = static_cast<const TextContainer*>(parent);
 		if (!pc && container) {
-			pc = container->TextColors();
+			pc = container->TextColors().get();
 		}
 		assert(printFont);
 		// FIXME: this shouldnt happen, but it does (BG2 belt03 unidentified).
@@ -674,14 +663,9 @@ TextContainer::TextContainer(const Region& frame, Holder<Font> fnt)
 {
 }
 
-TextContainer::~TextContainer()
-{
-	delete colors;
-}
-
 void TextContainer::AppendText(String text)
 {
-	AppendText(std::move(text), nullptr, colors);
+	AppendText(std::move(text), nullptr, colors.get());
 }
 
 void TextContainer::AppendText(String text, const Holder<Font> fnt, const Font::PrintColors* cols)
@@ -706,16 +690,10 @@ void TextContainer::ContentRemoved(const Content* content)
 	textLen -= ts->Text().length();
 }
 
-void TextContainer::ClearColors()
-{
-	delete colors;
-	MarkDirty();
-}
-
 void TextContainer::SetColors(const Color& fg, const Color& bg)
 {
-	ClearColors();
-	colors = new Font::PrintColors { fg, bg };
+	colors = std::make_unique<Font::PrintColors>(fg, bg);
+	MarkDirty();
 }
 
 String TextContainer::Text() const
