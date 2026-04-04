@@ -110,6 +110,11 @@ TooltipMargin = <number>
 Space between tooltip text and sides of TooltipBack (x2)
 
 
+TooltipSpeed = <number>
+- - - - - - - - - - - - -
+Speed of tooltip unrolling. 0 if tooltips are not scrolls.
+
+
 GroundCircleBAM1 = <resref>
 GroundCircleBAM2 = <resref>
 GroundCircleBAM3 = <resref>/<int>

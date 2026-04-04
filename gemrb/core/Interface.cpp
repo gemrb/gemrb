@@ -1537,15 +1537,15 @@ void Interface::LoadGemRBINI()
 	//which stat determines the fist weapon (defaults to class)
 	Actor::SetFistStat(ini->GetKeyAsInt("resources", "FistStat", IE_CLASS));
 
-	int ttMargin = ini->GetKeyAsInt("resources", "TooltipMargin", 10);
-
 	if (!tooltipBG.IsEmpty() && !config.UseAsLibrary) {
 		auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(tooltipBG, IE_BAM_CLASS_ID, true);
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (anim) {
+			int ttMargin = ini->GetKeyAsInt("resources", "TooltipMargin", 10);
+			int ttSpeed = ini->GetKeyAsInt("resources", "TooltipSpeed", 0);
+
 			TooltipBG = std::make_unique<TooltipBackground>(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2));
-			// FIXME: this is an arbitrary heuristic and speed
-			TooltipBG->SetAnimationSpeed((ttMargin == 5) ? 10 : 0);
+			TooltipBG->SetAnimationSpeed(ttSpeed);
 			TooltipBG->SetMargin(ttMargin);
 		}
 	}
