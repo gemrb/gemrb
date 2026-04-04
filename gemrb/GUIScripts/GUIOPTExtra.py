@@ -29,6 +29,17 @@ from GUIDefines import *
 ScreenW = GemRB.GetSystemVariable (SV_WIDTH)
 ScreenH = GemRB.GetSystemVariable (SV_HEIGHT)
 
+# mapped controls of the GUIOPT window we reuse
+controlIDs = { 'win' : 10, 'help' : 15, 'done' : 11, 'cancel' : 14,
+							'1' : 1, '2' : 2, '3' : 3, '4' : 4,  '5' : 5, '6' : 13, '7' : 25, '8' : 26,
+							'1t' : 17, '2t' : 18, '3t' : 19, '4t' : 20,  '5t' : 21, '6t' : 22, '7t' : 24, '8t' : 27
+							}
+if GameCheck.IsPST ():
+	controlIDs = { 'win' : 9, 'help' : 1, 'done' : 16, 'cancel' : 17,
+							'1' : 2, '2' : 3, '3' : 4, '4' : 5,  '5' : 6, '6' : 7, '7' : 8, '8' : None,
+							'1t' : 9, '2t' : 10, '3t' : 11, '4t' : 12,  '5t' : 13, '6t' : 14, '7t' : 15, '8t' : None
+							}
+
 def OpenGemRBOptionsWindow ():
 	# TODO: add hotkey config here for games that don't have windows for it (pst, iwd2, bg2 have GUIKEYS; bg1, iwd1 nothing; ees something else)
 	#       or simplify and link those buttons to the same constructed window as well
@@ -79,7 +90,7 @@ def CloseConfigWindow ():
 	GemRB.SaveConfig ()
 
 def PrepareBlankWindow (title, introText, usedControls, usedPSTcontrols):
-	Window = GemRB.LoadWindow (9 if GameCheck.IsPST () else 10, "GUIOPT")
+	Window = GemRB.LoadWindow (controlIDs["win"], "GUIOPT")
 	Window.SetBackground ({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 180})
 	Window.SetFrame ({ 'x': 0, 'y': 0, 'h': ScreenH, 'w': ScreenW })
 	Window.SetFlags (WF_BORDERLESS, OP_OR)
@@ -88,9 +99,9 @@ def PrepareBlankWindow (title, introText, usedControls, usedPSTcontrols):
 	Title = Window.GetControl (-1 + 0x10000000)
 	Title.SetFrame ({ 'x': 0, 'y': 10, 'h': 20, 'w': ScreenW })
 	Title.SetText (title)
-	GUIOPTControls.OptHelpText (1 if GameCheck.IsPST () else 15, introText)
-	GUIOPTControls.OptDone (CloseConfigWindow, 16 if GameCheck.IsPST () else 11)
-	GUIOPTControls.OptCancel (Window.Close, 17 if GameCheck.IsPST () else 14)
+	GUIOPTControls.OptHelpText (controlIDs["help"], introText)
+	GUIOPTControls.OptDone (CloseConfigWindow, controlIDs["done"])
+	GUIOPTControls.OptCancel (Window.Close, controlIDs["cancel"])
 
 	# delete all the unused controls
 	for cid in range(1, 40):
@@ -310,16 +321,6 @@ def OpenGUIEnhancementsWindow ():
 		"",
 		""
 	]
-
-	controlIDs = { 'win' : 10, 'help' : 15, 'done' : 11, 'cancel' : 14,
-							 '1' : 1, '2' : 2, '3' : 3, '4' : 4,  '5' : 5, '6' : 13, '7' : 25, '8' : 26,
-							 '1t' : 17, '2t' : 18, '3t' : 19, '4t' : 20,  '5t' : 21, '6t' : 22, '7t' : 24, '8t' : 27
-							 }
-	if GameCheck.IsPST ():
-		controlIDs = { 'win' : 9, 'help' : 1, 'done' : 16, 'cancel' : 17,
-								'1' : 2, '2' : 3, '3' : 4, '4' : 5,  '5' : 6, '6' : 7, '7' : 8, '8' : None,
-								'1t' : 9, '2t' : 10, '3t' : 11, '4t' : 12,  '5t' : 13, '6t' : 14, '7t' : 15, '8t' : None
-								}
 
 	Window = GemRB.LoadWindow (controlIDs["win"], "GUIOPT")
 	Window.AddAlias("SUB_WIN", 1)
