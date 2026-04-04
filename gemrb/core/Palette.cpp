@@ -75,6 +75,12 @@ void Palette::SetColor(size_t index, const Color& c)
 	updateVersion();
 }
 
+void Palette::CopyColors(const Colors& newColors)
+{
+	std::copy_n(newColors.cbegin(), newColors.size(), colors.begin());
+	updateVersion();
+}
+
 const Color* Palette::ColorData() const
 {
 	return colors.data();

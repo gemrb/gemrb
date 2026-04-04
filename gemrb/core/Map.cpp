@@ -1739,7 +1739,7 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 					buffer[i] = ColorGray;
 				}
 			}
-			searchMapPal->CopyColors(0, buffer.cbegin(), buffer.cend());
+			searchMapPal->CopyColors(buffer);
 
 			materialMapPal = MakeHolder<Palette>();
 			buffer[0] = ColorBlack; // impassable, light blocking
@@ -1764,7 +1764,7 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 			for (uint8_t i = 0; i < 255; ++i) {
 				buffer[i] = Color(i, i, i, 128);
 			}
-			heightMapPal->CopyColors(0, buffer.cbegin(), buffer.cend());
+			heightMapPal->CopyColors(buffer);
 		}
 	} debugPalettes;
 

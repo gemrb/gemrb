@@ -2923,7 +2923,7 @@ Palette SetupRGBModification(const Holder<Palette>& src, const RGBModifier* mods
 	for (i = 0; i < 72; ++i)
 		applyMod(srcData[0xB8 + i], buffer[0xB8 + i], tmods[4]);
 
-	pal.CopyColors(0, buffer.cbegin(), buffer.cend());
+	pal.CopyColors(buffer);
 
 	return pal;
 }
@@ -2943,7 +2943,7 @@ Palette SetupGlobalRGBModification(const Holder<Palette>& src, const RGBModifier
 		applyMod(srcData[i], buffer[i], mod);
 	}
 
-	pal.CopyColors(0, buffer.cbegin(), buffer.cend());
+	pal.CopyColors(buffer);
 
 	return pal;
 }
@@ -3003,7 +3003,7 @@ Palette SetupPaperdollColours(const ieDword* colors, unsigned int type) noexcept
 
 	buffer[1] = Color(0, 0, 0, 255); // shadows, will be half-trans'ed when required
 
-	pal.CopyColors(0, buffer.cbegin(), buffer.cend());
+	pal.CopyColors(buffer);
 	return pal;
 }
 

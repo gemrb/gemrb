@@ -75,6 +75,8 @@ public:
 		updateVersion();
 	}
 
+	void CopyColors(const Colors&);
+
 	const Color* ColorData() const;
 	Colors::const_reference GetColorAt(size_t pos) const;
 	Hash GetVersion() const;

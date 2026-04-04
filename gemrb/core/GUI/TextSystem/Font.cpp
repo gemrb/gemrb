@@ -160,7 +160,7 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 				c.b = 255 - c.b;
 				buffer[i] = c;
 			}
-			invertedPalette->CopyColors(0, buffer.cbegin(), buffer.cend());
+			invertedPalette->CopyColors(buffer);
 			invertedSheet->SetPalette(invertedPalette);
 		}
 	}
