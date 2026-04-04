@@ -90,6 +90,7 @@ FUNCTION(CONFIGURE_COMPILER)
 		ADD_FLAG_IF_SUPPORTED(FLAG "-ffast-math")
 		ADD_FLAG_IF_SUPPORTED(FLAG "-frounding-math")
 		ADD_FLAG_IF_SUPPORTED(FLAG "-fno-strict-aliasing")
+		ADD_FLAG_IF_SUPPORTED(FLAG "-fdiagnostics-all-candidates")
 
 		IF(WIN32)
 			# GCC 4.5.0+ has shared libstdc++ without dllimport
