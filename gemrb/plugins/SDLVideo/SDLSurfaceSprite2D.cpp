@@ -80,7 +80,7 @@ SDLSurfaceSprite2D::~SDLSurfaceSprite2D() noexcept
 
 Holder<Sprite2D> SDLSurfaceSprite2D::copy() const
 {
-	return Holder<Sprite2D>(new SDLSurfaceSprite2D(*this));
+	return MakeHolder<SDLSurfaceSprite2D>(*this);
 }
 
 const void* SDLSurfaceSprite2D::LockSprite() const
@@ -312,7 +312,7 @@ SDLTextureSprite2D::SDLTextureSprite2D(const SDLTextureSprite2D& other) noexcept
 
 Holder<Sprite2D> SDLTextureSprite2D::copy() const
 {
-	return Holder<Sprite2D>(new SDLTextureSprite2D(*this));
+	return MakeHolder<SDLTextureSprite2D>(*this);
 }
 
 SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
