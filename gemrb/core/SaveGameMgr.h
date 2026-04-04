@@ -27,7 +27,7 @@ namespace GemRB {
 
 class GEM_EXPORT SaveGameMgr : public ImporterBase {
 public:
-	virtual Game* LoadGame(Game* newGame, GAMVersion override = GAMVersion::GemRB) = 0;
+	virtual Game* LoadGame(Game* newGame, GAMVersion verOverride = GAMVersion::GemRB) = 0;
 
 	virtual int GetStoredFileSize(const Game* game) = 0;
 	virtual int PutGame(DataStream* stream, Game* game) const = 0;

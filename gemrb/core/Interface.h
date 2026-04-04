@@ -507,10 +507,10 @@ public:
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
 	/** sets up load game */
-	void SetupLoadGame(Holder<SaveGame> save, GAMVersion override);
+	void SetupLoadGame(Holder<SaveGame> save, GAMVersion verOverride);
 	/** load saved game by index (-1 is default), ver_override is an optional parameter
 	to override the saved game's version */
-	void LoadGame(Holder<SaveGame> save, GAMVersion override);
+	void LoadGame(Holder<SaveGame> save, GAMVersion verOverride);
 	/** reloads the world map from a resource file */
 	void UpdateWorldMap(const ResRef& wmResRef);
 	/** fix changes in global script/worldmap*/

@@ -2511,14 +2511,14 @@ void Interface::QuitGame(int BackToMain)
 	GSUpdate(true);
 }
 
-void Interface::SetupLoadGame(Holder<SaveGame> sg, GAMVersion override)
+void Interface::SetupLoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 {
 	LoadGameIndex = std::move(sg);
-	VersionOverride = override;
+	VersionOverride = verOverride;
 	QuitFlag |= QF_LOADGAME;
 }
 
-void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion override)
+void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 {
 	// This function has rather painful error handling,
 	// as it should swap all the objects or none at all
@@ -2593,7 +2593,7 @@ void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion override)
 	gamMgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gamStr);
 	if (!gamMgr) goto cleanup;
 
-	newGame = gamMgr->LoadGame(new Game(), override);
+	newGame = gamMgr->LoadGame(new Game(), verOverride);
 	if (!newGame) goto cleanup;
 	UpdateActorConfig(); // so things that require Game can properly rerun
 
