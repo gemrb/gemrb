@@ -1,6 +1,0 @@
-Description: This table lists special functionality items.
-
-Columns:
- IDENTIFY - the item could be used as identifying tool. The item's first extended header will be executed.
-
-Rows: Item resrefs

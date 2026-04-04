@@ -1,4 +1,7 @@
 2DA V1.0
 *
-	IDENTIFY
+        IDENTIFY
 SCRL75  1
+
+# this table lists items with special functionality
+# IDENTIFY - bitfield, currently used to mark items usable for identifying others. The item's first extended header will be executed.
