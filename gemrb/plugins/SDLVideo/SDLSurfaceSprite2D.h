@@ -53,7 +53,7 @@ private:
 	bool NeedToReshade(const Color* tint, BlitFlags flags) const noexcept;
 	bool NeedToUpdatePalette() const noexcept;
 	void ShadePalette(BlitFlags renderFlags, const Color* tint) const noexcept;
-	void UpdatePalettesState(bool flagsChanged) const noexcept;
+	void UpdatePalettesState(bool flagsChanged, bool skipUpdate) const noexcept;
 	void UpdatePaletteForSurface(const Palette& pal) const noexcept;
 	void Invalidate() noexcept;
 

@@ -66,7 +66,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D& obj) noexcept
 	if (obj.shadedPalette) {
 		shadedPalette = MakeHolder<Palette>(*obj.shadedPalette);
 	}
-	UpdatePalettesState(true);
+	UpdatePalettesState(true, true);
 
 	// note: make sure that src & dest have the same palette applied before this
 	// everything else will end up in SDL color transformation magic
@@ -246,7 +246,7 @@ BlitFlags SDLSurfaceSprite2D::PrepareForRendering(BlitFlags renderflags, const C
 			appliedTint = *tint;
 		}
 
-		UpdatePalettesState(flagsChanged);
+		UpdatePalettesState(flagsChanged, false);
 	}
 
 	return appliedBlitFlags;
@@ -266,7 +266,7 @@ void SDLSurfaceSprite2D::UpdatePaletteForSurface(const Palette& pal) const noexc
 #endif
 }
 
-void SDLSurfaceSprite2D::UpdatePalettesState(bool flagsChanged) const noexcept
+void SDLSurfaceSprite2D::UpdatePalettesState(bool flagsChanged, bool skipUpdate) const noexcept
 {
 	// effects modified?
 	if (appliedBlitFlags && shadedPaletteVersion != shadedPalette->GetVersion()) {
@@ -284,7 +284,7 @@ void SDLSurfaceSprite2D::UpdatePalettesState(bool flagsChanged) const noexcept
 		shadedPaletteVersion = 0;
 	}
 
-	OnSurfaceUpdate();
+	if (!skipUpdate) OnSurfaceUpdate();
 }
 
 SDL_Surface* SDLSurfaceSprite2D::GetSurface() const
