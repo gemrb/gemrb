@@ -31,7 +31,7 @@ IE_GUI_VIEW_RESIZE_ALL			= IE_GUI_VIEW_RESIZE_VERTICAL|IE_GUI_VIEW_RESIZE_HORIZO
 
 # TODO: move these to TextContainer
 IE_GUI_VIEW_RESIZE_WIDTH	= 1 << 27	# resize the view horizontally if horizontal content exceeds width
-IE_GUI_VIEW_RESIZE_HEIGHT	= 1 << 26	# resize the view vertically if vertical content exceeds width
+IE_GUI_VIEW_RESIZE_HEIGHT	= 1 << 26	# resize the view vertically if vertical content exceeds height
 
 IE_GUI_VIEW_INVISIBLE		= 1 << 30
 IE_GUI_VIEW_DISABLED		= 1 << 29
