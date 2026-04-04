@@ -552,12 +552,13 @@ void WindowManager::DrawTooltip(Point pos) const
 		TooltipTime = GetMilliseconds();
 	}
 
+	const String& currentText = tooltip.tt.GetText();
 	if (tooltip.time != TooltipTime + ToolTipDelay) {
 		tooltip.time = TooltipTime + ToolTipDelay;
 		if (hoverWin) {
 			const String& text = hoverWin->TooltipText();
 			// avoid a cacophony when long-pressing tab
-			if (text != tooltip.tt.GetText()) {
+			if (text != currentText) {
 				tooltip.reset = true;
 			}
 		} else {
@@ -579,6 +580,10 @@ void WindowManager::DrawTooltip(Point pos) const
 			}
 			tooltip.reset = false;
 		}
+		if (tooltip.tt.GetText().empty()) {
+			// nothing to draw
+			return;
+		}
 
 		// clamp pos so that the TT is all visible (TT draws centered at pos)
 		int halfW = tooltip.tt.TextSize().w / 2 + 16;
@@ -587,7 +592,7 @@ void WindowManager::DrawTooltip(Point pos) const
 		pos.y = Clamp<int>(pos.y, halfW, screen.h - halfH);
 
 		tooltip.tt.Draw(pos);
-	} else if (tooltip.reset) {
+	} else if (tooltip.reset && !currentText.empty()) {
 		tooltip.tt.SetText(u"");
 	}
 }
