@@ -57,6 +57,7 @@ class Tooltip {
 public:
 	Tooltip(const String& s, Holder<Font> fnt, const Font::PrintColors& cols, std::unique_ptr<TooltipBackground> bg);
 
+	const String& GetText() const { return text; };
 	void SetText(const String& s);
 	Size TextSize() const;
 

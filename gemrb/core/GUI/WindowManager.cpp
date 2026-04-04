@@ -548,12 +548,21 @@ void WindowManager::DrawTooltip(Point pos) const
 		return;
 	}
 
-	if (trackingWin) // if the mouse is held down we don't want tooltips
+	if (trackingWin) { // if the mouse is held down we don't want tooltips
 		TooltipTime = GetMilliseconds();
+	}
 
 	if (tooltip.time != TooltipTime + ToolTipDelay) {
 		tooltip.time = TooltipTime + ToolTipDelay;
-		tooltip.reset = true;
+		if (hoverWin) {
+			const String& text = hoverWin->TooltipText();
+			// avoid a cacophony when long-pressing tab
+			if (text != tooltip.tt.GetText()) {
+				tooltip.reset = true;
+			}
+		} else {
+			tooltip.reset = true;
+		}
 	}
 
 	if (hoverWin && TooltipTime && GetMilliseconds() >= tooltip.time) {
@@ -578,7 +587,7 @@ void WindowManager::DrawTooltip(Point pos) const
 		pos.y = Clamp<int>(pos.y, halfW, screen.h - halfH);
 
 		tooltip.tt.Draw(pos);
-	} else {
+	} else if (tooltip.reset) {
 		tooltip.tt.SetText(u"");
 	}
 }
