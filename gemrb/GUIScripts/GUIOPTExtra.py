@@ -30,11 +30,27 @@ ScreenW = GemRB.GetSystemVariable (SV_WIDTH)
 ScreenH = GemRB.GetSystemVariable (SV_HEIGHT)
 
 def OpenGemRBOptionsWindow ():
-	# if we ever need more than one subwindow open a selector window here instead
 	# TODO: add hotkey config here for games that don't have windows for it (pst, iwd2, bg2 have GUIKEYS; bg1, iwd1 nothing; ees something else)
 	#       or simplify and link those buttons to the same constructed window as well
-	#OpenINIConfigWindow ()
-	OpenGUIEnhancementsWindow ()
+	# if we ever need more than 3 buttons, switch to GUICONN 1 with 4/7/8 buttons (iwd2/bg1+iwd1/bg2) or add them manually (pst)
+	Window = GemRB.LoadWindow (4 if GameCheck.IsPST () else 5, "GUIOPT")
+	Button1 = Window.GetControl (0)
+	Button1.OnPress (OpenGUIEnhancementsWindow)
+	Button1.SetText ("Enhancements")
+	Button1.MakeDefault ()
+
+	Button2 = Window.GetControl (1)
+	Button2.OnPress (OpenINIConfigWindow)
+	Button2.SetText ("Hidden options")
+
+	Back = Window.GetControl (2)
+	Back.OnPress (Window.Close)
+	Back.SetText ("Back")
+
+	TextArea = Window.GetControl (3)
+	TextArea.SetText ("Extra configuration windows and GemRB-only option setting.")
+
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def AddGemRBOptionsButton (window, frame, xOff, yOff, sprite, cycle = 0):
