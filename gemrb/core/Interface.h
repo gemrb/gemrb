@@ -326,7 +326,7 @@ private:
 	ResRef TextFontResRef;
 	ResRef TooltipFontResRef;
 
-	TooltipBackground* TooltipBG = nullptr;
+	std::unique_ptr<TooltipBackground> TooltipBG;
 
 	ResRef Palette16;
 	ResRef Palette32;
@@ -427,7 +427,7 @@ public:
 	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
 	void LoadInitialValues(const ResRef& name, ieVarsMap& map) const;
 
-	Tooltip CreateTooltip() const;
+	Tooltip CreateTooltip();
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label* GetMessageLabel() const;
 	/** returns the textarea of the main game screen */

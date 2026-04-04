@@ -700,7 +700,6 @@ Interface::~Interface() noexcept
 	delete sgiterator;
 	delete projserv;
 	delete displaymsg;
-	delete TooltipBG;
 
 	delete audioPlayback;
 	delete ambientManager;
@@ -1544,7 +1543,7 @@ void Interface::LoadGemRBINI()
 		auto anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(tooltipBG, IE_BAM_CLASS_ID, true);
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (anim) {
-			TooltipBG = new TooltipBackground(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2));
+			TooltipBG = std::make_unique<TooltipBackground>(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2));
 			// FIXME: this is an arbitrary heuristic and speed
 			TooltipBG->SetAnimationSpeed((ttMargin == 5) ? 10 : 0);
 			TooltipBG->SetMargin(ttMargin);
@@ -1975,17 +1974,13 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 	//end of gui hacks
 }
 
-Tooltip Interface::CreateTooltip() const
+Tooltip Interface::CreateTooltip()
 {
 	Font::PrintColors colors;
 	colors.fg = displaymsg->GetColor(GUIColors::TOOLTIP);
 	colors.bg = displaymsg->GetColor(GUIColors::TOOLTIPBG);
 
-	TooltipBackground* bg = nullptr;
-	if (TooltipBG) {
-		bg = new TooltipBackground(*TooltipBG);
-	}
-	return Tooltip(u"", GetFont(TooltipFontResRef), colors, bg);
+	return Tooltip(u"", GetFont(TooltipFontResRef), colors, std::move(TooltipBG));
 }
 
 /** Get the Save game manager */

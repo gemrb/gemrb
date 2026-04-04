@@ -37,7 +37,6 @@ class TooltipBackground {
 
 public:
 	explicit TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> = nullptr, Holder<Sprite2D> right = nullptr);
-	TooltipBackground(const TooltipBackground&);
 
 	void Draw(Region rgn) const;
 
@@ -56,7 +55,7 @@ class Tooltip {
 	Font::PrintColors colors;
 
 public:
-	Tooltip(const String& s, Holder<Font> fnt, const Font::PrintColors& cols, TooltipBackground* bg);
+	Tooltip(const String& s, Holder<Font> fnt, const Font::PrintColors& cols, std::unique_ptr<TooltipBackground> bg);
 
 	void SetText(const String& s);
 	Size TextSize() const;

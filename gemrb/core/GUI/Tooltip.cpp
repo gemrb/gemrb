@@ -34,18 +34,6 @@ TooltipBackground::TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> left,
 	Reset();
 }
 
-TooltipBackground::TooltipBackground(const TooltipBackground& bg)
-{
-	animationSpeed = bg.animationSpeed;
-	margin = bg.margin;
-
-	background = bg.background;
-	leftbg = bg.leftbg;
-	rightbg = bg.rightbg;
-
-	Reset();
-}
-
 void TooltipBackground::Reset()
 {
 	if (animationSpeed) {
@@ -107,8 +95,8 @@ void TooltipBackground::Draw(Region rgn) const
 }
 
 
-Tooltip::Tooltip(const String& s, Holder<Font> fnt, const Font::PrintColors& cols, TooltipBackground* bg)
-	: font(std::move(fnt)), background(bg), colors(cols)
+Tooltip::Tooltip(const String& s, Holder<Font> fnt, const Font::PrintColors& cols, std::unique_ptr<TooltipBackground> bg)
+	: font(std::move(fnt)), background(std::move(bg)), colors(cols)
 {
 	SetText(s);
 }
