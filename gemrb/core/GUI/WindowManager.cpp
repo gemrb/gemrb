@@ -553,8 +553,10 @@ void WindowManager::DrawTooltip(Point pos) const
 	}
 
 	const String& currentText = tooltip.tt.GetText();
-	if (tooltip.time != TooltipTime + ToolTipDelay) {
-		tooltip.time = TooltipTime + ToolTipDelay;
+	// only use the delay the first time, otherwise drawing can flicker
+	int delay = currentText.empty() ? ToolTipDelay : 1;
+	if (tooltip.time != TooltipTime + delay) {
+		tooltip.time = TooltipTime + delay;
 		if (hoverWin) {
 			const String& text = hoverWin->TooltipText();
 			// avoid a cacophony when long-pressing tab
