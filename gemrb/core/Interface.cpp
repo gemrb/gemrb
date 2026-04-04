@@ -2203,9 +2203,9 @@ int Interface::PlayMovie(const ResRef& movieRef)
 		int b = sttable->QueryFieldSigned<int>("blue", "frame");
 
 		if (r || g || b) {
-			moviePlayer->SetSubtitles(new IESubtitles(std::move(font), sttable, Color(r, g, b, 0xff)));
+			moviePlayer->SetSubtitles(std::make_unique<IESubtitles>(std::move(font), sttable, Color(r, g, b, 0xff)));
 		} else {
-			moviePlayer->SetSubtitles(new IESubtitles(std::move(font), sttable));
+			moviePlayer->SetSubtitles(std::make_unique<IESubtitles>(std::move(font), sttable));
 		}
 	}
 

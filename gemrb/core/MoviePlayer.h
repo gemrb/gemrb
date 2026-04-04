@@ -83,7 +83,7 @@ public:
 private:
 	bool isPlaying = false;
 	bool showSubtitles = false;
-	SubtitleSet* subtitles = nullptr;
+	std::unique_ptr<SubtitleSet> subtitles;
 
 protected:
 	// NOTE: make sure any new movie plugins set these!
@@ -112,7 +112,7 @@ public:
 	void Play(Window* win);
 	virtual void Stop();
 
-	void SetSubtitles(SubtitleSet* subs);
+	void SetSubtitles(std::unique_ptr<SubtitleSet> subs);
 	void EnableSubtitles(bool set);
 	bool SubtitlesEnabled() const;
 	bool IsPlaying() const;
