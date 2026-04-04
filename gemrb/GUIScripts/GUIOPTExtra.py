@@ -127,7 +127,7 @@ def PrepareINIKeyList ():
 	defaultControlType = "" # deliberately invalid value
 
 	# construct a manually ordered list by combining our table and what's in the ini
-	# cycle through, save values of interesting keys
+	# cycle through, save values of interesting keys, add all other keys
 	coolKeysKeys = [k[0] for k in coolKeys]
 	ignoredSections = ["Movies", "Multiplayer"]
 	for section in config.sections():
@@ -135,19 +135,10 @@ def PrepareINIKeyList ():
 			continue
 
 		for key in config[section]:
-			if key not in coolKeysKeys:
-				continue
-			coolKeys[coolKeysKeys.index(key)][2] = config[section][key]
-
-	# cycle through, add all other keys
-	for section in config.sections():
-		if section in ignoredSections:
-			continue
-
-		for key in config[section]:
 			if key in coolKeysKeys:
-				continue
-			coolKeys.append([key, defaultControlType, config[section][key], ""])
+				coolKeys[coolKeysKeys.index(key)][2] = config[section][key]
+			else:
+				coolKeys.append([key, defaultControlType, config[section][key], ""])
 
 	# add descriptions to interesting keys
 	descs = {
