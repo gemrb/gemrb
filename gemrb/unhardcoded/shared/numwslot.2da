@@ -1,18 +1,18 @@
 2DA V1.0
 4
-                    WEAPSLOTS
+                    SLOTS
 MAGE                2
 FIGHTER             4
 CLERIC              2
 THIEF               2
 BARD                2
 PALADIN             3
-DRUID               2
-RANGER              3
 FIGHTER_MAGE        2
 FIGHTER_CLERIC      2
 FIGHTER_THIEF       2
 FIGHTER_MAGE_THIEF  2
+DRUID               2
+RANGER              3
 MAGE_THIEF          2
 CLERIC_MAGE         2
 CLERIC_THIEF        2
@@ -21,4 +21,6 @@ FIGHTER_MAGE_CLERIC 2
 CLERIC_RANGER       2
 MONK                3
 SORCERER            2
-BARBARIAN           4
+
+# how many quick weapon slots does the class get?
+# barbarians are technically kits, so they would use the FIGHTER row

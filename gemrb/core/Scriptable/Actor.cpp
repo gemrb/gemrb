@@ -2098,7 +2098,7 @@ static void InitActorTables()
 				auto it = className2ID.find(cls);
 				int id = 0;
 				if (it != className2ID.end()) id = it->second;
-				numWeaponSlots[id] = std::min<ieByte>(4, tm->QueryFieldUnsigned<ieByte>(i, 0));
+				numWeaponSlots[id] = std::min<ieByte>(4, tm->QueryFieldUnsigned<ieByte>(cls, "SLOTS"));
 			}
 		}
 	}
