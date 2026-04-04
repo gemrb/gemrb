@@ -36,7 +36,7 @@ const TypeID MoviePlayer::ID = { "MoviePlayer" };
 
 MoviePlayer::~MoviePlayer(void)
 {
-	Stop();
+	MoviePlayer::Stop();
 }
 
 void MoviePlayer::SetSubtitles(std::unique_ptr<SubtitleSet> subs)
