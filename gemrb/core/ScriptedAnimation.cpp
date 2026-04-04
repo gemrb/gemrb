@@ -355,7 +355,7 @@ void ScriptedAnimation::SetSound(int arg, const ResRef& sound)
 void ScriptedAnimation::PlayOnce()
 {
 	SequenceFlags &= ~IE_VVC_LOOP;
-	for (auto& anim : anims) {
+	for (const auto& anim : anims) {
 		if (anim) {
 			anim->flags |= S_ANI_PLAYONCE;
 		}

@@ -7757,7 +7757,7 @@ void GameScript::SetPCStatsTokens(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	static auto setfav = [](const auto& favs, ieVariable favtok, ieVariable cnttok) {
+	static auto setfav = [](const auto& favs, const ieVariable& favtok, ieVariable cnttok) {
 		String token = u"/";
 		auto fav = std::max_element(favs.begin(), favs.end(), [](const auto& lhs, const auto& rhs) {
 			return lhs.second < rhs.second;
@@ -7891,7 +7891,7 @@ void GameScript::SetZoomViewport(Scriptable* /*Sender*/, Action* parameters)
 
 	GameControl* gc = core->GetGameControl();
 	assert(gc);
-	WindowManager* wm = core->GetWindowManager();
+	const WindowManager* wm = core->GetWindowManager();
 	int gcWidth = wm->GetGameWindow()->Frame().w;
 	int newWidth = parameters->pointParameter.x;
 	int bestScale = -1;
@@ -7912,7 +7912,7 @@ void GameScript::SetZoomViewport(Scriptable* /*Sender*/, Action* parameters)
 // 	Stores the current zoom level internally. It can be restored with RestoreZoomLevel(). The stored zoom level is not saved.
 void GameScript::StoreZoomLevel(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	GameControl* gc = core->GetGameControl();
+	const GameControl* gc = core->GetGameControl();
 	assert(gc);
 	core->GetDictionary().Set("Zoom Save", gc->GetScalePercent());
 }

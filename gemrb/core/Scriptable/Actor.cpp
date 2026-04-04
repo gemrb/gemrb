@@ -8371,7 +8371,7 @@ bool Actor::AdvanceAnimations()
 		}
 	}
 
-	auto& first = currentStance.anim[0].first;
+	const auto& first = currentStance.anim[0].first;
 	auto firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
 
 	// advance first (main) animation by one frame (in sync)
