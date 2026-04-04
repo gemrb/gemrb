@@ -114,8 +114,7 @@ def PrepareINIKeyList ():
 		key = iniMeta.GetRowName (ri)
 		controlType = iniMeta.GetValue (key, "CONTROL")
 		cleanKey = key.replace("_", " ")
-		defDesc = "" if key == "Spacer" else cleanKey
-		coolKeys.append([cleanKey, controlType, -1, defDesc])
+		coolKeys.append([cleanKey, controlType, -1, ""])
 
 	# load ini
 	config = configparser.ConfigParser (inline_comment_prefixes=(';'))
@@ -148,7 +147,7 @@ def PrepareINIKeyList ():
 		for key in config[section]:
 			if key in coolKeysKeys:
 				continue
-			coolKeys.append([key, defaultControlType, config[section][key], key])
+			coolKeys.append([key, defaultControlType, config[section][key], ""])
 
 	# add descriptions to interesting keys
 	descs = {
@@ -180,7 +179,7 @@ def PrepareINIKeyList ():
 	return coolKeys
 
 def GuessControlType (keyData):
-	key, controlType, value, desc = keyData
+	key, controlType, value, _ = keyData
 	if controlType != "":
 		return controlType
 
@@ -203,7 +202,7 @@ def AddKeyControls (window, keyData, position, offset, introText):
 	secondID = offset["c"] * 10000 + offset["r"]
 
 	# create button to display key name and help on click
-	desc = introText if desc == key else desc
+	desc = introText if desc == "" else desc
 	labelW = 200 if offset["c"] == 2 else 250
 	labelBtn = window.CreateButton (firstID, position["x"], position["y"], labelW, 20)
 	GUIOPTControls.OptBuddyLabel (firstID, None, desc, introText)
