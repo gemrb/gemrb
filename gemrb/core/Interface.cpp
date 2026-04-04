@@ -572,7 +572,7 @@ Interface::Interface(CoreSettings&& cfg)
 
 	if (!config.UseAsLibrary) {
 		Log(MESSAGE, "Core", "Initializing Window Manager...");
-		winmgr = new WindowManager(VideoDriver, std::move(guifact));
+		winmgr = std::make_unique<WindowManager>(VideoDriver, std::move(guifact));
 		RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
 		winmgr->SetCursorFeedback(WindowManager::CursorFeedback(config.MouseFeedback));
 	}
@@ -689,7 +689,7 @@ Interface::~Interface() noexcept
 	WindowManager::CursorMouseUp = nullptr;
 	WindowManager::CursorMouseDown = nullptr;
 
-	delete winmgr;
+	winmgr.reset();
 
 	//destroy the highest objects in the hierarchy first!
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)

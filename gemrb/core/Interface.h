@@ -296,7 +296,7 @@ private:
 
 	ProjectileServer* projserv = nullptr;
 
-	WindowManager* winmgr = nullptr;
+	std::unique_ptr<WindowManager> winmgr;
 	PluginHolder<ScriptEngine> guiscript;
 	std::unique_ptr<FogRenderer> fogRenderer;
 	GameControl* gamectrl = nullptr;
@@ -421,7 +421,7 @@ public:
 	may apply a single fx on the summoned creature normally an unsummon effect */
 	Actor* SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable* Owner, const Actor* target, const Point& position, int eamod, int level, Effect* fx, bool sexmod = true);
 	/** Get the Window Manager */
-	WindowManager* GetWindowManager() const { return winmgr; };
+	WindowManager* GetWindowManager() const { return winmgr.get(); };
 
 	void ToggleViewsVisible(bool visible, const ScriptingGroup_t& group);
 	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
