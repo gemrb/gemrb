@@ -79,8 +79,8 @@
 75         INT        -1         0          int/greater 
 76         INT        -1         3          int/less_or_equal 
 77         INT        -1         2          int/greater_or_equal 
-78         CLASS      2          1          class/bard 
-79         CLASS      2          5          class/not_bard 
+78         CLASS      5          1          class/bard 
+79         CLASS      5          5          class/not_bard 
 80         0x108      1          *          near_enemies 
 81         0x108      0          *          not_near_enemies 
 82         SUBRACE    0x20001    1          subrace/drow 
