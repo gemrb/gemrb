@@ -33,3 +33,7 @@ W    SHRIEKER
 X    WOLF
 Y    OGRE
 Z    SKELETON
+
+# table unhardcoding the special iwd1 mapping of conditional weapon bonuses
+# it's triggered by the name starting with ZZ then a special sequence of character
+# the racial and alignment sections are listed here

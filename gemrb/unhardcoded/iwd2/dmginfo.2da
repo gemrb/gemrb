@@ -17,3 +17,11 @@ DAMAGE_STUNNING        121        0                     0x800      13      0    
 DAMAGE_SOULEATER       117        0                     0x1000     -1      0          0
 DAMAGE_DISEASE         126        0                     0x4000     -1      0          0
 DAMAGE_CHUNKING        126        0                     0x8000     -1      0          1
+
+# table of damage type details
+# LOWER - string reference index (there is a second indirection by strings.2da)
+# RESIST_STAT - character stat which provides resistance
+# VALUE - internal damage type value
+# IWDMOD - value of the type parameter to the bonus damage modifier effect in IWD
+# REDUCTION - is it considered for IWD2 flat reduction effects (2/-)?
+# CHUNKING - how much below 0 HP one can go before exploding?

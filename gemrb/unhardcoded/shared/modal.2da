@@ -6,3 +6,6 @@ BARDSONG     BARDSONG   BattleSong   16467      -1          -1          1       
 DETECTTRAPS  FINDTRAP   FindTraps    16468      -1          -1          0         0
 STEALTH      SNEAK      Hide         19944      4188        17120       0         0
 TURNUNDEAD   TURN       Turn         16466      -1          -1          1         1
+
+# table of modal actions
+# SPELL is the spell to apply, ACTION the GameScript action to run, while REPEAT_MSG toggles feedback every round

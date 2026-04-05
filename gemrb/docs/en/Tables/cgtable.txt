@@ -1,6 +1,0 @@
-Description: This table is used by the casting glow opcode and also when casting a spell (the spell header contains the casting glow code).
-
-Columns: the casting glow resref (VVC or BAM)
-
-Rows: the casting glow code
-

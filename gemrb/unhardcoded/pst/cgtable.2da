@@ -48,3 +48,8 @@ PSTDIV43    a005ldiv   *
 PSTSPI44    a010spin   *
 UNKNOWN1    a009skil   *
 UNKNOWN2    itemspll   *
+
+# visuals and sounds for casting graphics of different spell schools
+# RESREF is the casting glow animation
+# SOUND is the associated sound character (the filename has complicated construction)
+# EFFECT override glow resref for iwd2 SpellCastEffect mode

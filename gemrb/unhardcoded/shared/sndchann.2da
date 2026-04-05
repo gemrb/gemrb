@@ -24,3 +24,4 @@ WALKINGM    100
 ARMOR       100
 
 # default sndchann.2da for projects that lack it
+# base per-channel volume levels

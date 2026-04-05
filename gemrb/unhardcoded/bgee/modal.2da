@@ -7,3 +7,6 @@ DETECTTRAPS  FINDTRAP   FindTraps    50699      50700       -1          1       
 STEALTH      SNEAK      Hide         19944      4188        17120       0         0
 TURNUNDEAD   TURN       Turn         50702      50703       -1          1         1
 SHAMANDANCE  SPSH004    *            103118     103119      -1          0         1
+
+# table of modal actions
+# SPELL is the spell to apply, ACTION the GameScript action to run, while REPEAT_MSG toggles feedback every round

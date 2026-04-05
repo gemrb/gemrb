@@ -1,7 +1,12 @@
 2DA V1.0
 *
-	RESOURCE
-0	0x6000
-1	avprefr
-2	avprefg
-3	avprefc
+     RESOURCE
+0    0x6000
+1    avprefr
+2    avprefg
+3    avprefc
+
+# Contains the scheme of the avatar animation IDs based on character stats.
+# The first row contains the base animation ID.
+# A second column in the first row may store the first stance of the generated character.
+# Additional rows contain tables which additively modify the ID based on a stat.

@@ -6,3 +6,6 @@ BARDSONG     SPIN151    PlayBardSong 25138      25141       -1          2       
 DETECTTRAPS  FINDTRAP   FindTraps    25085      25090       -1          0         0
 STEALTH      SNEAK      Hide         19944      4188        17120       0         0
 TURNUNDEAD   TURN       Turn         25135      25136       -1          1         1
+
+# table of modal actions
+# SPELL is the spell to apply, ACTION the GameScript action to run, while REPEAT_MSG toggles feedback every round

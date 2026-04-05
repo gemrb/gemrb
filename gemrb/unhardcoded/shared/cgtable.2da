@@ -18,3 +18,8 @@ ILLUSION    IllusCG   1      ILLUSH
 CONJURATION ConjuCG   5      CONJUH
 INVOCATION  InvocCG   11     INVOCH
 DIVINATION  DivinCG   7      DIVINH
+
+# visuals and sounds for casting graphics of different spell schools
+# RESREF is the casting glow animation
+# SOUND is the associated sound character (the filename has complicated construction)
+# EFFECT override glow resref for iwd2 SpellCastEffect mode

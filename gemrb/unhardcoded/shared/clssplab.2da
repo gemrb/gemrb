@@ -22,3 +22,6 @@ FIGHTER_MAGE_CLERIC   6    8    100
 CLERIC_RANGER         6    8    100
 SORCERER              6    4      0
 MONK                  6    8    100
+
+# dice size for ability checks in some effects
+# columns hold stats

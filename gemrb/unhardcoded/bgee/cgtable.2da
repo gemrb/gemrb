@@ -36,3 +36,8 @@ SPARKCHROM2 *52        5
 SPARKPURP2  *48        5
 SPARKRED2   *53        5
 SPARKWHITE2 *49        5
+
+# visuals and sounds for casting graphics of different spell schools
+# RESREF is the casting glow animation
+# SOUND is the associated sound character (the filename has complicated construction)
+# EFFECT override glow resref for iwd2 SpellCastEffect mode

@@ -39,3 +39,5 @@ BATTLE_CRY             gbasi03                gbasi04
 BATTLE_CRY             0                      0
 SELECTION              gbasi01                gbasi02
 SELECTION              0                      0
+
+# fixed animation table for a specific animation ID

@@ -1,5 +1,10 @@
 2DA V1.0
 *
-	RESOURCE	STANCE
-0	0x6032		18
-1	avprefs
+     RESOURCE    STANCE
+0    0x6032      18
+1    avprefs
+
+# Contains the scheme of the avatar animation IDs based on character stats.
+# The first row contains the base animation ID.
+# The second column stores the first stance of the generated TNO (waking up on the slab).
+# Additional rows contain tables which additively modify the ID based on a stat.

@@ -1,4 +1,0 @@
-Description: This table lists the stats that are copied from a polymorph creature into the target of a polymorph effect. The stats could be given numerically, or literally as they are written in stats.ids
-
-Columns -
-  0 - the only column, containing stat values (or names).

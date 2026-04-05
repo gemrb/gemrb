@@ -72,3 +72,5 @@ Special_Abilities      FloatMenuWindow  FloatMenuSelectAbilities          0
 Toggle_Always_Run     GUICommonWindows ToggleAlwaysRun                   0
 Default               GUICommon        ResolveKey                        0
 
+# a mapping between keymap.ini key names (here as row names) and our python code
+# GROUP can be used to limit keys to a context, but it requires code changes

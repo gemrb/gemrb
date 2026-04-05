@@ -96,3 +96,6 @@
 0x6404  SSHD
 0x6500  CSHD
 0x6510  CSHD
+
+# this table states which shadow animation file does an animation ID use
+# it's used for animations that don't have baked in shadows

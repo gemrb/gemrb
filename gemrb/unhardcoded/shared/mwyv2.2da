@@ -39,3 +39,5 @@ BATTLE_CRY       wyvsr03          wyvsr04
 BATTLE_CRY       0                0
 SELECTION        wyvsr01          wyvsr02
 SELECTION        0                0
+
+# fixed animation table for a specific animation ID

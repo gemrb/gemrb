@@ -5,3 +5,9 @@ FREQUENCY           600
 PROBABILITY         10
 REPLAYDELAY         150
 SPECIALPROBABILITY  25
+
+# knobs for tuning how often NPCs start their banter dialogs
+# FREQUENCY is the base check period in ticks, checked against current game time
+# PROBABILITY further limits the occurrence when FREQUENCY matches
+# SPECIALPROBABILITY is limiting the same NPC bantering in a row
+# REPLAYDELAY is unused

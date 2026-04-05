@@ -22,3 +22,5 @@ FIGHTER_MAGE_CLERIC *
 SORCERER       HPWIZ
 MONK           HPMONK
 BARBARIAN      HPBARB
+
+# mapping between classes and their HP progression tables

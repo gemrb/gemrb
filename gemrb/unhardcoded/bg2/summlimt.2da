@@ -3,3 +3,7 @@
             LIMIT
 NORMAL      5
 DEMONDEVA   1
+
+# how many summons can the party have in control at the same time?
+# row 0 is for creatures with IE_SEX values of SEX_SUMMON (default) or SEX_SUMMON_DEMON
+# row 1 is for creatures with IE_SEX value of SEX_BOTH

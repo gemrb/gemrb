@@ -36,3 +36,5 @@ CLERIC_TEMPUS     HPPRS
 CLERIC_BANE       HPPRS
 CLERIC_MASK       HPPRS
 CLERIC_TALOS      HPPRS
+
+# mapping between classes and their HP progression tables

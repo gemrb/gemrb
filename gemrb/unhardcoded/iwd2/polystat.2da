@@ -24,3 +24,5 @@
 21 MAGICDAMAGERESISTANCE
 22 RESISTPOISON
 23 ANIMATIONID
+
+# the stats (by value or stats.ids name) that are copied from a polymorph creature into the target of a polymorph effect

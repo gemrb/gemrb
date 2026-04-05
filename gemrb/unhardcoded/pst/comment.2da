@@ -10,3 +10,8 @@ CARCERI    0x200      71         0
 CURST      0x100      72         0
 LIMBO      0x40       73         0
 LOWER      2          74         0
+
+# this table lists the association of verbal constants with area type flags
+# AREAFLAG - the area flag bit (PST has special flags, otherwise the games are pretty much the same)
+# VC       - the verbal constant associated with the area flag
+# SWITCH   - marks the day/night bit, if it is set to 1, then there are different messages for day and night

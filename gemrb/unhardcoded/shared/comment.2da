@@ -6,3 +6,8 @@ DUNGEON    0x20       23         0
 CITY       8          22         0          
 DAY        2          24         1          
 #NIGHT at VC25 has the same bit and is handled in code
+
+# this table lists the association of verbal constants with area type flags
+# AREAFLAG - the area flag bit (PST has special flags, otherwise the games are pretty much the same)
+# VC       - the verbal constant associated with the area flag
+# SWITCH   - marks the day/night bit, if it is set to 1, then there are different messages for day and night

@@ -19,3 +19,5 @@ FIGHTER_DRUID  *
 CLERIC_RANGER  *
 FIGHTER_MAGE_THIEF  *
 FIGHTER_MAGE_CLERIC *
+
+# mapping between classes and their HP progression tables
