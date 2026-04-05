@@ -1472,9 +1472,21 @@ static void pcf_dbutton(Actor* actor, ieDword /*oldValue*/, ieDword /*newValue*/
 }
 
 //no separate values (changes are permanent)
-static void pcf_intoxication(Actor* actor, ieDword /*oldValue*/, ieDword newValue)
+static void pcf_intoxication(Actor* actor, ieDword oldValue, ieDword newValue)
 {
-	actor->BaseStats[IE_INTOXICATION] = newValue;
+	static AutoTable intoxCon = gamedata->LoadTable("intoxcon", true);
+	ieDword maxIntox = 100; // maximum_values[IE_INTOXICATION]
+	int diff = static_cast<int>(newValue - oldValue);
+
+	if (intoxCon) {
+		const std::string& con = fmt::format("{}", actor->GetStat(IE_CON));
+		maxIntox = intoxCon->QueryFieldUnsigned<ieDword>(con, "INTOXICATION_CAP");
+		int intoxRate = intoxCon->QueryFieldSigned<int>(con, "INTOXICATION_RATE");
+		// not capped for negatives (curing), so it can happen faster during rest
+		diff = std::min(diff, intoxRate);
+	}
+	actor->BaseStats[IE_INTOXICATION] = std::min<ieDword>(static_cast<int>(oldValue) + diff, maxIntox);
+	actor->Modified[IE_INTOXICATION] = actor->BaseStats[IE_INTOXICATION];
 }
 
 static void pcf_color(Actor* actor, ieDword /*oldValue*/, ieDword /*newValue*/)
@@ -3011,9 +3023,18 @@ void Actor::RefreshPCStats()
 	RefreshHP();
 
 	// handle intoxication
+	const Game* game = core->GetGame();
 	static AutoTable intoxMod = gamedata->LoadTable("intoxmod", true);
+	static AutoTable intoxCon = gamedata->LoadTable("intoxcon", true);
 	int intoxLuck = 0; // applied further down with other luck modifiers
 	int intoxMorale = 0;
+	if (BaseStats[IE_INTOXICATION] > 0 && intoxCon) {
+		const std::string& con = fmt::format("{}", GetStat(IE_CON));
+		int rate = std::min(100, intoxCon->QueryFieldSigned<int>(con, "RECOVERY_RATE"));
+		if (!(game->GameTime % (core->Time.defaultTicksPerSec * rate))) {
+			BaseStats[IE_INTOXICATION]--;
+		}
+	}
 	if (BaseStats[IE_INTOXICATION] > 0 && intoxMod) {
 		const std::string& intoxLevel = fmt::format("{}", BaseStats[IE_INTOXICATION]);
 		intoxLuck = intoxMod->QueryFieldSigned<int>(intoxLevel, "LUCK");
@@ -3026,7 +3047,6 @@ void Actor::RefreshPCStats()
 		DisablePortraitIcon(PI_DRUNK);
 	}
 
-	const Game* game = core->GetGame();
 	//morale recovery every xth AI cycle ... except for pst pcs
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
 	if (mrec) {
@@ -4994,7 +5014,7 @@ std::string Actor::dump() const
 	AppendFormat(buffer, "Morale:     {}   current morale:{}\n", BaseStats[IE_MORALE], Modified[IE_MORALE]);
 	AppendFormat(buffer, "Moralebreak:{}   Morale recovery:{}\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME]);
 	AppendFormat(buffer, "Visualrange:{} (Explorer: {})\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE]);
-	AppendFormat(buffer, "Fatigue: {} (current: {})   Luck: {}\n", BaseStats[IE_FATIGUE], Modified[IE_FATIGUE], signed(Modified[IE_LUCK]));
+	AppendFormat(buffer, "Fatigue: {}   Luck: {}   Intoxication: {}\n", BaseStats[IE_FATIGUE], signed(Modified[IE_LUCK]), BaseStats[IE_INTOXICATION]);
 	AppendFormat(buffer, "Movement rate: {} (current: {})\n\n", BaseStats[IE_MOVEMENTRATE], Modified[IE_MOVEMENTRATE]);
 
 	//this works for both level slot style
@@ -9259,8 +9279,15 @@ void Actor::Rest(int hours)
 	if (hours < 8) {
 		// partial (interrupted) rest does not affect fatigue
 		//do remove effects
+		static AutoTable intoxCon = gamedata->LoadTable("intoxcon", true);
 		int remaining = hours * 10;
-		NewStat(IE_INTOXICATION, -remaining, MOD_ADDITIVE);
+		int detox = hours * 25; // 300 / 12
+		if (intoxCon) {
+			const std::string& con = fmt::format("{}", GetStat(IE_CON));
+			int rate = std::min(100, intoxCon->QueryFieldSigned<int>(con, "RECOVERY_RATE"));
+			detox = hours * core->Time.hour_sec / rate;
+		}
+		NewBase(IE_INTOXICATION, -detox, MOD_ADDITIVE);
 		//restore hours*10 spell levels
 		//rememorization starts with the lower spell levels?
 		inventory.ChargeAllItems(remaining);
