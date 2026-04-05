@@ -3010,6 +3010,22 @@ void Actor::RefreshPCStats()
 {
 	RefreshHP();
 
+	// handle intoxication
+	static AutoTable intoxMod = gamedata->LoadTable("intoxmod", true);
+	int intoxLuck = 0; // applied further down with other luck modifiers
+	int intoxMorale = 0;
+	if (BaseStats[IE_INTOXICATION] > 0 && intoxMod) {
+		const std::string& intoxLevel = fmt::format("{}", BaseStats[IE_INTOXICATION]);
+		intoxLuck = intoxMod->QueryFieldSigned<int>(intoxLevel, "LUCK");
+		intoxMorale = intoxMod->QueryFieldSigned<int>(intoxLevel, "MORALE");
+	}
+	// the cutoff is at half of max, coinciding with where the intoxmod penalties start
+	if (BaseStats[IE_INTOXICATION] >= 50) {
+		AddPortraitIcon(PI_DRUNK);
+	} else {
+		DisablePortraitIcon(PI_DRUNK);
+	}
+
 	const Game* game = core->GetGame();
 	//morale recovery every xth AI cycle ... except for pst pcs
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
@@ -3017,22 +3033,13 @@ void Actor::RefreshPCStats()
 		if (ShouldModifyMorale() && !(game->GameTime % mrec)) {
 			int morale = (signed) BaseStats[IE_MORALE];
 			if (morale < 10) {
-				NewBase(IE_MORALE, 1, MOD_ADDITIVE);
-			} else if (morale > 10) {
+				NewBase(IE_MORALE, 1 + intoxMorale, MOD_ADDITIVE);
+			} else if (morale > 10 + intoxMorale) {
 				SetBase(IE_MORALE, GetBase(IE_MORALE) - 1);
 			}
 		}
 	} else {
 		SetBase(IE_MORALE, 10);
-	}
-
-	// handle intoxication
-	// the cutoff is at half of max, coinciding with where the intoxmod penalties start
-	// TODO: intoxmod, intoxcon
-	if (BaseStats[IE_INTOXICATION] >= 50) {
-		AddPortraitIcon(PI_DRUNK);
-	} else {
-		DisablePortraitIcon(PI_DRUNK);
 	}
 
 	//get the wspattack bonuses for proficiencies
@@ -3074,8 +3081,8 @@ void Actor::RefreshPCStats()
 
 	UpdateFatigue();
 
-	// add luck bonus from difficulty
-	Modified[IE_LUCK] += CFGCache.difficultyLuckMod;
+	// add luck bonus from difficulty and drinking
+	Modified[IE_LUCK] += CFGCache.difficultyLuckMod + intoxLuck;
 
 	// regenerate actors with high enough constitution
 	int rate = GetConHealAmount();
