@@ -1223,12 +1223,13 @@ static void pcf_stat_wis(Actor* actor, ieDword oldValue, ieDword newValue)
 	if (third) {
 		int oldBonus = actor->GetAbilityBonus(IE_WIS, oldValue);
 		actor->Modified[IE_SAVEWILL] += actor->GetAbilityBonus(IE_WIS) - oldBonus;
-	} else if (pstflags) {
+	} else {
 		// also gives a +1 Luck bonus at 15, 18, and 25
-		AutoTable luckbon = gamedata->LoadTable("luckbon", true);
-		assert(luckbon);
-		int oldBonus = luckbon->QueryFieldSigned<int>(oldValue, 0);
-		actor->BaseStats[IE_LUCK] += luckbon->QueryFieldSigned<int>(newValue, 0) - oldBonus;
+		static AutoTable luckbon = gamedata->LoadTable("luckbon", true);
+		if (luckbon) {
+			int oldBonus = luckbon->QueryFieldSigned<int>(oldValue, 0);
+			actor->BaseStats[IE_LUCK] += luckbon->QueryFieldSigned<int>(newValue, 0) - oldBonus;
+		}
 	}
 }
 
