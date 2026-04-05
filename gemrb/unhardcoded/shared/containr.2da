@@ -1,16 +1,21 @@
 2DA V1.0
 *
-		SOUND		BAM		CLOSE
-*		*		*
-BAG		GAM_12A1	CONTSACK	GAM_12A
-CHEST		AMB_D05A	CONTCHST	AMB_D05B
-DRAWER		AMB_D05A	CONTDRWR	AMB_D05B
-PILE		AMB_D18		CONTGRND	*
-TABLE		AMB_D08		CONTTABL	*
-SHELF		AMB_D07		CONTSHLF	*
-ALTAR		AMB_D07		CONTALTR	*
-NONVISIBLE	AMB_D18		*		*
-SPELLBOOK	GAM_06		CONTBOOK	GAM_05
-BODY		AMB_D08G	CONTBODY	*
-BARREL		AMB_D12		CONTBARL	AMB_D13
-CRATE		AMB_D05A	CONTCRAT	AMB_D05B
+            SOUND      BAM        CLOSE
+            *          *          *
+BAG         GAM_12A1   CONTSACK   GAM_12A
+CHEST       AMB_D05A   CONTCHST   AMB_D05B
+DRAWER      AMB_D05A   CONTDRWR   AMB_D05B
+PILE        AMB_D18    CONTGRND   *
+TABLE       AMB_D08    CONTTABL   *
+SHELF       AMB_D07    CONTSHLF   *
+ALTAR       AMB_D07    CONTALTR   *
+NONVISIBLE  AMB_D18    *          *
+SPELLBOOK   GAM_06     CONTBOOK   GAM_05
+BODY        AMB_D08G   CONTBODY   *
+BARREL      AMB_D12    CONTBARL   AMB_D13
+CRATE       AMB_D05A   CONTCRAT   AMB_D05B
+
+# this table lists the resources used for different container types
+# row indices mirror the possible container type values stored in the area file.
+# see offset 0x24 in the container substructure of the ARE format
+# SOUND is the opening sound, CLOSE the closing, BAM the GUI icon to use

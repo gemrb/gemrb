@@ -210,12 +210,13 @@ def OpenContainerWindow ():
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	if not GameCheck.IsPST():
-		Table = GemRB.LoadTable ("containr")
+		Table = GemRB.LoadTable ("containr", False, True)
 		row = Container['Type']
-		tmp = Table.GetValue (row, 0)
+		rowName = Table.GetRowName (row)
+		tmp = Table.GetValue (rowName, "SOUND")
 		if tmp!='*':
 			GemRB.PlaySound (tmp)
-		tmp = Table.GetValue (row, 1)
+		tmp = Table.GetValue (rowName, "BAM")
 		if tmp!='*':
 			Button.SetSprites (tmp, 0, 0, 0, 0, 0 )
 
@@ -249,7 +250,8 @@ def CloseContainerWindow ():
 
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']
-	tmp = Table.GetValue (row, 2)
+	rowName = Table.GetRowName (row)
+	tmp = Table.GetValue (rowName, "CLOSE")
 	#play closing sound if applicable
 	if tmp!='*':
 		GemRB.PlaySound (tmp)
