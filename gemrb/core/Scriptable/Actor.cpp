@@ -3168,7 +3168,7 @@ void Actor::UpdateFatigue()
 		}
 	}
 
-	int LuckMod = core->ResolveStatBonus(this, "fatigue"); // fatigmod.2da
+	int LuckMod = core->ResolveStatBonus(this, "luck"); // fatigmod.2da
 	Modified[IE_LUCK] += LuckMod;
 	if (LuckMod < 0) {
 		AddPortraitIcon(PI_FATIGUE);

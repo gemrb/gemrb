@@ -1,0 +1,10 @@
+2DA V1.0
+*
+FILE        STAT        CHECKCOL    READCOL
+fatigmod    FATIGUE     -1          0
+
+# master file determing which tables and stats affect luck
+# the columns dictate which tables to consult at which offsets
+# STAT is the stat the value of which will be used for the lookup
+# CHECKCOL is for what column to check against, -1 being the row name
+# READCOL is for which column to read from
