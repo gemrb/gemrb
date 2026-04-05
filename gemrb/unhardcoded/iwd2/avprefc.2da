@@ -13,3 +13,5 @@ RANGER		0x100
 ROGUE		0x300
 SORCERER	0x200
 WIZARD		0x200
+
+# how class affects the construction of an animation ID
