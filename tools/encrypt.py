@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# SPDX-FileCopyrightText: 2023 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # Helper script for encrypting asset files using the IE key.
 # Useful for testing purposes.
 #

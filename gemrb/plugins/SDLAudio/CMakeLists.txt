@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2010 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 IF (SDL_MIXER_LIBRARIES)
 	# With v2.24, we get libSDL2main, and that wants main() be linked here.
 	IF(SDL2_SDL2main_FOUND)

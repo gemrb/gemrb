@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2016 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import print_function # so that print(blah) will work in console
 

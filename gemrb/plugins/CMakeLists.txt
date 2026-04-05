@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2008 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 ADD_SUBDIRECTORY( 2DAImporter )
 ADD_SUBDIRECTORY( ACMReader )
 ADD_SUBDIRECTORY( AREImporter )

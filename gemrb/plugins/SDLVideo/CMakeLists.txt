@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2008 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} $<$<BOOL:${WIN32}>:${GLEW_INCLUDE_DIRS}>)
 
 SET(COMMON_FILES COCOA SDLVideo.cpp SDLSurfaceSprite2D.cpp DPadSoftKeyboard.cpp GamepadControl.cpp)

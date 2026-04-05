@@ -1,3 +1,10 @@
+# SPDX-FileCopyrightText: 2005-2009 Kitware, Inc.
+# SPDX-FileCopyrightText: 2012 Benjamin Eikel
+# SPDX-FileCopyrightText: 2013 Noam Chitayat
+# SPDX-FileCopyrightText: 2014 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
 # - Locate SDL2_mixer library
 # This module defines:
 #  SDL2_MIXER_LIBRARIES, the name of the library to link against
@@ -13,21 +20,6 @@
 # SDL2_mixer. This was influenced by the FindSDL.cmake
 # module, but with modifications to recognize OS X frameworks and
 # additional Unix paths (FreeBSD, etc).
-
-#=============================================================================
-# Copyright 2005-2009 Kitware, Inc.
-# Copyright 2012 Benjamin Eikel
-# Copyright 2013 Noam Chitayat
-#
-# Distributed under the OSI-approved BSD License (the "License");
-# see accompanying file CMakeCopyright.md for details.
-#
-# This software is distributed WITHOUT ANY WARRANTY; without even the
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-# See the License for more information.
-#=============================================================================
-# (To distribute this file outside of CMake, substitute the full
-#  License text for the above reference.)
 
 if(NOT SDL2_MIXER_INCLUDE_DIR AND SDL2MIXER_INCLUDE_DIR)
   set(SDL2_MIXER_INCLUDE_DIR ${SDL2MIXER_INCLUDE_DIR} CACHE PATH "directory cache

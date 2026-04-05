@@ -8,6 +8,7 @@ Final development:
 - [ ] Triage open pull requests
 - [ ] Check local stashes
 - [ ] No Coverity Scan issues
+- [ ] No issues reported by `reuse lint`
 
 Beta testing:
 - [ ] Retest character generation of all games

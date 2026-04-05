@@ -1,4 +1,8 @@
 #!/bin/bash
+# SPDX-FileCopyrightText: 2013 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 #If you have ieparse (from ie_shell) or ielister, you can make git diff/log/show
 # output diffs of text dumps of the binary files it supports instead of just skipping
 # them.

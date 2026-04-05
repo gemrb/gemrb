@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2008 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 SET(CMAKE_CXX_VISIBILITY_PRESET "hidden")
 # FreeBSD clang still has symbol visibility issues with the GUIScript plugin
 # similarly on mac

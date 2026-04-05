@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 name: cleanup caches from a closed PR branch
 on:
   pull_request:

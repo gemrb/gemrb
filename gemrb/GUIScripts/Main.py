@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2016 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # This script sets up the imports for the __main__ module
 # we could use this file for other GUIScript initializations as well
 

@@ -1,30 +1,12 @@
-/*
- * (I)RDFT transforms
- * Copyright (c) 2009 Alex Converse <alex dot converse at gmail dot com>
- *
- * This file is part of FFmpeg.
- *
- * FFmpeg is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * FFmpeg is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with FFmpeg; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+// SPDX-FileCopyrightText: Copyright (c) 2009 Alex Converse <alex dot converse at gmail dot com>
+// SPDX-FileCopyrightText: FFmpeg project <https://ffmpeg.org>
+//
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "dsputil.h"
 
-/**
- * @file libavcodec/rdft.c
- * (Inverse) Real Discrete Fourier Transforms.
- */
+// @file libavcodec/rdft.c
+// (Inverse) Real Discrete Fourier Transforms.
 
 /* sin(2*pi*x/n) for 0<=x<n/4, followed by n/2<=x<3n/4 */
 SINTABLE(16);

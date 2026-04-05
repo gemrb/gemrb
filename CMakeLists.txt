@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2008 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 CMAKE_MINIMUM_REQUIRED(VERSION 3.25)
 
 SET(CMAKE_CXX_STANDARD 14)

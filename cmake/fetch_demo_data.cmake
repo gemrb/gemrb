@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # downloads big audio and other non-essential files from gemrb-assets
 
 set(DL_FROM audio/themea.ogg

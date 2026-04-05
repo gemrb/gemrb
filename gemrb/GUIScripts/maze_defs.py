@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2011 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # !!! Keep these synchronized with maze definitions in Game.h !!!
 
 

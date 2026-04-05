@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Rohit Yadav
+# SPDX-FileCopyrightText: 2012 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 # CMake module to search for LIBVLC (VLC library)
 # Author: Rohit Yadav <rohityadav89@gmail.com>

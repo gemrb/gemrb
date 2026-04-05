@@ -1,0 +1,154 @@
+version = 1
+
+SPDX-PackageName = "GemRB"
+SPDX-PackageDownloadLocation = "https://gemrb.org"
+
+# non-code and similar
+[[annotations]]
+path = [ 
+	"gemrb/unhardcoded/**", "gemrb/override/**",
+	"gemrb/tests/minimal/**", "gemrb/tests/resources/**",
+	"gemrb/*.in", "gemrb/*.cfg*", "platforms/**/*.cfg*", "platforms/**/*.xml",
+	"**/README", "gemrb/docs/**", "AUTHORS", "INSTALL", "NEWS", "*.md", "**/TODO", "platforms/**/*.md",
+	"admin/*.template", "admin/*.checklist",
+	".github/**/*.md", ".editorconfig", ".clang-format", ".sonarcloud.properties",
+	"testing/python.supp", "testing/id_travissfbot.av.enc",
+	".gitignore", ".gitattributes", ".git-blame-ignore-revs", ".mailmap",
+	"artwork/**", "platforms/**/*.png",
+	"platforms/**/*.json", "platforms/**/*.desktop", "platforms/windows/window.rc",
+	"platforms/apple/ios/iTunesMetadata.plist.in", "platforms/apple/en.lproj/InfoPlist.strings", "platforms/apple/GemRB.xcodeproj/**", "platforms/apple/**/*.xib", "platforms/apple/**/*.plist",
+]
+SPDX-FileCopyrightText = "Contributors to the GemRB project <https://gemrb.org>"
+SPDX-License-Identifier = "GPL-2.0-or-later"
+
+# fmt
+[[annotations]]
+path = "gemrb/includes/fmt/**"
+SPDX-FileCopyrightText = "Copyright (c) 2012 - present, Victor Zverovich and {fmt} contributors"
+SPDX-License-Identifier = "MIT"
+
+###############################################################################
+# all the rest is for our included demo
+[[annotations]]
+path = "demo/**"
+SPDX-FileCopyrightText = "2012, Contributors to the GemRB project <https://gemrb.org>"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = [ 
+	"demo/tester.cfg",
+	"demo/*.md", "demo/*.ini"
+]
+SPDX-FileCopyrightText = "Contributors to the GemRB project <https://gemrb.org>"
+SPDX-License-Identifier = "GPL-2.0-or-later"
+
+[[annotations]]
+path = "demo/override/ar0100.png"
+SPDX-FileCopyrightText = ["2011, Aranthor", "2021, Jaka Kranjc"]
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "demo/override/CHMB1**.bam"
+SPDX-FileCopyrightText = "2026, exhuman"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = "demo/override/Eadui.ttf"
+SPDX-FileCopyrightText = "2010, Peter S. Baker"
+SPDX-License-Identifier = "OFL-1.1-RFN"
+
+[[annotations]]
+path = "demo/override/Lato-Bold.ttf"
+SPDX-FileCopyrightText = "2010, tyPoland Lukasz Dziedzic"
+SPDX-License-Identifier = "OFL-1.1-RFN"
+
+[[annotations]]
+path = "demo/override/portr1**.png"
+SPDX-FileCopyrightText = "2012, Deevad"
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = "demo/override/swirl.bam"
+SPDX-FileCopyrightText = ["2013, Beast", "2021, Jaka Kranjc"]
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "demo/override/cursor**.png"
+SPDX-FileCopyrightText = ["2012, Tempest in the Aether and Ryzom Core", "2021, Jaka Kranjc"]
+SPDX-License-Identifier = "CC-BY-SA-3.0"
+
+[[annotations]]
+path = ["demo/override/**win**.png", "demo/override/btn**.bam", "demo/override/scrlbar1.bam", "demo/override/toolscrl.bam", "demo/override/invslotb.bam", "demo/override/mapicon0.bam", "demo/override/wmdag.bam"]
+
+SPDX-FileCopyrightText = ["2010, Lamoot", "2021, Jaka Kranjc"]
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = "demo/override/worldmap.png"
+SPDX-FileCopyrightText = "2015, Pepper Racoon"
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = "demo/override/cursarrs.bam"
+SPDX-FileCopyrightText = "2018, marcintokarski"
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = "demo/override/ruby**.png"
+SPDX-FileCopyrightText = "2018, rubberduck"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = "demo/override/loading.bam"
+SPDX-FileCopyrightText = "2012, qubodup"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = ["demo/override/grndloot.bam", "demo/override/contgrnd.bam"]
+SPDX-FileCopyrightText = ["2013, Clint Bellanger", "2021, Jaka Kranjc"]
+SPDX-License-Identifier = "CC-BY-SA-3.0"
+
+[[annotations]]
+path = "demo/override/backpack.bam"
+SPDX-FileCopyrightText = ["2012, Ravenmore", "2018, moot"]
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = "demo/override/ston**.png"
+SPDX-FileCopyrightText = "2015, lukems-br"
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = "demo/override/stonbag.png"
+SPDX-FileCopyrightText = "2011, Lorc"
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = "demo/override/stonquiv.png"
+SPDX-FileCopyrightText = "2012, Delapouite"
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = "demo/override/AMB_D18.ogg"
+SPDX-FileCopyrightText = "2017, Hansjörg Malthaner <https://opengameart.org/users/varkalandar>"
+SPDX-License-Identifier = "CC-BY-SA-3.0"
+
+[[annotations]]
+path = ["demo/override/winopen.ogg", "demo/override/winclose.ogg"]
+SPDX-FileCopyrightText = "2018, rubberduck"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "demo/override/btnpress.ogg"
+SPDX-FileCopyrightText = "2012, Kenney"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = ["demo/override/fs_dirt**.ogg", "demo/override/spell_02.ogg"]
+SPDX-FileCopyrightText = "2015, Little Robot Sound Factory <https://www.littlerobotsoundfactory.com>"
+SPDX-License-Identifier = "CC-BY-3.0"
+
+[[annotations]]
+path = "demo/override/MOS2000.PVRZ"
+SPDX-FileCopyrightText = "2013, Mikodrak"
+SPDX-License-Identifier = "CC0-1.0"

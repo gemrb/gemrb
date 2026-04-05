@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 FUNCTION(SET_INTERNAL VAR_NAME VALUE)
 	SET(${VAR_NAME} ${VALUE} CACHE INTERNAL "")
 ENDFUNCTION()

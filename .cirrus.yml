@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 macos_instance:
   image: ghcr.io/cirruslabs/macos-ventura-xcode:14.3
 

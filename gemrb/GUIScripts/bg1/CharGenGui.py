@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2009 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 import BGCommon
 import GemRB
 from GUIDefines import *

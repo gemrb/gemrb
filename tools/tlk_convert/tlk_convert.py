@@ -1,4 +1,9 @@
 #! /usr/bin/env python
+
+# SPDX-FileCopyrightText: 2013 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 #coding=utf-8
 from tlk import Tlk
 

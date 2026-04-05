@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # MSVC VCPKG Dependency DLL script
 # The existing default behaviour when using VCPKG copies the DLL files to the wrong place
 # Because of the way that GemRB is split into plugins, VCPKG makes copies of the DLL files in the /plugins/ directory

@@ -1,5 +1,9 @@
 #!/bin/bash
 #
+# SPDX-FileCopyrightText: 2013 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
 # Use Q in gource to see the "log position" to be used with --start-position and
 # --stop-position .
 #

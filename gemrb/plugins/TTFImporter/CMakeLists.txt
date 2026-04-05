@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2011 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 IF (FREETYPE_LIBRARIES)
 	INCLUDE_DIRECTORIES( ${FREETYPE_INCLUDE_DIRS})
 	INCLUDE_DIRECTORIES(${Iconv_INCLUDE_DIR})

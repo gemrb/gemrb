@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# SPDX-FileCopyrightText: 2023 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # Helper script to scan for all the resources of the demo,
 # and to create a chitin.key file from it. While this isn't
 # strictly necessary for GemRB, other tools may depend on this,

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2011 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # This is a script that allows you to talk to the embedded python interpreter
 # using ssh. To use it, put it in the GUIScript directory and then add the
 # following to include.py, or issue using the python console

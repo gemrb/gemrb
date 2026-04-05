@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2008 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS} ${Iconv_INCLUDE_DIR})
 ADD_GEMRB_PLUGIN (GUIScript GUIScript.cpp PythonErrors.cpp PythonConversions.cpp)
 IF(MINGW AND CMAKE_SIZEOF_VOID_P EQUAL 8)

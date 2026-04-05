@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2011 Contributors to the GemRB project <https://gemrb.org>
+//
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 // IE specific cursor types
 #ifndef IE_CURSORS_H
 #define IE_CURSORS_H

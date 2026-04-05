@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2023 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 FIND_PACKAGE(ZLIB REQUIRED)
 IF(ZLIB_FOUND)
 	MESSAGE(STATUS "Looking for Zlib: found")

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
 # FindOpenGLES2
 # ------------
 # Finds the OpenGLES2 library

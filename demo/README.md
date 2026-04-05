@@ -41,7 +41,7 @@ exploring the resources with *Near Infinity*.
 
 # AUTHORS
 
-Authors are noted in the Debian-compatible `copyright` file.
+Authors are noted in the top-level REUSE.toml file.
 
 For XCF and other files used to generate some of the used artwork, see the
 [gemrb-assets repo](https://github.com/gemrb/gemrb-assets).
