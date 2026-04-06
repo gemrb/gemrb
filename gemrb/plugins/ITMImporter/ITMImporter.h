@@ -24,7 +24,7 @@ public:
 private:
 	bool Import(DataStream* stream) override;
 	void GetExtHeader(const Item* s, ITMExtHeader* eh);
-	Effect* GetFeature(const Item* s);
+	std::unique_ptr<Effect> GetFeature(const Item* s);
 };
 
 

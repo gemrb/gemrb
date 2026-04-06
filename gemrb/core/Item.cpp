@@ -16,20 +16,6 @@
 
 namespace GemRB {
 
-ITMExtHeader::~ITMExtHeader()
-{
-	for (const auto& feature : features) {
-		delete feature;
-	}
-}
-
-Item::~Item()
-{
-	for (const auto& feature : equipping_features) {
-		delete feature;
-	}
-}
-
 ieStrRef Item::GetItemName(bool identified) const
 {
 	if (identified) {
@@ -58,18 +44,15 @@ ieStrRef Item::GetItemDesc(bool identified) const
 //otherwise returns the n'th feature block
 EffectQueue Item::GetEffectBlock(Scriptable* self, const Point& pos, int usage, ieDwordSigned invslot, ieDword pro) const
 {
-	Effect* const* features = nullptr;
-	size_t count;
+	auto it = equipping_features.begin();
+	auto end = equipping_features.end();
 
 	if (usage >= int(ext_headers.size())) {
 		return {};
 	}
 	if (usage >= 0) {
-		features = ext_headers[usage].features.data();
-		count = ext_headers[usage].features.size();
-	} else {
-		features = equipping_features.data();
-		count = EquippingFeatureCount;
+		it = ext_headers[usage].features.begin();
+		end = ext_headers[usage].features.end();
 	}
 
 	//collecting all self affecting effects in a single queue, so the random value is rolled only once
@@ -78,32 +61,31 @@ EffectQueue Item::GetEffectBlock(Scriptable* self, const Point& pos, int usage, 
 	Actor* target = Scriptable::As<Actor>(self);
 	static int casterLevel = gamedata->GetMiscRule("ITEM_CASTERLEVEL");
 
-	for (size_t i = 0; i < count; ++i) {
-		Effect* fx = features[i];
-		fx->InventorySlot = invslot;
-		fx->CasterLevel = casterLevel;
-		fx->CasterID = self->GetGlobalID();
+	for (; it != end; ++it) {
+		Effect& fx = *it->get();
+		fx.InventorySlot = invslot;
+		fx.CasterLevel = casterLevel;
+		fx.CasterID = self->GetGlobalID();
 		if (usage >= 0) {
 			//this is not coming from the item header, but from the recharge flags
-			fx->SourceFlags = ext_headers[usage].RechargeFlags;
+			fx.SourceFlags = ext_headers[usage].RechargeFlags;
 		} else {
-			fx->SourceFlags = 0;
+			fx.SourceFlags = 0;
 		}
 
-		if (fx->Target != FX_TARGET_PRESET && EffectQueue::OverrideTarget(fx)) {
-			fx->Target = FX_TARGET_PRESET;
+		if (fx.Target != FX_TARGET_PRESET && EffectQueue::OverrideTarget(&fx)) {
+			fx.Target = FX_TARGET_PRESET;
 		}
 
-		if (fx->Target == FX_TARGET_SELF) {
-			fx->Projectile = 0;
-			fx->Pos = pos;
+		if (fx.Target == FX_TARGET_SELF) {
+			fx.Projectile = 0;
+			fx.Pos = pos;
 			if (target) {
-				//core->ApplyEffect(fx, target, self);
-				selfqueue.AddEffect(new Effect(*fx));
+				selfqueue.AddEffect(new Effect(fx));
 			}
 		} else {
-			fx->Projectile = pro;
-			fxqueue.AddEffect(new Effect(*fx));
+			fx.Projectile = pro;
+			fxqueue.AddEffect(new Effect(fx));
 		}
 	}
 	if (target && selfqueue.GetEffectsCount()) {
@@ -278,7 +260,7 @@ std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(const ITMExtHeader* hea
 	std::multimap<ieDword, DamageInfoStruct>::iterator it;
 	std::vector<DMGOpcodeInfo> damage_opcodes;
 	if (!header) return damage_opcodes;
-	for (const Effect* fx : header->features) {
+	for (const auto& fx : header->features) {
 		if (fx->Opcode == damage_opcode) {
 			// damagetype is the same as in dmgtype.ids but GemRB uses those values
 			// shifted by two bytes

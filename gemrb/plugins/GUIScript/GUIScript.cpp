@@ -9170,7 +9170,7 @@ static PyObject* GemRB_GetItem(PyObject* /*self*/, PyObject* args)
 		if (eh->features.size() < 1) {
 			goto not_a_scroll;
 		}
-		const Effect* f = eh->features[0];
+		const Effect* f = eh->features[0].get();
 
 		//normally the learn spell opcode is 147
 		EffectQueue::ResolveEffect(fx_learn_spell_ref);

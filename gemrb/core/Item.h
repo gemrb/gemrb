@@ -114,7 +114,6 @@ class GEM_EXPORT ITMExtHeader {
 public:
 	ITMExtHeader() noexcept = default;
 	ITMExtHeader(const ITMExtHeader&) = delete;
-	~ITMExtHeader();
 	ITMExtHeader& operator=(const ITMExtHeader&) = delete;
 	ieByte AttackType = 0;
 	ieByte IDReq = 0; // in pst also holds the equivalent of spl friendly bit, but with only 2 senseless users
@@ -146,7 +145,7 @@ public:
 	std::array<ieWord, 3> MeleeAnimation;
 	//this value is set in projectiles and launchers too
 	int ProjectileQualifier = 0; // this is a derived value determined on load time
-	std::vector<Effect*> features;
+	std::vector<std::unique_ptr<Effect>> features;
 };
 
 /**
@@ -158,11 +157,10 @@ class GEM_EXPORT Item {
 public:
 	Item() noexcept = default;
 	Item(const Item&) = delete;
-	~Item();
 	Item& operator=(const Item&) = delete;
 
 	std::vector<ITMExtHeader> ext_headers;
-	std::vector<Effect*> equipping_features;
+	std::vector<std::unique_ptr<Effect>> equipping_features;
 	ResRef Name; //the resref of the item itself!
 
 	ieStrRef ItemName = ieStrRef::INVALID;

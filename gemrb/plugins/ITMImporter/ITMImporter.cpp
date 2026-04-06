@@ -117,7 +117,7 @@ static void AddZZFeatures(Item* s)
 		fx->Parameter3 = static_cast<ieDword>(bonus);
 		fx->SourceRef = s->Name;
 		fx->SourceType = 1;
-		s->equipping_features.push_back(fx);
+		s->equipping_features.push_back(std::make_unique<Effect>(std::move(*fx)));
 	}
 }
 
@@ -340,14 +340,14 @@ void ITMImporter::GetExtHeader(const Item* s, ITMExtHeader* eh)
 	}
 }
 
-Effect* ITMImporter::GetFeature(const Item* s)
+std::unique_ptr<Effect> ITMImporter::GetFeature(const Item* s)
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open(str, false);
 	Effect* fx = eM->GetEffect();
 	fx->SourceRef = s->Name;
 	fx->SourceType = 1;
-	return fx;
+	return std::make_unique<Effect>(std::move(*fx));
 }
 
 #include "plugindef.h"
