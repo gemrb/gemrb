@@ -39,12 +39,17 @@ public:
 	SDLSoundSourceHandle(const AudioPlaybackConfig& config, PositionGetter positionGetter, int channel = -1);
 	~SDLSoundSourceHandle() override;
 
+	bool operator==(const SoundSourceHandle&) override;
+
 	bool Enqueue(Holder<SoundBufferHandle>) override;
+	const AudioPoint& GetPosition() const override;
 	bool HasFinishedPlaying() const override;
+	bool IsSpatial() const override;
 	void ConfigChannel() const;
 	void Reconfigure(const AudioPlaybackConfig& config) override;
 	void Stop() override;
 	void StopLooping() override;
+	void SetOccluded(bool) override { /* nop */ };
 	void SetPitch(int) override { /* no known implementation yet */ };
 	void SetPosition(const AudioPoint&) override;
 	void SetVolume(int) override;
@@ -101,6 +106,7 @@ public:
 
 	bool Init() override;
 
+	bool HasOcclusionFeature() override { return false; }
 	Holder<SoundSourceHandle> CreatePlaybackSource(const AudioPlaybackConfig&, bool priority = false) override;
 	Holder<SoundStreamSourceHandle> CreateStreamable(const AudioPlaybackConfig&, size_t minQueueSize) override;
 	Holder<SoundBufferHandle> LoadSound(ResourceHolder<SoundMgr> resource, const AudioPlaybackConfig&) override;

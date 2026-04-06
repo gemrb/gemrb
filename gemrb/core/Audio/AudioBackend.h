@@ -43,11 +43,16 @@ class GEM_EXPORT SoundSourceHandle {
 public:
 	virtual ~SoundSourceHandle() = default;
 
+	virtual bool operator==(const SoundSourceHandle&) = 0;
+
 	virtual bool Enqueue(Holder<SoundBufferHandle> buffer) = 0;
+	virtual const AudioPoint& GetPosition() const = 0;
 	virtual bool HasFinishedPlaying() const = 0;
+	virtual bool IsSpatial() const = 0;
 	virtual void Reconfigure(const AudioPlaybackConfig& config) = 0;
 	virtual void Stop() = 0;
 	virtual void StopLooping() = 0;
+	virtual void SetOccluded(bool) = 0;
 	virtual void SetPitch(int pitch) = 0;
 	virtual void SetPosition(const AudioPoint&) = 0;
 	virtual void SetVolume(int volume) = 0;
@@ -75,6 +80,7 @@ public:
 
 	virtual bool Init() = 0;
 
+	virtual bool HasOcclusionFeature() { return false; }
 	virtual Holder<SoundSourceHandle> CreatePlaybackSource(const AudioPlaybackConfig& config, bool priority = false) = 0;
 	virtual Holder<SoundStreamSourceHandle> CreateStreamable(
 		const AudioPlaybackConfig& config,

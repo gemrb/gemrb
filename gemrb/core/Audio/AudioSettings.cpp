@@ -155,7 +155,7 @@ AudioPlaybackConfig AudioSettings::ConfigPresetPointAmbient(int gain, const Poin
 	AudioPlaybackConfig config;
 	config.masterVolume = GetVolumeBySetting("Volume Ambients");
 	config.channelVolume = ((std::max(45, gain) * channelVolume) / 100) * 2;
-	config.efx = true && UseEnvironmentalAudio();
+	config.efx = UseEnvironmentalAudio();
 	config.spatial = true;
 	config.muteDistance = range;
 	config.position = { p, GetChannelHeight(channel) };
@@ -183,7 +183,7 @@ AudioPlaybackConfig AudioSettings::ConfigPresetByChannel(SFXChannel channel, con
 	auto distance = std::min(screenSize.w, screenSize.h);
 
 	AudioPlaybackConfig config;
-	config.efx = true && UseEnvironmentalAudio();
+	config.efx = UseEnvironmentalAudio();
 	config.spatial = true;
 	config.muteDistance = distance;
 	config.position = { p, GetChannelHeight(channel) };
@@ -210,7 +210,7 @@ AudioPlaybackConfig AudioSettings::ConfigPresetScreenAction(SFXChannel channel) 
 AudioPlaybackConfig AudioSettings::ConfigPresetEnvVoice(SFXChannel channel) const
 {
 	AudioPlaybackConfig config;
-	config.efx = true && UseEnvironmentalAudio();
+	config.efx = UseEnvironmentalAudio();
 	config.channelVolume = GetVolumeByChannel(channel);
 	config.masterVolume = GetVolumeBySetting("Volume Voices");
 
@@ -223,7 +223,7 @@ AudioPlaybackConfig AudioSettings::ConfigPresetSpatialVoice(SFXChannel channel, 
 	auto distance = std::min(screenSize.w, screenSize.h);
 
 	AudioPlaybackConfig config;
-	config.efx = true && UseEnvironmentalAudio();
+	config.efx = UseEnvironmentalAudio();
 	config.spatial = true;
 	config.muteDistance = distance;
 	config.position = { p, GetChannelHeight(channel) };

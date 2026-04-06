@@ -7,14 +7,19 @@
 #include "Logging/Logging.h"
 
 #ifdef HAVE_OPENAL_EFX_H
-static LPALGENEFFECTS alGenEffects = NULL;
-static LPALDELETEEFFECTS alDeleteEffects = NULL;
-static LPALISEFFECT alIsEffect = NULL;
-static LPALGENAUXILIARYEFFECTSLOTS alGenAuxiliaryEffectSlots = NULL;
-static LPALDELETEAUXILIARYEFFECTSLOTS alDeleteAuxiliaryEffectSlots = NULL;
-static LPALEFFECTI alEffecti = NULL;
-static LPALEFFECTF alEffectf = NULL;
-static LPALAUXILIARYEFFECTSLOTI alAuxiliaryEffectSloti = NULL;
+static LPALGENEFFECTS alGenEffects = nullptr;
+static LPALDELETEEFFECTS alDeleteEffects = nullptr;
+static LPALISEFFECT alIsEffect = nullptr;
+static LPALGENAUXILIARYEFFECTSLOTS alGenAuxiliaryEffectSlots = nullptr;
+static LPALDELETEAUXILIARYEFFECTSLOTS alDeleteAuxiliaryEffectSlots = nullptr;
+static LPALEFFECTI alEffecti = nullptr;
+static LPALEFFECTF alEffectf = nullptr;
+static LPALAUXILIARYEFFECTSLOTI alAuxiliaryEffectSloti = nullptr;
+static LPALGENFILTERS alGenFilters = nullptr;
+static LPALDELETEFILTERS alDeleteFilters = nullptr;
+static LPALISFILTER alIsFilter = nullptr;
+static LPALFILTERF alFilterf = nullptr;
+static LPALFILTERI alFilteri = nullptr;
 #endif
 
 namespace GemRB {
@@ -23,6 +28,7 @@ static bool hasEFX = false;
 #ifdef HAVE_OPENAL_EFX_H
 static ALuint efxEffectSlot = 0;
 static ALuint efxEffect = 0;
+static ALuint efxLowPassFilter = 0;
 #endif
 
 static ALenum GetFormatEnum(int channels, int bits)
@@ -112,8 +118,10 @@ static void ConfigureSource(ALuint source, const AudioPlaybackConfig& config)
 #ifdef HAVE_OPENAL_EFX_H
 	if (config.efx && hasEFX) {
 		alSource3i(source, AL_AUXILIARY_SEND_FILTER, efxEffectSlot, 0, 0);
+		alSourcef(source, AL_AIR_ABSORPTION_FACTOR, 0.1f);
 	} else {
 		alSource3i(source, AL_AUXILIARY_SEND_FILTER, 0, 0, 0);
+		alSourcef(source, AL_AIR_ABSORPTION_FACTOR, 0.0f);
 	}
 #endif
 }
@@ -190,12 +198,27 @@ OpenALSourceHandle::~OpenALSourceHandle()
 	alDeleteSources(numSources, sourcesArray.data());
 }
 
+bool OpenALSourceHandle::operator==(const SoundSourceHandle& handle)
+{
+	auto other = dynamic_cast<const OpenALSourceHandle*>(&handle);
+	if (!other) {
+		return false;
+	}
+
+	return sources.first != 0 && sources.first == other->sources.first;
+}
+
 bool OpenALSourceHandle::HasFinishedPlaying() const
 {
 	ALint state = 0;
 	alGetSourcei(sources.first, AL_SOURCE_STATE, &state);
 
 	return state == AL_STOPPED;
+}
+
+bool OpenALSourceHandle::IsSpatial() const
+{
+	return spatial;
 }
 
 bool OpenALSourceHandle::Enqueue(Holder<SoundBufferHandle> handle)
@@ -235,6 +258,9 @@ void OpenALSourceHandle::Reconfigure(const AudioPlaybackConfig& config)
 	if (sources.second != 0) {
 		ConfigureSource(sources.second, config);
 	}
+
+	spatial = config.spatial;
+	position = config.position;
 }
 
 
@@ -257,6 +283,22 @@ void OpenALSourceHandle::StopLooping()
 	}
 }
 
+void OpenALSourceHandle::SetOccluded(bool state)
+{
+#ifdef HAVE_OPENAL_EFX_H
+	if (hasEFX) {
+		ALuint filter = state ? efxLowPassFilter : AL_FILTER_NULL;
+
+		alSourcei(sources.first, AL_DIRECT_FILTER, filter);
+		if (sources.second) {
+			alSourcei(sources.second, AL_DIRECT_FILTER, filter);
+		}
+	}
+#else
+	(void) state;
+#endif
+}
+
 void OpenALSourceHandle::SetPosition(const AudioPoint& point)
 {
 	std::array<ALfloat, 3> pos = { float(point.x), float(point.y), float(point.z) };
@@ -265,6 +307,13 @@ void OpenALSourceHandle::SetPosition(const AudioPoint& point)
 	if (sources.second) {
 		alSourcefv(sources.second, AL_POSITION, pos.data());
 	}
+
+	position = point;
+}
+
+const AudioPoint& OpenALSourceHandle::GetPosition() const
+{
+	return position;
 }
 
 void OpenALSourceHandle::SetPitch(int pitch)
@@ -431,7 +480,7 @@ void OpenALBackend::InitEFX()
 
 	alcGetIntegerv(device, ALC_MAX_AUXILIARY_SENDS, 1, &auxSends);
 
-	if (auxSends < 1) {
+	if (auxSends < 2) {
 		return;
 	}
 
@@ -444,7 +493,13 @@ void OpenALBackend::InitEFX()
 	alEffectf = reinterpret_cast<LPALEFFECTF>(alGetProcAddress("alEffectf"));
 	alAuxiliaryEffectSloti = reinterpret_cast<LPALAUXILIARYEFFECTSLOTI>(alGetProcAddress("alAuxiliaryEffectSloti"));
 
-	if (!alGenEffects || !alDeleteEffects || !alIsEffect) {
+	alGenFilters = reinterpret_cast<LPALGENFILTERS>(alGetProcAddress("alGenFilters"));
+	alDeleteFilters = reinterpret_cast<LPALDELETEFILTERS>(alGetProcAddress("alDeleteFilters"));
+	alIsFilter = reinterpret_cast<LPALISFILTER>(alGetProcAddress("alIsFilter"));
+	alFilterf = reinterpret_cast<LPALFILTERF>(alGetProcAddress("alFilterf"));
+	alFilteri = reinterpret_cast<LPALFILTERI>(alGetProcAddress("alFilteri"));
+
+	if (!alGenEffects || !alDeleteEffects || !alIsEffect || !alGenFilters || !alDeleteFilters || !alIsFilter) {
 		return;
 	}
 
@@ -455,25 +510,27 @@ void OpenALBackend::InitEFX()
 	}
 
 	alGenEffects(1, &efxEffect);
+	if (AL_NO_ERROR != alGetError() || !alIsEffect(efxEffect)) {
+		return;
+	}
 
+	alEffecti(efxEffect, AL_EFFECT_TYPE, AL_EFFECT_REVERB);
+
+	alAuxiliaryEffectSloti(efxEffectSlot, AL_EFFECTSLOT_EFFECT, efxEffect);
 	if (AL_NO_ERROR != alGetError()) {
 		return;
 	}
 
-	if (alIsEffect(efxEffect)) {
-		alEffecti(efxEffect, AL_EFFECT_TYPE, AL_EFFECT_REVERB);
-
-		if (AL_NO_ERROR != alGetError()) {
-			return;
-		}
-
-		alAuxiliaryEffectSloti(efxEffectSlot, AL_EFFECTSLOT_EFFECT, efxEffect);
-		if (AL_NO_ERROR != alGetError()) {
-			return;
-		}
-
-		hasEFX = true;
+	alGenFilters(1, &efxLowPassFilter);
+	if (AL_NO_ERROR != AL_NO_ERROR || !alIsFilter(efxLowPassFilter)) {
+		return;
 	}
+
+	alFilteri(efxLowPassFilter, AL_FILTER_TYPE, AL_FILTER_LOWPASS);
+	alFilterf(efxLowPassFilter, AL_LOWPASS_GAIN, 0.9f);
+	alFilterf(efxLowPassFilter, AL_LOWPASS_GAINHF, 0.4f);
+
+	hasEFX = true;
 #endif
 }
 
@@ -483,6 +540,7 @@ OpenALBackend::~OpenALBackend()
 	if (hasEFX) {
 		alDeleteAuxiliaryEffectSlots(1, &efxEffectSlot);
 		alDeleteEffects(1, &efxEffect);
+		alDeleteFilters(1, &efxLowPassFilter);
 	}
 #endif
 
@@ -495,7 +553,7 @@ OpenALBackend::~OpenALBackend()
 Holder<SoundSourceHandle> OpenALBackend::CreatePlaybackSource(const AudioPlaybackConfig& config, bool)
 {
 	std::array<ALuint, 2> sourcesArray = { 0, 0 };
-	alGenSources(config.spatial != 0 ? 2 : 1, sourcesArray.data());
+	alGenSources(config.spatial ? 2 : 1, sourcesArray.data());
 	if (CheckALError("Error creating source", ERROR)) {
 		return Holder<SoundSourceHandle>();
 	}
@@ -526,6 +584,11 @@ Holder<SoundBufferHandle> OpenALBackend::LoadSound(
 	}
 
 	return MakeHolder<OpenALBufferHandle>(buffers);
+}
+
+bool OpenALBackend::HasOcclusionFeature()
+{
+	return hasEFX;
 }
 
 ALPair OpenALBackend::GetBuffers(ResourceHolder<SoundMgr> resource, bool spatial) const
