@@ -90,7 +90,6 @@ protected:
 
 public:
 	MoviePlayer() noexcept {};
-	~MoviePlayer(void) override;
 
 	Size Dimensions() const { return movieSize; }
 	void Play(Window* win);

@@ -18,11 +18,6 @@ namespace GemRB {
 
 const TypeID MoviePlayer::ID = { "MoviePlayer" };
 
-MoviePlayer::~MoviePlayer(void)
-{
-	MoviePlayer::Stop();
-}
-
 void MoviePlayer::SetSubtitles(std::unique_ptr<SubtitleSet> subs)
 {
 	subtitles = std::move(subs);
