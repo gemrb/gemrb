@@ -685,10 +685,10 @@ Interface::~Interface() noexcept
 	delete projserv;
 	delete displaymsg;
 
-	delete audioSpatialMonitor;
-	delete audioPlayback;
-	delete ambientManager;
-	delete musicLoop;
+	audioSpatialMonitor.reset();
+	audioPlayback.reset();
+	ambientManager.reset();
+	musicLoop.reset();
 
 	// delete and nullify this global data as well
 	delete gamedata;
@@ -1144,10 +1144,10 @@ void Interface::InitAudio()
 
 	audioSettings.SetScreenSize({ config.Width, config.Height });
 
-	ambientManager = new AmbientMgr {};
-	audioPlayback = new AudioPlayback { gamedata->defaultSounds };
-	audioSpatialMonitor = new SpatialMonitor;
-	musicLoop = new MusicLoop {};
+	ambientManager = std::make_unique<AmbientMgr>();
+	audioPlayback = std::make_unique<AudioPlayback>(gamedata->defaultSounds);
+	audioSpatialMonitor = std::make_unique<SpatialMonitor>();
+	musicLoop = std::make_unique<MusicLoop>();
 }
 
 void Interface::LoadPlugins() const

@@ -346,10 +346,10 @@ private:
 
 	AudioSettings audioSettings;
 	// require audio driver, settings
-	AmbientMgr* ambientManager = nullptr;
-	AudioPlayback* audioPlayback = nullptr;
-	MusicLoop* musicLoop = nullptr;
-	SpatialMonitor* audioSpatialMonitor = nullptr;
+	std::unique_ptr<AmbientMgr> ambientManager;
+	std::unique_ptr<AudioPlayback> audioPlayback;
+	std::unique_ptr<MusicLoop> musicLoop;
+	std::unique_ptr<SpatialMonitor> audioSpatialMonitor;
 	ResourceHolder<MoviePlayer> moviePlayer;
 
 public:
