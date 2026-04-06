@@ -29,7 +29,7 @@ struct GemRB::PNGInternal {
 
 PNGImporter::PNGImporter(void)
 {
-	inf = new PNGInternal();
+	inf = std::make_unique<PNGInternal>();
 	inf->png_ptr = 0;
 	inf->info_ptr = 0;
 	inf->end_info = 0;
@@ -38,7 +38,6 @@ PNGImporter::PNGImporter(void)
 PNGImporter::~PNGImporter(void)
 {
 	Close();
-	delete inf;
 }
 
 void PNGImporter::Close()
@@ -64,21 +63,21 @@ bool PNGImporter::Import(DataStream* stream)
 		return false;
 	}
 	inf->png_ptr = png_create_read_struct(
-		PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+		PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 	if (!inf->png_ptr)
 		return false;
 
 	inf->info_ptr = png_create_info_struct(inf->png_ptr);
 	if (!inf->info_ptr) {
-		png_destroy_read_struct(&inf->png_ptr, (png_infopp) NULL,
-					(png_infopp) NULL);
+		png_destroy_read_struct(&inf->png_ptr, (png_infopp) nullptr,
+					(png_infopp) nullptr);
 		return false;
 	}
 
 	inf->end_info = png_create_info_struct(inf->png_ptr);
 	if (!inf->end_info) {
 		png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr,
-					(png_infopp) NULL);
+					(png_infopp) nullptr);
 		return false;
 	}
 
@@ -133,7 +132,7 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 		delete[] row_pointers;
 		free(buffer);
 		png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
-		return NULL;
+		return nullptr;
 	}
 
 	png_read_image(inf->png_ptr, row_pointers);

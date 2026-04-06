@@ -13,7 +13,7 @@ struct PNGInternal;
 
 class PNGImporter : public ImageMgr {
 private:
-	PNGInternal* inf;
+	std::unique_ptr<PNGInternal> inf;
 
 	bool hasPalette = false;
 

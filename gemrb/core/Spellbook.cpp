@@ -316,10 +316,10 @@ bool Spellbook::HaveSpell(const ResRef& resref, ieDword flags)
 					continue;
 				}
 
-				if (flags & HS_DEPLETE) {
-					if (DepleteSpell(ms) && (sorcerer & (1 << i))) {
-						DepleteLevel(sm, ms->SpellResRef);
-					}
+				if (!(flags & HS_DEPLETE)) return true;
+
+				if (DepleteSpell(ms) && (sorcerer & (1 << i))) {
+					DepleteLevel(sm, ms->SpellResRef);
 				}
 				return true;
 			}
