@@ -13,6 +13,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Audio/AudioSettings.cpp
 	Audio/MusicLoop.cpp
 	Audio/Playback.cpp
+	Audio/SpatialMonitor.cpp
 	Calendar.cpp
 	CharAnimations.cpp
 	Core.cpp

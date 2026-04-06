@@ -685,6 +685,7 @@ Interface::~Interface() noexcept
 	delete projserv;
 	delete displaymsg;
 
+	delete audioSpatialMonitor;
 	delete audioPlayback;
 	delete ambientManager;
 	delete musicLoop;
@@ -1145,6 +1146,7 @@ void Interface::InitAudio()
 
 	ambientManager = new AmbientMgr {};
 	audioPlayback = new AudioPlayback { gamedata->defaultSounds };
+	audioSpatialMonitor = new SpatialMonitor;
 	musicLoop = new MusicLoop {};
 }
 
@@ -1327,6 +1329,11 @@ const AudioSettings& Interface::GetAudioSettings() const
 AudioPlayback& Interface::GetAudioPlayback()
 {
 	return *audioPlayback;
+}
+
+SpatialMonitor& Interface::GetAudioSpatialMonitor()
+{
+	return *audioSpatialMonitor;
 }
 
 MusicLoop& Interface::GetMusicLoop()

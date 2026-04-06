@@ -3773,7 +3773,7 @@ void Actor::PlayWarCry(int range) const
 	if (!found && !InParty) {
 		ResRef sound;
 		GetSoundFromFile(sound, Verbal::BattleCry);
-		core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Monster, Pos);
+		core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Monster, Pos, GetCurrentArea());
 	}
 }
 
@@ -3885,7 +3885,7 @@ void Actor::PlayExistenceSounds()
 			return;
 		}
 
-		auto handle = core->GetAudioPlayback().Play(sb.Sound, AudioPreset::SpatialVoice, SFXChannel::Char0, Pos);
+		auto handle = core->GetAudioPlayback().Play(sb.Sound, AudioPreset::SpatialVoice, SFXChannel::Char0, Pos, GetCurrentArea());
 		if (handle) {
 			auto length = handle->GetLengthMs();
 			if (length > 0) {
@@ -4092,7 +4092,7 @@ void Actor::GetHit(int damage, bool killingBlow)
 		if (!VerbalConstant(Verbal::Damage, beingHitCount)) {
 			ResRef sound;
 			GetSoundFromFile(sound, Verbal::Damage);
-			core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Monster, Pos);
+			core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Monster, Pos, GetCurrentArea());
 		}
 	}
 
@@ -4676,7 +4676,7 @@ void Actor::PlayWalkSound()
 	}
 
 	SFXChannel channel = InParty ? SFXChannel::WalkChar : SFXChannel::WalkMonster;
-	auto handle = core->GetAudioPlayback().Play(Sound, AudioPreset::Spatial, channel, Pos);
+	auto handle = core->GetAudioPlayback().Play(Sound, AudioPreset::Spatial, channel, Pos, GetCurrentArea());
 	tick_t length = 0;
 	if (handle) {
 		length = handle->GetLengthMs();
@@ -4800,13 +4800,13 @@ void Actor::PlayHitSound(const DataFileMgr* resdata, int damagetype, bool suffix
 			type = -3;
 			break;
 		case DAMAGE_FIRE: // the only odd one out
-			core->GetAudioPlayback().Play("FIRE", AudioPreset::Spatial, SFXChannel::Hits, Pos);
+			core->GetAudioPlayback().Play("FIRE", AudioPreset::Spatial, SFXChannel::Hits, Pos, GetCurrentArea());
 			return;
 		case DAMAGE_MAGICFIRE: // and DAMAGE_PIERCINGMISSILE
 			if (third) {
 				type = 4;
 			} else {
-				core->GetAudioPlayback().Play("FIRE", AudioPreset::Spatial, SFXChannel::Hits, Pos);
+				core->GetAudioPlayback().Play("FIRE", AudioPreset::Spatial, SFXChannel::Hits, Pos, GetCurrentArea());
 				return;
 			}
 			break;
@@ -4870,7 +4870,8 @@ void Actor::PlayHitSound(const DataFileMgr* resdata, int damagetype, bool suffix
 			Sound.Format("HIT_0{}{:c}", type, suffix ? '1' : 0);
 		}
 	}
-	core->GetAudioPlayback().Play(Sound, AudioPreset::Spatial, SFXChannel::Hits, Pos);
+
+	core->GetAudioPlayback().Play(Sound, AudioPreset::Spatial, SFXChannel::Hits, Pos, GetCurrentArea());
 }
 
 // Play swing sounds
@@ -4903,7 +4904,7 @@ void Actor::PlaySwingSound(const WeaponInfo& wi) const
 	// this extra ATTACK in 2das was always played, together with anything else
 	ResRef sound;
 	GetSoundFrom2DA(sound, Verbal::Attack0);
-	core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Swings, Pos);
+	core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Swings, Pos, GetCurrentArea());
 
 	// the CRE attack was played only if the itemtype was 0/misc to avoid clashes with the hardcoded exceptions
 	// TobExAL and Infinity Sounds prefer both to be played, so we match that, giving more choice to modders
@@ -4951,7 +4952,8 @@ void Actor::PlaySwingSound(const WeaponInfo& wi) const
 		int isChoice = core->Roll(1, isCount, -1) + 2;
 		if (!gamedata->GetItemSound(sound, itemType, AnimRef(), isChoice)) return;
 	}
-	core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Swings, Pos);
+
+	core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Swings, Pos, GetCurrentArea());
 }
 
 //Just to quickly inspect debug maximum values
@@ -5600,7 +5602,7 @@ void Actor::Die(Scriptable* killer, bool grantXP)
 	if (found) {
 		ResRef sound;
 		GetSoundFromFile(sound, Verbal::Die);
-		core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Monster, Pos);
+		core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Monster, Pos, GetCurrentArea());
 	}
 
 	// remove poison, hold, casterhold, stun and its icon
@@ -11752,7 +11754,7 @@ void Actor::PlayArmorSound() const
 
 	const ResRef armorSound = GetArmorSound();
 	if (!armorSound.IsEmpty()) {
-		core->GetAudioPlayback().Play(armorSound, AudioPreset::Spatial, SFXChannel::Armor, Pos);
+		core->GetAudioPlayback().Play(armorSound, AudioPreset::Spatial, SFXChannel::Armor, Pos, GetCurrentArea());
 	}
 }
 
@@ -11839,4 +11841,5 @@ Actor::BlockingSizeCategory Actor::getSizeCategory() const
 {
 	return this->circleSize;
 }
+
 }

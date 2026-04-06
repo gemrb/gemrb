@@ -31,6 +31,7 @@
 #include "Audio/AudioSettings.h"
 #include "Audio/MusicLoop.h"
 #include "Audio/Playback.h"
+#include "Audio/SpatialMonitor.h"
 #include "GUI/Control.h"
 #include "GUI/Tooltip.h"
 #include "Strings/StringConversion.h"
@@ -348,6 +349,7 @@ private:
 	AmbientMgr* ambientManager = nullptr;
 	AudioPlayback* audioPlayback = nullptr;
 	MusicLoop* musicLoop = nullptr;
+	SpatialMonitor* audioSpatialMonitor = nullptr;
 	ResourceHolder<MoviePlayer> moviePlayer;
 
 public:
@@ -728,6 +730,7 @@ public:
 	const AudioSettings& GetAudioSettings() const;
 	AudioPlayback& GetAudioPlayback();
 	MusicLoop& GetMusicLoop();
+	SpatialMonitor& GetAudioSpatialMonitor();
 
 	Timer& SetTimer(const EventHandler&, tick_t interval, int repeats = -1);
 	float GetAnimationFPS(const ResRef& anim) const;

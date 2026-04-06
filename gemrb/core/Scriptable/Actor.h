@@ -483,7 +483,7 @@ public:
 	vvcDict vfxDict;
 	vvcSet vfxQueue = vvcSet(VVCSort); // sorted so we can distinguish effects infront and behind
 	std::vector<bool> projectileImmunity; // classic bitfield
-	Holder<PlaybackHandle> casting_sound;
+	Holder<PlaybackHandle> castingSound;
 	PanicMode panicMode = PanicMode::None; // runaway, berserk or randomwalk
 
 	// public combat related data

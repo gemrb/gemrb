@@ -328,7 +328,7 @@ void Projectile::Setup()
 		config.loop = true;
 	}
 
-	travelHandle = core->GetAudioPlayback().Play(FiringSound, config);
+	travelHandle = core->GetAudioPlayback().Play(FiringSound, config, area);
 
 	//create more projectiles
 	if (ExtFlags & PEF_ITERATION) {
@@ -542,7 +542,7 @@ void Projectile::UpdateSound()
 			config.loop = true;
 		}
 
-		travelHandle = core->GetAudioPlayback().Play(ArrivalSound, config);
+		travelHandle = core->GetAudioPlayback().Play(ArrivalSound, config, area);
 		SFlags |= PSF_SOUND2;
 	}
 }
@@ -1488,7 +1488,7 @@ void Projectile::SpawnFragments(const Holder<ProjectileExtension>& extension) co
 
 void Projectile::InitExplodingPhase1() const
 {
-	core->GetAudioPlayback().Play(Extension->SoundRes, AudioPreset::Spatial, SFXChannel::Missile, Pos);
+	core->GetAudioPlayback().Play(Extension->SoundRes, AudioPreset::Spatial, SFXChannel::Missile, Pos, area);
 
 	// play VVC in center
 	if (!(Extension->AFlags & PAF_VVC)) {
@@ -1781,7 +1781,7 @@ Projectile::ProjectileState Projectile::GetNextExplosionState()
 		if (!(ExtFlags & PEF_WALL)) InitExplodingPhase1(); // wall projectiles init it immediately
 		nextState = ProjectileState::EXPLODING_AGAIN;
 	} else {
-		core->GetAudioPlayback().Play(Extension->AreaSound, AudioPreset::Spatial, SFXChannel::Missile, Pos);
+		core->GetAudioPlayback().Play(Extension->AreaSound, AudioPreset::Spatial, SFXChannel::Missile, Pos, area);
 	}
 
 	if (Extension->Spread) {

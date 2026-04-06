@@ -1921,14 +1921,14 @@ void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 		auto config = core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Char0, Sender->Pos);
 		core->GetAudioPlayback().PlaySpeech(parameters->string0Parameter, config);
 	} else {
-		core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::Spatial, SFXChannel::Char0, Sender->Pos);
+		core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::Spatial, SFXChannel::Char0, Sender->Pos, Sender->GetCurrentArea());
 	}
 }
 
-void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::PlaySoundPoint(Scriptable* Sender, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound({})", parameters->string0Parameter);
-	core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::Spatial, SFXChannel::Actions, parameters->pointParameter);
+	core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::Spatial, SFXChannel::Actions, parameters->pointParameter, Sender->GetCurrentArea());
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
@@ -7409,7 +7409,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	}
 
 	// voice
-	core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::SpatialVoice, channel, Sender->Pos);
+	core->GetAudioPlayback().Play(parameters->string0Parameter, AudioPreset::SpatialVoice, channel, Sender->Pos, Sender->GetCurrentArea());
 	// string1Parameter has the starting sound, played at the same time, but on SFXChannel::Casting
 	// NOTE: only a few uses have also an ending sound that plays when the effect ends (also stopping Sound1)
 	// but we don't even read all three string parameters, as Action stores just two

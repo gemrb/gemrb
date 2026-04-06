@@ -1785,6 +1785,10 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		canMove = (p != viewport.origin);
 	}
 
+	if (canMove) {
+		core->GetAudioSpatialMonitor().UpdateSoundEffects();
+	}
+
 	return canMove;
 }
 

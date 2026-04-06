@@ -17,6 +17,11 @@ time_t PlaybackHandle::GetLengthMs() const
 	return length;
 }
 
+const Holder<SoundSourceHandle>& PlaybackHandle::GetSourceHandle() const
+{
+	return source;
+}
+
 bool PlaybackHandle::IsPlaying() const
 {
 	if (source) {
@@ -74,19 +79,18 @@ Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, AudioPreset pres
 	return Play(resource, config);
 }
 
-Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, AudioPreset preset, SFXChannel channel, const Point& point)
+Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, AudioPreset preset, SFXChannel channel, const Point& point, const Map* map)
 {
 	auto config = preset == AudioPreset::SpatialVoice ? core->GetAudioSettings().ConfigPresetSpatialVoice(channel, point) : core->GetAudioSettings().ConfigPresetByChannel(channel, point);
-
-	return Play(resource, config);
+	return Play(resource, config, map);
 }
 
-Holder<PlaybackHandle> AudioPlayback::PlayDirectional(StringView resource, SFXChannel channel, const Point& point, orient_t orientation)
+Holder<PlaybackHandle> AudioPlayback::PlayDirectional(StringView resource, SFXChannel channel, const Point& point, orient_t orientation, const Map* map)
 {
-	return Play(resource, core->GetAudioSettings().ConfigPresetDirectional(channel, point, orientation));
+	return Play(resource, core->GetAudioSettings().ConfigPresetDirectional(channel, point, orientation), map);
 }
 
-Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, const AudioPlaybackConfig& config)
+Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, const AudioPlaybackConfig& config, const Map* map)
 {
 	Housekeeping();
 
@@ -107,7 +111,12 @@ Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, const AudioPlayb
 
 	activeSources.insert(source);
 
-	return MakeHolder<PlaybackHandle>(std::move(source), cacheEntry.length, config.position.z);
+	auto handle = MakeHolder<PlaybackHandle>(std::move(source), cacheEntry.length, config.position.z);
+	if (config.spatial) {
+		core->GetAudioSpatialMonitor().AddHandleToMonitor(handle, map);
+	}
+
+	return handle;
 }
 
 Holder<PlaybackHandle> AudioPlayback::PlayDefaultSound(size_t index, SFXChannel channel)
