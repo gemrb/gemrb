@@ -542,7 +542,7 @@ void DisplayStringCore(Scriptable* const Sender, ieStrRef Strref, int flags, con
 		if (flags & DS_SPEECH) {
 			length = core->GetAudioPlayback().PlaySpeech(StringView(soundpath), config, !(flags & DS_QUEUE));
 		} else {
-			auto handle = core->GetAudioPlayback().Play(StringView(soundpath), config, Sender->GetCurrentArea());
+			auto handle = core->GetAudioPlayback().Play(StringView(soundpath), config);
 			if (handle) {
 				length = handle->GetLengthMs();
 			}

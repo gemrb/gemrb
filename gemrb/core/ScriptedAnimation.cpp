@@ -543,7 +543,7 @@ void ScriptedAnimation::UpdateSound()
 			auto config = core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Hits, currentSoundPos);
 			config.loop = loop;
 
-			soundHandle = core->GetAudioPlayback().Play(sounds[SoundPhase], config, nullptr);
+			soundHandle = core->GetAudioPlayback().Play(sounds[SoundPhase], config);
 			SoundPhase++;
 		}
 	} else if (soundPos != currentSoundPos) {

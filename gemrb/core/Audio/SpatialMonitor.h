@@ -20,8 +20,8 @@ class GEM_EXPORT SpatialMonitor {
 public:
 	SpatialMonitor();
 
-	void AddHandleToMonitor(const Holder<PlaybackHandle>&, const Map*);
-	void AddHandleToMonitor(const Holder<SoundSourceHandle>&, const Map*);
+	void AddHandleToMonitor(const Holder<PlaybackHandle>&, const ResRef&);
+	void AddHandleToMonitor(const Holder<SoundSourceHandle>&, const ResRef&);
 	void UpdateSoundEffects();
 	void UpdateSoundForHandle(const Holder<PlaybackHandle>&);
 

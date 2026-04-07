@@ -798,7 +798,7 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 				break;
 			case 6:
 				//duplication
-				core->GetAudioPlayback().Play("magic02", AudioPreset::Spatial, SFXChannel::Hits, target->Pos, target->GetCurrentArea());
+				core->GetAudioPlayback().Play("magic02", AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 				break;
 			case 7: //armor
 				target->ApplyEffectCopy(fx, fx_colorchange_ref, Owner, 0x825A2800, -1);

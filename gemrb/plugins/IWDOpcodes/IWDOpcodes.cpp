@@ -1617,7 +1617,7 @@ static int fx_animal_rage(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 static int fx_turn_undead2(Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if (fx->FirstApply) {
-		core->GetAudioPlayback().Play("ACT_06", AudioPreset::Spatial, SFXChannel::Monster, target->Pos, target->GetCurrentArea());
+		core->GetAudioPlayback().Play("ACT_06", AudioPreset::Spatial, SFXChannel::Monster, target->Pos);
 	}
 	target->SetSpellState(SS_TURNED);
 
@@ -1942,7 +1942,7 @@ static int fx_harpy_wail(Scriptable* Owner, Actor* target, Effect* fx)
 	if (STATE_GET(STATE_DEAD | STATE_PETRIFIED | STATE_FROZEN)) {
 		return FX_NOT_APPLIED;
 	}
-	core->GetAudioPlayback().Play(fx->Resource2, AudioPreset::Spatial, SFXChannel::Monster, target->Pos, target->GetCurrentArea());
+	core->GetAudioPlayback().Play(fx->Resource2, AudioPreset::Spatial, SFXChannel::Monster, target->Pos);
 
 	const Map* area = target->GetCurrentArea();
 	if (!area) return FX_NOT_APPLIED;

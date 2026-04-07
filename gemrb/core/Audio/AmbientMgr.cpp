@@ -91,11 +91,10 @@ void AmbientMgr::RemoveAmbients(const std::vector<Ambient*>& oldAmbients)
 }
 
 
-void AmbientMgr::SetAmbients(const std::vector<Ambient*>& a, const Map* map)
+void AmbientMgr::SetAmbients(const std::vector<Ambient*>& a)
 {
 	std::lock_guard<std::mutex> l(ambientsMutex);
 	ambients = a;
-	currentMap = map;
 	AmbientsSet(ambients);
 
 	Activate();
@@ -187,7 +186,7 @@ tick_t AmbientMgr::Tick(tick_t ticks)
 
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	for (auto& source : ambientSources) {
-		tick_t newdelay = source.Tick(ticks, { pos.x, pos.y }, timeslice, currentMap);
+		tick_t newdelay = source.Tick(ticks, { pos.x, pos.y }, timeslice);
 		if (newdelay < delay) delay = newdelay;
 	}
 	return delay;
@@ -195,7 +194,7 @@ tick_t AmbientMgr::Tick(tick_t ticks)
 
 // AmbientSource implementation
 //
-tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword timeslice, const Map* map)
+tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword timeslice)
 {
 	// if we are out of sounds do nothing
 	if (ambient->sounds.empty()) {
@@ -269,7 +268,8 @@ tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword tim
 			return nextdelay;
 		}
 
-		core->GetAudioSpatialMonitor().AddHandleToMonitor(source, map);
+		auto game = core->GetGame();
+		core->GetAudioSpatialMonitor().AddHandleToMonitor(source, game->CurrentArea);
 	} else if (ambient->gainVariance != 0) {
 		SetVolume(volume);
 	}

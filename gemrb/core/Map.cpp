@@ -865,7 +865,7 @@ void Map::UpdateScripts()
 
 		// Play the PST specific enter sound
 		if (wasActive & _TRAP_USEPOINT) {
-			core->GetAudioPlayback().Play(ip->EnterWav, AudioPreset::Spatial, SFXChannel::Actions, ip->TrapLaunch, this);
+			core->GetAudioPlayback().Play(ip->EnterWav, AudioPreset::Spatial, SFXChannel::Actions, ip->TrapLaunch);
 		}
 		ip->Update();
 	}
@@ -3276,7 +3276,7 @@ void Map::SetupAmbients() const
 {
 	AmbientMgr& ambim = core->GetAmbientManager();
 	ambim.Reset();
-	ambim.SetAmbients(ambients, this);
+	ambim.SetAmbients(ambients);
 }
 
 void Map::AddMapNote(const Point& point, ieWord color, String text, bool readonly)

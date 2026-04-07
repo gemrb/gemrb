@@ -30,7 +30,7 @@ public:
 
 	void Reset();
 	void RemoveAmbients(const std::vector<Ambient*>& oldAmbients);
-	void SetAmbients(const std::vector<Ambient*>& a, const Map*);
+	void SetAmbients(const std::vector<Ambient*>& a);
 
 	void UpdateVolume();
 	void SetVolume(unsigned short value);
@@ -45,8 +45,6 @@ private:
 	void AmbientsSet(const std::vector<Ambient*>&);
 
 private:
-	const Map* currentMap = nullptr;
-
 	mutable std::mutex ambientsMutex;
 	std::vector<Ambient*> ambients;
 	std::atomic_bool active { false };
@@ -65,7 +63,7 @@ private:
 		AmbientSource& operator=(const AmbientSource&) = delete;
 		AmbientSource& operator=(AmbientSource&&) = default;
 
-		tick_t Tick(tick_t ticks, Point listener, ieDword timeslice, const Map*);
+		tick_t Tick(tick_t ticks, Point listener, ieDword timeslice);
 		void HardStop();
 		void SetVolume(unsigned short volume);
 		const Ambient* GetAmbient() const { return ambient; };

@@ -128,7 +128,7 @@ void Spell::AddCastingGlow(EffectQueue* fxqueue, ieDword duration, int gender) c
 		}
 		// only actors have fxqueue's and also the parent function checks for that
 		Actor* caster = (Actor*) fxqueue->GetOwner();
-		caster->castingSound = core->GetAudioPlayback().PlayDirectional(Resource, SFXChannel::Casting, caster->Pos, caster->GetOrientation(), caster->GetCurrentArea());
+		caster->castingSound = core->GetAudioPlayback().PlayDirectional(Resource, SFXChannel::Casting, caster->Pos, caster->GetOrientation());
 	}
 
 	fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);

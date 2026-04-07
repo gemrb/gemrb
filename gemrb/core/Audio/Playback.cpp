@@ -5,6 +5,7 @@
 #include "Playback.h"
 
 #include "Interface.h"
+#include "Game.h"
 
 namespace GemRB {
 
@@ -79,18 +80,18 @@ Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, AudioPreset pres
 	return Play(resource, config);
 }
 
-Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, AudioPreset preset, SFXChannel channel, const Point& point, const Map* map)
+Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, AudioPreset preset, SFXChannel channel, const Point& point)
 {
 	auto config = preset == AudioPreset::SpatialVoice ? core->GetAudioSettings().ConfigPresetSpatialVoice(channel, point) : core->GetAudioSettings().ConfigPresetByChannel(channel, point);
-	return Play(resource, config, map);
+	return Play(resource, config);
 }
 
-Holder<PlaybackHandle> AudioPlayback::PlayDirectional(StringView resource, SFXChannel channel, const Point& point, orient_t orientation, const Map* map)
+Holder<PlaybackHandle> AudioPlayback::PlayDirectional(StringView resource, SFXChannel channel, const Point& point, orient_t orientation)
 {
-	return Play(resource, core->GetAudioSettings().ConfigPresetDirectional(channel, point, orientation), map);
+	return Play(resource, core->GetAudioSettings().ConfigPresetDirectional(channel, point, orientation));
 }
 
-Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, const AudioPlaybackConfig& config, const Map* map)
+Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, const AudioPlaybackConfig& config)
 {
 	Housekeeping();
 
@@ -113,7 +114,8 @@ Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, const AudioPlayb
 
 	auto handle = MakeHolder<PlaybackHandle>(std::move(source), cacheEntry.length, config.position.z);
 	if (config.spatial) {
-		core->GetAudioSpatialMonitor().AddHandleToMonitor(handle, map);
+		auto game = core->GetGame();
+		core->GetAudioSpatialMonitor().AddHandleToMonitor(handle, game->CurrentArea);
 	}
 
 	return handle;

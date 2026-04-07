@@ -15,14 +15,14 @@ namespace GemRB {
 
 SpatialMonitor::SpatialMonitor() : active(core->GetAudioDrv()->HasOcclusionFeature()) {}
 
-void SpatialMonitor::AddHandleToMonitor(const Holder<PlaybackHandle>& playbackHandle, const Map* currentMap)
+void SpatialMonitor::AddHandleToMonitor(const Holder<PlaybackHandle>& playbackHandle, const ResRef& mapName)
 {
 	if (playbackHandle) {
-		AddHandleToMonitor(playbackHandle->GetSourceHandle(), currentMap);
+		AddHandleToMonitor(playbackHandle->GetSourceHandle(), mapName);
 	}
 }
 
-void SpatialMonitor::AddHandleToMonitor(const Holder<SoundSourceHandle>& source, const Map* currentMap)
+void SpatialMonitor::AddHandleToMonitor(const Holder<SoundSourceHandle>& source, const ResRef& mapName)
 {
 	if (!active || !source) {
 		return;
@@ -34,9 +34,7 @@ void SpatialMonitor::AddHandleToMonitor(const Holder<SoundSourceHandle>& source,
 
 	monitoredHandles.emplace_back(); // C++17
 	auto& handle = monitoredHandles.back();
-	// if map is null, we later don't descriminate, but that's more like a workarond
-	// to honor that we currently don't have the map at hand everywhere (e. g. scripted animation)
-	handle.map = currentMap ? currentMap->WEDResRef : "";
+	handle.map = mapName;
 	handle.source = source;
 
 	EvaluateOcclusion(handle);
@@ -78,6 +76,7 @@ void SpatialMonitor::EvaluateOcclusion(SpatialHandle& handle)
 	auto mapName = game->CurrentArea;
 
 	if (!handle.map.empty() && mapName != handle.map) {
+		source->SetOccluded(true);
 		return;
 	}
 
