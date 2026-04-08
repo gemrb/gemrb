@@ -2453,7 +2453,12 @@ void GameControl::CommandSelectedMovement(const Point& p, bool formation, bool a
 
 bool GameControl::OnMouseWheelScroll(const Point& delta)
 {
-	if (core->GetDictionary().Get("Zoom Lock", 0) == 1) return false;
+	if (core->GetDictionary().Get("Zoom Lock", 0) == 1) {
+		// touchpad two finger scrolling ends up here as well
+		// redirect to panning like on middle-click, but make more intuitive
+		Scroll({ delta.x, -delta.y });
+		return true;
+	}
 
 	auto lastScale = GetScalePercent();
 	// EEs have 27 zoom steps
