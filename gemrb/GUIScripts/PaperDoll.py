@@ -127,7 +127,7 @@ def GetActorPaperDoll0 (pc):
 		anim_id = anim_id + table.GetValue (Race, 0)
 		table = GemRB.LoadTable ("avprefc")
 		ClassName = GUICommon.GetClassRowName (pc)
-		anim_id = anim_id + table.GetValue (ClassName, "CLASS")
+		anim_id = anim_id + table.GetValue (ClassName, "CLASS", GTV_INT)
 		table = GemRB.LoadTable ("avprefg")
 		Gender = GemRB.GetPlayerStat (pc, IE_SEX)
 		anim_id = anim_id + table.GetValue (Gender, 0)
