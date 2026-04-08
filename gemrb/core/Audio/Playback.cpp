@@ -5,6 +5,7 @@
 #include "Playback.h"
 
 #include "Interface.h"
+#include "Game.h"
 
 namespace GemRB {
 
@@ -15,6 +16,11 @@ PlaybackHandle::PlaybackHandle(Holder<SoundSourceHandle> source, time_t length, 
 time_t PlaybackHandle::GetLengthMs() const
 {
 	return length;
+}
+
+const Holder<SoundSourceHandle>& PlaybackHandle::GetSourceHandle() const
+{
+	return source;
 }
 
 bool PlaybackHandle::IsPlaying() const
@@ -77,7 +83,6 @@ Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, AudioPreset pres
 Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, AudioPreset preset, SFXChannel channel, const Point& point)
 {
 	auto config = preset == AudioPreset::SpatialVoice ? core->GetAudioSettings().ConfigPresetSpatialVoice(channel, point) : core->GetAudioSettings().ConfigPresetByChannel(channel, point);
-
 	return Play(resource, config);
 }
 
@@ -107,7 +112,13 @@ Holder<PlaybackHandle> AudioPlayback::Play(StringView resource, const AudioPlayb
 
 	activeSources.insert(source);
 
-	return MakeHolder<PlaybackHandle>(std::move(source), cacheEntry.length, config.position.z);
+	auto handle = MakeHolder<PlaybackHandle>(std::move(source), cacheEntry.length, config.position.z);
+	if (config.spatial) {
+		auto game = core->GetGame();
+		core->GetAudioSpatialMonitor().AddHandleToMonitor(handle, game->CurrentArea);
+	}
+
+	return handle;
 }
 
 Holder<PlaybackHandle> AudioPlayback::PlayDefaultSound(size_t index, SFXChannel channel)

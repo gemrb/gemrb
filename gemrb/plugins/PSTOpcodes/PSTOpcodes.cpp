@@ -796,7 +796,8 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 				// should be 5d4 + 10 per level, but the original spell doesn't use the opcode
 				// unhardcoded in our sshadow.spl with 10s as the flat bonus instead of rolling
 				break;
-			case 6: //duplication
+			case 6:
+				//duplication
 				core->GetAudioPlayback().Play("magic02", AudioPreset::Spatial, SFXChannel::Hits, target->Pos);
 				break;
 			case 7: //armor

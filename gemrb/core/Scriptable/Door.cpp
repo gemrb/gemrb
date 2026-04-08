@@ -148,13 +148,15 @@ void Door::SetDoorLocked(int Locked, int playsound)
 		Flags |= DOOR_LOCKED;
 		// only close it in pst, needed for Dead nations (see 4a3e1cb4ef)
 		if (core->HasFeature(GFFlags::REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
-		if (playsound && !LockSound.IsEmpty())
+		if (playsound && !LockSound.IsEmpty()) {
 			core->GetAudioPlayback().Play(LockSound, AudioPreset::Spatial, SFXChannel::Actions, toOpen[0]);
+		}
 	} else {
 		if (!(Flags & DOOR_LOCKED)) return;
 		Flags &= ~DOOR_LOCKED;
-		if (playsound && !UnLockSound.IsEmpty())
+		if (playsound && !UnLockSound.IsEmpty()) {
 			core->GetAudioPlayback().Play(UnLockSound, AudioPreset::Spatial, SFXChannel::Actions, toOpen[0]);
+		}
 	}
 }
 

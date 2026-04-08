@@ -55,9 +55,9 @@ void Movable::SetStance(unsigned int arg)
 
 	Actor* caster = Scriptable::As<Actor>(this);
 	if (StanceID == IE_ANI_CONJURE && StanceID != arg) {
-		if (caster && caster->casting_sound) {
-			caster->casting_sound->Stop();
-			caster->casting_sound.reset();
+		if (caster && caster->castingSound) {
+			caster->castingSound->Stop();
+			caster->castingSound.reset();
 		}
 	}
 

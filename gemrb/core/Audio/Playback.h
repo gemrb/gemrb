@@ -17,12 +17,15 @@ static constexpr uint8_t GEM_SND_SPEECH = 4;
 
 namespace GemRB {
 
+class Map;
+
 class PlaybackHandle {
 public:
 	PlaybackHandle() = default;
 	PlaybackHandle(Holder<SoundSourceHandle> source, time_t length, int32_t height = 0);
 
 	time_t GetLengthMs() const;
+	const Holder<SoundSourceHandle>& GetSourceHandle() const;
 	bool IsPlaying() const;
 	void SetPosition(const Point& p);
 	void Stop();

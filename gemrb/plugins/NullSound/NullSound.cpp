@@ -6,6 +6,8 @@
 
 namespace GemRB {
 
+AudioPoint NullSoundSourceHandle::nullPoint;
+
 Holder<SoundSourceHandle> NullSound::CreatePlaybackSource(const AudioPlaybackConfig&, bool)
 {
 	return MakeHolder<NullSoundSourceHandle>();

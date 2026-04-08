@@ -21,6 +21,7 @@
 namespace GemRB {
 
 class Ambient;
+class Map;
 
 class GEM_EXPORT AmbientMgr {
 public:

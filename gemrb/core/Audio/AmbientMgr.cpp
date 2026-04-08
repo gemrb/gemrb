@@ -267,6 +267,9 @@ tick_t AmbientMgr::AmbientSource::Tick(tick_t ticks, Point listener, ieDword tim
 			// Try again later
 			return nextdelay;
 		}
+
+		auto game = core->GetGame();
+		core->GetAudioSpatialMonitor().AddHandleToMonitor(source, game->CurrentArea);
 	} else if (ambient->gainVariance != 0) {
 		SetVolume(volume);
 	}

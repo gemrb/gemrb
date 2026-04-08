@@ -532,10 +532,10 @@ public:
 
 	Size GetSize() const;
 	void FillExplored(bool explored);
-	/* set one fog tile as visible. x, y are tile coordinates */
-	void ExploreTile(const FogPoint&, bool fogOnly = false);
-	/* explore map from given point in map coordinates */
-	void ExploreMapChunk(const SearchmapPoint& pos, int range, int los);
+	/* set one fog tile as visible. x, y are tile coordinates, true if uncovered something */
+	bool ExploreTile(const FogPoint&, bool fogOnly = false);
+	/* explore map from given point in map coordinates, true if uncovered something */
+	bool ExploreMapChunk(const SearchmapPoint& pos, int range, int los, bool updateSFXForVisibility = true);
 	void BlockSearchMapFor(const Movable* actor) const;
 	void ClearSearchMapFor(const Movable* actor) const;
 	/* update VisibleBitmap by resolving vision of all explore actors */

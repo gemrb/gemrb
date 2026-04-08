@@ -532,7 +532,7 @@ void ScriptedAnimation::UpdateSound()
 		return;
 	}
 
-	Point soundpos(Pos.x + XOffset, Pos.y + YOffset);
+	Point currentSoundPos { Pos.x + XOffset, Pos.y + YOffset };
 	if (!soundHandle || !soundHandle->IsPlaying()) {
 		while (SoundPhase <= P_RELEASE && sounds[SoundPhase].IsEmpty()) {
 			SoundPhase++;
@@ -540,14 +540,16 @@ void ScriptedAnimation::UpdateSound()
 
 		if (SoundPhase <= P_RELEASE) {
 			bool loop = SoundPhase == P_HOLD && (SequenceFlags & IE_VVC_LOOP);
-			auto config = core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Hits, soundpos);
+			auto config = core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Hits, currentSoundPos);
 			config.loop = loop;
 
 			soundHandle = core->GetAudioPlayback().Play(sounds[SoundPhase], config);
 			SoundPhase++;
 		}
-	} else {
-		soundHandle->SetPosition(soundpos);
+	} else if (soundPos != currentSoundPos) {
+		soundHandle->SetPosition(currentSoundPos);
+		core->GetAudioSpatialMonitor().UpdateSoundForHandle(soundHandle);
+		soundPos = currentSoundPos;
 	}
 }
 

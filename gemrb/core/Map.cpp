@@ -3526,20 +3526,22 @@ void Map::FillExplored(bool explored)
 	ExploredBitmap.fill(explored ? 0xff : 0x00);
 }
 
-void Map::ExploreTile(const FogPoint& fogP, bool fogOnly)
+bool Map::ExploreTile(const FogPoint& fogP, bool fogOnly)
 {
 	const Size fogSize = FogMapSize();
 	if (!fogSize.PointInside(fogP)) {
-		return;
+		return false;
 	}
 
 	ExploredBitmap[fogP] = true;
 	if (!fogOnly) {
 		VisibleBitmap[fogP] = true;
 	}
+
+	return true;
 }
 
-void Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los)
+bool Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los, bool updateSFXForVisibility)
 {
 	SearchmapPoint tile;
 	FogPoint fogTile;
@@ -3549,6 +3551,7 @@ void Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los)
 		range = Explore::MaxVisibility;
 	}
 	int p = explore.VisibilityPerimeter;
+	bool explored = false;
 	while (p--) {
 		int Pass = 2;
 		bool block = false;
@@ -3559,7 +3562,7 @@ void Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los)
 			fogTile = FogPoint(tile);
 
 			if (!los) {
-				ExploreTile(fogTile, fogOnly);
+				explored |= ExploreTile(fogTile, fogOnly);
 				continue;
 			}
 
@@ -3581,9 +3584,15 @@ void Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los)
 				Pass--;
 				if (!Pass) break;
 			}
-			ExploreTile(fogTile, fogOnly);
+			explored |= ExploreTile(fogTile, fogOnly);
 		}
 	}
+
+	if (explored && updateSFXForVisibility) {
+		core->GetAudioSpatialMonitor().UpdateSoundEffects();
+	}
+
+	return explored;
 }
 
 void Map::UpdateFog()
@@ -3594,6 +3603,7 @@ void Map::UpdateFog()
 		VisibleBitmap.fill(0);
 	}
 
+	bool explored = false;
 	std::set<Spawn*> potentialSpawns;
 	for (const auto actor : actors) {
 		if (!actor->Modified[IE_EXPLORE]) continue;
@@ -3603,12 +3613,16 @@ void Map::UpdateFog()
 
 		int vis2 = actor->GetVisualRange();
 		if ((state & STATE_BLIND) || (vis2 < 2)) vis2 = 2; //can see only themselves
-		ExploreMapChunk(actor->SMPos, vis2 + actor->GetAnims()->GetCircleSize(), 1);
+		explored |= ExploreMapChunk(actor->SMPos, vis2 + actor->GetAnims()->GetCircleSize(), 1, false);
 
 		Spawn* sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {
 			potentialSpawns.insert(sp);
 		}
+	}
+
+	if (explored) {
+		core->GetAudioSpatialMonitor().UpdateSoundEffects();
 	}
 
 	for (Spawn* spawn : potentialSpawns) {

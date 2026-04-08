@@ -106,6 +106,7 @@ public:
 	ieDword SequenceFlags = 0;
 	int Dither = 0;
 	Point Pos; // position of the effect in game coordinates
+	Point soundPos;
 	int XOffset = 0, YOffset = 0, ZOffset = 0; // orientation relative to Pos
 	ieDword LightX = 0, LightY = 0, LightZ = 0;
 	Holder<Sprite2D> light = nullptr; // this is just a round/halftrans sprite, has no animation

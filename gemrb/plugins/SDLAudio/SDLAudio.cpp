@@ -82,6 +82,16 @@ SDLSoundSourceHandle::~SDLSoundSourceHandle()
 	SDLSoundSourceHandle::Stop();
 }
 
+bool SDLSoundSourceHandle::operator==(const SoundSourceHandle& handle)
+{
+	auto other = dynamic_cast<const SDLSoundSourceHandle*>(&handle);
+	if (!other) {
+		return false;
+	}
+
+	return GetID() == other->GetID();
+}
+
 uint64_t SDLSoundSourceHandle::GetID() const
 {
 	return id;
@@ -118,6 +128,11 @@ bool SDLSoundSourceHandle::Enqueue(Holder<SoundBufferHandle> handle)
 bool SDLSoundSourceHandle::CanOperateOnChannel() const
 {
 	return reserved || (channel != -1 && ChannelManager::IsMyChannel(*this, channel));
+}
+
+bool SDLSoundSourceHandle::IsSpatial() const
+{
+	return config.spatial;
 }
 
 bool SDLSoundSourceHandle::HasFinishedPlaying() const
@@ -160,6 +175,11 @@ void SDLSoundSourceHandle::StopLooping()
 			channel = -1;
 		}
 	}
+}
+
+const AudioPoint& SDLSoundSourceHandle::GetPosition() const
+{
+	return config.position;
 }
 
 void SDLSoundSourceHandle::SetPosition(const AudioPoint& position)

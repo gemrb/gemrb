@@ -16,14 +16,22 @@ public:
 
 class NullSoundSourceHandle : public SoundSourceHandle {
 public:
+	bool operator==(const SoundSourceHandle&) override { return true; }
+
 	bool Enqueue(Holder<SoundBufferHandle>) override { return true; }
+	const AudioPoint& GetPosition() const override { return nullPoint; }
 	bool HasFinishedPlaying() const override { return true; }
+	bool IsSpatial() const override { return false; }
 	void Reconfigure(const AudioPlaybackConfig&) override { /* null */ }
 	void Stop() override { /* null */ }
 	void StopLooping() override { /* null */ }
+	void SetOccluded(bool) override { /* null */ }
 	void SetPitch(int) override { /* null */ }
 	void SetPosition(const AudioPoint&) override { /* null */ }
 	void SetVolume(int) override { /* null */ }
+
+private:
+	static AudioPoint nullPoint;
 };
 
 class NullSoundStreamSourceHandle : public SoundStreamSourceHandle {
@@ -47,6 +55,8 @@ public:
 	Holder<SoundSourceHandle> CreatePlaybackSource(const AudioPlaybackConfig&, bool priority = false) override;
 	Holder<SoundStreamSourceHandle> CreateStreamable(const AudioPlaybackConfig&, size_t) override;
 	Holder<SoundBufferHandle> LoadSound(ResourceHolder<SoundMgr> resource, const AudioPlaybackConfig&) override;
+
+	bool HasOcclusionFeature() override { return false; }
 
 	const AudioPoint& GetListenerPosition() const override { return point; }
 	void SetListenerPosition(const AudioPoint& p) override { point = p; }

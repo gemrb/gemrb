@@ -49,11 +49,15 @@ public:
 	OpenALSourceHandle(OpenALSourceHandle&& other) noexcept;
 	~OpenALSourceHandle() override;
 
+	bool operator==(const SoundSourceHandle&) override;
 	bool Enqueue(Holder<SoundBufferHandle> handle) override;
+	const AudioPoint& GetPosition() const override;
 	bool HasFinishedPlaying() const override;
+	bool IsSpatial() const override;
 	void Reconfigure(const AudioPlaybackConfig& config) override;
 	void Stop() override;
 	void StopLooping() override;
+	void SetOccluded(bool) override;
 	void SetPosition(const AudioPoint&) override;
 	void SetPitch(int pitch) override;
 	void SetVolume(int volume) override;
@@ -62,6 +66,9 @@ private:
 	AudioBufferFormat lastFormat;
 	ALPair sources;
 	int channelVolume = 0;
+
+	AudioPoint position;
+	bool spatial = false;
 };
 
 class OpenALSoundStreamHandle : public SoundStreamSourceHandle {
@@ -94,6 +101,8 @@ public:
 	Holder<SoundSourceHandle> CreatePlaybackSource(const AudioPlaybackConfig& config, bool priority = false) override;
 	Holder<SoundStreamSourceHandle> CreateStreamable(const AudioPlaybackConfig& config, size_t) override;
 	Holder<SoundBufferHandle> LoadSound(ResourceHolder<SoundMgr> resource, const AudioPlaybackConfig& config) override;
+
+	bool HasOcclusionFeature() override;
 
 	const AudioPoint& GetListenerPosition() const override;
 	void SetListenerPosition(const AudioPoint& p) override;

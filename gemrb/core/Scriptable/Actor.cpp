@@ -4870,6 +4870,7 @@ void Actor::PlayHitSound(const DataFileMgr* resdata, int damagetype, bool suffix
 			Sound.Format("HIT_0{}{:c}", type, suffix ? '1' : 0);
 		}
 	}
+
 	core->GetAudioPlayback().Play(Sound, AudioPreset::Spatial, SFXChannel::Hits, Pos);
 }
 
@@ -4951,6 +4952,7 @@ void Actor::PlaySwingSound(const WeaponInfo& wi) const
 		int isChoice = core->Roll(1, isCount, -1) + 2;
 		if (!gamedata->GetItemSound(sound, itemType, AnimRef(), isChoice)) return;
 	}
+
 	core->GetAudioPlayback().Play(sound, AudioPreset::Spatial, SFXChannel::Swings, Pos);
 }
 
@@ -11839,4 +11841,5 @@ Actor::BlockingSizeCategory Actor::getSizeCategory() const
 {
 	return this->circleSize;
 }
+
 }
