@@ -4334,7 +4334,7 @@ static PyObject* GemRB_SaveGame(PyObject* /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	const SaveGameIterator* sgip = core->GetSaveGameIterator();
+	const auto& sgip = core->GetSaveGameIterator();
 	if (!sgip) {
 		return RuntimeError("No savegame iterator");
 	}

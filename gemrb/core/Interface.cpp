@@ -301,7 +301,7 @@ Interface::Interface(CoreSettings&& cfg)
 #endif
 
 	gamedata = std::make_unique<GameData>();
-	sgiterator = new SaveGameIterator();
+	sgIterator = std::make_unique<SaveGameIterator>();
 
 	if (!MakeDirectories(config.CachePath)) {
 		ThrowException(fmt::format("Unable to create cache directory '{}'", config.CachePath));
@@ -679,7 +679,6 @@ Interface::~Interface() noexcept
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
 	assert(game == nullptr);
 	delete worldmap;
-	delete sgiterator;
 	delete projserv;
 	delete displaymsg;
 
@@ -1969,9 +1968,9 @@ Tooltip Interface::CreateTooltip()
 }
 
 /** Get the Save game manager */
-SaveGameIterator* Interface::GetSaveGameIterator() const
+const std::unique_ptr<SaveGameIterator>& Interface::GetSaveGameIterator() const
 {
-	return sgiterator;
+	return sgIterator;
 }
 
 void Interface::AskAndExit()

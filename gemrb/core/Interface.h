@@ -290,7 +290,7 @@ private:
 	PluginHolder<ScriptEngine> guiscript;
 	std::unique_ptr<FogRenderer> fogRenderer;
 	GameControl* gamectrl = nullptr;
-	SaveGameIterator* sgiterator = nullptr;
+	std::unique_ptr<SaveGameIterator> sgIterator;
 	tokens_t tokens;
 	StringMap<std::vector<ieDword>> lists;
 	variables_t vars;
@@ -426,7 +426,7 @@ public:
 	/** returns true if the passed feedback type is enabled */
 	bool HasFeedback(int type) const;
 	/** Get the SaveGameIterator */
-	SaveGameIterator* GetSaveGameIterator() const;
+	const std::unique_ptr<SaveGameIterator>& GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */
 	variables_t& GetDictionary();
 	/** Get the Token Dictionary */
