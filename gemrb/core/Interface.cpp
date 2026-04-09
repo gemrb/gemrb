@@ -490,7 +490,7 @@ Interface::Interface(CoreSettings&& cfg)
 	}
 
 	Log(MESSAGE, "Core", "Creating Projectile Server...");
-	projserv = new ProjectileServer();
+	projServer = std::make_unique<ProjectileServer>();
 
 	Log(MESSAGE, "Core", "Checking for Dialogue Manager...");
 	strings = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
@@ -679,7 +679,6 @@ Interface::~Interface() noexcept
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
 	assert(game == nullptr);
 	delete worldmap;
-	delete projserv;
 
 	audioSpatialMonitor.reset();
 	audioPlayback.reset();
@@ -1293,9 +1292,9 @@ WorldMap* Interface::GetWorldMap(const ResRef& area) const
 	return worldmap->GetWorldMap(index);
 }
 
-ProjectileServer* Interface::GetProjectileServer() const noexcept
+const std::unique_ptr<ProjectileServer>& Interface::GetProjectileServer() const noexcept
 {
-	return projserv;
+	return projServer;
 }
 
 FogRenderer& Interface::GetFogRenderer()

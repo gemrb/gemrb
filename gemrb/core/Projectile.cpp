@@ -31,12 +31,12 @@ constexpr uint8_t PALSIZE = 32;
 // different conversion than in Orientation.h
 static const ieByte SixteenToFive2[MAX_ORIENT] = { 0, 1, 2, 3, 4, 3, 2, 1, 0, 1, 2, 3, 4, 3, 2, 1 };
 
-static ProjectileServer* server = NULL;
+static ProjectileServer* server = nullptr;
 
 Projectile::Projectile() noexcept
 {
 	if (!server) {
-		server = core->GetProjectileServer();
+		server = core->GetProjectileServer().get();
 	}
 	travelAnim.resize(MAX_ORIENT);
 	shadowAnim.resize(MAX_ORIENT);

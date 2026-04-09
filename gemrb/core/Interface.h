@@ -284,7 +284,7 @@ private:
 	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
 	PluginHolder<AudioBackend> AudioDriver;
 
-	ProjectileServer* projserv = nullptr;
+	std::unique_ptr<ProjectileServer> projServer;
 
 	std::unique_ptr<WindowManager> winmgr;
 	PluginHolder<ScriptEngine> guiscript;
@@ -388,7 +388,7 @@ public:
 	void ClearFeature(GFFlags flag);
 	bool HasFeature(GFFlags flag) const;
 	bool IsAvailable(SClass_ID filetype) const;
-	ProjectileServer* GetProjectileServer() const noexcept;
+	const std::unique_ptr<ProjectileServer>& GetProjectileServer() const noexcept;
 	FogRenderer& GetFogRenderer();
 	/* create or change a custom string */
 	ieStrRef UpdateString(ieStrRef strref, const String& text) const;
