@@ -678,7 +678,6 @@ Interface::~Interface() noexcept
 	//destroy the highest objects in the hierarchy first!
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
 	assert(game == nullptr);
-	delete calendar;
 	delete worldmap;
 	delete keymap;
 	delete sgiterator;
@@ -2516,8 +2515,7 @@ void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 	strings->CloseAux();
 	tokens.clear(); //clearing the token dictionary
 
-	delete calendar;
-	calendar = new Calendar;
+	calendar = std::make_unique<Calendar>();
 
 	DataStream* gamStr = nullptr;
 	DataStream* savStr = nullptr;

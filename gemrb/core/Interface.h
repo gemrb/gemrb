@@ -301,7 +301,7 @@ private:
 	PluginHolder<DataFileMgr> INIquests;
 	PluginHolder<DataFileMgr> INIresdata;
 	Game* game = nullptr;
-	Calendar* calendar = nullptr;
+	std::unique_ptr<Calendar> calendar;
 	WorldMapArray* worldmap = nullptr;
 	EnumBitset<GFFlags> GameFeatures;
 	ResRef MainCursorsImage;
@@ -479,7 +479,7 @@ public:
 	}
 	void SetGame(Game* newGame) { game = newGame; };
 	/** Gets the Calendar class */
-	Calendar* GetCalendar() const
+	const std::unique_ptr<Calendar>& GetCalendar() const
 	{
 		return calendar;
 	}
