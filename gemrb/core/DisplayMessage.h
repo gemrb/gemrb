@@ -134,7 +134,7 @@ public:
 	}
 };
 
-extern GEM_EXPORT DisplayMessage* displaymsg;
+extern GEM_EXPORT std::unique_ptr<DisplayMessage> displaymsg;
 
 }
 

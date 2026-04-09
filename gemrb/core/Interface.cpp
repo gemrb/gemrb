@@ -547,7 +547,7 @@ Interface::Interface(CoreSettings&& cfg)
 	}
 
 	Log(MESSAGE, "Core", "Initializing string constants...");
-	displaymsg = new DisplayMessage();
+	displaymsg = std::make_unique<DisplayMessage>();
 
 	auto guifact = GetImporter<GUIFactory>(IE_CHU_CLASS_ID);
 	if (!guifact) {
@@ -680,7 +680,6 @@ Interface::~Interface() noexcept
 	assert(game == nullptr);
 	delete worldmap;
 	delete projserv;
-	delete displaymsg;
 
 	audioSpatialMonitor.reset();
 	audioPlayback.reset();

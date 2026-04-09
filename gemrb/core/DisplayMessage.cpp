@@ -18,7 +18,7 @@
 
 namespace GemRB {
 
-GEM_EXPORT DisplayMessage* displaymsg = nullptr;
+GEM_EXPORT std::unique_ptr<DisplayMessage> displaymsg;
 
 static const auto DisplayFormatName = u"[color={:08X}]{} - [/color][p][color={:08X}]{}[/color][/p]";
 static const auto DisplayFormatAction = u"[color={:08X}]{} - [/color][p][color={:08X}]{} {}[/color][/p]";
