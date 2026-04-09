@@ -238,7 +238,7 @@ public:
 	SrcMgr SrcManager;
 };
 
-extern GEM_EXPORT GameData* gamedata;
+extern GEM_EXPORT std::unique_ptr<GameData> gamedata;
 
 }
 

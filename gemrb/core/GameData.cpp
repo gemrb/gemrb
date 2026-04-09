@@ -33,7 +33,7 @@
 
 namespace GemRB {
 
-GEM_EXPORT GameData* gamedata;
+GEM_EXPORT std::unique_ptr<GameData> gamedata;
 
 GameData::~GameData()
 {

@@ -300,7 +300,7 @@ Interface::Interface(CoreSettings&& cfg)
 	config.SystemEncoding = nl_langinfo(CODESET);
 #endif
 
-	gamedata = new GameData();
+	gamedata = std::make_unique<GameData>();
 	sgiterator = new SaveGameIterator();
 
 	if (!MakeDirectories(config.CachePath)) {
@@ -687,10 +687,6 @@ Interface::~Interface() noexcept
 	audioPlayback.reset();
 	ambientManager.reset();
 	musicLoop.reset();
-
-	// delete and nullify this global data as well
-	delete gamedata;
-	gamedata = nullptr;
 
 	// Removing all stuff from Cache, except bifs
 	if (!config.KeepCache) DelTree(config.CachePath, true);
