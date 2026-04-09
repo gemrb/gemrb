@@ -57,7 +57,7 @@ void SpatialMonitor::UpdateSoundForHandle(const Holder<PlaybackHandle>& playback
 {
 	for (auto& handle : monitoredHandles) {
 		auto sharedHandle = handle.source.lock();
-		if (*sharedHandle == *playbackHandle->GetSourceHandle()) {
+		if (sharedHandle && *sharedHandle == *playbackHandle->GetSourceHandle()) {
 			EvaluateOcclusion(handle);
 			break;
 		}
