@@ -629,8 +629,8 @@ Interface::Interface(CoreSettings&& cfg)
 
 	if (!config.UseAsLibrary) {
 		Log(MESSAGE, "Core", "Initializing keymap tables...");
-		keymap = new KeyMap();
-		ret = keymap->InitializeKeyMap("keymap.ini", "keymap");
+		keyMap = std::make_unique<KeyMap>();
+		ret = keyMap->InitializeKeyMap("keymap.ini", "keymap");
 		if (!ret) {
 			Log(WARNING, "Core", "Failed to initialize keymaps.");
 		}
@@ -679,7 +679,6 @@ Interface::~Interface() noexcept
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
 	assert(game == nullptr);
 	delete worldmap;
-	delete keymap;
 	delete sgiterator;
 	delete projserv;
 	delete displaymsg;

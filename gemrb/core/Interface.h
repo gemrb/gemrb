@@ -344,7 +344,7 @@ private:
 	path_t nextScript;
 
 	std::deque<Timer> timers;
-	KeyMap* keymap = nullptr;
+	std::unique_ptr<KeyMap> keyMap;
 	Scriptable* CutSceneRunner = nullptr;
 
 	int MaximumAbility = 0;
@@ -485,9 +485,9 @@ public:
 	}
 
 	/** Gets the KeyMap class */
-	KeyMap* GetKeyMap() const
+	const std::unique_ptr<KeyMap>& GetKeyMap() const
 	{
-		return keymap;
+		return keyMap;
 	}
 
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
