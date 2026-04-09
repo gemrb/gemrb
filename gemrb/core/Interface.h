@@ -265,6 +265,11 @@ private:
 	static Control dragDummy;
 };
 
+struct LoadGameData {
+	Holder<SaveGame> save;
+	GAMVersion versionOverride = GAMVersion::GemRB;
+};
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -359,9 +364,8 @@ public:
 	GlobalTimer timer;
 	int QuitFlag = QF_NORMAL;
 	int EventFlag = EF_CONTROL;
-	Holder<SaveGame> LoadGameIndex;
+	LoadGameData gameToLoad;
 	SaveGameAREExtractor saveGameAREExtractor;
-	GAMVersion VersionOverride = GAMVersion::GemRB;
 	size_t SlotTypes = 0; // this is the same as the inventory size
 	ResRef GlobalScript = "BALDUR";
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };

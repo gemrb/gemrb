@@ -845,8 +845,8 @@ void Interface::HandleFlags() noexcept
 	if (QuitFlag & QF_LOADGAME) {
 		QuitFlag &= ~QF_LOADGAME;
 
-		LoadGame(LoadGameIndex, VersionOverride);
-		LoadGameIndex.reset();
+		LoadGame(gameToLoad.save, gameToLoad.versionOverride);
+		gameToLoad.save.reset();
 		//after loading a game, always check if the game needs to be upgraded
 	}
 
@@ -2499,8 +2499,8 @@ void Interface::QuitGame(int BackToMain)
 
 void Interface::SetupLoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 {
-	LoadGameIndex = std::move(sg);
-	VersionOverride = verOverride;
+	gameToLoad.save = std::move(sg);
+	gameToLoad.versionOverride = verOverride;
 	QuitFlag |= QF_LOADGAME;
 }
 
