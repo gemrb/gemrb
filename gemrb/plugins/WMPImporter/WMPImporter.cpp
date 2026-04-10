@@ -180,7 +180,7 @@ WMPAreaLink* WMPImporter::GetAreaLink(DataStream* str, WMPAreaLink* al) const
 	return al;
 }
 
-int WMPImporter::GetStoredFileSize(WorldMapArray* wmap, unsigned int index)
+int WMPImporter::GetStoredFileSize(const WorldMapArray* wmap, unsigned int index)
 {
 	assert(!index || !wmap->IsSingle());
 
@@ -225,7 +225,7 @@ int WMPImporter::GetStoredFileSize(WorldMapArray* wmap, unsigned int index)
 	return headersize;
 }
 
-int WMPImporter::PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray* wmap) const
+int WMPImporter::PutWorldMap(DataStream* stream1, DataStream* stream2, const WorldMapArray* wmap) const
 {
 	if (!stream1 || !wmap) {
 		return -1;

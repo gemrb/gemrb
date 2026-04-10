@@ -32,8 +32,8 @@ public:
 	bool Open(DataStream* stream1, DataStream* stream2) override;
 	WorldMapArray* GetWorldMapArray() const override;
 
-	int GetStoredFileSize(WorldMapArray* wmap, unsigned int index) override;
-	int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray* wmap) const override;
+	int GetStoredFileSize(const WorldMapArray* wmap, unsigned int index) override;
+	int PutWorldMap(DataStream* stream1, DataStream* stream2, const WorldMapArray* wmap) const override;
 
 private:
 	void GetWorldMap(DataStream* str, WorldMap* m, unsigned int index) const;
