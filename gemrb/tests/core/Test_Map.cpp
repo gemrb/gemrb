@@ -46,7 +46,6 @@ public:
 	static void TearDownTestSuite()
 	{
 		// cleanup to prevent a delay and crash on exit
-		delete core->GetGame();
 		core->SetGame(nullptr);
 		VideoDriver.reset();
 		delete gemrb;
