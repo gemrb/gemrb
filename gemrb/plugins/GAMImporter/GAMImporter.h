@@ -38,7 +38,7 @@ private:
 public:
 	GAMImporter() noexcept = default;
 
-	Game* LoadGame(Game* newGame, GAMVersion forceVersion = GAMVersion::GemRB) override;
+	std::unique_ptr<Game> LoadGame(std::unique_ptr<Game> newGame, GAMVersion forceVersion = GAMVersion::GemRB) override;
 
 	int GetStoredFileSize(const Game* game) override;
 	/* stores a gane in the savegame folder */

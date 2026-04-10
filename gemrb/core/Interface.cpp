@@ -22,7 +22,6 @@
 #include "EffectQueue.h"
 #include "Factory.h"
 #include "FontManager.h"
-#include "Game.h"
 #include "KeyMap.h"
 #include "Map.h"
 #include "MapMgr.h"
@@ -2474,10 +2473,7 @@ void Interface::QuitGame(int BackToMain)
 		musicLoop->Stop(); // also kill sounds
 	}
 	//delete game, worldmap
-	if (game) {
-		delete game;
-		game = nullptr;
-	}
+	game.reset();
 	worldmap.reset();
 
 	if (BackToMain) {
@@ -2512,7 +2508,7 @@ void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 	DataStream* wmpStr1 = nullptr;
 	DataStream* wmpStr2 = nullptr;
 
-	Game* newGame = nullptr;
+	std::unique_ptr<Game> newGame;
 	std::unique_ptr<WorldMapArray> newWorldmap;
 
 	LoadProgress(10);
@@ -2567,7 +2563,7 @@ void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 	gamMgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gamStr);
 	if (!gamMgr) goto cleanup;
 
-	newGame = gamMgr->LoadGame(new Game(), verOverride);
+	newGame = gamMgr->LoadGame(std::make_unique<Game>(), verOverride);
 	if (!newGame) goto cleanup;
 	UpdateActorConfig(); // so things that require Game can properly rerun
 
@@ -2594,8 +2590,7 @@ void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 	ambientManager->Reset();
 
 	// Let's assume that now is everything loaded OK and swap the objects
-	delete game;
-	game = newGame;
+	game = std::move(newGame);
 	worldmap = std::move(newWorldmap);
 
 	strings->OpenAux();
@@ -2603,7 +2598,6 @@ void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 	return;
 cleanup:
 	// Something went wrong, so try to clean after itself
-	delete newGame;
 	delete wmpStr1;
 	delete wmpStr2;
 	delete savStr;
@@ -3783,14 +3777,14 @@ int Interface::WriteGame(const path_t& folder)
 		return -1;
 	}
 
-	int size = gm->GetStoredFileSize(game);
+	int size = gm->GetStoredFileSize(game.get());
 	if (size > 0) {
 		//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
 
 		str.Create(folder, GameNameResRef.c_str(), IE_GAM_CLASS_ID);
-		int ret = gm->PutGame(&str, game);
+		int ret = gm->PutGame(&str, game.get());
 		if (ret < 0) {
 			Log(WARNING, "Core", "Game cannot be saved: {}", folder);
 			return -1;

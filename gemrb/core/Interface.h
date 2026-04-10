@@ -15,6 +15,7 @@
 #include "versions.h"
 
 #include "EnumIndex.h"
+#include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
 #include "Holder.h"
@@ -53,7 +54,6 @@ class EffectQueue;
 class EffectDesc;
 class FogRenderer;
 class Font;
-class Game;
 class GameControl;
 class Item;
 class KeyMap;
@@ -300,7 +300,7 @@ private:
 	PluginHolder<DataFileMgr> INIbeasts;
 	PluginHolder<DataFileMgr> INIquests;
 	PluginHolder<DataFileMgr> INIresdata;
-	Game* game = nullptr;
+	std::unique_ptr<Game> game;
 	std::unique_ptr<Calendar> calendar;
 	std::unique_ptr<WorldMapArray> worldmap;
 	EnumBitset<GFFlags> GameFeatures;
@@ -475,9 +475,9 @@ public:
 	/** Gets the Game class */
 	Game* GetGame() const
 	{
-		return game;
+		return game.get();
 	}
-	void SetGame(Game* newGame) { game = newGame; };
+	void SetGame(std::unique_ptr<Game> newGame) { game = std::move(newGame); };
 	/** Gets the Calendar class */
 	const std::unique_ptr<Calendar>& GetCalendar() const
 	{

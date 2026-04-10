@@ -67,7 +67,7 @@ bool GAMImporter::Import(DataStream* stream)
 	return true;
 }
 
-Game* GAMImporter::LoadGame(Game* newGame, GAMVersion forceVersion)
+std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVersion forceVersion)
 {
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time

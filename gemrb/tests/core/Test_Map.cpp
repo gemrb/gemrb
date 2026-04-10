@@ -35,8 +35,9 @@ public:
 
 		auto gamStream = gamedata->GetResourceStream("gem-demo", IE_GAM_CLASS_ID);
 		auto gamMgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gamStream);
-		Game* game = gamMgr->LoadGame(new Game(), GAMVersion::GemRB);
-		core->SetGame(game);
+		auto gam = gamMgr->LoadGame(std::make_unique<Game>(), GAMVersion::GemRB);
+		core->SetGame(std::move(gam));
+		Game* game = core->GetGame();
 
 		ResRef mapRef { "ar0100" };
 		map = game->GetMap(mapRef, false);
