@@ -7635,11 +7635,8 @@ int Actor::GetDamageReduction(int resist_stat, ieDword weaponEnchantment) const
 	static EffectRef fx_damage_reduction_ref = { "DamageReduction", -1 };
 	static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -1 };
 
-	// this is the total, but some of it may have to be discarded
+	// this is from non-reduction effects, so it ignores enchantment
 	int resisted = (signed) GetSafeStat(resist_stat);
-	if (!resisted) {
-		return 0;
-	}
 	int remaining = 0;
 	int total = 0;
 	if (resist_stat == IE_RESISTMISSILE) {
@@ -7650,20 +7647,15 @@ int Actor::GetDamageReduction(int resist_stat, ieDword weaponEnchantment) const
 	}
 
 	if (remaining == -1) {
-		// no relevant effects were found, so the whole resistance value ignores enchantment checks
-		return resisted;
-	}
-	if (remaining == resisted) {
-		Log(COMBAT, "DamageReduction", "Damage resistance ({}) is completely from damage reduction.", resisted);
+		// no reduction effects were found, so only use resistance
 		return resisted;
 	}
 	if (remaining == total) {
 		Log(COMBAT, "DamageReduction", "No weapon enchantment breach — full damage reduction and resistance used.");
-		return resisted;
 	} else {
 		Log(COMBAT, "DamageReduction", "Ignoring {} of {} damage reduction due to weapon enchantment breach.", total - remaining, total);
-		return resisted - (total - remaining);
 	}
+	return resisted + remaining;
 }
 
 /*Always call this on the suffering actor */

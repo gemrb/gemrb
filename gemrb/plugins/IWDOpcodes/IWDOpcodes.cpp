@@ -2890,15 +2890,11 @@ static int fx_day_blindness(Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 //436 DamageReduction
-static int fx_damage_reduction(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+static int fx_damage_reduction(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	// print("fx_damage_reduction(%2d) Hits: %d  Strength: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-
+	// handled as a generic effect in Actor::GetDamageReduction
 	// most of the uses have damage corresponding to this formula (eg. 5/+1, 15/+3)
 	if (!fx->Parameter1) fx->Parameter1 = 5 * fx->Parameter2;
-	STAT_ADD(IE_RESISTSLASHING, fx->Parameter1);
-	STAT_ADD(IE_RESISTCRUSHING, fx->Parameter1);
-	STAT_ADD(IE_RESISTPIERCING, fx->Parameter1);
 	return FX_APPLIED;
 }
 
@@ -3018,12 +3014,11 @@ static int fx_cleave(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //443 MissileDamageReduction
-static int fx_missile_damage_reduction(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+static int fx_missile_damage_reduction(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	// print("fx_missile_damage_reduction(%2d) Amount:%d", fx->Opcode, fx->Parameter1);
+	// handled as a generic effect in Actor::GetDamageReduction
 	// most of the uses have damage corresponding to this formula (eg. 5/+1, 15/+3)
 	if (!fx->Parameter1) fx->Parameter1 = 5 * fx->Parameter2;
-	STAT_ADD(IE_RESISTMISSILE, fx->Parameter1);
 	return FX_APPLIED;
 }
 
