@@ -442,11 +442,11 @@ def DisplayGeneral (pc, targetTextArea):
 
 		# cheat a bit and use the reduction at +10 as a modifier to remove from all other values
 		# it will hold all the non-enchantment related resistance (there are no +10 weapons)
-		mod = GemRB.GetDamageReduction (pc, damageType, 10)
+		mod = GemRB.GetDamageReduction (pc, 10, damageType)
 		if mod == -1:
 			mod = 0
-		for enchantment in range(6):
-			damage = GemRB.GetDamageReduction (pc, damageType, enchantment)
+		for enchantment in range(5, -1, -1):
+			damage = GemRB.GetDamageReduction (pc, enchantment, damageType)
 			if damage == -1 or damage-mod <= 0:
 				continue
 			if not DisplayedHeader:
@@ -460,6 +460,7 @@ def DisplayGeneral (pc, targetTextArea):
 				enchantment = "-"
 			reduction = "%d/%s" %(damage-mod, enchantment)
 			RecordsTextArea.Append (DelimitedText(BaseString, reduction))
+			break # only use the highest
 
 	return
 
