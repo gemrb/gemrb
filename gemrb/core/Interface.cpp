@@ -678,7 +678,7 @@ Interface::~Interface() noexcept
 	//destroy the highest objects in the hierarchy first!
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
 	assert(game == nullptr);
-	delete worldmap;
+	worldmap.reset();
 
 	audioSpatialMonitor.reset();
 	audioPlayback.reset();
@@ -2478,10 +2478,8 @@ void Interface::QuitGame(int BackToMain)
 		delete game;
 		game = nullptr;
 	}
-	if (worldmap) {
-		delete worldmap;
-		worldmap = nullptr;
-	}
+	worldmap.reset();
+
 	if (BackToMain) {
 		SetNextScript("Start");
 	}
@@ -2515,7 +2513,7 @@ void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 	DataStream* wmpStr2 = nullptr;
 
 	Game* newGame = nullptr;
-	WorldMapArray* newWorldmap = nullptr;
+	std::unique_ptr<WorldMapArray> newWorldmap;
 
 	LoadProgress(10);
 	if (!config.KeepCache) DelTree(config.CachePath, true);
@@ -2597,10 +2595,8 @@ void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 
 	// Let's assume that now is everything loaded OK and swap the objects
 	delete game;
-	delete worldmap;
-
 	game = newGame;
-	worldmap = newWorldmap;
+	worldmap = std::move(newWorldmap);
 
 	strings->OpenAux();
 	LoadProgress(70);
@@ -2608,7 +2604,6 @@ void Interface::LoadGame(Holder<SaveGame> sg, GAMVersion verOverride)
 cleanup:
 	// Something went wrong, so try to clean after itself
 	delete newGame;
-	delete newWorldmap;
 	delete wmpStr1;
 	delete wmpStr2;
 	delete savStr;
@@ -2627,7 +2622,7 @@ void Interface::UpdateWorldMap(const ResRef& wmResRef)
 		return;
 	}
 
-	WorldMapArray* new_worldmap = wmp_mgr->GetWorldMapArray();
+	std::unique_ptr<WorldMapArray> new_worldmap = wmp_mgr->GetWorldMapArray();
 	WorldMap* wm = worldmap->GetWorldMap(0);
 	WorldMap* nwm = new_worldmap->GetWorldMap(0);
 
@@ -2641,8 +2636,7 @@ void Interface::UpdateWorldMap(const ResRef& wmResRef)
 		}
 	}
 
-	delete worldmap;
-	worldmap = new_worldmap;
+	worldmap = std::move(new_worldmap);
 	WorldMapName[0] = wmResRef;
 }
 
@@ -2666,7 +2660,6 @@ void Interface::UpdateMasterScript()
 			delete wmp_str2;
 		}
 
-		delete worldmap;
 		worldmap = wmp_mgr->GetWorldMapArray();
 	}
 }
@@ -3820,12 +3813,12 @@ int Interface::WriteWorldMap(const path_t& folder)
 		worldmap->SetSingle(false);
 	}
 
-	int size1 = wmm->GetStoredFileSize(worldmap, 0);
+	int size1 = wmm->GetStoredFileSize(worldmap.get(), 0);
 	int size2 = 1; //just a dummy value
 
 	//if size is 0 for the first worldmap, then there is a problem
 	if (!worldmap->IsSingle() && (size1 > 0)) {
-		size2 = wmm->GetStoredFileSize(worldmap, 1);
+		size2 = wmm->GetStoredFileSize(worldmap.get(), 1);
 	}
 
 	int ret = 0;
@@ -3841,7 +3834,7 @@ int Interface::WriteWorldMap(const path_t& folder)
 		if (!worldmap->IsSingle()) {
 			str2.Create(folder, WorldMapName[1].c_str(), IE_WMP_CLASS_ID);
 		}
-		ret = wmm->PutWorldMap(&str1, &str2, worldmap);
+		ret = wmm->PutWorldMap(&str1, &str2, worldmap.get());
 	}
 	if (ret < 0) {
 		Log(WARNING, "Core", "Internal error, worldmap cannot be saved: {}", folder);

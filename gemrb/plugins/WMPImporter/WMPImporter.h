@@ -30,7 +30,7 @@ public:
 	~WMPImporter() override;
 	WMPImporter& operator=(const WMPImporter&) = delete;
 	bool Open(DataStream* stream1, DataStream* stream2) override;
-	WorldMapArray* GetWorldMapArray() const override;
+	std::unique_ptr<WorldMapArray> GetWorldMapArray() const override;
 
 	int GetStoredFileSize(const WorldMapArray* wmap, unsigned int index) override;
 	int PutWorldMap(DataStream* stream1, DataStream* stream2, const WorldMapArray* wmap) const override;

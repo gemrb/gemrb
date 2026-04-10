@@ -61,11 +61,11 @@ bool WMPImporter::Open(DataStream* stream1, DataStream* stream2)
 	return true;
 }
 
-WorldMapArray* WMPImporter::GetWorldMapArray() const
+std::unique_ptr<WorldMapArray> WMPImporter::GetWorldMapArray() const
 {
 	assert(WorldMapsCount == WorldMapsCount1 + WorldMapsCount2);
 
-	WorldMapArray* ma = new WorldMapArray(WorldMapsCount);
+	auto ma = std::make_unique<WorldMapArray>(WorldMapsCount);
 	for (unsigned int i = 0; i < WorldMapsCount1; i++) {
 		WorldMap* m = ma->NewWorldMap(i);
 		GetWorldMap(str1, m, i);

@@ -26,7 +26,7 @@ namespace GemRB {
 class GEM_EXPORT WorldMapMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream1, DataStream* stream2) = 0;
-	virtual WorldMapArray* GetWorldMapArray() const = 0;
+	virtual std::unique_ptr<WorldMapArray> GetWorldMapArray() const = 0;
 
 	virtual int GetStoredFileSize(const WorldMapArray* wmap, unsigned int index) = 0;
 	virtual int PutWorldMap(DataStream* stream1, DataStream* stream2, const WorldMapArray* wmap) const = 0;

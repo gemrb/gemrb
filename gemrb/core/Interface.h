@@ -302,7 +302,7 @@ private:
 	PluginHolder<DataFileMgr> INIresdata;
 	Game* game = nullptr;
 	std::unique_ptr<Calendar> calendar;
-	WorldMapArray* worldmap = nullptr;
+	std::unique_ptr<WorldMapArray> worldmap;
 	EnumBitset<GFFlags> GameFeatures;
 	ResRef MainCursorsImage;
 	ResRef TextCursorBam;
