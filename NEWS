@@ -1,11 +1,15 @@
-GemRB git (6aae7538):
+GemRB git (64e0552):
   New features:
     - 
+    - audio occlusion based on line of sight
+    - intoxication support
+    - in-game configuration screen for otherwise hidden settings
     - moddable GUI code, TobEx Limit effect stacking
 
   Improved features:
     - 
-    - ee compatibility
+    - tooltips
+    - ee compatibility, effects, projectiles
     - bugfixes
 
 GemRB v0.9.5 (2026-03-23):
