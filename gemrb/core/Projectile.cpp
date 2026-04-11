@@ -1055,14 +1055,12 @@ void Projectile::LineTarget(Path::const_iterator beg, Path::const_iterator end)
 
 		const Point s = first->point;
 		const Point d = last->point;
-		const std::vector<Actor*>& actors = area->GetAllActors();
+		Region bbox = Region::RegionFromPoints(s, d);
+		const std::vector<Actor*>& actors = area->GetActorsInRect(bbox, targetFlags);
 
 		for (Actor* target : actors) {
 			ieDword targetID = target->GetGlobalID();
 			if (targetID == Caster) {
-				continue;
-			}
-			if (!target->ValidTarget(targetFlags)) {
 				continue;
 			}
 			if (HasBeenHitRecently(targetID, time)) continue;
