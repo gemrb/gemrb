@@ -8,7 +8,7 @@ from GUIDefines import *
 from ie_stats import *
 import CharGenCommon
 import GUICommon
-
+from GUIPortraitCommon import *
 
 AppearanceWindow = 0
 CustomWindow = 0
@@ -18,10 +18,7 @@ LastPortrait = 0
 Gender = 0
 
 def SetPicture ():
-	global PortraitsTable, LastPortrait
-
-	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"G"
-	PortraitButton.SetPicture (PortraitName)
+	portrait_set_picture(PortraitButton, PortraitsTable, LastPortrait)
 	return
 
 def OnLoad():
@@ -29,7 +26,7 @@ def OnLoad():
 	global Gender
 
 	AppearanceWindow = GemRB.LoadWindow (11, "GUICG")
-	
+
 	#Load the Gender
 	MyChar = GemRB.GetVar ("Slot")
 	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
@@ -65,8 +62,8 @@ def OnLoad():
 	BackButton.OnPress (lambda: CharGenCommon.back(AppearanceWindow))
 	CustomButton.OnPress (CustomPress)
 	DoneButton.OnPress (NextPress)
-	
-	flag = False 
+
+	flag = False
 	while True:
 		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
 			SetPicture ()
@@ -84,133 +81,49 @@ def OnLoad():
 
 def RightPress():
 	global LastPortrait
-	while True:
-		LastPortrait = LastPortrait + 1
-		if LastPortrait >= PortraitsTable.GetRowCount ():
-			LastPortrait = 0
-		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
-			SetPicture ()
-			return
+	LastPortrait = portrait_next(PortraitsTable, LastPortrait, Gender)
+	SetPicture()
 
 def LeftPress():
 	global LastPortrait
-	while True:
-		LastPortrait = LastPortrait - 1
-		if LastPortrait < 0:
-			LastPortrait = PortraitsTable.GetRowCount ()-1
-		if PortraitsTable.GetValue (LastPortrait, 0) == Gender:
-			SetPicture ()
-			return
+	LastPortrait = portrait_prev(PortraitsTable, LastPortrait, Gender)
+	SetPicture()
 
 def CustomDone():
 	global AppearanceWindow
-
-	Window = CustomWindow
-	Portrait = PortraitList1.QueryText ()
-	GemRB.SetToken ("LargePortrait", Portrait)
-	Portrait = PortraitList2.QueryText ()
-	GemRB.SetToken ("SmallPortrait", Portrait)
-	if Window:
-		Window.Close ()
-	CharGenCommon.next()
+	portrait_custom_done(CustomWindow, AppearanceWindow, PortraitList1, PortraitList2)
 	return
 
 def CustomAbort():
-	global CustomWindow
-
-	if CustomWindow:
-		CustomWindow.Close ()
-	AppearanceWindow.ShowModal (MODAL_SHADOW_GRAY) # narrower than CustomWindow, so borders will remain
+	portrait_custom_abort(CustomWindow)
 	return
 
 def LargeCustomPortrait():
-	Window = CustomWindow
-
-	Portrait = PortraitList1.QueryText ()
-	#small hack
-	if GemRB.GetVar ("Row1") == RowCount1:
-		return
-
-	Label = Window.GetControl (0x10000007)
-	Label.SetText (Portrait)
-
-	Button = Window.GetControl (6)
-	if Portrait=="":
-		Portrait = "NOPORTLG"
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	else:
-		if PortraitList2.QueryText ()!="":
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-
-	Button = Window.GetControl (0)
-	Button.SetPicture (Portrait, "NOPORTLG")
-	return
+    portrait_common_large_custom(
+        CustomWindow,
+        PortraitList1,
+        PortraitList2,
+        RowCount1,
+        "NOPORTLG"
+    )
 
 def SmallCustomPortrait():
-	Window = CustomWindow
-
-	Portrait = PortraitList2.QueryText ()
-	#small hack
-	if GemRB.GetVar ("Row2") == RowCount2:
-		return
-
-	Label = Window.GetControl (0x10000008)
-	Label.SetText (Portrait)
-
-	Button = Window.GetControl (6)
-	if Portrait=="":
-		Portrait = "NOPORTSM"
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	else:
-		if PortraitList1.QueryText ()!="":
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-
-	Button = Window.GetControl (1)
-	Button.SetPicture (Portrait, "NOPORTSM")
-	return
+    portrait_common_small_custom(
+        CustomWindow,
+        PortraitList1,
+        PortraitList2,
+        RowCount2
+    )
 
 def CustomPress():
-	global PortraitList1, PortraitList2
-	global RowCount1, RowCount2
-	global CustomWindow
-
-	CustomWindow = Window = GemRB.LoadWindow (18, "GUICG")
-	PortraitList1 = Window.GetControl (2)
-	RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 1))
-
-	PortraitList2 = Window.GetControl (4)
-	RowCount2 = len(PortraitList2.ListResources (CHR_PORTRAITS, 0))
-	PortraitList2.OnSelect (SmallCustomPortrait)
-	PortraitList2.SetVarAssoc ("Row2",RowCount2)
-	PortraitList1.OnSelect (LargeCustomPortrait)
-	PortraitList1.SetVarAssoc ("Row1", RowCount1)
-
-	Button = Window.GetControl (6)
-	Button.SetText (11973)
-	Button.OnPress (CustomDone)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
-
-	Button = Window.GetControl (7)
-	Button.SetText (15416)
-	Button.OnPress (CustomAbort)
-
-	Button = Window.GetControl (0)
-	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"L"
-	Button.SetPicture (PortraitName, "NOPORTLG")
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
-
-	Button = Window.GetControl (1)
-	PortraitName = PortraitsTable.GetRowName (LastPortrait)+"S"
-	Button.SetPicture (PortraitName, "NOPORTSM")
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
-
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
+    portrait_custom_press(
+        PortraitsTable,
+        LastPortrait,
+        LargeCustomPortrait,
+        SmallCustomPortrait,
+        CustomDone,
+        CustomAbort
+    )
 
 def NextPress():
-	AppearanceWindow.Close()
-	PortraitTable = GemRB.LoadTable ("pictures")
-	PortraitName = PortraitTable.GetRowName (LastPortrait )
-	GemRB.SetToken ("SmallPortrait", PortraitName+"S")
-	GemRB.SetToken ("LargePortrait", PortraitName+"L")
-	CharGenCommon.next()
+	portrait_apply_selection(AppearanceWindow, LastPortrait)
