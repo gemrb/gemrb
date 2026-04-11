@@ -10,3 +10,5 @@ CHAOTIC_NEUTRAL 4188       33949      0          0x32       C_N       0x9
 LAWFUL_EVIL     1406       33950      0          0x13       L_E       0x12
 NEUTRAL_EVIL    4186       33951      0          0x23       N_E       0x22
 CHAOTIC_EVIL    4189       33952      0          0x33       C_E       0x3
+
+// alignment strings, stat value, reference column (for use in other tables) and usability mask
