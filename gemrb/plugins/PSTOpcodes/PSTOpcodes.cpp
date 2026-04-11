@@ -715,11 +715,11 @@ static inline int DamageLastHitter(Effect* fx, Actor* target, int param1, int pa
 	if (actor && PersonalDistance(target, actor) < 30) {
 		const TriggerEntry* entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
 		if (entry) {
-			Effect* newFX = EffectQueue::CreateEffect(fx_damage_opcode_ref, param1, param2 << 16, FX_DURATION_INSTANT_PERMANENT);
+			auto newFX = EffectQueue::CreateEffect(fx_damage_opcode_ref, param1, param2 << 16, FX_DURATION_INSTANT_PERMANENT);
 			newFX->Target = FX_TARGET_PRESET;
 			newFX->Power = fx->Power;
 			newFX->Source = fx->Source;
-			core->ApplyEffect(newFX, actor, target);
+			core->ApplyEffect(std::move(newFX), actor, target);
 			if (fx->Parameter3 != 0xffffffff) {
 				fx->Parameter3--;
 			}
@@ -751,7 +751,7 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 	int terminate = FX_APPLIED;
 	bool playonce = false;
 	ieDword tint = 0;
-	Effect* newfx;
+	std::unique_ptr<Effect> newfx;
 	ieDword tmp;
 
 	//special effects based on fx_param2
@@ -809,14 +809,14 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 					newfx->Duration = 0xffff; // just something big to mimic permanence
 					newfx->Resistance = FX_NO_RESIST_CAN_DISPEL;
 					newfx->Parameter3 = 8 + fx->CasterLevel;
-					core->ApplyEffect(newfx, target, Owner);
+					core->ApplyEffect(std::move(newfx), target, Owner);
 				}
 				break;
 			case 8: //antimagic shell
 				{
 					newfx = EffectQueue::CreateEffectCopy(fx, fx_dispel_ref, 100, 0);
 					newfx->Power = 10;
-					core->ApplyEffect(newfx, target, Owner);
+					core->ApplyEffect(std::move(newfx), target, Owner);
 
 					for (int i = 0; i < 2; i++) {
 						target->ApplyEffectCopy(fx, fx_miscast_ref, Owner, 100, i);
@@ -841,7 +841,7 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 				newfx = EffectQueue::CreateEffectCopy(fx, fx_colorchange_ref, 0x64FA00, 0x50005);
 				newfx->IsVariable = 0x23; // delay for 35 ticks
 				newfx->TimingMode = FX_DURATION_DELAY_LIMITED;
-				core->ApplyEffect(newfx, target, Owner);
+				core->ApplyEffect(std::move(newfx), target, Owner);
 
 				target->ApplyEffectCopy(fx, fx_resistfire_ref, Owner, 50, 1);
 				target->ApplyEffectCopy(fx, fx_resistmfire_ref, Owner, 50, 1);
@@ -1095,10 +1095,10 @@ int fx_prayer(Scriptable* Owner, Actor* target, Effect* fx)
 		//lets assume it is never resisted
 		//the effect will be destructed by ApplyEffect (not anymore)
 		//the effect is copied to a new memory area
-		Effect* newfx = EffectQueue::CreateEffect(type ? fx_curse_ref : fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
+		auto newfx = EffectQueue::CreateEffect(type ? fx_curse_ref : fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
 		newfx->Source = fx->Source;
 		newfx->Duration = 60;
-		core->ApplyEffect(newfx, tar, Owner);
+		core->ApplyEffect(std::move(newfx), tar, Owner);
 	}
 	return FX_APPLIED;
 }
@@ -1188,12 +1188,12 @@ int fx_detect_evil(Scriptable* Owner, Actor* target, Effect* fx)
 		ieDword color = fx->Parameter1;
 		//default is magenta (rgba)
 		if (!color) color = 0xff00ff00;
-		Effect* newfx = EffectQueue::CreateEffect(fx_single_color_pulse_ref, color, speed << 16, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
+		auto newfx = EffectQueue::CreateEffect(fx_single_color_pulse_ref, color, speed << 16, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
 		newfx->Target = FX_TARGET_PRESET;
 
 		EffectQueue fxqueue;
 		fxqueue.SetOwner(Owner);
-		fxqueue.AddEffect(newfx);
+		fxqueue.AddEffect(std::move(newfx));
 
 		//don't detect self? if yes, then use NULL as last parameter
 		fxqueue.AffectAllInRange(target->GetCurrentArea(), target->Pos, (type & 0xff000000) >> 24, (type & 0xff0000) >> 16, (type & 0xff) * 10, target);

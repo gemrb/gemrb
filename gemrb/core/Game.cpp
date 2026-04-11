@@ -1957,10 +1957,10 @@ bool Game::RestParty(RestChecks checks, int dream, int hp)
 	for (int idx = 0; idx < ps; idx++) {
 		Actor* tar = GetPC(idx, true);
 		if (!tar) continue;
-		Effect* fx = EffectQueue::CreateEffect(fx_protection_from_display_string_ref, 14022, 0, FX_DURATION_INSTANT_LIMITED);
+		auto fx = EffectQueue::CreateEffect(fx_protection_from_display_string_ref, 14022, 0, FX_DURATION_INSTANT_LIMITED);
 		if (!fx) continue;
 		fx->Duration = core->Time.round_size + GameTime;
-		tar->fxqueue.AddEffect(fx);
+		tar->fxqueue.AddEffect(std::move(fx));
 	}
 
 	//movie, cutscene, and still frame dreams

@@ -233,7 +233,7 @@ public:
 	Projectile* GetProjectile(Scriptable* self, int header, const Point& target, ieDwordSigned invslot, int miss) const;
 	//Builds an equipping glow effect from gradient colour
 	//this stuff is not item specific, could be moved elsewhere
-	Effect* BuildGlowEffect(int gradient) const;
+	std::unique_ptr<Effect> BuildGlowEffect(int gradient) const;
 	//returns the average damage of the weapon (doesn't check for special effects)
 	int GetDamagePotential(bool ranged, const ITMExtHeader*& header) const;
 	//returns the weapon header

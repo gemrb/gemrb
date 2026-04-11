@@ -25,7 +25,7 @@ public:
 
 private:
 	void GetExtHeader(const Spell* s, SPLExtHeader* eh);
-	Effect* GetFeature(const Spell* s);
+	std::unique_ptr<Effect> GetFeature(const Spell* s);
 };
 
 

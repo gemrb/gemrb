@@ -1034,9 +1034,9 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 				lastActor = area->GetActor(gameMousePos, GA_DEFAULT);
 			}
 			if (lastActor) {
-				Effect* fx = EffectQueue::CreateEffect(heal_ref, lastActor->GetStat(IE_MAXHITPOINTS), 0x30001, FX_DURATION_INSTANT_PERMANENT);
+				auto fx = EffectQueue::CreateEffect(heal_ref, lastActor->GetStat(IE_MAXHITPOINTS), 0x30001, FX_DURATION_INSTANT_PERMANENT);
 				if (fx) {
-					core->ApplyEffect(fx, lastActor, lastActor);
+					core->ApplyEffect(std::move(fx), lastActor, lastActor);
 				}
 			}
 			break;
@@ -1074,8 +1074,8 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 			while (i--) {
 				Actor* victim = area->GetActor(i, false);
 				if (victim->Modified[IE_EA] == EA_ENEMY) {
-					Effect* newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC << 16, FX_DURATION_INSTANT_PERMANENT);
-					core->ApplyEffect(newfx, victim, victim);
+					auto newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC << 16, FX_DURATION_INSTANT_PERMANENT);
+					core->ApplyEffect(std::move(newfx), victim, victim);
 				}
 			}
 			// fallthrough
@@ -1085,14 +1085,13 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 				// correctly (synchronisation)
 				lastActor->Stop();
 
-				Effect* newfx;
-				newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC << 16, FX_DURATION_INSTANT_PERMANENT);
-				core->ApplyEffect(newfx, lastActor, lastActor);
+				auto newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC << 16, FX_DURATION_INSTANT_PERMANENT);
+				core->ApplyEffect(std::move(newfx), lastActor, lastActor);
 				if (!(lastActor->GetInternalFlag() & IF_REALLYDIED)) {
 					newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_ACID << 16, FX_DURATION_INSTANT_PERMANENT);
-					core->ApplyEffect(newfx, lastActor, lastActor);
+					core->ApplyEffect(std::move(newfx), lastActor, lastActor);
 					newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_CRUSHING << 16, FX_DURATION_INSTANT_PERMANENT);
-					core->ApplyEffect(newfx, lastActor, lastActor);
+					core->ApplyEffect(std::move(newfx), lastActor, lastActor);
 				}
 			} else if (!overMe) {
 				break;

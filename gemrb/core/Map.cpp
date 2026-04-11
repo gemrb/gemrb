@@ -781,10 +781,10 @@ void Map::UpdateScripts()
 			actor->UpdatePosCounter(lastPos == actor->Pos);
 			if (actor->Timers.lastPosTicks > 10 && core->InCutSceneMode() && !actor->ValidTarget(GA_CAN_BUMP)) {
 				static EffectRef npcBumpRef = { "NPCBump", -1 };
-				Effect* fx = EffectQueue::CreateEffect(npcBumpRef, 1, 0, FX_DURATION_INSTANT_LIMITED);
+				auto fx = EffectQueue::CreateEffect(npcBumpRef, 1, 0, FX_DURATION_INSTANT_LIMITED);
 				if (fx) {
 					fx->Duration = core->Time.round_sec;
-					core->ApplyEffect(fx, actor, actor);
+					core->ApplyEffect(std::move(fx), actor, actor);
 				}
 			}
 		} else {

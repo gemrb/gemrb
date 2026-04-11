@@ -28,9 +28,9 @@ class GEM_EXPORT EffectMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 
-	virtual Effect* GetEffect() = 0;
-	virtual Effect* GetEffectV1() = 0;
-	virtual Effect* GetEffectV20() = 0;
+	virtual std::unique_ptr<Effect> GetEffect() = 0;
+	virtual std::unique_ptr<Effect> GetEffectV1() = 0;
+	virtual std::unique_ptr<Effect> GetEffectV20() = 0;
 	/** Fills the stream with Effect v2 data loaded from the effect*/
 	virtual void PutEffectV2(DataStream* stream, const Effect* fx) = 0;
 };

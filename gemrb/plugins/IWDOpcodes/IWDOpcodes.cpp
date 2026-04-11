@@ -380,14 +380,14 @@ static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effe
 		if (target == victim) continue;
 
 		if (PersonalDistance(target, victim) < 20) {
-			Effect* newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damagetype << 16, FX_DURATION_INSTANT_PERMANENT);
+			auto newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damagetype << 16, FX_DURATION_INSTANT_PERMANENT);
 			newfx->Target = FX_TARGET_PRESET;
 			newfx->Power = fx->Power;
 			newfx->DiceThrown = fx->DiceThrown;
 			newfx->DiceSides = fx->DiceSides;
 			newfx->Resource = fx->Resource;
 			newfx->SourceRef = fx->SourceRef;
-			core->ApplyEffect(newfx, victim, Owner);
+			core->ApplyEffect(std::move(newfx), victim, Owner);
 		}
 	}
 }
@@ -595,8 +595,8 @@ static int fx_iwd_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx
 	core->GetResRefFrom2DA(iwd_monster_2da[fx->Parameter2], monster, hit, areahit);
 
 	//the monster should appear near the effect position
-	Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
+	auto newfx = EffectQueue::CreateUnsummonEffect(fx);
+	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, std::move(newfx));
 	return FX_NOT_APPLIED;
 }
 
@@ -659,8 +659,8 @@ static int fx_animate_dead(Scriptable* Owner, Actor* target, Effect* fx)
 	core->GetResRefFrom2DA(animate_dead_2da[fx->Parameter2], monster, hit, areahit);
 
 	//the monster should appear near the effect position
-	Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
+	auto newfx = EffectQueue::CreateUnsummonEffect(fx);
+	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, std::move(newfx));
 	return FX_NOT_APPLIED;
 }
 //f4 Prayer
@@ -716,8 +716,8 @@ static int fx_summon_monster2(Scriptable* Owner, Actor* target, Effect* fx)
 	core->GetResRefFrom2DA(summon_monster_2da[fx->Parameter2], monster, hit, areahit);
 
 	//the monster should appear near the effect position
-	Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
+	auto newfx = EffectQueue::CreateUnsummonEffect(fx);
+	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, std::move(newfx));
 	return FX_NOT_APPLIED;
 }
 
@@ -794,8 +794,8 @@ static int fx_summon_shadow_monster(Scriptable* Owner, Actor* target, Effect* fx
 	core->GetResRefFrom2DA(summon_shadow_monster_2da[fx->Parameter2], monster, hit, areahit);
 
 	//the monster should appear near the effect position
-	Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
+	auto newfx = EffectQueue::CreateUnsummonEffect(fx);
+	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, std::move(newfx));
 	return FX_NOT_APPLIED;
 }
 //0xf9 Recitation
@@ -953,13 +953,13 @@ static int fx_salamander_aura(Scriptable* Owner, Actor* target, Effect* fx)
 		if (victim->GetSafeStat(mystat) >= 100) continue;
 
 		//apply the damage opcode
-		Effect* newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damage << 16, FX_DURATION_INSTANT_PERMANENT);
+		auto newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damage << 16, FX_DURATION_INSTANT_PERMANENT);
 		newfx->Target = FX_TARGET_PRESET;
 		newfx->Power = fx->Power;
 		newfx->DiceThrown = fx->DiceThrown;
 		newfx->DiceSides = fx->DiceSides;
 		newfx->Resource = fx->Resource;
-		core->ApplyEffect(newfx, victim, Owner);
+		core->ApplyEffect(std::move(newfx), victim, Owner);
 	}
 
 	return FX_APPLIED;
@@ -1004,20 +1004,20 @@ static int fx_umberhulk_gaze(Scriptable* Owner, Actor* target, Effect* fx)
 		}
 
 		// build effects to apply
-		Effect* newfx1 = EffectQueue::CreateEffectCopy(fx, fx_confusion_ref, 0, 0);
+		auto newfx1 = EffectQueue::CreateEffectCopy(fx, fx_confusion_ref, 0, 0);
 		newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
 		newfx1->Duration = fx->Parameter1;
 
-		Effect* newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell2_ref, 0, 0);
+		auto newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell2_ref, 0, 0);
 		newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
 		newfx2->Duration = fx->Parameter1;
 		newfx2->Resource = fx->SourceRef;
 
 		//apply a confusion opcode on target (0x80)
-		core->ApplyEffect(newfx1, victim, Owner);
+		core->ApplyEffect(std::move(newfx1), victim, Owner);
 
 		//apply a resource resistance against this spell to block flood
-		core->ApplyEffect(newfx2, victim, Owner);
+		core->ApplyEffect(std::move(newfx2), victim, Owner);
 	}
 
 	return FX_APPLIED;
@@ -1062,20 +1062,20 @@ static int fx_zombielord_aura(Scriptable* Owner, Actor* target, Effect* fx)
 		}
 
 		// build effects to apply
-		Effect* newfx1 = EffectQueue::CreateEffectCopy(fx, fx_fear_ref, 0, 0);
+		auto newfx1 = EffectQueue::CreateEffectCopy(fx, fx_fear_ref, 0, 0);
 		newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
 		newfx1->Duration = fx->Parameter1;
 
-		Effect* newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell2_ref, 0, 0);
+		auto newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell2_ref, 0, 0);
 		newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
 		newfx2->Duration = fx->Parameter1;
 		newfx2->Resource = fx->SourceRef;
 
 		//apply a panic opcode on target (0x18)
-		core->ApplyEffect(newfx1, victim, Owner);
+		core->ApplyEffect(std::move(newfx1), victim, Owner);
 
 		//apply a resource resistance against this spell to block flood
-		core->ApplyEffect(newfx2, victim, Owner);
+		core->ApplyEffect(std::move(newfx2), victim, Owner);
 	}
 
 	return FX_APPLIED;
@@ -1113,8 +1113,8 @@ static int fx_summon_creature2(Scriptable* Owner, Actor* target, Effect* fx)
 		} else if (fx->Target == FX_TARGET_PRESET) {
 			pos = fx->Pos;
 		}
-		Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
-		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, pos, eamod, 0, newfx);
+		auto newfx = EffectQueue::CreateUnsummonEffect(fx);
+		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, pos, eamod, 0, std::move(newfx));
 	}
 	return FX_NOT_APPLIED;
 }
@@ -1284,9 +1284,9 @@ static int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 		if (target == victim) continue;
 		if (PersonalDistance(target, victim) < 20) {
 			// how style (probably better would be to provide effcof.spl)
-			Effect* newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0, 8, FX_DURATION_INSTANT_PERMANENT);
+			auto newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0, 8, FX_DURATION_INSTANT_PERMANENT);
 			newfx->Power = fx->Power;
-			core->ApplyEffect(newfx, target, Owner);
+			core->ApplyEffect(std::move(newfx), target, Owner);
 		}
 	}
 
@@ -1433,23 +1433,23 @@ static int fx_soul_eater(Scriptable* Owner, Actor* target, Effect* fx)
 
 		core->GetResRefFrom2DA(ResRef("souleatr"), monster, hit, areahit);
 		//the monster should appear near the effect position
-		Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
-		core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
+		auto newfx = EffectQueue::CreateUnsummonEffect(fx);
+		core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, std::move(newfx));
 
 		// for each kill the caster receives a +1 bonus to Str, Dex and Con for 1 turn
 		Actor* actor = Scriptable::As<Actor>(Owner);
 		if (actor) {
 			newfx = EffectQueue::CreateEffect(fx_str_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
-			core->ApplyEffect(newfx, actor, Owner);
+			core->ApplyEffect(std::move(newfx), actor, Owner);
 
 			newfx = EffectQueue::CreateEffect(fx_dex_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
-			core->ApplyEffect(newfx, actor, Owner);
+			core->ApplyEffect(std::move(newfx), actor, Owner);
 
 			newfx = EffectQueue::CreateEffect(fx_con_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
-			core->ApplyEffect(newfx, actor, Owner);
+			core->ApplyEffect(std::move(newfx), actor, Owner);
 		}
 	}
 	return FX_NOT_APPLIED;
@@ -1827,17 +1827,17 @@ static int fx_mace_of_disruption(Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Effect* newfx = EffectQueue::CreateEffect(fx_iwd_visual_spell_hit_ref, 0,
-						  8, FX_DURATION_INSTANT_PERMANENT);
+	auto newfx = EffectQueue::CreateEffect(fx_iwd_visual_spell_hit_ref, 0,
+					       8, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Target = FX_TARGET_PRESET;
 	newfx->Power = fx->Power;
-	core->ApplyEffect(newfx, target, Owner);
+	core->ApplyEffect(std::move(newfx), target, Owner);
 
 	newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
 					  8, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Target = FX_TARGET_PRESET;
 	newfx->Power = fx->Power;
-	core->ApplyEffect(newfx, target, Owner);
+	core->ApplyEffect(std::move(newfx), target, Owner);
 
 	return FX_NOT_APPLIED;
 }
@@ -1880,7 +1880,7 @@ static int fx_rod_of_smithing(Scriptable* Owner, Actor* target, Effect* fx)
 		}
 	}
 	if (damage) {
-		Effect* newfx;
+		std::unique_ptr<Effect> newfx;
 		if (damage < 0) {
 			//create death effect (chunked death)
 			newfx = EffectQueue::CreateEffect(fx_death_ref, 0, 8, FX_DURATION_INSTANT_PERMANENT);
@@ -1889,7 +1889,7 @@ static int fx_rod_of_smithing(Scriptable* Owner, Actor* target, Effect* fx)
 			newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, (ieDword) damage,
 							  0, FX_DURATION_INSTANT_PERMANENT);
 		}
-		core->ApplyEffect(newfx, target, Owner);
+		core->ApplyEffect(std::move(newfx), target, Owner);
 	}
 
 	return FX_NOT_APPLIED;
@@ -2125,10 +2125,10 @@ static int fx_nausea(Scriptable* Owner, Actor* target, Effect* fx)
 	//FIXME: i'm not sure if this part is there
 	//create the sleep effect only once?
 	if (!fx->Parameter3 && Owner) {
-		Effect* newfx = EffectQueue::CreateEffect(fx_unconscious_state_ref,
-							  fx->Parameter1, 1, fx->TimingMode);
+		auto newfx = EffectQueue::CreateEffect(fx_unconscious_state_ref,
+						       fx->Parameter1, 1, fx->TimingMode);
 		newfx->Power = fx->Power;
-		core->ApplyEffect(newfx, target, Owner);
+		core->ApplyEffect(std::move(newfx), target, Owner);
 
 		fx->Parameter3 = 1;
 	}
@@ -2166,12 +2166,12 @@ static int fx_fireshield(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// create a general CastSpellOnCondition effect (bg2) for the payload
 	// much nicer than iwd's ApplyDamageNearby
 	if (fx->FirstApply) {
-		Effect* fx2 = EffectQueue::CreateEffect(fx_cast_spell_on_condition_ref, 1, COND_GOTHIT, FX_DURATION_ABSOLUTE);
+		auto fx2 = EffectQueue::CreateEffect(fx_cast_spell_on_condition_ref, 1, COND_GOTHIT, FX_DURATION_ABSOLUTE);
 		assert(fx2);
 		fx2->Duration = fx->Duration;
 		fx2->Source = fx->Source;
 		fx2->Resource = fx->Resource;
-		core->ApplyEffect(fx2, target, target);
+		core->ApplyEffect(std::move(fx2), target, target);
 	}
 	return FX_APPLIED;
 }
@@ -2221,16 +2221,16 @@ static int fx_righteous_wrath(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //410 SummonAllyIWD2
 static int fx_summon_ally(Scriptable* Owner, Actor* target, Effect* fx)
 {
-	Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, EAM_ALLY, 0, newfx);
+	auto newfx = EffectQueue::CreateUnsummonEffect(fx);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, EAM_ALLY, 0, std::move(newfx));
 	return FX_NOT_APPLIED;
 }
 
 //411 SummonEnemyIWD2
 static int fx_summon_enemy(Scriptable* Owner, Actor* target, Effect* fx)
 {
-	Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, EAM_ENEMY, 0, newfx);
+	auto newfx = EffectQueue::CreateUnsummonEffect(fx);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, EAM_ENEMY, 0, std::move(newfx));
 	return FX_NOT_APPLIED;
 }
 

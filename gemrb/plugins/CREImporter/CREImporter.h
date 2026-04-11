@@ -74,7 +74,7 @@ private:
 	void ReadInventory(Actor*, size_t);
 	void ReadSpellbook(Actor* act);
 	void ReadEffects(Actor* actor);
-	Effect* GetEffect();
+	std::unique_ptr<Effect> GetEffect();
 	void ReadScript(Actor* actor, int ScriptLevel);
 	void ReadDialog(Actor* actor);
 	CREKnownSpell* GetKnownSpell();

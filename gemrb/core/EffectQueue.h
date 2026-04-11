@@ -18,6 +18,7 @@
 
 #include <cstdlib>
 #include <list>
+#include <memory>
 
 namespace GemRB {
 
@@ -213,10 +214,10 @@ public:
 	Scriptable* GetOwner() const { return Owner; }
 
 	/** adds an effect to the queue, */
-	void AddEffect(Effect* fx, bool insert = false);
+	void AddEffect(std::unique_ptr<Effect> fx, bool insert = false);
 	/** Adds an Effect to the queue, subject to level and other checks.
 	 * Returns FX_ABORT if unsuccessful. */
-	int AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const Point& dest) const;
+	int AddEffect(std::unique_ptr<Effect> fx, Scriptable* self, Actor* pretarget, const Point& dest) const;
 	/** Removes first Effect matching fx from the queue.
 	 * Effects are matched based on their contents */
 	bool RemoveEffect(const Effect* fx);
@@ -280,9 +281,9 @@ public:
 	unsigned int GetEffectOrder(EffectRef& effectReference, const Effect* fx2) const;
 	/* this method hacks the offhand weapon color effects */
 	static void HackColorEffects(const Actor* Owner, Effect* fx);
-	static Effect* CreateEffect(EffectRef& effectReference, ieDword param1, ieDword param2, ieWord timing);
-	static Effect* CreateEffectCopy(const Effect* oldfx, EffectRef& effectReference, ieDword param1, ieDword param2);
-	static Effect* CreateUnsummonEffect(const Effect* fx);
+	static std::unique_ptr<Effect> CreateEffect(EffectRef& effectReference, ieDword param1, ieDword param2, ieWord timing);
+	static std::unique_ptr<Effect> CreateEffectCopy(const Effect* oldfx, EffectRef& effectReference, ieDword param1, ieDword param2);
+	static std::unique_ptr<Effect> CreateUnsummonEffect(const Effect* fx);
 	//locating opcodes
 	Effect* HasEffect(EffectRef& effectReference);
 	const Effect* HasEffect(EffectRef& effectReference) const;
@@ -328,8 +329,8 @@ private:
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const ResRef& = ResRef(), const ResRef& = ResRef()) const;
 	void ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y);
 	//use the effect reference style calls from outside
-	static Effect* CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing);
-	static Effect* CreateEffectCopy(const Effect* oldfx, ieDword opcode, ieDword param1, ieDword param2);
+	static std::unique_ptr<Effect> CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing);
+	static std::unique_ptr<Effect> CreateEffectCopy(const Effect* oldfx, ieDword opcode, ieDword param1, ieDword param2);
 	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current);
 	void RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword param2, const ResRef& resource);
 	Effect* HasOpcode(ieDword opcode);

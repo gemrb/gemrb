@@ -4100,8 +4100,8 @@ void Actor::GetHit(int damage, bool killingBlow)
 		if (Modified[IE_EXTSTATE_ID] & (EXTSTATE_NO_WAKEUP | EXTSTATE_DOESNT_AWAKEN_ON_DAMAGE) || HasSpellState(SS_NOAWAKE)) {
 			return;
 		}
-		Effect* fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
-		fxqueue.AddEffect(fx);
+		auto fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+		fxqueue.AddEffect(std::move(fx));
 	}
 	if (CheckSpellDisruption(damage)) {
 		InterruptCasting = true;
@@ -4200,10 +4200,10 @@ void Actor::CheckCleave()
 		cleave = 0;
 	}
 	if (cleave) {
-		Effect* fx = EffectQueue::CreateEffect(fx_cleave_ref, attackcount + 1, 0, FX_DURATION_INSTANT_LIMITED);
+		auto fx = EffectQueue::CreateEffect(fx_cleave_ref, attackcount + 1, 0, FX_DURATION_INSTANT_LIMITED);
 		if (fx) {
 			fx->Duration = core->Time.round_sec;
-			core->ApplyEffect(fx, this, this);
+			core->ApplyEffect(std::move(fx), this, this);
 		}
 	}
 }
@@ -4239,10 +4239,10 @@ static void ChunkActor(Actor* actor)
 
 		// make it expire
 		copy->SetInternalFlag(IF_REALLYDIED, BitOp::OR);
-		Effect* fx = EffectQueue::CreateEffect(fx_remove_creature_ref, 0, 0, FX_DURATION_DELAY_PERMANENT);
+		auto fx = EffectQueue::CreateEffect(fx_remove_creature_ref, 0, 0, FX_DURATION_DELAY_PERMANENT);
 		fx->Target = FX_TARGET_SELF;
 		fx->Duration = core->GetGame()->GameTime + core->Time.round_size / 2 + RAND(-30, 30);
-		copy->fxqueue.AddEffect(fx, true);
+		copy->fxqueue.AddEffect(std::move(fx), true);
 	}
 	for (uint8_t i = 0; i < MAX_SCRIPTS; ++i) {
 		actor->SetScript(ResRef {}, i, false);
@@ -4414,9 +4414,9 @@ int Actor::Damage(int damage, int damagetype, Scriptable* hitter, int modtype, i
 			if (sleep) {
 				sleep->Duration += below1hp * 15;
 			} else {
-				Effect* fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
+				auto fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
 				fx->Duration = 2 * core->Time.round_sec + below1hp * 15; // 2 rounds + 15s per hp below 1
-				core->ApplyEffect(fx, this, this);
+				core->ApplyEffect(std::move(fx), this, this);
 			}
 			//reduce damage to keep 1 hp
 			damage = Modified[IE_HITPOINTS] - 1;
@@ -5404,14 +5404,14 @@ void Actor::Turn(Scriptable* cleric, ieDword turnlevel)
 	//we get the modified level
 	if (turnlevel >= level + turnDeathLevelMod) {
 		if (evilcleric) {
-			Effect* fx = EffectQueue::CreateEffect(control_creature_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
+			auto fx = EffectQueue::CreateEffect(control_creature_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
 			if (!fx) {
 				fx = EffectQueue::CreateEffect(control_undead_ref, GEN_UNDEAD, 3, FX_DURATION_INSTANT_LIMITED);
 			}
 			if (fx) {
 				fx->Duration = core->Time.round_sec * 10;
 				fx->Target = FX_TARGET_PRESET;
-				core->ApplyEffect(fx, this, cleric);
+				core->ApplyEffect(std::move(fx), this, cleric);
 				return;
 			}
 			//fallthrough for bg1
@@ -5606,26 +5606,25 @@ void Actor::Die(Scriptable* killer, bool grantXP)
 	}
 
 	// remove poison, hold, casterhold, stun and its icon
-	Effect* newfx;
 	static EffectRef fx_cure_poisoned_state_ref = { "Cure:Poison", -1 };
-	newfx = EffectQueue::CreateEffect(fx_cure_poisoned_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, this, this);
+	auto newfx = EffectQueue::CreateEffect(fx_cure_poisoned_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(std::move(newfx), this, this);
 
 	static EffectRef fx_cure_hold_state_ref = { "Cure:Hold", -1 };
 	newfx = EffectQueue::CreateEffect(fx_cure_hold_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, this, this);
+	core->ApplyEffect(std::move(newfx), this, this);
 
 	static EffectRef fx_unpause_caster_ref = { "Cure:CasterHold", -1 };
 	newfx = EffectQueue::CreateEffect(fx_unpause_caster_ref, 0, 100, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, this, this);
+	core->ApplyEffect(std::move(newfx), this, this);
 
 	static EffectRef fx_cure_stun_state_ref = { "Cure:Stun", -1 };
 	newfx = EffectQueue::CreateEffect(fx_cure_stun_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, this, this);
+	core->ApplyEffect(std::move(newfx), this, this);
 
 	static EffectRef fx_remove_portrait_icon_ref = { "Icon:Remove", -1 };
 	newfx = EffectQueue::CreateEffect(fx_remove_portrait_icon_ref, 0, 37, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, this, this);
+	core->ApplyEffect(std::move(newfx), this, this);
 
 	// clearing the search map here means it's not blocked during death animations
 	// this is perhaps not ideal, but matches other searchmap code which uses
@@ -9597,12 +9596,12 @@ void Actor::ModifyWeaponDamage(const WeaponInfo& wi, Actor* target, int& damage,
 		} else if (CFGCache.preferSneakAttack) {
 			// Crippling Strike causes the victim to suffer a -1 to hit and damage rolls. The effect expires one turn later.
 			int malus = -int((level - 1) / 4);
-			Effect* fx = EffectQueue::CreateEffect(fx_to_hit_modifier_ref, malus, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
+			auto fx = EffectQueue::CreateEffect(fx_to_hit_modifier_ref, malus, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			fx->Duration = core->Time.turn_sec;
-			core->ApplyEffect(fx, target, this);
-			Effect* fx2 = EffectQueue::CreateEffect(fx_damage_bonus_modifier1_ref, malus, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
-			fx2->Duration = core->Time.turn_sec;
-			core->ApplyEffect(fx2, target, this);
+			core->ApplyEffect(std::move(fx), target, this);
+			fx = EffectQueue::CreateEffect(fx_damage_bonus_modifier1_ref, malus, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
+			fx->Duration = core->Time.turn_sec;
+			core->ApplyEffect(std::move(fx), target, this);
 		}
 	}
 
@@ -9825,7 +9824,7 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 	if (flags & UI_FAKE) {
 		delete pro;
 	} else if (header < 0 && !(flags & UI_MISS)) { // using a weapon
-		Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, ConvertDamageType(weaponTypeIdx) << 16, FX_DURATION_INSTANT_LIMITED);
+		auto AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, ConvertDamageType(weaponTypeIdx) << 16, FX_DURATION_INSTANT_LIMITED);
 		AttackEffect->Projectile = projectileAnim;
 		AttackEffect->Target = FX_TARGET_PRESET;
 		AttackEffect->Parameter3 = 1;
@@ -9838,7 +9837,7 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 		} else {
 			AttackEffect->IsVariable = flags & UI_CRITICAL;
 		}
-		pro->GetEffects().AddEffect(AttackEffect, true);
+		pro->GetEffects().AddEffect(std::move(AttackEffect), true);
 		if (ranged) {
 			fxqueue.AddWeaponEffects(&pro->GetEffects(), fx_ranged_ref);
 		} else {
@@ -10853,10 +10852,8 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, const Actor* op
 void Actor::CureInvisibility()
 {
 	if (Modified[IE_STATE_ID] & state_invisible) {
-		Effect* newfx;
-
-		newfx = EffectQueue::CreateEffect(fx_remove_invisible_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
-		core->ApplyEffect(newfx, this, this);
+		auto newfx = EffectQueue::CreateEffect(fx_remove_invisible_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+		core->ApplyEffect(std::move(newfx), this, this);
 
 		//not sure, but better than nothing
 		if (!(Modified[IE_STATE_ID] & state_invisible)) {
@@ -10886,9 +10883,8 @@ void Actor::CureSanctuary()
 	// clear the overlay immediately
 	pcf_sanctuary(this, Modified[IE_SANCTUARY], Modified[IE_SANCTUARY] & ~(1 << OV_SANCTUARY));
 
-	Effect* newfx;
-	newfx = EffectQueue::CreateEffect(fx_remove_sanctuary_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, this, this);
+	auto newfx = EffectQueue::CreateEffect(fx_remove_sanctuary_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(std::move(newfx), this, this);
 }
 
 void Actor::ResetState()
@@ -10967,10 +10963,9 @@ bool Actor::ModalSpellSkillCheck()
 
 inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 0, int targetDC = 0)
 {
-	Effect* newfx;
-	newfx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_LIMITED);
+	auto newfx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_LIMITED);
 	newfx->Duration = core->Time.round_sec; // 90 ticks, 1 round
-	core->ApplyEffect(newfx, actor, actor);
+	core->ApplyEffect(std::move(newfx), actor, actor);
 
 	if (!third) {
 		return;
@@ -11554,7 +11549,7 @@ bool Actor::ConcentrationCheck() const
 // shorthand wrapper for throw-away effects
 void Actor::ApplyEffectCopy(const Effect* oldfx, EffectRef& newref, Scriptable* Owner, ieDword param1, ieDword param2)
 {
-	Effect* newfx = EffectQueue::CreateEffectCopy(oldfx, newref, param1, param2);
+	auto newfx = EffectQueue::CreateEffectCopy(oldfx, newref, param1, param2);
 	if (newfx) {
 		newfx->ProbabilityRangeMin = 0;
 		newfx->ProbabilityRangeMax = 100;
@@ -11562,7 +11557,7 @@ void Actor::ApplyEffectCopy(const Effect* oldfx, EffectRef& newref, Scriptable* 
 		newfx->MaxAffectedLevel = 0;
 		newfx->SavingThrowType = 0;
 		newfx->Resistance = FX_NO_RESIST_CAN_DISPEL;
-		core->ApplyEffect(newfx, this, Owner);
+		core->ApplyEffect(std::move(newfx), this, Owner);
 	} else {
 		Log(ERROR, "Actor", "Failed to create effect copy for {}! Target: {}, Owner: {}", newref.Name, fmt::WideToChar { GetName() }, fmt::WideToChar { Owner->GetName() });
 	}

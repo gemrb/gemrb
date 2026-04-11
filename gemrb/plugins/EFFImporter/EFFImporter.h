@@ -23,9 +23,9 @@ public:
 	// We need this autoFree, since Effects are included inline
 	// in other file types, without a size header.
 	bool Open(DataStream* stream, bool autoFree = true) override;
-	Effect* GetEffect() override;
-	Effect* GetEffectV1() override;
-	Effect* GetEffectV20() override;
+	std::unique_ptr<Effect> GetEffect() override;
+	std::unique_ptr<Effect> GetEffectV1() override;
+	std::unique_ptr<Effect> GetEffectV20() override;
 	void PutEffectV2(DataStream* stream, const Effect* fx) override; // used in the area and cre importer
 };
 

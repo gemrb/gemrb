@@ -1371,11 +1371,11 @@ bool CreateMovementEffect(Actor* actor, const ResRef& area, const Point& positio
 		return true;
 	}
 
-	Effect* fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
+	auto fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
 	if (!fx) return false;
 	fx->SetPosition(position);
 	fx->Resource = area;
-	core->ApplyEffect(fx, actor, actor);
+	core->ApplyEffect(std::move(fx), actor, actor);
 	return true;
 }
 

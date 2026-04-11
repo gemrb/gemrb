@@ -81,11 +81,11 @@ EffectQueue Item::GetEffectBlock(Scriptable* self, const Point& pos, int usage, 
 			fx.Projectile = 0;
 			fx.Pos = pos;
 			if (target) {
-				selfqueue.AddEffect(new Effect(fx));
+				selfqueue.AddEffect(std::make_unique<Effect>(fx));
 			}
 		} else {
 			fx.Projectile = pro;
-			fxqueue.AddEffect(new Effect(fx));
+			fxqueue.AddEffect(std::make_unique<Effect>(fx));
 		}
 	}
 	if (target && selfqueue.GetEffectsCount()) {
@@ -95,11 +95,11 @@ EffectQueue Item::GetEffectBlock(Scriptable* self, const Point& pos, int usage, 
 	//adding a pulse effect for weapons (PST)
 	//if it is an equipping effect block
 	if (usage == -1 && WieldColor != 0xffff && Flags & IE_ITEM_PULSATING) {
-		Effect* tmp = BuildGlowEffect(WieldColor);
+		auto tmp = BuildGlowEffect(WieldColor);
 		if (tmp) {
 			tmp->InventorySlot = invslot;
 			tmp->Projectile = pro;
-			fxqueue.AddEffect(tmp);
+			fxqueue.AddEffect(std::move(tmp));
 		}
 	}
 	return fxqueue;
@@ -228,7 +228,7 @@ Projectile* Item::GetProjectile(Scriptable* self, int header, const Point& targe
 }
 
 //this is the implementation of the weapon glow effect in PST
-Effect* Item::BuildGlowEffect(int gradient) const
+std::unique_ptr<Effect> Item::BuildGlowEffect(int gradient) const
 {
 	static EffectRef glowRef = { "Color:PulseRGB", -1 };
 	//this type of colour uses PAL32, a PST specific palette
@@ -237,7 +237,7 @@ Effect* Item::BuildGlowEffect(int gradient) const
 	ieDword rgb = (pal32[16].r << 16) | (pal32[16].g << 8) | pal32[16].b;
 	ieDword location = 0;
 	ieDword speed = 128 << 16;
-	Effect* fx = EffectQueue::CreateEffect(glowRef, rgb, location | speed, FX_DURATION_INSTANT_WHILE_EQUIPPED);
+	auto fx = EffectQueue::CreateEffect(glowRef, rgb, location | speed, FX_DURATION_INSTANT_WHILE_EQUIPPED);
 	return fx;
 }
 

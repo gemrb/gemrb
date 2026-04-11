@@ -63,7 +63,7 @@ static ieDword FixSaveFlags(const Effect* fx, bool fix = true)
 	}
 }
 
-Effect* EFFImporter::GetEffect()
+std::unique_ptr<Effect> EFFImporter::GetEffect()
 {
 	if (version == 1) {
 		return GetEffectV1();
@@ -74,12 +74,12 @@ Effect* EFFImporter::GetEffect()
 	}
 }
 
-Effect* EFFImporter::GetEffectV1()
+std::unique_ptr<Effect> EFFImporter::GetEffectV1()
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
 
-	Effect* fx = new Effect;
+	auto fx = std::make_unique<Effect>();
 
 	str->ReadWord(tmpWord);
 	fx->Opcode = tmpWord;
@@ -102,22 +102,22 @@ Effect* EFFImporter::GetEffectV1()
 	str->ReadDword(fx->DiceThrown);
 	str->ReadDword(fx->DiceSides);
 	str->ReadDword(fx->SavingThrowType);
-	ieDword flags = FixSaveFlags(fx);
+	ieDword flags = FixSaveFlags(fx.get());
 	if (flags) fx->SavingThrowType = flags;
 	str->ReadDword(fx->SavingThrowBonus);
 	str->ReadWord(fx->IsVariable);
 	str->ReadWord(fx->IsSaveForHalfDamage);
-	fixAffectedLevels(fx);
+	fixAffectedLevels(fx.get());
 
 	fx->Pos.Invalidate();
 	fx->Source.Invalidate();
 	return fx;
 }
 
-Effect* EFFImporter::GetEffectV20()
+std::unique_ptr<Effect> EFFImporter::GetEffectV20()
 {
 	ieDword tmp;
-	Effect* fx = new Effect;
+	auto fx = std::make_unique<Effect>();
 
 	str->Seek(8, GEM_CURRENT_POS);
 	str->ReadDword(fx->Opcode);
@@ -134,7 +134,7 @@ Effect* EFFImporter::GetEffectV20()
 	str->ReadDword(fx->DiceThrown);
 	str->ReadDword(fx->DiceSides);
 	str->ReadDword(fx->SavingThrowType);
-	ieDword flags = FixSaveFlags(fx);
+	ieDword flags = FixSaveFlags(fx.get());
 	if (flags) fx->SavingThrowType = flags;
 	str->ReadDword(fx->SavingThrowBonus);
 	str->ReadWord(fx->IsVariable); //if this field was set to 1, this is a variable

@@ -1193,7 +1193,7 @@ void CREImporter::ReadEffects(Actor* act)
 	}
 }
 
-Effect* CREImporter::GetEffect()
+std::unique_ptr<Effect> CREImporter::GetEffect()
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 

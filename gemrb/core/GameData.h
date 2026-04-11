@@ -122,8 +122,8 @@ public:
 	void FreeItem(Item const* itm, const ResRef& name, bool free = false);
 	Spell* GetSpell(const ResRef& resname, bool silent = false);
 	void FreeSpell(const Spell* spl, const ResRef& name, bool free = false);
-	Effect* GetEffect(const ResRef& resname);
-	void FreeEffect(const Effect* eff, const ResRef& name, bool free = false);
+	// returns a fresh copy of a (cached) effect
+	std::unique_ptr<Effect> GetEffect(const ResRef& resname);
 
 	/** creates a vvc/bam animation object at point */
 	ScriptedAnimation* GetScriptedAnimation(const ResRef& resRef, bool doublehint);
@@ -209,7 +209,7 @@ private:
 private:
 	ResRefRCCache<Item> ItemCache;
 	ResRefRCCache<Spell> SpellCache;
-	ResRefRCCache<Effect> EffectCache;
+	ResRefMap<std::unique_ptr<Effect>> EffectCache;
 	ResRefMap<Holder<Palette>> PaletteCache;
 	Factory factory;
 	ResRefMap<AutoTable> tables;

@@ -11795,7 +11795,7 @@ static PyObject* GemRB_ApplyEffect(PyObject* /*self*/, PyObject* args)
 
 	work_ref.Name = opcodename;
 	work_ref.opcode = -1;
-	Effect* fx = EffectQueue::CreateEffect(work_ref, param1, param2, timing);
+	auto fx = EffectQueue::CreateEffect(work_ref, param1, param2, timing);
 	if (!fx) {
 		//invalid effect name didn't resolve to opcode
 		return RuntimeError("Invalid effect name!\n");
@@ -11809,7 +11809,7 @@ static PyObject* GemRB_ApplyEffect(PyObject* /*self*/, PyObject* args)
 	fx->Parameter3 = 1;
 
 	//fx is not freed by this function
-	core->ApplyEffect(fx, actor, actor);
+	core->ApplyEffect(std::move(fx), actor, actor);
 
 	Py_RETURN_NONE;
 }

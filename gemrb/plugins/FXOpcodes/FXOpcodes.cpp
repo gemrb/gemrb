@@ -1780,8 +1780,8 @@ int fx_set_invisible_state(Scriptable* Owner, Actor* target, Effect* fx)
 		case 1: // improved
 			// in the originals the improved invisibility spells included two opcodes
 			if (fx->FirstApply && core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
-				Effect* invisibility = EffectQueue::CreateEffectCopy(fx, fx_set_invisible_state_ref, 0, 0);
-				core->ApplyEffect(invisibility, target, Owner);
+				auto invisibility = EffectQueue::CreateEffectCopy(fx, fx_set_invisible_state_ref, 0, 0);
+				core->ApplyEffect(std::move(invisibility), target, Owner);
 			}
 			// changes to "weak invisibility" once detected, allowing weapon attacks, since the
 			// regular invisibility is gone, but not spell attacks
@@ -1995,7 +1995,7 @@ int fx_set_poisoned_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	Scriptable* caster = GetCasterObject();
-
+	std::unique_ptr<Effect> newfx;
 	switch (fx->Parameter2) {
 		case RPD_ROUNDS:
 			tmp = core->Time.round_sec;
@@ -2031,10 +2031,8 @@ int fx_set_poisoned_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//call the constitution effect like it was this one (don't add it to the effect queue)
 			//can't simply convert this effect to the constitution effect, because a poison effect
 			//could be removed and there is a portrait icon
-			Effect* newfx;
 			newfx = EffectQueue::CreateEffectCopy(fx, fx_constitution_modifier_ref, fx->Parameter1, 0);
-			target->fxqueue.ApplyEffect(target, newfx, fx->FirstApply, 0);
-			delete newfx;
+			target->fxqueue.ApplyEffect(target, newfx.get(), fx->FirstApply, 0);
 			damage = 0;
 			tmp = 1;
 			break;
@@ -2249,9 +2247,9 @@ int fx_set_unconscious_state(Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->FirstApply) {
 		target->ApplyEffectCopy(fx, fx_animation_stance_ref, Owner, 0, IE_ANI_SLEEP);
-		Effect* standUp = EffectQueue::CreateEffect(fx_animation_stance_ref, 0, IE_ANI_GET_UP, FX_DURATION_DELAY_LIMITED);
+		auto standUp = EffectQueue::CreateEffect(fx_animation_stance_ref, 0, IE_ANI_GET_UP, FX_DURATION_DELAY_LIMITED);
 		standUp->Duration = (fx->Duration - core->GetGame()->GameTime) / core->Time.defaultTicksPerSec;
-		core->ApplyEffect(standUp, target, target);
+		core->ApplyEffect(std::move(standUp), target, target);
 	}
 
 	if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
@@ -2923,8 +2921,8 @@ int fx_summon_creature(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//the monster should appear near the effect position
-	Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, eamod, 0, newfx);
+	auto newfx = EffectQueue::CreateUnsummonEffect(fx);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, eamod, 0, std::move(newfx));
 	return FX_NOT_APPLIED;
 }
 
@@ -4188,7 +4186,7 @@ int fx_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx)
 		hit = fx->Resource2;
 	}
 
-	Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
+	auto newfx = EffectQueue::CreateUnsummonEffect(fx);
 	//The hostile flag should cover these cases, all else is arbitrary
 	//0,1,2,3,4 - friendly to target
 	//5,6,7,8,9 - hostile to target
@@ -4205,7 +4203,7 @@ int fx_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx)
 	//don't use it
 	Scriptable* caster = GetCasterObject();
 	//the monster should appear near the effect position
-	core->SummonCreature(monster, hit, caster, target, fx->Pos, eamod, level, newfx);
+	core->SummonCreature(monster, hit, caster, target, fx->Pos, eamod, level, std::move(newfx));
 	return FX_NOT_APPLIED;
 }
 
@@ -5412,7 +5410,7 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 
 	//apply effect, if the effect is a goner, then kill
 	//this effect too
-	Effect* myfx = core->GetEffect(fx->Resource, -1, fx->Pos);
+	auto myfx = core->GetEffect(fx->Resource, -1, fx->Pos);
 	if (!myfx)
 		return FX_NOT_APPLIED;
 
@@ -5445,14 +5443,14 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 			// IESDP: The engine specially handles cases where effects are removed by opcode, ensuring it also matches the opcode in the EFF file of op177 instances.
 			//hack to entirely replace this effect with the applied effect, this is required for some generic effects
 			//that must be put directly in the effect queue to have any impact (to be counted by BonusAgainstCreature, etc)
-			target->fxqueue.AddEffect(myfx);
+			target->fxqueue.AddEffect(std::move(myfx));
 			return FX_NOT_APPLIED;
 		}
-		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !bypass);
+		ret = target->fxqueue.ApplyEffect(target, myfx.get(), fx->FirstApply, !bypass);
 	} else {
 		EffectQueue fxqueue;
 		fxqueue.SetOwner(Owner);
-		ret = fxqueue.ApplyEffect(nullptr, myfx, fx->FirstApply, !bypass);
+		ret = fxqueue.ApplyEffect(nullptr, myfx.get(), fx->FirstApply, !bypass);
 	}
 
 	// modify parent effect
@@ -5469,7 +5467,6 @@ int fx_apply_effect(Scriptable* Owner, Actor* target, Effect* fx)
 		fx->Parameter3 = 1;
 	}
 
-	delete myfx;
 	return ret;
 }
 
@@ -5649,8 +5646,8 @@ static Actor* GetFamiliar(Scriptable* Owner, const Actor* target, const Effect* 
 	game->AddNPC(fam);
 
 	//Add some essential effects
-	Effect* newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, fam->GetBase(IE_HITPOINTS) / 2, 0, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, fam, fam);
+	auto newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, fam->GetBase(IE_HITPOINTS) / 2, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(std::move(newfx), fam, fam);
 
 	//the familiar marker needs to be set to 2 in case of ToB
 	ieDword fm = 0;
@@ -5658,13 +5655,13 @@ static Actor* GetFamiliar(Scriptable* Owner, const Actor* target, const Effect* 
 		fm = 2;
 	}
 	newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, fm, 0, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, fam, fam);
+	core->ApplyEffect(std::move(newfx), fam, fam);
 
 	//maximum hp bonus of half the familiar's hp, there is no hp new bonus upgrade when upgrading familiar
 	//this is a bug even in the original engine, so I don't care
 	if (Owner) {
 		newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, fam->GetBase(IE_HITPOINTS) / 2, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
-		core->ApplyEffect(newfx, (Actor*) Owner, Owner);
+		core->ApplyEffect(std::move(newfx), (Actor*) Owner, Owner);
 	}
 
 	if (!fx->Resource2.IsEmpty()) {
@@ -5762,22 +5759,22 @@ int fx_familiar_constitution_loss(Scriptable* /*Owner*/, Actor* target, Effect* 
 	if (!STATE_GET(STATE_NOSAVE)) {
 		return FX_APPLIED;
 	}
-	Effect* newfx;
+
 	//familiar died
 	Actor* master = core->GetGame()->FindPC(1);
 	if (!master) return FX_NOT_APPLIED;
 
 	//lose 1 point of constitution
-	newfx = EffectQueue::CreateEffect(fx_constitution_modifier_ref, (ieDword) -1, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, master, master);
+	auto newfx = EffectQueue::CreateEffect(fx_constitution_modifier_ref, (ieDword) -1, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(std::move(newfx), master, master);
 
 	//remove the maximum hp bonus
 	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, (ieDword) (-(signed) (fx->Parameter1)), 3, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, master, master);
+	core->ApplyEffect(std::move(newfx), master, master);
 
 	//damage for half of the familiar's hitpoints
 	newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, DAMAGE_CRUSHING << 16, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(newfx, master, master);
+	core->ApplyEffect(std::move(newfx), master, master);
 
 	return FX_NOT_APPLIED;
 }
@@ -6856,9 +6853,9 @@ int fx_puppet_master(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//copyself doesn't copy scripts, so the script clearing code is not needed
 	Actor* copy = target->CopySelf(fx->Parameter2 == 1);
 
-	Effect* newfx = EffectQueue::CreateUnsummonEffect(fx);
+	auto newfx = EffectQueue::CreateUnsummonEffect(fx);
 	if (newfx) {
-		core->ApplyEffect(newfx, copy, copy);
+		core->ApplyEffect(std::move(newfx), copy, copy);
 	}
 
 	ResRef puppetRef;
@@ -6887,7 +6884,7 @@ int fx_puppet_master(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			// level = original caster - caster / 2; eg. lvl 32 -> 16 -> 24 -> 20 -> 22 -> 21
 			newfx = EffectQueue::CreateEffect(fx_leveldrain_ref, copy->GetXPLevel(1) / 2, 0, FX_DURATION_INSTANT_PERMANENT);
 			if (newfx) {
-				core->ApplyEffect(newfx, copy, copy);
+				core->ApplyEffect(std::move(newfx), copy, copy);
 			}
 			break;
 		default:
@@ -7449,7 +7446,7 @@ int fx_apply_effect_repeat(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Effect* newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
+	auto newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
 	if (!newfx) {
 		return FX_NOT_APPLIED;
 	}
@@ -7461,36 +7458,29 @@ int fx_apply_effect_repeat(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case 0: //once per second
 		case 1: //crash???
 			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(aRound))) {
-				core->ApplyEffect(newfx, target, caster);
-			} else {
-				delete newfx;
+				core->ApplyEffect(std::move(newfx), target, caster);
 			}
 			break;
 		case 2: //param1 times every second
 			if (!(core->GetGame()->GameTime % target->GetAdjustedTime(aRound))) {
 				for (ieDword i = 0; i < fx->Parameter1; i++) {
-					core->ApplyEffect(new Effect(*newfx), target, caster);
+					core->ApplyEffect(std::make_unique<Effect>(*newfx), target, caster);
 				}
 			}
-			delete newfx;
 			break;
 		case 3: //once every Param1 second
 			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * aRound))) {
-				core->ApplyEffect(newfx, target, caster);
-			} else {
-				delete newfx;
+				core->ApplyEffect(std::move(newfx), target, caster);
 			}
 			break;
 		case 4: //param3 times every Param1 second
 			if (fx->Parameter1 && !(core->GetGame()->GameTime % target->GetAdjustedTime(fx->Parameter1 * aRound))) {
 				for (ieDword i = 0; i < fx->Parameter3; i++) {
-					core->ApplyEffect(new Effect(*newfx), target, caster);
+					core->ApplyEffect(std::make_unique<Effect>(*newfx), target, caster);
 				}
 			}
-			delete newfx;
 			break;
 		default:
-			delete newfx;
 			break;
 	}
 
@@ -7667,15 +7657,14 @@ int fx_apply_effect_curse(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (EffectQueue::match_ids(target, fx->Parameter2, fx->Parameter1)) {
 		//apply effect, if the effect is a goner, then kill
 		//this effect too
-		Effect* myfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
+		auto myfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
 		if (myfx) {
 			myfx->RandomValue = fx->RandomValue;
 			myfx->TimingMode = fx->TimingMode;
 			myfx->Duration = fx->Duration;
 			myfx->Target = FX_TARGET_PRESET;
 			myfx->CasterID = fx->CasterID;
-			ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, 0);
-			delete myfx;
+			ret = target->fxqueue.ApplyEffect(target, myfx.get(), fx->FirstApply, 0);
 		}
 		//newfx is a borrowed reference don't delete it
 	}
@@ -8490,8 +8479,8 @@ int fx_iwdee_monster_summoning(Scriptable* Owner, Actor* target, Effect* fx)
 	// see IESDP for some odd notes
 
 	// the monster should appear near the effect position
-	Effect* newFx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areaHit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newFx);
+	auto newFx = EffectQueue::CreateUnsummonEffect(fx);
+	core->SummonCreature(monster, areaHit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, std::move(newFx));
 	return FX_NOT_APPLIED;
 }
 

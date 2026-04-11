@@ -409,7 +409,7 @@ public:
 	PluginHolder<ScriptEngine> GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor
 	may apply a single fx on the summoned creature normally an unsummon effect */
-	Actor* SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable* Owner, const Actor* target, const Point& position, int eamod, int level, Effect* fx, bool sexmod = true);
+	Actor* SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable* Owner, const Actor* target, const Point& position, int eamod, int level, std::unique_ptr<Effect> fx, bool sexmod = true);
 	/** Get the Window Manager */
 	WindowManager* GetWindowManager() const { return winmgr.get(); };
 
@@ -578,11 +578,11 @@ public:
 	/** applies the spell on the area or on a scriptable object */
 	void ApplySpellPoint(const ResRef& spellRef, Map* area, const Point& pos, Scriptable* caster, int level) const;
 	/** applies a single effect on the target */
-	int ApplyEffect(Effect* fx, Actor* target, Scriptable* caster) const;
+	int ApplyEffect(std::unique_ptr<Effect> fx, Actor* target, Scriptable* caster) const;
 	/** applies an effect queue on the target */
 	int ApplyEffectQueue(EffectQueue* fxqueue, Actor* actor, Scriptable* caster) const;
 	int ApplyEffectQueue(EffectQueue* fxqueue, Actor* actor, Scriptable* caster, Point p) const;
-	Effect* GetEffect(const ResRef& resname, int level, const Point& p);
+	std::unique_ptr<Effect> GetEffect(const ResRef& resname, int level, const Point& p);
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map* map) const;
 	/** saves (exports a character to the characters folder */

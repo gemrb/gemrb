@@ -324,12 +324,12 @@ static inline ieByte TriggeredEffect(ieByte timingmode)
 	return fx_triggered[timingmode];
 }
 
-Effect* EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing)
+std::unique_ptr<Effect> EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing)
 {
 	if (opcode == 0xffffffff) {
 		return nullptr;
 	}
-	Effect* fx = new Effect();
+	auto fx = std::make_unique<Effect>();
 	if (!fx) {
 		return nullptr;
 	}
@@ -376,7 +376,7 @@ void EffectQueue::ModifyAllEffectSources(const Point& source)
 	}
 }
 
-Effect* EffectQueue::CreateEffect(EffectRef& effectReference, ieDword param1, ieDword param2, ieWord timing)
+std::unique_ptr<Effect> EffectQueue::CreateEffect(EffectRef& effectReference, ieDword param1, ieDword param2, ieWord timing)
 {
 	Globals::ResolveEffectRef(effectReference);
 	if (effectReference.opcode < 0) {
@@ -389,12 +389,12 @@ Effect* EffectQueue::CreateEffect(EffectRef& effectReference, ieDword param1, ie
 //only opcode and parameters are changed
 //This is used mostly inside effects, when an effect needs to spawn
 //other effects with the same coordinates, source, duration, etc.
-Effect* EffectQueue::CreateEffectCopy(const Effect* oldfx, ieDword opcode, ieDword param1, ieDword param2)
+std::unique_ptr<Effect> EffectQueue::CreateEffectCopy(const Effect* oldfx, ieDword opcode, ieDword param1, ieDword param2)
 {
 	if (opcode == 0xffffffff) {
 		return nullptr;
 	}
-	Effect* fx = new Effect(*oldfx);
+	auto fx = std::make_unique<Effect>(*oldfx);
 	if (!fx) return nullptr;
 
 	fx->Opcode = opcode;
@@ -403,7 +403,7 @@ Effect* EffectQueue::CreateEffectCopy(const Effect* oldfx, ieDword opcode, ieDwo
 	return fx;
 }
 
-Effect* EffectQueue::CreateEffectCopy(const Effect* oldfx, EffectRef& effectReference, ieDword param1, ieDword param2)
+std::unique_ptr<Effect> EffectQueue::CreateEffectCopy(const Effect* oldfx, EffectRef& effectReference, ieDword param1, ieDword param2)
 {
 	Globals::ResolveEffectRef(effectReference);
 	if (effectReference.opcode < 0) {
@@ -412,31 +412,30 @@ Effect* EffectQueue::CreateEffectCopy(const Effect* oldfx, EffectRef& effectRefe
 	return CreateEffectCopy(oldfx, effectReference.opcode, param1, param2);
 }
 
-Effect* EffectQueue::CreateUnsummonEffect(const Effect* fx)
+std::unique_ptr<Effect> EffectQueue::CreateUnsummonEffect(const Effect* fx)
 {
-	Effect* newfx = nullptr;
-	if ((fx->TimingMode & 0xff) == FX_DURATION_INSTANT_LIMITED) {
-		newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
-		newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
-		newfx->Target = FX_TARGET_PRESET;
-		newfx->Resource = newfx->Resource3.IsEmpty() ? "SPGFLSH1" : newfx->Resource3;
-		if (fx->TimingMode == FX_DURATION_ABSOLUTE) {
-			//unprepare duration
-			newfx->Duration = (newfx->Duration - core->GetGame()->GameTime) / core->Time.defaultTicksPerSec;
-		}
+	if ((fx->TimingMode & 0xff) != FX_DURATION_INSTANT_LIMITED) {
+		return nullptr;
 	}
 
+	auto newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
+	newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
+	newfx->Target = FX_TARGET_PRESET;
+	newfx->Resource = newfx->Resource3.IsEmpty() ? "SPGFLSH1" : newfx->Resource3;
+	if (fx->TimingMode == FX_DURATION_ABSOLUTE) {
+		// unprepare duration
+		newfx->Duration = (newfx->Duration - core->GetGame()->GameTime) / core->Time.defaultTicksPerSec;
+	}
 	return newfx;
 }
 
-void EffectQueue::AddEffect(Effect* fx, bool insert)
+void EffectQueue::AddEffect(std::unique_ptr<Effect> fx, bool insert)
 {
 	if (insert) {
-		effects.push_front(std::move(*fx));
+		effects.push_front(*fx);
 	} else {
-		effects.push_back(std::move(*fx));
+		effects.push_back(*fx);
 	}
-	delete fx;
 }
 
 //This method can remove an effect described by a pointer to it, or
@@ -481,7 +480,7 @@ void EffectQueue::Cleanup()
 }
 
 //Handle the target flag when the effect is applied first
-int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const Point& dest) const
+int EffectQueue::AddEffect(std::unique_ptr<Effect> fx, Scriptable* self, Actor* pretarget, const Point& dest) const
 {
 	int i;
 	const Game* game;
@@ -522,21 +521,17 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			assert(self != nullptr);
 			fx->SetPosition(self->Pos);
 
-			flg = ApplyEffect(st, fx, 1);
+			flg = ApplyEffect(st, fx.get(), 1);
 			if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && st) {
-				st->fxqueue.AddEffect(fx, flg == FX_INSERT);
-			} else {
-				delete fx;
+				st->fxqueue.AddEffect(std::move(fx), flg == FX_INSERT);
 			}
 			break;
 		case FX_TARGET_SELF:
 			fx->SetPosition(dest);
 
-			flg = ApplyEffect(st, fx, 1);
+			flg = ApplyEffect(st, fx.get(), 1);
 			if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && st) {
-				st->fxqueue.AddEffect(fx, flg == FX_INSERT);
-			} else {
-				delete fx;
+				st->fxqueue.AddEffect(std::move(fx), flg == FX_INSERT);
 			}
 			break;
 
@@ -550,17 +545,14 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				if (st == actor) {
 					continue;
 				}
-				Effect* new_fx = new Effect(*fx);
-				new_fx->SetPosition(actor->Pos);
+				auto newFx = std::make_unique<Effect>(*fx);
+				newFx->SetPosition(actor->Pos);
 
-				flg = ApplyEffect(actor, new_fx, 1);
-				if (new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-					actor->fxqueue.AddEffect(new_fx, flg == FX_INSERT);
-				} else {
-					delete new_fx;
+				flg = ApplyEffect(actor, newFx.get(), 1);
+				if (newFx->TimingMode != FX_DURATION_JUST_EXPIRED) {
+					actor->fxqueue.AddEffect(std::move(newFx), flg == FX_INSERT);
 				}
 			}
-			delete fx;
 			flg = FX_APPLIED;
 			break;
 
@@ -575,17 +567,14 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				if (actor->GetStat(IE_SPECIFIC) != spec) {
 					continue;
 				}
-				Effect* new_fx = new Effect(*fx);
-				new_fx->SetPosition(actor->Pos);
+				auto newFx = std::make_unique<Effect>(*fx);
+				newFx->SetPosition(actor->Pos);
 
-				flg = ApplyEffect(actor, new_fx, 1);
-				if (new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-					actor->fxqueue.AddEffect(new_fx, flg == FX_INSERT);
-				} else {
-					delete new_fx;
+				flg = ApplyEffect(actor, newFx.get(), 1);
+				if (newFx->TimingMode != FX_DURATION_JUST_EXPIRED) {
+					actor->fxqueue.AddEffect(std::move(newFx), flg == FX_INSERT);
 				}
 			}
-			delete fx;
 			flg = FX_APPLIED;
 			break;
 		case FX_TARGET_OTHER_SIDE:
@@ -600,18 +589,15 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				if (actor->GetStat(IE_SPECIFIC) != spec) {
 					continue;
 				}
-				Effect* new_fx = new Effect(*fx);
-				new_fx->SetPosition(actor->Pos);
+				auto newFx = std::make_unique<Effect>(*fx);
+				newFx->SetPosition(actor->Pos);
 
-				flg = ApplyEffect(actor, new_fx, 1);
+				flg = ApplyEffect(actor, newFx.get(), 1);
 				//GetActorCount can now return all nonparty critters
-				if (new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-					actor->fxqueue.AddEffect(new_fx, flg == FX_INSERT);
-				} else {
-					delete new_fx;
+				if (newFx->TimingMode != FX_DURATION_JUST_EXPIRED) {
+					actor->fxqueue.AddEffect(std::move(newFx), flg == FX_INSERT);
 				}
 			}
-			delete fx;
 			flg = FX_APPLIED;
 			break;
 		case FX_TARGET_PRESET:
@@ -619,11 +605,9 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			//knock needs this
 			fx->SetPosition(dest);
 
-			flg = ApplyEffect(pretarget, fx, 1);
+			flg = ApplyEffect(pretarget, fx.get(), 1);
 			if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && pretarget) {
-				pretarget->fxqueue.AddEffect(fx, flg == FX_INSERT);
-			} else {
-				delete fx;
+				pretarget->fxqueue.AddEffect(std::move(fx), flg == FX_INSERT);
 			}
 			break;
 
@@ -632,17 +616,14 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			i = game->GetPartySize(false);
 			while (i--) {
 				Actor* actor = game->GetPC(i, false);
-				Effect* new_fx = new Effect(*fx);
-				new_fx->SetPosition(actor->Pos);
+				auto newFx = std::make_unique<Effect>(*fx);
+				newFx->SetPosition(actor->Pos);
 
-				flg = ApplyEffect(actor, new_fx, 1);
-				if (new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-					actor->fxqueue.AddEffect(new_fx, flg == FX_INSERT);
-				} else {
-					delete new_fx;
+				flg = ApplyEffect(actor, newFx.get(), 1);
+				if (newFx->TimingMode != FX_DURATION_JUST_EXPIRED) {
+					actor->fxqueue.AddEffect(std::move(newFx), flg == FX_INSERT);
 				}
 			}
-			delete fx;
 			flg = FX_APPLIED;
 			break;
 
@@ -652,18 +633,15 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			i = map->GetActorCount(true);
 			while (i--) {
 				Actor* actor = map->GetActor(i, true);
-				Effect* new_fx = new Effect(*fx);
-				new_fx->SetPosition(actor->Pos);
+				auto newFx = std::make_unique<Effect>(*fx);
+				newFx->SetPosition(actor->Pos);
 
-				flg = ApplyEffect(actor, new_fx, 1);
-				if (new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-					new_fx->Target = FX_TARGET_SELF;
-					actor->fxqueue.AddEffect(new_fx, flg == FX_INSERT);
-				} else {
-					delete new_fx;
+				flg = ApplyEffect(actor, newFx.get(), 1);
+				if (newFx->TimingMode != FX_DURATION_JUST_EXPIRED) {
+					newFx->Target = FX_TARGET_SELF;
+					actor->fxqueue.AddEffect(std::move(newFx), flg == FX_INSERT);
 				}
 			}
-			delete fx;
 			flg = FX_APPLIED;
 			break;
 
@@ -674,18 +652,15 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			while (i--) {
 				Actor* actor = map->GetActor(i, false);
 				if (actor->GetBase(IE_EA) == EA_FAMILIAR) continue;
-				Effect* new_fx = new Effect(*fx);
-				new_fx->SetPosition(actor->Pos);
+				auto newFx = std::make_unique<Effect>(*fx);
+				newFx->SetPosition(actor->Pos);
 
-				flg = ApplyEffect(actor, new_fx, 1);
+				flg = ApplyEffect(actor, newFx.get(), 1);
 				//GetActorCount can now return all nonparty critters
-				if (new_fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-					actor->fxqueue.AddEffect(new_fx, flg == FX_INSERT);
-				} else {
-					delete new_fx;
+				if (newFx->TimingMode != FX_DURATION_JUST_EXPIRED) {
+					actor->fxqueue.AddEffect(std::move(newFx), flg == FX_INSERT);
 				}
 			}
-			delete fx;
 			flg = FX_APPLIED;
 			break;
 
@@ -693,7 +668,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		default:
 			Log(MESSAGE, "EffectQueue", "Unknown FX target type: {} ({})", targetType, fx->Target);
 			flg = FX_ABORT;
-			delete fx;
 			break;
 	}
 
@@ -720,7 +694,7 @@ int EffectQueue::AddAllEffects(Actor* target, const Point& destination)
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
 
-		int tmp = AddEffect(new Effect(fx), Owner, target, destination);
+		int tmp = AddEffect(std::make_unique<Effect>(fx), Owner, target, destination);
 		//lets try without Owner, any crash?
 		//If yes, then try to fix the individual effect
 		//If you use target for Owner here, the wand in chateau irenicus will work
@@ -1501,7 +1475,7 @@ void EffectQueue::RemoveAllEffects(const ResRef& removed)
 
 		// unapply the effect by applying the reverse — if feasible
 		// but don't alter the spell itself or other users won't get what they asked for
-		Effect* fx = CreateEffectCopy(&origfx, origfx.Opcode, origfx.Parameter1, origfx.Parameter2);
+		auto fx = CreateEffectCopy(&origfx, origfx.Opcode, origfx.Parameter1, origfx.Parameter2);
 
 		// state setting effects are idempotent, so wouldn't cause problems during clab reapplication
 		// ...they would during disabled dualclass levels, but it would be too annoying to try, since
@@ -1516,8 +1490,7 @@ void EffectQueue::RemoveAllEffects(const ResRef& removed)
 		fx->Parameter1 = 0xffffffff - fx->Parameter1; // over- or under-flow is intentional
 
 		Log(DEBUG, "EffectQueue", "Manually removing effect {} (from {})", fx->Opcode, removed);
-		ApplyEffect(OwnerActor, fx, 1, 0);
-		delete fx;
+		ApplyEffect(OwnerActor, fx.get(), 1, 0);
 	}
 	gamedata->FreeSpell(spell, removed, false);
 }
@@ -2085,10 +2058,10 @@ void EffectQueue::AddWeaponEffects(EffectQueue* fxqueue, EffectRef& fx_ref, ieDw
 		MATCH_LIVE_FX()
 		if (!param2 && fx.Parameter2 != param2) continue;
 
-		Effect* fx2 = core->GetEffect(fx.Resource, fx.Power, p);
+		auto fx2 = core->GetEffect(fx.Resource, fx.Power, p);
 		if (!fx2) continue;
 		fx2->Target = FX_TARGET_PRESET;
-		fxqueue->AddEffect(fx2, true);
+		fxqueue->AddEffect(std::move(fx2), true);
 	}
 }
 

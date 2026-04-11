@@ -501,10 +501,10 @@ void Projectile::ProcessEffects(EffectQueue& projQueue, Scriptable* owner, Actor
 	while (fx) {
 		if (fx->Target != FX_TARGET_PRESET && fx->Target != FX_TARGET_ORIGINAL) {
 			if (apply) {
-				selfQueue.AddEffect(new Effect(*fx));
+				selfQueue.AddEffect(std::make_unique<Effect>(*fx));
 			}
 		} else {
-			projQueue.AddEffect(new Effect(*fx));
+			projQueue.AddEffect(std::make_unique<Effect>(*fx));
 		}
 		fx = effects.GetNextEffect(fxIter);
 	}

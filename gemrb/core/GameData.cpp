@@ -208,11 +208,11 @@ void GameData::FreeSpell(const Spell* /*spl*/, const ResRef& name, bool free)
 	SpellCache.DecRef(name, free);
 }
 
-Effect* GameData::GetEffect(const ResRef& resname)
+std::unique_ptr<Effect> GameData::GetEffect(const ResRef& resname)
 {
-	const Effect* effect = EffectCache.GetResource(resname);
-	if (effect) {
-		return new Effect(*effect);
+	auto effect = EffectCache.find(resname);
+	if (effect != EffectCache.end()) {
+		return std::make_unique<Effect>(*effect->second);
 	}
 	DataStream* str = GetResourceStream(resname, IE_EFF_CLASS_ID);
 	PluginHolder<EffectMgr> em = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
@@ -229,17 +229,9 @@ Effect* GameData::GetEffect(const ResRef& resname)
 		return nullptr;
 	}
 
-	EffectCache.SetAt(resname, *newEffect);
-
-	auto effectCopy = new Effect(std::move(*newEffect));
-	delete newEffect;
-
+	auto effectCopy = std::make_unique<Effect>(*newEffect);
+	EffectCache[resname] = std::move(newEffect);
 	return effectCopy;
-}
-
-void GameData::FreeEffect(const Effect* /*eff*/, const ResRef& name, bool free)
-{
-	EffectCache.DecRef(name, free);
 }
 
 //if the default setup doesn't fit for an animation

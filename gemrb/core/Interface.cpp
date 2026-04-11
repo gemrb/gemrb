@@ -1670,7 +1670,7 @@ PluginHolder<ScriptEngine> Interface::GetGUIScriptEngine() const
 }
 
 //NOTE: if there were more summoned creatures, it will return only the last
-Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable* Owner, const Actor* target, const Point& position, int eamod, int level, Effect* fx, bool sexmod)
+Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable* Owner, const Actor* target, const Point& position, int eamod, int level, std::unique_ptr<Effect> fx, bool sexmod)
 {
 	static EffectRef fx_summon_disable_ref = { "AvatarRemovalModifier", -1 };
 	//maximum number of monsters summoned
@@ -1687,7 +1687,6 @@ Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		map = game->GetCurrentArea();
 	}
 	if (!map) {
-		delete fx;
 		return nullptr;
 	}
 
@@ -1785,10 +1784,10 @@ Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 			map->AddVVCell(vvc);
 
 			// set up the summon disable effect
-			Effect* newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);
+			auto newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);
 			if (newfx) {
 				newfx->Duration = vvc->GetSequenceDuration(Time.defaultTicksPerSec) * 9 / 10 + core->GetGame()->GameTime;
-				ApplyEffect(newfx, ab, ab);
+				ApplyEffect(std::move(newfx), ab, ab);
 			}
 		}
 
@@ -1797,7 +1796,7 @@ Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 			ab->SetBase(IE_XPVALUE, 0);
 		}
 		if (fx) {
-			ApplyEffect(new Effect(*fx), ab, Owner);
+			ApplyEffect(std::make_unique<Effect>(*fx), ab, Owner);
 		}
 
 		//this check should happen after the fact
@@ -1808,7 +1807,6 @@ Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		}
 	}
 
-	delete fx;
 	return ab;
 }
 
@@ -3628,14 +3626,14 @@ void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point& 
 //-1 means the effect was reflected back to the caster
 //0 means the effect was resisted and should be removed
 //1 means the effect was applied
-int Interface::ApplyEffect(Effect* effect, Actor* actor, Scriptable* caster) const
+int Interface::ApplyEffect(std::unique_ptr<Effect> effect, Actor* actor, Scriptable* caster) const
 {
 	if (!effect) {
 		return 0;
 	}
 
 	EffectQueue fxqueue;
-	fxqueue.AddEffect(effect);
+	fxqueue.AddEffect(std::move(effect));
 	int res = ApplyEffectQueue(&fxqueue, actor, caster);
 	return res;
 }
@@ -3670,10 +3668,10 @@ int Interface::ApplyEffectQueue(EffectQueue* fxqueue, Actor* actor, Scriptable* 
 	return res;
 }
 
-Effect* Interface::GetEffect(const ResRef& resname, int level, const Point& p)
+std::unique_ptr<Effect> Interface::GetEffect(const ResRef& resname, int level, const Point& p)
 {
 	//Don't free this reference, it is cached!
-	Effect* effect = gamedata->GetEffect(resname);
+	auto effect = gamedata->GetEffect(resname);
 	if (!effect) {
 		return nullptr;
 	}

@@ -82,7 +82,6 @@ static EffectRef fx_casting_glow_ref = { "CastingGlow", -1 };
 void Spell::AddCastingGlow(EffectQueue* fxqueue, ieDword duration, int gender) const
 {
 	char g, t;
-	Effect* fx;
 	ResRef Resource;
 
 	int cgsound = CastingSound;
@@ -131,11 +130,11 @@ void Spell::AddCastingGlow(EffectQueue* fxqueue, ieDword duration, int gender) c
 		caster->castingSound = core->GetAudioPlayback().PlayDirectional(Resource, SFXChannel::Casting, caster->Pos, caster->GetOrientation());
 	}
 
-	fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
+	auto fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
 	fx->Duration = core->GetGame()->GameTime + duration;
 	fx->InventorySlot = 0xffff;
 	fx->Projectile = 0;
-	fxqueue->AddEffect(fx);
+	fxqueue->AddEffect(std::move(fx));
 }
 
 // pst did some nasty hardcoding ...
@@ -271,10 +270,10 @@ EffectQueue Spell::GetEffectBlock(Scriptable* self, const Point& pos, int block_
 			// effects should be able to affect non living targets
 			//This is done by NULL target, the position should be enough
 			//to tell which non-actor object is affected
-			selfqueue.AddEffect(new Effect(fx));
+			selfqueue.AddEffect(std::make_unique<Effect>(fx));
 		} else {
 			fx.Projectile = pro;
-			fxqueue.AddEffect(new Effect(fx));
+			fxqueue.AddEffect(std::make_unique<Effect>(fx));
 		}
 	}
 	if (self && selfqueue) {
@@ -305,13 +304,13 @@ Projectile* Spell::GetProjectile(Scriptable* self, int header, int level, const 
 		static EffectRef dmgRef = { "Damage", -1 };
 		EffectQueue::ResolveEffect(dmgRef);
 		if (!fxqueue.HasEffect(dmgRef)) {
-			Effect* fx = EffectQueue::CreateEffect(dmgRef, 0, 0x80000, FX_DURATION_INSTANT_PERMANENT);
+			auto fx = EffectQueue::CreateEffect(dmgRef, 0, 0x80000, FX_DURATION_INSTANT_PERMANENT);
 			fx->DiceThrown = 3;
 			fx->DiceSides = 6;
 			fx->SavingThrowType = core->HasFeature(GFFlags::RULES_3ED) ? 8 : 1;
 			fx->IsSaveForHalfDamage = 1;
 			fx->Target = FX_TARGET_PRESET;
-			fxqueue.AddEffect(fx);
+			fxqueue.AddEffect(std::move(fx));
 		}
 	}
 	pro->Range = GetCastingDistance(self);

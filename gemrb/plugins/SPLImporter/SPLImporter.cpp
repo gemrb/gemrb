@@ -159,11 +159,10 @@ Spell* SPLImporter::GetSpell(Spell* s, bool /*silent*/)
 	str->Seek(s->FeatureBlockOffset + 48 * s->CastingFeatureOffset,
 		  GEM_STREAM_START);
 	for (int i = 0; i < s->CastingFeatureCount; i++) {
-		Effect* fx = GetFeature(s);
+		auto fx = GetFeature(s);
 		// pst's fx_tint_screen has some instances and elsewhere it was noted to never use preset targets in global effects
 		if (fx->Target == FX_TARGET_PRESET) fx->Target = FX_TARGET_SELF;
-		s->casting_features.push_back(std::move(*fx));
-		delete fx;
+		s->casting_features.push_back(*fx);
 	}
 
 	return s;
@@ -214,17 +213,16 @@ void SPLImporter::GetExtHeader(const Spell* s, SPLExtHeader* eh)
 	eh->features.reserve(featureCount);
 	str->Seek(s->FeatureBlockOffset + 48 * eh->FeatureOffset, GEM_STREAM_START);
 	for (ieWord i = 0; i < featureCount; ++i) {
-		Effect* fx = GetFeature(s);
-		eh->features.push_back(std::move(*fx));
-		delete fx;
+		auto fx = GetFeature(s);
+		eh->features.push_back(*fx);
 	}
 }
 
-Effect* SPLImporter::GetFeature(const Spell* s)
+std::unique_ptr<Effect> SPLImporter::GetFeature(const Spell* s)
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open(str, false);
-	Effect* fx = eM->GetEffect();
+	auto fx = eM->GetEffect();
 	fx->SourceRef = s->Name;
 	fx->SourceType = 2;
 	fx->PrimaryType = s->PrimaryType;

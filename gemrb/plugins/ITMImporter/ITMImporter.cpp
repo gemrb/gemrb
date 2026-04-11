@@ -113,11 +113,11 @@ static void AddZZFeatures(Item* s)
 
 	// append the new equipping effects (tohit+damage)
 	for (auto& zzRef : zzRefs) {
-		Effect* fx = EffectQueue::CreateEffect(zzRef, IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
+		auto fx = EffectQueue::CreateEffect(zzRef, IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
 		fx->Parameter3 = static_cast<ieDword>(bonus);
 		fx->SourceRef = s->Name;
 		fx->SourceType = 1;
-		s->equipping_features.push_back(std::make_unique<Effect>(std::move(*fx)));
+		s->equipping_features.push_back(std::move(fx));
 	}
 }
 
@@ -344,10 +344,10 @@ std::unique_ptr<Effect> ITMImporter::GetFeature(const Item* s)
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open(str, false);
-	Effect* fx = eM->GetEffect();
+	auto fx = eM->GetEffect();
 	fx->SourceRef = s->Name;
 	fx->SourceType = 1;
-	return std::make_unique<Effect>(std::move(*fx));
+	return fx;
 }
 
 #include "plugindef.h"

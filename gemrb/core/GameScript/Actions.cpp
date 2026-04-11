@@ -4010,8 +4010,8 @@ void GameScript::Kill(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Effect* fx = EffectQueue::CreateEffect(fx_death_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
-	target->fxqueue.AddEffect(fx, false);
+	auto fx = EffectQueue::CreateEffect(fx_death_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	target->fxqueue.AddEffect(std::move(fx), false);
 }
 
 void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
@@ -4063,10 +4063,10 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	act->ApplyKit(true, Actor::GetClassID(ISPALADIN));
 	act->SetMCFlag(MC_FALLEN_PALADIN, BitOp::OR);
-	Effect* fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_TURN, FX_DURATION_INSTANT_PERMANENT);
-	act->fxqueue.AddEffect(fx, false);
+	auto fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_TURN, FX_DURATION_INSTANT_PERMANENT);
+	act->fxqueue.AddEffect(std::move(fx), false);
 	fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_CAST, FX_DURATION_INSTANT_PERMANENT);
-	act->fxqueue.AddEffect(fx, false);
+	act->fxqueue.AddEffect(std::move(fx), false);
 	if (act->InParty && core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(HCStrings::PaladinFall, GUIColors::XPCHANGE, act);
 }
 
@@ -4078,10 +4078,10 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	}
 	act->ApplyKit(true, Actor::GetClassID(ISRANGER));
 	act->SetMCFlag(MC_FALLEN_RANGER, BitOp::OR);
-	Effect* fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_PERMANENT);
-	act->fxqueue.AddEffect(fx, false);
+	auto fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_PERMANENT);
+	act->fxqueue.AddEffect(std::move(fx), false);
 	fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_CAST, FX_DURATION_INSTANT_PERMANENT);
-	act->fxqueue.AddEffect(fx, false);
+	act->fxqueue.AddEffect(std::move(fx), false);
 	if (act->InParty && core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(HCStrings::RangerFall, GUIColors::XPCHANGE, act);
 }
 
@@ -5068,8 +5068,8 @@ void GameScript::Calm(Scriptable* Sender, Action* /*parameters*/)
 	if (!act) {
 		return;
 	}
-	Effect* fx = EffectQueue::CreateEffect(fx_cure_berserk_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
-	core->ApplyEffect(fx, act, Sender);
+	auto fx = EffectQueue::CreateEffect(fx_cure_berserk_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(std::move(fx), act, Sender);
 }
 
 void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
@@ -7364,12 +7364,12 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	SetVariable(Sender, variable, value, "GLOBAL");
 }
 
-static Effect* GetEffect(ieDword opcode)
+static std::unique_ptr<Effect> GetEffect(ieDword opcode)
 {
 	if (opcode == 0xffffffff) {
 		return nullptr;
 	}
-	Effect* fx = new Effect();
+	auto fx = std::make_unique<Effect>();
 	if (!fx) {
 		return nullptr;
 	}
@@ -7395,7 +7395,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	ieDword sparkle = parameters->int0Parameter;
 
 	int opcode = EffectQueue::ResolveEffect(fx_iwd_casting_glow_ref);
-	Effect* fx = GetEffect(opcode);
+	auto fx = GetEffect(opcode);
 	if (!fx) {
 		//invalid effect name didn't resolve to opcode
 		return;
@@ -7435,7 +7435,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	fx->Resource = parameters->string1Parameter;
 	//int2param isn't actually used in the original engine
 
-	core->ApplyEffect(fx, actor, src);
+	core->ApplyEffect(std::move(fx), actor, src);
 
 	// SpellCastEffect tries to keep the action alive until the effect is over
 	Sender->SetWait(adjustedDuration);
@@ -7458,7 +7458,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	int opcode = EffectQueue::ResolveEffect(fx_iwd_visual_spell_hit_ref);
-	Effect* fx = GetEffect(opcode);
+	auto fx = GetEffect(opcode);
 	if (!fx) {
 		//invalid effect name didn't resolve to opcode
 		return;
@@ -7492,7 +7492,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode = FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	fx->Target = FX_TARGET_PRESET;
-	core->ApplyEffect(fx, target, src);
+	core->ApplyEffect(std::move(fx), target, src);
 
 	// see note in SpellHitEffectPoint, helps with #2109 efreeti all spawning at the same time
 	Sender->SetWait(3);
@@ -7506,7 +7506,7 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	}
 
 	int opcode = EffectQueue::ResolveEffect(fx_iwd_visual_spell_hit_ref);
-	Effect* fx = GetEffect(opcode);
+	auto fx = GetEffect(opcode);
 	if (!fx) {
 		//invalid effect name didn't resolve to opcode
 		return;
@@ -7528,7 +7528,7 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	}
 	fx->Pos.y += int(ProHeights::Normal); // negate future ZPos
 	fx->Target = FX_TARGET_PRESET;
-	core->ApplyEffect(fx, NULL, src);
+	core->ApplyEffect(std::move(fx), nullptr, src);
 
 	// it should probably wait until projectile payload, but a single tick works well for the use in 41cnatew
 	Sender->SetWait(1);
@@ -7705,8 +7705,8 @@ void GameScript::ChunkCreature(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Effect* fx = EffectQueue::CreateEffect(fx_death_ref, 0, 8, FX_DURATION_INSTANT_PERMANENT);
-	target->fxqueue.AddEffect(fx, false);
+	auto fx = EffectQueue::CreateEffect(fx_death_ref, 0, 8, FX_DURATION_INSTANT_PERMANENT);
+	target->fxqueue.AddEffect(std::move(fx), false);
 }
 
 void GameScript::MultiPlayerSync(Scriptable* Sender, Action* /*parameters*/)
