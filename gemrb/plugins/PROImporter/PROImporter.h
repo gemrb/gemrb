@@ -22,7 +22,7 @@ public:
 	~PROImporter() override;
 	PROImporter& operator=(const PROImporter&) = delete;
 	bool Open(DataStream* stream) override;
-	Projectile* GetProjectile(Projectile* s) override;
+	void GetProjectile(std::unique_ptr<Projectile>& s) override;
 
 private:
 	Holder<ProjectileExtension> GetAreaExtension();

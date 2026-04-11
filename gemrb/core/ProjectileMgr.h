@@ -15,7 +15,7 @@ namespace GemRB {
 class GEM_EXPORT ProjectileMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
-	virtual Projectile* GetProjectile(Projectile*) = 0;
+	virtual void GetProjectile(std::unique_ptr<Projectile>& pro) = 0;
 };
 
 }

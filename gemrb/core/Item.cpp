@@ -206,14 +206,14 @@ int Item::UseCharge(std::array<ieWord, CHARGE_COUNTERS>& charges, int header, bo
 }
 
 //returns a projectile loaded with the effect queue
-Projectile* Item::GetProjectile(Scriptable* self, int header, const Point& target, ieDwordSigned invslot, int miss) const
+std::unique_ptr<Projectile> Item::GetProjectile(Scriptable* self, int header, const Point& target, ieDwordSigned invslot, int miss) const
 {
 	const ITMExtHeader* eh = GetExtHeader(header);
 	if (!eh) {
 		return NULL;
 	}
 	ieDword idx = eh->ProjectileAnimation;
-	Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(idx);
+	auto pro = core->GetProjectileServer()->GetProjectileByIndex(idx);
 	int usage;
 	if (header >= 0)
 		usage = header;

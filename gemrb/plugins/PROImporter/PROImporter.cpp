@@ -33,7 +33,7 @@ bool PROImporter::Open(DataStream* stream)
 	return true;
 }
 
-Projectile* PROImporter::GetProjectile(Projectile* s)
+void PROImporter::GetProjectile(std::unique_ptr<Projectile>& s)
 {
 	ieWord AreaExtension;
 
@@ -85,10 +85,10 @@ Projectile* PROImporter::GetProjectile(Projectile* s)
 	// original bg2: DWORD  m_dwPuffFlags and then just reserved space
 	str->Seek(172, GEM_CURRENT_POS);
 	if (AreaExtension != 3) {
-		return s;
+		return;
 	}
 	s->Extension = GetAreaExtension();
-	return s;
+	return;
 }
 
 Holder<ProjectileExtension> PROImporter::GetAreaExtension()

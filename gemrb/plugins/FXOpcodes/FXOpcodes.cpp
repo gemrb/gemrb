@@ -7501,7 +7501,7 @@ int fx_remove_projectile(Scriptable* Owner, Actor* target, Effect* fx)
 
 		size_t cnt = area->GetProjectileCount(piter);
 		while (cnt--) {
-			Projectile* pro = *piter;
+			auto pro = piter->get();
 			if ((pro->GetType() == projectile) && pro->PointInRadius(fx->Pos)) {
 				pro->Cleanup();
 			}
@@ -8331,7 +8331,7 @@ int fx_iwd_visual_spell_hit(Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Projectile* pro;
+	std::unique_ptr<Projectile> pro;
 	if (fx->Parameter4 && fx->Parameter2 > 200) {
 		// SpellHitEffectPoint is used with sheffect.ids, so the indices are smaller
 		// we don't just check for both, since there's some overlap
@@ -8345,9 +8345,9 @@ int fx_iwd_visual_spell_hit(Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (target && !fx->Parameter4) {
 		// I believe the spell hit projectiles don't follow anyone
-		map->AddProjectile(pro, target->Pos, target->GetGlobalID(), true);
+		map->AddProjectile(std::move(pro), target->Pos, target->GetGlobalID(), true);
 	} else {
-		map->AddProjectile(pro, fx->Pos, fx->Pos);
+		map->AddProjectile(std::move(pro), fx->Pos, fx->Pos);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -8615,9 +8615,9 @@ int fx_alter_animation(Scriptable* Owner, Actor* /*target*/, Effect* fx)
 				continue;
 			}
 			// play spell hit animation
-			Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
+			auto pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
 			pro->SetCaster(fx->CasterID, fx->CasterLevel);
-			map->AddProjectile(pro, an->Pos, an->Pos);
+			map->AddProjectile(std::move(pro), an->Pos, an->Pos);
 			// alter animation, we need only this for the original, but in the
 			// spirit of unhardcoding, i provided the standard modifier codeset
 			// 0->4, 1->5, 2->6, 3->7

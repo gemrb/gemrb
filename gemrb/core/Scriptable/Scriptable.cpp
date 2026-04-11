@@ -665,7 +665,7 @@ const TriggerEntry* Scriptable::GetMatchingTrigger(unsigned short id, unsigned i
 }
 
 // handle wild surge projectile modifiers
-void Scriptable::ModifyProjectile(Projectile*& pro, Spell* spl, ieDword tgt, int level)
+void Scriptable::ModifyProjectile(std::unique_ptr<Projectile>& pro, Spell* spl, ieDword tgt, int level)
 {
 	Actor* caster = Scriptable::As<Actor>(this);
 	assert(caster);
@@ -682,7 +682,6 @@ void Scriptable::ModifyProjectile(Projectile*& pro, Spell* spl, ieDword tgt, int
 			}
 			// we need to fetch the projectile, so the effect queue is created
 			// (skipped above)
-			delete pro;
 			pro = spl->GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
 			pro->SetCaster(GetGlobalID(), level);
 			break;
@@ -698,7 +697,6 @@ void Scriptable::ModifyProjectile(Projectile*& pro, Spell* spl, ieDword tgt, int
 				}
 			}
 			// we need to refetch the projectile, so the effect queue is created
-			delete pro; // don't leak the original one
 			pro = spl->GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
 			pro->SetCaster(GetGlobalID(), level);
 			break;
@@ -728,7 +726,6 @@ void Scriptable::ModifyProjectile(Projectile*& pro, Spell* spl, ieDword tgt, int
 			}
 			// we need to fetch the projectile, so the effect queue is created
 			// (skipped above)
-			delete pro;
 			pro = spl->GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
 			pro->SetCaster(GetGlobalID(), level);
 			break;
@@ -756,7 +753,6 @@ void Scriptable::ModifyProjectile(Projectile*& pro, Spell* spl, ieDword tgt, int
 			}
 		}
 		// we need to refetch the projectile, so the new one is used
-		delete pro; // don't leak the original one
 		pro = spl->GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
 		pro->SetCaster(GetGlobalID(), level);
 	}
@@ -794,7 +790,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 	}
 
 	while (projectileCount--) {
-		Projectile* pro = nullptr;
+		std::unique_ptr<Projectile> pro;
 		// jump through hoops to skip applying selftargeting spells to the caster
 		// if we'll be changing the target
 		int tct = 0;
@@ -824,14 +820,13 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 		// only one wall of the same type can be up at the same time
 		if (pro->ExtFlags & PEF_WALL && !area->IsProjectileUnique(pro->GetType())) {
 			// the games silently discarded the spell
-			delete pro;
 			continue;
 		}
 
 		if (tgt) {
-			area->AddProjectile(pro, origin, tgt, fake);
+			area->AddProjectile(std::move(pro), origin, tgt, fake);
 		} else {
-			area->AddProjectile(pro, origin, objects.LastTargetPos);
+			area->AddProjectile(std::move(pro), origin, objects.LastTargetPos);
 		}
 	}
 

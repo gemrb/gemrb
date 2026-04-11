@@ -326,7 +326,6 @@ Actor::~Actor(void)
 		delete vvc;
 	}
 
-	delete attackProjectile;
 	delete polymorphCache;
 
 	free(spellStates);
@@ -7864,7 +7863,7 @@ void Actor::UpdateActorState()
 			// attacking enemies when they turned neutral — which is worse
 			// but it's also needed for cleave and now the counter case above works with LastTargetPersistent as well,
 			// as ClearActions resets attackProjectile
-			GetCurrentArea()->AddProjectile(attackProjectile, Pos, objects.LastTargetPersistent, false);
+			GetCurrentArea()->AddProjectile(std::move(attackProjectile), Pos, objects.LastTargetPersistent, false);
 			attackProjectile = nullptr;
 		}
 	}
@@ -9458,7 +9457,7 @@ bool Actor::UseItemPoint(ieDword slot, int header, const Point& target, ieDword 
 		return false;
 	}
 
-	Projectile* pro = itm->GetProjectile(this, header, target, slot, flags & UI_MISS);
+	auto pro = itm->GetProjectile(this, header, target, slot, flags & UI_MISS);
 	ChargeItem(slot, header, item, itm, flags & UI_SILENT, !(flags & UI_NOCHARGE));
 	if (!(flags & UI_NOAURA)) {
 		AuraCooldown = core->Time.attack_round_size;
@@ -9467,7 +9466,7 @@ bool Actor::UseItemPoint(ieDword slot, int header, const Point& target, ieDword 
 	if (pro) {
 		pro->SetCaster(GetGlobalID(), gamedata->GetMiscRule("ITEM_CASTERLEVEL"));
 		SetOrientation(Pos, target, false);
-		GetCurrentArea()->AddProjectile(pro, Pos, target);
+		GetCurrentArea()->AddProjectile(std::move(pro), Pos, target);
 		return true;
 	}
 	return false;
@@ -9797,7 +9796,7 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 		return false;
 	}
 
-	Projectile* pro = itm->GetProjectile(this, header, target->Pos, slot, flags & UI_MISS);
+	auto pro = itm->GetProjectile(this, header, target->Pos, slot, flags & UI_MISS);
 
 	// ChargeItem can break the item, now invalidating everything, so look things up in advance
 	int weaponTypeIdx = 0;
@@ -9822,7 +9821,7 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 	pro->SetCaster(GetGlobalID(), gamedata->GetMiscRule("ITEM_CASTERLEVEL"));
 	pro->SFlags &= ~PSF_FLYING;
 	if (flags & UI_FAKE) {
-		delete pro;
+		return true;
 	} else if (header < 0 && !(flags & UI_MISS)) { // using a weapon
 		auto AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, ConvertDamageType(weaponTypeIdx) << 16, FX_DURATION_INSTANT_LIMITED);
 		AttackEffect->Projectile = projectileAnim;
@@ -9847,7 +9846,7 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 			// ignore timestop
 			pro->TFlags |= PTF_TIMELESS;
 		}
-		attackProjectile = pro;
+		attackProjectile = std::move(pro);
 		// check if critical hit needs a screenshake
 		bool pm = InParty || (target->Type == ST_ACTOR && Scriptable::As<Actor>(target)->InParty);
 		if (flags & UI_CRITICAL && CFGCache.critHitShake && pm) {
@@ -9855,7 +9854,7 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 		}
 	} else { // launch it now as we are not attacking
 		SetOrientation(Pos, target->Pos, false);
-		GetCurrentArea()->AddProjectile(pro, Pos, tar->GetGlobalID(), false);
+		GetCurrentArea()->AddProjectile(std::move(pro), Pos, tar->GetGlobalID(), false);
 	}
 	return true;
 }

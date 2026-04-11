@@ -233,7 +233,7 @@ struct TrackingData {
 
 using aniIterator = std::list<AreaAnimation>::iterator;
 using scaIterator = std::list<VEFObject*>::const_iterator;
-using proIterator = std::list<Projectile*>::const_iterator;
+using proIterator = std::list<std::unique_ptr<Projectile>>::const_iterator;
 using spaIterator = std::list<Particles*>::const_iterator;
 static const Size ZeroSize;
 
@@ -319,7 +319,7 @@ private:
 	std::vector<Actor*> actors;
 	std::vector<WallPolygonGroup> wallGroups;
 	std::list<VEFObject*> vvcCells;
-	std::list<Projectile*> projectiles;
+	std::list<std::unique_ptr<Projectile>> projectiles;
 	std::list<Particles*> particles;
 	std::vector<Entrance*> entrances;
 	std::vector<Ambient*> ambients;
@@ -501,8 +501,8 @@ public:
 	//get the next saved projectile
 	const Projectile* GetNextTrap(proIterator& iter, int flags = 0) const;
 	//add a projectile to the area
-	void AddProjectile(Projectile* pro, const Point& source, ieDword actorID, bool fake);
-	void AddProjectile(Projectile* pro, const Point& source, const Point& dest);
+	void AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, ieDword actorID, bool fake);
+	void AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, const Point& dest);
 
 	//returns the duration of a VVC cell set in the area (point may be set to empty)
 	ieDword HasVVCCell(const ResRef& resource, const Point& p) const;
@@ -655,7 +655,7 @@ private:
 	void UpdateSpawns() const;
 	PathMapFlags GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, const Actor* caller = nullptr) const;
 	PathMapFlags GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, const Actor* caller = nullptr) const;
-	void AddProjectile(Projectile* pro);
+	void AddProjectile(std::unique_ptr<Projectile> pro);
 
 	// same as GetBlocked, but in TileCoords
 	PathMapFlags GetBlockedTile(const SearchmapPoint&, int size) const;

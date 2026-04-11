@@ -2727,7 +2727,7 @@ static int fx_projectile_use_effect_list(Scriptable* Owner, Actor* target, Effec
 	Spell* spl = gamedata->GetSpell(fx->Resource);
 	//create projectile from known spellheader
 	//cannot get the projectile from the spell
-	Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
+	auto pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
 
 	if (pro) {
 		Point origin = fx->Pos;
@@ -2735,9 +2735,9 @@ static int fx_projectile_use_effect_list(Scriptable* Owner, Actor* target, Effec
 		pro->SetEffects(spl->GetEffectBlock(Owner, origin, 0, fx->CasterLevel, fx->Parameter2));
 		pro->SetCaster(fx->CasterID, fx->CasterLevel);
 		if (target) {
-			map->AddProjectile(pro, origin, target->GetGlobalID(), false);
+			map->AddProjectile(std::move(pro), origin, target->GetGlobalID(), false);
 		} else {
-			map->AddProjectile(pro, origin, origin);
+			map->AddProjectile(std::move(pro), origin, origin);
 		}
 	}
 	return FX_NOT_APPLIED;

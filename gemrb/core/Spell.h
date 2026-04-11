@@ -156,7 +156,7 @@ public:
 	// add appropriate casting glow effect
 	void AddCastingGlow(EffectQueue* fxqueue, ieDword duration, int gender) const;
 	//returns a projectile created from an extended header
-	Projectile* GetProjectile(Scriptable* self, int headerindex, int level, const Point& pos);
+	std::unique_ptr<Projectile> GetProjectile(Scriptable* self, int headerindex, int level, const Point& pos);
 	unsigned int GetCastingDistance(Scriptable* Sender) const;
 	bool ContainsDamageOpcode() const;
 	bool ContainsTamingOpcode() const;

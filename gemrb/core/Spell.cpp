@@ -282,7 +282,7 @@ EffectQueue Spell::GetEffectBlock(Scriptable* self, const Point& pos, int block_
 	return fxqueue;
 }
 
-Projectile* Spell::GetProjectile(Scriptable* self, int header, int level, const Point& target)
+std::unique_ptr<Projectile> Spell::GetProjectile(Scriptable* self, int header, int level, const Point& target)
 {
 	const SPLExtHeader* seh = GetExtHeader(header);
 	if (!seh) {
@@ -290,7 +290,7 @@ Projectile* Spell::GetProjectile(Scriptable* self, int header, int level, const 
 		    header, ext_headers.size());
 		return nullptr;
 	}
-	Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
+	auto pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 	if (seh->features.size()) {
 		EffectQueue fxqueue = GetEffectBlock(self, target, header, level, seh->ProjectileAnimation);
 		pro->SetEffects(std::move(fxqueue));

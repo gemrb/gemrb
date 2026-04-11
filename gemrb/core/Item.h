@@ -230,7 +230,7 @@ public:
 	EffectQueue GetEffectBlock(Scriptable* self, const Point& pos, int header, ieDwordSigned invslot, ieDword pro) const;
 	//returns a projectile created from an extended header
 	//if miss is non-zero, then no effects will be loaded
-	Projectile* GetProjectile(Scriptable* self, int header, const Point& target, ieDwordSigned invslot, int miss) const;
+	std::unique_ptr<Projectile> GetProjectile(Scriptable* self, int header, const Point& target, ieDwordSigned invslot, int miss) const;
 	//Builds an equipping glow effect from gradient colour
 	//this stuff is not item specific, could be moved elsewhere
 	std::unique_ptr<Effect> BuildGlowEffect(int gradient) const;

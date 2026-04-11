@@ -28,13 +28,13 @@ public:
 	ProjectileServer(ProjectileServer&&) noexcept = default;
 	ProjectileServer& operator=(ProjectileServer&&) noexcept = default;
 
-	Projectile* GetProjectileByIndex(size_t idx);
+	std::unique_ptr<Projectile> GetProjectileByIndex(size_t idx);
 	//it is highly unlikely we need this function
-	Projectile* GetProjectileByName(const ResRef& resname);
+	std::unique_ptr<Projectile> GetProjectileByName(const ResRef& resname);
 	//returns the highest projectile id
 	size_t GetHighestProjectileNumber() const;
 	//creates an empty projectile on the fly
-	Projectile* CreateDefaultProjectile(size_t idx);
+	std::unique_ptr<Projectile> CreateDefaultProjectile(size_t idx);
 
 private:
 	//this represents a line of projectl.ids
@@ -66,9 +66,9 @@ private:
 	// internal function: read projectiles
 	void AddSymbols(const PluginHolder<SymbolMgr>& projlist);
 	//this method is used internally
-	Projectile* GetProjectile(size_t idx);
+	std::unique_ptr<Projectile> GetProjectile(size_t idx);
 	//creates a clone from the cached projectiles
-	Projectile* ReturnCopy(size_t idx);
+	std::unique_ptr<Projectile> ReturnCopy(size_t idx);
 	//returns one of the resource names
 	ResRef GetExplosion(size_t idx, int type);
 };

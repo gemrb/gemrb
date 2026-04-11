@@ -452,10 +452,6 @@ Map::~Map(void)
 		delete spawn;
 	}
 
-	for (auto projectile : projectiles) {
-		delete projectile;
-	}
-
 	for (auto vvc : vvcCells) {
 		delete vvc;
 	}
@@ -1092,7 +1088,7 @@ Projectile* Map::GetNextProjectile(const proIterator& iter) const
 	if (iter == projectiles.end()) {
 		return nullptr;
 	}
-	return *iter;
+	return iter->get();
 }
 
 bool Map::IsProjectileUnique(ieWord proType) const
@@ -1845,7 +1841,7 @@ void Map::UpdateProjectiles()
 		if ((*it)->IsStillIntact()) {
 			++it;
 		} else {
-			delete *it;
+			it->reset();
 			it = projectiles.erase(it);
 		}
 	}
@@ -2846,30 +2842,30 @@ void Map::SortQueues()
 }
 
 // adding projectile in order, based on its height parameter
-void Map::AddProjectile(Projectile* pro)
+void Map::AddProjectile(std::unique_ptr<Projectile> pro)
 {
 	int height = pro->GetHeight();
 	proIterator iter;
 	for (iter = projectiles.begin(); iter != projectiles.end(); iter++) {
 		if ((*iter)->GetHeight() >= height) break;
 	}
-	projectiles.insert(iter, pro);
+	projectiles.insert(iter, std::move(pro));
 }
 
-void Map::AddProjectile(Projectile* pro, const Point& source, ieDword actorID, bool fake)
+void Map::AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, ieDword actorID, bool fake)
 {
 	pro->MoveTo(this, source);
 	pro->SetupZPos();
 	pro->SetTarget(actorID, fake);
-	AddProjectile(pro);
+	AddProjectile(std::move(pro));
 }
 
-void Map::AddProjectile(Projectile* pro, const Point& source, const Point& dest)
+void Map::AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, const Point& dest)
 {
 	pro->MoveTo(this, source);
 	pro->SetupZPos();
 	pro->SetTarget(dest);
-	AddProjectile(pro);
+	AddProjectile(std::move(pro));
 }
 
 //returns the longest duration of the VVC cell named 'resource' (if it exists)

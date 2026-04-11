@@ -3618,9 +3618,9 @@ void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point& 
 		return;
 	}
 	int header = spell->GetHeaderIndexFromLevel(level);
-	Projectile* pro = spell->GetProjectile(caster, header, level, pos);
+	auto pro = spell->GetProjectile(caster, header, level, pos);
 	pro->SetCaster(caster->GetGlobalID(), level);
-	area->AddProjectile(pro, caster->Pos, pos);
+	area->AddProjectile(std::move(pro), caster->Pos, pos);
 }
 
 //-1 means the effect was reflected back to the caster

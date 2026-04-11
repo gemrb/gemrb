@@ -15,6 +15,7 @@
 #include "Game.h"
 #include "Inventory.h"
 #include "Palette.h"
+#include "Projectile.h"
 #include "Spellbook.h"
 
 #include "Audio/Playback.h"
@@ -526,7 +527,7 @@ private:
 	ieDword InTrap = 0;
 
 	char AttackStance = 0;
-	Projectile* attackProjectile = nullptr; // regular weapon payload projectile
+	std::unique_ptr<Projectile> attackProjectile; // regular weapon payload projectile
 	bool secondround = false; // true every second round of attack
 	int attacksperround = 0;
 
@@ -683,11 +684,6 @@ public:
 	/** Gets the Portrait */
 	Holder<Sprite2D> CopyPortrait(int which) const;
 
-	/** Gets the attack projectile */
-	Projectile* GetAttackProjectile()
-	{
-		return attackProjectile;
-	}
 	void ResetAttackProjectile() { attackProjectile = nullptr; }
 	void SetName(String str, unsigned char type);
 	void SetName(ieStrRef strref, unsigned char type);

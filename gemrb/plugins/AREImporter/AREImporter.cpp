@@ -1386,7 +1386,7 @@ bool AREImporter::GetTrap(DataStream* str, int idx, Map* map) const
 	// is a dummy projectile
 	// The projectile ID is 214 for TRAPSNAR
 	// It is off by one compared to projectl.ids, but the same as missile.ids
-	Projectile* pro = core->GetProjectileServer()->GetProjectileByIndex(proID - 1);
+	auto pro = core->GetProjectileServer()->GetProjectileByIndex(proID - 1);
 
 	EffectQueue fxqueue = EffectQueue();
 	DataStream* fs = new SlicedStream(str, trapEffOffset, trapSize);
@@ -1401,7 +1401,7 @@ bool AREImporter::GetTrap(DataStream* str, int idx, Map* map) const
 		ieDword level = caster->GetThiefLevel();
 		pro->SetCaster(caster->GetGlobalID(), level ? level : caster->GetXPLevel(false));
 	}
-	map->AddProjectile(pro, pos, pos);
+	map->AddProjectile(std::move(pro), pos, pos);
 	return true;
 }
 

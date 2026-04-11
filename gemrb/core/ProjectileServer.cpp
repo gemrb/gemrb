@@ -75,9 +75,9 @@ ProjectileServer::ProjectileServer() noexcept
 	}
 }
 
-Projectile* ProjectileServer::CreateDefaultProjectile(size_t idx)
+std::unique_ptr<Projectile> ProjectileServer::CreateDefaultProjectile(size_t idx)
 {
-	Projectile* pro = new Projectile();
+	auto pro = std::make_unique<Projectile>();
 
 	//take care, this projectile is not freed up by the server
 	if (idx == (unsigned int) ~0) {
@@ -91,10 +91,10 @@ Projectile* ProjectileServer::CreateDefaultProjectile(size_t idx)
 }
 
 //this function can return only projectiles listed in projectl.ids
-Projectile* ProjectileServer::GetProjectileByName(const ResRef& resname)
+std::unique_ptr<Projectile> ProjectileServer::GetProjectileByName(const ResRef& resname)
 {
 	if (!core->IsAvailable(IE_PRO_CLASS_ID)) {
-		return NULL;
+		return nullptr;
 	}
 	size_t idx = GetHighestProjectileNumber();
 	while (idx--) {
@@ -102,13 +102,13 @@ Projectile* ProjectileServer::GetProjectileByName(const ResRef& resname)
 			return GetProjectile(idx);
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
-Projectile* ProjectileServer::GetProjectileByIndex(size_t idx)
+std::unique_ptr<Projectile> ProjectileServer::GetProjectileByIndex(size_t idx)
 {
 	if (!core->IsAvailable(IE_PRO_CLASS_ID)) {
-		return NULL;
+		return nullptr;
 	}
 	if (idx >= GetHighestProjectileNumber()) {
 		return GetProjectile(0);
@@ -117,14 +117,14 @@ Projectile* ProjectileServer::GetProjectileByIndex(size_t idx)
 	return GetProjectile(idx);
 }
 
-Projectile* ProjectileServer::ReturnCopy(size_t idx)
+std::unique_ptr<Projectile> ProjectileServer::ReturnCopy(size_t idx)
 {
-	Projectile* pro = new Projectile(*projectiles[idx].projectile);
+	auto pro = std::make_unique<Projectile>(*projectiles[idx].projectile);
 	pro->SetIdentifiers(projectiles[idx].resname, idx);
 	return pro;
 }
 
-Projectile* ProjectileServer::GetProjectile(size_t idx)
+std::unique_ptr<Projectile> ProjectileServer::GetProjectile(size_t idx)
 {
 	if (projectiles[idx].projectile) {
 		return ReturnCopy(idx);
@@ -138,7 +138,7 @@ Projectile* ProjectileServer::GetProjectile(size_t idx)
 	if (!sm->Open(str)) {
 		return CreateDefaultProjectile(idx);
 	}
-	Projectile* pro = new Projectile();
+	auto pro = std::make_unique<Projectile>();
 	pro->SetIdentifiers(projectiles[idx].resname, idx);
 
 	sm->GetProjectile(pro);

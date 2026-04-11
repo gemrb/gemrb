@@ -407,7 +407,7 @@ private:
 	void CreateProjectile(const ResRef& spellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the weird/awesome wild surges */
 	bool HandleHardcodedSurge(const ResRef& surgeSpell, const Spell* spl, Actor* caster);
-	void ModifyProjectile(Projectile*& pro, Spell* spl, ieDword tgt, int level);
+	void ModifyProjectile(std::unique_ptr<Projectile>& pro, Spell* spl, ieDword tgt, int level);
 	void ResetCastingState(Actor* caster);
 	void DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const;
 	/* check for and trigger a wild surge */

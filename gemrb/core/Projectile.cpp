@@ -175,7 +175,7 @@ void Projectile::GetPaletteCopy(const AnimArray& anims, Holder<Palette>& pal) co
 //create another projectile with type-1 (iterate magic missiles and call lightning)
 void Projectile::CreateIteration()
 {
-	Projectile* pro = server->GetProjectileByIndex(type - 1);
+	auto pro = server->GetProjectileByIndex(type - 1);
 	pro->SetEffectsCopy(effects, Pos);
 	pro->SetCaster(Caster, Level);
 	if (ExtFlags & PEF_CURVE) {
@@ -184,9 +184,9 @@ void Projectile::CreateIteration()
 	}
 
 	if (FakeTarget) {
-		area->AddProjectile(pro, Pos, FakeTarget, true);
+		area->AddProjectile(std::move(pro), Pos, FakeTarget, true);
 	} else {
-		area->AddProjectile(pro, Pos, Target, false);
+		area->AddProjectile(std::move(pro), Pos, Target, false);
 	}
 
 	// added by fuzzie, to make magic missiles instant, maybe wrong place
@@ -1251,7 +1251,7 @@ void Projectile::SecondaryTarget()
 			}
 		}
 
-		Projectile* pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
+		auto pro = server->GetProjectileByIndex(Extension->ExplProjIdx);
 		// also copy speed, so visuals match the payload for slow moving projectiles like the bg2 cone of cold
 		pro->Speed = Speed;
 		// run special targeting modes on one child only, so target-all and similar don't run payload too often
@@ -1271,7 +1271,7 @@ void Projectile::SecondaryTarget()
 		pro->SetTarget(Pos);
 		//TODO:actually some of the splash projectiles are a good example of faketarget
 		//projectiles (that don't follow the target, but still hit)
-		area->AddProjectile(pro, Pos, targetID, false);
+		area->AddProjectile(std::move(pro), Pos, targetID, false);
 		fail = false;
 
 		//we already got one target affected in the AOE, this flag says
@@ -1459,14 +1459,14 @@ void Projectile::DrawChildren(const Region& vp, BlitFlags flags)
 
 void Projectile::SpawnFragment(Point& dest) const
 {
-	Projectile* pro = server->GetProjectileByIndex(Extension->FragProjIdx);
+	auto pro = server->GetProjectileByIndex(Extension->FragProjIdx);
 	if (pro) {
 		pro->SetCaster(Caster, Level);
 		if (pro->ExtFlags & PEF_RANDOM) {
 			dest.x += RAND(-Extension->tileCoord.x / 2, Extension->tileCoord.x / 2);
 			dest.y += RAND(-Extension->tileCoord.y / 2, Extension->tileCoord.y / 2);
 		}
-		area->AddProjectile(pro, dest, dest);
+		area->AddProjectile(std::move(pro), dest, dest);
 	}
 }
 
@@ -1560,7 +1560,7 @@ void Projectile::SpawnChild(size_t idx, bool firstExplosion, const Point& offset
 	}
 
 	// create a custom projectile with single traveling effect
-	Projectile* pro = server->CreateDefaultProjectile((unsigned int) ~0);
+	auto pro = server->CreateDefaultProjectile((unsigned int) ~0);
 	// not setting Caster, so we target the ground (ZPos 0)
 	pro->BAMRes1 = tmp;
 	pro->SetEffects(EffectQueue());
@@ -1664,7 +1664,6 @@ void Projectile::SpawnChild(size_t idx, bool firstExplosion, const Point& offset
 	}
 
 	children.push_back(std::move(*pro));
-	delete pro;
 }
 
 void Projectile::SpawnChildren()
