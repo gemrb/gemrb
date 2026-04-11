@@ -1024,7 +1024,7 @@ bool Projectile::HasBeenHitRecently(ieDword targetID, uint32_t time) const
 	}
 	// hit recently?
 	uint32_t threshold = targeted->second + Extension->Delay;
-	if (ExtFlags & PEF_LINE) threshold /= 2;
+	if (ExtFlags & PEF_LINE) threshold -= Extension->Delay / 2;
 	return threshold > time;
 }
 
