@@ -91,3 +91,8 @@ QSong7      20         21         22         23         37436      guibtact
 QSong8      20         21         22         23         37436      guibtact
 QSong9      20         21         22         23         37436      guibtact
 89
+
+// action button background, icons and associated tooltip.
+// Order matters and the row names are also part of the function name to run when the button is
+// pressed (e.g. "ActionThievingPressed()").
+// Columns 1-4 are the RESREF BAM frame numbers for the four button sprites / states.

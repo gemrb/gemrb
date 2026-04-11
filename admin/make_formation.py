@@ -12,6 +12,10 @@
 
 # written (badly, sorry!) by fuzzie, feb 2nd 2009
 
+# In essence it generates x/y offsets from the target location for each
+# formation type. The coordinates must be given for the north direction.
+# Other directions will be calculated on the fly.
+
 # TODO: older games have focus points in different positions and different
 # spacing (ie, coordinates have different offsets)
 # eg, pst seems to usually have the focus point always on the lead char

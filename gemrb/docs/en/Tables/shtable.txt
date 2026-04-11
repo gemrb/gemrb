@@ -1,6 +1,0 @@
-Description: This table is used by the spell hit animation opcode.
-
-Columns: the spell hit animation resref (VVC or BAM)
-
-Rows: the spell hit code
-

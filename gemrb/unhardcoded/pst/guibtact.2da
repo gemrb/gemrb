@@ -33,3 +33,8 @@ Search     0          1          2          3          41649      SP085
 29         *          *          *          *          *          *
 30         *          *          *          *          *          *
 QItem5     *          *          *          *          *          *
+
+// action button background, icons and associated tooltip.
+// Order matters and the row names are also part of the function name to run when the button is
+// pressed (e.g. "ActionThievingPressed()").
+// Columns 1-4 are the RESREF BAM frame numbers for the four button sprites / states.
