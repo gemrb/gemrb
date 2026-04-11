@@ -501,8 +501,8 @@ public:
 	//get the next saved projectile
 	const Projectile* GetNextTrap(proIterator& iter, int flags = 0) const;
 	//add a projectile to the area
-	void AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, ieDword actorID, bool fake);
-	void AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, const Point& dest);
+	Projectile* AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, ieDword actorID, bool fake);
+	Projectile* AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, const Point& dest);
 
 	//returns the duration of a VVC cell set in the area (point may be set to empty)
 	ieDword HasVVCCell(const ResRef& resource, const Point& p) const;
@@ -655,7 +655,7 @@ private:
 	void UpdateSpawns() const;
 	PathMapFlags GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, const Actor* caller = nullptr) const;
 	PathMapFlags GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, const Actor* caller = nullptr) const;
-	void AddProjectile(std::unique_ptr<Projectile> pro);
+	Projectile* AddProjectile(std::unique_ptr<Projectile> pro);
 
 	// same as GetBlocked, but in TileCoords
 	PathMapFlags GetBlockedTile(const SearchmapPoint&, int size) const;

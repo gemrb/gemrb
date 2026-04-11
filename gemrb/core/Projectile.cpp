@@ -176,6 +176,7 @@ void Projectile::GetPaletteCopy(const AnimArray& anims, Holder<Palette>& pal) co
 void Projectile::CreateIteration()
 {
 	auto pro = server->GetProjectileByIndex(type - 1);
+	if (!(pro->ExtFlags & PEF_ITERATION)) return;
 	pro->SetEffectsCopy(effects, Pos);
 	pro->SetCaster(Caster, Level);
 	if (ExtFlags & PEF_CURVE) {
@@ -183,14 +184,14 @@ void Projectile::CreateIteration()
 		pro->Speed = Speed; // fix the different speed of MAGICMIS.pro compared to SPMAGMIS.pro
 	}
 
+	Projectile* inserted;
 	if (FakeTarget) {
-		area->AddProjectile(std::move(pro), Pos, FakeTarget, true);
+		inserted = area->AddProjectile(std::move(pro), Pos, FakeTarget, true);
 	} else {
-		area->AddProjectile(std::move(pro), Pos, Target, false);
+		inserted = area->AddProjectile(std::move(pro), Pos, Target, false);
 	}
-
 	// added by fuzzie, to make magic missiles instant, maybe wrong place
-	pro->Update();
+	inserted->Update();
 }
 
 void Projectile::GetSmokeAnim()

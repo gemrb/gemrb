@@ -2842,7 +2842,7 @@ void Map::SortQueues()
 }
 
 // adding projectile in order, based on its height parameter
-void Map::AddProjectile(std::unique_ptr<Projectile> pro)
+Projectile* Map::AddProjectile(std::unique_ptr<Projectile> pro)
 {
 	int height = pro->GetHeight();
 	proIterator iter;
@@ -2850,22 +2850,23 @@ void Map::AddProjectile(std::unique_ptr<Projectile> pro)
 		if ((*iter)->GetHeight() >= height) break;
 	}
 	projectiles.insert(iter, std::move(pro));
+	return iter->get();
 }
 
-void Map::AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, ieDword actorID, bool fake)
+Projectile* Map::AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, ieDword actorID, bool fake)
 {
 	pro->MoveTo(this, source);
 	pro->SetupZPos();
 	pro->SetTarget(actorID, fake);
-	AddProjectile(std::move(pro));
+	return AddProjectile(std::move(pro));
 }
 
-void Map::AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, const Point& dest)
+Projectile* Map::AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, const Point& dest)
 {
 	pro->MoveTo(this, source);
 	pro->SetupZPos();
 	pro->SetTarget(dest);
-	AddProjectile(std::move(pro));
+	return AddProjectile(std::move(pro));
 }
 
 //returns the longest duration of the VVC cell named 'resource' (if it exists)
