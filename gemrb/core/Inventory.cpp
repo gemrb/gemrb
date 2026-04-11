@@ -1092,10 +1092,10 @@ int Inventory::FindRangedProjectile(unsigned int type) const
 
 		const Item* itm = GetItemPointer(i, Slot);
 		if (!itm) continue;
-		const ITMExtHeader* ext_header = itm->GetExtHeader(0);
+		const ITMExtHeader* extHeader = itm->GetExtHeader(0);
 		unsigned int weapontype = 0;
-		if (ext_header) {
-			weapontype = ext_header->ProjectileQualifier;
+		if (extHeader) {
+			weapontype = extHeader->ProjectileQualifier;
 		}
 		gamedata->FreeItem(itm, Slot->ItemResRef, false);
 		if (weapontype & type) {
@@ -1121,10 +1121,10 @@ int Inventory::FindSlotRangedWeapon(ieDword slot) const
 	if (!itm) return SLOT_FIST;
 
 	//always look for a ranged header when looking for a projectile/projector
-	const ITMExtHeader* ext_header = itm->GetWeaponHeader(true);
+	const ITMExtHeader* extHeader = itm->GetWeaponHeader(true);
 	unsigned int type = 0;
-	if (ext_header) {
-		type = ext_header->ProjectileQualifier;
+	if (extHeader) {
+		type = extHeader->ProjectileQualifier;
 	}
 	gamedata->FreeItem(itm, Slot->ItemResRef, false);
 	return FindTypedRangedWeapon(type);
@@ -1143,10 +1143,10 @@ int Inventory::FindTypedRangedWeapon(unsigned int type) const
 		const Item* itm = GetItemPointer(i, Slot);
 		if (!itm) continue;
 		//always look for a ranged header when looking for a projectile/projector
-		const ITMExtHeader* ext_header = itm->GetWeaponHeader(true);
+		const ITMExtHeader* extHeader = itm->GetWeaponHeader(true);
 		int weapontype = 0;
-		if (ext_header && (ext_header->AttackType == ITEM_AT_BOW || (ext_header->AttackType == ITEM_AT_PROJECTILE && !ext_header->Charges))) {
-			weapontype = ext_header->ProjectileQualifier;
+		if (extHeader && (extHeader->AttackType == ITEM_AT_BOW || (extHeader->AttackType == ITEM_AT_PROJECTILE && !extHeader->Charges))) {
+			weapontype = extHeader->ProjectileQualifier;
 		}
 		gamedata->FreeItem(itm, Slot->ItemResRef, false);
 		if (weapontype & type) {
@@ -1837,14 +1837,14 @@ bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int sta
 		if (!itm) {
 			continue;
 		}
-		for (size_t ehc = 0; ehc < itm->ext_headers.size(); ++ehc) {
-			const ITMExtHeader* ext_header = &itm->ext_headers[ehc];
-			if (ext_header->Location != ITEM_LOC_EQUIPMENT) {
+		for (size_t ehc = 0; ehc < itm->extHeaders.size(); ++ehc) {
+			const ITMExtHeader* extHeader = &itm->extHeaders[ehc];
+			if (extHeader->Location != ITEM_LOC_EQUIPMENT) {
 				continue;
 			}
 			//skipping if we cannot use the item
 			int idreq1 = (slot->Flags & IE_INV_ITEM_IDENTIFIED);
-			IDNeeded idreq2 = static_cast<IDNeeded>(ext_header->IDReq);
+			IDNeeded idreq2 = static_cast<IDNeeded>(extHeader->IDReq);
 			if (idreq2 == IDNeeded::Never && idreq1) continue;
 			if (idreq2 == IDNeeded::Yes && !idreq1) continue;
 
@@ -1859,11 +1859,11 @@ bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int sta
 				return true;
 			}
 			count--;
-			headerList[pos].CopyITMExtHeader(*ext_header);
+			headerList[pos].CopyITMExtHeader(*extHeader);
 			headerList[pos].itemName = slot->ItemResRef;
 			headerList[pos].slot = idx;
 			headerList[pos].headerindex = ehc;
-			if (!ext_header->Charges) {
+			if (!extHeader->Charges) {
 				headerList[pos].Charges = 0xffff;
 				pos++;
 				continue;

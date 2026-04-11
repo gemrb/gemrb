@@ -215,11 +215,11 @@ Item* ITMImporter::GetItem(Item* s)
 		s->ItemExcl = 0;
 	}
 
-	s->ext_headers = std::vector<ITMExtHeader>(headerCount);
+	s->extHeaders = std::vector<ITMExtHeader>(headerCount);
 
 	for (ieWord i = 0; i < headerCount; i++) {
 		str->Seek(s->ExtHeaderOffset + i * 56, GEM_STREAM_START);
-		ITMExtHeader* eh = &s->ext_headers[i];
+		ITMExtHeader* eh = &s->extHeaders[i];
 		GetExtHeader(s, eh);
 		// set the tooltip
 		if (tooltipTable) {

@@ -47,12 +47,12 @@ EffectQueue Item::GetEffectBlock(Scriptable* self, const Point& pos, int usage, 
 	auto it = equipping_features.begin();
 	auto end = equipping_features.end();
 
-	if (usage >= int(ext_headers.size())) {
+	if (usage >= int(extHeaders.size())) {
 		return {};
 	}
 	if (usage >= 0) {
-		it = ext_headers[usage].features.begin();
-		end = ext_headers[usage].features.end();
+		it = extHeaders[usage].features.begin();
+		end = extHeaders[usage].features.end();
 	}
 
 	//collecting all self affecting effects in a single queue, so the random value is rolled only once
@@ -68,7 +68,7 @@ EffectQueue Item::GetEffectBlock(Scriptable* self, const Point& pos, int usage, 
 		fx.CasterID = self->GetGlobalID();
 		if (usage >= 0) {
 			//this is not coming from the item header, but from the recharge flags
-			fx.SourceFlags = ext_headers[usage].RechargeFlags;
+			fx.SourceFlags = extHeaders[usage].RechargeFlags;
 		} else {
 			fx.SourceFlags = 0;
 		}
@@ -118,12 +118,12 @@ int Item::GetDamagePotential(bool ranged, const ITMExtHeader*& header) const
 
 int Item::GetWeaponHeaderNumber(bool ranged) const
 {
-	for (size_t ehc = 0; ehc < ext_headers.size(); ehc++) {
-		const ITMExtHeader* ext_header = &ext_headers[ehc];
-		if (ext_header->Location != ITEM_LOC_WEAPON) {
+	for (size_t ehc = 0; ehc < extHeaders.size(); ehc++) {
+		const ITMExtHeader* extHeader = &extHeaders[ehc];
+		if (extHeader->Location != ITEM_LOC_WEAPON) {
 			continue;
 		}
-		unsigned char AType = ext_header->AttackType;
+		unsigned char AType = extHeader->AttackType;
 		if (ranged) {
 			if ((AType != ITEM_AT_PROJECTILE) && (AType != ITEM_AT_BOW)) {
 				continue;
@@ -140,12 +140,12 @@ int Item::GetWeaponHeaderNumber(bool ranged) const
 
 int Item::GetEquipmentHeaderNumber(int cnt) const
 {
-	for (size_t ehc = 0; ehc < ext_headers.size(); ehc++) {
-		const ITMExtHeader* ext_header = &ext_headers[ehc];
-		if (ext_header->Location != ITEM_LOC_EQUIPMENT) {
+	for (size_t ehc = 0; ehc < extHeaders.size(); ehc++) {
+		const ITMExtHeader* extHeader = &extHeaders[ehc];
+		if (extHeader->Location != ITEM_LOC_EQUIPMENT) {
 			continue;
 		}
-		if (ext_header->AttackType != ITEM_AT_MAGIC) {
+		if (extHeader->AttackType != ITEM_AT_MAGIC) {
 			continue;
 		}
 
@@ -170,10 +170,10 @@ const ITMExtHeader* Item::GetExtHeader(int which) const
 {
 	if (which < 0) return GetWeaponHeader(which == -2);
 
-	if (static_cast<int>(ext_headers.size()) <= which) {
+	if (static_cast<int>(extHeaders.size()) <= which) {
 		return nullptr;
 	}
-	return &ext_headers[which];
+	return &extHeaders[which];
 }
 
 int Item::UseCharge(std::array<ieWord, CHARGE_COUNTERS>& charges, int header, bool expend) const
@@ -182,7 +182,7 @@ int Item::UseCharge(std::array<ieWord, CHARGE_COUNTERS>& charges, int header, bo
 	if (!ieh) return 0;
 	int type = ieh->ChargeDepletion;
 
-	int ccount = 0;
+	int ccount;
 	if (header >= CHARGE_COUNTERS || header < 0 || MaxStackAmount) {
 		header = 0;
 	}
@@ -210,15 +210,16 @@ std::unique_ptr<Projectile> Item::GetProjectile(Scriptable* self, int header, co
 {
 	const ITMExtHeader* eh = GetExtHeader(header);
 	if (!eh) {
-		return NULL;
+		return nullptr;
 	}
 	ieDword idx = eh->ProjectileAnimation;
 	auto pro = core->GetProjectileServer()->GetProjectileByIndex(idx);
 	int usage;
-	if (header >= 0)
+	if (header >= 0) {
 		usage = header;
-	else
+	} else {
 		usage = GetWeaponHeaderNumber(header == -2);
+	}
 	if (!miss) {
 		pro->SetEffects(GetEffectBlock(self, target, usage, invslot, idx));
 	}
@@ -246,22 +247,22 @@ unsigned int Item::GetCastingDistance(int idx) const
 	const ITMExtHeader* seh = GetExtHeader(idx);
 	if (!seh) {
 		Log(ERROR, "Item", "Cannot retrieve item header!!! required header: {}, maximum: {}",
-		    idx, (int) ext_headers.size());
+		    idx, (int) extHeaders.size());
 		return 0;
 	}
 	return (unsigned int) seh->Range;
 }
 
-static EffectRef fx_damage_ref = { "Damage", -1 };
 // returns a vector with details about any extended headers containing fx_damage
 std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(const ITMExtHeader* header) const
 {
-	ieDword damage_opcode = EffectQueue::ResolveEffect(fx_damage_ref);
+	static EffectRef fx_damage_ref = { "Damage", -1 };
+	ieDword damageOpcode = EffectQueue::ResolveEffect(fx_damage_ref);
 	std::multimap<ieDword, DamageInfoStruct>::iterator it;
 	std::vector<DMGOpcodeInfo> damage_opcodes;
 	if (!header) return damage_opcodes;
 	for (const auto& fx : header->features) {
-		if (fx->Opcode == damage_opcode) {
+		if (fx->Opcode == damageOpcode) {
 			// damagetype is the same as in dmgtype.ids but GemRB uses those values
 			// shifted by two bytes
 			// 0-3 -> 0 (crushing)

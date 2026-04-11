@@ -9139,12 +9139,12 @@ static PyObject* GemRB_GetItem(PyObject* /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "UsabilityBitmask", DecRef(PyLong_FromLong, item->UsabilityBitmask));
 	PyDict_SetItemString(dict, "KitUsability", DecRef(PyLong_FromLong, item->KitUsability));
 
-	size_t ehc = item->ext_headers.size();
+	size_t ehc = item->extHeaders.size();
 
 	PyObject* tooltiptuple = PyTuple_New(ehc);
 	PyObject* locationtuple = PyTuple_New(ehc);
 	for (size_t i = 0; i < ehc; ++i) {
-		const ITMExtHeader* eh = &item->ext_headers[i];
+		const ITMExtHeader* eh = &item->extHeaders[i];
 		PyTuple_SetItem(tooltiptuple, i, PyLong_FromStrRef(eh->Tooltip));
 		PyTuple_SetItem(locationtuple, i, PyLong_FromLong(eh->Location));
 		PyDict_SetItemString(dict, "MaxCharge", DecRef(PyLong_FromLong, eh->Charges));
@@ -9166,7 +9166,7 @@ static PyObject* GemRB_GetItem(PyObject* /*self*/, PyObject* args)
 		if (ehc < 2) {
 			goto not_a_scroll;
 		}
-		const ITMExtHeader* eh = &item->ext_headers[1];
+		const ITMExtHeader* eh = &item->extHeaders[1];
 		if (eh->features.size() < 1) {
 			goto not_a_scroll;
 		}

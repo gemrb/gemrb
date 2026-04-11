@@ -159,7 +159,7 @@ public:
 	Item(const Item&) = delete;
 	Item& operator=(const Item&) = delete;
 
-	std::vector<ITMExtHeader> ext_headers;
+	std::vector<ITMExtHeader> extHeaders;
 	std::vector<std::unique_ptr<Effect>> equipping_features;
 	ResRef Name; //the resref of the item itself!
 
@@ -241,7 +241,7 @@ public:
 	int GetWeaponHeaderNumber(bool ranged) const;
 	int GetEquipmentHeaderNumber(int cnt) const;
 	const ITMExtHeader* GetExtHeader(int which) const;
-	size_t GetExtHeaderCount() const { return ext_headers.size(); };
+	size_t GetExtHeaderCount() const { return extHeaders.size(); };
 	unsigned int GetCastingDistance(int header) const;
 	// returns  a vector with details about any extended headers containing fx_damage with a 100% probability
 	std::vector<DMGOpcodeInfo> GetDamageOpcodesDetails(const ITMExtHeader* header) const;
