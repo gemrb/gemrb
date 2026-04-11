@@ -173,10 +173,11 @@ def UpdateOverview(CurrentStep):
 
 	if CurrentStep > 5:
 		AddText('\n[color=FFFF00]' + GemRB.GetString(17088) + '[/color]', 1)
-		Stats = [ IE_STR, IE_DEX, IE_CON, IE_INT, IE_WIS, IE_CHR ]
 		for i in range(0, 6):
-			abl = GemRB.GetPlayerStat (MyChar, Stats[i])
-			strref = Tables[3].GetValue (Tables[3].GetRowName (i), "CAP_REF", GTV_INT)
+			statName = Tables[3].GetRowName (i)
+			stat = Tables[3].GetValue (statName, "STAT_ID", GTV_INT)
+			abl = GemRB.GetPlayerStat (MyChar, stat)
+			strref = Tables[3].GetValue (statName, "CAP_REF", GTV_INT)
 			AddText(strref)
 			AddText(': %d (%+d)' % (abl, abl / 2 - 5), 1)
 

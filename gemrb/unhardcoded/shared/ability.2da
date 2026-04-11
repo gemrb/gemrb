@@ -7,3 +7,5 @@ CONSTITUTION 11978      9583       1178      41
 INTELLIGENCE 11979      9585       1179      38
 WISDOM       11980      9586       1180      39
 CHARISMA     11981      9587       1181      42
+// list of abilities configurable during character generation's ability step
+// STAT_ID refers to their internal stat index like IE_DEX
