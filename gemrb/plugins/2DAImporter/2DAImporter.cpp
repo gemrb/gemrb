@@ -39,7 +39,7 @@ bool p2DAImporter::Open(std::unique_ptr<DataStream> str)
 
 	auto NextLine = [&]() -> bool {
 		while (str->ReadLine(line) != DataStream::Error) {
-			if (line[0] != '#') { // allow comments
+			if (line[0] != '#' && line[0] != '/') { // allow comments
 				return true;
 			}
 		}
