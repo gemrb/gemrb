@@ -43,20 +43,19 @@ def portrait_custom_done(custom_window, appearance_window, portrait_list1, portr
 
     if appearance_window:
         appearance_window.Close()
-    if GameCheck.IsBG1OrEE():
-        CharGenCommon.next()
     elif GameCheck.IsIWD2():
         GemRB.SetNextScript ("CharGen2")
 
 # This is for abort
-def portrait_custom_abort(custom_window):
+def portrait_custom_abort(custom_window, AppearanceWindow=None):
     print ("portrait_custom_abort")
     if custom_window:
         custom_window.Close()
-    if GameCheck.IsBG1OrEE():
-        AppearanceWindow.ShowModal (MODAL_SHADOW_GRAY) # narrower than CustomWindow, so borders will remain
-    elif GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
-        AppearanceWindow.ShowModal (MODAL_SHADOW_NONE) # narrower than CustomWindow, so borders will remain
+    if AppearanceWindow:
+        if GameCheck.IsBG1OrEE():
+            AppearanceWindow.ShowModal (MODAL_SHADOW_GRAY) # narrower than CustomWindow, so borders will remain
+        elif GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+            AppearanceWindow.ShowModal (MODAL_SHADOW_NONE) # narrower than CustomWindow, so borders will remain
 
 # This is for applying
 def portrait_apply_selection(AppearanceWindow, LastPortrait):

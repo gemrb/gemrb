@@ -92,10 +92,11 @@ def LeftPress():
 def CustomDone():
 	global AppearanceWindow
 	portrait_custom_done(CustomWindow, AppearanceWindow, PortraitList1, PortraitList2)
+	CharGenCommon.next()
 	return
 
 def CustomAbort():
-	portrait_custom_abort(CustomWindow)
+	portrait_custom_abort(CustomWindow, AppearanceWindow)
 	return
 
 def LargeCustomPortrait():
