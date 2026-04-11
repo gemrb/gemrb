@@ -50,21 +50,6 @@ enum class ProHeights {
 //gemrb specific internal flag
 #define PSF_SOUND2 0x80000000 //already started sound2
 
-//projectile travel flags
-#define PTF_COLOUR 1 //fake colours
-#define PTF_SMOKE  2 //has smoke
-// bg2: 4 smoke is false colored
-#define PTF_TINT 8 //tint projectile
-// bg2: 10 height
-#define PTF_SHADOW      32 //has shadow bam
-#define PTF_LIGHT       64 //has light shadow / glow
-#define PTF_TRANS       128 // glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
-#define PTF_BRIGHTEN    256 //brighten alpha; CPROJECTILEBAMFILEFORMAT_FLAGS_BRIGHTEST in bg2
-#define PTF_BLEND       512 // glBlendFunc(GL_DST_COLOR, GL_ONE);
-#define PTF_TRANS_BLEND (PTF_TRANS | PTF_BLEND) // glBlendFunc(GL_SRC_COLOR, GL_ONE); IWD only?
-// 0x100 and 0x200: FLAGS_BRIGHTESTIFFAST BRIGHTEST3DONLYOFF
-#define PTF_TIMELESS 0x4000 // GemRB extension to differentiate projectiles that ignore timestop
-
 //projectile extended travel flags (gemrb specific)
 #define PEF_BOUNCE   1 //bounce from walls (lightning bolt)
 #define PEF_CONTINUE 2 //continue as a travel projectile after trigger (lightning bolt)
@@ -155,6 +140,38 @@ struct ConeShape {
 	void SetupCone(ieWord width, orient_t orientation); // deliberately not providing as a ctor
 };
 
+// special (not using char animations)
+// using std::vector over std::array for better movability
+// the array will always be MAX_ORIENT in size
+using AnimArray = std::vector<Animation>;
+
+// travel projectile details
+struct TravelData {
+	ieDword flags = 0;
+	AnimArray anim;
+	ResRef VVC;
+	std::array<ResRef, 3> trailBAM;
+	std::array<ieWord, 3> trailSpeed;
+	Holder<PlaybackHandle> sound;
+
+	// projectile travel flags
+	enum {
+		PTF_COLOUR = 1, // fake colours
+		PTF_SMOKE = 2, // has smoke
+		// bg2: 4 smoke is false colored
+		PTF_TINT = 8, // tint projectile
+		// bg2: 16 height
+		PTF_SHADOW = 32, // has shadow bam
+		PTF_LIGHT = 64, // has light shadow / glow
+		PTF_TRANS = 128, // glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
+		PTF_BRIGHTEN = 256, // brighten alpha; CPROJECTILEBAMFILEFORMAT_FLAGS_BRIGHTEST in bg2
+		PTF_BLEND = 512, // glBlendFunc(GL_DST_COLOR, GL_ONE);
+		PTF_TRANS_BLEND = (PTF_TRANS | PTF_BLEND), // glBlendFunc(GL_SRC_COLOR, GL_ONE); IWD only?
+		// 0x100 and 0x200: FLAGS_BRIGHTESTIFFAST, BRIGHTEST3DONLYOFF
+		PTF_TIMELESS = 0x4000, // GemRB extension to differentiate projectiles that ignore timestop
+	};
+};
+
 struct ProjectileExtension {
 	ieDword AFlags;
 	ieWord TriggerRadius;
@@ -212,7 +229,6 @@ public:
 	ieDword SFlags = PSF_FLYING;
 	ResRef FiringSound;
 	ResRef ArrivalSound;
-	ResRef TravelVVC;
 	ieDword SparkColor = 0;
 	ieDword ExtFlags = 0;
 	ieStrRef StrRef = ieStrRef::INVALID;
@@ -226,7 +242,7 @@ public:
 	ResRef failureSpell;
 	ResRef successSpell;
 	////// gap
-	ieDword TFlags = 0;
+	TravelData travelData;
 	ResRef BAMRes1;
 	ResRef BAMRes2;
 	ieByte Seq1 = 0;
@@ -240,8 +256,6 @@ public:
 	ieByte SmokeGrad[7] {};
 	ieByte Aim = 0; // original bg2: m_numDirections, a list of {1, 5, 9}
 	ieWord SmokeAnimID = 0;
-	ResRef TrailBAM[3];
-	ieWord TrailSpeed[3] {};
 	unsigned int Range = 0;
 	//these are public but not in the .pro file
 	Holder<ProjectileExtension> Extension;
@@ -276,11 +290,6 @@ private:
 	int extensionTargetCount = 0;
 	Color tint;
 
-	// special (not using char animations)
-	// using std::vector over std::array for better movability
-	// the array will always be MAX_ORIENT in size
-	using AnimArray = std::vector<Animation>;
-	AnimArray travelAnim;
 	AnimArray shadowAnim;
 
 	Holder<Sprite2D> light = nullptr; // this is just a round/halftrans sprite, has no animation
@@ -291,7 +300,6 @@ private:
 	int bend = 0;
 	int drawSpark = 0;
 
-	Holder<PlaybackHandle> travelHandle;
 	// time-based duration for walls, instead of tracking ExplosionCount
 	uint32_t duration = 0;
 

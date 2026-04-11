@@ -38,11 +38,11 @@ Projectile::Projectile() noexcept
 	if (!server) {
 		server = core->GetProjectileServer().get();
 	}
-	travelAnim.resize(MAX_ORIENT);
+	travelData.anim.resize(MAX_ORIENT);
 	shadowAnim.resize(MAX_ORIENT);
 }
 
-Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bam, ieByte seq)
+AnimArray Projectile::CreateAnimations(const ResRef& bam, ieByte seq)
 {
 	auto af = gamedata->GetFactoryResourceAs<const AnimationFactory>(bam, IE_BAM_CLASS_ID);
 	if (!af) {
@@ -72,7 +72,7 @@ Projectile::AnimArray Projectile::CreateAnimations(const ResRef& bam, ieByte seq
 
 //Seq is the first cycle to use in the composite
 //Aim is the number of cycles
-Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactory& af, ieByte seq) const
+AnimArray Projectile::CreateCompositeAnimation(const AnimationFactory& af, ieByte seq) const
 {
 	AnimArray anims(MAX_ORIENT);
 	for (ieByte cycle = 0; cycle < Aim; cycle++) {
@@ -96,7 +96,7 @@ Projectile::AnimArray Projectile::CreateCompositeAnimation(const AnimationFactor
 //Seq is the cycle to use in case of single orientations
 //Aim is the number of Orientations
 // FIXME: seems inefficient that we load up MAX_ORIENT animations even for those with a single orientation (default case)
-Projectile::AnimArray Projectile::CreateOrientedAnimations(const AnimationFactory& af, ieByte seq) const
+AnimArray Projectile::CreateOrientedAnimations(const AnimationFactory& af, ieByte seq) const
 {
 	AnimArray anims(MAX_ORIENT);
 	for (ieByte cycle = 0; cycle < MAX_ORIENT; cycle++) {
@@ -209,7 +209,7 @@ void Projectile::GetSmokeAnim()
 	}
 	//turn off smoke animation if its animation was not found
 	//you might want to issue some warning here
-	TFlags &= PTF_SMOKE;
+	travelData.flags &= TravelData::PTF_SMOKE;
 }
 // load animations, start sound
 void Projectile::Setup()
@@ -286,13 +286,13 @@ void Projectile::Setup()
 		StaticTint(pal32[idx]);
 	}
 
-	travelAnim = CreateAnimations(BAMRes1, Seq1);
+	travelData.anim = CreateAnimations(BAMRes1, Seq1);
 
-	if (TFlags & PTF_SHADOW) {
+	if (travelData.flags & TravelData::PTF_SHADOW) {
 		shadowAnim = CreateAnimations(BAMRes2, Seq2);
 	}
 
-	if (TFlags & PTF_SMOKE) {
+	if (travelData.flags & TravelData::PTF_SMOKE) {
 		GetSmokeAnim();
 	}
 
@@ -303,24 +303,24 @@ void Projectile::Setup()
 		//the travel projectile should linger after explosion
 		if (ExtFlags & PEF_POP) {
 			//the explosion consists of a pop in/hold/pop out of the travel projectile (dimension door)
-			if (travelAnim[0] && shadowAnim[0]) {
-				extensionDelay = travelAnim[0].GetFrameCount() * 2 + shadowAnim[0].GetFrameCount();
-				travelAnim[0].flags |= Animation::Flags::Once;
+			if (travelData.anim[0] && shadowAnim[0]) {
+				extensionDelay = travelData.anim[0].GetFrameCount() * 2 + shadowAnim[0].GetFrameCount();
+				travelData.anim[0].flags |= Animation::Flags::Once;
 				shadowAnim[0].flags |= Animation::Flags::Once;
 			}
-		} else if (travelAnim[0]) {
-			extensionDelay = travelAnim[0].GetFrameCount();
-			travelAnim[0].flags |= Animation::Flags::Once;
+		} else if (travelData.anim[0]) {
+			extensionDelay = travelData.anim[0].GetFrameCount();
+			travelData.anim[0].flags |= Animation::Flags::Once;
 		}
 	}
 
-	if (TFlags & PTF_COLOUR) {
-		SetupPalette(travelAnim, palette, Gradients);
+	if (travelData.flags & TravelData::PTF_COLOUR) {
+		SetupPalette(travelData.anim, palette, Gradients);
 	} else {
 		palette = gamedata->GetPalette(PaletteRes);
 	}
 
-	if (TFlags & PTF_LIGHT) {
+	if (travelData.flags & TravelData::PTF_LIGHT) {
 		light = CreateLight(Size(LightX, LightY), LightZ);
 	}
 
@@ -329,7 +329,7 @@ void Projectile::Setup()
 		config.loop = true;
 	}
 
-	travelHandle = core->GetAudioPlayback().Play(FiringSound, config);
+	travelData.sound = core->GetAudioPlayback().Play(FiringSound, config);
 
 	//create more projectiles
 	if (ExtFlags & PEF_ITERATION) {
@@ -527,8 +527,8 @@ void Projectile::ApplyDefault() const
 
 void Projectile::StopSound()
 {
-	if (travelHandle) {
-		travelHandle->Stop();
+	if (travelData.sound) {
+		travelData.sound->Stop();
 	}
 }
 
@@ -537,13 +537,13 @@ void Projectile::UpdateSound()
 	if (!(SFlags & PSF_SOUND2)) {
 		StopSound();
 	}
-	if (!travelHandle || !travelHandle->IsPlaying()) {
+	if (!travelData.sound || !travelData.sound->IsPlaying()) {
 		auto config = core->GetAudioSettings().ConfigPresetByChannel(SFXChannel::Missile, Pos);
 		if (SFlags & PSF_LOOPING2) {
 			config.loop = true;
 		}
 
-		travelHandle = core->GetAudioPlayback().Play(ArrivalSound, config);
+		travelData.sound = core->GetAudioPlayback().Play(ArrivalSound, config);
 		SFlags |= PSF_SOUND2;
 	}
 }
@@ -601,7 +601,7 @@ Projectile::ProjectileState Projectile::GetNextTravelState()
 	}
 
 	if (ExtFlags & PEF_FADE) {
-		TFlags &= ~PTF_TINT; // turn off area tint
+		travelData.flags &= ~TravelData::PTF_TINT; // turn off area tint
 		tint.a--;
 		if (tint.a > 0) {
 			return state;
@@ -689,9 +689,9 @@ Projectile::ProjectileState Projectile::DoStep()
 
 	//intro trailing, drawn only once at the beginning
 	if (pathcounter == 0x7ffe) {
-		for (int i = 0; i < 3; i++) {
-			if (!TrailSpeed[i] && !TrailBAM[i].IsEmpty()) {
-				extensionDelay = AddTrail(TrailBAM[i], (ExtFlags & PEF_TINT) ? Gradients : nullptr);
+		for (size_t i = 0; i < travelData.trailSpeed.size(); i++) {
+			if (!travelData.trailSpeed[i] && !travelData.trailBAM[i].IsEmpty()) {
+				extensionDelay = AddTrail(travelData.trailBAM[i], (ExtFlags & PEF_TINT) ? Gradients : nullptr);
 			}
 		}
 	}
@@ -706,13 +706,13 @@ Projectile::ProjectileState Projectile::DoStep()
 	}
 
 	//don't bug out on 0 smoke frequency like the original IE
-	if ((TFlags & PTF_SMOKE) && SmokeSpeed && !(pathcounter % SmokeSpeed)) {
+	if ((travelData.flags & TravelData::PTF_SMOKE) && SmokeSpeed && !(pathcounter % SmokeSpeed)) {
 		AddTrail(smokebam, SmokeGrad);
 	}
 
-	for (int i = 0; i < 3; i++) {
-		if (TrailSpeed[i] && !(pathcounter % TrailSpeed[i])) {
-			AddTrail(TrailBAM[i], (ExtFlags & PEF_TINT) ? Gradients : NULL);
+	for (size_t i = 0; i < travelData.trailSpeed.size(); i++) {
+		if (travelData.trailSpeed[i] && !(pathcounter % travelData.trailSpeed[i])) {
+			AddTrail(travelData.trailBAM[i], (ExtFlags & PEF_TINT) ? Gradients : nullptr);
 		}
 	}
 
@@ -723,7 +723,7 @@ Projectile::ProjectileState Projectile::DoStep()
 			//transform into an explosive line
 			newState = EndTravel();
 		} else {
-			if (!(ExtFlags & PEF_FREEZE) && travelAnim[0]) {
+			if (!(ExtFlags & PEF_FREEZE) && travelData.anim[0]) {
 				//switch to 'fading' phase
 				SetDelay(100);
 			}
@@ -764,8 +764,8 @@ Projectile::ProjectileState Projectile::DoStep()
 	Pos = step->point;
 	path.currentStep = step - path.begin();
 
-	if (travelHandle) {
-		travelHandle->SetPosition(Pos);
+	if (travelData.sound) {
+		travelData.sound->SetPosition(Pos);
 	}
 
 	if (step == last) {
@@ -972,8 +972,8 @@ Projectile::ProjectileState Projectile::CheckTrigger(unsigned int radius)
 	if (state == ProjectileState::AWAITING_TRIGGER) {
 		//special trigger flag, explode only if the trigger animation has
 		//passed a hardcoded sequence number
-		if (Extension->AFlags & PAF_TRIGGER_D && travelAnim[Orientation]) {
-			int anim = travelAnim[Orientation].GetCurrentFrameIndex();
+		if (Extension->AFlags & PAF_TRIGGER_D && travelData.anim[Orientation]) {
+			int anim = travelData.anim[Orientation].GetCurrentFrameIndex();
 			if (anim < 30) {
 				return state;
 			}
@@ -1316,7 +1316,7 @@ void Projectile::Update()
 	}
 
 	const Game* game = core->GetGame();
-	if (game && game->IsTimestopActive() && !(TFlags & PTF_TIMELESS)) {
+	if (game && game->IsTimestopActive() && !(travelData.flags & TravelData::PTF_TIMELESS)) {
 		return;
 	}
 
@@ -1375,7 +1375,7 @@ Region Projectile::DrawingRegion(const Region& viewPort) const
 	}
 
 	orient_t face = GetOrientation();
-	const Animation& travel = travelAnim[face];
+	const Animation& travel = travelData.anim[face];
 	if (travel) {
 		Region r2 = travel.animArea;
 		r2.origin += Pos;
@@ -1647,7 +1647,7 @@ void Projectile::SpawnChild(size_t idx, bool firstExplosion, const Point& offset
 	}
 	// i'm unsure if we need blending for all anims or just the tinted ones
 	// FIXME: this seems suspect
-	pro->TFlags |= PTF_TRANS;
+	pro->travelData.flags |= TravelData::PTF_TRANS;
 	if (!(ExtFlags & PEF_CYCLE) || (ExtFlags & PEF_RANDOM)) {
 		pro->ExtFlags |= PEF_RANDOM;
 	}
@@ -1657,9 +1657,9 @@ void Projectile::SpawnChild(size_t idx, bool firstExplosion, const Point& offset
 	// currently needed by bg2/how Web (less obvious in bg1)
 	// the original hardcoded a cycle switch to 1 or 2 at random when reaching the end, which results in the same frame
 	// TODO: original behaviour was to repeat individually (per-child) not as a whole
-	if (pro->travelAnim[0] && Extension->APFlags & APF_PLAYONCE) {
+	if (pro->travelData.anim[0] && Extension->APFlags & APF_PLAYONCE) {
 		// set on all orients while we don't force one for single-orientation animations (see CreateOrientedAnimations)
-		for (auto& anim : pro->travelAnim) {
+		for (auto& anim : pro->travelData.anim) {
 			anim.flags |= Animation::Flags::Once;
 		}
 	}
@@ -1818,8 +1818,8 @@ void Projectile::DrawExplosion(const Region& vp, BlitFlags flags)
 
 int Projectile::GetTravelPos(orient_t face) const
 {
-	if (travelAnim[face]) {
-		return travelAnim[face].GetCurrentFrameIndex();
+	if (travelData.anim[face]) {
+		return travelData.anim[face].GetCurrentFrameIndex();
 	}
 	return 0;
 }
@@ -1834,8 +1834,8 @@ int Projectile::GetShadowPos(orient_t face) const
 
 void Projectile::SetFrames(orient_t face, int frame1, int frame2)
 {
-	if (travelAnim[face]) {
-		travelAnim[face].SetFrame(frame1);
+	if (travelData.anim[face]) {
+		travelData.anim[face].SetFrame(frame1);
 	}
 	if (shadowAnim[face]) {
 		shadowAnim[face].SetFrame(frame2);
@@ -1847,11 +1847,11 @@ void Projectile::DrawLine(const Region& vp, orient_t face, BlitFlags flag)
 	const Game* game = core->GetGame();
 	auto iter = path.begin();
 	Holder<Sprite2D> frame;
-	if (game && game->IsTimestopActive() && !(TFlags & PTF_TIMELESS)) {
-		frame = travelAnim[face].LastFrame();
+	if (game && game->IsTimestopActive() && !(travelData.flags & TravelData::PTF_TIMELESS)) {
+		frame = travelData.anim[face].LastFrame();
 		flag |= BlitFlags::GREY;
 	} else {
-		frame = travelAnim[face].NextFrame();
+		frame = travelData.anim[face].NextFrame();
 	}
 
 	// agannazar's scorcher and the bg1 wand of frost (only known line projectiles)
@@ -1898,8 +1898,8 @@ void Projectile::DrawPopping(orient_t face, const Point& pos, BlitFlags flags, c
 {
 	const Game* game = core->GetGame();
 	Holder<Sprite2D> frame;
-	if (game && game->IsTimestopActive() && !(TFlags & PTF_TIMELESS)) {
-		frame = travelAnim[face].LastFrame();
+	if (game && game->IsTimestopActive() && !(travelData.flags & TravelData::PTF_TIMELESS)) {
+		frame = travelData.anim[face].LastFrame();
 		flags |= BlitFlags::GREY;
 		Draw(frame, pos, flags, popTint);
 		return;
@@ -1911,10 +1911,10 @@ void Projectile::DrawPopping(orient_t face, const Point& pos, BlitFlags flags, c
 			ExtFlags &= ~PEF_UNPOP;
 		}
 	} else {
-		frame = travelAnim[0].NextFrame();
-		if (travelAnim[0].endReached) {
-			travelAnim[0].playReversed = true;
-			travelAnim[0].SetFrame(0);
+		frame = travelData.anim[0].NextFrame();
+		if (travelData.anim[0].endReached) {
+			travelData.anim[0].playReversed = true;
+			travelData.anim[0].SetFrame(0);
 			ExtFlags |= PEF_UNPOP;
 			frame = shadowAnim[0].NextFrame();
 		}
@@ -1936,7 +1936,7 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 	}
 
 	//Area tint
-	if (TFlags & PTF_TINT) {
+	if (travelData.flags & TravelData::PTF_TINT) {
 		tint = area->GetLighting(Pos);
 		tint.a = 255;
 		flags |= BlitFlags::COLOR_MOD;
@@ -1955,7 +1955,7 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 	// set up the tint for the rest of the blits, but don't overwrite the saved one
 	Color tint2 = tint;
 
-	if (TFlags & PTF_TINT && game) {
+	if (travelData.flags & TravelData::PTF_TINT && game) {
 		game->ApplyGlobalTint(tint2, flags);
 	}
 
@@ -1980,32 +1980,32 @@ void Projectile::DrawTravel(const Region& viewport, BlitFlags flags)
 
 	pos.y -= ZPos;
 
-	if (TFlags & PTF_TRANS) {
+	if (travelData.flags & TravelData::PTF_TRANS) {
 		flags |= BlitFlags::ONE_MINUS_DST;
 	}
-	if (TFlags & PTF_BLEND) {
+	if (travelData.flags & TravelData::PTF_BLEND) {
 		flags |= BlitFlags::DST;
 	}
-	if (TFlags & PTF_TRANS_BLEND) {
+	if (travelData.flags & TravelData::PTF_TRANS_BLEND) {
 		flags |= BlitFlags::SRC;
 	}
 
 	if (ExtFlags & PEF_PILLAR) {
 		//draw all frames simultaneously on top of each other
 		for (int i = 0; i < Aim; i++) {
-			if (travelAnim[i]) {
-				Holder<Sprite2D> frame = travelAnim[i].NextFrame();
+			if (travelData.anim[i]) {
+				Holder<Sprite2D> frame = travelData.anim[i].NextFrame();
 				Draw(frame, pos, flags, tint2);
 				pos.y -= frame->Frame.y;
 			}
 		}
-	} else if (travelAnim[face]) {
+	} else if (travelData.anim[face]) {
 		Holder<Sprite2D> frame;
-		if (game && game->IsTimestopActive() && !(TFlags & PTF_TIMELESS)) {
-			frame = travelAnim[face].LastFrame();
+		if (game && game->IsTimestopActive() && !(travelData.flags & TravelData::PTF_TIMELESS)) {
+			frame = travelData.anim[face].LastFrame();
 			flags |= BlitFlags::GREY; // move higher if it interferes with other tints badly
 		} else {
-			frame = travelAnim[face].NextFrame();
+			frame = travelData.anim[face].NextFrame();
 		}
 		Draw(frame, pos, flags, tint2);
 	}
@@ -2067,14 +2067,14 @@ void Projectile::SetGradient(int gradient, bool tinted)
 	if (tinted) {
 		ExtFlags |= PEF_TINT;
 	} else {
-		TFlags |= PTF_COLOUR;
+		travelData.flags |= TravelData::PTF_COLOUR;
 	}
 }
 
 void Projectile::StaticTint(const Color& newtint)
 {
 	tint = newtint;
-	TFlags &= ~PTF_TINT; //turn off area tint
+	travelData.flags &= ~TravelData::PTF_TINT; // turn off area tint
 }
 
 bool Projectile::IsWaitingForTrigger() const

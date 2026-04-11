@@ -42,7 +42,7 @@ void PROImporter::GetProjectile(std::unique_ptr<Projectile>& s)
 	str->ReadDword(s->SFlags); //spark, ignore center, looping sound etc
 	str->ReadResRef(s->FiringSound);
 	str->ReadResRef(s->ArrivalSound);
-	str->ReadResRef(s->TravelVVC); //no original game data uses this feature
+	str->ReadResRef(s->travelData.VVC); // no original game data uses this feature
 	str->ReadDword(s->SparkColor); //enabled by PSF_SPARK
 	// in the original bg2, there was just a 2 byte padding and 212 byte reserve left
 	str->ReadDword(s->ExtFlags); //gemrb extension flags
@@ -60,7 +60,7 @@ void PROImporter::GetProjectile(std::unique_ptr<Projectile>& s)
 	str->ReadResRef(s->successSpell); //gemrb extension implicit effect
 	str->Seek(172, GEM_CURRENT_POS); // skipping unused bytes
 	//we should stand at offset 0x100 now
-	str->ReadDword(s->TFlags); //other projectile flags
+	str->ReadDword(s->travelData.flags); //other projectile flags
 	str->ReadResRef(s->BAMRes1);
 	str->ReadResRef(s->BAMRes2);
 	str->Read(&s->Seq1, 1);
@@ -74,12 +74,12 @@ void PROImporter::GetProjectile(std::unique_ptr<Projectile>& s)
 	str->Read(s->SmokeGrad, 7);
 	str->Read(&s->Aim, 1);
 	str->ReadWord(s->SmokeAnimID);
-	str->ReadResRef(s->TrailBAM[0]);
-	str->ReadResRef(s->TrailBAM[1]);
-	str->ReadResRef(s->TrailBAM[2]);
-	str->ReadWord(s->TrailSpeed[0]);
-	str->ReadWord(s->TrailSpeed[1]);
-	str->ReadWord(s->TrailSpeed[2]);
+	for (auto& bam : s->travelData.trailBAM) {
+		str->ReadResRef(bam);
+	}
+	for (auto& speed : s->travelData.trailSpeed) {
+		str->ReadWord(speed);
+	}
 	// TODO: check if this was used
 	// IESDP: 0 - puff at target, 1 - puff at source
 	// original bg2: DWORD  m_dwPuffFlags and then just reserved space

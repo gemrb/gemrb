@@ -9844,7 +9844,7 @@ bool Actor::UseItem(ieDword slot, int header, const Scriptable* target, ieDword 
 			int param2 = (inventory.FistsEquipped() && GetMonkLevel()) ? 4 : 0;
 			fxqueue.AddWeaponEffects(&pro->GetEffects(), fx_melee_ref, param2);
 			// ignore timestop
-			pro->TFlags |= PTF_TIMELESS;
+			pro->travelData.flags |= TravelData::PTF_TIMELESS;
 		}
 		attackProjectile = std::move(pro);
 		// check if critical hit needs a screenshake
