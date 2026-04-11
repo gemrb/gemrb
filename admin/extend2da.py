@@ -14,6 +14,15 @@ def usage(msg):
   print("Example:")
   print("python extend2da.py gemrb/override/bg1/classes.2da APPEND 'HACKER 1 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0'")
 
+def isComment(line):
+	if len(line) == 0:
+		return False
+	if len(line) > 0 and chr(line[0]) == "#":
+		return True
+	if len(line) > 1 and str(line[0:2]) == "//":
+		return True
+	return False
+
 # get the longest row for comparison, while caching the reads
 def readAndGetMaxLength(f):
   global lines
@@ -21,7 +30,7 @@ def readAndGetMaxLength(f):
   maxL = i = 0
   for line in f:
     lines.append(line.rstrip())
-    if len(lines[i]) > maxL and chr(line[0]) != "#":
+    if len(lines[i]) > maxL and not isComment(line):
       maxL = len(lines[i])
     i = i + 1
   return maxL
@@ -36,7 +45,7 @@ def appendCol(f, max):
     if i == 2:
       colName = cell
 
-    if cell == "$" or lines[i] == b"" or chr(lines[i][0]) == "#":
+    if cell == "$" or lines[i] == b"" or isComment(lines[i]):
       f.write(lines[i] + b"\n")
       i = i + 1
       continue
@@ -103,7 +112,7 @@ def switchCols(f):
   colIdx1 = 0
   colIdx2 = 0
   for line in lines:
-    if i < 2 or line == b"" or chr(line[0]) == "#":
+    if i < 2 or line == b"" or isComment(line):
       f.write(line + b"\n")
       i = i + 1
       continue
