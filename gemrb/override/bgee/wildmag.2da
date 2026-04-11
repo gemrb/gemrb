@@ -101,3 +101,6 @@
 98         SPWM198    0x2289     *
 99         +AT2XLVL   0x2296     spell_cast_at_double_level
 100        0.1        0x227D     no_change
+
+// the ees added the missing table, but didn't mark the special results, so we override it
+// SPELL - if not a filename, it triggers special mechanics (see wildmag.txt)

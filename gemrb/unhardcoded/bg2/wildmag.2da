@@ -101,3 +101,6 @@
 98         SPWM198    0x2289     *
 99         +AT2XLVL   0x2296     spell_cast_at_double_level
 100        0.1        0x227D     no_change
+
+// unhardcoded table for wild magic results
+// SPELL - if not a filename, it triggers special mechanics (see wildmag.txt)
