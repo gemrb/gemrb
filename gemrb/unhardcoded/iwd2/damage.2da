@@ -17,6 +17,12 @@ ICEL       COLDH      COLDL      -1        1
 ACIDS      ACIDH      ACIDDTH    -1        1
 ACIDM      ACIDH      ACIDDTH    -1        1
 ACIDL      ACIDH      ACIDDTH    -1        1
-# looks like disin, divin might also be present as types
-# add them here and in Actor::PlayDamageType if spells
-# don't do it themselves
+// looks like disin, divin might also be present as types
+// add them here and in Actor::PlayDamageType if spells
+// don't do it themselves
+
+// damage animations for different damage types (see dmginfo.2da) and severities
+// MAIN     - the damage hit animation
+// SPARKS   - additional splash animations
+// GRADIENT - fake coloured animations will be recoloured with this gradient
+// BLEND - does the animation need blending?

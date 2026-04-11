@@ -14,3 +14,9 @@ SPARKL  SPSHKIMP  SPSPARKS  -1        1
 ICES    SPFIRIMP  *         71        0
 ICEM    SPFIRIMP  *         71        0
 ICEL    SPFIRIMP  *         71        0
+
+// damage animations for different damage types (see dmginfo.2da) and severities
+// MAIN     - the damage hit animation
+// SPARKS   - additional splash animations
+// GRADIENT - fake coloured animations will be recoloured with this gradient
+// BLEND - does the animation need blending?

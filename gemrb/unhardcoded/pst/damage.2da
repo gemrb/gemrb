@@ -14,3 +14,9 @@ SPARKL  DMGSPARK  *       -1        1
 ICES    D005DICE  *       -1        1
 ICEM    D005DICE  *       -1        1
 ICEL    D005DICE  *       -1        1
+
+// damage animations for different damage types (see dmginfo.2da) and severities
+// MAIN     - the damage hit animation
+// SPARKS   - additional splash animations
+// GRADIENT - fake coloured animations will be recoloured with this gradient
+// BLEND - does the animation need blending?
