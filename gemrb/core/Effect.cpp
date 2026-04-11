@@ -80,6 +80,56 @@ Effect& Effect::operator=(const Effect& rhs) noexcept
 	return *this;
 }
 
+Effect& Effect::operator=(Effect&& rhs) noexcept
+{
+	Opcode = std::move(rhs.Opcode);
+	Target = std::move(rhs.Target);
+	Power = std::move(rhs.Power);
+	Parameter1 = std::move(rhs.Parameter1);
+	Parameter2 = std::move(rhs.Parameter2);
+	TimingMode = std::move(rhs.TimingMode);
+	// skip unknown2
+	Resistance = std::move(rhs.Resistance);
+	Duration = std::move(rhs.Duration);
+	ProbabilityRangeMax = std::move(rhs.ProbabilityRangeMax);
+	ProbabilityRangeMin = std::move(rhs.ProbabilityRangeMin);
+	DiceThrown = std::move(rhs.DiceThrown);
+	DiceSides = std::move(rhs.DiceSides);
+	SavingThrowType = std::move(rhs.SavingThrowType);
+	SavingThrowBonus = std::move(rhs.SavingThrowBonus);
+	IsVariable = std::move(rhs.IsVariable);
+	IsSaveForHalfDamage = std::move(rhs.IsSaveForHalfDamage);
+	PrimaryType = std::move(rhs.PrimaryType);
+	MinAffectedLevel = std::move(rhs.MinAffectedLevel);
+	MaxAffectedLevel = std::move(rhs.MaxAffectedLevel);
+	Parameter3 = std::move(rhs.Parameter3);
+	Parameter4 = std::move(rhs.Parameter4);
+	Parameter5 = std::move(rhs.Parameter5);
+	Parameter6 = std::move(rhs.Parameter6);
+	Source = std::move(rhs.Source);
+	Pos = std::move(rhs.Pos);
+	SourceType = std::move(rhs.SourceType);
+	SourceRef = std::move(rhs.SourceRef);
+	SourceFlags = std::move(rhs.SourceFlags);
+	Projectile = std::move(rhs.Projectile);
+	InventorySlot = std::move(rhs.InventorySlot);
+	CasterLevel = std::move(rhs.CasterLevel);
+	FirstApply = std::move(rhs.FirstApply);
+	SecondaryType = std::move(rhs.SecondaryType);
+	SecondaryDelay = std::move(rhs.SecondaryDelay);
+	CasterID = std::move(rhs.CasterID);
+	RandomValue = std::move(rhs.RandomValue);
+	SpellLevel = std::move(rhs.SpellLevel);
+
+	IsVariable = std::move(rhs.IsVariable);
+	if (IsVariable) {
+		VariableName = std::move(rhs.VariableName);
+	} else {
+		resources = std::move(rhs.resources);
+	}
+	return *this;
+}
+
 bool Effect::operator==(const Effect& rhs) const noexcept
 {
 	if (this == &rhs) return true;

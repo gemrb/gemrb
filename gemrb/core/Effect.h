@@ -162,6 +162,7 @@ public:
 	Effect(const Effect& rhs) noexcept;
 
 	Effect& operator=(const Effect& rhs) noexcept;
+	Effect& operator=(Effect&& rhs) noexcept;
 
 	~Effect() noexcept = default;
 
