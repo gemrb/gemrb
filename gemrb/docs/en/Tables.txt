@@ -1,0 +1,13 @@
+GemRB includes several 2DA tables under gemrb/unhardcoded and gemrb/override.
+Some are tables present only in some games, made available elsewhere, so we can
+use a shared data model. For those, more documentation is available on IESDP:
+https://gibberlings3.github.io/iesdp/files/2da/index.htm
+
+The few in gemrb/override are there to force consistency, since they have
+precedence over any file in the game. We try to minimize their number, as they
+are generally not compatible with mods. Many are there to prevent leftover
+files from previous games to have unwanted effects.
+
+The rest are tables that represent data that was hardcoded in the engines.
+They generally include their own basic documentation, while the more
+complicated ones have documentation in Tables/.

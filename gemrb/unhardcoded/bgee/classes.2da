@@ -23,3 +23,11 @@ SORCERER             SAVEWIZ    0       0x40000    -1         0         10
 MONK                 SAVEMONK   0       0x20000000 -1         0         9
 BARBARIAN            SAVEWAR    0       0          -1         1         9
 SHAMAN               SAVEPRS    0       0x40000000 -1         1         9
+
+// extra data about classes
+// SAVE      - the saving throw table for this class
+// MULTI     - if multi class, which classes are combined (constructed from their IDs)
+// USABILITY - the item usability flag
+// MC_WAS_ID - value used by dualclassed character to denote the old class
+// STREXTRA  - is the extraordinary strength stat available to this class (17, 18/01-18/00, 19)
+// CONBONLVL - up until which level does the class receive a constitution bonus to hp on level up?

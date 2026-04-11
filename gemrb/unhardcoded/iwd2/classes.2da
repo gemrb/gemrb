@@ -36,3 +36,10 @@ CLERIC_TEMPUS    38102      38123      0x100000   3          CLABCL06   SAVEPRS 
 CLERIC_BANE      38103      38124      0x200000   3          CLABCL07   SAVEPRS     0x200000       BAATNFG
 CLERIC_MASK      38106      38125      0x400000   3          CLABCL08   SAVEPRS     0x400000       BAATNFG
 CLERIC_TALOS     38107      38126      0x800000   3          CLABCL09   SAVEPR      0x800000       BAATNFG
+
+// extra data about classes and kits
+// CLASS - base class (CLASSID) for kits
+// CLAB - class level abilities table
+// SAVE      - the saving throw table for this class
+// USABILITY - the item usability flag
+// TOHIT - the table used for to-hit stat progression

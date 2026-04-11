@@ -1,8 +1,0 @@
-Description: Contains the hp to gain on barbarian level up.
-
-Columns - 
-SIDES    - number of sides to roll
-ROLL     - number of rolls
-MODIFIER - add after the roll
-
-Rows - the level the roll applies to

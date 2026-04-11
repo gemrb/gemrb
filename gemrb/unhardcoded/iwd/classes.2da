@@ -19,3 +19,11 @@ FIGHTER_DRUID        *          1026    0x1000     -1         1         9
 CLERIC_RANGER        *          2052    1024       -1         1         9
 FIGHTER_MAGE_THIEF   *          11      0x10000    -1         1         9
 FIGHTER_MAGE_CLERIC  *          7       0x8000     -1         1         9
+
+// extra data about classes
+// SAVE      - the saving throw table for this class
+// MULTI     - if multi class, which classes are combined (constructed from their IDs)
+// USABILITY - the item usability flag
+// MC_WAS_ID - value used by dualclassed character to denote the old class
+// STREXTRA  - is the extraordinary strength stat available to this class (17, 18/01-18/00, 19)
+// CONBONLVL - up until which level does the class receive a constitution bonus to hp on level up?
