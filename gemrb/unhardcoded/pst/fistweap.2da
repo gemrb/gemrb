@@ -11,3 +11,6 @@ FIST
 7	KARACH
 8	ANNAHDAG
 9	MBITE
+
+// per-class (row name must match class ID) list of fist slot weapons at each level
+// the table default dictates it for everyone else
