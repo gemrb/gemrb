@@ -320,8 +320,6 @@ Actor::Actor()
 
 Actor::~Actor(void)
 {
-	delete anims;
-
 	for (ScriptedAnimation* vvc : vfxQueue) {
 		delete vvc;
 	}
@@ -392,7 +390,6 @@ void Actor::SetAnimationID(stat_t animID)
 				recover = gamedata->GetPalette(paletteResRef);
 			}
 		}
-		delete anims;
 	}
 
 	// hacking PST no palette
@@ -403,9 +400,8 @@ void Actor::SetAnimationID(stat_t animID)
 		BaseStats[IE_COLORCOUNT] = 0;
 	}
 
-	anims = new CharAnimations(animID & 0xffff, BaseStats[IE_ARMOR_TYPE]);
+	anims = std::make_unique<CharAnimations>(animID & 0xffff, BaseStats[IE_ARMOR_TYPE]);
 	if (!anims || anims->ResRefBase.IsEmpty()) {
-		delete anims;
 		anims = nullptr;
 		Log(ERROR, "Actor", "Missing animation for {}", fmt::WideToChar { GetName() });
 		return;
@@ -464,7 +460,7 @@ void Actor::SetAnimationID(stat_t animID)
 
 CharAnimations* Actor::GetAnims() const
 {
-	return anims;
+	return anims.get();
 }
 
 /** Returns a Stat value (Base Value + Mod) */

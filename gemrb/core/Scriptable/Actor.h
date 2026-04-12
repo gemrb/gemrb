@@ -507,7 +507,7 @@ private:
 	String LongName;
 	String ShortName;
 
-	CharAnimations* anims = nullptr;
+	std::unique_ptr<CharAnimations> anims;
 
 	using AnimationPart = std::pair<Holder<Animation>, Holder<Palette>>;
 	struct {
@@ -533,7 +533,7 @@ private:
 
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Point& p, BlitFlags flags,
-			     const std::vector<AnimationPart>& anims, const Color& tint) const;
+			     const std::vector<AnimationPart>& animParts, const Color& tint) const;
 
 	/** fixes the palette */
 	void SetupColors();
