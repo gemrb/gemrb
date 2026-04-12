@@ -155,7 +155,7 @@ struct TravelData {
 	Holder<PlaybackHandle> sound;
 
 	// projectile travel flags
-	enum {
+	enum : int {
 		PTF_COLOUR = 1, // fake colours
 		PTF_SMOKE = 2, // has smoke
 		// bg2: 4 smoke is false colored
