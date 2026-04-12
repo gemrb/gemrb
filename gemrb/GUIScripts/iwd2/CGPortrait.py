@@ -82,7 +82,7 @@ def BackPress ():
 	return
 
 def CustomDone ():
-	portrait_custom_done(CustomWindow, AppearanceWindow, PortraitList1, PortraitList2)
+	portrait_custom_done(AppearanceWindow)
 	return
 
 def CustomAbort ():
@@ -90,21 +90,10 @@ def CustomAbort ():
 	return
 
 def LargeCustomPortrait():
-    portrait_common_large_custom(
-        CustomWindow,
-        PortraitList1,
-        PortraitList2,
-        RowCount1,
-        "NOPORTMD"
-    )
+    portrait_common_large_custom()
 
 def SmallCustomPortrait ():
-	portrait_common_small_custom(
-        CustomWindow,
-        PortraitList1,
-        PortraitList2,
-        RowCount2
-    )
+	portrait_common_small_custom()
 
 def CustomPress ():
     portrait_custom_press(

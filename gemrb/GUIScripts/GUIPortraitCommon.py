@@ -6,6 +6,9 @@
 import GemRB
 import GameCheck
 from GUIDefines import *
+from ie_restype import RES_BMP
+
+CustomWindow = 0
 
 # This if for moving to next portrait
 def portrait_next(PortraitsTable, LastPortrait, gender):
@@ -30,20 +33,25 @@ def portrait_prev(PortraitsTable, LastPortrait, gender):
             return LastPortrait
 
 # This is for when is done
-def portrait_custom_done(custom_window, appearance_window, portrait_list1, portrait_list2):
+def portrait_custom_done(appearance_window):
+
+    global PortraitList1, PortraitList2
+    global RowCount1
+    global CustomWindow
+
     print ("portrait_custom_done")
-    portrait = portrait_list1.QueryText()
+    portrait = PortraitList1.QueryText()
     GemRB.SetToken("LargePortrait", portrait)
 
-    portrait = portrait_list2.QueryText()
+    portrait = PortraitList2.QueryText()
     GemRB.SetToken("SmallPortrait", portrait)
 
-    if custom_window:
-        custom_window.Close()
+    if CustomWindow:
+        CustomWindow.Close()
 
     if appearance_window:
         appearance_window.Close()
-    elif GameCheck.IsIWD2():
+    if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
         GemRB.SetNextScript ("CharGen2")
 
 # This is for abort
@@ -69,28 +77,27 @@ def portrait_apply_selection(AppearanceWindow, LastPortrait):
         large_suffix = "M"
     GemRB.SetToken("SmallPortrait", PortraitName + "S")
     GemRB.SetToken("LargePortrait", PortraitName + large_suffix)
-    if GameCheck.IsBG1OrEE():
-        CharGenCommon.next()
-    elif GameCheck.IsIWD2():
-        GemRB.SetNextScript ("CharGen2") #Before race
-    elif GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+    if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
         GemRB.SetNextScript ("CharGen2") #Before race
 
 # This is for the large custom portrait
-def portrait_common_large_custom(
-    custom_window,
-    portrait_list1,
-    portrait_list2,
-    row_count1,
-    empty_portrait
-):
-    print ("portrait_common_large_custom")
-    window = custom_window
+def portrait_common_large_custom():
+    global PortraitList1, PortraitList2
+    global RowCount1
+    global CustomWindow
 
-    portrait = portrait_list1.QueryText()
+    print ("portrait_common_large_custom")
+    if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+        empty_portrait = "NOPORTMD"
+    else:
+        empty_portrait = "NOPORTLG"
+
+    window = CustomWindow
+
+    portrait = PortraitList1.QueryText()
 
     # small hack
-    if GemRB.GetVar("Row1") == row_count1:
+    if GemRB.GetVar("Row1") == RowCount1:
         return
 
     label = window.GetControl(0x10000007)
@@ -105,7 +112,7 @@ def portrait_common_large_custom(
         else:
             button.SetState(IE_GUI_BUTTON_DISABLED)
     else:
-        if portrait_list2.QueryText() != "":
+        if PortraitList2.QueryText() != "":
             if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
                 button.SetDisabled(False)
             else:
@@ -115,19 +122,18 @@ def portrait_common_large_custom(
     preview.SetPicture(portrait, empty_portrait)
 
 # This is for the small custom portrait
-def portrait_common_small_custom(
-    custom_window,
-    portrait_list1,
-    portrait_list2,
-    row_count2
-):
-    print ("portrait_common_small_custom")
-    window = custom_window
+def portrait_common_small_custom():
+    global PortraitList1, PortraitList2
+    global RowCount2
+    global CustomWindow
 
-    portrait = portrait_list2.QueryText()
+    print ("portrait_common_small_custom")
+    window = CustomWindow
+
+    portrait = PortraitList2.QueryText()
 
     # small hack
-    if GemRB.GetVar("Row2") == row_count2:
+    if GemRB.GetVar("Row2") == RowCount2:
         return
 
     label = window.GetControl(0x10000008)
@@ -143,7 +149,7 @@ def portrait_common_small_custom(
         else:
             button.SetState(IE_GUI_BUTTON_DISABLED)
     else:
-        if portrait_list1.QueryText() != "":
+        if PortraitList1.QueryText() != "":
             if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
                 button.SetDisabled(False)
             else:
@@ -166,9 +172,8 @@ def portrait_custom_press(
     global RowCount1, RowCount2
     global CustomWindow
 
-    window_pack=None
-    if not GameCheck.IsIWD2():
-        window_pack="GUICG"
+    window_pack="GUICG"
+    print(window_pack)
     if window_pack:
         CustomWindow = Window = GemRB.LoadWindow(18, window_pack)
     else:

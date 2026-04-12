@@ -91,7 +91,7 @@ def LeftPress():
 
 def CustomDone():
 	global AppearanceWindow
-	portrait_custom_done(CustomWindow, AppearanceWindow, PortraitList1, PortraitList2)
+	portrait_custom_done(AppearanceWindow)
 	CharGenCommon.next()
 	return
 
@@ -100,21 +100,10 @@ def CustomAbort():
 	return
 
 def LargeCustomPortrait():
-    portrait_common_large_custom(
-        CustomWindow,
-        PortraitList1,
-        PortraitList2,
-        RowCount1,
-        "NOPORTLG"
-    )
+    portrait_common_large_custom()
 
 def SmallCustomPortrait():
-    portrait_common_small_custom(
-        CustomWindow,
-        PortraitList1,
-        PortraitList2,
-        RowCount2
-    )
+    portrait_common_small_custom()
 
 def CustomPress():
     portrait_custom_press(
@@ -128,3 +117,4 @@ def CustomPress():
 
 def NextPress():
 	portrait_apply_selection(AppearanceWindow, LastPortrait)
+	CharGenCommon.next()
