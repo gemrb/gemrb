@@ -15,6 +15,7 @@
 #include "Game.h"
 #include "Inventory.h"
 #include "Palette.h"
+#include "PolymorphCache.h"
 #include "Projectile.h"
 #include "Spellbook.h"
 
@@ -33,7 +34,6 @@ class Animation;
 class DataFileMgr;
 class Map;
 class ScriptedAnimation;
-struct PolymorphCache;
 enum class Feat : uint8_t;
 
 #define MAX_STATS 256
@@ -497,7 +497,7 @@ public:
 	int LastDamage = 0;
 	ResRef BackstabResRef = "*"; // apply on successful backstab
 
-	PolymorphCache* polymorphCache = nullptr; // fx_polymorph etc
+	std::unique_ptr<PolymorphCache> polymorphCache; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods {};
 	ieDword* spellStates = nullptr;
 

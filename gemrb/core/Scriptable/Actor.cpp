@@ -324,8 +324,6 @@ Actor::~Actor(void)
 		delete vvc;
 	}
 
-	delete polymorphCache;
-
 	free(spellStates);
 }
 

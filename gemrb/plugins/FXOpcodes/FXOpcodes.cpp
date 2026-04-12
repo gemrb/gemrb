@@ -4443,7 +4443,7 @@ int fx_polymorph(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	bool cached = true;
 	if (!target->polymorphCache) {
 		cached = false;
-		target->polymorphCache = new PolymorphCache();
+		target->polymorphCache = std::make_unique<PolymorphCache>();
 	}
 	if (!cached || fx->Resource != target->polymorphCache->Resource) {
 		Actor* newCreature = gamedata->GetCreature(fx->Resource, 0);
