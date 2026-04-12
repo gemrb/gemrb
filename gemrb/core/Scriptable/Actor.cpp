@@ -312,7 +312,7 @@ Actor::Actor()
 	}
 
 	RollSaves();
-	spellStates = (ieDword*) calloc(SpellStatesSize, sizeof(ieDword));
+	spellStates.resize(SpellStatesSize);
 
 	AC.SetOwner(this);
 	ToHit.SetOwner(this);
@@ -323,8 +323,6 @@ Actor::~Actor(void)
 	for (ScriptedAnimation* vvc : vfxQueue) {
 		delete vvc;
 	}
-
-	free(spellStates);
 }
 
 void Actor::SetFistStat(ieDword stat)
@@ -2656,9 +2654,7 @@ Actor::stats_t Actor::ResetStats(bool init)
 	if (PCStats) {
 		PCStats->States = PCStatsStruct::StateArray();
 	}
-	if (SpellStatesSize) {
-		memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
-	}
+	spellStates.assign(SpellStatesSize, 0);
 	AC.ResetAll();
 	ToHit.ResetAll(); // effects can result in the change of any of the boni, so we need to reset all
 
@@ -2686,9 +2682,7 @@ void Actor::AddEffects(EffectQueue&& fx)
 	fx.SetOwner(this);
 	fx.AddAllEffects(this, Pos);
 
-	if (SpellStatesSize) {
-		memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
-	}
+	spellStates.assign(SpellStatesSize, 0);
 	//also clear the spell bonuses just given, they will be
 	//recalculated below again
 	spellbook.ClearBonus();
@@ -10258,7 +10252,7 @@ void Actor::SetOverlay(unsigned int overlay)
 }
 
 //returns true if spell state is already set or illegal
-bool Actor::SetSpellState(ieDword spellstate) const
+bool Actor::SetSpellState(ieDword spellstate)
 {
 	if (spellstate >= SpellStatesSize << 5) return true;
 	ieDword pos = spellstate >> 5;

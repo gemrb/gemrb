@@ -499,7 +499,7 @@ public:
 
 	std::unique_ptr<PolymorphCache> polymorphCache; // fx_polymorph etc
 	WildSurgeSpellMods wildSurgeMods {};
-	ieDword* spellStates = nullptr;
+	std::vector<ieDword> spellStates;
 
 	Region drawingRegion;
 
@@ -953,7 +953,7 @@ public:
 	/* Enables an overlay */
 	void SetOverlay(unsigned int overlay);
 	/* Checks and sets a spellstate if it wasn't set yet */
-	bool SetSpellState(ieDword spellstate) const;
+	bool SetSpellState(ieDword spellstate);
 	/* Checks a spellstate */
 	bool HasSpellState(ieDword spellstate) const;
 	/* Checks a feat */
