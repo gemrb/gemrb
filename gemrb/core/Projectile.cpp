@@ -981,6 +981,9 @@ Projectile::ProjectileState Projectile::CheckTrigger(unsigned int radius)
 	}
 
 	// we can use the normal radius for all, since walls effectively use only half of it
+	if (!(ExtFlags & PEF_WALL)) {
+		radius /= 16;
+	}
 	std::vector<Actor*> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	bool overlap = false;
 	if (ExtFlags & PEF_WALL) {
@@ -991,7 +994,7 @@ Projectile::ProjectileState Projectile::CheckTrigger(unsigned int radius)
 			}
 		}
 	} else {
-		overlap = actors.empty();
+		overlap = !actors.empty();
 	}
 	if (overlap) {
 		if (state == ProjectileState::AWAITING_TRIGGER) {
