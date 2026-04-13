@@ -400,7 +400,7 @@ void Actor::SetAnimationID(stat_t animID)
 	anims->SetWeaponRef(WeaponRef);
 
 	//if we have a recovery palette, then set it back
-	assert(anims->PartPalettes[PAL_MAIN] == 0);
+	assert(anims->PartPalettes[PAL_MAIN] == nullptr);
 	anims->PartPalettes[PAL_MAIN] = recover;
 	if (recover) {
 		anims->lockPalette = true;
@@ -738,7 +738,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 		// TODO: fix it — one application ensures no problems with stacking permanent effects
 		// NOTE: it can happen in normal play that we are leveling two classes at once, as some of the xp thresholds are shared (f/m at 250,000 xp).
 		bool found = false;
-		std::map<int, ClassKits>::iterator clskit = class2kits.begin();
+		auto clskit = class2kits.begin();
 		for (int cidx = 0; clskit != class2kits.end(); clskit++, cidx++) {
 			std::vector<TableMgr::index_t> kits = class2kits[cidx].indices;
 			auto it = kits.begin();
@@ -1133,7 +1133,7 @@ static void pcf_hitpoint(Actor* actor, ieDword oldValue, ieDword hp)
 		hp = minhp;
 	}
 	if ((signed) hp <= 0) {
-		actor->Die(NULL);
+		actor->Die(nullptr);
 	} else {
 		// in testing it popped up somewhere between 39% and 25.3% (single run) -> 1/3
 		if (signed(3 * oldValue) > maxhp && signed(3 * hp) < maxhp) {
@@ -1171,7 +1171,7 @@ static void pcf_stat(Actor* actor, ieDword newValue, ieDword stat)
 	if ((signed) newValue <= 0) {
 		static EffectRef fx_minimum_base_stats_ref = { "MinimumBaseStats", -1 };
 		if (DeathOnZeroStat && !actor->fxqueue.HasEffectWithParam(fx_minimum_base_stats_ref, 1)) {
-			actor->Die(NULL);
+			actor->Die(nullptr);
 		} else {
 			actor->Modified[stat] = 1;
 		}
@@ -2097,7 +2097,7 @@ static void InitActorTables()
 			const std::string& rowName = fmt::to_string(i);
 			// kit usability is in hex and is sometimes used as the kit ID,
 			// while other times ID is the baseclass constant or-ed with the index
-			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE").c_str(), NULL, 16);
+			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE").c_str(), nullptr, 16);
 			int classID = tm->QueryFieldSigned<int>(rowName, "CLASS");
 			ResRef clab = tm->QueryField(rowName, "ABILITIES");
 			const std::string& kitName = tm->QueryField(rowName, "ROWNAME");
@@ -2223,9 +2223,9 @@ static void InitActorTables()
 	tm = gamedata->LoadTable("avprefix");
 	avBase = 0;
 	if (tm) {
-		TableMgr::index_t count = tm->GetRowCount();
-		if (count > 0 && count < 8) {
-			avPrefix.resize(count - 1);
+		TableMgr::index_t avpCount = tm->GetRowCount();
+		if (avpCount > 0 && avpCount < 8) {
+			avPrefix.resize(avpCount - 1);
 			avBase = tm->QueryFieldSigned<int>(0, 0);
 			const auto& poi = tm->QueryField(0, 1);
 			if (poi[0] != '*') {
@@ -2414,7 +2414,6 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 		flags |= AA_BLEND;
 	}
 
-	Log(COMBAT, "Actor", "Damage animation type: {}", type);
 	const Effect* fx;
 	int sparkType = 0;
 	int gradientType = damageGradients[type];
@@ -2460,6 +2459,9 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 		case 17:
 		case 18: //disintegrate
 			break;
+		default:
+			Log(ERROR, "Actor", "Unknown damage animation type: {} ({})!", type & 255, type);
+			return;
 	}
 
 	if (hit) {
@@ -2501,12 +2503,10 @@ bool Actor::SetStat(unsigned int StatIndex, stat_t Value, int pcf)
 	if (Modified[StatIndex] != Value) {
 		Modified[StatIndex] = Value;
 	}
-	if (previous != Value) {
-		if (pcf) {
-			PostChangeFunctionType f = post_change_functions[StatIndex];
-			if (f) {
-				(*f)(this, previous, Value);
-			}
+	if (previous != Value && pcf) {
+		PostChangeFunctionType f = post_change_functions[StatIndex];
+		if (f) {
+			(*f)(this, previous, Value);
 		}
 	}
 	return true;
@@ -2631,6 +2631,9 @@ void Actor::CheckPuppet(Actor* puppet, ieDword type)
 			AddPortraitIcon(PI_PROJIMAGE);
 			Modified[IE_STATE_ID] |= STATE_HELPLESS;
 			break;
+		default:
+			Log(ERROR, "Actor", "Unknown puppet type: {}!", type);
+			break;
 	}
 	Modified[IE_PUPPETTYPE] = type;
 	Modified[IE_PUPPETID] = puppet->GetGlobalID();
@@ -2722,7 +2725,7 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 	}
 
 	//move this further down if needed
-	PrevStats = NULL;
+	PrevStats = nullptr;
 
 	for (auto& trigger : triggers) {
 		trigger.flags |= TEF_PROCESSED_EFFECTS;
@@ -3470,7 +3473,6 @@ int Actor::NewBase(unsigned int StatIndex, stat_t ModifierValue, ieDword Modifie
 void Actor::Interact(int type) const
 {
 	EnumIterator<Verbal> start;
-	int count;
 	bool queue = false;
 
 	switch (type & 0xff) {
@@ -3494,15 +3496,17 @@ void Actor::Interact(int type) const
 		default:
 			return;
 	}
+
+	int choices;
 	if (type & 0xff00) {
 		//PST style fixed slots
 		start = start + (((type & 0xff00) >> 8) - 1);
-		count = 1;
+		choices = 1;
 	} else {
 		//BG1 style random slots
-		count = 3;
+		choices = 3;
 	}
-	VerbalConstant(*start, count, queue ? DS_QUEUE : 0);
+	VerbalConstant(*start, choices, queue ? DS_QUEUE : 0);
 }
 
 ieStrRef Actor::GetVerbalConstant(Verbal index) const
@@ -6207,9 +6211,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable* checker) const
 		if (Modified[IE_AVATARREMOVAL]) return false;
 
 		const Game* game = core->GetGame();
-		if (game) {
-			if (!Schedule(game->GameTime, true)) return false;
-		}
+		if (game && !Schedule(game->GameTime, true)) return false;
 	}
 
 	if (ga_flags & GA_NO_HIDDEN) {
@@ -6240,6 +6242,8 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable* checker) const
 			if (Modified[IE_EA] >= EA_EVILCUTOFF) return false;
 			// neither to bats and birds
 			if (anims && anims->GetCircleSize() == 0) return false;
+			break;
+		default:
 			break;
 	}
 	if (ga_flags & GA_NO_DEAD) {
@@ -7047,6 +7051,8 @@ int Actor::GetToHit(ieDword Flags, const Actor* target)
 		case WEAPON_RANGED:
 			generic += GetStat(IE_MISSILEHITBONUS);
 			break;
+		default:
+			break;
 	}
 
 	if (target) {
@@ -7125,7 +7131,9 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 			// WEAPON_USESTRENGTH only affects weapon damage, WEAPON_USESTRENGTH_HIT unknown
 			strbonus = 0;
 			break;
-			// no ability tohit bonus for WEAPON_FIST
+		// no ability tohit bonus for WEAPON_FIST
+		default:
+			break;
 	}
 
 	// both strength and dex bonus are stored positive only in iwd2
@@ -7170,7 +7178,7 @@ int Actor::GetDefense(int headerDamageType, ieDword wflags, const Actor* attacke
 		if (header && (header->AttackType == ITEM_AT_MELEE)) {
 			int slot;
 			ieDword stars;
-			if (inventory.GetUsedWeapon(true, slot) == NULL) {
+			if (inventory.GetUsedWeapon(true, slot) == nullptr) {
 				//single-weapon style applies to all ac
 				stars = GetStars(IE_PROFICIENCYSINGLEWEAPON);
 				defense += gamedata->GetWeaponStyleBonus(WS::SingleWeapon, stars, WSB::ACBase);
@@ -8185,10 +8193,8 @@ int Actor::GetFavoredPenalties() const
 
 bool Actor::Schedule(ieDword gametime, bool checkhide) const
 {
-	if (checkhide) {
-		if (!(InternalFlags & IF_VISIBLE)) {
-			return false;
-		}
+	if (checkhide && !(InternalFlags & IF_VISIBLE)) {
+		return false;
 	}
 
 	//check for schedule
@@ -8338,11 +8344,11 @@ bool Actor::AdvanceAnimations()
 
 	const auto* shadows = anims->GetShadowAnimation(stanceID, face);
 
-	const auto count = anims->GetTotalPartCount();
+	const int partCount = anims->GetTotalPartCount();
 	const auto zOrder = anims->GetZOrder(face);
 
 	// display current frames in the right order
-	for (int part = 0; part < count; ++part) {
+	for (int part = 0; part < partCount; ++part) {
 		int partnum = part;
 		if (zOrder) partnum = zOrder[part];
 		auto anim = stanceAnim->at(partnum);
@@ -8943,10 +8949,10 @@ bool Actor::GetSoundFromINI(ResRef& sound, Verbal index) const
 	}
 
 	auto elements = Explode<StringView, ResRef>(resource);
-	size_t count = elements.size();
-	if (count == 0) return false;
+	size_t soundCount = elements.size();
+	if (soundCount == 0) return false;
 
-	int choice = core->Roll(1, int(count), -1);
+	int choice = core->Roll(1, int(soundCount), -1);
 	sound = elements[choice];
 	// highly unlikely, but this way we match the expectations from GetSoundFrom2DA
 	if (IsStar(sound) || sound == "nosound") sound.Reset();
@@ -9191,7 +9197,7 @@ void Actor::RemoveVVCells(int vvcIdx)
 //use this for the seven eyes overlay
 ScriptedAnimation* Actor::FindOverlay(int index) const
 {
-	if (index >= OVERLAY_COUNT) return NULL;
+	if (index >= OVERLAY_COUNT) return nullptr;
 
 	auto it = vfxDict.find(OverrideVVC(this, index));
 	return (it != vfxDict.end()) ? it->second : nullptr;
@@ -10199,11 +10205,9 @@ HCStrings Actor::Unusable(const Item* item) const
 		return HCStrings::CantUseItem;
 	}
 
-	if (item->MinStrength == 18) {
-		if (GetStat(IE_STR) == 18) {
-			if (item->MinStrengthBonus > GetStat(IE_STREXTRA)) {
-				return HCStrings::CantUseItem;
-			}
+	if (item->MinStrength == 18 && GetStat(IE_STR) == 18) {
+		if (item->MinStrengthBonus > GetStat(IE_STREXTRA)) {
+			return HCStrings::CantUseItem;
 		}
 	}
 
@@ -11233,7 +11237,7 @@ int Actor::GetSkillBonus(unsigned int col) const
 	// race
 	int lookup = GetSubRace();
 	int bonus = 0;
-	std::vector<std::vector<int>>::iterator it = skillrac.begin();
+	auto it = skillrac.begin();
 	// make sure we have a column, since the games have different amounts of thieving skills
 	if (col < it->size()) {
 		for (; it != skillrac.end(); it++) {
