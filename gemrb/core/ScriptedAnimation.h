@@ -120,7 +120,7 @@ public:
 	ResRef ResName;
 	int Phase = P_NOTINITED;
 	int SoundPhase = P_NOTINITED;
-	ScriptedAnimation* twin = nullptr;
+	std::unique_ptr<ScriptedAnimation> twin;
 	bool active = true;
 	bool effect_owned = false;
 	Holder<PlaybackHandle> soundHandle;
@@ -162,7 +162,7 @@ public:
 	/* alters palette with rgb factor */
 	void AlterPalette(const RGBModifier& rgb);
 	/* returns possible twin after altering it to become underlay */
-	ScriptedAnimation* DetachTwin();
+	std::unique_ptr<ScriptedAnimation> DetachTwin();
 
 private:
 	Holder<Animation> PrepareAnimation(const AnimationFactory& af, Animation::index_t cycle, Animation::index_t i, bool loop = false) const;

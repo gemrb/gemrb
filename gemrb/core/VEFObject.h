@@ -26,13 +26,15 @@ enum class VEFTypes { INVALID = -1,
 		      VEF,
 		      _2DA };
 
+class VEFObject;
 struct ScheduleEntry {
 	ResRef resourceName;
 	ieDword start;
 	ieDword length;
 	Point offset;
 	VEFTypes type;
-	void* ptr;
+	std::unique_ptr<ScriptedAnimation> sptr;
+	std::unique_ptr<VEFObject> vptr;
 };
 
 class GEM_EXPORT VEFObject {
@@ -41,14 +43,13 @@ public:
 	Point Pos; // position of the effect in game coordinates
 
 	VEFObject() noexcept = default;
-	explicit VEFObject(ScriptedAnimation* sca);
+	explicit VEFObject(std::unique_ptr<ScriptedAnimation> sca);
 	VEFObject(const VEFObject&) = delete;
-	~VEFObject();
 	VEFObject& operator=(const VEFObject&) = delete;
 
 private:
 	std::vector<ScheduleEntry> entries;
-	std::vector<ScheduleEntry> drawQueue;
+	std::vector<ScheduleEntry*> drawQueue;
 	bool SingleObject = false;
 
 public:
@@ -59,17 +60,18 @@ public:
 	void Draw(const Region& screen, const Color& p_tint, int height, BlitFlags flags) const;
 	void Load2DA(const ResRef& resource);
 	void LoadVEF(DataStream* stream);
-	ScriptedAnimation* GetSingleObject() const;
+	std::unique_ptr<ScriptedAnimation> GetSingleObjectUptr();
+	ScriptedAnimation* GetSingleObject();
 
 private:
 	//clears the schedule, used internally
 	void Init();
 	//load a 2DA/VEF resource into the object
-	VEFObject* CreateObject(const ResRef& res, SClass_ID id) const;
+	std::unique_ptr<VEFObject> CreateObject(const ResRef& res, SClass_ID id) const;
 	// just a helper function
 	void CreateObjectFromEntry(ScheduleEntry& entry) const;
 	//load a BAM/VVC resource into the object
-	ScriptedAnimation* CreateCell(const ResRef& res, ieDword start, ieDword end) const;
+	std::unique_ptr<ScriptedAnimation> CreateCell(const ResRef& res, ieDword start, ieDword end) const;
 	//load a single entry from stream
 	void ReadEntry(DataStream* stream);
 };

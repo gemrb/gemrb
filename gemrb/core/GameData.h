@@ -126,10 +126,10 @@ public:
 	std::unique_ptr<Effect> GetEffect(const ResRef& resname);
 
 	/** creates a vvc/bam animation object at point */
-	ScriptedAnimation* GetScriptedAnimation(const ResRef& resRef, bool doublehint);
+	std::unique_ptr<ScriptedAnimation> GetScriptedAnimation(const ResRef& resRef, bool doublehint);
 
 	/** creates a composite vef/2da animation */
-	VEFObject* GetVEFObject(const ResRef& vefRef, bool doublehint);
+	std::unique_ptr<VEFObject> GetVEFObject(const ResRef& vefRef, bool doublehint);
 
 	/** returns a single sprite (not cached) from a BAM resource */
 	Holder<Sprite2D> GetBAMSprite(const ResRef& resRef, int cycle, int frame, bool silent = false);

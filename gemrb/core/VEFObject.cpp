@@ -20,7 +20,7 @@
 
 namespace GemRB {
 
-VEFObject::VEFObject(ScriptedAnimation* sca)
+VEFObject::VEFObject(std::unique_ptr<ScriptedAnimation> sca)
 	: Pos(sca->Pos), SingleObject(true)
 {
 	ResName = sca->ResName;
@@ -32,28 +32,23 @@ VEFObject::VEFObject(ScriptedAnimation* sca)
 		entry.length = sca->Duration + entry.start;
 	entry.offset = Point(0, 0);
 	entry.type = VEFTypes::VVC;
-	entry.ptr = sca;
 	entry.resourceName = sca->ResName;
-	entries.push_back(entry);
-}
-
-VEFObject::~VEFObject()
-{
-	Init();
+	entry.sptr = std::move(sca);
+	entries.push_back(std::move(entry));
 }
 
 void VEFObject::Init()
 {
 	for (auto& entry : entries) {
-		if (!entry.ptr) continue;
+		if (!entry.vptr && !entry.sptr) continue;
 		switch (entry.type) {
 			case VEFTypes::BAM:
 			case VEFTypes::VVC:
-				delete (ScriptedAnimation*) entry.ptr;
+				entry.sptr.reset();
 				break;
 			case VEFTypes::VEF:
 			case VEFTypes::_2DA:
-				delete (VEFObject*) entry.ptr;
+				entry.vptr.reset();
 				break;
 			default:; //error, no suitable destructor
 		}
@@ -70,23 +65,22 @@ void VEFObject::AddEntry(const ResRef& res, ieDword st, ieDword len, Point pos, 
 	entry.length = len;
 	entry.offset = pos;
 	entry.type = type;
-	entry.ptr = nullptr;
-	entries.push_back(entry);
+	entries.push_back(std::move(entry));
 }
 
-ScriptedAnimation* VEFObject::CreateCell(const ResRef& res, ieDword start, ieDword end) const
+std::unique_ptr<ScriptedAnimation> VEFObject::CreateCell(const ResRef& res, ieDword start, ieDword end) const
 {
-	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(res, false);
+	auto sca = gamedata->GetScriptedAnimation(res, false);
 	if (sca && end != 0xffffffff) {
 		sca->SetDefaultDuration(core->Time.defaultTicksPerSec * (end - start));
 	}
 	return sca;
 }
 
-VEFObject* VEFObject::CreateObject(const ResRef& res, SClass_ID id) const
+std::unique_ptr<VEFObject> VEFObject::CreateObject(const ResRef& res, SClass_ID id) const
 {
 	if (gamedata->Exists(res, id, true)) {
-		VEFObject* obj = new VEFObject();
+		auto obj = std::make_unique<VEFObject>();
 
 		if (id == IE_2DA_CLASS_ID) {
 			obj->Load2DA(res);
@@ -104,22 +98,22 @@ void VEFObject::CreateObjectFromEntry(ScheduleEntry& entry) const
 {
 	switch (entry.type) {
 		case VEFTypes::_2DA: // original gemrb implementation of composite video effects
-			entry.ptr = CreateObject(entry.resourceName, IE_2DA_CLASS_ID);
-			if (entry.ptr) {
+			entry.vptr = CreateObject(entry.resourceName, IE_2DA_CLASS_ID);
+			if (entry.vptr) {
 				break;
 			}
 			// fall back to VEF
 			// intentional fallthrough
 		case VEFTypes::VEF: // vanilla engine implementation of composite video effects
-			entry.ptr = CreateObject(entry.resourceName, IE_VEF_CLASS_ID);
-			if (entry.ptr) {
+			entry.vptr = CreateObject(entry.resourceName, IE_VEF_CLASS_ID);
+			if (entry.vptr) {
 				break;
 			}
 			// fall back to BAM or VVC
 			// intentional fallthrough
 		case VEFTypes::BAM: // just a BAM
 		case VEFTypes::VVC: // videocell (can contain a BAM)
-			entry.ptr = CreateCell(entry.resourceName, entry.length, entry.start);
+			entry.sptr = CreateCell(entry.resourceName, entry.length, entry.start);
 			break;
 		default:;
 	}
@@ -134,25 +128,23 @@ bool VEFObject::UpdateDrawingState(int orientation)
 		if (entry.start > GameTime) continue;
 		if (entry.length < GameTime) continue;
 
-		if (!entry.ptr) {
+		if (!entry.vptr && !entry.sptr) {
 			CreateObjectFromEntry(entry);
 		}
 
-		if (!entry.ptr) entry.type = VEFTypes::INVALID;
+		if (!entry.vptr && !entry.sptr) entry.type = VEFTypes::INVALID;
 
 		bool ended = true;
 		switch (entry.type) {
 			case VEFTypes::BAM:
 			case VEFTypes::VVC:
-				{
-					ScriptedAnimation* anim = static_cast<ScriptedAnimation*>(entry.ptr);
-					orient_t orient = orientation == -1 ? anim->Orientation : ClampToOrientation(orientation);
-					ended = anim->UpdateDrawingState(orient);
-				}
+				orient_t orient;
+				orient = orientation == -1 ? entry.sptr->Orientation : ClampToOrientation(orientation);
+				ended = entry.sptr->UpdateDrawingState(orient);
 				break;
 			case VEFTypes::_2DA:
 			case VEFTypes::VEF:
-				ended = ((VEFObject*) entry.ptr)->UpdateDrawingState(orientation);
+				ended = entry.vptr->UpdateDrawingState(orientation);
 				break;
 			default:
 				break;
@@ -160,7 +152,7 @@ bool VEFObject::UpdateDrawingState(int orientation)
 
 		if (ended) return true;
 
-		drawQueue.push_back(entry);
+		drawQueue.push_back(&entry);
 	}
 	return false;
 }
@@ -168,14 +160,14 @@ bool VEFObject::UpdateDrawingState(int orientation)
 void VEFObject::Draw(const Region& vp, const Color& p_tint, int height, BlitFlags flags) const
 {
 	for (const auto& entry : drawQueue) {
-		switch (entry.type) {
+		switch (entry->type) {
 			case VEFTypes::BAM:
 			case VEFTypes::VVC:
-				((ScriptedAnimation*) entry.ptr)->Draw(vp, p_tint, height, flags);
+				entry->sptr->Draw(vp, p_tint, height, flags);
 				break;
 			case VEFTypes::_2DA:
 			case VEFTypes::VEF:
-				((VEFObject*) entry.ptr)->Draw(vp, p_tint, height, flags);
+				entry->vptr->Draw(vp, p_tint, height, flags);
 				break;
 			default:
 				break;
@@ -268,19 +260,31 @@ void VEFObject::LoadVEF(DataStream* stream)
 	}
 }
 
-ScriptedAnimation* VEFObject::GetSingleObject() const
+std::unique_ptr<ScriptedAnimation> VEFObject::GetSingleObjectUptr()
 {
-	ScriptedAnimation* sca = nullptr;
-
+	std::unique_ptr<ScriptedAnimation> sca;
 	if (SingleObject) {
 		if (!entries.empty()) {
-			const ScheduleEntry& entry = entries[0];
+			ScheduleEntry& entry = entries[0];
 			if (entry.type == VEFTypes::VVC || entry.type == VEFTypes::BAM) {
-				sca = (ScriptedAnimation*) entry.ptr;
+				sca = std::move(entry.sptr);
 			}
 		}
 	}
 	return sca;
+}
+
+ScriptedAnimation* VEFObject::GetSingleObject()
+{
+	if (!SingleObject || entries.empty()) {
+		return nullptr;
+	}
+
+	ScheduleEntry& entry = entries[0];
+	if (entry.type == VEFTypes::VVC || entry.type == VEFTypes::BAM) {
+		return entry.sptr.get();
+	}
+	return nullptr;
 }
 
 }

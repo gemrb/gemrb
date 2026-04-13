@@ -2936,10 +2936,10 @@ int fx_unsummon_creature(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Map* area = target->GetCurrentArea();
 	if (!target->InParty && area) {
 		//play the vanish animation
-		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, false);
+		auto sca = gamedata->GetScriptedAnimation(fx->Resource, false);
 		if (sca) {
 			sca->SetPos(target->Pos);
-			area->AddVVCell(sca);
+			area->AddVVCell(std::move(sca));
 		}
 		//remove the creature
 		target->DestroySelf();
@@ -4590,7 +4590,7 @@ int fx_casting_glow(Scriptable* Owner, Actor* target, Effect* fx)
 			animRef = gamedata->castingHits[fx->Parameter2];
 		}
 
-		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(animRef, false);
+		auto sca = gamedata->GetScriptedAnimation(animRef, false);
 		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;
@@ -4613,7 +4613,7 @@ int fx_casting_glow(Scriptable* Owner, Actor* target, Effect* fx)
 		}
 
 		sca->SequenceFlags |= IE_VVC_STATIC;
-		target->AddVVCell(sca);
+		target->AddVVCell(std::move(sca));
 	} else {
 		//simulate sparkle casting glows
 		target->ApplyEffectCopy(fx, fx_sparkle_ref, Owner, fx->Parameter2, 3);
@@ -4642,7 +4642,7 @@ int fx_visual_spell_hit(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	if (fx->Parameter2 < gamedata->spellHits.size()) {
-		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(gamedata->spellHits[fx->Parameter2], false);
+		auto sca = gamedata->GetScriptedAnimation(gamedata->spellHits[fx->Parameter2], false);
 		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;
@@ -4661,7 +4661,7 @@ int fx_visual_spell_hit(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		sca->SetBlend();
 		sca->PlayOnce();
-		map->AddVVCell(sca);
+		map->AddVVCell(std::move(sca));
 	} else {
 		Log(ERROR, "FXOpcodes", "fx_visual_spell_hit: Unhandled Type: {}", fx->Parameter2);
 	}
@@ -5665,14 +5665,14 @@ static Actor* GetFamiliar(Scriptable* Owner, const Actor* target, const Effect* 
 	}
 
 	if (!fx->Resource2.IsEmpty()) {
-		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(fx->Resource2, false);
+		auto vvc = gamedata->GetScriptedAnimation(fx->Resource2, false);
 		if (vvc) {
 			//This is the final position of the summoned creature
 			//not the original target point
 			vvc->SetPos(fam->Pos);
 			//force vvc to play only once
 			vvc->PlayOnce();
-			map->AddVVCell(vvc);
+			map->AddVVCell(std::move(vvc));
 		}
 	}
 
@@ -6171,7 +6171,7 @@ int fx_play_visual_effect(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (!fx->FirstApply) return FX_NOT_APPLIED;
 	}
 
-	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, false);
+	auto sca = gamedata->GetScriptedAnimation(fx->Resource, false);
 
 	//don't crash on nonexistent resources
 	if (!sca) {
@@ -6188,7 +6188,7 @@ int fx_play_visual_effect(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2 == 1) {
 		//play over target (sticky)
 		sca->SetEffectOwned(true);
-		target->AddVVCell(sca);
+		target->AddVVCell(std::move(sca));
 		return FX_APPLIED;
 	}
 
@@ -6200,7 +6200,6 @@ int fx_play_visual_effect(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		// BUT child pros shouldn't actually draw this, since their timing is not in sync and the last few frames will then flicker, as each copy ends
 		if (!fx->Source.IsZero()) {
 			if (map->HasVVCCell(fx->Resource, fx->Source)) {
-				delete sca;
 				return FX_NOT_APPLIED;
 			}
 			sca->SetPos(fx->Source);
@@ -6212,7 +6211,7 @@ int fx_play_visual_effect(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		sca->SetPos(target->Pos + Point(sca->XOffset, sca->YOffset));
 	}
 	sca->PlayOnce();
-	map->AddVVCell(sca);
+	map->AddVVCell(std::move(sca));
 	return FX_NOT_APPLIED;
 }
 

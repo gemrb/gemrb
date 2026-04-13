@@ -17,6 +17,7 @@
 #include "Palette.h"
 #include "PolymorphCache.h"
 #include "Projectile.h"
+#include "ScriptedAnimation.h"
 #include "Spellbook.h"
 
 #include "Audio/Playback.h"
@@ -33,7 +34,6 @@ namespace GemRB {
 class Animation;
 class DataFileMgr;
 class Map;
-class ScriptedAnimation;
 enum class Feat : uint8_t;
 
 #define MAX_STATS 256
@@ -416,8 +416,8 @@ enum class Verbal : unsigned int {
 
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
 
-bool VVCSort(const ScriptedAnimation* lhs, const ScriptedAnimation* rhs);
-using vvcSet = std::multiset<ScriptedAnimation*, decltype(VVCSort)*>;
+bool VVCSort(const std::unique_ptr<ScriptedAnimation>& lhs, const std::unique_ptr<ScriptedAnimation>& rhs);
+using vvcSet = std::multiset<std::unique_ptr<ScriptedAnimation>, decltype(VVCSort)*>;
 using vvcDict = std::multimap<ResRef, ScriptedAnimation*>;
 
 class GEM_EXPORT Actor : public Movable {
@@ -586,7 +586,6 @@ public:
 	using BlockingSizeCategory = uint8_t;
 	Actor(void);
 	Actor(const Actor&) = delete;
-	~Actor() override;
 	Actor& operator=(const Actor&) = delete;
 	/** sets game specific parameter (which stat should determine the fist weapon type */
 	static void SetFistStat(ieDword stat);
@@ -879,7 +878,7 @@ public:
 	void Draw(const Region& screen, Color baseTint, Color tint, BlitFlags flags) const;
 
 	/* add mobile vvc (spell effects) to actor's list */
-	void AddVVCell(ScriptedAnimation* vvc);
+	void AddVVCell(std::unique_ptr<ScriptedAnimation> vvc);
 	/* remove a vvc from the list, graceful means animated removal */
 	void RemoveVVCells(int vvcIdx);
 	/* returns true if actor already has the overlay (slow) */

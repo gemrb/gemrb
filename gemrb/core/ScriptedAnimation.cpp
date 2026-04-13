@@ -182,7 +182,7 @@ void ScriptedAnimation::LoadAnimationFactory(const AnimationFactory& af, int get
 		return;
 	}
 	if (type & CycleType::Double) {
-		twin = new ScriptedAnimation();
+		twin = std::make_unique<ScriptedAnimation>();
 		twin->LoadAnimationFactory(af, 1);
 	}
 	SetPhase(P_ONSET);
@@ -308,9 +308,6 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 
 ScriptedAnimation::~ScriptedAnimation(void)
 {
-	if (twin) {
-		delete twin;
-	}
 	StopSound();
 }
 
@@ -733,17 +730,16 @@ void ScriptedAnimation::AlterPalette(const RGBModifier& mod)
 	}
 }
 
-ScriptedAnimation* ScriptedAnimation::DetachTwin()
+std::unique_ptr<ScriptedAnimation> ScriptedAnimation::DetachTwin()
 {
 	if (!twin) {
 		return nullptr;
 	}
-	ScriptedAnimation* ret = twin;
+	std::unique_ptr<ScriptedAnimation> ret = std::move(twin);
 	//ret->Frame.y+=ret->ZPos+1;
 	if (ret->ZOffset >= 0) {
 		ret->ZOffset = -1;
 	}
-	twin = nullptr;
 	return ret;
 }
 

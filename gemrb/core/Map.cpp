@@ -452,10 +452,6 @@ Map::~Map(void)
 		delete spawn;
 	}
 
-	for (auto vvc : vvcCells) {
-		delete vvc;
-	}
-
 	for (auto particle : particles) {
 		delete particle;
 	}
@@ -635,7 +631,7 @@ void Map::DrawPortal(const InfoPoint* ip, int enable)
 
 	if (enable) {
 		if (gotPortal > portalTime) return;
-		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(portalResRef, false);
+		auto sca = gamedata->GetScriptedAnimation(portalResRef, false);
 		if (sca) {
 			sca->SetBlend();
 			sca->PlayOnce();
@@ -643,7 +639,7 @@ void Map::DrawPortal(const InfoPoint* ip, int enable)
 			sca->SetPos(ip->Pos);
 			//this is actually ordered by time, not by height
 			sca->ZOffset = gotPortal;
-			AddVVCell(sca);
+			AddVVCell(std::move(sca));
 		}
 		return;
 	}
@@ -1145,7 +1141,7 @@ VEFObject* Map::GetNextScriptedAnimation(const scaIterator& iter) const
 	if (iter == vvcCells.end()) {
 		return nullptr;
 	}
-	return *iter;
+	return iter->get();
 }
 
 //Draw the game area (including overlays, actors, animations, weather)
@@ -1333,7 +1329,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 				bool endReached;
 				endReached = sca->UpdateDrawingState(-1);
 				if (endReached) {
-					delete sca;
+					scaidx->reset();
 					scaidx = vvcCells.erase(scaidx);
 				} else {
 					VideoDriver->SetStencilBuffer(wallStencil);
@@ -2875,7 +2871,7 @@ ieDword Map::HasVVCCell(const ResRef& resource, const Point& p) const
 {
 	ieDword ret = 0;
 
-	for (const VEFObject* vvc : vvcCells) {
+	for (const auto& vvc : vvcCells) {
 		if (!p.IsInvalid() && vvc->Pos != p) continue;
 
 		if (resource != vvc->ResName) continue;
@@ -2893,17 +2889,17 @@ ieDword Map::HasVVCCell(const ResRef& resource, const Point& p) const
 }
 
 //adding videocell in order, based on its height parameter
-void Map::AddVVCell(ScriptedAnimation* vvc)
+void Map::AddVVCell(std::unique_ptr<ScriptedAnimation> vvc)
 {
-	AddVVCell(new VEFObject(vvc));
+	AddVVCell(std::make_unique<VEFObject>(std::move(vvc)));
 }
 
-void Map::AddVVCell(VEFObject* vvc)
+void Map::AddVVCell(std::unique_ptr<VEFObject> vvc)
 {
 	scaIterator iter;
 
 	for (iter = vvcCells.begin(); iter != vvcCells.end() && (*iter)->Pos.y < vvc->Pos.y; iter++);
-	vvcCells.insert(iter, vvc);
+	vvcCells.insert(iter, std::move(vvc));
 }
 
 AreaAnimation* Map::GetAnimation(const ieVariable& Name)

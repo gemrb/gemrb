@@ -7336,14 +7336,14 @@ void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 	//the PST crew apparently loved hardcoding stuff
 	static ResRef RebusResRef { "DABUS1" };
 	RebusResRef[5] = (char) core->Roll(1, 5, '0');
-	ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(RebusResRef, false);
+	auto vvc = gamedata->GetScriptedAnimation(RebusResRef, false);
 	if (vvc) {
 		//setting the height
 		vvc->ZOffset = actor->circleSize * 20;
 		vvc->PlayOnce();
 		//maybe this needs setting up some time
 		vvc->SetDefaultDuration(20);
-		actor->AddVVCell(vvc);
+		actor->AddVVCell(std::move(vvc));
 	}
 }
 

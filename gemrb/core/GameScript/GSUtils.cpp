@@ -930,13 +930,13 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 }
 
-static ScriptedAnimation* GetVVCEffect(const ResRef& effect, int iterations)
+static std::unique_ptr<ScriptedAnimation> GetVVCEffect(const ResRef& effect, int iterations)
 {
 	if (effect.IsEmpty()) {
 		return nullptr;
 	}
 
-	ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(effect, false);
+	auto vvc = gamedata->GetScriptedAnimation(effect, false);
 	if (!vvc) {
 		Log(ERROR, "GameScript", "Failed to create effect.");
 		return nullptr;
@@ -951,9 +951,9 @@ static ScriptedAnimation* GetVVCEffect(const ResRef& effect, int iterations)
 
 void CreateVisualEffectCore(Actor* target, const ResRef& effect, int iterations)
 {
-	ScriptedAnimation* vvc = GetVVCEffect(effect, iterations);
+	auto vvc = GetVVCEffect(effect, iterations);
 	if (vvc) {
-		target->AddVVCell(vvc);
+		target->AddVVCell(std::move(vvc));
 	}
 }
 
@@ -966,14 +966,14 @@ void CreateVisualEffectCore(const Scriptable* Sender, const Point& position, con
 	}
 
 	if (gamedata->Exists(effect, IE_VEF_CLASS_ID, true)) {
-		VEFObject* vef = gamedata->GetVEFObject(effect, false);
+		auto vef = gamedata->GetVEFObject(effect, false);
 		vef->Pos = position;
-		area->AddVVCell(vef);
+		area->AddVVCell(std::move(vef));
 	} else {
-		ScriptedAnimation* vvc = GetVVCEffect(effect, iterations);
+		auto vvc = GetVVCEffect(effect, iterations);
 		if (vvc) {
 			vvc->SetPos(position);
-			area->AddVVCell(vvc);
+			area->AddVVCell(std::move(vvc));
 		}
 	}
 }

@@ -236,17 +236,17 @@ std::unique_ptr<Effect> GameData::GetEffect(const ResRef& resname)
 
 //if the default setup doesn't fit for an animation
 //create a vvc for it!
-ScriptedAnimation* GameData::GetScriptedAnimation(const ResRef& effect, bool doublehint)
+std::unique_ptr<ScriptedAnimation> GameData::GetScriptedAnimation(const ResRef& effect, bool doublehint)
 {
-	ScriptedAnimation* ret = NULL;
+	std::unique_ptr<ScriptedAnimation> ret;
 
 	if (Exists(effect, IE_VVC_CLASS_ID, true)) {
 		DataStream* ds = GetResourceStream(effect, IE_VVC_CLASS_ID);
-		ret = new ScriptedAnimation(ds);
+		ret = std::make_unique<ScriptedAnimation>(ds);
 	} else {
 		auto af = GetFactoryResourceAs<AnimationFactory>(effect, IE_BAM_CLASS_ID);
 		if (af) {
-			ret = new ScriptedAnimation();
+			ret = std::make_unique<ScriptedAnimation>();
 			ret->LoadAnimationFactory(*af, doublehint ? 2 : 0);
 		}
 	}
@@ -256,23 +256,23 @@ ScriptedAnimation* GameData::GetScriptedAnimation(const ResRef& effect, bool dou
 	return ret;
 }
 
-VEFObject* GameData::GetVEFObject(const ResRef& vefRef, bool doublehint)
+std::unique_ptr<VEFObject> GameData::GetVEFObject(const ResRef& vefRef, bool doublehint)
 {
-	VEFObject* ret = nullptr;
+	std::unique_ptr<VEFObject> ret;
 
 	if (Exists(vefRef, IE_VEF_CLASS_ID, true)) {
 		DataStream* ds = GetResourceStream(vefRef, IE_VEF_CLASS_ID);
-		ret = new VEFObject();
+		ret = std::make_unique<VEFObject>();
 		ret->ResName = vefRef;
 		ret->LoadVEF(ds);
 	} else {
 		if (Exists(vefRef, IE_2DA_CLASS_ID, true)) {
-			ret = new VEFObject();
+			ret = std::make_unique<VEFObject>();
 			ret->Load2DA(vefRef);
 		} else {
-			ScriptedAnimation* sca = GetScriptedAnimation(vefRef, doublehint);
+			auto sca = GetScriptedAnimation(vefRef, doublehint);
 			if (sca) {
-				ret = new VEFObject(sca);
+				ret = std::make_unique<VEFObject>(std::move(sca));
 			}
 		}
 	}

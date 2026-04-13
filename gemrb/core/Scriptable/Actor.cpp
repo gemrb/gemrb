@@ -318,13 +318,6 @@ Actor::Actor()
 	ToHit.SetOwner(this);
 }
 
-Actor::~Actor(void)
-{
-	for (ScriptedAnimation* vvc : vfxQueue) {
-		delete vvc;
-	}
-}
-
 void Actor::SetFistStat(ieDword stat)
 {
 	fiststat = stat;
@@ -1304,7 +1297,7 @@ static void handle_overlay(Actor* actor, ieDword idx)
 	if (idx >= OVERLAY_COUNT || actor->FindOverlay(idx)) return;
 
 	ResRef overlayGfx = OverrideVVC(actor, idx);
-	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(overlayGfx, false);
+	auto sca = gamedata->GetScriptedAnimation(overlayGfx, false);
 
 	if (!sca) {
 		return;
@@ -1317,7 +1310,6 @@ static void handle_overlay(Actor* actor, ieDword idx)
 	// IE_AVATARREMOVAL and unscheduled get handled by not drawing anything at all
 	// MC_ENABLED is not perfectly understood
 	if (!actor->InParty && actor->Modified[IE_STATE_ID] & state_invisible && !(hcOverlays[idx].flags & HC_INVISIBLE)) {
-		delete sca;
 		return;
 	}
 
@@ -1325,7 +1317,7 @@ static void handle_overlay(Actor* actor, ieDword idx)
 	if (flag) {
 		sca->ZOffset = -1;
 	}
-	actor->AddVVCell(sca);
+	actor->AddVVCell(std::move(sca));
 }
 
 //de/activates the entangle overlay
@@ -2295,7 +2287,7 @@ void Actor::UnlockPalette()
 
 void Actor::AddAnimation(const ResRef& resource, int gradient, int height, int flags)
 {
-	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(resource, false);
+	auto sca = gamedata->GetScriptedAnimation(resource, false);
 	if (!sca)
 		return;
 	sca->ZOffset = height;
@@ -2309,7 +2301,7 @@ void Actor::AddAnimation(const ResRef& resource, int gradient, int height, int f
 	if (gradient != -1) {
 		sca->SetPalette(gradient, 4);
 	}
-	AddVVCell(sca);
+	AddVVCell(std::move(sca));
 }
 
 ieDword Actor::GetSpellFailure(bool arcana) const
@@ -2695,7 +2687,7 @@ void Actor::AddEffects(EffectQueue&& fx)
 void Actor::RefreshEffects(bool first, const stats_t& previous)
 {
 	// some VVCs are controlled by stats (and so by PCFs), the rest have 'effect_owned' set
-	for (ScriptedAnimation* vvc : vfxQueue) {
+	for (auto& vvc : vfxQueue) {
 		if (vvc->effect_owned) vvc->active = false;
 	}
 
@@ -8494,7 +8486,7 @@ int Actor::GetElevation() const
 bool Actor::UpdateDrawingState()
 {
 	for (auto it = vfxQueue.cbegin(); it != vfxQueue.cend();) {
-		ScriptedAnimation* vvc = *it;
+		auto& vvc = *it;
 
 		// skip two overlays if fx_disable_overlay_modifier is in effect
 		// add a flags field if this ever starts being used heavily (currently only bg2 demi-liches)
@@ -8511,7 +8503,6 @@ bool Actor::UpdateDrawingState()
 		if (endReached) {
 			vfxDict.erase(vfxDict.find(vvc->ResName)); // make sure to delete only one element
 			it = vfxQueue.erase(it);
-			delete vvc;
 			continue;
 		}
 
@@ -8643,7 +8634,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	}
 	auto it = vfxQueue.cbegin();
 	for (; it != vfxQueue.cend(); ++it) {
-		const ScriptedAnimation* vvc = *it;
+		const auto& vvc = *it;
 		if (vvc->YOffset >= 0) {
 			break;
 		}
@@ -8771,7 +8762,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 
 	//draw videocells over the actor
 	for (; it != vfxQueue.cend(); ++it) {
-		const ScriptedAnimation* vvc = *it;
+		const auto& vvc = *it;
 		vvc->Draw(vp, baseTint, BBox.h, vvcFlags);
 	}
 }
@@ -9169,7 +9160,7 @@ bool Actor::HasVVCCell(const ResRef& resource) const
 	return GetVVCCells(resource).first != vfxDict.end();
 }
 
-bool VVCSort(const ScriptedAnimation* lhs, const ScriptedAnimation* rhs)
+bool VVCSort(const std::unique_ptr<ScriptedAnimation>& lhs, const std::unique_ptr<ScriptedAnimation>& rhs)
 {
 	return lhs->YOffset < rhs->YOffset;
 }
@@ -9203,12 +9194,12 @@ ScriptedAnimation* Actor::FindOverlay(int index) const
 	return (it != vfxDict.end()) ? it->second : nullptr;
 }
 
-void Actor::AddVVCell(ScriptedAnimation* vvc)
+void Actor::AddVVCell(std::unique_ptr<ScriptedAnimation> vvc)
 {
 	assert(vvc);
 	vvc->SetPos(Pos);
-	vfxDict.emplace(vvc->ResName, vvc);
-	vfxQueue.insert(vvc);
+	vfxDict.emplace(vvc->ResName, vvc.get());
+	vfxQueue.insert(std::move(vvc));
 	assert(vfxDict.size() == vfxQueue.size());
 }
 

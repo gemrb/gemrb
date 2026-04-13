@@ -1774,14 +1774,14 @@ Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 			Owner->AddTrigger(TriggerEntry(trigger_summoned, ab->GetGlobalID()));
 		}
 
-		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(animRes, false);
+		auto vvc = gamedata->GetScriptedAnimation(animRes, false);
 		if (vvc) {
 			// This is the final position of the summoned creature
 			// not the original target point
 			vvc->SetPos(ab->Pos);
 			// force vvc to play only once
 			vvc->PlayOnce();
-			map->AddVVCell(vvc);
+			map->AddVVCell(std::move(vvc));
 
 			// set up the summon disable effect
 			auto newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);

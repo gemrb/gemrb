@@ -649,12 +649,11 @@ Projectile::ProjectileState Projectile::EndTravel()
 //Note: trails couldn't be higher than VVC, but this shouldn't be a problem
 int Projectile::AddTrail(const ResRef& BAM, const ieByte* pal) const
 {
-	VEFObject* vef = gamedata->GetVEFObject(BAM, false);
+	auto vef = gamedata->GetVEFObject(BAM, false);
 	if (!vef) return 0;
 
-	ScriptedAnimation* sca = vef->GetSingleObject();
+	auto sca = vef->GetSingleObject();
 	if (!sca) {
-		delete vef;
 		return 0;
 	}
 
@@ -675,7 +674,7 @@ int Projectile::AddTrail(const ResRef& BAM, const ieByte* pal) const
 	sca->SetPos(Pos);
 	// oddly, there's no visible difference in setting or not setting sca->ZOffset = ZPos
 	// the heights are still fine even for the large dragon offsets
-	area->AddVVCell(vef);
+	area->AddVVCell(std::move(vef));
 	return sca->GetSequenceDuration(core->Time.defaultTicksPerSec);
 }
 
@@ -1497,11 +1496,14 @@ void Projectile::InitExplodingPhase1() const
 		return;
 	}
 
-	ScriptedAnimation* vvc;
-	VEFObject* vef = gamedata->GetVEFObject(Extension->VVCRes, false);
+	std::unique_ptr<ScriptedAnimation> vvc;
+	auto vef = gamedata->GetVEFObject(Extension->VVCRes, false);
 	if (vef) {
-		vvc = vef->GetSingleObject();
-		if (!vvc) delete vef;
+		if (vef->GetSingleObject()) {
+			vvc = vef->GetSingleObjectUptr();
+		} else {
+			vef.reset();
+		}
 	} else {
 		vvc = gamedata->GetScriptedAnimation(Extension->VVCRes, false);
 	}
@@ -1536,20 +1538,20 @@ void Projectile::InitExplodingPhase1() const
 
 	vvc->SetBlend();
 	if (vef) {
-		area->AddVVCell(vef);
+		area->AddVVCell(std::move(vef));
 	} else {
-		area->AddVVCell(vvc);
+		area->AddVVCell(std::move(vvc));
 	}
 
 	// bg2 comet has the explosion split into two vvcs, with just a starting cycle difference
 	// until we actually need two vvc fields in the extension, let's just hack around it
 	if (Extension->VVCRes == "SPCOMEX1") {
-		ScriptedAnimation* secondVVC = gamedata->GetScriptedAnimation("SPCOMEX2", false);
+		auto secondVVC = gamedata->GetScriptedAnimation("SPCOMEX2", false);
 		if (secondVVC) {
 			secondVVC->SetPos(Pos);
 			secondVVC->PlayOnce();
 			secondVVC->SetBlend();
-			area->AddVVCell(secondVVC);
+			area->AddVVCell(std::move(secondVVC));
 		}
 	}
 }

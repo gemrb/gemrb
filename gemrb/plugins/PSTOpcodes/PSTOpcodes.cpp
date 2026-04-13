@@ -164,14 +164,14 @@ int fx_play_bam_blended(Scriptable* Owner, Actor* target, Effect* fx)
 
 	//play once set to true
 	//check tearring.itm (0xbb effect)
-	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, true);
+	auto sca = gamedata->GetScriptedAnimation(fx->Resource, true);
 	if (!sca)
 		return FX_NOT_APPLIED;
 
 	sca->SetBlend();
 	//the transparency is based on the original palette
 	if (fx->Parameter1) {
-		SetRGBMod(fx->Parameter1, sca);
+		SetRGBMod(fx->Parameter1, sca.get());
 	}
 	if ((fx->TimingMode == FX_DURATION_INSTANT_LIMITED) && (fx->Parameter2 & 1)) {
 		playonce = false;
@@ -195,14 +195,14 @@ int fx_play_bam_blended(Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->Parameter2 & 2) {
 		sca->SetPos(fx->Pos);
-		area->AddVVCell(sca);
+		area->AddVVCell(std::move(sca));
 	} else {
 		assert(target);
-		ScriptedAnimation* twin = sca->DetachTwin();
+		auto twin = sca->DetachTwin();
 		if (twin) {
-			target->AddVVCell(twin);
+			target->AddVVCell(std::move(twin));
 		}
-		target->AddVVCell(sca);
+		target->AddVVCell(std::move(sca));
 	}
 	return FX_NOT_APPLIED;
 }
@@ -237,7 +237,7 @@ int fx_play_bam_not_blended(Scriptable* Owner, Actor* target, Effect* fx)
 	} else {
 		doublehint = false;
 	}
-	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, doublehint);
+	auto sca = gamedata->GetScriptedAnimation(fx->Resource, doublehint);
 	if (!sca)
 		return FX_NOT_APPLIED;
 
@@ -254,7 +254,7 @@ int fx_play_bam_not_blended(Scriptable* Owner, Actor* target, Effect* fx)
 			break;
 		default:
 			if (fx->Parameter1) {
-				SetRGBMod(fx->Parameter1, sca);
+				SetRGBMod(fx->Parameter1, sca.get());
 			}
 	}
 	if (fx->TimingMode == FX_DURATION_INSTANT_LIMITED) {
@@ -285,13 +285,13 @@ int fx_play_bam_not_blended(Scriptable* Owner, Actor* target, Effect* fx)
 	} else {
 		sca->SetDefaultDuration(fx->Duration - core->GetGame()->Ticks);
 	}
-	ScriptedAnimation* twin = sca->DetachTwin();
+	auto twin = sca->DetachTwin();
 
 	if (target && (fx->Parameter2 & 4096)) {
 		if (twin) {
-			target->AddVVCell(twin);
+			target->AddVVCell(std::move(twin));
 		}
-		target->AddVVCell(sca);
+		target->AddVVCell(std::move(sca));
 	} else {
 		//the random placement works only when it is not sticky
 		int x = 0;
@@ -310,9 +310,9 @@ int fx_play_bam_not_blended(Scriptable* Owner, Actor* target, Effect* fx)
 			twin->SetPos(fx->Pos);
 			twin->XOffset -= x;
 			twin->YOffset -= y;
-			area->AddVVCell(twin);
+			area->AddVVCell(std::move(twin));
 		}
-		area->AddVVCell(sca);
+		area->AddVVCell(std::move(sca));
 	}
 	return FX_NOT_APPLIED;
 }
@@ -640,9 +640,9 @@ int fx_multiple_vvc(Scriptable* Owner, Actor* /*target*/, Effect* fx)
 	if (!area)
 		return FX_NOT_APPLIED;
 
-	VEFObject* vef = gamedata->GetVEFObject(fx->Resource, true);
+	auto vef = gamedata->GetVEFObject(fx->Resource, true);
 	if (vef) {
-		area->AddVVCell(vef);
+		area->AddVVCell(std::move(vef));
 	}
 	/*
 	AutoTable tab(fx->Resource);
@@ -934,10 +934,10 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 		}
 
 		if (!target->HasVVCCell(fx->Resource)) {
-			ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, true);
+			auto sca = gamedata->GetScriptedAnimation(fx->Resource, true);
 			if (sca) {
 				if (tint) {
-					SetRGBMod(tint, sca);
+					SetRGBMod(tint, sca.get());
 				}
 				sca->SetBlend();
 				if (playonce) {
@@ -946,11 +946,11 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 					sca->SetDefaultDuration(fx->Duration - core->GetGame()->Ticks);
 				}
 				sca->SetEffectOwned(true);
-				ScriptedAnimation* twin = sca->DetachTwin();
+				auto twin = sca->DetachTwin();
 				if (twin) {
-					target->AddVVCell(twin);
+					target->AddVVCell(std::move(twin));
 				}
-				target->AddVVCell(sca);
+				target->AddVVCell(std::move(sca));
 			}
 		}
 	}
@@ -997,10 +997,10 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 			break;
 		case 8: //antimagic shell
 			if (!target->HasVVCCell("S061GLWB")) {
-				ScriptedAnimation* sca = gamedata->GetScriptedAnimation("S061GLWB", false);
+				auto sca = gamedata->GetScriptedAnimation("S061GLWB", false);
 				if (sca) {
 					sca->SetDefaultDuration(fx->Duration - core->GetGame()->Ticks);
-					target->AddVVCell(sca);
+					target->AddVVCell(std::move(sca));
 				}
 			}
 			break;
