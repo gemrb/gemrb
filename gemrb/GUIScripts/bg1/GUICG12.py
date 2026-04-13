@@ -11,7 +11,6 @@ import GUICommon
 from GUIPortraitCommon import *
 
 AppearanceWindow = 0
-CustomWindow = 0
 PortraitButton = 0
 PortraitsTable = 0
 LastPortrait = 0
@@ -96,7 +95,7 @@ def CustomDone():
 	return
 
 def CustomAbort():
-	portrait_custom_abort(CustomWindow, AppearanceWindow)
+	portrait_custom_abort(AppearanceWindow)
 	return
 
 def LargeCustomPortrait():

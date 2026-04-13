@@ -12,7 +12,6 @@ CustomWindow = 0
 
 # This if for moving to next portrait
 def portrait_next(PortraitsTable, LastPortrait, gender):
-    print ("portrait_next")
     while True:
         LastPortrait += 1
         if LastPortrait >= PortraitsTable.GetRowCount():
@@ -55,10 +54,9 @@ def portrait_custom_done(appearance_window):
         GemRB.SetNextScript ("CharGen2")
 
 # This is for abort
-def portrait_custom_abort(custom_window, AppearanceWindow=None):
-    print ("portrait_custom_abort")
-    if custom_window:
-        custom_window.Close()
+def portrait_custom_abort(AppearanceWindow=None):
+    if CustomWindow:
+        CustomWindow.Close()
     if AppearanceWindow:
         if GameCheck.IsBG1OrEE():
             AppearanceWindow.ShowModal (MODAL_SHADOW_GRAY) # narrower than CustomWindow, so borders will remain

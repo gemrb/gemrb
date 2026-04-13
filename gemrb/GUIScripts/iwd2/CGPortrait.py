@@ -86,7 +86,7 @@ def CustomDone ():
 	return
 
 def CustomAbort ():
-	portrait_custom_abort(CustomWindow, AppearanceWindow)
+	portrait_custom_abort(AppearanceWindow)
 	return
 
 def LargeCustomPortrait():
