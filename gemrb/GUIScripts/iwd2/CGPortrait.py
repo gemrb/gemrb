@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-#character generation, appearance (GUICG12)
+# character generation, appearance (GUICG12)
 import GemRB
 import CharOverview
 from GUIDefines import *
@@ -14,89 +14,93 @@ PortraitsTable = 0
 LastPortrait = 0
 Gender = 0
 
-def SetPicture ():
-	global PortraitsTable, LastPortrait
-	portrait_set_picture(PortraitButton, PortraitsTable, LastPortrait)
-	return
 
-def OnLoad ():
-	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
-	global Gender
+def SetPicture():
+    global PortraitsTable, LastPortrait
+    portrait_set_picture(PortraitButton, PortraitsTable, LastPortrait)
+    return
 
-	Gender=GemRB.GetVar ("Gender")
 
-	AppearanceWindow = GemRB.LoadWindow (11, "GUICG")
-	CharOverview.PositionCharGenWin(AppearanceWindow)
+def OnLoad():
+    global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
+    global Gender
 
-	# Load the Portraits Table, sorted by gender col (1: m, 2: f)
-	PortraitsTable = GemRB.LoadTable ("PICTURES")
-	FemalePortraitsStart = PortraitsTable.FindValue (0, 2)
-	FemaleCount = PortraitsTable.GetRowCount () - FemalePortraitsStart
+    Gender = GemRB.GetVar("Gender")
 
-	if Gender == 2:
-		LastPortrait = GemRB.Roll (1, FemaleCount, FemalePortraitsStart - 1)
-	else:
-		LastPortrait = GemRB.Roll (1, PortraitsTable.GetRowCount() - FemaleCount, -1)
+    AppearanceWindow = GemRB.LoadWindow(11, "GUICG")
+    CharOverview.PositionCharGenWin(AppearanceWindow)
 
-	PortraitButton = AppearanceWindow.GetControl (1)
-	PortraitButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	PortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
+    # Load the Portraits Table, sorted by gender col (1: m, 2: f)
+    PortraitsTable = GemRB.LoadTable("PICTURES")
+    FemalePortraitsStart = PortraitsTable.FindValue(0, 2)
+    FemaleCount = PortraitsTable.GetRowCount() - FemalePortraitsStart
 
-	LeftButton = AppearanceWindow.GetControl (2)
-	RightButton = AppearanceWindow.GetControl (3)
+    if Gender == 2:
+        LastPortrait = GemRB.Roll(1, FemaleCount, FemalePortraitsStart - 1)
+    else:
+        LastPortrait = GemRB.Roll(1, PortraitsTable.GetRowCount() - FemaleCount, -1)
 
-	BackButton = AppearanceWindow.GetControl (5)
-	BackButton.SetText (15416)
-	BackButton.MakeEscape()
+    PortraitButton = AppearanceWindow.GetControl(1)
+    PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+    PortraitButton.SetState(IE_GUI_BUTTON_LOCKED)
 
-	CustomButton = AppearanceWindow.GetControl (6)
-	CustomButton.SetText (17545)
+    LeftButton = AppearanceWindow.GetControl(2)
+    RightButton = AppearanceWindow.GetControl(3)
 
-	DoneButton = AppearanceWindow.GetControl (0)
-	DoneButton.SetText (36789)
-	DoneButton.MakeDefault()
+    BackButton = AppearanceWindow.GetControl(5)
+    BackButton.SetText(15416)
+    BackButton.MakeEscape()
 
-	RightButton.OnPress (RightPress)
-	LeftButton.OnPress (LeftPress)
-	BackButton.OnPress (BackPress)
-	CustomButton.OnPress (CustomPress)
-	DoneButton.OnPress (NextPress)
+    CustomButton = AppearanceWindow.GetControl(6)
+    CustomButton.SetText(17545)
 
-	SetPicture ()
-	AppearanceWindow.Focus()
+    DoneButton = AppearanceWindow.GetControl(0)
+    DoneButton.SetText(36789)
+    DoneButton.MakeDefault()
 
-	return
+    RightButton.OnPress(RightPress)
+    LeftButton.OnPress(LeftPress)
+    BackButton.OnPress(BackPress)
+    CustomButton.OnPress(CustomPress)
+    DoneButton.OnPress(NextPress)
 
-def RightPress ():
-	global LastPortrait
-	LastPortrait = portrait_next(PortraitsTable, LastPortrait, Gender)
-	SetPicture()
+    SetPicture()
+    AppearanceWindow.Focus()
 
-def LeftPress ():
-	global LastPortrait
-	LastPortrait = portrait_prev(PortraitsTable, LastPortrait, Gender)
-	SetPicture()
+    return
 
-def BackPress ():
-	portrait_back_press(AppearanceWindow)
-	return
 
-def CustomDone ():
-	portrait_custom_done(AppearanceWindow)
-	return
+def RightPress():
+    global LastPortrait
+    LastPortrait = portrait_next(PortraitsTable, LastPortrait, Gender)
+    SetPicture()
 
-def CustomAbort ():
-	portrait_custom_abort(AppearanceWindow)
-	return
 
-def CustomPress ():
-    portrait_custom_press(
-        PortraitsTable,
-        LastPortrait,
-        CustomDone,
-        CustomAbort
-    )
+def LeftPress():
+    global LastPortrait
+    LastPortrait = portrait_prev(PortraitsTable, LastPortrait, Gender)
+    SetPicture()
 
-def NextPress ():
+
+def BackPress():
+    portrait_back_press(AppearanceWindow)
+    return
+
+
+def CustomDone():
+    portrait_custom_done(AppearanceWindow)
+    return
+
+
+def CustomAbort():
+    portrait_custom_abort(AppearanceWindow)
+    return
+
+
+def CustomPress():
+    portrait_custom_press(PortraitsTable, LastPortrait, CustomDone, CustomAbort)
+
+
+def NextPress():
     portrait_apply_selection(AppearanceWindow, LastPortrait)
     return
