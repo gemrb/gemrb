@@ -88,7 +88,7 @@ public:
 	static uint32_t DebugFlags;
 	static uint8_t DebugPropVal;
 
-	DialogHandler* dialoghandler = nullptr;
+	std::unique_ptr<DialogHandler> dialoghandler;
 	//the name of the spell to cast
 	ResRef spellName;
 	//using spell or item

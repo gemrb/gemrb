@@ -110,7 +110,7 @@ GameControl::GameControl(const Region& frame)
 		screenFlags.Set(ScreenFlags::AlwaysCenter);
 	}
 	// the game always starts paused so nothing happens till we are ready
-	dialoghandler = new DialogHandler();
+	dialoghandler = std::make_unique<DialogHandler>();
 
 	EventMgr::EventCallback cb = METHOD_CALLBACK(&GameControl::OnGlobalMouseMove, this);
 	eventMonitors[0] = EventMgr::RegisterEventMonitor(cb, Event::MouseMoveMask);
@@ -123,8 +123,6 @@ GameControl::~GameControl()
 	for (unsigned long eventMonitor : eventMonitors) {
 		EventMgr::UnRegisterEventMonitor(eventMonitor);
 	}
-
-	delete dialoghandler;
 }
 
 //returns a single point offset for a formation
