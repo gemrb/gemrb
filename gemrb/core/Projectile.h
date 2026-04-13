@@ -150,8 +150,8 @@ struct TravelData {
 	ieDword flags = 0;
 	AnimArray anim;
 	ResRef VVC;
-	std::array<ResRef, 3> trailBAM;
-	std::array<ieWord, 3> trailSpeed;
+	std::array<ResRef, 3> trailBAM {};
+	std::array<ieWord, 3> trailSpeed {};
 	Holder<PlaybackHandle> sound;
 
 	// projectile travel flags
