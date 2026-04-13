@@ -419,27 +419,30 @@ void Actor::SetAnimationID(stat_t animID)
 	// PST and EE 2.0+ use an ini to define animation data, including walk and run speed
 	// the rest had it hardcoded
 	SetBase(IE_MOVEMENTRATE, 9); // just a fallback
-	if (!core->HasFeature(GFFlags::RESDATA_INI)) {
-		// handle default speed and per-animation overrides
-		TableMgr::index_t row = TableMgr::npos;
-		static AutoTable extspeed = gamedata->LoadTable("moverate", true);
-		if (extspeed) {
-			const std::string& animHex = fmt::format("{:#04x}", animID);
-			row = extspeed->FindTableValue(0UL, animHex);
-			if (row != TableMgr::npos) {
-				int rate = extspeed->QueryFieldSigned<int>(row, 1);
-				SetBase(IE_MOVEMENTRATE, rate);
-			}
-		} else {
-			Log(MESSAGE, "Actor", "No moverate.2da found, using animation ({:#x}) for speed fallback!", animID);
+	if (core->HasFeature(GFFlags::RESDATA_INI)) {
+		SetSpeed(false);
+		return;
+	}
+
+	// handle default speed and per-animation overrides
+	TableMgr::index_t row = TableMgr::npos;
+	static AutoTable extspeed = gamedata->LoadTable("moverate", true);
+	if (extspeed) {
+		const std::string& animHex = fmt::format("{:#04x}", animID);
+		row = extspeed->FindTableValue(0UL, animHex);
+		if (row != TableMgr::npos) {
+			int rate = extspeed->QueryFieldSigned<int>(row, 1);
+			SetBase(IE_MOVEMENTRATE, rate);
 		}
-		if (row == TableMgr::npos) {
-			const auto* anim = anims->GetAnimation(IE_ANI_WALK, S);
-			if (anim) {
-				SetBase(IE_MOVEMENTRATE, anim->at(0)->GetFrameCount());
-			} else {
-				Log(WARNING, "Actor", "Unable to determine movement rate for animation {:#x}!", animID);
-			}
+	} else {
+		Log(MESSAGE, "Actor", "No moverate.2da found, using animation ({:#x}) for speed fallback!", animID);
+	}
+	if (row == TableMgr::npos) {
+		const auto* anim = anims->GetAnimation(IE_ANI_WALK, S);
+		if (anim) {
+			SetBase(IE_MOVEMENTRATE, anim->at(0)->GetFrameCount());
+		} else {
+			Log(WARNING, "Actor", "Unable to determine movement rate for animation {:#x}!", animID);
 		}
 	}
 
