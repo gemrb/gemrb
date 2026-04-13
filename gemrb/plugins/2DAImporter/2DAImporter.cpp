@@ -181,12 +181,14 @@ p2DAImporter::index_t p2DAImporter::FindTableValue(index_t col, const key_t& val
 p2DAImporter::index_t p2DAImporter::FindTableValue(const key_t& col, long val, index_t start) const
 {
 	index_t coli = GetColumnIndex(col);
+	if (coli == npos) return npos;
 	return FindTableValue(coli, val, start);
 }
 
 p2DAImporter::index_t p2DAImporter::FindTableValue(const key_t& col, const key_t& val, index_t start) const
 {
 	index_t coli = GetColumnIndex(col);
+	if (coli == npos) return npos;
 	return FindTableValue(coli, val, start);
 }
 
