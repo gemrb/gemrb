@@ -140,12 +140,11 @@ void Console::SaveHistory() const noexcept
 	}
 
 	path_t filePath = PathJoin<false>(core->config.GamePath, "gemrb_console.txt");
-	FileStream* histFile = new FileStream();
-	if (histFile->Create(filePath)) {
-		histFile->Write(commands.c_str(), commands.size());
-		histFile->Close();
+	FileStream histFile;
+	if (histFile.Create(filePath)) {
+		histFile.Write(commands.c_str(), commands.size());
+		histFile.Close();
 	}
-	delete histFile;
 }
 
 void Console::LoadHistory()
