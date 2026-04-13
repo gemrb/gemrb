@@ -281,7 +281,7 @@ public:
 	ieDword FamiliarOwner = 0; // IWDEE: which player has the familiar? InParty - 1
 	FixedSizeString<20> RandomEncounterEntry;
 
-	Particles* weather = nullptr;
+	std::unique_ptr<Particles> weather;
 	int eventTimer = 0;
 	EventHandler eventHandler = nullptr;
 	bool hasInfra = false;

@@ -70,7 +70,7 @@ Game::Game(void)
 	: Scriptable(ST_GLOBAL)
 {
 	SetScript(core->GlobalScript, 0);
-	weather = new Particles(200);
+	weather = std::make_unique<Particles>(200);
 	weather->SetRegion(0, 0, core->config.Width, core->config.Height);
 
 	//loading master areas
@@ -123,7 +123,6 @@ Game::Game(void)
 
 Game::~Game(void)
 {
-	delete weather;
 	for (auto map : Maps) {
 		delete map;
 	}
