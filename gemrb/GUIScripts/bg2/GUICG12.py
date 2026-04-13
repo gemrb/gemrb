@@ -24,7 +24,7 @@ def OnLoad():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
 	global Gender
 
-	Gender=GemRB.GetVar ("Gender")
+	Gender = GemRB.GetVar ("Gender")
 
 	AppearanceWindow = GemRB.LoadWindow (11, "GUICG")
 	CharGenCommon.PositionCharGenWin(AppearanceWindow, -6)
@@ -106,12 +106,12 @@ def CustomAbort():
 	return
 
 def CustomPress():
-    portrait_custom_press(
-        PortraitsTable,
-        LastPortrait,
-        CustomDone,
-        CustomAbort
-    )
+	portrait_custom_press(
+		PortraitsTable,
+		LastPortrait,
+		CustomDone,
+		CustomAbort
+	)
 
 def NextPress():
 	portrait_apply_selection(AppearanceWindow, LastPortrait)

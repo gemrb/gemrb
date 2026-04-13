@@ -98,5 +98,5 @@ def CustomPress ():
     )
 
 def NextPress ():
-	portrait_apply_selection(AppearanceWindow, LastPortrait)
-	return
+    portrait_apply_selection(AppearanceWindow, LastPortrait)
+    return

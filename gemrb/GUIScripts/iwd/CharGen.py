@@ -643,11 +643,11 @@ def CustomAbort():
 
 def PortraitCustomPress():
 	portrait_custom_press(
-        PortraitsTable,
-        Portrait,
-        CustomDone,
-        CustomAbort
-    )
+		PortraitsTable,
+		Portrait,
+		CustomDone,
+		CustomAbort
+	)
 	return
 
 def CGPortraitDonePress():

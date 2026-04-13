@@ -107,5 +107,5 @@ def CustomPress():
     )
 
 def NextPress():
-	portrait_apply_selection(AppearanceWindow, LastPortrait)
-	CharGenCommon.next()
+    portrait_apply_selection(AppearanceWindow, LastPortrait)
+    CharGenCommon.next()

@@ -172,9 +172,9 @@ def portrait_custom_press(
 
     CustomWindow = Window = GemRB.LoadWindow(18, "GUICG")
 
-    list_mode1=1
+    list_mode1 = 1
     if GameCheck.IsIWD2():
-        list_mode1=2
+        list_mode1 = 2
     PortraitList1 = Window.GetControl(2)
     RowCount1 = len(PortraitList1.ListResources(CHR_PORTRAITS, list_mode1))
     PortraitList1.OnSelect(portrait_common_large_custom)
@@ -201,12 +201,12 @@ def portrait_custom_press(
         Button.MakeEscape()
     Button.OnPress(custom_abort)
 
-    large_suffix="L"
+    large_suffix = "L"
     if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
-        large_suffix="M"
-    fallback_resource="NOPORTMD"
+        large_suffix = "M"
+    fallback_resource = "NOPORTMD"
     if GameCheck.IsBG1OrEE():
-        fallback_resource="NOPORTLG"
+        fallback_resource = "NOPORTLG"
     Button = Window.GetControl(0)
     portrait_name = portraits_table.GetRowName(last_portrait) + large_suffix
 
