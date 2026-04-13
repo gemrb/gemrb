@@ -105,18 +105,10 @@ def CustomAbort():
 	portrait_custom_abort(AppearanceWindow)
 	return
 
-def LargeCustomPortrait():
-    portrait_common_large_custom()
-
-def SmallCustomPortrait():
-	portrait_common_small_custom()
-
 def CustomPress():
     portrait_custom_press(
         PortraitsTable,
         LastPortrait,
-        LargeCustomPortrait,
-        SmallCustomPortrait,
         CustomDone,
         CustomAbort
     )

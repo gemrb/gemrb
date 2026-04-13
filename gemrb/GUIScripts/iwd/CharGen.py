@@ -19,6 +19,7 @@ import CommonTables
 import LUSkillsSelection
 import LUCommon
 import PaperDoll
+from GUIPortraitCommon import *
 
 CharGenWindow = 0
 CharGenState = 0
@@ -353,7 +354,7 @@ def AcceptPress():
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 	GemRB.SetToken ("CHARNAME","")
 	GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
-	
+
 	LUCommon.SetupSavingThrows (MyChar)
 	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0)
 	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0)
@@ -617,156 +618,44 @@ def PortraitSelect():
 	return
 
 def CGPortraitLeftPress():
-	global PortraitWindow, Portrait, PortraitPortraitButton
 	global MyChar
-
-	while True:
-		Portrait = Portrait - 1
-		if Portrait < 0:
-			Portrait = PortraitsTable.GetRowCount () - 1
-		if PortraitsTable.GetValue (Portrait, 0) == GemRB.GetPlayerStat(MyChar, IE_SEX):
-			PortraitPortraitButton.SetPicture (PortraitsTable.GetRowName (Portrait) + "G")
-			return
+	global Portrait
+	Portrait = portrait_prev(PortraitsTable, Portrait, GemRB.GetPlayerStat(MyChar, IE_SEX))
+	portrait_set_picture(PortraitPortraitButton, PortraitsTable, Portrait)
+	return
 
 def CGPortraitRightPress():
-	global PortraitWindow, Portrait, PortraitPortraitButton
 	global MyChar
-
-	while True:
-		Portrait = Portrait + 1
-		if Portrait == PortraitsTable.GetRowCount():
-			Portrait = 0
-		if PortraitsTable.GetValue (Portrait, 0) == GemRB.GetPlayerStat(MyChar, IE_SEX):
-			PortraitPortraitButton.SetPicture (PortraitsTable.GetRowName (Portrait) + "G")
-			return
+	global Portrait
+	Portrait = portrait_next(PortraitsTable, Portrait, GemRB.GetPlayerStat(MyChar, IE_SEX))
+	portrait_set_picture(PortraitPortraitButton, PortraitsTable, Portrait)
+	return
 
 def CustomDone():
-	global CharGenWindow, PortraitWindow
-	global PortraitButton, GenderButton, RaceButton
-	global CharGenState, Portrait
-
-	Window = CustomWindow
-
-	PortraitName = PortraitList2.QueryText ()
-	GemRB.SetToken ("SmallPortrait", PortraitName)
-	PortraitName = PortraitList1.QueryText ()
-	GemRB.SetToken ("LargePortrait", PortraitName)
-	if Window:
-		Window.Close ()
-
-	if PortraitWindow:
-		PortraitWindow.Close ()
-	PortraitButton.SetPicture(PortraitName)
-	GenderButton.SetState (IE_GUI_BUTTON_DISABLED)
-	RaceButton.SetState (IE_GUI_BUTTON_ENABLED)
-	RaceButton.MakeDefault()
-	CharGenState = 1
-	Portrait = -1
-	SetCharacterDescription()
+	global PortraitWindow
+	portrait_picture_button_name = portrait_custom_done(PortraitWindow)
+	CGPortraitChangeToRace(portrait_picture_button_name)
 	return
 
 def CustomAbort():
-	if CustomWindow:
-		CustomWindow.Close ()
-	return
-
-def CGLargeCustomPortrait():
-	Window = CustomWindow
-
-	Portrait = PortraitList1.QueryText ()
-	#small hack
-	if GemRB.GetVar ("Row1") == RowCount1:
-		return
-
-	Label = Window.GetControl (0x10000007)
-	Label.SetText (Portrait)
-
-	Button = Window.GetControl (6)
-	if Portrait=="":
-		Portrait = "NOPORTMD"
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	elif PortraitList2.QueryText () != "":
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-
-	Button = Window.GetControl (0)
-	Button.SetPicture (Portrait, "NOPORTMD")
-	return
-
-def CGSmallCustomPortrait():
-	Window = CustomWindow
-
-	Portrait = PortraitList2.QueryText ()
-	#small hack
-	if GemRB.GetVar ("Row2") == RowCount2:
-		return
-
-	Label = Window.GetControl (0x10000008)
-	Label.SetText (Portrait)
-
-	Button = Window.GetControl (6)
-	if Portrait=="":
-		Portrait = "NOPORTSM"
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
-	elif PortraitList1.QueryText () != "":
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-
-	Button = Window.GetControl (1)
-	Button.SetPicture (Portrait, "NOPORTSM")
+	portrait_custom_abort(None)
 	return
 
 def PortraitCustomPress():
-	global PortraitList1, PortraitList2
-	global RowCount1, RowCount2
-	global CustomWindow
-
-	CustomWindow = Window = GemRB.LoadWindow (18, "GUICG")
-	PortraitList1 = Window.GetControl (2)
-	RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 1))
-	PortraitList1.OnSelect (CGLargeCustomPortrait)
-	PortraitList1.SetVarAssoc ("Row1",RowCount1)
-
-	PortraitList2 = Window.GetControl (4)
-	RowCount2 = len(PortraitList2.ListResources (CHR_PORTRAITS, 0))
-	PortraitList2.OnSelect (CGSmallCustomPortrait)
-	PortraitList2.SetVarAssoc ("Row2",RowCount2)
-
-	Button = Window.GetControl (6)
-	Button.SetText (11973)
-	Button.OnPress (CustomDone)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
-
-	Button = Window.GetControl (7)
-	Button.SetText (13727)
-	Button.OnPress (CustomAbort)
-
-	Button = Window.GetControl (0)
-	PortraitName = PortraitsTable.GetRowName (Portrait)+"L"
-	Button.SetPicture (PortraitName, "NOPORTLG")
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
-
-	Button = Window.GetControl (1)
-	PortraitName = PortraitsTable.GetRowName (Portrait)+"S"
-	Button.SetPicture (PortraitName, "NOPORTSM")
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
-
-	Window.ShowModal (MODAL_SHADOW_NONE)
+	portrait_custom_press(
+        PortraitsTable,
+        Portrait,
+        CustomDone,
+        CustomAbort
+    )
 	return
 
 def CGPortraitDonePress():
-	global CharGenWindow, PortraitWindow, PortraitButton, GenderButton, RaceButton
-	global CharGenState, Portrait
+	global PortraitWindow, PortraitButton, GenderButton, RaceButton
+	global Portrait
 
-	PortraitName = PortraitsTable.GetRowName (Portrait )
-	GemRB.SetToken ("SmallPortrait", PortraitName+"S")
-	GemRB.SetToken ("LargePortrait", PortraitName+"L")
-	PortraitButton.SetPicture(PortraitsTable.GetRowName (Portrait) + "L")
-	GenderButton.SetState (IE_GUI_BUTTON_DISABLED)
-	RaceButton.SetState (IE_GUI_BUTTON_ENABLED)
-	RaceButton.MakeDefault()
-	CharGenState = 1
-	SetCharacterDescription()
-	if PortraitWindow:
-		PortraitWindow.Close ()
+	portrait_picture_button_name = portrait_apply_selection(PortraitWindow, Portrait)
+	CGPortraitChangeToRace(portrait_picture_button_name)
 	return
 
 def CGPortraitCancelPress():
@@ -775,6 +664,15 @@ def CGPortraitCancelPress():
 	if PortraitWindow:
 		PortraitWindow.Close ()
 	return
+
+def CGPortraitChangeToRace(portrait_picture_button_name):
+	global CharGenState, PortraitButton, GenderButton, RaceButton
+	PortraitButton.SetPicture(portrait_picture_button_name)
+	GenderButton.SetState (IE_GUI_BUTTON_DISABLED)
+	RaceButton.SetState (IE_GUI_BUTTON_ENABLED)
+	RaceButton.MakeDefault()
+	CharGenState = 1
+	SetCharacterDescription()
 
 # Race Selection
 
