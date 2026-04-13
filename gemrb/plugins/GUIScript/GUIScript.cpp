@@ -3639,7 +3639,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	anim->flags = (animFlags | Animation::Flags::Active) & ~GAMEANIM;
 	anim->gameAnimation = bool(animFlags & GAMEANIM);
 
-	btn->SetAnimation(new SpriteAnimation(std::move(anim)));
+	btn->SetAnimation(MakeHolder<SpriteAnimation>(std::move(anim)));
 
 	Py_RETURN_NONE;
 }

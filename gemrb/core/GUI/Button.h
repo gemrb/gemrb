@@ -113,7 +113,7 @@ public:
 	void SetText(String string) override;
 	/** Sets the Picture */
 	void SetPicture(Holder<Sprite2D> Picture);
-	void SetAnimation(SpriteAnimation* anim);
+	void SetAnimation(Holder<SpriteAnimation> anim);
 	/** Clears the list of Pictures */
 	void ClearPictureList();
 	/** Add picture to the end of the list of Pictures */
@@ -160,7 +160,7 @@ private: // Private attributes
 	EnumArray<ButtonImage, Holder<Sprite2D>> buttonImages {};
 	/** Pictures to Apply when the hasPicture flag is set */
 	Holder<Sprite2D> Picture = nullptr;
-	SpriteAnimation* animation = nullptr;
+	Holder<SpriteAnimation> animation = nullptr;
 	/** If non-empty, list of Pictures to draw when hasPicture is set */
 	std::vector<Holder<Sprite2D>> PictureList;
 	/** The current state of the Button */

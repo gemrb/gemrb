@@ -613,10 +613,9 @@ void Button::SetPicture(Holder<Sprite2D> newpic)
 	MarkDirty();
 }
 
-void Button::SetAnimation(SpriteAnimation* anim)
+void Button::SetAnimation(Holder<SpriteAnimation> anim)
 {
-	delete animation;
-	animation = anim;
+	animation = std::move(anim);
 
 	const auto& key = fmt::format("{}_ANIM", ControlID);
 	if (animation) {
