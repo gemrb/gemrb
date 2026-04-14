@@ -12,13 +12,12 @@ using namespace GemRB;
 bool INIImporter::Open(std::unique_ptr<DataStream> str)
 {
 	std::string strbuf;
-	KeyValueGroup* lastTag = NULL;
+	KeyValueGroup* lastTag = nullptr;
 	bool startedSection = false;
 	while (str->ReadLine(strbuf) != DataStream::Error) {
-		if (strbuf.length() == 0)
+		if (strbuf.empty() || strbuf[0] == ';') {
 			continue;
-		if (strbuf[0] == ';') //Rem
-			continue;
+		}
 		if (strbuf[0] == '[') {
 			// this is a tag
 			auto pos = strbuf.find_first_of(']');
@@ -46,8 +45,8 @@ bool INIImporter::Open(std::unique_ptr<DataStream> str)
 			lastTag = &tags[tags.size() - 1];
 			continue;
 		}
-		if (lastTag == NULL)
-			continue;
+		if (!lastTag) continue;
+
 		if (lastTag->AddLine(strbuf)) {
 			startedSection = false;
 		} else {
