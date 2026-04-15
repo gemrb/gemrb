@@ -76,7 +76,7 @@ void SetMainLogLevel(LogLevel level)
 void LogMsg(LogMessage&& msg)
 {
 	ConsoleWinLogMsg(msg);
-	if (logger && msg.level > LL) {
+	if (logger && msg.level >= LL) {
 		logger->LogMsg(std::move(msg));
 	}
 }
