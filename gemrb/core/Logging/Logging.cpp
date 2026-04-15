@@ -21,6 +21,7 @@ namespace GemRB {
 using LogMessage = Logger::LogMessage;
 
 static std::atomic<LogLevel> CWLL;
+static std::atomic<LogLevel> LL;
 static std::deque<Logger::WriterPtr> writers;
 static std::unique_ptr<Logger> logger;
 
@@ -66,10 +67,16 @@ void SetConsoleWindowLogLevel(LogLevel level)
 	CWLL = level;
 }
 
+void SetMainLogLevel(LogLevel level)
+{
+	assert(level <= DEBUG);
+	LL = level;
+}
+
 void LogMsg(LogMessage&& msg)
 {
 	ConsoleWinLogMsg(msg);
-	if (logger) {
+	if (logger && msg.level > LL) {
 		logger->LogMsg(std::move(msg));
 	}
 }
