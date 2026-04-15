@@ -30,6 +30,7 @@ public:
 		const char* argv[] = { "tester", "-c", "../../tester.cfg" };
 		auto cfg = LoadFromArgs(3, const_cast<char**>(argv));
 		ToggleLogging(true);
+		SetMainLogLevel(DEBUG);
 		AddLogWriter(createStdioLogWriter());
 		gemrb = new Interface(std::move(cfg));
 

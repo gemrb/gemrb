@@ -99,6 +99,7 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 	const char* argv[] = { "tester", "-c", iter->c_str() };
 	auto cfg = LoadFromArgs(3, const_cast<char**>(argv));
 	ToggleLogging(true);
+	SetMainLogLevel(DEBUG);
 	// no need for AddLogWriter(createStdioLogWriter()) — already done by MapTest
 	SaveGameTest::gemrb = new Interface(std::move(cfg));
 
@@ -119,7 +120,7 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 	core->LoadGame(save, iwd2 ? GAMVersion::IWD2 : GAMVersion::GemRB);
 	Game* game = core->GetGame();
 	ASSERT_TRUE(game != nullptr);
-	Log(MESSAGE, "SaveGameTest", "{} game loaded successfully!\n", gameType);
+	Log(DEBUG, "SaveGameTest", "{} game loaded successfully!\n", gameType);
 
 	///////////////////////////
 	// SAVE back
@@ -144,15 +145,15 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 	core->config.SavePath = "tests/resources"; // set to build dir destination, so we don't pollute the source
 	int ret = sgi->CreateSaveGame(1, false);
 	ASSERT_TRUE(ret == GEM_OK);
-	Log(MESSAGE, "SaveGameTest", "{} game saved successfully!\n", gameType);
+	Log(DEBUG, "SaveGameTest", "{} game saved successfully!\n", gameType);
 
 	////////////////////////////////////////////////////////
 	// compare the original and resaved files for changes
-	Log(MESSAGE, "SaveGameTest", "Starting checking for differences between the two saved games");
+	Log(DEBUG, "SaveGameTest", "Starting checking for differences between the two saved games");
 	auto cmd = fmt::format("tests/resources/saves/saveDiffer.sh {} {}", gameType, core->INIConfig);
 	ret = system(cmd.c_str());
 	EXPECT_EQ(ret, 0);
-	if (!ret) Log(MESSAGE, "SaveGameTest", "{} game is identical to loaded game!\n", gameType);
+	if (!ret) Log(DEBUG, "SaveGameTest", "{} game is identical to loaded game!\n", gameType);
 
 	// try reseting the state a bit
 	core->SetGame(nullptr);
