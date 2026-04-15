@@ -116,6 +116,7 @@ public: //struct members
 	ieDword unknown2 = 0;
 	ResRef MapIconResRef;
 	ieDword Flags = 0;
+	std::array<ieByte, 124> endGarbage {};
 
 	std::shared_ptr<AnimationFactory> bam;
 

@@ -103,6 +103,7 @@ void WMPImporter::GetWorldMap(DataStream* str, WorldMap* m, unsigned int index) 
 	str->ReadDword(AreaLinksCount);
 	str->ReadResRef(m->MapIconResRef);
 	str->ReadDword(m->Flags);
+	str->Read(m->endGarbage.data(), m->endGarbage.size());
 
 	// Load map bitmap
 	ResourceHolder<ImageMgr> mos = gamedata->GetResourceHolder<ImageMgr>(m->MapResRef);
@@ -354,10 +355,9 @@ int WMPImporter::PutMap(DataStream* stream, const WorldMapArray* wmap, unsigned 
 		stream->WriteDword(AreaLinksCount);
 		stream->WriteResRef(map->MapIconResRef);
 		stream->WriteDword(map->Flags);
+		stream->Write(map->endGarbage.data(), map->endGarbage.size());
 		AreaEntriesOffset += AreaEntriesCount * 240;
 		AreaLinksOffset += AreaLinksCount * 216;
-
-		stream->WriteFilling(124);
 
 		if (!wmap->IsSingle() && !index) {
 			break;
