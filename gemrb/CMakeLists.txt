@@ -201,6 +201,7 @@ IF (BUILD_TESTING)
     tests/core/Test_MurmurHash.cpp
     tests/core/Test_Orient.cpp
     tests/core/Test_Palette.cpp
+    tests/core/Test_SaveGame.cpp
     tests/core/Streams/Test_DataStream.cpp
     tests/core/Strings/Test_CString.cpp
     tests/core/Strings/Test_String.cpp

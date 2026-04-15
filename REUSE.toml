@@ -21,6 +21,12 @@ path = [
 SPDX-FileCopyrightText = "Contributors to the GemRB project <https://gemrb.org>"
 SPDX-License-Identifier = "GPL-2.0-or-later"
 
+# saves
+[[annotations]]
+path = "gemrb/tests/resources/saves/0-*/**"
+SPDX-FileCopyrightText = "Contributors to the GemRB project <https://gemrb.org>"
+SPDX-License-Identifier = "CC0-1.0"
+
 # fmt
 [[annotations]]
 path = "gemrb/includes/fmt/**"
