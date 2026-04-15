@@ -1511,7 +1511,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		map->Scripts[MAX_SCRIPTS - 1] = new GameScript(Script, map);
 	}
 
-	Log(DEBUG, "AREImporter", "Loading songs");
+	Log(MESSAGE, "AREImporter", "Loading songs");
 	std::vector<Ambient*> ambients;
 	str->Seek(SongHeader, GEM_STREAM_START);
 	GetSongs(str, map, ambients);
@@ -1525,30 +1525,30 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	str->Seek(RestHeader + 32, GEM_STREAM_START); // skip the name
 	GetRestHeader(str, map);
 
-	Log(DEBUG, "AREImporter", "Loading regions");
+	Log(MESSAGE, "AREImporter", "Loading regions");
 	core->LoadProgress(70);
 	//Loading InfoPoints
 	for (int i = 0; i < InfoPointsCount; i++) {
 		GetInfoPoint(str, i, map);
 	}
 
-	Log(DEBUG, "AREImporter", "Loading containers");
+	Log(MESSAGE, "AREImporter", "Loading containers");
 	for (int i = 0; i < ContainersCount; i++) {
 		GetContainer(str, i, map);
 	}
 
-	Log(DEBUG, "AREImporter", "Loading doors");
+	Log(MESSAGE, "AREImporter", "Loading doors");
 	for (ieDword i = 0; i < DoorsCount; i++) {
 		GetDoor(str, i, map, tmm);
 	}
 
-	Log(DEBUG, "AREImporter", "Loading spawnpoints");
+	Log(MESSAGE, "AREImporter", "Loading spawnpoints");
 	for (ieDword i = 0; i < SpawnCount; i++) {
 		GetSpawnPoint(str, i, map);
 	}
 
 	core->LoadProgress(75);
-	Log(DEBUG, "AREImporter", "Loading actors");
+	Log(MESSAGE, "AREImporter", "Loading actors");
 	str->Seek(ActorOffset, GEM_STREAM_START);
 	assert(core->IsAvailable(IE_CRE_CLASS_ID));
 	auto actmgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
@@ -1557,13 +1557,13 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	}
 
 	core->LoadProgress(90);
-	Log(DEBUG, "AREImporter", "Loading animations");
+	Log(MESSAGE, "AREImporter", "Loading animations");
 	str->Seek(AnimOffset, GEM_STREAM_START);
 	for (ieDword i = 0; i < AnimCount; i++) {
 		GetAreaAnimation(str, map);
 	}
 
-	Log(DEBUG, "AREImporter", "Loading entrances");
+	Log(MESSAGE, "AREImporter", "Loading entrances");
 	str->Seek(EntrancesOffset, GEM_STREAM_START);
 	for (ieDword i = 0; i < EntrancesCount; i++) {
 		ieVariable Name;
@@ -1576,7 +1576,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		map->AddEntrance(Name, Pos, Face);
 	}
 
-	Log(DEBUG, "AREImporter", "Loading variables");
+	Log(MESSAGE, "AREImporter", "Loading variables");
 	core->LoadInitialValues(resRef, map->locals);
 	str->Seek(VariablesOffset, GEM_STREAM_START);
 	for (ieDword i = 0; i < VariablesCount; i++) {
@@ -1589,37 +1589,37 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		map->locals[Name] = Value;
 	}
 
-	Log(DEBUG, "AREImporter", "Loading ambients");
+	Log(MESSAGE, "AREImporter", "Loading ambients");
 	str->Seek(AmbiOffset, GEM_STREAM_START);
 	for (int i = 0; i < AmbiCount; ++i) {
 		GetAmbient(str, ambients);
 	}
 	map->SetAmbients(std::move(ambients), reverbID);
 
-	Log(DEBUG, "AREImporter", "Loading automap notes");
+	Log(MESSAGE, "AREImporter", "Loading automap notes");
 	str->Seek(NoteOffset, GEM_STREAM_START);
 	GetAutomapNotes(str, map);
 
 	//this is a ToB feature (saves the unexploded projectiles)
-	Log(DEBUG, "AREImporter", "Loading traps");
+	Log(MESSAGE, "AREImporter", "Loading traps");
 	for (ieDword i = 0; i < TrapCount; i++) {
 		if (!GetTrap(str, i, map)) continue;
 	}
 
-	Log(DEBUG, "AREImporter", "Loading tiles");
+	Log(MESSAGE, "AREImporter", "Loading tiles");
 	//Loading Tiled objects (if any)
 	str->Seek(TileOffset, GEM_STREAM_START);
 	for (ieDword i = 0; i < TileCount; i++) {
 		GetTile(str, map);
 	}
 
-	Log(DEBUG, "AREImporter", "Loading explored bitmap");
+	Log(MESSAGE, "AREImporter", "Loading explored bitmap");
 	ieDword mapSize = ieDword(map->ExploredBitmap.Bytes());
 	mapSize = std::min(mapSize, ExploredBitmapSize);
 	str->Seek(ExploredBitmapOffset, GEM_STREAM_START);
 	str->Read(map->ExploredBitmap.data(), mapSize);
 
-	Log(DEBUG, "AREImporter", "Loading wallgroups");
+	Log(MESSAGE, "AREImporter", "Loading wallgroups");
 	map->SetWallGroups(tmm->GetWallGroups());
 	// setting up doors - doing it here instead when reading doors, so actors can be bumped if needed
 	for (ieDword i = 0; i < DoorsCount; i++) {
