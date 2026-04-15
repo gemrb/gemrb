@@ -54,6 +54,7 @@ struct SaveGameTest : public testing::TestWithParam<path_t> {
 			std::string& gamePath = parts[1];
 			TrimString(gameType);
 			TrimString(gamePath);
+			gamePath = ResolveFilePath(gamePath);
 
 			if (!DirExists(gamePath)) continue;
 
