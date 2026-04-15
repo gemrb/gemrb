@@ -871,8 +871,7 @@ int Game::LoadMap(const ResRef& resRef, bool loadscreen)
 	int ret = AddMap(newMap);
 
 	// spawn creatures on a map already in the game
-	for (size_t i = 0; i < PCs.size(); i++) {
-		Actor* pc = PCs[i];
+	for (auto pc : PCs) {
 		if (pc->AreaName == resRef) {
 			newMap->AddActor(pc, false);
 		}
