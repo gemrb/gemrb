@@ -54,6 +54,9 @@ struct SaveGameTest : public testing::TestWithParam<path_t> {
 			std::string& gamePath = parts[1];
 			TrimString(gameType);
 			TrimString(gamePath);
+
+			if (!DirExists(gamePath)) continue;
+
 			std::string contents = "GemRBPath = ../../../gemrb/\nPluginsPath = ../plugins\n";
 			contents.append("SavePath = ../../../gemrb/tests/resources\n");
 			contents.append("UseAsLibrary = 1\nAudioDriver = none\n");
