@@ -29,6 +29,11 @@ for file in "${files[@]}"; do
   a=$(find "$base1" -type f -iname "$file")
   b=$(find "$base2" -type f -iname "$file")
   echo "Diffing $file"
+  if md5sum "$a" "$b" | sort -u -k1 | wc -l | grep -q 1; then
+    echo "Files are binary equal!"
+    continue;
+  fi
+
   echo "Running $IEDIFF --locase '$a' '$b'"
   diff=$("$IEDIFF" --locase "$a" "$b")
   if grep -q "are identical" <<< "$diff"; then
