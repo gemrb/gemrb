@@ -1234,7 +1234,7 @@ static void pcf_xp(Actor* actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	// check if we reached a new level
 	ieDword pc = actor->InParty;
-	if (pc && !actor->GotLUFeedback) {
+	if (pc && !actor->GotLUFeedback && core->GetGUIScriptEngine()) {
 		auto ret = core->GetGUIScriptEngine()->RunFunction("LUCommon", "CanLevelUp", pc, true);
 		if (!ret.Value<bool>()) return;
 
@@ -6171,6 +6171,8 @@ void Actor::InitStatsOnLoad()
 //most feats are simulated via spells (feat<xx>)
 void Actor::ApplyFeats()
 {
+	if (!core->GetGUIScriptEngine()) return;
+
 	//apply scripted feats
 	if (InParty) {
 		core->GetGUIScriptEngine()->RunFunction("LUCommon", "ApplyFeats", ieDword(InParty), true);

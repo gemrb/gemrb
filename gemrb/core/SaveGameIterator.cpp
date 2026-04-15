@@ -438,6 +438,8 @@ static bool DoSaveGame(const path_t& Path, bool overrideRunning)
 	// FIXME: the preview should be passed in by the caller!
 
 	WindowManager* wm = core->GetWindowManager();
+	if (!wm) return true; // skip imagery for tests
+
 	Holder<Sprite2D> preview = wm->GetScreenshot(wm->GetGameWindow());
 
 	// scale down to get more of the screen and reduce the size
