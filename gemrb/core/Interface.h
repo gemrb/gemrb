@@ -417,6 +417,8 @@ public:
 	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
 	void LoadInitialValues(const ResRef& name, ieVarsMap& map) const;
 
+	/** Creates a game control, closes all other windows */
+	GameControl* StartGameControl();
 	Tooltip CreateTooltip();
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label* GetMessageLabel() const;
@@ -679,8 +681,6 @@ private:
 	void HandleEvents();
 	/** handles hardcoded gui behaviour */
 	void HandleGUIBehaviour(GameControl*);
-	/** Creates a game control, closes all other windows */
-	GameControl* StartGameControl();
 	/** Executes everything (non graphical) in the main game loop */
 	void GameLoop(void);
 	/** the internal (without cache) part of GetListFrom2DA */
