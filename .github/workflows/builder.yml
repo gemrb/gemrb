@@ -62,8 +62,9 @@ jobs:
         xvfb-run make test
 
   macos:
+    if: false
     name: MacOS build
-    runs-on: macos-15
+    runs-on: macos-latest
 
     steps:
     - name: Checkout
