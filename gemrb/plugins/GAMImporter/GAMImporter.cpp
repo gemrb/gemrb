@@ -826,9 +826,13 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 	stream->WriteDword(PPLocOffset);
 	stream->WriteDword(PPLocCount);
 
-	auto gc = core->GetGameControl();
-	stream->WriteDword(gc->GetScalePercent());
-	stream->WriteFilling(48); //unknown
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		auto gc = core->GetGameControl();
+		stream->WriteDword(gc->GetScalePercent());
+		stream->WriteFilling(48); // some more used by ees, the rest unused
+	} else {
+		stream->WriteFilling(52); // unused
+	}
 
 	//save failed, but it is not our fault, returning now before the asserts kill us
 	if (stream->GetPos() == 0) {
