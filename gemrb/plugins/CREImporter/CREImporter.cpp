@@ -1924,7 +1924,12 @@ int CREImporter::PutInventory(DataStream* stream, const Actor* actor, unsigned i
 				tmpDword &= ~IE_INV_ITEM_UNDROPPABLE;
 			}
 		}
-		stream->WriteDword(tmpDword);
+		// bg1 saved only the first four bits!?
+		if (actor->creVersion == CREVersion::V1_0) {
+			stream->WriteDword(tmpDword & (IE_INV_ITEM_ACQUIRED - 1));
+		} else {
+			stream->WriteDword(tmpDword);
+		}
 	}
 	return 0;
 }
