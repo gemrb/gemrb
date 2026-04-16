@@ -664,7 +664,7 @@ public:
 		return TalkCount ? GetLongName() : GetShortName();
 	}
 
-	ResRef GetScript(int ScriptIndex) const;
+	ResRef GetScript(int ScriptIndex, bool empty = false) const;
 	/** Gets the Character's level for XP calculations */
 	ieDword GetXPLevel(int modified) const;
 	/* Gets the given ISCLASS level */

@@ -2137,11 +2137,11 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		stream->WriteFilling(1);
 		// no kit word order magic for iwd2
 		stream->WriteDword(actor->BaseStats[IE_KIT]);
-		stream->WriteResRef(actor->GetScript(SCR_OVERRIDE));
-		stream->WriteResRef(actor->GetScript(SCR_CLASS));
-		stream->WriteResRef(actor->GetScript(SCR_RACE));
-		stream->WriteResRef(actor->GetScript(SCR_GENERAL));
-		stream->WriteResRef(actor->GetScript(SCR_DEFAULT));
+		stream->WriteResRef(actor->GetScript(SCR_OVERRIDE, true));
+		stream->WriteResRef(actor->GetScript(SCR_CLASS, true));
+		stream->WriteResRef(actor->GetScript(SCR_RACE, true));
+		stream->WriteResRef(actor->GetScript(SCR_GENERAL, true));
+		stream->WriteResRef(actor->GetScript(SCR_DEFAULT, true));
 	} else {
 		for (int i = 0; i < 21; i++) {
 			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_PROFICIENCYBASTARDSWORD + i]);
@@ -2171,11 +2171,11 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		ieDword tmpDword = ((actor->BaseStats[IE_KIT] & 0xffff) << 16) +
 			((actor->BaseStats[IE_KIT] & 0xffff0000) >> 16);
 		stream->WriteDword(tmpDword);
-		stream->WriteResRef(actor->GetScript(SCR_OVERRIDE));
-		stream->WriteResRef(actor->GetScript(SCR_CLASS));
-		stream->WriteResRef(actor->GetScript(SCR_RACE));
-		stream->WriteResRef(actor->GetScript(SCR_GENERAL));
-		stream->WriteResRef(actor->GetScript(SCR_DEFAULT));
+		stream->WriteResRef(actor->GetScript(SCR_OVERRIDE, true));
+		stream->WriteResRef(actor->GetScript(SCR_CLASS, true));
+		stream->WriteResRef(actor->GetScript(SCR_RACE, true));
+		stream->WriteResRef(actor->GetScript(SCR_GENERAL, true));
+		stream->WriteResRef(actor->GetScript(SCR_DEFAULT, true));
 	}
 	//now follows the fuzzy part in separate putactor... functions
 	return 0;
