@@ -644,13 +644,19 @@ int GAMImporter::GetStoredFileSize(const Game* game)
 		SavedLocCount = 0;
 		// there is an unknown dword at the end of iwd2 savegames (see PutSavedLocations)
 		headersize += 4;
-	} else {
+	} else if (version == GAMVersion::BG2 || version == GAMVersion::TOB) {
 		SavedLocOffset = headersize;
 		SavedLocCount = game->GetSavedLocationCount();
+	} else {
+		SavedLocCount = 0;
 	}
 	headersize += SavedLocCount * 12;
 
-	PPLocOffset = headersize;
+	if (version == GAMVersion::BG2 || version == GAMVersion::TOB) {
+		PPLocOffset = headersize;
+	} else {
+		PPLocOffset = 0;
+	}
 	PPLocCount = game->GetPlaneLocationCount();
 
 	return headersize + PPLocCount * 12;
