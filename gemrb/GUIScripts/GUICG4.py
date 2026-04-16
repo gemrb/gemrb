@@ -26,7 +26,6 @@ KitIndex = 0
 HasStrExtra = 0
 MyChar = 0
 
-AbilityTable = GemRB.LoadTable ("ability")
 Abracead = GemRB.LoadTable ("ABRACEAD")
 Abclsmod = GemRB.LoadTable ("ABCLSMOD", True)
 Abclasrq = GemRB.LoadTable ("ABCLASRQ")
@@ -205,7 +204,7 @@ def OnLoad():
 		# delete the labels and use the buttons instead
 		if GameCheck.IsBG2 ():
 			AbilityWindow.DeleteControl (i + 0x10000009)
-			Button.SetText (AbilityTable.GetValue (i, 0))
+			Button.SetText (CommonTables.Ability.GetValue (i, 0, GTV_REF))
 			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT, OP_OR)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 
@@ -243,7 +242,7 @@ def MinusPress(Button):
 	CalcLimits (Abidx)
 	GemRB.SetToken ("MINIMUM", str(Minimum))
 	GemRB.SetToken ("MAXIMUM", str(Maximum))
-	TextAreaControl.SetText (AbilityTable.GetValue (Abidx, 1))
+	TextAreaControl.SetText (CommonTables.Ability.GetValue (Abidx, 1, GTV_REF))
 	if Ability <= Minimum:
 		return
 	GemRB.SetVar ("Ability " + str(Abidx), Ability - 1)
@@ -259,7 +258,7 @@ def JustPress(Button):
 	CalcLimits (Abidx)
 	GemRB.SetToken ("MINIMUM", str(Minimum))
 	GemRB.SetToken ("MAXIMUM", str(Maximum))
-	TextAreaControl.SetText (AbilityTable.GetValue (Abidx, 1))
+	TextAreaControl.SetText (CommonTables.Ability.GetValue (Abidx, 1, GTV_REF))
 	return
 
 def PlusPress(Button):
@@ -268,7 +267,7 @@ def PlusPress(Button):
 	CalcLimits (Abidx)
 	GemRB.SetToken ("MINIMUM", str(Minimum))
 	GemRB.SetToken ("MAXIMUM", str(Maximum))
-	TextAreaControl.SetText (AbilityTable.GetValue (Abidx, 1))
+	TextAreaControl.SetText (CommonTables.Ability.GetValue (Abidx, 1, GTV_REF))
 	PointsLeft = GemRB.GetVar ("Ability -1") - 1
 	if PointsLeft == -1:
 		return
@@ -317,9 +316,9 @@ def NextPress():
 	if AbilityWindow:
 		AbilityWindow.Close ()
 
-	AbilityCount = AbilityTable.GetRowCount ()
+	AbilityCount = CommonTables.Ability.GetRowCount ()
 	for i in range (AbilityCount):
-		StatID = AbilityTable.GetValue (i, 3)
+		StatID = CommonTables.Ability.GetValue (i, 3, GTV_INT)
 		StatValue = GemRB.GetVar ("Ability " + str(i))
 		GemRB.SetPlayerStat (MyChar, StatID, StatValue)
 

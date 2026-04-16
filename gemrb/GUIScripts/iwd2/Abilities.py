@@ -13,7 +13,6 @@ from ie_stats import IE_STR, IE_DEX, IE_CON, IE_INT, IE_WIS, IE_CHR
 AbilityWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-AbilityTable = 0
 PointsLeft = 0
 Minimum = 0
 Maximum = 0
@@ -98,13 +97,11 @@ def OnLoad():
 def OpenAbilitiesWindow(chargen, points):
 	global AbilityWindow, TextAreaControl, DoneButton
 	global CharGen, PointsLeft
-	global AbilityTable
 	global KitIndex, Minimum, Maximum
 	
 	CharGen = chargen
 	PointsLeft = points
 
-	AbilityTable = GemRB.LoadTable ("ability")
 	if chargen:
 		Kit = GemRB.GetVar("Class Kit")
 		KitName = GUICommon.GetKitRowName (GemRB.GetVar ("Slot"), True, Kit)
@@ -171,7 +168,7 @@ def RightPress(btn):
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
-	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
+	TextAreaControl.SetText (CommonTables.Ability.GetValue (Abidx, 1, GTV_REF))
 	if Ability<=Minimum:
 		return
 	Ability -= 1
@@ -194,7 +191,7 @@ def JustPress(btn):
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
-	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
+	TextAreaControl.SetText (CommonTables.Ability.GetValue (Abidx, 1, GTV_REF))
 	return
 
 def LeftPress(btn):
@@ -205,7 +202,7 @@ def LeftPress(btn):
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
-	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
+	TextAreaControl.SetText (CommonTables.Ability.GetValue (Abidx, 1, GTV_REF))
 	if PointsLeft == 0:
 		return
 	if Ability>=Maximum:  #should be more elaborate

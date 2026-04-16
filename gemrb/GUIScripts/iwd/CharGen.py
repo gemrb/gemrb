@@ -61,7 +61,6 @@ AlignmentTextArea = 0
 AlignmentDoneButton = 0
 
 AbilitiesButton = 0
-AbilitiesTable = 0
 
 SkillsButton = 0
 SkillsWindow = 0
@@ -125,13 +124,12 @@ def OnLoad():
 	global GenderButton, RaceButton, ClassButton, AlignmentButton
 	global AbilitiesButton, SkillsButton, AppearanceButton, BiographyButton, NameButton
 	global KitTable, ProficienciesTable, RacialEnemyTable
-	global AbilitiesTable, PortraitsTable
+	global PortraitsTable
 	global MyChar, ImportedChar
 
 	KitTable = GemRB.LoadTable ("magesch")
 	ProficienciesTable = GemRB.LoadTable ("weapprof")
 	RacialEnemyTable = GemRB.LoadTable ("haterace")
-	AbilitiesTable = GemRB.LoadTable ("ability")
 	PortraitsTable = GemRB.LoadTable ("pictures")
 	CharGenWindow = GemRB.LoadWindow (0, "GUICG")
 	CharGenState = 0
@@ -421,9 +419,9 @@ def SetCharacterDescription():
 		strextra = GemRB.GetPlayerStat (MyChar, IE_STREXTRA)
 		TextArea.Append ("\n")
 		for i in range (6):
-			TextArea.Append (AbilitiesTable.GetValue (i, 2))
+			TextArea.Append (CommonTables.Ability.GetValue (i, 2, GTV_REF))
 			TextArea.Append (": " )
-			StatID = AbilitiesTable.GetValue (i, 3)
+			StatID = CommonTables.Ability.GetValue (i, 3, GTV_INT)
 			stat = GemRB.GetPlayerStat (MyChar, StatID)
 			if (i == 0) and HasStrExtra and (stat==18):
 				TextArea.Append (str(stat) + "/" + str(strextra) )

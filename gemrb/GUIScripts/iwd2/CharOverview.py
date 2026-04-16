@@ -123,8 +123,8 @@ def UpdateOverview(CurrentStep):
 	TextAreaControl = CharGenWindow.GetControl(9)
 	CharGenWindow.SetEventProxy (TextAreaControl)
 
-	Tables = [None, None, None]
-	for tbl in ['ability', 'skillsta', 'skills', 'featreq', 'feats']:
+	Tables = [None, None, None, None]
+	for tbl in ['skillsta', 'skills', 'featreq', 'feats']:
 		Tables.append(GemRB.LoadTable(tbl))
 	
 	MyChar = GemRB.GetVar ("Slot")
@@ -174,10 +174,10 @@ def UpdateOverview(CurrentStep):
 	if CurrentStep > 5:
 		AddText('\n[color=FFFF00]' + GemRB.GetString(17088) + '[/color]', 1)
 		for i in range(0, 6):
-			statName = Tables[3].GetRowName (i)
-			stat = Tables[3].GetValue (statName, "STAT_ID", GTV_INT)
+			statName = CommonTables.Ability.GetRowName (i)
+			stat = CommonTables.Ability.GetValue (statName, "STAT_ID", GTV_INT)
 			abl = GemRB.GetPlayerStat (MyChar, stat)
-			strref = Tables[3].GetValue (statName, "CAP_REF", GTV_INT)
+			strref = CommonTables.Ability.GetValue (statName, "CAP_REF", GTV_INT)
 			AddText(strref)
 			AddText(': %d (%+d)' % (abl, abl / 2 - 5), 1)
 

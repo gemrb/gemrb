@@ -7,14 +7,14 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 import CharOverview
+import CommonTables
 
 def OnLoad():
 	#setting the stats so the feat code will work
 	MyChar = GemRB.GetVar("Slot")
-	TmpTable = GemRB.LoadTable ("ability")
-	AbilityCount = TmpTable.GetRowCount ()
+	AbilityCount = CommonTables.Ability.GetRowCount ()
 	for i in range (AbilityCount):
-		StatID = TmpTable.GetValue (i, 3, GTV_STAT)
+		StatID = CommonTables.Ability.GetValue (i, 3, GTV_INT)
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Ability "+str(i) ) )
 
 	CharOverview.UpdateOverview(6)

@@ -105,23 +105,21 @@ def getAlignment(area):
 # Abilities
 def unsetAbilities():
 	MyChar = GemRB.GetVar ("Slot")
-	AbilityTable = GemRB.LoadTable ("ability")
-	AbilityCount = AbilityTable.GetRowCount ()
+	AbilityCount = CommonTables.Ability.GetRowCount ()
 	
 	# set all our abilites to zero
 	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, 0)
 	for i in range(AbilityCount):
-		StatID = AbilityTable.GetValue (i, 3)
+		StatID = CommonTables.Ability.GetValue (i, 3, GTV_INT)
 		GemRB.SetPlayerStat (MyChar, StatID, 0)
 
 def getAbilities(area):
 	MyChar = GemRB.GetVar ("Slot")
-	AbilityTable = GemRB.LoadTable ("ability")
-	AbilityCount = AbilityTable.GetRowCount ()
+	AbilityCount = CommonTables.Ability.GetRowCount ()
 	area.Append("\n")
 	for i in range(AbilityCount):
-		v = AbilityTable.GetValue(i,2)
-		stat = AbilityTable.GetValue (i, 3)
+		v = AbilityTable.GetValue (i, 2, GTV_REF)
+		stat = AbilityTable.GetValue (i, 3, GTV_INT)
 		area.Append(v)
 		area.Append (": " + str(GemRB.GetPlayerStat (MyChar, stat)) + "\n")
 	area.Append("\n")

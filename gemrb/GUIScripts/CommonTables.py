@@ -10,6 +10,7 @@ StrMod = StrModEx = None
 Classes = KitList = ClassSkills = Races = NextLevel = None
 Pdolls = SpellDisplay = Aligns = ItemType = None
 WeapProfs = CharProfs = RaceData = ClassText = None
+Ability = None
 
 Loaded = False
 
@@ -17,7 +18,7 @@ def Load():
 	global Classes, KitList, ClassSkills, Races, NextLevel
 	global Pdolls, StrModEx, StrMod, SpellDisplay, Aligns
 	global ItemType, WeapProfs, CharProfs, RaceData
-	global Loaded, ClassText
+	global Loaded, ClassText, Ability
 
 	if Loaded:
 		return
@@ -34,6 +35,7 @@ def Load():
 	StrModEx = GemRB.LoadTable ("strmodex", False, True)
 	SpellDisplay = GemRB.LoadTable ("spldisp", False, True)
 	ItemType = GemRB.LoadTable ("itemtype", False, True)
+	Ability = GemRB.LoadTable ("ability", False, True)
 
 	# tables that are only in some games, but not optional there
 	if GemRB.HasResource ("kitlist", RES_2DA):

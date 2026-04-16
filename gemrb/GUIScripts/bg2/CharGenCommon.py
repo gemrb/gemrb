@@ -122,8 +122,6 @@ def DisplayOverview(step):
 	###
 	# Stat overview
 	###
-	AbilityTable = GemRB.LoadTable ("ability")
-
 	MyChar = GemRB.GetVar ("Slot")
 	TextAreaControl= CharGenWindow.GetControl (9)
 	TextAreaControl.SetText ("")
@@ -157,8 +155,8 @@ def DisplayOverview(step):
 			TextAreaControl.Append ("\n")
 			strextra = GemRB.GetPlayerStat (MyChar, IE_STREXTRA)
 			for i in range(6):
-				v = AbilityTable.GetValue (i, 2, GTV_REF)
-				StatID = AbilityTable.GetValue (i, 3)
+				v = CommonTables.Ability.GetValue (i, 2, GTV_REF)
+				StatID = CommonTables.Ability.GetValue (i, 3, GTV_INT)
 				stat = GemRB.GetPlayerStat (MyChar, StatID)
 				if (i == 0) and (strextra > 0) and (stat==18):
 					TextAreaControl.Append (v + ": " + str(stat) + "/" + str(strextra) + "\n")
