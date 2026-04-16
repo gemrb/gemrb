@@ -968,6 +968,9 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	if (ac->LongStrRef == ieStrRef::INVALID) {
 		std::string tmpstr = TLKStringFromString(ac->GetLongName());
 		stream->WriteVariable(ieVariable(tmpstr));
+	} else if (newVersion == GAMVersion::BG) {
+		// at least bg1, if not more, only saved it for the protagonist
+		stream->WriteFilling(32);
 	} else {
 		std::string tmpstr = core->GetMBString(ac->LongStrRef, STRING_FLAGS::STRREFOFF);
 		stream->WriteVariable(ieVariable(tmpstr));
