@@ -615,6 +615,11 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 		actor->Select(true);
 		assert(actor->IsSelected());
 		selected.push_back(actor);
+		// potentially update npc area index
+		const Actor* areaViewer = FindPC(NPCAreaViewed - 1);
+		if (areaViewer && !areaViewer->Selected) {
+			NPCAreaViewed = actor->InParty - 1;
+		}
 
 		if (!(flags & SELECT_QUIET) && selected.size() == 1) {
 			actor->PlaySelectionSound();

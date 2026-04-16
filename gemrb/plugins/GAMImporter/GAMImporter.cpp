@@ -767,14 +767,7 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 		}
 	}
 	stream->WriteDword(game->PartyGold);
-	ieWord NPCAreaViewed = -1;
-	for (const auto& actor : game->selected) {
-		if (actor->InParty) {
-			NPCAreaViewed = actor->InParty - 1;
-			break;
-		}
-	}
-	stream->WriteWord(NPCAreaViewed);
+	stream->WriteWord(game->NPCAreaViewed);
 	stream->WriteWord(game->WeatherBits);
 	stream->WriteDword(PCOffset);
 	stream->WriteDword(PCCount);
