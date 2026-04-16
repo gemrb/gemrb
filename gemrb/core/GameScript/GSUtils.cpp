@@ -113,7 +113,7 @@ ieWordSigned GetHappiness(const Scriptable* Sender, int reputation)
 
 	static AutoTable happyTable = gamedata->LoadTable("happy", true);
 	if (happyTable) {
-		return happyTable->QueryFieldSigned<ieWordSigned>(alignment - 1, reputation / 10 - 1);
+		return happyTable->QueryFieldSigned<ieWordSigned>(reputation / 10 - 1, alignment - 1);
 	}
 	return 0;
 }
