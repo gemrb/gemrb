@@ -829,7 +829,11 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
 		auto gc = core->GetGameControl();
 		stream->WriteDword(gc->GetScalePercent());
-		stream->WriteFilling(48); // some more used by ees, the rest unused
+		stream->WriteResRef(game->RandomEncounterArea);
+		stream->WriteResRef(game->CurrentWorldMap);
+		stream->WriteResRef(game->CurrentCampaign);
+		stream->WriteDword(game->FamiliarOwner);
+		stream->WriteString(game->RandomEncounterEntry, game->RandomEncounterEntry.Size);
 	} else {
 		stream->WriteFilling(52); // unused
 	}
