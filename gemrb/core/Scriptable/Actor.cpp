@@ -1253,7 +1253,8 @@ static void pcf_gold(Actor* actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	//this function will make a party member automatically donate their
 	//gold to the party pool, not the same as in the original engine
-	if (actor->InParty) {
+	// disable for test runners, so saves appear identical
+	if (actor->InParty && !core->config.UseAsLibrary) {
 		Game* game = core->GetGame();
 		game->AddGold(actor->BaseStats[IE_GOLD]);
 		actor->BaseStats[IE_GOLD] = 0;
