@@ -484,6 +484,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	actor->AreaName = pcInfo.Area;
 	actor->SetOrientation(ClampToOrientation(pcInfo.Orientation), false);
 	actor->TalkCount = pcInfo.TalkCount;
+	actor->ignoredFields.viewPos = pcInfo.ViewPos;
 	actor->Modal.State = pcInfo.ModalState;
 	actor->SetModalSpell(actor->Modal.State, {});
 
@@ -864,9 +865,13 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	stream->WriteDword(ac->GetOrientation());
 	stream->WriteResRefUC(ac->AreaName);
 	stream->WritePoint(ac->Pos);
-	//no viewport, we cheat
-	stream->WriteWord(ac->Pos.x - core->config.Width / 2);
-	stream->WriteWord(ac->Pos.y - core->config.Height / 2);
+	if (core->config.UseAsLibrary) {
+		stream->WritePoint(ac->ignoredFields.viewPos);
+	} else {
+		// better for higher resolutions, I guess?
+		stream->WriteWord(ac->Pos.x - core->config.Width / 2);
+		stream->WriteWord(ac->Pos.y - core->config.Height / 2);
+	}
 	stream->WriteEnum(ac->Modal.State);
 	stream->WriteWord(ac->PCStats->Happiness);
 	//interact counters

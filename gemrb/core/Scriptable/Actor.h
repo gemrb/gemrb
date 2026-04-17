@@ -340,6 +340,7 @@ struct IgnoredFields {
 	ieByte pstColorBytes[10] {};
 	ieWord saveGlobalID = 0;
 	ieWord savelocalID = 0;
+	Point viewPos;
 };
 
 enum DamageFlags {
