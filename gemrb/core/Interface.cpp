@@ -2725,13 +2725,12 @@ void Interface::InitItemTypes()
 		bool alias;
 		ieDword i = strtounsigned<ieDword>(st->GetRowName(row).c_str());
 		if (i >= SlotTypes) continue;
-		if (slotTypes[i].slotEffects != 100) { // SLOT_EFFECT_ALIAS
-			slotTypes[row].slot = i;
+		slotTypes[row].slot = i;
+		if (slotTypes[i].slotEffects == 100) { // default value of slotEffects - SLOT_EFFECT_ALIAS
+			alias = false;
+		} else {
 			i = row;
 			alias = true;
-		} else {
-			slotTypes[row].slot = i;
-			alias = false;
 		}
 		slotTypes[i].slotType = st->QueryFieldUnsigned<ieDword>(row, 0);
 		slotTypes[i].slotID = st->QueryFieldUnsigned<ieDword>(row, 1);
