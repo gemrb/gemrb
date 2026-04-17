@@ -1781,12 +1781,13 @@ Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 			vvc->SetPos(ab->Pos);
 			// force vvc to play only once
 			vvc->PlayOnce();
+			ieDword newDuration = vvc->GetSequenceDuration(Time.defaultTicksPerSec) * 9 / 10 + core->GetGame()->GameTime;
 			map->AddVVCell(std::move(vvc));
 
 			// set up the summon disable effect
 			auto newfx = EffectQueue::CreateEffect(fx_summon_disable_ref, 0, 1, FX_DURATION_ABSOLUTE);
 			if (newfx) {
-				newfx->Duration = vvc->GetSequenceDuration(Time.defaultTicksPerSec) * 9 / 10 + core->GetGame()->GameTime;
+				newfx->Duration = newDuration;
 				ApplyEffect(std::move(newfx), ab, ab);
 			}
 		}
