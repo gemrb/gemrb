@@ -1042,7 +1042,8 @@ void CREImporter::GetActorPST(Actor* act)
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SEX]);
 	str->Seek(5, GEM_CURRENT_POS);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_ALIGNMENT]);
-	str->Seek(4, GEM_CURRENT_POS);
+	str->ReadScalar(act->ignoredFields.saveGlobalID);
+	str->ReadScalar(act->ignoredFields.savelocalID);
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
@@ -1348,7 +1349,8 @@ void CREImporter::GetActorBG(Actor* act)
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SEX]);
 	str->Seek(5, GEM_CURRENT_POS); // 5x SpecialCase in bg2/ee
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_ALIGNMENT]);
-	str->Seek(4, GEM_CURRENT_POS); // dword labeled Instance
+	str->ReadScalar(act->ignoredFields.saveGlobalID);
+	str->ReadScalar(act->ignoredFields.savelocalID);
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
@@ -1581,7 +1583,8 @@ void CREImporter::GetActorIWD2(Actor* act)
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SEX]);
 	str->Seek(5, GEM_CURRENT_POS); // object.ids references that we don't save
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_ALIGNMENT]);
-	str->Seek(4, GEM_CURRENT_POS);
+	str->ReadScalar(act->ignoredFields.saveGlobalID);
+	str->ReadScalar(act->ignoredFields.savelocalID);
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
@@ -1760,7 +1763,8 @@ void CREImporter::GetActorIWD1(Actor* act) //9.0
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SEX]);
 	str->Seek(5, GEM_CURRENT_POS);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_ALIGNMENT]);
-	str->Seek(4, GEM_CURRENT_POS);
+	str->ReadScalar(act->ignoredFields.saveGlobalID);
+	str->ReadScalar(act->ignoredFields.savelocalID);
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
@@ -2213,7 +2217,8 @@ int CREImporter::PutActorBG(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
 	stream->WriteFilling(5); //unknown bytes
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
-	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
+	stream->WriteScalar(actor->ignoredFields.saveGlobalID);
+	stream->WriteScalar(actor->ignoredFields.savelocalID);
 	stream->WriteVariable(actor->GetScriptName());
 	return 0;
 }
@@ -2251,7 +2256,8 @@ int CREImporter::PutActorPST(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
 	stream->WriteFilling(5); //unknown bytes
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
-	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
+	stream->WriteScalar(actor->ignoredFields.saveGlobalID);
+	stream->WriteScalar(actor->ignoredFields.savelocalID);
 	stream->WriteVariable(actor->GetScriptName());
 	return 0;
 }
@@ -2281,7 +2287,8 @@ int CREImporter::PutActorIWD1(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
 	stream->WriteFilling(5); //unknown bytes
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
-	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
+	stream->WriteScalar(actor->ignoredFields.saveGlobalID);
+	stream->WriteScalar(actor->ignoredFields.savelocalID);
 	stream->WriteVariable(actor->GetScriptName());
 	return 0;
 }
@@ -2317,7 +2324,8 @@ int CREImporter::PutActorIWD2(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
 	stream->WriteFilling(5); //unknown bytes
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
-	stream->WriteFilling(4); //this is called ID in iwd2, and contains 2 words
+	stream->WriteScalar(actor->ignoredFields.saveGlobalID);
+	stream->WriteScalar(actor->ignoredFields.savelocalID);
 	stream->WriteVariable(actor->GetScriptName());
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASS]);
 	stream->WriteFilling(1);

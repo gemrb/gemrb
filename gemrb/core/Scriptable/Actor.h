@@ -338,6 +338,8 @@ struct IgnoredFields {
 	 *   it periodically reduces brightness to ~50% and back to full
 	 */
 	ieByte pstColorBytes[10] {};
+	ieWord saveGlobalID = 0;
+	ieWord savelocalID = 0;
 };
 
 enum DamageFlags {
