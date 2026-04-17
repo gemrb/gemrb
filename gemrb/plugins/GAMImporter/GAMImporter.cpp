@@ -107,6 +107,7 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 	str->ReadDword(GlobalOffset);
 	str->ReadDword(GlobalCount);
 	str->ReadResRef(newGame->LastMasterArea); // this is the 'master area', different for subareas
+	newGame->PreviousArea = newGame->LastMasterArea; // last worldmap area
 	str->ReadDword(newGame->CurrentLink); //in ToB this is named 'currentLink'
 	str->ReadDword(JournalCount);
 	str->ReadDword(JournalOffset);
@@ -786,14 +787,7 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 	stream->WriteDword(NPCCount);
 	stream->WriteDword(GlobalOffset);
 	stream->WriteDword(GlobalCount);
-	ResRef masterArea = game->CurrentArea;
-	if (!game->MasterArea(game->CurrentArea)) {
-		masterArea = game->LastMasterArea; // not necessarily correct
-		if (masterArea.IsEmpty() || !game->MasterArea(masterArea)) {
-			masterArea = game->CurrentArea;
-		}
-	}
-	stream->WriteResRefUC(masterArea);
+	stream->WriteResRefUC(game->PreviousArea);
 	stream->WriteDword(game->CurrentLink);
 	stream->WriteDword(JournalCount);
 	stream->WriteDword(JournalOffset);
@@ -806,7 +800,7 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 		case GAMVersion::TOB:
 		case GAMVersion::IWD2:
 			stream->WriteDword(game->Reputation);
-			stream->WriteResRefUC(masterArea); // current area, but usually overridden via NPCAreaViewed
+			stream->WriteResRefUC(game->CurrentArea); // current area, but usually overridden via NPCAreaViewed
 			stream->WriteDword(game->ControlStatus);
 			stream->WriteDword(game->Expansion);
 			stream->WriteDword(FamiliarsOffset);
