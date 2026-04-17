@@ -572,12 +572,7 @@ def GenderCancelPress():
 
 
 def PortraitSelect():
-	def GetGender():
-		MyChar = GemRB.GetVar("Slot")
-		return GemRB.GetPlayerStat(MyChar, IE_SEX)
-
 	SetupAppearanceWindow(
-		GetGenderFunc=GetGender,
 		NextPressFunc=CGPortraitChangeToRace,
 		CustomDoneFunc=CGPortraitChangeToRace,
 	)

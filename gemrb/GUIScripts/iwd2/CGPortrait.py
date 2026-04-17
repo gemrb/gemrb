@@ -8,13 +8,9 @@ import CharOverview
 from GUIPortraitCommon import *
 
 def OnLoad():
-	def GetGender():
-		return GemRB.GetVar("Gender")
-
 	def extra_setup(window):
 		CharOverview.PositionCharGenWin(window)
 		
 	SetupAppearanceWindow(
-		GetGenderFunc=GetGender,
 		ExtraSetupFunc=extra_setup
 	)

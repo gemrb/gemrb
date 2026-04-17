@@ -9,9 +9,6 @@ import CharGenCommon
 from GUIPortraitCommon import *
 
 def OnLoad():
-	def get_gender():
-		return GemRB.GetVar("Gender")
-
 	def extra_setup(window):
 		CharGenCommon.PositionCharGenWin(window, -6)
 
@@ -20,7 +17,6 @@ def OnLoad():
 			TextAreaControl.SetText("")
 
 	SetupAppearanceWindow(
-		GetGenderFunc=get_gender,
 		ExtraSetupFunc=extra_setup
 	)
 
