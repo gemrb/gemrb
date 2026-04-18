@@ -99,6 +99,8 @@ void Scriptable::SetDialog(const ResRef& resref)
 {
 	if (!resref.IsEmpty() && gamedata->Exists(resref, IE_DLG_CLASS_ID, true)) {
 		Dialog = resref;
+	} else if (core->config.UseAsLibrary) {
+		Dialog = resref;
 	}
 }
 
@@ -133,7 +135,8 @@ void Scriptable::SetScript(const ResRef& aScript, int idx, bool ai)
 	Scripts[idx] = NULL;
 	// NONE is an 'invalid' script name, seldom used to reset the slot, which we do above
 	// This check is to prevent flooding of the console
-	if (!aScript.IsEmpty() && aScript != "NONE") {
+	// it's also present in some files, which we ignore unless comparing saves
+	if (!aScript.IsEmpty() && (core->config.UseAsLibrary || aScript != "NONE")) {
 		if (idx != AI_SCRIPT_LEVEL) ai = false;
 		Scripts[idx] = new GameScript(aScript, this, idx, ai);
 	}

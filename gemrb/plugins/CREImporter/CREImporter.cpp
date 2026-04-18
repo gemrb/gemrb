@@ -801,7 +801,7 @@ void CREImporter::ReadDialog(Actor* act)
 	ResRef Dialog;
 	str->ReadResRef(Dialog);
 	// avoiding a literal NONE to not error, since the file doesn't exist
-	if (Dialog == "NONE") {
+	if (Dialog == "NONE" && !core->config.UseAsLibrary) {
 		Dialog.Reset();
 	}
 	act->SetDialog(Dialog);
