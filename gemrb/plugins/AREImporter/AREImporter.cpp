@@ -700,7 +700,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	if (script0.IsEmpty()) {
 		ip->Scripts[0] = nullptr;
 	} else {
-		ip->Scripts[0] = new GameScript(script0, ip);
+		ip->Scripts[0] = MakeHolder<GameScript>(script0, ip);
 	}
 
 	if (ip->Type != ST_TRAVEL || !ip->outline) return;
@@ -810,7 +810,7 @@ void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
 	if (Script.IsEmpty()) {
 		c->Scripts[0] = nullptr;
 	} else {
-		c->Scripts[0] = new GameScript(Script, c);
+		c->Scripts[0] = MakeHolder<GameScript>(Script, c);
 	}
 	c->KeyResRef = keyResRef;
 	if (!openFail) openFail = ieStrRef(-1); // rewrite 0 to -1
@@ -979,7 +979,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	if (script0.IsEmpty()) {
 		door->Scripts[0] = nullptr;
 	} else {
-		door->Scripts[0] = new GameScript(script0, door);
+		door->Scripts[0] = MakeHolder<GameScript>(script0, door);
 	}
 
 	door->toOpen[0] = toOpen[0];
@@ -1508,7 +1508,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 		//for some reason the area's script is run from the last slot
 		//at least one area script depends on this, if you need something
 		//more customisable, add a game flag
-		map->Scripts[MAX_SCRIPTS - 1] = new GameScript(Script, map);
+		map->Scripts[MAX_SCRIPTS - 1] = MakeHolder<GameScript>(Script, map);
 	}
 
 	Log(MESSAGE, "AREImporter", "Loading songs");
@@ -1859,7 +1859,7 @@ int AREImporter::PutHeader(DataStream* stream, const Map* map) const
 	stream->WriteFilling(4);
 
 	//the saved area script is in the last script slot!
-	const GameScript* s = map->Scripts[MAX_SCRIPTS - 1];
+	const auto& s = map->Scripts[MAX_SCRIPTS - 1];
 	if (s) {
 		stream->WriteResRefLC(s->GetName());
 	} else {
@@ -1944,7 +1944,7 @@ int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword& VertIndex
 		stream->WriteWord(d->TrapDetected);
 		stream->WritePoint(d->TrapLaunch);
 		stream->WriteResRefLC(d->KeyResRef);
-		const GameScript* s = d->Scripts[0];
+		const auto& s = d->Scripts[0];
 		if (s) {
 			stream->WriteResRefLC(s->GetName());
 		} else {
@@ -2068,7 +2068,7 @@ int AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword& Vert
 		stream->WriteDword(ItemIndex);
 		stream->WriteDword(tmpDword);
 		ItemIndex += tmpDword;
-		const GameScript* s = c->Scripts[0];
+		const auto& s = c->Scripts[0];
 		if (s) {
 			stream->WriteResRefLC(s->GetName());
 		} else {
@@ -2122,7 +2122,7 @@ int AREImporter::PutRegions(DataStream* stream, const Map* map, ieDword& VertInd
 		stream->WriteWord(ip->TrapDetected);
 		stream->WritePoint(ip->TrapLaunch);
 		stream->WriteResRefLC(ip->KeyResRef);
-		const GameScript* s = ip->Scripts[0];
+		const auto& s = ip->Scripts[0];
 		if (s) {
 			stream->WriteResRefLC(s->GetName());
 		} else {
@@ -2184,7 +2184,7 @@ int AREImporter::PutSpawns(DataStream* stream, const Map* map) const
 
 void AREImporter::PutScript(DataStream* stream, const Actor* ac, unsigned int index) const
 {
-	const GameScript* s = ac->Scripts[index];
+	const auto& s = ac->Scripts[index];
 	if (s) {
 		stream->WriteResRefLC(s->GetName());
 	} else {

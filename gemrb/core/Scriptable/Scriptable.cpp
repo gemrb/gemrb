@@ -68,9 +68,6 @@ Scriptable::~Scriptable(void)
 		ReleaseCurrentAction();
 	}
 	ClearActions(4);
-	for (auto& script : Scripts) {
-		delete script;
-	}
 }
 
 ieDword Scriptable::GetLocal(const ieVariable& key, ieDword fallback) const
@@ -130,15 +127,15 @@ void Scriptable::SetScript(const ResRef& aScript, int idx, bool ai)
 	if (Scripts[idx] && Scripts[idx]->running) {
 		Scripts[idx]->dead = true;
 	} else {
-		delete Scripts[idx];
+		Scripts[idx].reset();
 	}
-	Scripts[idx] = NULL;
+
 	// NONE is an 'invalid' script name, seldom used to reset the slot, which we do above
 	// This check is to prevent flooding of the console
 	// it's also present in some files, which we ignore unless comparing saves
 	if (!aScript.IsEmpty() && (core->config.UseAsLibrary || aScript != "NONE")) {
 		if (idx != AI_SCRIPT_LEVEL) ai = false;
-		Scripts[idx] = new GameScript(aScript, this, idx, ai);
+		Scripts[idx] = MakeHolder<GameScript>(aScript, this, idx, ai);
 	}
 }
 
@@ -320,11 +317,11 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	bool continuing = false, done = false;
 	for (scriptLevel = 0; scriptLevel < scriptCount; scriptLevel++) {
-		GameScript* script = Scripts[scriptLevel];
+		auto script = Scripts[scriptLevel];
 		if (script) {
 			changed |= script->Update(&continuing, &done);
 			if (script->dead) {
-				delete script;
+				script.reset();
 			}
 		}
 

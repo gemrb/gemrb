@@ -3008,7 +3008,7 @@ std::string Map::dump(bool show_actors) const
 {
 	std::string buffer = fmt::format("Debugdump of Area {}:\nScripts:", scriptName);
 
-	for (const auto script : Scripts) {
+	for (const auto& script : Scripts) {
 		ResRef poi = "<none>";
 		if (script) {
 			poi = script->GetName();

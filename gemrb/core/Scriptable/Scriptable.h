@@ -8,6 +8,7 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include "Holder.h"
 #include "OverHeadText.h"
 #include "PathFinder.h"
 
@@ -270,7 +271,7 @@ public:
 	bool CurrentActionInterruptible = true;
 	ieDword CurrentActionTicks = 0;
 
-	std::array<GameScript*, MAX_SCRIPTS> Scripts {};
+	std::array<Holder<GameScript>, MAX_SCRIPTS> Scripts {};
 	int scriptLevel = 0; // currently running script slot
 
 	// The number of times this was updated.

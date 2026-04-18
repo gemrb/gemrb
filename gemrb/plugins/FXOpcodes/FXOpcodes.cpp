@@ -7840,9 +7840,8 @@ int fx_cutscene2(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		resRef = "cut250a";
 	}
 
-	GameScript* gs = new GameScript(resRef, game);
+	auto gs = MakeHolder<GameScript>(resRef, game);
 	gs->EvaluateAllBlocks();
-	delete gs;
 	return FX_NOT_APPLIED;
 }
 

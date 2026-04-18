@@ -11549,12 +11549,11 @@ static PyObject* GemRB_RunRestScripts(PyObject* /*self*/, PyObject* /*args*/)
 			} else {
 				resRef = pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE");
 			}
-			GameScript* restscript = new GameScript(resRef, tar, 0, false);
+			auto restscript = MakeHolder<GameScript>(resRef, tar, 0, false);
 			if (restscript->Update()) {
 				// there could be several steps involved, so we can't reliably check tar->Timers.lastRested
 				dreamed = 1;
 			}
-			delete restscript;
 		}
 	}
 

@@ -4963,7 +4963,7 @@ std::string Actor::dump() const
 	std::string buffer;
 	AppendFormat(buffer, "Debugdump of Actor {} ({}, {}):\n", fmt::WideToChar { GetName() }, fmt::WideToChar { GetShortName() }, fmt::WideToChar { GetDefaultName() });
 	buffer.append("Scripts:");
-	for (const auto script : Scripts) {
+	for (const auto& script : Scripts) {
 		ResRef poi = "<none>";
 		if (script) {
 			poi = script->GetName();

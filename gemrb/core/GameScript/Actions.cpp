@@ -850,9 +850,8 @@ void GameScript::EndCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
 // StartCutScene("my_nifty_cut_scene") = StartCutSceneEx("my_nifty_cut_scene",FALSE)
 void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 {
-	GameScript* gs = new GameScript(parameters->resref0Parameter, Sender);
+	auto gs = MakeHolder<GameScript>(parameters->resref0Parameter, Sender);
 	gs->EvaluateAllBlocks(parameters->int0Parameter);
-	delete gs;
 }
 
 void GameScript::CutSceneID(Scriptable* Sender, Action* /*parameters*/)

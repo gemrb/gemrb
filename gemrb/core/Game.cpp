@@ -1707,9 +1707,8 @@ void Game::PlayerDream() const
 	Scriptable* Sender = GetPC(0, true);
 	if (!Sender) return;
 
-	GameScript* gs = new GameScript(ResRef("player1d"), Sender, 0, false);
+	auto gs = MakeHolder<GameScript>(ResRef("player1d"), Sender, 0, false);
 	gs->Update();
-	delete gs;
 }
 
 //Start a TextScreen dream for the protagonist
