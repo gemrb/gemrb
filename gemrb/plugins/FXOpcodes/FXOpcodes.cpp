@@ -5351,9 +5351,14 @@ int fx_hold_creature_no_icon(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (!EffectQueue::match_ids(target, fx->Parameter2, fx->Parameter1)) {
-		//if the ids don't match, the effect doesn't stick
+	bool matchIDS = EffectQueue::match_ids(target, fx->Parameter2, fx->Parameter1);
+	if (!matchIDS && !core->config.UseAsLibrary) {
+		// if the ids don't match, the effect doesn't stick, since it can't do anything
+		// in tests we disable this, since the bg1 mpsave comes with useless matching effects
 		return FX_NOT_APPLIED;
+	} else if (!matchIDS && core->config.UseAsLibrary) {
+		// don't do anything, otherwise saving will be disabled
+		return FX_APPLIED;
 	}
 	target->SetSpellState(SS_HELD);
 	STATE_SET(STATE_HELPLESS);
