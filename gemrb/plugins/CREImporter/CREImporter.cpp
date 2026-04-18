@@ -432,10 +432,10 @@ CREImporter::CREImporter(void)
 	InitSpellbook();
 }
 
-bool CREImporter::Import(DataStream* str)
+bool CREImporter::Import(DataStream* stream)
 {
 	char Signature[8];
-	str->Read(Signature, 8);
+	stream->Read(Signature, 8);
 	IsCharacter = false;
 	if (strncmp(Signature, "CHR ", 4) == 0) {
 		IsCharacter = true;
@@ -895,7 +895,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 		default:
 			Log(ERROR, "CREImporter", "Unknown creature signature: {}\n", static_cast<int>(version));
 			delete act;
-			return NULL;
+			return nullptr;
 	}
 
 	// Read saved effects
@@ -1373,13 +1373,13 @@ void CREImporter::GetActorBG(Actor* act)
 	ReadDialog(act);
 }
 
-void CREImporter::GetIWD2Spellpage(Actor* act, ieIWD2SpellType type, int level, int count)
+void CREImporter::GetIWD2Spellpage(Actor* act, ieIWD2SpellType type, int level, int maxCount)
 {
 	ieDword spellindex;
 	ieDword totalcount;
 	ieDword memocount;
 
-	int i = count;
+	int i = maxCount;
 	CRESpellMemorization* sm = act->spellbook.GetSpellMemorization(type, level);
 	assert(sm && sm->SlotCount == 0 && sm->SlotCountWithBonus == 0); // unused
 	while (i--) {
@@ -1422,13 +1422,13 @@ void CREImporter::GetIWD2Spellpage(Actor* act, ieIWD2SpellType type, int level, 
 	// NOTE: luckily this does not cause save game incompatibility
 	ieDword tmpDword;
 	str->ReadDword(tmpDword);
-	if (type == IE_IWD2_SPELL_DOMAIN && count > 0) {
+	if (type == IE_IWD2_SPELL_DOMAIN && maxCount > 0) {
 		sm->SlotCount = 1;
 	} else {
 		sm->SlotCount = (ieWord) tmpDword;
 	}
 	str->ReadDword(tmpDword);
-	if (type == IE_IWD2_SPELL_DOMAIN && count > 0) {
+	if (type == IE_IWD2_SPELL_DOMAIN && maxCount > 0) {
 		sm->SlotCountWithBonus = 1;
 	} else {
 		sm->SlotCountWithBonus = (ieWord) tmpDword;
@@ -2351,9 +2351,9 @@ int CREImporter::PutKnownSpells(DataStream* stream, const Actor* actor) const
 	for (int i = 0; i < type; i++) {
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
 		for (unsigned int j = 0; j < level; j++) {
-			unsigned int count = actor->spellbook.GetKnownSpellsCount(i, j);
-			if (!count) continue;
-			for (int k = count - 1; k >= 0; k--) {
+			unsigned int knownCount = actor->spellbook.GetKnownSpellsCount(i, j);
+			if (!knownCount) continue;
+			for (int k = knownCount - 1; k >= 0; k--) {
 				const CREKnownSpell* ck = actor->spellbook.GetKnownSpell(i, j, k);
 				assert(ck);
 				stream->WriteResRef(ck->SpellResRef);
@@ -2394,8 +2394,8 @@ int CREImporter::PutMemorizedSpells(DataStream* stream, const Actor* actor) cons
 	for (int i = 0; i < type; i++) {
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
 		for (unsigned int j = 0; j < level; j++) {
-			unsigned int count = actor->spellbook.GetMemorizedSpellsCount(i, j, false);
-			for (unsigned int k = 0; k < count; k++) {
+			unsigned int memoCount = actor->spellbook.GetMemorizedSpellsCount(i, j, false);
+			for (unsigned int k = 0; k < memoCount; k++) {
 				const CREMemorizedSpell* cm = actor->spellbook.GetMemorizedSpell(i, j, k);
 				assert(cm);
 				stream->WriteResRef(cm->SpellResRef);
@@ -2415,7 +2415,7 @@ int CREImporter::PutEffects(DataStream* stream, const Actor* actor) const
 	for (unsigned int i = 0; i < EffectsCount; i++) {
 		const Effect* fx = actor->fxqueue.GetNextSavedEffect(f);
 
-		assert(fx != NULL);
+		assert(fx != nullptr);
 
 		if (TotSCEFF) {
 			eM->PutEffectV2(stream, fx);
