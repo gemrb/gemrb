@@ -2589,17 +2589,17 @@ int CREImporter::PutActor(DataStream* stream, const Actor* actor, bool chr)
 			stream->WriteDword(tmpDword);
 		}
 	} else {
-		stream->WriteDword(KnownSpellsOffset);
+		stream->WriteDword(KnownSpellsCount ? KnownSpellsOffset : 0);
 		stream->WriteDword(KnownSpellsCount);
-		stream->WriteDword(SpellMemorizationOffset);
+		stream->WriteDword(SpellMemorizationCount ? SpellMemorizationOffset : 0);
 		stream->WriteDword(SpellMemorizationCount);
-		stream->WriteDword(MemorizedSpellsOffset);
+		stream->WriteDword(MemorizedSpellsCount ? MemorizedSpellsOffset : 0);
 		stream->WriteDword(MemorizedSpellsCount);
 	}
 	stream->WriteDword(ItemSlotsOffset);
-	stream->WriteDword(ItemsOffset);
+	stream->WriteDword(ItemsCount ? ItemsOffset : 0);
 	stream->WriteDword(ItemsCount);
-	stream->WriteDword(EffectsOffset);
+	stream->WriteDword(EffectsCount ? EffectsOffset : 0);
 	stream->WriteDword(EffectsCount + VariablesCount);
 	stream->WriteResRef(actor->GetDialog(false));
 	//spells, spellbook etc
