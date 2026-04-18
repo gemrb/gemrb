@@ -5,18 +5,8 @@
 #character generation, appearance (GUICG12)
 import GemRB
 
-import CharGenCommon
-from GUIPortraitCommon import *
+from GUIPortraitCommon import SetupAppearanceWindow
 
 def OnLoad():
-	def extra_setup(window):
-		CharGenCommon.PositionCharGenWin(window, -6)
-
-		TextAreaControl = window.GetControl(7)
-		if TextAreaControl:
-			TextAreaControl.SetText("")
-
-	SetupAppearanceWindow(
-		ExtraSetupFunc=extra_setup
-	)
+	SetupAppearanceWindow()
 

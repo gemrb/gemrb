@@ -4,12 +4,7 @@
 
 # character generation, portrait (GUICG12)
 import GemRB
-import CharGenCommon
-from GUIPortraitCommon import *
+from GUIPortraitCommon import SetupAppearanceWindow
 
 def OnLoad():
-	SetupAppearanceWindow(
-		BackHandler= lambda: CharGenCommon.back(AppearanceWindow),
-		NextPressFunc= CharGenCommon.next,
-		CustomDoneFunc= CharGenCommon.next
-	)
+	SetupAppearanceWindow()

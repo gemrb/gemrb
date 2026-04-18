@@ -4,13 +4,8 @@
 
 # character generation, appearance (GUICG12)
 import GemRB
-import CharOverview
-from GUIPortraitCommon import *
+from GUIPortraitCommon import SetupAppearanceWindow
 
 def OnLoad():
-	def extra_setup(window):
-		CharOverview.PositionCharGenWin(window)
-		
-	SetupAppearanceWindow(
-		ExtraSetupFunc=extra_setup
-	)
+	
+	SetupAppearanceWindow()
