@@ -2211,10 +2211,11 @@ void EffectQueue::HackColorEffects(const Actor* Owner, Effect* fx)
 //iterate through saved effects
 const Effect* EffectQueue::GetNextSavedEffect(queue_t::const_iterator& f) const
 {
+	ieDword gameTime = core->GetGame()->GameTime;
 	while (f != effects.end()) {
 		const Effect& effect = *f;
 		f++;
-		if (effect.Persistent()) {
+		if (effect.Persistent(gameTime)) {
 			return &effect;
 		}
 	}
@@ -2279,9 +2280,10 @@ void EffectQueue::ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y)
 ieDword EffectQueue::GetSavedEffectsCount() const
 {
 	ieDword cnt = 0;
+	ieDword gameTime = core->GetGame()->GameTime;
 
 	for (const auto& fx : effects) {
-		if (fx.Persistent()) cnt++;
+		if (fx.Persistent(gameTime)) cnt++;
 	}
 	return cnt;
 }

@@ -143,7 +143,7 @@ bool Effect::HasDuration() const
 }
 
 //returns true if the effect must be saved
-bool Effect::Persistent() const
+bool Effect::Persistent(ieDword gameTime) const
 {
 	// local variable effects self-destruct if they were processed already
 	// but if they weren't processed, e.g. in a global actor, we must save them
@@ -164,6 +164,10 @@ bool Effect::Persistent() const
 		case FX_DURATION_JUST_EXPIRED:
 			return false;
 	}
+
+	// also ignore instant effects that get continuously reapplied
+	// e.g. bg1 helm04 has two color effects marked as instant instead of while equipped
+	if (TimingMode == FX_DURATION_ABSOLUTE && Duration == gameTime + 1) return false;
 	return true;
 }
 

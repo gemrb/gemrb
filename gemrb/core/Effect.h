@@ -171,7 +171,7 @@ public:
 	bool HasDuration() const;
 
 	//returns true if the effect must be saved
-	bool Persistent() const;
+	bool Persistent(ieDword gameTime) const;
 
 	void PrepareDuration(ieDword gameTime);
 };
