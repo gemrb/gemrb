@@ -3269,13 +3269,22 @@ void Interface::SanitizeItem(CREItem* item) const
 		//set charge counters for items not using charges to one
 		for (size_t i = 0; i < item->Usages.size(); i++) {
 			const ITMExtHeader* h = itm->GetExtHeader(i);
-			if (!h) {
+			// skip for example bg1 scrl2k with an empty extended header
+			// skip for example bg1 hamm03 with just a regular melee extended header
+			if (!h || h->features.empty() || h->AttackType != ITEM_AT_MAGIC) {
 				item->Usages[i] = 0;
 				continue;
 			}
 
 			if (item->Usages[i] != 0 && h->Charges == 0) {
 				item->Usages[i] = 1;
+				continue;
+			}
+
+			// ignore rechargeable items depleted for today
+			// bg1 clck08 in the mpsave is an example
+			int usedUp = itm->UseCharge(item->Usages, i, false);
+			if (usedUp == CHG_NONE || usedUp == CHG_DAY) {
 				continue;
 			}
 
