@@ -1893,14 +1893,22 @@ int CREImporter::PutInventory(DataStream* stream, const Actor* actor, unsigned i
 {
 	ieWord ItemCount = 0;
 	std::vector<ieWord> indices(size, -1);
+	static AutoTable slotTypeTable = gamedata->LoadTable("slottype", true);
 
+	// the cloak slot ruins the otherwise predictable order
 	for (unsigned int i = 0; i < size; i++) {
-		//ignore first element, getinventorysize makes space for fist
-		unsigned int j = core->QuerySlot(i + 1);
+		// skipping fists is embedded in the table values and is the reason for the -1 below
+		TableMgr::index_t row = slotTypeTable->FindTableValue("SAVEORDER", i);
+		if (row == TableMgr::npos) {
+			continue;
+		}
+		unsigned int j = core->QuerySlot(row);
 		const CREItem* it = actor->inventory.GetSlotItem(j);
 		if (it) {
-			indices[i] = ItemCount++;
+			indices[row - 1] = ItemCount++;
 		}
+	}
+	for (unsigned int i = 0; i < size; i++) {
 		stream->WriteWord(indices[i]);
 	}
 
@@ -1909,7 +1917,11 @@ int CREImporter::PutInventory(DataStream* stream, const Actor* actor, unsigned i
 
 	for (unsigned int i = 0; i < size; i++) {
 		//ignore first element, getinventorysize makes space for fist
-		unsigned int j = core->QuerySlot(i + 1);
+		TableMgr::index_t row = slotTypeTable->FindTableValue("SAVEORDER", i);
+		if (row == TableMgr::npos) {
+			continue;
+		}
+		unsigned int j = core->QuerySlot(row);
 		const CREItem* it = actor->inventory.GetSlotItem(j);
 		if (!it) {
 			continue;
