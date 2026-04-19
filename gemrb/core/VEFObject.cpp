@@ -280,7 +280,7 @@ ScriptedAnimation* VEFObject::GetSingleObject()
 		return nullptr;
 	}
 
-	ScheduleEntry& entry = entries[0];
+	const ScheduleEntry& entry = entries[0];
 	if (entry.type == VEFTypes::VVC || entry.type == VEFTypes::BAM) {
 		return entry.sptr.get();
 	}

@@ -35,7 +35,7 @@ struct SaveGameTest : public testing::TestWithParam<path_t> {
 		// set up all the possible per-game configs with GameType, GamePath, SavePath
 		// we expect a special ini file with GameType = GamePath pairs
 		// reimplement parsing since we can't link to INIImporter
-		auto stream = new FileStream {};
+		auto stream = std::make_unique<FileStream>();
 		if (!stream->Open(saveINI)) {
 			return;
 		}
@@ -136,8 +136,8 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 	// NOTE: call MoveBetweenAreasCore if AddActor won't be enough in comparisons
 	int i = game->GetPartySize(false);
 	while (i--) {
-		Actor* actor = game->GetPC(i, false);
-		game->GetCurrentArea()->AddActor(actor, true);
+		Actor* pc = game->GetPC(i, false);
+		game->GetCurrentArea()->AddActor(pc, true);
 	}
 	ASSERT_TRUE(actor->GetCurrentArea() != nullptr);
 
