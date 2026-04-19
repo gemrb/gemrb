@@ -3239,7 +3239,9 @@ static void SanitizeCharges(CREItem* item, const Item* itm)
 		// skip for example bg1 scrl2k with an empty extended header
 		// skip for example bg1 hamm03 with just a regular melee extended header
 		if (!h || h->features.empty() || h->AttackType != ITEM_AT_MAGIC) {
-			item->Usages[i] = 0;
+			// there's a bg1 dagg01 in one of the mpsave inventories with 8 charges
+			// skip clearing when testing, so the savegame diff is smaller
+			if (!core->config.UseAsLibrary) item->Usages[i] = 0;
 			continue;
 		}
 
