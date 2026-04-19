@@ -1381,14 +1381,9 @@ void Game::PartyMemberDied(const Actor* actor) const
 
 void Game::IncrementChapter()
 {
-	//chapter first set to 0 (prologue)
-	auto lookup = locals.find("CHAPTER");
-	if (lookup != locals.cend()) {
-		lookup->second += 1;
-		//increment chapter only if it exists
-	} else if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
-		locals.Create("CHAPTER", 0);
-	}
+	// chapter first set to 0 (prologue), increment it only if it exists
+	// this initial part is handled by GAMImporter::LoadGame already
+	locals.IncrementOrCreate("CHAPTER", 1, core->HasFeature(GFFlags::NO_NEW_VARIABLES));
 
 	//clear statistics
 	for (const auto& pc : PCs) {

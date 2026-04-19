@@ -5520,22 +5520,12 @@ void Actor::SendDiedTrigger() const
 
 static void UpdateOrCreateVariable(ieVarsMap& vars, const ieVariable& key, ieDword value)
 {
-	auto lookup = vars.find(key);
-	if (lookup != vars.cend()) {
-		lookup->second = value;
-	} else if (!nocreate) {
-		vars.Create(key, value);
-	}
+	vars.UpdateOrCreate(key, value, nocreate);
 }
 
 static void IncrementOrCreateVariable(ieVarsMap& vars, const ieVariable& key, ieDword value)
 {
-	auto lookup = vars.find(key);
-	if (lookup != vars.cend()) {
-		lookup->second += value;
-	} else if (!nocreate) {
-		vars.Create(key, value);
-	}
+	vars.IncrementOrCreate(key, value, nocreate);
 }
 
 bool Actor::ProcessKillXP(const Actor* killerActor, bool grantXP)

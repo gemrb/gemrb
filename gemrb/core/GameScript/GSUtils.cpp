@@ -1751,13 +1751,7 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 	ieVariable key { VarName };
 
 	auto SetLocalVariable = [=](ieVarsMap& vars, const ieVariable& key, ieDword value) {
-		auto lookup = vars.find(key);
-
-		if (lookup != vars.cend()) {
-			lookup->second = value;
-		} else if (!NoCreate) {
-			vars.Create(key, value);
-		}
+		vars.UpdateOrCreate(key, value, NoCreate);
 	};
 
 	if (context.IsEmpty()) {

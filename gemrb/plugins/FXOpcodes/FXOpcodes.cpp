@@ -7338,12 +7338,7 @@ int fx_modify_global_variable(Scriptable* /*Owner*/, Actor* /*target*/, Effect* 
 	// print("fx_modify_global_variable(%2d): Variable: %s Value: %d Type: %d", fx->Opcode, fx->Resource, fx->Parameter1, fx->Parameter2);
 	if (fx->Parameter2) {
 		//use resource memory area as variable name
-		auto lookup = game->locals.find(key);
-		if (lookup != game->locals.cend()) {
-			lookup->second += fx->Parameter1;
-		} else {
-			game->locals.Create(key, fx->Parameter1);
-		}
+		game->locals.IncrementOrCreate(key, fx->Parameter1, false);
 	} else {
 		game->locals[key] = fx->Parameter1;
 	}
@@ -7977,12 +7972,7 @@ int fx_modify_local_variable(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_modify_local_variable(%2d): %s, Mod: %d", fx->Opcode, fx->Resource, fx->Parameter2);
 	if (fx->Parameter2) {
 		//use resource memory area as variable name
-		auto lookup = target->locals.find(key);
-		if (lookup != target->locals.cend()) {
-			lookup->second += fx->Parameter1;
-		} else {
-			target->locals.Create(key, fx->Parameter1);
-		}
+		target->locals.IncrementOrCreate(key, fx->Parameter1, false);
 	} else {
 		target->locals[key] = fx->Parameter1;
 	}

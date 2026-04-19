@@ -150,16 +150,38 @@ public:
 	}
 	ieDword& operator[](const ieVariable& key)
 	{
-		auto lookup = data.find(key);
-		if (lookup == data.cend()) {
-			Create(key, 0);
-		}
+		CreateIfNew(key, 0);
 		return data.operator[](key);
 	}
 	void Create(const ieVariable& key, ieDword value = 0)
 	{
 		data[key] = value;
 		order.push_back(key);
+	}
+	void CreateIfNew(const ieVariable& key, ieDword value)
+	{
+		auto lookup = data.find(key);
+		if (lookup == data.cend()) {
+			Create(key, value);
+		}
+	}
+	void UpdateOrCreate(const ieVariable& key, ieDword value, bool noCreate)
+	{
+		auto lookup = data.find(key);
+		if (lookup != data.cend()) {
+			lookup->second = value;
+		} else if (!noCreate) {
+			Create(key, value);
+		}
+	}
+	void IncrementOrCreate(const ieVariable& key, ieDword value, bool noCreate)
+	{
+		auto lookup = data.find(key);
+		if (lookup != data.cend()) {
+			lookup->second += value;
+		} else if (!noCreate) {
+			Create(key, value);
+		}
 	}
 	const std::list<ieVariable>& keys() const
 	{
