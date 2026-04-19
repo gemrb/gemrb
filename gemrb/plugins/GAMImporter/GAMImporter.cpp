@@ -730,9 +730,9 @@ int GAMImporter::PutVariables(DataStream* stream, const Game* game) const
 {
 	ieVariable tmpname;
 
-	for (const auto& entry : game->locals) {
+	for (const auto& key : game->locals.keys()) {
 		//global variables are locals for game, that's why the local/global confusion
-
+		auto entry = *game->locals.find(key);
 		tmpname = MakeVariable(entry.first);
 		/* This is one anomaly that must have a space injected (PST crashes otherwise). */
 		if (tmpname == "dictionary_githzerai_hjacknir") {

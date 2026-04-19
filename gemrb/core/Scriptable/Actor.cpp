@@ -5524,7 +5524,7 @@ static void UpdateOrCreateVariable(ieVarsMap& vars, const ieVariable& key, ieDwo
 	if (lookup != vars.cend()) {
 		lookup->second = value;
 	} else if (!nocreate) {
-		vars[key] = value;
+		vars.Create(key, value);
 	}
 }
 
@@ -5534,7 +5534,7 @@ static void IncrementOrCreateVariable(ieVarsMap& vars, const ieVariable& key, ie
 	if (lookup != vars.cend()) {
 		lookup->second += value;
 	} else if (!nocreate) {
-		vars[key] = value;
+		vars.Create(key, value);
 	}
 }
 

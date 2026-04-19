@@ -18,6 +18,7 @@
 #include "Strings/StringView.h"
 
 #include <cstdint>
+#include <list>
 #include <unordered_map>
 
 namespace GemRB {
@@ -102,7 +103,69 @@ enum class ieStrRef : ieDword {
 using ieVariable = FixedSizeString<32, strnicmp>;
 using ResRef = FixedSizeString<8, strnicmp>;
 
-using ieVarsMap = std::unordered_map<ieVariable, ieDword, CstrHashCI>;
+// needs to be insertion ordered
+class ieVarsMap {
+	std::unordered_map<ieVariable, ieDword, CstrHashCI> data;
+	std::list<ieVariable> order;
+
+	using iterator = std::unordered_map<ieVariable, ieDword, CstrHashCI>::iterator;
+	using const_iterator = std::unordered_map<ieVariable, ieDword, CstrHashCI>::const_iterator;
+
+public:
+	iterator begin() noexcept
+	{
+		return data.begin();
+	}
+	const_iterator begin() const noexcept
+	{
+		return data.begin();
+	}
+	const_iterator cbegin() const noexcept
+	{
+		return data.cbegin();
+	}
+	iterator end() noexcept
+	{
+		return data.end();
+	}
+	const_iterator end() const noexcept
+	{
+		return data.end();
+	}
+	const_iterator cend() const noexcept
+	{
+		return data.cend();
+	}
+	iterator find(const ieVariable& key)
+	{
+		return data.find(key);
+	}
+	const_iterator find(const ieVariable& key) const
+	{
+		return data.find(key);
+	}
+	size_t size() const noexcept
+	{
+		return data.size();
+	}
+	ieDword& operator[](const ieVariable& key)
+	{
+		auto lookup = data.find(key);
+		if (lookup == data.cend()) {
+			Create(key, 0);
+		}
+		return data.operator[](key);
+	}
+	void Create(const ieVariable& key, ieDword value = 0)
+	{
+		data[key] = value;
+		order.push_back(key);
+	}
+	const std::list<ieVariable>& keys() const
+	{
+		return order;
+	}
+};
 
 template<typename STR>
 inline bool IsStar(const STR& str)

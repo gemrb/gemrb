@@ -1387,7 +1387,7 @@ void Game::IncrementChapter()
 		lookup->second += 1;
 		//increment chapter only if it exists
 	} else if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
-		locals["CHAPTER"] = 0;
+		locals.Create("CHAPTER", 0);
 	}
 
 	//clear statistics

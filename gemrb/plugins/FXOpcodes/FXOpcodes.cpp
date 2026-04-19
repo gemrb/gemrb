@@ -7342,7 +7342,7 @@ int fx_modify_global_variable(Scriptable* /*Owner*/, Actor* /*target*/, Effect* 
 		if (lookup != game->locals.cend()) {
 			lookup->second += fx->Parameter1;
 		} else {
-			game->locals[key] = fx->Parameter1;
+			game->locals.Create(key, fx->Parameter1);
 		}
 	} else {
 		game->locals[key] = fx->Parameter1;
@@ -7981,7 +7981,7 @@ int fx_modify_local_variable(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (lookup != target->locals.cend()) {
 			lookup->second += fx->Parameter1;
 		} else {
-			target->locals[key] = fx->Parameter1;
+			target->locals.Create(key, fx->Parameter1);
 		}
 	} else {
 		target->locals[key] = fx->Parameter1;

@@ -1756,7 +1756,7 @@ void SetVariable(Scriptable* Sender, const StringParam& VarName, ieDword value, 
 		if (lookup != vars.cend()) {
 			lookup->second = value;
 		} else if (!NoCreate) {
-			vars[key] = value;
+			vars.Create(key, value);
 		}
 	};
 
