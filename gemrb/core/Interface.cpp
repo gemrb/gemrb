@@ -3230,6 +3230,38 @@ CREItem* Interface::ReadItem(DataStream* str, CREItem* itm) const
 	return nullptr;
 }
 
+// set charge counters for non-rechargeable items if their charge is zero
+// set charge counters for items not using charges to one
+static void SanitizeCharges(CREItem* item, const Item* itm)
+{
+	for (size_t i = 0; i < item->Usages.size(); i++) {
+		const ITMExtHeader* h = itm->GetExtHeader(i);
+		// skip for example bg1 scrl2k with an empty extended header
+		// skip for example bg1 hamm03 with just a regular melee extended header
+		if (!h || h->features.empty() || h->AttackType != ITEM_AT_MAGIC) {
+			item->Usages[i] = 0;
+			continue;
+		}
+
+		if (item->Usages[i] != 0 && h->Charges == 0) {
+			item->Usages[i] = 1;
+			continue;
+		}
+
+		// ignore rechargeable items depleted for today
+		// bg1 clck08 in the mpsave is an example
+		int usedUp = itm->UseCharge(item->Usages, i, false);
+		if (usedUp == CHG_NONE || usedUp == CHG_DAY) {
+			continue;
+		}
+
+		if (item->Usages[i] == 0 && !(h->RechargeFlags & IE_ITEM_RECHARGE)) {
+			// HACK: the original (bg2) allows for 0 charged gems
+			item->Usages[i] = std::max<ieWord>(1, h->Charges);
+		}
+	}
+}
+
 //Make sure the item attributes are valid
 //we don't update all flags here because some need to be set later (like
 //unmovable items in containers (e.g. the bg2 portal key) so that they
@@ -3265,34 +3297,7 @@ void Interface::SanitizeItem(CREItem* item) const
 			item->Usages[0] = 1;
 		}
 	} else {
-		//set charge counters for non-rechargeable items if their charge is zero
-		//set charge counters for items not using charges to one
-		for (size_t i = 0; i < item->Usages.size(); i++) {
-			const ITMExtHeader* h = itm->GetExtHeader(i);
-			// skip for example bg1 scrl2k with an empty extended header
-			// skip for example bg1 hamm03 with just a regular melee extended header
-			if (!h || h->features.empty() || h->AttackType != ITEM_AT_MAGIC) {
-				item->Usages[i] = 0;
-				continue;
-			}
-
-			if (item->Usages[i] != 0 && h->Charges == 0) {
-				item->Usages[i] = 1;
-				continue;
-			}
-
-			// ignore rechargeable items depleted for today
-			// bg1 clck08 in the mpsave is an example
-			int usedUp = itm->UseCharge(item->Usages, i, false);
-			if (usedUp == CHG_NONE || usedUp == CHG_DAY) {
-				continue;
-			}
-
-			if (item->Usages[i] == 0 && !(h->RechargeFlags & IE_ITEM_RECHARGE)) {
-				// HACK: the original (bg2) allows for 0 charged gems
-				item->Usages[i] = std::max<ieWord>(1, h->Charges);
-			}
-		}
+		SanitizeCharges(item, itm);
 	}
 
 	// simply adding the item flags to the slot
