@@ -1117,6 +1117,12 @@ static void pcf_extstate(Actor* actor, ieDword oldValue, ieDword State)
 	}
 }
 
+// just for easier debugging
+static void SetBaseHP(Actor* actor, ieDword hp)
+{
+	actor->BaseStats[IE_HITPOINTS] = hp;
+}
+
 static void pcf_hitpoint(Actor* actor, ieDword oldValue, ieDword hp)
 {
 	if (actor->Timers.checkHP == 2) return;
@@ -1141,7 +1147,7 @@ static void pcf_hitpoint(Actor* actor, ieDword oldValue, ieDword hp)
 		}
 	}
 
-	actor->BaseStats[IE_HITPOINTS] = hp;
+	SetBaseHP(actor, hp);
 	actor->Modified[IE_HITPOINTS] = hp;
 	// don't fire off events if nothing changed, which can happen when called indirectly
 	if (oldValue != hp && actor->InParty) {
@@ -1160,7 +1166,7 @@ static void pcf_maxhitpoint(Actor* actor, ieDword /*oldValue*/, ieDword /*newVal
 static void pcf_minhitpoint(Actor* actor, ieDword /*oldValue*/, ieDword hp)
 {
 	if ((signed) hp > (signed) actor->BaseStats[IE_HITPOINTS]) {
-		actor->BaseStats[IE_HITPOINTS] = hp;
+		SetBaseHP(actor, hp);
 		//passing 0 because it is ignored anyway
 		pcf_hitpoint(actor, 0, hp);
 	}
@@ -2955,7 +2961,7 @@ void Actor::RefreshHP()
 	// temporary con bonuses also modify current HP; this can kill! (EE behavior)
 	// but skip on game load, while old bonuses are still re-applied
 	if (!(BaseStats[IE_STATE_ID] & STATE_DEAD) && Timers.checkHP != 2 && bonus != Timers.lastConBonus) {
-		BaseStats[IE_HITPOINTS] += bonus - Timers.lastConBonus;
+		SetBaseHP(this, BaseStats[IE_HITPOINTS] + bonus - Timers.lastConBonus);
 	}
 	Timers.lastConBonus = bonus;
 }
@@ -6152,7 +6158,7 @@ void Actor::InitStatsOnLoad()
 	CreateDerivedStats();
 	Modified[IE_CON] = BaseStats[IE_CON]; // used by GetHpAdjustment
 	ieDword hp = BaseStats[IE_HITPOINTS] + GetHpAdjustment(GetXPLevel(false));
-	BaseStats[IE_HITPOINTS] = hp;
+	SetBaseHP(this, hp);
 
 	SetupFist();
 	//initial setup of modified stats
