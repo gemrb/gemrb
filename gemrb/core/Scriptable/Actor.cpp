@@ -6100,7 +6100,8 @@ int Actor::GetHpAdjustment(int multiplier, bool modified) const
 	int val;
 
 	// only player classes get this bonus
-	if (!HasPlayerClass()) {
+	// skip dead actors on load, so we don't screw their hp
+	if (!HasPlayerClass() || (BaseStats[IE_STATE_ID] & STATE_DEAD && Timers.checkHP == 2)) {
 		return 0;
 	}
 
