@@ -19,7 +19,7 @@ Gender = 0
 def OnLoad():
 	SetupAppearanceWindow()
 
-def SetupAppearanceWindow(CustomDoneFunc = None, NextPressFunc = None):
+def SetupAppearanceWindow():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
 	global Gender
 
@@ -104,8 +104,8 @@ def SetupAppearanceWindow(CustomDoneFunc = None, NextPressFunc = None):
 	else:
 		BackButton.OnPress(PortraitBackPress)
 
-	CustomButton.OnPress(lambda: PortraitButtonCustomPress(CustomDoneFunc))
-	DoneButton.OnPress(lambda: PortraitButtonNextPress(NextPressFunc))
+	CustomButton.OnPress(PortraitButtonCustomDone)
+	DoneButton.OnPress(PortraitButtonNextPress)
 	PortraitSetPicture()
 	AppearanceWindow.Focus()
 	if GameCheck.IsBG1OrEE():
@@ -141,30 +141,24 @@ def PortraitButtonCustomDone(NextFunc = None):
 		# HACK
 		from CharGenCommon import next
 		next()
+	if GameCheck.IsIWD1():
+		CGPortraitChangeToRace(PortraitPictureButtonName)
 	if NextFunc:
 		if GameCheck.IsIWD1():
 			NextFunc(PortraitPictureButtonName)
 		else:
 			NextFunc()
 
-# Button custom press, must pass function because of BG1
-def PortraitButtonCustomPress(CustomDoneFunc = None):
-	PortraitCustomPress(lambda: PortraitButtonCustomDone(CustomDoneFunc))
-
-# Button next press, must pass function because of BG1
-def PortraitButtonNextPress(NextFunc = None):
+# Button next press
+def PortraitButtonNextPress():
 	global PortraitsTable, LastPortrait
 	PortraitPictureButtonName = PortraitApplySelection()
 	if GameCheck.IsBG1OrEE():
 		# HACK
 		from CharGenCommon import next
 		next()
-	if NextFunc:
-		if GameCheck.IsIWD1():
-			NextFunc(PortraitPictureButtonName)
-		else:
-			NextFunc()
-
+	if GameCheck.IsIWD1():
+		CGPortraitChangeToRace(PortraitPictureButtonName)
 	
 # This if for moving to next portrait
 def PortraitNext():
@@ -398,9 +392,14 @@ def PortraitSetPicture():
 		PictureSize = "G"
 	PortraitName = PortraitsTable.GetRowName (LastPortrait)+PictureSize
 	PortraitButton.SetPicture(PortraitName, "NOPORTLG")
-	# if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
-	# 	PortraitButton.SetPicture (PortraitName, "NOPORTLG")
-	# else:
-	# 	#Don't know what to do.
-	# 	PortraitButton.SetPicture (PortraitName)
 	return
+
+def CGPortraitChangeToRace(portrait_picture_button_name):
+	# HACK
+	import CharGen
+	CharGen.PortraitButton.SetPicture(portrait_picture_button_name)
+	CharGen.GenderButton.SetState(IE_GUI_BUTTON_DISABLED)
+	CharGen.RaceButton.SetState(IE_GUI_BUTTON_ENABLED)
+	CharGen.RaceButton.MakeDefault()
+	CharGen.CharGenState = 1
+	CharGen.SetCharacterDescription()

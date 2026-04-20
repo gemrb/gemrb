@@ -557,7 +557,7 @@ def GenderDonePress():
 	Gender = GemRB.GetVar ("Gender")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
 
-	PortraitSelect()
+	GemRB.SetNextScript("GUIPortraitCommon")
 	return
 
 def GenderCancelPress():
@@ -569,24 +569,6 @@ def GenderCancelPress():
 	if GenderWindow:
 		GenderWindow.Close ()
 	return
-
-
-def PortraitSelect():
-	SetupAppearanceWindow(
-		NextPressFunc=CGPortraitChangeToRace,
-		CustomDoneFunc=CGPortraitChangeToRace,
-	)
-
-
-def CGPortraitChangeToRace(portrait_picture_button_name):
-	global CharGenState, PortraitButton, GenderButton, RaceButton
-	PortraitButton.SetPicture(portrait_picture_button_name)
-	GenderButton.SetState(IE_GUI_BUTTON_DISABLED)
-	RaceButton.SetState(IE_GUI_BUTTON_ENABLED)
-	RaceButton.MakeDefault()
-	CharGenState = 1
-	SetCharacterDescription()
-
 
 # Race Selection
 
