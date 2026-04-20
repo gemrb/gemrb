@@ -2968,7 +2968,7 @@ void Actor::RefreshHP()
 
 int Actor::GetStyleExtraAPR(bool& isEligible) const
 {
-	if (third) return 0;
+	if (third || weaponInfo[0].wflags & WEAPON_RANGED) return 0;
 
 	ieDword stars = GetProficiency(weaponInfo[0].prof) & PROFS_MASK;
 	// tenser's transformation ensures the actor is at least proficient with any weapon
