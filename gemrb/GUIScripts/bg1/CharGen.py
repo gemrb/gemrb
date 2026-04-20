@@ -25,12 +25,12 @@ def init():
 		("alignment", 3, 11958),
 		("setAlignment", "GUICG3", CharGenGui.getAlignment, CharGenGui.unsetAlignment, None), #bg2: BG1 doesn't take kits into account
 		("abilities", 4, 11960),
-		("setAbilities"	, "GUICG4"	, CharGenGui.getAbilities, CharGenGui.unsetAbilities, None), #bg2: BG2 has extra strength, overpress (functionality + resources), kits
+		("setAbilities", "GUICG4", CharGenGui.getAbilities, CharGenGui.unsetAbilities, None), #bg2: BG2 has extra strength, overpress (functionality + resources), kits
 		("skill", 5, 17372),
 		("divine spells", None, CharGenGui.getDivineSpells, CharGenGui.unsetDivineSpells, CharGenGui.setDivineSpells),
 		("hate race", "GUICG15", CharGenGui.getHatedRace, CharGenGui.unsetHateRace, CharGenGui.guardHateRace), #BG2: other listsize, button offset, BG2 has TopIndex
 		("mage spells", "GUICG7", CharGenGui.getMageSpells, CharGenGui.unsetMageSpells, CharGenGui.guardMageSpells),   #also sets priest in CharGen6, we do it at the end, other animations for buttons
-		("setSkill"	, "GUICG6", CharGenGui.getSkills, CharGenGui.unsetSkill, CharGenGui.guardSkills),
+		("setSkill", "GUICG6", CharGenGui.getSkills, CharGenGui.unsetSkill, CharGenGui.guardSkills),
 		("proficiencies", "GUICG9", CharGenGui.getProfi, CharGenGui.unsetProfi, None),
 		("appearance", 6, 11961),
 		("colors", "GUICG13", None, CharGenGui.unsetColors, None), #bg2: other cycleids (SetBAM)
