@@ -79,7 +79,7 @@ struct SaveGameTest : public testing::TestWithParam<path_t> {
 	static void TearDownTestSuite()
 	{
 		// cleanup to prevent a delay and crash on exit
-		core->SetGame(nullptr);
+		if (core) core->SetGame(nullptr);
 		VideoDriver.reset();
 		delete gemrb;
 	}
