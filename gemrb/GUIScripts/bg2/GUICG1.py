@@ -72,5 +72,5 @@ def NextPress():
 
 	Gender = GemRB.GetVar ("Gender")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
-	GemRB.SetNextScript("GUICG12") #appearance
+	GemRB.SetNextScript("GUIPortraitCommon") #appearance
 	return

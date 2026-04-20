@@ -15,7 +15,7 @@ def init():
 	("gender"	 , 0		, 11956		),
 	("Show name, create player" , None    ,CharGenGui.getName, CharGenGui.unsetPlayer,  CharGenGui.setPlayer ),
 	("setGender"	, "GUICG1"	, CharGenGui.getGender	,CharGenGui.unsetGender		, None		), #BG2: same
-	("setPortrait"	, "GUICG12"	, None		,CharGenGui.unsetPortrait		, None		), #BG2: different setPicture, PortraitName and extra unused control (TextAreaControl)
+	("setPortrait"	, "GUIPortraitCommon"	, None		,CharGenGui.unsetPortrait		, None		), #BG2: different setPicture, PortraitName and extra unused control (TextAreaControl)
 	("race"		, 1		,11957		),
 	("setRace"	, "GUICG8"	, CharGenGui.getRace	,CharGenGui.unsetRace 		, None		), #BG2: different resources
 	("class"	, 2		,11959		),

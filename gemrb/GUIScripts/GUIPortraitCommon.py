@@ -16,6 +16,9 @@ PortraitsTable = 0
 LastPortrait = 0
 Gender = 0
 
+def OnLoad():
+	SetupAppearanceWindow()
+
 def SetupAppearanceWindow(CustomDoneFunc = None, NextPressFunc = None):
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
 	global Gender
@@ -394,8 +397,10 @@ def PortraitSetPicture():
 	if GameCheck.IsBG1OrEE() or GameCheck.IsIWD1():
 		PictureSize = "G"
 	PortraitName = PortraitsTable.GetRowName (LastPortrait)+PictureSize
-	if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
-		PortraitButton.SetPicture (PortraitName, "NOPORTLG")
-	else:
-		PortraitButton.SetPicture (PortraitName)
+	PortraitButton.SetPicture(PortraitName, "NOPORTLG")
+	# if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+	# 	PortraitButton.SetPicture (PortraitName, "NOPORTLG")
+	# else:
+	# 	#Don't know what to do.
+	# 	PortraitButton.SetPicture (PortraitName)
 	return
