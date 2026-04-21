@@ -29,6 +29,8 @@ static std::vector<ResRef> snglist; //IE_IWD2_SPELL_SONG
 static std::vector<ResRef> shplist; //IE_IWD2_SPELL_SHAPE
 static const ResRef EmptyResRef;
 
+constexpr ieDword FAKE_VARIABLE_OPCODE = 187;
+
 class SpellEntry {
 public:
 	const ResRef& GetSpell() const;
@@ -1872,11 +1874,31 @@ int CREImporter::GetStoredFileSize(const Actor* actor)
 	}
 	headersize += ItemsCount * 20;
 
+	auto CountVarEffects = [&actor]() {
+		ieDword count = 0;
+		auto iter = actor->fxqueue.GetFirstEffect();
+		const Effect* fx = actor->fxqueue.GetNextEffect(iter);
+		while (fx) {
+			if (fx->Opcode == FAKE_VARIABLE_OPCODE) {
+				count++;
+			}
+			fx = actor->fxqueue.GetNextEffect(iter);
+		}
+		return count;
+	};
+
 	EffectsOffset = headersize;
 	//adding effects
 	EffectsCount = actor->fxqueue.GetSavedEffectsCount();
+	ieDword varEffectsCount = CountVarEffects();
 	VariablesCount = static_cast<ieDword>(actor->locals.size());
-	if (VariablesCount) {
+	// dead actors will have the effect, but since it was never executed, no var in locals
+	// Yoshimo in the bg2 test save is an example with 10 vs 0
+	if (VariablesCount > 0) {
+		assert(VariablesCount >= varEffectsCount);
+		VariablesCount -= varEffectsCount;
+	}
+	if (VariablesCount || varEffectsCount) {
 		TotSCEFF = 1;
 	}
 	if (TotSCEFF) {
@@ -2451,13 +2473,27 @@ int CREImporter::PutEffects(DataStream* stream, const Actor* actor) const
 // local variables are all stored as effects, so we add them as such
 int CREImporter::PutVariables(DataStream* stream, const Actor* actor) const
 {
-	constexpr ieDword FAKE_VARIABLE_OPCODE = 187;
 	constexpr ieDword FAKE_VARIABLE_MARKER = 1;
 	ieDword value;
 	ieDword tmpDword;
 
+	auto HasVarEffect = [&actor](const ieVariable& var, ieDword value) {
+		auto iter = actor->fxqueue.GetFirstEffect();
+		const Effect* fx = actor->fxqueue.GetNextEffect(iter);
+		while (fx) {
+			if (fx->Opcode == FAKE_VARIABLE_OPCODE && fx->Parameter1 == value && fx->VariableName == var) {
+				return true;
+			}
+			fx = actor->fxqueue.GetNextEffect(iter);
+		}
+		return false;
+	};
+
 	for (const auto& entry : actor->locals) {
 		value = entry.second;
+		// make sure such an effect doesn't already exist - currently we duplicate them
+		if (HasVarEffect(entry.first, value)) continue;
+
 		stream->WriteFilling(8);
 		tmpDword = FAKE_VARIABLE_OPCODE;
 		stream->WriteDword(tmpDword);
