@@ -2368,19 +2368,24 @@ int CREImporter::PutKnownSpells(DataStream* stream, const Actor* actor) const
 int CREImporter::PutSpellPages(DataStream* stream, const Actor* actor) const
 {
 	ieDword SpellIndex = 0;
+	const auto& bonuses = gamedata->GetBonusSpells(actor->GetStat(IE_WIS));
 
 	int type = actor->spellbook.GetTypes();
 	for (int i = 0; i < type; i++) {
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
 		for (ieWord j = 0; j < level; ++j) {
 			stream->WriteScalar(j);
+			ieDword tmpDword = actor->spellbook.GetMemorizedSpellsCount(i, j, false);
 			int tmp = actor->spellbook.GetMemorizableSpellsCount(i, j, false);
 			stream->WriteScalar<int, ieWord>(tmp);
-			tmp = actor->spellbook.GetMemorizableSpellsCount(i, j, true);
+			// bg1 apparently counted only the wisdom bonus, not anything extra from effects (Edwin or the ring of holiness)
+			// we always reconstruct it on load, so it doesn't matter to us
+			if (tmp && i == IE_SPELL_TYPE_PRIEST && !bonuses.empty()) {
+				tmp += bonuses[j];
+			}
 			stream->WriteScalar<int, ieWord>(tmp);
 			stream->WriteScalar<int, ieWord>(i);
 			stream->WriteDword(SpellIndex);
-			ieDword tmpDword = actor->spellbook.GetMemorizedSpellsCount(i, j, false);
 			stream->WriteDword(tmpDword);
 			SpellIndex += tmpDword;
 		}
