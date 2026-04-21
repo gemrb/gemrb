@@ -9,6 +9,7 @@ Final development:
 - [ ] Check local stashes
 - [ ] No Coverity Scan issues
 - [ ] No issues reported by `reuse lint`
+- [ ] Ensure `make test` still passes the opt-in savegame compatibility tests
 
 Beta testing:
 - [ ] Retest character generation of all games
