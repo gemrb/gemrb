@@ -4106,7 +4106,7 @@ static PyObject* GemRB_CheckVar(PyObject* /*self*/, PyObject* args)
 	}
 	ResRef context = ResRefFromPy(pyctx);
 	long value = CheckVariable(Sender, StringParam(Variable), context);
-	Log(DEBUG, "GUISCript", "{} {}={}", context, Variable, value);
+	Log(DEBUG, "GUIScript", "{} {}={}", context, Variable, value);
 	return PyLong_FromLong(value);
 }
 
