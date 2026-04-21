@@ -3391,7 +3391,9 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 			pic = SpriteFromPy(pydefaultPic);
 		}
 		if (!pic) {
-			return RuntimeError("Picture resource not found!\n");
+			btn->SetPicture(nullptr);
+			Log(ERROR, "GUIScript", "Neither picture resource found!\n");
+			Py_RETURN_NONE;
 		}
 
 		btn->SetPicture(std::move(pic));
