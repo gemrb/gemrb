@@ -2447,9 +2447,12 @@ int CREImporter::PutEffects(DataStream* stream, const Actor* actor) const
 	return 0;
 }
 
-//add as effect!
+// there is actually no variable section
+// local variables are all stored as effects, so we add them as such
 int CREImporter::PutVariables(DataStream* stream, const Actor* actor) const
 {
+	constexpr ieDword FAKE_VARIABLE_OPCODE = 187;
+	constexpr ieDword FAKE_VARIABLE_MARKER = 1;
 	ieDword value;
 	ieDword tmpDword;
 

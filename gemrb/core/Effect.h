@@ -17,10 +17,6 @@
 
 namespace GemRB {
 
-//local variables in creatures are stored in fake opcodes
-#define FAKE_VARIABLE_OPCODE 187
-#define FAKE_VARIABLE_MARKER 1
-
 // Effect target types
 #define FX_TARGET_UNKNOWN       0
 #define FX_TARGET_SELF          1
