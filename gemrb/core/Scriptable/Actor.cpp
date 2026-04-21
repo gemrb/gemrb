@@ -2697,6 +2697,26 @@ void Actor::AddEffects(EffectQueue&& fx)
 	RefreshEffects(first, prev);
 }
 
+// add wisdom/casting_ability bonus spells
+static void AddBonusSpells(Actor* actor)
+{
+	if (actor->spellbook.IsIWDSpellBook()) {
+		// check each class separately for the casting stat and booktype (luckily there is no bonus for domain spells)
+		for (int i = 0; i < ISCLASSES; ++i) {
+			int level = actor->GetClassLevel(i);
+			int booktype = booksiwd2[i]; // ieIWD2SpellType
+			if (!level || booktype == -1) {
+				continue;
+			}
+			level = actor->Modified[castingStat[classesiwd2[i]]];
+			actor->spellbook.BonusSpells(booktype, level);
+		}
+	} else {
+		int level = actor->Modified[IE_WIS];
+		actor->spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, level);
+	}
+}
+
 void Actor::RefreshEffects(bool first, const stats_t& previous)
 {
 	// some VVCs are controlled by stats (and so by PCFs), the rest have 'effect_owned' set
@@ -2824,22 +2844,7 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 		pcf_sanctuary(this, BaseStats[IE_SANCTUARY], Modified[IE_SANCTUARY]);
 	}
 
-	//add wisdom/casting_ability bonus spells
-	if (spellbook.IsIWDSpellBook()) {
-		// check each class separately for the casting stat and booktype (luckily there is no bonus for domain spells)
-		for (int i = 0; i < ISCLASSES; ++i) {
-			int level = GetClassLevel(i);
-			int booktype = booksiwd2[i]; // ieIWD2SpellType
-			if (!level || booktype == -1) {
-				continue;
-			}
-			level = Modified[castingStat[classesiwd2[i]]];
-			spellbook.BonusSpells(booktype, level);
-		}
-	} else {
-		int level = Modified[IE_WIS];
-		spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, level);
-	}
+	AddBonusSpells(this);
 
 	// iwd2 barbarian speed increase isn't handled like for monks (normal clab)!?
 	if (third && GetBarbarianLevel()) {
@@ -6164,6 +6169,10 @@ void Actor::InitStatsOnLoad()
 	SetupFist();
 	//initial setup of modified stats
 	Modified = BaseStats;
+
+	// add wisdom/casting_ability bonus spells
+	// this is typically done by RefreshEffects, but it won't run for liminal global actors in save tests
+	AddBonusSpells(this);
 }
 
 //most feats are simulated via spells (feat<xx>)
