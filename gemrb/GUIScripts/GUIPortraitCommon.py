@@ -15,16 +15,20 @@ PortraitButton = 0
 PortraitsTable = 0
 LastPortrait = 0
 Gender = 0
-EmptyPortrait = "NOPORTMD"
 EmptyPortraitBig = "NOPORTLG"
+EmptyPortraitMedium = EmptyPortraitBig if GameCheck.IsBG1OrEE() else "NOPORTMD"
 EmptyPortraitSmall = "NOPORTSM"
+PortraitSuffix = {
+    "medium": "M",
+    "large": "M" if (GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo()) else "L",
+    "small": "S",
+    "set": "G" if (GameCheck.IsBG1OrEE() or GameCheck.IsIWD1())
+           else ("M" if (GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo()) else "L"),
+}
 
 def OnLoad():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
-	global Gender, EmptyPortrait, EmptyPortraitBig
-
-	if GameCheck.IsBG1OrEE():
-		EmptyPortrait = EmptyPortraitBig
+	global Gender
 		
 	# Window
 	AppearanceWindow = GemRB.LoadWindow(11, "GUICG")
@@ -220,20 +224,17 @@ def PortraitApplySelection():
 		AppearanceWindow.Close ()
 	PortraitTable = GemRB.LoadTable("pictures")
 	PortraitName = PortraitTable.GetRowName(LastPortrait)
-	LargeSuffix = "L"
-	if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
-		LargeSuffix = "M"
-	GemRB.SetToken("SmallPortrait", PortraitName + "S")
-	GemRB.SetToken("LargePortrait", PortraitName + LargeSuffix)
+	GemRB.SetToken("SmallPortrait", PortraitName + PortraitSuffix["small"])
+	GemRB.SetToken("LargePortrait", PortraitName + PortraitSuffix["large"])
 	if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
 		GemRB.SetNextScript ("CharGen2") #Before race
-	return PortraitName + LargeSuffix
+	return PortraitName + PortraitSuffix["large"]
 
 # This is for the large custom portrait
 def PortraitCommonLargeCustom():
 	global PortraitList1, PortraitList2
 	global RowCount1
-	global CustomWindow, EmptyPortrait
+	global CustomWindow
 
 	window = CustomWindow
 
@@ -249,7 +250,7 @@ def PortraitCommonLargeCustom():
 	button = window.GetControl(6)
 
 	if portrait == "":
-		portrait = EmptyPortrait
+		portrait = EmptyPortraitMedium
 		if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
 			button.SetDisabled(True)
 		else:
@@ -262,7 +263,7 @@ def PortraitCommonLargeCustom():
 				button.SetState(IE_GUI_BUTTON_ENABLED)
 
 	preview = window.GetControl(0)
-	preview.SetPicture(portrait, EmptyPortrait)
+	preview.SetPicture(portrait, EmptyPortraitMedium)
 
 # This is for the small custom portrait
 def PortraitCommonSmallCustom():
@@ -305,7 +306,7 @@ def PortraitCustomPress(CustomDone):
 	global PortraitsTable, LastPortrait
 	global PortraitList1, PortraitList2
 	global RowCount1, RowCount2
-	global CustomWindow, EmptyPortrait
+	global CustomWindow, EmptyPortraitMedium
 
 	CustomWindow = Window = GemRB.LoadWindow(18, "GUICG")
 
@@ -337,23 +338,20 @@ def PortraitCustomPress(CustomDone):
 	if GameCheck.IsIWD2():
 		Button.MakeEscape()
 	Button.OnPress(PortraitCustomAbort)
-
-	LargeSuffix = "L"
-	if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
-		LargeSuffix = "M"
+	
 	Button = Window.GetControl(0)
-	PortraitName = PortraitsTable.GetRowName(LastPortrait) + LargeSuffix
+	PortraitName = PortraitsTable.GetRowName(LastPortrait) + PortraitSuffix["large"]
 
 	if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
-		if GemRB.HasResource(PortraitName, RES_BMP, 1) or GemRB.HasResource(EmptyPortrait, RES_BMP, 1):
-			Button.SetPicture(PortraitName, EmptyPortrait)
+		if GemRB.HasResource(PortraitName, RES_BMP, 1) or GemRB.HasResource(EmptyPortraitMedium, RES_BMP, 1):
+			Button.SetPicture(PortraitName, EmptyPortraitMedium)
 	else:
-		Button.SetPicture(PortraitName, EmptyPortrait)
+		Button.SetPicture(PortraitName, EmptyPortraitMedium)
 
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 
 	Button = Window.GetControl(1)
-	PortraitName = PortraitsTable.GetRowName(LastPortrait) + "S"
+	PortraitName = PortraitsTable.GetRowName(LastPortrait) + PortraitSuffix["small"]
 	Button.SetPicture(PortraitName, EmptyPortraitSmall)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 
@@ -377,10 +375,7 @@ def PortraitBackPress():
 
 def PortraitSetPicture():
 	global PortraitButton, PortraitsTable, LastPortrait, EmptyPortraitBig
-	PictureSize = "L"
-	if GameCheck.IsBG1OrEE() or GameCheck.IsIWD1():
-		PictureSize = "G"
-	PortraitName = PortraitsTable.GetRowName (LastPortrait)+PictureSize
+	PortraitName = PortraitsTable.GetRowName (LastPortrait)+PortraitSuffix["set"]
 	PortraitButton.SetPicture(PortraitName, EmptyPortraitBig)
 	return
 
