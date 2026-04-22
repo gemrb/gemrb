@@ -55,6 +55,9 @@ def OnLoad():
 	PortraitsStart = PortraitsTable.FindValue(0, 2)
 	FemaleCountAdd = 1
 	LastPortraitOffset = 0
+	if GameCheck.IsIWD2():
+		FemaleCountAdd = 0
+		LastPortraitOffset = -1
 	FemaleCount = PortraitsTable.GetRowCount() - PortraitsStart + FemaleCountAdd
 	if Gender == 2:
 		LastPortrait = GemRB.Roll(1, FemaleCount, PortraitsStart - 1)
