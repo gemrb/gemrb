@@ -684,6 +684,8 @@ Interface::~Interface() noexcept
 	ambientManager.reset();
 	musicLoop.reset();
 
+	gamedata.reset();
+
 	// Removing all stuff from Cache, except bifs
 	if (!config.KeepCache) DelTree(config.CachePath, true);
 }
