@@ -26,7 +26,7 @@ PortraitSuffix = {
 	"large": "M" if (GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo()) else "L",
 	"small": "S",
 	"set": "G" if (GameCheck.IsBG1OrEE() or GameCheck.IsIWD1()) else "L",
-	}
+}
 
 def OnLoad():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
