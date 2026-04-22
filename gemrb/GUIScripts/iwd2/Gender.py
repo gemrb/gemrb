@@ -76,5 +76,5 @@ def BackPress():
 def NextPress():
 	if GenderWindow:
 		GenderWindow.Close ()
-	GemRB.SetNextScript("CGPortrait") #appearance
+	GemRB.SetNextScript("GUIPortraitCommon") #appearance
 	return
