@@ -108,7 +108,7 @@ def OnLoad():
 	else:
 		BackButton.OnPress(PortraitBackPress)
 
-	CustomButton.OnPress(PortraitButtonCustomDone)
+	CustomButton.OnPress(PortraitCustomPress)
 	DoneButton.OnPress(PortraitButtonNextPress)
 	PortraitSetPicture()
 	AppearanceWindow.Focus()
@@ -296,7 +296,7 @@ def PortraitCommonSmallCustom():
 	preview.SetPicture(portrait, EmptyPortrait["small"])
 
 
-def PortraitCustomPress(CustomDone):
+def PortraitCustomPress():
 	global PortraitsTable, LastPortrait
 	global PortraitList1, PortraitList2
 	global RowCount1, RowCount2
@@ -321,7 +321,7 @@ def PortraitCustomPress(CustomDone):
 	Button.SetText(11973)
 	Button.MakeDefault()
 	
-	Button.OnPress(CustomDone)
+	Button.OnPress(PortraitButtonCustomDone)
 	if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
 		Button.SetDisabled(True)
 	else:
