@@ -98,9 +98,8 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 	str->ReadWord(newGame->WeatherBits);
 	str->ReadDword(PCOffset);
 	str->ReadDword(PCCount);
-	//these fields are not really used by any engine, and never saved
-	//str->ReadDword(UnknownOffset);
-	//str->ReadDword(UnknownCount);
+	// these fields are not really used by any engine, and never saved
+	// two dwords: supposedly offset to party inventory and count
 	str->Seek(8, GEM_CURRENT_POS);
 	str->ReadDword(NPCOffset);
 	str->ReadDword(NPCCount);
