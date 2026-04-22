@@ -19,7 +19,6 @@ import CommonTables
 import LUSkillsSelection
 import LUCommon
 import PaperDoll
-from GUIPortraitCommon import SetupAppearanceWindow
 
 CharGenWindow = 0
 CharGenState = 0
