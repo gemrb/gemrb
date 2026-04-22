@@ -485,6 +485,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 	actor->SetOrientation(ClampToOrientation(pcInfo.Orientation), false);
 	actor->TalkCount = pcInfo.TalkCount;
 	actor->ignoredFields.viewPos = pcInfo.ViewPos;
+	actor->ignoredFields.CREResRef = pcInfo.CREResRef;
 	actor->Modal.State = pcInfo.ModalState;
 	actor->SetModalSpell(actor->Modal.State, {});
 
@@ -851,10 +852,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 
 	stream->WriteDword(CREOffset);
 	stream->WriteDword(CRESize);
-	//creature resref is always unused in saved games
-	//BG1 doesn't even like the * in there, zero fill
-	//seems to be accepted by all
-	stream->WriteFilling(8);
+	stream->WriteResRef(ac->ignoredFields.CREResRef);
 	stream->WriteDword(ac->GetOrientation());
 	stream->WriteResRefUC(ac->AreaName);
 	stream->WritePoint(ac->Pos);

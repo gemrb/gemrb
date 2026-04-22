@@ -341,6 +341,7 @@ struct IgnoredFields {
 	ieWord saveGlobalID = 0;
 	ieWord savelocalID = 0;
 	Point viewPos;
+	ResRef CREResRef;
 };
 
 enum DamageFlags {
