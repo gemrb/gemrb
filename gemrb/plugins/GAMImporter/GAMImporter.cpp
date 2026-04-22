@@ -653,12 +653,12 @@ int GAMImporter::GetStoredFileSize(const Game* game)
 	}
 	headersize += SavedLocCount * 12;
 
-	if (game->version == GAMVersion::BG2 || game->version == GAMVersion::TOB) {
+	PPLocCount = game->GetPlaneLocationCount();
+	if (PPLocCount && (game->version == GAMVersion::BG2 || game->version == GAMVersion::TOB)) {
 		PPLocOffset = headersize;
 	} else {
 		PPLocOffset = 0;
 	}
-	PPLocCount = game->GetPlaneLocationCount();
 
 	return headersize + PPLocCount * 12;
 }
