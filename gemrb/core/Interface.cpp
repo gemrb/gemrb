@@ -3236,6 +3236,8 @@ CREItem* Interface::ReadItem(DataStream* str, CREItem* itm) const
 // set charge counters for items not using charges to one
 static void SanitizeCharges(CREItem* item, const Item* itm)
 {
+	if (core->config.UseAsLibrary) return;
+
 	for (size_t i = 0; i < item->Usages.size(); i++) {
 		const ITMExtHeader* h = itm->GetExtHeader(i);
 		// skip for example bg1 scrl2k with an empty extended header
@@ -3243,7 +3245,7 @@ static void SanitizeCharges(CREItem* item, const Item* itm)
 		if (!h || h->features.empty() || h->AttackType != ITEM_AT_MAGIC) {
 			// there's a bg1 dagg01 in one of the mpsave inventories with 8 charges
 			// skip clearing when testing, so the savegame diff is smaller
-			if (!core->config.UseAsLibrary) item->Usages[i] = 0;
+			item->Usages[i] = 0;
 			continue;
 		}
 
