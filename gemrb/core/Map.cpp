@@ -493,7 +493,7 @@ void Map::MoveToNewArea(const ResRef& newArea, const ieVariable& entrance, unsig
 		//copy the area name if it exists on the worldmap
 		const WMPAreaEntry* entry = core->GetWorldMap()->FindNearestEntry(newArea);
 		if (entry) {
-			game->PreviousArea = entry->AreaName;
+			game->WorldMapArea = entry->AreaName;
 		}
 
 		// perform autosave, but not in ambush and other special areas

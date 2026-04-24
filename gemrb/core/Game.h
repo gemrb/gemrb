@@ -271,7 +271,7 @@ public:
 	ieDword zoomLevel = 100; // ee-style zoom, 0 or 100: default zoom level, >100: zoomed out, <100: zoomed in
 	ResRef AnotherArea;
 	ResRef CurrentArea;
-	ResRef PreviousArea; //move here if the worldmap exit is illegal?
+	ResRef WorldMapArea;
 	ResRef LastMasterArea; // last party-visited master area
 	ResRef LoadMos;
 	ResRef TextScreen;

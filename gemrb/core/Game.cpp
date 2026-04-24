@@ -2383,7 +2383,7 @@ std::string Game::dump() const
 	for (const auto& map : Maps) {
 		AppendFormat(buffer, "{}\n", map->GetScriptName());
 	}
-	AppendFormat(buffer, "Current area: {}   Previous area: {}\n\n", CurrentArea, PreviousArea);
+	AppendFormat(buffer, "Current area: {}   Worldmap area: {}\n\n", CurrentArea, WorldMapArea);
 	if (Scripts[0]) {
 		AppendFormat(buffer, "Global script: {}\n", Scripts[0]->GetName());
 	}
