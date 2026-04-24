@@ -9,6 +9,7 @@ import GameCheck
 import GUICommon
 import PaperDoll
 import Portrait
+import GUIPortraitCommon
 from GUIDefines import *
 from ie_stats import *
 from ie_restype import RES_WAV
@@ -114,6 +115,11 @@ def OpenCustomizeWindow ():
 	return
 
 def OpenPortraitSelectWindow ():
+	# get players gender and portrait
+	Pc = GemRB.GameGetSelectedPCSingle()
+	PcPortrait = GemRB.GetPlayerPortrait(Pc, 0)["ResRef"]
+	GUIPortraitCommon.OnLoad(True, Gender, PcPortrait)
+	return
 	global PortraitPictureButton
 
 	SubCustomizeWindow = GemRB.LoadWindow (18, "GUIREC")
