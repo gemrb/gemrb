@@ -233,6 +233,8 @@ private:
 	ResRef nightmovies[8];
 	int MapIndex = -1;
 	ResRef Familiars[9];
+	Actor* timestopper = nullptr;
+	ieDword timestopEnd = 0;
 
 public:
 	std::vector<Actor*> selected;
@@ -288,12 +290,6 @@ public:
 	bool familiarBlock = false;
 	bool PartyAttack = false;
 	bool HOFMode = false;
-
-private:
-	/** reads the challenge rating table */
-	void LoadCRTable();
-	Actor* timestopper = nullptr;
-	ieDword timestopEnd = 0;
 
 public:
 	/** Returns the PC's slot count for partyID */
@@ -502,6 +498,8 @@ public:
 	void CheckAreaComment();
 
 private:
+	/** reads the challenge rating table */
+	void LoadCRTable();
 	ResRef* GetDream(Map* area);
 	bool RestPartyInternal(RestChecks checks, int hp, int& hours);
 	bool CastOnRest() const;
