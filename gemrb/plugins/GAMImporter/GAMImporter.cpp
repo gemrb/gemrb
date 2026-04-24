@@ -106,7 +106,7 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 	str->ReadDword(GlobalOffset);
 	str->ReadDword(GlobalCount);
 	str->ReadResRef(newGame->LastMasterArea); // this is the 'master area', different for subareas
-	newGame->PreviousArea = newGame->LastMasterArea; // last worldmap area
+	newGame->WorldMapArea = newGame->LastMasterArea; // last worldmap area
 	str->ReadDword(newGame->CurrentLink); //in ToB this is named 'currentLink'
 	str->ReadDword(JournalCount);
 	str->ReadDword(JournalOffset);
@@ -787,7 +787,7 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 	stream->WriteDword(NPCCount);
 	stream->WriteDword(GlobalOffset);
 	stream->WriteDword(GlobalCount);
-	stream->WriteResRefUC(game->PreviousArea);
+	stream->WriteResRefUC(game->WorldMapArea);
 	stream->WriteDword(game->CurrentLink);
 	stream->WriteDword(JournalCount);
 	stream->WriteDword(JournalOffset);
