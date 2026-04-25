@@ -3260,6 +3260,7 @@ static int fx_power_attack(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::PowerAttack, target);
 		}
+		return FX_APPLIED;
 	}
 
 	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::PowerAttack, target);
@@ -3287,6 +3288,7 @@ static int fx_expertise(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Expertise, target);
 		}
+		return FX_APPLIED;
 	}
 
 	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::Expertise, target);
