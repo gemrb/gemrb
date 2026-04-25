@@ -49,6 +49,7 @@ Effect& Effect::operator=(const Effect& rhs) noexcept
 		IsVariable = rhs.IsVariable;
 		IsSaveForHalfDamage = rhs.IsSaveForHalfDamage;
 		PrimaryType = rhs.PrimaryType;
+		JeremyIsAnIdiot = rhs.JeremyIsAnIdiot;
 		MinAffectedLevel = rhs.MinAffectedLevel;
 		MaxAffectedLevel = rhs.MaxAffectedLevel;
 		Parameter3 = rhs.Parameter3;
@@ -102,6 +103,7 @@ bool Effect::operator==(const Effect& rhs) const noexcept
 	if (IsVariable != rhs.IsVariable) return false;
 	if (IsSaveForHalfDamage != rhs.IsSaveForHalfDamage) return false;
 	if (PrimaryType != rhs.PrimaryType) return false;
+	if (JeremyIsAnIdiot != rhs.JeremyIsAnIdiot) return false;
 	if (MinAffectedLevel != rhs.MinAffectedLevel) return false;
 	if (MaxAffectedLevel != rhs.MaxAffectedLevel) return false;
 	if (Parameter3 != rhs.Parameter3) return false;
