@@ -28,6 +28,7 @@ static std::vector<ResRef> innlist; //IE_IWD2_SPELL_INNATE
 static std::vector<ResRef> snglist; //IE_IWD2_SPELL_SONG
 static std::vector<ResRef> shplist; //IE_IWD2_SPELL_SHAPE
 static const ResRef EmptyResRef;
+static std::set<ieDword> modalFeats;
 
 constexpr ieDword FAKE_VARIABLE_OPCODE = 187;
 
@@ -432,6 +433,17 @@ static void InitSpellbook()
 CREImporter::CREImporter(void)
 {
 	InitSpellbook();
+	if (version != CREVersion::V2_2) return;
+
+	std::array<EffectRef, 5> featRefs { { { "PowerAttack", -1 },
+					      { "Expertise", -1 },
+					      { "ArterialStrike", -1 },
+					      { "HamString", -1 },
+					      { "RapidShot", -1 } } };
+	for (auto& featRef : featRefs) {
+		EffectQueue::ResolveEffect(featRef);
+		modalFeats.insert(featRef.opcode);
+	}
 }
 
 bool CREImporter::Import(DataStream* stream)
@@ -1192,7 +1204,11 @@ void CREImporter::ReadEffects(Actor* act)
 	str->Seek(EffectsOffset + CREOffset, GEM_STREAM_START);
 
 	for (unsigned int i = 0; i < EffectsCount; i++) {
-		act->fxqueue.AddEffect(GetEffect());
+		std::unique_ptr<Effect> fx = GetEffect();
+		// skip iwd2 modal feat effects, since they will be added through ApplyExtraSettings
+		if (act->creVersion != CREVersion::V2_2 || modalFeats.count(fx->Opcode) == 0) {
+			act->fxqueue.AddEffect(std::move(fx));
+		}
 	}
 }
 
