@@ -342,6 +342,9 @@ struct IgnoredFields {
 	ieWord savelocalID = 0;
 	Point viewPos;
 	ResRef CREResRef;
+	ieWord IWDAutoSaveLoc = 0;
+	std::array<ieByte, 15> IWDUnknowns {};
+	ieByte IgnoredGender = 0;
 };
 
 enum DamageFlags {
