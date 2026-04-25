@@ -2707,7 +2707,7 @@ static void AddBonusSpells(Actor* actor)
 			level = actor->Modified[castingStat[classesiwd2[i]]];
 			actor->spellbook.BonusSpells(booktype, level);
 		}
-	} else {
+	} else if (actor->GetClericLevel() || actor->GetDruidLevel()) {
 		int level = actor->Modified[IE_WIS];
 		actor->spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, level);
 	}
