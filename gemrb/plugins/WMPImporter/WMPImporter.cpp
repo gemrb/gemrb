@@ -274,7 +274,7 @@ int WMPImporter::PutAreas(DataStream* stream, const WorldMap* wmap) const
 		stream->WriteResRefUC(ae->AreaName);
 		stream->WriteResRefUC(ae->AreaResRef);
 		stream->WriteVariableUC(ae->ScriptName);
-		tmpDword = ae->GetAreaStatus();
+		tmpDword = ae->GetAreaStatus(true);
 		stream->WriteDword(tmpDword);
 		stream->WriteDword(ae->IconSeq);
 		ieDword coord = ae->pos.x;
