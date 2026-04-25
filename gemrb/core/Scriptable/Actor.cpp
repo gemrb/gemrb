@@ -1538,11 +1538,6 @@ static const PostChangeFunctionType post_change_functions[MAX_STATS] = {
 	nullptr, nullptr, nullptr, nullptr, pcf_morale, pcf_bounce, nullptr, nullptr //ff
 };
 
-#define COL_MAIN     0
-#define COL_SPARKS   1
-#define COL_GRADIENT 2
-#define COL_BLEND    3
-
 /* returns the ISCLASS for the class based on name */
 static int IsClassFromName(const std::string& name)
 {
@@ -1772,19 +1767,20 @@ static void InitActorTables()
 	tm = gamedata->LoadTable("damage");
 	if (tm) {
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
-			ResRef tmp = tm->QueryField(i, COL_MAIN);
+			auto rowName = tm->GetRowName(i);
+			ResRef tmp = tm->QueryField(rowName, "MAIN");
 			damageMainResources[i] = tmp;
 			if (IsStar(damageMainResources[i])) {
 				damageMainResources[i].Reset();
 			}
-			tmp = tm->QueryField(i, COL_SPARKS);
+			tmp = tm->QueryField(rowName, "SPARKS");
 			damageSparks[i] = tmp;
 			if (IsStar(damageSparks[i])) {
 				damageSparks[i].Reset();
 			}
-			damageGradients[i] = tm->QueryFieldSigned<int>(i, COL_GRADIENT);
+			damageGradients[i] = tm->QueryFieldSigned<int>(rowName, "GRADIENT");
 
-			uint8_t value = tm->QueryFieldUnsigned<uint8_t>(i, COL_BLEND);
+			uint8_t value = tm->QueryFieldUnsigned<uint8_t>(rowName, "BLEND");
 			damageBlendFlags[i] = value > 0;
 		}
 	}
