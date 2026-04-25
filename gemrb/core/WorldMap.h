@@ -55,7 +55,7 @@ enum class WMPDirection : uint8_t {
 class GEM_EXPORT WMPAreaEntry {
 public:
 	WMPAreaEntry() noexcept = default;
-	ieDword GetAreaStatus() const;
+	ieDword GetAreaStatus(bool saving = false) const;
 	void SetAreaStatus(ieDword status, BitOp op);
 
 	//! return the map icon of this location. Free the sprite afterwards.
