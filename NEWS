@@ -1,4 +1,4 @@
-GemRB git (64e0552):
+GemRB git (653dee9e):
   New features:
     - 
     - audio occlusion based on line of sight
@@ -9,7 +9,7 @@ GemRB git (64e0552):
   Improved features:
     - 
     - tooltips
-    - ee compatibility, effects, projectiles
+    - save game and ee compatibility, effects, projectiles
     - bugfixes
 
 GemRB v0.9.5 (2026-03-23):
