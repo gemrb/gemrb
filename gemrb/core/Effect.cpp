@@ -138,6 +138,8 @@ bool Effect::HasDuration() const
 		case FX_DURATION_DELAY_PERMANENT: //simple delayed
 			// not supporting FX_DURATION_INSTANT_LIMITED_TICKS, since it's in ticks
 			return true;
+		default:
+			break;
 	}
 	return false;
 }
@@ -163,6 +165,8 @@ bool Effect::Persistent(ieDword gameTime) const
 		//just expired effect
 		case FX_DURATION_JUST_EXPIRED:
 			return false;
+		default:
+			break;
 	}
 
 	// also ignore instant effects that get continuously reapplied
