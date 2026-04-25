@@ -804,7 +804,7 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 			stream->WriteDword(game->ControlStatus);
 			stream->WriteDword(game->Expansion);
 			stream->WriteDword(FamiliarsOffset);
-			stream->WriteDword(SavedLocOffset);
+			stream->WriteDword(SavedLocCount ? SavedLocOffset : 0);
 			stream->WriteDword(SavedLocCount);
 			break;
 		case GAMVersion::PST:
