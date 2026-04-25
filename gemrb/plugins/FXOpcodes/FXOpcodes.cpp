@@ -5930,7 +5930,7 @@ int fx_resist_spell2(Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (fx->Resource != fx->SourceRef) {
+	if (fx->Resource != fx->SourceRef || core->config.UseAsLibrary) { // extend the lifetime when savetesting
 		return FX_APPLIED;
 	}
 	//this has effect only on first apply, it will stop applying the spell
