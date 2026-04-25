@@ -2845,8 +2845,7 @@ Projectile* Map::AddProjectile(std::unique_ptr<Projectile> pro)
 	for (iter = projectiles.begin(); iter != projectiles.end(); iter++) {
 		if ((*iter)->GetHeight() >= height) break;
 	}
-	projectiles.insert(iter, std::move(pro));
-	return iter->get();
+	return projectiles.insert(iter, std::move(pro))->get();
 }
 
 Projectile* Map::AddProjectile(std::unique_ptr<Projectile> pro, const Point& source, ieDword actorID, bool fake)
