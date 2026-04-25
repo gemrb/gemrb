@@ -993,6 +993,7 @@ bool Inventory::EquipItem(ieDword slot)
 				slot = GetWeaponSlot(weaponslot);
 			}
 			if (ieWordSigned(equip) == Equipped && newHeader == EquippedHeader) {
+				if (!Owner->weaponInfo[0].extHeader) CacheAllWeaponInfo();
 				gamedata->FreeItem(itm, item->ItemResRef, false);
 				return false;
 			}
