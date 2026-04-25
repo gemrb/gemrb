@@ -45,6 +45,7 @@ namespace GemRB {
 #define WriteVariable(str)   WriteString(str, str.Size)
 #define WriteVariableLC(str) WriteStringLC(str, str.Size)
 #define WriteVariableUC(str) WriteStringUC(str, str.Size)
+#define WriteArray(arr)      Write(arr.data(), arr.size() * sizeof(decltype(arr)::value_type))
 
 // represents the byte position of the stream
 using strpos_t = size_t;

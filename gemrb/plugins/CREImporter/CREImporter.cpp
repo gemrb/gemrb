@@ -1564,12 +1564,11 @@ void CREImporter::GetActorIWD2(Actor* act)
 	act->KillVar = MakeVariable(KillVar);
 	str->ReadVariable(KillVar);
 	act->IncKillVar = MakeVariable(KillVar);
-	str->Seek(2, GEM_CURRENT_POS);
+	str->ReadWord(act->ignoredFields.IWDAutoSaveLoc);
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDXPOS]);
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDYPOS]);
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDFACE]);
-
-	str->Seek(15, GEM_CURRENT_POS);
+	str->ReadArray(act->ignoredFields.IWDUnknowns);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRANSLUCENT]);
 	str->ReadScalar(tmpByte); //fade speed
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPECFLAGS]); //spec. flags
@@ -1715,7 +1714,7 @@ void CREImporter::GetActorIWD1(Actor* act) //9.0
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL2]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL3]);
 	//this is rumoured to be IE_SEX, but we use the gender field for this
-	str->ReadScalar(tmpByte); //skipping a byte
+	str->Read(&act->ignoredFields.IgnoredGender, 1);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STR]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STREXTRA]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INT]);
@@ -1752,11 +1751,12 @@ void CREImporter::GetActorIWD1(Actor* act) //9.0
 	act->KillVar = MakeVariable(KillVar);
 	str->ReadVariable(KillVar);
 	act->IncKillVar = MakeVariable(KillVar);
-	str->Seek(2, GEM_CURRENT_POS);
+	str->ReadWord(act->ignoredFields.IWDAutoSaveLoc);
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDXPOS]);
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDYPOS]);
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDFACE]);
-	str->Seek(18, GEM_CURRENT_POS);
+	str->ReadArray(act->ignoredFields.IWDUnknowns);
+	str->Seek(3, GEM_CURRENT_POS);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_EA]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_GENERAL]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_RACE]);
@@ -2197,7 +2197,11 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL2]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL3]);
-		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
+		if (actor->creVersion == CREVersion::V9_0) {
+			stream->Write(&actor->ignoredFields.IgnoredGender, 1);
+		} else {
+			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
+		}
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_STR]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_STREXTRA]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_INT]);
@@ -2307,11 +2311,12 @@ int CREImporter::PutActorIWD1(DataStream* stream, const Actor* actor) const
 	}
 	stream->WriteVariable(actor->KillVar); // some variable names in iwd
 	stream->WriteVariable(actor->IncKillVar); // some variable names in iwd
-	stream->WriteFilling(2);
+	stream->WriteWord(actor->ignoredFields.IWDAutoSaveLoc);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDXPOS]);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDYPOS]);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDFACE]);
-	stream->WriteFilling(18);
+	stream->WriteArray(actor->ignoredFields.IWDUnknowns);
+	stream->WriteFilling(3);
 	//similar in all engines
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_EA]);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_GENERAL]);
@@ -2338,11 +2343,11 @@ int CREImporter::PutActorIWD2(DataStream* stream, const Actor* actor) const
 	}
 	stream->WriteVariable(actor->KillVar); // some variable names in iwd
 	stream->WriteVariable(actor->IncKillVar); // some variable names in iwd
-	stream->WriteFilling(2);
+	stream->WriteWord(actor->ignoredFields.IWDAutoSaveLoc);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDXPOS]);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDYPOS]);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDFACE]);
-	stream->WriteFilling(15);
+	stream->WriteArray(actor->ignoredFields.IWDUnknowns);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TRANSLUCENT]);
 	stream->WriteFilling(1); //fade speed
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPECFLAGS]);
