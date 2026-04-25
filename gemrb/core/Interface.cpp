@@ -3307,7 +3307,11 @@ void Interface::SanitizeItem(CREItem* item) const
 	}
 
 	// simply adding the item flags to the slot
-	item->Flags |= itm->Flags << 8;
+	if (HasFeature(GFFlags::MAGICBIT)) {
+		item->Flags |= (itm->Flags & ~IE_ITEM_MAGICAL) << 8; // handled above
+	} else {
+		item->Flags |= itm->Flags << 8;
+	}
 	// some slot flags might be affected by the item flags
 	if (!(item->Flags & IE_INV_ITEM_CRITICAL)) {
 		item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
