@@ -115,10 +115,7 @@ def OpenCustomizeWindow ():
 	return
 
 def OpenPortraitSelectWindow ():
-	# get players gender and portrait
-	Pc = GemRB.GameGetSelectedPCSingle()
-	PcPortrait = GemRB.GetPlayerPortrait(Pc, 0)["ResRef"]
-	GUIPortraitCommon.OnLoad(True, Gender, PcPortrait)
+	GUIPortraitCommon.OnLoad(True)
 	return
 
 def OpenSoundWindow ():

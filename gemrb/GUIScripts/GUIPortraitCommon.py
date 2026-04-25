@@ -30,7 +30,7 @@ PortraitSuffix = {
 	"set": "G" if (GameCheck.IsBG1OrEE() or GameCheck.IsIWD1()) else "L",
 }
 
-def OnLoad(GUIRECCommon = False, UseGender = None, PortraitName = None):
+def OnLoad(GUIRECCommon = False):
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
 	global Gender, IsGUIRECCommon
 	
@@ -39,14 +39,15 @@ def OnLoad(GUIRECCommon = False, UseGender = None, PortraitName = None):
 	if GUIRECCommon:
 		AppearanceWindow = GemRB.LoadWindow(18, "GUIREC")
 		AppearanceWindow.AddAlias("SUB_WIN", 0)
+		Pc = GemRB.GameGetSelectedPCSingle()
+		PortraitName = GemRB.GetPlayerPortrait(Pc, 0)["ResRef"]
+		# Load the Gender
+		Gender = GemRB.GetPlayerStat(Pc, IE_SEX)
 	else:
 		AppearanceWindow = GemRB.LoadWindow(11, "GUICG")
-	
-	# Load the Gender
-	if GUIRECCommon:
-		Gender = UseGender
-	else:
+		# Load the Gender
 		Gender = GetGender()
+	
 	if not GUIRECCommon:
 		# Optional extra setup
 		if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
@@ -200,7 +201,6 @@ def PortraitButtonCustomDone():
 def PortraitButtonNextPress():
 	global PortraitsTable, LastPortrait
 	PortraitPictureButtonName = PortraitApplySelection()
-	print(PortraitPictureButtonName)
 	if not IsGUIRECCommon:
 		if GameCheck.IsBG1OrEE():
 			import CharGenCommon
@@ -210,7 +210,6 @@ def PortraitButtonNextPress():
 	else:
 		PortraitName = PortraitPictureButtonName[:-1]
 		pc = GemRB.GameGetSelectedPCSingle()
-		print(PortraitName)
 		# eh, different sizes
 		if GameCheck.IsBG2OrEE():
 			GemRB.FillPlayerInfo(pc, PortraitName + "M", PortraitName + "S")
@@ -259,7 +258,7 @@ def PortraitCustomDone():
 
 	if AppearanceWindow:
 		AppearanceWindow.Close()
-	if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+	if not IsGUIRECCommon and (GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo()):
 		GemRB.SetNextScript ("CharGen2")
 	return PortraitLarge
 
@@ -283,7 +282,7 @@ def PortraitApplySelection():
 	PortraitName = PortraitTable.GetRowName(LastPortrait)
 	GemRB.SetToken("SmallPortrait", PortraitName + PortraitSuffix["small"])
 	GemRB.SetToken("LargePortrait", PortraitName + PortraitSuffix["large"])
-	if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+	if not IsGUIRECCommon and (GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo()):
 		GemRB.SetNextScript ("CharGen2") #Before race
 	return PortraitName + PortraitSuffix["large"]
 
