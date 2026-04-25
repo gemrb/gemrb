@@ -140,7 +140,7 @@ std::unique_ptr<Effect> EFFImporter::GetEffectV20()
 	str->ReadWord(fx->IsVariable); //if this field was set to 1, this is a variable
 	str->ReadWord(fx->IsSaveForHalfDamage); //if this field was set to 1, save for half damage; part of Special dword with the preceding field
 	str->ReadDword(fx->PrimaryType);
-	str->Seek(4, GEM_CURRENT_POS); // JeremyIsAnIdiot in the original :D
+	str->ReadDword(fx->JeremyIsAnIdiot);
 	str->ReadDword(fx->MinAffectedLevel);
 	str->ReadDword(fx->MaxAffectedLevel);
 	str->ReadDword(fx->Resistance);
@@ -215,7 +215,8 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	stream->WriteWord(fx->IsVariable);
 	stream->WriteFilling(2); // SaveForHalfDamage
 	stream->WriteDword(fx->PrimaryType);
-	stream->WriteFilling(12); // MinAffectedLevel, MaxAffectedLevel, Resistance
+	stream->WriteDword(fx->JeremyIsAnIdiot);
+	stream->WriteFilling(8); // MinAffectedLevel, MaxAffectedLevel
 	stream->WriteDword(fx->Resistance);
 	stream->WriteDword(fx->Parameter3);
 	stream->WriteDword(fx->Parameter4);

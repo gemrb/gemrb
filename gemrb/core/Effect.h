@@ -119,6 +119,7 @@ struct GEM_EXPORT Effect {
 
 	// EFF V2.0 fields:
 	ieDword PrimaryType = 0; //school
+	ieDword JeremyIsAnIdiot = 0; // name from the original, actually used in iwd1 data
 	ieDword MinAffectedLevel = 0;
 	ieDword MaxAffectedLevel = 0;
 	ieDword Parameter3 = 0;
