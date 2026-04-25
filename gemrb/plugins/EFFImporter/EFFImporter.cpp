@@ -166,7 +166,7 @@ std::unique_ptr<Effect> EFFImporter::GetEffectV20()
 	fx->InventorySlot = (ieDwordSigned) (tmp);
 	//Variable simply overwrites the resource fields (Keep them grouped)
 	//They have to be continuous
-	if (fx->IsVariable) {
+	if (fx->IsVariable || fx->Opcode == 187) { // FAKE_VARIABLE_OPCODE
 		str->ReadVariable(fx->VariableName);
 	} else {
 		str->Seek(32, GEM_CURRENT_POS);
@@ -195,6 +195,8 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	} else {
 		stream->WriteFilling(8);
 	}
+	// iwd2 test save has actors with local var fx attached without fx->IsVariable set
+	bool isVariable = fx->IsVariable || fx->Opcode == 187; // FAKE_VARIABLE_OPCODE
 	stream->WriteDword(fx->Opcode);
 	stream->WriteDword(fx->Target);
 	stream->WriteDword(fx->Power);
@@ -205,7 +207,7 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	stream->WriteDword(fx->Duration);
 	stream->WriteWord(fx->ProbabilityRangeMax);
 	stream->WriteWord(fx->ProbabilityRangeMin);
-	if (fx->IsVariable) {
+	if (isVariable) {
 		stream->WriteFilling(8);
 	} else {
 		stream->WriteResRef(fx->Resource);
@@ -226,7 +228,7 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	stream->WriteDword(fx->Parameter4);
 	stream->WriteDword(fx->Parameter5);
 	stream->WriteDword(fx->Parameter6);
-	if (fx->IsVariable) {
+	if (isVariable) {
 		stream->WriteFilling(16);
 	} else {
 		stream->WriteResRef(fx->Resource2);
@@ -246,7 +248,7 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	stream->WriteDword(fx->Projectile);
 	tmpDword1 = (ieDword) fx->InventorySlot;
 	stream->WriteDword(tmpDword1);
-	if (fx->IsVariable) {
+	if (isVariable) {
 		//resource1-4 are used as a continuous memory
 		stream->WriteVariableLC(fx->VariableName);
 	} else {
@@ -254,7 +256,7 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	}
 	stream->WriteDword(fx->CasterLevel);
 	// try preserving fx->FirstApply for save testing
-	if (fx->IsVariable) {
+	if (isVariable) {
 		stream->WriteDword(1);
 	} else {
 		stream->WriteFilling(4);
