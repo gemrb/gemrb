@@ -2070,7 +2070,7 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_RESISTMISSILE]);
 	if (actor->creVersion == CREVersion::V2_2) {
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MAGICDAMAGERESISTANCE]);
-		stream->Write(Signature, 4);
+		stream->WriteFilling(4);
 	} else {
 		if (actor->creVersion == CREVersion::V1_2) {
 			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_FREESLOTS]);
