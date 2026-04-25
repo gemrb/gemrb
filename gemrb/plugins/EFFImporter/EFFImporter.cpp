@@ -248,7 +248,12 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 		stream->WriteFilling(32);
 	}
 	stream->WriteDword(fx->CasterLevel);
-	stream->WriteFilling(4);
+	// try preserving fx->FirstApply for save testing
+	if (fx->IsVariable) {
+		stream->WriteDword(1);
+	} else {
+		stream->WriteFilling(4);
+	}
 	stream->WriteDword(fx->SecondaryType);
 	stream->WriteFilling(60);
 }
