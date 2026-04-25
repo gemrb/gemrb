@@ -1965,6 +1965,8 @@ int CREImporter::PutInventory(DataStream* stream, const Actor* actor, unsigned i
 		// bg1 saved only the first 3 bits!?
 		if (actor->creVersion == CREVersion::V1_0 || actor->creVersion == CREVersion::V1_1) {
 			stream->WriteDword(tmpDword & (IE_INV_ITEM_UNDROPPABLE - 1));
+		} else if (actor->creVersion == CREVersion::V9_0) {
+			stream->WriteDword(tmpDword & (IE_INV_ITEM_ACQUIRED - 1));
 		} else {
 			stream->WriteDword(tmpDword);
 		}
