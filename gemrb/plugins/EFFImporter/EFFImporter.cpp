@@ -190,7 +190,11 @@ std::unique_ptr<Effect> EFFImporter::GetEffectV20()
 
 void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 {
-	stream->WriteFilling(8); //signature
+	if (core->HasFeature(GFFlags::RULES_3ED)) {
+		stream->Write("EFF V2.0", 8);
+	} else {
+		stream->WriteFilling(8);
+	}
 	stream->WriteDword(fx->Opcode);
 	stream->WriteDword(fx->Target);
 	stream->WriteDword(fx->Power);
