@@ -641,6 +641,7 @@ int GAMImporter::GetStoredFileSize(const Game* game)
 		}
 	}
 
+	FamiliarsOffset2 = headersize;
 	if (game->version == GAMVersion::IWD2) {
 		SavedLocOffset = game->HOFMode;
 		SavedLocCount = 0;
@@ -650,6 +651,7 @@ int GAMImporter::GetStoredFileSize(const Game* game)
 		SavedLocOffset = headersize;
 		SavedLocCount = game->GetSavedLocationCount();
 	} else {
+		FamiliarsOffset2 = 0;
 		SavedLocCount = 0;
 	}
 	headersize += SavedLocCount * 12;
@@ -1161,7 +1163,7 @@ int GAMImporter::PutFamiliars(DataStream* stream, const Game* game) const
 	for (unsigned int i = 0; i < 9; i++) {
 		stream->WriteResRef(game->GetFamiliar(i));
 	}
-	stream->WriteDword(SavedLocOffset);
+	stream->WriteDword(FamiliarsOffset2);
 	if (len) {
 		stream->Write(game->beasts.data(), len);
 	}
