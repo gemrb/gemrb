@@ -30,6 +30,7 @@ private:
 	ieDword KillVarsOffset = 0;
 	ieDword KillVarsCount = 0;
 	ieDword FamiliarsOffset = 0;
+	ieDword FamiliarsOffset2 = 0;
 	ieDword SavedLocOffset = 0;
 	ieDword SavedLocCount = 0;
 	ieDword PPLocOffset = 0;
