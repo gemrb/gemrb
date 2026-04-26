@@ -1036,7 +1036,13 @@ static void pcf_class(Actor* actor, ieDword /*oldValue*/, ieDword newValue)
 	//in case of iwd2. Maybe we need a custom quickslots flag here.
 	// also ensure multiclass is set early, since GetActiveClass relies on it
 	actor->ResetMC();
-	actor->InitButtons(actor->GetActiveClass(), !iwd2class || actor->Ticks == 0);
+	actor->InitButtons(actor->GetActiveClass(), !iwd2class);
+	if (iwd2class && actor->Ticks == 0 && actor->PCStats) {
+		// force reset only the first 3 hardcoded action buttons
+		actor->PCStats->QSlots[0] = DefaultButtons[0];
+		actor->PCStats->QSlots[1] = DefaultButtons[1];
+		actor->PCStats->QSlots[2] = DefaultButtons[2];
+	}
 	actor->ChangeSorcererType(newValue);
 }
 
