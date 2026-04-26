@@ -619,15 +619,15 @@ int GAMImporter::GetStoredFileSize(const Game* game)
 
 	GlobalCount = static_cast<ieDword>(game->locals.size());
 	headersize += GlobalCount * 84;
-	JournalOffset = headersize;
-
-	JournalCount = game->GetJournalCount();
-	headersize += JournalCount * 12;
 
 	KillVarsOffset = headersize;
 	if (KillVarsCount) {
 		headersize += KillVarsCount * 84;
 	}
+
+	JournalOffset = headersize;
+	JournalCount = game->GetJournalCount();
+	headersize += JournalCount * 12;
 
 	if (game->version == GAMVersion::BG) {
 		FamiliarsOffset = 0;
