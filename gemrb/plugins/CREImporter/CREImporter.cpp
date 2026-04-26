@@ -990,8 +990,7 @@ void CREImporter::GetActorPST(Actor* act)
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL2]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL3]);
-	// skipping, this is rumoured to be IE_SEX, but we use the gender field for this
-	str->Seek(1, GEM_CURRENT_POS);
+	str->Read(&act->ignoredFields.IgnoredGender, 1);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STR]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STREXTRA]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INT]);
@@ -1017,7 +1016,7 @@ void CREImporter::GetActorPST(Actor* act)
 	//they are a kind of effect block (like our vvclist)
 	// NOTE: rendered obsolete by our implementation of pst fx_overlay
 	// no creature comes with this preset
-	str->ReadDword(OverlayOffset);
+	str->ReadDword(act->ignoredFields.pstOverlayOffset);
 	str->ReadDword(OverlayMemorySize);
 	str->ReadDword(act->BaseStats[IE_XP_MAGE]); // Exp for secondary class
 	str->ReadDword(act->BaseStats[IE_XP_THIEF]); // Exp for tertiary class
@@ -1031,7 +1030,9 @@ void CREImporter::GetActorPST(Actor* act)
 	ieVariable KillVar; //use this as needed
 	str->ReadVariable(KillVar);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_DIALOGRANGE]);
-	str->Seek(2, GEM_CURRENT_POS); // circle size is only here (not in resdata.ini), but we have it in our own avatars.2da; plus an unknown byte
+	// circle size is only here (not in resdata.ini), but we have it in our own avatars.2da
+	str->Read(&act->ignoredFields.pstPersonalSpace, 1);
+	str->Seek(1, GEM_CURRENT_POS); // unknown
 
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_COLORCOUNT]);
 	str->ReadDword(act->AppearanceFlags);
@@ -1980,7 +1981,7 @@ int CREImporter::PutInventory(DataStream* stream, const Actor* actor, unsigned i
 			}
 		}
 		// bg1 saved only the first 3 bits!?
-		if (actor->creVersion == CREVersion::V1_0 || actor->creVersion == CREVersion::V1_1) {
+		if (actor->creVersion == CREVersion::V1_0 || actor->creVersion == CREVersion::V1_1 || actor->creVersion == CREVersion::V1_2) {
 			stream->WriteDword(tmpDword & (IE_INV_ITEM_UNDROPPABLE - 1));
 		} else if (actor->creVersion == CREVersion::V9_0 || actor->creVersion == CREVersion::V2_2) {
 			stream->WriteDword(tmpDword & (IE_INV_ITEM_ACQUIRED - 1));
@@ -2219,7 +2220,7 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL2]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL3]);
-		if (actor->creVersion == CREVersion::V9_0) {
+		if (actor->creVersion == CREVersion::V9_0 || actor->creVersion == CREVersion::V1_2) {
 			stream->Write(&actor->ignoredFields.IgnoredGender, 1);
 		} else {
 			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
@@ -2237,9 +2238,14 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_MORALERECOVERYTIME]);
 		// unknown byte
 		stream->WriteFilling(1);
-		ieDword tmpDword = ((actor->BaseStats[IE_KIT] & 0xffff) << 16) +
-			((actor->BaseStats[IE_KIT] & 0xffff0000) >> 16);
-		stream->WriteDword(tmpDword);
+		if (actor->creVersion == CREVersion::V1_2) {
+			// no reordering in pst
+			stream->WriteDword(actor->BaseStats[IE_KIT]);
+		} else {
+			ieDword tmpDword = ((actor->BaseStats[IE_KIT] & 0xffff) << 16) +
+				((actor->BaseStats[IE_KIT] & 0xffff0000) >> 16);
+			stream->WriteDword(tmpDword);
+		}
 		stream->WriteResRef(actor->GetScript(SCR_OVERRIDE, true));
 		stream->WriteResRef(actor->GetScript(SCR_CLASS, true));
 		stream->WriteResRef(actor->GetScript(SCR_RACE, true));
@@ -2285,7 +2291,9 @@ int CREImporter::PutActorBG(DataStream* stream, const Actor* actor) const
 
 int CREImporter::PutActorPST(DataStream* stream, const Actor* actor) const
 {
-	stream->WriteFilling(44); //11*4 totally unknown
+	stream->WriteFilling(36); // 9*4 totally unknown
+	stream->WriteDword(actor->ignoredFields.pstOverlayOffset);
+	stream->WriteDword(OverlayMemorySize);
 	stream->WriteDword(actor->BaseStats[IE_XP_MAGE]);
 	stream->WriteDword(actor->BaseStats[IE_XP_THIEF]);
 	for (int i = 0; i < 10; i++) {
@@ -2295,7 +2303,9 @@ int CREImporter::PutActorPST(DataStream* stream, const Actor* actor) const
 		stream->WriteScalar(counter);
 	}
 	stream->WriteVariable(actor->KillVar);
-	stream->WriteFilling(3); //unknown
+	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_DIALOGRANGE]);
+	stream->Write(&actor->ignoredFields.pstPersonalSpace, 1);
+	stream->WriteFilling(1); //unknown
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_COLORCOUNT]);
 	stream->WriteDword(actor->AppearanceFlags);
 
@@ -2429,7 +2439,9 @@ int CREImporter::PutSpellPages(DataStream* stream, const Actor* actor) const
 			stream->WriteScalar<int, ieWord>(tmp);
 			// bg1 apparently counted only the wisdom bonus, not anything extra from effects (Edwin or the ring of holiness)
 			// we always reconstruct it on load, so it doesn't matter to us
-			if (tmp && i == IE_SPELL_TYPE_PRIEST && !bonuses.empty() && (actor->GetClericLevel() || actor->GetDruidLevel())) {
+			if (actor->creVersion == CREVersion::V1_2) {
+				// pst didn't use the table, even though it kept a copy from bg1
+			} else if (tmp && i == IE_SPELL_TYPE_PRIEST && !bonuses.empty() && (actor->GetClericLevel() || actor->GetDruidLevel())) {
 				tmp += bonuses[j];
 			}
 			stream->WriteScalar<int, ieWord>(tmp);

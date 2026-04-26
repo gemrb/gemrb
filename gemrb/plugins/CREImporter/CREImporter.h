@@ -35,7 +35,6 @@ private:
 	bool IsCharacter = false;
 	ieDword CREOffset = 0;
 	ieDword VariablesCount = 0;
-	ieDword OverlayOffset = 0;
 	ieDword OverlayMemorySize = 0;
 	//used in CHR header
 	int QWPCount = 0; // weapons
