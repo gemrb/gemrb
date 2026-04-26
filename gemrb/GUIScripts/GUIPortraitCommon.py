@@ -31,36 +31,39 @@ PortraitSuffix = {
 }
 
 WindowButtonPosition = {
-	"portrait": 1,
-	"modification_portrait": 0,
-	"left": 2,
-	"modification_left": 1,
-	"right": 3,
-	"modification_right": 2,
-	"custom": 6,
-	"modification_custom": 5,
-	"done": 0,
-	"modification_done": 3,
-	"back": 5,
-	"modification_cancel": 4,
-	"custom_portrait": 6,
-	"modification_custom_portrait": 10,
-	"custom_done": 6,
-	"modification_custom_done": 10,
-	"custom_cancel": 7,
-	"modification_custom_cancel": 11,
-	"custom_portrait_list": 4,
-	"modification_custom_portrait_list": 3,
+	"Portrait": 1,
+	"Left": 2,
+	"Right": 3,
+	"Custom": 6,
+	"Done": 0,
+	"Back": 5,
+	"CustomPortrait": 6,
+	"CustomDone": 6,
+	"CustomCancel": 7,
+	"CustomPortraitList": 4,
 }
 
 def OnLoad(PortraitModification = False):
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
-	global Gender, IsPortraitModification
+	global Gender, IsPortraitModification, WindowButtonPosition
 	
 	IsPortraitModification = PortraitModification
 	# Window
 	if IsPortraitModification:
 		AppearanceWindow = GemRB.LoadWindow(18, "GUIREC")
+		WindowButtonPosition = {
+			"Portrait": 0,
+			"Left": 1,
+			"Right": 2,
+			"Custom": 5,
+			"Done": 3,
+			"Back": 5,
+			"Cancel": 4,
+			"CustomPortrait": 10,
+			"CustomDone": 10,
+			"CustomCancel": 11,
+			"CustomPortraitList": 3,
+		}
 	else:
 		AppearanceWindow = GemRB.LoadWindow(11, "GUICG")
 
@@ -85,32 +88,29 @@ def OnLoad(PortraitModification = False):
 	else:
 		RandomPortrait()
 	
-	ButtonDictionaryPrefix = ""
-	if IsPortraitModification:
-		ButtonDictionaryPrefix = "modification_"
 	# Controls
-	PortraitButton = AppearanceWindow.GetControl(WindowButtonPosition[ButtonDictionaryPrefix+"portrait"])
+	PortraitButton = AppearanceWindow.GetControl(WindowButtonPosition["Portrait"])
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	PortraitButton.SetState(IE_GUI_BUTTON_LOCKED)
 
-	LeftButton = AppearanceWindow.GetControl(WindowButtonPosition[ButtonDictionaryPrefix+"left"])
+	LeftButton = AppearanceWindow.GetControl(WindowButtonPosition["Left"])
 	LeftButton.SetState(IE_GUI_BUTTON_ENABLED)
 	LeftButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	LeftButton.OnPress(PortraitButtonLeftPress)
 	
-	RightButton = AppearanceWindow.GetControl(WindowButtonPosition[ButtonDictionaryPrefix+"right"])
+	RightButton = AppearanceWindow.GetControl(WindowButtonPosition["Right"])
 	RightButton.SetState(IE_GUI_BUTTON_ENABLED)
 	RightButton.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	RightButton.OnPress(PortraitButtonRightPress)
 	
 	if IsPortraitModification:
-		CancelButton = AppearanceWindow.GetControl(WindowButtonPosition[ButtonDictionaryPrefix+"cancel"])
+		CancelButton = AppearanceWindow.GetControl(WindowButtonPosition["Cancel"])
 		CancelButton.SetState(IE_GUI_BUTTON_ENABLED)
 		CancelButton.OnPress(AppearanceWindow.Close)
 		CancelButton.SetText(13727)
 		CancelButton.MakeEscape()
 	else:
-		BackButton = AppearanceWindow.GetControl(WindowButtonPosition[ButtonDictionaryPrefix+"back"])
+		BackButton = AppearanceWindow.GetControl(WindowButtonPosition["Back"])
 		BackButton.SetText(15416)
 		BackButton.MakeEscape()
 		if GameCheck.IsBG1OrEE():
@@ -119,12 +119,12 @@ def OnLoad(PortraitModification = False):
 		else:
 			BackButton.OnPress(PortraitBackPress)
 	
-	CustomButton = AppearanceWindow.GetControl(WindowButtonPosition[ButtonDictionaryPrefix+"custom"])
+	CustomButton = AppearanceWindow.GetControl(WindowButtonPosition["Custom"])
 	CustomButton.SetText(17545)
 	CustomButton.SetState(IE_GUI_BUTTON_ENABLED)
 	CustomButton.OnPress(PortraitCustomPress)
 	
-	DoneButton = AppearanceWindow.GetControl(WindowButtonPosition[ButtonDictionaryPrefix+"done"])
+	DoneButton = AppearanceWindow.GetControl(WindowButtonPosition["Done"])
 	if not IsPortraitModification and GameCheck.IsIWD2():
 		DoneButton.SetText(36789)
 	else:
@@ -198,7 +198,7 @@ def PortraitButtonLeftPress():
 
 # Button custom done
 def PortraitButtonCustomDone():
-	if not IsPortraitModification:
+	if IsPortraitModification:
 		pc = GemRB.GameGetSelectedPCSingle()
 		GemRB.FillPlayerInfo(pc, PortraitList1.QueryText(), PortraitList2.QueryText())
 		if CustomWindow:
@@ -314,10 +314,7 @@ def PortraitCommonLargeCustom():
 	Label = Window.GetControl(0x10000007)
 	Label.SetText(Portrait)
 
-	ButtonDictionaryPrefix = ""
-	if IsPortraitModification:
-		ButtonDictionaryPrefix = "modification_"
-	Button = Window.GetControl(WindowButtonPosition[ButtonDictionaryPrefix+"custom_portrait"])
+	Button = Window.GetControl(WindowButtonPosition["CustomPortrait"])
 
 	if Portrait == "":
 		Portrait = EmptyPortrait["medium"]
@@ -356,10 +353,7 @@ def PortraitCommonSmallCustom():
 	Label = Window.GetControl(0x10000008)
 	Label.SetText(Portrait)
 
-	ButtonDictionaryPrefix = ""
-	if IsPortraitModification:
-		ButtonDictionaryPrefix = "modification_"
-	Button = Window.GetControl(WindowButtonPosition[ButtonDictionaryPrefix+"custom_portrait"])
+	Button = Window.GetControl(WindowButtonPosition["CustomPortrait"])
 
 	if Portrait == "":
 		Portrait = EmptyPortrait["small"]
@@ -393,10 +387,7 @@ def PortraitCustomPress():
 	else:
 		CustomWindow = Window = GemRB.LoadWindow(18, "GUICG")
 
-	ButtonDictionaryPrefix = ""
-	if IsPortraitModification:
-		ButtonDictionaryPrefix = "modification_"
-	ButtonDone = Window.GetControl(WindowButtonPosition[ButtonDictionaryPrefix+"custom_done"])
+	ButtonDone = Window.GetControl(WindowButtonPosition["CustomDone"])
 	ButtonDone.SetText(11973)
 	ButtonDone.MakeDefault()
 
@@ -408,7 +399,7 @@ def PortraitCustomPress():
 	else:
 		ButtonDone.SetState(IE_GUI_BUTTON_DISABLED)
 
-	ButtonCancel = Window.GetControl(WindowButtonPosition[ButtonDictionaryPrefix + "custom_cancel"])
+	ButtonCancel = Window.GetControl(WindowButtonPosition["CustomCancel"])
 	if IsPortraitModification:
 		ButtonCancel.SetText(13727)
 		ButtonCancel.MakeEscape()
@@ -444,7 +435,7 @@ def PortraitCustomPress():
 	PortraitList1.OnSelect(PortraitCommonLargeCustom)
 	PortraitList1.SetVarAssoc("Row1", RowCount1)
 
-	PortraitList2 = Window.GetControl(WindowButtonPosition[ButtonDictionaryPrefix + "custom_portrait_list"])
+	PortraitList2 = Window.GetControl(WindowButtonPosition["CustomPortraitList"])
 	RowCount2 = len(PortraitList2.ListResources(CHR_PORTRAITS, 0))
 	PortraitList2.OnSelect(PortraitCommonSmallCustom)
 	PortraitList2.SetVarAssoc("Row2", RowCount2)
