@@ -2030,7 +2030,11 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 	stream->WriteResRef(smallPortrait);
 	stream->WriteResRef(actor->LargePortrait);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_REPUTATION]);
-	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_HIDEINSHADOWS]);
+	if (actor->creVersion == CREVersion::V2_2) {
+		stream->WriteFilling(1);
+	} else {
+		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_HIDEINSHADOWS]);
+	}
 	//from here it differs, slightly
 	stream->WriteScalar<int, ieWord>(actor->AC.GetNatural());
 	//iwd2 doesn't store this a second time,
@@ -2108,8 +2112,7 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 	if (actor->creVersion == CREVersion::V2_2) {
 		//this is rather fuzzy
 		//turnundead level, + 33 bytes of zero
-		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TURNUNDEADLEVEL]);
-		stream->WriteFilling(33);
+		stream->WriteFilling(34);
 		//total levels
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASSLEVELSUM]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVELBARBARIAN]);
