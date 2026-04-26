@@ -1546,8 +1546,9 @@ void CREImporter::GetActorIWD2(Actor* act)
 		str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_HATEDRACE2 + i]);
 	}
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SUBRACE]);
-	//skipping 2 bytes, one is SEX (could use it for sounds)
-	str->ReadScalar(tmpWord);
+	// skipping byte
+	str->ReadScalar(tmpByte);
+	str->Read(&act->ignoredFields.IgnoredGender, 1);
 
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STR]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INT]);
@@ -2182,7 +2183,7 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		}
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SUBRACE]);
 		stream->WriteFilling(1); //unknown
-		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
+		stream->Write(&actor->ignoredFields.IgnoredGender, 1);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_STR]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_INT]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_WIS]);
