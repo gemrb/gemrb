@@ -103,6 +103,10 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 	SetMainLogLevel(DEBUG);
 	// no need for AddLogWriter(createStdioLogWriter()) — already done by MapTest
 	SaveGameTest::gemrb = new Interface(std::move(cfg));
+	bool iwd2 = core->HasFeature(GFFlags::RULES_3ED);
+	if (iwd2) {
+		Actor::SetDefaultActions(1, ACT_DEFEND, ACT_WEAPON1, ACT_OFFHAND);
+	}
 
 	///////////////////////////
 	// LOAD the test save
@@ -117,7 +121,6 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 	}
 
 	// set PlayMode?
-	bool iwd2 = core->HasFeature(GFFlags::RULES_3ED);
 	core->LoadGame(save, iwd2 ? GAMVersion::IWD2 : GAMVersion::GemRB);
 	Game* game = core->GetGame();
 	ASSERT_TRUE(game != nullptr);
