@@ -53,6 +53,7 @@ namespace GemRB {
 #define ACT_SKILLS     25
 #define ACT_WILDERNESS 26
 #define ACT_DANCE      27
+#define ACT_OFFHAND    28
 //gui navigation (scrolling button rows left or right)
 #define ACT_LEFT      32
 #define ACT_RIGHT     33
