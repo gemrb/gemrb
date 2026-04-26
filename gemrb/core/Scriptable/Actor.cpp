@@ -3042,7 +3042,7 @@ void Actor::RefreshPCStats()
 	//get the wspattack bonuses for proficiencies
 	const ITMExtHeader* header = GetWeapon(false);
 
-	if (header) {
+	if (header && !third) {
 		// haste and monk bonuses are added on top, later
 		int defaultattacks = 2 + 2 * IsDualWielding();
 		bool eligibleForFullBonus = false;
