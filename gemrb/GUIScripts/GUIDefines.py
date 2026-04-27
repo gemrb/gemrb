@@ -311,7 +311,7 @@ STR_LOADMOS  = 0
 STR_AREANAME = 1
 STR_TEXTSCREEN = 2
 
-#game integers
+# game constants for GemRB.GetSystemVariable
 SV_BPP = 0
 SV_WIDTH = 1
 SV_HEIGHT = 2
@@ -319,6 +319,7 @@ SV_GAMEPATH = 3
 SV_TOUCH = 4
 SV_SAVEPATH = 5
 SV_INICONF = 6
+SV_UNHARDCODEDPATH = 7
 
 # GUIEnhancements bits
 GE_CONTAINERS = 1
