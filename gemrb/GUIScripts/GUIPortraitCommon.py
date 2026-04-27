@@ -247,15 +247,14 @@ def SaveCustomPortrait():
 
 	if AppearanceWindow:
 		AppearanceWindow.Close()
-		
+	PortraitLarge = PortraitList1.QueryText()
+	PortraitSmall = PortraitList2.QueryText()
 	if IsPortraitModification:
 		Pc = GemRB.GameGetSelectedPCSingle()
-		GemRB.FillPlayerInfo(Pc, PortraitList1.QueryText(), PortraitList2.QueryText())
+		GemRB.FillPlayerInfo(Pc, PortraitLarge, PortraitSmall)
 		return
 	else:
-		PortraitLarge = PortraitList1.QueryText()
 		GemRB.SetToken("LargePortrait", PortraitLarge)
-		PortraitSmall = PortraitList2.QueryText()
 		GemRB.SetToken("SmallPortrait", PortraitSmall)
 		if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
 			GemRB.SetNextScript("CharGen2")
@@ -276,11 +275,12 @@ def PortraitCustomAbort():
 
 # This is for applying
 def PortraitApplySelection():
-	global AppearanceWindow, LastPortrait
+	global AppearanceWindow, LastPortrait, PortraitsTable
 	if AppearanceWindow:
 		AppearanceWindow.Close ()
-	PortraitTable = GemRB.LoadTable("pictures")
-	PortraitName = PortraitTable.GetRowName(LastPortrait)
+	if PortraitsTable == 0:
+		PortraitsTable = GemRB.LoadTable("PICTURES")
+	PortraitName = PortraitsTable.GetRowName(LastPortrait)
 	GemRB.SetToken("SmallPortrait", PortraitName + PortraitSuffix["small"])
 	GemRB.SetToken("LargePortrait", PortraitName + PortraitSuffix["large"])
 	if not IsPortraitModification and (GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo()):
