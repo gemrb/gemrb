@@ -9644,6 +9644,7 @@ PyDoc_STRVAR(GemRB_GetSystemVariable__doc,
     * SV_TOUCH = 4 - are we using touch input mode?\n\
     * SV_SAVEPATH = 5 - path to the parent of save/mpsave/bpsave dir\n\
     * SV_INICONF = 6 - path to our copy of the game ini file\n\
+    * SV_UNHARDCODEDPATH = 7 - path to our unhardcoded/ dir\n\
 \n\
 **Return value:** -1 if the index is invalid, otherwise the requested value.\n\
 \n\
@@ -9676,6 +9677,9 @@ static PyObject* GemRB_GetSystemVariable(PyObject* /*self*/, PyObject* args)
 			break;
 		case SV_INICONF:
 			path = core->INIConfig;
+			break;
+		case SV_UNHARDCODEDPATH:
+			path = core->config.GemRBUnhardcodedPath;
 			break;
 		default:
 			value = -1;

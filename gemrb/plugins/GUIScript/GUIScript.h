@@ -22,6 +22,7 @@ enum {
 	SV_TOUCH,
 	SV_SAVEPATH,
 	SV_INICONF,
+	SV_UNHARDCODEDPATH,
 };
 
 class GUIScript : public ScriptEngine {
