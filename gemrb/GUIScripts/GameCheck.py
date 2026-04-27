@@ -83,7 +83,7 @@ def HasTOTSC ():
 	return GemRB.HasResource ("toscst", RES_2DA)
 
 # there are no marker files, so check weidu.log
-def HasWideScreenMod ():
+def HasMod (modName):
 	gamePath = GemRB.GetSystemVariable (SV_GAMEPATH)
 	weiduLogPath = os.path.join (gamePath, "weidu.log")
 	try:
@@ -95,9 +95,16 @@ def HasWideScreenMod ():
 
 	ret = False
 	for line in weiduLog:
-		if "~WIDESCREEN/" in line and not "Uninstalled" in line:
+		if modName in line and not "Uninstalled" in line:
 			ret = True
 			break
 
 	weiduLog.close ()
 	return ret
+
+# there are no marker files, so check weidu.log
+def HasWideScreenMod ():
+	return HasMod ("~WIDESCREEN/")
+
+def HasTobEx ():
+	return HasMod ("~TOBEX/")
