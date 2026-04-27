@@ -650,13 +650,12 @@ Interface::Interface(CoreSettings&& cfg)
 	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
 	path_t pathString = fmt::format("GemRB_Data_Path = {}", unhardcodedTypePath);
 	strpath = PathJoin(config.GamePath, "gemrb_path.txt");
-	FileStream* pathFile = new FileStream();
+	FileStream pathFile;
 	// don't abort if something goes wrong, since it should never happen and it's not critical
-	if (pathFile->Create(strpath)) {
-		pathFile->Write(pathString.c_str(), pathString.length());
-		pathFile->Close();
+	if (pathFile.Create(strpath)) {
+		pathFile.Write(pathString.c_str(), pathString.length());
+		pathFile.Close();
 	}
-	delete pathFile;
 
 	EventMgr::EventCallback ToggleConsole = [this](const Event& e) {
 		if (e.type != Event::KeyDown) return false;
