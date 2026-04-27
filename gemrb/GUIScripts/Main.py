@@ -48,3 +48,47 @@ def Init():
 		frame = {'x' : 0, 'y' : 0, 'w' : 0, 'h' : 0}
 		sb = GemRB.CreateView (-1, IE_GUI_SCROLLBAR, frame, SBArgs)
 		sb.AddAlias ("SBGLOB")
+
+	# tobex invented racetext, but then the ees used it too and changed the layout ...
+	# we assume that anyone with tobex installed wants to play with GemRB, so move
+	# it away for compatibility
+	# Fishing for trouble and Item revisions also install it, though it could be from
+	# biffing the tobex file
+	if GameCheck.IsBG2 ():
+		FixRaceTable ()
+
+# we assume that if a bad racetext.2da file is in a biff, it is also in override
+def FixRaceTable ():
+	import os
+	gamePath = GemRB.GetSystemVariable (SV_GAMEPATH)
+
+	# is there a bad copy in the override?
+	path = os.path.join (gamePath, "override")
+	path = os.path.join (path, "racetext.2da")
+	bad = False
+	found = False
+	try:
+		with open (path, encoding="latin-1") as table:
+			found = True
+			table.readline()
+			table.readline()
+			if "STRREF" in table.readline():
+				bad = True
+	except FileNotFoundError:
+		pass
+	if bad:
+		os.rename (path, path + ".tobex")
+	elif not found:
+		# the file is ours, compatible or not present
+		return
+
+	# however the file might be in a biff as well, so we
+	# need to put our own in place
+	import shutil
+	unhPath = GemRB.GetSystemVariable (SV_UNHARDCODEDPATH)
+	ourPath = os.path.join (unhPath, "unhardcoded", "bg2", "racetext.2da")
+	try:
+		shutil.copy (ourPath, path)
+		shutil.copy (ourPath, path + ".gemrb") # so users can easily switch back and forth
+	except:
+		print("Manually place the GemRB version of racetext.2da into override/")
