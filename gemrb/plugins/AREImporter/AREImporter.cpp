@@ -1577,7 +1577,9 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	}
 
 	Log(MESSAGE, "AREImporter", "Loading variables");
-	core->LoadInitialValues(resRef, map->locals);
+	if (VariablesCount == 0) {
+		core->LoadInitialValues(resRef, map->locals);
+	}
 	str->Seek(VariablesOffset, GEM_STREAM_START);
 	for (ieDword i = 0; i < VariablesCount; i++) {
 		ieVariable Name;
