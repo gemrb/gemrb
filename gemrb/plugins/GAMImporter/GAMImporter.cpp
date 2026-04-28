@@ -1213,17 +1213,18 @@ int GAMImporter::PutGame(DataStream* stream, Game* game) const
 		return ret;
 	}
 
-	ret = PutJournals(stream, game);
-	if (ret) {
-		return ret;
-	}
-
 	if (core->HasFeature(GFFlags::HAS_KAPUTZ)) {
 		ret = PutKillVars(stream, game);
 		if (ret) {
 			return ret;
 		}
 	}
+
+	ret = PutJournals(stream, game);
+	if (ret) {
+		return ret;
+	}
+
 	if (FamiliarsOffset) {
 		ret = PutFamiliars(stream, game);
 		if (ret) {
