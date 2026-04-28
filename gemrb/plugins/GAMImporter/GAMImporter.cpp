@@ -724,7 +724,7 @@ int GAMImporter::PutKillVars(DataStream* stream, const Game* game) const
 {
 	for (const auto& entry : game->kaputz) {
 		//global variables are locals for game, that's why the local/global confusion
-		stream->WriteVariableUC(ieVariable(entry.first));
+		stream->WriteVariableUC(entry.first);
 		stream->WriteFilling(8);
 		stream->WriteDword(entry.second);
 		//40 bytes of empty crap
