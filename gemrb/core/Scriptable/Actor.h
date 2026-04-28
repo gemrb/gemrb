@@ -345,6 +345,7 @@ struct IgnoredFields {
 	ieWord pstWord1 = 0; // 20 in the test save
 	ieWord pstWord2 = 0; // 8 for pcs, 4 for TNO in test save
 	std::array<ieByte, 7> pstBG1colors {};
+	std::array<ieByte, 36> pstDwords {};
 	ieWord saveGlobalID = 0;
 	ieWord savelocalID = 0;
 	Point viewPos;
