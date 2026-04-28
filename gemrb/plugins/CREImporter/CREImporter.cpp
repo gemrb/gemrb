@@ -2319,7 +2319,8 @@ int CREImporter::PutActorPST(DataStream* stream, const Actor* actor) const
 	stream->WriteDword(actor->AppearanceFlags);
 
 	for (int i = 0; i < 7; i++) {
-		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_COLORS + i]);
+		// ignore IE_COLORCOUNT conflict with IE_HAIR_COLOR by ignoring the latter, just like on load
+		stream->WriteScalar<Actor::stat_t, ieWord>(i < 6 ? actor->BaseStats[IE_COLORS + i] : 0);
 	}
 	stream->Write(actor->ignoredFields.pstColorBytes, 10);
 	stream->WriteFilling(16);
