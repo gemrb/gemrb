@@ -851,15 +851,16 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_MAXHITPOINTS]);
 	str->ReadDword(act->BaseStats[IE_ANIMATION_ID]); //animID is a dword
 
-	std::array<ieByte, 7> tmp2;
-	str->ReadArray(tmp2);
-	for (size_t i = 0; i < tmp2.size(); i++) {
-		ieDword t = tmp2[i];
-		// apply RANDCOLR.2DA transformation
-		SetupColor(t);
-		t |= t << 8;
-		t |= t << 16;
-		act->BaseStats[IE_COLORS + i] = t;
+	str->ReadArray(act->ignoredFields.pstBG1colors);
+	if (act->creVersion != CREVersion::V1_2) {
+		for (size_t i = 0; i < act->ignoredFields.pstBG1colors.size(); i++) {
+			ieDword t = act->ignoredFields.pstBG1colors[i];
+			// apply RANDCOLR.2DA transformation
+			SetupColor(t);
+			t |= t << 8;
+			t |= t << 16;
+			act->BaseStats[IE_COLORS + i] = t;
+		}
 	}
 
 	str->Read(&TotSCEFF, 1);
@@ -2020,8 +2021,13 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_MAXHITPOINTS]);
 	stream->WriteDword(actor->BaseStats[IE_ANIMATION_ID]);
 	for (int i = 0; i < 7; i++) {
-		Signature[i] = (char) actor->BaseStats[IE_COLORS + i];
+		if (actor->creVersion == CREVersion::V1_2) {
+			Signature[i] = actor->ignoredFields.pstBG1colors[i];
+		} else {
+			Signature[i] = (char) actor->BaseStats[IE_COLORS + i];
+		}
 	}
+
 	//old effect type
 	Signature[7] = TotSCEFF;
 	stream->Write(Signature, 8);
