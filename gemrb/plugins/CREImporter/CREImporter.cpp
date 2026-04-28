@@ -1045,7 +1045,10 @@ void CREImporter::GetActorPST(Actor* act)
 	}
 	act->BaseStats[IE_COLORCOUNT] = colorCount;
 	str->Read(act->ignoredFields.pstColorBytes, 10); // color location in IESDP, sort of a palette index and flags
-	str->Seek(21, GEM_CURRENT_POS);
+	str->Seek(16, GEM_CURRENT_POS);
+	str->ReadWord(act->ignoredFields.pstWord1);
+	str->ReadWord(act->ignoredFields.pstWord2);
+	str->Seek(1, GEM_CURRENT_POS);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_SPECIES]); // offset: 0x311
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TEAM]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_FACTION]);
@@ -2313,7 +2316,10 @@ int CREImporter::PutActorPST(DataStream* stream, const Actor* actor) const
 		stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_COLORS + i]);
 	}
 	stream->Write(actor->ignoredFields.pstColorBytes, 10);
-	stream->WriteFilling(21);
+	stream->WriteFilling(16);
+	stream->WriteWord(actor->ignoredFields.pstWord1);
+	stream->WriteWord(actor->ignoredFields.pstWord2);
+	stream->WriteFilling(1);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SPECIES]);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_TEAM]);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_FACTION]);
