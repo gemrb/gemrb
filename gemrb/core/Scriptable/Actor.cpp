@@ -1211,7 +1211,7 @@ static void pcf_stat_wis(Actor* actor, ieDword oldValue, ieDword newValue)
 		static AutoTable luckbon = gamedata->LoadTable("luckbon", true);
 		if (luckbon) {
 			int oldBonus = luckbon->QueryFieldSigned<int>(oldValue, 0);
-			actor->BaseStats[IE_LUCK] += luckbon->QueryFieldSigned<int>(newValue, 0) - oldBonus;
+			actor->Modified[IE_LUCK] += luckbon->QueryFieldSigned<int>(newValue, 0) - oldBonus;
 		}
 	}
 }
