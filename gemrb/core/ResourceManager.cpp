@@ -99,6 +99,16 @@ bool ResourceManager::AddSource(const path_t& path, const std::string& descripti
 	return true;
 }
 
+void ResourceManager::AddPathToSource(const path_t& path, const std::string& description)
+{
+	for (auto& path2 : searchPath) {
+		if (description == path2->GetDescription()) {
+			path2->MergeBifsFromPath(path);
+			break;
+		}
+	}
+}
+
 static void PrintPossibleFiles(std::string& buffer, StringView ResRef, const TypeID* type)
 {
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);

@@ -35,6 +35,7 @@ public:
 	 * @param[in] type Plugin type used for source.
 	 **/
 	bool AddSource(const path_t& path, const std::string& description, PluginID type, int flags = 0);
+	void AddPathToSource(const path_t& path, const std::string& description);
 
 	/** returns true if resource exists */
 	bool Exists(const String& resRef, SClass_ID type, bool silent = false) const;

@@ -9,6 +9,7 @@
 
 #include "Logging/Logging.h"
 #include "Streams/FileStream.h"
+#include "System/FileFilters.h"
 
 using namespace GemRB;
 
@@ -162,6 +163,35 @@ bool KEYImporter::Open(const path_t& resfile, std::string desc)
 	Log(MESSAGE, "KEYImporter", "Resources Loaded...");
 	delete f;
 	return true;
+}
+
+// If we find BIFs with the same name in the given path, use
+// them instead. This allows language-aware overrides.
+void KEYImporter::MergeBifsFromPath(const path_t& path)
+{
+	DirectoryIterator dirIt { path };
+	dirIt.SetFilterPredicate(std::make_shared<ExtFilter>("bif"));
+
+	do {
+		BIFEntry bifEntry;
+		const path_t& name = dirIt.GetName();
+		bifEntry.found = true;
+		bifEntry.name = name;
+		bifEntry.path = PathJoin(path, name);
+
+		auto checkName = fmt::format("data/{}", name);
+		auto lookup =
+			std::find_if(biffiles.begin(), biffiles.end(), [&checkName](const BIFEntry& bif) {
+				// names in biffiles have a trailing NUL
+				auto bifName = bif.name;
+				bifName.resize(checkName.size());
+				return bifName == checkName;
+			});
+
+		if (lookup != biffiles.end()) {
+			*lookup = bifEntry;
+		}
+	} while (++dirIt);
 }
 
 bool KEYImporter::HasResource(StringView resname, SClass_ID type)

@@ -21,9 +21,9 @@ class DataStream;
 
 struct BIFEntry {
 	path_t name;
-	ieWord BIFLocator;
+	ieWord BIFLocator = 0;
 	path_t path;
-	int cd;
+	int cd = 0;
 	bool found;
 };
 
@@ -73,6 +73,7 @@ private:
 
 public:
 	bool Open(const path_t& file, std::string desc) override;
+	void MergeBifsFromPath(const path_t& directory) override;
 	/* predicts the availability of a resource */
 	bool HasResource(StringView resname, SClass_ID type) override;
 	bool HasResource(StringView resname, const ResourceDesc& type) override;
