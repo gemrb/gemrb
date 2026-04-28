@@ -384,6 +384,12 @@ Interface::Interface(CoreSettings&& cfg)
 		ThrowException("The path must point to a game directory with a readable chitin.key file.");
 	}
 
+	// Inject language specific data BIFs
+	auto languageDataPath = PathJoin(config.GamePath, config.GameLanguagePath, "data");
+	if (DirExists(languageDataPath)) {
+		gamedata->AddPathToSource(languageDataPath, "chitin.key");
+	}
+
 	// most of the old gemrb override files can be found here,
 	// so they have a lower priority than the game files and can more easily be modded
 	path = PathJoin(config.GemRBUnhardcodedPath, "unhardcoded", config.GameType);
