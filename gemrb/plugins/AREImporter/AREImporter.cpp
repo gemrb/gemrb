@@ -2298,11 +2298,8 @@ int AREImporter::PutVariables(DataStream* stream, const Map* map) const
 {
 	for (const auto& key : map->locals.keys()) {
 		auto entry = *map->locals.find(key);
-		size_t len = entry.first.length();
-		stream->Write(entry.first.c_str(), len);
-		if (len < 40) {
-			stream->WriteFilling(40 - len);
-		}
+		stream->WriteVariableUC(entry.first);
+		stream->WriteFilling(8);
 		stream->WriteDword(entry.second);
 		//40 bytes of empty crap
 		stream->WriteFilling(40);
