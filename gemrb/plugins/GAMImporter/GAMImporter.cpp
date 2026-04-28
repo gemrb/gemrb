@@ -194,8 +194,11 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 		newGame->AddNPC(actor);
 	}
 
-	// load initial values from var.var
-	core->LoadInitialValues("GLOBAL", newGame->locals);
+	// load initial values from var.var, but only for new games,
+	// since we need to maintain the order
+	if (GlobalCount == 0) {
+		core->LoadInitialValues("GLOBAL", newGame->locals);
+	}
 
 	//Loading Global Variables
 	ieVariable Name;
@@ -210,7 +213,9 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 	}
 	if (core->HasFeature(GFFlags::HAS_KAPUTZ)) {
 		// load initial values from var.var
-		core->LoadInitialValues("KAPUTZ", newGame->kaputz);
+		if (KillVarsCount == 0) {
+			core->LoadInitialValues("KAPUTZ", newGame->kaputz);
+		}
 		str->Seek(KillVarsOffset, GEM_STREAM_START);
 		for (unsigned int i = 0; i < KillVarsCount; i++) {
 			ieDword Value;
