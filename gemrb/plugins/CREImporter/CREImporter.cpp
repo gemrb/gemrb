@@ -1012,7 +1012,7 @@ void CREImporter::GetActorPST(Actor* act)
 	ReadScript(act, SCR_GENERAL);
 	ReadScript(act, SCR_DEFAULT);
 
-	str->Seek(36, GEM_CURRENT_POS);
+	str->ReadArray(act->ignoredFields.pstDwords);
 	//the overlays are not fully decoded yet
 	//they are a kind of effect block (like our vvclist)
 	// NOTE: rendered obsolete by our implementation of pst fx_overlay
@@ -2300,7 +2300,7 @@ int CREImporter::PutActorBG(DataStream* stream, const Actor* actor) const
 
 int CREImporter::PutActorPST(DataStream* stream, const Actor* actor) const
 {
-	stream->WriteFilling(36); // 9*4 totally unknown
+	stream->WriteArray(actor->ignoredFields.pstDwords);
 	stream->WriteDword(actor->ignoredFields.pstOverlayOffset);
 	stream->WriteDword(OverlayMemorySize);
 	stream->WriteDword(actor->BaseStats[IE_XP_MAGE]);
