@@ -342,6 +342,7 @@ struct IgnoredFields {
 	ieDword pstOverlayOffset = 0; // obviated by our fx_overlay
 	ieWord pstWord1 = 0; // 20 in the test save
 	ieWord pstWord2 = 0; // 8 for pcs, 4 for TNO in test save
+	std::array<ieByte, 7> pstBG1colors {};
 	ieWord saveGlobalID = 0;
 	ieWord savelocalID = 0;
 	Point viewPos;
