@@ -333,6 +333,8 @@ struct IgnoredFields {
 	/**
 	 * We don't know how to profit of them, but PST needs them saved.
 	 * Otherwise, some actors are badly drawn, like TNO but not Morte.
+	 * The first 3 bytes are unknown, but supposedly also related to colors.
+	 * The other 7 (as many as color stats) are marked as color slot/placement, with:
 	 * bit 0 for a "plasma" effect: palette color entries shift by one index position per cycle update
 	 * bit 1 is for enabling pulsating for the particular color range (we store them in IE_COLOR*)
 	 *   it periodically reduces brightness to ~50% and back to full
