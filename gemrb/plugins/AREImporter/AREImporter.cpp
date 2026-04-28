@@ -2296,7 +2296,8 @@ int AREImporter::PutEntrances(DataStream* stream, const Map* map) const
 
 int AREImporter::PutVariables(DataStream* stream, const Map* map) const
 {
-	for (const auto& entry : map->locals) {
+	for (const auto& key : map->locals.keys()) {
+		auto entry = *map->locals.find(key);
 		size_t len = entry.first.length();
 		stream->Write(entry.first.c_str(), len);
 		if (len < 40) {

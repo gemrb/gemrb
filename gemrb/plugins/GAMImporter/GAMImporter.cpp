@@ -722,8 +722,9 @@ int GAMImporter::PutPlaneLocations(DataStream* stream, Game* game) const
 //only in PST
 int GAMImporter::PutKillVars(DataStream* stream, const Game* game) const
 {
-	for (const auto& entry : game->kaputz) {
+	for (const auto& key : game->kaputz.keys()) {
 		//global variables are locals for game, that's why the local/global confusion
+		auto entry = *game->kaputz.find(key);
 		stream->WriteVariableUC(entry.first);
 		stream->WriteFilling(8);
 		stream->WriteDword(entry.second);
