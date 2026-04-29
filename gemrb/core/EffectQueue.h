@@ -16,6 +16,7 @@
 
 #include "Effect.h"
 
+#include <array>
 #include <cstdlib>
 #include <list>
 #include <memory>
@@ -186,6 +187,38 @@ void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes);
 
 /** Check if opcode is for an effect that takes a color slot as parameter. */
 bool IsColorslotEffect(int opcode);
+
+/** Initializes table of available spell Effects used by all the queues. */
+/** The available effects should already be registered by the effect plugins */
+struct GEM_EXPORT Globals {
+	static constexpr int MAX_EFFECTS = 512;
+	std::array<EffectDesc, MAX_EFFECTS> Opcodes;
+
+	int pstflags = false;
+	bool iwd2fx = false;
+
+	static Globals& Get()
+	{
+		static Globals globs;
+		return globs;
+	}
+
+	static void ResolveEffectRef(EffectRef& effectReference)
+	{
+		Get().ResolveEffectRefImp(effectReference);
+	}
+
+	void Init(bool clear);
+
+private:
+	Globals()
+	{
+		Init(false);
+	}
+
+	// nonstatic, this actually depends on Globals() indirectly
+	void ResolveEffectRefImp(EffectRef& effectReference) const;
+};
 
 /**
  * @class EffectQueue

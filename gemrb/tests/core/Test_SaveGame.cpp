@@ -107,6 +107,8 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 	if (iwd2) {
 		Actor::SetDefaultActions(1, ACT_DEFEND, ACT_WEAPON1, ACT_OFFHAND);
 	}
+	// reinit effects, since they're data dependant
+	Globals::Get().Init(true);
 
 	///////////////////////////
 	// LOAD the test save

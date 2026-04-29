@@ -62,97 +62,77 @@ static EffectDesc* FindEffect(StringView effectname)
 	return (EffectDesc*) tmp;
 }
 
-/** Initializes table of available spell Effects used by all the queues. */
-/** The available effects should already be registered by the effect plugins */
+void Globals::Init(bool clear)
+{
+	pstflags = core->HasFeature(GFFlags::PST_STATE_FLAGS);
+	iwd2fx = core->HasFeature(GFFlags::ENHANCED_EFFECTS);
 
-struct Globals {
-	static constexpr int MAX_EFFECTS = 512;
-	EffectDesc Opcodes[MAX_EFFECTS];
-
-	int pstflags = false;
-	bool iwd2fx = false;
-
-	static const Globals& Get()
-	{
-		static Globals globs;
-		return globs;
+	int eT = core->LoadSymbol("effects");
+	if (eT < 0) {
+		error("EffectQueue", "A critical scripting file is missing!");
+	}
+	auto effectsTable = core->GetSymbol(eT);
+	if (!effectsTable) {
+		error("EffectQueue", "A critical scripting file is damaged!");
 	}
 
-	static void ResolveEffectRef(EffectRef& effectReference)
-	{
-		Get().ResolveEffectRefImp(effectReference);
+	if (clear) {
+		Opcodes.fill({});
 	}
 
-private:
-	Globals()
-	{
-		pstflags = core->HasFeature(GFFlags::PST_STATE_FLAGS);
-		iwd2fx = core->HasFeature(GFFlags::ENHANCED_EFFECTS);
+	AutoTable efftextTable = gamedata->LoadTable("efftext");
+	int maxOpcode = core->GetDictionary().Get("MaxFXOpcode", 999999);
+	for (int i = 0; i < MAX_EFFECTS; i++) {
+		const auto& effectname = effectsTable->GetValue(i);
+		if (effectname.empty()) continue; // past the table size or undefined effect
 
-		AutoTable efftextTable = gamedata->LoadTable("efftext");
+		EffectDesc* poi = FindEffect(effectname);
+		assert(poi != nullptr);
 
-		int eT = core->LoadSymbol("effects");
-		if (eT < 0) {
-			error("EffectQueue", "A critical scripting file is missing!");
+		// make sure the opcode is within original engine limits for save compatibility
+		if (i > maxOpcode) {
+			// this is fine for effects that don't linger
+			// but we don't have a good way of detecting that
+			//Log(DEBUG, "EffectQueue", "Opcode {} '{}' is higher than the original max {}! Saves will be incompatible", i, effectname, maxOpcode);
 		}
-		auto effectsTable = core->GetSymbol(eT);
-		if (!effectsTable) {
-			error("EffectQueue", "A critical scripting file is damaged!");
+
+		Opcodes[i] = *poi;
+
+		// reverse linking opcode number
+		// using this unused field
+		if (poi->opcode != -1 && effectname[0] != '*' && !clear) {
+			error("EffectQueue", "Clashing Opcodes FN: {} vs. {}, {}", i, poi->opcode, effectname);
 		}
+		poi->opcode = i;
 
-		int maxOpcode = core->GetDictionary().Get("MaxFXOpcode", 999999);
-		for (int i = 0; i < MAX_EFFECTS; i++) {
-			const auto& effectname = effectsTable->GetValue(i);
-			if (effectname.empty()) continue; // past the table size or undefined effect
-
-			EffectDesc* poi = FindEffect(effectname);
-			assert(poi != nullptr);
-
-			// make sure the opcode is within original engine limits for save compatibility
-			if (i > maxOpcode) {
-				// this is fine for effects that don't linger
-				// but we don't have a good way of detecting that
-				//Log(DEBUG, "EffectQueue", "Opcode {} '{}' is higher than the original max {}! Saves will be incompatible", i, effectname, maxOpcode);
+		if (!efftextTable) continue;
+		TableMgr::index_t row = efftextTable->GetRowCount();
+		while (row--) {
+			const char* ret = efftextTable->GetRowName(row).c_str();
+			int val;
+			if (valid_signednumber(ret, val) && (i == val)) {
+				Opcodes[i].Strref = efftextTable->QueryFieldAsStrRef(row, 1);
+				break;
+			} else {
+				Opcodes[i].Strref = ieStrRef::INVALID;
 			}
-
-			Opcodes[i] = *poi;
-
-			// reverse linking opcode number
-			// using this unused field
-			if (poi->opcode != -1 && effectname[0] != '*') {
-				error("EffectQueue", "Clashing Opcodes FN: {} vs. {}, {}", i, poi->opcode, effectname);
-			}
-			poi->opcode = i;
-
-			if (!efftextTable) continue;
-			TableMgr::index_t row = efftextTable->GetRowCount();
-			while (row--) {
-				const char* ret = efftextTable->GetRowName(row).c_str();
-				int val;
-				if (valid_signednumber(ret, val) && (i == val)) {
-					Opcodes[i].Strref = efftextTable->QueryFieldAsStrRef(row, 1);
-					break;
-				} else {
-					Opcodes[i].Strref = ieStrRef::INVALID;
-				}
-			}
-		}
-		core->DelSymbol(eT);
-	}
-
-	// nonstatic, this actually depends on Globals() indirectly
-	void ResolveEffectRefImp(EffectRef& effectReference) const
-	{
-		if (effectReference.opcode == -1) {
-			const EffectDesc* ref = FindEffect(StringView(effectReference.Name));
-			if (ref && ref->opcode >= 0) {
-				effectReference.opcode = ref->opcode;
-				return;
-			}
-			effectReference.opcode = -2;
 		}
 	}
-};
+	core->DelSymbol(eT);
+}
+
+// nonstatic, this actually depends on Globals() indirectly
+void Globals::ResolveEffectRefImp(EffectRef& effectReference) const
+{
+	if (effectReference.opcode == -1) {
+		const EffectDesc* ref = FindEffect(StringView(effectReference.Name));
+		if (ref && ref->opcode >= 0) {
+			effectReference.opcode = ref->opcode;
+			return;
+		}
+		effectReference.opcode = -2;
+	}
+}
 
 static EffectRef fx_unsummon_creature_ref = { "UnsummonCreature", -1 };
 static EffectRef fx_ac_vs_creature_type_ref = { "ACVsCreatureType", -1 };
