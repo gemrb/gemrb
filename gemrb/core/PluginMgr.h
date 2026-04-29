@@ -21,6 +21,7 @@
 
 #include <cstring>
 #include <map>
+#include <set>
 #include <vector>
 
 namespace GemRB {
@@ -56,11 +57,13 @@ private:
 	std::vector<void (*)(void)> cleanupFunctions;
 	using driver_map = std::map<std::string, PluginFunc>;
 	std::map<const TypeID*, driver_map> drivers;
+	std::set<PluginID> libs;
 
 public:
 	size_t GetPluginCount() const { return plugins.size(); }
 	bool IsAvailable(SClass_ID plugintype) const;
 	PluginHolder<Plugin> GetPlugin(SClass_ID plugintype) const;
+	std::set<PluginID>& GetLibs() { return libs; }
 
 
 	/**
