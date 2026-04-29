@@ -50,6 +50,7 @@ public:
 		core->SetGame(nullptr);
 		VideoDriver.reset();
 		delete gemrb;
+		PluginMgr::Get()->RunCleanup();
 	}
 };
 
