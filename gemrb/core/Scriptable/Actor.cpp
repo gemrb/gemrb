@@ -10688,7 +10688,7 @@ ieDword Actor::GetClassLevel(const ieDword isClass) const
 
 	// handle TNO's special case, a fake multiclass
 	// he always has a single class set, which throws off the level stat mapping
-	if (pstflags && GetStat(IE_SPECIFIC) == 2) {
+	if (pstflags && BaseStats[IE_SPECIFIC] == 2) {
 		classID = 10 - 1; // use F/M/T to be able to look up all three levels
 		// should we return 0 for some callers instead, emulating IsDualClassed?
 	}
