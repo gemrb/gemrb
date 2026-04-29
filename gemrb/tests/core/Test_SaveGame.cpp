@@ -24,9 +24,7 @@ const std::list<path_t> availableGameTypes { "bg1", "bg2", "bgee", "bg2ee", "pst
 const path_t saveINI = PathJoin("tests", "resources", "saves", "saveTesting.ini");
 
 struct SaveGameTest : public testing::TestWithParam<path_t> {
-	static Interface* gemrb;
 	static std::set<path_t> cfgList;
-	static bool inited;
 
 	static void SetUpTestSuite()
 	{
@@ -41,6 +39,7 @@ struct SaveGameTest : public testing::TestWithParam<path_t> {
 		}
 
 		std::string line;
+		bool inited = false;
 		while (stream->ReadLine(line) != DataStream::Error) {
 			if (line.empty() || line[0] == ';' || line[0] == '[') {
 				continue;
@@ -75,19 +74,9 @@ struct SaveGameTest : public testing::TestWithParam<path_t> {
 
 		if (!inited) GTEST_SKIP() << "Skipping test group due to no path being set in " << saveINI;
 	}
-
-	static void TearDownTestSuite()
-	{
-		// cleanup to prevent a delay and crash on exit
-		if (core) core->SetGame(nullptr);
-		VideoDriver.reset();
-		delete gemrb;
-	}
 };
 
-Interface* SaveGameTest::gemrb = nullptr;
 std::set<path_t> SaveGameTest::cfgList;
-bool SaveGameTest::inited = false;
 
 TEST_P(SaveGameTest, LoadAndResaveGameTest)
 {
@@ -102,12 +91,12 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 	ToggleLogging(true);
 	SetMainLogLevel(DEBUG);
 	// no need for AddLogWriter(createStdioLogWriter()) — already done by MapTest
-	SaveGameTest::gemrb = new Interface(std::move(cfg));
+	Interface gemrb(std::move(cfg));
 	bool iwd2 = core->HasFeature(GFFlags::RULES_3ED);
 	if (iwd2) {
 		Actor::SetDefaultActions(1, ACT_DEFEND, ACT_WEAPON1, ACT_OFFHAND);
 	}
-	// reinit effects, since they're data dependant
+	// reinit effects, since they're data dependent
 	Globals::Get().Init(true);
 
 	///////////////////////////
@@ -118,7 +107,9 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 	ASSERT_TRUE(sgi != nullptr);
 	auto save = sgi->GetSaveGame(saveName);
 	if (save == nullptr) {
+		core = nullptr;
 		VideoDriver.reset();
+		PluginMgr::Get()->RunCleanup();
 		GTEST_SKIP() << gameType << " game is missing a save game in gemrb/core/tests/resources/saves/!";
 	}
 
@@ -163,7 +154,9 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 
 	// try reseting the state a bit
 	core->SetGame(nullptr);
+	core = nullptr;
 	VideoDriver.reset();
+	PluginMgr::Get()->RunCleanup();
 }
 
 INSTANTIATE_TEST_SUITE_P(
