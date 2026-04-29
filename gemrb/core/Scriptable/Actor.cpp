@@ -10057,23 +10057,39 @@ static ieDword ResolveTableValue(const ResRef& resref, ieDword stat, ieDword mco
 	if (!tm) return 0;
 
 	TableMgr::index_t row;
+	std::string rowName;
+	bool rowKnown = false;
+
 	if (mcol == 0xff) {
 		row = stat;
+		rowKnown = true;
 	} else {
 		// fix lookup, since now the values are split across two tables
+		// we assume that the first entry found is always the super class
 		if (resref == "classes") {
 			static AutoTable table = gamedata->LoadTable("clastext", true);
 			row = table->FindTableValue(mcol, stat);
+			rowName = table->GetRowName(row);
 		} else if (resref == "racetext") {
 			static AutoTable table = gamedata->LoadTable("racedata", true);
 			row = table->FindTableValue(mcol, stat);
+			rowName = table->GetRowName(row);
 		} else {
 			row = tm->FindTableValue(mcol, stat);
+			rowKnown = true;
 		}
 		if (row == 0xffffffff) {
 			return 0;
 		}
 	}
+
+	if (!rowKnown) {
+		if (rowName.empty()) {
+			return 0;
+		}
+		row = tm->GetRowIndex(rowName);
+	}
+
 	ieDword ret;
 	if (valid_unsignednumber(tm->QueryField(row, vcol).c_str(), ret)) {
 		return ret;
