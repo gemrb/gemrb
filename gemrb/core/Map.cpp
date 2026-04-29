@@ -3601,7 +3601,7 @@ void Map::UpdateFog()
 		if (!actor->Modified[IE_EXPLORE]) continue;
 
 		int state = actor->Modified[IE_STATE_ID];
-		if (state & STATE_CANTSEE) continue;
+		if (state & STATE_CANTSEE || !actor->GetAnims()) continue;
 
 		int vis2 = actor->GetVisualRange();
 		if ((state & STATE_BLIND) || (vis2 < 2)) vis2 = 2; //can see only themselves
