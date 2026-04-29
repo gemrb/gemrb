@@ -34,6 +34,7 @@
 GameType=auto
 
 # Encoding [default|japanese|korean|chinese] Language used by game data.
+# Setting ignored for EE games.
 # Encoding=default
 
 ###############################################################################

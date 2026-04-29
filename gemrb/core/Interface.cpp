@@ -1602,6 +1602,13 @@ void Interface::LoadGemRBINI()
 /** Load the encoding table selected in gemrb.cfg */
 bool Interface::LoadEncoding()
 {
+	// EEs come with UTF-8 thankfully
+	if (config.GameType.substr(config.GameType.size() - 2, 2) == "ee") {
+		TLKEncoding.encoding = "UTF-8";
+		TLKEncoding.multibyte = true;
+		return true;
+	}
+
 	DataStream* inifile = gamedata->GetResourceStream(config.Encoding, IE_INI_CLASS_ID, true);
 	if (!inifile) {
 		return false;
