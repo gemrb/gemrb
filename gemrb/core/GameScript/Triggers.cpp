@@ -1221,6 +1221,7 @@ int GameScript::PartyHasItem(Scriptable* /*Sender*/, const Trigger* parameters)
 	int i = game->GetPartySize(true);
 	while (i--) {
 		const Actor* actor = game->GetPC(i, true);
+		if (!actor) continue;
 		if (HasItemCore(&actor->inventory, parameters->resref0Parameter, parameters->int0Parameter)) {
 			return 1;
 		}
