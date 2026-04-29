@@ -446,6 +446,10 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 		for (; i < word.length(); i++) {
 			// process glyphs in word
 			currChar = word[i];
+			// for now, silently skip chars we cannot serve
+			if (currChar > AtlasIndex.size()) {
+				continue;
+			}
 			if (currChar == u'\r' || currChar == u'\n') {
 				continue;
 			}
@@ -454,6 +458,10 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			}
 
 			const Glyph& curGlyph = GetGlyph(currChar);
+			if (!curGlyph.pixels) {
+				continue;
+			}
+
 			Point blitPoint = dp + lineRgn.origin + curGlyph.pos;
 			// use intersection because some rare glyphs can sometimes overlap lines
 			if (!lineRgn.IntersectsRegion(Region(blitPoint, curGlyph.size))) {
