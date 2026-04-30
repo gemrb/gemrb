@@ -208,7 +208,12 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	stream->WriteDword(fx->Power);
 	stream->WriteDword(fx->Parameter1);
 	stream->WriteDword(fx->Parameter2);
-	stream->WriteWord(fx->TimingMode);
+	if (core->config.UseAsLibrary) {
+		// unexpire some effects
+		stream->WriteWord(fx->TimingMode == FX_DURATION_JUST_EXPIRED ? FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES : fx->TimingMode);
+	} else {
+		stream->WriteWord(fx->TimingMode);
+	}
 	stream->WriteWord(fx->unknown2);
 	stream->WriteDword(fx->Duration);
 	stream->WriteWord(fx->ProbabilityRangeMax);
