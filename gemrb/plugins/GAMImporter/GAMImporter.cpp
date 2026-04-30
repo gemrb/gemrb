@@ -812,7 +812,7 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 			stream->WriteDword(game->ControlStatus);
 			stream->WriteDword(game->Expansion);
 			stream->WriteDword(FamiliarsOffset);
-			if (SavedLocCount || core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+			if (SavedLocCount || game->version == GAMVersion::BG2 || game->version == GAMVersion::TOB) {
 				stream->WriteDword(SavedLocOffset);
 			} else {
 				stream->WriteDword(0);
