@@ -2561,7 +2561,7 @@ int CREImporter::PutVariables(DataStream* stream, const Actor* actor) const
 		tmpDword = FAKE_VARIABLE_MARKER;
 		stream->WriteDword(tmpDword); //variable marker
 		stream->WriteFilling(92); //23 * 4
-		stream->WriteVariable(ieVariable(entry.first));
+		stream->WriteVariableUC(entry.first);
 		stream->WriteFilling(72); //32 + 72
 	}
 	return 0;

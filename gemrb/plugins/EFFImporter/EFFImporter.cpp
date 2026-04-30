@@ -250,7 +250,7 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	stream->WriteDword(tmpDword1);
 	if (isVariable) {
 		//resource1-4 are used as a continuous memory
-		stream->WriteVariableLC(fx->VariableName);
+		stream->WriteVariableUC(fx->VariableName);
 	} else {
 		stream->WriteFilling(32);
 	}

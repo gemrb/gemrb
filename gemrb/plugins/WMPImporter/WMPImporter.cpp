@@ -251,7 +251,7 @@ int WMPImporter::PutLinks(DataStream* stream, const WorldMap* wmap) const
 		const WMPAreaLink* al = wmap->GetLink(i);
 
 		stream->WriteDword(al->AreaIndex);
-		stream->WriteVariableUC(al->DestEntryPoint);
+		stream->WriteVariable(al->DestEntryPoint);
 		stream->WriteDword(al->DistanceScale);
 		stream->WriteDword(al->DirectionFlags);
 		for (const auto& ref : al->EncounterAreaResRef) {
@@ -265,7 +265,6 @@ int WMPImporter::PutLinks(DataStream* stream, const WorldMap* wmap) const
 
 int WMPImporter::PutAreas(DataStream* stream, const WorldMap* wmap) const
 {
-	ieDword tmpDword;
 	unsigned int cnt = wmap->GetEntryCount();
 
 	for (unsigned i = 0; i < cnt; i++) {
@@ -273,9 +272,9 @@ int WMPImporter::PutAreas(DataStream* stream, const WorldMap* wmap) const
 
 		stream->WriteResRefUC(ae->AreaName);
 		stream->WriteResRefUC(ae->AreaResRef);
-		stream->WriteVariableUC(ae->ScriptName);
-		tmpDword = ae->GetAreaStatus(true);
-		stream->WriteDword(tmpDword);
+		stream->WriteVariable(ae->ScriptName);
+		ieDword areaStatus = ae->GetAreaStatus(true);
+		stream->WriteDword(areaStatus);
 		stream->WriteDword(ae->IconSeq);
 		ieDword coord = ae->pos.x;
 		stream->WriteDword(coord);
