@@ -5162,9 +5162,7 @@ int fx_cure_hold_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 // NOTE: it didn't remove 0xb0 effects, so perhaps fx_movement_modifier_ref needs to be changed to refer to 0x7e
 int fx_cure_slow_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
-	// print("fx_cure_slow_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	target->fxqueue.RemoveAllEffects(fx_movement_modifier_ref);
-	//	STATE_CURE( STATE_SLOWED );
 	return FX_NOT_APPLIED;
 }
 
