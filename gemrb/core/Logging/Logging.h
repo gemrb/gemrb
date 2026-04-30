@@ -19,7 +19,7 @@
 
 namespace GemRB {
 
-GEM_EXPORT void ToggleLogging(bool);
+GEM_EXPORT void ToggleLogging(bool enable, bool clear = false);
 GEM_EXPORT void AddLogWriter(Logger::WriterPtr&&);
 GEM_EXPORT void SetMainLogLevel(LogLevel level);
 GEM_EXPORT void SetConsoleWindowLogLevel(LogLevel level);
