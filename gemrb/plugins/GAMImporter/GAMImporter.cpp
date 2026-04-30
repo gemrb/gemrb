@@ -812,7 +812,11 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 			stream->WriteDword(game->ControlStatus);
 			stream->WriteDword(game->Expansion);
 			stream->WriteDword(FamiliarsOffset);
-			stream->WriteDword(SavedLocCount ? SavedLocOffset : 0);
+			if (SavedLocCount || core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+				stream->WriteDword(SavedLocOffset);
+			} else {
+				stream->WriteDword(0);
+			}
 			stream->WriteDword(SavedLocCount);
 			break;
 		case GAMVersion::PST:
@@ -972,7 +976,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	if (ac->LongStrRef == ieStrRef::INVALID) {
 		std::string tmpstr = TLKStringFromString(ac->GetLongName());
 		stream->WriteVariable(ieVariable(tmpstr));
-	} else if (newVersion == GAMVersion::BG || newVersion == GAMVersion::BG2 || newVersion == GAMVersion::PST) {
+	} else if (newVersion != GAMVersion::IWD && newVersion != GAMVersion::IWD2) {
 		// at least bg1, if not more, only saved it for the protagonist
 		stream->WriteFilling(32);
 	} else {
