@@ -873,16 +873,20 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 		act->creVersion = version;
 	}
 	str->ReadResRef(act->SmallPortrait);
-	if (act->SmallPortrait.IsEmpty()) {
-		act->SmallPortrait = "NONE";
-	} else if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
-		// bg2ee stores the M and L, but not S
-		// gimp it for now, since we want the small portrait to be small
-		*act->SmallPortrait.rbegin() = 'S';
-	}
 	str->ReadResRef(act->LargePortrait);
-	if (act->LargePortrait.IsEmpty()) {
-		act->LargePortrait = "NONE";
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		if (!act->SmallPortrait.IsEmpty()) {
+			// bg2ee typically stores the M and L, but not S
+			// gimp it for now, since we want the small portrait to be small
+			*act->SmallPortrait.rbegin() = 'S';
+		}
+	} else {
+		if (act->SmallPortrait.IsEmpty()) {
+			act->SmallPortrait = "NONE";
+		}
+		if (act->LargePortrait.IsEmpty()) {
+			act->LargePortrait = "NONE";
+		}
 	}
 
 	size_t inventorySize;
@@ -2034,7 +2038,7 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 
 	// see the read above, this just ensures save compatibility
 	ResRef smallPortrait = actor->SmallPortrait;
-	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS) && *actor->LargePortrait.rbegin() != 'M') {
 		*smallPortrait.rbegin() = 'M';
 	}
 	stream->WriteResRef(smallPortrait);
