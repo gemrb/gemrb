@@ -172,7 +172,13 @@ std::unique_ptr<Effect> EFFImporter::GetEffectV20()
 		str->Seek(32, GEM_CURRENT_POS);
 	}
 	str->ReadDword(fx->CasterLevel);
-	str->Seek(4, GEM_CURRENT_POS); // FirstApply
+	// preserve FirstApply for testing purposes (we have EFFECT_REINIT_ON_LOAD)
+	// Parameter5 is only used by a few effects so far, not present in our test saves
+	if (fx->Parameter5 == 0 && core->config.UseAsLibrary) {
+		str->ReadDword(fx->Parameter5);
+	} else {
+		str->Seek(4, GEM_CURRENT_POS);
+	}
 	str->ReadDword(fx->SecondaryType);
 	str->Seek(60, GEM_CURRENT_POS); // padding
 
@@ -226,7 +232,7 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	stream->WriteDword(fx->Resistance);
 	stream->WriteDword(fx->Parameter3);
 	stream->WriteDword(fx->Parameter4);
-	stream->WriteDword(fx->Parameter5);
+	stream->WriteDword(core->config.UseAsLibrary ? 0 : fx->Parameter5);
 	stream->WriteDword(fx->Parameter6);
 	if (isVariable) {
 		stream->WriteFilling(16);
@@ -256,8 +262,8 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	}
 	stream->WriteDword(fx->CasterLevel);
 	// try preserving fx->FirstApply for save testing
-	if (isVariable) {
-		stream->WriteDword(1);
+	if (core->config.UseAsLibrary) {
+		stream->WriteDword(fx->Parameter5);
 	} else {
 		stream->WriteFilling(4);
 	}
