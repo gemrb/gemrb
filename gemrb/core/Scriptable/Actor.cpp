@@ -6501,7 +6501,7 @@ ResRef Actor::GetScript(int ScriptIndex, bool empty) const
 	} else if (empty) {
 		return "";
 	} else {
-		return "NONE";
+		return "None";
 	}
 }
 

@@ -202,9 +202,7 @@ inline ieVariable MakeVariable(const StringView& sv)
 	auto dest = var.begin();
 	auto source = sv.begin();
 	while (count-- && source != sv.end()) {
-		// TODO: we shouldnt call towlower here. ieVariable is case insensitive
-		// we probably should be calling WriteVariableLC in the writers instead
-		char c = std::towlower(*source++);
+		char c = *source++;
 		if (!std::isspace(c)) { // the originals ignored whitespace too
 			*dest++ = c;
 		}

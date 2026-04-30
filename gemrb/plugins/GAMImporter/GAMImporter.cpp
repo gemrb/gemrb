@@ -822,11 +822,11 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 		case GAMVersion::PST:
 			stream->WriteDword(MazeOffset);
 			stream->WriteDword(game->Reputation);
-			stream->WriteResRefLC(game->CurrentArea);
+			stream->WriteResRefUC(game->CurrentArea);
 			stream->WriteDword(KillVarsOffset);
 			stream->WriteDword(KillVarsCount);
 			stream->WriteDword(FamiliarsOffset);
-			stream->WriteResRefLC(game->CurrentArea); //again
+			stream->WriteResRefUC(game->CurrentArea); // again
 			break;
 	}
 	stream->WriteDword(game->RealTime); //this isn't correct, this field is the realtime
@@ -1009,7 +1009,7 @@ int GAMImporter::PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, 
 	if (core->HasFeature(GFFlags::SOUNDFOLDERS)) {
 		std::string soundFolder = TLKStringFromString(ac->PCStats->SoundFolder);
 		soundFolder.resize(ieVariable::Size);
-		stream->WriteStringLC(std::move(soundFolder), ieVariable::Size);
+		stream->WriteStringUC(std::move(soundFolder), ieVariable::Size);
 	}
 	if (newVersion == GAMVersion::IWD2 || newVersion == GAMVersion::GemRB) {
 		//I don't know how many fields are actually used in IWD2 saved game
