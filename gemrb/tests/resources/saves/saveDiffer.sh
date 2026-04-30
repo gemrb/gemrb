@@ -34,8 +34,8 @@ for file in "${files[@]}"; do
     continue;
   fi
 
-  echo "Running $IEDIFF --locase '$a' '$b'"
-  diff=$("$IEDIFF" --locase "$a" "$b")
+  echo "Running $IEDIFF '$a' '$b'"
+  diff=$("$IEDIFF" "$a" "$b")
   if grep -q "are identical" <<< "$diff"; then
     echo "Files are equal!"
   else
