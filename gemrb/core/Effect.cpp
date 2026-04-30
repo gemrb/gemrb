@@ -151,7 +151,7 @@ bool Effect::Persistent(ieDword gameTime) const
 {
 	// local variable effects self-destruct if they were processed already
 	// but if they weren't processed, e.g. in a global actor, we must save them
-	// TODO: do we really need to special-case this? leaving it for now - fuzzie
+	// we still need to special-case this in 2026
 	static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
 	if (Opcode == (ieDword) EffectQueue::ResolveEffect(fx_variable_ref)) {
 		return true;
