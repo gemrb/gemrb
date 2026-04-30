@@ -1953,7 +1953,7 @@ static void InitActorTables()
 			AppendFormat(buffer, "ToHit: {} ", tohit);
 			AppendFormat(buffer, "XPCap: {}", xpCap[classis]);
 
-			Log(DEBUG, "Actor", "{}", buffer);
+			Log(MESSAGE, "Actor", "{}", buffer);
 		}
 	} else {
 		AutoTable hptm;
@@ -1982,7 +1982,7 @@ static void InitActorTables()
 			//i.e. barbarians would overwrite fighters in bg2
 			if (!levelStats[tmpindex].empty()) {
 				AppendFormat(buffer, "Already Found!");
-				Log(DEBUG, "Actor", "{}", buffer);
+				Log(MESSAGE, "Actor", "{}", buffer);
 				continue;
 			}
 
@@ -2012,7 +2012,7 @@ static void InitActorTables()
 					AppendFormat(buffer, "HPROLLMAXLVL: {}", conBonLevel);
 					if (conBonLevel) maxLevelForHpRoll[tmpindex] = conBonLevel;
 				}
-				Log(DEBUG, "Actor", "{}", buffer);
+				Log(MESSAGE, "Actor", "{}", buffer);
 				continue;
 			}
 
@@ -2075,7 +2075,7 @@ static void InitActorTables()
 			AppendFormat(buffer, "HPROLLMAXLVL: {} ", maxLevelForHpRoll[tmpindex]);
 			AppendFormat(buffer, "DS: {} ", dualSwap[tmpindex]);
 			AppendFormat(buffer, "MULTI: {}", multiclassIDs[tmpindex]);
-			Log(DEBUG, "Actor", "{}", buffer);
+			Log(MESSAGE, "Actor", "{}", buffer);
 		}
 	}
 	Log(MESSAGE, "Actor", "Finished examining classes.2da");
