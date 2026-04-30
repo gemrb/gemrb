@@ -25,12 +25,13 @@ static std::atomic<LogLevel> LL;
 static std::deque<Logger::WriterPtr> writers;
 static std::unique_ptr<Logger> logger;
 
-void ToggleLogging(bool enable)
+void ToggleLogging(bool enable, bool clear)
 {
 	if (enable && logger == nullptr) {
 		logger = std::make_unique<Logger>(writers);
 	} else if (!enable) {
 		logger = nullptr;
+		if (clear) writers.clear();
 	}
 }
 

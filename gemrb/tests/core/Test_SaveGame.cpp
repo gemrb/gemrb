@@ -88,9 +88,10 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 
 	const char* argv[] = { "tester", "-c", iter->c_str() };
 	auto cfg = LoadFromArgs(3, const_cast<char**>(argv));
+	ToggleLogging(false, true); // clear old loggers if any
 	ToggleLogging(true);
+	AddLogWriter(createStdioLogWriter());
 	SetMainLogLevel(DEBUG);
-	// no need for AddLogWriter(createStdioLogWriter()) — already done by MapTest
 	Interface gemrb(std::move(cfg));
 	bool iwd2 = core->HasFeature(GFFlags::RULES_3ED);
 	if (iwd2) {
