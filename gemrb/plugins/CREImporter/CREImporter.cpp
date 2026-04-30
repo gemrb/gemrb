@@ -1778,7 +1778,7 @@ void CREImporter::GetActorIWD1(Actor* act) //9.0
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDYPOS]);
 	str->ReadScalar<Actor::stat_t, ieWord>(act->BaseStats[IE_SAVEDFACE]);
 	str->ReadArray(act->ignoredFields.IWDUnknowns);
-	str->Seek(3, GEM_CURRENT_POS);
+	str->ReadArray(act->ignoredFields.IWDUnknowns2);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_EA]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_GENERAL]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_RACE]);
@@ -2361,7 +2361,7 @@ int CREImporter::PutActorIWD1(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDYPOS]);
 	stream->WriteScalar<Actor::stat_t, ieWord>(actor->BaseStats[IE_SAVEDFACE]);
 	stream->WriteArray(actor->ignoredFields.IWDUnknowns);
-	stream->WriteFilling(3);
+	stream->WriteArray(actor->ignoredFields.IWDUnknowns2);
 	//similar in all engines
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_EA]);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_GENERAL]);

@@ -352,6 +352,7 @@ struct IgnoredFields {
 	ResRef CREResRef;
 	ieWord IWDAutoSaveLoc = 0;
 	std::array<ieByte, 15> IWDUnknowns {};
+	std::array<ieByte, 3> IWDUnknowns2 {}; // how endgame save: 0x80000
 	ieByte IgnoredGender = 0;
 };
 
