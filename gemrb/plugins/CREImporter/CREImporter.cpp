@@ -2594,8 +2594,12 @@ int CREImporter::PutIWD2Spellpage(DataStream* stream, const Actor* actor, ieIWD2
 
 	max = actor->spellbook.GetMemorizableSpellsCount(type, level, false);
 	known = actor->spellbook.GetMemorizableSpellsCount(type, level, true);
+	known = std::min(known, max); // looks like we're double counting the stat bonus
 	if (type == IE_IWD2_SPELL_DOMAIN) { // these don't get stored
 		max = 0;
+		known = 0;
+	} else if (type != IE_IWD2_SPELL_SORCERER && type != IE_IWD2_SPELL_BARD && type != IE_IWD2_SPELL_SHAPE) {
+		// the whole field has to do with sorcerer-style books
 		known = 0;
 	}
 	stream->WriteDword(max);
