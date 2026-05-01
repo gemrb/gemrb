@@ -364,6 +364,7 @@ UAW_QITEMS = 13
 UAW_BG2SUMMONS = 14
 UAW_WEAPONSETS = 15
 UAW_CONFIGUREBAR = 16
+UAW_MODALFEATS = 17
 
 # item extended header location field
 ITEM_LOC_WEAPON = 1  # show on quick weapon ability selection

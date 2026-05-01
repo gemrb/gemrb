@@ -538,6 +538,8 @@ def UpdateActionsWindow ():
 		SetupWeaponSets ()
 	elif level == UAW_CONFIGUREBAR:
 		SetupButtonChoices ()
+	elif level == UAW_MODALFEATS: # configurable feats like power attack
+		Spellbook.SetupModalFeats (CurrentWindow, ActionBarControlOffset)
 	else:
 		print("Invalid action level:", level)
 		SetActionLevel (UAW_STANDARD)
