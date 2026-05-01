@@ -3300,6 +3300,7 @@ static int fx_expertise(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Expertise, target);
 			UndepleteSourceInnate(target, fx);
 		}
+		target->AC.SetGenericBonus(x);
 		return FX_APPLIED;
 	}
 

@@ -7010,6 +7010,11 @@ bool Actor::GetCombatDetails(int& toHit, bool leftOrRight, int& damageBonus,
 	}
 	ToHit.SetProficiencyBonus(prof);
 
+	if (third) {
+		// power attack bonus
+		damageBonus += PCStats ? PCStats->ExtraSettings[4] : 0;
+	}
+
 	// get the remaining boni
 	// FIXME: merge
 	toHit = GetToHit(wi.wflags, target);
@@ -7152,7 +7157,12 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 
 	// both strength and dex bonus are stored positive only in iwd2
 	if (third) {
-		ToHit.SetAbilityBonus(dexbonus + strbonus);
+		int modalFeatBonus = HasSpellState(SS_RAPIDSHOT) ? -2 : 0;
+		if (PCStats) {
+			// expertise and power attack
+			modalFeatBonus -= PCStats->ExtraSettings[3] + PCStats->ExtraSettings[4];
+		}
+		ToHit.SetAbilityBonus(dexbonus + strbonus + modalFeatBonus);
 	} else {
 		ToHit.SetAbilityBonus(-(dexbonus + strbonus));
 	}
