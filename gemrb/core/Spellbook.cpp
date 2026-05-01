@@ -764,7 +764,7 @@ bool Spellbook::MemorizeSpell(const CREKnownSpell* spell, bool usable)
 
 	CREMemorizedSpell* mem_spl = new CREMemorizedSpell();
 	mem_spl->SpellResRef = spell->SpellResRef;
-	mem_spl->Flags = usable ? 1 : 0; // FIXME: is it all it's used for?
+	mem_spl->Flags = usable ? 1 : 0;
 
 	sm->memorized_spells.push_back(mem_spl);
 	ClearSpellInfo();
