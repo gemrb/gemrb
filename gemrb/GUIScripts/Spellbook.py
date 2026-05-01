@@ -192,6 +192,17 @@ def SortUsableSpells(memorizedSpells):
 def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	import GUICommon
 	actor = GemRB.GameGetFirstSelectedActor ()
+	actionLevel = GemRB.GetVar ("ActionLevel")
+
+	# prepare for iwd2 modal feats like expertise
+	modalFeats = []
+	if GameCheck.IsIWD2 () and actionLevel == UAW_INNATES:
+		table = GemRB.LoadTable ("mdfeats", False, True)
+		for idx in range(table.GetRowCount()):
+			rowName = table.GetRowName (idx)
+			spellName = table.GetValue (rowName, "SPELL", GTV_STR)
+			if spellName != "*":
+				modalFeats.append (spellName)
 
 	# bardsongs weren't saved in iwd1, so learn them now if needed
 	if GameCheck.IsIWD1 () and BookType == (1 << IE_SPELL_TYPE_SONG) and HasSpell (actor, IE_SPELL_TYPE_SONG, 0, "SPIN151") == -1:
@@ -199,7 +210,6 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		GUICommon.AddClassAbilities (actor, "clabbard", level, level)
 
 	classRowName = GUICommon.GetClassRowName (actor)
-	actionLevel = GemRB.GetVar ("ActionLevel")
 	extraActionButton = not (GameCheck.IsIWD2() or GameCheck.IsPST()) and classRowName == "CLERIC_THIEF" and actionLevel == UAW_INNATES
 
 	# check if we're dealing with a temporary spellbook
@@ -328,6 +338,10 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 				Button.SetText (str(Spell['MemoCount']))
 			else:
 				Button.SetText ("")
+
+		# handle iwd2 modal feats, presented as spells
+		if actionLevel == UAW_INNATES and Spell['SpellResRef'].upper() in modalFeats:
+			Button.SetText ("")
 
 	# scroll right button
 	if More:
