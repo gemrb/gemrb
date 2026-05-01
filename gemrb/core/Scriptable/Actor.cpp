@@ -2989,9 +2989,11 @@ int Actor::GetStyleExtraAPR(bool& isEligible) const
 	// unfortunately it has a non-distinct default value, so it's hard to be smart about it
 	// we support kits enabling the bonus for classes that don't have it, but not disabling for those that do
 	const std::string& className = GetClassName(GetActiveClass());
-	const std::string& kitName = GetKitName(BaseStats[IE_KIT]);
 	isEligible = weaponMisc->QueryFieldSigned<int>(className, "GETS_PROF_APR") != 0;
-	isEligible = isEligible || weaponMisc->QueryFieldSigned<int>(kitName, "GETS_PROF_APR") != 0;
+	if (BaseStats[IE_KIT] != KIT_BASECLASS) {
+		const std::string& kitName = GetKitName(BaseStats[IE_KIT]);
+		isEligible = isEligible || weaponMisc->QueryFieldSigned<int>(kitName, "GETS_PROF_APR") != 0;
+	}
 	if (isEligible) {
 		return gamedata->GetWeaponStyleAPRBonus(stars, GetHighestLevel() - 1);
 	} else {
