@@ -202,7 +202,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			rowName = table.GetRowName (idx)
 			spellName = table.GetValue (rowName, "SPELL", GTV_STR)
 			if spellName != "*":
-				modalFeats[spellName] = (rowName, idx)
+				modalFeats[spellName] = idx
 
 	# bardsongs weren't saved in iwd1, so learn them now if needed
 	if GameCheck.IsIWD1 () and BookType == (1 << IE_SPELL_TYPE_SONG) and HasSpell (actor, IE_SPELL_TYPE_SONG, 0, "SPIN151") == -1:
@@ -362,7 +362,7 @@ def HandleModalFeatButton (Button, actor, modalFeat, spellRef):
 	Button.OnRightPress (None)
 	Button.OnShiftPress (None)
 
-	featStat = modalFeat[1] | EXTRASETTINGS
+	featStat = modalFeat | EXTRASETTINGS
 	def onPress():
 		if GemRB.GetPlayerStat (actor, featStat):
 			GemRB.SetPlayerStat (actor, featStat, 0)
@@ -392,7 +392,7 @@ def HandleModalFeatButton (Button, actor, modalFeat, spellRef):
 		import ActionsWindow
 		ActionsWindow.SetActionLevel (UAW_MODALFEATS)
 		ActionsWindow.UpdateActionsWindow ()
-	if modalFeat[0] == "EXPERTISE" or modalFeat[0] == "POWERATK":
+	if featStat == IE_EXPERTISE or featStat == IE_POWERATTACK:
 		GemRB.SetVar ("ModalFeatStat", featStat)
 		Button.OnPress (onPress2)
 
