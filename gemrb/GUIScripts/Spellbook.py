@@ -366,9 +366,9 @@ def HandleModalFeatButton (Button, actor, modalFeat):
 	def onPress():
 		if GemRB.GetPlayerStat (actor, featStat):
 			GemRB.SetPlayerStat (actor, featStat, 0)
-		else:
-			# FIXME: this is wrong for expertise and power attack
+		elif featStat not in [ IE_EXPERTISE, IE_POWERATTACK ]:
 			GemRB.SetPlayerStat (actor, featStat, 1)
+			# the other two are handled below
 		import ActionsWindow
 		ActionsWindow.SpellPressed ()
 	Button.OnPress (onPress)
@@ -378,6 +378,73 @@ def HandleModalFeatButton (Button, actor, modalFeat):
 		Button.SetState (IE_GUI_BUTTON_SELECTED)
 	else:
 		Button.SetState (IE_GUI_BUTTON_UNPRESSED)
+
+	# expertise and power attack have levels; 0 for disabling, 1-5 for amount
+	# we need to present a subspell selection menu
+	def onPress2():
+		import ActionsWindow
+		ActionsWindow.SetActionLevel (UAW_MODALFEATS)
+		ActionsWindow.UpdateActionsWindow ()
+	if modalFeat[0] == "EXPERTISE" or modalFeat[0] == "POWERATK":
+		GemRB.SetVar ("ModalFeatStat", featStat)
+		Button.OnPress (onPress2)
+
+# Sets up all the action buttons for a player character with a configurable modal feat.
+# This is how expertise and power attack level can be configured.
+def SetupModalFeats (Window, Offset = 0):
+	import GUICommon
+	actor = GemRB.GameGetFirstSelectedActor ()
+
+	# which feat are we dealing with?
+	featStat = GemRB.GetVar ("ModalFeatStat")
+	modalFeats = {}
+	table = GemRB.LoadTable ("mdfeats", False, True)
+	spellName = table.GetValue (featStat - EXTRASETTINGS, 0, GTV_STR)
+	spell = GemRB.GetSpell (spellName, True)
+
+	# maximum level depends on base attack bonus, since it can't go below zero
+	dets = GemRB.GetCombatDetails (actor, 0)
+	if dets:
+		maxLevel = min(5, dets["ToHitStats"]["Base"])
+	else:
+		maxLevel = 0
+
+	# create the "spell" icon buttons
+	for i in range (12): # GUIBT_COUNT in PCStatsStruct
+		Button = Window.GetControl (i + Offset)
+		Button.OnRightPress (None)
+		Button.OnShiftPress (None)
+		Button.SetText ("")
+		Button.SetVarAssoc ("ModalFeat", i)
+
+		# 1 button to disable plus 5 levels
+		if i > maxLevel:
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			continue
+
+		Button.SetSpellIcon (spell['SpellResRef'], 1)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
+		GUICommon.SetButtonAnchor (Button)
+		# power attack: off / 1-5
+		Button.SetTooltip (GemRB.GetString (spell['SpellName']) + GemRB.GetString (39831 + i))
+		Button.OnPress (SelectModalFeat)
+		if i > 0:
+			Button.SetText (str(i))
+		if i > 0 and GemRB.GetPlayerStat (actor, featStat) == i:
+			Button.SetState (IE_GUI_BUTTON_SELECTED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_UNPRESSED)
+
+def SelectModalFeat ():
+	actor = GemRB.GameGetFirstSelectedActor ()
+	featStat = GemRB.GetVar ("ModalFeatStat")
+	featLevel = GemRB.GetVar ("ModalFeat")
+	GemRB.SetPlayerStat (actor, featStat, featLevel)
+
+	import ActionsWindow
+	ActionsWindow.SetActionLevel (UAW_STANDARD)
+	ActionsWindow.UpdateActionsWindow ()
 
 #################################################################
 # routines used during character generation and levelup
