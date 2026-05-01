@@ -7156,7 +7156,7 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 
 	// both strength and dex bonus are stored positive only in iwd2
 	if (third) {
-		int modalFeatBonus = HasSpellState(SS_RAPIDSHOT) ? -2 : 0;
+		int modalFeatBonus = 0;
 		if (PCStats) {
 			modalFeatBonus -= PCStats->ExtraSettings[ModalFeat::EXPERTISE];
 			modalFeatBonus -= PCStats->ExtraSettings[ModalFeat::POWERATTACK];
