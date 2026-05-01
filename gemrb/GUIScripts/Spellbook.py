@@ -343,7 +343,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		# handle iwd2 modal feats, presented as spells
 		spellRef = Spell['SpellResRef'].upper()
 		if actionLevel == UAW_INNATES and spellRef in modalFeats:
-			HandleModalFeatButton (Button, actor, modalFeats[spellRef])
+			HandleModalFeatButton (Button, actor, modalFeats[spellRef], spellRef)
 
 	# scroll right button
 	if More:
@@ -357,7 +357,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
-def HandleModalFeatButton (Button, actor, modalFeat):
+def HandleModalFeatButton (Button, actor, modalFeat, spellRef):
 	Button.SetText ("")
 	Button.OnRightPress (None)
 	Button.OnShiftPress (None)
@@ -374,10 +374,17 @@ def HandleModalFeatButton (Button, actor, modalFeat):
 	Button.OnPress (onPress)
 
 	# mark as selected if enabled
-	if GemRB.GetPlayerStat (actor, featStat):
+	featLevel = GemRB.GetPlayerStat (actor, featStat)
+	if featLevel:
 		Button.SetState (IE_GUI_BUTTON_SELECTED)
 	else:
 		Button.SetState (IE_GUI_BUTTON_UNPRESSED)
+	spell = GemRB.GetSpell (spellRef, True)
+	if featLevel > 1:
+		Button.SetText (str(featLevel))
+		Button.SetTooltip (GemRB.GetString (spell['SpellName']) + GemRB.GetString (39831 + featLevel))
+	else:
+		Button.SetTooltip (GemRB.GetString (spell['SpellName']))
 
 	# expertise and power attack have levels; 0 for disabling, 1-5 for amount
 	# we need to present a subspell selection menu
