@@ -276,7 +276,6 @@ static EffectRef fx_set_diseased_state_ref = { "State:Diseased", -1 };
 //used by iwd2
 static const ResRef CripplingStrikeRef = "cripstr";
 static const ResRef DirtyFightingRef = "dirty";
-static const ResRef ArterialStrikeRef = "artstr";
 
 static int avBase, avStance;
 struct avType {
@@ -9678,12 +9677,12 @@ int Actor::GetSneakAttackDamage(Actor* target, const WeaponInfo& wi, int& multip
 	// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
 	// both are available at level 10+ (5d6), so it's safe to decrease multiplier without checking
 	if (!IsStar(BackstabResRef)) {
-		if (BackstabResRef != ArterialStrikeRef) {
+		if (HasSpellState(SS_HAMSTRING)) {
 			// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
 			multiplier -= 2;
 			sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
 			displaymsg->DisplayRollStringName(ieStrRef::ROLL18, GUIColors::LIGHTGREY, this, sneakAttackDamage);
-		} else {
+		} else if (HasSpellState(SS_ARTERIAL)) {
 			// ~Sneak attack for %d scores arterial strike (Inflicts bleeding wound)~
 			multiplier--;
 			sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
