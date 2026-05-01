@@ -210,7 +210,15 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	stream->WriteDword(fx->Parameter2);
 	if (core->config.UseAsLibrary) {
 		// unexpire some effects
-		stream->WriteWord(fx->TimingMode == FX_DURATION_JUST_EXPIRED ? FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES : fx->TimingMode);
+		ieWord timingMode = fx->TimingMode;
+		if (timingMode == FX_DURATION_JUST_EXPIRED) {
+			if (core->HasFeature(GFFlags::RULES_3ED)) {
+				timingMode = FX_DURATION_INSTANT_PERMANENT;
+			} else {
+				timingMode = FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
+			}
+		}
+		stream->WriteWord(timingMode);
 	} else {
 		stream->WriteWord(fx->TimingMode);
 	}
