@@ -7106,6 +7106,21 @@ int Actor::GetToHit(ieDword Flags, const Actor* target)
 		return ToHit.GetTotal();
 	} else {
 		ToHit.SetGenericBonus(generic); // flat out cumulative
+		// rapid shot gives an extra attack at full BAB!
+		// but also doesn't count when cascading, so make sure that if
+		// there are more attacks afterwads, they don't have a double step
+		// do we need to limit this more?
+		bool rapid = HasSpellState(SS_RAPIDSHOT);
+		rapid = rapid && (Flags & WEAPON_STYLEMASK) == WEAPON_RANGED;
+		if (rapid) {
+			rapid = attackcount + 1 == attacksperround;
+			// an attack later than the extra one?
+			if (!rapid && attacksperround > 2 && attacknum > 2) {
+				attacknum--;
+			} else if (rapid) {
+				attacknum = 0; // get max to hit
+			}
+		}
 		return ToHit.GetTotalForAttackNum(attacknum);
 	}
 }
