@@ -1111,6 +1111,10 @@ void CREImporter::ReadInventory(Actor* act, size_t slotCount)
 	str->ReadScalar(eqslot);
 	//the equipped slot's selected ability is stored here
 	str->ReadWord(eqheader);
+	if (act->creVersion == CREVersion::V2_2 && eqslot > 0 && eqslot <= 6) {
+		// translate weapon sets back to base index
+		eqslot /= 2;
+	}
 	act->inventory.SetEquipped(eqslot, eqheader);
 
 	//read the item entries based on the previously read indices
@@ -1959,7 +1963,12 @@ int CREImporter::PutInventory(DataStream* stream, const Actor* actor, unsigned i
 		stream->WriteWord(indices[i]);
 	}
 
-	stream->WriteScalar<int, ieWord>(actor->inventory.GetEquipped());
+	ieWord equipped = actor->inventory.GetEquipped();
+	// translate index back to weapon set stored format
+	if (actor->creVersion == CREVersion::V2_2 && equipped > 0 && equipped <= 3) {
+		equipped *= 2;
+	}
+	stream->WriteScalar<int, ieWord>(equipped);
 	stream->WriteScalar<int, ieWord>(actor->inventory.GetEquippedHeader());
 
 	for (unsigned int i = 0; i < size; i++) {
