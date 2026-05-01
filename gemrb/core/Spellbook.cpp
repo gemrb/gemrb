@@ -950,6 +950,18 @@ bool Spellbook::ChargeSpell(CREMemorizedSpell* spl)
 	return true;
 }
 
+void Spellbook::ChargeSpell(const ResRef& spellRef, int type)
+{
+	for (const auto& spellMemo : spells[type]) {
+		for (auto& memorizedSpell : spellMemo->memorized_spells) {
+			if (memorizedSpell->SpellResRef == spellRef) {
+				ChargeSpell(memorizedSpell);
+				break;
+			}
+		}
+	}
+}
+
 bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 {
 	if (spl->Flags) {

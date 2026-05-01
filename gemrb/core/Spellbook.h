@@ -209,6 +209,7 @@ public:
 
 	/** Sets spell from memorized as 'not-yet-cast' */
 	bool ChargeSpell(CREMemorizedSpell* spl);
+	void ChargeSpell(const ResRef& spellRef, int type);
 
 	/** Sets spell from memorized as 'already-cast' */
 	bool DepleteSpell(int type, unsigned int page, unsigned int slot);
