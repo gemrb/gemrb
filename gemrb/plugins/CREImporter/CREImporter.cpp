@@ -2456,9 +2456,10 @@ int CREImporter::PutSpellPages(DataStream* stream, const Actor* actor) const
 			stream->WriteScalar<int, ieWord>(tmp);
 			// bg1 apparently counted only the wisdom bonus, not anything extra from effects (Edwin or the ring of holiness)
 			// we always reconstruct it on load, so it doesn't matter to us
-			if (actor->creVersion == CREVersion::V1_2 || (actor->creVersion == CREVersion::V9_0 && core->config.GameType == "how")) {
+			if (actor->creVersion == CREVersion::V1_1 || actor->creVersion == CREVersion::V1_2 || (actor->creVersion == CREVersion::V9_0 && core->config.GameType == "how")) {
 				// pst didn't use the table, even though it kept a copy from bg1
 				// iwd1:how didn't store the bonus, iwd1 did??
+				// bg2ee also appears to skip the wisdom bonus
 			} else if (tmp && i == IE_SPELL_TYPE_PRIEST && !bonuses.empty() && (actor->GetClericLevel() || actor->GetDruidLevel())) {
 				tmp += bonuses[j];
 			}
