@@ -361,11 +361,14 @@ IE_BOUNCE                       = 253
 IE_MIRRORIMAGES                 = 254
 
 #these stats exist only in PC's (but we access only PCs anyway)
-IE_EXPERTISE                    = 0x1003
-IE_POWERATTACK                  = 0x1004
-IE_ARTERIAL_STRIKE              = 0x1005
-IE_HAMSTRING                    = 0x1006
-IE_RAPID_SHOT                   = 0x1007
+# make sure EXTRASETTINGS matches GUIScript.cpp
+# make sure the stats match their mdfeats.2da index (which itself matches GAM)
+EXTRASETTINGS = 0x1000
+IE_EXPERTISE = EXTRASETTINGS + 3
+IE_POWERATTACK = EXTRASETTINGS + 4
+IE_ARTERIAL_STRIKE = EXTRASETTINGS + 5
+IE_HAMSTRING = EXTRASETTINGS + 6
+IE_RAPID_SHOT = EXTRASETTINGS + 7
 
 # internal class indices
 # Keep these synchronized with Actor.h

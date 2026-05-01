@@ -362,7 +362,7 @@ def HandleModalFeatButton (Button, actor, modalFeat):
 	Button.OnRightPress (None)
 	Button.OnShiftPress (None)
 
-	featStat = modalFeat[1] | 0x1000
+	featStat = modalFeat[1] | EXTRASETTINGS
 	def onPress():
 		if GemRB.GetPlayerStat (actor, featStat):
 			GemRB.SetPlayerStat (actor, featStat, 0)
