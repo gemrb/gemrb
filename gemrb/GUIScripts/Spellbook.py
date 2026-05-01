@@ -344,6 +344,8 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		spellRef = Spell['SpellResRef'].upper()
 		if actionLevel == UAW_INNATES and spellRef in modalFeats:
 			Button.SetText ("")
+			Button.OnRightPress (None)
+			Button.OnShiftPress (None)
 
 			featStat = modalFeats[spellRef][1] | 0x1000
 			def onPress():
@@ -354,6 +356,12 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 					GemRB.SetPlayerStat (actor, featStat, 1)
 				ActionsWindow.SpellPressed ()
 			Button.OnPress (onPress)
+
+			# mark as selected if enabled
+			if GemRB.GetPlayerStat (actor, featStat):
+				Button.SetState (IE_GUI_BUTTON_SELECTED)
+			else:
+				Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 
 	# scroll right button
 	if More:
