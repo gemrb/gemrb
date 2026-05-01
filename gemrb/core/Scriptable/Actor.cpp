@@ -119,13 +119,12 @@ static const int levelslotsiwd2[ISCLASSES] = { IE_LEVELFIGHTER, IE_LEVELMAGE, IE
 					       IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, IE_LEVELMONK,
 					       IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVELSORCERER, IE_LEVELSHAMAN, IE_LEVELCLASS13 };
 
-#define BGCLASSCNT 23
 //fighter is the default level here
 //fixme, make this externalized
 //this map could probably be auto-generated BG2 class ID -> ISCLASS
-static const int levelslotsbg[BGCLASSCNT] = { ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERIC, ISTHIEF,
-					      ISBARD, ISPALADIN, 0, 0, 0, 0, ISDRUID, ISRANGER, 0, 0, 0, 0, 0, 0, ISSORCERER, ISMONK,
-					      ISSHAMAN, ISCLASS13 };
+static const std::array<int, 23> levelslotsbg = { ISFIGHTER, ISMAGE, ISFIGHTER, ISCLERIC, ISTHIEF,
+						  ISBARD, ISPALADIN, 0, 0, 0, 0, ISDRUID, ISRANGER, 0, 0, 0, 0, 0, 0, ISSORCERER, ISMONK,
+						  ISSHAMAN, ISCLASS13 };
 // map isClass -> (IWD2) class ID
 static unsigned int classesiwd2[ISCLASSES] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -10684,7 +10683,7 @@ ieDword Actor::GetLevelInClass(ieDword classid) const
 		return 0;
 	}
 
-	if (classid >= BGCLASSCNT) {
+	if (classid >= levelslotsbg.size()) {
 		classid = 0;
 	}
 	//other, levelslotsbg starts at 0 classid
@@ -11605,7 +11604,7 @@ void Actor::ApplyEffectCopy(const Effect* oldfx, EffectRef& newref, Scriptable* 
 // NOTE: does not ignore disabled dual classes!
 bool Actor::WasClass(ieDword oldClassID) const
 {
-	if (oldClassID >= BGCLASSCNT) return false;
+	if (oldClassID >= levelslotsbg.size()) return false;
 
 	int mcWas = BaseStats[IE_MC_FLAGS] & MC_WAS_ANY;
 	if (!mcWas) {
