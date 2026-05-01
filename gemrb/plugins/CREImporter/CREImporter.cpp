@@ -1344,8 +1344,7 @@ void CREImporter::GetActorBG(Actor* act)
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL2]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_LEVEL3]);
 	//this is IE_SEX, but we use the gender field for this
-	str->ReadScalar(tmpByte);
-	//skipping a byte
+	str->Read(&act->ignoredFields.IgnoredGender, 1);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STR]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_STREXTRA]);
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_INT]);
@@ -2233,11 +2232,7 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL2]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_LEVEL3]);
-		if (actor->creVersion == CREVersion::V9_0 || actor->creVersion == CREVersion::V1_2) {
-			stream->Write(&actor->ignoredFields.IgnoredGender, 1);
-		} else {
-			stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_SEX]);
-		}
+		stream->Write(&actor->ignoredFields.IgnoredGender, 1);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_STR]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_STREXTRA]);
 		stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_INT]);
