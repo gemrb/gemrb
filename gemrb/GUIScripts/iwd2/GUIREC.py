@@ -636,12 +636,16 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 	if lbonus:
 		AddIndent()
 		RecordsTextArea.Append (DelimitedText (41408, PlusMinusStat(lbonus), 0))
-	#TODO: Power Attack has its own row
+	paBonus = GemRB.GetPlayerStat (pc, IE_POWERATTACK)
+	if paBonus:
+		AddIndent()
+		RecordsTextArea.Append (DelimitedText (39817, PlusMinusStat(paBonus), 0))
+
 	# Damage Potential (2-12)
 	# add any other bonus to the ammo damage calc
 	AddIndent()
-	wmin = wdice + wbonus + abonus + pbonus + lbonus + dosmin
-	wmax = wdice*wsides + wbonus + abonus + pbonus + lbonus + dosmax
+	wmin = wdice + wbonus + abonus + pbonus + lbonus + dosmin + paBonus
+	wmax = wdice * wsides + wbonus + abonus + pbonus + lbonus + dosmax + paBonus
 	RecordsTextArea.Append (DelimitedText (41120, str (wmin)+"-"+str(wmax), 0))
 	# Critical Hit (19-20 / x2)
 	crange = combatdet["CriticalRange"]
