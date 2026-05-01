@@ -487,16 +487,23 @@ def PlusMinusStat(value):
 		return "+" + str(value)
 	return str(value)
 
-def CascadeToHit(total, ac, apr, slot):
-	cascade = PlusMinusStat(total)
+def CascadeToHit(total, ac, apr, slot, flags = 0):
+	babs = [ PlusMinusStat(total) ]
 	babDec = 5
 	if ac["Wisdom"] and slot == 10: # fist slot - nothing is equipped
 		babDec = 3
 
 	for i in range(1, apr):
 		if total-i*babDec > 0: # skips negative ones, meaning a lower number of attacks can be displayed
-			cascade = cascade  + "/" + PlusMinusStat(total-i*babDec)
-	return cascade
+			babs.append (PlusMinusStat(total - i * babDec))
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	if flags & 15 == 2 and GemRB.GetPlayerStat (pc, IE_RAPID_SHOT):
+		# extra attack at max BAB
+		babs.insert (0, babs[0])
+		babs.pop ()
+
+	return "/".join(babs)
 
 def ToHitOfHand(combatdet, dualwielding, left=0):
 	ac = combatdet["AC"]
@@ -513,7 +520,7 @@ def ToHitOfHand(combatdet, dualwielding, left=0):
 			apr = combatdet["APR"]//2 - 1
 		else:
 			apr = combatdet["APR"]//2
-		hits = CascadeToHit(tohit["Total"], ac, apr, combatdet["Slot"])
+		hits = CascadeToHit(tohit["Total"], ac, apr, combatdet["Slot"], combatdet["Flags"])
 		RecordsTextArea.Append (DelimitedText (734, hits, 0))
 
 	# Base
