@@ -325,7 +325,21 @@ def DisplayGeneral (pc, targetTextArea):
 			tmp = StateTable.GetValue (str(c - 66), "DESCRIPTION", GTV_REF)
 			RecordsTextArea.Append ("[cap][int=" + str(c) + "]%[/cap][p]" + tmp + "[/p]")
 
-	# TODO: Active Feats (eg. Power attack 4)
+	# Active Feats (eg. Power attack 4)
+	modalFeats = [ IE_EXPERTISE, IE_POWERATTACK, IE_ARTERIAL_STRIKE, IE_HAMSTRING, IE_RAPID_SHOT ]
+	modalFeat = False
+	for modalStat in modalFeats:
+		if GemRB.GetPlayerStat (pc, modalStat):
+			modalFeat = modalStat
+			break
+	if modalFeat:
+		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(40312) + "[/color]\n")
+		if modalFeat in [ IE_POWERATTACK, IE_EXPERTISE ]:
+			featLevel = GemRB.GetPlayerStat (pc, modalFeat)
+		else:
+			featLevel = ""
+		mfStrings = [ 39818, 39817, 39819, 39820, 39821 ]
+		RecordsTextArea.Append (DelimitedText(mfStrings[modalFeat - IE_EXPERTISE], featLevel, 0, " "))
 
 	#race
 	RaceCap = CommonTables.Races.GetValue (RaceName, "UPPERCASE", GTV_REF)
