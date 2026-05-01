@@ -195,14 +195,14 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 	actionLevel = GemRB.GetVar ("ActionLevel")
 
 	# prepare for iwd2 modal feats like expertise
-	modalFeats = []
+	modalFeats = {}
 	if GameCheck.IsIWD2 () and actionLevel == UAW_INNATES:
 		table = GemRB.LoadTable ("mdfeats", False, True)
 		for idx in range(table.GetRowCount()):
 			rowName = table.GetRowName (idx)
 			spellName = table.GetValue (rowName, "SPELL", GTV_STR)
 			if spellName != "*":
-				modalFeats.append (spellName)
+				modalFeats[spellName] = (rowName, idx)
 
 	# bardsongs weren't saved in iwd1, so learn them now if needed
 	if GameCheck.IsIWD1 () and BookType == (1 << IE_SPELL_TYPE_SONG) and HasSpell (actor, IE_SPELL_TYPE_SONG, 0, "SPIN151") == -1:
@@ -341,8 +341,19 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 				Button.SetText ("")
 
 		# handle iwd2 modal feats, presented as spells
-		if actionLevel == UAW_INNATES and Spell['SpellResRef'].upper() in modalFeats:
+		spellRef = Spell['SpellResRef'].upper()
+		if actionLevel == UAW_INNATES and spellRef in modalFeats:
 			Button.SetText ("")
+
+			featStat = modalFeats[spellRef][1] | 0x1000
+			def onPress():
+				if GemRB.GetPlayerStat (actor, featStat):
+					GemRB.SetPlayerStat (actor, featStat, 0)
+				else:
+					# FIXME: this is wrong for expertise and power attack
+					GemRB.SetPlayerStat (actor, featStat, 1)
+				ActionsWindow.SpellPressed ()
+			Button.OnPress (onPress)
 
 	# scroll right button
 	if More:
