@@ -6808,7 +6808,7 @@ void Actor::InitRound(ieDword gameTime)
 	Timers.roundStart = gameTime;
 
 	//print a little message :)
-	Log(MESSAGE, "InitRound", "Name: {} | Attacks: {} | Start: {}", fmt::WideToChar { ShortName }, attacksperround, gameTime);
+	Log(COMBAT, "InitRound", "Name: {} | Attacks: {} | Start: {}", fmt::WideToChar { ShortName }, attacksperround, gameTime);
 
 	// this might not be the right place, but let's give it a go
 	if (attacksperround && InParty) {
@@ -7330,7 +7330,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	// this check shouldn't be necessary, but it causes a divide-by-zero below,
 	// so i would like it to be clear if it ever happens
 	if (attacksperround == 0) {
-		Log(ERROR, "Actor", "APR was 0 in PerformAttack!");
+		Log(COMBAT, "Actor", "APR was 0 in PerformAttack!");
 		return;
 	}
 
@@ -7344,18 +7344,18 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (ShouldStopAttack()) {
 		// this should be avoided by the AF_ALIVE check by all the calling actions
-		Log(ERROR, "Actor", "Attack by dead actor!");
+		Log(COMBAT, "Actor", "Attack by dead actor!");
 		return;
 	}
 
 	if (!objects.LastTarget) {
-		Log(ERROR, "Actor", "Attack without valid target ID!");
+		Log(COMBAT, "Actor", "Attack without valid target ID!");
 		return;
 	}
 	//get target
 	Actor* target = area->GetActorByGlobalID(objects.LastTarget);
 	if (!target) {
-		Log(WARNING, "Actor", "Attack without valid target!");
+		Log(COMBAT, "Actor", "Attack without valid target!");
 		return;
 	}
 
@@ -7371,7 +7371,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		BaseStats[IE_CHECKFORBERSERK] = 3;
 	}
 
-	Log(DEBUG, "Actor", "Performattack for {}, target is: {}", fmt::WideToChar { GetShortName() }, fmt::WideToChar { target->GetShortName() });
+	Log(COMBAT, "Actor", "Performattack for {}, target is: {}", fmt::WideToChar { GetShortName() }, fmt::WideToChar { target->GetShortName() });
 
 	//which hand is used
 	//we do apr - attacksleft so we always use the main hand first
@@ -7423,7 +7423,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (!WithinPersonalRange(this, target, GetWeaponRange(usedLeftHand)) || GetCurrentArea() != target->GetCurrentArea()) {
 		// this is a temporary double-check, remove when bugfixed
-		Log(ERROR, "Actor", "Attack action didn't bring us close enough!");
+		Log(COMBAT, "Actor", "Attack action didn't bring us close enough!");
 		return;
 	}
 
@@ -7596,7 +7596,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	ModifyWeaponDamage(wi, target, damage, critical);
 
 	if (third && target->GetStat(IE_MC_FLAGS) & MC_INVULNERABLE) {
-		Log(DEBUG, "Actor", "Attacking invulnerable target, nulifying damage!");
+		Log(COMBAT, "Actor", "Attacking invulnerable target, nulifying damage!");
 		damage = 0;
 	}
 
