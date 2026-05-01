@@ -328,7 +328,8 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 			Button.OnShiftPress (ActionsWindow.SpellShiftPressed)
 
 		if Spell['SpellResRef']:
-			Button.SetSprites ("guibtbut", 0, 0,1,2,3)
+			if not GameCheck.IsIWD2 (): # who else doesn't need it?
+				Button.SetSprites ("guibtbut", 0, 0, 1, 2, 3)
 			Button.SetSpellIcon (Spell['SpellResRef'], 1)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET)
 			Button.SetTooltip (Spell['SpellName'])
