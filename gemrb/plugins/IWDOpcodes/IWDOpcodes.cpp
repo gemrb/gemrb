@@ -67,13 +67,6 @@ using namespace GemRB;
 
 #define PI_EMPTYBODY 145
 
-//These settings are saved in the V2.2 chr struct in IWD2
-#define ES_EXPERTISE   3
-#define ES_POWERATTACK 4
-#define ES_ARTERIAL    5
-#define ES_HAMSTRING   6
-#define ES_RAPIDSHOT   7
-
 static int fx_ac_vs_damage_type_modifier_iwd2(Scriptable* Owner, Actor* target, Effect* fx); //0
 static int fx_draw_upon_holy_might(Scriptable* Owner, Actor* target, Effect* fx); //84 (iwd2)
 static int fx_ironskins(Scriptable* Owner, Actor* target, Effect* fx); //da (iwd2)
@@ -3254,7 +3247,7 @@ static int fx_power_attack(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!target->HasFeat(Feat::PowerAttack)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
-	ieDword x = target->PCStats->ExtraSettings[ES_POWERATTACK];
+	ieDword x = target->PCStats->ExtraSettings[ModalFeat::POWERATTACK];
 	if (x) {
 		if (target->SetSpellState(SS_POWERATTACK + x)) {
 			UndepleteSourceInnate(target, fx);
@@ -3262,7 +3255,7 @@ static int fx_power_attack(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		if (fx->FirstApply) {
 			//disable mutually exclusive feats
-			target->PCStats->ExtraSettings[ES_EXPERTISE] = 0;
+			target->PCStats->ExtraSettings[ModalFeat::EXPERTISE] = 0;
 
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::PowerAttack, target);
@@ -3286,7 +3279,7 @@ static int fx_expertise(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!target->HasFeat(Feat::Expertise)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
-	ieDword x = target->PCStats->ExtraSettings[ES_EXPERTISE];
+	ieDword x = target->PCStats->ExtraSettings[ModalFeat::EXPERTISE];
 	if (x) {
 		if (target->SetSpellState(SS_EXPERTISE + x)) {
 			UndepleteSourceInnate(target, fx);
@@ -3294,7 +3287,7 @@ static int fx_expertise(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		if (fx->FirstApply) {
 			//disable mutually exclusive feats
-			target->PCStats->ExtraSettings[ES_POWERATTACK] = 0;
+			target->PCStats->ExtraSettings[ModalFeat::POWERATTACK] = 0;
 
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Expertise, target);
@@ -3317,7 +3310,7 @@ static int fx_arterial_strike(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!target->HasFeat(Feat::ArterialStrike)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
-	if (target->PCStats->ExtraSettings[ES_ARTERIAL]) {
+	if (target->PCStats->ExtraSettings[ModalFeat::ARTERIAL]) {
 		if (target->SetSpellState(SS_ARTERIAL)) {
 			UndepleteSourceInnate(target, fx);
 			return FX_NOT_APPLIED; // don't apply it twice
@@ -3328,7 +3321,7 @@ static int fx_arterial_strike(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				fx->Resource = "ARTSTR";
 			}
 			//disable mutually exclusive feats
-			target->PCStats->ExtraSettings[ES_HAMSTRING] = 0;
+			target->PCStats->ExtraSettings[ModalFeat::HAMSTRING] = 0;
 
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Arterial, target);
@@ -3354,7 +3347,7 @@ static int fx_hamstring(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!target->HasFeat(Feat::Hamstring)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
-	if (target->PCStats->ExtraSettings[ES_HAMSTRING]) {
+	if (target->PCStats->ExtraSettings[ModalFeat::HAMSTRING]) {
 		if (target->SetSpellState(SS_HAMSTRING)) {
 			UndepleteSourceInnate(target, fx);
 			return FX_NOT_APPLIED; // don't apply it twice
@@ -3365,7 +3358,7 @@ static int fx_hamstring(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				fx->Resource = "HAMSTR";
 			}
 			//disable mutually exclusive feats
-			target->PCStats->ExtraSettings[ES_ARTERIAL] = 0;
+			target->PCStats->ExtraSettings[ModalFeat::ARTERIAL] = 0;
 
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Hamstring, target);
@@ -3390,7 +3383,7 @@ static int fx_rapid_shot(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!target->HasFeat(Feat::RapidShot)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
-	if (target->PCStats->ExtraSettings[ES_RAPIDSHOT]) {
+	if (target->PCStats->ExtraSettings[ModalFeat::RAPIDSHOT]) {
 		if (target->SetSpellState(SS_RAPIDSHOT)) {
 			UndepleteSourceInnate(target, fx);
 			return FX_NOT_APPLIED; // don't apply it twice

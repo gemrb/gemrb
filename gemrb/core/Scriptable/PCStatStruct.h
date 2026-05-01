@@ -8,6 +8,8 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include "EnumIndex.h"
+
 #include "Strings/String.h"
 
 #include <array>
@@ -74,7 +76,27 @@ namespace GemRB {
 
 #define MAX_ACT_COUNT 100
 
-#define ES_COUNT 16 //number of iwd2 persistent feat preset values (original iwd2 had only 5)
+// these settings are saved in the V2.2 chr struct in IWD2
+enum class ModalFeat : ieDword {
+	ES_0,
+	ES_1,
+	ES_2,
+	EXPERTISE,
+	POWERATTACK,
+	ARTERIAL,
+	HAMSTRING,
+	RAPIDSHOT,
+	ES_8,
+	ES_9,
+	ES_10,
+	ES_11,
+	ES_12,
+	ES_13,
+	ES_14,
+	ES_15,
+
+	count // number of iwd2 modal feat preset values (original iwd2 had only 5)
+};
 
 #define GUIBT_COUNT (MAX_QSLOTS + 3)
 
@@ -112,7 +134,7 @@ public:
 	FavoriteList FavouriteWeapons;
 	ResRef SoundSet;
 	String SoundFolder;
-	std::array<ieDword, ES_COUNT> ExtraSettings { 0 }; //iwd2 - expertise, hamstring, arterial strike, etc
+	EnumArray<ModalFeat, ieDword> ExtraSettings {}; // iwd2 - expertise, hamstring, arterial strike, etc
 	std::array<ResRef, MAX_QSLOTS> QuickSpells; //iwd2 uses 9, others use only 3
 	std::array<ieWord, MAX_QUICKWEAPONSLOT> QuickWeaponSlots { 0xffff }; //iwd2 uses 8, others use only 4
 	std::array<ieWord, MAX_QUICKWEAPONSLOT> QuickWeaponHeaders { 0xffff };

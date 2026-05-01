@@ -91,7 +91,7 @@ static ConfigCache CFGCache;
 
 #define MAX_FEATV 4294967295U // 1<<32-1 (used for the triple-stat feat handling)
 
-static ResRef featSpells[ES_COUNT];
+static EnumArray<ModalFeat, ResRef> featSpells;
 static bool pstflags = false;
 static bool nocreate = false;
 static bool third = false;
@@ -1854,8 +1854,8 @@ static void InitActorTables()
 
 	tm = gamedata->LoadTable("mdfeats", true);
 	if (tm) {
-		for (int i = 0; i < ES_COUNT; i++) {
-			featSpells[i] = tm->QueryField(i, 0);
+		for (const ModalFeat i : EnumIterator<ModalFeat>()) {
+			featSpells[i] = tm->QueryField(static_cast<int>(i), 0);
 		}
 	}
 
@@ -6194,10 +6194,10 @@ void Actor::ApplyFeats()
 void Actor::ApplyExtraSettings()
 {
 	if (!PCStats) return;
-	for (int i = 0; i < ES_COUNT; i++) {
-		if (!featSpells[i].IsEmpty() && !IsStar(featSpells[i])) {
-			if (PCStats->ExtraSettings[i]) {
-				core->ApplySpell(featSpells[i], this, this, PCStats->ExtraSettings[i]);
+	for (const ModalFeat mf : EnumIterator<ModalFeat>()) {
+		if (!featSpells[mf].IsEmpty() && !IsStar(featSpells[mf])) {
+			if (PCStats->ExtraSettings[mf]) {
+				core->ApplySpell(featSpells[mf], this, this, PCStats->ExtraSettings[mf]);
 			}
 		}
 	}
@@ -7011,8 +7011,7 @@ bool Actor::GetCombatDetails(int& toHit, bool leftOrRight, int& damageBonus,
 	ToHit.SetProficiencyBonus(prof);
 
 	if (third) {
-		// power attack bonus
-		damageBonus += PCStats ? PCStats->ExtraSettings[4] : 0;
+		damageBonus += PCStats ? PCStats->ExtraSettings[ModalFeat::POWERATTACK] : 0;
 	}
 
 	// get the remaining boni
@@ -7159,8 +7158,8 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 	if (third) {
 		int modalFeatBonus = HasSpellState(SS_RAPIDSHOT) ? -2 : 0;
 		if (PCStats) {
-			// expertise and power attack
-			modalFeatBonus -= PCStats->ExtraSettings[3] + PCStats->ExtraSettings[4];
+			modalFeatBonus -= PCStats->ExtraSettings[ModalFeat::EXPERTISE];
+			modalFeatBonus -= PCStats->ExtraSettings[ModalFeat::POWERATTACK];
 		}
 		ToHit.SetAbilityBonus(dexbonus + strbonus + modalFeatBonus);
 	} else {
