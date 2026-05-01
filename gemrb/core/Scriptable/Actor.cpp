@@ -86,6 +86,7 @@ struct ConfigCache {
 	int difficultyLuckMod = 0;
 	int difficultyDamageMod = 0;
 	int difficultySaveMod = 0;
+	ieDword translucentShadows = 0;
 };
 static ConfigCache CFGCache;
 
@@ -161,7 +162,6 @@ ActionButtonRow DefaultButtons = { ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 static int QslotTranslation = false;
 static int DeathOnZeroStat = true;
 static int IWDSound = false;
-static ieDword TranslucentShadows = 0;
 static ieDword SpellStatesSize = 0; // the spellStates bitfield was stored as a sequence of ints
 
 //letters for char sound resolution bg1/bg2
@@ -299,8 +299,6 @@ Actor::Actor()
 	if (classcount < 0) {
 		//This block is executed only once, when the first actor is loaded
 		InitActorTables();
-
-		TranslucentShadows = core->GetDictionary().Get("Translucent Shadows", 0);
 	}
 	static size_t maxProjectileCount = core->GetProjectileServer()->GetHighestProjectileNumber();
 	projectileImmunity.resize(maxProjectileCount);
@@ -1614,6 +1612,7 @@ GEM_EXPORT void UpdateActorConfig()
 
 	// iwd has a config option for leniency
 	CFGCache.noExtraDifficultyDmg = core->GetDictionary().Get("Suppress Extra Difficulty Damage", 0);
+	CFGCache.translucentShadows = core->GetDictionary().Get("Translucent Shadows", 0);
 }
 
 static void ReadModalStates()
@@ -8305,7 +8304,7 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
 			if (palette) {
-				palette->TranslucentShadowColor(TranslucentShadows);
+				palette->TranslucentShadowColor(CFGCache.translucentShadows);
 				VideoDriver->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
 			} else {
 				VideoDriver->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
