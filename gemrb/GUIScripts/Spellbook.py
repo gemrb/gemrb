@@ -343,25 +343,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		# handle iwd2 modal feats, presented as spells
 		spellRef = Spell['SpellResRef'].upper()
 		if actionLevel == UAW_INNATES and spellRef in modalFeats:
-			Button.SetText ("")
-			Button.OnRightPress (None)
-			Button.OnShiftPress (None)
-
-			featStat = modalFeats[spellRef][1] | 0x1000
-			def onPress():
-				if GemRB.GetPlayerStat (actor, featStat):
-					GemRB.SetPlayerStat (actor, featStat, 0)
-				else:
-					# FIXME: this is wrong for expertise and power attack
-					GemRB.SetPlayerStat (actor, featStat, 1)
-				ActionsWindow.SpellPressed ()
-			Button.OnPress (onPress)
-
-			# mark as selected if enabled
-			if GemRB.GetPlayerStat (actor, featStat):
-				Button.SetState (IE_GUI_BUTTON_SELECTED)
-			else:
-				Button.SetState (IE_GUI_BUTTON_UNPRESSED)
+			HandleModalFeatButton (Button, actor, modalFeats[spellRef])
 
 	# scroll right button
 	if More:
@@ -374,6 +356,28 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 		else:
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+
+def HandleModalFeatButton (Button, actor, modalFeat):
+	Button.SetText ("")
+	Button.OnRightPress (None)
+	Button.OnShiftPress (None)
+
+	featStat = modalFeat[1] | 0x1000
+	def onPress():
+		if GemRB.GetPlayerStat (actor, featStat):
+			GemRB.SetPlayerStat (actor, featStat, 0)
+		else:
+			# FIXME: this is wrong for expertise and power attack
+			GemRB.SetPlayerStat (actor, featStat, 1)
+		import ActionsWindow
+		ActionsWindow.SpellPressed ()
+	Button.OnPress (onPress)
+
+	# mark as selected if enabled
+	if GemRB.GetPlayerStat (actor, featStat):
+		Button.SetState (IE_GUI_BUTTON_SELECTED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_UNPRESSED)
 
 #################################################################
 # routines used during character generation and levelup
