@@ -3242,28 +3242,37 @@ static int fx_bane(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
+// used for modal feats, which are more like modal states than regular spells
+static void UndepleteSourceInnate(Actor* target, const Effect* fx)
+{
+	target->spellbook.ChargeSpell(fx->SourceRef, IE_IWD2_SPELL_INNATE);
+}
+
 //453 PowerAttack
 static int fx_power_attack(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_power_attack(%2d)", fx->Opcode);
-
 	if (!target->HasFeat(Feat::PowerAttack)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
 	ieDword x = target->PCStats->ExtraSettings[ES_POWERATTACK];
 	if (x) {
-		if (target->SetSpellState(SS_POWERATTACK + x)) return FX_NOT_APPLIED;
+		if (target->SetSpellState(SS_POWERATTACK + x)) {
+			UndepleteSourceInnate(target, fx);
+			return FX_NOT_APPLIED; // don't reapply
+		}
 		if (fx->FirstApply) {
 			//disable mutually exclusive feats
 			target->PCStats->ExtraSettings[ES_EXPERTISE] = 0;
 
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::PowerAttack, target);
+			UndepleteSourceInnate(target, fx);
 		}
 		return FX_APPLIED;
 	}
 
 	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::PowerAttack, target);
+	UndepleteSourceInnate(target, fx);
 	return FX_NOT_APPLIED;
 }
 
@@ -3273,25 +3282,29 @@ static int fx_expertise(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//expertise feat:
 	//convert positive base attack bonus into AC (dodge bonus)
 	//up to feat_expertise count (player's choice)
-	// print("fx_expertise(%2d)", fx->Opcode);
 
 	if (!target->HasFeat(Feat::Expertise)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
 	ieDword x = target->PCStats->ExtraSettings[ES_EXPERTISE];
 	if (x) {
-		if (target->SetSpellState(SS_EXPERTISE + x)) return FX_NOT_APPLIED;
+		if (target->SetSpellState(SS_EXPERTISE + x)) {
+			UndepleteSourceInnate(target, fx);
+			return FX_NOT_APPLIED; // don't reapply
+		}
 		if (fx->FirstApply) {
 			//disable mutually exclusive feats
 			target->PCStats->ExtraSettings[ES_POWERATTACK] = 0;
 
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Expertise, target);
+			UndepleteSourceInnate(target, fx);
 		}
 		return FX_APPLIED;
 	}
 
 	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::Expertise, target);
+	UndepleteSourceInnate(target, fx);
 	return FX_NOT_APPLIED;
 }
 
@@ -3299,13 +3312,15 @@ static int fx_expertise(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //apply arterial strike spell on backstab, this is by default the same as in iwd2
 static int fx_arterial_strike(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_arterial_strike(%2d)", fx->Opcode);
 	//arterial strike doesn't work for npcs?
 	if (!target->HasFeat(Feat::ArterialStrike)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
 	if (target->PCStats->ExtraSettings[ES_ARTERIAL]) {
-		if (target->SetSpellState(SS_ARTERIAL)) return FX_NOT_APPLIED; //don't apply it twice
+		if (target->SetSpellState(SS_ARTERIAL)) {
+			UndepleteSourceInnate(target, fx);
+			return FX_NOT_APPLIED; // don't apply it twice
+		}
 
 		if (fx->FirstApply) {
 			if (fx->Resource.IsEmpty()) {
@@ -3316,6 +3331,7 @@ static int fx_arterial_strike(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Arterial, target);
+			UndepleteSourceInnate(target, fx);
 		}
 		if (IsStar(target->BackstabResRef)) {
 			target->BackstabResRef = fx->Resource;
@@ -3325,6 +3341,7 @@ static int fx_arterial_strike(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//stop arterial
 	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::Arterial, target);
+	UndepleteSourceInnate(target, fx);
 	return FX_NOT_APPLIED;
 }
 
@@ -3332,13 +3349,15 @@ static int fx_arterial_strike(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //apply hamstring spell on backstab, this is by default the same as in iwd2
 static int fx_hamstring(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_hamstring(%2d)", fx->Opcode);
 	//hamstring doesn't work for npcs?
 	if (!target->HasFeat(Feat::Hamstring)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
 	if (target->PCStats->ExtraSettings[ES_HAMSTRING]) {
-		if (target->SetSpellState(SS_HAMSTRING)) return FX_NOT_APPLIED; //don't apply it twice
+		if (target->SetSpellState(SS_HAMSTRING)) {
+			UndepleteSourceInnate(target, fx);
+			return FX_NOT_APPLIED; // don't apply it twice
+		}
 
 		if (fx->FirstApply) {
 			if (fx->Resource.IsEmpty()) {
@@ -3349,6 +3368,7 @@ static int fx_hamstring(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::Hamstring, target);
+			UndepleteSourceInnate(target, fx);
 		}
 		if (IsStar(target->BackstabResRef)) {
 			target->BackstabResRef = fx->Resource;
@@ -3358,19 +3378,22 @@ static int fx_hamstring(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//stop hamstring
 	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::Hamstring, target);
+	UndepleteSourceInnate(target, fx);
 	return FX_NOT_APPLIED;
 }
 
 //457 RapidShot
 static int fx_rapid_shot(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_rapid_shot(%2d)", fx->Opcode);
 	//rapid shot doesn't work for npcs?
 	if (!target->HasFeat(Feat::RapidShot)) return FX_NOT_APPLIED;
 	if (!target->PCStats) return FX_NOT_APPLIED;
 
 	if (target->PCStats->ExtraSettings[ES_RAPIDSHOT]) {
-		if (target->SetSpellState(SS_RAPIDSHOT)) return FX_NOT_APPLIED; //don't apply it twice
+		if (target->SetSpellState(SS_RAPIDSHOT)) {
+			UndepleteSourceInnate(target, fx);
+			return FX_NOT_APPLIED; // don't apply it twice
+		}
 
 		target->ToHit.HandleFxBonus(-2, false);
 		if (fx->FirstApply) {
@@ -3379,13 +3402,14 @@ static int fx_rapid_shot(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(HCStrings::UsingFeat, GUIColors::WHITE, HCStrings::RapidShot, target);
+			UndepleteSourceInnate(target, fx);
 		}
-
 		return FX_APPLIED;
 	}
 
 	//stop rapidshot
 	displaymsg->DisplayConstantStringNameString(HCStrings::StoppedFeat, GUIColors::WHITE, HCStrings::RapidShot, target);
+	UndepleteSourceInnate(target, fx);
 	return FX_NOT_APPLIED;
 }
 
