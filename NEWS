@@ -1,10 +1,10 @@
-GemRB git (653dee9e):
+GemRB git (2179386):
   New features:
     - 
     - audio occlusion based on line of sight
-    - intoxication support
+    - intoxication, TobEx Limit effect stacking, modal feats
     - in-game configuration screen for otherwise hidden settings
-    - moddable GUI code, TobEx Limit effect stacking
+    - moddable GUI code
 
   Improved features:
     - 
