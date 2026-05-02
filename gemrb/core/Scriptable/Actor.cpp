@@ -272,10 +272,6 @@ static EffectRef fx_animation_override_data_ref = { "AnimationOverrideData", -1 
 static EffectRef fx_save_vs_school_bonus_ref = { "SaveVsSchoolModifier", -1 };
 static EffectRef fx_set_diseased_state_ref = { "State:Diseased", -1 };
 
-//used by iwd2
-static const ResRef CripplingStrikeRef = "cripstr";
-static const ResRef DirtyFightingRef = "dirty";
-
 static int avBase, avStance;
 struct avType {
 	ResRef avresref;
@@ -9657,7 +9653,7 @@ void Actor::ModifyWeaponDamage(const WeaponInfo& wi, Actor* target, int& damage,
 
 			//apply the dirty fighting spell
 			if (HasFeat(Feat::DirtyFighting)) {
-				core->ApplySpell(DirtyFightingRef, target, this, multiplier);
+				core->ApplySpell("dirty", target, this, multiplier);
 			}
 		}
 	}
@@ -9715,7 +9711,7 @@ int Actor::GetSneakAttackDamage(Actor* target, const WeaponInfo& wi, int& multip
 		// do we need this?
 		BackstabResRef.Reset();
 		if (HasFeat(Feat::CripplingStrike)) {
-			core->ApplySpell(CripplingStrikeRef, target, this, multiplier);
+			core->ApplySpell("cripstr", target, this, multiplier);
 		}
 	}
 
