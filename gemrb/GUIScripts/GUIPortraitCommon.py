@@ -278,8 +278,6 @@ def PortraitApplySelection():
 	global AppearanceWindow, LastPortrait, PortraitsTable
 	if AppearanceWindow:
 		AppearanceWindow.Close ()
-	if PortraitsTable == 0:
-		PortraitsTable = GemRB.LoadTable("PICTURES")
 	PortraitName = PortraitsTable.GetRowName(LastPortrait)
 	GemRB.SetToken("SmallPortrait", PortraitName + PortraitSuffix["small"])
 	GemRB.SetToken("LargePortrait", PortraitName + PortraitSuffix["large"])
@@ -399,8 +397,7 @@ def PortraitCustomPress():
 		ButtonCancel.SetState(IE_GUI_BUTTON_ENABLED)
 	else:
 		ButtonCancel.SetText(15416)
-	if GameCheck.IsIWD2():
-		ButtonCancel.MakeEscape()
+	ButtonCancel.MakeEscape()
 	ButtonCancel.OnPress(PortraitCustomAbort)
 
 	if IsPortraitModification:
