@@ -5381,7 +5381,7 @@ void Actor::Turn(Scriptable* cleric, ieDword turnlevel)
 			AddTrigger(TriggerEntry(trigger_turnedby, cleric->GetGlobalID()));
 			if (turnlevel >= level + turnDeathLevelMod) {
 				if (gamedata->Exists("panic", IE_SPL_CLASS_ID)) {
-					core->ApplySpell(ResRef("panic"), this, cleric, level);
+					core->ApplySpell("panic", this, cleric, level);
 				} else {
 					Log(DEBUG, "Actor", "Panic from turning!");
 					Panic(cleric, PanicMode::RunAway);
@@ -7945,7 +7945,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	//apply the modal effect about every second (pst and iwds have round sizes that are not multiples of 15)
 	// FIXME: split dayblindness out of detect.spl and only run that each tick + simplify this check
 	if (InParty && core->HasFeature(GFFlags::AUTOSEARCH_HIDDEN) && (third || (roundFraction % core->Time.defaultTicksPerSec == 0))) {
-		core->ApplySpell(ResRef("detect"), this, this, 0);
+		core->ApplySpell("detect", this, this, 0);
 	}
 
 	// this is a HACK, fuzzie can't work out where else to do this for now
