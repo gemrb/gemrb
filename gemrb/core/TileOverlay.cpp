@@ -53,31 +53,42 @@ void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlayPtr>& over
 			int mask = 2;
 			for (size_t z = 1; z < overlays.size(); ++z) {
 				const auto& ov = overlays[z];
-				if (ov && !ov->tiles.empty()) {
-					const Tile& ovtile = ov->tiles[0]; //allow only 1x1 tiles now
-					if (tile.om & mask) {
-						//draw overlay tiles, they should be half transparent except for BG1
-						BlitFlags transFlag = (core->HasFeature(GFFlags::LAYERED_WATER_TILES)) ? BlitFlags::HALFTRANS : BlitFlags::NONE;
-						// this is the water (or whatever)
-						VideoDriver->BlitGameSprite(ovtile.GetAnimation(0)->NextFrame(), p, flags | transFlag, tintcol);
-
-						if (core->HasFeature(GFFlags::LAYERED_WATER_TILES)) {
-							Animation* anim1 = tile.GetAnimation(1);
-							if (anim1) {
-								// this is the mask to blend the terrain tile with the water for everything but BG1
-								VideoDriver->BlitGameSprite(anim1->NextFrame(), p,
-											    flags | BlitFlags::BLENDED, tintcol);
-							}
-						} else {
-							// in BG 1 this is the mask to blend the terrain tile with the water
-							VideoDriver->BlitGameSprite(tile.GetAnimation(0)->NextFrame(), p,
-										    flags | BlitFlags::BLENDED, tintcol);
-						}
-					}
-				}
+				DrawOverlay(tile, ov, mask, p, tintcol, flags);
 				mask <<= 1;
 			}
 		}
+	}
+}
+
+void TileOverlay::DrawOverlay(const Tile& tile, TileOverlayPtr overlay, int mask, const Point& p, const Color& tintCol, BlitFlags flags) const
+{
+	if (!overlay || overlay->tiles.empty()) {
+		return;
+	}
+
+	const Tile& ovTile = overlay->tiles[0]; // allow only 1x1 tiles now
+	if (!(tile.om & mask)) {
+		return;
+	}
+
+	// draw overlay tiles, they should be half transparent except for BG1
+	BlitFlags transFlag = (core->HasFeature(GFFlags::LAYERED_WATER_TILES)) ? BlitFlags::HALFTRANS : BlitFlags::NONE;
+	// this is the water (or whatever)
+	// in the original the fps field was used slightly differently: 1 for max speed:
+	// nextFrame = anim[startingTile + (gameTime / max(1, fps)) % numTiles]
+	VideoDriver->BlitGameSprite(ovTile.GetAnimation(0)->NextFrame(), p, flags | transFlag, tintCol);
+
+	if (core->HasFeature(GFFlags::LAYERED_WATER_TILES)) {
+		Animation* anim1 = tile.GetAnimation(1);
+		if (anim1) {
+			// this is the mask to blend the terrain tile with the water for everything but BG1
+			VideoDriver->BlitGameSprite(anim1->NextFrame(), p,
+						    flags | BlitFlags::BLENDED, tintCol);
+		}
+	} else {
+		// in BG 1 this is the mask to blend the terrain tile with the water
+		VideoDriver->BlitGameSprite(tile.GetAnimation(0)->NextFrame(), p,
+					    flags | BlitFlags::BLENDED, tintCol);
 	}
 }
 
