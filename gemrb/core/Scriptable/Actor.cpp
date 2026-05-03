@@ -163,8 +163,6 @@ static const int booksiwd2[ISCLASSES] = { -1, IE_IWD2_SPELL_WIZARD, -1, -1,
 					  IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, -1,
 					  IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_SORCERER, -1, -1 };
 
-#define CLASS_PCCUTOFF    32
-
 static std::vector<ActionButtonRow> GUIBTDefaults; // qslots per-class rows
 static std::vector<ActionButtonRow2> OtherGUIButtons;
 ActionButtonRow DefaultButtons = { ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
@@ -10419,7 +10417,7 @@ void Actor::CreateDerivedStatsBG()
 	static int defaultAC = gamedata->GetMiscRule("DEFAULT_AC");
 
 	//this works only for PC classes
-	if (classid >= CLASS_PCCUTOFF) return;
+	if (classid >= classcount) return;
 
 	//recalculate all level based changes
 	pcf_level(this, 0, 0);
@@ -10485,7 +10483,7 @@ void Actor::CreateDerivedStatsIWD2()
 	int classid = BaseStats[IE_CLASS];
 
 	// this works only for PC classes
-	if (classid >= CLASS_PCCUTOFF) return;
+	if (classid >= classcount) return;
 
 	// recalculate all level based changes
 	pcf_level(this, 0, 0, classid);
