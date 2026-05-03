@@ -404,7 +404,6 @@ def SetupModalFeats (Window, Offset = 0):
 
 	# which feat are we dealing with?
 	featStat = GemRB.GetVar ("ModalFeatStat")
-	modalFeats = {}
 	table = GemRB.LoadTable ("mdfeats", False, True)
 	spellName = table.GetValue (featStat - EXTRASETTINGS, 0, GTV_STR)
 	spell = GemRB.GetSpell (spellName, True)
