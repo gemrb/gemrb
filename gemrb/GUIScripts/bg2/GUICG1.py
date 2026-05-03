@@ -12,12 +12,9 @@ import CharGenCommon
 GenderWindow = 0
 TextAreaControl = 0
 DoneButton = 0
-MyChar = 0
 
 def OnLoad():
-	global GenderWindow, TextAreaControl, DoneButton, MyChar
-	
-	MyChar = GemRB.GetVar ("Slot")
+	global GenderWindow, TextAreaControl, DoneButton
 
 	GenderWindow = GemRB.LoadWindow(1, "GUICG")
 	GenderWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
@@ -63,6 +60,8 @@ def BackPress():
 	if GenderWindow:
 		GenderWindow.Close ()
 	GemRB.SetNextScript("CharGen")
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (MyChar, IE_SEX, 0)
 	GemRB.SetVar("Gender",0)  #scrapping the gender value
 	return
 
@@ -71,6 +70,7 @@ def NextPress():
 		GenderWindow.Close ()
 
 	Gender = GemRB.GetVar ("Gender")
+	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
 	GemRB.SetNextScript("GUIPortraitCommon") #appearance
 	return
