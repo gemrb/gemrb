@@ -170,11 +170,10 @@ ActionButtonRow DefaultButtons = { ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 
 static void InitActorTables();
 
-#define DAMAGE_LEVELS 19
-
+static constexpr int DAMAGE_LEVELS = 19;
 // ANIMATION1 in dmgtypes.2da, except it only has fire, electricity, cold AND no levels
 // we have both maps in damage.2da, plus the gradient info in damageGradients
-static ResRef damageMainResources[DAMAGE_LEVELS] = {
+static std::array<ResRef, DAMAGE_LEVELS> damageMainResources = {
 	//slot 0 is not used in the original engine
 	"BLOODCR", "BLOODS", "BLOODM", "BLOODL", //blood
 	"SPFIRIMP", "SPFIRIMP", "SPFIRIMP", //fire
@@ -184,7 +183,7 @@ static ResRef damageMainResources[DAMAGE_LEVELS] = {
 	"SPDUSTY2", "SPDUSTY2", "SPDUSTY2" //disintegrate
 };
 // ANIMATION2 in dmgtypes.2da with the same limitations
-static ResRef damageSparks[DAMAGE_LEVELS] = {
+static std::array<ResRef, DAMAGE_LEVELS> damageSparks = {
 	"", "", "", "",
 	"SPBURN", "SPBURN", "SPBURN", //flames
 	"SPSPARKS", "SPSPARKS", "SPSPARKS", //sparks
@@ -193,14 +192,13 @@ static ResRef damageSparks[DAMAGE_LEVELS] = {
 	"", "", ""
 };
 
-static bool damageBlendFlags[DAMAGE_LEVELS] = { false };
+static std::array<bool, DAMAGE_LEVELS> damageBlendFlags {};
 
-#define BLOOD_GRADIENT 19
-#define FIRE_GRADIENT  19
-#define ICE_GRADIENT   71
-#define STONE_GRADIENT 93
-
-static int damageGradients[DAMAGE_LEVELS] = {
+static constexpr int BLOOD_GRADIENT = 19;
+static constexpr int FIRE_GRADIENT = 19;
+static constexpr int ICE_GRADIENT = 71;
+static constexpr int STONE_GRADIENT = 93;
+static std::array<int, DAMAGE_LEVELS> damageGradients = {
 	BLOOD_GRADIENT, BLOOD_GRADIENT, BLOOD_GRADIENT, BLOOD_GRADIENT,
 	FIRE_GRADIENT, FIRE_GRADIENT, FIRE_GRADIENT,
 	-1, -1, -1,
