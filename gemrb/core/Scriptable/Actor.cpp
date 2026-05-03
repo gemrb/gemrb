@@ -272,6 +272,7 @@ Actor::Actor()
 		// this block is executed only once, when the first actor is loaded
 		// or in library/test mode when a new game type has been started
 		InitActorTables();
+		CFGCache.currentGameType = core->config.GameType;
 	}
 	static size_t maxProjectileCount = core->GetProjectileServer()->GetHighestProjectileNumber();
 	projectileImmunity.resize(maxProjectileCount);
@@ -1528,7 +1529,6 @@ static int IsClassFromName(const std::string& name)
 
 GEM_EXPORT void UpdateActorConfig()
 {
-	CFGCache.currentGameType = core->config.GameType;
 	CFGCache.critHitShake = core->GetDictionary().Get("Critical Hit Screen Shake", 1);
 
 	unsigned int effectTextLevel = core->GetDictionary().Get("Effect Text Level", 0);
