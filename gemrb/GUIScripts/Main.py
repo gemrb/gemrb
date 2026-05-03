@@ -90,5 +90,5 @@ def FixRaceTable ():
 	try:
 		shutil.copy (ourPath, path)
 		shutil.copy (ourPath, path + ".gemrb") # so users can easily switch back and forth
-	except:
+	except Exception:
 		print("Manually place the GemRB version of racetext.2da into override/")

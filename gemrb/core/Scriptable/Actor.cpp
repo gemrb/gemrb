@@ -8440,10 +8440,8 @@ bool Actor::ShouldDrawCircle() const
 	}
 
 	//adjust invisibility for enemies
-	if (Modified[IE_EA] > EA_GOODCUTOFF) {
-		if (State & CFGCache.stateInvisible) {
-			return false;
-		}
+	if (Modified[IE_EA] > EA_GOODCUTOFF && State & CFGCache.stateInvisible) {
+		return false;
 	}
 
 	const GameControl* gc = core->GetGameControl();
