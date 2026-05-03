@@ -689,6 +689,7 @@ Interface::~Interface() noexcept
 	ambientManager.reset();
 	musicLoop.reset();
 
+	Spellbook::ReleaseMemory(); // reset for tests, so globals can get regenerated
 	gamedata.reset();
 
 	// Removing all stuff from Cache, except bifs
