@@ -90,6 +90,11 @@ struct ConfigCache {
 	int difficultyDamageMod = 0;
 	int difficultySaveMod = 0;
 	ieDword translucentShadows = 0;
+	int fistStat = IE_CLASS;
+	Actor::stat_t stateInvisible = STATE_INVISIBLE; // used in many places, but different in engines
+	ieDword spellStatesSize = 0; // the spellStates bitfield was stored as a sequence of ints
+	int checkAbilities = false;
+	int qSlotTranslation = false;
 };
 static ConfigCache CFGCache;
 
@@ -98,10 +103,6 @@ static bool pstflags = false;
 static bool nocreate = false;
 static bool third = false;
 static bool iwd2class = false;
-//used in many places, but different in engines
-static ieDword state_invisible = STATE_INVISIBLE;
-
-static int fiststat = IE_CLASS;
 
 //conversion for 3rd ed
 static int isclass[ISCLASSES] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -154,10 +155,8 @@ static std::vector<ActionButtonRow2> OtherGUIButtons;
 ActionButtonRow DefaultButtons = { ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 				   ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3, ACT_CAST, ACT_USE, ACT_QSLOT1, ACT_QSLOT2,
 				   ACT_QSLOT3, ACT_INNATE };
-static int QslotTranslation = false;
 static int DeathOnZeroStat = true;
 static int IWDSound = false;
-static ieDword SpellStatesSize = 0; // the spellStates bitfield was stored as a sequence of ints
 
 //letters for char sound resolution bg1/bg2
 static EnumArray<Verbal, char> csound { '\0' };
@@ -228,7 +227,6 @@ std::map<int, ieByte> numWeaponSlots;
 
 //for every game except IWD2 we need to reverse TOHIT
 static int ReverseToHit = true;
-static int CheckAbilities = false;
 
 // from FXOpcodes
 #define PI_DRUNK     5
@@ -300,7 +298,7 @@ Actor::Actor()
 	}
 
 	RollSaves();
-	spellStates.resize(SpellStatesSize);
+	spellStates.resize(CFGCache.spellStatesSize);
 
 	AC.SetOwner(this);
 	ToHit.SetOwner(this);
@@ -308,12 +306,12 @@ Actor::Actor()
 
 void Actor::SetFistStat(ieDword stat)
 {
-	fiststat = stat;
+	CFGCache.fistStat = stat;
 }
 
 void Actor::SetDefaultActions(int qslot, ieByte slot1, ieByte slot2, ieByte slot3)
 {
-	QslotTranslation = qslot;
+	CFGCache.qSlotTranslation = qslot;
 	DefaultButtons[0] = slot1;
 	DefaultButtons[1] = slot2;
 	DefaultButtons[2] = slot3;
@@ -1313,7 +1311,7 @@ static void handle_overlay(Actor* actor, ieDword idx)
 	// this is just a guess, maybe there are extra conditions
 	// IE_AVATARREMOVAL and unscheduled get handled by not drawing anything at all
 	// MC_ENABLED is not perfectly understood
-	if (!actor->InParty && actor->Modified[IE_STATE_ID] & state_invisible && !(hcOverlays[idx].flags & HC_INVISIBLE)) {
+	if (!actor->InParty && actor->Modified[IE_STATE_ID] & CFGCache.stateInvisible && !(hcOverlays[idx].flags & HC_INVISIBLE)) {
 		return;
 	}
 
@@ -1640,13 +1638,13 @@ static void InitActorTables()
 	}
 
 	if (pstflags) {
-		state_invisible = STATE_PST_INVIS;
+		CFGCache.stateInvisible = STATE_PST_INVIS;
 	} else {
-		state_invisible = STATE_INVISIBLE;
+		CFGCache.stateInvisible = STATE_INVISIBLE;
 	}
 
 	ReverseToHit = core->HasFeature(GFFlags::REVERSE_TOHIT);
-	CheckAbilities = core->HasFeature(GFFlags::CHECK_ABILITIES);
+	CFGCache.checkAbilities = core->HasFeature(GFFlags::CHECK_ABILITIES);
 	DeathOnZeroStat = core->HasFeature(GFFlags::DEATH_ON_ZERO_STAT);
 	IWDSound = core->HasFeature(GFFlags::SOUNDS_INI);
 
@@ -2258,10 +2256,10 @@ static void InitActorTables()
 		if (numstates > 0) {
 			//rounding up
 			// iwd1 has a practically empty ids though, so force a minimum
-			SpellStatesSize = std::max(6, (numstates >> 5) + 1);
+			CFGCache.spellStatesSize = std::max(6, (numstates >> 5) + 1);
 		}
 	} else {
-		SpellStatesSize = 6;
+		CFGCache.spellStatesSize = 6;
 	}
 
 	// modal actions/state data
@@ -2608,7 +2606,7 @@ void Actor::CheckPuppet(Actor* puppet, ieDword type)
 
 	switch (type) {
 		case 1:
-			Modified[IE_STATE_ID] |= state_invisible;
+			Modified[IE_STATE_ID] |= CFGCache.stateInvisible;
 			//also set the improved invisibility flag where available
 			if (!pstflags) {
 				Modified[IE_STATE_ID] |= STATE_INVIS2;
@@ -2645,7 +2643,7 @@ Actor::stats_t Actor::ResetStats(bool init)
 	if (PCStats) {
 		PCStats->States = PCStatsStruct::StateArray();
 	}
-	spellStates.assign(SpellStatesSize, 0);
+	spellStates.assign(CFGCache.spellStatesSize, 0);
 	AC.ResetAll();
 	ToHit.ResetAll(); // effects can result in the change of any of the boni, so we need to reset all
 
@@ -2673,7 +2671,7 @@ void Actor::AddEffects(EffectQueue&& fx)
 	fx.SetOwner(this);
 	fx.AddAllEffects(this, Pos);
 
-	spellStates.assign(SpellStatesSize, 0);
+	spellStates.assign(CFGCache.spellStatesSize, 0);
 	//also clear the spell bonuses just given, they will be
 	//recalculated below again
 	spellbook.ClearBonus();
@@ -8446,7 +8444,7 @@ bool Actor::ShouldDrawCircle() const
 
 	//adjust invisibility for enemies
 	if (Modified[IE_EA] > EA_GOODCUTOFF) {
-		if (State & state_invisible) {
+		if (State & CFGCache.stateInvisible) {
 			return false;
 		}
 	}
@@ -8647,7 +8645,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	int State = Modified[IE_STATE_ID];
 
 	//adjust invisibility for enemies
-	if (Modified[IE_EA] > EA_GOODCUTOFF && (State & state_invisible)) {
+	if (Modified[IE_EA] > EA_GOODCUTOFF && (State & CFGCache.stateInvisible)) {
 		trans = 255;
 	} else if (State & STATE_BLUR) {
 		//can't move this, because there is permanent blur state where
@@ -9060,7 +9058,7 @@ int Actor::Gemrb2IWD2Qslot(ieByte actslot, int slotindex) const
 		13, 5, 119, 0, 0, 0, 0, 0 // 24
 	};
 
-	if (QslotTranslation && slotindex > 2) {
+	if (CFGCache.qSlotTranslation && slotindex > 2) {
 		if (actslot == ACT_NONE) {
 			actslot = ACT_NONE; // do nothing
 		} else if (actslot >= ACT_IWDQSONG) { // quick songs
@@ -9096,7 +9094,7 @@ ieByte Actor::IWD2GemrbQslot(int slotIndex) const
 	ieByte qslot = PCStats->QSlots[slotIndex];
 	//the first three buttons are hardcoded in gemrb
 	//don't mess with them
-	if (QslotTranslation && slotIndex > 2) {
+	if (CFGCache.qSlotTranslation && slotIndex > 2) {
 		if (qslot == 119) { // yep...
 			qslot = ACT_WILDERNESS;
 		} else if (qslot == ACT_NONE) {
@@ -9661,7 +9659,7 @@ void Actor::ModifyWeaponDamage(const WeaponInfo& wi, Actor* target, int& damage,
 int Actor::GetSneakAttackDamage(Actor* target, const WeaponInfo& wi, int& multiplier, bool weaponImmunity)
 {
 	ieDword always = Modified[IE_ALWAYSBACKSTAB];
-	bool invisible = Modified[IE_STATE_ID] & state_invisible;
+	bool invisible = Modified[IE_STATE_ID] & CFGCache.stateInvisible;
 	int sneakAttackDamage = 0;
 
 	// TODO: should be rate limited (web says to once per 4 rounds?)
@@ -9725,7 +9723,7 @@ int Actor::GetSneakAttackDamage(Actor* target, const WeaponInfo& wi, int& multip
 int Actor::GetBackstabDamage(const Actor* target, const WeaponInfo& wi, int multiplier, int damage) const
 {
 	ieDword always = Modified[IE_ALWAYSBACKSTAB];
-	bool invisible = Modified[IE_STATE_ID] & state_invisible;
+	bool invisible = Modified[IE_STATE_ID] & CFGCache.stateInvisible;
 	int backstabDamage = damage;
 
 	//ToBEx compatibility in the ALWAYSBACKSTAB field:
@@ -10054,7 +10052,7 @@ void Actor::SetupFist()
 {
 	int slot = core->QuerySlot(0);
 	assert(core->QuerySlotEffects(slot) == SLOT_EFFECT_FIST);
-	int row = GetBase(fiststat);
+	int row = GetBase(CFGCache.fistStat);
 	int col = GetXPLevel(false);
 	col = Clamp(col, 1, MAX_LEVEL);
 
@@ -10242,7 +10240,7 @@ HCStrings Actor::Unusable(const Item* item) const
 		return HCStrings::CantUseItem;
 	}
 
-	if (!CheckAbilities) {
+	if (!CFGCache.checkAbilities) {
 		return HCStrings::count;
 	}
 
@@ -10297,7 +10295,7 @@ void Actor::SetOverlay(unsigned int overlay)
 //returns true if spell state is already set or illegal
 bool Actor::SetSpellState(ieDword spellstate)
 {
-	if (spellstate >= SpellStatesSize << 5) return true;
+	if (spellstate >= CFGCache.spellStatesSize << 5) return true;
 	ieDword pos = spellstate >> 5;
 	ieDword bit = 1 << (spellstate & 31);
 	if (spellStates[pos] & bit) return true;
@@ -10308,7 +10306,7 @@ bool Actor::SetSpellState(ieDword spellstate)
 //returns true if spell state is already set
 bool Actor::HasSpellState(ieDword spellstate) const
 {
-	if (spellstate >= SpellStatesSize << 5) return false;
+	if (spellstate >= CFGCache.spellStatesSize << 5) return false;
 	ieDword pos = spellstate >> 5;
 	ieDword bit = 1 << (spellstate & 31);
 	if (spellStates[pos] & bit) return true;
@@ -10881,12 +10879,12 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, const Actor* op
 // removes the (normal) invisibility state
 void Actor::CureInvisibility()
 {
-	if (Modified[IE_STATE_ID] & state_invisible) {
+	if (Modified[IE_STATE_ID] & CFGCache.stateInvisible) {
 		auto newfx = EffectQueue::CreateEffect(fx_remove_invisible_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 		core->ApplyEffect(std::move(newfx), this, this);
 
 		//not sure, but better than nothing
-		if (!(Modified[IE_STATE_ID] & state_invisible)) {
+		if (!(Modified[IE_STATE_ID] & CFGCache.stateInvisible)) {
 			AddTrigger(TriggerEntry(trigger_becamevisible));
 		}
 	}
@@ -11062,7 +11060,7 @@ bool Actor::TryToHide()
 	}
 
 	// iwd2 is like the others only when trying to hide for the first time
-	bool continuation = Modified[IE_STATE_ID] & state_invisible;
+	bool continuation = Modified[IE_STATE_ID] & CFGCache.stateInvisible;
 	if (third && continuation) {
 		return TryToHideIWD2();
 	}
@@ -11462,7 +11460,7 @@ bool Actor::IsInvisibleTo(const Scriptable* checker, int flags) const
 	}
 	if (canSeeInvisibles) return false;
 
-	if (flags & 1 && GetSafeStat(IE_STATE_ID) & state_invisible) return true;
+	if (flags & 1 && GetSafeStat(IE_STATE_ID) & CFGCache.stateInvisible) return true;
 	if (flags & 2 && GetSafeStat(IE_STATE_ID) & STATE_INVIS2) return true;
 	if (flags & 4 && HasSpellState(SS_SANCTUARY)) return true;
 
