@@ -22,51 +22,6 @@
 
 using namespace GemRB;
 
-#define PI_PROTFROMEVIL 9
-#define PI_FREEACTION   19
-#define PI_BARKSKIN     20
-#define PI_BANE         35
-#define PI_PANIC        36
-#define PI_NAUSEA       43
-#define PI_HOPELESSNESS 44
-#define PI_STONESKIN    46
-#define PI_TENSER       55
-#define PI_RIGHTEOUS    67
-#define PI_ELEMENTS     76
-#define PI_FAITHARMOR   84
-#define PI_BLEEDING     85
-#define PI_HOLYPOWER    86
-#define PI_DEATHWARD    87
-#define PI_UNCONSCIOUS  88
-#define PI_IRONSKIN     89
-#define PI_ENFEEBLEMENT 90
-#define PI_ELEMPROT     93
-#define PI_MINORGLOBE   96
-#define PI_MAJORGLOBE   97
-#define PI_SHROUD       98
-#define PI_ANTIMAGIC    99
-#define PI_RESILIENT    100
-#define PI_MINDFLAYER   101
-#define PI_CLOAKOFFEAR  102
-#define PI_ENTROPY      103
-#define PI_INSECT       104
-#define PI_STORMSHELL   105
-//#define PI_LOWERRESIST  106 //this is different in iwd2 and bg2
-
-#define PI_AEGIS       119
-#define PI_EXECUTIONER 120
-#define PI_FIRESHIELD  121
-#define PI_ICESHIELD   122
-
-#define PI_TORTOISE 125
-
-#define PI_BLINK 130
-
-#define PI_DAYBLINDNESS 137
-#define PI_HEROIC       138
-
-#define PI_EMPTYBODY 145
-
 static int fx_ac_vs_damage_type_modifier_iwd2(Scriptable* Owner, Actor* target, Effect* fx); //0
 static int fx_draw_upon_holy_might(Scriptable* Owner, Actor* target, Effect* fx); //84 (iwd2)
 static int fx_ironskins(Scriptable* Owner, Actor* target, Effect* fx); //da (iwd2)
@@ -499,7 +454,7 @@ static int fx_ironskins(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (target->SetSpellState(SS_STONESKIN)) return FX_NOT_APPLIED;
 	target->SetGradient(14);
-	target->AddPortraitIcon(PI_STONESKIN);
+	target->AddPortraitIcon(PI_STONESKIN_IWD);
 	return FX_APPLIED;
 }
 

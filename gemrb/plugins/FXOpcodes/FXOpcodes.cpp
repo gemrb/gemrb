@@ -38,45 +38,6 @@
 
 using namespace GemRB;
 
-#define PI_RIGID      2
-#define PI_CONFUSED   3
-#define PI_BERSERK    4
-#define PI_DRUNK      5
-#define PI_POISONED   6
-#define PI_DISEASED   7
-#define PI_BLIND      8
-#define PI_HELD       13
-#define PI_SLEEP      14
-#define PI_BLESS      17
-#define PI_PANIC      36
-#define PI_HASTED     38
-#define PI_FATIGUE    39
-#define PI_SLOWED     41
-#define PI_HOPELESS   44
-#define PI_LEVELDRAIN 53
-#define PI_FEEBLEMIND 54
-#define PI_STUN       55 //bg1+bg2
-#define PI_STUN_IWD   44 //iwd1+iwd2
-#define PI_AID        57
-#define PI_HOLY       59
-#define PI_BOUNCE     65
-#define PI_BOUNCE2    67
-#define PI_PETRIFIED  71
-
-#define PI_CONTINGENCY   75
-#define PI_BLOODRAGE     76 //iwd2
-#define PI_PROJIMAGE     77
-#define PI_MAZE          78
-#define PI_PRISON        79
-#define PI_STONESKIN     80
-#define PI_DEAFNESS      83 //iwd2
-#define PI_SEQUENCER     92
-#define PI_BLUR          109
-#define PI_IMPROVEDHASTE 110
-#define PI_SPELLTRAP     117
-#define PI_CSHIELD       162
-#define PI_CSHIELD2      163
-
 //the original engine stores the colors in sprklclr.2da in a different order
 
 static ScriptedAnimation default_spell_hit;
