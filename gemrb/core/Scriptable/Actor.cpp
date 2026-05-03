@@ -155,7 +155,6 @@ static std::vector<ActionButtonRow2> OtherGUIButtons;
 ActionButtonRow DefaultButtons = { ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 				   ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3, ACT_CAST, ACT_USE, ACT_QSLOT1, ACT_QSLOT2,
 				   ACT_QSLOT3, ACT_INNATE };
-static int DeathOnZeroStat = true;
 static int IWDSound = false;
 
 //letters for char sound resolution bg1/bg2
@@ -1168,7 +1167,7 @@ static void pcf_stat(Actor* actor, ieDword newValue, ieDword stat)
 {
 	if ((signed) newValue <= 0) {
 		static EffectRef fx_minimum_base_stats_ref = { "MinimumBaseStats", -1 };
-		if (DeathOnZeroStat && !actor->fxqueue.HasEffectWithParam(fx_minimum_base_stats_ref, 1)) {
+		if (core->HasFeature(GFFlags::DEATH_ON_ZERO_STAT) && !actor->fxqueue.HasEffectWithParam(fx_minimum_base_stats_ref, 1)) {
 			actor->Die(nullptr);
 		} else {
 			actor->Modified[stat] = 1;
@@ -1645,7 +1644,6 @@ static void InitActorTables()
 
 	ReverseToHit = core->HasFeature(GFFlags::REVERSE_TOHIT);
 	CFGCache.checkAbilities = core->HasFeature(GFFlags::CHECK_ABILITIES);
-	DeathOnZeroStat = core->HasFeature(GFFlags::DEATH_ON_ZERO_STAT);
 	IWDSound = core->HasFeature(GFFlags::SOUNDS_INI);
 
 	//this table lists skill groups assigned to classes
