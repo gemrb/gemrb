@@ -133,6 +133,7 @@ bool DisplayMessage::HasStringReference(HCStrings idx)
 DisplayMessage::DisplayMessage()
 {
 	LoadStringRefs();
+	GUIColorNames = GetAllColors();
 }
 
 void DisplayMessage::DisplayMarkupString(String Text) const

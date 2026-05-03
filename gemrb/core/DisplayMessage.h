@@ -87,7 +87,7 @@ private:
 	/** displays a string in the textarea */
 	void DisplayString(String text, const Color& color, Scriptable* target) const;
 	std::map<GUIColors, std::string> GetAllColors() const;
-	const std::map<GUIColors, std::string> GUIColorNames = DisplayMessage::GetAllColors();
+	std::map<GUIColors, std::string> GUIColorNames;
 
 public:
 	static ieStrRef GetStringReference(HCStrings idx, const Scriptable* = nullptr);
