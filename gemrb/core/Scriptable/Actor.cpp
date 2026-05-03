@@ -119,7 +119,6 @@ static ConfigCache CFGCache;
 static bool pstflags = false;
 static bool nocreate = false;
 static bool third = false;
-static bool iwd2class = false;
 static int IWDSound = false;
 static int ReverseToHit = true; // for every game except IWD2 we need to reverse TOHIT
 
@@ -632,7 +631,9 @@ static TableMgr::index_t GetIWD2KitIndex(ieDword kit, ieDword baseclass = 0, boo
 
 		if (strict) return TableMgr::npos;
 		// this is also hit for kitted multiclasses like illusionist/thieves, who we take care of in the second loop
-		if (iwd2class) Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit {} at expected class {}, recalculating!", kit, baseclass);
+		if (core->HasFeature(GFFlags::LEVELSLOT_PER_CLASS)) {
+			Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit {} at expected class {}, recalculating!", kit, baseclass);
+		}
 	}
 
 	// no class info passed or dc/mc, so infer the kit's parent single class
@@ -652,7 +653,7 @@ TableMgr::index_t Actor::GetKitIndex(ieDword kit, ieDword baseclass) const
 {
 	TableMgr::index_t kitindex = 0;
 
-	if (iwd2class) {
+	if (creVersion == CREVersion::V2_2) {
 		return GetIWD2KitIndex(kit, baseclass);
 	}
 
@@ -686,7 +687,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 	// at the same time each baseclass has its own level stat, so the logic is cleaner
 	// NOTE: in iwd2 there are no pure class options for classes with kits, a kit has to be chosen
 	// even generalist mages are a kit the same way as in the older games
-	if (iwd2class) {
+	if (creVersion == CREVersion::V2_2) {
 		// callers always pass a baseclass (only exception are actions not present in iwd2: addkit and addsuperkit)
 		assert(baseclass != 0);
 		row = GetIWD2KitIndex(kit, baseclass, true);
@@ -769,7 +770,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 	}
 	max = GetLevelInClass(cls);
 	// iwd2 has clabs for kits and classes in the same table
-	if (kitclass == cls || iwd2class) {
+	if (kitclass == cls || creVersion == CREVersion::V2_2) {
 		ApplyClab(clab, max, remove, diff);
 	} else {
 		ApplyClab(class2kits[cls].clab, max, remove, diff);
@@ -1015,8 +1016,8 @@ static void pcf_class(Actor* actor, ieDword /*oldValue*/, ieDword newValue)
 	//in case of iwd2. Maybe we need a custom quickslots flag here.
 	// also ensure multiclass is set early, since GetActiveClass relies on it
 	actor->ResetMC();
-	actor->InitButtons(actor->GetActiveClass(), !iwd2class);
-	if (iwd2class && actor->Ticks == 0 && actor->PCStats) {
+	actor->InitButtons(actor->GetActiveClass(), actor->creVersion != CREVersion::V2_2);
+	if (actor->creVersion == CREVersion::V2_2 && actor->Ticks == 0 && actor->PCStats) {
 		// force reset only the first 3 hardcoded action buttons
 		actor->PCStats->QSlots[0] = DefaultButtons[0];
 		actor->PCStats->QSlots[1] = DefaultButtons[1];
@@ -1624,7 +1625,7 @@ static void InitActorTables()
 	pstflags = core->HasFeature(GFFlags::PST_STATE_FLAGS) != 0;
 	nocreate = core->HasFeature(GFFlags::NO_NEW_VARIABLES) != 0;
 	third = core->HasFeature(GFFlags::RULES_3ED) != 0;
-	iwd2class = core->HasFeature(GFFlags::LEVELSLOT_PER_CLASS) != 0;
+	bool iwd2class = core->HasFeature(GFFlags::LEVELSLOT_PER_CLASS) != 0;
 	// iwd2 has some different base class names
 	if (iwd2class) {
 		isclassnames[ISTHIEF] = "ROGUE";
@@ -5122,7 +5123,7 @@ ieDword Actor::GetXPLevel(int modified) const
 	const stats_t& stats = modified ? Modified : BaseStats;
 
 	stat_t average = 0;
-	if (iwd2class) {
+	if (creVersion == CREVersion::V2_2) {
 		// iwd2
 		return stats[IE_CLASSLEVELSUM];
 	} else {
@@ -10127,7 +10128,7 @@ HCStrings Actor::CheckUsability(const Item* item) const
 		ieDword mcol = itemUse[i].mcol;
 		//if we have a kit, we just use its index for the lookup
 		if (itemUse[i].stat == IE_KIT) {
-			if (!iwd2class) {
+			if (creVersion != CREVersion::V2_2) {
 				if (IsKitInactive()) continue;
 
 				stat = GetKitIndex(stat);
@@ -10141,12 +10142,12 @@ HCStrings Actor::CheckUsability(const Item* item) const
 			}
 		}
 
-		if (!iwd2class && itemUse[i].stat == IE_CLASS) {
+		if (creVersion != CREVersion::V2_2 && itemUse[i].stat == IE_CLASS) {
 			// account for inactive duals
 			stat = GetActiveClass();
 		}
 
-		if (iwd2class && itemUse[i].stat == IE_CLASS) {
+		if (creVersion == CREVersion::V2_2 && itemUse[i].stat == IE_CLASS) {
 			// in iwd2 any class mixin can enable the use, but the stat only holds the first class;
 			// it also means we shouldn't check all kits (which we do last)!
 			// Eg. a paladin of Mystra/sorcerer is allowed to use wands,
@@ -10514,7 +10515,7 @@ void Actor::CreateDerivedStatsIWD2()
 
 void Actor::ResetMC()
 {
-	if (iwd2class) {
+	if (creVersion == CREVersion::V2_2) {
 		multiclass = 0;
 	} else {
 		ieDword cls = BaseStats[IE_CLASS] - 1;
