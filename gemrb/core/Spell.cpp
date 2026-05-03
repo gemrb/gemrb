@@ -74,11 +74,6 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 	return int(ext_headers.size()) - 1;
 }
 
-//-1 will return cfb
-//0 will always return first spell block
-//otherwise set to caster level
-static EffectRef fx_casting_glow_ref = { "CastingGlow", -1 };
-
 void Spell::AddCastingGlow(EffectQueue* fxqueue, ieDword duration, int gender) const
 {
 	char g, t;
@@ -130,6 +125,7 @@ void Spell::AddCastingGlow(EffectQueue* fxqueue, ieDword duration, int gender) c
 		caster->castingSound = core->GetAudioPlayback().PlayDirectional(Resource, SFXChannel::Casting, caster->Pos, caster->GetOrientation());
 	}
 
+	static EffectRef fx_casting_glow_ref = { "CastingGlow", -1 };
 	auto fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_ABSOLUTE);
 	fx->Duration = core->GetGame()->GameTime + duration;
 	fx->InventorySlot = 0xffff;
@@ -164,6 +160,9 @@ static void AdjustPSTDurations(const Spell* spl, Effect& fx, size_t ignoreFx)
 	}
 }
 
+// -1 will return cfb
+// 0 will always return first spell block
+// otherwise set to caster level
 EffectQueue Spell::GetEffectBlock(Scriptable* self, const Point& pos, int block_index, int level, ieDword pro)
 {
 	bool pstFriendly = false;
