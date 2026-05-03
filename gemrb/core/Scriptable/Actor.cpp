@@ -8,10 +8,10 @@
 
 #include "Scriptable/Actor.h"
 
+#include "damages.h"
 #include "defsounds.h"
 #include "ie_feats.h"
 #include "ie_stats.h" // using definitions as described in stats.ids
-#include "opcode_params.h"
 #include "overlays.h"
 #include "strrefs.h"
 #include "voodooconst.h"
@@ -35,7 +35,6 @@
 #include "Sprite2D.h"
 #include "StringMgr.h"
 #include "TableMgr.h"
-#include "damages.h"
 
 #include "GUI/GameControl.h"
 #include "GameScript/GSUtils.h" //needed for DisplayStringCore
@@ -2566,20 +2565,20 @@ bool Actor::SetBaseBit(unsigned int StatIndex, stat_t Value, bool setreset)
 	return true;
 }
 
-void Actor::AddPortraitIcon(ieByte icon) const
+void Actor::AddPortraitIcon(PI icon) const
 {
 	if (!PCStats) {
 		return;
 	}
-	PCStats->EnableState(icon);
+	PCStats->EnableState(UnderType(icon));
 }
 
-void Actor::DisablePortraitIcon(ieByte icon) const
+void Actor::DisablePortraitIcon(PI icon) const
 {
 	if (!PCStats) {
 		return;
 	}
-	PCStats->DisableState(icon);
+	PCStats->DisableState(UnderType(icon));
 }
 
 
@@ -2617,7 +2616,7 @@ void Actor::CheckPuppet(Actor* puppet, ieDword type)
 				return;
 			}
 			Modified[IE_HELD] = 1;
-			AddPortraitIcon(PI_PROJIMAGE);
+			AddPortraitIcon(PI::PROJIMAGE);
 			Modified[IE_STATE_ID] |= STATE_HELPLESS;
 			break;
 		default:
@@ -3007,9 +3006,9 @@ void Actor::RefreshPCStats()
 	}
 	// the cutoff is at half of max, coinciding with where the intoxmod penalties start
 	if (BaseStats[IE_INTOXICATION] >= 50) {
-		AddPortraitIcon(PI_DRUNK);
+		AddPortraitIcon(PI::DRUNK);
 	} else {
-		DisablePortraitIcon(PI_DRUNK);
+		DisablePortraitIcon(PI::DRUNK);
 	}
 
 	//morale recovery every xth AI cycle ... except for pst pcs
@@ -3164,15 +3163,15 @@ void Actor::UpdateFatigue()
 	int LuckMod = core->ResolveStatBonus(this, "luck"); // fatigmod.2da
 	Modified[IE_LUCK] += LuckMod;
 	if (LuckMod < 0) {
-		AddPortraitIcon(PI_FATIGUE);
+		AddPortraitIcon(PI::FATIGUE);
 		if (updated) {
 			// stagger the complaint, so long travels don't cause a fatigue choir
 			Timers.fatigueComplaintDelay = core->Roll(3, core->Time.round_size, 0) * 5;
 		}
 	} else {
 		// the icon can be added manually; eg. by spcl321 in bg2 (berserker enrage)
-		if (!fxqueue.HasEffectWithParam(fx_display_portrait_icon_ref, PI_FATIGUE)) {
-			DisablePortraitIcon(PI_FATIGUE);
+		if (!fxqueue.HasEffectWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::FATIGUE))) {
+			DisablePortraitIcon(PI::FATIGUE);
 		}
 		Timers.fatigueComplaintDelay = 0;
 	}
