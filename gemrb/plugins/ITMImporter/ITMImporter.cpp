@@ -19,6 +19,12 @@ using namespace GemRB;
 static std::vector<int> profs;
 std::map<wchar_t, ieByte> zzmap;
 
+static void Cleanup()
+{
+	profs.clear();
+	zzmap.clear();
+}
+
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
@@ -354,4 +360,5 @@ std::unique_ptr<Effect> ITMImporter::GetFeature(const Item* s)
 
 GEMRB_PLUGIN(0xD913A54, "ITM File Importer")
 PLUGIN_CLASS(IE_ITM_CLASS_ID, ImporterPlugin<ITMImporter>)
+PLUGIN_CLEANUP(Cleanup)
 END_PLUGIN()
