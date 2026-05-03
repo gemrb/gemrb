@@ -58,7 +58,6 @@ def ClickedFemale():
 def NextPress():
 	GenderWindow.Close()
 	MyChar = GemRB.GetVar ("Slot")
-	#GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
 	Gender = GemRB.GetVar ("Gender")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
 	CharGenCommon.next()

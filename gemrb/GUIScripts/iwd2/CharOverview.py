@@ -55,7 +55,7 @@ def UpdateOverview(CurrentStep):
 	
 	# Handle portrait
 	PortraitName = GemRB.GetToken('LargePortrait')
-	if PortraitName != '' and CurrentStep > 1:
+	if CurrentStep > 1:
 		PortraitButton.SetPicture(PortraitName, 'NOPORTLG')
 	
 	# Handle step buttons
@@ -135,12 +135,12 @@ def UpdateOverview(CurrentStep):
 
 	if CurrentStep > 1:
 		name = GemRB.GetToken('CHARNAME')
-		if not name:
-			TextAreaControl.SetText(12135)
-		else:
+		if name:
 			TextAreaControl.SetText(1047)
 			AddText(': ' + GemRB.GetToken('CHARNAME'), 1)
-			AddText(12135)
+		else:
+			TextAreaControl.Clear ()
+		AddText(12135)
 		AddText(': ')
 		strref = 1049 + GemRB.GetPlayerStat (MyChar, IE_SEX)
 		AddText(strref, 1)
@@ -296,7 +296,10 @@ def ImportPress():
 
 def BackPress():
 	# Need to clear relevant variables
-	if GlobalStep == 2: GemRB.SetVar('Gender', 0)
+	if GlobalStep == 2:
+		GemRB.SetVar ('Gender', 0)
+		MyChar = GemRB.GetVar ("Slot")
+		GemRB.SetPlayerStat (MyChar, IE_SEX, 0)
 	elif GlobalStep == 3: GemRB.SetVar('Race', 0)
 	elif GlobalStep == 4: GemRB.SetVar('Class', 0)
 	elif GlobalStep == 5: GemRB.SetVar('Alignment', 0)

@@ -4,7 +4,10 @@
 
 #character generation (GUICG 0)
 import CharOverview
+from ie_stats import IE_SEX
 
 def OnLoad():
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender"))
 	CharOverview.UpdateOverview(2)
 	return
