@@ -30,6 +30,9 @@ public:
 
 	void AddTile(Tile&& tile);
 	void Draw(const Region& viewport, std::vector<TileOverlayPtr>& overlays, BlitFlags flags) const;
+
+private:
+	void DrawOverlay(const Tile& tile, TileOverlayPtr overlay, int mask, const Point& p, const Color& tintCol, BlitFlags flags) const;
 };
 
 }
