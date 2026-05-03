@@ -116,7 +116,7 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 			str->ReadWord(secondary);
 			str->Read(&overlaymask, 1); // bFlags in the original
 			str->Read(&animspeed, 1);
-			// WORD    wFlags in the original (currently unused)
+			// WORD    wFlags used at runtime in the original for door open/close switching (redundant)
 			if (animspeed == 0) {
 				animspeed = ANI_DEFAULT_FRAMERATE;
 			}
