@@ -17,6 +17,8 @@
 
 #include "Region.h"
 
+#include <array>
+
 namespace GemRB {
 
 class DataFileMgr;
@@ -80,7 +82,7 @@ struct CritterEntry {
 	int TotalQuantity = 0; // total number
 	int SpawnCount = 0; // create quantity
 	ieDword TimeOfDay = 0; // spawn time of day (defaults to anytime)
-	ieByte DeathCounters[4] {}; // 4 bytes
+	std::array<ieByte, 4> DeathCounters {}; // 4 bytes
 };
 
 /**

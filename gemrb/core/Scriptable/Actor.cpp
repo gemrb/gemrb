@@ -68,7 +68,6 @@ static std::vector<int> maxLevelForHpRoll;
 static std::map<TableMgr::index_t, std::vector<int>> skillstats;
 static std::map<int, int> stat2skill;
 static std::vector<std::vector<int>> wmLevelMods;
-static const ieVariable CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 
 //verbal constant specific data
 static EnumArray<Verbal> VCMap;
@@ -5847,7 +5846,9 @@ bool Actor::CheckOnDeath()
 	}
 
 	// death counters for PST: APP_GOOD, APP_LAW, APP_LADY, APP_MURDER
-	for (int i = 0, j = APP_GOOD; i < 4; i++) {
+	static const std::array<ieVariable, 4> CounterNames = { "GOOD", "LAW", "LADY", "MURDER" };
+	assert(CounterNames.size() == DeathCounters.size());
+	for (size_t i = 0, j = APP_GOOD; i < DeathCounters.size(); i++) {
 		if (AppearanceFlags & j) {
 			IncrementOrCreateVariable(game->locals, CounterNames[i], DeathCounters[i]);
 		}
