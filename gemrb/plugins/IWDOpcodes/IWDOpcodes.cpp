@@ -2018,7 +2018,7 @@ static int fx_hopelessness(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	}
 
 	if (target->SetSpellState(SS_HOPELESSNESS)) return FX_NOT_APPLIED;
-	target->AddPortraitIcon(PI_HOPELESSNESS);
+	target->AddPortraitIcon(PI_HOPELESS);
 	STATE_SET(STATE_HELPLESS);
 	return FX_APPLIED;
 }
