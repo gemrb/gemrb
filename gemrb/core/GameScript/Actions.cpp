@@ -924,7 +924,7 @@ void GameScript::ResetPlayerAI(Scriptable* Sender, Action* parameters)
 	Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) return;
 
-	static AutoTable partyAI = gamedata->LoadTable("partyai", true);
+	AutoTable partyAI = gamedata->LoadTable("partyai", true);
 	ResRef defaultAI = partyAI->QueryField(actor->GetScriptName(), "AI_SCRIPT");
 	// should we set 0 (SCR_OVERRIDE) instead, now it's the class slot?
 	// ees don't use .bs any more, so the false is always good
