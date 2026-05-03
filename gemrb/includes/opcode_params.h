@@ -227,7 +227,6 @@ namespace GemRB {
 #define PI_SLOWED     41
 #define PI_NAUSEA       43 // iwd
 #define PI_HOPELESS   44
-#define PI_HOPELESSNESS 44 // iwd
 #define PI_STUN_IWD   44 // iwd1 + iwd2
 #define PI_STONESKIN_IWD    46
 #define PI_LEVELDRAIN 53
