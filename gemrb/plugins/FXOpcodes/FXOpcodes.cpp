@@ -1068,7 +1068,7 @@ int fx_cure_sleep_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	// print("fx_cure_sleep_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	BASE_STATE_CURE(STATE_SLEEP);
 	target->fxqueue.RemoveAllEffects(fx_set_sleep_state_ref);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_SLEEP);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::SLEEP));
 	target->SetStance(IE_ANI_GET_UP);
 	return FX_NOT_APPLIED;
 }
@@ -1100,7 +1100,7 @@ int fx_set_berserk_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			STAT_SET(IE_BERSERKSTAGE2, 1);
 			// intentional fallthrough
 		default:
-			target->AddPortraitIcon(PI_BERSERK);
+			target->AddPortraitIcon(PI::BERSERK);
 			break;
 		case 2: //blood rage
 			target->SetSpellState(SS_BERSERK);
@@ -1117,7 +1117,7 @@ int fx_set_berserk_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->SetSpellState(SS_BLOODRAGE);
 			target->SetSpellState(SS_NOHPINFO);
 			target->SetColorMod(0xff, RGBModifier::ADD, 15, Color(128, 0, 0, 0));
-			target->AddPortraitIcon(PI_BLOODRAGE);
+			target->AddPortraitIcon(PI::BLOODRAGE);
 			break;
 	}
 	return FX_PERMANENT;
@@ -1362,7 +1362,7 @@ int fx_cure_poisoned_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	//all three steps are present in bg2 and iwd2
 	BASE_STATE_CURE(STATE_POISONED);
 	target->fxqueue.RemoveAllEffects(fx_poisoned_state_ref);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_POISONED);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::POISONED));
 	return FX_NOT_APPLIED;
 }
 
@@ -1548,7 +1548,7 @@ int fx_set_hasted_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_set_hasted_state(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	target->fxqueue.RemoveAllEffects(fx_set_slow_state_ref);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_SLOWED);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::SLOWED));
 	int old_type = -2;
 	int new_type = -2; // lowest priority by default
 	if (target->GetStat(IE_STATE_ID) & STATE_HASTED) {
@@ -1565,19 +1565,19 @@ int fx_set_hasted_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// note that the number of attacks is handled separately, based on below stats, after effects are applied
 	switch (fx->Parameter2) {
 		case 0: //normal haste
-			target->AddPortraitIcon(PI_HASTED);
+			target->AddPortraitIcon(PI::HASTED);
 			new_type = 0;
 			// -2 initiative bonus
 			STAT_ADD(IE_PHYSICALSPEED, 2);
 			break;
 		case 1: //improved haste
-			target->AddPortraitIcon(PI_IMPROVEDHASTE);
+			target->AddPortraitIcon(PI::IMPROVEDHASTE);
 			new_type = 1;
 			// -2 initiative bonus
 			STAT_ADD(IE_PHYSICALSPEED, 2);
 			break;
 		case 2: //speed haste only
-			target->AddPortraitIcon(PI_HASTED);
+			target->AddPortraitIcon(PI::HASTED);
 			new_type = -1; // SCS detects imp. haste by checking if stat is > 0, so this correctly fails
 			break;
 	}
@@ -1903,7 +1903,7 @@ int fx_set_panic_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddActionInFront(action);
 	}
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_PANIC);
+		target->AddPortraitIcon(PI::PANIC);
 	}
 	target->SetCircleSize();
 	return FX_PERMANENT;
@@ -1932,9 +1932,9 @@ int fx_set_poisoned_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	STATE_SET(STATE_POISONED);
 	if (fx->IsVariable) {
-		target->AddPortraitIcon(static_cast<ieByte>(fx->IsVariable));
+		target->AddPortraitIcon(static_cast<PI>(fx->IsVariable));
 	} else {
-		target->AddPortraitIcon(PI_POISONED);
+		target->AddPortraitIcon(PI::POISONED);
 	}
 
 	ieDword damage = 0;
@@ -1977,7 +1977,7 @@ int fx_set_poisoned_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 		case RPD_SNAKE: //iwd2 snakebite (a poison causing paralysis)
 			STAT_SET(IE_HELD, 1);
-			target->AddPortraitIcon(PI_HELD);
+			target->AddPortraitIcon(PI::HELD);
 			target->SetSpellState(SS_HELD);
 			STATE_SET(STATE_HELPLESS);
 			if (fx->FirstApply) {
@@ -2227,7 +2227,7 @@ int fx_set_unconscious_state(Scriptable* Owner, Actor* target, Effect* fx)
 		// else make the creature untargettable (backlisted); an original hack to avoid stunning damage
 		// knockout then death by some other (eg. script targeting or call lightning)
 
-		target->AddPortraitIcon(PI_SLEEP);
+		target->AddPortraitIcon(PI::SLEEP);
 	}
 	target->InterruptCasting = true;
 	return FX_PERMANENT;
@@ -2247,13 +2247,13 @@ int fx_set_slowed_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	if (STATE_GET(STATE_HASTED)) {
 		BASE_STATE_CURE(STATE_HASTED);
 		target->fxqueue.RemoveAllEffects(fx_set_haste_state_ref);
-		target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_HASTED);
+		target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::HASTED));
 	} else if (STATE_GET(STATE_SLOWED)) {
 		// already slowed
 		return FX_NOT_APPLIED;
 	} else {
 		STATE_SET(STATE_SLOWED);
-		target->AddPortraitIcon(PI_SLOWED);
+		target->AddPortraitIcon(PI::SLOWED);
 		// halve apr and speed
 		STAT_MUL(IE_NUMBEROFATTACKS, 50);
 		STAT_MUL(IE_MOVEMENTRATE, 50);
@@ -2322,7 +2322,8 @@ int fx_cure_petrified_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 		target->SetScript(ResRef(), SCR_RACE, true);
 		target->SetScript(ResRef(), SCR_GENERAL, true);
 		target->SetScript("DPLAYER2", SCR_DEFAULT, false);
-		target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_PETRIFIED); // the spell doesn't do it
+		// the spell doesn't do it
+		target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::PETRIFIED));
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2381,7 +2382,7 @@ static int power_word_stun_iwd2(Actor* target, Effect* fx)
 	fx->Duration = stuntime * core->Time.round_size + core->GetGame()->GameTime;
 	STATE_SET(STATE_STUNNED);
 	STAT_SET(IE_HELD, 1);
-	target->AddPortraitIcon(PI_STUN_IWD);
+	target->AddPortraitIcon(PI::STUN_IWD);
 	return FX_APPLIED;
 }
 
@@ -2414,9 +2415,9 @@ int fx_set_stun_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	STATE_SET(STATE_STUNNED);
 	if (core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) { // all iwds
-		target->AddPortraitIcon(PI_STUN_IWD);
+		target->AddPortraitIcon(PI::STUN_IWD);
 	} else {
-		target->AddPortraitIcon(PI_STUN);
+		target->AddPortraitIcon(PI::STUN);
 	}
 	if (fx->Parameter2 == 1) {
 		target->SetSpellState(SS_AWAKE);
@@ -2431,8 +2432,8 @@ int fx_cure_stun_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	BASE_STATE_CURE(STATE_STUNNED);
 	target->fxqueue.RemoveAllEffects(fx_set_stun_state_ref);
 	target->fxqueue.RemoveAllEffects(fx_hold_creature_no_icon_ref);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_HELD);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_HOPELESS);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::HELD));
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::HOPELESS));
 	return FX_NOT_APPLIED;
 }
 
@@ -2819,7 +2820,7 @@ int fx_set_blur_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//iwd2 specific
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_BLUR);
+		target->AddPortraitIcon(PI::BLUR);
 	}
 	return FX_PERMANENT;
 }
@@ -3076,7 +3077,7 @@ int fx_set_blind_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STATE_SET(STATE_BLIND);
 		//the feat normally exists only in IWD2, but won't hurt
 		if (!target->HasFeat(Feat::BlindFight)) {
-			target->AddPortraitIcon(PI_BLIND);
+			target->AddPortraitIcon(PI::BLIND);
 			if (reverse) {
 				//BG2
 				target->AC.HandleFxBonus(-4, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
@@ -3114,7 +3115,7 @@ int fx_set_feebleminded_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx
 	STATE_SET(STATE_FEEBLE);
 	STAT_SET(IE_INT, 3);
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_FEEBLEMIND);
+		target->AddPortraitIcon(PI::FEEBLEMIND);
 	}
 	//This state is better off with always stored, because of the portrait icon and the int stat
 	//it wouldn't be easily cured if it would go away after irrevocably altering another stat
@@ -3128,7 +3129,7 @@ int fx_cure_feebleminded_state(Scriptable* /*Owner*/, Actor* target, Effect* /*f
 	// print("fx_cure_feebleminded_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	BASE_STATE_CURE(STATE_FEEBLE);
 	target->fxqueue.RemoveAllEffects(fx_set_feebleminded_state_ref);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_FEEBLEMIND);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::FEEBLEMIND));
 	return FX_NOT_APPLIED;
 }
 
@@ -3204,7 +3205,7 @@ int fx_set_diseased_state(Scriptable* Owner, Actor* target, Effect* fx)
 				// in bg2 normal slow
 				fx_set_slowed_state(Owner, target, fx);
 			}
-			target->AddPortraitIcon(PI_SLOWED);
+			target->AddPortraitIcon(PI::SLOWED);
 			break;
 		case RPD_MOLD2:
 		case RPD_MOLD: //mold touch (how)
@@ -3237,7 +3238,7 @@ int fx_set_diseased_state(Scriptable* Owner, Actor* target, Effect* fx)
 	if (damage) {
 		target->Damage(damage, damageType, caster);
 	}
-	if (fx->IsVariable) target->AddPortraitIcon(static_cast<ieByte>(fx->IsVariable));
+	if (fx->IsVariable) target->AddPortraitIcon(static_cast<PI>(fx->IsVariable));
 	target->SetSpellState(SS_DISEASED);
 
 	return FX_APPLIED;
@@ -3251,11 +3252,11 @@ int fx_cure_diseased_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	// so this is even more unlikely to be used as advertised and we can't just STATE_CURE(STATE_DISEASED)
 	target->fxqueue.RemoveAllEffects(fx_diseased_state_ref); //this is what actually happens in bg2
 	// iwd also does this, as its mummies have permanent timing diseases
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_DISEASED);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::DISEASED));
 	// also cures feeblemind, duplicating fx_cure_feebleminded_state
 	BASE_STATE_CURE(STATE_FEEBLE);
 	target->fxqueue.RemoveAllEffects(fx_set_feebleminded_state_ref);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_FEEBLEMIND);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::FEEBLEMIND));
 	return FX_NOT_APPLIED;
 }
 
@@ -3274,7 +3275,7 @@ int fx_set_deaf_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 
 	EXTSTATE_SET(EXTSTATE_DEAF); //iwd1/how needs this
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_DEAFNESS);
+		target->AddPortraitIcon(PI::DEAFNESS);
 	}
 	return FX_APPLIED;
 }
@@ -3516,7 +3517,7 @@ int fx_set_regenerating_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	target->NewBase(IE_HITPOINTS, damage, MOD_ADDITIVE);
-	if (fx->IsVariable) target->AddPortraitIcon(static_cast<ieByte>(fx->IsVariable));
+	if (fx->IsVariable) target->AddPortraitIcon(static_cast<PI>(fx->IsVariable));
 	return FX_APPLIED;
 }
 
@@ -4105,7 +4106,7 @@ int fx_movement_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STAT_MOD(IE_MOVEMENTRATE);
 	}
 	if (value < target->GetStat(IE_MOVEMENTRATE)) {
-		target->AddPortraitIcon(PI_HASTED);
+		target->AddPortraitIcon(PI::HASTED);
 	}
 	return FX_APPLIED;
 }
@@ -4187,7 +4188,7 @@ int fx_set_confused_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//the portrait icon cannot be made common because rigid thinking uses a different icon
 	//in bg2/how
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_CONFUSED);
+		target->AddPortraitIcon(PI::CONFUSED);
 	}
 	return FX_PERMANENT;
 }
@@ -4218,7 +4219,7 @@ int fx_set_aid_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
 	STAT_ADD(IE_DAMAGEBONUS, fx->Parameter1);
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_AID);
+		target->AddPortraitIcon(PI::AID);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(50, 50, 50, 0));
 	}
 	return FX_APPLIED;
@@ -4243,7 +4244,7 @@ int fx_set_bless_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_DAMAGEBONUS, fx->Parameter1);
 	if (target->ShouldModifyMorale()) STAT_ADD(IE_MORALE, fx->Parameter1);
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_BLESS);
+		target->AddPortraitIcon(PI::BLESS);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xc0, 0x80, 0, 0));
 	}
 	return FX_APPLIED;
@@ -4275,7 +4276,7 @@ int fx_set_holy_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_CON, fx->Parameter1);
 	STAT_ADD(IE_DEX, fx->Parameter1);
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_HOLY);
+		target->AddPortraitIcon(PI::HOLY);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0x80, 0x80, 0x80, 0));
 	}
 	return FX_APPLIED;
@@ -4633,8 +4634,8 @@ int fx_visual_spell_hit(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_display_portrait_icon(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	static EffectRef fx_disable_portrait_icon_ref = { "Icon:Disable", -1 };
-	if (!target->fxqueue.HasEffectWithParam(fx_disable_portrait_icon_ref, fx->Parameter2)) {
-		target->AddPortraitIcon(fx->Parameter2);
+	if (!target->fxqueue.HasEffectWithParam(fx_disable_portrait_icon_ref, static_cast<ieDword>(fx->Parameter2))) {
+		target->AddPortraitIcon(static_cast<PI>(fx->Parameter2));
 	}
 	return FX_APPLIED;
 }
@@ -5111,7 +5112,7 @@ int fx_cure_hold_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	//note that this effect doesn't remove 185 (another hold effect)
 	target->fxqueue.RemoveAllEffects(fx_hold_creature_ref);
 	target->fxqueue.RemoveAllEffects(fx_hold_creature_no_icon_ref);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_HELD);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::HELD));
 	return FX_NOT_APPLIED;
 }
 
@@ -5209,8 +5210,7 @@ int fx_remove_creature(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0xa9 Icon:Disable
 int fx_disable_portrait_icon(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	// print("fx_disable_portrait_icon(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-	target->DisablePortraitIcon(fx->Parameter2);
+	target->DisablePortraitIcon(static_cast<PI>(fx->Parameter2));
 	return FX_APPLIED;
 }
 
@@ -5348,7 +5348,7 @@ int fx_hold_creature(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	target->SetSpellState(SS_HELD);
 	STAT_SET(IE_HELD, 1);
-	target->AddPortraitIcon(PI_HELD);
+	target->AddPortraitIcon(PI::HELD);
 	return FX_APPLIED;
 }
 //0xb0 see: fx_movement_modifier
@@ -5794,7 +5794,7 @@ int fx_bounce_opcode(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_bounce_opcode(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	STAT_BIT_OR_PCF(IE_BOUNCE, BNC_OPCODE);
-	target->AddPortraitIcon(PI_BOUNCE2);
+	target->AddPortraitIcon(PI::BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -5803,7 +5803,7 @@ int fx_bounce_spelllevel(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_bounce_spellevel(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	STAT_BIT_OR_PCF(IE_BOUNCE, BNC_LEVEL);
-	target->AddPortraitIcon(PI_BOUNCE2);
+	target->AddPortraitIcon(PI::BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -5817,7 +5817,7 @@ int fx_bounce_spelllevel_dec(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	STAT_BIT_OR_PCF(IE_BOUNCE, BNC_LEVEL_DEC);
-	target->AddPortraitIcon(PI_BOUNCE);
+	target->AddPortraitIcon(PI::BOUNCE);
 	return FX_APPLIED;
 }
 
@@ -5830,7 +5830,7 @@ int fx_protection_spelllevel_dec(Scriptable* /*Owner*/, Actor* target, Effect* f
 		return FX_NOT_APPLIED;
 	}
 	STAT_BIT_OR(IE_IMMUNITY, IMM_LEVEL_DEC);
-	target->AddPortraitIcon(PI_BOUNCE2);
+	target->AddPortraitIcon(PI::BOUNCE2);
 	target->SetOverlay(OV_SPELLTRAP);
 	return FX_APPLIED;
 }
@@ -5840,7 +5840,7 @@ int fx_bounce_school(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_bounce_school(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	STAT_BIT_OR_PCF(IE_BOUNCE, BNC_SCHOOL);
-	target->AddPortraitIcon(PI_BOUNCE2);
+	target->AddPortraitIcon(PI::BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -5849,7 +5849,7 @@ int fx_bounce_secondary_type(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*
 {
 	// print("fx_bounce_secondary_type(%2d): Type: %d", fx->Opcode, fx->Parameter2);
 	STAT_BIT_OR_PCF(IE_BOUNCE, BNC_SECTYPE);
-	target->AddPortraitIcon(PI_BOUNCE2);
+	target->AddPortraitIcon(PI::BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -6025,7 +6025,7 @@ int fx_imprisonment(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 	STAT_SET(IE_AVATARREMOVAL, 1);
-	target->AddPortraitIcon(PI_PRISON);
+	target->AddPortraitIcon(PI::PRISON);
 	target->SendDiedTrigger();
 	target->Stop();
 	if (target->InParty) core->GetGame()->LeaveParty(target);
@@ -6068,7 +6068,7 @@ int fx_maze(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (core->InCutSceneMode()) return FX_APPLIED;
 
 	STAT_SET(IE_AVATARREMOVAL, 1);
-	target->AddPortraitIcon(PI_MAZE);
+	target->AddPortraitIcon(PI::MAZE);
 	target->Stop();
 	return FX_APPLIED;
 }
@@ -6211,7 +6211,7 @@ int fx_leveldrain_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	STAT_SUB(IE_LORE, mod);
 
-	target->AddPortraitIcon(PI_LEVELDRAIN);
+	target->AddPortraitIcon(PI::LEVELDRAIN);
 	//decrease current hitpoints on first apply
 	if (fx->FirstApply) {
 		//current hitpoints don't have base/modified, only current
@@ -6282,7 +6282,7 @@ int fx_stoneskin_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	STAT_SET(IE_STONESKINS, fx->Parameter1);
-	target->AddPortraitIcon(PI_STONESKIN);
+	target->AddPortraitIcon(PI::STONESKIN);
 	return FX_APPLIED;
 }
 
@@ -6386,7 +6386,7 @@ int fx_bounce_school_dec(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	STAT_BIT_OR_PCF(IE_BOUNCE, BNC_SCHOOL_DEC);
-	target->AddPortraitIcon(PI_BOUNCE2);
+	target->AddPortraitIcon(PI::BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -6400,7 +6400,7 @@ int fx_bounce_secondary_type_dec(Scriptable* /*Owner*/, Actor* target, Effect* f
 		return FX_NOT_APPLIED;
 	}
 	STAT_BIT_OR_PCF(IE_BOUNCE, BNC_SECTYPE_DEC);
-	target->AddPortraitIcon(PI_BOUNCE2);
+	target->AddPortraitIcon(PI::BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -6467,7 +6467,7 @@ int fx_cast_spell_on_condition(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter3) {
-		target->AddPortraitIcon(PI_CONTINGENCY);
+		target->AddPortraitIcon(PI::CONTINGENCY);
 	}
 
 	// get the actor to cast spells at
@@ -6953,8 +6953,8 @@ int fx_cure_confused_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//probably the best is to remove them all by default
 	//New mods can still disable the icon removal by setting param2
 	if (!fx->Parameter2) {
-		target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_CONFUSED);
-		target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_RIGID);
+		target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::CONFUSED));
+		target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::RIGID));
 	}
 	return FX_NOT_APPLIED;
 }
@@ -7139,7 +7139,7 @@ int fx_store_spell_sequencer(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_store_spell_sequencer(%2d)", fx->Opcode);
 	//just display the spell sequencer portrait icon
-	target->AddPortraitIcon(PI_SEQUENCER);
+	target->AddPortraitIcon(PI::SEQUENCER);
 	if (fx->FirstApply && fx->Parameter3) {
 		if (gamedata->Exists(fx->Resource, IE_SPL_CLASS_ID)) {
 			target->spellbook.HaveSpell(fx->Resource, HS_DEPLETE);
@@ -7216,7 +7216,7 @@ int fx_spelltrap(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	target->SetOverlay(OV_SPELLTRAP);
-	target->AddPortraitIcon(PI_SPELLTRAP);
+	target->AddPortraitIcon(PI::SPELLTRAP);
 	return FX_APPLIED;
 }
 
@@ -7442,7 +7442,7 @@ int fx_apply_effect_repeat(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 	}
 
-	if (fx->IsVariable) target->AddPortraitIcon(static_cast<ieByte>(fx->IsVariable));
+	if (fx->IsVariable) target->AddPortraitIcon(static_cast<PI>(fx->IsVariable));
 
 	return FX_APPLIED;
 }
@@ -7805,9 +7805,9 @@ int fx_chaos_shield_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_chaos_shield_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	STAT_ADD(IE_CHAOSSHIELD, fx->Parameter1);
 	if (fx->Parameter2) {
-		target->AddPortraitIcon(PI_CSHIELD); //162
+		target->AddPortraitIcon(PI::CSHIELD); //162
 	} else {
-		target->AddPortraitIcon(PI_CSHIELD2); //163
+		target->AddPortraitIcon(PI::CSHIELD2); //163
 	}
 	target->SetOverlay(OV_BOUNCE);
 	return FX_APPLIED;
@@ -8027,7 +8027,7 @@ int fx_magical_rest(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	//instant, full rest
 	target->Rest(8);
 	target->fxqueue.RemoveAllEffects(fx_fatigue_ref);
-	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_FATIGUE);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, static_cast<ieDword>(PI::FATIGUE));
 	return FX_NOT_APPLIED;
 }
 

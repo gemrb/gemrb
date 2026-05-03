@@ -7,6 +7,7 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "opcode_params.h"
 #include "strrefs.h"
 #include "versions.h"
 
@@ -926,9 +927,9 @@ public:
 	void Rest(int hours);
 	int GetConHealAmount() const;
 	/* adds a state icon to the list */
-	void AddPortraitIcon(ieByte icon) const;
+	void AddPortraitIcon(PI icon) const;
 	/* disables a state icon in the list, doesn't remove it! */
-	void DisablePortraitIcon(ieByte icon) const;
+	void DisablePortraitIcon(PI icon) const;
 	/* returns which slot belongs to the quickweapon slot */
 	int GetQuickSlot(int slot) const;
 	/* Sets equipped Quick slot, if header is -1, then use the current one */

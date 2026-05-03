@@ -438,7 +438,7 @@ static int fx_ironskins(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			STAT_SET(IE_STONESKINS, fx->Parameter1);
 		}
 		target->SetSpellState(SS_IRONSKIN);
-		target->AddPortraitIcon(PI_IRONSKIN);
+		target->AddPortraitIcon(PI::IRONSKIN);
 		return FX_APPLIED;
 	}
 
@@ -454,7 +454,7 @@ static int fx_ironskins(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (target->SetSpellState(SS_STONESKIN)) return FX_NOT_APPLIED;
 	target->SetGradient(14);
-	target->AddPortraitIcon(PI_STONESKIN_IWD);
+	target->AddPortraitIcon(PI::STONESKIN_IWD);
 	return FX_APPLIED;
 }
 
@@ -509,7 +509,7 @@ static int fx_chill_touch_panic(Scriptable* /*Owner*/, Actor* target, Effect* fx
 		STATE_SET(state);
 	}
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_PANIC);
+		target->AddPortraitIcon(PI::PANIC);
 	}
 	return FX_PERMANENT;
 }
@@ -2018,7 +2018,7 @@ static int fx_hopelessness(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	}
 
 	if (target->SetSpellState(SS_HOPELESSNESS)) return FX_NOT_APPLIED;
-	target->AddPortraitIcon(PI_HOPELESS);
+	target->AddPortraitIcon(PI::HOPELESS);
 	STATE_SET(STATE_HELPLESS);
 	return FX_APPLIED;
 }
@@ -2029,7 +2029,7 @@ static int fx_protection_from_evil(Scriptable* /*Owner*/, Actor* target, Effect*
 	// print("fx_protection_from_evil(%2d)", fx->Opcode);
 	//
 	if (target->SetSpellState(SS_PROTFROMEVIL)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_PROTFROMEVIL);
+	target->AddPortraitIcon(PI::PROTFROMEVIL);
 	//+2 to all saving throws and AC
 	HandleSaveBoni(target, 2, fx->TimingMode);
 	target->AC.SetDeflectionBonus(2, 0);
@@ -2060,7 +2060,7 @@ static int fx_armor_of_faith(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_RESISTMAGICCOLD, fx->Parameter1);
 	STAT_ADD(IE_RESISTMAGICFIRE, fx->Parameter1);
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_FAITHARMOR);
+		target->AddPortraitIcon(PI::FAITHARMOR);
 	}
 	return FX_APPLIED;
 }
@@ -2082,7 +2082,7 @@ static int fx_nausea(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	//end of unsure part
 	if (target->SetSpellState(SS_NAUSEA)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_NAUSEA);
+	target->AddPortraitIcon(PI::NAUSEA);
 	STATE_SET(STATE_HELPLESS | STATE_SLEEP);
 	return FX_APPLIED;
 }
@@ -2093,7 +2093,7 @@ static int fx_enfeeblement(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_enfeeblement(%2d)", fx->Opcode);
 	if (target->SetSpellState(SS_ENFEEBLED)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_ENFEEBLEMENT);
+	target->AddPortraitIcon(PI::ENFEEBLEMENT);
 	STAT_ADD(IE_STR, -15);
 	return FX_APPLIED;
 }
@@ -2104,11 +2104,11 @@ static int fx_fireshield(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_fireshield(%2d) Type: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter2) {
 		if (target->SetSpellState(SS_ICESHIELD)) return FX_APPLIED;
-		target->AddPortraitIcon(PI_ICESHIELD);
+		target->AddPortraitIcon(PI::ICESHIELD);
 		target->SetOverlay(OV_ICESHIELD1);
 	} else {
 		if (target->SetSpellState(SS_FIRESHIELD)) return FX_APPLIED;
-		target->AddPortraitIcon(PI_FIRESHIELD);
+		target->AddPortraitIcon(PI::FIRESHIELD);
 		target->SetOverlay(OV_FIRESHIELD1);
 	}
 	// create a general CastSpellOnCondition effect (bg2) for the payload
@@ -2129,7 +2129,7 @@ static int fx_death_ward(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_death_ward(%2d)", fx->Opcode);
 	if (target->SetSpellState(SS_DEATHWARD)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_DEATHWARD); // is it ok?
+	target->AddPortraitIcon(PI::DEATHWARD); // is it ok?
 
 	return FX_APPLIED;
 }
@@ -2141,7 +2141,7 @@ static int fx_holy_power(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	if (target->SetSpellState(SS_HOLYPOWER)) return FX_APPLIED;
 
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_HOLYPOWER);
+		target->AddPortraitIcon(PI::HOLYPOWER);
 		target->SetColorMod(0xff, RGBModifier::ADD, 20, Color(0x80, 0x80, 0x80, 0));
 	}
 	STAT_ADD(IE_DAMAGEBONUS, 4);
@@ -2160,7 +2160,7 @@ static int fx_righteous_wrath(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//
 	}
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_RIGHTEOUS);
+		target->AddPortraitIcon(PI::RIGHTEOUS);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xd7, 0xb6, 0, 0));
 	}
 	return FX_APPLIED;
@@ -2347,7 +2347,7 @@ static int fx_resilient_sphere(Scriptable* /*Owner*/, Actor* target, Effect* /*f
 	target->SetSpellState(SS_HELD | SS_RESILIENT);
 	STATE_SET(STATE_HELPLESS);
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_RESILIENT);
+		target->AddPortraitIcon(PI::RESILIENT);
 		target->SetOverlay(OV_RESILIENT);
 	}
 	return FX_APPLIED;
@@ -2372,7 +2372,7 @@ static int fx_barkskin(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->AC.HandleFxBonus(bonus, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
 
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_BARKSKIN);
+		target->AddPortraitIcon(PI::BARKSKIN);
 		target->SetGradient(2);
 	}
 	return FX_APPLIED;
@@ -2411,7 +2411,7 @@ static int fx_bleeding_wounds(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	target->Damage(damage, DAMAGE_POISON, Owner, MOD_ADDITIVE, fx->IsVariable, fx->SavingThrowType);
-	target->AddPortraitIcon(PI_BLEEDING);
+	target->AddPortraitIcon(PI::BLEEDING);
 	return FX_APPLIED;
 }
 
@@ -2487,7 +2487,7 @@ static int fx_free_action_iwd2(Scriptable* /*Owner*/, Actor* target, Effect* /*f
 	// 0x28 State:Slowed            ok
 	// 0xb0 MovementRateModifier2   ok
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_FREEACTION);
+		target->AddPortraitIcon(PI::FREEACTION);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0x80, 0x60, 0x60, 0));
 	}
 	return FX_APPLIED;
@@ -2504,7 +2504,7 @@ static int fx_unconsciousness(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	//
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_UNCONSCIOUS);
+		target->AddPortraitIcon(PI::UNCONSCIOUS);
 	}
 	return FX_APPLIED;
 }
@@ -2525,7 +2525,7 @@ static int fx_entropy_shield(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddProjectileImmunity(pro);
 	}
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_ENTROPY);
+		target->AddPortraitIcon(PI::ENTROPY);
 		//entropy shield overlay
 		target->SetOverlay(OV_ENTROPY);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0x40, 0xc0, 0x40, 0));
@@ -2553,7 +2553,7 @@ static int fx_protection_from_elements(Scriptable* /*Owner*/, Actor* target, Eff
 {
 	// print("fx_protection_from_elements(%2d)", fx->Opcode);
 	if (target->SetSpellState(SS_ELEMPROT)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_ELEMPROT);
+	target->AddPortraitIcon(PI::ELEMPROT);
 	STAT_ADD(IE_RESISTFIRE, 15);
 	STAT_ADD(IE_RESISTCOLD, 15);
 	STAT_ADD(IE_RESISTACID, 15);
@@ -2613,7 +2613,7 @@ static int fx_aegis(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_AEGIS);
+		target->AddPortraitIcon(PI::AEGIS);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0x80, 0x60, 0x60, 0));
 		target->SetGradient(14);
 	}
@@ -2631,7 +2631,7 @@ static int fx_executioner_eyes(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->ToHit.HandleFxBonus(4, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
 
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_EXECUTIONER);
+		target->AddPortraitIcon(PI::EXECUTIONER);
 		target->SetGradient(8);
 	}
 	return FX_APPLIED;
@@ -2722,7 +2722,7 @@ static int fx_tortoise_shell(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (target->SetSpellState(SS_TORTOISE)) return FX_NOT_APPLIED;
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_TORTOISE);
+		target->AddPortraitIcon(PI::TORTOISE);
 		target->SetOverlay(OV_TORTOISE);
 	}
 
@@ -2762,13 +2762,13 @@ static int fx_blink(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_ETHEREALNESS, 50); // how likely are people to miss us?
 
 	if (fx->Parameter2) {
-		target->AddPortraitIcon(PI_EMPTYBODY);
+		target->AddPortraitIcon(PI::EMPTYBODY);
 		return FX_APPLIED;
 	}
 
 	// how likely are we to miss others? Combined in the same stat
 	STAT_ADD(IE_ETHEREALNESS, 20 << 8);
-	target->AddPortraitIcon(PI_BLINK);
+	target->AddPortraitIcon(PI::BLINK);
 	return FX_APPLIED;
 }
 
@@ -2821,7 +2821,7 @@ static int fx_day_blindness(Scriptable* Owner, Actor* target, Effect* fx)
 	else
 		return FX_APPLIED;
 
-	target->AddPortraitIcon(PI_DAYBLINDNESS);
+	target->AddPortraitIcon(PI::DAYBLINDNESS);
 
 	//saving throw penalty (bigger is better in iwd2)
 	HandleSaveBoni(target, -penalty, fx->TimingMode);
@@ -2882,7 +2882,7 @@ static int fx_heroic_inspiration(Scriptable* /*Owner*/, Actor* target, Effect* f
 
 	if (target->GetSafeStat(IE_HITPOINTS) * 2 >= target->GetSafeStat(IE_MAXHITPOINTS)) return FX_APPLIED;
 
-	target->AddPortraitIcon(PI_HEROIC);
+	target->AddPortraitIcon(PI::HEROIC);
 	//+1 bab and damage
 	STAT_ADD(IE_DAMAGEBONUS, 1);
 	STAT_ADD(IE_HITBONUS, 1);
@@ -2993,7 +2993,7 @@ static int fx_tenser_transformation(Scriptable* /*Owner*/, Actor* target, Effect
 	STAT_ADD(IE_CON, fx->Parameter5);
 
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_TENSER);
+		target->AddPortraitIcon(PI::TENSER);
 		target->SetGradient(0x3e);
 	}
 
@@ -3050,7 +3050,7 @@ static int fx_alicorn_lance(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_alicorn_lance(%2d)", fx->Opcode);
 	if (target->SetSpellState(SS_ALICORNLANCE)) return FX_APPLIED;
-	////target->AddPortraitIcon(PI_ALICORN); //no portrait icon
+	////target->AddPortraitIcon(PI::ALICORN); //no portrait icon
 	target->AC.HandleFxBonus(-2, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
 	//color glow
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
@@ -3105,18 +3105,18 @@ static int fx_globe_invulnerability(Scriptable* /*Owner*/, Actor* target, Effect
 {
 	// print("fx_globe_invulnerability(%2d)", fx->Opcode);
 	int state;
-	int icon;
+	PI icon;
 	int value;
 	int overlay;
 
 	if (fx->Parameter2) {
 		state = SS_MAJORGLOBE;
-		icon = PI_MAJORGLOBE;
+		icon = PI::MAJORGLOBE;
 		value = 30; //if globe is needed, use 31
 		overlay = OV_GLOBE;
 	} else {
 		state = SS_MINORGLOBE;
-		icon = PI_MINORGLOBE;
+		icon = PI::MINORGLOBE;
 		value = 14; //if globe is needed use 15
 		overlay = OV_MINORGLOBE;
 	}
@@ -3181,7 +3181,7 @@ static int fx_bane(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->FirstApply)
 		target->fxqueue.RemoveAllEffects(fx_bless_ref);
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
-		target->AddPortraitIcon(PI_BANE);
+		target->AddPortraitIcon(PI::BANE);
 		target->SetColorMod(0xff, RGBModifier::ADD, 20, Color(0, 0, 0x80, 0));
 	}
 	int mod = signed(fx->Parameter1);
