@@ -93,6 +93,7 @@ static EnumArray<Verbal, char> csound { '\0' };
 //verbal constant specific data
 static EnumArray<Verbal> VCMap;
 struct ConfigCache {
+	std::string currentGameType;
 	ieDword selectionSndFreq = 0;
 	ieDword commandSndFreq = 0;
 	ieDword boredTimeout = 3000;
@@ -278,8 +279,9 @@ Actor::Actor()
 
 	fxqueue.SetOwner(this);
 	inventory.SetOwner(this);
-	if (classcount < 0) {
-		//This block is executed only once, when the first actor is loaded
+	if (CFGCache.currentGameType != core->config.GameType) {
+		// this block is executed only once, when the first actor is loaded
+		// or in library/test mode when a new game type has been started
 		InitActorTables();
 	}
 	static size_t maxProjectileCount = core->GetProjectileServer()->GetHighestProjectileNumber();
@@ -1535,6 +1537,7 @@ static int IsClassFromName(const std::string& name)
 
 GEM_EXPORT void UpdateActorConfig()
 {
+	CFGCache.currentGameType = core->config.GameType;
 	CFGCache.critHitShake = core->GetDictionary().Get("Critical Hit Screen Shake", 1);
 
 	unsigned int effectTextLevel = core->GetDictionary().Get("Effect Text Level", 0);
