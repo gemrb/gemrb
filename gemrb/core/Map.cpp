@@ -460,6 +460,9 @@ Map::~Map(void)
 	for (auto ambient : ambients) {
 		delete ambient;
 	}
+
+	// for tests with more than one game type
+	InfoPoint::Reset();
 }
 
 void Map::SetTileMapProps(TileProps props)

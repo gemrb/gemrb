@@ -31,6 +31,7 @@ public:
 	int GetCursor(TargetMode targetMode) const;
 	void TryBashLock(Actor*) override { return; };
 	void TryPickLock(Actor*) override { return; };
+	static void Reset();
 
 public:
 	ResRef Destination;
