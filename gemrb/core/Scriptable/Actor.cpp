@@ -217,11 +217,6 @@ constexpr int HC_INVISIBLE = 1;
 
 EnumArray<Modal, ModalStatesStruct> ModalStates;
 
-// from FXOpcodes
-#define PI_DRUNK     5
-#define PI_FATIGUE   39
-#define PI_PROJIMAGE 77
-
 static EffectRef fx_set_haste_state_ref = { "State:Hasted", -1 };
 static EffectRef fx_set_slow_state_ref = { "State:Slowed", -1 };
 static EffectRef fx_sleep_ref = { "State:Helpless", -1 };
