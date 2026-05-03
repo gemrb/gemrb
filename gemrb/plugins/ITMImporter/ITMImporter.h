@@ -10,13 +10,16 @@
 
 namespace GemRB {
 
-#define ITM_VER_BG   10
-#define ITM_VER_PST  11
-#define ITM_VER_IWD2 20
+enum class ITMVersion {
+	INVALID = 0,
+	BG = 10,
+	PST = 11,
+	IWD2 = 20,
+};
 
 class ITMImporter : public ItemMgr {
 private:
-	int version = 0;
+	ITMVersion version {};
 
 public:
 	Item* GetItem(Item* s) override;

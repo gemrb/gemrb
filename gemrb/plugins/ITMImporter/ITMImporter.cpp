@@ -71,11 +71,11 @@ bool ITMImporter::Import(DataStream* str)
 	char Signature[8];
 	str->Read(Signature, 8);
 	if (strncmp(Signature, "ITM V1  ", 8) == 0) {
-		version = 10;
+		version = ITMVersion::BG;
 	} else if (strncmp(Signature, "ITM V1.1", 8) == 0) {
-		version = 11;
+		version = ITMVersion::PST;
 	} else if (strncmp(Signature, "ITM V2.0", 8) == 0) {
-		version = 20;
+		version = ITMVersion::IWD2;
 	} else {
 		Log(WARNING, "ITMImporter", "This file is not a valid ITM file! Actual signature: {}", Signature);
 		return false;
@@ -185,10 +185,10 @@ Item* ITMImporter::GetItem(Item* s)
 	memset(s->unknown, 0, 26);
 
 	//skipping header data for iwd2
-	if (version == ITM_VER_IWD2) {
+	if (version == ITMVersion::IWD2) {
 		str->Read(s->unknown, 16);
 	}
-	if (version == ITM_VER_PST) {
+	if (version == ITMVersion::PST) {
 		//pst data
 		str->ReadResRef(s->Dialog);
 		str->ReadStrRef(s->DialogName);
@@ -231,7 +231,7 @@ Item* ITMImporter::GetItem(Item* s)
 	// handle iwd1/iwd2 weapon "peculiarity"
 	bool zzWeapon = false;
 	int extraFeatureCount = 0;
-	if (s->Name.BeginsWith("ZZ") && version != 11) {
+	if (s->Name.BeginsWith("ZZ") && version != ITMVersion::PST) {
 		zzWeapon = true;
 		// reserve space in the effect array
 		extraFeatureCount = 2;
