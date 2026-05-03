@@ -1944,7 +1944,7 @@ int CREImporter::PutInventory(DataStream* stream, const Actor* actor, unsigned i
 {
 	ieWord ItemCount = 0;
 	std::vector<ieWord> indices(size, -1);
-	static AutoTable slotTypeTable = gamedata->LoadTable("slottype", true);
+	AutoTable slotTypeTable = gamedata->LoadTable("slottype", true);
 
 	// the cloak slot ruins the otherwise predictable order
 	for (unsigned int i = 0; i < size; i++) {
