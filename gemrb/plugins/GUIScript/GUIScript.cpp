@@ -80,23 +80,21 @@ struct UsedItemType {
 	ieStrRef GetFeedback() const { return feedback[RAND<size_t>(0, feedback.size() - 1)]; }
 };
 
-using EventNameType = FixedSizeString<16>;
 using stat_t = Actor::stat_t;
 #define IS_DROP        0
 #define IS_GET         1
 #define IS_SWINGOFFSET 2 // offset to the swing sound columns
-
-#define UNINIT_IEDWORD 0xcccccccc
 
 static std::vector<SpellDescType> SpecialItems;
 static std::vector<UsedItemType> UsedItems;
 
 //4 action button indices are packed on a single ieDword, there are 32 actions max.
 //there are additional fake action buttons
-static ieDword GUIAction[MAX_ACT_COUNT] = { UNINIT_IEDWORD };
-static ieStrRef GUITooltip[MAX_ACT_COUNT] = { ieStrRef::INVALID };
-static ResRef GUIResRef[MAX_ACT_COUNT];
-static EventNameType GUIEvent[MAX_ACT_COUNT] {};
+using EventNameType = FixedSizeString<16>;
+static std::array<ieDword, 100> GUIAction { ~0U };
+static std::array<ieStrRef, GUIAction.size()> GUITooltip;
+static std::array<ResRef, GUIAction.size()> GUIResRef;
+static std::array<EventNameType, GUIAction.size()> GUIEvent;
 static Store* rhstore = nullptr;
 
 static EffectRef fx_learn_spell_ref = { "Spell:Learn", -1 };
@@ -10442,11 +10440,13 @@ typedef union pack {
 
 static void ReadActionButtons()
 {
-	memset(GUIAction, -1, sizeof(GUIAction));
-	memset(GUITooltip, -1, sizeof(GUITooltip));
+	GUIAction.fill(~0U);
+	GUITooltip.fill(ieStrRef::INVALID);
+	GUIResRef.fill("");
+	GUIEvent.fill("");
 	auto tab = gamedata->LoadTable("guibtact");
 	assert(tab);
-	for (unsigned int i = 0; i < MAX_ACT_COUNT; i++) {
+	for (size_t i = 0; i < GUIAction.size(); i++) {
 		packtype row;
 
 		row.bytes[0] = tab->QueryFieldUnsigned<ieByte>(i, 0);
@@ -10486,7 +10486,7 @@ image, the tooltip and the push button event handler.\n\
 
 static PyObject* SetActionIcon(Button* btn, PyObject* dict, int Index, int Function)
 {
-	if (Index >= MAX_ACT_COUNT) {
+	if (Index >= static_cast<int>(GUIAction.size())) {
 		return nullptr;
 	}
 	ABORT_IF_NULL(btn);
@@ -10510,7 +10510,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject* dict, int Index, int Funct
 		return Py_None;
 	}
 
-	if (GUIAction[0] == 0xcccccccc) {
+	if (GUIAction[0] == ~0U) {
 		ReadActionButtons();
 	}
 
@@ -13087,7 +13087,7 @@ GUIScript::~GUIScript(void)
 		Py_Finalize();
 	}
 
-	GUIAction[0] = UNINIT_IEDWORD;
+	GUIAction[0] = -1; // recache when running multiple gametype tests
 
 	// free the memory from the global scrollbar template
 	auto view = ScriptingRefCast<View>(ScriptEngine::GetScriptingRef("SBGLOB", 0));
