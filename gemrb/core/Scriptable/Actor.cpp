@@ -58,6 +58,7 @@ static constexpr ieWord IT_WAND = 35;
 static constexpr Actor::stat_t CLASS_INNOCENT = 155;
 static constexpr Actor::stat_t CLASS_FLAMINGFIST = 156;
 
+// prepared values from InitActorTables
 static int classcount = -1;
 static std::vector<int> turnLevelOffset;
 static std::vector<int> bookTypes;
@@ -72,6 +73,22 @@ static std::vector<int> maxLevelForHpRoll;
 static std::map<TableMgr::index_t, std::vector<int>> skillstats;
 static std::map<int, int> stat2skill;
 static std::vector<std::vector<int>> wmLevelMods;
+static EnumArray<ModalFeat, ResRef> featSpells;
+// stat values are 0-255, so a byte is enough
+static EnumArray<Feat, ieByte> featStats;
+static EnumArray<Feat, ieByte> featMax;
+// iwd2 class to-hit and apr tables read into a single object
+static ResRefMap<std::vector<BABTable>> IWD2HitTable;
+static std::map<int, ResRef> BABClassMap; // maps classis (not id!) to the BAB table
+static std::map<int, ieByte> numWeaponSlots;
+// thieving skill dexterity and race boni vectors
+static std::vector<std::vector<int>> skilldex;
+static std::vector<std::vector<int>> skillrac;
+// subset of races.2da
+static std::map<unsigned int, int> favoredMap;
+static std::map<unsigned int, std::string> raceID2Name;
+// letters for char sound resolution bg1/bg2
+static EnumArray<Verbal, char> csound { '\0' };
 
 //verbal constant specific data
 static EnumArray<Verbal> VCMap;
@@ -98,11 +115,12 @@ struct ConfigCache {
 };
 static ConfigCache CFGCache;
 
-static EnumArray<ModalFeat, ResRef> featSpells;
 static bool pstflags = false;
 static bool nocreate = false;
 static bool third = false;
 static bool iwd2class = false;
+static int IWDSound = false;
+static int ReverseToHit = true; // for every game except IWD2 we need to reverse TOHIT
 
 //conversion for 3rd ed
 static int isclass[ISCLASSES] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -144,10 +162,6 @@ static const int booksiwd2[ISCLASSES] = { -1, IE_IWD2_SPELL_WIZARD, -1, -1,
 					  IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, -1,
 					  IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_SORCERER, -1, -1 };
 
-//stat values are 0-255, so a byte is enough
-static EnumArray<Feat, ieByte> featStats;
-static EnumArray<Feat, ieByte> featMax;
-
 #define CLASS_PCCUTOFF    32
 
 static std::vector<ActionButtonRow> GUIBTDefaults; // qslots per-class rows
@@ -155,10 +169,6 @@ static std::vector<ActionButtonRow2> OtherGUIButtons;
 ActionButtonRow DefaultButtons = { ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 				   ACT_QSPELL1, ACT_QSPELL2, ACT_QSPELL3, ACT_CAST, ACT_USE, ACT_QSLOT1, ACT_QSLOT2,
 				   ACT_QSLOT3, ACT_INNATE };
-static int IWDSound = false;
-
-//letters for char sound resolution bg1/bg2
-static EnumArray<Verbal, char> csound { '\0' };
 
 static void InitActorTables();
 
@@ -207,25 +217,9 @@ struct HCOverlay {
 };
 static std::array<HCOverlay, OVERLAY_COUNT> hcOverlays;
 static ieDword hcLocations = 0;
-#define HC_INVISIBLE 1
-
-// thieving skill dexterity and race boni vectors
-std::vector<std::vector<int>> skilldex;
-std::vector<std::vector<int>> skillrac;
-
-// subset of races.2da
-std::map<unsigned int, int> favoredMap;
-std::map<unsigned int, std::string> raceID2Name;
-
-// iwd2 class to-hit and apr tables read into a single object
-ResRefMap<std::vector<BABTable>> IWD2HitTable;
-std::map<int, ResRef> BABClassMap; // maps classis (not id!) to the BAB table
+constexpr int HC_INVISIBLE = 1;
 
 EnumArray<Modal, ModalStatesStruct> ModalStates;
-std::map<int, ieByte> numWeaponSlots;
-
-//for every game except IWD2 we need to reverse TOHIT
-static int ReverseToHit = true;
 
 // from FXOpcodes
 #define PI_DRUNK     5
@@ -1657,6 +1651,7 @@ static void InitActorTables()
 		bookTypes.resize(classcount);
 		castingStat.resize(classcount);
 		iwd2SPLTypes.resize(classcount);
+		class2kits.clear();
 
 		ieDword bitmask = 1;
 
@@ -1873,6 +1868,8 @@ static void InitActorTables()
 		// we need to set up much less here due to a saner class/level system in 3ed
 		Log(MESSAGE, "Actor", "Examining IWD2-style classes.2da");
 		AutoTable tht;
+		IWD2HitTable.clear();
+		BABClassMap.clear();
 		for (int i = 0; i < (int) tm->GetRowCount(); i++) {
 			const auto& classname = tm->GetRowName(i);
 			int classis = IsClassFromName(classname);
@@ -2064,6 +2061,7 @@ static void InitActorTables()
 	if (!iwd2class) {
 		tm = gamedata->LoadTable("numwslot", true);
 		if (tm) {
+			numWeaponSlots.clear();
 			TableMgr::index_t rowcount = tm->GetRowCount();
 			for (TableMgr::index_t i = 0; i < rowcount; i++) {
 				const auto& cls = tm->GetRowName(i);
@@ -2135,6 +2133,8 @@ static void InitActorTables()
 	if (tm) {
 		TableMgr::index_t rowcount = tm->GetRowCount();
 		TableMgr::index_t colcount = tm->GetColumnCount();
+		stat2skill.clear();
+		skillstats.clear();
 		for (TableMgr::index_t i = 0; i < rowcount; i++) {
 			skillstats[i] = std::vector<int>();
 			for (TableMgr::index_t j = 0; j < colcount; j++) {
@@ -2158,6 +2158,7 @@ static void InitActorTables()
 	if (tm) {
 		TableMgr::index_t skilldexNCols = tm->GetColumnCount();
 		TableMgr::index_t skilldexNRows = tm->GetRowCount();
+		skilldex.clear();
 		skilldex.reserve(skilldexNRows);
 
 		for (TableMgr::index_t i = 0; i < skilldexNRows; i++) {
@@ -2186,6 +2187,7 @@ static void InitActorTables()
 	if (tm) {
 		TableMgr::index_t cols = tm->GetColumnCount();
 		TableMgr::index_t rows = tm->GetRowCount();
+		skillrac.clear();
 		skillrac.reserve(rows);
 
 		for (TableMgr::index_t i = 0; i < rows; i++) {
@@ -2237,6 +2239,8 @@ static void InitActorTables()
 	if (tm && !pstflags) {
 		TableMgr::index_t racesNRows = tm->GetRowCount();
 
+		favoredMap.clear();
+		raceID2Name.clear();
 		for (TableMgr::index_t i = 0; i < racesNRows; i++) {
 			const auto& raceName = tm->GetRowName(i);
 			int raceID = tm->QueryFieldSigned<int>(raceName, "ID");
