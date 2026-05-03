@@ -70,7 +70,7 @@ int GetReaction(const Actor* target, const Scriptable* Sender)
 {
 	int reaction = 10;
 
-	static AutoTable repModTable = gamedata->LoadTable("rmodrep", true);
+	AutoTable repModTable = gamedata->LoadTable("rmodrep", true);
 	if (repModTable) {
 		int rep;
 		if (target->GetStat(IE_EA) == EA_PC) {
@@ -82,7 +82,7 @@ int GetReaction(const Actor* target, const Scriptable* Sender)
 		reaction += repModTable->QueryFieldSigned<int>(0, rep);
 	}
 
-	static AutoTable chrModTable = gamedata->LoadTable("rmodchr", true);
+	AutoTable chrModTable = gamedata->LoadTable("rmodchr", true);
 	if (chrModTable) {
 		int chr = Clamp<int>(target->GetStat(IE_CHR) - 1, 0, 24);
 		reaction += repModTable->QueryFieldSigned<int>(0, chr);
@@ -111,7 +111,7 @@ ieWordSigned GetHappiness(const Scriptable* Sender, int reputation)
 	}
 	reputation = Clamp(reputation, 10, 200);
 
-	static AutoTable happyTable = gamedata->LoadTable("happy", true);
+	AutoTable happyTable = gamedata->LoadTable("happy", true);
 	if (happyTable) {
 		return happyTable->QueryFieldSigned<ieWordSigned>(reputation / 10 - 1, alignment - 1);
 	}

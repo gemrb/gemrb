@@ -397,7 +397,7 @@ void Actor::SetAnimationID(stat_t animID)
 
 	// handle default speed and per-animation overrides
 	TableMgr::index_t row = TableMgr::npos;
-	static AutoTable extspeed = gamedata->LoadTable("moverate", true);
+	AutoTable extspeed = gamedata->LoadTable("moverate", true);
 	if (extspeed) {
 		const std::string& animHex = fmt::format("{:#04x}", animID);
 		row = extspeed->FindTableValue(0UL, animHex);
@@ -1430,7 +1430,7 @@ static void pcf_dbutton(Actor* actor, ieDword /*oldValue*/, ieDword /*newValue*/
 //no separate values (changes are permanent)
 static void pcf_intoxication(Actor* actor, ieDword oldValue, ieDword newValue)
 {
-	static AutoTable intoxCon = gamedata->LoadTable("intoxcon", true);
+	AutoTable intoxCon = gamedata->LoadTable("intoxcon", true);
 	ieDword maxIntox = 100; // maximum_values[IE_INTOXICATION]
 	int diff = static_cast<int>(newValue - oldValue);
 
@@ -6869,7 +6869,7 @@ int Actor::GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, i
 		// +2 main, +2 off with two weapon fighting
 		// +2 main, +2 off with a simple weapon in the off hand
 		// so a minimum penalty of -2, -2
-		static AutoTable modifierTable = gamedata->LoadTable("dwmods");
+		AutoTable modifierTable = gamedata->LoadTable("dwmods");
 		std::string hand = "RIGHT";
 		if (wi.wflags & WEAPON_LEFTHAND) hand = "LEFT";
 
@@ -8853,7 +8853,7 @@ bool Actor::GetSoundFrom2DA(ResRef& sound, Verbal index) const
 	// check if there is an override (ToBExAL),
 	// otherwise use the base animation prefix
 	ResRef prefix = anims->ResRefBase;
-	static AutoTable aniSndOverride = gamedata->LoadTable("anisndex", true);
+	AutoTable aniSndOverride = gamedata->LoadTable("anisndex", true);
 	const std::string& row = fmt::format("0x{:4X}", Modified[IE_ANIMATION_ID]);
 	ResRef file = aniSndOverride->QueryField(row, "File");
 	if (!IsStar(file)) {
@@ -9267,7 +9267,7 @@ void Actor::Rest(int hours)
 	if (hours < 8) {
 		// partial (interrupted) rest does not affect fatigue
 		//do remove effects
-		static AutoTable intoxCon = gamedata->LoadTable("intoxcon", true);
+		AutoTable intoxCon = gamedata->LoadTable("intoxcon", true);
 		int remaining = hours * 10;
 		int detox = hours * 25; // 300 / 12
 		if (intoxCon) {
@@ -10078,11 +10078,11 @@ static ieDword ResolveTableValue(const ResRef& resref, ieDword stat, ieDword mco
 		// fix lookup, since now the values are split across two tables
 		// we assume that the first entry found is always the super class
 		if (resref == "classes") {
-			static AutoTable table = gamedata->LoadTable("clastext", true);
+			AutoTable table = gamedata->LoadTable("clastext", true);
 			row = table->FindTableValue(mcol, stat);
 			rowName = table->GetRowName(row);
 		} else if (resref == "racetext") {
-			static AutoTable table = gamedata->LoadTable("racedata", true);
+			AutoTable table = gamedata->LoadTable("racedata", true);
 			row = table->FindTableValue(mcol, stat);
 			rowName = table->GetRowName(row);
 		} else {

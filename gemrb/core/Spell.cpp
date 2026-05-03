@@ -139,7 +139,7 @@ static void AdjustPSTDurations(const Spell* spl, Effect& fx, size_t ignoreFx)
 	if (fx.TimingMode != 0 && fx.TimingMode != 3) return;
 	if (fx.Opcode == 195) return; // pointless to touch fx_tint_screen and at least spwi308 excluded it manually
 
-	static AutoTable durationOverride = gamedata->LoadTable("spldurat", true);
+	AutoTable durationOverride = gamedata->LoadTable("spldurat", true);
 	if (!durationOverride) return;
 	auto row = durationOverride->GetRowIndex(spl->Name);
 	if (row == TableMgr::npos) return;

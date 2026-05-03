@@ -861,7 +861,7 @@ int GameData::GetWeaponStyleBonus(WS style, int stars, WSB bonusType)
 		return 0;
 	}
 
-	static AutoTable styleTable = LoadTable("stylbonu", true);
+	AutoTable styleTable = LoadTable("stylbonu", true);
 	if (!styleTable) {
 		ignore = 1;
 		return 0;
