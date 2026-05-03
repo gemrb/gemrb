@@ -53,7 +53,6 @@ static const std::string blank;
 //configurable?
 const ieDword ref_lightness = 43;
 
-static int sharexp = SX_DIVIDE | SX_COMBAT;
 static int classcount = -1;
 static std::vector<int> turnLevelOffset;
 static std::vector<int> bookTypes;
@@ -1648,11 +1647,6 @@ static void InitActorTables()
 		state_invisible = STATE_INVISIBLE;
 	}
 
-	if (core->HasFeature(GFFlags::CHALLENGERATING)) {
-		sharexp = SX_DIVIDE | SX_COMBAT | SX_CR;
-	} else {
-		sharexp = SX_DIVIDE | SX_COMBAT;
-	}
 	ReverseToHit = core->HasFeature(GFFlags::REVERSE_TOHIT);
 	CheckAbilities = core->HasFeature(GFFlags::CHECK_ABILITIES);
 	DeathOnZeroStat = core->HasFeature(GFFlags::DEATH_ON_ZERO_STAT);
@@ -5567,7 +5561,11 @@ bool Actor::ProcessKillXP(const Actor* killerActor, bool grantXP)
 	if (!grantXP) return false;
 
 	// finally give experience to party, taking CR into account if needed
-	core->GetGame()->ShareXP(Modified[IE_XPVALUE], sharexp);
+	int shareXP = SX_DIVIDE | SX_COMBAT;
+	if (core->HasFeature(GFFlags::CHALLENGERATING)) {
+		shareXP |= SX_CR;
+	}
+	core->GetGame()->ShareXP(Modified[IE_XPVALUE], shareXP);
 	return true;
 }
 
