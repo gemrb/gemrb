@@ -89,8 +89,6 @@ using stat_t = Actor::stat_t;
 #define UNINIT_IEDWORD 0xcccccccc
 
 static std::vector<SpellDescType> SpecialItems;
-static std::vector<SpellDescType> StoreSpells;
-
 static std::vector<UsedItemType> UsedItems;
 
 //4 action button indices are packed on a single ieDword, there are 32 actions max.
@@ -7789,24 +7787,11 @@ static void ReadSpecialItems()
 
 static ieStrRef GetSpellDesc(const ResRef& CureResRef)
 {
-	if (StoreSpells.empty()) {
-		AutoTable tab = gamedata->LoadTable("speldesc");
-		if (tab) {
-			TableMgr::index_t StoreSpellsCount = tab->GetRowCount();
-			StoreSpells.resize(StoreSpellsCount);
-			for (TableMgr::index_t i = 0; i < StoreSpellsCount; i++) {
-				StoreSpells[i].resref = tab->GetRowName(i);
-				StoreSpells[i].value = tab->QueryFieldAsStrRef(i, 0);
-			}
-		}
+	AutoTable tab = gamedata->LoadTable("speldesc");
+	if (!tab) {
+		return ieStrRef::INVALID;
 	}
-
-	for (const auto& spell : StoreSpells) {
-		if (spell.resref == CureResRef) {
-			return spell.value;
-		}
-	}
-	return ieStrRef::INVALID;
+	return tab->QueryFieldAsStrRef(CureResRef, "DESCRIPTION");
 }
 
 PyDoc_STRVAR(GemRB_GetStoreCure__doc,
