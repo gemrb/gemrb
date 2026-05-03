@@ -52,6 +52,11 @@ static const std::string blank;
 
 //configurable?
 const ieDword ref_lightness = 43;
+static constexpr Actor::stat_t MAX_FEATV = 4294967295U; // 1<<32-1 (used for the triple-stat feat handling)
+static constexpr ieWord IT_SCROLL = 11;
+static constexpr ieWord IT_WAND = 35;
+static constexpr Actor::stat_t CLASS_INNOCENT = 155;
+static constexpr Actor::stat_t CLASS_FLAMINGFIST = 156;
 
 static int classcount = -1;
 static std::vector<int> turnLevelOffset;
@@ -88,8 +93,6 @@ struct ConfigCache {
 };
 static ConfigCache CFGCache;
 
-#define MAX_FEATV 4294967295U // 1<<32-1 (used for the triple-stat feat handling)
-
 static EnumArray<ModalFeat, ResRef> featSpells;
 static bool pstflags = false;
 static bool nocreate = false;
@@ -97,8 +100,6 @@ static bool third = false;
 static bool iwd2class = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
-static constexpr ieWord IT_SCROLL = 11;
-static constexpr ieWord IT_WAND = 35;
 
 static int fiststat = IE_CLASS;
 
@@ -146,10 +147,7 @@ static const int booksiwd2[ISCLASSES] = { -1, IE_IWD2_SPELL_WIZARD, -1, -1,
 static EnumArray<Feat, ieByte> featStats;
 static EnumArray<Feat, ieByte> featMax;
 
-// reputation modifiers
 #define CLASS_PCCUTOFF    32
-#define CLASS_INNOCENT    155
-#define CLASS_FLAMINGFIST 156
 
 static std::vector<ActionButtonRow> GUIBTDefaults; // qslots per-class rows
 static std::vector<ActionButtonRow2> OtherGUIButtons;
