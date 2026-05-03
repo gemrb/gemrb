@@ -123,7 +123,7 @@ static int IWDSound = false;
 static int ReverseToHit = true; // for every game except IWD2 we need to reverse TOHIT
 
 //conversion for 3rd ed
-static int isclass[ISCLASSES] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static std::array<int, ISCLASSES> isclass = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 static const int mcwasflags[ISCLASSES] = {
 	MC_WAS_FIGHTER, MC_WAS_MAGE, MC_WAS_THIEF, 0, 0, MC_WAS_CLERIC,
@@ -1652,6 +1652,7 @@ static void InitActorTables()
 		castingStat.resize(classcount);
 		iwd2SPLTypes.resize(classcount);
 		class2kits.clear();
+		isclass.fill(0);
 
 		ieDword bitmask = 1;
 
