@@ -74,8 +74,6 @@ namespace GemRB {
 #define ACT_IWDQSPEC  70
 #define ACT_IWDQSONG  80
 
-#define MAX_ACT_COUNT 100
-
 // these settings are saved in the V2.2 chr struct in IWD2
 enum class ModalFeat : ieDword {
 	ES_0,
