@@ -64,10 +64,12 @@ GUIScript* GemRB::gs = nullptr;
 	}
 
 //Check removal/equip/swap of item based on item name and actor's scriptname
-#define CRI_REMOVE        0
-#define CRI_EQUIP         1
-#define CRI_SWAP          2
-#define CRI_REMOVEFORSWAP 3
+enum class CRI {
+	Remove = 0,
+	Equip = 1,
+	Swap = 2,
+	RemoveForSwap = 3,
+};
 
 //bit used in SetCreatureStat to access some fields
 #define EXTRASETTINGS 0x1000
@@ -9086,10 +9088,12 @@ PyDoc_STRVAR(GemRB_GetItem__doc,
 \n\
 **See also:** [GetSlotItem](GetSlotItem.md), [GetSpell](GetSpell.md), [Button_SetItemIcon](Button_SetItemIcon.md)");
 
-#define CAN_DRINK  1 //potions
-#define CAN_READ   2 //scrolls
-#define CAN_STUFF  4 //containers
-#define CAN_SELECT 8 //items with more abilities
+enum ITMActions {
+	CAN_DRINK = 1, // potions
+	CAN_READ = 2, // scrolls
+	CAN_STUFF = 4, // containers
+	CAN_SELECT = 8, // items with more abilities
+};
 
 static PyObject* GemRB_GetItem(PyObject* /*self*/, PyObject* args)
 {
@@ -9144,7 +9148,7 @@ static PyObject* GemRB_GetItem(PyObject* /*self*/, PyObject* args)
 	int function = 0;
 
 	if (core->CheckItemType(item, SLOT_POTION)) {
-		function |= CAN_DRINK;
+		function |= ITMActions::CAN_DRINK;
 	}
 	if (core->CheckItemType(item, SLOT_SCROLL)) {
 		//determining if this is a copyable scroll
@@ -9164,10 +9168,10 @@ static PyObject* GemRB_GetItem(PyObject* /*self*/, PyObject* args)
 		}
 		//maybe further checks for school exclusion?
 		//no, those were done by CanUseItemType
-		function |= CAN_READ;
+		function |= ITMActions::CAN_READ;
 		PyDict_SetItemString(dict, "Spell", DecRef(PyString_FromResRef, f->Resource));
 	} else if (ehc > 1) {
-		function |= CAN_SELECT;
+		function |= ITMActions::CAN_SELECT;
 	}
 not_a_scroll:
 	if (core->CheckItemType(item, SLOT_BAG) && gamedata->Exists(resref, IE_STO_CLASS_ID)) {
@@ -9177,7 +9181,7 @@ not_a_scroll:
 		//while this isn't required anymore, as bag itemtypes are customisable
 		//we still better check for the existence of the store, or we
 		//get a crash somewhere.
-		function |= CAN_STUFF;
+		function |= ITMActions::CAN_STUFF;
 	}
 	PyDict_SetItemString(dict, "Function", DecRef(PyLong_FromLong, function));
 	gamedata->FreeItem(item, resref, false);
@@ -9197,7 +9201,7 @@ static void DragItem(CREItem* si)
 	gamedata->FreeItem(item, si->ItemResRef, false);
 }
 
-static int CheckRemoveItem(const Actor* actor, const CREItem* si, int action)
+static int CheckRemoveItem(const Actor* actor, const CREItem* si, CRI action)
 {
 	///check if item is undroppable because the actor likes it
 	if (UsedItems.empty()) {
@@ -9213,21 +9217,21 @@ static int CheckRemoveItem(const Actor* actor, const CREItem* si, int action)
 
 		switch (action) {
 			//the named actor cannot remove it
-			case CRI_REMOVE:
+			case CRI::Remove:
 				if (usedItem.flags & 1) {
 					if (nomatch) continue;
 				} else
 					continue;
 				break;
 			//the named actor can equip it
-			case CRI_EQUIP:
+			case CRI::Equip:
 				if (usedItem.flags & 2) {
 					if (!nomatch) continue;
 				} else
 					continue;
 				break;
 			//the named actor can swap it
-			case CRI_SWAP:
+			case CRI::Swap:
 				if (usedItem.flags & 4) {
 					if (!nomatch) continue;
 				} else
@@ -9235,7 +9239,7 @@ static int CheckRemoveItem(const Actor* actor, const CREItem* si, int action)
 				break;
 			//the named actor cannot remove it except when initiating a swap (used for plain inventory slots)
 			// and make sure not to treat earrings improperly
-			case CRI_REMOVEFORSWAP:
+			case CRI::RemoveForSwap:
 				if (!(usedItem.flags & 1) || usedItem.flags & 4) {
 					continue;
 				}
@@ -9287,11 +9291,11 @@ static CREItem* TryToUnequip(Actor* actor, unsigned int Slot, unsigned int Count
 	// however in pst, we need to ensure immovable swappables are swappable
 	bool isdragging = core->GetDraggedItem() != nullptr;
 	if (core->QuerySlotType(Slot) & SLOT_INVENTORY) {
-		if (CheckRemoveItem(actor, si, CRI_REMOVEFORSWAP)) {
+		if (CheckRemoveItem(actor, si, CRI::RemoveForSwap)) {
 			return nullptr;
 		}
 	} else {
-		if (CheckRemoveItem(actor, si, isdragging ? CRI_SWAP : CRI_REMOVE)) {
+		if (CheckRemoveItem(actor, si, isdragging ? CRI::Swap : CRI::Remove)) {
 			return nullptr;
 		}
 	}
@@ -9528,7 +9532,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject* /*self*/, PyObject* args)
 
 	//it is always possible to put these items into the inventory
 	if (!(Slottype & SLOT_INVENTORY)) {
-		if (CheckRemoveItem(actor, slotitem, CRI_EQUIP)) {
+		if (CheckRemoveItem(actor, slotitem, CRI::Equip)) {
 			gamedata->FreeItem(item, slotitem->ItemResRef, false);
 			return PyLong_FromLong(ASI_FAILED);
 		}
