@@ -128,11 +128,19 @@ def UpdatePriestWindow (Window):
 			Button.EnableBorder (0, 0)
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, spelltype, level)
+	# bg2 sorted the spells
+	knownSpells = []
+	for i in range (known_cnt):
+		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
+		knownSpells.append (ks)
+	if GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ():
+		knownSpells.sort (key = lambda ks: GemRB.GetString (GemRB.GetSpell (ks["SpellResRef"])["SpellName"]))
+
 	btncount = GUICommon.GetGUISpellButtonCount()
 	i = 0
 	for i in range (known_cnt):
 		Button = Window.GetControl (27 + i)
-		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
+		ks = knownSpells[i]
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
 		if not GameCheck.IsBG2EE ():
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
@@ -142,7 +150,8 @@ def UpdatePriestWindow (Window):
 		Button.SetTooltip (spell['SpellName'])
 		Button.SetVarAssoc ("Memorized", i)
 
-	if known_cnt == 0: i = -1
+	if known_cnt == 0:
+		i = -1
 	for i in range (i + 1, btncount):
 		Button = Window.GetControl (27 + i)
 		

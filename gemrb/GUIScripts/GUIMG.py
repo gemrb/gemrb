@@ -196,13 +196,21 @@ def UpdateMageWindow (MageWindow):
 			label.SetText (GemRB.GetString(61256) + " " + str(true_mem_cnt // known_cnt) + "/" + str(max_mem_cnt))
 		else:
 			label.SetText ("")
-	
+
+	# bg2 sorted the spells
+	knownSpells = []
+	for i in range (known_cnt):
+		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
+		knownSpells.append (ks)
+	if GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ():
+		knownSpells.sort (key = lambda ks: GemRB.GetString (GemRB.GetSpell (ks["SpellResRef"])["SpellName"]))
+
 	btncount = GUICommon.GetGUISpellButtonCount()
 	i = 0
 	for i in range (known_cnt):
 		Button = MageWindow.GetControl (27 + i)
 		
-		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
+		ks = knownSpells[i]
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
 		Button.OnPress (OnMageMemorizeSpell)
 		spell = GemRB.GetSpell (ks['SpellResRef'])
@@ -210,7 +218,8 @@ def UpdateMageWindow (MageWindow):
 		Button.OnRightPress (BindControlCallbackParams(OpenMageSpellInfoWindow, spell, Button.VarName))
 		Button.SetTooltip (spell['SpellName'])
 
-	if known_cnt == 0: i = -1
+	if known_cnt == 0:
+		i = -1
 	for i in range (i + 1, btncount):
 		Button = MageWindow.GetControl (27 + i)
 		
