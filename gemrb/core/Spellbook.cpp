@@ -555,7 +555,28 @@ bool Spellbook::AddKnownSpell(CREKnownSpell* spl, int flg)
 		}
 	}
 
-	spells[type][level]->known_spells.push_back(spl);
+	auto GetSpellName = [](const ResRef& spellRef) {
+		const Spell* spell = gamedata->GetSpell(spellRef, true);
+		return core->GetString(spell->SpellName);
+	};
+
+	// bg2 was the only one that complicated by storing them in descending spell name order
+	// this only comes into play when learning in-game, since CREImporter preserves order
+	if (core->HasFeature(GFFlags::ORDERED_KNOWN_SPELLS)) {
+		auto& knownSpells = spells[type][level]->known_spells;
+		auto pos = knownSpells.begin();
+		String newSpellName = GetSpellName(spl->SpellResRef);
+		while (pos != knownSpells.end()) {
+			String curName = GetSpellName((*pos)->SpellResRef);
+			if (newSpellName.compare(curName) > 0) {
+				break;
+			}
+			++pos;
+		}
+		knownSpells.insert(pos, spl);
+	} else {
+		spells[type][level]->known_spells.push_back(spl);
+	}
 	if (1 << type == innate || type == IE_IWD2_SPELL_SONG || type == IE_SPELL_TYPE_SONG) {
 		spells[type][level]->SlotCount++;
 		spells[type][level]->SlotCountWithBonus++;

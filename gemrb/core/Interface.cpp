@@ -1488,6 +1488,7 @@ static const EnumArray<GFFlags, StringView> game_flags {
 	"BetterOfHearing", // GFFlags::BETTER_OF_HEARING
 	"GreyDisabledControls", // GFFlags::GREY_DISABLED_CONTROLS
 	"NameEveryoneOnTab", // GFFlags::NAME_EVERYONE_ON_TAB
+	"OrderedKnownSpells", // GFFlags::ORDERED_KNOWN_SPELLS
 };
 
 /** Loads gemrb.ini */

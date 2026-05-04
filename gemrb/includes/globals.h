@@ -126,6 +126,7 @@ enum class GFFlags : uint32_t {
 	BETTER_OF_HEARING, // all but bg1 and psts
 	GREY_DISABLED_CONTROLS, // bg1
 	NAME_EVERYONE_ON_TAB, // ees
+	ORDERED_KNOWN_SPELLS, // bg2, ees
 
 	count // must be last
 };
