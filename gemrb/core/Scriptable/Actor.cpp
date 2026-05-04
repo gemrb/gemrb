@@ -10824,23 +10824,6 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, const Actor* op
 		return (add + luck > 1 ? add + luck : 1);
 	}
 
-	ieDword critical = flags & LR_CRITICAL;
-
-	if (dice > 100) {
-		int bonus;
-		if (std::abs(luck) > size) {
-			bonus = luck / std::abs(luck) * size;
-		} else {
-			bonus = luck;
-		}
-		int roll = RAND(1, dice * size);
-		if (critical && (roll == 1 || roll == size)) {
-			return roll;
-		} else {
-			return add + dice * (size + bonus) / 2;
-		}
-	}
-
 	int roll, result = 0, misses = 0, hits = 0;
 	for (int i = 0; i < dice; i++) {
 		roll = RAND(1, size);
@@ -10859,6 +10842,7 @@ int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, const Actor* op
 	}
 
 	// ensure we can still return a critical failure/success
+	ieDword critical = flags & LR_CRITICAL;
 	if (critical && dice == misses) return 1;
 	if (critical && dice == hits) return size * dice;
 
