@@ -2713,7 +2713,7 @@ int CREImporter::PutActor(DataStream* stream, const Actor* actor, bool chr)
 	stream->WriteDword(ItemSlotsOffset);
 	stream->WriteDword(ItemsCount ? ItemsOffset : 0);
 	stream->WriteDword(ItemsCount);
-	stream->WriteDword(EffectsCount ? EffectsOffset : 0);
+	stream->WriteDword((EffectsCount + VariablesCount) ? EffectsOffset : 0);
 	stream->WriteDword(EffectsCount + VariablesCount);
 	stream->WriteResRef(actor->GetDialog(false));
 	//spells, spellbook etc
