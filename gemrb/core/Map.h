@@ -487,7 +487,7 @@ public:
 	//if items == true, remove noncritical items from ground piles too
 	void PurgeArea(bool items);
 
-	ieDword SongList[MAX_RESCOUNT] {};
+	std::array<ieDword, MAX_RESCOUNT> SongList {};
 	RestHeaderType RestHeader {};
 	int AreaDifficulty = 0;
 
