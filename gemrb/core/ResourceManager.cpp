@@ -190,10 +190,18 @@ ResourceHolder<Resource> ResourceManager::GetResource(StringView ResRef, const T
 		Log(MESSAGE, "ResourceManager", "Searching for '{}'...", ResRef);
 	}
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);
-	std::vector<ResourceDesc> types2 = types;
+	std::vector<ResourceDesc> types2;
 	if (preferredType) {
 		// sort the preferred type to the front, so we check it first
-		std::sort(types2.begin(), types2.end(), [&preferredType](auto& a, auto& b) { return (a.GetKeyType() == preferredType ? true : (a.GetKeyType() < b.GetKeyType())); });
+		for (auto& rd : types) {
+			if (rd.GetKeyType() == preferredType) {
+				types2.insert(types2.begin(), rd);
+			} else {
+				types2.push_back(rd);
+			}
+		}
+	} else {
+		types2 = types;
 	}
 
 	for (const auto& type2 : types2) {
