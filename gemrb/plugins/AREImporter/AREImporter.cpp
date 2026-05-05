@@ -1485,6 +1485,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	map->WEDResRef = WEDResRef;
 	map->Dream[0] = Dream1;
 	map->Dream[1] = Dream2;
+	map->LastSaveTime = LastSave;
 
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
@@ -1810,7 +1811,7 @@ int AREImporter::PutHeader(DataStream* stream, const Map* map) const
 	stream->WriteResRef(signature);
 	stream->WriteResRef(map->WEDResRef);
 	uint32_t time = core->GetGame()->GameTime;
-	stream->WriteDword(time); //lastsaved
+	stream->WriteDword(core->config.UseAsLibrary ? map->LastSaveTime : time);
 	stream->WriteDword(map->AreaFlags);
 
 	stream->WriteFilling(12); // northref
@@ -1844,37 +1845,38 @@ int AREImporter::PutHeader(DataStream* stream, const Map* map) const
 	stream->WriteWord(ActorCount);
 	stream->WriteWord(InfoPointsCount);
 	stream->WriteDword(InfoPointsOffset);
-	stream->WriteDword(SpawnOffset);
+	stream->WriteDword(SpawnCount ? SpawnOffset : 0);
 	stream->WriteDword(SpawnCount);
 	stream->WriteDword(EntrancesOffset);
 	stream->WriteDword(EntrancesCount);
-	stream->WriteDword(ContainersOffset);
+	stream->WriteDword(ContainersCount ? ContainersOffset : 0);
 	stream->WriteWord(ContainersCount);
 	stream->WriteWord(ItemsCount);
-	stream->WriteDword(ItemsOffset);
+	stream->WriteDword(ItemsCount ? ItemsOffset : 0);
 	stream->WriteDword(VerticesOffset);
 	stream->WriteWord(VerticesCount);
-	stream->WriteWord(SavedAmbientCount(map));
-	stream->WriteDword(AmbiOffset);
-	stream->WriteDword(VariablesOffset);
+	ieWord ambCount = SavedAmbientCount(map);
+	stream->WriteWord(ambCount);
+	stream->WriteDword(ambCount ? AmbiOffset : 0);
+	stream->WriteDword(VariablesCount ? VariablesOffset : 0);
 	stream->WriteDword(VariablesCount);
 	stream->WriteFilling(4);
 
 	//the saved area script is in the last script slot!
 	const auto& s = map->Scripts[MAX_SCRIPTS - 1];
 	if (s) {
-		stream->WriteResRefLC(s->GetName());
+		stream->WriteResRef(s->GetName());
 	} else {
 		stream->WriteFilling(8);
 	}
 	stream->WriteDword(ExploredBitmapSize);
 	stream->WriteDword(ExploredBitmapOffset);
 	stream->WriteDword(DoorsCount);
-	stream->WriteDword(DoorsOffset);
+	stream->WriteDword(DoorsCount ? DoorsOffset : 0);
 	stream->WriteDword(AnimCount);
-	stream->WriteDword(AnimOffset);
+	stream->WriteDword(AnimCount ? AnimOffset : 0);
 	stream->WriteDword(TileCount);
-	stream->WriteDword(TileOffset);
+	stream->WriteDword(TileCount ? TileOffset : 0);
 	stream->WriteDword(SongHeader);
 	stream->WriteDword(RestHeader);
 	//an empty dword for pst
@@ -1883,9 +1885,9 @@ int AREImporter::PutHeader(DataStream* stream, const Map* map) const
 		stream->WriteDword(0xffffffff);
 		i = 52;
 	}
-	stream->WriteDword(NoteOffset);
+	stream->WriteDword(NoteCount ? NoteOffset : 0);
 	stream->WriteDword(NoteCount);
-	stream->WriteDword(TrapOffset);
+	stream->WriteDword(TrapCount ? TrapOffset : 0);
 	stream->WriteDword(TrapCount);
 	stream->WriteResRef(map->Dream[0]);
 	stream->WriteResRef(map->Dream[1]);
