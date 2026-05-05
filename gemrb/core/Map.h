@@ -310,6 +310,7 @@ public:
 	Holder<Sprite2D> Background = nullptr;
 	ieDword BgDuration = 0;
 	ieDword LastGoCloser = 0;
+	ieDword LastSaveTime = 0; // used only to preserve the timestamp in resave tests
 
 private:
 	uint32_t debugFlags = 0;
