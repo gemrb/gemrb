@@ -118,7 +118,7 @@ TEST_P(SaveGameTest, LoadAndResaveGameTest)
 	core->LoadGame(save, iwd2 ? GAMVersion::IWD2 : GAMVersion::GemRB);
 	Game* game = core->GetGame();
 	ASSERT_TRUE(game != nullptr);
-	Log(DEBUG, "SaveGameTest", "{} game loaded successfully!\n", gameType);
+	Log(DEBUG, "SaveGameTest", "{} game loaded successfully!", gameType);
 
 	///////////////////////////
 	// SAVE back
