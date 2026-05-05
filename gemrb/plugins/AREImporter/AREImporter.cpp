@@ -1685,6 +1685,16 @@ void AREImporter::ReadEffects(DataStream* ds, EffectQueue* fxqueue, ieDword Effe
 int AREImporter::GetStoredFileSize(Map* map)
 {
 	int headersize = map->version + 0x11c;
+	SongHeader = headersize;
+	headersize += map->SongList.size() * 4 + 0x68;
+
+	RestHeader = headersize;
+	headersize += 0xe4;
+
+	ExploredBitmapOffset = headersize;
+	ExploredBitmapSize = map->ExploredBitmap.Bytes();
+	headersize += ExploredBitmapSize;
+
 	ActorOffset = headersize;
 
 	//get only saved actors (no familiars or partymembers)
@@ -1767,10 +1777,7 @@ int AREImporter::GetStoredFileSize(Map* map)
 
 	TileCount = (ieDword) map->TMap->GetTileCount();
 	headersize += TileCount * 0x6c;
-	ExploredBitmapOffset = headersize;
 
-	ExploredBitmapSize = map->ExploredBitmap.Bytes();
-	headersize += ExploredBitmapSize;
 	EffectOffset = headersize;
 
 	proIterator piter;
@@ -1791,12 +1798,7 @@ int AREImporter::GetStoredFileSize(Map* map)
 
 	NoteCount = map->GetMapNoteCount();
 	headersize += NoteCount * (core->HasFeature(GFFlags::AUTOMAP_INI) ? 0x214 : 0x34);
-	SongHeader = headersize;
 
-	headersize += 0x90;
-	RestHeader = headersize;
-
-	headersize += 0xe4;
 	return headersize;
 }
 
@@ -1893,6 +1895,7 @@ int AREImporter::PutHeader(DataStream* stream, const Map* map) const
 	stream->WriteResRef(map->Dream[1]);
 	//usually 56 empty bytes (but pst used up 4 elsewhere)
 	stream->WriteFilling(i);
+	assert(stream->GetPos() == SongHeader);
 	return 0;
 }
 
@@ -2455,6 +2458,7 @@ int AREImporter::PutTraps(DataStream* stream, const Map* map) const
 
 int AREImporter::PutExplored(DataStream* stream, const Map* map) const
 {
+	assert(stream->GetPos() == ExploredBitmapOffset);
 	stream->Write(map->ExploredBitmap.data(), ExploredBitmapSize);
 	return 0;
 }
@@ -2506,6 +2510,7 @@ int AREImporter::PutMapAmbients(DataStream* stream, const Map* map) const
 
 int AREImporter::PutRestHeader(DataStream* stream, const Map* map) const
 {
+	assert(stream->GetPos() == RestHeader);
 	stream->WriteFilling(32); //empty label
 	for (const auto& ref : map->RestHeader.Strref) {
 		stream->WriteStrRef(ref);
@@ -2526,7 +2531,6 @@ int AREImporter::PutRestHeader(DataStream* stream, const Map* map) const
 	return 0;
 }
 
-/* no saving of tiled objects, are they used anywhere? */
 int AREImporter::PutArea(DataStream* stream, const Map* map) const
 {
 	ieDword VertIndex = 0;
@@ -2541,11 +2545,32 @@ int AREImporter::PutArea(DataStream* stream, const Map* map) const
 		return ret;
 	}
 
+	// songs
+	for (const auto& list : map->SongList) {
+		stream->WriteDword(list);
+	}
+	ret = PutMapAmbients(stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	// rest encounters
+	ret = PutRestHeader(stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutExplored(stream, map);
+	if (ret) {
+		return ret;
+	}
+
 	ret = PutActors(stream, map);
 	if (ret) {
 		return ret;
 	}
 
+	// triggers
 	ret = PutRegions(stream, map, VertIndex);
 	if (ret) {
 		return ret;
@@ -2601,11 +2626,6 @@ int AREImporter::PutArea(DataStream* stream, const Map* map) const
 		return ret;
 	}
 
-	ret = PutExplored(stream, map);
-	if (ret) {
-		return ret;
-	}
-
 	proIterator iter;
 	ieDword i = map->GetTrapCount(iter);
 	while (i--) {
@@ -2635,17 +2655,6 @@ int AREImporter::PutArea(DataStream* stream, const Map* map) const
 	if (ret) {
 		return ret;
 	}
-
-	for (const auto& list : map->SongList) {
-		stream->WriteDword(list);
-	}
-
-	ret = PutMapAmbients(stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutRestHeader(stream, map);
 
 	return ret;
 }
