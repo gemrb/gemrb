@@ -6,7 +6,6 @@
 gameType="$1"
 baseGame="${2%????}" # strip extension
 export PAGER=cat
-pwd
 
 if [[ -z $IEDIFF ]]; then
   echo "IEDIFF is not set to a path to iesh's iediff program! Skipping comparison!"
@@ -23,18 +22,15 @@ function diffFile() {
   a=$(find "$base1" -type f -iname "$file")
   b=$(find "$base2" -type f -iname "$file")
 
-  echo "Diffing $file"
   if md5sum "$a" "$b" | sort -u -k1 | wc -l | grep -q 1; then
-    echo "Files are binary equal!"
     return 0
   fi
 
-  echo "Running $IEDIFF '$a' '$b'"
   diff=$("$IEDIFF" "$a" "$b")
-  if grep -q "are identical" <<< "$diff"; then
-    echo "Files are equal!"
-  else
+  if ! grep -q "are identical" <<< "$diff"; then
     let rc++
+    echo "Diffing $file"
+    echo "Running $IEDIFF '$a' '$b'"
     echo "$diff"
   fi
 }
