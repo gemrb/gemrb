@@ -231,10 +231,9 @@ Container* TileMap::GetContainerByPosition(const Point& position, int type) cons
 
 int TileMap::CleanupContainer(Container* container)
 {
-	if (container->containerType != IE_CONTAINER_PILE)
-		return 0;
-	if (container->inventory.GetSlotCount())
-		return 0;
+	if (container->containerType != IE_CONTAINER_PILE) return 0;
+	if (container->inventory.GetSlotCount()) return 0;
+	if (core->config.UseAsLibrary) return 0;
 
 	for (size_t i = 0; i < containers.size(); i++) {
 		if (containers[i] == container) {
