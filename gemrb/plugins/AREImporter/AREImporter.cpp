@@ -319,7 +319,7 @@ bool AREImporter::Import(DataStream* str)
 	}
 	//bigheader gap is here
 	str->Seek(0x54 + bigheader, GEM_STREAM_START);
-	str->ReadDword(ActorOffset);
+	str->ReadDword(ActorStubOffset);
 	str->ReadWord(ActorCount);
 	str->ReadWord(InfoPointsCount);
 	str->ReadDword(InfoPointsOffset);
@@ -342,6 +342,7 @@ bool AREImporter::Import(DataStream* str)
 	str->ReadResRef(Script);
 	str->ReadDword(ExploredBitmapSize);
 	str->ReadDword(ExploredBitmapOffset);
+	EmbeddedCreOffset = ExploredBitmapOffset + ExploredBitmapSize;
 	str->ReadDword(DoorsCount);
 	str->ReadDword(DoorsOffset);
 	str->ReadDword(AnimCount);
@@ -1553,7 +1554,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	core->LoadProgress(75);
 	Log(MESSAGE, "AREImporter", "Loading actors");
-	str->Seek(ActorOffset, GEM_STREAM_START);
+	str->Seek(ActorStubOffset, GEM_STREAM_START);
 	assert(core->IsAvailable(IE_CRE_CLASS_ID));
 	auto actmgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	for (int i = 0; i < ActorCount; i++) {
@@ -1700,48 +1701,31 @@ int AREImporter::GetStoredFileSize(Map* map)
 	ExploredBitmapSize = map->ExploredBitmap.Bytes();
 	headersize += ExploredBitmapSize;
 
-	ActorOffset = headersize;
+	AnimOffset = headersize;
+	AnimCount = (ieDword) map->GetAnimationCount();
+	headersize += AnimCount * 0x4c;
 
-	//get only saved actors (no familiars or partymembers)
-	//summons?
-	ActorCount = (ieWord) map->GetActorCount(false);
-	headersize += ActorCount * 0x110;
+	AmbiOffset = headersize;
+	headersize += SavedAmbientCount(map) * 0xd4;
 
-	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
+	// get only saved actors (no familiars, party members or global actors, which are stored in the GAM)
 	EmbeddedCreOffset = headersize;
-
+	ActorCount = (ieWord) map->GetActorCount(false);
+	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	for (unsigned int i = 0; i < ActorCount; i++) {
 		headersize += am->GetStoredFileSize(map->GetActor(i, false));
 	}
 
-	InfoPointsOffset = headersize;
+	ActorStubOffset = headersize;
+	headersize += ActorCount * 0x110;
 
-	InfoPointsCount = (ieWord) map->TMap->GetInfoPointCount();
-	headersize += InfoPointsCount * 0xc4;
-	SpawnOffset = headersize;
-
-	SpawnCount = map->GetSpawnCount();
-	headersize += SpawnCount * 0xc8;
-	EntrancesOffset = headersize;
-
-	EntrancesCount = (ieDword) map->GetEntranceCount();
-	headersize += EntrancesCount * 0x68;
-	ContainersOffset = headersize;
-
-	//this one removes empty heaps and counts items, should be before
-	//getting ContainersCount
-	ItemsCount = (ieWord) map->ConsolidateContainers();
-	ContainersCount = (ieWord) map->TMap->GetContainerCount();
-	headersize += ContainersCount * 0xc0;
-	ItemsOffset = headersize;
-	headersize += ItemsCount * 0x14;
-	DoorsOffset = headersize;
-
-	DoorsCount = (ieDword) map->TMap->GetDoorCount();
-	headersize += DoorsCount * 0xc8;
 	VerticesOffset = headersize;
-
 	VerticesCount = 0;
+	// this one removes empty heaps and counts items, should be before
+	ItemsCount = (ieWord) map->ConsolidateContainers();
+	InfoPointsCount = (ieWord) map->TMap->GetInfoPointCount();
+	ContainersCount = (ieWord) map->TMap->GetContainerCount();
+	DoorsCount = (ieDword) map->TMap->GetDoorCount();
 	for (unsigned int i = 0; i < InfoPointsCount; i++) {
 		const InfoPoint* ip = map->TMap->GetInfoPoint(i);
 		if (ip->outline) {
@@ -1767,24 +1751,36 @@ int AREImporter::GetStoredFileSize(Map* map)
 		VerticesCount += d->open_ib.size() + d->closed_ib.size();
 	}
 	headersize += VerticesCount * 4;
-	AmbiOffset = headersize;
 
-	headersize += SavedAmbientCount(map) * 0xd4;
+	DoorsOffset = headersize;
+	headersize += DoorsCount * 0xc8;
+
+	InfoPointsOffset = headersize;
+	headersize += InfoPointsCount * 0xc4;
+
+	ItemsOffset = headersize;
+	headersize += ItemsCount * 0x14;
+
+	SpawnOffset = headersize;
+	SpawnCount = map->GetSpawnCount();
+	headersize += SpawnCount * 0xc8;
+
+	ContainersOffset = headersize;
+	headersize += ContainersCount * 0xc0;
+
 	VariablesOffset = headersize;
-
 	VariablesCount = (ieDword) map->locals.size();
 	headersize += VariablesCount * 0x54;
-	AnimOffset = headersize;
 
-	AnimCount = (ieDword) map->GetAnimationCount();
-	headersize += AnimCount * 0x4c;
+	EntrancesOffset = headersize;
+	EntrancesCount = (ieDword) map->GetEntranceCount();
+	headersize += EntrancesCount * 0x68;
+
 	TileOffset = headersize;
-
 	TileCount = (ieDword) map->TMap->GetTileCount();
 	headersize += TileCount * 0x6c;
 
 	EffectOffset = headersize;
-
 	proIterator piter;
 	TrapCount = (ieDword) map->GetTrapCount(piter);
 	for (unsigned int i = 0; i < TrapCount; i++) {
@@ -1799,8 +1795,8 @@ int AREImporter::GetStoredFileSize(Map* map)
 
 	TrapOffset = headersize;
 	headersize += TrapCount * 0x1c;
-	NoteOffset = headersize;
 
+	NoteOffset = headersize;
 	NoteCount = map->GetMapNoteCount();
 	headersize += NoteCount * (core->HasFeature(GFFlags::AUTOMAP_INI) ? 0x214 : 0x34);
 
@@ -1848,7 +1844,7 @@ int AREImporter::PutHeader(DataStream* stream, const Map* map) const
 		stream->WriteFilling(8);
 	}
 
-	stream->WriteDword(ActorOffset);
+	stream->WriteDword(ActorCount ? ActorStubOffset : 0);
 	stream->WriteWord(ActorCount);
 	stream->WriteWord(InfoPointsCount);
 	stream->WriteDword(InfoPointsOffset);
@@ -1904,7 +1900,7 @@ int AREImporter::PutHeader(DataStream* stream, const Map* map) const
 	return 0;
 }
 
-int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword& VertIndex) const
+int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword VertIndex) const
 {
 	for (unsigned int i = 0; i < DoorsCount; i++) {
 		Door* d = map->TMap->GetDoor(i);
@@ -1916,15 +1912,15 @@ int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword& VertIndex
 			flags = FixIWD2DoorFlags(d->Flags, true);
 		}
 		stream->WriteDword(flags);
-		stream->WriteDword(VertIndex);
 		auto open = d->OpenTriggerArea();
 		ieWord tmpWord = static_cast<ieWord>(open ? open->Count() : 0);
+		stream->WriteDword(tmpWord ? VertIndex : 0);
 		stream->WriteWord(tmpWord);
 		VertIndex += tmpWord;
 		auto closed = d->ClosedTriggerArea();
 		tmpWord = static_cast<ieWord>(closed ? closed->Count() : 0);
 		stream->WriteWord(tmpWord);
-		stream->WriteDword(VertIndex);
+		stream->WriteDword(tmpWord ? VertIndex : 0);
 		VertIndex += tmpWord;
 		//open bounding box
 		stream->WriteWord(d->OpenBBox.x);
@@ -1999,9 +1995,40 @@ int AREImporter::PutPoints(DataStream* stream, const std::vector<SearchmapPoint>
 	return 0;
 }
 
-int AREImporter::PutVertices(DataStream* stream, const Map* map) const
+// unfortunately it seems bg2 saved infopoints before containers, but their
+// vertices in opposite order, so we can't just monotonically increase an index
+// so we assume containers at Vertex Index 0, then save the other two offsets
+int AREImporter::PutVertices(DataStream* stream, const Map* map, ieDword& regionVertStart, ieDword& doorVertStart) const
 {
-	//regions
+	// containers
+	for (size_t i = 0; i < ContainersCount; i++) {
+		const Container* c = map->TMap->GetContainer(i);
+		if (c->outline) {
+			PutPoints(stream, c->outline->vertices);
+			regionVertStart += c->outline->Count();
+		}
+	}
+	doorVertStart = regionVertStart;
+
+	//doors
+	for (unsigned int i = 0; i < DoorsCount; i++) {
+		const Door* d = map->TMap->GetDoor(i);
+		auto open = d->OpenTriggerArea();
+		auto closed = d->ClosedTriggerArea();
+		if (open) {
+			PutPoints(stream, open->vertices);
+			regionVertStart += open->Count();
+		}
+		if (closed) {
+			PutPoints(stream, closed->vertices);
+			regionVertStart += closed->Count();
+		}
+		PutPoints(stream, d->open_ib);
+		PutPoints(stream, d->closed_ib);
+		regionVertStart += d->open_ib.size() + d->closed_ib.size();
+	}
+
+	// regions
 	for (unsigned int i = 0; i < InfoPointsCount; i++) {
 		const InfoPoint* ip = map->TMap->GetInfoPoint(i);
 		if (ip->outline) {
@@ -2010,25 +2037,6 @@ int AREImporter::PutVertices(DataStream* stream, const Map* map) const
 			Point origin = ip->BBox.origin;
 			stream->WritePoint(origin);
 		}
-	}
-	//containers
-	for (size_t i = 0; i < ContainersCount; i++) {
-		const Container* c = map->TMap->GetContainer(i);
-		if (c->outline) {
-			PutPoints(stream, c->outline->vertices);
-		}
-	}
-	//doors
-	for (unsigned int i = 0; i < DoorsCount; i++) {
-		const Door* d = map->TMap->GetDoor(i);
-		auto open = d->OpenTriggerArea();
-		auto closed = d->ClosedTriggerArea();
-		if (open)
-			PutPoints(stream, open->vertices);
-		if (closed)
-			PutPoints(stream, closed->vertices);
-		PutPoints(stream, d->open_ib);
-		PutPoints(stream, d->closed_ib);
 	}
 	return 0;
 }
@@ -2052,7 +2060,7 @@ int AREImporter::PutItems(DataStream* stream, const Map* map) const
 	return 0;
 }
 
-int AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword& VertIndex) const
+int AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword VertIndex) const
 {
 	ieDword ItemIndex = 0;
 
@@ -2088,7 +2096,7 @@ int AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword& Vert
 		}
 		//outline polygon index and count
 		ieWord tmpWord = static_cast<ieWord>(c->outline ? c->outline->Count() : 0);
-		stream->WriteDword(VertIndex);
+		stream->WriteDword(tmpWord ? VertIndex : 0);
 		stream->WriteWord(tmpWord);
 		VertIndex += tmpWord;
 		tmpWord = 0;
@@ -2210,8 +2218,20 @@ void AREImporter::PutScript(DataStream* stream, const Actor* ac, unsigned int in
 int AREImporter::PutActors(DataStream* stream, const Map* map) const
 {
 	ieDword CreatureOffset = EmbeddedCreOffset;
-
 	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
+	// for each entry embed the actual CRE files
+	for (unsigned int i = 0; i < ActorCount; i++) {
+		assert(stream->GetPos() == CreatureOffset);
+		const Actor* ac = map->GetActor(i, false);
+
+		CreatureOffset += am->GetStoredFileSize(ac);
+		am->PutActor(stream, ac);
+	}
+	assert(stream->GetPos() == CreatureOffset);
+
+	// append the short actor entries
+	assert(stream->GetPos() == ActorStubOffset);
+	CreatureOffset = EmbeddedCreOffset; // confusing layout, yea
 	for (unsigned int i = 0; i < ActorCount; i++) {
 		const Actor* ac = map->GetActor(i, false);
 
@@ -2232,12 +2252,9 @@ int AREImporter::PutActors(DataStream* stream, const Map* map) const
 		stream->WriteDword(ac->appearance);
 		stream->WriteDword(ac->TalkCount);
 		stream->WriteResRef(ac->GetDialog());
-		PutScript(stream, ac, SCR_OVERRIDE);
-		PutScript(stream, ac, SCR_GENERAL);
-		PutScript(stream, ac, SCR_CLASS);
-		PutScript(stream, ac, SCR_RACE);
-		PutScript(stream, ac, SCR_DEFAULT);
-		PutScript(stream, ac, SCR_SPECIFICS);
+		// ignore their resolved scripts, as none of the initial value in this header survive
+		// if any was set, the CRE file's ones were overriden and are stored there
+		stream->WriteFilling(6 * 8);
 		//creature reference is empty because we are embedding it
 		//the original engine used a '*'
 		stream->WriteFilling(8);
@@ -2245,20 +2262,10 @@ int AREImporter::PutActors(DataStream* stream, const Map* map) const
 		ieDword CreatureSize = am->GetStoredFileSize(ac);
 		stream->WriteDword(CreatureSize);
 		CreatureOffset += CreatureSize;
-		PutScript(stream, ac, SCR_AREA);
+		// ignore the area script too
+		stream->WriteFilling(8);
 		stream->WriteFilling(120);
 	}
-
-	CreatureOffset = EmbeddedCreOffset;
-	for (unsigned int i = 0; i < ActorCount; i++) {
-		assert(stream->GetPos() == CreatureOffset);
-		const Actor* ac = map->GetActor(i, false);
-
-		//reconstructing offsets again
-		CreatureOffset += am->GetStoredFileSize(ac);
-		am->PutActor(stream, ac);
-	}
-	assert(stream->GetPos() == CreatureOffset);
 
 	return 0;
 }
@@ -2540,14 +2547,11 @@ int AREImporter::PutRestHeader(DataStream* stream, const Map* map) const
 
 int AREImporter::PutArea(DataStream* stream, const Map* map) const
 {
-	ieDword VertIndex = 0;
-	int ret;
-
 	if (!stream || !map) {
 		return -1;
 	}
 
-	ret = PutHeader(stream, map);
+	int ret = PutHeader(stream, map);
 	if (ret) {
 		return ret;
 	}
@@ -2572,43 +2576,7 @@ int AREImporter::PutArea(DataStream* stream, const Map* map) const
 		return ret;
 	}
 
-	ret = PutActors(stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	// triggers
-	ret = PutRegions(stream, map, VertIndex);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutSpawns(stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutEntrances(stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutContainers(stream, map, VertIndex);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutItems(stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutDoors(stream, map, VertIndex);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutVertices(stream, map);
+	ret = PutAnimations(stream, map);
 	if (ret) {
 		return ret;
 	}
@@ -2618,12 +2586,47 @@ int AREImporter::PutArea(DataStream* stream, const Map* map) const
 		return ret;
 	}
 
+	ret = PutActors(stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ieDword regionVertStart = 0;
+	ieDword doorVertStart = 0;
+	ret = PutVertices(stream, map, regionVertStart, doorVertStart);
+
+	ret = PutDoors(stream, map, doorVertStart);
+	if (ret) {
+		return ret;
+	}
+
+	// triggers
+	ret = PutRegions(stream, map, regionVertStart);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutItems(stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutSpawns(stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutContainers(stream, map, 0);
+	if (ret) {
+		return ret;
+	}
+
 	ret = PutVariables(stream, map);
 	if (ret) {
 		return ret;
 	}
 
-	ret = PutAnimations(stream, map);
+	ret = PutEntrances(stream, map);
 	if (ret) {
 		return ret;
 	}
@@ -2642,7 +2645,6 @@ int AREImporter::PutArea(DataStream* stream, const Map* map) const
 		}
 
 		const EffectQueue& fxqueue = trap->GetEffects();
-
 		if (!fxqueue) {
 			continue;
 		}

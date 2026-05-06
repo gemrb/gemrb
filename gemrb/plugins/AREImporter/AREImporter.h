@@ -22,7 +22,7 @@ private:
 	ieDword AreaFlags = 0;
 	MapEnv AreaType = AT_UNINITIALIZED;
 	ieWord WRain = 0, WSnow = 0, WFog = 0, WLightning = 0, WUnknown = 0;
-	ieDword ActorOffset = 0, EmbeddedCreOffset = 0, AnimOffset = 0, AnimCount = 0;
+	ieDword ActorStubOffset = 0, EmbeddedCreOffset = 0, AnimOffset = 0, AnimCount = 0;
 	ieDword VerticesOffset = 0;
 	ieDword DoorsCount = 0, DoorsOffset = 0;
 	ieDword ExploredBitmapSize = 0, ExploredBitmapOffset = 0;
@@ -60,11 +60,11 @@ private:
 	int PutHeader(DataStream* stream, const Map* map) const;
 	int PutPoints(DataStream* stream, const std::vector<Point>&) const;
 	int PutPoints(DataStream* stream, const std::vector<SearchmapPoint>& points) const;
-	int PutDoors(DataStream* stream, const Map* map, ieDword& VertIndex) const;
+	int PutDoors(DataStream* stream, const Map* map, ieDword VertIndex) const;
 	int PutItems(DataStream* stream, const Map* map) const;
-	int PutContainers(DataStream* stream, const Map* map, ieDword& VertIndex) const;
+	int PutContainers(DataStream* stream, const Map* map, ieDword VertIndex) const;
 	int PutRegions(DataStream* stream, const Map* map, ieDword& VertIndex) const;
-	int PutVertices(DataStream* stream, const Map* map) const;
+	int PutVertices(DataStream* stream, const Map* map, ieDword& regionVertStart, ieDword& doorVertStart) const;
 	int PutSpawns(DataStream* stream, const Map* map) const;
 	void PutScript(DataStream* stream, const Actor* ac, unsigned int index) const;
 	int PutActors(DataStream* stream, const Map* map) const;
