@@ -171,13 +171,7 @@ def RandomPortrait():
 		
 # Function for getting the gender.
 def GetGender():
-	if IsPortraitModification:
-		Pc = GemRB.GameGetSelectedPCSingle()
-	else:
-		if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
-			return GemRB.GetVar("Gender")
-		else:
-			Pc = GemRB.GetVar("Slot")
+	Pc = GemRB.GameGetSelectedPCSingle() if IsPortraitModification else GemRB.GetVar("Slot")
 	return GemRB.GetPlayerStat(Pc, IE_SEX)
 	
 # Button right press function	
