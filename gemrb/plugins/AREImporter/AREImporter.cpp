@@ -1958,7 +1958,7 @@ int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword& VertIndex
 		stream->WriteResRefLC(d->KeyResRef);
 		const auto& s = d->Scripts[0];
 		if (s) {
-			stream->WriteResRefLC(s->GetName());
+			stream->WriteResRef(s->GetName());
 		} else {
 			stream->WriteFilling(8);
 		}
@@ -2046,7 +2046,7 @@ int AREImporter::PutItems(DataStream* stream, const Map* map) const
 			stream->WriteWord(ci->Usages[0]);
 			stream->WriteWord(ci->Usages[1]);
 			stream->WriteWord(ci->Usages[2]);
-			stream->WriteDword(ci->Flags);
+			stream->WriteDword(ci->Flags & (IE_INV_ITEM_ACQUIRED - 1));
 		}
 	}
 	return 0;
@@ -2077,12 +2077,12 @@ int AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword& Vert
 		stream->WriteWord(c->BBox.y + c->BBox.h);
 		//item index and offset
 		ieDword tmpDword = c->inventory.GetSlotCount();
-		stream->WriteDword(ItemIndex);
+		stream->WriteDword(tmpDword ? ItemIndex : 0);
 		stream->WriteDword(tmpDword);
 		ItemIndex += tmpDword;
 		const auto& s = c->Scripts[0];
 		if (s) {
-			stream->WriteResRefLC(s->GetName());
+			stream->WriteResRef(s->GetName());
 		} else {
 			stream->WriteFilling(8);
 		}
@@ -2093,8 +2093,8 @@ int AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword& Vert
 		VertIndex += tmpWord;
 		tmpWord = 0;
 		stream->WriteWord(tmpWord); //vertex count is made short
-		//this is the real scripting name
-		stream->WriteVariable(c->GetScriptName());
+		// this was the unused owner's scripting name
+		stream->WriteFilling(32);
 		stream->WriteResRefLC(c->KeyResRef);
 		stream->WriteDword(0); //unknown80
 		stream->WriteStrRef(c->OpenFail);
