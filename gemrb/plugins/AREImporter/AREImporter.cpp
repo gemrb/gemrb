@@ -792,6 +792,7 @@ void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
 	}
 
 	c->SetPos(pos);
+	c->OriginalName = containerName;
 	c->LockDifficulty = lockDiff;
 	c->Flags = containerFlags;
 	c->TrapDetectionDiff = trapDetDiff;
@@ -967,6 +968,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	}
 	door->SetMap(map);
 
+	door->OriginalName = longName;
 	door->hp = hp;
 	door->ac = ac;
 	door->TrapDetectionDiff = trapDetect;
@@ -1907,7 +1909,7 @@ int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword& VertIndex
 	for (unsigned int i = 0; i < DoorsCount; i++) {
 		Door* d = map->TMap->GetDoor(i);
 
-		stream->WriteVariable(d->GetScriptName());
+		stream->WriteVariable(d->GetOriginalName());
 		stream->WriteResRef(d->ID);
 		ieDword flags = d->Flags;
 		if (map->version == 16) {
@@ -2058,7 +2060,7 @@ int AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword& Vert
 		const Container* c = map->TMap->GetContainer(i);
 
 		//this is the editor name
-		stream->WriteVariable(c->GetScriptName());
+		stream->WriteVariable(c->GetOriginalName());
 		stream->WritePoint(c->Pos);
 		stream->WriteWord(c->containerType);
 		stream->WriteWord(c->LockDifficulty);

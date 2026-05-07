@@ -37,6 +37,7 @@ public:
 	ResRef KeyResRef;
 	// play this wav file when stepping on the trap (on PST)
 	ResRef EnterWav;
+	ieVariable OriginalName;
 
 public:
 	bool IsOver(const Point& place) const;
@@ -54,6 +55,7 @@ public:
 	bool TryUnlock(Actor* actor, bool removekey) const;
 	bool TryBashLock(Actor* actor, ieWord lockDifficulty, HCStrings failStr);
 	bool TryPickLock(Actor* actor, ieWord lockDifficulty, ieStrRef customFailStr, HCStrings failStr);
+	const ieVariable& GetOriginalName() const { return OriginalName; };
 };
 
 }

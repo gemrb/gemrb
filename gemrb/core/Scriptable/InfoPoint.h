@@ -31,7 +31,6 @@ public:
 	int GetCursor(TargetMode targetMode) const;
 	void TryBashLock(Actor*) override { return; };
 	void TryPickLock(Actor*) override { return; };
-	const ieVariable& GetOriginalName() const { return OriginalName; };
 	static void Reset();
 
 public:
@@ -42,7 +41,6 @@ public:
 	ieStrRef StrRef = ieStrRef::INVALID;
 	Point UsePoint = Point(-1, -1);
 	Point TalkPos = Point(-1, -1);
-	ieVariable OriginalName;
 };
 
 }
