@@ -3397,7 +3397,7 @@ static ResRef UpgradeRandomItem(const ResRef& pickedItem, const ResRef& workResR
 // - "UP", which causes a pick from one of the next rows (RT01_L -> RT01_M -> RT01_R -> RT01_V)
 bool Interface::ResolveRandomItem(CREItem* itm) const
 {
-	if (RtRows.empty()) return true;
+	if (RtRows.empty() || core->config.UseAsLibrary) return true;
 
 	auto pickFromRow = [this](const ResRef& itemRef) {
 		const ItemList& itemList = RtRows.at(itemRef);
