@@ -122,9 +122,20 @@ IF (USE_TESTS)
 	LIST(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 ENDIF()
 
-IF(USE_TRACY)
-	INCLUDE(FetchContent)
+INCLUDE(FetchContent)
 
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt
+  GIT_TAG        407c905e45ad75fc29bf0f9bb7c5c2fd3475976f
+) # 12.1.0
+FetchContent_MakeAvailable(fmt)
+
+INCLUDE_DIRECTORIES(${fmt_SOURCE_DIR}/include)
+# to overcome some errors around GCC 16.1
+ADD_DEFINITIONS("-DFMT_USE_CONSTEVAL=0")
+
+IF(USE_TRACY)
 	IF (NOT STATIC_LINK)
 		SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
 	ENDIF()
