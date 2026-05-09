@@ -201,16 +201,17 @@ def UpdateMageWindow (MageWindow):
 	knownSpells = []
 	for i in range (known_cnt):
 		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
-		knownSpells.append (ks)
+		knownSpells.append ((ks, i))
 	if GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ():
-		knownSpells.sort (key = lambda ks: GemRB.GetString (GemRB.GetSpell (ks["SpellResRef"])["SpellName"]))
+		knownSpells.sort (key = lambda tpl: GemRB.GetString (GemRB.GetSpell (tpl[0]["SpellResRef"])["SpellName"]))
 
 	btncount = GUICommon.GetGUISpellButtonCount()
 	i = 0
 	for i in range (known_cnt):
 		Button = MageWindow.GetControl (27 + i)
 		
-		ks = knownSpells[i]
+		ks = knownSpells[i][0]
+		Button.SetValue(knownSpells[i][1])
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
 		Button.OnPress (OnMageMemorizeSpell)
 		spell = GemRB.GetSpell (ks['SpellResRef'])
@@ -326,9 +327,8 @@ def OnMageMemorizeSpell (btn):
 	index = btn.Value
 	if GemRB.MemorizeSpell (pc, spelltype, level, index):
 		GemRB.PlaySound ("GAM_24")
-		Button = MageWindow.GetControl(index + 27)
-		Button.SetAnimation (FlashResRef, 0, A_ANI_PLAYONCE | A_ANI_BLEND)
-		Button.OnAnimEnd(Complete)
+		btn.SetAnimation (FlashResRef, 0, A_ANI_PLAYONCE | A_ANI_BLEND)
+		btn.OnAnimEnd(Complete)
 
 	return
 
