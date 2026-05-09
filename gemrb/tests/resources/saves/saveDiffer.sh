@@ -22,6 +22,12 @@ function diffFile() {
   a=$(find "$base1" -type f -iname "$file")
   b=$(find "$base2" -type f -iname "$file")
 
+  # useful until we start saving the wmp in the SAV
+  if [[ ! -f "$a" || ! -f "$b" ]]; then
+    echo "File $file only exists in one save!?"
+    return 0
+  fi
+
   if md5sum "$a" "$b" | sort -u -k1 | wc -l | grep -q 1; then
     return 0
   fi
