@@ -808,8 +808,6 @@ void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
 		c->AddItem(core->ReadItem(str));
 	}
 
-	if (containerType == IE_CONTAINER_PILE) Script.Reset();
-
 	if (Script.IsEmpty()) {
 		c->Scripts[0] = nullptr;
 	} else {
