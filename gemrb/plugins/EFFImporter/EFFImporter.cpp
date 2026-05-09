@@ -276,7 +276,7 @@ void EFFImporter::PutEffectV2(DataStream* stream, const Effect* fx)
 	stream->WriteDword(fx->CasterLevel);
 	// try preserving fx->FirstApply for save testing
 	if (core->config.UseAsLibrary) {
-		stream->WriteDword(fx->Parameter5);
+		stream->WriteDword(fx->Parameter5 ? 1 : 0);
 	} else {
 		stream->WriteFilling(4);
 	}
