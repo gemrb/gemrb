@@ -327,7 +327,7 @@ public:
 	{
 		return Dialog;
 	}
-	void SetDialog(const ResRef& resref);
+	void SetDialog(const ResRef& resref, bool embedded = false);
 	void SetFloatingText(char*);
 	void SetScript(const ResRef& aScript, int idx, bool ai = false);
 	void SetSpellResRef(const ResRef& resref);

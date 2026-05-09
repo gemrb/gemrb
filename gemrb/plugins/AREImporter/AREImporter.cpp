@@ -1120,7 +1120,8 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 
 	// actually, Flags&1 signs that the creature
 	// is not loaded yet, so !(Flags&1) means it is embedded
-	if (creOffset != 0 && !(flags & AF_CRE_NOT_LOADED)) {
+	bool embedded = creOffset != 0 && !(flags & AF_CRE_NOT_LOADED);
+	if (embedded) {
 		creFile = SliceStream(str, creOffset, creSize, true);
 	} else {
 		creFile = gamedata->GetResourceStream(creResRef, IE_CRE_CLASS_ID);
@@ -1184,7 +1185,9 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 		act->ignoredFields.altName = altName;
 	}
 
-	act->SetDialog(dialog);
+	// if the creature is already embedded in the area, leave its data intact
+	// if we just loaded the CRE, apply the override from the area entry
+	act->SetDialog(dialog, embedded);
 
 	for (int j = 0; j < 8; j++) {
 		if (!scripts[j].IsEmpty()) {
@@ -2259,7 +2262,8 @@ int AREImporter::PutActors(DataStream* stream, const Map* map) const
 		stream->WriteWord(0); //more unknowns
 		stream->WriteDword(ac->appearance);
 		stream->WriteDword(ac->TalkCount);
-		stream->WriteResRef(ac->GetDialog());
+		// ignore dialog, it was resolved and stored in the CRE part
+		stream->WriteFilling(8);
 		// ignore their resolved scripts, as none of the initial value in this header survive
 		// if any was set, the CRE file's ones were overriden and are stored there
 		stream->WriteFilling(6 * 8);
