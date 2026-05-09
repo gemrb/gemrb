@@ -3239,6 +3239,13 @@ CREItem* Interface::ReadItem(DataStream* str, CREItem* itm) const
 	str->ReadWord(itm->Usages[1]);
 	str->ReadWord(itm->Usages[2]);
 	str->ReadDword(itm->Flags);
+
+	// iwds used the second gold charge for extra loot randomisation
+	if (itm->Usages[1] > 0 && !core->config.UseAsLibrary && itm->ItemResRef == core->GoldResRef) {
+		itm->Usages[0] += core->Roll(1, itm->Usages[1], -1);
+		itm->Usages[1] = 0;
+	}
+
 	if (ResolveRandomItem(itm)) {
 		SanitizeItem(itm);
 		return itm;
