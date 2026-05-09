@@ -1997,9 +1997,11 @@ int CREImporter::PutInventory(DataStream* stream, const Actor* actor, unsigned i
 			}
 		}
 		// bg1 saved only the first 3 bits!?
-		if (actor->creVersion == CREVersion::V1_0 || actor->creVersion == CREVersion::V1_1 || actor->creVersion == CREVersion::V1_2) {
+		// it's more complicated, but too complicated right now, bg2ee test save shows both behaviours
+		bool force = actor->GetLongName() != u"Cespenar"; // HACK
+		if (force && (actor->creVersion == CREVersion::V1_0 || actor->creVersion == CREVersion::V1_1 || actor->creVersion == CREVersion::V1_2)) {
 			stream->WriteDword(tmpDword & (IE_INV_ITEM_UNDROPPABLE - 1));
-		} else if (actor->creVersion == CREVersion::V9_0 || actor->creVersion == CREVersion::V2_2) {
+		} else if (!force || actor->creVersion == CREVersion::V9_0 || actor->creVersion == CREVersion::V2_2) {
 			stream->WriteDword(tmpDword & (IE_INV_ITEM_ACQUIRED - 1));
 		} else {
 			stream->WriteDword(tmpDword);
