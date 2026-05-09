@@ -875,7 +875,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	str->ReadResRef(act->SmallPortrait);
 	str->ReadResRef(act->LargePortrait);
 	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
-		if (!act->SmallPortrait.IsEmpty()) {
+		if (!act->SmallPortrait.IsEmpty() && act->SmallPortrait != "NONE") {
 			// bg2ee typically stores the M and L, but not S
 			// gimp it for now, since we want the small portrait to be small
 			*act->SmallPortrait.rbegin() = 'S';
@@ -2046,7 +2046,7 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 
 	// see the read above, this just ensures save compatibility
 	ResRef smallPortrait = actor->SmallPortrait;
-	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS) && *actor->LargePortrait.rbegin() != 'M') {
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS) && *actor->LargePortrait.rbegin() != 'M' && actor->SmallPortrait != "NONE") {
 		*smallPortrait.rbegin() = 'M';
 	}
 	stream->WriteResRef(smallPortrait);
