@@ -2428,9 +2428,9 @@ int AREImporter::PutMapnotes(DataStream* stream, const Map* map) const
 		} else {
 			stream->WritePoint(mn.Pos);
 			stream->WriteStrRef(mn.strref);
-			stream->WriteWord(mn.Pos.y);
+			stream->WriteWord(1);
 			stream->WriteWord(mn.color);
-			stream->WriteDword(1);
+			stream->WriteDword(11 + i);
 			for (int x = 0; x < 9; ++x) { //9 empty dwords
 				stream->WriteFilling(4);
 			}
