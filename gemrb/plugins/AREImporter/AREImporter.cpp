@@ -1079,6 +1079,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	ieWord maxDistance;
 	ieWord spawned;
 	ieByte difficultyMargin;
+	ieByte maybeStar;
 	DataStream* creFile;
 
 	str->ReadVariable(defaultName);
@@ -1086,7 +1087,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	str->ReadPoint(destination);
 	str->ReadDword(flags);
 	str->ReadWord(spawned); // "type"
-	str->Seek(1, GEM_CURRENT_POS); // one letter of a ResRef, changed to * at runtime, purpose unknown (portraits?), but not needed either
+	str->Read(&maybeStar, 1); // one letter of a ResRef, changed to * at runtime, purpose unknown (portraits?), but not needed either
 	str->Read(&difficultyMargin, 1); // iwd2 only, "alignbyte" in bg2 (padding)
 	str->Seek(4, GEM_CURRENT_POS); //actor animation, unused
 	str->ReadDword(orientation); // was word + padding in bg2
@@ -1106,12 +1107,15 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	str->ReadResRef(creResRef);
 	str->ReadDword(creOffset);
 	str->ReadDword(creSize);
-	// another iwd2 script slot
-	str->ReadResRef(scripts[SCR_AREA]);
-	str->Seek(120, GEM_CURRENT_POS);
-	// not iwd2, this field is garbage
-	if (!core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) {
+	// another iwd2 script slot, alternate name elsewhere
+	ieVariable altName;
+	if (map->version == 16) {
+		str->ReadResRef(scripts[SCR_AREA]);
+		str->Seek(120, GEM_CURRENT_POS);
+	} else {
 		scripts[SCR_AREA].Reset();
+		str->ReadVariable(altName);
+		str->Seek(96, GEM_CURRENT_POS);
 	}
 
 	// actually, Flags&1 signs that the creature
@@ -1175,6 +1179,10 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 		}
 	}
 	act->ignoredFields.difficultyMargin = difficultyMargin;
+	act->ignoredFields.maybeStar = maybeStar;
+	if (map->version != 16) {
+		act->ignoredFields.altName = altName;
+	}
 
 	act->SetDialog(dialog);
 
@@ -2241,7 +2249,7 @@ int AREImporter::PutActors(DataStream* stream, const Map* map) const
 
 		stream->WriteDword(0); //used fields flag always 0 for saved areas
 		stream->WriteWord(ac->Spawned);
-		stream->WriteFilling(1); // letter
+		stream->Write(&ac->ignoredFields.maybeStar, 1); // letter
 		stream->WriteScalar(ac->ignoredFields.difficultyMargin);
 		stream->WriteDword(0); //actor animation, unused
 		stream->WriteWord(ac->GetOrientation());
@@ -2255,16 +2263,27 @@ int AREImporter::PutActors(DataStream* stream, const Map* map) const
 		// ignore their resolved scripts, as none of the initial value in this header survive
 		// if any was set, the CRE file's ones were overriden and are stored there
 		stream->WriteFilling(6 * 8);
-		//creature reference is empty because we are embedding it
-		//the original engine used a '*'
-		stream->WriteFilling(8);
+		// creature reference is empty because we are embedding it; we keep it for save diffing purposes
+		// this matches the original, but if case issues pop up, just save and restore the field
+		if (ac->creVersion == CREVersion::V1_0 || ac->creVersion == CREVersion::V1_2) {
+			stream->WriteFilling(8);
+		} else {
+			ResRef starry { ac->GetScriptName() };
+			starry[0] = '*';
+			stream->WriteResRefUC(starry);
+		}
 		stream->WriteDword(CreatureOffset);
 		ieDword CreatureSize = am->GetStoredFileSize(ac);
 		stream->WriteDword(CreatureSize);
 		CreatureOffset += CreatureSize;
-		// ignore the area script too
-		stream->WriteFilling(8);
-		stream->WriteFilling(120);
+		// only the area script in iwd2, but preserving the value everywhere
+		if (map->version == 16) {
+			PutScript(stream, ac, SCR_AREA);
+			stream->WriteFilling(120);
+		} else {
+			stream->WriteVariable(ac->ignoredFields.altName);
+			stream->WriteFilling(96);
+		}
 	}
 
 	return 0;
