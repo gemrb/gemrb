@@ -3511,8 +3511,9 @@ int fx_set_regenerating_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->Parameter5 = gameTime + core->Time.round_sec * static_cast<ieDword>(timeStep);
 	}
 
-	if (fx->FirstApply) {
+	if (fx->FirstApply || target->Timers.checkHP == 2) {
 		//don't add hp in the first occasion, so it cannot be used for cheat heals
+		// same for actors that just came about, so we don't increase their hp over the max
 		return FX_APPLIED;
 	}
 
