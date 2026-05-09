@@ -253,7 +253,8 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword openerID, bool addTrigge
 		// in PS:T, opening a door does not unlock it
 		// iwd2 ar6051 pit traps (eg. the lava switch door) also show it's not true there
 		// except perhaps sometimes on closing?
-		if (!core->HasFeature(GFFlags::REVERSE_DOOR) && !core->HasFeature(GFFlags::RULES_3ED)) {
+		// maybe the Ticks check is enough, we shouldn't touch it on load anywhere
+		if (!core->HasFeature(GFFlags::REVERSE_DOOR) && !core->HasFeature(GFFlags::RULES_3ED) && Ticks > 0) {
 			SetDoorLocked(false, playsound);
 		}
 	} else if (addTrigger) {
