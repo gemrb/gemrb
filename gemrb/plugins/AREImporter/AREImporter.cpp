@@ -1944,18 +1944,31 @@ int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword VertIndex)
 		stream->WriteWord(d->ClosedBBox.x + d->ClosedBBox.w);
 		stream->WriteWord(d->ClosedBBox.y + d->ClosedBBox.h);
 		//open and closed impeded blocks
-		stream->WriteDword(VertIndex);
 		tmpWord = (ieWord) d->open_ib.size();
+		stream->WriteDword(tmpWord ? VertIndex : 0);
 		stream->WriteWord(tmpWord);
 		VertIndex += tmpWord;
 		tmpWord = (ieWord) d->closed_ib.size();
 		stream->WriteWord(tmpWord);
-		stream->WriteDword(VertIndex);
+		stream->WriteDword(tmpWord ? VertIndex : 0);
 		VertIndex += tmpWord;
 		stream->WriteWord(d->hp);
 		stream->WriteWord(d->ac);
-		stream->WriteResRef(d->OpenSound);
-		stream->WriteResRef(d->CloseSound);
+		// revert the sounds to empty if we sanitized them
+		if (!d->OpenSound.IsEmpty() &&
+		    d->OpenSound != gamedata->defaultSounds[DEF_HOPEN] &&
+		    d->OpenSound != gamedata->defaultSounds[DEF_OPEN]) {
+			stream->WriteResRef(d->OpenSound);
+		} else {
+			stream->WriteFilling(8);
+		}
+		if (!d->CloseSound.IsEmpty() &&
+		    d->CloseSound != gamedata->defaultSounds[DEF_HCLOSE] &&
+		    d->CloseSound != gamedata->defaultSounds[DEF_CLOSE]) {
+			stream->WriteResRef(d->CloseSound);
+		} else {
+			stream->WriteFilling(8);
+		}
 		stream->WriteDword(d->Cursor);
 		stream->WriteWord(d->TrapDetectionDiff);
 		stream->WriteWord(d->TrapRemovalDiff);
