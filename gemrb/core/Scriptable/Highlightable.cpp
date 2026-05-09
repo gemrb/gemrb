@@ -171,7 +171,7 @@ bool Highlightable::TryBashLock(Actor* actor, ieWord lockDifficulty, HCStrings f
 bool Highlightable::TryPickLock(Actor* actor, ieWord lockDifficulty, ieStrRef customFailStr, HCStrings failStr)
 {
 	if (lockDifficulty == 100) {
-		if (customFailStr != ieStrRef::INVALID) {
+		if (customFailStr && customFailStr != ieStrRef::INVALID) {
 			displaymsg->DisplayStringName(customFailStr, GUIColors::XPCHANGE, actor, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 		} else {
 			displaymsg->DisplayMsgAtLocation(failStr, FT_ANY, actor, actor, GUIColors::XPCHANGE);

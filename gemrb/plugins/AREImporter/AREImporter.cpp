@@ -812,7 +812,6 @@ void AREImporter::GetContainer(DataStream* str, int idx, Map* map)
 		c->Scripts[0] = MakeHolder<GameScript>(Script, c);
 	}
 	c->KeyResRef = keyResRef;
-	if (!openFail) openFail = ieStrRef(-1); // rewrite 0 to -1
 	c->OpenFail = openFail;
 }
 
