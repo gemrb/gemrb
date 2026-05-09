@@ -1814,9 +1814,14 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 	}
 }
 
-//adding animation in order, based on its height parameter
+// adding animation in rendering order, based on its height parameter
+// the originals don't care, so we skip this optimisation in tests
 void Map::AddAnimation(AreaAnimation anim)
 {
+	if (core->config.UseAsLibrary) {
+		animations.push_back(std::move(anim));
+		return;
+	}
 	int Height = anim.GetHeight();
 	auto iter = animations.begin();
 	for (; (iter != animations.end()) && (iter->GetHeight() < Height); ++iter);
