@@ -2274,7 +2274,7 @@ int AREImporter::PutActors(DataStream* stream, const Map* map) const
 		PutScript(stream, ac, SCR_SPECIFICS); // the only one missing the CRE (non-iwd2)
 		// creature reference is empty because we are embedding it; we keep it for save diffing purposes
 		// this matches the original, but if case issues pop up, just save and restore the field
-		if (ac->creVersion == CREVersion::V1_0 || ac->creVersion == CREVersion::V1_2) {
+		if (ac->creVersion == CREVersion::V1_0 || ac->creVersion == CREVersion::V1_2 || ac->creVersion == CREVersion::V2_2) {
 			stream->WriteFilling(8);
 		} else {
 			ResRef starry { ac->GetScriptName() };

@@ -881,10 +881,10 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 			*act->SmallPortrait.rbegin() = 'S';
 		}
 	} else {
-		if (act->SmallPortrait.IsEmpty()) {
+		if (act->SmallPortrait.IsEmpty() && version != CREVersion::V2_2) {
 			act->SmallPortrait = "NONE";
 		}
-		if (act->LargePortrait.IsEmpty()) {
+		if (act->LargePortrait.IsEmpty() && version != CREVersion::V2_2) {
 			act->LargePortrait = "NONE";
 		}
 	}
