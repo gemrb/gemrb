@@ -41,6 +41,7 @@ public:
 	ieStrRef StrRef = ieStrRef::INVALID;
 	Point UsePoint = Point(-1, -1);
 	Point TalkPos = Point(-1, -1);
+	Point AltPoint = Point(-1, -1); // TODO: currently unused, unknown function
 };
 
 }

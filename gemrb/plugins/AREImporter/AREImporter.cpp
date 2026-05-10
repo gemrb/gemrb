@@ -558,6 +558,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	Point pos;
 	Point talkPos;
 	Region bbox;
+	Point altPoint;
 	ieVariable ipName;
 	ieVariable entrance;
 	ResRef script0;
@@ -591,12 +592,8 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	// ARE 9.1: 4B per position after that.
 	if (16 == map->version) {
 		str->ReadPoint(pos); // OverridePoint in NI
-		if (pos.IsZero()) {
-			str->ReadScalar(pos.x); // AlternatePoint in NI
-			str->ReadScalar(pos.y);
-		} else {
-			str->Seek(8, GEM_CURRENT_POS);
-		}
+		str->ReadScalar(altPoint.x); // AlternatePoint in NI
+		str->ReadScalar(altPoint.y);
 		str->Seek(26, GEM_CURRENT_POS);
 	} else {
 		str->ReadPoint(pos); // TransitionWalkToX, TransitionWalkToY
@@ -673,6 +670,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	ip->SetMap(map);
 	ip->Flags = ipFlags;
 	ip->UsePoint = pos;
+	ip->AltPoint = altPoint;
 	// FIXME: PST doesn't use this field
 	if (ip->GetUsePoint()) {
 		ip->SetPos(ip->UsePoint);
@@ -2172,8 +2170,8 @@ int AREImporter::PutRegions(DataStream* stream, const Map* map, ieDword& VertInd
 		}
 		stream->WritePoint(ip->UsePoint);
 		if (16 == map->version) {
-			stream->WriteDword(ip->UsePoint.x);
-			stream->WriteDword(ip->UsePoint.y);
+			stream->WriteDword(ip->AltPoint.x);
+			stream->WriteDword(ip->AltPoint.y);
 			stream->WriteFilling(28); //unknown
 		} else {
 			stream->WriteFilling(36); //unknown
