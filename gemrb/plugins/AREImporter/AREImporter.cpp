@@ -1217,9 +1217,6 @@ void AREImporter::GetAreaAnimation(DataStream* str, Map* map) const
 	ieWord startFrameRange;
 	str->ReadWord(startFrameRange);
 	str->Read(&anim.startchance, 1);
-	if (anim.startchance <= 0) {
-		anim.startchance = 100; // percentage of starting a cycle
-	}
 	if (startFrameRange && bool(anim.flags & AreaAnimation::Flags::RandStart)) {
 		anim.frame = RAND<AreaAnimation::index_t>(0, startFrameRange - 1);
 	}
@@ -2308,15 +2305,20 @@ int AREImporter::PutAnimations(DataStream* stream, const Map* map) const
 		stream->WriteWord(an->sequence);
 		stream->WriteWord(an->frame);
 
-		if (core->HasFeature(GFFlags::AUTOMAP_INI)) {
-			/* PST toggles the active bit only, and we need to keep the rest. */
-			auto flags = (an->originalFlags & ~AreaAnimation::Flags::Active) | (an->flags & AreaAnimation::Flags::Active);
-			stream->WriteEnum(flags);
-		} else {
-			stream->WriteEnum(an->flags);
+		ieWordSigned height = an->height;
+		auto flags = an->flags;
+		if (core->HasFeature(GFFlags::IMPLICIT_AREAANIM_BACKGROUND)) {
+			height -= ANI_PRI_BACKGROUND;
+			flags &= ~AreaAnimation::Flags::NoWall;
 		}
 
-		stream->WriteScalar(an->height);
+		if (core->HasFeature(GFFlags::AUTOMAP_INI)) {
+			/* PST toggles the active bit only, and we need to keep the rest. */
+			flags = (an->originalFlags & ~AreaAnimation::Flags::Active) | (an->flags & AreaAnimation::Flags::Active);
+		}
+		stream->WriteEnum(flags);
+
+		stream->WriteScalar(height);
 		stream->WriteWord(an->transparency);
 		stream->WriteWord(an->startFrameRange); //used by A_ANI_RANDOM_START
 		stream->Write(&an->startchance, 1);
