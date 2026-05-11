@@ -838,7 +838,13 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	act->BaseStats[IE_VISUALRANGE] = Scriptable::VOODOO_VISUAL_RANGE; // not stored anywhere
 	act->BaseStats[IE_DIALOGRANGE] = VOODOO_DIALOG_RANGE;
 	str->ReadDword(act->BaseStats[IE_MC_FLAGS]);
-	str->ReadDword(act->BaseStats[IE_XPVALUE]);
+	if (version == CREVersion::V2_2) {
+		// save the value for minimising resaving difference
+		// it's not really used, so we replace it with the IE_CR stat
+		str->ReadDword(act->ignoredFields.iwd2XPValue);
+	} else {
+		str->ReadDword(act->BaseStats[IE_XPVALUE]);
+	}
 	str->ReadDword(act->BaseStats[IE_XP]);
 	str->ReadDword(act->BaseStats[IE_GOLD]);
 	str->ReadDword(act->BaseStats[IE_STATE_ID]);
@@ -2023,7 +2029,11 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 	stream->WriteStrRef(actor->LongStrRef);
 	stream->WriteStrRef(actor->ShortStrRef);
 	stream->WriteDword(actor->BaseStats[IE_MC_FLAGS]);
-	stream->WriteDword(actor->BaseStats[IE_XPVALUE]);
+	if (version == CREVersion::V2_2) {
+		stream->WriteDword(actor->ignoredFields.iwd2XPValue);
+	} else {
+		stream->WriteDword(actor->BaseStats[IE_XPVALUE]);
+	}
 	stream->WriteDword(actor->BaseStats[IE_XP]);
 	stream->WriteDword(actor->BaseStats[IE_GOLD]);
 	stream->WriteDword(actor->BaseStats[IE_STATE_ID]);
