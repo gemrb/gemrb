@@ -9839,7 +9839,8 @@ static PyObject* GemRB_SetMapnote(PyObject* /*self*/, PyObject* args)
 	}
 
 	if (text.length() > 0) {
-		map->AddMapNote(point, MapNote(std::move(text), color, false));
+		std::array<ieDword, 5> garbage {};
+		map->AddMapNote(point, MapNote(std::move(text), color, false, garbage));
 	} else {
 		map->RemoveMapNote(point);
 	}

@@ -1304,7 +1304,7 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 		gamedata->AddFactoryResource<AnimationFactory>(std::move(af));
 	}
 
-	// Load user-added notes, but skip readonly ones — added from autonote.ini later
+	// Load user-added notes, skip any autonote.ini duplicates later
 	const Size mapsize = map->GetSize();
 	if (NoteCount) {
 		for (ieDword i = 0; i < NoteCount; i++) {
@@ -1324,11 +1324,9 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 			bytes[500] = '\0';
 			ieDword readonly;
 			str->ReadDword(readonly); // readonly == 1
-			str->Seek(20, GEM_CURRENT_POS);
-			if (readonly) {
-				continue;
-			}
-			map->AddMapNote(point, 1, StringFromTLK(StringView(bytes)), false);
+			std::array<ieDword, 5> unknowns;
+			str->ReadArray(unknowns);
+			map->AddMapNote(point, readonly ? 0 : 1, StringFromTLK(StringView(bytes)), readonly, unknowns);
 		}
 	}
 
@@ -1351,6 +1349,11 @@ void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 		// autonote.ini coordinates are in small map space too, so convert to game world space
 		point.x = static_cast<int>(smallX * double(mapsize.w) / map->SmallMap->Frame.w);
 		point.y = static_cast<int>(smallY * double(mapsize.h) / map->SmallMap->Frame.h);
+		if (map->MapNoteAtPoint(point, 1)) {
+			// already embedded in the area and loaded above
+			count--;
+			continue;
+		}
 
 		key.Format("text{}", count);
 		int value = INInote->GetKeyAsInt(scriptName, key, 0);
@@ -2390,9 +2393,7 @@ void AREImporter::PutMapnotes(DataStream* stream, const Map* map) const
 				stream->WriteFilling(x);
 			}
 			stream->WriteDword(mn.readonly);
-			for (x = 0; x < 5; x++) { //5 empty dwords
-				stream->WriteFilling(4);
-			}
+			stream->WriteArray(mn.unknowns);
 		} else {
 			stream->WritePoint(mn.Pos);
 			stream->WriteStrRef(mn.strref);

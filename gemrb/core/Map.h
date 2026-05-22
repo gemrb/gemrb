@@ -133,8 +133,9 @@ public:
 	String text;
 	Point Pos;
 	bool readonly;
+	std::array<ieDword, 5> unknowns {};
 
-	MapNote(String txt, ieWord c, bool readonly);
+	MapNote(String txt, ieWord c, bool readonly, const std::array<ieDword, 5>& garbage);
 	MapNote(ieStrRef ref, ieWord c, bool readonly);
 
 	const Color& GetColor() const;
@@ -577,7 +578,7 @@ public:
 	const MapReverbProperties& GetReverbProperties() const;
 
 	//mapnotes
-	void AddMapNote(const Point& point, ieWord color, String text, bool readonly = false);
+	void AddMapNote(const Point& point, ieWord color, String text, bool readonly, const std::array<ieDword, 5>& unknowns);
 	void AddMapNote(const Point& point, ieWord color, ieStrRef strref, bool readonly = false);
 	void AddMapNote(const Point& point, MapNote note);
 	void RemoveMapNote(const Point& point);

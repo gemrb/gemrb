@@ -370,8 +370,8 @@ static inline AnimationObjectType SelectObject(const Actor* actor, int q, const 
 	return AnimationObjectType::ACTOR;
 }
 
-MapNote::MapNote(String txt, ieWord c, bool readonly)
-	: text(std::move(txt)), readonly(readonly)
+MapNote::MapNote(String txt, ieWord c, bool readonly, const std::array<ieDword, 5>& garbage)
+	: text(std::move(txt)), readonly(readonly), unknowns(garbage)
 {
 	color = Clamp<ieWord>(c, 0, 8);
 	//update custom strref
@@ -3279,9 +3279,9 @@ void Map::SetupAmbients() const
 	ambim.SetAmbients(ambients);
 }
 
-void Map::AddMapNote(const Point& point, ieWord color, String text, bool readonly)
+void Map::AddMapNote(const Point& point, ieWord color, String text, bool readonly, const std::array<ieDword, 5>& unknowns)
 {
-	AddMapNote(point, MapNote(std::move(text), color, readonly));
+	AddMapNote(point, MapNote(std::move(text), color, readonly, unknowns));
 }
 
 void Map::AddMapNote(const Point& point, ieWord color, ieStrRef strref, bool readonly)
