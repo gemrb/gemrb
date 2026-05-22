@@ -1193,7 +1193,7 @@ void Game::SetFamiliar(const ResRef& familiar, size_t index)
 //reading the challenge rating table for iwd2 (only when needed)
 void Game::LoadCRTable()
 {
-	AutoTable table = gamedata->LoadTable("moncrate");
+	AutoTable table = gamedata->LoadTable("moncrate", true);
 	if (table) {
 		TableMgr::index_t maxrow = table->GetRowCount() - 1;
 		crtable = new CRRow[MAX_LEVEL];
