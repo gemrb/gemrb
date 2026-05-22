@@ -2370,8 +2370,8 @@ void AREImporter::PutMapnotes(DataStream* stream, const Map* map) const
 		if (pst) {
 			// in PST the coordinates are stored in small map space
 			const Size& mapsize = map->GetSize();
-			stream->WriteDword(static_cast<ieDword>(mn.Pos.x * double(map->SmallMap->Frame.w) / mapsize.w));
-			stream->WriteDword(static_cast<ieDword>(mn.Pos.y * double(map->SmallMap->Frame.h) / mapsize.h));
+			stream->WriteDword(static_cast<ieDword>(mn.Pos.x * double(map->SmallMap->Frame.w) / mapsize.w + 0.5));
+			stream->WriteDword(static_cast<ieDword>(mn.Pos.y * double(map->SmallMap->Frame.h) / mapsize.h + 0.5));
 
 			size_t len = 0;
 			// limited to 500 *bytes* of text, convert to a multibyte encoding.
