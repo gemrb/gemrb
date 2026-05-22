@@ -85,6 +85,16 @@ def OpenSaveWindow ():
 	Window.Focus ()
 	return
 
+def GetSaveTime (Pos):
+	GameDate = Games[Pos].GetGameDate ()
+	if GameCheck.IsBG2OrEE ():
+		Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
+		GameDate = GemRB.GetString (str_chapter[Chapter-1]) + " " + GameDate
+	elif GameCheck.IsBG1 ():
+		ChapterTitle = GemRB.GetString (16202 + int(GemRB.GetToken ("CHAPTER0")))
+		GameDate = ChapterTitle + ". " + GameDate
+	return GameDate
+
 def ScrollBarPress ():
 	Window = SaveWindow
 
@@ -102,7 +112,7 @@ def ScrollBarPress ():
 
 		if ActPos < len(Games):
 			Slotname = Games[ActPos].GetName ()
-			Slottime = Games[ActPos].GetGameDate ()
+			Slottime = GetSaveTime (ActPos)
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
 		elif ActPos == len(Games):
 			Slotname = strs['empty']
@@ -191,11 +201,7 @@ def OpenConfirmWindow (btn):
 		Slotname = Games[Pos].GetName()
 		save_strref = strs['overwrite']
 
-		if GameCheck.IsBG2OrEE ():
-			Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
-			GameDate = GemRB.GetString (str_chapter[Chapter-1]) + " " + Games[Pos].GetGameDate()
-		else:
-			GameDate = Games[Pos].GetGameDate ()
+		GameDate = GetSaveTime (Pos)
 
 		if AreaPreview:
 			AreaPreview.SetPicture (Games[Pos].GetPreview())
