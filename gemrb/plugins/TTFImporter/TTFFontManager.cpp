@@ -95,7 +95,7 @@ Holder<Font> TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/,
 		auto c = pal->GetColorAt(i);
 		unsigned int m = (c.r + c.g + c.b) / 3;
 		if (m > 2) {
-			int tmp = m * MUL;
+			int tmp = m * 2;
 			c.a = std::min(tmp, 0xff);
 		} else {
 			c.a = 0;
