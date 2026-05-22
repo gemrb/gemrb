@@ -300,23 +300,24 @@ bool AREImporter::Import(DataStream* str)
 	if (bigheader == AREVersion::V9_1) {
 		// are9.1 difficulty bits for level2/level3
 		// ar4000 for example has a bunch of actors for all area difficulty levels, so these here are likely just the allowed levels
+		str->ReadDword(OrigAreaDifficulty);
 		AreaDifficulty = 1;
 		ieByte tmp = 0;
 		int avgPartyLevel = core->GetGame()->GetTotalPartyLevel(false) / core->GetGame()->GetPartySize(false);
-		str->Read(&tmp, 1); // 0x54
+		tmp = OrigAreaDifficulty & 0xff;
 		if (tmp && avgPartyLevel >= tmp) {
 			AreaDifficulty = 2;
 		}
-		tmp = 0;
-		str->Read(&tmp, 1); // 0x55
+		tmp = OrigAreaDifficulty & 0xff00;
 		if (tmp && avgPartyLevel >= tmp) {
 			AreaDifficulty = 4;
 		}
-		// 0x56 held the average party level at load time (usually 1, since it had no access yet),
+		// 0x56-0x57 held the average party level at load time,
 		// but we resolve everything here and store AreaDifficulty instead
+		// bigheader gap is here
+		str->Seek(0x54 + static_cast<int>(bigheader), GEM_STREAM_START);
 	}
-	//bigheader gap is here
-	str->Seek(0x54 + static_cast<int>(bigheader), GEM_STREAM_START);
+
 	str->ReadDword(ActorStubOffset);
 	str->ReadWord(ActorCount);
 	str->ReadWord(InfoPointsCount);
@@ -1487,6 +1488,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 	map->AreaType = AreaType;
 	map->DayNight = day_or_night;
 	map->AreaDifficulty = AreaDifficulty;
+	map->origAreaDiff = OrigAreaDifficulty;
 	map->WEDResRef = WEDResRef;
 	map->Dream[0] = Dream1;
 	map->Dream[1] = Dream2;
@@ -1830,19 +1832,9 @@ void AREImporter::PutHeader(DataStream* stream, const Map* map) const
 	stream->WriteWord(map->Lightning);
 	stream->WriteFilling(2);
 
-	if (map->version == AREVersion::V9_1) { // writing 14 bytes of 0's
-		char tmp[1] = { '0' };
-		if (map->AreaDifficulty == 2) {
-			tmp[0] = 1;
-		}
-		stream->Write(tmp, 1);
-		tmp[0] = 0;
-		if (map->AreaDifficulty == 4) {
-			tmp[0] = 1;
-		}
-		stream->Write(tmp, 1);
-		stream->WriteFilling(6);
-		stream->WriteFilling(8);
+	if (map->version == AREVersion::V9_1) {
+		stream->WriteDword(map->origAreaDiff);
+		stream->WriteFilling(12);
 	}
 
 	stream->WriteDword(ActorCount ? ActorStubOffset : 0);

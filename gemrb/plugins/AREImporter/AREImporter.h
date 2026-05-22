@@ -42,6 +42,7 @@ private:
 	ResRef Dream1; // only in ToB
 	ResRef Dream2; // only in ToB
 	ieByte AreaDifficulty = 0;
+	ieDword OrigAreaDifficulty = 0; // just for resave compat purposes
 
 public:
 	AREImporter() noexcept = default;

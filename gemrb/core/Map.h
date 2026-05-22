@@ -491,6 +491,7 @@ public:
 	std::array<ieDword, MAX_RESCOUNT> SongList {};
 	RestHeaderType RestHeader {};
 	int AreaDifficulty = 0;
+	ieDword origAreaDiff = 0;
 
 	//count of all projectiles that are saved
 	size_t GetProjectileCount(proIterator& iter) const;
