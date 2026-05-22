@@ -58,6 +58,23 @@ def OnLoad():
 	temp = GemRB.Roll (TmpTable.GetValue (ClassName, "ROLLS"), TmpTable.GetValue (ClassName, "SIDES"), TmpTable.GetValue (ClassName, "MODIFIER"))
 	GemRB.SetPlayerStat (MyChar, IE_GOLD, temp * TmpTable.GetValue (ClassName, "MULTIPLIER"))
 
+	# bgee added stweapon.2da to disable monks getting the plain staff
+	if GameCheck.IsBGEE ():
+		# 10 is a weapon slot (see slottype.2da row 10)
+		table = GemRB.LoadTable ("stweapon", True)
+		defVal = table.GetValue (None, None)
+		cell = table.GetValue (ClassName, "WEAPON")
+		# but it has invalid format ...
+		found = False
+		for row in range(table.GetRowCount ()):
+			rowName = table.GetRowName (row)
+			if rowName == ClassName:
+				found = True
+				break
+		if not found or cell != defVal:
+			GemRB.CreateItem (MyChar, cell, 10, 1, 0, 0)
+			GemRB.SetEquippedQuickSlot (MyChar, 0)
+
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
 
 	CustomizeChar (MyChar)
