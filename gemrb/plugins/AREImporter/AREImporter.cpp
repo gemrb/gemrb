@@ -1806,7 +1806,7 @@ int AREImporter::GetStoredFileSize(Map* map)
 	return headersize;
 }
 
-int AREImporter::PutHeader(DataStream* stream, const Map* map) const
+void AREImporter::PutHeader(DataStream* stream, const Map* map) const
 {
 	ResRef signature = "AREAV1.0";
 
@@ -1900,10 +1900,9 @@ int AREImporter::PutHeader(DataStream* stream, const Map* map) const
 	//usually 56 empty bytes (but pst used up 4 elsewhere)
 	stream->WriteFilling(i);
 	assert(stream->GetPos() == SongHeader);
-	return 0;
 }
 
-int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword VertIndex) const
+void AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword VertIndex) const
 {
 	for (unsigned int i = 0; i < DoorsCount; i++) {
 		Door* d = map->TMap->GetDoor(i);
@@ -1992,29 +1991,26 @@ int AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword VertIndex)
 			stream->WriteFilling(8);
 		}
 	}
-	return 0;
 }
 
-int AREImporter::PutPoints(DataStream* stream, const std::vector<Point>& points) const
+void AREImporter::PutPoints(DataStream* stream, const std::vector<Point>& points) const
 {
 	for (const Point& p : points) {
 		stream->WritePoint(p);
 	}
-	return 0;
 }
 
-int AREImporter::PutPoints(DataStream* stream, const std::vector<SearchmapPoint>& points) const
+void AREImporter::PutPoints(DataStream* stream, const std::vector<SearchmapPoint>& points) const
 {
 	for (const SearchmapPoint& p : points) {
 		stream->WritePoint(p);
 	}
-	return 0;
 }
 
 // unfortunately it seems bg2 saved infopoints before containers, but their
 // vertices in opposite order, so we can't just monotonically increase an index
 // so we assume containers at Vertex Index 0, then save the other two offsets
-int AREImporter::PutVertices(DataStream* stream, const Map* map, ieDword& regionVertStart, ieDword& doorVertStart) const
+void AREImporter::PutVertices(DataStream* stream, const Map* map, ieDword& regionVertStart, ieDword& doorVertStart) const
 {
 	// containers
 	for (size_t i = 0; i < ContainersCount; i++) {
@@ -2054,10 +2050,9 @@ int AREImporter::PutVertices(DataStream* stream, const Map* map, ieDword& region
 			stream->WritePoint(origin);
 		}
 	}
-	return 0;
 }
 
-int AREImporter::PutItems(DataStream* stream, const Map* map) const
+void AREImporter::PutItems(DataStream* stream, const Map* map) const
 {
 	for (size_t i = 0; i < ContainersCount; i++) {
 		const Container* c = map->TMap->GetContainer(i);
@@ -2073,10 +2068,9 @@ int AREImporter::PutItems(DataStream* stream, const Map* map) const
 			stream->WriteDword(ci->Flags & (IE_INV_ITEM_ACQUIRED - 1));
 		}
 	}
-	return 0;
 }
 
-int AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword VertIndex) const
+void AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword VertIndex) const
 {
 	ieDword ItemIndex = 0;
 
@@ -2124,10 +2118,9 @@ int AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword VertI
 		stream->WriteStrRef(c->OpenFail);
 		stream->WriteFilling(56); //unknown or unused stuff
 	}
-	return 0;
 }
 
-int AREImporter::PutRegions(DataStream* stream, const Map* map, ieDword& VertIndex) const
+void AREImporter::PutRegions(DataStream* stream, const Map* map, ieDword& VertIndex) const
 {
 	for (unsigned int i = 0; i < InfoPointsCount; i++) {
 		const InfoPoint* ip = map->TMap->GetInfoPoint(i);
@@ -2181,10 +2174,9 @@ int AREImporter::PutRegions(DataStream* stream, const Map* map, ieDword& VertInd
 			stream->WriteFilling(24);
 		}
 	}
-	return 0;
 }
 
-int AREImporter::PutSpawns(DataStream* stream, const Map* map) const
+void AREImporter::PutSpawns(DataStream* stream, const Map* map) const
 {
 	ieWord tmpWord;
 
@@ -2218,7 +2210,6 @@ int AREImporter::PutSpawns(DataStream* stream, const Map* map) const
 		stream->WriteWord(sp->NightChance);
 		stream->WriteFilling(56); //most likely unused crap
 	}
-	return 0;
 }
 
 void AREImporter::PutScript(DataStream* stream, const Actor* ac, unsigned int index) const
@@ -2226,7 +2217,7 @@ void AREImporter::PutScript(DataStream* stream, const Actor* ac, unsigned int in
 	stream->WriteResRef(ac->GetScript(index, true));
 }
 
-int AREImporter::PutActors(DataStream* stream, const Map* map) const
+void AREImporter::PutActors(DataStream* stream, const Map* map) const
 {
 	ieDword CreatureOffset = EmbeddedCreOffset;
 	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
@@ -2290,11 +2281,9 @@ int AREImporter::PutActors(DataStream* stream, const Map* map) const
 			stream->WriteFilling(96);
 		}
 	}
-
-	return 0;
 }
 
-int AREImporter::PutAnimations(DataStream* stream, const Map* map) const
+void AREImporter::PutAnimations(DataStream* stream, const Map* map) const
 {
 	auto iter = map->GetFirstAnimation();
 	while (const AreaAnimation* an = map->GetNextAnimation(iter)) {
@@ -2326,10 +2315,9 @@ int AREImporter::PutAnimations(DataStream* stream, const Map* map) const
 		stream->WriteResRef(an->PaletteRef);
 		stream->WriteDword(an->unknown48); //seems utterly unused
 	}
-	return 0;
 }
 
-int AREImporter::PutEntrances(DataStream* stream, const Map* map) const
+void AREImporter::PutEntrances(DataStream* stream, const Map* map) const
 {
 	for (unsigned int i = 0; i < EntrancesCount; i++) {
 		const Entrance* e = map->GetEntrance(i);
@@ -2339,10 +2327,9 @@ int AREImporter::PutEntrances(DataStream* stream, const Map* map) const
 		stream->WriteWord(e->Face);
 		stream->WriteArray(e->IgnoredGarbage);
 	}
-	return 0;
 }
 
-int AREImporter::PutVariables(DataStream* stream, const Map* map) const
+void AREImporter::PutVariables(DataStream* stream, const Map* map) const
 {
 	for (const auto& key : map->locals.keys()) {
 		auto entry = *map->locals.find(key);
@@ -2352,10 +2339,9 @@ int AREImporter::PutVariables(DataStream* stream, const Map* map) const
 		//40 bytes of empty crap
 		stream->WriteFilling(40);
 	}
-	return 0;
 }
 
-int AREImporter::PutAmbients(DataStream* stream, const Map* map) const
+void AREImporter::PutAmbients(DataStream* stream, const Map* map) const
 {
 	for (const auto& am : map->GetAmbients()) {
 		if (am->flags & IE_AMBI_NOSAVE) continue;
@@ -2381,10 +2367,9 @@ int AREImporter::PutAmbients(DataStream* stream, const Map* map) const
 		stream->WriteDword(am->flags);
 		stream->WriteFilling(64);
 	}
-	return 0;
 }
 
-int AREImporter::PutMapnotes(DataStream* stream, const Map* map) const
+void AREImporter::PutMapnotes(DataStream* stream, const Map* map) const
 {
 	//different format
 	int pst = core->HasFeature(GFFlags::AUTOMAP_INI);
@@ -2429,10 +2414,9 @@ int AREImporter::PutMapnotes(DataStream* stream, const Map* map) const
 			}
 		}
 	}
-	return 0;
 }
 
-int AREImporter::PutEffects(DataStream* stream, const EffectQueue& fxqueue) const
+void AREImporter::PutEffects(DataStream* stream, const EffectQueue& fxqueue) const
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
@@ -2446,10 +2430,9 @@ int AREImporter::PutEffects(DataStream* stream, const EffectQueue& fxqueue) cons
 
 		eM->PutEffectV2(stream, fx);
 	}
-	return 0;
 }
 
-int AREImporter::PutTraps(DataStream* stream, const Map* map) const
+void AREImporter::PutTraps(DataStream* stream, const Map* map) const
 {
 	ieDword Offset;
 	ResRef name;
@@ -2496,17 +2479,15 @@ int AREImporter::PutTraps(DataStream* stream, const Map* map) const
 		stream->Write(&tmpByte, 1); // unknown field, TargetType
 		stream->Write(&tmpByte, 1); // Owner
 	}
-	return 0;
 }
 
-int AREImporter::PutExplored(DataStream* stream, const Map* map) const
+void AREImporter::PutExplored(DataStream* stream, const Map* map) const
 {
 	assert(stream->GetPos() == ExploredBitmapOffset);
 	stream->Write(map->ExploredBitmap.data(), ExploredBitmapSize);
-	return 0;
 }
 
-int AREImporter::PutTiles(DataStream* stream, const Map* map) const
+void AREImporter::PutTiles(DataStream* stream, const Map* map) const
 {
 	for (unsigned int i = 0; i < TileCount; i++) {
 		const TileObject* am = map->TMap->GetTile(i);
@@ -2521,7 +2502,6 @@ int AREImporter::PutTiles(DataStream* stream, const Map* map) const
 		stream->WriteDword(0);
 		stream->WriteFilling(48);
 	}
-	return 0;
 }
 
 ieWord AREImporter::SavedAmbientCount(const Map* map) const
@@ -2534,7 +2514,7 @@ ieWord AREImporter::SavedAmbientCount(const Map* map) const
 	return count;
 }
 
-int AREImporter::PutMapAmbients(DataStream* stream, const Map* map) const
+void AREImporter::PutMapAmbients(DataStream* stream, const Map* map) const
 {
 	//day
 	stream->WriteResRef(map->dayAmbients.Ambient1);
@@ -2548,10 +2528,9 @@ int AREImporter::PutMapAmbients(DataStream* stream, const Map* map) const
 	stream->WriteDword(map->reverbID == EFX_PROFILE_REVERB_INVALID ? 0 : map->reverbID);
 	//lots of empty crap (15x4)
 	stream->WriteFilling(60);
-	return 0;
 }
 
-int AREImporter::PutRestHeader(DataStream* stream, const Map* map) const
+void AREImporter::PutRestHeader(DataStream* stream, const Map* map) const
 {
 	assert(stream->GetPos() == RestHeader);
 	stream->WriteFilling(32); //empty label
@@ -2571,99 +2550,49 @@ int AREImporter::PutRestHeader(DataStream* stream, const Map* map) const
 	stream->WriteWord(map->RestHeader.DayChance);
 	stream->WriteWord(map->RestHeader.NightChance);
 	stream->WriteFilling(56);
-	return 0;
 }
 
 int AREImporter::PutArea(DataStream* stream, const Map* map) const
 {
 	if (!stream || !map) {
-		return -1;
+		return GEM_ERROR;
 	}
 
-	int ret = PutHeader(stream, map);
-	if (ret) {
-		return ret;
-	}
+	PutHeader(stream, map);
 
 	// songs
 	for (const auto& list : map->SongList) {
 		stream->WriteDword(list);
 	}
-	ret = PutMapAmbients(stream, map);
-	if (ret) {
-		return ret;
-	}
+	PutMapAmbients(stream, map);
 
 	// rest encounters
-	ret = PutRestHeader(stream, map);
-	if (ret) {
-		return ret;
-	}
+	PutRestHeader(stream, map);
 
-	ret = PutExplored(stream, map);
-	if (ret) {
-		return ret;
-	}
+	PutExplored(stream, map);
+	PutAnimations(stream, map);
+	PutAmbients(stream, map);
 
-	ret = PutAnimations(stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutAmbients(stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutActors(stream, map);
-	if (ret) {
-		return ret;
-	}
+	PutActors(stream, map);
 
 	ieDword regionVertStart = 0;
 	ieDword doorVertStart = 0;
-	ret = PutVertices(stream, map, regionVertStart, doorVertStart);
+	PutVertices(stream, map, regionVertStart, doorVertStart);
 
-	ret = PutDoors(stream, map, doorVertStart);
-	if (ret) {
-		return ret;
-	}
+	PutDoors(stream, map, doorVertStart);
 
 	// triggers
-	ret = PutRegions(stream, map, regionVertStart);
-	if (ret) {
-		return ret;
-	}
+	PutRegions(stream, map, regionVertStart);
 
-	ret = PutItems(stream, map);
-	if (ret) {
-		return ret;
-	}
+	PutItems(stream, map);
+	PutSpawns(stream, map);
 
-	ret = PutSpawns(stream, map);
-	if (ret) {
-		return ret;
-	}
+	PutContainers(stream, map, 0);
 
-	ret = PutContainers(stream, map, 0);
-	if (ret) {
-		return ret;
-	}
+	PutVariables(stream, map);
 
-	ret = PutVariables(stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutEntrances(stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutTiles(stream, map);
-	if (ret) {
-		return ret;
-	}
+	PutEntrances(stream, map);
+	PutTiles(stream, map);
 
 	proIterator iter;
 	ieDword i = map->GetTrapCount(iter);
@@ -2678,23 +2607,13 @@ int AREImporter::PutArea(DataStream* stream, const Map* map) const
 			continue;
 		}
 
-		ret = PutEffects(stream, fxqueue);
-		if (ret) {
-			return ret;
-		}
+		PutEffects(stream, fxqueue);
 	}
 
-	ret = PutTraps(stream, map);
-	if (ret) {
-		return ret;
-	}
+	PutTraps(stream, map);
 
-	ret = PutMapnotes(stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	return ret;
+	PutMapnotes(stream, map);
+	return GEM_OK;
 }
 
 #include "plugindef.h"

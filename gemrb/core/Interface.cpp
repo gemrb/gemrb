@@ -3758,7 +3758,7 @@ int Interface::SwapoutArea(Map* map) const
 
 		str.Create(map->GetScriptName().c_str(), IE_ARE_CLASS_ID);
 		int ret = mm->PutArea(&str, map);
-		if (ret < 0) {
+		if (ret != GEM_OK) {
 			Log(WARNING, "Core", "Area removed: {}",
 			    map->GetScriptName());
 			RemoveFromCache(map->GetScriptRef(), IE_ARE_CLASS_ID);
