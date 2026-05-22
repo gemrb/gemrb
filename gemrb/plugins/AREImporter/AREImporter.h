@@ -16,7 +16,7 @@ class TileMapMgr;
 
 class AREImporter : public MapMgr {
 private:
-	int bigheader = 0;
+	AREVersion bigheader = AREVersion::V1_0;
 	ResRef WEDResRef;
 	ieDword LastSave = 0;
 	ieDword AreaFlags = 0;

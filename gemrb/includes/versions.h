@@ -24,4 +24,10 @@ enum class CREVersion {
 	V9_0 = 90 // iwd
 };
 
+// actually version-dependent offsets
+enum class AREVersion {
+	V1_0 = 0, // everyone but iwd2
+	V9_1 = 16 // iwd2
+};
+
 #endif

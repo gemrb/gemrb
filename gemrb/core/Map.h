@@ -301,7 +301,7 @@ public:
 	ieWord Lightning = 0;
 	Bitmap ExploredBitmap;
 	Bitmap VisibleBitmap;
-	int version = 0;
+	AREVersion version = AREVersion::V1_0;
 	ResRef WEDResRef;
 	bool MasterArea;
 	//this is set by the importer (not stored in the file)

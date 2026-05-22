@@ -275,10 +275,10 @@ bool AREImporter::Import(DataStream* str)
 		if (strncmp(Signature, "AREAV9.1", 8) != 0) {
 			return false;
 		} else {
-			bigheader = 16;
+			bigheader = AREVersion::V9_1;
 		}
 	} else {
-		bigheader = 0;
+		bigheader = AREVersion::V1_0;
 	}
 
 	str->ReadResRef(WEDResRef);
@@ -299,7 +299,7 @@ bool AREImporter::Import(DataStream* str)
 	str->ReadWord(WUnknown);
 
 	AreaDifficulty = 0;
-	if (bigheader) {
+	if (bigheader == AREVersion::V9_1) {
 		// are9.1 difficulty bits for level2/level3
 		// ar4000 for example has a bunch of actors for all area difficulty levels, so these here are likely just the allowed levels
 		AreaDifficulty = 1;
@@ -318,7 +318,7 @@ bool AREImporter::Import(DataStream* str)
 		// but we resolve everything here and store AreaDifficulty instead
 	}
 	//bigheader gap is here
-	str->Seek(0x54 + bigheader, GEM_STREAM_START);
+	str->Seek(0x54 + static_cast<int>(bigheader), GEM_STREAM_START);
 	str->ReadDword(ActorStubOffset);
 	str->ReadWord(ActorCount);
 	str->ReadWord(InfoPointsCount);
@@ -590,7 +590,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	str->ReadResRef(keyResRef);
 	str->ReadResRef(script0);
 	// ARE 9.1: 4B per position after that.
-	if (16 == map->version) {
+	if (map->version == AREVersion::V9_1) {
 		str->ReadPoint(pos); // OverridePoint in NI
 		str->ReadScalar(altPoint.x); // AlternatePoint in NI
 		str->ReadScalar(altPoint.y);
@@ -855,7 +855,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	str->ReadVariable(longName);
 	str->ReadResRef(shortName);
 	str->ReadDword(doorFlags);
-	if (map->version == 16) {
+	if (map->version == AREVersion::V9_1) {
 		doorFlags = FixIWD2DoorFlags(doorFlags, false);
 	}
 	if (AreaType & AT_OUTDOOR) doorFlags |= DOOR_TRANSPARENT; // actually true only for fog-of-war, excluding other actors
@@ -887,7 +887,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	str->ReadPoint(toOpen[0]);
 	str->ReadPoint(toOpen[1]);
 	str->ReadStrRef(openStrRef);
-	if (core->HasFeature(GFFlags::AUTOMAP_INI) || map->version == 16) { // true in all games? IESDP has 24 bits for v1 too
+	if (core->HasFeature(GFFlags::AUTOMAP_INI) || map->version == AREVersion::V9_1) { // true in all games? IESDP has 24 bits for v1 too
 		char tmp[25];
 		str->Read(tmp, 24);
 		tmp[24] = 0;
@@ -1104,7 +1104,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	str->ReadDword(creSize);
 	// another iwd2 script slot, alternate name elsewhere
 	ieVariable altName;
-	if (map->version == 16) {
+	if (map->version == AREVersion::V9_1) {
 		str->ReadResRef(scripts[SCR_AREA]);
 		str->Seek(120, GEM_CURRENT_POS);
 	} else {
@@ -1176,7 +1176,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	}
 	act->ignoredFields.difficultyMargin = difficultyMargin;
 	act->ignoredFields.maybeStar = maybeStar;
-	if (map->version != 16) {
+	if (map->version == AREVersion::V1_0) {
 		act->ignoredFields.altName = altName;
 	}
 
@@ -1693,7 +1693,7 @@ void AREImporter::ReadEffects(DataStream* ds, EffectQueue* fxqueue, ieDword Effe
 
 int AREImporter::GetStoredFileSize(Map* map)
 {
-	int headersize = map->version + 0x11c;
+	int headersize = static_cast<int>(map->version) + 0x11c;
 	SongHeader = headersize;
 	headersize += map->SongList.size() * 4 + 0x68;
 
@@ -1810,7 +1810,7 @@ void AREImporter::PutHeader(DataStream* stream, const Map* map) const
 {
 	ResRef signature = "AREAV1.0";
 
-	if (map->version == 16) {
+	if (map->version == AREVersion::V9_1) {
 		signature[5] = '9';
 		signature[7] = '1';
 	}
@@ -1832,7 +1832,7 @@ void AREImporter::PutHeader(DataStream* stream, const Map* map) const
 	stream->WriteWord(map->Lightning);
 	stream->WriteFilling(2);
 
-	if (map->version == 16) { //writing 14 bytes of 0's
+	if (map->version == AREVersion::V9_1) { // writing 14 bytes of 0's
 		char tmp[1] = { '0' };
 		if (map->AreaDifficulty == 2) {
 			tmp[0] = 1;
@@ -1910,7 +1910,7 @@ void AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword VertIndex
 		stream->WriteVariable(d->GetOriginalName());
 		stream->WriteResRef(d->ID);
 		ieDword flags = d->Flags;
-		if (map->version == 16) {
+		if (map->version == AREVersion::V9_1) {
 			flags = FixIWD2DoorFlags(d->Flags, true);
 		}
 		stream->WriteDword(flags);
@@ -2158,7 +2158,7 @@ void AREImporter::PutRegions(DataStream* stream, const Map* map, ieDword& VertIn
 			stream->WriteFilling(8);
 		}
 		stream->WritePoint(ip->UsePoint);
-		if (16 == map->version) {
+		if (map->version == AREVersion::V9_1) {
 			stream->WriteDword(ip->AltPoint.x);
 			stream->WriteDword(ip->AltPoint.y);
 			stream->WriteFilling(28); //unknown
@@ -2273,7 +2273,7 @@ void AREImporter::PutActors(DataStream* stream, const Map* map) const
 		stream->WriteDword(CreatureSize);
 		CreatureOffset += CreatureSize;
 		// only the area script in iwd2, but preserving the value everywhere
-		if (map->version == 16) {
+		if (map->version == AREVersion::V9_1) {
 			PutScript(stream, ac, SCR_AREA);
 			stream->WriteFilling(120);
 		} else {
