@@ -16,16 +16,16 @@ PortraitsTable = 0
 LastPortrait = 0
 Gender = 0
 EmptyPortrait = {
-	"big": "NOPORTLG",
-	"medium": "NOPORTLG" if GameCheck.IsBG1OrEE() else "NOPORTMD",
-	"small": "NOPORTSM",
+	"big": "NOPORTLL" if GameCheck.IsAnyEE () else "NOPORTLG",
+	"medium": "NOPORTLG" if GameCheck.IsBG1 () else "NOPORTMD",
+	"small": "NOPORTLS" if GameCheck.IsAnyEE () else "NOPORTSM",
 }
 
 PortraitSuffix = {
 	"medium": "M",
-	"large": "M" if (GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo()) else "L",
+	"large": "M" if (GameCheck.UsesBG2GUI ()) else "L",
 	"small": "S",
-	"set": "G" if (GameCheck.IsBG1OrEE() or GameCheck.IsIWD1()) else "L",
+	"set": "G" if (GameCheck.IsBG1 () or GameCheck.IsIWD1 ()) else "L",
 }
 
 def OnLoad():
@@ -39,7 +39,7 @@ def OnLoad():
 	Gender = GetGender()
 	
 	# Optional extra setup
-	if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+	if GameCheck.UsesBG2GUI ():
 		import CharGenCommon
 		CharGenCommon.PositionCharGenWin(AppearanceWindow, -6)
 
@@ -102,7 +102,7 @@ def OnLoad():
 	# Events
 	RightButton.OnPress(PortraitButtonRightPress)
 	LeftButton.OnPress(PortraitButtonLeftPress)
-	if GameCheck.IsBG1OrEE():
+	if GameCheck.IsBG1 ():
 		import CharGenCommon
 		BackButton.OnPress(lambda: CharGenCommon.back(AppearanceWindow))
 	else:
@@ -112,14 +112,14 @@ def OnLoad():
 	DoneButton.OnPress(PortraitButtonNextPress)
 	PortraitSetPicture()
 	AppearanceWindow.Focus()
-	if GameCheck.IsBG1OrEE():
+	if GameCheck.IsBG1 ():
 		AppearanceWindow.ShowModal(MODAL_SHADOW_GRAY)
 	if GameCheck.IsIWD1():
 		AppearanceWindow.ShowModal(MODAL_SHADOW_NONE)
 
 # Function for getting the gender.
 def GetGender():
-	if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+	if GameCheck.IsIWD2 () or GameCheck.UsesBG2GUI ():
 		return GemRB.GetVar("Gender")
 	else:
 		MyChar = GemRB.GetVar("Slot")
@@ -140,7 +140,7 @@ def PortraitButtonLeftPress():
 # Button custom done
 def PortraitButtonCustomDone():
 	PortraitPictureButtonName = PortraitCustomDone()
-	if GameCheck.IsBG1OrEE():
+	if GameCheck.IsBG1 ():
 		import CharGenCommon
 		CharGenCommon.next()
 	elif GameCheck.IsIWD1():
@@ -150,7 +150,7 @@ def PortraitButtonCustomDone():
 def PortraitButtonNextPress():
 	global PortraitsTable, LastPortrait
 	PortraitPictureButtonName = PortraitApplySelection()
-	if GameCheck.IsBG1OrEE():
+	if GameCheck.IsBG1 ():
 		import CharGenCommon
 		CharGenCommon.next()
 	elif GameCheck.IsIWD1():
@@ -196,7 +196,7 @@ def PortraitCustomDone():
 
 	if AppearanceWindow:
 		AppearanceWindow.Close()
-	if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+	if GameCheck.IsIWD2 () or GameCheck.UsesBG2GUI ():
 		GemRB.SetNextScript ("CharGen2")
 	return PortraitLarge
 
@@ -206,9 +206,9 @@ def PortraitCustomAbort():
 	if CustomWindow:
 		CustomWindow.Close()
 	if AppearanceWindow:
-		if GameCheck.IsBG1OrEE():
+		if GameCheck.IsBG1 ():
 			AppearanceWindow.ShowModal (MODAL_SHADOW_GRAY) # narrower than CustomWindow, so borders will remain
-		elif GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+		elif GameCheck.UsesBG2GUI ():
 			AppearanceWindow.ShowModal (MODAL_SHADOW_NONE) # narrower than CustomWindow, so borders will remain
 
 # This is for applying
@@ -220,7 +220,7 @@ def PortraitApplySelection():
 	PortraitName = PortraitTable.GetRowName(LastPortrait)
 	GemRB.SetToken("SmallPortrait", PortraitName + PortraitSuffix["small"])
 	GemRB.SetToken("LargePortrait", PortraitName + PortraitSuffix["large"])
-	if GameCheck.IsIWD2() or GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+	if GameCheck.IsIWD2 () or GameCheck.UsesBG2GUI ():
 		GemRB.SetNextScript ("CharGen2") #Before race
 	return PortraitName + PortraitSuffix["large"]
 
@@ -245,13 +245,13 @@ def PortraitCommonLargeCustom():
 
 	if portrait == "":
 		portrait = EmptyPortrait["medium"]
-		if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+		if GameCheck.UsesBG2GUI ():
 			button.SetDisabled(True)
 		else:
 			button.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
 		if PortraitList2.QueryText() != "":
-			if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+			if GameCheck.UsesBG2GUI ():
 				button.SetDisabled(False)
 			else:
 				button.SetState(IE_GUI_BUTTON_ENABLED)
@@ -281,13 +281,13 @@ def PortraitCommonSmallCustom():
 	if portrait == "":
 		portrait = EmptyPortrait["small"]
 
-		if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+		if GameCheck.UsesBG2GUI ():
 			button.SetDisabled(True)
 		else:
 			button.SetState(IE_GUI_BUTTON_DISABLED)
 	else:
 		if PortraitList1.QueryText() != "":
-			if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+			if GameCheck.UsesBG2GUI ():
 				button.SetDisabled(False)
 			else:
 				button.SetState(IE_GUI_BUTTON_ENABLED)
@@ -322,7 +322,7 @@ def PortraitCustomPress():
 	Button.MakeDefault()
 	
 	Button.OnPress(PortraitButtonCustomDone)
-	if GameCheck.IsBG2OrEE() or GameCheck.IsBG2Demo():
+	if GameCheck.UsesBG2GUI ():
 		Button.SetDisabled(True)
 	else:
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
@@ -345,7 +345,7 @@ def PortraitCustomPress():
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 
 	ModalShadow = MODAL_SHADOW_NONE
-	if GameCheck.IsBG1OrEE():
+	if GameCheck.IsBG1 ():
 		ModalShadow = MODAL_SHADOW_GRAY
 	Window.ShowModal(ModalShadow)
 
