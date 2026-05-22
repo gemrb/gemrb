@@ -271,14 +271,12 @@ bool AREImporter::Import(DataStream* str)
 	char Signature[8];
 	str->Read(Signature, 8);
 
-	if (strncmp(Signature, "AREAV1.0", 8) != 0) {
-		if (strncmp(Signature, "AREAV9.1", 8) != 0) {
-			return false;
-		} else {
-			bigheader = AREVersion::V9_1;
-		}
-	} else {
+	if (strncmp(Signature, "AREAV1.0", 8) == 0) {
 		bigheader = AREVersion::V1_0;
+	} else if (strncmp(Signature, "AREAV9.1", 8) == 0) {
+		bigheader = AREVersion::V9_1;
+	} else {
+		return false;
 	}
 
 	str->ReadResRef(WEDResRef);
