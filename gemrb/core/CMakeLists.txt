@@ -71,6 +71,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Store.cpp
 	TileMap.cpp
 	TileOverlay.cpp
+	TileProps.cpp
 	TraversabilityCache.cpp
 	VEFObject.cpp
 	WorldMap.cpp

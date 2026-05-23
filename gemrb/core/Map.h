@@ -14,6 +14,7 @@
 #include "PathFinder.h"
 #include "Polygon.h"
 #include "TableMgr.h"
+#include "TileProps.h"
 #include "TraversabilityCache.h"
 #include "WorldMap.h"
 
@@ -238,54 +239,6 @@ using scaIterator = std::list<std::unique_ptr<VEFObject>>::iterator;
 using proIterator = std::list<std::unique_ptr<Projectile>>::const_iterator;
 using spaIterator = std::list<Particles*>::const_iterator;
 static const Size ZeroSize;
-
-class GEM_EXPORT TileProps {
-	// tileProps contains the searchmap, the lightmap, the heightmap, and the material map
-	// the assigned palette is the palette for the lightmap
-	uint32_t* propPtr = nullptr;
-	Size size;
-	Holder<Sprite2D> propImage;
-
-	static constexpr uint32_t searchMapMask = 0xff000000;
-	static constexpr uint32_t materialMapMask = 0x00ff0000;
-	static constexpr uint32_t heightMapMask = 0x0000ff00;
-	static constexpr uint32_t lightMapMask = 0x000000ff;
-
-	static constexpr uint32_t searchMapShift = 24;
-	static constexpr uint32_t materialMapShift = 16;
-	static constexpr uint32_t heightMapShift = 8;
-	static constexpr uint32_t lightMapShift = 0;
-
-public:
-	static const PixelFormat pixelFormat;
-
-	static constexpr uint8_t defaultSearchMap = uint8_t(PathMapFlags::IMPASSABLE);
-	static constexpr uint8_t defaultMaterial = 0; // Black, impassable
-	static constexpr uint8_t defaultElevation = 128; // sea level
-	static constexpr uint8_t defaultLighting = 0; // color index 0? no better idea what a good default is
-
-	enum class Property : uint8_t {
-		SEARCH_MAP,
-		MATERIAL,
-		ELEVATION,
-		LIGHTING
-	};
-
-	explicit TileProps(Holder<Sprite2D> props) noexcept;
-
-	const Size& GetSize() const noexcept;
-
-	void SetTileProp(const SearchmapPoint& p, Property prop, uint8_t val) noexcept;
-	uint8_t QueryTileProp(const SearchmapPoint& p, Property prop) const noexcept;
-
-	PathMapFlags QuerySearchMap(const SearchmapPoint& p) const noexcept;
-	uint8_t QueryMaterial(const SearchmapPoint& p) const noexcept;
-	int QueryElevation(const SearchmapPoint& p) const noexcept;
-	Color QueryLighting(const SearchmapPoint& p) const noexcept;
-
-	void PaintSearchMap(const SearchmapPoint&, PathMapFlags value) const noexcept;
-	void PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, PathMapFlags value) const noexcept;
-};
 
 class GEM_EXPORT Map : public Scriptable {
 public:
