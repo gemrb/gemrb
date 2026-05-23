@@ -1204,7 +1204,7 @@ void AREImporter::GetAreaAnimation(DataStream* str, Map* map) const
 	anim.originalFlags = anim.flags;
 	str->ReadScalar(anim.height);
 	if (core->HasFeature(GFFlags::IMPLICIT_AREAANIM_BACKGROUND)) {
-		anim.height = ANI_PRI_BACKGROUND;
+		anim.height += ANI_PRI_BACKGROUND;
 		anim.flags |= AreaAnimation::Flags::NoWall;
 	}
 	str->ReadWord(anim.transparency);
