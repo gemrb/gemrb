@@ -95,6 +95,28 @@ struct ItemUseType {
 	ieByte which; // which item dword should be used (1 = kit)
 };
 
+struct Explore {
+	int LargeFog;
+	// NOTE: iwds supported also much higher values than 30, but there is no known need for that #1460
+	static constexpr int MaxVisibility = 30;
+	int VisibilityPerimeter = 0; // calculated from MaxVisibility
+	std::array<std::vector<SearchmapPoint>, MaxVisibility> VisibilityMasks;
+	bool inited = false;
+
+	void Init() noexcept;
+	const Explore* Get() // used to delay init, so GFFlags can get loaded beforehand
+	{
+		if (!inited) {
+			Init();
+			inited = true;
+		}
+		return this;
+	}
+
+private:
+	void AddLOS(int destx, int desty, int slot);
+};
+
 class GEM_EXPORT GameData : public ResourceManager {
 public:
 	GameData() = default;
@@ -236,6 +258,7 @@ public:
 	std::vector<int> castingSounds;
 	std::vector<ResRef> spellHits;
 	SrcMgr SrcManager;
+	Explore Visibility;
 };
 
 extern GEM_EXPORT std::unique_ptr<GameData> gamedata;

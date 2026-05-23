@@ -83,87 +83,6 @@ private:
 	}
 };
 
-struct Explore {
-	int LargeFog;
-	// NOTE: iwds supported also much higher values than 30, but there is no known need for that #1460
-	static constexpr int MaxVisibility = 30;
-	int VisibilityPerimeter = 0; // calculated from MaxVisibility
-	std::array<std::vector<SearchmapPoint>, MaxVisibility> VisibilityMasks;
-
-	static const Explore& Get()
-	{
-		static Explore explore;
-		return explore;
-	}
-
-private:
-	void AddLOS(int destx, int desty, int slot)
-	{
-		for (int i = 0; i < MaxVisibility; i++) {
-			int x = (destx * i + MaxVisibility / 2) / MaxVisibility;
-			int y = (desty * i + MaxVisibility / 2) / MaxVisibility;
-			if (LargeFog) {
-				x++;
-				y++;
-			}
-			VisibilityMasks[i][slot].x = x;
-			VisibilityMasks[i][slot].y = y;
-		}
-	}
-
-	Explore() noexcept
-	{
-		LargeFog = !core->HasFeature(GFFlags::SMALL_FOG);
-
-		//circle perimeter size for MaxVisibility
-		int x = MaxVisibility;
-		int y = 0;
-		int xc = 1 - (2 * MaxVisibility);
-		int yc = 1;
-		int re = 0;
-		while (x >= y) {
-			VisibilityPerimeter += 8;
-			y++;
-			re += yc;
-			yc += 2;
-			if (((2 * re) + xc) > 0) {
-				x--;
-				re += xc;
-				xc += 2;
-			}
-		}
-
-		for (int i = 0; i < MaxVisibility; i++) {
-			VisibilityMasks[i].resize(VisibilityPerimeter);
-		}
-
-		x = MaxVisibility;
-		y = 0;
-		xc = 1 - (2 * MaxVisibility);
-		yc = 1;
-		re = 0;
-		VisibilityPerimeter = 0;
-		while (x >= y) {
-			AddLOS(x, y, VisibilityPerimeter++);
-			AddLOS(-x, y, VisibilityPerimeter++);
-			AddLOS(-x, -y, VisibilityPerimeter++);
-			AddLOS(x, -y, VisibilityPerimeter++);
-			AddLOS(y, x, VisibilityPerimeter++);
-			AddLOS(-y, x, VisibilityPerimeter++);
-			AddLOS(-y, -x, VisibilityPerimeter++);
-			AddLOS(y, -x, VisibilityPerimeter++);
-			y++;
-			re += yc;
-			yc += 2;
-			if (((2 * re) + xc) > 0) {
-				x--;
-				re += xc;
-				xc += 2;
-			}
-		}
-	}
-};
-
 static inline AnimationObjectType SelectObject(const Actor* actor, int q, const AreaAnimation* a, const VEFObject* sca, const Particles* spark, const Projectile* pro, const Container* pile)
 {
 	int actorh;
@@ -790,7 +709,7 @@ Size Map::FogMapSize() const
 {
 	// Ratio of bg tile size and fog tile size
 	constexpr int CELL_RATIO = 2;
-	const int largefog = Explore::Get().LargeFog;
+	const int largefog = gamedata->Visibility.Get()->LargeFog;
 	return Size(TMap->XCellCount * CELL_RATIO + largefog, TMap->YCellCount * CELL_RATIO + largefog);
 }
 
@@ -1248,7 +1167,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 		viewport,
 		GetSize(),
 		FogMapSize(),
-		Explore::Get().LargeFog
+		gamedata->Visibility.Get()->LargeFog
 	};
 	fogRenderer.DrawFog(mapData);
 
@@ -3397,12 +3316,12 @@ bool Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los, bool up
 {
 	SearchmapPoint tile;
 	FogPoint fogTile;
-	const Explore& explore = Explore::Get();
+	const Explore* explore = gamedata->Visibility.Get();
 
 	if (range > Explore::MaxVisibility) {
 		range = Explore::MaxVisibility;
 	}
-	int p = explore.VisibilityPerimeter;
+	int p = explore->VisibilityPerimeter;
 	bool explored = false;
 	while (p--) {
 		int Pass = 2;
@@ -3410,7 +3329,7 @@ bool Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los, bool up
 		bool sidewall = false;
 		bool fogOnly = false;
 		for (int i = 0; i < range; i++) {
-			tile = pos + explore.VisibilityMasks[i][p];
+			tile = pos + explore->VisibilityMasks[i][p];
 			fogTile = FogPoint(tile);
 
 			if (!los) {

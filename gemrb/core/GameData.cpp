@@ -1044,4 +1044,70 @@ int GameData::GetVBData(const TableMgr::key_t& rowName)
 	return vbDetails->QueryFieldSigned<int>(rowName, "VALUE");
 }
 
+void Explore::Init() noexcept
+{
+	LargeFog = !core->HasFeature(GFFlags::SMALL_FOG);
+
+	// circle perimeter size for MaxVisibility
+	int x = MaxVisibility;
+	int y = 0;
+	int xc = 1 - 2 * MaxVisibility;
+	int yc = 1;
+	int re = 0;
+	while (x >= y) {
+		VisibilityPerimeter += 8;
+		y++;
+		re += yc;
+		yc += 2;
+		if ((2 * re + xc) > 0) {
+			x--;
+			re += xc;
+			xc += 2;
+		}
+	}
+
+	for (int i = 0; i < MaxVisibility; i++) {
+		VisibilityMasks[i].resize(VisibilityPerimeter);
+	}
+
+	x = MaxVisibility;
+	y = 0;
+	xc = 1 - 2 * MaxVisibility;
+	yc = 1;
+	re = 0;
+	VisibilityPerimeter = 0;
+	while (x >= y) {
+		AddLOS(x, y, VisibilityPerimeter++);
+		AddLOS(-x, y, VisibilityPerimeter++);
+		AddLOS(-x, -y, VisibilityPerimeter++);
+		AddLOS(x, -y, VisibilityPerimeter++);
+		AddLOS(y, x, VisibilityPerimeter++);
+		AddLOS(-y, x, VisibilityPerimeter++);
+		AddLOS(-y, -x, VisibilityPerimeter++);
+		AddLOS(y, -x, VisibilityPerimeter++);
+		y++;
+		re += yc;
+		yc += 2;
+		if ((2 * re + xc) > 0) {
+			x--;
+			re += xc;
+			xc += 2;
+		}
+	}
+}
+
+void Explore::AddLOS(int destx, int desty, int slot)
+{
+	for (int i = 0; i < MaxVisibility; i++) {
+		int x = (destx * i + MaxVisibility / 2) / MaxVisibility;
+		int y = (desty * i + MaxVisibility / 2) / MaxVisibility;
+		if (LargeFog) {
+			x++;
+			y++;
+		}
+		VisibilityMasks[i][slot].x = x;
+		VisibilityMasks[i][slot].y = y;
+	}
+}
+
 }
