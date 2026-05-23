@@ -678,9 +678,8 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 
 	// these appear only in PST, but we could support them everywhere
 	// HOWEVER they did not use them as witnessed in ar0101 (0101prt1 and 0101prt2) :(
-	if (core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
-		talkPos = ip->Pos;
-	}
+	// in 2026 that's not the case any more, those regions and scripts work fine and
+	// we don't reset talkPos to the centroid any more, which also ensures save compat
 	ip->TalkPos = talkPos;
 	ip->DialogName = dialogName;
 
