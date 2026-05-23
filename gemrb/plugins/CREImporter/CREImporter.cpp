@@ -1530,8 +1530,8 @@ void CREImporter::GetActorIWD2(Actor* act)
 	}
 	ReadScript(act, SCR_SPECIFICS);
 	ReadScript(act, SCR_AREA);
-	// 1 byte enchantment level?
-	str->Seek(4, GEM_CURRENT_POS);
+	str->Read(&act->ignoredFields.iwd2DRLevel, 1);
+	str->Seek(3, GEM_CURRENT_POS);
 	str->ReadDword(act->BaseStats[IE_FEATS1]);
 	str->ReadDword(act->BaseStats[IE_FEATS2]);
 	str->ReadDword(act->BaseStats[IE_FEATS3]);
@@ -2173,8 +2173,9 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		}
 		stream->WriteResRef(actor->GetScript(SCR_SPECIFICS));
 		stream->WriteResRef(actor->GetScript(SCR_AREA));
+		stream->Write(&actor->ignoredFields.iwd2DRLevel, 1);
 		//unknowns before feats
-		stream->WriteFilling(4);
+		stream->WriteFilling(3);
 		//feats
 		stream->WriteDword(actor->BaseStats[IE_FEATS1]);
 		stream->WriteDword(actor->BaseStats[IE_FEATS2]);

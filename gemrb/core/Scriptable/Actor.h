@@ -359,6 +359,7 @@ struct IgnoredFields {
 	ieVariable altName;
 	ieDword iwd2XPValue = 0;
 	ieVariable origScriptName;
+	ieByte iwd2DRLevel = 0; // creature enchantment level?
 };
 
 enum DamageFlags {
