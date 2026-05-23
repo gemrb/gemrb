@@ -566,7 +566,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	// two adopted pst specific fields
 	ResRef dialogResRef;
 	ResRef wavResRef;
-	ieStrRef dialogName;
+	ieStrRef dialogName = ieStrRef::INVALID;
 
 	str->ReadVariable(ipName);
 	str->ReadWord(ipType);
@@ -607,10 +607,6 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 		str->ReadPoint(talkPos);
 		str->ReadStrRef(dialogName);
 		str->ReadResRef(dialogResRef);
-	} else {
-		wavResRef.Reset();
-		dialogName = ieStrRef::INVALID;
-		dialogResRef.Reset();
 	}
 
 	InfoPoint* ip = nullptr;
