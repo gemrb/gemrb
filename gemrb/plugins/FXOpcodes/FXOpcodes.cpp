@@ -1664,8 +1664,9 @@ int fx_maximum_hp_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				BASE_ADD(IE_HITPOINTS, fx->Parameter1);
 			} else {
 				STAT_ADD(IE_MAXHITPOINTS, fx->Parameter1);
-				if (fx->FirstApply) {
+				if (fx->FirstApply && !(fx->IsVariable & 1)) {
 					BASE_ADD(IE_HITPOINTS, fx->Parameter1);
+					fx->IsVariable |= 1;
 				}
 			}
 			break;
@@ -1684,6 +1685,11 @@ int fx_maximum_hp_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			} else {
 				STAT_SET(IE_MAXHITPOINTS, fx->Parameter1);
 			}
+			// seems to be fine (testing with bg2 helm of balduran)
+			if (fx->Parameter2 == 1 && fx->FirstApply && !(fx->IsVariable & 1)) {
+				BASE_ADD(IE_HITPOINTS, fx->Parameter1);
+				fx->IsVariable |= 1;
+			}
 			break;
 		case 2:
 			if (base) {
@@ -1691,8 +1697,9 @@ int fx_maximum_hp_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				BASE_MUL(IE_HITPOINTS, fx->Parameter1);
 			} else {
 				target->NewStat(IE_MAXHITPOINTS, target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100, MOD_ABSOLUTE);
-				if (fx->FirstApply) {
+				if (fx->FirstApply && !(fx->IsVariable & 1)) {
 					target->NewBase(IE_HITPOINTS, target->GetSafeStat(IE_HITPOINTS) * fx->Parameter1 / 100, MOD_ABSOLUTE);
+					fx->IsVariable |= 1;
 				}
 			}
 			break;
