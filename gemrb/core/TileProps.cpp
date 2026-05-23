@@ -32,26 +32,28 @@ const Size& TileProps::GetSize() const noexcept
 
 void TileProps::SetTileProp(const SearchmapPoint& p, Property prop, uint8_t val) noexcept
 {
-	if (size.PointInside(p)) {
-		uint32_t& c = propPtr[p.y * size.w + p.x];
-		switch (prop) {
-			case Property::SEARCH_MAP:
-				c &= ~searchMapMask;
-				c |= val << searchMapShift;
-				break;
-			case Property::MATERIAL:
-				c &= ~materialMapMask;
-				c |= val << materialMapShift;
-				break;
-			case Property::ELEVATION:
-				c &= ~heightMapMask;
-				c |= val << heightMapShift;
-				break;
-			case Property::LIGHTING:
-				c &= ~lightMapMask;
-				c |= val << lightMapShift;
-				break;
-		}
+	if (!size.PointInside(p)) {
+		return;
+	}
+
+	uint32_t& c = propPtr[p.y * size.w + p.x];
+	switch (prop) {
+		case Property::SEARCH_MAP:
+			c &= ~searchMapMask;
+			c |= val << searchMapShift;
+			break;
+		case Property::MATERIAL:
+			c &= ~materialMapMask;
+			c |= val << materialMapShift;
+			break;
+		case Property::ELEVATION:
+			c &= ~heightMapMask;
+			c |= val << heightMapShift;
+			break;
+		case Property::LIGHTING:
+			c &= ~lightMapMask;
+			c |= val << lightMapShift;
+			break;
 	}
 }
 
