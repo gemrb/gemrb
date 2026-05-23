@@ -1075,6 +1075,7 @@ void CREImporter::GetActorPST(Actor* act)
 	str->ReadScalar(act->ignoredFields.savelocalID);
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
+	act->ignoredFields.origScriptName = scriptname;
 	act->SetScriptName(scriptname);
 	act->KillVar = MakeVariable(KillVar);
 	act->IncKillVar.Reset();
@@ -1389,6 +1390,7 @@ void CREImporter::GetActorBG(Actor* act)
 	str->ReadScalar(act->ignoredFields.savelocalID);
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
+	act->ignoredFields.origScriptName = scriptname;
 	act->SetScriptName(scriptname);
 	act->KillVar.Reset();
 	act->IncKillVar.Reset();
@@ -1623,6 +1625,7 @@ void CREImporter::GetActorIWD2(Actor* act)
 	str->ReadScalar(act->ignoredFields.savelocalID);
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
+	act->ignoredFields.origScriptName = scriptname;
 	act->SetScriptName(scriptname);
 
 	KnownSpellsOffset = 0;
@@ -1741,6 +1744,7 @@ void CREImporter::GetActorIWD1(Actor* act) //9.0
 		str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_PROFICIENCYBASTARDSWORD + i]);
 	}
 	str->ReadScalar<Actor::stat_t, ieByte>(act->BaseStats[IE_TRACKING]);
+	// unused, supposedly tracking target scriptname, which is pointless with how tracking works in iwd
 	str->Seek(32, GEM_CURRENT_POS);
 	for (auto& ref : act->StrRefs) {
 		str->ReadStrRef(ref);
@@ -1804,6 +1808,7 @@ void CREImporter::GetActorIWD1(Actor* act) //9.0
 	str->ReadScalar(act->ignoredFields.savelocalID);
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
+	act->ignoredFields.origScriptName = scriptname;
 	act->SetScriptName(scriptname);
 
 	str->ReadDword(KnownSpellsOffset);
@@ -2314,7 +2319,7 @@ int CREImporter::PutActorBG(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
 	stream->WriteScalar(actor->ignoredFields.saveGlobalID);
 	stream->WriteScalar(actor->ignoredFields.savelocalID);
-	stream->WriteVariable(actor->GetScriptName());
+	stream->WriteVariable(actor->ignoredFields.origScriptName);
 	return 0;
 }
 
@@ -2361,7 +2366,7 @@ int CREImporter::PutActorPST(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
 	stream->WriteScalar(actor->ignoredFields.saveGlobalID);
 	stream->WriteScalar(actor->ignoredFields.savelocalID);
-	stream->WriteVariable(actor->GetScriptName());
+	stream->WriteVariable(actor->ignoredFields.origScriptName);
 	return 0;
 }
 
@@ -2393,7 +2398,7 @@ int CREImporter::PutActorIWD1(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
 	stream->WriteScalar(actor->ignoredFields.saveGlobalID);
 	stream->WriteScalar(actor->ignoredFields.savelocalID);
-	stream->WriteVariable(actor->GetScriptName());
+	stream->WriteVariable(actor->ignoredFields.origScriptName);
 	return 0;
 }
 
@@ -2430,7 +2435,7 @@ int CREImporter::PutActorIWD2(DataStream* stream, const Actor* actor) const
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_ALIGNMENT]);
 	stream->WriteScalar(actor->ignoredFields.saveGlobalID);
 	stream->WriteScalar(actor->ignoredFields.savelocalID);
-	stream->WriteVariable(actor->GetScriptName());
+	stream->WriteVariable(actor->ignoredFields.origScriptName);
 	stream->WriteScalar<Actor::stat_t, ieByte>(actor->BaseStats[IE_CLASS]);
 	stream->WriteFilling(1);
 	stream->WriteScalar<int, ieDword>(actor->GetClassMask());

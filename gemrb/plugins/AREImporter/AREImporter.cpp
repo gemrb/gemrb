@@ -2224,7 +2224,7 @@ void AREImporter::PutActors(DataStream* stream, const Map* map) const
 	for (unsigned int i = 0; i < ActorCount; i++) {
 		const Actor* ac = map->GetActor(i, false);
 
-		stream->WriteVariable(ac->GetScriptName());
+		stream->WriteVariable(ac->ignoredFields.origScriptName);
 		stream->WritePoint(ac->Pos);
 		stream->WritePoint(ac->HomeLocation);
 

@@ -358,6 +358,7 @@ struct IgnoredFields {
 	ieByte maybeStar = 0;
 	ieVariable altName;
 	ieDword iwd2XPValue = 0;
+	ieVariable origScriptName;
 };
 
 enum DamageFlags {
