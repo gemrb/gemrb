@@ -992,7 +992,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	} else {
 		door->CloseSound = gamedata->defaultSounds[DEF_CLOSE];
 	}
-	if (!openStrRef) openStrRef = ieStrRef(-1); // rewrite 0 to -1
+	if (!openStrRef && !core->config.UseAsLibrary) openStrRef = ieStrRef(-1); // rewrite 0 to -1
 	door->LockedStrRef = openStrRef;
 
 	door->DiscoveryDiff = discoveryDiff;
