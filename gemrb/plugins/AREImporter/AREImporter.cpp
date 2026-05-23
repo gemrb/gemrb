@@ -666,7 +666,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	ip->Flags = ipFlags;
 	ip->UsePoint = usePoint;
 	ip->AltPoint = altPoint;
-	// FIXME: PST doesn't use this field
+	// PST doesn't use this field, so it will always use the centroid
 	if (ip->GetUsePoint()) {
 		ip->SetPos(ip->UsePoint);
 	} else {
