@@ -554,7 +554,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	ieWord trapped;
 	ieWord trapDetected;
 	Point launchP;
-	Point pos;
+	Point usePoint;
 	Point talkPos;
 	Region bbox;
 	Point altPoint;
@@ -590,12 +590,12 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	str->ReadResRef(script0);
 	// ARE 9.1: 4B per position after that.
 	if (map->version == AREVersion::V9_1) {
-		str->ReadPoint(pos); // OverridePoint in NI
+		str->ReadPoint(usePoint); // OverridePoint in NI
 		str->ReadScalar(altPoint.x); // AlternatePoint in NI
 		str->ReadScalar(altPoint.y);
 		str->Seek(26, GEM_CURRENT_POS);
 	} else {
-		str->ReadPoint(pos); // TransitionWalkToX, TransitionWalkToY
+		str->ReadPoint(usePoint); // TransitionWalkToX, TransitionWalkToY
 		// maybe we have to store this
 		// bg2: 15 reserved dwords, the above point is actually in dwords (+1),
 		// but since it's the last thing the underseek doesn't matter
@@ -623,8 +623,8 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 			// we approximate a bounding box equivalent to a small radius
 			// we copied this from the Container code that seems to indicate
 			// this is how the originals behave. It is probably "good enough"
-			bbox.x = pos.x - 7;
-			bbox.y = pos.y - 5;
+			bbox.x = usePoint.x - 7;
+			bbox.y = usePoint.y - 5;
 			bbox.w = 16;
 			bbox.h = 12;
 		}
@@ -664,7 +664,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	ip->StrRef = overheadRef; //we need this when saving area
 	ip->SetMap(map);
 	ip->Flags = ipFlags;
-	ip->UsePoint = pos;
+	ip->UsePoint = usePoint;
 	ip->AltPoint = altPoint;
 	// FIXME: PST doesn't use this field
 	if (ip->GetUsePoint()) {
