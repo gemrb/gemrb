@@ -1270,10 +1270,9 @@ void AREImporter::GetAmbient(DataStream* str, std::vector<Ambient*>& ambients) c
 
 void AREImporter::GetAutomapNotes(DataStream* str, Map* map) const
 {
-	static int pst = core->HasFeature(GFFlags::AUTOMAP_INI);
 	Point point;
 
-	if (!pst) {
+	if (!core->HasFeature(GFFlags::AUTOMAP_INI)) {
 		for (ieDword i = 0; i < NoteCount; i++) {
 			str->ReadPoint(point);
 			ieStrRef strref = ieStrRef::INVALID;
