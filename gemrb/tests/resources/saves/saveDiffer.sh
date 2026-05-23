@@ -52,6 +52,7 @@ for file in "${files[@]}"; do
   if [[ $file == "$baseGame.sav" ]]; then
     echo "Unpacking and inspecting $baseGame.sav, this can take a while."
     # unpack SAV then iterate the contents
+    rm -rf "$base1/sav" "$base2/sav"
     mkdir -p "$base1/sav" "$base2/sav"
     a=$(find "$base1" -type f -iname "$baseGame.sav")
     b=$(find "$base2" -type f -iname "$baseGame.sav")
