@@ -1505,7 +1505,7 @@ Map* AREImporter::GetMap(const ResRef& resRef, bool day_or_night)
 
 	//if the Script field is empty, the area name will be copied into it on first load
 	//this works only in the iwd branch of the games
-	if (Script.IsEmpty() && core->HasFeature(GFFlags::FORCE_AREA_SCRIPT)) {
+	if (Script.IsEmpty() && core->HasFeature(GFFlags::FORCE_AREA_SCRIPT) && !core->config.UseAsLibrary) {
 		Script = resRef;
 	}
 
