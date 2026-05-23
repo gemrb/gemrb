@@ -1953,7 +1953,7 @@ void AREImporter::PutDoors(DataStream* stream, const Map* map, ieDword VertIndex
 		stream->WriteWord(d->Trapped);
 		stream->WriteWord(d->TrapDetected);
 		stream->WritePoint(d->TrapLaunch);
-		stream->WriteResRefLC(d->KeyResRef);
+		stream->WriteResRef(d->KeyResRef);
 		const auto& s = d->Scripts[0];
 		if (s) {
 			stream->WriteResRef(s->GetName());
@@ -2100,7 +2100,7 @@ void AREImporter::PutContainers(DataStream* stream, const Map* map, ieDword Vert
 		stream->WriteWord(tmpWord); //vertex count is made short
 		// this was the unused owner's scripting name
 		stream->WriteFilling(32);
-		stream->WriteResRefLC(c->KeyResRef);
+		stream->WriteResRef(c->KeyResRef);
 		stream->WriteDword(0); //unknown80
 		stream->WriteStrRef(c->OpenFail);
 		stream->WriteFilling(56); //unknown or unused stuff
@@ -2137,7 +2137,7 @@ void AREImporter::PutRegions(DataStream* stream, const Map* map, ieDword& VertIn
 		stream->WriteWord(ip->Trapped); //unknown???
 		stream->WriteWord(ip->TrapDetected);
 		stream->WritePoint(ip->TrapLaunch);
-		stream->WriteResRefLC(ip->KeyResRef);
+		stream->WriteResRef(ip->KeyResRef);
 		const auto& s = ip->Scripts[0];
 		if (s) {
 			stream->WriteResRef(s->GetName());
