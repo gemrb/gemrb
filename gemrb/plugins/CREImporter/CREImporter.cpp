@@ -2171,8 +2171,8 @@ int CREImporter::PutHeader(DataStream* stream, const Actor* actor) const
 		for (int i = 0; i < 64; i++) {
 			stream->WriteStrRef(actor->StrRefs[i]);
 		}
+		stream->WriteResRef(actor->GetScript(SCR_SPECIFICS));
 		stream->WriteResRef(actor->GetScript(SCR_AREA));
-		stream->WriteResRef(actor->GetScript(SCR_RESERVED));
 		//unknowns before feats
 		stream->WriteFilling(4);
 		//feats
