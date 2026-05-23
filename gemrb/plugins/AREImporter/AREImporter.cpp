@@ -589,7 +589,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	str->ReadResRef(keyResRef);
 	str->ReadResRef(script0);
 	// ARE 9.1: 4B per position after that.
-	if (map->version == AREVersion::V9_1) {
+	if (core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) { // all iwds have the alt point
 		str->ReadPoint(usePoint); // OverridePoint in NI
 		str->ReadScalar(altPoint.x); // AlternatePoint in NI
 		str->ReadScalar(altPoint.y);
@@ -2145,7 +2145,7 @@ void AREImporter::PutRegions(DataStream* stream, const Map* map, ieDword& VertIn
 			stream->WriteFilling(8);
 		}
 		stream->WritePoint(ip->UsePoint);
-		if (map->version == AREVersion::V9_1) {
+		if (core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) {
 			stream->WriteDword(ip->AltPoint.x);
 			stream->WriteDword(ip->AltPoint.y);
 			stream->WriteFilling(28); //unknown
