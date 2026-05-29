@@ -2052,7 +2052,15 @@ void AREImporter::PutItems(DataStream* stream, const Map* map) const
 			stream->WriteWord(ci->Usages[0]);
 			stream->WriteWord(ci->Usages[1]);
 			stream->WriteWord(ci->Usages[2]);
-			stream->WriteDword(ci->Flags & (IE_INV_ITEM_ACQUIRED - 1));
+			ieDword flags = ci->Flags;
+			if (core->HasFeature(GFFlags::MAGICBIT)) {
+				if (flags & IE_INV_ITEM_MAGICAL) {
+					flags |= IE_INV_ITEM_UNDROPPABLE;
+				} else {
+					flags &= ~IE_INV_ITEM_UNDROPPABLE;
+				}
+			}
+			stream->WriteDword(flags & (IE_INV_ITEM_ACQUIRED - 1));
 		}
 	}
 }
