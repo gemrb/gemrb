@@ -47,19 +47,7 @@ Deployment:
 - [ ] SourceForge
   - [ ] Upload source package to SourceForge, maintaining the naming format under Releases
   - [ ] Upload any release notes alongside as Readme.md
-  - [ ] Copy generated release builds into Release:
-```sh
-# run in SourceForge shell
-version=0.9.0
-
-cd /home/frs/project/gemrb/Buildbot\ Binaries
-mkdir -p ../Releases/$version
-cp -v Windows/AppVeyor/$(ls Windows/AppVeyor/ -1rt | tail -n1) ../Releases/$version/gemrb-win32-v$version.zip
-cp -v Apple/OSX/$(ls Apple/OSX/ -1rt | tail -n1) ../Releases/$version/gemrb-macos-v$version.tar.bz2
-cp -v Apple/ARM64/$(ls Apple/ARM64 -1rt | tail -n1) ../Releases/$version/gemrb-macos-arm64-v$version.zip
-cp -v $(find Linux/ -name "*$version*" | tail -n1) ../Releases/$version/gemrb-linux-v$version.AppImage
-```
-
+  - [ ] Manually reupload generated release builds into release dir (SourceForge SFTP does not support copying)
   - [ ] Mark release builds as OS defaults on SourceForge as appropriate; mark the source for everyone else
   - [ ] Test downloads
 - [ ] Runtime tests of release packages
@@ -79,3 +67,11 @@ Post-release:
 - [ ] If the manpage changed (`git log v0.8.6.. gemrb.6.in`), adapt the web copy (pandoc can convert it to markdown)
 - [ ] Close old milestone
 - [ ] Close old project and create new one from template, redo its milestone rule
+- [ ] Delete build bot images of previous release:
+```sh
+sftp $SF_USERNAME@frs.sourceforge.net
+
+rm gem-files/Buildbot\ Binaries/Apple/*/gemrb-*
+rm gem-files/Buildbot\ Binaries/Linux/GemRB-*
+rm gem-files/Buildbot\ Binaries/W*/A*/gemrb-win32-*
+```
