@@ -2209,7 +2209,7 @@ void AREImporter::PutSpawns(DataStream* stream, const Map* map) const
 
 void AREImporter::PutScript(DataStream* stream, const Actor* ac, unsigned int index) const
 {
-	stream->WriteResRef(ac->GetScript(index, true));
+	stream->WriteResRef(ac->GetScript(index, true, true));
 }
 
 void AREImporter::PutActors(DataStream* stream, const Map* map) const

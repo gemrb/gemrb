@@ -6481,10 +6481,12 @@ void Actor::CreateStats()
 	}
 }
 
-ResRef Actor::GetScript(int ScriptIndex, bool empty) const
+ResRef Actor::GetScript(int ScriptIndex, bool empty, bool skipNone) const
 {
 	if (Scripts[ScriptIndex]) {
-		return Scripts[ScriptIndex]->GetName();
+		ResRef scriptName = Scripts[ScriptIndex]->GetName();
+		if (skipNone && scriptName == "none") return "";
+		return scriptName;
 	} else if (empty) {
 		return "";
 	} else {
