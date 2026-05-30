@@ -96,7 +96,7 @@ void Scriptable::SetDialog(const ResRef& resref, bool embedded)
 {
 	if (!resref.IsEmpty() && gamedata->Exists(resref, IE_DLG_CLASS_ID, true)) {
 		Dialog = resref;
-	} else if (core->config.UseAsLibrary && !embedded) {
+	} else if (!embedded) {
 		Dialog = resref;
 	}
 }
