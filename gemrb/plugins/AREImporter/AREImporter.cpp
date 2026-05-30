@@ -2252,7 +2252,15 @@ void AREImporter::PutActors(DataStream* stream, const Map* map) const
 		stream->WriteFilling(8);
 		// ignore their resolved scripts, as none of the initial value in this header survive
 		// if any was set, the CRE file's ones were overriden and are stored there
-		stream->WriteFilling(5 * 8);
+		if (ac->creVersion == CREVersion::V2_2) {
+			PutScript(stream, ac, SCR_OVERRIDE);
+			PutScript(stream, ac, SCR_GENERAL);
+			PutScript(stream, ac, SCR_CLASS);
+			PutScript(stream, ac, SCR_RACE);
+			PutScript(stream, ac, SCR_DEFAULT);
+		} else {
+			stream->WriteFilling(5 * 8);
+		}
 		PutScript(stream, ac, SCR_SPECIFICS); // the only one missing the CRE (non-iwd2)
 		// creature reference is empty because we are embedding it; we keep it for save diffing purposes
 		// this matches the original, but if case issues pop up, just save and restore the field
