@@ -4529,10 +4529,16 @@ PyDoc_STRVAR(GemRB_GetGamePreview__doc,
 
 static PyObject* GemRB_GetGamePreview(PyObject* /*self*/, PyObject* /*args*/)
 {
-	// FIXME: this method should be removed
-	// A SaveGame object should be created prior to this (not the *actual* save files)
-	// from that SaveGame we have methods for SaveGame_GetPortrait and SaveGame_GetPreview
-	Py_RETURN_NONE;
+	// we need this also for new saves, where the preview has not been generated yet
+	// it's done as part of the saving process and results in a file, so creating a temporary
+	// save just to grab its screenshot is overkill
+	WindowManager* wm = core->GetWindowManager();
+	if (!wm) Py_RETURN_NONE;
+
+	Holder<Sprite2D> preview = wm->GetScreenshot(wm->GetGameWindow());
+	// scale down to get more of the screen and reduce the size
+	preview = VideoDriver->SpriteScaleDown(preview, 5);
+	return PyObject_FromHolder<Sprite2D>(preview);
 }
 
 PyDoc_STRVAR(GemRB_Roll__doc,
