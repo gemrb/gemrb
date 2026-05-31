@@ -668,6 +668,8 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, StringView slotname,
 		//probably the hardcoded slot names should be read by this object
 		//in that case 7 == size of hardcoded slot names array (savegame.2da)
 		index = 7;
+		AutoTable tab = gamedata->LoadTable("savegame", true);
+		if (tab) index = tab->GetRowCount() + 1;
 		for (const auto& save2 : save_slots) {
 			if (save2->GetSaveID() >= index) {
 				index = save2->GetSaveID() + 1;
