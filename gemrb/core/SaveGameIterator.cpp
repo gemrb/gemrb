@@ -396,6 +396,16 @@ static bool DoSaveGame(const path_t& Path, bool overrideRunning)
 
 	gamedata->SaveAllStores();
 
+	// Create .wmp file from WorldMap() object
+	path_t wmpPath = Path;
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
+		// create it inside the SAV instead
+		wmpPath = core->config.CachePath;
+	}
+	if (core->WriteWorldMap(wmpPath)) {
+		return false;
+	}
+
 	//compress files in cache named: .STO and .ARE
 	//no .CRE would be saved in cache
 	if (core->CompressSave(Path, overrideRunning)) {
@@ -404,11 +414,6 @@ static bool DoSaveGame(const path_t& Path, bool overrideRunning)
 
 	//Create .gam file from Game() object
 	if (core->WriteGame(Path)) {
-		return false;
-	}
-
-	//Create .wmp file from WorldMap() object
-	if (core->WriteWorldMap(Path)) {
 		return false;
 	}
 

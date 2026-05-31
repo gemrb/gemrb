@@ -3042,7 +3042,7 @@ bool Interface::HasFeedback(int type) const
 	return FeedbackLevel & type;
 }
 
-static const char* const saved_extensions[] = { ".are", ".sto", ".blb", nullptr };
+static const char* const saved_extensions[] = { ".are", ".sto", ".wmp", ".blb", nullptr };
 static const char* const saved_extensions_last[] = { ".tot", ".toh", nullptr };
 
 //returns the priority of the file to be saved
