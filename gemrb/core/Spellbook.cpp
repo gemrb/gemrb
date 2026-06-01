@@ -588,8 +588,12 @@ bool Spellbook::AddKnownSpell(CREKnownSpell* spl, int flg)
 
 CREKnownSpell* Spellbook::GetKnownSpell(int type, unsigned int level, unsigned int index) const
 {
-	if (type >= NUM_BOOK_TYPES || level >= GetSpellLevelCount(type) || index >= spells[type][level]->known_spells.size())
-		return NULL;
+	if (type >= NUM_BOOK_TYPES || level >= GetSpellLevelCount(type)) {
+		return nullptr;
+	}
+	if (index >= spells[type][level]->known_spells.size()) {
+		return nullptr;
+	}
 	return spells[type][level]->known_spells[index];
 }
 
@@ -651,8 +655,12 @@ unsigned int Spellbook::GetMemorizedSpellsCount(const ResRef& name, int type, bo
 
 CREMemorizedSpell* Spellbook::GetMemorizedSpell(int type, unsigned int level, unsigned int index) const
 {
-	if (type >= NUM_BOOK_TYPES || level >= GetSpellLevelCount(type) || index >= spells[type][level]->memorized_spells.size())
-		return NULL;
+	if (type >= NUM_BOOK_TYPES || level >= GetSpellLevelCount(type)) {
+		return nullptr;
+	}
+	if (index >= spells[type][level]->memorized_spells.size()) {
+		return nullptr;
+	}
 	return spells[type][level]->memorized_spells[index];
 }
 
@@ -717,8 +725,9 @@ void Spellbook::ClearBonus()
 
 CRESpellMemorization* Spellbook::GetSpellMemorization(unsigned int type, unsigned int level)
 {
-	if (type >= (unsigned int) NUM_BOOK_TYPES)
-		return NULL;
+	if (type >= (unsigned int) NUM_BOOK_TYPES) {
+		return nullptr;
+	}
 
 	CRESpellMemorization* sm;
 	if (level >= GetSpellLevelCount(type)) {
@@ -728,7 +737,7 @@ CRESpellMemorization* Spellbook::GetSpellMemorization(unsigned int type, unsigne
 		sm->SlotCount = sm->SlotCountWithBonus = 0;
 		if (!AddSpellMemorization(sm)) {
 			delete sm;
-			return NULL;
+			return nullptr;
 		}
 		assert(sm == spells[type][level]);
 	} else {
@@ -864,7 +873,7 @@ CREMemorizedSpell* Spellbook::FindUnchargedSpell(int type, int level) const
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 //creates sorcerer style memory for the given spell type
