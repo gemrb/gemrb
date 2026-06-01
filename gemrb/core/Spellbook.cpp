@@ -30,7 +30,7 @@ Spellbook::Spellbook()
 	if (!SBInitialized) {
 		InitializeSpellbook();
 	}
-	spells = new std::vector<CRESpellMemorization*>[NUM_BOOK_TYPES];
+	spells.resize(NUM_BOOK_TYPES);
 
 	if (IWD2Style) {
 		innate = 1 << IE_IWD2_SPELL_INNATE;
@@ -70,7 +70,6 @@ Spellbook::~Spellbook()
 		}
 	}
 	ClearSpellInfo();
-	delete[] spells;
 }
 
 void Spellbook::FreeSpellPage(CRESpellMemorization* sm)

@@ -116,7 +116,7 @@ struct SpellExtHeader {
 
 class GEM_EXPORT Spellbook {
 private:
-	std::vector<CRESpellMemorization*>* spells;
+	std::vector<std::vector<CRESpellMemorization*>> spells;
 	std::vector<SpellExtHeader*> spellinfo;
 	int sorcerer = 0;
 	int innate;
