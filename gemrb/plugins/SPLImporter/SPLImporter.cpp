@@ -182,9 +182,9 @@ void SPLImporter::GetExtHeader(const Spell* s, SPLExtHeader* eh)
 	// and knock in non-pst, since it's also set to target actors
 	if (eh->Target == 1) {
 		int flags = gamedata->GetSpecialSpell(s->Name);
-		if (flags & SPEC_DEAD) {
+		if (flags & SpecialSpell::DeadTarget) {
 			eh->Target = 3;
-		} else if (flags & SPEC_AREA) {
+		} else if (flags & SpecialSpell::AreaTarget) {
 			eh->Target = 4;
 		}
 	}

@@ -50,12 +50,14 @@ struct SpecialSpellType {
 	int amount;
 	int bonus_limit;
 };
-enum SpecialSpell : int8_t {
+enum SpecialSpell {
 	Identify = 1, // any spell that cannot be cast from the menu
 	Silence = 2, // any spell that can be cast in silence
 	Surge = 4, // any spell that cannot be cast during a wild surge
 	Rest = 8, // any spell that is cast upon rest if memorized
-	HealAll = 16 // any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
+	HealAll = 16, // any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
+	AreaTarget = 32, // any spell that requires their ability header targets changed to area (knock)
+	DeadTarget = 64, // any spell that can target dead actors despite its target type being 1 (pst)
 };
 
 struct SurgeSpell {

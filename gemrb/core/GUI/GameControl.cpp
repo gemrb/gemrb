@@ -1462,7 +1462,7 @@ void GameControl::UpdateCursor()
 		// point is always valid if accessible
 		// knock ignores that
 		bool blocked = bool(area->GetBlocked(gameMousePos) & (PathMapFlags::PASSABLE | PathMapFlags::TRAVEL | PathMapFlags::ACTOR));
-		bool ignoreSM = gamedata->GetSpecialSpell(spellName) & SPEC_AREA;
+		bool ignoreSM = gamedata->GetSpecialSpell(spellName) & SpecialSpell::AreaTarget;
 		if (!ignoreSM && (!blocked || (!(targetTypes & GA_POINT) && !lastActor))) {
 			nextCursor |= IE_CURSOR_GRAY;
 		}
@@ -2362,7 +2362,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	}
 
 	//add a check if you don't want some random monster handle doors and such
-	if (targetMode == TargetMode::Cast && !(gamedata->GetSpecialSpell(spellName) & SPEC_AREA)) {
+	if (targetMode == TargetMode::Cast && !(gamedata->GetSpecialSpell(spellName) & SpecialSpell::AreaTarget)) {
 		//the player is using an item or spell on the ground
 		targetTypes |= GA_POINT;
 		TryToCast(selectedActor, p);

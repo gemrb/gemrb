@@ -20,8 +20,11 @@ LSR_STAT    = 4  #insufficient stat (can't learn the spell due to low stat)
 LSR_LEVEL   = 5  #insufficient level (low mage, etc level)
 LSR_FULL    = 6  #can't learn more spells of this level (due to level)
 
-# CheckSpecialSpell return values (see Interface.h)
+# CheckSpecialSpell return values (see GameData.h)
 SP_IDENTIFY = 1  # any spell that cannot be cast from the menu
 SP_SILENCE  = 2  # any spell that can be cast in silence
 SP_SURGE    = 4  # any spell that cannot be cast during a wild surge
 SP_REST     = 8  # any spell that is cast upon rest if memorized
+SP_HEAL_ALL = 16 # any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
+SP_AREA     = 32 # any spell that requires their ability header targets changed to area (knock)
+SP_DEAD     = 64 # spells that can target dead actors despite their target type is 1 (pst)

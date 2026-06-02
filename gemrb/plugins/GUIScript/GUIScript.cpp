@@ -8393,6 +8393,9 @@ PyDoc_STRVAR(GemRB_CheckSpecialSpell__doc,
   * SP_IDENTIFY - any spell that cannot be cast from the menu\n\
   * SP_SILENCE  - any spell that can be cast in silence\n\
   * SP_SURGE    - any spell that cannot be cast during a wild surge\n\
+  * SP_AREA     - any spell that requires their ability header targets changed to area (knock)\n\
+  * SP_DEAD     - any spell that can target dead actors despite its target type being 1 (pst)\n\
+  * SP_HEAL_ALL - any healing spell that is cast upon rest at more than one target (healing circle, mass cure)\n\
   * SP_REST     - any spell that is cast upon rest if memorized");
 
 static PyObject* GemRB_CheckSpecialSpell(PyObject* /*self*/, PyObject* args)
