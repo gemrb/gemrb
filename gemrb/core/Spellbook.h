@@ -118,7 +118,7 @@ struct SpellExtHeader {
 
 class GEM_EXPORT Spellbook {
 private:
-	std::vector<std::vector<CRESpellMemorization*>> spells;
+	std::vector<std::vector<Holder<CRESpellMemorization>>> spells;
 	std::vector<Holder<SpellExtHeader>> spellinfo;
 	int sorcerer = 0;
 	int innate;
@@ -126,7 +126,7 @@ private:
 	/** Sets spell from memorized as 'already-cast' */
 	bool DepleteSpell(CREMemorizedSpell* spl);
 	/** Depletes a sorcerer type spellpage by one */
-	void DepleteLevel(const CRESpellMemorization* sm, const ResRef& except) const;
+	void DepleteLevel(Holder<CRESpellMemorization> sm, const ResRef& except) const;
 	/** Adds a single spell to the spell info list */
 	void AddSpellInfo(unsigned int level, unsigned int type, const ResRef& name, unsigned int idx);
 	/** regenerates the spellinfo list */
@@ -134,11 +134,11 @@ private:
 	/** looks up the spellinfo list for an element */
 	Holder<SpellExtHeader> FindSpellInfo(unsigned int level, unsigned int type, const ResRef& name) const;
 	/** removes all instances of a spell from a given page */
-	void RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRef);
+	void RemoveMemorization(Holder<CRESpellMemorization> sm, const ResRef& resRef);
 	/** adds a spell to the book, internal */
 	bool AddKnownSpell(Holder<CREKnownSpell> spl, int memo);
 	/** Adds a new CRESpellMemorization, to the *end* only */
-	bool AddSpellMemorization(CRESpellMemorization* sm);
+	bool AddSpellMemorization(Holder<CRESpellMemorization> sm);
 
 	bool HaveSpell(int spellid, int type, ieDword flags);
 	bool KnowSpell(int spellid, int type) const;

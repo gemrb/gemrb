@@ -61,14 +61,6 @@ void Spellbook::ReleaseMemory()
 
 Spellbook::~Spellbook()
 {
-	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (auto& page : spells[i]) {
-			if (page) {
-				delete page;
-				page = nullptr;
-			}
-		}
-	}
 	ClearSpellInfo();
 }
 
@@ -80,15 +72,8 @@ void Spellbook::CopyFrom(const Actor* source)
 	}
 
 	// clear it first
-	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (auto& page : spells[i]) {
-			if (page) {
-				delete page;
-				page = nullptr;
-			}
-		}
-		spells[i].clear();
-	}
+	spells.clear();
+	spells.resize(NUM_BOOK_TYPES);
 	ClearSpellInfo();
 
 	const Spellbook& wikipedia = source->spellbook;
@@ -96,7 +81,7 @@ void Spellbook::CopyFrom(const Actor* source)
 	for (int t = 0; t < NUM_BOOK_TYPES; t++) {
 		for (const auto& wm : wikipedia.spells[t]) {
 			unsigned int k;
-			CRESpellMemorization* sm = new CRESpellMemorization();
+			auto sm = MakeHolder<CRESpellMemorization>();
 			spells[t].push_back(sm);
 			sm->Level = wm->Level;
 			sm->SlotCount = wm->SlotCount;
@@ -177,7 +162,7 @@ bool Spellbook::HaveSpell(int spellid, int type, ieDword flags)
 {
 	unsigned int count = GetSpellLevelCount(type);
 	for (unsigned int j = 0; j < count; j++) {
-		const CRESpellMemorization* sm = spells[type][j];
+		auto sm = spells[type][j];
 		for (auto& ms : sm->memorizedSpells) {
 			if (!ms->Flags) continue;
 			if (atoi(ms->SpellResRef.c_str() + 4) != spellid) continue;
@@ -249,7 +234,7 @@ bool Spellbook::KnowSpell(int spellid) const
 bool Spellbook::KnowSpell(int spellid, int type) const
 {
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
-		const CRESpellMemorization* sm = spells[type][j];
+		const CRESpellMemorization* sm = spells[type][j].get();
 		for (const auto& knownSpell : sm->knownSpells) {
 			if (atoi(knownSpell->SpellResRef.c_str() + 4) == spellid) {
 				return true;
@@ -369,7 +354,7 @@ unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level) const
 
 //called when a spell was removed from spellbook
 //this one purges all instances of known spells of the same name from memory
-void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRef)
+void Spellbook::RemoveMemorization(Holder<CRESpellMemorization> sm, const ResRef& resRef)
 {
 	for (auto ms = sm->memorizedSpells.begin(); ms != sm->memorizedSpells.end();) {
 		if (resRef != (*ms)->SpellResRef) {
@@ -521,12 +506,11 @@ bool Spellbook::AddKnownSpell(Holder<CREKnownSpell> spl, int flg)
 	}
 	unsigned int level = spl->Level;
 	if (level >= GetSpellLevelCount(type)) {
-		CRESpellMemorization* sm = new CRESpellMemorization();
+		auto sm = MakeHolder<CRESpellMemorization>();
 		sm->Type = (ieWord) type;
 		sm->Level = (ieWord) level;
 		sm->SlotCount = sm->SlotCountWithBonus = 0;
 		if (!AddSpellMemorization(sm)) {
-			delete sm;
 			return false;
 		}
 	}
@@ -642,12 +626,12 @@ CREMemorizedSpell* Spellbook::GetMemorizedSpell(int type, unsigned int level, un
 }
 
 //creates a spellbook level
-bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
+bool Spellbook::AddSpellMemorization(Holder<CRESpellMemorization> sm)
 {
 	if (sm->Type >= NUM_BOOK_TYPES) {
 		return false;
 	}
-	std::vector<CRESpellMemorization*>* s = &spells[sm->Type];
+	auto s = &spells[sm->Type];
 	//when loading, level starts on 0
 	unsigned int level = sm->Level;
 	if (level > MAX_SPELL_LEVEL) {
@@ -657,7 +641,7 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 	while (s->size() < level) {
 		// this code previously added NULLs, leading to crashes,
 		// so this is an attempt to make it not broken
-		CRESpellMemorization* newsm = new CRESpellMemorization();
+		auto newsm = MakeHolder<CRESpellMemorization>();
 		newsm->Type = sm->Type;
 		newsm->Level = (ieWord) s->size();
 		newsm->SlotCount = newsm->SlotCountWithBonus = 0;
@@ -706,21 +690,20 @@ CRESpellMemorization* Spellbook::GetSpellMemorization(unsigned int type, unsigne
 		return nullptr;
 	}
 
-	CRESpellMemorization* sm;
+	Holder<CRESpellMemorization> sm;
 	if (level >= GetSpellLevelCount(type)) {
-		sm = new CRESpellMemorization();
+		sm = MakeHolder<CRESpellMemorization>();
 		sm->Type = (ieWord) type;
 		sm->Level = (ieWord) level;
 		sm->SlotCount = sm->SlotCountWithBonus = 0;
 		if (!AddSpellMemorization(sm)) {
-			delete sm;
 			return nullptr;
 		}
 		assert(sm == spells[type][level]);
 	} else {
 		sm = spells[type][level];
 	}
-	return sm;
+	return sm.get();
 }
 //if bonus is not set, then sets the base value (adjusts bonus too)
 //if bonus is set, then sets only the bonus
@@ -752,7 +735,7 @@ int Spellbook::GetMemorizableSpellsCount(int type, unsigned int level, bool bonu
 {
 	if (type >= NUM_BOOK_TYPES || level >= GetSpellLevelCount(type))
 		return 0;
-	const CRESpellMemorization* sm = spells[type][level];
+	auto sm = spells[type][level];
 	if (bonus)
 		return sm->SlotCountWithBonus;
 	return sm->SlotCount;
@@ -761,7 +744,7 @@ int Spellbook::GetMemorizableSpellsCount(int type, unsigned int level, bool bonu
 bool Spellbook::MemorizeSpell(const CREKnownSpell* spell, bool usable)
 {
 	ieWord spellType = spell->Type;
-	CRESpellMemorization* sm = spells[spellType][spell->Level];
+	CRESpellMemorization* sm = spells[spellType][spell->Level].get();
 	if (sm->SlotCountWithBonus <= sm->memorizedSpells.size() && !(innate & (1 << spellType))) {
 		//it is possible to have sorcerer type spellbooks for any spellbook type
 		if (!(sorcerer & (1 << spellType)))
@@ -892,7 +875,7 @@ bool Spellbook::DepleteSpell(int type)
 	}
 	size_t j = GetSpellLevelCount(type);
 	while (j--) {
-		const CRESpellMemorization* sm = spells[type][j];
+		auto sm = spells[type][j];
 
 		for (auto& spell : sm->memorizedSpells) {
 			if (!DepleteSpell(spell.get())) continue;
@@ -906,7 +889,7 @@ bool Spellbook::DepleteSpell(int type)
 	return false;
 }
 
-void Spellbook::DepleteLevel(const CRESpellMemorization* sm, const ResRef& except) const
+void Spellbook::DepleteLevel(Holder<CRESpellMemorization> sm, const ResRef& except) const
 {
 	ResRef last;
 
@@ -929,7 +912,7 @@ bool Spellbook::DepleteSpell(int type, unsigned int page, unsigned int slot)
 	if (spells[type].size() <= page) {
 		return false;
 	}
-	CRESpellMemorization* sm = spells[page][type];
+	auto sm = spells[page][type];
 	if (sm->memorizedSpells.size() <= slot) {
 		return false;
 	}
