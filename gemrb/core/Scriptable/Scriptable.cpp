@@ -1545,7 +1545,7 @@ bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell* spl
 				unsigned int spellCount = caster->spellbook.GetKnownSpellsCount(i, lvl);
 				if (!spellCount) continue;
 				int id = core->Roll(1, spellCount, -1);
-				const CREKnownSpell* ck = caster->spellbook.GetKnownSpell(i, lvl, id);
+				auto ck = caster->spellbook.GetKnownSpell(i, lvl, id);
 				if (ck) {
 					SpellResRef = ck->SpellResRef;
 					break;

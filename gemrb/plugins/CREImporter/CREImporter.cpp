@@ -2450,7 +2450,7 @@ int CREImporter::PutKnownSpells(DataStream* stream, const Actor* actor) const
 			unsigned int knownCount = actor->spellbook.GetKnownSpellsCount(i, j);
 			if (!knownCount) continue;
 			for (int k = knownCount - 1; k >= 0; k--) {
-				const CREKnownSpell* ck = actor->spellbook.GetKnownSpell(i, j, k);
+				auto ck = actor->spellbook.GetKnownSpell(i, j, k);
 				assert(ck);
 				stream->WriteResRef(ck->SpellResRef);
 				stream->WriteWord(ck->Level);
@@ -2605,7 +2605,7 @@ int CREImporter::PutIWD2Spellpage(DataStream* stream, const Actor* actor, ieIWD2
 
 	int knownCount = actor->spellbook.GetKnownSpellsCount(type, level);
 	for (int i = 0; i < knownCount; i++) {
-		const CREKnownSpell* knownSpell = actor->spellbook.GetKnownSpell(type, level, i);
+		auto knownSpell = actor->spellbook.GetKnownSpell(type, level, i);
 		ieDword ID = ResolveSpellName(knownSpell->SpellResRef, level, type);
 		stream->WriteDword(ID);
 		max = actor->spellbook.CountSpells(knownSpell->SpellResRef, type, 1);

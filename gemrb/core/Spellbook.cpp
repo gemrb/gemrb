@@ -474,7 +474,7 @@ int Spellbook::LearnSpell(Spell* spell, int memo, unsigned int clsmsk, unsigned 
 		// make sure the level and type match, so domain spells are handled properly
 		// we should probably be idempotent like that in other games as well
 		if (KnowSpell(spl->SpellResRef, spl->Type, level)) {
-			int ret = MemorizeSpell(spl.get(), memo);
+			int ret = MemorizeSpell(spl, memo);
 			return ret ? spell->SpellLevel : 0;
 		} // else learn normally
 	} else {
@@ -542,12 +542,12 @@ bool Spellbook::AddKnownSpell(Holder<CREKnownSpell> spl, int flg)
 		spells[type][level]->SlotCountWithBonus++;
 	}
 	if (flg) {
-		MemorizeSpell(spl.get(), true);
+		MemorizeSpell(spl, true);
 	}
 	return true;
 }
 
-CREKnownSpell* Spellbook::GetKnownSpell(int type, unsigned int level, unsigned int index) const
+Holder<CREKnownSpell> Spellbook::GetKnownSpell(int type, unsigned int level, unsigned int index) const
 {
 	if (type >= NUM_BOOK_TYPES || level >= GetSpellLevelCount(type)) {
 		return nullptr;
@@ -555,7 +555,7 @@ CREKnownSpell* Spellbook::GetKnownSpell(int type, unsigned int level, unsigned i
 	if (index >= spells[type][level]->knownSpells.size()) {
 		return nullptr;
 	}
-	return spells[type][level]->knownSpells[index].get();
+	return spells[type][level]->knownSpells[index];
 }
 
 unsigned int Spellbook::GetMemorizedSpellsCount(int type, bool real) const
@@ -741,7 +741,7 @@ int Spellbook::GetMemorizableSpellsCount(int type, unsigned int level, bool bonu
 	return sm->SlotCount;
 }
 
-bool Spellbook::MemorizeSpell(const CREKnownSpell* spell, bool usable)
+bool Spellbook::MemorizeSpell(Holder<CREKnownSpell> spell, bool usable)
 {
 	ieWord spellType = spell->Type;
 	CRESpellMemorization* sm = spells[spellType][spell->Level].get();
@@ -842,7 +842,7 @@ void Spellbook::CreateSorcererMemory(int type)
 		for (const auto& ck : spellMemo->knownSpells) {
 			size_t cnt = spellMemo->SlotCountWithBonus;
 			while (cnt--) {
-				MemorizeSpell(ck.get(), true);
+				MemorizeSpell(ck, true);
 			}
 		}
 	}

@@ -8225,7 +8225,7 @@ static PyObject* GemRB_GetKnownSpell(PyObject* /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	const CREKnownSpell* ks = actor->spellbook.GetKnownSpell(SpellType, Level, Index);
+	auto ks = actor->spellbook.GetKnownSpell(SpellType, Level, Index);
 	if (!ks) {
 		return RuntimeError("Spell not found!");
 	}
@@ -8618,12 +8618,12 @@ static PyObject* GemRB_RemoveSpell(PyObject* /*self*/, PyObject* args)
 	PARSE_ARGS(args, "iiii", &globalID, &SpellType, &Level, &Index);
 
 	GET_ACTOR_GLOBAL();
-	const CREKnownSpell* ks = actor->spellbook.GetKnownSpell(SpellType, Level, Index);
+	auto ks = actor->spellbook.GetKnownSpell(SpellType, Level, Index);
 	if (!ks) {
 		return RuntimeError("Spell not known!");
 	}
 
-	return PyLong_FromLong(actor->spellbook.RemoveSpell(ks));
+	return PyLong_FromLong(actor->spellbook.RemoveSpell(ks.get()));
 }
 
 PyDoc_STRVAR(GemRB_RemoveItem__doc,
@@ -8692,7 +8692,7 @@ static PyObject* GemRB_MemorizeSpell(PyObject* /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	const CREKnownSpell* ks = actor->spellbook.GetKnownSpell(SpellType, Level, Index);
+	auto ks = actor->spellbook.GetKnownSpell(SpellType, Level, Index);
 	if (!ks) {
 		return RuntimeError("Spell not found!");
 	}

@@ -187,7 +187,7 @@ public:
 	void SetBookType(int clss);
 	/** adds a spell to the book, returns experience if learned */
 	int LearnSpell(Spell* spell, int memo, unsigned int clsmsk, unsigned int kit, int level = -1);
-	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index) const;
+	Holder<CREKnownSpell> GetKnownSpell(int type, unsigned int level, unsigned int index) const;
 	unsigned int GetMemorizedSpellsCount(int type, bool real) const;
 	unsigned int GetMemorizedSpellsCount(int type, unsigned int level, bool real) const;
 	unsigned int GetMemorizedSpellsCount(const ResRef& name, int type, bool real) const;
@@ -197,7 +197,7 @@ public:
 	void SetMemorizableSpellsCount(int Value, int type, unsigned int level, bool bonus);
 
 	/** Adds spell from known to memorized */
-	bool MemorizeSpell(const CREKnownSpell* spl, bool usable);
+	bool MemorizeSpell(Holder<CREKnownSpell> spl, bool usable);
 
 	/** Removes memorized spell */
 	bool UnmemorizeSpell(const CREMemorizedSpell* spl);
