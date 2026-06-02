@@ -29,8 +29,8 @@ struct TileEntry {
 
 class BIFImporter : public IndexedArchive {
 private:
-	FileEntry* fentries = nullptr;
-	TileEntry* tentries = nullptr;
+	std::vector<FileEntry> fentries;
+	std::vector<TileEntry> tentries;
 	ieDword fentcount = 0;
 	ieDword tentcount = 0;
 	DataStream* stream = nullptr;

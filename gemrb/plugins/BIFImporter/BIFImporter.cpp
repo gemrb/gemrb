@@ -21,12 +21,6 @@ using namespace GemRB;
 BIFImporter::~BIFImporter(void)
 {
 	delete stream;
-	if (fentries) {
-		delete[] fentries;
-	}
-	if (tentries) {
-		delete[] tentries;
-	}
 }
 
 DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const path_t& path)
@@ -169,11 +163,9 @@ int BIFImporter::ReadBIF()
 	stream->ReadDword(tentcount);
 	stream->ReadDword(foffset);
 	stream->Seek(foffset, GEM_STREAM_START);
-	fentries = new FileEntry[fentcount];
-	tentries = new TileEntry[tentcount];
-	if (!fentries || !tentries) {
-		delete[] fentries;
-		delete[] tentries;
+	fentries.resize(fentcount);
+	tentries.resize(tentcount);
+	if (fentries.empty() && tentries.empty()) {
 		return GEM_ERROR;
 	}
 
