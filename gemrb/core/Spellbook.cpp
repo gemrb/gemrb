@@ -974,20 +974,14 @@ bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 
 void Spellbook::ClearSpellInfo()
 {
-	size_t i = spellinfo.size();
-	while (i--) {
-		delete spellinfo[i];
-	}
 	spellinfo.clear();
 }
 
-bool Spellbook::GetSpellInfo(SpellExtHeader* array, int type, int startindex, int count)
+bool Spellbook::GetSpellInfo(SpellExtHeader& array, int type, int startindex)
 {
 	if (spellinfo.empty()) {
 		GenerateSpellInfo();
 	}
-	int actual = 0;
-	bool ret = false;
 	for (const auto& extHeader : spellinfo) {
 		if (!(type & (1 << extHeader->type))) {
 			continue;
@@ -996,14 +990,10 @@ bool Spellbook::GetSpellInfo(SpellExtHeader* array, int type, int startindex, in
 			startindex--;
 			continue;
 		}
-		if (actual >= count) {
-			ret = true;
-			break;
-		}
-		*(array + actual) = *extHeader;
-		actual++;
+		array = *extHeader.get();
+		return true;
 	}
-	return ret;
+	return false;
 }
 
 // returns the size of spellinfo vector, if type is nonzero it is used as filter
@@ -1028,7 +1018,7 @@ unsigned int Spellbook::GetSpellInfoSize(int type)
 }
 
 //type = 0 means any type
-int Spellbook::FindSpellInfo(SpellExtHeader* array, const ResRef& spellName, unsigned int type)
+int Spellbook::FindSpellInfo(SpellExtHeader& array, const ResRef& spellName, unsigned int type)
 {
 	if (spellinfo.empty()) {
 		GenerateSpellInfo();
@@ -1041,13 +1031,13 @@ int Spellbook::FindSpellInfo(SpellExtHeader* array, const ResRef& spellName, uns
 			continue;
 		}
 		if (spellName != spellinfo[i]->spellName) continue;
-		*array = *spellinfo[i];
+		array = *spellinfo[i].get();
 		return i - offset + 1;
 	}
 	return 0;
 }
 
-SpellExtHeader* Spellbook::FindSpellInfo(unsigned int level, unsigned int type, const ResRef& spellname) const
+Holder<SpellExtHeader> Spellbook::FindSpellInfo(unsigned int level, unsigned int type, const ResRef& spellname) const
 {
 	size_t i = spellinfo.size();
 	while (i--) {
@@ -1069,13 +1059,13 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 		return;
 
 	ieDword level = 0;
-	SpellExtHeader* seh = FindSpellInfo(sm_level, sm_type, spellname);
+	Holder<SpellExtHeader> seh = FindSpellInfo(sm_level, sm_type, spellname);
 	if (seh) {
 		seh->count++;
 		return;
 	}
 
-	seh = new SpellExtHeader;
+	seh = MakeHolder<SpellExtHeader>();
 	spellinfo.push_back(seh);
 
 	seh->spellName = spellname;

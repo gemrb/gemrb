@@ -8433,7 +8433,7 @@ static PyObject* GemRB_GetSpelldataIndex(PyObject* /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	SpellExtHeader spelldata {};
-	int ret = actor->spellbook.FindSpellInfo(&spelldata, ResRefFromPy(spellResRef), type);
+	int ret = actor->spellbook.FindSpellInfo(spelldata, ResRefFromPy(spellResRef), type);
 	return PyLong_FromLong(ret - 1);
 }
 
@@ -8464,7 +8464,7 @@ static PyObject* GemRB_GetSpelldata(PyObject* /*self*/, PyObject* args)
 	int count = actor->spellbook.GetSpellInfoSize(type);
 	PyObject* spell_list = PyTuple_New(count);
 	for (int i = 0; i < count; i++) {
-		actor->spellbook.GetSpellInfo(&spelldata, type, i, 1);
+		actor->spellbook.GetSpellInfo(spelldata, type, i);
 		StringToUpper(spelldata.spellName);
 		PyTuple_SetItem(spell_list, i, PyString_FromResRef(spelldata.spellName));
 	}
@@ -10804,7 +10804,7 @@ static PyObject* GemRB_SetupQuickSpell(PyObject* /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 
-	actor->spellbook.GetSpellInfo(&spelldata, type, which, 1);
+	actor->spellbook.GetSpellInfo(spelldata, type, which);
 	if (spelldata.spellName.IsEmpty()) {
 		return RuntimeError("Invalid parameter! Spell not found!\n");
 	}
@@ -11151,7 +11151,7 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject* /*self*/, PyObject* args
 	std::vector<ResRef> data;
 	actor->spellbook.SetCustomSpellInfo(data, ResRef(), 1 << type);
 	SpellExtHeader spelldata {};
-	int idx = actor->spellbook.FindSpellInfo(&spelldata, replacementSpell, 1 << type);
+	int idx = actor->spellbook.FindSpellInfo(spelldata, replacementSpell, 1 << type);
 
 	return PyLong_FromLong(idx - 1);
 }
@@ -11201,7 +11201,7 @@ static PyObject* GemRB_SpellCast(PyObject* /*self*/, PyObject* args)
 	if (type == -3) {
 		data.push_back(ResRef(resRef));
 		actor->spellbook.SetCustomSpellInfo(data, ResRef(), 0);
-		actor->spellbook.GetSpellInfo(&spelldata, 255, 0, 1);
+		actor->spellbook.GetSpellInfo(spelldata, 255, 0);
 	} else if (type == -2) {
 		//resolve quick spell slot
 		if (!actor->PCStats) {
@@ -11209,7 +11209,7 @@ static PyObject* GemRB_SpellCast(PyObject* /*self*/, PyObject* args)
 			//return RuntimeError( "Actor has no quickslots!\n" );
 			Py_RETURN_NONE;
 		}
-		actor->spellbook.FindSpellInfo(&spelldata, actor->PCStats->QuickSpells[spell], actor->PCStats->QuickSpellBookType[spell]);
+		actor->spellbook.FindSpellInfo(spelldata, actor->PCStats->QuickSpells[spell], actor->PCStats->QuickSpellBookType[spell]);
 		if (spelldata.Target == TARGET_INVALID) {
 			// empty quickspell slot, don't complain
 			Py_RETURN_NONE;
@@ -11220,7 +11220,7 @@ static PyObject* GemRB_SpellCast(PyObject* /*self*/, PyObject* args)
 			// get the right spell, since the lookup below only checks the memorized list
 			actor->spellbook.SetCustomSpellInfo(data, ResRef(), type);
 		}
-		actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
+		actor->spellbook.GetSpellInfo(spelldata, type, spell);
 	}
 
 	Log(MESSAGE, "GUIScript", "Cast spell: {}", spelldata.spellName);

@@ -119,7 +119,7 @@ struct SpellExtHeader {
 class GEM_EXPORT Spellbook {
 private:
 	std::vector<std::vector<CRESpellMemorization*>> spells;
-	std::vector<SpellExtHeader*> spellinfo;
+	std::vector<Holder<SpellExtHeader>> spellinfo;
 	int sorcerer = 0;
 	int innate;
 
@@ -132,7 +132,7 @@ private:
 	/** regenerates the spellinfo list */
 	void GenerateSpellInfo();
 	/** looks up the spellinfo list for an element */
-	SpellExtHeader* FindSpellInfo(unsigned int level, unsigned int type, const ResRef& name) const;
+	Holder<SpellExtHeader> FindSpellInfo(unsigned int level, unsigned int type, const ResRef& name) const;
 	/** removes all instances of a spell from a given page */
 	void RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRef);
 	/** adds a spell to the book, internal */
@@ -235,10 +235,10 @@ public:
 	void ClearSpellInfo();
 
 	/** lists spells of a type */
-	bool GetSpellInfo(SpellExtHeader* array, int type, int startindex, int count);
+	bool GetSpellInfo(SpellExtHeader& array, int type, int startindex);
 
 	/** find the first spell matching resref (returns index+1) */
-	int FindSpellInfo(SpellExtHeader* array, const ResRef& spellName, unsigned int type);
+	int FindSpellInfo(SpellExtHeader& array, const ResRef& spellName, unsigned int type);
 
 	/** Dumps spellbook to stdout for debugging */
 	std::string dump(bool print = true) const;
