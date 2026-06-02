@@ -17,11 +17,7 @@ namespace GemRB {
 TileMap::~TileMap(void)
 {
 	infoPoints.clear();
-
-	for (const Door* door : doors) {
-		delete door;
-	}
-
+	doors.clear();
 	containers.clear();
 }
 
@@ -55,10 +51,10 @@ TileObject* TileMap::GetTile(unsigned int idx)
 }
 
 //doors
-Door* TileMap::AddDoor(const ResRef& ID, const ieVariable& Name, unsigned int Flags,
-		       int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt)
+Holder<Door> TileMap::AddDoor(const ResRef& ID, const ieVariable& Name, unsigned int Flags,
+			      int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt)
 {
-	Door* door = new Door(overlays[0], std::move(dt));
+	auto door = MakeHolder<Door>(overlays[0], std::move(dt));
 	door->Flags = Flags;
 	door->closedIndex = ClosedIndex;
 	door->SetTiles(std::move(indices));
@@ -73,25 +69,25 @@ Door* TileMap::GetDoor(size_t idx) const
 	if (idx >= doors.size()) {
 		return nullptr;
 	}
-	return doors[idx];
+	return doors[idx].get();
 }
 
 Door* TileMap::GetDoor(const Point& p) const
 {
-	for (Door* door : doors) {
-		if (door->HitTest(p)) return door;
+	for (const auto& door : doors) {
+		if (door->HitTest(p)) return door.get();
 	}
 	return nullptr;
 }
 
 Door* TileMap::GetDoorByPosition(const Point& p) const
 {
-	for (Door* door : doors) {
+	for (const auto& door : doors) {
 		if (door->toOpen[0] == p) {
-			return door;
+			return door.get();
 		}
 		if (door->toOpen[1] == p) {
-			return door;
+			return door.get();
 		}
 	}
 	return nullptr;
@@ -99,16 +95,16 @@ Door* TileMap::GetDoorByPosition(const Point& p) const
 
 Door* TileMap::GetDoor(const ieVariable& Name) const
 {
-	for (Door* door : doors) {
+	for (const auto& door : doors) {
 		if (door->GetScriptName() == Name)
-			return door;
+			return door.get();
 	}
 	return nullptr;
 }
 
 void TileMap::UpdateDoors()
 {
-	for (Door* door : doors) {
+	for (const auto& door : doors) {
 		door->SetNewOverlay(overlays[0]);
 	}
 }
@@ -118,7 +114,7 @@ void TileMap::AutoLockDoors() const
 {
 	if (!core->HasFeature(GFFlags::RANDOM_BANTER_DIALOGS)) return;
 
-	for (Door* door : doors) {
+	for (const auto& door : doors) {
 		if (door->CantAutoClose()) continue;
 		if (core->Roll(1, 2, -1)) continue; // just a guess
 		door->SetDoorOpen(false, false, 0);

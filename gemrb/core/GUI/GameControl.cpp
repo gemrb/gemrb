@@ -513,7 +513,7 @@ void GameControl::OutlineDoors() const
 			continue;
 		}
 
-		if (overMe != door) continue;
+		if (overMe != door.get()) continue;
 
 		door->Highlight = true;
 		if (targetMode != TargetMode::None) {

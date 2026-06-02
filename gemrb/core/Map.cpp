@@ -1828,7 +1828,7 @@ Door* Map::GetDoorByGlobalID(ieDword objectID) const
 
 	for (const auto& door : area->TMap->GetDoors()) {
 		if (door->GetGlobalID() == objectID) {
-			return door;
+			return door.get();
 		}
 	}
 	return nullptr;
@@ -1883,7 +1883,7 @@ Scriptable* Map::GetScriptable(const Point& p, int flags, const Movable* checker
 	if (actor) return actor;
 
 	for (const auto& door : TMap->GetDoors()) {
-		if (door->IsOver(p)) return door;
+		if (door->IsOver(p)) return door.get();
 	}
 
 	for (const auto& cont : TMap->GetContainers()) {
@@ -1908,7 +1908,7 @@ std::vector<Scriptable*> Map::GetScriptablesInRect(const Point& p, unsigned int 
 	rect.h -= radius / 2;
 
 	for (const auto& door : TMap->GetDoors()) {
-		if (door->BBox.IntersectsRegion(rect)) neighbours.emplace_back(door);
+		if (door->BBox.IntersectsRegion(rect)) neighbours.emplace_back(door.get());
 	}
 
 	for (const auto& cont : TMap->GetContainers()) {
@@ -2120,7 +2120,7 @@ Scriptable* Map::GetScriptableByDialog(const ResRef& resref) const
 	// move higher if someone needs talking doors
 	for (const auto& door : TMap->GetDoors()) {
 		if (door->GetDialog() == resref) {
-			return door;
+			return door.get();
 		}
 	}
 	return nullptr;

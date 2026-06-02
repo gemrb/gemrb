@@ -938,7 +938,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	auto openPolys = tmm->OpenDoorPolygons();
 
 	DoorTrigger dt(std::move(open), std::move(openPolys), std::move(closed), std::move(closedPolys));
-	Door* door = map->TMap->AddDoor(shortName, longName, doorFlags, baseClosed, std::move(indices), std::move(dt));
+	auto door = map->TMap->AddDoor(shortName, longName, doorFlags, baseClosed, std::move(indices), std::move(dt));
 	door->OpenBBox = openedBBox;
 	door->ClosedBBox = closedBBox;
 
@@ -972,7 +972,7 @@ void AREImporter::GetDoor(DataStream* str, int idx, Map* map, PluginHolder<TileM
 	if (script0.IsEmpty()) {
 		door->Scripts[0] = nullptr;
 	} else {
-		door->Scripts[0] = MakeHolder<GameScript>(script0, door);
+		door->Scripts[0] = MakeHolder<GameScript>(script0, door.get());
 	}
 
 	door->toOpen[0] = toOpen[0];
