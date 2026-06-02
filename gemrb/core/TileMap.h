@@ -66,8 +66,8 @@ public:
 	Holder<InfoPoint> AdjustNearestTravel(Point& p) const;
 	size_t GetInfoPointCount() const { return infoPoints.size(); }
 
-	TileObject* AddTile(const ResRef& ID, const ieVariable& Name, unsigned int Flags,
-			    unsigned short* openindices, int opencount, unsigned short* closeindices, int closecount);
+	Holder<TileObject> AddTile(const ResRef& ID, const ieVariable& Name, unsigned int Flags,
+				   unsigned short* openindices, int opencount, unsigned short* closeindices, int closecount);
 	TileObject* GetTile(unsigned int idx);
 	TileObject* GetTile(const char* Name);
 	size_t GetTileCount() const { return tiles.size(); }
@@ -86,7 +86,7 @@ private:
 	std::vector<Door*> doors;
 	std::vector<Container*> containers;
 	std::vector<Holder<InfoPoint>> infoPoints;
-	std::vector<TileObject*> tiles;
+	std::vector<Holder<TileObject>> tiles;
 };
 
 }

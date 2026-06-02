@@ -35,10 +35,10 @@ void TileMap::ClearOverlays()
 }
 
 //tiled objects
-TileObject* TileMap::AddTile(const ResRef& ID, const ieVariable& Name, unsigned int Flags,
-			     unsigned short* openindices, int opencount, unsigned short* closeindices, int closecount)
+Holder<TileObject> TileMap::AddTile(const ResRef& ID, const ieVariable& Name, unsigned int Flags,
+				    unsigned short* openindices, int opencount, unsigned short* closeindices, int closecount)
 {
-	TileObject* tile = new TileObject();
+	auto tile = MakeHolder<TileObject>();
 	tile->flags = Flags;
 	tile->name = Name; // would probably need MakeVariable if the whole class wasn't unused
 	tile->tileset = ID;
@@ -53,7 +53,7 @@ TileObject* TileMap::GetTile(unsigned int idx)
 	if (idx >= tiles.size()) {
 		return nullptr;
 	}
-	return tiles[idx];
+	return tiles[idx].get();
 }
 
 //doors
