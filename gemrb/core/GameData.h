@@ -58,6 +58,7 @@ enum SpecialSpell {
 	HealAll = 16, // any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
 	AreaTarget = 32, // any spell that requires their ability header targets changed to area (knock)
 	DeadTarget = 64, // any spell that can target dead actors despite its target type being 1 (pst)
+	NoClone = 128, // any spell that shouldn't be copied to simulacra
 };
 
 struct SurgeSpell {

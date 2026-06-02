@@ -28,3 +28,4 @@ SP_REST     = 8  # any spell that is cast upon rest if memorized
 SP_HEAL_ALL = 16 # any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
 SP_AREA     = 32 # any spell that requires their ability header targets changed to area (knock)
 SP_DEAD     = 64 # spells that can target dead actors despite their target type is 1 (pst)
+SP_NOCLONE  = 128 # any spell that shouldn't be copied to simulacra

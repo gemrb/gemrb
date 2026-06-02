@@ -64,7 +64,6 @@ Spellbook::~Spellbook()
 	ClearSpellInfo();
 }
 
-// TODO: exclude slayer, pocket plane, perhaps also bhaal innates?
 void Spellbook::CopyFrom(const Actor* source)
 {
 	if (!source) {
@@ -76,6 +75,10 @@ void Spellbook::CopyFrom(const Actor* source)
 	spells.resize(NUM_BOOK_TYPES);
 	ClearSpellInfo();
 
+	// ees exclude some spells
+	auto CannotCopy = [](const ResRef& spellRef) {
+		return gamedata->GetSpecialSpell(spellRef) & SpecialSpell::NoClone;
+	};
 	const Spellbook& wikipedia = source->spellbook;
 
 	for (int t = 0; t < NUM_BOOK_TYPES; t++) {
@@ -88,9 +91,11 @@ void Spellbook::CopyFrom(const Actor* source)
 			sm->SlotCountWithBonus = wm->SlotCountWithBonus;
 			sm->Type = wm->Type;
 			for (k = 0; k < wm->knownSpells.size(); k++) {
+				if (CannotCopy(wm->knownSpells[k]->SpellResRef)) continue;
 				sm->knownSpells.emplace_back(wm->knownSpells[k]);
 			}
 			for (k = 0; k < wm->memorizedSpells.size(); k++) {
+				if (CannotCopy(wm->memorizedSpells[k]->SpellResRef)) continue;
 				sm->memorizedSpells.emplace_back(wm->memorizedSpells[k]);
 			}
 		}
