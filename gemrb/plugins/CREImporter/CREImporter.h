@@ -8,6 +8,7 @@
 #include "versions.h"
 
 #include "ActorMgr.h"
+#include "Holder.h"
 #include "Spellbook.h"
 
 namespace GemRB {
@@ -76,9 +77,9 @@ private:
 	std::unique_ptr<Effect> GetEffect();
 	void ReadScript(Actor* actor, int ScriptLevel);
 	void ReadDialog(Actor* actor);
-	CREKnownSpell* GetKnownSpell();
+	Holder<CREKnownSpell> GetKnownSpell();
 	CRESpellMemorization* GetSpellMemorization(Actor* act);
-	CREMemorizedSpell* GetMemorizedSpell();
+	Holder<CREMemorizedSpell> GetMemorizedSpell();
 	CREItem* GetItem();
 	void SetupColor(ieDword&) const;
 

@@ -719,9 +719,9 @@ bool CREImporter::SeekCreHeader(char* Signature)
 	return true;
 }
 
-CREMemorizedSpell* CREImporter::GetMemorizedSpell()
+Holder<CREMemorizedSpell> CREImporter::GetMemorizedSpell()
 {
-	CREMemorizedSpell* spl = new CREMemorizedSpell();
+	auto spl = MakeHolder<CREMemorizedSpell>();
 
 	str->ReadResRef(spl->SpellResRef);
 	str->ReadDword(spl->Flags); // was split into flags word and two alignment bytes
@@ -729,9 +729,9 @@ CREMemorizedSpell* CREImporter::GetMemorizedSpell()
 	return spl;
 }
 
-CREKnownSpell* CREImporter::GetKnownSpell()
+Holder<CREKnownSpell> CREImporter::GetKnownSpell()
 {
-	CREKnownSpell* spl = new CREKnownSpell();
+	auto spl = MakeHolder<CREKnownSpell>();
 
 	str->ReadResRef(spl->SpellResRef);
 	str->ReadWord(spl->Level);
@@ -1158,8 +1158,8 @@ void CREImporter::ReadInventory(Actor* act, size_t slotCount)
 void CREImporter::ReadSpellbook(Actor* act)
 {
 	// Reading spellbook
-	std::vector<CREKnownSpell*> knownSpells;
-	std::vector<CREMemorizedSpell*> memorizedSpells;
+	std::vector<Holder<CREKnownSpell>> knownSpells;
+	std::vector<Holder<CREMemorizedSpell>> memorizedSpells;
 	knownSpells.resize(KnownSpellsCount);
 	memorizedSpells.resize(MemorizedSpellsCount);
 
@@ -1179,12 +1179,12 @@ void CREImporter::ReadSpellbook(Actor* act)
 
 		unsigned int j = KnownSpellsCount;
 		while (j--) {
-			CREKnownSpell* spl = knownSpells[j];
+			auto spl = knownSpells[j];
 			if (!spl) {
 				continue;
 			}
 			if (spl->Type == sm->Type && spl->Level == sm->Level) {
-				sm->known_spells.push_back(spl);
+				sm->knownSpells.push_back(spl);
 				knownSpells[j] = nullptr;
 			}
 		}
@@ -1192,7 +1192,7 @@ void CREImporter::ReadSpellbook(Actor* act)
 			unsigned int k = MemorizedIndex + idx;
 			assert(k < MemorizedSpellsCount);
 			if (memorizedSpells[k]) {
-				sm->memorized_spells.push_back(memorizedSpells[k]);
+				sm->memorizedSpells.push_back(memorizedSpells[k]);
 				memorizedSpells[k] = nullptr;
 				continue;
 			}
@@ -1204,7 +1204,6 @@ void CREImporter::ReadSpellbook(Actor* act)
 		if (knownSpell) {
 			Log(WARNING, "CREImporter", "Dangling known spell in creature: {}!",
 			    knownSpell->SpellResRef);
-			delete knownSpell;
 		}
 	}
 	knownSpells.clear();
@@ -1213,7 +1212,6 @@ void CREImporter::ReadSpellbook(Actor* act)
 		if (memorizedSpell) {
 			Log(WARNING, "CREImporter", "Dangling spell in creature: {}!",
 			    memorizedSpell->SpellResRef);
-			delete memorizedSpell;
 		}
 	}
 	memorizedSpells.clear();
@@ -1432,11 +1430,11 @@ void CREImporter::GetIWD2Spellpage(Actor* act, ieIWD2SpellType type, int level, 
 			continue;
 		}
 
-		CREKnownSpell* known = new CREKnownSpell;
+		auto known = MakeHolder<CREKnownSpell>();
 		known->Level = static_cast<ieWord>(level);
 		known->Type = type;
 		known->SpellResRef = tmp;
-		sm->known_spells.push_back(known);
+		sm->knownSpells.push_back(known);
 		while (memocount--) {
 			if (totalcount) {
 				totalcount--;
@@ -1444,16 +1442,16 @@ void CREImporter::GetIWD2Spellpage(Actor* act, ieIWD2SpellType type, int level, 
 				Log(ERROR, "CREImporter", "More spells still known than memorised.");
 				break;
 			}
-			CREMemorizedSpell* memory = new CREMemorizedSpell;
+			auto memory = MakeHolder<CREMemorizedSpell>();
 			memory->Flags = 1;
 			memory->SpellResRef = tmp;
-			sm->memorized_spells.push_back(memory);
+			sm->memorizedSpells.push_back(memory);
 		}
 		while (totalcount--) {
-			CREMemorizedSpell* memory = new CREMemorizedSpell;
+			auto memory = MakeHolder<CREMemorizedSpell>();
 			memory->Flags = 0;
 			memory->SpellResRef = tmp;
-			sm->memorized_spells.push_back(memory);
+			sm->memorizedSpells.push_back(memory);
 		}
 	}
 	// hacks for domain spells, since their count is not stored and also always 1

@@ -15,6 +15,8 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#include "Holder.h"
+
 #include <vector>
 
 namespace GemRB {
@@ -86,8 +88,8 @@ struct CRESpellMemorization {
 	ieWord SlotCountWithBonus;
 	ieWord Type;
 
-	std::vector<CREKnownSpell*> known_spells;
-	std::vector<CREMemorizedSpell*> memorized_spells;
+	std::vector<Holder<CREKnownSpell>> knownSpells;
+	std::vector<Holder<CREMemorizedSpell>> memorizedSpells;
 };
 
 struct SpellExtHeader {
@@ -134,7 +136,7 @@ private:
 	/** removes all instances of a spell from a given page */
 	void RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRef);
 	/** adds a spell to the book, internal */
-	bool AddKnownSpell(CREKnownSpell* spl, int memo);
+	bool AddKnownSpell(Holder<CREKnownSpell> spl, int memo);
 	/** Adds a new CRESpellMemorization, to the *end* only */
 	bool AddSpellMemorization(CRESpellMemorization* sm);
 
@@ -150,7 +152,6 @@ public:
 	static void InitializeSpellbook();
 	static void ReleaseMemory();
 
-	void FreeSpellPage(CRESpellMemorization* sm);
 	/** duplicates the source spellbook into the current one */
 	void CopyFrom(const Actor* source);
 	/** Check if the spell is memorised, optionally deplete it (casting) */

@@ -1339,12 +1339,11 @@ static bool RemoveMemo(Actor* ownerActor, unsigned int type, unsigned int idx, i
 	size_t diff = sm->SlotCountWithBonus - sm->SlotCount;
 	if (diff == 0) return false;
 
-	if (sm->SlotCount >= sm->memorized_spells.size()) return false;
-	diff = std::min(diff, sm->memorized_spells.size());
+	if (sm->SlotCount >= sm->memorizedSpells.size()) return false;
+	diff = std::min(diff, sm->memorizedSpells.size());
 	if (bonus) diff = std::min<size_t>(diff, bonus);
 	for (size_t j = 0; j < diff; j++) {
-		delete sm->memorized_spells.back();
-		sm->memorized_spells.pop_back();
+		sm->memorizedSpells.pop_back();
 	}
 	return true;
 }
