@@ -6484,9 +6484,9 @@ void Actor::CreateStats()
 ResRef Actor::GetScript(int ScriptIndex, bool empty, bool skipNone) const
 {
 	if (Scripts[ScriptIndex]) {
-		ResRef scriptName = Scripts[ScriptIndex]->GetName();
-		if (skipNone && scriptName == "none") return "";
-		return scriptName;
+		ResRef scriptRef = Scripts[ScriptIndex]->GetName();
+		if (skipNone && scriptRef == "none") return "";
+		return scriptRef;
 	} else if (empty) {
 		return "";
 	} else {

@@ -1590,13 +1590,13 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 void Map::AddAnimation(AreaAnimation anim)
 {
 	if (core->config.UseAsLibrary) {
-		animations.push_back(std::move(anim));
+		animations.push_back(anim);
 		return;
 	}
 	int Height = anim.GetHeight();
 	auto iter = animations.begin();
 	for (; (iter != animations.end()) && (iter->GetHeight() < Height); ++iter);
-	animations.insert(iter, std::move(anim));
+	animations.insert(iter, anim);
 }
 
 //reapplying all of the effects on the actors of this map

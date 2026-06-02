@@ -168,7 +168,7 @@ bool Spellbook::HaveSpell(int spellid, int type, ieDword flags)
 	unsigned int count = GetSpellLevelCount(type);
 	for (unsigned int j = 0; j < count; j++) {
 		auto sm = spells[type][j];
-		for (auto& ms : sm->memorizedSpells) {
+		for (const auto& ms : sm->memorizedSpells) {
 			if (!ms->Flags) continue;
 			if (atoi(ms->SpellResRef.c_str() + 4) != spellid) continue;
 
@@ -281,7 +281,7 @@ bool Spellbook::KnowSpell(const ResRef& resref, int type, int level) const
 bool Spellbook::HaveSpell(const ResRef& resref, ieDword flags)
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (auto& sm : spells[i]) {
+		for (const auto& sm : spells[i]) {
 			for (const auto& ms : sm->memorizedSpells) {
 				if (!ms->Flags) continue;
 				if (ms->SpellResRef != resref) {
@@ -864,7 +864,7 @@ void Spellbook::ChargeAllSpells()
 		}
 
 		for (const auto& spellMemo : spells[i]) {
-			for (auto& memorizedSpell : spellMemo->memorizedSpells) {
+			for (const auto& memorizedSpell : spellMemo->memorizedSpells) {
 				ChargeSpell(memorizedSpell.get());
 			}
 		}
@@ -882,7 +882,7 @@ bool Spellbook::DepleteSpell(int type)
 	while (j--) {
 		auto sm = spells[type][j];
 
-		for (auto& spell : sm->memorizedSpells) {
+		for (const auto& spell : sm->memorizedSpells) {
 			if (!DepleteSpell(spell.get())) continue;
 
 			if (sorcerer & (1 << type)) {
@@ -898,7 +898,7 @@ void Spellbook::DepleteLevel(Holder<CRESpellMemorization> sm, const ResRef& exce
 {
 	ResRef last;
 
-	for (auto& cms : sm->memorizedSpells) {
+	for (const auto& cms : sm->memorizedSpells) {
 		//sorcerer spells are created in orderly manner
 		if (cms->Flags && last != cms->SpellResRef && except != cms->SpellResRef) {
 			last = cms->SpellResRef;
@@ -941,7 +941,7 @@ bool Spellbook::ChargeSpell(CREMemorizedSpell* spl)
 void Spellbook::ChargeSpell(const ResRef& spellRef, int type)
 {
 	for (const auto& spellMemo : spells[type]) {
-		for (auto& memorizedSpell : spellMemo->memorizedSpells) {
+		for (const auto& memorizedSpell : spellMemo->memorizedSpells) {
 			if (memorizedSpell->SpellResRef == spellRef) {
 				ChargeSpell(memorizedSpell.get());
 				break;
