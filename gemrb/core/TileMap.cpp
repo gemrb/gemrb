@@ -22,9 +22,7 @@ TileMap::~TileMap(void)
 		delete door;
 	}
 
-	for (const Container* container : containers) {
-		delete container;
-	}
+	containers.clear();
 }
 
 //this needs in case of a tileset switch (for extended night)
@@ -152,7 +150,7 @@ void TileMap::DrawOverlays(const Region& viewport, bool rain, BlitFlags flags)
 }
 
 //containers
-void TileMap::AddContainer(Container* c)
+void TileMap::AddContainer(Holder<Container> c)
 {
 	containers.push_back(c);
 }
@@ -162,14 +160,14 @@ Container* TileMap::GetContainer(size_t idx) const
 	if (idx >= containers.size()) {
 		return nullptr;
 	}
-	return containers[idx];
+	return containers[idx].get();
 }
 
 Container* TileMap::GetContainer(const ieVariable& Name) const
 {
-	for (Container* container : containers) {
+	for (const auto& container : containers) {
 		if (container->GetScriptName() == Name) {
-			return container;
+			return container.get();
 		}
 	}
 	return nullptr;
@@ -180,7 +178,7 @@ Container* TileMap::GetContainer(const ieVariable& Name) const
 //in this case, empty piles won't be found!
 Container* TileMap::GetContainer(const Point& position, int type) const
 {
-	for (Container* container : containers) {
+	for (const auto& container : containers) {
 		if (type != -1 && type != container->containerType) {
 			continue;
 		}
@@ -194,9 +192,9 @@ Container* TileMap::GetContainer(const Point& position, int type) const
 			if ((type == -1) && !container->inventory.GetSlotCount()) {
 				continue;
 			}
-			return container;
+			return container.get();
 		} else if (container->outline && container->outline->PointIn(position)) {
-			return container;
+			return container.get();
 		}
 	}
 	return nullptr;
@@ -204,7 +202,7 @@ Container* TileMap::GetContainer(const Point& position, int type) const
 
 Container* TileMap::GetContainerByPosition(const Point& position, int type) const
 {
-	for (Container* container : containers) {
+	for (const auto& container : containers) {
 		if (type != -1 && type != container->containerType) {
 			continue;
 		}
@@ -220,9 +218,9 @@ Container* TileMap::GetContainerByPosition(const Point& position, int type) cons
 			if ((type == -1) && !container->inventory.GetSlotCount()) {
 				continue;
 			}
-			return container;
+			return container.get();
 		}
-		return container;
+		return container.get();
 	}
 	return nullptr;
 }
@@ -234,9 +232,8 @@ int TileMap::CleanupContainer(Container* container)
 	if (core->config.UseAsLibrary) return 0;
 
 	for (size_t i = 0; i < containers.size(); i++) {
-		if (containers[i] == container) {
+		if (containers[i].get() == container) {
 			containers.erase(containers.begin() + i);
-			delete container;
 			return 1;
 		}
 	}

@@ -1840,7 +1840,7 @@ Container* Map::GetContainerByGlobalID(ieDword objectID) const
 
 	for (const auto& container : area->TMap->GetContainers()) {
 		if (container->GetGlobalID() == objectID) {
-			return container;
+			return container.get();
 		}
 	}
 	return nullptr;
@@ -1887,7 +1887,7 @@ Scriptable* Map::GetScriptable(const Point& p, int flags, const Movable* checker
 	}
 
 	for (const auto& cont : TMap->GetContainers()) {
-		if (cont->IsOver(p)) return cont;
+		if (cont->IsOver(p)) return cont.get();
 	}
 
 	for (const auto& ip : TMap->GetInfoPoints()) {
@@ -1912,7 +1912,7 @@ std::vector<Scriptable*> Map::GetScriptablesInRect(const Point& p, unsigned int 
 	}
 
 	for (const auto& cont : TMap->GetContainers()) {
-		if (cont->BBox.IntersectsRegion(rect)) neighbours.emplace_back(cont);
+		if (cont->BBox.IntersectsRegion(rect)) neighbours.emplace_back(cont.get());
 	}
 
 	for (const auto& ip : TMap->GetInfoPoints()) {
@@ -3545,7 +3545,7 @@ void Map::AddItemToLocation(const Point& position, CREItem* item)
 Container* Map::AddContainer(const ieVariable& Name, unsigned short cType,
 			     const std::shared_ptr<Gem_Polygon>& outline)
 {
-	Container* c = new Container();
+	auto c = MakeHolder<Container>();
 	c->SetScriptName(Name);
 	c->containerType = cType;
 	c->outline = outline;
@@ -3554,7 +3554,7 @@ Container* Map::AddContainer(const ieVariable& Name, unsigned short cType,
 		c->BBox = outline->BBox;
 	}
 	TMap->AddContainer(c);
-	return c;
+	return c.get();
 }
 
 int Map::GetCursor(const Point& p) const

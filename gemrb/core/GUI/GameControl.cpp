@@ -539,7 +539,7 @@ void GameControl::OutlineContainers() const
 			continue;
 		}
 
-		if (overMe == container) {
+		if (overMe == container.get()) {
 			container->Highlight = true;
 			if (targetMode == TargetMode::None) {
 				container->outlineColor = displaymsg->GetColor(GUIColors::HOVERCONTAINER);

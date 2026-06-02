@@ -45,7 +45,7 @@ public:
 	void AutoLockDoors() const;
 
 	/* type is an optional filter for container type*/
-	void AddContainer(Container* c);
+	void AddContainer(Holder<Container> c);
 	//gets container by active region (click target)
 	Container* GetContainer(const Point& position, int type = -1) const;
 	//gets container by activation position (spell target)
@@ -84,7 +84,7 @@ private:
 	std::vector<TileOverlayPtr> overlays;
 	std::vector<TileOverlayPtr> rain_overlays;
 	std::vector<Door*> doors;
-	std::vector<Container*> containers;
+	std::vector<Holder<Container>> containers;
 	std::vector<Holder<InfoPoint>> infoPoints;
 	std::vector<Holder<TileObject>> tiles;
 };
