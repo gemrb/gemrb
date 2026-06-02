@@ -57,13 +57,13 @@ public:
 	int CleanupContainer(Container* container);
 	size_t GetContainerCount() const { return containers.size(); }
 
-	InfoPoint* AddInfoPoint(const ieVariable& Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline);
+	Holder<InfoPoint> AddInfoPoint(const ieVariable& Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline);
 	InfoPoint* GetInfoPoint(const Point& position, bool detectable) const;
 	InfoPoint* GetInfoPoint(const ieVariable& Name) const;
 	InfoPoint* GetInfoPoint(size_t idx) const;
 	const auto& GetInfoPoints() const { return infoPoints; }
 	InfoPoint* GetTravelTo(const ResRef& Destination) const;
-	InfoPoint* AdjustNearestTravel(Point& p) const;
+	Holder<InfoPoint> AdjustNearestTravel(Point& p) const;
 	size_t GetInfoPointCount() const { return infoPoints.size(); }
 
 	TileObject* AddTile(const ResRef& ID, const ieVariable& Name, unsigned int Flags,
@@ -85,7 +85,7 @@ private:
 	std::vector<TileOverlayPtr> rain_overlays;
 	std::vector<Door*> doors;
 	std::vector<Container*> containers;
-	std::vector<InfoPoint*> infoPoints;
+	std::vector<Holder<InfoPoint>> infoPoints;
 	std::vector<TileObject*> tiles;
 };
 

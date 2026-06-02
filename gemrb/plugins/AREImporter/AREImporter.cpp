@@ -609,7 +609,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 		str->ReadResRef(dialogResRef);
 	}
 
-	InfoPoint* ip = nullptr;
+	Holder<InfoPoint> ip;
 	str->Seek(VerticesOffset + firstVertex * 4, GEM_STREAM_START);
 	if (vertexCount <= 1) {
 		// this is exactly the same as bbox.origin
@@ -694,7 +694,7 @@ void AREImporter::GetInfoPoint(DataStream* str, int idx, Map* map) const
 	if (script0.IsEmpty()) {
 		ip->Scripts[0] = nullptr;
 	} else {
-		ip->Scripts[0] = MakeHolder<GameScript>(script0, ip);
+		ip->Scripts[0] = MakeHolder<GameScript>(script0, ip.get());
 	}
 
 	if (ip->Type != ST_TRAVEL || !ip->outline) return;

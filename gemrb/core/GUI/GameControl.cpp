@@ -474,7 +474,7 @@ void GameControl::OutlineInfoPoints() const
 		infoPoint->Highlight = false;
 
 		if (infoPoint->VisibleTrap(0)) {
-			if (overMe == infoPoint && targetMode != TargetMode::None) {
+			if (overMe == infoPoint.get() && targetMode != TargetMode::None) {
 				infoPoint->outlineColor = displaymsg->GetColor(GUIColors::HOVERTARGETABLE);
 			} else {
 				infoPoint->outlineColor = displaymsg->GetColor(GUIColors::TRAPCOLOR);

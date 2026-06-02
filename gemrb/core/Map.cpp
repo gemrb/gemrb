@@ -1852,7 +1852,7 @@ InfoPoint* Map::GetInfoPointByGlobalID(ieDword objectID) const
 
 	for (const auto& ip : TMap->GetInfoPoints()) {
 		if (ip->GetGlobalID() == objectID) {
-			return ip;
+			return ip.get();
 		}
 	}
 	return nullptr;
@@ -1891,7 +1891,7 @@ Scriptable* Map::GetScriptable(const Point& p, int flags, const Movable* checker
 	}
 
 	for (const auto& ip : TMap->GetInfoPoints()) {
-		if (ip->IsOver(p)) return ip;
+		if (ip->IsOver(p)) return ip.get();
 	}
 
 	return nullptr;
@@ -1916,7 +1916,7 @@ std::vector<Scriptable*> Map::GetScriptablesInRect(const Point& p, unsigned int 
 	}
 
 	for (const auto& ip : TMap->GetInfoPoints()) {
-		if (ip->BBox.IntersectsRegion(rect)) neighbours.emplace_back(ip);
+		if (ip->BBox.IntersectsRegion(rect)) neighbours.emplace_back(ip.get());
 	}
 	return neighbours;
 }
@@ -2113,7 +2113,7 @@ Scriptable* Map::GetScriptableByDialog(const ResRef& resref) const
 	// pst has plenty of talking infopoints, eg. in ar0508 (Lothar's cabinet)
 	for (const auto& ip : TMap->GetInfoPoints()) {
 		if (ip->GetDialog() == resref) {
-			return ip;
+			return ip.get();
 		}
 	}
 

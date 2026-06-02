@@ -16,9 +16,7 @@ namespace GemRB {
 
 TileMap::~TileMap(void)
 {
-	for (const InfoPoint* infoPoint : infoPoints) {
-		delete infoPoint;
-	}
+	infoPoints.clear();
 
 	for (const Door* door : doors) {
 		delete door;
@@ -248,9 +246,9 @@ int TileMap::CleanupContainer(Container* container)
 }
 
 //infopoints
-InfoPoint* TileMap::AddInfoPoint(const ieVariable& Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline)
+Holder<InfoPoint> TileMap::AddInfoPoint(const ieVariable& Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline)
 {
-	InfoPoint* ip = new InfoPoint();
+	auto ip = MakeHolder<InfoPoint>();
 	ip->SetScriptName(Name);
 	switch (Type) {
 		case 0:
@@ -269,10 +267,10 @@ InfoPoint* TileMap::AddInfoPoint(const ieVariable& Name, unsigned short Type, co
 			ip->Type = ST_PROXIMITY;
 			break;
 	}
-	ip->outline = outline;
-	if (ip->outline)
+	if (outline) {
+		ip->outline = outline;
 		ip->BBox = outline->BBox;
-	//ip->Active = true; //set active on creation
+	}
 	infoPoints.push_back(ip);
 	return ip;
 }
@@ -280,7 +278,7 @@ InfoPoint* TileMap::AddInfoPoint(const ieVariable& Name, unsigned short Type, co
 //if detectable is set, then only detectable infopoints will be returned
 InfoPoint* TileMap::GetInfoPoint(const Point& p, bool skipSilent) const
 {
-	for (InfoPoint* infoPoint : infoPoints) {
+	for (const auto& infoPoint : infoPoints) {
 		//these flags disable any kind of user interaction
 		//scripts can still access an infopoint by name
 		if (infoPoint->Flags & (INFO_DOOR | TRAP_DEACTIVATED))
@@ -304,10 +302,10 @@ InfoPoint* TileMap::GetInfoPoint(const Point& p, bool skipSilent) const
 
 		if (infoPoint->outline) {
 			if (infoPoint->outline->PointIn(p)) {
-				return infoPoint;
+				return infoPoint.get();
 			}
 		} else if (infoPoint->BBox.PointInside(p)) {
-			return infoPoint;
+			return infoPoint.get();
 		}
 	}
 	return nullptr;
@@ -315,9 +313,9 @@ InfoPoint* TileMap::GetInfoPoint(const Point& p, bool skipSilent) const
 
 InfoPoint* TileMap::GetInfoPoint(const ieVariable& Name) const
 {
-	for (InfoPoint* infoPoint : infoPoints) {
+	for (const auto& infoPoint : infoPoints) {
 		if (infoPoint->GetScriptName() == Name) {
-			return infoPoint;
+			return infoPoint.get();
 		}
 	}
 	return nullptr;
@@ -328,27 +326,27 @@ InfoPoint* TileMap::GetInfoPoint(size_t idx) const
 	if (idx >= infoPoints.size()) {
 		return nullptr;
 	}
-	return infoPoints[idx];
+	return infoPoints[idx].get();
 }
 
 InfoPoint* TileMap::GetTravelTo(const ResRef& Destination) const
 {
-	for (InfoPoint* infoPoint : infoPoints) {
+	for (const auto& infoPoint : infoPoints) {
 		if (infoPoint->Type != ST_TRAVEL) continue;
 
 		if (infoPoint->Destination == Destination) {
-			return infoPoint;
+			return infoPoint.get();
 		}
 	}
 	return nullptr;
 }
 
-InfoPoint* TileMap::AdjustNearestTravel(Point& p) const
+Holder<InfoPoint> TileMap::AdjustNearestTravel(Point& p) const
 {
 	unsigned int min = UINT_MAX;
-	InfoPoint* best = nullptr;
+	Holder<InfoPoint> best;
 
-	for (InfoPoint* infoPoint : infoPoints) {
+	for (const auto& infoPoint : infoPoints) {
 		if (infoPoint->Type != ST_TRAVEL) continue;
 
 		unsigned int dist = SquaredDistance(p, infoPoint->Pos);
