@@ -71,7 +71,7 @@ int SpellEntry::FindSpell(unsigned int kit) const
 	return it->second;
 }
 
-static int FindSpell(const ResRef& spellref, std::vector<SpellEntry*>& list)
+static int FindSpell(const ResRef& spellref, std::vector<std::unique_ptr<SpellEntry>>& list)
 {
 	size_t i = list.size();
 	while (i--) {
@@ -135,9 +135,9 @@ static int IsShape(const ResRef& name)
 	return -1;
 }
 
-static std::vector<SpellEntry*> splList;
-static std::vector<SpellEntry*> domList;
-static std::vector<SpellEntry*> magList;
+static std::vector<std::unique_ptr<SpellEntry>> splList;
+static std::vector<std::unique_ptr<SpellEntry>> domList;
+static std::vector<std::unique_ptr<SpellEntry>> magList;
 
 static int IsDomain(const ResRef& name, unsigned short level, unsigned int kit)
 {
@@ -262,7 +262,6 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 		return EmptyResRef;
 	}
 
-	const SpellEntry* entry;
 	switch (type) {
 		case IE_IWD2_SPELL_INNATE:
 			return innlist[index];
@@ -274,9 +273,8 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 			// translate the actual kit to a column index to make them comparable
 			// luckily they are in order
 			kit = static_cast<int>(std::log2(kit / 0x8000)); // 0x8000 is the first cleric kit
-			entry = domList[index];
-			if (entry) {
-				const ResRef& ret = entry->FindSpell(level, kit);
+			if (domList[index]) {
+				const ResRef& ret = domList[index]->FindSpell(level, kit);
 				if (!ret.IsEmpty()) {
 					return ret;
 				}
@@ -292,9 +290,8 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 			// translate the actual kit to a column index to make them comparable
 			kit = static_cast<int>(std::log2(kit / 0x40)); // 0x40 is the first mage kit
 			//if it is a specialist spell, return it now
-			entry = magList[index];
-			if (entry) {
-				const ResRef& ret = entry->FindSpell(level, kit);
+			if (magList[index]) {
+				const ResRef& ret = magList[index]->FindSpell(level, kit);
 				if (!ret.IsEmpty()) {
 					return ret;
 				}
@@ -334,17 +331,9 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 static void ReleaseMemoryCRE()
 {
 	randcolors.clear();
-
-	for (auto spl : splList) {
-		delete spl;
-	}
-	for (auto spl : domList) {
-		delete spl;
-	}
-	for (auto spl : magList) {
-		delete spl;
-	}
-
+	splList.clear();
+	domList.clear();
+	magList.clear();
 	innlist.clear();
 	snglist.clear();
 	shplist.clear();
@@ -366,7 +355,7 @@ static void GetSpellTable(const ResRef& tableRef, std::vector<ResRef>& list)
 }
 
 // different tables, but all use listspll.2da for the spell indices
-static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
+static void GetKitSpell(const ResRef& tableRef, std::vector<std::unique_ptr<SpellEntry>>& list)
 {
 	AutoTable tab = gamedata->LoadTable(tableRef);
 	if (!tab) return;
@@ -403,7 +392,7 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 		// IWD2 listdomn has SPWI903 twice
 		auto&& listItem = list[index];
 		if (listItem == nullptr) {
-			listItem = new SpellEntry;
+			listItem = std::make_unique<SpellEntry>();
 			listItem->SetSpell(spellRef);
 		}
 
