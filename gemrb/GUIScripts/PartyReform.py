@@ -14,13 +14,8 @@ import PortraitWindow
 from GUIDefines import *
 from ie_stats import *
 
-FRAME_PC_SELECTED = 0
-FRAME_PC_TARGET   = 1
-
 def UpdateReformWindow (Window, select):
-	needToDrop = GemRB.GetPartySize () - GameCheck.MAX_PARTY_SIZE
-	if needToDrop < 0:
-		needToDrop = 0
+	needToDrop = max(0, GemRB.GetPartySize () - GameCheck.MAX_PARTY_SIZE)
 
 	# excess player number
 	Label = Window.GetControl (0x1000000f)
@@ -56,7 +51,7 @@ def UpdateReformWindow (Window, select):
 				Button.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
 				Button.SetState (IE_GUI_BUTTON_DISABLED)
-			Button.EnableBorder (FRAME_PC_SELECTED, select == pc)
+			Button.EnableBorder (PortraitWindow.FRAME_PC_SELECTED, select == pc)
 
 		portrait = GemRB.GetPlayerPortrait (pc, 1)
 		Button.SetVisible(True)
@@ -116,7 +111,7 @@ def OpenReformPartyWindow ():
 	for Button in PortraitButtons:
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		color = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
-		Button.SetBorder (FRAME_PC_SELECTED, color, 0, 0, Button.GetInsetFrame (1, 1, 2, 2))
+		Button.SetBorder (PortraitWindow.FRAME_PC_SELECTED, color, 0, 0, Button.GetInsetFrame (1, 1, 2, 2))
 		Button.OnPress (lambda btn: UpdateReformWindow (Window, btn.Value))
 
 	# Done
