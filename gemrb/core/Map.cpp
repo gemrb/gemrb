@@ -1587,7 +1587,7 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 
 // adding animation in rendering order, based on its height parameter
 // the originals don't care, so we skip this optimisation in tests
-void Map::AddAnimation(AreaAnimation anim)
+void Map::AddAnimation(const AreaAnimation& anim)
 {
 	if (core->config.UseAsLibrary) {
 		animations.push_back(anim);

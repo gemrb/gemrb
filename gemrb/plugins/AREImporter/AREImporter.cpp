@@ -1192,7 +1192,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 
 void AREImporter::GetAreaAnimation(DataStream* str, Map* map) const
 {
-	AreaAnimation anim = AreaAnimation();
+	AreaAnimation anim {};
 
 	str->ReadVariable(anim.Name);
 	str->ReadPoint(anim.Pos);
@@ -1228,7 +1228,7 @@ void AREImporter::GetAreaAnimation(DataStream* str, Map* map) const
 
 	// set up the animation, it cannot be done here
 	// because a StaticSequence action can change it later
-	map->AddAnimation(std::move(anim));
+	map->AddAnimation(anim);
 }
 
 void AREImporter::GetAmbient(DataStream* str, std::vector<Ambient*>& ambients) const

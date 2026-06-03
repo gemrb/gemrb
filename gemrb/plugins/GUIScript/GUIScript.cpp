@@ -9812,7 +9812,7 @@ static PyObject* GemRB_SetMapAnimation(PyObject* /*self*/, PyObject* args)
 	anim.flags = AreaAnimation::Flags(Flags);
 	anim.sequence = static_cast<AreaAnimation::index_t>(Cycle);
 	anim.height = Height;
-	map->AddAnimation(std::move(anim));
+	map->AddAnimation(anim);
 	Py_RETURN_NONE;
 }
 

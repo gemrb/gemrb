@@ -350,7 +350,7 @@ public:
 
 	void DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t debugFlags);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false) const;
-	void AddAnimation(AreaAnimation anim);
+	void AddAnimation(const AreaAnimation& anim);
 	aniIterator GetFirstAnimation() { return animations.begin(); }
 	std::list<AreaAnimation>::const_iterator GetFirstAnimation() const { return animations.begin(); }
 	AreaAnimation* GetNextAnimation(aniIterator& iter) const
