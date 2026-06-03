@@ -118,6 +118,8 @@ def OpenReformPartyWindow ():
 	Button = Window.GetControl (8)
 	Button.SetText (1403 if GameCheck.IsPST () else 11973)
 	Button.OnPress (Window.Close)
+	# deliberately (re)bind escape, so it doesn't close the window if there is party overflow to resolve
+	Button.MakeEscape ()
 
 	CommonWindow.SetGameGUIHidden (hideFlag)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
