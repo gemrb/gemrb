@@ -27,12 +27,6 @@ else:
 # the dictionary keys match entries in keymap.2da
 AITip = {"Deactivate" : 15918, "Enable" : 15917}
 if GameCheck.IsPST(): #Torment
-	import GUIClasses
-	TimeWindow = None
-	PortWindow = None
-	MenuWindow = None
-	MainWindow = None
-	DiscWindow = None
 	AITip = {	"Deactivate" : 41631, "Enable" : 41646 }
 	OptionTip = { # dictionary to the stringrefs in each games dialog.tlk
 	'Inventory' : 41601, 'Map': 41625, MageSpellsKey : 41624, 'Priest_Spells': 4709, CharacterStatsKey : 4707, 'Journal': 41623,

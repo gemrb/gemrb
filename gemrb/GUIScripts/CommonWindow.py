@@ -30,3 +30,12 @@ def AddScrollbarProxy(win, sbar, leftctl):
 	scrollview.SetEventProxy(sbar)
 	
 AddScrollbarProxy.proxyID = 1000
+
+def PortraitPanePress ():
+	"""Toggles the portraits pane """
+	PP = GemRB.GetGUIFlags () & GS_PORTRAITPANE
+	if PP:
+		GemRB.GameSetScreenFlags (GS_PORTRAITPANE, OP_NAND)
+	else:
+		GemRB.GameSetScreenFlags (GS_PORTRAITPANE, OP_OR)
+	return

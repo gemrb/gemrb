@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-
-# GUICommonWindows.py - functions to open common
-# windows in lower part of the screen
+# GUICommonWindows.py - shared code for managing top windows and more
 ###################################################
 
 import GemRB
@@ -18,14 +16,7 @@ import GameCheck
 import GUICommon
 import InventoryCommon
 
-def PortraitPress ():
-	"""Toggles the portraits pane """
-	PP = GemRB.GetGUIFlags () & GS_PORTRAITPANE
-	if PP:
-		GemRB.GameSetScreenFlags (GS_PORTRAITPANE, OP_NAND)
-	else:
-		GemRB.GameSetScreenFlags (GS_PORTRAITPANE, OP_OR)
-	return
+DiscWindow = None
 
 # NOTE: the following two features are only used in pst
 # which=INVENTORY|STATS|FMENU
@@ -37,7 +28,6 @@ def GetActorPortrait (actor, which):
 	row = "0x%02X" %anim_id
 
 	return CommonTables.Pdolls.GetValue (row, which)
-
 
 def UpdateAnimation ():
 	if not GemRB.HasResource ("ANIMS", RES_2DA, 1):
