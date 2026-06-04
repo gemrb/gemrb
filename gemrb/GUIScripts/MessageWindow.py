@@ -64,18 +64,22 @@ def OnLoad():
 
 	Button = ActionsWindow.GetControl (60)
 	if Button:
-		Button.OnPress (lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
+		Button.OnPress (ToggleMenuWindow)
 		Button = ActionsWindow.GetControl (61)
 		Button.OnPress (lambda: ToggleWindowMinimize(PortraitWin, GS_PORTRAITPANE))
 
 	# 1280 and higher don't have this control
 	Button = OptionsWindow.GetControl (10)
 	if Button:
-		Button.OnPress (lambda: ToggleWindowMinimize(OptionsWindow, GS_OPTIONPANE))
+		Button.OnPress (ToggleMenuWindow)
 		Button = PortraitWin.GetControl (8)
 		Button.OnPress (lambda: ToggleWindowMinimize(PortraitWin, GS_PORTRAITPANE))
 
 	UpdateControlStatus(True)
+
+# also used by keybindings
+def ToggleMenuWindow():
+	ToggleWindowMinimize (GemRB.GetView ("OPTWIN"), GS_OPTIONPANE)
 
 tries = 0
 def MWinBG(size, pack = None):

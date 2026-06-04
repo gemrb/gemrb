@@ -49,3 +49,6 @@ def OnLoad():
 
 def UpdateControlStatus():
 	pass
+
+def ToggleMenuWindow():
+	pass

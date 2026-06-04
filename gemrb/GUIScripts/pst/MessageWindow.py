@@ -112,3 +112,5 @@ def UpdateControlStatus ():
 	elif MWindow:
 		MWindow.Close()
 
+def ToggleMenuWindow():
+	pass
