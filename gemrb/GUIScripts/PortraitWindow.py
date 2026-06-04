@@ -7,6 +7,7 @@ import GameCheck
 import GUICommon
 import GUICommonWindows
 import LUCommon
+import MenuWindow
 
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
@@ -268,7 +269,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			if GameCheck.IsIWD():
 				# Rest (iwd)
 				Button.SetTooltip (11942)
-				Button.OnPress (GUICommonWindows.RestPress)
+				Button.OnPress (MenuWindow.RestPress)
 			else:
 				Button.OnPress (MinimizePortraits)
 		else:
@@ -278,7 +279,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 				Button = Window.CreateButton (8, 6, pos, 55, 37)
 				Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 				Button.SetTooltip (11942)
-				Button.OnPress (GUICommonWindows.RestPress)
+				Button.OnPress (MenuWindow.RestPress)
 
 				pos = pos - 37
 				Window.CreateButton (6, 6, pos, 27, 36)
@@ -287,8 +288,8 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button = Window.GetControl (6)
 		#fixing a gui bug, and while we are at it, hacking it to be easier
 		Button.SetSprites ("GUIBTACT", 0, 46, 47, 48, 49)
-		GUICommonWindows.InitOptionButton(Window, 'Toggle_AI', GUICommonWindows.AIPress)
-		GUICommonWindows.AIPress(0) #this initialises the state and tooltip
+		MenuWindow.InitOptionButton (Window, 'Toggle_AI', MenuWindow.AIPress)
+		MenuWindow.AIPress (0) # this initialises the state and tooltip
 
 		#Select All
 		if GameCheck.HasHOW():
@@ -302,7 +303,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button = Window.GetControl (6)
 		if Button:
 			Button.SetTooltip (11942)
-			Button.OnPress (GUICommonWindows.RestPress)
+			Button.OnPress (MenuWindow.RestPress)
 
 	PortraitButtons = GetPortraitButtons (Window)
 	for Button in PortraitButtons:

@@ -29,15 +29,15 @@ Equip_Melee_Weapon    ActionsWindow    ActionMeleePressed                0
 Equip_Range_Weapon    ActionsWindow    ActionRangePressed                0
 Quick_Load            GUILOAD          QuickLoadPressed                  0
 Quick_Save            GUISAVE          QuickSavePressed                  0
-Rest                  GUICommonWindows RestPress                         0
+Rest                  MenuWindow       RestPress                         0
 Hide_Interface        CommonWindow     ToggleGUIHidden                   0
 Right_Interface       GUICommonWindows PortraitPress                     0
 Left_Interface        GUICommonWindows OptionsPress                      0
-Toggle_AI             GUICommonWindows AIPress                           0
+Toggle_AI             MenuWindow       AIPress                           0
 Hard_Pause            GUICommonWindows HardPausePressed                  0
 Location              GUICommon        LocationPressed                   0
 Chat_Window           GUIMP            *
-Center_Character      GUICommonWindows OnLockViewPress                   0
+Center_Character      MenuWindow       OnLockViewPress                   0
 Spell_Slot_1          ActionsWindow    ActionQSpell1Pressed              0
 Spell_Slot_2          ActionsWindow    ActionQSpell2Pressed              0
 Spell_Slot_3          ActionsWindow    ActionQSpell3Pressed              0

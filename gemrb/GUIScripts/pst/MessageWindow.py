@@ -15,6 +15,7 @@ import GUICommonWindows
 import CommonWindow
 import GUIWORLD
 import Clock
+import MenuWindow
 import PortraitWindow
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
@@ -70,7 +71,7 @@ def OnLoad():
 	OpenButton.OnPress (MWindow.Focus)
 
 	SetupClockWindowControls (ActionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow)
+	MenuWindow.SetupMenuWindowControls (OptionsWindow)
 
 	UpdateControlStatus ()
 	

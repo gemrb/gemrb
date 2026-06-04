@@ -5,7 +5,6 @@
 import GemRB
 import Tests
 import GUICommon
-import GUICommonWindows
 import CommonWindow
 import GUIClasses
 import GUIINV

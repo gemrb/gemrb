@@ -4,7 +4,7 @@
 
 import GemRB
 import GUICommon
-import GUICommonWindows
+import MenuWindow
 import GUIClasses
 import PortraitWindow
 from GameCheck import MAX_PARTY_SIZE
@@ -21,7 +21,7 @@ def OnLoad():
 	OptionsWindow.AddAlias("OPTWIN")
 	OptionsWindow.AddAlias("HIDE_CUT", 2)
 	OptionsWindow.AddAlias("NOT_DLG", 1)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
+	MenuWindow.SetupMenuWindowControls (OptionsWindow, 1, None)
 
 	# this also has the small MTA window
 	OptionsWindow.AddAlias("MSGWIN")

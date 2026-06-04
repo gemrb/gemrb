@@ -10,7 +10,7 @@ import GemRB
 import ActionsWindow as ActionsWindowModule
 import GameCheck
 import GUICommon
-import GUICommonWindows
+import MenuWindow
 import PortraitWindow
 
 from ie_restype import RES_MOS
@@ -57,7 +57,7 @@ def OnLoad():
 	OptionsWindow.AddAlias("HIDE_CUT", 2)
 	OptionsWindow.AddAlias("NOT_DLG", 1)
 	
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
+	MenuWindow.SetupMenuWindowControls (OptionsWindow, 1, None)
 	PortraitWin = PortraitWindow.OpenPortraitWindow(1)
 	PortraitWin.AddAlias("HIDE_CUT", 3)
 	PortraitWin.AddAlias("NOT_DLG", 2)

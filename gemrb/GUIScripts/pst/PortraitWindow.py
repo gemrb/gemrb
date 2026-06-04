@@ -6,6 +6,7 @@ import random
 
 import GemRB
 import GUICommonWindows
+import MenuWindow
 from GUICommon import BindControlCallbackParams
 from GUIDefines import *
 from ie_stats import *
@@ -39,7 +40,7 @@ def OpenPortraitWindow (pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	# Rest
 	Button = Window.GetControl (6)
 	Button.SetTooltip (11942)
-	Button.OnPress (GUICommonWindows.RestPress)
+	Button.OnPress (MenuWindow.RestPress)
 
 	PortraitButtons = GetPortraitButtons (Window)
 	for Button in PortraitButtons:
