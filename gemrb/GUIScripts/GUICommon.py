@@ -246,50 +246,6 @@ def RemoveClassAbility (pc, ab):
 	elif ab[:3] != "FA_" and ab[:3] != "FS_":
 		GemRB.Log (LOG_ERROR, "RemoveClassAbilities", "Unknown class ability (type): " + ab)
 
-# PST uses a button, IWD2 two types, the rest are the same with two labels
-def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
-	"""Displays the encumbrance as a ratio of current to maximum."""
-
-	# encumbrance
-	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
-	max_encumb = GemRB.GetMaxEncumbrance (pc)
-
-	Control = Window.GetControl (ControlID)
-	if GameCheck.IsPST():
-		# FIXME: there should be a space before LB symbol (':') - but there is no frame for it and our doesn't cut it
-		Control.SetText (str (encumbrance) + ":\n\n" + str (max_encumb) + ":")
-	elif GameCheck.IsIWD2() and not Control2ID:
-		Control.SetText (str (encumbrance) + "/" + str(max_encumb) + GemRB.GetString(39537))
-	else:
-		Control.SetText (str (encumbrance) + ":")
-		if not Control2ID: # shouldn't happen
-			print("Missing second control parameter to SetEncumbranceLabels!")
-			return
-		Control2 = Window.GetControl (Control2ID)
-		Control2.SetText (str (max_encumb) + ":")
-
-	ratio = encumbrance / max_encumb
-	if GameCheck.IsIWD2 () or GameCheck.IsPST ():
-		if ratio > 1.0:
-			Control.SetColor ({'r' : 255, 'g' : 0, 'b' : 0})
-		elif ratio > 0.8:
-			Control.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
-		else:
-			Control.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
-
-		if Control2ID:
-			Control2.SetColor ({'r' : 255, 'g' : 0, 'b' : 0})
-
-	else:
-		if ratio > 1.0:
-			Control.SetFont ("NUMBER3");
-		elif ratio > 0.8:
-			Control.SetFont ("NUMBER2");
-		else:
-			Control.SetFont ("NUMBER");
-
-	return
-
 def GetRaceRowName (actor, race = -1):
 	if race != -1:
 		raceIndex = CommonTables.Races.FindValue ("ID", race)

@@ -1149,3 +1149,46 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 		# this check does not catch scrolls that are not learnable (e.g. priest scrolls)
 		Button.SetItemIcon (Slot['ItemResRef'], 1 if GameCheck.IsAnyEE () and scroll else 0)
 	return
+
+# PST uses a button, IWD2 two types, the rest are the same with two labels
+def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
+	"""Displays the encumbrance as a ratio of current to maximum."""
+
+	# encumbrance
+	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
+	maxEncumb = GemRB.GetMaxEncumbrance (pc)
+
+	Control = Window.GetControl (ControlID)
+	if GameCheck.IsPST():
+		# FIXME: there should be a space before LB symbol (':') - but there is no frame for it and our doesn't cut it
+		Control.SetText (str (encumbrance) + ":\n\n" + str (maxEncumb) + ":")
+	elif GameCheck.IsIWD2 () and not Control2ID:
+		Control.SetText (str (encumbrance) + "/" + str(maxEncumb) + GemRB.GetString (39537))
+	else:
+		Control.SetText (str (encumbrance) + ":")
+		if not Control2ID: # shouldn't happen
+			print("Missing second control parameter to SetEncumbranceLabels!")
+			return
+		Control2 = Window.GetControl (Control2ID)
+		Control2.SetText (str (maxEncumb) + ":")
+
+	ratio = encumbrance / maxEncumb
+	if GameCheck.IsIWD2 () or GameCheck.IsPST ():
+		if ratio > 1.0:
+			Control.SetColor ({'r' : 255, 'g' : 0, 'b' : 0})
+		elif ratio > 0.8:
+			Control.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
+		else:
+			Control.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
+
+		if Control2ID:
+			Control2.SetColor ({'r' : 255, 'g' : 0, 'b' : 0})
+	else:
+		if ratio > 1.0:
+			Control.SetFont ("NUMBER3");
+		elif ratio > 0.8:
+			Control.SetFont ("NUMBER2");
+		else:
+			Control.SetFont ("NUMBER");
+
+	return

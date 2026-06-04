@@ -4,7 +4,6 @@
 
 import GemRB
 import GameCheck
-import GUIClasses
 import GUICommon
 import InventoryCommon
 from CommonWindow import SetGameGUIHidden, IsGameGUIHidden
@@ -28,9 +27,9 @@ def UpdateContainerWindow ():
 
 	pc = GemRB.GameGetFirstSelectedPC ()
 	if GameCheck.IsPST():
-		GUICommon.SetEncumbranceLabels (Window, 54, None, pc)
+		InventoryCommon.SetEncumbranceLabels (Window, 54, None, pc)
 	else:
-		GUICommon.SetEncumbranceLabels (Window, 0x10000045, 0x10000046, pc)
+		InventoryCommon.SetEncumbranceLabels (Window, 0x10000045, 0x10000046, pc)
 
 	party_gold = GemRB.GameGetPartyGold ()
 	Text = Window.GetControl (0x10000036)

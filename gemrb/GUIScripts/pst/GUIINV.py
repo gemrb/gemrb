@@ -167,7 +167,7 @@ def RefreshInventoryWindow (Window):
 	Button = Window.GetControl (44)
 	Button.SetPicture (GUICommonWindows.GetActorPortrait (pc, 'INVENTORY'))
 
-	GUICommon.SetEncumbranceLabels (Window, 46, None, pc)
+	InventoryCommon.SetEncumbranceLabels (Window, 46, None, pc)
 
 	# armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)

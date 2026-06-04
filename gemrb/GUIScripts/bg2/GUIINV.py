@@ -158,7 +158,7 @@ def RefreshInventoryWindow (Window):
 		PaperDoll.SetupEquipment (pc, Button, size, stats)
 
 	# encumbrance
-	GUICommon.SetEncumbranceLabels ( Window, 0x10000043, 0x10000044, pc)
+	InventoryCommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 
 	# armor class
 	GUICommon.DisplayAC (pc, Window, 0x10000038)

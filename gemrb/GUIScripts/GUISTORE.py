@@ -11,6 +11,7 @@ import GemRB
 import GameCheck
 import GUICommon
 import GUICommonWindows
+import InventoryCommon
 from CommonWindow import AddScrollbarProxy
 from GUIDefines import *
 from ie_stats import *
@@ -1291,9 +1292,9 @@ def RedrawStoreShoppingWindow (Window):
 		SetupItems (pc, Slot, Button, Label, i, ITEM_BAG if Bag else ITEM_PC)
 
 	if GameCheck.IsPST():
-		GUICommon.SetEncumbranceLabels (Window, 25, None, pc)
+		InventoryCommon.SetEncumbranceLabels (Window, 25, None, pc)
 	else:
-		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
+		InventoryCommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 	return
 
 def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
@@ -1634,9 +1635,9 @@ def RedrawStoreStealWindow (Window):
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	if GameCheck.IsPST():
-		GUICommon.SetEncumbranceLabels (Window, 22, None, pc)
+		InventoryCommon.SetEncumbranceLabels (Window, 22, None, pc)
 	else:
-		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
+		InventoryCommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 	return
 
 def SetupItems (pc, Slot, Button, Label, i, storetype, steal = False):
