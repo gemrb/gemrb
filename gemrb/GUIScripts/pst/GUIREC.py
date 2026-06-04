@@ -439,7 +439,6 @@ def GetStatOverview (pc):
 	won = "[color=FFFFFF]"
 	woff = "[/color]"
 
-	GB = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s, 1)
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 
 	stats = []

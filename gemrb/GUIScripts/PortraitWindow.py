@@ -84,7 +84,7 @@ def SetupDamageInfo (Button):
 # in the rest, it will enable extra button generation for higher resolutions
 # Mode determines arrangement direction, horizontal being for party reform and potentially save/load
 def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
-	list = []
+	portraitList = []
 
 	oldSlotCount = 6 + ExtraSlots
 
@@ -92,25 +92,25 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 		btn = Window.GetControl(i)
 		btn.SetHotKey(chr(ord('1') + i), 0, True)
 		btn.SetVarAssoc("portrait", i + 1)
-		list.append(btn)
+		portraitList.append(btn)
 
 	# nothing left to do
 	PartySize = GemRB.GetPartySize ()
 	if PartySize <= oldSlotCount:
-		return list
+		return portraitList
 
 	if GameCheck.IsIWD2():
 		# set Mode = "horizontal" once we can create enough space
 		GemRB.Log(LOG_ERROR, "GetPortraitButtons", "Parties larger than 6 are currently not supported in IWD2! Using 6 ...")
-		return list
+		return portraitList
 
 	# GUIWORLD doesn't have a separate portraits window, so we need to skip
 	# all this magic when reforming an overflowing party
 	if PartySize > MAX_PARTY_SIZE:
-		return list
+		return portraitList
 
 	# generate new buttons by copying from existing ones
-	firstButton = list[0]
+	firstButton = portraitList[0]
 	firstRect = firstButton.GetFrame ()
 	buttonHeight = firstRect["h"]
 	buttonWidth = firstRect["w"]
@@ -146,13 +146,13 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 			limit = windowHeight - buttonHeight * 6 + unused
 		limitStep = buttonHeight
 
-	for i in range(len(list), PartySize):
+	for i in range(len(portraitList), PartySize):
 		if limitStep > limit:
 			raise SystemExit("Not enough window space for so many party members (portraits), bailing out! %d vs width/height of %d/%d" %(limit, buttonWidth, buttonHeight))
 		nextID = 1000 + i
 		control = Window.GetControl (nextID)
 		if control:
-			list.append(control)
+			portraitList.append(control)
 			continue
 		if Mode ==  "horizontal":
 			button = Window.CreateButton (nextID, xOffset+i*buttonWidth, yOffset, buttonWidth, buttonHeight)
@@ -163,13 +163,13 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 		SetupPortraitButton (button, i + 1)
 		button.SetSprites ("GUIRSPOR", 0, 0, 1, 0, 0)
 
-		list.append(button)
+		portraitList.append(button)
 		limit -= limitStep
 
 	# move the buttons back up, to combine the freed space
 	if scale:
 		for i in range(PartySize - 1):
-			button = list[i]
+			button = portraitList[i]
 			button.SetSize (buttonWidth, buttonHeight)
 			if i == 0:
 				continue # don't move the first portrait
@@ -178,7 +178,7 @@ def GetPortraitButtons (Window, ExtraSlots=0, Mode="vertical"):
 			y = rect["y"]
 			button.SetPos (x, y-portraitGap*i)
 
-	return list
+	return portraitList
 
 def SetupPortraitButton (Button, pcID, needControls = 0):
 	Button.SetVarAssoc ("portrait", pcID)

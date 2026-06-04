@@ -99,15 +99,15 @@ def Exec(cmd):
 		if con:
 			sys.stdout = OutputCapture(stdout)
 
-		locals = {} # we dont want to expose our locals
+		locals0 = {} # we dont want to expose our locals
 		modend = cmd.find('.')
 		paren = cmd.find('(')
 		if modend > -1 and (paren == -1 or modend < paren):
 			import importlib
 			importlib.invalidate_caches()
 			modname = cmd[0:modend]
-			locals[modname] = importlib.import_module(modname)
-		return eval(cmd, globals(), locals)
+			locals0[modname] = importlib.import_module(modname)
+		return eval(cmd, globals(), locals0)
 	except (SyntaxError, NameError, TypeError, ZeroDivisionError) as error:
 		if con:
 			con.Append("[color=ffffff]" + cmd + ": [/color][color=ff0000]" + str(error) + "[/color]\n")

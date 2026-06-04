@@ -213,7 +213,6 @@ def UpdateSpellBookWindow (Window):
 	# sorcerer-style books are different, since max_mem_cnt holds the total level capacity, not the slot count
 	# and they display just the current and total number of memorizations per level
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, BookType, level)
-	mem_cnt = GetMemorizedSpellsCount (memorized) # count of unique memorized spells
 	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, BookType, level, True)
 	Label = Window.GetControl (0x10000004)
 	if sorcerer_style:

@@ -12,18 +12,18 @@ from GUIDefines import *
 from ie_stats import *
 
 def GetPortraitButtons(Window, *args):
-	list = []
+	portraitList = []
 	for i in range(6):
 		btn = Window.GetControl(i)
 		btn.SetVarAssoc("portrait", i + 1)
-		list.append(btn)
-	return list
+		portraitList.append(btn)
+	return portraitList
 
 def PortraitButtonHPOnPress (btn):
-	id = btn.ControlID - 6
+	btnID = btn.ControlID - 6
 	hbs = GemRB.GetVar('Health Bar Settings')
-	GemRB.SetVar('Health Bar Settings', hbs ^ (1 << id))
-	UpdatePortraitButton(btn.Window.GetControl(id))
+	GemRB.SetVar ('Health Bar Settings', hbs ^ (1 << btnID))
+	UpdatePortraitButton (btn.Window.GetControl (btnID))
 	return
 
 def SetupButtonBorders (Button):

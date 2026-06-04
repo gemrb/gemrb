@@ -807,7 +807,7 @@ def OpenContingenciesWindow():
 				spellBtn3.SetBAM (cont["Spell3Icon"][:-1] + "b", 0, 0)
 
 			# warning: can take out too many
-			handBtn.OnPress (lambda: GemRB.DispelEffect (pc, "CastSpellOnCondition", cont["Param2"]))
+			handBtn.OnPress (lambda ctg = cont: GemRB.DispelEffect (pc, "CastSpellOnCondition", ctg["Param2"]))
 		elif cidx < len(contingencies) + len(sequencers):
 			rowID1.SetText (str(cidx + 1))
 			cont = sequencers[cidx - len(contingencies)]
@@ -821,7 +821,7 @@ def OpenContingenciesWindow():
 				spellBtn3.SetBAM (cont["Spell3Icon"][:-1] + "b", 0, 0)
 
 			# warning: can take out too many
-			handBtn.OnPress (lambda: GemRB.DispelEffect (pc, "CastSpellOnCondition", cont["Param2"]))
+			handBtn.OnPress (lambda ctg = cont: GemRB.DispelEffect (pc, "CastSpellOnCondition", ctg["Param2"]))
 		else:
 			rowID1.SetText (None)
 			rowID2.SetText (None)
