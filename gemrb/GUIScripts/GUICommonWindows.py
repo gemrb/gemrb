@@ -132,7 +132,7 @@ def CloseTopWindow ():
 	# we cannot close the current WIN_TOP unless it has focus
 	if window and window.HasFocus == True:
 		window.Close()
-		UpdateClock()
+		Clock.UpdateClock()
 
 def TopWindowClosed(window):
 	optwin = GemRB.GetView("OPTWIN")
@@ -258,7 +258,7 @@ def ToggleWindow(id, pack, pos=WINDOW_CENTER):
 	window = GemRB.GetView(pack, id)
 	if window:
 		window.Close()
-		UpdateClock ()
+		Clock.UpdateClock ()
 		return None
 	else:
 		return GemRB.LoadWindow(id, pack, pos)
