@@ -98,8 +98,10 @@ enum class ModalFeat : ieDword {
 
 #define GUIBT_COUNT (MAX_QSLOTS + 3)
 
-#define FAV_SPELL  0
-#define FAV_WEAPON 1
+enum class Favourite {
+	Spell,
+	Weapon,
+};
 
 class GEM_EXPORT PCStatsStruct {
 public:
@@ -154,7 +156,7 @@ public:
 	void SetSlotIndex(unsigned int which, ieWord headerindex);
 	void GetSlotAndIndex(unsigned int which, ieWord& slot, ieWord& headerindex) const;
 	int GetHeaderForSlot(int slot) const;
-	void RegisterFavourite(const ResRef& fav, int what);
+	void RegisterFavourite(const ResRef& fav, Favourite what);
 
 	std::string GetStateString() const;
 	void EnableState(state_t state);

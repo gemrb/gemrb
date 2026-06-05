@@ -222,12 +222,12 @@ static void RegisterFavorite(PCStatsStruct::FavoriteList& favorites, const ResRe
 	}
 }
 
-void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
+void PCStatsStruct::RegisterFavourite(const ResRef& fav, Favourite what)
 {
 	switch (what) {
-		case FAV_SPELL:
+		case Favourite::Spell:
 			return RegisterFavorite(FavouriteSpells, fav);
-		case FAV_WEAPON:
+		case Favourite::Weapon:
 			return RegisterFavorite(FavouriteWeapons, fav);
 		default:
 			Log(ERROR, "PCStatsStruct", "Illegal RegisterFavourite call: {}", what);

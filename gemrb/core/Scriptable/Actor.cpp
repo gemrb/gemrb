@@ -7403,7 +7403,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	if (PCStats) {
-		PCStats->RegisterFavourite(weaponInfo[usedLeftHand].item->Name, FAV_WEAPON);
+		PCStats->RegisterFavourite(weaponInfo[usedLeftHand].item->Name, Favourite::Weapon);
 	}
 
 	//if this is the first call of the round, we need to update next attack
