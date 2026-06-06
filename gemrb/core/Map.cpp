@@ -2089,7 +2089,8 @@ Actor* Map::GetActor(int index, bool any) const
 		return actors[index];
 	}
 	for (auto actor : actors) {
-		if (MustSave(actor) && !index--) {
+		if (!MustSave(actor)) continue;
+		if (!index--) {
 			return actor;
 		}
 	}

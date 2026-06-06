@@ -312,9 +312,9 @@ Action* GenerateActionCore(const char* src, const char* str, unsigned short acti
 							}
 
 							// this works only if there are no spaces
-							if (*src++ != ',' || *src++ != '"') {
-								break;
-							}
+							if (*src++ != ',') break;
+							if (*src++ != '"') break;
+
 							// reading the context string
 							i = 0;
 							while (*src != '"') {
@@ -441,9 +441,10 @@ Trigger* GenerateTriggerCore(const char* src, const char* str, int trIndex, int 
 							}
 
 							// this works only if there are no spaces
-							if (*src++ != '"' || *src++ != ',' || *src++ != '"') {
-								break;
-							}
+							if (*src++ != '"') break;
+							if (*src++ != ',') break;
+							if (*src++ != '"') break;
+
 							// reading the context string
 							i = 0;
 							while (*src != '"' && (*src != '#' || (*(src - 1) != '(' && *(src - 1) != ','))) {
