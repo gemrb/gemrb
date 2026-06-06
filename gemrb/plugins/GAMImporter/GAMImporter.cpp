@@ -381,7 +381,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 			//quick innates
 			//we spare some memory and time by storing them in the same place
 			//this may be slightly buggy because IWD2 doesn't clear the
-			//fields, but QuickSpellClass is set correctly
+			//fields, but QuickSpellBookType is set correctly
 			ResRef tmp;
 			for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
 				str->ReadResRef(tmp);
@@ -391,7 +391,7 @@ Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_par
 					ps.QuickSpellBookType[i] = 0xff;
 				}
 			}
-			//recently discovered fields (bard songs)
+			// quick/bard songs
 			for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
 				str->ReadResRef(tmp);
 				if (!tmp.IsEmpty() && ps.QuickSpells[i].IsEmpty()) {
