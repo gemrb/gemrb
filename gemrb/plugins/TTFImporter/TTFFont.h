@@ -20,7 +20,7 @@ private:
 
 public:
 	TTFFont(Holder<Palette> pal, FT_Face face, int lineheight, int baseline);
-	~TTFFont(void) override;
+	~TTFFont(void);
 
 	const Glyph& GetGlyph(ieWord chr) const override;
 	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const override;

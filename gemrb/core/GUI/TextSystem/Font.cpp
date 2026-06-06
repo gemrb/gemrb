@@ -179,13 +179,6 @@ Font::Font(Holder<Palette> pal, ieWord lineheight, ieWord baseline, bool bg)
 	: palette(std::move(pal)), background(bg), LineHeight(lineheight), Baseline(baseline)
 {}
 
-Font::~Font(void)
-{
-	for (const auto& page : Atlas) {
-		delete page;
-	}
-}
-
 void Font::CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph* g)
 {
 	if (chr >= AtlasIndex.size()) {
@@ -211,7 +204,7 @@ const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>& 
 	// adjust the location for the glyph
 	if (!CurrentAtlasPage || !CurrentAtlasPage->AddGlyph(chr, tmp)) {
 		// page is full, make a new one
-		CurrentAtlasPage = new GlyphAtlasPage(Size(1024, LineHeight), this);
+		CurrentAtlasPage = MakeHolder<GlyphAtlasPage>(Size(1024, LineHeight), this);
 		Atlas.push_back(CurrentAtlasPage);
 		bool ok = CurrentAtlasPage->AddGlyph(chr, tmp);
 		assert(ok);
@@ -478,7 +471,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			} else {
 				size_t pageIdx = AtlasIndex[currChar].pageIdx;
 				if (pageIdx < Atlas.size()) {
-					GlyphAtlasPage* page = Atlas[pageIdx];
+					Holder<GlyphAtlasPage> page = Atlas[pageIdx];
 					page->Draw(currChar, Region(blitPoint, curGlyph.size), colors);
 				}
 			}

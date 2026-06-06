@@ -136,11 +136,9 @@ private:
 	};
 
 	using GlyphIndex = std::vector<GlyphIndexEntry>;
-	// TODO: Unfortunately, we have no smart pointer suitable for an STL container...
-	// if we ever transition to C++11 we can use one here
-	using GlyphAtlas = std::deque<GlyphAtlasPage*>;
+	using GlyphAtlas = std::deque<Holder<GlyphAtlasPage>>;
 
-	GlyphAtlasPage* CurrentAtlasPage = nullptr;
+	Holder<GlyphAtlasPage> CurrentAtlasPage;
 	GlyphIndex AtlasIndex;
 	GlyphAtlas Atlas;
 
@@ -166,7 +164,6 @@ private:
 public:
 	Font(Holder<Palette> pal, ieWord lineheight, ieWord baseline, bool bg);
 	Font(const Font&) = delete;
-	virtual ~Font();
 	Font& operator=(const Font&) = delete;
 
 	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>&);
