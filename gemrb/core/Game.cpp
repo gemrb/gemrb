@@ -141,10 +141,6 @@ Game::~Game(void)
 		free(mazedata);
 	}
 
-	for (auto journal : Journals) {
-		delete journal;
-	}
-
 	for (auto sp : savedpositions) {
 		delete sp;
 	}
@@ -1008,7 +1004,6 @@ void Game::DeleteJournalEntry(ieStrRef strRef)
 	size_t i = Journals.size();
 	while (i--) {
 		if (Journals[i]->Text == strRef || strRef == ieStrRef(-1)) {
-			delete Journals[i];
 			Journals.erase(Journals.begin() + i);
 		}
 	}
@@ -1019,7 +1014,6 @@ void Game::DeleteJournalGroup(ieByte group)
 	size_t i = Journals.size();
 	while (i--) {
 		if (Journals[i]->Group == group) {
-			delete Journals[i];
 			Journals.erase(Journals.begin() + i);
 		}
 	}
@@ -1049,19 +1043,20 @@ bool Game::AddJournalEntry(ieStrRef strRef, JournalSection section, ieByte group
 			return true;
 		}
 	}
-	je = new GAMJournalEntry;
-	je->GameTime = GameTime;
+
+	auto newEntry = std::make_unique<GAMJournalEntry>();
+	newEntry->GameTime = GameTime;
 	ieDword chapter = 0;
 	if (!core->HasFeature(GFFlags::NO_NEW_VARIABLES)) {
 		chapter = GetGlobal("CHAPTER", 0);
 	}
-	je->Chapter = (ieByte) chapter;
-	je->unknown09 = 0;
-	je->Section = UnderType(section);
-	je->Group = group;
-	je->Text = strRef;
+	newEntry->Chapter = (ieByte) chapter;
+	newEntry->unknown09 = 0;
+	newEntry->Section = UnderType(section);
+	newEntry->Group = group;
+	newEntry->Text = strRef;
 
-	Journals.push_back(je);
+	Journals.push_back(std::move(newEntry));
 
 	// print some feedback, but it has to be constructed first
 	String msg(u"\n[color=bcefbc]");
@@ -1095,9 +1090,9 @@ bool Game::AddJournalEntry(ieStrRef strRef, JournalSection section, ieByte group
 	return true;
 }
 
-void Game::AddJournalEntry(GAMJournalEntry* entry)
+void Game::AddJournalEntry(std::unique_ptr<GAMJournalEntry> entry)
 {
-	Journals.push_back(entry);
+	Journals.push_back(std::move(entry));
 }
 
 unsigned int Game::GetJournalCount() const
@@ -1107,9 +1102,9 @@ unsigned int Game::GetJournalCount() const
 
 GAMJournalEntry* Game::FindJournalEntry(ieStrRef strRef) const
 {
-	for (auto entry : Journals) {
+	for (auto& entry : Journals) {
 		if (entry->Text == strRef) {
-			return entry;
+			return entry.get();
 		}
 	}
 
@@ -1121,7 +1116,7 @@ GAMJournalEntry* Game::GetJournalEntry(unsigned int index) const
 	if (index >= Journals.size()) {
 		return nullptr;
 	}
-	return Journals[index];
+	return Journals[index].get();
 }
 
 unsigned int Game::GetSavedLocationCount() const

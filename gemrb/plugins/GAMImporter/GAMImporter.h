@@ -50,7 +50,7 @@ private:
 
 	Actor* GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_party);
 	void GetPCStats(PCStatsStruct& ps, bool extended);
-	GAMJournalEntry* GetJournalEntry();
+	std::unique_ptr<GAMJournalEntry> GetJournalEntry();
 
 	int PutHeader(DataStream* stream, const Game* game) const;
 	int PutActor(DataStream* stream, const Actor* ac, ieDword CRESize, ieDword CREOffset, GAMVersion newVersion) const;

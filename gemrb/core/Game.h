@@ -222,7 +222,7 @@ private:
 	std::vector<Actor*> PCs;
 	std::vector<Actor*> NPCs;
 	std::vector<Map*> Maps;
-	std::vector<GAMJournalEntry*> Journals;
+	std::vector<std::unique_ptr<GAMJournalEntry>> Journals;
 	std::vector<GAMLocationEntry*> savedpositions;
 	std::vector<GAMLocationEntry*> planepositions;
 	std::vector<ResRef> mastarea;
@@ -372,7 +372,7 @@ public:
 	 * Returns false if the entry already exists */
 	bool AddJournalEntry(ieStrRef strRef, JournalSection section, ieByte group, ieStrRef feedback = ieStrRef::INVALID);
 	/** Adds a journal entry while loading the .gam structure */
-	void AddJournalEntry(GAMJournalEntry* entry);
+	void AddJournalEntry(std::unique_ptr<GAMJournalEntry> entry);
 	unsigned int GetJournalCount() const;
 	GAMJournalEntry* FindJournalEntry(ieStrRef strRef) const;
 	GAMJournalEntry* GetJournalEntry(unsigned int index) const;

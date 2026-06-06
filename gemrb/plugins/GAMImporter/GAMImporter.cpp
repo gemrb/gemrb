@@ -237,8 +237,8 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 	//Loading Journal entries
 	str->Seek(JournalOffset, GEM_STREAM_START);
 	for (unsigned int i = 0; i < JournalCount; i++) {
-		GAMJournalEntry* je = GetJournalEntry();
-		newGame->AddJournalEntry(je);
+		auto je = GetJournalEntry();
+		newGame->AddJournalEntry(std::move(je));
 	}
 
 	if (version == GAMVersion::PST) {
@@ -545,9 +545,9 @@ void GAMImporter::GetPCStats(PCStatsStruct& ps, bool extended)
 	}
 }
 
-GAMJournalEntry* GAMImporter::GetJournalEntry()
+std::unique_ptr<GAMJournalEntry> GAMImporter::GetJournalEntry()
 {
-	GAMJournalEntry* j = new GAMJournalEntry();
+	auto j = std::make_unique<GAMJournalEntry>();
 
 	str->ReadStrRef(j->Text);
 	str->ReadDword(j->GameTime);
