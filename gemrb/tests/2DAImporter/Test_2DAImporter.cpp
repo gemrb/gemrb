@@ -20,10 +20,10 @@ protected:
 public:
 	void SetUp() override
 	{
-		auto stream = new FileStream {};
+		auto stream = std::make_unique<FileStream>();
 
 		assert(stream->Open(GetParam()));
-		assert(unit.Open(std::unique_ptr<DataStream> { stream }));
+		assert(unit.Open(std::unique_ptr<DataStream> { std::move(stream) }));
 	}
 };
 
@@ -117,9 +117,9 @@ INSTANTIATE_TEST_SUITE_P(
 TEST(p2DAImporterTest, GetColumnCount2)
 {
 	p2DAImporter unit;
-	auto stream = new FileStream {};
+	auto stream = std::make_unique<FileStream>();
 	stream->Open(SAMPLE_FILE2);
-	unit.Open(std::unique_ptr<DataStream> { stream });
+	unit.Open(std::unique_ptr<DataStream> { std::move(stream) });
 	EXPECT_EQ(unit.GetColumnCount(), TableMgr::index_t(1));
 	EXPECT_EQ(unit.GetColumnCount(0), TableMgr::index_t(1));
 }

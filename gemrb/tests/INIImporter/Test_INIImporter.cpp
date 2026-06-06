@@ -18,10 +18,10 @@ protected:
 public:
 	void SetUp() override
 	{
-		auto stream = new FileStream {};
+		auto stream = std::make_unique<FileStream>();
 
 		assert(stream->Open(SAMPLE_FILE));
-		assert(unit.Open(std::unique_ptr<DataStream> { stream }));
+		assert(unit.Open(std::unique_ptr<DataStream> { std::move(stream) }));
 	}
 };
 

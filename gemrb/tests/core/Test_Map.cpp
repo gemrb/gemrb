@@ -20,7 +20,7 @@ namespace GemRB {
 
 class MapTest : public testing::Test {
 public:
-	static const Interface* gemrb;
+	static std::unique_ptr<Interface> gemrb;
 	static Map* map;
 
 	// set up core and the first map from the demo
@@ -32,7 +32,7 @@ public:
 		ToggleLogging(true);
 		SetMainLogLevel(DEBUG);
 		AddLogWriter(createStdioLogWriter());
-		gemrb = new Interface(std::move(cfg));
+		gemrb = std::make_unique<Interface>(std::move(cfg));
 
 		auto gamStream = gamedata->GetResourceStream("gem-demo", IE_GAM_CLASS_ID);
 		auto gamMgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gamStream);
@@ -49,13 +49,13 @@ public:
 		// cleanup to prevent a delay and crash on exit
 		core->SetGame(nullptr);
 		VideoDriver.reset();
-		delete gemrb;
+		gemrb.reset();
 		PluginMgr::Get()->RunCleanup();
 	}
 };
 
 Map* MapTest::map = nullptr;
-const Interface* MapTest::gemrb = nullptr;
+std::unique_ptr<Interface> MapTest::gemrb = nullptr;
 
 static Point badPaths[] = { Point(1270, 640), Point(1071, 699), Point(1170, 967), Point(1126, 601) };
 static Point goodPaths[] = { Point(1126, 601), Point(685, 655), Point(720, 496), Point(1056, 336) };

@@ -12,7 +12,7 @@
 namespace GemRB {
 
 // GTest does not like testing over abstract DataStream
-using DataStreamFactory = std::function<DataStream*(const path_t&)>;
+using DataStreamFactory = std::function<std::unique_ptr<DataStream>(const path_t&)>;
 
 enum class DummyEnum : uint16_t {
 	VALUE_1 = 1,
@@ -25,19 +25,7 @@ static const path_t WRITE_TEST_FILE = PathJoin("tests", "resources", "streams", 
 
 class DataStream_Test : public testing::TestWithParam<DataStreamFactory> {
 protected:
-	DataStream* stream;
-
-public:
-	~DataStream_Test() override
-	{
-		delete stream;
-	}
-
-	void TearDown() override
-	{
-		delete stream;
-		this->stream = nullptr;
-	}
+	std::unique_ptr<DataStream> stream;
 };
 
 class DataStreamReadingTest : public DataStream_Test {
@@ -202,17 +190,17 @@ TEST(DataStreamWritingTest, Writes)
 	}
 }
 
-static DataStream* createFileStream(const path_t& path)
+static std::unique_ptr<DataStream> createFileStream(const path_t& path)
 {
-	auto fstream = new FileStream();
+	auto fstream = std::make_unique<FileStream>();
 	fstream->Open(path);
 
 	return fstream;
 }
 
-static DataStream* createMMapStream(const path_t& path)
+static std::unique_ptr<DataStream> createMMapStream(const path_t& path)
 {
-	return new MappedFileMemoryStream(path);
+	return std::make_unique<MappedFileMemoryStream>(path);
 }
 
 INSTANTIATE_TEST_SUITE_P(
