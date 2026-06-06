@@ -78,6 +78,9 @@ struct PythonCallback {
 	PythonCallback(const PythonCallback& pcb)
 		: PythonCallback(pcb.Function) {}
 
+	PythonCallback(PythonCallback&& other) noexcept
+		: Function(std::exchange(other.Function, nullptr)) {}
+
 	virtual ~PythonCallback()
 	{
 		Py_XDECREF(Function);

@@ -164,7 +164,7 @@ public:
 	PyStringWrapper(const PyStringWrapper&) = delete;
 	PyStringWrapper& operator=(const PyStringWrapper&) = delete;
 
-	PyStringWrapper(PyStringWrapper&& wrap)
+	PyStringWrapper(PyStringWrapper&& wrap) noexcept
 	{
 		std::swap(wrap.str, str);
 		std::swap(wrap.object, object);
