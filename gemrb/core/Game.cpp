@@ -140,14 +140,6 @@ Game::~Game(void)
 	if (mazedata) {
 		free(mazedata);
 	}
-
-	for (auto sp : savedpositions) {
-		delete sp;
-	}
-
-	for (auto pp : planepositions) {
-		delete pp;
-	}
 }
 
 static bool IsAlive(const Actor* pc)
@@ -1126,9 +1118,6 @@ unsigned int Game::GetSavedLocationCount() const
 
 void Game::ClearSavedLocations()
 {
-	for (auto sp : savedpositions) {
-		delete sp;
-	}
 	savedpositions.clear();
 }
 
@@ -1141,10 +1130,10 @@ GAMLocationEntry* Game::GetSavedLocationEntry(unsigned int i)
 		}
 		savedpositions.resize(i + 1);
 		while (current <= i) {
-			savedpositions[current++] = new GAMLocationEntry;
+			savedpositions[current++] = std::make_unique<GAMLocationEntry>();
 		}
 	}
-	return savedpositions[i];
+	return savedpositions[i].get();
 }
 
 unsigned int Game::GetPlaneLocationCount() const
@@ -1154,9 +1143,6 @@ unsigned int Game::GetPlaneLocationCount() const
 
 void Game::ClearPlaneLocations()
 {
-	for (auto pp : planepositions) {
-		delete pp;
-	}
 	planepositions.clear();
 }
 
@@ -1169,10 +1155,10 @@ GAMLocationEntry* Game::GetPlaneLocationEntry(unsigned int i)
 		}
 		planepositions.resize(i + 1);
 		while (current <= i) {
-			planepositions[current++] = new GAMLocationEntry;
+			planepositions[current++] = std::make_unique<GAMLocationEntry>();
 		}
 	}
-	return planepositions[i];
+	return planepositions[i].get();
 }
 
 const ResRef& Game::GetFamiliar(size_t index) const

@@ -223,8 +223,8 @@ private:
 	std::vector<Actor*> NPCs;
 	std::vector<Map*> Maps;
 	std::vector<std::unique_ptr<GAMJournalEntry>> Journals;
-	std::vector<GAMLocationEntry*> savedpositions;
-	std::vector<GAMLocationEntry*> planepositions;
+	std::vector<std::unique_ptr<GAMLocationEntry>> savedpositions;
+	std::vector<std::unique_ptr<GAMLocationEntry>> planepositions;
 	std::vector<ResRef> mastarea;
 	std::vector<std::vector<ResRef>> npclevels;
 	CRRow* crtable = nullptr;
