@@ -1160,17 +1160,16 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
 
 	Control = Window.GetControl (ControlID)
 	if GameCheck.IsPST():
-		# FIXME: there should be a space before LB symbol (':') - but there is no frame for it and our doesn't cut it
-		Control.SetText (str (encumbrance) + ":\n\n" + str (maxEncumb) + ":")
+		Control.SetText (str (encumbrance) + " :\n\n" + str (maxEncumb) + " :")
 	elif GameCheck.IsIWD2 () and not Control2ID:
 		Control.SetText (str (encumbrance) + "/" + str(maxEncumb) + GemRB.GetString (39537))
 	else:
-		Control.SetText (str (encumbrance) + ":")
+		Control.SetText (str (encumbrance) + " :")
 		if not Control2ID: # shouldn't happen
 			print("Missing second control parameter to SetEncumbranceLabels!")
 			return
 		Control2 = Window.GetControl (Control2ID)
-		Control2.SetText (str (maxEncumb) + ":")
+		Control2.SetText (str (maxEncumb) + " :")
 
 	ratio = encumbrance / maxEncumb
 	if GameCheck.IsIWD2 () or GameCheck.IsPST ():
