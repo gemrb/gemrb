@@ -9,6 +9,7 @@
 
 #include "DisplayMessage.h"
 #include "Game.h"
+#include "Geometry.h"
 #include "Interface.h"
 #include "WorldMap.h"
 
@@ -204,6 +205,8 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 	Area = nullptr;
 
 	unsigned int ec = worldmap->GetEntryCount();
+	WMPAreaEntry* closest = nullptr;
+	unsigned int closestDist = 0;
 	for (unsigned int i = 0; i < ec; i++) {
 		WMPAreaEntry* ae = worldmap->GetEntry(i);
 
@@ -222,23 +225,31 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 		if (ftext) {
 			Size ts = ftext->StringSize(ae->GetCaption());
 			ts.w += 10;
-			if (rgn.h < ts.h)
-				rgn.h = ts.h;
-			if (rgn.w < ts.w)
+			if (ts.w > rgn.w) {
+				rgn.x -= (ts.w - rgn.w) / 2;
 				rgn.w = ts.w;
+			}
+			rgn.h += ts.h + ftext->LineHeight;
 		}
 		if (!rgn.PointInside(mapOff)) continue;
 
+		unsigned int dist = SquaredDistance(mapOff, ae->pos);
+		if (!closest || dist < closestDist) {
+			closest = ae;
+			closestDist = dist;
+		}
+	}
+
+	if (closest) {
 		SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
-		Area = ae;
-		if (oldArea != ae) {
+		Area = closest;
+		if (oldArea != closest) {
 			const String str = core->GetString(HCStrings::TravelTime);
 			int hours = worldmap->GetDistance(Area->AreaName);
 			if (!str.empty() && hours >= 0) {
 				SetTooltip(fmt::format(u"{}: {}", str, hours));
 			}
 		}
-		break;
 	}
 	if (Area == nullptr) {
 		SetTooltip(u"");
