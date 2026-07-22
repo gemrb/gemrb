@@ -153,7 +153,8 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 			pixels = DecodeRLEData(dataBegin, rgn.size, CompressedColorIndex);
 		} else {
 			pixels = malloc(rgn.w * rgn.h);
-			memcpy(pixels, dataBegin, rgn.w * rgn.h);
+			str->Seek(frameInfo.location.dataOffset, GEM_STREAM_START);
+			str->Read(pixels, rgn.w * rgn.h);
 		}
 		PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, CompressedColorIndex);
 		spr = VideoDriver->CreateSprite(rgn, pixels, fmt);
