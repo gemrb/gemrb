@@ -75,6 +75,8 @@ Holder<Font> BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*styl
 	auto pal = af->GetFrameWithoutCycle(0)->GetPalette();
 	auto fnt = MakeHolder<Font>(std::move(pal), lineHeight, baseLine, background);
 
+	ieWord digitWidth = isNumeric ? af->GetFrame(0)->Frame.w : 0;
+
 	std::map<Sprite2D*, ieWord> tmp;
 	for (ieWord cycle = 0; cycle < af->GetCycleCount(); cycle++) {
 		for (ieWord frame = 0; frame < af->GetCycleSize(cycle); frame++) {
@@ -84,6 +86,9 @@ Holder<Font> BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*styl
 			ieWord chr = '\0';
 			if (isNumeric) {
 				chr = frame + '0';
+				if (frame >= 10 && spr->Frame.w > digitWidth * 3 / 2) {
+					continue;
+				}
 			} else {
 				chr = ((frame << 8) | (cycle & 0x00ff)) + 1;
 			}
