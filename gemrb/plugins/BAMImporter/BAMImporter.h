@@ -68,7 +68,8 @@ private:
 	void Blit(const FrameEntry& frame, const BAMV2DataBlock& dataBlock, uint8_t* data);
 	std::vector<index_t> CacheFLT();
 	Holder<Sprite2D> GetV2Frame(const FrameEntry& frame);
-	Holder<Sprite2D> GetFrameInternal(const FrameEntry& frame, bool RLESprite, uint8_t* data) const;
+	Holder<Sprite2D> GetFrameInternal(const FrameEntry& frame, bool RLESprite) const;
+	std::vector<uint8_t> ReadRLESource(strpos_t offset, const Size& size) const;
 };
 
 }
