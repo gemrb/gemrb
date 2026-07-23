@@ -77,12 +77,11 @@ Holder<Font> BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*styl
 	auto pal = af->GetFrameWithoutCycle(0)->GetPalette();
 	auto fnt = MakeHolder<Font>(std::move(pal), lineHeight, baseLine, background);
 
-	ieWord digitWidth = isNumeric ? af->GetFrame(0)->Frame.w : 0;
-
 	if (isNumeric) {
-		ieWord spaceWidth = digitWidth / 2;
-		void* pixels = calloc(spaceWidth * lineHeight, 4);
-		Holder<Sprite2D> spaceSpr = VideoDriver->CreateSprite(Region(0, 0, spaceWidth, lineHeight), pixels, PixelFormat::ARGB32Bit());
+		ieWord spaceWidth = af->GetFrame(0)->Frame.w / 2;
+		void* pixels = calloc(spaceWidth * lineHeight, 1);
+		PixelFormat fmt = PixelFormat::Paletted8Bit(af->GetFrameWithoutCycle(0)->GetPalette(), true, 0);
+		Holder<Sprite2D> spaceSpr = VideoDriver->CreateSprite(Region(0, 0, spaceWidth, lineHeight), pixels, fmt);
 		fnt->CreateGlyphForCharSprite(' ', spaceSpr);
 	}
 
