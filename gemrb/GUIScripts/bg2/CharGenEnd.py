@@ -54,9 +54,21 @@ def OnLoad():
 		GUICommon.AddClassAbilities (MyChar, "abstart", 6,6, AlignmentAbbrev)
 
 	# setup starting gold (uses a roll dictated by class
-	TmpTable = GemRB.LoadTable ("strtgold")
-	temp = GemRB.Roll (TmpTable.GetValue (ClassName, "ROLLS"), TmpTable.GetValue (ClassName, "SIDES"), TmpTable.GetValue (ClassName, "MODIFIER"))
-	GemRB.SetPlayerStat (MyChar, IE_GOLD, temp * TmpTable.GetValue (ClassName, "MULTIPLIER"))
+	GoldTable = GemRB.LoadTable ("strtgold")
+	ClosestClassName = ClassName
+	multiplier = GoldTable.GetValue (ClassName, "MULTIPLIER", GTV_INT)
+	if multiplier == 0:
+		# bg2 is missing entries
+		if ClassName == "MONK":
+			ClosestClassName = "FIGHTER"
+		elif ClassName == "SORCERER":
+			ClosestClassName = "MAGE"
+		multiplier = GoldTable.GetValue (ClosestClassName, "MULTIPLIER", GTV_INT)
+	rolls = GoldTable.GetValue (ClosestClassName, "ROLLS", GTV_INT)
+	sides = GoldTable.GetValue (ClosestClassName, "SIDES", GTV_INT)
+	bonus = GoldTable.GetValue (ClosestClassName, "MODIFIER", GTV_INT)
+	baseGold = GemRB.Roll (rolls, sides, bonus) * multiplier
+	GemRB.SetPlayerStat (MyChar, IE_GOLD, baseGold)
 
 	# bgee added stweapon.2da to disable monks getting the plain staff
 	if GameCheck.IsBGEE ():
