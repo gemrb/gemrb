@@ -65,7 +65,7 @@ def IsTOB ():
 	return GemRB.HasResource ("worldm25", RES_WMP) and GemRB.GetVar("oldgame") == 0
 
 def UsesBG2GUI ():
-	return GemRB.GameType in ["bg2", "bg2ee", "bgee"] or GameCheck.IsBG2Demo ()
+	return GemRB.GameType in ["bg2", "bg2ee", "bgee"] or IsBG2Demo ()
 
 def HasTOB ():
 	return not IsBGEE() and GemRB.HasResource ("worldm25", RES_WMP)
