@@ -292,7 +292,7 @@ def OpenGUIEnhancementsWindow ():
 		"Stop scrolling on focus loss",
 		"Outline learnable scrolls",
 		"Remember already identified items",
-		"",
+		"Snap portrait window to top window",
 		""
 	]
 
@@ -304,7 +304,7 @@ def OpenGUIEnhancementsWindow ():
 		"When the mouse leaves the GemRB window, stop any area scrolling that was triggered near the border.",
 		"Lightly outline inventory slots with spell scrolls that can still be learned from.",
 		"Within the same session, remember any items that were identified. This means that if another of its kind is found, it will be autoidentified. And if you already have several copies, only identifying one is needed.",
-		"",
+		"When a top window like the inventory or store is opened, move the portrait window next to it for easier switching between party members.",
 		""
 	]
 
@@ -330,6 +330,7 @@ def OpenGUIEnhancementsWindow ():
 	GUIOPTControls.OptCheckbox (desc[4], controlIDs["4"], controlIDs["4t"], title[4], 'GUIEnhancements', None, GE_UNFOCUS_STOPS_SCROLLING)
 	GUIOPTControls.OptCheckbox (desc[5], controlIDs["5"], controlIDs["5t"], title[5], 'GUIEnhancements', None, GE_MARK_SCROLLS)
 	GUIOPTControls.OptCheckbox (desc[6], controlIDs["6"], controlIDs["6t"], title[6], 'GUIEnhancements', None, GE_PERSISTENT_IDENTIFICATION)
+	GUIOPTControls.OptCheckbox (desc[7], controlIDs["7"], controlIDs["7t"], title[7], 'GUIEnhancements', None, GE_SNAP_PORTWIN)
 
 	# only pst lacks the silly labels and sets the button text directly (otherwise there would be alignment issues)
 	if not GameCheck.IsPST ():
@@ -339,10 +340,7 @@ def OpenGUIEnhancementsWindow ():
 				label.SetText (title[cid[0] + 1])
 	# remove all the other entries
 	# shift the ranges when new buttons will be needed
-	for cid in (22 + 0x10000000, controlIDs["7"], controlIDs["7t"]):
-		if Window.GetControl (cid):
-			Window.DeleteControl (cid)
-	for cid in range(24, 40):
+	for cid in range(26, 40):
 		if Window.GetControl (cid):
 			Window.DeleteControl (cid)
 		if Window.GetControl (cid + 0x10000000):

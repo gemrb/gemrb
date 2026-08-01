@@ -396,3 +396,55 @@ def UpdatePortraitWindow ():
 			EnablePortrait(Button)
 
 	return
+
+def SnapPortraitWindow (snap):
+	"""Moves the window close to the "top window" if several conditions are met."""
+
+	global OriginalH
+
+	Window = GemRB.GetView ("PORTWIN")
+	if not Window:
+		return
+
+	# prerequisites
+	if GameCheck.IsPST () or GameCheck.IsIWD2 ():
+		return # not using a vertical window
+	if GemRB.GetVar ("GUIEnhancements") & GE_SNAP_PORTWIN == 0 and snap:
+		return
+	screenW = GemRB.GetSystemVariable (SV_WIDTH)
+	screenH = GemRB.GetSystemVariable (SV_HEIGHT)
+	if screenW <= 800:
+		return # pointless
+
+	# snap or unsnap, so the portraits are closer to original positions
+	portWinFrame = Window.GetFrame ()
+	if snap:
+		# make adjacent, vertically center if needed; resize first if there's space?
+		topWin = GemRB.GetView ("WIN_TOP")
+		if not topWin:
+			return
+
+		topWinFrame = topWin.GetFrame ()
+		newX = topWinFrame["x"] + topWinFrame["w"]
+		newY = portWinFrame["y"]
+		newH = portWinFrame["h"]
+		OriginalH = portWinFrame["h"]
+
+		# is there empty space on the portrait window? Just ignore the potential bottom buttons
+		portButton = Window.GetControl (0)
+		pbFrame = portButton.GetFrame ()
+		space = portWinFrame["h"] - 10 - (pbFrame["h"] + 5) * max(6, GemRB.GetPartySize ())
+		if space > portWinFrame["y"] - topWinFrame["y"]:
+			newY -= (portWinFrame["y"] - topWinFrame["y"])
+		# to resize instead:
+		# FIXME: shrinking the height cuts the window from the top, not the bottom
+		# 	newH = portWinFrame["h"] - space
+		# 	newY = (screenH - newH) // 2
+		Window.SetFrame ({ 'x': newX, 'y': newY, 'h': newH, 'w': portWinFrame["w"] })
+	else:
+		# restore to right border
+		try:
+			Window.SetFrame ({ 'x': 0, 'y': 0, 'h': OriginalH, 'w': portWinFrame["w"] })
+			Window.SetPos (screenW - portWinFrame["w"], (screenH - OriginalH) // 2)
+		except NameError:
+			pass # somehow we unsnapped without first snapping

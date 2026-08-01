@@ -155,6 +155,8 @@ def TopWindowClosed(window):
 		GemRB.GetView ("ACTWIN").SetVisible (True)
 		GemRB.GetView ("MSGWIN").SetVisible(True)
 
+	SnapPortraitWindow (False)
+
 	SetSelectionChangeHandler (None)
 	SelectionChanged()
 
@@ -231,6 +233,7 @@ def SetTopWindow (window, selectionHandler = None):
 		window.Focus()
 
 		Clock.UpdateClock()
+		SnapPortraitWindow (True)
 
 		if selectionHandler:
 			selectionHandler = lambda win=window, fn=selectionHandler: fn(win)
@@ -262,6 +265,10 @@ def ToggleWindow(id, pack, pos=WINDOW_CENTER):
 		return None
 	else:
 		return GemRB.LoadWindow(id, pack, pos)
+
+def SnapPortraitWindow (snap):
+	import PortraitWindow
+	PortraitWindow.SnapPortraitWindow (snap)
 
 def OpenInventoryWindowClick (btn):
 	import GUIINV
