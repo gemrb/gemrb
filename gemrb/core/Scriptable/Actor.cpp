@@ -10051,6 +10051,9 @@ void Actor::SetupFist()
 	assert(core->QuerySlotEffects(slot) == SLOT_EFFECT_FIST);
 	int row = GetBase(CFGCache.fistStat);
 	int col = GetXPLevel(false);
+	// workaround for monk multiclasses to consider just their monk level, not the average
+	int monkLevel = GetMonkLevel();
+	if (monkLevel) col = monkLevel;
 	col = Clamp(col, 1, MAX_LEVEL);
 
 	ResRef ItemResRef = gamedata->GetFist(row, col);
