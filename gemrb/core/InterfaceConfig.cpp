@@ -281,6 +281,27 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	CONFIG_STRING("Encoding", config.Encoding);
 	CONFIG_STRING("ScaleQuality", config.ScaleQuality);
 
+	CONFIG_INT("PathfinderThreadsCount", config.PathfinderThreadsCount);
+	// limit only the lower bound, if user wants to spawn 1000 threads - let them have some fun
+	if (config.PathfinderThreadsCount < 0) {
+		config.PathfinderThreadsCount = 0;
+	}
+
+	CONFIG_STRING("PathfinderMainThreadMode", config.PathfinderMainThreadMode);
+	const std::string availableMainThreadModes[] = { "immediate", "queued" };
+	// cast to unsigned char first: tolower is undefined for negative values, which is what a
+	// non-ASCII byte sign-extends to
+	std::transform(config.PathfinderMainThreadMode.begin(), config.PathfinderMainThreadMode.end(), config.PathfinderMainThreadMode.begin(),
+		       [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+	const auto foundProperMode = std::find(
+		std::cbegin(availableMainThreadModes),
+		std::cend(availableMainThreadModes),
+		config.PathfinderMainThreadMode);
+	if (foundProperMode == std::cend(availableMainThreadModes)) {
+		Log(WARNING, "Interface", "Invalid PathfinderMainThreadMode detected, setting to immediate.");
+		config.PathfinderMainThreadMode = availableMainThreadModes[0];
+	}
+
 	auto value = cfg.Get("ModPath", "");
 	if (value.length()) {
 		config.ModPath = Explode<std::string, std::string>(value, PathListSeparator);

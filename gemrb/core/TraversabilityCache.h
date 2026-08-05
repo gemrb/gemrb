@@ -5,11 +5,24 @@
 #ifndef TRAVERSABILITY_CACHE_H
 #define TRAVERSABILITY_CACHE_H
 
-#include "Scriptable/Actor.h"
+
+#include "FixedSizePool.h"
+#include "PagedSparseArray.h"
+#include "Region.h"
+
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+#include <type_traits>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 
 namespace GemRB {
 
+class Actor;
 
 /**
  * This class manages the cached data of actors on a navmap, to be used for speed up the FindPath implementation.
@@ -67,16 +80,41 @@ public:
 	struct TraversabilityCellData {
 		Actor* occupyingActor = nullptr;
 		TraversabilityCellState state = TraversabilityCellValueEmpty;
+
+		// Pads `state` out to the pointer alignment boundary so the compiler inserts no implicit
+		// padding of its own
+		char padding[7] = {};
+
+		bool operator!=(const TraversabilityCellData& other) const noexcept
+		{
+			return occupyingActor != other.occupyingActor || state != other.state;
+		}
 	};
 
+	// Guards the padding above: if the members ever stop summing to the object size, the compiler
+	// has inserted padding this type does not control. Written as a sum rather than a literal so
+	// it holds for both 32- and 64-bit pointers.
+	static_assert(sizeof(TraversabilityCellData) ==
+			      sizeof(Actor*) + sizeof(TraversabilityCellState) + sizeof(TraversabilityCellData::padding),
+		      "TraversabilityCellData has implicit padding; adjust its padding member, or store it "
+		      "in a PagedSparseArray instantiated with DefaultTIsAllZeroBytes = false");
+
+	using Data_t = PagedSparseArray<TraversabilityCellData, true>;
+
 	explicit TraversabilityCache(class Map* inMap)
-		: map { inMap }
+		: map { inMap }, traversabilityData(dataAllocator)
 	{
 	}
 
 	TraversabilityCellData GetCellData(const std::size_t inIndex) const
 	{
 		return traversabilityData[inIndex];
+	}
+
+	/** The cache's backing store, handed to PathFinderScheduler::Sync() as a SyncFrom() source. */
+	Data_t& GetData()
+	{
+		return traversabilityData;
 	}
 
 	bool HasUpdatedTraversabilityThisFrame() const
@@ -94,7 +132,23 @@ public:
 		return traversabilityData.size();
 	}
 
-	void Update();
+	/**
+	 * Rebuilds the cache from the map's current actors.
+	 *
+	 * Does the work at most once per frame: the first call after MarkNewFrame() rebuilds, every
+	 * later one in the same frame returns immediately.
+	 *
+	 * @return true only from the frame's first call, and only when an actor was added, removed or
+	 *         moved. Every later call in the same frame returns false whether or not the cache
+	 *         changed.
+	 */
+	bool Update();
+
+	TraversabilityCache(const TraversabilityCache& other) = delete;
+	TraversabilityCache(TraversabilityCache&& other) = delete;
+	TraversabilityCache& operator=(const TraversabilityCache& other) = delete;
+	TraversabilityCache& operator=(TraversabilityCache&& other) = delete;
+	TraversabilityCache() = delete;
 
 private:
 	/**
@@ -109,7 +163,7 @@ private:
 		std::vector<Actor*> actor;
 		std::vector<Point> pos;
 		std::vector<uint8_t> flags;
-		std::vector<Actor::BlockingSizeCategory> sizeCategory;
+		std::vector<uint8_t> sizeCategory;
 
 		explicit CachedActorsState(size_t reserve);
 
@@ -121,9 +175,9 @@ private:
 
 		size_t AddCachedActorState(Actor* inActor);
 
-		void ClearOldPosition(size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, int inWidth) const;
+		void ClearOldPosition(size_t i, Data_t& inOutTraversabilityData, int inWidth) const;
 
-		void MarkNewPosition(size_t i, std::vector<TraversabilityCellData>& inOutTraversabilityData, int inWidth, bool inShouldUpdateSelf = false);
+		void MarkNewPosition(size_t i, Data_t& inOutTraversabilityData, int inWidth, bool inShouldUpdateSelf = false);
 
 		void UpdateNewState(size_t i);
 
@@ -155,8 +209,11 @@ private:
 		TraversabilityCellState GetCellStateFromFlags(size_t i) const;
 	};
 
-	Map* map;
-	std::vector<TraversabilityCellData> traversabilityData;
+	Map* map = nullptr;
+	// declaration order matters: traversabilityData holds a reference to dataAllocator, so the
+	// allocator has to outlive it on both construction and destruction
+	FixedSizePool<Data_t::TPage_t> dataAllocator;
+	Data_t traversabilityData;
 	CachedActorsState cachedActorsState { 0 };
 	bool hasBeenUpdatedThisFrame { false };
 
@@ -167,11 +224,30 @@ private:
 	// direct vector access via idx will be faster on slow HW than going through std::unordered_map buckets
 	static std::vector<std::vector<bool>> BlockingShapeCache;
 
-	static const std::vector<bool>& GetBlockingShape(const Actor* actor, Actor::BlockingSizeCategory blockingSizeCategory);
+	static const std::vector<bool>& GetBlockingShape(const Actor* actor, uint8_t blockingSizeCategory);
 
-	static uint16_t GetBlockingShapeRegionW(Actor::BlockingSizeCategory blockingSizeCategory);
+	static uint16_t GetBlockingShapeRegionW(uint8_t blockingSizeCategory);
 
-	static uint16_t GetBlockingShapeRegionH(Actor::BlockingSizeCategory blockingSizeCategory);
+	static uint16_t GetBlockingShapeRegionH(uint8_t blockingSizeCategory);
+};
+
+/**
+ *  One immutable snapshot of a map's traversability data.
+ *  Owns its allocator, so the pages are freed through it wherever the last reference happens to
+ *  be dropped - which may be a worker thread. Sharing one allocator across snapshots would put
+ *  that free on a racing thread.
+ */
+struct TraversabilityDataSnapshot {
+	FixedSizePool<TraversabilityCache::Data_t::TPage_t> allocator;
+	TraversabilityCache::Data_t data;
+	/** Which version of the source data this was taken from; see PathFinderScheduler. */
+	uint64_t version = 0;
+
+	TraversabilityDataSnapshot()
+		: data(allocator) {}
+
+	TraversabilityDataSnapshot(const TraversabilityDataSnapshot&) = delete;
+	TraversabilityDataSnapshot& operator=(const TraversabilityDataSnapshot&) = delete;
 };
 }
 

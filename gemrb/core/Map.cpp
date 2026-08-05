@@ -33,6 +33,7 @@
 #include "GUI/GameControl.h"
 #include "GUI/WindowManager.h"
 #include "GameScript/GSUtils.h"
+#include "Logging/Logging.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
@@ -44,8 +45,6 @@
 #include <utility>
 
 namespace GemRB {
-
-static constexpr unsigned int MAX_CIRCLESIZE = 8;
 
 struct Spawns {
 	ResRefMap<SpawnGroup> vars;
@@ -687,24 +686,83 @@ void Map::DoStepForActor(Actor* actor, ieDword time) const
 	}
 }
 
-void Map::BlockSearchMapFor(const Movable* actor) const
+bool Map::UpdateTraversabilityCache()
+{
+	return traversabilityCache.Update();
+}
+
+TraversabilityCache::Data_t& Map::GetTraversabilityCacheData()
+{
+	return traversabilityCache.GetData();
+}
+
+void Map::BlockSearchMapFor(const Movable* actor)
+{
+	PathFinder::BlockSearchMapFor(actor, tileProps);
+}
+
+void PathFinder::BlockSearchMapFor(const Movable* actor, TileProps& tileProps)
 {
 	auto flag = actor->IsPC() ? PathMapFlags::PC : PathMapFlags::NPC;
 	tileProps.PaintSearchMap(actor->SMPos, actor->circleSize, flag);
 }
 
-void Map::ClearSearchMapFor(const Movable* actor) const
+void Map::ClearSearchMapFor(const Movable* actor)
 {
-	std::vector<Actor*> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF | GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE * 3, actor);
-	tileProps.PaintSearchMap(actor->SMPos, actor->circleSize, PathMapFlags::UNMARKED);
+	PathFinder::ClearSearchMapFor(actors, actor, tileProps);
+}
+
+void PathFinder::ClearSearchMapFor(const std::vector<Actor*>& actors, const Movable* actor, TileProps& tileProps)
+{
+	ClearSearchMapFor(actors, actor, actor->Pos, actor->SMPos, actor->circleSize, tileProps);
+}
+
+void PathFinder::ClearSearchMapFor(const std::vector<Actor*>& actors, const Movable* instigatorIdentity, const Point& actorPos, const SearchmapPoint& actorSMPos, int actorCircleSize, TileProps& tileProps)
+{
+	// Find nearby actors that need their searchmap restored
+	std::vector<Actor*> nearActors;
+	constexpr unsigned int radiusFeet = MAX_CIRCLE_SIZE * 3; // WithinRange takes feet
+	constexpr int flags = GA_NO_DEAD | GA_NO_LOS | GA_NO_UNSCHEDULED;
+
+	for (auto actor : actors) {
+		if (!WithinRange(actor, actorPos, radiusFeet)) {
+			continue;
+		}
+		if (!actor->ValidTarget(flags)) {
+			continue;
+		}
+		nearActors.emplace_back(actor);
+	}
+
+	tileProps.PaintSearchMap(actorSMPos, actorCircleSize, PathMapFlags::UNMARKED);
 
 	// Restore the searchmap areas of any nearby actors that could
-	// have been cleared by this BlockSearchMap(..., PathMapFlags::UNMARKED).
-	// (Necessary since blocked areas of actors may overlap.)
+	// have been cleared by this PaintSearchMap(..., PathMapFlags::UNMARKED).
+	// Skip the instigator itself — its footprint was just cleared intentionally.
 	for (const Actor* neighbour : nearActors) {
+		if (neighbour == instigatorIdentity) continue;
 		if (neighbour->BlocksSearchMap()) {
-			BlockSearchMapFor(neighbour);
+			BlockSearchMapFor(neighbour, tileProps);
 		}
+	}
+}
+
+void PathFinder::ClearSearchMapFor(const std::vector<ActorSearchMapData>& actorsData, const Movable* instigatorIdentity, const Point& actorPos, const SearchmapPoint& actorSMPos, int actorCircleSize, TileProps& tileProps)
+{
+	tileProps.PaintSearchMap(actorSMPos, actorCircleSize, PathMapFlags::UNMARKED);
+
+	// Restore the searchmap areas of any nearby actors that could
+	// have been cleared by this PaintSearchMap(..., PathMapFlags::UNMARKED).
+	// Skip the instigator itself — its footprint was just cleared intentionally.
+	// Uses snapshotted actor data — safe for worker threads.
+	constexpr unsigned int radiusPixels = MAX_CIRCLE_SIZE * 3 * 16;
+	for (const auto& data : actorsData) {
+		if (!data.blocksSearchMap) continue;
+		if (data.identity == instigatorIdentity) continue;
+		if (Distance(data.pos, actorPos) > radiusPixels) continue;
+
+		auto flag = data.isPC ? PathMapFlags::PC : PathMapFlags::NPC;
+		tileProps.PaintSearchMap(data.smPos, data.circleSize, flag);
 	}
 }
 
@@ -714,11 +772,6 @@ Size Map::FogMapSize() const
 	constexpr int CELL_RATIO = 2;
 	const int largefog = gamedata->Visibility.Get()->LargeFog;
 	return Size(TMap->XCellCount * CELL_RATIO + largefog, TMap->YCellCount * CELL_RATIO + largefog);
-}
-
-Size Map::PropsSize() const noexcept
-{
-	return tileProps.GetSize();
 }
 
 // Returns true if map at (x;y) was explored, else false.
@@ -1962,7 +2015,7 @@ std::vector<Actor*> Map::GetAllActorsInRadius(const Point& p, int flags, unsigne
 		}
 		if (!(flags & GA_NO_LOS)) {
 			//line of sight visibility
-			if (!IsVisibleLOS(actor->Pos, p, actor)) {
+			if (!PathFinder::IsVisibleLOS(tileProps, actor->Pos, p, actor)) {
 				continue;
 			}
 		}
@@ -2003,7 +2056,7 @@ int Map::GetActorCount(bool any) const
 	return ret;
 }
 
-void Map::JumpActors(bool jump) const
+void Map::JumpActors(bool jump)
 {
 	for (auto actor : actors) {
 		if (actor->Modified[IE_DONOTJUMP] & DNJ_JUMP) {
@@ -2294,16 +2347,6 @@ Color Map::GetLighting(const NavmapPoint& p) const
 	return tileProps.QueryLighting(tilePos);
 }
 
-// a more thorough, but more expensive version for the cases when it matters
-PathMapFlags Map::GetBlocked(const NavmapPoint& p, int size) const
-{
-	if (size == -1) {
-		return GetBlocked(p);
-	} else {
-		return GetBlockedInRadius(p, size);
-	}
-}
-
 // The default behavior is for actors to be blocking
 // If they shouldn't be, the caller should check for PathMapFlags::PASSABLE | PathMapFlags::ACTOR
 PathMapFlags Map::GetBlocked(const NavmapPoint& p) const
@@ -2312,17 +2355,22 @@ PathMapFlags Map::GetBlocked(const NavmapPoint& p) const
 }
 
 // p is in tile coords
-PathMapFlags Map::GetBlockedTile(const SearchmapPoint& p, int size) const
+PathMapFlags PathFinder::GetBlockedTile(const TileProps& tileProps, const SearchmapPoint& p, int size)
 {
 	if (size == -1) {
-		return GetBlockedTile(p);
+		return GetBlockedTile(tileProps, p);
 	} else {
-		return GetBlockedInRadiusTile(p, size);
+		return GetBlockedInRadiusTile(tileProps, p, size);
 	}
 }
 
 // p is in tile coords
 PathMapFlags Map::GetBlockedTile(const SearchmapPoint& p) const
+{
+	return PathFinder::GetBlockedTile(tileProps, p);
+}
+
+PathMapFlags PathFinder::GetBlockedTile(const TileProps& tileProps, const SearchmapPoint& p)
 {
 	PathMapFlags ret = tileProps.QuerySearchMap(p);
 	if (bool(ret & PathMapFlags::TRAVEL)) {
@@ -2340,10 +2388,10 @@ PathMapFlags Map::GetBlockedTile(const SearchmapPoint& p) const
 // p is in map coords
 PathMapFlags Map::GetBlockedInRadius(const NavmapPoint& p, unsigned int size, bool stopOnImpassable) const
 {
-	return GetBlockedInRadiusTile(SearchmapPoint(p), size, stopOnImpassable);
+	return PathFinder::GetBlockedInRadiusTile(tileProps, SearchmapPoint(p), size, stopOnImpassable);
 }
 
-PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size, const bool stopOnImpassable) const
+PathMapFlags PathFinder::GetBlockedInRadiusTile(const TileProps& tileProps, const SearchmapPoint& tp, uint16_t size, const bool stopOnImpassable)
 {
 	// We check a circle of radius size-2 around (px,py)
 	// TODO: recheck that this matches originals
@@ -2367,7 +2415,7 @@ PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size
 		assert(p2.x <= p1.x);
 
 		for (int x = p2.x; x <= p1.x; ++x) {
-			PathMapFlags flags = GetBlockedTile(SearchmapPoint(x, p1.y));
+			PathMapFlags flags = GetBlockedTile(tileProps, SearchmapPoint(x, p1.y));
 			if (stopOnImpassable && flags == PathMapFlags::IMPASSABLE) {
 				return PathMapFlags::IMPASSABLE;
 			}
@@ -2385,15 +2433,21 @@ PathMapFlags Map::GetBlockedInRadiusTile(const SearchmapPoint& tp, uint16_t size
 	return ret;
 }
 
-PathMapFlags Map::GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, const Actor* caller) const
+PathMapFlags PathFinder::GetBlockedInLine(const TileProps& tileProps, const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, const Actor* caller)
+{
+	int speed = caller ? caller->GetSpeed() : 0;
+	int cSize = caller ? caller->circleSize : 0;
+	return GetBlockedInLine(tileProps, s, d, stopOnImpassable, speed, cSize);
+}
+
+PathMapFlags PathFinder::GetBlockedInLine(const TileProps& tileProps, const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, int actorSpeed, int actorCircleSize)
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	NavmapPoint p = s;
 	SearchmapPoint sms { s };
-	float_t factor = caller && caller->GetSpeed() ? float_t(gamedata->GetStepTime()) / float_t(caller->GetSpeed()) : 1;
+	float_t factor = actorSpeed ? float_t(gamedata->GetStepTime()) / float_t(actorSpeed) : 1;
 
-	const int circleSize = caller ? caller->circleSize : 0;
-	const auto getBlockedStatusFn = (stopOnImpassable && caller) ? &Map::GetChildBlockedStatusForBigSize : &Map::GetChildBlockedStatusForSmallSize;
+	const auto getBlockedStatusFn = (stopOnImpassable && actorCircleSize) ? &PathFinder::GetChildBlockedStatusForBigSize : &PathFinder::GetChildBlockedStatusForSmallSize;
 	while (p != d) {
 		float_t dx = d.x - p.x;
 		float_t dy = d.y - p.y;
@@ -2404,7 +2458,7 @@ PathMapFlags Map::GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, b
 		if (sms == smp) continue;
 
 		// see note in GetBlockedInLineTile
-		const PathMapFlags blockStatus = (this->*getBlockedStatusFn)(smp, circleSize);
+		const PathMapFlags blockStatus = (getBlockedStatusFn) (tileProps, smp, actorCircleSize);
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}
@@ -2420,14 +2474,20 @@ PathMapFlags Map::GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, b
 	return ret;
 }
 
-PathMapFlags Map::GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, const Actor* caller) const
+PathMapFlags PathFinder::GetBlockedInLineTile(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, const Actor* caller)
+{
+	int speed = caller ? caller->GetSpeed() : 0;
+	int cSize = caller ? caller->circleSize : 0;
+	return GetBlockedInLineTile(tileProps, s, d, stopOnImpassable, speed, cSize);
+}
+
+PathMapFlags PathFinder::GetBlockedInLineTile(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, int actorSpeed, int actorCircleSize)
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	SearchmapPoint p = s;
-	float_t factor = caller && caller->GetSpeed() ? float_t(gamedata->GetStepTime()) / float_t(caller->GetSpeed()) / 16 : 1;
+	float_t factor = actorSpeed ? float_t(gamedata->GetStepTime()) / float_t(actorSpeed) / 16 : 1;
 
-	const int circleSize = caller ? caller->circleSize : 0;
-	const auto getBlockedStatusFn = (stopOnImpassable && caller) ? &Map::GetChildBlockedStatusForBigSize : &Map::GetChildBlockedStatusForSmallSize;
+	const auto getBlockedStatusFn = (stopOnImpassable && actorCircleSize) ? &PathFinder::GetChildBlockedStatusForBigSize : &PathFinder::GetChildBlockedStatusForSmallSize;
 	while (p != d) {
 		float_t dx = d.x - p.x;
 		float_t dy = d.y - p.y;
@@ -2438,7 +2498,7 @@ PathMapFlags Map::GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapP
 
 		// do a wider check for bigger actors (for the common case it's the same)
 		// should not be used for IsVisibleLOS
-		const PathMapFlags blockStatus = (this->*getBlockedStatusFn)(p, circleSize);
+		const PathMapFlags blockStatus = (getBlockedStatusFn) (tileProps, p, actorCircleSize);
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}
@@ -2457,27 +2517,55 @@ PathMapFlags Map::GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapP
 // PathMapFlags::SIDEWALL obstructs LOS, while PathMapFlags::IMPASSABLE doesn't
 bool Map::IsVisibleLOS(const Point& s, const Point& d, const Actor* caller) const
 {
-	PathMapFlags ret = GetBlockedInLine(s, d, false, caller);
+	return PathFinder::IsVisibleLOS(tileProps, s, d, caller);
+}
+
+bool PathFinder::IsVisibleLOS(const TileProps& tileProps, const Point& s, const Point& d, const Actor* caller)
+{
+	PathMapFlags ret = GetBlockedInLine(tileProps, s, d, false, caller);
 	return !bool(ret & PathMapFlags::SIDEWALL);
 }
 
 bool Map::IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller) const
 {
-	PathMapFlags ret = GetBlockedInLineTile(s, d, false, caller);
+	return PathFinder::IsVisibleLOS(tileProps, s, d, caller);
+}
+
+bool PathFinder::IsVisibleLOS(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller)
+{
+	PathMapFlags ret = GetBlockedInLineTile(tileProps, s, d, false, caller);
+	return !bool(ret & PathMapFlags::SIDEWALL);
+}
+
+bool PathFinder::IsVisibleLOS(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, int actorSpeed, int actorCircleSize)
+{
+	PathMapFlags ret = GetBlockedInLineTile(tileProps, s, d, false, actorSpeed, actorCircleSize);
 	return !bool(ret & PathMapFlags::SIDEWALL);
 }
 
 // Used by the pathfinder, so PathMapFlags::IMPASSABLE obstructs walkability
 bool Map::IsWalkableTo(const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller) const
 {
-	PathMapFlags ret = GetBlockedInLine(s, d, true, caller);
+	return PathFinder::IsWalkableTo(tileProps, s, d, actorsAreBlocking, caller);
+}
+
+bool PathFinder::IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller)
+{
+	PathMapFlags ret = GetBlockedInLine(tileProps, s, d, true, caller);
+	PathMapFlags mask = PathMapFlags::PASSABLE | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
+	return bool(ret & mask);
+}
+
+bool PathFinder::IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, int actorSpeed, int actorCircleSize)
+{
+	PathMapFlags ret = GetBlockedInLine(tileProps, s, d, true, actorSpeed, actorCircleSize);
 	PathMapFlags mask = PathMapFlags::PASSABLE | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
 	return bool(ret & mask);
 }
 
 bool Map::IsWalkableTo(const SearchmapPoint& s, const SearchmapPoint& d, bool actorsAreBlocking, const Actor* caller) const
 {
-	PathMapFlags ret = GetBlockedInLineTile(s, d, true, caller);
+	PathMapFlags ret = PathFinder::GetBlockedInLineTile(tileProps, s, d, true, caller);
 	PathMapFlags mask = PathMapFlags::PASSABLE | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
 	return bool(ret & mask);
 }
@@ -2819,7 +2907,7 @@ std::string Map::dump(bool show_actors) const
 	return buffer;
 }
 
-bool Map::AdjustPositionX(SearchmapPoint& goal, const Size& radius, int size) const
+bool PathFinder::AdjustPositionX(const TileProps& tileProps, SearchmapPoint& goal, const Size& radius, int size)
 {
 	int minx = 0;
 	if (goal.x > radius.w) {
@@ -2827,7 +2915,7 @@ bool Map::AdjustPositionX(SearchmapPoint& goal, const Size& radius, int size) co
 	}
 	int maxx = goal.x + radius.w + 1;
 
-	const Size& mapSize = PropsSize();
+	const Size& mapSize = tileProps.GetSize();
 
 	if (maxx > mapSize.w)
 		maxx = mapSize.w;
@@ -2835,7 +2923,7 @@ bool Map::AdjustPositionX(SearchmapPoint& goal, const Size& radius, int size) co
 	for (int scanx = minx; scanx < maxx; scanx++) {
 		if (goal.y >= radius.h) {
 			const SearchmapPoint p(scanx, goal.y - radius.h);
-			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
+			if (bool(GetBlockedTile(tileProps, p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
 				goal.y = goal.y - radius.h;
 				return true;
@@ -2843,7 +2931,7 @@ bool Map::AdjustPositionX(SearchmapPoint& goal, const Size& radius, int size) co
 		}
 		if (goal.y + radius.h < mapSize.h) {
 			const SearchmapPoint p(scanx, goal.y + radius.h);
-			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
+			if (bool(GetBlockedTile(tileProps, p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
 				goal.y = goal.y + radius.h;
 				return true;
@@ -2853,7 +2941,7 @@ bool Map::AdjustPositionX(SearchmapPoint& goal, const Size& radius, int size) co
 	return false;
 }
 
-bool Map::AdjustPositionY(SearchmapPoint& goal, const Size& radius, int size) const
+bool PathFinder::AdjustPositionY(const TileProps& tileProps, SearchmapPoint& goal, const Size& radius, int size)
 {
 	int miny = 0;
 	if (goal.y > radius.h) {
@@ -2861,13 +2949,13 @@ bool Map::AdjustPositionY(SearchmapPoint& goal, const Size& radius, int size) co
 	}
 	int maxy = goal.y + radius.h + 1;
 
-	const Size& mapSize = PropsSize();
+	const Size& mapSize = tileProps.GetSize();
 	if (maxy > mapSize.h)
 		maxy = mapSize.h;
 	for (int scany = miny; scany < maxy; scany++) {
 		if (goal.x >= radius.w) {
 			const SearchmapPoint p(goal.x - radius.w, scany);
-			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
+			if (bool(GetBlockedTile(tileProps, p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = goal.x - radius.w;
 				goal.y = scany;
 				return true;
@@ -2875,7 +2963,7 @@ bool Map::AdjustPositionY(SearchmapPoint& goal, const Size& radius, int size) co
 		}
 		if (goal.x + radius.w < mapSize.w) {
 			const SearchmapPoint p(goal.x + radius.w, scany);
-			if (bool(GetBlockedTile(p, size) & PathMapFlags::PASSABLE)) {
+			if (bool(GetBlockedTile(tileProps, p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = goal.x + radius.w;
 				goal.y = scany;
 				return true;
@@ -2896,9 +2984,9 @@ void Map::AdjustPositionNavmap(NavmapPoint& goal, const Size& radius) const
 // best adjustment attempt given an initial direction to look around
 // at the same time we don't want to look too far in the same direction, since getting close
 // to the target is more important
-void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int startingRadius, unsigned int minDistance) const
+void PathFinder::AdjustPositionDirected(const TileProps& tileProps, NavmapPoint& goal, orient_t direction, int startingRadius, unsigned int minDistance)
 {
-	const Size& mapSize = PropsSize();
+	const Size& mapSize = tileProps.GetSize();
 	SearchmapPoint smptGoal { goal };
 	if (smptGoal.x > mapSize.w) {
 		smptGoal.x = mapSize.w;
@@ -2925,7 +3013,7 @@ void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int star
 	while (radius < 2 * startingRadius) { // reduce this search radius if needed
 		for (auto& offset : baseOffsets) {
 			SearchmapPoint candidate = smptGoal + offset * radius;
-			if (bool(GetBlockedTile(candidate, startingRadius) & PathMapFlags::PASSABLE)) {
+			if (bool(GetBlockedTile(tileProps, candidate, startingRadius) & PathMapFlags::PASSABLE)) {
 				unsigned int range = SquaredDistance(candidate.ToNavmapPoint(), adjGoal);
 				candidates[range] = candidate;
 			}
@@ -2935,7 +3023,7 @@ void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int star
 
 	if (candidates.empty()) {
 		// fall back to regular search
-		AdjustPosition(smptGoal);
+		AdjustPosition(tileProps, smptGoal);
 	} else {
 		// pick the closest candidate, taking the needed range into account
 		// the map is reverse-sorted already
@@ -2959,7 +3047,12 @@ void Map::AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int star
 
 void Map::AdjustPosition(SearchmapPoint& goal, const Size& startingRadius, int size) const
 {
-	const Size& mapSize = PropsSize();
+	PathFinder::AdjustPosition(tileProps, goal, startingRadius, size);
+}
+
+void PathFinder::AdjustPosition(const TileProps& tileProps, SearchmapPoint& goal, const Size& startingRadius, int size)
+{
+	const Size& mapSize = tileProps.GetSize();
 	Size radius = startingRadius;
 
 	if (goal.x > mapSize.w) {
@@ -2972,17 +3065,17 @@ void Map::AdjustPosition(SearchmapPoint& goal, const Size& startingRadius, int s
 	while (radius.w < mapSize.w || radius.h < mapSize.h) {
 		//lets make it slightly random where the actor will appear
 		if (RandomFlip()) {
-			if (AdjustPositionX(goal, radius, size)) {
+			if (AdjustPositionX(tileProps, goal, radius, size)) {
 				return;
 			}
-			if (AdjustPositionY(goal, radius, size)) {
+			if (AdjustPositionY(tileProps, goal, radius, size)) {
 				return;
 			}
 		} else {
-			if (AdjustPositionY(goal, radius, size)) {
+			if (AdjustPositionY(tileProps, goal, radius, size)) {
 				return;
 			}
-			if (AdjustPositionX(goal, radius, size)) {
+			if (AdjustPositionX(tileProps, goal, radius, size)) {
 				return;
 			}
 		}
@@ -2993,6 +3086,32 @@ void Map::AdjustPosition(SearchmapPoint& goal, const Size& startingRadius, int s
 			radius.h++;
 		}
 	}
+}
+
+// Find the best path of limited length that brings us the farthest from d
+void Map::RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, Actor* caller)
+{
+	if (!caller || !caller->GetSpeed()) return;
+	Point p;
+	if (!PathFinder::CalculateRunAwayPoint(tileProps, s, d, maxPathLength, caller->GetSpeed(), caller->circleSize, p)) return;
+	const int minDistance = caller->circleSize;
+	const int extraFlags = backAway ? PF_BACKAWAY : 0;
+	caller->ScheduleFindPath(FindPathRequestType::RunAway, s, p, minDistance, this, extraFlags);
+}
+
+bool Map::RandomWalk(const Point& s, int size, int radius, const Actor* caller, PathNode& outStep) const
+{
+	return PathFinder::CalculateRandomWalkPoint(tileProps, s, size, radius, caller ? caller->GetSpeed() : 0, outStep);
+}
+
+Path Map::GetLinePath(const Point& start, const Point& dest, int Speed, orient_t Orientation, int flags) const
+{
+	return PathFinder::CalculateLinePath(tileProps, start, dest, Speed, Orientation, flags);
+}
+
+PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
+{
+	return PathFinder::CalculateLineEnd(tileProps, p, steps, orient);
 }
 
 bool Map::IsVisible(const Point& pos) const
@@ -3013,7 +3132,7 @@ WMPDirection Map::WhichEdge(const NavmapPoint& s) const
 		return WMPDirection::NONE;
 	}
 	// FIXME: is this backwards?
-	const Size& mapSize = PropsSize();
+	const Size& mapSize = this->tileProps.GetSize();
 	SearchmapPoint tileP { s };
 	tileP.x *= mapSize.h;
 	tileP.y *= mapSize.w;
@@ -3342,7 +3461,7 @@ bool Map::ExploreMapChunk(const SearchmapPoint& pos, int range, int los, bool up
 			}
 
 			if (!block) {
-				PathMapFlags type = GetBlockedTile(tile);
+				const PathMapFlags type = GetBlockedTile(tile);
 				if (bool(type & PathMapFlags::NO_SEE)) {
 					block = true;
 				} else if (bool(type & PathMapFlags::SIDEWALL)) {
@@ -3778,13 +3897,13 @@ void Map::SetBackground(const ResRef& bgResRef, ieDword duration)
 
 Actor* Map::GetRandomEnemySeen(const Actor* origin) const
 {
-	GroupType type = GetGroup(origin);
+	const GroupType type = GetGroup(origin);
 	if (type == GroupType::Neutral) {
 		return nullptr; //no enemies
 	}
 
-	int flags = GA_NO_HIDDEN | GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF;
-	std::vector<Actor*> neighbours = GetAllActorsInRadius(origin->Pos, flags, origin->GetVisualRange(), origin);
+	constexpr int flags = GA_NO_HIDDEN | GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF;
+	const std::vector<Actor*> neighbours = GetAllActorsInRadius(origin->Pos, flags, origin->GetVisualRange(), origin);
 	Actor* victim = neighbours[RAND<size_t>(0, neighbours.size() - 1)];
 
 	if (type == GroupType::PC) {

@@ -1,0 +1,176 @@
+/* GemRB - Infinity Engine Emulator
+ * Copyright (C) 2026 The GemRB Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ *
+ */
+
+#ifndef PATHFINDERREQUEST_H
+#define PATHFINDERREQUEST_H
+
+// The vocabulary types of a pathfinding request
+
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+
+namespace GemRB {
+
+/**
+ *  Specifies the type of pathfinding operation to perform after the path is calculated.
+ *  Different request types may affect how the path is computed, merged with existing paths,
+ *  or applied to the actor's movement queue.
+ */
+enum class FindPathRequestType : uint8_t {
+	WalkTo,
+	WalkToFromNewPath,
+	AddWaypoint,
+	RunAway,
+};
+
+/**
+ *  Defines scheduling priorities for pathfinding requests.
+ *  Higher priority requests (lower numeric value) are processed before lower priority ones.
+ *  The `Immediate` priority bypasses the request queues entirely and executes synchronously.
+ */
+enum class FindPathRequestPriority : uint8_t {
+	Highest = 0, ///< For player's party - highest async priority
+	High = 1, ///< For NPCs in combat
+	Normal = 2, ///< For background NPCs, random walks, etc.
+	Immediate = 3, ///< Special priority: forces immediate, synchronous calculation. Keep it last in enum.
+};
+
+/** Number of distinct priority queues used by the scheduler (excludes Immediate) */
+constexpr size_t ScheduledQueuesPrioritiesCount = static_cast<size_t>(FindPathRequestPriority::Normal) + 1;
+
+// The scheduler uses a priority's numeric value directly as an index into
+// workerScheduledQueuesByPriority (see Sync() step 3), an unchecked raw-array subscript.
+// Immediate is deliberately not counted: RequestPath() computes those synchronously and they
+// never enter the queues, so Immediate sits exactly one past the end of the array.
+static_assert(static_cast<size_t>(FindPathRequestPriority::Highest) == 0,
+	      "queued priorities are used as array indices and must start at 0");
+static_assert(static_cast<size_t>(FindPathRequestPriority::Immediate) == ScheduledQueuesPrioritiesCount,
+	      "Immediate must be the last enumerator, directly after Normal - otherwise "
+	      "ScheduledQueuesPrioritiesCount undercounts the queued priorities and Sync() "
+	      "indexes workerScheduledQueuesByPriority out of bounds");
+
+
+/**
+ *  Unique identifier for pathfinding requests in the navigation system.
+ *  Provides a lightweight, copyable handle to track and reference pathfinding operations
+ *  across threads and scheduling queues.
+ *  IDs are automatically generated in sequence and wrap around when reaching the maximum value.
+ *  The identifier zero is reserved for the null request.
+ *  Includes hash and equality functors for use with standard containers.
+ */
+class FindPathRequestId {
+public:
+	// don't allow to default-construct by the user
+	FindPathRequestId() = delete;
+
+	/**
+	 *  Returns a special null/invalid request identifier.
+	 *  Used to represent the absence of a valid request ID.
+	 *
+	 *  @return A FindPathRequestId with ID value 0, representing null
+	 */
+	static FindPathRequestId NullId()
+	{
+		static FindPathRequestId nullId { 0 };
+		return nullId;
+	}
+
+	/**
+	 *  Generates the next unique request identifier in sequence.
+	 *  ID 0 is reserved for null, so valid IDs range from 1 to 65534.
+	 *
+	 *  @return A new unique FindPathRequestId
+	 */
+	static FindPathRequestId CreateNextId()
+	{
+		static uint16_t lastUsedID = 1;
+
+		// Wrapping is accepted. A collision needs a request to still be live when the counter
+		// laps back onto its ID, 65534 requests later. An ID does not stay live long: incoming
+		// requests are cleared every Sync(), scheduled ones are dropped after
+		// requestExpirationFrames, and a computed path is consumed on the next DoStep(). Each
+		// Movable also holds only one request at a time - RequestPath() cancels the previous one
+		// from the same instigator - so the issue rate is bounded by the actor count. Lapping
+		// within that window would take on the order of a thousand actors requesting a path every
+		// frame, sustained.
+		// If it ever did happen, two live requests would share a key and lookups by that ID could
+		// return the other request's data and this  would misroute an actor.
+		// For IE games, it's not reachable in any circumstance.
+		++lastUsedID;
+		if (lastUsedID == std::numeric_limits<uint16_t>::max()) {
+			lastUsedID = 1;
+		}
+		return FindPathRequestId { lastUsedID };
+	}
+
+	/**
+	 *  Checks if this ID represents a null/invalid request.
+	 *
+	 *  @return True if this is the null ID (value 0), false otherwise
+	 */
+	bool IsNull() const
+	{
+		return GetId() == 0;
+	}
+
+	/**
+	 *  Returns the raw numeric identifier value.
+	 *
+	 *  @return The uint16_t ID value
+	 */
+	uint16_t GetId() const
+	{
+		return id;
+	}
+
+	/**
+	 *  Hash functor for use with std::unordered_map and std::unordered_set.
+	 *  Allows FindPathRequestId to be used as a key in hash-based containers.
+	 */
+	struct Hash {
+		std::size_t operator()(const FindPathRequestId& requestId) const
+		{
+			return requestId.GetId();
+		}
+	};
+
+	bool operator==(const FindPathRequestId& other) const
+	{
+		return this->GetId() == other.GetId();
+	}
+
+	FindPathRequestId(const FindPathRequestId& other) = default;
+
+	FindPathRequestId& operator=(const FindPathRequestId& other) = default;
+
+private:
+	explicit FindPathRequestId(const uint16_t inId)
+		: id { inId }
+	{
+	}
+
+	uint16_t id = 0;
+};
+
+
+}
+
+#endif //PATHFINDERREQUEST_H

@@ -801,6 +801,10 @@ int Game::DelMap(unsigned int index, int forced)
 
 	// remove map from memory
 	core->SwapoutArea(Maps[index]);
+	// Purge all pathfinder references to this map under the pathfinder lock.
+	// This ensures no worker thread is dereferencing the map or its actors
+	// while we delete it.
+	PathFinderScheduler::OnMapDeletion(Maps[index]);
 	delete Maps[index];
 	Maps.erase(Maps.begin() + index);
 	// current map will be decreased
@@ -1585,6 +1589,10 @@ void Game::UpdateScripts()
 {
 	Update();
 
+	// Collect paths the workers finished since the last Sync(), so an actor waiting on one can
+	// claim it in this tick instead of the next.
+	PathFinderScheduler::DrainCompletedPathsEarly();
+
 	PartyAttack = false;
 
 	for (size_t idx = 0; idx < Maps.size(); idx++) {
@@ -1619,6 +1627,9 @@ void Game::UpdateScripts()
 			DelMap(i, false);
 		}
 	}
+
+	// sync PathFinderScheduler after all scripts were updated and all unwanted maps deleted
+	PathFinderScheduler::Sync(Maps);
 
 	//this is used only for the death delay so far
 	if (eventHandler) {

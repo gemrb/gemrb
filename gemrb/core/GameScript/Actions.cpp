@@ -3142,7 +3142,7 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 	}
 
 	actor->SetBase(IE_AVATARREMOVAL, parameters->int0Parameter);
-	const Map* map = actor->GetCurrentArea();
+	Map* map = actor->GetCurrentArea();
 	if (!map || !actor->BlocksSearchMap()) return;
 
 	if (parameters->int0Parameter == 0) {
@@ -5728,15 +5728,16 @@ void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* /*parameters*/
 	// unlike other randomwalk actions, this one queues its payload, so it can get interrupted;
 	// it just queues MoveToPoint and itself again
 	// ... that's why we don't use Movable::RandomWalk
-	const Map* area = actor->GetCurrentArea();
+	Map* area = actor->GetCurrentArea();
 	if (actor->BlocksSearchMap()) {
 		area->ClearSearchMapFor(actor);
 	}
-	const auto randomStep = area->RandomWalk(actor->Pos, actor->circleSize, std::max<int>(5, actor->maxWalkDistance), actor);
+	PathNode randomStep;
+	const bool foundStep = area->RandomWalk(actor->Pos, actor->circleSize, std::max<int>(5, actor->maxWalkDistance), actor, randomStep);
 	if (actor->BlocksSearchMap()) {
 		area->BlockSearchMapFor(actor);
 	}
-	if (!randomStep.point.IsZero()) {
+	if (foundStep) {
 		Action* moveAction = GenerateAction("MoveToPoint()");
 		moveAction->pointParameter = randomStep.point;
 		Action* randomWalk = GenerateAction("RandomWalkContinuous()");

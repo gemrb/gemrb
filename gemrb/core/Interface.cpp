@@ -476,7 +476,6 @@ Interface::Interface(CoreSettings&& cfg)
 	ieDword maxRefreshRate = vars.Get("Maximum Frame Rate", 30);
 	// the originals used double ticks for haste handling
 	Time.ticksPerSec = maxRefreshRate / 2;
-
 	ApplyTooltipDelay();
 
 	// restore the game config name if we read it from our version
@@ -670,10 +669,13 @@ Interface::Interface(CoreSettings&& cfg)
 		return true;
 	};
 	EventMgr::RegisterHotKeyCallback(ToggleConsole, ' ', GEM_MOD_CTRL);
+
+	PathFinderScheduler::Start(config.PathfinderThreadsCount, config.PathfinderMainThreadMode);
 }
 
 Interface::~Interface() noexcept
 {
+	PathFinderScheduler::Stop();
 	WindowManager::CursorMouseUp = nullptr;
 	WindowManager::CursorMouseDown = nullptr;
 

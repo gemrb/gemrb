@@ -6,6 +6,17 @@
 
 #include "globals.h"
 
+#include "Geometry.h"
+#include "Palette.h"
+#include "Sprite2D.h"
+
+#include "Logging/Logging.h"
+
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <utility>
+
 namespace GemRB {
 
 const PixelFormat TileProps::pixelFormat(0, 0, 0, 0,
@@ -108,22 +119,27 @@ int TileProps::QueryElevation(const SearchmapPoint& p) const noexcept
 
 Color TileProps::QueryLighting(const SearchmapPoint& p) const noexcept
 {
+	// an OwningTileProps copy carries the pixels but not the source image, so there is no palette
+	// to resolve the index against
+	if (!propImage) {
+		return Color();
+	}
 	uint8_t val = QueryTileProp(p, Property::LIGHTING);
 	return propImage->GetPalette()->GetColorAt(val);
 }
 
-void TileProps::PaintSearchMap(const SearchmapPoint& p, PathMapFlags value) const noexcept
+void TileProps::PaintSearchMap(const SearchmapPoint& p, PathMapFlags value) noexcept
 {
 	if (!size.PointInside(p)) {
 		return;
 	}
 
 	uint32_t& pixel = propPtr[p.y * size.w + p.x];
-	pixel = (pixel & ~searchMapMask) | (uint32_t(value) << propImage->Format().Rshift);
+	pixel = (pixel & ~searchMapMask) | (uint32_t(value) << pixelFormat.Rshift);
 }
 
 // Valid values are - PathMapFlags::UNMARKED, PathMapFlags::PC, PathMapFlags::NPC
-void TileProps::PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, const PathMapFlags value) const noexcept
+void TileProps::PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, const PathMapFlags value) noexcept
 {
 	// We block a circle of radius size-1 around (px,py)
 	// TODO: recheck that this matches originals
@@ -138,11 +154,10 @@ void TileProps::PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, cons
 		if (mapval != PathMapFlags::IMPASSABLE) {
 			PathMapFlags newVal = (mapval & PathMapFlags::NOTACTOR) | value;
 			uint32_t& pixel = propPtr[pos.y * size.w + pos.x];
-			pixel = (pixel & ~searchMapMask) | (uint32_t(newVal) << propImage->Format().Rshift);
+			pixel = (pixel & ~searchMapMask) | (uint32_t(newVal) << pixelFormat.Rshift);
 		}
 	};
 
-	constexpr unsigned int MAX_CIRCLESIZE = 8;
 	blocksize = Clamp<uint16_t>(blocksize, 1, MAX_CIRCLESIZE);
 	uint16_t r = blocksize - 1;
 
@@ -159,4 +174,98 @@ void TileProps::PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, cons
 	}
 }
 
+OwningTileProps OwningTileProps::CopyFrom(const TileProps& tileProps)
+{
+	return OwningTileProps { tileProps };
+}
+
+OwningTileProps::OwningTileProps() noexcept
+{
+	bytesSize = 0;
+	propPtr = nullptr;
+	propImage = nullptr;
+}
+
+OwningTileProps::OwningTileProps(OwningTileProps&& other) noexcept
+{
+	*this = std::move(other);
+}
+
+OwningTileProps::OwningTileProps(const OwningTileProps& other) noexcept
+	: TileProps() // non-copy c-tor on purpose
+{
+	*this = other;
+}
+
+OwningTileProps& OwningTileProps::operator=(const OwningTileProps& other) noexcept
+{
+	if (this == &other) {
+		return *this;
+	}
+
+	// grow only: a buffer that is already large enough is reused, and bytesSize keeps describing
+	// what is allocated rather than what was copied, so the destructor still frees all of it
+	if (bytesSize < other.bytesSize) {
+		free(propPtr);
+		propPtr = static_cast<uint32_t*>(malloc(other.bytesSize));
+		bytesSize = other.bytesSize;
+	}
+	size = other.size;
+	propImage = nullptr;
+
+	if (other.bytesSize > 0) {
+		// pathfinding cannot proceed without its terrain data, and there is nothing sensible to
+		// fall back to, so a failed allocation is fatal
+		if (propPtr == nullptr) {
+			error("TileProps", "Failed to allocate {} bytes for a tile properties buffer.", other.bytesSize);
+		}
+		memcpy(propPtr, other.propPtr, other.bytesSize);
+	}
+	return *this;
+}
+
+OwningTileProps& OwningTileProps::operator=(OwningTileProps&& other) noexcept
+{
+	if (this == &other) {
+		return *this;
+	}
+
+	if (propPtr && bytesSize > 0) {
+		free(propPtr);
+	}
+
+	propPtr = other.propPtr;
+	size = other.size;
+	bytesSize = other.bytesSize;
+	propImage = nullptr;
+
+	other.propPtr = nullptr;
+	other.propImage = nullptr;
+	other.size.reset();
+	return *this;
+}
+
+OwningTileProps::~OwningTileProps()
+{
+	if (propPtr && bytesSize > 0) {
+		free(propPtr);
+	}
+}
+
+OwningTileProps::OwningTileProps(const TileProps& tileProps)
+{
+	bytesSize = pixelFormat.Bpp * tileProps.GetSize().Area();
+	size = tileProps.GetSize();
+	propImage = nullptr;
+
+	if (bytesSize > 0) {
+		propPtr = static_cast<uint32_t*>(malloc(bytesSize));
+		// pathfinding cannot proceed without its terrain data, and there is nothing sensible to
+		// fall back to, so a failed allocation is fatal
+		if (propPtr == nullptr) {
+			error("TileProps", "Failed to allocate {} bytes for a tile properties buffer.", bytesSize);
+		}
+		memcpy(propPtr, tileProps.GetPropPtr(), bytesSize);
+	}
+}
 }

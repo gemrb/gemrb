@@ -6,12 +6,14 @@
 #define MAP_H
 
 #include "exports.h"
+#include "versions.h"
 
 #include "AreaAnimation.h"
 #include "Bitmap.h"
 #include "FogRenderer.h"
 #include "MapReverb.h"
 #include "PathFinder.h"
+#include "PathFinderScheduler.h"
 #include "Polygon.h"
 #include "TableMgr.h"
 #include "TileProps.h"
@@ -240,6 +242,27 @@ using proIterator = std::list<std::unique_ptr<Projectile>>::const_iterator;
 using spaIterator = std::list<Particles*>::const_iterator;
 static const Size ZeroSize;
 
+/**
+ * Map - Game area containing terrain, actors, objects, and providing pathfinding API
+ *
+ * RESPONSIBILITIES:
+ * - Owns terrain data (tileProps), the actor list and the traversability cache
+ * - Manages actors, containers, animations, projectiles, ambients, etc.
+ * - Provides a high-level pathfinding API that delegates to PathFinder's static methods
+ * - Maintains fog of war and exploration state
+ *
+ * PATHFINDING ARCHITECTURE - three pieces, and Map is only one of them:
+ * - Map owns the data (tileProps, actors, traversability cache) and wraps PathFinder in thin
+ *   convenience methods.
+ * - PathFinder is pure algorithm: static, stateless, no Map dependency. It works from whatever
+ *   terrain and actor data it is handed, which is what lets a worker thread run it on a snapshot.
+ * - PathFinderScheduler owns the worker threads and the request queues.
+ *
+ * Map does not talk to the scheduler; requests are issued by Movable::ScheduleFindPath(). Map's
+ * role towards it is as the data source: once a frame PathFinderScheduler::Sync() calls
+ * UpdateTraversabilityCache() and copies this map's tileprops and actor data into the snapshots
+ * the workers read, so no worker ever dereferences a Map or an Actor.
+ */
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
@@ -327,7 +350,6 @@ private:
 public:
 	Map(TileMap* tm, TileProps tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
-	static void NormalizeDeltas(float_t& dx, float_t& dy, float_t factor = 1);
 
 	/** prints useful information on console */
 	std::string dump() const override { return dump(false); };
@@ -339,6 +361,8 @@ public:
 	void SetTileMapProps(TileProps props);
 	void AutoLockDoors() const;
 	void UpdateScripts();
+	bool UpdateTraversabilityCache();
+	TraversabilityCache::Data_t& GetTraversabilityCacheData();
 	ResRef ResolveTerrainSound(const ResRef& sound, const Point& pos) const;
 	void DoStepForActor(Actor* actor, ieDword time) const;
 	void UpdateEffects();
@@ -396,21 +420,6 @@ public:
 	int GetHeight(const NavmapPoint& p) const;
 	Color GetLighting(const NavmapPoint& p) const;
 
-	PathMapFlags GetBlockedInRadius(const NavmapPoint&, unsigned int size, bool stopOnImpassable = true) const;
-	PathMapFlags GetBlocked(const NavmapPoint&) const;
-	PathMapFlags GetBlocked(const NavmapPoint&, int size) const;
-	PathMapFlags GetBlockedTile(const SearchmapPoint&) const;
-
-	// helper function used when the size > 2
-	PathMapFlags GetChildBlockedStatusForBigSize(const SearchmapPoint& smptChild, const unsigned int size) const
-	{
-		return GetBlockedInRadiusTile(smptChild, size);
-	}
-	// helper function used when the size <= 2
-	PathMapFlags GetChildBlockedStatusForSmallSize(const SearchmapPoint& smptChild, const unsigned int /* size */) const
-	{
-		return GetBlockedTile(smptChild);
-	}
 	Scriptable* GetScriptableByGlobalID(ieDword objectID);
 	Door* GetDoorByGlobalID(ieDword objectID) const;
 	Container* GetContainerByGlobalID(ieDword objectID) const;
@@ -436,7 +445,7 @@ public:
 
 	int GetActorCount(bool any) const;
 	//fix actors position if required
-	void JumpActors(bool jump) const;
+	void JumpActors(bool jump);
 	//selects all selectable actors in the area
 	void SelectActors() const;
 	//if items == true, remove noncritical items from ground piles too
@@ -493,34 +502,40 @@ public:
 	bool ExploreTile(const FogPoint&, bool fogOnly = false);
 	/* explore map from given point in map coordinates, true if uncovered something */
 	bool ExploreMapChunk(const SearchmapPoint& pos, int range, int los, bool updateSFXForVisibility = true);
-	void BlockSearchMapFor(const Movable* actor) const;
-	void ClearSearchMapFor(const Movable* actor) const;
+	void BlockSearchMapFor(const Movable* actor);
+	void ClearSearchMapFor(const Movable* actor);
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
-	//PathFinder
-	/* Finds the nearest passable point */
-	void AdjustPosition(SearchmapPoint& goal, const Size& startingRadius = ZeroSize, int size = -1) const;
-	void AdjustPositionNavmap(Point& goal, const Size& radius = ZeroSize) const;
-	void AdjustPositionDirected(NavmapPoint& goal, orient_t direction, int startingRadius, unsigned int minDistance) const;
-	/* Finds the path which leads the farthest from d */
-	Path RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, const Actor* caller);
-	PathNode RandomWalk(const Point& s, int size, int radius, const Actor* caller) const;
-	/* returns true if there is enemy visible */
-	bool AnyPCSeesEnemy() const;
-	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
-	PathNode GetLineEnd(const Point& start, int steps, orient_t orient) const;
-	Path GetLinePath(const Point& start, int Steps, orient_t Orientation, int flags) const;
-	Path GetLinePath(const Point& start, const Point& dest, int speed, orient_t Orientation, int flags) const;
-	/* Finds the path which leads to near d */
-	Path FindPath(const Point& s, const Point& d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor* caller = nullptr);
 
-	bool IsVisible(const Point& p) const;
-	bool IsExplored(const Point& p) const;
+	// PATHFINDING API:
+	// Map provides high-level pathfinding API that delegates to PathFinder static methods.
+	// These methods handle Map-specific concerns (actor management, scheduling) and pass
+	// data (tileProps, actors) to PathFinder's pure algorithms.
+
+	// PATHFINDING API - Terrain queries, utils (thin wrappers to PathFinder):
+	PathMapFlags GetBlockedInRadius(const NavmapPoint&, unsigned int size, bool stopOnImpassable = true) const;
+	PathMapFlags GetBlocked(const NavmapPoint&) const;
+	PathMapFlags GetBlockedTile(const SearchmapPoint&) const;
 	bool IsVisibleLOS(const Point& s, const Point& d, const Actor* caller) const;
 	bool IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller) const;
 	bool IsWalkableTo(const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller) const;
 	bool IsWalkableTo(const SearchmapPoint& s, const SearchmapPoint& d, bool actorsAreBlocking, const Actor* caller) const;
+	void AdjustPosition(SearchmapPoint& goal, const Size& startingRadius = ZeroSize, int size = -1) const;
+	void AdjustPositionNavmap(Point& goal, const Size& radius = ZeroSize) const;
+	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
+	PathNode GetLineEnd(const Point& start, int steps, orient_t orient) const;
+	Path GetLinePath(const Point& start, const Point& dest, int speed, orient_t Orientation, int flags) const;
 
+	// PATHFINDING API - High-level pathfinding operations (may schedule async pathfinding):
+	void RunAway(const Point& s, const Point& d, int maxPathLength, bool backAway, Actor* caller);
+	/** Picks a random reachable destination within radius. Returns false and leaves outStep
+	 * untouched if the actor is too slow or is boxed in. */
+	bool RandomWalk(const Point& s, int size, int radius, const Actor* caller, PathNode& outStep) const;
+
+
+	bool AnyPCSeesEnemy() const;
+	bool IsVisible(const Point& p) const;
+	bool IsExplored(const Point& p) const;
 	/* returns edge direction of map boundary, only worldmap regions */
 	WMPDirection WhichEdge(const NavmapPoint& s) const;
 
@@ -594,7 +609,6 @@ private:
 	void DrawOverheadText() const;
 	void DrawWallPolygons(const Region& viewport) const;
 
-	Size PropsSize() const noexcept;
 	Size FogMapSize() const;
 	bool FogTileUncovered(const Point& p, const Bitmap*) const;
 
@@ -606,17 +620,9 @@ private:
 	//actor uses travel region
 	void UseExit(Actor* pc, InfoPoint* ip);
 	//separated position adjustment, so their order could be randomised
-	bool AdjustPositionX(SearchmapPoint& goal, const Size& radius, int size = -1) const;
-	bool AdjustPositionY(SearchmapPoint& goal, const Size& radius, int size = -1) const;
 
 	void UpdateSpawns() const;
-	PathMapFlags GetBlockedInLine(const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, const Actor* caller = nullptr) const;
-	PathMapFlags GetBlockedInLineTile(const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, const Actor* caller = nullptr) const;
 	Projectile* AddProjectile(std::unique_ptr<Projectile> pro);
-
-	// same as GetBlocked, but in TileCoords
-	PathMapFlags GetBlockedTile(const SearchmapPoint&, int size) const;
-	PathMapFlags GetBlockedInRadiusTile(const SearchmapPoint&, uint16_t size, bool stopOnImpassable = true) const;
 };
 
 }

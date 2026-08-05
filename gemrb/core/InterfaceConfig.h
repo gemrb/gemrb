@@ -109,6 +109,9 @@ struct CoreSettings {
 	std::string SystemEncoding = "UTF-8";
 	std::string ScaleQuality = "best";
 
+	int PathfinderThreadsCount = 3;
+	std::string PathfinderMainThreadMode = "immediate";
+
 	variables_t vars;
 };
 
