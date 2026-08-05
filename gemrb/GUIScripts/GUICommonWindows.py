@@ -267,6 +267,15 @@ def ToggleWindow(id, pack, pos=WINDOW_CENTER):
 		return GemRB.LoadWindow(id, pack, pos)
 
 def SnapPortraitWindow (snap):
+	# prerequisites
+	if GameCheck.IsPST () or GameCheck.IsIWD2 ():
+		return # not using a vertical window
+	if GemRB.GetVar ("GUIEnhancements") & GE_SNAP_PORTWIN == 0 and snap:
+		return
+	screenW = GemRB.GetSystemVariable (SV_WIDTH)
+	if screenW <= 800:
+		return # pointless
+
 	import PortraitWindow
 	PortraitWindow.SnapPortraitWindow (snap)
 

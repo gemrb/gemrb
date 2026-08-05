@@ -398,7 +398,7 @@ def UpdatePortraitWindow ():
 	return
 
 def SnapPortraitWindow (snap):
-	"""Moves the window close to the "top window" if several conditions are met."""
+	"""Moves the window close to the "top window"."""
 
 	global OriginalH
 
@@ -406,15 +406,8 @@ def SnapPortraitWindow (snap):
 	if not Window:
 		return
 
-	# prerequisites
-	if GameCheck.IsPST () or GameCheck.IsIWD2 ():
-		return # not using a vertical window
-	if GemRB.GetVar ("GUIEnhancements") & GE_SNAP_PORTWIN == 0 and snap:
-		return
 	screenW = GemRB.GetSystemVariable (SV_WIDTH)
 	screenH = GemRB.GetSystemVariable (SV_HEIGHT)
-	if screenW <= 800:
-		return # pointless
 
 	# snap or unsnap, so the portraits are closer to original positions
 	portWinFrame = Window.GetFrame ()
