@@ -14,6 +14,7 @@ using namespace GemRB;
 
 void BMPWriter::PutImage(DataStream* output, Holder<Sprite2D> spr)
 {
+	if (!spr) return;
 	// FIXME
 	ieDword Width = spr->Frame.w;
 	ieDword Height = spr->Frame.h;
