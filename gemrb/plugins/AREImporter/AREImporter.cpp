@@ -1176,7 +1176,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 
 	// if the creature is already embedded in the area, leave its data intact
 	// if we just loaded the CRE, apply the override from the area entry
-	act->SetDialog(dialog, embedded);
+	act->SetDialog(dialog);
 
 	for (int j = 0; j < 8; j++) {
 		if (!scripts[j].IsEmpty()) {

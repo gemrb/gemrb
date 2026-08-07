@@ -92,11 +92,9 @@ const ieVariable& Scriptable::GetScriptName(void) const
 	return scriptName;
 }
 
-void Scriptable::SetDialog(const ResRef& resref, bool embedded)
+void Scriptable::SetDialog(const ResRef& resref)
 {
-	if (!resref.IsEmpty() && gamedata->Exists(resref, IE_DLG_CLASS_ID, true)) {
-		Dialog = resref;
-	} else if (!embedded) {
+	if (!resref.IsEmpty()) {
 		Dialog = resref;
 	}
 }
