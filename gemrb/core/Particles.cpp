@@ -210,22 +210,22 @@ void Particles::AddParticles(int count)
 
 		switch (path) {
 			case SP_PATH_EXPL:
-				p.x = pos.w / 2 + core->Roll(1, pos.w / 2, pos.w / 4);
+				p.x = pos.w / 2 + RAND(1, pos.w / 2) + pos.w / 4;
 				p.y = pos.h / 2 + (last_insert & 7);
 				break;
 			case SP_PATH_RAIN:
 			case SP_PATH_FLIT:
-				p.x = core->Roll(1, pos.w, 0);
-				p.y = core->Roll(1, pos.h, 0);
+				p.x = RAND(1, pos.w);
+				p.y = RAND(1, pos.h);
 				break;
 			case SP_PATH_FOUNT:
-				p.x = core->Roll(1, pos.w / 2, pos.w / 4);
-				p.y = core->Roll(1, pos.h / 2, 0);
+				p.x = RAND(1, pos.w / 2) + pos.w / 4;
+				p.y = RAND(1, pos.h / 2);
 				break;
 			case SP_PATH_FALL:
 			default:
-				p.x = core->Roll(1, pos.w, 0);
-				p.y = core->Roll(1, pos.h / 2, 0);
+				p.x = RAND(1, pos.w);
+				p.y = RAND(1, pos.h / 2);
 				break;
 		}
 		if (AddNew(p)) {
@@ -292,7 +292,7 @@ int Particles::Update()
 				if (points[i].state <= MAX_SPARK_PHASE << 4) {
 					break;
 				}
-				points[i].pos.x += core->Roll(1, 3, pos.w - 2);
+				points[i].pos.x += RAND(1, 3) + pos.w - 2;
 				points[i].pos.x %= pos.w;
 				points[i].pos.y += (i & 3) + 1;
 				break;
