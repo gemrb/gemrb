@@ -187,9 +187,13 @@ PathNode PathFinder::CalculateLineEnd(const TileProps& tileProps, const Point& p
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
-Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCacheSnapshot, const TileProps& tileProps, const Point& source, const Point& destination, const unsigned int actorCircleSize, unsigned int minDistance, int pathfindingFlags, const Movable* actorIdentity, int actorSpeed)
+Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCacheSnapshot, const TileProps& tileProps, const Point& source, const Point& destination, const ActorPathContext& actorContext, unsigned int minDistance, int pathfindingFlags)
 {
 	TRACY(ZoneScoped);
+
+	const unsigned int actorCircleSize = actorContext.circleSize;
+	const Movable* const actorIdentity = actorContext.identity;
+	const int actorSpeed = actorContext.speed;
 
 	if (InDebugMode(DebugMode::PATHFINDER))
 		Log(DEBUG, "FindPath", "source = {}, destination = {}, dist = {}, actorCircleSize = {}",

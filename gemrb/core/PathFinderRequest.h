@@ -29,6 +29,17 @@
 
 namespace GemRB {
 
+class Movable;
+
+/**
+ * The requesting actor's properties, as snapshotted when the request was made.
+ */
+struct ActorPathContext {
+	unsigned int circleSize = 0;
+	const Movable* identity = nullptr; // pointer identity only, never dereferenced
+	int speed = 0;
+};
+
 /**
  *  Specifies the type of pathfinding operation to perform after the path is calculated.
  *  Different request types may affect how the path is computed, merged with existing paths,

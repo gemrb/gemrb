@@ -7,6 +7,7 @@
 #include "exports.h"
 
 #include "Orientation.h"
+#include "PathFinderRequest.h"
 #include "Region.h"
 #include "TileProps.h"
 #include "TraversabilityCache.h"
@@ -163,7 +164,7 @@ public:
 	static void AdjustPositionDirected(const TileProps& tileProps, NavmapPoint& goal, orient_t direction, int startingRadius, unsigned int minDistance);
 
 	/* Finds the path which leads to near d */
-	static Path FindPath(const TraversabilityCache::Data_t& traversabilityCacheSnapshot, const TileProps& tileProps, const Point& source, const Point& destination, unsigned int actorCircleSize, unsigned int minDistance = 0, int pathfindingFlags = PF_SIGHT, const Movable* actorIdentity = nullptr, int actorSpeed = 0);
+	static Path FindPath(const TraversabilityCache::Data_t& traversabilityCacheSnapshot, const TileProps& tileProps, const Point& source, const Point& destination, const ActorPathContext& actorContext, unsigned int minDistance = 0, int pathfindingFlags = PF_SIGHT);
 
 	static bool IsVisibleLOS(const TileProps& tileProps, const Point& s, const Point& d, const Actor* caller);
 	static bool IsVisibleLOS(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller);

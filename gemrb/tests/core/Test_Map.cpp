@@ -67,7 +67,7 @@ static Path FindPathSync(const Point& source, const Point& destination, unsigned
 {
 	MapTest::map->UpdateTraversabilityCache();
 	return PathFinder::FindPath(MapTest::map->GetTraversabilityCacheData(), MapTest::map->tileProps,
-				    source, destination, circleSize);
+				    source, destination, ActorPathContext { circleSize });
 }
 
 TEST_F(MapTest, GetBlockedInLineTest1)

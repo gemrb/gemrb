@@ -810,16 +810,20 @@ Path PathFinderScheduler::PerformImmediatePathCalculation(
 Path PathFinderScheduler::PerformPathCalculation(const TraversabilityCache::Data_t& currentTraversabilityCacheSnapshot, const TileProps& currentTileProps, FindPathRequestId currentRequestId, FindPathRequestWorkerData& InOutCurrentRequest)
 {
 	// could be called both from main and workers thread, no access to any shared states
+	const ActorPathContext actorContext {
+		static_cast<unsigned int>(InOutCurrentRequest.payload.actorCircleSize),
+		InOutCurrentRequest.payload.instigatorIdentity,
+		InOutCurrentRequest.payload.actorSpeed
+	};
+
 	auto foundPath = PathFinder::FindPath(
 		currentTraversabilityCacheSnapshot,
 		currentTileProps,
 		InOutCurrentRequest.payload.source,
 		InOutCurrentRequest.payload.destination,
-		InOutCurrentRequest.payload.actorCircleSize,
+		actorContext,
 		InOutCurrentRequest.payload.minDistance,
-		InOutCurrentRequest.payload.pathfindingFlags,
-		InOutCurrentRequest.payload.instigatorIdentity,
-		InOutCurrentRequest.payload.actorSpeed);
+		InOutCurrentRequest.payload.pathfindingFlags);
 
 	if (!foundPath && InOutCurrentRequest.payload.canRePathIgnoringActors) {
 		if (InDebugMode(DebugMode::PATHFINDER)) {
@@ -831,11 +835,9 @@ Path PathFinderScheduler::PerformPathCalculation(const TraversabilityCache::Data
 			currentTileProps,
 			InOutCurrentRequest.payload.source,
 			InOutCurrentRequest.payload.destination,
-			InOutCurrentRequest.payload.actorCircleSize,
+			actorContext,
 			InOutCurrentRequest.payload.minDistance,
-			InOutCurrentRequest.payload.pathfindingFlags,
-			InOutCurrentRequest.payload.instigatorIdentity,
-			InOutCurrentRequest.payload.actorSpeed);
+			InOutCurrentRequest.payload.pathfindingFlags);
 	}
 	return foundPath;
 }
