@@ -379,8 +379,8 @@ void Movable::AddWayPoint(const Point& Des)
 	}
 	Destination = Des;
 
-	size_t steps = path.Size();
-	PathNode& lastStep = path.nodes[steps - 1];
+	const size_t steps = path.Size();
+	const PathNode& lastStep = path.nodes[steps - 1];
 
 	ScheduleFindPath(FindPathRequestType::AddWaypoint, lastStep.point, Des, 0);
 }
