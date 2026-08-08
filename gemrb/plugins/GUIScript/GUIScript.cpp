@@ -4331,7 +4331,7 @@ static PyObject* GemRB_SaveGame(PyObject* /*self*/, PyObject* args)
 
 	if (!PyArg_ParseTuple(args, "OO|iO", &obj, &folder, &Version, &preview)) {
 		PyErr_Clear();
-		PARSE_ARGS(args, "i|i", &slot, &Version);
+		PARSE_ARGS(args, "i|iO", &slot, &Version, &preview);
 	}
 
 	GET_GAME();

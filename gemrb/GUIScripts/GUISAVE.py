@@ -157,7 +157,7 @@ def QuickSavePressed ():
 	if GameCheck.IsTOB():
 		Slot = 4
 
-	GemRB.SaveGame(Slot)
+	GemRB.SaveGame (Slot, -1, GemRB.GetGamePreview ())
 	return
 
 def CloseConfirmWindow():

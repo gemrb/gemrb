@@ -283,7 +283,7 @@ def ConfirmedSaveGame ():
 	GemRB.SaveGame (game, Slotname, -1, CurrentPreview)
 
 def QuickSavePressed():
-	GemRB.SaveGame(1)
+	GemRB.SaveGame (1, -1, GemRB.GetGamePreview ())
 
 # Exit either back to game or to the Start window
 def CloseSaveWindow ():
