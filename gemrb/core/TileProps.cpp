@@ -179,13 +179,6 @@ OwningTileProps OwningTileProps::CopyFrom(const TileProps& tileProps)
 	return OwningTileProps { tileProps };
 }
 
-OwningTileProps::OwningTileProps() noexcept
-{
-	bytesSize = 0;
-	propPtr = nullptr;
-	propImage = nullptr;
-}
-
 OwningTileProps::OwningTileProps(OwningTileProps&& other) noexcept
 {
 	*this = std::move(other);

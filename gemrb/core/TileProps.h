@@ -108,7 +108,7 @@ class GEM_EXPORT OwningTileProps : public TileProps {
 public:
 	static OwningTileProps CopyFrom(const TileProps& tileProps);
 
-	OwningTileProps() noexcept;
+	OwningTileProps() noexcept = default;
 	OwningTileProps(OwningTileProps&& other) noexcept;
 	OwningTileProps(const OwningTileProps& other) noexcept;
 	OwningTileProps& operator=(const OwningTileProps& other) noexcept;
