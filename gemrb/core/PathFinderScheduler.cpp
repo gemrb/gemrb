@@ -70,6 +70,26 @@ int64_t PathFinderScheduler::lastRequestFrameNumber { 0 };
 int64_t PathFinderScheduler::lastCacheUpdateFrameNumber { 0 };
 std::vector<FindPathRequestId> PathFinderScheduler::earlyDrainedRequests;
 
+// Log() at DEBUG, gated on the pathfinder debug flag
+template<typename... ARGS>
+static void LogDebugPathfinder(const char* owner, const char* message, ARGS&&... args)
+{
+	if (InDebugMode(DebugMode::PATHFINDER)) {
+		Log(DEBUG, owner, message, std::forward<ARGS>(args)...);
+	}
+}
+
+// the map's entry, created empty on the allocator if this is the first sync for that map
+static TraversabilityCache::Data_t& GetOrCreateTraversabilityData(
+	std::unordered_map<ScriptID, TraversabilityCache::Data_t>& cacheData, const ScriptID mapID)
+{
+	auto found = cacheData.find(mapID);
+	if (found == cacheData.end()) {
+		found = cacheData.emplace(mapID, TraversabilityCache::Data_t(traversabilityCacheSnapshotAllocator)).first;
+	}
+	return found->second;
+}
+
 FindPathRequestId PathFinderScheduler::RequestPath(FindPathRequest request)
 {
 	// main thread
@@ -606,11 +626,9 @@ void PathFinderScheduler::Sync(const std::vector<Map*>& allMaps)
 			for (auto& scheduledRequest : workerScheduledQueuesByPriority[queueIdx]) {
 				const auto requestWaitingInQueueFrames = currentSyncFrameNumber - scheduledRequest.second.originFrame;
 				if (requestWaitingInQueueFrames >= requestExpirationFrames) {
-					if (InDebugMode(DebugMode::PATHFINDER)) {
-						Log(DEBUG, "PathfinderThreadUpdate", "[main] Path request with ID={} was "
+					LogDebugPathfinder("PathfinderThreadUpdate", "[main] Path request with ID={} was "
 										     "waiting in the queue for too long ({} frames), dropping it.",
-						    scheduledRequest.first.GetId(), requestWaitingInQueueFrames);
-					}
+							   scheduledRequest.first.GetId(), requestWaitingInQueueFrames);
 					// insert empty path for this request
 					foundPaths.insert({ scheduledRequest.first, { Path {}, scheduledRequest.second } });
 					staleRequestsPerQueue[queueIdx].push_back(scheduledRequest.first);
@@ -658,13 +676,8 @@ void PathFinderScheduler::Sync(const std::vector<Map*>& allMaps)
 				auto* map = allMaps[mapIdx];
 				const auto mapID = map->GetGlobalID();
 				if (wasTravUpdated[mapIdx]) {
-					auto found = traversabilityCacheData.find(mapID);
-					if (found == traversabilityCacheData.end()) {
-						found = traversabilityCacheData.emplace(mapID,
-											TraversabilityCache::Data_t(traversabilityCacheSnapshotAllocator))
-								.first;
-					}
-					found->second.SyncFrom(map->GetTraversabilityCacheData());
+					auto& mapTraversabilityData = GetOrCreateTraversabilityData(traversabilityCacheData, mapID);
+					mapTraversabilityData.SyncFrom(map->GetTraversabilityCacheData());
 					// invalidates the snapshot without copying anything here; the next worker
 					// to claim a request for this map re-takes it
 					++traversabilityCacheDataSnapshotVersion[mapID];
@@ -713,14 +726,10 @@ void PathFinderScheduler::Sync(const std::vector<Map*>& allMaps)
 		newRequestsAvailable = untakenScheduledCount > 0;
 	}
 	if (untakenScheduledCount == 1) {
-		if (InDebugMode(DebugMode::PATHFINDER)) {
-			Log(DEBUG, "PathfinderThreadUpdate", "[main] There is 1 request awaiting a worker, waking up 1 thread.");
-		}
+		LogDebugPathfinder("PathfinderThreadUpdate", "[main] There is 1 request awaiting a worker, waking up 1 thread.");
 		newRequestsAvailableSignal.notify_one();
 	} else if (untakenScheduledCount > 1) {
-		if (InDebugMode(DebugMode::PATHFINDER)) {
-			Log(DEBUG, "PathfinderThreadUpdate", "[main] There are {} requests awaiting a worker, waking up all threads.", untakenScheduledCount);
-		}
+		LogDebugPathfinder("PathfinderThreadUpdate", "[main] There are {} requests awaiting a worker, waking up all threads.", untakenScheduledCount);
 		newRequestsAvailableSignal.notify_all();
 	}
 	// 6. Cleanup
@@ -826,9 +835,7 @@ Path PathFinderScheduler::PerformPathCalculation(const TraversabilityCache::Data
 		InOutCurrentRequest.payload.pathfindingFlags);
 
 	if (!foundPath && InOutCurrentRequest.payload.canRePathIgnoringActors) {
-		if (InDebugMode(DebugMode::PATHFINDER)) {
-			Log(DEBUG, "WalkTo", "RequestID={}, re-pathing ignoring actors", currentRequestId.GetId());
-		}
+		LogDebugPathfinder("WalkTo", "RequestID={}, re-pathing ignoring actors", currentRequestId.GetId());
 		InOutCurrentRequest.payload.pathfindingFlags &= ~static_cast<int>(PF_ACTORS_ARE_BLOCKING);
 		foundPath = PathFinder::FindPath(
 			currentTraversabilityCacheSnapshot,
@@ -971,18 +978,14 @@ void PathFinderScheduler::PathfinderThreadUpdate(const size_t workerIdx)
 					// the main-thread back-off protocol is built around.
 					// This is fine for debugging, but interferes with the designed threading model
 					// and may (will) affect performance.
-					if (InDebugMode(DebugMode::PATHFINDER)) {
-						Log(DEBUG, "PathfinderThreadUpdate", "[worker {}] request ID={}, is already taken, going to next one.",
-						    std::this_thread::get_id(),
-						    scheduledRequest.first.GetId());
-					}
+					LogDebugPathfinder("PathfinderThreadUpdate", "[worker {}] request ID={}, is already taken, going to next one.",
+							   std::this_thread::get_id(),
+							   scheduledRequest.first.GetId());
 				}
 			}
 
 			if (currentRequestId.IsNull()) {
-				if (InDebugMode(DebugMode::PATHFINDER)) {
-					Log(DEBUG, "PathfinderThreadUpdate", "[worker {}] No valid requests found, leaving.", std::this_thread::get_id());
-				}
+				LogDebugPathfinder("PathfinderThreadUpdate", "[worker {}] No valid requests found, leaving.", std::this_thread::get_id());
 				std::unique_lock<std::mutex> newRequestsAvailableLock { newRequestsAvailableMutex };
 				newRequestsAvailable = false;
 				break; // break from this update; will put thread to sleep, nothing to work on right now; thread update will be called again when ready
@@ -1064,30 +1067,22 @@ void PathFinderScheduler::PathfinderThreadUpdate(const size_t workerIdx)
 
 void PathFinderScheduler::WorkerThreadMainLoop(const size_t workerIdx)
 {
-	if (InDebugMode(DebugMode::PATHFINDER)) {
-		Log(DEBUG, "PathfinderThreadUpdate", "[worker {}] Starting pathfinder thread", std::this_thread::get_id());
-	}
+	LogDebugPathfinder("PathfinderThreadUpdate", "[worker {}] Starting pathfinder thread", std::this_thread::get_id());
 	while (!shouldStop.load(std::memory_order_relaxed)) {
 		{ // newRequestsAvailableLock scope, put the worker thread to sleep if no new requests are available
 			std::unique_lock<std::mutex> newRequestsAvailableLock { newRequestsAvailableMutex };
 			if (!newRequestsAvailable) {
-				if (InDebugMode(DebugMode::PATHFINDER)) {
-					Log(DEBUG, "PathfinderThreadUpdate", "[worker {}] No requests are available, going to sleep", std::this_thread::get_id());
-				}
+				LogDebugPathfinder("PathfinderThreadUpdate", "[worker {}] No requests are available, going to sleep", std::this_thread::get_id());
 				// sleep and await on signal from condition_variable that there is a work to do:
 				newRequestsAvailableSignal.wait(newRequestsAvailableLock, [] {
 					return newRequestsAvailable || shouldStop.load(std::memory_order_relaxed);
 				});
 			}
-			if (InDebugMode(DebugMode::PATHFINDER)) {
-				Log(DEBUG, "PathfinderThreadUpdate", "[worker {}] Some requests are available, waking up!", std::this_thread::get_id());
-			}
+			LogDebugPathfinder("PathfinderThreadUpdate", "[worker {}] Some requests are available, waking up!", std::this_thread::get_id());
 		} // newRequestsAvailableLock scope
 
 		PathfinderThreadUpdate(workerIdx);
 	}
-	if (InDebugMode(DebugMode::PATHFINDER)) {
-		Log(DEBUG, "PathfinderThreadUpdate", "[worker {}] Exiting pathfinder thread", std::this_thread::get_id());
-	}
+	LogDebugPathfinder("PathfinderThreadUpdate", "[worker {}] Exiting pathfinder thread", std::this_thread::get_id());
 }
 }
