@@ -286,7 +286,7 @@ void Window::RedrawControls(const Control::varname_t& VarName) const
 	Control::value_t val = core->GetDictionary().Get(VarName, Control::INVALID_VALUE);
 
 	for (auto ctrl : Controls) {
-		ctrl->UpdateState(VarName, val);
+		ctrl->UpdateStateForVar(VarName, val);
 	}
 }
 

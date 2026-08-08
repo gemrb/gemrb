@@ -98,7 +98,7 @@ void Control::FlagsChanged(unsigned int /*oldflags*/)
 	}
 }
 
-void Control::UpdateState(const varname_t& varname, value_t val)
+void Control::UpdateStateForVar(const varname_t& varname, value_t val)
 {
 	if (VarName == varname) {
 		UpdateState(val);
@@ -172,7 +172,7 @@ void Control::UpdateDictValue() noexcept
 	if (win) {
 		win->RedrawControls(VarName);
 	} else {
-		UpdateState(VarName, newVal);
+		UpdateStateForVar(VarName, newVal);
 	}
 }
 
@@ -194,7 +194,7 @@ void Control::BindDictVariable(const varname_t& var, value_t val, ValueRange val
 		const auto& vars = core->GetDictionary();
 		const auto lookup = vars.Get(VarName);
 		if (lookup != nullptr) {
-			UpdateState(VarName, *lookup);
+			UpdateStateForVar(VarName, *lookup);
 		}
 	}
 }
