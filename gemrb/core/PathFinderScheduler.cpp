@@ -935,7 +935,12 @@ void PathFinderScheduler::PathfinderThreadUpdate(const size_t workerIdx)
 					break; // back off, let main thread have priority
 				}
 			} else {
-				scheduledAndCancelledQueuesMutex.lock();
+				// Explanation for sonar exemption:
+				// sonar wants to move the manual lock to RAII construction, but that's not really a viable option,
+				// without other compromises.
+				// Blocking here but timing out on the other branch cannot be expressed by a guard's
+				// constructor; the lock is adopted by RAII guardQueue on the very next line
+				scheduledAndCancelledQueuesMutex.lock(); // NOSONAR
 			}
 			std::lock_guard<std::timed_mutex> guardQueue(scheduledAndCancelledQueuesMutex, std::adopt_lock);
 
