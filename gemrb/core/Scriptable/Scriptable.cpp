@@ -193,8 +193,9 @@ void Scriptable::TickScripting()
 	}
 
 	ieDword actorState = 0;
-	if (Type == ST_ACTOR) {
-		actorState = static_cast<Actor*>(this)->Modified[IE_STATE_ID];
+	Actor* actor = As<Actor>(this);
+	if (actor) {
+		actorState = actor->Modified[IE_STATE_ID];
 	}
 
 	// Dead actors only get one chance to run a new script.
@@ -219,6 +220,15 @@ void Scriptable::TickScripting()
 	Region vp = core->GetGameControl()->Viewport();
 	if (!needsUpdate && vp.PointInside(Pos) && (!area || area->IsExplored(Pos))) {
 		needsUpdate = true;
+	}
+
+	// a ~neutral actor that is hidden or scrolled off-screen skips full AI this tick
+	// the "hidden" (m_canBeSeen) part seemed to have been something like our RemovalTime? So far: useless
+	if (actor && !(actor->GetSafeStat(IE_MC_FLAGS) & MC_IGNORE_INHIBIT_AI) && !actor->GetSafeStat(IE_ENABLEOFFSCREENAI)) {
+		Actor::stat_t ea = actor->GetSafeStat(IE_EA);
+		if (ea > EA_CONTROLLABLE && ea < EA_EVILCUTOFF && !actor->DrawingRegion().IntersectsRegion(vp)) {
+			return;
+		}
 	}
 
 	// Charmed actors don't get frequent updates.
