@@ -344,7 +344,10 @@ private:
 		       "A default-constructed T is not all-zero bytes. Instantiate PagedSparseArray with "
 		       "DefaultTIsAllZeroBytes = false, or give T a zeroed default (including struct padding).");
 	}
-	static void AssertDefaultTIsAllZeroBytes(std::false_type) {}
+	static void AssertDefaultTIsAllZeroBytes(std::false_type)
+	{
+		// intentionally empty: nothing to check, the false path claims nothing about T's bytes
+	}
 
 	static void ResetCell(TPage_t* page, const size_t cellIdx, std::true_type)
 	{
