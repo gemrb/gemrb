@@ -1001,7 +1001,7 @@ void PathFinderScheduler::PathfinderThreadUpdate(const size_t workerIdx)
 			const auto currentSnapshotVersion = traversabilityCacheDataSnapshotVersion[currentRequest.mapID];
 			if (!publishedTraversability || publishedTraversability->version != currentSnapshotVersion) {
 				auto snapshot = std::make_shared<TraversabilityDataSnapshot>();
-				snapshot->data = foundTraversabilityData->second;
+				snapshot->data.CopyFrom(foundTraversabilityData->second);
 				snapshot->version = currentSnapshotVersion;
 				publishedTraversability = std::move(snapshot);
 			}

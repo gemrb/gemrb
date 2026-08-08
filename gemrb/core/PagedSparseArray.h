@@ -138,16 +138,16 @@ struct PagedSparseArray {
 		other.usedPages = 0;
 	}
 
-	// do not allow copy construction, as we need clear definition of allocator's ownership, and it's not usually the
-	// `other` allocator instance we want to use
+	// do not allow copy construction nor copy assignment, as we need clear definition of allocator's ownership
+	// copying is available as the named CopyFrom() instead
 	PagedSparseArray(const PagedSparseArray& other) = delete;
+	PagedSparseArray& operator=(const PagedSparseArray& other) = delete;
 
-	// allow copy assignment, we will use `this` instance of the allocator
-	PagedSparseArray& operator=(const PagedSparseArray& other)
+	// copy `other`'s contents, using `this` instance of the allocator
+	void CopyFrom(const PagedSparseArray& other)
 	{
 		if (this == &other) {
-			// clear() below would free the very pages the copy loop then reads
-			return *this;
+			return;
 		}
 
 		clear(other.size());
@@ -161,7 +161,6 @@ struct PagedSparseArray {
 				++usedPages;
 			}
 		}
-		return *this;
 	}
 
 	~PagedSparseArray()
@@ -211,7 +210,7 @@ struct PagedSparseArray {
 	void SyncFrom(PagedSparseArray& other)
 	{
 		if (pageTable.empty() || totalSize != other.totalSize) {
-			*this = other;
+			CopyFrom(other);
 			other.dirtyPages.clear();
 			return;
 		}
