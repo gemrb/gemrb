@@ -294,6 +294,8 @@ private:
 	static std::vector<FindPathRequestId> cancelledQueue;
 
 	// cached state per map, keyed by map's global ID
+	/** Pages' pool for traversabilityCacheData below. Facing only main thread. */
+	static FixedSizePool<TraversabilityCache::Data_t::TPage_t> traversabilityCacheSnapshotAllocator;
 	/** Main-thread instance per map; SyncFrom() updates it incrementally from the map's dirty set */
 	static std::unordered_map<ScriptID, TraversabilityCache::Data_t> traversabilityCacheData;
 
@@ -419,6 +421,12 @@ private:
 		const TraversabilityCache::Data_t& currentTraversabilityCacheSnapshot,
 		const TileProps& currentTileProps, FindPathRequestId currentRequestId,
 		FindPathRequestWorkerData& InOutCurrentRequest);
+
+	/**
+	 * Hands traversabilityCacheData's entry for selected map.
+	 * Creates empty one on the pool if it is the first sync for that map.
+	 */
+	static TraversabilityCache::Data_t& GetOrCreateTraversabilityData(ScriptID mapID);
 };
 }
 

@@ -43,7 +43,7 @@ PathFinderScheduler::IncomingQueue_t PathFinderScheduler::incomingRequests;
 PathFinderScheduler::ScheduledQueue_t PathFinderScheduler::scheduledQueue;
 std::vector<FindPathRequestId> PathFinderScheduler::cancelledQueue;
 
-static FixedSizePool<TraversabilityCache::Data_t::TPage_t> traversabilityCacheSnapshotAllocator;
+FixedSizePool<TraversabilityCache::Data_t::TPage_t> PathFinderScheduler::traversabilityCacheSnapshotAllocator;
 std::unordered_map<ScriptID, TraversabilityCache::Data_t> PathFinderScheduler::traversabilityCacheData;
 std::unordered_map<ScriptID, uint64_t> PathFinderScheduler::traversabilityCacheDataSnapshotVersion;
 std::unordered_map<ScriptID, std::shared_ptr<const TraversabilityDataSnapshot>> PathFinderScheduler::traversabilityCacheDataSnapshot;
@@ -79,13 +79,11 @@ static void LogDebugPathfinder(const char* owner, const char* message, ARGS&&...
 	}
 }
 
-// the map's entry, created empty on the allocator if this is the first sync for that map
-static TraversabilityCache::Data_t& GetOrCreateTraversabilityData(
-	std::unordered_map<ScriptID, TraversabilityCache::Data_t>& cacheData, const ScriptID mapID)
+TraversabilityCache::Data_t& PathFinderScheduler::GetOrCreateTraversabilityData(const ScriptID mapID)
 {
-	auto found = cacheData.find(mapID);
-	if (found == cacheData.end()) {
-		found = cacheData.emplace(mapID, TraversabilityCache::Data_t(traversabilityCacheSnapshotAllocator)).first;
+	auto found = traversabilityCacheData.find(mapID);
+	if (found == traversabilityCacheData.end()) {
+		found = traversabilityCacheData.emplace(mapID, TraversabilityCache::Data_t(traversabilityCacheSnapshotAllocator)).first;
 	}
 	return found->second;
 }
@@ -676,7 +674,7 @@ void PathFinderScheduler::Sync(const std::vector<Map*>& allMaps)
 				auto* map = allMaps[mapIdx];
 				const auto mapID = map->GetGlobalID();
 				if (wasTravUpdated[mapIdx]) {
-					auto& mapTraversabilityData = GetOrCreateTraversabilityData(traversabilityCacheData, mapID);
+					auto& mapTraversabilityData = GetOrCreateTraversabilityData(mapID);
 					mapTraversabilityData.SyncFrom(map->GetTraversabilityCacheData());
 					// invalidates the snapshot without copying anything here; the next worker
 					// to claim a request for this map re-takes it
