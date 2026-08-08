@@ -13,8 +13,6 @@
 #include "Logging/Logging.h"
 
 #include <cassert>
-#include <cstdlib>
-#include <cstring>
 #include <utility>
 
 namespace GemRB {
@@ -195,25 +193,10 @@ OwningTileProps& OwningTileProps::operator=(const OwningTileProps& other) noexce
 	if (this == &other) {
 		return *this;
 	}
-
-	// grow only: a buffer that is already large enough is reused, and bytesSize keeps describing
-	// what is allocated rather than what was copied, so the destructor still frees all of it
-	if (bytesSize < other.bytesSize) {
-		free(propPtr);
-		propPtr = static_cast<uint32_t*>(malloc(other.bytesSize));
-		bytesSize = other.bytesSize;
-	}
+	ownedProps = other.ownedProps;
+	RebindPropPtr();
 	size = other.size;
 	propImage = nullptr;
-
-	if (other.bytesSize > 0) {
-		// pathfinding cannot proceed without its terrain data, and there is nothing sensible to
-		// fall back to, so a failed allocation is fatal
-		if (propPtr == nullptr) {
-			error("TileProps", "Failed to allocate {} bytes for a tile properties buffer.", other.bytesSize);
-		}
-		memcpy(propPtr, other.propPtr, other.bytesSize);
-	}
 	return *this;
 }
 
@@ -223,42 +206,24 @@ OwningTileProps& OwningTileProps::operator=(OwningTileProps&& other) noexcept
 		return *this;
 	}
 
-	if (propPtr && bytesSize > 0) {
-		free(propPtr);
-	}
-
-	propPtr = other.propPtr;
+	ownedProps = std::move(other.ownedProps);
+	RebindPropPtr();
 	size = other.size;
-	bytesSize = other.bytesSize;
 	propImage = nullptr;
 
+	other.ownedProps.clear();
 	other.propPtr = nullptr;
 	other.propImage = nullptr;
 	other.size.reset();
 	return *this;
 }
 
-OwningTileProps::~OwningTileProps()
-{
-	if (propPtr && bytesSize > 0) {
-		free(propPtr);
-	}
-}
-
 OwningTileProps::OwningTileProps(const TileProps& tileProps)
+	// one uint32_t per cell; pixelFormat.Bpp is that same 4 bytes, expressed for the pixel buffer
+	: ownedProps(tileProps.GetPropPtr(), tileProps.GetPropPtr() + tileProps.GetSize().Area())
 {
-	bytesSize = pixelFormat.Bpp * tileProps.GetSize().Area();
 	size = tileProps.GetSize();
 	propImage = nullptr;
-
-	if (bytesSize > 0) {
-		propPtr = static_cast<uint32_t*>(malloc(bytesSize));
-		// pathfinding cannot proceed without its terrain data, and there is nothing sensible to
-		// fall back to, so a failed allocation is fatal
-		if (propPtr == nullptr) {
-			error("TileProps", "Failed to allocate {} bytes for a tile properties buffer.", bytesSize);
-		}
-		memcpy(propPtr, tileProps.GetPropPtr(), bytesSize);
-	}
+	RebindPropPtr();
 }
 }

@@ -14,6 +14,7 @@
 #include "Sprite2D.h"
 
 #include <cstdint>
+#include <vector>
 
 namespace GemRB {
 // upper bound on the radius of the circle painted into / tested against the searchmap
@@ -114,13 +115,20 @@ public:
 	OwningTileProps& operator=(const OwningTileProps& other) noexcept;
 	OwningTileProps& operator=(OwningTileProps&& other) noexcept;
 
-	~OwningTileProps() override;
+	~OwningTileProps() override = default;
 
 private:
-	// bytes currently allocated at propPtr
-	size_t bytesSize = 0;
+	// backing storage for the base class' propPtr, which points at ownedProps.data() whenever
+	// this instance holds any pixels
+	std::vector<uint32_t> ownedProps;
 
 	explicit OwningTileProps(const TileProps& tileProps);
+
+	// repoints propPtr at the current storage; must run after anything that reallocates it
+	void RebindPropPtr() noexcept
+	{
+		propPtr = ownedProps.empty() ? nullptr : ownedProps.data();
+	}
 };
 }
 

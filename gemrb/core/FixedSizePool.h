@@ -24,15 +24,16 @@
 #include "Logging/Logging.h"
 
 #include <cstddef>
-#include <cstdlib>
 #include <deque>
+#include <memory>
+#include <new>
 #include <type_traits>
 #include <vector>
 
 namespace GemRB {
 
 /**
-	 * Freelist pool of same-sized slots, carved out of larger malloc'd blocks.
+	 * Freelist pool of same-sized slots, carved out of larger raw blocks.
 	 *
 	 * Requires trivially copyable T, as this works in concept as malloc/free - treat it
 	 * as raw, uninitialized memory pool:
@@ -87,11 +88,12 @@ public:
 
 private:
 	struct Block {
-		void* memory;
+		// raw storage; no T is ever constructed in it, see the class comment
+		std::unique_ptr<unsigned char[]> memory;
 		size_t numberOfElements;
 
 		explicit Block(const size_t inNumberOfElements)
-			: memory(std::malloc(inNumberOfElements * sizeof(T))),
+			: memory(new(std::nothrow) unsigned char[inNumberOfElements * sizeof(T)]),
 			  numberOfElements(inNumberOfElements)
 		{
 			if (memory == nullptr) {
@@ -101,19 +103,7 @@ private:
 		}
 
 		Block(const Block&) = delete;
-		Block(Block&& other) noexcept
-			: memory(other.memory), numberOfElements(other.numberOfElements)
-		{
-			other.memory = nullptr;
-			other.numberOfElements = 0;
-		}
-
-		~Block()
-		{
-			if (memory) {
-				std::free(memory);
-			}
-		}
+		Block(Block&& other) noexcept = default;
 	};
 	std::deque<Block> blocks;
 	std::vector<T*> availableElements;
@@ -130,7 +120,7 @@ private:
 		blocks.emplace_back(newAllocationSize);
 
 		// add each new element from the new allocation to the list of available elements
-		T* newBlockDataPointer = static_cast<T*>(blocks.back().memory);
+		T* newBlockDataPointer = reinterpret_cast<T*>(blocks.back().memory.get());
 		TotalElements += newAllocationSize;
 		availableElements.reserve(TotalElements);
 		for (size_t i = 0; i < newAllocationSize; ++i) {
