@@ -197,7 +197,7 @@ public:
 	virtual void AddSubviewInFrontOfView(View*, const View* = NULL);
 	View* RemoveSubview(const View*) noexcept;
 	View* RemoveFromSuperview();
-	View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
+	virtual View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
 	Window* GetWindow() const;
 	bool ContainsView(const View* view) const;
 

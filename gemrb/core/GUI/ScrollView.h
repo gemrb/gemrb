@@ -65,7 +65,7 @@ public:
 
 	void AddSubviewInFrontOfView(View*, const View* = NULL) override;
 	View* RemoveSubview(const View*);
-	View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
+	View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false) override;
 
 	// TODO: this isn't how we want to do things
 	// this should happen automatically as subivews are added/removed/resized

@@ -621,7 +621,7 @@ public:
 	 * of this actor in the traversability cache */
 	BlockingSizeCategory getSizeCategory() const;
 	/** places the actor on the map */
-	void SetMap(Map* map);
+	void SetMap(Map* map) override;
 	/** sets the actor's position, calculating with the nojump flag*/
 	void SetPosition(const Point& nmptTarget, bool jump, const Size& radius = Size(), int size = -1);
 	/** you better use SetStat, this stuff is only for special cases*/

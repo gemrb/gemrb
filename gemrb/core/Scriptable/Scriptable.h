@@ -345,7 +345,7 @@ public:
 	void SetInternalFlag(unsigned int value, BitOp mode);
 	const ieVariable& GetScriptName() const;
 	Map* GetCurrentArea() const;
-	void SetMap(Map* map);
+	virtual void SetMap(Map* map);
 	void SetScriptName(const ieVariable& text);
 	//call this to enable script running as soon as possible
 	void ImmediateEvent();
