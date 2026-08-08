@@ -2013,11 +2013,11 @@ std::vector<Actor*> Map::GetAllActorsInRadius(const Point& p, int flags, unsigne
 		if (!actor->ValidTarget(flags, see)) {
 			continue;
 		}
-		if (!(flags & GA_NO_LOS)) {
-			//line of sight visibility
-			if (!PathFinder::IsVisibleLOS(tileProps, actor->Pos, p, actor)) {
-				continue;
-			}
+		//line of sight visibility
+		const bool isLosRequired = !(flags & GA_NO_LOS);
+		const bool isOutOfSight = isLosRequired && !PathFinder::IsVisibleLOS(tileProps, actor->Pos, p, actor);
+		if (isOutOfSight) {
+			continue;
 		}
 		neighbours.emplace_back(actor);
 	}
