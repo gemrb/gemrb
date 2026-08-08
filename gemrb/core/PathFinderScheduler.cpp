@@ -57,7 +57,7 @@ std::atomic<bool> PathFinderScheduler::mainThreadWantsSync { false };
 bool PathFinderScheduler::newRequestsAvailable { false };
 
 std::vector<PathFinderScheduler::FoundQueue_t> PathFinderScheduler::workerFoundPaths;
-PathFinderScheduler::ScheduledQueue_t PathFinderScheduler::workerScheduledQueuesByPriority[ScheduledQueuesPrioritiesCount];
+std::array<PathFinderScheduler::ScheduledQueue_t, ScheduledQueuesPrioritiesCount> PathFinderScheduler::workerScheduledQueuesByPriority;
 std::vector<FindPathRequestId> PathFinderScheduler::workerCancelledQueue;
 
 std::timed_mutex PathFinderScheduler::scheduledAndCancelledQueuesMutex;

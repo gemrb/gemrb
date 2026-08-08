@@ -8,6 +8,8 @@
 #include "Streams/FileStream.h"
 #include "System/VFS.h"
 
+#include <array>
+
 namespace GemRB {
 
 void SanityCheck(const char* ver)
@@ -288,7 +290,7 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	}
 
 	CONFIG_STRING("PathfinderMainThreadMode", config.PathfinderMainThreadMode);
-	const std::string availableMainThreadModes[] = { "immediate", "queued" };
+	const std::array<std::string, 2> availableMainThreadModes { "immediate", "queued" };
 	// cast to unsigned char first: tolower is undefined for negative values, which is what a
 	// non-ASCII byte sign-extends to
 	std::transform(config.PathfinderMainThreadMode.begin(), config.PathfinderMainThreadMode.end(), config.PathfinderMainThreadMode.begin(),

@@ -30,6 +30,7 @@
 
 #include "Scriptable/Scriptable.h"
 
+#include <array>
 #include <atomic>
 #include <condition_variable>
 #include <memory>
@@ -347,7 +348,7 @@ private:
 	/** Per-worker queues of completed paths pending transfer to main thread (each protected by its own foundPathsMutexByWorker entry) */
 	static std::vector<FoundQueue_t> workerFoundPaths;
 	/** Worker thread array of scheduled request queues, indexed by priority level (protected by scheduledAndCancelledQueuesMutex) */
-	static ScheduledQueue_t workerScheduledQueuesByPriority[ScheduledQueuesPrioritiesCount];
+	static std::array<ScheduledQueue_t, ScheduledQueuesPrioritiesCount> workerScheduledQueuesByPriority;
 	/** Worker thread queue of cancelled request IDs pending processing (protected by scheduledAndCancelledQueuesMutex) */
 	static std::vector<FindPathRequestId> workerCancelledQueue;
 
