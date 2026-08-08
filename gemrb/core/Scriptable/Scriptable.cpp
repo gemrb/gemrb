@@ -215,8 +215,9 @@ void Scriptable::TickScripting()
 		InternalFlags &= ~IF_FORCEUPDATE;
 	}
 	// also force it for on-screen actors
+	// but only if the place was already explored, so scrolling over the black void does not activate
 	Region vp = core->GetGameControl()->Viewport();
-	if (!needsUpdate && vp.PointInside(Pos)) {
+	if (!needsUpdate && vp.PointInside(Pos) && (!area || area->IsExplored(Pos))) {
 		needsUpdate = true;
 	}
 
