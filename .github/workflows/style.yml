@@ -24,7 +24,7 @@ jobs:
     - name: python-lint whitespace check
       run: |
         git fetch origin
-        pip install pycodestyle &&
+        pip install --only-binary :all: pycodestyle==2.14.0 &&
         git diff -u origin/${{github.base_ref}}... -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff --show-source
 
     - uses: cpp-linter/cpp-linter-action@v2
