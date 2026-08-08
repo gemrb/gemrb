@@ -109,9 +109,18 @@ struct PagedSparseArray {
 
 	// Only odr-used on the DefaultTIsAllZeroBytes == true path, and static data members of a class
 	// template are instantiated on demand, so a false instantiation never emits it.
-	static const char ZeroBuffer[PAGE_SIZE * sizeof(T)];
+	// Explanation for sonar exemption:
+	// raw array on purpose. It exists only as a memcmp reference, so a container would buy nothing
+	// and add .data() at every use; the rule's suggested std::string would put a heap allocation
+	// behind the emptiness test that runs on every cell reset.
+	static const char ZeroBuffer[PAGE_SIZE * sizeof(T)]; // NOSONAR
 
-	using TPage_t = T[PAGE_SIZE];
+	// Explanation for sonar exemption:
+	// a page is raw memory, not a container. FixedSizePool carves slots of exactly sizeof(TPage_t)
+	// bytes and never constructs a T in them, and whole pages are copied and compared with
+	// memcpy/memcmp. A container type would sit between the pool and those raw byte operations,
+	// with its own layout to trust.
+	using TPage_t = T[PAGE_SIZE]; // NOSONAR
 
 	FixedSizePool<TPage_t>& pageAllocator;
 	std::unordered_set<size_t> dirtyPages;
@@ -339,7 +348,8 @@ private:
 		// the memset/memcmp path is only valid if a defaulted T really is all-zero bytes, padding
 		// included; two elements are checked so any padding between them is covered too
 		constexpr size_t AssertedArraySize = 2;
-		const T DefaultT[AssertedArraySize] { T(), T() };
+		// Explanation for sonar exemption: raw array, same reason as ZeroBuffer, this is byte-wise storage for the memcmp
+		const T DefaultT[AssertedArraySize] { T(), T() }; // NOSONAR
 		assert((std::memcmp(DefaultT, ZeroBuffer, AssertedArraySize * sizeof(T)) == 0) &&
 		       "A default-constructed T is not all-zero bytes. Instantiate PagedSparseArray with "
 		       "DefaultTIsAllZeroBytes = false, or give T a zeroed default (including struct padding).");
@@ -375,7 +385,8 @@ private:
 };
 
 template<typename T, bool DefaultTIsAllZeroBytes, size_t PageBits>
-const char PagedSparseArray<T, DefaultTIsAllZeroBytes, PageBits>::ZeroBuffer[PAGE_SIZE * sizeof(T)] = {};
+// Explanation for sonar exemption: see the declaration
+const char PagedSparseArray<T, DefaultTIsAllZeroBytes, PageBits>::ZeroBuffer[PAGE_SIZE * sizeof(T)] = {}; // NOSONAR
 }
 
 #endif
