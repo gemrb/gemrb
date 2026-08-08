@@ -84,8 +84,8 @@ int GetReaction(const Actor* target, const Scriptable* Sender)
 
 	AutoTable chrModTable = gamedata->LoadTable("rmodchr", true);
 	if (chrModTable) {
-		int chr = Clamp<int>(target->GetStat(IE_CHR) - 1, 0, 24);
-		reaction += repModTable->QueryFieldSigned<int>(0, chr);
+		int chr = Clamp<int>(0, target->GetStat(IE_CHR) - 1, 24);
+		reaction += chrModTable->QueryFieldSigned<int>(0, chr);
 	}
 
 	// add -4 penalty when dealing with racial enemies
