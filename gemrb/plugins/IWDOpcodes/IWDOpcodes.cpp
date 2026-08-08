@@ -873,8 +873,8 @@ static int fx_salamander_aura(Scriptable* Owner, Actor* target, Effect* fx)
 
 	ieDword damage, mystat;
 	switch (fx->Parameter2) {
-		case 0:
 		default:
+		case 0:
 			damage = DAMAGE_FIRE;
 			mystat = IE_RESISTFIRE;
 			break;
@@ -3141,8 +3141,8 @@ static int fx_lower_resistance(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	int modifier;
 
 	switch (fx->Parameter2) {
-		case 0:
 		default:
+		case 0:
 			//original IWD2 style
 			if (target->SetSpellState(SS_LOWERRESIST)) return FX_APPLIED;
 			modifier = fx->CasterLevel * 2;

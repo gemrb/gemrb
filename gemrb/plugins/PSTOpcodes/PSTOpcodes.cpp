@@ -758,6 +758,8 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 	// PST:EE also exploded this into separate opcodes with more parameters and using a bam/vvc instead of an internal projectile
 	if (fx->FirstApply) {
 		switch (fx->Parameter2) {
+			default:
+				break;
 			case 0: //cloak of warding
 				ConvertTiming(fx, 5 * fx->CasterLevel);
 				fx->Parameter3 = RAND(3, 12) + fx->CasterLevel;
@@ -831,7 +833,6 @@ int fx_overlay(Scriptable* Owner, Actor* target, Effect* fx)
 				break;
 			case 9:
 			case 10: //unused
-			default:
 				break;
 			case 11: //flame walk
 				ConvertTiming(fx, 10 + 10 * fx->CasterLevel);

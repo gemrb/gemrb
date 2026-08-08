@@ -12447,13 +12447,13 @@ static PyObject* GemRB_SetMazeEntry(PyObject* /*self*/, PyObject* args)
 	maze_entry* m = reinterpret_cast<maze_entry*>(game->mazedata + entry * MAZE_ENTRY_SIZE);
 	maze_entry* m2;
 	switch (index) {
-		case ME_OVERRIDE:
-			m->me_override = value;
-			break;
 		default:
 		case ME_VALID:
 		case ME_ACCESSIBLE:
 			return nullptr;
+		case ME_OVERRIDE:
+			m->me_override = value;
+			break;
 		case ME_TRAP: //trapped/traptype
 			if (value == -1) {
 				m->trapped = 0;

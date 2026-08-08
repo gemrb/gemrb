@@ -188,16 +188,16 @@ void Particles::Draw(Point p)
 			case SP_TYPE_CIRCLE:
 				VideoDriver->DrawCircle(points[i].pos - p, 2, clr);
 				break;
-			case SP_TYPE_POINT:
-			default:
-				VideoDriver->DrawPoint(points[i].pos - p, clr);
-				break;
 			// this is more like a raindrop
 			case SP_TYPE_LINE:
 				if (length) {
 					int y = length > 3 ? i & 1 : 0;
 					VideoDriver->DrawLine(points[i].pos - p, points[i].pos - p + Point(y, length), clr);
 				}
+				break;
+			case SP_TYPE_POINT:
+			default:
+				VideoDriver->DrawPoint(points[i].pos - p, clr);
 				break;
 		}
 	}
@@ -213,11 +213,6 @@ void Particles::AddParticles(int count)
 				p.x = pos.w / 2 + core->Roll(1, pos.w / 2, pos.w / 4);
 				p.y = pos.h / 2 + (last_insert & 7);
 				break;
-			case SP_PATH_FALL:
-			default:
-				p.x = core->Roll(1, pos.w, 0);
-				p.y = core->Roll(1, pos.h / 2, 0);
-				break;
 			case SP_PATH_RAIN:
 			case SP_PATH_FLIT:
 				p.x = core->Roll(1, pos.w, 0);
@@ -225,6 +220,11 @@ void Particles::AddParticles(int count)
 				break;
 			case SP_PATH_FOUNT:
 				p.x = core->Roll(1, pos.w / 2, pos.w / 4);
+				p.y = core->Roll(1, pos.h / 2, 0);
+				break;
+			case SP_PATH_FALL:
+			default:
+				p.x = core->Roll(1, pos.w, 0);
 				p.y = core->Roll(1, pos.h / 2, 0);
 				break;
 		}

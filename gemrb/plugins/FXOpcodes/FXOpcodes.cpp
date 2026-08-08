@@ -1098,8 +1098,6 @@ int fx_set_berserk_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->SetSpellState(SS_BERSERK);
 			EXTSTATE_SET(EXTSTATE_BERSERK);
 			STAT_SET(IE_BERSERKSTAGE2, 1);
-			// intentional fallthrough
-		default:
 			target->AddPortraitIcon(PI::BERSERK);
 			break;
 		case 2: //blood rage
@@ -1118,6 +1116,9 @@ int fx_set_berserk_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->SetSpellState(SS_NOHPINFO);
 			target->SetColorMod(0xff, RGBModifier::ADD, 15, Color(128, 0, 0, 0));
 			target->AddPortraitIcon(PI::BLOODRAGE);
+			break;
+		default:
+			target->AddPortraitIcon(PI::BERSERK);
 			break;
 	}
 	return FX_PERMANENT;
@@ -2526,8 +2527,8 @@ int fx_animation_id_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_animation_id_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	switch (fx->Parameter2) {
-		case 0: //non permanent animation change
 		default:
+		case 0: // non permanent animation change
 			STAT_SET_PCF(IE_ANIMATION_ID, fx->Parameter1);
 			return FX_APPLIED;
 		case 1: //remove any non permanent change
@@ -2553,8 +2554,8 @@ int fx_to_hit_modifier(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	int percentage;
 	switch (fx->Parameter2) {
-		case MOD_ADDITIVE:
 		default:
+		case MOD_ADDITIVE:
 			target->ToHit.HandleFxBonus(fx->Parameter1, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
 			break;
 		case MOD_ABSOLUTE:
@@ -2648,8 +2649,8 @@ int fx_dispel_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ieDword itemLevel;
 	if (fx->Parameter2 > 2 && !target->inventory.IsSlotEmpty(slot)) {
 		switch (fx->Parameter2 >> 16) {
-			case 0:
 			default: // always dispel, ignore undispellable
+			case 0:
 				if (!(target->inventory.GetItemFlag(slot) & IE_INV_ITEM_NO_DISPEL)) target->inventory.RemoveItem(slot);
 				break;
 			case 1: // never dispel, regardless of flags
@@ -2663,8 +2664,8 @@ int fx_dispel_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	switch (fx->Parameter2 & 3) {
-		case 0:
 		default:
+		case 0:
 			// dispel everything
 			target->fxqueue.RemoveLevelEffects(0xffffffff, RL_DISPELLABLE, 0, target);
 			break;
@@ -6784,8 +6785,8 @@ int fx_wing_buffet(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//create movement in actor
 	orient_t dir;
 	switch (fx->Parameter2) {
-		case 2: // away
 		default:
+		case 2: // away
 			dir = GetOrient(fx->Source, target->Pos);
 			break;
 		case 4: // towards
@@ -7354,8 +7355,8 @@ int fx_screenshake(Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 	Point shake;
 	switch (fx->Parameter2) {
-		case 0:
 		default:
+		case 0:
 			shake.x = fx->Parameter1;
 			shake.y = fx->Parameter1;
 			break;
