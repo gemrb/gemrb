@@ -277,7 +277,11 @@ struct PagedSparseArray {
 			: arr(a), index(i) {}
 
 		// Read - no allocation
-		operator T() const
+		// Explanation for sonar exemption:
+		// Deliberately implicit: Proxy is a proxy reference, and its whole
+		// purpose is to be invisible at the call site so that `arr[i]` reads and `arr[i] = v`
+		// writes without the caller knowing which one it holds. `explicit` would defeat that.
+		operator T() const // NOSONAR
 		{
 			const TPage_t* page = arr.pageTable[index >> PAGE_BITS];
 			return page ? (*page)[index & PAGE_MASK] : T();
