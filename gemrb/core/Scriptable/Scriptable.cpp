@@ -218,7 +218,22 @@ void Scriptable::TickScripting()
 	// also force it for on-screen actors
 	// but only if the place was already explored, so scrolling over the black void does not activate
 	Region vp = core->GetGameControl()->Viewport();
-	if (!needsUpdate && vp.PointInside(Pos) && (!area || area->IsExplored(Pos))) {
+	bool explored = [&actor](const Map* map, const Point& pos) {
+		if (!map) return true;
+		if (!actor) return map->IsExplored(pos); // limit also by circle size?
+		// check all four corners, since actors can be bigger than a fog cell
+		Region rgn = actor->DrawingRegion();
+		Point vert = rgn.Maximum();
+		if (map->IsExplored(vert)) return true;
+		vert.y = rgn.y;
+		if (map->IsExplored(vert)) return true;
+		vert.x = rgn.x;
+		if (map->IsExplored(vert)) return true;
+		vert.y = rgn.y + rgn.h;
+		if (map->IsExplored(vert)) return true;
+		return false;
+	}(area, Pos);
+	if (!needsUpdate && vp.PointInside(Pos) && explored) {
 		needsUpdate = true;
 	}
 
@@ -226,7 +241,7 @@ void Scriptable::TickScripting()
 	// the "hidden" (m_canBeSeen) part seemed to have been something like our RemovalTime? So far: useless
 	if (actor && !(actor->GetSafeStat(IE_MC_FLAGS) & MC_IGNORE_INHIBIT_AI) && !actor->GetSafeStat(IE_ENABLEOFFSCREENAI)) {
 		Actor::stat_t ea = actor->GetSafeStat(IE_EA);
-		if (ea > EA_CONTROLLABLE && ea < EA_EVILCUTOFF && !actor->DrawingRegion().IntersectsRegion(vp)) {
+		if (ea > EA_CONTROLLABLE && ea < EA_EVILCUTOFF && (!actor->DrawingRegion().IntersectsRegion(vp) || !explored)) {
 			return;
 		}
 	}
