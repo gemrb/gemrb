@@ -825,7 +825,7 @@ Path PathFinderScheduler::PerformPathCalculation(const TraversabilityCache::Data
 		if (InDebugMode(DebugMode::PATHFINDER)) {
 			Log(DEBUG, "WalkTo", "RequestID={}, re-pathing ignoring actors", currentRequestId.GetId());
 		}
-		InOutCurrentRequest.payload.pathfindingFlags &= ~PF_ACTORS_ARE_BLOCKING;
+		InOutCurrentRequest.payload.pathfindingFlags &= ~static_cast<int>(PF_ACTORS_ARE_BLOCKING);
 		foundPath = PathFinder::FindPath(
 			currentTraversabilityCacheSnapshot,
 			currentTileProps,

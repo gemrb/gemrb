@@ -71,9 +71,17 @@ public:
 		return allocatedElement;
 	}
 
-	void Free(T* elementToFree)
+	void Free(T* elementToFree) noexcept
 	{
-		availableElements.push_back(elementToFree);
+		try {
+			availableElements.push_back(elementToFree);
+		} catch (...) {
+			// this path is unreachable, but exists to satisfy the static analysis tools.
+			// availableElements.push_back() should never throw under any normal
+			// circumstances: T* is trivially copyable, so no exceptions from the
+			// assignment, and all slots are pre-allocated so no allocation failure
+			// can happen.
+		}
 	}
 
 
@@ -111,6 +119,7 @@ private:
 	std::vector<T*> availableElements;
 	size_t AllocationGrowthFactor = 1;
 	size_t PreviousAllocationSize = 1;
+	size_t TotalElements = 0;
 
 	void allocateNextBlock(size_t newAllocationSize = 0)
 	{
@@ -122,7 +131,8 @@ private:
 
 		// add each new element from the new allocation to the list of available elements
 		T* newBlockDataPointer = static_cast<T*>(blocks.back().memory);
-		availableElements.reserve(availableElements.size() + newAllocationSize);
+		TotalElements += newAllocationSize;
+		availableElements.reserve(TotalElements);
 		for (size_t i = 0; i < newAllocationSize; ++i) {
 			availableElements.push_back(newBlockDataPointer + i);
 		}
