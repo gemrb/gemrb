@@ -1591,6 +1591,9 @@ void Game::UpdateScripts()
 
 	// Collect paths the workers finished since the last Sync(), so an actor waiting on one can
 	// claim it in this tick instead of the next.
+	// Must precede Map::UpdateScripts() below, which is where DoStep() consumes foundPaths.
+	// The global script `Update()` above neither steps actors nor reads results, and running
+	// after it gives the workers a little more time to publish.
 	PathFinderScheduler::DrainCompletedPathsEarly();
 
 	PartyAttack = false;
