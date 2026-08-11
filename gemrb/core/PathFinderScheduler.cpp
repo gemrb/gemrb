@@ -534,7 +534,7 @@ void PathFinderScheduler::Sync(const std::vector<Map*>& allMaps)
 			cancelledQueue.push_back(cancelledRequestId);
 		}
 		workerCancelledQueue.clear();
-		// 1.2. Remove any request that has been canceled from ony pending queues
+		// 1.2. Remove any request that has been canceled from any pending queues
 		for (const auto& cancelledRequestId : cancelledQueue) {
 			// 1.3. Remove from scheduled:
 			for (auto& priorityQueue : workerScheduledQueuesByPriority) {
