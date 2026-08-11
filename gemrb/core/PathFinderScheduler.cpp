@@ -76,25 +76,25 @@ FindPathRequestId PathFinderScheduler::RequestPath(FindPathRequest request)
 {
 	// main thread
 	lastRequestFrameNumber = currentSyncFrameNumber;
-	if (request.instigatorIdentity) {
-		// check if we had this actor in the incoming requests, if so - remove it
-		for (auto it = incomingRequests.begin(); it != incomingRequests.end();) {
-			const auto& scheduledRequest = it->second;
-			if (scheduledRequest.instigatorIdentity == request.instigatorIdentity) {
-				it = incomingRequests.erase(it);
-			} else {
-				++it;
-			}
-		}
-		// check if we had already scheduled path for this actor and cancel it
-		for (const auto& scheduledItem : scheduledQueue) {
-			const auto& scheduledRequestID = scheduledItem.first;
-			const auto& scheduledRequest = scheduledItem.second;
-			if (scheduledRequest.payload.instigatorIdentity == request.instigatorIdentity) {
-				cancelledQueue.push_back(scheduledRequestID);
-			}
+
+	// check if we had this actor in the incoming requests, if so - remove it
+	for (auto it = incomingRequests.begin(); it != incomingRequests.end();) {
+		const auto& scheduledRequest = it->second;
+		if (scheduledRequest.instigatorIdentity == request.instigatorIdentity) {
+			it = incomingRequests.erase(it);
+		} else {
+			++it;
 		}
 	}
+	// check if we had already scheduled path for this actor and cancel it
+	for (const auto& scheduledItem : scheduledQueue) {
+		const auto& scheduledRequestID = scheduledItem.first;
+		const auto& scheduledRequest = scheduledItem.second;
+		if (scheduledRequest.payload.instigatorIdentity == request.instigatorIdentity) {
+			cancelledQueue.push_back(scheduledRequestID);
+		}
+	}
+
 	const auto requestId = FindPathRequestId::CreateNextId();
 
 	const bool shouldCalculateImmediately = isInMainThreadImmediateMode || (request.priority == FindPathRequestPriority::Immediate);
