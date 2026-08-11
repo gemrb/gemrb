@@ -291,7 +291,7 @@ Actor::Actor()
 
 FindPathRequestPriority Actor::GetFindPathRequestPriority() const
 {
-	if (!IsNPC()) {
+	if (!IsPartyMember()) {
 		return FindPathRequestPriority::Highest;
 	}
 	if (IsInCombat()) {

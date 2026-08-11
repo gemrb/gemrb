@@ -784,7 +784,6 @@ public:
 	void SetInTrap(ieDword tmp);
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
-	bool IsNPC() const { return InParty == 0; }
 	bool IsInCombat() const;
 	bool IsRunning() const { return InternalFlags & IF_RUNFLAGS; }
 	/* applies the kit abilities, returns false if kit is not applicable */
