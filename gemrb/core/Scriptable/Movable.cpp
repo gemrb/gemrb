@@ -468,8 +468,9 @@ void Movable::OnPathCalculated(Path&& newPath, const FindPathRequest& pathReques
 		case FindPathRequestType::AddWaypoint:
 			// if the waypoint is too close to the current position, no path is generated
 			if (!newPath) {
-				// AddWayPoint() only asks for one while a path is being walked, so dropping to
-				// NoMovement here would strand the actor holding a path DoStep() never looks at
+				// AddWayPoint() only files an `AddWaypoint` path request, while a path is being walked (with
+				// no path it degrades to WalkTo). Setting here `NoMovement` unconditionally would strand an actor
+				// still holding its original path.
 				SetMovementState(path ? MovementState::Moving : MovementState::NoMovement);
 				return;
 			}
