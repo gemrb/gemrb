@@ -290,18 +290,12 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	}
 
 	CONFIG_STRING("PathfinderMainThreadMode", config.PathfinderMainThreadMode);
-	const std::array<std::string, 2> availableMainThreadModes { "immediate", "queued" };
-	// cast to unsigned char first: tolower is undefined for negative values, which is what a
-	// non-ASCII byte sign-extends to
-	std::transform(config.PathfinderMainThreadMode.begin(), config.PathfinderMainThreadMode.end(), config.PathfinderMainThreadMode.begin(),
-		       [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-	const auto foundProperMode = std::find(
-		std::cbegin(availableMainThreadModes),
-		std::cend(availableMainThreadModes),
-		config.PathfinderMainThreadMode);
-	if (foundProperMode == std::cend(availableMainThreadModes)) {
+	constexpr auto PathfinderMainThreadModeImmediate = "immediate";
+	constexpr auto PathfinderMainThreadModeQueued = "queued";
+	if (config.PathfinderMainThreadMode != PathfinderMainThreadModeImmediate &&
+	    config.PathfinderMainThreadMode != PathfinderMainThreadModeQueued) {
 		Log(WARNING, "Interface", "Invalid PathfinderMainThreadMode detected, setting to immediate.");
-		config.PathfinderMainThreadMode = availableMainThreadModes[0];
+		config.PathfinderMainThreadMode = PathfinderMainThreadModeImmediate;
 	}
 
 	auto value = cfg.Get("ModPath", "");
