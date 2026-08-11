@@ -119,7 +119,7 @@ FindPathRequestId PathFinderScheduler::RequestPath(FindPathRequest request)
 }
 
 
-bool PathFinderScheduler::CancelPath(const FindPathRequestId& requestId)
+void PathFinderScheduler::CancelPath(const FindPathRequestId& requestId)
 {
 	// main thread
 
@@ -127,24 +127,21 @@ bool PathFinderScheduler::CancelPath(const FindPathRequestId& requestId)
 	const auto foundInIncomingRequests = incomingRequests.find(requestId);
 	if (foundInIncomingRequests != incomingRequests.end()) {
 		incomingRequests.erase(foundInIncomingRequests);
-		return true;
+		return;
 	}
 
 	// check if we had already scheduled this path and cancel it
 	const auto foundInScheduledQueue = scheduledQueue.find(requestId);
 	if (foundInScheduledQueue != scheduledQueue.end()) {
 		cancelledQueue.push_back(requestId);
-		return true;
+		return;
 	}
 
 	// if we cancel already calculated path, remove it
 	const auto foundInFoundPaths = foundPaths.find(requestId);
 	if (foundInFoundPaths != foundPaths.end()) {
 		foundPaths.erase(foundInFoundPaths);
-		return true;
 	}
-
-	return false;
 }
 
 bool PathFinderScheduler::IsPathCalculated(const FindPathRequestId& requestId)

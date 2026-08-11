@@ -150,10 +150,8 @@ public:
 	 *
 	 *
 	 *  @param requestId The unique identifier of the request to cancel
-	 *  @return True if the request was found in any of those three stages, false if the scheduler
-	 *          does not know it - already consumed, expired, or never issued
 	 */
-	static bool CancelPath(const FindPathRequestId& requestId);
+	static void CancelPath(const FindPathRequestId& requestId);
 
 	/**
 	 *  Checks if a pathfinding request has been completed and the result is available.
