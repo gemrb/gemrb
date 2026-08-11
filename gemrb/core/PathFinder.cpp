@@ -496,12 +496,13 @@ void PathFinder::ClearSearchMapFor(const std::vector<ActorSearchMapData>& actors
 	// Skip the instigator itself — its footprint was just cleared intentionally.
 	// Uses snapshotted actor data — safe for worker threads.
 	constexpr unsigned int radiusPixels = MAX_CIRCLE_SIZE * 3 * 16;
+	constexpr unsigned int radiusPixelsSquared = radiusPixels * radiusPixels;
 	for (const auto& data : actorsData) {
 		if (!data.blocksSearchMap) continue;
 		if (data.identity == instigatorIdentity) continue;
-		if (Distance(data.pos, actorPos) > radiusPixels) continue;
+		if (SquaredDistance(data.pos, actorPos) > radiusPixelsSquared) continue;
 
-		auto flag = data.isPC ? PathMapFlags::PC : PathMapFlags::NPC;
+		const auto flag = data.isPC ? PathMapFlags::PC : PathMapFlags::NPC;
 		tileProps.PaintSearchMap(data.smPos, data.circleSize, flag);
 	}
 }
