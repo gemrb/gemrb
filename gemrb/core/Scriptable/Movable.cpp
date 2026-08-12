@@ -411,7 +411,8 @@ void Movable::ScheduleFindPath(
 	pathfindingRequest.PutBasicRequestData(
 		InRequestType,
 		GetFindPathRequestPriority(),
-		this);
+		this,
+		GetScriptName());
 
 	pathfindingRequest.PutPathData(
 		InSource,

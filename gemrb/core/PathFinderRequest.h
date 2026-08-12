@@ -7,6 +7,8 @@
 
 // The vocabulary types of a pathfinding request
 
+#include "ie_types.h"
+
 #include "Region.h"
 
 #include <cstddef>
@@ -25,6 +27,7 @@ struct ActorPathContext {
 	unsigned int circleSize = 0;
 	const Movable* identity = nullptr; // pointer identity only, never dereferenced
 	int speed = 0;
+	ieVariable scriptName;
 };
 
 /**
@@ -82,6 +85,7 @@ struct FindPathRequest {
 	// Movable subclass, so comparisons against the const Actor* stored in ActorSearchMapData
 	// and TraversabilityCellData are plain upcasts.
 	Movable* instigatorIdentity = nullptr;
+	ieVariable instigatorScriptName;
 	Map* map = nullptr; // never dereferenced on worker threads, used in immediate calculation flow and for getting ID
 	int actorCircleSize = 0; // actor's collision circle size, snapshotted at request time
 	unsigned int minDistance = 0;
@@ -98,15 +102,18 @@ struct FindPathRequest {
 	 *  @param inRequestType The type of pathfinding operation (WalkTo, RunAway, etc.)
 	 *  @param inPriority The scheduling priority for this request
 	 *  @param inInstigatorIdentity Pointer identity of the Movable that initiated the request
+	 *  @param inInstigatorScriptName The requester's script name, for debug logging
 	 *  @return Reference to this request for method chaining
 	 */
 	FindPathRequest& PutBasicRequestData(const FindPathRequestType inRequestType,
 					     const FindPathRequestPriority inPriority,
-					     Movable* inInstigatorIdentity)
+					     Movable* inInstigatorIdentity,
+					     const ieVariable& inInstigatorScriptName)
 	{
 		requestType = inRequestType;
 		priority = inPriority;
 		instigatorIdentity = inInstigatorIdentity;
+		instigatorScriptName = inInstigatorScriptName;
 		return *this;
 	}
 

@@ -6,12 +6,14 @@
 
 #include "exports.h"
 
+#include "Debug.h"
 #include "Orientation.h"
 #include "PathFinderRequest.h"
 #include "Region.h"
 #include "TileProps.h"
 #include "TraversabilityCache.h"
 
+#include "Logging/Logging.h"
 #include "Scriptable/Scriptable.h"
 
 #include <vector>
@@ -20,6 +22,16 @@
 namespace GemRB {
 class Actor;
 class Movable;
+
+// Log() at DEBUG, gated on the pathfinder debug flag. Shared by the pathfinder and its scheduler,
+// so neither spams a plain debug build with per-request output.
+template<typename... ARGS>
+void LogDebugPathfinder(const char* owner, const char* message, ARGS&&... args)
+{
+	if (InDebugMode(DebugMode::PATHFINDER)) {
+		Log(DEBUG, owner, message, std::forward<ARGS>(args)...);
+	}
+}
 
 /**
  * Lightweight snapshot of actor data needed for searchmap operations on worker threads.

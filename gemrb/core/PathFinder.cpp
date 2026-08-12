@@ -196,10 +196,9 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	const Movable* const actorIdentity = actorContext.identity;
 	const int actorSpeed = actorContext.speed;
 
-	if (InDebugMode(DebugMode::PATHFINDER))
-		Log(DEBUG, "FindPath", "source = {}, destination = {}, dist = {}, actorCircleSize = {}",
-		    source, destination,
-		    minDistance, actorCircleSize);
+	LogDebugPathfinder("FindPath", "caller = {}, source = {}, destination = {}, dist = {}, actorCircleSize = {}",
+			   actorContext.scriptName, source, destination,
+			   minDistance, actorCircleSize);
 	const bool actorsAreBlocking = pathfindingFlags & PF_ACTORS_ARE_BLOCKING;
 	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellValueActor : TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
@@ -222,7 +221,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	SearchmapPoint smptDest { nmptDest };
 
 	if (minDistance < actorCircleSize && !(GetBlockedInRadiusTile(tileProps, smptDest, actorCircleSize) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
-		Log(DEBUG, "FindPath", "can't fit in destination");
+		LogDebugPathfinder("FindPath", "{} can't fit in destination", actorContext.scriptName);
 		return {};
 	}
 
@@ -294,8 +293,8 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			constexpr tick_t FindPathTimeThresholdMs = 15 * 1000;
 			const auto timeFromStartMs = GetMilliseconds() - timeOfStartMs;
 			if (timeFromStartMs > FindPathTimeThresholdMs) {
-				Log(DEBUG, "FindPath", "Abandoning path, it was executing for {}ms which exceeds the threshold.",
-				    timeFromStartMs);
+				Log(DEBUG, "FindPath", "Abandoning path of {}, it was executing for {}ms which exceeds the threshold.",
+				    actorContext.scriptName, timeFromStartMs);
 				return {};
 			}
 		}
@@ -413,9 +412,9 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			smptCurrent = SearchmapPoint(nmptCurrent);
 		}
 		return resultPath;
-	} else if (InDebugMode(DebugMode::PATHFINDER)) {
-		Log(DEBUG, "FindPath", "Pathing failed");
 	}
+
+	LogDebugPathfinder("FindPath", "Pathing failed for {}", actorContext.scriptName);
 
 	return {};
 }

@@ -54,15 +54,6 @@ int64_t PathFinderScheduler::lastRequestFrameNumber { 0 };
 int64_t PathFinderScheduler::lastCacheUpdateFrameNumber { 0 };
 std::vector<FindPathRequestId> PathFinderScheduler::earlyDrainedRequests;
 
-// Log() at DEBUG, gated on the pathfinder debug flag
-template<typename... ARGS>
-static void LogDebugPathfinder(const char* owner, const char* message, ARGS&&... args)
-{
-	if (InDebugMode(DebugMode::PATHFINDER)) {
-		Log(DEBUG, owner, message, std::forward<ARGS>(args)...);
-	}
-}
-
 TraversabilityCache::Data_t& PathFinderScheduler::GetOrCreateTraversabilityData(const ScriptID mapID)
 {
 	auto found = traversabilityCacheData.find(mapID);
@@ -220,7 +211,7 @@ void PathFinderScheduler::Start(uint16_t InNumberOfRequestedWorkerThreads, const
 	numberOfSpawnedWorkerThreads = 0;
 	try {
 		for (uint16_t i = 0; i < numberOfRequestedWorkerThreads; ++i) {
-			Log(DEBUG, "PathfinderThreadUpdate", "[main] Starting pathfinder thread #{}", i);
+			LogDebugPathfinder("PathfinderThreadUpdate", "[main] Starting pathfinder thread #{}", i);
 			workerThreads.emplace_back(WorkerThreadMainLoop, static_cast<size_t>(i));
 			++numberOfSpawnedWorkerThreads;
 		}
@@ -251,7 +242,7 @@ void PathFinderScheduler::Stop()
 
 	// join all worker threads
 	for (size_t i = 0; i < workerThreads.size(); ++i) {
-		Log(DEBUG, "PathfinderThreadUpdate", "[main] Stopping pathfinder thread #{}", i);
+		LogDebugPathfinder("PathfinderThreadUpdate", "[main] Stopping pathfinder thread #{}", i);
 		workerThreads[i].join();
 	}
 
@@ -801,7 +792,8 @@ Path PathFinderScheduler::PerformPathCalculation(const TraversabilityCache::Data
 	const ActorPathContext actorContext {
 		static_cast<unsigned int>(InOutCurrentRequest.payload.actorCircleSize),
 		InOutCurrentRequest.payload.instigatorIdentity,
-		InOutCurrentRequest.payload.actorSpeed
+		InOutCurrentRequest.payload.actorSpeed,
+		InOutCurrentRequest.payload.instigatorScriptName
 	};
 
 	auto foundPath = PathFinder::FindPath(
@@ -814,7 +806,8 @@ Path PathFinderScheduler::PerformPathCalculation(const TraversabilityCache::Data
 		InOutCurrentRequest.payload.pathfindingFlags);
 
 	if (!foundPath && InOutCurrentRequest.payload.canRePathIgnoringActors) {
-		LogDebugPathfinder("WalkTo", "RequestID={}, re-pathing ignoring actors", currentRequestId.GetId());
+		LogDebugPathfinder("WalkTo", "RequestID={} of {}, re-pathing ignoring actors",
+				   currentRequestId.GetId(), InOutCurrentRequest.payload.instigatorScriptName);
 		InOutCurrentRequest.payload.pathfindingFlags &= ~static_cast<int>(PF_ACTORS_ARE_BLOCKING);
 		foundPath = PathFinder::FindPath(
 			currentTraversabilityCacheSnapshot,
@@ -1019,9 +1012,10 @@ void PathFinderScheduler::PathfinderThreadUpdate(const size_t workerIdx)
 				for (auto& sq : workerScheduledQueuesByPriority) {
 					totalRequests += sq.size();
 				}
-				Log(DEBUG, "PathfinderThreadUpdate", "[worker {}] Processing request ID={}, on the priorityQueue there is {} elements total.",
+				Log(DEBUG, "PathfinderThreadUpdate", "[worker {}] Processing request ID={} of {}, on the priorityQueue there is {} elements total.",
 				    std::this_thread::get_id(),
 				    currentRequestId.GetId(),
+				    currentRequest.payload.instigatorScriptName,
 				    totalRequests);
 			}
 		} // guardQueue scope
