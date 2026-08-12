@@ -66,8 +66,10 @@ static SearchmapPoint goodPaths2[] = { SearchmapPoint(goodPaths[0]), SearchmapPo
 static Path FindPathSync(const Point& source, const Point& destination, unsigned int circleSize)
 {
 	MapTest::map->UpdateTraversabilityCache();
+	ActorPathContext actorContext;
+	actorContext.circleSize = circleSize;
 	return PathFinder::FindPath(MapTest::map->GetTraversabilityCacheData(), MapTest::map->tileProps,
-				    source, destination, ActorPathContext { circleSize });
+				    source, destination, actorContext);
 }
 
 TEST_F(MapTest, GetBlockedInLineTest1)
