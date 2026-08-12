@@ -65,7 +65,8 @@ struct FindPathRequestWorkerData {
  *
  *  A REQUEST'S LIFE
  *  RequestPath() queues it and returns an ID. Sync() hands it to the workers. A worker computes
- *  it and publishes the result. Movable::DoStep() polls for it. Unanswered requests expire after
+ *  it and publishes the result, taking the longest-waiting request of the highest priority tier
+ *  that has one. Movable::DoStep() polls for it. Unanswered requests expire after
  *  requestExpirationFrames.
  *
  *  EXECUTION MODES, picked in Start() from PathfinderThreadsCount and PathfinderMainThreadMode:

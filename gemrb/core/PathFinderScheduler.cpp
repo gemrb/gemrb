@@ -863,8 +863,10 @@ void PathFinderScheduler::PathfinderThreadUpdate(const size_t workerIdx)
 	 *
 	 *       Steps 1-2 run with scheduledAndCancelledQueuesMutex held.
 	 *
-	 * 1. Claim a request: scan the priority queues highest-first for the first untaken request,
-	 *    mark it taken and copy it.
+	 * 1. Claim a request: scan the priority queues highest-first and, in the first tier holding an
+	 *    untaken request, take the one that has waited longest (smallest originFrame), mark it taken
+	 *    and copy it. Priority decides which tier is served, age decides within a tier, so
+	 *    a request cannot be passed over indefinitely by newer ones of its own priority.
 	 *    If there is none requests left to be processed:
 	 *       >> LOCK newRequestsAvailableMutex, clear newRequestsAvailable, UNLOCK,
 	 *    then leave the loop. This is the only place the worker side lowers that flag. The caller
@@ -932,34 +934,39 @@ void PathFinderScheduler::PathfinderThreadUpdate(const size_t workerIdx)
 			}
 			std::lock_guard<std::timed_mutex> guardQueue(scheduledAndCancelledQueuesMutex, std::adopt_lock);
 
-			// go through all workerScheduledQueuesByPriority by their priority (highest prio is first in array) and select
-			// first non-taken request to work on
+			// go through all workerScheduledQueuesByPriority by their priority (highest prio is first in
+			// array) and select the longest-waiting non-taken request of the first tier that has one:
+			// the tier is chosen by priority, the request within it by age. Requests dispatched by the
+			// same Sync() share an originFrame, so ties among equally old ones are broken arbitrarily
 			currentRequestId = FindPathRequestId::NullId();
 			for (auto& priorityQueue : workerScheduledQueuesByPriority) {
-				if (!currentRequestId.IsNull()) {
-					break;
-				}
-
-				if (priorityQueue.empty()) {
-					continue;
-				}
-
+				// nullptr means this tier has yielded no candidate yet; it points into the queue, so
+				// claiming the winner below needs no second lookup
+				FindPathRequestWorkerData* oldestRequest = nullptr;
 				for (auto& scheduledRequest : priorityQueue) {
-					if (!scheduledRequest.second.taken) {
-						scheduledRequest.second.taken = true;
-						currentRequestId = scheduledRequest.first;
-						currentRequest = scheduledRequest.second;
-						break;
+					if (scheduledRequest.second.taken) {
+						// NOTE: these DebugMode::PATHFINDER blocks sit inside scheduledAndCancelledQueuesMutex.
+						// Log() takes the logger's own mutex and does a notify_all, so enabling the flag puts a
+						// blocking lock and a futex wake inside the worker's selection phase - the very section
+						// the main-thread back-off protocol is built around.
+						// This is fine for debugging, but interferes with the designed threading model
+						// and may (will) affect performance.
+						LogDebugPathfinder("PathfinderThreadUpdate", "[worker {}] request ID={}, is already taken, going to next one.",
+								   std::this_thread::get_id(),
+								   scheduledRequest.first.GetId());
+						continue;
 					}
-					// NOTE: these DebugMode::PATHFINDER blocks sit inside scheduledAndCancelledQueuesMutex.
-					// Log() takes the logger's own mutex and does a notify_all, so enabling the flag puts a
-					// blocking lock and a futex wake inside the worker's selection phase - the very section
-					// the main-thread back-off protocol is built around.
-					// This is fine for debugging, but interferes with the designed threading model
-					// and may (will) affect performance.
-					LogDebugPathfinder("PathfinderThreadUpdate", "[worker {}] request ID={}, is already taken, going to next one.",
-							   std::this_thread::get_id(),
-							   scheduledRequest.first.GetId());
+
+					if (!oldestRequest || scheduledRequest.second.originFrame < oldestRequest->originFrame) {
+						oldestRequest = &scheduledRequest.second;
+						currentRequestId = scheduledRequest.first;
+					}
+				}
+
+				if (oldestRequest) {
+					oldestRequest->taken = true;
+					currentRequest = *oldestRequest;
+					break;
 				}
 			}
 
