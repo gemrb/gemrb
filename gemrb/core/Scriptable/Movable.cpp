@@ -597,8 +597,6 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		area->ClearSearchMapFor(this);
 	}
 
-	// the 5th parameter is controlling the orientation of the actor
-	// 0 - back away, 1 - face direction
 	PathNode randomStep;
 	const bool foundStep = area->RandomWalk(Pos, circleSize, maxWalkDistance ? maxWalkDistance : 5, As<Actor>(), randomStep);
 	if (BlocksSearchMap()) {
