@@ -74,28 +74,6 @@ Height=480
 #AudioDriver = openal
 
 ###############################################################################
-#  Pathfinding Parameters                                                     #
-###############################################################################
-
-# Control how many pathfinding worker threads to spawn. If set to 0, path calculations will be
-# performed on the main thread.
-PathfinderThreadsCount=3
-
-# Select mode in which PathFinderScheduler will execute calculations on the main thread.
-# It matters only when no worker thread has been spawned, either due to explicitly set value
-# of 'PathfinderThreadsCount', or a failure when spawning the threads.
-# Does nothing if any worker thread is spawned.
-# Available modes:
-#    "immediate": all paths will be calculated immediately when requested, with complete bypass of
-#    the scheduler internal queues. This closely resembles the legacy implementation.
-#
-#    "queued": all path requests will be driven through the scheduler's queue system, but calculated
-#    on the main thread. This will cause the path delivery to be delayed the same way as with
-#    worker threads, mimicking the multithreaded model. Useful to debug issues with the
-#    multithreaded pathfinder disregarding any thread-safety concerns.
-PathfinderMainThreadMode=immediate
-
-###############################################################################
 #  GUI Parameters                                                             #
 ###############################################################################
 #                                                                             #
@@ -193,6 +171,28 @@ PathfinderMainThreadMode=immediate
 
 # Vita specific options
 #VitaKeepAspectRatio=1
+
+###############################################################################
+#  Pathfinding Parameters                                                     #
+###############################################################################
+
+# Control how many pathfinding worker threads to spawn. If set to 0, path calculations will be
+# performed on the main thread.
+PathfinderThreadsCount=3
+
+# Select mode in which PathFinderScheduler will execute calculations on the main thread.
+# It matters only when no worker thread has been spawned, either due to explicitly set value
+# of 'PathfinderThreadsCount', or a failure when spawning the threads.
+# Does nothing if any worker thread is spawned.
+# Available modes:
+#    "immediate": all paths will be calculated immediately when requested, with complete bypass of
+#    the scheduler internal queues. This closely resembles the legacy implementation.
+#
+#    "queued": all path requests will be driven through the scheduler's queue system, but calculated
+#    on the main thread. This will cause the path delivery to be delayed the same way as with
+#    worker threads, mimicking the multithreaded model. Useful to debug issues with the
+#    multithreaded pathfinder disregarding any thread-safety concerns.
+PathfinderMainThreadMode=immediate
 
 ###############################################################################
 #  Paths                                                                      #
