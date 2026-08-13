@@ -128,7 +128,17 @@ A request that is never answered is dropped after 60 frames and reported as "no 
 
 There are 2 config knobs.
 
-`PathfinderThreadsCount` - how many worker threads to spawn, 3 by default. Setting it to 0 spawns none and leaves all the work on the main thread.
+`PathfinderThreadsCount` - how many worker threads to spawn. Correct values range from -1 to 65535:
+
+| value     | meaning                                         |
+|-----------|-------------------------------------------------|
+| `-1`      | automatic detection (the default)               |
+| `0`       | the path calculations run on the main thread    |
+| `1-65535` | set explicitly how many workers will be spawned |
+
+The automatic detection runs when the configuration is loaded and comes down to `Clamp(hardware_concurrency() - 1, 2, 8)`: one worker per hardware thread beyond the one the main thread needs. Any explicit value in the config file wins, including 0.
+
+The top of the user provided range is a limit on `uint16_t` feeding to `PathFinderScheduler::Start()`.
 
 `PathfinderMainThreadMode` - what the main thread should do when there are no workers. It is ignored completely as long as at least one worker was spawned. Two values:
 
@@ -164,8 +174,16 @@ Cancelling a path request is now handled by `Movable`, including on destruction,
 #### Thread scaling 
 
 Generally no performance difference between 1-3 threads on any reasonably modern system. 
-Advice: if a system has support for 4+ HW threads, set number of workers to 3. For systems with HW support for less than 4 threads, set it to 2.
+Advice: if a system has support for 4+ HW threads, set number of workers to minimum 3. For systems with HW support for less than 4 threads, set it to 2.
 One worker thread may not keep up with the piling up requests in very NPC heavy scenarios.
+
+`PathfinderThreadsCount=-1` applies this automatically, in `DetectPathfinderThreadsCount()` (`InterfaceConfig.cpp`), unless the config file says otherwise.
+
+The lower bound of 2 holds even on machines with fewer than 2 hardware threads to spare. Dropping to a single worker there could be functionally harming: weak hardware is where each worker is slowest, so it is the least able to absorb a burst of requests, and some extreme cases can saturate one worker on a machine like a Raspberry Pi.
+
+The upper bound of 8 is about balance between handling requests' burst and keeping the workers resources (contention for the requests and memory needed per-worker) under control. Ordering the whole party to move, files up to 6 requests in a single frame, all at `Highest` priority, and nearby wandering NPCs add more on top. A machine with 9 or more hardware threads has the cores to answer a whole party move in one go, so it is allowed to.
+
+Note that `hardware_concurrency()` reports online CPUs and does not account for affinity masks or container CPU quotas, so a process restricted to fewer cores than the machine has may still be given more workers that it should.
 
 #### Single-threaded modes
 

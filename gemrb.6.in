@@ -133,8 +133,13 @@ critical settings.
 .TP
 .BR PathfinderThreadsCount =INT
 How many worker threads the PathFinderScheduler should spawn.
-If set to 0, the path calculations will be executed on the main thread.
-Defaults to 3.
+Correct values range from -1 to 65535:
+       -1: automatic detection (the default)
+        0: the path calculations run on the main thread
+  1-65535: set explicitly how many workers will be spawned
+
+The automatic detection will spawn N-1 workers for your N hardware supported
+threads, but never fewer than 2 and never more than 8.
 
 .TP
 .BR PathfinderMainThreadMode =(immediate|queued)

@@ -176,9 +176,15 @@ Height=480
 #  Pathfinding Parameters                                                     #
 ###############################################################################
 
-# Control how many pathfinding worker threads to spawn. If set to 0, path calculations will be
-# performed on the main thread.
-PathfinderThreadsCount=3
+# Control how many pathfinding worker threads to spawn.
+# Correct values range from -1 to 65535:
+#         -1: automatic detection (the default)
+#          0: the path calculations run on the main thread
+#    1-65535: set explicitly how many workers will be spawned
+#
+# The automatic detection will spawn N-1 workers for your N hardware supported threads, but never
+# fewer than 2 and never more than 8.
+PathfinderThreadsCount=-1
 
 # Select mode in which PathFinderScheduler will execute calculations on the main thread.
 # It matters only when no worker thread has been spawned, either due to explicitly set value
