@@ -85,11 +85,20 @@ The second synchronization point needs no such protocol. Each output slot belong
 
 ## How an actor waits for its path
 
-`Movable` carries a `MovementState`, with three values: `NoMovement`, `FindPathScheduled` and `Moving`.
+`Movable` carries a `MovementState`, with four values: `NoMovement`, `FindPathScheduled`, `PathSearchFailed` and `Moving`. The first three all mean the actor is not walking; `HasMovementInProgress` (and `Scriptable::InMove`, which defers to it) is the test for "is this actor going anywhere", and answers true only for `Moving` and `FindPathScheduled`.
 
 It is necessary because "the actor holds a path" and "the actor is going somewhere" stopped being the same thing. An actor waiting for its first path holds nothing yet, and an actor re-pathing holds an old path it is still walking. The path alone can no longer distinguish those cases.
 
 The re-pathing case is worth spelling out: filing a new request does not clear the current path, and `DoStep` deliberately keeps walking it until the new one arrives. Stopping for the round trip would be plainly visible as an actor stutter, and it would happen constantly while chasing, since a chase re-paths every few frames.
+
+`PathSearchFailed` exists for the opposite reason: a result has to outlive the frame it arrived in. The move actions in `Actions.cpp` and `GSUtils.cpp` give up on an unreachable destination with
+
+```cpp
+if (!actor->InMove() || actor->Destination != point) actor->WalkTo(point, ...);
+if (!actor->InMove()) { actor->ClearPath(); Sender->ReleaseCurrentAction(); }
+```
+
+which the synchronous pathfinder satisfied by resolving the search between the two checks. Asynchronously the failure lands 1+ tick later, when the second check is long past, and the first check - seeing an idle actor - would refile the same request before the second one could ever fire. So a failed `WalkTo` search parks the actor in `PathSearchFailed` along with the destination it failed for. The next `WalkTo` for that same destination files nothing, drops to `NoMovement` and returns, and the action's `!InMove()` gives up exactly as it did in the legacy implementation. Any other destination clears the state and gets a real search.
 
 ## Life cycle of a path request
 
@@ -111,7 +120,7 @@ This section describes current logical flow of what happens in order, when a Mov
 
 8. The main thread collects the result, either in `DrainCompletedPathsEarly` early in the next tick, before any actor is stepped, or in the next `Sync`. Whichever site collects it, reconciles it against the queues: if the request is no longer scheduled it was cancelled while being computed, and the result is dropped.
 
-9. On its next `DoStep` the actor polls the state of his request ID, sees it is waiting, takes the result and hands it to `OnPathCalculated`, which applies it according to the request type - replacing the current path for a walk, appending for a waypoint - and switches the movement state to `Moving`, or back to `NoMovement` if nothing was found.
+9. On its next `DoStep` the actor polls the state of his request ID, sees it is waiting, takes the result and hands it to `OnPathCalculated`, which applies it according to the request type - replacing the current path for a walk, appending for a waypoint - and switches the movement state to `Moving`. If nothing was found, a walk request goes to `PathSearchFailed` (see above) and the other request types go back to `NoMovement`.
 
 A request that is never answered is dropped after 60 frames and reported as "no path found", so an actor cannot wait forever. If a request leaves the scheduler for any other reason - the most realistic one being the map it belonged to getting unloaded - the actor notices on its next `DoStep` that the scheduler no longer knows the id, and resolves its own state instead of waiting.
 

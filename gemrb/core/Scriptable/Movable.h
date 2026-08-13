@@ -20,7 +20,8 @@ struct FindPathRequest;
  *
  * Transitions:
  *   NoMovement --ScheduleFindPath()--> FindPathScheduled --OnPathCalculated()--> Moving
- *                                                        \--(empty result)-----> NoMovement
+ *                                                        \--(empty result)-----> PathSearchFailed
+ *   PathSearchFailed --WalkTo() for the same destination-----------------------> NoMovement
  *   NoMovement --MoveLine()/RandomWalk()---------------------------------------> Moving
  *   any        --ClearPath()---------------------------------------------------> NoMovement
  *
@@ -33,15 +34,24 @@ struct FindPathRequest;
  * keeps walking it until the new one arrives - the request takes a tick or two to come back,
  * and pausing for that window would show up as a visible actor stall. So the state means "a
  * request is in flight", not "not moving". Callers that need "is this actor going anywhere"
- * should test against NoMovement, as InMove() does.
+ * should ask HasMovementInProgress(), as InMove() does; the two idle states differ only in what
+ * WalkTo() does next, and no caller outside Movable cares about that distinction.
  *
- * DoStep() returns immediately while the state is NoMovement, without inspecting `path`. Anything
+ * PathSearchFailed is what makes an unreachable destination terminate. The synchronous pathfinder
+ * answered inside WalkTo(), so the `if (!InMove()) give up` check the move actions run right after
+ * it saw the failure; now the answer arrives a few frames later, when that check is long past. The
+ * failure therefore has to survive in the state until the action next calls WalkTo(), which is
+ * where it is reported - see WalkTo(). Collapsing straight to NoMovement instead makes the actions
+ * refile the same hopeless request forever.
+ *
+ * DoStep() returns immediately while the state is idle, without inspecting `path`. Anything
  * that populates `path` directly instead of going through the pathfinder must therefore set
  * Moving itself, or the actor will hold a path it never walks.
  */
 enum class MovementState {
 	NoMovement, ///< idle; `path` is empty
 	FindPathScheduled, ///< a request is in flight; DoStep() keeps walking any previous `path` meanwhile
+	PathSearchFailed, ///< idle; the last WalkTo search found nothing and that is not reported yet
 	Moving, ///< walking `path`
 };
 
@@ -55,6 +65,10 @@ private: // these seem to be sensitive, so get protection
 	FindPathRequestId pathRequestId = FindPathRequestId::NullId();
 	MovementState movementState = MovementState::NoMovement;
 	Path path; // whole path
+	// Destination of the search that put us in PathSearchFailed state;
+	// only a WalkTo() for the same spot reports the failure, any other one
+	// gets a fresh search.
+	Point lastFailedDestination;
 	unsigned int prevTicks = 0;
 	int bumpBackTries = 0;
 	bool pathAbandoned = false;
@@ -73,6 +87,12 @@ public:
 	inline MovementState GetMovementState() const
 	{
 		return movementState;
+	}
+
+	/** Has the actor began to go somewhere - is it awaiting on a path to walk or already walking? */
+	inline bool HasMovementInProgress() const
+	{
+		return movementState == MovementState::Moving || movementState == MovementState::FindPathScheduled;
 	}
 
 	void SetMovementState(const MovementState InNewMovementState);

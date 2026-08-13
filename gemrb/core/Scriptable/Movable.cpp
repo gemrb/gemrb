@@ -113,7 +113,7 @@ void Movable::MoveLine(int steps, orient_t orient)
 {
 	// Only start a line move when nothing else is in progress; the Moving state set below is what
 	// makes this guard reject re-entry while the line is still being walked.
-	if (GetMovementState() != MovementState::NoMovement || !steps) {
+	if (HasMovementInProgress() || !steps) {
 		return;
 	}
 	// DoStep takes care of stopping on walls if necessary
@@ -220,7 +220,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 {
 	// Only bump back if not moving
 	// Actors can be bumped while moving if they are backing off
-	if (GetMovementState() == MovementState::NoMovement) {
+	if (!HasMovementInProgress()) {
 		if (IsBumped()) {
 			BumpBack();
 		}
@@ -374,6 +374,13 @@ void Movable::AddWayPoint(const Point& Des)
 	// frames a re-path is in flight. A non-empty path is also what makes the last-node access
 	// below safe.
 	if (!path) {
+		// A waypoint is a new order, not the retry of a failed one, so it must not be answered by a
+		// stale PathSearchFailed: WalkTo() would consume that and file nothing, and GameScript's
+		// AddWayPoint releases its action without ever testing InMove(), so the waypoint would be
+		// dropped for good. Discard the pending verdict and let the search actually run.
+		if (GetMovementState() == MovementState::PathSearchFailed) {
+			SetMovementState(MovementState::NoMovement);
+		}
 		WalkTo(Des);
 		return;
 	}
@@ -454,7 +461,11 @@ void Movable::OnPathCalculated(Path&& newPath, const FindPathRequest& pathReques
 			// if we had an old path and new path was not correct, restore
 			// the movement_state based on the currently held old path
 			if (!path) {
-				SetMovementState(MovementState::NoMovement);
+				// the caller that ordered this move has to learn the search failed.
+				// Park the dead end in the state until then, or the move actions
+				// will re-file the same hopeless request forever.
+				SetMovementState(MovementState::PathSearchFailed);
+				lastFailedDestination = pathRequest.destination;
 				// Count the failed try here rather than where the request was issued: the search
 				// completes asynchronously, so failure is only known once the result arrives.
 				// WalkToFromNewPath marks a request as originating from Actor::NewPath, which is
@@ -515,6 +526,21 @@ void Movable::WalkTo(const Point& Des, int distance, FindPathRequestType InReque
 		return;
 	}
 
+	// Report a search that already came back empty for this exact destination. The move actions
+	// give up by testing InMove() right after WalkTo(), which the synchronous pathfinder could
+	// answer within the call; here the answer is the state left behind by OnPathCalculated() a few
+	// frames ago. Drop to NoMovement without filing anything, and that InMove() test - false for
+	// both idle states - fires exactly as it used to. Consuming the state keeps it one-shot, so a
+	// later order for the same spot still gets a fresh search.
+	// A different destination is not covered by the failure and falls through to a real search.
+	if (GetMovementState() == MovementState::PathSearchFailed) {
+		SetMovementState(MovementState::NoMovement);
+		if (Des == lastFailedDestination) {
+			Destination = Des;
+			return;
+		}
+	}
+
 	const Actor* actor = Scriptable::As<Actor>(this);
 
 	prevTicks = Ticks;
@@ -544,7 +570,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 {
 	// Only start a random walk when nothing else is in progress; the Moving state set at the end
 	// is what makes this guard reject re-entry while the step is still being walked.
-	if (GetMovementState() != MovementState::NoMovement) {
+	if (HasMovementInProgress()) {
 		return;
 	}
 	// if not continuous random walk, then stops for a while
