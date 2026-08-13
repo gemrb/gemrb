@@ -605,10 +605,12 @@ private:
 	void RefreshEffects(bool init, const stats_t& prev);
 
 public:
-	using BlockingSizeCategory = uint8_t;
 	Actor(void);
 	Actor(const Actor&) = delete;
 	Actor& operator=(const Actor&) = delete;
+
+	FindPathRequestPriority GetFindPathRequestPriority() const override;
+
 	/** sets game specific parameter (which stat should determine the fist weapon type */
 	static void SetFistStat(ieDword stat);
 	/** sets game specific default data about action buttons */
@@ -619,7 +621,7 @@ public:
 	void SetCircleSize();
 	/** get the size category for this actor; it's used to determine and track region needed for tracing blocking shape
 	 * of this actor in the traversability cache */
-	BlockingSizeCategory getSizeCategory() const;
+	uint8_t getSizeCategory() const;
 	/** places the actor on the map */
 	void SetMap(Map* map) override;
 	/** sets the actor's position, calculating with the nojump flag*/
@@ -782,6 +784,7 @@ public:
 	void SetInTrap(ieDword tmp);
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
+	bool IsInCombat() const;
 	bool IsRunning() const { return InternalFlags & IF_RUNFLAGS; }
 	/* applies the kit abilities, returns false if kit is not applicable */
 	bool ApplyKit(bool remove, ieDword baseclass = 0, int diff = 0);
@@ -869,7 +872,7 @@ public:
 	bool Schedule(ieDword gametime, bool checkhide) const;
 	void NewPath();
 	/* overridden method, won't walk if dead */
-	void WalkTo(const Point& Des, ieDword flags, int MinDistance = 0);
+	void WalkTo(const Point& Des, ieDword flags, int MinDistance = 0, FindPathRequestType InRequestType = FindPathRequestType::WalkTo);
 	/* resolve string constant (sound will be altered) */
 	void GetVerbalConstantSound(ResRef& sound, Verbal index, bool resolved = false) const;
 	bool GetSoundFromFile(ResRef& sound, Verbal index) const;

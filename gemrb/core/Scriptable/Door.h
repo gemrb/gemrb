@@ -12,6 +12,7 @@
 #include "Scriptable/Highlightable.h"
 
 namespace GemRB {
+enum class PathMapFlags : uint8_t;
 
 // door flags; iwd2 differences are remapped in the importer
 #define DOOR_OPEN                 1

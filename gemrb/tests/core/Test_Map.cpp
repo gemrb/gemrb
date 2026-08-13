@@ -5,16 +5,17 @@
 // FIXME: remove once fixed, this is excluding non-linux build bots
 #if defined(USE_OPENGL_BACKEND) || (!defined(__APPLE__) && !defined(WIN32))
 
-#include "../../core/GameData.h"
-#include "../../core/Interface.h"
-#include "../../core/InterfaceConfig.h"
-#include "../../core/Logging/Loggers/Stdio.h"
-#include "../../core/Logging/Logging.h"
-#include "../../core/Map.h"
-#include "../../core/PluginMgr.h"
-#include "../../core/SaveGameMgr.h"
+	#include "../../core/GameData.h"
+	#include "../../core/Interface.h"
+	#include "../../core/InterfaceConfig.h"
+	#include "../../core/Logging/Loggers/Stdio.h"
+	#include "../../core/Logging/Logging.h"
+	#include "../../core/Map.h"
+	#include "../../core/PathFinder.h"
+	#include "../../core/PluginMgr.h"
+	#include "../../core/SaveGameMgr.h"
 
-#include <gtest/gtest.h>
+	#include <gtest/gtest.h>
 
 namespace GemRB {
 
@@ -61,6 +62,15 @@ static Point badPaths[] = { Point(1270, 640), Point(1071, 699), Point(1170, 967)
 static Point goodPaths[] = { Point(1126, 601), Point(685, 655), Point(720, 496), Point(1056, 336) };
 static SearchmapPoint badPaths2[] = { SearchmapPoint(badPaths[0]), SearchmapPoint(badPaths[1]), SearchmapPoint(badPaths[2]), SearchmapPoint(badPaths[3]) };
 static SearchmapPoint goodPaths2[] = { SearchmapPoint(goodPaths[0]), SearchmapPoint(goodPaths[1]), SearchmapPoint(goodPaths[2]), SearchmapPoint(goodPaths[3]) };
+
+static Path FindPathSync(const Point& source, const Point& destination, unsigned int circleSize)
+{
+	MapTest::map->UpdateTraversabilityCache();
+	ActorPathContext actorContext;
+	actorContext.circleSize = circleSize;
+	return PathFinder::FindPath(MapTest::map->GetTraversabilityCacheData(), MapTest::map->tileProps,
+				    source, destination, actorContext);
+}
 
 TEST_F(MapTest, GetBlockedInLineTest1)
 {
@@ -110,12 +120,12 @@ TEST_F(MapTest, FindPathTest)
 {
 	// straight path
 	constexpr int circleSize = 2;
-	auto path = map->FindPath(goodPaths[0], goodPaths[1], circleSize);
+	auto path = FindPathSync(goodPaths[0], goodPaths[1], circleSize);
 	EXPECT_TRUE(path);
 	EXPECT_EQ(path.Size(), 1);
 
 	// curvy path
-	path = map->FindPath(badPaths[0], badPaths[1], circleSize);
+	path = FindPathSync(badPaths[0], badPaths[1], circleSize);
 	EXPECT_TRUE(path);
 	EXPECT_EQ(path.Size(), 3);
 
@@ -125,7 +135,7 @@ TEST_F(MapTest, FindPathTest)
 	EXPECT_EQ(path.GetStep(2).point, Point(1062, 700)); // not exactly badPaths[1]!
 
 	// basic determinism
-	auto path2 = map->FindPath(badPaths[0], badPaths[1], circleSize);
+	auto path2 = FindPathSync(badPaths[0], badPaths[1], circleSize);
 	EXPECT_TRUE(path2);
 	EXPECT_EQ(path2.Size(), 3);
 	for (int i = 0; i < 3; i++) {
@@ -133,7 +143,7 @@ TEST_F(MapTest, FindPathTest)
 	}
 
 	// close obstacle: don't try to tunnel through monolith
-	path = map->FindPath(Point(1217, 690), Point(1111, 715), circleSize);
+	path = FindPathSync(Point(1217, 690), Point(1111, 715), circleSize);
 	EXPECT_TRUE(path);
 	EXPECT_GT(path.Size(), 1);
 }

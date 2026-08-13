@@ -4,11 +4,33 @@
 
 #include "InterfaceConfig.h"
 
+#include "globals.h"
+
 #include "Logging/Logging.h"
 #include "Streams/FileStream.h"
 #include "System/VFS.h"
 
+#include <array>
+#include <cstdint>
+#include <limits>
+#include <thread>
+
 namespace GemRB {
+
+/**
+ *  Detect automatically pathfinder's worker count.
+ *
+ *  Yields one fewer than the hardware threads, so the main thread keeps a core to itself, bounded to 2..8.
+ *  Minimum 2 workers are picked, because a single worker can fall behind in NPC-heavy scenes.
+ *  The upper bound of 8 is taking into account the whole party of 6 and nearby NPCs filing up
+ *  requests in the same frame.
+ */
+static int DetectPathfinderThreadsCount()
+{
+	const unsigned int hardwareThreads = std::thread::hardware_concurrency();
+	const unsigned int workerThreads = hardwareThreads > 0 ? hardwareThreads - 1 : 0;
+	return static_cast<int>(Clamp<unsigned int>(workerThreads, 2, 8));
+}
 
 void SanityCheck(const char* ver)
 {
@@ -280,6 +302,29 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 	CONFIG_STRING("DelayPlugin", config.DelayPlugin);
 	CONFIG_STRING("Encoding", config.Encoding);
 	CONFIG_STRING("ScaleQuality", config.ScaleQuality);
+
+	CONFIG_INT("PathfinderThreadsCount", config.PathfinderThreadsCount);
+	// any negative value asks us to pick
+	if (config.PathfinderThreadsCount < 0) {
+		config.PathfinderThreadsCount = DetectPathfinderThreadsCount();
+		Log(MESSAGE, "Config", "Detected {} hardware thread(s), using {} pathfinder worker threads.",
+		    std::thread::hardware_concurrency(), config.PathfinderThreadsCount);
+	}
+	constexpr int maxPathfinderThreadsCount = std::numeric_limits<uint16_t>::max();
+	if (config.PathfinderThreadsCount > maxPathfinderThreadsCount) {
+		Log(WARNING, "Config", "PathfinderThreadsCount={} is above the maximum of {}, clamping it down.",
+		    config.PathfinderThreadsCount, maxPathfinderThreadsCount);
+		config.PathfinderThreadsCount = maxPathfinderThreadsCount;
+	}
+
+	CONFIG_STRING("PathfinderMainThreadMode", config.PathfinderMainThreadMode);
+	constexpr auto PathfinderMainThreadModeImmediate = "immediate";
+	constexpr auto PathfinderMainThreadModeQueued = "queued";
+	if (config.PathfinderMainThreadMode != PathfinderMainThreadModeImmediate &&
+	    config.PathfinderMainThreadMode != PathfinderMainThreadModeQueued) {
+		Log(WARNING, "Interface", "Invalid PathfinderMainThreadMode detected, setting to immediate.");
+		config.PathfinderMainThreadMode = PathfinderMainThreadModeImmediate;
+	}
 
 	auto value = cfg.Get("ModPath", "");
 	if (value.length()) {

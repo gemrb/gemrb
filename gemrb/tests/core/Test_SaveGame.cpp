@@ -14,6 +14,7 @@
 	#include "../../core/PluginMgr.h"
 	#include "../../core/SaveGameIterator.h"
 	#include "../../core/SaveGameMgr.h"
+	#include "../../core/Scriptable/Actor.h"
 	#include "../../core/Streams/FileStream.h"
 
 	#include <gtest/gtest.h>

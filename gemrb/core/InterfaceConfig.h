@@ -109,6 +109,10 @@ struct CoreSettings {
 	std::string SystemEncoding = "UTF-8";
 	std::string ScaleQuality = "best";
 
+	// negative means "auto detection"; resolved to a concrete count while loading
+	int PathfinderThreadsCount = -1;
+	std::string PathfinderMainThreadMode = "immediate";
+
 	variables_t vars;
 };
 

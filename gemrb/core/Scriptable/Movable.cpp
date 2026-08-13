@@ -9,6 +9,7 @@
 #include "Actor.h"
 #include "Interface.h"
 #include "Map.h"
+#include "PathFinderScheduler.h"
 
 #include "GUI/GameControl.h"
 #include "GameScript/GSUtils.h"
@@ -18,6 +19,8 @@ namespace GemRB {
 
 Point Movable::GetMostLikelyPosition() const
 {
+	// what matters here is whether there is a path to extrapolate along, not the request stage:
+	// with FindPathScheduled the actor may still be walking a previous path - see MovementState
 	if (!path) {
 		return Pos;
 	}
@@ -108,11 +111,16 @@ void Movable::SetAttackMoveChances(const std::array<ieWord, 3>& amc)
 //this could be used for WingBuffet as well
 void Movable::MoveLine(int steps, orient_t orient)
 {
-	if (path || !steps) {
+	// Only start a line move when nothing else is in progress; the Moving state set below is what
+	// makes this guard reject re-entry while the line is still being walked.
+	if (HasMovementInProgress() || !steps) {
 		return;
 	}
 	// DoStep takes care of stopping on walls if necessary
 	path.AppendStep(area->GetLineEnd(Pos, steps, orient));
+	// the path is built here rather than requested from the pathfinder, so the state has to be
+	// advanced by hand - DoStep ignores a path while the state is NoMovement
+	SetMovementState(MovementState::Moving);
 }
 
 orient_t Movable::GetNextFace() const
@@ -124,6 +132,19 @@ orient_t Movable::GetNextFace() const
 	return GemRB::GetNextFace(Orientation, NewOrientation);
 }
 
+void Movable::SetMovementState(const MovementState InNewMovementState)
+{
+	if (movementState == InNewMovementState) {
+		return;
+	}
+	movementState = InNewMovementState;
+}
+
+FindPathRequestPriority Movable::GetFindPathRequestPriority() const
+{
+	return FindPathRequestPriority::Normal;
+}
+
 void Movable::Backoff()
 {
 	SetStanceDirect(IE_ANI_READY);
@@ -131,6 +152,13 @@ void Movable::Backoff()
 		randomBackoff = RAND(MAX_PATH_TRIES * 2 / 3, MAX_PATH_TRIES * 4 / 3);
 	} else {
 		randomBackoff = RAND(MAX_PATH_TRIES, MAX_PATH_TRIES * 2);
+	}
+}
+
+Movable::~Movable()
+{
+	if (!pathRequestId.IsNull()) {
+		PathFinderScheduler::CancelPath(pathRequestId);
 	}
 }
 
@@ -192,7 +220,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 {
 	// Only bump back if not moving
 	// Actors can be bumped while moving if they are backing off
-	if (!path) {
+	if (!HasMovementInProgress()) {
 		if (IsBumped()) {
 			BumpBack();
 		}
@@ -209,13 +237,37 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		return;
 	}
 
+	if (GetMovementState() == MovementState::FindPathScheduled) {
+		if (PathFinderScheduler::IsPathCalculated(pathRequestId)) {
+			Path newPath = PathFinderScheduler::TakeCalculatedPath(pathRequestId);
+			const FindPathRequest pathRequest = PathFinderScheduler::TakeCompletedRequest(pathRequestId);
+			OnPathCalculated(std::move(newPath), pathRequest);
+		} else if (!PathFinderScheduler::IsRequestLive(pathRequestId)) {
+			// The request left the scheduler without producing a result, so nothing will ever
+			// answer it. Resolve the state by hand: WalkTo() refuses to reissue while a request is
+			// in flight, so staying here would strand this actor for the rest of the game.
+			pathRequestId = FindPathRequestId::NullId();
+			SetMovementState(path ? MovementState::Moving : MovementState::NoMovement);
+		}
+		// Not ready yet: fall through and keep walking the path we already hold, if any. The round
+		// trip costs a tick or two - two Sync() cycles, unless DrainCompletedPathsEarly() catches
+		// the result mid-tick and saves one - and standing still for that window would show up as
+		// a visible actor stall, so an actor never goes pathless while repathing. With no previous
+		// path the `!path` check below still parks the actor until the first result lands.
+	}
+
+	if (!path) {
+		// the pathless window: this is the frame budget the async round trip actually costs
+		return;
+	}
+
 	const PathNode& step = path.GetCurrentStep();
 	assert(!step.point.IsZero());
 
 	Point nmptStep = step.point;
 	float_t dx = nmptStep.x - Pos.x;
 	float_t dy = nmptStep.y - Pos.y;
-	Map::NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / float_t(walkScale));
+	PathFinder::NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / float_t(walkScale));
 	if (dx == 0 && dy == 0) {
 		// probably shouldn't happen, but it does when running bg2's cut28a set of cutscenes
 		ClearPath(true);
@@ -293,7 +345,20 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		path.nodes[path.currentStep].waypoint = false;
 		++path.currentStep;
 		if (path.currentStep >= path.Size()) {
-			ClearPath(true);
+			// Walked the path out. A request already in flight is the *continuation* of this
+			// journey - when chasing a moving target the path just finished aimed at where the
+			// target used to be, and the pending one aims at where it is now - so it must
+			// survive. ClearPath() cancels it unconditionally, which would drop the actor to
+			// NoMovement and reset its stance, leaving it standing short of the target until
+			// something happened to issue a fresh request. Just drop the spent path instead and
+			// stay in FindPathScheduled; the `!path` check above parks the actor for the frame
+			// or two until the result lands, and an empty result still resolves to NoMovement
+			// through OnPathCalculated.
+			if (GetMovementState() == MovementState::FindPathScheduled) {
+				path.Clear();
+			} else {
+				ClearPath(true);
+			}
 			NewOrientation = Orientation;
 			pathfindingDistance = circleSize;
 		}
@@ -302,34 +367,178 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 
 void Movable::AddWayPoint(const Point& Des)
 {
+	// A waypoint extends a path that is already being walked; with nothing to extend this degrades
+	// to a plain WalkTo. The test is on the path rather than on the movement state: an actor in
+	// FindPathScheduled may well be walking a previous path (see MovementState), and that path
+	// extends just as safely - testing the state would silently drop the waypoint for the two
+	// frames a re-path is in flight. A non-empty path is also what makes the last-node access
+	// below safe.
 	if (!path) {
+		// A waypoint is a new order, not the retry of a failed one, so it must not be answered by a
+		// stale PathSearchFailed: WalkTo() would consume that and file nothing, and GameScript's
+		// AddWayPoint releases its action without ever testing InMove(), so the waypoint would be
+		// dropped for good. Discard the pending verdict and let the search actually run.
+		if (GetMovementState() == MovementState::PathSearchFailed) {
+			SetMovementState(MovementState::NoMovement);
+		}
 		WalkTo(Des);
 		return;
 	}
 	Destination = Des;
 
-	size_t steps = path.Size();
-	PathNode& lastStep = path.nodes[steps - 1];
-	area->ClearSearchMapFor(this);
-	Path path2 = area->FindPath(lastStep.point, Des, circleSize);
-	// if the waypoint is too close to the current position, no path is generated
-	if (!path2) {
-		if (BlocksSearchMap()) {
-			area->BlockSearchMapFor(this);
-		}
-		return;
+	const size_t steps = path.Size();
+	const PathNode& lastStep = path.nodes[steps - 1];
+
+	ScheduleFindPath(FindPathRequestType::AddWaypoint, lastStep.point, Des, 0);
+}
+
+void Movable::ScheduleFindPath(
+	const FindPathRequestType InRequestType, const Point& InSource, const Point& InDestination, const int InMinDistance,
+	Map* InOptionalMap, const int InOptionalAdditionalFlags)
+{
+	// first cancel a path if any was issued before
+	if (!pathRequestId.IsNull()) {
+		PathFinderScheduler::CancelPath(pathRequestId);
 	}
-	lastStep.waypoint = true;
-	path.AppendPath(path2);
+
+	// prepare parameters for the request; the actor data is read here, on the main thread,
+	// because the request itself only ever carries our pointer identity
+	const Actor* self = Scriptable::As<Actor>(this);
+	Map* requestMap = InOptionalMap ? InOptionalMap : area;
+	const int actorSpeed = self ? self->GetSpeed() : 0;
+	bool canRePathIgnoringActors = false;
+	int pathfindingFlags = PF_SIGHT | InOptionalAdditionalFlags;
+	if (InRequestType == FindPathRequestType::WalkTo) {
+		canRePathIgnoringActors = self && self->ValidTarget(GA_CAN_BUMP);
+		pathfindingFlags |= PF_ACTORS_ARE_BLOCKING;
+	}
+
+	// prepare request
+	FindPathRequest pathfindingRequest;
+	pathfindingRequest.PutBasicRequestData(
+		InRequestType,
+		GetFindPathRequestPriority(),
+		this,
+		GetScriptName());
+
+	pathfindingRequest.PutPathData(
+		InSource,
+		InDestination,
+		requestMap,
+		pathfindingFlags);
+
+	pathfindingRequest.PutActorData(
+		SMPos,
+		circleSize,
+		static_cast<unsigned int>(InMinDistance),
+		actorSpeed,
+		canRePathIgnoringActors,
+		BlocksSearchMap());
+
+	// note appropriate movement state and submit the request
+	SetMovementState(MovementState::FindPathScheduled);
+	pathRequestId = PathFinderScheduler::RequestPath(std::move(pathfindingRequest));
+}
+
+void Movable::OnPathCalculated(Path&& newPath, const FindPathRequest& pathRequest)
+{
+	PathFinderScheduler::RemoveFoundPath(pathRequestId);
+	pathRequestId = FindPathRequestId::NullId();
+
+	switch (pathRequest.requestType) {
+		case FindPathRequestType::WalkTo:
+			// intentional fallthrough, mostly common implementation
+		case FindPathRequestType::WalkToFromNewPath:
+			if (newPath && newPath != path) {
+				ClearPath(false);
+				path = std::move(newPath);
+				SetMovementState(MovementState::Moving);
+				HandleAnkhegStance(false);
+				return;
+			}
+
+			pathfindingDistance = std::max(circleSize, static_cast<int>(pathRequest.minDistance));
+			// if we had an old path and new path was not correct, restore
+			// the movement_state based on the currently held old path
+			if (!path) {
+				// the caller that ordered this move has to learn the search failed.
+				// Park the dead end in the state until then, or the move actions
+				// will re-file the same hopeless request forever.
+				SetMovementState(MovementState::PathSearchFailed);
+				lastFailedDestination = pathRequest.destination;
+				// Count the failed try here rather than where the request was issued: the search
+				// completes asynchronously, so failure is only known once the result arrives.
+				// WalkToFromNewPath marks a request as originating from Actor::NewPath, which is
+				// what MAX_PATH_TRIES caps.
+				if (pathRequest.requestType == FindPathRequestType::WalkToFromNewPath) {
+					IncrementPathTries();
+				}
+			} else {
+				SetMovementState(MovementState::Moving);
+			}
+			break;
+		case FindPathRequestType::AddWaypoint:
+			// if the waypoint is too close to the current position, no path is generated
+			if (!newPath) {
+				// AddWayPoint() only files an `AddWaypoint` path request, while a path is being walked (with
+				// no path it degrades to WalkTo). Setting here `NoMovement` unconditionally would strand an actor
+				// still holding its original path.
+				SetMovementState(path ? MovementState::Moving : MovementState::NoMovement);
+				return;
+			}
+			if (path) {
+				const size_t steps = path.Size();
+				PathNode& lastStep = path.nodes[steps - 1];
+				lastStep.waypoint = true;
+			}
+			path.AppendPath(newPath);
+			SetMovementState(MovementState::Moving);
+			break;
+		case FindPathRequestType::RunAway:
+			path = std::move(newPath);
+			HandleAnkhegStance(false);
+			SetMovementState(path ? MovementState::Moving : MovementState::NoMovement);
+			break;
+	}
 }
 
 // This function is called at each tick if an actor is following another actor
 // Therefore it's rate-limited to avoid actors being stuck as they keep pathfinding
-void Movable::WalkTo(const Point& Des, int distance)
+void Movable::WalkTo(const Point& Des, int distance, FindPathRequestType InRequestType)
 {
-	// Only rate-limit when moving
-	if (path && prevTicks && Ticks < prevTicks + 2) {
+	// A request is already in flight - let it finish, never reissue on top of it.
+	// ScheduleFindPath() cancels the pending request, and CancelPath() also erases an
+	// already-computed path from FoundPaths, while the pathfinder's round trip is up to two
+	// Sync() cycles: a request filed in frame N is dispatched by that frame's Sync(), drained
+	// into FoundPaths by frame N+1's, and first visible to DoStep() in frame N+2 - one frame
+	// sooner when DrainCompletedPathsEarly() picks the result up mid-tick. Since WalkTo() runs
+	// before DoStep() within a frame (Map::UpdateScripts), reissuing on any interval at or below
+	// that latency destroys every result one call before it would be consumed, and the actor
+	// never moves at all. The wait is bounded by requestExpirationFrames, or by DoStep()'s
+	// IsRequestLive() check if the request left the scheduler without producing a result.
+	if (GetMovementState() == MovementState::FindPathScheduled) {
 		return;
+	}
+
+	// Only rate-limit an actor that is actually walking. Gating on `path` instead would also catch
+	// an actor whose re-path is in flight, since it keeps walking the path it still holds.
+	if (GetMovementState() == MovementState::Moving && prevTicks && Ticks < prevTicks + 2) {
+		return;
+	}
+
+	// Report a search that already came back empty for this exact destination. The move actions
+	// give up by testing InMove() right after WalkTo(), which the synchronous pathfinder could
+	// answer within the call; here the answer is the state left behind by OnPathCalculated() a few
+	// frames ago. Drop to NoMovement without filing anything, and that InMove() test - false for
+	// both idle states - fires exactly as it used to. Consuming the state keeps it one-shot, so a
+	// later order for the same spot still gets a fresh search.
+	// A different destination is not covered by the failure and falls through to a real search.
+	if (GetMovementState() == MovementState::PathSearchFailed) {
+		SetMovementState(MovementState::NoMovement);
+		if (Des == lastFailedDestination) {
+			Destination = Des;
+			return;
+		}
 	}
 
 	const Actor* actor = Scriptable::As<Actor>(this);
@@ -348,36 +557,20 @@ void Movable::WalkTo(const Point& Des, int distance)
 		return;
 	}
 
-	if (BlocksSearchMap()) area->ClearSearchMapFor(this);
-	Path newPath = area->FindPath(Pos, Des, circleSize, distance, PF_SIGHT | PF_ACTORS_ARE_BLOCKING, actor);
-	if (!newPath && actor && actor->ValidTarget(GA_CAN_BUMP)) {
-		Log(DEBUG, "WalkTo", "{} re-pathing ignoring actors", fmt::WideToChar { actor->GetShortName() });
-		newPath = area->FindPath(Pos, Des, circleSize, distance, PF_SIGHT, actor);
-	}
-	if (BlocksSearchMap()) {
-		area->BlockSearchMapFor(this);
-	}
-
-	if (newPath && newPath != path) {
-		ClearPath(false);
-		path = std::move(newPath);
-		HandleAnkhegStance(false);
-	} else {
-		pathfindingDistance = std::max(circleSize, distance);
-	}
+	ScheduleFindPath(InRequestType, Pos, Des, distance);
 }
 
 void Movable::RunAwayFrom(const Point& Source, int PathLength, bool noBackAway)
 {
 	ClearPath(true);
-	area->ClearSearchMapFor(this);
-	path = area->RunAway(Pos, Source, PathLength, !noBackAway, As<Actor>());
-	HandleAnkhegStance(false);
+	area->RunAway(Pos, Source, PathLength, !noBackAway, As<Actor>());
 }
 
 void Movable::RandomWalk(bool can_stop, bool run)
 {
-	if (path) {
+	// Only start a random walk when nothing else is in progress; the Moving state set at the end
+	// is what makes this guard reject re-entry while the step is still being walked.
+	if (HasMovementInProgress()) {
 		return;
 	}
 	// if not continuous random walk, then stops for a while
@@ -431,15 +624,17 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		area->ClearSearchMapFor(this);
 	}
 
-	// the 5th parameter is controlling the orientation of the actor
-	// 0 - back away, 1 - face direction
-	PathNode randomStep = area->RandomWalk(Pos, circleSize, maxWalkDistance ? maxWalkDistance : 5, As<Actor>());
+	PathNode randomStep;
+	const bool foundStep = area->RandomWalk(Pos, circleSize, maxWalkDistance ? maxWalkDistance : 5, As<Actor>(), randomStep);
 	if (BlocksSearchMap()) {
 		area->BlockSearchMapFor(this);
 	}
-	if (!randomStep.point.IsZero()) {
+	if (foundStep) {
 		Destination = randomStep.point;
 		path.PrependStep(std::move(randomStep)); // start or end doesn't matter, since the path is currently empty
+		// the path is built here rather than requested from the pathfinder, so the state has to be
+		// advanced by hand - DoStep ignores a path while the state is NoMovement
+		SetMovementState(MovementState::Moving);
 	} else {
 		randomWalkCounter = 0;
 		WalkTo(HomeLocation);
@@ -481,6 +676,9 @@ void Movable::ClearPath(bool resetDestination)
 		InternalFlags &= ~IF_NORETICLE;
 	}
 	path.Clear();
+	SetMovementState(MovementState::NoMovement);
+	PathFinderScheduler::CancelPath(pathRequestId);
+	pathRequestId = FindPathRequestId::NullId();
 	// don't call ReleaseCurrentAction
 }
 
@@ -489,6 +687,10 @@ void Movable::HandleAnkhegStance(bool emerge)
 {
 	const Actor* actor = As<Actor>();
 	int nextStance = emerge ? IE_ANI_EMERGE : IE_ANI_HIDE;
+	// Gated on the path, not on the movement state. Both callers run before the state is settled:
+	// OnPathCalculated's RunAway branch assigns `path` and calls us while still in
+	// FindPathScheduled, and ClearPath calls us before it clears the path and drops to NoMovement.
+	// A state test is therefore false exactly when the stance needs changing.
 	if (actor && path && StanceID != nextStance && actor->GetAnims()->GetAnimType() == IE_ANI_TWO_PIECE) {
 		SetStance(nextStance);
 		SetWait(15); // both stances have 15 frames, at 15 fps

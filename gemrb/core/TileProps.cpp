@@ -6,6 +6,15 @@
 
 #include "globals.h"
 
+#include "Geometry.h"
+#include "Palette.h"
+#include "Sprite2D.h"
+
+#include "Logging/Logging.h"
+
+#include <cassert>
+#include <utility>
+
 namespace GemRB {
 
 const PixelFormat TileProps::pixelFormat(0, 0, 0, 0,
@@ -108,22 +117,27 @@ int TileProps::QueryElevation(const SearchmapPoint& p) const noexcept
 
 Color TileProps::QueryLighting(const SearchmapPoint& p) const noexcept
 {
+	// an OwningTileProps copy carries the pixels but not the source image, so there is no palette
+	// to resolve the index against
+	if (!propImage) {
+		return Color();
+	}
 	uint8_t val = QueryTileProp(p, Property::LIGHTING);
 	return propImage->GetPalette()->GetColorAt(val);
 }
 
-void TileProps::PaintSearchMap(const SearchmapPoint& p, PathMapFlags value) const noexcept
+void TileProps::PaintSearchMap(const SearchmapPoint& p, PathMapFlags value) noexcept
 {
 	if (!size.PointInside(p)) {
 		return;
 	}
 
 	uint32_t& pixel = propPtr[p.y * size.w + p.x];
-	pixel = (pixel & ~searchMapMask) | (uint32_t(value) << propImage->Format().Rshift);
+	pixel = (pixel & ~searchMapMask) | (uint32_t(value) << pixelFormat.Rshift);
 }
 
 // Valid values are - PathMapFlags::UNMARKED, PathMapFlags::PC, PathMapFlags::NPC
-void TileProps::PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, const PathMapFlags value) const noexcept
+void TileProps::PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, const PathMapFlags value) noexcept
 {
 	// We block a circle of radius size-1 around (px,py)
 	// TODO: recheck that this matches originals
@@ -138,11 +152,10 @@ void TileProps::PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, cons
 		if (mapval != PathMapFlags::IMPASSABLE) {
 			PathMapFlags newVal = (mapval & PathMapFlags::NOTACTOR) | value;
 			uint32_t& pixel = propPtr[pos.y * size.w + pos.x];
-			pixel = (pixel & ~searchMapMask) | (uint32_t(newVal) << propImage->Format().Rshift);
+			pixel = (pixel & ~searchMapMask) | (uint32_t(newVal) << pixelFormat.Rshift);
 		}
 	};
 
-	constexpr unsigned int MAX_CIRCLESIZE = 8;
 	blocksize = Clamp<uint16_t>(blocksize, 1, MAX_CIRCLESIZE);
 	uint16_t r = blocksize - 1;
 
@@ -159,4 +172,58 @@ void TileProps::PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, cons
 	}
 }
 
+OwningTileProps OwningTileProps::CopyFrom(const TileProps& tileProps)
+{
+	return OwningTileProps { tileProps };
+}
+
+OwningTileProps::OwningTileProps(OwningTileProps&& other) noexcept
+{
+	*this = std::move(other);
+}
+
+OwningTileProps::OwningTileProps(const OwningTileProps& other) noexcept
+	: TileProps() // non-copy c-tor on purpose
+{
+	*this = other;
+}
+
+OwningTileProps& OwningTileProps::operator=(const OwningTileProps& other) noexcept
+{
+	if (this == &other) {
+		return *this;
+	}
+	ownedProps = other.ownedProps;
+	RebindPropPtr();
+	size = other.size;
+	propImage = nullptr;
+	return *this;
+}
+
+OwningTileProps& OwningTileProps::operator=(OwningTileProps&& other) noexcept
+{
+	if (this == &other) {
+		return *this;
+	}
+
+	ownedProps = std::move(other.ownedProps);
+	RebindPropPtr();
+	size = other.size;
+	propImage = nullptr;
+
+	other.ownedProps.clear();
+	other.propPtr = nullptr;
+	other.propImage = nullptr;
+	other.size.reset();
+	return *this;
+}
+
+OwningTileProps::OwningTileProps(const TileProps& tileProps)
+	// one uint32_t per cell; pixelFormat.Bpp is that same 4 bytes, expressed for the pixel buffer
+	: ownedProps(tileProps.GetPropPtr(), tileProps.GetPropPtr() + tileProps.GetSize().Area())
+{
+	size = tileProps.GetSize();
+	propImage = nullptr;
+	RebindPropPtr();
+}
 }

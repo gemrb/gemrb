@@ -173,6 +173,34 @@ Height=480
 #VitaKeepAspectRatio=1
 
 ###############################################################################
+#  Pathfinding Parameters                                                     #
+###############################################################################
+
+# Control how many pathfinding worker threads to spawn.
+# Correct values range from -1 to 65535:
+#         -1: automatic detection (the default)
+#          0: the path calculations run on the main thread
+#    1-65535: set explicitly how many workers will be spawned
+#
+# The automatic detection will spawn N-1 workers for your N hardware supported threads, but never
+# fewer than 2 and never more than 8.
+PathfinderThreadsCount=-1
+
+# Select mode in which PathFinderScheduler will execute calculations on the main thread.
+# It matters only when no worker thread has been spawned, either due to explicitly set value
+# of 'PathfinderThreadsCount', or a failure when spawning the threads.
+# Does nothing if any worker thread is spawned.
+# Available modes:
+#    "immediate": all paths will be calculated immediately when requested, with complete bypass of
+#    the scheduler internal queues. This closely resembles the legacy implementation.
+#
+#    "queued": all path requests will be driven through the scheduler's queue system, but calculated
+#    on the main thread. This will cause the path delivery to be delayed the same way as with
+#    worker threads, mimicking the multithreaded model. Useful to debug issues with the
+#    multithreaded pathfinder disregarding any thread-safety concerns.
+PathfinderMainThreadMode=immediate
+
+###############################################################################
 #  Paths                                                                      #
 ###############################################################################
 

@@ -10,7 +10,6 @@
 
 #include "Holder.h"
 #include "OverHeadText.h"
-#include "PathFinder.h"
 
 #include <list>
 #include <map>
@@ -102,6 +101,7 @@ class Spell;
 #define XP_PICKPOCKET 3 // gemrb extension
 
 using ScriptID = ieDword;
+using NavmapPoint = Point;
 
 using ScriptableType = enum ScriptableType { ST_ACTOR = 0,
 					     ST_PROXIMITY = 1,

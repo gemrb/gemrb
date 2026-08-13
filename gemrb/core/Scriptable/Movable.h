@@ -6,10 +6,54 @@
 #define MOVABLE_H
 
 #include "CharAnimations.h"
+#include "PathFinder.h"
+#include "PathFinderRequest.h"
 #include "Region.h"
 #include "Selectable.h"
 
 namespace GemRB {
+
+struct FindPathRequest;
+
+/**
+ * Movement stage of a Movable, and the gate DoStep() uses to decide what to do with `path`.
+ *
+ * Transitions:
+ *   NoMovement --ScheduleFindPath()--> FindPathScheduled --OnPathCalculated()--> Moving
+ *                                                        \--(empty result)-----> PathSearchFailed
+ *   PathSearchFailed --WalkTo() for the same destination-----------------------> NoMovement
+ *   NoMovement --MoveLine()/RandomWalk()---------------------------------------> Moving
+ *   any        --ClearPath()---------------------------------------------------> NoMovement
+ *
+ * Invariant: Moving implies a non-empty `path`, and emptying `path` goes through ClearPath(),
+ * which sets NoMovement. Code may therefore rely on the state alone - AddWayPoint() indexes the
+ * last path node after checking only for Moving.
+ *
+ * The converse does not hold: FindPathScheduled says nothing about `path`. ScheduleFindPath()
+ * does not clear it, so a re-path keeps the previous path available, and DoStep() deliberately
+ * keeps walking it until the new one arrives - the request takes a tick or two to come back,
+ * and pausing for that window would show up as a visible actor stall. So the state means "a
+ * request is in flight", not "not moving". Callers that need "is this actor going anywhere"
+ * should ask HasMovementInProgress(), as InMove() does; the two idle states differ only in what
+ * WalkTo() does next, and no caller outside Movable cares about that distinction.
+ *
+ * PathSearchFailed is what makes an unreachable destination terminate. The synchronous pathfinder
+ * answered inside WalkTo(), so the `if (!InMove()) give up` check the move actions run right after
+ * it saw the failure; now the answer arrives a few frames later, when that check is long past. The
+ * failure therefore has to survive in the state until the action next calls WalkTo(), which is
+ * where it is reported - see WalkTo(). Collapsing straight to NoMovement instead makes the actions
+ * refile the same hopeless request forever.
+ *
+ * DoStep() returns immediately while the state is idle, without inspecting `path`. Anything
+ * that populates `path` directly instead of going through the pathfinder must therefore set
+ * Moving itself, or the actor will hold a path it never walks.
+ */
+enum class MovementState {
+	NoMovement, ///< idle; `path` is empty
+	FindPathScheduled, ///< a request is in flight; DoStep() keeps walking any previous `path` meanwhile
+	PathSearchFailed, ///< idle; the last WalkTo search found nothing and that is not reported yet
+	Moving, ///< walking `path`
+};
 
 class GEM_EXPORT Movable : public Selectable {
 private: // these seem to be sensitive, so get protection
@@ -18,7 +62,13 @@ private: // these seem to be sensitive, so get protection
 	orient_t NewOrientation = S;
 	std::array<ieWord, 3> AttackMovements = { 100, 0, 0 };
 
+	FindPathRequestId pathRequestId = FindPathRequestId::NullId();
+	MovementState movementState = MovementState::NoMovement;
 	Path path; // whole path
+	// Destination of the search that put us in PathSearchFailed state;
+	// only a WalkTo() for the same spot reports the failure, any other one
+	// gets a fresh search.
+	Point lastFailedDestination;
 	unsigned int prevTicks = 0;
 	int bumpBackTries = 0;
 	bool pathAbandoned = false;
@@ -34,6 +84,21 @@ protected:
 	int randomWalkCounter = 0;
 
 public:
+	inline MovementState GetMovementState() const
+	{
+		return movementState;
+	}
+
+	/** Has the actor began to go somewhere - is it awaiting on a path to walk or already walking? */
+	inline bool HasMovementInProgress() const
+	{
+		return movementState == MovementState::Moving || movementState == MovementState::FindPathScheduled;
+	}
+
+	void SetMovementState(const MovementState InNewMovementState);
+
+	virtual FindPathRequestPriority GetFindPathRequestPriority() const;
+
 	inline int GetRandomBackoff() const
 	{
 		return randomBackoff;
@@ -46,6 +111,7 @@ public:
 	using Selectable::Selectable;
 	Movable(const Movable&) = delete;
 	Movable& operator=(const Movable&) = delete;
+	~Movable() override;
 
 	Point Destination = Pos;
 	ResRef AreaName;
@@ -91,11 +157,19 @@ public:
 	void SetAttackMoveChances(const std::array<ieWord, 3>& amc);
 	virtual void DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point& Des);
+
+	void ScheduleFindPath(const FindPathRequestType InRequestType, const Point& InSource, const Point& InDestination, const int InMinDistance,
+			      Map* InOptionalMap = nullptr, const int InOptionalAdditionalFlags = 0);
+	void OnPathCalculated(Path&& newPath, const FindPathRequest& PathRequest);
+
 	void RunAwayFrom(const Point& Des, int PathLength, bool noBackAway);
 	void RandomWalk(bool can_stop, bool run);
 	int GetRandomWalkCounter() const { return randomWalkCounter; };
 	void MoveLine(int steps, orient_t Orient);
-	void WalkTo(const Point& Des, int MinDistance = 0);
+	// InRequestType selects how OnPathCalculated() treats the result; the only alternative to
+	// WalkTo is WalkToFromNewPath, which additionally counts a failed search against the
+	// actor's path-retry budget.
+	void WalkTo(const Point& Des, int MinDistance = 0, FindPathRequestType InRequestType = FindPathRequestType::WalkTo);
 	void MoveTo(const Point& Des);
 	void Stop(int flags = 0) override;
 	void ClearPath(bool resetDestination = true);

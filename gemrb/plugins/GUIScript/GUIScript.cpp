@@ -10748,7 +10748,9 @@ static PyObject* GemRB_ClearActions(PyObject* /*self*/, PyObject* args)
 		Log(MESSAGE, "GuiScript", "Cannot break action!");
 		Py_RETURN_NONE;
 	}
-	if (!actor->GetPath() && !actor->Modal.State && !actor->objects.LastTarget && actor->objects.LastTargetPos.IsInvalid() && !actor->objects.LastSpellTarget) {
+	// The movement state, not path emptiness: an actor awaiting a path holds none yet and would
+	// otherwise look idle here. See Scriptable::InMove.
+	if (!actor->HasMovementInProgress() && !actor->Modal.State && !actor->objects.LastTarget && actor->objects.LastTargetPos.IsInvalid() && !actor->objects.LastSpellTarget) {
 		Log(MESSAGE, "GuiScript", "No breakable action!");
 		Py_RETURN_NONE;
 	}

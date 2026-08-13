@@ -289,6 +289,17 @@ Actor::Actor()
 	ToHit.SetOwner(this);
 }
 
+FindPathRequestPriority Actor::GetFindPathRequestPriority() const
+{
+	if (IsPartyMember()) {
+		return FindPathRequestPriority::Highest;
+	}
+	if (IsInCombat()) {
+		return FindPathRequestPriority::High;
+	}
+	return FindPathRequestPriority::Normal;
+}
+
 void Actor::SetFistStat(ieDword stat)
 {
 	CFGCache.fistStat = stat;
@@ -663,6 +674,14 @@ TableMgr::index_t Actor::GetKitIndex(ieDword kit, ieDword baseclass) const
 	}
 
 	return kitindex;
+}
+
+bool Actor::IsInCombat() const
+{
+	return objects.LastTarget != 0 || // attacking someone
+		objects.LastSpellTarget != 0 || // casting at someone
+		!objects.LastTargetPos.IsInvalid() || // casting at ground
+		(Modified[IE_STATE_ID] & STATE_PANIC); // fleeing a fight
 }
 
 //applies a kit on the character
@@ -1409,7 +1428,7 @@ static void pcf_alignment(Actor* actor, ieDword /*oldValue*/, ieDword /*newValue
 
 static void pcf_avatarremoval(Actor* actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	const Map* map = actor->GetCurrentArea();
+	Map* map = actor->GetCurrentArea();
 	if (!map) return;
 
 	if (newValue) {
@@ -3762,7 +3781,9 @@ void Actor::PlayWarCry(int range) const
 void Actor::CommandActor(Action* action, bool clearPath)
 {
 	ClearActions(); // stop what you were doing
-	if (clearPath) ClearPath(true);
+	if (clearPath) {
+		ClearPath(true);
+	}
 	AddAction(action); // now do this new thing
 
 	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
@@ -4192,7 +4213,8 @@ void Actor::CheckCleave()
 // NOTE: only does the visual part of chunking
 static void ChunkActor(Actor* actor)
 {
-	const Map* map = actor->GetCurrentArea();
+	// non-const: ClearSearchMapFor mutates the searchmap now
+	Map* map = actor->GetCurrentArea();
 	if (!map) return;
 	if (!map->IsVisible(actor->Pos)) return; // protect against ctrl-shift-y
 
@@ -5095,7 +5117,7 @@ void Actor::SetPosition(const Point& nmptTarget, bool jump, const Size& radius, 
 
 	SearchmapPoint q = p;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size) {
-		const Map* map = GetCurrentArea();
+		Map* map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
 		map->ClearSearchMapFor(this);
 		map->AdjustPosition(p, radius, size);
@@ -8255,14 +8277,11 @@ void Actor::NewPath()
 		ResetPathTries();
 		return;
 	}
-	WalkTo(savedDest, InternalFlags, pathfindingDistance);
-	if (!GetPath()) {
-		IncrementPathTries();
-	}
+	WalkTo(savedDest, InternalFlags, pathfindingDistance, FindPathRequestType::WalkToFromNewPath);
 }
 
 
-void Actor::WalkTo(const Point& Des, ieDword flags, int MinDistance)
+void Actor::WalkTo(const Point& Des, ieDword flags, int MinDistance, FindPathRequestType InRequestType)
 {
 	ResetPathTries();
 	if (InternalFlags & IF_REALLYDIED || walkScale == 0) {
@@ -8270,7 +8289,7 @@ void Actor::WalkTo(const Point& Des, ieDword flags, int MinDistance)
 	}
 	SetRunFlags(flags);
 	ResetCommentTime();
-	Movable::WalkTo(Des, MinDistance);
+	Movable::WalkTo(Des, MinDistance, InRequestType);
 }
 
 void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
@@ -11836,7 +11855,7 @@ bool Actor::TouchAttack(const Projectile* pro) const
 	return !fail;
 }
 
-Actor::BlockingSizeCategory Actor::getSizeCategory() const
+uint8_t Actor::getSizeCategory() const
 {
 	return this->circleSize;
 }

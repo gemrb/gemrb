@@ -557,7 +557,10 @@ bool Scriptable::InMove() const
 	if (Type != ST_ACTOR) {
 		return false;
 	}
-	return !As<Movable>(this)->GetPath().Empty();
+	// Tests the movement state, not `path`: an actor whose path request is still in flight holds
+	// no path yet, and counts as in-move. Otherwise a caller could issue a second, conflicting
+	// order in the window before the result lands.
+	return As<Movable>(this)->HasMovementInProgress();
 }
 
 void Scriptable::SetWait(tick_t time)

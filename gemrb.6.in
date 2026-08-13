@@ -130,6 +130,37 @@ By default (set to 1) logging is enabled and several loggers are used depending
 on the plaftorm. Use 0 to disable all logging, which can help in performance
 critical settings.
 
+.TP
+.BR PathfinderThreadsCount =INT
+How many worker threads the PathFinderScheduler should spawn.
+Correct values range from -1 to 65535:
+       -1: automatic detection (the default)
+        0: the path calculations run on the main thread
+  1-65535: set explicitly how many workers will be spawned
+
+The automatic detection will spawn N-1 workers for your N hardware supported
+threads, but never fewer than 2 and never more than 8.
+
+.TP
+.BR PathfinderMainThreadMode =(immediate|queued)
+Describes the mode in which PathFinderScheduler will execute calculations on the main thread.
+Defaults to "immediate".
+Does nothing if any worker thread is spawned.
+
+\[bu]
+.I "immediate"
+: all paths will be calculated immediately when requested, with complete
+bypass of the scheduler internal queues. This closely resembles the
+legacy implementation.
+
+\[bu]
+.I "queued"
+: all path requests will be driven through the scheduler's
+queue system, but calculated on the main thread. This will cause the path
+delivery to be delayed the same way as with worker threads, mimicking the
+multithreaded model. Useful to debug issues with the multithreaded pathfinder
+disregarding any thread-safety concerns.
+
 .\"###################################################
 .SH Video Parameters:
 
