@@ -148,8 +148,15 @@ void TileProps::PaintSearchMap(const SearchmapPoint& p, uint16_t blocksize, cons
 	// actor. This matches the behaviour of the original BG2.
 
 	auto PaintIfPassable = [this, value](const SearchmapPoint& pos) {
-		PathMapFlags mapval = QuerySearchMap(pos);
-		if (mapval != PathMapFlags::IMPASSABLE) {
+		const PathMapFlags mapval = QuerySearchMap(pos);
+		// Only walkable terrain should be able to carry actor marks.
+		// Marking a wall as occupied is wrong and buys us nothing
+		// (it is unwalkable already, regardless of whether an actor is bumped
+		// there or not).
+		// Readers that accept a tile based on its ACTOR bit would then see a hole
+		// in the wall wherever a circle spills onto it.
+		constexpr auto CanStoreActor = PathMapFlags::PASSABLE | PathMapFlags::TRAVEL;
+		if (static_cast<bool>(mapval & CanStoreActor)) {
 			PathMapFlags newVal = (mapval & PathMapFlags::NOTACTOR) | value;
 			uint32_t& pixel = propPtr[pos.y * size.w + pos.x];
 			pixel = (pixel & ~searchMapMask) | (uint32_t(newVal) << pixelFormat.Rshift);

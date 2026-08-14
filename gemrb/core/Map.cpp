@@ -2326,8 +2326,7 @@ bool Map::IsWalkableTo(const Point& s, const Point& d, bool actorsAreBlocking, c
 bool Map::IsWalkableTo(const SearchmapPoint& s, const SearchmapPoint& d, bool actorsAreBlocking, const Actor* caller) const
 {
 	PathMapFlags ret = PathFinder::GetBlockedInLineTile(tileProps, s, d, true, caller);
-	PathMapFlags mask = PathMapFlags::PASSABLE | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
-	return bool(ret & mask);
+	return PathFinder::IsLineWalkable(ret, actorsAreBlocking);
 }
 
 void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)

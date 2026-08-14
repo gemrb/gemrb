@@ -675,18 +675,30 @@ bool PathFinder::IsVisibleLOS(const TileProps& tileProps, const SearchmapPoint& 
 }
 
 
+bool PathFinder::IsLineWalkable(const PathMapFlags accumulatedFlags, const bool areActorsBlocking)
+{
+	// Check the geometry first:
+	// `accumulatedFlags` is OR-accumulated over the whole line, so a single tile with ACTOR flag, sets ACTOR for
+	// all of it. Ignoring actors would cause ignore any wall on the line, so pathfinder could route a path
+	// going straight through a wall - and that's a pretty bad pathfinder's job if you ask me. Unless it's a pathfinder
+	// for ghosts.
+	if (static_cast<bool>(accumulatedFlags & (PathMapFlags::SIDEWALL | PathMapFlags::DOOR_IMPASSABLE))) {
+		return false;
+	}
+	const PathMapFlags mask = PathMapFlags::PASSABLE | (areActorsBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
+	return static_cast<bool>(accumulatedFlags & mask);
+}
+
 bool PathFinder::IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller)
 {
 	PathMapFlags ret = GetBlockedInLine(tileProps, s, d, true, caller);
-	PathMapFlags mask = PathMapFlags::PASSABLE | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
-	return bool(ret & mask);
+	return IsLineWalkable(ret, actorsAreBlocking);
 }
 
 bool PathFinder::IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, int actorSpeed, int actorCircleSize)
 {
 	PathMapFlags ret = GetBlockedInLine(tileProps, s, d, true, actorSpeed, actorCircleSize);
-	PathMapFlags mask = PathMapFlags::PASSABLE | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
-	return bool(ret & mask);
+	return IsLineWalkable(ret, actorsAreBlocking);
 }
 
 bool PathFinder::AdjustPositionX(const TileProps& tileProps, SearchmapPoint& goal, const Size& radius, int size)
