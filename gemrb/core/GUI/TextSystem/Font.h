@@ -165,6 +165,7 @@ public:
 	Font(Holder<Palette> pal, ieWord lineheight, ieWord baseline, bool bg);
 	Font(const Font&) = delete;
 	Font& operator=(const Font&) = delete;
+	virtual ~Font() = default;
 
 	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>&);
 	// BAM fonts use alisases a lot so this saves quite a bit of space
