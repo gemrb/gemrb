@@ -289,6 +289,17 @@ int Game::DelNPC(unsigned int slot, bool autoFree)
 	return 0;
 }
 
+void Game::ResolveItemExpiry() const
+{
+	const ieDword hour = GameTime / core->Time.hour_size;
+	for (const Actor* pc : PCs) {
+		pc->inventory.ResolveItemExpiry(hour);
+	}
+	for (const Actor* npc : NPCs) {
+		npc->inventory.ResolveItemExpiry(hour);
+	}
+}
+
 //i'm sure this could be faster
 void Game::ConsolidateParty() const
 {
