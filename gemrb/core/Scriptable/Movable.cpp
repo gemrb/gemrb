@@ -17,6 +17,12 @@
 
 namespace GemRB {
 
+// Diagnostics helper: who is this, and what tick is it
+static std::string MoveTag(const Movable* who)
+{
+	return fmt::format("[t={}] {}", core->GetGame() ? core->GetGame()->Ticks : 0, who->GetScriptName());
+}
+
 Point Movable::GetMostLikelyPosition() const
 {
 	// what matters here is whether there is a path to extrapolate along, not the request stage:
@@ -168,7 +174,10 @@ void Movable::BumpAway()
 	if (!IsBumped()) oldPos = Pos;
 	bumped = true;
 	bumpBackTries = 0;
+	const Point beforeBump = Pos;
 	area->AdjustPositionNavmap(Pos);
+	LogDebugPathfinder("Movable::BumpAway", "{}: bumped away {} -> {} (oldPos={}, landed on flags={})",
+			   MoveTag(this), beforeBump, Pos, oldPos, uint8_t(area->GetBlocked(Pos)));
 }
 
 void Movable::BumpBack()
@@ -239,10 +248,14 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 
 	if (GetMovementState() == MovementState::FindPathScheduled) {
 		if (PathFinderScheduler::IsPathCalculated(pathRequestId)) {
+			LogDebugPathfinder("Movable::DoStep", "{}: request ID={} completed, taking calculated path from the scheduler",
+					   MoveTag(this), pathRequestId.GetId());
 			Path newPath = PathFinderScheduler::TakeCalculatedPath(pathRequestId);
 			const FindPathRequest pathRequest = PathFinderScheduler::TakeCompletedRequest(pathRequestId);
 			OnPathCalculated(std::move(newPath), pathRequest);
 		} else if (!PathFinderScheduler::IsRequestLive(pathRequestId)) {
+			LogDebugPathfinder("Movable::DoStep", "{}: request ID={} vanished from the scheduler without a result",
+					   MoveTag(this), pathRequestId.GetId());
 			// The request left the scheduler without producing a result, so nothing will ever
 			// answer it. Resolve the state by hand: WalkTo() refuses to reissue while a request is
 			// in flight, so staying here would strand this actor for the rest of the game.
@@ -270,6 +283,8 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	PathFinder::NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / float_t(walkScale));
 	if (dx == 0 && dy == 0) {
 		// probably shouldn't happen, but it does when running bg2's cut28a set of cutscenes
+		LogDebugPathfinder("Movable::DoStep", "{}: ZERO-DELTA ABANDON at Pos={} step={} step {}/{} dest={}",
+				   MoveTag(this), Pos, nmptStep, path.currentStep, path.Size(), Destination);
 		ClearPath(true);
 		Log(DEBUG, "PathFinderWIP", "Abandoning because I'm exactly at the goal");
 		pathAbandoned = true;
@@ -302,6 +317,9 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		// attacking actions already take weapon range into account when
 		// triggering movement, so this here does not mean we go needlessly close
 		if (path.Size() == 1 && WithinPersonalRange(this, nmptStep, 1)) {
+			LogDebugPathfinder("Movable::DoStep", "{}: NEAR-GOAL ABANDON at Pos={} step={} dest={} blocker={} at {}",
+					   MoveTag(this), Pos, nmptStep, Destination,
+					   actorInTheWay->GetScriptName(), actorInTheWay->Pos);
 			ClearPath(true);
 			NewOrientation = Orientation;
 			// Do not call ReleaseCurrentAction() since other actions
@@ -311,14 +329,28 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 			return;
 		}
 		if (actor && actor->ValidTarget(GA_CAN_BUMP) && actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE)) {
+			LogDebugPathfinder("Movable::DoStep", "{}: bumping {} away from {} (I'm at {}, step {}/{})",
+					   MoveTag(this), actorInTheWay->GetScriptName(), actorInTheWay->Pos,
+					   Pos, path.currentStep, path.Size());
 			actorInTheWay->BumpAway();
 		} else {
+			LogDebugPathfinder("Movable::DoStep", "{}: backing off, {} at {} blocks me at {} (step {}/{})",
+					   MoveTag(this), actorInTheWay->GetScriptName(), actorInTheWay->Pos,
+					   Pos, path.currentStep, path.Size());
 			Backoff();
 			return;
 		}
 	}
 	// Stop if there's a door in the way
-	if (blocksSearch && !core->InCutSceneMode() && bool(area->GetBlocked(Pos + Point(dx, dy)) & PathMapFlags::SIDEWALL)) {
+	const Point wallProbe = Pos + Point(dx, dy);
+	if (blocksSearch && !core->InCutSceneMode() && bool(area->GetBlocked(wallProbe) & PathMapFlags::SIDEWALL)) {
+		LogDebugPathfinder("Movable::DoStep", "{}: WALL ABANDON at Pos={} SM={} probe={} probeFlags={} stepTarget={} "
+						      "delta=({},{}) step {}/{} dest={} bumped={} probeRadiusFlags={} posFlags={}",
+				   MoveTag(this), Pos, fmt::format("({},{})", SMPos.x, SMPos.y), wallProbe,
+				   uint8_t(area->GetBlocked(wallProbe)), nmptStep, dx, dy,
+				   path.currentStep, path.Size(), Destination, bumped,
+				   uint8_t(area->GetBlockedInRadius(wallProbe, circleSize)),
+				   uint8_t(area->GetBlocked(Pos)));
 		Log(DEBUG, "PathFinder", "Abandoning because I'm in front of a wall");
 		ClearPath(true);
 		ReleaseCurrentAction(); // otherwise MoveToPoint and others that keep retrying will loop
@@ -438,10 +470,19 @@ void Movable::ScheduleFindPath(
 	// note appropriate movement state and submit the request
 	SetMovementState(MovementState::FindPathScheduled);
 	pathRequestId = PathFinderScheduler::RequestPath(std::move(pathfindingRequest));
+	LogDebugPathfinder("Movable::ScheduleFindPath", "{}: filed request ID={} type={} from {} to {} minDist={} flags={} canRepathIgnoringActors={}",
+			   MoveTag(this), pathRequestId.GetId(), int(InRequestType), InSource, InDestination,
+			   InMinDistance, pathfindingFlags, canRePathIgnoringActors);
 }
 
 void Movable::OnPathCalculated(Path&& newPath, const FindPathRequest& pathRequest)
 {
+	LogDebugPathfinder("Movable::OnPathCalculated", "{}: request ID={} type={} came back with {} nodes (first={}, last={}), "
+							"I'm at {}, requested source={} dest={}",
+			   MoveTag(this), pathRequestId.GetId(), int(pathRequest.requestType), newPath.Size(),
+			   newPath ? newPath.GetStep(0).point : Point(), newPath ? newPath.nodes.back().point : Point(),
+			   Pos, pathRequest.source, pathRequest.destination);
+
 	PathFinderScheduler::RemoveFoundPath(pathRequestId);
 	pathRequestId = FindPathRequestId::NullId();
 
@@ -517,6 +558,8 @@ void Movable::WalkTo(const Point& Des, int distance, FindPathRequestType InReque
 	// never moves at all. The wait is bounded by requestExpirationFrames, or by DoStep()'s
 	// IsRequestLive() check if the request left the scheduler without producing a result.
 	if (GetMovementState() == MovementState::FindPathScheduled) {
+		LogDebugPathfinder("Movable::WalkTo", "{}: skipped, request {} still in flight (dest={})",
+				   MoveTag(this), pathRequestId.GetId(), Des);
 		return;
 	}
 
@@ -536,6 +579,8 @@ void Movable::WalkTo(const Point& Des, int distance, FindPathRequestType InReque
 	if (GetMovementState() == MovementState::PathSearchFailed) {
 		SetMovementState(MovementState::NoMovement);
 		if (Des == lastFailedDestination) {
+			LogDebugPathfinder("Movable::WalkTo", "{}: reporting earlier search failure for dest={}, filing nothing",
+					   MoveTag(this), Des);
 			Destination = Des;
 			return;
 		}
@@ -546,6 +591,7 @@ void Movable::WalkTo(const Point& Des, int distance, FindPathRequestType InReque
 	prevTicks = Ticks;
 	Destination = Des;
 	if (pathAbandoned) {
+		LogDebugPathfinder("Movable::WalkTo", "{}: refusing dest={}, path was abandoned last step", MoveTag(this), Des);
 		Log(DEBUG, "WalkTo", "{}: Path was just abandoned", fmt::WideToChar { actor->GetShortName() });
 		ClearPath(true);
 		return;
@@ -661,6 +707,10 @@ void Movable::Stop(int flags)
 
 void Movable::ClearPath(bool resetDestination)
 {
+	if (HasMovementInProgress()) {
+		LogDebugPathfinder("Movable::ClearPath", "{}: dropping movement (state={}, {} path nodes left, request ID={}, at {} heading for {})",
+				   MoveTag(this), int(GetMovementState()), path.Size(), pathRequestId.GetId(), Pos, Destination);
+	}
 	pathAbandoned = false;
 
 	if (resetDestination) {
