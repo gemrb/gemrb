@@ -32,6 +32,7 @@
 
 #include <array>
 #include <limits>
+#include <set>
 
 namespace GemRB {
 
@@ -773,8 +774,8 @@ void PathFinder::AdjustPositionDirected(const TileProps& tileProps, NavmapPoint&
 	// NOTE: OrientedOffset is wrong for radius > 1, ignoring the other 8 possible orientations
 	//       it's not really important, since we're usually checking circle sizes larger than 1
 	//       and there'd be overlaps for longer than it takes to find a good position
-	std::array<orient_t, 5> orients { direction, NextOrientation(direction, 2), PrevOrientation(direction, 2), NextOrientation(direction), PrevOrientation(direction) };
-	std::set<SearchmapPoint> baseOffsets; // OrientedOffset only offsets in 8 directions, so there will be duplicates
+	const std::array<orient_t, 5> orients { direction, NextOrientation(direction, 2), PrevOrientation(direction, 2), NextOrientation(direction), PrevOrientation(direction) };
+	std::set<SearchmapPoint, SearchmapPoint::Cmp> baseOffsets; // OrientedOffset only offsets in 8 directions, so there will be duplicates
 	for (size_t idx = 0; idx < orients.size(); idx++) {
 		Point p = OrientedOffset(orients[idx], 1);
 		baseOffsets.emplace(p.x, p.y);

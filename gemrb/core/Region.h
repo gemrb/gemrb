@@ -57,6 +57,16 @@ public:
 
 	int x = 0;
 	int y = 0;
+
+	/**
+	 *  Comparator functor for use with std::map and std::set.
+	 */
+	struct Cmp {
+		bool operator()(const BasePoint& P1, const BasePoint& P2) const
+		{
+			return P1.x < P2.x || (P1.x == P2.x && P1.y < P2.y);
+		}
+	};
 };
 
 class GEM_EXPORT Point : public BasePoint {
