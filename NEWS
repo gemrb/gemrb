@@ -1,14 +1,15 @@
-GemRB git (b8df5c6):
+GemRB git (295370c):
   New features:
     - 
+    - multithreaded pathfinding
     - audio occlusion based on line of sight
     - intoxication, TobEx Limit effect stacking, modal feats
     - in-game configuration screen for otherwise hidden settings
-    - moddable GUI code
+    - moddable GUI code, optional portrait window snapping
 
   Improved features:
     - 
-    - tooltips, fonts
+    - tooltips, fonts, pathfinding
     - save game and ee compatibility, effects, projectiles
     - bugfixes
 
