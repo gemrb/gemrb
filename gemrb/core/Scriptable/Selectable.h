@@ -30,6 +30,7 @@ public:
 	void DrawCircle(const Point& p) const;
 	bool IsOver(const Point& Pos) const;
 	bool IsOver(const Point& Pos, const Point& CenterPos) const;
+	static bool IsOverCircle(const Point& Pos, const Point& CenterPos, int circleSize);
 	void SetOver(bool over);
 	bool IsSelected() const;
 	void Select(int Value);

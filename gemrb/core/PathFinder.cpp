@@ -585,18 +585,13 @@ PathMapFlags PathFinder::GetBlockedInLine(const TileProps& tileProps, const Navm
 PathMapFlags PathFinder::GetBlockedInLine(const TileProps& tileProps, const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, int actorSpeed, int actorCircleSize)
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
-	NavmapPoint p = s;
 	SearchmapPoint sms { s };
 	float_t factor = actorSpeed ? float_t(gamedata->GetStepTime()) / float_t(actorSpeed) : 1;
 
 	const auto getBlockedStatusFn = (stopOnImpassable && actorCircleSize) ? &PathFinder::GetChildBlockedStatusForBigSize : &PathFinder::GetChildBlockedStatusForSmallSize;
-	while (p != d) {
-		float_t dx = d.x - p.x;
-		float_t dy = d.y - p.y;
-		NormalizeDeltas(dx, dy, factor);
-		p.x += dx;
-		p.y += dy;
-		SearchmapPoint smp { p };
+	LineStepper<NavmapPoint> walk { s, d, factor };
+	while (walk.Step()) {
+		SearchmapPoint smp { walk.Current() };
 		if (sms == smp) continue;
 
 		// see note in GetBlockedInLineTile
@@ -626,16 +621,12 @@ PathMapFlags PathFinder::GetBlockedInLineTile(const TileProps& tileProps, const 
 PathMapFlags PathFinder::GetBlockedInLineTile(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, int actorSpeed, int actorCircleSize)
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
-	SearchmapPoint p = s;
 	float_t factor = actorSpeed ? float_t(gamedata->GetStepTime()) / float_t(actorSpeed) / 16 : 1;
 
 	const auto getBlockedStatusFn = (stopOnImpassable && actorCircleSize) ? &PathFinder::GetChildBlockedStatusForBigSize : &PathFinder::GetChildBlockedStatusForSmallSize;
-	while (p != d) {
-		float_t dx = d.x - p.x;
-		float_t dy = d.y - p.y;
-		NormalizeDeltas(dx, dy, factor);
-		p.x += dx;
-		p.y += dy;
+	LineStepper<SearchmapPoint> walk { s, d, factor };
+	while (walk.Step()) {
+		const SearchmapPoint& p = walk.Current();
 		if (s == p) continue;
 
 		// do a wider check for bigger actors (for the common case it's the same)
