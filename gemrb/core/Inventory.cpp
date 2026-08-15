@@ -2206,6 +2206,13 @@ void Inventory::EnforceUsability()
 	}
 }
 
+void Inventory::ResolveItemExpiry(const ieDword hour) const
+{
+	for (CREItem* itm : Slots) {
+		if (itm) itm->ResolveExpiry(hour);
+	}
+}
+
 void Inventory::CheckExpiry(ieDword hour)
 {
 	size_t maxSlot = Slots.size();

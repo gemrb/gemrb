@@ -445,6 +445,8 @@ public:
 	void AddGold(int add);
 	/** Adds ticks to game time */
 	void AdvanceTime(ieDword add, bool fatigue = true);
+	/** Converts item expiration delays that were still relative when the party was read */
+	void ResolveItemExpiry() const;
 	/** Runs the script engine on the global script and the area scripts
 	areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();

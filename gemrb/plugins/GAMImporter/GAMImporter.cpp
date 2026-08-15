@@ -194,6 +194,10 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 		newGame->AddNPC(actor);
 	}
 
+	// the actors above were read while this Game wasn't installed yet, so their items
+	// couldn't have their expiration delays converted to absolute time
+	newGame->ResolveItemExpiry();
+
 	// load initial values from var.var, but only for new games,
 	// since we need to maintain the order
 	if (GlobalCount == 0) {

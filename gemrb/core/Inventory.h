@@ -171,6 +171,13 @@ public:
 		Weight = item->Weight;
 		MaxStackAmount = item->MaxStackAmount;
 	};
+	// turns a still relative expiration delay in days into an absolute hour;
+	// the forced 255 also marks the value as already converted
+	void ResolveExpiry(ieDword hour)
+	{
+		if (Expired == 0 || Expired > 255) return;
+		Expired = hour + Expired * 24 + 255;
+	};
 };
 
 /**
@@ -346,6 +353,7 @@ public:
 	void CacheAllWeaponInfo() const;
 	void EnforceUsability();
 	void CheckExpiry(ieDword hour); // check if any item is past its expiration date
+	void ResolveItemExpiry(ieDword hour) const; // convert delays that were still relative when the item was read
 
 private:
 	void CalculateWeight(void);

@@ -3232,9 +3232,11 @@ CREItem* Interface::ReadItem(DataStream* str, CREItem* itm) const
 {
 	str->ReadResRef(itm->ItemResRef);
 	str->ReadWord(itm->Expired);
-	if (itm->Expired != 0 && itm->Expired <= 255) {
-		// convert to absolute time, including forcing a 255 delay
-		itm->Expired = (GetGame()->GameTime / Time.hour_size) + itm->Expired * 24 + 255;
+	// if the party is read from the GAM while the Game isn't installed yet,
+	// later call to Game::ResolveItemExpiry will handle that
+	const Game* curGame = GetGame();
+	if (curGame) {
+		itm->ResolveExpiry(curGame->GameTime / Time.hour_size);
 	}
 
 	str->ReadWord(itm->Usages[0]);
