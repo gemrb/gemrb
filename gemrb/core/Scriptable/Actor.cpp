@@ -4990,19 +4990,19 @@ std::string Actor::dump() const
 	AppendFormat(buffer, "Area:       {} {} Dest: {}\n", AreaName, Pos, Destination);
 	AppendFormat(buffer, "Dialog:     {}    TalkCount:  {}\n", Dialog, TalkCount);
 	AppendFormat(buffer, "Global ID:  {}   PartySlot: {}\n", GetGlobalID(), InParty);
-	AppendFormat(buffer, "Script name:{:<32}    Current action: {}    Total: {}\n", scriptName, CurrentAction ? CurrentAction->actionID : -1, actionQueue.size());
+	AppendFormat(buffer, "Script name: {:<32}    Current action: {}    Total: {}\n", scriptName, CurrentAction ? CurrentAction->actionID : -1, actionQueue.size());
 	AppendFormat(buffer, "Int. Flags: {:#x}    ", InternalFlags);
 	AppendFormat(buffer, "MC Flags: {:#x}    \n", Modified[IE_MC_FLAGS]);
 	AppendFormat(buffer, "State: {:#x}     current state: {:#x}\n", BaseStats[IE_STATE_ID], Modified[IE_STATE_ID]);
-	AppendFormat(buffer, "Allegiance: {}   current allegiance:{}\n", BaseStats[IE_EA], Modified[IE_EA]);
-	AppendFormat(buffer, "Class:      {}   current class:{}    Kit: {} (base: {})\n", BaseStats[IE_CLASS], Modified[IE_CLASS], Modified[IE_KIT], BaseStats[IE_KIT]);
-	AppendFormat(buffer, "Race:       {}   current race:{}\n", BaseStats[IE_RACE], Modified[IE_RACE]);
-	AppendFormat(buffer, "Gender:     {}   current gender:{}\n", BaseStats[IE_SEX], Modified[IE_SEX]);
-	AppendFormat(buffer, "Specifics:  {}   current specifics:{}\n", BaseStats[IE_SPECIFIC], Modified[IE_SPECIFIC]);
-	AppendFormat(buffer, "Alignment:  {:#x}   current alignment:{:#x}\n", BaseStats[IE_ALIGNMENT], Modified[IE_ALIGNMENT]);
-	AppendFormat(buffer, "Morale:     {}   current morale:{}\n", BaseStats[IE_MORALE], Modified[IE_MORALE]);
-	AppendFormat(buffer, "Moralebreak:{}   Morale recovery:{}\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME]);
-	AppendFormat(buffer, "Visualrange:{} (Explorer: {})\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE]);
+	AppendFormat(buffer, "Allegiance: {}   current allegiance: {}\n", BaseStats[IE_EA], Modified[IE_EA]);
+	AppendFormat(buffer, "Class:      {}   current class: {}    Kit: {} (base: {})\n", BaseStats[IE_CLASS], Modified[IE_CLASS], Modified[IE_KIT], BaseStats[IE_KIT]);
+	AppendFormat(buffer, "Race:       {}   current race: {}\n", BaseStats[IE_RACE], Modified[IE_RACE]);
+	AppendFormat(buffer, "Gender:     {}   current gender: {}\n", BaseStats[IE_SEX], Modified[IE_SEX]);
+	AppendFormat(buffer, "Specifics:  {}   current specifics: {}\n", BaseStats[IE_SPECIFIC], Modified[IE_SPECIFIC]);
+	AppendFormat(buffer, "Alignment:  {:#x}   current alignment: {:#x}\n", BaseStats[IE_ALIGNMENT], Modified[IE_ALIGNMENT]);
+	AppendFormat(buffer, "Morale:     {}   current morale: {}\n", BaseStats[IE_MORALE], Modified[IE_MORALE]);
+	AppendFormat(buffer, "Moralebreak: {}   Morale recovery: {}\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME]);
+	AppendFormat(buffer, "Visualrange: {} (Explorer: {})\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE]);
 	AppendFormat(buffer, "Fatigue: {}   Luck: {}   Intoxication: {}\n", BaseStats[IE_FATIGUE], signed(Modified[IE_LUCK]), BaseStats[IE_INTOXICATION]);
 	AppendFormat(buffer, "Movement rate: {} (current: {})\n\n", BaseStats[IE_MOVEMENTRATE], Modified[IE_MOVEMENTRATE]);
 
@@ -5016,8 +5016,8 @@ std::string Actor::dump() const
 	}
 	buffer.append("\n");
 
-	AppendFormat(buffer, "current HP:{}\n", BaseStats[IE_HITPOINTS]);
-	AppendFormat(buffer, "Mod[IE_ANIMATION_ID]: 0x{:^4X} ResRef:{} Stance: {}\n", Modified[IE_ANIMATION_ID], anims ? anims->ResRefBase : "unknown", GetStance());
+	AppendFormat(buffer, "current HP: {}\n", BaseStats[IE_HITPOINTS]);
+	AppendFormat(buffer, "Mod[IE_ANIMATION_ID]: 0x{:^4X} ResRef: {} Stance: {}\n", Modified[IE_ANIMATION_ID], anims ? anims->ResRefBase : "unknown", GetStance());
 	AppendFormat(buffer, "TURNUNDEADLEVEL: {} current: {}\n", BaseStats[IE_TURNUNDEADLEVEL], Modified[IE_TURNUNDEADLEVEL]);
 	AppendFormat(buffer, "Colors:    ");
 	if (core->HasFeature(GFFlags::ONE_BYTE_ANIMID)) {
