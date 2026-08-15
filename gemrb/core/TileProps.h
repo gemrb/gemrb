@@ -109,6 +109,9 @@ class GEM_EXPORT OwningTileProps : public TileProps {
 public:
 	static OwningTileProps CopyFrom(const TileProps& tileProps);
 
+	// creates tile props with all-zero buffer of the given tile size
+	static OwningTileProps MakeEmpty(const Size& size);
+
 	OwningTileProps() noexcept = default;
 	OwningTileProps(OwningTileProps&& other) noexcept;
 	OwningTileProps(const OwningTileProps& other) noexcept;
@@ -123,6 +126,7 @@ private:
 	std::vector<uint32_t> ownedProps;
 
 	explicit OwningTileProps(const TileProps& tileProps);
+	explicit OwningTileProps(const Size& size);
 
 	// repoints propPtr at the current storage; must run after anything that reallocates it
 	void RebindPropPtr() noexcept

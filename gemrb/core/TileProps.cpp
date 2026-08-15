@@ -184,6 +184,11 @@ OwningTileProps OwningTileProps::CopyFrom(const TileProps& tileProps)
 	return OwningTileProps { tileProps };
 }
 
+OwningTileProps OwningTileProps::MakeEmpty(const Size& size)
+{
+	return OwningTileProps { size };
+}
+
 OwningTileProps::OwningTileProps(OwningTileProps&& other) noexcept
 {
 	*this = std::move(other);
@@ -223,6 +228,15 @@ OwningTileProps& OwningTileProps::operator=(OwningTileProps&& other) noexcept
 	other.propImage = nullptr;
 	other.size.reset();
 	return *this;
+}
+
+OwningTileProps::OwningTileProps(const Size& propSize)
+	// one uint32_t per cell, zeroed; an invalid size yields an empty instance
+	: ownedProps(propSize.IsInvalid() ? 0 : size_t(propSize.Area()), 0)
+{
+	size = ownedProps.empty() ? Size() : propSize;
+	propImage = nullptr;
+	RebindPropPtr();
 }
 
 OwningTileProps::OwningTileProps(const TileProps& tileProps)
