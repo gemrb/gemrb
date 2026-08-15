@@ -127,7 +127,7 @@ DMG_FIRE                   -1               0
 DMG_ELECTRIC               -1               0
 DMG_COLD                   -1               0
 DMG_ACID                   -1               0
-DMG_OTHER                  -1               0
+DMG_NONLETHAL              -1               0
 GOTQUESTXP                 -1               0
 LEVELUP                 4246                0
 INVFULL_ITEMDROP        37079               1
@@ -198,3 +198,5 @@ HEALING_REST               -1               0
 HEALING_REST_FULL          -1               0
 UNUSABLE_DROPPED_BAG    65514               0
 UNUSABLE_DROPPED_GROUND 65515               0
+DMG_MAGICFIRE              -1               0
+DMG_MAGICCOLD              -1               0

@@ -13,10 +13,10 @@ DAMAGE_MISSILE         118        RESISTMISSILE         0x80       10      1    
 DAMAGE_SLASHING        119        RESISTSLASHING        0x100      7       1          8
 DAMAGE_PIERCINGMISSILE 120        RESISTMISSILE         0x200      10      1          5
 DAMAGE_CRUSHINGMISSILE 121        RESISTMISSILE         0x400      10      1          5
-DAMAGE_STUNNING        121        0                     0x800      13      0          0
+DAMAGE_STUNNING        126        0                     0x800      13      0          0
 DAMAGE_SOULEATER       117        0                     0x1000     -1      0          0
-DAMAGE_DISEASE         126        0                     0x4000     -1      0          0
-DAMAGE_CHUNKING        126        0                     0x8000     -1      0          1
+DAMAGE_DISEASE         117        0                     0x4000     -1      0          0
+DAMAGE_CHUNKING        117        0                     0x8000     -1      0          1
 
 # table of damage type details
 # LOWER - string reference index (there is a second indirection by strings.2da)

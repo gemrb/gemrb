@@ -145,7 +145,7 @@ enum class HCStrings : TableMgr::index_t {
 	DmgElectric,
 	DmgCold,
 	DmgAcid,
-	DmgOther,
+	DmgNonLethal,
 	GotQuestXP,
 	LevelUp,
 	InventoryFullItemDrop,
@@ -216,6 +216,8 @@ enum class HCStrings : TableMgr::index_t {
 	HealingRestFull,
 	UnusableDroppedBag,
 	UnusableDroppedGround,
+	DmgMagicFire,
+	DmgMagicCold,
 
 	count,
 };
