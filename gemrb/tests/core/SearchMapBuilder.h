@@ -5,13 +5,9 @@
 #ifndef TESTS_SEARCHMAPBUILDER_H
 #define TESTS_SEARCHMAPBUILDER_H
 
-#include "../../core/Holder.h"
 #include "../../core/Region.h"
-#include "../../core/Sprite2D.h"
 #include "../../core/TileProps.h"
 
-#include <cstdlib>
-#include <cstring>
 #include <gtest/gtest.h>
 #include <initializer_list>
 #include <string>
@@ -51,7 +47,7 @@ namespace test {
 	/**
 	 * A map drawing, one string per row.
 	 */
-	using MapRows = std::initializer_list<const char*>;
+	using MapRows = std::initializer_list<std::string>;
 
 	inline bool IsActorGlyph(const char c)
 	{
@@ -86,8 +82,10 @@ namespace test {
 			default:
 				// actors stand on plain floor; their footprint is painted afterwards
 				if (IsActorGlyph(c)) return PathMapFlags::PASSABLE;
-				// anything else is a typo in the literal, not terrain
-				abort();
+
+				// anything else is a typo in the literal, not terrain - report test failure
+				ADD_FAILURE() << "unknown searchmap glyph '" << c << "'";
+				return PathMapFlags::IMPASSABLE;
 		}
 	}
 
@@ -126,38 +124,43 @@ namespace test {
 	 * pathfinder never reads the material, height or light channels.
 	 *
 	 * One character is one searchmap tile, which is 16x12 navmap pixels.
-	 *
-	 * Owns the pixel buffer behind the TileProps. Sprite2D free()s the buffer it is handed,
-	 * so it has to come from malloc().
 	 */
 	class TestSearchMap {
 	public:
 		TestSearchMap(const MapRows inMapRows)
 		{
-			height = static_cast<int>(inMapRows.size());
-			width = height ? static_cast<int>(strlen(*inMapRows.begin())) : 0;
+			const int rowCount = static_cast<int>(inMapRows.size());
+			const int rowWidth = rowCount ? static_cast<int>(inMapRows.begin()->size()) : 0;
 
-			auto* pixels = static_cast<uint32_t*>(calloc(size_t(width) * height, sizeof(uint32_t)));
+			// verify we have all lines the same length
+			for (const std::string& row : inMapRows) {
+				if (static_cast<int>(row.size()) != rowWidth) {
+					ADD_FAILURE() << "every map row must be " << rowWidth
+						      << " characters wide, got " << row;
+					return;
+				}
+			}
+
+			height = rowCount;
+			width = rowWidth;
+
+			props = OwningTileProps::MakeEmpty(Size(width, height));
 			std::vector<std::pair<SearchmapPoint, char>> actors;
 
 			int y = 0;
 			// parse chars one by one and write it as flags
 			// It builds the terrain first, actors are not marked here yet
-			for (const char* row : inMapRows) {
-				if (static_cast<int>(strlen(row)) != width) abort();
+			for (const std::string& row : inMapRows) {
 				for (int x = 0; x < width; ++x) {
-					const auto flags = uint32_t(ParseSearchMapChar(row[x]));
-					pixels[y * width + x] = flags << TileProps::pixelFormat.Rshift;
+					const SearchmapPoint tile(x, y);
+					props.SetTileProp(tile, TileProps::Property::SEARCH_MAP,
+							  uint8_t(ParseSearchMapChar(row[x])));
 					if (IsActorGlyph(row[x])) {
-						actors.emplace_back(SearchmapPoint(x, y), row[x]);
+						actors.emplace_back(tile, row[x]);
 					}
 				}
 				++y;
 			}
-
-			auto sprite = MakeHolder<Sprite2D>(Region(0, 0, width, height), pixels,
-							   TileProps::pixelFormat, uint16_t(width * 4));
-			props = TileProps(std::move(sprite));
 
 			// only after the terrain is ready, mark the actors
 			for (const auto& actor : actors) {
@@ -208,7 +211,7 @@ namespace test {
 		}
 
 	private:
-		TileProps props;
+		OwningTileProps props;
 		int width = 0;
 		int height = 0;
 	};

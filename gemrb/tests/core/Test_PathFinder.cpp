@@ -10,6 +10,7 @@
 
 #include "../../core/PathFinder.h"
 
+#include <gtest/gtest-spi.h>
 #include <gtest/gtest.h>
 
 namespace GemRB {
@@ -45,6 +46,20 @@ TEST(SearchMapBuilderTest, ParsesTerrainCharacters)
 
 	// out of bounds should be impassable, not a crash
 	EXPECT_EQ(map.At(99, 99), PathMapFlags::IMPASSABLE);
+}
+
+// A malformed literal is a mistake in the test, check if it correctly reports failure
+TEST(SearchMapBuilderTest, RejectsMalformedMaps)
+{
+	EXPECT_NONFATAL_FAILURE(test::ParseSearchMapChar('@'), "unknown searchmap glyph '@'");
+
+	const test::MapRows raggedRows {
+		"###",
+		"#.#",
+		"##"
+	};
+	EXPECT_NONFATAL_FAILURE(TestSearchMap { raggedRows },
+				"every map row must be 3 characters wide");
 }
 
 // An actor glyph carries two things: which side it belongs to and how big it is.
