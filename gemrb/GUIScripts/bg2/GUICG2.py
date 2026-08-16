@@ -148,6 +148,8 @@ def SetClass():
 		if GameCheck.IsBGT ("bg1"):
 			# not tutorial (=soa->bg1, tob would be caught before)
 			GemRB.SetPlayerStat (MyChar, IE_XP, 0)
+		elif GameCheck.HasCA (): # classic adventures starts at 100 ...
+			GemRB.SetPlayerStat (MyChar, IE_XP, 100)
 		else:
 			GemRB.SetPlayerStat (MyChar, IE_XP, CommonTables.ClassSkills.GetValue (ClassName, "STARTXP"))
 

@@ -7,7 +7,7 @@
 import os
 
 import GemRB
-from ie_restype import RES_WMP, RES_ARE, RES_2DA
+from ie_restype import RES_WMP, RES_ARE, RES_2DA, RES_ITM
 from GUIDefines import SV_GAMEPATH
 
 MAX_PARTY_SIZE = GemRB.GetVar ("MaxPartySize")
@@ -84,6 +84,9 @@ def HasTutu ():
 
 def HasTOTSC ():
 	return GemRB.HasResource ("toscst", RES_2DA)
+
+def HasCA ():
+	return GemRB.HasResource ("tclute01", RES_ITM)
 
 # there are no marker files, so check weidu.log
 def HasMod (modName):
