@@ -1542,11 +1542,34 @@ int GameScript::Range(Scriptable* Sender, const Trigger* parameters)
 		return 0;
 	}
 	SearchmapPoint senderPos;
-	if (Sender->Type == ST_ACTOR) {
-		Sender->objects.LastMarked = scr->GetGlobalID();
-		senderPos = Scriptable::As<Actor>(Sender)->SMPos;
-	} else {
-		senderPos = SearchmapPoint(Sender->Pos);
+	// similar to GetPositionFromScriptable, but everything is handled differently
+	// actors are using MostLikelyPosition which should be fine here as well
+	// TrapLaunch would be incorrect for infopoints, doors and containers
+	// extract to GetMoveToPositionFromScriptable if more users pop up
+	switch (Sender->Type) {
+		case ST_ACTOR:
+			Sender->objects.LastMarked = scr->GetGlobalID();
+			senderPos = Scriptable::As<Actor>(Sender)->SMPos;
+			break;
+		case ST_PROXIMITY:
+		case ST_TRAVEL:
+		case ST_TRIGGER:
+			InfoPoint* ip;
+			ip = Scriptable::As<InfoPoint>(Sender);
+			if (ip->GetUsePoint()) {
+				senderPos = SearchmapPoint(ip->UsePoint);
+			} else {
+				senderPos = SearchmapPoint(Sender->Pos);
+			}
+			break;
+		case ST_DOOR:
+			unsigned int distance;
+			senderPos = SearchmapPoint(*Scriptable::As<Door>(Sender)->GetClosestApproach(Sender, distance));
+			break;
+		case ST_CONTAINER:
+		default:
+			senderPos = SearchmapPoint(Sender->Pos);
+			break;
 	}
 	SearchmapPoint targetPos { scr->Pos };
 	int distance = SquaredDistance(senderPos, targetPos);
