@@ -67,7 +67,11 @@ bool Selectable::IsOver(const Point& P) const
 
 bool Selectable::IsOver(const Point& P, const Point& CenterPos) const
 {
-	int csize = circleSize;
+	return IsOverCircle(P, CenterPos, circleSize);
+}
+
+bool Selectable::IsOverCircle(const Point& P, const Point& CenterPos, int csize)
+{
 	if (csize < 2) {
 		Point d = P - CenterPos;
 		if (d.x < -16 || d.x > 16) return false;

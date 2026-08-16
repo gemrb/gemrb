@@ -201,6 +201,41 @@ public:
 
 	static void NormalizeDeltas(float_t& dx, float_t& dy, float_t factor = 1);
 
+	/**
+	 * Walks a point towards a target one engine step at a time.
+	 *
+	 * The delta is renormalized on every step.
+	 * Movable::DoStep() runs one such step per frame.
+	 *
+	 * The point type picks the space: NavmapPoint steps in pixels, SearchmapPoint in tiles.
+	 */
+	template<typename PointType>
+	class LineStepper {
+	public:
+		LineStepper(const PointType& from, const PointType& to, float_t stepFactor = 1)
+			: p(from), d(to), factor(stepFactor) {}
+
+		/** Takes one step; false once the target is reached, leaving Current() on it. */
+		bool Step()
+		{
+			if (p == d) return false;
+
+			float_t dx = d.x - p.x;
+			float_t dy = d.y - p.y;
+			NormalizeDeltas(dx, dy, factor);
+			p.x += dx;
+			p.y += dy;
+			return true;
+		}
+
+		const PointType& Current() const { return p; }
+
+	private:
+		PointType p;
+		PointType d;
+		float_t factor;
+	};
+
 	/** Calculate a destination point for running away from a threat.
 	 * Returns false and leaves outPoint untouched if the actor is too slow or the deltas are
 	 * too small; on success outPoint holds the destination. */
