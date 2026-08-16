@@ -2707,12 +2707,12 @@ PathNode Map::GetLineEnd(const Point& p, int steps, orient_t orient) const
 
 bool Map::IsVisible(const Point& pos) const
 {
-	return FogTileUncovered(pos, &VisibleBitmap);
+	return FogTileUncovered(pos, &VisibleBitmap) || GameControl::DebugFlags & DEBUG_SHOW_FOG_INVISIBLE;
 }
 
 bool Map::IsExplored(const Point& pos) const
 {
-	return FogTileUncovered(pos, &ExploredBitmap);
+	return FogTileUncovered(pos, &ExploredBitmap) || GameControl::DebugFlags & DEBUG_SHOW_FOG_UNEXPLORED;
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
