@@ -1045,7 +1045,6 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 			break;
 		case 't': // advances time by 1 hour
 			game->AdvanceTime(core->Time.hour_size);
-			//refresh gui here once we got it
 			break;
 		case 'u': // dump GameScript GLOBAL vars
 			PrintCollection("locals", core->GetGame()->locals);
