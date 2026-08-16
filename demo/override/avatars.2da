@@ -6,3 +6,10 @@
 0x1000     MWYV       MWYV       MWYV       MWYV       11         3          1          *
 0xc800     CHMB1      CHMB1      CHMB1      CHMB1      0          2          0          *
 0xd000     RABB       RABB       RABB       RABB       0          1          1          *
+# test-only rows for the pathfinder tests. Re-use CHMB1's art, differ on SPACE
+0x9003     CHMB1      CHMB1      CHMB1      CHMB1      0          3          0          *
+0x9004     CHMB1      CHMB1      CHMB1      CHMB1      0          4          0          *
+0x9005     CHMB1      CHMB1      CHMB1      CHMB1      0          5          0          *
+0x9006     CHMB1      CHMB1      CHMB1      CHMB1      0          6          0          *
+0x9007     CHMB1      CHMB1      CHMB1      CHMB1      0          7          0          *
+0x9008     CHMB1      CHMB1      CHMB1      CHMB1      0          8          0          *

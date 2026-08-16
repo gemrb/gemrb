@@ -5,6 +5,7 @@
 #ifndef PATHFINDERSCHEDULER_H
 #define PATHFINDERSCHEDULER_H
 
+#include "exports.h"
 #include "globals.h"
 
 #include "PathFinder.h"
@@ -91,7 +92,7 @@ struct FindPathRequestWorkerData {
  *  - DrainCompletedPathsEarly(): why results are collected twice per tick.
  *  - MovementState in Movable.h: how an actor's state tracks a request in flight.
  */
-class PathFinderScheduler {
+class GEM_EXPORT PathFinderScheduler {
 public:
 	/**
 	 *  Initializes and starts the pathfinder scheduler and worker threads.
