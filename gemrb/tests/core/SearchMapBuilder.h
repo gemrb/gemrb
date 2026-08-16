@@ -468,7 +468,7 @@ namespace test {
 			PathFinder::LineStepper<NavmapPoint> walk { p, path.GetStep(i).point };
 			while (walk.Step()) {
 				if (walk.Current() == p) {
-					// a step should always moves, bail out if that ever stops holding
+					// a step should always move, bail out if that ever stops holding
 					ADD_FAILURE() << "LineStepper makes no progress for point " << i << "  at ("
 						      << p.x << ',' << p.y << ')';
 					return tiles;
