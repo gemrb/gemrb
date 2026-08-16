@@ -1016,7 +1016,15 @@ bool GameControl::OnCheatKeyRelease(const KeyboardEvent& key, unsigned short /*m
 			area->dump(true);
 			FlushLogs();
 			break;
-		// o
+		case 'o': // dump Scriptable's local vars (for Game see below)
+			if (lastActor) {
+				PrintCollection("locals", lastActor->locals);
+			} else if (overMe) {
+				PrintCollection("locals", overMe->locals);
+			} else {
+				PrintCollection("locals", area->locals);
+			}
+			break;
 		case 'p': // center on actor
 			screenFlags.Flip(ScreenFlags::CenterOnActor);
 			screenFlags.Flip(ScreenFlags::AlwaysCenter);
