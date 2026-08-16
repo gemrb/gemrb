@@ -6,6 +6,8 @@
 #define TRAVERSABILITY_CACHE_H
 
 
+#include "exports.h"
+
 #include "FixedSizePool.h"
 #include "PagedSparseArray.h"
 #include "Region.h"
@@ -27,7 +29,7 @@ class Actor;
 /**
  * This class manages the cached data of actors on a navmap, to be used for speed up the FindPath implementation.
  */
-class TraversabilityCache {
+class GEM_EXPORT TraversabilityCache {
 public:
 	// There can be more than one actor occupying a navmap cell, the cache must be able
 	// to represent more than one traversability value per cell at a time.

@@ -13,6 +13,13 @@ namespace GemRB {
 
 std::vector<std::vector<bool>> TraversabilityCache::BlockingShapeCache;
 
+// C++14 needs a definition for a static constexpr member that gets odr-used, which is
+// what happens as soon as one is bound to a reference outside this file;
+// could be removed when moving to C++17 with inlined static constexpr members
+constexpr TraversabilityCache::TraversabilityCellState TraversabilityCache::TraversabilityCellValueEmpty;
+constexpr TraversabilityCache::TraversabilityCellState TraversabilityCache::TraversabilityCellValueActor;
+constexpr TraversabilityCache::TraversabilityCellState TraversabilityCache::TraversabilityCellValueActorNonTraversable;
+
 size_t TraversabilityCache::CachedActorsState::AddCachedActorState(Actor* inActor)
 {
 	if (!inActor) {
