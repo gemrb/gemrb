@@ -625,7 +625,7 @@ TEST(TraversabilityTest, BumpableActorBlocksOnlyWhenActorsAreBlocking)
 		"#########"
 	};
 
-	const char selfTag = 0;
+	constexpr char selfTag = 0;
 	const test::ActorIdentity self = test::MakeActorIdentity(selfTag);
 
 	const Point from = map.Start();
@@ -794,7 +794,7 @@ TEST(FindPathTest, RespectsActorSize)
 		"#.........#.........#",
 		"#.........#.........#",
 		"#.........#.........#",
-		"#..1..4........E....#",
+		"#1...3.........E....#",
 		"#.........#.........#",
 		"#.........#.........#",
 		"#.........#.........#",
