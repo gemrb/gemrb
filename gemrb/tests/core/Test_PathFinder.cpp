@@ -643,6 +643,33 @@ TEST(TraversabilityTest, BumpableActorBlocksOnlyWhenActorsAreBlocking)
 	EXPECT_TRUE(yielding.Empty()) << "a blocking actor plugs the only corridor, so there is no route";
 }
 
+TEST(TraversabilityTest, BumpableMultipleActorsBlocksOnlyWhenActorsAreBlocking)
+{
+	// a one tile corridor with a blocker standing in it, so it cannot be walked around
+	const TestSearchMap map {
+		"#########",
+		"#S.a1a.E#",
+		"#########"
+	};
+
+	constexpr char selfTag = 0;
+	const test::ActorIdentity self = test::MakeActorIdentity(selfTag);
+
+	const Point from = map.Start();
+	const Point to = map.End();
+
+	const test::TestTraversability traversability { map, true };
+
+	// intending to bump: all the blockers are transparent, so the route runs straight through them
+	const Path bumping = test::CallFindPath(map, traversability, from, to, self, 1, PF_SIGHT);
+	EXPECT_FALSE(bumping.Empty()) << "a bumpable actors must not stop a route that would bump it";
+
+	// treating actors as solid: there is no way past in a one tile corridor
+	const Path yielding = test::CallFindPath(map, traversability, from, to, self, 1,
+						 PF_SIGHT | PF_ACTORS_ARE_BLOCKING);
+	EXPECT_TRUE(yielding.Empty()) << "a blocking actors plugs the only corridor, so there is no route";
+}
+
 TEST(TraversabilityTest, UnbumpableActorAlwaysBlocks)
 {
 	const TestSearchMap map {
