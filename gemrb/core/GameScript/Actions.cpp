@@ -6352,7 +6352,7 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (res != -1) { // it is gold and we got the party pool!
-		if (scr->IsPartyMember()) {
+		if (scr->IsInExtendedParty()) {
 			core->GetGame()->PartyGold += res;
 			// if you want message here then use core->GetGame()->AddGold(res);
 		} else {

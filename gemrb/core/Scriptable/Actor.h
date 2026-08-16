@@ -1066,7 +1066,7 @@ public:
 	/* computes the thieving skill bonus from race and dexterity */
 	int GetSkillBonus(unsigned int col) const;
 	/* returns true for party members (and familiars) */
-	bool IsPartyMember() const;
+	bool IsInExtendedParty() const;
 	/* resets the bored and area comment timers */
 	void ResetCommentTime();
 	/* returns the armor check penalty */

@@ -2603,7 +2603,7 @@ void Map::RemoveActor(Actor* actor)
 bool Map::CanFree() const
 {
 	for (const auto& actor : actors) {
-		if (actor->IsPartyMember()) {
+		if (actor->IsInExtendedParty()) {
 			return false;
 		}
 

@@ -3592,7 +3592,7 @@ int GameScript::Vacant(Scriptable* Sender, const Trigger* /*parameters*/)
 	while (i--) {
 		const Actor* actor = map->GetActor(i, true);
 		bool usedExit = actor->GetInternalFlag() & IF_USEEXIT;
-		if (!usedExit && actor->IsPartyMember()) {
+		if (!usedExit && actor->IsInExtendedParty()) {
 			return 0;
 		}
 	}

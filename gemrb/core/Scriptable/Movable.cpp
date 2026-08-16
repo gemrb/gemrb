@@ -367,7 +367,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	SetPos(NavmapPoint(Pos.x + dx, Pos.y + dy));
 	oldPos = Pos;
 	if (actor && blocksSearch) {
-		auto flag = actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
+		auto flag = actor->IsInExtendedParty() ? PathMapFlags::PC : PathMapFlags::NPC;
 		area->tileProps.PaintSearchMap(SMPos, circleSize, flag);
 	}
 

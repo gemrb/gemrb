@@ -291,7 +291,7 @@ Actor::Actor()
 
 FindPathRequestPriority Actor::GetFindPathRequestPriority() const
 {
-	if (IsPartyMember()) {
+	if (IsInExtendedParty()) {
 		return FindPathRequestPriority::Highest;
 	}
 	if (IsInCombat()) {
@@ -7385,7 +7385,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	// also start CombatCounter if a pc is attacked
-	if (!InParty && target->IsPartyMember()) {
+	if (!InParty && target->IsInExtendedParty()) {
 		core->GetGame()->PartyAttack = true;
 	}
 
@@ -8017,12 +8017,12 @@ void Actor::UpdateModalState(ieDword gameTime)
 				// some modals notify each round, some only initially
 				bool feedback = ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
 				Modal.FirstApply = false;
-				if (IsPartyMember() && feedback && core->HasFeedback(FT_MISC)) {
+				if (IsInExtendedParty() && feedback && core->HasFeedback(FT_MISC)) {
 					ieStrRef entering = PersonalizePSTString(ModalStates[Modal.State].entering_str, this);
 					displaymsg->DisplayStringName(entering, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
 			} else {
-				if (IsPartyMember() && core->HasFeedback(FT_MISC)) {
+				if (IsInExtendedParty() && core->HasFeedback(FT_MISC)) {
 					ieStrRef failed = PersonalizePSTString(ModalStates[Modal.State].failed_str, this);
 					displaymsg->DisplayStringName(failed, GUIColors::WHITE, this, STRING_FLAGS::SOUND | STRING_FLAGS::SPEECH);
 				}
@@ -11309,7 +11309,7 @@ int Actor::GetSkillBonus(unsigned int col) const
 	return bonus;
 }
 
-bool Actor::IsPartyMember() const
+bool Actor::IsInExtendedParty() const
 {
 	if (Modified[IE_EA] <= EA_FAMILIAR) return true;
 	return InParty > 0;

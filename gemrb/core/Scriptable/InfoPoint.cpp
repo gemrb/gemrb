@@ -62,7 +62,7 @@ ieDword InfoPoint::GetUsePoint() const
 int InfoPoint::CheckTravel(const Actor* actor) const
 {
 	if (Flags & TRAP_DEACTIVATED) return CT_CANTMOVE;
-	bool pm = actor->IsPartyMember();
+	bool pm = actor->IsInExtendedParty();
 
 	//this flag does not exist in IWD2, we cannot use it if the infopoint flag took it over
 	if (TRAP_USEPOINT != _TRAVEL_NONPC) {
@@ -198,7 +198,7 @@ check:
 	}
 
 	// recheck ar1404 mirror trap Shadow1 still works if you modify TRAP_NPC logic
-	if ((Flags & TRAP_NPC) ^ actor->IsPartyMember()) {
+	if ((Flags & TRAP_NPC) ^ actor->IsInExtendedParty()) {
 		//no need to avoid a travel trigger
 
 		//skill?
