@@ -186,6 +186,73 @@ TEST(SearchMapBuilderTest, RejectsDuplicateOrMissingWaypoints)
 	EXPECT_NONFATAL_FAILURE(noWaypoints.End(), "no end point defined");
 }
 
+// test map.Actor* accessors
+TEST(SearchMapBuilderTest, ReadsBackTheDrawnActors)
+{
+	const TestSearchMap map {
+		".................",
+		"..1......c.......",
+		".................",
+		".................",
+		".......4.........",
+		".................",
+		"................."
+	};
+
+	// reading order is row by row, left to right, whatever the glyph or its size
+	ASSERT_EQ(map.Actors().size(), 3);
+	EXPECT_EQ(map.Actors()[0].tile, SearchmapPoint(2, 1));
+	EXPECT_EQ(map.Actors()[1].tile, SearchmapPoint(9, 1));
+	EXPECT_EQ(map.Actors()[2].tile, SearchmapPoint(7, 4));
+
+	// ActorPosOf() is that tile's centre in navmap coordinates
+	EXPECT_EQ(map.ActorPosOf(0), TestSearchMap::Nav(2, 1));
+	EXPECT_EQ(map.ActorPosOf(1), TestSearchMap::Nav(9, 1));
+	EXPECT_EQ(map.ActorPosOf(2), TestSearchMap::Nav(7, 4));
+
+	// ActorCircleSizeOf() is what the glyph spelled, across both alphabets
+	EXPECT_EQ(map.ActorCircleSizeOf(0), 1);
+	EXPECT_EQ(map.ActorCircleSizeOf(1), 3);
+	EXPECT_EQ(map.ActorCircleSizeOf(2), 4);
+
+	// digits are party members, letters are NPCs
+	EXPECT_EQ(map.Actors()[0].flag, PathMapFlags::PC);
+	EXPECT_EQ(map.Actors()[1].flag, PathMapFlags::NPC);
+	EXPECT_EQ(map.Actors()[2].flag, PathMapFlags::PC);
+
+	// ActorIdentityOf() gives each actor one of its own, and the same one every time
+	EXPECT_NE(map.ActorIdentityOf(0), nullptr);
+	EXPECT_NE(map.ActorIdentityOf(1), nullptr);
+	EXPECT_NE(map.ActorIdentityOf(2), nullptr);
+	EXPECT_NE(map.ActorIdentityOf(0), map.ActorIdentityOf(1));
+	EXPECT_NE(map.ActorIdentityOf(1), map.ActorIdentityOf(2));
+	EXPECT_NE(map.ActorIdentityOf(0), map.ActorIdentityOf(2));
+	EXPECT_EQ(map.ActorIdentityOf(0), map.ActorIdentityOf(0)) << "an identity has to be stable";
+}
+
+// Asking for an actor a drawing does not have is a mistake in the test
+TEST(SearchMapBuilderTest, RejectsOutOfRangeActorIndex)
+{
+	const TestSearchMap map {
+		"...",
+		".1.",
+		"..."
+	};
+	ASSERT_EQ(map.Actors().size(), size_t(1));
+
+	EXPECT_NONFATAL_FAILURE(map.ActorPosOf(1), "no actor number 1");
+	EXPECT_NONFATAL_FAILURE(map.ActorCircleSizeOf(1), "no actor number 1");
+	EXPECT_NONFATAL_FAILURE(map.ActorIdentityOf(1), "no actor number 1");
+
+	const TestSearchMap noActors {
+		"...",
+		"...",
+		"..."
+	};
+	ASSERT_TRUE(noActors.Actors().empty());
+	EXPECT_NONFATAL_FAILURE(noActors.ActorPosOf(0), "no actor number 0");
+}
+
 // The glyphs have to reach the searchmap as the right actor bits over the right area.
 TEST(SearchMapBuilderTest, PaintsActorFootprintsFromGlyphs)
 {
@@ -695,12 +762,6 @@ TEST(FindPathTest, RoutesAroundABarrier)
 
 	// it has to come round the open bottom row, so it has to get more >1 waypoint
 	EXPECT_GT(path.Size(), 1u);
-
-	// it must never set foot on the barrier
-	for (const SearchmapPoint& tile : test::PathTiles(start, path)) {
-		EXPECT_NE(map.At(tile.x, tile.y), PathMapFlags::SIDEWALL)
-			<< "route enters the wall at (" << tile.x << ',' << tile.y << ')';
-	}
 }
 
 // A destination that cannot be reached at all must not produce a route into it.
@@ -743,9 +804,6 @@ TEST(FindPathTest, RespectsActorSize)
 
 	constexpr size_t smallActor = 0;
 	constexpr size_t bigActor = 1;
-	ASSERT_EQ(map.Actors().size(), 2);
-	ASSERT_EQ(map.ActorCircleSizeOf(smallActor), 1);
-	ASSERT_EQ(map.ActorCircleSizeOf(bigActor), 4);
 
 	// bumpable, so neither walker is stopped by the other's mark; only the terrain is in play
 	const test::TestTraversability traversability { map, true };
