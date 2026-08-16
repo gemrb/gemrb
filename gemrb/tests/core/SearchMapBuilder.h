@@ -157,7 +157,9 @@ namespace test {
 	/** A distinct, never-dereferenced actor identity. Pass the same tag to keep the same one. */
 	inline ActorIdentity MakeActorIdentity(const char& tag)
 	{
-		return reinterpret_cast<ActorIdentity>(&tag);
+		// deliberate unsafe cast - in tests we don't use real actor instances,
+		// we just need a number for the sake of identity comparison
+		return reinterpret_cast<ActorIdentity>(&tag); // NOSONAR
 	}
 
 	/**
@@ -256,7 +258,9 @@ namespace test {
 				ADD_FAILURE() << "this map has no actor number " << index;
 				return nullptr;
 			}
-			return reinterpret_cast<ActorIdentity>(&drawnActors[index]);
+			// deliberate unsafe cast - in tests we don't use real actor instances,
+			// we just need a number for the sake of identity comparison
+			return reinterpret_cast<ActorIdentity>(&drawnActors[index]); // NOSONAR
 		}
 
 		/** Circle size of the nth drawn actor */
@@ -392,7 +396,9 @@ namespace test {
 					const size_t idx = size_t(cell.y) * navWidth + cell.x;
 					TraversabilityCache::TraversabilityCellData cellData = data[idx];
 					cellData.state += token;
-					cellData.occupyingActor = reinterpret_cast<Actor*>(const_cast<Movable*>(who));
+					// deliberate unsafe cast - in tests we don't use real actor instances,
+					// we just need a number for the sake of identity comparison
+					cellData.occupyingActor = reinterpret_cast<Actor*>(const_cast<Movable*>(who)); // NOSONAR
 					data[idx] = cellData;
 				}
 			}
@@ -406,7 +412,10 @@ namespace test {
 		/** Who the cache has standing on that navmap pixel, which is what FindPath() compares. */
 		ActorIdentity ActorAt(const Point& navPoint) const
 		{
-			return reinterpret_cast<ActorIdentity>(data[size_t(navPoint.y) * navWidth + navPoint.x].occupyingActor);
+			const auto actorPtr = data[size_t(navPoint.y) * navWidth + navPoint.x].occupyingActor;
+			// deliberate unsafe cast - in tests we don't use real actor instances,
+			// we just need a number for the sake of identity comparison
+			return reinterpret_cast<ActorIdentity>(actorPtr); // NOSONAR
 		}
 
 		const TraversabilityCache::Data_t& Data() const noexcept { return data; }
