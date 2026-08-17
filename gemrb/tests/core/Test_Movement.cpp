@@ -114,8 +114,7 @@ TEST_F(MovementTest, GlyphsDecideSizeAndParty)
 	EXPECT_EQ(live.ActorAt(drawn.ActorPosOf(1)), live.ActorOf(1));
 }
 
-// Every size the glyph alphabet allows, has a creature behind it.
-// Sizes 3 to 8 are the test-only creatures in demo/override.
+// Every size the glyph alphabet allows, has a creature with proper stats behind it.
 TEST_F(MovementTest, EveryDrawnSizeHasACreature)
 {
 	const TestGameMap live {
@@ -163,6 +162,43 @@ TEST_F(MovementTest, WalksToItsDestination)
 	EXPECT_LT(frames, 200) << "the walk has to finish inside the frame budget";
 	EXPECT_GT(frames, 1) << "arriving in one frame would mean it teleported, not walked";
 	EXPECT_EQ(actor->Pos, drawn.End()) << "and it has to end up where it was sent";
+}
+
+// The complementary to the walk above, for actor which needs to stand on more than one tile.
+TEST_F(MovementTest, StopsShortOfADestinationItDoesNotFitInto)
+{
+	TestGameMap live {
+		"###############",
+		"#.............#",
+		"#.............#",
+		"#...3........E#",
+		"#.............#",
+		"#.............#",
+		"###############"
+	};
+	const TestSearchMap& drawn = live.Drawing();
+	Actor* actor = live.ActorOf(0);
+	ASSERT_NE(actor, nullptr);
+	ASSERT_EQ(actor->circleSize, 3);
+
+	const SearchmapPoint endTile { drawn.End() };
+	// E lies against the wall: room enough for small actors, but not for this one:
+	EXPECT_TRUE(bool(PathFinder::GetBlockedInRadiusTile(drawn.Props(), endTile, 2) & PathMapFlags::PASSABLE))
+		<< "the size <=2 has to still fit";
+	ASSERT_FALSE(bool(PathFinder::GetBlockedInRadiusTile(drawn.Props(), endTile, 3) & PathMapFlags::PASSABLE))
+		<< "for this size the pathfinder should claim end position is not passable";
+
+	actor->WalkTo(drawn.End(), 0, 0);
+	ASSERT_FALSE(actor->GetPath().Empty()) << "an end it cannot stand on still has reachable neighbours";
+
+	const int frames = WalkUntilStopped(live, actor);
+	EXPECT_LT(frames, 200) << "the walk has to finish inside the frame budget";
+	EXPECT_GT(frames, 1);
+
+	// it stopped short of where it was sent
+	EXPECT_NE(actor->Pos, drawn.End()) << "the destination had to be pulled back off the wall";
+	EXPECT_LT(Distance(actor->Pos, drawn.End()), Distance(drawn.ActorPosOf(0), drawn.End()))
+		<< "stopping short still means walking towards the end, not giving up at the start";
 }
 
 // Live map uses as its searchmap the drawing's own buffer, so a drawing reads back the
