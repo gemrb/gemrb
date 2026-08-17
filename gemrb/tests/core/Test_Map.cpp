@@ -5,58 +5,30 @@
 // FIXME: remove once fixed, this is excluding non-linux build bots
 #if defined(USE_OPENGL_BACKEND) || (!defined(__APPLE__) && !defined(WIN32))
 
-	#include "../../core/GameData.h"
-	#include "../../core/Interface.h"
-	#include "../../core/InterfaceConfig.h"
-	#include "../../core/Logging/Loggers/Stdio.h"
-	#include "../../core/Logging/Logging.h"
+	#include "LiveGameFixture.h"
+
 	#include "../../core/Map.h"
 	#include "../../core/PathFinder.h"
-	#include "../../core/PluginMgr.h"
-	#include "../../core/SaveGameMgr.h"
 
 	#include <gtest/gtest.h>
 
 namespace GemRB {
 
-class MapTest : public testing::Test {
+class MapTest : public LiveGameTest {
 public:
-	static std::unique_ptr<Interface> gemrb;
 	static Map* map;
 
-	// set up core and the first map from the demo
+	// set up the first map from the demo
 	static void SetUpTestSuite()
 	{
-		setlocale(LC_ALL, "");
-		const char* argv[] = { "tester", "-c", "../../tester.cfg" };
-		auto cfg = LoadFromArgs(3, const_cast<char**>(argv));
-		ToggleLogging(true);
-		SetMainLogLevel(DEBUG);
-		AddLogWriter(createStdioLogWriter());
-		gemrb = std::make_unique<Interface>(std::move(cfg));
-
-		auto gamStream = gamedata->GetResourceStream("gem-demo", IE_GAM_CLASS_ID);
-		auto gamMgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gamStream);
-		auto gam = gamMgr->LoadGame(std::make_unique<Game>(), GAMVersion::GemRB);
-		core->SetGame(std::move(gam));
-		Game* game = core->GetGame();
+		LiveGameTest::SetUpTestSuite();
 
 		ResRef mapRef { "ar0100" };
-		map = game->GetMap(mapRef, false);
-	}
-
-	static void TearDownTestSuite()
-	{
-		// cleanup to prevent a delay and crash on exit
-		core->SetGame(nullptr);
-		VideoDriver.reset();
-		gemrb.reset();
-		PluginMgr::Get()->RunCleanup();
+		map = core->GetGame()->GetMap(mapRef, false);
 	}
 };
 
 Map* MapTest::map = nullptr;
-std::unique_ptr<Interface> MapTest::gemrb = nullptr;
 
 static Point badPaths[] = { Point(1270, 640), Point(1071, 699), Point(1170, 967), Point(1126, 601) };
 static Point goodPaths[] = { Point(1126, 601), Point(685, 655), Point(720, 496), Point(1056, 336) };

@@ -163,6 +163,17 @@ namespace test {
 	}
 
 	/**
+	 * Whether a drawing paints its actor glyphs into the searchmap.
+	 *
+	 * Paint is designed for a terrain-only test, where nothing else will ever mark those tiles.
+	 * Skip is intended for a live Map, where we expect the state to be driven by the actors in a game loop.
+	 */
+	enum class ActorPainting {
+		Paint,
+		Skip
+	};
+
+	/**
 	 * Builds TileProps out of an ASCII drawing, so pathfinder tests can state their terrain
 	 * inline instead of shipping a searchmap BMP. Only the searchmap byte is filled in; the
 	 * pathfinder never reads the material, height or light channels.
@@ -177,7 +188,7 @@ namespace test {
 			PathMapFlags flag; // PC or NPC
 		};
 
-		TestSearchMap(const MapRows inMapRows)
+		TestSearchMap(const MapRows inMapRows, const ActorPainting painting = ActorPainting::Paint)
 		{
 			const int rowCount = static_cast<int>(inMapRows.size());
 			const int rowWidth = rowCount ? static_cast<int>(inMapRows.begin()->size()) : 0;
@@ -221,8 +232,10 @@ namespace test {
 			}
 
 			// only after the terrain is ready, mark the actors
-			for (const DrawnActor& actor : drawnActors) {
-				props.PaintSearchMap(actor.tile, actor.circleSize, actor.flag);
+			if (painting == ActorPainting::Paint) {
+				for (const DrawnActor& actor : drawnActors) {
+					props.PaintSearchMap(actor.tile, actor.circleSize, actor.flag);
+				}
 			}
 		}
 

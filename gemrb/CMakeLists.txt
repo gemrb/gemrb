@@ -201,6 +201,7 @@ ENDIF(VITA)
 IF (BUILD_TESTING)
   ADD_EXECUTABLE(Test_gemrb_core
     tests/core/Test_Map.cpp
+    tests/core/Test_Movement.cpp
     tests/core/Test_MurmurHash.cpp
     tests/core/Test_Orient.cpp
     tests/core/Test_Palette.cpp
