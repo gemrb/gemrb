@@ -238,11 +238,16 @@ void Scriptable::TickScripting()
 	}
 
 	// a ~neutral actor that is hidden or scrolled off-screen skips full AI this tick
-	// the "hidden" (m_canBeSeen) part seemed to have been something like our RemovalTime? So far: useless
-	if (actor && !(actor->GetSafeStat(IE_MC_FLAGS) & MC_IGNORE_INHIBIT_AI) && !actor->GetSafeStat(IE_ENABLEOFFSCREENAI)) {
-		Actor::stat_t ea = actor->GetSafeStat(IE_EA);
-		if (ea > EA_CONTROLLABLE && ea < EA_EVILCUTOFF && (!actor->DrawingRegion().IntersectsRegion(vp) || !explored)) {
-			return;
+	// this was lifted from iwd2 for bg1 (Drizzt and gnolls in ar4200 should remain calm until encountered)
+	// bg2 on the other hand doesn't seem to use this (RE + ar0602 lesser flesh golems should activate on alarm even if unexplored)
+	if (actor && !core->HasFeature(GFFlags::START_ACTIVE)) {
+		// checking the inhibitor stats may be redundant due to Actor::HibernateIfAble, but let's be explicit
+		bool forced = actor->GetSafeStat(IE_MC_FLAGS) & MC_IGNORE_INHIBIT_AI || actor->GetSafeStat(IE_ENABLEOFFSCREENAI);
+		if (!forced) {
+			Actor::stat_t ea = actor->GetSafeStat(IE_EA);
+			if (ea > EA_CONTROLLABLE && ea < EA_EVILCUTOFF && (!explored || !actor->DrawingRegion().IntersectsRegion(vp))) {
+				return;
+			}
 		}
 	}
 
