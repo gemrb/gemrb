@@ -22,7 +22,7 @@ namespace GemRB {
 // typical fonts lack several glyphs, including U+3000 (ideographic space)
 const Glyph& TTFFont::AliasBlank(ieWord chr) const
 {
-	((TTFFont*) this)->CreateAliasForChar(32, chr);
+	const_cast<TTFFont*>(this)->CreateAliasForChar(32, chr);
 	return Font::GetGlyph(chr);
 }
 
@@ -155,7 +155,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, 0);
 	Holder<Sprite2D> spr = VideoDriver->CreateSprite(r, pixels, fmt);
 	// FIXME: casting away const
-	const Glyph& ret = ((TTFFont*) this)->CreateGlyphForCharSprite(chr, spr);
+	const Glyph& ret = const_cast<TTFFont*>(this)->CreateGlyphForCharSprite(chr, spr);
 	return ret;
 }
 
