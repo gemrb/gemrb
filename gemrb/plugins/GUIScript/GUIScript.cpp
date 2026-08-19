@@ -4457,7 +4457,7 @@ static PyObject* GemRB_SaveGame_GetGameDate(PyObject* /*self*/, PyObject* args)
 
 	Holder<SaveGame> save = CObject<SaveGame>(Slot);
 	const std::string& date = save->GetGameDate();
-	return PyUnicode_Decode(date.c_str(), date.length(), core->config.SystemEncoding.c_str(), "strict");
+	return PyUnicode_Decode(date.c_str(), date.length(), core->TLKEncoding.encoding.c_str(), "strict");
 }
 
 PyDoc_STRVAR(GemRB_SaveGame_GetSaveID__doc,
