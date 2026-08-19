@@ -17,9 +17,12 @@
 
 namespace GemRB {
 
+// alias to the basic space character instead, so we get sane data
+// avoids crashes on UTF-8 version of the japanese translation, where
+// typical fonts lack several glyphs, including U+3000 (ideographic space)
 const Glyph& TTFFont::AliasBlank(ieWord chr) const
 {
-	((TTFFont*) this)->CreateAliasForChar(0, chr);
+	((TTFFont*) this)->CreateAliasForChar(32, chr);
 	return Font::GetGlyph(chr);
 }
 
