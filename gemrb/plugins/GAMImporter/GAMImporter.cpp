@@ -105,8 +105,8 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 	str->ReadDword(NPCCount);
 	str->ReadDword(GlobalOffset);
 	str->ReadDword(GlobalCount);
-	str->ReadResRef(newGame->LastMasterArea); // this is the 'master area', different for subareas
-	newGame->WorldMapArea = newGame->LastMasterArea; // last worldmap area
+	str->ReadResRef(newGame->WorldMapArea); // WMP icon area
+	newGame->LastMasterArea = newGame->WorldMapArea; // last master area, used for special area song entries
 	str->ReadDword(newGame->CurrentLink); //in ToB this is named 'currentLink'
 	str->ReadDword(JournalCount);
 	str->ReadDword(JournalOffset);
