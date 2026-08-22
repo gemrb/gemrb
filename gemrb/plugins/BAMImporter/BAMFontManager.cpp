@@ -7,6 +7,8 @@
 #include "BAMImporter.h"
 #include "Sprite2D.h"
 
+#include "Video/Video.h"
+
 using namespace GemRB;
 
 BAMFontManager::~BAMFontManager(void)
@@ -74,6 +76,14 @@ Holder<Font> BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*styl
 
 	auto pal = af->GetFrameWithoutCycle(0)->GetPalette();
 	auto fnt = MakeHolder<Font>(std::move(pal), lineHeight, baseLine, background);
+
+	if (isNumeric) {
+		ieWord spaceWidth = af->GetFrame(0)->Frame.w / 2;
+		void* pixels = calloc(spaceWidth * lineHeight, 1);
+		PixelFormat fmt = PixelFormat::Paletted8Bit(af->GetFrameWithoutCycle(0)->GetPalette(), true, 0);
+		Holder<Sprite2D> spaceSpr = VideoDriver->CreateSprite(Region(0, 0, spaceWidth, lineHeight), pixels, fmt);
+		fnt->CreateGlyphForCharSprite(' ', spaceSpr);
+	}
 
 	std::map<Sprite2D*, ieWord> tmp;
 	for (ieWord cycle = 0; cycle < af->GetCycleCount(); cycle++) {
