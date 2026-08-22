@@ -106,7 +106,6 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 	str->ReadDword(GlobalOffset);
 	str->ReadDword(GlobalCount);
 	str->ReadResRef(newGame->WorldMapArea); // WMP icon area
-	newGame->LastMasterArea = newGame->WorldMapArea; // last master area, used for special area song entries
 	str->ReadDword(newGame->CurrentLink); //in ToB this is named 'currentLink'
 	str->ReadDword(JournalCount);
 	str->ReadDword(JournalOffset);
@@ -127,8 +126,8 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 	} else {
 		MazeOffset = 0;
 		str->ReadDword(newGame->Reputation);
-		str->ReadResRef(newGame->CurrentArea);
-		newGame->AnotherArea = newGame->CurrentArea;
+		str->ReadResRef(newGame->LastMasterArea);
+		newGame->AnotherArea = newGame->LastMasterArea;
 		str->ReadDword(newGame->ControlStatus);
 		str->ReadDword(newGame->Expansion);
 		str->ReadDword(FamiliarsOffset);
@@ -181,6 +180,8 @@ std::unique_ptr<Game> GAMImporter::LoadGame(std::unique_ptr<Game> newGame, GAMVe
 			newGame->CurrentArea = actor->AreaName;
 			newGame->AnotherArea = newGame->CurrentArea;
 		}
+		// pst will reset CurrentArea after QF_ENTERGAME / GameControl::ChangeMap
+		// the whole NPCAreaViewed spiel would be redundant (if IESDP conflict is wrong), since it forces party travel
 
 		if (newGame->version == GAMVersion::PST && actor->GetStat(IE_SPECIFIC) == 2) {
 			Scriptable::VOODOO_VISUAL_RANGE = (14 + actor->GetStat(IE_LEVELFIGHTER)) * 2;
@@ -808,7 +809,7 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 		case GAMVersion::TOB:
 		case GAMVersion::IWD2:
 			stream->WriteDword(game->Reputation);
-			stream->WriteResRefUC(game->CurrentArea); // current area, but usually overridden via NPCAreaViewed
+			stream->WriteResRefUC(game->LastMasterArea);
 			stream->WriteDword(game->ControlStatus);
 			stream->WriteDword(game->Expansion);
 			stream->WriteDword(FamiliarsOffset);
