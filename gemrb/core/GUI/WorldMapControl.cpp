@@ -31,7 +31,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Holder<Font> font, const C
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 	const Game* game = core->GetGame();
 	WorldMap* worldmap = core->GetWorldMap();
-	currentArea = game->CurrentArea;
+	currentArea = game->WorldMapArea;
 	int entry = gamedata->GetAreaAlias(currentArea);
 	if (entry >= 0) {
 		const WMPAreaEntry* m = worldmap->GetEntry(entry);
