@@ -10335,6 +10335,12 @@ bool Actor::HasSpellState(ieDword spellstate) const
 int Actor::GetMaxEncumbrance() const
 {
 	int max = core->GetStrengthBonus(3, GetStat(IE_STR), GetStat(IE_STREXTRA));
+	AutoTable encMod = gamedata->LoadTable("encmod", true);
+	if (encMod) {
+		ieDword kit = GetStat(IE_KIT);
+		int mod = encMod->QueryFieldSigned<int>(GetKitName(kit), "ENCUMBRANCE_MOD_PERCENT");
+		max = (max * (mod + 100)) / 100;
+	}
 	if (HasFeat(Feat::StrongBack)) max += max / 2;
 	return max;
 }
