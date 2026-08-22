@@ -59,7 +59,7 @@ public:
 	void SetAreaStatus(ieDword status, BitOp op);
 
 	//! return the map icon of this location. Free the sprite afterwards.
-	Holder<Sprite2D> GetMapIcon(const AnimationFactory* bam);
+	Holder<Sprite2D> GetMapIcon(const AnimationFactory* bam) const;
 	// note that this is only valid after GetMapIcon has been called
 	bool HighlightSelected() const { return SingleFrame; }
 	String GetCaption();
@@ -67,10 +67,10 @@ public:
 
 private:
 	ieDword AreaStatus = 0;
-	Holder<Sprite2D> MapIcon = nullptr;
+	mutable Holder<Sprite2D> MapIcon = nullptr;
 	String StrCaption;
 	String StrTooltip;
-	bool SingleFrame = false;
+	mutable bool SingleFrame = false;
 
 public:
 	ResRef AreaName;

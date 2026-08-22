@@ -87,7 +87,7 @@ void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		if (!(m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 
 		Point offset = MapToScreen(m->pos);
-		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam.get());
+		const Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam.get());
 		if (!icon) continue;
 
 		BlitFlags flags = BlitFlags::BLENDED;

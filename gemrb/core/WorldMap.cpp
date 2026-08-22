@@ -39,7 +39,7 @@ String WMPAreaEntry::GetTooltip()
 	return StrTooltip;
 }
 
-Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory* bam)
+Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory* bam) const
 {
 	if (!bam || IconSeq == (ieDword) -1) {
 		return NULL;
