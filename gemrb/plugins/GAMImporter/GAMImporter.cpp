@@ -764,8 +764,6 @@ int GAMImporter::PutVariables(DataStream* stream, const Game* game) const
 int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 {
 	ResRef signature = "GAMEV0.0";
-	ieDword tmpDword;
-
 	signature[5] += static_cast<int>(game->version) / 10;
 	if (game->version == GAMVersion::PST || game->version == GAMVersion::BG) { //pst/bg1 saved version
 		signature[7] += 1;
@@ -774,8 +772,8 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 	}
 	stream->WriteResRef(signature);
 
-	tmpDword = game->GameTime / core->Time.defaultTicksPerSec;
-	stream->WriteDword(tmpDword);
+	ieDword gameSeconds = game->GameTime / core->Time.defaultTicksPerSec;
+	stream->WriteDword(gameSeconds);
 	//pst has a single preset of formations
 	if (game->version == GAMVersion::PST) {
 		stream->WriteWord(game->Formations[0]);
@@ -791,10 +789,8 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 	stream->WriteWord(game->WeatherBits);
 	stream->WriteDword(PCOffset);
 	stream->WriteDword(PCCount);
-	//these fields are zeroed in any original savegame
-	tmpDword = 0;
-	stream->WriteDword(tmpDword);
-	stream->WriteDword(tmpDword);
+	// these two fields are zeroed in any original savegame
+	stream->WriteFilling(8);
 	stream->WriteDword(NPCOffset);
 	stream->WriteDword(NPCCount);
 	stream->WriteDword(GlobalOffset);
