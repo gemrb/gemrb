@@ -10972,7 +10972,9 @@ bool Actor::ModalSpellSkillCheck()
 	switch (Modal.State) {
 		case Modal::BattleSong:
 			if (GetBardLevel()) {
-				return !CheckSilenced();
+				bool silenced = CheckSilenced();
+				if (silenced) displaymsg->DisplayConstantStringName(HCStrings::BardSongSilenced, GUIColors::WHITE, this);
+				return !silenced;
 			}
 			return false;
 		case Modal::DetectTraps:

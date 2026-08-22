@@ -218,6 +218,7 @@ enum class HCStrings : TableMgr::index_t {
 	UnusableDroppedGround,
 	DmgMagicFire,
 	DmgMagicCold,
+	BardSongSilenced,
 
 	count,
 };
