@@ -5,7 +5,10 @@
 #include "Strings/String.h"
 #include "Strings/StringConversion.h"
 
+#include <array>
+#include <deque>
 #include <gtest/gtest.h>
+#include <set>
 
 namespace GemRB {
 
@@ -319,4 +322,40 @@ TEST(StringTest, RecodedStringFromWideStringBytes)
 	EXPECT_EQ("abc", utf8);
 }
 
+TEST(StringTest, AsRanges)
+{
+	EXPECT_EQ(AsRanges(std::vector<int> {}), "");
+	EXPECT_EQ(AsRanges(std::vector<int> { 5 }), "5");
+	EXPECT_EQ(AsRanges(std::vector<int> { 0, 1 }), "0-1");
+	EXPECT_EQ(AsRanges(std::vector<int> { 0, 2 }), "0, 2");
+	EXPECT_EQ(AsRanges(std::vector<int> { 0, 1, 2, 7, 9, 10 }), "0-2, 7, 9-10");
+	EXPECT_EQ(AsRanges(std::vector<int> { -3, -2, -1, 4 }), "-3--1, 4");
+}
+
+TEST(StringTest, AsRangesElementTypes)
+{
+	EXPECT_EQ(AsRanges(std::vector<size_t> { 1, 2, 3 }), "1-3");
+	EXPECT_EQ(AsRanges(std::vector<int64_t> { 100, 101 }), "100-101");
+	// the promotion in `b != a + 1` keeps this from wrapping at the top of the type
+	EXPECT_EQ(AsRanges(std::vector<uint8_t> { 250, 251, 255 }), "250-251, 255");
+}
+
+TEST(StringTest, AsRangesContainers)
+{
+	EXPECT_EQ(AsRanges(std::array<int, 4> { 1, 2, 5, 6 }), "1-2, 5-6");
+	// no random access, so only std::next and std::prev may be used on the iterators
+	EXPECT_EQ(AsRanges(std::deque<int> { 8, 9 }), "8-9");
+	EXPECT_EQ(AsRanges(std::set<int> { 4, 1, 2, 3 }), "1-4");
+
+	const int raw[] = { 3, 4, 5 };
+	EXPECT_EQ(AsRanges(std::begin(raw), std::end(raw)), "3-5");
+}
+
+TEST(StringTest, AsRangesIteratorPairAndSeparator)
+{
+	const std::vector<int> v { 1, 2, 9 };
+	EXPECT_EQ(AsRanges(v.cbegin(), v.cend()), "1-2, 9");
+	EXPECT_EQ(AsRanges(v.cbegin() + 1, v.cend()), "2, 9");
+	EXPECT_EQ(AsRanges(v, " | "), "1-2 | 9");
+}
 }
