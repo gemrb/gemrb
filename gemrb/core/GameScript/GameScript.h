@@ -1241,6 +1241,7 @@ public: //Script Functions
 	static void RestNoSpells(Scriptable* Sender, Action* parameters);
 	static void RestoreZoomLevel(Scriptable* Sender, Action* parameters);
 	static void RestParty(Scriptable* Sender, Action* parameters);
+	static void RestPartyEx(Scriptable* Sender, Action* parameters);
 	static void RestUntilHealed(Scriptable* Sender, Action* parameters);
 	static void ReturnToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void ReturnToSavedLocationDelete(Scriptable* Sender, Action* parameters);

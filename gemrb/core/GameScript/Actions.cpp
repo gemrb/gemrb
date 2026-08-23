@@ -5506,6 +5506,18 @@ void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction();
 }
 
+// similar to the pst variant of RestParty
+// RestPartyEx(I:Gold*,I:HpBonus*,I:DisableMovie*Boolean)
+void GameScript::RestPartyEx(Scriptable* Sender, Action* parameters)
+{
+	int dream = parameters->int2Parameter ? -1 : 0;
+	if (parameters->int0Parameter) dream = 1; // force the "rest at inn" movie
+	Game* game = core->GetGame();
+	game->PartyGold -= parameters->int0Parameter;
+	game->RestParty(RestChecks::NoCheck, dream, parameters->int1Parameter + 1);
+	Sender->ReleaseCurrentAction();
+}
+
 //doesn't advance game time, just removes fatigue & refreshes spells of target
 //this is a non-blocking action
 static EffectRef fx_fatigue_ref = { "FatigueModifier", -1 };

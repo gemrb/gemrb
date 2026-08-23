@@ -905,6 +905,7 @@ static const ActionLink actionnames[] = {
 	{ "restorepartylocations", GameScript::RestorePartyLocation, 0 },
 	{ "restorezoomlevel", GameScript::RestoreZoomLevel, 0 },
 	{ "restparty", GameScript::RestParty, 0 },
+	{ "restpartyex", GameScript::RestPartyEx, 0 },
 	{ "restuntilhealed", GameScript::RestUntilHealed, 0 },
 	//this is in iwd2, same as movetosavedlocation, but with stats
 	{ "returntosavedlocation", GameScript::ReturnToSavedLocation, AF_BLOCKING | AF_ALIVE },
