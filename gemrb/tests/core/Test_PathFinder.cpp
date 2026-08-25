@@ -935,7 +935,7 @@ TEST(FindPathTest, MinDistanceEndsTheRouteShortOfTheGoal)
 
 	const Point last = shortOf.GetLastStep().point;
 	EXPECT_NE(SearchmapPoint(last), SearchmapPoint { to }) << "it was told to keep its distance";
-	EXPECT_LT(unsigned(Distance(last, to)), keepAway) << "and to come at least that close";
+	EXPECT_LT(Distance(last, to), keepAway) << "it must stop closer than ordered `minDistance` (" << keepAway << " tiles)";
 
 	// and it didn't go to the target and back up, but rather stop at the nearest occasion
 	EXPECT_LT(test::PathLength(from, shortOf), test::PathLength(from, onto));
