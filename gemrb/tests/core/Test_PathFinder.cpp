@@ -925,7 +925,7 @@ TEST(FindPathTest, MinDistanceEndsTheRouteShortOfTheGoal)
 	// with no distance to keep, the walk ends on the goal itself
 	const Path onto = test::CallFindPath(map, traversability, from, to);
 	ASSERT_FALSE(onto.Empty());
-	EXPECT_EQ(SearchmapPoint(onto.GetStep(onto.Size() - 1).point), SearchmapPoint { to });
+	EXPECT_EQ(SearchmapPoint { onto.GetLastStep().point }, SearchmapPoint { to });
 
 	// asked to stop five tiles out, it ends within that of the goal but not on it
 	constexpr unsigned int keepAway = test::Tiles(5);
@@ -933,7 +933,7 @@ TEST(FindPathTest, MinDistanceEndsTheRouteShortOfTheGoal)
 	ASSERT_FALSE(shortOf.Empty());
 	EXPECT_TRUE(test::PathIsSane(map, from, shortOf));
 
-	const Point last = shortOf.GetStep(shortOf.Size() - 1).point;
+	const Point last = shortOf.GetLastStep().point;
 	EXPECT_NE(SearchmapPoint(last), SearchmapPoint { to }) << "it was told to keep its distance";
 	EXPECT_LT(unsigned(Distance(last, to)), keepAway) << "and to come at least that close";
 
@@ -967,7 +967,7 @@ TEST(FindPathTest, MinDistanceWaitsForSightOfTheGoalWithPFSight)
 	const Path blind = test::CallFindPath(map, traversability, from, to, nullptr, 1, 0, keepAway);
 	ASSERT_FALSE(blind.Empty());
 	EXPECT_TRUE(test::PathIsSane(map, from, blind));
-	const Point blindEnd = blind.GetStep(blind.Size() - 1).point;
+	const Point blindEnd = blind.GetLastStep().point;
 	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(blindEnd), SearchmapPoint { to },
 					      noSpeed, noCircle))
 		<< "without PF_SIGHT range alone is enough, so it stops on the near side of the wall";
@@ -976,7 +976,7 @@ TEST(FindPathTest, MinDistanceWaitsForSightOfTheGoalWithPFSight)
 	ASSERT_FALSE(seeing.Empty());
 	EXPECT_TRUE(test::PathIsSane(map, from, seeing));
 	EXPECT_TRUE(test::PathAvoidsWalls(map, from, seeing));
-	const Point seeingEnd = seeing.GetStep(seeing.Size() - 1).point;
+	const Point seeingEnd = seeing.GetLastStep().point;
 	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(seeingEnd), SearchmapPoint { to },
 					     noSpeed, noCircle))
 		<< "with PF_SIGHT it may only stop where it can see the goal";
@@ -1166,14 +1166,14 @@ TEST(FindPathTest, ClickIntoAThinWallLandsOnTheCallersSide)
 	ASSERT_FALSE(fromWest.Empty());
 	EXPECT_TRUE(test::PathIsSane(map, west, fromWest));
 	EXPECT_TRUE(test::PathAvoidsWalls(map, west, fromWest));
-	EXPECT_EQ(SearchmapPoint(fromWest.GetStep(fromWest.Size() - 1).point), SearchmapPoint(4, 2))
+	EXPECT_EQ(SearchmapPoint(fromWest.GetLastStep().point), SearchmapPoint(4, 2))
 		<< "the west caller should stop against the west face";
 
 	const Path fromEast = test::CallFindPath(map, traversability, east, rock);
 	ASSERT_FALSE(fromEast.Empty());
 	EXPECT_TRUE(test::PathIsSane(map, east, fromEast));
 	EXPECT_TRUE(test::PathAvoidsWalls(map, east, fromEast));
-	EXPECT_EQ(SearchmapPoint(fromEast.GetStep(fromEast.Size() - 1).point), SearchmapPoint(6, 2))
+	EXPECT_EQ(SearchmapPoint(fromEast.GetLastStep().point), SearchmapPoint(6, 2))
 		<< "and the east caller against the east face";
 }
 
@@ -1197,11 +1197,11 @@ TEST(FindPathTest, DISABLED_ClickIntoAThickWallStopsAgainstTheNearFace)
 
 	const Path fromWest = test::CallFindPath(map, traversability, map.Start(), rock);
 	ASSERT_FALSE(fromWest.Empty());
-	EXPECT_EQ(SearchmapPoint(fromWest.GetStep(fromWest.Size() - 1).point), SearchmapPoint(4, 2));
+	EXPECT_EQ(SearchmapPoint(fromWest.GetLastStep().point), SearchmapPoint(4, 2));
 
 	const Path fromEast = test::CallFindPath(map, traversability, map.End(), rock);
 	ASSERT_FALSE(fromEast.Empty()) << "the east caller has a face of its own to walk up to";
-	EXPECT_EQ(SearchmapPoint(fromEast.GetStep(fromEast.Size() - 1).point), SearchmapPoint(6, 2))
+	EXPECT_EQ(SearchmapPoint(fromEast.GetLastStep().point), SearchmapPoint(6, 2))
 		<< "and it is the east one, not the west";
 }
 
@@ -1244,7 +1244,7 @@ TEST(FindPathTest, ClickOnAnActorEndsBesideIt)
 						     PF_SIGHT | PF_ACTORS_ARE_BLOCKING);
 		ASSERT_FALSE(path.Empty()) << "bumpable = " << bumpable;
 		EXPECT_TRUE(test::PathIsSane(map, from, path)) << "bumpable = " << bumpable;
-		const SearchmapPoint last { path.GetStep(path.Size() - 1).point };
+		const SearchmapPoint last { path.GetLastStep().point };
 		EXPECT_NE(last, targetTile) << "bumpable = " << bumpable << ": the route ended on the target";
 		EXPECT_LE(std::abs(last.x - targetTile.x), 1) << "bumpable = " << bumpable;
 	}
@@ -1283,7 +1283,7 @@ TEST(FindPathTest, BigActorClickingIntoANookStopsInTheOpen)
 	const Path small = test::CallFindPath(map, traversability, from, to, nullptr, 1);
 	ASSERT_FALSE(small.Empty());
 	EXPECT_TRUE(test::PathIsSane(map, from, small));
-	EXPECT_EQ(SearchmapPoint(small.GetStep(small.Size() - 1).point), SearchmapPoint { to });
+	EXPECT_EQ(SearchmapPoint(small.GetLastStep().point), SearchmapPoint { to });
 
 	// the big one cannot enter the corridor at all, so it is given the nearest ground in the hall
 	const Path big = test::CallFindPath(map, traversability, from, to, nullptr, 4);
@@ -1536,8 +1536,8 @@ TEST(FindPathTest, DISABLED_BackAwayFacesTheThreatOnAStraightRetreat)
 						PF_SIGHT | PF_BACKAWAY);
 
 	ASSERT_FALSE(retreat.Empty());
-	const Point last = retreat.GetStep(retreat.Size() - 1).point;
-	EXPECT_EQ(retreat.GetStep(retreat.Size() - 1).orient, GetOrient(last, from))
+	const Point last = retreat.GetLastStep().point;
+	EXPECT_EQ(retreat.GetLastStep().orient, GetOrient(last, from))
 		<< "an actor backing away should be facing what it is backing away from";
 }
 
@@ -1644,7 +1644,7 @@ TEST(FindPathTest, RunsDoNotLeakIntoEachOther)
 	ASSERT_GT(bigFirst.Size(), 1u) << "the big map has to produce a route with corners in it";
 	EXPECT_EQ(smallAfterBig, smallAgain) << "the same request twice has to give the same answer";
 	EXPECT_EQ(bigFirst, bigAgain) << "and the smaller map in between must not have disturbed it";
-	EXPECT_EQ(SearchmapPoint(smallAfterBig.GetStep(smallAfterBig.Size() - 1).point),
+	EXPECT_EQ(SearchmapPoint(smallAfterBig.GetLastStep().point),
 		  SearchmapPoint { small.End() })
 		<< "the small map's route has to end on the small map's goal";
 }
@@ -1704,11 +1704,11 @@ TEST(PathFinderTest, LinePathStopsPassesOrReboundsAtAWall)
 	const Path rebounded = PathFinder::CalculateLinePath(map.Props(), start, dest, 1, E, GL_REBOUND);
 
 	ASSERT_FALSE(stopped.Empty());
-	EXPECT_EQ(SearchmapPoint(stopped.GetStep(stopped.Size() - 1).point), SearchmapPoint(5, 3))
+	EXPECT_EQ(SearchmapPoint(stopped.GetLastStep().point), SearchmapPoint(5, 3))
 		<< "GL_NORMAL ends the line on the wall it ran into";
 	EXPECT_LT(stopped.Size(), passed.Size());
 
-	EXPECT_EQ(SearchmapPoint(passed.GetStep(passed.Size() - 1).point), SearchmapPoint { dest })
+	EXPECT_EQ(SearchmapPoint(passed.GetLastStep().point), SearchmapPoint { dest })
 		<< "GL_PASS carries on to the target";
 
 	// GL_PASS keeps facing east the whole way; GL_REBOUND turns to face west over the wall. Only
@@ -1742,7 +1742,7 @@ TEST(PathFinderTest, DISABLED_AReboundedLineDoesNotEndWhereAnUnimpededOneWould)
 
 	ASSERT_FALSE(passed.Empty());
 	ASSERT_FALSE(rebounded.Empty());
-	EXPECT_NE(rebounded.GetStep(rebounded.Size() - 1).point, passed.GetStep(passed.Size() - 1).point)
+	EXPECT_NE(rebounded.GetLastStep().point, passed.GetLastStep().point)
 		<< "bouncing off a wall has to change where the line ends, not only which way it faces";
 }
 
