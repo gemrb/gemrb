@@ -229,14 +229,16 @@ void Font::CreateAliasForChar(ieWord chr, ieWord alias)
 
 const Glyph& Font::GetGlyph(ieWord chr) const
 {
+	const Glyph* g = nullptr;
 	if (chr < AtlasIndex.size()) {
-		const Glyph* g = AtlasIndex[chr].glyph;
-		if (g) {
-			return *g;
-		}
+		g = AtlasIndex[chr].glyph;
 	}
-	const static Glyph blank(Size(0, 0), Point(0, 0), NULL, 0, 1);
-	return blank;
+
+	// potentially fall back to first usable glyph
+	for (size_t i = 0; !g; i++) {
+		g = AtlasIndex[i].glyph;
+	}
+	return *g;
 }
 
 size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, const PrintColors* colors,
