@@ -513,13 +513,13 @@ namespace test {
 	 * A distance in whole searchmap tiles, as navmap pixels.
 	 *
 	 * A tile is 16x12, so there is no single pixel count for a tile; FindPath() measures with
-	 * Distance() on tile coordinates scaled by SEARCHMAP_SQUARE_DIAGONAL, which is 20. That is
+	 * Distance() on tile coordinates scaled by SEARCHMAP_SQUARE_DIAGONAL. That is
 	 * the number a minDistance argument is really in, so this is what a test means by "n tiles
 	 * away".
 	 */
-	constexpr unsigned int Tiles(const unsigned int count) noexcept
+	constexpr unsigned int Tiles(const unsigned int tilesCount) noexcept
 	{
-		return count * 20;
+		return tilesCount * SEARCHMAP_SQUARE_DIAGONAL;
 	}
 
 	/**

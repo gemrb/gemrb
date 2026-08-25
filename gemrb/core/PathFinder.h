@@ -142,6 +142,8 @@ enum {
 	PF_ACTORS_ARE_BLOCKING = 4
 };
 
+constexpr unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
+
 /**
  * PathFinder - stateless class implementing pathfinding-related algorithms.
  *
