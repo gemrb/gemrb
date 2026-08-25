@@ -1182,6 +1182,9 @@ TEST(FindPathTest, ClickIntoAThinWallLandsOnTheCallersSide)
 // DISABLED: the directed adjustment only reaches one tile out, so against a wall two tiles thick
 // it finds nothing and hands over to the undirected scan, which can settle on the far side. The
 // east caller is then given a goal it cannot reach, and gets no path at all.
+// The lookback distance could always be increased, but it's also true that in bg1 one can get arbitrarily big parties,
+// so formation rotation can result in goals very deep in walls.
+// Doing our best (like the test expects) even for inaccessible areas seems like the most obvious thing to do.
 TEST(FindPathTest, DISABLED_ClickIntoAThickWallStopsAgainstTheNearFace)
 {
 	const TestSearchMap map {
