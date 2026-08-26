@@ -1521,9 +1521,11 @@ TEST(FindPathTest, BackAwayLeavesSharpCornersAlone)
 
 // An actor backing away faces the threat it is retreating from, not the way it is going.
 //
-// DISABLED: Theta* collapses a straight run to a single waypoint, and FindPath() always gives its
-// first built node a forward orientation. That node is the only one, so on the plainest retreat
-// there is - the case PF_BACKAWAY exists for - the flag changes nothing at all.
+// DISABLED: Theta* collapses a straight run to a single waypoint, and the PF_BACKAWAY check in
+// FindPath() (PathFinder.cpp, the `resultPath &&` guard) deliberately skips the first built node
+// for the sake of the iwd ar1015 beetles. That node is the only one here, so on the plainest
+// retreat - the case PF_BACKAWAY exists for - the flag changes nothing. The exception should be
+// revisited once the waypoint-collapse and orientation issues are fixed; it may become unnecessary.
 TEST(FindPathTest, DISABLED_BackAwayFacesTheThreatOnAStraightRetreat)
 {
 	// the threat is behind S, and the actor backs away due east
