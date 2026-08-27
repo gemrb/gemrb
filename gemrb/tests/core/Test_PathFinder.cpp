@@ -1678,11 +1678,11 @@ TEST(PathFinderTest, AdjustPositionFindsPassableGround)
 	EXPECT_EQ(goal.y, 3);
 
 	// a goal off the map is pulled inside it first
-	SearchmapPoint far(99, 99);
-	PathFinder::AdjustPosition(map.Props(), far);
-	EXPECT_LT(far.x, map.Width());
-	EXPECT_LT(far.y, map.Height());
-	EXPECT_TRUE(bool(PathFinder::GetBlockedTile(map.Props(), far) & PathMapFlags::PASSABLE));
+	SearchmapPoint pointOutside(99, 99);
+	PathFinder::AdjustPosition(map.Props(), pointOutside);
+	EXPECT_LT(pointOutside.x, map.Width());
+	EXPECT_LT(pointOutside.y, map.Height());
+	EXPECT_TRUE(bool(PathFinder::GetBlockedTile(map.Props(), pointOutside) & PathMapFlags::PASSABLE));
 }
 
 // === projectile lines ===
