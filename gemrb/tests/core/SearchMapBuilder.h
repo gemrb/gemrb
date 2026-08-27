@@ -5,14 +5,20 @@
 #ifndef TESTS_SEARCHMAPBUILDER_H
 #define TESTS_SEARCHMAPBUILDER_H
 
+#include "../../core/GameData.h"
+#include "../../core/Geometry.h"
 #include "../../core/PathFinder.h"
 #include "../../core/Region.h"
 #include "../../core/Scriptable/Selectable.h"
+#include "../../core/Strings/String.h"
 #include "../../core/TileProps.h"
 #include "../../core/TraversabilityCache.h"
 
+#include <cmath>
+#include <cstdlib>
 #include <gtest/gtest.h>
 #include <initializer_list>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -242,6 +248,28 @@ namespace test {
 		TileProps& Props() noexcept { return props; }
 		const TileProps& Props() const noexcept { return props; }
 
+		/**
+		 * Rewrites one tile's terrain, as the glyph of the same name would have set it.
+		 * For a test that has to change the map between two runs - opening a door, or taking
+		 * an obstacle away - so both runs can be stated against the same drawing.
+		 * Actor glyphs are not accepted: they imply a footprint and a cache entry, which a
+		 * single tile write cannot deliver.
+		 */
+		void SetTile(const int x, const int y, const char glyph)
+		{
+			if (IsActorGlyph(glyph)) {
+				ADD_FAILURE() << "SetTile() cannot place actor '" << glyph
+					      << "': draw it on the map instead";
+				return;
+			}
+			if (x < 0 || y < 0 || x >= width || y >= height) {
+				ADD_FAILURE() << "SetTile() called outside the map, at (" << x << ',' << y << ')';
+				return;
+			}
+			props.SetTileProp(SearchmapPoint(x, y), TileProps::Property::SEARCH_MAP,
+					  uint8_t(ParseSearchMapChar(glyph)));
+		}
+
 		int Width() const noexcept { return width; }
 		int Height() const noexcept { return height; }
 
@@ -339,6 +367,15 @@ namespace test {
 		 * list of coordinates, and shows at a glance how much of it the pathfinder chose.
 		 */
 		testing::AssertionResult MatchesWithPath(const Point& from, const Path& path, MapRows expected) const;
+
+		/**
+		 * As Matches(), with the actor mark on every tile the standing footprint of an actor of
+		 * that circle size covers, when it stands on `centre`.
+		 *
+		 * The ground the actor needs for itself, which GetBlockedInRadiusTile() asks about.
+		 */
+		testing::AssertionResult MatchesStandingFootprint(const SearchmapPoint& centre, uint16_t circleSize,
+								  MapRows expected) const;
 
 		// centre of a tile in navmap coordinates, which is what the Point-taking overloads want
 		static Point Nav(int x, int y) noexcept
@@ -444,25 +481,45 @@ namespace test {
 	 * Runs the real FindPath() over a drawn map.
 	 *
 	 * Speed 0 keeps it clear of gamedata->GetStepTime(), so no Interface is needed.
+	 *
+	 * minDistance comes last, after flags, so the existing positional calls keep working. It is
+	 * in navmap pixels, the same as FindPath() takes it, so a test wanting whole tiles should
+	 * say so with Tiles().
 	 */
 	inline Path CallFindPath(const TestSearchMap& map, const TestTraversability& traversability,
 				 const Point& from, const Point& to, ActorIdentity self = nullptr,
-				 unsigned int circleSize = 1, int flags = PF_SIGHT)
+				 unsigned int circleSize = 1, int flags = PF_SIGHT,
+				 unsigned int minDistance = 0)
 	{
 		ActorPathContext actor;
 		actor.circleSize = circleSize;
 		actor.identity = self;
-		return PathFinder::FindPath(traversability.Data(), map.Props(), from, to, actor, 0, flags);
+		return PathFinder::FindPath(traversability.Data(), map.Props(), from, to, actor, minDistance, flags);
 	}
 
 	/**
 	 * Finds a path from the nth drawn actor to `to`.
 	 */
 	inline Path PathDrawnActor(const TestSearchMap& map, const TestTraversability& traversability,
-				   size_t index, const Point& to, int flags = PF_SIGHT)
+				   size_t index, const Point& to, int flags = PF_SIGHT,
+				   unsigned int minDistance = 0)
 	{
 		return CallFindPath(map, traversability, map.ActorPosOf(index), to,
-				    map.ActorIdentityOf(index), map.ActorCircleSizeOf(index), flags);
+				    map.ActorIdentityOf(index), map.ActorCircleSizeOf(index), flags,
+				    minDistance);
+	}
+
+	/**
+	 * A distance in whole searchmap tiles, as navmap pixels.
+	 *
+	 * A tile is 16x12, so there is no single pixel count for a tile; FindPath() measures with
+	 * Distance() on tile coordinates scaled by SEARCHMAP_SQUARE_DIAGONAL. That is
+	 * the number a minDistance argument is really in, so this is what a test means by "n tiles
+	 * away".
+	 */
+	constexpr unsigned int Tiles(const unsigned int tilesCount) noexcept
+	{
+		return tilesCount * SEARCHMAP_SQUARE_DIAGONAL;
 	}
 
 	/**
@@ -514,6 +571,213 @@ namespace test {
 			previous = step;
 		}
 		return testing::AssertionSuccess();
+	}
+
+	/**
+	 * How far the path is to walk, in navmap pixels, summed leg by leg.
+	 *
+	 * Compare against Distance(from, to) or a hand counted route, with room to spare: the heuristic is weighted, so the
+	 * pathfinder does not promise the shortest path and a tight bound here would break on every retune.
+	 */
+	inline unsigned int PathLength(const Point& from, const Path& path)
+	{
+		unsigned int total = 0;
+		Point previous = from;
+		for (size_t i = 0; i < path.Size(); ++i) {
+			total += Distance(previous, path.GetStep(i).point);
+			previous = path.GetStep(i).point;
+		}
+		return total;
+	}
+
+	/**
+	 * The invariants every non-empty path has to hold, whatever the map.
+	 *
+	 * Complements PathAvoidsWalls(), which only looks at what the legs cross: this looks at the
+	 * waypoints themselves. Cheap enough to call from every FindPath test, and it catches the
+	 * corruption an ASCII drawing does not show - a repeated waypoint reads as one tile, and a
+	 * waypoint on blocked ground reads as whatever the terrain under it was.
+	 *
+	 * Deliberately does not check that the route makes steady progress towards the goal:
+	 * PathUTurn is a legitimate path that starts by walking away from it.
+	 */
+	inline testing::AssertionResult PathIsSane(const TestSearchMap& map, const Point& from,
+						   const Path& path, const unsigned int circleSize = 1)
+	{
+		if (path.Empty()) {
+			return testing::AssertionFailure() << "path is empty";
+		}
+
+		Point previous = from;
+		for (size_t i = 0; i < path.Size(); ++i) {
+			const Point step = path.GetStep(i).point;
+			const SearchmapPoint tile { step };
+
+			if (tile.x < 0 || tile.y < 0 || tile.x >= map.Width() || tile.y >= map.Height()) {
+				return testing::AssertionFailure()
+					<< "waypoint " << i << " is outside the map, at ("
+					<< step.x << ',' << step.y << ')';
+			}
+
+			if (step == previous) {
+				return testing::AssertionFailure()
+					<< "waypoint " << i << " repeats the previous point, ("
+					<< step.x << ',' << step.y << "), so the leg goes nowhere";
+			}
+
+			// the same test FindPath() puts on a candidate tile: an actor mark does not
+			// disqualify a waypoint, since a bumpable actor is expected to move aside
+			const PathMapFlags fits = PathFinder::GetBlockedInRadiusTile(map.Props(), tile, circleSize);
+			if (!bool(fits & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
+				return testing::AssertionFailure()
+					<< "waypoint " << i << " sits on tile (" << tile.x << ',' << tile.y
+					<< "), where an actor of circle size " << circleSize << " does not fit";
+			}
+
+			previous = step;
+		}
+		return testing::AssertionSuccess();
+	}
+
+	/** The orientation each waypoint carries, in walking order. */
+	inline std::vector<orient_t> PathOrients(const Path& path)
+	{
+		std::vector<orient_t> orients;
+		orients.reserve(path.Size());
+		for (size_t i = 0; i < path.Size(); ++i) {
+			orients.push_back(path.GetStep(i).orient);
+		}
+		return orients;
+	}
+
+	/**
+	 * The orientations a plain forward walk should carry: each waypoint faces the way the leg
+	 * that arrives at it was going. The source is not a waypoint, so the first leg starts there.
+	 */
+	inline std::vector<orient_t> ForwardOrients(const Point& from, const Path& path)
+	{
+		std::vector<orient_t> orients;
+		orients.reserve(path.Size());
+		Point previous = from;
+		for (size_t i = 0; i < path.Size(); ++i) {
+			const Point step = path.GetStep(i).point;
+			orients.push_back(GetOrient(previous, step));
+			previous = step;
+		}
+		return orients;
+	}
+
+	/**
+	 * The orientations PF_BACKAWAY should produce, by replaying the rule FindPath() applies:
+	 * a waypoint faces backwards when it is nearly collinear with the one that follows it and
+	 * the one it came from, so the actor retreats without turning round.
+	 *
+	 * The final waypoint always faces forwards: FindPath() builds the path from the destination
+	 * backwards and skips the check on the first node it makes, which is that one. Note the
+	 * source comment there calls it "the first step", meaning first built, not first walked.
+	 */
+	inline std::vector<orient_t> BackAwayOrients(const Point& from, const Path& path)
+	{
+		constexpr int COLLINEARITY_THRESHOLD = 300; // as in FindPath()
+
+		std::vector<orient_t> orients = ForwardOrients(from, path);
+		for (size_t i = 0; i + 1 < path.Size(); ++i) {
+			const Point step = path.GetStep(i).point;
+			const Point successor = path.GetStep(i + 1).point;
+			const Point predecessor = i ? path.GetStep(i - 1).point : from;
+			if (std::abs(area2(step, successor, predecessor)) < COLLINEARITY_THRESHOLD) {
+				orients[i] = GetOrient(step, predecessor);
+			}
+		}
+		return orients;
+	}
+
+	/** How many of those waypoints ended up facing backwards, so a test can prove it saw any. */
+	inline size_t CountBackAwayOrients(const Point& from, const Path& path)
+	{
+		const std::vector<orient_t> forward = ForwardOrients(from, path);
+		const std::vector<orient_t> backAway = BackAwayOrients(from, path);
+		size_t flipped = 0;
+		for (size_t i = 0; i < forward.size(); ++i) {
+			if (forward[i] != backAway[i]) ++flipped;
+		}
+		return flipped;
+	}
+
+	/**
+	 * Lends the pathfinder a step time for the duration of a scope.
+	 *
+	 * Both line walks read gamedata->GetStepTime() the moment they are given a non-zero actor
+	 * speed, and a terrain-only test has no Interface to supply one - gamedata is simply null.
+	 * This produces a bare GameData up so those code paths can be reached.
+	 *
+	 * 566 is what Interface installs for BG2, and what a test should use unless it means to say
+	 * something about a different game.
+	 */
+	class ScopedStepTime {
+	public:
+		explicit ScopedStepTime(const int stepTime = 566)
+		{
+			if (!gamedata) {
+				gamedata = std::make_unique<GameData>();
+				installed = true;
+			}
+			previous = gamedata->GetStepTime();
+			gamedata->SetStepTime(stepTime);
+		}
+
+		ScopedStepTime(const ScopedStepTime&) = delete;
+		ScopedStepTime& operator=(const ScopedStepTime&) = delete;
+
+		~ScopedStepTime()
+		{
+			if (installed) {
+				gamedata.reset();
+			} else {
+				gamedata->SetStepTime(previous);
+			}
+		}
+
+	private:
+		int previous = 0;
+		bool installed = false;
+	};
+
+	/**
+	 * Which tiles the standing footprint of that circle size covers, centred on `centre`.
+	 *
+	 * Drawn with the same actor mark Matches() uses for the blocking footprint, so the two can be
+	 * read against each other: they are both footprints, and the only difference is which of the
+	 * two an engine call is asking about.
+	 */
+	inline std::vector<std::string> RenderStandingFootprint(const Size& mapSize, const SearchmapPoint& centre,
+								const uint16_t circleSize)
+	{
+		std::vector<std::string> out(size_t(mapSize.h), std::string(size_t(mapSize.w), Glyph::Floor));
+		for (int y = 0; y < mapSize.h; ++y) {
+			for (int x = 0; x < mapSize.w; ++x) {
+				OwningTileProps scratch = OwningTileProps::MakeEmpty(mapSize);
+				for (int fy = 0; fy < mapSize.h; ++fy) {
+					for (int fx = 0; fx < mapSize.w; ++fx) {
+						scratch.SetTileProp(SearchmapPoint(fx, fy), TileProps::Property::SEARCH_MAP,
+								    uint8_t(PathMapFlags::PASSABLE));
+					}
+				}
+				scratch.SetTileProp(SearchmapPoint(x, y), TileProps::Property::SEARCH_MAP,
+						    uint8_t(PathMapFlags::SIDEWALL));
+
+				const PathMapFlags seen = PathFinder::GetBlockedInRadiusTile(scratch, centre, circleSize);
+				if (bool(seen & PathMapFlags::SIDEWALL)) out[y][x] = Glyph::PCMark;
+			}
+		}
+		return out;
+	}
+
+	inline testing::AssertionResult TestSearchMap::MatchesStandingFootprint(const SearchmapPoint& centre,
+										const uint16_t circleSize,
+										const MapRows expected) const
+	{
+		return CompareRows(RenderStandingFootprint(Size(width, height), centre, circleSize), expected);
 	}
 
 	inline testing::AssertionResult TestSearchMap::MatchesWithPath(const Point& from, const Path& path,

@@ -87,17 +87,24 @@ struct Path {
 		nodes.clear();
 		currentStep = 0;
 	}
-	PathNode GetStep(size_t idx) const
+	PathNode GetStep(const size_t idx) const
 	{
 		return nodes[idx];
+	}
+	PathNode GetLastStep() const
+	{
+		if (nodes.empty()) {
+			return {};
+		}
+		return nodes[nodes.size() - 1];
 	}
 	PathNode GetCurrentStep() const
 	{
 		return nodes[currentStep];
 	}
-	PathNode GetNextStep(size_t x) const
+	PathNode GetNextStep(const size_t x) const
 	{
-		size_t next = currentStep + x;
+		const size_t next = currentStep + x;
 		if (next < nodes.size()) {
 			return nodes[next];
 		} else {
@@ -141,6 +148,8 @@ enum {
 	PF_BACKAWAY = 2,
 	PF_ACTORS_ARE_BLOCKING = 4
 };
+
+constexpr unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
 
 /**
  * PathFinder - stateless class implementing pathfinding-related algorithms.

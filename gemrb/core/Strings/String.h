@@ -9,6 +9,7 @@
 
 #include "StringView.h"
 
+#include "fmt/format.h"
 #include "fmt/xchar.h"
 
 #include <algorithm>
@@ -198,6 +199,38 @@ std::string& AppendFormat(std::string& str, const std::string& fmt, ARGS&&... ar
 {
 	std::string formatted = fmt::format(fmt, std::forward<ARGS>(args)...);
 	return str += formatted;
+}
+
+/**
+ * Writes a sorted range of integers out as ranges: 0, 1, 2, 7, 9, 10 reads "0-2, 7, 9-10".
+ * The range has to be sorted ascending; consecutive means exactly `previous + 1`.
+ *
+ * The counterpart to Explode().
+ */
+template<typename IT>
+std::string AsRanges(IT first, IT last, const char* separator = ", ")
+{
+	std::string out;
+	for (IT run = first; run != last;) {
+		// the first pair that is not consecutive is where this run ends
+		const IT gap = std::adjacent_find(run, last, [](const auto& a, const auto& b) {
+			return b != a + 1;
+		});
+		const IT next = gap == last ? gap : std::next(gap);
+		const IT back = std::prev(next);
+
+		if (!out.empty()) out += separator;
+		out += run == back ? fmt::format("{}", *run) : fmt::format("{}-{}", *run, *back);
+		run = next;
+	}
+	return out;
+}
+
+/** As above, for a whole container. */
+template<typename C>
+std::string AsRanges(const C& sorted, const char* separator = ", ")
+{
+	return AsRanges(std::begin(sorted), std::end(sorted), separator);
 }
 
 template<typename STR>
