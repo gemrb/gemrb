@@ -160,6 +160,29 @@ static void AdjustPSTDurations(const Spell* spl, Effect& fx, size_t ignoreFx)
 	}
 }
 
+static void AddSpellFocusBonus(Effect& fx, const Actor* caster)
+{
+	const auto& tables = SpellTables::Get();
+	if (fx.PrimaryType >= tables.spellfocus.size()) {
+		return;
+	}
+
+	ieDword stat = tables.spellfocus[fx.PrimaryType].stat;
+	if (stat == 0) {
+		return;
+	}
+	switch (caster->Modified[stat]) {
+		case 0:
+			break;
+		case 1:
+			fx.SavingThrowBonus += tables.spellfocus[fx.PrimaryType].val1;
+			break;
+		default:
+			fx.SavingThrowBonus += tables.spellfocus[fx.PrimaryType].val2;
+			break;
+	}
+}
+
 // -1 will return cfb
 // 0 will always return first spell block
 // otherwise set to caster level
@@ -235,23 +258,7 @@ EffectQueue Spell::GetEffectBlock(Scriptable* self, const Point& pos, int block_
 				fx.Duration = (fx.Duration * factor) / 100;
 			}
 
-			//evaluate spell focus feats
-			//TODO: the usual problem: which saving throw is better? Easy fix in the data file.
-			if (fx.PrimaryType < tables.spellfocus.size()) {
-				ieDword stat = tables.spellfocus[fx.PrimaryType].stat;
-				if (stat > 0) {
-					switch (caster->Modified[stat]) {
-						case 0:
-							break;
-						case 1:
-							fx.SavingThrowBonus += tables.spellfocus[fx.PrimaryType].val1;
-							break;
-						default:
-							fx.SavingThrowBonus += tables.spellfocus[fx.PrimaryType].val2;
-							break;
-					}
-				}
-			}
+			AddSpellFocusBonus(fx, caster);
 		}
 
 		// item revisions uses a bunch of fx_cast_spell with spells that have effects with no target set
