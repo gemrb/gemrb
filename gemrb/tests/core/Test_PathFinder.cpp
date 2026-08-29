@@ -542,15 +542,15 @@ TEST(PathFinderTest, WallStaysSolidWithActorsAlongIt)
 	const Point west = map.ActorPosOf(0);
 	const Point east = map.ActorPosOf(1);
 
-	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), west, east, true, noSpeed, noCircle));
-	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), west, east, false, noSpeed, noCircle))
+	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), west, east, true, noCircle));
+	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), west, east, false, noCircle))
 		<< "ignoring actors must not ignore the wall between them";
 
 	// the wall also still blocks sight
-	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(west), SearchmapPoint(east), noSpeed, noCircle));
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(west), SearchmapPoint(east)));
 
 	// ... while the untouched column on the far side of the room, S to E, is walkable
-	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noSpeed, noCircle));
+	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
 }
 
 // LineStepper tests
@@ -612,8 +612,8 @@ TEST(PathFinderTest, ActorBlocksOnlyWhenActorsAreBlocking)
 	const Point from = map.Start();
 	const Point to = map.End();
 
-	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), from, to, true, noSpeed, noCircle));
-	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), from, to, false, noSpeed, noCircle));
+	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), from, to, true, noCircle));
+	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), from, to, false, noCircle));
 }
 
 // A bumpable actor is transparent to a route that means to shove it aside, and solid once the
@@ -823,11 +823,11 @@ TEST(FindPathTest, RespectsActorSize)
 	EXPECT_FALSE(inHall.Empty()) << "the wide actor must still be able to move within its hall";
 }
 
-// Test diagonal line, expect only one waypoint
-TEST(FindPathTest, PathLongDiagonal)
+// S to E is a very shallow diagonal: 12 tiles across for 2 tiles down, so the straight line
+// between them clips the divider well above the slit. The route therefore cannot be a single leg -
+// it has to break at the slit and go through it.
+TEST(FindPathTest, PathLongDiagonalBreaksAtTheSlit)
 {
-	// S to E is a very shallow diagonal: 12 tiles across for 2 tiles down, so the straight
-	// line between them clips the divider well above the slit
 	const TestSearchMap map {
 		"#####################",
 		"#.........#.........#",
@@ -847,7 +847,7 @@ TEST(FindPathTest, PathLongDiagonal)
 		"#.........#.........#",
 		"#..**.....#.........#",
 		"#...**....#.........#",
-		"#....**********@....#",
+		"#....******@***@....#",
 		"#.........#.........#",
 		"#.........#.........#",
 		"#.........#.........#",
@@ -858,7 +858,7 @@ TEST(FindPathTest, PathLongDiagonal)
 	const Point from = map.Start();
 	const test::TestTraversability traversability { map };
 	const Path path = test::CallFindPath(map, traversability, from, map.End());
-	EXPECT_EQ(path.Size(), 1) << "the leg has to stay long enough for the rounding to show";
+	EXPECT_EQ(path.Size(), 2) << "one leg down to the slit, one along to the goal";
 	EXPECT_TRUE(test::PathAvoidsWalls(map, from, path));
 	EXPECT_TRUE(test::PathIsSane(map, from, path));
 	EXPECT_TRUE(map.MatchesWithPath(map.Start(), path, expected));
@@ -880,13 +880,14 @@ TEST(FindPathTest, PathUTurn)
 		"#.........#.........#",
 		"#####################"
 	};
+	// the second leg is drawn as the straight line it is
 	const test::MapRows expected {
 		"#####################",
 		"#.........#....@....#",
-		"#.........#...**....#",
-		"#..**.....#..**.....#",
-		"#...**....#.**......#",
-		"#....******@*.......#",
+		"#.........#..**.....#",
+		"#..**.....#.**......#",
+		"#...**....#.*.......#",
+		"#....******@........#",
 		"#.........#.........#",
 		"#.........#.........#",
 		"#.........#.........#",
@@ -968,8 +969,7 @@ TEST(FindPathTest, MinDistanceWaitsForSightOfTheGoalWithPFSight)
 	ASSERT_FALSE(blind.Empty());
 	EXPECT_TRUE(test::PathIsSane(map, from, blind));
 	const Point blindEnd = blind.GetLastStep().point;
-	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(blindEnd), SearchmapPoint { to },
-					      noSpeed, noCircle))
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(blindEnd), SearchmapPoint { to }))
 		<< "without PF_SIGHT range alone is enough, so it stops on the near side of the wall";
 
 	const Path seeing = test::CallFindPath(map, traversability, from, to, nullptr, 1, PF_SIGHT, keepAway);
@@ -977,8 +977,7 @@ TEST(FindPathTest, MinDistanceWaitsForSightOfTheGoalWithPFSight)
 	EXPECT_TRUE(test::PathIsSane(map, from, seeing));
 	EXPECT_TRUE(test::PathAvoidsWalls(map, from, seeing));
 	const Point seeingEnd = seeing.GetLastStep().point;
-	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(seeingEnd), SearchmapPoint { to },
-					     noSpeed, noCircle))
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(seeingEnd), SearchmapPoint { to }))
 		<< "with PF_SIGHT it may only stop where it can see the goal";
 
 	// which costs it the walk around the divider
@@ -1060,81 +1059,32 @@ namespace {
 		}
 		return corridors;
 	}
-
-	// actorSpeed is Actor::walkScale, bigger number is a slower creature. Haste halves the walkScale,
-	// encumbrance at half speed doubles it, so the usable range across the supported games is roughly
-	// 0-1500. The sweeps below run past the games' shipped values.
-	constexpr int slowestSpeed = 2000;
-
 }
 
-// How fast the observer walks has nothing to do with whether a wall is in the way, so every wall
-// on the line has to block sight at every speed, wherever it stands and however thick it is.
-//
-// DISABLED: The tile space line walk borrows NormalizeDeltas(), a navmap function whose
-// STEP_RADIUS of 2 means two navmap pixels - an eighth of a tile. GetBlockedInLineTile() converts
-// that to tile units by dividing its factor by 16, but only on the branch where there is an actor
-// speed to divide by; with no speed the factor is a bare 1 and the stride becomes two whole tiles.
-// The conversion is a rounding effect rather than an exact scaling, so it also stops working once
-// the factor climbs back over half a tile, which it does for fast actors.
-TEST(PathFinderTest, DISABLED_AWallBlocksSightAtEverySpeed)
+// Every wall on the line has to block sight, wherever it stands and however thick it is
+TEST(PathFinderTest, AWallAlwaysBlocksSight)
 {
-	// the line walk asks gamedata for the step time as soon as the speed is non-zero
-	const test::ScopedStepTime stepTime;
-
 	for (const WalledCorridor& corridor : WalledCorridors()) {
-		const SearchmapPoint eye { corridor.map.Start() };
-		const SearchmapPoint target { corridor.map.End() };
-
-		std::vector<int> sawThroughTheWall;
-		for (int speed = 0; speed <= slowestSpeed; ++speed) {
-			if (PathFinder::IsVisibleLOS(corridor.map.Props(), eye, target, speed, noCircle)) {
-				sawThroughTheWall.push_back(speed);
-			}
-		}
-
-		if (!sawThroughTheWall.empty()) {
-			ADD_FAILURE() << "a wall is a wall whatever the observer's walk speed, but sight passed "
-				      << "through " << corridor.Describe() << " at the following actor's speeds: "
-				      << AsRanges(sawThroughTheWall);
-		}
+		EXPECT_FALSE(PathFinder::IsVisibleLOS(corridor.map.Props(), SearchmapPoint { corridor.map.Start() },
+						      SearchmapPoint { corridor.map.End() }))
+			<< "sight passed through " << corridor.Describe();
 	}
 }
 
 // The same of the navmap sibling, which backs IsWalkableTo() and so Theta*'s line check.
-//
-// DISABLED: GetBlockedInLine() samples the line with the movement stride NormalizeDeltas() hands
-// Movable::DoStep() - two navmap pixels scaled by stepTime / walkScale. Scaling by speed is right
-// for moving an actor and wrong for sampling geometry, where the resolution has to come from the
-// tile being looked for. Fast actors stride clean over the wall; only speed 0, whose factor is a
-// bare 1 and so one navmap pixel per step, samples finely enough.
-TEST(PathFinderTest, DISABLED_AWallIsSeenOnTheNavmapLineAtEverySpeed)
+TEST(PathFinderTest, AWallIsAlwaysSeenOnTheNavmapLine)
 {
-	// the line walk asks gamedata for the step time as soon as the speed is non-zero
-	const test::ScopedStepTime stepTime;
-
-	// both consumers of GetBlockedInLine(): IsVisibleLOS() asks without stopping on impassable,
-	// IsWalkableTo() asks with. The flag also picks which blocked status function runs, so a wall
-	// has to be reported on either branch.
+	// stopOnImpassable also picks which blocked status function runs, so a wall has to be reported
+	// on either branch.
 	for (const bool stopOnImpassable : { false, true }) {
 		for (const WalledCorridor& corridor : WalledCorridors()) {
-			std::vector<int> missedTheWall;
-			for (int speed = 0; speed <= slowestSpeed; ++speed) {
-				const PathMapFlags blocked = PathFinder::GetBlockedInLine(
-					corridor.map.Props(), corridor.map.Start(), corridor.map.End(),
-					stopOnImpassable, speed, noCircle);
+			const PathMapFlags blocked = PathFinder::GetBlockedInLine(
+				corridor.map.Props(), corridor.map.Start(), corridor.map.End(),
+				stopOnImpassable, noCircle);
 
-				if (!bool(blocked & PathMapFlags::SIDEWALL)) {
-					missedTheWall.push_back(speed);
-				}
-			}
-
-			if (!missedTheWall.empty()) {
-				ADD_FAILURE() << "a wall is a wall whatever the observer's walk speed, but the navmap "
-					      << "line walk (stopOnImpassable " << std::boolalpha << stopOnImpassable
-					      << ") stepped over " << corridor.Describe()
-					      << " at the following actor's speeds: " << AsRanges(missedTheWall);
-			}
+			EXPECT_TRUE(bool(blocked & PathMapFlags::SIDEWALL))
+				<< "the navmap line walk (stopOnImpassable " << std::boolalpha << stopOnImpassable
+				<< ") stepped over " << corridor.Describe();
 		}
 	}
 }
@@ -1360,27 +1310,227 @@ TEST(PathFinderTest, APlainDoorIsSeenThroughWhereverItStands)
 {
 	for (const CorridorWithADoor& corridor : CorridorsWithADoorAt(Glyph::Door)) {
 		EXPECT_TRUE(PathFinder::IsVisibleLOS(corridor.map.Props(), SearchmapPoint { corridor.map.Start() },
-						     SearchmapPoint { corridor.map.End() }, noSpeed, noCircle))
+						     SearchmapPoint { corridor.map.End() }))
 			<< "a shut wooden door can be seen through, but one on tile " << corridor.doorTile
 			<< " stopped sight";
 	}
 }
 
 // The other half of the same property - opaque doors cannot be seen through.
-//
-// DISABLED: with no actor speed the tile space line walk strides two whole tiles, so an opaque
-// door blocks or not according to whether the stride happens to land on it - today it blocks on
-// the odd columns and is invisible on the even ones. Same defect as the === the line walk ===
-// tests state in general.
-TEST(PathFinderTest, DISABLED_AnOpaqueDoorBlocksSightWhereverItStands)
+TEST(PathFinderTest, AnOpaqueDoorBlocksSightWhereverItStands)
 {
 	for (const CorridorWithADoor& corridor : CorridorsWithADoorAt(Glyph::OpaqueDoor)) {
 		EXPECT_FALSE(PathFinder::IsVisibleLOS(corridor.map.Props(), SearchmapPoint { corridor.map.Start() },
-						      SearchmapPoint { corridor.map.End() }, noSpeed, noCircle))
+						      SearchmapPoint { corridor.map.End() }))
 			<< "an opaque door cannot be seen through, but sight passed through one on tile "
 			<< corridor.doorTile;
 	}
 }
+
+TEST(PathFinderTest, SamePointIsVisibleToItself)
+{
+	const TestSearchMap map {
+		"####",
+		"#SE#",
+		"####"
+	};
+	const SearchmapPoint p = SearchmapPoint(map.Start());
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), p, p));
+}
+
+TEST(PathFinderTest, OpenCorridorIsVisible)
+{
+	const TestSearchMap map {
+		"##########",
+		"#S.......#",
+		"#........#",
+		"#.......E#",
+		"##########"
+	};
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(map.Start()),
+					     SearchmapPoint(map.End())));
+}
+
+TEST(PathFinderTest, HorizontalVerticalAndDiagonalLinesAreVisible)
+{
+	const TestSearchMap map {
+		"#######",
+		"#S....#",
+		"#.....#",
+		"#....E#",
+		"#######"
+	};
+	const SearchmapPoint s = SearchmapPoint(map.Start());
+	const SearchmapPoint e = SearchmapPoint(map.End());
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), s, SearchmapPoint(e.x, s.y)));
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), s, SearchmapPoint(s.x, e.y)));
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), s, e));
+}
+
+TEST(PathFinderTest, WallRightNextToStartBlocks)
+{
+	const TestSearchMap map {
+		"########",
+		"#S#...E#",
+		"########"
+	};
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(map.Start()),
+					      SearchmapPoint(map.End())));
+}
+
+TEST(PathFinderTest, WallRightNextToTargetBlocks)
+{
+	const TestSearchMap map {
+		"########",
+		"#S...#E#",
+		"########"
+	};
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(map.Start()),
+					      SearchmapPoint(map.End())));
+}
+
+TEST(PathFinderTest, AdjacentTilesAreVisible)
+{
+	const TestSearchMap map {
+		"#####",
+		"#SE.#",
+		"#####"
+	};
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(map.Start()),
+					     SearchmapPoint(map.End())));
+}
+
+TEST(PathFinderTest, SingleTileWallBlocksSight)
+{
+	const TestSearchMap map {
+		"#########",
+		"#S..#..E#",
+		"#########"
+	};
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(map.Start()),
+					      SearchmapPoint(map.End())));
+}
+
+TEST(PathFinderTest, ThickWallBlocksSight)
+{
+	const TestSearchMap map {
+		"###########",
+		"#S..###..E#",
+		"###########"
+	};
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(map.Start()),
+					      SearchmapPoint(map.End())));
+}
+
+// Two walls meeting only at a corner: the segment from S to E runs exactly through the point the
+// four tiles share, and is never inside either wall. A ray has no width, so sight gets through.
+TEST(PathFinderTest, SightPassesThroughDiagonalWallJoints)
+{
+	const TestSearchMap map {
+		"####",
+		"#S#.",
+		"##E.",
+		"####"
+	};
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(map.Start()),
+					     SearchmapPoint(map.End())));
+}
+
+// A body is not a ray. It sits on integer pixels and has nowhere to be in a corner of zero width,
+// so a route may not thread the joint - if it did, the actor would walk into one of the two walls
+// and the wall probe in Movable::DoStep() would abandon the path on the corner.
+TEST(PathFinderTest, WalkingDoesNotThreadDiagonalWallJoints)
+{
+	const TestSearchMap map {
+		"####",
+		"#S#.",
+		"##E.",
+		"####"
+	};
+	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
+}
+
+// Only a joint is barred, not any diagonal that happens to touch a wall: rounding a single convex
+// corner is just walking past it, and a corridor two tiles wide running diagonally is made of
+// nothing else. Barring those too would leave the pathfinder unable to take a diagonal at all.
+TEST(PathFinderTest, WalkingRoundsASingleCornerDiagonally)
+{
+	const TestSearchMap map {
+		"##########",
+		"#S########",
+		"#..#######",
+		"##..######",
+		"###..#####",
+		"####..####",
+		"#####..###",
+		"######.E##",
+		"##########"
+	};
+	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
+
+	// the same corridor one tile wide is a chain of joints, and none of them may be threaded
+	const TestSearchMap narrow {
+		"##########",
+		"#S########",
+		"##.#######",
+		"###.######",
+		"####.#####",
+		"#####.####",
+		"######.###",
+		"#######E##",
+		"##########"
+	};
+	EXPECT_FALSE(PathFinder::IsWalkableTo(narrow.Props(), narrow.Start(), narrow.End(), true, noCircle));
+}
+
+// The wall down the middle has one gap, and the straight segment from S to E goes through it. A
+// walk that does not follow that segment - as NormalizeDeltas() does not - is lifted
+// four rows above it and meets the wall instead of the gap. Both queries have to see the gap.
+TEST(PathFinderTest, LineQueriesFollowTheRealSegment)
+{
+	const TestSearchMap map {
+		"#####################",
+		"#.........#.........#",
+		"#.........#.........#",
+		"#..S......#.........#",
+		"#.........#.........#",
+		"#...................#",
+		"#.........#.........#",
+		"#.........#......E..#",
+		"#.........#.........#",
+		"#.........#.........#",
+		"#####################"
+	};
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), SearchmapPoint(map.Start()),
+					     SearchmapPoint(map.End())));
+
+	// and the walkability query walks the same segment, so it agrees
+	EXPECT_FALSE(bool(PathFinder::GetBlockedInLine(map.Props(), map.Start(), map.End(), false, noCircle) &
+			  PathMapFlags::SIDEWALL));
+	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
+}
+
+TEST(PathFinderTest, NavmapPixelLOSUsesTheSameTileWalk)
+{
+	const TestSearchMap map {
+		"##########",
+		"#S...#...#",
+		"#....#...#",
+		"#....#..E#",
+		"##########"
+	};
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), map.Start(), map.End()));
+
+	const TestSearchMap clear {
+		"##########",
+		"#S.......#",
+		"#........#",
+		"#.......E#",
+		"##########"
+	};
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(clear.Props(), clear.Start(), clear.End()));
+}
+
 
 // === travel tiles ===
 
@@ -1466,16 +1616,16 @@ TEST(FindPathTest, WaypointsFaceAlongTheirLegs)
 // neighbours faces back the way it came instead.
 TEST(FindPathTest, BackAwayTurnsNearlyCollinearWaypointsRound)
 {
+	// the route has to bend gently: the collinearity rule only fires below an area2 of 300, and
+	// legs between tile centres give multiples of 192, so the turns must be of the mildest kind
+	// the tile grid can express
 	const TestSearchMap map {
-		"########",
-		"#S######",
-		"#.######",
-		"#..#####",
-		"##.#####",
-		"##..####",
-		"###.####",
-		"###E####",
-		"########"
+		"#######",
+		"#S....#",
+		"##.####",
+		"#.....#",
+		"#....E#",
+		"#######"
 	};
 
 	const Point from = map.Start();

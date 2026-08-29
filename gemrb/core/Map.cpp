@@ -1955,7 +1955,7 @@ std::vector<Actor*> Map::GetAllActorsInRadius(const Point& p, int flags, unsigne
 		}
 		//line of sight visibility
 		const bool isLosRequired = !(flags & GA_NO_LOS);
-		const bool isOutOfSight = isLosRequired && !PathFinder::IsVisibleLOS(tileProps, actor->Pos, p, actor);
+		const bool isOutOfSight = isLosRequired && !PathFinder::IsVisibleLOS(tileProps, actor->Pos, p);
 		if (isOutOfSight) {
 			continue;
 		}
@@ -2307,14 +2307,14 @@ PathMapFlags Map::GetBlockedInRadius(const NavmapPoint& p, unsigned int size, bo
 }
 
 // PathMapFlags::SIDEWALL obstructs LOS, while PathMapFlags::IMPASSABLE doesn't
-bool Map::IsVisibleLOS(const Point& s, const Point& d, const Actor* caller) const
+bool Map::IsVisibleLOS(const Point& s, const Point& d) const
 {
-	return PathFinder::IsVisibleLOS(tileProps, s, d, caller);
+	return PathFinder::IsVisibleLOS(tileProps, s, d);
 }
 
-bool Map::IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller) const
+bool Map::IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d) const
 {
-	return PathFinder::IsVisibleLOS(tileProps, s, d, caller);
+	return PathFinder::IsVisibleLOS(tileProps, s, d);
 }
 
 // Used by the pathfinder, so PathMapFlags::IMPASSABLE obstructs walkability

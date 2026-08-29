@@ -278,9 +278,23 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	assert(!step.point.IsZero());
 
 	Point nmptStep = step.point;
-	float_t dx = nmptStep.x - Pos.x;
-	float_t dy = nmptStep.y - Pos.y;
-	PathFinder::NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / float_t(walkScale));
+	const float_t remainingX = nmptStep.x - Pos.x;
+	const float_t remainingY = nmptStep.y - Pos.y;
+	float_t dx = remainingX;
+	float_t dy = remainingY;
+	PathFinder::ScaleDeltas(dx, dy, float_t(gamedata->GetStepTime()) / float_t(walkScale));
+
+	// The whole pixels this frame gets to spend, fraction carried over. Clamped to what is left of
+	// the leg so the actor still lands exactly on the waypoint.
+	const float_t wantX = dx + stepFractionX;
+	const float_t wantY = dy + stepFractionY;
+	const float_t moveX = Clamp(std::trunc(wantX), -std::fabs(remainingX), std::fabs(remainingX));
+	const float_t moveY = Clamp(std::trunc(wantY), -std::fabs(remainingY), std::fabs(remainingY));
+	stepFractionX = wantX - moveX;
+	stepFractionY = wantY - moveY;
+
+	// dx/dy stay the real step from here on: they aim the collision lookahead and the wall probe,
+	// which have to point where the actor is going even on a frame that spends no whole pixel.
 	if (dx == 0 && dy == 0) {
 		// probably shouldn't happen, but it does when running bg2's cut28a set of cutscenes
 		LogDebugPathfinder("Movable::DoStep", "{}: ZERO-DELTA ABANDON at Pos={} step={} step {}/{} dest={}",
@@ -341,8 +355,9 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 			return;
 		}
 	}
-	// Stop if there's a door in the way
-	const Point wallProbe = Pos + Point(dx, dy);
+	// Stop if there's a door in the way.
+	// Check where the actor will really be after this frame, fraction included
+	const Point wallProbe(std::lround(Pos.x + dx), std::lround(Pos.y + dy));
 	if (blocksSearch && !core->InCutSceneMode() && bool(area->GetBlocked(wallProbe) & PathMapFlags::SIDEWALL)) {
 		LogDebugPathfinder("Movable::DoStep", "{}: WALL ABANDON at Pos={} SM={} probe={} probeFlags={} stepTarget={} "
 						      "delta=({},{}) step {}/{} dest={} bumped={} probeRadiusFlags={} posFlags={}",
@@ -364,7 +379,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	if (InternalFlags & IF_RUNNING) {
 		SetStanceDirect(IE_ANI_RUN);
 	}
-	SetPos(NavmapPoint(Pos.x + dx, Pos.y + dy));
+	SetPos(NavmapPoint(Pos.x + moveX, Pos.y + moveY));
 	oldPos = Pos;
 	if (actor && blocksSearch) {
 		auto flag = actor->IsInExtendedParty() ? PathMapFlags::PC : PathMapFlags::NPC;
@@ -374,6 +389,9 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	SetOrientation(step.orient, false);
 	timeStartStep = time;
 	if (Pos == nmptStep) {
+		// a new leg has its own direction; carrying the old one's leftover into it would bias it
+		stepFractionX = 0;
+		stepFractionY = 0;
 		path.nodes[path.currentStep].waypoint = false;
 		++path.currentStep;
 		if (path.currentStep >= path.Size()) {
@@ -726,6 +744,8 @@ void Movable::ClearPath(bool resetDestination)
 		InternalFlags &= ~IF_NORETICLE;
 	}
 	path.Clear();
+	stepFractionX = 0;
+	stepFractionY = 0;
 	SetMovementState(MovementState::NoMovement);
 	PathFinderScheduler::CancelPath(pathRequestId);
 	pathRequestId = FindPathRequestId::NullId();

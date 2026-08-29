@@ -516,8 +516,8 @@ public:
 	PathMapFlags GetBlockedInRadius(const NavmapPoint&, unsigned int size, bool stopOnImpassable = true) const;
 	PathMapFlags GetBlocked(const NavmapPoint&) const;
 	PathMapFlags GetBlockedTile(const SearchmapPoint&) const;
-	bool IsVisibleLOS(const Point& s, const Point& d, const Actor* caller) const;
-	bool IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller) const;
+	bool IsVisibleLOS(const Point& s, const Point& d) const;
+	bool IsVisibleLOS(const SearchmapPoint& s, const SearchmapPoint& d) const;
 	bool IsWalkableTo(const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller) const;
 	bool IsWalkableTo(const SearchmapPoint& s, const SearchmapPoint& d, bool actorsAreBlocking, const Actor* caller) const;
 	void AdjustPosition(SearchmapPoint& goal, const Size& startingRadius = ZeroSize, int size = -1) const;

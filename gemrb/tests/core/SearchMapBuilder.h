@@ -562,7 +562,7 @@ namespace test {
 		Point previous = from;
 		for (size_t i = 0; i < path.Size(); ++i) {
 			const Point step = path.GetStep(i).point;
-			const PathMapFlags leg = PathFinder::GetBlockedInLine(map.Props(), previous, step, false, 0, 0);
+			const PathMapFlags leg = PathFinder::GetBlockedInLine(map.Props(), previous, step, false, 0);
 			if (bool(leg & (PathMapFlags::SIDEWALL | PathMapFlags::DOOR_IMPASSABLE))) {
 				return testing::AssertionFailure()
 					<< "leg " << i << ", (" << previous.x << ',' << previous.y << ") -> ("

@@ -25,9 +25,8 @@ class MovementTest : public GameMapTest {
 // engine ever steps, so a wall cannot hide between two samples.
 static testing::AssertionResult StepStayedOffWalls(const TestSearchMap& drawn, const Point& from, const Point& to)
 {
-	constexpr int noSpeed = 0;
 	constexpr int noCircle = 0;
-	const PathMapFlags crossed = PathFinder::GetBlockedInLine(drawn.Props(), from, to, false, noSpeed, noCircle);
+	const PathMapFlags crossed = PathFinder::GetBlockedInLine(drawn.Props(), from, to, false, noCircle);
 	if (bool(crossed & (PathMapFlags::SIDEWALL | PathMapFlags::DOOR_IMPASSABLE))) {
 		return testing::AssertionFailure()
 			<< "step (" << from.x << ',' << from.y << ") -> (" << to.x << ',' << to.y << ") crosses a wall";

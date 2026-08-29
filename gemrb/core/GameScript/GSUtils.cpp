@@ -596,7 +596,7 @@ int CanSee(const Scriptable* Sender, const Scriptable* target, bool range, int s
 		}
 	}
 
-	return map->IsVisibleLOS(target->SMPos, Sender->SMPos, snd);
+	return map->IsVisibleLOS(target->SMPos, Sender->SMPos);
 }
 
 //non actors can see too (reducing function to LOS)
@@ -1582,7 +1582,7 @@ void AttackCore(Scriptable* Sender, Scriptable* target, int flags)
 	float_t angle = AngleFromPoints(attacker->Pos, target->Pos);
 	if (attacker->GetCurrentArea() != target->GetCurrentArea() ||
 	    !WithinPersonalRange(attacker, target, weaponRange) ||
-	    !attacker->GetCurrentArea()->IsVisibleLOS(attacker->Pos, target->Pos, attacker) ||
+	    !attacker->GetCurrentArea()->IsVisibleLOS(attacker->Pos, target->Pos) ||
 	    !CanSee(attacker, target, true, 0)) {
 		MoveNearerTo(attacker, target, Feet2Pixels(weaponRange, angle));
 		return;
@@ -2320,7 +2320,7 @@ void SpellCore(Scriptable* Sender, Holder<Action>parameters, int flags)
 				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 				return;
 			}
-			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, tar->SMPos, act)) {
+			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, tar->SMPos)) {
 				if (!(spl->Flags & SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					MoveNearerTo(Sender, tar, dist, MNT::FinalDistance);
@@ -2446,7 +2446,7 @@ void SpellPointCore(Scriptable* Sender, Holder<Action>parameters, int flags)
 				MoveNearerTo(Sender, parameters->pointParameter, dist, MNT::FinalDistance);
 				return;
 			}
-			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, SearchmapPoint(parameters->pointParameter), act)) {
+			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->SMPos, SearchmapPoint(parameters->pointParameter))) {
 				const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
 				if (!(spl->Flags & SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
