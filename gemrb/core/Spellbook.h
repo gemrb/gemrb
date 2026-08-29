@@ -186,7 +186,7 @@ public:
 	/** sets the book type */
 	void SetBookType(int clss);
 	/** adds a spell to the book, returns experience if learned */
-	int LearnSpell(Spell* spell, int memo, unsigned int clsmsk, unsigned int kit, int level = -1);
+	int LearnSpell(const Spell* spell, int memo, unsigned int clsmsk, unsigned int kit, int level = -1);
 	Holder<CREKnownSpell> GetKnownSpell(int type, unsigned int level, unsigned int index) const;
 	unsigned int GetMemorizedSpellsCount(int type, bool real) const;
 	unsigned int GetMemorizedSpellsCount(int type, unsigned int level, bool real) const;

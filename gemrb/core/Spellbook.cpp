@@ -456,7 +456,7 @@ void Spellbook::SetBookType(int bt)
 //in the right group
 //the rest are stored as innate
 
-int Spellbook::LearnSpell(Spell* spell, int memo, unsigned int clsmsk, unsigned int kit, int level)
+int Spellbook::LearnSpell(const Spell* spell, int memo, unsigned int clsmsk, unsigned int kit, int level)
 {
 	auto spl = MakeHolder<CREKnownSpell>();
 	spl->SpellResRef = spell->Name;
@@ -486,10 +486,7 @@ int Spellbook::LearnSpell(Spell* spell, int memo, unsigned int clsmsk, unsigned 
 		//not IWD2
 		if (spell->SpellType < 6) {
 			spl->Type = spelltypes[spell->SpellType];
-			if (spell->SpellLevel == 0) { // totemic druid has some broken innates (fixed by fixpack)
-				spell->SpellLevel = 1;
-			}
-			spl->Level = static_cast<ieWord>(spell->SpellLevel - 1);
+			spl->Level = static_cast<ieWord>(std::max(1U, spell->SpellLevel) - 1);
 		} else {
 			spl->Type = IE_SPELL_TYPE_INNATE;
 		}
