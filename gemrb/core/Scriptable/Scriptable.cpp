@@ -800,14 +800,15 @@ void Scriptable::ModifyProjectile(std::unique_ptr<Projectile>& pro, Spell* spl, 
 
 void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int level, bool fake)
 {
-	Spell* spl = gamedata->GetSpell(spellResRef);
+	const Spell* splBase = gamedata->GetSpell(spellResRef);
+	Spell spl(*splBase);
 	Actor* caster = Scriptable::As<Actor>(this);
 
 	//PST has a weird effect, called Enoll Eva's duplication
 	//it creates every projectile of the affected actor twice
 	int projectileCount = 1;
 	if (caster) {
-		if (spl->Flags & (SF_HOSTILE | SF_BREAK_SANCTUARY)) {
+		if (spl.Flags & (SF_HOSTILE | SF_BREAK_SANCTUARY)) {
 			caster->CureSanctuary();
 		}
 
@@ -830,7 +831,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 			tct = caster->wildSurgeMods.target_change_type;
 		}
 		if (!caster || !tct || tct == WSTC_ADDTYPE || !caster->wildSurgeMods.projectile_id) {
-			pro = spl->GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
+			pro = spl.GetProjectile(this, SpellHeader, level, objects.LastTargetPos);
 			if (!pro) {
 				return;
 			}
@@ -847,7 +848,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 		}
 
 		if (caster) {
-			ModifyProjectile(pro, spl, tgt, level);
+			ModifyProjectile(pro, &spl, tgt, level);
 		}
 		// only one wall of the same type can be up at the same time
 		if (pro->ExtFlags & PEF_WALL && !area->IsProjectileUnique(pro->GetType())) {
@@ -869,7 +870,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 		// spellcasting feedback
 		// iwd2: only display it for party friendly creatures - enemies require a successful spellcraft check
 		if (!third || (caster && caster->GetStat(IE_EA) <= EA_CONTROLLABLE)) {
-			DisplaySpellCastMessage(tgt, spl);
+			DisplaySpellCastMessage(tgt, &spl);
 		}
 	}
 	// only trigger the autopause when in combat or buffing gets very annoying
@@ -877,7 +878,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 		core->Autopause(AUTOPAUSE::SPELLCAST, this);
 	}
 
-	gamedata->FreeSpell(spl, spellResRef, false);
+	gamedata->FreeSpell(splBase, spellResRef, false);
 }
 
 void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell* spl) const
@@ -1347,17 +1348,18 @@ static EffectRef fx_castingspeed_modifier_ref = { "CastingSpeedModifier", -1 };
 //start spellcasting (common part)
 int Scriptable::SpellCast(bool instant, Scriptable* target, int level)
 {
-	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	const Spell* splBase = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	Spell spl(*splBase);
 	Actor* actor = Scriptable::As<Actor>(this);
 	if (actor) {
 		//The ext. index is here to calculate the casting time
-		if (!level) level = actor->GetCasterLevel(spl->SpellType);
-		SpellHeader = spl->GetHeaderIndexFromLevel(level);
+		if (!level) level = actor->GetCasterLevel(spl.SpellType);
+		SpellHeader = spl.GetHeaderIndexFromLevel(level);
 	} else {
 		SpellHeader = 0;
 	}
 
-	const SPLExtHeader* header = spl->GetExtHeader(SpellHeader);
+	const SPLExtHeader* header = spl.GetExtHeader(SpellHeader);
 	int casting_time = (int) header->CastingTime;
 	// how does this work for non-actors exactly?
 	if (actor) {
@@ -1388,12 +1390,12 @@ int Scriptable::SpellCast(bool instant, Scriptable* target, int level)
 		if (!(actor->Modified[IE_AVATARREMOVAL] || instant)) {
 			ieDword gender = actor->GetCGGender();
 			fxqueue.SetOwner(actor);
-			spl->AddCastingGlow(&fxqueue, duration, gender);
+			spl.AddCastingGlow(&fxqueue, duration, gender);
 			fxqueue.AddAllEffects(actor, Point());
 		}
 
 		// actual cfb
-		fxqueue = spl->GetEffectBlock(this, this->Pos, -1, level);
+		fxqueue = spl.GetEffectBlock(this, this->Pos, -1, level);
 		fxqueue.SetOwner(actor);
 		if (target && target->Type == ST_ACTOR) {
 			fxqueue.AddAllEffects((Actor*) target, target->Pos);
@@ -1409,7 +1411,7 @@ int Scriptable::SpellCast(bool instant, Scriptable* target, int level)
 		actor->ResetCommentTime();
 	}
 
-	gamedata->FreeSpell(spl, SpellResRef, false);
+	gamedata->FreeSpell(splBase, SpellResRef, false);
 	core->SetEventFlag(EF_ACTION); // in case it was cast from a quickspell slot, so we update the count
 	return duration;
 }

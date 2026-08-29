@@ -6387,13 +6387,14 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 			return LSR_KNOWN;
 		}
 	}
-	Spell* spell = gamedata->GetSpell(spellname);
-	if (!spell) {
+	const Spell* spellBase = gamedata->GetSpell(spellname);
+	if (!spellBase) {
 		return LSR_INVALID; //not existent spell
 	}
+	Spell spell(*spellBase);
 
 	//innates are always memorized when gained
-	if (spell->SpellType == IE_SPL_INNATE) {
+	if (spell.SpellType == IE_SPL_INNATE) {
 		flags |= LS_MEMO;
 	}
 
@@ -6404,8 +6405,8 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 		int roll = LuckyRoll(1, 100, 0);
 		// adjust the roll for specialist mages
 		// doesn't work in bg1, since its spells don't have PrimaryType set (0 is NONE)
-		if (!third && GetKitIndex(kit) && spell->PrimaryType) {
-			if (kit == (unsigned) 1 << (spell->PrimaryType + 5)) { // +5 since the kit values start at 0x40
+		if (!third && GetKitIndex(kit) && spell.PrimaryType) {
+			if (kit == (unsigned) 1 << (spell.PrimaryType + 5)) { // +5 since the kit values start at 0x40
 				roll += 15;
 			} else {
 				roll -= 15;
@@ -6421,11 +6422,11 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 	if (bookmask == -1) {
 		bookmask = GetBookMask();
 	}
-	int explev = spellbook.LearnSpell(spell, flags & LS_MEMO, bookmask, kit, level);
+	int explev = spellbook.LearnSpell(&spell, flags & LS_MEMO, bookmask, kit, level);
 	HCStrings message = HCStrings::count;
 	if (flags & LS_LEARN) {
-		core->GetTokenDictionary()["SPECIALABILITYNAME"] = core->GetString(spell->SpellName);
-		switch (spell->SpellType) {
+		core->GetTokenDictionary()["SPECIALABILITYNAME"] = core->GetString(spell.SpellName);
+		switch (spell.SpellType) {
 			case IE_SPL_INNATE:
 				message = HCStrings::GotAbility;
 				break;
@@ -6437,7 +6438,7 @@ int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int 
 				break;
 		}
 	}
-	gamedata->FreeSpell(spell, spellname, false);
+	gamedata->FreeSpell(spellBase, spellname, false);
 	if (!explev) {
 		return LSR_INVALID;
 	}

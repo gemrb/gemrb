@@ -145,7 +145,7 @@ public:
 
 	Item* GetItem(const ResRef& resname, bool silent = false);
 	void FreeItem(Item const* itm, const ResRef& name, bool free = false);
-	Spell* GetSpell(const ResRef& resname, bool silent = false);
+	const Spell* GetSpell(const ResRef& resname, bool silent = false);
 	void FreeSpell(const Spell* spl, const ResRef& name, bool free = false);
 	// returns a fresh copy of a (cached) effect
 	std::unique_ptr<Effect> GetEffect(const ResRef& resname);

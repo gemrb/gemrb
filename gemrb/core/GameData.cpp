@@ -176,7 +176,7 @@ void GameData::FreeItem(Item const* /*itm*/, const ResRef& name, bool free)
 	ItemCache.DecRef(name, free);
 }
 
-Spell* GameData::GetSpell(const ResRef& resname, bool silent)
+const Spell* GameData::GetSpell(const ResRef& resname, bool silent)
 {
 	if (resname.IsEmpty()) {
 		return nullptr;

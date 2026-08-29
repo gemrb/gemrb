@@ -2457,12 +2457,13 @@ static int fx_area_effect(Scriptable* Owner, Actor* target, Effect* fx)
 
 	fx->Parameter4 = game->GameTime + fx->Parameter3;
 
-	Spell* spell = gamedata->GetSpell(fx->Resource);
-	if (!spell) {
+	const Spell* spellBase = gamedata->GetSpell(fx->Resource);
+	if (!spellBase) {
 		return FX_NOT_APPLIED;
 	}
+	Spell spell(*spellBase);
 
-	EffectQueue fxqueue = spell->GetEffectBlock(Owner, fx->Pos, 0, fx->CasterLevel);
+	EffectQueue fxqueue = spell.GetEffectBlock(Owner, fx->Pos, 0, fx->CasterLevel);
 	fxqueue.SetOwner(Owner);
 	//bit 2 original target is excluded or not excluded
 	fxqueue.AffectAllInRange(map, fx->Pos, 0, 0, fx->Parameter1, fx->Parameter2 & AE_TARGETEXCL ? target : nullptr);
@@ -2673,7 +2674,8 @@ static int fx_projectile_use_effect_list(Scriptable* Owner, Actor* target, Effec
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	Spell* spl = gamedata->GetSpell(fx->Resource);
+	const Spell* splBase = gamedata->GetSpell(fx->Resource);
+	Spell spl(*splBase);
 	//create projectile from known spellheader
 	//cannot get the projectile from the spell
 	auto pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
@@ -2681,7 +2683,7 @@ static int fx_projectile_use_effect_list(Scriptable* Owner, Actor* target, Effec
 	if (pro) {
 		Point origin = fx->Pos;
 
-		pro->SetEffects(spl->GetEffectBlock(Owner, origin, 0, fx->CasterLevel, fx->Parameter2));
+		pro->SetEffects(spl.GetEffectBlock(Owner, origin, 0, fx->CasterLevel, fx->Parameter2));
 		pro->SetCaster(fx->CasterID, fx->CasterLevel);
 		if (target) {
 			map->AddProjectile(std::move(pro), origin, target->GetGlobalID(), false);

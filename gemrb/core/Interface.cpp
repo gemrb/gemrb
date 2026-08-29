@@ -3649,25 +3649,28 @@ int Interface::CanMoveItem(const CREItem* item) const
 // dealing with applying effects
 void Interface::ApplySpell(const ResRef& spellRef, Actor* actor, Scriptable* caster, int level) const
 {
-	Spell* spell = gamedata->GetSpell(spellRef);
-	if (!spell) {
+	const Spell* spellBase = gamedata->GetSpell(spellRef);
+	if (!spellBase) {
 		return;
 	}
 
-	int header = spell->GetHeaderIndexFromLevel(level);
+	Spell spell(*spellBase);
+	int header = spell.GetHeaderIndexFromLevel(level);
 
-	auto block = spell->GetEffectBlock(caster, actor->Pos, header, level);
+	auto block = spell.GetEffectBlock(caster, actor->Pos, header, level);
 	ApplyEffectQueue(&block, actor, caster, actor->Pos);
 }
 
 void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point& pos, Scriptable* caster, int level) const
 {
-	Spell* spell = gamedata->GetSpell(spellRef);
-	if (!spell) {
+	const Spell* spellBase = gamedata->GetSpell(spellRef);
+	if (!spellBase) {
 		return;
 	}
-	int header = spell->GetHeaderIndexFromLevel(level);
-	auto pro = spell->GetProjectile(caster, header, level, pos);
+
+	Spell spell(*spellBase);
+	int header = spell.GetHeaderIndexFromLevel(level);
+	auto pro = spell.GetProjectile(caster, header, level, pos);
 	pro->SetCaster(caster->GetGlobalID(), level);
 	area->AddProjectile(std::move(pro), caster->Pos, pos);
 }
