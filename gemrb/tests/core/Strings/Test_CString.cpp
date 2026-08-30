@@ -7,6 +7,7 @@
 #include "Strings/CString.h"
 
 #include <gtest/gtest.h>
+#include <string>
 
 namespace GemRB {
 
@@ -23,6 +24,18 @@ TEST(CStringTest, IsASCII)
 
 	unit3 = FixedSizeString<3> { "ab\xFE" };
 	EXPECT_FALSE(unit3.IsASCII());
+}
+
+TEST(CStringTest, EmptyRangeAssign)
+{
+	auto unit = FixedSizeString<8> { "abc" };
+	std::string empty;
+	unit = empty;
+	EXPECT_TRUE(unit.empty());
+	EXPECT_STREQ("", unit.c_str());
+
+	auto fromEmpty = FixedSizeString<8> { "" };
+	EXPECT_TRUE(fromEmpty.empty());
 }
 
 TEST(CStringTest, Format)

@@ -20,6 +20,8 @@
 #include <cstdio>
 #include <cstring>
 #include <cwctype>
+#include <iterator>
+#include <memory>
 
 #ifndef WIN32
 	#define stricmp  strcasecmp
@@ -87,6 +89,22 @@ class FixedSizeString {
 	static_assert(LEN < 255, "Cannot create FixedSizeString larger than 255 characters");
 	char str[LEN + 1] { '\0' };
 
+	template<typename STR>
+	void CopyFrom(const STR& s) noexcept
+	{
+		const auto src = std::begin(s);
+		const auto srcLen = static_cast<size_t>(std::distance(src, std::end(s)));
+		if (srcLen == 0) {
+			std::fill(begin(), bufend(), '\0');
+		} else {
+			size_t n = std::min(srcLen, LEN);
+			std::copy_n(std::addressof(*src), n, str);
+			if (n < LEN) {
+				std::fill_n(str + n, LEN - n, '\0');
+			}
+		}
+	}
+
 public:
 	using size_type = uint8_t;
 	using iterator = char*;
@@ -113,13 +131,13 @@ public:
 	template<typename STR, ENABLE_CHAR_RANGE(STR)>
 	FixedSizeString(const STR& s) noexcept
 	{
-		strncpy(str, &s[0], LEN);
+		CopyFrom(s);
 	}
 
 	template<typename STR, ENABLE_CHAR_RANGE(STR)>
 	FixedSizeString& operator=(const STR& s) noexcept
 	{
-		strncpy(str, &s[0], LEN);
+		CopyFrom(s);
 		return *this;
 	}
 
