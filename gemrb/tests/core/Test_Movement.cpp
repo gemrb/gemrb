@@ -37,7 +37,7 @@ static testing::AssertionResult StepStayedOffWalls(const TestSearchMap& drawn, c
 
 // Runs frames until the actor stops moving, checking every single step against a wall. Returns
 // how many frames it took, or the budget if it never arrived.
-static int WalkUntilStopped(const TestGameMap& live, Actor* actor, int frameBudget = 200)
+static int WalkUntilStopped(const TestGameMap& live, const Actor* actor, int frameBudget = 200)
 {
 	int frames = 0;
 	for (; frames < frameBudget && actor->InMove(); ++frames) {

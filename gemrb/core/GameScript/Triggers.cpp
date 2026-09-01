@@ -1554,7 +1554,7 @@ int GameScript::Range(Scriptable* Sender, const Trigger* parameters)
 		case ST_PROXIMITY:
 		case ST_TRAVEL:
 		case ST_TRIGGER:
-			InfoPoint* ip;
+			const InfoPoint* ip;
 			ip = Scriptable::As<InfoPoint>(Sender);
 			if (ip->GetUsePoint()) {
 				senderPos = SearchmapPoint(ip->UsePoint);

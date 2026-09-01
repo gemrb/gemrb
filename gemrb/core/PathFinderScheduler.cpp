@@ -607,7 +607,7 @@ void PathFinderScheduler::Sync(const std::vector<Map*>& allMaps)
 		}
 		// remove all stale requests from the scheduled queue
 		for (size_t queueIdx = 0; queueIdx < ScheduledQueuesPrioritiesCount; ++queueIdx) {
-			for (auto& request : staleRequestsPerQueue[queueIdx]) {
+			for (const auto& request : staleRequestsPerQueue[queueIdx]) {
 				workerScheduledQueuesByPriority[queueIdx].erase(request);
 			}
 		}
@@ -615,7 +615,7 @@ void PathFinderScheduler::Sync(const std::vector<Map*>& allMaps)
 		// 3. Handle all incoming requests
 		// 3.1. Assign each incoming request to its proper (selected by priority) scheduled
 		// queue on the worker threads side
-		for (auto& incomingRequest : incomingRequests) {
+		for (const auto& incomingRequest : incomingRequests) {
 			auto workerData = FindPathRequestWorkerData {
 				incomingRequest.second,
 				currentSyncFrameNumber,
