@@ -634,7 +634,7 @@ Targets* GameScript::StrongestOfMale(const Scriptable* Sender, Targets* paramete
 {
 	const Map* area = Sender->GetCurrentArea();
 	const Game* game = core->GetGame();
-	Scriptable* scr = NULL;
+	Scriptable* scr = nullptr;
 	int besthp = 0;
 	int i = game->GetPartySize(false);
 	while (i--) {
@@ -658,7 +658,7 @@ Targets* GameScript::StrongestOf(const Scriptable* Sender, Targets* parameters, 
 {
 	const Map* area = Sender->GetCurrentArea();
 	const Game* game = core->GetGame();
-	Scriptable* scr = NULL;
+	Scriptable* scr = nullptr;
 	int besthp = 0;
 	int i = game->GetPartySize(false);
 	while (i--) {
@@ -681,7 +681,7 @@ Targets* GameScript::WeakestOf(const Scriptable* Sender, Targets* parameters, in
 {
 	const Map* area = Sender->GetCurrentArea();
 	const Game* game = core->GetGame();
-	Scriptable* scr = NULL;
+	Scriptable* scr = nullptr;
 	int worsthp = 0;
 	int i = game->GetPartySize(false);
 	while (i--) {
@@ -704,7 +704,7 @@ Targets* GameScript::BestAC(const Scriptable* Sender, Targets* parameters, int g
 {
 	const Map* area = Sender->GetCurrentArea();
 	const Game* game = core->GetGame();
-	Scriptable* scr = NULL;
+	Scriptable* scr = nullptr;
 	int bestac = 0;
 	int i = game->GetPartySize(false);
 	while (i--) {
@@ -727,7 +727,7 @@ Targets* GameScript::WorstAC(const Scriptable* Sender, Targets* parameters, int 
 {
 	const Map* area = Sender->GetCurrentArea();
 	const Game* game = core->GetGame();
-	Scriptable* scr = NULL;
+	Scriptable* scr = nullptr;
 	int worstac = 0;
 	int i = game->GetPartySize(false);
 	while (i--) {
@@ -750,7 +750,7 @@ Targets* GameScript::MostDamagedOf(const Scriptable* Sender, Targets* parameters
 {
 	const Map* area = Sender->GetCurrentArea();
 	const Game* game = core->GetGame();
-	Scriptable* scr = NULL;
+	Scriptable* scr = nullptr;
 	int worsthp = 0;
 	int i = game->GetPartySize(false);
 	while (i--) {
@@ -774,7 +774,7 @@ Targets* GameScript::LeastDamagedOf(const Scriptable* Sender, Targets* parameter
 {
 	const Map* area = Sender->GetCurrentArea();
 	const Game* game = core->GetGame();
-	Scriptable* scr = NULL;
+	Scriptable* scr = nullptr;
 	int besthp = 0;
 	int i = game->GetPartySize(false);
 	while (i--) {
@@ -1015,7 +1015,7 @@ Targets* GameScript::NearestPC(const Scriptable* Sender, Targets* parameters, in
 	const Game* game = core->GetGame();
 	int i = game->GetPartySize(true);
 	int mindist = -1;
-	Actor* ac = NULL;
+	Actor* ac = nullptr;
 	while (i--) {
 		Actor* newactor = game->GetPC(i, true);
 		//NearestPC for PC's will not give themselves as a result

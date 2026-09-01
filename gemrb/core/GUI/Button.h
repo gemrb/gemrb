@@ -60,7 +60,7 @@ struct ButtonBorder {
 	bool enabled;
 };
 
-#define MAX_NUM_BORDERS 3
+constexpr int MAX_NUM_BORDERS = 3;
 
 enum class ButtonImage : unsigned int {
 	Unpressed,

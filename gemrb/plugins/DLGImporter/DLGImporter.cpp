@@ -126,12 +126,12 @@ Holder<DialogTransition> DLGImporter::GetTransition(unsigned int index) const
 	return MakeHolder<DialogTransition>(std::move(dt));
 }
 
-static char** GetStrings(const char* string, unsigned int& count);
+static std::vector<std::string> GetStrings(const char* string, unsigned int& count);
 
 Holder<Condition> DLGImporter::GetCondition(const char* string) const
 {
 	unsigned int count;
-	char** lines = GetStrings(string, count);
+	auto lines = GetStrings(string, count);
 	Condition condition;
 	for (size_t i = 0; i < count; ++i) {
 		Holder<Trigger> trigger = GenerateTrigger(lines[i]);
@@ -140,9 +140,7 @@ Holder<Condition> DLGImporter::GetCondition(const char* string) const
 		} else {
 			condition.triggers.push_back(trigger);
 		}
-		free(lines[i]);
 	}
-	free(lines);
 	return MakeHolder<Condition>(std::move(condition));
 }
 
@@ -207,7 +205,7 @@ std::vector<Holder<Action>> DLGImporter::GetAction(unsigned int index) const
 	str->Read(string, Length);
 	string[Length] = 0;
 	unsigned int count;
-	char** lines = GetStrings(string, count);
+	auto lines = GetStrings(string, count);
 	std::vector<Holder<Action>> actions;
 	for (size_t i = 0; i < count; ++i) {
 		auto action = GenerateAction(lines[i]);
@@ -216,9 +214,7 @@ std::vector<Holder<Action>> DLGImporter::GetAction(unsigned int index) const
 		} else {
 			actions.push_back(action);
 		}
-		free(lines[i]);
 	}
-	free(lines);
 	free(string);
 	return actions;
 }
@@ -268,7 +264,7 @@ static int GetActionLength(const char* string)
      pst's FORGE.DLG (trigger split across two lines),
      bg2's SAHIMP02.DLG (missing quotemark in string),
      bg2's QUAYLE.DLG (missing closing bracket) */
-static char** GetStrings(const char* string, unsigned int& count)
+static std::vector<std::string> GetStrings(const char* string, unsigned int& count)
 {
 	int level = 0;
 	bool quotes = true;
@@ -318,10 +314,12 @@ static char** GetStrings(const char* string, unsigned int& count)
 		}
 	}
 	if (!count) {
-		return nullptr;
+		return {};
 	}
-	char** strings = (char**) calloc(count, sizeof(char*));
-	if (strings == nullptr) {
+
+	std::vector<std::string> strings;
+	strings.resize(count);
+	if (strings.empty()) {
 		count = 0;
 		return strings;
 	}
@@ -343,7 +341,7 @@ static char** GetStrings(const char* string, unsigned int& count)
 			i--;
 			continue;
 		}
-		strings[i] = (char*) malloc(len + 1);
+		strings[i].resize(len + 1);
 		int j;
 		for (j = 0; len; poi++, len--) {
 			if (isspace(*poi))

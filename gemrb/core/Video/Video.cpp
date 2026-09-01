@@ -243,6 +243,7 @@ Holder<Sprite2D> Video::SpriteScaleDown(const Holder<Sprite2D>& sprite, unsigned
 Color Video::SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio) const
 {
 	// TODO: turn this into one of our software "shaders"
+	assert(ratio > 0);
 	Color sum;
 	unsigned int count = ratio * ratio;
 	unsigned int r = 0, g = 0, b = 0, a = 0;
