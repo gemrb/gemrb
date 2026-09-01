@@ -1790,7 +1790,7 @@ static PyObject* GemRB_Control_SetStatus(PyObject* self, PyObject* args)
 		case IE_GUI_WORLDMAP:
 			break;
 		default:
-			ctrl->SetValue(status);
+			ctrl->SetValue(static_cast<Control::value_t>(status));
 			break;
 	}
 
@@ -10686,7 +10686,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		}
 
 		if (!Picture) {
-			btn->SetState(Button::DISABLED);
+			btn->SetState(Button::State::DISABLED);
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BitOp::SET);
 			btn->SetTooltip(u"");
 		} else {
@@ -10696,7 +10696,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			SetButtonCycle(bam, btn, 2, ButtonImage::Selected);
 			SetButtonCycle(bam, btn, 3, ButtonImage::Disabled);
 			btn->SetPicture(std::move(Picture));
-			btn->SetState(Button::UNPRESSED);
+			btn->SetState(Button::State::UNPRESSED);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_ALIGN_RIGHT, BitOp::SET);
 
 			SetViewTooltipFromRef(btn, item.Tooltip);
@@ -10704,7 +10704,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			if (item.Charges && item.Charges != 0xffff) {
 				SetItemText(btn, item.Charges, false);
 			} else if (!item.Charges && item.ChargeDepletion == CHG_NONE) {
-				btn->SetState(Button::DISABLED);
+				btn->SetState(Button::State::DISABLED);
 			}
 		}
 	}

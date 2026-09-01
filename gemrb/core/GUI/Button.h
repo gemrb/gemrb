@@ -84,7 +84,7 @@ public:
 	};
 
 	// NOTE: keep these synchronized with GUIDefines.py!!!
-	enum State : uint8_t {
+	enum class State : uint8_t {
 		UNPRESSED,
 		PRESSED,
 		SELECTED,
@@ -164,7 +164,7 @@ private: // Private attributes
 	/** If non-empty, list of Pictures to draw when hasPicture is set */
 	std::vector<Holder<Sprite2D>> PictureList;
 	/** The current state of the Button */
-	State ButtonState = UNPRESSED;
+	State ButtonState = State::UNPRESSED;
 	double Clipping = 1.0;
 	/** HP Bar over portraits */
 	ColorAnimation overlayAnim;

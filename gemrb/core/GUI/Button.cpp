@@ -122,15 +122,15 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		Holder<Sprite2D> Image;
 
 		switch (ButtonState) {
-			case FAKEPRESSED:
-			case PRESSED:
+			case State::FAKEPRESSED:
+			case State::PRESSED:
 				Image = buttonImages[ButtonImage::Pressed];
 				break;
-			case SELECTED:
+			case State::SELECTED:
 				Image = buttonImages[ButtonImage::Selected];
 				break;
-			case DISABLED:
-			case FAKEDISABLED:
+			case State::DISABLED:
+			case State::FAKEDISABLED:
 				Image = buttonImages[ButtonImage::Disabled];
 				break;
 			default:
@@ -143,7 +143,7 @@ void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 		}
 	}
 
-	if (ButtonState == PRESSED) {
+	if (ButtonState == State::PRESSED) {
 		//shift the writing/border a bit
 		rgn.x += PushOffset.x;
 		rgn.y += PushOffset.y;
@@ -301,7 +301,7 @@ void Button::DrawLabel(const Region& rgn) const
 	}
 
 	Color c = textColor;
-	if (ButtonState == DISABLED || IsDisabled()) {
+	if (ButtonState == State::DISABLED || IsDisabled()) {
 		c.r *= 0.66;
 		c.g *= 0.66;
 		c.b *= 0.66;
@@ -314,17 +314,17 @@ void Button::DrawLabel(const Region& rgn) const
 /** Sets the Button State */
 void Button::SetState(State state, bool setval)
 {
-	if (state > LOCKED_PRESSED) { // If wrong value inserted
+	if (state > State::LOCKED_PRESSED) { // If wrong value inserted
 		return;
 	}
 
 	// FIXME: we should properly consolidate IE_GUI_BUTTON_DISABLED with the view Disabled flag
-	SetDisabled(state == DISABLED);
+	SetDisabled(state == State::DISABLED);
 
 	if (ButtonState != state) {
 		MarkDirty();
 		ButtonState = state;
-		if (setval && ButtonState == SELECTED) {
+		if (setval && ButtonState == State::SELECTED) {
 			UpdateDictValue();
 		}
 	}
@@ -465,11 +465,11 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 	}
 
 	if (me.button == GEM_MB_ACTION) {
-		if (ButtonState == LOCKED) {
-			SetState(LOCKED_PRESSED);
+		if (ButtonState == State::LOCKED) {
+			SetState(State::LOCKED_PRESSED);
 			return true;
 		}
-		SetState(PRESSED);
+		SetState(State::PRESSED);
 		if (flags & IE_GUI_BUTTON_SOUND) {
 			core->GetAudioPlayback().PlayDefaultSound(DS_BUTTON_PRESSED, SFXChannel::GUI);
 		}
@@ -492,10 +492,10 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		}
 	}
 
-	if (ButtonState == LOCKED_PRESSED) {
-		SetState(LOCKED);
-	} else if (ButtonState != LOCKED) {
-		SetState(UNPRESSED);
+	if (ButtonState == State::LOCKED_PRESSED) {
+		SetState(State::LOCKED);
+	} else if (ButtonState != State::LOCKED) {
+		SetState(State::UNPRESSED);
 	}
 
 	// not sure why we limit this on checkboxes and radios - perhaps to match the originals?
@@ -507,7 +507,7 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 
 bool Button::OnMouseOver(const MouseEvent& me)
 {
-	if (ButtonState == LOCKED) {
+	if (ButtonState == State::LOCKED) {
 		return true;
 	}
 
@@ -519,7 +519,7 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 	Control::OnMouseEnter(me, dop);
 
 	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {
-		SetState(PRESSED);
+		SetState(State::PRESSED);
 	}
 
 	for (const ButtonBorder& border : borders) {
@@ -535,8 +535,8 @@ void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
 {
 	Control::OnMouseLeave(me, dop);
 
-	if (ButtonState == PRESSED && (dop == nullptr || dop->dragView == this)) {
-		SetState(UNPRESSED);
+	if (ButtonState == State::PRESSED && (dop == nullptr || dop->dragView == this)) {
+		SetState(State::UNPRESSED);
 	}
 
 	if (pulseBorder) {
@@ -580,11 +580,11 @@ void Button::UpdateState(value_t Sum)
 
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		//radio button, exact value
-		State state = Sum == GetValue() ? SELECTED : UNPRESSED;
+		State state = Sum == GetValue() ? State::SELECTED : State::UNPRESSED;
 		SetState(state);
 	} else if (flags & IE_GUI_BUTTON_CHECKBOX) {
 		//checkbox, bitvalue
-		State state = bool(Sum & GetValue()) ? SELECTED : UNPRESSED;
+		State state = bool(Sum & GetValue()) ? State::SELECTED : State::UNPRESSED;
 		SetState(state, false);
 	}
 }
