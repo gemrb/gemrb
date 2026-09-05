@@ -1851,6 +1851,18 @@ void GameControl::TryToDisarm(Actor* source, const InfoPoint* tgt) const
 	source->CommandActor(GenerateActionDirect("RemoveTraps([-1])", tgt));
 }
 
+void GameControl::SetSpellCastCheck(std::function<bool(ieDword, const ResRef&)> check)
+{
+	spellCastCheck = std::move(check);
+}
+
+bool GameControl::CheckSpellCast(const Actor* source, const ResRef& spell) const
+{
+	// A callback may replace or remove itself while running.
+	const auto check = spellCastCheck;
+	return !check || check(source->InParty ? source->InParty : source->GetGlobalID(), spell);
+}
+
 //generate action code for source actor to use item/cast spell on a point
 void GameControl::TryToCast(Actor* source, const Point& tgt)
 {
@@ -1900,6 +1912,10 @@ void GameControl::TryToCast(Actor* source, const Point& tgt)
 		if (spellCount) {
 			action->int2Parameter |= UI_NOAURA | UI_NOCHARGE;
 		}
+	}
+	if (spellOrItem >= 0 && !CheckSpellCast(source, action->resref0Parameter)) {
+		ResetTargetMode();
+		return;
 	}
 	source->AddAction(action);
 	if (!spellCount) {
@@ -1969,6 +1985,10 @@ void GameControl::TryToCast(Actor* source, const Actor* tgt)
 		if (spellCount) {
 			action->int2Parameter |= UI_NOAURA | UI_NOCHARGE;
 		}
+	}
+	if (spellOrItem >= 0 && !CheckSpellCast(source, action->resref0Parameter)) {
+		ResetTargetMode();
+		return;
 	}
 	source->AddAction(action);
 	if (!spellCount) {

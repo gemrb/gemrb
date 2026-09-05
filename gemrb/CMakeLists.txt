@@ -199,12 +199,33 @@ ENDIF(VITA)
 
 # Tests
 IF (BUILD_TESTING)
+  FIND_PACKAGE(Python3 COMPONENTS Interpreter REQUIRED)
+  ADD_TEST(NAME Test_GUIScripts_LevelupSelection
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_levelup_selection.py
+  )
+  ADD_TEST(NAME Test_GUIScripts_PortraitNavigation
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_portrait_navigation.py
+  )
+  ADD_TEST(NAME Test_GUIScripts_ChargenStartup
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_chargen_startup.py
+  )
+  ADD_TEST(NAME Test_GUIScripts_BGEELevelup
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_bgee_levelup.py
+  )
+  ADD_TEST(NAME Test_GUIScripts_SpellCastCheck
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_spell_cast_check.py
+  )
+  ADD_TEST(NAME Test_Core_ItemTypeSchema
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_itemtype_schema.py
+  )
+
   ADD_EXECUTABLE(Test_gemrb_core
     tests/core/Test_Map.cpp
     tests/core/Test_Movement.cpp
     tests/core/Test_MurmurHash.cpp
     tests/core/Test_Orient.cpp
     tests/core/Test_Palette.cpp
+    tests/core/GUI/Test_Font.cpp
     tests/core/Test_PathFinder.cpp
     tests/core/Test_SaveGame.cpp
     tests/core/Streams/Test_DataStream.cpp
