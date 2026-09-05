@@ -72,7 +72,8 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	# create a scrollbar if need-be
 	if len (HLAAbilities) >= 25:
 		# setup extra 25th HLA slot:
-		HLAWindow.CreateButton (24, 231, 345, 42, 42)
+		if not HLAWindow.GetControl (24):
+			HLAWindow.CreateButton (24, 231, 345, 42, 42)
 		if ( len (HLAAbilities) > 25):
 			# setup scrollbar
 			ScrollBar = HLAWindow.CreateScrollBar (1000, {'x' : 290, 'y' : 142, 'w' : 16, 'h' : 252}, "GUISCRCW")
@@ -293,16 +294,24 @@ def GetHLAs ():
 
 	# the HLA table lookup table
 	HLAAbbrTable = GemRB.LoadTable ("luabbr")
+	LoadedTables = set ()
 
 	# get all the HLAs for each class
 	for i in range (NumClasses):
-		CurrentLevel = Level[i]
+		CurrentLevels = [Level[i]]
 		ClassName = GUICommon.GetClassRowName (Classes[i], "class")
 		KitName = GUICommon.GetKitRowName (pc, NumClasses == 1 and not IsDual, Kit)
 
 		if KitName != ClassName: # kitted single-class
 			ClassName = KitName
 		HLAClassTable = "lu" + HLAAbbrTable.GetValue (ClassName, "ABBREV")
+		if HLAClassTable in LoadedTables:
+			continue
+		LoadedTables.add (HLAClassTable)
+		if NumClasses > 1:
+			# Multiclasses have a merged table, not one copy per component.
+			# Retain eligibility reached by any active component level.
+			CurrentLevels = Level[:NumClasses]
 
 		# actually load the table
 		HLAClassTable = GemRB.LoadTable (HLAClassTable)
@@ -327,7 +336,9 @@ def GetHLAs ():
 				HLAClassTable.GetValue (j, 7, GTV_STR)]
 
 			# make sure we fall within the min and max parameters
-			if HLAClassTable.GetValue (j, 3) > CurrentLevel or HLAClassTable.GetValue (j, 4) < CurrentLevel:
+			MinLevel = HLAClassTable.GetValue (j, 3)
+			MaxLevel = HLAClassTable.GetValue (j, 4)
+			if not any (MinLevel <= level <= MaxLevel for level in CurrentLevels):
 				print("\t\tNot within parameters")
 				HLAAbilities.append(SaveArray)
 				continue
@@ -423,5 +434,4 @@ def HLARecheckPrereqs (index):
 				HLAAbilities[i][1] = 0
 
 	return
-
 

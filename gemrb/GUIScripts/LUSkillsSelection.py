@@ -113,7 +113,6 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		SkillsOffsetPoints = 9
 		SkillsNumButtons = 4
 		SkillsTextArea = SkillsWindow.GetControl (22)
-		SkillsTextArea.SetText(17248)
 		if (scroll):
 			ScrollBar = SkillsWindow.GetControl (26)
 			SkillsWindow.SetEventProxy(ScrollBar)
@@ -125,7 +124,6 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		SkillsOffsetPoints = 1
 		SkillsNumButtons = 6 if GameCheck.IsAnyEE () else 4
 		SkillsTextArea = SkillsWindow.GetControl (19)
-		SkillsTextArea.SetText(17248)
 		if (scroll):
 			ScrollBar = SkillsWindow.GetControl (26)
 			SkillsWindow.SetEventProxy(ScrollBar)
@@ -275,6 +273,12 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		SkillSumLabel = SkillsWindow.GetControl(0x10000000+SkillsOffsetSum)
 		SkillSumLabel.SetText("")
 		return
+
+	if skilltype in (LUSKILLS_TYPE_CHARGEN, LUSKILLS_TYPE_DUALCLASS):
+		# The introductory text shares this token with spell selection.
+		# Expand it only after computing the actual points available here.
+		GemRB.SetToken ("number", str (SkillPointsLeft))
+		SkillsTextArea.SetText (17248)
 
 	#skills scrollbar
 	if len(SkillsIndices) > SkillsNumButtons:
