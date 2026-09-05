@@ -215,6 +215,9 @@ IF (BUILD_TESTING)
   ADD_TEST(NAME Test_GUIScripts_SpellCastCheck
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_spell_cast_check.py
   )
+  ADD_TEST(NAME Test_Core_ItemTypeSchema
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_itemtype_schema.py
+  )
 
   ADD_EXECUTABLE(Test_gemrb_core
     tests/core/Test_Map.cpp
