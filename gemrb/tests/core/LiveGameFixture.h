@@ -68,6 +68,9 @@ public:
 		core->SetGame(nullptr);
 		VideoDriver.reset();
 		Engine().reset();
+		// Interface destruction does not clear the global observer. Later
+		// filesystem tests consult it when deciding whether to resolve case.
+		core = nullptr;
 		PluginMgr::Get()->RunCleanup();
 	}
 };

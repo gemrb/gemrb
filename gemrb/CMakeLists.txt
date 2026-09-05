@@ -206,6 +206,15 @@ IF (BUILD_TESTING)
   ADD_TEST(NAME Test_GUIScripts_PortraitNavigation
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_portrait_navigation.py
   )
+  ADD_TEST(NAME Test_GUIScripts_ChargenStartup
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_chargen_startup.py
+  )
+  ADD_TEST(NAME Test_GUIScripts_BGEELevelup
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_bgee_levelup.py
+  )
+  ADD_TEST(NAME Test_GUIScripts_SpellCastCheck
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/GUIScripts/test_spell_cast_check.py
+  )
 
   ADD_EXECUTABLE(Test_gemrb_core
     tests/core/Test_Map.cpp

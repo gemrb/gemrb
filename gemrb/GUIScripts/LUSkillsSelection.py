@@ -72,7 +72,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 		return
 
 	#setup the offsets
-	if skilltype == LUSKILLS_TYPE_LEVELUP and GameCheck.IsBG2OrEE ():
+	if skilltype == LUSKILLS_TYPE_LEVELUP and (GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ()):
 		SkillsOffsetPress = 120
 		SkillsOffsetButton1 = 17
 		SkillsOffsetSum = 37

@@ -22,6 +22,7 @@
 #include "GUI/EventMgr.h"
 #include "GUI/GameControlDefs.h"
 
+#include <functional>
 #include <vector>
 
 namespace GemRB {
@@ -83,6 +84,7 @@ private:
 	Scriptable* overMe = nullptr;
 
 	EventMgr::TapMonitorId eventMonitors[2];
+	std::function<bool(ieDword, const ResRef&)> spellCastCheck;
 
 public:
 	static uint32_t DebugFlags;
@@ -183,6 +185,9 @@ public:
 	void TryToAttack(Actor* source, const Actor* target) const;
 	void TryToCast(Actor* source, const Point& p);
 	void TryToCast(Actor* source, const Actor* target);
+	/** Optional GUI-only check, called after targeting validation and before queuing a spell. */
+	void SetSpellCastCheck(std::function<bool(ieDword, const ResRef&)> check);
+	bool CheckSpellCast(const Actor* source, const ResRef& spell) const;
 	void TryToDefend(Actor* source, const Actor* target) const;
 	void TryToTalk(Actor* source, const Actor* target) const;
 	void TryToPick(Actor* source, const Scriptable* tgt) const;
