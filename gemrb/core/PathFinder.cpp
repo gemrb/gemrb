@@ -237,24 +237,21 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	// each run we just clear the storage, which is keeping the underlying allocated memory at hand.
 	// thread_local rather than static: worker threads run FindPath concurrently
 	thread_local BucketPriorityQueue open;
-	thread_local std::vector<bool> isClosed;
+	thread_local std::vector<uint8_t> isClosed;
 	thread_local std::vector<NavmapPoint> parents;
 	thread_local std::vector<unsigned short> distFromStart;
 
-	// these two, and isClosed further down, are indexed by the same cell index and kept at the
-	// same size; resize is a no-op when the size already matches, so this only costs anything on
-	// a map change
+	// these three are indexed by the same cell index and kept at the same size; resize is a no-op
+	// when the size already matches, so this only costs anything on a map change
 	parents.resize(mapCellsCount);
 	distFromStart.resize(mapCellsCount);
+	isClosed.resize(mapCellsCount);
 
 	// cleanup
 	open.Clear();
-	isClosed.clear();
-	isClosed.resize(mapCellsCount, false);
-	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
-	// number of elements, while memset performs better for large vectors
 	memset(static_cast<void*>(parents.data()), 0, sizeof(decltype(parents)::value_type) * mapCellsCount);
 	memset(static_cast<void*>(distFromStart.data()), 255, sizeof(decltype(distFromStart)::value_type) * mapCellsCount);
+	memset(static_cast<void*>(isClosed.data()), 0, sizeof(decltype(isClosed)::value_type) * mapCellsCount);
 
 	// begin algo init
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
