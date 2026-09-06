@@ -8,45 +8,9 @@
 
 namespace GemRB {
 
-bool BasePoint::operator==(const BasePoint& pnt) const noexcept
-{
-	return (x == pnt.x) && (y == pnt.y);
-}
-
-bool BasePoint::operator!=(const BasePoint& pnt) const noexcept
-{
-	return !(*this == pnt);
-}
-
 bool BasePoint::operator<(const BasePoint& pnt) const noexcept
 {
 	return x <= pnt.x && y <= pnt.y;
-}
-
-BasePoint BasePoint::operator-(const BasePoint& p) const noexcept
-{
-	return BasePoint(x - p.x, y - p.y);
-}
-
-BasePoint BasePoint::operator+(const BasePoint& p) const noexcept
-{
-	return BasePoint(x + p.x, y + p.y);
-}
-
-BasePoint::BasePoint(int x, int y) noexcept
-{
-	this->x = x;
-	this->y = y;
-}
-
-bool BasePoint::IsZero() const noexcept
-{
-	return (x == 0) && (y == 0);
-}
-
-bool BasePoint::IsInvalid() const noexcept
-{
-	return (x == -1) && (y == -1);
 }
 
 bool BasePoint::IsWithinRadius(int r, const BasePoint& p) const noexcept
