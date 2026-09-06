@@ -78,6 +78,12 @@ namespace {
 		std::vector<uint8_t> isClosed;
 		std::vector<NavmapPoint> parents;
 		std::vector<unsigned short> distFromStart;
+		// Generation stamping: cells whose `genOf[i] != searchGen` are "fresh" (unvisited this
+		// call) and read as their default values (isClosed=false, parents=zero, dist=0xFFFF).
+		// Bumping searchGen each call replaces the three memsets that previously zeroed all
+		// three arrays, most of which a typical search never touches.
+		std::vector<uint32_t> genOf;
+		uint32_t searchGen = 0;
 	};
 
 	// One thread_local object behind one deliberately out-of-line accessor, rather than four
@@ -291,22 +297,33 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	std::vector<uint8_t>& isClosed = searchState.isClosed;
 	std::vector<NavmapPoint>& parents = searchState.parents;
 	std::vector<unsigned short>& distFromStart = searchState.distFromStart;
+	std::vector<uint32_t>& genOf = searchState.genOf;
+	uint32_t& searchGen = searchState.searchGen;
 
-	// these three are indexed by the same cell index and kept at the same size; resize is a no-op
+	// these four are indexed by the same cell index and kept at the same size; resize is a no-op
 	// when the size already matches, so this only costs anything on a map change
 	parents.resize(mapCellsCount);
 	distFromStart.resize(mapCellsCount);
 	isClosed.resize(mapCellsCount);
+	genOf.resize(mapCellsCount);
 
-	// cleanup
+	// Generation-stamp reset: bump searchGen so every cell reads as "unvisited" without touching
+	// its storage. If the counter wraps, zero it and also zero genOf so stale stamps from before
+	// the wrap cannot masquerade as current. Wrapping is rare (requires 2^32 FindPath calls on
+	// the same thread) so the memset here costs essentially nothing amortised.
 	open.Clear();
-	memset(static_cast<void*>(parents.data()), 0, sizeof(NavmapPoint) * mapCellsCount);
-	memset(static_cast<void*>(distFromStart.data()), 255, sizeof(unsigned short) * mapCellsCount);
-	memset(static_cast<void*>(isClosed.data()), 0, sizeof(uint8_t) * mapCellsCount);
+	++searchGen;
+	if (searchGen == 0) {
+		memset(static_cast<void*>(genOf.data()), 0, sizeof(uint32_t) * mapCellsCount);
+	}
 
 	// begin algo init
-	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
-	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
+	{
+		const int srcIdx = smptSource.y * mapSize.w + smptSource.x;
+		genOf[srcIdx] = searchGen;
+		distFromStart[srcIdx] = 0;
+		parents[srcIdx] = nmptSource;
+	}
 
 	open.Push(nmptSource, 0);
 
@@ -353,7 +370,9 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 		const SearchmapPoint smptCurrent { nmptCurrent };
 		const int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
-		if (parents[smptCurrentIdx].IsZero()) {
+		// A fresh cell (generation mismatch) reads as unvisited: parents==zero, skip.
+		// This matches the old memset-to-zero behaviour and filters stale open-queue entries.
+		if (genOf[smptCurrentIdx] != searchGen || parents[smptCurrentIdx].IsZero()) {
 			continue;
 		}
 
@@ -373,6 +392,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			break;
 		}
 
+		// Cell is stamped (generation matches); safe to write isClosed directly.
 		isClosed[smptCurrentIdx] = true;
 
 		const NavmapPoint nmptParent = parents[smptCurrentIdx];
@@ -386,7 +406,8 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
-			if (isClosed[smptChildIdx]) continue;
+			// Fresh cell reads as isClosed=false; stamped cell reads the actual flag.
+			if (genOf[smptChildIdx] == searchGen && isClosed[smptChildIdx]) continue;
 
 			const PathMapFlags childBlockStatus = useBigSize ? GetChildBlockedStatusForBigSize(tileProps, smptChild, actorCircleSize) : GetChildBlockedStatusForSmallSize(tileProps, smptChild, actorCircleSize);
 			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR));
@@ -397,11 +418,15 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			const bool childIsUnbumpable = navmapCellTraversability.occupyingActor != actorIdentity && navmapCellTraversability.state >= blockingTraversabilityValue;
 			if (childIsUnbumpable) continue;
 
-			unsigned short oldDist = distFromStart[smptChildIdx];
+			// Fresh cell reads as distFromStart==0xFFFF (same as old memset(255,...) default).
+			const unsigned short oldDist = (genOf[smptChildIdx] == searchGen) ? distFromStart[smptChildIdx] : std::numeric_limits<unsigned short>::max();
 
 			// Lazy Theta star*
 			unsigned short newDist = parentDist + Distance(smptParent, smptChild);
 			if (newDist < oldDist) {
+				// First touch: stamp the cell before writing any field.
+				genOf[smptChildIdx] = searchGen;
+				isClosed[smptChildIdx] = false;
 				parents[smptChildIdx] = nmptParent;
 				distFromStart[smptChildIdx] = newDist;
 			}
@@ -419,11 +444,12 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 						SearchmapPoint smptVis { nmptVis };
 						// Outside map
 						if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
-						// Only consider already visited
-						if (!isClosed[smptVis.y * mapSize.w + smptVis.x]) continue;
+						// Only consider already visited (closed)
+						const int smptVisIdx = smptVis.y * mapSize.w + smptVis.x;
+						if (genOf[smptVisIdx] != searchGen || !isClosed[smptVisIdx]) continue;
 
 						unsigned short oldVisDist = distFromStart[smptChildIdx];
-						newDist = distFromStart[smptVis.y * mapSize.w + smptVis.x] + Distance(smptVis, smptChild);
+						newDist = distFromStart[smptVisIdx] + Distance(smptVis, smptChild);
 						if (newDist < oldVisDist) {
 							parents[smptChildIdx] = nmptVis;
 							distFromStart[smptChildIdx] = newDist;
