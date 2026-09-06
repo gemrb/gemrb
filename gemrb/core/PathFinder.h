@@ -208,8 +208,26 @@ public:
 	static PathMapFlags GetBlockedInLineTile(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, int actorCircleSize);
 
 	// same as GetBlocked, but in TileCoords
-	static PathMapFlags GetBlockedTile(const TileProps& tileProps, const SearchmapPoint&);
 	static PathMapFlags GetBlockedTile(const TileProps& tileProps, const SearchmapPoint&, int size);
+
+	// PathFinder is GEM_EXPORT (public API). Under GCC's default -fPIC handling, an out-of-line
+	// definition of this function is subject to ELF symbol interposition and can never be inlined into
+	// any caller - not even one in PathFinder.cpp itself.
+	// This is the tile-fetch hot path for every walkability and line-of-sight walk, keep it inlined in a header.
+	static PathMapFlags GetBlockedTile(const TileProps& tileProps, const SearchmapPoint& p)
+	{
+		PathMapFlags ret = tileProps.QuerySearchMap(p);
+		if (bool(ret & PathMapFlags::TRAVEL)) {
+			ret |= PathMapFlags::PASSABLE;
+		}
+		if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR))) {
+			ret &= ~PathMapFlags::PASSABLE;
+		}
+		if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
+			ret = PathMapFlags::SIDEWALL;
+		}
+		return ret;
+	}
 
 	static PathMapFlags GetBlockedInRadiusTile(const TileProps& tileProps, const SearchmapPoint&, uint16_t size, bool stopOnImpassable = true);
 

@@ -519,22 +519,6 @@ PathMapFlags PathFinder::GetBlockedTile(const TileProps& tileProps, const Search
 	}
 }
 
-PathMapFlags PathFinder::GetBlockedTile(const TileProps& tileProps, const SearchmapPoint& p)
-{
-	PathMapFlags ret = tileProps.QuerySearchMap(p);
-	if (bool(ret & PathMapFlags::TRAVEL)) {
-		ret |= PathMapFlags::PASSABLE;
-	}
-	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR))) {
-		ret &= ~PathMapFlags::PASSABLE;
-	}
-	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
-		ret = PathMapFlags::SIDEWALL;
-	}
-	return ret;
-}
-
-
 PathMapFlags PathFinder::GetBlockedInRadiusTile(const TileProps& tileProps, const SearchmapPoint& tp, uint16_t size, const bool stopOnImpassable)
 {
 	// We check a circle of radius size-2 around (px,py)
