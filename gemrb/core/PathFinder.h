@@ -341,12 +341,16 @@ public:
 	 * - repeat. The tiles come out in the order the segment meets them, and the cost is one
 	 *   comparison and one addition per tile rather than anything per pixel.
 	 *
-	 * Two deviations from the paper, both for this use:
+	 * Two deviations from the paper, both tailored for our use:
 	 *
 	 * - it is kept in integers. `tMaxX` is `errX / ax`, where `errX` is the distance still to go
 	 *   to the next vertical grid line and `ax` is `abs(delta.x)`; comparing it with `tMaxY` is
 	 *   then `errX * ay` against `errY * ax`, so the whole walk needs no division, square root
-	 *   or float, only two multiplications per step. `tDelta` becomes a plain `+= cellW`.
+	 *   or float. That comparison term, `err = errX * ay - errY * ax`, is carried forward rather
+	 *   than rebuilt each step: errX only ever grows by cellW and errY by cellH, so err only
+	 *   ever grows by the loop invariants `errStepX = cellW * ay` and `errStepY = cellH * ax`,
+	 *   both computed once in the constructor. A step is then a masked add of one of those two
+	 *   precomputed values,
 	 * - the paper's ray is unbounded and stops on a hit; this is a segment, so an axis that has
 	 *   reached the target tile is pinned. That both terminates the walk exactly on the far end
 	 *   and keeps rounding from carrying it one tile past.
@@ -384,19 +388,22 @@ public:
 
 			// branchless Amanatides & Woo step:
 			// Pending axes are 0/1 masks; the comparison produces a 0/1 mask without a branch.
-			// A tie (cmp == 0) takes both axes.
+			// A tie (err == 0) takes both axes.
+			//
+			// `err` is the paper's `tMaxX - tMaxY` scaled to integers: errX * ay - errY * ax.
+			// It is carried rather than rebuilt each iteration, because errX only ever grows by
+			// cellW and errY by cellH, so err only ever grows by the loop invariants cellW * ay / cellH * ax.
+			// That takes the two 64-bit multiplies off the loop-carried dependency chain.
 			const int32_t pendingX = current.x != target.x;
 			const int32_t pendingY = current.y != target.y;
-			const int64_t cmp = errX * ay - errY * ax;
-			const int32_t takeX = pendingX & ((1 - pendingY) | static_cast<int32_t>(cmp <= 0));
-			const int32_t takeY = pendingY & ((1 - pendingX) | static_cast<int32_t>(cmp >= 0));
+			const int32_t takeX = pendingX & ((1 - pendingY) | static_cast<int32_t>(err <= 0));
+			const int32_t takeY = pendingY & ((1 - pendingX) | static_cast<int32_t>(err >= 0));
 
 			cutACorner = takeX && takeY;
 
 			current.x += stepX * takeX;
 			current.y += stepY * takeY;
-			errX += static_cast<int64_t>(cellW) * takeX;
-			errY += static_cast<int64_t>(cellH) * takeY;
+			err += (errStepX & -static_cast<int64_t>(takeX)) - (errStepY & -static_cast<int64_t>(takeY));
 			return true;
 		}
 
@@ -413,27 +420,26 @@ public:
 		GridRayCast(const int sx, const int sy, const int dx, const int dy, const int w, const int h) noexcept
 			: current(sx / w, sy / h),
 			  target(dx / w, dy / h),
-			  ax(std::abs(dx - sx)),
-			  ay(std::abs(dy - sy)),
-			  cellW(w),
-			  cellH(h),
 			  stepX(dx >= sx ? 1 : -1),
 			  stepY(dy >= sy ? 1 : -1)
 		{
+			const int64_t ax = std::abs(dx - sx);
+			const int64_t ay = std::abs(dy - sy);
 			// the paper's initial tMax, as a distance rather than a t: how far the start
 			// lies from the first grid line it will cross on each axis
-			errX = stepX > 0 ? static_cast<int64_t>(current.x + 1) * w - sx : sx - static_cast<int64_t>(current.x) * w;
-			errY = stepY > 0 ? static_cast<int64_t>(current.y + 1) * h - sy : sy - static_cast<int64_t>(current.y) * h;
+			const int64_t errX = stepX > 0 ? static_cast<int64_t>(current.x + 1) * w - sx : sx - static_cast<int64_t>(current.x) * w;
+			const int64_t errY = stepY > 0 ? static_cast<int64_t>(current.y + 1) * h - sy : sy - static_cast<int64_t>(current.y) * h;
+			err = errX * ay - errY * ax;
+			errStepX = w * ay;
+			errStepY = h * ax;
 		}
 
 		SearchmapPoint current;
 		SearchmapPoint target;
-		int64_t errX = 0;
-		int64_t errY = 0;
-		int64_t ax;
-		int64_t ay;
-		int cellW;
-		int cellH;
+		// errX * ay - errY * ax, carried; and what a step on each axis adds to it
+		int64_t err = 0;
+		int64_t errStepX = 0;
+		int64_t errStepY = 0;
 		int stepX;
 		int stepY;
 		bool cutACorner = false;
