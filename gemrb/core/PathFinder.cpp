@@ -275,7 +275,11 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 		const int dxCross = smptDest.x - smptSource.x;
 		const int dyCross = smptDest.y - smptSource.y;
 		const int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
-		const float distance = std::hypotf(xDist, yDist);
+		// sqrtf, not hypotf: hypot()'s overflow/underflow scaling only matters when the squares
+		// would leave a float's exact range, and these are tile deltas.
+		// `std::sqrt` translates directly to a single CPU instruction on x86 and ARM architectures,
+		// while `std::hypotf` is a function call, which is costly on a hotpath
+		const float distance = std::sqrt(static_cast<float>(xDist * xDist + yDist * yDist));
 		const float heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
 		const float estDist = distFromStart[smptChildIdx] + heuristic;
 		return estDist;
