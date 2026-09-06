@@ -16,8 +16,10 @@
 #include "Logging/Logging.h"
 #include "Scriptable/Scriptable.h"
 
+#include <array>
 #include <cstdint>
 #include <cstdlib>
+#include <utility>
 #include <vector>
 
 
@@ -155,6 +157,43 @@ constexpr unsigned int SEARCHMAP_SQUARE_WIDTH = 16;
 constexpr unsigned int SEARCHMAP_SQUARE_HEIGHT = 12;
 constexpr unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
 
+namespace {
+
+	// GetBlockedTile's fixup table, built at compile time - see the comment there.
+	// Written as a free function plus an index_sequence expansion.
+	// When moving to C++17, we could just use a loop writing into a std::array
+	// instead, without this 3-steps template parameters expansion.
+	constexpr PathMapFlags SearchMapFixupEntry(unsigned i) noexcept
+	{
+		PathMapFlags f = static_cast<PathMapFlags>(i);
+		if (bool(f & PathMapFlags::TRAVEL)) {
+			f |= PathMapFlags::PASSABLE;
+		}
+		if (bool(f & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR))) {
+			f &= ~PathMapFlags::PASSABLE;
+		}
+		if (bool(f & PathMapFlags::DOOR_OPAQUE)) {
+			f = PathMapFlags::SIDEWALL;
+		}
+		return f;
+	}
+
+	template<std::size_t... IDXS>
+	constexpr std::array<PathMapFlags, 256> MakeSearchMapFixupTable(std::index_sequence<IDXS...>) noexcept
+	{
+		return { { SearchMapFixupEntry(IDXS)... } };
+	}
+
+	// Anonymous namespace, not a function-local static inside GetBlockedTile: a function-local
+	// static of an inline function is emitted as an STB_GNU_UNIQUE ELF symbol (so that every
+	// translation unit in the process shares one instance), and under -fPIC that forces every
+	// access through the GOT - a memory indirection on EVERY tile fetch.
+	// An anonymous-namespace object has internal linkage: every translation unit that includes this header
+	// gets its own private copy, addressed directly with a rip-relative lea, no GOT, no indirection.
+	// The cost is a few hundred bytes of duplicated .rodata per translation unit.
+	constexpr std::array<PathMapFlags, 256> SearchMapFixupTable = MakeSearchMapFixupTable(std::make_index_sequence<256> {});
+} // namespace
+
 /**
  * PathFinder - stateless class implementing pathfinding-related algorithms.
  *
@@ -216,17 +255,11 @@ public:
 	// This is the tile-fetch hot path for every walkability and line-of-sight walk, keep it inlined in a header.
 	static PathMapFlags GetBlockedTile(const TileProps& tileProps, const SearchmapPoint& p)
 	{
-		PathMapFlags ret = tileProps.QuerySearchMap(p);
-		if (bool(ret & PathMapFlags::TRAVEL)) {
-			ret |= PathMapFlags::PASSABLE;
-		}
-		if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR))) {
-			ret &= ~PathMapFlags::PASSABLE;
-		}
-		if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
-			ret = PathMapFlags::SIDEWALL;
-		}
-		return ret;
+		// PathMapFlags is a uint8_t enum, so the fixup (TRAVEL implies PASSABLE, DOOR_IMPASSABLE/
+		// ACTOR clear it, DOOR_OPAQUE forces SIDEWALL) has only 256 possible inputs and collapses
+		// to SearchMapFixupTable above, turning three dependent branches per tile fetch into one
+		// load of compile-time computed data.
+		return SearchMapFixupTable[static_cast<uint8_t>(tileProps.QuerySearchMap(p))];
 	}
 
 	static PathMapFlags GetBlockedInRadiusTile(const TileProps& tileProps, const SearchmapPoint&, uint16_t size, bool stopOnImpassable = true);
