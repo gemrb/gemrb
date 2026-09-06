@@ -227,10 +227,9 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	const Size& mapSize = tileProps.GetSize();
 	if (!mapSize.PointInside(smptSource)) return {};
 
-	const auto getChildBlockedStatusFn = actorCircleSize > 2 ? &PathFinder::GetChildBlockedStatusForBigSize : &PathFinder::GetChildBlockedStatusForSmallSize;
-
 	// Initialize data structures
 	const size_t mapCellsCount = mapSize.Area();
+	const bool useBigSize = actorCircleSize > 2;
 
 	const auto timeOfStartMs = GetMilliseconds();
 
@@ -333,7 +332,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
 			if (isClosed[smptChildIdx]) continue;
 
-			const PathMapFlags childBlockStatus = (getChildBlockedStatusFn) (tileProps, smptChild, actorCircleSize);
+			const PathMapFlags childBlockStatus = useBigSize ? GetChildBlockedStatusForBigSize(tileProps, smptChild, actorCircleSize) : GetChildBlockedStatusForSmallSize(tileProps, smptChild, actorCircleSize);
 			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR));
 			if (childBlocked) continue;
 
