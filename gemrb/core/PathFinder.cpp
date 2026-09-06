@@ -570,9 +570,12 @@ static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinde
 
 	// do a wider check for bigger actors (for the common case it's the same)
 	// should not be used for IsVisibleLOS
-	const auto getBlockedStatusFn = (stopOnImpassable && actorCircleSize) ? &PathFinder::GetChildBlockedStatusForBigSize : &PathFinder::GetChildBlockedStatusForSmallSize;
+	const bool useBigSize = stopOnImpassable && actorCircleSize;
+	const auto getBlockedStatus = [&](const SearchmapPoint& p) {
+		return useBigSize ? PathFinder::GetChildBlockedStatusForBigSize(tileProps, p, actorCircleSize) : PathFinder::GetChildBlockedStatusForSmallSize(tileProps, p, actorCircleSize);
+	};
 	while (walk.Step()) {
-		const PathMapFlags blockStatus = (getBlockedStatusFn) (tileProps, walk.Current(), actorCircleSize);
+		const PathMapFlags blockStatus = getBlockedStatus(walk.Current());
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}
@@ -583,8 +586,8 @@ static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinde
 		// between two of them, so this only counts when neither side is open. Without it a route
 		// is free to cut corners no body can cut, and the actor wedges on them.
 		if (walk.CutACorner()) {
-			const PathMapFlags besideX = (getBlockedStatusFn) (tileProps, walk.CornerBesideX(), actorCircleSize);
-			const PathMapFlags besideY = (getBlockedStatusFn) (tileProps, walk.CornerBesideY(), actorCircleSize);
+			const PathMapFlags besideX = getBlockedStatus(walk.CornerBesideX());
+			const PathMapFlags besideY = getBlockedStatus(walk.CornerBesideY());
 			const bool jammed = !bool(besideX & PathMapFlags::PASSABLE) && !bool(besideY & PathMapFlags::PASSABLE);
 			if (jammed) {
 				if (stopOnImpassable) return PathMapFlags::IMPASSABLE;
