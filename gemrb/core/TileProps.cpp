@@ -94,11 +94,6 @@ uint8_t TileProps::QueryTileProp(const SearchmapPoint& p, Property prop) const n
 	return -1;
 }
 
-PathMapFlags TileProps::QuerySearchMap(const SearchmapPoint& p) const noexcept
-{
-	return static_cast<PathMapFlags>(QueryTileProp(p, Property::SEARCH_MAP));
-}
-
 uint8_t TileProps::QueryMaterial(const SearchmapPoint& p) const noexcept
 {
 	return QueryTileProp(p, Property::MATERIAL);
