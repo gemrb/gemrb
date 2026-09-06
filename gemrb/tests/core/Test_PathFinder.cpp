@@ -1532,6 +1532,159 @@ TEST(PathFinderTest, NavmapPixelLOSUsesTheSameTileWalk)
 }
 
 
+// === walks that are not the segment ===
+// The scenarios below are chosen so a different traversal gets them wrong: the old
+// NormalizeDeltas() walk rounds every step up to at least one pixel per axis, so it walks a
+// shallow line as a 45 degree staircase; Bresenham's raster line skips corner-clip tiles
+// the segment truly crosses. Each test states the correct answer.
+
+// The wall sits on that 45 degree staircase, a tile the shallow segment never crosses:
+// the old walk reported it.
+TEST(PathFinderTest, ShallowLineSeesPastAWallBesideTheSegment)
+{
+	const TestSearchMap map {
+		"####################",
+		"#.................E#",
+		"#........#.........#",
+		"#..................#",
+		"#..................#",
+		"#..................#",
+		"#..................#",
+		"#..................#",
+		"#S.................#",
+		"####################"
+	};
+	const SearchmapPoint s(map.Start());
+	const SearchmapPoint e(map.End());
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), s, e));
+	EXPECT_FALSE(bool(PathFinder::GetBlockedInLineTile(map.Props(), s, e, false, noCircle) & PathMapFlags::SIDEWALL));
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(map.Props(), map.Start(), map.End()));
+	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
+}
+
+// The same line, wall moved onto it: a tile the staircase stepped over, so the old walk
+// missed the wall.
+TEST(PathFinderTest, ShallowLineReportsTheWallUnderTheStaircase)
+{
+	const TestSearchMap map {
+		"####################",
+		"#.................E#",
+		"#..................#",
+		"#..................#",
+		"#.........#........#",
+		"#..................#",
+		"#..................#",
+		"#..................#",
+		"#S.................#",
+		"####################"
+	};
+	const SearchmapPoint s(map.Start());
+	const SearchmapPoint e(map.End());
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), s, e));
+	EXPECT_TRUE(bool(PathFinder::GetBlockedInLineTile(map.Props(), s, e, false, noCircle) & PathMapFlags::SIDEWALL));
+	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
+}
+
+// The segment crosses y, x, y in that order, so three tiles lie between the endpoints.
+// Bresenham's line takes both axes one step early and never enters the middle one.
+TEST(PathFinderTest, TheCornerRegionBetweenEndpointsIsThreeTiles)
+{
+	const TestSearchMap map {
+		"#####",
+		"#S..#",
+		"#.#.#",
+		"#.E.#",
+		"#####"
+	};
+	const SearchmapPoint s(map.Start());
+	const SearchmapPoint e(map.End());
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(map.Props(), s, e));
+	EXPECT_TRUE(bool(PathFinder::GetBlockedInLineTile(map.Props(), s, e, false, noCircle) & PathMapFlags::SIDEWALL));
+	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
+}
+
+// One tile of the segment sits in the row the raster line rounds away, on a shallow and on
+// a steep slope alike: Bresenham's chain visits neither.
+TEST(PathFinderTest, TheOneTileTheRasterLineRoundsAway)
+{
+	const TestSearchMap shallow {
+		"###########",
+		"#S........#",
+		"#..#......#",
+		"#........E#",
+		"###########"
+	};
+	const SearchmapPoint shallowS(shallow.Start());
+	const SearchmapPoint shallowE(shallow.End());
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(shallow.Props(), shallowS, shallowE));
+	EXPECT_TRUE(bool(PathFinder::GetBlockedInLineTile(shallow.Props(), shallowS, shallowE, false, noCircle) & PathMapFlags::SIDEWALL));
+	EXPECT_FALSE(PathFinder::IsWalkableTo(shallow.Props(), shallow.Start(), shallow.End(), true, noCircle));
+
+	const TestSearchMap steep {
+		"#####",
+		"#S..#",
+		"#...#",
+		"#.#.#",
+		"#...#",
+		"#...#",
+		"#...#",
+		"#...#",
+		"#...#",
+		"#..E#",
+		"#####"
+	};
+	const SearchmapPoint steepS(steep.Start());
+	const SearchmapPoint steepE(steep.End());
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(steep.Props(), steepS, steepE));
+	EXPECT_TRUE(bool(PathFinder::GetBlockedInLineTile(steep.Props(), steepS, steepE, false, noCircle) & PathMapFlags::SIDEWALL));
+	EXPECT_FALSE(PathFinder::IsWalkableTo(steep.Props(), steep.Start(), steep.End(), true, noCircle));
+}
+
+// Near the diagonal the raster line skips half the tiles it crosses; the wall is one of
+// them, on the diagonal itself. It even gets fetched as a corner-beside, but the corner
+// rule blocks only when both sides are walls.
+TEST(PathFinderTest, TheWallOnTheDiagonalIsNotSteppedOver)
+{
+	const TestSearchMap walled {
+		"###########",
+		"#S........#",
+		"#.........#",
+		"#.........#",
+		"#.........#",
+		"#.........#",
+		"#.....#...#",
+		"#.........#",
+		"#.........#",
+		"#.........#",
+		"#........E#",
+		"###########"
+	};
+	const SearchmapPoint s(walled.Start());
+	const SearchmapPoint e(walled.End());
+	EXPECT_FALSE(PathFinder::IsVisibleLOS(walled.Props(), s, e));
+	EXPECT_TRUE(bool(PathFinder::GetBlockedInLineTile(walled.Props(), s, e, false, noCircle) & PathMapFlags::SIDEWALL));
+	EXPECT_FALSE(PathFinder::IsWalkableTo(walled.Props(), walled.Start(), walled.End(), true, noCircle));
+
+	const TestSearchMap clear {
+		"###########",
+		"#S........#",
+		"#.........#",
+		"#.........#",
+		"#.........#",
+		"#.........#",
+		"#.........#",
+		"#.........#",
+		"#.........#",
+		"#.........#",
+		"#........E#",
+		"###########"
+	};
+	EXPECT_TRUE(PathFinder::IsVisibleLOS(clear.Props(), SearchmapPoint(clear.Start()),
+					     SearchmapPoint(clear.End())));
+	EXPECT_TRUE(PathFinder::IsWalkableTo(clear.Props(), clear.Start(), clear.End(), true, noCircle));
+}
+
+
 // === travel tiles ===
 
 // An area transition strip is walkable ground: GetBlockedTile() adds PASSABLE wherever it sees
