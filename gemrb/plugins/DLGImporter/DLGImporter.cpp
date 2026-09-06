@@ -134,7 +134,7 @@ Holder<Condition> DLGImporter::GetCondition(const char* string) const
 	char** lines = GetStrings(string, count);
 	Condition condition;
 	for (size_t i = 0; i < count; ++i) {
-		Trigger* trigger = GenerateTrigger(lines[i]);
+		Holder<Trigger> trigger = GenerateTrigger(lines[i]);
 		if (!trigger) {
 			Log(WARNING, "DLGImporter", "Can't compile trigger: {}", lines[i]);
 		} else {

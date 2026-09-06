@@ -2009,10 +2009,9 @@ int GameScript::EvaluateString(Scriptable* Sender, const char* String)
 	if (String[0] == 0) {
 		return 0;
 	}
-	Trigger* tri = GenerateTrigger(String);
+	Holder<Trigger> tri = GenerateTrigger(String);
 	if (tri) {
 		int ret = tri->Evaluate(Sender);
-		tri->Release();
 		return ret;
 	}
 	return 0;
@@ -2028,7 +2027,7 @@ bool Condition::Evaluate(Scriptable* Sender) const
 		return true;
 	}
 
-	for (const Trigger* tR : triggers) {
+	for (auto tR : triggers) {
 		//do not evaluate triggers in an Or() block if one of them
 		//was already True() ... but this sane approach was only used in iwd2!
 		if (!core->HasFeature(GFFlags::EFFICIENT_OR) || !ORcount || !subresult) {

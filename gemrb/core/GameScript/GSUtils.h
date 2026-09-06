@@ -120,7 +120,7 @@ GEM_EXPORT ieDword CheckVariable(const Scriptable* Sender, const StringParam& Va
 GEM_EXPORT Point CheckPointVariable(const Scriptable* Sender, const StringParam& VarName, const VarContext& Context = {}, bool* valid = nullptr);
 GEM_EXPORT bool VariableExists(const Scriptable* Sender, const StringParam& VarName, const VarContext& Context);
 Holder<Action> GenerateActionCore(const char* src, const char* str, unsigned short actionID);
-Trigger* GenerateTriggerCore(const char* src, const char* str, int trIndex, int negate);
+Holder<Trigger> GenerateTriggerCore(const char* src, const char* str, int trIndex, int negate);
 GEM_EXPORT unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable* Sender, const Point& target = Point());
 unsigned int GetItemDistance(const ResRef& itemres, int header, float_t angle);
 void SetupWishCore(Scriptable* Sender, TableMgr::index_t column, int picks);

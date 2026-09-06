@@ -335,9 +335,9 @@ Holder<Action> GenerateActionCore(const char* src, const char* str, unsigned sho
 }
 
 
-Trigger* GenerateTriggerCore(const char* src, const char* str, int trIndex, int negate)
+Holder<Trigger> GenerateTriggerCore(const char* src, const char* str, int trIndex, int negate)
 {
-	Trigger* newTrigger = new Trigger();
+	Holder<Trigger> newTrigger = MakeHolder<Trigger>();
 	newTrigger->triggerID = (unsigned short) triggersTable->GetValueIndex(trIndex) & 0x3fff;
 	newTrigger->flags = (unsigned short) negate;
 	int mergeStrings = triggerflags[newTrigger->triggerID] & TF_MERGESTRINGS;
@@ -352,7 +352,6 @@ Trigger* GenerateTriggerCore(const char* src, const char* str, int trIndex, int 
 			switch (*str) {
 				default:
 					Log(ERROR, "GSUtils", "Invalid type: {}", str);
-					delete newTrigger;
 					return nullptr;
 
 				case 'p': // Point
@@ -406,7 +405,6 @@ Trigger* GenerateTriggerCore(const char* src, const char* str, int trIndex, int 
 						// BUT at the same time, some bg2 mod prefixes use it too (eg. Tashia)
 						while (!IsParamDelimiter(src)) {
 							if (*src == 0) {
-								delete newTrigger;
 								return nullptr;
 							}
 
@@ -423,7 +421,6 @@ Trigger* GenerateTriggerCore(const char* src, const char* str, int trIndex, int 
 							str++;
 							if (*str != 's') {
 								Log(ERROR, "GSUtils", "Invalid mergestrings 2: {}", str);
-								delete newTrigger;
 								return nullptr;
 							}
 							SKIP_ARGUMENT();
@@ -442,7 +439,6 @@ Trigger* GenerateTriggerCore(const char* src, const char* str, int trIndex, int 
 							i = 0;
 							while (*src != '"' && (*src != '#' || (*(src - 1) != '(' && *(src - 1) != ','))) {
 								if (*src == 0) {
-									delete newTrigger;
 									return nullptr;
 								}
 
@@ -465,7 +461,7 @@ Trigger* GenerateTriggerCore(const char* src, const char* str, int trIndex, int 
 	return newTrigger;
 }
 
-Trigger* GenerateTrigger(std::string string)
+Holder<Trigger> GenerateTrigger(std::string string)
 {
 	StringToLower(string);
 	ScriptDebugLog(DebugMode::TRIGGERS, "Compiling: '{}'", string);
@@ -484,7 +480,7 @@ Trigger* GenerateTrigger(std::string string)
 	}
 	const char* src = string.c_str() + start + len;
 	const char* str = triggersTable->GetStringIndex(i).c_str() + len;
-	Trigger* trigger = GenerateTriggerCore(src, str, i, negate);
+	Holder<Trigger> trigger = GenerateTriggerCore(src, str, i, negate);
 	if (!trigger) {
 		Log(ERROR, "GameScript", "Malformed scripting trigger: '{}'", string);
 		return nullptr;

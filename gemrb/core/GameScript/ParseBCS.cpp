@@ -101,7 +101,7 @@ static Object* DecodeObject(const std::string& line)
 	return oB;
 }
 
-static Trigger* ReadTrigger(DataStream* stream)
+static Holder<Trigger> ReadTrigger(DataStream* stream)
 {
 	std::string line;
 	stream->ReadLine(line);
@@ -110,7 +110,7 @@ static Trigger* ReadTrigger(DataStream* stream)
 	}
 
 	stream->ReadLine(line);
-	Trigger* tR = new Trigger();
+	Holder<Trigger> tR = MakeHolder<Trigger>();
 	// this exists only in PST?
 	if (HasTriggerPoint) {
 		sscanf(line.data(), R"(%hu %d %d %d %d [%d,%d] "%[^"]" "%[^"]" OB)",
@@ -135,7 +135,6 @@ static Trigger* ReadTrigger(DataStream* stream)
 	stream->ReadLine(line);
 	// discard invalid triggers, so they won't cause a crash
 	if (tR->triggerID >= MAX_TRIGGERS) {
-		delete tR;
 		return nullptr;
 	}
 	return tR;
@@ -152,7 +151,7 @@ static Holder<Condition> ReadCondition(DataStream* stream)
 	Condition cO;
 	Object* triggerer = nullptr;
 	while (true) {
-		Trigger* tR = ReadTrigger(stream);
+		Holder<Trigger> tR = ReadTrigger(stream);
 		if (!tR) {
 			if (triggerer) delete triggerer;
 			break;
@@ -171,7 +170,6 @@ static Holder<Condition> ReadCondition(DataStream* stream)
 		} else if (tR->triggerID == NextTriggerObjectID) {
 			triggerer = tR->objectParameter;
 			tR->objectParameter = nullptr;
-			delete tR;
 			continue;
 		}
 

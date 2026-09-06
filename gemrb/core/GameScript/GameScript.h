@@ -176,29 +176,13 @@ public:
 	};
 
 	std::string dump() const;
-
-	void Release()
-	{
-		delete this;
-	}
 };
 
 class GEM_EXPORT Condition final : protected Canary {
 public:
-	Condition() noexcept = default;
-	Condition(Condition&&) noexcept = default;
-	~Condition() noexcept override
-	{
-		for (auto& trigger : triggers) {
-			if (trigger) {
-				trigger->Release();
-				trigger = nullptr;
-			}
-		}
-	}
 	bool Evaluate(Scriptable* Sender) const;
 
-	std::vector<Trigger*> triggers;
+	std::vector<Holder<Trigger>> triggers;
 };
 
 class GEM_EXPORT Action final : public std::enable_shared_from_this<Action>, protected Canary {
@@ -1527,7 +1511,7 @@ public: //Script Functions
 
 GEM_EXPORT Holder<Action> GenerateAction(std::string String);
 GEM_EXPORT Holder<Action> GenerateActionDirect(std::string string, const Scriptable* object);
-GEM_EXPORT Trigger* GenerateTrigger(std::string string);
+GEM_EXPORT Holder<Trigger> GenerateTrigger(std::string string);
 
 void InitializeIEScript();
 
