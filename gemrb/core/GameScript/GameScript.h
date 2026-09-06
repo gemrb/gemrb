@@ -196,10 +196,6 @@ public:
 			}
 		}
 	}
-	void Release()
-	{
-		delete this;
-	}
 	bool Evaluate(Scriptable* Sender) const;
 
 	std::vector<Trigger*> triggers;
