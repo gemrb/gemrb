@@ -6119,6 +6119,8 @@ void GameScript::ChangeAnimationNoEffect(Scriptable* Sender, Holder<Action> para
 	ChangeAnimationCore(actor, parameters->resref0Parameter, false);
 }
 
+// NOTE: pst has PolymorphEx (aliased) with RangeModes int1 that we ignore
+// scripts only used with 0, 1 or 4, but RE shows the field to be practically ignored
 void GameScript::Polymorph(Scriptable* Sender, Holder<Action> parameters)
 {
 	Actor* act = Scriptable::As<Actor>(Sender);
