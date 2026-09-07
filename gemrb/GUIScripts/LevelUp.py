@@ -62,7 +62,7 @@ def OpenLevelUpWindow():
 
 	LevelUpWindow = GemRB.LoadWindow (3, "GUIREC")
 
-	if GameCheck.IsBG2OrEE ():
+	if GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ():
 		InfoButton = LevelUpWindow.GetControl (125)
 		InfoButton.SetText (13707)
 		InfoButton.OnPress (LevelUpInfoPress)
@@ -232,7 +232,7 @@ def OpenLevelUpWindow():
 		# set values required by the hla level up code
 		HLACount = HLACount // HLATable.GetValue (ClassName, "RATE", GTV_INT)
 		GemRB.SetVar ("HLACount", HLACount)
-	if GameCheck.IsBG2OrEE ():
+	if GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ():
 		HLAButton = LevelUpWindow.GetControl (126)
 		if HLACount:
 			HLAButton.SetText (4954)
@@ -244,7 +244,7 @@ def OpenLevelUpWindow():
 	Level1 = []
 	for i in range (len (Level)):
 		Level1.append (Level[i]-LevelDiff[i])
-	if GameCheck.IsBG2OrEE ():
+	if GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ():
 		LUProfsSelection.SetupProfsWindow (pc, LUProfsSelection.LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
 	else:
 		LUProfsSelection.SetupProfsWindow (pc, LUProfsSelection.LUPROFS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False, 0)
@@ -253,13 +253,13 @@ def OpenLevelUpWindow():
 	#we autohide the skills and let SetupSkillsWindow show them if needbe
 	for i in range (4):
 		HideSkills (i)
-	if GameCheck.IsBG2OrEE ():
+	if GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ():
 		LUSkillsSelection.SetupSkillsWindow (pc, LUSkillsSelection.LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level)
 	else:
 		LUSkillsSelection.SetupSkillsWindow (pc, LUSkillsSelection.LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False)
 	NewSkillPoints = GemRB.GetVar ("SkillPointsLeft")
 
-	if GameCheck.IsBG2OrEE ():
+	if GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ():
 		TextAreaControl = LevelUpWindow.GetControl(110)
 		TextAreaControl.SetText(GetLevelUpNews())
 	else:
@@ -301,7 +301,7 @@ def RedrawSkills():
 
 	# we need to disable the HLA button if we don't have any HLAs left
 	HLACount = GemRB.GetVar ("HLACount") or 0
-	if GameCheck.IsBG2OrEE () and HLACount == 0:
+	if (GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ()) and HLACount == 0:
 		# turn the HLA button off
 		HLAButton = LevelUpWindow.GetControl (126)
 		HLAButton.SetState(IE_GUI_BUTTON_DISABLED)

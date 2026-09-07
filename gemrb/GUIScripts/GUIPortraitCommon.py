@@ -109,7 +109,7 @@ def OnLoad(PortraitModification = False):
 		BackOrCancelButton.SetText(13727)
 	else:
 		BackOrCancelButton.SetText(15416)
-		if GameCheck.IsBG1OrEE():
+		if GameCheck.IsBG1():
 			import CharGenCommon
 			BackOrCancelButton.OnPress(lambda: CharGenCommon.back(AppearanceWindow))
 		else:
@@ -197,7 +197,7 @@ def PortraitButtonNextPress():
 
 def PortraitApplyName(PortraitName):
 	if not InGUIRECMode:
-		if GameCheck.IsBG1OrEE():
+		if GameCheck.IsBG1():
 			import CharGenCommon
 			CharGenCommon.next()
 		elif GameCheck.IsIWD1():

@@ -132,12 +132,14 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			DoneButton = SpellsWindow.GetControl (33)
 			SpellsTextArea = SpellsWindow.GetControl(30)
 			SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000022)
-		elif GameCheck.IsAnyEE ():
+		elif GameCheck.IsBG2EE ():
 			NewScrollBarID = 40
 			DoneButton = SpellsWindow.GetControl (42)
 			SpellsTextArea = SpellsWindow.GetControl(41)
 			SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
 		else:
+			# BGEE retains the original GUIREC/8 text and Done IDs even
+			# though its chargen and main level-up windows use EE layouts.
 			DoneButton = SpellsWindow.GetControl (28)
 			SpellsTextArea = SpellsWindow.GetControl(26)
 			SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
@@ -184,10 +186,13 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 
 		# make sure we get more spells of each class before continuing
 		SpellsSelectPointsLeft[i] = SpellsToMemoTable.GetValue (str(level), str(i + 1), GTV_INT) - PreviousPoints
-		if SpellsSelectPointsLeft[i] <= 0:
+		if SpellsSelectPointsLeft[i] <= 0 and not Spellbook.HasSorcererBook (pc):
 			continue
 
-		# also make sure we don't learn too many, which is important for sorcerers
+		# Spontaneous casters can learn another spell without gaining a
+		# casting slot (eg. sorcerer level 7 gains a known level 1 spell,
+		# while its level 1 slot count remains 6). Use the learning table
+		# independently of slot growth for those books.
 		PreviousPoints = SpellLearnTable.GetValue (str(level - diff), str(i + 1), GTV_INT)
 		SpellsSelectPointsLeft[i] = SpellLearnTable.GetValue (str(level), str(i + 1), GTV_INT) - PreviousPoints
 		# luckily the bonus applies both to learning and memorization

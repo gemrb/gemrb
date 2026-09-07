@@ -2681,6 +2681,17 @@ void Interface::InitItemTypes()
 	if (!it) {
 		ThrowException("Could not open itemtype table.");
 	}
+	// EE's native ITEMTYPE stores sounds and one slot number, not GemRB's
+	// column-per-slot bit matrix. Keep compatible mod tables, but do not
+	// interpret native SLOT=-1 as the SHIELD bit for ordinary weapons.
+	if ((config.GameType == "bgee" || config.GameType == "bg2ee") &&
+	    it->GetColumnCount() == 3 && it->GetColumnIndex("TAKESOUND") == 0 &&
+	    it->GetColumnIndex("DROPSOUND") == 1 && it->GetColumnIndex("SLOT") == 2) {
+		it = gamedata->LoadTable("gitemtyp");
+		if (!it) {
+			ThrowException("Could not open GemRB itemtype slot matrix.");
+		}
+	}
 	ItemTypes = it->GetRowCount(); //number of itemtypes
 
 	TableMgr::index_t InvSlotTypes = it->GetColumnCount();

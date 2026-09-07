@@ -89,7 +89,7 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 		if GameCheck.IsBG2OrEE () or GameCheck.IsIWD2 () or GameCheck.IsBGEE ():
 			import CharGenCommon
 			CharGenCommon.PositionCharGenWin (ProfsWindow)
-	elif proftype == LUPROFS_TYPE_LEVELUP and GameCheck.IsBG2OrEE ():
+	elif proftype == LUPROFS_TYPE_LEVELUP and (GameCheck.IsBG2OrEE () or GameCheck.IsBGEE ()):
 		ProfsOffsetSum = 36
 		ProfsOffsetButton1 = 1
 		ProfsOffsetStar = 48

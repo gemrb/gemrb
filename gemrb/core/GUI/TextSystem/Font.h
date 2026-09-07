@@ -145,6 +145,8 @@ private:
 protected:
 	Holder<Palette> palette;
 	bool background = false;
+	// Lazy font importers must distinguish an uncached glyph from a fallback.
+	const Glyph* FindGlyph(ieWord chr) const;
 
 public:
 	const int LineHeight = 0;

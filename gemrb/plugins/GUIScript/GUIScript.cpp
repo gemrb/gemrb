@@ -11168,6 +11168,64 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject* /*self*/, PyObject* args
 	return PyLong_FromLong(idx - 1);
 }
 
+struct PythonSpellCastCheck : PythonCallback {
+	using PythonCallback::PythonCallback;
+
+	bool operator()(ieDword actorID, const ResRef& spell) const
+	{
+		PyObject* args = Py_BuildValue("(Is)", actorID, spell.c_str());
+		if (!args) {
+			PyErr_Print();
+			return false;
+		}
+		int allowed = 0;
+		const bool called = CallPython<int, PyObject_IsTrue>(Function, args, &allowed);
+		// Both callback exceptions and exceptions from truth-value conversion veto.
+		if (PyErr_Occurred()) {
+			PyErr_Print();
+			return false;
+		}
+		return called && allowed > 0;
+	}
+};
+
+PyDoc_STRVAR(GemRB_SetSpellCastCheck__doc,
+	     "===== SetSpellCastCheck =====\n\
+\n\
+**Prototype:** GemRB.SetSpellCastCheck (Callback)\n\
+\n\
+**Description:** Installs an optional check for accepted GUI spell casts.\n\
+The callback receives (actorID, spellResRef), using the party slot for party\n\
+members and the global ID otherwise. spellResRef is the actual spell resource,\n\
+including any substitution. A false result or Python exception prevents the\n\
+cast. The check runs after target validation, immediately before queuing the\n\
+spell action, or before applying an instant TARGET_NONE spell. It does not\n\
+run when merely selecting or canceling a target, for item use, or for AI casts.\n\
+For spells accepting multiple targets it runs once per accepted target. This\n\
+is acceptance of a GUI command, not confirmation that its later effect succeeds.\n\
+The callback must not start another cast, change targeting, or unload the game.\n\
+It lasts for the current GameControl lifetime; None removes the check.\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [SpellCast](SpellCast.md)\n\
+");
+
+static PyObject* GemRB_SetSpellCastCheck(PyObject* /*self*/, PyObject* args)
+{
+	PyObject* callback = nullptr;
+	PARSE_ARGS(args, "O", &callback);
+	GET_GAMECONTROL();
+	if (callback == Py_None) {
+		gc->SetSpellCastCheck(nullptr);
+	} else if (PyCallable_Check(callback)) {
+		gc->SetSpellCastCheck(PythonSpellCastCheck(callback));
+	} else {
+		return RuntimeError("Spell cast check must be callable or None.");
+	}
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR(GemRB_SpellCast__doc,
 	     "===== SpellCast =====\n\
 \n\
@@ -11257,6 +11315,9 @@ static PyObject* GemRB_SpellCast(PyObject* /*self*/, PyObject* args)
 		case TARGET_NONE:
 			//reset the cursor
 			gc->ResetTargetMode();
+			if (!gc->CheckSpellCast(actor, spelldata.spellName)) {
+				break;
+			}
 			//this is always instant casting without spending the spell
 			core->ApplySpell(spelldata.spellName, actor, actor, 0);
 			break;
@@ -13009,6 +13070,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetPlayerStat, METH_VARARGS),
 	METHOD(SetPlayerString, METH_VARARGS),
 	METHOD(SetPurchasedAmount, METH_VARARGS),
+	METHOD(SetSpellCastCheck, METH_VARARGS),
 	METHOD(SetTimedEvent, METH_VARARGS),
 	METHOD(SetTimer, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),
