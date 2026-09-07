@@ -47,9 +47,9 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		chr = unicodeChr;
 	}
 	// first check if the glyph already exists
-	const Glyph& g = Font::GetGlyph(chr);
-	if (g.pixels) {
-		return g;
+	const Glyph* g = FindGlyph(chr);
+	if (g) {
+		return *g;
 	}
 
 	// attempt to generate glyph
