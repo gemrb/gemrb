@@ -220,10 +220,6 @@ public:
 			}
 		}
 	}
-	void Release()
-	{
-		delete this;
-	}
 	int Execute(Scriptable* Sender);
 
 	unsigned char weight = 0;
@@ -232,60 +228,20 @@ public:
 
 class GEM_EXPORT ResponseSet final : protected Canary {
 public:
-	~ResponseSet() final
-	{
-		for (auto& response : responses) {
-			response->Release();
-			response = nullptr;
-		}
-	}
-	void Release()
-	{
-		delete this;
-	}
 	int Execute(Scriptable* Sender);
 
-	std::vector<Response*> responses;
+	std::vector<Holder<Response>> responses;
 };
 
 class GEM_EXPORT ResponseBlock final : protected Canary {
 public:
-	ResponseBlock() noexcept = default;
-	~ResponseBlock() noexcept override
-	{
-		condition = nullptr;
-		if (responseSet) {
-			responseSet->Release();
-			responseSet = nullptr;
-		}
-	}
-	void Release()
-	{
-		delete this;
-	}
-
 	Holder<Condition> condition = nullptr;
-	ResponseSet* responseSet = nullptr;
+	Holder<ResponseSet> responseSet = nullptr;
 };
 
 class GEM_EXPORT Script final : protected Canary {
 public:
-	~Script() noexcept override
-	{
-		for (auto& responseBlock : responseBlocks) {
-			if (responseBlock) {
-				responseBlock->Release();
-				responseBlock = nullptr;
-			}
-		}
-	}
-
-	std::vector<ResponseBlock*> responseBlocks;
-
-	void Release()
-	{
-		delete this;
-	}
+	std::vector<Holder<ResponseBlock>> responseBlocks;
 };
 
 using TriggerFunction = int (*)(Scriptable*, const Trigger*);
@@ -415,9 +371,9 @@ public:
 
 private: //Internal Functions
 	Script* CacheScript(const ResRef& ResRef, bool AIScript);
-	ResponseBlock* ReadResponseBlock(DataStream* stream);
-	ResponseSet* ReadResponseSet(DataStream* stream);
-	Response* ReadResponse(DataStream* stream);
+	Holder<ResponseBlock> ReadResponseBlock(DataStream* stream);
+	Holder<ResponseSet> ReadResponseSet(DataStream* stream);
+	Holder<Response> ReadResponse(DataStream* stream);
 	static int InParty(Scriptable* Sender, const Trigger* parameters, bool allowdead);
 
 	// Internal variables

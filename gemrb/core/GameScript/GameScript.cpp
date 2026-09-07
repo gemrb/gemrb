@@ -1838,7 +1838,7 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 	auto newScript = BcsCache.SetAt(resRef).first;
 
 	while (true) {
-		ResponseBlock* rB = ReadResponseBlock(stream);
+		Holder<ResponseBlock> rB = ReadResponseBlock(stream);
 		if (!rB)
 			break;
 		newScript->responseBlocks.push_back(rB);
@@ -1873,7 +1873,7 @@ bool GameScript::Update(bool* continuing, bool* done)
 
 	RandomNumValue = RAND<int>();
 	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
-		ResponseBlock* rB = script->responseBlocks[a];
+		auto rB = script->responseBlocks[a];
 		if (!rB->condition->Evaluate(MySelf)) {
 			continue;
 		}
@@ -1958,10 +1958,10 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 	// first response, take the object from the first action,
 	// and then add the actions to that object's queue.
 	for (const auto& rB : script->responseBlocks) {
-		const ResponseSet* rS = rB->responseSet;
+		const ResponseSet* rS = rB->responseSet.get();
 		if (rS->responses.empty()) continue;
 
-		Response* response = rS->responses[0];
+		auto response = rS->responses[0];
 		if (response->actions.empty()) continue;
 
 		auto action = response->actions[0];
@@ -2105,7 +2105,7 @@ int ResponseSet::Execute(Scriptable* Sender)
 
 	// ees added a switch-case mode with the Switch trigger
 	if (Sender->weightsAsCases) {
-		for (Response* response : responses) {
+		for (auto response : responses) {
 			if (response->weight == Sender->weightsAsCases) {
 				Sender->weightsAsCases = 0;
 				return response->Execute(Sender);
@@ -2117,14 +2117,14 @@ int ResponseSet::Execute(Scriptable* Sender)
 		int randWeight = 0;
 		int maxWeight = 0;
 
-		for (const Response* response : responses) {
+		for (const auto& response : responses) {
 			maxWeight += response->weight;
 		}
 		if (maxWeight) {
 			randWeight = RAND(0, maxWeight - 1);
 		}
 
-		for (Response* response : responses) {
+		for (auto response : responses) {
 			if (response->weight > randWeight) {
 				return response->Execute(Sender);
 			}

@@ -174,7 +174,7 @@ static Holder<Condition> ReadCondition(DataStream* stream)
 	return MakeHolder<Condition>(std::move(cO));
 }
 
-ResponseBlock* GameScript::ReadResponseBlock(DataStream* stream)
+Holder<ResponseBlock> GameScript::ReadResponseBlock(DataStream* stream)
 {
 	std::string line;
 	stream->ReadLine(line, 10);
@@ -182,13 +182,13 @@ ResponseBlock* GameScript::ReadResponseBlock(DataStream* stream)
 		return nullptr;
 	}
 
-	ResponseBlock* rB = new ResponseBlock();
+	auto rB = MakeHolder<ResponseBlock>();
 	rB->condition = ReadCondition(stream);
 	rB->responseSet = ReadResponseSet(stream);
 	return rB;
 }
 
-ResponseSet* GameScript::ReadResponseSet(DataStream* stream)
+Holder<ResponseSet> GameScript::ReadResponseSet(DataStream* stream)
 {
 	std::string line;
 	stream->ReadLine(line, 10);
@@ -196,9 +196,9 @@ ResponseSet* GameScript::ReadResponseSet(DataStream* stream)
 		return nullptr;
 	}
 
-	ResponseSet* rS = new ResponseSet();
+	auto rS = MakeHolder<ResponseSet>();
 	while (true) {
-		Response* rE = ReadResponse(stream);
+		auto rE = ReadResponse(stream);
 		if (!rE) break;
 		rS->responses.push_back(rE);
 	}
@@ -207,7 +207,7 @@ ResponseSet* GameScript::ReadResponseSet(DataStream* stream)
 
 // this is the border of the GameScript object (all subsequent functions are library functions)
 // we can't make this a library function, because scriptlevel is set here
-Response* GameScript::ReadResponse(DataStream* stream)
+Holder<Response> GameScript::ReadResponse(DataStream* stream)
 {
 	std::string line;
 	stream->ReadLine(line);
@@ -215,7 +215,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		return nullptr;
 	}
 
-	Response* rE = new Response();
+	auto rE = MakeHolder<Response>();
 	rE->weight = 0;
 	stream->ReadLine(line, 1024);
 	char* poi;
