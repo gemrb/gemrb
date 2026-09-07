@@ -45,11 +45,11 @@ static void ParseString(const char*& src, char* tmp)
 	if (*src) src++;
 }
 
-static Object* DecodeObject(const std::string& line)
+static Holder<Object> DecodeObject(const std::string& line)
 {
 	const char* cursor = line.c_str();
 
-	Object* oB = new Object();
+	Holder<Object> oB = MakeHolder<Object>();
 	for (int i = 0; i < ObjectFieldsCount; i++) {
 		oB->objectFields[i] = ParseInt(cursor);
 	}
@@ -95,7 +95,6 @@ static Object* DecodeObject(const std::string& line)
 	}
 	// let the object realize it has no future (in case of null objects)
 	if (oB->isNull()) {
-		oB->Release();
 		return nullptr;
 	}
 	return oB;
@@ -149,11 +148,10 @@ static Holder<Condition> ReadCondition(DataStream* stream)
 	}
 
 	Condition cO;
-	Object* triggerer = nullptr;
+	Holder<Object> triggerer;
 	while (true) {
 		Holder<Trigger> tR = ReadTrigger(stream);
 		if (!tR) {
-			if (triggerer) delete triggerer;
 			break;
 		}
 
@@ -164,12 +162,10 @@ static Holder<Condition> ReadCondition(DataStream* stream)
 		 * cannot be found, the next trigger will evaluate to false.
 		 */
 		if (triggerer) {
-			delete tR->objectParameter; // not using Release, so we don't have to check if it's null
 			tR->objectParameter = triggerer;
 			triggerer = nullptr;
 		} else if (tR->triggerID == NextTriggerObjectID) {
 			triggerer = tR->objectParameter;
-			tR->objectParameter = nullptr;
 			continue;
 		}
 
@@ -235,7 +231,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		aC->actionID = strtounsigned<uint16_t>(line.c_str(), nullptr, 10);
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine(line, 1024);
-			Object* oB = DecodeObject(line);
+			Holder<Object> oB = DecodeObject(line);
 			aC->objects[i] = oB;
 			if (i != 2) {
 				stream->ReadLine(line, 1024);

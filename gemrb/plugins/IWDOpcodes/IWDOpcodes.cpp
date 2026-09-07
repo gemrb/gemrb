@@ -1545,7 +1545,7 @@ static int fx_animal_rage(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (!target->objects.LastTarget) {
 		//depends on whom it considers enemy
 		Trigger enemy;
-		enemy.objectParameter = new Object;
+		enemy.objectParameter = MakeHolder<Object>();
 		if (STAT_GET(IE_EA) < EA_EVILCUTOFF) {
 			enemy.objectParameter->objectFields[0] = EA_ENEMY;
 		} else {
@@ -2931,7 +2931,7 @@ static int fx_cleave(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//reset attackcount to a previous number and hack the current opponent to another enemy nearby
 	//SeeCore returns the closest living enemy
 	Trigger enemies;
-	enemies.objectParameter = new Object;
+	enemies.objectParameter = MakeHolder<Object>();
 	if (STAT_GET(IE_EA) < EA_EVILCUTOFF) {
 		enemies.objectParameter->objectFields[0] = EA_ENEMY;
 	} else {

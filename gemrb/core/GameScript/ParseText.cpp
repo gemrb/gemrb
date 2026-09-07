@@ -77,7 +77,7 @@ static int ParseIntParam(const char*& src, const char*& str)
 	return strtosigned<int>(src, const_cast<char**>(&src));
 }
 
-static void ParseIdsTarget(const char*& src, Object*& object)
+static void ParseIdsTarget(const char*& src, Holder<Object> object)
 {
 	for (int i = 0; i < DialogObjectIDSCount; i++) {
 		int fieldIndex = DialogObjectIDSOrder[i];
@@ -94,10 +94,10 @@ static void ParseIdsTarget(const char*& src, Object*& object)
 #define SKIP_ARGUMENT() \
 	while (*str && (*str != ',') && (*str != ')')) str++
 
-static void ParseObject(const char*& str, const char*& src, Object*& object)
+static Holder<Object> ParseObject(const char*& str, const char*& src)
 {
 	SKIP_ARGUMENT();
-	object = new Object();
+	auto object = MakeHolder<Object>();
 	switch (*src) {
 		case ')':
 			// missing parameter
@@ -142,6 +142,7 @@ static void ParseObject(const char*& str, const char*& src, Object*& object)
 			}
 			src += Nesting; // skipping )
 	}
+	return object;
 }
 
 // some iwd2 dialogs use # instead of " for delimiting parameters (11phaen, 30gobpon, 11oswald)
@@ -166,7 +167,7 @@ Holder<Action> GenerateActionCore(const char* src, const char* str, unsigned sho
 	int stringsCount = 0;
 	int intCount = 0;
 	if (actionflags[newAction->actionID] & AF_DIRECT) {
-		Object* tmp = new Object();
+		auto tmp = MakeHolder<Object>();
 		tmp->objectFields[0] = -1;
 		newAction->objects[objectCount++] = tmp;
 	}
@@ -235,7 +236,6 @@ Holder<Action> GenerateActionCore(const char* src, const char* str, unsigned sho
 							return nullptr;
 						}
 						act->objects[0] = newAction->objects[0];
-						newAction->objects[0] = nullptr; // avoid freeing of object
 						newAction = act;
 					}
 					break;
@@ -245,7 +245,7 @@ Holder<Action> GenerateActionCore(const char* src, const char* str, unsigned sho
 						Log(ERROR, "GSUtils", "Invalid object count!");
 						return nullptr;
 					}
-					ParseObject(str, src, newAction->objects[objectCount++]);
+					newAction->objects[objectCount++] = ParseObject(str, src);
 					break;
 
 				case 's': // String
@@ -378,7 +378,7 @@ Holder<Trigger> GenerateTriggerCore(const char* src, const char* str, int trInde
 					break;
 
 				case 'o': // Object
-					ParseObject(str, src, newTrigger->objectParameter);
+					newTrigger->objectParameter = ParseObject(str, src);
 					break;
 
 				case 's': // String
@@ -535,7 +535,7 @@ Holder<Action> GenerateActionDirect(std::string string, const Scriptable* object
 {
 	Holder<Action> action = GenerateAction(std::move(string));
 	if (!action) return nullptr;
-	Object* tmp = action->objects[1];
+	Holder<Object> tmp = action->objects[1];
 	if (tmp && tmp->objectFields[0] == -1) {
 		tmp->objectFields[1] = object->GetGlobalID();
 	}

@@ -216,12 +216,12 @@ static Targets* EvaluateObject(const Map* map, const Scriptable* Sender, const O
 
 Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Holder<Action> parameters, int gaFlags)
 {
-	return GetAllObjects(map, Sender, parameters->objects[1], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
+	return GetAllObjects(map, Sender, parameters->objects[1].get(), gaFlags, parameters->flags & ACF_MISSING_OBJECT);
 }
 
 Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Trigger* parameters, int gaFlags)
 {
-	return GetAllObjects(map, Sender, parameters->objectParameter, gaFlags, parameters->flags & TF_MISSING_OBJECT);
+	return GetAllObjects(map, Sender, parameters->objectParameter.get(), gaFlags, parameters->flags & TF_MISSING_OBJECT);
 }
 
 Targets* GetAllObjects(const Map* map, Scriptable* Sender, const Object* oC, int ga_flags, bool anyone)
@@ -304,7 +304,7 @@ Scriptable* GetActorObject(const TileMap* TMap, const ieVariable& name)
 // blocking actions need to store some kinds of objects between ticks
 Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Holder<Action> parameters, int gaFlags)
 {
-	return GetStoredActorFromObject(Sender, parameters->objects[1], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
+	return GetStoredActorFromObject(Sender, parameters->objects[1].get(), gaFlags, parameters->flags & ACF_MISSING_OBJECT);
 }
 
 Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Object* oC, int ga_flags, bool anyone)
@@ -332,17 +332,17 @@ Scriptable* GetStoredActorFromObject(Scriptable* Sender, const Object* oC, int g
 
 Scriptable* GetScriptableFromObject(Scriptable* Sender, const Trigger* parameters, int gaFlags)
 {
-	return GetScriptableFromObject(Sender, parameters->objectParameter, gaFlags, parameters->flags & TF_MISSING_OBJECT);
+	return GetScriptableFromObject(Sender, parameters->objectParameter.get(), gaFlags, parameters->flags & TF_MISSING_OBJECT);
 }
 
 Scriptable* GetScriptableFromObject(Scriptable* Sender, const Holder<Action> parameters, int gaFlags)
 {
-	return GetScriptableFromObject(Sender, parameters->objects[1], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
+	return GetScriptableFromObject(Sender, parameters->objects[1].get(), gaFlags, parameters->flags & ACF_MISSING_OBJECT);
 }
 
 Scriptable* GetScriptableFromObject2(Scriptable* Sender, const Holder<Action> parameters, int gaFlags)
 {
-	return GetScriptableFromObject(Sender, parameters->objects[2], gaFlags, parameters->flags & ACF_MISSING_OBJECT);
+	return GetScriptableFromObject(Sender, parameters->objects[2].get(), gaFlags, parameters->flags & ACF_MISSING_OBJECT);
 }
 
 Scriptable* GetScriptableFromObject(Scriptable* Sender, const Object* oC, int gaFlags, bool anyone)
@@ -463,7 +463,7 @@ bool MatchActor(const Scriptable* Sender, ieDword actorID, const Object* oC)
 
 int GetObjectCount(Scriptable* Sender, const Trigger* parameters)
 {
-	const Object* oC = parameters->objectParameter;
+	const Object* oC = parameters->objectParameter.get();
 	return GetObjectCount(Sender, oC, parameters->flags & TF_MISSING_OBJECT);
 }
 
@@ -493,7 +493,7 @@ int GetObjectCount(Scriptable* Sender, const Object* oC, bool anyone)
 //actor having at high level
 int GetObjectLevelCount(Scriptable* Sender, const Trigger* parameters)
 {
-	const Object* oC = parameters->objectParameter;
+	const Object* oC = parameters->objectParameter.get();
 	bool anyone = parameters->flags & TF_MISSING_OBJECT;
 	if (!oC && !anyone) {
 		return 0;

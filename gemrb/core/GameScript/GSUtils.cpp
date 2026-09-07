@@ -1703,10 +1703,10 @@ bool IsInObjectRect(const Point& pos, const Region& rect)
 	}
 }
 
-static Object* ObjectCopy(const Object* object)
+static Holder<Object> ObjectCopy(const Object* object)
 {
 	if (!object) return nullptr;
-	Object* newObject = new Object();
+	auto newObject = MakeHolder<Object>();
 	memcpy(newObject->objectFields, object->objectFields, sizeof(newObject->objectFields));
 	memcpy(newObject->objectFilters, object->objectFilters, sizeof(newObject->objectFilters));
 	newObject->objectRect = object->objectRect;
@@ -1725,7 +1725,7 @@ Holder<Action> ParamCopy(const Holder<Action>parameters)
 	newAction->string0Parameter = parameters->string0Parameter;
 	newAction->string1Parameter = parameters->string1Parameter;
 	for (int c = 0; c < 3; c++) {
-		newAction->objects[c] = ObjectCopy(parameters->objects[c]);
+		newAction->objects[c] = ObjectCopy(parameters->objects[c].get());
 	}
 	return newAction;
 }
@@ -1741,8 +1741,8 @@ Holder<Action> ParamCopyNoOverride(const Holder<Action>parameters)
 	newAction->string0Parameter = parameters->string0Parameter;
 	newAction->string1Parameter = parameters->string1Parameter;
 	newAction->objects[0] = nullptr;
-	newAction->objects[1] = ObjectCopy(parameters->objects[1]);
-	newAction->objects[2] = ObjectCopy(parameters->objects[2]);
+	newAction->objects[1] = ObjectCopy(parameters->objects[1].get());
+	newAction->objects[2] = ObjectCopy(parameters->objects[2].get());
 	return newAction;
 }
 

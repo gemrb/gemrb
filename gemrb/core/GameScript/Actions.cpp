@@ -7054,7 +7054,7 @@ void GameScript::ChangeAIType(Scriptable* Sender, Holder<Action> parameters)
 	if (!scr) {
 		return;
 	}
-	const Object* ob = parameters->objects[1];
+	const Object* ob = parameters->objects[1].get();
 	if (!ob) {
 		return;
 	}

@@ -135,10 +135,6 @@ public:
 		: objectName() {};
 
 	std::string dump(bool print = true) const;
-	void Release()
-	{
-		delete this;
-	}
 	bool isNull() const;
 };
 
@@ -146,13 +142,6 @@ class GEM_EXPORT Trigger final : protected Canary {
 public:
 	Trigger() noexcept
 		: string0Parameter(), string1Parameter() {};
-	~Trigger() final
-	{
-		if (objectParameter) {
-			objectParameter->Release();
-			objectParameter = nullptr;
-		}
-	}
 	int Evaluate(Scriptable* Sender) const;
 
 	unsigned short triggerID = 0;
@@ -161,7 +150,7 @@ public:
 	int int1Parameter = 0;
 	int int2Parameter = 0;
 	Point pointParameter;
-	Object* objectParameter = nullptr;
+	Holder<Object> objectParameter;
 
 	union {
 		StringParam string0Parameter;
@@ -191,22 +180,12 @@ class GEM_EXPORT Action final : public std::enable_shared_from_this<Action>, pro
 	{}
 
 public:
-	~Action() noexcept override
-	{
-		for (auto& object : objects) {
-			if (object) {
-				object->Release();
-				object = nullptr;
-			}
-		}
-	}
-
 	static Holder<Action> MakeAction() noexcept;
 
 	std::string dump() const;
 
 	unsigned short actionID = 0;
-	Object* objects[3] {};
+	std::array<Holder<Object>, 3> objects;
 	int int0Parameter = 0;
 	Point pointParameter;
 	int int1Parameter = 0;

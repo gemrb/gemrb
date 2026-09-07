@@ -1965,7 +1965,7 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 		if (response->actions.empty()) continue;
 
 		auto action = response->actions[0];
-		Scriptable* target = GetScriptableFromObject(MySelf, action->objects[1]);
+		Scriptable* target = GetScriptableFromObject(MySelf, action->objects[1].get());
 		if (!target) {
 			Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
 			if (InDebugMode(DebugMode::CUTSCENE) && action->objects[1]) {
@@ -2242,7 +2242,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Holder<Action> aC)
 
 	// check for ActionOverride
 	// actions use the second and third object, so this is only set when overridden (see GenerateActionCore)
-	const Object* overrider = aC->objects[0];
+	const Object* overrider = aC->objects[0].get();
 	if (overrider) {
 		Scriptable* scr = GetScriptableFromObject(Sender, overrider);
 		if (CheckDeadException(scr, actionID)) {
