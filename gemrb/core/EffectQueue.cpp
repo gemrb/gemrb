@@ -310,9 +310,6 @@ std::unique_ptr<Effect> EffectQueue::CreateEffect(ieDword opcode, ieDword param1
 		return nullptr;
 	}
 	auto fx = std::make_unique<Effect>();
-	if (!fx) {
-		return nullptr;
-	}
 
 	fx->Target = FX_TARGET_SELF;
 	fx->Opcode = opcode;
@@ -375,8 +372,6 @@ std::unique_ptr<Effect> EffectQueue::CreateEffectCopy(const Effect* oldfx, ieDwo
 		return nullptr;
 	}
 	auto fx = std::make_unique<Effect>(*oldfx);
-	if (!fx) return nullptr;
-
 	fx->Opcode = opcode;
 	fx->Parameter1 = param1;
 	fx->Parameter2 = param2;

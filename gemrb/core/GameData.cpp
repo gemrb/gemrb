@@ -836,6 +836,7 @@ int GameData::GetMonkBonus(int bonusType, int level, const Actor* actor)
 	// ees externalized just APR and in a linear manner, where bonus = class levels/value (rounded down)
 	if (bonusType == 0) {
 		AutoTable weaponMisc = LoadTable("clswpbon", true);
+		assert(weaponMisc);
 		const std::string& className = actor->GetClassName(actor->GetActiveClass());
 		const std::string& kitName = actor->GetKitName(actor->GetBase(IE_KIT));
 		// make this more generic if there's ever a need, now there's no partial

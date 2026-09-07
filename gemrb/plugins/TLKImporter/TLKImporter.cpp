@@ -261,7 +261,7 @@ String TLKImporter::ExternalToken(const ieVariable& token) const
 
 	int tokenCount = static_cast<int>(tokenTable->GetRowCount());
 	for (int idx = 0; idx < tokenCount; ++idx) {
-		auto name = tokenTable->QueryField(idx, 0);
+		const auto& name = tokenTable->QueryField(idx, 0);
 		if (token != name) continue;
 
 		// set to non-zero for protagonist (Player1) tokens, set to zero for current talker tokens

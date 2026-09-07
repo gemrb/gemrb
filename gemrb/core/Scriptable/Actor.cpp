@@ -1657,6 +1657,7 @@ static void InitActorTables()
 	//it is theoretically possible to create hybrid classes
 	AutoTable tm = gamedata->LoadTable("clskills");
 	AutoTable weaponMisc = gamedata->LoadTable("clswpbon", true);
+	assert(weaponMisc);
 	if (tm) {
 		classcount = tm->GetRowCount();
 		noProfPenalty.resize(classcount);
@@ -1762,7 +1763,7 @@ static void InitActorTables()
 	tm = gamedata->LoadTable("damage");
 	if (tm) {
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
-			auto rowName = tm->GetRowName(i);
+			const auto& rowName = tm->GetRowName(i);
 			ResRef tmp = tm->QueryField(rowName, "MAIN");
 			damageMainResources[i] = tmp;
 			if (IsStar(damageMainResources[i])) {
@@ -2983,6 +2984,7 @@ int Actor::GetStyleExtraAPR(bool& isEligible) const
 	if (weaponInfo[0].prof == 254) return 0;
 
 	AutoTable weaponMisc = gamedata->LoadTable("clswpbon", true);
+	assert(weaponMisc);
 	// if a kit is not present in the table, check its class
 	// unfortunately it has a non-distinct default value, so it's hard to be smart about it
 	// we support kits enabling the bonus for classes that don't have it, but not disabling for those that do
@@ -6894,6 +6896,7 @@ int Actor::GetProficiencyBonus(int& style, bool leftOrRight, int& damageBonus, i
 		// +2 main, +2 off with a simple weapon in the off hand
 		// so a minimum penalty of -2, -2
 		AutoTable modifierTable = gamedata->LoadTable("dwmods");
+		assert(modifierTable);
 		std::string hand = "RIGHT";
 		if (wi.wflags & WEAPON_LEFTHAND) hand = "LEFT";
 
@@ -8873,6 +8876,7 @@ bool Actor::GetSoundFrom2DA(ResRef& sound, Verbal index) const
 	// otherwise use the base animation prefix
 	ResRef prefix = anims->ResRefBase;
 	AutoTable aniSndOverride = gamedata->LoadTable("anisndex", true);
+	assert(aniSndOverride);
 	const std::string& row = fmt::format("0x{:4X}", Modified[IE_ANIMATION_ID]);
 	ResRef file = aniSndOverride->QueryField(row, "File");
 	if (!IsStar(file)) {
@@ -10101,10 +10105,12 @@ static ieDword ResolveTableValue(const ResRef& resref, ieDword stat, ieDword mco
 		// we assume that the first entry found is always the super class
 		if (resref == "classes") {
 			AutoTable table = gamedata->LoadTable("clastext", true);
+			assert(table);
 			row = table->FindTableValue(mcol, stat);
 			rowName = table->GetRowName(row);
 		} else if (resref == "racetext") {
 			AutoTable table = gamedata->LoadTable("racedata", true);
+			assert(table);
 			row = table->FindTableValue(mcol, stat);
 			rowName = table->GetRowName(row);
 		} else {

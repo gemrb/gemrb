@@ -843,6 +843,7 @@ void Scriptable::CreateProjectile(const ResRef& spellResRef, ieDword tgt, int le
 			origin = As<const Highlightable>(this)->TrapLaunch;
 		}
 
+		assert(pro);
 		if (caster) {
 			ModifyProjectile(pro, &spl, tgt, level);
 		}

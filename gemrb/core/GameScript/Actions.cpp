@@ -925,6 +925,7 @@ void GameScript::ResetPlayerAI(Scriptable* Sender, Holder<Action> parameters)
 	if (!actor) return;
 
 	AutoTable partyAI = gamedata->LoadTable("partyai", true);
+	if (!partyAI) return;
 	ResRef defaultAI = partyAI->QueryField(actor->GetScriptName(), "AI_SCRIPT");
 	// should we set 0 (SCR_OVERRIDE) instead, now it's the class slot?
 	// ees don't use .bs any more, so the false is always good
@@ -7387,10 +7388,6 @@ static std::unique_ptr<Effect> GetEffect(ieDword opcode)
 		return nullptr;
 	}
 	auto fx = std::make_unique<Effect>();
-	if (!fx) {
-		return nullptr;
-	}
-
 	fx->Opcode = opcode;
 	return fx;
 }
