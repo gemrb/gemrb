@@ -192,6 +192,31 @@ namespace {
 	// gets its own private copy, addressed directly with a rip-relative lea, no GOT, no indirection.
 	// The cost is a few hundred bytes of duplicated .rodata per translation unit.
 	constexpr std::array<PathMapFlags, 256> SearchMapFixupTable = MakeSearchMapFixupTable(std::make_index_sequence<256> {});
+
+	// GetBlockedInRadiusTile() applies its own second fixup to the OR of every tile in the circle.
+	// For an actor circle size of 2 or less that circle is a single tile, so its whole result is
+	// this second fixup composed onto the first - foldable into one more 256-entry table, and so
+	// into one load at the call site instead of the allocating GetBlockedInRadiusTile() call. See
+	// GetChildBlockedStatusForBigSize() below.
+	constexpr PathMapFlags RadiusFixupEntry(unsigned i) noexcept
+	{
+		PathMapFlags f = SearchMapFixupEntry(i);
+		if (bool(f & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR | PathMapFlags::SIDEWALL))) {
+			f &= ~PathMapFlags::PASSABLE;
+		}
+		if (bool(f & PathMapFlags::DOOR_OPAQUE)) {
+			f = PathMapFlags::SIDEWALL;
+		}
+		return f;
+	}
+
+	template<std::size_t... IDXS>
+	constexpr std::array<PathMapFlags, 256> MakeRadiusFixupTable(std::index_sequence<IDXS...>) noexcept
+	{
+		return { { RadiusFixupEntry(IDXS)... } };
+	}
+
+	constexpr std::array<PathMapFlags, 256> RadiusFixupTable = MakeRadiusFixupTable(std::make_index_sequence<256> {});
 } // namespace
 
 /**
@@ -206,8 +231,23 @@ namespace {
 class GEM_EXPORT PathFinder {
 public:
 	// helper function used when the size > 2
-	static PathMapFlags GetChildBlockedStatusForBigSize(const TileProps& tileProps, const SearchmapPoint& smptChild, const unsigned int size)
+	//
+	// GetBlockedInRadiusTile() clamps size to [2, MAX_CIRCLESIZE] and inspects a circle of radius
+	// size - 2, so for every size up to 2 it inspects exactly the tile itself and its result
+	// reduces to RadiusFixupTable[raw searchmap byte] - one load instead of a call that builds and
+	// walks a std::vector<BasePoint>. Sizes 1 and 2 are ordinary actors (most of the party), so
+	// this is the common case for every walkability query made with a nonzero circle size.
+	// GetBlockedInRadiusTile itself stays unchanged - Map.cpp and the tests call it directly -
+	// and still handles everything from size 3 up.
+	//
+	// Deliberately kept out of line (GEM_NOINLINE): inlining this into AccumulateAlongTheLine's
+	// big-size dispatch grows its walk loop and costs the unrelated, more common small-size path
+	// through worse code layout; a call+ret here is nothing next to the allocation it replaces.
+	static GEM_NOINLINE PathMapFlags GetChildBlockedStatusForBigSize(const TileProps& tileProps, const SearchmapPoint& smptChild, const unsigned int size)
 	{
+		if (GEM_LIKELY(size <= 2)) {
+			return RadiusFixupTable[static_cast<uint8_t>(tileProps.QuerySearchMap(smptChild))];
+		}
 		return GetBlockedInRadiusTile(tileProps, smptChild, size);
 	}
 	// helper function used when the size <= 2

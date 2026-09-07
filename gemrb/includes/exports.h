@@ -51,4 +51,17 @@
 	#define GEM_UNLIKELY(x) (!!(x))
 #endif
 
+/* Keeps a function out of line. Only used where the alternative - letting the compiler inline it -
+ * is measurably worse: either it would grow a hot loop's other, more common paths through worse
+ * code layout, or (elsewhere) it would let the compiler re-materialise a returned value at every
+ * use site instead of keeping it in a register.
+ */
+#if defined(__GNUC__) || defined(__clang__)
+	#define GEM_NOINLINE __attribute__((noinline))
+#elif defined(_MSC_VER)
+	#define GEM_NOINLINE __declspec(noinline)
+#else
+	#define GEM_NOINLINE
+#endif
+
 #endif

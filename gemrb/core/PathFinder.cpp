@@ -46,6 +46,33 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383,
 // Sines
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand { { 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924 } };
 
+// Internal-linkage helpers for FindPath's own hot loop. PathFinder is GEM_EXPORT (public API),
+// which under GCC's -fPIC default makes every call to its methods - even from this same file -
+// subject to ELF symbol interposition, which blocks inlining. A function in an anonymous
+// namespace has internal linkage and can never be interposed, on any compiler.
+namespace {
+
+	// PlotCircle() is a pure translation of a fixed offset set: every point it emits is
+	// `origin + <offset>`. GetBlockedInRadiusTile() is on the pathfinder's hot path and used to
+	// call it (and so allocate, fill and free a std::vector<BasePoint>) on every single tile
+	// query. The offsets depend only on r, and r is at most MAX_CIRCLESIZE - 2, so plot each
+	// radius once and translate at use. Built eagerly at static-init time, like
+	// SearchMapFixupTable, rather than lazily: a function-local static would cost a guard
+	// check per call and a thread_local one a __tls_get_addr call per call, both on the hot path,
+	// for a table that is seven short vectors.
+	std::array<std::vector<BasePoint>, MAX_CIRCLESIZE - 1> MakeCircleOffsetTable()
+	{
+		std::array<std::vector<BasePoint>, MAX_CIRCLESIZE - 1> t;
+		for (uint16_t r = 1; r < t.size(); ++r) {
+			t[r] = PlotCircle(BasePoint(0, 0), r);
+		}
+		return t;
+	}
+
+	const std::array<std::vector<BasePoint>, MAX_CIRCLESIZE - 1> CircleOffsetTable = MakeCircleOffsetTable();
+
+} // namespace
+
 // Calculate a destination point for running away from d, starting at s.
 // Returns false and leaves outPoint untouched if the actor is too slow or the deltas are too
 // small; on success outPoint holds the destination. (0, 0) is a legal map coordinate, so
@@ -527,27 +554,36 @@ PathMapFlags PathFinder::GetBlockedInRadiusTile(const TileProps& tileProps, cons
 
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	size = Clamp<uint16_t>(size, 2, MAX_CIRCLESIZE);
-	uint16_t r = size - 2;
+	const uint16_t r = size - 2;
 
-	std::vector<BasePoint> points;
-	if (r == 0) { // avoid generating 16 identical points
-		points.push_back(tp);
-		points.push_back(tp);
+	if (r == 0) {
+		// A radius-0 circle is the tile itself
+		const PathMapFlags flags = GetBlockedTile(tileProps, tp);
+		if (stopOnImpassable && flags == PathMapFlags::IMPASSABLE) {
+			return PathMapFlags::IMPASSABLE;
+		}
+		ret |= flags;
 	} else {
-		points = PlotCircle(tp, r);
-	}
-	for (size_t i = 0; i < points.size(); i += 2) {
-		const BasePoint& p1 = points[i];
-		const BasePoint& p2 = points[i + 1];
-		assert(p1.y == p2.y);
-		assert(p2.x <= p1.x);
+		// PlotCircle() adds the origin to a fixed set of offsets, so the offsets depend only on
+		// r - which is at most MAX_CIRCLESIZE - 2. Plot each radius once and translate, rather
+		// than allocating and re-plotting a fresh vector on every call.
+		assert(r < CircleOffsetTable.size());
+		const std::vector<BasePoint>& points = CircleOffsetTable[r];
+		for (size_t i = 0; i < points.size(); i += 2) {
+			const BasePoint& p1 = points[i];
+			const BasePoint& p2 = points[i + 1];
+			assert(p1.y == p2.y);
+			assert(p2.x <= p1.x);
 
-		for (int x = p2.x; x <= p1.x; ++x) {
-			PathMapFlags flags = GetBlockedTile(tileProps, SearchmapPoint(x, p1.y));
-			if (stopOnImpassable && flags == PathMapFlags::IMPASSABLE) {
-				return PathMapFlags::IMPASSABLE;
+			const int y = tp.y + p1.y;
+			const int xEnd = tp.x + p1.x;
+			for (int x = tp.x + p2.x; x <= xEnd; ++x) {
+				PathMapFlags flags = GetBlockedTile(tileProps, SearchmapPoint(x, y));
+				if (stopOnImpassable && flags == PathMapFlags::IMPASSABLE) {
+					return PathMapFlags::IMPASSABLE;
+				}
+				ret |= flags;
 			}
-			ret |= flags;
 		}
 	}
 
