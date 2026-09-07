@@ -71,6 +71,29 @@ namespace {
 
 	const std::array<std::vector<BasePoint>, MAX_CIRCLESIZE - 1> CircleOffsetTable = MakeCircleOffsetTable();
 
+	// FindPath's scratch storage. Kept across calls so a search allocates nothing, and per thread
+	// because worker threads run FindPath concurrently.
+	struct SearchState {
+		BucketPriorityQueue open;
+		std::vector<uint8_t> isClosed;
+		std::vector<NavmapPoint> parents;
+		std::vector<unsigned short> distFromStart;
+	};
+
+	// One thread_local object behind one deliberately out-of-line accessor, rather than four
+	// thread_local variables used directly. gemrb_core is a shared library, so a thread_local
+	// access uses the general-dynamic TLS model - a real __tls_get_addr() call - and gcc will
+	// happily re-materialise that address at every use site instead of keeping it in a register:
+	// the built library made 42 such calls inside FindPath alone, which perf put at ~11% of its
+	// time.
+	// Returning a reference from a function the optimiser cannot see through makes the
+	// address an ordinary opaque value, resolved once per search.
+	GEM_NOINLINE SearchState& GetSearchState()
+	{
+		thread_local SearchState state;
+		return state;
+	}
+
 } // namespace
 
 // Calculate a destination point for running away from d, starting at s.
@@ -260,13 +283,14 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 	const auto timeOfStartMs = GetMilliseconds();
 
-	// keep most data storage for this algorithm thread_local, to avoid memory allocations;
-	// each run we just clear the storage, which is keeping the underlying allocated memory at hand.
-	// thread_local rather than static: worker threads run FindPath concurrently
-	thread_local BucketPriorityQueue open;
-	thread_local std::vector<uint8_t> isClosed;
-	thread_local std::vector<NavmapPoint> parents;
-	thread_local std::vector<unsigned short> distFromStart;
+	// keep most data storage for this algorithm alive across calls, to avoid memory allocations;
+	// each run we just clear the storage, which is keeping the underlying allocated memory at
+	// hand. See GetSearchState() for why it is reached through a function instead of defined here.
+	SearchState& searchState = GetSearchState();
+	BucketPriorityQueue& open = searchState.open;
+	std::vector<uint8_t>& isClosed = searchState.isClosed;
+	std::vector<NavmapPoint>& parents = searchState.parents;
+	std::vector<unsigned short>& distFromStart = searchState.distFromStart;
 
 	// these three are indexed by the same cell index and kept at the same size; resize is a no-op
 	// when the size already matches, so this only costs anything on a map change
@@ -276,9 +300,9 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 	// cleanup
 	open.Clear();
-	memset(static_cast<void*>(parents.data()), 0, sizeof(decltype(parents)::value_type) * mapCellsCount);
-	memset(static_cast<void*>(distFromStart.data()), 255, sizeof(decltype(distFromStart)::value_type) * mapCellsCount);
-	memset(static_cast<void*>(isClosed.data()), 0, sizeof(decltype(isClosed)::value_type) * mapCellsCount);
+	memset(static_cast<void*>(parents.data()), 0, sizeof(NavmapPoint) * mapCellsCount);
+	memset(static_cast<void*>(distFromStart.data()), 255, sizeof(unsigned short) * mapCellsCount);
+	memset(static_cast<void*>(isClosed.data()), 0, sizeof(uint8_t) * mapCellsCount);
 
 	// begin algo init
 	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
