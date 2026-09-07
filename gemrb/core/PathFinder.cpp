@@ -375,6 +375,10 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 		isClosed[smptCurrentIdx] = true;
 
+		const NavmapPoint nmptParent = parents[smptCurrentIdx];
+		const SearchmapPoint smptParent { nmptParent };
+		const unsigned short parentDist = distFromStart[smptParent.y * mapSize.w + smptParent.x];
+
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			const NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
 			const SearchmapPoint smptChild { nmptChild };
@@ -393,13 +397,10 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			const bool childIsUnbumpable = navmapCellTraversability.occupyingActor != actorIdentity && navmapCellTraversability.state >= blockingTraversabilityValue;
 			if (childIsUnbumpable) continue;
 
-			SearchmapPoint smptCurrent2 { nmptCurrent };
-			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
-			SearchmapPoint smptParent { nmptParent };
 			unsigned short oldDist = distFromStart[smptChildIdx];
 
 			// Lazy Theta star*
-			unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
+			unsigned short newDist = parentDist + Distance(smptParent, smptChild);
 			if (newDist < oldDist) {
 				parents[smptChildIdx] = nmptParent;
 				distFromStart[smptChildIdx] = newDist;
