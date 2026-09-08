@@ -1173,7 +1173,7 @@ void CREImporter::ReadSpellbook(Actor* act)
 				continue;
 			}
 			if (spl->Type == sm->Type && spl->Level == sm->Level) {
-				sm->knownSpells.push_back(spl);
+				sm->knownSpells.push_back(std::move(spl));
 				knownSpells[j] = nullptr;
 			}
 		}
@@ -1423,7 +1423,7 @@ void CREImporter::GetIWD2Spellpage(Actor* act, ieIWD2SpellType type, int level, 
 		known->Level = static_cast<ieWord>(level);
 		known->Type = type;
 		known->SpellResRef = tmp;
-		sm->knownSpells.push_back(known);
+		sm->knownSpells.push_back(std::move(known));
 		while (memocount--) {
 			if (totalcount) {
 				totalcount--;
@@ -1434,13 +1434,13 @@ void CREImporter::GetIWD2Spellpage(Actor* act, ieIWD2SpellType type, int level, 
 			auto memory = MakeHolder<CREMemorizedSpell>();
 			memory->Flags = 1;
 			memory->SpellResRef = tmp;
-			sm->memorizedSpells.push_back(memory);
+			sm->memorizedSpells.push_back(std::move(memory));
 		}
 		while (totalcount--) {
 			auto memory = MakeHolder<CREMemorizedSpell>();
 			memory->Flags = 0;
 			memory->SpellResRef = tmp;
-			sm->memorizedSpells.push_back(memory);
+			sm->memorizedSpells.push_back(std::move(memory));
 		}
 	}
 	// hacks for domain spells, since their count is not stored and also always 1

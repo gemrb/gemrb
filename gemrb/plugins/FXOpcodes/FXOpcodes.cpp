@@ -1908,7 +1908,7 @@ int fx_set_panic_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		action->int2Parameter = 1; // mark as our own
 		const Holder<Action> current = target->GetCurrentAction();
 		if (current && current->int2Parameter == 1) target->ReleaseCurrentAction();
-		target->AddActionInFront(action);
+		target->AddActionInFront(std::move(action));
 	}
 	if (core->HasFeature(GFFlags::ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI::PANIC);
@@ -4760,7 +4760,7 @@ int fx_cast_spell(Scriptable* Owner, Actor* target, Effect* fx)
 		if (!target2) target2 = target;
 		if (!target2) return FX_NOT_APPLIED;
 		Holder<Action> forceSpellAction = GenerateActionDirect(std::move(tmp), target2);
-		Owner->AddActionInFront(forceSpellAction);
+		Owner->AddActionInFront(std::move(forceSpellAction));
 		Owner->ImmediateEvent();
 	} else if (fx->Parameter2 == 1) {
 		// no deplete, instant, no interrupt, caster level
@@ -4795,7 +4795,7 @@ int fx_cast_spell_point(Scriptable* Owner, Actor* /*target*/, Effect* fx)
 		// no deplete, no interrupt, caster or provided level
 		std::string tmp = fmt::format("ForceSpellPointRES(\"{}\",[{}.{}],{})", fx->Resource, fx->Pos.x, fx->Pos.y, fx->Parameter1);
 		Holder<Action> forceSpellAction = GenerateAction(std::move(tmp));
-		Owner->AddActionInFront(forceSpellAction);
+		Owner->AddActionInFront(std::move(forceSpellAction));
 		Owner->ImmediateEvent();
 	} else if (fx->Parameter2 == 1) {
 		// no deplete, instant, no interrupt, caster level

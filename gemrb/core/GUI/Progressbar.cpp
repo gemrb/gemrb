@@ -83,7 +83,7 @@ void Progressbar::SetImages(Holder<Sprite2D> bg, Holder<Sprite2D> cap)
 
 void Progressbar::SetAnimation(Holder<Animation> arg)
 {
-	PBarAnim = arg;
+	PBarAnim = std::move(arg);
 }
 
 void Progressbar::SetSliderPos(const Point& knob, const Point& cap)

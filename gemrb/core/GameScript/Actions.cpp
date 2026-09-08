@@ -745,18 +745,18 @@ void GameScript::MoveGlobal(Scriptable* Sender, Holder<Action> parameters)
 //we also allow moving to door, container
 void GameScript::MoveGlobalObject(Scriptable* Sender, Holder<Action> parameters)
 {
-	MoveGlobalObjectCore(Sender, parameters, 0);
+	MoveGlobalObjectCore(Sender, std::move(parameters), 0);
 }
 
 void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Holder<Action> parameters)
 {
-	MoveGlobalObjectCore(Sender, parameters, CC_OFFSCREEN);
+	MoveGlobalObjectCore(Sender, std::move(parameters), CC_OFFSCREEN);
 }
 
 //don't use offset from Sender
 void GameScript::CreateCreature(Scriptable* Sender, Holder<Action> parameters)
 {
-	CreateCreatureCore(Sender, parameters, CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_SCRIPTNAME);
+	CreateCreatureCore(Sender, std::move(parameters), CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_SCRIPTNAME);
 }
 
 //another highly redundant action
@@ -764,7 +764,7 @@ void GameScript::CreateCreatureDoor(Scriptable* Sender, Holder<Action> parameter
 {
 	//we hack this to death
 	parameters->resref1Parameter = "SPDIMNDR";
-	CreateCreatureCore(Sender, parameters, CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_PLAY_ANIM);
+	CreateCreatureCore(Sender, std::move(parameters), CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_PLAY_ANIM);
 }
 
 //another highly redundant action
@@ -772,41 +772,41 @@ void GameScript::CreateCreatureObjectDoor(Scriptable* Sender, Holder<Action> par
 {
 	//we hack this to death
 	parameters->resref1Parameter = "SPDIMNDR";
-	CreateCreatureCore(Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_PLAY_ANIM);
+	CreateCreatureCore(Sender, std::move(parameters), CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_PLAY_ANIM);
 }
 
 //don't use offset from Sender
 void GameScript::CreateCreatureImpassable(Scriptable* Sender, Holder<Action> parameters)
 {
-	CreateCreatureCore(Sender, parameters, CC_CHECK_OVERLAP);
+	CreateCreatureCore(Sender, std::move(parameters), CC_CHECK_OVERLAP);
 }
 
 void GameScript::CreateCreatureImpassableAllowOverlap(Scriptable* Sender, Holder<Action> parameters)
 {
-	CreateCreatureCore(Sender, parameters, 0);
+	CreateCreatureCore(Sender, std::move(parameters), 0);
 }
 
 //use offset from Sender
 void GameScript::CreateCreatureAtFeet(Scriptable* Sender, Holder<Action> parameters)
 {
-	CreateCreatureCore(Sender, parameters, CC_OFFSET | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP);
+	CreateCreatureCore(Sender, std::move(parameters), CC_OFFSET | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP);
 }
 
 void GameScript::CreateCreatureOffScreen(Scriptable* Sender, Holder<Action> parameters)
 {
-	CreateCreatureCore(Sender, parameters, CC_OFFSCREEN | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP);
+	CreateCreatureCore(Sender, std::move(parameters), CC_OFFSCREEN | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP);
 }
 
 //creates copy at actor, plays animation
 void GameScript::CreateCreatureObjectCopy(Scriptable* Sender, Holder<Action> parameters)
 {
-	CreateCreatureCore(Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_COPY | CC_PLAY_ANIM);
+	CreateCreatureCore(Sender, std::move(parameters), CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_COPY | CC_PLAY_ANIM);
 }
 
 //creates copy at absolute point
 void GameScript::CreateCreatureCopyPoint(Scriptable* Sender, Holder<Action> parameters)
 {
-	CreateCreatureCore(Sender, parameters, CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_COPY | CC_PLAY_ANIM);
+	CreateCreatureCore(Sender, std::move(parameters), CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_COPY | CC_PLAY_ANIM);
 }
 
 //this is the same, object + offset
@@ -814,12 +814,12 @@ void GameScript::CreateCreatureCopyPoint(Scriptable* Sender, Holder<Action> para
 //createcreatureobjecteffect may have animation
 void GameScript::CreateCreatureObjectOffset(Scriptable* Sender, Holder<Action> parameters)
 {
-	CreateCreatureCore(Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_PLAY_ANIM);
+	CreateCreatureCore(Sender, std::move(parameters), CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_PLAY_ANIM);
 }
 
 void GameScript::CreateCreatureObjectOffScreen(Scriptable* Sender, Holder<Action> parameters)
 {
-	CreateCreatureCore(Sender, parameters, CC_OFFSCREEN | CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP);
+	CreateCreatureCore(Sender, std::move(parameters), CC_OFFSCREEN | CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP);
 }
 
 //I think this simply removes the cursor and hides the gui without disabling scripts
@@ -1048,7 +1048,7 @@ void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Holder<Action> par
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
 	parameters->pointParameter.y = (ieWord) (value & 0xffff);
 	parameters->pointParameter.x = (ieWord) (value >> 16);
-	CreateCreatureCore(Sender, parameters, CC_CHECK_IMPASSABLE | CC_STRING1);
+	CreateCreatureCore(Sender, std::move(parameters), CC_CHECK_IMPASSABLE | CC_STRING1);
 }
 
 void GameScript::WaitRandom(Scriptable* Sender, Holder<Action> parameters)
@@ -1284,9 +1284,9 @@ void GameScript::TimedMoveToPoint(Scriptable* Sender, Holder<Action> parameters)
 
 	//repeat movement...
 	if (parameters->int0Parameter > 0) {
-		Holder<Action> newaction = ParamCopyNoOverride(parameters);
+		Holder<Action> newaction = ParamCopyNoOverride(std::move(parameters));
 		newaction->int0Parameter--;
-		actor->AddActionInFront(newaction);
+		actor->AddActionInFront(std::move(newaction));
 		Sender->SetWait(1);
 	}
 
@@ -1460,28 +1460,28 @@ void GameScript::TriggerWalkTo(Scriptable* Sender, Holder<Action> parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	MoveToObjectCore(Sender, parameters, 0, false);
+	MoveToObjectCore(Sender, std::move(parameters), 0, false);
 	tar->AddTrigger(TriggerEntry(trigger_walkedtotrigger, Sender->GetGlobalID()));
 }
 
 void GameScript::MoveToObjectNoInterrupt(Scriptable* Sender, Holder<Action> parameters)
 {
-	MoveToObjectCore(Sender, parameters, IF_NOINT, false);
+	MoveToObjectCore(Sender, std::move(parameters), IF_NOINT, false);
 }
 
 void GameScript::RunToObject(Scriptable* Sender, Holder<Action> parameters)
 {
-	MoveToObjectCore(Sender, parameters, IF_RUNNING, false);
+	MoveToObjectCore(Sender, std::move(parameters), IF_RUNNING, false);
 }
 
 void GameScript::MoveToObject(Scriptable* Sender, Holder<Action> parameters)
 {
-	MoveToObjectCore(Sender, parameters, 0, false);
+	MoveToObjectCore(Sender, std::move(parameters), 0, false);
 }
 
 void GameScript::MoveToObjectUntilSee(Scriptable* Sender, Holder<Action> parameters)
 {
-	MoveToObjectCore(Sender, parameters, 0, true);
+	MoveToObjectCore(Sender, std::move(parameters), 0, true);
 }
 
 void GameScript::MoveToObjectFollow(Scriptable* Sender, Holder<Action> parameters)
@@ -1491,7 +1491,7 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Holder<Action> parameter
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	const Scriptable* target = GetStoredActorFromObject(Sender, parameters);
+	const Scriptable* target = GetStoredActorFromObject(Sender, std::move(parameters));
 	const Actor* tar = Scriptable::As<Actor>(target);
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
@@ -1580,28 +1580,28 @@ void GameScript::MoveToOffset(Scriptable* Sender, Holder<Action> parameters)
 
 void GameScript::RunAwayFrom(Scriptable* Sender, Holder<Action> parameters)
 {
-	RunAwayFromCore(Sender, parameters, RunAwayFlags::LeaveArea);
+	RunAwayFromCore(Sender, std::move(parameters), RunAwayFlags::LeaveArea);
 }
 
 void GameScript::RunAwayFromNoLeaveArea(Scriptable* Sender, Holder<Action> parameters)
 {
-	RunAwayFromCore(Sender, parameters, 0);
+	RunAwayFromCore(Sender, std::move(parameters), 0);
 }
 
 void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Holder<Action> parameters)
 {
-	RunAwayFromCore(Sender, parameters, RunAwayFlags::NoInterrupt | RunAwayFlags::LeaveArea);
+	RunAwayFromCore(Sender, std::move(parameters), RunAwayFlags::NoInterrupt | RunAwayFlags::LeaveArea);
 }
 
 void GameScript::RunAwayFromNoInterruptNoLeaveArea(Scriptable* Sender, Holder<Action> parameters)
 {
-	RunAwayFromCore(Sender, parameters, RunAwayFlags::NoInterrupt);
+	RunAwayFromCore(Sender, std::move(parameters), RunAwayFlags::NoInterrupt);
 }
 
 // gemrb extension
 void GameScript::RunAwayFromPoint(Scriptable* Sender, Holder<Action> parameters)
 {
-	RunAwayFromCore(Sender, parameters, RunAwayFlags::LeaveArea | RunAwayFlags::UsePoint);
+	RunAwayFromCore(Sender, std::move(parameters), RunAwayFlags::LeaveArea | RunAwayFlags::UsePoint);
 }
 
 void GameScript::DisplayStringNoName(Scriptable* Sender, Holder<Action> parameters)
@@ -2027,12 +2027,12 @@ void GameScript::UnlockScroll(Scriptable* /*Sender*/, Holder<Action> /*parameter
 //no string, increase talkcount, no interrupt
 void GameScript::Dialogue(Scriptable* Sender, Holder<Action> parameters)
 {
-	BeginDialog(Sender, parameters, BD_SOURCE | BD_TALKCOUNT | BD_CHECKDIST);
+	BeginDialog(Sender, std::move(parameters), BD_SOURCE | BD_TALKCOUNT | BD_CHECKDIST);
 }
 
 void GameScript::DialogueForceInterrupt(Scriptable* Sender, Holder<Action> parameters)
 {
-	BeginDialog(Sender, parameters, BD_SOURCE | BD_TALKCOUNT | BD_INTERRUPT);
+	BeginDialog(Sender, std::move(parameters), BD_SOURCE | BD_TALKCOUNT | BD_INTERRUPT);
 }
 
 // not in IESDP but this one should affect ambients
@@ -2050,7 +2050,7 @@ void GameScript::SoundActivate(Scriptable* /*Sender*/, Holder<Action> parameters
 //PST's SetCorpseEnabled also handles containers, but no one uses it
 void GameScript::AmbientActivate(Scriptable* Sender, Holder<Action> parameters)
 {
-	AmbientActivateCore(Sender, parameters, parameters->int0Parameter);
+	AmbientActivateCore(Sender, std::move(parameters), parameters->int0Parameter);
 }
 
 void GameScript::ChangeTileState(Scriptable* Sender, Holder<Action> parameters)
@@ -2148,14 +2148,15 @@ void GameScript::SetMyTarget(Scriptable* Sender, Holder<Action> parameters)
 // PlaySequence without object parameter defaults to Sender
 void GameScript::PlaySequence(Scriptable* Sender, Holder<Action> parameters)
 {
-	PlaySequenceCore(Sender, parameters, parameters->int0Parameter);
+	ieDword value = parameters->int0Parameter;
+	PlaySequenceCore(Sender, std::move(parameters), value);
 }
 
 //same as PlaySequence, but the value comes from a variable
 void GameScript::PlaySequenceGlobal(Scriptable* Sender, Holder<Action> parameters)
 {
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
-	PlaySequenceCore(Sender, parameters, value);
+	PlaySequenceCore(Sender, std::move(parameters), value);
 }
 
 void GameScript::SetDialogue(Scriptable* Sender, Holder<Action> parameters)
@@ -2180,7 +2181,7 @@ void GameScript::ChangeDialogue(Scriptable* Sender, Holder<Action> parameters)
 //string0, no interrupt, talkcount increased
 void GameScript::StartDialogue(Scriptable* Sender, Holder<Action> parameters)
 {
-	BeginDialog(Sender, parameters, BD_STRING0 | BD_TALKCOUNT | BD_SETDIALOG);
+	BeginDialog(Sender, std::move(parameters), BD_STRING0 | BD_TALKCOUNT | BD_SETDIALOG);
 }
 
 //string0, no interrupt, talkcount increased, don't set default
@@ -2192,7 +2193,7 @@ void GameScript::StartDialogueOverride(Scriptable* Sender, Holder<Action> parame
 	if (parameters->int2Parameter) {
 		flags |= BD_ITEM;
 	}
-	BeginDialog(Sender, parameters, flags);
+	BeginDialog(Sender, std::move(parameters), flags);
 }
 
 //string0, no interrupt, talkcount increased, don't set default
@@ -2205,19 +2206,19 @@ void GameScript::StartDialogueOverrideInterrupt(Scriptable* Sender,
 	if (parameters->int2Parameter) {
 		flags |= BD_ITEM;
 	}
-	BeginDialog(Sender, parameters, flags);
+	BeginDialog(Sender, std::move(parameters), flags);
 }
 
 //start talking to oneself
 void GameScript::PlayerDialogue(Scriptable* Sender, Holder<Action> parameters)
 {
-	BeginDialog(Sender, parameters, BD_RESERVED | BD_OWN);
+	BeginDialog(Sender, std::move(parameters), BD_RESERVED | BD_OWN);
 }
 
 //we hijack this action for the player initiated dialogue
 void GameScript::NIDSpecial1(Scriptable* Sender, Holder<Action> parameters)
 {
-	BeginDialog(Sender, parameters, BD_INTERRUPT | BD_TARGET /*| BD_NUMERIC*/ | BD_TALKCOUNT | BD_CHECKDIST);
+	BeginDialog(Sender, std::move(parameters), BD_INTERRUPT | BD_TARGET /*| BD_NUMERIC*/ | BD_TALKCOUNT | BD_CHECKDIST);
 }
 
 void GameScript::NIDSpecial2(Scriptable* Sender, Holder<Action> /*parameters*/)
@@ -2291,20 +2292,20 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Holder<Action> /*parameters*/)
 
 void GameScript::StartDialogueInterrupt(Scriptable* Sender, Holder<Action> parameters)
 {
-	BeginDialog(Sender, parameters,
+	BeginDialog(Sender, std::move(parameters),
 		    BD_STRING0 | BD_INTERRUPT | BD_TALKCOUNT | BD_SETDIALOG);
 }
 
 //No string, flags:0
 void GameScript::StartDialogueNoSet(Scriptable* Sender, Holder<Action> parameters)
 {
-	BeginDialog(Sender, parameters, BD_TALKCOUNT | BD_SOURCE);
+	BeginDialog(Sender, std::move(parameters), BD_TALKCOUNT | BD_SOURCE);
 }
 
 void GameScript::StartDialogueNoSetInterrupt(Scriptable* Sender,
 					     Holder<Action> parameters)
 {
-	BeginDialog(Sender, parameters, BD_TALKCOUNT | BD_SOURCE | BD_INTERRUPT);
+	BeginDialog(Sender, std::move(parameters), BD_TALKCOUNT | BD_SOURCE | BD_INTERRUPT);
 }
 
 //no talkcount, using banter dialogs
@@ -2312,13 +2313,13 @@ void GameScript::StartDialogueNoSetInterrupt(Scriptable* Sender,
 //no, they aren't, but they increase interactcount
 void GameScript::Interact(Scriptable* Sender, Holder<Action> parameters)
 {
-	BeginDialog(Sender, parameters, BD_INTERACT | BD_NOEMPTY);
+	BeginDialog(Sender, std::move(parameters), BD_INTERACT | BD_NOEMPTY);
 }
 
 //this is an immediate action without checking Sender
 void GameScript::DetectSecretDoor(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters, GA_NO_DEAD);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 	Door* door = Scriptable::As<Door>(tar);
 	if (!door) {
 		return;
@@ -2668,27 +2669,27 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Holder<Action> parameters)
 //spell is depleted, casting time is calculated, interruptible
 void GameScript::Spell(Scriptable* Sender, Holder<Action> parameters)
 {
-	SpellCore(Sender, parameters, SC_NO_DEAD | SC_RANGE_CHECK | SC_DEPLETE | SC_AURA_CHECK);
+	SpellCore(Sender, std::move(parameters), SC_NO_DEAD | SC_RANGE_CHECK | SC_DEPLETE | SC_AURA_CHECK);
 }
 
 //spell is depleted, casting time is calculated, interruptible
 void GameScript::SpellPoint(Scriptable* Sender, Holder<Action> parameters)
 {
-	SpellPointCore(Sender, parameters, SC_RANGE_CHECK | SC_DEPLETE | SC_AURA_CHECK);
+	SpellPointCore(Sender, std::move(parameters), SC_RANGE_CHECK | SC_DEPLETE | SC_AURA_CHECK);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
 //casting time is calculated, interruptible
 void GameScript::SpellNoDec(Scriptable* Sender, Holder<Action> parameters)
 {
-	SpellCore(Sender, parameters, SC_NO_DEAD | SC_RANGE_CHECK | SC_AURA_CHECK);
+	SpellCore(Sender, std::move(parameters), SC_NO_DEAD | SC_RANGE_CHECK | SC_AURA_CHECK);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
 //casting time is calculated, interruptible
 void GameScript::SpellPointNoDec(Scriptable* Sender, Holder<Action> parameters)
 {
-	SpellPointCore(Sender, parameters, SC_RANGE_CHECK | SC_AURA_CHECK);
+	SpellPointCore(Sender, std::move(parameters), SC_RANGE_CHECK | SC_AURA_CHECK);
 }
 
 // this one has many signatures:
@@ -2700,31 +2701,31 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Holder<Action> parameters)
 // casting time is calculated, not interruptible
 void GameScript::ForceSpell(Scriptable* Sender, Holder<Action> parameters)
 {
-	SpellCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
+	SpellCore(Sender, std::move(parameters), SC_NOINTERRUPT | SC_SETLEVEL);
 }
 
 void GameScript::ForceSpellRange(Scriptable* Sender, Holder<Action> parameters)
 {
-	SpellCore(Sender, parameters, SC_NOINTERRUPT | SC_RANGE_CHECK);
+	SpellCore(Sender, std::move(parameters), SC_NOINTERRUPT | SC_RANGE_CHECK);
 }
 
 //spell is not depleted (doesn't need to be memorised or known)
 // casting time is calculated, not interruptible
 void GameScript::ForceSpellPoint(Scriptable* Sender, Holder<Action> parameters)
 {
-	SpellPointCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
+	SpellPointCore(Sender, std::move(parameters), SC_NOINTERRUPT | SC_SETLEVEL);
 }
 
 void GameScript::ForceSpellPointRange(Scriptable* Sender, Holder<Action> parameters)
 {
-	SpellPointCore(Sender, parameters, SC_NOINTERRUPT | SC_RANGE_CHECK);
+	SpellPointCore(Sender, std::move(parameters), SC_NOINTERRUPT | SC_RANGE_CHECK);
 }
 
 //ForceSpell with zero casting time
 // zero casting time, no depletion, not interruptible
 void GameScript::ReallyForceSpell(Scriptable* Sender, Holder<Action> parameters)
 {
-	SpellCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL | SC_INSTANT);
+	SpellCore(Sender, std::move(parameters), SC_NOINTERRUPT | SC_SETLEVEL | SC_INSTANT);
 }
 
 //ForceSpellPoint with zero casting time
@@ -2732,7 +2733,7 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Holder<Action> parameters)
 //no CFB
 void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Holder<Action> parameters)
 {
-	SpellPointCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL | SC_INSTANT);
+	SpellPointCore(Sender, std::move(parameters), SC_NOINTERRUPT | SC_SETLEVEL | SC_INSTANT);
 }
 
 // this differs from ReallyForceSpell that this one allows dead Sender casting
@@ -2740,7 +2741,7 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Holder<Action> parame
 void GameScript::ReallyForceSpellDead(Scriptable* Sender, Holder<Action> parameters)
 {
 	// the difference from ReallyForceSpell is handled by the lack of AF_ALIVE being set
-	SpellCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL | SC_INSTANT);
+	SpellCore(Sender, std::move(parameters), SC_NOINTERRUPT | SC_SETLEVEL | SC_INSTANT);
 }
 
 void GameScript::Activate(Scriptable* Sender, Holder<Action> parameters)
@@ -2748,7 +2749,7 @@ void GameScript::Activate(Scriptable* Sender, Holder<Action> parameters)
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	if (!tar) {
 		//it could still be an area animation, PST allows deactivating them via Activate
-		AmbientActivateCore(Sender, parameters, true);
+		AmbientActivateCore(Sender, std::move(parameters), true);
 		return;
 	}
 	if (tar->Type == ST_ACTOR) {
@@ -2774,7 +2775,7 @@ void GameScript::Deactivate(Scriptable* Sender, Holder<Action> parameters)
 	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
 	if (!tar) {
 		//it could still be an area animation, PST allows deactivating them via Deactivate
-		AmbientActivateCore(Sender, parameters, false);
+		AmbientActivateCore(Sender, std::move(parameters), false);
 		return;
 	}
 	if (tar->Type == ST_ACTOR) {
@@ -2947,12 +2948,12 @@ void GameScript::AddXPObject(Scriptable* Sender, Holder<Action> parameters)
 
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Holder<Action> parameters)
 {
-	AddXPCore(parameters);
+	AddXPCore(std::move(parameters));
 }
 
 void GameScript::AddXPVar(Scriptable* /*Sender*/, Holder<Action> parameters)
 {
-	AddXPCore(parameters, true);
+	AddXPCore(std::move(parameters), true);
 }
 
 void GameScript::AddXPWorth(Scriptable* Sender, Holder<Action> parameters)
@@ -3233,7 +3234,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Holder<Action> parameters
 	}
 	parameters->pointParameter = p;
 	parameters->string1Parameter.Reset();
-	LeaveAreaLUA(Sender, parameters);
+	LeaveAreaLUA(Sender, std::move(parameters));
 	Sender->ReleaseCurrentAction();
 }
 
@@ -3254,7 +3255,7 @@ void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Holder<Action> parameters
 
 void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Holder<Action> parameters)
 {
-	LeaveAreaLUAPanic(Sender, parameters);
+	LeaveAreaLUAPanic(Sender, std::move(parameters));
 }
 
 void GameScript::SetToken(Scriptable* /*Sender*/, Holder<Action> parameters)
@@ -3692,7 +3693,7 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Holder<Action> parameters)
 void GameScript::IncrementChapter(Scriptable* Sender, Holder<Action> parameters)
 {
 	core->GetGame()->IncrementChapter();
-	TextScreen(Sender, parameters);
+	TextScreen(Sender, std::move(parameters));
 }
 
 void GameScript::SetCriticalPathObject(Scriptable* Sender, Holder<Action> parameters)
@@ -4580,7 +4581,7 @@ void GameScript::Plunder(Scriptable* Sender, Holder<Action> parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetStoredActorFromObject(Sender, parameters);
+	Scriptable* tar = GetStoredActorFromObject(Sender, std::move(parameters));
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4633,7 +4634,7 @@ void GameScript::PickPockets(Scriptable* Sender, Holder<Action> parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetStoredActorFromObject(Sender, parameters);
+	Scriptable* tar = GetStoredActorFromObject(Sender, std::move(parameters));
 	Actor* scr = Scriptable::As<Actor>(tar);
 	if (!scr) {
 		Sender->ReleaseCurrentAction();
@@ -4830,7 +4831,7 @@ void GameScript::TakeItemListPartyNum(Scriptable* Sender, Holder<Action> paramet
 		// grant the default table item to the Sender in regular games
 		Holder<Action> params = Action::MakeAction();
 		params->resref0Parameter = tab->QueryDefault();
-		CreateItem(Sender, params);
+		CreateItem(Sender, std::move(params));
 	}
 }
 
@@ -4863,7 +4864,7 @@ void GameScript::EndCredits(Scriptable* Sender, Holder<Action> parameters)
 		ExecuteString(Sender, "TextScreen(\"25ecred\")");
 	} else {
 		core->PlayMovie("credits");
-		QuitGame(Sender, parameters);
+		QuitGame(Sender, std::move(parameters));
 	}
 }
 
@@ -4875,7 +4876,7 @@ void GameScript::ExpansionEndCredits(Scriptable* Sender, Holder<Action> paramete
 	// end the game for HoW-only runs, but teleport back to Kuldahar for full iwd runs
 	bool howOnly = CheckVariable(Sender, "JOIN_POSSE", "GLOBAL") == 0; // 0 how only, >0 for full run
 	if (howOnly) {
-		QuitGame(Sender, parameters);
+		QuitGame(Sender, std::move(parameters));
 	} else {
 		static const ResRef area = "ar2109";
 		Point dest(275, 235);
@@ -4905,7 +4906,7 @@ void GameScript::QuitGame(Scriptable* Sender, Holder<Action> parameters)
 void GameScript::DemoEnd(Scriptable* Sender, Holder<Action> parameters)
 {
 	auto& vars = core->GetDictionary();
-	ClearAllActions(Sender, parameters);
+	ClearAllActions(Sender, std::move(parameters));
 	vars.Set("QuitGame1", 0);
 	vars.Set("QuitGame2", 0);
 	vars.Set("QuitGame3", -1);
@@ -5043,7 +5044,7 @@ void GameScript::Berserk(Scriptable* Sender, Holder<Action> /*parameters*/)
 		//generate attack action
 		Holder<Action> newaction = GenerateActionDirect("NIDSpecial3()", target);
 		if (newaction) {
-			Sender->AddActionInFront(newaction);
+			Sender->AddActionInFront(std::move(newaction));
 		}
 	}
 	Sender->ReleaseCurrentAction();
@@ -5183,7 +5184,7 @@ void GameScript::AttackOneRound(Scriptable* Sender, Holder<Action> parameters)
 		return;
 	}
 	//using auto target!
-	Scriptable* tar = GetStoredActorFromObject(Sender, parameters, GA_NO_DEAD);
+	Scriptable* tar = GetStoredActorFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type != ST_DOOR && tar->Type != ST_CONTAINER)) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -5215,7 +5216,7 @@ void GameScript::RunningAttackNoSound(Scriptable* Sender, Holder<Action> paramet
 		return;
 	}
 	//using auto target!
-	Scriptable* tar = GetStoredActorFromObject(Sender, parameters, GA_NO_DEAD);
+	Scriptable* tar = GetStoredActorFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type != ST_DOOR && tar->Type != ST_CONTAINER)) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -5237,7 +5238,7 @@ void GameScript::AttackNoSound(Scriptable* Sender, Holder<Action> parameters)
 		return;
 	}
 	//using auto target!
-	Scriptable* tar = GetStoredActorFromObject(Sender, parameters, GA_NO_DEAD);
+	Scriptable* tar = GetStoredActorFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type != ST_DOOR && tar->Type != ST_CONTAINER)) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -5259,7 +5260,7 @@ void GameScript::RunningAttack(Scriptable* Sender, Holder<Action> parameters)
 		return;
 	}
 	//using auto target!
-	Scriptable* tar = GetStoredActorFromObject(Sender, parameters, GA_NO_DEAD);
+	Scriptable* tar = GetStoredActorFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type != ST_DOOR && tar->Type != ST_CONTAINER)) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -5281,7 +5282,7 @@ void GameScript::Attack(Scriptable* Sender, Holder<Action> parameters)
 		return;
 	}
 	//using auto target!
-	Scriptable* tar = GetStoredActorFromObject(Sender, parameters, GA_NO_DEAD);
+	Scriptable* tar = GetStoredActorFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type != ST_DOOR && tar->Type != ST_CONTAINER) || tar == Sender) {
 		Sender->ReleaseCurrentAction();
@@ -5382,7 +5383,7 @@ void GameScript::GroupAttack(Scriptable* Sender, Holder<Action> parameters)
 	Sender->ReleaseCurrentAction(); // it's not an instant
 	Holder<Action> attack = GenerateAction("Attack()");
 	attack->objects[1]->objectFields[4] = specific;
-	actor->AddActionInFront(attack);
+	actor->AddActionInFront(std::move(attack));
 }
 
 void GameScript::Explore(Scriptable* Sender, Holder<Action> /*parameters*/)
@@ -5753,8 +5754,8 @@ void GameScript::RandomWalkContinuous(Scriptable* Sender, Holder<Action> /*param
 		Holder<Action> moveAction = GenerateAction("MoveToPoint()");
 		moveAction->pointParameter = randomStep.point;
 		Holder<Action> randomWalk = GenerateAction("RandomWalkContinuous()");
-		actor->AddActionInFront(randomWalk);
-		actor->AddActionInFront(moveAction);
+		actor->AddActionInFront(std::move(randomWalk));
+		actor->AddActionInFront(std::move(moveAction));
 	}
 
 	actor->ReleaseCurrentAction();
@@ -5852,7 +5853,7 @@ void GameScript::ForceUseContainer(Scriptable* Sender, Holder<Action> parameters
 		return;
 	}
 	Holder<Action> newaction = GenerateAction("UseContainer()");
-	tar->AddActionInFront(newaction);
+	tar->AddActionInFront(std::move(newaction));
 	Sender->ReleaseCurrentAction(); //why blocking???
 }
 
@@ -6566,7 +6567,7 @@ void GameScript::UseDoor(Scriptable* Sender, Holder<Action> parameters)
 	}
 
 	gc->ResetTargetMode();
-	OpenDoor(Sender, parameters);
+	OpenDoor(Sender, std::move(parameters));
 
 	Sender->ReleaseCurrentAction(); // this is blocking, OpenDoor is not
 }
@@ -7105,7 +7106,7 @@ void GameScript::Leader(Scriptable* Sender, Holder<Action> parameters)
 
 	std::string tmp = fmt::format("MoveToPoint([{}.{}])", parameters->pointParameter.x, parameters->pointParameter.y);
 	Holder<Action> newact = GenerateAction(std::move(tmp));
-	Sender->AddAction(newact);
+	Sender->AddAction(std::move(newact));
 }
 
 //same as MoveToPointNoRecticle, but not blocking
@@ -7117,7 +7118,7 @@ void GameScript::Follow(Scriptable* Sender, Holder<Action> parameters)
 
 	std::string tmp = fmt::format("MoveToPointNoRecticle([{}.{}])", parameters->pointParameter.x, parameters->pointParameter.y);
 	Holder<Action> newact = GenerateAction(std::move(tmp));
-	Sender->AddAction(newact);
+	Sender->AddAction(std::move(newact));
 }
 
 void GameScript::FollowCreature(Scriptable* Sender, Holder<Action> parameters)
@@ -7128,7 +7129,7 @@ void GameScript::FollowCreature(Scriptable* Sender, Holder<Action> parameters)
 		return;
 	}
 
-	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters);
+	const Scriptable* tar = GetStoredActorFromObject(Sender, std::move(parameters));
 	const Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		Sender->ReleaseCurrentAction();
@@ -7150,7 +7151,7 @@ void GameScript::RunFollow(Scriptable* Sender, Holder<Action> parameters)
 		return;
 	}
 
-	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters);
+	const Scriptable* tar = GetStoredActorFromObject(Sender, std::move(parameters));
 	const Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		Sender->ReleaseCurrentAction();
@@ -7271,7 +7272,7 @@ void GameScript::TransformItem(Scriptable* Sender, Holder<Action> parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	TransformItemCore((Actor*) tar, parameters, true);
+	TransformItemCore((Actor*) tar, std::move(parameters), true);
 }
 
 void GameScript::TransformPartyItem(Scriptable* /*Sender*/, Holder<Action> parameters)
@@ -7280,7 +7281,7 @@ void GameScript::TransformPartyItem(Scriptable* /*Sender*/, Holder<Action> param
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor* tar = game->GetPC(i, false);
-		TransformItemCore(tar, parameters, true);
+		TransformItemCore(tar, std::move(parameters), true);
 	}
 }
 
@@ -7290,7 +7291,7 @@ void GameScript::TransformItemAll(Scriptable* Sender, Holder<Action> parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	TransformItemCore((Actor*) tar, parameters, false);
+	TransformItemCore((Actor*) tar, std::move(parameters), false);
 }
 
 void GameScript::TransformPartyItemAll(Scriptable* /*Sender*/, Holder<Action> parameters)
@@ -7299,7 +7300,7 @@ void GameScript::TransformPartyItemAll(Scriptable* /*Sender*/, Holder<Action> pa
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor* tar = game->GetPC(i, false);
-		TransformItemCore(tar, parameters, false);
+		TransformItemCore(tar, std::move(parameters), false);
 	}
 }
 

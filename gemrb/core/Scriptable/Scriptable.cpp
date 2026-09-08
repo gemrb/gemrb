@@ -371,7 +371,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 void Scriptable::AddAction(std::string actStr)
 {
 	Holder<Action> aC = GenerateAction(std::move(actStr));
-	AddAction(aC);
+	AddAction(std::move(aC));
 }
 
 void Scriptable::AddAction(Holder<Action> aC)
@@ -401,13 +401,13 @@ void Scriptable::AddAction(Holder<Action> aC)
 			instant = AF_DLG_INSTANT;
 		}
 		if (actionflags[aC->actionID] & instant) {
-			CurrentAction = aC;
+			CurrentAction = std::move(aC);
 			GameScript::ExecuteAction(this, CurrentAction);
 			return;
 		}
 	}
 
-	actionQueue.push_back(aC);
+	actionQueue.push_back(std::move(aC));
 }
 
 void Scriptable::AddActionInFront(Holder<Action> aC)

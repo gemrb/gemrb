@@ -261,7 +261,7 @@ Holder<Response> GameScript::ReadResponse(DataStream* stream)
 		}
 		aC->flags |= ACF_PRECOMPILED;
 
-		rE->actions.push_back(aC);
+		rE->actions.push_back(std::move(aC));
 
 		stream->ReadLine(line);
 		if (line.compare(0, 2, "RE") == 0) {

@@ -189,7 +189,7 @@ void KEYImporter::MergeBifsFromPath(const path_t& path)
 			});
 
 		if (lookup != biffiles.end()) {
-			*lookup = bifEntry;
+			*lookup = std::move(bifEntry);
 		}
 	} while (++dirIt);
 }

@@ -212,7 +212,7 @@ std::vector<Holder<Action>> DLGImporter::GetAction(unsigned int index) const
 		if (!action) {
 			Log(WARNING, "DLGImporter", "Can't compile action: {}", lines[i]);
 		} else {
-			actions.push_back(action);
+			actions.push_back(std::move(action));
 		}
 	}
 	free(string);

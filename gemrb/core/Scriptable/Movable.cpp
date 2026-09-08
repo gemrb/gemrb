@@ -635,8 +635,8 @@ void Movable::RandomWalk(bool can_stop, bool run)
 			// remove and readd ourselves, so the turning gets a chance to run
 			ReleaseCurrentAction();
 			ClearPath(false);
-			AddActionInFront(me);
-			AddActionInFront(turnAction);
+			AddActionInFront(std::move(me));
+			AddActionInFront(std::move(turnAction));
 			return;
 		}
 	}

@@ -3697,7 +3697,7 @@ bool Actor::GetPartyComment(const Actor* target)
 		objects.LastTalker = target->GetGlobalID();
 		Holder<Action> action = GenerateActionDirect("Interact([-1])", target);
 		assert(action);
-		AddActionInFront(action);
+		AddActionInFront(std::move(action));
 		return true;
 	}
 
@@ -3786,7 +3786,7 @@ void Actor::CommandActor(Holder<Action> action, bool clearPath)
 	if (clearPath) {
 		ClearPath(true);
 	}
-	AddAction(action); // now do this new thing
+	AddAction(std::move(action)); // now do this new thing
 
 	// pst uses a slider in lieu of buttons, so the frequency value is off by 1
 	switch (CFGCache.commandSndFreq + pstflags) {
@@ -3907,7 +3907,7 @@ static void ForceOverrideAction(Actor* actor, std::string actionString)
 	assert(action);
 	// the original was as aggressive, clearing the queue and stopping movement
 	actor->Stop();
-	actor->AddAction(action);
+	actor->AddAction(std::move(action));
 }
 
 static bool CheckCharmOverride(Actor* actor)
@@ -4059,7 +4059,7 @@ void Actor::Panic(const Scriptable* attacker, PanicMode mode, bool extraFeedback
 	}
 	if (action) {
 		ReleaseCurrentAction(); // iwd2 even cleared the queue
-		AddActionInFront(action);
+		AddActionInFront(std::move(action));
 	} else {
 		Log(ERROR, "Actor", "Cannot generate panic action");
 	}

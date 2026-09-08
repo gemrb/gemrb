@@ -4544,7 +4544,7 @@ static PyObject* GemRB_GetGamePreview(PyObject* /*self*/, PyObject* /*args*/)
 
 	// scale down to get more of the screen and reduce the size
 	Holder<Sprite2D> preview = wm->GetScreenshotPreview();
-	return PyObject_FromHolder<Sprite2D>(preview);
+	return PyObject_FromHolder<Sprite2D>(std::move(preview));
 }
 
 PyDoc_STRVAR(GemRB_Roll__doc,
@@ -8714,7 +8714,7 @@ static PyObject* GemRB_MemorizeSpell(PyObject* /*self*/, PyObject* args)
 		if (SpellType == IE_SPELL_TYPE_INNATE) enabled = 1;
 	}
 
-	return PyLong_FromLong(actor->spellbook.MemorizeSpell(ks, enabled));
+	return PyLong_FromLong(actor->spellbook.MemorizeSpell(std::move(ks), enabled));
 }
 
 

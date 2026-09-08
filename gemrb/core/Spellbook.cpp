@@ -175,7 +175,7 @@ bool Spellbook::HaveSpell(int spellid, int type, ieDword flags)
 			if (!(flags & HS_DEPLETE)) return true;
 
 			if (DepleteSpell(ms.get()) && (sorcerer & (1 << type))) {
-				DepleteLevel(sm, ms->SpellResRef);
+				DepleteLevel(std::move(sm), ms->SpellResRef);
 			}
 			return true;
 		}
@@ -479,7 +479,7 @@ int Spellbook::LearnSpell(const Spell* spell, int memo, unsigned int clsmsk, uns
 		// make sure the level and type match, so domain spells are handled properly
 		// we should probably be idempotent like that in other games as well
 		if (KnowSpell(spl->SpellResRef, spl->Type, level)) {
-			int ret = MemorizeSpell(spl, memo);
+			int ret = MemorizeSpell(std::move(spl), memo);
 			return ret ? spell->SpellLevel : 0;
 		} // else learn normally
 	} else {
@@ -512,7 +512,7 @@ bool Spellbook::AddKnownSpell(Holder<CREKnownSpell> spl, int flg)
 		sm->Type = (ieWord) type;
 		sm->Level = (ieWord) level;
 		sm->SlotCount = sm->SlotCountWithBonus = 0;
-		if (!AddSpellMemorization(sm)) {
+		if (!AddSpellMemorization(std::move(sm))) {
 			return false;
 		}
 	}
@@ -544,7 +544,7 @@ bool Spellbook::AddKnownSpell(Holder<CREKnownSpell> spl, int flg)
 		spells[type][level]->SlotCountWithBonus++;
 	}
 	if (flg) {
-		MemorizeSpell(spl, true);
+		MemorizeSpell(std::move(spl), true);
 	}
 	return true;
 }
@@ -647,12 +647,12 @@ bool Spellbook::AddSpellMemorization(Holder<CRESpellMemorization> sm)
 		newsm->Type = sm->Type;
 		newsm->Level = (ieWord) s->size();
 		newsm->SlotCount = newsm->SlotCountWithBonus = 0;
-		s->push_back(newsm);
+		s->push_back(std::move(newsm));
 	}
 
 	// only add this one if necessary
 	assert(s->size() == level);
-	s->push_back(sm);
+	s->push_back(std::move(sm));
 	return true;
 }
 
@@ -757,7 +757,7 @@ bool Spellbook::MemorizeSpell(Holder<CREKnownSpell> spell, bool usable)
 	memSpl->SpellResRef = spell->SpellResRef;
 	memSpl->Flags = usable ? 1 : 0;
 
-	sm->memorizedSpells.push_back(memSpl);
+	sm->memorizedSpells.push_back(std::move(memSpl));
 	ClearSpellInfo();
 	return true;
 }
@@ -883,7 +883,7 @@ bool Spellbook::DepleteSpell(int type)
 			if (!DepleteSpell(spell.get())) continue;
 
 			if (sorcerer & (1 << type)) {
-				DepleteLevel(sm, spell->SpellResRef);
+				DepleteLevel(std::move(sm), spell->SpellResRef);
 			}
 			return true;
 		}
@@ -922,7 +922,7 @@ bool Spellbook::DepleteSpell(int type, unsigned int page, unsigned int slot)
 	CREMemorizedSpell* cms = sm->memorizedSpells[slot].get();
 	ret = DepleteSpell(cms);
 	if (ret && (sorcerer & (1 << type))) {
-		DepleteLevel(sm, cms->SpellResRef);
+		DepleteLevel(std::move(sm), cms->SpellResRef);
 	}
 
 	return ret;

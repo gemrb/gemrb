@@ -2344,7 +2344,7 @@ int GameScript::SetMarkedSpell_Trigger(Scriptable* Sender, const Trigger* parame
 {
 	auto params = Action::MakeAction();
 	params->int0Parameter = parameters->int0Parameter;
-	GameScript::SetMarkedSpell(Sender, params);
+	GameScript::SetMarkedSpell(Sender, std::move(params));
 	return 1;
 }
 

@@ -1982,7 +1982,7 @@ void GameScript::EvaluateAllBlocks(bool testConditions)
 			Holder<Action> interrupt = GenerateAction("SetInterrupt(FALSE)");
 			response->actions.insert(response->actions.begin(), interrupt);
 			interrupt = GenerateAction("SetInterrupt(TRUE)");
-			response->actions.push_back(interrupt);
+			response->actions.push_back(std::move(interrupt));
 		}
 		response->Execute(target);
 
@@ -2000,7 +2000,7 @@ void GameScript::ExecuteString(Scriptable* Sender, std::string string)
 	if (!act) {
 		return;
 	}
-	Sender->AddActionInFront(act);
+	Sender->AddActionInFront(std::move(act));
 }
 
 //This must return integer because Or(3) returns 3
@@ -2159,10 +2159,10 @@ int Response::Execute(Scriptable* Sender)
 			// mimicking AddAction
 			Sender->SetInternalFlag(IF_ACTIVE, BitOp::OR);
 			if (startActive) Sender->SetInternalFlag(IF_IDLE, BitOp::NAND);
-			GameScript::ExecuteAction(Sender, aC);
+			GameScript::ExecuteAction(Sender, std::move(aC));
 			ret = 0;
 		} else if ((actionflags[aC->actionID] & AF_MASK) == AF_NONE) {
-			Sender->AddAction(aC);
+			Sender->AddAction(std::move(aC));
 			ret = 0;
 		} else if ((actionflags[aC->actionID] & AF_MASK) == AF_MASK) {
 			// covers also AF_CONTINUE, since Continue, the only user, also has AF_IMMEDIATE
@@ -2197,7 +2197,7 @@ static void HandleActionOverride(Scriptable* target, const Holder<Action> aC)
 		target->ReleaseCurrentAction();
 	}
 
-	target->AddAction(newAction);
+	target->AddAction(std::move(newAction));
 	if (!(actionflags[aC->actionID] & AF_INSTANT)) {
 		assert(target->GetNextAction());
 		// there are plenty of places where it's vital that ActionOverride is not interrupted,
@@ -2300,7 +2300,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Holder<Action> aC)
 			return;
 		}
 	}
-	func(Sender, aC);
+	func(Sender, std::move(aC));
 
 	//don't bother with special flow control actions
 	if (actionflags[actionID] & AF_IMMEDIATE) {

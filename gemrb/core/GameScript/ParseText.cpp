@@ -235,8 +235,8 @@ Holder<Action> GenerateActionCore(const char* src, const char* str, unsigned sho
 						if (!act) {
 							return nullptr;
 						}
-						act->objects[0] = newAction->objects[0];
-						newAction = act;
+						act->objects[0] = std::move(newAction->objects[0]);
+						newAction = std::move(act);
 					}
 					break;
 

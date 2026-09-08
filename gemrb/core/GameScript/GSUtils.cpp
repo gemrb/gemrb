@@ -1038,7 +1038,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point& p, const ResRef& area, cons
 	}
 	Sender->ReleaseCurrentAction();
 	auto action = GenerateAction(std::move(Tmp));
-	Sender->AddActionInFront(action);
+	Sender->AddActionInFront(std::move(action));
 }
 
 static void GetTalkPositionFromScriptable(Scriptable* scr, Point& position)
