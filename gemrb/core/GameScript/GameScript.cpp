@@ -1841,7 +1841,7 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 		Holder<ResponseBlock> rB = ReadResponseBlock(stream);
 		if (!rB)
 			break;
-		newScript->responseBlocks.push_back(rB);
+		newScript->responseBlocks.push_back(std::move(rB));
 		stream->ReadLine(line, 10);
 	}
 	delete stream;
@@ -2256,7 +2256,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Holder<Action> aC)
 				return;
 			}
 			ScriptDebugLog(DebugMode::ACTIONS, "Sender {} ran ActionOverride on {}", Sender->GetScriptName(), scr->GetScriptName());
-			HandleActionOverride(scr, aC);
+			HandleActionOverride(scr, std::move(aC));
 		} else {
 			// skip showing errors when party size is lower than the (original) max
 			bool pc = overrider->objectFilters[0] >= 21 && overrider->objectFilters[0] < 27; // Player2-Player6

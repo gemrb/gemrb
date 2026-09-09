@@ -169,7 +169,7 @@ static Holder<Condition> ReadCondition(DataStream* stream)
 			continue;
 		}
 
-		cO.triggers.push_back(tR);
+		cO.triggers.push_back(std::move(tR));
 	}
 	return MakeHolder<Condition>(std::move(cO));
 }
@@ -200,7 +200,7 @@ Holder<ResponseSet> GameScript::ReadResponseSet(DataStream* stream)
 	while (true) {
 		auto rE = ReadResponse(stream);
 		if (!rE) break;
-		rS->responses.push_back(rE);
+		rS->responses.push_back(std::move(rE));
 	}
 	return rS;
 }
@@ -232,7 +232,7 @@ Holder<Response> GameScript::ReadResponse(DataStream* stream)
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine(line, 1024);
 			Holder<Object> oB = DecodeObject(line);
-			aC->objects[i] = oB;
+			aC->objects[i] = std::move(oB);
 			if (i != 2) {
 				stream->ReadLine(line, 1024);
 			}

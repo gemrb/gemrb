@@ -492,7 +492,7 @@ int Spellbook::LearnSpell(const Spell* spell, int memo, unsigned int clsmsk, uns
 		}
 	}
 
-	bool ret = AddKnownSpell(spl, memo);
+	bool ret = AddKnownSpell(std::move(spl), memo);
 	if (!ret) {
 		return 0;
 	}

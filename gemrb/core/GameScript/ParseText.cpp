@@ -169,7 +169,7 @@ Holder<Action> GenerateActionCore(const char* src, const char* str, unsigned sho
 	if (actionflags[newAction->actionID] & AF_DIRECT) {
 		auto tmp = MakeHolder<Object>();
 		tmp->objectFields[0] = -1;
-		newAction->objects[objectCount++] = tmp;
+		newAction->objects[objectCount++] = std::move(tmp);
 	}
 	// here is the Action; now we need to evaluate the parameters, if any
 	if (*str != ')')

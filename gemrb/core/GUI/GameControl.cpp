@@ -280,7 +280,7 @@ void GameControl::CreateMovement(Actor* actor, const Point& p, bool append, bool
 		}
 	}
 
-	actor->CommandActor(action, !append);
+	actor->CommandActor(std::move(action), !append);
 	actor->Destination = p; // just to force target reticle drawing if paused
 }
 
@@ -1901,7 +1901,7 @@ void GameControl::TryToCast(Actor* source, const Point& tgt)
 			action->int2Parameter |= UI_NOAURA | UI_NOCHARGE;
 		}
 	}
-	source->AddAction(action);
+	source->AddAction(std::move(action));
 	if (!spellCount) {
 		ResetTargetMode();
 	}
@@ -1970,7 +1970,7 @@ void GameControl::TryToCast(Actor* source, const Actor* tgt)
 			action->int2Parameter |= UI_NOAURA | UI_NOCHARGE;
 		}
 	}
-	source->AddAction(action);
+	source->AddAction(std::move(action));
 	if (!spellCount) {
 		ResetTargetMode();
 	}
@@ -2063,7 +2063,7 @@ void GameControl::HandleDoor(Door* door, Actor* actor)
 	// internal gemrb toggle door action hack - should we use UseDoor instead?
 	auto toggle = GenerateAction("NIDSpecial9()");
 	toggle->int0Parameter = door->GetGlobalID();
-	actor->CommandActor(toggle);
+	actor->CommandActor(std::move(toggle));
 }
 
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)

@@ -609,7 +609,7 @@ void GameScript::JumpToPointInstant(Scriptable* Sender, Holder<Action> parameter
 /** default subject is the current actor */
 void GameScript::JumpToSavedLocation(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!tar) {
 		tar = Sender;
 	}
@@ -920,7 +920,7 @@ void GameScript::ForceAIScript(Scriptable* Sender, Holder<Action> parameters)
 
 void GameScript::ResetPlayerAI(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) return;
 
@@ -1342,7 +1342,7 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Holder<Action> paramete
 /** use Sender as default subject */
 void GameScript::ReturnToSavedLocation(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters, GA_NO_DEAD);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 	if (!tar) {
 		tar = Sender;
 	}
@@ -1369,7 +1369,7 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Holder<Action> parame
 //PST
 void GameScript::RunToSavedLocation(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters, GA_NO_DEAD);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 	if (!tar) {
 		tar = Sender;
 	}
@@ -1400,7 +1400,7 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Holder<Action> parameter
 //iwd2
 void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters, GA_NO_DEAD);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 	if (!tar) {
 		tar = Sender;
 	}
@@ -1655,7 +1655,7 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Holder<Action> parameters
 
 void GameScript::KillFloatMessage(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* target = GetScriptableFromObject(Sender, parameters);
+	Scriptable* target = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!target) {
 		target = Sender;
 	}
@@ -1808,7 +1808,7 @@ void GameScript::FaceObject(Scriptable* Sender, Holder<Action> parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	const Scriptable* target = GetScriptableFromObject(Sender, parameters);
+	const Scriptable* target = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!target) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2050,7 +2050,7 @@ void GameScript::SoundActivate(Scriptable* /*Sender*/, Holder<Action> parameters
 //PST's SetCorpseEnabled also handles containers, but no one uses it
 void GameScript::AmbientActivate(Scriptable* Sender, Holder<Action> parameters)
 {
-	AmbientActivateCore(Sender, std::move(parameters), parameters->int0Parameter);
+	AmbientActivateCore(Sender, parameters, parameters->int0Parameter);
 }
 
 void GameScript::ChangeTileState(Scriptable* Sender, Holder<Action> parameters)
@@ -2136,7 +2136,7 @@ void GameScript::WaitAnimation(Scriptable* Sender, Holder<Action> parameters)
 // the spell target and attack target are different only in iwd2
 void GameScript::SetMyTarget(Scriptable* Sender, Holder<Action> parameters)
 {
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	const Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!tar) {
 		// we got called with Nothing to invalidate the target
 		Sender->objects.MyTarget = 0;
@@ -2333,7 +2333,7 @@ void GameScript::DetectSecretDoor(Scriptable* Sender, Holder<Action> parameters)
 //this is an immediate action without checking Sender
 void GameScript::Lock(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!tar) {
 		return;
 	}
@@ -2351,7 +2351,7 @@ void GameScript::Lock(Scriptable* Sender, Holder<Action> parameters)
 
 void GameScript::Unlock(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!tar) {
 		return;
 	}
@@ -2427,7 +2427,7 @@ void GameScript::RemoveTraps(Scriptable* Sender, Holder<Action> parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2508,7 +2508,7 @@ void GameScript::PickLock(Scriptable* Sender, Holder<Action> parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2554,7 +2554,7 @@ void GameScript::PickLock(Scriptable* Sender, Holder<Action> parameters)
 
 void GameScript::OpenDoor(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	Door* door = Scriptable::As<Door>(tar);
 	if (!door) {
 		return;
@@ -2575,7 +2575,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Holder<Action> parameters)
 
 void GameScript::CloseDoor(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	Door* door = Scriptable::As<Door>(tar);
 	if (!door) {
 		return;
@@ -3163,7 +3163,7 @@ void GameScript::HideCreature(Scriptable* Sender, Holder<Action> parameters)
 //i have absolutely no idea why this is needed when we have HideCreature
 void GameScript::ForceHide(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!tar) {
 		tar = Sender;
 	}
@@ -4005,7 +4005,7 @@ void GameScript::UnloadArea(Scriptable* /*Sender*/, Holder<Action> parameters)
 static EffectRef fx_death_ref = { "Death", -1 };
 void GameScript::Kill(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	Actor* target = Scriptable::As<Actor>(tar);
 	if (!target) {
 		return;
@@ -4017,7 +4017,7 @@ void GameScript::Kill(Scriptable* Sender, Holder<Action> parameters)
 
 void GameScript::SetGabber(Scriptable* Sender, Holder<Action> parameters)
 {
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	const Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
@@ -4042,7 +4042,7 @@ void GameScript::ReputationInc(Scriptable* /*Sender*/, Holder<Action> parameters
 
 void GameScript::FullHeal(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	Actor* scr = Scriptable::As<Actor>(tar);
 	if (!scr) {
 		return;
@@ -4615,7 +4615,7 @@ void GameScript::MoveInventory(Scriptable* Sender, Holder<Action> parameters)
 	if (!src || src->Type != ST_ACTOR) {
 		return;
 	}
-	Scriptable* tar = GetScriptableFromObject2(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject2(Sender, std::move(parameters));
 	if (!tar) {
 		return;
 	}
@@ -5304,7 +5304,7 @@ void GameScript::ForceAttack(Scriptable* Sender, Holder<Action> parameters)
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	Scriptable* tar = GetScriptableFromObject2(Sender, parameters, GA_NO_DEAD);
+	Scriptable* tar = GetScriptableFromObject2(Sender, std::move(parameters), GA_NO_DEAD);
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type != ST_DOOR && tar->Type != ST_CONTAINER)) {
 		return;
 	}
@@ -5373,7 +5373,7 @@ void GameScript::AttackReevaluate(Scriptable* Sender, Holder<Action> parameters)
 // attack creatures with the same specific value as the target creature
 void GameScript::GroupAttack(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* scr = GetScriptableFromObject(Sender, parameters, GA_NO_DEAD);
+	Scriptable* scr = GetScriptableFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
@@ -5567,7 +5567,7 @@ void GameScript::ClearPartyEffects(Scriptable* /*Sender*/, Holder<Action> /*para
 //iwd2 removes effects from a single sprite
 void GameScript::ClearSpriteEffects(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return;
@@ -5583,7 +5583,7 @@ void GameScript::MarkObject(Scriptable* Sender, Holder<Action> parameters)
 		return;
 	}
 	//unsure, could mark dead objects?
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters, GA_NO_DEAD);
+	const Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters), GA_NO_DEAD);
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
@@ -5847,7 +5847,7 @@ void GameScript::UseContainer(Scriptable* Sender, Holder<Action> parameters)
 //call the usecontainer action in target (not used)
 void GameScript::ForceUseContainer(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!tar || tar->Type != ST_ACTOR) {
 		Sender->ReleaseCurrentAction(); //why blocking???
 		return;
@@ -6138,7 +6138,7 @@ void GameScript::PolymorphCopy(Scriptable* Sender, Holder<Action> parameters)
 	if (!actor) {
 		return;
 	}
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	const Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	const Actor* target = Scriptable::As<Actor>(tar);
 	if (!target) {
 		return;
@@ -6153,7 +6153,7 @@ void GameScript::PolymorphCopyBase(Scriptable* Sender, Holder<Action> parameters
 	if (!act) {
 		return;
 	}
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	const Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	const Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return;
@@ -6587,7 +6587,7 @@ void GameScript::BashDoor(Scriptable* Sender, Holder<Action> parameters)
 		return;
 	}
 
-	Scriptable* target = GetScriptableFromObject(Sender, parameters);
+	Scriptable* target = GetScriptableFromObject(Sender, std::move(parameters));
 	if (!target) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -7281,7 +7281,7 @@ void GameScript::TransformPartyItem(Scriptable* /*Sender*/, Holder<Action> param
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor* tar = game->GetPC(i, false);
-		TransformItemCore(tar, std::move(parameters), true);
+		TransformItemCore(tar, parameters, true);
 	}
 }
 
@@ -7300,7 +7300,7 @@ void GameScript::TransformPartyItemAll(Scriptable* /*Sender*/, Holder<Action> pa
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor* tar = game->GetPC(i, false);
-		TransformItemCore(tar, std::move(parameters), false);
+		TransformItemCore(tar, parameters, false);
 	}
 }
 
@@ -7347,7 +7347,7 @@ void GameScript::DisableSpriteDither(Scriptable* /*Sender*/, Holder<Action> /*pa
 
 void GameScript::FloatRebus(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	Actor* actor = Scriptable::As<Actor>(tar);
 	if (!actor) {
 		return;
@@ -7714,7 +7714,7 @@ void GameScript::SetNamelessDeathParty(Scriptable* Sender, Holder<Action> parame
 // like GameScript::Kill, but forces chunking damage (disabling resurrection)
 void GameScript::ChunkCreature(Scriptable* Sender, Holder<Action> parameters)
 {
-	Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	Actor* target = Scriptable::As<Actor>(tar);
 	if (!target) {
 		return;
@@ -7750,7 +7750,7 @@ void GameScript::SetOriginalClass(Scriptable* Sender, Holder<Action> parameters)
 // gemrb extension
 void GameScript::SetPCStatsTokens(Scriptable* Sender, Holder<Action> parameters)
 {
-	const Scriptable* tar = GetScriptableFromObject(Sender, parameters);
+	const Scriptable* tar = GetScriptableFromObject(Sender, std::move(parameters));
 	const Actor* actor = Scriptable::As<const Actor>(tar);
 	if (!actor || !actor->PCStats) {
 		return;
