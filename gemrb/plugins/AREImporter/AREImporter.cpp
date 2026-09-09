@@ -282,7 +282,7 @@ bool AREImporter::Import(DataStream* str)
 	str->ReadResRef(WEDResRef);
 	str->ReadDword(LastSave);
 	str->ReadDword(AreaFlags);
-	//skipping bg1 area connection fields
+	// skipping bg1 area connection fields (documented, set, but unused by engines)
 	str->Seek(0x48, GEM_STREAM_START);
 	str->ReadEnum<MapEnv>(AreaType);
 	str->ReadWord(WRain);
@@ -1817,10 +1817,8 @@ void AREImporter::PutHeader(DataStream* stream, const Map* map) const
 	stream->WriteDword(core->config.UseAsLibrary ? map->LastSaveTime : time);
 	stream->WriteDword(map->AreaFlags);
 
-	stream->WriteFilling(12); // northref
-	stream->WriteFilling(12); // westref
-	stream->WriteFilling(12); // southref
-	stream->WriteFilling(12); // eastref
+	// skipping unused bordering area references and flags
+	stream->WriteFilling(48);
 
 	stream->WriteWord(map->AreaType);
 	stream->WriteWord(map->Rain);
