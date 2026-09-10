@@ -2443,7 +2443,7 @@ void AREImporter::PutTraps(DataStream* stream, const Map* map) const
 	ieDword i = map->GetTrapCount(iter);
 	while (i--) {
 		ieWord tmpWord = 0;
-		ieByte tmpByte = 0xff;
+		ieByte ownerSlot = 0xff;
 		const Projectile* pro = map->GetNextTrap(iter);
 		if (pro) {
 			//The projectile ID is based on missile.ids which is
@@ -2461,7 +2461,7 @@ void AREImporter::PutTraps(DataStream* stream, const Map* map) const
 			const Actor* actor = core->GetGame()->GetActorByGlobalID(ID);
 			//0xff if not in party
 			//party slot if in party
-			if (actor) tmpByte = (ieByte) (actor->InParty - 1);
+			if (actor) ownerSlot = (ieByte) (actor->InParty - 1);
 		}
 
 		stream->WriteResRefUC(name);
@@ -2475,8 +2475,9 @@ void AREImporter::PutTraps(DataStream* stream, const Map* map) const
 		stream->WriteDword(0); // unknown field, Ticks
 		stream->WritePoint(dest);
 		stream->WriteWord(0); // unknown field, Z
-		stream->Write(&tmpByte, 1); // unknown field, TargetType
-		stream->Write(&tmpByte, 1); // Owner
+		constexpr ieByte targetType = EA_EVILCUTOFF; // only the player can set traps, so this will never be anything else
+		stream->Write(&targetType, 1); // TargetType - EA
+		stream->Write(&ownerSlot, 1);
 	}
 }
 
