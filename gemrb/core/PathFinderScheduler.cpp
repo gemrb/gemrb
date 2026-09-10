@@ -186,7 +186,7 @@ void PathFinderScheduler::Start(uint16_t InNumberOfRequestedWorkerThreads, const
 		return;
 	}
 
-	Log(DEBUG, "PathfinderThreadUpdate", "[main] Starting pathfinder: numberOfRequestedWorkerThreads={}, mainThreadMode={}",
+	Log(MESSAGE, "PathfinderThreadUpdate", "[main] Starting pathfinder: numberOfRequestedWorkerThreads={}, mainThreadMode={}",
 	    InNumberOfRequestedWorkerThreads, InMainThreadMode);
 
 	isInitialized = true;
@@ -223,7 +223,7 @@ void PathFinderScheduler::Start(uint16_t InNumberOfRequestedWorkerThreads, const
 	if (numberOfSpawnedWorkerThreads == 0) {
 		// this is the case if we failed to start any thread, but also if there is enforced 0 pathfinding threads from
 		// the config file
-		Log(DEBUG, "PathfinderThreadUpdate", "[main] Not starting any new pathfinder thread, pathfinding will be executed from the main thread.");
+		Log(MESSAGE, "PathfinderThreadUpdate", "[main] Not starting any new pathfinder thread, pathfinding will be executed from the main thread.");
 	}
 
 	isInMainThreadImmediateMode = numberOfSpawnedWorkerThreads == 0 && mainThreadMode == PathFinderSchedulerMainThreadMode::Immediate;
