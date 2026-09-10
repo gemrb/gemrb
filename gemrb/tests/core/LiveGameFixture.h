@@ -68,6 +68,7 @@ public:
 		core->SetGame(nullptr);
 		VideoDriver.reset();
 		Engine().reset();
+		core = nullptr;
 		PluginMgr::Get()->RunCleanup();
 	}
 };
