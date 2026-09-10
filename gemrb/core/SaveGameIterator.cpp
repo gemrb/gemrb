@@ -243,6 +243,8 @@ static bool IsSaveGameSlot(const path_t& Path, const path_t& slotname)
 
 	ftmp = PathJoinExt(dtmp, core->WorldMapName[0], "wmp");
 	if (!FileExists(ftmp)) {
+		// deliberately not logging to not confuse users of games with expansions
+		// e.g. soa/tob saves are stored in the same folder and we need to display one type
 		return false;
 	}
 
