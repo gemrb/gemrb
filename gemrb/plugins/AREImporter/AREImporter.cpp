@@ -2435,46 +2435,53 @@ void AREImporter::PutEffects(DataStream* stream, const EffectQueue& fxqueue) con
 	}
 }
 
-void AREImporter::PutTraps(DataStream* stream, const Map* map) const
+// to maintain resave layout, we need to save the traps in reverse
+static std::list<const Projectile*> GetSortedTraps(const Map* map)
 {
-	ieDword Offset;
-	ResRef name;
-	ieWord type = 0;
-	Point dest(0, 0);
-
-	Offset = EffectOffset;
 	proIterator iter;
 	ieDword i = map->GetTrapCount(iter);
+	std::list<const Projectile*> traps;
 	while (i--) {
-		ieWord tmpWord = 0;
-		ieByte ownerSlot = 0xff;
 		const Projectile* pro = map->GetNextTrap(iter);
 		if (pro) {
-			//The projectile ID is based on missile.ids which is
-			//off by one compared to projectl.ids
-			type = pro->GetType() + 1;
-			dest = pro->GetDestination();
-			const ResRef& proName = pro->GetName();
-			name = proName;
-			const EffectQueue& fxqueue = pro->GetEffects();
-			if (fxqueue) {
-				tmpWord = static_cast<ieWord>(fxqueue.GetSavedEffectsCount());
-			}
-			ieDword ID = pro->GetCaster();
-			// lookup caster via Game, since the the current map can already be empty when switching them
-			const Actor* actor = core->GetGame()->GetActorByGlobalID(ID);
-			//0xff if not in party
-			//party slot if in party
-			if (actor) ownerSlot = (ieByte) (actor->InParty - 1);
+			traps.push_back(pro);
 		}
+	}
+	traps.reverse();
+	return traps;
+}
 
-		stream->WriteResRefUC(name);
+void AREImporter::PutTraps(DataStream* stream, const Map* map) const
+{
+	ieDword Offset = EffectOffset;
+
+	auto traps = GetSortedTraps(map);
+	for (auto pro : traps) {
+		ieWord fxQueueSize = 0;
+		ieByte ownerSlot = 0xff;
+
+		// The projectile ID is based on missile.ids which is
+		// off by one compared to projectl.ids
+		ieWord type = pro->GetType() + 1;
+		Point dest = pro->GetDestination();
+		const EffectQueue& fxqueue = pro->GetEffects();
+		if (fxqueue) {
+			fxQueueSize = static_cast<ieWord>(fxqueue.GetSavedEffectsCount());
+		}
+		ieDword ID = pro->GetCaster();
+		// lookup caster via Game, since the the current map can already be empty when switching them
+		const Actor* actor = core->GetGame()->GetActorByGlobalID(ID);
+		// 0xff if not in party
+		// party slot if in party
+		if (actor) ownerSlot = (ieByte) (actor->InParty - 1);
+
+		stream->WriteResRefUC(pro->GetName());
 		stream->WriteDword(Offset);
 		//size of fxqueue;
-		assert(tmpWord < 256);
-		tmpWord *= 0x108;
-		Offset += tmpWord;
-		stream->WriteWord(tmpWord); //size in bytes
+		assert(fxQueueSize < 256);
+		fxQueueSize *= 0x108;
+		Offset += fxQueueSize;
+		stream->WriteWord(fxQueueSize); //size in bytes
 		stream->WriteWord(type); //missile.ids
 		stream->WriteDword(0); // unknown field, Ticks
 		stream->WritePoint(dest);
@@ -2575,14 +2582,8 @@ int AREImporter::PutArea(DataStream* stream, const Map* map) const
 
 	PutExplored(stream, map);
 
-	proIterator iter;
-	ieDword i = map->GetTrapCount(iter);
-	while (i--) {
-		const Projectile* trap = map->GetNextTrap(iter);
-		if (!trap) {
-			continue;
-		}
-
+	auto traps = GetSortedTraps(map);
+	for (auto trap : traps) {
 		const EffectQueue& fxqueue = trap->GetEffects();
 		if (!fxqueue) {
 			continue;
