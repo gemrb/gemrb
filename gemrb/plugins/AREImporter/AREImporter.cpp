@@ -1705,6 +1705,22 @@ int AREImporter::GetStoredFileSize(Map* map)
 	ExploredBitmapSize = map->ExploredBitmap.Bytes();
 	headersize += ExploredBitmapSize;
 
+	EffectOffset = headersize;
+	proIterator piter;
+	TrapCount = (ieDword) map->GetTrapCount(piter);
+	for (unsigned int i = 0; i < TrapCount; i++) {
+		const Projectile* pro = map->GetNextTrap(piter);
+		if (pro) {
+			const EffectQueue& fxqueue = pro->GetEffects();
+			if (fxqueue) {
+				headersize += fxqueue.GetSavedEffectsCount() * 0x108;
+			}
+		}
+	}
+
+	TrapOffset = headersize;
+	headersize += TrapCount * 0x1c;
+
 	AnimOffset = headersize;
 	AnimCount = (ieDword) map->GetAnimationCount();
 	headersize += AnimCount * 0x4c;
@@ -1783,22 +1799,6 @@ int AREImporter::GetStoredFileSize(Map* map)
 	TileOffset = headersize;
 	TileCount = (ieDword) map->TMap->GetTileCount();
 	headersize += TileCount * 0x6c;
-
-	EffectOffset = headersize;
-	proIterator piter;
-	TrapCount = (ieDword) map->GetTrapCount(piter);
-	for (unsigned int i = 0; i < TrapCount; i++) {
-		const Projectile* pro = map->GetNextTrap(piter);
-		if (pro) {
-			const EffectQueue& fxqueue = pro->GetEffects();
-			if (fxqueue) {
-				headersize += fxqueue.GetSavedEffectsCount() * 0x108;
-			}
-		}
-	}
-
-	TrapOffset = headersize;
-	headersize += TrapCount * 0x1c;
 
 	NoteOffset = headersize;
 	NoteCount = map->GetMapNoteCount();
@@ -2574,6 +2574,24 @@ int AREImporter::PutArea(DataStream* stream, const Map* map) const
 	PutRestHeader(stream, map);
 
 	PutExplored(stream, map);
+
+	proIterator iter;
+	ieDword i = map->GetTrapCount(iter);
+	while (i--) {
+		const Projectile* trap = map->GetNextTrap(iter);
+		if (!trap) {
+			continue;
+		}
+
+		const EffectQueue& fxqueue = trap->GetEffects();
+		if (!fxqueue) {
+			continue;
+		}
+
+		PutEffects(stream, fxqueue);
+	}
+	PutTraps(stream, map);
+
 	PutAnimations(stream, map);
 	PutAmbients(stream, map);
 
@@ -2597,24 +2615,6 @@ int AREImporter::PutArea(DataStream* stream, const Map* map) const
 
 	PutEntrances(stream, map);
 	PutTiles(stream, map);
-
-	proIterator iter;
-	ieDword i = map->GetTrapCount(iter);
-	while (i--) {
-		const Projectile* trap = map->GetNextTrap(iter);
-		if (!trap) {
-			continue;
-		}
-
-		const EffectQueue& fxqueue = trap->GetEffects();
-		if (!fxqueue) {
-			continue;
-		}
-
-		PutEffects(stream, fxqueue);
-	}
-
-	PutTraps(stream, map);
 
 	PutMapnotes(stream, map);
 	return GEM_OK;
