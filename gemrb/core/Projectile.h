@@ -40,6 +40,17 @@ enum class ProHeights {
 	Background = 50 // this is supposed to move the projectile to the background
 };
 
+enum class ProjectileState {
+	NEW,
+	TRAVELLING, // moving towards target
+	AWAITING_TRIGGER, // hovering over target, waiting to trigger
+	HIT, // hit target
+	EXPLODING, // first explosion
+	EXPLODING_AGAIN, // any subsequent explosion
+	BURNING_DOWN, // children still there
+	EXPIRED
+};
+
 //projectile spark flags
 #define PSF_SPARKS        1
 #define PSF_FLYING        2
@@ -199,18 +210,6 @@ struct ProjectileExtension {
 };
 
 class GEM_EXPORT Projectile {
-private:
-	enum class ProjectileState {
-		NEW,
-		TRAVELLING, // moving towards target
-		AWAITING_TRIGGER, // hovering over target, waiting to trigger
-		HIT, // hit target
-		EXPLODING, // first explosion
-		EXPLODING_AGAIN, // any subsequent explosion
-		BURNING_DOWN, // children still there
-		EXPIRED
-	};
-
 public:
 	Projectile() noexcept;
 #if _MSC_VER
@@ -308,6 +307,7 @@ public:
 	ieDword GetCaster() const;
 	bool FailedIDS(const Actor* target) const;
 	bool IsWaitingForTrigger() const;
+	void SetState(ProjectileState newState) { state = newState; };
 	void SetTarget(ieDword t, bool fake);
 	void SetTarget(const Point& p);
 	bool PointInRadius(const Point& p) const;

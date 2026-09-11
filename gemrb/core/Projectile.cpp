@@ -552,7 +552,7 @@ void Projectile::UpdateSound()
 //possible actions: vanish, hover over point, explode
 //depends on the area extension
 //play explosion sound
-Projectile::ProjectileState Projectile::GetNextTravelState()
+ProjectileState Projectile::GetNextTravelState()
 {
 	if (Target) {
 		const Actor* target = area->GetActorByGlobalID(Target);
@@ -630,7 +630,7 @@ int Projectile::CalculateExplosionCount() const
 	return count;
 }
 
-Projectile::ProjectileState Projectile::EndTravel()
+ProjectileState Projectile::EndTravel()
 {
 	StopSound();
 	UpdateSound();
@@ -678,7 +678,7 @@ int Projectile::AddTrail(const ResRef& BAM, const ieByte* pal) const
 	return sca->GetSequenceDuration(core->Time.defaultTicksPerSec);
 }
 
-Projectile::ProjectileState Projectile::DoStep()
+ProjectileState Projectile::DoStep()
 {
 	if (pathcounter) {
 		pathcounter--;
@@ -966,7 +966,7 @@ int Projectile::CalculateTargetFlag() const
 }
 
 //get actors covered in area of trigger radius
-Projectile::ProjectileState Projectile::CheckTrigger(unsigned int radius)
+ProjectileState Projectile::CheckTrigger(unsigned int radius)
 {
 	if (state == ProjectileState::AWAITING_TRIGGER) {
 		//special trigger flag, explode only if the trigger animation has
@@ -1712,7 +1712,7 @@ void Projectile::SpawnChildren()
 	}
 }
 
-Projectile::ProjectileState Projectile::GetNextExplosionState()
+ProjectileState Projectile::GetNextExplosionState()
 {
 	if (!Extension) {
 		return ProjectileState::EXPIRED;

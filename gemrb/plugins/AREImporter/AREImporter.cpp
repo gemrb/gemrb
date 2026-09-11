@@ -1402,6 +1402,12 @@ bool AREImporter::GetTrap(DataStream* str, int idx, Map* map) const
 		ieDword level = caster->GetThiefLevel();
 		pro->SetCaster(caster->GetGlobalID(), level ? level : caster->GetXPLevel(false));
 	}
+	if (core->config.UseAsLibrary) {
+		// currently in tests Projectile::Update() doesn't get to run, so Projectile::state is always NEW.
+		// We need to ensure they get reckognized as traps or CanSave would bail out as if they were AoEs
+		// and we wouldn't resave them either, as they would be considered ephemeral by GetNextTrap
+		pro->SetState(ProjectileState::AWAITING_TRIGGER);
+	}
 	map->AddProjectile(std::move(pro), dest, dest);
 	return true;
 }
