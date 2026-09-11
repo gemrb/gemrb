@@ -2483,7 +2483,8 @@ void AREImporter::PutTraps(DataStream* stream, const Map* map) const
 		Offset += fxQueueSize;
 		stream->WriteWord(fxQueueSize); //size in bytes
 		stream->WriteWord(type); //missile.ids
-		stream->WriteDword(0); // unknown field, Ticks
+		stream->WriteWord(pro->GetName() == "TRAPBOOM" ? 1 : 0); // explosion frequency that we happily ignore
+		stream->WriteWord(1); // duration
 		stream->WritePoint(dest);
 		stream->WriteWord(0); // unknown field, Z
 		constexpr ieByte targetType = EA_EVILCUTOFF; // only the player can set traps, so this will never be anything else
