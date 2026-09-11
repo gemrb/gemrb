@@ -1792,8 +1792,8 @@ int AREImporter::GetStoredFileSize(Map* map)
 	VariablesCount = (ieDword) map->locals.size();
 	headersize += VariablesCount * 0x54;
 
-	EntrancesOffset = headersize;
 	EntrancesCount = (ieDword) map->GetEntranceCount();
+	EntrancesOffset = EntrancesCount ? headersize : 0;
 	headersize += EntrancesCount * 0x68;
 
 	TileOffset = headersize;
