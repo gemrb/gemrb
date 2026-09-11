@@ -1365,9 +1365,7 @@ bool AREImporter::GetTrap(DataStream* str, int idx, Map* map) const
 	ieWord trapSize;
 	ieWord proID;
 	ieByte owner;
-	Point pos;
-	// currently unused:
-	Point point;
+	Point dest;
 	ieDword ticks;
 	ieByte targetType;
 
@@ -1381,7 +1379,7 @@ bool AREImporter::GetTrap(DataStream* str, int idx, Map* map) const
 	}
 	str->ReadWord(proID);
 	str->ReadDword(ticks); // actually, delaycount/repetitioncount
-	str->ReadPoint(point);
+	str->ReadPoint(dest);
 	str->Seek(2, GEM_CURRENT_POS); // unknown/unused 'Z'
 	str->Read(&targetType, 1); // according to dev info, this is 'targettype'; "Enemy-ally targeting" on IESDP
 	str->Read(&owner, 1); // party member index that created this projectile (0-5)
@@ -1404,7 +1402,7 @@ bool AREImporter::GetTrap(DataStream* str, int idx, Map* map) const
 		ieDword level = caster->GetThiefLevel();
 		pro->SetCaster(caster->GetGlobalID(), level ? level : caster->GetXPLevel(false));
 	}
-	map->AddProjectile(std::move(pro), pos, pos);
+	map->AddProjectile(std::move(pro), dest, dest);
 	return true;
 }
 
