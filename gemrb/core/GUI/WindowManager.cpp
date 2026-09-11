@@ -540,7 +540,7 @@ void WindowManager::DrawTooltip(Point pos) const
 
 	const String& currentText = tooltip.tt.GetText();
 	// only use the delay the first time, otherwise drawing can flicker
-	int delay = currentText.empty() ? ToolTipDelay : 1;
+	int delay = currentText.empty() ? ToolTipDelay : 0;
 	if (tooltip.time != TooltipTime + delay) {
 		tooltip.time = TooltipTime + delay;
 		if (hoverWin) {
