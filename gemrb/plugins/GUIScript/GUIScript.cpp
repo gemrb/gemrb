@@ -3051,12 +3051,12 @@ works only after a LoadGame().\n\
 
 static PyObject* GemRB_GameSetProtagonistMode(PyObject* /*self*/, PyObject* args)
 {
-	int Flags;
-	PARSE_ARGS(args, "i", &Flags);
+	ProtagonistMode mode;
+	PARSE_ARGS(args, "B", &mode);
 
 	GET_GAME();
 
-	game->SetProtagonistMode(Flags);
+	game->SetProtagonistMode(mode);
 
 	Py_RETURN_NONE;
 }

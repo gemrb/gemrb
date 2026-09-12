@@ -5780,7 +5780,7 @@ bool Actor::CheckOnDeath()
 			inventory.DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
 		}
 		// drop everything remaining, but ignore TNO, as he needs to keep his gear
-		if (game->protagonist != PM_NO || GetScriptName() != game->GetPC(0, false)->GetScriptName()) {
+		if (game->protagonist != ProtagonistMode::No || GetScriptName() != game->GetPC(0, false)->GetScriptName()) {
 			DropItem("", 0);
 		}
 		InternalFlags |= IF_DUMPED;

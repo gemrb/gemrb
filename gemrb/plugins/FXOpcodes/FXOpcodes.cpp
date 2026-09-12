@@ -4336,8 +4336,8 @@ int fx_set_petrified_state(Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 
 	// end the game if everyone in the party gets petrified
 	Game* game = core->GetGame();
-	int oldPM = game->protagonist;
-	game->SetProtagonistMode(PM_TEAM);
+	ProtagonistMode oldPM = game->protagonist;
+	game->SetProtagonistMode(ProtagonistMode::Team);
 	if (game->EveryoneDead()) {
 		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindowPlot", false);
 	}
@@ -5676,7 +5676,7 @@ int fx_find_familiar(Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//The protagonist is ALWAYS in the first slot
-	if (game->protagonist != PM_TEAM && game->GetPC(0, false) != target) {
+	if (game->protagonist != ProtagonistMode::Team && game->GetPC(0, false) != target) {
 		displaymsg->DisplayConstantStringName(HCStrings::FamiliarProtagonistOnly, GUIColors::RED, target);
 		return FX_NOT_APPLIED;
 	}

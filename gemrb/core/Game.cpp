@@ -1546,7 +1546,7 @@ bool Game::EveryoneDead() const
 	if (PCs.empty()) {
 		return true;
 	}
-	if (protagonist == PM_NO) {
+	if (protagonist == ProtagonistMode::No) {
 		const Actor* nameless = PCs[0];
 		// don't trigger this outside pst, our game loop depends on it
 		if (nameless->GetStat(IE_STATE_ID) & STATE_NOSAVE && core->HasFeature(GFFlags::PST_STATE_FLAGS)) {
@@ -1557,7 +1557,7 @@ bool Game::EveryoneDead() const
 		return false;
 	}
 	// if protagonist died
-	if (protagonist == PM_YES) {
+	if (protagonist == ProtagonistMode::Yes) {
 		if (PCs[0]->GetStat(IE_STATE_ID) & STATE_NOSAVE || PCs[0]->GetInternalFlag() & IF_JUSTDIED) {
 			return true;
 		}
@@ -1656,7 +1656,7 @@ void Game::UpdateScripts()
 
 	if (EveryoneDead()) {
 		//don't check it any more
-		protagonist = PM_NO;
+		protagonist = ProtagonistMode::No;
 		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindow");
 		// That's for BG as the action bars to the left and right remain visible.
 		core->ToggleViewsEnabled(false, "NOT_DLG");
@@ -1676,7 +1676,7 @@ void Game::SetTimedEvent(EventHandler func, int count)
 	eventHandler = std::move(func);
 }
 
-void Game::SetProtagonistMode(int mode)
+void Game::SetProtagonistMode(ProtagonistMode mode)
 {
 	protagonist = mode;
 }

@@ -45,10 +45,11 @@ enum BlitFlags : uint32_t;
 #define JP_SELECT  4 //select the actor after joining
 #define JP_OVERRIDE 8 // replace actor, if any
 
-//protagonist mode
-#define PM_NO   0 //no death checks
-#define PM_YES  1 //if protagonist dies, game over
-#define PM_TEAM 2 //if team dies, game over
+enum class ProtagonistMode {
+	No, // no death checks
+	Yes, // if protagonist dies, game over
+	Team, // if team dies, game over
+};
 
 // Flags bits for SelectActor()
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -254,7 +255,7 @@ public:
 	/** 0 if the protagonist's death doesn't cause game over */
 	/** 1 if the protagonist's death causes game over */
 	/** 2 if no check is needed (pst) */
-	int protagonist = PM_YES;
+	ProtagonistMode protagonist = ProtagonistMode::Yes;
 	/** if party size exceeds this amount, a callback will be called */
 	size_t partysize = 6;
 	std::atomic_uint32_t GameTime { 0 };
@@ -438,7 +439,7 @@ public:
 	/** Sets a guiscript function to happen after x AI cycles have elapsed */
 	void SetTimedEvent(EventHandler func, int count);
 	/** Sets protagonist mode to 0-none,1-protagonist,2-team */
-	void SetProtagonistMode(int value);
+	void SetProtagonistMode(ProtagonistMode value);
 	void StartRainOrSnow(bool conditional, ieWord weather);
 	size_t GetLoadedMapCount() const { return Maps.size(); }
 	/** Adds or removes gold */
