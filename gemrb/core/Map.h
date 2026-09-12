@@ -77,6 +77,22 @@ enum MapEnv : ieWord {
 	AT_PST_DAYNIGHT = 0x400
 };
 
+// Song types, index in ARE song section (hardcoded and in musics.ids for scripts (iwd))
+enum class AreaSong {
+	Day,
+	Night,
+	BattleWin,
+	Battle,
+	BattleLose,
+	Misc0,
+	Misc1,
+	Misc2,
+	Misc3,
+	Misc4,
+
+	Invalid = 0xffff
+};
+
 //creature area flags
 #define AF_CRE_NOT_LOADED 1
 #define AF_NAME_OVERRIDE  8
@@ -373,7 +389,7 @@ public:
 	void MoveVisibleGroundPiles(const Point& Pos);
 
 	void DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t debugFlags);
-	void PlayAreaSong(int SongType, bool restart = true, bool hard = false) const;
+	void PlayAreaSong(AreaSong SongType, bool restart = true, bool hard = false) const;
 	void AddAnimation(const AreaAnimation& anim);
 	aniIterator GetFirstAnimation() { return animations.begin(); }
 	std::list<AreaAnimation>::const_iterator GetFirstAnimation() const { return animations.begin(); }

@@ -1891,14 +1891,14 @@ void GameScript::StartMusic(Scriptable* Sender, Holder<Action> parameters)
 			restart = false;
 			break;
 	}
-	map->PlayAreaSong(parameters->int0Parameter, restart, force);
+	map->PlayAreaSong(static_cast<AreaSong>(parameters->int0Parameter), restart, force);
 }
 
 void GameScript::StartCombatCounter(Scriptable* Sender, Holder<Action> /*parameters*/)
 {
 	const Map* map = Sender->GetCurrentArea();
 	if (!map) return;
-	map->PlayAreaSong(SONG_BATTLE, true, true);
+	map->PlayAreaSong(AreaSong::Battle, true, true);
 }
 
 /*iwd2 can set an areasong slot*/

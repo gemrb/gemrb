@@ -2250,17 +2250,17 @@ bool Game::IsDay(int hour) const
 
 void Game::ChangeSong(bool always, bool force) const
 {
-	int Song;
+	AreaSong song;
 	static int BattleSong = 0;
 
 	if (!area) return;
 
 	if (CombatCounter) {
 		//battlesong
-		Song = SONG_BATTLE;
+		song = AreaSong::Battle;
 		BattleSong++;
 	} else {
-		Song = 0xffff; // will select SONG_DAY or SONG_NIGHT
+		song = AreaSong::Invalid; // will select AreaSong::Day or AreaSong::Night
 		BattleSong = 0;
 	}
 	//area may override the song played (stick in battlemusic)
@@ -2269,7 +2269,7 @@ void Game::ChangeSong(bool always, bool force) const
 	//is playing
 	// make sure we only start one battle song at a time, since we're called once per party member
 	if (BattleSong < 2) {
-		area->PlayAreaSong(Song, always, force);
+		area->PlayAreaSong(song, always, force);
 	}
 }
 

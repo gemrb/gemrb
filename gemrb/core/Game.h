@@ -106,14 +106,6 @@ enum RestChecks {
 	NoRepeats = 16 // disable Rest until healed
 };
 
-// Song types, index in ARE song section (hardcoded and in musics.ids for scripts (iwd))
-#define SONG_DAY   0
-#define SONG_NIGHT 1
-// SONG_BATTLE_WIN
-#define SONG_BATTLE 3
-// SONG_BATTLE_LOSE
-// SONG_MISC0-4
-
 enum class JournalSection : uint8_t {
 	Main,
 	Unsolved,

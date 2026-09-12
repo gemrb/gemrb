@@ -2217,7 +2217,7 @@ bool Map::SpawnsAlive() const
 	return false;
 }
 
-void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
+void Map::PlayAreaSong(AreaSong SongType, bool restart, bool hard) const
 {
 	// Some subareas don't have their own songlist. IWDs do nothing about it,
 	// while other games support continuation values:
@@ -2231,13 +2231,15 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 		musicMgr->End();
 		return;
 	}
-	if (SongType == 0xffff || SongList[SongType] == ieDword(-2)) {
-		// select SONG_DAY or SONG_NIGHT
+	int songTypeIdx = static_cast<int>(SongType);
+	if (SongType == AreaSong::Invalid || SongList[songTypeIdx] == ieDword(-2)) {
+		// select AreaSong::Day or AreaSong::Night
 		Trigger parameters;
 		parameters.int0Parameter = 0; // TIMEOFDAY_DAY, while dusk, dawn and night we treat as night
-		SongType = int(GameScript::TimeOfDay(nullptr, &parameters) != 1);
+		SongType = static_cast<AreaSong>(GameScript::TimeOfDay(nullptr, &parameters) != 1);
+		songTypeIdx = static_cast<int>(SongType);
 	}
-	size_t pl = SongList[SongType];
+	size_t pl = SongList[songTypeIdx];
 
 	bool hasContinuation = core->HasFeature(GFFlags::HAS_CONTINUATION);
 	Game* game = core->GetGame();
@@ -2250,7 +2252,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 		static constexpr int bc1Idx = 19; // fallback to first BG1 battle music, should never be hit
 
 		const Map* lastMasterArea = game->GetMap(game->LastMasterArea, false);
-		pl = lastMasterArea ? lastMasterArea->SongList[SongType] : bc1Idx;
+		pl = lastMasterArea ? lastMasterArea->SongList[songTypeIdx] : bc1Idx;
 		poi = core->GetMusicPlaylist(pl);
 		if (IsStar(poi)) silentAreas.insert(scriptName);
 	}
@@ -2270,7 +2272,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 		core->DisableMusicPlaylist(pl);
 		return;
 	}
-	if (SongType == SONG_BATTLE) {
+	if (SongType == AreaSong::Battle) {
 		game->CombatCounter = 150;
 	}
 }
