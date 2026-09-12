@@ -1,0 +1,60 @@
+# SPDX-FileCopyrightText: 2026 Contributors to the GemRB project <https://gemrb.org>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# See: https://circleci.com/docs/reference/configuration-reference/
+version: 2.1
+
+jobs:
+  build:
+    macos:
+      xcode: 26.6.0
+    resource_class: m4pro.medium
+    environment:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+
+    steps:
+      - checkout
+      - run: brew install sdl2 openal-soft sdl2_mixer libpng libvorbis openssh googletest
+      - run: |
+          # FindOpenAL prefers the framework version by default ... which deprecated OpenAL
+          openal="-DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/AL -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib"
+          mkdir build && cd build
+          export OPENALDIR="/usr/local/opt/openal-soft/"
+          cmake -DCMAKE_INSTALL_PREFIX=iprefix -DBIN_DIR="$CIRCLE_WORKING_DIRECTORY" $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off -DUSE_TESTS=ON ..
+
+      - run: |
+          cd build
+          make
+
+      - run: |
+          # try to only run on tag pushes
+          if grep -q '^v[01]\.[0-9].[0-9]' \<<< "${CIRCLE_TAG}"; then make fetch-demo-data; fi
+          make install
+
+      - run: |
+          cd build
+          make test # also try real testing on this platform later if creating a display succeeds
+
+      - run: |
+          if [[ $CIRCLE_PROJECT_USERNAME != 'gemrb' || -n $CIRCLE_PULL_REQUEST ]]; then exit 0; fi
+          # generate filename
+          # there are no tags, so improvise
+          v2=${CIRCLE_SHA1:0:8}
+          if [[ -n $CIRCLE_TAG ]]; then v2=$CIRCLE_TAG; fi
+          version=$({ date +%F; echo "-$v2"; } | tr -d '\n') || exit 14
+          file="gemrb-$version.zip"
+          # pack
+          zip -q -r "$file" "GemRB.app"
+          # unpack ssh key
+          # echo "$SSHKEY" > testing/id_travissfbot.av
+          # chmod 600 testing/id_travissfbot.av
+          # upload
+          filepath="Apple/ARM64/$file"
+          scp -vvv -oStrictHostKeyChecking=no "$file" "gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath"
+          # scp -vvv -oStrictHostKeyChecking=no -i testing/id_travissfbot.av "$file" "gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/botbins/$filepath"
+
+workflows:
+  build-and-test:
+    jobs:
+      - build
