@@ -535,17 +535,12 @@ namespace test {
 		Point p = from;
 		appendIfNotPresent(SearchmapPoint { p });
 		for (size_t i = 0; i < path.Size(); ++i) {
-			PathFinder::LineStepper<NavmapPoint> walk { p, path.GetStep(i).point };
+			const Point to = path.GetStep(i).point;
+			PathFinder::GridRayCast walk { NavmapPoint(p), NavmapPoint(to) };
 			while (walk.Step()) {
-				if (walk.Current() == p) {
-					// a step should always move, bail out if that ever stops holding
-					ADD_FAILURE() << "LineStepper makes no progress for point " << i << "  at ("
-						      << p.x << ',' << p.y << ')';
-					return tiles;
-				}
-				p = walk.Current();
-				appendIfNotPresent(SearchmapPoint { p });
+				appendIfNotPresent(walk.Current());
 			}
+			p = to;
 		}
 		return tiles;
 	}
