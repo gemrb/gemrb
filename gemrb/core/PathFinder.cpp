@@ -31,6 +31,8 @@
 #include "Scriptable/Actor.h"
 
 #include <array>
+#include <cassert>
+#include <cmath>
 #include <limits>
 #include <set>
 
@@ -40,6 +42,9 @@ constexpr size_t DEGREES_OF_FREEDOM = 4;
 constexpr size_t RAND_DEGREES_OF_FREEDOM = 16;
 constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent { { 1, 0, -1, 0 } };
 constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent { { 0, 1, 0, -1 } };
+
+// Distance is accumulated in COST_SCALE-ths of a tile, so we can put correct price tag on diagonal steps
+constexpr unsigned int COST_SCALE = 256;
 
 // Cosines
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383 } };
@@ -71,15 +76,31 @@ namespace {
 
 	const std::array<std::vector<BasePoint>, MAX_CIRCLESIZE - 1> CircleOffsetTable = MakeCircleOffsetTable();
 
+	// Distance() in COST_SCALE-ths of a tile, so that the sqrt(2) of a diagonal step survives as
+	// something other than the 1 of an orthogonal one.
+	// Rounded, not truncated: the error then stays centred instead of accumulating short over a long route.
+	// Note on rounding impl: floor(x + 0.5f) is round-half-up, a single instruction, and correct in this case, because
+	// costs are never negative. Do not "fix" this to std::lround, that adds a libm call and a range check for no accuracy
+	// gain.
+	unsigned int StepCost(const SearchmapPoint& from, const SearchmapPoint& to) noexcept
+	{
+		const int dx = from.x - to.x;
+		const int dy = from.y - to.y;
+		return static_cast<unsigned int>(
+			std::floor(COST_SCALE * std::sqrt(static_cast<float>(dx * dx + dy * dy)) + 0.5f));
+	}
+
 	// FindPath's scratch storage. Kept across calls so a search allocates nothing, and per thread
 	// because worker threads run FindPath concurrently.
 	struct SearchState {
 		BucketPriorityQueue open;
 		std::vector<uint8_t> isClosed;
 		std::vector<NavmapPoint> parents;
-		std::vector<unsigned short> distFromStart;
+		// in COST_SCALE-ths of a tile, see StepCost(); 32 bits because the scaling costs 8 of
+		// them and a whole-tile total already wanted 16
+		std::vector<uint32_t> distFromStart;
 		// Generation stamping: cells whose `genOf[i] != searchGen` are "fresh" (unvisited this
-		// call) and read as their default values (isClosed=false, parents=zero, dist=0xFFFF).
+		// call) and read as their default values (isClosed=false, parents=zero, dist=max).
 		// Bumping searchGen each call replaces the three memsets that previously zeroed all
 		// three arrays, most of which a typical search never touches.
 		std::vector<uint32_t> genOf;
@@ -296,7 +317,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	BucketPriorityQueue& open = searchState.open;
 	std::vector<uint8_t>& isClosed = searchState.isClosed;
 	std::vector<NavmapPoint>& parents = searchState.parents;
-	std::vector<unsigned short>& distFromStart = searchState.distFromStart;
+	std::vector<uint32_t>& distFromStart = searchState.distFromStart;
 	std::vector<uint32_t>& genOf = searchState.genOf;
 	uint32_t& searchGen = searchState.searchGen;
 
@@ -306,6 +327,9 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	distFromStart.resize(mapCellsCount);
 	isClosed.resize(mapCellsCount);
 	genOf.resize(mapCellsCount);
+	// and so is the open set: it holds at most one entry per cell, so the same count is what
+	// bounds its storage
+	open.Reserve(mapCellsCount);
 
 	// Generation-stamp reset: bump searchGen so every cell reads as "unvisited" without touching
 	// its storage. If the counter wraps, zero it and also zero genOf so stale stamps from before
@@ -320,17 +344,17 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	// begin algo init
 	const int srcIdx = smptSource.y * mapSize.w + smptSource.x;
 	genOf[srcIdx] = searchGen;
+	isClosed[srcIdx] = false;
 	distFromStart[srcIdx] = 0;
 	parents[srcIdx] = nmptSource;
-
-	open.Push(nmptSource, 0);
+	open.Push(nmptSource, uint32_t(srcIdx), 0);
 
 	bool foundPath = false;
 	unsigned int squaredMinDist = minDistance * minDistance;
 
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 	constexpr float_t HEURISTIC_WEIGHT = 1.5;
-	const auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) {
+	const auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) -> uint32_t {
 		// Calculate heuristic
 		const int xDist = smptChild.x - smptDest.x;
 		const int yDist = smptChild.y - smptDest.y;
@@ -343,9 +367,9 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 		// `std::sqrt` translates directly to a single CPU instruction on x86 and ARM architectures,
 		// while `std::hypotf` is a function call, which is costly on a hotpath
 		const float distance = std::sqrt(static_cast<float>(xDist * xDist + yDist * yDist));
-		const float heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
-		const float estDist = distFromStart[smptChildIdx] + heuristic;
-		return estDist;
+		const float heuristic = HEURISTIC_WEIGHT * (distance + static_cast<float>(crossProduct));
+		const uint32_t heuristicFixed = static_cast<uint32_t>(heuristic * static_cast<float>(COST_SCALE) + 0.5f);
+		return distFromStart[smptChildIdx] + heuristicFixed;
 	};
 
 	constexpr uint8_t ITERATION_FREQUENCY_OF_CHECKING_TIMEOUT = 25;
@@ -368,11 +392,11 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 		const SearchmapPoint smptCurrent { nmptCurrent };
 		const int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
-		// A fresh cell (generation mismatch) reads as unvisited: parents==zero, skip.
-		// This matches the old memset-to-zero behaviour and filters stale open-queue entries.
+		// A fresh cell (generation mismatch) reads as unvisited, so skip it.
 		if (genOf[smptCurrentIdx] != searchGen || parents[smptCurrentIdx].IsZero()) {
 			continue;
 		}
+		assert(!isClosed[smptCurrentIdx] && "a closed cell was popped: the open set has duplicates");
 
 		if (smptCurrent == smptDest) {
 			nmptDest = nmptCurrent;
@@ -395,7 +419,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 		const NavmapPoint nmptParent = parents[smptCurrentIdx];
 		const SearchmapPoint smptParent { nmptParent };
-		const unsigned short parentDist = distFromStart[smptParent.y * mapSize.w + smptParent.x];
+		const uint32_t parentDist = distFromStart[smptParent.y * mapSize.w + smptParent.x];
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			const NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
@@ -416,11 +440,11 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			const bool childIsUnbumpable = navmapCellTraversability.occupyingActor != actorIdentity && navmapCellTraversability.state >= blockingTraversabilityValue;
 			if (childIsUnbumpable) continue;
 
-			// Fresh cell reads as distFromStart==0xFFFF (same as old memset(255,...) default).
-			const unsigned short oldDist = (genOf[smptChildIdx] == searchGen) ? distFromStart[smptChildIdx] : std::numeric_limits<unsigned short>::max();
+			// A fresh cell reads as infinitely far.
+			const uint32_t oldDist = (genOf[smptChildIdx] == searchGen) ? distFromStart[smptChildIdx] : std::numeric_limits<uint32_t>::max();
 
 			// Lazy Theta star*
-			unsigned short newDist = parentDist + Distance(smptParent, smptChild);
+			uint32_t newDist = parentDist + StepCost(smptParent, smptChild);
 			if (newDist < oldDist) {
 				// First touch: stamp the cell before writing any field.
 				genOf[smptChildIdx] = searchGen;
@@ -435,7 +459,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 				//if (!IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
 				if (!IsWalkableTo(tileProps, nmptParent, nmptChild, actorsAreBlocking, actorCircleSize)) {
 					// Fall back to A-star path
-					distFromStart[smptChildIdx] = std::numeric_limits<unsigned short>::max();
+					distFromStart[smptChildIdx] = std::numeric_limits<uint32_t>::max();
 					// Find already visited neighbour with shortest: path from start + path to child
 					for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
 						NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
@@ -446,8 +470,8 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 						const int smptVisIdx = smptVis.y * mapSize.w + smptVis.x;
 						if (genOf[smptVisIdx] != searchGen || !isClosed[smptVisIdx]) continue;
 
-						unsigned short oldVisDist = distFromStart[smptChildIdx];
-						newDist = distFromStart[smptVisIdx] + Distance(smptVis, smptChild);
+						const uint32_t oldVisDist = distFromStart[smptChildIdx];
+						newDist = distFromStart[smptVisIdx] + StepCost(smptVis, smptChild);
 						if (newDist < oldVisDist) {
 							parents[smptChildIdx] = nmptVis;
 							distFromStart[smptChildIdx] = newDist;
@@ -456,8 +480,10 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 					if (distFromStart[smptChildIdx] >= oldDist) continue;
 				}
 
-				const float newCost = getHeuristic(smptChild, smptChildIdx);
-				open.Push(nmptChild, newCost);
+				const uint32_t newCost = getHeuristic(smptChild, smptChildIdx);
+				// The queue keys on the cell index, and holds at most one entry per cell: this
+				// either queues the child or moves the entry it already has down to the new cost.
+				open.Push(nmptChild, uint32_t(smptChildIdx), newCost);
 			}
 		}
 	}
