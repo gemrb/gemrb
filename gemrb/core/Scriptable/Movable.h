@@ -79,6 +79,12 @@ protected:
 	int pathTries = 0;
 	int randomBackoff = 0;
 	Point oldPos = Pos;
+	// Pos is whole pixels, but one frame of movement is not: on a shallow leg the step is a
+	// fraction of a pixel on the minor axis. Rounding that away every frame is what used to bend
+	// the walk off its leg, so what a frame cannot spend is kept here and spent by a later one.
+	// Reset whenever the actor stops following the current leg.
+	float_t stepFractionX = 0;
+	float_t stepFractionY = 0;
 	bool bumped = false;
 	int pathfindingDistance = circleSize;
 	int randomWalkCounter = 0;

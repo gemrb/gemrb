@@ -119,7 +119,7 @@ static inline bool DoObjectChecks(const Map* map, const Scriptable* Sender, Acto
 	}
 
 	// line of sight check
-	if (!map->IsVisibleLOS(Sender->SMPos, target->SMPos, source)) return false;
+	if (!map->IsVisibleLOS(Sender->SMPos, target->SMPos)) return false;
 
 	// protection against creature
 	if (target->fxqueue.HasEffect(fx_protection_creature_ref)) {

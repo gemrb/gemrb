@@ -47,26 +47,26 @@ static Path FindPathSync(const Point& source, const Point& destination, unsigned
 TEST_F(MapTest, GetBlockedInLineTest1)
 {
 	// same point
-	EXPECT_TRUE(map->IsVisibleLOS(badPaths[0], badPaths[0], nullptr));
+	EXPECT_TRUE(map->IsVisibleLOS(badPaths[0], badPaths[0]));
 
 	// random points
 	for (int i = 0; i < 3; i++) {
-		EXPECT_FALSE(map->IsVisibleLOS(badPaths[i], badPaths[i + 1], nullptr)) << "i: " << i << std::endl;
+		EXPECT_FALSE(map->IsVisibleLOS(badPaths[i], badPaths[i + 1])) << "i: " << i << std::endl;
 
-		EXPECT_TRUE(map->IsVisibleLOS(goodPaths[i], goodPaths[i + 1], nullptr)) << "i: " << i << std::endl;
+		EXPECT_TRUE(map->IsVisibleLOS(goodPaths[i], goodPaths[i + 1])) << "i: " << i << std::endl;
 	}
 }
 
 TEST_F(MapTest, GetBlockedInLineTileTest1)
 {
 	// same point
-	EXPECT_TRUE(map->IsVisibleLOS(badPaths2[0], badPaths2[0], nullptr));
+	EXPECT_TRUE(map->IsVisibleLOS(badPaths2[0], badPaths2[0]));
 
 	// random points
 	for (int i = 0; i < 3; i++) {
-		EXPECT_FALSE(map->IsVisibleLOS(badPaths2[i], badPaths2[i + 1], nullptr)) << "i: " << i << std::endl;
+		EXPECT_FALSE(map->IsVisibleLOS(badPaths2[i], badPaths2[i + 1])) << "i: " << i << std::endl;
 
-		EXPECT_TRUE(map->IsVisibleLOS(goodPaths2[i], goodPaths2[i + 1], nullptr)) << "i: " << i << std::endl;
+		EXPECT_TRUE(map->IsVisibleLOS(goodPaths2[i], goodPaths2[i + 1])) << "i: " << i << std::endl;
 	}
 }
 
@@ -74,16 +74,16 @@ TEST_F(MapTest, GetBlockedInLineTileTest1)
 TEST_F(MapTest, GetBlockedInLineTestDouble)
 {
 	// same point
-	EXPECT_TRUE(map->IsVisibleLOS(badPaths[0], badPaths[0], nullptr));
+	EXPECT_TRUE(map->IsVisibleLOS(badPaths[0], badPaths[0]));
 
 	// random points
 	for (int i = 0; i < 3; i++) {
-		EXPECT_EQ(map->IsVisibleLOS(badPaths[i], badPaths[i + 1], nullptr),
-			  map->IsVisibleLOS(badPaths2[i], badPaths2[i + 1], nullptr))
+		EXPECT_EQ(map->IsVisibleLOS(badPaths[i], badPaths[i + 1]),
+			  map->IsVisibleLOS(badPaths2[i], badPaths2[i + 1]))
 			<< "i: " << i << std::endl;
 
-		EXPECT_EQ(map->IsVisibleLOS(goodPaths[i], goodPaths[i + 1], nullptr),
-			  map->IsVisibleLOS(goodPaths2[i], goodPaths2[i + 1], nullptr))
+		EXPECT_EQ(map->IsVisibleLOS(goodPaths[i], goodPaths[i + 1]),
+			  map->IsVisibleLOS(goodPaths2[i], goodPaths2[i + 1]))
 			<< "i: " << i << std::endl;
 	}
 }
@@ -99,18 +99,28 @@ TEST_F(MapTest, FindPathTest)
 	// curvy path
 	path = FindPathSync(badPaths[0], badPaths[1], circleSize);
 	EXPECT_TRUE(path);
-	EXPECT_EQ(path.Size(), 3);
+	EXPECT_EQ(path.Size(), 4);
 
 	// ... is exactly what we expect
 	EXPECT_EQ(path.GetStep(0).point, Point(1222, 700));
-	EXPECT_EQ(path.GetStep(1).point, Point(1110, 712));
-	EXPECT_EQ(path.GetStep(2).point, Point(1062, 700)); // not exactly badPaths[1]!
+	EXPECT_EQ(path.GetStep(1).point, Point(1174, 712));
+	EXPECT_EQ(path.GetStep(2).point, Point(1110, 712));
+	EXPECT_EQ(path.GetStep(3).point, Point(1062, 700)); // not exactly badPaths[1]!
+
+	// every leg of it stays on passable ground
+	Point previous = badPaths[0];
+	for (size_t i = 0; i < path.Size(); i++) {
+		const Point step = path.GetStep(i).point;
+		EXPECT_TRUE(PathFinder::IsWalkableTo(map->tileProps, previous, step, true, circleSize))
+			<< "leg " << i << std::endl;
+		previous = step;
+	}
 
 	// basic determinism
 	auto path2 = FindPathSync(badPaths[0], badPaths[1], circleSize);
 	EXPECT_TRUE(path2);
-	EXPECT_EQ(path2.Size(), 3);
-	for (int i = 0; i < 3; i++) {
+	EXPECT_EQ(path2.Size(), 4);
+	for (int i = 0; i < 4; i++) {
 		EXPECT_EQ(path.GetStep(i).point, path2.GetStep(i).point);
 	}
 

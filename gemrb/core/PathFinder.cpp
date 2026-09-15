@@ -194,7 +194,6 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 	const unsigned int actorCircleSize = actorContext.circleSize;
 	const Movable* const actorIdentity = actorContext.identity;
-	const int actorSpeed = actorContext.speed;
 
 	LogDebugPathfinder("FindPath", "caller = {}, source = {}, destination = {}, dist = {}, actorCircleSize = {}",
 			   actorContext.scriptName, source, destination,
@@ -316,7 +315,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 		if (minDistance &&
 		    parents[smptCurrentIdx] != nmptCurrent &&
 		    SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist &&
-		    (!(pathfindingFlags & PF_SIGHT) || IsVisibleLOS(tileProps, smptCurrent, smptDest0, actorSpeed, actorCircleSize))) { // FIXME: should probably be smptDest
+		    (!(pathfindingFlags & PF_SIGHT) || IsVisibleLOS(tileProps, smptCurrent, smptDest0))) { // FIXME: should probably be smptDest
 			smptDest = smptCurrent;
 			nmptDest = nmptCurrent;
 			foundPath = true;
@@ -359,7 +358,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 				// Theta-star path if there is LOS
 				// so far the searchmap grid appears too coarse to play on, see #2261
 				//if (!IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
-				if (!IsWalkableTo(tileProps, nmptParent, nmptChild, actorsAreBlocking, actorSpeed, actorCircleSize)) {
+				if (!IsWalkableTo(tileProps, nmptParent, nmptChild, actorsAreBlocking, actorCircleSize)) {
 					// Fall back to A-star path
 					distFromStart[smptChildIdx] = std::numeric_limits<unsigned short>::max();
 					// Find already visited neighbour with shortest: path from start + path to child
@@ -419,29 +418,33 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	return {};
 }
 
+void PathFinder::ScaleDeltas(float_t& dx, float_t& dy, const float_t factor)
+{
+	constexpr float_t STEP_RADIUS = 2.0; // navmap pixels along x, so an eighth of a tile
+
+	if (dx == 0.0 && dy == 0.0) return;
+
+	// Measure the step in tiles, not in navmap pixels. The navmap is anisotropic - a tile is 16
+	// pixels wide and 12 tall - so a step of constant pixel length covers different ground
+	// depending on its direction, and the actor would walk faster up and down than sideways.
+	//
+	// Normalizing in tile space makes the whole thing one scalar on both components, so
+	// the direction survives exactly, and the length is constant in tiles as intended.
+	const float_t lengthInTiles = std::hypotf(dx / static_cast<float_t>(SEARCHMAP_SQUARE_WIDTH),
+						  dy / static_cast<float_t>(SEARCHMAP_SQUARE_HEIGHT));
+	const float_t q = (STEP_RADIUS / static_cast<float_t>(SEARCHMAP_SQUARE_WIDTH)) / lengthInTiles;
+
+	// never overshoot the target the step is aimed at
+	const float_t scale = std::min(q * factor, 1.0f);
+	dx *= scale;
+	dy *= scale;
+}
+
 void PathFinder::NormalizeDeltas(float_t& dx, float_t& dy, const float_t factor)
 {
-	constexpr float_t STEP_RADIUS = 2.0;
-
-	const float_t ySign = std::copysign(1.0f, dy);
-	const float_t xSign = std::copysign(1.0f, dx);
-	dx = std::fabs(dx);
-	dy = std::fabs(dy);
-	const float_t dxOrig = dx;
-	const float_t dyOrig = dy;
-	if (dx == 0.0) {
-		dy = STEP_RADIUS * 0.75f;
-	} else if (dy == 0.0) {
-		dx = STEP_RADIUS;
-	} else {
-		const float_t q = STEP_RADIUS / std::hypotf(dx, dy);
-		dx = dx * q;
-		dy = dy * q * 0.75f;
-	}
-	dx = std::min(dx * factor, dxOrig);
-	dy = std::min(dy * factor, dyOrig);
-	dx = std::ceil(dx) * xSign;
-	dy = std::ceil(dy) * ySign;
+	ScaleDeltas(dx, dy, factor);
+	dx = std::copysign(std::ceil(std::fabs(dx)), dx);
+	dy = std::copysign(std::ceil(std::fabs(dy)), dy);
 }
 
 void PathFinder::BlockSearchMapFor(const Movable* actor, TileProps& tileProps)
@@ -516,22 +519,6 @@ PathMapFlags PathFinder::GetBlockedTile(const TileProps& tileProps, const Search
 	}
 }
 
-PathMapFlags PathFinder::GetBlockedTile(const TileProps& tileProps, const SearchmapPoint& p)
-{
-	PathMapFlags ret = tileProps.QuerySearchMap(p);
-	if (bool(ret & PathMapFlags::TRAVEL)) {
-		ret |= PathMapFlags::PASSABLE;
-	}
-	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR))) {
-		ret &= ~PathMapFlags::PASSABLE;
-	}
-	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
-		ret = PathMapFlags::SIDEWALL;
-	}
-	return ret;
-}
-
-
 PathMapFlags PathFinder::GetBlockedInRadiusTile(const TileProps& tileProps, const SearchmapPoint& tp, uint16_t size, const bool stopOnImpassable)
 {
 	// We check a circle of radius size-2 around (px,py)
@@ -574,31 +561,39 @@ PathMapFlags PathFinder::GetBlockedInRadiusTile(const TileProps& tileProps, cons
 	return ret;
 }
 
-PathMapFlags PathFinder::GetBlockedInLine(const TileProps& tileProps, const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, const Actor* caller)
-{
-	int speed = caller ? caller->GetSpeed() : 0;
-	int cSize = caller ? caller->circleSize : 0;
-	return GetBlockedInLine(tileProps, s, d, stopOnImpassable, speed, cSize);
-}
-
-PathMapFlags PathFinder::GetBlockedInLine(const TileProps& tileProps, const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, int actorSpeed, int actorCircleSize)
+// Every line query - sight and walkability alike - asks the same thing: what does the straight
+// segment from s to d cross? GridRayCast answers exactly that, so the walk is the only thing these
+// share; what differs is how wide each tile is inspected and when to give up.
+static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinder::GridRayCast walk, bool stopOnImpassable, int actorCircleSize)
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
-	SearchmapPoint sms { s };
-	float_t factor = actorSpeed ? float_t(gamedata->GetStepTime()) / float_t(actorSpeed) : 1;
 
-	const auto getBlockedStatusFn = (stopOnImpassable && actorCircleSize) ? &PathFinder::GetChildBlockedStatusForBigSize : &PathFinder::GetChildBlockedStatusForSmallSize;
-	LineStepper<NavmapPoint> walk { s, d, factor };
+	// do a wider check for bigger actors (for the common case it's the same)
+	// should not be used for IsVisibleLOS
+	const bool useBigSize = stopOnImpassable && actorCircleSize;
+	const auto getBlockedStatus = [&](const SearchmapPoint& p) {
+		return useBigSize ? PathFinder::GetChildBlockedStatusForBigSize(tileProps, p, actorCircleSize) : PathFinder::GetChildBlockedStatusForSmallSize(tileProps, p, actorCircleSize);
+	};
 	while (walk.Step()) {
-		SearchmapPoint smp { walk.Current() };
-		if (sms == smp) continue;
-
-		// see note in GetBlockedInLineTile
-		const PathMapFlags blockStatus = (getBlockedStatusFn) (tileProps, smp, actorCircleSize);
+		const PathMapFlags blockStatus = getBlockedStatus(walk.Current());
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}
 		ret |= blockStatus;
+
+		// Check if the segment went between two tiles without entering either.
+		// An actor can round one blocked corner - that is just walking past a wall - but not squeeze through the joint
+		// between two of them, so this only counts when neither side is open. Without it a route
+		// is free to cut corners no body can cut, and the actor wedges on them.
+		if (walk.CutACorner()) {
+			const PathMapFlags besideX = getBlockedStatus(walk.CornerBesideX());
+			const PathMapFlags besideY = getBlockedStatus(walk.CornerBesideY());
+			const bool jammed = !bool(besideX & PathMapFlags::PASSABLE) && !bool(besideY & PathMapFlags::PASSABLE);
+			if (jammed) {
+				if (stopOnImpassable) return PathMapFlags::IMPASSABLE;
+				ret |= besideX | besideY;
+			}
+		}
 	}
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR | PathMapFlags::SIDEWALL))) {
 		ret &= ~PathMapFlags::PASSABLE;
@@ -608,60 +603,46 @@ PathMapFlags PathFinder::GetBlockedInLine(const TileProps& tileProps, const Navm
 	}
 
 	return ret;
+}
+
+PathMapFlags PathFinder::GetBlockedInLine(const TileProps& tileProps, const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, const Actor* caller)
+{
+	return GetBlockedInLine(tileProps, s, d, stopOnImpassable, caller ? caller->circleSize : 0);
+}
+
+PathMapFlags PathFinder::GetBlockedInLine(const TileProps& tileProps, const NavmapPoint& s, const NavmapPoint& d, bool stopOnImpassable, int actorCircleSize)
+{
+	return AccumulateAlongTheLine(tileProps, GridRayCast { s, d }, stopOnImpassable, actorCircleSize);
 }
 
 PathMapFlags PathFinder::GetBlockedInLineTile(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, const Actor* caller)
 {
-	int speed = caller ? caller->GetSpeed() : 0;
-	int cSize = caller ? caller->circleSize : 0;
-	return GetBlockedInLineTile(tileProps, s, d, stopOnImpassable, speed, cSize);
+	return GetBlockedInLineTile(tileProps, s, d, stopOnImpassable, caller ? caller->circleSize : 0);
 }
 
-PathMapFlags PathFinder::GetBlockedInLineTile(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, int actorSpeed, int actorCircleSize)
+PathMapFlags PathFinder::GetBlockedInLineTile(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, bool stopOnImpassable, int actorCircleSize)
 {
-	PathMapFlags ret = PathMapFlags::IMPASSABLE;
-	float_t factor = actorSpeed ? float_t(gamedata->GetStepTime()) / float_t(actorSpeed) / 16 : 1;
+	return AccumulateAlongTheLine(tileProps, GridRayCast { s, d }, stopOnImpassable, actorCircleSize);
+}
 
-	const auto getBlockedStatusFn = (stopOnImpassable && actorCircleSize) ? &PathFinder::GetChildBlockedStatusForBigSize : &PathFinder::GetChildBlockedStatusForSmallSize;
-	LineStepper<SearchmapPoint> walk { s, d, factor };
+static bool IsNoOpaqueBlockerOnTheLine(const TileProps& tileProps, PathFinder::GridRayCast walk)
+{
 	while (walk.Step()) {
-		const SearchmapPoint& p = walk.Current();
-		if (s == p) continue;
-
-		// do a wider check for bigger actors (for the common case it's the same)
-		// should not be used for IsVisibleLOS
-		const PathMapFlags blockStatus = (getBlockedStatusFn) (tileProps, p, actorCircleSize);
-		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
-			return PathMapFlags::IMPASSABLE;
+		if (static_cast<bool>(PathFinder::GetBlockedTile(tileProps, walk.Current()) & PathMapFlags::SIDEWALL)) {
+			return false;
 		}
-		ret |= blockStatus;
 	}
-	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR | PathMapFlags::SIDEWALL))) {
-		ret &= ~PathMapFlags::PASSABLE;
-	}
-	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
-		ret = PathMapFlags::SIDEWALL;
-	}
-
-	return ret;
+	return true;
 }
 
-bool PathFinder::IsVisibleLOS(const TileProps& tileProps, const Point& s, const Point& d, const Actor* caller)
+bool PathFinder::IsVisibleLOS(const TileProps& tileProps, const Point& s, const Point& d)
 {
-	PathMapFlags ret = GetBlockedInLine(tileProps, s, d, false, caller);
-	return !bool(ret & PathMapFlags::SIDEWALL);
+	return IsNoOpaqueBlockerOnTheLine(tileProps, GridRayCast { s, d });
 }
 
-bool PathFinder::IsVisibleLOS(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, const Actor* caller)
+bool PathFinder::IsVisibleLOS(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d)
 {
-	PathMapFlags ret = GetBlockedInLineTile(tileProps, s, d, false, caller);
-	return !bool(ret & PathMapFlags::SIDEWALL);
-}
-
-bool PathFinder::IsVisibleLOS(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, int actorSpeed, int actorCircleSize)
-{
-	PathMapFlags ret = GetBlockedInLineTile(tileProps, s, d, false, actorSpeed, actorCircleSize);
-	return !bool(ret & PathMapFlags::SIDEWALL);
+	return IsNoOpaqueBlockerOnTheLine(tileProps, GridRayCast { s, d });
 }
 
 
@@ -685,9 +666,9 @@ bool PathFinder::IsWalkableTo(const TileProps& tileProps, const Point& s, const 
 	return IsLineWalkable(ret, actorsAreBlocking);
 }
 
-bool PathFinder::IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, int actorSpeed, int actorCircleSize)
+bool PathFinder::IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, int actorCircleSize)
 {
-	PathMapFlags ret = GetBlockedInLine(tileProps, s, d, true, actorSpeed, actorCircleSize);
+	PathMapFlags ret = GetBlockedInLine(tileProps, s, d, true, actorCircleSize);
 	return IsLineWalkable(ret, actorsAreBlocking);
 }
 

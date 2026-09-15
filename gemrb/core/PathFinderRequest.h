@@ -26,7 +26,6 @@ class Movable;
 struct ActorPathContext {
 	unsigned int circleSize = 0;
 	const Movable* identity = nullptr; // pointer identity only, never dereferenced
-	int speed = 0;
 	ieVariable scriptName;
 };
 
