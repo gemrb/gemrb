@@ -193,7 +193,8 @@ namespace {
 	// The cost is a few hundred bytes of duplicated .rodata per translation unit.
 	constexpr std::array<PathMapFlags, 256> SearchMapFixupTable = MakeSearchMapFixupTable(std::make_index_sequence<256> {});
 
-	// GetBlockedInRadiusTile() applies its own second fixup to the OR of every tile in the circle.
+	// GetBlockedInRadiusTile() applies its own second fixup to the bitwise OR-accumulated flags
+	// of every tile in the circle.
 	// For an actor circle size of 2 or less that circle is a single tile, so its whole result is
 	// this second fixup composed onto the first - foldable into one more 256-entry table, and so
 	// into one load at the call site instead of the allocating GetBlockedInRadiusTile() call. See
