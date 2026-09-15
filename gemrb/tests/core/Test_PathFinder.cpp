@@ -841,9 +841,9 @@ TEST(FindPathTest, PathUTurn)
 		"#####################",
 		"#.........#...*@....#",
 		"#.........#..**.....#",
-		"#..***....#.@*......#",
-		"#....****.#*........#",
-		"#.......**@.........#",
+		"#..***....#.**......#",
+		"#....****.#**.......#",
+		"#.......**@*........#",
 		"#.........#.........#",
 		"#.........#.........#",
 		"#.........#.........#",
@@ -854,7 +854,7 @@ TEST(FindPathTest, PathUTurn)
 	const Point from = map.Start();
 	const test::TestTraversability traversability { map };
 	const Path path = test::CallFindPath(map, traversability, from, map.End());
-	EXPECT_EQ(path.Size(), 3) << "expected 3 waypoints";
+	EXPECT_EQ(path.Size(), 2);
 	EXPECT_TRUE(test::PathAvoidsWalls(map, from, path));
 	EXPECT_TRUE(test::PathIsSane(map, from, path));
 	EXPECT_TRUE(map.MatchesWithPath(map.Start(), path, expected));
@@ -2817,6 +2817,49 @@ INSTANTIATE_TEST_SUITE_P(
 				   "...XXX.XXXX",
 				   "....XX.XXX." } }),
 	[](const testing::TestParamInfo<WallFaceCorner>& info) { return info.param.area; });
+
+// === path smoothing ===
+// Theta* offers a node only the parent of the node it was expanded from, so the leg it settles
+// for is the longest that ancestor could see, not the longest there is. The smoothing pass drops
+// a waypoint whose two neighbours can see each other.
+
+// The stub is the second waypoint: it lies on the line between its neighbours, so it buys
+// nothing and costs two turns.
+TEST(FindPathTest, RoundingAnObstacleLeavesNoStubLeg)
+{
+	const TestSearchMap map {
+		"##############################",
+		"#............................#",
+		"#............................#",
+		"#S...........................#",
+		"#..........########..........#",
+		"#..........########..........#",
+		"#..........########..........#",
+		"#..........########..........#",
+		"#..........########..........#",
+		"#...........................E#",
+		"#............................#",
+		"##############################"
+	};
+
+	const Point from = map.Start();
+	const test::TestTraversability traversability { map };
+	const Path path = test::CallFindPath(map, traversability, from, map.End());
+
+	ASSERT_FALSE(path.Empty());
+	EXPECT_TRUE(test::PathAvoidsWalls(map, from, path));
+	EXPECT_TRUE(test::PathIsSane(map, from, path));
+	EXPECT_EQ(path.Size(), 2) << "one leg to the barrier's corner, one from it to the goal";
+
+	// no waypoint may be one its neighbours can see past
+	Point previous = from;
+	for (size_t i = 0; i + 1 < path.Size(); ++i) {
+		const Point next = path.GetStep(i + 1).point;
+		EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), previous, next, false, 1))
+			<< "waypoint " << i << " is a stub: its neighbours can see each other";
+		previous = path.GetStep(i).point;
+	}
+}
 
 // A one tile wide diagonal passage is a chain of wall/wall corners; the originals walk it.
 TEST(FindPathTest, AOneTileWideDiagonalPassageIsWalkable)

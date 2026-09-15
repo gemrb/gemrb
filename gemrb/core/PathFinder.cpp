@@ -30,6 +30,7 @@
 #include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cmath>
@@ -107,6 +108,8 @@ namespace {
 		// three arrays, most of which a typical search never touches.
 		std::vector<uint32_t> genOf;
 		uint32_t searchGen = 0;
+		// The reconstructed route, pulled straight
+		std::vector<NavmapPoint> waypoints;
 	};
 
 	// One thread_local object behind one deliberately out-of-line accessor, rather than four
@@ -512,28 +515,52 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	}
 
 	if (foundPath) {
-		Path resultPath;
+		// Walk the parent chain back from the destination. The source is the one cell that is its
+		// own parent and ends the walk.
+		std::vector<NavmapPoint>& waypoints = searchState.waypoints;
+		waypoints.clear();
 		NavmapPoint nmptCurrent = nmptDest;
-		NavmapPoint nmptParent;
 		SearchmapPoint smptCurrent { nmptCurrent };
-		while (!resultPath || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
-			nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
-			PathNode newStep { nmptCurrent, S };
+		while (waypoints.empty() || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
+			const NavmapPoint nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
+			waypoints.push_back(nmptCurrent);
+			nmptCurrent = nmptParent;
+			smptCurrent = SearchmapPoint(nmptCurrent);
+		}
+		std::reverse(waypoints.begin(), waypoints.end());
+
+		// Theta* settles for short stub legs; drop every waypoint whose two neighbours can see
+		// each other. The destination is always kept.
+		{
+			NavmapPoint anchor = nmptSource;
+			size_t kept = 0;
+			for (size_t i = 0; i + 1 < waypoints.size(); ++i) {
+				if (!walkableTo(anchor, waypoints[i + 1])) {
+					anchor = waypoints[i];
+					waypoints[kept++] = waypoints[i];
+				}
+			}
+			waypoints[kept++] = waypoints.back();
+			waypoints.resize(kept);
+		}
+
+		Path resultPath;
+		for (size_t i = waypoints.size(); i-- > 0;) {
+			const NavmapPoint& nmptStep = waypoints[i];
+			const NavmapPoint& nmptPrevious = i == 0 ? nmptSource : waypoints[i - 1];
+			PathNode newStep { nmptStep, S };
 			// movement in general allows characters to walk backwards given that
 			// the destination is behind the character (within a threshold), and
 			// that the distance isn't too far away
 			// we approximate that with a relaxed collinearity check and intentionally
 			// skip the first step, otherwise it doesn't help with iwd beetles in ar1015
-			if (pathfindingFlags & PF_BACKAWAY && resultPath && std::abs(area2(nmptCurrent, resultPath.GetStep(0).point, nmptParent)) < 300) {
-				newStep.orient = GetOrient(nmptCurrent, nmptParent);
+			if (pathfindingFlags & PF_BACKAWAY && resultPath && std::abs(area2(nmptStep, resultPath.GetStep(0).point, nmptPrevious)) < 300) {
+				newStep.orient = GetOrient(nmptStep, nmptPrevious);
 			} else {
-				newStep.orient = GetOrient(nmptParent, nmptCurrent);
+				newStep.orient = GetOrient(nmptPrevious, nmptStep);
 			}
 
 			resultPath.PrependStep(std::move(newStep));
-			nmptCurrent = nmptParent;
-
-			smptCurrent = SearchmapPoint(nmptCurrent);
 		}
 		return resultPath;
 	}
