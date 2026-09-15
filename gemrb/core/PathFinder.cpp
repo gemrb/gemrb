@@ -354,13 +354,22 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 	constexpr float_t HEURISTIC_WEIGHT = 1.5;
+
+	// Tie-breaking used to smooth out the path: nudges the heuristic towards candidates that sit
+	// closer to the straight source-destination line. dxCross/dyCross are loop invariants, so
+	// they are hoisted here rather than recomputed per neighbour.
+	const int dxCross = smptDest.x - smptSource.x;
+	const int dyCross = smptDest.y - smptSource.y;
+
+	// This search's walkability query.
+	const auto walkableTo = [&](const NavmapPoint& from, const NavmapPoint& to) {
+		return IsWalkableTo(tileProps, from, to, actorsAreBlocking, actorCircleSize);
+	};
+
 	const auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) -> uint32_t {
 		// Calculate heuristic
 		const int xDist = smptChild.x - smptDest.x;
 		const int yDist = smptChild.y - smptDest.y;
-		// Tie-breaking used to smooth out the path
-		const int dxCross = smptDest.x - smptSource.x;
-		const int dyCross = smptDest.y - smptSource.y;
 		const int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
 		// sqrtf, not hypotf: hypot()'s overflow/underflow scaling only matters when the squares
 		// would leave a float's exact range, and these are tile deltas.
@@ -443,23 +452,20 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			// A fresh cell reads as infinitely far.
 			const uint32_t oldDist = (genOf[smptChildIdx] == searchGen) ? distFromStart[smptChildIdx] : std::numeric_limits<uint32_t>::max();
 
-			// Lazy Theta star*
-			uint32_t newDist = parentDist + StepCost(smptParent, smptChild);
-			if (newDist < oldDist) {
-				// First touch: stamp the cell before writing any field.
-				genOf[smptChildIdx] = searchGen;
-				isClosed[smptChildIdx] = false;
-				parents[smptChildIdx] = nmptParent;
-				distFromStart[smptChildIdx] = newDist;
-			}
+			// Theta*'s candidate: reach the child straight from the current node's parent.
+			// Committed only once it is reachable and an improvement, so a failed line-of-sight
+			// test leaves the cell untouched.
+			uint32_t bestDist = parentDist + StepCost(smptParent, smptChild);
+			if (bestDist >= oldDist) continue;
+			NavmapPoint bestParent = nmptParent;
 
-			if (distFromStart[smptChildIdx] < oldDist) {
+			{
 				// Theta-star path if there is LOS
 				// so far the searchmap grid appears too coarse to play on, see #2261
 				//if (!IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
-				if (!IsWalkableTo(tileProps, nmptParent, nmptChild, actorsAreBlocking, actorCircleSize)) {
+				if (!walkableTo(nmptParent, nmptChild)) {
 					// Fall back to A-star path
-					distFromStart[smptChildIdx] = std::numeric_limits<uint32_t>::max();
+					bestDist = std::numeric_limits<uint32_t>::max();
 					// Find already visited neighbour with shortest: path from start + path to child
 					for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
 						NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
@@ -470,15 +476,22 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 						const int smptVisIdx = smptVis.y * mapSize.w + smptVis.x;
 						if (genOf[smptVisIdx] != searchGen || !isClosed[smptVisIdx]) continue;
 
-						const uint32_t oldVisDist = distFromStart[smptChildIdx];
-						newDist = distFromStart[smptVisIdx] + StepCost(smptVis, smptChild);
-						if (newDist < oldVisDist) {
-							parents[smptChildIdx] = nmptVis;
-							distFromStart[smptChildIdx] = newDist;
+						const uint32_t visDist = distFromStart[smptVisIdx] + StepCost(smptVis, smptChild);
+						if (visDist < bestDist) {
+							bestParent = nmptVis;
+							bestDist = visDist;
 						}
 					}
-					if (distFromStart[smptChildIdx] >= oldDist) continue;
+					// Nothing reachable beat what the child already had - leave the cell exactly
+					// as it was.
+					if (bestDist >= oldDist) continue;
 				}
+
+				// Commit. First touch: stamp the cell before writing any field.
+				genOf[smptChildIdx] = searchGen;
+				isClosed[smptChildIdx] = false;
+				parents[smptChildIdx] = bestParent;
+				distFromStart[smptChildIdx] = bestDist;
 
 				const uint32_t newCost = getHeuristic(smptChild, smptChildIdx);
 				// The queue keys on the cell index, and holds at most one entry per cell: this
@@ -701,7 +714,9 @@ static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinde
 			const PathMapFlags besideY = getBlockedStatus(walk.CornerBesideY());
 			const bool jammed = !bool(besideX & PathMapFlags::PASSABLE) && !bool(besideY & PathMapFlags::PASSABLE);
 			if (jammed) {
-				if (stopOnImpassable) return PathMapFlags::IMPASSABLE;
+				if (stopOnImpassable) {
+					return PathMapFlags::IMPASSABLE;
+				}
 				ret |= besideX | besideY;
 			}
 		}
