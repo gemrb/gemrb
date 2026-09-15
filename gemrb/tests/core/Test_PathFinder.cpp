@@ -2681,6 +2681,107 @@ INSTANTIATE_TEST_SUITE_P(AllAreas, SmoverriJointTest, testing::ValuesIn(Smoverri
 				 return fmt::format("{}_{}_{}", j.area, j.overrideX, j.overrideY);
 			 });
 
+// === reachability from every pixel ===
+// A region's reachability must not depend on which pixel of a tile the request is asked from.
+// The search used to build each point by offsetting the previous one by a tile, so the source's
+// intra-tile offset rode through the whole search and decided which corridor or joint was found.
+
+TEST(FindPathTest, ARockFlankedJointIsReachableFromEveryPixelOfItsTiles)
+{
+	// The ar9106 entry of SmoverriJoints(), the rock/rock joint.
+	const TestSearchMap map {
+		"XXXXXX.",
+		"XXX.S..",
+		"XXXX..X",
+		"XXXX.XX",
+		"XXX.XXX",
+		"X....XX",
+		"...E..."
+	};
+	const test::TestTraversability traversability { map };
+	const Point startCentre = map.Start();
+	const Point endCentre = map.End();
+
+	std::vector<std::string> failures;
+	const auto tryRoute = [&](const Point& from, const Point& to) {
+		const Path path = test::CallFindPath(map, traversability, from, to, nullptr, 2);
+		if (path.Empty()) {
+			failures.push_back(fmt::format("({},{}) -> ({},{})", from.x, from.y, to.x, to.y));
+			return;
+		}
+		EXPECT_TRUE(test::PathAvoidsWalls(map, from, path))
+			<< fmt::format("({},{}) -> ({},{}): the route crosses a wall", from.x, from.y, to.x, to.y);
+		EXPECT_TRUE(test::PathIsSane(map, from, path, 2))
+			<< fmt::format("({},{}) -> ({},{}): the route is not sane", from.x, from.y, to.x, to.y);
+	};
+
+	// every intra-tile offset of one endpoint, the other held at its centre; a tile is 16x12
+	// navmap pixels and its centre is (8,6) inside it
+	for (int oy = 0; oy < 12; ++oy) {
+		for (int ox = 0; ox < 16; ++ox) {
+			const Point startOff(startCentre.x - 8 + ox, startCentre.y - 6 + oy);
+			const Point endOff(endCentre.x - 8 + ox, endCentre.y - 6 + oy);
+			tryRoute(startOff, endCentre);
+			tryRoute(endCentre, startOff);
+			tryRoute(startCentre, endOff);
+			tryRoute(endOff, startCentre);
+		}
+	}
+	// the pair the real AR9106 walk carried
+	const Point realStart(endCentre.x, endCentre.y + 2);
+	const Point realEnd(startCentre.x + 3, startCentre.y - 2);
+	tryRoute(realStart, realEnd);
+	tryRoute(realEnd, realStart);
+
+	EXPECT_TRUE(failures.empty())
+		<< failures.size() << " endpoint offsets cannot reach through the joint; e.g. "
+		<< (failures.size() > 8 ? failures.front() + " ..." : fmt::format("{}", fmt::join(failures, "; ")));
+}
+
+// The same sweep over every joint of the table: a joint either links or it does not, and that
+// must be settled by the searchmap alone.
+TEST(FindPathTest, EveryJointLinksFromEveryPixelOfItsTiles)
+{
+	for (const SmoverriJoint& joint : SmoverriJoints()) {
+		const TestSearchMap map { joint.rows };
+		const test::TestTraversability traversability { map };
+		const Point startCentre = map.Start();
+		const Point endCentre = map.End();
+
+		size_t attempted = 0;
+		std::vector<std::string> failures;
+		const auto tryRoute = [&](const Point& from, const Point& to) {
+			++attempted;
+			const Path path = test::CallFindPath(map, traversability, from, to, nullptr, 2);
+			if (path.Empty()) {
+				failures.push_back(fmt::format("({},{}) -> ({},{})", from.x, from.y, to.x, to.y));
+				return;
+			}
+			EXPECT_TRUE(test::PathAvoidsWalls(map, from, path))
+				<< joint.area << fmt::format(" ({},{}): the route crosses a wall", from.x, from.y);
+			EXPECT_TRUE(test::PathIsSane(map, from, path, 2))
+				<< joint.area << fmt::format(" ({},{}): the route is not sane", from.x, from.y);
+		};
+
+		for (int oy = 0; oy < 12; ++oy) {
+			for (int ox = 0; ox < 16; ++ox) {
+				const Point startOff(startCentre.x - 8 + ox, startCentre.y - 6 + oy);
+				const Point endOff(endCentre.x - 8 + ox, endCentre.y - 6 + oy);
+				tryRoute(startOff, endCentre);
+				tryRoute(endCentre, startOff);
+				tryRoute(startCentre, endOff);
+				tryRoute(endOff, startCentre);
+			}
+		}
+
+		EXPECT_TRUE(failures.empty())
+			<< joint.area << " (" << joint.overrideX << "," << joint.overrideY << "): "
+			<< failures.size() << " of " << attempted
+			<< " standing pixels cannot reach through the joint; e.g. "
+			<< (failures.size() > 8 ? failures.front() + " ..." : fmt::format("{}", fmt::join(failures, "; ")));
+	}
+}
+
 // A corner with a wall face on one side and rock on the other. Both cuts are the sole link
 // between the two regions they join.
 namespace {

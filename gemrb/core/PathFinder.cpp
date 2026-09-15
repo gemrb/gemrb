@@ -435,10 +435,11 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 		const uint32_t parentDist = distFromStart[smptParent.y * mapSize.w + smptParent.x];
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
-			const NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
-			// Bound the pixel point before narrowing it to a tile: SearchmapPoint truncates toward
-			// zero, so a negative overhang would fold onto tile 0, while the traversability lookup
-			// below reads the pixels directly and would fault.
+			// The neighbour's tile centre, not "this point plus one tile": offsetting the current
+			// point would carry the source's intra-tile offset through the whole search, and a
+			// diagonal ray between such points clips one of the tiles flanking the corner instead
+			// of passing through it.
+			const NavmapPoint nmptChild((smptCurrent.x + dxAdjacent[i]) * 16 + 8, (smptCurrent.y + dyAdjacent[i]) * 12 + 6);
 			if (nmptChild.x < 0 || nmptChild.y < 0 || nmptChild.x >= mapSize.w * 16 || nmptChild.y >= mapSize.h * 12) continue;
 			const SearchmapPoint smptChild { nmptChild };
 			// Already visited
@@ -474,17 +475,17 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 					bestDist = std::numeric_limits<uint32_t>::max();
 					// Find already visited neighbour with shortest: path from start + path to child
 					for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
-						NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
-						// Bound the pixel point, same reason as nmptChild above.
+						// The neighbour's tile centre, same reason as nmptChild above.
+						NavmapPoint nmptVis((smptChild.x + dxAdjacent[j]) * 16 + 8, (smptChild.y + dyAdjacent[j]) * 12 + 6);
 						if (nmptVis.x < 0 || nmptVis.y < 0 || nmptVis.x >= mapSize.w * 16 || nmptVis.y >= mapSize.h * 12) continue;
 						SearchmapPoint smptVis { nmptVis };
 						// Only consider already visited (closed)
 						const int smptVisIdx = smptVis.y * mapSize.w + smptVis.x;
 						if (genOf[smptVisIdx] != searchGen || !isClosed[smptVisIdx]) continue;
 						// The A* fallback takes a grid neighbour as parent without asking whether
-						// the step is walkable. That is only safe for orthogonal steps: two
-						// passable tiles sharing an edge are always joined. Diagonal steps are
-						// asked, since sharing only a corner is not enough.
+						// the step is walkable. Two passable tiles sharing an edge are always
+						// joined; two sharing only a corner are not, for a big actor whose radius
+						// can be refused on the crossing line.
 						if (dxAdjacent[j] && dyAdjacent[j] &&
 						    !walkableTo(nmptVis, nmptChild)) continue;
 
