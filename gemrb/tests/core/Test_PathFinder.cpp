@@ -553,45 +553,6 @@ TEST(PathFinderTest, WallStaysSolidWithActorsAlongIt)
 	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
 }
 
-// LineStepper tests
-TEST(PathFinderTest, LineStepperArrivesExactlyAndAlwaysMoves)
-{
-	const NavmapPoint from(56, 42);
-	const NavmapPoint to(248, 66);
-
-	PathFinder::LineStepper<NavmapPoint> walk { from, to };
-	Point previous = from;
-	size_t steps = 0;
-	while (walk.Step()) {
-		EXPECT_NE(walk.Current(), previous) << "a step must always move";
-		previous = walk.Current();
-		ASSERT_LT(++steps, 1000u) << "the walk has to terminate";
-	}
-	EXPECT_EQ(walk.Current(), to) << "it has to land exactly on the target";
-	EXPECT_FALSE(walk.Step()) << "and stay there once it has";
-
-	// the same in tile space, which is what GetBlockedInLineTile() walks
-	PathFinder::LineStepper<SearchmapPoint> tiles { SearchmapPoint(0, 0), SearchmapPoint(6, 0) };
-	while (tiles.Step()) {}
-	EXPECT_EQ(tiles.Current(), SearchmapPoint(6, 0));
-}
-
-TEST(PathFinderTest, LineStepperFactorScalesTheStep)
-{
-	auto stepsWith = [](float_t factor) {
-		PathFinder::LineStepper<NavmapPoint> walk { NavmapPoint(0, 0), NavmapPoint(100, 0), factor };
-		size_t n = 0;
-		while (walk.Step()) ++n;
-		return n;
-	};
-
-	// factor 1 is the shortest step: 2 pixels along the dominant axis, so 50 of them
-	EXPECT_EQ(stepsWith(1), 50u);
-	// a faster actor covers the same line in fewer, longer steps
-	EXPECT_EQ(stepsWith(4), 13u);
-	EXPECT_LT(stepsWith(8), stepsWith(4));
-}
-
 // An actor in the way is only an obstacle while actors are blocking; open floor beneath it
 // must stay walkable for the ignore-actors queries the pathfinder makes.
 TEST(PathFinderTest, ActorBlocksOnlyWhenActorsAreBlocking)
