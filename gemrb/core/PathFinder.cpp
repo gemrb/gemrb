@@ -318,12 +318,10 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	}
 
 	// begin algo init
-	{
-		const int srcIdx = smptSource.y * mapSize.w + smptSource.x;
-		genOf[srcIdx] = searchGen;
-		distFromStart[srcIdx] = 0;
-		parents[srcIdx] = nmptSource;
-	}
+	const int srcIdx = smptSource.y * mapSize.w + smptSource.x;
+	genOf[srcIdx] = searchGen;
+	distFromStart[srcIdx] = 0;
+	parents[srcIdx] = nmptSource;
 
 	open.Push(nmptSource, 0);
 
