@@ -29,17 +29,19 @@ namespace GemRB {
 class GEM_EXPORT BasePoint {
 public:
 	BasePoint() noexcept = default;
-	BasePoint(int x, int y) noexcept;
+	// All members below inlined here on purpose, to avoid symbol interposition and allow inlining
+	BasePoint(int x, int y) noexcept
+		: x(x), y(y) {}
 
-	BasePoint operator+(const BasePoint& p) const noexcept;
-	BasePoint operator-(const BasePoint& p) const noexcept;
+	BasePoint operator+(const BasePoint& p) const noexcept { return BasePoint(x + p.x, y + p.y); }
+	BasePoint operator-(const BasePoint& p) const noexcept { return BasePoint(x - p.x, y - p.y); }
 
-	bool operator==(const BasePoint& pnt) const noexcept;
-	bool operator!=(const BasePoint& pnt) const noexcept;
+	bool operator==(const BasePoint& pnt) const noexcept { return x == pnt.x && y == pnt.y; }
+	bool operator!=(const BasePoint& pnt) const noexcept { return !operator==(pnt); }
 	bool operator<(const BasePoint& pnt) const noexcept;
 
-	bool IsZero() const noexcept; // (0, 0)
-	bool IsInvalid() const noexcept; // (-1, -1)
+	bool IsZero() const noexcept { return x == 0 && y == 0; } // (0, 0)
+	bool IsInvalid() const noexcept { return x == -1 && y == -1; } // (-1, -1)
 
 	inline void reset() noexcept
 	{

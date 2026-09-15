@@ -22,10 +22,6 @@ namespace GemRB {
 using test::TestSearchMap;
 namespace Glyph = test::Glyph;
 
-// Actor speed 0 keeps GetBlockedInLine() away from gamedata->GetStepTime(), which needs a
-// live Interface. It only sets the step length of the line walk, so a value of 0 (one navmap
-// pixel per step).
-constexpr int noSpeed = 0;
 constexpr int noCircle = 0;
 
 // === TestSearchMap infrastructure tests ===

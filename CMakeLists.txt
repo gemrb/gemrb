@@ -20,7 +20,6 @@ SET(CMAKE_INSTALL_MESSAGE "NEVER")
 CACHE_BUILD_TYPE()
 
 if(CMAKE_BUILD_TYPE MATCHES "Rel.*")
-	ENABLE_LINK_TIME_OPTIMIZATIONS()
 	# On Release builds cmake automatically defines NDEBUG,
 	# so we explicitly undefine it:
 	# This matches stripped (Release) and nonstripped (RelWithDebInfo) builds
@@ -36,6 +35,12 @@ PROJECT(gemrb)
 IF(APPLE)
 	enable_language(OBJC OBJCXX)
 ENDIF()
+
+# check_ipo_supported() needs a working compiler for the language it tests, which only exists once
+# PROJECT() has run
+if(CMAKE_BUILD_TYPE MATCHES "Rel.*")
+	ENABLE_LINK_TIME_OPTIMIZATIONS()
+endif()
 
 # use relative rpaths for build relocation / reproducibility
 SET(CMAKE_BUILD_RPATH_USE_ORIGIN ON)

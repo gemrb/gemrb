@@ -63,14 +63,6 @@ Point RotatePoint(const Point& p, float_t angle)
 	return Point(newx, newy);
 }
 
-/** Calculates distance between 2 points */
-unsigned int Distance(const BasePoint& p, const BasePoint& q)
-{
-	long x = p.x - q.x;
-	long y = p.y - q.y;
-	return (unsigned int) std::hypot(x, y);
-}
-
 /** Calculates squared distance between 2 points */
 unsigned int SquaredDistance(const BasePoint& p, const BasePoint& q)
 {

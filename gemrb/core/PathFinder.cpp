@@ -46,6 +46,62 @@ constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383,
 // Sines
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dyRand { { 1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924 } };
 
+// Internal-linkage helpers for FindPath's own hot loop. PathFinder is GEM_EXPORT (public API),
+// which under GCC's -fPIC default makes every call to its methods - even from this same file -
+// subject to ELF symbol interposition, which blocks inlining. A function in an anonymous
+// namespace has internal linkage and can never be interposed, on any compiler.
+namespace {
+
+	// PlotCircle() is a pure translation of a fixed offset set: every point it emits is
+	// `origin + <offset>`. GetBlockedInRadiusTile() is on the pathfinder's hot path and used to
+	// call it (and so allocate, fill and free a std::vector<BasePoint>) on every single tile
+	// query. The offsets depend only on r, and r is at most MAX_CIRCLESIZE - 2, so plot each
+	// radius once and translate at use. Built eagerly at static-init time, like
+	// SearchMapFixupTable, rather than lazily: a function-local static would cost a guard
+	// check per call and a thread_local one a __tls_get_addr call per call, both on the hot path,
+	// for a table that is seven short vectors.
+	std::array<std::vector<BasePoint>, MAX_CIRCLESIZE - 1> MakeCircleOffsetTable()
+	{
+		std::array<std::vector<BasePoint>, MAX_CIRCLESIZE - 1> t;
+		for (uint16_t r = 1; r < t.size(); ++r) {
+			t[r] = PlotCircle(BasePoint(0, 0), r);
+		}
+		return t;
+	}
+
+	const std::array<std::vector<BasePoint>, MAX_CIRCLESIZE - 1> CircleOffsetTable = MakeCircleOffsetTable();
+
+	// FindPath's scratch storage. Kept across calls so a search allocates nothing, and per thread
+	// because worker threads run FindPath concurrently.
+	struct SearchState {
+		BucketPriorityQueue open;
+		std::vector<uint8_t> isClosed;
+		std::vector<NavmapPoint> parents;
+		std::vector<unsigned short> distFromStart;
+		// Generation stamping: cells whose `genOf[i] != searchGen` are "fresh" (unvisited this
+		// call) and read as their default values (isClosed=false, parents=zero, dist=0xFFFF).
+		// Bumping searchGen each call replaces the three memsets that previously zeroed all
+		// three arrays, most of which a typical search never touches.
+		std::vector<uint32_t> genOf;
+		uint32_t searchGen = 0;
+	};
+
+	// One thread_local object behind one deliberately out-of-line accessor, rather than four
+	// thread_local variables used directly. gemrb_core is a shared library, so a thread_local
+	// access uses the general-dynamic TLS model - a real __tls_get_addr() call - and gcc will
+	// happily re-materialise that address at every use site instead of keeping it in a register:
+	// the built library made 42 such calls inside FindPath alone, which perf put at ~11% of its
+	// time.
+	// Returning a reference from a function the optimiser cannot see through makes the
+	// address an ordinary opaque value, resolved once per search.
+	GEM_NOINLINE SearchState& GetSearchState()
+	{
+		thread_local SearchState state;
+		return state;
+	}
+
+} // namespace
+
 // Calculate a destination point for running away from d, starting at s.
 // Returns false and leaves outPoint untouched if the actor is too slow or the deltas are too
 // small; on success outPoint holds the destination. (0, 0) is a legal map coordinate, so
@@ -227,39 +283,45 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	const Size& mapSize = tileProps.GetSize();
 	if (!mapSize.PointInside(smptSource)) return {};
 
-	const auto getChildBlockedStatusFn = actorCircleSize > 2 ? &PathFinder::GetChildBlockedStatusForBigSize : &PathFinder::GetChildBlockedStatusForSmallSize;
-
 	// Initialize data structures
 	const size_t mapCellsCount = mapSize.Area();
+	const bool useBigSize = actorCircleSize > 2;
 
 	const auto timeOfStartMs = GetMilliseconds();
 
-	// keep most data storage for this algorithm thread_local, to avoid memory allocations;
-	// each run we just clear the storage, which is keeping the underlying allocated memory at hand.
-	// thread_local rather than static: worker threads run FindPath concurrently
-	thread_local BucketPriorityQueue open;
-	thread_local std::vector<bool> isClosed;
-	thread_local std::vector<NavmapPoint> parents;
-	thread_local std::vector<unsigned short> distFromStart;
+	// keep most data storage for this algorithm alive across calls, to avoid memory allocations;
+	// each run we just clear the storage, which is keeping the underlying allocated memory at
+	// hand. See GetSearchState() for why it is reached through a function instead of defined here.
+	SearchState& searchState = GetSearchState();
+	BucketPriorityQueue& open = searchState.open;
+	std::vector<uint8_t>& isClosed = searchState.isClosed;
+	std::vector<NavmapPoint>& parents = searchState.parents;
+	std::vector<unsigned short>& distFromStart = searchState.distFromStart;
+	std::vector<uint32_t>& genOf = searchState.genOf;
+	uint32_t& searchGen = searchState.searchGen;
 
-	// these two, and isClosed further down, are indexed by the same cell index and kept at the
-	// same size; resize is a no-op when the size already matches, so this only costs anything on
-	// a map change
+	// these four are indexed by the same cell index and kept at the same size; resize is a no-op
+	// when the size already matches, so this only costs anything on a map change
 	parents.resize(mapCellsCount);
 	distFromStart.resize(mapCellsCount);
+	isClosed.resize(mapCellsCount);
+	genOf.resize(mapCellsCount);
 
-	// cleanup
+	// Generation-stamp reset: bump searchGen so every cell reads as "unvisited" without touching
+	// its storage. If the counter wraps, zero it and also zero genOf so stale stamps from before
+	// the wrap cannot masquerade as current. Wrapping is rare (requires 2^32 FindPath calls on
+	// the same thread) so the memset here costs essentially nothing amortised.
 	open.Clear();
-	isClosed.clear();
-	isClosed.resize(mapCellsCount, false);
-	// `.clear() + .resize()` is generally more performant than `memset` in cases where we have relatively small
-	// number of elements, while memset performs better for large vectors
-	memset(static_cast<void*>(parents.data()), 0, sizeof(decltype(parents)::value_type) * mapCellsCount);
-	memset(static_cast<void*>(distFromStart.data()), 255, sizeof(decltype(distFromStart)::value_type) * mapCellsCount);
+	++searchGen;
+	if (searchGen == 0) {
+		memset(static_cast<void*>(genOf.data()), 0, sizeof(uint32_t) * mapCellsCount);
+	}
 
 	// begin algo init
-	distFromStart[smptSource.y * mapSize.w + smptSource.x] = 0;
-	parents[smptSource.y * mapSize.w + smptSource.x] = nmptSource;
+	const int srcIdx = smptSource.y * mapSize.w + smptSource.x;
+	genOf[srcIdx] = searchGen;
+	distFromStart[srcIdx] = 0;
+	parents[srcIdx] = nmptSource;
 
 	open.Push(nmptSource, 0);
 
@@ -276,7 +338,11 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 		const int dxCross = smptDest.x - smptSource.x;
 		const int dyCross = smptDest.y - smptSource.y;
 		const int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
-		const float distance = std::hypotf(xDist, yDist);
+		// sqrtf, not hypotf: hypot()'s overflow/underflow scaling only matters when the squares
+		// would leave a float's exact range, and these are tile deltas.
+		// `std::sqrt` translates directly to a single CPU instruction on x86 and ARM architectures,
+		// while `std::hypotf` is a function call, which is costly on a hotpath
+		const float distance = std::sqrt(static_cast<float>(xDist * xDist + yDist * yDist));
 		const float heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
 		const float estDist = distFromStart[smptChildIdx] + heuristic;
 		return estDist;
@@ -302,7 +368,9 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 		const SearchmapPoint smptCurrent { nmptCurrent };
 		const int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
-		if (parents[smptCurrentIdx].IsZero()) {
+		// A fresh cell (generation mismatch) reads as unvisited: parents==zero, skip.
+		// This matches the old memset-to-zero behaviour and filters stale open-queue entries.
+		if (genOf[smptCurrentIdx] != searchGen || parents[smptCurrentIdx].IsZero()) {
 			continue;
 		}
 
@@ -322,7 +390,12 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			break;
 		}
 
+		// Cell is stamped (generation matches); safe to write isClosed directly.
 		isClosed[smptCurrentIdx] = true;
+
+		const NavmapPoint nmptParent = parents[smptCurrentIdx];
+		const SearchmapPoint smptParent { nmptParent };
+		const unsigned short parentDist = distFromStart[smptParent.y * mapSize.w + smptParent.x];
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			const NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
@@ -331,9 +404,10 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
-			if (isClosed[smptChildIdx]) continue;
+			// Fresh cell reads as isClosed=false; stamped cell reads the actual flag.
+			if (genOf[smptChildIdx] == searchGen && isClosed[smptChildIdx]) continue;
 
-			const PathMapFlags childBlockStatus = (getChildBlockedStatusFn) (tileProps, smptChild, actorCircleSize);
+			const PathMapFlags childBlockStatus = useBigSize ? GetChildBlockedStatusForBigSize(tileProps, smptChild, actorCircleSize) : GetChildBlockedStatusForSmallSize(tileProps, smptChild, actorCircleSize);
 			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR));
 			if (childBlocked) continue;
 
@@ -342,14 +416,15 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			const bool childIsUnbumpable = navmapCellTraversability.occupyingActor != actorIdentity && navmapCellTraversability.state >= blockingTraversabilityValue;
 			if (childIsUnbumpable) continue;
 
-			SearchmapPoint smptCurrent2 { nmptCurrent };
-			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
-			SearchmapPoint smptParent { nmptParent };
-			unsigned short oldDist = distFromStart[smptChildIdx];
+			// Fresh cell reads as distFromStart==0xFFFF (same as old memset(255,...) default).
+			const unsigned short oldDist = (genOf[smptChildIdx] == searchGen) ? distFromStart[smptChildIdx] : std::numeric_limits<unsigned short>::max();
 
 			// Lazy Theta star*
-			unsigned short newDist = distFromStart[smptParent.y * mapSize.w + smptParent.x] + Distance(smptParent, smptChild);
+			unsigned short newDist = parentDist + Distance(smptParent, smptChild);
 			if (newDist < oldDist) {
+				// First touch: stamp the cell before writing any field.
+				genOf[smptChildIdx] = searchGen;
+				isClosed[smptChildIdx] = false;
 				parents[smptChildIdx] = nmptParent;
 				distFromStart[smptChildIdx] = newDist;
 			}
@@ -367,11 +442,12 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 						SearchmapPoint smptVis { nmptVis };
 						// Outside map
 						if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
-						// Only consider already visited
-						if (!isClosed[smptVis.y * mapSize.w + smptVis.x]) continue;
+						// Only consider already visited (closed)
+						const int smptVisIdx = smptVis.y * mapSize.w + smptVis.x;
+						if (genOf[smptVisIdx] != searchGen || !isClosed[smptVisIdx]) continue;
 
 						unsigned short oldVisDist = distFromStart[smptChildIdx];
-						newDist = distFromStart[smptVis.y * mapSize.w + smptVis.x] + Distance(smptVis, smptChild);
+						newDist = distFromStart[smptVisIdx] + Distance(smptVis, smptChild);
 						if (newDist < oldVisDist) {
 							parents[smptChildIdx] = nmptVis;
 							distFromStart[smptChildIdx] = newDist;
@@ -527,27 +603,36 @@ PathMapFlags PathFinder::GetBlockedInRadiusTile(const TileProps& tileProps, cons
 
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	size = Clamp<uint16_t>(size, 2, MAX_CIRCLESIZE);
-	uint16_t r = size - 2;
+	const uint16_t r = size - 2;
 
-	std::vector<BasePoint> points;
-	if (r == 0) { // avoid generating 16 identical points
-		points.push_back(tp);
-		points.push_back(tp);
+	if (r == 0) {
+		// A radius-0 circle is the tile itself
+		const PathMapFlags flags = GetBlockedTile(tileProps, tp);
+		if (stopOnImpassable && flags == PathMapFlags::IMPASSABLE) {
+			return PathMapFlags::IMPASSABLE;
+		}
+		ret |= flags;
 	} else {
-		points = PlotCircle(tp, r);
-	}
-	for (size_t i = 0; i < points.size(); i += 2) {
-		const BasePoint& p1 = points[i];
-		const BasePoint& p2 = points[i + 1];
-		assert(p1.y == p2.y);
-		assert(p2.x <= p1.x);
+		// PlotCircle() adds the origin to a fixed set of offsets, so the offsets depend only on
+		// r - which is at most MAX_CIRCLESIZE - 2. Plot each radius once and translate, rather
+		// than allocating and re-plotting a fresh vector on every call.
+		assert(r < CircleOffsetTable.size());
+		const std::vector<BasePoint>& points = CircleOffsetTable[r];
+		for (size_t i = 0; i < points.size(); i += 2) {
+			const BasePoint& p1 = points[i];
+			const BasePoint& p2 = points[i + 1];
+			assert(p1.y == p2.y);
+			assert(p2.x <= p1.x);
 
-		for (int x = p2.x; x <= p1.x; ++x) {
-			PathMapFlags flags = GetBlockedTile(tileProps, SearchmapPoint(x, p1.y));
-			if (stopOnImpassable && flags == PathMapFlags::IMPASSABLE) {
-				return PathMapFlags::IMPASSABLE;
+			const int y = tp.y + p1.y;
+			const int xEnd = tp.x + p1.x;
+			for (int x = tp.x + p2.x; x <= xEnd; ++x) {
+				PathMapFlags flags = GetBlockedTile(tileProps, SearchmapPoint(x, y));
+				if (stopOnImpassable && flags == PathMapFlags::IMPASSABLE) {
+					return PathMapFlags::IMPASSABLE;
+				}
+				ret |= flags;
 			}
-			ret |= flags;
 		}
 	}
 
