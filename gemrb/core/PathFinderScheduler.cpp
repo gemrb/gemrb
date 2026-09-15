@@ -792,7 +792,6 @@ Path PathFinderScheduler::PerformPathCalculation(const TraversabilityCache::Data
 	const ActorPathContext actorContext {
 		static_cast<unsigned int>(InOutCurrentRequest.payload.actorCircleSize),
 		InOutCurrentRequest.payload.instigatorIdentity,
-		InOutCurrentRequest.payload.actorSpeed,
 		InOutCurrentRequest.payload.instigatorScriptName
 	};
 
