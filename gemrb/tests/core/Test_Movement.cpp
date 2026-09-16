@@ -34,15 +34,29 @@ static testing::AssertionResult StepStayedOffWalls(const TestSearchMap& drawn, c
 	return testing::AssertionSuccess();
 }
 
+// The engine's rule (Movable::DoStep): a position is inside a wall only when all four pixels
+// bracketing it are wall face. A segment probe would false-flag the corner passes the engine
+// allows.
+static testing::AssertionResult StoodClearOfWalls(const TestSearchMap& drawn, const Point& p)
+{
+	const auto wallAt = [&drawn](int x, int y) {
+		return bool(PathFinder::GetBlockedTile(drawn.Props(), SearchmapPoint(Point(x, y))) & PathMapFlags::SIDEWALL);
+	};
+	if (wallAt(p.x, p.y) && wallAt(p.x + 1, p.y) && wallAt(p.x, p.y + 1) && wallAt(p.x + 1, p.y + 1)) {
+		return testing::AssertionFailure()
+			<< "(" << p.x << ',' << p.y << ") is demonstrably inside a wall";
+	}
+	return testing::AssertionSuccess();
+}
+
 // Runs frames until the actor stops moving, checking every single step against a wall. Returns
 // how many frames it took, or the budget if it never arrived.
 static int WalkUntilStopped(const TestGameMap& live, const Actor* actor, int frameBudget = 200)
 {
 	int frames = 0;
 	for (; frames < frameBudget && actor->InMove(); ++frames) {
-		const Point before = actor->Pos;
 		TestGameLoop::RunFrame();
-		EXPECT_TRUE(StepStayedOffWalls(live.Drawing(), before, actor->Pos)) << "on frame " << frames;
+		EXPECT_TRUE(StoodClearOfWalls(live.Drawing(), actor->Pos)) << "on frame " << frames;
 	}
 	return frames;
 }
@@ -260,6 +274,126 @@ TEST_F(MovementTest, WalksAroundABarrierWithoutCrossingIt)
 	EXPECT_EQ(actor->Pos, drawn.End());
 }
 
+// An actor aimed at a destination behind a wall face has to stop, without standing in the wall.
+// The path is built by hand and handed to the actor, not coming from: FindPath() would never return
+// a leg into a wall, so only an injected path can put DoStep()'s wall guard on the spot.
+// The actor walks the open floor, reaches the face and drops the path there.
+TEST_F(MovementTest, StopsAgainstAWallFaceRatherThanWalkingIntoIt)
+{
+	const TestGameMap live {
+		"###############",
+		"#.............#",
+		"#....##########",
+		"#1...####...E.#",
+		"#....##########",
+		"#.............#",
+		"###############"
+	};
+	const TestSearchMap& drawn = live.Drawing();
+	Actor* actor = live.ActorOf(0);
+	ASSERT_NE(actor, nullptr);
+
+	const Point start = actor->Pos;
+	const Point goal = drawn.End();
+	ASSERT_FALSE(PathFinder::IsWalkableTo(drawn.Props(), start, goal, true, actor->circleSize));
+
+	Path path;
+	path.AppendStep({ goal, GetOrient(start, goal), false });
+	FindPathRequest request;
+	request.requestType = FindPathRequestType::WalkTo;
+	request.destination = goal;
+	actor->OnPathCalculated(std::move(path), request);
+
+	ASSERT_FALSE(actor->GetPath().Empty()) << "the injected path should be what the actor walks";
+	ASSERT_TRUE(actor->InMove());
+
+	const int frames = WalkUntilStopped(live, actor);
+	EXPECT_LT(frames, 200) << "the walk has to end inside the frame budget";
+	EXPECT_FALSE(actor->InMove()) << "it has to give up rather than keep pushing";
+	EXPECT_GT(actor->Pos.x, start.x) << "stopping at the start would mean it never tried";
+
+	// it stopped on the floor, facing the wall face it refused to enter
+	const SearchmapPoint under { actor->Pos };
+	EXPECT_FALSE(bool(PathFinder::GetBlockedTile(drawn.Props(), under) & PathMapFlags::SIDEWALL))
+		<< "stopped at (" << actor->Pos.x << ',' << actor->Pos.y << "), which is inside a wall";
+	EXPECT_TRUE(bool(PathFinder::GetBlockedTile(drawn.Props(), SearchmapPoint(under.x + 1, under.y)) & PathMapFlags::SIDEWALL))
+		<< "it should have walked up to the wall face, not stopped short of it at ("
+		<< actor->Pos.x << ',' << actor->Pos.y << ')';
+}
+
+// BG1's AR0146: open floor one tile from a staircase of wall faces. The route from '2' to E is a
+// 1:1 diagonal parallel to it, so every step threads the point four tiles share with a wall face
+// on one side. Swept over every pixel of the starting tile: crossing such a corner puts the actor
+// on a tile boundary, and the wall probe used to round onto the wall-face side and abandon the
+// walk.
+TEST_F(MovementTest, WalksADiagonalThatHugsAStaircaseOfWallFaces)
+{
+	const TestGameMap live {
+		"######XX######X............",
+		"#####XX######...........###",
+		"####XX######...........##.#",
+		"###XX######.........E.##...",
+		"##XX######...........##....",
+		"#XX######...........##.....",
+		"XX######...........##......",
+		"X######...........##.......",
+		"######...........##........",
+		"#####...........##.........",
+		"####..........###..........",
+		"##X..........##.........#..",
+		"#X..........##..........##.",
+		"X..........##............##",
+		"XX........##..............#",
+		"X........##................",
+		"X.......##.................",
+		".......##........###.......",
+		"......##........#XX##......",
+		"....2##........##XXX##.....",
+		"....##........###X#X###....",
+		"....#........####XXX####...",
+		"............####XX#XX####..",
+		"...........###XXX###XX####.",
+		"..........##XXX######XX####"
+	};
+	const TestSearchMap& drawn = live.Drawing();
+	Actor* actor = live.ActorOf(0);
+	ASSERT_NE(actor, nullptr);
+
+	const Point home = actor->Pos;
+	const Point goal = drawn.End();
+
+	std::vector<std::string> failures;
+	// check starting from every possible navmap point from a starting tile
+	for (int oy = -6; oy < 6; ++oy) {
+		for (int ox = -8; ox < 8; ++ox) {
+			const Point start(home.x + ox, home.y + oy);
+			live.GetMap()->ClearSearchMapFor(actor);
+			actor->ClearPath(true);
+			actor->SetPos(start);
+
+			actor->WalkTo(goal, 0, 0);
+			if (actor->GetPath().Empty()) {
+				failures.push_back(fmt::format("({},{}): no path at all", start.x, start.y));
+				continue;
+			}
+			const size_t legs = actor->GetPath().Size();
+			const Point last = actor->GetPath().GetStep(legs - 1).point;
+			int f = 0;
+			for (; f < 400 && actor->InMove(); ++f) {
+				TestGameLoop::RunFrame();
+			}
+			if (actor->Pos != goal) {
+				failures.push_back(fmt::format("({},{}): stopped at ({},{}) after {} frames; path had {} legs ending ({},{}), goal ({},{})",
+							       start.x, start.y, actor->Pos.x, actor->Pos.y,
+							       f, legs, last.x, last.y, goal.x, goal.y));
+			}
+		}
+	}
+
+	EXPECT_TRUE(failures.empty())
+		<< failures.size() << " of 192 starting pixels never reached the goal, first few:\n"
+		<< fmt::format("{}", fmt::join(failures.begin(), failures.begin() + std::min<size_t>(failures.size(), 8), "\n"));
+}
 }
 
 #endif

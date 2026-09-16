@@ -278,20 +278,24 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	assert(!step.point.IsZero());
 
 	Point nmptStep = step.point;
-	const float_t remainingX = nmptStep.x - Pos.x;
-	const float_t remainingY = nmptStep.y - Pos.y;
+	// Aim from the actor's real sub-pixel position (Pos plus the carried fraction), not from the
+	// integer Pos: the offset biases every step by up to a pixel, which on a leg along a wall face
+	// can take the actor into the wall before the corner.
+	const float_t remainingX = nmptStep.x - (Pos.x + stepFractionX);
+	const float_t remainingY = nmptStep.y - (Pos.y + stepFractionY);
 	float_t dx = remainingX;
 	float_t dy = remainingY;
 	PathFinder::ScaleDeltas(dx, dy, float_t(gamedata->GetStepTime()) / float_t(walkScale));
 
-	// The whole pixels this frame gets to spend, fraction carried over. Clamped to what is left of
-	// the leg so the actor still lands exactly on the waypoint.
-	const float_t wantX = dx + stepFractionX;
-	const float_t wantY = dy + stepFractionY;
-	const float_t moveX = Clamp(std::trunc(wantX), -std::fabs(remainingX), std::fabs(remainingX));
-	const float_t moveY = Clamp(std::trunc(wantY), -std::fabs(remainingY), std::fabs(remainingY));
-	stepFractionX = wantX - moveX;
-	stepFractionY = wantY - moveY;
+	// The position after this frame, its whole part moved into Pos and the fraction left in
+	// [0,1). Folding it in lets a one pixel leg finish: the `Pos == nmptStep` test below only ever
+	// sees integers.
+	const float_t exactX = Pos.x + stepFractionX + dx;
+	const float_t exactY = Pos.y + stepFractionY + dy;
+	const float_t moveX = float_t(std::floor(exactX)) - Pos.x;
+	const float_t moveY = float_t(std::floor(exactY)) - Pos.y;
+	stepFractionX = exactX - (Pos.x + moveX);
+	stepFractionY = exactY - (Pos.y + moveY);
 
 	// dx/dy stay the real step from here on: they aim the collision lookahead and the wall probe,
 	// which have to point where the actor is going even on a frame that spends no whole pixel.
@@ -355,10 +359,19 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 			return;
 		}
 	}
-	// Stop if there's a door in the way.
-	// Check where the actor will really be after this frame, fraction included
-	const Point wallProbe(std::lround(Pos.x + dx), std::lround(Pos.y + dy));
-	if (blocksSearch && !core->InCutSceneMode() && bool(area->GetBlocked(wallProbe) & PathMapFlags::SIDEWALL)) {
+	// Stop if the actor would be inside a wall or a closed door. Ask with the real sub-pixel
+	// position: the exact point lies in the unit square of the four pixels bracketing it, and the
+	// actor is only in a wall when all four are wall face. A single pixel would pick an arbitrary
+	// side of a tile boundary the actor is crossing.
+	const int loX = static_cast<int>(std::floor(exactX));
+	const int loY = static_cast<int>(std::floor(exactY));
+	const auto wallFaceAt = [&](int px, int py) {
+		return bool(area->GetBlocked(Point(px, py)) & PathMapFlags::SIDEWALL);
+	};
+	const bool insideAWall = wallFaceAt(loX, loY) && wallFaceAt(loX + 1, loY) &&
+		wallFaceAt(loX, loY + 1) && wallFaceAt(loX + 1, loY + 1);
+	const Point wallProbe(loX, loY);
+	if (blocksSearch && !core->InCutSceneMode() && insideAWall) {
 		LogDebugPathfinder("Movable::DoStep", "{}: WALL ABANDON at Pos={} SM={} probe={} probeFlags={} stepTarget={} "
 						      "delta=({},{}) step {}/{} dest={} bumped={} probeRadiusFlags={} posFlags={}",
 				   MoveTag(this), Pos, fmt::format("({},{})", SMPos.x, SMPos.y), wallProbe,

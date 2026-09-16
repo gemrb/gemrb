@@ -2657,6 +2657,18 @@ namespace {
 		EXPECT_FALSE(path.Empty()) << joint.area << ": the far side is only reachable through the joint";
 	}
 
+	// The same joint walked backwards: reachability must not depend on direction.
+	TEST_P(SmoverriJointTest, IsReachableBackwardsThroughTheJoint)
+	{
+		const SmoverriJoint& joint = GetParam();
+		const TestSearchMap map { joint.rows };
+
+		const test::TestTraversability traversability { map };
+		const Path path = test::CallFindPath(map, traversability, map.End(), map.Start(), nullptr, 2);
+
+		EXPECT_FALSE(path.Empty()) << joint.area << ": reachable forwards, so reachable backwards";
+	}
+
 	// Same map with the tile smoverri.2da repainted to floor: the request succeeds without the
 	// corner.
 	TEST_P(SmoverriJointTest, IsWalkableOnceTheSearchmapOverrideOpensTheJoint)

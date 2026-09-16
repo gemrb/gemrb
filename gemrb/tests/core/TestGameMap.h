@@ -184,6 +184,10 @@ namespace TestGameLoop {
 		}
 		PathFinderScheduler::Sync(Maps());
 
+		// Game::AdvanceTime() calls RunFunction("Clock", "UpdateClock") on the hour, which
+		// segfaults with no GUI script engine behind the tests. Keep the clock inside the first
+		// hour.
+		game->GameTime = 1;
 		game->AdvanceTime(1);
 	}
 
