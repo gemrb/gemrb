@@ -306,12 +306,11 @@ TEST(StringTest, StringToUpper)
 	EXPECT_EQ(unit, u" STR.ING");
 
 	// cyrilic
-	// mac runners leave it lowercase, appveyor mangles it completely
-#if !defined(__APPLE__) && !defined(_MSC_VER)
+	// ensure we're running on a UTF-8 enabled locale
+	setlocale(LC_ALL, "C.utf8");
 	String unit2 { u"Закончить" };
 	StringToUpper(unit2);
 	EXPECT_EQ(unit2, u"ЗАКОНЧИТЬ");
-#endif
 }
 
 TEST(StringTest, RecodedStringFromWideStringBytes)
