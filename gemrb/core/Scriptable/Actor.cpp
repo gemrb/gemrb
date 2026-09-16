@@ -684,67 +684,105 @@ bool Actor::IsInCombat() const
 		(Modified[IE_STATE_ID] & STATE_PANIC); // fleeing a fight
 }
 
+static ResRef GetClabIWD2(ieDword kit, ieDword baseclass)
+{
+	// callers always pass a baseclass (only exception are actions not present in iwd2: addkit and addsuperkit)
+	assert(baseclass != 0);
+
+	auto row = GetIWD2KitIndex(kit, baseclass, true);
+	bool kitMatchesClass = row != TableMgr::npos;
+
+	ResRef clab;
+	if (!kit || !kitMatchesClass) {
+		// pure class
+		clab = class2kits[baseclass].clab;
+	} else {
+		// both kit and baseclass are fine and the kit is of this baseclass
+		int idx = 0;
+		for (const auto& aKit : class2kits[baseclass].ids) {
+			if (kit & aKit) {
+				clab = class2kits[baseclass].clabs[idx];
+				break;
+			}
+			idx++;
+		}
+	}
+	assert(!clab.IsEmpty());
+	return clab;
+}
+
+// NOTE: a fighter/illusionist multiclass and illusionist/fighter dualclass would be
+// good test cases, but they don't have any clabs
+static ResRef GetClab(TableMgr::index_t row, ieDword& kitclass)
+{
+	ResRef clab;
+	auto clskit = class2kits.begin();
+	for (int cidx = 0; clskit != class2kits.end(); clskit++, cidx++) {
+		const auto& kits = class2kits[cidx].indices;
+		auto it = kits.begin();
+		for (int kidx = 0; it != kits.end(); it++, kidx++) {
+			if (row == *it) {
+				kitclass = cidx;
+				clab = class2kits[cidx].clabs[kidx];
+				return clab;
+			}
+		}
+	}
+	return clab;
+}
+
+void Actor::ApplyClab2MC(const ResRef& clab, int diff, bool remove, ieDword& kitclass)
+{
+	ieDword msk = 1;
+	bool isDualClassed = IsDualClassed();
+	for (unsigned int i = 1; (i < (unsigned int) classcount) && (msk <= multiclass); i++) {
+		if (!(multiclass & msk)) {
+			msk += msk;
+			continue;
+		}
+
+		ieDword max = GetLevelInClass(i);
+		// don't apply/remove the old kit clab if the kit is disabled
+		if (i == kitclass && !IsKitInactive()) {
+			// in case of dc reactivation, we already removed the clabs on activation of new class
+			// so we shouldn't do it again as some of the effects could be permanent (oozemaster)
+			if (isDualClassed) {
+				ApplyClab(clab, max, 2, 0);
+			} else {
+				ApplyClab(clab, max, remove, diff);
+			}
+		} else {
+			ApplyClab(class2kits[i].clab, max, remove, diff);
+		}
+		msk += msk;
+	}
+}
+
 //applies a kit on the character
 bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 {
 	ieDword kit = GetStat(IE_KIT);
 	ieDword kitclass = 0;
 	TableMgr::index_t row = GetKitIndex(kit, baseclass);
-	ResRef clab;
-	ieDword max = 0;
 	ieDword cls = GetStat(IE_CLASS);
-	PluginHolder<TableMgr> tm;
 
 	// iwd2 has support for multikit characters, so we have more work
 	// at the same time each baseclass has its own level stat, so the logic is cleaner
 	// NOTE: in iwd2 there are no pure class options for classes with kits, a kit has to be chosen
 	// even generalist mages are a kit the same way as in the older games
+	ResRef clab;
 	if (creVersion == CREVersion::V2_2) {
-		// callers always pass a baseclass (only exception are actions not present in iwd2: addkit and addsuperkit)
-		assert(baseclass != 0);
-		row = GetIWD2KitIndex(kit, baseclass, true);
-		bool kitMatchesClass = row != TableMgr::npos;
-
-		if (!kit || !kitMatchesClass) {
-			// pure class
-			clab = class2kits[baseclass].clab;
-		} else {
-			// both kit and baseclass are fine and the kit is of this baseclass
-			int idx = 0;
-			for (const auto& aKit : class2kits[baseclass].ids) {
-				if (kit & aKit) {
-					clab = class2kits[baseclass].clabs[idx];
-					break;
-				}
-				idx++;
-			}
-		}
-		assert(!clab.IsEmpty());
+		clab = GetClabIWD2(kit, baseclass);
 		cls = baseclass;
 	} else if (row) {
 		// bg2 kit abilities
-		// this doesn't do a kitMatchesClass like above, since it is handled when applying the clab below
-		// NOTE: a fighter/illusionist multiclass and illusionist/fighter dualclass would be good test cases, but they don't have any clabs
+		// this doesn't do a kitMatchesClass like GetClabIWD2, since it is handled when applying the clab below
 		// NOTE: multiclass characters will get the clabs applied for all classes at once, so up to three times, since there are three level stats
 		// we can't rely on baseclass, since it will match only for combinations of fighters, mages and thieves.
 		// TODO: fix it — one application ensures no problems with stacking permanent effects
 		// NOTE: it can happen in normal play that we are leveling two classes at once, as some of the xp thresholds are shared (f/m at 250,000 xp).
-		bool found = false;
-		auto clskit = class2kits.begin();
-		for (int cidx = 0; clskit != class2kits.end(); clskit++, cidx++) {
-			std::vector<TableMgr::index_t> kits = class2kits[cidx].indices;
-			auto it = kits.begin();
-			for (int kidx = 0; it != kits.end(); it++, kidx++) {
-				if (row == *it) {
-					kitclass = cidx;
-					clab = class2kits[cidx].clabs[kidx];
-					found = true;
-					clskit = --class2kits.end(); // break out of the outer loop too
-					break;
-				}
-			}
-		}
-		if (!found) {
+		clab = GetClab(row, kitclass);
+		if (clab.IsEmpty()) {
 			Log(ERROR, "Actor", "ApplyKit: could not look up the requested kit ({}), skipping!", kit);
 			return false;
 		}
@@ -755,32 +793,15 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 
 	//multi class
 	if (multiclass) {
-		ieDword msk = 1;
-		for (unsigned int i = 1; (i < (unsigned int) classcount) && (msk <= multiclass); i++) {
-			if (multiclass & msk) {
-				max = GetLevelInClass(i);
-				// don't apply/remove the old kit clab if the kit is disabled
-				if (i == kitclass && !IsKitInactive()) {
-					// in case of dc reactivation, we already removed the clabs on activation of new class
-					// so we shouldn't do it again as some of the effects could be permanent (oozemaster)
-					if (IsDualClassed()) {
-						ApplyClab(clab, max, 2, 0);
-					} else {
-						ApplyClab(clab, max, remove, diff);
-					}
-				} else {
-					ApplyClab(class2kits[i].clab, max, remove, diff);
-				}
-			}
-			msk += msk;
-		}
+		ApplyClab2MC(clab, diff, remove, kitclass);
 		return true;
 	}
+
 	//single class
 	if (cls >= (ieDword) classcount) {
 		return false;
 	}
-	max = GetLevelInClass(cls);
+	ieDword max = GetLevelInClass(cls);
 	// iwd2 has clabs for kits and classes in the same table
 	if (kitclass == cls || creVersion == CREVersion::V2_2) {
 		ApplyClab(clab, max, remove, diff);
