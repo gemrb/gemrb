@@ -5406,15 +5406,15 @@ void Actor::Turn(Scriptable* cleric, ieDword turnlevel)
 	//this is safely hardcoded i guess
 	if (Modified[IE_GENERAL] != GEN_UNDEAD) {
 		level = GetPaladinLevel();
-		if (evilcleric && level) {
-			AddTrigger(TriggerEntry(trigger_turnedby, cleric->GetGlobalID()));
-			if (turnlevel >= level + turnDeathLevelMod) {
-				if (gamedata->Exists("panic", IE_SPL_CLASS_ID)) {
-					core->ApplySpell("panic", this, cleric, level);
-				} else {
-					Log(DEBUG, "Actor", "Panic from turning!");
-					Panic(cleric, PanicMode::RunAway);
-				}
+		if (!(evilcleric && level)) return;
+
+		AddTrigger(TriggerEntry(trigger_turnedby, cleric->GetGlobalID()));
+		if (turnlevel >= level + turnDeathLevelMod) {
+			if (gamedata->Exists("panic", IE_SPL_CLASS_ID)) {
+				core->ApplySpell("panic", this, cleric, level);
+			} else {
+				Log(DEBUG, "Actor", "Panic from turning!");
+				Panic(cleric, PanicMode::RunAway);
 			}
 		}
 		return;
