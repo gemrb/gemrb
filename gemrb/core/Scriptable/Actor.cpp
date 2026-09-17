@@ -6105,26 +6105,23 @@ void Actor::CheckWeaponQuickSlot(unsigned int which) const
 	if (inventory.IsSlotEmpty(slot) || header == 0xffff) {
 		//a quiver just went dry, falling back to fist
 		empty = true;
-	} else {
+	} else if (core->QuerySlotEffects(slot) == SLOT_EFFECT_MISSILE) {
 		// If current quickweaponslot contains ammo, and bow not found, reset
-
-		if (core->QuerySlotEffects(slot) == SLOT_EFFECT_MISSILE) {
-			const CREItem* slotitm = inventory.GetSlotItem(slot);
-			assert(slotitm);
-			const Item* itm = gamedata->GetItem(slotitm->ItemResRef, true);
-			assert(itm);
-			const ITMExtHeader* ext_header = itm->GetExtHeader(header);
-			if (ext_header) {
-				int type = ext_header->ProjectileQualifier;
-				int weaponslot = inventory.FindTypedRangedWeapon(type);
-				if (weaponslot == Inventory::GetFistSlot()) {
-					empty = true;
-				}
-			} else {
+		const CREItem* slotitm = inventory.GetSlotItem(slot);
+		assert(slotitm);
+		const Item* itm = gamedata->GetItem(slotitm->ItemResRef, true);
+		assert(itm);
+		const ITMExtHeader* ext_header = itm->GetExtHeader(header);
+		if (ext_header) {
+			int type = ext_header->ProjectileQualifier;
+			int weaponslot = inventory.FindTypedRangedWeapon(type);
+			if (weaponslot == Inventory::GetFistSlot()) {
 				empty = true;
 			}
-			gamedata->FreeItem(itm, slotitm->ItemResRef, false);
+		} else {
+			empty = true;
 		}
+		gamedata->FreeItem(itm, slotitm->ItemResRef, false);
 	}
 
 	if (empty)
