@@ -2580,8 +2580,6 @@ bool Actor::SetBaseNoPCF(unsigned int StatIndex, stat_t Value)
 	Value = ClampStat(StatIndex, Value);
 	BaseStats[StatIndex] = Value;
 
-	//if already initialized, then the modified stats
-	//might need to run the post change function (stat change can kill actor)
 	SetStat(StatIndex, Value + diff, 0);
 	return true;
 }
