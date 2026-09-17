@@ -35,7 +35,7 @@ public:
 
 	static void SetUpTestSuite()
 	{
-		setlocale(LC_ALL, "");
+		setlocale(LC_ALL, "C.utf8");
 		const char* argv[] = { "tester", "-c", "../../tester.cfg" };
 		auto cfg = LoadFromArgs(3, const_cast<char**>(argv));
 		ToggleLogging(true);

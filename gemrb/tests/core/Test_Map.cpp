@@ -90,6 +90,7 @@ TEST_F(MapTest, GetBlockedInLineTestDouble)
 
 TEST_F(MapTest, FindPathTest)
 {
+	setlocale(LC_ALL, "C.utf8");
 	// straight path
 	constexpr int circleSize = 2;
 	auto path = FindPathSync(goodPaths[0], goodPaths[1], circleSize);

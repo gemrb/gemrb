@@ -171,6 +171,8 @@ TEST(DataStreamWritingTest, Writes)
 	Point p { 0x8, 0x9 };
 	EXPECT_EQ(stream.WritePoint(p), 4);
 
+	// avoid problems with Turkic locales, see note in StringTest: StringToUpper
+	setlocale(LC_ALL, "C.utf8");
 	EXPECT_EQ(stream.WriteString(std::string { "String" }, 6), 6);
 	EXPECT_EQ(stream.WriteStringLC(std::string { "StRING" }, 6), 6);
 	EXPECT_EQ(stream.WriteStringUC(std::string { "sTring" }, 6), 6);

@@ -301,9 +301,14 @@ TEST(StringTest, StringToLower)
 
 TEST(StringTest, StringToUpper)
 {
-	String unit { u" StR.iNG" };
+	// avoid problems with Turkish, since EEs do provide a Turkish translation
+	// don't test any 'i'
+	// Lowercase i (dotted) should become uppercase İ (dotted).
+	// Lowercase ı (dotless) should become uppercase I (dotless).
+	// currently not a problem, since a previous test resets the locale
+	String unit { u" StR.oNG" };
 	StringToUpper(unit);
-	EXPECT_EQ(unit, u" STR.ING");
+	EXPECT_EQ(unit, u" STR.ONG");
 
 	// cyrilic
 	// ensure we're running on a UTF-8 enabled locale
