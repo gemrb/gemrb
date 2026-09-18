@@ -64,7 +64,7 @@ public:
 		return actors[index];
 	}
 
-	/** Token sum on that navmap pixel, as FindPath() reads it. */
+	/** Token sum on that searchmap tile, as FindPath() reads it. */
 	TraversabilityCache::TraversabilityCellState StateAt(const Point& navPoint) const
 	{
 		return CellAt(navPoint).state;
@@ -134,7 +134,8 @@ private:
 
 	TraversabilityCache::TraversabilityCellData CellAt(const Point& navPoint) const
 	{
-		const size_t idx = size_t(navPoint.y) * (drawn.Width() * 16) + navPoint.x;
+		const SearchmapPoint tile { navPoint };
+		const size_t idx = size_t(tile.y) * drawn.Width() + tile.x;
 		return map->GetTraversabilityCacheData()[idx];
 	}
 

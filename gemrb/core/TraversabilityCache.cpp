@@ -11,7 +11,53 @@
 
 namespace GemRB {
 
-std::vector<std::vector<bool>> TraversabilityCache::BlockingShapeCache;
+// The cache stores one entry per searchmap tile. An actor's footprint is still a pixel-space
+// circle, so stamping marks every tile whose centre falls inside it.
+namespace {
+
+	constexpr int TileW = SEARCHMAP_SQUARE_WIDTH;
+	constexpr int TileH = SEARCHMAP_SQUARE_HEIGHT;
+
+	Point TileCentre(int tx, int ty)
+	{
+		return Point(tx * TileW + TileW / 2, ty * TileH + TileH / 2);
+	}
+
+	// Integer division rounding down, including for negatives: a tile bound derived from a
+	// negative pixel coordinate must stay negative rather than fold onto 0.
+	int FloorDiv(int a, int b)
+	{
+		return a >= 0 ? a / b : -((-a + b - 1) / b);
+	}
+
+	// Integer division rounding up, including for negatives (truncation already rounds up there).
+	int CeilDiv(int a, int b)
+	{
+		return a >= 0 ? (a + b - 1) / b : a / b;
+	}
+
+	struct TileRange {
+		int firstX;
+		int lastX;
+		int firstY;
+		int lastY;
+	};
+
+	// The tiles whose centre can fall inside the region, clamped to the map. A tile centre is at
+	// tx*TileW + TileW/2, so the region's half-open pixel span becomes
+	//   region.x <= tx*TileW + TileW/2 <= region.x + region.w - 1.
+	// Folding the region test into these bounds is what keeps the stamping bodies free of
+	// per-tile border and bounds branches: the caller only has to run the ellipse test.
+	TileRange TilesCovering(const TraversabilityCache::FitRegion& region, int mapWidth, int mapHeight)
+	{
+		return {
+			std::max(0, CeilDiv(region.x - TileW / 2, TileW)),
+			std::min(mapWidth - 1, FloorDiv(region.x + region.w - 1 - TileW / 2, TileW)),
+			std::max(0, CeilDiv(region.y - TileH / 2, TileH)),
+			std::min(mapHeight - 1, FloorDiv(region.y + region.h - 1 - TileH / 2, TileH))
+		};
+	}
+}
 
 // C++14 needs a definition for a static constexpr member that gets odr-used, which is
 // what happens as soon as one is bound to a reference outside this file;
@@ -48,26 +94,26 @@ TraversabilityCache::FitRegion TraversabilityCache::CachedActorsState::Calculate
 
 void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, Data_t& inOutTraversabilityData, const int inWidth) const
 {
-	const std::vector<bool>& cachedBlockingShape = GetBlockingShape(actor[i], sizeCategory[i]);
-	if (cachedBlockingShape.empty()) {
-		return;
-	}
-
 	const auto cachedCellState = GetCellStateFromFlags(i);
-	const auto blockingShapeRegionW = GetBlockingShapeRegionW(sizeCategory[i]);
-	const size_t trashIdx = inOutTraversabilityData.size() - 1;
-	for (int y = 0; y < region[i].h; ++y) {
-		for (int x = 0; x < region[i].w; ++x) {
-			const int targetX = region[i].x + x;
-			const int targetY = region[i].y + y;
-			const size_t targetIdx = targetY * inWidth * 16 + targetX;
+	const FitRegion& actorRegion = region[i];
+	// Recover the centre the region was built around; the ellipse test depends on the actor's
+	// position, so the subtraction has to be the exact one the stamping added.
+	const Point centre(actorRegion.x + actorRegion.w / 2, actorRegion.y + actorRegion.h / 2);
+	const int circleSize = sizeCategory[i];
+	const size_t mapCells = inOutTraversabilityData.size();
+	const int mapHeight = static_cast<int>((mapCells - 1) / static_cast<size_t>(inWidth));
+	const TileRange range = TilesCovering(actorRegion, inWidth, mapHeight);
+	// a size <= 1 actor covers its whole region, so there is no ellipse to test
+	const int ellipseR = circleSize - 1;
 
-			// use spare cell index for invalid data: it's faster than paying fee for validating branch each iteration:
-			const size_t idx = targetIdx < trashIdx ? targetIdx : trashIdx;
+	for (int ty = range.firstY; ty <= range.lastY; ++ty) {
+		const size_t rowBase = static_cast<size_t>(ty) * inWidth;
+		for (int tx = range.firstX; tx <= range.lastX; ++tx) {
+			if (ellipseR >= 1 && !TileCentre(tx, ty).IsWithinEllipse(ellipseR, centre)) continue;
+			const size_t idx = rowBase + tx;
+
 			TraversabilityCellData currentTraversabilityData = inOutTraversabilityData[idx];
-
-			const auto blockingShapeIdx = y * blockingShapeRegionW * 16 + x;
-			currentTraversabilityData.state -= static_cast<uint8_t>(cachedBlockingShape[blockingShapeIdx]) * cachedCellState;
+			currentTraversabilityData.state -= cachedCellState;
 
 			if (currentTraversabilityData.state == TraversabilityCellValueEmpty) {
 				inOutTraversabilityData.reset(idx);
@@ -85,32 +131,26 @@ void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, Da
 
 void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, Data_t& inOutTraversabilityData, int inWidth, bool inShouldUpdateSelf)
 {
-	const auto currentSizeCategory = actor[i]->getSizeCategory();
-	const std::vector<bool>& currentBlockingShape = GetBlockingShape(actor[i], currentSizeCategory);
-	if (currentBlockingShape.empty()) {
-		return;
-	}
-
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
-
 	const auto currentCellState = GetCellStateFromFlags(newActorStateIdx);
-	const auto blockingShapeRegionW = GetBlockingShapeRegionW(currentSizeCategory);
-	const size_t trashIdx = inOutTraversabilityData.size() - 1;
-	for (int y = 0; y < region[newActorStateIdx].h; ++y) {
-		for (int x = 0; x < region[newActorStateIdx].w; ++x) {
-			const int targetX = region[newActorStateIdx].x + x;
-			const int targetY = region[newActorStateIdx].y + y;
-			const size_t targetIdx = targetY * inWidth * 16 + targetX;
+	const FitRegion& actorRegion = region[newActorStateIdx];
+	const Point centre = actor[i]->Pos;
+	const int circleSize = sizeCategory[newActorStateIdx];
+	const size_t mapCells = inOutTraversabilityData.size();
+	const int mapHeight = static_cast<int>((mapCells - 1) / static_cast<size_t>(inWidth));
+	const TileRange range = TilesCovering(actorRegion, inWidth, mapHeight);
+	// a size <= 1 actor covers its whole region, so there is no ellipse to test
+	const int ellipseR = circleSize - 1;
 
-			// use spare cell index for invalid data: it's faster than paying fee for validating branch each iteration:
-			const size_t idx = targetIdx < trashIdx ? targetIdx : trashIdx;
+	for (int ty = range.firstY; ty <= range.lastY; ++ty) {
+		const size_t rowBase = static_cast<size_t>(ty) * inWidth;
+		for (int tx = range.firstX; tx <= range.lastX; ++tx) {
+			if (ellipseR >= 1 && !TileCentre(tx, ty).IsWithinEllipse(ellipseR, centre)) continue;
+			const size_t idx = rowBase + tx;
+
 			TraversabilityCellData currentTraversabilityData = inOutTraversabilityData[idx];
-
-			const auto blockingShapeIdx = y * blockingShapeRegionW * 16 + x;
-			const uint16_t cellStateOfThisActor = static_cast<uint8_t>(currentBlockingShape[blockingShapeIdx]) * currentCellState;
-			currentTraversabilityData.state += cellStateOfThisActor;
-
-			currentTraversabilityData.occupyingActor = cellStateOfThisActor > TraversabilityCellValueEmpty ? actor[i] : currentTraversabilityData.occupyingActor;
+			currentTraversabilityData.state += currentCellState;
+			currentTraversabilityData.occupyingActor = currentCellState > TraversabilityCellValueEmpty ? actor[i] : currentTraversabilityData.occupyingActor;
 
 			inOutTraversabilityData[idx] = currentTraversabilityData;
 		}
@@ -327,51 +367,9 @@ void TraversabilityCache::ValidateTraversabilityCacheSize()
 	// it's faster than paying the fee for validation branches each iteration.
 	// It's okay to have garbage cell in the data, if no one will never read from it.
 	constexpr size_t spareCells = 1;
-	const size_t expectedSize = map->tileProps.GetSize().h * 12 * map->tileProps.GetSize().w * 16 + spareCells;
+	const size_t expectedSize = map->tileProps.GetSize().h * map->tileProps.GetSize().w + spareCells;
 	if (traversabilityData.size() != expectedSize) {
 		traversabilityData.clear(expectedSize);
 	}
-}
-
-const std::vector<bool>& TraversabilityCache::GetBlockingShape(const Actor* actor, const uint8_t blockingSizeCategory)
-{
-	// if we don't have data with given index, fill the cache with default data up to that index;
-	// it's okay to do so, blocking size category is a small integer, should be below value of 10
-	if (BlockingShapeCache.size() <= static_cast<size_t>(blockingSizeCategory)) {
-		BlockingShapeCache.resize(blockingSizeCategory + 1);
-	}
-
-	// if we don't have the proper data yet, calculate it
-	if (BlockingShapeCache[blockingSizeCategory].empty()) {
-		std::vector<bool> blockingShape;
-
-		const ::GemRB::Size blockingShapeRegionSize(GetBlockingShapeRegionW(blockingSizeCategory), GetBlockingShapeRegionH(blockingSizeCategory));
-		constexpr bool notBlockingValue = false;
-		blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, notBlockingValue);
-
-		const FitRegion CurrentBlockingRegion = { actor->Pos - blockingShapeRegionSize.Center(), blockingShapeRegionSize };
-		for (int y = 0; y < blockingShapeRegionSize.h; ++y) {
-			for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
-				const bool shapeMask = actor->IsOver({ x + CurrentBlockingRegion.x, y + CurrentBlockingRegion.y });
-				const auto idx = y * blockingShapeRegionSize.w * 16 + x;
-				blockingShape[idx] = shapeMask;
-			}
-		}
-
-		BlockingShapeCache[blockingSizeCategory] = std::move(blockingShape);
-	}
-	return BlockingShapeCache[blockingSizeCategory];
-}
-
-uint16_t TraversabilityCache::GetBlockingShapeRegionW(const uint8_t blockingSizeCategory)
-{
-	const auto baseSize = Actor::CircleSize2Radius(blockingSizeCategory);
-	return baseSize * 8;
-}
-
-uint16_t TraversabilityCache::GetBlockingShapeRegionH(const uint8_t blockingSizeCategory)
-{
-	const auto baseSize = Actor::CircleSize2Radius(blockingSizeCategory);
-	return baseSize * 6;
 }
 }

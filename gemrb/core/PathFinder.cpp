@@ -461,8 +461,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			if (childBlocked) continue;
 
 			// If there's an actor, check it can be bumped away
-			const Point childCentre = TileCentre(smptChild);
-			const TraversabilityCache::TraversabilityCellData childTraversability = traversabilityCacheSnapshot[childCentre.y * mapSize.w * 16 + childCentre.x];
+			const TraversabilityCache::TraversabilityCellData childTraversability = traversabilityCacheSnapshot[smptChildIdx];
 			const bool childIsUnbumpable = childTraversability.occupyingActor != actorIdentity && childTraversability.state >= blockingTraversabilityValue;
 			if (childIsUnbumpable) continue;
 

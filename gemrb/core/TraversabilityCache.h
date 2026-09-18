@@ -27,11 +27,11 @@ namespace GemRB {
 class Actor;
 
 /**
- * This class manages the cached data of actors on a navmap, to be used for speed up the FindPath implementation.
+ * This class manages the cached data of actors on a searchmap, to be used for speed up the FindPath implementation.
  */
 class GEM_EXPORT TraversabilityCache {
 public:
-	// There can be more than one actor occupying a navmap cell, the cache must be able
+	// There can be more than one actor occupying a searchmap cell, the cache must be able
 	// to represent more than one traversability value per cell at a time.
 	//
 	// We will use a token strategy:
@@ -58,15 +58,15 @@ public:
 	static constexpr TraversabilityCellState TraversabilityCellValueActorNonTraversable = 15;
 
 	/**
-	 * Struct representing Region, but with reduced data size.
-	 * We don't use the regular GemRG::Region class because of its footprint:
-	 * currently it weights 48 bytes, while we can work totally fine with 6 bytes.
-	 * In TraversabilityCache, we don't pay as much attention to memory size, but
-	 * this reduces CPU data cache pressure by a factor of 8 per single loaded region.
+	 * A Region with a reduced footprint, to cut cache pressure when many are loaded at once.
+	 *
+	 * The origin and size stay in navmap pixels: they describe the actor's ground footprint and
+	 * only bound which searchmap tiles to stamp. The origin is signed, since an actor near the
+	 * top or left edge has a negative region origin.
 	 */
 	struct FitRegion {
-		uint16_t x;
-		uint16_t y;
+		int x;
+		int y;
 		uint8_t w;
 		uint8_t h;
 
@@ -77,7 +77,7 @@ public:
 	};
 
 	/**
-	 * Struct holding data describing traversability of a navmap point: its state and potential actor data.
+	 * Traversability of a searchmap tile: its state and the actor occupying it.
 	 */
 	struct TraversabilityCellData {
 		Actor* occupyingActor = nullptr;
@@ -154,8 +154,7 @@ public:
 
 private:
 	/**
-	 * Struct for storing cached state of actors on the map: position, occupied region on the navmap,
-	 * bumpable and alive states and their size category.
+	 * Cached state of one tracked actor: position, occupied region, bumpable/alive flags and size.
 	 */
 	struct CachedActorsState {
 		constexpr static uint8_t FLAG_BUMPABLE = 1;
@@ -220,17 +219,6 @@ private:
 	bool hasBeenUpdatedThisFrame { false };
 
 	void ValidateTraversabilityCacheSize();
-
-	// BlockingShapeCache could have been a map of (actor's size category)->(blocking shape),
-	// but it's deliberately not a map; actors' size categories usually range from 0-3 (large creatures, e.g. dragons, having it at 7),
-	// direct vector access via idx will be faster on slow HW than going through std::unordered_map buckets
-	static std::vector<std::vector<bool>> BlockingShapeCache;
-
-	static const std::vector<bool>& GetBlockingShape(const Actor* actor, uint8_t blockingSizeCategory);
-
-	static uint16_t GetBlockingShapeRegionW(uint8_t blockingSizeCategory);
-
-	static uint16_t GetBlockingShapeRegionH(uint8_t blockingSizeCategory);
 };
 
 /**

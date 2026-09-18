@@ -427,11 +427,11 @@ namespace test {
 		 * given here for all of them at once; AddActor() still covers anything finer.
 		 */
 		explicit TestTraversability(const TestSearchMap& map, bool actorsAreBumpable = true)
-			: navWidth(map.Width() * 16),
-			  navHeight(map.Height() * 12),
+			: tileWidth(map.Width()),
+			  tileHeight(map.Height()),
 			  // the trailing spare cell matches TraversabilityCache::ValidateTraversabilityCacheSize(),
 			  // which keeps one as a dumpster for out-of-range writes
-			  data(pool, size_t(navWidth) * navHeight + 1)
+			  data(pool, size_t(tileWidth) * tileHeight + 1)
 		{
 			for (size_t i = 0; i < map.Actors().size(); ++i) {
 				const auto& drawn = map.Actors()[i];
@@ -443,8 +443,8 @@ namespace test {
 		TestTraversability& operator=(const TestTraversability&) = delete;
 
 		/**
-		 * Stamps an actor's ground circle into the cache, the same footprint and token value
-		 * TraversabilityCache::Update() would give it.
+		 * Stamps an actor's ground circle into the cache: every tile whose centre falls inside
+		 * the pixel footprint and IsOverCircle() accepts.
 		 */
 		void AddActor(const Point& pos, int circleSize, bool bumpable, ActorIdentity who = nullptr)
 		{
@@ -453,13 +453,21 @@ namespace test {
 			const Point origin = pos - shape.Center();
 			const auto token = bumpable ? TraversabilityCache::TraversabilityCellValueActor : TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
-			for (int y = 0; y < shape.h; ++y) {
-				for (int x = 0; x < shape.w; ++x) {
-					const Point cell(origin.x + x, origin.y + y);
-					if (cell.x < 0 || cell.y < 0 || cell.x >= navWidth || cell.y >= navHeight) continue;
-					if (!Selectable::IsOverCircle(cell, pos, circleSize)) continue;
+			auto floorDiv = [](int a, int b) { return a >= 0 ? a / b : -((-a + b - 1) / b); };
+			const int firstX = floorDiv(origin.x, 16) - 1;
+			const int lastX = floorDiv(origin.x + shape.w - 1, 16) + 1;
+			const int firstY = floorDiv(origin.y, 12) - 1;
+			const int lastY = floorDiv(origin.y + shape.h - 1, 12) + 1;
 
-					const size_t idx = size_t(cell.y) * navWidth + cell.x;
+			for (int ty = firstY; ty <= lastY; ++ty) {
+				if (ty < 0 || ty >= tileHeight) continue;
+				for (int tx = firstX; tx <= lastX; ++tx) {
+					if (tx < 0 || tx >= tileWidth) continue;
+					const Point centre(tx * 16 + 8, ty * 12 + 6);
+					if (centre.x < origin.x || centre.y < origin.y || centre.x >= origin.x + shape.w || centre.y >= origin.y + shape.h) continue;
+					if (!Selectable::IsOverCircle(centre, pos, circleSize)) continue;
+
+					const size_t idx = size_t(ty) * tileWidth + tx;
 					TraversabilityCache::TraversabilityCellData cellData = data[idx];
 					cellData.state += token;
 					// deliberate unsafe cast - in tests we don't use real actor instances,
@@ -472,13 +480,15 @@ namespace test {
 
 		TraversabilityCache::TraversabilityCellState StateAt(const Point& navPoint) const
 		{
-			return data[size_t(navPoint.y) * navWidth + navPoint.x].state;
+			const SearchmapPoint tile { navPoint };
+			return data[size_t(tile.y) * tileWidth + tile.x].state;
 		}
 
-		/** Who the cache has standing on that navmap pixel, which is what FindPath() compares. */
+		/** Who the cache has standing on that searchmap tile, which is what FindPath() compares. */
 		ActorIdentity ActorAt(const Point& navPoint) const
 		{
-			const auto actorPtr = data[size_t(navPoint.y) * navWidth + navPoint.x].occupyingActor;
+			const SearchmapPoint tile { navPoint };
+			const auto actorPtr = data[size_t(tile.y) * tileWidth + tile.x].occupyingActor;
 			// deliberate unsafe cast - in tests we don't use real actor instances,
 			// we just need a number for the sake of identity comparison
 			return reinterpret_cast<ActorIdentity>(actorPtr); // NOSONAR
@@ -487,8 +497,8 @@ namespace test {
 		const TraversabilityCache::Data_t& Data() const noexcept { return data; }
 
 	private:
-		int navWidth = 0;
-		int navHeight = 0;
+		int tileWidth = 0;
+		int tileHeight = 0;
 		FixedSizePool<TraversabilityCache::Data_t::TPage_t> pool;
 		TraversabilityCache::Data_t data;
 	};
