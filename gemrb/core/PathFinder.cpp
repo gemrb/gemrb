@@ -82,9 +82,11 @@ namespace {
 	// Distance() in COST_SCALE-ths of a tile, so that the sqrt(2) of a diagonal step survives as
 	// something other than the 1 of an orthogonal one.
 	// Rounded, not truncated: the error then stays centred instead of accumulating short over a long route.
-	// Note on rounding impl: floor(x + 0.5f) is round-half-up, a single instruction, and correct in this case, because
-	// costs are never negative. Do not "fix" this to std::lround, that adds a libm call and a range check for no accuracy
-	// gain.
+	// Note on rounding impl:
+	// Do not "fix" this to std::lround, despite what clang-tidy might suggest. That adds a libm
+	// call and a range check for no accuracy gain in our case.
+	// `floor(x + 0.5f)` is round-half-up, a single instruction, and correct in this case, because
+	// costs are never negative.
 	unsigned int StepCost(const SearchmapPoint& from, const SearchmapPoint& to) noexcept
 	{
 		const int dx = from.x - to.x;
@@ -360,29 +362,26 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 	constexpr float_t HEURISTIC_WEIGHT = 1.5;
 
-	// Tie-breaking used to smooth out the path: nudges the heuristic towards candidates that sit
-	// closer to the straight source-destination line. dxCross/dyCross are loop invariants, so
-	// they are hoisted here rather than recomputed per neighbour.
-	const int dxCross = smptDest.x - smptSource.x;
-	const int dyCross = smptDest.y - smptSource.y;
-
 	// This search's walkability query.
 	const auto walkableTo = [&](const NavmapPoint& from, const NavmapPoint& to) {
 		return IsWalkableTo(tileProps, from, to, actorsAreBlocking, actorCircleSize);
 	};
 
 	const auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) -> uint32_t {
-		// Calculate heuristic
 		const int xDist = smptChild.x - smptDest.x;
 		const int yDist = smptChild.y - smptDest.y;
-		const int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
 		// sqrtf, not hypotf: hypot()'s overflow/underflow scaling only matters when the squares
 		// would leave a float's exact range, and these are tile deltas.
 		// `std::sqrt` translates directly to a single CPU instruction on x86 and ARM architectures,
 		// while `std::hypotf` is a function call, which is costly on a hotpath
 		const float distance = std::sqrt(static_cast<float>(xDist * xDist + yDist * yDist));
-		const float heuristic = HEURISTIC_WEIGHT * (distance + static_cast<float>(crossProduct));
-		const uint32_t heuristicFixed = static_cast<uint32_t>(heuristic * static_cast<float>(COST_SCALE) + 0.5f);
+		// Note on rounding impl:
+		// Do not "fix" this to std::lround, despite what clang-tidy might suggest. That adds a libm
+		// call and a range check for no accuracy gain in our case.
+		// `floor(x + 0.5f)` is round-half-up, a single instruction, and correct in this case, because
+		// costs are never negative.
+		const uint32_t heuristicFixed = static_cast<uint32_t>(
+			std::floor(HEURISTIC_WEIGHT * distance * static_cast<float>(COST_SCALE) + 0.5f));
 		return distFromStart[smptChildIdx] + heuristicFixed;
 	};
 

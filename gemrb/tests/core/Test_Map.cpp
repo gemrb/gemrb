@@ -100,13 +100,14 @@ TEST_F(MapTest, FindPathTest)
 	// curvy path
 	path = FindPathSync(badPaths[0], badPaths[1], circleSize);
 	EXPECT_TRUE(path);
-	EXPECT_EQ(path.Size(), 4);
+	// Two legs: the search no longer biases the frontier towards the straight line, so the
+	// smoothing pass collapses the same shape into fewer waypoints. Each leg is checked for
+	// passability below.
+	EXPECT_EQ(path.Size(), 2);
 
 	// ... is exactly what we expect
-	EXPECT_EQ(path.GetStep(0).point, Point(1222, 700));
-	EXPECT_EQ(path.GetStep(1).point, Point(1174, 712));
-	EXPECT_EQ(path.GetStep(2).point, Point(1110, 712));
-	EXPECT_EQ(path.GetStep(3).point, Point(1062, 700)); // not exactly badPaths[1]!
+	EXPECT_EQ(path.GetStep(0).point, Point(1126, 628));
+	EXPECT_EQ(path.GetStep(1).point, Point(1062, 700)); // not exactly badPaths[1]!
 
 	// every leg of it stays on passable ground
 	Point previous = badPaths[0];
@@ -120,8 +121,8 @@ TEST_F(MapTest, FindPathTest)
 	// basic determinism
 	auto path2 = FindPathSync(badPaths[0], badPaths[1], circleSize);
 	EXPECT_TRUE(path2);
-	EXPECT_EQ(path2.Size(), 4);
-	for (int i = 0; i < 4; i++) {
+	ASSERT_EQ(path2.Size(), path.Size());
+	for (size_t i = 0; i < path.Size(); i++) {
 		EXPECT_EQ(path.GetStep(i).point, path2.GetStep(i).point);
 	}
 
