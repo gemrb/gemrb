@@ -704,22 +704,6 @@ static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinde
 			return PathMapFlags::IMPASSABLE;
 		}
 		ret |= blockStatus;
-
-		// Check if the segment went between two tiles without entering either.
-		// An actor can round one blocked corner - that is just walking past a wall - but not squeeze through the joint
-		// between two of them, so this only counts when neither side is open. Without it a route
-		// is free to cut corners no body can cut, and the actor wedges on them.
-		if (walk.CutACorner()) {
-			const PathMapFlags besideX = getBlockedStatus(walk.CornerBesideX());
-			const PathMapFlags besideY = getBlockedStatus(walk.CornerBesideY());
-			const bool jammed = !bool(besideX & PathMapFlags::PASSABLE) && !bool(besideY & PathMapFlags::PASSABLE);
-			if (jammed) {
-				if (stopOnImpassable) {
-					return PathMapFlags::IMPASSABLE;
-				}
-				ret |= besideX | besideY;
-			}
-		}
 	}
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR | PathMapFlags::SIDEWALL))) {
 		ret &= ~PathMapFlags::PASSABLE;

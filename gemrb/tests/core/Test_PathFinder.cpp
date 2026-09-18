@@ -1393,10 +1393,8 @@ TEST(PathFinderTest, SightPassesThroughDiagonalWallJoints)
 					     SearchmapPoint(map.End())));
 }
 
-// A body is not a ray. It sits on integer pixels and has nowhere to be in a corner of zero width,
-// so a route may not thread the joint - if it did, the actor would walk into one of the two walls
-// and the wall probe in Movable::DoStep() would abandon the path on the corner.
-TEST(PathFinderTest, WalkingDoesNotThreadDiagonalWallJoints)
+// we should be able to walk diagonally
+TEST(PathFinderTest, WalkingThreadsDiagonalWallJoints)
 {
 	const TestSearchMap map {
 		"####",
@@ -1404,12 +1402,11 @@ TEST(PathFinderTest, WalkingDoesNotThreadDiagonalWallJoints)
 		"##E.",
 		"####"
 	};
-	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
+	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
 }
 
-// Only a joint is barred, not any diagonal that happens to touch a wall: rounding a single convex
-// corner is just walking past it, and a corridor two tiles wide running diagonally is made of
-// nothing else. Barring those too would leave the pathfinder unable to take a diagonal at all.
+// Rounding a single convex corner is just walking past it; a one tile wide diagonal corridor is
+// a chain of joints and is walked as well.
 TEST(PathFinderTest, WalkingRoundsASingleCornerDiagonally)
 {
 	const TestSearchMap map {
@@ -1425,7 +1422,7 @@ TEST(PathFinderTest, WalkingRoundsASingleCornerDiagonally)
 	};
 	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
 
-	// the same corridor one tile wide is a chain of joints, and none of them may be threaded
+	// the same corridor one tile wide is a chain of joints, and every one of them is walked
 	const TestSearchMap narrow {
 		"##########",
 		"#S########",
@@ -1437,7 +1434,7 @@ TEST(PathFinderTest, WalkingRoundsASingleCornerDiagonally)
 		"#######E##",
 		"##########"
 	};
-	EXPECT_FALSE(PathFinder::IsWalkableTo(narrow.Props(), narrow.Start(), narrow.End(), true, noCircle));
+	EXPECT_TRUE(PathFinder::IsWalkableTo(narrow.Props(), narrow.Start(), narrow.End(), true, noCircle));
 }
 
 // The wall down the middle has one gap, and the straight segment from S to E goes through it. A
@@ -1597,9 +1594,8 @@ TEST(PathFinderTest, TheOneTileTheRasterLineRoundsAway)
 	EXPECT_FALSE(PathFinder::IsWalkableTo(steep.Props(), steep.Start(), steep.End(), true, noCircle));
 }
 
-// Near the diagonal the raster line skips half the tiles it crosses; the wall is one of
-// them, on the diagonal itself. It even gets fetched as a corner-beside, but the corner
-// rule blocks only when both sides are walls.
+// The wall sits on the segment itself, so it is stepped onto and blocks; only the two tiles the
+// segment threads between at a corner go uninspected.
 TEST(PathFinderTest, TheWallOnTheDiagonalIsNotSteppedOver)
 {
 	const TestSearchMap walled {
