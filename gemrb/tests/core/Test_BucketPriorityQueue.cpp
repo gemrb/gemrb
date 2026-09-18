@@ -27,9 +27,9 @@ namespace test {
 		}
 
 		// The queue returns only the point, so map each cell to a point whose x identifies it.
-		Point PointForCell(uint32_t cell)
+		SearchmapPoint PointForCell(uint32_t cell)
 		{
-			return Point(int(cell), 0);
+			return SearchmapPoint(int(cell), 0);
 		}
 
 	} // namespace
@@ -51,7 +51,7 @@ namespace test {
 		std::set<int> poppedX;
 		uint32_t pops = 0;
 		while (!queue.IsEmpty() && pops < 4 * N) {
-			const Point p = queue.Pop();
+			const SearchmapPoint p = queue.Pop();
 			poppedX.insert(p.x);
 			++pops;
 		}
@@ -77,7 +77,7 @@ namespace test {
 		std::set<int> poppedX;
 		uint32_t pops = 0;
 		while (!queue.IsEmpty() && pops < 4 * N) {
-			const Point p = queue.Pop();
+			const SearchmapPoint p = queue.Pop();
 			poppedX.insert(p.x);
 			++pops;
 		}
@@ -107,7 +107,7 @@ namespace test {
 		uint32_t pops = 0;
 		const uint32_t total = overfull + neighbour;
 		while (!queue.IsEmpty() && pops < 4 * total) {
-			const Point p = queue.Pop();
+			const SearchmapPoint p = queue.Pop();
 			poppedX.insert(p.x);
 			++pops;
 		}
@@ -138,7 +138,7 @@ namespace test {
 		std::vector<uint32_t> popped;
 		popped.reserve(N);
 		while (!queue.IsEmpty()) {
-			const Point p = queue.Pop();
+			const SearchmapPoint p = queue.Pop();
 			ASSERT_GE(p.x, 0);
 			ASSERT_LT(uint32_t(p.x), N);
 			popped.push_back(pushedCosts[uint32_t(p.x)]);
@@ -170,7 +170,7 @@ namespace test {
 		std::vector<uint32_t> popped;
 		popped.reserve(N);
 		while (!queue.IsEmpty()) {
-			const Point p = queue.Pop();
+			const SearchmapPoint p = queue.Pop();
 			popped.push_back(pushedCosts[uint32_t(p.x)]);
 		}
 
@@ -243,7 +243,7 @@ namespace test {
 			uint32_t pops = 0;
 			uint32_t last = 0;
 			while (!queue.IsEmpty() && pops < N / 3) {
-				const Point p = queue.Pop();
+				const SearchmapPoint p = queue.Pop();
 				const uint32_t cost = (uint32_t(p.x) % 97) * 512;
 				EXPECT_GE(cost, last) << "order broke in round " << round;
 				last = cost;

@@ -274,6 +274,7 @@ public:
 
 	static bool IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller);
 	static bool IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, int actorCircleSize);
+	static bool IsWalkableTo(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, bool actorsAreBlocking, int actorCircleSize);
 	static bool IsLineWalkable(PathMapFlags accumulatedFlags, bool areActorsBlocking);
 
 	static bool AdjustPositionX(const TileProps& tileProps, SearchmapPoint& goal, const Size& radius, int size = -1);

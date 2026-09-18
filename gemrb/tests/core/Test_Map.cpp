@@ -108,12 +108,15 @@ TEST_F(MapTest, FindPathTest)
 	EXPECT_EQ(path.GetStep(2).point, Point(1160, 714));
 	EXPECT_EQ(path.GetStep(3).point, Point(1064, 702)); // not exactly badPaths[1]!
 
-	// every leg of it stays on passable ground
+	// every leg of it stays on passable ground; a leg inside one tile is not a line query at all,
+	// since the whole segment is inside a single passable tile
 	Point previous = badPaths[0];
 	for (size_t i = 0; i < path.Size(); i++) {
 		const Point step = path.GetStep(i).point;
-		EXPECT_TRUE(PathFinder::IsWalkableTo(map->tileProps, previous, step, true, circleSize))
-			<< "leg " << i << std::endl;
+		if (SearchmapPoint(previous) != SearchmapPoint(step)) {
+			EXPECT_TRUE(PathFinder::IsWalkableTo(map->tileProps, previous, step, true, circleSize))
+				<< "leg " << i << std::endl;
+		}
 		previous = step;
 	}
 

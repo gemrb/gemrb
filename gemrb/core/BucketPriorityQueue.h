@@ -87,7 +87,7 @@ public:
 	 * `cell` is the caller's own row-major cell index (the same one it uses for its per-cell
 	 * arrays); the queue keys on it to deduplicate.
 	 */
-	void Push(const Point& point, const uint32_t cell, const uint32_t cost)
+	void Push(const SearchmapPoint& point, const uint32_t cell, const uint32_t cost)
 	{
 		assert(cell < cells && "BucketPriorityQueue: cell index outside the reserved map");
 		const int32_t bucketIdx = BucketOf(cost);
@@ -114,7 +114,7 @@ public:
 	}
 
 	/** The cheapest queued point. Undefined on an empty queue - check IsEmpty() first. */
-	Point Pop()
+	SearchmapPoint Pop()
 	{
 		--count;
 		minBucket = static_cast<int32_t>(occupancy.NextSetFrom(static_cast<uint32_t>(minBucket)));
@@ -197,7 +197,7 @@ private:
 	constexpr static int32_t CHUNK_SIZE = 1 << CHUNK_SHIFT;
 
 	struct Entry {
-		Point point;
+		SearchmapPoint point;
 		uint32_t cell;
 	};
 
@@ -234,7 +234,7 @@ private:
 	}
 
 	/** Appends to `bucketIdx`'s head chunk, taking a fresh one if it is full or absent. */
-	int32_t Insert(const int32_t bucketIdx, const Point& point, const uint32_t cell, const uint32_t cost)
+	int32_t Insert(const int32_t bucketIdx, const SearchmapPoint& point, const uint32_t cell, const uint32_t cost)
 	{
 		int32_t head = bucketHead[bucketIdx];
 		if (head < 0) {
