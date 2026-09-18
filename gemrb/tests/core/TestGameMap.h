@@ -45,8 +45,33 @@ public:
 	TestGameMap(const test::MapRows rows)
 		: drawn(rows, test::ActorPainting::Skip), map(MakeMapFor(drawn))
 	{
-		for (size_t i = 0; i < drawn.Actors().size(); ++i) {
-			actors.push_back(Spawn(i));
+		SpawnDrawnActors();
+	}
+
+	/**
+	 * Same, from a container instead of a literal: a corpus built up front for a data-driven
+	 * walker outlives the full expression that wrote the rows, so it has to own them.
+	 */
+	explicit TestGameMap(const std::vector<std::string>& rows)
+		: drawn(rows, test::ActorPainting::Skip), map(MakeMapFor(drawn))
+	{
+		SpawnDrawnActors();
+	}
+
+	/**
+	 * The map borrows this object's terrain, so it must leave the frame loop before the terrain
+	 * goes away: a later test's RunFrame() would otherwise update a map whose searchmap has been
+	 * freed. Game keeps its own map list private, so only this loop's record can be withdrawn.
+	 */
+	~TestGameMap()
+	{
+		auto& maps = TestGameLoop::Maps();
+		for (auto it = maps.begin(); it != maps.end();) {
+			if (*it == map) {
+				it = maps.erase(it);
+			} else {
+				++it;
+			}
 		}
 	}
 
@@ -85,6 +110,36 @@ public:
 		map->UpdateTraversabilityCache();
 	}
 
+	/**
+	 * Spawns one of the demo's creatures at an arbitrary position, for a map whose actor is
+	 * placed by the test rather than drawn as a glyph. Sizes 1 and 2 are the demo's own
+	 * creatures; bigger sizes re-point the animation at a test-only avatars.2da row.
+	 */
+	Actor* SpawnActor(uint16_t circleSize, PathMapFlags flag, const Point& pos)
+	{
+		Actor* actor = gamedata->GetCreature(circleSize == 1 ? ResRef("rabbit") : ResRef("protagon"));
+		if (!actor) {
+			ADD_FAILURE() << "the demo has to provide a creature to spawn";
+			return nullptr;
+		}
+		if (circleSize > 2) {
+			actor->SetBase(IE_ANIMATION_ID, testAnimationIdBase + circleSize);
+		}
+
+		actor->InParty = flag == PathMapFlags::PC ? 1 : 0;
+
+		// activate so that actor will get the RunScripts priority
+		actor->Activate();
+		map->AddActor(actor, true);
+		actor->SetPosition(pos, false);
+
+		// the requested size has to agree with what the creature came up as
+		EXPECT_EQ(actor->circleSize, circleSize)
+			<< "spawned actor at circle size " << circleSize
+			<< " but its creature came up at " << actor->circleSize;
+		return actor;
+	}
+
 private:
 	static Map* MakeMapFor(const TestSearchMap& drawn)
 	{
@@ -101,6 +156,14 @@ private:
 
 
 	static constexpr unsigned int testAnimationIdBase = 0x9000;
+
+	void SpawnDrawnActors()
+	{
+		for (size_t i = 0; i < drawn.Actors().size(); ++i) {
+			actors.push_back(Spawn(i));
+		}
+	}
+
 	/**
 	 * Sizes 1 and 2 are the demo's own creatures. Anything bigger re-points `protagon` at a
 	 * test-only row of avatars.2da (those rows have IDs equal to `testAnimationIdBase + circle_size`)
@@ -108,28 +171,7 @@ private:
 	Actor* Spawn(const size_t index)
 	{
 		const TestSearchMap::DrawnActor& glyph = drawn.Actors()[index];
-		Actor* actor = gamedata->GetCreature(glyph.circleSize == 1 ? ResRef("rabbit") : ResRef("protagon"));
-		if (!actor) {
-			ADD_FAILURE() << "the demo has to provide a creature to spawn";
-			return nullptr;
-		}
-		if (glyph.circleSize > 2) {
-			actor->SetBase(IE_ANIMATION_ID, testAnimationIdBase + glyph.circleSize);
-		}
-
-		actor->InParty = glyph.flag == PathMapFlags::PC ? 1 : 0;
-
-		// activate so that actor will get the RunScripts priority
-		actor->Activate();
-		actor->Pos = drawn.ActorPosOf(index);
-		map->AddActor(actor, true);
-
-		// the ASCII drawing promised a size and a live actor gets its circle size from
-		// the game data; ensure they agree
-		EXPECT_EQ(actor->circleSize, glyph.circleSize)
-			<< "actor " << index << " was drawn at circle size " << glyph.circleSize
-			<< " but its creature came up at " << actor->circleSize;
-		return actor;
+		return SpawnActor(glyph.circleSize, glyph.flag, drawn.ActorPosOf(index));
 	}
 
 	TraversabilityCache::TraversabilityCellData CellAt(const Point& navPoint) const
