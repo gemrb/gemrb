@@ -38,10 +38,12 @@
 
 namespace GemRB {
 
-constexpr size_t DEGREES_OF_FREEDOM = 4;
+// 8-connected: a tile reachable only across the corner of two others is opened by the frontier
+// only if diagonal neighbours are offered.
+constexpr size_t DEGREES_OF_FREEDOM = 8;
 constexpr size_t RAND_DEGREES_OF_FREEDOM = 16;
-constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent { { 1, 0, -1, 0 } };
-constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent { { 0, 1, 0, -1 } };
+constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent { { 1, 0, -1, 0, 1, 1, -1, -1 } };
+constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent { { 0, 1, 0, -1, 1, -1, 1, -1 } };
 
 // Distance is accumulated in COST_SCALE-ths of a tile, so we can put correct price tag on diagonal steps
 constexpr unsigned int COST_SCALE = 256;
@@ -432,9 +434,11 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
 			const NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
+			// Bound the pixel point before narrowing it to a tile: SearchmapPoint truncates toward
+			// zero, so a negative overhang would fold onto tile 0, while the traversability lookup
+			// below reads the pixels directly and would fault.
+			if (nmptChild.x < 0 || nmptChild.y < 0 || nmptChild.x >= mapSize.w * 16 || nmptChild.y >= mapSize.h * 12) continue;
 			const SearchmapPoint smptChild { nmptChild };
-			// Outside map
-			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
 			// Fresh cell reads as isClosed=false; stamped cell reads the actual flag.
@@ -469,12 +473,18 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 					// Find already visited neighbour with shortest: path from start + path to child
 					for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
 						NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
+						// Bound the pixel point, same reason as nmptChild above.
+						if (nmptVis.x < 0 || nmptVis.y < 0 || nmptVis.x >= mapSize.w * 16 || nmptVis.y >= mapSize.h * 12) continue;
 						SearchmapPoint smptVis { nmptVis };
-						// Outside map
-						if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
 						// Only consider already visited (closed)
 						const int smptVisIdx = smptVis.y * mapSize.w + smptVis.x;
 						if (genOf[smptVisIdx] != searchGen || !isClosed[smptVisIdx]) continue;
+						// The A* fallback takes a grid neighbour as parent without asking whether
+						// the step is walkable. That is only safe for orthogonal steps: two
+						// passable tiles sharing an edge are always joined. Diagonal steps are
+						// asked, since sharing only a corner is not enough.
+						if (dxAdjacent[j] && dyAdjacent[j] &&
+						    !walkableTo(nmptVis, nmptChild)) continue;
 
 						const uint32_t visDist = distFromStart[smptVisIdx] + StepCost(smptVis, smptChild);
 						if (visDist < bestDist) {

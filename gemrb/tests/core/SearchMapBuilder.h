@@ -196,6 +196,21 @@ namespace test {
 
 		TestSearchMap(const MapRows inMapRows, const ActorPainting painting = ActorPainting::Paint)
 		{
+			Init(inMapRows, painting);
+		}
+
+		// Same drawing from a container instead of a literal: an initializer_list's backing array
+		// only lives for the full expression, so a pre-built table of maps has to own its rows.
+		explicit TestSearchMap(const std::vector<std::string>& inMapRows, const ActorPainting painting = ActorPainting::Paint)
+		{
+			Init(inMapRows, painting);
+		}
+
+	private:
+		// Both row types support size(), begin() and range-for, so one body covers both.
+		template<typename Rows>
+		void Init(const Rows& inMapRows, const ActorPainting painting)
+		{
 			const int rowCount = static_cast<int>(inMapRows.size());
 			const int rowWidth = rowCount ? static_cast<int>(inMapRows.begin()->size()) : 0;
 
@@ -245,6 +260,7 @@ namespace test {
 			}
 		}
 
+	public:
 		TileProps& Props() noexcept { return props; }
 		const TileProps& Props() const noexcept { return props; }
 
