@@ -13198,7 +13198,7 @@ bool GUIScript::Init(void)
 
 	// Add generic script path early, so GameType detection works
 	PyObject* pyPath = PyString_FromStringObj(path);
-	PyList_Append(sysPath, pyPath);
+	PyList_Insert(sysPath, 0, pyPath);
 	Py_DecRef(pyPath);
 
 	PyModule_AddStringConstant(pGemRB, "GEMRB_VERSION", GEMRB_STRING);
@@ -13230,10 +13230,11 @@ bool GUIScript::Init(void)
 
 	// GameType-specific import path must have a higher priority than
 	// the generic one, so insert it before it
-	PyList_Insert(sysPath, -1, PyString_FromStringObj(path2));
+	PyList_Insert(sysPath, 0, PyString_FromStringObj(path2));
 	// also add python/ as a game path subdir for mod provided python overrides
 	path2 = PathJoin(core->config.GamePath, "python");
-	PyList_Insert(sysPath, -2, PyString_FromStringObj(path2));
+	PyList_Insert(sysPath, 0, PyString_FromStringObj(path2));
+	// the final python search path order is: mod, game, shared, system
 
 	PyModule_AddStringConstant(pGemRB, "GameType", core->config.GameType.c_str());
 
