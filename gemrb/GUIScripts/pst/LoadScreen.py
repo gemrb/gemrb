@@ -9,15 +9,14 @@
 import GemRB
 from GUIDefines import *
 
-LoadScreen = None
-
 LS_TYPE_LOADING = 0
 LS_TYPE_SAVING = 1
 LS_TYPE_UNLOADING = 2
 
+def SetLoadScreen ():
+	return
+
 def StartLoadScreen (screen_type = LS_TYPE_LOADING):
-	global LoadScreen
-		
 	LoadScreen = Window = GemRB.LoadWindow (0, "guils")
 	LoadScreen.AddAlias("LOADWIN")
 
@@ -36,7 +35,8 @@ def StartLoadScreen (screen_type = LS_TYPE_LOADING):
 	def EndLoadScreen ():
 		Skull = Window.GetControl (1)
 		Skull.SetPicture ("GSKULON")
-		
+
+		LoadScreen = GemRB.GetView ("LOADWIN")
 		LoadScreen.OnClose (lambda win: GemRB.GamePause(0, 0))
 		GemRB.SetTimer(LoadScreen.Close, 500, 0)
 		return

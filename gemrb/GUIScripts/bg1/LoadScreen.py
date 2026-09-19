@@ -9,14 +9,10 @@
 import GemRB
 from GUIDefines import *
 
-LoadScreen = None
-
 def SetLoadScreen ():
 	return
 
 def StartLoadScreen ():
-	global LoadScreen
-
 	LoadScreen = GemRB.LoadWindow (0, "guils")
 	LoadScreen.AddAlias("LOADWIN")
 
@@ -37,6 +33,7 @@ def StartLoadScreen ():
 	return
 
 def EndLoadScreen ():
+	LoadScreen = GemRB.GetView ("LOADWIN")
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetPicture ("GTRBPSK2")
 

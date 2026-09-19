@@ -10,14 +10,10 @@ import GemRB
 import GameCheck
 from GUIDefines import *
 
-LoadScreen = None
-
 def SetLoadScreen ():
 	return
 
 def StartLoadScreen ():
-	global LoadScreen
-
 	LoadScreen = GemRB.LoadWindow (0, "guils")
 	LoadScreen.AddAlias("LOADWIN")
 
@@ -65,7 +61,8 @@ def StartLoadScreen ():
 def EndLoadScreen (HintStr):
 	TMessageTA = GemRB.GetView("MsgSys", 0)
 	TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
-	
+
+	LoadScreen = GemRB.GetView ("LOADWIN")
 	if GameCheck.IsBG2Demo():
 		Middle = LoadScreen.GetControl (3)
 		Middle.SetBAM ("COADCNTR", 1, 0)

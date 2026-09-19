@@ -9,20 +9,17 @@
 import GemRB
 from GUIDefines import *
 
-LoadScreen = None
-Picture = None
-
 def SetLoadScreen ():
 	Table = GemRB.LoadTable ("areaload")
 	Area = GemRB.GetGameString (STR_AREANAME)
 	LoadPic = Table.GetValue (Area, Table.GetColumnName(0) )
 	if LoadPic!="*":
+		LoadScreen = GemRB.GetView ("LOADWIN")
+		Picture = LoadScreen.GetControl (4)
 		Picture.SetPicture(LoadPic)
 	return
 
 def StartLoadScreen ():
-	global LoadScreen, Picture
-
 	LoadScreen = GemRB.LoadWindow (0, "guils")
 	LoadScreen.AddAlias("LOADWIN")
 
@@ -42,9 +39,9 @@ def StartLoadScreen ():
 	
 	def EndLoadScreen ():
 		TMessageTA = GemRB.GetView("MsgSys", 0)
-
 		TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
 
+		LoadScreen = GemRB.GetView ("LOADWIN")
 		Skull = LoadScreen.GetControl (3)
 		Skull.SetPicture ("GTRBPSK2")
 		
