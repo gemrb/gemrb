@@ -731,7 +731,7 @@ static ResRef GetClab(TableMgr::index_t row, ieDword& kitclass)
 	return clab;
 }
 
-void Actor::ApplyClab2MC(const ResRef& clab, int diff, bool remove, ieDword& kitclass)
+void Actor::ApplyClab2MC(const ResRef& clab, int diff, bool remove, ieDword kitclass)
 {
 	ieDword msk = 1;
 	bool isDualClassed = IsDualClassed();

@@ -791,7 +791,7 @@ public:
 	bool ApplyKit(bool remove, ieDword baseclass = 0, int diff = 0);
 	/* applies the class abilities*/
 	void ApplyClab(const ResRef& clab, ieDword max, int remove, int diff);
-	void ApplyClab2MC(const ResRef& clab, int diff, bool remove, ieDword& kitclass);
+	void ApplyClab2MC(const ResRef& clab, int diff, bool remove, ieDword kitclass);
 	/* calls InitQuickSlot in PCStatStruct */
 	void SetupQuickSlot(unsigned int which, ieWord slot, ieWord headerIndex) const;
 	/* returns true if the actor is PC/joinable*/
