@@ -277,6 +277,23 @@ PathNode PathFinder::CalculateLineEnd(const TileProps& tileProps, const Point& p
 	return lineEnd;
 }
 
+// structure describing data needed for proper checks of LOS with actors along the way
+struct LineActorBlockingData {
+	const TraversabilityCache::Data_t& cache;
+	const Movable* identity = nullptr;
+	TraversabilityCache::TraversabilityCellState threshold = TraversabilityCache::TraversabilityCellValueEmpty;
+	int mapWidth = 0;
+
+	bool blocks(const SearchmapPoint& p) const
+	{
+		const TraversabilityCache::TraversabilityCellData cell = cache[size_t(p.y) * mapWidth + p.x];
+		// state first: the walk crosses mostly empty tiles, and they short-circuit on one compare
+		return cell.state >= threshold && cell.occupyingActor != identity;
+	}
+};
+
+static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinder::GridRayCast walk, bool stopOnImpassable, int actorCircleSize, const LineActorBlockingData* actorBlockingData = nullptr);
+
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
 Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCacheSnapshot, const TileProps& tileProps, const Point& source, const Point& destination, const ActorPathContext& actorContext, unsigned int minDistance, int pathfindingFlags)
@@ -374,14 +391,24 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 	constexpr float_t HEURISTIC_WEIGHT = 1.5;
 
-	// This search's walkability query.
+	// Both the search's edge test (the Theta* candidate and the A* fallback below) and the
+	// post-search straightening pass share this one query. It reads the searchmap and, when actors
+	// are not blocking, the traversability cache in the same traversal - so a straight edge cannot
+	// be drawn over an actor the movement could not bump.
+	// With actors blocking, the searchmap test already refuses every actor mark, so the cache view
+	// is redundant there and skipped.
+	const LineActorBlockingData actorBlockingData { traversabilityCacheSnapshot, actorIdentity, blockingTraversabilityValue, mapSize.w };
+	const LineActorBlockingData* actorView = actorsAreBlocking ? nullptr : &actorBlockingData;
+	const auto walkableLine = [&](GridRayCast walk) {
+		return IsLineWalkable(AccumulateAlongTheLine(tileProps, walk, true, actorCircleSize, actorView), actorsAreBlocking);
+	};
 	const auto walkableTo = [&](const SearchmapPoint& from, const SearchmapPoint& to) {
-		return IsWalkableTo(tileProps, from, to, actorsAreBlocking, actorCircleSize);
+		return walkableLine(GridRayCast { from, to });
 	};
 
 	// The same query from a navmap pixel, for the straightening pass's first leg.
 	const auto walkableFromPixel = [&](const NavmapPoint& from, const SearchmapPoint& to) {
-		return IsWalkableTo(tileProps, from, TileCentre(to), actorsAreBlocking, actorCircleSize);
+		return walkableLine(GridRayCast { NavmapPoint(from), TileCentre(to) });
 	};
 	const auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) -> uint32_t {
 		const int xDist = smptChild.x - smptDest.x;
@@ -737,7 +764,7 @@ PathMapFlags PathFinder::GetBlockedInRadiusTile(const TileProps& tileProps, cons
 // Every line query - sight and walkability alike - asks the same thing: what does the straight
 // segment from s to d cross? GridRayCast answers exactly that, so the walk is the only thing these
 // share; what differs is how wide each tile is inspected and when to give up.
-static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinder::GridRayCast walk, bool stopOnImpassable, int actorCircleSize)
+static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinder::GridRayCast walk, bool stopOnImpassable, int actorCircleSize, const LineActorBlockingData* actorBlockingData)
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 
@@ -748,7 +775,10 @@ static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinde
 		return useBigSize ? PathFinder::GetChildBlockedStatusForBigSize(tileProps, p, actorCircleSize) : PathFinder::GetChildBlockedStatusForSmallSize(tileProps, p, actorCircleSize);
 	};
 	while (walk.Step()) {
-		const PathMapFlags blockStatus = getBlockedStatus(walk.Current());
+		const SearchmapPoint p = walk.Current();
+		// A solid occupant blocks the line the same way a wall does: the walkability query is
+		// boolean. Only the walk passes a context; sight lines leave it null on purpose.
+		const PathMapFlags blockStatus = (stopOnImpassable && actorBlockingData && actorBlockingData->blocks(p)) ? PathMapFlags::IMPASSABLE : getBlockedStatus(p);
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}
