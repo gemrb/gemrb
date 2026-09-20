@@ -27,7 +27,6 @@ PathFinderScheduler::IncomingQueue_t PathFinderScheduler::incomingRequests;
 PathFinderScheduler::ScheduledQueue_t PathFinderScheduler::scheduledQueue;
 std::vector<FindPathRequestId> PathFinderScheduler::cancelledQueue;
 
-FixedSizePool<TraversabilityCache::Data_t::TPage_t> PathFinderScheduler::traversabilityCacheSnapshotAllocator;
 std::unordered_map<ScriptID, TraversabilityCache::Data_t> PathFinderScheduler::traversabilityCacheData;
 std::unordered_map<ScriptID, uint64_t> PathFinderScheduler::traversabilityCacheDataSnapshotVersion;
 std::unordered_map<ScriptID, std::shared_ptr<const TraversabilityDataSnapshot>> PathFinderScheduler::traversabilityCacheDataSnapshot;
@@ -58,7 +57,7 @@ TraversabilityCache::Data_t& PathFinderScheduler::GetOrCreateTraversabilityData(
 {
 	auto found = traversabilityCacheData.find(mapID);
 	if (found == traversabilityCacheData.end()) {
-		found = traversabilityCacheData.emplace(mapID, TraversabilityCache::Data_t(traversabilityCacheSnapshotAllocator)).first;
+		found = traversabilityCacheData.emplace(mapID, TraversabilityCache::Data_t {}).first;
 	}
 	return found->second;
 }
@@ -436,9 +435,9 @@ void PathFinderScheduler::Sync(const std::vector<Map*>& allMaps)
 	 *    worker has taken yet, which is what step 5 wakes workers on.
 	 *
 	 * 4. Refresh the worker snapshots, when shouldSyncCache:
-	 *    - 4.1 traversability cache, only for maps whose cache changed this frame, and only the
-	 *      dirty pages; bumping its version invalidates the shared snapshot without copying here,
-	 *      and the next worker to claim a request for that map re-takes it,
+	 *    - 4.1 traversability cache, only for maps whose cache changed this frame; the copy into
+	 *      the per-map instance is deferred - bumping its version invalidates the shared snapshot
+	 *      without copying here, and the next worker to claim a request for that map re-takes it,
 	 *    - 4.2 tileprops and actor data, for *every* map rather than only the changed ones: neither
 	 *      is gated on wasTravUpdated, so both are rebuilt from scratch on any frame a request
 	 *      arrived. That is a full tileprops buffer copy and a full actor vector per map, and it is
@@ -647,7 +646,7 @@ void PathFinderScheduler::Sync(const std::vector<Map*>& allMaps)
 				const auto mapID = map->GetGlobalID();
 				if (wasTravUpdated[mapIdx]) {
 					auto& mapTraversabilityData = GetOrCreateTraversabilityData(mapID);
-					mapTraversabilityData.SyncFrom(map->GetTraversabilityCacheData());
+					mapTraversabilityData = map->GetTraversabilityCacheData();
 					// invalidates the snapshot without copying anything here; the next worker
 					// to claim a request for this map re-takes it
 					++traversabilityCacheDataSnapshotVersion[mapID];
@@ -791,8 +790,8 @@ Path PathFinderScheduler::PerformPathCalculation(const TraversabilityCache::Data
 	// could be called both from main and workers thread, no access to any shared states
 	const ActorPathContext actorContext {
 		static_cast<unsigned int>(InOutCurrentRequest.payload.actorCircleSize),
-		InOutCurrentRequest.payload.instigatorIdentity,
-		InOutCurrentRequest.payload.instigatorScriptName
+		InOutCurrentRequest.payload.instigatorScriptName,
+		InOutCurrentRequest.payload.selfBumpable
 	};
 
 	auto foundPath = PathFinder::FindPath(
@@ -989,7 +988,7 @@ void PathFinderScheduler::PathfinderThreadUpdate(const size_t workerIdx)
 			const auto currentSnapshotVersion = traversabilityCacheDataSnapshotVersion[currentRequest.mapID];
 			if (!publishedTraversability || publishedTraversability->version != currentSnapshotVersion) {
 				auto snapshot = std::make_shared<TraversabilityDataSnapshot>();
-				snapshot->data.CopyFrom(foundTraversabilityData->second);
+				snapshot->data = foundTraversabilityData->second;
 				snapshot->version = currentSnapshotVersion;
 				publishedTraversability = std::move(snapshot);
 			}

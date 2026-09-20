@@ -431,7 +431,7 @@ namespace test {
 			  tileHeight(map.Height()),
 			  // the trailing spare cell matches TraversabilityCache::ValidateTraversabilityCacheSize(),
 			  // which keeps one as a dumpster for out-of-range writes
-			  data(pool, size_t(tileWidth) * tileHeight + 1)
+			  data(size_t(tileWidth) * tileHeight + 1)
 		{
 			for (size_t i = 0; i < map.Actors().size(); ++i) {
 				const auto& drawn = map.Actors()[i];
@@ -468,12 +468,7 @@ namespace test {
 					if (!Selectable::IsOverCircle(centre, pos, circleSize)) continue;
 
 					const size_t idx = size_t(ty) * tileWidth + tx;
-					TraversabilityCache::TraversabilityCellData cellData = data[idx];
-					cellData.state += token;
-					// deliberate unsafe cast - in tests we don't use real actor instances,
-					// we just need a number for the sake of identity comparison
-					cellData.occupyingActor = reinterpret_cast<Actor*>(const_cast<Movable*>(who)); // NOSONAR
-					data[idx] = cellData;
+					data[idx] = static_cast<TraversabilityCache::TraversabilityCellState>(data[idx] + token);
 				}
 			}
 		}
@@ -481,17 +476,7 @@ namespace test {
 		TraversabilityCache::TraversabilityCellState StateAt(const Point& navPoint) const
 		{
 			const SearchmapPoint tile { navPoint };
-			return data[size_t(tile.y) * tileWidth + tile.x].state;
-		}
-
-		/** Who the cache has standing on that searchmap tile, which is what FindPath() compares. */
-		ActorIdentity ActorAt(const Point& navPoint) const
-		{
-			const SearchmapPoint tile { navPoint };
-			const auto actorPtr = data[size_t(tile.y) * tileWidth + tile.x].occupyingActor;
-			// deliberate unsafe cast - in tests we don't use real actor instances,
-			// we just need a number for the sake of identity comparison
-			return reinterpret_cast<ActorIdentity>(actorPtr); // NOSONAR
+			return data[size_t(tile.y) * tileWidth + tile.x];
 		}
 
 		const TraversabilityCache::Data_t& Data() const noexcept { return data; }
@@ -499,7 +484,6 @@ namespace test {
 	private:
 		int tileWidth = 0;
 		int tileHeight = 0;
-		FixedSizePool<TraversabilityCache::Data_t::TPage_t> pool;
 		TraversabilityCache::Data_t data;
 	};
 
@@ -513,13 +497,12 @@ namespace test {
 	 * say so with Tiles().
 	 */
 	inline Path CallFindPath(const TestSearchMap& map, const TestTraversability& traversability,
-				 const Point& from, const Point& to, ActorIdentity self = nullptr,
+				 const Point& from, const Point& to, [[maybe_unused]] ActorIdentity self = nullptr,
 				 unsigned int circleSize = 1, int flags = PF_SIGHT,
 				 unsigned int minDistance = 0)
 	{
 		ActorPathContext actor;
 		actor.circleSize = circleSize;
-		actor.identity = self;
 		return PathFinder::FindPath(traversability.Data(), map.Props(), from, to, actor, minDistance, flags);
 	}
 

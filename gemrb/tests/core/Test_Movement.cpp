@@ -120,11 +120,10 @@ TEST_F(MovementTest, GlyphsDecideSizeAndParty)
 	EXPECT_EQ(live.ActorOf(0)->Pos, drawn.ActorPosOf(0));
 	EXPECT_EQ(live.ActorOf(1)->Pos, drawn.ActorPosOf(1));
 
-	// the live actors reach the cache the pathfinder consults, each owning its own cell
+	// the live actors reach the cache the pathfinder consults
 	live.RefreshTraversability();
 	EXPECT_GT(live.StateAt(drawn.ActorPosOf(0)), TraversabilityCache::TraversabilityCellValueEmpty);
-	EXPECT_EQ(live.ActorAt(drawn.ActorPosOf(0)), live.ActorOf(0));
-	EXPECT_EQ(live.ActorAt(drawn.ActorPosOf(1)), live.ActorOf(1));
+	EXPECT_GT(live.StateAt(drawn.ActorPosOf(1)), TraversabilityCache::TraversabilityCellValueEmpty);
 }
 
 // Every size the glyph alphabet allows, has a creature with proper stats behind it.
@@ -408,11 +407,10 @@ protected:
 	 * phrasing ScheduleFindPath() gives FindPath() for a walk.
 	 */
 	static Path FindPathOnLive(const TestGameMap& live, const Point& from, const Point& to,
-				   const Movable* self, unsigned int circleSize, int flags)
+				   const Movable* /*self*/, unsigned int circleSize, int flags)
 	{
 		ActorPathContext actor;
 		actor.circleSize = circleSize;
-		actor.identity = self;
 		return PathFinder::FindPath(live.GetMap()->GetTraversabilityCacheData(), live.Drawing().Props(),
 					    from, to, actor, 0, flags);
 	}
@@ -446,7 +444,6 @@ TEST_F(TraversabilityLiveTest, CacheFollowsTheActorAsItWalks)
 	const Point home = actor->Pos;
 	const Point goal = drawn.End();
 	EXPECT_EQ(live.StateAt(home), TraversabilityCache::TraversabilityCellValueActor);
-	EXPECT_EQ(live.ActorAt(home), actor);
 	EXPECT_EQ(live.StateAt(goal), TraversabilityCache::TraversabilityCellValueEmpty);
 
 	actor->WalkTo(goal, 0, 0);
@@ -458,7 +455,6 @@ TEST_F(TraversabilityLiveTest, CacheFollowsTheActorAsItWalks)
 	EXPECT_EQ(live.StateAt(home), TraversabilityCache::TraversabilityCellValueEmpty)
 		<< "the start tile has to go back to empty once the actor has left it";
 	EXPECT_EQ(live.StateAt(goal), TraversabilityCache::TraversabilityCellValueActor);
-	EXPECT_EQ(live.ActorAt(goal), actor);
 }
 
 // Bumpability is not a constant: an actor in a moving stance cannot be shoved aside, and the cache
@@ -519,9 +515,7 @@ TEST_F(TraversabilityLiveTest, CacheCountsAndClearsOverlappingActors)
 	TestGameLoop::RunFrame();
 	live.RefreshTraversability();
 	EXPECT_EQ(live.StateAt(here), TraversabilityCache::TraversabilityCellValueActor) << "one token left";
-	EXPECT_NE(live.ActorAt(here), second) << "the departed actor's identity must not linger";
 	EXPECT_EQ(live.StateAt(there), TraversabilityCache::TraversabilityCellValueActor);
-	EXPECT_EQ(live.ActorAt(there), second);
 }
 
 // A beast summoned mid-game is a new actor on a map whose cache already holds the settled state of
@@ -553,10 +547,8 @@ TEST_F(TraversabilityLiveTest, LiveCachePicksUpAnActorAddedAfterTheCacheSettled)
 
 	EXPECT_EQ(live.StateAt(summonPos), TraversabilityCache::TraversabilityCellValueActor)
 		<< "the newcomer's tile has to become occupied";
-	EXPECT_EQ(live.ActorAt(summonPos), summoned);
 	EXPECT_EQ(live.StateAt(residentPos), TraversabilityCache::TraversabilityCellValueActor)
 		<< "the actor already cached must not be lost when another is added";
-	EXPECT_EQ(live.ActorAt(residentPos), resident);
 }
 
 // The other half: a summon that leaves the map (dies, is banished, leaves the area) must surrender
@@ -577,7 +569,6 @@ TEST_F(TraversabilityLiveTest, LiveCacheForgetsAnActorRemovedFromTheMap)
 	ASSERT_NE(guest, nullptr);
 	live.RefreshTraversability();
 	ASSERT_EQ(live.StateAt(guestPos), TraversabilityCache::TraversabilityCellValueActor);
-	ASSERT_EQ(live.ActorAt(guestPos), guest);
 
 	// gone from the map list, but nothing has told the cache yet
 	live.GetMap()->RemoveActor(guest);
@@ -586,10 +577,8 @@ TEST_F(TraversabilityLiveTest, LiveCacheForgetsAnActorRemovedFromTheMap)
 
 	EXPECT_EQ(live.StateAt(guestPos), TraversabilityCache::TraversabilityCellValueEmpty)
 		<< "a removed actor must not leave a phantom blocker behind";
-	EXPECT_EQ(live.ActorAt(guestPos), nullptr) << "the departed identity must be gone";
 	EXPECT_EQ(live.StateAt(residentPos), TraversabilityCache::TraversabilityCellValueActor)
 		<< "removing one actor must not touch its neighbour";
-	EXPECT_EQ(live.ActorAt(residentPos), resident);
 }
 
 // The point of the cache: a blocked tile is a tile a route cannot step on. The loop here is the
@@ -618,7 +607,7 @@ TEST_F(TraversabilityLiveTest, LiveCacheRoutesAroundABlockingActor)
 	ASSERT_NE(blocker, nullptr);
 	TestGameLoop::RunFrame();
 	live.RefreshTraversability();
-	ASSERT_EQ(live.ActorAt(blockerPos), blocker);
+	ASSERT_GT(live.StateAt(blockerPos), TraversabilityCache::TraversabilityCellValueEmpty);
 
 	// people are solid: the top corridor is plugged, so the route has to take the bottom one
 	const Path around = FindPathOnLive(live, from, to, nullptr, 1, actorsBlock);
@@ -799,9 +788,7 @@ TEST_F(BumpTest, ABumpableCrowdIsPushedAsideAndComesBack)
 
 // Solid: the crowd cannot be moved, so the walker has to find the way around the half-circle. No
 // NPC may move for the whole run, and the walker may not be stopped by the wall of bodies.
-// DISABLED: fails because the cache keeps one actor pointer per cell, so a solid actor sharing a
-// cell with the mover is masked by the mover's identity and the walker paths onto its tile.
-TEST_F(BumpTest, DISABLED_ASolidCrowdIsWalkedAroundWithoutMoving)
+TEST_F(BumpTest, ASolidCrowdIsWalkedAroundWithoutMoving)
 {
 	TestGameMap live { HalfCircleAroundPc() };
 	Actor* pc = PcOf(live);
@@ -824,7 +811,6 @@ TEST_F(BumpTest, DISABLED_ASolidCrowdIsWalkedAroundWithoutMoving)
 	{
 		ActorPathContext ctx;
 		ctx.circleSize = pc->circleSize;
-		ctx.identity = pc;
 		const Path around = PathFinder::FindPath(live.GetMap()->GetTraversabilityCacheData(), live.Drawing().Props(),
 							 pc->Pos, goal, ctx, 0, PF_SIGHT | PF_ACTORS_ARE_BLOCKING);
 		ASSERT_FALSE(around.Empty()) << "the open ground behind the PC has to offer a way around the solid crowd";

@@ -469,6 +469,9 @@ void Movable::ScheduleFindPath(
 	const Actor* self = Scriptable::As<Actor>(this);
 	Map* requestMap = InOptionalMap ? InOptionalMap : area;
 	const int actorSpeed = self ? self->GetSpeed() : 0;
+	// the token this actor contributes to a traversability cell; FindPath subtracts it from the
+	// actor's own footprint so a co-occupant cannot be masked by it
+	const bool selfBumpable = !self || self->ValidTarget(GA_ONLY_BUMPABLE);
 	bool canRePathIgnoringActors = false;
 	int pathfindingFlags = PF_SIGHT | InOptionalAdditionalFlags;
 	if (InRequestType == FindPathRequestType::WalkTo) {
@@ -496,7 +499,8 @@ void Movable::ScheduleFindPath(
 		static_cast<unsigned int>(InMinDistance),
 		actorSpeed,
 		canRePathIgnoringActors,
-		BlocksSearchMap());
+		BlocksSearchMap(),
+		selfBumpable);
 
 	// note appropriate movement state and submit the request
 	SetMovementState(MovementState::FindPathScheduled);

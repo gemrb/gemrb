@@ -8,8 +8,6 @@
 
 #include "exports.h"
 
-#include "FixedSizePool.h"
-#include "PagedSparseArray.h"
 #include "Region.h"
 
 #include <array>
@@ -58,62 +56,39 @@ public:
 	static constexpr TraversabilityCellState TraversabilityCellValueActorNonTraversable = 15;
 
 	/**
-	 * A Region with a reduced footprint, to cut cache pressure when many are loaded at once.
-	 *
-	 * The origin and size stay in navmap pixels: they describe the actor's ground footprint and
-	 * only bound which searchmap tiles to stamp. The origin is signed, since an actor near the
-	 * top or left edge has a negative region origin.
+	 * The searchmap tiles an actor of a given size covers, centred on its position. Shared by the
+	 * cache when it stamps or unstamps an actor and by FindPath when it decides whether a cell is
+	 * the mover's own, so the two cannot drift apart.
 	 */
-	struct FitRegion {
-		int x;
-		int y;
-		uint8_t w;
-		uint8_t h;
+	struct ActorFootprint {
+		int firstX = 0;
+		int lastX = -1;
+		int firstY = 0;
+		int lastY = -1;
+		Point centre;
+		int ellipseR = 0;
 
-		FitRegion(const Point& InOrigin, const Size& InSize)
-			: x(InOrigin.x), y(InOrigin.y), w(InSize.w), h(InSize.h)
+		bool covers(const SearchmapPoint& tile) const noexcept
 		{
+			// unsigned wrap makes each two-sided bounds test branchless
+			if (static_cast<unsigned>(tile.x - firstX) > static_cast<unsigned>(lastX - firstX)) return false;
+			if (static_cast<unsigned>(tile.y - firstY) > static_cast<unsigned>(lastY - firstY)) return false;
+			if (ellipseR < 1) return true;
+			// tile centres are at tx*16+8, ty*12+6 (SEARCHMAP_SQUARE_WIDTH/HEIGHT)
+			const Point tileCentre(tile.x * 16 + 8, tile.y * 12 + 6);
+			return tileCentre.IsWithinEllipse(ellipseR, centre);
 		}
 	};
 
-	/**
-	 * Traversability of a searchmap tile: its state and the actor occupying it.
-	 */
-	struct TraversabilityCellData {
-		Actor* occupyingActor = nullptr;
-		TraversabilityCellState state = TraversabilityCellValueEmpty;
-
-		// Pads `state` out to the pointer alignment boundary so the compiler inserts no implicit
-		// padding of its own
-		char padding[7] = {};
-
-		bool operator!=(const TraversabilityCellData& other) const noexcept
-		{
-			return occupyingActor != other.occupyingActor || state != other.state;
-		}
-	};
-
-	// Guards the padding above: if the members ever stop summing to the object size, the compiler
-	// has inserted padding this type does not control. Written as a sum rather than a literal so
-	// it holds for both 32- and 64-bit pointers.
-	static_assert(sizeof(TraversabilityCellData) ==
-			      sizeof(Actor*) + sizeof(TraversabilityCellState) + sizeof(TraversabilityCellData::padding),
-		      "TraversabilityCellData has implicit padding; adjust its padding member, or store it "
-		      "in a PagedSparseArray instantiated with DefaultTIsAllZeroBytes = false");
-
-	using Data_t = PagedSparseArray<TraversabilityCellData, true>;
+	// One cell per searchmap tile, holding the token sum of the actors covering it.
+	using Data_t = std::vector<TraversabilityCellState>;
 
 	explicit TraversabilityCache(class Map* inMap)
-		: map { inMap }, traversabilityData(dataAllocator)
+		: map { inMap }
 	{
 	}
 
-	TraversabilityCellData GetCellData(const std::size_t inIndex) const
-	{
-		return traversabilityData[inIndex];
-	}
-
-	/** The cache's backing store, handed to PathFinderScheduler::Sync() as a SyncFrom() source. */
+	/** The cache's backing store, copied by PathFinderScheduler::Sync() into its per-map entry. */
 	Data_t& GetData()
 	{
 		return traversabilityData;
@@ -154,13 +129,12 @@ public:
 
 private:
 	/**
-	 * Cached state of one tracked actor: position, occupied region, bumpable/alive flags and size.
+	 * Cached state of one tracked actor: position, bumpable/alive flags and size.
 	 */
 	struct CachedActorsState {
 		constexpr static uint8_t FLAG_BUMPABLE = 1;
 		constexpr static uint8_t FLAG_ALIVE = 2;
 
-		std::vector<FitRegion> region;
 		std::vector<Actor*> actor;
 		std::vector<Point> pos;
 		std::vector<uint8_t> flags;
@@ -183,8 +157,6 @@ private:
 		void UpdateNewState(size_t i);
 
 		void emplace_back(CachedActorsState&& another);
-
-		static FitRegion CalculateRegion(const Actor* inActor);
 
 		// flags manipulation should be inlined
 		void SetIsBumpable(const size_t i, const bool isBumpable)
@@ -211,9 +183,6 @@ private:
 	};
 
 	Map* map = nullptr;
-	// declaration order matters: traversabilityData holds a reference to dataAllocator, so the
-	// allocator has to outlive it on both construction and destruction
-	FixedSizePool<Data_t::TPage_t> dataAllocator;
 	Data_t traversabilityData;
 	CachedActorsState cachedActorsState { 0 };
 	bool hasBeenUpdatedThisFrame { false };
@@ -221,21 +190,18 @@ private:
 	void ValidateTraversabilityCacheSize();
 };
 
+/** The footprint of an actor of this circle size standing at this position. */
+GEM_EXPORT TraversabilityCache::ActorFootprint ComputeActorFootprint(const Point& pos, int circleSize, int mapWidth, int mapHeight);
+
 /**
- *  One immutable snapshot of a map's traversability data.
- *  Owns its allocator, so the pages are freed through it wherever the last reference happens to
- *  be dropped - which may be a worker thread. Sharing one allocator across snapshots would put
- *  that free on a racing thread.
+ *  One immutable snapshot of a map's traversability data, shared by reference between workers.
  */
 struct TraversabilityDataSnapshot {
-	FixedSizePool<TraversabilityCache::Data_t::TPage_t> allocator;
 	TraversabilityCache::Data_t data;
 	/** Which version of the source data this was taken from; see PathFinderScheduler. */
 	uint64_t version = 0;
 
-	TraversabilityDataSnapshot()
-		: data(allocator) {}
-
+	TraversabilityDataSnapshot() = default;
 	TraversabilityDataSnapshot(const TraversabilityDataSnapshot&) = delete;
 	TraversabilityDataSnapshot& operator=(const TraversabilityDataSnapshot&) = delete;
 };

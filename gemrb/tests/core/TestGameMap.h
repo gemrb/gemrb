@@ -92,13 +92,7 @@ public:
 	/** Token sum on that searchmap tile, as FindPath() reads it. */
 	TraversabilityCache::TraversabilityCellState StateAt(const Point& navPoint) const
 	{
-		return CellAt(navPoint).state;
-	}
-
-	/** Who the cache has standing there, for the ignore-myself comparison. */
-	const Movable* ActorAt(const Point& navPoint) const
-	{
-		return CellAt(navPoint).occupyingActor;
+		return CellAt(navPoint);
 	}
 
 	/**
@@ -174,7 +168,7 @@ private:
 		return SpawnActor(glyph.circleSize, glyph.flag, drawn.ActorPosOf(index));
 	}
 
-	TraversabilityCache::TraversabilityCellData CellAt(const Point& navPoint) const
+	TraversabilityCache::TraversabilityCellState CellAt(const Point& navPoint) const
 	{
 		const SearchmapPoint tile { navPoint };
 		const size_t idx = size_t(tile.y) * drawn.Width() + tile.x;

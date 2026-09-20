@@ -18,11 +18,6 @@ namespace {
 	constexpr int TileW = SEARCHMAP_SQUARE_WIDTH;
 	constexpr int TileH = SEARCHMAP_SQUARE_HEIGHT;
 
-	Point TileCentre(int tx, int ty)
-	{
-		return Point(tx * TileW + TileW / 2, ty * TileH + TileH / 2);
-	}
-
 	// Integer division rounding down, including for negatives: a tile bound derived from a
 	// negative pixel coordinate must stay negative rather than fold onto 0.
 	int FloorDiv(int a, int b)
@@ -35,28 +30,32 @@ namespace {
 	{
 		return a >= 0 ? (a + b - 1) / b : a / b;
 	}
+}
 
-	struct TileRange {
-		int firstX;
-		int lastX;
-		int firstY;
-		int lastY;
+// Returns the tiles whose centre can fall inside the actor's pixel footprint, clamped to the map.
+TraversabilityCache::ActorFootprint ComputeActorFootprint(const Point& pos, int circleSize, int mapWidth, int mapHeight)
+{
+	const int baseSize = Selectable::CircleSize2Radius(circleSize);
+	const int halfW = baseSize * 4;
+	const int halfH = baseSize * 3;
+	// The ground ellipse reaches halfW/halfH on both sides. The shape is even-sized and half-open,
+	// so for sizes 2 and up the far row/column (at +halfW/+halfH) has to be included explicitly -
+	// movement's IsWithinEllipse does include it, and a pathfinder that leaves it out routes the
+	// walker onto a tile the collision test then refuses. Size 1 keeps its original box.
+	const int includeFarEdge = circleSize < 2 ? 0 : 1;
+	const int originX = pos.x - halfW;
+	const int originY = pos.y - halfH;
+	const int sizeW = 2 * halfW + includeFarEdge;
+	const int sizeH = 2 * halfH + includeFarEdge;
+
+	return {
+		std::max(0, CeilDiv(originX - TileW / 2, TileW)),
+		std::min(mapWidth - 1, FloorDiv(originX + sizeW - 1 - TileW / 2, TileW)),
+		std::max(0, CeilDiv(originY - TileH / 2, TileH)),
+		std::min(mapHeight - 1, FloorDiv(originY + sizeH - 1 - TileH / 2, TileH)),
+		pos,
+		circleSize - 1
 	};
-
-	// The tiles whose centre can fall inside the region, clamped to the map. A tile centre is at
-	// tx*TileW + TileW/2, so the region's half-open pixel span becomes
-	//   region.x <= tx*TileW + TileW/2 <= region.x + region.w - 1.
-	// Folding the region test into these bounds is what keeps the stamping bodies free of
-	// per-tile border and bounds branches: the caller only has to run the ellipse test.
-	TileRange TilesCovering(const TraversabilityCache::FitRegion& region, int mapWidth, int mapHeight)
-	{
-		return {
-			std::max(0, CeilDiv(region.x - TileW / 2, TileW)),
-			std::min(mapWidth - 1, FloorDiv(region.x + region.w - 1 - TileW / 2, TileW)),
-			std::max(0, CeilDiv(region.y - TileH / 2, TileH)),
-			std::min(mapHeight - 1, FloorDiv(region.y + region.h - 1 - TileH / 2, TileH))
-		};
-	}
 }
 
 // C++14 needs a definition for a static constexpr member that gets odr-used, which is
@@ -77,7 +76,6 @@ size_t TraversabilityCache::CachedActorsState::AddCachedActorState(Actor* inActo
 	actor.push_back(inActor);
 	pos.push_back(inActor->Pos);
 	sizeCategory.push_back(inActor->getSizeCategory());
-	region.push_back(CalculateRegion(inActor));
 	flags.push_back(0);
 	SetIsBumpable(newIdx, inActor->ValidTarget(GA_ONLY_BUMPABLE));
 	SetIsAlive(newIdx, inActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED));
@@ -85,46 +83,20 @@ size_t TraversabilityCache::CachedActorsState::AddCachedActorState(Actor* inActo
 	return newIdx;
 }
 
-TraversabilityCache::FitRegion TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* inActor)
-{
-	const auto baseSize = inActor->CircleSize2Radius();
-	const GemRB::Size s(baseSize * 8, baseSize * 6);
-	return { inActor->Pos - s.Center(), s };
-}
-
 void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, Data_t& inOutTraversabilityData, const int inWidth) const
 {
 	const auto cachedCellState = GetCellStateFromFlags(i);
-	const FitRegion& actorRegion = region[i];
-	// Recover the centre the region was built around; the ellipse test depends on the actor's
-	// position, so the subtraction has to be the exact one the stamping added.
-	const Point centre(actorRegion.x + actorRegion.w / 2, actorRegion.y + actorRegion.h / 2);
-	const int circleSize = sizeCategory[i];
 	const size_t mapCells = inOutTraversabilityData.size();
 	const int mapHeight = static_cast<int>((mapCells - 1) / static_cast<size_t>(inWidth));
-	const TileRange range = TilesCovering(actorRegion, inWidth, mapHeight);
-	// a size <= 1 actor covers its whole region, so there is no ellipse to test
-	const int ellipseR = circleSize - 1;
+	const ActorFootprint footprint = ComputeActorFootprint(pos[i], sizeCategory[i], inWidth, mapHeight);
 
-	for (int ty = range.firstY; ty <= range.lastY; ++ty) {
+	for (int ty = footprint.firstY; ty <= footprint.lastY; ++ty) {
 		const size_t rowBase = static_cast<size_t>(ty) * inWidth;
-		for (int tx = range.firstX; tx <= range.lastX; ++tx) {
-			if (ellipseR >= 1 && !TileCentre(tx, ty).IsWithinEllipse(ellipseR, centre)) continue;
+		for (int tx = footprint.firstX; tx <= footprint.lastX; ++tx) {
+			if (!footprint.covers(SearchmapPoint(tx, ty))) continue;
 			const size_t idx = rowBase + tx;
 
-			TraversabilityCellData currentTraversabilityData = inOutTraversabilityData[idx];
-			currentTraversabilityData.state -= cachedCellState;
-
-			if (currentTraversabilityData.state == TraversabilityCellValueEmpty) {
-				inOutTraversabilityData.reset(idx);
-			} else {
-				// the following is a branchless version of zeroing `CurrentTraversabilityData.occupyingActor` if it's equal to actor[i]
-				currentTraversabilityData.occupyingActor = reinterpret_cast<Actor*>(
-					static_cast<size_t>(currentTraversabilityData.occupyingActor != actor[i]) *
-					reinterpret_cast<size_t>(currentTraversabilityData.occupyingActor));
-
-				inOutTraversabilityData[idx] = currentTraversabilityData;
-			}
+			inOutTraversabilityData[idx] = static_cast<TraversabilityCellState>(inOutTraversabilityData[idx] - cachedCellState);
 		}
 	}
 }
@@ -133,33 +105,24 @@ void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, Dat
 {
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
 	const auto currentCellState = GetCellStateFromFlags(newActorStateIdx);
-	const FitRegion& actorRegion = region[newActorStateIdx];
-	const Point centre = actor[i]->Pos;
 	const int circleSize = sizeCategory[newActorStateIdx];
 	const size_t mapCells = inOutTraversabilityData.size();
 	const int mapHeight = static_cast<int>((mapCells - 1) / static_cast<size_t>(inWidth));
-	const TileRange range = TilesCovering(actorRegion, inWidth, mapHeight);
-	// a size <= 1 actor covers its whole region, so there is no ellipse to test
-	const int ellipseR = circleSize - 1;
+	const ActorFootprint footprint = ComputeActorFootprint(actor[i]->Pos, circleSize, inWidth, mapHeight);
 
-	for (int ty = range.firstY; ty <= range.lastY; ++ty) {
+	for (int ty = footprint.firstY; ty <= footprint.lastY; ++ty) {
 		const size_t rowBase = static_cast<size_t>(ty) * inWidth;
-		for (int tx = range.firstX; tx <= range.lastX; ++tx) {
-			if (ellipseR >= 1 && !TileCentre(tx, ty).IsWithinEllipse(ellipseR, centre)) continue;
+		for (int tx = footprint.firstX; tx <= footprint.lastX; ++tx) {
+			if (!footprint.covers(SearchmapPoint(tx, ty))) continue;
 			const size_t idx = rowBase + tx;
 
-			TraversabilityCellData currentTraversabilityData = inOutTraversabilityData[idx];
-			currentTraversabilityData.state += currentCellState;
-			currentTraversabilityData.occupyingActor = currentCellState > TraversabilityCellValueEmpty ? actor[i] : currentTraversabilityData.occupyingActor;
-
-			inOutTraversabilityData[idx] = currentTraversabilityData;
+			inOutTraversabilityData[idx] = static_cast<TraversabilityCellState>(inOutTraversabilityData[idx] + currentCellState);
 		}
 	}
 
 	if (inShouldUpdateSelf) {
 		flags[i] = flags[newActorStateIdx];
 		pos[i] = pos[newActorStateIdx];
-		region[i] = region[newActorStateIdx];
 		sizeCategory[i] = sizeCategory[newActorStateIdx];
 	}
 
@@ -171,7 +134,6 @@ void TraversabilityCache::CachedActorsState::UpdateNewState(const size_t i)
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
 	flags[i] = flags[newActorStateIdx];
 	pos[i] = pos[newActorStateIdx];
-	region[i] = region[newActorStateIdx];
 	sizeCategory[i] = sizeCategory[newActorStateIdx];
 	erase(newActorStateIdx);
 }
@@ -306,7 +268,6 @@ TraversabilityCache::CachedActorsState::CachedActorsState(const size_t reserve)
 
 void TraversabilityCache::CachedActorsState::reserve(const size_t reserve)
 {
-	region.reserve(reserve);
 	actor.reserve(reserve);
 	pos.reserve(reserve);
 	flags.reserve(reserve);
@@ -315,7 +276,6 @@ void TraversabilityCache::CachedActorsState::reserve(const size_t reserve)
 
 void TraversabilityCache::CachedActorsState::clear()
 {
-	region.clear();
 	actor.clear();
 	pos.clear();
 	flags.clear();
@@ -324,7 +284,6 @@ void TraversabilityCache::CachedActorsState::clear()
 
 void TraversabilityCache::CachedActorsState::erase(const size_t idx)
 {
-	region.erase(region.begin() + idx);
 	actor.erase(actor.begin() + idx);
 	pos.erase(pos.begin() + idx);
 	flags.erase(flags.begin() + idx);
@@ -333,8 +292,7 @@ void TraversabilityCache::CachedActorsState::erase(const size_t idx)
 
 void TraversabilityCache::CachedActorsState::emplace_back(CachedActorsState&& another)
 {
-	reserve(region.size() + another.region.size());
-	region.insert(region.end(), another.region.begin(), another.region.end());
+	reserve(actor.size() + another.actor.size());
 	actor.insert(actor.end(), another.actor.begin(), another.actor.end());
 	pos.insert(pos.end(), another.pos.begin(), another.pos.end());
 	flags.insert(flags.end(), another.flags.begin(), another.flags.end());
@@ -369,7 +327,7 @@ void TraversabilityCache::ValidateTraversabilityCacheSize()
 	constexpr size_t spareCells = 1;
 	const size_t expectedSize = map->tileProps.GetSize().h * map->tileProps.GetSize().w + spareCells;
 	if (traversabilityData.size() != expectedSize) {
-		traversabilityData.clear(expectedSize);
+		traversabilityData.assign(expectedSize, TraversabilityCellValueEmpty);
 	}
 }
 }

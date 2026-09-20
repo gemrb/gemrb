@@ -280,15 +280,16 @@ PathNode PathFinder::CalculateLineEnd(const TileProps& tileProps, const Point& p
 // structure describing data needed for proper checks of LOS with actors along the way
 struct LineActorBlockingData {
 	const TraversabilityCache::Data_t& cache;
-	const Movable* identity = nullptr;
+	TraversabilityCache::ActorFootprint footprint;
 	TraversabilityCache::TraversabilityCellState threshold = TraversabilityCache::TraversabilityCellValueEmpty;
+	TraversabilityCache::TraversabilityCellState selfToken = TraversabilityCache::TraversabilityCellValueActor;
 	int mapWidth = 0;
 
 	bool blocks(const SearchmapPoint& p) const
 	{
-		const TraversabilityCache::TraversabilityCellData cell = cache[size_t(p.y) * mapWidth + p.x];
-		// state first: the walk crosses mostly empty tiles, and they short-circuit on one compare
-		return cell.state >= threshold && cell.occupyingActor != identity;
+		const TraversabilityCache::TraversabilityCellState cell = cache[size_t(p.y) * mapWidth + p.x];
+		// empty tiles short-circuit on the first compare; only an occupied one asks whose it is
+		return cell >= threshold && (!footprint.covers(p) || cell - selfToken >= threshold);
 	}
 };
 
@@ -301,7 +302,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	TRACY(ZoneScoped);
 
 	const unsigned int actorCircleSize = actorContext.circleSize;
-	const Movable* const actorIdentity = actorContext.identity;
+	const auto selfToken = actorContext.selfBumpable ? TraversabilityCache::TraversabilityCellValueActor : TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
 	LogDebugPathfinder("FindPath", "caller = {}, source = {}, destination = {}, dist = {}, actorCircleSize = {}",
 			   actorContext.scriptName, source, destination,
@@ -339,6 +340,10 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 	const Size& mapSize = tileProps.GetSize();
 	if (!mapSize.PointInside(smptSource)) return {};
+
+	// The mover's own ground; the checks below subtract its token from these cells so the mover
+	// ignores itself wherever it overlaps, whatever identity the cache happened to keep.
+	const TraversabilityCache::ActorFootprint moverFootprint = ComputeActorFootprint(source, static_cast<int>(actorCircleSize), mapSize.w, mapSize.h);
 
 	// Initialize data structures
 	const size_t mapCellsCount = mapSize.Area();
@@ -397,10 +402,10 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	// be drawn over an actor the movement could not bump.
 	// With actors blocking, the searchmap test already refuses every actor mark, so the cache view
 	// is redundant there and skipped.
-	const LineActorBlockingData actorBlockingData { traversabilityCacheSnapshot, actorIdentity, blockingTraversabilityValue, mapSize.w };
+	const LineActorBlockingData actorBlockingData { traversabilityCacheSnapshot, moverFootprint, blockingTraversabilityValue, selfToken, mapSize.w };
 	const LineActorBlockingData* actorView = actorsAreBlocking ? nullptr : &actorBlockingData;
-	const auto walkableLine = [&](GridRayCast walk) {
-		return IsLineWalkable(AccumulateAlongTheLine(tileProps, walk, true, actorCircleSize, actorView), actorsAreBlocking);
+	const auto walkableLine = [&](const GridRayCast& walk) {
+		return IsLineWalkable(AccumulateAlongTheLine(tileProps, walk, true, static_cast<int>(actorCircleSize), actorView), actorsAreBlocking);
 	};
 	const auto walkableTo = [&](const SearchmapPoint& from, const SearchmapPoint& to) {
 		return walkableLine(GridRayCast { from, to });
@@ -488,9 +493,12 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			if (childBlocked) continue;
 
 			// If there's an actor, check it can be bumped away
-			const TraversabilityCache::TraversabilityCellData childTraversability = traversabilityCacheSnapshot[smptChildIdx];
-			const bool childIsUnbumpable = childTraversability.occupyingActor != actorIdentity && childTraversability.state >= blockingTraversabilityValue;
-			if (childIsUnbumpable) continue;
+			auto childTraversabilityState = traversabilityCacheSnapshot[smptChildIdx];
+			// if the tile we're standing on, remove our traversability token, so we couldn't block ourselves
+			if (childTraversabilityState >= blockingTraversabilityValue && moverFootprint.covers(smptChild)) {
+				childTraversabilityState -= selfToken;
+			}
+			if (childTraversabilityState >= blockingTraversabilityValue) continue;
 
 			// A fresh cell reads as infinitely far.
 			const uint32_t oldDist = (genOf[smptChildIdx] == searchGen) ? distFromStart[smptChildIdx] : std::numeric_limits<uint32_t>::max();

@@ -377,16 +377,6 @@ TEST(TraversabilityTest, DrawnActorsPopulateTheCache)
 	const test::TestTraversability solid { map, false };
 	EXPECT_EQ(solid.StateAt(map.ActorPosOf(0)), TraversabilityCache::TraversabilityCellValueActorNonTraversable);
 	EXPECT_EQ(solid.StateAt(map.ActorPosOf(1)), TraversabilityCache::TraversabilityCellValueActorNonTraversable);
-
-	// each drawn actor gets its own identity, so they can tell each other apart
-	EXPECT_NE(map.ActorIdentityOf(0), map.ActorIdentityOf(1));
-	EXPECT_NE(map.ActorIdentityOf(0), nullptr);
-
-	// the identity belongs to the drawing rather than to a cache, so it is the one that lands
-	// in the cells and every cache built over this map names the same actor
-	EXPECT_EQ(bumpable.ActorAt(map.ActorPosOf(0)), map.ActorIdentityOf(0));
-	EXPECT_EQ(solid.ActorAt(map.ActorPosOf(0)), map.ActorIdentityOf(0));
-	EXPECT_EQ(bumpable.ActorAt(map.ActorPosOf(1)), map.ActorIdentityOf(1));
 }
 
 // The cache, not the searchmap, is what makes an actor stop a route. A bumpable one only

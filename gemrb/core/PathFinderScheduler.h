@@ -279,9 +279,7 @@ private:
 	static std::vector<FindPathRequestId> cancelledQueue;
 
 	// cached state per map, keyed by map's global ID
-	/** Pages' pool for traversabilityCacheData below. Facing only main thread. */
-	static FixedSizePool<TraversabilityCache::Data_t::TPage_t> traversabilityCacheSnapshotAllocator;
-	/** Main-thread instance per map; SyncFrom() updates it incrementally from the map's dirty set */
+	/** Main-thread instance per map; Sync() copies the map's data into it when it changed */
 	static std::unordered_map<ScriptID, TraversabilityCache::Data_t> traversabilityCacheData;
 
 	// The three snapshots below are handed to workers by shared handle rather than by value.
@@ -297,7 +295,7 @@ private:
 	static std::unordered_map<ScriptID, std::shared_ptr<const std::vector<ActorSearchMapData>>> actorsSnapshot;
 	/**
 	 *  Immutable snapshot of the main-thread instance, which cannot be shared directly because
-	 *  SyncFrom() mutates it in place. Taken lazily by the first worker to claim a request for the
+	 *  Sync() replaces it in place. Taken lazily by the first worker to claim a request for the
 	 *  map after a version bump, so the copy stays off the main thread and every other worker
 	 *  claiming against the same version gets it for a refcount bump.
 	 */
