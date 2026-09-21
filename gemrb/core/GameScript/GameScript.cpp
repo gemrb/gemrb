@@ -1110,9 +1110,9 @@ static const ActionLink actionnames[] = {
 	{ "verbalconstant", GameScript::VerbalConstant, 0 },
 	{ "verbalconstanthead", GameScript::VerbalConstantHead, 0 },
 	{ "wait", GameScript::Wait, AF_BLOCKING },
-	{ "waitsync", GameScript::Wait, AF_BLOCKING },
 	{ "waitanimation", GameScript::WaitAnimation, AF_BLOCKING }, //iwd2
 	{ "waitrandom", GameScript::WaitRandom, AF_BLOCKING | AF_ALIVE },
+	{ "waitsync", GameScript::WaitSync, AF_BLOCKING },
 	{ "weather", GameScript::Weather, 0 },
 	{ "xequipitem", GameScript::XEquipItem, 0 },
 	{ "zoomlock", GameScript::ZoomLock, 0 },

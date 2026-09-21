@@ -1295,6 +1295,7 @@ public: //Script Functions
 	static void Wait(Scriptable* Sender, Holder<Action> parameters);
 	static void WaitAnimation(Scriptable* Sender, Holder<Action> parameters);
 	static void WaitRandom(Scriptable* Sender, Holder<Action> parameters);
+	static void WaitSync(Scriptable* Sender, Holder<Action> parameters);
 	static void Weather(Scriptable* Sender, Holder<Action> parameters);
 	static void XEquipItem(Scriptable* Sender, Holder<Action> parameters);
 	static void ZoomLock(Scriptable* Sender, Holder<Action> parameters);

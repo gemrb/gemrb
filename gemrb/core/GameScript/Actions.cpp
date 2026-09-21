@@ -1089,6 +1089,23 @@ void GameScript::Wait(Scriptable* Sender, Holder<Action> parameters)
 	assert(Sender->CurrentActionState >= 0);
 }
 
+// negates effect of faster AI speed
+void GameScript::WaitSync(Scriptable* Sender, Holder<Action> parameters)
+{
+	if (!Sender->CurrentActionState) {
+		Sender->CurrentActionState = parameters->int0Parameter * core->Time.ticksPerSec;
+	} else {
+		Sender->CurrentActionState--;
+	}
+
+	if (!Sender->CurrentActionState) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	assert(Sender->CurrentActionState >= 0);
+}
+
 void GameScript::SmallWait(Scriptable* Sender, Holder<Action> parameters)
 {
 	if (!Sender->CurrentActionState) {
