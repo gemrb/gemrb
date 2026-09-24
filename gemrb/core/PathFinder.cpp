@@ -47,7 +47,7 @@ constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent { { 1, 0, -1, 0, 1, 1,
 constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent { { 0, 1, 0, -1, 1, -1, 1, -1 } };
 
 // Distance is accumulated in COST_SCALE-ths of a tile, so we can put correct price tag on diagonal steps
-constexpr unsigned int COST_SCALE = 256;
+constexpr float COST_SCALE = 256.f;
 
 // Cosines
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383 } };
@@ -429,7 +429,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 		// `floor(x + 0.5f)` is round-half-up, a single instruction, and correct in this case, because
 		// costs are never negative.
 		const uint32_t heuristicFixed = static_cast<uint32_t>(
-			std::floor(HEURISTIC_WEIGHT * distance * static_cast<float>(COST_SCALE) + 0.5f));
+			std::floor(HEURISTIC_WEIGHT * distance * COST_SCALE + 0.5f));
 		return distFromStart[smptChildIdx] + heuristicFixed;
 	};
 
@@ -510,47 +510,45 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			if (bestDist >= oldDist) continue;
 			SearchmapPoint bestParent = smptParent;
 
-			{
-				// Theta-star path if there is LOS
-				if (!walkableTo(smptParent, smptChild)) {
-					// Fall back to A-star path
-					bestDist = std::numeric_limits<uint32_t>::max();
-					// Find already visited neighbour with shortest: path from start + path to child
-					for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
-						const SearchmapPoint smptVis(smptChild.x + dxAdjacent[j], smptChild.y + dyAdjacent[j]);
-						if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
-						// Only consider already visited (closed)
-						const int smptVisIdx = smptVis.y * mapSize.w + smptVis.x;
-						if (genOf[smptVisIdx] != searchGen || !isClosed[smptVisIdx]) continue;
-						// The A* fallback takes a grid neighbour as parent without asking whether
-						// the step is walkable. Two passable tiles sharing an edge are always
-						// joined; two sharing only a corner are not, for a big actor whose radius
-						// can be refused on the crossing line.
-						if (dxAdjacent[j] && dyAdjacent[j] &&
-						    !walkableTo(smptVis, smptChild)) continue;
+			// Theta-star path if there is LOS
+			if (!walkableTo(smptParent, smptChild)) {
+				// Fall back to A-star path
+				bestDist = std::numeric_limits<uint32_t>::max();
+				// Find already visited neighbour with shortest: path from start + path to child
+				for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
+					const SearchmapPoint smptVis(smptChild.x + dxAdjacent[j], smptChild.y + dyAdjacent[j]);
+					if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
+					// Only consider already visited (closed)
+					const int smptVisIdx = smptVis.y * mapSize.w + smptVis.x;
+					if (genOf[smptVisIdx] != searchGen || !isClosed[smptVisIdx]) continue;
+					// The A* fallback takes a grid neighbour as parent without asking whether
+					// the step is walkable. Two passable tiles sharing an edge are always
+					// joined; two sharing only a corner are not, for a big actor whose radius
+					// can be refused on the crossing line.
+					if (dxAdjacent[j] && dyAdjacent[j] &&
+					    !walkableTo(smptVis, smptChild)) continue;
 
-						const uint32_t visDist = distFromStart[smptVisIdx] + StepCost(smptVis, smptChild);
-						if (visDist < bestDist) {
-							bestParent = smptVis;
-							bestDist = visDist;
-						}
+					const uint32_t visDist = distFromStart[smptVisIdx] + StepCost(smptVis, smptChild);
+					if (visDist < bestDist) {
+						bestParent = smptVis;
+						bestDist = visDist;
 					}
-					// Nothing reachable beat what the child already had - leave the cell exactly
-					// as it was.
-					if (bestDist >= oldDist) continue;
 				}
-
-				// Commit. First touch: stamp the cell before writing any field.
-				genOf[smptChildIdx] = searchGen;
-				isClosed[smptChildIdx] = false;
-				parents[smptChildIdx] = bestParent;
-				distFromStart[smptChildIdx] = bestDist;
-
-				const uint32_t newCost = getHeuristic(smptChild, smptChildIdx);
-				// The queue keys on the cell index, and holds at most one entry per cell: this
-				// either queues the child or moves the entry it already has down to the new cost.
-				open.Push(smptChild, uint32_t(smptChildIdx), newCost);
+				// Nothing reachable beat what the child already had - leave the cell exactly
+				// as it was.
+				if (bestDist >= oldDist) continue;
 			}
+
+			// Commit. First touch: stamp the cell before writing any field.
+			genOf[smptChildIdx] = searchGen;
+			isClosed[smptChildIdx] = false;
+			parents[smptChildIdx] = bestParent;
+			distFromStart[smptChildIdx] = bestDist;
+
+			const uint32_t newCost = getHeuristic(smptChild, smptChildIdx);
+			// The queue keys on the cell index, and holds at most one entry per cell: this
+			// either queues the child or moves the entry it already has down to the new cost.
+			open.Push(smptChild, uint32_t(smptChildIdx), newCost);
 		}
 	}
 

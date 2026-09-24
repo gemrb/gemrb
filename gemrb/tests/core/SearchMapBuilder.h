@@ -435,7 +435,7 @@ namespace test {
 		{
 			for (size_t i = 0; i < map.Actors().size(); ++i) {
 				const auto& drawn = map.Actors()[i];
-				AddActor(map.ActorPosOf(i), drawn.circleSize, actorsAreBumpable, map.ActorIdentityOf(i));
+				AddActor(map.ActorPosOf(i), drawn.circleSize, actorsAreBumpable);
 			}
 		}
 
@@ -446,7 +446,7 @@ namespace test {
 		 * Stamps an actor's ground circle into the cache: every tile whose centre falls inside
 		 * the pixel footprint and IsOverCircle() accepts.
 		 */
-		void AddActor(const Point& pos, int circleSize, bool bumpable, ActorIdentity who = nullptr)
+		void AddActor(const Point& pos, int circleSize, bool bumpable)
 		{
 			const int baseSize = Selectable::CircleSize2Radius(circleSize);
 			const Size shape(baseSize * 8, baseSize * 6);
