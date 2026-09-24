@@ -218,7 +218,8 @@ static TileProps MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day
 		throw std::runtime_error("No heightmap available.");
 	}
 
-	const Size propsize(tm->XCellCount * 4, CeilDiv(tm->YCellCount * 64, 12));
+	const Size mapPixels = tm->GetMapSize();
+	const Size propsize(mapPixels.w / SEARCHMAP_TILE_WIDTH, CeilDiv(mapPixels.h, SEARCHMAP_TILE_HEIGHT));
 
 	PixelFormat fmt = TileProps::pixelFormat;
 	fmt.palette = lightmap->GetPalette();

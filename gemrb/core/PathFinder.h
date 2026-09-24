@@ -153,9 +153,7 @@ enum {
 	PF_ACTORS_ARE_BLOCKING = 4
 };
 
-constexpr unsigned int SEARCHMAP_SQUARE_WIDTH = 16;
-constexpr unsigned int SEARCHMAP_SQUARE_HEIGHT = 12;
-constexpr unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
+// SEARCHMAP_TILE_WIDTH/HEIGHT/DIAGONAL live in Region.h, beside SearchmapPoint
 
 namespace {
 
@@ -372,7 +370,7 @@ public:
 	class GridRayCast {
 	public:
 		GridRayCast(const NavmapPoint& from, const NavmapPoint& to) noexcept
-			: GridRayCast(from.x, from.y, to.x, to.y, SEARCHMAP_SQUARE_WIDTH, SEARCHMAP_SQUARE_HEIGHT) {}
+			: GridRayCast(from.x, from.y, to.x, to.y, SEARCHMAP_TILE_WIDTH, SEARCHMAP_TILE_HEIGHT) {}
 
 		// tile indices in half tiles, so that a tile centre is still an exact integer
 		GridRayCast(const SearchmapPoint& from, const SearchmapPoint& to) noexcept

@@ -2012,8 +2012,9 @@ TEST(PathFinderTest, LineEndIsClampedToTheMap)
 
 	const PathNode end = PathFinder::CalculateLineEnd(map.Props(), map.Start(), 100, E);
 
-	EXPECT_LE(end.point.x, (map.Width() - 1) * 16);
-	EXPECT_LE(end.point.y, (map.Height() - 1) * 12);
+	const Point mapEdge = SearchmapPoint(map.Width() - 1, map.Height() - 1).ToNavmapOrigin();
+	EXPECT_LE(end.point.x, mapEdge.x);
+	EXPECT_LE(end.point.y, mapEdge.y);
 	EXPECT_GE(end.point.x, 1);
 	EXPECT_GE(end.point.y, 1);
 	EXPECT_EQ(end.orient, E) << "and it still faces the way it was sent";
@@ -3013,7 +3014,7 @@ TEST(FindPathTest, ADiagonalStepIsNotAsCheapAsAStraightOne)
 	ASSERT_FALSE(path.Empty());
 	EXPECT_TRUE(test::PathIsSane(map, from, path));
 	// the straight run is 8 tiles; anything that dips into the rows below pays for it
-	EXPECT_LE(test::PathLength(from, path), Distance(from, map.End()) + SEARCHMAP_SQUARE_WIDTH)
+	EXPECT_LE(test::PathLength(from, path), Distance(from, map.End()) + SEARCHMAP_TILE_WIDTH)
 		<< "a straight run must not be traded for a diagonal detour of the same step count";
 }
 }

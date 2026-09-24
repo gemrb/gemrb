@@ -1514,10 +1514,10 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 		}
 	} debugPalettes;
 
-	Region block(0, 0, 16, 12);
+	Region block(0, 0, SEARCHMAP_TILE_WIDTH, SEARCHMAP_TILE_HEIGHT);
 
-	int w = vp.w / 16 + 2;
-	int h = vp.h / 12 + 2;
+	int w = vp.w / SEARCHMAP_TILE_WIDTH + 2;
+	int h = vp.h / SEARCHMAP_TILE_HEIGHT + 2;
 
 	BlitFlags flags = BlitFlags::BLENDED;
 	if (dFlags & DEBUG_SHOW_LIGHTMAP) {
@@ -1526,8 +1526,8 @@ void Map::DrawDebugOverlay(const Region& vp, uint32_t dFlags) const
 
 	for (int x = 0; x < w; x++) {
 		for (int y = 0; y < h; y++) {
-			block.x = x * 16 - (vp.x % 16);
-			block.y = y * 12 - (vp.y % 12);
+			block.x = x * SEARCHMAP_TILE_WIDTH - (vp.x % SEARCHMAP_TILE_WIDTH);
+			block.y = y * SEARCHMAP_TILE_HEIGHT - (vp.y % SEARCHMAP_TILE_HEIGHT);
 
 			SearchmapPoint p = SearchmapPoint(x, y) + SearchmapPoint(vp.origin);
 
@@ -2672,8 +2672,7 @@ void Map::AdjustPositionNavmap(NavmapPoint& goal, const Size& radius) const
 {
 	SearchmapPoint smptGoal { goal };
 	AdjustPosition(smptGoal, radius);
-	goal.x = smptGoal.x * 16 + 8;
-	goal.y = smptGoal.y * 12 + 6;
+	goal = smptGoal.ToNavmapCenter();
 }
 
 void Map::AdjustPosition(SearchmapPoint& goal, const Size& startingRadius, int size) const
@@ -3240,14 +3239,14 @@ Container* Map::GetPile(const NavmapPoint& position)
 	ieVariable pileName;
 	pileName.Format("heap_{}.{}", smPos.x, smPos.y);
 	// pixel position is centered on search square, we convert back and forth to round off
-	Point upperLeft = smPos.ToNavmapPoint();
-	Point center = upperLeft + Point(8, 6);
+	Point center = smPos.ToNavmapCenter();
 	Container* container = TMap->GetContainer(center, IE_CONTAINER_PILE);
 	if (!container) {
 		container = AddContainer(pileName, IE_CONTAINER_PILE, nullptr);
 		container->SetPos(center);
 		//bounding box covers the search square
-		container->BBox = Region::RegionFromPoints(upperLeft, Point(center.x + 8, center.y + 6));
+		const Point upperLeft = smPos.ToNavmapOrigin();
+		container->BBox = Region::RegionFromPoints(upperLeft, upperLeft + Point(SEARCHMAP_TILE_WIDTH, SEARCHMAP_TILE_HEIGHT));
 	}
 	return container;
 }

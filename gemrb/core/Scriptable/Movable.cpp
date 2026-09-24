@@ -632,7 +632,7 @@ void Movable::WalkTo(const Point& Des, int distance, FindPathRequestType InReque
 		return;
 	}
 
-	if (Pos.x / 16 == Des.x / 16 && Pos.y / 12 == Des.y / 12) {
+	if (SearchmapPoint(Pos) == SearchmapPoint(Des)) {
 		ClearPath(true);
 		SetStance(IE_ANI_HEAD_TURN);
 		return;

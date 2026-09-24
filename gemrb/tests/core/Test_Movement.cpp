@@ -500,8 +500,8 @@ TEST_F(TraversabilityLiveTest, CacheCountsAndClearsOverlappingActors)
 		"#.....#",
 		"#######"
 	};
-	const Point here(3 * 16 + 8, 1 * 12 + 6);
-	const Point there(5 * 16 + 8, 1 * 12 + 6);
+	const Point here = SearchmapPoint(3, 1).ToNavmapCenter();
+	const Point there = SearchmapPoint(5, 1).ToNavmapCenter();
 	Actor* first = live.SpawnActor(1, PathMapFlags::PC, here);
 	Actor* second = live.SpawnActor(1, PathMapFlags::NPC, here);
 	ASSERT_NE(first, nullptr);
@@ -661,8 +661,8 @@ TEST_F(TraversabilityLiveTest, LiveCacheLetsAnActorIgnoreItsOwnTile)
 		"#...2...#",
 		"#########"
 	};
-	const Point from(4 * 16 + 8, 1 * 12 + 6);
-	const Point to(7 * 16 + 8, 1 * 12 + 6);
+	const Point from = SearchmapPoint(4, 1).ToNavmapCenter();
+	const Point to = SearchmapPoint(7, 1).ToNavmapCenter();
 	Actor* actor = live.ActorOf(0);
 	ASSERT_NE(actor, nullptr);
 	TestGameLoop::RunFrame();
@@ -671,7 +671,7 @@ TEST_F(TraversabilityLiveTest, LiveCacheLetsAnActorIgnoreItsOwnTile)
 	constexpr int actorsBlock = PF_SIGHT | PF_ACTORS_ARE_BLOCKING;
 	EXPECT_FALSE(FindPathOnLive(live, from, to, actor, 2, actorsBlock).Empty())
 		<< "an actor must be able to walk out of its own footprint";
-	const Point strangerFrom(1 * 16 + 8, 1 * 12 + 6);
+	const Point strangerFrom = SearchmapPoint(1, 1).ToNavmapCenter();
 	EXPECT_TRUE(FindPathOnLive(live, strangerFrom, to, nullptr, 2, actorsBlock).Empty())
 		<< "the very same footprint has to stop anyone else in a one tile corridor";
 }

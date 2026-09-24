@@ -15,8 +15,8 @@ namespace GemRB {
 // circle, so stamping marks every tile whose centre falls inside it.
 namespace {
 
-	constexpr int TileW = SEARCHMAP_SQUARE_WIDTH;
-	constexpr int TileH = SEARCHMAP_SQUARE_HEIGHT;
+	constexpr int TileW = SEARCHMAP_TILE_WIDTH;
+	constexpr int TileH = SEARCHMAP_TILE_HEIGHT;
 
 	// Integer division rounding down, including for negatives: a tile bound derived from a
 	// negative pixel coordinate must stay negative rather than fold onto 0.

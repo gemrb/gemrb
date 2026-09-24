@@ -5146,8 +5146,7 @@ void Actor::SetPosition(const Point& nmptTarget, bool jump, const Size& radius, 
 	if (p == q) {
 		MoveTo(nmptTarget);
 	} else {
-		Point nmpt { p.x * 16 + 8, p.y * 12 + 6 };
-		MoveTo(nmpt);
+		MoveTo(p.ToNavmapCenter());
 	}
 }
 

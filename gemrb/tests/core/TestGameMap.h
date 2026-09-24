@@ -139,7 +139,7 @@ private:
 	{
 		auto* tileMap = new TileMap();
 		tileMap->XCellCount = drawn.Width() / 4;
-		tileMap->YCellCount = (drawn.Height() * 12) / 64 + 1;
+		tileMap->YCellCount = (drawn.Height() * SEARCHMAP_TILE_HEIGHT) / 64 + 1;
 
 		Map* map = new Map(tileMap, drawn.Props(), nullptr);
 		core->GetGame()->AddMap(map);

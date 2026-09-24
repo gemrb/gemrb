@@ -114,13 +114,6 @@ namespace {
 		std::vector<SearchmapPoint> waypoints;
 	};
 
-	// The navmap pixel centre of a searchmap tile.
-	Point TileCentre(const SearchmapPoint& tile) noexcept
-	{
-		return Point(tile.x * SEARCHMAP_SQUARE_WIDTH + SEARCHMAP_SQUARE_WIDTH / 2,
-			     tile.y * SEARCHMAP_SQUARE_HEIGHT + SEARCHMAP_SQUARE_HEIGHT / 2);
-	}
-
 	// One thread_local object behind one deliberately out-of-line accessor, rather than four
 	// thread_local variables used directly. gemrb_core is a shared library, so a thread_local
 	// access uses the general-dynamic TLS model - a real __tls_get_addr() call - and gcc will
@@ -151,7 +144,7 @@ bool PathFinder::CalculateRunAwayPoint(const TileProps& tileProps, const Point& 
 	size_t tries = 0;
 	NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / actorSpeed);
 	if (std::abs(dx) <= 0.333 && std::abs(dy) <= 0.333) return false;
-	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
+	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_TILE_DIAGONAL * SEARCHMAP_TILE_DIAGONAL)) {
 		Point rad(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy));
 		if (!(GetBlockedInRadiusTile(tileProps, SearchmapPoint(rad), actorCircleSize) & PathMapFlags::PASSABLE)) {
 			tries++;
@@ -183,7 +176,7 @@ bool PathFinder::CalculateRandomWalkPoint(const TileProps& tileProps, const Poin
 
 	NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / actorSpeed);
 	size_t tries = 0;
-	while (SquaredDistance(p, s) < unsigned(radius * radius * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
+	while (SquaredDistance(p, s) < unsigned(radius * radius * SEARCHMAP_TILE_DIAGONAL * SEARCHMAP_TILE_DIAGONAL)) {
 		if (!(GetBlockedInRadiusTile(tileProps, SearchmapPoint(p + Point(dx, dy)), actorCircleSize) & PathMapFlags::PASSABLE)) {
 			tries++;
 			// Give up if backed into a corner
@@ -206,7 +199,7 @@ bool PathFinder::CalculateRandomWalkPoint(const TileProps& tileProps, const Poin
 		p.y -= dy;
 	}
 	const Size& mapSize = tileProps.GetSize();
-	outStep.point = Clamp(p, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
+	outStep.point = Clamp(p, Point(1, 1), SearchmapPoint(mapSize.w - 1, mapSize.h - 1).ToNavmapOrigin());
 	outStep.orient = GetOrient(s, p);
 	return true;
 }
@@ -236,7 +229,7 @@ Path PathFinder::CalculateLinePath(const TileProps& tileProps, const Point& star
 			return path;
 		}
 
-		if (p.x > mapSize.w * 16 || p.y > mapSize.h * 12) {
+		if (p.x > mapSize.w * SEARCHMAP_TILE_WIDTH || p.y > mapSize.h * SEARCHMAP_TILE_HEIGHT) {
 			return path;
 		}
 
@@ -269,10 +262,10 @@ Path PathFinder::CalculateLinePath(const TileProps& tileProps, const Point& star
 PathNode PathFinder::CalculateLineEnd(const TileProps& tileProps, const Point& p, int steps, orient_t orient)
 {
 	PathNode lineEnd;
-	lineEnd.point.x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
-	lineEnd.point.y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
+	lineEnd.point.x = p.x + steps * SEARCHMAP_TILE_DIAGONAL * dxRand[orient];
+	lineEnd.point.y = p.y + steps * SEARCHMAP_TILE_DIAGONAL * dyRand[orient];
 	const Size& mapSize = tileProps.GetSize();
-	lineEnd.point = Clamp(lineEnd.point, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
+	lineEnd.point = Clamp(lineEnd.point, Point(1, 1), SearchmapPoint(mapSize.w - 1, mapSize.h - 1).ToNavmapOrigin());
 	lineEnd.orient = GetOrient(p, lineEnd.point);
 	return lineEnd;
 }
@@ -413,7 +406,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 	// The same query from a navmap pixel, for the straightening pass's first leg.
 	const auto walkableFromPixel = [&](const NavmapPoint& from, const SearchmapPoint& to) {
-		return walkableLine(GridRayCast { NavmapPoint(from), TileCentre(to) });
+		return walkableLine(GridRayCast { NavmapPoint(from), to.ToNavmapCenter() });
 	};
 	const auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) -> uint32_t {
 		const int xDist = smptChild.x - smptDest.x;
@@ -464,7 +457,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 		if (minDistance &&
 		    parents[smptCurrentIdx] != smptCurrent &&
-		    SquaredDistance(TileCentre(smptCurrent), nmptDest) < squaredMinDist &&
+		    SquaredDistance(smptCurrent.ToNavmapCenter(), nmptDest) < squaredMinDist &&
 		    (!(pathfindingFlags & PF_SIGHT) || IsVisibleLOS(tileProps, smptCurrent, smptDest0))) { // FIXME: should probably be smptDest
 			smptDest = smptCurrent;
 			foundPath = true;
@@ -571,7 +564,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 		// The pass starts from the actor's real pixel; the source tile centre is offered as the
 		// first candidate and kept only when the actor cannot see the first node directly. That
 		// stub is inside one tile, so it needs no line-of-sight query.
-		const NavmapPoint nmptSourceCentre = TileCentre(smptSource);
+		const NavmapPoint nmptSourceCentre = smptSource.ToNavmapCenter();
 		NavmapPoint anchorPixel = nmptSource;
 		if (anchorPixel != nmptSourceCentre) {
 			waypoints.insert(waypoints.begin(), smptSource);
@@ -580,7 +573,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			size_t kept = 0;
 			for (size_t i = 0; i + 1 < waypoints.size(); ++i) {
 				if (!walkableFromPixel(anchorPixel, waypoints[i + 1])) {
-					anchorPixel = TileCentre(waypoints[i]);
+					anchorPixel = waypoints[i].ToNavmapCenter();
 					waypoints[kept++] = waypoints[i];
 				}
 			}
@@ -590,8 +583,8 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 		Path resultPath;
 		for (size_t i = waypoints.size(); i-- > 0;) {
-			const NavmapPoint nmptStep = TileCentre(waypoints[i]);
-			const NavmapPoint nmptPrevious = i == 0 ? nmptSource : TileCentre(waypoints[i - 1]);
+			const NavmapPoint nmptStep = waypoints[i].ToNavmapCenter();
+			const NavmapPoint nmptPrevious = i == 0 ? nmptSource : waypoints[i - 1].ToNavmapCenter();
 			PathNode newStep { nmptStep, S };
 			// movement in general allows characters to walk backwards given that
 			// the destination is behind the character (within a threshold), and
@@ -627,9 +620,9 @@ void PathFinder::ScaleDeltas(float_t& dx, float_t& dy, const float_t factor)
 	//
 	// Normalizing in tile space makes the whole thing one scalar on both components, so
 	// the direction survives exactly, and the length is constant in tiles as intended.
-	const float_t lengthInTiles = std::hypotf(dx / static_cast<float_t>(SEARCHMAP_SQUARE_WIDTH),
-						  dy / static_cast<float_t>(SEARCHMAP_SQUARE_HEIGHT));
-	const float_t q = (STEP_RADIUS / static_cast<float_t>(SEARCHMAP_SQUARE_WIDTH)) / lengthInTiles;
+	const float_t lengthInTiles = std::hypotf(dx / static_cast<float_t>(SEARCHMAP_TILE_WIDTH),
+						  dy / static_cast<float_t>(SEARCHMAP_TILE_HEIGHT));
+	const float_t q = (STEP_RADIUS / static_cast<float_t>(SEARCHMAP_TILE_WIDTH)) / lengthInTiles;
 
 	// never overshoot the target the step is aimed at
 	const float_t scale = std::min(q * factor, 1.0f);
@@ -694,7 +687,7 @@ void PathFinder::ClearSearchMapFor(const std::vector<ActorSearchMapData>& actors
 	// have been cleared by this PaintSearchMap(..., PathMapFlags::UNMARKED).
 	// Skip the instigator itself — its footprint was just cleared intentionally.
 	// Uses snapshotted actor data — safe for worker threads.
-	constexpr unsigned int radiusPixels = MAX_CIRCLE_SIZE * 3 * 16;
+	constexpr unsigned int radiusPixels = MAX_CIRCLE_SIZE * 3 * SEARCHMAP_TILE_WIDTH;
 	constexpr unsigned int radiusPixelsSquared = radiusPixels * radiusPixels;
 	for (const auto& data : actorsData) {
 		if (!data.blocksSearchMap) continue;
@@ -966,13 +959,12 @@ void PathFinder::AdjustPositionDirected(const TileProps& tileProps, NavmapPoint&
 	}
 
 	std::map<unsigned int, SearchmapPoint, std::greater<>> candidates;
-	NavmapPoint adjGoal = goal - NavmapPoint(8, 6);
 	int radius = startingRadius - 1;
 	while (radius < 2 * startingRadius) { // reduce this search radius if needed
 		for (auto& offset : baseOffsets) {
 			SearchmapPoint candidate = smptGoal + offset * radius;
 			if (bool(GetBlockedTile(tileProps, candidate, startingRadius) & PathMapFlags::PASSABLE)) {
-				unsigned int range = SquaredDistance(candidate.ToNavmapPoint(), adjGoal);
+				unsigned int range = SquaredDistance(candidate.ToNavmapCenter(), goal);
 				candidates[range] = candidate;
 			}
 		}
@@ -999,8 +991,7 @@ void PathFinder::AdjustPositionDirected(const TileProps& tileProps, NavmapPoint&
 		}
 	}
 
-	goal.x = smptGoal.x * 16 + 8;
-	goal.y = smptGoal.y * 12 + 6;
+	goal = smptGoal.ToNavmapCenter();
 }
 
 void PathFinder::AdjustPosition(const TileProps& tileProps, SearchmapPoint& goal, const Size& startingRadius, int size)

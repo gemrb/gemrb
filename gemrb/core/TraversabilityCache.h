@@ -74,9 +74,7 @@ public:
 			if (static_cast<unsigned>(tile.x - firstX) > static_cast<unsigned>(lastX - firstX)) return false;
 			if (static_cast<unsigned>(tile.y - firstY) > static_cast<unsigned>(lastY - firstY)) return false;
 			if (ellipseR < 1) return true;
-			// tile centres are at tx*16+8, ty*12+6 (SEARCHMAP_SQUARE_WIDTH/HEIGHT)
-			const Point tileCentre(tile.x * 16 + 8, tile.y * 12 + 6);
-			return tileCentre.IsWithinEllipse(ellipseR, centre);
+			return tile.ToNavmapCenter().IsWithinEllipse(ellipseR, centre);
 		}
 	};
 

@@ -396,7 +396,7 @@ namespace test {
 		// centre of a tile in navmap coordinates, which is what the Point-taking overloads want
 		static Point Nav(int x, int y) noexcept
 		{
-			return Point(x * 16 + 8, y * 12 + 6);
+			return SearchmapPoint(x, y).ToNavmapCenter();
 		}
 
 	private:
@@ -454,16 +454,16 @@ namespace test {
 			const auto token = bumpable ? TraversabilityCache::TraversabilityCellValueActor : TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
 			auto floorDiv = [](int a, int b) { return a >= 0 ? a / b : -((-a + b - 1) / b); };
-			const int firstX = floorDiv(origin.x, 16) - 1;
-			const int lastX = floorDiv(origin.x + shape.w - 1, 16) + 1;
-			const int firstY = floorDiv(origin.y, 12) - 1;
-			const int lastY = floorDiv(origin.y + shape.h - 1, 12) + 1;
+			const int firstX = floorDiv(origin.x, SEARCHMAP_TILE_WIDTH) - 1;
+			const int lastX = floorDiv(origin.x + shape.w - 1, SEARCHMAP_TILE_WIDTH) + 1;
+			const int firstY = floorDiv(origin.y, SEARCHMAP_TILE_HEIGHT) - 1;
+			const int lastY = floorDiv(origin.y + shape.h - 1, SEARCHMAP_TILE_HEIGHT) + 1;
 
 			for (int ty = firstY; ty <= lastY; ++ty) {
 				if (ty < 0 || ty >= tileHeight) continue;
 				for (int tx = firstX; tx <= lastX; ++tx) {
 					if (tx < 0 || tx >= tileWidth) continue;
-					const Point centre(tx * 16 + 8, ty * 12 + 6);
+					const Point centre = SearchmapPoint(tx, ty).ToNavmapCenter();
 					if (centre.x < origin.x || centre.y < origin.y || centre.x >= origin.x + shape.w || centre.y >= origin.y + shape.h) continue;
 					if (!Selectable::IsOverCircle(centre, pos, circleSize)) continue;
 
@@ -522,13 +522,13 @@ namespace test {
 	 * A distance in whole searchmap tiles, as navmap pixels.
 	 *
 	 * A tile is 16x12, so there is no single pixel count for a tile; FindPath() measures with
-	 * Distance() on tile coordinates scaled by SEARCHMAP_SQUARE_DIAGONAL. That is
+	 * Distance() on tile coordinates scaled by SEARCHMAP_TILE_DIAGONAL. That is
 	 * the number a minDistance argument is really in, so this is what a test means by "n tiles
 	 * away".
 	 */
 	constexpr unsigned int Tiles(const unsigned int tilesCount) noexcept
 	{
-		return tilesCount * SEARCHMAP_SQUARE_DIAGONAL;
+		return tilesCount * SEARCHMAP_TILE_DIAGONAL;
 	}
 
 	/**

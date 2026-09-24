@@ -205,10 +205,10 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 
 	//getting all impeded actors flagged for jump
 	Region rgn;
-	rgn.w = 16;
-	rgn.h = 12;
+	rgn.w = SEARCHMAP_TILE_WIDTH;
+	rgn.h = SEARCHMAP_TILE_HEIGHT;
 	for (const SearchmapPoint& p : *points) {
-		rgn.origin = p.ToNavmapPoint();
+		rgn.origin = p.ToNavmapOrigin();
 		PathMapFlags tmp = area->tileProps.QuerySearchMap(p) & PathMapFlags::ACTOR;
 		if (tmp != PathMapFlags::IMPASSABLE) {
 			auto actors = area->GetActorsInRect(rgn, GA_NO_DEAD | GA_NO_UNSCHEDULED);
