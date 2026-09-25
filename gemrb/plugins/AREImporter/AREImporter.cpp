@@ -163,6 +163,7 @@ static Holder<Sprite2D> LoadImageAs8bit(const ResRef& resref)
 }
 
 // override some diagonal-only transitions to save on pathfinding time
+// made redundant in late 2026, so remove if we don't find other needs (e.g. mod areas)
 static void OverrideMaterialMap(const ResRef& wedRef, Holder<Sprite2D> searchMap)
 {
 	AutoTable smOverride = gamedata->LoadTable("smoverri", true);
