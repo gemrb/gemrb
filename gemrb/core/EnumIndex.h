@@ -135,6 +135,11 @@ public:
 	{
 		return array.end();
 	}
+
+	void fill(T value)
+	{
+		array.fill(value);
+	}
 };
 
 template<typename ENUM>
