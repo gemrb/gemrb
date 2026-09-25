@@ -103,25 +103,28 @@ TEST_F(MapTest, FindPathTest)
 	EXPECT_EQ(path.Size(), 4);
 
 	// ... is exactly what we expect
-	EXPECT_EQ(path.GetStep(0).point, Point(1222, 700));
-	EXPECT_EQ(path.GetStep(1).point, Point(1174, 712));
-	EXPECT_EQ(path.GetStep(2).point, Point(1110, 712));
-	EXPECT_EQ(path.GetStep(3).point, Point(1062, 700)); // not exactly badPaths[1]!
+	EXPECT_EQ(path.GetStep(0).point, Point(1224, 690));
+	EXPECT_EQ(path.GetStep(1).point, Point(1208, 702));
+	EXPECT_EQ(path.GetStep(2).point, Point(1160, 714));
+	EXPECT_EQ(path.GetStep(3).point, Point(1064, 702)); // not exactly badPaths[1]!
 
-	// every leg of it stays on passable ground
+	// every leg of it stays on passable ground; a leg inside one tile is not a line query at all,
+	// since the whole segment is inside a single passable tile
 	Point previous = badPaths[0];
 	for (size_t i = 0; i < path.Size(); i++) {
 		const Point step = path.GetStep(i).point;
-		EXPECT_TRUE(PathFinder::IsWalkableTo(map->tileProps, previous, step, true, circleSize))
-			<< "leg " << i << std::endl;
+		if (SearchmapPoint(previous) != SearchmapPoint(step)) {
+			EXPECT_TRUE(PathFinder::IsWalkableTo(map->tileProps, previous, step, true, circleSize))
+				<< "leg " << i << std::endl;
+		}
 		previous = step;
 	}
 
 	// basic determinism
 	auto path2 = FindPathSync(badPaths[0], badPaths[1], circleSize);
 	EXPECT_TRUE(path2);
-	EXPECT_EQ(path2.Size(), 4);
-	for (int i = 0; i < 4; i++) {
+	ASSERT_EQ(path2.Size(), path.Size());
+	for (size_t i = 0; i < path.Size(); i++) {
 		EXPECT_EQ(path.GetStep(i).point, path2.GetStep(i).point);
 	}
 

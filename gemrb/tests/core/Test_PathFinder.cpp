@@ -377,16 +377,6 @@ TEST(TraversabilityTest, DrawnActorsPopulateTheCache)
 	const test::TestTraversability solid { map, false };
 	EXPECT_EQ(solid.StateAt(map.ActorPosOf(0)), TraversabilityCache::TraversabilityCellValueActorNonTraversable);
 	EXPECT_EQ(solid.StateAt(map.ActorPosOf(1)), TraversabilityCache::TraversabilityCellValueActorNonTraversable);
-
-	// each drawn actor gets its own identity, so they can tell each other apart
-	EXPECT_NE(map.ActorIdentityOf(0), map.ActorIdentityOf(1));
-	EXPECT_NE(map.ActorIdentityOf(0), nullptr);
-
-	// the identity belongs to the drawing rather than to a cache, so it is the one that lands
-	// in the cells and every cache built over this map names the same actor
-	EXPECT_EQ(bumpable.ActorAt(map.ActorPosOf(0)), map.ActorIdentityOf(0));
-	EXPECT_EQ(solid.ActorAt(map.ActorPosOf(0)), map.ActorIdentityOf(0));
-	EXPECT_EQ(bumpable.ActorAt(map.ActorPosOf(1)), map.ActorIdentityOf(1));
 }
 
 // The cache, not the searchmap, is what makes an actor stop a route. A bumpable one only
@@ -837,14 +827,13 @@ TEST(FindPathTest, PathUTurn)
 		"#.........#.........#",
 		"#####################"
 	};
-	// both legs are drawn as the straight lines
 	const test::MapRows expected {
 		"#####################",
-		"#.........#....@....#",
-		"#.........#...*.....#",
-		"#..***....#..*......#",
-		"#....*****#.*.......#",
-		"#........**@........#",
+		"#.........#...*@....#",
+		"#.........#..**.....#",
+		"#..***....#.**......#",
+		"#....****.#**.......#",
+		"#.......**@*........#",
 		"#.........#.........#",
 		"#.........#.........#",
 		"#.........#.........#",
@@ -855,7 +844,7 @@ TEST(FindPathTest, PathUTurn)
 	const Point from = map.Start();
 	const test::TestTraversability traversability { map };
 	const Path path = test::CallFindPath(map, traversability, from, map.End());
-	EXPECT_EQ(path.Size(), 2) << "expected 2 waypoints";
+	EXPECT_EQ(path.Size(), 2);
 	EXPECT_TRUE(test::PathAvoidsWalls(map, from, path));
 	EXPECT_TRUE(test::PathIsSane(map, from, path));
 	EXPECT_TRUE(map.MatchesWithPath(map.Start(), path, expected));
@@ -1393,10 +1382,8 @@ TEST(PathFinderTest, SightPassesThroughDiagonalWallJoints)
 					     SearchmapPoint(map.End())));
 }
 
-// A body is not a ray. It sits on integer pixels and has nowhere to be in a corner of zero width,
-// so a route may not thread the joint - if it did, the actor would walk into one of the two walls
-// and the wall probe in Movable::DoStep() would abandon the path on the corner.
-TEST(PathFinderTest, WalkingDoesNotThreadDiagonalWallJoints)
+// we should be able to walk diagonally
+TEST(PathFinderTest, WalkingThreadsDiagonalWallJoints)
 {
 	const TestSearchMap map {
 		"####",
@@ -1404,12 +1391,11 @@ TEST(PathFinderTest, WalkingDoesNotThreadDiagonalWallJoints)
 		"##E.",
 		"####"
 	};
-	EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
+	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
 }
 
-// Only a joint is barred, not any diagonal that happens to touch a wall: rounding a single convex
-// corner is just walking past it, and a corridor two tiles wide running diagonally is made of
-// nothing else. Barring those too would leave the pathfinder unable to take a diagonal at all.
+// Rounding a single convex corner is just walking past it; a one tile wide diagonal corridor is
+// a chain of joints and is walked as well.
 TEST(PathFinderTest, WalkingRoundsASingleCornerDiagonally)
 {
 	const TestSearchMap map {
@@ -1425,7 +1411,7 @@ TEST(PathFinderTest, WalkingRoundsASingleCornerDiagonally)
 	};
 	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
 
-	// the same corridor one tile wide is a chain of joints, and none of them may be threaded
+	// the same corridor one tile wide is a chain of joints, and every one of them is walked
 	const TestSearchMap narrow {
 		"##########",
 		"#S########",
@@ -1437,7 +1423,7 @@ TEST(PathFinderTest, WalkingRoundsASingleCornerDiagonally)
 		"#######E##",
 		"##########"
 	};
-	EXPECT_FALSE(PathFinder::IsWalkableTo(narrow.Props(), narrow.Start(), narrow.End(), true, noCircle));
+	EXPECT_TRUE(PathFinder::IsWalkableTo(narrow.Props(), narrow.Start(), narrow.End(), true, noCircle));
 }
 
 // The wall down the middle has one gap, and the straight segment from S to E goes through it. A
@@ -1597,9 +1583,8 @@ TEST(PathFinderTest, TheOneTileTheRasterLineRoundsAway)
 	EXPECT_FALSE(PathFinder::IsWalkableTo(steep.Props(), steep.Start(), steep.End(), true, noCircle));
 }
 
-// Near the diagonal the raster line skips half the tiles it crosses; the wall is one of
-// them, on the diagonal itself. It even gets fetched as a corner-beside, but the corner
-// rule blocks only when both sides are walls.
+// The wall sits on the segment itself, so it is stepped onto and blocks; only the two tiles the
+// segment threads between at a corner go uninspected.
 TEST(PathFinderTest, TheWallOnTheDiagonalIsNotSteppedOver)
 {
 	const TestSearchMap walled {
@@ -1726,16 +1711,18 @@ TEST(FindPathTest, WaypointsFaceAlongTheirLegs)
 // neighbours faces back the way it came instead.
 TEST(FindPathTest, BackAwayTurnsNearlyCollinearWaypointsRound)
 {
-	// the route has to bend gently: the collinearity rule only fires below an area2 of 300, and
-	// legs between tile centres give multiples of 192, so the turns must be of the mildest kind
-	// the tile grid can express
+	// The gap is staggered over two rows so the route has to step diagonally between them and bend
+	// on either side of that step: a single slit threads too cleanly for the collinearity rule to
+	// fire
 	const TestSearchMap map {
-		"#######",
-		"#S....#",
-		"##.####",
-		"#.....#",
-		"#....E#",
-		"#######"
+		"########",
+		"#..S...#",
+		"#......#",
+		"#XXX.XX#",
+		"#XXXX.X#",
+		"#......#",
+		"#.E....#",
+		"########"
 	};
 
 	const Point from = map.Start();
@@ -1836,7 +1823,7 @@ TEST(FindPathTest, SerpentineMazeForcesTheAStarFallback)
 	// a range rather than a number: the corner count is a tuning detail, but a route which has
 	// collapsed to one or two legs cannot have gone round the bends
 	EXPECT_GE(path.Size(), 6);
-	EXPECT_LE(path.Size(), 8);
+	EXPECT_LE(path.Size(), 9);
 }
 
 // The weighted heuristic makes the search greedy, so a goal walled off behind its own opening -
@@ -2025,8 +2012,9 @@ TEST(PathFinderTest, LineEndIsClampedToTheMap)
 
 	const PathNode end = PathFinder::CalculateLineEnd(map.Props(), map.Start(), 100, E);
 
-	EXPECT_LE(end.point.x, (map.Width() - 1) * 16);
-	EXPECT_LE(end.point.y, (map.Height() - 1) * 12);
+	const Point mapEdge = SearchmapPoint(map.Width() - 1, map.Height() - 1).ToNavmapOrigin();
+	EXPECT_LE(end.point.x, mapEdge.x);
+	EXPECT_LE(end.point.y, mapEdge.y);
 	EXPECT_GE(end.point.x, 1);
 	EXPECT_GE(end.point.y, 1);
 	EXPECT_EQ(end.orient, E) << "and it still faces the way it was sent";
@@ -2527,5 +2515,506 @@ TEST(FindPathTest, TheSlitTakesTheSizesWhoseStandingFootprintFits)
 	EXPECT_TRUE(test::PathIsSane(map, from, one));
 	EXPECT_EQ(one, two) << "the same standing footprint is the same request";
 	EXPECT_TRUE(three.Empty()) << "a size 3 actor stands on 3x3 and the slit is one tile wide";
+}
+
+// The smallest shape the originals walk and a 4-connected search does not: two tiles touching
+// only at a corner.
+TEST(FindPathTest, AJointIsReachableEvenThoughItIsNotFourConnected)
+{
+	const TestSearchMap map {
+		"XXXXX",
+		"XXEXX",
+		"XSXXX",
+		"XXXXX"
+	};
+	constexpr int circleSize = 2;
+	ASSERT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, circleSize));
+
+	const test::TestTraversability traversability { map };
+	const Path path = test::CallFindPath(map, traversability, map.Start(), map.End(), nullptr, circleSize);
+	EXPECT_FALSE(path.Empty()) << "if it's walkable, pathfinder should yield a correct path for it";
+}
+
+
+// 7x7 cuts extracted from the stock game data; `joint` names the tile smoverri.2da repainted.
+namespace {
+	struct SmoverriJoint {
+		std::string area; // the smoverri.2da row this reproduces, for a legible test name
+		int overrideX, overrideY; // that row's (X,Y) columns, i.e. the tile's real map coordinates
+		std::vector<std::string> rows; // the joint, closed, exactly as smoverri.2da found it
+		SearchmapPoint joint; // rows coordinates of the tile smoverri.2da repainted to floor
+	};
+
+	// for nice printing when test fails
+	void PrintTo(const SmoverriJoint& joint, std::ostream* os)
+	{
+		*os << joint.area << " (" << joint.overrideX << "," << joint.overrideY << ")";
+	}
+
+	const std::vector<SmoverriJoint>& SmoverriJoints()
+	{
+		// clang-format off
+	static const std::vector<SmoverriJoint> joints = {
+		{ "ar9106", 29, 22,
+		  { "XXXXXX.",
+		    "XXX.S..",
+		    "XXXX..X",
+		    "XXXX.XX",
+		    "XXX.XXX",
+		    "X....XX",
+		    "...E..." },
+		  { 3, 3 } },
+		{ "ar1008", 42, 42,
+		  { ".S.....",
+		    ".......",
+		    "....XXX",
+		    "....X##",
+		    "XXXX.XX",
+		    "##XX...",
+		    "XX...E." },
+		  { 4, 3 } },
+		{ "ar1008", 56, 35,
+		  { ".S.....",
+		    ".......",
+		    ".......",
+		    "....XXX",
+		    ".XXX.X#",
+		    "X##X.XX",
+		    "##XX.E." },
+		  { 4, 3 } },
+		{ "ar1012", 11, 20,
+		  { "XX.XXX.",
+		    "XXX..S.",
+		    "XXXX...",
+		    "XXXX...",
+		    "X.E.XXX",
+		    "X.XXXXX",
+		    "X..XXXX" },
+		  { 3, 3 } },
+		{ "ar1014", 10, 23,
+		  { "XX.....",
+		    "X..S...",
+		    "X......",
+		    "XXX.XXX",
+		    "XXXX.XX",
+		    "XXXX.E.",
+		    "XXXXX.." },
+		  { 3, 4 } },
+		{ "ar2006", 12, 24,
+		  { "XX.S...",
+		    "X...XXX",
+		    "...XXXX",
+		    "....X.X",
+		    "XXXX..X",
+		    "X###X.E",
+		    "#####X." },
+		  { 4, 3 } },
+		{ "ar2115", 12, 22,
+		  { "X#####X",
+		    "XX###X.",
+		    "XX##X.S",
+		    "..XX...",
+		    "....XX.",
+		    ".E.X##X",
+		    "....X##" },
+		  { 4, 4 } },
+		{ "ar2115", 17, 30,
+		  { "X####X.",
+		    ".X##X.S",
+		    ".XX#X..",
+		    "..XX...",
+		    "....X..",
+		    "E..X##X",
+		    "....X##" },
+		  { 4, 4 } },
+	};
+		// clang-format on
+		return joints;
+	}
+
+	struct SmoverriJointTest : testing::TestWithParam<SmoverriJoint> {};
+
+	// With the override file gone, a 4-connected FindPath() could not reach across any of these joints;
+	// diagonal neighbours are what should fix it.
+	TEST_P(SmoverriJointTest, IsReachableWithoutTheSearchmapOverride)
+	{
+		const SmoverriJoint& joint = GetParam();
+		const TestSearchMap map { joint.rows };
+
+		const test::TestTraversability traversability { map };
+		// circleSize 2, as in the reported case.
+		const Path path = test::CallFindPath(map, traversability, map.Start(), map.End(), nullptr, 2);
+
+		EXPECT_FALSE(path.Empty()) << joint.area << ": the far side is only reachable through the joint";
+	}
+
+	// The same joint walked backwards: reachability must not depend on direction.
+	TEST_P(SmoverriJointTest, IsReachableBackwardsThroughTheJoint)
+	{
+		const SmoverriJoint& joint = GetParam();
+		const TestSearchMap map { joint.rows };
+
+		const test::TestTraversability traversability { map };
+		const Path path = test::CallFindPath(map, traversability, map.End(), map.Start(), nullptr, 2);
+
+		EXPECT_FALSE(path.Empty()) << joint.area << ": reachable forwards, so reachable backwards";
+	}
+
+	// Same map with the tile smoverri.2da repainted to floor: the request succeeds without the
+	// corner.
+	TEST_P(SmoverriJointTest, IsWalkableOnceTheSearchmapOverrideOpensTheJoint)
+	{
+		const SmoverriJoint& joint = GetParam();
+		TestSearchMap map { joint.rows };
+		map.SetTile(joint.joint.x, joint.joint.y, test::Glyph::Floor);
+
+		const test::TestTraversability traversability { map };
+		const Path path = test::CallFindPath(map, traversability, map.Start(), map.End(), nullptr, 2);
+
+		ASSERT_FALSE(path.Empty()) << joint.area;
+		EXPECT_TRUE(test::PathAvoidsWalls(map, map.Start(), path)) << joint.area;
+		EXPECT_TRUE(test::PathIsSane(map, map.Start(), path)) << joint.area;
+	}
+
+} // namespace
+
+INSTANTIATE_TEST_SUITE_P(AllAreas, SmoverriJointTest, testing::ValuesIn(SmoverriJoints()),
+			 [](const testing::TestParamInfo<SmoverriJoint>& info) {
+				 const SmoverriJoint& j = info.param;
+				 return fmt::format("{}_{}_{}", j.area, j.overrideX, j.overrideY);
+			 });
+
+// === reachability from every pixel ===
+// A region's reachability must not depend on which pixel of a tile the request is asked from.
+// The search used to build each point by offsetting the previous one by a tile, so the source's
+// intra-tile offset rode through the whole search and decided which corridor or joint was found.
+
+TEST(FindPathTest, ARockFlankedJointIsReachableFromEveryPixelOfItsTiles)
+{
+	// The ar9106 entry of SmoverriJoints(), the rock/rock joint.
+	const TestSearchMap map {
+		"XXXXXX.",
+		"XXX.S..",
+		"XXXX..X",
+		"XXXX.XX",
+		"XXX.XXX",
+		"X....XX",
+		"...E..."
+	};
+	const test::TestTraversability traversability { map };
+	const Point startCentre = map.Start();
+	const Point endCentre = map.End();
+
+	std::vector<std::string> failures;
+	const auto tryRoute = [&](const Point& from, const Point& to) {
+		const Path path = test::CallFindPath(map, traversability, from, to, nullptr, 2);
+		if (path.Empty()) {
+			failures.push_back(fmt::format("({},{}) -> ({},{})", from.x, from.y, to.x, to.y));
+			return;
+		}
+		EXPECT_TRUE(test::PathAvoidsWalls(map, from, path))
+			<< fmt::format("({},{}) -> ({},{}): the route crosses a wall", from.x, from.y, to.x, to.y);
+		EXPECT_TRUE(test::PathIsSane(map, from, path, 2))
+			<< fmt::format("({},{}) -> ({},{}): the route is not sane", from.x, from.y, to.x, to.y);
+	};
+
+	// every intra-tile offset of one endpoint, the other held at its centre; a tile is 16x12
+	// navmap pixels and its centre is (8,6) inside it
+	for (int oy = 0; oy < 12; ++oy) {
+		for (int ox = 0; ox < 16; ++ox) {
+			const Point startOff(startCentre.x - 8 + ox, startCentre.y - 6 + oy);
+			const Point endOff(endCentre.x - 8 + ox, endCentre.y - 6 + oy);
+			tryRoute(startOff, endCentre);
+			tryRoute(endCentre, startOff);
+			tryRoute(startCentre, endOff);
+			tryRoute(endOff, startCentre);
+		}
+	}
+	// the pair the real AR9106 walk carried
+	const Point realStart(endCentre.x, endCentre.y + 2);
+	const Point realEnd(startCentre.x + 3, startCentre.y - 2);
+	tryRoute(realStart, realEnd);
+	tryRoute(realEnd, realStart);
+
+	EXPECT_TRUE(failures.empty())
+		<< failures.size() << " endpoint offsets cannot reach through the joint; e.g. "
+		<< (failures.size() > 8 ? failures.front() + " ..." : fmt::format("{}", fmt::join(failures, "; ")));
+}
+
+// The same sweep over every joint of the table: a joint either links or it does not, and that
+// must be settled by the searchmap alone.
+TEST(FindPathTest, EveryJointLinksFromEveryPixelOfItsTiles)
+{
+	for (const SmoverriJoint& joint : SmoverriJoints()) {
+		const TestSearchMap map { joint.rows };
+		const test::TestTraversability traversability { map };
+		const Point startCentre = map.Start();
+		const Point endCentre = map.End();
+
+		size_t attempted = 0;
+		std::vector<std::string> failures;
+		const auto tryRoute = [&](const Point& from, const Point& to) {
+			++attempted;
+			const Path path = test::CallFindPath(map, traversability, from, to, nullptr, 2);
+			if (path.Empty()) {
+				failures.push_back(fmt::format("({},{}) -> ({},{})", from.x, from.y, to.x, to.y));
+				return;
+			}
+			EXPECT_TRUE(test::PathAvoidsWalls(map, from, path))
+				<< joint.area << fmt::format(" ({},{}): the route crosses a wall", from.x, from.y);
+			EXPECT_TRUE(test::PathIsSane(map, from, path, 2))
+				<< joint.area << fmt::format(" ({},{}): the route is not sane", from.x, from.y);
+		};
+
+		for (int oy = 0; oy < 12; ++oy) {
+			for (int ox = 0; ox < 16; ++ox) {
+				const Point startOff(startCentre.x - 8 + ox, startCentre.y - 6 + oy);
+				const Point endOff(endCentre.x - 8 + ox, endCentre.y - 6 + oy);
+				tryRoute(startOff, endCentre);
+				tryRoute(endCentre, startOff);
+				tryRoute(startCentre, endOff);
+				tryRoute(endOff, startCentre);
+			}
+		}
+
+		EXPECT_TRUE(failures.empty())
+			<< joint.area << " (" << joint.overrideX << "," << joint.overrideY << "): "
+			<< failures.size() << " of " << attempted
+			<< " standing pixels cannot reach through the joint; e.g. "
+			<< (failures.size() > 8 ? failures.front() + " ..." : fmt::format("{}", fmt::join(failures, "; ")));
+	}
+}
+
+// A corner with a wall face on one side and rock on the other. Both cuts are the sole link
+// between the two regions they join.
+namespace {
+	struct MixedFlankJoint {
+		std::string area;
+		std::vector<std::string> rows;
+	};
+
+	void PrintTo(const MixedFlankJoint& joint, std::ostream* os)
+	{
+		*os << joint.area;
+	}
+
+} // namespace
+
+struct MixedFlankJointTest : testing::TestWithParam<MixedFlankJoint> {};
+
+TEST_P(MixedFlankJointTest, OneWallFaceBesideACornerDoesNotRefuseIt)
+{
+	const MixedFlankJoint& joint = GetParam();
+	const TestSearchMap map { joint.rows };
+
+	const test::TestTraversability traversability { map };
+	const Path path = test::CallFindPath(map, traversability, map.Start(), map.End(), nullptr, 2);
+
+	ASSERT_FALSE(path.Empty()) << joint.area << ": one wall face beside a corner must not bar it";
+	EXPECT_TRUE(test::PathIsSane(map, map.Start(), path)) << joint.area;
+}
+
+INSTANTIATE_TEST_SUITE_P(
+	AllAreas, MixedFlankJointTest,
+	testing::Values(
+		// ar2115 (23,27)<->(22,28); the sides are (23,28)='#' and (22,27)='X'
+		MixedFlankJoint {
+			"ar2115",
+			{ "###XXXX##",
+			  "##XXXXXX#",
+			  "#X.XXXXXX",
+			  "X...XXXXX",
+			  "....XS.XX",
+			  ".....####",
+			  ".E..##XXX",
+			  "..X##X..X",
+			  "#X##X.XXX" } },
+		// ar4004 (225,81)<->(226,82); the sides are (225,82)='X' and (226,81)='#'
+		MixedFlankJoint {
+			"ar4004",
+			{ "...X#####",
+			  "....X####",
+			  ".S..X####",
+			  ".....####",
+			  "XXXX.####",
+			  "XXXXX.###",
+			  "XXXXXE###",
+			  "XXXXX.###",
+			  "XXXXX####" } }),
+	[](const testing::TestParamInfo<MixedFlankJoint>& info) { return info.param.area; });
+
+// A wall face on both sides of a corner is walked as readily as rock on both sides.
+TEST(FindPathTest, ACornerBetweenTwoWallFacesIsWalked)
+{
+	const TestSearchMap map {
+		"#####",
+		"##E##",
+		"#S###",
+		"#####"
+	};
+
+	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle));
+
+	const test::TestTraversability traversability { map };
+	const Path path = test::CallFindPath(map, traversability, map.Start(), map.End(), nullptr, 1);
+	EXPECT_FALSE(path.Empty());
+	EXPECT_TRUE(test::PathIsSane(map, map.Start(), path));
+}
+
+// The same shape, cut from the shipped searchmaps; both are the sole link between the regions
+// they join.
+namespace {
+	struct WallFaceCorner {
+		std::string area;
+		std::vector<std::string> rows;
+	};
+
+	void PrintTo(const WallFaceCorner& corner, std::ostream* os)
+	{
+		*os << corner.area;
+	}
+} // namespace
+
+struct WallFaceCornerTest : testing::TestWithParam<WallFaceCorner> {};
+
+TEST_P(WallFaceCornerTest, IsWalked)
+{
+	const WallFaceCorner& corner = GetParam();
+	const TestSearchMap map { corner.rows };
+
+	EXPECT_TRUE(PathFinder::IsWalkableTo(map.Props(), map.Start(), map.End(), true, noCircle))
+		<< corner.area;
+
+	const test::TestTraversability traversability { map };
+	const Path path = test::CallFindPath(map, traversability, map.Start(), map.End(), nullptr, 1);
+	ASSERT_FALSE(path.Empty()) << corner.area << ": the far side is only reachable across the corner";
+	EXPECT_TRUE(test::PathIsSane(map, map.Start(), path)) << corner.area;
+}
+
+INSTANTIATE_TEST_SUITE_P(
+	AllAreas, WallFaceCornerTest,
+	testing::Values(
+		// pst ar0506 (48,20)<->(47,21); both sides wall.
+		WallFaceCorner { "pst_ar0506",
+				 { "###########",
+				   "#####...###",
+				   "#####...###",
+				   "XXXX#.S.###",
+				   "XXXX#...###",
+				   ".....######",
+				   "...E..#####",
+				   ".......X###",
+				   "......XX###",
+				   "......XX###",
+				   "......XX###" } },
+		// bg1 ar0700 (250,78)<->(249,79); both sides wall.
+		WallFaceCorner { "bg1_ar0700",
+				 { "###########",
+				   ".##########",
+				   "..#########",
+				   "...########",
+				   "....#S#####",
+				   ".....######",
+				   ".......####",
+				   "..E.....##.",
+				   "....XX..XXX",
+				   "...XXX.XXXX",
+				   "....XX.XXX." } }),
+	[](const testing::TestParamInfo<WallFaceCorner>& info) { return info.param.area; });
+
+// === path smoothing ===
+// Theta* offers a node only the parent of the node it was expanded from, so the leg it settles
+// for is the longest that ancestor could see, not the longest there is. The smoothing pass drops
+// a waypoint whose two neighbours can see each other.
+
+// The stub is the second waypoint: it lies on the line between its neighbours, so it buys
+// nothing and costs two turns.
+TEST(FindPathTest, RoundingAnObstacleLeavesNoStubLeg)
+{
+	const TestSearchMap map {
+		"##############################",
+		"#............................#",
+		"#............................#",
+		"#S...........................#",
+		"#..........########..........#",
+		"#..........########..........#",
+		"#..........########..........#",
+		"#..........########..........#",
+		"#..........########..........#",
+		"#...........................E#",
+		"#............................#",
+		"##############################"
+	};
+
+	const Point from = map.Start();
+	const test::TestTraversability traversability { map };
+	const Path path = test::CallFindPath(map, traversability, from, map.End());
+
+	ASSERT_FALSE(path.Empty());
+	EXPECT_TRUE(test::PathAvoidsWalls(map, from, path));
+	EXPECT_TRUE(test::PathIsSane(map, from, path));
+	EXPECT_EQ(path.Size(), 2) << "one leg to the barrier's corner, one from it to the goal";
+
+	// no waypoint may be one its neighbours can see past
+	Point previous = from;
+	for (size_t i = 0; i + 1 < path.Size(); ++i) {
+		const Point next = path.GetStep(i + 1).point;
+		EXPECT_FALSE(PathFinder::IsWalkableTo(map.Props(), previous, next, false, 1))
+			<< "waypoint " << i << " is a stub: its neighbours can see each other";
+		previous = path.GetStep(i).point;
+	}
+}
+
+// A one tile wide diagonal passage is a chain of wall/wall corners; the originals walk it.
+TEST(FindPathTest, AOneTileWideDiagonalPassageIsWalkable)
+{
+	const TestSearchMap map {
+		"##########",
+		"#S########",
+		"##.#######",
+		"###.######",
+		"####.#####",
+		"#####.####",
+		"######.###",
+		"#######E##",
+		"##########"
+	};
+
+	const Point from = map.Start();
+	const test::TestTraversability traversability { map };
+	const Path path = test::CallFindPath(map, traversability, from, map.End());
+
+	ASSERT_FALSE(path.Empty()) << "the diagonal shaft is the only way to the far end";
+	EXPECT_TRUE(test::PathIsSane(map, from, path));
+}
+
+// === step cost ===
+// Distance() answers in whole tiles, so the sqrt(2) of a diagonal step truncates to the 1 of an
+// orthogonal one and the frontier gets 41% more ground for the same price by going diagonally.
+// FindPath accumulates in COST_SCALE-ths of a tile instead, which is what stops routes from
+// running flush along every diagonal they can find.
+TEST(FindPathTest, ADiagonalStepIsNotAsCheapAsAStraightOne)
+{
+	// Two ways from S to E of equal *step count* but different length: straight along the wall
+	// and back out, or a diagonal detour. Priced correctly the straight route wins.
+	const TestSearchMap map {
+		"###########",
+		"#.........#",
+		"#.........#",
+		"#S.......E#",
+		"#.........#",
+		"#.........#",
+		"###########"
+	};
+
+	const Point from = map.Start();
+	const test::TestTraversability traversability { map };
+	const Path path = test::CallFindPath(map, traversability, from, map.End());
+
+	ASSERT_FALSE(path.Empty());
+	EXPECT_TRUE(test::PathIsSane(map, from, path));
+	// the straight run is 8 tiles; anything that dips into the rows below pays for it
+	EXPECT_LE(test::PathLength(from, path), Distance(from, map.End()) + SEARCHMAP_TILE_WIDTH)
+		<< "a straight run must not be traded for a diagonal detour of the same step count";
 }
 }

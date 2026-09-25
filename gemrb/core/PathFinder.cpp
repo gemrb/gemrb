@@ -30,16 +30,24 @@
 #include "Logging/Logging.h"
 #include "Scriptable/Actor.h"
 
+#include <algorithm>
 #include <array>
+#include <cassert>
+#include <cmath>
 #include <limits>
 #include <set>
 
 namespace GemRB {
 
-constexpr size_t DEGREES_OF_FREEDOM = 4;
+// 8-connected: a tile reachable only across the corner of two others is opened by the frontier
+// only if diagonal neighbours are offered.
+constexpr size_t DEGREES_OF_FREEDOM = 8;
 constexpr size_t RAND_DEGREES_OF_FREEDOM = 16;
-constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent { { 1, 0, -1, 0 } };
-constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent { { 0, 1, 0, -1 } };
+constexpr std::array<char, DEGREES_OF_FREEDOM> dxAdjacent { { 1, 0, -1, 0, 1, 1, -1, -1 } };
+constexpr std::array<char, DEGREES_OF_FREEDOM> dyAdjacent { { 0, 1, 0, -1, 1, -1, 1, -1 } };
+
+// Distance is accumulated in COST_SCALE-ths of a tile, so we can put correct price tag on diagonal steps
+constexpr float COST_SCALE = 256.f;
 
 // Cosines
 constexpr std::array<float_t, RAND_DEGREES_OF_FREEDOM> dxRand { { 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924, 1.000, 0.924, 0.707, 0.383 } };
@@ -71,19 +79,39 @@ namespace {
 
 	const std::array<std::vector<BasePoint>, MAX_CIRCLESIZE - 1> CircleOffsetTable = MakeCircleOffsetTable();
 
+	// Distance() in COST_SCALE-ths of a tile, so that the sqrt(2) of a diagonal step survives as
+	// something other than the 1 of an orthogonal one.
+	// Rounded, not truncated: the error then stays centred instead of accumulating short over a long route.
+	// Note on rounding impl:
+	// Do not "fix" this to std::lround, despite what clang-tidy might suggest. That adds a libm
+	// call and a range check for no accuracy gain in our case.
+	// `floor(x + 0.5f)` is round-half-up, a single instruction, and correct in this case, because
+	// costs are never negative.
+	unsigned int StepCost(const SearchmapPoint& from, const SearchmapPoint& to) noexcept
+	{
+		const int dx = from.x - to.x;
+		const int dy = from.y - to.y;
+		return static_cast<unsigned int>(
+			std::floor(COST_SCALE * std::sqrt(static_cast<float>(dx * dx + dy * dy)) + 0.5f));
+	}
+
 	// FindPath's scratch storage. Kept across calls so a search allocates nothing, and per thread
 	// because worker threads run FindPath concurrently.
 	struct SearchState {
 		BucketPriorityQueue open;
 		std::vector<uint8_t> isClosed;
-		std::vector<NavmapPoint> parents;
-		std::vector<unsigned short> distFromStart;
+		std::vector<SearchmapPoint> parents;
+		// in COST_SCALE-ths of a tile, see StepCost(); 32 bits because the scaling costs 8 of
+		// them and a whole-tile total already wanted 16
+		std::vector<uint32_t> distFromStart;
 		// Generation stamping: cells whose `genOf[i] != searchGen` are "fresh" (unvisited this
-		// call) and read as their default values (isClosed=false, parents=zero, dist=0xFFFF).
+		// call) and read as their default values (isClosed=false, parents=zero, dist=max).
 		// Bumping searchGen each call replaces the three memsets that previously zeroed all
 		// three arrays, most of which a typical search never touches.
 		std::vector<uint32_t> genOf;
 		uint32_t searchGen = 0;
+		// The reconstructed route, pulled straight
+		std::vector<SearchmapPoint> waypoints;
 	};
 
 	// One thread_local object behind one deliberately out-of-line accessor, rather than four
@@ -116,7 +144,7 @@ bool PathFinder::CalculateRunAwayPoint(const TileProps& tileProps, const Point& 
 	size_t tries = 0;
 	NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / actorSpeed);
 	if (std::abs(dx) <= 0.333 && std::abs(dy) <= 0.333) return false;
-	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
+	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_TILE_DIAGONAL * SEARCHMAP_TILE_DIAGONAL)) {
 		Point rad(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy));
 		if (!(GetBlockedInRadiusTile(tileProps, SearchmapPoint(rad), actorCircleSize) & PathMapFlags::PASSABLE)) {
 			tries++;
@@ -148,7 +176,7 @@ bool PathFinder::CalculateRandomWalkPoint(const TileProps& tileProps, const Poin
 
 	NormalizeDeltas(dx, dy, float_t(gamedata->GetStepTime()) / actorSpeed);
 	size_t tries = 0;
-	while (SquaredDistance(p, s) < unsigned(radius * radius * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
+	while (SquaredDistance(p, s) < unsigned(radius * radius * SEARCHMAP_TILE_DIAGONAL * SEARCHMAP_TILE_DIAGONAL)) {
 		if (!(GetBlockedInRadiusTile(tileProps, SearchmapPoint(p + Point(dx, dy)), actorCircleSize) & PathMapFlags::PASSABLE)) {
 			tries++;
 			// Give up if backed into a corner
@@ -171,7 +199,7 @@ bool PathFinder::CalculateRandomWalkPoint(const TileProps& tileProps, const Poin
 		p.y -= dy;
 	}
 	const Size& mapSize = tileProps.GetSize();
-	outStep.point = Clamp(p, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
+	outStep.point = Clamp(p, Point(1, 1), SearchmapPoint(mapSize.w - 1, mapSize.h - 1).ToNavmapOrigin());
 	outStep.orient = GetOrient(s, p);
 	return true;
 }
@@ -201,7 +229,7 @@ Path PathFinder::CalculateLinePath(const TileProps& tileProps, const Point& star
 			return path;
 		}
 
-		if (p.x > mapSize.w * 16 || p.y > mapSize.h * 12) {
+		if (p.x > mapSize.w * SEARCHMAP_TILE_WIDTH || p.y > mapSize.h * SEARCHMAP_TILE_HEIGHT) {
 			return path;
 		}
 
@@ -234,13 +262,31 @@ Path PathFinder::CalculateLinePath(const TileProps& tileProps, const Point& star
 PathNode PathFinder::CalculateLineEnd(const TileProps& tileProps, const Point& p, int steps, orient_t orient)
 {
 	PathNode lineEnd;
-	lineEnd.point.x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
-	lineEnd.point.y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
+	lineEnd.point.x = p.x + steps * SEARCHMAP_TILE_DIAGONAL * dxRand[orient];
+	lineEnd.point.y = p.y + steps * SEARCHMAP_TILE_DIAGONAL * dyRand[orient];
 	const Size& mapSize = tileProps.GetSize();
-	lineEnd.point = Clamp(lineEnd.point, Point(1, 1), Point((mapSize.w - 1) * 16, (mapSize.h - 1) * 12));
+	lineEnd.point = Clamp(lineEnd.point, Point(1, 1), SearchmapPoint(mapSize.w - 1, mapSize.h - 1).ToNavmapOrigin());
 	lineEnd.orient = GetOrient(p, lineEnd.point);
 	return lineEnd;
 }
+
+// structure describing data needed for proper checks of LOS with actors along the way
+struct LineActorBlockingData {
+	const TraversabilityCache::Data_t& cache;
+	TraversabilityCache::ActorFootprint footprint;
+	TraversabilityCache::TraversabilityCellState threshold = TraversabilityCache::TraversabilityCellValueEmpty;
+	TraversabilityCache::TraversabilityCellState selfToken = TraversabilityCache::TraversabilityCellValueActor;
+	int mapWidth = 0;
+
+	bool blocks(const SearchmapPoint& p) const
+	{
+		const TraversabilityCache::TraversabilityCellState cell = cache[size_t(p.y) * mapWidth + p.x];
+		// empty tiles short-circuit on the first compare; only an occupied one asks whose it is
+		return cell >= threshold && (!footprint.covers(p) || cell - selfToken >= threshold);
+	}
+};
+
+static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinder::GridRayCast walk, bool stopOnImpassable, int actorCircleSize, const LineActorBlockingData* actorBlockingData = nullptr);
 
 // Find a path from start to goal, ending at the specified distance from the
 // target (the goal must be in sight of the end, if PF_SIGHT is specified)
@@ -249,7 +295,7 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	TRACY(ZoneScoped);
 
 	const unsigned int actorCircleSize = actorContext.circleSize;
-	const Movable* const actorIdentity = actorContext.identity;
+	const auto selfToken = actorContext.selfBumpable ? TraversabilityCache::TraversabilityCellValueActor : TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
 	LogDebugPathfinder("FindPath", "caller = {}, source = {}, destination = {}, dist = {}, actorCircleSize = {}",
 			   actorContext.scriptName, source, destination,
@@ -257,7 +303,8 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	const bool actorsAreBlocking = pathfindingFlags & PF_ACTORS_ARE_BLOCKING;
 	const auto blockingTraversabilityValue = actorsAreBlocking ? TraversabilityCache::TraversabilityCellValueActor : TraversabilityCache::TraversabilityCellValueActorNonTraversable;
 
-	// TODO: we could optimize this function further by doing everything in SearchmapPoint and converting at the end
+	// The search runs in searchmap (tile) space; navmap pixels are used only to relocate a blocked
+	// destination and to phrase the returned path.
 	SearchmapPoint smptDest0 { destination };
 	NavmapPoint nmptDest = destination;
 	NavmapPoint nmptSource = source;
@@ -275,6 +322,10 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	SearchmapPoint smptSource { nmptSource };
 	SearchmapPoint smptDest { nmptDest };
 
+	// Same tile but a different pixel: the search has nowhere to go, and reconstructing an empty
+	// waypoint list below would be nonsense.
+	if (smptSource == smptDest) return {};
+
 	if (minDistance < actorCircleSize && !(GetBlockedInRadiusTile(tileProps, smptDest, actorCircleSize) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
 		LogDebugPathfinder("FindPath", "{} can't fit in destination", actorContext.scriptName);
 		return {};
@@ -282,6 +333,10 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 
 	const Size& mapSize = tileProps.GetSize();
 	if (!mapSize.PointInside(smptSource)) return {};
+
+	// The mover's own ground; the checks below subtract its token from these cells so the mover
+	// ignores itself wherever it overlaps, whatever identity the cache happened to keep.
+	const TraversabilityCache::ActorFootprint moverFootprint = ComputeActorFootprint(source, static_cast<int>(actorCircleSize), mapSize.w, mapSize.h);
 
 	// Initialize data structures
 	const size_t mapCellsCount = mapSize.Area();
@@ -295,8 +350,8 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	SearchState& searchState = GetSearchState();
 	BucketPriorityQueue& open = searchState.open;
 	std::vector<uint8_t>& isClosed = searchState.isClosed;
-	std::vector<NavmapPoint>& parents = searchState.parents;
-	std::vector<unsigned short>& distFromStart = searchState.distFromStart;
+	std::vector<SearchmapPoint>& parents = searchState.parents;
+	std::vector<uint32_t>& distFromStart = searchState.distFromStart;
 	std::vector<uint32_t>& genOf = searchState.genOf;
 	uint32_t& searchGen = searchState.searchGen;
 
@@ -306,6 +361,9 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	distFromStart.resize(mapCellsCount);
 	isClosed.resize(mapCellsCount);
 	genOf.resize(mapCellsCount);
+	// and so is the open set: it holds at most one entry per cell, so the same count is what
+	// bounds its storage
+	open.Reserve(mapCellsCount);
 
 	// Generation-stamp reset: bump searchGen so every cell reads as "unvisited" without touching
 	// its storage. If the counter wraps, zero it and also zero genOf so stale stamps from before
@@ -320,32 +378,52 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 	// begin algo init
 	const int srcIdx = smptSource.y * mapSize.w + smptSource.x;
 	genOf[srcIdx] = searchGen;
+	isClosed[srcIdx] = false;
 	distFromStart[srcIdx] = 0;
-	parents[srcIdx] = nmptSource;
-
-	open.Push(nmptSource, 0);
+	parents[srcIdx] = smptSource;
+	open.Push(smptSource, uint32_t(srcIdx), 0);
 
 	bool foundPath = false;
 	unsigned int squaredMinDist = minDistance * minDistance;
 
 	// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 	constexpr float_t HEURISTIC_WEIGHT = 1.5;
-	const auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) {
-		// Calculate heuristic
+
+	// Both the search's edge test (the Theta* candidate and the A* fallback below) and the
+	// post-search straightening pass share this one query. It reads the searchmap and, when actors
+	// are not blocking, the traversability cache in the same traversal - so a straight edge cannot
+	// be drawn over an actor the movement could not bump.
+	// With actors blocking, the searchmap test already refuses every actor mark, so the cache view
+	// is redundant there and skipped.
+	const LineActorBlockingData actorBlockingData { traversabilityCacheSnapshot, moverFootprint, blockingTraversabilityValue, selfToken, mapSize.w };
+	const LineActorBlockingData* actorView = actorsAreBlocking ? nullptr : &actorBlockingData;
+	const auto walkableLine = [&](const GridRayCast& walk) {
+		return IsLineWalkable(AccumulateAlongTheLine(tileProps, walk, true, static_cast<int>(actorCircleSize), actorView), actorsAreBlocking);
+	};
+	const auto walkableTo = [&](const SearchmapPoint& from, const SearchmapPoint& to) {
+		return walkableLine(GridRayCast { from, to });
+	};
+
+	// The same query from a navmap pixel, for the straightening pass's first leg.
+	const auto walkableFromPixel = [&](const NavmapPoint& from, const SearchmapPoint& to) {
+		return walkableLine(GridRayCast { NavmapPoint(from), to.ToNavmapCenter() });
+	};
+	const auto getHeuristic = [&](const SearchmapPoint& smptChild, const int& smptChildIdx) -> uint32_t {
 		const int xDist = smptChild.x - smptDest.x;
 		const int yDist = smptChild.y - smptDest.y;
-		// Tie-breaking used to smooth out the path
-		const int dxCross = smptDest.x - smptSource.x;
-		const int dyCross = smptDest.y - smptSource.y;
-		const int crossProduct = std::abs(xDist * dyCross - yDist * dxCross) >> 3;
 		// sqrtf, not hypotf: hypot()'s overflow/underflow scaling only matters when the squares
 		// would leave a float's exact range, and these are tile deltas.
 		// `std::sqrt` translates directly to a single CPU instruction on x86 and ARM architectures,
 		// while `std::hypotf` is a function call, which is costly on a hotpath
 		const float distance = std::sqrt(static_cast<float>(xDist * xDist + yDist * yDist));
-		const float heuristic = HEURISTIC_WEIGHT * (distance + crossProduct);
-		const float estDist = distFromStart[smptChildIdx] + heuristic;
-		return estDist;
+		// Note on rounding impl:
+		// Do not "fix" this to std::lround, despite what clang-tidy might suggest. That adds a libm
+		// call and a range check for no accuracy gain in our case.
+		// `floor(x + 0.5f)` is round-half-up, a single instruction, and correct in this case, because
+		// costs are never negative.
+		const uint32_t heuristicFixed = static_cast<uint32_t>(
+			std::floor(HEURISTIC_WEIGHT * distance * COST_SCALE + 0.5f));
+		return distFromStart[smptChildIdx] + heuristicFixed;
 	};
 
 	constexpr uint8_t ITERATION_FREQUENCY_OF_CHECKING_TIMEOUT = 25;
@@ -364,28 +442,24 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			}
 		}
 
-		const NavmapPoint nmptCurrent = open.Pop();
-
-		const SearchmapPoint smptCurrent { nmptCurrent };
+		const SearchmapPoint smptCurrent = open.Pop();
 		const int smptCurrentIdx = smptCurrent.y * mapSize.w + smptCurrent.x;
-		// A fresh cell (generation mismatch) reads as unvisited: parents==zero, skip.
-		// This matches the old memset-to-zero behaviour and filters stale open-queue entries.
-		if (genOf[smptCurrentIdx] != searchGen || parents[smptCurrentIdx].IsZero()) {
+		// A fresh cell (generation mismatch) reads as unvisited, so skip it.
+		if (genOf[smptCurrentIdx] != searchGen) {
 			continue;
 		}
+		assert(!isClosed[smptCurrentIdx] && "a closed cell was popped: the open set has duplicates");
 
 		if (smptCurrent == smptDest) {
-			nmptDest = nmptCurrent;
 			foundPath = true;
 			break;
 		}
 
 		if (minDistance &&
-		    parents[smptCurrentIdx] != nmptCurrent &&
-		    SquaredDistance(nmptCurrent, nmptDest) < squaredMinDist &&
+		    parents[smptCurrentIdx] != smptCurrent &&
+		    SquaredDistance(smptCurrent.ToNavmapCenter(), nmptDest) < squaredMinDist &&
 		    (!(pathfindingFlags & PF_SIGHT) || IsVisibleLOS(tileProps, smptCurrent, smptDest0))) { // FIXME: should probably be smptDest
 			smptDest = smptCurrent;
-			nmptDest = nmptCurrent;
 			foundPath = true;
 			break;
 		}
@@ -393,14 +467,14 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 		// Cell is stamped (generation matches); safe to write isClosed directly.
 		isClosed[smptCurrentIdx] = true;
 
-		const NavmapPoint nmptParent = parents[smptCurrentIdx];
-		const SearchmapPoint smptParent { nmptParent };
-		const unsigned short parentDist = distFromStart[smptParent.y * mapSize.w + smptParent.x];
+		const SearchmapPoint smptParent = parents[smptCurrentIdx];
+		const uint32_t parentDist = distFromStart[smptParent.y * mapSize.w + smptParent.x];
 
 		for (size_t i = 0; i < DEGREES_OF_FREEDOM; i++) {
-			const NavmapPoint nmptChild(nmptCurrent.x + 16 * dxAdjacent[i], nmptCurrent.y + 12 * dyAdjacent[i]);
-			const SearchmapPoint smptChild { nmptChild };
-			// Outside map
+			// The neighbouring tile. The search lives on the searchmap lattice, so a diagonal ray
+			// between two nodes is cast between tile centres and passes through the corner where
+			// four tiles meet, leaving both flanking tiles uninspected.
+			const SearchmapPoint smptChild(smptCurrent.x + dxAdjacent[i], smptCurrent.y + dyAdjacent[i]);
 			if (smptChild.x < 0 || smptChild.y < 0 || smptChild.x >= mapSize.w || smptChild.y >= mapSize.h) continue;
 			// Already visited
 			int smptChildIdx = smptChild.y * mapSize.w + smptChild.x;
@@ -412,80 +486,120 @@ Path PathFinder::FindPath(const TraversabilityCache::Data_t& traversabilityCache
 			if (childBlocked) continue;
 
 			// If there's an actor, check it can be bumped away
-			const TraversabilityCache::TraversabilityCellData navmapCellTraversability = traversabilityCacheSnapshot[nmptChild.y * mapSize.w * 16 + nmptChild.x];
-			const bool childIsUnbumpable = navmapCellTraversability.occupyingActor != actorIdentity && navmapCellTraversability.state >= blockingTraversabilityValue;
-			if (childIsUnbumpable) continue;
-
-			// Fresh cell reads as distFromStart==0xFFFF (same as old memset(255,...) default).
-			const unsigned short oldDist = (genOf[smptChildIdx] == searchGen) ? distFromStart[smptChildIdx] : std::numeric_limits<unsigned short>::max();
-
-			// Lazy Theta star*
-			unsigned short newDist = parentDist + Distance(smptParent, smptChild);
-			if (newDist < oldDist) {
-				// First touch: stamp the cell before writing any field.
-				genOf[smptChildIdx] = searchGen;
-				isClosed[smptChildIdx] = false;
-				parents[smptChildIdx] = nmptParent;
-				distFromStart[smptChildIdx] = newDist;
+			auto childTraversabilityState = traversabilityCacheSnapshot[smptChildIdx];
+			// if the tile we're standing on, remove our traversability token, so we couldn't block ourselves
+			if (childTraversabilityState >= blockingTraversabilityValue && moverFootprint.covers(smptChild)) {
+				childTraversabilityState -= selfToken;
 			}
+			if (childTraversabilityState >= blockingTraversabilityValue) continue;
 
-			if (distFromStart[smptChildIdx] < oldDist) {
-				// Theta-star path if there is LOS
-				// so far the searchmap grid appears too coarse to play on, see #2261
-				//if (!IsWalkableTo(smptParent, smptChild, actorsAreBlocking, caller)) {
-				if (!IsWalkableTo(tileProps, nmptParent, nmptChild, actorsAreBlocking, actorCircleSize)) {
-					// Fall back to A-star path
-					distFromStart[smptChildIdx] = std::numeric_limits<unsigned short>::max();
-					// Find already visited neighbour with shortest: path from start + path to child
-					for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
-						NavmapPoint nmptVis(nmptChild.x + 16 * dxAdjacent[j], nmptChild.y + 12 * dyAdjacent[j]);
-						SearchmapPoint smptVis { nmptVis };
-						// Outside map
-						if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
-						// Only consider already visited (closed)
-						const int smptVisIdx = smptVis.y * mapSize.w + smptVis.x;
-						if (genOf[smptVisIdx] != searchGen || !isClosed[smptVisIdx]) continue;
+			// A fresh cell reads as infinitely far.
+			const uint32_t oldDist = (genOf[smptChildIdx] == searchGen) ? distFromStart[smptChildIdx] : std::numeric_limits<uint32_t>::max();
 
-						unsigned short oldVisDist = distFromStart[smptChildIdx];
-						newDist = distFromStart[smptVisIdx] + Distance(smptVis, smptChild);
-						if (newDist < oldVisDist) {
-							parents[smptChildIdx] = nmptVis;
-							distFromStart[smptChildIdx] = newDist;
-						}
+			// Theta*'s candidate: reach the child straight from the current node's parent.
+			// Committed only once it is reachable and an improvement, so a failed line-of-sight
+			// test leaves the cell untouched.
+			uint32_t bestDist = parentDist + StepCost(smptParent, smptChild);
+			if (bestDist >= oldDist) continue;
+			SearchmapPoint bestParent = smptParent;
+
+			// Theta-star path if there is LOS
+			if (!walkableTo(smptParent, smptChild)) {
+				// Fall back to A-star path
+				bestDist = std::numeric_limits<uint32_t>::max();
+				// Find already visited neighbour with shortest: path from start + path to child
+				for (size_t j = 0; j < DEGREES_OF_FREEDOM; j++) {
+					const SearchmapPoint smptVis(smptChild.x + dxAdjacent[j], smptChild.y + dyAdjacent[j]);
+					if (smptVis.x < 0 || smptVis.y < 0 || smptVis.x >= mapSize.w || smptVis.y >= mapSize.h) continue;
+					// Only consider already visited (closed)
+					const int smptVisIdx = smptVis.y * mapSize.w + smptVis.x;
+					if (genOf[smptVisIdx] != searchGen || !isClosed[smptVisIdx]) continue;
+					// The A* fallback takes a grid neighbour as parent without asking whether
+					// the step is walkable. Two passable tiles sharing an edge are always
+					// joined; two sharing only a corner are not, for a big actor whose radius
+					// can be refused on the crossing line.
+					if (dxAdjacent[j] && dyAdjacent[j] &&
+					    !walkableTo(smptVis, smptChild)) continue;
+
+					const uint32_t visDist = distFromStart[smptVisIdx] + StepCost(smptVis, smptChild);
+					if (visDist < bestDist) {
+						bestParent = smptVis;
+						bestDist = visDist;
 					}
-					if (distFromStart[smptChildIdx] >= oldDist) continue;
 				}
-
-				const float newCost = getHeuristic(smptChild, smptChildIdx);
-				open.Push(nmptChild, newCost);
+				// Nothing reachable beat what the child already had - leave the cell exactly
+				// as it was.
+				if (bestDist >= oldDist) continue;
 			}
+
+			// Commit. First touch: stamp the cell before writing any field.
+			genOf[smptChildIdx] = searchGen;
+			isClosed[smptChildIdx] = false;
+			parents[smptChildIdx] = bestParent;
+			distFromStart[smptChildIdx] = bestDist;
+
+			const uint32_t newCost = getHeuristic(smptChild, smptChildIdx);
+			// The queue keys on the cell index, and holds at most one entry per cell: this
+			// either queues the child or moves the entry it already has down to the new cost.
+			open.Push(smptChild, uint32_t(smptChildIdx), newCost);
 		}
 	}
 
 	if (foundPath) {
+		// Walk the parent chain back from the destination. The source is the one cell that is its
+		// own parent and ends the walk.
+		std::vector<SearchmapPoint>& waypoints = searchState.waypoints;
+		waypoints.clear();
+		SearchmapPoint smptCurrent = smptDest;
+		while (waypoints.empty() || smptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
+			const SearchmapPoint smptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
+			waypoints.push_back(smptCurrent);
+			smptCurrent = smptParent;
+		}
+		std::reverse(waypoints.begin(), waypoints.end());
+
+		// Theta* settles for short stub legs; drop every waypoint whose two neighbours can see
+		// each other. The destination is always kept.
+		//
+		// The pass starts from the actor's real pixel; the source tile centre is offered as the
+		// first candidate and kept only when the actor cannot see the first node directly. That
+		// stub is inside one tile, so it needs no line-of-sight query.
+		const NavmapPoint nmptSourceCentre = smptSource.ToNavmapCenter();
+		NavmapPoint anchorPixel = nmptSource;
+		if (anchorPixel != nmptSourceCentre) {
+			waypoints.insert(waypoints.begin(), smptSource);
+		}
+		{
+			size_t kept = 0;
+			for (size_t i = 0; i + 1 < waypoints.size(); ++i) {
+				if (!walkableFromPixel(anchorPixel, waypoints[i + 1])) {
+					anchorPixel = waypoints[i].ToNavmapCenter();
+					waypoints[kept++] = waypoints[i];
+				}
+			}
+			waypoints[kept++] = waypoints.back();
+			waypoints.resize(kept);
+		}
+
 		Path resultPath;
-		NavmapPoint nmptCurrent = nmptDest;
-		NavmapPoint nmptParent;
-		SearchmapPoint smptCurrent { nmptCurrent };
-		while (!resultPath || nmptCurrent != parents[smptCurrent.y * mapSize.w + smptCurrent.x]) {
-			nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
-			PathNode newStep { nmptCurrent, S };
+		for (size_t i = waypoints.size(); i-- > 0;) {
+			const NavmapPoint nmptStep = waypoints[i].ToNavmapCenter();
+			const NavmapPoint nmptPrevious = i == 0 ? nmptSource : waypoints[i - 1].ToNavmapCenter();
+			PathNode newStep { nmptStep, S };
 			// movement in general allows characters to walk backwards given that
 			// the destination is behind the character (within a threshold), and
 			// that the distance isn't too far away
 			// we approximate that with a relaxed collinearity check and intentionally
 			// skip the first step, otherwise it doesn't help with iwd beetles in ar1015
-			if (pathfindingFlags & PF_BACKAWAY && resultPath && std::abs(area2(nmptCurrent, resultPath.GetStep(0).point, nmptParent)) < 300) {
-				newStep.orient = GetOrient(nmptCurrent, nmptParent);
+			if (pathfindingFlags & PF_BACKAWAY && resultPath && std::abs(area2(nmptStep, resultPath.GetStep(0).point, nmptPrevious)) < 300) {
+				newStep.orient = GetOrient(nmptStep, nmptPrevious);
 			} else {
-				newStep.orient = GetOrient(nmptParent, nmptCurrent);
+				newStep.orient = GetOrient(nmptPrevious, nmptStep);
 			}
 
 			resultPath.PrependStep(std::move(newStep));
-			nmptCurrent = nmptParent;
-
-			smptCurrent = SearchmapPoint(nmptCurrent);
 		}
+
 		return resultPath;
 	}
 
@@ -506,9 +620,9 @@ void PathFinder::ScaleDeltas(float_t& dx, float_t& dy, const float_t factor)
 	//
 	// Normalizing in tile space makes the whole thing one scalar on both components, so
 	// the direction survives exactly, and the length is constant in tiles as intended.
-	const float_t lengthInTiles = std::hypotf(dx / static_cast<float_t>(SEARCHMAP_SQUARE_WIDTH),
-						  dy / static_cast<float_t>(SEARCHMAP_SQUARE_HEIGHT));
-	const float_t q = (STEP_RADIUS / static_cast<float_t>(SEARCHMAP_SQUARE_WIDTH)) / lengthInTiles;
+	const float_t lengthInTiles = std::hypotf(dx / static_cast<float_t>(SEARCHMAP_TILE_WIDTH),
+						  dy / static_cast<float_t>(SEARCHMAP_TILE_HEIGHT));
+	const float_t q = (STEP_RADIUS / static_cast<float_t>(SEARCHMAP_TILE_WIDTH)) / lengthInTiles;
 
 	// never overshoot the target the step is aimed at
 	const float_t scale = std::min(q * factor, 1.0f);
@@ -573,7 +687,7 @@ void PathFinder::ClearSearchMapFor(const std::vector<ActorSearchMapData>& actors
 	// have been cleared by this PaintSearchMap(..., PathMapFlags::UNMARKED).
 	// Skip the instigator itself — its footprint was just cleared intentionally.
 	// Uses snapshotted actor data — safe for worker threads.
-	constexpr unsigned int radiusPixels = MAX_CIRCLE_SIZE * 3 * 16;
+	constexpr unsigned int radiusPixels = MAX_CIRCLE_SIZE * 3 * SEARCHMAP_TILE_WIDTH;
 	constexpr unsigned int radiusPixelsSquared = radiusPixels * radiusPixels;
 	for (const auto& data : actorsData) {
 		if (!data.blocksSearchMap) continue;
@@ -649,7 +763,7 @@ PathMapFlags PathFinder::GetBlockedInRadiusTile(const TileProps& tileProps, cons
 // Every line query - sight and walkability alike - asks the same thing: what does the straight
 // segment from s to d cross? GridRayCast answers exactly that, so the walk is the only thing these
 // share; what differs is how wide each tile is inspected and when to give up.
-static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinder::GridRayCast walk, bool stopOnImpassable, int actorCircleSize)
+static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinder::GridRayCast walk, bool stopOnImpassable, int actorCircleSize, const LineActorBlockingData* actorBlockingData)
 {
 	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 
@@ -660,25 +774,14 @@ static PathMapFlags AccumulateAlongTheLine(const TileProps& tileProps, PathFinde
 		return useBigSize ? PathFinder::GetChildBlockedStatusForBigSize(tileProps, p, actorCircleSize) : PathFinder::GetChildBlockedStatusForSmallSize(tileProps, p, actorCircleSize);
 	};
 	while (walk.Step()) {
-		const PathMapFlags blockStatus = getBlockedStatus(walk.Current());
+		const SearchmapPoint p = walk.Current();
+		// A solid occupant blocks the line the same way a wall does: the walkability query is
+		// boolean. Only the walk passes a context; sight lines leave it null on purpose.
+		const PathMapFlags blockStatus = (stopOnImpassable && actorBlockingData && actorBlockingData->blocks(p)) ? PathMapFlags::IMPASSABLE : getBlockedStatus(p);
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}
 		ret |= blockStatus;
-
-		// Check if the segment went between two tiles without entering either.
-		// An actor can round one blocked corner - that is just walking past a wall - but not squeeze through the joint
-		// between two of them, so this only counts when neither side is open. Without it a route
-		// is free to cut corners no body can cut, and the actor wedges on them.
-		if (walk.CutACorner()) {
-			const PathMapFlags besideX = getBlockedStatus(walk.CornerBesideX());
-			const PathMapFlags besideY = getBlockedStatus(walk.CornerBesideY());
-			const bool jammed = !bool(besideX & PathMapFlags::PASSABLE) && !bool(besideY & PathMapFlags::PASSABLE);
-			if (jammed) {
-				if (stopOnImpassable) return PathMapFlags::IMPASSABLE;
-				ret |= besideX | besideY;
-			}
-		}
 	}
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::ACTOR | PathMapFlags::SIDEWALL))) {
 		ret &= ~PathMapFlags::PASSABLE;
@@ -754,6 +857,12 @@ bool PathFinder::IsWalkableTo(const TileProps& tileProps, const Point& s, const 
 bool PathFinder::IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, int actorCircleSize)
 {
 	PathMapFlags ret = GetBlockedInLine(tileProps, s, d, true, actorCircleSize);
+	return IsLineWalkable(ret, actorsAreBlocking);
+}
+
+bool PathFinder::IsWalkableTo(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, bool actorsAreBlocking, int actorCircleSize)
+{
+	PathMapFlags ret = GetBlockedInLineTile(tileProps, s, d, true, actorCircleSize);
 	return IsLineWalkable(ret, actorsAreBlocking);
 }
 
@@ -850,13 +959,12 @@ void PathFinder::AdjustPositionDirected(const TileProps& tileProps, NavmapPoint&
 	}
 
 	std::map<unsigned int, SearchmapPoint, std::greater<>> candidates;
-	NavmapPoint adjGoal = goal - NavmapPoint(8, 6);
 	int radius = startingRadius - 1;
 	while (radius < 2 * startingRadius) { // reduce this search radius if needed
 		for (auto& offset : baseOffsets) {
 			SearchmapPoint candidate = smptGoal + offset * radius;
 			if (bool(GetBlockedTile(tileProps, candidate, startingRadius) & PathMapFlags::PASSABLE)) {
-				unsigned int range = SquaredDistance(candidate.ToNavmapPoint(), adjGoal);
+				unsigned int range = SquaredDistance(candidate.ToNavmapCenter(), goal);
 				candidates[range] = candidate;
 			}
 		}
@@ -883,8 +991,7 @@ void PathFinder::AdjustPositionDirected(const TileProps& tileProps, NavmapPoint&
 		}
 	}
 
-	goal.x = smptGoal.x * 16 + 8;
-	goal.y = smptGoal.y * 12 + 6;
+	goal = smptGoal.ToNavmapCenter();
 }
 
 void PathFinder::AdjustPosition(const TileProps& tileProps, SearchmapPoint& goal, const Size& startingRadius, int size)

@@ -11,7 +11,52 @@
 
 namespace GemRB {
 
-std::vector<std::vector<bool>> TraversabilityCache::BlockingShapeCache;
+// The cache stores one entry per searchmap tile. An actor's footprint is still a pixel-space
+// circle, so stamping marks every tile whose centre falls inside it.
+namespace {
+
+	constexpr int TileW = SEARCHMAP_TILE_WIDTH;
+	constexpr int TileH = SEARCHMAP_TILE_HEIGHT;
+
+	// Integer division rounding down, including for negatives: a tile bound derived from a
+	// negative pixel coordinate must stay negative rather than fold onto 0.
+	int FloorDiv(int a, int b)
+	{
+		return a >= 0 ? a / b : -((-a + b - 1) / b);
+	}
+
+	// Integer division rounding up, including for negatives (truncation already rounds up there).
+	int CeilDiv(int a, int b)
+	{
+		return a >= 0 ? (a + b - 1) / b : a / b;
+	}
+}
+
+// Returns the tiles whose centre can fall inside the actor's pixel footprint, clamped to the map.
+TraversabilityCache::ActorFootprint ComputeActorFootprint(const Point& pos, int circleSize, int mapWidth, int mapHeight)
+{
+	const int baseSize = Selectable::CircleSize2Radius(circleSize);
+	const int halfW = baseSize * 4;
+	const int halfH = baseSize * 3;
+	// The ground ellipse reaches halfW/halfH on both sides. The shape is even-sized and half-open,
+	// so for sizes 2 and up the far row/column (at +halfW/+halfH) has to be included explicitly -
+	// movement's IsWithinEllipse does include it, and a pathfinder that leaves it out routes the
+	// walker onto a tile the collision test then refuses. Size 1 keeps its original box.
+	const int includeFarEdge = circleSize < 2 ? 0 : 1;
+	const int originX = pos.x - halfW;
+	const int originY = pos.y - halfH;
+	const int sizeW = 2 * halfW + includeFarEdge;
+	const int sizeH = 2 * halfH + includeFarEdge;
+
+	return {
+		std::max(0, CeilDiv(originX - TileW / 2, TileW)),
+		std::min(mapWidth - 1, FloorDiv(originX + sizeW - 1 - TileW / 2, TileW)),
+		std::max(0, CeilDiv(originY - TileH / 2, TileH)),
+		std::min(mapHeight - 1, FloorDiv(originY + sizeH - 1 - TileH / 2, TileH)),
+		pos,
+		circleSize - 1
+	};
+}
 
 // C++14 needs a definition for a static constexpr member that gets odr-used, which is
 // what happens as soon as one is bound to a reference outside this file;
@@ -31,7 +76,6 @@ size_t TraversabilityCache::CachedActorsState::AddCachedActorState(Actor* inActo
 	actor.push_back(inActor);
 	pos.push_back(inActor->Pos);
 	sizeCategory.push_back(inActor->getSizeCategory());
-	region.push_back(CalculateRegion(inActor));
 	flags.push_back(0);
 	SetIsBumpable(newIdx, inActor->ValidTarget(GA_ONLY_BUMPABLE));
 	SetIsAlive(newIdx, inActor->ValidTarget(GA_NO_DEAD | GA_NO_UNSCHEDULED));
@@ -39,87 +83,46 @@ size_t TraversabilityCache::CachedActorsState::AddCachedActorState(Actor* inActo
 	return newIdx;
 }
 
-TraversabilityCache::FitRegion TraversabilityCache::CachedActorsState::CalculateRegion(const Actor* inActor)
-{
-	const auto baseSize = inActor->CircleSize2Radius();
-	const GemRB::Size s(baseSize * 8, baseSize * 6);
-	return { inActor->Pos - s.Center(), s };
-}
-
 void TraversabilityCache::CachedActorsState::ClearOldPosition(const size_t i, Data_t& inOutTraversabilityData, const int inWidth) const
 {
-	const std::vector<bool>& cachedBlockingShape = GetBlockingShape(actor[i], sizeCategory[i]);
-	if (cachedBlockingShape.empty()) {
-		return;
-	}
-
 	const auto cachedCellState = GetCellStateFromFlags(i);
-	const auto blockingShapeRegionW = GetBlockingShapeRegionW(sizeCategory[i]);
-	const size_t trashIdx = inOutTraversabilityData.size() - 1;
-	for (int y = 0; y < region[i].h; ++y) {
-		for (int x = 0; x < region[i].w; ++x) {
-			const int targetX = region[i].x + x;
-			const int targetY = region[i].y + y;
-			const size_t targetIdx = targetY * inWidth * 16 + targetX;
+	const size_t mapCells = inOutTraversabilityData.size();
+	const int mapHeight = static_cast<int>((mapCells - 1) / static_cast<size_t>(inWidth));
+	const ActorFootprint footprint = ComputeActorFootprint(pos[i], sizeCategory[i], inWidth, mapHeight);
 
-			// use spare cell index for invalid data: it's faster than paying fee for validating branch each iteration:
-			const size_t idx = targetIdx < trashIdx ? targetIdx : trashIdx;
-			TraversabilityCellData currentTraversabilityData = inOutTraversabilityData[idx];
+	for (int ty = footprint.firstY; ty <= footprint.lastY; ++ty) {
+		const size_t rowBase = static_cast<size_t>(ty) * inWidth;
+		for (int tx = footprint.firstX; tx <= footprint.lastX; ++tx) {
+			if (!footprint.covers(SearchmapPoint(tx, ty))) continue;
+			const size_t idx = rowBase + tx;
 
-			const auto blockingShapeIdx = y * blockingShapeRegionW * 16 + x;
-			currentTraversabilityData.state -= static_cast<uint8_t>(cachedBlockingShape[blockingShapeIdx]) * cachedCellState;
-
-			if (currentTraversabilityData.state == TraversabilityCellValueEmpty) {
-				inOutTraversabilityData.reset(idx);
-			} else {
-				// the following is a branchless version of zeroing `CurrentTraversabilityData.occupyingActor` if it's equal to actor[i]
-				currentTraversabilityData.occupyingActor = reinterpret_cast<Actor*>(
-					static_cast<size_t>(currentTraversabilityData.occupyingActor != actor[i]) *
-					reinterpret_cast<size_t>(currentTraversabilityData.occupyingActor));
-
-				inOutTraversabilityData[idx] = currentTraversabilityData;
-			}
+			inOutTraversabilityData[idx] = static_cast<TraversabilityCellState>(inOutTraversabilityData[idx] - cachedCellState);
 		}
 	}
 }
 
 void TraversabilityCache::CachedActorsState::MarkNewPosition(const size_t i, Data_t& inOutTraversabilityData, int inWidth, bool inShouldUpdateSelf)
 {
-	const auto currentSizeCategory = actor[i]->getSizeCategory();
-	const std::vector<bool>& currentBlockingShape = GetBlockingShape(actor[i], currentSizeCategory);
-	if (currentBlockingShape.empty()) {
-		return;
-	}
-
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
-
 	const auto currentCellState = GetCellStateFromFlags(newActorStateIdx);
-	const auto blockingShapeRegionW = GetBlockingShapeRegionW(currentSizeCategory);
-	const size_t trashIdx = inOutTraversabilityData.size() - 1;
-	for (int y = 0; y < region[newActorStateIdx].h; ++y) {
-		for (int x = 0; x < region[newActorStateIdx].w; ++x) {
-			const int targetX = region[newActorStateIdx].x + x;
-			const int targetY = region[newActorStateIdx].y + y;
-			const size_t targetIdx = targetY * inWidth * 16 + targetX;
+	const int circleSize = sizeCategory[newActorStateIdx];
+	const size_t mapCells = inOutTraversabilityData.size();
+	const int mapHeight = static_cast<int>((mapCells - 1) / static_cast<size_t>(inWidth));
+	const ActorFootprint footprint = ComputeActorFootprint(actor[i]->Pos, circleSize, inWidth, mapHeight);
 
-			// use spare cell index for invalid data: it's faster than paying fee for validating branch each iteration:
-			const size_t idx = targetIdx < trashIdx ? targetIdx : trashIdx;
-			TraversabilityCellData currentTraversabilityData = inOutTraversabilityData[idx];
+	for (int ty = footprint.firstY; ty <= footprint.lastY; ++ty) {
+		const size_t rowBase = static_cast<size_t>(ty) * inWidth;
+		for (int tx = footprint.firstX; tx <= footprint.lastX; ++tx) {
+			if (!footprint.covers(SearchmapPoint(tx, ty))) continue;
+			const size_t idx = rowBase + tx;
 
-			const auto blockingShapeIdx = y * blockingShapeRegionW * 16 + x;
-			const uint16_t cellStateOfThisActor = static_cast<uint8_t>(currentBlockingShape[blockingShapeIdx]) * currentCellState;
-			currentTraversabilityData.state += cellStateOfThisActor;
-
-			currentTraversabilityData.occupyingActor = cellStateOfThisActor > TraversabilityCellValueEmpty ? actor[i] : currentTraversabilityData.occupyingActor;
-
-			inOutTraversabilityData[idx] = currentTraversabilityData;
+			inOutTraversabilityData[idx] = static_cast<TraversabilityCellState>(inOutTraversabilityData[idx] + currentCellState);
 		}
 	}
 
 	if (inShouldUpdateSelf) {
 		flags[i] = flags[newActorStateIdx];
 		pos[i] = pos[newActorStateIdx];
-		region[i] = region[newActorStateIdx];
 		sizeCategory[i] = sizeCategory[newActorStateIdx];
 	}
 
@@ -131,7 +134,6 @@ void TraversabilityCache::CachedActorsState::UpdateNewState(const size_t i)
 	const size_t newActorStateIdx = AddCachedActorState(actor[i]);
 	flags[i] = flags[newActorStateIdx];
 	pos[i] = pos[newActorStateIdx];
-	region[i] = region[newActorStateIdx];
 	sizeCategory[i] = sizeCategory[newActorStateIdx];
 	erase(newActorStateIdx);
 }
@@ -266,7 +268,6 @@ TraversabilityCache::CachedActorsState::CachedActorsState(const size_t reserve)
 
 void TraversabilityCache::CachedActorsState::reserve(const size_t reserve)
 {
-	region.reserve(reserve);
 	actor.reserve(reserve);
 	pos.reserve(reserve);
 	flags.reserve(reserve);
@@ -275,7 +276,6 @@ void TraversabilityCache::CachedActorsState::reserve(const size_t reserve)
 
 void TraversabilityCache::CachedActorsState::clear()
 {
-	region.clear();
 	actor.clear();
 	pos.clear();
 	flags.clear();
@@ -284,7 +284,6 @@ void TraversabilityCache::CachedActorsState::clear()
 
 void TraversabilityCache::CachedActorsState::erase(const size_t idx)
 {
-	region.erase(region.begin() + idx);
 	actor.erase(actor.begin() + idx);
 	pos.erase(pos.begin() + idx);
 	flags.erase(flags.begin() + idx);
@@ -293,8 +292,7 @@ void TraversabilityCache::CachedActorsState::erase(const size_t idx)
 
 void TraversabilityCache::CachedActorsState::emplace_back(CachedActorsState&& another)
 {
-	reserve(region.size() + another.region.size());
-	region.insert(region.end(), another.region.begin(), another.region.end());
+	reserve(actor.size() + another.actor.size());
 	actor.insert(actor.end(), another.actor.begin(), another.actor.end());
 	pos.insert(pos.end(), another.pos.begin(), another.pos.end());
 	flags.insert(flags.end(), another.flags.begin(), another.flags.end());
@@ -327,51 +325,9 @@ void TraversabilityCache::ValidateTraversabilityCacheSize()
 	// it's faster than paying the fee for validation branches each iteration.
 	// It's okay to have garbage cell in the data, if no one will never read from it.
 	constexpr size_t spareCells = 1;
-	const size_t expectedSize = map->tileProps.GetSize().h * 12 * map->tileProps.GetSize().w * 16 + spareCells;
+	const size_t expectedSize = map->tileProps.GetSize().h * map->tileProps.GetSize().w + spareCells;
 	if (traversabilityData.size() != expectedSize) {
-		traversabilityData.clear(expectedSize);
+		traversabilityData.assign(expectedSize, TraversabilityCellValueEmpty);
 	}
-}
-
-const std::vector<bool>& TraversabilityCache::GetBlockingShape(const Actor* actor, const uint8_t blockingSizeCategory)
-{
-	// if we don't have data with given index, fill the cache with default data up to that index;
-	// it's okay to do so, blocking size category is a small integer, should be below value of 10
-	if (BlockingShapeCache.size() <= static_cast<size_t>(blockingSizeCategory)) {
-		BlockingShapeCache.resize(blockingSizeCategory + 1);
-	}
-
-	// if we don't have the proper data yet, calculate it
-	if (BlockingShapeCache[blockingSizeCategory].empty()) {
-		std::vector<bool> blockingShape;
-
-		const ::GemRB::Size blockingShapeRegionSize(GetBlockingShapeRegionW(blockingSizeCategory), GetBlockingShapeRegionH(blockingSizeCategory));
-		constexpr bool notBlockingValue = false;
-		blockingShape.resize(blockingShapeRegionSize.w * blockingShapeRegionSize.h * 16, notBlockingValue);
-
-		const FitRegion CurrentBlockingRegion = { actor->Pos - blockingShapeRegionSize.Center(), blockingShapeRegionSize };
-		for (int y = 0; y < blockingShapeRegionSize.h; ++y) {
-			for (int x = 0; x < blockingShapeRegionSize.w; ++x) {
-				const bool shapeMask = actor->IsOver({ x + CurrentBlockingRegion.x, y + CurrentBlockingRegion.y });
-				const auto idx = y * blockingShapeRegionSize.w * 16 + x;
-				blockingShape[idx] = shapeMask;
-			}
-		}
-
-		BlockingShapeCache[blockingSizeCategory] = std::move(blockingShape);
-	}
-	return BlockingShapeCache[blockingSizeCategory];
-}
-
-uint16_t TraversabilityCache::GetBlockingShapeRegionW(const uint8_t blockingSizeCategory)
-{
-	const auto baseSize = Actor::CircleSize2Radius(blockingSizeCategory);
-	return baseSize * 8;
-}
-
-uint16_t TraversabilityCache::GetBlockingShapeRegionH(const uint8_t blockingSizeCategory)
-{
-	const auto baseSize = Actor::CircleSize2Radius(blockingSizeCategory);
-	return baseSize * 6;
 }
 }

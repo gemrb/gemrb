@@ -84,19 +84,36 @@ public:
 	Point& operator/(int div) noexcept;
 };
 
+// The searchmap tile in navmap pixels
+constexpr int SEARCHMAP_TILE_WIDTH = 16;
+constexpr int SEARCHMAP_TILE_HEIGHT = 12;
+constexpr int SEARCHMAP_TILE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
+
 class GEM_EXPORT SearchmapPoint : public BasePoint {
 public:
 	using BasePoint::BasePoint;
 	SearchmapPoint() noexcept = default;
 	explicit SearchmapPoint(const Point& p) noexcept
 	{
-		x = p.x / 16;
-		y = p.y / 12;
+		x = p.x / SEARCHMAP_TILE_WIDTH;
+		y = p.y / SEARCHMAP_TILE_HEIGHT;
 	}
 
 	SearchmapPoint operator+(const SearchmapPoint& p) const noexcept;
 	SearchmapPoint operator*(int n) const noexcept;
-	Point ToNavmapPoint() const { return Point(x * 16, y * 12); };
+
+	/** The navmap pixel at the tile's top left corner. */
+	Point ToNavmapOrigin() const noexcept
+	{
+		return Point(x * SEARCHMAP_TILE_WIDTH, y * SEARCHMAP_TILE_HEIGHT);
+	}
+
+	/** The navmap pixel at the tile's centre, which is where the search places its nodes. */
+	Point ToNavmapCenter() const noexcept
+	{
+		return Point(x * SEARCHMAP_TILE_WIDTH + SEARCHMAP_TILE_WIDTH / 2,
+			     y * SEARCHMAP_TILE_HEIGHT + SEARCHMAP_TILE_HEIGHT / 2);
+	}
 };
 
 class GEM_EXPORT Size {

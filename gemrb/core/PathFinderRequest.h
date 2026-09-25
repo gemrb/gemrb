@@ -25,8 +25,10 @@ class Movable;
  */
 struct ActorPathContext {
 	unsigned int circleSize = 0;
-	const Movable* identity = nullptr; // pointer identity only, never dereferenced
 	ieVariable scriptName;
+	// Whether this actor's own cache token is 1 (bumpable) or 15 (not). FindPath subtracts it
+	// from any cell inside the actor's own footprint, so overlapping actors cannot mask it.
+	bool selfBumpable = true;
 };
 
 /**
@@ -79,10 +81,9 @@ struct FindPathRequest {
 	Point destination;
 	SearchmapPoint actorSMPos; // actor's searchmap position, snapshotted at request time
 	// The Movable that issued this request. Never dereferenced on worker threads: it is used
-	// only for pointer identity comparisons (skipping the requester's own footprint when
-	// repainting the searchmap, and recognising its own cell as bumpable). Actor is the only
-	// Movable subclass, so comparisons against the const Actor* stored in ActorSearchMapData
-	// and TraversabilityCellData are plain upcasts.
+	// only for pointer identity comparisons, skipping the requester's own footprint when
+	// repainting the searchmap. Actor is the only Movable subclass, so comparisons against the
+	// const Actor* stored in ActorSearchMapData are plain upcasts.
 	Movable* instigatorIdentity = nullptr;
 	ieVariable instigatorScriptName;
 	Map* map = nullptr; // never dereferenced on worker threads, used in immediate calculation flow and for getting ID
@@ -93,6 +94,7 @@ struct FindPathRequest {
 	FindPathRequestType requestType = FindPathRequestType::WalkTo;
 	bool canRePathIgnoringActors = false;
 	bool blocksSearchMaps = false;
+	bool selfBumpable = true; // whether the actor's own traversability token is 1 rather than 15
 
 	/**
 	 *  Sets the basic request metadata.
@@ -157,7 +159,8 @@ struct FindPathRequest {
 				      const unsigned int inMinDistance,
 				      const int inActorSpeed,
 				      const bool inCanRePathIgnoringActors,
-				      const bool inBlocksSearchMaps)
+				      const bool inBlocksSearchMaps,
+				      const bool inSelfBumpable = true)
 	{
 		actorSMPos = inActorSMPos;
 		actorCircleSize = inActorCircleSize;
@@ -165,6 +168,7 @@ struct FindPathRequest {
 		actorSpeed = inActorSpeed;
 		canRePathIgnoringActors = inCanRePathIgnoringActors;
 		blocksSearchMaps = inBlocksSearchMaps;
+		selfBumpable = inSelfBumpable;
 		return *this;
 	}
 };

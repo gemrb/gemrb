@@ -153,9 +153,7 @@ enum {
 	PF_ACTORS_ARE_BLOCKING = 4
 };
 
-constexpr unsigned int SEARCHMAP_SQUARE_WIDTH = 16;
-constexpr unsigned int SEARCHMAP_SQUARE_HEIGHT = 12;
-constexpr unsigned int SEARCHMAP_SQUARE_DIAGONAL = 20; // sqrt(16 * 16 + 12 * 12)
+// SEARCHMAP_TILE_WIDTH/HEIGHT/DIAGONAL live in Region.h, beside SearchmapPoint
 
 namespace {
 
@@ -274,6 +272,7 @@ public:
 
 	static bool IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, const Actor* caller);
 	static bool IsWalkableTo(const TileProps& tileProps, const Point& s, const Point& d, bool actorsAreBlocking, int actorCircleSize);
+	static bool IsWalkableTo(const TileProps& tileProps, const SearchmapPoint& s, const SearchmapPoint& d, bool actorsAreBlocking, int actorCircleSize);
 	static bool IsLineWalkable(PathMapFlags accumulatedFlags, bool areActorsBlocking);
 
 	static bool AdjustPositionX(const TileProps& tileProps, SearchmapPoint& goal, const Size& radius, int size = -1);
@@ -363,15 +362,7 @@ public:
 	 *   and keeps rounding from carrying it one tile past.
 	 *
 	 * A tie, `tMaxX == tMaxY`, is the segment going exactly through a tile corner, where four
-	 * tiles meet: the walk moves diagonally and is never inside either of the two tiles beside
-	 * the diagonal. Whether those matter depends on what is travelling the line, so they are not
-	 * reported as tiles on it - CutACorner() flags the step and CornerBesideX()/CornerBesideY()
-	 * name them, and the caller decides:
-	 *
-	 * - sight ignores them. A ray has no width and does thread the joint of two diagonal walls.
-	 * - walkability blocks only when *both* are blocked. An actor can round a single convex
-	 *   corner, which is what a diagonal step past one wall tile is, but it cannot thread the
-	 *   joint between two: its body is on integer pixels and has nowhere to be.
+	 * tiles meet.
 	 *
      * The constructor picks the space: NavmapPoint endpoints are navmap pixels, SearchmapPoint
 	 * ones are tile indices and are taken as tile centres.
@@ -379,7 +370,7 @@ public:
 	class GridRayCast {
 	public:
 		GridRayCast(const NavmapPoint& from, const NavmapPoint& to) noexcept
-			: GridRayCast(from.x, from.y, to.x, to.y, SEARCHMAP_SQUARE_WIDTH, SEARCHMAP_SQUARE_HEIGHT) {}
+			: GridRayCast(from.x, from.y, to.x, to.y, SEARCHMAP_TILE_WIDTH, SEARCHMAP_TILE_HEIGHT) {}
 
 		// tile indices in half tiles, so that a tile centre is still an exact integer
 		GridRayCast(const SearchmapPoint& from, const SearchmapPoint& to) noexcept
@@ -406,8 +397,6 @@ public:
 			const int32_t takeX = pendingX & ((1 - pendingY) | static_cast<int32_t>(err <= 0));
 			const int32_t takeY = pendingY & ((1 - pendingX) | static_cast<int32_t>(err >= 0));
 
-			cutACorner = takeX && takeY;
-
 			current.x += stepX * takeX;
 			current.y += stepY * takeY;
 			err += (errStepX & -static_cast<int64_t>(takeX)) - (errStepY & -static_cast<int64_t>(takeY));
@@ -415,13 +404,6 @@ public:
 		}
 
 		const SearchmapPoint& Current() const noexcept { return current; }
-
-		/** Whether the step just taken went diagonally through the point four tiles share. */
-		bool CutACorner() const noexcept { return cutACorner; }
-
-		/** The two tiles the segment passed between; only meaningful after CutACorner(). */
-		SearchmapPoint CornerBesideX() const noexcept { return SearchmapPoint(current.x, current.y - stepY); }
-		SearchmapPoint CornerBesideY() const noexcept { return SearchmapPoint(current.x - stepX, current.y); }
 
 	private:
 		GridRayCast(const int sx, const int sy, const int dx, const int dy, const int w, const int h) noexcept
@@ -449,7 +431,6 @@ public:
 		int64_t errStepY = 0;
 		int stepX;
 		int stepY;
-		bool cutACorner = false;
 	};
 
 	/** Calculate a destination point for running away from a threat.
