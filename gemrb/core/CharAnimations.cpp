@@ -2939,7 +2939,7 @@ Palette SetupPaperdollColours(const ieDword* colors, unsigned int type) noexcept
 	Palette pal;
 	Palette::Colors buffer;
 
-	enum PALETTES : uint8_t {
+	enum class PALETTES : uint8_t {
 		METAL = 0,
 		MINOR,
 		MAJOR,
@@ -2950,7 +2950,7 @@ Palette SetupPaperdollColours(const ieDword* colors, unsigned int type) noexcept
 		END
 	};
 
-	for (uint8_t idx = METAL; idx < END; ++idx) {
+	for (uint8_t idx = 0; idx < UnderType(PALETTES::END); ++idx) {
 		const auto& pal16 = core->GetPalette16(colors[idx] >> s);
 		// FIXME: is this 0x04 an error? sizeof Color is 4, so that only skips the transparency color
 		// the shadow color we manually reset below, but doesn't this offset all the palettes by 1 slot?

@@ -64,7 +64,7 @@ void SpatialMonitor::UpdateSoundForHandle(const Holder<PlaybackHandle>& playback
 	}
 }
 
-void SpatialMonitor::EvaluateOcclusion(SpatialHandle& handle)
+void SpatialMonitor::EvaluateOcclusion(const SpatialHandle& handle)
 {
 	if (handle.source.expired()) {
 		return;

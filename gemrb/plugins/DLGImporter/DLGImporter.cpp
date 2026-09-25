@@ -138,7 +138,7 @@ Holder<Condition> DLGImporter::GetCondition(const char* string) const
 		if (!trigger) {
 			Log(WARNING, "DLGImporter", "Can't compile trigger: {}", lines[i]);
 		} else {
-			condition.triggers.push_back(trigger);
+			condition.triggers.push_back(std::move(trigger));
 		}
 	}
 	return MakeHolder<Condition>(std::move(condition));

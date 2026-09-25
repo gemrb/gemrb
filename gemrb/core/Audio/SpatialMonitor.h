@@ -34,7 +34,7 @@ private:
 	bool active = false;
 	std::list<SpatialHandle> monitoredHandles;
 
-	void EvaluateOcclusion(SpatialHandle&);
+	void EvaluateOcclusion(const SpatialHandle&);
 	void Housekeeping();
 };
 
