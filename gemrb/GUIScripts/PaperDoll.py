@@ -286,10 +286,12 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 
 	table = ColorTable
 	if GameCheck.IsIWD2 ():
-		SRTable = GemRB.LoadTable ("srtable", False, True)
+		SRTable = GemRB.LoadTable ("srlist", False, True)
 		RaceName = GUICommon.GetRaceRowName (pc)
-		HairTable = GemRB.LoadTable (SRTable.GetValue (RaceName, "HAIRCLRFILE"), False, True)
-		SkinTable = GemRB.LoadTable (SRTable.GetValue (RaceName, "SKINCLRFILE"), False, True)
+		RaceIdx = SRTable.FindValue ("ROWNAME", RaceName)
+		RaceRow = SRTable.GetRowName (RaceIdx)
+		HairTable = GemRB.LoadTable (SRTable.GetValue (RaceRow, "HAIRCLRFILE"), False, True)
+		SkinTable = GemRB.LoadTable (SRTable.GetValue (RaceRow, "SKINCLRFILE"), False, True)
 		if row == 0:
 			btnIDs = range(HairTable.GetRowCount ())
 			table = HairTable
