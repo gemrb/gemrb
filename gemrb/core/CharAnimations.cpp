@@ -276,18 +276,18 @@ unsigned char CharAnimations::MaybeOverrideStance(unsigned char stance) const
 }
 /*
  * For some actors (Arundel, FFG, fire giants) a new stance requires a
- * different palette to use. Presumably, this is relevant for PAL_MAIN only.
+ * different palette to use. Presumably, this is relevant for PaletteType::MAIN only.
  */
 void CharAnimations::MaybeUpdateMainPalette(const Animation& anim)
 {
 	if (previousStanceID != stanceID && GetAnimType() != IE_ANI_TWO_PIECE) {
 		// Test if the palette in question is actually different to the one loaded.
 		Holder<Palette> palette = anim.GetFrame(0)->GetPalette();
-		if (!PartPalettes[PAL_MAIN] || *PartPalettes[PAL_MAIN] != *palette) {
-			PaletteResRef[PAL_MAIN].Reset();
+		if (!PartPalettes[PaletteType::MAIN] || *PartPalettes[PaletteType::MAIN] != *palette) {
+			PaletteResRef[UnderType(PaletteType::MAIN)].Reset();
 
-			if (palette) PartPalettes[PAL_MAIN] = MakeHolder<Palette>(*palette);
-			SetupColors(PAL_MAIN);
+			if (palette) PartPalettes[PaletteType::MAIN] = MakeHolder<Palette>(*palette);
+			SetupColors(PaletteType::MAIN);
 		}
 	}
 }
@@ -412,8 +412,8 @@ void CharAnimations::SetHelmetRef(AnimRef ref)
 	// Note: this doesn't happen "often", so this isn't a performance
 	//       bottleneck. (wjp)
 	DropAnims();
-	PartPalettes[PAL_HELMET] = nullptr;
-	ModPartPalettes[PAL_HELMET] = nullptr;
+	PartPalettes[PaletteType::HELMET] = nullptr;
+	ModPartPalettes[PaletteType::HELMET] = nullptr;
 }
 
 void CharAnimations::SetWeaponRef(AnimRef ref)
@@ -422,8 +422,8 @@ void CharAnimations::SetWeaponRef(AnimRef ref)
 
 	// TODO: Only drop weapon anims?
 	DropAnims();
-	PartPalettes[PAL_WEAPON] = nullptr;
-	ModPartPalettes[PAL_WEAPON] = nullptr;
+	PartPalettes[PaletteType::WEAPON] = nullptr;
+	ModPartPalettes[PaletteType::WEAPON] = nullptr;
 }
 
 void CharAnimations::SetOffhandRef(AnimRef ref)
@@ -432,8 +432,8 @@ void CharAnimations::SetOffhandRef(AnimRef ref)
 
 	// TODO: Only drop shield/offhand anims?
 	DropAnims();
-	PartPalettes[PAL_OFFHAND] = nullptr;
-	ModPartPalettes[PAL_OFFHAND] = nullptr;
+	PartPalettes[PaletteType::OFFHAND] = nullptr;
+	ModPartPalettes[PaletteType::OFFHAND] = nullptr;
 }
 
 void CharAnimations::LockPalette(const ieDword* gradients)
@@ -446,7 +446,7 @@ void CharAnimations::LockPalette(const ieDword* gradients)
 	//force initialisation of animation
 	SetColors(gradients);
 	GetAnimation(stanceID, S);
-	if (PartPalettes[PAL_MAIN]) {
+	if (PartPalettes[PaletteType::MAIN]) {
 		lockPalette = true;
 	}
 }
@@ -462,14 +462,14 @@ static const unsigned int CycleOffset[] = { 0, 0, 0, 0, 0, 9, 0, 0, 0, 18, 0, 0,
 void CharAnimations::SetColors(const ieDword* arg)
 {
 	Colors = arg;
-	SetupColors(PAL_MAIN);
-	SetupColors(PAL_MAIN_2);
-	SetupColors(PAL_MAIN_3);
-	SetupColors(PAL_MAIN_4);
-	SetupColors(PAL_MAIN_5);
-	SetupColors(PAL_WEAPON);
-	SetupColors(PAL_OFFHAND);
-	SetupColors(PAL_HELMET);
+	SetupColors(PaletteType::MAIN);
+	SetupColors(PaletteType::MAIN_2);
+	SetupColors(PaletteType::MAIN_3);
+	SetupColors(PaletteType::MAIN_4);
+	SetupColors(PaletteType::MAIN_5);
+	SetupColors(PaletteType::WEAPON);
+	SetupColors(PaletteType::OFFHAND);
+	SetupColors(PaletteType::HELMET);
 }
 
 void CharAnimations::CheckColorMod()
@@ -482,7 +482,7 @@ void CharAnimations::CheckColorMod()
 		}
 	}
 
-	for (unsigned int location = 0; location < PAL_MAX * 8; ++location) {
+	for (unsigned int location = 0; location < UnderType(PaletteType::MAX) * 8; ++location) {
 		if (!ColorMods[location].phase && ColorMods[location].type != RGBModifier::NONE) {
 			ColorMods[location].type = RGBModifier::NONE;
 			ColorMods[location].speed = 0;
@@ -509,7 +509,7 @@ void CharAnimations::SetupColors(PaletteType type)
 
 	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
 		// Only do main palette
-		if (type != PAL_MAIN) {
+		if (type != PaletteType::MAIN) {
 			return;
 		}
 
@@ -527,14 +527,14 @@ void CharAnimations::SetupColors(PaletteType type)
 
 		for (int i = 0; i < colorcount; i++) {
 			const auto& pal32 = core->GetPalette32(static_cast<uint8_t>(Colors[i]));
-			PartPalettes[PAL_MAIN]->CopyColors(dest, pal32.cbegin(), pal32.cend());
+			PartPalettes[PaletteType::MAIN]->CopyColors(dest, pal32.cbegin(), pal32.cend());
 			dest += size;
 		}
-	} else if (type <= PAL_MAIN_5 && paletteType != "0" && !paletteType.IsEmpty()) {
+	} else if (type <= PaletteType::MAIN_5 && paletteType != "0" && !paletteType.IsEmpty()) {
 		//handling special palettes like MBER_BL (black bear)
 		if (paletteType != "1") {
 			if (GetAnimType() == IE_ANI_NINE_FRAMES) {
-				PaletteResRef[type].Format("{:.4}_{:.2}{:c}", ResRefBase, paletteType, '1' + type);
+				PaletteResRef[type].Format("{:.4}_{:.2}{:c}", ResRefBase, paletteType, '1' + UnderType(type));
 			} else if (ResRefBase == "MFIE") { // hack for magic golems
 				PaletteResRef[type].Format("{:.4}{:.2}B", ResRefBase, paletteType);
 			} else {
@@ -548,7 +548,7 @@ void CharAnimations::SetupColors(PaletteType type)
 			}
 		}
 	} else {
-		*pal = SetupPaperdollColours(Colors, type);
+		*pal = SetupPaperdollColours(Colors, UnderType(type));
 		if (lockPalette) {
 			return;
 		}
@@ -559,8 +559,8 @@ void CharAnimations::SetupColors(PaletteType type)
 	if (GlobalColorMod.type != RGBModifier::NONE) {
 		needMod = true;
 	} else {
-		for (size_t i = 0; i < PAL_MAX; ++i) {
-			if (ColorMods[i + 8 * type].type != RGBModifier::NONE) {
+		for (size_t i = 0; i < UnderType(PaletteType::MAX); ++i) {
+			if (ColorMods[i + 8 * UnderType(type)].type != RGBModifier::NONE) {
 				needMod = true;
 				break;
 			}
@@ -585,7 +585,7 @@ void CharAnimations::SetupColors(PaletteType type)
 Holder<Palette> CharAnimations::GetPartPalette(int part) const
 {
 	int actorPartCount = GetActorPartCount();
-	PaletteType type = PAL_MAIN;
+	PaletteType type = PaletteType::MAIN;
 	if (GetAnimType() == IE_ANI_NINE_FRAMES) {
 		//these animations use several palettes
 		type = NINE_FRAMES_PALETTE(stanceID);
@@ -595,11 +595,11 @@ Holder<Palette> CharAnimations::GetPartPalette(int part) const
 	else if (GetAnimType() == IE_ANI_TWO_PIECE && part == 1)
 		return nullptr;
 	else if (part == actorPartCount)
-		type = PAL_WEAPON;
+		type = PaletteType::WEAPON;
 	else if (part == actorPartCount + 1)
-		type = PAL_OFFHAND;
+		type = PaletteType::OFFHAND;
 	else if (part == actorPartCount + 2)
-		type = PAL_HELMET;
+		type = PaletteType::HELMET;
 
 	if (ModPartPalettes[type])
 		return ModPartPalettes[type];
@@ -618,7 +618,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		c = true;
 	}
 
-	for (size_t i = 0; i < PAL_MAX * 8; ++i) {
+	for (size_t i = 0; i < UnderType(PaletteType::MAX) * 8; ++i) {
 		// make initial phase depend on location to make the pulse appear
 		// less even
 		ColorMods[i].phase = 5 * i;
@@ -649,13 +649,8 @@ void CharAnimations::DropAnims()
 
 CharAnimations::~CharAnimations(void)
 {
-	int i;
-	for (i = 0; i <= PAL_MAIN_5; ++i)
-		PartPalettes[i] = nullptr;
-	for (; i < PAL_MAX; ++i)
-		PartPalettes[i] = nullptr;
-	for (i = 0; i < PAL_MAX; ++i)
-		ModPartPalettes[i] = nullptr;
+	PartPalettes.fill(nullptr);
+	ModPartPalettes.fill(nullptr);
 
 	if (shadowPalette) {
 		shadowPalette = nullptr;
@@ -986,7 +981,7 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char stanc
 		}
 
 		if (part < actorPartCount) {
-			PaletteType ptype = PAL_MAIN;
+			PaletteType ptype = PaletteType::MAIN;
 			if (AnimType == IE_ANI_NINE_FRAMES) {
 				//these animations use several palettes
 				ptype = NINE_FRAMES_PALETTE(stanceID);
@@ -1003,23 +998,23 @@ const CharAnimations::PartAnim* CharAnimations::GetAnimation(unsigned char stanc
 				if (palette) PartPalettes[ptype] = MakeHolder<Palette>(*palette);
 				// ...and setup the colours properly
 				SetupColors(ptype);
-			} else if (ptype == PAL_MAIN) {
+			} else if (ptype == PaletteType::MAIN) {
 				MaybeUpdateMainPalette(*newanim);
 			}
 		} else if (part == actorPartCount) {
-			if (!PartPalettes[PAL_WEAPON]) {
-				PartPalettes[PAL_WEAPON] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
-				SetupColors(PAL_WEAPON);
+			if (!PartPalettes[PaletteType::WEAPON]) {
+				PartPalettes[PaletteType::WEAPON] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
+				SetupColors(PaletteType::WEAPON);
 			}
 		} else if (part == actorPartCount + 1) {
-			if (!PartPalettes[PAL_OFFHAND]) {
-				PartPalettes[PAL_OFFHAND] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
-				SetupColors(PAL_OFFHAND);
+			if (!PartPalettes[PaletteType::OFFHAND]) {
+				PartPalettes[PaletteType::OFFHAND] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
+				SetupColors(PaletteType::OFFHAND);
 			}
 		} else if (part == actorPartCount + 2) {
-			if (!PartPalettes[PAL_HELMET]) {
-				PartPalettes[PAL_HELMET] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
-				SetupColors(PAL_HELMET);
+			if (!PartPalettes[PaletteType::HELMET]) {
+				PartPalettes[PaletteType::HELMET] = MakeHolder<Palette>(*newanim->GetFrame(0)->GetPalette());
+				SetupColors(PaletteType::HELMET);
 			}
 		}
 
@@ -2752,7 +2747,7 @@ void CharAnimations::PulseRGBModifiers()
 		}
 	}
 
-	for (size_t i = 0; i < PAL_MAX * 8; ++i) {
+	for (size_t i = 0; i < UnderType(PaletteType::MAX) * 8; ++i) {
 		if (ColorMods[i].type != RGBModifier::NONE &&
 		    ColorMods[i].speed > 0) {
 			change[i >> 3] = true;
@@ -2766,7 +2761,7 @@ void CharAnimations::PulseRGBModifiers()
 		}
 	}
 
-	for (const PaletteType i : EnumIterator<PaletteType, PAL_MAIN, PAL_MAX>()) {
+	for (const PaletteType i : EnumIterator<PaletteType>()) {
 		if (change[i]) {
 			change[i] = false;
 			SetupColors(i);
@@ -2858,12 +2853,12 @@ static inline void applyMod(const Color& src, Color& dest, const RGBModifier& mo
 }
 
 Palette SetupRGBModification(const Holder<Palette>& src, const RGBModifier* mods,
-			     unsigned int type) noexcept
+			     PaletteType type) noexcept
 {
 	Palette pal;
 	Palette::Colors buffer;
 
-	const RGBModifier* tmods = mods + (8 * type);
+	const RGBModifier* tmods = mods + (8 * UnderType(type));
 	int i;
 
 	std::copy(src->cbegin(), src->cbegin() + 4, buffer.begin());

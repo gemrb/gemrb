@@ -352,11 +352,11 @@ void Actor::SetAnimationID(stat_t animID)
 	ClearCurrentStanceAnims();
 	if (anims) {
 		if (anims->lockPalette) {
-			recover = anims->PartPalettes[PAL_MAIN];
+			recover = anims->PartPalettes[PaletteType::MAIN];
 		}
 		// Take ownership so the palette won't be deleted
 		if (recover) {
-			paletteResRef = anims->PaletteResRef[PAL_MAIN];
+			paletteResRef = anims->PaletteResRef[PaletteType::MAIN];
 			if (recover->IsNamed()) {
 				recover = gamedata->GetPalette(paletteResRef);
 			}
@@ -382,11 +382,11 @@ void Actor::SetAnimationID(stat_t animID)
 	anims->SetWeaponRef(WeaponRef);
 
 	//if we have a recovery palette, then set it back
-	assert(anims->PartPalettes[PAL_MAIN] == nullptr);
-	anims->PartPalettes[PAL_MAIN] = recover;
+	assert(anims->PartPalettes[PaletteType::MAIN] == nullptr);
+	anims->PartPalettes[PaletteType::MAIN] = recover;
 	if (recover) {
 		anims->lockPalette = true;
-		anims->PaletteResRef[PAL_MAIN] = paletteResRef;
+		anims->PaletteResRef[PaletteType::MAIN] = paletteResRef;
 	}
 	//bird animations are not hindered by searchmap
 	//only animations with a space of 0 in avatars.2da files use this feature

@@ -8,6 +8,7 @@
 #include "exports.h"
 
 #include "Animation.h"
+#include "EnumIndex.h"
 #include "Orientation.h"
 #include "Palette.h"
 
@@ -100,16 +101,18 @@ namespace GemRB {
 #define AV_NO_BODY_HEAT    1
 #define AV_BUFFET_IMMUNITY 0x1000
 
-enum PaletteType : uint8_t {
-	PAL_MAIN,
-	PAL_MAIN_2,
-	PAL_MAIN_3,
-	PAL_MAIN_4,
-	PAL_MAIN_5,
-	PAL_WEAPON,
-	PAL_OFFHAND,
-	PAL_HELMET,
-	PAL_MAX
+enum class PaletteType : uint8_t {
+	MAIN,
+	MAIN_2,
+	MAIN_3,
+	MAIN_4,
+	MAIN_5,
+	WEAPON,
+	OFFHAND,
+	HELMET,
+	MAX,
+
+	count = MAX
 };
 
 struct AvatarStruct {
@@ -152,18 +155,18 @@ public:
 	using StanceAnim = std::array<OrientAnim, MAX_ANIMS>;
 
 	const ieDword* Colors = nullptr; // these are the custom color indices
-	RGBModifier ColorMods[PAL_MAX * 8]; // color modification effects
+	RGBModifier ColorMods[UnderType(PaletteType::MAX) * 8]; // color modification effects
 	tick_t lastModUpdate = 0;
 	RGBModifier GlobalColorMod; // global color modification effect
 
-	bool change[PAL_MAX];
-	Holder<Palette> PartPalettes[PAL_MAX];
-	Holder<Palette> ModPartPalettes[PAL_MAX];
+	EnumArray<PaletteType, bool> change;
+	EnumArray<PaletteType, Holder<Palette>> PartPalettes;
+	EnumArray<PaletteType, Holder<Palette>> ModPartPalettes;
 	Holder<Palette> shadowPalette;
 	size_t AvatarsRowNum;
 	unsigned char ArmorType = 0, WeaponType = 0, RangedType = 0;
 	ResRef ResRefBase;
-	ResRef PaletteResRef[5] = {};
+	EnumArray<PaletteType, ResRef> PaletteResRef;
 	unsigned char previousStanceID = 0;
 	unsigned char nextStanceID = 0;
 	unsigned char stanceID = 0;
@@ -291,7 +294,7 @@ private:
 };
 
 GEM_EXPORT Palette SetupPaperdollColours(const ieDword* Colors, unsigned int type) noexcept;
-GEM_EXPORT Palette SetupRGBModification(const Holder<Palette>& src, const RGBModifier* mods, unsigned int type) noexcept;
+GEM_EXPORT Palette SetupRGBModification(const Holder<Palette>& src, const RGBModifier* mods, PaletteType type) noexcept;
 GEM_EXPORT Palette SetupGlobalRGBModification(const Holder<Palette>& src, const RGBModifier& mod) noexcept;
 
 GEM_EXPORT Holder<Sprite2D> GetPaperdollImage(const ResRef& resref, const ieDword* colors, Holder<Sprite2D>& picture2, unsigned int type);
