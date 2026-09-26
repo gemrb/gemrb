@@ -175,7 +175,8 @@ void Movable::BumpAway()
 	bumped = true;
 	bumpBackTries = 0;
 	const Point beforeBump = Pos;
-	area->AdjustPositionNavmap(Pos);
+	Size radius { 1, 1 }; // ensure we look beyond the current position
+	area->AdjustPositionNavmap(Pos, radius);
 	LogDebugPathfinder("Movable::BumpAway", "{}: bumped away {} -> {} (oldPos={}, landed on flags={})",
 			   MoveTag(this), beforeBump, Pos, oldPos, uint8_t(area->GetBlocked(Pos)));
 }
