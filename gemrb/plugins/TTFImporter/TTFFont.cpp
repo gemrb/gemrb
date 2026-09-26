@@ -154,8 +154,10 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	Region r(glyph->bitmap_left, glyph->bitmap_top, sprSize.w, sprSize.h);
 	PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, 0);
 	Holder<Sprite2D> spr = VideoDriver->CreateSprite(r, pixels, fmt);
+	// the rendered bitmap is only the ink; the pen has to move by the advance and
+	// the ink has to sit at the left side bearing, or the glyphs run into each other
 	// FIXME: casting away const
-	const Glyph& ret = const_cast<TTFFont*>(this)->CreateGlyphForCharSprite(chr, spr);
+	const Glyph& ret = const_cast<TTFFont*>(this)->CreateGlyphForCharSprite(chr, spr, FT_CEIL(glyph->advance.x), glyph->bitmap_left);
 	return ret;
 }
 
@@ -184,7 +186,14 @@ TTFFont::TTFFont(Holder<Palette> pal, FT_Face face, int lineheight, int baseline
 	// blank for returning when there is an error
 	// TODO: ttf fonts have a "box" glyph they use for this
 	CreateGlyphForCharSprite(0, blank);
-	blank->Frame.w = core->TLKEncoding.zerospace ? 1 : (LineHeight * 0.25);
+
+	// the space glyph has no ink, so its width has to come from the face's advance
+	int spaceWidth = LineHeight * 0.25;
+	FT_UInt spaceIndex = FT_Get_Char_Index(face, ' ');
+	if (spaceIndex && !FT_Load_Glyph(face, spaceIndex, FT_LOAD_DEFAULT | FT_LOAD_TARGET_MONO)) {
+		spaceWidth = FT_CEIL(face->glyph->advance.x);
+	}
+	blank->Frame.w = core->TLKEncoding.zerospace ? 1 : spaceWidth;
 	CreateGlyphForCharSprite(' ', blank);
 	blank->Frame.w *= 4;
 	CreateGlyphForCharSprite('\t', blank);
