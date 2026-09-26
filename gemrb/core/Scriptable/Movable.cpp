@@ -305,7 +305,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		LogDebugPathfinder("Movable::DoStep", "{}: ZERO-DELTA ABANDON at Pos={} step={} step {}/{} dest={}",
 				   MoveTag(this), Pos, nmptStep, path.currentStep, path.Size(), Destination);
 		ClearPath(true);
-		Log(DEBUG, "PathFinderWIP", "Abandoning because I'm exactly at the goal");
+		Log(DEBUG, "PathFinder", "Abandoning because I'm exactly at the goal");
 		pathAbandoned = true;
 		return;
 	}
@@ -343,7 +343,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 			NewOrientation = Orientation;
 			// Do not call ReleaseCurrentAction() since other actions
 			// than MoveToPoint can cause movement
-			Log(DEBUG, "PathFinderWIP", "Abandoning because I'm close to the goal");
+			Log(DEBUG, "PathFinder", "Abandoning because I'm close to the goal");
 			pathAbandoned = true;
 			return;
 		}
