@@ -33,6 +33,7 @@ private:
 	/** Draws the Control on the Output Display */
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	void DrawSelf(const Region& drawFrame, const Region&) override;
+	bool IsAnimated() const override { return Area != nullptr; }
 
 public:
 	WorldMapControl(const Region& frame, Holder<Font> font);
