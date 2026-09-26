@@ -676,6 +676,46 @@ TEST_F(TraversabilityLiveTest, LiveCacheLetsAnActorIgnoreItsOwnTile)
 		<< "the very same footprint has to stop anyone else in a one tile corridor";
 }
 
+TEST_F(TraversabilityLiveTest, IsOverConsistentFromEveryPixelOfItsTiles)
+{
+	const TestGameMap live {
+		"XXX",
+		".1X",
+		"..."
+	};
+	Actor* pc = live.ActorOf(0);
+	ASSERT_NE(pc, nullptr);
+	const Point top = pc->SMPos.ToNavmapOrigin();
+	const Point center = pc->SMPos.ToNavmapCenter();
+
+	auto checkFromPixels = [&pc](const Point& base, const Point& test, bool negate) {
+		for (int oy = 0; oy < SEARCHMAP_TILE_HEIGHT; ++oy) {
+			for (int ox = 0; ox < SEARCHMAP_TILE_WIDTH; ++ox) {
+				pc->SetPos(base + Point(ox, oy));
+				if (negate) {
+					EXPECT_FALSE(pc->IsOver(test)) << pc->Pos.x << ", " << pc->Pos.y << ": is over test point";
+				} else {
+					EXPECT_TRUE(pc->IsOver(test)) << pc->Pos.x << ", " << pc->Pos.y << ": not over test point";
+				}
+			}
+		}
+	};
+
+	// are we always over ourselves?
+	checkFromPixels(top, center, false);
+
+	// are we over neighbours? Testing 8 external edge points
+	Point test;
+	for (int oy = 0; oy < 3; ++oy) {
+		for (int ox = 0; ox < 3; ++ox) {
+			test.x = (ox + 2) * SEARCHMAP_TILE_WIDTH / 2 + 1 * (ox - 1);
+			test.y = (oy + 2) * SEARCHMAP_TILE_HEIGHT / 2 + 1 * (oy - 1);
+			if (test == center) continue;
+			checkFromPixels(top, test, true);
+		}
+	}
+}
+
 // === bumping through a crowd ===
 
 // The crowd both bump tests share: a PC with a half-circle of five NPCs around his northern half,
@@ -684,9 +724,9 @@ TEST_F(TraversabilityLiveTest, LiveCacheLetsAnActorIgnoreItsOwnTile)
 // size-2 PC. The ring is spaced so a shove has somewhere to put each actor and they can find their
 // way home; a tighter ring piles them onto each other's tiles and they never get back.
 //
-// Size 2 is load bearing. For a circle size below 2, Selectable::IsOverCircle() treats every actor
-// as a 33x25 pixel box, so Map::GetActor() at a collision point returns whichever adjacent actor
-// sits first in the list rather than the one in the way: the walker walks through the blocker and
+// Size 2 is load bearing. For a circle size below 2, Selectable::IsOverCircle() used to treat every actor
+// as a 33x25 pixel box, so Map::GetActor() at a collision point returned whichever adjacent actor
+// sat first in the list rather than the one in the way: the walker walks through the blocker and
 // the bump is aimed at somebody off to the side. Circle size 2 uses the real ellipse and picks the
 // actor in front - the size the game's own characters use.
 static std::vector<std::string> HalfCircleAroundPc()

@@ -60,9 +60,10 @@ void Selectable::DrawCircle(const Point& p) const
 }
 
 // Check if P is over our ground circle
+// we can be anywhere in our searchmap footprint, so check from the center
 bool Selectable::IsOver(const Point& P) const
 {
-	return IsOver(P, Pos);
+	return IsOver(P, SMPos.ToNavmapCenter());
 }
 
 bool Selectable::IsOver(const Point& P, const Point& CenterPos) const
@@ -74,8 +75,8 @@ bool Selectable::IsOverCircle(const Point& P, const Point& CenterPos, int csize)
 {
 	if (csize < 2) {
 		Point d = P - CenterPos;
-		if (d.x < -16 || d.x > 16) return false;
-		if (d.y < -12 || d.y > 12) return false;
+		if (d.x <= -SEARCHMAP_TILE_WIDTH / 2 || d.x > SEARCHMAP_TILE_WIDTH / 2) return false;
+		if (d.y <= -SEARCHMAP_TILE_HEIGHT / 2 || d.y > SEARCHMAP_TILE_HEIGHT / 2) return false;
 		return true;
 	}
 	// TODO: make sure to match the actual blocking shape; use GetEllipseSize/GetEllipseOffset instead?
