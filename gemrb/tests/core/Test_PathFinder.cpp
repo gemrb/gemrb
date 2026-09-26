@@ -1930,6 +1930,16 @@ TEST(PathFinderTest, AdjustPositionFindsPassableGround)
 	EXPECT_LT(pointOutside.x, map.Width());
 	EXPECT_LT(pointOutside.y, map.Height());
 	EXPECT_TRUE(bool(PathFinder::GetBlockedTile(map.Props(), pointOutside) & PathMapFlags::PASSABLE));
+
+	// zero radius search should investigate the current Pos and still return
+	// true on a walkable tile, even though it will be a noop for actual actors
+	SearchmapPoint goal2(7, 3);
+	SearchmapPoint oldGoal = goal2;
+	Size radius;
+	EXPECT_TRUE(PathFinder::AdjustPositionX(map.Props(), goal2, radius));
+	EXPECT_EQ(goal2, oldGoal);
+	EXPECT_TRUE(PathFinder::AdjustPositionY(map.Props(), goal2, radius));
+	EXPECT_EQ(goal2, oldGoal);
 }
 
 // === projectile lines ===
