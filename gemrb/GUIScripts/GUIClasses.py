@@ -352,6 +352,14 @@ class GButton(GControl):
 	def CreateLabel(self, labelid, *args):
 		frame = self.GetFrame()
 		frame["x"] = frame["y"] = 0
+		if len(args) >= 3 and isinstance(args[-1], int):
+			flags = args[-1]
+			half = frame["h"] // 2
+			if flags & IE_FONT_ALIGN_TOP:
+				frame["h"] = half
+			elif flags & IE_FONT_ALIGN_BOTTOM:
+				frame["y"] = half
+				frame["h"] -= half
 		return self.CreateSubview(labelid, IE_GUI_LABEL, frame, args)
 		
 	def CreateButton(self, btnid):

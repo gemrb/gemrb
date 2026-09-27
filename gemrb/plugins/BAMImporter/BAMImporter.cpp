@@ -65,7 +65,6 @@ bool BAMImporter::Import(DataStream* str)
 	if (version == BAMVersion::V1) {
 		str->ReadDword(PaletteOffset);
 		str->ReadDword(FLTOffset);
-		DataStart = str->Size();
 	} else {
 		str->ReadDword(CyclesOffset);
 		str->ReadScalar<strpos_t, ieDword>(DataStart);
@@ -84,7 +83,6 @@ bool BAMImporter::Import(DataStream* str)
 			str->ReadScalar(offset);
 			frame.RLE = (offset & 0x80000000) == 0;
 			frame.location.dataOffset = offset & 0x7FFFFFFF;
-			DataStart = std::min(DataStart, frame.location.dataOffset);
 		} else {
 			str->ReadWord(frame.location.v2.dataBlockIdx);
 			str->ReadWord(frame.location.v2.dataBlockCount);
@@ -133,27 +131,41 @@ BAMImporter::index_t BAMImporter::GetCycleSize(index_t cycle)
 	return cycles[cycle].FramesCount;
 }
 
-Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool RLESprite, uint8_t* data) const
+std::vector<uint8_t> BAMImporter::ReadRLESource(strpos_t offset, const Size& size) const
+{
+	str->Seek(offset, GEM_STREAM_START);
+	strpos_t maxLen = std::min<strpos_t>(str->Remains(), 2 * static_cast<strpos_t>(size.Area()));
+	std::vector<uint8_t> buffer(maxLen);
+	str->Read(buffer.data(), maxLen);
+	return buffer;
+}
+
+Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool RLESprite) const
 {
 	Holder<Sprite2D> spr;
 	const Region& rgn = frameInfo.bounds;
-	uint8_t* dataBegin = data + frameInfo.location.dataOffset;
 
 	if (RLESprite) {
+		std::vector<uint8_t> raw = ReadRLESource(frameInfo.location.dataOffset, rgn.size);
+		if (raw.empty()) return nullptr;
+
 		PixelFormat fmt = PixelFormat::RLE8Bit(palette, CompressedColorIndex);
-		const uint8_t* dataEnd = FindRLEPos(dataBegin, rgn.w, Point(rgn.w, rgn.h - 1), CompressedColorIndex);
-		ptrdiff_t dataLen = dataEnd - dataBegin;
+		const uint8_t* dataEnd = FindRLEPos(raw.data(), rgn.w, Point(rgn.w, rgn.h - 1), CompressedColorIndex);
+		ptrdiff_t dataLen = dataEnd - raw.data();
 		if (dataLen == 0) return nullptr;
 		void* pixels = malloc(dataLen);
-		memcpy(pixels, dataBegin, dataLen);
+		memcpy(pixels, raw.data(), dataLen);
 		spr = VideoDriver->CreateSprite(rgn, pixels, fmt);
 	} else {
 		void* pixels = nullptr;
 		if (frameInfo.RLE) {
-			pixels = DecodeRLEData(dataBegin, rgn.size, CompressedColorIndex);
+			std::vector<uint8_t> raw = ReadRLESource(frameInfo.location.dataOffset, rgn.size);
+			if (raw.empty()) return nullptr;
+			pixels = DecodeRLEData(raw.data(), rgn.size, CompressedColorIndex);
 		} else {
 			pixels = malloc(rgn.w * rgn.h);
-			memcpy(pixels, dataBegin, rgn.w * rgn.h);
+			str->Seek(frameInfo.location.dataOffset, GEM_STREAM_START);
+			str->Read(pixels, rgn.w * rgn.h);
 		}
 		PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, CompressedColorIndex);
 		spr = VideoDriver->CreateSprite(rgn, pixels, fmt);
@@ -240,19 +252,11 @@ std::shared_ptr<AnimationFactory> BAMImporter::GetAnimationFactory(const ResRef&
 	std::vector<Holder<Sprite2D>> animframes;
 
 	if (version == BAMVersion::V1) {
-		str->Seek(DataStart, GEM_STREAM_START);
-		strpos_t length = str->Remains();
-		if (length == 0) return nullptr;
-
 		auto FLT = CacheFLT();
-		uint8_t* data = (uint8_t*) malloc(length);
-		str->Read(data, length);
-
 		for (const auto& frameInfo : frames) {
 			bool RLECompressed = allowCompression && frameInfo.RLE;
-			animframes.push_back(GetFrameInternal(frameInfo, RLECompressed, data - DataStart));
+			animframes.push_back(GetFrameInternal(frameInfo, RLECompressed));
 		}
-		free(data);
 
 		return std::make_shared<AnimationFactory>(resref, std::move(animframes), cycles, std::move(FLT));
 	} else {
