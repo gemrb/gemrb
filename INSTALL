@@ -43,10 +43,10 @@ The following commands will try to configure, make and install GemRB.
   make
   make install
 
-By default, GemRB is installed into /usr/local ("fhs"). You can pass -DLAYOUT
-with "home" or "opt" to change the general layout and -DCMAKE_INSTALL_PREFIX
-to change the install path prefix. Check the toplevel CMakeLists.txt to see
-all the individual path components you can additionally alter.
+By default, GemRB is installed into /usr/local ("fhs"). You can pass
+-DCMAKE_INSTALL_PREFIX to change the install path and -DLAYOUT with "home"
+or "opt" to change the general file layout. Check the toplevel CMakeLists.txt
+to see all the individual path components you can additionally alter.
 
 Pass -DCMAKE_BUILD_TYPE=Debug to cmake if you want to create a debug build.
 
