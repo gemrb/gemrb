@@ -3079,6 +3079,12 @@ int fx_set_blind_state(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->Duration = core->GetGame()->GameTime + stat;
 	}
 
+	// ees added iwd-style duration randomization option
+	if (core->HasFeature(GFFlags::HAS_EE_EFFECTS) && fx->Parameter2) {
+		ieDword newDuration = core->Roll(fx->Parameter2 & 0x0000ffff, fx->Parameter2 & 0xffff0000, 0);
+		fx->Duration = core->GetGame()->GameTime + newDuration * core->Time.defaultTicksPerSec;
+	}
+
 	//don't do this effect twice (bug exists in BG2, but fixed in IWD2)
 	static bool reverse = core->HasFeature(GFFlags::REVERSE_TOHIT);
 	if (!STATE_GET(STATE_BLIND)) {
