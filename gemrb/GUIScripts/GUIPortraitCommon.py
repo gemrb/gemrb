@@ -155,8 +155,8 @@ def FindPortraitRow(PortraitsTableToSearch, PortraitName):
 
 def FindPortraitTableRowName(PortraitsTableToSearch, PortraitName, GenderToFind):
 	PortraitPosition = FindPortraitRow(PortraitsTableToSearch, PortraitName)
-	while PortraitsTableToSearch.GetValue (PortraitPosition, 0) != GenderToFind:
-		PortraitPosition = PortraitPosition + 1
+	if PortraitsTableToSearch.GetValue(PortraitPosition, "GENDER") != GenderToFind:
+		PortraitPosition = PortraitsTableToSearch.FindValue("GENDER", GenderToFind)
 	return PortraitsTableToSearch.GetRowName(PortraitPosition)
 	
 # Function for setting a random portrait
