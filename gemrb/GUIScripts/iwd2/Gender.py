@@ -6,6 +6,7 @@
 import GemRB
 import CharOverview
 from GUIDefines import *
+from ie_stats import *
 
 GenderWindow = 0
 TextAreaControl = 0
@@ -76,5 +77,8 @@ def BackPress():
 def NextPress():
 	if GenderWindow:
 		GenderWindow.Close ()
+	Gender = GemRB.GetVar ("Gender")
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.SetPlayerStat (MyChar, IE_SEX, Gender)
 	GemRB.SetNextScript("GUIPortraitCommon") #appearance
 	return

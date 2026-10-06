@@ -15,7 +15,7 @@ PortraitButton = 0
 PortraitsTable = 0
 LastPortrait = 0
 Gender = 0
-InGUIRECMode = False # are we in a running game or in chargen?
+InGUIRECMode = False # It's default in false when in chargen.
 
 EmptyPortrait = {
 	"big": "NOPORTLL" if GameCheck.IsAnyEE () else "NOPORTLG",
@@ -139,20 +139,26 @@ def CharacterPortrait():
 	global LastPortrait
 	Pc = GemRB.GameGetSelectedPCSingle()
 	PortraitName = GemRB.GetPlayerPortrait(Pc, 0)["ResRef"]
+	LastPortrait = FindPortraitRow(PortraitsTable, PortraitName)
+
+def FindPortraitRow(PortraitsTableToSearch, PortraitName):
 	if GameCheck.IsBG2OrEE():
 		PortraitName = PortraitName.rstrip("[ms]")
 	else:
 		PortraitName = PortraitName.rstrip("[ls]")
-
 	# capitalize PortraitName
 	PortraitName = PortraitName.upper()
+	for i in range(0, PortraitsTableToSearch.GetRowCount()):
+		if PortraitName == PortraitsTableToSearch.GetRowName(i).upper():
+			return i
+	return 0
 
-	# search table
-	for i in range(0, PortraitsTable.GetRowCount()):
-		if PortraitName == PortraitsTable.GetRowName(i).upper():
-			LastPortrait = i
-			break
-
+def FindPortraitTableRowName(PortraitsTableToSearch, PortraitName, GenderToFind):
+	PortraitPosition = FindPortraitRow(PortraitsTableToSearch, PortraitName)
+	if PortraitsTableToSearch.GetValue(PortraitPosition, "GENDER") != GenderToFind:
+		PortraitPosition = PortraitsTableToSearch.FindValue("GENDER", GenderToFind)
+	return PortraitsTableToSearch.GetRowName(PortraitPosition)
+	
 # Function for setting a random portrait
 def RandomPortrait():
 	global LastPortrait

@@ -8,7 +8,6 @@ import GemRB
 import GameCheck
 import GUICommon
 import PaperDoll
-import Portrait
 import GUIPortraitCommon
 from GUIDefines import *
 from ie_stats import *

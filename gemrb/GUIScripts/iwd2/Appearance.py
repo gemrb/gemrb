@@ -7,7 +7,7 @@ import GemRB
 
 import CharOverview
 import PaperDoll
-import Portrait
+import GUIPortraitCommon
 from GUIDefines import *
 from ie_stats import IE_SEX
 
@@ -22,10 +22,8 @@ def OnLoad():
 
 	#set these colors to some default
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
-	Portrait.Init (Gender)
-	Portrait.Set (GemRB.GetPlayerPortrait (pc)["ResRef"])
-	PortraitName = Portrait.Name () # strips the last char like the table needs
-
+	PortraitsTable = GemRB.LoadTable("PICTURES")
+	PortraitName = GUIPortraitCommon.FindPortraitTableRowName(PortraitsTable, GemRB.GetPlayerPortrait (pc)["ResRef"], Gender)
 	stats = PaperDoll.ColorStatsFromPortrait (PortraitName)
 	ColorWindow = PaperDoll.OpenPaperDollWindow (pc, "GUICG", stats)
 	CharOverview.PositionCharGenWin (ColorWindow)
