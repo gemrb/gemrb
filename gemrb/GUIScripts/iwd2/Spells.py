@@ -61,5 +61,12 @@ def SetupSpellsWindow(chargen=0):
 			GUIREC.FinishLevelUp ()
 		return
 
+	# make sure to pass the effective caster level
+	# for example, leveling up from paladin 1 to sorcerer 1 should consider
+	# there was no previous sorcerer levels, instead of 1 (since the actor level is already 1)
+	if not chargen:
+		existingLevel = GemRB.GetPlayerStat (MyChar, IDLUCommon.Levels[ClassIndex])
+		Level = existingLevel
+
 	SpellBookType = CommonTables.ClassSkills.GetValue (ClassName, "SPLTYPE")
 	LUSpellSelection.OpenSpellsWindow (MyChar, SpellTableName, Level+LevelDiff, LevelDiff, KitValue, chargen, True, SpellBookType)
