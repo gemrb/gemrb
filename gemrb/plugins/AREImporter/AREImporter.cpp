@@ -1131,6 +1131,7 @@ bool AREImporter::GetActor(DataStream* str, PluginHolder<ActorMgr> actorMgr, Map
 	// if the CreatureAreaFlag was set to 8
 	// AF_NAME_OVERRIDE == AF_ENABLED, used for something else in IWD2
 	if ((flags & AF_NAME_OVERRIDE) || core->HasFeature(GFFlags::IWD2_SCRIPTNAME)) {
+		act->ignoredFields.origScriptName = defaultName;
 		act->SetScriptName(defaultName);
 	}
 	// IWD2 specific hacks
