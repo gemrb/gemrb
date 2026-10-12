@@ -155,7 +155,7 @@ def FindPortraitRow(PortraitsTableToSearch, PortraitName):
 
 def FindPortraitTableRowName(PortraitsTableToSearch, PortraitName, GenderToFind):
 	PortraitPosition = FindPortraitRow(PortraitsTableToSearch, PortraitName)
-	if PortraitsTableToSearch.GetValue(PortraitPosition, "GENDER") != GenderToFind:
+	if PortraitsTableToSearch.GetValue(PortraitsTableToSearch.GetRowName(PortraitPosition), "GENDER", GTV_INT) != GenderToFind:
 		PortraitPosition = PortraitsTableToSearch.FindValue("GENDER", GenderToFind)
 	return PortraitsTableToSearch.GetRowName(PortraitPosition)
 	
