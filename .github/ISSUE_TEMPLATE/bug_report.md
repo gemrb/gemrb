@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 #### Bug description
-Add a clear and concise description of what the bug is, in which game, who or
+Add a clear and concise description of what the bug (singular) is, in which game, who or
 what is involved, which area is it in (if needed) ... anything that you
 think will help with understanding and fixing the bug.
 
@@ -23,6 +23,8 @@ debug dump.
 
 In case of complicated bugs or hard to reach states, please provide a save
 game, so we can reproduce the problem more easily.
+
+If you found more bugs, open a separate report for each one.
 
 #### Steps to reproduce
 1. Go to '...'
