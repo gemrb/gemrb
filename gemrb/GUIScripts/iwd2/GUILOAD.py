@@ -115,6 +115,29 @@ def LoadGamePress (btn):
 	GemRB.EnterGame ()
 	return
 
+def GetQuickLoadSlot():
+	global Games
+
+	Games = GemRB.GetSaveGames()
+	QuickLoadSlot = None
+	idx = 0
+	for Game in Games:
+		Slotname = Game.GetSaveID ()
+		# quick save is 1 ... but not necessarily in the expansions
+		if Slotname == 1 or (Slotname > 1 and idx == 1):
+			QuickLoadSlot = Game
+			break
+		idx = idx + 1
+	return QuickLoadSlot
+
+def QuickLoadPressed():
+	QuickLoadSlot = GetQuickLoadSlot ()
+	if QuickLoadSlot != None:
+		LoadScreen.StartLoadScreen ()
+		GemRB.LoadGame (QuickLoadSlot)
+		GemRB.EnterGame ()
+	return
+
 def DeleteGameConfirm (btn):
 	global Games
 
