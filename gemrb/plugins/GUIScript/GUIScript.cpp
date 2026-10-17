@@ -9453,8 +9453,8 @@ static PyObject* GemRB_DropDraggedItem(PyObject* /*self*/, PyObject* args)
 
 	Label* l = core->GetMessageLabel();
 	if (l) {
-		// this is how BG2 behaves, not sure about others
-		l->SetText(u""); // clear previous message
+		// clear the temporary contents, not the whole MSGWIN history
+		l->SetText(u"");
 	}
 
 	GET_GAME();

@@ -48,7 +48,7 @@ def OnDragItemGround (btn):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = btn.Value
 
-	GemRB.GetView ("MsgSys").SetText ("")
+	GemRB.GetView ("MsgSys", 1).SetText ("")
 
 	if GemRB.IsDraggingItem ()==0:
 		slot_item = GemRB.GetContainerItem (pc, slot)
@@ -102,7 +102,7 @@ def OnDragItem (btn):
 			GemRB.DisplayString (errorRef, ColorWhite)
 			return
 
-	GemRB.GetView ("MsgSys").SetText ("")
+	GemRB.GetView ("MsgSys", 1).SetText ("")
 
 	if not GemRB.IsDraggingItem ():
 		item = GemRB.GetItem (slot_item["ItemResRef"])
@@ -164,7 +164,7 @@ def OnDropItemToPC (pc):
 	if pc > GemRB.GetPartySize ():
 		return
 
-	GemRB.GetView ("MsgSys").SetText ("")
+	GemRB.GetView ("MsgSys", 1).SetText ("")
 
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
