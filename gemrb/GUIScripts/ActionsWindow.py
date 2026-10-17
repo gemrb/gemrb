@@ -1588,11 +1588,12 @@ def SetWeaponButton (btn, action, pc, pcStats, invInfo):
 
 	btn.SetBAM ("stonweap", 0, 0)
 	state = IE_GUI_BUTTON_UNPRESSED
+	weaponNumber = action - ACT_WEAPON1
 	if magicSlot == None:
 		if pcStats:
-			slot = pcStats["QuickWeaponSlots"][action - ACT_WEAPON1]
+			slot = pcStats["QuickWeaponSlots"][weaponNumber]
 		else:
-			slot = weaponSlot + (action - ACT_WEAPON1)
+			slot = weaponSlot + weaponNumber
 	else:
 		slot = magicSlot
 		action = ACT_WEAPON1 # avoid oob-ing QuickWeaponHeaders
@@ -1619,9 +1620,10 @@ def SetWeaponButton (btn, action, pc, pcStats, invInfo):
 			# empty weapon slot, already drawn
 			return state
 
-	btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1, item2ResRef)
+	# F-keys start at 1 and there's one button before the weapons
+	btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, weaponNumber + 1 + 1, item2ResRef)
 	if pcStats:
-		SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][action - ACT_WEAPON1])], True)
+		SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][weaponNumber])], True)
 	else:
 		SetItemText (btn, 0, True)
 
@@ -1645,7 +1647,7 @@ def SetOffHandButton (btn, pc, pcStats, magicSlot, usedSlot, fistSlot):
 	item = GemRB.GetSlotItem (pc, offhandSlot, 1)
 	state = IE_GUI_BUTTON_LOCKED
 	if item and usedSlot != fistSlot and item["LauncherSlot"] == 0:
-		btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, i + 1)
+		btn.SetItemIcon (item["ItemResRef"], 4, 2 if item["Flags"] & IE_INV_ITEM_IDENTIFIED else 1, 2)
 		if pcStats and offhandSlot in pcStats["QuickWeaponSlots"]:
 			qwIdx = pcStats["QuickWeaponSlots"].index(offhandSlot)
 			SetItemText (btn, item["Usages" + str(pcStats["QuickWeaponHeaders"][qwIdx])], True)
