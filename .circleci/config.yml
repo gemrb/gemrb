@@ -15,6 +15,7 @@ jobs:
 
     steps:
       - checkout
+      - run: brew update
       - run: brew install sdl2 openal-soft sdl2_mixer libpng libvorbis googletest cmake
       # figure out how to use with_tool_cache, once it stabilizes
       - run: |
