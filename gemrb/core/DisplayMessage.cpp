@@ -148,7 +148,7 @@ void DisplayMessage::DisplayString(const String& text) const
 	DisplayMarkupString(fmt::format(DisplayFormatSimple, text));
 }
 
-Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable*& speaker) const
+Color DisplayMessage::GetSpeakerColor(String& name, const Scriptable* speaker) const
 {
 	if (!speaker) {
 		name = u"";

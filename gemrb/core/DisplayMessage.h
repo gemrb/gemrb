@@ -80,8 +80,6 @@ private:
 	static bool EnableRollFeedback();
 	static String ResolveStringRef(ieStrRef);
 
-	/** returns the speaker's color and name */
-	Color GetSpeakerColor(String& name, const Scriptable*& speaker) const;
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(String text, const Color& color, const Scriptable* speaker) const;
 	/** displays a string in the textarea */
@@ -96,6 +94,8 @@ public:
 	DisplayMessage();
 	Color GetColor(const GUIColors color) const;
 	const std::string& GetColorName(GUIColors idx) const;
+	/** returns the speaker's color and name */
+	Color GetSpeakerColor(String& name, const Scriptable* speaker) const;
 	/** displays any string in the textarea */
 	void DisplayMarkupString(String txt) const;
 	/** displays a string constant in the textarea */

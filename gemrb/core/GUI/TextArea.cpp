@@ -40,8 +40,8 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 		selOption->SetAutoResizeFlags(ResizeHorizontal, BitOp::SET);
 
 		if (numbered) {
-			// TODO: as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
-			// but that should probably actually be done by the dialog handler, not here.
+			// as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
+			// this is done by the dialog handler, not here.
 			auto ts = new TextSpan(fmt::format(u"{}. - ", i + 1), nullptr, selectedCol, &numFrame);
 			ts->Alignment = IE_FONT_ALIGN_RIGHT;
 			selOption->AppendContent(ts);

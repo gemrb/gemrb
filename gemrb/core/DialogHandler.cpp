@@ -431,6 +431,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 	std::vector<SelectOption> dialogOptions;
 	int idx = GetDialogOptions(ds, dialogOptions, target);
+	String tmp;
+	ta->SetColor(displaymsg->GetSpeakerColor(tmp, speaker), TextArea::COLOR_SELECTED);
 	ta->SetSelectOptions(dialogOptions, true);
 	ControlEventHandler handler = [this](const Control* c) {
 		DialogChoose(c->GetValue());
