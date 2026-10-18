@@ -204,25 +204,31 @@ void DisplayMessage::DisplayString(ieStrRef stridx, const Color& color, STRING_F
 	DisplayString(core->GetString(stridx, flags), color, nullptr);
 }
 
+// display in the inline console if available, otherwise the message window or
+// as overhead text if neither is available
 void DisplayMessage::DisplayString(String text, const Color& color, Scriptable* target) const
 {
-	TextArea* ta = core->GetMessageTextArea();
-	if (ta) {
-		DisplayMarkupString(fmt::format(DisplayFormat, color.Packed(), text));
-	}
-
 	Label* l = core->GetMessageLabel();
-	if (l) {
+	if (l && l->IsVisible()) {
 		l->SetColors(color, ColorBlack);
 		l->SetText(std::move(text));
-	} else if (core->HasFeature(GFFlags::HAS_EE_EFFECTS)) {
-		// ees have a text area instead
-		ta = core->GetMessageTextArea(1);
-		if (ta) ta->SetText(fmt::format(DisplayFormat, color.Packed(), text));
+		return;
 	}
 
-	if (target && l == nullptr && ta == nullptr) {
-		// overhead text only if we dont have somewhere else for the message
+	// ees use a textarea in the inventory instead of a label
+	TextArea* ta = core->GetMessageTextArea(1);
+	if (ta && ta->IsVisible()) {
+		ta->SetText(fmt::format(DisplayFormat, color.Packed(), text));
+		return;
+	}
+
+	ta = core->GetMessageTextArea(0);
+	if (ta) {
+		DisplayMarkupString(fmt::format(DisplayFormat, color.Packed(), text));
+		return;
+	}
+
+	if (target) {
 		target->overHead.SetText(std::move(text));
 	}
 }
