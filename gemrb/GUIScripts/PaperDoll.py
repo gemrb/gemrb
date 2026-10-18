@@ -260,11 +260,11 @@ def GetMyColor (row, i, offset, table):
 def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 	if pack == "GUICG":
 		winID = 14
-		btnIDs = range(0, 33 if GameCheck.IsIWD2 () else 34)
+		btnIDs = range(0, 34)
 		offset = 0
 	elif pack == "GUIINV":
 		winID = 3
-		btnIDs = range(0, 33 if GameCheck.IsIWD2 () else 34)
+		btnIDs = range(0, 34)
 		offset = 0
 	else:
 		# only GUIREC remains valid so treat everything else as GUIREC
@@ -322,23 +322,7 @@ def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 		import CharGenCommon
 		CharGenCommon.PositionCharGenWin (ColorPicker, -2)
 
-	def RandomSelect():
-		color = "*"
-		while color == "*":
-			roll = GemRB.Roll (1, btnIDs[-1], 0)
-			if row < 2:
-				color = t.GetValue (roll, 0)
-			else:
-				color = ColorTable.GetValue (row - 2, roll)
-
-		GemRB.SetVar ("PickedColor", color)
-		ColorPicker.Close ()
-
 	if GameCheck.IsIWD2 ():
-		Button = ColorPicker.GetControl (33)
-		Button.OnPress (RandomSelect)
-		Button.SetText ("RND")
-
 		CancelButton = ColorPicker.GetControl (35)
 		CancelButton.SetText (13727)
 		CancelButton.OnPress (ColorPicker.Close)
