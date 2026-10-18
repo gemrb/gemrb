@@ -255,7 +255,7 @@ def GetMyColor (row, i, offset, table):
 	if row < 2:
 		return table.GetValue (i, 0)
 	else:
-		return ColorTable.GetValue (row - 2, i)
+		return ColorTable.GetValue (row, i)
 
 def OpenColorPicker (row, pc, PickedColor, pack = "GUICG"):
 	if pack == "GUICG":
