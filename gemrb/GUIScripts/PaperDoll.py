@@ -8,9 +8,6 @@ import CommonTables
 import GameCheck
 import GUICommon
 
-if GameCheck.IsIWD2 ():
-	import IDLUCommon
-
 from GUIDefines import *
 from ie_restype import *
 from ie_stats import *
