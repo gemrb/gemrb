@@ -90,12 +90,29 @@ def InitInventoryWindow (Window):
 	Label.SetTooltip (17378)
 
 	# info label, game paused, etc
-	# this is useless to us, message window is still visible
+	# the original shipped a window with a sliver of a label below it
+	# (other games have it nicely integrated into the window)
+	# because we support arbitrary resolutions, we override the MOS, since
+	# the label doesn't carry its background itself
+	# then here we reposition it and override its bg to hide the
+	# existing contents of the main message window. This way we can clear and
+	# set inventory feedback as much as we want without affecting the main log
 	Label = Window.GetControl (0x1000003f)
-	Window.RemoveSubview(Label, True)
-	# resize the win to hide the baked in BG for this useless control
+	Label.AddAlias ("MsgSys", 1)
+	msgWin = GemRB.GetView ("MSGWIN", 0)
+	msgTA = GemRB.GetView ("MsgSys", 0)
+	offset = ( -98, 1 )
+	origin = [ sum(i) for i in zip(msgWin.GetPos (), msgTA.GetPos (), offset) ]
+	msgTAFrame = { "x": origin[0], "y": origin[1] }
+	msgTAFrame["w"], msgTAFrame["h"] = msgTA.GetSize ()
+	msgTAFrame["w"] -= 24 # scrollbar
+	Label.SetFrame (msgTAFrame)
+	Label.SetBackground ("msgta")
+	Label.SetText (None)
+
+	# resize the window, so the moved control will be visible
 	width, height = Window.GetSize()
-	height -= 167 # read from the chu
+	height = GemRB.GetSystemVariable (SV_HEIGHT)
 	Window.SetSize(width, height)
 
 	SlotCount = GemRB.GetSlotType (-1)["Count"]

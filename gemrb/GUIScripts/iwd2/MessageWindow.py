@@ -28,7 +28,6 @@ def OnLoad():
 	# compensate for the bogus scrollbar on the CHU BG
 	smallMTA = OptionsWindow.GetControl(1)
 	smallMTA.AddAlias("MsgSys", 0)
-	smallMTA.AddAlias("MsgSys", 1) # FIXME: should be something for the inventory only
 	smallMTA.AddAlias("MTA_SM", 0, True)
 	smallMTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	smallMTA.SetColor(ColorRed, TA_COLOR_OPTIONS)
