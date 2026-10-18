@@ -1241,10 +1241,7 @@ def OpenLevelUpWindow ():
 
 	Window.ShowModal (MODAL_SHADOW_NONE)
 
-OldLevelLabel = 0
 def LUClassPress ():
-	global OldLevelLabel
-
 	Window = LUWindow
 	Button = Window.GetControl (0)
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -1258,23 +1255,16 @@ def LUClassPress ():
 	Window.SetEventProxy (TextArea)
 
 	# increase/decrease level label by LevelDiff (usually 1)
-	if OldLevelLabel != i:
-		pc = GemRB.GameGetSelectedPCSingle ()
-		j = OldLevelLabel
-		Label = Window.GetControl (0x10000000 + j+15)
-		level = Label.QueryText ()
-		if level == "":
-			level = 1
-		level = int(level)
-		if level-LevelDiff > 0:
-			Label.SetText (str(level - LevelDiff))
+	pc = GemRB.GameGetSelectedPCSingle ()
+	for cb in range(11):
+		Label = Window.GetControl (0x10000000 + cb + 15)
+		oldLevel = GemRB.GetPlayerStat (pc, Classes[cb])
+		if i == cb:
+			Label.SetText (str(oldLevel + LevelDiff))
+		elif oldLevel:
+			Label.SetText (str(oldLevel))
 		else:
-			Label.SetText ("")
-
-		OldLevelLabel = i
-		Label = Window.GetControl (0x10000000 + i+15)
-		level = GemRB.GetPlayerStat (pc, Classes[i])
-		Label.SetText (str(level + LevelDiff))
+			Label.SetText (None)
 
 # if the pc is a paladin or a monk, multiclassing is limited;
 # only their school's favoured class is fair game, otherwise
