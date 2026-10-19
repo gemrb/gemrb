@@ -830,7 +830,7 @@ int GAMImporter::PutHeader(DataStream* stream, const Game* game) const
 			stream->WriteResRefUC(game->CurrentArea); // again
 			break;
 	}
-	stream->WriteDword(game->RealTime); //this isn't correct, this field is the realtime
+	stream->WriteDword(game->RealTime);
 	stream->WriteDword(PPLocOffset);
 	stream->WriteDword(PPLocCount);
 
