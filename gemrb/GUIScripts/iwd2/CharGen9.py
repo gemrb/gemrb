@@ -165,14 +165,14 @@ def NextPress():
 	# setup saving throws
 	IDLUCommon.SetupSavingThrows (MyChar, Class, True)
 
-	# 10 is a weapon slot (see slottype.2da row 10)
-	GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
-	GemRB.SetEquippedQuickSlot (MyChar, 0)
-
 	# reset hitpoints
 	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, GemRB.HasFeat (MyChar, FEAT_TOUGHNESS) * 3, 0)
 	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, GemRB.HasFeat (MyChar, FEAT_TOUGHNESS) * 3, 0)
 	LUCommon.SetupHP (MyChar)
+
+	# 10 is a weapon slot (see slottype.2da row 10)
+	GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
+	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	# must be set, see #2091
 	TmpTable = GemRB.LoadTable ("repstart")
