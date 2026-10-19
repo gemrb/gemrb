@@ -2826,7 +2826,13 @@ void Actor::RefreshEffects(bool first, const stats_t& previous)
 		Timers.checkHPTime = game->GameTime;
 	} else if (Timers.checkHP && Timers.checkHPTime != game->GameTime) {
 		Timers.checkHP = 0;
-		if (!(BaseStats[IE_STATE_ID] & STATE_DEAD)) pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
+		ieDword newHP = BaseStats[IE_HITPOINTS];
+		if (core->GetGame()->RealTime < 1000) { // fresh out of chargen
+			newHP += Timers.lastConBonus;
+		}
+		if (!(BaseStats[IE_STATE_ID] & STATE_DEAD)) {
+			pcf_hitpoint(this, 0, newHP);
+		}
 	}
 
 	// apply haste bonuses to attacks per round, possibly exceeding the limit of 5
