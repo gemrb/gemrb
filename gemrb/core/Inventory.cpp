@@ -1781,6 +1781,7 @@ bool Inventory::EquipBestWeapon(int flags)
 	ieDword bestSlot = SLOT_FIST;
 	const ITMExtHeader* header;
 	CREItem* Slot;
+	bool checkAll = (flags & (EQUIP_MELEE | EQUIP_RANGED)) == (EQUIP_MELEE | EQUIP_RANGED);
 
 	//cannot change equipment when holding magic weapons
 	if (Equipped == SLOT_MAGIC - SLOT_MELEE && !(flags & EQUIP_FORCE)) {
@@ -1789,7 +1790,7 @@ bool Inventory::EquipBestWeapon(int flags)
 
 	if (flags & EQUIP_RANGED) {
 		CanEquipRanged(damage, bestSlot);
-		if (int(bestSlot) == SLOT_FIST) return false;
+		if (int(bestSlot) == SLOT_FIST && !checkAll) return false;
 	}
 
 	if (flags & EQUIP_MELEE) {
