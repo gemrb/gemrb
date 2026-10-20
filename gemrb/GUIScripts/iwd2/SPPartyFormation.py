@@ -111,7 +111,15 @@ def GeneratePress ():
 	GemRB.SetNextScript ("CharGen")
 	return
 
+def EquipBestWeapon ():
+	for pc in range(1, GemRB.GetPartySize () + 1):
+		GemRB.ExecuteString ('EquipWeapon()', pc)
+
 def EnterGamePress ():
+	# ensure all pcs have weapons equipped for new games
+	if GemRB.GetVar ("PartyIdx") == 0:
+		GemRB.SetTimedEvent (EquipBestWeapon, 1)
+
 	GemRB.SetToken ("SaveDir", "mpsave") # iwd2 is always using 'mpsave'
 	GemRB.EnterGame ()
 	return

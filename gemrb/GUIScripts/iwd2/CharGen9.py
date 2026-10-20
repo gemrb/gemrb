@@ -172,7 +172,6 @@ def NextPress():
 
 	# 10 is a weapon slot (see slottype.2da row 10)
 	GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
-	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	# must be set, see #2091
 	TmpTable = GemRB.LoadTable ("repstart")
