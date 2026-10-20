@@ -68,6 +68,7 @@ def NewSpellBookWindow(Window):
 	Window.AddAlias("WIN_SPL")
 	InitSpellBookWindow(Window)
 	GemRB.SetVar ("SpellBookSpellLevel", 0)
+	UpdateSpellBookWindow (Window)
 
 def GetActiveSpellBooks(pc):
 	return [i for i in range(8) if GemRB.GetMemorizableSpellsCount(pc, i, 0) > 0]
