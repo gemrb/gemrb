@@ -106,13 +106,8 @@ def SpellBookCycle (btn):
 	UpdateSpellBookWindow (btn.Window)
 	return
 
-def UpdateSpellBookWindow (Window):
-	pc = GemRB.GameGetSelectedPCSingle ()
-	ActiveSpellBooks = GetActiveSpellBooks(pc)
-	NumBooks = len(ActiveSpellBooks)
-
-	# update spellbook buttons
-	ActiveSpellBooks = GetActiveSpellBooks (pc)
+# update spellbook buttons
+def UpdateSpellBooksRow (Window, ActiveSpellBooks):
 	for i in range(3, -1, -1):
 		Button = Window.GetControl (88 + i)
 		if len(ActiveSpellBooks) > i:
@@ -129,8 +124,20 @@ def UpdateSpellBookWindow (Window):
 		Button = Window.GetControl (88 + (GemRB.GetVar ("SelectedBook") or 0))
 		Button.SetState (IE_GUI_BUTTON_SELECTED) # will reset "SelectedBook"
 
+def UpdateSpellBookWindow (Window):
+	pc = GemRB.GameGetSelectedPCSingle ()
+	ActiveSpellBooks = GetActiveSpellBooks(pc)
+	NumBooks = len(ActiveSpellBooks)
+
+	ActiveSpellBooks = GetActiveSpellBooks (pc)
+	UpdateSpellBooksRow (Window, ActiveSpellBooks)
+
 	BookIndex = GemRB.GetVar ("SelectedBook")
 	if BookIndex is not None:
+		if BookIndex >= NumBooks:
+			BookIndex = 0
+			GemRB.SetVar ("SelectedBook", None)
+			UpdateSpellBooksRow (Window, ActiveSpellBooks)
 		Button = Window.GetControl (92)
 		Button.SetDisabled(BookIndex <= 0)
 		Button.SetValue(BookIndex - 1)
