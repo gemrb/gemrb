@@ -1017,13 +1017,18 @@ bool Inventory::EquipItem(ieDword slot)
 				return false;
 			}
 
-			weaponslot -= SLOT_MELEE;
-			if (IWD2) weaponslot /= 2;
-			SetEquippedSlot((ieWordSigned) (slot - SLOT_MELEE), newHeader);
-			effect = 0; // SetEquippedSlot will already call AddSlotEffects
-			// it is unsure if we can have multiple equipping headers for bows/arrow
-			// it is unclear which item's header index should go there
-			Owner->SetupQuickSlot(ACT_WEAPON1 + weaponslot, slot, 0);
+			if (IWD2) {
+				// iwd2 didn't switch weapons on ammo equip
+				// only do the flags and core fx portion of SetEquippedSlot (other half at the end of function)
+				CREItem* item2 = GetSlotItem(slot);
+				item2->Flags |= IE_INV_ITEM_EQUIPPED;
+			} else {
+				SetEquippedSlot(static_cast<ieWordSigned>(slot - SLOT_MELEE), newHeader);
+				effect = 0; // SetEquippedSlot will already call AddSlotEffects
+				// it is unsure if we can have multiple equipping headers for bows/arrow
+				// it is unclear which item's header index should go there
+				Owner->SetupQuickSlot(ACT_WEAPON1 + weaponslot - SLOT_MELEE, slot, 0);
+			}
 			break;
 		case SLOT_EFFECT_HEAD:
 			if (itm->AnimationType == Owner->HelmetRef) {
