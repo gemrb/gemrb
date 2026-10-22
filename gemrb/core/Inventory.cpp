@@ -2044,7 +2044,7 @@ HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 
 	if (twohanded) {
 		if (IWD2) {
-			if (slot >= SLOT_MELEE && slot <= LAST_MELEE && (slot - SLOT_MELEE) & 1) {
+			if (slot >= SLOT_MELEE && slot <= LAST_MELEE + 1 && (slot - SLOT_MELEE) & 1) {
 				return HCStrings::NotInOffhand;
 			}
 		} else if (slot == SLOT_LEFT) {
