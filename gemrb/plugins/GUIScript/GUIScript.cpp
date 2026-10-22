@@ -9501,7 +9501,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject* /*self*/, PyObject* args)
 	}
 
 	// too far away?
-	constexpr unsigned int maxPassingDistance = 500; // verified in game
+	unsigned int maxPassingDistance = gamedata->GetMiscRule("MAX_DRAGGING_DISTANCE");
 	const Actor* current = game->FindPC(game->GetSelectedPCSingle());
 	if (current && current != actor &&
 	    (actor->GetCurrentArea() != current->GetCurrentArea() ||
