@@ -2466,7 +2466,7 @@ static int fx_area_effect(Scriptable* Owner, Actor* target, Effect* fx)
 	EffectQueue fxqueue = spell.GetEffectBlock(Owner, fx->Pos, 0, fx->CasterLevel);
 	fxqueue.SetOwner(Owner);
 	//bit 2 original target is excluded or not excluded
-	fxqueue.AffectAllInRange(map, fx->Pos, 0, 0, fx->Parameter1, fx->Parameter2 & AE_TARGETEXCL ? target : nullptr);
+	fxqueue.AffectAllInRange(map, fx->Pos, 0, 0, fx->Parameter1 / 16, fx->Parameter2 & AE_TARGETEXCL ? target : nullptr);
 
 	//bit 1 repeat or only once
 	if (fx->Parameter2 & AE_REPEAT) {
