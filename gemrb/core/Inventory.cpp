@@ -2036,7 +2036,7 @@ HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 		}
 		if (slot != otherslot) continue;
 
-		HCStrings shieldSlotUsable = CanUseShieldSlot(i, ranged);
+		HCStrings shieldSlotUsable = CanUseShieldSlot(otherslot, ranged);
 		if (shieldSlotUsable != HCStrings::count) {
 			return shieldSlotUsable;
 		}
