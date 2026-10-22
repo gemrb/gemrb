@@ -1018,6 +1018,7 @@ bool Inventory::EquipItem(ieDword slot)
 			}
 
 			weaponslot -= SLOT_MELEE;
+			if (IWD2) weaponslot /= 2;
 			SetEquippedSlot((ieWordSigned) (slot - SLOT_MELEE), newHeader);
 			effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			// it is unsure if we can have multiple equipping headers for bows/arrow
