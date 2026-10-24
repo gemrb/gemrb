@@ -155,6 +155,12 @@ def TopWindowClosed(window):
 		GemRB.GetView ("ACTWIN").SetVisible (True)
 		GemRB.GetView ("MSGWIN").SetVisible(True)
 
+	InvFeedback = GemRB.GetView ("MsgSys", 1)
+	if GameCheck.IsIWD2 () and InvFeedback:
+		smallMW = GemRB.GetView ("MSGWIN")
+		smallMW.RemoveSubview (InvFeedback, True)
+		GemRB.GetView ("MsgSys", 0).SetVisible (True)
+
 	SnapPortraitWindow (False)
 
 	SetSelectionChangeHandler (None)

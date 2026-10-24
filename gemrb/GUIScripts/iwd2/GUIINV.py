@@ -98,21 +98,13 @@ def InitInventoryWindow (Window):
 	# existing contents of the main message window. This way we can clear and
 	# set inventory feedback as much as we want without affecting the main log
 	Label = Window.GetControl (0x1000003f)
-	Label.AddAlias ("MsgSys", 1)
-	msgWin = GemRB.GetView ("MSGWIN", 0)
-	msgTA = GemRB.GetView ("MsgSys", 0)
-	offset = ( -98, 1 )
-	origin = [ sum(i) for i in zip(msgWin.GetPos (), msgTA.GetPos (), offset) ]
-	msgTAFrame = { "x": origin[0], "y": origin[1] }
-	msgTAFrame["w"], msgTAFrame["h"] = msgTA.GetSize ()
-	msgTAFrame["w"] -= 24 # scrollbar
-	Label.SetFrame (msgTAFrame)
-	Label.SetBackground ("msgta")
-	Label.SetText (None)
+	Window.RemoveSubview(Label, True)
+	import MessageWindow
+	MessageWindow.UpdateControlStatus ()
 
-	# resize the window, so the moved control will be visible
+	# resize the win to hide the baked in BG for this useless control
 	width, height = Window.GetSize()
-	height = GemRB.GetSystemVariable (SV_HEIGHT)
+	height -= 167
 	Window.SetSize(width, height)
 
 	SlotCount = GemRB.GetSlotType (-1)["Count"]

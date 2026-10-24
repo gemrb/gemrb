@@ -72,6 +72,7 @@ def UpdateControlStatus():
 	InDialog = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand
 
+	smallMW = GemRB.GetView("MSGWIN")
 	largeMW = GemRB.GetView("MSGWINLG")
 
 	#a dialogue is running, setting messagewindow size to maximum
@@ -82,12 +83,26 @@ def UpdateControlStatus():
 	else:
 		largeMW.SetVisible(False)
 
+	inventoryWindow = GemRB.GetView ("WIN_INV")
+	if inventoryWindow and inventoryWindow.IsVisible () and not GemRB.GetView ("MsgSys", 1):
+		# create an overlay TA for MsgSys1 to hide the main one (MsgSys0)
+		msgTA = GemRB.GetView ("MsgSys", 0)
+		msgTAFrame = msgTA.GetFrame ()
+		msgTAFrame["x"] += 3
+		msgTAFrame["y"] += 3
+		overlayTA = smallMW.CreateTextArea (0x0fff0000, *msgTAFrame.values(), "NORMAL")
+		overlayTA.SetColor (ColorWhitish, TA_COLOR_NORMAL)
+		overlayTA.SetBackground ("msgta")
+		overlayTA.AddAlias ("MsgSys", 1)
+		overlayTA.SetText (None)
+		msgTA.SetVisible (False)
+		return
+
 	if MTASize == Expand:
 		return
 
 	MTASize = Expand
 
-	smallMW = GemRB.GetView("MSGWIN")
 	smallMTA = GemRB.GetView("MTA_SM", 0)
 	smallFrame = smallMTA.GetFrame()
 
@@ -105,7 +120,7 @@ def UpdateControlStatus():
 	newSmallMTA = smallMW.AddSubview(largeMTA, None, smallID)
 	newSmallMTA.SetFrame(smallFrame)
 	newSmallMTA.AddAlias("MTA_SM", 0, True)
-	
+
 	if InDialog:
 		#gets PC currently talking
 		pc = GemRB.GameGetFirstSelectedPC ()
