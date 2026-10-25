@@ -191,6 +191,7 @@ public:
 
 private:
 	bool AdvancePastReachedStep();
+	void TrimStaleLeadingSteps(Path& newPath, const Point& requestSource) const;
 };
 
 }

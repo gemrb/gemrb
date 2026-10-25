@@ -494,6 +494,46 @@ bool Movable::AdvancePastReachedStep()
 	return false;
 }
 
+// A path is searched from where the actor stood when the request was filed, but the actor keeps
+// walking its previous path for the round trip. By the time the result lands, the first node -
+// often the source tile centre, kept by the pathfinder when the source pixel had no clear line to
+// the next node - can lie behind the actor: walking it means stepping back and turning around,
+// and with re-paths filed every couple of ticks in a crowd the actor starts going in circles.
+// Drop such leading nodes, but only when the actor has really moved since the request, and only
+// when it can walk straight from where it is now to the node after: that is what made the
+// pathfinder keep the stub in the first place, so without a clear line the stub stays.
+void Movable::TrimStaleLeadingSteps(Path& newPath, const Point& requestSource) const
+{
+	if (Pos == requestSource) {
+		return;
+	}
+	size_t dropped = 0;
+	while (newPath.Size() - dropped >= 2) {
+		const Point& first = newPath.nodes[dropped].point;
+		const Point& second = newPath.nodes[dropped + 1].point;
+		// heading to `first` and then on to `second` turns by more than a right angle
+		const long towardFirstX = first.x - Pos.x;
+		const long towardFirstY = first.y - Pos.y;
+		const long onwardX = second.x - first.x;
+		const long onwardY = second.y - first.y;
+		const bool behind = towardFirstX * onwardX + towardFirstY * onwardY < 0;
+		// geometry only: actors on the line are the bump logic's business
+		if (!behind || !area->IsWalkableTo(Pos, second, false, Scriptable::As<Actor>(this))) {
+			break;
+		}
+		++dropped;
+	}
+	if (dropped == 0) {
+		return;
+	}
+	LogDebugPathfinder("Movable::OnPathCalculated", "{}: dropping {} stale leading node(s) behind me (first was {}, now {}), "
+							"I'm at {}, requested source={}",
+			   MoveTag(this), dropped, newPath.nodes.front().point, newPath.nodes[dropped].point, Pos, requestSource);
+	newPath.nodes.erase(newPath.nodes.begin(), newPath.nodes.begin() + static_cast<std::ptrdiff_t>(dropped));
+	// the new first leg starts from here, not from the dropped node
+	newPath.nodes.front().orient = GetOrient(Pos, newPath.nodes.front().point);
+}
+
 void Movable::AddWayPoint(const Point& Des)
 {
 	// A waypoint extends a path that is already being walked; with nothing to extend this degrades
@@ -591,6 +631,9 @@ void Movable::OnPathCalculated(Path&& newPath, const FindPathRequest& pathReques
 		case FindPathRequestType::WalkTo:
 			// intentional fallthrough, mostly common implementation
 		case FindPathRequestType::WalkToFromNewPath:
+			if (newPath) {
+				TrimStaleLeadingSteps(newPath, pathRequest.source);
+			}
 			if (newPath && newPath != path) {
 				ClearPath(false);
 				path = std::move(newPath);
