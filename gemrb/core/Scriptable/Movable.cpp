@@ -176,7 +176,13 @@ void Movable::BumpAway()
 	bumpBackTries = 0;
 	const Point beforeBump = Pos;
 	Size radius { 1, 1 }; // ensure we look beyond the current position
-	area->AdjustPositionNavmap(Pos, radius);
+	NavmapPoint newPos = Pos;
+	area->AdjustPositionNavmap(newPos, radius);
+	// SetPos() keeps SMPos in sync; a stale SMPos left a ghost the bumper kept hitting
+	SetPos(newPos);
+	if (BlocksSearchMap()) {
+		area->BlockSearchMapFor(this);
+	}
 	LogDebugPathfinder("Movable::BumpAway", "{}: bumped away {} -> {} (oldPos={}, landed on flags={})",
 			   MoveTag(this), beforeBump, Pos, oldPos, uint8_t(area->GetBlocked(Pos)));
 }
