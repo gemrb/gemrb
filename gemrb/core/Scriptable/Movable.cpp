@@ -168,23 +168,103 @@ Movable::~Movable()
 	}
 }
 
-void Movable::BumpAway()
+// Distance from p to segment [a, b], in searchmap tiles.
+static float TileDistanceToSegment(const Point& p, const Point& a, const Point& b)
+{
+	constexpr float tileW = SEARCHMAP_TILE_WIDTH;
+	constexpr float tileH = SEARCHMAP_TILE_HEIGHT;
+	const float px = p.x / tileW, py = p.y / tileH;
+	const float ax = a.x / tileW, ay = a.y / tileH;
+	const float abx = b.x / tileW - ax, aby = b.y / tileH - ay;
+	const float len2 = abx * abx + aby * aby;
+	float t = 0;
+	if (len2 > 0) {
+		t = Clamp<float>(((px - ax) * abx + (py - ay) * aby) / len2, 0, 1);
+	}
+	return hypotf(px - (ax + t * abx), py - (ay + t * aby));
+}
+
+// Is cell clear of the bumper's way: its remaining path and its destination?
+bool Movable::IsOutOfTheWayOf(const Movable& bumper, const Point& cell) const
+{
+	// the bumper's collision lookahead hits us while its centre line is within our ellipse
+	const float_t clearance = std::max(1, circleSize - 1);
+	Point from = bumper.Pos;
+	for (size_t i = bumper.path.currentStep; i < bumper.path.Size(); ++i) {
+		const Point& to = bumper.path.nodes[i].point;
+		if (TileDistanceToSegment(cell, from, to) <= clearance) return false;
+		from = to;
+	}
+	return TileDistanceToSegment(cell, bumper.Destination, bumper.Destination) > clearance;
+}
+
+// Pick where to step aside: the closest free cell (up to 2 tiles away) off the bumper's way,
+// preferring not to move ahead of it.
+bool Movable::FindBumpSpot(const Movable& bumper, float_t dirX, float_t dirY, NavmapPoint& spot) const
+{
+	// heading in tile space
+	constexpr float tileW = SEARCHMAP_TILE_WIDTH;
+	constexpr float tileH = SEARCHMAP_TILE_HEIGHT;
+	float_t hx = dirX / tileW, hy = dirY / tileH;
+	const float_t hlen = std::hypotf(hx, hy);
+	if (hlen == 0) return false;
+	hx /= hlen;
+	hy /= hlen;
+	// prefer the side we already stand on
+	const float_t bx = float_t(Pos.x - bumper.Pos.x) / tileW, by = float_t(Pos.y - bumper.Pos.y) / tileH;
+	const float_t mySide = hx * by - hy * bx;
+
+	constexpr int reach = 2;
+	constexpr float_t aheadPenalty = 1.0f;
+	constexpr float_t otherSidePenalty = 0.25f;
+	const Actor* self = Scriptable::As<Actor>(this);
+	bool found = false;
+	float_t bestScore = 0;
+	for (int sy = -reach; sy <= reach; ++sy) {
+		for (int sx = -reach; sx <= reach; ++sx) {
+			if (sx == 0 && sy == 0) continue;
+			const Point cell = SearchmapPoint(SMPos.x + sx, SMPos.y + sy).ToNavmapCenter();
+			// free for our size: passable, no actor, no wall
+			if (!bool(area->GetBlockedInRadius(cell, circleSize) & PathMapFlags::PASSABLE)) continue;
+			if (!IsOutOfTheWayOf(bumper, cell)) continue;
+			if (!area->IsWalkableTo(Pos, cell, false, self)) continue;
+
+			const float_t ahead = sx * hx + sy * hy;
+			const float_t cellSide = hx * sy - hy * sx;
+			float_t score = std::hypotf(float_t(sx), float_t(sy)) + aheadPenalty * std::max<float_t>(ahead, 0);
+			if (cellSide * mySide < 0) score += otherSidePenalty;
+			if (!found || score < bestScore) {
+				found = true;
+				bestScore = score;
+				spot = cell;
+			}
+		}
+	}
+	return found;
+}
+
+void Movable::BumpAway(const Movable& bumper, float_t dirX, float_t dirY)
 {
 	area->ClearSearchMapFor(this);
 	if (!IsBumped()) oldPos = Pos;
 	bumped = true;
 	bumpBackTries = 0;
 	const Point beforeBump = Pos;
-	Size radius { 1, 1 }; // ensure we look beyond the current position
 	NavmapPoint newPos = Pos;
-	area->AdjustPositionNavmap(newPos, radius);
+	const bool foundSpotAside = FindBumpSpot(bumper, dirX, dirY, newPos);
+	if (!foundSpotAside) {
+		// nothing free off the bumper's way: fallback to the nearest free spot
+		const Size radius { 1, 1 }; // ensure we look beyond the current position
+		area->AdjustPositionNavmap(newPos, radius);
+	}
 	// SetPos() keeps SMPos in sync; a stale SMPos left a ghost the bumper kept hitting
 	SetPos(newPos);
 	if (BlocksSearchMap()) {
 		area->BlockSearchMapFor(this);
 	}
-	LogDebugPathfinder("Movable::BumpAway", "{}: bumped away {} -> {} (oldPos={}, landed on flags={})",
-			   MoveTag(this), beforeBump, Pos, oldPos, uint8_t(area->GetBlocked(Pos)));
+	LogDebugPathfinder("Movable::BumpAway", "{}: bumped away {} -> {} by {} ({}) (oldPos={}, landed on flags={})",
+			   MoveTag(this), beforeBump, Pos, bumper.GetScriptName(), foundSpotAside ? "aside" : "fallback",
+			   oldPos, uint8_t(area->GetBlocked(Pos)));
 }
 
 void Movable::BumpBack()
@@ -403,7 +483,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 			LogDebugPathfinder("Movable::DoStep", "{}: bumping {} away from {} (I'm at {}, step {}/{})",
 					   MoveTag(this), actorInTheWay->GetScriptName(), actorInTheWay->Pos,
 					   Pos, path.currentStep, path.Size());
-			actorInTheWay->BumpAway();
+			actorInTheWay->BumpAway(*this, dx, dy);
 		} else {
 			Backoff();
 			LogDebugPathfinder("Movable::DoStep", "{}: backing off for {} ticks, {} at {} blocks me at {} (step {}/{}, dest={} "

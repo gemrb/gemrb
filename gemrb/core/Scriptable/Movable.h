@@ -134,7 +134,8 @@ public:
 		oldPos = Pos;
 		bumped = false;
 	}
-	void BumpAway();
+	// step aside for bumper, which is heading along (dirX, dirY)
+	void BumpAway(const Movable& bumper, float_t dirX, float_t dirY);
 	void BumpBack();
 	inline bool IsBumped() const { return bumped; }
 	PathNode GetNextStep(int x) const;
@@ -191,6 +192,8 @@ public:
 
 private:
 	bool AdvancePastReachedStep();
+	bool IsOutOfTheWayOf(const Movable& bumper, const Point& cell) const;
+	bool FindBumpSpot(const Movable& bumper, float_t dirX, float_t dirY, NavmapPoint& spot) const;
 	void TrimStaleLeadingSteps(Path& newPath, const Point& requestSource) const;
 };
 
