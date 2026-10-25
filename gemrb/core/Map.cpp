@@ -530,6 +530,8 @@ void Map::UpdateScripts()
 		if (actor->GetRandomBackoff()) {
 			actor->DecreaseBackoff();
 			if (!actor->GetRandomBackoff() && actor->GetSpeed() > 0) {
+				LogDebugPathfinder("Map::UpdateScripts", "{}: backoff expired at {}, re-pathing to {}",
+						   actor->GetScriptName(), actor->Pos, actor->Destination);
 				actor->NewPath();
 			}
 		} else if (actor->InMove() && actor->GetSpeed()) {

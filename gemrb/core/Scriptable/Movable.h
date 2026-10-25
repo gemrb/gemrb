@@ -86,7 +86,11 @@ protected:
 	float_t stepFractionX = 0;
 	float_t stepFractionY = 0;
 	bool bumped = false;
+	// the range Actor::NewPath re-paths with, never below the circle size
 	int pathfindingDistance = circleSize;
+	// The range the caller asked for when it ordered the walk being followed now (the request's
+	// minDistance).
+	unsigned int requestedGoalDistance = 0;
 	int randomWalkCounter = 0;
 
 public:
