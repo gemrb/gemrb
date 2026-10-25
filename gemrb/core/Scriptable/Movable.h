@@ -188,6 +188,9 @@ public:
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition() const;
 	virtual bool BlocksSearchMap() const = 0;
+
+private:
+	bool AdvancePastReachedStep();
 };
 
 }

@@ -285,6 +285,15 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		return;
 	}
 
+	// Skip nodes we already stand on (common with async paths), instead of a zero-delta abandon
+	while (Pos == path.GetCurrentStep().point) {
+		LogDebugPathfinder("Movable::DoStep", "{}: already on node {} (step {}/{}), advancing",
+				   MoveTag(this), Pos, path.currentStep, path.Size());
+		if (!AdvancePastReachedStep()) {
+			return;
+		}
+	}
+
 	const PathNode& step = path.GetCurrentStep();
 	assert(!step.point.IsZero());
 
@@ -451,30 +460,38 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	SetOrientation(step.orient, false);
 	timeStartStep = time;
 	if (Pos == nmptStep) {
-		// a new leg has its own direction; carrying the old one's leftover into it would bias it
-		stepFractionX = 0;
-		stepFractionY = 0;
-		path.nodes[path.currentStep].waypoint = false;
-		++path.currentStep;
-		if (path.currentStep >= path.Size()) {
-			// Walked the path out. A request already in flight is the *continuation* of this
-			// journey - when chasing a moving target the path just finished aimed at where the
-			// target used to be, and the pending one aims at where it is now - so it must
-			// survive. ClearPath() cancels it unconditionally, which would drop the actor to
-			// NoMovement and reset its stance, leaving it standing short of the target until
-			// something happened to issue a fresh request. Just drop the spent path instead and
-			// stay in FindPathScheduled; the `!path` check above parks the actor for the frame
-			// or two until the result lands, and an empty result still resolves to NoMovement
-			// through OnPathCalculated.
-			if (GetMovementState() == MovementState::FindPathScheduled) {
-				path.Clear();
-			} else {
-				ClearPath(true);
-			}
-			NewOrientation = Orientation;
-			pathfindingDistance = circleSize;
-		}
+		AdvancePastReachedStep();
 	}
+}
+
+// Current node reached: advance, or finish the path. Returns true if nodes remain.
+bool Movable::AdvancePastReachedStep()
+{
+	// a new leg has its own direction; carrying the old one's leftover into it would bias it
+	stepFractionX = 0;
+	stepFractionY = 0;
+	path.nodes[path.currentStep].waypoint = false;
+	++path.currentStep;
+	if (path.currentStep < path.Size()) {
+		return true;
+	}
+	// Walked the path out. A request already in flight is the *continuation* of this
+	// journey - when chasing a moving target the path just finished aimed at where the
+	// target used to be, and the pending one aims at where it is now - so it must
+	// survive. ClearPath() cancels it unconditionally, which would drop the actor to
+	// NoMovement and reset its stance, leaving it standing short of the target until
+	// something happened to issue a fresh request. Just drop the spent path instead and
+	// stay in FindPathScheduled; the `!path` check in DoStep parks the actor for the frame
+	// or two until the result lands, and an empty result still resolves to NoMovement
+	// through OnPathCalculated.
+	if (GetMovementState() == MovementState::FindPathScheduled) {
+		path.Clear();
+	} else {
+		ClearPath(true);
+	}
+	NewOrientation = Orientation;
+	pathfindingDistance = circleSize;
+	return false;
 }
 
 void Movable::AddWayPoint(const Point& Des)
