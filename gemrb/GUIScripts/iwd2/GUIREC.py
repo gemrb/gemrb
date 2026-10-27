@@ -168,7 +168,7 @@ def GetBonusSpells (pc):
 		# check if at casting stat size, there is any bonus spell in BonusSpellTable
 		bonusSpells[ClassTitle] = [0] * maxLevel
 		for level in range (1, maxLevel+1):
-			bonusSpells[ClassTitle][level-1] = BonusSpellTable.GetValue (Stat-12, level-1)
+			bonusSpells[ClassTitle][level - 1] = BonusSpellTable.GetValue (str(Stat), str(level), GTV_INT)
 
 	return bonusSpells, classes
 
