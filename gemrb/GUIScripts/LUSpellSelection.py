@@ -169,14 +169,6 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	SpellLearnTable = Spellbook.GetSpellLearningTable (table)
 	SpellLearnTable = GemRB.LoadTable (SpellLearnTable)
 
-	CastingStatValue = 0
-	if IWD2:
-		# mxsplbon.2da is handled in core, but does also affect learning, at least in chargen
-		BonusSpellTable = GemRB.LoadTable ("mxsplbon")
-		ClassRowName = GUICommon.GetClassRowName (pc)
-		CastingStat = CommonTables.ClassSkills.GetValue (ClassRowName, "CASTING", GTV_INT)
-		CastingStatValue = GemRB.GetPlayerStat (pc, CastingStat)
-
 	AlreadyShown = 0
 	for i in range (9):
 		# make sure we always have a value to minus (bards)
@@ -190,10 +182,6 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		# also make sure we don't learn too many, which is important for sorcerers
 		PreviousPoints = SpellLearnTable.GetValue (str(level - diff), str(i + 1), GTV_INT)
 		SpellsSelectPointsLeft[i] = SpellLearnTable.GetValue (str(level), str(i + 1), GTV_INT) - PreviousPoints
-		# luckily the bonus applies both to learning and memorization
-		if IWD2 and chargen:
-			BonusPoints[i] = BonusSpellTable.GetValue (str(CastingStatValue), str(i+1), GTV_INT)
-			SpellsSelectPointsLeft[i] += BonusPoints[i]
 
 		if SpellsSelectPointsLeft[i] <= 0:
 			continue
