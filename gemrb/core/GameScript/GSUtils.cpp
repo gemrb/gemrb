@@ -1672,6 +1672,10 @@ MNT MoveNearerTo(Scriptable* Sender, const Point& p, int distance, MNT flags)
 			return flags;
 		}
 		// we can't walk any nearer to destination, give up
+		LogDebugPathfinder("MoveNearerTo", "{}: ACTION ABANDON, not moving after WalkTo, releasing actionID={} "
+						   "(at {}, dest={}, dist={}, wanted={}, state={})",
+				   Sender->GetScriptName(), Sender->GetCurrentAction() ? int(Sender->GetCurrentAction()->actionID) : -1,
+				   actor->Pos, p, Distance(p, actor), distance, int(actor->GetMovementState()));
 		Sender->ReleaseCurrentAction();
 	}
 	return MNT::None;

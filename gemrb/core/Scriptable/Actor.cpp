@@ -8297,10 +8297,16 @@ void Actor::NewPath()
 	// And we don't want to modify Destination so we use a temporary
 	Point savedDest = Destination;
 	if (GetPathTries() > MAX_PATH_TRIES) {
+		LogDebugPathfinder("Actor::NewPath", "{}: PATH-TRIES ABANDON at {} dest={} after {} tries (max {}), actionID={}",
+				   GetScriptName(), Pos, savedDest, GetPathTries(), MAX_PATH_TRIES,
+				   CurrentAction ? int(CurrentAction->actionID) : -1);
 		ClearPath(true);
 		ResetPathTries();
 		return;
 	}
+	LogDebugPathfinder("Actor::NewPath", "{}: re-path at {} dest={} minDist={} (requestedDist={}), tries={}, state={}",
+			   GetScriptName(), Pos, savedDest, pathfindingDistance, requestedGoalDistance, GetPathTries(),
+			   int(GetMovementState()));
 	WalkTo(savedDest, InternalFlags, pathfindingDistance, FindPathRequestType::WalkToFromNewPath);
 }
 

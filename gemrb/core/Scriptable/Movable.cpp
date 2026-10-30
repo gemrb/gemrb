@@ -168,17 +168,103 @@ Movable::~Movable()
 	}
 }
 
-void Movable::BumpAway()
+// Distance from p to segment [a, b], in searchmap tiles.
+static float TileDistanceToSegment(const Point& p, const Point& a, const Point& b)
+{
+	constexpr float tileW = SEARCHMAP_TILE_WIDTH;
+	constexpr float tileH = SEARCHMAP_TILE_HEIGHT;
+	const float px = p.x / tileW, py = p.y / tileH;
+	const float ax = a.x / tileW, ay = a.y / tileH;
+	const float abx = b.x / tileW - ax, aby = b.y / tileH - ay;
+	const float len2 = abx * abx + aby * aby;
+	float t = 0;
+	if (len2 > 0) {
+		t = Clamp<float>(((px - ax) * abx + (py - ay) * aby) / len2, 0, 1);
+	}
+	return hypotf(px - (ax + t * abx), py - (ay + t * aby));
+}
+
+// Is cell clear of the bumper's way: its remaining path and its destination?
+bool Movable::IsOutOfTheWayOf(const Movable& bumper, const Point& cell) const
+{
+	// the bumper's collision lookahead hits us while its centre line is within our ellipse
+	const float_t clearance = std::max(1, circleSize - 1);
+	Point from = bumper.Pos;
+	for (size_t i = bumper.path.currentStep; i < bumper.path.Size(); ++i) {
+		const Point& to = bumper.path.nodes[i].point;
+		if (TileDistanceToSegment(cell, from, to) <= clearance) return false;
+		from = to;
+	}
+	return TileDistanceToSegment(cell, bumper.Destination, bumper.Destination) > clearance;
+}
+
+// Pick where to step aside: the closest free cell (up to 2 tiles away) off the bumper's way,
+// preferring not to move ahead of it.
+bool Movable::FindBumpSpot(const Movable& bumper, float_t dirX, float_t dirY, NavmapPoint& spot) const
+{
+	// heading in tile space
+	constexpr float tileW = SEARCHMAP_TILE_WIDTH;
+	constexpr float tileH = SEARCHMAP_TILE_HEIGHT;
+	float_t hx = dirX / tileW, hy = dirY / tileH;
+	const float_t hlen = std::hypotf(hx, hy);
+	if (hlen == 0) return false;
+	hx /= hlen;
+	hy /= hlen;
+	// prefer the side we already stand on
+	const float_t bx = float_t(Pos.x - bumper.Pos.x) / tileW, by = float_t(Pos.y - bumper.Pos.y) / tileH;
+	const float_t mySide = hx * by - hy * bx;
+
+	constexpr int reach = 2;
+	constexpr float_t aheadPenalty = 1.0f;
+	constexpr float_t otherSidePenalty = 0.25f;
+	const Actor* self = Scriptable::As<Actor>(this);
+	bool found = false;
+	float_t bestScore = 0;
+	for (int sy = -reach; sy <= reach; ++sy) {
+		for (int sx = -reach; sx <= reach; ++sx) {
+			if (sx == 0 && sy == 0) continue;
+			const Point cell = SearchmapPoint(SMPos.x + sx, SMPos.y + sy).ToNavmapCenter();
+			// free for our size: passable, no actor, no wall
+			if (!bool(area->GetBlockedInRadius(cell, circleSize) & PathMapFlags::PASSABLE)) continue;
+			if (!IsOutOfTheWayOf(bumper, cell)) continue;
+			if (!area->IsWalkableTo(Pos, cell, false, self)) continue;
+
+			const float_t ahead = sx * hx + sy * hy;
+			const float_t cellSide = hx * sy - hy * sx;
+			float_t score = std::hypotf(float_t(sx), float_t(sy)) + aheadPenalty * std::max<float_t>(ahead, 0);
+			if (cellSide * mySide < 0) score += otherSidePenalty;
+			if (!found || score < bestScore) {
+				found = true;
+				bestScore = score;
+				spot = cell;
+			}
+		}
+	}
+	return found;
+}
+
+void Movable::BumpAway(const Movable& bumper, float_t dirX, float_t dirY)
 {
 	area->ClearSearchMapFor(this);
 	if (!IsBumped()) oldPos = Pos;
 	bumped = true;
 	bumpBackTries = 0;
 	const Point beforeBump = Pos;
-	Size radius { 1, 1 }; // ensure we look beyond the current position
-	area->AdjustPositionNavmap(Pos, radius);
-	LogDebugPathfinder("Movable::BumpAway", "{}: bumped away {} -> {} (oldPos={}, landed on flags={})",
-			   MoveTag(this), beforeBump, Pos, oldPos, uint8_t(area->GetBlocked(Pos)));
+	NavmapPoint newPos = Pos;
+	const bool foundSpotAside = FindBumpSpot(bumper, dirX, dirY, newPos);
+	if (!foundSpotAside) {
+		// nothing free off the bumper's way: fallback to the nearest free spot
+		const Size radius { 1, 1 }; // ensure we look beyond the current position
+		area->AdjustPositionNavmap(newPos, radius);
+	}
+	// SetPos() keeps SMPos in sync; a stale SMPos left a ghost the bumper kept hitting
+	SetPos(newPos);
+	if (BlocksSearchMap()) {
+		area->BlockSearchMapFor(this);
+	}
+	LogDebugPathfinder("Movable::BumpAway", "{}: bumped away {} -> {} by {} ({}) (oldPos={}, landed on flags={})",
+			   MoveTag(this), beforeBump, Pos, bumper.GetScriptName(), foundSpotAside ? "aside" : "fallback",
+			   oldPos, uint8_t(area->GetBlocked(Pos)));
 }
 
 void Movable::BumpBack()
@@ -212,6 +298,10 @@ void Movable::BumpBack()
 			bumped = false;
 			bumpBackTries = 0;
 			if (SquaredDistance(Pos, Destination) < unsigned(circleSize * 32 * circleSize * 32)) {
+				LogDebugPathfinder("Movable::BumpBack", "{}: BUMP-BACK ABANDON after {} tries at {} (dest={} dist={} < cutoff={}), "
+									"original spot still blocked (flags={})",
+						   MoveTag(this), MAX_BUMP_BACK_TRIES, Pos, Destination, Distance(Destination, this),
+						   circleSize * 32, uint8_t(oldPosBlockStatus));
 				ClearPath(true);
 			}
 		}
@@ -275,6 +365,15 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		return;
 	}
 
+	// Skip nodes we already stand on (common with async paths), instead of a zero-delta abandon
+	while (Pos == path.GetCurrentStep().point) {
+		LogDebugPathfinder("Movable::DoStep", "{}: already on node {} (step {}/{}), advancing",
+				   MoveTag(this), Pos, path.currentStep, path.Size());
+		if (!AdvancePastReachedStep()) {
+			return;
+		}
+	}
+
 	const PathNode& step = path.GetCurrentStep();
 	assert(!step.point.IsZero());
 
@@ -302,8 +401,11 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	// which have to point where the actor is going even on a frame that spends no whole pixel.
 	if (dx == 0 && dy == 0) {
 		// probably shouldn't happen, but it does when running bg2's cut28a set of cutscenes
-		LogDebugPathfinder("Movable::DoStep", "{}: ZERO-DELTA ABANDON at Pos={} step={} step {}/{} dest={}",
-				   MoveTag(this), Pos, nmptStep, path.currentStep, path.Size(), Destination);
+		LogDebugPathfinder("Movable::DoStep", "{}: ZERO-DELTA ABANDON at Pos={} step={} step {}/{} dest={} "
+						      "remaining=({:.3f},{:.3f}) fraction=({:.3f},{:.3f}) walkScale={} stepTime={} requestedDist={}",
+				   MoveTag(this), Pos, nmptStep, path.currentStep, path.Size(), Destination,
+				   remainingX, remainingY, stepFractionX, stepFractionY, walkScale, gamedata->GetStepTime(),
+				   requestedGoalDistance);
 		ClearPath(true);
 		Log(DEBUG, "PathFinder", "Abandoning because I'm exactly at the goal");
 		pathAbandoned = true;
@@ -321,6 +423,17 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	// We can't use GetActorInRadius because we want to only check directly along the way
 	// and not be blocked by actors who are on the sides
 	int collisionLookaheadRadius = ((circleSize < 3 ? 3 : circleSize) - 1) * 3;
+	// On the final leg don't look past its end: the path stops there, so whatever lies beyond is
+	// not in the way. Approaching an actor (a touch spell, a melee attack) the pathfinder ends the
+	// path just outside the target's circle, and an unclamped lookahead would find the target
+	// itself and stop the walk short of the range the caller asked for
+	if (path.currentStep + 1 >= path.Size()) {
+		const float_t stepLength = std::hypotf(dx, dy);
+		const float_t legLeft = std::hypotf(remainingX, remainingY);
+		if (stepLength > 0) {
+			collisionLookaheadRadius = std::min(collisionLookaheadRadius, static_cast<int>(legLeft / stepLength));
+		}
+	}
 	for (int r = collisionLookaheadRadius; r > 0; r--) {
 		auto xCollision = Pos.x + dx * r;
 		auto yCollision = Pos.y + dy * r; // NormalizeDeltas already adjusted dy for perspective
@@ -335,10 +448,29 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 		// the cut-off should be max 1 foot, so attacking with close-ranged weapons is unlikely to stop approaching too soon
 		// attacking actions already take weapon range into account when
 		// triggering movement, so this here does not mean we go needlessly close
-		if (path.Size() == 1 && WithinPersonalRange(this, nmptStep, 1)) {
-			LogDebugPathfinder("Movable::DoStep", "{}: NEAR-GOAL ABANDON at Pos={} step={} dest={} blocker={} at {}",
-					   MoveTag(this), Pos, nmptStep, Destination,
-					   actorInTheWay->GetScriptName(), actorInTheWay->Pos);
+		// ...but never short of the range the caller asked for: stopping outside it leaves the
+		// caller with a halted actor that is still too far, and it gives up the action.
+		const unsigned int distToDest = Distance(Destination, this);
+		const bool withinRequestedRange = requestedGoalDistance == 0 || distToDest <= requestedGoalDistance;
+		const unsigned int stepPersonalDist = PersonalDistance(nmptStep, this);
+		const float_t nearGoalCutoff = Feet2Pixels(1, AngleFromPoints(Pos, nmptStep));
+		const bool nearStep = stepPersonalDist <= nearGoalCutoff;
+		const bool lastNode = path.Size() == 1;
+		if (lastNode && nearStep && !withinRequestedRange) {
+			LogDebugPathfinder("Movable::DoStep", "{}: NEAR-GOAL HELD (out of requested range) at Pos={} step={} dest={} "
+							      "distToDest={} > requestedDist={} stepPersonalDist={} cutoff={:.1f} blocker={} at {}",
+					   MoveTag(this), Pos, nmptStep, Destination, distToDest, requestedGoalDistance,
+					   stepPersonalDist, nearGoalCutoff, actorInTheWay->GetScriptName(), actorInTheWay->Pos);
+		}
+		if (lastNode && withinRequestedRange && nearStep) {
+			LogDebugPathfinder("Movable::DoStep", "{}: NEAR-GOAL ABANDON at Pos={} step={} dest={} pathSize={} "
+							      "distToDest={} requestedDist={} (withinRequested={}) stepPersonalDist={} <= cutoff={:.1f} "
+							      "myRadius={} lookahead={} blocker={} at {} blockerRadius={} rawDistToBlocker={}",
+					   MoveTag(this), Pos, nmptStep, Destination, path.Size(),
+					   distToDest, requestedGoalDistance, withinRequestedRange, stepPersonalDist, nearGoalCutoff,
+					   actor ? actor->CircleSize2Radius() * 4 : 0, collisionLookaheadRadius,
+					   actorInTheWay->GetScriptName(), actorInTheWay->Pos, actorInTheWay->CircleSize2Radius() * 4,
+					   Distance(actorInTheWay, this));
 			ClearPath(true);
 			NewOrientation = Orientation;
 			// Do not call ReleaseCurrentAction() since other actions
@@ -351,12 +483,15 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 			LogDebugPathfinder("Movable::DoStep", "{}: bumping {} away from {} (I'm at {}, step {}/{})",
 					   MoveTag(this), actorInTheWay->GetScriptName(), actorInTheWay->Pos,
 					   Pos, path.currentStep, path.Size());
-			actorInTheWay->BumpAway();
+			actorInTheWay->BumpAway(*this, dx, dy);
 		} else {
-			LogDebugPathfinder("Movable::DoStep", "{}: backing off, {} at {} blocks me at {} (step {}/{})",
-					   MoveTag(this), actorInTheWay->GetScriptName(), actorInTheWay->Pos,
-					   Pos, path.currentStep, path.Size());
 			Backoff();
+			LogDebugPathfinder("Movable::DoStep", "{}: backing off for {} ticks, {} at {} blocks me at {} (step {}/{}, dest={} "
+							      "distToDest={} requestedDist={} iCanBump={} blockerBumpable={} lastNode={} nearStep={})",
+					   MoveTag(this), randomBackoff, actorInTheWay->GetScriptName(), actorInTheWay->Pos,
+					   Pos, path.currentStep, path.Size(), Destination, distToDest, requestedGoalDistance,
+					   actor && actor->ValidTarget(GA_CAN_BUMP), actorInTheWay->ValidTarget(GA_ONLY_BUMPABLE),
+					   lastNode, nearStep);
 			return;
 		}
 	}
@@ -374,12 +509,14 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	const Point wallProbe(loX, loY);
 	if (blocksSearch && !core->InCutSceneMode() && insideAWall) {
 		LogDebugPathfinder("Movable::DoStep", "{}: WALL ABANDON at Pos={} SM={} probe={} probeFlags={} stepTarget={} "
-						      "delta=({},{}) step {}/{} dest={} bumped={} probeRadiusFlags={} posFlags={}",
+						      "delta=({},{}) step {}/{} dest={} bumped={} probeRadiusFlags={} posFlags={} "
+						      "distToDest={} requestedDist={} releasingActionID={}",
 				   MoveTag(this), Pos, fmt::format("({},{})", SMPos.x, SMPos.y), wallProbe,
 				   uint8_t(area->GetBlocked(wallProbe)), nmptStep, dx, dy,
 				   path.currentStep, path.Size(), Destination, bumped,
 				   uint8_t(area->GetBlockedInRadius(wallProbe, circleSize)),
-				   uint8_t(area->GetBlocked(Pos)));
+				   uint8_t(area->GetBlocked(Pos)), Distance(Destination, this), requestedGoalDistance,
+				   CurrentAction ? int(CurrentAction->actionID) : -1);
 		Log(DEBUG, "PathFinder", "Abandoning because I'm in front of a wall");
 		ClearPath(true);
 		ReleaseCurrentAction(); // otherwise MoveToPoint and others that keep retrying will loop
@@ -403,30 +540,78 @@ void Movable::DoStep(unsigned int walkScale, ieDword time)
 	SetOrientation(step.orient, false);
 	timeStartStep = time;
 	if (Pos == nmptStep) {
-		// a new leg has its own direction; carrying the old one's leftover into it would bias it
-		stepFractionX = 0;
-		stepFractionY = 0;
-		path.nodes[path.currentStep].waypoint = false;
-		++path.currentStep;
-		if (path.currentStep >= path.Size()) {
-			// Walked the path out. A request already in flight is the *continuation* of this
-			// journey - when chasing a moving target the path just finished aimed at where the
-			// target used to be, and the pending one aims at where it is now - so it must
-			// survive. ClearPath() cancels it unconditionally, which would drop the actor to
-			// NoMovement and reset its stance, leaving it standing short of the target until
-			// something happened to issue a fresh request. Just drop the spent path instead and
-			// stay in FindPathScheduled; the `!path` check above parks the actor for the frame
-			// or two until the result lands, and an empty result still resolves to NoMovement
-			// through OnPathCalculated.
-			if (GetMovementState() == MovementState::FindPathScheduled) {
-				path.Clear();
-			} else {
-				ClearPath(true);
-			}
-			NewOrientation = Orientation;
-			pathfindingDistance = circleSize;
-		}
+		AdvancePastReachedStep();
 	}
+}
+
+// Current node reached: advance, or finish the path. Returns true if nodes remain.
+bool Movable::AdvancePastReachedStep()
+{
+	// a new leg has its own direction; carrying the old one's leftover into it would bias it
+	stepFractionX = 0;
+	stepFractionY = 0;
+	path.nodes[path.currentStep].waypoint = false;
+	++path.currentStep;
+	if (path.currentStep < path.Size()) {
+		return true;
+	}
+	// Walked the path out. A request already in flight is the *continuation* of this
+	// journey - when chasing a moving target the path just finished aimed at where the
+	// target used to be, and the pending one aims at where it is now - so it must
+	// survive. ClearPath() cancels it unconditionally, which would drop the actor to
+	// NoMovement and reset its stance, leaving it standing short of the target until
+	// something happened to issue a fresh request. Just drop the spent path instead and
+	// stay in FindPathScheduled; the `!path` check in DoStep parks the actor for the frame
+	// or two until the result lands, and an empty result still resolves to NoMovement
+	// through OnPathCalculated.
+	if (GetMovementState() == MovementState::FindPathScheduled) {
+		path.Clear();
+	} else {
+		ClearPath(true);
+	}
+	NewOrientation = Orientation;
+	pathfindingDistance = circleSize;
+	return false;
+}
+
+// A path is searched from where the actor stood when the request was filed, but the actor keeps
+// walking its previous path for the round trip. By the time the result lands, the first node -
+// often the source tile centre, kept by the pathfinder when the source pixel had no clear line to
+// the next node - can lie behind the actor: walking it means stepping back and turning around,
+// and with re-paths filed every couple of ticks in a crowd the actor starts going in circles.
+// Drop such leading nodes, but only when the actor has really moved since the request, and only
+// when it can walk straight from where it is now to the node after: that is what made the
+// pathfinder keep the stub in the first place, so without a clear line the stub stays.
+void Movable::TrimStaleLeadingSteps(Path& newPath, const Point& requestSource) const
+{
+	if (Pos == requestSource) {
+		return;
+	}
+	size_t dropped = 0;
+	while (newPath.Size() - dropped >= 2) {
+		const Point& first = newPath.nodes[dropped].point;
+		const Point& second = newPath.nodes[dropped + 1].point;
+		// heading to `first` and then on to `second` turns by more than a right angle
+		const long towardFirstX = first.x - Pos.x;
+		const long towardFirstY = first.y - Pos.y;
+		const long onwardX = second.x - first.x;
+		const long onwardY = second.y - first.y;
+		const bool behind = towardFirstX * onwardX + towardFirstY * onwardY < 0;
+		// geometry only: actors on the line are the bump logic's business
+		if (!behind || !area->IsWalkableTo(Pos, second, false, Scriptable::As<Actor>(this))) {
+			break;
+		}
+		++dropped;
+	}
+	if (dropped == 0) {
+		return;
+	}
+	LogDebugPathfinder("Movable::OnPathCalculated", "{}: dropping {} stale leading node(s) behind me (first was {}, now {}), "
+							"I'm at {}, requested source={}",
+			   MoveTag(this), dropped, newPath.nodes.front().point, newPath.nodes[dropped].point, Pos, requestSource);
+	newPath.nodes.erase(newPath.nodes.begin(), newPath.nodes.begin() + static_cast<std::ptrdiff_t>(dropped));
+	// the new first leg starts from here, not from the dropped node
+	newPath.nodes.front().orient = GetOrient(Pos, newPath.nodes.front().point);
 }
 
 void Movable::AddWayPoint(const Point& Des)
@@ -526,9 +711,20 @@ void Movable::OnPathCalculated(Path&& newPath, const FindPathRequest& pathReques
 		case FindPathRequestType::WalkTo:
 			// intentional fallthrough, mostly common implementation
 		case FindPathRequestType::WalkToFromNewPath:
+			if (newPath) {
+				TrimStaleLeadingSteps(newPath, pathRequest.source);
+			}
 			if (newPath && newPath != path) {
 				ClearPath(false);
 				path = std::move(newPath);
+				// Actor::NewPath re-paths around crowds and after a backoff; it has to aim for
+				// the range of this order, not the circle size or a stale failed one
+				pathfindingDistance = std::max(circleSize, static_cast<int>(pathRequest.minDistance));
+				// a NewPath re-path carries the order's range plus a circle size floor; keep the
+				// caller's own figure, or a plain walk (0) would turn into a range-bound one
+				if (pathRequest.requestType == FindPathRequestType::WalkTo) {
+					requestedGoalDistance = pathRequest.minDistance;
+				}
 				SetMovementState(MovementState::Moving);
 				HandleAnkhegStance(false);
 				return;
@@ -569,10 +765,13 @@ void Movable::OnPathCalculated(Path&& newPath, const FindPathRequest& pathReques
 				lastStep.waypoint = true;
 			}
 			path.AppendPath(newPath);
+			// the path now ends at the waypoint, which was requested with its own range
+			requestedGoalDistance = pathRequest.minDistance;
 			SetMovementState(MovementState::Moving);
 			break;
 		case FindPathRequestType::RunAway:
 			path = std::move(newPath);
+			requestedGoalDistance = 0;
 			HandleAnkhegStance(false);
 			SetMovementState(path ? MovementState::Moving : MovementState::NoMovement);
 			break;
@@ -627,13 +826,18 @@ void Movable::WalkTo(const Point& Des, int distance, FindPathRequestType InReque
 	prevTicks = Ticks;
 	Destination = Des;
 	if (pathAbandoned) {
-		LogDebugPathfinder("Movable::WalkTo", "{}: refusing dest={}, path was abandoned last step", MoveTag(this), Des);
+		LogDebugPathfinder("Movable::WalkTo", "{}: refusing dest={} minDist={}, path was abandoned last step (at {}, dist={}, "
+						      "previous requestedDist={}, actionID={})",
+				   MoveTag(this), Des, distance, Pos, Distance(Des, this), requestedGoalDistance,
+				   CurrentAction ? int(CurrentAction->actionID) : -1);
 		Log(DEBUG, "WalkTo", "{}: Path was just abandoned", fmt::WideToChar { actor->GetShortName() });
 		ClearPath(true);
 		return;
 	}
 
 	if (SMPos == SearchmapPoint(Des)) {
+		LogDebugPathfinder("Movable::WalkTo", "{}: SAME-CELL STOP, already on dest={} cell (at {}, minDist={}), filing nothing",
+				   MoveTag(this), Des, Pos, distance);
 		ClearPath(true);
 		SetStance(IE_ANI_HEAD_TURN);
 		return;
@@ -714,6 +918,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	if (foundStep) {
 		Destination = randomStep.point;
 		path.PrependStep(std::move(randomStep)); // start or end doesn't matter, since the path is currently empty
+		requestedGoalDistance = 0;
 		// the path is built here rather than requested from the pathfinder, so the state has to be
 		// advanced by hand - DoStep ignores a path while the state is NoMovement
 		SetMovementState(MovementState::Moving);

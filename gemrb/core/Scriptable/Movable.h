@@ -86,7 +86,11 @@ protected:
 	float_t stepFractionX = 0;
 	float_t stepFractionY = 0;
 	bool bumped = false;
+	// the range Actor::NewPath re-paths with, never below the circle size
 	int pathfindingDistance = circleSize;
+	// The range the caller asked for when it ordered the walk being followed now (the request's
+	// minDistance).
+	unsigned int requestedGoalDistance = 0;
 	int randomWalkCounter = 0;
 
 public:
@@ -130,7 +134,8 @@ public:
 		oldPos = Pos;
 		bumped = false;
 	}
-	void BumpAway();
+	// step aside for bumper, which is heading along (dirX, dirY)
+	void BumpAway(const Movable& bumper, float_t dirX, float_t dirY);
 	void BumpBack();
 	inline bool IsBumped() const { return bumped; }
 	PathNode GetNextStep(int x) const;
@@ -184,6 +189,12 @@ public:
 	/* returns the most likely position of this actor */
 	Point GetMostLikelyPosition() const;
 	virtual bool BlocksSearchMap() const = 0;
+
+private:
+	bool AdvancePastReachedStep();
+	bool IsOutOfTheWayOf(const Movable& bumper, const Point& cell) const;
+	bool FindBumpSpot(const Movable& bumper, float_t dirX, float_t dirY, NavmapPoint& spot) const;
+	void TrimStaleLeadingSteps(Path& newPath, const Point& requestSource) const;
 };
 
 }
