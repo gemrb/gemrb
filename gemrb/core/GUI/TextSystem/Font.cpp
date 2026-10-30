@@ -100,7 +100,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 	MapSheetSegment(chr, Region(pageXPos, (g.pos.y < 0) ? 0 : g.pos.y, g.size.w, g.size.h));
 	// make the non-temporary glyph from our own data
 	const ieByte* pageLoc = pageData + pageXPos;
-	glyphs.emplace(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w, g.bytesPerPx));
+	glyphs.emplace(chr, Glyph(g.size, g.pos, g.advance, pageLoc, SheetRegion.w, g.bytesPerPx));
 
 	pageXPos = newX;
 
@@ -117,7 +117,7 @@ const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 	if (it != glyphs.end()) {
 		return it->second;
 	}
-	const static Glyph blank(Size(0, 0), Point(0, 0), NULL, 0, 1);
+	const static Glyph blank(Size(0, 0), Point(0, 0), 0, NULL, 0, 1);
 	return blank;
 }
 
@@ -190,16 +190,18 @@ void Font::CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph* g)
 	AtlasIndex[chr] = GlyphIndexEntry(chr, pageIdx, g);
 }
 
-const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>& spr)
+const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>& spr, int advance, int bearingX)
 {
 	assert(AtlasIndex.size() <= chr || AtlasIndex[chr].pageIdx == static_cast<ieWord>(-1));
 	assert(spr);
 
 	Size size(spr->Frame.w, spr->Frame.h);
-	// FIXME: should we adjust for spr->Frame.x too?
-	Point pos(0, Baseline - spr->Frame.y);
+	Point pos(bearingX, Baseline - spr->Frame.y);
+	if (advance < 0) {
+		advance = spr->Frame.w;
+	}
 
-	Glyph tmp = Glyph(size, pos, (ieByte*) spr->LockSprite(), spr->Frame.w, spr->GetPalette() ? 1 : 4);
+	Glyph tmp = Glyph(size, pos, advance, (ieByte*) spr->LockSprite(), spr->Frame.w, spr->GetPalette() ? 1 : 4);
 	spr->UnlockSprite(); // FIXME: this is assuming it is ok to hang onto to pixel buffer returned from LockSprite()
 	// adjust the location for the glyph
 	if (!CurrentAtlasPage || !CurrentAtlasPage->AddGlyph(chr, tmp)) {
@@ -479,7 +481,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 					page->Draw(currChar, Region(blitPoint, curGlyph.size), colors);
 				}
 			}
-			dp.x += curGlyph.size.w;
+			dp.x += curGlyph.advance;
 		}
 		linePos += i;
 		if (done) break;
@@ -548,7 +550,7 @@ size_t Font::StringSizeWidth(const String& string, size_t width, size_t* numChar
 		}
 
 		const Glyph& curGlyph = GetGlyph(c);
-		ieWord chrW = curGlyph.size.w;
+		ieWord chrW = curGlyph.advance;
 		if (i > 0) {
 			chrW -= GetKerningOffset(string[i - 1], string[i]);
 		}
@@ -587,7 +589,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 		eos = (i == string.length() - 1);
 		ws = std::iswspace(string[i]);
 		if (!ws) {
-			ieWord chrW = curGlyph.size.w;
+			ieWord chrW = curGlyph.advance;
 			if (lineW > 0) { // kerning
 				chrW -= GetKerningOffset(string[i - 1], string[i]);
 			}
@@ -611,7 +613,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 					lineW += spaceW; // everything else appended later
 					newline = true;
 				} else if (ws && string[i] != u'\r') {
-					spaceW += curGlyph.size.w;
+					spaceW += curGlyph.advance;
 				}
 				APPEND_TO_LINE(wordW);
 			}
