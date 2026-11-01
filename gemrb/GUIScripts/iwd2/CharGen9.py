@@ -172,6 +172,9 @@ def NextPress():
 
 	# 10 is a weapon slot (see slottype.2da row 10)
 	GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
+	# this is not needed any more for equipping the staff, BUT we need to
+	# init the actor for the pcfs to run properly (SetStat checks IF_INITIALIZED)
+	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	# must be set, see #2091
 	TmpTable = GemRB.LoadTable ("repstart")
