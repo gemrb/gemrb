@@ -148,24 +148,71 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 
 	if ScrollBar:
 		ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, 0)
-	#get our class id and name
-	IsDual = GUICommon.IsDualClassedDetailed (pc)
-	IsMulti = GUICommon.IsMultiClassed (pc, 1)
-	if classid: #used when dual-classing
-		Class = classid
-		ClassName = GUICommon.GetClassRowName (Class, "class")
-	elif IsDual[0]: #only care about the current class
-		ClassName = IsDual[2]
-	else:
-		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-		ClassName = GUICommon.GetClassRowName (Class, "class")
 
 	if GUICommon.IsNamelessOne(pc):
 		# sigh
 		level1 = [level1[2]]
 		level2 = [level2[2]]
 
-	#get the number of classes
+	GetAvailableSkillPoints (pc, classid, level1, level2, skilltype)
+
+	# we didn't find anything, so don't continue (will show as a return of 0)
+	# or don't display if we aren't leveling and have a bard/ranger
+	if not len (SkillsIndices) or (not SkillPointsLeft and skilltype != LUSKILLS_TYPE_LEVELUP):
+		SkillSumLabel = SkillsWindow.GetControl (0x10000000 + SkillsOffsetSum)
+		SkillSumLabel.SetText ("")
+		return
+
+	# skills scrollbar
+	if len(SkillsIndices) > SkillsNumButtons:
+		ScrollBar.OnChange (lambda: SkillsRedraw())
+		# decrease it with the number of controls on screen (list size)
+		maxvalue = SkillsTable.GetRowCount() - SkillsNumButtons
+		ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, maxvalue)
+		Button = SkillsWindow.GetControl (SkillsOffsetPress)
+		AddScrollbarProxy (SkillsWindow, ScrollBar, Button)
+	else:
+		GemRB.SetVar ("SkillsTopIndex", 0)
+
+	# setup all the visible buttons
+	for i in range(len(SkillsIndices)):
+		if i == SkillsNumButtons:
+			break
+		if SkillsOffsetPress != -1:
+			Button = SkillsWindow.GetControl (i + SkillsOffsetPress)
+			Button.SetVarAssoc ("Skill", SkillsIndices[i])
+			Button.OnPress (SkillJustPress)
+
+		Button = SkillsWindow.GetControlAlias ("PLUSBTN" + str(i))
+		Button.SetVarAssoc ("Skill", SkillsIndices[i])
+		Button.OnPress (SkillLeftPress)
+		Button.SetActionInterval (20);
+
+		Button =  SkillsWindow.GetControlAlias ("MINUSBTN" + str(i))
+		Button.SetVarAssoc ("Skill", SkillsIndices[i])
+		Button.OnPress (SkillRightPress)
+		Button.SetActionInterval (20);
+
+	SkillsRedraw ()
+	return
+
+def GetAvailableSkillPoints (pc, classid, level1, level2, skillType):
+	global SkillsIndices, SkillPointsLeft
+	global SkillsKitName, SkillsAssignable
+
+	# get our class id and name
+	IsDual = GUICommon.IsDualClassedDetailed (pc)
+	IsMulti = GUICommon.IsMultiClassed (pc, 1)
+	if classid: # used when dual-classing
+		Class = classid
+		ClassName = GUICommon.GetClassRowName (Class, "class")
+	elif IsDual[0]: # only care about the current class
+		ClassName = IsDual[2]
+	else:
+		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+		ClassName = GUICommon.GetClassRowName (Class, "class")
+
+	# get the number of classes
 	if IsMulti[0]>1:
 		NumClasses = IsMulti[0]
 	else:
@@ -173,10 +220,10 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	if NumClasses > len (level2):
 		return
 
-	#figure out the kitname if we need it
-	#protect against kitted multiclasses
+	# figure out the kitname if we need it
+	# protect against kitted multiclasses
 	Kit = GUICommon.GetKitIndex (pc)
-	if not Kit or skilltype == LUSKILLS_TYPE_DUALCLASS or IsDual[0] in [1, 2] or IsMulti[0]>1:
+	if not Kit or skillType == LUSKILLS_TYPE_DUALCLASS or IsDual[0] in [1, 2] or IsMulti[0] > 1:
 		SkillsKitName = ClassName
 	else:
 		SkillsKitName = GUICommon.GetKitRowName (pc, True, Kit)
@@ -196,7 +243,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	# in effect, the only difference is that it allows per-kit granularity
 	# disabled until proven useful: GemRB.LoadTable ("clasiskl", True, True)
 
-	#figure out the correct skills table
+	# figure out the correct skills table
 	SkillIndex = -1
 	for i in range (NumClasses):
 		TmpClassName = ClassName
@@ -209,8 +256,8 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 	#see if we got a thief (or monk)
 	SkillsIndices = []
 	if SkillIndex >= 0:
-		#SkillsKitName should be fine as all multis are in classes.2da
-		#also allows for thief kits
+		# SkillsKitName should be fine as all multis are in classes.2da
+		# also allows for thief kits
 		SkillsAssignable = 1
 		for i in range(SkillsTable.GetRowCount()):
 			SkillName = SkillsTable.GetRowName (i)
@@ -231,7 +278,7 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 			#really don't have an entry
 			SkillPointsLeft = 0
 		else:
-			#get the skill values
+			# get the skill values
 			for i in range(SkillsTable.GetRowCount()):
 				SkillName = SkillsTable.GetRowName (i)
 				SkillID = SkillsTable.GetValue (SkillName, "ID")
@@ -243,12 +290,12 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 				GemRB.SetVar("SkillDisplayMod "+str(i), SkillValue-BaseSkillValue)
 				TotalSkillsAssignable += LUSKILLS_MAX-SkillValue
 
-		#protect against having more skills than we can assign
+		# protect against having more skills than we can assign
 		if SkillPointsLeft > TotalSkillsAssignable:
 			SkillPointsLeft = TotalSkillsAssignable
 		GemRB.SetVar ("SkillPointsLeft", SkillPointsLeft)
 	else: 
-		#get ranger and bard skills
+		# get ranger and bard skills
 		SpecialSkillsMap = []
 		for i in range(NumClasses):
 			if IsMulti[0]>1:
@@ -269,44 +316,6 @@ def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[
 				GemRB.SetVar ("Skill " + str(skillindex), value)
 				SkillsIndices.append(skillindex)
 
-	#we didn't find anything, so don't continue (will show as a return of 0)
-	#or don't display if we aren't leveling and have a bard/ranger
-	if not len (SkillsIndices) or (not SkillPointsLeft and skilltype != LUSKILLS_TYPE_LEVELUP):
-		SkillSumLabel = SkillsWindow.GetControl(0x10000000+SkillsOffsetSum)
-		SkillSumLabel.SetText("")
-		return
-
-	#skills scrollbar
-	if len(SkillsIndices) > SkillsNumButtons:
-		ScrollBar.OnChange (lambda: SkillsRedraw())
-		#decrease it with the number of controls on screen (list size)
-		maxvalue = SkillsTable.GetRowCount() - SkillsNumButtons
-		ScrollBar.SetVarAssoc ("SkillsTopIndex", 0, 0, maxvalue)
-		Button = SkillsWindow.GetControl(SkillsOffsetPress)
-		AddScrollbarProxy(SkillsWindow, ScrollBar, Button)
-	else:
-		GemRB.SetVar ("SkillsTopIndex", 0)
-
-	#setup all the visible buttons
-	for i in range(len(SkillsIndices)):
-		if i == SkillsNumButtons:
-			break
-		if SkillsOffsetPress != -1:
-			Button = SkillsWindow.GetControl(i+SkillsOffsetPress)
-			Button.SetVarAssoc("Skill",SkillsIndices[i])
-			Button.OnPress (SkillJustPress)
-
-		Button = SkillsWindow.GetControlAlias ("PLUSBTN" + str(i))
-		Button.SetVarAssoc("Skill",SkillsIndices[i])
-		Button.OnPress (SkillLeftPress)
-		Button.SetActionInterval(20);
-
-		Button =  SkillsWindow.GetControlAlias ("MINUSBTN" + str(i))
-		Button.SetVarAssoc("Skill",SkillsIndices[i])
-		Button.OnPress (SkillRightPress)
-		Button.SetActionInterval(20);
-	
-	SkillsRedraw ()
 	return
 
 def SkillsRedraw (direction=0):
