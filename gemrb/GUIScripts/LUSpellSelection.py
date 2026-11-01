@@ -171,14 +171,6 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 
 	AlreadyShown = 0
 	for i in range (9):
-		# make sure we always have a value to minus (bards)
-		PreviousPoints = SpellsToMemoTable.GetValue (str(level - diff), str(i + 1), GTV_INT)
-
-		# make sure we get more spells of each class before continuing
-		SpellsSelectPointsLeft[i] = SpellsToMemoTable.GetValue (str(level), str(i + 1), GTV_INT) - PreviousPoints
-		if SpellsSelectPointsLeft[i] <= 0:
-			continue
-
 		# also make sure we don't learn too many, which is important for sorcerers
 		PreviousPoints = SpellLearnTable.GetValue (str(level - diff), str(i + 1), GTV_INT)
 		SpellsSelectPointsLeft[i] = SpellLearnTable.GetValue (str(level), str(i + 1), GTV_INT) - PreviousPoints
