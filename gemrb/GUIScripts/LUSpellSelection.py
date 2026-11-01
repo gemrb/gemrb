@@ -206,6 +206,11 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			ShowSpells ()
 			AlreadyShown = 1
 
+	# no new spells?
+	if AlreadyShown == 0:
+		CloseAndContinue ()
+		return
+
 	# show the selection window
 	if chargen:
 		if recommend:
@@ -296,6 +301,12 @@ def SpellsDonePress ():
 			ShowKnownSpells()
 			return
 
+	CloseAndContinue ()
+	return
+
+def CloseAndContinue ():
+	global SpellsWindow
+
 	# close our window and update our records
 	if SpellsWindow and (not chargen or GameCheck.IsBG2 () or GameCheck.IsAnyEE () or IWD2):
 		SpellsWindow.Close ()
@@ -315,7 +326,6 @@ def SpellsDonePress ():
 	elif IWD2:
 		import GUIREC
 		GUIREC.FinishLevelUp ()
-
 	return
 
 def ShowKnownSpells ():
