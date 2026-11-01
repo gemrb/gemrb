@@ -11,6 +11,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import InventoryCommon
+import MessageWindow
 import PaperDoll
 from GUIDefines import *
 from ie_stats import *
@@ -99,7 +100,6 @@ def InitInventoryWindow (Window):
 	# set inventory feedback as much as we want without affecting the main log
 	Label = Window.GetControl (0x1000003f)
 	Window.RemoveSubview(Label, True)
-	import MessageWindow
 	MessageWindow.UpdateControlStatus ()
 
 	# resize the win to hide the baked in BG for this useless control
@@ -158,6 +158,7 @@ def UpdateInventoryWindow (Window):
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 
+	MessageWindow.UpdateControlStatus ()
 	RefreshInventoryWindow ()
 	# populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
