@@ -97,7 +97,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	if chargen:
 		SpellsWindow = GemRB.LoadWindow (7, "GUICG")
 
-		if GameCheck.IsBG2OrEE ():
+		if GameCheck.IsBG2 () or GameCheck.IsAnyEE ():
 			import CharGenCommon
 			CharGenCommon.PositionCharGenWin (SpellsWindow)
 		elif IWD2:
@@ -105,7 +105,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			CharOverview.PositionCharGenWin (SpellsWindow)
 
 		DoneButton = SpellsWindow.GetControl (0)
-		SpellsTextArea = SpellsWindow.GetControl (41 if GameCheck.IsAnyEE() else 27)
+		SpellsTextArea = SpellsWindow.GetControl (41 if GameCheck.IsBG2EE() else 27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
 		if (EnhanceGUI):
 			sb = SpellsWindow.CreateScrollBar (NewScrollBarID, {'x' : 325, 'y' : 42, 'w' : 16, 'h' : 252})
@@ -305,13 +305,13 @@ def SpellsDonePress ():
 			return
 
 	# close our window and update our records
-	if SpellsWindow and (not chargen or GameCheck.IsBG2OrEE () or IWD2):
+	if SpellsWindow and (not chargen or GameCheck.IsBG2 () or GameCheck.IsAnyEE () or IWD2):
 		SpellsWindow.Close ()
 		SpellsWindow = None
 
 	# move to the next script if this is chargen
 	if chargen:
-		if GameCheck.IsBG2OrEE ():
+		if GameCheck.IsBG2 () or GameCheck.IsAnyEE ():
 			GemRB.SetNextScript("GUICG6")
 		elif GameCheck.IsBG1():
 			SpellsWindow.Close ()
