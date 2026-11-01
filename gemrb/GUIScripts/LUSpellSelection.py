@@ -132,7 +132,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			DoneButton = SpellsWindow.GetControl (33)
 			SpellsTextArea = SpellsWindow.GetControl(30)
 			SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000022)
-		elif GameCheck.IsAnyEE ():
+		elif GameCheck.IsBG2EE (): # not bgee
 			NewScrollBarID = 40
 			DoneButton = SpellsWindow.GetControl (42)
 			SpellsTextArea = SpellsWindow.GetControl(41)
