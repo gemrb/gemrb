@@ -49,7 +49,7 @@ def OnLoad():
 
 	# alignment based bhaal powers are added in FixInnates later
 	# unless we're starting with SoA
-	if GemRB.GetVar("oldgame") == 1:
+	if GemRB.GetVar ("oldgame") == 1 and not GameCheck.IsBGEE ():
 		AlignmentAbbrev = CommonTables.Aligns.FindValue ("VALUE", GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT))
 		GUICommon.AddClassAbilities (MyChar, "abstart", 6,6, AlignmentAbbrev)
 
