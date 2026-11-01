@@ -131,11 +131,13 @@ def RunGame(MyChar):
 		if GemRB.GetVar ("ImportedChar"):
 			return
 
-		if GameCheck.IsTOB () and Spellbook.HasSorcererBook (MyChar):
-			# delay for sorcerers, since their class pcf needs to run first to set up their spellbook properly
-			GemRB.SetTimedEvent (lambda: GemRB.ChargeSpells (MyChar), 1)
-		else:
-			GemRB.SetTimedEvent (lambda: GemRB.ExecuteString ("EquipWeapon()", MyChar), 1)
+		# delay equip and sorcerer memo (class pcf needs to run first to set up their spellbook properly)
+		def postSetup ():
+			GemRB.ExecuteString ("EquipWeapon()", MyChar)
+			if Spellbook.HasSorcererBook (MyChar) and (GameCheck.IsTOB () or GameCheck.IsBGEE ()):
+				GemRB.ChargeSpells (MyChar)
+
+		GemRB.SetTimedEvent (postSetup, 1)
 	else:
 		#when export is done, go to start
 		if GameCheck.HasTOB():
