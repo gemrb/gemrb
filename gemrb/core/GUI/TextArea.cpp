@@ -163,7 +163,7 @@ TextContainer* TextArea::SpanSelector::TextAtIndex(Option_t idx)
 		return NULL;
 	}
 
-	std::list<View*>::reverse_iterator it = subViews.rbegin();
+	auto it = subViews.rbegin();
 	std::advance(it, idx);
 	return static_cast<TextContainer*>(*it);
 }
@@ -190,7 +190,7 @@ bool TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mo
 	const TextContainer* span = TextAtPoint(p);
 
 	if (span) {
-		std::list<View*>::reverse_iterator it = subViews.rbegin();
+		auto it = subViews.rbegin();
 		unsigned int idx = 0;
 		while (*it++ != span) {
 			++idx;
@@ -681,7 +681,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 {
 	ClearSelectOptions(); // deletes previous options
 
-	ContentContainer::ContentList::const_reverse_iterator it = textContainer->Contents().rbegin();
+	auto it = textContainer->Contents().rbegin();
 	if (it != textContainer->Contents().rend()) {
 		dialogBeginNode = *it; // need to get the last node *before* we append anything
 	}

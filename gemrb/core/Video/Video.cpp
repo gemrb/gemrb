@@ -84,7 +84,7 @@ VideoBufferPtr Video::CreateBuffer(const Region& r, BufferFormat fmt)
 void Video::DestroyBuffer(VideoBuffer* buffer)
 {
 	// FIXME: this is poorly implemented
-	VideoBuffers::iterator it = std::find(drawingBuffers.begin(), drawingBuffers.end(), buffer);
+	auto it = std::find(drawingBuffers.begin(), drawingBuffers.end(), buffer);
 	if (it != drawingBuffers.end()) {
 		drawingBuffers.erase(it);
 	}

@@ -63,7 +63,7 @@ const targettype* Targets::GetNextTarget(targetlist::iterator& m, ScriptableType
 
 Scriptable* Targets::GetTarget(unsigned int index, ScriptableType type)
 {
-	targetlist::iterator m = objects.begin();
+	auto m = objects.begin();
 	while (m != objects.end()) {
 		if (type == ST_ANY || (*m).actor->Type == type) {
 			if (!index) {

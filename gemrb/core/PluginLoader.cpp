@@ -183,9 +183,8 @@ void LoadPlugins(const path_t& pluginpath, const plugin_flags_t& pluginFlags)
 		LoadPlugin(PathJoin(pluginpath, name).c_str());
 	} while (++dirIt);
 
-	PathSet::iterator it = delayedPlugins.begin();
-	for (; it != delayedPlugins.end(); ++it) {
-		LoadPlugin(it->c_str());
+	for (const auto& plugin : delayedPlugins) {
+		LoadPlugin(plugin.c_str());
 	}
 }
 

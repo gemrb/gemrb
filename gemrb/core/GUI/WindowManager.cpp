@@ -110,7 +110,7 @@ Window* WindowManager::CreateWindow(ScriptingId WindowID, const Region& frame)
 
 void WindowManager::DestroyClosedWindows()
 {
-	WindowList::iterator it = closedWindows.begin();
+	auto it = closedWindows.begin();
 	while (it != closedWindows.end()) {
 		Window* win = *it;
 		// IMPORTANT: ensure the window (a control subview) isn't executing a callback before deleting it
@@ -204,8 +204,8 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 	Window* oldFront = windows.front();
 	// if we only have one window, or the 2 windows are the same it is an automatic success
 	if (windows.size() > 1 && win != win2) {
-		WindowList::iterator it = WIN_IT(win);
-		WindowList::iterator it2 = WIN_IT(win2);
+		auto it = WIN_IT(win);
+		auto it2 = WIN_IT(win2);
 		if (it == windows.end() || it2 == windows.end()) return false;
 
 		windows.erase(it);
@@ -263,7 +263,7 @@ void WindowManager::CloseWindow(Window* win)
 		return;
 	}
 
-	WindowList::iterator it = WIN_IT(win);
+	auto it = WIN_IT(win);
 	if (it == windows.end()) return;
 
 	if (win == ModalWindow()) {
@@ -660,8 +660,7 @@ void WindowManager::DrawWindows() const
 	Window* modalWin = ModalWindow();
 	const Region& frontWinFrame = frontWin->Frame();
 	// we have to draw windows from the bottom up so the front window is drawn last
-	WindowList::const_reverse_iterator rit = windows.rbegin();
-	for (; rit != windows.rend(); ++rit) {
+	for (auto rit = windows.crbegin(); rit != windows.crend(); ++rit) {
 		Window* win = *rit;
 
 		if (!win->IsVisible())

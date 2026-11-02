@@ -274,9 +274,8 @@ ContentContainer::ContentContainer(const Region& frame)
 
 ContentContainer::~ContentContainer()
 {
-	ContentList::iterator it = contents.begin();
-	for (; it != contents.end(); ++it) {
-		delete *it;
+	for (auto& it : contents) {
+		delete it;
 	}
 }
 
@@ -365,8 +364,7 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 		contents.push_front(newContent);
 		LayoutContentsFrom(contents.begin());
 	} else {
-		ContentList::iterator it;
-		it = std::find(contents.begin(), contents.end(), existing);
+		auto it = std::find(contents.begin(), contents.end(), existing);
 		contents.insert(++it, newContent);
 		LayoutContentsFrom(--it);
 	}
@@ -402,8 +400,7 @@ Content* ContentContainer::RemoveContent(const Content* span)
 
 Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 {
-	ContentList::iterator it;
-	it = std::find(contents.begin(), contents.end(), span);
+	auto it = std::find(contents.begin(), contents.end(), span);
 	if (it != contents.end()) {
 		Content* content = *it;
 		it = contents.erase(it);
@@ -547,7 +544,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	// clear the existing layout, but only for "it" and onward
 	ContentList::const_iterator clearit = it;
 	for (; clearit != contents.end(); ++clearit) {
-		ContentLayout::iterator i = std::find(layout.begin(), layout.end(), *clearit);
+		auto i = std::find(layout.begin(), layout.end(), *clearit);
 		if (i != layout.end()) {
 			layoutPoint.reset(); // reset cached layoutPoint
 			// since 'layout' is sorted alongsize 'contents' we should be able clear everything following 'i' and bail
@@ -958,7 +955,7 @@ void TextContainer::AdvanceCursor(int delta)
 TextContainer::ContentIndex TextContainer::FindContentForChar(size_t idx)
 {
 	size_t charCount = 0;
-	ContentList::iterator it = contents.begin();
+	auto it = contents.begin();
 	while (it != contents.end()) {
 		const TextSpan* ts = static_cast<const TextSpan*>(*it);
 		size_t textLength = ts->Text().length();

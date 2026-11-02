@@ -893,7 +893,7 @@ bool View::OnControllerButtonUp(const ControllerEvent& ce)
 
 const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, const ScriptingGroup_t& group)
 {
-	std::vector<ViewScriptingRef*>::iterator it = std::find(scriptingRefs.begin(), scriptingRefs.end(), old);
+	auto it = std::find(scriptingRefs.begin(), scriptingRefs.end(), old);
 	if (it != scriptingRefs.end()) {
 		bool unregistered = ScriptEngine::UnregisterScriptingRef(old);
 		assert(unregistered);

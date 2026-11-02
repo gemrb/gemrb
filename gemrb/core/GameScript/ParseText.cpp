@@ -61,7 +61,7 @@ static int ParseIntParam(const char*& src, const char*& str)
 	if (*str == '*') { // there may be an IDS table
 		str++;
 		ResRef idsTabName;
-		char* cur = idsTabName.begin();
+		auto cur = idsTabName.begin();
 		const char* end = idsTabName.bufend();
 		while (cur != end && *str != ',' && *str != ')') {
 			*cur = *str;

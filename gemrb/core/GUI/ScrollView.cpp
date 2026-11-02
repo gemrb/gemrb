@@ -43,7 +43,7 @@ void ScrollView::ContentView::ResizeToSubviews()
 	Size newSize = superView->Dimensions();
 
 	if (!subViews.empty()) {
-		std::list<View*>::iterator it = subViews.begin();
+		auto it = subViews.begin();
 		Region bounds = (*it)->Frame();
 
 		for (++it; it != subViews.end(); ++it) {

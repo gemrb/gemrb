@@ -1831,9 +1831,7 @@ Actor* Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 
 inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flags, BitOp op)
 {
-	std::vector<View*>::const_iterator it = views.begin();
-	for (; it != views.end(); ++it) {
-		View* view = *it;
+	for (auto view : views) {
 		view->SetFlags(flags, op);
 	}
 }

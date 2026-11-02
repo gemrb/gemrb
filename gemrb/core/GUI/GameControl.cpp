@@ -450,9 +450,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	int flags = GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_SELECT | GA_NO_ENEMY | GA_NO_NEUTRAL;
 	auto ab = area->GetActorsInRect(SelectionRect(), flags);
 
-	std::vector<Actor*>::iterator it = highlighted.begin();
-	for (; it != highlighted.end(); ++it) {
-		Actor* act = *it;
+	for (Actor* act : highlighted) {
 		act->SetOver(false);
 	}
 
@@ -2688,9 +2686,7 @@ void GameControl::MakeSelection(bool extend)
 		game->SelectActor(nullptr, false, SELECT_NORMAL);
 	}
 
-	std::vector<Actor*>::iterator it = highlighted.begin();
-	for (; it != highlighted.end(); ++it) {
-		Actor* act = *it;
+	for (Actor* act : highlighted) {
 		act->SetOver(false);
 		game->SelectActor(act, true, SELECT_NORMAL);
 	}
