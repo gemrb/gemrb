@@ -985,7 +985,7 @@ void Map::DrawMap(const Region& viewport, FogRenderer& fogRenderer, uint32_t dFl
 	VideoDriver->SetStencilBuffer(wallStencil);
 
 	//draw all background animations first
-	aniIterator aniidx = animations.begin();
+	auto aniidx = animations.begin();
 	const AreaAnimation* masterAreaAnimation = nullptr; // save one for syncing purposes
 
 	auto DrawAreaAnimation = [&, this](AreaAnimation* a) {

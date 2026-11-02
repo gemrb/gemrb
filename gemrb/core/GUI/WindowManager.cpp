@@ -758,6 +758,7 @@ Holder<Sprite2D> WindowManager::GetScreenshot(Window* win, unsigned int scaleDow
 Holder<Sprite2D> WindowManager::GetScreenshotPreview()
 {
 	// 5x reduce the image — file size, since buttons scale to fit on their own
+	assert(gameWin);
 	return GetScreenshot(gameWin, 5);
 }
 
