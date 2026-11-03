@@ -684,7 +684,7 @@ FUNCTION(MAKE_APPIMAGE_TARGET)
 		COMMAND
 			make install DESTDIR=./AppDir
 		COMMAND
-			cp "${CMAKE_CURRENT_SOURCE_DIR}"/artwork/gemrb-logo-256px.png AppDir/org.gemrb.gemrb.png
+			cp ../artwork/gemrb-logo-256px.png AppDir/org.gemrb.gemrb.png
 		COMMAND
 			mv AppDir/usr/usr/share/gemrb ${SHARE}/ || true # not always needed
 		COMMAND
