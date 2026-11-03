@@ -199,7 +199,7 @@ def OpenSkillsWindow(chargen, level=0):
 	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
-	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10+1)
+	ScrollBarControl.SetVarAssoc ("TopIndex", 0, 0, RowCount - 10 + 1)
 
 	DoneButton.OnPress (NextPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)

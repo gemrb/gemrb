@@ -325,7 +325,7 @@ def OpenFeatsWindow(chargen=0):
 	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
-	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10)
+	ScrollBarControl.SetVarAssoc ("TopIndex", 0, 0, RowCount - 10)
 	FeatWindow.SetEventProxy(ScrollBarControl)
 
 	DoneButton.OnPress (NextPress)
