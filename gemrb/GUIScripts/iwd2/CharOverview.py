@@ -48,7 +48,6 @@ def UpdateOverview(CurrentStep):
 	GlobalStep = CurrentStep
 	
 	CharGenWindow = GemRB.LoadWindow(0, "GUICG")
-	CharGenWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	PortraitButton = CharGenWindow.GetControl(12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -57,6 +56,7 @@ def UpdateOverview(CurrentStep):
 	PortraitName = GemRB.GetToken('LargePortrait')
 	if CurrentStep > 1:
 		PortraitButton.SetPicture(PortraitName, 'NOPORTLG')
+		PortraitButton.SetState (IE_GUI_BUTTON_DISABLED)
 	
 	# Handle step buttons
 	TextLookup = [11956, 11957, 11959, 11958, 11960, 11983, 11961, 11963]

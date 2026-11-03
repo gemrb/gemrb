@@ -40,6 +40,8 @@ def OnLoad ():
 		if portrait is None:
 			Button.SetFlags (IE_GUI_BUTTON_NORMAL,OP_SET)
 			Button.OnPress (GeneratePress)
+			if i == 18:
+				Button.MakeDefault ()
 		else:
 			Button.SetPicture (portrait["ResRef"])
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)

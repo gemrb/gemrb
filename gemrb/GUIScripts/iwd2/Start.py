@@ -89,6 +89,7 @@ def OnLoad():
 	OptionsButton.SetText(13905)
 	QuitGameButton.SetText(13731)
 	QuitGameButton.MakeEscape()
+	NewGameButton.MakeDefault()
 	NewGameButton.OnPress (NewGamePress)
 	QuitGameButton.OnPress (QuitPress)
 	ProtocolButton.OnPress (ProtocolPress)
