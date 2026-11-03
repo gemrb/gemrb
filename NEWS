@@ -1,7 +1,7 @@
-GemRB git (2e1dae6):
+GemRB git (82915a36):
   New features:
     - 
-    - multithreaded pathfinding
+    - multithreaded pathfinding with better paths
     - audio occlusion based on line of sight
     - intoxication, TobEx Limit effect stacking, modal feats
     - in-game configuration screen for otherwise hidden settings
@@ -9,7 +9,8 @@ GemRB git (2e1dae6):
 
   Improved features:
     - 
-    - tooltips, fonts, pathfinding
+    - pathfinding
+    - tooltips, fonts, iwd2 GUI
     - save game and ee compatibility, effects, projectiles
     - bugfixes
 
