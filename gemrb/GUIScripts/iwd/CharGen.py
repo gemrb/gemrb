@@ -438,7 +438,7 @@ def SetCharacterDescription():
 		if IsThief != "*" or DruidSpell != "*" or IsBard != "*":
 			PositiveStats = []
 			for i in range (4):
-				SkillRow = SkillTable.GetRowName (i)
+				SkillRow = SkillsTable.GetRowName (i)
 				StatID = SkillsTable.GetValue (SkillRow, "ID")
 				Stat = GemRB.GetPlayerStat (MyChar, StatID)
 				if Stat>0:
@@ -448,7 +448,7 @@ def SetCharacterDescription():
 				TextArea.Append (8442)
 				TextArea.Append ("\n")
 				for i, Stat in PositiveStats:
-					SkillRow = SkillTable.GetRowName (i)
+					SkillRow = SkillsTable.GetRowName (i)
 					TextArea.Append (SkillsTable.GetValue (SkillRow, "CAP_REF"))
 					TextArea.Append (": " )
 					TextArea.Append (str(Stat) )
