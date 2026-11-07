@@ -233,7 +233,7 @@ using Regions = std::vector<Region>;
 namespace fmt {
 
 template<>
-struct formatter<GemRB::Point> {
+struct formatter<GemRB::BasePoint> {
 	char presentation = 'd';
 
 	auto parse(const format_parse_context& ctx) const -> decltype(ctx.begin())
@@ -256,9 +256,25 @@ struct formatter<GemRB::Point> {
 	}
 
 	template<typename FormatContext>
-	auto format(const GemRB::Point& p, FormatContext& ctx) const -> decltype(ctx.out())
+	auto format(const GemRB::BasePoint& p, FormatContext& ctx) const -> decltype(ctx.out())
 	{
 		return format_to(ctx.out(), "({:d}, {:d})", p.x, p.y);
+	}
+};
+
+template<>
+struct formatter<GemRB::Point> : formatter<GemRB::BasePoint> {
+	auto format(const GemRB::Point& value, format_context& ctx) const
+	{
+		return formatter<GemRB::BasePoint>::format(value, ctx);
+	}
+};
+
+template<>
+struct formatter<GemRB::SearchmapPoint> : formatter<GemRB::BasePoint> {
+	auto format(const GemRB::SearchmapPoint& value, format_context& ctx) const
+	{
+		return formatter<GemRB::BasePoint>::format(value, ctx);
 	}
 };
 
