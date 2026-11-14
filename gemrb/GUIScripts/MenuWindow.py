@@ -113,8 +113,8 @@ def SetupMenuWindowControls (Window, Gears = None, CloseWindowCallback = None):
 		Button.OnPress (AIPress)
 		AIPress(0) #this initialises the state and tooltip
 
-		# Message popup FIXME disable on non game screen...
-		Button = InitOptionButton (Window, 'Expand', False) # or 41661 Close ...
+		# Big MessageWindow popup
+		InitOptionButton (Window, 'Expand', False)
 	else: ## pst lacks this control here. it is on the clock. iwd2 seems to skip it
 		# Return to Game
 		Button = InitOptionButton (Window, 'Return_To_Game')

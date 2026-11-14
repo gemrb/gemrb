@@ -68,7 +68,7 @@ def OnLoad():
 	CloseButton.MakeDefault()
 	
 	OpenButton = OptionsWindow.GetControl (10)
-	OpenButton.OnPress (MWindow.Focus)
+	OpenButton.OnPress (OpenBigMsgWin)
 
 	SetupClockWindowControls (ActionsWindow)
 	MenuWindow.SetupMenuWindowControls (OptionsWindow)
@@ -111,6 +111,11 @@ def UpdateControlStatus ():
 		MWindow.Focus()
 	elif MWindow:
 		MWindow.Close()
+
+def OpenBigMsgWin ():
+	GUICommonWindows.CloseTopWindow ()
+	MWindow.Focus ()
+	return
 
 def ToggleMenuWindow():
 	pass
