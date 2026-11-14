@@ -22,6 +22,9 @@ SDL12VideoDriver::SDL12VideoDriver() noexcept
 
 SDL12VideoDriver::~SDL12VideoDriver() noexcept
 {
+	scratchBuffer = nullptr;
+	DestroyBuffers();
+
 	if (gameController != nullptr) {
 		SDL_JoystickClose(gameController);
 	}
@@ -405,10 +408,23 @@ void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 void SDL12VideoDriver::BlitVideoBufferFully(const VideoBufferPtr& buf, BlitFlags flags, Color tint)
 {
 	auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();
-	bool nativeBlit = (flags & ~(BlitFlags::HALFTRANS | BlitFlags::ALPHA_MOD | BlitFlags::BLENDED)) == 0 && ((surface->flags & SDL_SRCCOLORKEY) != 0 || (flags & BlitFlags::BLENDED) == 0);
 
 	auto sRect = buf->Rect();
 	auto dRect = drawingBuffer->Rect();
+
+	// EE-style zoom - stretch the region explicitly
+	if (sRect.size != dRect.size) {
+		SDL_Surface* dst = CurrentRenderBuffer();
+		SDL_Rect srcRegion = { 0, 0, static_cast<Uint16>(surface->w), static_cast<Uint16>(surface->h) };
+		SDL_Rect dstRegion = { 0, 0, static_cast<Uint16>(dRect.w), static_cast<Uint16>(dRect.h) };
+		if (SDL_SoftStretch(surface, &srcRegion, dst, &dstRegion) != 0) {
+			Log(ERROR, "SDL 1.2", "{}", SDL_GetError());
+		}
+		return;
+	}
+
+	bool nativeBlit = (flags & ~(BlitFlags::HALFTRANS | BlitFlags::ALPHA_MOD | BlitFlags::BLENDED)) == 0 && ((surface->flags & SDL_SRCCOLORKEY) != 0 || (flags & BlitFlags::BLENDED) == 0);
+
 	SDL_Rect sRegion = { 0, 0, static_cast<uint16_t>(sRect.w), static_cast<uint16_t>(sRect.h) };
 	SDL_Rect dRegion = { 0, 0, static_cast<uint16_t>(dRect.w), static_cast<uint16_t>(dRect.h) };
 

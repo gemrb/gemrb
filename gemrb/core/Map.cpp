@@ -2319,6 +2319,8 @@ void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 
 	stencilViewport = vp;
 
+	objectStencils.clear();
+
 	if (wallStencil == nullptr) {
 		// FIXME: this should be forced 8bit*4 color format
 		// but currently that is forcing some performance killing conversion issues on some platforms
