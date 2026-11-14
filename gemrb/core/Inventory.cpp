@@ -2032,7 +2032,7 @@ HCStrings Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 	}
 
 	//can't equip in shield slot if a weapon slot is twohanded or ranged
-	for (int i = SLOT_MELEE; i <= LAST_MELEE; i++) {
+	for (int i = SLOT_MELEE; i <= LAST_MELEE; i = i + 2) {
 		//see GetShieldSlot
 		int otherslot;
 		if (IWD2) {
