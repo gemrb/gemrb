@@ -21,7 +21,7 @@ def OnLoad():
 	OptionsWindow.AddAlias("OPTWIN")
 	OptionsWindow.AddAlias("HIDE_CUT", 2)
 	OptionsWindow.AddAlias("NOT_DLG", 1)
-	MenuWindow.SetupMenuWindowControls (OptionsWindow, 1, None)
+	MenuWindow.SetupMenuWindowControls (OptionsWindow, True)
 
 	# this also has the small MTA window
 	OptionsWindow.AddAlias("MSGWIN")

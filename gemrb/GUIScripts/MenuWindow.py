@@ -78,7 +78,7 @@ def InitOptionButton(Window, Index, HotKey = True):
 
 	return Button
 
-def SetupMenuWindowControls (Window, Gears = None, CloseWindowCallback = None):
+def SetupMenuWindowControls (Window, Gears = None):
 	"""Binds all of the basic controls and windows to the options pane."""
 
 	bg1 = GameCheck.IsBG1 ()

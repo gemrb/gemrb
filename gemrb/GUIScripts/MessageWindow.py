@@ -57,7 +57,7 @@ def OnLoad():
 	OptionsWindow.AddAlias("HIDE_CUT", 2)
 	OptionsWindow.AddAlias("NOT_DLG", 1)
 	
-	MenuWindow.SetupMenuWindowControls (OptionsWindow, 1, None)
+	MenuWindow.SetupMenuWindowControls (OptionsWindow, True)
 	PortraitWin = PortraitWindow.OpenPortraitWindow(1)
 	PortraitWin.AddAlias("HIDE_CUT", 3)
 	PortraitWin.AddAlias("NOT_DLG", 2)
