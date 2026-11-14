@@ -36,7 +36,7 @@ Left_Interface        MessageWindow    ToggleMenuWindow                  0
 Toggle_AI             MenuWindow       AIPress                           0
 Hard_Pause            GUICommonWindows HardPausePressed                  0
 Location              GUICommon        LocationPressed                   0
-Chat_Window           GUIMP            *
+Chat_Window           GUIMP            *                                 0
 Center_Character      MenuWindow       OnLockViewPress                   0
 Spell_Slot_1          ActionsWindow    ActionQSpell1Pressed              0
 Spell_Slot_2          ActionsWindow    ActionQSpell2Pressed              0

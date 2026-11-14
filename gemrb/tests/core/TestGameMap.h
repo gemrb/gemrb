@@ -135,7 +135,7 @@ public:
 	}
 
 	/** Prints the current state of the map */
-	void Print()
+	void Print() const
 	{
 		auto searchMap = drawn.Render();
 		for (const auto& cell : searchMap) {

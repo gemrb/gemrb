@@ -27,7 +27,7 @@ def OnLoad():
 
 	# TODO: we can uncomment the "HIDE_CUT" lines below to hide the windows for cutscenes
 	# the original doesn't hide them and it looks like there is a map drawing bug at the bottom of the screen due to the bottom
-	# row of tiles getting squished for not fitting perfectly on screen (tho I havent seen this in BG2, but maybe wasnt paying attention)
+	# row of tiles getting squished for not fitting perfectly on screen (though I havent seen this in BG2, but maybe wasn't paying attention)
 
 	ActionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_LEFT)
 	ActionsWindow.AddAlias("ACTWIN")

@@ -72,7 +72,7 @@ def InitOptionButton(Window, Index, HotKey = True):
 	if HotKey:
 		Button.SetHotKey (Index, True)
 		
-	# this variable isnt used anywhere (tho it might be useful to use it for knowing what window is open)
+	# this variable isn't used anywhere (though it might be useful to use it for knowing what window is open)
 	# however, we still need to set one because we do depend on the button having a value
 	Button.SetVarAssoc ("OPT_BTN", OptionControl[Index])
 
