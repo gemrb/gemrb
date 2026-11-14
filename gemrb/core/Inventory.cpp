@@ -2001,6 +2001,14 @@ bool Inventory::IsSlotBlocked(int slot) const
 
 inline HCStrings Inventory::CanUseShieldSlot(int slot, bool ranged) const
 {
+	if (IWD2) {
+		// make sure the main hand does not contain a 2h weapon
+		const CREItem* mainItem = GetSlotItem(slot - 1);
+		if (mainItem && mainItem->Flags & IE_INV_ITEM_TWOHANDED) {
+			return HCStrings::TwohandedUsed;
+		}
+	}
+
 	const CREItem* item = GetSlotItem(slot);
 	if (!item) return HCStrings::count;
 
