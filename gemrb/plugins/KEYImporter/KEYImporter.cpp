@@ -116,6 +116,9 @@ bool KEYImporter::Open(const path_t& resfile, std::string desc)
 	    ResCount, ResOffset);
 	f->Seek(BifOffset, GEM_STREAM_START);
 
+	// search for bifs in a safe locale, so the lowercasing can't break it
+	// e.g. tr_TR data/GUIbam.bif lowercases to data/guIbam.bif
+	setlocale(LC_ALL, "C");
 	ieDword BifLen, ASCIIZOffset;
 	ieWord ASCIIZLen;
 	for (unsigned int i = 0; i < BifCount; i++) {
@@ -144,6 +147,7 @@ bool KEYImporter::Open(const path_t& resfile, std::string desc)
 		biffiles.push_back(std::move(be));
 	}
 	f->Seek(ResOffset, GEM_STREAM_START);
+	setlocale(LC_ALL, "");
 
 	MapKey key;
 	ieDword ResLocator;
