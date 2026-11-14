@@ -483,7 +483,7 @@ void WorldMap::ClearEncounterArea()
 int WorldMap::GetDistance(const ResRef& areaName) const
 {
 	size_t i;
-	if (GetArea(areaName, i)) {
+	if (GetArea(areaName, i) && i < Distances.size()) {
 		return Distances[i];
 	}
 	return -1;
