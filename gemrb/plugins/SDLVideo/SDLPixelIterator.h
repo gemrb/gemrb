@@ -5,6 +5,8 @@
 #ifndef SDL_PIXEL_ITERATOR_H
 #define SDL_PIXEL_ITERATOR_H
 
+#include "SDLVideo.h"
+
 #include "Video/Pixels.h"
 
 namespace GemRB {

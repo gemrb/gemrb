@@ -345,6 +345,12 @@ void SDL12VideoDriver::BlitWithPipeline(SDLPixelIterator& src, SDLPixelIterator&
 		BlendFn = ShaderAdditive;
 	} else if (flags & BlitFlags::MOD) {
 		BlendFn = ShaderTint;
+	} else if (flags & BlitFlags::ONE_MINUS_DST) {
+		BlendFn = ShaderOneMinusDst;
+	} else if (flags & BlitFlags::DST) {
+		BlendFn = ShaderDst;
+	} else if (flags & BlitFlags::SRC) {
+		BlendFn = ShaderSrc;
 	}
 
 	if (flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)) {
