@@ -51,7 +51,7 @@ Holder<Sprite2D> AnimationFactory::GetFrame(index_t index, index_t cycle) const
 	if (index >= fc) {
 		return nullptr;
 	}
-	return frames[FLTable[ff + index]];
+	return GetFrameWithoutCycle(FLTable[ff + index]);
 }
 
 Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(index_t index) const
