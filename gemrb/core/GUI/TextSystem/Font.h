@@ -46,15 +46,16 @@ enum FontStyle {
 #define IE_FONT_NO_CALC 0x80
 
 struct Glyph {
-	const Size size;
-	const Point pos;
+	const Size size; // dimensions of the rendered pixels (the ink), not of the advance
+	const Point pos; // offset from the pen position; x is the left side bearing
+	const int advance; // how far the pen moves after this glyph; >= size.w for most TTF glyphs
 
 	const ieWord pitch;
 	const ieByte* pixels;
 	const uint8_t bytesPerPx;
 
-	Glyph(const Size& size, Point pos, const ieByte* pixels, ieWord pitch, uint8_t bpp)
-		: size(size), pos(pos), pitch(pitch), pixels(pixels), bytesPerPx(bpp) {};
+	Glyph(const Size& size, Point pos, int advance, const ieByte* pixels, ieWord pitch, uint8_t bpp)
+		: size(size), pos(pos), advance(advance), pitch(pitch), pixels(pixels), bytesPerPx(bpp) {};
 };
 
 /**
@@ -169,7 +170,9 @@ public:
 	Font& operator=(const Font&) = delete;
 	virtual ~Font() = default;
 
-	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>&);
+	// advance < 0 means "use the sprite width", which is all a BAM font has to go on;
+	// TTF fonts pass the real horizontal advance and left side bearing from the face
+	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>&, int advance = -1, int bearingX = 0);
 	// BAM fonts use alisases a lot so this saves quite a bit of space
 	// Aliases are 2 glyphs that share identical frames such as 'ā' and 'a'
 	void CreateAliasForChar(ieWord chr, ieWord alias);
