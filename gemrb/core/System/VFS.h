@@ -49,6 +49,10 @@ GEM_EXPORT path_t BundlePath(BundleDirectory dir = BUNDLE);
 const char PathDelimiter = '\\';
 const char16_t PathDelimiterW = u'\\';
 const char PathListSeparator = ';';
+#elif defined(AMIGA)
+const char PathDelimiter = '/';
+const char16_t PathDelimiterW = u'/';
+const char PathListSeparator = ';';
 #else
 const char PathDelimiter = '/';
 const char16_t PathDelimiterW = u'/';
