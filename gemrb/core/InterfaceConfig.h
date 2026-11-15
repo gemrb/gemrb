@@ -45,7 +45,7 @@ struct CoreSettings {
 	path_t GameLanguagePath = "lang/en_US";
 	path_t GameMoviesPath = "movies";
 	path_t SavePath;
-	path_t CachePath = "./Cache2";
+	path_t CachePath = "Cache2";
 	std::vector<path_t> CD[MAX_CD];
 	std::vector<path_t> ModPath;
 	path_t CustomFontPath = "/usr/share/fonts/TTF";
