@@ -43,6 +43,10 @@
 	#define S_ISREG(mode) (((mode) & S_IFMT) == S_IFREG)
 #endif
 
+#ifdef AMIGA
+int access(const char* path, int amode);
+#endif
+
 #ifdef WIN32
 
 	#include <array>
@@ -284,6 +288,11 @@ std::tm* FileModificationTime(const path_t& path)
 
 void PathAppend(path_t& target, const path_t& name)
 {
+#ifdef AMIGA
+	AmigaPathAppend(target, name);
+	return;
+#endif
+
 	if (name.empty()) {
 		return;
 	}
@@ -368,7 +377,12 @@ path_t& ResolveCase(path_t& filePath)
 		MutableStringView msv(filePath);
 		ResolveCase(msv, nextItem);
 	} else if (!DirExists(filePath)) { // filePath is a single component
+		// FIXME: we ignore the return value, so this looks like a noop
+#ifdef AMIGA
+		FindMatchInDir("", MutableStringView { filePath });
+#else
 		FindMatchInDir(".", MutableStringView { filePath });
+#endif
 	}
 
 	return filePath;
@@ -376,6 +390,10 @@ path_t& ResolveCase(path_t& filePath)
 
 path_t& FixPath(path_t& path)
 {
+#ifdef AMIGA
+	return AmigaFixPath(path);
+#endif
+
 	if (path.empty()) {
 		return path;
 	}
@@ -497,6 +515,10 @@ void DelTree(const path_t& path, bool onlySave)
 
 GEM_EXPORT path_t HomePath()
 {
+#ifdef AMIGA
+	return "";
+#endif
+
 	const char* home = getenv("HOME");
 	if (home) {
 		return home;
@@ -580,7 +602,12 @@ path_t GemDataPath()
 	if (!outPath.empty()) {
 		PathAppend(outPath, PACKAGE);
 	} else {
+	#ifdef AMIGA
+		// AmigaOS uses local paths; an empty path means the current location
+		outPath.clear();
+	#else
 		outPath = path_t(".") + SPathDelimiter;
+	#endif
 	}
 #endif
 
@@ -766,6 +793,13 @@ void DirectoryIterator::Rewind()
 	if (Directory)
 		closedir(static_cast<DIR*>(Directory));
 	Directory = opendir(Path.c_str());
+#ifdef AMIGA
+	if (Directory == nullptr) {
+		path_t fixedPath = Path;
+		FixPath(fixedPath);
+		Directory = opendir(fixedPath.c_str());
+	}
+#endif
 	if (Directory == nullptr) {
 		Entry = nullptr;
 		//Log(WARNING, "DirectoryIterator", "Cannot open directory: {}\nError: {}", Path, strerror(errno));

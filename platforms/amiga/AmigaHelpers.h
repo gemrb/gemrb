@@ -6,13 +6,15 @@
 #define AMIGAHELPERS_H
 
 #include "../../gemrb/core/Streams/DataStream.h"
+#include "../../gemrb/core/System/VFS.h"
 
 #include <cstddef>
 
 namespace GemRB {
 
 bool AmigaMMap(void* fileHandle, strpos_t size, char*& data);
-
+path_t& AmigaFixPath(path_t& path);
+void AmigaPathAppend(path_t& target, const path_t& name);
 };
 
 #endif
