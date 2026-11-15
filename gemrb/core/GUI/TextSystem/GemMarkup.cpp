@@ -6,7 +6,7 @@
 
 #include "TextContainer.h"
 
-#include <codecvt>
+#include <cstdlib>
 
 namespace GemRB {
 
@@ -221,12 +221,9 @@ GemMarkupParser::ParseState
 				break;
 			case INT:
 				if (*it == u']') {
-					std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::little_endian>, wchar_t> conv;
-					std::wstring wToken = conv.from_bytes(
-						reinterpret_cast<const char*>(token.data()),
-						reinterpret_cast<const char*>(token.data() + token.size()));
-					// state icons, invalid as unicode, so we cant translate in Python
-					wchar_t chr = (wchar_t) wcstoul(wToken.c_str(), nullptr, 0);
+					// Markup integers contain ASCII; preserve native-endian UTF-16.
+					std::string digits(token.begin(), token.end());
+					char16_t chr = static_cast<char16_t>(strtoul(digits.c_str(), nullptr, 0));
 					token.clear();
 					token.push_back(chr);
 					state = TEXT;
