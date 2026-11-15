@@ -69,9 +69,6 @@ public:
 	DataStream(const DataStream&) = delete;
 	DataStream& operator=(const DataStream&) = delete;
 
-	// FIXME: these should wrap private implementations
-	// so that we can properly swab the read data
-	// if (NeedEndianSwap()) swabs(..., len);
 	virtual strret_t Read(void* dest, strpos_t len) = 0;
 	virtual strret_t Write(const void* src, strpos_t len) = 0;
 
