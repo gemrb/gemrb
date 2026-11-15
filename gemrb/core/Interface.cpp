@@ -3095,10 +3095,7 @@ bool Interface::StupidityDetector(const path_t& path) const
 		const path_t& name = dir.GetName();
 		if (dir.IsDirectory()) {
 			// since we can't use DirectoryIterator::Hidden, exclude the special dirs manually
-			if (name[0] == '.' && name[1] == '\0') {
-				continue;
-			}
-			if (name[0] == '.' && name[1] == '.' && name[2] == '\0') {
+			if (name == "." || name == "..") {
 				continue;
 			}
 			Log(ERROR, "Interface", "**contains another dir**");
