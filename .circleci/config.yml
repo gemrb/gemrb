@@ -23,7 +23,7 @@ jobs:
           openal="-DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/AL -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib"
           mkdir build && cd build
           export OPENALDIR="/usr/local/opt/openal-soft/"
-          cmake -DCMAKE_INSTALL_PREFIX=iprefix -DBIN_DIR="$CIRCLE_WORKING_DIRECTORY" $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off -DUSE_TESTS=ON ..
+          cmake -DCMAKE_INSTALL_PREFIX=iprefix -DBIN_DIR="$CIRCLE_WORKING_DIRECTORY" $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off -DUSE_TESTS=ON -DFONTS_DIR="~/Library/Fonts" ..
 
       - run: |
           cd build
