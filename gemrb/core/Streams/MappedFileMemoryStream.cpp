@@ -5,7 +5,7 @@
 #include <cassert>
 
 #ifdef AMIGA
-	#include <cstdlib>
+	#include "../../../platforms/amiga/AmigaHelpers.h"
 #endif
 
 #if !defined(WIN32) && !defined(AMIGA)
@@ -61,27 +61,7 @@ MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)
 
 	if (fileOpened) {
 #ifdef AMIGA
-		/*
-		 * AmigaOS has no mmap(), so load the complete file into
-		 * an allocated memory block.
-		 */
-		const size_t allocationSize = size != 0 ? static_cast<size_t>(size) : 1;
-		this->data = static_cast<char*>(std::malloc(allocationSize));
-		if (data != nullptr) {
-			FILE* file = static_cast<FILE*>(fileHandle);
-
-			if (size == 0) {
-				this->fileMapped = true;
-			} else {
-				const size_t bytesRead = fread(data, 1, static_cast<size_t>(size), file);
-				this->fileMapped = bytesRead == static_cast<size_t>(size);
-			}
-
-			if (!fileMapped) {
-				std::free(data);
-				data = nullptr;
-			}
-		}
+		fileMapped = AmigaMMap(fileHandle, size, data);
 #else
 		this->data = static_cast<char*>(readonly_mmap(fileHandle));
 		this->fileMapped = data != nullptr;
