@@ -215,7 +215,6 @@ CoreSettings LoadFromDictionary(InterfaceConfig cfg)
 		ResolveFilePath(field);
 	};
 
-	// TODO: make CustomFontPath default cross platform
 	CONFIG_PATH("CustomFontPath", config.CustomFontPath);
 	CONFIG_PATH("GameCharactersPath", config.GameCharactersPath);
 	CONFIG_PATH("GameDataPath", config.GameDataPath);

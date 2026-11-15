@@ -15,6 +15,7 @@
 #cmakedefine PLUGIN_DIR "${PLUGIN_DIR}"
 #cmakedefine DATA_DIR "${DATA_DIR}"
 #cmakedefine SYSCONF_DIR "${SYSCONF_DIR}"
+#cmakedefine FONTS_DIR "${FONTS_DIR}"
 #cmakedefine OPENGL_BACKEND ${OPENGL_BACKEND}
 #cmakedefine NOFPSLIMIT ${NOFPSLIMIT}
 #cmakedefine HAVE_UNISTD_H 1
