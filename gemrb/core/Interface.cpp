@@ -1225,20 +1225,21 @@ void Interface::LoadSprites()
 	// Load ground circle bitmaps (PST only)
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-		if (!GroundCircleBam[size].IsEmpty()) {
-			anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(GroundCircleBam[size], IE_BAM_CLASS_ID);
-			if (!anim || anim->GetCycleCount() != 6) {
-				// unknown type of circle anim
-				ThrowException("Failed Loading Ground circle bitmaps...");
-			}
+		if (GroundCircleBam[size].IsEmpty()) {
+			continue;
+		}
+		anim = gamedata->GetFactoryResourceAs<const AnimationFactory>(GroundCircleBam[size], IE_BAM_CLASS_ID);
+		if (!anim || anim->GetCycleCount() != 6) {
+			// unknown type of circle anim
+			ThrowException("Failed Loading Ground circle bitmaps...");
+		}
 
-			for (int i = 0; i < 6; i++) {
-				Holder<Sprite2D> sprite = anim->GetFrame(0, (ieByte) i);
-				if (GroundCircleScale[size]) {
-					sprite = VideoDriver->SpriteScaleDown(sprite, GroundCircleScale[size]);
-				}
-				GroundCircles[size][i] = std::move(sprite);
+		for (int i = 0; i < 6; i++) {
+			Holder<Sprite2D> sprite = anim->GetFrame(0, (ieByte) i);
+			if (GroundCircleScale[size]) {
+				sprite = VideoDriver->SpriteScaleDown(sprite, GroundCircleScale[size]);
 			}
+			GroundCircles[size][i] = std::move(sprite);
 		}
 	}
 }
