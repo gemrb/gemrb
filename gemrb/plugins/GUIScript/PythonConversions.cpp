@@ -129,7 +129,7 @@ PyObject* PyString_FromStringObj(const std::string& s)
 
 PyObject* PyString_FromStringObj(const String& s)
 {
-	return PyUnicode_Decode(reinterpret_cast<const char*>(s.c_str()), s.length() * sizeof(char16_t), "UTF-16", "strict");
+	return PyUnicode_Decode(reinterpret_cast<const char*>(s.c_str()), s.length() * sizeof(char16_t), (IsBigEndian() ? "UTF-16BE" : "UTF-16LE"), "strict");
 }
 
 String PyString_AsStringObj(PyObject* obj)
