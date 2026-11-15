@@ -2,4 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+SET(FONTS_DIR "Fonts:_TrueType")
+
 include_directories(AFTER SYSTEM "${CMAKE_CURRENT_LIST_DIR}")
