@@ -1292,8 +1292,7 @@ bool Interface::IsAvailable(SClass_ID filetype) const
 
 WorldMap* Interface::GetWorldMap() const
 {
-	size_t index = worldmap->FindAndSetCurrentMap(game->CurrentArea);
-	return worldmap->GetWorldMap(index);
+	return GetWorldMap(game->CurrentArea);
 }
 
 WorldMap* Interface::GetWorldMap(const ResRef& area) const
