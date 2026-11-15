@@ -243,7 +243,10 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 
 	std::vector<index_t> FLT(count);
 	str->Seek(FLTOffset, GEM_STREAM_START);
-	str->ReadArray(FLT);
+	// ReadScalar converts the file byte order to the host byte order
+	for (auto& frameIndex : FLT) {
+		str->ReadWord(frameIndex);
+	}
 	return FLT;
 }
 
@@ -254,7 +257,8 @@ std::shared_ptr<AnimationFactory> BAMImporter::GetAnimationFactory(const ResRef&
 	if (version == BAMVersion::V1) {
 		auto FLT = CacheFLT();
 		for (const auto& frameInfo : frames) {
-			bool RLECompressed = allowCompression && frameInfo.RLE;
+			// The optimized RLE renderer assumes little-endian host layout
+			bool RLECompressed = allowCompression && frameInfo.RLE && !IsBigEndian();
 			animframes.push_back(GetFrameInternal(frameInfo, RLECompressed));
 		}
 

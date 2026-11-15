@@ -122,7 +122,11 @@ int WEDImporter::AddOverlay(TileMap* tm, const Overlay* newOverlays, bool rain) 
 			}
 			str->Seek(newOverlays->TILOffset + startindex * 2, GEM_STREAM_START);
 			std::vector<ieWord> indices(count);
-			str->ReadArray(indices);
+			// WED stores these words little-endian. ReadArray is a raw byte copy,
+			// which turns tile 19 into 4864 on big-endian m68k.
+			for (auto& index : indices) {
+				str->ReadWord(index);
+			}
 
 			Tile* tile;
 			if (secondary == 0xffff) {
@@ -246,7 +250,10 @@ std::vector<ieWord> WEDImporter::GetDoorIndices(const ResRef& resref, bool& Base
 	//Reading Door Tile Cells
 	str->Seek(DoorTilesOffset + (DoorTileStart * 2), GEM_STREAM_START);
 	auto DoorTiles = std::vector<ieWord>(DoorTileCount);
-	str->ReadArray(DoorTiles);
+	// not using ReadArray to get correct values on big-endian machines
+	for (auto& tile : DoorTiles) {
+		str->ReadWord(tile);
+	}
 
 	BaseClosed = DoorClosed != 0;
 	return DoorTiles;

@@ -410,10 +410,13 @@ MVEPlayer::FrameResult MVEPlayer::RenderFrame(uint16_t size)
 		return FrameResult::ERROR;
 	}
 
-	uint16_t flags = 0;
-	if (str->Read(&flags, 2) != 2) {
+	std::array<uint8_t, 2> flagBytes;
+	if (str->Read(flagBytes.data(), flagBytes.size()) != static_cast<strret_t>(flagBytes.size())) {
 		return FrameResult::ERROR;
 	}
+
+	// MVE flags are stored little endian, independent of host byte order.
+	uint16_t flags = GST_READ_UINT16_LE(flagBytes.data());
 
 	size -= 14;
 	if (flags & MVE_VIDEO_DELTA_FRAME) {

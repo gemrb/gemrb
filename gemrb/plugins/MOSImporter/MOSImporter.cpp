@@ -113,7 +113,7 @@ Holder<Sprite2D> MOSImporter::GetSprite2Dv2()
 Holder<Sprite2D> MOSImporter::GetSprite2Dv1()
 {
 	Color Col[256];
-	unsigned char* pixels = (unsigned char*) malloc(size.Area() * 4);
+	uint32_t* pixels = static_cast<uint32_t*>(malloc(size.Area() * sizeof(uint32_t)));
 	unsigned char* blockpixels = (unsigned char*)
 		malloc(layout.v1.BlockSize * layout.v1.BlockSize);
 	ieDword blockoffset;
@@ -130,7 +130,17 @@ Holder<Sprite2D> MOSImporter::GetSprite2Dv1()
 			str->Seek(PalOffset + (y * Cols * 1024) +
 					  (x * 1024),
 				  GEM_STREAM_START);
-			str->Read(&Col[0], 1024);
+			// MOS V1 palettes are stored as BGRA bytes. Reading all four bytes
+			// directly into Color and later treating them as a native 32-bit
+			// pixel only worked by accident on little-endian hosts.
+			for (auto& color : Col) {
+				str->Read(&color.b, 1);
+				str->Read(&color.g, 1);
+				str->Read(&color.r, 1);
+				unsigned char unused;
+				str->Read(&unused, 1);
+				color.a = 0xff;
+			}
 			str->Seek(PalOffset + (Rows * Cols * 1024) +
 					  (y * Cols * 4) + (x * 4),
 				  GEM_STREAM_START);
@@ -140,22 +150,17 @@ Holder<Sprite2D> MOSImporter::GetSprite2Dv1()
 				  GEM_STREAM_START);
 			str->Read(blockpixels, bw * bh);
 			const unsigned char* bp = blockpixels;
-			unsigned char* startpixel = pixels +
-				((size.w * 4 * y) * 64) +
-				(4 * x * 64);
+			uint32_t* startpixel = pixels +
+				((size.w * y) * 64) +
+				(x * 64);
 			for (int h = 0; h < bh; h++) {
 				for (int w = 0; w < bw; w++) {
-					*startpixel = Col[*bp].r;
-					startpixel++;
-					*startpixel = Col[*bp].g;
-					startpixel++;
-					*startpixel = Col[*bp].b;
-					startpixel++;
-					*startpixel = Col[*bp].a;
-					startpixel++;
+					const Color& color = Col[*bp];
+					*startpixel++ = (static_cast<uint32_t>(color.r) << 16) |
+						(static_cast<uint32_t>(color.g) << 8) | color.b;
 					bp++;
 				}
-				startpixel = startpixel + (size.w * 4) - (4 * bw);
+				startpixel = startpixel + size.w - bw;
 			}
 		}
 	}

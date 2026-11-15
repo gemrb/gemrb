@@ -160,7 +160,8 @@ bool WavPCMReader::Import(DataStream* stream)
 	if (memcmp(&data_hdr.fourcc, fact_4cc, 4) == 0) {
 		str->Seek(data_hdr.length, GEM_CURRENT_POS);
 		//str->Read( &data_hdr, sizeof( data_hdr ) );
-		str->ReadDword(data_hdr.fourcc);
+		// FourCC values are byte strings, not integers.
+		str->Read(&data_hdr.fourcc, 4);
 		str->ReadDword(data_hdr.length);
 	}
 	if (memcmp(&data_hdr.fourcc, data_4cc, 4) != 0) {
