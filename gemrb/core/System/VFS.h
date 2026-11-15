@@ -17,6 +17,7 @@
 
 #include "fmt/format.h"
 
+#include <ctime>
 #include <string>
 
 #ifdef WIN32
