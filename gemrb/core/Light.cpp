@@ -10,27 +10,10 @@
 
 namespace GemRB {
 
-static Holder<Palette> GetLightPalette() noexcept
-{
-	static struct Init {
-		Holder<Palette> pal;
-		Init() noexcept
-		{
-			Color cols[256] { ColorBlack };
-			for (int i = 1; i < 256; ++i) {
-				cols[i] = ColorWhite;
-				cols[i].a = i;
-			}
-			pal = MakeHolder<Palette>(std::begin(cols), std::end(cols));
-		}
-	} data;
-
-	return data.pal;
-}
-
 Holder<Sprite2D> CreateLight(const Size& size, uint8_t intensity) noexcept
 {
-	uint8_t* px = (uint8_t*) calloc(size.w, size.h);
+	// Use a 32bit sprite with per-pixel alpha.
+	uint32_t* px = (uint32_t*) calloc(size.w * size.h, sizeof(uint32_t));
 
 	const Point& radii = size.Center();
 	const float maxr = std::max<float>(radii.x, radii.y);
@@ -52,15 +35,16 @@ Holder<Sprite2D> CreateLight(const Size& size, uint8_t intensity) noexcept
 			uint8_t dist = static_cast<uint8_t>((hyp / maxr) * intensity);
 			assert(dist <= intensity);
 			uint8_t light = Clamp<uint8_t>(intensity - dist, 0, intensity);
-			px[(radii.y + q1.y) * size.w + radii.x + x] = light; // quad 1
-			px[(radii.y + q2.y) * size.w + radii.x - x] = light; // quad 2
-			px[(radii.y + q3.y) * size.w + radii.x - x] = light; // quad 3
-			px[(radii.y + q4.y) * size.w + radii.x + x] = light; // quad 4
+			uint32_t color = (uint32_t(light) << 24) | 0x00FFFFFF;
+			px[(radii.y + q1.y) * size.w + radii.x + x] = color; // quad 1
+			px[(radii.y + q2.y) * size.w + radii.x - x] = color; // quad 2
+			px[(radii.y + q3.y) * size.w + radii.x - x] = color; // quad 3
+			px[(radii.y + q4.y) * size.w + radii.x + x] = color; // quad 4
 		}
 	}
 
 	r.origin = radii;
-	PixelFormat fmt = PixelFormat::Paletted8Bit(GetLightPalette(), true, 0);
+	PixelFormat fmt = PixelFormat::ARGB32Bit();
 	return VideoDriver->CreateSprite(r, px, fmt);
 }
 
