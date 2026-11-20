@@ -351,16 +351,12 @@ void SDLVideoDriver::ConfigurePointer(int pointerSpeed, int pointerAccel, int de
 Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, const PixelFormat& fmt)
 {
 	if (fmt.RLE) {
-#if SDL_VERSION_ATLEAST(1, 3, 0)
-		// SDL2 should not allow RLE sprites so convert it
+		// Decode RLE for every backend
 		void* newpixels = DecodeRLEData(static_cast<uint8_t*>(pixels), rgn.size, fmt.ColorKey);
 		free(pixels);
 		PixelFormat newfmt = fmt;
 		newfmt.RLE = false;
 		return MakeHolder<sprite_t>(rgn, newpixels, newfmt);
-#else
-		return MakeHolder<sprite_t>(rgn, pixels, fmt);
-#endif
 	}
 	return MakeHolder<sprite_t>(rgn, pixels, fmt);
 }

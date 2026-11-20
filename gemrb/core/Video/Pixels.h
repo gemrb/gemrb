@@ -168,6 +168,38 @@ inline void ShaderAdditive(const Color& src, Color& dst)
 	dst.b = src.b + dst.b;
 }
 
+inline uint8_t AddSaturate(uint8_t dst, unsigned add)
+{
+	unsigned v = unsigned(dst) + add;
+	return uint8_t(v > 255 ? 255 : v);
+}
+
+// software equivalents of the custom GL blenders (used for the "blend black"
+// glow effects, e.g. VVC spells and area-animation fountains)
+inline void ShaderSrc(const Color& src, Color& dst)
+{
+	dst.r = AddSaturate(dst.r, unsigned(src.r) * src.r / 255);
+	dst.g = AddSaturate(dst.g, unsigned(src.g) * src.g / 255);
+	dst.b = AddSaturate(dst.b, unsigned(src.b) * src.b / 255);
+	dst.a = AddSaturate(dst.a, unsigned(src.a) * src.a / 255);
+}
+
+inline void ShaderDst(const Color& src, Color& dst)
+{
+	dst.r = AddSaturate(dst.r, unsigned(src.r) * dst.r / 255);
+	dst.g = AddSaturate(dst.g, unsigned(src.g) * dst.g / 255);
+	dst.b = AddSaturate(dst.b, unsigned(src.b) * dst.b / 255);
+	dst.a = AddSaturate(dst.a, unsigned(src.a) * dst.a / 255);
+}
+
+inline void ShaderOneMinusDst(const Color& src, Color& dst)
+{
+	dst.r = AddSaturate(dst.r, unsigned(src.r) * (255 - dst.r) / 255);
+	dst.g = AddSaturate(dst.g, unsigned(src.g) * (255 - dst.g) / 255);
+	dst.b = AddSaturate(dst.b, unsigned(src.b) * (255 - dst.b) / 255);
+	dst.a = AddSaturate(dst.a, unsigned(src.a) * (255 - dst.a) / 255);
+}
+
 template<bool MASKED, bool SRCALPHA>
 struct OneMinusSrcA : RGBBlender {
 	void operator()(const Color& c, Color& dst, uint8_t mask) const override
@@ -243,7 +275,10 @@ public:
 		}
 
 		Color c = src;
-		c.a = mask ? (255 - mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+		c.a = c.a * (255 - mask) / 255;
+		if (c.a == 0) {
+			return;
+		}
 
 		// first apply "shader"
 		switch (SHADE) {
