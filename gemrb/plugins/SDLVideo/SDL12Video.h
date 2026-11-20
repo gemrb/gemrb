@@ -56,7 +56,7 @@ private:
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
 
-	IAlphaIterator* StencilIterator(BlitFlags flags, const Region& dst) const;
+	IAlphaIterator* StencilIterator(BlitFlags flags, Region dst) const;
 
 	int ProcessEvent(const SDL_Event& event) override;
 

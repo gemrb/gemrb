@@ -106,7 +106,7 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 	}
 }
 
-IAlphaIterator* SDL12VideoDriver::StencilIterator(BlitFlags flags, const Region& maskclip) const
+IAlphaIterator* SDL12VideoDriver::StencilIterator(BlitFlags flags, Region& maskclip) const
 {
 	struct SurfaceAlphaIterator : RGBAChannelIterator {
 		SDLPixelIteratorWrapper wrap;
